@@ -8,7 +8,7 @@ SET(Filters_SRCS
   vtkCaveRenderManager.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkClientCompositeManager.cxx
-  vtkColorByPart.cxx
+#  vtkColorByPart.cxx
   vtkCompleteArrays.cxx
   vtkCVGeometryCache.cxx
   vtkDataAnalysisFilter.cxx
@@ -17,7 +17,7 @@ SET(Filters_SRCS
   vtkDesktopDeliveryServer.cxx
   vtkExtractHistogram.cxx
   vtkExtractScatterPlot.cxx
-  vtkGroup.cxx
+#  vtkGroup.cxx
   vtkHDF5RawImageReader.cxx
   vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
@@ -72,7 +72,7 @@ SET(Filters_SRCS
   vtkPVUpdateSuppressor.cxx
   vtkPhastaReader.cxx
   vtkPickFilter.cxx
-  vtkSelectInputs.cxx
+#  vtkSelectInputs.cxx
   vtkSpyPlotReader.cxx
   vtkStreamingTessellator.cxx
   vtkSubdivisionAlgorithm.cxx

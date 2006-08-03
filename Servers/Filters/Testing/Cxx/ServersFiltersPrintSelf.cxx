@@ -18,22 +18,20 @@
 #include "vtkCaveRenderManager.h"
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkClientCompositeManager.h"
-#include "vtkColorByPart.h"
 #include "vtkCompleteArrays.h"
 #include "vtkCVGeometryCache.h"
 #include "vtkDataAnalysisFilter.h"
 #include "vtkDataSetSubdivisionAlgorithm.h"
-#include "vtkGroup.h"
 #include "vtkHDF5RawImageReader.h"
 #include "vtkHierarchicalFractal.h"
 #include "vtkImageCompressor.h"
 #include "vtkIntegrateAttributes.h"
 #include "vtkIntegrateFlowThroughSurface.h"
-#include "vtkMergeArrays.h"
 #include "vtkMPICompositeManager.h"
 #include "vtkMPIDuplicatePolyData.h"
 #include "vtkMPIDuplicateUnstructuredGrid.h"
 #include "vtkMPIMoveData.h"
+#include "vtkMergeArrays.h"
 #include "vtkMultiActorHelper.h"
 #include "vtkMultiDisplayManager.h"
 #include "vtkOrderedCompositeDistributor.h"
@@ -75,7 +73,6 @@
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkSelectInputs.h"
 #include "vtkSpyPlotReader.h"
 #include "vtkSquirtCompressor.h"
 #include "vtkStreamingTessellator.h"
@@ -118,12 +115,10 @@ int main(int , char *[])
   c = vtkCaveRenderManager::New(); c->Print(cout); c->Delete();
   c = vtkCleanUnstructuredGrid::New(); c->Print(cout); c->Delete();
   c = vtkClientCompositeManager::New(); c->Print(cout); c->Delete();
-  c = vtkColorByPart::New(); c->Print(cout); c->Delete();
   c = vtkCompleteArrays::New(); c->Print(cout); c->Delete();
   c = vtkCVGeometryCache::New(); c->Print(cout); c->Delete();
   c = vtkDataAnalysisFilter::New(); c->Print(cout); c->Delete();
   c = vtkDataSetSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
-  c = vtkGroup::New(); c->Print(cout); c->Delete();
   c = vtkHDF5RawImageReader::New(); c->Print(cout); c->Delete();
   c = vtkHierarchicalFractal::New(); c->Print(cout); c->Delete();
   c = vtkImageCompressor::New(); c->Print(cout); c->Delete();
@@ -172,7 +167,6 @@ int main(int , char *[])
   c = vtkPVUpdateSuppressor::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLElement::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLParser::New(); c->Print(cout); c->Delete();
-  c = vtkSelectInputs::New(); c->Print(cout); c->Delete();
   c = vtkSpyPlotReader::New(); c->Print(cout); c->Delete();
   c = vtkSquirtCompressor::New(); c->Print(cout); c->Delete();
   c = vtkStreamingTessellator::New(); c->Print(cout); c->Delete();

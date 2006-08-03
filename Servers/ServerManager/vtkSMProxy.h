@@ -392,6 +392,7 @@ protected:
   friend class vtkSMProxyRegisterUndoElement;
   friend class vtkSMProxyUnRegisterUndoElement;
   friend class vtkSMNew3DWidgetProxy;
+  friend class vtkSMPart;
   // -- PVEE only
   friend class vtkWSMApplication;
 //ETX

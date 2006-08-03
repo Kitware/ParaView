@@ -35,7 +35,7 @@
 #include "vtkUnstructuredGrid.h"
 
 
-vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.5");
+vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.6");
 vtkStandardNewMacro(vtkIntegrateAttributes);
 
 //-----------------------------------------------------------------------------
@@ -202,7 +202,7 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
-    inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (hdInput) 
     {
     vtkCompositeDataIterator* iter = hdInput->NewIterator();

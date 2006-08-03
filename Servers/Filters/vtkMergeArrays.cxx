@@ -14,14 +14,16 @@
 =========================================================================*/
 #include "vtkMergeArrays.h"
 
-#include "vtkObjectFactory.h"
+#include "vtkCellData.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
-#include "vtkPointData.h"
-#include "vtkCellData.h"
 #include "vtkFieldData.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 
-vtkCxxRevisionMacro(vtkMergeArrays, "1.6");
+vtkCxxRevisionMacro(vtkMergeArrays, "1.7");
 vtkStandardNewMacro(vtkMergeArrays);
 
 //----------------------------------------------------------------------------
@@ -35,131 +37,41 @@ vtkMergeArrays::~vtkMergeArrays()
 }
 
 //----------------------------------------------------------------------------
-// Add a dataset to the list of data to append.
-void vtkMergeArrays::AddInput(vtkDataSet *ds)
+int vtkMergeArrays::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
 {
-  this->vtkProcessObject::AddInput(ds);
-}
-
-//----------------------------------------------------------------------------
-vtkDataSet *vtkMergeArrays::GetInput(int idx)
-{
-  if (idx >= this->NumberOfInputs || idx < 0)
-    {
-    return NULL;
-    }
-  
-  return (vtkDataSet *)(this->Inputs[idx]);
-}
-
-//----------------------------------------------------------------------------
-vtkDataSet* vtkMergeArrays::GetOutput(int idx)
-{
-  if (idx == 0)
-    {
-    return this->GetOutput();
-    }
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
-vtkDataSet* vtkMergeArrays::GetOutput()
-{
-  vtkDataSet* input = NULL;
-  vtkDataObject* output;
-
-  // Find the corresponding input for this output.
-  input = this->GetInput(0);
-  if (input == NULL)
-    {
-    vtkErrorMacro("You need to set an input before you get the output.");
-    return NULL;
-    }
-  output = this->Superclass::GetOutput(0);
-  if (output == NULL)
-    { // Create a new output.
-    output = input->NewInstance();
-    if (this->NumberOfOutputs <= 0)
-      {
-      this->SetNumberOfOutputs(1);
-      }
-    this->Outputs[0] = output;
-    output->SetSource(this);
-    return static_cast<vtkDataSet*>(output);
-    }
-  if (input->GetDataObjectType() != output->GetDataObjectType())
-    {
-    vtkErrorMacro("Input and output do not match type.");
-    return static_cast<vtkDataSet*>(output);
-    }
-  return static_cast<vtkDataSet*>(output);
-}
-
-
-//----------------------------------------------------------------------------
-// Copy the update information across
-void vtkMergeArrays::ComputeInputUpdateExtents(vtkDataObject *)
-{
-  int idx;
-  int num;
-  vtkDataSet *input;
-  vtkDataSet *output;
-
-  num = this->NumberOfInputs;
-  output = this->GetOutput();
-  for (idx = 0; idx < num; ++idx)
-    {
-    input = this->GetInput(idx);
-
-    input->SetUpdatePiece( output->GetUpdatePiece() );
-    input->SetUpdateNumberOfPieces( output->GetUpdateNumberOfPieces() );
-    input->SetUpdateGhostLevel( output->GetUpdateGhostLevel() );
-    input->SetUpdateExtent( output->GetUpdateExtent() );
-    }
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkMergeArrays::ExecuteInformation()
-{
-  vtkDataSet *input;
-  vtkDataSet *output;
-
-  input = this->GetInput(0);
-  output = this->GetOutput();
-  if (input == NULL || output == NULL ||
-      input->GetDataObjectType() != output->GetDataObjectType())
-    {
-    vtkErrorMacro("Input/Output mismatch.");
-    }
-  else
-    {
-    output->CopyInformation(input);
-    }
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
+  return 1;
 }
 
 
 //----------------------------------------------------------------------------
 // Append data sets into single unstructured grid
-void vtkMergeArrays::Execute()
+int vtkMergeArrays::RequestData(vtkInformation *vtkNotUsed(request),
+                                vtkInformationVector **inputVector,
+                                vtkInformationVector *outputVector)
 {
   int idx;
-  int num;
   int numCells, numPoints;
   int numArrays, arrayIdx;
   vtkDataSet *input;
-  vtkDataSet *output;
   vtkDataArray *array;
-
-  num = this->NumberOfInputs;
-  if (num == 0)
+  int num = inputVector[0]->GetNumberOfInformationObjects();
+  if (num < 1)
     {
-    return;
+    return 0;
     }
 
-  output = this->GetOutput();
-  input = this->GetInput(0);
+  // get the output info object
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkDataSet *output = vtkDataSet::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  input = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   numCells = input->GetNumberOfCells();
   numPoints = input->GetNumberOfPoints();
   output->CopyStructure(input);
@@ -169,7 +81,10 @@ void vtkMergeArrays::Execute()
 
   for (idx = 1; idx < num; ++idx)
     {
-    input = this->GetInput(idx);
+    inInfo = inputVector[0]->GetInformationObject(idx);
+    input = vtkDataSet::SafeDownCast(
+      inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
     if (output->GetNumberOfPoints() == numPoints &&
         output->GetNumberOfCells() == numCells)
       {
@@ -196,37 +111,12 @@ void vtkMergeArrays::Execute()
         }
       }
     } 
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkMergeArrays::PrintSelf(ostream& os, vtkIndent indent)
 {
-  int idx;
-  int num;
-  vtkDataSet *input;
-  vtkDataSet *output;
-
   this->Superclass::PrintSelf(os,indent);
-
-  num = this->NumberOfInputs;
-  for (idx = 0; idx < num; ++idx)
-    {
-    input = this->GetInput(idx);
-    if( input )
-      {
-      os << indent << "Input: (" << input << ")\n";
-      }
-    else
-      {
-      os << indent << "No Input\n";
-      }
-    } 
-  if( num && ( output = this->GetOutput() ) )
-    {
-    os << indent << "Output: (" << output << ")\n";
-    }
-  else
-    {
-    os << indent << "No Output\n";
-    }  
 }

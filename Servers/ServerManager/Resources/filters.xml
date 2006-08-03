@@ -4,7 +4,7 @@
    <SourceProxy name="ImageShrink" class="vtkImageShrink3D">
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -41,7 +41,7 @@ The surface vectors filter is used for 2D data sets.  It constrains vectors to l
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -89,7 +89,7 @@ Integrates point and cell data over lines and surfaces.  It also computes length
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -110,7 +110,7 @@ The flow integration fitler  integrates the dot product of a point flow vector f
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -145,7 +145,7 @@ The All to N filter is available when ParaView is run in parallel. It redistribu
       </Documentation>
       <InputProperty
          name="Input"
-         command="SetInput">
+         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -172,7 +172,7 @@ The Balance filter is available when ParaView is run in parallel. It does load-b
       </Documentation>
       <InputProperty
          name="Input"
-         command="SetInput">
+         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -192,7 +192,7 @@ The Append Attributes filter takes multiple input data sets with the same geomet
       </Documentation>
       <InputProperty
          name="Input"
-         command="AddInput"
+         command="AddInputConnection"
          clean_command="RemoveAllInputs"
          multiple_input="1">
            <ProxyGroupDomain name="groups">
@@ -215,7 +215,7 @@ The Append Geometry filter operates on multiple polygonal data sets. The data se
       </Documentation>
       <InputProperty
          name="Input"
-         command="AddInput"
+         command="AddInputConnection"
          clean_command="RemoveAllInputs"
          multiple_input="1">
            <ProxyGroupDomain name="groups">
@@ -237,7 +237,7 @@ The Append Datasets filter operates on multiple data sets of any type (polygonal
       </Documentation>
       <InputProperty
          name="Input"
-         command="AddInput"
+         command="AddInputConnection"
          clean_command="RemoveAllInputs"
          multiple_input="1">
            <ProxyGroupDomain name="groups">
@@ -259,7 +259,7 @@ The Cell Centers filter places a point at the center of each cell in the input d
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -287,7 +287,7 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -311,7 +311,7 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
    <SourceProxy name="PointDataToCellData" class="vtkPointDataToCellData">
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -343,7 +343,7 @@ If the Piece invariant option is checked, the whole data set will be processed a
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -428,7 +428,7 @@ The Clean to Grid filter merges points that are within a tolerance of 1/100,000 
       </Documentation>
       <InputProperty
          name="Input"
-         command="SetInput">
+         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -495,7 +495,7 @@ convex hull.
       </Documentation>
       <InputProperty
          name="Input"
-         command="SetInput">
+         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -549,7 +549,7 @@ The Connectivity filter assigns a region id to connected components of the input
       </Documentation>
       <InputProperty
          name="Input"
-         command="SetInput">
+         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -570,7 +570,7 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
 
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -603,7 +603,7 @@ The Curvature filter computes the curvature at each point in a polygonal data se
 
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -642,7 +642,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -695,7 +695,7 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -736,7 +736,7 @@ The line can be specified interactively using the 3D line widget. See section 7.
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -793,7 +793,7 @@ This filter only operates on unstructured data. It produces polygonal output.
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -842,7 +842,7 @@ The Extract Edges filter produces a wireframe version of the input data set by e
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -854,36 +854,6 @@ The Extract Edges filter produces a wireframe version of the input data set by e
    <!-- End ExtractEdges -->
    </SourceProxy>
 
-   <SourceProxy name="ExtractParts" class="vtkSelectInputs">
-    <Documentation
-       long_help="Extract a subset of parts from a group."
-       short_help="Extract a subset of parts from a group.">
-The Extract Parts filter operates on any type of data, but its input reader/source/filter must have created multiple parts. The output type of this filter depends on the output type of the selected part(s). This filter is useful for operating on only a subset of the parts available from a reader, source, or filter.
-    </Documentation>
-    <InputProperty
-       name="Input"
-       command="AddInput"
-       clean_command="RemoveAllInputs"
-       multiple_input="1">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources"/>
-            <Group name="filters"/>
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkDataSet"/>
-          </DataTypeDomain>
-          <NumberOfPartsDomain name="multi_group" multiplicity="multiple"/>
-     </InputProperty>
-
-     <IntVectorProperty 
-        name="InputMask" 
-        command="SetInputMask"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        use_index="1"/>
-   <!-- End ExtractParts -->
-   </SourceProxy>
-
    <SourceProxy name="DataSetSurfaceFilter" class="vtkDataSetSurfaceFilter">
      <Documentation
         long_help="Extract a 2-d boundary surface using neighbor relations to eliminate internal faces."
@@ -892,7 +862,7 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -952,7 +922,7 @@ The Calculator filter is available on the Toolbar.
 
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1039,7 +1009,7 @@ This filter operates on polygonal data and produces polygonal output.
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1105,7 +1075,7 @@ The Gradient filter computes the gradient vector at each point in an image or vo
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1145,7 +1115,7 @@ The Gradient filter computes the gradient vector at each point in an image or vo
      <Documentation>
 The Gradient filter estimates the gradient vector at each point or cell.  The Input menu allows the user to select the data set to which this filter will be applied.  The Field and Scalars menus allow the user to select the scalar array from which to compute gradients.  The Scalars menu determines from which scalar array the gradient will be computed.  The Result Array Name box allows the user to specify the name of the output array holding the computed gradients.
      </Documentation>
-     <InputProperty name="Input" command="SetInput">
+     <InputProperty name="Input" command="SetInputConnection">
        <ProxyGroupDomain name="groups">
          <Group name="sources"/>
          <Group name="filters"/>
@@ -1188,7 +1158,7 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -1225,28 +1195,6 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
    <!-- End Gradient -->
    </SourceProxy>
 
-   <SourceProxy name="GroupParts" class="vtkGroup">
-     <Documentation
-        long_help="Group parts."
-        short_help="Group multiple inputs into one collection.">
-The Group Parts filter causes different data sets to be grouped into a collection and treated as a single data set for filtering purposes. All the data objects currently in ParaView will appear in the selection list. Only visible data objects are selected by default. To select a single data set, click on its name. To select several sources whose names are contiguous in the list, select the first name, press and hold the Shift key, and (while still holding the Shift key) click the last name. To select several data sets whose names are non-contiguous, press and hold the Ctrl key while clicking the names. This filter operates on any type of data. The output type depends on the data sets selected for grouping.
-     </Documentation>
-     <InputProperty
-        name="Input"
-        command="AddInput"
-        clean_command="RemoveAllInputs"
-        multiple_input="1">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
-           <DataTypeDomain name="input_type" composite_data_supported="0">
-             <DataType value="vtkDataSet"/>
-           </DataTypeDomain>
-      </InputProperty>
-   <!-- End GroupParts -->
-   </SourceProxy>
-
    <SourceProxy name="LinearExtrusionFilter" class="vtkPVLinearExtrusionFilter">
     <Documentation
        long_help="This filter creates a swept surface defined by translating the input along a vector."
@@ -1257,7 +1205,7 @@ The Piece invariant check box determines whether the output will be the same reg
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1310,7 +1258,7 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1340,7 +1288,7 @@ The Input menu allows the user to select the data set to which this filter will 
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1399,7 +1347,7 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1441,7 +1389,7 @@ This filter creates a new cell array containing a geometric measure of each cell
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1493,7 +1441,7 @@ If this filter is run in parallel, the resulting data set will have seams along 
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1569,7 +1517,7 @@ The Outline filter generates an axis-aligned bounding box for the input data set
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -1589,7 +1537,7 @@ The Outline Corners filter generates the corners of a bounding box for the input
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1609,29 +1557,6 @@ The Outline Corners filter generates the corners of a bounding box for the input
    <!-- End  OutlineCornerFilter -->
    </SourceProxy>
 
-   <SourceProxy name="PartScalars" class="vtkColorByPart">
-     <Documentation
-        long_help="This filter uses colors to show how data is partitioned across parts."
-        short_help="Generate point scalars from part id.">
-The Part Id Scalars filter assigns a unique scalar value to each part in the input. The input parts must have been collected together either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
-     </Documentation>
-     <InputProperty
-        name="Input"
-        command="AddInput"
-        clean_command="RemoveAllInputs"
-        multiple_input="1">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
-             <DataType value="vtkDataSet"/>
-           </DataTypeDomain>
-           <NumberOfPartsDomain name="multi_group" multiplicity="multiple"/>
-      </InputProperty>
-   <!-- End  PartScalars -->
-   </SourceProxy>
-
    <SourceProxy name="OctreeDepthScalars" class="vtkHyperOctreeDepth">
      <Documentation
         long_help="This filter adds a scalar to each leaf of the octree that represents the leaf's depth within the tree."
@@ -1640,7 +1565,7 @@ The vtkHyperOctreeDepth filter adds a scalar to each leaf of the octree that rep
      </Documentation>
      <InputProperty
         name="Input"
-        command="AddInput"
+        command="AddInputConnection"
         clean_command="RemoveAllInputs">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
@@ -1661,7 +1586,7 @@ The vtkHyperOctreeLimiter takes in a octree and produces a new octree in which i
      </Documentation>
      <InputProperty
         name="Input"
-        command="AddInput"
+        command="AddInputConnection"
         clean_command="RemoveAllInputs">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
@@ -1690,7 +1615,7 @@ The Process Id Scalars filter assigns a unique scalar value to each piece of the
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -1718,7 +1643,7 @@ The Point Data to Cell Data filter averages the values of the point attributes o
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -1750,7 +1675,7 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1818,7 +1743,7 @@ The Random Vectors filter generates a point-centered array of random vectors. It
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1854,7 +1779,7 @@ The Reflection filter reflects the input data set across the specified plane. If
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -1911,7 +1836,7 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2007,7 +1932,7 @@ The Capping check box controls whether to close the open ends of the swept surfa
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2069,7 +1994,7 @@ The Shrink filter causes the individual cells of a data set to break apart from 
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -2098,7 +2023,7 @@ The Smooth filter operates on a polygonal data set by iteratively adjusting the 
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2135,7 +2060,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2163,7 +2088,7 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2195,7 +2120,7 @@ The Max Num Of Subdivisions setting specifies the maximum number of times an edg
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -2254,7 +2179,7 @@ The Tetrahedralize filter converts the 3D cells of any type of data set to tetra
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -2274,7 +2199,7 @@ The Transform filter allows you to specify the position, size, and orientation o
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2300,7 +2225,7 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -2320,7 +2245,7 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2391,7 +2316,7 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -2458,7 +2383,7 @@ The Warp (vector) filter translates the points of the input data set using a spe
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -2503,7 +2428,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2560,7 +2485,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2636,7 +2561,7 @@ The Threshold filter extracts the portions of the input data set whose scalars l
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2702,7 +2627,7 @@ The Contour filter operates on any type of data set, but the input is required t
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2788,7 +2713,7 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2830,7 +2755,7 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
 
      <InputProperty
         name="Source"
-        command="SetSource">
+        command="SetSourceConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="glyph_sources" />
@@ -2925,7 +2850,7 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -2992,7 +2917,7 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -3008,7 +2933,7 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
 
      <InputProperty
         name="Source"
-        command="SetSource">
+        command="SetSourceConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
@@ -3061,7 +2986,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
     </Documentation>
     <InputProperty
        name="Source"
-       command="SetSource">
+       command="SetSourceConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -3077,7 +3002,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
 
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
@@ -3088,7 +3013,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
    <SourceProxy name="TemporalProbe" class="vtkTemporalProbeFilter">
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -3119,7 +3044,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
    <SourceProxy name="TemporalPick" class="vtkTemporalPickFilter">
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -3173,7 +3098,7 @@ This filter operates on any type of data set, provided it has point-centered vec
     </Documentation>
     <InputProperty
        name="Input"
-       command="AddInput"
+       command="AddInputConnection"
        clean_command="RemoveAllInputs"
        multiple_input="1">
           <ProxyGroupDomain name="groups">
@@ -3189,7 +3114,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 
      <InputProperty
         name="Source"
-        command="SetSource">
+        command="SetSourceConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
@@ -3354,7 +3279,7 @@ This filter operates on any type of data set, provided it has point-centered vec
                 class="vtkStructuredGridOutlineFilter">
       <InputProperty
          name="Input"
-         command="SetInput">
+         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -3375,7 +3300,7 @@ The Pick filter operates on any type of data and produces unstructured grid outp
      </Documentation>
      <InputProperty
         name="Input"
-        command="AddInput"
+        command="AddInputConnection"
         clean_command="RemoveAllInputs"
         multiple_input="1">
            <ProxyGroupDomain name="groups">
@@ -3435,7 +3360,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -3501,7 +3426,7 @@ The Contour filter operates on any type of data set, but the input is required t
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -3569,7 +3494,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -3624,7 +3549,7 @@ Extract geometry from a higher-order dataset.
      </Documentation>
      <InputProperty
          name="Input"
-         command="SetInput">
+         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -3646,7 +3571,7 @@ The Outline filter generates an axis-aligned bounding box for the input data set
       
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -3673,7 +3598,7 @@ This filter operates on any type of data set, provided it has point-centered vec
        
     <InputProperty
        name="Input"
-       command="AddInput"
+       command="AddInputConnection"
        clean_command="RemoveAllInputs"
        multiple_input="1">
           <ProxyGroupDomain name="groups">
@@ -3689,7 +3614,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 
      <InputProperty
         name="Source"
-        command="SetSource">
+        command="SetSourceConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
@@ -3861,7 +3786,7 @@ Tessellate a higher-order dataset.
      </Documentation>
      <InputProperty
          name="Input"
-         command="SetInput">
+         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -3882,7 +3807,7 @@ Groups multiple datasets to create a multigroup dataset
      </Documentation>
      <InputProperty
         name="Input"
-        command="AddInput"
+        command="AddInputConnection"
         clean_command="RemoveAllInputs"
         multiple_input="1">
            <ProxyGroupDomain name="groups">
@@ -3904,7 +3829,7 @@ This filter uses colors to show levels of a hiearchical dataset.
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -3919,7 +3844,7 @@ This filter uses colors to show levels of a hiearchical dataset.
     <SourceProxy name="GeometryFilter" class="vtkPVGeometryFilter">
       <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -3946,7 +3871,7 @@ This filter uses colors to show levels of a hiearchical dataset.
 
     <SourceProxy name="OrderedCompositeDistributor"
                  class="vtkOrderedCompositeDistributor">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -3970,11 +3895,11 @@ This filter uses colors to show levels of a hiearchical dataset.
       </StringVectorProperty>
     </SourceProxy>
 
-    <SourceProxy name="UpdateSuppressor" class="vtkPVUpdateSuppressor"
+    <UpdateSuppressorProxy name="UpdateSuppressor" class="vtkPVUpdateSuppressor"
       executive="vtkUpdateSuppressorPipeline">
       <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -4004,12 +3929,12 @@ This filter uses colors to show levels of a hiearchical dataset.
         command="SetOutputType"
         number_of_elements="1">
       </StringVectorProperty>
-    </SourceProxy>
+    </UpdateSuppressorProxy>
     
     <SourceProxy name="MPIMoveData" class="vtkMPIMoveData">
       <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -4038,7 +3963,7 @@ This filter extracts a range of groups from a multigroup dataset
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -4072,7 +3997,7 @@ This filter extracts a list of datasets from multigroup datasets.
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -4112,7 +4037,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
      </Documentation>
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -4126,7 +4051,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
 
      <InputProperty
         name="Source"
-        command="SetSource">
+        command="SetSourceConnection">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
@@ -4134,6 +4059,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
       </InputProperty>
+
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SetInputArrayToProcess"
@@ -4200,7 +4126,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
 
    
    <SourceProxy name="TemporalCache" class="vtkTemporalCacheFilter">
-     <InputProperty name="Input" command="SetInput">
+     <InputProperty name="Input" command="SetInputConnection">
        <ProxyGroupDomain name="groups">
          <Group name="sources"/>
          <Group name="filters"/>
@@ -4252,7 +4178,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
 Click the Start Selection button to begin. Then use the left mouse button to make a selection rectangle on the render window. The portion of the input data set that lies within the volume in space behind the selection rectangle will be returned.
       </Documentation>
 
-     <InputProperty name="Input" command="SetInput">
+     <InputProperty name="Input" command="SetInputConnection">
        <ProxyGroupDomain name="groups">
          <Group name="sources"/>
          <Group name="filters"/>
@@ -4319,7 +4245,7 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
    <SourceProxy name="TestCut" class="vtkCutter">
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -4358,7 +4284,7 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
         short_help="Extract a histogram from field data.">
      </Documentation>
     
-     <InputProperty name="Input" command="SetInput">
+     <InputProperty name="Input" command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -4407,7 +4333,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInput">
+       command="SetInputConnection">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>

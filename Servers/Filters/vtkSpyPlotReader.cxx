@@ -52,7 +52,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.42");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.43");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -249,7 +249,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.42");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.43");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -2791,7 +2791,7 @@ int vtkSpyPlotReader::RequestData(
   vtkstd::vector<vtkRectilinearGrid*> grids;
 
   vtkInformation *info=outputVector->GetInformationObject(0);
-  vtkDataObject *doOutput=info->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET());
+  vtkDataObject *doOutput=info->Get(vtkDataObject::DATA_OBJECT());
   vtkHierarchicalDataSet *hb=vtkHierarchicalDataSet::SafeDownCast(doOutput);  
   if(!hb)
     {

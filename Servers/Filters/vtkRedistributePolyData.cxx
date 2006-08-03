@@ -42,7 +42,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.24");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.25");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -206,7 +206,9 @@ void vtkRedistributePolyData::Execute()
   // ... allocate space and copy point and cell data attributes from input to 
   //   output ...
 
+  output->GetPointData()->CopyGlobalIdsOn();
   output->GetPointData()->CopyAllocate(input->GetPointData());
+  output->GetCellData()->CopyGlobalIdsOn();
   output->GetCellData()->CopyAllocate(input->GetCellData());
   
   // ... copy remaining input cell data to output cell data ...

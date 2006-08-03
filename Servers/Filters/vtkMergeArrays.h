@@ -23,54 +23,29 @@
 #ifndef __vtkMergeArrays_h
 #define __vtkMergeArrays_h
 
-#include "vtkSource.h"
+#include "vtkDataSetAlgorithm.h"
 
 class vtkDataSet;
 
-class VTK_EXPORT vtkMergeArrays : public vtkSource
+class VTK_EXPORT vtkMergeArrays : public vtkDataSetAlgorithm
 {
 public:
   static vtkMergeArrays *New();
 
-  vtkTypeRevisionMacro(vtkMergeArrays,vtkSource);
+  vtkTypeRevisionMacro(vtkMergeArrays,vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Add a dataset to the list of data to append.
-  void AddInput(vtkDataSet *in);
-
-  // Description:
-  // Get any input of this filter.
-  vtkDataSet *GetInput(int idx);
-  vtkDataSet *GetInput() 
-    {return this->GetInput( 0 );}
-  
-  // Description:
-  // Get any input of this filter.
-  virtual int GetNumberOfOutputs() { return 1;}
-  vtkDataSet *GetOutput(); 
-  vtkDataSet *GetOutput(int idx); 
-
-  // Description:
-  // By default copy the output update extent to the input
-  virtual void ComputeInputUpdateExtents( vtkDataObject *output );  
-  
 protected:
   vtkMergeArrays();
   ~vtkMergeArrays();
 
-  // Usual data generation method
-  virtual void Execute();
-  virtual void ExecuteInformation();
+  virtual int RequestData(vtkInformation*, 
+                          vtkInformationVector**, 
+                          vtkInformationVector*);
+  
+  // see algorithm for more info
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-
-private:
-
-  // hide the superclass' AddInput() from the user and the compiler
-  void AddInput(vtkDataObject *)
-    { vtkErrorMacro( << "AddInput() must be called with a vtkDataSet not a vtkDataObject."); };
-  void RemoveInput(vtkDataObject *input)
-    { this->vtkProcessObject::RemoveInput(input); };
 private:
   vtkMergeArrays(const vtkMergeArrays&);  // Not implemented.
   void operator=(const vtkMergeArrays&);  // Not implemented.

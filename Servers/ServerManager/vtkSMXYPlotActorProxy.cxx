@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMXYPlotActorProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.9");
 vtkCxxSetObjectMacro(vtkSMXYPlotActorProxy, Input, vtkSMSourceProxy);
 
 class vtkSMXYPlotActorProxyInternals
@@ -163,14 +163,21 @@ void vtkSMXYPlotActorProxy::SetupInputs()
     iter != this->Internals->ArrayNames.end(); ++iter)
     {
     arrayname = (*iter).c_str();
+    vtkSMPart* part = this->Input->GetPart(0);
     stream << vtkClientServerStream::Invoke
-      << sourceID << "AddInput"
-      << this->Input->GetPart(0)->GetID(0)
-      << arrayname << 0 /*component no*/
-      << vtkClientServerStream::End;
+           << part->GetProducerID()
+           << "GetOutputDataObject"
+           << part->GetPortIndex()
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << sourceID << "AddInput"
+           << vtkClientServerStream::LastResult
+           << arrayname << 0 /*component no*/
+           << vtkClientServerStream::End;
+
     stream << vtkClientServerStream::Invoke
-      << sourceID << "SetPlotLabel" << arrayCount << arrayname
-      << vtkClientServerStream::End;
+           << sourceID << "SetPlotLabel" << arrayCount << arrayname
+           << vtkClientServerStream::End;
     
     if (this->Smart)
       {

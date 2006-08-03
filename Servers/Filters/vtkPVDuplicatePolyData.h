@@ -31,16 +31,17 @@
 #ifndef __vtkPVDuplicatePolyData_h
 #define __vtkPVDuplicatePolyData_h
 
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
+
 class vtkSocketController;
 class vtkMultiProcessController;
 class vtkTiledDisplaySchedule;
 
-class VTK_EXPORT vtkPVDuplicatePolyData : public vtkPolyDataToPolyDataFilter
+class VTK_EXPORT vtkPVDuplicatePolyData : public vtkPolyDataAlgorithm
 {
 public:
   static vtkPVDuplicatePolyData *New();
-  vtkTypeRevisionMacro(vtkPVDuplicatePolyData, vtkPolyDataToPolyDataFilter);
+  vtkTypeRevisionMacro(vtkPVDuplicatePolyData, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -79,11 +80,20 @@ protected:
   vtkPVDuplicatePolyData();
   ~vtkPVDuplicatePolyData();
 
-  // Data generation method
-  void ComputeInputUpdateExtents(vtkDataObject *output);
-  void Execute();
-  void ClientExecute(vtkMultiProcessController* controller);
-  void ExecuteInformation();
+  virtual int RequestInformation(vtkInformation* request,
+                                 vtkInformationVector** inputVector,
+                                 vtkInformationVector* outputVector);
+
+  // Description:
+  // This is called by the superclass.
+  // This is the method you should override.
+  virtual int RequestData(vtkInformation* request,
+                          vtkInformationVector** inputVector,
+                          vtkInformationVector* outputVector);
+  void ClientExecute(vtkMultiProcessController* controller, 
+                     vtkPolyData* output);
+
+  int FillInputPortInformation(int, vtkInformation* info);
 
   vtkMultiProcessController *Controller;
   vtkTiledDisplaySchedule* Schedule;

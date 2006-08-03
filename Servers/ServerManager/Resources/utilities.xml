@@ -1317,7 +1317,7 @@
     <XYPlotActorProxy name="XYPlotActor" class="vtkXYPlotActor">
       <InputProperty
         name="Input"
-        command="SetInput"
+        command="SetInputConnection"
         clean_command="RemoveAllInputs">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />

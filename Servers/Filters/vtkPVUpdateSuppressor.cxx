@@ -25,11 +25,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 #include "vtkProcessModule.h"
-#include "vtkSource.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.34");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.35");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------

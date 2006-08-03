@@ -15,24 +15,26 @@
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
-#include "vtkCellType.h"
-#include "vtkPoints.h"
-#include "vtkDataSetAttributes.h"
-#include "vtkPointData.h"
-#include "vtkFieldData.h"
-#include "vtkDataArray.h"
-#include "vtkFloatArray.h"
-#include "vtkDataSet.h"
+
 #include "vtkCell.h"
-
-#include "vtkTessellatorFilter.h"
+#include "vtkCellType.h"
+#include "vtkDataArray.h"
 #include "vtkDataSet.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkStreamingTessellator.h"
+#include "vtkDataSet.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkDataSetSubdivisionAlgorithm.h"
+#include "vtkFieldData.h"
+#include "vtkFloatArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkPointData.h"
+#include "vtkPoints.h"
+#include "vtkStreamingTessellator.h"
 #include "vtkSubdivisionAlgorithm.h"
+#include "vtkTessellatorFilter.h"
+#include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkTessellatorFilter, "1.1");
+vtkCxxRevisionMacro(vtkTessellatorFilter, "1.2");
 vtkStandardNewMacro(vtkTessellatorFilter);
 
 // ========================================
@@ -309,9 +311,11 @@ void vtkTessellatorFilter::ResetFieldCriteria()
 
 // ========================================
 // pipeline procedures
-void vtkTessellatorFilter::SetupOutput()
+void vtkTessellatorFilter::SetupOutput(vtkDataSet* input,
+                                       vtkUnstructuredGrid* output)
 {
-  this->OutputMesh = this->GetOutput(); 
+  this->OutputMesh = output; 
+
   // avoid doing all the stupid checks on NumberOfOutputs for every
   // triangle/line.
   this->OutputMesh->Reset();
@@ -327,7 +331,7 @@ void vtkTessellatorFilter::SetupOutput()
   // This returns the id numbers of arrays that are default scalars, vectors,
   // normals, texture coords, and tensors.  These are the fields that will be
   // interpolated and passed on to the output mesh.
-  vtkPointData* fields = this->GetInput()->GetPointData();
+  vtkPointData* fields = input->GetPointData();
   vtkDataSetAttributes* outarrays = this->OutputMesh->GetPointData();
   outarrays->Initialize(); 
   // empty, turn off all attributes, and set CopyAllOn to true.
@@ -929,7 +933,9 @@ static int vtkNotSupportedErrorPrinted = 0;
 
 // ========================================
 // the meat of the class: execution!
-void vtkTessellatorFilter::Execute()
+int vtkTessellatorFilter::RequestData(vtkInformation*,
+                                      vtkInformationVector** inputVector,
+                                      vtkInformationVector* outputVector)
 {
   static double weights[27];
   int dummySubId=-1;
@@ -937,9 +943,16 @@ void vtkTessellatorFilter::Execute()
 
   vtkNotSupportedErrorPrinted = 0;
 
-  vtkDataSet* mesh = this->GetInput();
+  // get the output info object
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  this->SetupOutput();
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataSet* mesh = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  this->SetupOutput(mesh, output);
 
   this->Subdivider->SetMesh( mesh );
   this->Tessellator->SetEdgeCallback( AddALine );
@@ -1285,5 +1298,14 @@ void vtkTessellatorFilter::Execute()
     }
 
   this->Teardown();
+
+  return 1;
 }
 
+//----------------------------------------------------------------------------
+int vtkTessellatorFilter::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
+{
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  return 1;
+}

@@ -4,7 +4,7 @@
       <!-- Base for parallel writers -->
       <SubProxy>
         <SourceProxy name="CompleteArrays" class="vtkCompleteArrays">
-          <InputProperty name="Input" command="SetInput">
+          <InputProperty name="Input" command="SetInputConnection">
           </InputProperty>
         </SourceProxy>
       </SubProxy>
@@ -70,7 +70,7 @@
       <!-- Base for parallel XML writers -->
       <SubProxy>
         <SourceProxy name="CompleteArrays" class="vtkCompleteArrays">
-          <InputProperty name="Input" command="SetInput">
+          <InputProperty name="Input" command="SetInputConnection">
           </InputProperty>
         </SourceProxy>
       </SubProxy>
@@ -89,7 +89,7 @@
     <PWriterProxy name="XMLPVDWriter" class="vtkXMLPVDWriter" 
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
 
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -102,7 +102,7 @@
 
     <WriterProxy name="XMLPolyDataWriter" class="vtkXMLPolyDataWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
@@ -112,7 +112,7 @@
     <WriterProxy name="XMLUnstructuredGridWriter" 
       class="vtkXMLUnstructuredGridWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
@@ -122,7 +122,7 @@
     <WriterProxy name="XMLStructuredGridWriter" 
       class="vtkXMLStructuredGridWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkStructuredGrid" />
         </DataTypeDomain>
@@ -132,7 +132,7 @@
     <WriterProxy name="XMLRectilinearGridWriter" 
       class="vtkXMLRectilinearGridWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
@@ -142,7 +142,7 @@
     <WriterProxy name="XMLImageDataWriter" 
       class="vtkXMLImageDataWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkImageData" />
         </DataTypeDomain>
@@ -152,7 +152,7 @@
     <WriterProxy name="XMLMultiGroupDataWriter"
       class="vtkXMLMultiGroupDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkMultiGroupDataSet" />
         </DataTypeDomain>
@@ -162,7 +162,7 @@
     <PWriterProxy name="XMLPPolyDataWriter"
       class="vtkXMLPPolyDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
@@ -172,7 +172,7 @@
     <PWriterProxy name="XMLPUnstructuredGridWriter"
       class="vtkXMLPUnstructuredGridWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
@@ -182,7 +182,7 @@
     <PWriterProxy name="XMLPStructuredGridWriter"
       class="vtkXMLPStructuredGridWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkStructuredGrid" />
         </DataTypeDomain>
@@ -192,7 +192,7 @@
     <PWriterProxy name="XMLPRectilinearGridWriter"
       class="vtkXMLPRectilinearGridWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
@@ -202,7 +202,7 @@
     <PWriterProxy name="XMLPImageDataWriter"
       class="vtkXMLPImageDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkImageData" />
         </DataTypeDomain>
@@ -212,7 +212,7 @@
     <PWriterProxy name="XMLPMultiGroupDataWriter"
       class="vtkXMLPMultiGroupDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkMultiGroupDataSet" />
         </DataTypeDomain>
@@ -221,7 +221,7 @@
 
     <WriterProxy name="DataSetWriter" class="vtkDataSet"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
@@ -231,7 +231,7 @@
 
     <WriterProxy name="PLYWriter" class="vtkPLYWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -244,7 +244,7 @@
 
     <WriterProxy name="MetaImageWriter" class="vtkMetaImageWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -257,7 +257,7 @@
 
     <WriterProxy name="PNGWriter" class="vtkPNGWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -270,7 +270,7 @@
 
     <WriterProxy name="XdmfWriter" class="vtkXdmfWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -283,7 +283,7 @@
 
     <PWriterProxy name="ExodusIIWriter" class="vtkExodusIIWriter"
       base_proxygroup="writers" base_proxyname="ParallelWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -296,7 +296,7 @@
 
     <PWriterProxy name="EnSightWriter" class="vtkEnSightWriter"
       base_proxygroup="writers" base_proxyname="ParallelWriterBase">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>

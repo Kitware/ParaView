@@ -49,15 +49,8 @@ public:
   static vtkAttributeEditor *New();
 
   // Description:
-  // Get either input of this filter.
-//BTX
-//  vtkDataSet *GetInput(int idx);
-//  vtkDataSet *GetInput() 
-//    {return this->GetInput( 0 );}
-//ETX
-
-  // Description:
   // Specify the source object used when writing out data.
+  void SetSourceConnection(vtkAlgorithmOutput*);
   void SetSource(vtkDataSet *source);
   vtkDataSet *GetSource();
 

@@ -52,8 +52,7 @@ protected:
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
 
-  vtkDataSet* GenerateSurfaceVectors(vtkDataSet* input,
-                                     vtkInformationVector **inputVector);
+  vtkDataSet* GenerateSurfaceVectors(vtkDataSet* input);
 
 private:
   vtkIntegrateFlowThroughSurface(const vtkIntegrateFlowThroughSurface&); // Not implemented.

@@ -16,22 +16,25 @@
 
 #include "vtkAppendPolyData.h"
 #include "vtkCellData.h"
-#include "vtkMultiProcessController.h"
-#include "vtkPolyDataWriter.h"
-#include "vtkPolyDataReader.h"
 #include "vtkCharArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkPolyDataReader.h"
+#include "vtkPolyDataWriter.h"
 #include "vtkProcessModule.h"
 #include "vtkSocketController.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.14");
+vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.15");
 vtkStandardNewMacro(vtkMPIDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -49,9 +52,6 @@ vtkMPIDuplicatePolyData::vtkMPIDuplicatePolyData()
   this->PassThrough = 0;
   this->ZeroEmpty = 0;
   //this->MemorySize = 0;
-  
-  // Client has no inputs.
-  this->NumberOfRequiredInputs = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -81,40 +81,28 @@ static inline int vtkDPDLog2(int j, int& exact)
 
 
 //-----------------------------------------------------------------------------
-void vtkMPIDuplicatePolyData::ExecuteInformation()
+int vtkMPIDuplicatePolyData::RequestInformation(
+  vtkInformation*,
+  vtkInformationVector**,
+  vtkInformationVector* outputVector)
 {
-  if (this->GetOutput() == NULL)
-    {
-    vtkErrorMacro("Missing output");
-    return;
-    }
-  this->GetOutput()->SetMaximumNumberOfPieces(-1);
+  vtkInformation *info = outputVector->GetInformationObject(0);
+  info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
+  return 1;
 }
-
-//-----------------------------------------------------------------------------
-void vtkMPIDuplicatePolyData::ComputeInputUpdateExtents(vtkDataObject *output)
-{
-  vtkPolyData *input = this->GetInput();
-  int piece = output->GetUpdatePiece();
-  int numPieces = output->GetUpdateNumberOfPieces();
-  int ghostLevel = output->GetUpdateGhostLevel();
-
-  if (input == NULL)
-    {
-    return;
-    }
-  input->SetUpdatePiece(piece);
-  input->SetUpdateNumberOfPieces(numPieces);
-  input->SetUpdateGhostLevel(ghostLevel);
-}
-
-
   
-
 //-----------------------------------------------------------------------------
-void vtkMPIDuplicatePolyData::Execute()
+int vtkMPIDuplicatePolyData::RequestData(vtkInformation*,
+                                         vtkInformationVector** inputVector,
+                                         vtkInformationVector* outputVector)
 {
-  vtkPolyData *input = this->GetInput();
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkPolyData *input = vtkPolyData::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkPolyData *output = vtkPolyData::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
   
   vtkTimerLog::MarkStartEvent("MPIGather");
   
@@ -122,13 +110,12 @@ void vtkMPIDuplicatePolyData::Execute()
     {
     if (input == NULL)
       {
-      return;
+      return 1;
       }
-    vtkPolyData* output = this->GetOutput();
     output->CopyStructure(input);
     output->GetPointData()->ShallowCopy(input->GetPointData());
     output->GetCellData()->ShallowCopy(input->GetCellData());
-    return;
+    return 1;
     }
   
   // Setup a reader.
@@ -140,10 +127,10 @@ void vtkMPIDuplicatePolyData::Execute()
 
   if (this->SocketController && this->ClientFlag)
     {
-    this->ClientExecute(reader);
+    this->ClientExecute(reader, output);
     reader->Delete();
     reader = NULL;
-    return;
+    return 1;
     }
   
   // Create the writer.
@@ -152,7 +139,7 @@ void vtkMPIDuplicatePolyData::Execute()
   writer->WriteToOutputStringOn();
 
   // Node 0 gathers all the the data and the broadcast it to all procs.
-  this->ServerExecute(reader, writer);
+  this->ServerExecute(reader, writer, input, output);
 
   reader->Delete();
   reader = NULL;
@@ -160,25 +147,29 @@ void vtkMPIDuplicatePolyData::Execute()
   writer = NULL;
 
   vtkTimerLog::MarkEndEvent("MPIGather");
+
+  return 1;
 }
 
 
 //-----------------------------------------------------------------------------
 #ifdef VTK_USE_MPI
 void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* reader,
-                                            vtkPolyDataWriter* writer)
+                                            vtkPolyDataWriter* writer,
+                                            vtkPolyData* input,
+                                            vtkPolyData* output)
 #else
 void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* ,
-                                            vtkPolyDataWriter* writer)
+                                            vtkPolyDataWriter* writer,
+                                            vtkPolyData* input,
+                                            vtkPolyData* output)
 #endif
 {
   int numProcs;
   numProcs = this->Controller->GetNumberOfProcesses();
-  vtkPolyData* input;
   vtkPolyData* pd;
   
   // First marshal our input.
-  input = this->GetInput();
   pd = vtkPolyData::New();
   if (input)
     {
@@ -240,7 +231,7 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* ,
                                    1, vtkProcessModule::DuplicatePDNAllBuffers);
       }
     this->ReconstructOutput(reader, numProcs, allbuffers, 
-                            recvLengths, recvOffsets);
+                            recvLengths, recvOffsets, output);
     delete [] allbuffers;
     allbuffers = NULL;
     delete [] recvLengths;
@@ -270,7 +261,7 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* ,
   // Degenerate reconstruct output.
   if (input)
     {
-    this->GetOutput()->ShallowCopy(input);
+    output->ShallowCopy(input);
     }
   delete [] buf;
   buf = NULL;
@@ -282,10 +273,10 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* ,
 void vtkMPIDuplicatePolyData::ReconstructOutput(vtkPolyDataReader* reader,
                                                 int numProcs, char* recv,
                                                 int* recvLengths, 
-                                                int* recvOffsets)
+                                                int* recvOffsets,
+                                                vtkPolyData* pd)
 {
   vtkPolyData* output;
-  vtkPolyData* pd;
   int idx;
 
   // Reconstruct the poly datas and append them together.
@@ -313,7 +304,6 @@ void vtkMPIDuplicatePolyData::ReconstructOutput(vtkPolyDataReader* reader,
   output->Update();
 
   // Copy results to our output;
-  pd = this->GetOutput();
   pd->CopyStructure(output);
   pd->GetPointData()->PassData(output->GetPointData());
   pd->GetCellData()->PassData(output->GetCellData());
@@ -324,7 +314,8 @@ void vtkMPIDuplicatePolyData::ReconstructOutput(vtkPolyDataReader* reader,
 
 
 //-----------------------------------------------------------------------------
-void vtkMPIDuplicatePolyData::ClientExecute(vtkPolyDataReader* reader)
+void vtkMPIDuplicatePolyData::ClientExecute(vtkPolyDataReader* reader,
+                                            vtkPolyData* output)
 {
   int numProcs;
   int* recvLengths;
@@ -353,7 +344,7 @@ void vtkMPIDuplicatePolyData::ClientExecute(vtkPolyDataReader* reader)
                                   1, vtkProcessModule::DuplicatePDNAllBuffers);
 
   this->ReconstructOutput(reader, numProcs, buffers, 
-                          recvLengths, recvOffsets);
+                          recvLengths, recvOffsets, output);
   delete [] recvLengths;
   recvLengths = NULL;
   delete [] buffers;
@@ -378,3 +369,12 @@ void vtkMPIDuplicatePolyData::PrintSelf(ostream& os, vtkIndent indent)
   // to be mimicked, then this may need to be declared).
 }
 
+
+//----------------------------------------------------------------------------
+int vtkMPIDuplicatePolyData::FillInputPortInformation(int , 
+                                                      vtkInformation* info)
+{
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
+  info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
+  return 1;
+}
