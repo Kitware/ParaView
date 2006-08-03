@@ -13,7 +13,7 @@ proc applyAllFiltersUns {} {
     for {set i 0} {$i < $numItems} {incr i 1} {
         if {[$fmenu GetItemState $i]} {
             set label [$fmenu GetItemLabel $i]
-            if {$label != "AttributeEditor" && $label != "Calculator"} {
+            if {$label != "AttributeEditor" && $label != "Calculator" && $label != "Append Attributes" && $label != "SpecializedBoxClip"} {
                 $fmenu InvokeItem $i
                 [$window GetCurrentPVSource] AcceptCallback
                 [$window GetCurrentPVSource] DeleteCallback
@@ -43,7 +43,7 @@ proc applyAllFiltersStru {} {
     for {set i 0} {$i < $numItems} {incr i 1} {
         if {[$fmenu GetItemState $i]} {
             set label [$fmenu GetItemLabel $i]
-            if {$label != "AttributeEditor" && $label != "Tessellate" && $label != "Calculator" && $label != "Append Attributes"} {
+            if {$label != "AttributeEditor" && $label != "Tessellate" && $label != "Calculator" && $label != "Append Attributes" && $label != "SpecializedBoxClip"} {
                 $fmenu InvokeItem $i
                 [$window GetCurrentPVSource] AcceptCallback
                 [$window GetCurrentPVSource] DeleteCallback
