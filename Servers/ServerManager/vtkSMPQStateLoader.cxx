@@ -22,7 +22,7 @@
 #include "vtkSMRenderModuleProxy.h"
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.5");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.6");
 vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewRenderModuleProxy, 
   vtkSMMultiViewRenderModuleProxy);
 //-----------------------------------------------------------------------------
@@ -94,15 +94,6 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
     return display;
     }
   return this->Superclass::NewProxyInternal(xml_group, xml_name);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMPQStateLoader::RegisterProxyInternal(const char* group, 
-  const char* name, vtkSMProxy* proxy)
-{
-  //vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  //pxm->RegisterProxy(group, proxy->GetSelfIDAsString(), proxy);
-  this->Superclass::RegisterProxyInternal(group, name, proxy);
 }
 
 //-----------------------------------------------------------------------------

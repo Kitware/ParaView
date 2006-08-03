@@ -54,13 +54,6 @@ protected:
   ~vtkSMPQStateLoader();
 
   // Description:
-  // In ParaView, since we register all proxies only by their SelfIDs, this method
-  // ignores the registration name indicated in the state file and registers
-  // the proxies using their self ids.
-  virtual void RegisterProxyInternal(const char* group, 
-    const char* name, vtkSMProxy* proxy);
-  
-  // Description:
   // Overridden so that render modules and displays can be created of appropriate
   // types.
   virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
