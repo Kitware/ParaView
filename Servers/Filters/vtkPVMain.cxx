@@ -38,10 +38,14 @@
 #include "vtkDynamicLoader.h"
 #include <vtksys/ios/sstream>
 
-#include <unistd.h>
+#if !defined(_WIN32) || defined(__CYGWIN__)
+# include <unistd.h> /* unlink */
+#else
+# include <io.h> /* unlink */
+#endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.14");
+vtkCxxRevisionMacro(vtkPVMain, "1.15");
 
 int vtkPVMain::InitializeMPI = 1;
 
