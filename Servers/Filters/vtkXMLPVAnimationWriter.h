@@ -38,6 +38,14 @@ public:
   void AddInput(vtkDataSet*, const char* group);
   void AddInput(vtkDataSet*);
   void AddInputConnection(vtkAlgorithmOutput* ao, const char* group);
+  void AddInputConnection(vtkAlgorithmOutput* ao)
+    {
+      this->AddInputConnection(0, ao);
+    }
+  void AddInputConnection(int port, vtkAlgorithmOutput* ao)
+    {
+      this->Superclass::AddInputConnection(port, ao);
+    }
   
   // Description:
   // Start a new animation with the current set of inputs.
