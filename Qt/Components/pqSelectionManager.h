@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMDisplayProxy;
 class vtkSMProxy;
-class vtkSMProxy;
+class vtkSelection;
 class pqPipelineSource;
 class pqRenderModule;
 class pqSelectionManagerImplementation;
@@ -93,8 +93,9 @@ private:
   void processEvents(unsigned long event);
   void updateSelection(int* eventpos, pqRenderModule* rm);
   void selectInFrustrum(int* eventpos, pqRenderModule* rm);
-  //vtkSMDisplayProxy* getDisplayProxy(pqRenderModule*, vtkSMProxy*);
-  //void createDisplayProxies(vtkSMProxy*);
+  void sendSelection(vtkSelection* sel, vtkSMProxy* proxy);
+  vtkSMDisplayProxy* getDisplayProxy(pqRenderModule*, vtkSMProxy*);
+  void createDisplayProxies(vtkSMProxy*);
 };
 
 

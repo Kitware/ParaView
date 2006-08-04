@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "qdebug.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkInformation.h"
 #include "vtkInteractorObserver.h"
@@ -59,7 +60,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSelection.h"
+#include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/algorithm>
@@ -95,6 +98,7 @@ struct pqSelectionProxies
 {
   vtkSmartPointer<vtkSMProxy> SelectorProxy;
   vtkSmartPointer<vtkSMProxy> SelectionProxy;
+  vtkSmartPointer<vtkSMSourceProxy> GeometrySource;
 };
 
 //-----------------------------------------------------------------------------
@@ -136,7 +140,7 @@ public:
     }
 
   // traverse selection and extract prop ids (unique)
-  void traverseSelection(vtkSelectionNode* sel, vtkstd::list<int>& ids);
+  void traverseSelection(vtkSelection* sel, vtkstd::list<int>& ids);
   
   vtkInteractorStyleRubberBandPick* RubberBand;
   vtkInteractorObserver* SavedStyle;
@@ -160,12 +164,12 @@ public:
 //-----------------------------------------------------------------------------
 // traverse selection and extract prop ids (unique)
 void pqSelectionManagerImplementation::traverseSelection(
-  vtkSelectionNode* sel, vtkstd::list<int>& ids)
+  vtkSelection* sel, vtkstd::list<int>& ids)
 {
   vtkInformation* properties = sel->GetProperties();
-  if (properties && properties->Has(vtkSelectionNode::PROP_ID()))
+  if (properties && properties->Has(vtkSelection::PROP_ID()))
     {
-    int id = properties->Get(vtkSelectionNode::PROP_ID());
+    int id = properties->Get(vtkSelection::PROP_ID());
     if (vtkstd::find(ids.begin(), ids.end(), id) == ids.end())
       {
       ids.push_back(id);
@@ -331,89 +335,93 @@ int pqSelectionManager::setInteractorStyleToInteract(pqRenderModule* rm)
   return 1;
 }
 
-// //-----------------------------------------------------------------------------
-// void pqSelectionManager::createDisplayProxies(vtkSMProxy* input)
-// {
-//   pqServerManagerModel* model = 
-//     pqApplicationCore::instance()->getServerManagerModel();
+//-----------------------------------------------------------------------------
+void pqSelectionManager::createDisplayProxies(vtkSMProxy* input)
+{
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
 
-//   int numRenModules = model->getNumberOfRenderModules();
-//   for (int i=0; i<numRenModules; i++)
-//     {
-//     pqRenderModule* rm = model->getRenderModule(i);
-//     vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
-//     if (rmp->GetConnectionID() == input->GetConnectionID())
-//       {
-//       this->getDisplayProxy(rm, input);
-//       }
-//     }
-// }
+  int numRenModules = model->getNumberOfRenderModules();
+  for (int i=0; i<numRenModules; i++)
+    {
+    pqRenderModule* rm = model->getRenderModule(i);
+    vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
+    if (rmp->GetConnectionID() == input->GetConnectionID())
+      {
+      this->getDisplayProxy(rm, input);
+      }
+    }
+}
 
-// //-----------------------------------------------------------------------------
-// vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderModule* rm,
-//                                                        vtkSMProxy* input)
-// {
-//   vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
-//   if (!rmp)
-//     {
-//     qDebug("No render module proxy specified. Cannot return display object");
-//     return 0;
-//     }
+//-----------------------------------------------------------------------------
+vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderModule* rm,
+                                                       vtkSMProxy* input)
+{
+  vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
+  if (!rmp)
+    {
+    qDebug("No render module proxy specified. Cannot return display object");
+    return 0;
+    }
 
-//   vtkTypeUInt32 id = rmp->GetSelfID().ID;
+  vtkTypeUInt32 id = rmp->GetSelfID().ID;
 
-//   vtkSMDataObjectDisplayProxy* displayProxy = 0;
-//   pqSelectionManagerImplementation::DisplaysType::iterator iter = 
-//     this->Implementation->Displays.find(id);
-//   if (iter != this->Implementation->Displays.end())
-//     {
-//     displayProxy = iter->second.DisplayProxy;
-//     }
+  vtkSMDataObjectDisplayProxy* displayProxy = 0;
+  pqSelectionManagerImplementation::DisplaysType::iterator iter = 
+    this->Implementation->Displays.find(id);
+  if (iter != this->Implementation->Displays.end())
+    {
+    displayProxy = iter->second.DisplayProxy;
+    }
 
-//   if (!displayProxy)
-//     {
-//     displayProxy = vtkSMDataObjectDisplayProxy::SafeDownCast(
-//       rmp->CreateDisplayProxy());
+  if (!displayProxy)
+    {
+    displayProxy = vtkSMDataObjectDisplayProxy::SafeDownCast(
+      rmp->CreateDisplayProxy());
 
-//     this->Implementation->Displays[id].DisplayProxy =
-//       displayProxy;
+    this->Implementation->Displays[id].DisplayProxy =
+      displayProxy;
 
-//     vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
-//     //pm->RegisterProxy(
-//     //"selection_objects", displayProxy->GetSelfIDAsString(), displayProxy);
-//     pm->RegisterProxy(
-//       "displays", displayProxy->GetSelfIDAsString(), displayProxy);
+    vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+    pm->RegisterProxy(
+      "selection_objects", displayProxy->GetSelfIDAsString(), displayProxy);
+    //pm->RegisterProxy(
+    //"displays", displayProxy->GetSelfIDAsString(), displayProxy);
 
-//     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-//       displayProxy->GetProperty("Input"));
-//     pp->AddProxy(input);
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      displayProxy->GetProperty("Input"));
+    pp->AddProxy(input);
 
-//     // Add the display proxy to render module.
-//     pp = vtkSMProxyProperty::SafeDownCast(rmp->GetProperty("Displays"));
-//     pp->AddProxy(displayProxy);
-//     rmp->UpdateVTKObjects();
+    // Add the display proxy to render module.
+    pp = vtkSMProxyProperty::SafeDownCast(rmp->GetProperty("Displays"));
+    pp->AddProxy(displayProxy);
+    rmp->UpdateVTKObjects();
 
-//     // Set representation to wireframe
-//     displayProxy->SetRepresentationCM(1);
+    // Set representation to wireframe
+    displayProxy->SetRepresentationCM(1);
 
-//     // Set color to purple
-//     displayProxy->SetColorCM(1, 0, 1);
+    // Do not color by array
+    displayProxy->SetScalarVisibilityCM(0);
 
-//     // Set line thickness to 2
-//     displayProxy->SetLineWidthCM(2.0);
+    // Set color to purple
+    displayProxy->SetColorCM(1, 0, 1);
 
-//     vtkSMIntVectorProperty* pk = vtkSMIntVectorProperty::SafeDownCast(
-//       displayProxy->GetProperty("Pickable"));
-//     pk->SetElements1(0); // do not pick self
+    // Set line thickness to 2
+    displayProxy->SetLineWidthCM(2.0);
 
-//     displayProxy->UpdateVTKObjects();
 
-//     displayProxy->Delete();
-//     }
+    vtkSMIntVectorProperty* pk = vtkSMIntVectorProperty::SafeDownCast(
+      displayProxy->GetProperty("Pickable"));
+    pk->SetElements1(0); // do not pick self
 
-//   return displayProxy;
+    displayProxy->UpdateVTKObjects();
 
-// }
+    displayProxy->Delete();
+    }
+
+  return displayProxy;
+
+}
 
 //-----------------------------------------------------------------------------
 void pqSelectionManager::setActiveRenderModule(pqRenderModule* rm)
@@ -476,6 +484,8 @@ void pqSelectionManager::setActiveRenderModule(pqRenderModule* rm)
 
     vtkSMProxy* selectionProxy = 
       pxm->NewProxy("selection_helpers", "Selection");
+    selectionProxy->SetConnectionID(connId);
+    selectionProxy->SetServers(vtkProcessModule::DATA_SERVER);
     selectionProxy->UpdateVTKObjects();
 
     // This is the object that stores the result of selection
@@ -484,10 +494,26 @@ void pqSelectionManager::setActiveRenderModule(pqRenderModule* rm)
     selectionProperty->AddProxy(selectionProxy);
     this->Implementation->ServerSelections[connId].SelectionProxy = 
       selectionProxy;
-    selectionProxy->Delete();
 
     selectorProxy->UpdateVTKObjects();
     selectorProxy->Delete();
+
+    vtkSMSourceProxy* selectionGeomProxy = 
+      vtkSMSourceProxy::SafeDownCast(
+        pxm->NewProxy("sources", "SelectionSource"));
+    selectionGeomProxy->SetConnectionID(connId);
+    selectionGeomProxy->SetServers(vtkProcessModule::DATA_SERVER);
+
+    selectionProperty = vtkSMProxyProperty::SafeDownCast(
+      selectionGeomProxy->GetProperty("Selection"));
+    selectionProperty->AddProxy(selectionProxy);
+    selectionGeomProxy->UpdateVTKObjects();
+
+    this->Implementation->ServerSelections[connId].GeometrySource = 
+      selectionGeomProxy;
+
+    selectionProxy->Delete();
+    selectionGeomProxy->Delete();
     }
 
 }
@@ -737,6 +763,8 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
   // selection is in the works
   this->selectInFrustrum(eventpos, rm);
 
+  //this->sendSelection(selection, selectionProxy);
+
   vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
   vtkSMProxy* selectionProxy = 
     this->Implementation->ServerSelections[rmp->GetConnectionID()].SelectionProxy;
@@ -776,22 +804,50 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
       selection.push_back(pqSource);
       }
     }
+
+  // render the selection
+  vtkSMSourceProxy* geomProxy = 
+    this->Implementation->ServerSelections[rmp->GetConnectionID()].GeometrySource;
+  geomProxy->MarkModified(0);
+  
   selInfo->Delete();
   selectionModel->select(
     selection, pqServerManagerSelectionModel::ClearAndSelect);
 
-  //this->createDisplayProxies(selectorProxy);
+  this->createDisplayProxies(geomProxy);
 
-//   int numRenModules = model->getNumberOfRenderModules();
-//   for (int i=0; i<numRenModules; i++)
-//     {
-//     pqRenderModule* renModule = model->getRenderModule(i);
-//     vtkSMRenderModuleProxy* renModuleProxy = renModule->getRenderModuleProxy();
-//     if (renModuleProxy->GetConnectionID() == selectorProxy->GetConnectionID())
-//       {
-//       renModule->render();
-//       }
-//     }
+  int numRenModules = model->getNumberOfRenderModules();
+  for (int i=0; i<numRenModules; i++)
+    {
+    pqRenderModule* renModule = model->getRenderModule(i);
+    vtkSMRenderModuleProxy* renModuleProxy = renModule->getRenderModuleProxy();
+    if (renModuleProxy->GetConnectionID() == geomProxy->GetConnectionID())
+      {
+      renModule->render();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::sendSelection(vtkSelection* sel, vtkSMProxy* proxy)
+{
+  vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
+
+  ostrstream res;
+  vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
+  res << ends;
+  vtkClientServerStream stream;
+  vtkClientServerID parserID =
+    processModule->NewStreamObject("vtkSelectionSerializer", stream);
+  stream << vtkClientServerStream::Invoke
+         << parserID << "Parse" << res.str() << proxy->GetID(0)
+         << vtkClientServerStream::End;
+  processModule->DeleteStreamObject(parserID, stream);
+
+  processModule->SendStream(proxy->GetConnectionID(), 
+                            proxy->GetServers(), 
+                            stream);
+  delete[] res.str();
 }
 
 //-----------------------------------------------------------------------------
