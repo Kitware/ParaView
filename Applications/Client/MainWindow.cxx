@@ -151,6 +151,9 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionFileSaveAnimation,
     SLOT(setEnabled(bool)));
 
+  connect(this->Implementation->UI.actionFileManageServers,
+    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onFileManageServers()));
+
   connect(this->Implementation->UI.actionFileExit,
     SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));  
 

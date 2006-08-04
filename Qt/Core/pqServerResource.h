@@ -102,7 +102,7 @@ public:
   const QString toString() const;
   
   /** Returns the resource scheme -
-  session, cs, csrc, cdsrs, cdsrsrc, or session */
+  builtin, cs, csrc, cdsrs, cdsrsrc, or session */
   const QString scheme() const;
   /// Sets the resource scheme
   void setScheme(const QString&);
@@ -137,7 +137,15 @@ public:
   const pqServerResource sessionServer() const;
   void setSessionServer(const pqServerResource&);
   
-  const pqServerResource server() const;
+  /** Returns a copy of this resource containing only server information -
+  scheme, host, and port numbers */
+  const pqServerResource schemeHostsPorts() const;
+  /** Returns a copy of this resource containing a subset of server information -
+  scheme and host (no port numbers */
+  const pqServerResource schemeHosts() const;
+  /** Returns a copy of this resource containing only host and path information -
+  scheme, port numbers, and server session are excluded */
+  const pqServerResource hostPath() const;
 
   bool operator==(const pqServerResource&) const;
   bool operator!=(const pqServerResource&) const;

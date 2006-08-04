@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRecentFilesMenu.h
+   Module:    pqShellServerStartup.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,41 +30,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqRecentFilesMenu_h
-#define _pqRecentFilesMenu_h
+#ifndef _pqShellServerStartup_h
+#define _pqShellServerStartup_h
 
-#include "pqComponentsExport.h"
+#include "pqServerStartup.h"
 
-#include <QObject>
+#include <QProcess>
 
-class QAction;
-class QMenu;
+/////////////////////////////////////////////////////////////////////////////
+// pqShellServerStartup
 
-/** Displays a collection of recently-used files (server resources)
-as a menu, sorted in most-recently-used order and grouped by server */
-class PQCOMPONENTS_EXPORT pqRecentFilesMenu :
+/// Concrete implementation of pqServerStartup that runs an external
+/// shell command to start a remote server.
+class pqShellServerStartup :
+  public pqServerStartup
+{
+public:
+  pqShellServerStartup(const QString& command_line, double delay);
+  
+  void execute(const pqServerResource& server, pqServerStartupContext& context);
+
+  const QString CommandLine;
+  const double Delay;
+};
+
+/// Private implementation detail
+class pqShellServerStartupContextHelper :
   public QObject
 {
   Q_OBJECT
-
-public:
-  /// Assigns the menu that will display the list of files
-  pqRecentFilesMenu(QMenu& menu);
+  
+signals:
+  void succeeded();
+  void failed();
 
 private slots:
-  void onResourcesChanged();
-  void onOpenResource(QAction*);
-  void onOpenResource();
-  void onServerStarted();
-  void onServerFailed();
-
+  void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
+  void onError(QProcess::ProcessError error);
+  void onDelayComplete();
+  
 private:
-  ~pqRecentFilesMenu();
-  pqRecentFilesMenu(const pqRecentFilesMenu&);
-  pqRecentFilesMenu& operator=(const pqRecentFilesMenu&);
-
-  class pqImplementation;
-  pqImplementation* const Implementation;  
+  pqShellServerStartupContextHelper(double Delay, QObject* parent);
+  
+  friend pqShellServerStartup;
+  
+  const double Delay;
 };
 
-#endif // !_pqRecentFilesMenu_h
+#endif // !_pqShellServerStartup

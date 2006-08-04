@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayColorWidget.h"
 #include "pqElementInspectorWidget.h"
 #include "pqMainWindowCore.h"
+#include "pqManageServersDialog.h"
 #include "pqMultiView.h"
 #include "pqMultiViewFrame.h"
 #include "pqObjectInspectorWidget.h"
@@ -793,7 +794,7 @@ void pqMainWindowCore::onFileOpen(const QStringList& files)
     pqServerResource resource = this->getActiveServer()->getResource();
     resource.setPath(files[i]);
     pqApplicationCore::instance()->serverResources().add(resource);
-    pqApplicationCore::instance()->serverResources().save();
+    pqApplicationCore::instance()->serverResources().save(*pqApplicationCore::instance()->settings());
     }
 }
 
@@ -863,7 +864,7 @@ void pqMainWindowCore::onFileLoadServerState(const QStringList& files)
       resource.setPath(files[i]);
       resource.setSessionServer(this->getActiveServer()->getResource());
       pqApplicationCore::instance()->serverResources().add(resource);
-      pqApplicationCore::instance()->serverResources().save();
+      pqApplicationCore::instance()->serverResources().save(*pqApplicationCore::instance()->settings());
       }
     else
       {
@@ -907,7 +908,7 @@ void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
     resource.setPath(files[i]);
     resource.setSessionServer(this->getActiveServer()->getResource());
     pqApplicationCore::instance()->serverResources().add(resource);
-    pqApplicationCore::instance()->serverResources().save();
+    pqApplicationCore::instance()->serverResources().save(*pqApplicationCore::instance()->settings());
     }
 
   root->Delete();
@@ -1074,6 +1075,15 @@ void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
     {
     qDebug()<< "Animation not saved successfully.";
     }
+}
+
+void pqMainWindowCore::onFileManageServers()
+{
+  pqManageServersDialog dialog(
+    pqApplicationCore::instance()->serverStartups(),
+    *pqApplicationCore::instance()->settings(),
+    this->Implementation->Parent);
+  dialog.exec();
 }
 
 //-----------------------------------------------------------------------------

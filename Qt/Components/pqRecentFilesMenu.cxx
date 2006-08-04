@@ -33,25 +33,66 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRecentFilesMenu.h"
 
 #include <pqApplicationCore.h>
+#include <pqEditServerStartupDialog.h>
 #include <pqServerResources.h>
+#include <pqServerStartup.h>
+#include <pqServerStartupContext.h>
+#include <pqServerStartupDialog.h>
+#include <pqServerStartups.h>
 
 #include <QFileInfo>
 #include <QMenu>
 #include <QTimer>
 #include <QtDebug>
 
-#include <algorithm>
+#include <vtkstd/algorithm>
 
 class pqRecentFilesMenu::pqImplementation
 {
 public:
   pqImplementation(QMenu& menu) :
-    Menu(menu)
+    Menu(menu),
+    StartupContext(0),
+    StartupDialog(0)
   {
+  }
+  
+  ~pqImplementation()
+  {
+    this->closeStartup();
+  }
+
+  void closeStartup()
+  {
+    delete this->StartupContext;
+    delete this->StartupDialog;
+    
+    this->StartupContext = 0;
+    this->StartupDialog = 0;
   }
 
   QMenu& Menu;
   pqServerResource RecentResource;
+  pqServerStartupContext* StartupContext;
+  pqServerStartupDialog* StartupDialog;
+  
+  /// Functor that returns true if two resources have the same URI scheme and host(s)
+  class SameSchemeAndHost
+  {
+  public:
+    SameSchemeAndHost(const pqServerResource& lhs) :
+      LHS(lhs)
+    {
+    }
+    
+    bool operator()(const pqServerResource& rhs) const
+    {
+      return this->LHS.schemeHosts() == rhs.schemeHosts();
+    }
+    
+  private:
+    const pqServerResource& LHS;
+  };
 };
 
 pqRecentFilesMenu::pqRecentFilesMenu(QMenu& menu) :
@@ -79,16 +120,17 @@ void pqRecentFilesMenu::onResourcesChanged()
   pqServerResources::ListT resources = 
     pqApplicationCore::instance()->serverResources().list();
 
-  // Get a list of servers in most-recently-used order ...
+  // Get the set of servers with unique scheme/host in most-recently-used order ...
   pqServerResources::ListT servers;
   for(int i = 0; i != resources.size(); ++i)
     {
     pqServerResource resource = resources[i];
     pqServerResource server = resource.scheme() == "session" ?
-      resource.sessionServer() :
-      resource.server();
+      resource.sessionServer().schemeHostsPorts() :
+      resource.schemeHostsPorts();
       
-    if(-1 == servers.indexOf(server))
+    // If this host isn't already in the list, add it ...
+    if(!vtkstd::count_if(servers.begin(), servers.end(), pqImplementation::SameSchemeAndHost(server)))
       {
       servers.push_back(server);
       }
@@ -120,7 +162,7 @@ void pqRecentFilesMenu::onResourcesChanged()
       if(
         resource.scheme() != "session"
         || resource.path().isEmpty()
-        || resource.sessionServer() != server)
+        || resource.sessionServer().schemeHosts() != server.schemeHosts())
         {
         continue;
         }
@@ -140,7 +182,7 @@ void pqRecentFilesMenu::onResourcesChanged()
       if(
         resource.scheme() == "session"
         || resource.path().isEmpty()
-        || resource.server() != server)
+        || resource.schemeHosts() != server.schemeHosts())
         {
         continue;
         }
@@ -155,15 +197,62 @@ void pqRecentFilesMenu::onResourcesChanged()
 
 void pqRecentFilesMenu::onOpenResource(QAction* action)
 {
-  this->Implementation->RecentResource = pqServerResource(action->data().toString());
-  pqApplicationCore::instance()->serverResources().open(this->Implementation->RecentResource);
-  
   // Note: we can't update the resources here because it would destroy the action that's calling
   // this slot.  So, schedule an update for the next time the UI is idle.
-  QTimer::singleShot(0, this, SLOT(onUpdateResources()));
+  this->Implementation->RecentResource = pqServerResource(action->data().toString());
+  QTimer::singleShot(0, this, SLOT(onOpenResource()));
 }
 
-void pqRecentFilesMenu::onUpdateResources()
+void pqRecentFilesMenu::onOpenResource()
 {
-  pqApplicationCore::instance()->serverResources().add(this->Implementation->RecentResource);
+  // Cleanup old connections ...
+  this->Implementation->closeStartup();
+  
+  const pqServerResource resource = this->Implementation->RecentResource;
+  const pqServerResource server = resource.scheme() == "session" ? resource.sessionServer().schemeHostsPorts() : resource.schemeHostsPorts();
+  
+  // If no startup is required for this server, jump to opening the file ...
+  pqServerStartups& startups = pqApplicationCore::instance()->serverStartups();
+  if(!startups.startupRequired(server))
+    {
+    this->onServerStarted();
+    return;
+    }
+
+  // If a startup isn't available for this server, prompt the user ...    
+  if(!startups.startupAvailable(server))
+    {
+    pqEditServerStartupDialog dialog(
+      pqApplicationCore::instance()->serverStartups(), server);
+    if(QDialog::Rejected == dialog.exec())
+      return;
+    startups.save(*pqApplicationCore::instance()->settings());
+    }
+
+  // Try starting the server ...
+  if(pqServerStartup* const startup = startups.getStartup(server))
+    {
+    this->Implementation->StartupContext = new pqServerStartupContext();
+    this->connect(this->Implementation->StartupContext, SIGNAL(succeeded()), this, SLOT(onServerStarted()));
+    this->connect(this->Implementation->StartupContext, SIGNAL(failed()), this, SLOT(onServerFailed()));
+    
+    this->Implementation->StartupDialog = new pqServerStartupDialog(server);
+    this->Implementation->StartupDialog->show();
+    QObject::connect(this->Implementation->StartupContext, SIGNAL(succeeded()), this->Implementation->StartupDialog, SLOT(hide()));
+    QObject::connect(this->Implementation->StartupContext, SIGNAL(failed()), this->Implementation->StartupDialog, SLOT(hide()));
+    
+    startup->execute(server, *this->Implementation->StartupContext);
+    }
 }
+
+void pqRecentFilesMenu::onServerStarted()
+{
+  pqServerResources& resources = pqApplicationCore::instance()->serverResources();    
+  resources.open(this->Implementation->RecentResource);
+  resources.add(this->Implementation->RecentResource);
+}
+
+void pqRecentFilesMenu::onServerFailed()
+{
+}
+

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRecentFilesMenu.h
+   Module:    pqEditServerStartupDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,42 +29,36 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-#ifndef _pqRecentFilesMenu_h
-#define _pqRecentFilesMenu_h
+#ifndef __pqEditServerStartupDialog_h
+#define __pqEditServerStartupDialog_h
 
 #include "pqComponentsExport.h"
 
-#include <QObject>
+#include <QDialog>
 
-class QAction;
-class QMenu;
+class pqServerResource;
+class pqServerStartups;
 
-/** Displays a collection of recently-used files (server resources)
-as a menu, sorted in most-recently-used order and grouped by server */
-class PQCOMPONENTS_EXPORT pqRecentFilesMenu :
-  public QObject
+class PQCOMPONENTS_EXPORT pqEditServerStartupDialog :
+  public QDialog
 {
+  typedef QDialog Superclass;
+  
   Q_OBJECT
-
+  
 public:
-  /// Assigns the menu that will display the list of files
-  pqRecentFilesMenu(QMenu& menu);
-
-private slots:
-  void onResourcesChanged();
-  void onOpenResource(QAction*);
-  void onOpenResource();
-  void onServerStarted();
-  void onServerFailed();
+  pqEditServerStartupDialog(
+    pqServerStartups& startups,
+    const pqServerResource& server,
+    QWidget* parent = 0);
+  ~pqEditServerStartupDialog();
 
 private:
-  ~pqRecentFilesMenu();
-  pqRecentFilesMenu(const pqRecentFilesMenu&);
-  pqRecentFilesMenu& operator=(const pqRecentFilesMenu&);
+  void accept();
 
   class pqImplementation;
-  pqImplementation* const Implementation;  
+  pqImplementation* const Implementation;
 };
 
-#endif // !_pqRecentFilesMenu_h
+#endif
+

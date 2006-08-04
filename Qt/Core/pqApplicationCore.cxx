@@ -56,7 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QSize>
 
-
 // ParaView includes.
 #include "pq3DWidgetFactory.h"
 #include "pqPendingDisplayUndoElement.h"
@@ -70,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqServerResources.h"
+#include "pqServerStartups.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
@@ -94,6 +94,7 @@ public:
   QString OrganizationName;
   QString ApplicationName;
   QPointer<pqServerResources> ServerResources;
+  QPointer<pqServerStartups> ServerStartups;
   QPointer<pqSettings> Settings;
 };
 
@@ -349,9 +350,21 @@ pqServerResources& pqApplicationCore::serverResources()
   if(!this->Internal->ServerResources)
     {
     this->Internal->ServerResources = new pqServerResources();
+    this->Internal->ServerResources->load(*this->settings());
     }
     
   return *this->Internal->ServerResources;
+}
+
+pqServerStartups& pqApplicationCore::serverStartups()
+{
+  if(!this->Internal->ServerStartups)
+    {
+    this->Internal->ServerStartups = new pqServerStartups();
+    this->Internal->ServerStartups->load(*this->settings());
+    }
+    
+  return *this->Internal->ServerStartups;
 }
 
 //-----------------------------------------------------------------------------
@@ -397,7 +410,7 @@ QString pqApplicationCore::organizationName()
 pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
 {
   // Create a modified version of the resource that only contains server information
-  const pqServerResource server_resource = resource.server();
+  const pqServerResource server_resource = resource.schemeHostsPorts();
 
   // See if the server is already created.
   pqServerManagerModel *smModel = this->getServerManagerModel();
@@ -434,7 +447,7 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
         server_resource.dataServerHost().toAscii().data(),
         server_resource.dataServerPort(11111),
         server_resource.renderServerHost().toAscii().data(),
-        server_resource.renderServerPort(21111));
+        server_resource.renderServerPort(22221));
       }
     else if(server_resource.scheme() == "cdsrsrc")
       {

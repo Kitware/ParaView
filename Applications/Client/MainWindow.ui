@@ -28,35 +28,13 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>27</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSources" >
     <property name="title" >
      <string>S&amp;ources</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>&amp;File</string>
-    </property>
-    <widget class="QMenu" name="menuRecentFiles" >
-     <property name="title" >
-      <string>Recent Files</string>
-     </property>
-    </widget>
-    <addaction name="actionFileNew" />
-    <addaction name="actionFileOpen" />
-    <addaction name="menuRecentFiles" />
-    <addaction name="separator" />
-    <addaction name="actionFileLoadServerState" />
-    <addaction name="actionFileSaveServerState" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveData" />
-    <addaction name="actionFileSaveScreenshot" />
-    <addaction name="actionFileSaveAnimation" />
-    <addaction name="separator" />
-    <addaction name="actionFileExit" />
    </widget>
    <widget class="QMenu" name="menuFilters" >
     <property name="title" >
@@ -120,6 +98,30 @@
     <addaction name="actionEditCameraRedo" />
     <addaction name="separator" />
     <addaction name="actionEditSettings" />
+   </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuRecentFiles" >
+     <property name="title" >
+      <string>Recent Files</string>
+     </property>
+    </widget>
+    <addaction name="actionFileNew" />
+    <addaction name="actionFileOpen" />
+    <addaction name="menuRecentFiles" />
+    <addaction name="separator" />
+    <addaction name="actionFileLoadServerState" />
+    <addaction name="actionFileSaveServerState" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveData" />
+    <addaction name="actionFileSaveScreenshot" />
+    <addaction name="actionFileSaveAnimation" />
+    <addaction name="separator" />
+    <addaction name="actionFileManageServers" />
+    <addaction name="separator" />
+    <addaction name="actionFileExit" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -589,6 +591,14 @@
   <action name="actionEditSettings" >
    <property name="text" >
     <string>&amp;Settings</string>
+   </property>
+  </action>
+  <action name="actionFileManageServers" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqConnect22.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Manage Servers ...</string>
    </property>
   </action>
  </widget>

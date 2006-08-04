@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRecentFilesMenu.h
+   Module:    pqServerStartupContext.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,41 +30,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqRecentFilesMenu_h
-#define _pqRecentFilesMenu_h
+#ifndef _pqServerStartupContext_h
+#define _pqServerStartupContext_h
 
-#include "pqComponentsExport.h"
+#include "pqCoreExport.h"
 
 #include <QObject>
 
-class QAction;
-class QMenu;
+/////////////////////////////////////////////////////////////////////////////
+// pqServerStartupContext
 
-/** Displays a collection of recently-used files (server resources)
-as a menu, sorted in most-recently-used order and grouped by server */
-class PQCOMPONENTS_EXPORT pqRecentFilesMenu :
+class PQCORE_EXPORT pqServerStartupContext :
   public QObject
 {
   Q_OBJECT
 
 public:
-  /// Assigns the menu that will display the list of files
-  pqRecentFilesMenu(QMenu& menu);
+  pqServerStartupContext();
+  virtual ~pqServerStartupContext();
+  
+signals:
+  void succeeded();
+  void failed();
 
-private slots:
-  void onResourcesChanged();
-  void onOpenResource(QAction*);
-  void onOpenResource();
-  void onServerStarted();
-  void onServerFailed();
+public slots:
+  void onSucceeded();
+  void onFailed();
 
 private:
-  ~pqRecentFilesMenu();
-  pqRecentFilesMenu(const pqRecentFilesMenu&);
-  pqRecentFilesMenu& operator=(const pqRecentFilesMenu&);
-
-  class pqImplementation;
-  pqImplementation* const Implementation;  
+  pqServerStartupContext(const pqServerStartupContext&);
+  pqServerStartupContext& operator=(const pqServerStartupContext&);
 };
 
-#endif // !_pqRecentFilesMenu_h
+#endif // !_pqServerStartupContext_h

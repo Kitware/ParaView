@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqServerResources.h"
 #include "pqServer.h"
+#include "pqServerStartups.h"
 #include "pqSettings.h"
 
 #include <QStringList>
@@ -60,11 +61,7 @@ public:
 
   bool operator()(const pqServerResource& rhs) const
   {
-    return
-      this->Resource.host() == rhs.host()
-      && this->Resource.dataServerHost() == rhs.dataServerHost()
-      && this->Resource.renderServerHost() == rhs.renderServerHost()
-      && this->Resource.path() == rhs.path();
+    return this->Resource.hostPath() == rhs.hostPath();
   }
   
 private:
@@ -74,15 +71,6 @@ private:
 pqServerResources::pqServerResources() :
   Implementation(new pqImplementation())
 {
-  // Set some default resources ...
-  this->add(pqServerResource("builtin:"));
-
-  // Load saved resources ...
-  const QStringList resources = pqApplicationCore::instance()->settings()->value("ServerResources").toStringList();
-  for(int i = resources.size() - 1; i >= 0; --i)
-    {
-    this->add(pqServerResource(resources[i]));
-    }
 }
 
 pqServerResources::~pqServerResources()
@@ -125,7 +113,16 @@ const pqServerResources::ListT pqServerResources::list() const
   return results;
 }
 
-void pqServerResources::save()
+void pqServerResources::load(pqSettings& settings)
+{
+  const QStringList resources = settings.value("ServerResources").toStringList();
+  for(int i = resources.size() - 1; i >= 0; --i)
+    {
+    this->add(pqServerResource(resources[i]));
+    }
+}
+
+void pqServerResources::save(pqSettings& settings)
 {
   QStringList resources;
   for(
@@ -135,7 +132,7 @@ void pqServerResources::save()
     {
     resources.push_back(resource->toString());
     }
-  pqApplicationCore::instance()->settings()->setValue("ServerResources", resources);
+  settings.setValue("ServerResources", resources);
 }
 
 void pqServerResources::open(const pqServerResource& resource)

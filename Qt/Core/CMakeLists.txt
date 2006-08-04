@@ -52,7 +52,10 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerManagerObserver.h
   pqServerManagerSelectionModel.h
   pqServerResources.h
+  pqServerStartupContext.h
+  pqServerStartups.h
   pqSettings.h
+  pqShellServerStartup.h
   pqTestUtility.h
   pqUndoStack.h
   )
@@ -98,6 +101,8 @@ ADD_LIBRARY(pqCore
   pqFileDialogEventTranslator.h
   pqMain.cxx
   pqMain.h
+  pqManualServerStartup.cxx
+  pqManualServerStartup.h
   pqNameCount.cxx
   pqNameCount.h
   pqOptions.cxx
@@ -134,6 +139,8 @@ ADD_LIBRARY(pqCore
   pqRenderModule.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
+  pqShellServerStartup.cxx
+  pqShellServerStartup.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
   pqSMProxy.cxx
@@ -152,6 +159,11 @@ ADD_LIBRARY(pqCore
   pqServerResource.h
   pqServerResources.cxx
   pqServerResources.h
+  pqServerStartup.h
+  pqServerStartupContext.cxx
+  pqServerStartupContext.h
+  pqServerStartups.cxx
+  pqServerStartups.h
   pqSettings.cxx
   pqSettings.h
   pqTestUtility.cxx
@@ -192,5 +204,4 @@ INSTALL(TARGETS pqCore
 IF(BUILD_TESTING)
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)
-
 

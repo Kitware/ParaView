@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QVector>
 
+class pqSettings;
 class pqServer;
 
 /**
@@ -65,8 +66,10 @@ public:
   most-recently-used to least-recently-used */
   const ListT list() const;
 
+  /// Load the collection (from local user preferences)
+  void load(pqSettings&);
   /// Save the collection (to local user preferences)
-  void save();
+  void save(pqSettings&);
 
   /// Open (connect to) a resource
   void open(const pqServerResource& resource);

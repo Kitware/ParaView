@@ -42,6 +42,7 @@ class pqPipelineSource;
 class pqReaderFactory;
 class pqRenderModule;
 class pqServer;
+class pqServerStartups;
 class pqServerManagerModel;
 class pqServerManagerObserver;
 class pqServerManagerSelectionModel;
@@ -110,6 +111,8 @@ public:
 
   /// Returns the set of available server resources
   pqServerResources& serverResources();
+  /// Returns an object that can start remote servers
+  pqServerStartups& serverStartups();
 
   /// Get the application settings.
   pqSettings* settings();

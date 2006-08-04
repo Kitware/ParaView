@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRecentFilesMenu.h
+   Module:    pqServerStartupDialog.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,42 +29,36 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "pqServerStartupDialog.h"
+#include "ui_pqServerStartupDialog.h"
 
-#ifndef _pqRecentFilesMenu_h
-#define _pqRecentFilesMenu_h
+#include <pqServerResource.h>
 
-#include "pqComponentsExport.h"
-
-#include <QObject>
-
-class QAction;
-class QMenu;
-
-/** Displays a collection of recently-used files (server resources)
-as a menu, sorted in most-recently-used order and grouped by server */
-class PQCOMPONENTS_EXPORT pqRecentFilesMenu :
-  public QObject
+class pqServerStartupDialog::pqImplementation
 {
-  Q_OBJECT
-
 public:
-  /// Assigns the menu that will display the list of files
-  pqRecentFilesMenu(QMenu& menu);
+  pqImplementation(const pqServerResource& server) :
+    Server(server)
+  {
+  }
 
-private slots:
-  void onResourcesChanged();
-  void onOpenResource(QAction*);
-  void onOpenResource();
-  void onServerStarted();
-  void onServerFailed();
-
-private:
-  ~pqRecentFilesMenu();
-  pqRecentFilesMenu(const pqRecentFilesMenu&);
-  pqRecentFilesMenu& operator=(const pqRecentFilesMenu&);
-
-  class pqImplementation;
-  pqImplementation* const Implementation;  
+  Ui::pqServerStartupDialog UI;
+  const pqServerResource Server;
 };
 
-#endif // !_pqRecentFilesMenu_h
+pqServerStartupDialog::pqServerStartupDialog(
+  const pqServerResource& server, QWidget* widget_parent) :
+    Superclass(widget_parent),
+    Implementation(new pqImplementation(server))
+{
+  this->Implementation->UI.setupUi(this);
+  this->Implementation->UI.message->setText(
+    QString("Please wait while server %1 starts ...").arg(server.schemeHosts().toString()));
+    
+  this->setModal(true);
+}
+
+pqServerStartupDialog::~pqServerStartupDialog()
+{
+  delete this->Implementation;
+}

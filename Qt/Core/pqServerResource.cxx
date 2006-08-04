@@ -462,43 +462,43 @@ void pqServerResource::setSessionServer(const pqServerResource& rhs)
   this->Implementation->SessionServer = rhs.toString();
 }
 
-const pqServerResource pqServerResource::server() const
+const pqServerResource pqServerResource::schemeHostsPorts() const
 {
-  if(this->Implementation->Scheme == "builtin")
-    {
-    pqServerResource result;
-    result.setScheme(this->Implementation->Scheme);
-    return result;
-    }
-  else if(this->Implementation->Scheme == "cs" || this->Implementation->Scheme == "csrc")
-    {
-    pqServerResource result;
-    result.setScheme(this->Implementation->Scheme);
-    result.setHost(this->Implementation->Host);
-    if(-1 != this->Implementation->Port)
-      {
-      result.setPort(this->Implementation->Port);
-      }
-    return result;
-    }
-  else if(this->Implementation->Scheme == "cdsrs" || this->Implementation->Scheme == "cdsrsrc")
-    {
-    pqServerResource result;
-    result.setScheme(this->Implementation->Scheme);
-    result.setDataServerHost(this->Implementation->DataServerHost);
-    if(-1 != this->Implementation->DataServerPort)
-      result.setDataServerPort(this->Implementation->DataServerPort);
-    result.setRenderServerHost(this->Implementation->RenderServerHost);
-    if(-1 != this->Implementation->RenderServerPort)
-      result.setRenderServerPort(this->Implementation->RenderServerPort);
-    return result;
-    }
-  else
-    {
-    qWarning() << "Unknown resource scheme: " << this->Implementation->Scheme;
-    }
-    
-  return pqServerResource();
+  pqServerResource result;
+  
+  result.setScheme(this->Implementation->Scheme);
+  result.setHost(this->Implementation->Host);
+  result.setPort(this->Implementation->Port);
+  result.setDataServerHost(this->Implementation->DataServerHost);
+  result.setDataServerPort(this->Implementation->DataServerPort);
+  result.setRenderServerHost(this->Implementation->RenderServerHost);
+  result.setRenderServerPort(this->Implementation->RenderServerPort);
+  
+  return result;
+}
+
+const pqServerResource pqServerResource::schemeHosts() const
+{
+  pqServerResource result;
+  
+  result.setScheme(this->Implementation->Scheme);
+  result.setHost(this->Implementation->Host);
+  result.setDataServerHost(this->Implementation->DataServerHost);
+  result.setRenderServerHost(this->Implementation->RenderServerHost);
+  
+  return result;
+}
+
+const pqServerResource pqServerResource::hostPath() const
+{
+  pqServerResource result;
+  
+  result.setHost(this->Implementation->Host);
+  result.setDataServerHost(this->Implementation->DataServerHost);
+  result.setRenderServerHost(this->Implementation->RenderServerHost);
+  result.setPath(this->Implementation->Path);
+  
+  return result;
 }
 
 bool pqServerResource::operator==(const pqServerResource& rhs) const

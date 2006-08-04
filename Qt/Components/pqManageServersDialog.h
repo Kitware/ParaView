@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRecentFilesMenu.h
+   Module:    pqManageServersDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,42 +29,43 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-#ifndef _pqRecentFilesMenu_h
-#define _pqRecentFilesMenu_h
+#ifndef __pqManageServersDialog_h
+#define __pqManageServersDialog_h
 
 #include "pqComponentsExport.h"
 
-#include <QObject>
+#include <QDialog>
 
-class QAction;
-class QMenu;
+class pqServerStartups;
+class pqSettings;
+class QListWidgetItem;
 
-/** Displays a collection of recently-used files (server resources)
-as a menu, sorted in most-recently-used order and grouped by server */
-class PQCOMPONENTS_EXPORT pqRecentFilesMenu :
-  public QObject
+class PQCOMPONENTS_EXPORT pqManageServersDialog :
+  public QDialog
 {
+  typedef QDialog Superclass;
+  
   Q_OBJECT
-
+  
 public:
-  /// Assigns the menu that will display the list of files
-  pqRecentFilesMenu(QMenu& menu);
+  pqManageServersDialog(pqServerStartups& startups, pqSettings& settings, QWidget* parent = 0);
+  ~pqManageServersDialog();
 
 private slots:
-  void onResourcesChanged();
-  void onOpenResource(QAction*);
-  void onOpenResource();
-  void onServerStarted();
-  void onServerFailed();
+  void onStartupsChanged();
+  void onAddServer();
+  void onEditServer();
+  void onDeleteServer();
+  void onSelectAll();
+  void onSelectionChanged();
+  void onItemDoubleClicked(QListWidgetItem*);
 
 private:
-  ~pqRecentFilesMenu();
-  pqRecentFilesMenu(const pqRecentFilesMenu&);
-  pqRecentFilesMenu& operator=(const pqRecentFilesMenu&);
+  void accept();
 
   class pqImplementation;
-  pqImplementation* const Implementation;  
+  pqImplementation* const Implementation;
 };
 
-#endif // !_pqRecentFilesMenu_h
+#endif
+

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRecentFilesMenu.h
+   Module:    pqServerStartup.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,41 +30,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqRecentFilesMenu_h
-#define _pqRecentFilesMenu_h
+#ifndef _pqServerStartup_h
+#define _pqServerStartup_h
 
-#include "pqComponentsExport.h"
+class pqServerResource;
+class pqServerStartupContext;
 
-#include <QObject>
+/////////////////////////////////////////////////////////////////////////////
+// pqServerStartup
 
-class QAction;
-class QMenu;
-
-/** Displays a collection of recently-used files (server resources)
-as a menu, sorted in most-recently-used order and grouped by server */
-class PQCOMPONENTS_EXPORT pqRecentFilesMenu :
-  public QObject
+/// Abstract interface for an object that can start a remote server
+class pqServerStartup
 {
-  Q_OBJECT
-
 public:
-  /// Assigns the menu that will display the list of files
-  pqRecentFilesMenu(QMenu& menu);
-
-private slots:
-  void onResourcesChanged();
-  void onOpenResource(QAction*);
-  void onOpenResource();
-  void onServerStarted();
-  void onServerFailed();
-
-private:
-  ~pqRecentFilesMenu();
-  pqRecentFilesMenu(const pqRecentFilesMenu&);
-  pqRecentFilesMenu& operator=(const pqRecentFilesMenu&);
-
-  class pqImplementation;
-  pqImplementation* const Implementation;  
+  virtual ~pqServerStartup() {}
+  
+  /** Begins (asynchronous) execution of the startup procedure.  Callers should
+  create a pqServerStartupContext object to pass to this funtion, and connect
+  to its startupSucceed() and startupFailed() signals to receive notification
+  that the startup procedure has been completed. */
+  virtual void execute(const pqServerResource& server, pqServerStartupContext& context) = 0;
+  
+protected:
+  pqServerStartup() {}
+  pqServerStartup(const pqServerStartup&) {}
+  pqServerStartup& operator=(const pqServerStartup&) { return *this; }
 };
 
-#endif // !_pqRecentFilesMenu_h
+#endif // !_pqServerStartup_h
+

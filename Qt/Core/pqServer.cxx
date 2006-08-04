@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /////////////////////////////////////////////////////////////////////////////////////////////
 // pqServer
 
+//-----------------------------------------------------------------------------
 void pqServer::disconnect(pqServer* server)
 {
   // disconnect on the process module. The event handling will

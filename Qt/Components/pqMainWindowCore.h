@@ -226,6 +226,8 @@ public slots:
   void onFileSaveAnimation();
   void onFileSaveAnimation(const QStringList& files);
   
+  void onFileManageServers();
+  
   void onEditCameraUndo();
   void onEditCameraRedo();
   

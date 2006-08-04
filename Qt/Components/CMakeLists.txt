@@ -44,6 +44,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqColorMapEditor.h
   pqComboBoxDomain.h
   pqContourPanel.h
+  pqCreateServerStartupDialog.h
+  pqEditServerStartupDialog.h
   pqCustomFilterDefinitionWizard.h
   pqCustomFilterManager.h
   pqCustomFilterManagerModel.h
@@ -63,6 +65,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLineWidget.h
   pqLoadedFormObjectPanel.h
   pqMainWindowCore.h
+  pqManageServersDialog.h
   pqMultiView.h
   pqMultiViewFrame.h
   pqNamedObjectPanel.h
@@ -83,6 +86,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSelectionManager.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
+  pqServerStartupDialog.h
   pqSettingsDialog.h
   pqSignalAdaptorProxyList.h
   pqSimpleAnimationManager.h
@@ -108,18 +112,22 @@ SET(UI_FORMS
   Resources/UI/pqAnimationSettings.ui
   Resources/UI/pqColorMapEditor.ui
   Resources/UI/pqContourControls.ui
+  Resources/UI/pqCreateServerStartupDialog.ui
+  Resources/UI/pqEditServerStartupDialog.ui
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqDisplayProxyEditor.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqLineWidget.ui
+  Resources/UI/pqManageServersDialog.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqRenderViewEditor.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui
   Resources/UI/pqServerBrowser.ui
+  Resources/UI/pqServerStartupDialog.ui
   Resources/UI/pqSettingsDialog.ui
   Resources/UI/pqStreamTracerControls.ui
 )
@@ -166,6 +174,10 @@ ADD_LIBRARY(pqComponents
   pqComponentsExport.h
   pqContourPanel.cxx
   pqContourPanel.h
+  pqCreateServerStartupDialog.cxx
+  pqCreateServerStartupDialog.h
+  pqEditServerStartupDialog.cxx
+  pqEditServerStartupDialog.h
   pqCustomFilterDefinitionModel.cxx
   pqCustomFilterDefinitionModel.h
   pqCustomFilterDefinitionWizard.cxx
@@ -206,6 +218,8 @@ ADD_LIBRARY(pqComponents
   pqLoadedFormObjectPanel.h
   pqMainWindowCore.cxx
   pqMainWindowCore.h
+  pqManageServersDialog.cxx
+  pqManageServersDialog.h
   pqMultiView.cxx
   pqMultiView.h
   pqMultiViewFrame.cxx
@@ -250,6 +264,8 @@ ADD_LIBRARY(pqComponents
   pqServerBrowser.h
   pqServerFileDialogModel.cxx
   pqServerFileDialogModel.h
+  pqServerStartupDialog.cxx
+  pqServerStartupDialog.h
   pqSignalAdaptorProxyList.cxx
   pqSignalAdaptorProxyList.h
   pqSimpleAnimationManager.cxx
