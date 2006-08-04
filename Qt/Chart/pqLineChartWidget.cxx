@@ -50,11 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLineChart.h"
 #include "pqLineChartWidget.h"
 
-#include <pqConnect.h>
-#include <pqSetName.h>
-#include <pqFileDialog.h>
-#include <pqLocalFileDialogModel.h>
-
 #include <QCursor>
 #include <QEvent>
 #include <QFont>
@@ -66,7 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QPoint>
 #include <QPrinter>
-#include <QPrintDialog>
 #include <QRect>
 #include <QToolTip>
 
@@ -528,25 +522,9 @@ void pqLineChartWidget::resizeEvent(QResizeEvent *)
   this->ZoomPan->updateContentSize();
 }
 
-void pqLineChartWidget::addMenuActions(QMenu& menu)
-{
-  menu.addAction("Print Chart")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(printChart()));
-
-  menu.addAction("Save .pdf")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(savePDF()));
-    
-  menu.addAction("Save .png")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(savePNG()));
-}
-
 void pqLineChartWidget::contextMenuEvent(QContextMenuEvent *e)
 {
   e->accept();
-
-  QMenu popup_menu;
-  this->addMenuActions(popup_menu);
-  popup_menu.exec(QCursor::pos());
 }
 
 bool pqLineChartWidget::viewportEvent(QEvent *e)
@@ -609,17 +587,6 @@ void pqLineChartWidget::draw(QPainter& painter, QRect area)
     }
 }
 
-void pqLineChartWidget::printChart()
-{
-  QPrinter printer(QPrinter::HighResolution);
-
-  QPrintDialog print_dialog(&printer);
-  if(print_dialog.exec() != QDialog::Accepted)
-    return;
-    
-  this->printChart(printer);
-}
-
 void pqLineChartWidget::printChart(QPrinter& printer)
 {
   QSize viewport_size(this->rect().size());
@@ -632,17 +599,6 @@ void pqLineChartWidget::printChart(QPrinter& printer)
   this->draw(painter, this->rect());
 }
 
-void pqLineChartWidget::savePDF()
-{
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
-    this, tr("Save .pdf File:"), QString(), "PDF files (*.pdf)")
-    << pqSetName("fileSavePDFDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePDF(const QStringList&)));
-  file_dialog->setFileMode(pqFileDialog::AnyFile);
-    
-  file_dialog->show();
-}
-
 void pqLineChartWidget::savePDF(const QStringList& files)
 {
   for(int i = 0; i != files.size(); ++i)
@@ -653,17 +609,6 @@ void pqLineChartWidget::savePDF(const QStringList& files)
     
     this->printChart(printer);
     }
-}
-
-void pqLineChartWidget::savePNG()
-{
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
-    this, tr("Save .png File:"), QString(), "PNG files (*.png)")
-    << pqSetName("fileSavePNGDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePNG(const QStringList&)));
-  file_dialog->setFileMode(pqFileDialog::AnyFile);
-    
-  file_dialog->show();
 }
 
 void pqLineChartWidget::savePNG(const QStringList& files)

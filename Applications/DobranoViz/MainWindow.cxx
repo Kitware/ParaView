@@ -14,6 +14,7 @@
 #include "ui_MainWindow.h"
 
 #include <pqApplicationCore.h>
+#include <pqChartContextMenu.h>
 #include <pqConnect.h>
 #include <pqSetName.h>
 #include <pqFileDialog.h>
@@ -45,6 +46,7 @@ public:
     Core(parent),
     ViewMenu(0),
     LineChartWidget(0),
+    ChartMenu(0),
     LineChart(0),
     ChooseDataCombo(0)
   {
@@ -62,6 +64,7 @@ public:
   pqMainWindowCore Core;
   pqViewMenu* ViewMenu;
   pqLineChartWidget* LineChartWidget;
+  pqChartContextMenu *ChartMenu;
   LineChartAdapter* LineChart;
   QComboBox* ChooseDataCombo;
 };
@@ -71,6 +74,9 @@ MainWindow::MainWindow() :
 {
   this->Implementation->UI.setupUi(this);
   this->Implementation->ViewMenu = new pqViewMenu(*this->Implementation->UI.menuView);
+
+  // Setup the default chart context menu.
+  this->Implementation->ChartMenu = new pqChartContextMenu(this);
 
   // Setup menus and toolbars ...
   connect(this->Implementation->UI.actionFileNew,
@@ -574,7 +580,9 @@ void MainWindow::onLineChartContextMenu(const QPoint&)
 
   popup_menu.addSeparator();
 
-  this->Implementation->LineChartWidget->addMenuActions(popup_menu);
+  //this->Implementation->LineChartWidget->addMenuActions(popup_menu);
+  this->Implementation->ChartMenu->addMenuActions(popup_menu,
+      this->Implementation->LineChartWidget);
 
   popup_menu.addSeparator();
   

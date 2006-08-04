@@ -143,9 +143,6 @@ public:
   ///   The prefered size of the widget.
   virtual QSize sizeHint() const;
 
-  /// Adds actions to the given menu object
-  void addMenuActions(QMenu& menu);
-
 public slots:
   /// \brief
   ///   Updates the chart layout when a change is made.
@@ -155,16 +152,12 @@ public slots:
   ///   Initiates a repaint of the chart when a change is made.
   void repaintChart();
 
-  /// Prompt the user with a print dialog and print the chart contents
-  void printChart();
   /// Prints the chart to the given device
   void printChart(QPrinter& printer);
-  /// Prompt the user for a filename and save the chart as a PDF file
-  void savePDF();
+
   /// Save the chart as a PDF file
   void savePDF(const QStringList&);
-  /// Prompt the user for a filename and save the chart as a PNG file
-  void savePNG();
+
   /// Save the chart as a PNG file
   void savePNG(const QStringList&);
 

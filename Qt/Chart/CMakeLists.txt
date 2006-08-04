@@ -2,8 +2,6 @@ PROJECT(QtChart)
 
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
-  ${QtWidgets_SOURCE_DIR}
-  ${QtWidgets_BINARY_DIR}
 )
 
 SET(QtChart_SRCS
@@ -100,7 +98,6 @@ ADD_LIBRARY(QtChart
 )
 
 TARGET_LINK_LIBRARIES(QtChart
-  QtWidgets
   ${QT_LIBRARIES}
 )
 

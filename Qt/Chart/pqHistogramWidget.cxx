@@ -52,11 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHistogramWidget.h"
 #include "pqLineChart.h"
 
-#include <pqConnect.h>
-#include <pqSetName.h>
-#include <pqFileDialog.h>
-#include <pqLocalFileDialogModel.h>
-
 #include <QCursor>
 #include <QEvent>
 #include <QKeyEvent>
@@ -64,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPainter>
 #include <QPixmap>
 #include <QPrinter>
-#include <QPrintDialog>
 #include <QTimer>
 
 // Set up a margin around the histogram.
@@ -906,25 +900,9 @@ void pqHistogramWidget::resizeEvent(QResizeEvent *)
   this->ZoomPan->updateContentSize();
 }
 
-void pqHistogramWidget::addMenuActions(QMenu& menu)
-{
-  menu.addAction("Print Chart")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(printChart()));
-
-  menu.addAction("Save .pdf")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(savePDF()));
-    
-  menu.addAction("Save .png")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(savePNG()));
-}
-
 void pqHistogramWidget::contextMenuEvent(QContextMenuEvent *e)
 {
   e->accept();
-  
-  QMenu popup_menu;
-  this->addMenuActions(popup_menu);
-  popup_menu.exec(QCursor::pos());
 }
 
 bool pqHistogramWidget::viewportEvent(QEvent *e)
@@ -997,17 +975,6 @@ void pqHistogramWidget::draw(QPainter& painter, QRect area)
     }
 }
 
-void pqHistogramWidget::printChart()
-{
-  QPrinter printer(QPrinter::HighResolution);
-
-  QPrintDialog print_dialog(&printer);
-  if(print_dialog.exec() != QDialog::Accepted)
-    return;
-    
-  this->printChart(printer);
-}
-
 void pqHistogramWidget::printChart(QPrinter& printer)
 {
   QSize viewport_size(this->rect().size());
@@ -1020,17 +987,6 @@ void pqHistogramWidget::printChart(QPrinter& printer)
   this->draw(painter, this->rect());
 }
 
-void pqHistogramWidget::savePDF()
-{
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
-    this, tr("Save .pdf File:"), QString(), "PDF files (*.pdf)")
-    << pqSetName("fileSavePDFDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePDF(const QStringList&)));
-  file_dialog->setFileMode(pqFileDialog::AnyFile);
-    
-  file_dialog->show();
-}
-
 void pqHistogramWidget::savePDF(const QStringList& files)
 {
   for(int i = 0; i != files.size(); ++i)
@@ -1041,17 +997,6 @@ void pqHistogramWidget::savePDF(const QStringList& files)
     
     this->printChart(printer);
     }
-}
-
-void pqHistogramWidget::savePNG()
-{
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
-    this, tr("Save .png File:"), QString(), "PNG files (*.png)")
-    << pqSetName("fileSavePNGDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePNG(const QStringList&)));
-  file_dialog->setFileMode(pqFileDialog::AnyFile);
-    
-  file_dialog->show();
 }
 
 void pqHistogramWidget::savePNG(const QStringList& files)

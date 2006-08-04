@@ -189,9 +189,6 @@ public:
   pqChartZoomPan& getZoomPanHandler() const {return *this->ZoomPan;}
   //@}
 
-  /// Adds actions to a menu for this object
-  void addMenuActions(QMenu& menu);
-
 public slots:
   /// \brief
   ///   Sets the interaction mode.
@@ -219,16 +216,12 @@ public slots:
   ///   Initiates a repaint of the chart when a change is made.
   void repaintChart();
 
-  /// Prompt the user with a print dialog and print the chart contents
-  void printChart();
   /// Prints the chart to the given device
   void printChart(QPrinter& printer);
-  /// Prompt the user for a filename and save the chart as a PDF file
-  void savePDF();
+
   /// Save the chart as a PDF file
   void savePDF(const QStringList&);
-  /// Prompt the user for a filename and save the chart as a PNG file
-  void savePNG();
+
   /// Save the chart as a PNG file
   void savePNG(const QStringList&);
 
