@@ -32,7 +32,7 @@
 #include "vtkSmartPointer.h"
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkVolumeSelector, "1.2");
+vtkCxxRevisionMacro(vtkVolumeSelector, "1.3");
 vtkStandardNewMacro(vtkVolumeSelector);
 
 vtkCxxSetObjectMacro(vtkVolumeSelector, Selection, vtkSelection);
@@ -84,7 +84,7 @@ void vtkVolumeSelector::Select()
 
   this->Selection->Clear();
   this->Selection->GetProperties()->Set(
-    vtkSelectionNode::CONTENT_TYPE(), vtkSelectionNode::SELECTIONS);
+    vtkSelection::CONTENT_TYPE(), vtkSelection::SELECTIONS);
 
   vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
 
@@ -118,12 +118,12 @@ void vtkVolumeSelector::Select()
         }
 
       // Create and add a selection node
-      vtkSelectionNode* selection = vtkSelectionNode::New();
+      vtkSelection* selection = vtkSelection::New();
       this->Selection->AddChild(selection);
 
       // For now, we only support cell ids
       selection->GetProperties()->Set(
-        vtkSelectionNode::CONTENT_TYPE(), vtkSelectionNode::CELL_IDS);
+        vtkSelection::CONTENT_TYPE(), vtkSelection::CELL_IDS);
 
       // Selected cell array
       vtkIdTypeArray* selectedCells = vtkIdTypeArray::New();
@@ -154,7 +154,7 @@ void vtkVolumeSelector::Select()
             {
             vtkClientServerID id = processModule->GetIDFromObject(alg);
             selection->GetProperties()->Set(
-              vtkSelectionNode::SOURCE_ID(), id.ID);
+              vtkSelection::SOURCE_ID(), id.ID);
             }
           }
         }
@@ -164,14 +164,14 @@ void vtkVolumeSelector::Select()
         vtkClientServerID pid = processModule->GetIDFromObject(
           this->Internal->Props[i]);
         selection->GetProperties()->Set(
-          vtkSelectionNode::PROP_ID(), pid.ID);
+          vtkSelection::PROP_ID(), pid.ID);
         }
 
       // Add the process id as another property
       if (processModule->GetPartitionId() >= 0)
         {
         selection->GetProperties()->Set(
-          vtkSelectionNode::PROCESS_ID(), processModule->GetPartitionId());
+          vtkSelection::PROCESS_ID(), processModule->GetPartitionId());
         }
 
       selection->Delete();
