@@ -66,7 +66,8 @@ public:
     ENUMERATION,
     SINGLE_ELEMENT,
     MULTIPLE_ELEMENTS,
-    FILE_LIST
+    FILE_LIST,
+    FIELD_SELECTION
     };
 
   /// Get the type of the property
@@ -168,6 +169,18 @@ public:
   static void setUncheckedFileListProperty(vtkSMProperty* Property, 
                                            QString Value);
 
+  /// get/set the field selection mode (point, cell, ...)
+  static QString getFieldSelectionMode(vtkSMProperty* prop);
+  static void setFieldSelectionMode(vtkSMProperty*, const QString&);
+  static void setUncheckedFieldSelectionMode(vtkSMProperty*, const QString&);
+  static QList<QString> getFieldSelectionModeDomain(vtkSMProperty*);
+  
+  /// get/set the field selection scalar 
+  static QString getFieldSelectionScalar(vtkSMProperty*);
+  static void setFieldSelectionScalar(vtkSMProperty*, const QString&);
+  static void setUncheckedFieldSelectionScalar(vtkSMProperty*, const QString&);
+  static QList<QString> getFieldSelectionScalarDomain(vtkSMProperty*);
+  
 };
 
 #endif // !_pqSMAdaptor_h

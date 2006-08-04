@@ -100,6 +100,10 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       type = pqSMAdaptor::PROXYSELECTION;
       }
     }
+  else if(Property->GetDomain("field_list"))
+    {
+    type = pqSMAdaptor::FIELD_SELECTION;
+    }
   else
     {
     vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
@@ -627,6 +631,7 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property)
 void pqSMAdaptor::setEnumerationProperty(vtkSMProperty* Property,
                                          QVariant Value)
 {
+  // TODO:  need to handle array lists?
   vtkSMBooleanDomain* BooleanDomain = NULL;
   vtkSMEnumerationDomain* EnumerationDomain = NULL;
   vtkSMStringListDomain* StringListDomain = NULL;
@@ -1389,4 +1394,156 @@ void pqSMAdaptor::setUncheckedFileListProperty(vtkSMProperty* Property,
     }
   Property->UpdateDependentDomains();
 }
+
+QString pqSMAdaptor::getFieldSelectionMode(vtkSMProperty* prop)
+{
+  QString ret;
+  vtkSMStringVectorProperty* Property =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  vtkSMEnumerationDomain* domain =
+    vtkSMEnumerationDomain::SafeDownCast(prop->GetDomain("field_list"));
+  
+  if(Property && domain)
+    {
+    int which = QString(Property->GetElement(3)).toInt();
+    int numEntries = domain->GetNumberOfEntries();
+    for(int i=0; i<numEntries; i++)
+      {
+      if(domain->GetEntryValue(i) == which)
+        {
+        ret = domain->GetEntryText(i);
+        break;
+        }
+      }
+    }
+  return ret;
+}
+
+void pqSMAdaptor::setFieldSelectionMode(vtkSMProperty* prop, 
+                                             const QString& val)
+{
+  vtkSMStringVectorProperty* Property =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  vtkSMEnumerationDomain* domain =
+    vtkSMEnumerationDomain::SafeDownCast(prop->GetDomain("field_list"));
+  
+  if(Property && domain)
+    {
+    int numEntries = domain->GetNumberOfEntries();
+    for(int i=0; i<numEntries; i++)
+      {
+      if(val == domain->GetEntryText(i))
+        {
+        Property->SetElement(3, 
+           QString("%1").arg(domain->GetEntryValue(i)).toAscii().data());
+        break;
+        }
+      }
+    }
+}
+
+void pqSMAdaptor::setUncheckedFieldSelectionMode(vtkSMProperty* prop, 
+                                             const QString& val)
+{
+  vtkSMStringVectorProperty* Property =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  vtkSMEnumerationDomain* domain =
+    vtkSMEnumerationDomain::SafeDownCast(prop->GetDomain("field_list"));
+  
+  if(Property && domain)
+    {
+    int numEntries = domain->GetNumberOfEntries();
+    for(int i=0; i<numEntries; i++)
+      {
+      if(val == domain->GetEntryText(i))
+        {
+        Property->SetUncheckedElement(3, 
+           QString("%1").arg(domain->GetEntryValue(i)).toAscii().data());
+        break;
+        }
+      }
+    Property->UpdateDependentDomains();
+    }
+}
+
+QList<QString> pqSMAdaptor::getFieldSelectionModeDomain(vtkSMProperty* prop)
+{
+  QList<QString> types;
+
+  vtkSMStringVectorProperty* Property =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  vtkSMEnumerationDomain* domain =
+    vtkSMEnumerationDomain::SafeDownCast(prop->GetDomain("field_list"));
+  
+  if(Property && domain)
+    {
+    int numEntries = domain->GetNumberOfEntries();
+    for(int i=0; i<numEntries; i++)
+      {
+      types.append(domain->GetEntryText(i));
+      }
+    }
+  return types;
+}
+
+
+QString pqSMAdaptor::getFieldSelectionScalar(vtkSMProperty* prop)
+{
+  QString ret;
+  vtkSMStringVectorProperty* Property =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  
+  if(Property)
+    {
+    ret = Property->GetElement(4);
+    }
+  return ret;
+}
+
+void pqSMAdaptor::setFieldSelectionScalar(vtkSMProperty* prop, 
+                                              const QString& val)
+{
+  vtkSMStringVectorProperty* Property =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  
+  if(Property)
+    {
+    Property->SetElement(4, val.toAscii().data());
+    }
+}
+
+void pqSMAdaptor::setUncheckedFieldSelectionScalar(vtkSMProperty* prop, 
+                                              const QString& val)
+{
+  vtkSMStringVectorProperty* Property =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  
+  if(Property)
+    {
+    Property->SetUncheckedElement(4, val.toAscii().data());
+    Property->UpdateDependentDomains();
+    }
+}
+
+QList<QString> pqSMAdaptor::getFieldSelectionScalarDomain(vtkSMProperty*
+  prop)
+{
+  QList<QString> types;
+
+  vtkSMStringVectorProperty* Property =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  vtkSMArrayListDomain* domain =
+    vtkSMArrayListDomain::SafeDownCast(prop->GetDomain("array_list"));
+  
+  if(Property && domain)
+    {
+    int numEntries = domain->GetNumberOfStrings();
+    for(int i=0; i<numEntries; i++)
+      {
+      types.append(domain->GetString(i));
+      }
+    }
+  return types;
+}
+
 

@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqThresholdPanel_h
 
 #include "pqLoadedFormObjectPanel.h"
-class QComboBox;
 class QSlider;
 class QDoubleSpinBox;
 
@@ -56,7 +55,6 @@ protected slots:
   void upperSpinChanged();
   void lowerSliderChanged();
   void upperSliderChanged();
-  void attributeModeChanged(int);
 
 protected:
   /// populate widgets with properties from the server manager
@@ -64,7 +62,6 @@ protected:
   /// set the properties in the server manager with properties in the widgets
   virtual void unlinkServerManagerProperties();
 
-  QComboBox* AttributeMode;
   QSlider* LowerSlider;
   QSlider* UpperSlider;
   QDoubleSpinBox* LowerSpin;

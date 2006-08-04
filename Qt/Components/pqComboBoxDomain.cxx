@@ -67,38 +67,60 @@ public:
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
   bool IsSetting;
+  int Index;
 };
   
 
-pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop)
+pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, int idx)
   : QObject(p)
 {
   this->Internal = new pqInternal();
   this->Internal->Property = prop;
+  this->Internal->Index = idx;
 
-  // get domain
-  vtkSMDomainIterator* iter = prop->NewDomainIterator();
-  iter->Begin();
-  while(!iter->IsAtEnd() && !this->Internal->Domain)
+  if(pqSMAdaptor::getPropertyType(prop) == pqSMAdaptor::FIELD_SELECTION)
     {
-    vtkSMEnumerationDomain* enumeration;
-    enumeration = vtkSMEnumerationDomain::SafeDownCast(iter->GetDomain());
-    if(enumeration)
+    if(idx == 0)
       {
-      this->Internal->Domain = enumeration;
+      this->Internal->Domain = prop->GetDomain("field_list");
       }
-    iter->Next();
+    else if(idx == 1)
+      {
+      this->Internal->Domain = prop->GetDomain("array_list");
+      }
     }
-  iter->Delete();
+  else
+    {
+    // get domain
+    vtkSMDomainIterator* iter = prop->NewDomainIterator();
+    iter->Begin();
+    while(!iter->IsAtEnd() && !this->Internal->Domain)
+      {
+      vtkSMEnumerationDomain* enumeration;
+      enumeration = vtkSMEnumerationDomain::SafeDownCast(iter->GetDomain());
+      if(enumeration)
+        {
+        this->Internal->Domain = enumeration;
+        }
+      iter->Next();
+      }
+    iter->Delete();
+    }
 
   if(this->Internal->Domain)
     {
     this->Internal->Connection->Connect(this->Internal->Domain, 
                                         vtkCommand::ModifiedEvent,
                                         this,
-                                        SLOT(domainChanged()));
-    this->domainChanged();
+                                        SIGNAL(domainChanged()));
+    this->internalDomainChanged();
     }
+  
+  // queued connection, otherwise, we get modified events during the
+  // modification of the domain, which we don't want
+  QObject::connect(this, SIGNAL(domainChanged()),
+                   this, SLOT(internalDomainChanged()),
+                   Qt::QueuedConnection);
 }
 
 pqComboBoxDomain::~pqComboBoxDomain()
@@ -106,7 +128,7 @@ pqComboBoxDomain::~pqComboBoxDomain()
   delete this->Internal;
 }
 
-void pqComboBoxDomain::domainChanged()
+void pqComboBoxDomain::internalDomainChanged()
 {
   QComboBox* combo = qobject_cast<QComboBox*>(this->parent());
   Q_ASSERT(combo != NULL);
@@ -122,20 +144,46 @@ void pqComboBoxDomain::domainChanged()
 
   this->Internal->IsSetting = true;
 
+  QList<QString> domain;
   pqSMAdaptor::PropertyType type;
+
   type = pqSMAdaptor::getPropertyType(this->Internal->Property);
   if(type == pqSMAdaptor::ENUMERATION)
     {
     QList<QVariant> enums;
     enums = pqSMAdaptor::getEnumerationPropertyDomain(this->Internal->Property);
+    foreach(QVariant var, enums)
+      {
+      domain.append(var.toString());
+      }
+    }
+  else if(type == pqSMAdaptor::FIELD_SELECTION)
+    {
+    if(this->Internal->Index == 0)
+      {
+      domain = pqSMAdaptor::getFieldSelectionModeDomain(this->Internal->Property);
+      }
+    else if(this->Internal->Index == 1)
+      {
+      domain = pqSMAdaptor::getFieldSelectionScalarDomain(this->Internal->Property);
+      }
+    }
+
+  // check if the domain didn't change
+  QList<QString> oldDomain;
+
+  for(int i=0; i<combo->count(); i++)
+    {
+    oldDomain.append(combo->itemText(i));
+    }
+
+  if(oldDomain != domain)
+    {
     // save previous value to put back
     QString old = combo->currentText();
     combo->blockSignals(true);
     combo->clear();
-    foreach(QVariant var, enums)
-      {
-      combo->addItem(var.toString());
-      }
+    combo->addItems(domain);
     combo->setCurrentIndex(-1);
     combo->blockSignals(false);
     int foundOld = combo->findText(old);

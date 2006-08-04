@@ -57,7 +57,9 @@ public:
   void setScaleFactor(double scale);
   double scaleFactor() const;
 
-public slots:
+protected slots:
+  void internalDomainChanged();
+signals:
   void domainChanged();
 
 protected:

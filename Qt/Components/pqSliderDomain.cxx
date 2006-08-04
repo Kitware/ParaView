@@ -114,8 +114,16 @@ pqSliderDomain::pqSliderDomain(QSlider* p, vtkSMProperty* prop, int index)
     this->Internal->Connection->Connect(this->Internal->Domain, 
                                         vtkCommand::ModifiedEvent,
                                         this,
-                                        SLOT(domainChanged()));
+                                        SIGNAL(domainChanged()));
+    this->internalDomainChanged();
     }
+
+  // queued connection, otherwise, we get modified events during the
+  // modification of the domain, which we don't want
+  QObject::connect(this, SIGNAL(domainChanged()),
+                   this, SLOT(internalDomainChanged()),
+                   Qt::QueuedConnection);
+
 }
 
 pqSliderDomain::~pqSliderDomain()
@@ -134,7 +142,7 @@ double pqSliderDomain::scaleFactor() const
 }
 
 
-void pqSliderDomain::domainChanged()
+void pqSliderDomain::internalDomainChanged()
 {
   QSlider* slider = qobject_cast<QSlider*>(this->parent());
   Q_ASSERT(slider != NULL);

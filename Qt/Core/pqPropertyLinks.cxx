@@ -240,6 +240,29 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
           }
         }
       break;
+    case pqSMAdaptor::FIELD_SELECTION:
+        {
+        if(this->Internal->Index == 0)
+          {
+          prop = pqSMAdaptor::getFieldSelectionMode(
+            this->Internal->Property);
+          if(prop != old)
+            {
+            this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
+              prop);
+            }
+          }
+        else
+          {
+          prop = pqSMAdaptor::getFieldSelectionScalar(
+            this->Internal->Property);
+          if(prop != old)
+            {
+            this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
+              prop);
+            }
+          }
+        }
     case pqSMAdaptor::UNKNOWN:
     case pqSMAdaptor::PROXYLIST:
       break;
@@ -393,6 +416,44 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
             {
             pqSMAdaptor::setMultipleElementProperty(
               this->Internal->Property, this->Internal->Index, prop);
+            if(this->Internal->AutoUpdate)
+              {
+              this->Internal->Proxy->UpdateVTKObjects();
+              }
+            }
+          }
+        }
+      break;
+    case pqSMAdaptor::FIELD_SELECTION:
+        {
+        if(this->Internal->Index == 0)
+          {
+          if(this->Internal->UseUncheckedProperties)
+            {
+            pqSMAdaptor::setUncheckedFieldSelectionMode(
+              this->Internal->Property, prop.toString());
+            }
+          else
+            {
+            pqSMAdaptor::setFieldSelectionMode(
+              this->Internal->Property, prop.toString());
+            if(this->Internal->AutoUpdate)
+              {
+              this->Internal->Proxy->UpdateVTKObjects();
+              }
+            }
+          }
+        else
+          {
+          if(this->Internal->UseUncheckedProperties)
+            {
+            pqSMAdaptor::setUncheckedFieldSelectionScalar(
+              this->Internal->Property, prop.toString());
+            }
+          else
+            {
+            pqSMAdaptor::setFieldSelectionScalar(
+              this->Internal->Property, prop.toString());
             if(this->Internal->AutoUpdate)
               {
               this->Internal->Proxy->UpdateVTKObjects();

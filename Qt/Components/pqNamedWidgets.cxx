@@ -345,6 +345,41 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
             proxy, SMProperty);
           }
         }
+      else if(pt == pqSMAdaptor::FIELD_SELECTION)
+        {
+        QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
+        if(comboBox)
+          {
+          if(comboBox->objectName().contains(QRegExp(":mode$")))
+            {
+            QList<QString> domain = 
+              pqSMAdaptor::getFieldSelectionModeDomain(SMProperty);
+            comboBox->clear();
+            comboBox->addItems(domain);
+
+            pqSignalAdaptorComboBox* adaptor = 
+              new pqSignalAdaptorComboBox(comboBox);
+            adaptor->setObjectName("ComboBoxAdaptor");
+            property_manager->registerLink(
+              adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
+              proxy, SMProperty, 0);  // 0 means link mode for field selection
+            }
+          if(comboBox->objectName().contains(QRegExp(":scalars$")))
+            {
+            QList<QString> domain = 
+              pqSMAdaptor::getFieldSelectionScalarDomain(SMProperty);
+            comboBox->clear();
+            comboBox->addItems(domain);
+
+            pqSignalAdaptorComboBox* adaptor = 
+              new pqSignalAdaptorComboBox(comboBox);
+            adaptor->setObjectName("ComboBoxAdaptor");
+            property_manager->registerLink(
+              adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
+              proxy, SMProperty, 1);  // 1 means link scalar for field selection
+            }
+          }
+        }
       }
     }
   iter->Delete();

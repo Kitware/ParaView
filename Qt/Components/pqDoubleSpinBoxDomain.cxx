@@ -96,9 +96,15 @@ pqDoubleSpinBoxDomain::pqDoubleSpinBoxDomain(QDoubleSpinBox* p, vtkSMProperty* p
     this->Internal->Connection->Connect(this->Internal->Domain, 
                                         vtkCommand::ModifiedEvent,
                                         this,
-                                        SLOT(domainChanged()));
-    this->domainChanged();
+                                        SIGNAL(domainChanged()));
+    this->internalDomainChanged();
     }
+  
+  // queued connection, otherwise, we get modified events during the
+  // modification of the domain, which we don't want
+  QObject::connect(this, SIGNAL(domainChanged()),
+                   this, SLOT(internalDomainChanged()),
+                   Qt::QueuedConnection);
 }
 
 pqDoubleSpinBoxDomain::~pqDoubleSpinBoxDomain()
@@ -106,7 +112,7 @@ pqDoubleSpinBoxDomain::~pqDoubleSpinBoxDomain()
   delete this->Internal;
 }
   
-void pqDoubleSpinBoxDomain::domainChanged()
+void pqDoubleSpinBoxDomain::internalDomainChanged()
 {
   QDoubleSpinBox* spinbox = qobject_cast<QDoubleSpinBox*>(this->parent());
   Q_ASSERT(spinbox != NULL);

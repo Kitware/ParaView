@@ -49,9 +49,11 @@ public:
   /// and the property with the domain to observe
   /// the list of values in the combo box is automatically 
   /// updated when the domain changes
-  pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop);
+  pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, int idx = -1);
   ~pqComboBoxDomain();
 protected slots:
+  void internalDomainChanged();
+signals:
   void domainChanged();
 protected:
   class pqInternal;

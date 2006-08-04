@@ -54,11 +54,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqThresholdPanel::pqThresholdPanel(QWidget* p) :
   pqLoadedFormObjectPanel(":/pqWidgets/UI/pqThresholdPanel.ui", p)
 {
-  this->AttributeMode = this->findChild<QComboBox*>("AttributeMode");
-  
-  QObject::connect(this->AttributeMode, SIGNAL(currentIndexChanged(int)),
-                   this, SLOT(attributeModeChanged(int)));
-
   this->LowerSlider = this->findChild<QSlider*>("LowerThresholdSlider");
   this->UpperSlider = this->findChild<QSlider*>("UpperThresholdSlider");
   this->LowerSpin = this->findChild<QDoubleSpinBox*>("ThresholdBetween:Spin:0");
@@ -84,32 +79,21 @@ void pqThresholdPanel::accept()
   // accept widgets controlled by the parent class
   pqLoadedFormObjectPanel::accept();
 
+  /*
+
   vtkSMStringVectorProperty* Property;
   Property = vtkSMStringVectorProperty::SafeDownCast(
        this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
- 
-  int idx = this->AttributeMode->currentIndex(); 
-  QString mode = this->AttributeMode->itemData(idx).toString();
 
-  Property->SetElement(3, mode.toAscii().data());
+  pqSMAdaptor::setFieldSelectionMode( Property,
+         this->AttributeMode->currentText());
 
   this->proxy()->getProxy()->UpdateVTKObjects();
+  */
 }
 
 void pqThresholdPanel::reset()
 {
-  vtkSMStringVectorProperty* Property;
-  Property = vtkSMStringVectorProperty::SafeDownCast(
-       this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
- 
-  QString mode = Property->GetElement(3);
-  
-  int idx = this->AttributeMode->findData(mode);
-  if(idx != -1)
-    {
-    this->AttributeMode->setCurrentIndex(idx);
-    }
-
   // reset widgets controlled by the parent class
   pqLoadedFormObjectPanel::reset();
   
@@ -119,8 +103,8 @@ void pqThresholdPanel::reset()
   pqDoubleSpinBoxDomain* d2;
   d2 = this->UpperSpin->findChild<pqDoubleSpinBoxDomain*>("upperSpinDomain");
 
-  d1->domainChanged();
-  d2->domainChanged();
+  d1->internalDomainChanged();
+  d2->internalDomainChanged();
 
   this->upperSpinChanged();
   this->lowerSpinChanged();
@@ -140,30 +124,12 @@ void pqThresholdPanel::linkServerManagerProperties()
   AttributeProperty = vtkSMStringVectorProperty::SafeDownCast(
        this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
   AttributeProperty->UpdateDependentDomains();
-  
-  vtkSMEnumerationDomain* domain;
-  domain = vtkSMEnumerationDomain::SafeDownCast(
-        AttributeProperty->GetDomain("field_list"));
-  unsigned numEntries = domain->GetNumberOfEntries();
-  int AttributeIndex = 0;
-  int AttributeModeVal = atoi(AttributeProperty->GetElement(3));
-  for(unsigned int i=0; i<numEntries; i++)
-    {
-    this->AttributeMode->addItem(domain->GetEntryText(i),
-                                 domain->GetEntryValue(i));
-    if(domain->GetEntryValue(i)==AttributeModeVal)
-      {
-      AttributeIndex = i;
-      }
-    }
-  //this->AttributeMode->setCurrentIndex(-1);
-  this->AttributeMode->setCurrentIndex(AttributeIndex);
 
-  
-  QComboBox* Scalars = this->findChild<QComboBox*>("SelectInputScalars");
+  // TODO domain updates should be handled by auto-panel code
+  QComboBox* Scalars = this->findChild<QComboBox*>("SelectInputScalars:scalars");
   // connect domain to scalar combo box
   vtkSMProperty* Property = this->proxy()->getProxy()->GetProperty("SelectInputScalars");
-  pqComboBoxDomain* d0 = new pqComboBoxDomain(Scalars, Property);
+  pqComboBoxDomain* d0 = new pqComboBoxDomain(Scalars, Property, 1);
   d0->setObjectName("ScalarsDomain");
 
   // connect domain to spin boxes
@@ -182,9 +148,9 @@ void pqThresholdPanel::linkServerManagerProperties()
   // TODO -- pqDoubleSpinBoxDomain::updateDomain should automatically be called
   //         let's hack and help out a bit.
   QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   d1, SLOT(domainChanged()), Qt::QueuedConnection);
+                   d1, SIGNAL(domainChanged()), Qt::QueuedConnection);
   QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   d2, SLOT(domainChanged()), Qt::QueuedConnection);
+                   d2, SIGNAL(domainChanged()), Qt::QueuedConnection);
 
 
   // some hacks to get things working
@@ -198,8 +164,6 @@ void pqThresholdPanel::linkServerManagerProperties()
 
 void pqThresholdPanel::unlinkServerManagerProperties()
 {
-  this->AttributeMode->clear();
-  
   QComboBox* Scalars = this->findChild<QComboBox*>("SelectInputScalars");
   pqComboBoxDomain* d0 = Scalars->findChild<pqComboBoxDomain*>("ScalarsDomain");
   delete d0;
@@ -301,19 +265,5 @@ void pqThresholdPanel::upperSliderChanged()
       this->LowerSlider->setValue(this->UpperSlider->value());
       }
     }
-}
-
-void pqThresholdPanel::attributeModeChanged(int idx)
-{
-  vtkSMStringVectorProperty* Property;
-  Property = vtkSMStringVectorProperty::SafeDownCast(
-       this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
-
-  QString mode = this->AttributeMode->itemData(idx).toString();
-
-  Property->SetUncheckedElement(3, mode.toAscii().data());
-  Property->UpdateDependentDomains();
-
-  emit this->canAcceptOrReject(true);
 }
 
