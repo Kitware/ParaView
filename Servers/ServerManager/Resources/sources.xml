@@ -989,5 +989,12 @@ The output of the Wavelet source is image (uniform rectilinear) data.
    <!-- End Test3DWidget -->
    </SourceProxy>
 
+   <SourceProxy name="SelectionSource" 
+                class="vtkMultiBlockExtractSelection">
+     <ProxyProperty name="Selection" command="SetSelection">
+     </ProxyProperty>
+   <!-- End SelectionSource -->
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
