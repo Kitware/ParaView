@@ -682,6 +682,10 @@ Qt::ItemFlags pqPipelineModel::flags(const QModelIndex &idx) const
 bool pqPipelineModel::setData(const QModelIndex &idx, const QVariant& value,
   int /*role =Qt::EditRole*/)
 {
+  if (value.toString().isEmpty())
+    {
+    return false;
+    }
   pqServerManagerModelItem* item = this->getItemFor(idx);
   pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
   if (src)
