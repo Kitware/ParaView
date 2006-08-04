@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.24");
+vtkCxxRevisionMacro(vtkKWTree, "1.25");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -135,6 +135,13 @@ void vtkKWTree::SelectionCallback()
       return;
       }
     }
+
+  // We need to process the idle tasks here, since redrawing the tree
+  // is only done on 'idle': we want redrawing to happen before our callback
+  // otherwise it will appear as the selection itself is refreshed after
+  // our callback.
+
+  this->GetApplication()->ProcessIdleTasks();
 
   this->InvokeSelectionChangedCommand();
 

@@ -29,7 +29,8 @@ The changes are:
             event generate $path <<TreeSelect>>
         }
     }
-  should be moved from Tree::_mouse_select to the end of Tree::selection
+  should be moved from Tree::_mouse_select to the end of Tree::selection,
+  *after* _redraw_idle $path 1
 
 --------------------------------------------------------------------------
 

@@ -710,12 +710,12 @@ proc Tree::selection { path cmd args } {
             return
         }
     }
+    _redraw_idle $path 1
     switch -- $cmd {
         "add" - "clear" - "remove" - "set" - "toggle" {
             event generate $path <<TreeSelect>>
         }
     }
-    _redraw_idle $path 1
 }
 
 
