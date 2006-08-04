@@ -24,7 +24,7 @@
 #include "vtkSelection.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkMultiBlockExtractSelection, "1.1");
+vtkCxxRevisionMacro(vtkMultiBlockExtractSelection, "1.2");
 vtkStandardNewMacro(vtkMultiBlockExtractSelection);
 vtkCxxSetObjectMacro(vtkMultiBlockExtractSelection, Selection,vtkSelection);
 
@@ -151,6 +151,16 @@ vtkDataSet* vtkMultiBlockExtractSelection::SelectFromDataSet(
 void vtkMultiBlockExtractSelection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "Selection: ";
+  if (this->Selection)
+    {
+    this->Selection->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
 
 //----------------------------------------------------------------------------
