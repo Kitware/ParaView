@@ -27,7 +27,6 @@
 class vtkClientServerStream;
 class vtkPVXMLElement;
 class vtkSelection;
-class vtkSelectionNode;
 
 class VTK_EXPORT vtkPVSelectionInformation : public vtkPVInformation
 {

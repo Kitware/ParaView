@@ -58,7 +58,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVInformation
   vtkProcessModuleConnection
   vtkProcessModuleGUIHelper
-  vtkSelectionSerializer.cxx
   vtkRemoteConnection
   vtkUndoElement
   ABSTRACT
@@ -74,7 +73,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
   vtkPVCreateProcessModule
-  vtkSelectionSerializer.cxx
   WRAP_EXCLUDE
   )
 

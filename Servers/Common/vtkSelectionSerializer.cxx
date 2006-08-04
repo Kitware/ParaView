@@ -23,10 +23,12 @@
 #include "vtkInstantiator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSelection.h"
 
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.3");
+vtkStandardNewMacro(vtkSelectionSerializer);
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.4");
 
 //----------------------------------------------------------------------------
 vtkSelectionSerializer::vtkSelectionSerializer()
@@ -39,10 +41,17 @@ vtkSelectionSerializer::~vtkSelectionSerializer()
 }
 
 //----------------------------------------------------------------------------
-void vtkSelectionSerializer::PrintXML(
-  ostream& os, vtkIndent indent, int printData, vtkSelectionNode* selection)
+void vtkSelectionSerializer::PrintXML(int printData,
+                                      vtkSelection* selection)
 {
-  os << indent << "<SelectionNode>" << endl;
+  vtkSelectionSerializer::PrintXML(cout, vtkIndent(), printData, selection);
+}
+
+//----------------------------------------------------------------------------
+void vtkSelectionSerializer::PrintXML(
+  ostream& os, vtkIndent indent, int printData, vtkSelection* selection)
+{
+  os << indent << "<Selection>" << endl;
 
   vtkIndent ni = indent.GetNextIndent();
 
@@ -84,7 +93,7 @@ void vtkSelectionSerializer::PrintXML(
     vtkSelectionSerializer::WriteSelectionList(os, indent, selection);
     }
 
-  os << indent << "</SelectionNode>" << endl;
+  os << indent << "</Selection>" << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -103,7 +112,7 @@ void vtkSelectionSerializerWriteSelectionList(ostream& os, vtkIndent indent,
 //----------------------------------------------------------------------------
 // Serializes the selection list data array
 void vtkSelectionSerializer::WriteSelectionList(
-  ostream& os, vtkIndent indent, vtkSelectionNode* selection)
+  ostream& os, vtkIndent indent, vtkSelection* selection)
 {
   vtkDataArray* selectionList = vtkDataArray::SafeDownCast(
     selection->GetSelectionList());
@@ -129,28 +138,27 @@ void vtkSelectionSerializer::WriteSelectionList(
           numTuples*numComps, (VTK_TT*)(dataPtr)
           ));
       }
+    os << indent << "</SelectionList>" << endl;
     }
 }
 
 //----------------------------------------------------------------------------
-vtkSelection* vtkSelectionSerializer::Parse(const char* xml)
+void vtkSelectionSerializer::Parse(const char* xml, vtkSelection* root)
 {
-  vtkSelection* sel = vtkSelection::New();
+  root->Clear();
 
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   parser->Parse(xml);
   if (parser->GetRootElement())
     {
-    vtkSelectionSerializer::ParseNode(parser->GetRootElement(), sel);
+    vtkSelectionSerializer::ParseNode(parser->GetRootElement(), root);
     }
   parser->Delete();
-
-  return sel;
 }
 
 //----------------------------------------------------------------------------
 void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML, 
-                                       vtkSelectionNode* node)
+                                       vtkSelection* node)
 {
   if (!nodeXML || !node)
     {
@@ -167,9 +175,9 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
       continue;
       }
 
-    if (strcmp("SelectionNode", name) == 0 )
+    if (strcmp("Selection", name) == 0 )
       {
-      vtkSelectionNode* newNode = vtkSelectionNode::New();
+      vtkSelection* newNode = vtkSelection::New();
       node->AddChild(newNode);
       vtkSelectionSerializer::ParseNode(elem, newNode);
       newNode->Delete();
@@ -185,7 +193,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelectionNode::CONTENT_TYPE(), val);
+            node->GetProperties()->Set(vtkSelection::CONTENT_TYPE(), val);
             }
           }
         else if (strcmp("SOURCE_ID", key) == 0)
@@ -193,7 +201,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelectionNode::SOURCE_ID(), val);
+            node->GetProperties()->Set(vtkSelection::SOURCE_ID(), val);
             }
           }
         else if (strcmp("PROP_ID", key) == 0)
@@ -201,7 +209,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelectionNode::PROP_ID(), val);
+            node->GetProperties()->Set(vtkSelection::PROP_ID(), val);
             }
           }
         else if (strcmp("PROCESS_ID", key) == 0)
@@ -209,7 +217,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), val);
+            node->GetProperties()->Set(vtkSelection::PROCESS_ID(), val);
             }
           }
         }
@@ -244,8 +252,17 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
               }
             delete[] data;
             }
+          node->SetSelectionList(dataArray);
+          dataArray->Delete();
           }
         }
       }
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkSelectionSerializer::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+

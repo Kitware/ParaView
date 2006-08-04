@@ -18,7 +18,7 @@
 // vtkSelection to/from xml. Currently, it supports only a subset of
 // properties: CONTENT_TYPE, SOURCE_ID, PROP_ID, PROCESS_ID
 // .SECTION See Also
-// vtkSelection vtkSelectionNode
+// vtkSelection
 
 #ifndef __vtkSelectionSerializer_h
 #define __vtkSelectionSerializer_h
@@ -27,27 +27,30 @@
 
 class vtkPVXMLElement;
 class vtkSelection;
-class vtkSelectionNode;
+class vtkSelection;
 
 class VTK_EXPORT vtkSelectionSerializer : public vtkObject
 {
 public:
+  static vtkSelectionSerializer* New();
   vtkTypeRevisionMacro(vtkSelectionSerializer,vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Serialize the selection tree to a stream as xml.
   // For now, only keys of type vtkInformationIntegerKey are supported.
+  static void PrintXML(int printData, 
+                       vtkSelection* selection);
   static void PrintXML(ostream& os, 
                        vtkIndent indent, 
                        int printData, 
-                       vtkSelectionNode* selection);
+                       vtkSelection* selection);
 
   // Description:
-  // Parse an xml string to create a new selection tree. It is
-  // the caller's responsibility to delete the returned object.
+  // Parse an xml string to create a new selection tree.
   // Currently, this supports only a subset of
   // properties: CONTENT_TYPE, SOURCE_ID, PROP_ID, PROCESS_ID
-  static vtkSelection* Parse(const char* xml);
+  static void Parse(const char* xml, vtkSelection* root);
 
 
 protected:
@@ -60,9 +63,9 @@ private:
 
   static void WriteSelectionList(ostream& os, 
                                  vtkIndent indent, 
-                                 vtkSelectionNode* selection);
+                                 vtkSelection* selection);
   static void ParseNode(
-    vtkPVXMLElement* nodeXML, vtkSelectionNode* node);
+    vtkPVXMLElement* nodeXML, vtkSelection* node);
 };
 
 #endif

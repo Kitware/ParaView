@@ -22,7 +22,7 @@
 #include "vtkSelectionSerializer.h"
 
 vtkStandardNewMacro(vtkPVSelectionInformation);
-vtkCxxRevisionMacro(vtkPVSelectionInformation, "1.3");
+vtkCxxRevisionMacro(vtkPVSelectionInformation, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVSelectionInformation::vtkPVSelectionInformation()
@@ -111,6 +111,6 @@ void vtkPVSelectionInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing selection xml from message.");
     return;
     }
-  this->Selection = vtkSelectionSerializer::Parse(xml);
+  vtkSelectionSerializer::Parse(xml, this->Selection);
 }
 
