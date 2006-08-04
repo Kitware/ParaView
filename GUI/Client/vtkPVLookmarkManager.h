@@ -51,7 +51,7 @@ class vtkPVTraceHelper;
 class vtkPVWindow;
 class vtkPVReaderModule;
 class vtkTransform;
-class vtkPVPickBoxWidget;
+class vtkPVBoxWidget;
 
 //BTX
 template<class DataType> class vtkVector;
@@ -242,7 +242,7 @@ protected:
   // Description:
   // Recursively visit each xml element of the lookmark file, creating, packing, and storing vtkPVLookmarks and vtkKWLookmarkFolders as appropriate
   void ImportLookmarkFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWWidget *parentWidget);
-  void ImportBoundingBoxFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWLookmarkFolder *parentWidget,vtkPVPickBoxWidget *box);
+  void ImportBoundingBoxFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWLookmarkFolder *parentWidget,vtkPVBoxWidget *box);
 
   // Description:
   // Recursively visit each xml element of the lookmark file, creatings entries in the "Add Macro Examples" menu

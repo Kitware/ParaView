@@ -40,8 +40,8 @@ Wylie, Brian
 #include "vtkPVInputMenu.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVWidgetCollection.h"
-#include "vtkPVPickSphereWidget.h"
-#include "vtkPVPickBoxWidget.h"
+#include "vtkPVSphereWidget.h"
+#include "vtkPVBoxWidget.h"
 #include "vtkPVAnimationManager.h"
 #include "vtkPVAnimationScene.h"
 #include "vtkPVPointWidget.h"
@@ -63,7 +63,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.15");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.16");
 
 
 //----------------------------------------------------------------------------
@@ -253,13 +253,13 @@ void vtkPVAttributeEditor::OnChar()
 
     return;
     }
+/*
   else if (this->GetPVWindow()->GetInteractor()->GetKeyCode() == 't' ||
       this->GetPVWindow()->GetInteractor()->GetKeyCode() == 'T' )
     {
     vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(this->GetPVWidget("PickFunction"));
     vtkPVPickSphereWidget *sphere = vtkPVPickSphereWidget::SafeDownCast(select->GetPVWidget("'e'dit within a draggable sphere"));
 
-/*
     if(strcmp(select->GetCurrentValue(),"'e'dit within a box") == 0)
       {
       box->GetMouseControlToggle()->ToggleSelectedState();
@@ -269,7 +269,7 @@ void vtkPVAttributeEditor::OnChar()
     vtkPVPickBoxWidget *box = vtkPVPickBoxWidget::SafeDownCast(select->GetPVWidget("'e'dit within a box"));
 
     else
-*/
+
     if(strcmp(select->GetCurrentValue(),"'e'dit within a draggable sphere") == 0)
       {
       sphere->GetMouseControlToggle()->ToggleSelectedState();
@@ -279,6 +279,7 @@ void vtkPVAttributeEditor::OnChar()
 
     return;
     }
+*/
 }
 
 
@@ -423,7 +424,7 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
       {
       point->ActualPlaceWidget();
       }
-    vtkPVPickBoxWidget *box = vtkPVPickBoxWidget::SafeDownCast(select->GetPVWidget("'e'dit within a box"));
+    vtkPVBoxWidget *box = vtkPVBoxWidget::SafeDownCast(select->GetPVWidget("'e'dit within a box"));
     if(box)
       {
       box->ActualPlaceWidget();

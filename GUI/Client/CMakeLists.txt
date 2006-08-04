@@ -152,8 +152,6 @@ SET( ParaViewClient_SRCS
   vtkPVPointSourceWidget.cxx
   vtkPVPointWidget.cxx
   vtkPVPick.cxx
-  vtkPVPickBoxWidget.cxx
-  vtkPVPickSphereWidget.cxx
   vtkPVPlotArraySelection.cxx
   vtkPVPlotDisplayLabelPropertiesDialog.cxx
   vtkPVProbe.cxx

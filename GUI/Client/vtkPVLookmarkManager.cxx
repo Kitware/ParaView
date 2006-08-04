@@ -59,7 +59,6 @@
 #include "vtkSMProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkPVWidget.h"
-#include "vtkPVPickBoxWidget.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVSelectWidget.h"
 #include "vtkPVLabeledToggle.h"
@@ -75,6 +74,7 @@
 #include "vtkMath.h"
 #include "vtkPVFileEntry.h"
 #include "vtkKWEntry.h"
+#include "vtkPVBoxWidget.h"
 
 #define VTK_AVERAGE(a,b,c) \
   c[0] = (a[0] + b[0])/2.0; \
@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.91");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.92");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1355,12 +1355,12 @@ void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkP
     }
 
   vtkPVSource *input = this->GetPVWindow()->GetCurrentPVSource();
-  vtkPVSource *clip = this->GetPVWindow()->CreatePVSource("SpecializedBoxClip");
+  vtkPVSource *clip = this->GetPVWindow()->CreatePVSource("Clip");
   clip->SetLabel("BoundingBox");
   vtkPVInputMenu::SafeDownCast(clip->GetPVWidget("Input"))->SetCurrentValue(input);
   vtkPVSelectWidget *widgetType = vtkPVSelectWidget::SafeDownCast(clip->GetPVWidget("Clip Function"));
   widgetType->SetCurrentValue("Box");
-  vtkPVPickBoxWidget *box = vtkPVPickBoxWidget::SafeDownCast(widgetType->GetPVWidget("Box"));
+  vtkPVBoxWidget *box = vtkPVBoxWidget::SafeDownCast(widgetType->GetPVWidget("Box"));
   vtkPVLabeledToggle *insideOut = vtkPVLabeledToggle::SafeDownCast(clip->GetPVWidget("InsideOut"));
   insideOut->SetSelectedState(1);
   box->PlaceWidget(0,1,0,1,0,1);
@@ -1398,7 +1398,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkP
 
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *lmkElement, vtkKWLookmarkFolder *parent,vtkPVPickBoxWidget *box)
+void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *lmkElement, vtkKWLookmarkFolder *parent,vtkPVBoxWidget *box)
 {
   vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
