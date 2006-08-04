@@ -2554,56 +2554,6 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
 
   </Module>
 
- <Module name="AttributeEditor"
-          root_name="AttributeEditor"
-          class="vtkPVAttributeEditor"
-          module_type="Filter"
-          button_image="PVAttributeEditor"
-          button_help="Select with a point or box widget the region to edit."
-          button_visibility="0">
-    <Filter class="vtkAttributeEditor">
-      <Input name="Input"
-             class="vtkDataSet"/>
-    </Filter>
-    <InputMenu trace_name="Input" property="Input"
-               id="im1"
-               label="Input"
-               help="Set the input to this filter."
-               input_name="Input"/>
-    <ArrayMenu id="am" property="SelectInputScalars"
-               trace_name="Scalars"
-               label="Scalars"
-               input_menu="im1"
-               help="Choose the scalar array."/>
-    <SelectWidget label="Pick Method"
-                  trace_name="PickFunction"
-                  property="PickFunction">
-      <Item label="'e'dit within a box"
-            value="Box">
-        <PickBoxWidget use_label="0"
-                   trace_name="Box"
-                   input_menu="im1"
-                   help="Adjusts the parameters of the box to clip with."/>
-      </Item>
-      <Item label="'e'dit within a draggable sphere"
-            value="Sphere">
-        <PickSphereWidget use_label="0"
-                   trace_name="Sphere"
-                   input_menu="im1"
-                   help="Adjusts the parameters of the box to clip with."/>
-      </Item>
-      <Item label="'e'dit at a point" value="Point">
-        <PointWidget trace_name="Point" variable="WorldPoint" input_menu="im1"
-                     help="Pick the node closest to this world point. The 'p' key can be used to select a node under the cursor."/>
-      </Item>
-    </SelectWidget>
-
-    <VectorEntry label="Attribute Value"
-                        trace_name="AttributeValue"
-                        type="float"
-                        property="Value"
-                        help="Choose the scalar value to select with"/>
-  </Module>
 
   <Module name="TestCut"
           root_name="TestCut"
@@ -2627,40 +2577,6 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
     <NewImplicitPlane trace_name="Plane"
                       input_menu="im1"
                       help="Adjusts the parameters of the plane to cut with."/>
-  </Module>
-  <Module name="SpecializedBoxClip"
-          root_name="SpecializedBoxClip"
-          module_type="Filter"
-          button_help="Clip with a box widget. Clipping does not reduce the dimensionality of the data set.">
-    <Filter class="vtkPVSpecializedBoxClip">
-      <Input name="Input"
-             class="vtkDataSet"/>
-    </Filter>
-    <InputMenu trace_name="Input" property="Input"
-               id="im1"
-               label="Input"
-               help="Set the input to this filter."
-               input_name="Input"/>
-    <BoundsDisplay show_hide_frame="1"
-                   label="Input Bounds"
-                   property="InputBounds"
-                   trace_name="Input Bounds"
-                   input_menu="im1"/>
-    <SelectWidget label="Clip Function"
-                  trace_name="Clip Function"
-                  property="ClipFunction">
-      <Item label="Box"
-            value="Box">
-        <PickBoxWidget use_label="0"
-                   trace_name="Box"
-                   input_menu="im1"
-                   help="Adjusts the parameters of the box to clip with."/>
-      </Item>
-    </SelectWidget>
-    <LabeledToggle label="Inside Out"
-                   trace_name="InsideOut"
-                   property="InsideOut"
-                   help="Switches which part to keep."/>
   </Module>
 
 </ModuleInterfaces>

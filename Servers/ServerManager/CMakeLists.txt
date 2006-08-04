@@ -84,10 +84,8 @@ SET(Kit_SRCS
   vtkSMObject.cxx
   vtkSMPVDWriterProxy.cxx
   vtkSMPart.cxx
-  vtkSMPickBoxWidgetProxy.cxx
   vtkSMPickLineWidgetProxy.cxx
   vtkSMPickPointWidgetProxy.cxx
-  vtkSMPickSphereWidgetProxy.cxx
   vtkSMPointWidgetProxy.cxx 
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
@@ -149,10 +147,8 @@ SET(Kit_SRCS
   )
 
 SET( ServerManagerCS_SRCS
-  vtkPickBoxWidget.cxx
   vtkPickPointWidget.cxx
   vtkPickLineWidget.cxx
-  vtkPickSphereWidget.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
