@@ -29,6 +29,7 @@ SET(Filters_SRCS
   vtkMPIMoveData.cxx
   vtkMergeArrays.cxx
   vtkMultiActorHelper.cxx
+  vtkMultiBlockExtractSelection.cxx
   vtkMultiDisplayManager.cxx
   vtkOrderedCompositeDistributor.cxx
   vtkPPhastaReader.cxx
