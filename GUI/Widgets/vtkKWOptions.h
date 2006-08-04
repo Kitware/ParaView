@@ -117,6 +117,23 @@ public:
   //ETX
 
   // Description:
+  // Specifies if the widget should display text and bitmaps/images at the
+  // same time, and if so, where the bitmap/image should be placed relative 
+  // to the text. 
+  //BTX
+  enum CompoundModeType
+  {
+    CompoundModeNone = 0,
+    CompoundModeLeft,
+    CompoundModeCenter,
+    CompoundModeRight,
+    CompoundModeTop,
+    CompoundModeBottom,
+    CompoundModeUnknown
+  };
+  //ETX
+
+  // Description:
   // Return the Tcl value for a given encoding constant
   // Check vtkSystemIncludes for a list of valid encodings.
   static const char* GetCharacterEncodingAsTclOptionValue(int);
@@ -150,6 +167,11 @@ public:
   // Return the Tk value for a given state constant, and vice-versa.
   static const char* GetStateAsTkOptionValue(int);
   static int GetStateFromTkOptionValue(const char *);
+
+  // Description:
+  // Return the Tk value for a given compound constant, and vice-versa.
+  static const char* GetCompoundModeAsTkOptionValue(int);
+  static int GetCompoundModeFromTkOptionValue(const char *);
 
 protected:
   vtkKWOptions() {};

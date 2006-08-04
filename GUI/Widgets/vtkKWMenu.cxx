@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.108");
+vtkCxxRevisionMacro(vtkKWMenu, "1.109");
 
 //----------------------------------------------------------------------------
 class vtkKWMenuInternals
@@ -1338,14 +1338,53 @@ void vtkKWMenu::SetItemSelectImageToPredefinedIcon(int index, int icon_index)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemCompoundMode(int index, int flag)
+void vtkKWMenu::SetItemCompoundMode(int index, int mode)
 {
   if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
     return;
     }
   this->Script("%s entryconfigure %d -compound %s", 
-               this->GetWidgetName(), index, (flag ? "left" : "none"));
+               this->GetWidgetName(), 
+               index,
+               vtkKWOptions::GetCompoundModeAsTkOptionValue(mode));
+}
+
+void vtkKWMenu::SetItemCompoundModeToNone(int index)     
+{ 
+  this->SetItemCompoundMode(index, vtkKWOptions::CompoundModeNone); 
+};
+void vtkKWMenu::SetItemCompoundModeToLeft(int index) 
+{ 
+  this->SetItemCompoundMode(index, vtkKWOptions::CompoundModeLeft); 
+};
+void vtkKWMenu::SetItemCompoundModeToCenter(int index) 
+{ 
+  this->SetItemCompoundMode(index, vtkKWOptions::CompoundModeCenter); 
+};
+void vtkKWMenu::SetItemCompoundModeToRight(int index) 
+{ 
+  this->SetItemCompoundMode(index, vtkKWOptions::CompoundModeRight); 
+};
+void vtkKWMenu::SetItemCompoundModeToTop(int index) 
+{ 
+  this->SetItemCompoundMode(index, vtkKWOptions::CompoundModeTop); 
+};
+void vtkKWMenu::SetItemCompoundModeToBottom(int index) 
+{ 
+  this->SetItemCompoundMode(index, vtkKWOptions::CompoundModeBottom);
+};
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetItemCompoundMode(int index)
+{
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
+    {
+    return vtkKWOptions::CompoundModeUnknown;
+    }
+
+  return vtkKWOptions::GetCompoundModeFromTkOptionValue(
+    this->GetItemOption(index, "-compound"));
 }
 
 //----------------------------------------------------------------------------

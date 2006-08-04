@@ -33,6 +33,22 @@ proc vtkKWLabelEntryPoint {parent win} {
 
   # -----------------------------------------------------------------------
 
+  # Create another label, with an icon
+
+  set label2b [vtkKWLabel New]
+  $label2b SetParent $parent
+  $label2b Create
+  $label2b SetText "A label with an icon"
+  $label2b SetImageToPredefinedIcon 61
+  $label2b SetCompoundModeToLeft
+  $label2b SetPadX 2
+  $label2b SetBalloonHelpString \
+      "This is a label with one of the predefined icons in front of it."
+
+  pack [$label2b GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+
+  # -----------------------------------------------------------------------
+
   # Create another label with a label this time  !
 
   set label3 [vtkKWLabelWithLabel New]
@@ -48,23 +64,6 @@ proc vtkKWLabelEntryPoint {parent win} {
     label out of two separate elements one of them likely not to change."
 
   pack [$label3 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
-
-  # -----------------------------------------------------------------------
-
-  # Create another label with a label this time  !
-
-  set label4 [vtkKWLabelWithLabel New]
-  $label4 SetParent $parent
-  $label4 Create
-  [$label4 GetLabel] SetImageToPredefinedIcon 61
-  [$label4 GetWidget] SetText "Another use of a labeled label !"
-  $label4 SetBalloonHelpString \
-    "This is a vtkKWLabelWithLabel i.e. a label associated to a\
-    label that can be positioned around the label. This can be used for\
-    example to prefix a label with a small icon to emphasize its meaning.\
-    Predefined icons include warning info error etc."
-
-  pack [$label4 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
   # -----------------------------------------------------------------------
 

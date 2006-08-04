@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.24");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveButton::vtkKWLoadSaveButton()
@@ -61,7 +61,7 @@ void vtkKWLoadSaveButton::CreateWidget()
   // Cosmetic add-on
 
   this->SetImageToPredefinedIcon(vtkKWIcon::IconFolder);
-  this->SetConfigurationOption("-compound", "left");
+  this->SetCompoundModeToLeft();
   this->SetPadX(3);
   this->SetPadY(2);
 

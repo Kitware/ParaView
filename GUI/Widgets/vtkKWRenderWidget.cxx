@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.146");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.147");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1343,7 +1343,7 @@ void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
       {
       menu->SetItemImageToPredefinedIcon(
         index, vtkKWIcon::IconCornerAnnotation);
-      menu->SetItemCompoundMode(index, 1);
+      menu->SetItemCompoundModeToLeft(index);
       }
     }
 
@@ -1360,7 +1360,7 @@ void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
       {
       menu->SetItemImageToPredefinedIcon(
         index, vtkKWIcon::IconHeaderAnnotation);
-      menu->SetItemCompoundMode(index, 1);
+      menu->SetItemCompoundModeToLeft(index);
       }
     }
 }

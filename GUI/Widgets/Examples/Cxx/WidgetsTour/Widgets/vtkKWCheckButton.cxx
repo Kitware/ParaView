@@ -49,6 +49,24 @@ void vtkKWCheckButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   // -----------------------------------------------------------------------
 
+  // Create another checkbutton, but use both text and an icon
+
+  vtkKWCheckButton *cb2b = vtkKWCheckButton::New();
+  cb2b->SetParent(parent);
+  cb2b->Create();
+  cb2b->SetText("A checkbutton");
+  cb2b->SetImageToPredefinedIcon(vtkKWIcon::IconLock);
+  cb2b->SetCompoundModeToLeft();
+  cb2b->IndicatorVisibilityOff();
+  cb2b->SetBalloonHelpString(
+    "This time, use both a text and one of the predefined icon");
+
+  app->Script(
+    "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
+    cb2b->GetWidgetName());
+
+  // -----------------------------------------------------------------------
+
   // Create another checkbutton, with a label this time
 
   vtkKWCheckButtonWithLabel *cb3 = vtkKWCheckButtonWithLabel::New();
@@ -111,6 +129,7 @@ void vtkKWCheckButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   cb1->Delete();
   cb2->Delete();
+  cb2b->Delete();
   cb3->Delete();
   cbs->Delete();
 }

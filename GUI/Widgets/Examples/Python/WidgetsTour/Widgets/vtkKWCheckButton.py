@@ -41,6 +41,24 @@ def vtkKWCheckButtonEntryPoint(parent, win):
     
     # -----------------------------------------------------------------------
     
+    # Create another checkbutton, but use both text and an icon
+    
+    cb2b = vtkKWCheckButton()
+    cb2b.SetParent(parent)
+    cb2b.Create()
+    cb2b.SetText("A checkbutton")
+    cb2b.SetImageToPredefinedIcon(vtkKWIcon.IconLock)
+    cb2b.SetCompoundModeToLeft()
+    cb2b.IndicatorVisibilityOff()
+    cb2b.SetBalloonHelpString(
+        "This time, use both a text and one of the predefined icon")
+    
+    app.Script(
+        "pack %s -side top -anchor nw -expand n -padx 2 -pady 6",
+        cb2b.GetWidgetName())
+    
+    # -----------------------------------------------------------------------
+    
     # Create another checkbutton, with a label this time
     
     cb3 = vtkKWCheckButtonWithLabel()

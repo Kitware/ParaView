@@ -48,6 +48,24 @@ def vtkKWLabelEntryPoint(parent, win):
     
     # -----------------------------------------------------------------------
     
+    # Create another label, with an icon
+    
+    label2b = vtkKWLabel()
+    label2b.SetParent(parent)
+    label2b.Create()
+    label2b.SetText("A label with an icon")
+    label2b.SetImageToPredefinedIcon(vtkKWIcon.IconInfoMini)
+    label2b.SetCompoundModeToLeft()
+    label2b.SetPadX(2)
+    label2b.SetBalloonHelpString(
+        "This is a label with one of the predefined icons in front of it.")
+    
+    app.Script(
+        "pack %s -side top -anchor nw -expand n -padx 2 -pady 6",
+        label2b.GetWidgetName())
+    
+    # -----------------------------------------------------------------------
+    
     # Create another label, with a label this time (!)
     
     label3 = vtkKWLabelWithLabel()
@@ -65,25 +83,6 @@ def vtkKWLabelEntryPoint(parent, win):
     app.Script(
         "pack %s -side top -anchor nw -expand n -padx 2 -pady 6",
         label3.GetWidgetName())
-    
-    # -----------------------------------------------------------------------
-    
-    # Create another label, with a label this time (!)
-    
-    label4 = vtkKWLabelWithLabel()
-    label4.SetParent(parent)
-    label4.Create()
-    label4.GetLabel().SetImageToPredefinedIcon(vtkKWIcon.IconInfoMini)
-    label4.GetWidget().SetText("Another use of a labeled label !")
-    label4.SetBalloonHelpString(
-        "This is a vtkKWLabelWithLabel, i.e. a label associated to a "
-        "label that can be positioned around the label. This can be used for "
-        "example to prefix a label with a small icon to emphasize its meaning. "
-        "Predefined icons include warning, info, error, etc.")
-    
-    app.Script(
-        "pack %s -side top -anchor nw -expand n -padx 2 -pady 6",
-        label4.GetWidgetName())
     
     # -----------------------------------------------------------------------
     

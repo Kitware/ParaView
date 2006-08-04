@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.55");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.56");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -168,7 +168,7 @@ void vtkKWCheckButton::CreateWidget()
   // Call the superclass to create the widget and set the appropriate flags
 
   if (!vtkKWWidget::CreateSpecificTkWidget(this, 
-        "checkbutton", "-highlightthickness 0"))
+        "checkbutton", "-highlightthickness 0 -padx 2 -pady 2"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -583,6 +583,45 @@ void vtkKWCheckButton::SetImageToPixels(
 
   vtkKWTkUtilities::SetImageOptionToPixels(
     this, pixels, width, height, pixel_size, buffer_length, "-selectimage");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetCompoundMode(int mode)
+{
+  this->SetConfigurationOption(
+    "-compound", vtkKWOptions::GetCompoundModeAsTkOptionValue(mode));
+}
+
+void vtkKWCheckButton::SetCompoundModeToNone()     
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeNone); 
+};
+void vtkKWCheckButton::SetCompoundModeToLeft() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeLeft); 
+};
+void vtkKWCheckButton::SetCompoundModeToCenter() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeCenter); 
+};
+void vtkKWCheckButton::SetCompoundModeToRight() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeRight); 
+};
+void vtkKWCheckButton::SetCompoundModeToTop() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeTop); 
+};
+void vtkKWCheckButton::SetCompoundModeToBottom() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeBottom); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWCheckButton::GetCompoundMode()
+{
+  return vtkKWOptions::GetCompoundModeFromTkOptionValue(
+    this->GetConfigurationOption("-compound"));
 }
 
 //----------------------------------------------------------------------------

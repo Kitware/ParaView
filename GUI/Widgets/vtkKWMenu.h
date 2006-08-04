@@ -306,10 +306,21 @@ public:
   virtual void SetItemSelectImageToPredefinedIcon(int index, int icon_index);
 
   // Description:
-  // Set the compound mode of a menu item. Set it to 'true' to display
-  // both the image and the label.
+  // Specifies if the menu item should display text and bitmaps/images at the
+  // same time, and if so, where the bitmap/image should be placed relative 
+  // to the text. 
+  // Valid constants can be found in vtkKWOptions::CompoundModeType.
+  // The (default) value CompoundModeNone specifies that the bitmap or image 
+  // should (if defined) be displayed instead of the text. 
   // Check the SetItemMarginVisibility method too.
-  virtual void SetItemCompoundMode(int index, int flag);
+  virtual void SetItemCompoundMode(int index, int mode);
+  virtual int GetItemCompoundMode(int index);
+  virtual void SetItemCompoundModeToNone(int index);
+  virtual void SetItemCompoundModeToLeft(int index);
+  virtual void SetItemCompoundModeToCenter(int index);
+  virtual void SetItemCompoundModeToRight(int index);
+  virtual void SetItemCompoundModeToTop(int index);
+  virtual void SetItemCompoundModeToBottom(int index);
 
   // Description:
   // Set the visibility of the standard margin of a menu item.

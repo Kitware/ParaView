@@ -50,6 +50,23 @@ void vtkKWPushButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   // -----------------------------------------------------------------------
 
+  // Create another push button, use both text and icon
+
+  vtkKWPushButton *pushbutton2b = vtkKWPushButton::New();
+  pushbutton2b->SetParent(parent);
+  pushbutton2b->Create();
+  pushbutton2b->SetText("A push button with an icon");
+  pushbutton2b->SetImageToPredefinedIcon(vtkKWIcon::IconWarningMini);
+  pushbutton2b->SetCompoundModeToLeft();
+  pushbutton2b->SetBalloonHelpString(
+    "Another pushbutton, using both a text and one of the predefined icons");
+
+  app->Script(
+    "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
+    pushbutton2b->GetWidgetName());
+
+  // -----------------------------------------------------------------------
+
   // Create another push button, with a label this time
 
   vtkKWPushButtonWithLabel *pushbutton3 = vtkKWPushButtonWithLabel::New();
@@ -106,6 +123,7 @@ void vtkKWPushButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   pushbutton1->Delete();
   pushbutton2->Delete();
+  pushbutton2b->Delete();
   pushbutton3->Delete();
   pushbutton_set->Delete();
 

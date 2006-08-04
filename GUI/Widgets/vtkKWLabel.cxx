@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.52");
+vtkCxxRevisionMacro(vtkKWLabel, "1.53");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -499,6 +499,45 @@ void vtkKWLabel::SetImageToPixels(const unsigned char* pixels,
 {
   vtkKWTkUtilities::SetImageOptionToPixels(
     this, pixels, width, height, pixel_size, buffer_length);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetCompoundMode(int mode)
+{
+  this->SetConfigurationOption(
+    "-compound", vtkKWOptions::GetCompoundModeAsTkOptionValue(mode));
+}
+
+void vtkKWLabel::SetCompoundModeToNone()     
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeNone); 
+};
+void vtkKWLabel::SetCompoundModeToLeft() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeLeft); 
+};
+void vtkKWLabel::SetCompoundModeToCenter() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeCenter); 
+};
+void vtkKWLabel::SetCompoundModeToRight() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeRight); 
+};
+void vtkKWLabel::SetCompoundModeToTop() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeTop); 
+};
+void vtkKWLabel::SetCompoundModeToBottom() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeBottom); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWLabel::GetCompoundMode()
+{
+  return vtkKWOptions::GetCompoundModeFromTkOptionValue(
+    this->GetConfigurationOption("-compound"));
 }
 
 //---------------------------------------------------------------------------

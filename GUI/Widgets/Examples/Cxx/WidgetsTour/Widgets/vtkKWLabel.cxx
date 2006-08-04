@@ -57,6 +57,24 @@ void vtkKWLabelItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   // -----------------------------------------------------------------------
 
+  // Create another label, with an icon
+
+  vtkKWLabel *label2b = vtkKWLabel::New();
+  label2b->SetParent(parent);
+  label2b->Create();
+  label2b->SetText("A label with an icon");
+  label2b->SetImageToPredefinedIcon(vtkKWIcon::IconInfoMini);
+  label2b->SetCompoundModeToLeft();
+  label2b->SetPadX(2);
+  label2b->SetBalloonHelpString(
+    "This is a label with one of the predefined icons in front of it.");
+
+  app->Script(
+    "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
+    label2b->GetWidgetName());
+
+  // -----------------------------------------------------------------------
+
   // Create another label, with a label this time (!)
 
   vtkKWLabelWithLabel *label3 = vtkKWLabelWithLabel::New();
@@ -74,25 +92,6 @@ void vtkKWLabelItem::Create(vtkKWWidget *parent, vtkKWWindow *)
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     label3->GetWidgetName());
-
-  // -----------------------------------------------------------------------
-
-  // Create another label, with a label this time (!)
-
-  vtkKWLabelWithLabel *label4 = vtkKWLabelWithLabel::New();
-  label4->SetParent(parent);
-  label4->Create();
-  label4->GetLabel()->SetImageToPredefinedIcon(vtkKWIcon::IconInfoMini);
-  label4->GetWidget()->SetText("Another use of a labeled label !");
-  label4->SetBalloonHelpString(
-    "This is a vtkKWLabelWithLabel, i.e. a label associated to a "
-    "label that can be positioned around the label. This can be used for "
-    "example to prefix a label with a small icon to emphasize its meaning. "
-    "Predefined icons include warning, info, error, etc.");
-
-  app->Script(
-    "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
-    label4->GetWidgetName());
 
   // -----------------------------------------------------------------------
 
@@ -171,8 +170,8 @@ void vtkKWLabelItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   label1->Delete();
   label2->Delete();
+  label2b->Delete();
   label3->Delete();
-  label4->Delete();
   label_set->Delete();
   label_set2->Delete();
 }

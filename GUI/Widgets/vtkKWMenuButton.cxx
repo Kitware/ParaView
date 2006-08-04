@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.39");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.40");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -493,6 +493,45 @@ void vtkKWMenuButton::SetImageToPixels(const unsigned char* pixels,
 {
   vtkKWTkUtilities::SetImageOptionToPixels(
     this, pixels, width, height, pixel_size, buffer_length);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetCompoundMode(int mode)
+{
+  this->SetConfigurationOption(
+    "-compound", vtkKWOptions::GetCompoundModeAsTkOptionValue(mode));
+}
+
+void vtkKWMenuButton::SetCompoundModeToNone()     
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeNone); 
+};
+void vtkKWMenuButton::SetCompoundModeToLeft() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeLeft); 
+};
+void vtkKWMenuButton::SetCompoundModeToCenter() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeCenter); 
+};
+void vtkKWMenuButton::SetCompoundModeToRight() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeRight); 
+};
+void vtkKWMenuButton::SetCompoundModeToTop() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeTop); 
+};
+void vtkKWMenuButton::SetCompoundModeToBottom() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeBottom); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWMenuButton::GetCompoundMode()
+{
+  return vtkKWOptions::GetCompoundModeFromTkOptionValue(
+    this->GetConfigurationOption("-compound"));
 }
 
 //----------------------------------------------------------------------------

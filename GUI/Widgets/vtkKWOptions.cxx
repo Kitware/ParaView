@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptions );
-vtkCxxRevisionMacro(vtkKWOptions, "1.1");
+vtkCxxRevisionMacro(vtkKWOptions, "1.2");
 
 //----------------------------------------------------------------------------
 const char* vtkKWOptions::GetCharacterEncodingAsTclOptionValue(int encoding)
@@ -374,6 +374,62 @@ int vtkKWOptions::GetStateFromTkOptionValue(const char *state)
     return vtkKWOptions::StateReadOnly;
     }
   return vtkKWOptions::StateUnknown;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWOptions::GetCompoundModeAsTkOptionValue(int compound)
+{
+  switch (compound)
+    {
+    case vtkKWOptions::CompoundModeNone:
+      return "none";
+    case vtkKWOptions::CompoundModeLeft:
+      return "left";
+    case vtkKWOptions::CompoundModeCenter:
+      return "center";
+    case vtkKWOptions::CompoundModeRight:
+      return "right";
+    case vtkKWOptions::CompoundModeTop:
+      return "top";
+    case vtkKWOptions::CompoundModeBottom:
+      return "bottom";
+    default:
+      return "";
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWOptions::GetCompoundModeFromTkOptionValue(const char *compound)
+{
+  if (!compound)
+    {
+    return vtkKWOptions::CompoundModeUnknown;
+    }
+  if (!strcmp(compound, "none"))
+    {
+    return vtkKWOptions::CompoundModeNone;
+    }
+  if (!strcmp(compound, "left"))
+    {
+    return vtkKWOptions::CompoundModeLeft;
+    }
+  if (!strcmp(compound, "center"))
+    {
+    return vtkKWOptions::CompoundModeCenter;
+    }
+  if (!strcmp(compound, "right"))
+    {
+    return vtkKWOptions::CompoundModeRight;
+    }
+  if (!strcmp(compound, "top"))
+    {
+    return vtkKWOptions::CompoundModeTop;
+    }
+  if (!strcmp(compound, "bottom"))
+    {
+    return vtkKWOptions::CompoundModeBottom;
+    }
+  return vtkKWOptions::CompoundModeUnknown;
 }
 
 //----------------------------------------------------------------------------

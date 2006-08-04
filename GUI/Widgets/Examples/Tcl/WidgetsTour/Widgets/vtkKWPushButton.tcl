@@ -15,7 +15,7 @@ proc vtkKWPushButtonEntryPoint {parent win} {
 
   # -----------------------------------------------------------------------
 
-  # Create another push button use an icon
+  # Create another push button, use an icon
 
   set pushbutton2 [vtkKWPushButton New]
   $pushbutton2 SetParent $parent
@@ -25,6 +25,21 @@ proc vtkKWPushButtonEntryPoint {parent win} {
     "Another pushbutton using one of the predefined icons"
 
   pack [$pushbutton2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+
+  # -----------------------------------------------------------------------
+
+  # Create another push button, use both text and icon
+
+  set pushbutton2b [vtkKWPushButton New]
+  $pushbutton2b SetParent $parent
+  $pushbutton2b Create
+  $pushbutton2b SetText "A push button with an icon"
+  $pushbutton2b SetImageToPredefinedIcon 171
+  $pushbutton2b SetCompoundModeToLeft
+  $pushbutton2b SetBalloonHelpString \
+    "Another pushbutton, using both a text and one of the predefined icons"
+
+  pack [$pushbutton2b GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
   # -----------------------------------------------------------------------
 

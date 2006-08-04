@@ -205,12 +205,30 @@ public:
   // that the buffer has been encoded using base64 and/or zlib.
   // If pixel_size > 3 (i.e. RGBA), the image is blend the with background
   // color of the widget.
+  // Check the SetCompoundMode method if you want to display both the
+  // image and the label at the same time.
   virtual void SetImageToIcon(vtkKWIcon *icon);
   virtual void SetImageToPredefinedIcon(int icon_index);
   virtual void SetImageToPixels(
     const unsigned char *pixels, int width, int height, int pixel_size,
     unsigned long buffer_length = 0);
   
+  // Description:
+  // Specifies if the widget should display text and bitmaps/images at the
+  // same time, and if so, where the bitmap/image should be placed relative 
+  // to the text. 
+  // Valid constants can be found in vtkKWOptions::CompoundModeType.
+  // The (default) value CompoundModeNone specifies that the bitmap or image 
+  // should (if defined) be displayed instead of the text. 
+  virtual void SetCompoundMode(int);
+  virtual int GetCompoundMode();
+  virtual void SetCompoundModeToNone();
+  virtual void SetCompoundModeToLeft();
+  virtual void SetCompoundModeToCenter();
+  virtual void SetCompoundModeToRight();
+  virtual void SetCompoundModeToTop();
+  virtual void SetCompoundModeToBottom();
+
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 

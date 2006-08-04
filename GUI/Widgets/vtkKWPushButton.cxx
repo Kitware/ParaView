@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.34");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.35");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -47,7 +47,7 @@ void vtkKWPushButton::CreateWidget()
   // Call the superclass to create the widget and set the appropriate flags
 
   if (!vtkKWWidget::CreateSpecificTkWidget(this, 
-        "button", "-highlightthickness 0"))
+        "button", "-highlightthickness 0 -padx 2 -pady 2"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -410,6 +410,45 @@ void vtkKWPushButton::SetImageToPixels(const unsigned char* pixels,
 {
   vtkKWTkUtilities::SetImageOptionToPixels(
     this, pixels, width, height, pixel_size, buffer_length);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetCompoundMode(int mode)
+{
+  this->SetConfigurationOption(
+    "-compound", vtkKWOptions::GetCompoundModeAsTkOptionValue(mode));
+}
+
+void vtkKWPushButton::SetCompoundModeToNone()     
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeNone); 
+};
+void vtkKWPushButton::SetCompoundModeToLeft() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeLeft); 
+};
+void vtkKWPushButton::SetCompoundModeToCenter() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeCenter); 
+};
+void vtkKWPushButton::SetCompoundModeToRight() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeRight); 
+};
+void vtkKWPushButton::SetCompoundModeToTop() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeTop); 
+};
+void vtkKWPushButton::SetCompoundModeToBottom() 
+{ 
+  this->SetCompoundMode(vtkKWOptions::CompoundModeBottom); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWPushButton::GetCompoundMode()
+{
+  return vtkKWOptions::GetCompoundModeFromTkOptionValue(
+    this->GetConfigurationOption("-compound"));
 }
 
 //----------------------------------------------------------------------------

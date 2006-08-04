@@ -15,7 +15,7 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
 
   # -----------------------------------------------------------------------
 
-  # Create another checkbutton but use an icon this time
+  # Create another checkbutton, but use an icon this time
 
   set  cb2 [vtkKWCheckButton New]
   $cb2 SetParent $parent
@@ -25,6 +25,22 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
   $cb2 SetBalloonHelpString "This time use one of the predefined icon"
 
   pack [$cb2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+
+  # -----------------------------------------------------------------------
+
+  # Create another checkbutton, but use both text and an icon
+
+  set  cb2b [vtkKWCheckButton New]
+  $cb2b SetParent $parent
+  $cb2b Create
+  $cb2b SetText "A checkbutton"
+  $cb2b SetImageToPredefinedIcon 62
+  $cb2b SetCompoundModeToLeft
+  $cb2b IndicatorVisibilityOff
+  $cb2b SetBalloonHelpString \
+      "This time, use both a text and one of the predefined icon"
+
+  pack [$cb2b GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
   # -----------------------------------------------------------------------
 
