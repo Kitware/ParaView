@@ -79,8 +79,7 @@ pqEditServerStartupDialog::pqEditServerStartupDialog(
           shell_startup->CommandLine);
         this->Implementation->UI.delay->setValue(shell_startup->Delay);
         }
-      else if(pqManualServerStartup* const manual_startup =
-          dynamic_cast<pqManualServerStartup*>(startup))
+      else if(dynamic_cast<pqManualServerStartup*>(startup))
         {
         this->Implementation->UI.type->setCurrentIndex(1);
         }

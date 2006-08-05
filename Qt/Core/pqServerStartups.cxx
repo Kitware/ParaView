@@ -173,11 +173,11 @@ void pqServerStartups::setShellStartup(const pqServerResource& server, const QSt
   emit this->changed();
 }
 
-void pqServerStartups::deleteStartups(const ServersT& servers)
+void pqServerStartups::deleteStartups(const ServersT& startups)
 {
-  for(ServersT::const_iterator server = servers.begin(); server != servers.end(); ++server) 
+  for(ServersT::const_iterator startup = startups.begin(); startup != startups.end(); ++startup) 
     {
-    this->Implementation->deleteStartup(*server);
+    this->Implementation->deleteStartup(*startup);
     }
     
   emit this->changed();
@@ -186,10 +186,10 @@ void pqServerStartups::deleteStartups(const ServersT& servers)
 void pqServerStartups::load(pqSettings& settings)
 {
   settings.beginGroup("ServerStartups");
-  const QStringList servers = settings.childGroups();
-  for(int i = 0; i != servers.size(); ++i)
+  const QStringList startups = settings.childGroups();
+  for(int i = 0; i != startups.size(); ++i)
     {
-    const QString encoded_server = servers[i];
+    const QString encoded_server = startups[i];
     const QString server_type = settings.value(encoded_server + "/type").toString();
 
     QString server = encoded_server;
@@ -225,7 +225,7 @@ void pqServerStartups::save(pqSettings& settings)
     encoded_startup_server.replace("/", "|");
     
     const QString server_key = "ServerStartups/" + encoded_startup_server;
-    if(pqManualServerStartup* const manual_startup = dynamic_cast<pqManualServerStartup*>(startup_command))
+    if(dynamic_cast<pqManualServerStartup*>(startup_command))
       {
       settings.setValue(server_key + "/type", "manual");
       }

@@ -47,13 +47,36 @@ pqShellServerStartupContextHelper::pqShellServerStartupContextHelper(double dela
 {
 }
 
-void pqShellServerStartupContextHelper::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
+void pqShellServerStartupContextHelper::onFinished(int /*exitCode*/, QProcess::ExitStatus exitStatus)
 {
-  QTimer::singleShot(static_cast<int>(this->Delay * 1000), this, SLOT(onDelayComplete()));
+  switch(exitStatus)
+    {
+    case QProcess::NormalExit:
+      QTimer::singleShot(static_cast<int>(this->Delay * 1000), this, SLOT(onDelayComplete()));
+      break;
+    case QProcess::CrashExit:
+      qWarning() << "The startup command crashed";
+      emit this->failed();
+      break;
+    }
+  
 }
 
 void pqShellServerStartupContextHelper::onError(QProcess::ProcessError error)
 {
+  switch(error)
+    {
+    case QProcess::FailedToStart:
+      qWarning() << "The startup command failed to start ... check your PATH and file permissions";
+      break;
+    case QProcess::Crashed:
+      qWarning() << "The startup command crashed";
+      break;
+    default:
+      qWarning() << "Unknown error running startup command";
+      break;
+    }
+  
   emit this->failed();
 }
 

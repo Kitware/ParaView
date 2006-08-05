@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // pqManualServerStartup
 
 void pqManualServerStartup::execute(
-  const pqServerResource& server, pqServerStartupContext& context)
+  const pqServerResource& /*server*/, pqServerStartupContext& context)
 {
   context.onSucceeded();
 }
