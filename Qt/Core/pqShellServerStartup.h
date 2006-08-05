@@ -72,7 +72,7 @@ private slots:
 private:
   pqShellServerStartupContextHelper(double Delay, QObject* parent);
   
-  friend pqShellServerStartup;
+  friend class pqShellServerStartup;
   
   const double Delay;
 };
