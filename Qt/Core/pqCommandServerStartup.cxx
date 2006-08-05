@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqShellServerStartup.cxx
+   Module:    pqCommandServerStartup.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -32,22 +32,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqServerResource.h"
 #include "pqServerStartupContext.h"
-#include "pqShellServerStartup.h"
+#include "pqCommandServerStartup.h"
 
 #include <QProcess>
 #include <QTimer>
 #include <QtDebug>
 
 /////////////////////////////////////////////////////////////////////////////
-// pqShellServerStartupContextHelper
+// pqCommandServerStartupContextHelper
 
-pqShellServerStartupContextHelper::pqShellServerStartupContextHelper(double delay, QObject* object_parent) :
+pqCommandServerStartupContextHelper::pqCommandServerStartupContextHelper(double delay, QObject* object_parent) :
   QObject(object_parent),
   Delay(delay)
 {
 }
 
-void pqShellServerStartupContextHelper::onFinished(int /*exitCode*/, QProcess::ExitStatus exitStatus)
+void pqCommandServerStartupContextHelper::onFinished(int /*exitCode*/, QProcess::ExitStatus exitStatus)
 {
   switch(exitStatus)
     {
@@ -62,7 +62,7 @@ void pqShellServerStartupContextHelper::onFinished(int /*exitCode*/, QProcess::E
   
 }
 
-void pqShellServerStartupContextHelper::onError(QProcess::ProcessError error)
+void pqCommandServerStartupContextHelper::onError(QProcess::ProcessError error)
 {
   switch(error)
     {
@@ -80,21 +80,21 @@ void pqShellServerStartupContextHelper::onError(QProcess::ProcessError error)
   emit this->failed();
 }
 
-void pqShellServerStartupContextHelper::onDelayComplete()
+void pqCommandServerStartupContextHelper::onDelayComplete()
 {
   emit this->succeeded();
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// pqShellServerStartup
+// pqCommandServerStartup
 
-pqShellServerStartup::pqShellServerStartup(const QString& command_line, double delay) :
+pqCommandServerStartup::pqCommandServerStartup(const QString& command_line, double delay) :
   CommandLine(command_line),
   Delay(delay)
 {
 }
 
-void pqShellServerStartup::execute(
+void pqCommandServerStartup::execute(
   const pqServerResource& server, pqServerStartupContext& context)
 {
   QStringList environment = QProcess::systemEnvironment();
@@ -111,7 +111,7 @@ void pqShellServerStartup::execute(
   QProcess* const process = new QProcess(&context);
   process->setEnvironment(environment);
 
-  pqShellServerStartupContextHelper* const helper = new pqShellServerStartupContextHelper(this->Delay, &context);
+  pqCommandServerStartupContextHelper* const helper = new pqCommandServerStartupContextHelper(this->Delay, &context);
   QObject::connect(process, SIGNAL(error(QProcess::ProcessError)), helper, SLOT(onError(QProcess::ProcessError)));
   QObject::connect(process, SIGNAL(finished(int, QProcess::ExitStatus)), helper, SLOT(onFinished(int, QProcess::ExitStatus)));
 

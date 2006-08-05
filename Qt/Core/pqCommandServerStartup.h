@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqShellServerStartup.h
+   Module:    pqCommandServerStartup.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,23 +30,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqShellServerStartup_h
-#define _pqShellServerStartup_h
+#ifndef _pqCommandServerStartup_h
+#define _pqCommandServerStartup_h
 
 #include "pqServerStartup.h"
 
 #include <QProcess>
 
 /////////////////////////////////////////////////////////////////////////////
-// pqShellServerStartup
+// pqCommandServerStartup
 
 /// Concrete implementation of pqServerStartup that runs an external
 /// shell command to start a remote server.
-class pqShellServerStartup :
+class pqCommandServerStartup :
   public pqServerStartup
 {
 public:
-  pqShellServerStartup(const QString& command_line, double delay);
+  pqCommandServerStartup(const QString& command_line, double delay);
   
   void execute(const pqServerResource& server, pqServerStartupContext& context);
 
@@ -55,7 +55,7 @@ public:
 };
 
 /// Private implementation detail
-class pqShellServerStartupContextHelper :
+class pqCommandServerStartupContextHelper :
   public QObject
 {
   Q_OBJECT
@@ -70,11 +70,11 @@ private slots:
   void onDelayComplete();
   
 private:
-  pqShellServerStartupContextHelper(double Delay, QObject* parent);
+  pqCommandServerStartupContextHelper(double Delay, QObject* parent);
   
-  friend class pqShellServerStartup;
+  friend class pqCommandServerStartup;
   
   const double Delay;
 };
 
-#endif // !_pqShellServerStartup
+#endif // !_pqCommandServerStartup

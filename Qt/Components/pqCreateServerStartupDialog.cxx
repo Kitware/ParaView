@@ -91,27 +91,50 @@ void pqCreateServerStartupDialog::updateServer()
     {
     case 0:
       this->Implementation->Server.setScheme("cs");
+
+      this->Implementation->UI.hostLabel->setVisible(true);
       this->Implementation->UI.host->setVisible(true);
+      this->Implementation->UI.dataServerHostLabel->setVisible(false);
       this->Implementation->UI.dataServerHost->setVisible(false);
+      this->Implementation->UI.renderServerHostLabel->setVisible(false);
       this->Implementation->UI.renderServerHost->setVisible(false);
+      
       break;
+      
     case 1:
       this->Implementation->Server.setScheme("csrc");
+      
+      this->Implementation->UI.hostLabel->setVisible(true);
       this->Implementation->UI.host->setVisible(true);
+      this->Implementation->UI.dataServerHostLabel->setVisible(false);
       this->Implementation->UI.dataServerHost->setVisible(false);
+      this->Implementation->UI.renderServerHostLabel->setVisible(false);
       this->Implementation->UI.renderServerHost->setVisible(false);
+
       break;
+      
     case 2:
       this->Implementation->Server.setScheme("cdsrs");
+      
+      this->Implementation->UI.hostLabel->setVisible(false);
       this->Implementation->UI.host->setVisible(false);
+      this->Implementation->UI.dataServerHostLabel->setVisible(true);
       this->Implementation->UI.dataServerHost->setVisible(true);
+      this->Implementation->UI.renderServerHostLabel->setVisible(true);
       this->Implementation->UI.renderServerHost->setVisible(true);
+
       break;
+      
     case 3:
       this->Implementation->Server.setScheme("cdsrsrc");
+      
+      this->Implementation->UI.hostLabel->setVisible(false);
       this->Implementation->UI.host->setVisible(false);
+      this->Implementation->UI.dataServerHostLabel->setVisible(true);
       this->Implementation->UI.dataServerHost->setVisible(true);
+      this->Implementation->UI.renderServerHostLabel->setVisible(true);
       this->Implementation->UI.renderServerHost->setVisible(true);
+
       break;
     }
     
@@ -119,10 +142,11 @@ void pqCreateServerStartupDialog::updateServer()
   this->Implementation->Server.setDataServerHost(this->Implementation->UI.dataServerHost->text());
   this->Implementation->Server.setRenderServerHost(this->Implementation->UI.renderServerHost->text());
   
-  this->Implementation->UI.message->setText(QString("Create new server ... %1").arg(this->Implementation->Server.toString()));
+  this->Implementation->UI.message->setText(QString("Configure new server ... %1").arg(this->Implementation->Server.toString()));
 }
 
 void pqCreateServerStartupDialog::accept()
 {
   Superclass::accept();
 }
+

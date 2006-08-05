@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerResource.h"
 #include "pqServerStartups.h"
 #include "pqSettings.h"
-#include "pqShellServerStartup.h"
+#include "pqCommandServerStartup.h"
 
 #include <QtDebug>
 
@@ -169,7 +169,7 @@ void pqServerStartups::setManualStartup(const pqServerResource& server)
 void pqServerStartups::setShellStartup(const pqServerResource& server, const QString& command_line, double delay)
 {
   this->Implementation->deleteStartup(server);
-  this->Implementation->Startups.insert(vtkstd::make_pair(server.schemeHosts(), new pqShellServerStartup(command_line, delay)));
+  this->Implementation->Startups.insert(vtkstd::make_pair(server.schemeHosts(), new pqCommandServerStartup(command_line, delay)));
   emit this->changed();
 }
 
@@ -229,11 +229,11 @@ void pqServerStartups::save(pqSettings& settings)
       {
       settings.setValue(server_key + "/type", "manual");
       }
-    else if(pqShellServerStartup* const shell_startup = dynamic_cast<pqShellServerStartup*>(startup_command))
+    else if(pqCommandServerStartup* const command_startup = dynamic_cast<pqCommandServerStartup*>(startup_command))
       {
       settings.setValue(server_key + "/type", "shell");
-      settings.setValue(server_key + "/command_line", shell_startup->CommandLine);
-      settings.setValue(server_key + "/delay", shell_startup->Delay);
+      settings.setValue(server_key + "/command_line", command_startup->CommandLine);
+      settings.setValue(server_key + "/delay", command_startup->Delay);
       }
     }
 }

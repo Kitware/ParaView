@@ -34,6 +34,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DWidgetFactory.h
   pqApplicationCore.h
+  pqCommandServerStartup.h
   pqFileDialogEventTranslator.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
@@ -55,7 +56,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerStartupContext.h
   pqServerStartups.h
   pqSettings.h
-  pqShellServerStartup.h
   pqTestUtility.h
   pqUndoStack.h
   )
@@ -94,6 +94,8 @@ ADD_LIBRARY(pqCore
   pq3DWidgetFactory.h
   pqApplicationCore.cxx
   pqApplicationCore.h
+  pqCommandServerStartup.cxx
+  pqCommandServerStartup.h
   pqCoreExport.h
   pqFileDialogEventPlayer.cxx
   pqFileDialogEventPlayer.h
@@ -139,8 +141,6 @@ ADD_LIBRARY(pqCore
   pqRenderModule.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
-  pqShellServerStartup.cxx
-  pqShellServerStartup.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
   pqSMProxy.cxx

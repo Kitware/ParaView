@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>415</width>
-    <height>203</height>
+    <width>529</width>
+    <height>231</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -48,10 +48,10 @@
      <property name="spacing" >
       <number>6</number>
      </property>
-     <item row="5" column="0" >
-      <widget class="QLabel" name="label_6" >
+     <item row="1" column="0" >
+      <widget class="QLabel" name="hostLabel" >
        <property name="text" >
-        <string>Render Server host</string>
+        <string>Host</string>
        </property>
       </widget>
      </item>
@@ -70,11 +70,28 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1" >
-      <widget class="QLineEdit" name="host" />
+     <item row="4" column="0" colspan="2" >
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item row="3" column="1" >
-      <widget class="QLineEdit" name="dataServerHost" />
+      <widget class="QLineEdit" name="renderServerHost" />
+     </item>
+     <item row="3" column="0" >
+      <widget class="QLabel" name="renderServerHostLabel" >
+       <property name="text" >
+        <string>Render Server host</string>
+       </property>
+      </widget>
      </item>
      <item row="0" column="1" >
       <widget class="QComboBox" name="type" >
@@ -103,37 +120,20 @@
        </item>
       </widget>
      </item>
-     <item row="1" column="0" >
-      <widget class="QLabel" name="label" >
-       <property name="text" >
-        <string>Host</string>
-       </property>
-      </widget>
+     <item row="1" column="1" >
+      <widget class="QLineEdit" name="host" />
      </item>
-     <item row="5" column="1" >
-      <widget class="QLineEdit" name="renderServerHost" />
+     <item row="2" column="1" >
+      <widget class="QLineEdit" name="dataServerHost" />
      </item>
-     <item row="3" column="0" >
-      <widget class="QLabel" name="label_3" >
+     <item row="2" column="0" >
+      <widget class="QLabel" name="dataServerHostLabel" >
        <property name="text" >
         <string>Data Server host</string>
        </property>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" >

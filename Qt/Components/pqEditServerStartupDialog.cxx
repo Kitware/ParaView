@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqServerResource.h>
 #include <pqServerStartup.h>
 #include <pqServerStartups.h>
-#include <pqShellServerStartup.h>
+#include <pqCommandServerStartup.h>
 
 #include <QtDebug>
 
@@ -66,27 +66,31 @@ pqEditServerStartupDialog::pqEditServerStartupDialog(
 {
   this->Implementation->UI.setupUi(this);
   this->Implementation->UI.message->setText(
-    QString("Configure startup for server %1").arg(
+    QString("Configure server %1").arg(
       server.schemeHosts().toString()));
     
   if(pqServerStartup* const startup = startups.getStartup(server))
     {
-      if(pqShellServerStartup* const shell_startup =
-          dynamic_cast<pqShellServerStartup*>(startup))
+      if(pqCommandServerStartup* const command_startup =
+          dynamic_cast<pqCommandServerStartup*>(startup))
         {
         this->Implementation->UI.type->setCurrentIndex(0);
+        this->Implementation->UI.stackedWidget->setCurrentIndex(0);
+
         this->Implementation->UI.commandLine->setPlainText(
-          shell_startup->CommandLine);
-        this->Implementation->UI.delay->setValue(shell_startup->Delay);
+          command_startup->CommandLine);
+        this->Implementation->UI.delay->setValue(command_startup->Delay);
         }
       else if(dynamic_cast<pqManualServerStartup*>(startup))
         {
         this->Implementation->UI.type->setCurrentIndex(1);
+        this->Implementation->UI.stackedWidget->setCurrentIndex(1);
         }
     }
   else
     {
     this->Implementation->UI.type->setCurrentIndex(0);
+    this->Implementation->UI.stackedWidget->setCurrentIndex(0);
     }
 }
 

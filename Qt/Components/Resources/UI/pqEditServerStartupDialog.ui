@@ -13,7 +13,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Configure Startup</string>
+   <string>Configure Server</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
@@ -36,7 +36,7 @@
       </font>
      </property>
      <property name="text" >
-      <string>Configure startup for server cs://foobar</string>
+      <string>Configure server cs://foobar</string>
      </property>
     </widget>
    </item>
@@ -78,9 +78,12 @@
      </item>
      <item>
       <widget class="QComboBox" name="type" >
+       <property name="currentIndex" >
+        <number>0</number>
+       </property>
        <item>
         <property name="text" >
-         <string>Shell</string>
+         <string>Command</string>
         </property>
        </item>
        <item>
@@ -108,7 +111,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget" >
      <property name="currentIndex" >
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_1" >
       <layout class="QVBoxLayout" >
@@ -121,7 +124,7 @@
        <item>
         <widget class="QLabel" name="label_3" >
          <property name="text" >
-          <string>Execute a shell command to start the server:</string>
+          <string>Execute an external command to start the server:</string>
          </property>
         </widget>
        </item>
