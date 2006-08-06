@@ -15,6 +15,7 @@
 #include "vtkMultiBlockExtractSelection.h"
 
 #include "vtkDataSet.h"
+#include "vtkExtractSelection.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
@@ -23,8 +24,9 @@
 #include "vtkProcessModule.h"
 #include "vtkSelection.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkMultiBlockExtractSelection, "1.2");
+vtkCxxRevisionMacro(vtkMultiBlockExtractSelection, "1.3");
 vtkStandardNewMacro(vtkMultiBlockExtractSelection);
 vtkCxxSetObjectMacro(vtkMultiBlockExtractSelection, Selection,vtkSelection);
 
@@ -33,13 +35,15 @@ vtkMultiBlockExtractSelection::vtkMultiBlockExtractSelection()
 {
   this->SetNumberOfInputPorts(0);
   this->Selection = 0;
-  this->ExtractFilter = vtkPolyDataExtractSelection::New();
+  this->PolyDataExtractFilter = vtkPolyDataExtractSelection::New();
+  this->ExtractFilter = vtkExtractSelection::New();
 } 
 
 //----------------------------------------------------------------------------
 vtkMultiBlockExtractSelection::~vtkMultiBlockExtractSelection()
 {
   this->SetSelection(NULL);
+  this->PolyDataExtractFilter->Delete();
   this->ExtractFilter->Delete();
 }
 
@@ -120,30 +124,53 @@ vtkDataSet* vtkMultiBlockExtractSelection::SelectFromDataSet(
     return 0;
     }
 
-  vtkPolyData* input = vtkPolyData::SafeDownCast(
+  vtkDataSet* input = vtkDataSet::SafeDownCast(
     alg->GetOutputDataObject(0));
   if (!input)
     {
     return 0;
     }
 
-  vtkPolyData* inputCopy = vtkPolyData::New();
+  vtkDataSet* inputCopy = input->NewInstance();
   inputCopy->ShallowCopy(input);
 
-  this->ExtractFilter->SetSelection(sel);
-  this->ExtractFilter->SetInput(inputCopy);
-  this->ExtractFilter->Update();
-  this->ExtractFilter->SetInput(0);
-  inputCopy->Delete();
-
-  vtkPolyData* output = vtkPolyData::SafeDownCast(
-    this->ExtractFilter->GetOutputDataObject(0));
-  if (output)
+  if (input->IsA("vtkPolyData"))
     {
-    vtkPolyData* outputCopy = vtkPolyData::New();
-    outputCopy->ShallowCopy(output);
-    return outputCopy;
+    this->PolyDataExtractFilter->SetSelection(sel);
+    this->PolyDataExtractFilter->SetInput(inputCopy);
+    this->PolyDataExtractFilter->Update();
+    this->PolyDataExtractFilter->SetInput(0);
+    inputCopy->Delete();
+    
+    vtkPolyData* output = vtkPolyData::SafeDownCast(
+      this->PolyDataExtractFilter->GetOutputDataObject(0));
+    if (output)
+      {
+      vtkPolyData* outputCopy = vtkPolyData::New();
+      outputCopy->ShallowCopy(output);
+      output->Initialize();
+      return outputCopy;
+      }
     }
+  else
+    {
+    this->ExtractFilter->SetSelection(sel);
+    this->ExtractFilter->SetInput(inputCopy);
+    this->ExtractFilter->Update();
+    this->ExtractFilter->SetInput(0);
+    inputCopy->Delete();
+    
+    vtkUnstructuredGrid* output = vtkUnstructuredGrid::SafeDownCast(
+      this->ExtractFilter->GetOutputDataObject(0));
+    if (output)
+      {
+      vtkUnstructuredGrid* outputCopy = vtkUnstructuredGrid::New();
+      outputCopy->ShallowCopy(output);
+      output->Initialize();
+      return outputCopy;
+      }
+    }
+
   return 0;
 }
 

@@ -25,6 +25,7 @@
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
 class vtkDataSet;
+class vtkExtractSelection;
 class vtkPolyDataExtractSelection;
 class vtkSelection;
 
@@ -61,7 +62,8 @@ protected:
   
 private:
   vtkDataSet* SelectFromDataSet(vtkSelection* sel);
-  vtkPolyDataExtractSelection* ExtractFilter;
+  vtkPolyDataExtractSelection* PolyDataExtractFilter;
+  vtkExtractSelection* ExtractFilter;
 
   vtkMultiBlockExtractSelection(const vtkMultiBlockExtractSelection&);  // Not implemented.
   void operator=(const vtkMultiBlockExtractSelection&);  // Not implemented.
