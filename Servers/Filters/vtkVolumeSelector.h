@@ -55,9 +55,19 @@ public:
   void ClearDataSets();
 
   // Description:
-  // Tries to obtain a dataset from the pointer, and adds the dataset to the
-  // output.
-  void AddDataSet(vtkAlgorithm* alg);
+  // Tries to obtain a dataset from the pointer, and adds the dataset
+  // to the output.
+  void AddDataSet(vtkAlgorithm* source);
+
+  // Description:
+  // Clears original sources.
+  void ClearOriginalSources();
+
+  // Description:
+  // Add an original source to the list. These are used to populate
+  // the selection. Make sure that these are added in the same order
+  // as datasets.
+  void AddOriginalSource(vtkAlgorithm* source);
 
   // Description:
   // Clears props.

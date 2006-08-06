@@ -1700,6 +1700,13 @@
        </ProxyProperty>
 
        <ProxyProperty 
+         name="OriginalSources" 
+         command="AddOriginalSource" 
+         is_internal="1"
+         clean_command="ClearOriginalSources">
+       </ProxyProperty>
+
+       <ProxyProperty 
          name="Selection" 
          command="SetSelection">
        </ProxyProperty>
