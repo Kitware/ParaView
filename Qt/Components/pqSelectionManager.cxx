@@ -97,7 +97,8 @@ public:
 struct pqSelectionProxies
 {
   vtkSmartPointer<vtkSMProxy> SelectorProxy;
-  vtkSmartPointer<vtkSMProxy> SelectionProxy;
+  vtkSmartPointer<vtkSMProxy> GeometrySelectionProxy;
+  vtkSmartPointer<vtkSMProxy> SourceSelectionProxy;
   vtkSmartPointer<vtkSMSourceProxy> GeometrySource;
 };
 
@@ -482,18 +483,18 @@ void pqSelectionManager::setActiveRenderModule(pqRenderModule* rm)
     this->Implementation->ServerSelections[connId].SelectorProxy = 
       selectorProxy;
 
-    vtkSMProxy* selectionProxy = 
+    vtkSMProxy* geometrySelectionProxy = 
       pxm->NewProxy("selection_helpers", "Selection");
-    selectionProxy->SetConnectionID(connId);
-    selectionProxy->SetServers(vtkProcessModule::DATA_SERVER);
-    selectionProxy->UpdateVTKObjects();
+    geometrySelectionProxy->SetConnectionID(connId);
+    geometrySelectionProxy->SetServers(vtkProcessModule::DATA_SERVER);
+    geometrySelectionProxy->UpdateVTKObjects();
 
     // This is the object that stores the result of selection
     vtkSMProxyProperty* selectionProperty = 
       vtkSMProxyProperty::SafeDownCast(selectorProxy->GetProperty("Selection"));
-    selectionProperty->AddProxy(selectionProxy);
-    this->Implementation->ServerSelections[connId].SelectionProxy = 
-      selectionProxy;
+    selectionProperty->AddProxy(geometrySelectionProxy);
+    this->Implementation->ServerSelections[connId].GeometrySelectionProxy = 
+      geometrySelectionProxy;
 
     selectorProxy->UpdateVTKObjects();
     selectorProxy->Delete();
@@ -506,14 +507,25 @@ void pqSelectionManager::setActiveRenderModule(pqRenderModule* rm)
 
     selectionProperty = vtkSMProxyProperty::SafeDownCast(
       selectionGeomProxy->GetProperty("Selection"));
-    selectionProperty->AddProxy(selectionProxy);
+    selectionProperty->AddProxy(geometrySelectionProxy);
     selectionGeomProxy->UpdateVTKObjects();
 
     this->Implementation->ServerSelections[connId].GeometrySource = 
       selectionGeomProxy;
 
-    selectionProxy->Delete();
     selectionGeomProxy->Delete();
+    geometrySelectionProxy->Delete();
+
+    vtkSMProxy* sourceSelectionProxy = 
+      pxm->NewProxy("selection_helpers", "Selection");
+    sourceSelectionProxy->SetConnectionID(connId);
+    sourceSelectionProxy->SetServers(vtkProcessModule::DATA_SERVER);
+    sourceSelectionProxy->UpdateVTKObjects();
+
+    this->Implementation->ServerSelections[connId].SourceSelectionProxy = 
+      sourceSelectionProxy;
+    
+    sourceSelectionProxy->Delete();
     }
 
 }
@@ -632,6 +644,7 @@ void pqSelectionManager::selectInFrustrum(int* eventpos, pqRenderModule* rm)
 
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> > displays;
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> > geomFilters;
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > sources;
 
   pqServerManagerModel* model = 
     pqApplicationCore::instance()->getServerManagerModel();
@@ -681,6 +694,7 @@ void pqSelectionManager::selectInFrustrum(int* eventpos, pqRenderModule* rm)
       {
       displays.push_back(dispProxy);
       geomFilters.push_back(geomProxy);
+      sources.push_back(objProxy);
       }
     }
 
@@ -705,9 +719,10 @@ void pqSelectionManager::selectInFrustrum(int* eventpos, pqRenderModule* rm)
     selectorProxy->GetProperty("DataSets"));
   vtkSMProxyProperty* props = vtkSMProxyProperty::SafeDownCast(
     selectorProxy->GetProperty("Props"));
+  vtkSMProxyProperty* originalSources = vtkSMProxyProperty::SafeDownCast(
+    selectorProxy->GetProperty("OriginalSources"));
 
   unsigned int numProxies = geomFilters.size();
-  dataSets->RemoveAllProxies();
   for (unsigned int i = 0; i < numProxies; i++)
     {
     vtkSMDataObjectDisplayProxy* dp = 
@@ -716,6 +731,7 @@ void pqSelectionManager::selectInFrustrum(int* eventpos, pqRenderModule* rm)
       {
       dataSets->AddProxy(geomFilters[i]);
       props->AddProxy(dp->GetActorProxy());
+      originalSources->AddProxy(sources[i]);
       }
     }
   idInfo->Delete();
@@ -727,6 +743,7 @@ void pqSelectionManager::selectInFrustrum(int* eventpos, pqRenderModule* rm)
   // Cleanup
   dataSets->RemoveAllProxies();
   props->RemoveAllProxies();
+  originalSources->RemoveAllProxies();
   selectorProxy->UpdateVTKObjects();
 }
 
@@ -763,11 +780,13 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
   // selection is in the works
   this->selectInFrustrum(eventpos, rm);
 
-  //this->sendSelection(selection, selectionProxy);
+  //this->sendSelection(selection, geometrySelectionProxy);
 
   vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
-  vtkSMProxy* selectionProxy = 
-    this->Implementation->ServerSelections[rmp->GetConnectionID()].SelectionProxy;
+  vtkIdType connId = rmp->GetConnectionID();
+
+  vtkSMProxy* geometrySelectionProxy = 
+    this->Implementation->ServerSelections[connId].GeometrySelectionProxy;
   //gather the selection results
   vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
 
@@ -776,7 +795,7 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
     vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
     vtkProcessModule::RENDER_SERVER, 
     selInfo, 
-    selectionProxy->GetID(0)
+    geometrySelectionProxy->GetID(0)
     );
   vtkSelection* sel = selInfo->GetSelection();
   vtkstd::list<int> ids;
@@ -807,7 +826,7 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
 
   // render the selection
   vtkSMSourceProxy* geomProxy = 
-    this->Implementation->ServerSelections[rmp->GetConnectionID()].GeometrySource;
+    this->Implementation->ServerSelections[connId].GeometrySource;
   geomProxy->MarkModified(0);
   
   selInfo->Delete();
@@ -821,11 +840,31 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
     {
     pqRenderModule* renModule = model->getRenderModule(i);
     vtkSMRenderModuleProxy* renModuleProxy = renModule->getRenderModuleProxy();
-    if (renModuleProxy->GetConnectionID() == geomProxy->GetConnectionID())
+    if (connId == geomProxy->GetConnectionID())
       {
       renModule->render();
       }
     }
+
+  vtkSMProxy* sourceSelection =
+    this->Implementation->ServerSelections[connId].SourceSelectionProxy;
+  vtkSMProxy* geomSelection =
+    this->Implementation->ServerSelections[connId].GeometrySelectionProxy;
+
+  vtkClientServerStream stream;
+  vtkClientServerID converterID =
+    processModule->NewStreamObject("vtkSelectionConverter", stream);
+  stream << vtkClientServerStream::Invoke
+         << converterID 
+         << "Convert" 
+         << geomSelection->GetID(0) 
+         << sourceSelection->GetID(0)
+         << vtkClientServerStream::End;
+  processModule->DeleteStreamObject(converterID, stream);
+  processModule->SendStream(sourceSelection->GetConnectionID(), 
+                            sourceSelection->GetServers(), 
+                            stream);
+
 }
 
 //-----------------------------------------------------------------------------
