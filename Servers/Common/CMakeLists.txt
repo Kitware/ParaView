@@ -42,6 +42,7 @@ SET(Kit_SRCS
   vtkProcessModuleConnectionManager.cxx
   vtkProcessModuleGUIHelper.cxx
   vtkRemoteConnection.cxx
+  vtkSelectionConverter.cxx
   vtkSelectionSerializer.cxx
   vtkSelfConnection.cxx
   vtkServerConnection.cxx
