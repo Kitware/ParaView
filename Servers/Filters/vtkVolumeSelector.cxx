@@ -27,12 +27,13 @@
 #include "vtkProcessModule.h"
 #include "vtkProp.h"
 #include "vtkSelection.h"
+#include "vtkSelectionSerializer.h"
 #include "vtkSignedCharArray.h"
 
 #include "vtkSmartPointer.h"
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkVolumeSelector, "1.3");
+vtkCxxRevisionMacro(vtkVolumeSelector, "1.4");
 vtkStandardNewMacro(vtkVolumeSelector);
 
 vtkCxxSetObjectMacro(vtkVolumeSelector, Selection, vtkSelection);
@@ -41,6 +42,7 @@ struct vtkVolumeSelectorInternals
 {
   vtkstd::vector<vtkSmartPointer<vtkDataObject> > DataSets;
   vtkstd::vector<vtkSmartPointer<vtkProp> > Props;
+  vtkstd::vector<vtkSmartPointer<vtkAlgorithm> > OriginalSources;
 };
 
 //----------------------------------------------------------------------------
@@ -159,6 +161,14 @@ void vtkVolumeSelector::Select()
           }
         }
       
+      if (this->Internal->OriginalSources.size() > i)
+        {
+        vtkClientServerID pid = processModule->GetIDFromObject(
+          this->Internal->OriginalSources[i]);
+        selection->GetProperties()->Set(
+          vtkSelectionSerializer::ORIGINAL_SOURCE_ID(), pid.ID);
+        }
+
       if (this->Internal->Props.size() > i)
         {
         vtkClientServerID pid = processModule->GetIDFromObject(
@@ -180,6 +190,12 @@ void vtkVolumeSelector::Select()
 }
 
 //----------------------------------------------------------------------------
+void vtkVolumeSelector::ClearOriginalSources()
+{
+  this->Internal->OriginalSources.clear();
+}
+
+//----------------------------------------------------------------------------
 void vtkVolumeSelector::ClearDataSets()
 {
   this->Internal->DataSets.clear();
@@ -196,7 +212,15 @@ void vtkVolumeSelector::Initialize()
 {
   this->ClearProps();
   this->ClearDataSets();
+  this->ClearOriginalSources();
   this->Selection->Clear();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkVolumeSelector::AddOriginalSource(vtkAlgorithm* source)
+{
+  this->Internal->OriginalSources.push_back(source);
   this->Modified();
 }
 
@@ -208,12 +232,12 @@ void vtkVolumeSelector::AddProp(vtkProp* prop)
 }
 
 //----------------------------------------------------------------------------
-void vtkVolumeSelector::AddDataSet(vtkAlgorithm* alg)
+void vtkVolumeSelector::AddDataSet(vtkAlgorithm* source)
 {
   vtkDataObject *dObj = NULL;
-  if (alg)
+  if (source)
     {
-    dObj = alg->GetOutputDataObject(0);
+    dObj = source->GetOutputDataObject(0);
     if (!dObj)
       {
       vtkErrorMacro("Could not find algorithm's vtkDataObject output.");
