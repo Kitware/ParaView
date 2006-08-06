@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqCommandServerStartup.h"
 
+#include <QDomDocument>
 #include <QtDebug>
 
 #include <vtkstd/map>
@@ -166,7 +167,7 @@ void pqServerStartups::setManualStartup(const pqServerResource& server)
   emit this->changed();
 }
 
-void pqServerStartups::setShellStartup(const pqServerResource& server, const QString& command_line, double delay)
+void pqServerStartups::setCommandStartup(const pqServerResource& server, const QString& command_line, double delay)
 {
   this->Implementation->deleteStartup(server);
   this->Implementation->Startups.insert(vtkstd::make_pair(server.schemeHosts(), new pqCommandServerStartup(command_line, delay)));
@@ -181,32 +182,6 @@ void pqServerStartups::deleteStartups(const ServersT& startups)
     }
     
   emit this->changed();
-}
-
-void pqServerStartups::load(pqSettings& settings)
-{
-  settings.beginGroup("ServerStartups");
-  const QStringList startups = settings.childGroups();
-  for(int i = 0; i != startups.size(); ++i)
-    {
-    const QString encoded_server = startups[i];
-    const QString server_type = settings.value(encoded_server + "/type").toString();
-
-    QString server = encoded_server;
-    server.replace("|", "/");
-    
-    if(server_type == "manual")
-      {
-      this->setManualStartup(server);
-      }
-    else if(server_type == "shell")
-      {
-      const QString command_line = settings.value(encoded_server + "/command_line").toString();
-      const double delay = settings.value(encoded_server + "/delay").toDouble();
-      this->setShellStartup(server, command_line, delay);
-      }
-    }
-  settings.endGroup();
 }
 
 void pqServerStartups::save(pqSettings& settings)
@@ -237,3 +212,104 @@ void pqServerStartups::save(pqSettings& settings)
       }
     }
 }
+
+void pqServerStartups::save(QDomDocument& xml_doc)
+{
+  QDomElement xml_root = xml_doc.createElement("pvservers");
+  xml_doc.appendChild(xml_root);
+
+  for(
+    pqImplementation::StartupsT::iterator startup = this->Implementation->Startups.begin();
+    startup != this->Implementation->Startups.end();
+    ++startup)
+    {
+    const pqServerResource startup_server = startup->first;
+    pqServerStartup* const startup_command = startup->second;
+
+    QDomElement xml_server = xml_doc.createElement("server");
+    xml_root.appendChild(xml_server);
+
+    QDomAttr xml_server_resource = xml_doc.createAttribute("resource");
+    xml_server_resource.setValue(startup_server.toString());
+    xml_server.setAttributeNode(xml_server_resource);
+   
+    if(dynamic_cast<pqManualServerStartup*>(startup_command))
+      {
+      QDomElement xml_startup = xml_doc.createElement("manual_startup");
+      xml_server.appendChild(xml_startup);
+      }
+    else if(pqCommandServerStartup* const command_startup = dynamic_cast<pqCommandServerStartup*>(startup_command))
+      {
+      QDomElement xml_startup = xml_doc.createElement("command_startup");
+      xml_server.appendChild(xml_startup);
+
+      QDomAttr xml_delay = xml_doc.createAttribute("delay");
+      xml_delay.setValue(QString::number(command_startup->Delay));
+      xml_startup.setAttributeNode(xml_delay);
+      
+      QDomAttr xml_command = xml_doc.createAttribute("command");
+      xml_command.setValue(command_startup->CommandLine);
+      xml_startup.setAttributeNode(xml_command);
+      }
+    }
+}
+
+void pqServerStartups::load(pqSettings& settings)
+{
+  settings.beginGroup("ServerStartups");
+  const QStringList startups = settings.childGroups();
+  for(int i = 0; i != startups.size(); ++i)
+    {
+    const QString encoded_server = startups[i];
+    const QString server_type = settings.value(encoded_server + "/type").toString();
+
+    QString server = encoded_server;
+    server.replace("|", "/");
+    
+    if(server_type == "manual")
+      {
+      this->setManualStartup(server);
+      }
+    else if(server_type == "shell")
+      {
+      const QString command_line = settings.value(encoded_server + "/command_line").toString();
+      const double delay = settings.value(encoded_server + "/delay").toDouble();
+      this->setCommandStartup(server, command_line, delay);
+      }
+    }
+  settings.endGroup();
+}
+
+void pqServerStartups::load(QDomDocument& xml_document)
+{
+  QDomElement xml_servers = xml_document.documentElement();
+  if(xml_servers.nodeName() != "pvservers")
+    {
+    qCritical() << "Not an XML server configuration document";
+    return;
+    }
+
+  for(QDomNode xml_server = xml_servers.firstChild(); !xml_server.isNull(); xml_server = xml_server.nextSibling())
+    {
+    if(xml_server.isElement() && xml_server.toElement().tagName() == "server")
+      {
+      const pqServerResource server =
+        pqServerResource(xml_server.toElement().attribute("resource"));
+
+      for(QDomNode xml_startup = xml_server.firstChild(); !xml_startup.isNull(); xml_startup = xml_startup.nextSibling())
+        {
+        if(xml_startup.isElement() && xml_startup.toElement().tagName() == "manual_startup")
+          {
+          this->setManualStartup(server);
+          }
+        else if(xml_startup.isElement() && xml_startup.toElement().tagName() == "command_startup")
+          {
+          const QString command_line = xml_startup.toElement().attribute("command");
+          const double delay = xml_startup.toElement().attribute("delay").toDouble();
+          this->setCommandStartup(server, command_line, delay);
+          }
+        }
+      }
+    }
+}
+

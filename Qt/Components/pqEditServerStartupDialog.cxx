@@ -106,7 +106,7 @@ void pqEditServerStartupDialog::accept()
   switch(this->Implementation->UI.type->currentIndex())
     {
     case 0:
-      startups.setShellStartup(
+      startups.setCommandStartup(
         this->Implementation->Server,
         this->Implementation->UI.commandLine->toPlainText(),
         this->Implementation->UI.delay->value());

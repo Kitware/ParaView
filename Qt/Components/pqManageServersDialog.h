@@ -59,6 +59,10 @@ private slots:
   void onSelectAll();
   void onSelectionChanged();
   void onItemDoubleClicked(QListWidgetItem*);
+  void onSave();
+  void onSave(const QStringList&);
+  void onLoad();
+  void onLoad(const QStringList&);
 
 private:
   void accept();

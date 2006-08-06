@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServerResource;
 class pqServerStartup;
 class pqSettings;
+class QDomDocument;
 
 /** Manages a persistent collection of server "startups" - instructions
 on how to start a local / remote server prior to connection */
@@ -69,16 +70,23 @@ public:
   
   /// Configures the given server for manual (i.e do nothing) startup.
   void setManualStartup(const pqServerResource& server);
-  /** Configure the given server for shell startup - the given command-line
+  /** Configure the given server for command startup - the given command
   will be executed whenever the server needs to be started. */
-  void setShellStartup(const pqServerResource& server, const QString& command_line, double delay);
+  void setCommandStartup(
+    const pqServerResource& server,
+    const QString& command_line,
+    double delay);
   /// Removes startup configuration for the given servers
   void deleteStartups(const ServersT& servers);
   
-  /// Loads startup configurations from user preferences
-  void load(pqSettings&);
   /// Saves startup configurations to user preferences
   void save(pqSettings&);
+  /// Saves startup configurations to an XML document
+  void save(QDomDocument&);
+  /// Loads startup configurations from user preferences
+  void load(pqSettings&);
+  /// Loads startup configurations from an XML document
+  void load(QDomDocument&);
 
 signals:
   /// Signal emitted whenever the collection changes

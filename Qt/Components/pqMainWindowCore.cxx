@@ -1079,11 +1079,13 @@ void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
 
 void pqMainWindowCore::onFileManageServers()
 {
-  pqManageServersDialog dialog(
+  pqManageServersDialog* const  dialog = new pqManageServersDialog(
     pqApplicationCore::instance()->serverStartups(),
     *pqApplicationCore::instance()->settings(),
     this->Implementation->Parent);
-  dialog.exec();
+  dialog->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
+  dialog->setModal(false);
+  dialog->show();
 }
 
 //-----------------------------------------------------------------------------

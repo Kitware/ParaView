@@ -35,8 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqManageServersDialog.h"
 #include "ui_pqManageServersDialog.h"
 
+#include <pqFileDialog.h>
+#include <pqLocalFileDialogModel.h>
 #include <pqServerResource.h>
 #include <pqServerStartups.h>
+
+#include <QDomDocument>
+#include <QFile>
+#include <QtDebug>
 
 class pqManageServersDialog::pqImplementation
 {
@@ -75,6 +81,10 @@ pqManageServersDialog::pqManageServersDialog(
     this, SLOT(onSelectionChanged()));
   connect(this->Implementation->UI.servers, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
     this, SLOT(onItemDoubleClicked(QListWidgetItem*)));
+  connect(this->Implementation->UI.save, SIGNAL(clicked()),
+    this, SLOT(onSave()));
+  connect(this->Implementation->UI.load, SIGNAL(clicked()),
+    this, SLOT(onLoad()));
 }
 
 pqManageServersDialog::~pqManageServersDialog()
@@ -182,3 +192,67 @@ void pqManageServersDialog::onItemDoubleClicked(QListWidgetItem* item)
       }
     }
 }
+
+void pqManageServersDialog::onSave()
+{
+  QString filters;
+  filters += "ParaView server configuration file (*.pvsc)";
+  filters += ";;All files (*)";
+
+  pqFileDialog* const dialog  = new pqFileDialog(new pqLocalFileDialogModel(),
+      this, tr("Save Server Configuration File:"), QString(), filters);
+  dialog->setObjectName("SaveServerConfigurationDialog");
+  dialog->setFileMode(pqFileDialog::AnyFile);
+  QObject::connect(dialog, SIGNAL(filesSelected(const QStringList&)),
+      this, SLOT(onSave(const QStringList&)));
+  dialog->show();
+}
+
+void pqManageServersDialog::onSave(const QStringList& files)
+{
+  QDomDocument xml;
+  this->Implementation->Startups.save(xml);
+
+  for(int i = 0; i != files.size(); ++i)
+    {
+    QFile file(files[i]);
+    if(!file.open(QIODevice::WriteOnly))
+      {
+      qCritical() << "Error opening " << files[i] << "for writing";
+      }
+    file.write(xml.toByteArray());
+    }
+}
+
+void pqManageServersDialog::onLoad()
+{
+  QString filters;
+  filters += "ParaView server configuration file (*.pvsc)";
+  filters += ";;All files (*)";
+
+  pqFileDialog* const dialog  = new pqFileDialog(new pqLocalFileDialogModel(),
+      this, tr("Load Server Configuration File:"), QString(), filters);
+  dialog->setObjectName("LoadServerConfigurationDialog");
+  dialog->setFileMode(pqFileDialog::ExistingFile);
+  QObject::connect(dialog, SIGNAL(filesSelected(const QStringList&)),
+      this, SLOT(onLoad(const QStringList&)));
+  dialog->show();
+}
+
+void pqManageServersDialog::onLoad(const QStringList& files)
+{
+  for(int i = 0; i != files.size(); ++i)
+    {
+    QFile file(files[i]);
+    QDomDocument xml;
+    if(xml.setContent(&file, false))
+      {
+      this->Implementation->Startups.load(xml);
+      }
+    else
+      {
+      qCritical() << "Error parsing " << files[i] << ": not a valid XML document";
+      }
+    }
+}
+
