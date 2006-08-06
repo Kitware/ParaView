@@ -14,9 +14,10 @@
 =========================================================================*/
 // .NAME vtkSelectionSerializer - Serialize/deserialize vtkSelection to/from xml
 // .SECTION Description
-// vtkSelectionSerializer is a helper class that can serialize/deserialize
-// vtkSelection to/from xml. Currently, it supports only a subset of
-// properties: CONTENT_TYPE, SOURCE_ID, PROP_ID, PROCESS_ID
+// vtkSelectionSerializer is a helper class that can
+// serialize/deserialize vtkSelection to/from xml. Currently, it
+// supports only a subset of properties: CONTENT_TYPE, SOURCE_ID,
+// PROP_ID, PROCESS_ID, ORIGINAL_SOURCE_ID
 // .SECTION See Also
 // vtkSelection
 
@@ -25,6 +26,7 @@
 
 #include "vtkObject.h"
 
+class vtkInformationIntegerKey;
 class vtkPVXMLElement;
 class vtkSelection;
 class vtkSelection;
@@ -52,6 +54,10 @@ public:
   // properties: CONTENT_TYPE, SOURCE_ID, PROP_ID, PROCESS_ID
   static void Parse(const char* xml, vtkSelection* root);
 
+  // Description:
+  // ID the data or algorithm the selection belongs to. What
+  // ID means is application specific.
+  static vtkInformationIntegerKey* ORIGINAL_SOURCE_ID();
 
 protected:
   vtkSelectionSerializer();

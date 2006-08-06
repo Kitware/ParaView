@@ -28,7 +28,9 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.4");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.5");
+
+vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
 //----------------------------------------------------------------------------
 vtkSelectionSerializer::vtkSelectionSerializer()
@@ -202,6 +204,14 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           if (elem->GetScalarAttribute("value", &val))
             {
             node->GetProperties()->Set(vtkSelection::SOURCE_ID(), val);
+            }
+          }
+        else if (strcmp("ORIGINAL_SOURCE_ID", key) == 0)
+          {
+          int val;
+          if (elem->GetScalarAttribute("value", &val))
+            {
+            node->GetProperties()->Set(ORIGINAL_SOURCE_ID(), val);
             }
           }
         else if (strcmp("PROP_ID", key) == 0)
