@@ -30,80 +30,155 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqEditServerStartupDialog.h"
 #include "pqServer.h"
 #include "pqServerBrowser.h"
-
-#include "pqApplicationCore.h"
+#include "pqServerStartupDialog.h"
 #include "ui_pqServerBrowser.h"
+
+#include <pqApplicationCore.h>
+#include <pqServerResources.h>
+#include <pqServerStartup.h>
+#include <pqServerStartupContext.h>
+#include <pqServerStartups.h>
 
 #include <QMessageBox>
 
-pqServerBrowser::pqServerBrowser(QWidget* Parent) :
-  base(Parent),
-  Ui(new Ui::pqServerBrowser())
+class pqServerBrowser::pqImplementation
 {
-  this->Ui->setupUi(this);
+public:
+  pqImplementation() :
+    StartupContext(0),
+    StartupDialog(0)
+  {
+  }
+
+  ~pqImplementation()
+  {
+    this->closeStartup();
+  }
+
+  void closeStartup()
+  {
+    delete this->StartupContext;
+    delete this->StartupDialog;
+    
+    this->StartupContext = 0;
+    this->StartupDialog = 0;
+  }
+
+  Ui::pqServerBrowser UI;
+  pqServerResource Server;
+  pqServerStartupContext* StartupContext;
+  pqServerStartupDialog* StartupDialog;
+};
+
+pqServerBrowser::pqServerBrowser(QWidget* Parent) :
+  Superclass(Parent),
+  Implementation(new pqImplementation())
+{
+  this->Implementation->UI.setupUi(this);
   this->setObjectName("ServerBrowser");
   this->setWindowTitle(tr("Pick Server:"));
   
-  this->Ui->ServerType->addItem(tr("Builtin"));
-  this->Ui->ServerType->addItem(tr("Remote"));
+  QObject::connect(this->Implementation->UI.ServerType, SIGNAL(activated(int)), this, SLOT(onServerTypeActivated(int)));
 
-  QObject::connect(this->Ui->ServerType, SIGNAL(activated(int)), this, SLOT(onServerTypeActivated(int)));
-
-  this->Ui->ServerType->setCurrentIndex(0);
+  this->Implementation->UI.ServerType->setCurrentIndex(0);
   this->onServerTypeActivated(0);
 }
 
 pqServerBrowser::~pqServerBrowser()
 {
-  delete this->Ui;
-}
-
-void pqServerBrowser::accept()
-{
-  pqServer* server = 0;
-  switch(this->Ui->ServerType->currentIndex())
-    {
-    case 0:
-      {
-        pqServerResource resource;
-        resource.setScheme("builtin");
-        server = pqApplicationCore::instance()->createServer(resource);
-      }
-      break;
-    case 1:
-      {
-      pqServerResource resource;
-      resource.setScheme("cs");
-      resource.setHost(this->Ui->HostName->text());
-      resource.setPort(this->Ui->PortNumber->value());
-      server = pqApplicationCore::instance()->createServer(resource);
-      }
-      break;
-    case 2:
-      // TODO: Add case where the user connects to render server and data server separately.
-      // UI will accept host name and port numbers for both data server and render server.
-      break;
-    default:
-      QMessageBox::critical(this, tr("Pick Server:"), tr("Internal error: unknown server type"));
-      return;
-    }
-  
-  if(!server)
-    {
-    QMessageBox::critical(this, tr("Pick Server:"), tr("Error connecting to server"));
-    return;
-    }
-
-  emit serverConnected(server);
-
-  base::accept();
+  delete this->Implementation;
 }
 
 void pqServerBrowser::onServerTypeActivated(int Index)
 {
-  this->Ui->HostName->setEnabled(1 == Index);
-  this->Ui->PortNumber->setEnabled(1 == Index);
+  this->Implementation->UI.HostName->setEnabled(1 == Index);
+  this->Implementation->UI.PortNumber->setEnabled(1 == Index);
+}
+
+void pqServerBrowser::accept()
+{
+  pqServerResource server;
+  
+  switch(this->Implementation->UI.ServerType->currentIndex())
+    {
+    case 0:
+      server.setScheme("builtin");
+      break;
+      
+    case 1:
+      server.setScheme("cs");
+      server.setHost(this->Implementation->UI.HostName->text());
+      server.setPort(this->Implementation->UI.PortNumber->value());
+      break;
+
+    default:
+      QMessageBox::critical(this, tr("Pick Server:"), tr("Internal error: unknown server type"));
+      Superclass::accept();
+      return;
+    }
+  
+  this->Implementation->Server = server;
+
+  // If no startup is required for this server, jump to opening the file ...
+  pqServerStartups& startups = pqApplicationCore::instance()->serverStartups();
+  if(!startups.startupRequired(server))
+    {
+    this->onServerStarted();
+    return;
+    }
+
+  // If a startup isn't available for this server, prompt the user ...    
+  if(!startups.startupAvailable(server))
+    {
+    pqEditServerStartupDialog dialog(
+      pqApplicationCore::instance()->serverStartups(), server);
+    if(QDialog::Rejected == dialog.exec())
+      {
+      Superclass::accept();
+      return;
+      }
+    startups.save(*pqApplicationCore::instance()->settings());
+    }
+
+  // Try starting the server ...
+  if(pqServerStartup* const startup = startups.getStartup(server))
+    {
+    this->Implementation->StartupContext = new pqServerStartupContext();
+    this->connect(this->Implementation->StartupContext, SIGNAL(succeeded()), this, SLOT(onServerStarted()));
+    this->connect(this->Implementation->StartupContext, SIGNAL(failed()), this, SLOT(onServerFailed()));
+    
+    this->Implementation->StartupDialog = new pqServerStartupDialog(server);
+    this->Implementation->StartupDialog->show();
+    QObject::connect(this->Implementation->StartupContext, SIGNAL(succeeded()), this->Implementation->StartupDialog, SLOT(hide()));
+    QObject::connect(this->Implementation->StartupContext, SIGNAL(failed()), this->Implementation->StartupDialog, SLOT(hide()));
+    
+    startup->execute(server, *this->Implementation->StartupContext);
+    return;
+    }
+
+  Superclass::accept();
+}
+
+void pqServerBrowser::onServerStarted()
+{
+  pqServer* const server = pqApplicationCore::instance()->createServer(this->Implementation->Server);
+  if(server)
+    {
+    pqServerResources& resources = pqApplicationCore::instance()->serverResources();    
+    resources.open(this->Implementation->Server);
+    resources.add(this->Implementation->Server);
+
+    emit this->serverConnected(server);
+    }
+
+  Superclass::accept();
+}
+
+void pqServerBrowser::onServerFailed()
+{
+  Superclass::accept();
 }
 

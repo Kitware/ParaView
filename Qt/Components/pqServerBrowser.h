@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDialog>
 
-namespace Ui { class pqServerBrowser; }
 class pqServer;
 
 /**
@@ -53,7 +52,7 @@ the slot will be called with the new pqServer object that encapsulates the conne
 class PQCOMPONENTS_EXPORT pqServerBrowser :
   public QDialog
 {
-  typedef QDialog base;
+  typedef QDialog Superclass;
 
   Q_OBJECT
 
@@ -65,15 +64,19 @@ signals:
   /// This signal will be emitted iff a server connection is successfully created
   void serverConnected(pqServer*);
  
+  
+private slots:
+  void onServerTypeActivated(int);
+  void accept();
+  void onServerStarted();
+  void onServerFailed();
+
 private:
   pqServerBrowser(const pqServerBrowser&);
   pqServerBrowser& operator=(const pqServerBrowser&);
-  
-  Ui::pqServerBrowser* const Ui;
-  
-private slots:
-  void accept();
-  void onServerTypeActivated(int);
+ 
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif // !_pqServerBrowser_h
