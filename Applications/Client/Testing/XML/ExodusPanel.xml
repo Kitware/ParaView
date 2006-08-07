@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <pqevents>
   <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
-  <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
+  <pqevent object="MainWindow/ServerBrowser/OK" command="activate" arguments="" />
   <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/box.ex2" />
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ExodusReader/Variables/qt_scrollarea_viewport" command="contextMenu" arguments="" />

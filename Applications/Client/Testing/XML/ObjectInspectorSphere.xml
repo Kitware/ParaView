@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <pqevents>
   <pqevent object="MainWindow/menubar/menuServer" command="activate" arguments="actionServerConnect" />
-  <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
+  <pqevent object="MainWindow/ServerBrowser/OK" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/EndPhi" command="set_double" arguments="179" />
