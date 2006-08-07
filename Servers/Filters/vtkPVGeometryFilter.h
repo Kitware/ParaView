@@ -76,6 +76,15 @@ public:
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
+  // Description:
+  // If on, the output polygonal dataset will have a celldata array that 
+  // holds the cell index of the original 3D cell that produced each output
+  // cell. This is useful for cell picking. The default is off to conserve 
+  // memory.
+  void SetPassThroughCellIds(int);
+  vtkGetMacro(PassThroughCellIds,int);
+  vtkBooleanMacro(PassThroughCellIds,int);
+
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
@@ -133,6 +142,8 @@ protected:
   virtual int FillInputPortInformation(int, vtkInformation*);
 
   virtual void ReportReferences(vtkGarbageCollector*);
+
+  int PassThroughCellIds;
 
 private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented
