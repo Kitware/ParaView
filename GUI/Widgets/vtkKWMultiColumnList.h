@@ -256,6 +256,9 @@ public:
 
   // Description:
   // Sort by a given column.
+  // The GetLastSortedColumn teturns the numerical index of the column by
+  // which the items were last sorted with the aid of the SortByColumn or -1 if
+  // they haven't been sorted at all.
   //BTX
   enum 
   {
@@ -271,6 +274,7 @@ public:
   virtual void SortByColumnDecreasingOrder(int col_index)
     { this->SortByColumn(
       col_index, vtkKWMultiColumnList::SortByDecreasingOrder); };
+  virtual int GetLastSortedColumn();
 
   // Description:
   // Set/Get the type of the temporary embedded widget to be used for

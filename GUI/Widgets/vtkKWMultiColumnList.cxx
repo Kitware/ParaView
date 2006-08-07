@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.62");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.63");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -153,7 +153,7 @@ void vtkKWMultiColumnList::CreateWidget()
 
   // Call the superclass to set the appropriate flags then create manually
 
-  vtksys_stl::string options("-bg #fafafa -stripebackground #dfe7ef -showseparators 1 -showarrow 0  -highlightthickness 0 -selectmode browse -relief sunken -bd 2 -spacing 2 -exportselection 0 -activestyle none -fg #000000 -selectforeground #ffffff -width 0 -setfocus 1");
+  vtksys_stl::string options("-bg #fafafa -stripebackground #dfe7ef -showseparators 1 -showarrow 1  -highlightthickness 0 -selectmode browse -relief sunken -bd 2 -spacing 2 -exportselection 0 -activestyle none -fg #000000 -selectforeground #ffffff -width 0 -setfocus 1");
 #ifdef _WIN32
   options += " -selectbackground #092369";
 #else
@@ -854,6 +854,17 @@ void vtkKWMultiColumnList::SortByColumn(int col_index, int order)
 
   this->Script(
     "%s sortbycolumn %d %s", this->GetWidgetName(), col_index,  sort_opt);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetLastSortedColumn()
+{
+  if (!this->IsCreated())
+    {
+    return -1;
+    }
+
+  return atoi(this->Script("%s sortcolumn", this->GetWidgetName()));
 }
 
 //----------------------------------------------------------------------------
