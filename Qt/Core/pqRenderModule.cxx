@@ -308,7 +308,7 @@ void pqRenderModule::displaysChanged()
       this->Internal->Displays.begin();
   while(iter != this->Internal->Displays.end())
     {
-    if(!currentDisplays.contains(*iter))
+    if(*iter && !currentDisplays.contains(*iter))
       {
       // Remove the render module pointer from the display.
       (*iter)->removeRenderModule(this);

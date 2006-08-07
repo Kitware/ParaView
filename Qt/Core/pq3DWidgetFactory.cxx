@@ -129,7 +129,7 @@ void pq3DWidgetFactory::proxyUnRegistered(QString group,
   QString vtkNotUsed(name), vtkSMProxy* proxy)
 {
   vtkSMNew3DWidgetProxy* widget;
-  if (group != "3d_widgets" || 
+  if (group != "3d_widgets_prototypes" || 
     (widget = vtkSMNew3DWidgetProxy::SafeDownCast(proxy)) == 0)
     {
     return;
