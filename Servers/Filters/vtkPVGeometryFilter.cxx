@@ -50,7 +50,7 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.64");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.65");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -79,6 +79,8 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
 
   this->GenerateGroupScalars = 0;
   this->CurrentGroup = 0;
+
+  this->PassThroughCellIds = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -254,7 +256,7 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
       inInfo->Get(vtkDataObject::DATA_OBJECT()));
     if (!input) {return 0;}
     }
-  
+
   this->ExecuteBlock(input, output, 1);
 
   vtkDataArray* ghost = output->GetCellData()->GetArray("vtkGhostLevels");
@@ -839,6 +841,24 @@ void vtkPVGeometryFilter::PolyDataExecute(
       {
       out->ShallowCopy(input);
       out->RemoveGhostCells(1);
+      if (this->PassThroughCellIds)
+        {
+        vtkIdTypeArray *OriginalCellIds = vtkIdTypeArray::New();
+        OriginalCellIds->SetName("vtkOriginalCellIds");
+        OriginalCellIds->SetNumberOfComponents(1);
+        vtkCellData *outputCD = out->GetCellData();
+        outputCD->AddArray(OriginalCellIds);
+        
+        vtkIdType numTup = out->GetNumberOfCells();
+        OriginalCellIds->SetNumberOfValues(numTup);
+        for (vtkIdType cId = 0; cId < numTup; cId++)
+          {
+          OriginalCellIds->SetValue(cId, cId);
+          }
+        
+        OriginalCellIds->Delete();
+        OriginalCellIds = NULL;
+        }
       }
     return;
     }
@@ -856,6 +876,7 @@ void vtkPVGeometryFilter::OctreeExecute(
     this->OutlineFlag = 0;
 
     vtkHyperOctreeSurfaceFilter* internalFilter = vtkHyperOctreeSurfaceFilter::New();
+    internalFilter->SetPassThroughCellIds(this->PassThroughCellIds);
     vtkHyperOctree* octreeCopy = vtkHyperOctree::New();
     octreeCopy->ShallowCopy(input);
     internalFilter->SetInput(octreeCopy);
@@ -912,4 +933,21 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseStrips: " << (this->UseStrips?"on":"off") << endl;
   os << indent << "GenerateCellNormals: " << (this->GenerateCellNormals?"on":"off") << endl;
   os << indent << "Controller: " << this->Controller << endl;
+
+  os << indent << "PassThroughCellIds: " << (this->PassThroughCellIds ? "On\n" : "Off\n");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::SetPassThroughCellIds(int newvalue)
+{
+  this->PassThroughCellIds = newvalue;
+  if (this->DataSetSurfaceFilter)
+    {
+    this->DataSetSurfaceFilter->SetPassThroughCellIds(this->PassThroughCellIds);
+    }
+  if (this->GenericGeometryFilter)
+    {
+    this->GenericGeometryFilter->SetPassThroughCellIds(this->PassThroughCellIds);
+    }
+  
 }

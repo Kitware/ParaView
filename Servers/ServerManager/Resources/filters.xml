@@ -3867,6 +3867,14 @@ This filter uses colors to show levels of a hiearchical dataset.
         animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
+      <IntVectorProperty
+        name="PassThroughIds"
+        command="SetPassThroughCellIds"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+        <BooleanDomain name="bool"/> 
+      </IntVectorProperty>
     </SourceProxy>
 
     <SourceProxy name="OrderedCompositeDistributor"
