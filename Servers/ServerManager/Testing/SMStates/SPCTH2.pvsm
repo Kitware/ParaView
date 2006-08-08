@@ -1370,6 +1370,10 @@
         <Group value="implicit_functions"/>
       </Domain>
     </Property>
+    <Property name="VolumeFractionSurfaceValue"
+              id="1096.VolumeFramctionSurfaceValue" number_of_elements="1">
+      <Element index="0" value="0.499"/>
+    </Property>
     <Property name="Input" id="1096.Input" number_of_elements="1">
       <Proxy value="983"/>
       <Domain name="groups" id="1096.Input.groups">
