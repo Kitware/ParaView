@@ -94,7 +94,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.35");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.36");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -1185,10 +1185,10 @@ void vtkIceTRenderManager::GetGlobalViewport(int viewport[4])
   viewport[0] = viewport[1] = 0;
   viewport[2] = this->TileDimensions[0]
     * (  this->ReducedImageSize[0]
-       + (this->TileMullions[0]/this->ImageReductionFactor) );
+       + (int)(this->TileMullions[0]/this->ImageReductionFactor) );
   viewport[3] = this->TileDimensions[1]
     * (  this->ReducedImageSize[1]
-       + (this->TileMullions[1]/this->ImageReductionFactor) );
+       + (int)(this->TileMullions[1]/this->ImageReductionFactor) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1198,9 +1198,9 @@ void vtkIceTRenderManager::GetTileViewport(int x, int y, int viewport[4])
   // "Invert" y so that tiles are counted from top to bottom.
   y = this->TileDimensions[1]-y-1;
   viewport[0] = x*(  this->ReducedImageSize[0]
-                   + (this->TileMullions[0]/this->ImageReductionFactor) );
+                   + (int)(this->TileMullions[0]/this->ImageReductionFactor) );
   viewport[1] = y*(  this->ReducedImageSize[1]
-                   + (this->TileMullions[1]/this->ImageReductionFactor) );
+                   + (int)(this->TileMullions[1]/this->ImageReductionFactor) );
 
   viewport[2] = viewport[0] + this->ReducedImageSize[0];
   viewport[3] = viewport[1] + this->ReducedImageSize[1];
