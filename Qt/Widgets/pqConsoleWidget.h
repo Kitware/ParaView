@@ -54,21 +54,18 @@ public:
   pqConsoleWidget(QWidget* Parent);
   virtual ~pqConsoleWidget();
 
-public slots:
   /// Returns the current formatting that will be used by printString
   QTextCharFormat getFormat();
   /// Sets formatting that will be used by printString
   void setFormat(const QTextCharFormat& Format);
-  /// Writes the supplied text to the console
-  void printString(const QString& Text);
-
+  
 signals:
   /// Signal emitted whenever the user enters a command
   void executeCommand(const QString& Command);
 
-private slots:
-  void onCursorPositionChanged();
-  void onSelectionChanged();
+public slots:
+  /// Writes the supplied text to the console
+  void printString(const QString& Text);
 
 private:
   pqConsoleWidget(const pqConsoleWidget&);

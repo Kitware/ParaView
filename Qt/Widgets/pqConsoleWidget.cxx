@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqConsoleWidget.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QKeyEvent>
 #include <QTextCursor>
 #include <QTextEdit>
@@ -51,9 +53,13 @@ public:
   {
     this->setTabChangesFocus(false);
     this->setAcceptDrops(false);
+    this->setAcceptRichText(false);
+    this->setUndoRedoEnabled(false);
     
     QFont f;
+    f.setFamily("Courier");
     f.setStyleHint(QFont::TypeWriter);
+    f.setFixedPitch(true);
     
     QTextCharFormat format;
     format.setFont(f);
@@ -64,80 +70,125 @@ public:
     this->CommandPosition = 0;
   }
 
-  void printString(const QString& Text)
+  void keyPressEvent(QKeyEvent* e)
   {
-    this->textCursor().movePosition(QTextCursor::End);
-    this->textCursor().insertText(Text);
-    this->InteractivePosition = this->documentEnd();
-    this->ensureCursorVisible();
-  }
+    QTextCursor text_cursor = this->textCursor();
 
-  void onCursorPositionChanged()
-  {
-    QTextCursor c = this->textCursor();
-    if(c.position() < this->documentEnd())
-      {
-      c.setPosition(this->documentEnd());
-      this->setTextCursor(c);
-      }
-  }
-  
-  void onSelectionChanged()
-  {
-    QTextCursor c = this->textCursor();
-    if(c.position() < this->documentEnd())
-      {
-      c.setPosition(this->documentEnd());
-      this->setTextCursor(c);
-      }
-  }
+    // Set to true if there's a current selection
+    const bool selection = text_cursor.anchor() != text_cursor.position();
+    // Set to true if the cursor overlaps the history area
+    const bool history_area =
+      text_cursor.anchor() < this->InteractivePosition
+      || text_cursor.position() < this->InteractivePosition;
 
-private:
-  void keyPressEvent(QKeyEvent* Event)
-  {
-    switch(Event->key())
+    // Allow copying anywhere in the console ...
+    if(e->key() == Qt::Key_C && e->modifiers() == Qt::ControlModifier)
       {
-      case Qt::Key_Left:
-      case Qt::Key_Right:
-        Event->accept();
-        break;
+      if(selection)
+        {
+        this->copy();
+        }
+        
+      e->accept();
+      return;
+      }
+      
+    // Allow cut only if the selection is limited to the interactive area ...
+    if(e->key() == Qt::Key_X && e->modifiers() == Qt::ControlModifier)
+      {
+      if(selection && !history_area)
+        {
+        this->cut();
+        }
+        
+      e->accept();
+      return;
+      }
+    
+    // Allow paste only if the selection is in the interactive area ...
+    if(e->key() == Qt::Key_V && e->modifiers() == Qt::ControlModifier)
+      {
+      if(!history_area)
+        {
+        const QMimeData* const clipboard = QApplication::clipboard()->mimeData();
+        const QString text = clipboard->text();
+        if(!text.isNull())
+          {
+          text_cursor.insertText(text);
+          this->updateCommandBuffer();
+          }
+        }
+        
+      e->accept();
+      return;
+      }
+    
+    // Force the cursor back to the interactive area
+    if(history_area && e->key() != Qt::Key_Control)
+      {
+      text_cursor.setPosition(this->documentEnd());
+      this->setTextCursor(text_cursor);
+      }
+    
+    switch(e->key())
+      {
       case Qt::Key_Up:
-        Event->accept();
+        e->accept();
         if(this->CommandPosition > 0)
           this->replaceCommandBuffer(this->CommandHistory[--this->CommandPosition]);
         break;
+        
       case Qt::Key_Down:
-        Event->accept();
+        e->accept();
         if(this->CommandPosition < this->CommandHistory.size() - 2)
           this->replaceCommandBuffer(this->CommandHistory[++this->CommandPosition]);
         break;
+  
+      case Qt::Key_Delete:
+        e->accept();
+        QTextEdit::keyPressEvent(e);
+        this->updateCommandBuffer();
+        break;
+        
       case Qt::Key_Backspace:
-        Event->accept();
-        if(this->commandBuffer().size())
+        e->accept();
+        if(text_cursor.position() > this->InteractivePosition)
           {
-          this->commandBuffer().chop(1);
-          QTextEdit::keyPressEvent(Event);
+          QTextEdit::keyPressEvent(e);
+          this->updateCommandBuffer();
           }
         break;
+        
       case Qt::Key_Return:
       case Qt::Key_Enter:
-        Event->accept();
+        e->accept();
+        
+        text_cursor.setPosition(this->documentEnd());
+        this->setTextCursor(text_cursor);
+        
         this->internalExecuteCommand();
         break;
-        break;
+        
       default:
-        this->commandBuffer().append(Event->text());
-        QTextEdit::keyPressEvent(Event);
+        e->accept();
+        QTextEdit::keyPressEvent(e);
+        this->updateCommandBuffer();
         break;
       }
   }
   
-  /// Return the end of the document
+  /// Returns the end of the document
   const int documentEnd()
   {
     QTextCursor c(this->document());
     c.movePosition(QTextCursor::End);
     return c.position();
+  }
+  
+  /// Update the contents of the command buffer from the contents of the widget
+  void updateCommandBuffer()
+  {
+    this->commandBuffer() = this->toPlainText().mid(this->InteractivePosition);
   }
   
   /// Replace the contents of the command buffer, updating the display
@@ -178,7 +229,8 @@ private:
   
   /// Stores a back-reference to our owner
   pqConsoleWidget& Parent;
-  /// Stores the beginning of the area of interactive input, outside which the cursor can't be moved
+  /** Stores the beginning of the area of interactive input, outside which
+  changes can't be made to the text edit contents */
   int InteractivePosition;
   /// Stores command-history, plus the current command buffer
   QStringList CommandHistory;
@@ -196,9 +248,6 @@ pqConsoleWidget::pqConsoleWidget(QWidget* Parent) :
   QVBoxLayout* const l = new QVBoxLayout(this);
   l->setMargin(0);
   l->addWidget(this->Implementation);
-
-  QObject::connect(this->Implementation, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
-  QObject::connect(this->Implementation, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
 }
 
 pqConsoleWidget::~pqConsoleWidget()
@@ -218,21 +267,13 @@ void pqConsoleWidget::setFormat(const QTextCharFormat& Format)
 
 void pqConsoleWidget::printString(const QString& Text)
 {
-  this->Implementation->printString(Text);
+  this->Implementation->textCursor().movePosition(QTextCursor::End);
+  this->Implementation->textCursor().insertText(Text);
+  this->Implementation->InteractivePosition = this->Implementation->documentEnd();
+  this->Implementation->ensureCursorVisible();
 }
 
 void pqConsoleWidget::internalExecuteCommand(const QString& Command)
 {
-  emit executeCommand(Command);
+  emit this->executeCommand(Command);
 }
-
-void pqConsoleWidget::onCursorPositionChanged()
-{
-  this->Implementation->onCursorPositionChanged();
-}
-
-void pqConsoleWidget::onSelectionChanged()
-{
-  this->Implementation->onSelectionChanged();
-}
-
