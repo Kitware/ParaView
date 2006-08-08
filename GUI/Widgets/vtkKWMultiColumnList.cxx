@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.64");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.65");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -4065,6 +4065,8 @@ void vtkKWMultiColumnList::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
+  os << indent << "ColorSortedColumn: " 
+     << (this->ColorSortedColumn ? "On\n" : "Off\n");
   os << indent << "SortedColumnBackgroundColor: (" 
      << this->SortedColumnBackgroundColor[0] << ", " 
      << this->SortedColumnBackgroundColor[1] << ", " 
