@@ -102,7 +102,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.56");
+vtkCxxRevisionMacro(vtkProcessModule, "1.57");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1574,18 +1574,16 @@ void vtkProcessModule::SynchronizeServerClientOptions(vtkIdType id)
     }
   if (!this->Options->GetTileDimensions()[0])
     {
-    this->Options->SetTileDimensions
-      (info->GetTileDimensions());
+    this->Options->SetTileDimensions(info->GetTileDimensions());
     }
-  if (!this->Options->GetTileMullions()[0])
+  if (   !this->Options->GetTileMullions()[0]
+      && !this->Options->GetTileMullions()[1])
     {
-    this->Options->SetTileMullions
-      (this->ServerInformation->GetTileMullions());
+    this->Options->SetTileMullions(info->GetTileMullions());
     }
   if (!this->Options->GetUseOffscreenRendering())
     {
-    this->Options->SetUseOffscreenRendering
-      (info->GetUseOffscreenRendering());
+    this->Options->SetUseOffscreenRendering(info->GetUseOffscreenRendering());
     }
 }
 
