@@ -153,7 +153,7 @@ void pqServerBrowser::onServerStarted()
     {
     pqServerResources& resources =
       pqApplicationCore::instance()->serverResources();
-//    resources.open(this->Implementation->Server);
+
     resources.add(this->Implementation->Server);
 
     emit this->serverConnected(server);
