@@ -46,6 +46,8 @@ $kw(vtkTemp1094) SetSelectState {Material volume fraction - 0} 1
 $kw(vtkTemp1094) SetSelectState {Material volume fraction - 1} 1
 set kw(vtkTemp1122) [$kw(vtkTemp1090) GetPVWidget {Clipping}]
 $kw(vtkTemp1122) SetCurrentValue {Off}
+set kw(vtkTemp1100) [$kw(vtkTemp1090) GetPVWidget {VolumeFractionSurfaceValue}]
+$kw(vtkTemp1100) SetValue 0.499
 $kw(vtkTemp1090) AcceptCallback
 
 set kw(vtkTemp1194) [$kw(vtkTemp5) GetPVColorMap {Part Index} 1]
