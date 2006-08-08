@@ -61,20 +61,20 @@ struct pqPythonShell::pqImplementation
     PySys_SetObject(const_cast<char*>("stderr"), reinterpret_cast<PyObject*>(pqWrap(this->pythonStderr)));
 
     /** \todo Add the path to the *installed* paraview module to Python's path, or do some sort of dynamic lookup */
-    
-    // For the convenience of developers, add the path to the paraview module in the source tree to Python's path
+
+    // For the convenience of developers, add the path to the server manager wrappers to Python's path
     if(PyObject* path = PySys_GetObject(const_cast<char*>("path")))
       {
-      PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PARAVIEW_DEFAULT_PYTHON_MODULE_DIR).toAscii().data());
+      PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PV_PYTHON_MODULE_DIR).toAscii().data());
       PyList_Insert(path, 0, module_dir);
       Py_XDECREF(module_dir);
       }
 
-    // For the convenience of developers, add the path to the built server manager wrappers to Python's path
+    // For the convenience of developers, add the path to the paraview libraries to Python's path
     if(PyObject* path = PySys_GetObject(const_cast<char*>("path")))
       {
-      PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PARAVIEW_LIBRARY_OUTPUT_PATH).toAscii().data());
-      PyList_Insert(path, 0, module_dir);
+      PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PV_PYTHON_LIBRARY_DIR).toAscii().data());
+      PyList_Insert(path, 1, module_dir);
       Py_XDECREF(module_dir);
       }
       
