@@ -1854,6 +1854,12 @@
                          default_values="0 0">
         <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
+      <IntVectorProperty name="TileMullions"
+                         command="SetTileMullions"
+                         number_of_elements="2"
+                         default_values="0 0">
+        <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
       <ProxyProperty name="SortingKdTree" command="SetSortingKdTree">
         <ProxyGroupDomain name="groups">
           <Group name="locators"/>

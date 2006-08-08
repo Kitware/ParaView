@@ -23,7 +23,7 @@
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVServerInformation);
-vtkCxxRevisionMacro(vtkPVServerInformation, "1.9");
+vtkCxxRevisionMacro(vtkPVServerInformation, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
@@ -31,6 +31,7 @@ vtkPVServerInformation::vtkPVServerInformation()
   this->RootOnly = 1;
   this->RemoteRendering = 1;
   this->TileDimensions[0] = this->TileDimensions[1] = 0;
+  this->TileMullions[0] = this->TileMullions[1] = 0;
   this->UseOffscreenRendering = 0;
 #if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
   this->UseIceT = 1;
@@ -56,6 +57,8 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseOffscreenRendering: " << this->UseOffscreenRendering << endl;
   os << indent << "TileDimensions: " << this->TileDimensions[0]
      << ", " << this->TileDimensions[1] << endl;
+  os << indent << "TileMullions: " << this->TileMullions[0]
+     << ", " << this->TileMullions[1] << endl;
   os << indent << "UseIceT: " << this->UseIceT << endl;
   os << indent << "RenderModuleName: "
      << (this->RenderModuleName ? this->RenderModuleName : "(none)") << endl;
@@ -66,6 +69,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
 {
   this->RemoteRendering = info->GetRemoteRendering();
   info->GetTileDimensions(this->TileDimensions);
+  info->GetTileMullions(this->TileMullions);
   this->UseOffscreenRendering = info->GetUseOffscreenRendering();
   this->UseIceT = info->GetUseIceT();
   this->SetRenderModuleName(info->GetRenderModuleName());
@@ -93,6 +97,7 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* obj)
   vtkPVServerOptions *options =
     vtkPVServerOptions::SafeDownCast(pm->GetOptions());
   options->GetTileDimensions(this->TileDimensions);
+  options->GetTileMullions(this->TileMullions);
   this->UseOffscreenRendering = options->GetUseOffscreenRendering();
   this->SetRenderModuleName(options->GetRenderModuleName());
   this->SetNumberOfMachines(options->GetNumberOfMachines());
@@ -123,6 +128,10 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       {
       serverInfo->GetTileDimensions(this->TileDimensions);
       }
+    if (serverInfo->GetTileMullions()[0])
+      {
+      serverInfo->GetTileMullions(this->TileMullions);
+      }
     if (serverInfo->GetUseOffscreenRendering())
       {
       this->UseOffscreenRendering = 1;
@@ -149,6 +158,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << vtkClientServerStream::Reply;
   *css << this->RemoteRendering;
   *css << this->TileDimensions[0] << this->TileDimensions[1];
+  *css << this->TileMullions[0] << this->TileMullions[1];
   *css << this->UseOffscreenRendering;
   *css << this->UseIceT;
   *css << this->RenderModuleName;
@@ -181,25 +191,31 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing TileDimensions from message.");
     return;
     }
-  if(!css->GetArgument(0, 3, &this->UseOffscreenRendering))
+  if(   !css->GetArgument(0, 3, &this->TileMullions[0])
+     || !css->GetArgument(0, 4, &this->TileMullions[1]) )
+    {
+    vtkErrorMacro("Error parsing TileMullions from message.");
+    return;
+    }
+  if(!css->GetArgument(0, 5, &this->UseOffscreenRendering))
     {
     vtkErrorMacro("Error parsing UseOffscreenRendering from message.");
     return;
     }
-  if (!css->GetArgument(0, 4, &this->UseIceT))
+  if (!css->GetArgument(0, 6, &this->UseIceT))
     {
     vtkErrorMacro("Error parsing ICE-T flag from message.");
     return;
     }
   const char *rmName;
-  if (!css->GetArgument(0, 5, &rmName))
+  if (!css->GetArgument(0, 7, &rmName))
     {
     vtkErrorMacro("Error parsing render module name from message.");
     return;
     }
   this->SetRenderModuleName(rmName);
   unsigned int numMachines;
-  if (!css->GetArgument(0, 6, &numMachines))
+  if (!css->GetArgument(0, 8, &numMachines))
     {
     vtkErrorMacro("Error parsing number of machines from message.");
     return;
@@ -209,37 +225,37 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   const char* env;
   for (idx = 0; idx < numMachines; idx++)
     {
-    if (!css->GetArgument(0, 7 + idx*10, &env))
+    if (!css->GetArgument(0, 9 + idx*10, &env))
       {
       vtkErrorMacro("Error parsing display environment from message.");
       return;
       }
     this->MachinesInternals->MachineInformationVector[idx].Environment = env;
-    if (!css->GetArgument(0, 8 + idx*10,
+    if (!css->GetArgument(0, 10 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[0]) ||
-        !css->GetArgument(0, 9 + idx*10,
+        !css->GetArgument(0, 11 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[1]) ||
-        !css->GetArgument(0, 10 + idx*10,
+        !css->GetArgument(0, 12 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[2]))
       {
       vtkErrorMacro("Error parsing lower left coordinate from message.");
       return;
       }
-    if (!css->GetArgument(0, 11 + idx*10,
+    if (!css->GetArgument(0, 13 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerRight[0]) ||
-        !css->GetArgument(0, 12 + idx*10,
+        !css->GetArgument(0, 14 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerRight[1]) ||
-        !css->GetArgument(0, 13 + idx*10,
+        !css->GetArgument(0, 15 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerRight[2]))
       {
       vtkErrorMacro("Error parsing lower right coordinate from message.");
       return;
       }
-    if (!css->GetArgument(0, 14 + idx*10,
+    if (!css->GetArgument(0, 16 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[0]) ||
-        !css->GetArgument(0, 15 + idx*10,
+        !css->GetArgument(0, 17 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[1]) ||
-        !css->GetArgument(0, 16 + idx*10,
+        !css->GetArgument(0, 18 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[2]))
       {
       vtkErrorMacro("Error parsing upper left coordinate from message.");

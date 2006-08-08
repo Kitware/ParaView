@@ -63,6 +63,8 @@ public:
   // Varibles (command line argurments) set to render to a tiled display.
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
+  vtkSetVector2Macro(TileMullions, int);
+  vtkGetVector2Macro(TileMullions, int);
 
   // Description:
   // Variable (command line argument) to use offscreen rendering.
@@ -112,6 +114,7 @@ protected:
 
   int RemoteRendering;
   int TileDimensions[2];
+  int TileMullions[2];
   int UseOffscreenRendering;
   int UseIceT;
   char* RenderModuleName;

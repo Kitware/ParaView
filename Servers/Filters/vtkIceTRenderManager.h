@@ -88,6 +88,14 @@ public:
   virtual int GetTileRank(int x, int y);
   virtual void SetTileRank(int x, int y, int rank);
 
+  // Description:
+  // Methods to set/get the mullions (space between the tiles).  The mullions
+  // are measured in pixels.  Negative mullions correspond to overlap.
+  virtual void SetTileMullions(int mullX, int mullY);
+  void SetTileMullions(int mull[2])
+    { this->SetTileMullions(mull[0], mull[1]); }
+  vtkGetVector2Macro(TileMullions, int);
+
   virtual double GetRenderTime();
   virtual double GetImageProcessingTime();
   virtual double GetBufferReadTime();
@@ -203,6 +211,7 @@ protected:
 
   int TileDimensions[2];
   int **TileRanks;
+  int TileMullions[2];
   int TilesDirty;
   int CleanScreenWidth;
   int CleanScreenHeight;

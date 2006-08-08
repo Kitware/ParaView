@@ -94,7 +94,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.34");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.35");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -104,6 +104,8 @@ vtkIceTRenderManager::vtkIceTRenderManager()
 {
   this->TileDimensions[0] = 1;
   this->TileDimensions[1] = 1;
+  this->TileMullions[0] = 0;
+  this->TileMullions[1] = 0;
   this->TileRanks = new int*[1];
   this->TileRanks[0] = new int[1];
   this->TileRanks[0][0] = 0;
@@ -249,9 +251,19 @@ void vtkIceTRenderManager::UpdateIceTContext()
       // displaySize should take into account render window's
       // tileScale. Later code assumes that the display size
       // includes it.
+      // KEN: On reviewing this code, I'm not sure that it is correct.
+      // displaySize is based on the full image size whereas the things it is
+      // compared to are based on the reduced image size.  I would guess that
+      // displaySize should be based on the reduced image size.  It may also
+      // make sense to make the condition above based on the reduced image size
+      // and get rid of the condition above it concerning the image reduction
+      // factor.  There is also little point to using the render window tile
+      // scale rather than the local TileDimensions ivar.
       int displaySize[2];
       displaySize[0] = tileScale[0]* this->FullImageSize[0];
       displaySize[1] = tileScale[1]* this->FullImageSize[1];
+      displaySize[0] += int(this->TileDimensions[0]*this->TileMullions[0]*this->ImageReductionFactor);
+      displaySize[1] += int(this->TileDimensions[1]*this->TileMullions[1]*this->ImageReductionFactor);
 
       // Adjust the global viewport of the renderer.  That is convert the
       // normalized renderer viewport (as values between 0 and 1) to actual
@@ -442,6 +454,14 @@ void vtkIceTRenderManager::SetTileRank(int x, int y, int rank)
 
 //-----------------------------------------------------------------------------
 
+void vtkIceTRenderManager::SetTileMullions(int mullX, int mullY)
+{
+  this->TileMullions[0] = mullX;
+  this->TileMullions[1] = mullY;
+  this->TilesDirty = 1;
+}
+//-----------------------------------------------------------------------------
+
 void vtkIceTRenderManager::ComputeTileViewportTransform()
 {
   vtkDebugMacro("ComputeTileViewportTransform");
@@ -456,10 +476,15 @@ void vtkIceTRenderManager::ComputeTileViewportTransform()
 
   // Initialize tiled window for 2D actors.  We may not be displaying any
   // tile, in which case just show something.
+  float TileDim[2];
+  TileDim[0] = this->TileDimensions[0];
+  TileDim[1] = this->TileDimensions[1];
+  //TileDim[0] += ((float)this->TileMullions[0]*this->ImageReductionFactor/((float)this->ReducedImageSize[0]));
+  //TileDim[1] += ((float)this->TileMullions[1]*this->ImageReductionFactor/((float)this->ReducedImageSize[1]));
   this->RenderWindow->SetTileScale(this->TileDimensions);
   this->RenderWindow->SetTileViewport(0.0, 0.0,
-                                      1.0/this->TileDimensions[0],
-                                      1.0/this->TileDimensions[1]);
+                                      1.0/TileDim[0],
+                                      1.0/TileDim[1]);
 
   for (int y = 0; y < this->TileDimensions[1]; y++)
     {
@@ -470,10 +495,10 @@ void vtkIceTRenderManager::ComputeTileViewportTransform()
         // Transform camera for 3D actors.
         vtkPerspectiveTransform *transform = vtkPerspectiveTransform::New();
         transform->Identity();
-        transform->Ortho(x*2.0/this->TileDimensions[0] - 1.0,
-                         (x+1)*2.0/this->TileDimensions[0] - 1.0,
-                         y*2.0/this->TileDimensions[1] - 1.0,
-                         (y+1)*2.0/this->TileDimensions[1] - 1.0,
+        transform->Ortho(x*2.0/TileDim[0] - 1.0,
+                         (x+1)*2.0/TileDim[0] - 1.0,
+                         y*2.0/TileDim[1] - 1.0,
+                         (y+1)*2.0/TileDim[1] - 1.0,
                          1.0, -1.0);
         this->SetTileViewportTransform(transform);
         transform->Delete();
@@ -484,10 +509,10 @@ void vtkIceTRenderManager::ComputeTileViewportTransform()
           // RenderWindow tiles from lower left instead of upper left.
           y = this->TileDimensions[1] - y - 1;
           this->RenderWindow->SetTileViewport
-            (x*(1.0/(float)(this->TileDimensions[0])), 
-             y*(1.0/(float)(this->TileDimensions[1])), 
-             (x+1.0)*(1.0/(float)(this->TileDimensions[0])), 
-             (y+1.0)*(1.0/(float)(this->TileDimensions[1])));
+            (x*(1.0/TileDim[0]), 
+             y*(1.0/TileDim[1]), 
+             (x+1.0)*(1.0/TileDim[0]), 
+             (y+1.0)*(1.0/TileDim[1]));
           }
 
         return;
@@ -1158,16 +1183,24 @@ int vtkIceTRenderManager::ImageReduceRenderer(vtkRenderer *ren)
 void vtkIceTRenderManager::GetGlobalViewport(int viewport[4])
 {
   viewport[0] = viewport[1] = 0;
-  viewport[2] = this->TileDimensions[0]*this->ReducedImageSize[0];
-  viewport[3] = this->TileDimensions[1]*this->ReducedImageSize[1];
+  viewport[2] = this->TileDimensions[0]
+    * (  this->ReducedImageSize[0]
+       + (this->TileMullions[0]/this->ImageReductionFactor) );
+  viewport[3] = this->TileDimensions[1]
+    * (  this->ReducedImageSize[1]
+       + (this->TileMullions[1]/this->ImageReductionFactor) );
 }
 
 //-----------------------------------------------------------------------------
 
 void vtkIceTRenderManager::GetTileViewport(int x, int y, int viewport[4])
 {
-  viewport[0] = x*this->ReducedImageSize[0];
-  viewport[1] = (this->TileDimensions[1]-y-1)*this->ReducedImageSize[1];
+  // "Invert" y so that tiles are counted from top to bottom.
+  y = this->TileDimensions[1]-y-1;
+  viewport[0] = x*(  this->ReducedImageSize[0]
+                   + (this->TileMullions[0]/this->ImageReductionFactor) );
+  viewport[1] = y*(  this->ReducedImageSize[1]
+                   + (this->TileMullions[1]/this->ImageReductionFactor) );
 
   viewport[2] = viewport[0] + this->ReducedImageSize[0];
   viewport[3] = viewport[1] + this->ReducedImageSize[1];
