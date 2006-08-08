@@ -63,7 +63,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.16");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.17");
 
 
 //----------------------------------------------------------------------------
@@ -140,16 +140,16 @@ void vtkPVAttributeEditor::PickMethodObserver()
 {
   vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(this->GetPVWidget("PickFunction"));
 
-  if(!strcmp(select->GetCurrentValue(),"'e'dit within a box") && this->GetInitialized())
+  if(!strcmp(select->GetCurrentValue(),"Box") && this->GetInitialized())
     {
     this->GetNotebook()->SetAutoAccept(0);
     }
-  else if(!strcmp(select->GetCurrentValue(),"'e'dit at a point") && this->GetInitialized())
+  else if(!strcmp(select->GetCurrentValue(),"Point") && this->GetInitialized())
     {
     this->GetNotebook()->SetAutoAccept(0);
-    vtkPVPointWidget::SafeDownCast(select->GetPVWidget("'e'dit at a point"))->PositionResetCallback();
+    vtkPVPointWidget::SafeDownCast(select->GetPVWidget("Point"))->PositionResetCallback();
     }
-  else if(!strcmp(select->GetCurrentValue(),"'e'dit within a draggable sphere") && this->GetInitialized())
+  else if(!strcmp(select->GetCurrentValue(),"Sphere") && this->GetInitialized())
     {
     this->GetNotebook()->SetAutoAccept(1);
     }
@@ -192,7 +192,7 @@ void vtkPVAttributeEditor::ProcessEvents(vtkObject* vtkNotUsed(object),
 
   // Toggle auto-accept if our widget is a sphere based on whether this is a mouse up or down event
   vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(self->GetPVWidget("PickFunction"));
-  if(!strcmp(select->GetCurrentValue(),"'e'dit within a draggable sphere") && self->GetInitialized())
+  if(!strcmp(select->GetCurrentValue(),"Sphere") && self->GetInitialized())
     {
     if(leftdown)
       {
@@ -317,7 +317,7 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
       this->GetApplication()->SetRegistryValue(
         1, "RunTime", "SaveDataFile", dname);
 */
-      this->GetProxy()->AddInput(reader->GetProxy(),"SetSource",0);
+      this->GetProxy()->AddInput(reader->GetProxy(),"SetSourceConnection",0);
       }
     editFlag = 0;
     }
@@ -419,12 +419,12 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
   if(inputModified)
     {
     vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(this->GetPVWidget("PickFunction"));
-    vtkPVPointWidget *point = vtkPVPointWidget::SafeDownCast(select->GetPVWidget("'e'dit at a point"));
+    vtkPVPointWidget *point = vtkPVPointWidget::SafeDownCast(select->GetPVWidget("Point"));
     if(point)
       {
       point->ActualPlaceWidget();
       }
-    vtkPVBoxWidget *box = vtkPVBoxWidget::SafeDownCast(select->GetPVWidget("'e'dit within a box"));
+    vtkPVBoxWidget *box = vtkPVBoxWidget::SafeDownCast(select->GetPVWidget("Box"));
     if(box)
       {
       box->ActualPlaceWidget();
