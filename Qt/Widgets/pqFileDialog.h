@@ -107,7 +107,8 @@ protected:
 protected slots:
   void onDataChanged(const QModelIndex&, const QModelIndex&);
   void onActivated(const QModelIndex&);
-  void onClicked(const QModelIndex&);
+  void onClickedFiles(const QModelIndex&);
+  void onClickedFavorites(const QModelIndex&);
   void onManualEntry(const QString&);
   void onNavigate(const QString&);
   void onNavigateUp();
@@ -117,7 +118,8 @@ protected slots:
 private:
   pqFileDialog(const pqFileDialog&);
   pqFileDialog& operator=(const pqFileDialog&);
-
+  
+  void onClicked(const QModelIndex&);
 };
 
 #endif // !_pqFileDialog_h

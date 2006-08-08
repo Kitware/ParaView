@@ -144,7 +144,7 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, QWidget* p,
   QObject::connect(this->Ui->Files, 
                    SIGNAL(clicked(const QModelIndex&)), 
                    this, 
-                   SLOT(onClicked(const QModelIndex&)));
+                   SLOT(onClickedFiles(const QModelIndex&)));
 
   QObject::connect(this->Ui->Favorites, 
                    SIGNAL(activated(const QModelIndex&)), 
@@ -154,7 +154,7 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, QWidget* p,
   QObject::connect(this->Ui->Favorites, 
                    SIGNAL(clicked(const QModelIndex&)), 
                    this, 
-                   SLOT(onClicked(const QModelIndex&)));
+                   SLOT(onClickedFavorites(const QModelIndex&)));
 
   QObject::connect(this->Ui->Parents, 
                    SIGNAL(activated(const QString&)), 
@@ -239,7 +239,7 @@ void pqFileDialog::accept()
 {
   QStringList selected_files;
   
-  // Collect special files ...
+  // Collect favorites ...
     {
     QModelIndexList indexes = this->Ui->Favorites->selectionModel()->selectedIndexes();
     for(int i = 0; i != indexes.size(); ++i)
@@ -419,6 +419,18 @@ void pqFileDialog::onDataChanged(const QModelIndex&, const QModelIndex&)
 void pqFileDialog::onActivated(const QModelIndex&)
 {
   this->accept();
+}
+
+void pqFileDialog::onClickedFiles(const QModelIndex& Index)
+{
+  this->Ui->Favorites->clearSelection();
+  this->onClicked(Index);
+}
+
+void pqFileDialog::onClickedFavorites(const QModelIndex& Index)
+{
+  this->Ui->Files->clearSelection();
+  this->onClicked(Index);
 }
 
 void pqFileDialog::onClicked(const QModelIndex& Index)
