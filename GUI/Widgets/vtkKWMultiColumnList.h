@@ -277,39 +277,6 @@ public:
   virtual int GetLastSortedColumn();
 
   // Description:
-  // Set/Get the type of the temporary embedded widget to be used for
-  // interactive editing of the contents of the given column's cells.
-  // It can be one of entry (which is the default), spinbox or checkbutton
-  // at the moment. 
-  // This can be set at the cell level too (see SetCellEditWindow).
-  // Note that this setting controls the widget used for *editing*, not for
-  // display. The cell contents is still displayed using whatever text (see
-  // SetCellText), image (see SetCellImage) or custom window (see 
-  // SetCellWindowCommand) is defined at the cell level. Check the
-  // SetCellWindowCommandToCheckButton or SetCellWindowCommandToColorButton
-  // methods for more advanced display *and* editing features.
-  //BTX
-  enum 
-  {
-    ColumnEditWindowEntry = 0,
-    ColumnEditWindowCheckButton,
-    ColumnEditWindowSpinBox,
-    ColumnEditWindowUnknown
-  };
-  //ETX
-  virtual int GetColumnEditWindow(int col_index);
-  virtual void SetColumnEditWindow(int col_index, int arg);
-  virtual void SetColumnEditWindowToEntry(int col_index)
-    { this->SetColumnEditWindow(
-      col_index, vtkKWMultiColumnList::ColumnEditWindowEntry); };
-  virtual void SetColumnEditWindowToCheckButton(int col_index)
-    { this->SetColumnEditWindow(
-      col_index, vtkKWMultiColumnList::ColumnEditWindowCheckButton); };
-  virtual void SetColumnEditWindowToSpinBox(int col_index)
-    { this->SetColumnEditWindow(
-      col_index, vtkKWMultiColumnList::ColumnEditWindowSpinBox); };
-
-  // Description:
   // Set/Get each column sort mode
   //BTX
   enum 
@@ -343,6 +310,58 @@ public:
   vtkBooleanMacro(SortArrowVisibility, int);
   virtual void SetSortArrowVisibility(int);
   virtual int GetSortArrowVisibility();
+
+  // Description:
+  // Set/Get if the background color of the sorted column should be set
+  // automatically to SortedColumnBackgroundColor. 
+  // Warning: when a different column is sorted, the background color of the
+  // previously sorted column is cleared (i.e., this column has no background
+  // color anymore).
+  vtkBooleanMacro(ColorSortedColumn, int);
+  vtkGetMacro(ColorSortedColumn, int);
+  virtual void SetColorSortedColumn(int);
+
+  // Description:
+  // Set/Get the background color of the sorted column, when ColorSortedColumn
+  // is set to On.
+  vtkGetVector3Macro(SortedColumnBackgroundColor,double);
+  virtual void SetSortedColumnBackgroundColor(
+    double r, double g, double b);
+  virtual void SetSortedColumnBackgroundColor(double rgb[3])
+    { this->SetSortedColumnBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the type of the temporary embedded widget to be used for
+  // interactive editing of the contents of the given column's cells.
+  // It can be one of entry (which is the default), spinbox or checkbutton
+  // at the moment. 
+  // This can be set at the cell level too (see SetCellEditWindow).
+  // Note that this setting controls the widget used for *editing*, not for
+  // display. The cell contents is still displayed using whatever text (see
+  // SetCellText), image (see SetCellImage) or custom window (see 
+  // SetCellWindowCommand) is defined at the cell level. Check the
+  // SetCellWindowCommandToCheckButton or SetCellWindowCommandToColorButton
+  // methods for more advanced display *and* editing features.
+  //BTX
+  enum 
+  {
+    ColumnEditWindowEntry = 0,
+    ColumnEditWindowCheckButton,
+    ColumnEditWindowSpinBox,
+    ColumnEditWindowUnknown
+  };
+  //ETX
+  virtual int GetColumnEditWindow(int col_index);
+  virtual void SetColumnEditWindow(int col_index, int arg);
+  virtual void SetColumnEditWindowToEntry(int col_index)
+    { this->SetColumnEditWindow(
+      col_index, vtkKWMultiColumnList::ColumnEditWindowEntry); };
+  virtual void SetColumnEditWindowToCheckButton(int col_index)
+    { this->SetColumnEditWindow(
+      col_index, vtkKWMultiColumnList::ColumnEditWindowCheckButton); };
+  virtual void SetColumnEditWindowToSpinBox(int col_index)
+    { this->SetColumnEditWindow(
+      col_index, vtkKWMultiColumnList::ColumnEditWindowSpinBox); };
 
   // Description:
   // Specifies a boolean value that determines whether a specific column 
@@ -383,6 +402,7 @@ public:
     int col_index, double r, double g, double b);
   virtual void SetColumnBackgroundColor(int col_index, double rgb[3])
     { this->SetColumnBackgroundColor(col_index, rgb[0], rgb[1], rgb[2]); };
+  virtual void ClearColumnBackgroundColor(int col_index);
   virtual void GetColumnForegroundColor(
     int col_index, double *r, double *g, double *b);
   virtual double* GetColumnForegroundColor(int col_index);
@@ -477,6 +497,7 @@ public:
     int row_index, double r, double g, double b);
   virtual void SetRowBackgroundColor(int row_index, double rgb[3])
     { this->SetRowBackgroundColor(row_index, rgb[0], rgb[1], rgb[2]); };
+  virtual void ClearRowBackgroundColor(int col_index);
   virtual void GetRowForegroundColor(
     int row_index, double *r, double *g, double *b);
   virtual double* GetRowForegroundColor(int row_index);
@@ -501,6 +522,7 @@ public:
   virtual void SetStripeBackgroundColor(double r, double g, double b);
   virtual void SetStripeBackgroundColor(double rgb[3])
     { this->SetStripeBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void ClearStripeBackgroundColor();
   virtual void GetStripeForegroundColor(double *r, double *g, double *b);
   virtual double* GetStripeForegroundColor();
   virtual void SetStripeForegroundColor(double r, double g, double b);
@@ -581,6 +603,7 @@ public:
     int row_index, int col_index, double rgb[3])
     { this->SetCellBackgroundColor(
       row_index, col_index, rgb[0], rgb[1], rgb[2]); };
+  virtual void ClearCellBackgroundColor(int row_index, int col_index);
   virtual void GetCellForegroundColor(
     int row_index, int col_index, double *r, double *g, double *b);
   virtual double* GetCellForegroundColor(int row_index, int col_index);
@@ -1328,6 +1351,12 @@ protected:
   // Find cell at relative coordinate x, y
   virtual int FindCellAtRelativeCoordinates(
     int x, int y, int *row_index, int *col_index);
+
+  // Description:
+  // Color of the sorted column.
+  int ColorSortedColumn;
+  double SortedColumnBackgroundColor[3];
+  virtual void UpdateSortedColumnBackgroundColor();
 
 private:
   vtkKWMultiColumnList(const vtkKWMultiColumnList&); // Not implemented

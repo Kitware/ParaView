@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.63");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.64");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -73,6 +73,8 @@ public:
   double CellSelectionForegroundColorTemp[3];
 
   int FindCellTextTemp[2];
+
+  int PreviousColorSortedColumn;
 };
 
 //----------------------------------------------------------------------------
@@ -88,7 +90,13 @@ vtkKWMultiColumnList::vtkKWMultiColumnList()
   this->RightClickCommand = NULL;
   this->UneditableCellDoubleClickCommand = NULL;
 
+  this->ColorSortedColumn = 0;
+  this->SortedColumnBackgroundColor[0] = 0.965;
+  this->SortedColumnBackgroundColor[1] = 0.965;
+  this->SortedColumnBackgroundColor[2] = 0.965;
+
   this->Internals = new vtkKWMultiColumnListInternals;
+  this->Internals->PreviousColorSortedColumn = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -153,7 +161,7 @@ void vtkKWMultiColumnList::CreateWidget()
 
   // Call the superclass to set the appropriate flags then create manually
 
-  vtksys_stl::string options("-bg #fafafa -stripebackground #dfe7ef -showseparators 1 -showarrow 1  -highlightthickness 0 -selectmode browse -relief sunken -bd 2 -spacing 2 -exportselection 0 -activestyle none -fg #000000 -selectforeground #ffffff -width 0 -setfocus 1");
+  vtksys_stl::string options("-bg #ffffff -stripebackground #dfe7ef -showseparators 1 -showarrow 1  -highlightthickness 0 -selectmode browse -relief sunken -bd 2 -spacing 2 -exportselection 0 -activestyle none -fg #000000 -selectforeground #ffffff -width 0 -setfocus 1");
 #ifdef _WIN32
   options += " -selectbackground #092369";
 #else
@@ -728,6 +736,13 @@ void vtkKWMultiColumnList::SetColumnBackgroundColor(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::ClearColumnBackgroundColor(int col_index)
+{
+  this->SetColumnConfigurationOptionAsText(col_index, "-bg", "");
+  this->InvokePotentialCellColorsChangedCommand();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::GetColumnForegroundColor(
   int col_index, double *r, double *g, double *b)
 {
@@ -938,6 +953,77 @@ void vtkKWMultiColumnList::SetSortArrowVisibility(int arg)
 int vtkKWMultiColumnList::GetSortArrowVisibility()
 {
   return this->GetConfigurationOptionAsInt("-showarrow");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetSortedColumnBackgroundColor(
+  double r, double g, double b)
+{
+  if (r < 0.0 || r > 1.0 || g < 0.0 || g > 1.0 || b < 0.0 || b > 1.0)
+    {
+    return;
+    }
+
+  if (r == this->SortedColumnBackgroundColor[0] &&
+      g == this->SortedColumnBackgroundColor[1] &&
+      b == this->SortedColumnBackgroundColor[2])
+    {
+    return;
+    }
+
+  this->SortedColumnBackgroundColor[0] = r;
+  this->SortedColumnBackgroundColor[1] = g;
+  this->SortedColumnBackgroundColor[2] = b;
+
+  this->Modified();
+
+  this->UpdateSortedColumnBackgroundColor();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetColorSortedColumn(int arg)
+{
+  if (arg == this->ColorSortedColumn)
+    {
+    return;
+    }
+
+  this->ColorSortedColumn = arg;
+
+  this->UpdateSortedColumnBackgroundColor();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::UpdateSortedColumnBackgroundColor()
+{
+  int potential_change = 0;
+  if (this->Internals->PreviousColorSortedColumn >= 0)
+    {
+    this->ClearColumnBackgroundColor(
+      this->Internals->PreviousColorSortedColumn);
+    this->Internals->PreviousColorSortedColumn = -1;
+    potential_change++;
+    }
+
+  int idx = this->GetLastSortedColumn();
+  if (idx >= 0)
+    {
+    if (this->ColorSortedColumn)
+      {
+      this->SetColumnBackgroundColor(idx, this->SortedColumnBackgroundColor);
+      this->Internals->PreviousColorSortedColumn = idx;
+      }
+    else
+      {
+      this->ClearColumnBackgroundColor(idx);
+      }
+    potential_change++;
+    }
+
+  if (potential_change)
+    {
+    this->InvokePotentialCellColorsChangedCommand();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1237,6 +1323,13 @@ void vtkKWMultiColumnList::SetRowBackgroundColor(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::ClearRowBackgroundColor(int row_index)
+{
+  this->SetRowConfigurationOption(row_index, "-bg", "");
+  this->InvokePotentialCellColorsChangedCommand();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::GetRowForegroundColor(
   int row_index, double *r, double *g, double *b)
 {
@@ -1286,6 +1379,13 @@ double* vtkKWMultiColumnList::GetStripeBackgroundColor()
 void vtkKWMultiColumnList::SetStripeBackgroundColor(double r, double g, double b)
 {
   vtkKWTkUtilities::SetOptionColor(this, "-stripebackground", r, g, b);
+  this->InvokePotentialCellColorsChangedCommand();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::ClearStripeBackgroundColor()
+{
+  this->SetConfigurationOption("-stripebackground", "");
   this->InvokePotentialCellColorsChangedCommand();
 }
 
@@ -1666,6 +1766,14 @@ void vtkKWMultiColumnList::SetCellBackgroundColor(
     this->SetCellConfigurationOption(row_index, col_index, "-bg", color);
     this->InvokePotentialCellColorsChangedCommand();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::ClearCellBackgroundColor(
+  int row_index, int col_index)
+{
+  this->SetCellConfigurationOption(row_index, col_index, "-bg", "");
+  this->InvokePotentialCellColorsChangedCommand();
 }
 
 //----------------------------------------------------------------------------
@@ -3841,6 +3949,7 @@ void vtkKWMultiColumnList::UneditableCellDoubleClickCallback()
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::ColumnSortedCallback()
 {
+  this->UpdateSortedColumnBackgroundColor();
   this->InvokePotentialCellColorsChangedCommand();
   this->InvokeColumnSortedCommand();
 }
@@ -3955,4 +4064,9 @@ void vtkKWMultiColumnList::UpdateEnableState()
 void vtkKWMultiColumnList::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "SortedColumnBackgroundColor: (" 
+     << this->SortedColumnBackgroundColor[0] << ", " 
+     << this->SortedColumnBackgroundColor[1] << ", " 
+     << this->SortedColumnBackgroundColor[2] << ")\n";
 }
