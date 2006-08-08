@@ -56,7 +56,6 @@ private slots:
   void onOpenResource(QAction*);
   void onOpenResource();
   void onServerStarted();
-  void onServerFailed();
 
 private:
   ~pqRecentFilesMenu();

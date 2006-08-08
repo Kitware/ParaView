@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqServerBrowser.h
+   Module:    pqSimpleServerStartup.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,56 +29,64 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-#ifndef _pqServerBrowser_h
-#define _pqServerBrowser_h
+#ifndef __pqSimpleServerStartup_h
+#define __pqSimpleServerStartup_h
 
 #include "pqComponentsExport.h"
 
 #include <QDialog>
 
-class pqServer;
+class pqServerResource;
+class pqServerStartups;
+class pqSettings;
 
 /**
-Provides a user-interface component for creating server connections.
+Convenience class that handles the entire process of connecting to a server ...
+callers should create an instance of pqSimpleServerStartup, and
+call the startServer() method to begin the connection process.  Note that
+startServer() is asynchronous - the client must wait until serverCancelled(),
+serverFailed(), or serverStarted() is emitted to know whether startup
+was successful.  It is the caller's responsibility to ensure that the
+pqSimpleServerStartup object does not go out of scope until one of the three
+signals is emitted.
 
-To use, create an instance of pqServerBrowser, and connect its serverConnected()
-method to a slot.  If the user selects a server and a connection is established,
-the slot will be called with the new pqServer object that encapsulates the connection.
+If necessary, the user will be prompted to configure how to start the server,
+and optionally prompted for site-specific runtime parameters.
 
-\sa pqServer
+A modal dialog will be displayed while the server starts.
 */
-
-class PQCOMPONENTS_EXPORT pqServerBrowser :
-  public QDialog
+class PQCOMPONENTS_EXPORT pqSimpleServerStartup :
+  public QObject
 {
-  typedef QDialog Superclass;
-
+  typedef QObject Superclass;
+  
   Q_OBJECT
-
+  
 public:
-  pqServerBrowser(QWidget* Parent);
-  ~pqServerBrowser();
+  pqSimpleServerStartup(
+    pqSettings& settings,
+    pqServerStartups& startups,
+    QObject* parent = 0);
+    
+  ~pqSimpleServerStartup();
+
+  void startServer(const pqServerResource& server);
 
 signals:
-  /// This signal will be emitted iff a server connection is successfully created
-  void serverConnected(pqServer*);
- 
-  
+  /// Signal emitted if the user cancels startup
+  void serverCancelled();
+  /// Signal emitted if the server fails to start
+  void serverFailed();
+  /// Signal emitted if the server successfully starts
+  void serverStarted();
+
 private slots:
-  void onServerTypeActivated(int);
-  void accept();
-  
-  void onServerCancelled();
   void onServerFailed();
   void onServerStarted();
 
 private:
-  pqServerBrowser(const pqServerBrowser&);
-  pqServerBrowser& operator=(const pqServerBrowser&);
- 
   class pqImplementation;
   pqImplementation* const Implementation;
 };
 
-#endif // !_pqServerBrowser_h
+#endif

@@ -30,48 +30,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqEditServerStartupDialog.h"
-#include "pqServer.h"
 #include "pqServerBrowser.h"
-#include "pqServerStartupDialog.h"
+#include "pqSimpleServerStartup.h"
 #include "ui_pqServerBrowser.h"
 
 #include <pqApplicationCore.h>
+#include <pqServerResource.h>
 #include <pqServerResources.h>
-#include <pqServerStartup.h>
-#include <pqServerStartupContext.h>
-#include <pqServerStartups.h>
 
 #include <QMessageBox>
+
+//////////////////////////////////////////////////////////////////////////////
+// pqServerBrowser::pqImplementation
 
 class pqServerBrowser::pqImplementation
 {
 public:
   pqImplementation() :
-    StartupContext(0),
-    StartupDialog(0)
+    ServerStartup(
+      *pqApplicationCore::instance()->settings(),
+      pqApplicationCore::instance()->serverStartups())  
   {
-  }
-
-  ~pqImplementation()
-  {
-    this->closeStartup();
-  }
-
-  void closeStartup()
-  {
-    delete this->StartupContext;
-    delete this->StartupDialog;
-    
-    this->StartupContext = 0;
-    this->StartupDialog = 0;
   }
 
   Ui::pqServerBrowser UI;
+  
   pqServerResource Server;
-  pqServerStartupContext* StartupContext;
-  pqServerStartupDialog* StartupDialog;
+  pqSimpleServerStartup ServerStartup;
 };
+
+//////////////////////////////////////////////////////////////////////////////
+// pqServerBrowser
 
 pqServerBrowser::pqServerBrowser(QWidget* Parent) :
   Superclass(Parent),
@@ -81,10 +70,32 @@ pqServerBrowser::pqServerBrowser(QWidget* Parent) :
   this->setObjectName("ServerBrowser");
   this->setWindowTitle(tr("Pick Server:"));
   
-  QObject::connect(this->Implementation->UI.ServerType, SIGNAL(activated(int)), this, SLOT(onServerTypeActivated(int)));
+  QObject::connect(
+    this->Implementation->UI.ServerType,
+    SIGNAL(activated(int)),
+    this,
+    SLOT(onServerTypeActivated(int)));
 
   this->Implementation->UI.ServerType->setCurrentIndex(0);
   this->onServerTypeActivated(0);
+  
+  connect(
+    &this->Implementation->ServerStartup,
+    SIGNAL(serverCancelled()),
+    this,
+    SLOT(onServerCancelled()));
+  
+  connect(
+    &this->Implementation->ServerStartup,
+    SIGNAL(serverFailed()),
+    this,
+    SLOT(onServerFailed()));
+  
+  connect(
+    &this->Implementation->ServerStartup,
+    SIGNAL(serverStarted()),
+    this,
+    SLOT(onServerStarted()));
 }
 
 pqServerBrowser::~pqServerBrowser()
@@ -122,58 +133,11 @@ void pqServerBrowser::accept()
   
   this->Implementation->Server = server;
 
-  // If no startup is required for this server, jump to opening the file ...
-  pqServerStartups& startups = pqApplicationCore::instance()->serverStartups();
-  if(!startups.startupRequired(server))
-    {
-    this->onServerStarted();
-    return;
-    }
-
-  // If a startup isn't available for this server, prompt the user ...    
-  if(!startups.startupAvailable(server))
-    {
-    pqEditServerStartupDialog dialog(
-      pqApplicationCore::instance()->serverStartups(), server);
-    if(QDialog::Rejected == dialog.exec())
-      {
-      Superclass::accept();
-      return;
-      }
-    startups.save(*pqApplicationCore::instance()->settings());
-    }
-
-  // Try starting the server ...
-  if(pqServerStartup* const startup = startups.getStartup(server))
-    {
-    this->Implementation->StartupContext = new pqServerStartupContext();
-    this->connect(this->Implementation->StartupContext, SIGNAL(succeeded()), this, SLOT(onServerStarted()));
-    this->connect(this->Implementation->StartupContext, SIGNAL(failed()), this, SLOT(onServerFailed()));
-    
-    this->Implementation->StartupDialog = new pqServerStartupDialog(server);
-    this->Implementation->StartupDialog->show();
-    QObject::connect(this->Implementation->StartupContext, SIGNAL(succeeded()), this->Implementation->StartupDialog, SLOT(hide()));
-    QObject::connect(this->Implementation->StartupContext, SIGNAL(failed()), this->Implementation->StartupDialog, SLOT(hide()));
-    
-    startup->execute(server, *this->Implementation->StartupContext);
-    return;
-    }
-
-  Superclass::accept();
+  this->Implementation->ServerStartup.startServer(server);
 }
 
-void pqServerBrowser::onServerStarted()
+void pqServerBrowser::onServerCancelled()
 {
-  pqServer* const server = pqApplicationCore::instance()->createServer(this->Implementation->Server);
-  if(server)
-    {
-    pqServerResources& resources = pqApplicationCore::instance()->serverResources();    
-    resources.open(this->Implementation->Server);
-    resources.add(this->Implementation->Server);
-
-    emit this->serverConnected(server);
-    }
-
   Superclass::accept();
 }
 
@@ -182,3 +146,18 @@ void pqServerBrowser::onServerFailed()
   Superclass::accept();
 }
 
+void pqServerBrowser::onServerStarted()
+{
+  if(pqServer* const server = pqApplicationCore::instance()->createServer(
+    this->Implementation->Server))
+    {
+    pqServerResources& resources =
+      pqApplicationCore::instance()->serverResources();
+//    resources.open(this->Implementation->Server);
+    resources.add(this->Implementation->Server);
+
+    emit this->serverConnected(server);
+    }
+
+  Superclass::accept();
+}

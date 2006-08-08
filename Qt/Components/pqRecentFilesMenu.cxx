@@ -31,16 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqRecentFilesMenu.h"
+#include "pqSimpleServerStartup.h"
 
 #include <pqApplicationCore.h>
-#include <pqEditServerStartupDialog.h>
+#include <pqServerResource.h>
 #include <pqServerResources.h>
-#include <pqServerStartup.h>
-#include <pqServerStartupContext.h>
-#include <pqServerStartupDialog.h>
-#include <pqServerStartups.h>
 
-#include <QFileInfo>
 #include <QMenu>
 #include <QTimer>
 #include <QtDebug>
@@ -52,29 +48,19 @@ class pqRecentFilesMenu::pqImplementation
 public:
   pqImplementation(QMenu& menu) :
     Menu(menu),
-    StartupContext(0),
-    StartupDialog(0)
+    ServerStartup(
+      *pqApplicationCore::instance()->settings(),
+      pqApplicationCore::instance()->serverStartups())
   {
   }
   
   ~pqImplementation()
   {
-    this->closeStartup();
-  }
-
-  void closeStartup()
-  {
-    delete this->StartupContext;
-    delete this->StartupDialog;
-    
-    this->StartupContext = 0;
-    this->StartupDialog = 0;
   }
 
   QMenu& Menu;
   pqServerResource RecentResource;
-  pqServerStartupContext* StartupContext;
-  pqServerStartupDialog* StartupDialog;
+  pqSimpleServerStartup ServerStartup;
   
   /// Functor that returns true if two resources have the same URI scheme and host(s)
   class SameSchemeAndHost
@@ -103,6 +89,9 @@ pqRecentFilesMenu::pqRecentFilesMenu(QMenu& menu) :
   
   connect(&this->Implementation->Menu, SIGNAL(triggered(QAction*)),
     this, SLOT(onOpenResource(QAction*)));
+    
+  connect(&this->Implementation->ServerStartup, SIGNAL(serverStarted()),
+    this, SLOT(onServerStarted()));
   
   this->onResourcesChanged();
 }
@@ -197,62 +186,29 @@ void pqRecentFilesMenu::onResourcesChanged()
 
 void pqRecentFilesMenu::onOpenResource(QAction* action)
 {
-  // Note: we can't update the resources here because it would destroy the action that's calling
-  // this slot.  So, schedule an update for the next time the UI is idle.
-  this->Implementation->RecentResource = pqServerResource(action->data().toString());
+  // Note: we can't update the resources here because it would destroy the
+  // action that's calling this slot.  So, schedule an update for the
+  // next time the UI is idle.
+  this->Implementation->RecentResource =
+    pqServerResource(action->data().toString());
   QTimer::singleShot(0, this, SLOT(onOpenResource()));
 }
 
 void pqRecentFilesMenu::onOpenResource()
 {
-  // Cleanup old connections ...
-  this->Implementation->closeStartup();
-  
   const pqServerResource resource = this->Implementation->RecentResource;
-  const pqServerResource server = resource.scheme() == "session" ? resource.sessionServer().schemeHostsPorts() : resource.schemeHostsPorts();
   
-  // If no startup is required for this server, jump to opening the file ...
-  pqServerStartups& startups = pqApplicationCore::instance()->serverStartups();
-  if(!startups.startupRequired(server))
-    {
-    this->onServerStarted();
-    return;
-    }
-
-  // If a startup isn't available for this server, prompt the user ...    
-  if(!startups.startupAvailable(server))
-    {
-    pqEditServerStartupDialog dialog(
-      pqApplicationCore::instance()->serverStartups(), server);
-    if(QDialog::Rejected == dialog.exec())
-      return;
-    startups.save(*pqApplicationCore::instance()->settings());
-    }
-
-  // Try starting the server ...
-  if(pqServerStartup* const startup = startups.getStartup(server))
-    {
-    this->Implementation->StartupContext = new pqServerStartupContext();
-    this->connect(this->Implementation->StartupContext, SIGNAL(succeeded()), this, SLOT(onServerStarted()));
-    this->connect(this->Implementation->StartupContext, SIGNAL(failed()), this, SLOT(onServerFailed()));
-    
-    this->Implementation->StartupDialog = new pqServerStartupDialog(server);
-    this->Implementation->StartupDialog->show();
-    QObject::connect(this->Implementation->StartupContext, SIGNAL(succeeded()), this->Implementation->StartupDialog, SLOT(hide()));
-    QObject::connect(this->Implementation->StartupContext, SIGNAL(failed()), this->Implementation->StartupDialog, SLOT(hide()));
-    
-    startup->execute(server, *this->Implementation->StartupContext);
-    }
+  const pqServerResource server =
+    resource.scheme() == "session"
+      ? resource.sessionServer().schemeHostsPorts()
+      : resource.schemeHostsPorts();
+  
+  this->Implementation->ServerStartup.startServer(server);
 }
 
 void pqRecentFilesMenu::onServerStarted()
 {
-  pqServerResources& resources = pqApplicationCore::instance()->serverResources();    
+  pqServerResources& resources = pqApplicationCore::instance()->serverResources();
   resources.open(this->Implementation->RecentResource);
   resources.add(this->Implementation->RecentResource);
 }
-
-void pqRecentFilesMenu::onServerFailed()
-{
-}
-
