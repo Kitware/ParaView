@@ -27,7 +27,7 @@
 #include "vtkRenderWindow.h"
 
 vtkStandardNewMacro(vtkSMIceTRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.8");
 
 //-----------------------------------------------------------------------------
 vtkSMIceTRenderModuleProxy::vtkSMIceTRenderModuleProxy()
@@ -54,6 +54,9 @@ void vtkSMIceTRenderModuleProxy::InitializeCompositingPipeline()
   int *tileDims =  pm->GetOptions()->GetTileDimensions();
   this->TileDimensions[0] = tileDims[0];
   this->TileDimensions[1] = tileDims[1];
+  int *tileMulls =  pm->GetOptions()->GetTileMullions();
+  this->TileMullions[0] = tileMulls[0];
+  this->TileMullions[1] = tileMulls[1];
 
 
   if (!getenv("PV_ICET_WINDOW_BORDERS"))

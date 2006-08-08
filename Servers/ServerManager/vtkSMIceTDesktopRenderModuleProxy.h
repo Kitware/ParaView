@@ -106,6 +106,7 @@ protected:
   virtual void InitializeCompositingPipeline();
 
   int TileDimensions[2];
+  int TileMullions[2];
 
   // Control the RemoteDisplay property on vtkDesktopDeliveryServer.
   int RemoteDisplay;

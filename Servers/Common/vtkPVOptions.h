@@ -63,6 +63,7 @@ public:
   vtkGetMacro(ReverseConnection, int);
   vtkGetMacro(UseRenderingGroup, int);
   vtkGetVector2Macro(TileDimensions, int);
+  vtkGetVector2Macro(TileMullions, int);
   vtkGetStringMacro(RenderModuleName);
   vtkGetStringMacro(CaveConfigurationFileName);
   vtkGetStringMacro(MachinesFileName);
@@ -83,6 +84,7 @@ public:
   // Description:
   // vtkPVProcessModule needs to set this.
   vtkSetVector2Macro(TileDimensions, int);
+  vtkSetVector2Macro(TileMullions, int);
   vtkSetMacro(UseOffscreenRendering, int);
 
   // Description:
@@ -160,6 +162,7 @@ private:
   int UseSatelliteSoftwareRendering;
   int ReverseConnection;
   int TileDimensions[2];
+  int TileMullions[2];
   int UseRenderingGroup;
 
   

@@ -29,7 +29,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.18");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -49,6 +49,7 @@ class vtkSMIceTDesktopRenderModuleProxyProxySet
 vtkSMIceTDesktopRenderModuleProxy::vtkSMIceTDesktopRenderModuleProxy()
 {
   this->TileDimensions[0] = this->TileDimensions[1] = 1;
+  this->TileMullions[0] = this->TileMullions[1] = 1;
   this->RemoteDisplay = 1;
   this->OrderedCompositing = 0;
 
@@ -294,6 +295,15 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
     return;
     }
   ivp->SetElements(this->TileDimensions);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->DisplayManagerProxy->GetProperty("TileMullions"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property TileMullions on DisplayManagerProxy.");
+    return;
+    }
+  ivp->SetElements(this->TileMullions);
   this->DisplayManagerProxy->UpdateVTKObjects(); 
   // Tile Dimensions must be set before the RenderWindow is set,
   // hence the call to DisplayManagerProxy->UpdateVTKObjects()  is required.

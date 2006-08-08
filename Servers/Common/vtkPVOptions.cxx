@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.36");
+vtkCxxRevisionMacro(vtkPVOptions, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -43,6 +43,8 @@ vtkPVOptions::vtkPVOptions()
 
   this->TileDimensions[0] = 0;
   this->TileDimensions[1] = 0;
+  this->TileMullions[0] = 0;
+  this->TileMullions[1] = 0;
   this->ClientMode = 0;
   this->ServerMode = 0;
   this->RenderServerMode = 0;
@@ -167,6 +169,12 @@ void vtkPVOptions::Initialize()
                     vtkPVOptions::PVCLIENT|vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
   this->AddArgument("--tile-dimensions-y", "-tdy", this->TileDimensions+1, 
                     "Size of tile display in the number of displays in each column of the display.",
+                    vtkPVOptions::PVCLIENT|vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
+  this->AddArgument("--tile-mullion-x", "-tmx", this->TileMullions, 
+                    "Size of the gap between columns in the tile display, in Pixels.",
+                    vtkPVOptions::PVCLIENT|vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
+  this->AddArgument("--tile-mullion-y", "-tmy", this->TileMullions+1, 
+                    "Size of the gap between rows in the tile display, in Pixels.",
                     vtkPVOptions::PVCLIENT|vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
   
   // This should be deprecated when I get the time 
