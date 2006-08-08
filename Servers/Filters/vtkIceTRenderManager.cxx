@@ -94,7 +94,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.36");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.37");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -476,15 +476,27 @@ void vtkIceTRenderManager::ComputeTileViewportTransform()
 
   // Initialize tiled window for 2D actors.  We may not be displaying any
   // tile, in which case just show something.
-  float TileDim[2];
-  TileDim[0] = this->TileDimensions[0];
-  TileDim[1] = this->TileDimensions[1];
-  //TileDim[0] += ((float)this->TileMullions[0]*this->ImageReductionFactor/((float)this->ReducedImageSize[0]));
-  //TileDim[1] += ((float)this->TileMullions[1]*this->ImageReductionFactor/((float)this->ReducedImageSize[1]));
+
+  // The mullion size as a fraction of total display size.
+  double mullions[2];
+  mullions[0] = (double)this->TileMullions[0]/(double)this->FullImageSize[0];
+  mullions[1] = (double)this->TileMullions[1]/(double)this->FullImageSize[1];
+
+  // The spacing of the tiles (including the mullions).
+  double tileSpacing[2];
+  tileSpacing[0] = 1.0/(double)this->TileDimensions[0];
+  tileSpacing[1] = 1.0/(double)this->TileDimensions[1];
+
+  // The size of the tile as a fraction of the total display size.
+  double tileSize[2];
+  tileSize[0] = tileSpacing[0] - mullions[0];
+  tileSize[1] = tileSpacing[1] - mullions[1];
+
+  // At this time, the render window's tile parameters (which 2D annotation will
+  // use for placement) does not support mullions.  Punt, and don't use mullions
+  // for 2D annotation.
   this->RenderWindow->SetTileScale(this->TileDimensions);
-  this->RenderWindow->SetTileViewport(0.0, 0.0,
-                                      1.0/TileDim[0],
-                                      1.0/TileDim[1]);
+  this->RenderWindow->SetTileViewport(0.0, 0.0, tileSpacing[0], tileSpacing[1]);
 
   for (int y = 0; y < this->TileDimensions[1]; y++)
     {
@@ -495,10 +507,10 @@ void vtkIceTRenderManager::ComputeTileViewportTransform()
         // Transform camera for 3D actors.
         vtkPerspectiveTransform *transform = vtkPerspectiveTransform::New();
         transform->Identity();
-        transform->Ortho(x*2.0/TileDim[0] - 1.0,
-                         (x+1)*2.0/TileDim[0] - 1.0,
-                         y*2.0/TileDim[1] - 1.0,
-                         (y+1)*2.0/TileDim[1] - 1.0,
+        transform->Ortho(2.0*(x*tileSpacing[0]) - 1.0,
+                         2.0*(x*tileSpacing[0] + tileSize[0]) - 1.0,
+                         2.0*(y*tileSpacing[1]) - 1.0,
+                         2.0*(y*tileSpacing[1] + tileSize[1]) - 1.0,
                          1.0, -1.0);
         this->SetTileViewportTransform(transform);
         transform->Delete();
@@ -508,11 +520,13 @@ void vtkIceTRenderManager::ComputeTileViewportTransform()
           {
           // RenderWindow tiles from lower left instead of upper left.
           y = this->TileDimensions[1] - y - 1;
-          this->RenderWindow->SetTileViewport
-            (x*(1.0/TileDim[0]), 
-             y*(1.0/TileDim[1]), 
-             (x+1.0)*(1.0/TileDim[0]), 
-             (y+1.0)*(1.0/TileDim[1]));
+          // At this time, the render window's tile parameters (which 2D
+          // annotation will use for placement) does not support mullions.
+          // Punt, and don't use mullions for 2D annotation.
+          this->RenderWindow->SetTileViewport(x*tileSpacing[0],
+                                              y*tileSpacing[1],
+                                              x*tileSpacing[0]+tileSpacing[0],
+                                              y*tileSpacing[1]+tileSpacing[1]);
           }
 
         return;
