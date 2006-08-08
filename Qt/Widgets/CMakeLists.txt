@@ -31,8 +31,6 @@ SET(QtWidgets_SRCS
   pqListWidgetItemObject.h
   pqLocalFileDialogModel.cxx
   pqLocalFileDialogModel.h
-  pqPlayControlsWidget.cxx
-  pqPlayControlsWidget.h
   pqProgressBar.cxx
   pqProgressBar.h
   pqSectionVisibilityContextMenu.cxx
@@ -67,7 +65,6 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqFlatTreeView.h
   pqListWidgetItemObject.h
   pqLocalFileDialogModel.h
-  pqPlayControlsWidget.h
   pqProgressBar.h
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
