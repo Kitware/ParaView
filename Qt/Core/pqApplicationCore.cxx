@@ -52,6 +52,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 
 // Qt includes.
+#include <QApplication>
+#include <QDomDocument>
+#include <QFile>
 #include <QPointer>
 #include <QtDebug>
 #include <QSize>
@@ -361,6 +364,19 @@ pqServerStartups& pqApplicationCore::serverStartups()
   if(!this->Internal->ServerStartups)
     {
     this->Internal->ServerStartups = new pqServerStartups();
+    
+    // Load default settings ...
+    QFile file(QApplication::applicationDirPath() + "/default_servers.pvsc");
+    if(file.exists())
+      {
+      QDomDocument xml;
+      if(xml.setContent(&file, false))
+        {
+        this->Internal->ServerStartups->load(xml);
+        }
+      }
+    
+    // Load user settings ...
     this->Internal->ServerStartups->load(*this->settings());
     }
     
