@@ -24,35 +24,6 @@ public:
       Py_Initialize();
       
     Interpreter = Py_NewInterpreter();
-    
-    PyThreadState_Swap(Interpreter);
-
-/*
-    PyObject* const path = PySys_GetObject("path");
-    PyList_Insert(path, 0, PyString_FromString(VTK_PYTHON_LIBRARY_DIR));
-    PyList_Insert(path, 0, PyString_FromString(VTK_PYTHON_PACKAGE_DIR));
-*/
-
-/*    
-    char tmpPath[5];
-    sprintf(tmpPath,"path");
-    PyObject* path = PySys_GetObject(tmpPath);
-    PyObject* newpath;
-    if ( vtksys::SystemTools::FileExists(VTK_PYTHON_LIBRARY_DIR) )
-    {
-    newpath = PyString_FromString(VTK_PYTHON_LIBRARY_DIR);
-    PyList_Insert(path, 0, newpath);
-    Py_DECREF(newpath);
-    }
-    if ( vtksys::SystemTools::FileExists(VTK_PYTHON_PACKAGE_DIR) )
-    {
-    newpath = PyString_FromString(VTK_PYTHON_PACKAGE_DIR);
-    PyList_Insert(path, 0, newpath);
-    Py_DECREF(newpath);
-    }
-*/
-
-    PyThreadState_Swap(0);
   }
   
   ~pqImplementation()
