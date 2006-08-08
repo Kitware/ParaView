@@ -239,23 +239,42 @@ void pqFileDialog::accept()
 {
   QStringList selected_files;
   
-  // Collect files that were selected from the list ...
-  QModelIndexList indexes = this->Ui->Files->selectionModel()->selectedIndexes();
-  for(int i = 0; i != indexes.size(); ++i)
+  // Collect special files ...
     {
-    QModelIndex idx = indexes[i];
-
-    if(idx.column() != 0)
-      continue;
-      
-    if(idx.model() == this->Filter)
+    QModelIndexList indexes = this->Ui->Favorites->selectionModel()->selectedIndexes();
+    for(int i = 0; i != indexes.size(); ++i)
       {
-      idx = this->Filter->mapToSource(idx);
-      }
+      QModelIndex idx = indexes[i];
 
-    QStringList files = this->Model->getFilePaths(idx);
-    for(int j = 0; j != files.size(); ++j)
-      selected_files.push_back(files[j]);
+      if(idx.column() != 0)
+        continue;
+        
+      if(idx.model() == this->Filter)
+        {
+        idx = this->Filter->mapToSource(idx);
+        }
+
+      selected_files << this->Model->getFilePaths(idx);
+      }
+    }
+  
+  // Collect files that were selected from the list ...
+    {
+    QModelIndexList indexes = this->Ui->Files->selectionModel()->selectedIndexes();
+    for(int i = 0; i != indexes.size(); ++i)
+      {
+      QModelIndex idx = indexes[i];
+
+      if(idx.column() != 0)
+        continue;
+        
+      if(idx.model() == this->Filter)
+        {
+        idx = this->Filter->mapToSource(idx);
+        }
+
+      selected_files << this->Model->getFilePaths(idx);
+      }
     }
 
   // Collect manually entered filenames (if any) ...
