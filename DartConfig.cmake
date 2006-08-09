@@ -3,6 +3,7 @@
 SET (NIGHTLY_START_TIME "21:00:00 EDT")
 
 # Dart server to submit results (used by client)
+SET(DROP_METHOD http)
 IF(DROP_METHOD MATCHES http)
   IF (NOT DEFINED DROP_SITE)
     SET (DROP_SITE "public.kitware.com")
