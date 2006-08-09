@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.6");
 vtkStandardNewMacro(vtkSMIceTMultiDisplayProxy);
 
 //-----------------------------------------------------------------------------
@@ -34,8 +34,10 @@ vtkSMIceTMultiDisplayProxy::vtkSMIceTMultiDisplayProxy()
   this->OutlineUpdateSuppressorProxy = NULL;
 
   // Turn on suppression to start with to avoid unnecessary collections.
-  // Turning it on later is no problem.
+  // Turning it off later is no problem.
   this->SuppressGeometryCollection = 1;
+
+  this->OutlineGeometryIsValid = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -253,7 +255,8 @@ void vtkSMIceTMultiDisplayProxy::SetCollectionDecision(int v)
     {
     // Set the mapper's input on the client to the geometry.
     vtkClientServerStream stream;
-    for (unsigned int i=0; i < this->OutlineUpdateSuppressorProxy->GetNumberOfIDs(); i++)
+    for (unsigned int i=0;
+         i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
       {
       stream << vtkClientServerStream::Invoke
              << this->UpdateSuppressorProxy->GetID(i) << "GetOutput"
@@ -323,5 +326,46 @@ void vtkSMIceTMultiDisplayProxy::SetLODCollectionDecision(int v)
       this->ConnectionID, vtkProcessModule::CLIENT, stream);
 
     this->Superclass::SetLODCollectionDecision(v);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void vtkSMIceTMultiDisplayProxy::InvalidateGeometryInternal(int useCache)
+{
+  this->OutlineGeometryIsValid = 0;
+
+  this->Superclass::InvalidateGeometryInternal(useCache);
+}
+
+//-----------------------------------------------------------------------------
+
+int vtkSMIceTMultiDisplayProxy::UpdateRequired()
+{
+  if (   this->SuppressGeometryCollection
+      && !this->OutlineGeometryIsValid
+      && this->OutlineUpdateSuppressorProxy )
+    {
+    return 1;
+    }
+  else
+    {
+    return this->Superclass::UpdateRequired();
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void vtkSMIceTMultiDisplayProxy::Update()
+{
+  this->Superclass::Update();
+
+  if (this->SuppressGeometryCollection && !this->OutlineGeometryIsValid)
+    {
+    vtkSMProperty *p
+      = this->OutlineUpdateSuppressorProxy->GetProperty("ForceUpdate");
+    p->Modified();
+    this->OutlineUpdateSuppressorProxy->UpdateVTKObjects();
+    this->OutlineGeometryIsValid = 1;
     }
 }

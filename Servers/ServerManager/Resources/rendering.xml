@@ -2925,6 +2925,7 @@
           proxygroup="filters" proxyname="UpdateSuppressor" />
         <ShareProperties subproxy="UpdateSuppressor">
           <Exception name="Input" />
+          <Exception name="ForceUpdate" />
         </ShareProperties>
       </SubProxy>
       <IntVectorProperty

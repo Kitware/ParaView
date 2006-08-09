@@ -54,11 +54,17 @@ protected:
   virtual void SetupPipeline();
   virtual void SetupDefaults();
 
+  virtual void InvalidateGeometryInternal(int useCache);
+  virtual int UpdateRequired();
+  virtual void Update();
+
   vtkSMProxy *OutlineFilterProxy;
   vtkSMProxy *OutlineCollectProxy;
   vtkSMProxy *OutlineUpdateSuppressorProxy;
 
   int SuppressGeometryCollection;
+
+  int OutlineGeometryIsValid;
 
 private:
   vtkSMIceTMultiDisplayProxy(const vtkSMIceTMultiDisplayProxy &);  // Not implemented
