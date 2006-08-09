@@ -135,58 +135,44 @@ void pqServerResources::save(pqSettings& settings)
   settings.setValue("ServerResources", resources);
 }
 
-void pqServerResources::open(const pqServerResource& resource)
+void pqServerResources::open(pqServer* server, const pqServerResource& resource)
 {
+  if(!server)
+    {
+    qCritical() << "Cannot open a resource with NULL server";
+    return;
+    }
+    
   if(resource.scheme() == "session")
     {
-    pqServer* const server = pqApplicationCore::instance()->createServer(
-      resource.sessionServer());
-    if(!server)
+    if(!resource.path().isEmpty())
       {
-      qCritical() << "Error creating server " << resource.sessionServer().toString() << "\n";
-      return;
-      }
-    
-    if(resource.path().isEmpty())
-      {
-      return;
-      }
+      // Read in the xml file to restore.
+      vtkSmartPointer<vtkPVXMLParser> xmlParser = vtkSmartPointer<vtkPVXMLParser>::New();
+      xmlParser->SetFileName(resource.path().toAscii().data());
+      xmlParser->Parse();
 
-    // Read in the xml file to restore.
-    vtkSmartPointer<vtkPVXMLParser> xmlParser = vtkSmartPointer<vtkPVXMLParser>::New();
-    xmlParser->SetFileName(resource.path().toAscii().data());
-    xmlParser->Parse();
-
-    // Get the root element from the parser.
-    if(vtkPVXMLElement* const root = xmlParser->GetRootElement())
-      {
-      pqApplicationCore::instance()->loadState(root, server, 0/*this->getActiveRenderModule()*/);
-      }
-    else
-      {
-      qCritical("Root does not exist. Either state file could not be opened "
-                "or it does not contain valid xml");
-      return;
+      // Get the root element from the parser.
+      if(vtkPVXMLElement* const root = xmlParser->GetRootElement())
+        {
+        pqApplicationCore::instance()->loadState(root, server, 0/*this->getActiveRenderModule()*/);
+        }
+      else
+        {
+        qCritical() << "Root does not exist. Either state file could not be opened "
+                  "or it does not contain valid xml";
+        }
       }
     }
   else
     {
-    pqServer* const server = pqApplicationCore::instance()->createServer(resource);
-    if(!server)
+    if(!resource.path().isEmpty())
       {
-      qCritical() << "Error creating server " << resource.toString() << "\n";
-      return;
-      }
-    
-    if(resource.path().isEmpty())
-      {
-      return;
-      }
-    
-    if(!pqApplicationCore::instance()->createReaderOnServer(resource.path(), server))
-      {
-      qCritical() << "Error opening file " << resource.path() << "\n";
-      return;
+      if(!pqApplicationCore::instance()->createReaderOnServer(resource.path(), server))
+        {
+        qCritical() << "Error opening file " << resource.path() << "\n";
+        return;
+        }
       }
     }
 }

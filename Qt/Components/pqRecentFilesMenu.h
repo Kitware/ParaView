@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
+class pqServer;
 class QAction;
 class QMenu;
 
@@ -55,7 +56,7 @@ private slots:
   void onResourcesChanged();
   void onOpenResource(QAction*);
   void onOpenResource();
-  void onServerStarted();
+  void onServerStarted(pqServer*);
 
 private:
   ~pqRecentFilesMenu();

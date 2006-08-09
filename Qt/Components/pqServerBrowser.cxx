@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqServerResource.h>
 #include <pqServerResources.h>
 
-#include <QMessageBox>
+#include <QtDebug>
 
 //////////////////////////////////////////////////////////////////////////////
 // pqServerBrowser::pqImplementation
@@ -71,12 +71,12 @@ pqServerBrowser::pqServerBrowser(QWidget* Parent) :
   this->setWindowTitle(tr("Pick Server:"));
   
   QObject::connect(
-    this->Implementation->UI.ServerType,
+    this->Implementation->UI.serverType,
     SIGNAL(activated(int)),
     this,
     SLOT(onServerTypeActivated(int)));
 
-  this->Implementation->UI.ServerType->setCurrentIndex(0);
+  this->Implementation->UI.serverType->setCurrentIndex(0);
   this->onServerTypeActivated(0);
   
   connect(
@@ -93,9 +93,9 @@ pqServerBrowser::pqServerBrowser(QWidget* Parent) :
   
   connect(
     &this->Implementation->ServerStartup,
-    SIGNAL(serverStarted()),
+    SIGNAL(serverStarted(pqServer*)),
     this,
-    SLOT(onServerStarted()));
+    SLOT(onServerStarted(pqServer*)));
 }
 
 pqServerBrowser::~pqServerBrowser()
@@ -105,15 +105,27 @@ pqServerBrowser::~pqServerBrowser()
 
 void pqServerBrowser::onServerTypeActivated(int Index)
 {
-  this->Implementation->UI.HostName->setEnabled(1 == Index);
-  this->Implementation->UI.PortNumber->setEnabled(1 == Index);
+  switch(Index)
+    {
+    case 0:
+      this->Implementation->UI.stackedWidget->setCurrentIndex(0);
+      break;
+    case 1:
+    case 2:
+      this->Implementation->UI.stackedWidget->setCurrentIndex(1);
+      break;
+    case 3:
+    case 4:
+      this->Implementation->UI.stackedWidget->setCurrentIndex(2);
+      break;
+    }
 }
 
 void pqServerBrowser::accept()
 {
   pqServerResource server;
   
-  switch(this->Implementation->UI.ServerType->currentIndex())
+  switch(this->Implementation->UI.serverType->currentIndex())
     {
     case 0:
       server.setScheme("builtin");
@@ -121,18 +133,39 @@ void pqServerBrowser::accept()
       
     case 1:
       server.setScheme("cs");
-      server.setHost(this->Implementation->UI.HostName->text());
-      server.setPort(this->Implementation->UI.PortNumber->value());
+      server.setHost(this->Implementation->UI.host->text());
+      server.setPort(this->Implementation->UI.port->value());
+      break;
+
+    case 2:
+      server.setScheme("csrc");
+      server.setHost(this->Implementation->UI.host->text());
+      server.setPort(this->Implementation->UI.port->value());
+      break;
+
+    case 3:
+      server.setScheme("cdsrs");
+      server.setDataServerHost(this->Implementation->UI.dataServerHost->text());
+      server.setDataServerPort(this->Implementation->UI.dataServerPort->value());
+      server.setRenderServerHost(this->Implementation->UI.renderServerHost->text());
+      server.setRenderServerPort(this->Implementation->UI.renderServerPort->value());
+      break;
+    
+    case 4:
+      server.setScheme("cdsrsrc");
+      server.setDataServerHost(this->Implementation->UI.dataServerHost->text());
+      server.setDataServerPort(this->Implementation->UI.dataServerPort->value());
+      server.setRenderServerHost(this->Implementation->UI.renderServerHost->text());
+      server.setRenderServerPort(this->Implementation->UI.renderServerPort->value());
       break;
 
     default:
-      QMessageBox::critical(this, tr("Pick Server:"), tr("Internal error: unknown server type"));
+      qCritical() << "Unknown server type";
       Superclass::accept();
       return;
     }
   
   this->Implementation->Server = server;
-
   this->Implementation->ServerStartup.startServer(server);
 }
 
@@ -146,10 +179,9 @@ void pqServerBrowser::onServerFailed()
   Superclass::accept();
 }
 
-void pqServerBrowser::onServerStarted()
+void pqServerBrowser::onServerStarted(pqServer* server)
 {
-  if(pqServer* const server = pqApplicationCore::instance()->createServer(
-    this->Implementation->Server))
+  if(server)
     {
     pqServerResources& resources =
       pqApplicationCore::instance()->serverResources();

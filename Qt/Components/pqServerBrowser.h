@@ -71,7 +71,7 @@ private slots:
   
   void onServerCancelled();
   void onServerFailed();
-  void onServerStarted();
+  void onServerStarted(pqServer*);
 
 private:
   pqServerBrowser(const pqServerBrowser&);

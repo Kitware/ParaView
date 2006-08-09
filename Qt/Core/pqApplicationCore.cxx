@@ -486,7 +486,7 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
 
       server = smModel->getServer(id);
       server->setResource(server_resource);
-      emit this->serverCreated(server);
+//      emit this->serverCreated(server);
       }
     }
 

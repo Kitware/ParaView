@@ -84,14 +84,23 @@ public:
 pqRecentFilesMenu::pqRecentFilesMenu(QMenu& menu) :
   Implementation(new pqImplementation(menu))
 {
-  connect(&pqApplicationCore::instance()->serverResources(),
-    SIGNAL(changed()), this, SLOT(onResourcesChanged()));
+  connect(
+    &pqApplicationCore::instance()->serverResources(),
+    SIGNAL(changed()),
+    this,
+    SLOT(onResourcesChanged()));
   
-  connect(&this->Implementation->Menu, SIGNAL(triggered(QAction*)),
-    this, SLOT(onOpenResource(QAction*)));
+  connect(
+    &this->Implementation->Menu,
+    SIGNAL(triggered(QAction*)),
+    this,
+    SLOT(onOpenResource(QAction*)));
     
-  connect(&this->Implementation->ServerStartup, SIGNAL(serverStarted()),
-    this, SLOT(onServerStarted()));
+  connect(
+    &this->Implementation->ServerStartup,
+    SIGNAL(serverStarted(pqServer*)),
+    this,
+    SLOT(onServerStarted(pqServer*)));
   
   this->onResourcesChanged();
 }
@@ -206,9 +215,9 @@ void pqRecentFilesMenu::onOpenResource()
   this->Implementation->ServerStartup.startServer(server);
 }
 
-void pqRecentFilesMenu::onServerStarted()
+void pqRecentFilesMenu::onServerStarted(pqServer* server)
 {
   pqServerResources& resources = pqApplicationCore::instance()->serverResources();
-  resources.open(this->Implementation->RecentResource);
+  resources.open(server, this->Implementation->RecentResource);
   resources.add(this->Implementation->RecentResource);
 }

@@ -97,6 +97,13 @@ pqCommandServerStartup::pqCommandServerStartup(const QString& command_line, doub
 void pqCommandServerStartup::execute(
   const pqServerResource& server, pqServerStartupContext& context)
 {
+  if(this->CommandLine.isEmpty())
+    {
+    qWarning() << "Can't execute empty command-line";
+    context.onFailed();
+    return;
+    }
+
   QStringList environment = QProcess::systemEnvironment();
   environment.push_back("PV_CONNECTION_URI=" + server.toString());
   environment.push_back("PV_CONNECTION_SCHEME=" + server.scheme());

@@ -261,7 +261,7 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
                    this, 
                    SLOT(serverRemoved(pqServer*)));
   
-  QObject::connect(core, SIGNAL(serverCreated(pqServer*)),
+  QObject::connect(core->getServerManagerModel(), SIGNAL(serverAdded(pqServer*)),
                    this, SLOT(serverAdded(pqServer*)));
   
   QObject::connect(core,

@@ -157,8 +157,6 @@ signals:
   
   void sourceCreated(pqPipelineSource*);
 
-  void serverCreated(pqServer*);
-
 protected:
   /// create signal/slot connections between pdata and smModel.
   void connect(pqServerManagerObserver* pdata, pqServerManagerModel* smModel);

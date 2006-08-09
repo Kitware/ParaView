@@ -71,8 +71,8 @@ public:
   /// Save the collection (to local user preferences)
   void save(pqSettings&);
 
-  /// Open (connect to) a resource
-  void open(const pqServerResource& resource);
+  /// Open a resource on the given server
+  void open(pqServer* server, const pqServerResource& resource);
 
 signals:
   /// Signal emitted whenever the collection is changed

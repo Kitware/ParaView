@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDialog>
 
+class pqServer;
 class pqServerResource;
 class pqServerStartups;
 class pqSettings;
@@ -70,7 +71,7 @@ public:
     
   ~pqSimpleServerStartup();
 
-  void startServer(const pqServerResource& server);
+  void startServer(const pqServerResource& resource);
 
 signals:
   /// Signal emitted if the user cancels startup
@@ -78,15 +79,20 @@ signals:
   /// Signal emitted if the server fails to start
   void serverFailed();
   /// Signal emitted if the server successfully starts
-  void serverStarted();
+  void serverStarted(pqServer*);
 
 private slots:
-  void onServerFailed();
-  void onServerStarted();
+  void forwardConnectServer();
+  void monitorReverseConnections();
+  void reverseConnection(pqServer*);
 
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
+  
+  void startBuiltinConnection();
+  void startForwardConnection();
+  void startReverseConnection();
 };
 
 #endif
