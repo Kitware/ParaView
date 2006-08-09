@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWPushButtonWithMenu );
-vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.10");
+vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWPushButtonWithMenu::vtkKWPushButtonWithMenu()
@@ -64,7 +64,7 @@ void vtkKWPushButtonWithMenu::CreateWidget()
   this->MenuButton->IndicatorVisibilityOff();
   this->MenuButton->SetImageToPredefinedIcon(vtkKWIcon::IconExpandMini);
 
-  this->Script("pack %s -side left -expand y -fill y",
+  this->Script("pack %s -side left -fill y",
                this->MenuButton->GetWidgetName());
 }
   

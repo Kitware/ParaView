@@ -5,7 +5,7 @@
 static const unsigned int  image_PVResetViewButton_width          = 32;
 static const unsigned int  image_PVResetViewButton_height         = 32;
 static const unsigned int  image_PVResetViewButton_pixel_size     = 3;
-static const unsigned long image_PVResetViewButton_length         = 1028;
+static const unsigned long image_PVResetViewButton_length         = 1012;
 static const unsigned long image_PVResetViewButton_decoded_length = 3072;
 
 static const unsigned char image_PVResetViewButton[] = 
@@ -23,5 +23,5 @@ static const unsigned char image_PVResetViewButton[] =
   "c7IGC+n98cYMpsa5kHqRSA2gvybfBEAbzUhRSwyBENtBFoHdwvNVUdDXUTqyvb0QIT6B6g"
   "LWhFNzwKkIsUuKWQNgNQI650hYmA7gQGF9wW5CiAl4pAQQYwIKYYx0RABwNtgQcX3LWQMA"
   "wIkAM2cggW4AQRPLiQQ0NFhQESSsTXcfiLcR4eBiCChwPca/gLcKBGNARMAAwYAGgsBKFF"
-  "H1AEaCkwiAhqxGUCkQFInkZIbkUGtGgP09RwzKoKAOPrhh4=";
+  "H1AEaCkwiAhqxGUCkQFInsZhiQCjXpvq";
 

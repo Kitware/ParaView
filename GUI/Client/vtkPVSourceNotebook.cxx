@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.30");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVSourceNotebook::vtkPVSourceNotebook()
@@ -325,15 +325,16 @@ void vtkPVSourceNotebook::CreateWidget()
   this->AcceptButton->Create();
   if (this->AutoAccept)
     {
-    this->AcceptButton->SetText("Auto Accept");
+    this->AcceptButton->GetPushButton()->SetText("Auto Accept");
     this->Script("%s config -relief flat", this->AcceptButton->GetWidgetName());
     }
   else
     {
-    this->AcceptButton->SetText("Accept");
+    this->AcceptButton->GetPushButton()->SetText("Accept");
     this->Script("%s config -relief raised", this->AcceptButton->GetWidgetName());
     }    
-  this->AcceptButton->SetCommand(this, "AcceptButtonCallback");
+  this->AcceptButton->GetPushButton()->SetCommand(
+    this, "AcceptButtonCallback");
   this->AcceptButton->SetBalloonHelpString(
     "Cause the current values in the user interface to take effect "
     "(key shortcut: Ctrl+Enter)");
@@ -430,13 +431,13 @@ void vtkPVSourceNotebook::SetAutoAccept(int val)
 
   if (val)
     {
-    this->AcceptButton->SetText("Auto Accept");
+    this->AcceptButton->GetPushButton()->SetText("Auto Accept");
     // Just in case the source is already modified.
     this->AcceptButtonCallback();
     }
   else
     {
-    this->AcceptButton->SetText("Accept");
+    this->AcceptButton->GetPushButton()->SetText("Accept");
     }
 }
 
@@ -502,9 +503,9 @@ void vtkPVSourceNotebook::SetAcceptButtonColorToModified()
     }
   
   this->Script("%s configure -background #17b27e",
-               this->AcceptButton->GetWidgetName());
+               this->AcceptButton->GetPushButton()->GetWidgetName());
   this->Script("%s configure -activebackground #17b27e",
-               this->AcceptButton->GetWidgetName());
+               this->AcceptButton->GetPushButton()->GetWidgetName());
 }
 //----------------------------------------------------------------------------
 void vtkPVSourceNotebook::SetAcceptButtonColorToUnmodified()
@@ -517,17 +518,17 @@ void vtkPVSourceNotebook::SetAcceptButtonColorToUnmodified()
 
 #ifdef _WIN32
   this->Script("%s configure -background [lindex [%s configure -background] 3]",
-               this->AcceptButton->GetWidgetName(),
-               this->AcceptButton->GetWidgetName());
+               this->AcceptButton->GetPushButton()->GetWidgetName(),
+               this->AcceptButton->GetPushButton()->GetWidgetName());
   this->Script("%s configure -activebackground "
                "[lindex [%s configure -activebackground] 3]",
-               this->AcceptButton->GetWidgetName(),
-               this->AcceptButton->GetWidgetName());
+               this->AcceptButton->GetPushButton()->GetWidgetName(),
+               this->AcceptButton->GetPushButton()->GetWidgetName());
 #else
   this->Script("%s configure -background #ccc",
-               this->AcceptButton->GetWidgetName());
+               this->AcceptButton->GetPushButton()->GetWidgetName());
   this->Script("%s configure -activebackground #eee",
-               this->AcceptButton->GetWidgetName());
+               this->AcceptButton->GetPushButton()->GetWidgetName());
 #endif
 }
 

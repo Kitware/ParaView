@@ -181,7 +181,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.792");
+vtkCxxRevisionMacro(vtkPVWindow, "1.793");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -1029,8 +1029,10 @@ void vtkPVWindow::InitializeInteractorInterfaces()
   
   this->ResetCameraButton->SetParent(this->InteractorToolbar->GetFrame());
   this->ResetCameraButton->Create();
-  this->ResetCameraButton->SetConfigurationOption("-image", "PVResetViewButton");
-  this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
+  this->ResetCameraButton->GetPushButton()->SetConfigurationOption(
+    "-image", "PVResetViewButton");
+  this->ResetCameraButton->GetPushButton()->SetCommand(
+    this, "ResetCameraCallback");
   this->ResetCameraButton->SetBalloonHelpString("Reset the view to show everything visible.");
   this->InteractorToolbar->AddWidget(this->ResetCameraButton);
   
