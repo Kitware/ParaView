@@ -25,7 +25,7 @@
 #include "vtkSelectionSerializer.h"
 
 vtkStandardNewMacro(vtkSelectionConverter);
-vtkCxxRevisionMacro(vtkSelectionConverter, "1.1");
+vtkCxxRevisionMacro(vtkSelectionConverter, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSelectionConverter::vtkSelectionConverter()
@@ -88,7 +88,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output)
     }
 
   vtkIdTypeArray* mapArray = vtkIdTypeArray::SafeDownCast(
-    ds->GetCellData()->GetArray("MapArray"));
+    ds->GetCellData()->GetArray("vtkOriginalCellIds"));
   if (!mapArray)
     {
     return;
