@@ -274,6 +274,19 @@ static const unsigned char image_expand[] =
 
 /* 
  * Resource generated for file:
+ *    expand_mini.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_expand_mini_width          = 5;
+static const unsigned int  image_expand_mini_height         = 3;
+static const unsigned int  image_expand_mini_pixel_size     = 4;
+static const unsigned long image_expand_mini_length         = 32;
+static const unsigned long image_expand_mini_decoded_length = 60;
+
+static const unsigned char image_expand_mini[] = 
+  "eNpjYGD4z4CGgYABnQ/DyHwAkMca5g==";
+
+/* 
+ * Resource generated for file:
  *    eye.png (zlib, base64) (image file)
  */
 static const unsigned int  image_eye_width          = 11;

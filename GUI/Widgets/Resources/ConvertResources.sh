@@ -27,6 +27,7 @@ KWConvertImageToHeader --zlib --base64 \
     error_mini.png \
     error_red_mini.png \
     expand.png \
+    expand_mini.png \
     eye.png \
     file_open.png \
     floppy.png \
