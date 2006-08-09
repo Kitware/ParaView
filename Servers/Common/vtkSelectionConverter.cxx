@@ -25,7 +25,7 @@
 #include "vtkSelectionSerializer.h"
 
 vtkStandardNewMacro(vtkSelectionConverter);
-vtkCxxRevisionMacro(vtkSelectionConverter, "1.2");
+vtkCxxRevisionMacro(vtkSelectionConverter, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSelectionConverter::vtkSelectionConverter()
@@ -40,6 +40,8 @@ vtkSelectionConverter::~vtkSelectionConverter()
 //----------------------------------------------------------------------------
 void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output)
 {
+  output->Clear();
+
   vtkInformation* inputProperties =  input->GetProperties();
   vtkInformation* outputProperties = output->GetProperties();
   
@@ -100,9 +102,10 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output)
     inputList->GetNumberOfComponents();
   outputArray->SetNumberOfTuples(numCells);
 
-  for (vtkIdType i=0; i<numCells; i++)
+  for (vtkIdType cellId=0; cellId<numCells; cellId++)
     {
-    outputArray->SetValue(i, mapArray->GetValue(inputList->GetValue(i)));
+    outputArray->SetValue(cellId, 
+                          mapArray->GetValue(inputList->GetValue(cellId)));
     }
 
   outputProperties->Set(
