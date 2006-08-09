@@ -102,13 +102,17 @@ protected:
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
 
-  void ExecuteBlock(vtkDataObject* input, vtkPolyData* output, int doCommunicate);
+  void ExecuteBlock(vtkDataObject* input, 
+                    vtkPolyData* output, 
+                    int doCommunicate);
 
   void DataSetExecute(vtkDataSet* input, vtkPolyData* output,
                       int doCommunicate);
   void GenericDataSetExecute(vtkGenericDataSet* input, vtkPolyData* output,
                              int doCommunicate);
-  void ImageDataExecute(vtkImageData* input, vtkPolyData* output, int doCommunicate);
+  void ImageDataExecute(vtkImageData* input, 
+                        vtkPolyData* output, 
+                        int doCommunicate);
   void StructuredGridExecute(vtkStructuredGrid* input, vtkPolyData* output);
   void RectilinearGridExecute(vtkRectilinearGrid* input, vtkPolyData* output);
   void UnstructuredGridExecute(
