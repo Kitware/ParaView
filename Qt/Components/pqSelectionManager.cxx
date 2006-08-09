@@ -839,7 +839,6 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
   for (int i=0; i<numRenModules; i++)
     {
     pqRenderModule* renModule = model->getRenderModule(i);
-    vtkSMRenderModuleProxy* renModuleProxy = renModule->getRenderModuleProxy();
     if (connId == geomProxy->GetConnectionID())
       {
       renModule->render();
