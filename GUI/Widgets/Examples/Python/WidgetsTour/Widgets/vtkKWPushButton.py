@@ -1,5 +1,7 @@
 from kwwidgets import vtkKWPushButton
 from kwwidgets import vtkKWPushButtonWithLabel
+from kwwidgets import vtkKWPushButtonWithMenu
+from kwwidgets import vtkKWMenu
 from kwwidgets import vtkKWPushButtonSet
 from kwwidgets import vtkKWApplication
 from kwwidgets import vtkKWWindow
@@ -74,6 +76,28 @@ def vtkKWPushButtonEntryPoint(parent, win):
         "pack %s -side top -anchor nw -expand n -padx 2 -pady 6",
         pushbutton3.GetWidgetName())
     
+    # -----------------------------------------------------------------------
+
+    # Create another push button, with a menu
+
+    pushbutton4 = vtkKWPushButtonWithMenu()
+    pushbutton4.SetParent(parent)
+    pushbutton4.Create()
+    pushbutton4.GetPushButton().SetImageToPredefinedIcon(
+        vtkKWIcon.IconTransportRewind)
+    pushbutton4.SetBalloonHelpString(
+        "This is a vtkKWPushButtonWithMenu, i.e. a pushbutton associated to a "
+        "menu.")
+    
+    menu = pushbutton4.GetMenu()
+    menu.AddCommand("Microsoft Office")
+    menu.AddCommand("Program Files")
+    menu.AddCommand("C:")
+    
+    app.Script(
+        "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
+        pushbutton4.GetWidgetName())
+
     # -----------------------------------------------------------------------
     
     # Create a set of pushbutton

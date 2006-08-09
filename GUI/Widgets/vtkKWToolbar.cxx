@@ -19,6 +19,8 @@
 #include "vtkKWRadioButton.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWPushButtonWithMenu.h"
+#include "vtkKWMenuButton.h"
 
 #include <vtksys/stl/list>
 #include <vtksys/stl/algorithm>
@@ -36,7 +38,7 @@ const char *vtkKWToolbar::WidgetsAspectRegKey = "ToolbarFlatButtons";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.68");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.69");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -477,6 +479,8 @@ void vtkKWToolbar::UpdateWidgetsAspect()
     vtkKWPushButton *pb = vtkKWPushButton::SafeDownCast(*it);
     vtkKWCheckButton *cb = vtkKWCheckButton::SafeDownCast(*it);
     vtkKWRadioButton *rb = vtkKWRadioButton::SafeDownCast(*it);
+    vtkKWPushButtonWithMenu *pbwm = vtkKWPushButtonWithMenu::SafeDownCast(*it);
+    vtkKWMenuButton *mb = vtkKWMenuButton::SafeDownCast(*it);
     if (pb)
       {
       if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectFlat)
@@ -490,6 +494,42 @@ void vtkKWToolbar::UpdateWidgetsAspect()
         pb->SetReliefToRaised();
         pb->SetOverReliefToNone();
         pb->SetBorderWidth(1);
+        }
+      }
+    else if (mb)
+      {
+      if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectFlat)
+        {
+        mb->SetReliefToFlat();
+        mb->SetBorderWidth(1);
+        }
+      else if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectRelief)
+        {
+        mb->SetReliefToRaised();
+        mb->SetBorderWidth(1);
+        }
+      }
+    else if (pbwm)
+      {
+      mb = pbwm->GetMenuButton();
+      pb = pbwm->GetPushButton();
+      if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectFlat)
+        {
+        pb->SetReliefToFlat();
+        pb->SetOverReliefToSolid();
+        pb->SetBorderWidth(1);
+
+        mb->SetReliefToFlat();
+        mb->SetBorderWidth(1);
+        }
+      else if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectRelief)
+        {
+        pb->SetReliefToRaised();
+        pb->SetOverReliefToNone();
+        pb->SetBorderWidth(1);
+
+        mb->SetReliefToRaised();
+        mb->SetBorderWidth(1);
         }
       }
     else if (cb)

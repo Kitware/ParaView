@@ -15,22 +15,35 @@
 #include "vtkKWPushButtonWithMenu.h"
 
 #include "vtkKWMenu.h"
+#include "vtkKWMenuButton.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWIcon.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWPushButtonWithMenu );
-vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.9");
+vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWPushButtonWithMenu::vtkKWPushButtonWithMenu()
 {
-  this->Menu = vtkKWMenu::New();
+  this->PushButton = vtkKWPushButton::New();
+  this->MenuButton = vtkKWMenuButton::New();
 }
 
 //----------------------------------------------------------------------------
 vtkKWPushButtonWithMenu::~vtkKWPushButtonWithMenu()
 {
-  this->Menu->Delete();
-  this->Menu = NULL;
+  if (this->PushButton)
+    {
+    this->PushButton->Delete();
+    this->PushButton = NULL;
+    }
+
+  if (this->MenuButton)
+    {
+    this->MenuButton->Delete();
+    this->MenuButton = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -39,23 +52,30 @@ void vtkKWPushButtonWithMenu::CreateWidget()
   // Call the superclass to create the widget and set the appropriate flags
 
   this->Superclass::CreateWidget();
-  this->Menu->SetParent(this);
-  this->Menu->Create();  
 
-  this->SetBinding("<ButtonPress-3>", this, "PopupCallback %X %Y");
+  this->PushButton->SetParent(this);
+  this->PushButton->Create();  
+
+  this->Script("pack %s -side left -expand y -fill both",
+               this->PushButton->GetWidgetName());
+
+  this->MenuButton->SetParent(this);
+  this->MenuButton->Create();
+  this->MenuButton->IndicatorVisibilityOff();
+  this->MenuButton->SetImageToPredefinedIcon(vtkKWIcon::IconExpandMini);
+
+  this->Script("pack %s -side left -expand y -fill y",
+               this->MenuButton->GetWidgetName());
 }
   
-  
-//----------------------------------------------------------------------------
-void vtkKWPushButtonWithMenu::PopupCallback(int x, int y)
-{ 
-  this->Menu->PopUp(x, y);
-}
-
 //----------------------------------------------------------------------------
 vtkKWMenu* vtkKWPushButtonWithMenu::GetMenu()
 {
-  return this->Menu;
+  if (this->MenuButton)
+    {
+    return this->MenuButton->GetMenu();
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -63,7 +83,8 @@ void vtkKWPushButtonWithMenu::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->Menu);
+  this->PropagateEnableState(this->PushButton);
+  this->PropagateEnableState(this->MenuButton);
 }
 
 //----------------------------------------------------------------------------

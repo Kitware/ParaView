@@ -58,6 +58,25 @@ proc vtkKWPushButtonEntryPoint {parent win} {
 
   # -----------------------------------------------------------------------
 
+  # Create another push button, with a menu
+
+  set pushbutton4 [vtkKWPushButtonWithMenu New]
+  $pushbutton4 SetParent $parent
+  $pushbutton4 Create
+  [$pushbutton4 GetPushButton] SetImageToPredefinedIcon 128
+  $pushbutton4 SetBalloonHelpString \
+      "This is a vtkKWPushButtonWithMenu, i.e. a pushbutton associated to a\
+      menu."
+
+  set menu [$pushbutton4 GetMenu]
+  $menu AddCommand "Microsoft Office"
+  $menu AddCommand "Program Files"
+  $menu AddCommand "C:"
+
+  pack [$pushbutton4 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+
+  # -----------------------------------------------------------------------
+
   # Create a set of pushbutton
   # An easy way to create a bunch of related widgets without allocating
   # them one by one

@@ -19,20 +19,24 @@
 #ifndef __vtkKWPushButtonWithMenu_h
 #define __vtkKWPushButtonWithMenu_h
 
-#include "vtkKWPushButton.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWMenu;
+class vtkKWPushButton;
+class vtkKWMenuButton;
 
-class KWWidgets_EXPORT vtkKWPushButtonWithMenu : public vtkKWPushButton
+class KWWidgets_EXPORT vtkKWPushButtonWithMenu : public vtkKWCompositeWidget
 {
 public:
   static vtkKWPushButtonWithMenu* New();
-  vtkTypeRevisionMacro(vtkKWPushButtonWithMenu, vtkKWPushButton);
+  vtkTypeRevisionMacro(vtkKWPushButtonWithMenu, vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description: 
-  // Access to the menu
+  // Get internal objects.
   virtual vtkKWMenu* GetMenu();
+  vtkGetObjectMacro(MenuButton, vtkKWMenuButton);
+  vtkGetObjectMacro(PushButton, vtkKWPushButton);
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -43,10 +47,6 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
-  // Description:
-  // Callbacks. Internal, do not use.
-  virtual void PopupCallback(int x, int y);
-
 protected:
   vtkKWPushButtonWithMenu();
   ~vtkKWPushButtonWithMenu();
@@ -55,7 +55,8 @@ protected:
   // Create the widget.
   virtual void CreateWidget();
     
-  vtkKWMenu *Menu;
+  vtkKWMenuButton *MenuButton;
+  vtkKWPushButton *PushButton;
 
 private:
   vtkKWPushButtonWithMenu(const vtkKWPushButtonWithMenu&); // Not implemented

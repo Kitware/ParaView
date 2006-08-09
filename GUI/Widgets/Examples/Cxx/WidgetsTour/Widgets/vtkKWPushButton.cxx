@@ -1,8 +1,10 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonWithLabel.h"
+#include "vtkKWPushButtonWithMenu.h"
 #include "vtkKWPushButtonSet.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
+#include "vtkKWMenu.h"
 #include "vtkKWIcon.h"
 #include "vtkMath.h"
 
@@ -84,6 +86,28 @@ void vtkKWPushButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   // -----------------------------------------------------------------------
 
+  // Create another push button, with a menu
+
+  vtkKWPushButtonWithMenu *pushbutton4 = vtkKWPushButtonWithMenu::New();
+  pushbutton4->SetParent(parent);
+  pushbutton4->Create();
+  pushbutton4->GetPushButton()->SetImageToPredefinedIcon(
+    vtkKWIcon::IconTransportRewind);
+  pushbutton4->SetBalloonHelpString(
+    "This is a vtkKWPushButtonWithMenu, i.e. a pushbutton associated to a "
+    "menu.");
+
+  vtkKWMenu *menu = pushbutton4->GetMenu();
+  menu->AddCommand("Microsoft Office");
+  menu->AddCommand("Program Files");
+  menu->AddCommand("C:");
+
+  app->Script(
+    "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
+    pushbutton4->GetWidgetName());
+
+  // -----------------------------------------------------------------------
+
   // Create a set of pushbutton
   // An easy way to create a bunch of related widgets without allocating
   // them one by one
@@ -125,6 +149,7 @@ void vtkKWPushButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
   pushbutton2->Delete();
   pushbutton2b->Delete();
   pushbutton3->Delete();
+  pushbutton4->Delete();
   pushbutton_set->Delete();
 
   // TODO: add callbacks
