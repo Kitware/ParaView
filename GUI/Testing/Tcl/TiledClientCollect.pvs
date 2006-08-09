@@ -1,0 +1,17 @@
+set kw(vtkTemp6) [$Application GetMainWindow]
+set kw(vtkTemp86) [$kw(vtkTemp6) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp86) $argv $argc
+
+set kw(vtkTemp1204) [$kw(vtkTemp6) CreatePVSource SphereSource]
+$kw(vtkTemp6) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp6) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp1204) AcceptCallback
+set kw(vtkTemp448) [$kw(vtkTemp86) GetRenderModuleUI]
+catch {$kw(vtkTemp448) SetCollectThreshold 0.000000}
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit

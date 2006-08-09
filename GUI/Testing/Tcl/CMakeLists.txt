@@ -452,6 +452,20 @@ IF (PARAVIEW_TEST_TILED_DISPLAY)
     -FrontBuffer
     -NoRerender
     )
+  ADD_TEST(TiledClientCollect
+    ${PARAVIEW_CS_EXECUTABLE}
+    --test-tiled
+    ${TIMEOUT}
+    --disable-registry
+    ${PVClientTests_SOURCE_DIR}/Tcl/TiledClientCollect.pvs
+    -UC
+    -D ${PVClientTestData}
+    -C ${PVCompareImages}
+    -T ${ParaView_BINARY_DIR}/Testing/Temporary
+    -V ${PVClientTestData}/Baseline/TiledClientCollect.png
+    -FrontBuffer
+    -NoRerender
+    )
 ENDIF (PARAVIEW_TEST_TILED_DISPLAY)
 
 # Test the PVLocal plugin example.
