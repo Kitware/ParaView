@@ -460,6 +460,24 @@ public:
     const char* renderserver_host, int renderserver_port);
 
   // Description:
+  // Setups up a server socket on the given port. On success, returns a non-zero
+  // identifier for the server socket which can be used to close the socket
+  // using StopAcceptingConnections(). 
+  int AcceptConnectionsOnPort(int port);
+
+  // Description:
+  // Setups up a server socket on the given port. On success, 
+  // ds_id and rs_id are set to non-zero identifiers for the data and render
+  // server sockets, respectively.
+  void AcceptConnectionsOnPort(int data_server_port, int render_server_port,
+    int &ds_id, int &rs_id);
+
+  // Description:
+  // Closes a server socket with the given id. The id is the same id returned 
+  // by AcceptConnectionsOnPort().
+  void StopAcceptingConnections(int id);
+
+  // Description:
   // This creates a new SelfConnection. This is experimental feature.
   vtkIdType ConnectToSelf();
 
