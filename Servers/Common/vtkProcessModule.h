@@ -497,12 +497,13 @@ public:
   // Checks if any new connections are available, if so, creates
   // vtkConnections for them. The call will wait for a timeout of msec
   // milliseconds for a new connection to arrive. Timeout of 0 will wait
-  // until a new connection arrives.  This method is intended to be used on
-  // the client when running in reverse connection mode with
+  // indefinitely until a new connection arrives.  This method is intended
+  // for use by the client when running in reverse connection mode with
   // SupportMultipleConnections set to 1. When SupportMultipleConnections
   // is set to 1 Start() does not wait for server to attempt to connect to
   // the client.  The gui must explicitly call this method to check if any
-  // new connections are pending.
+  // new connections are pending.  Return value: -1 on error, 0 on timeout,
+  // 1 if a new connection has been established.
   int MonitorConnections(unsigned long msec);
   
   // Description:

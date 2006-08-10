@@ -102,7 +102,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.58");
+vtkCxxRevisionMacro(vtkProcessModule, "1.59");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -667,15 +667,14 @@ int vtkProcessModule::IsRemote(vtkIdType id)
 //-----------------------------------------------------------------------------
 int vtkProcessModule::MonitorConnections(unsigned long msec)
 {
-  int ret;
-  while ((ret =this->ConnectionManager->MonitorConnections(msec)) != -1)
+  switch(this->ConnectionManager->MonitorConnections(msec))
     {
-    if (ret == 2)
-      {
-      // new connection established.
+    case -1:
+      return -1;
+    case 2:
       return 1;
-      }
     }
+    
   return 0;
 }
 

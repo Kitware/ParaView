@@ -311,7 +311,12 @@ void pqSimpleServerStartup::startReverseConnection()
 void pqSimpleServerStartup::monitorReverseConnections()
 {
   vtkProcessModule* const process_module = vtkProcessModule::GetProcessModule();
-  process_module->MonitorConnections(10);
+  if(-1 == process_module->MonitorConnections(10))
+    {
+    this->Implementation->ReverseTimer.stop();
+    this->Implementation->StartupDialog->hide();
+    emit this->serverFailed();
+    }
 }
 
 void pqSimpleServerStartup::reverseConnection(pqServer* server)
