@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectPanel.h"
 
+class pqImplicitPlaneWidget;
+
 /// Custom panel for the Cut filter that manages a 3D widget for interactive cutting
 class pqCutPanel :
   public pqObjectPanel
@@ -46,6 +48,8 @@ class pqCutPanel :
 public:
   pqCutPanel(QWidget* p);
   ~pqCutPanel();
+
+  pqImplicitPlaneWidget* getImplicitPlaneWidget();
   
 private slots:
   /// Called if the user accepts pending modifications

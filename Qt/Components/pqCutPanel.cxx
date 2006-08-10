@@ -225,3 +225,8 @@ void pqCutPanel::deselect()
 {
   this->Implementation->ImplicitPlaneWidget.deselect();
 }
+
+pqImplicitPlaneWidget* pqCutPanel::getImplicitPlaneWidget()
+{
+  return &this->Implementation->ImplicitPlaneWidget;
+}
