@@ -100,9 +100,6 @@ MainWindow::MainWindow() :
     QString("ParaView %1 (alpha)").arg(PARAVIEW_VERSION_FULL));
 
   // Setup menus and toolbars ...
-  connect(this->Implementation->UI.actionFileNew,
-    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onFileNew()));
-
   connect(this->Implementation->UI.actionFileOpen,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onFileOpen()));
   connect(
@@ -376,10 +373,6 @@ MainWindow::MainWindow() :
 
   // Set up the action icons ...
   QIcon icon;
-  icon.addFile(":/pqWidgets/Icons/pqNewProject16.png", QSize(16, 16));
-  icon.addFile(":/pqWidgets/Icons/pqNewProject22.png", QSize(22, 22));
-  icon.addFile(":/pqWidgets/Icons/pqNewProject32.png", QSize(32, 32));
-  this->Implementation->UI.actionFileNew->setIcon(icon);
   icon = QIcon();
   icon.addFile(":/pqWidgets/Icons/pqOpen16.png", QSize(16, 16));
   icon.addFile(":/pqWidgets/Icons/pqOpen22.png", QSize(22, 22));

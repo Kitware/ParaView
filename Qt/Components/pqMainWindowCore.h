@@ -204,8 +204,6 @@ signals:
 
 
 public slots:
-  void onFileNew();
-
   virtual void onFileOpen();
   virtual void onFileOpen(pqServer* Server);
   virtual void onFileOpen(const QStringList& Files);

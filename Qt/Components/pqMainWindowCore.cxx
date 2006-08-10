@@ -724,17 +724,6 @@ void pqMainWindowCore::initializeStates()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onFileNew()
-{
-  pqServer* server = this->getActiveServer();
-  if (server)
-    {
-    pqApplicationCore::instance()->removeServer(server);
-    }
-  this->onInitializeStates();
-}
-
-//-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileOpen()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -1129,8 +1118,12 @@ void pqMainWindowCore::onServerConnect()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onServerDisconnect()
 {
-  // for now, they both are same.
-  this->onFileNew();
+  pqServer* server = this->getActiveServer();
+  if (server)
+    {
+    pqApplicationCore::instance()->removeServer(server);
+    }
+  this->onInitializeStates();
 }
 
 void pqMainWindowCore::onToolsCreateCustomFilter()
