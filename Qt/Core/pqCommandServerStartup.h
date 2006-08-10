@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // pqCommandServerStartup
 
 /// Concrete implementation of pqServerStartup that runs an external
-/// shell command to start a remote server.
+/// command to start a remote server.
 class pqCommandServerStartup :
   public pqServerStartup
 {
