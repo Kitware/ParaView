@@ -35,7 +35,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.75");
+vtkCxxRevisionMacro(vtkSMProxy, "1.76");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1168,6 +1168,13 @@ void vtkSMProxy::ExecuteSubProxyEvent(vtkSMProxy* subproxy,
     // some internal property has changed.
     this->InvokeEvent(vtkCommand::PropertyModifiedEvent, (void*)exposed_name);
     }
+  else if (subproxy && event == vtkCommand::ModifiedEvent)
+    {
+    vtkSMProxy* modifiedProxy = vtkSMProxy::SafeDownCast(
+      reinterpret_cast<vtkObjectBase*>(data));
+    this->MarkConsumersAsModified(modifiedProxy);
+    this->InvokeEvent(vtkCommand::ModifiedEvent, modifiedProxy);
+    }
 
   // Note we are not throwing vtkCommand::UpdateEvent fired by subproxies.
   // Since doing so would imply that this proxy (as well as all its subproxies)
@@ -1257,6 +1264,7 @@ void vtkSMProxy::MarkModified(vtkSMProxy* modifiedProxy)
     this->UpdatePropertyInformation();
     }
   */
+  this->InvokeEvent(vtkCommand::ModifiedEvent, (void*)modifiedProxy);
   this->MarkConsumersAsModified(modifiedProxy);
 }
 
