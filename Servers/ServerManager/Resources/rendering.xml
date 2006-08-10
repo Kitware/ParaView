@@ -1761,6 +1761,26 @@
 
     <MultiViewRenderModuleProxy name="MultiViewRenderModule">
     </MultiViewRenderModuleProxy>
+
+    <ViewModuleProxy name="ViewModule">
+      <Property 
+        name="StillRender" 
+        command="StillRender" 
+        update_self="1">
+      </Property>
+      <Property name="InteractiveRender" 
+        command="InteractiveRender" update_self="1">
+      </Property>
+      <ProxyProperty
+        name="Displays"
+        command="AddDisplay"
+        update_self="1"
+        remove_command="RemoveDisplay">
+        <ProxyGroupDomain name="groups">
+          <Group name="viewdisplays" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    </ViewModuleProxy>
   </ProxyGroup>
   
   <ProxyGroup name="interactors">
@@ -3083,6 +3103,45 @@
       </SubProxy>
     </New3DWidgetProxy>
     <!-- End of displays group -->
+  </ProxyGroup>
+
+  <ProxyGroup name="viewdisplays">
+    <GenericViewDisplayProxy name="GenericViewDisplay">
+       <InputProperty
+        name="Input"
+        command="SetInput-not-used"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+          <Group name="glyph_sources" />
+        </ProxyGroupDomain>
+      </InputProperty>
+      <Property
+        name="Update"
+        command="Update"
+        is_internal="1"
+        update_self="1">
+      </Property>
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="UpdateSuppressor" 
+          proxygroup="filters" proxyname="UpdateSuppressor" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+    </GenericViewDisplayProxy>
+    <!-- End of view displays group -->
   </ProxyGroup>
 
   <ProxyGroup name="PropPickers">

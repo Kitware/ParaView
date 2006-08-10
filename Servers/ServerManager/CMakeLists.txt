@@ -52,7 +52,7 @@ SET(Kit_SRCS
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx
   vtkSMFixedTypeDomain.cxx
-  vtkSMGenericViewDisplay.cxx
+  vtkSMGenericViewDisplayProxy.cxx
   vtkSMIceTDesktopRenderModuleProxy.cxx
   vtkSMIceTMultiDisplayProxy.cxx
   vtkSMIceTRenderModuleProxy.cxx
