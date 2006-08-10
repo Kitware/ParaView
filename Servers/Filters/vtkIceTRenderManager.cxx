@@ -94,7 +94,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.37");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.38");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -1230,9 +1230,10 @@ void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
 
   os << indent << "Display: " << this->TileDimensions[0]
      << " X " << this->TileDimensions[1] << " with display ranks" << endl;
+  vtkIndent rankIndent = indent.GetNextIndent();
   for (y = 0; y < this->TileDimensions[1]; y++)
     {
-    os << indent << "    ";
+    os << rankIndent;
     for (x = 0; x < this->TileDimensions[0]; x++)
       {
       os.width(4);
@@ -1241,4 +1242,6 @@ void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
     os << endl;
     }
   os.width(0);
+  os << indent << "Mullions: " << this->TileMullions[0] << ", "
+     << this->TileMullions[1] << endl;
 }
