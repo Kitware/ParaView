@@ -3,6 +3,7 @@ PROJECT(QtTesting)
 INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
   ${QtTesting_SOURCE_DIR}
+  ${QT_QTTEST_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
 )
 
@@ -84,8 +85,6 @@ ADD_LIBRARY(QtTesting
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.cxx
   pqSpinBoxEventTranslator.h
-  pqTesting.cxx
-  pqTesting.h
   pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
   ${MOC_BUILT_SOURCES}
@@ -98,8 +97,8 @@ SOURCE_GROUP("Generated" FILES
 )
 
 TARGET_LINK_LIBRARIES(QtTesting
-  ${QT_LIBRARIES}
-  ${QT_XML_LIBRARIES}
+  ${QT_LIBRARIES} 
+  ${QT_QTTEST_LIBRARY}
 )
 
 INSTALL(TARGETS QtTesting

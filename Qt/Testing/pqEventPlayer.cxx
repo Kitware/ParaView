@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBasicWidgetEventPlayer.h"
 #include "pqEventPlayer.h"
 #include "pqObjectNaming.h"
-#include "pqTesting.h"
 
 #include <QApplication>
 #include <QObject>
