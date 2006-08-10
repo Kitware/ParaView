@@ -23,7 +23,7 @@
 
 
 vtkStandardNewMacro(vtkSMProxyRegisterUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyRegisterUndoElement, "1.4");
+vtkCxxRevisionMacro(vtkSMProxyRegisterUndoElement, "1.5");
 vtkCxxSetObjectMacro(vtkSMProxyRegisterUndoElement, XMLElement,
   vtkPVXMLElement);
 //-----------------------------------------------------------------------------
@@ -94,6 +94,7 @@ int vtkSMProxyRegisterUndoElement::Undo()
   
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   pxm->UnRegisterProxy(group_name, proxy_name, proxy);
+  proxy->Delete();
 
   // Unregistering may trigger deletion of the proxy.
   return 1;
