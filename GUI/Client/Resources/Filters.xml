@@ -1748,6 +1748,7 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
                    property="RandomMode"
                    help="Choose points at random to mask" />
   </Module>
+
   <Module name="Pick"
           class="vtkPVPick"
           root_name="Pick"
@@ -2628,4 +2629,19 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
                         property="Value"
                         help="Choose the scalar value to select with"/>
   </Module>
+
+  <Module name="CellSelect2"
+          class="vtkPVCellSelect"
+          root_name="CellSelect2"
+          replace_input="0"
+          module_type="Filter">
+   <Filter class="vtkCellSelect">
+      <Input name="Input" class="vtkDataSet" >
+      </Input>
+   </Filter>
+    <InputMenu trace_name="Input" label="Input" property="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+  </Module>
+
 </ModuleInterfaces>

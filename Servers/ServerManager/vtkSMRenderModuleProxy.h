@@ -31,6 +31,7 @@ class vtkPVRenderModuleHelper;
 class vtkSMDisplay;
 class vtkSMDisplayProxy;
 class vtkPVClientServerIdCollectionInformation;
+class vtkSelection;
 class vtkTimerLog;
 
 // TODO: have to change the PVCameraManipulators to do ResetCamera on
@@ -184,6 +185,10 @@ public:
   // If INPUT, the input of the display proxy is returned.
   // If GEOMETRY, the geometry filter proxy is returned
   vtkSMProxy *GetProxyFromPropID(vtkClientServerID *id, int proxyType);
+
+  // Description:
+  // Return a list of visible cells within the provided screen area.
+  vtkSelection *SelectVisibleCells(int x0, int y0, int x1, int y1);
 
 protected:
   vtkSMRenderModuleProxy();

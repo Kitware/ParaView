@@ -90,6 +90,8 @@ SET(Filters_SRCS
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
+  vtkCellSelect.cxx
+  vtkPVVisibleCellSelector.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(

@@ -48,8 +48,11 @@
 #include "vtkPVClientServerIdCollectionInformation.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkPVVisibleCellSelector.h"
+#include "vtkIdTypeArray.h"
+#include "vtkSelection.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.40");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.41");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1267,3 +1270,118 @@ void vtkSMRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LastPolygonsPerSecond: " 
     << this->LastPolygonsPerSecond << endl;
 }
+
+//-----------------------------------------------------------------------------
+vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(int x0, int y0, int x1, int y1)
+{  
+  //Find number of rendering processors.
+  int numProcessors = 1;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (!pm->GetOptions()->GetClientMode())
+    {
+    numProcessors = pm->GetNumberOfPartitions(this->ConnectionID);
+    }
+  
+  //Find largest polygon count in any actor
+  vtkTypeInt64 maxNumCells = 0;
+  vtkCollection *displays = this->GetDisplays();
+  vtkCollectionIterator* iter = displays->NewIterator();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkSMDisplayProxy* disp = 
+      vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    if (!disp || !disp->GetVisibilityCM())
+      {
+      continue;
+      }
+    vtkSMDataObjectDisplayProxy *dodp = vtkSMDataObjectDisplayProxy::SafeDownCast(disp);
+    if (!dodp)
+      {
+      continue;
+      }
+
+    vtkPVGeometryInformation *gi = dodp->GetGeometryInformation();
+    if (!gi)
+      {
+      continue;
+      }
+    vtkTypeInt64 numCells = gi->GetNumberOfCells();
+    if (numCells > maxNumCells)
+      {
+      maxNumCells = numCells;
+      }
+    }
+  iter->Delete();
+
+  const vtkTypeInt64 TWO_TO_THE_48 = 0x1000000000000LL;
+  const vtkTypeInt64 TWO_TO_THE_24 =       0x1000000LL;
+
+  vtkSMProxyManager* proxyManager = vtkSMObject::GetProxyManager();  
+  vtkSMProxy *vcsProxy = proxyManager->NewProxy("PropPickers", "PVVisibleCellSelector");
+  vtkSMProxyProperty *setRendererMethod = vtkSMProxyProperty::SafeDownCast(
+    vcsProxy->GetProperty("SetRenderer"));
+  setRendererMethod->AddProxy(this->GetRendererProxy());
+  vcsProxy->UpdateVTKObjects();   
+
+  vtkSMIntVectorProperty *setModeMethod = vtkSMIntVectorProperty::SafeDownCast(
+    vcsProxy->GetProperty("SetSelectMode"));
+
+  vtkSMProperty *setPIdMethod = vcsProxy->GetProperty("SetProcessorId");
+
+  //I'm using the auto created PVVisCellSelectors in the vcsProxy above just
+  //to set the SelectionMode parameter of the renderers.
+  //I use this one below to convert the composited images that arrive here
+  //into a selection.
+  vtkPVVisibleCellSelector *pti = vtkPVVisibleCellSelector::New();
+  pti->SetArea(x0,y0,x1,y1);
+  pti->SetRenderer(this->GetRenderer());
+
+  this->RenderWindow->SwapBuffersOff();
+
+  unsigned char *buf;  
+  for (int p = 0; p < 5; p++)
+    {
+    if ((p==0) && (numProcessors==1))
+      {
+      p++;
+      }
+    if ((p==2) && (maxNumCells < TWO_TO_THE_48))
+      {
+      p++;
+      }
+    if ((p==3) && (maxNumCells < TWO_TO_THE_24))
+      {
+      p++;
+      }
+    setModeMethod->SetElements1(p+1);
+    if (p==0)
+      {
+      setPIdMethod->Modified();
+      }
+    vcsProxy->UpdateVTKObjects();   
+
+    this->StillRender();  
+    //renderwindow will allocate the buffer
+    buf = this->RenderWindow->GetRGBACharPixelData(x0,y0,x1,y1,0); 
+    //pti will deallocate the buffer when it is deleted
+    pti->SavePixelBuffer(p, buf); 
+    }
+  
+  //clear selection mode to resume normal rendering
+  setModeMethod->SetElements1(0);
+  vcsProxy->UpdateVTKObjects();   
+
+  this->RenderWindow->SwapBuffersOn();
+  
+  pti->ComputeSelectedIds();
+
+  //test the selection data structure
+  vtkSelection *selection = vtkSelection::New();
+  pti->GetSelectedIds(selection);
+
+  pti->Delete();
+  vcsProxy->Delete();
+
+  return selection;
+}
+

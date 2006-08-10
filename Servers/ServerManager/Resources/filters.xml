@@ -4354,6 +4354,22 @@ This filter operates on all types of data sets, and it returns unstructured grid
      </IntVectorProperty>
    </SourceProxy>
 
+   <SourceProxy name="CellSelect2" class="vtkCellSelect">
+     <Documentation
+        long_help="testing"
+        short_help="testing">
+        Testing.
+     </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+     </InputProperty>
+   </SourceProxy>
+
    </ProxyGroup>
 </ServerManagerConfiguration>
 

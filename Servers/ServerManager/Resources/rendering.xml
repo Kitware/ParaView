@@ -189,6 +189,7 @@
           <Group name="lights"/>
         </ProxyGroupDomain>
       </ProxyProperty>
+
     <!-- End Renderer -->
     </Proxy>
   </ProxyGroup>
@@ -3109,6 +3110,32 @@
         command="Pick"
         is_internal="1">
       </Property>
+    </Proxy>
+
+    <Proxy name="PVVisibleCellSelector"
+           class="vtkPVVisibleCellSelector">
+
+      <ProxyProperty 
+        name="SetRenderer" 
+        command="SetRenderer">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty
+        name="SetSelectMode"
+        command="SetSelectMode"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" max="5"/>
+      </IntVectorProperty>
+ 
+      <Property
+        name="SetProcessorId"
+        command="SetProcessorId">
+      </Property>
+      
     </Proxy>
     
   </ProxyGroup>
