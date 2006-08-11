@@ -253,7 +253,9 @@ public:
   // If revival=1, then these methods save the revival states for all proxies.
   // Revival states are useful to revive a proxy using already present
   // server side objects.
-  void SaveState(const char* filename, int revival=0);
+  void SaveState(const char* filename)
+    { this->SaveState(filename, 0); }
+  void SaveState(const char* filename, int revival);
   void SaveState(vtkPVXMLElement* rootElement, int revival=0);
   void SaveState(vtkIdType connectionID, vtkPVXMLElement* root, int revival=0);
 
