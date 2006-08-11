@@ -36,7 +36,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.77");
+vtkCxxRevisionMacro(vtkSMProxy, "1.78");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1691,16 +1691,16 @@ int vtkSMProxy::LoadState(vtkPVXMLElement* proxyElement,
       }
     if (strcmp(name, "Property") == 0)
       {
-      const char* name = currentElement->GetAttribute("name");
-      if (!name)
+      const char* prop_name = currentElement->GetAttribute("name");
+      if (!prop_name)
         {
-        vtkErrorMacro("Cannon load property without a name.");
+        vtkErrorMacro("Cannot load property without a name.");
         continue;
         }
-      vtkSMProperty* property = this->GetProperty(name);
+      vtkSMProperty* property = this->GetProperty(prop_name);
       if (!property)
         {
-        vtkErrorMacro("Property " << name << " does not exist.");
+        vtkErrorMacro("Property " << prop_name<< " does not exist.");
         continue;
         }
       if (!property->LoadState(currentElement, loader))
