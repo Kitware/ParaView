@@ -15,6 +15,7 @@ SET(Filters_SRCS
   vtkDataSetSubdivisionAlgorithm.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
+  vtkExtractBlockFromSelection.cxx
   vtkExtractHistogram.cxx
   vtkExtractScatterPlot.cxx
 #  vtkGroup.cxx

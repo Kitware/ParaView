@@ -62,7 +62,6 @@ protected:
   
 private:
   vtkDataSet* SelectFromDataSet(vtkSelection* sel);
-  vtkPolyDataExtractSelection* PolyDataExtractFilter;
   vtkExtractSelection* ExtractFilter;
 
   vtkMultiBlockExtractSelection(const vtkMultiBlockExtractSelection&);  // Not implemented.
