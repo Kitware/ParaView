@@ -170,6 +170,10 @@ public:
   void UnRegisterProxies();
 
   // Description:
+  // Unregisters all managed proxies on the given connection.
+  void UnRegisterProxies(vtkIdType cid);
+
+  // Description:
   // Calls UpdateVTKObjects() on all managed proxies.
   // If modified_only flag is set, then UpdateVTKObjects will be called 
   // only those proxies that have any properties that were modifed i.e.
@@ -237,15 +241,21 @@ public:
   // Description:
   // Load the state for a particular connection.
   // If loader is not specified, a vtkSMStateLoader instance is used.
-  void LoadState(vtkPVXMLElement* rootElement, vtkIdType id, vtkSMStateLoader* loader=NULL);
-  void LoadState(const char* filename, vtkIdType id, vtkSMStateLoader* loader=NULL);
-  
+  void LoadState(vtkPVXMLElement* rootElement, vtkIdType id, 
+    vtkSMStateLoader* loader=NULL);
+  void LoadState(const char* filename, vtkIdType id, 
+    vtkSMStateLoader* loader=NULL);
+
   // Description:
   // Save the state of the server manager in XML format in a file.
   // This saves the state of all proxies and properties. NOTE: The XML
   // format is still evolving.
-  void SaveState(const char* filename);
-  void SaveState(vtkPVXMLElement* rootElement);
+  // If revival=1, then these methods save the revival states for all proxies.
+  // Revival states are useful to revive a proxy using already present
+  // server side objects.
+  void SaveState(const char* filename, int revival=0);
+  void SaveState(vtkPVXMLElement* rootElement, int revival=0);
+  void SaveState(vtkIdType connectionID, vtkPVXMLElement* root, int revival=0);
 
   // Description:
   // Given a group name, create prototypes and store them
@@ -313,6 +323,7 @@ public:
   // Returns the XML element for the hints associated with this proxy,
   // if any, otherwise returns NULL. 
   vtkPVXMLElement* GetHints(const char* xmlgroup, const char* xmlname);
+
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
@@ -354,6 +365,9 @@ protected:
   // Description:
   // Save/Load registered link states.
   void SaveRegisteredLinks(vtkPVXMLElement* root);
+
+  void SaveStateInternal(vtkIdType connectionID, vtkPVXMLElement* root, 
+    int revival);
 
 private:
   vtkSMProxyManagerInternals* Internals;

@@ -129,6 +129,16 @@ public:
   // invalid.
   void InvalidateDataInformation(int invalidateConsumers);
 
+  // Description:
+  // This method saves state information about the proxy
+  // which can be used to revive the proxy using server side objects
+  // already present. This includes the entire state saved by calling 
+  // SaveState() as well additional information such as server side
+  // object IDs.
+  // Overridden to save information pertinant to reviving the parts.
+  virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
+  virtual int LoadRevivalState(vtkPVXMLElement* revivalElement, 
+    vtkSMStateLoader* loader);
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();

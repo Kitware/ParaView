@@ -424,6 +424,14 @@ protected:
   virtual void CreateVTKObjects(int numObjects);
 
   // Description:
+  // This method is complementary to CreateVTKObjects() when we want the proxy to
+  // reuse the VTK object IDs are defined. When reviving a proxy on the client,
+  // this method creates new client-side objects and reuses the server side objects.
+  // When reviving a proxy on the server, it reuses the server objects while creating
+  // new "client-only" objects on the server itself.
+  virtual void ReviveVTKObjects();
+
+  // Description:
   // UnRegister all managed objects. This also resets the ID list.
   // However, it does not remove the properties.
   void UnRegisterVTKObjects();
@@ -575,6 +583,8 @@ protected:
   // Description:
   // Updates state from an XML element. Returns 0 on failure.
   virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
+  virtual int LoadRevivalState(vtkPVXMLElement* revivalElement, 
+    vtkSMStateLoader* loader);
  
   int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
     vtkPVXMLElement *element);
@@ -607,7 +617,18 @@ protected:
   void SetXMLElement(vtkPVXMLElement* element);
   vtkPVXMLElement* XMLElement;
 
+  // Description:
+  // Saves the state of the proxy. This state can be reloaded
+  // to create a new proxy that is identical the present state of this proxy.
   virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
+
+  // Description:
+  // This method saves state information about the proxy
+  // which can be used to revive the proxy using server side objects
+  // already present. This includes the entire state saved by calling 
+  // SaveState() as well additional information such as server side
+  // object IDs.
+  virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
 
   void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
   void SetupExposedProperties(const char* subproxy_name, vtkPVXMLElement *element);

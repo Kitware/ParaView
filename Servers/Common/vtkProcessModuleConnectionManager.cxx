@@ -72,7 +72,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.13");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.14");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -304,6 +304,12 @@ vtkIdType vtkProcessModuleConnectionManager::OpenConnection(
 int vtkProcessModuleConnectionManager::MonitorConnections(
   unsigned long msec/* = 0*/)
 {
+  if (this->SocketCollection->GetNumberOfItems() == 0)
+    {
+    // No server sockets to monitor.
+    // Return with an error indication.
+    return -1;
+    }
   // Select sockets.
   // If activity:
   //  If on existing Connection, send it to the connection to process.
@@ -476,6 +482,29 @@ GetConnectionClientServerID(vtkIdType id)
     return nullid;
     }
   return conn->GetSelfID();
+}
+
+//-----------------------------------------------------------------------------
+vtkIdType vtkProcessModuleConnectionManager::GetConnectionID(
+  vtkProcessModuleConnection* conn)
+{
+  if (!conn)
+    {
+    return vtkProcessModuleConnectionManager::GetNullConnectionID();
+    }
+
+  vtkConnectionIterator* iter = this->NewIterator();
+  for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    if (iter->GetCurrentConnection() == conn)
+      {
+      vtkIdType cid = iter->GetCurrentConnectionID();
+      iter->Delete();
+      return cid;
+      }
+    }
+  iter->Delete();
+  return vtkProcessModuleConnectionManager::GetNullConnectionID();
 }
 
 //-----------------------------------------------------------------------------

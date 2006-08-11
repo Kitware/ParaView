@@ -155,6 +155,13 @@ protected:
   virtual void StartCueInternal(void* info);
   virtual void TickInternal(void* info);
   virtual void EndCueInternal(void* info);
+
+  // Description;
+  // Since animation Cue has no server side objects, reviving an animation Cue
+  // is no different from create a new animation Cue. Hence, we override this method
+  // to simply call CreateVTKObjects().
+  virtual void ReviveVTKObjects()
+    { this->CreateVTKObjects(1); }
   
 //BTX
   vtkSMAnimationCueProxyObserver* Observer;

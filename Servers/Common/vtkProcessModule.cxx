@@ -102,7 +102,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.59");
+vtkCxxRevisionMacro(vtkProcessModule, "1.60");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -142,6 +142,7 @@ vtkProcessModule::vtkProcessModule()
   this->ServerInformation = vtkPVServerInformation::New();
 
   this->UseMPI = 1;
+  this->SendStreamToClientOnly = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -543,6 +544,12 @@ void vtkProcessModule::AcceptConnectionsOnPort(int data_server_port,
 }
 
 //-----------------------------------------------------------------------------
+void vtkProcessModule::StopAcceptingAllConnections()
+{
+  this->ConnectionManager->StopAcceptingAllConnections();
+}
+
+//-----------------------------------------------------------------------------
 void vtkProcessModule::StopAcceptingConnections(int id)
 {
   this->ConnectionManager->StopAcceptingConnections(id);
@@ -732,6 +739,20 @@ vtkClientServerID vtkProcessModule::NewStreamObject(
 }
 
 //-----------------------------------------------------------------------------
+vtkClientServerID vtkProcessModule::NewStreamObject(
+  const char* type, vtkClientServerStream& stream, vtkClientServerID id)
+{
+  if (this->UniqueID.ID <= id.ID)
+    {
+    this->UniqueID.ID = (id.ID+1);
+    }
+  stream << vtkClientServerStream::New << type
+         << id <<  vtkClientServerStream::End;
+
+  return id;
+}
+
+//-----------------------------------------------------------------------------
 vtkObjectBase* vtkProcessModule::GetObjectFromID(vtkClientServerID id)
 {
   return this->Interpreter->GetObjectFromID(id);
@@ -765,6 +786,24 @@ vtkClientServerID vtkProcessModule::GetConnectionClientServerID(
 }
 
 //-----------------------------------------------------------------------------
+vtkIdType vtkProcessModule::GetConnectionID(vtkClientServerID id)
+{
+  vtkProcessModuleConnection* conn = vtkProcessModuleConnection::SafeDownCast(
+    this->GetObjectFromID(id));
+  if (conn)
+    {
+    return this->ConnectionManager->GetConnectionID(conn);
+    }
+  return vtkProcessModuleConnectionManager::GetNullConnectionID();
+}
+
+//-----------------------------------------------------------------------------
+vtkIdType vtkProcessModule::GetConnectionID(vtkProcessModuleConnection* conn)
+{
+  return this->ConnectionManager->GetConnectionID(conn);
+}
+
+//-----------------------------------------------------------------------------
 int vtkProcessModule::SendStream(vtkIdType connectionID, 
   vtkTypeUInt32 server, vtkClientServerStream& stream, int resetStream/*=1*/)
 {
@@ -772,6 +811,20 @@ int vtkProcessModule::SendStream(vtkIdType connectionID,
     {
     return 0;
     }
+  
+  if (this->SendStreamToClientOnly)
+    {
+    server &= vtkProcessModule::CLIENT;
+    if (!server)
+      {
+      /*
+      vtkWarningMacro("The process module is in a ClientOnly mode, "
+        "and a SendStream was requested to send something only to the servers."
+        "This call will be ignored.");
+        */
+      }
+    }
+
   int ret = this->ConnectionManager->SendStream(connectionID,
     server, stream, resetStream);
  
@@ -996,6 +1049,15 @@ vtkClientServerID vtkProcessModule::GetUniqueID()
 }
 
 //-----------------------------------------------------------------------------
+void vtkProcessModule::ReserveID(vtkClientServerID id)
+{
+  if (this->UniqueID < id)
+    {
+    this->UniqueID = id;
+    }
+}
+
+//-----------------------------------------------------------------------------
 vtkClientServerID vtkProcessModule::GetProcessModuleID()
 {
   vtkClientServerID id = { 2 };
@@ -1032,7 +1094,7 @@ void vtkProcessModule::SendPrepareProgress(vtkIdType connectionId,
 {
   if (!this->GUIHelper)
     {
-    vtkErrorMacro("GUIHelper must be set for SendPrepareProgress.");
+    // vtkErrorMacro("GUIHelper must be set for SendPrepareProgress.");
     return;
     }
 
@@ -1064,6 +1126,12 @@ void vtkProcessModule::SendPrepareProgress(vtkIdType connectionId,
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendCleanupPendingProgress(vtkIdType connectionId)
 {
+  if (!this->GUIHelper)
+    {
+    // vtkErrorMacro("GUIHelper must be set for SendCleanupPendingProgress.");
+    return;
+    }
+
   if ( this->ProgressRequests < 0 )
     {
     vtkErrorMacro("Internal ParaView Error: Progress requests went below zero");
@@ -1074,7 +1142,6 @@ void vtkProcessModule::SendCleanupPendingProgress(vtkIdType connectionId)
     {
     return;
     }
-  
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke 
          << this->GetProcessModuleID() << "CleanupPendingProgress" 
@@ -1082,11 +1149,7 @@ void vtkProcessModule::SendCleanupPendingProgress(vtkIdType connectionId)
   this->SendStream(connectionId, this->Internals->ProgressServersFlag, stream);
   this->Internals->ProgressServersFlag = 0;
   
-  if (!this->GUIHelper)
-    {
-    vtkErrorMacro("GUIHelper must be set for SendCleanupPendingProgress.");
-    return;
-    }
+
   this->GUIHelper->SendCleanupPendingProgress();
 }
 

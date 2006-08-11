@@ -28,6 +28,7 @@
 #include "vtkSMDocumentation.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMUndoStack.h"
 #include "vtkStdString.h"
@@ -37,7 +38,6 @@
 #include <vtkstd/set>
 #include <vtksys/RegularExpression.hxx>
 #include <vtkstd/vector>
-
 
 #include "vtkSMProxyManagerInternals.h"
 
@@ -88,7 +88,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.52");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.53");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -695,6 +695,7 @@ struct vtkSMProxyManagerProxyInformation
 {
   vtkstd::string GroupName;
   vtkstd::string ProxyName;
+  vtkSMProxy* Proxy;
 };
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
@@ -724,6 +725,33 @@ void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
     {
     this->UnRegisterProxy(vIter->GroupName.c_str(), vIter->ProxyName.c_str(), 
       proxy);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UnRegisterProxies(vtkIdType cid)
+{
+  vtkstd::vector<vtkSMProxyManagerProxyInformation> toUnRegister;
+  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+  iter->SetModeToAll();
+  iter->SetConnectionID(cid);
+
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProxyManagerProxyInformation info;
+    info.GroupName = iter->GetGroup();
+    info.ProxyName = iter->GetKey();
+    info.Proxy = iter->GetProxy();
+    toUnRegister.push_back(info);
+    }
+  iter->Delete();
+
+  vtkstd::vector<vtkSMProxyManagerProxyInformation>::iterator vIter = 
+    toUnRegister.begin();
+  for (;vIter != toUnRegister.end(); ++vIter)
+    {
+    this->UnRegisterProxy(vIter->GroupName.c_str(), vIter->ProxyName.c_str(), 
+      vIter->Proxy);
     }
 }
 
@@ -972,12 +1000,12 @@ void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveState(const char* filename)
+void vtkSMProxyManager::SaveState(const char* filename, int revival/*=0*/)
 {
   vtkPVXMLElement* rootElement = vtkPVXMLElement::New();
   rootElement->SetName("ServerManagerState");
 
-  this->SaveState(rootElement);
+  this->SaveState(rootElement, revival);
 
   ofstream os(filename, ios::out);
   rootElement->PrintXML(os, vtkIndent());
@@ -986,7 +1014,22 @@ void vtkSMProxyManager::SaveState(const char* filename)
 
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
+void vtkSMProxyManager::SaveState(vtkPVXMLElement* root, int revival/*=0*/)
+{
+  this->SaveStateInternal(
+    vtkProcessModuleConnectionManager::GetNullConnectionID(), root, revival);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::SaveState(vtkIdType connectionID,
+  vtkPVXMLElement* root, int revival/*=0*/)
+{
+  this->SaveStateInternal(connectionID, root, revival);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
+  vtkPVXMLElement* rootElement, int revival)
 {
   if (!rootElement)
     {
@@ -1038,8 +1081,17 @@ void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
           if (visited_proxies.find(it3->Proxy.GetPointer()) 
             == visited_proxies.end())
             {
-            it3->Proxy.GetPointer()->SaveState(rootElement);
-            visited_proxies.insert(it3->Proxy.GetPointer());
+            if (connectionID == vtkProcessModuleConnectionManager::GetNullConnectionID() || 
+              it3->Proxy.GetPointer()->GetConnectionID() == connectionID)
+              {
+              vtkPVXMLElement* proxyElement = 
+                it3->Proxy.GetPointer()->SaveState(rootElement);
+              if (revival && proxyElement)
+                {
+                it3->Proxy.GetPointer()->SaveRevivalState(proxyElement);
+                }
+              visited_proxies.insert(it3->Proxy.GetPointer());
+              }
             }
           }
         }
@@ -1076,13 +1128,16 @@ void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
           it2->second.begin();
         for (; it3 != it2->second.end(); ++it3)
           {
-          vtkPVXMLElement* itemElement = vtkPVXMLElement::New();
-          itemElement->SetName("Item");
-          itemElement->AddAttribute("id", 
-            it3->Proxy.GetPointer()->GetSelfIDAsString());
-          itemElement->AddAttribute("name", it2->first.c_str());
-          collectionElement->AddNestedElement(itemElement);
-          itemElement->Delete();
+          if (visited_proxies.find(it3->Proxy.GetPointer()) != visited_proxies.end())
+            {
+            vtkPVXMLElement* itemElement = vtkPVXMLElement::New();
+            itemElement->SetName("Item");
+            itemElement->AddAttribute("id", 
+              it3->Proxy.GetPointer()->GetSelfIDAsString());
+            itemElement->AddAttribute("name", it2->first.c_str());
+            collectionElement->AddNestedElement(itemElement);
+            itemElement->Delete();
+            }
           }
         }
       rootElement->AddNestedElement(collectionElement);
@@ -1096,6 +1151,7 @@ void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
   rootElement->AddNestedElement(defs);
   defs->Delete();
 
+  // TODO: Save links as per connection ID
   vtkPVXMLElement* links = vtkPVXMLElement::New();
   links->SetName("Links");
   this->SaveRegisteredLinks(links);

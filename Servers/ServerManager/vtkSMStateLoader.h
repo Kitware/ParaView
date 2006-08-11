@@ -59,11 +59,18 @@ public:
   vtkSetMacro(ConnectionID, vtkIdType);
   vtkGetMacro(ConnectionID, vtkIdType);
 
+  // Description:
+  // Get/Set if the proxies are to be revived, if the state has sufficient
+  // information needed to revive proxies (such as server-side object IDs etc).
+  // By default, this is set to 0.
+  vtkSetMacro(ReviveProxies, int);
+  vtkGetMacro(ReviveProxies, int);
 protected:
   vtkSMStateLoader();
   ~vtkSMStateLoader();
 
   vtkPVXMLElement* RootElement;
+  int ReviveProxies;
 
   void ClearCreatedProxies();
 
