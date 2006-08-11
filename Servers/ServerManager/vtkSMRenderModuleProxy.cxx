@@ -52,7 +52,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkSelection.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.41");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.42");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1313,8 +1313,8 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(int x0, int y0, int x1,
     }
   iter->Delete();
 
-  const vtkTypeInt64 TWO_TO_THE_48 = 0x1000000000000LL;
-  const vtkTypeInt64 TWO_TO_THE_24 =       0x1000000LL;
+  vtkTypeInt64 needs_2_passes = (maxNumCells+1)/0x1000000;//> than 2^24-1 cells
+  vtkTypeInt64 needs_3_passes = needs_2_passes / 0x1000000; //more than 2^48-1
 
   vtkSMProxyManager* proxyManager = vtkSMObject::GetProxyManager();  
   vtkSMProxy *vcsProxy = proxyManager->NewProxy("PropPickers", "PVVisibleCellSelector");
@@ -1326,7 +1326,7 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(int x0, int y0, int x1,
   vtkSMIntVectorProperty *setModeMethod = vtkSMIntVectorProperty::SafeDownCast(
     vcsProxy->GetProperty("SetSelectMode"));
 
-  vtkSMProperty *setPIdMethod = vcsProxy->GetProperty("SetProcessorId");
+  vtkSMProperty *setPIdMethod = vcsProxy->GetProperty("LookupProcessorId");
 
   //I'm using the auto created PVVisCellSelectors in the vcsProxy above just
   //to set the SelectionMode parameter of the renderers.
@@ -1345,11 +1345,11 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(int x0, int y0, int x1,
       {
       p++;
       }
-    if ((p==2) && (maxNumCells < TWO_TO_THE_48))
+    if ((p==2) && (needs_3_passes>=1))
       {
       p++;
       }
-    if ((p==3) && (maxNumCells < TWO_TO_THE_24))
+    if ((p==3) && (needs_2_passes>=1))
       {
       p++;
       }
