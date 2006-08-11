@@ -25,7 +25,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMMPIRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.10");
 //-----------------------------------------------------------------------------
 vtkSMMPIRenderModuleProxy::vtkSMMPIRenderModuleProxy()
 {
@@ -121,7 +121,7 @@ void vtkSMMPIRenderModuleProxy::CreateCompositeManager()
   // Composite Manager is vtkClientCompositeManager in client/server/renderserver mode.
   // Otherwise, vtkPVTreeComposite is used.
   const char* manager_name = 0;
-  if (pm->GetOptions()->GetClientMode() || pm->GetOptions()->GetServerMode())
+  if (pm->GetOptions()->GetClientMode())
     {
     manager_name = "ClientCompositeManager";
     }
@@ -175,7 +175,7 @@ void vtkSMMPIRenderModuleProxy::InitializeCompositingPipeline()
       this->RenderWindowProxy->GetServers(), stream);
     }
 
-  if (pm->GetOptions()->GetClientMode() || pm->GetOptions()->GetServerMode())
+  if (pm->GetOptions()->GetClientMode())
     {
     // using vtkClientCompositeManager. 
     for (i=0; i < this->CompositeManagerProxy->GetNumberOfIDs(); i++)
