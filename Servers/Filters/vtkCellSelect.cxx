@@ -19,7 +19,7 @@
 #include "vtkInformationVector.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkCellSelect, "1.1");
+vtkCxxRevisionMacro(vtkCellSelect, "1.2");
 vtkStandardNewMacro(vtkCellSelect);
 
 //----------------------------------------------------------------------------
@@ -36,12 +36,9 @@ vtkCellSelect::~vtkCellSelect()
 int vtkCellSelect::RequestData(
   vtkInformation *vtkNotUsed(r),
   vtkInformationVector **vtkNotUsed(iv),
-  vtkInformationVector *ov)
+  vtkInformationVector *vtkNotUsed(ov))
 { 
-  // get a hold of my output dataobject to put the results into
-  vtkInformation* outInfo = ov->GetInformationObject(0);
-  vtkPolyData* output = 
-    vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  //This is just a dummy filter for testing purposes.
   return 1;
 }
 

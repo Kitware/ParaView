@@ -45,7 +45,7 @@ public:
 
   // Description:
   // This uses the ProcessModule to look up the rank of the executing node.
-  void SetProcessorId();
+  void LookupProcessorId();
 
   //BTX
   enum {NOT_SELECTING = 0, COLOR_BY_PROCESSOR, COLOR_BY_ACTOR, 

@@ -3191,8 +3191,8 @@
       </IntVectorProperty>
  
       <Property
-        name="SetProcessorId"
-        command="SetProcessorId">
+        name="LookupProcessorId"
+        command="LookupProcessorId">
       </Property>
       
     </Proxy>
