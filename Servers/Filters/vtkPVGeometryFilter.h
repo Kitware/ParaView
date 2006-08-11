@@ -58,7 +58,7 @@ public:
   // When input is structured data, this flag will generate faces with
   // triangle strips.  This should render faster and use less memory, but no
   // cell data is copied.  By default, UseStrips is Off.
-  vtkSetMacro(UseStrips, int);
+  void SetUseStrips(int);
   vtkGetMacro(UseStrips, int);
   vtkBooleanMacro(UseStrips, int);
 
