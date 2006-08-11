@@ -33,17 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSimpleAnimationManager.h"
 
 // ParaView Server Manager includes.
-#include "vtkSMAnimationCueProxy.h"
-#include "vtkSMAnimationSceneProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMKeyFrameAnimationCueManipulatorProxy.h"
-#include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMTimestepKeyFrameProxy.h"
 #include "QVTKWidget.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMServerProxyManagerReviver.h"
+#include "vtkSMTimestepKeyFrameProxy.h"
 
 // Qt includes.
 #include <QDialog>
@@ -51,72 +49,129 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
-#include "pqPipelineSource.h"
-#include "pqPipelineDisplay.h"
-#include "pqSMAdaptor.h"
 #include "pqApplicationCore.h"
+#include "pqPipelineDisplay.h"
+#include "pqPipelineSource.h"
 #include "pqRenderModule.h"
+#include "pqRenderModule.h"
+#include "pqServer.h"
+#include "pqSMAdaptor.h"
 #include "ui_pqAbortAnimation.h"
 #include "ui_pqAnimationSettings.h"
 
 //-----------------------------------------------------------------------------
-class pqSimpleAnimationManagerInternal
+class pqSimpleAnimationManagerProxies
 {
 public:
-  vtkSmartPointer<vtkSMAnimationSceneProxy> AnimationScene;
-  vtkSmartPointer<vtkSMAnimationCueProxy> AnimationCue;
-  vtkSmartPointer<vtkSMKeyFrameAnimationCueManipulatorProxy> 
-    KeyframeManipulator;
+  vtkSmartPointer<vtkSMProxy> AnimationScene;
+  vtkSmartPointer<vtkSMProxy> AnimationCue;
+  vtkSmartPointer<vtkSMProxy> KeyframeManipulator;
+  vtkSmartPointer<vtkSMProxy> KeyFrame0;
+  vtkSmartPointer<vtkSMProxy> KeyFrame1;
+
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  pqSimpleAnimationManagerInternal()
+  pqSimpleAnimationManagerProxies()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    }
+
+  ~pqSimpleAnimationManagerProxies()
+    {
+    this->unregisterProxies();
+    }
+
+  void createSceneProxies(pqServer* server, bool useDataSetTimesteps)
+    {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+    // Create animation scene.
+    this->AnimationScene.TakeReference(
+      pxm->NewProxy("animation", "AnimationScene"));
+    this->AnimationScene->SetConnectionID(server->GetConnectionID());
+    
+    pqSMAdaptor::setElementProperty(
+      this->AnimationScene->GetProperty("Loop"), 0);
+
+    // Create a cue for the timesteps property.
+    this->AnimationCue.TakeReference(
+      pxm->NewProxy("animation", "AnimationCue"));
+    this->AnimationCue->SetConnectionID(server->GetConnectionID());
+    
+    pqSMAdaptor::setProxyProperty(this->AnimationScene->GetProperty(
+        "Cues"), this->AnimationCue);
+    pqSMAdaptor::setEnumerationProperty(this->AnimationCue->GetProperty(
+        "TimeMode"), "Normalized");
+    pqSMAdaptor::setElementProperty(this->AnimationCue->GetProperty(
+        "EndTime"), 1.0);
+
+    // Create a key frame manupulator for the cue.
+    this->KeyframeManipulator.TakeReference(
+      pxm->NewProxy("animation_manipulators", "KeyFrameAnimationCueManipulator"));
+    this->KeyframeManipulator->SetConnectionID(server->GetConnectionID());
+
+    pqSMAdaptor::setProxyProperty(this->AnimationCue->GetProperty("Manipulator"), 
+      this->KeyframeManipulator);
+
+    vtkSMProxyProperty* keyFramesProperty = vtkSMProxyProperty::SafeDownCast(
+      this->KeyframeManipulator->GetProperty("KeyFrames"));
+    keyFramesProperty->RemoveAllProxies();
+
+    // Create key frame proxies.
+    const char* keyframeType = (useDataSetTimesteps)?
+      "TimestepKeyFrame" : "RampKeyFrame";
+    this->KeyFrame0.TakeReference(
+      pxm->NewProxy("animation_keyframes", keyframeType));
+    this->KeyFrame0->SetConnectionID(server->GetConnectionID());
+    pqSMAdaptor::setElementProperty(this->KeyFrame0->GetProperty("KeyTime"),   0.0);
+    pqSMAdaptor::setElementProperty(this->KeyFrame0->GetProperty("NumberOfKeyValues"), 1);
+    keyFramesProperty->AddProxy(this->KeyFrame0);
+
+    this->KeyFrame1.TakeReference(
+      pxm->NewProxy("animation_keyframes", keyframeType));
+    this->KeyFrame1->SetConnectionID(server->GetConnectionID());
+    pqSMAdaptor::setElementProperty(this->KeyFrame1->GetProperty("KeyTime"), 1.0);
+    pqSMAdaptor::setElementProperty(this->KeyFrame1->GetProperty("NumberOfKeyValues"), 1);
+    keyFramesProperty->AddProxy(this->KeyFrame1);
+
+    this->KeyFrame0->UpdateVTKObjects();
+    this->KeyFrame1->UpdateVTKObjects();
+    this->KeyframeManipulator->UpdateVTKObjects();
+    this->AnimationCue->UpdateVTKObjects();
+    this->AnimationScene->UpdateVTKObjects();
+
+    pxm->RegisterProxy("animation","Scene", this->AnimationScene);
+    pxm->RegisterProxy("animation", "Cue", this->AnimationCue);
+    pxm->RegisterProxy("animation", "Manipulator", this->KeyframeManipulator);
+    pxm->RegisterProxy("animation", "key0", this->KeyFrame0);
+    pxm->RegisterProxy("animation", "key1", this->KeyFrame1);
+    }
+
+  void unregisterProxies()
+    {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+    pxm->UnRegisterProxy("animation", "Scene", this->AnimationScene);
+    pxm->UnRegisterProxy("animation", "Cue", this->AnimationCue);
+    pxm->UnRegisterProxy("animation", "Manipulator", this->KeyframeManipulator);
+    pxm->UnRegisterProxy("animation", "key0", this->KeyFrame0);
+    pxm->UnRegisterProxy("animation", "key1", this->KeyFrame1);
+
+    this->AnimationScene = 0;
+    this->AnimationCue = 0;
+    this->KeyframeManipulator = 0;
+    this->KeyFrame0 = 0;
+    this->KeyFrame1 = 0;
     }
 };
 
 //-----------------------------------------------------------------------------
-pqSimpleAnimationManager::pqSimpleAnimationManager(QObject *_p/*=0*/)
+pqSimpleAnimationManager::pqSimpleAnimationManager( QObject *_p/*=0*/)
   :QObject(_p)
 {
   this->Source = 0;
-  this->Internal = new pqSimpleAnimationManagerInternal;
-
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  // Create animation scene.
-  this->Internal->AnimationScene = vtkSMAnimationSceneProxy::SafeDownCast(
-    pxm->NewProxy("animation", "AnimationScene"));
-  this->Internal->AnimationScene->Delete();
-
-  this->Internal->VTKConnect->Connect(this->Internal->AnimationScene,
-    vtkCommand::AnimationCueTickEvent, this,
-    SLOT(onAnimationTick()));
-
-  pqSMAdaptor::setElementProperty(this->Internal->AnimationScene->GetProperty("Loop"),
-    0);
-
-  // Create a cue for the timesteps property.
-  this->Internal->AnimationCue = vtkSMAnimationCueProxy::SafeDownCast(
-    pxm->NewProxy("animation", "AnimationCue"));
-  this->Internal->AnimationCue->Delete();
-  pqSMAdaptor::setProxyProperty(this->Internal->AnimationScene->GetProperty(
-      "Cues"), this->Internal->AnimationCue);
-  pqSMAdaptor::setEnumerationProperty(this->Internal->AnimationCue->GetProperty(
-      "TimeMode"), "Normalized");
-  pqSMAdaptor::setElementProperty(this->Internal->AnimationCue->GetProperty(
-      "EndTime"), 1.0);
-
-  // Create a key frame manupulator for the cue.
-  this->Internal->KeyframeManipulator = 
-    vtkSMKeyFrameAnimationCueManipulatorProxy::SafeDownCast(
-      pxm->NewProxy("animation_manipulators", "KeyFrameAnimationCueManipulator"));
-  this->Internal->KeyframeManipulator->Delete();
-
-  pqSMAdaptor::setProxyProperty(this->Internal->AnimationCue->GetProperty(
-      "Manipulator"), this->Internal->KeyframeManipulator);
-
-  this->Internal->KeyframeManipulator->UpdateVTKObjects();
-  this->Internal->AnimationCue->UpdateVTKObjects();
-  this->Internal->AnimationScene->UpdateVTKObjects();
+  this->Server = 0;
+  this->RenderModule = 0;
+  this->Proxies = 0;
 
 }
 
@@ -124,7 +179,7 @@ pqSimpleAnimationManager::pqSimpleAnimationManager(QObject *_p/*=0*/)
 pqSimpleAnimationManager::~pqSimpleAnimationManager()
 {
   this->Source = 0;
-  delete this->Internal;
+  delete this->Proxies;
 }
 
 //-----------------------------------------------------------------------------
@@ -153,7 +208,15 @@ bool pqSimpleAnimationManager::canAnimate(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqSimpleAnimationManager::abortSavingAnimation()
 {
-  this->Internal->AnimationScene->Stop();
+  if (this->Proxies)
+    {
+    vtkSMAnimationSceneProxy* scene = 
+      vtkSMAnimationSceneProxy::SafeDownCast(this->Proxies->AnimationScene);
+    if (scene)
+      {
+      scene->Stop();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -165,13 +228,19 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
     return false;
     }
 
+  if (!this->Server || !this->RenderModule)
+    {
+    qDebug() << "Server and RenderModule must be set on pqSimpleAnimationManager";
+    return false;
+    }
+
   vtkSMProxy* proxy = source->getProxy();
   vtkSMProperty* timestep = proxy->GetProperty("TimeStep");
   vtkSMDoubleVectorProperty* timestepValues = 
     vtkSMDoubleVectorProperty::SafeDownCast(
       timestep->GetInformationProperty());
   proxy->UpdatePropertyInformation(timestepValues);
-  pqRenderModule* activeView = source->getDisplay(0)->getRenderModule(0);
+  pqRenderModule* activeView = this->RenderModule;
 
   QFileInfo fileinfo(filename);
   QString filePrefix = filename;
@@ -185,6 +254,8 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
   QDialog dialog;
   Ui::Dialog dialogUI;
   dialogUI.setupUi(&dialog);
+  dialogUI.checkBoxDisconnect->setEnabled(this->Server->isRemote());
+
   if (extension == "mpg")
     {
     // Size bounds for mpeg.
@@ -219,7 +290,10 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
   bool useDataSetTimesteps = 
     dialogUI.checkBoxUseDatasetTimesteps->checkState() == Qt::Checked;
 
-  vtkSMAnimationCueProxy* cue = this->Internal->AnimationCue;
+  this->Proxies = new pqSimpleAnimationManagerProxies;
+  this->Proxies->createSceneProxies(this->Server, useDataSetTimesteps);
+
+  vtkSMProxy* cue = this->Proxies->AnimationCue;
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
   pqSMAdaptor::setProxyProperty(cue->GetProperty("AnimatedProxy"), proxy);
@@ -228,44 +302,61 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
   pqSMAdaptor::setElementProperty(cue->GetProperty("AnimatedElement"), 0);
   cue->UpdateVTKObjects();
 
-  vtkSMProxyProperty* keyFramesProperty = vtkSMProxyProperty::SafeDownCast(
-    this->Internal->KeyframeManipulator->GetProperty("KeyFrames"));
-  keyFramesProperty->RemoveAllProxies();
+  pqSMAdaptor::setElementProperty(
+    this->Proxies->KeyFrame0->GetProperty("KeyValues"), 0.0);
+  this->Proxies->KeyFrame0->UpdateVTKObjects();
 
-  const char* keyframeType = (useDataSetTimesteps)?
-    "TimestepKeyFrame" : "RampKeyFrame";
+  pqSMAdaptor::setElementProperty(
+    this->Proxies->KeyFrame1->GetProperty("KeyValues"),
+    timestepValues->GetNumberOfElements()-1);
+  this->Proxies->KeyFrame1->UpdateVTKObjects();
 
-  vtkSMKeyFrameProxy* keyFrame = vtkSMKeyFrameProxy::SafeDownCast(
-    pxm->NewProxy("animation_keyframes", keyframeType));
-  pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyTime"),   0.0);
-  pqSMAdaptor::setElementProperty(keyFrame->GetProperty("NumberOfKeyValues"), 1);
-  keyFrame->UpdateVTKObjects();
-  pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyValues"), 0.0);
-  keyFrame->UpdateVTKObjects();
-  keyFramesProperty->AddProxy(keyFrame);
-  keyFrame->Delete();
-
-  keyFrame = vtkSMKeyFrameProxy::SafeDownCast(
-    pxm->NewProxy("animation_keyframes", keyframeType));
-  pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyTime"), 1.0);
-  pqSMAdaptor::setElementProperty(keyFrame->GetProperty("NumberOfKeyValues"), 1);
-  keyFrame->UpdateVTKObjects();
-  vtkSMDoubleVectorProperty::SafeDownCast(keyFrame->GetProperty("KeyValues"))
-    ->SetElement(0, timestepValues->GetNumberOfElements()-1);
-  keyFrame->UpdateVTKObjects();
-  keyFramesProperty->AddProxy(keyFrame);
-  keyFrame->Delete();
-  this->Internal->KeyframeManipulator->UpdateVTKObjects();
-
-  this->Internal->AnimationScene->SetRenderModuleProxy(
-    activeView->getRenderModuleProxy());
+  pqSMAdaptor::setProxyProperty(
+    this->Proxies->AnimationScene->GetProperty("RenderModule"), 
+    activeView->getProxy());
 
   activeView->getWidget()->resize(dialogUI.spinBoxWidth->value(),
     dialogUI.spinBoxHeight->value());
 
-  this->Internal->AnimationScene->SetStartTime(0);
-  this->Internal->AnimationScene->SetEndTime(
+  pqSMAdaptor::setElementProperty(
+    this->Proxies->AnimationScene->GetProperty("StartTime"),    0);
+  pqSMAdaptor::setElementProperty(
+    this->Proxies->AnimationScene->GetProperty("EndTime"),
     dialogUI.spinBoxAnimationDuration->value());
+  this->Proxies->AnimationScene->UpdateVTKObjects();
+ 
+  if (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked)
+    {
+    // We save the animation offline.
+    vtkSMProxy* cleaner = 
+      pxm->NewProxy("connection_cleaners", "AnimationPlayer");
+    cleaner->SetConnectionID(this->Server->GetConnectionID());
+    pxm->RegisterProxy("animation","cleaner",cleaner);
+    cleaner->Delete();
+
+    pqSMAdaptor::setElementProperty(cleaner->GetProperty("AnimationFileName"),
+      filename.toStdString().c_str());
+    pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 0,
+      dialogUI.spinBoxWidth->value());
+    pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 1,
+      dialogUI.spinBoxHeight->value());
+    pqSMAdaptor::setElementProperty(cleaner->GetProperty("FrameRate"),
+      dialogUI.spinBoxFrameRate->value());
+    cleaner->UpdateVTKObjects();
+
+    vtkSMServerProxyManagerReviver* reviver = 
+      vtkSMServerProxyManagerReviver::New();
+    int status = 
+      reviver->ReviveRemoteServerManager(this->Server->GetConnectionID());
+    reviver->Delete();
+
+    // we must remove all the proxies we created before the server
+    // disconnects.
+    delete this->Proxies;
+    this->Proxies = 0;
+    pqApplicationCore::instance()->removeServer(this->Server);
+    return status;
+    }
 
   QDialog abortDialog;
   Ui::AbortAnimation abortDialogUI;
@@ -277,14 +368,22 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
     this, SLOT(abortSavingAnimation()));
 
 
-  int status = this->Internal->AnimationScene->SaveImages(
-    filePrefix.toStdString().c_str(),
-    extension.toStdString().c_str(), 
-    dialogUI.spinBoxWidth->value(),
-    dialogUI.spinBoxHeight->value(),
-    dialogUI.spinBoxFrameRate->value(), 0);
+  vtkSMAnimationSceneProxy* scene = vtkSMAnimationSceneProxy::SafeDownCast(
+    this->Proxies->AnimationScene);
+  int status = 0;
+  if (scene)
+    {
+    status = scene->SaveImages(
+      filePrefix.toStdString().c_str(),
+      extension.toStdString().c_str(), 
+      dialogUI.spinBoxWidth->value(),
+      dialogUI.spinBoxHeight->value(),
+      dialogUI.spinBoxFrameRate->value(), 0);
+    }
  
   activeView->getWidget()->resize(viewSize);   
+  delete this->Proxies;
+  this->Proxies = 0;
   return (status == 0);
 }
 

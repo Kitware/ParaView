@@ -1060,6 +1060,8 @@ void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
     return;
     }
   pqSimpleAnimationManager manager(this);
+  manager.setServer(this->getActiveServer());
+  manager.setRenderModule(this->getActiveRenderModule());
   if (!manager.createTimestepAnimation(source, files[0]))
     {
     qDebug()<< "Animation not saved successfully.";

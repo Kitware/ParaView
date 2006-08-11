@@ -200,6 +200,14 @@ int pqServer::getNumberOfPartitions()
 
 }
 
+//-----------------------------------------------------------------------------
+bool pqServer::isRemote() const
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  return pm->IsRemote(this->ConnectionID);
+}
+
+//-----------------------------------------------------------------------------
 void pqServer::setResource(const pqServerResource &server_resource)
 {
   this->Resource = server_resource;

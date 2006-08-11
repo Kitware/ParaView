@@ -36,7 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqPipelineSource;
-class pqSimpleAnimationManagerInternal;
+class pqRenderModule;
+class pqServer;
+class pqSimpleAnimationManagerProxies;
 
 // This class is a temporary animation manager. It simply saves
 // animations in which the timestep of a reader is animated.
@@ -51,7 +53,6 @@ public:
   // given source.
   static bool canAnimate(pqPipelineSource* source);
 
-
   // Creates the animation. This will pop-up a dialog asking for
   // relevant information about the animation.
   bool createTimestepAnimation(pqPipelineSource* source, const QString& filename);
@@ -60,15 +61,22 @@ public slots:
   // Call to interrupt saving of the animation.
   void abortSavingAnimation();
 
+  // Set the server.
+  void setServer(pqServer* server)
+    {this->Server = server; }
+
+  // Set the render module. The view in this render module will be
+  // saved in the animation.
+  void setRenderModule(pqRenderModule* ren)
+    { this->RenderModule = ren; }
 private slots:
   void onAnimationTick();
 
-
-
 private:
   pqPipelineSource* Source;
-
-  pqSimpleAnimationManagerInternal* Internal;
+  pqServer* Server;
+  pqRenderModule* RenderModule;
+  pqSimpleAnimationManagerProxies* Proxies;
 };
 #endif
 

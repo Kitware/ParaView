@@ -78,6 +78,9 @@ public:
   // server connection. A convenience method.
   int getNumberOfPartitions();
 
+  // Returns is this connection is a connection to a remote
+  // server or a built-in server.
+  bool isRemote() const;
 signals:
   void nameChanged();
 
