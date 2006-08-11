@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -322,5 +322,6 @@ vtkDataObject* vtkSMGenericViewDisplayProxy::GetOutput()
 void vtkSMGenericViewDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Visibility: " << this->Visibility << endl;
 }
 
