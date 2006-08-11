@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqSelectionManager_h
 
 #include "pqComponentsExport.h"
+#include "pqServerManagerSelectionModel.h"
+
 #include <QObject>
 
 class vtkSMDisplayProxy;
@@ -91,11 +93,17 @@ private:
   int setInteractorStyleToSelect(pqRenderModule*);
   int setInteractorStyleToInteract(pqRenderModule*);
   void processEvents(unsigned long event);
-  void updateSelection(int* eventpos, pqRenderModule* rm);
-  void selectInFrustrum(int* eventpos, pqRenderModule* rm);
-  void sendSelection(vtkSelection* sel, vtkSMProxy* proxy);
   vtkSMDisplayProxy* getDisplayProxy(pqRenderModule*, vtkSMProxy*);
   void createDisplayProxies(vtkSMProxy*);
+
+  void updateSelection(int* eventpos, pqRenderModule* rm);
+  vtkSelection* selectInFrustrum(int* eventpos, pqRenderModule* rm);
+  void sendSelection(vtkSelection* sel, vtkSMProxy* proxy);
+  vtkSelection* selectOnSurface(pqRenderModule* rm);
+  void convertSelection(pqRenderModule* rm, vtkSelection* sel);
+
+  void clearClientDisplays();
+  void createNewClientDisplays(pqServerManagerSelection&);
 };
 
 
