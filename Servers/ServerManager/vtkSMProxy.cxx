@@ -17,12 +17,13 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
-#include "vtkSMDocumentation.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
 #include "vtkProcessModuleConnectionManager.h"
+#include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
@@ -35,7 +36,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.76");
+vtkCxxRevisionMacro(vtkSMProxy, "1.77");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -206,7 +207,8 @@ void vtkSMProxy::RegisterSelfID()
       "functional.");
     return ;
     }
-  
+  pm->ReserveID(this->SelfID);
+
   vtkClientServerStream initStream;
   initStream << vtkClientServerStream::Assign 
     << this->SelfID << this
@@ -953,6 +955,7 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
     }
   this->ObjectsCreated = 1;
   this->GetSelfID(); // this will ensure that the SelfID is assigned properly.
+
   if (this->VTKClassName && this->VTKClassName[0] != '\0')
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -961,7 +964,6 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
       {
       vtkClientServerID objectId = 
         pm->NewStreamObject(this->VTKClassName, stream);
-      
       this->Internals->IDs.push_back(objectId);
 
       stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
@@ -980,6 +982,72 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
   for( ; it2 != this->Internals->SubProxies.end(); it2++)
     {
     it2->second.GetPointer()->CreateVTKObjects(numObjects);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::ReviveVTKObjects()
+{
+  if (this->ObjectsCreated)
+    {
+    vtkErrorMacro(
+      "Cannot revive VTK objects, they have already been created.");
+    return;
+    }
+
+  this->ObjectsCreated = 1;
+  this->GetSelfID();
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  int numObjects = this->Internals->IDs.size();
+
+  vtkPVOptions* options = pm->GetOptions();
+  if (options->GetServerMode() || options->GetRenderServerMode())
+    {
+    // This server manager is running on the server. 
+    // Reviving such VTK objects means creating the objects only
+    // when the Servers == CLIENT only.
+    if (this->Servers != vtkProcessModule::CLIENT)
+      {
+      // We still need to update the PM to make sure that the IDs don't get
+      // accidently reused.
+      for (int cc=0; cc < numObjects; cc++)
+        {
+        pm->ReserveID(this->Internals->IDs[cc]);
+        }
+      return;
+      }
+    }
+
+  if (this->VTKClassName && this->VTKClassName[0] != '\0')
+    {
+    if (numObjects == 0)
+      {
+      vtkErrorMacro("No IDs set to revive.");
+      return;
+      }
+    vtkClientServerStream stream;
+    for (int i=0; i<numObjects; i++)
+      {
+      vtkClientServerID objectId = { 0 };
+      objectId = this->Internals->IDs[i];
+      pm->NewStreamObject(this->VTKClassName, stream, objectId);
+
+      stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
+        << "RegisterProgressEvent"
+        << objectId << static_cast<int>(objectId.ID)
+        << vtkClientServerStream::End;
+      }
+    if (stream.GetNumberOfMessages() > 0)
+      {
+      pm->SendStream(this->ConnectionID, this->Servers, stream);
+      }
+    }
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->ReviveVTKObjects();
     }
 }
 
@@ -1616,8 +1684,12 @@ int vtkSMProxy::LoadState(vtkPVXMLElement* proxyElement,
   for (unsigned int i=0; i<numElems; i++)
     {
     vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
-    if (currentElement->GetName() &&
-        strcmp(currentElement->GetName(), "Property") == 0)
+    const char* name =  currentElement->GetName();
+    if (!name)
+      {
+      continue;
+      }
+    if (strcmp(name, "Property") == 0)
       {
       const char* name = currentElement->GetAttribute("name");
       if (!name)
@@ -1636,7 +1708,90 @@ int vtkSMProxy::LoadState(vtkPVXMLElement* proxyElement,
         return 0;
         }
       }
+    else if (strcmp(name, "RevivalState") == 0 && loader->GetReviveProxies())
+      {
+      if (!this->LoadRevivalState(currentElement, loader))
+        {
+        return 0;
+        }
+      }
     }
+  return 1;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
+  vtkSMStateLoader* loader)
+{
+  if (this->ObjectsCreated)
+    {
+    vtkErrorMacro("Cannot revive a proxy when the VTK objects for the proxy "
+      "have already been created.");
+    return 0;
+    }
+
+  vtkClientServerID selfid = { 0 };
+  int temp = 0;
+
+  if (revivalElem->GetScalarAttribute("servers", &temp))
+    {
+    this->SetServersSelf(static_cast<vtkTypeUInt32>(temp));
+    }
+  else
+    {
+    vtkErrorMacro("Missing attribute 'servers'.");
+    return 0;
+    }
+
+  if (revivalElem->GetScalarAttribute("id", &temp))
+    {
+    selfid.ID = static_cast<vtkTypeUInt32>(temp);
+    }
+  if (!selfid.ID)
+    {
+    vtkErrorMacro("Invalid self ID or attribute 'id' missing.");
+    return 0;
+    }
+  this->SetSelfID(selfid);
+  for (unsigned int cc=0; cc < revivalElem->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* currentElement = revivalElem->GetNestedElement(cc);
+    const char* name = currentElement->GetName();
+    if (name && strcmp(name, "VTKObjectIDs") == 0)
+      {
+      this->Internals->IDs.clear();
+      for (unsigned int i=0; i < currentElement->GetNumberOfNestedElements(); i++)
+        {
+        vtkPVXMLElement* element = currentElement->GetNestedElement(i);
+        if (element->GetName() && strcmp(element->GetName(), "Element") == 0)
+          {
+          vtkClientServerID id;
+          int int_id;
+          if (element->GetScalarAttribute("id", &int_id) && int_id)
+            {
+            id.ID = int_id;
+            this->Internals->IDs.push_back(id);
+            }
+          }
+        }
+      }
+    else if (name && strcmp(name, "SubProxy") == 0)
+      {
+      vtkSMProxy* subProxy = this->GetSubProxy(currentElement->GetAttribute("name"));
+      if (!subProxy)
+        {
+        vtkErrorMacro("Failed to load subproxy with name: " << 
+          currentElement->GetAttribute("name") << ". Cannot revive the subproxy.");
+        return 0;
+        }
+      if (!subProxy->LoadRevivalState(currentElement->GetNestedElement(0), loader))
+        {
+        return 0;
+        }
+      }
+    }
+  // This will create the client side objects needed.
+  this->ReviveVTKObjects();
   return 1;
 }
 
@@ -1671,9 +1826,50 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
     proxyElement->Delete();
     }
 
-  // Now save subproxies.
-  this->SaveSubProxyIds(proxyElement);
 
+  // SubProxyIds are never really needed.
+  //this->SaveSubProxyIds(proxyElement);
+
+  return proxyElement;
+}
+
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxy::SaveRevivalState(vtkPVXMLElement* root)
+{
+  vtkPVXMLElement* proxyElement = vtkPVXMLElement::New();
+  proxyElement->SetName("RevivalState");
+  proxyElement->AddAttribute("id", this->GetSelfIDAsString());
+  proxyElement->AddAttribute("servers", 
+    static_cast<unsigned int>(this->Servers));
+  root->AddNestedElement(proxyElement);
+  proxyElement->Delete();
+
+  // Save VTKObject IDs as well.
+  vtkPVXMLElement* idRoot = vtkPVXMLElement::New();
+  idRoot->SetName("VTKObjectIDs");
+  idRoot->AddAttribute("number_of_ids", this->GetNumberOfIDs());
+  proxyElement->AddNestedElement(idRoot);
+  idRoot->Delete();
+  for (unsigned int cc=0; cc < this->Internals->IDs.size(); cc++)
+    {
+    vtkPVXMLElement* elem = vtkPVXMLElement::New();
+    elem->SetName("Element");
+    elem->AddAttribute("id", 
+      static_cast<unsigned int>(this->Internals->IDs[cc].ID));
+    idRoot->AddNestedElement(elem);
+    elem->Delete();
+    }
+  vtkSMProxyInternals::ProxyMap::iterator iter =
+    this->Internals->SubProxies.begin();
+  for (; iter != this->Internals->SubProxies.end(); ++iter)
+    {
+    vtkPVXMLElement* subproxyElement = vtkPVXMLElement::New();
+    subproxyElement->SetName("SubProxy");
+    subproxyElement->AddAttribute("name", iter->first.c_str());
+    iter->second.GetPointer()->SaveRevivalState(subproxyElement);
+    proxyElement->AddNestedElement(subproxyElement);
+    subproxyElement->Delete();
+    }
   return proxyElement;
 }
 

@@ -245,6 +245,11 @@ public:
   vtkClientServerID GetConnectionClientServerID(vtkIdType);
 
   // Description:
+  // Given a vtkProcessModuleConnection, this method returns the connection
+  // ID for it.
+  vtkIdType GetConnectionID(vtkProcessModuleConnection* connection);
+
+  // Description:
   // Sends streams to the appropriate connection.
   // serverFlags are passed on to the connection. This method also
   // gurantees that the SelfConnection is present in the group of connections

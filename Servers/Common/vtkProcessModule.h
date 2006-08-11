@@ -161,6 +161,18 @@ public:
   // caller must use SendStream() to actually perform the operation.
   vtkClientServerID NewStreamObject(const char*, vtkClientServerStream& stream);
   void DeleteStreamObject(vtkClientServerID, vtkClientServerStream& stream);
+
+  // Description:
+  // This method is an overload for the 
+  // NewStreamObject(const char*, vtkClientServerStream&). It is similar to the other
+  // since is also creates a new vtkobject, however, it does not assign a new
+  // object ID for it, instead the id passed as argument is used. 
+  // Additionally, it updates the internal ID count, so that next UniqueID 
+  // requested from the process module will certainly be greater than the one
+  // passed to this method.
+  vtkClientServerID NewStreamObject(const char*, vtkClientServerStream& stream,
+    vtkClientServerID id);
+
   
   // Description:
   // Return the vtk object associated with the given id for the
@@ -236,6 +248,11 @@ public:
   // Description:
   // Get a unique vtkClientServerID for this process module.
   vtkClientServerID GetUniqueID();
+
+  // Description:
+  // This method updates the internal datastructure that allocates unique ID to
+  // ensure that the \c id does not get assigned.
+  void ReserveID(vtkClientServerID id);
 
   // Description:
   // Get the vtkClientServerID used for the ProcessModule.
@@ -374,8 +391,17 @@ public:
   // to SelfConnection also.
   vtkClientServerID GetConnectionClientServerID(vtkIdType);
 
+  // Description:
+  // Given a ClientServer ID for a connection, it returns the connection ID
+  // assigned to it on this process.
+  vtkIdType GetConnectionID(vtkClientServerID id);
 //ETX
-  
+
+  // Description:
+  // Given a vtkProcessModuleConnection, this method returns the connection
+  // ID for it.
+  vtkIdType GetConnectionID(vtkProcessModuleConnection* connection);
+
   // Description:
   // Get the active remote connection. The notion of active conntion
   // is here only for the sake of ProgressHandler.
@@ -476,6 +502,7 @@ public:
   // Closes a server socket with the given id. The id is the same id returned 
   // by AcceptConnectionsOnPort().
   void StopAcceptingConnections(int id);
+  void StopAcceptingAllConnections();
 
   // Description:
   // This creates a new SelfConnection. This is experimental feature.
@@ -535,6 +562,12 @@ public:
   // \returns NULL on failure, otherwise the XML element is returned.
   vtkPVXMLElement* NewNextRedo(vtkIdType id);
 
+  // Description:
+  // This flag is used to shut the SendStream from sending any thing to
+  // the servers. This is useful for reiviving a server manager.
+  vtkSetMacro(SendStreamToClientOnly, int);
+  vtkGetMacro(SendStreamToClientOnly, int);
+  vtkBooleanMacro(SendStreamToClientOnly, int);
 //BTX
 protected:
   vtkProcessModule();
@@ -647,6 +680,10 @@ protected:
   // On the server, connections are no longer monitored once
   // ExceptionRaised is set.
   int ExceptionRaised;
+
+  // This flag is used to shut the SendStream from sending any thing to
+  // the servers. This is useful for reiviving a server manager.
+  int SendStreamToClientOnly;
 
   static int StreamBlockFlag;
 

@@ -41,6 +41,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkClientServerInterpreter.h"
 
 #include "vtkProcessModule.h"
+#include "vtkSMApplication.h"
+#include "vtkSMProperty.h"
 
 // forward declare the initialize function
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
@@ -60,7 +62,12 @@ int main(int argc, char* argv[])
     argc, argv);
   if (!ret)
     {
+    vtkSMApplication* smapplication = vtkSMApplication::New();
+    vtkSMProperty::SetCheckDomains(0);
+    smapplication->Initialize();
     ret = pvmain->Run(options);
+    smapplication->Finalize();
+    smapplication->Delete();
     }
   // clean up and return
   pvmain->Delete();

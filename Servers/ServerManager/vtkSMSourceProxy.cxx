@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.41");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.42");
 
 struct vtkSMSourceProxyInternals
 {
@@ -707,6 +707,59 @@ void vtkSMSourceProxy::ConvertArrayInformationToProperty(
     }
 
   prop->SetInformationOnly(1);
+}
+
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMSourceProxy::SaveRevivalState(vtkPVXMLElement* root)
+{
+  vtkPVXMLElement* revivalElem = this->Superclass::SaveRevivalState(root);
+  if (revivalElem)
+    {
+    vtkstd::vector<vtkSmartPointer<vtkSMPart> >::iterator it =
+      this->PInternals->Parts.begin();
+    for(; it != this->PInternals->Parts.end(); ++it)
+      {
+      vtkPVXMLElement* partsElement = vtkPVXMLElement::New();
+      partsElement->SetName("Part");
+      revivalElem->AddNestedElement(partsElement);
+      partsElement->Delete();
+      it->GetPointer()->SaveRevivalState(partsElement);
+      }
+    }
+  return revivalElem;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMSourceProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
+  vtkSMStateLoader* loader)
+{
+  if (!this->Superclass::LoadRevivalState(revivalElem, loader))
+    {
+    return 0;
+    }
+
+  unsigned int num_elems = revivalElem->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc <num_elems; cc++)
+    {
+    vtkPVXMLElement* curElement = revivalElem->GetNestedElement(cc);
+    if (curElement->GetName() && strcmp(curElement->GetName(), "Part") == 0)
+      {
+      vtkSmartPointer<vtkSMPart> part = vtkSmartPointer<vtkSMPart>::New();
+      part->SetConnectionID(this->ConnectionID);
+      part->SetServers(this->Servers);
+      if (part->LoadRevivalState(curElement->GetNestedElement(0), loader))
+        {
+        this->PInternals->Parts.push_back(part);
+        }
+      else
+        {
+        vtkErrorMacro("Failed to revive part");
+        return 0;
+        }
+      }
+    }
+  this->PartsCreated = 1;
+  return 1;
 }
 
 //---------------------------------------------------------------------------

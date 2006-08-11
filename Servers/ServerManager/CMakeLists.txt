@@ -36,6 +36,7 @@ SET(Kit_SRCS
   vtkSMCompositeRenderModuleProxy.cxx
   vtkSMCompoundProxy.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
+  vtkSMConnectionCleanerProxy.cxx
   vtkSMConsumerDisplayProxy.cxx
   vtkSMDataObjectDisplayProxy.cxx
   vtkSMDataTypeDomain.cxx
@@ -99,6 +100,7 @@ SET(Kit_SRCS
   vtkSMProxyIterator.cxx
   vtkSMProxyLink.cxx
   vtkSMProxyListDomain.cxx
+  vtkSMProxyManagerReviver.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
@@ -106,9 +108,11 @@ SET(Kit_SRCS
   vtkSMPWriterProxy.cxx
   vtkSMRampKeyFrameProxy.cxx
   vtkSMRenderModuleProxy.cxx
-  vtkSMServerFileListingProxy.cxx
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetProxy.cxx
+  vtkSMServerFileListingProxy.cxx
+  vtkSMServerProxyManagerReviver.cxx
+  vtkSMServerSideAnimationPlayer.cxx
   vtkSMShrunkContoursProxy.cxx
   vtkSMSimpleIntInformationHelper.cxx
   vtkSMSinusoidKeyFrameProxy.cxx
@@ -173,6 +177,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMLink.cxx
+  vtkSMProxyManagerReviver.cxx
   vtkSMRenderModuleProxy.cxx
   vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx

@@ -68,6 +68,12 @@ public:
   virtual void Copy(vtkSMProxy* src, const char* exceptionClass, 
     int proxyPropertyCopyFlag);
 protected:
+
+  // Description:
+  // Overridden simply to set ObjectsCreated to 1, since this class does 
+  // not create any server side objects.
+  virtual void CreateVTKObjects(int numObjects);
+
   // Description:
   // This method is called when the AnimationCue's StartAnimationCueEvent is
   // triggerred, to let the animation manipulator know that the cue has
