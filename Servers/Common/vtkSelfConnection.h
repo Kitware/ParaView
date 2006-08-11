@@ -99,8 +99,8 @@ protected:
   // same as sending to the root.
   virtual vtkTypeUInt32 CreateSendFlag(vtkTypeUInt32 );
 
-  // send a stream to the data server root.
-  virtual int SendStreamToDataServerRoot(vtkClientServerStream& s);
+  // send a stream to the client.
+  virtual int SendStreamToClient(vtkClientServerStream& s);
 
   vtkUndoStack* UndoRedoStack;
 

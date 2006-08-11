@@ -61,12 +61,12 @@ private:
 };
 
 vtkStandardNewMacro(vtkSelfConnectionUndoSet);
-vtkCxxRevisionMacro(vtkSelfConnectionUndoSet, "1.2");
+vtkCxxRevisionMacro(vtkSelfConnectionUndoSet, "1.3");
 vtkCxxSetObjectMacro(vtkSelfConnectionUndoSet, XMLElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSelfConnection);
-vtkCxxRevisionMacro(vtkSelfConnection, "1.2");
+vtkCxxRevisionMacro(vtkSelfConnection, "1.3");
 //-----------------------------------------------------------------------------
 vtkSelfConnection::vtkSelfConnection()
 {
@@ -101,13 +101,13 @@ vtkTypeUInt32 vtkSelfConnection::CreateSendFlag(vtkTypeUInt32 servers)
   // Everything is just processed on this single process.
   if (servers != 0)
     {
-    return vtkProcessModule::DATA_SERVER_ROOT;
+    return vtkProcessModule::CLIENT;
     }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
-int vtkSelfConnection::SendStreamToDataServerRoot(vtkClientServerStream& stream)
+int vtkSelfConnection::SendStreamToClient(vtkClientServerStream& stream)
 {
   return this->ProcessStreamLocally(stream);
 }
