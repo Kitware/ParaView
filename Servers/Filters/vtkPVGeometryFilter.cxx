@@ -50,7 +50,7 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.66");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.67");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -640,7 +640,6 @@ void vtkPVGeometryFilter::DataSetSurfaceExecute(vtkDataSet* input,
   this->DataSetSurfaceFilter->SetInput(ds);
   ds->Delete();
 
-
   // Observe the progress of the internal filter.
   this->DataSetSurfaceFilter->AddObserver(vtkCommand::ProgressEvent, 
                                           this->InternalProgressObserver);
@@ -827,6 +826,7 @@ void vtkPVGeometryFilter::PolyDataExecute(
       {
       vtkPolyData *inCopy = vtkPolyData::New();
       vtkStripper *stripper = vtkStripper::New();
+      stripper->SetPassThroughCellIds(this->PassThroughCellIds);
       inCopy->ShallowCopy(input);
       inCopy->RemoveGhostCells(1);
       stripper->SetInput(inCopy);
@@ -848,14 +848,12 @@ void vtkPVGeometryFilter::PolyDataExecute(
         originalCellIds->SetNumberOfComponents(1);
         vtkCellData *outputCD = out->GetCellData();
         outputCD->AddArray(originalCellIds);
-        
         vtkIdType numTup = out->GetNumberOfCells();
         originalCellIds->SetNumberOfValues(numTup);
         for (vtkIdType cId = 0; cId < numTup; cId++)
           {
           originalCellIds->SetValue(cId, cId);
           }
-        
         originalCellIds->Delete();
         originalCellIds = NULL;
         }
@@ -955,4 +953,14 @@ void vtkPVGeometryFilter::SetPassThroughCellIds(int newvalue)
       this->PassThroughCellIds);
     }
   
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::SetUseStrips(int newvalue)
+{
+  this->UseStrips = newvalue;
+  if (this->DataSetSurfaceFilter)
+    {
+    this->DataSetSurfaceFilter->SetUseStrips(this->UseStrips);
+    }  
 }
