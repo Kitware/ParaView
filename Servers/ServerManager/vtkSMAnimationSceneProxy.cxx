@@ -51,7 +51,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.25");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -201,6 +201,11 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot,
                                          int quality)
 {
 
+  if (!this->RenderModuleProxy)
+    {
+    vtkErrorMacro("Render Module is not set.");
+    return 1;
+    }
   if (this->InSaveAnimation || 
       this->ImageWriter || this->MovieWriter || !this->RenderModuleProxy)
     {

@@ -1761,7 +1761,7 @@
       <IntVectorProperty
         name="Size"
         command="SetSize"
-        number_of_elements="1"
+        number_of_elements="2"
         default_values="400 400">
         <IntRangeDomain name="range" min="1 1" />
       </IntVectorProperty>

@@ -20,14 +20,15 @@
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkSMProxy.h"
+#include "vtkSMPart.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStateLoader.h"
 
 #include <vtksys/ios/sstream>
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.1");
+vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {
@@ -57,33 +58,36 @@ int vtkSMServerProxyManagerReviver::ReviveRemoteServerManager(vtkIdType cid)
 
   vtkClientServerStream stream;
 
-  // 1.1) Cleanup render modules and displays altogether.
+  // hide server side objects from every proxy except displays/render modules.
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetConnectionID(cid);
-  for (iter->Begin(); !iter->IsAtEnd(); )
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkstd::string group = iter->GetGroup();
     vtkstd::string proxy_name = iter->GetKey();
     vtkSMProxy* proxy = iter->GetProxy();
-    int unregister = 0;
     if (proxy && 
-      (strcmp(proxy->GetXMLGroup(), "displays") ==0 ||
-       strcmp(proxy->GetXMLGroup(), "rendermodules") ==0))
+      strcmp(proxy->GetXMLGroup(), "displays") !=0 &&
+      strcmp(proxy->GetXMLGroup(), "rendermodules") !=0)
       {
-      unregister = 1;
-      }
-    iter->Next();
-    if (unregister)
-      {
-      pxm->UnRegisterProxy(group.c_str(), proxy_name.c_str(), proxy);
+      proxy->SetServers(proxy->GetServers() & vtkProcessModule::CLIENT);
+      vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(proxy);
+      if (src)
+        {
+        for (unsigned int cc=0; cc <src->GetNumberOfParts(); ++cc)
+          {
+          vtkSMProxy* part = src->GetPart(cc);
+          part->SetServers(part->GetServers() & vtkProcessModule::CLIENT);
+          }
+        }
       }
     }
   iter->Delete();
 
   // 2) Cleanup client side proxy manager objects for the cid.
-  pm->SendStreamToClientOnlyOn();
+  // pm->SendStreamToClientOnlyOn();
   pxm->UnRegisterProxies(cid);  
-  pm->SendStreamToClientOnlyOff();
+  // pm->SendStreamToClientOnlyOff();
 
   vtksys_ios::ostringstream xml_stream;
   root->PrintXML(xml_stream, vtkIndent());
