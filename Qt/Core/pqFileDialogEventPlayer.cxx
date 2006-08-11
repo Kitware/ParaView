@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTestUtility.h"
 
 #include <pqFileDialog.h>
-#include <pqTesting.h>
 
 #include <QApplication>
 #include <QtDebug>
