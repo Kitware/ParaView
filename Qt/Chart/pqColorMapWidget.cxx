@@ -403,16 +403,17 @@ void pqColorMapWidget::mouseReleaseEvent(QMouseEvent *e)
     {
     // TODO: Finish point move mode.
     // TODO: Allow the user to add points.
+
+    if(this->Internal->PointIndex != -1)
+      {
+      // Make a request for the color change event.
+      emit this->colorChangeRequested(this->Internal->PointIndex);
+      }
     }
 }
 
-void pqColorMapWidget::mouseDoubleClickEvent(QMouseEvent *e)
+void pqColorMapWidget::mouseDoubleClickEvent(QMouseEvent *)
 {
-  if(e->button() == Qt::LeftButton && this->Internal->PointIndex != -1)
-    {
-    // Make a request for the color change event.
-    emit this->colorChangeRequested(this->Internal->PointIndex);
-    }
 }
 
 void pqColorMapWidget::paintEvent(QPaintEvent *e)

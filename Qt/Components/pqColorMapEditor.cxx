@@ -39,10 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartValue.h"
 #include "pqColorMapColorChanger.h"
 #include "pqColorMapWidget.h"
+#include "pqColorTableDelegate.h"
+#include "pqColorTableModel.h"
 #include "pqPipelineDisplay.h"
 #include "pqSMAdaptor.h"
 
 #include <QColor>
+#include <QColorDialog>
 #include <QList>
 #include <QPointer>
 #include <QString>
@@ -74,11 +77,13 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
   : QDialog(widgetParent)
 {
   this->Form = new pqColorMapEditorForm();
+  this->Model = new pqColorTableModel(this);
   this->LookupTable = 0;
   this->EditDelay = new QTimer(this);
   this->Form->setupUi(this);
 
-  // Set up the timer.
+  // Set up the timer. The timer is used when the user edits the
+  // table size.
   this->EditDelay->setSingleShot(true);
 
   // Use the default color chooser. The pointer will get deleted with
@@ -89,9 +94,28 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
   this->Form->UseTable->setEnabled(false);
   this->Form->UseGradient->setEnabled(false);
 
+  // Set up the color table model. Use the color table delegate to
+  // display the colors correctly. It will get deleted with the model.
+  this->Form->ColorTable->setModel(this->Model);
+  this->Form->ColorTable->setItemDelegate(
+      new pqColorTableDelegate(this->Model));
+
+  // Hide the color table until it is requested. Shorten the dialog to
+  // account for the hidden field.
+  this->Form->ColorTable->hide();
+  QSize dialogSize = this->sizeHint();
+  dialogSize.setWidth(this->size().width());
+  this->resize(dialogSize);
+
   // Connect the close button.
   this->connect(this->Form->CloseButton, SIGNAL(clicked()),
       this, SLOT(closeForm()));
+
+  // Connect the check box options.
+  this->connect(this->Form->UseTable, SIGNAL(toggled(bool)),
+      this, SLOT(setUsingTable(bool)));
+  this->connect(this->Form->UseGradient, SIGNAL(toggled(bool)),
+      this, SLOT(setUsingGradient(bool)));
 
   // Link the resolution slider and text box with the color scale.
   this->connect(this->Form->TableSize, SIGNAL(valueChanged(int)),
@@ -101,15 +125,24 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
   this->connect(this->EditDelay, SIGNAL(timeout()),
       this, SLOT(setSizeFromText()));
 
+  // Handle the color change request for the color table.
+  this->connect(this->Form->ColorTable, SIGNAL(clicked(const QModelIndex &)),
+      this, SLOT(getTableColor(const QModelIndex &)));
+
   // Listen for color changes.
   this->connect(
       this->Form->ColorScale, SIGNAL(colorChanged(int, const QColor &)),
-      this, SLOT(changeColor(int, const QColor &)));
+      this, SLOT(changeControlColor(int, const QColor &)));
+  this->connect(this->Model, SIGNAL(colorChanged(int, const QColor &)),
+      this, SLOT(changeTableColor(int, const QColor &)));
+  this->connect(this->Model, SIGNAL(colorRangeChanged(int, int)),
+      this, SLOT(updateTableRange(int, int)));
 }
 
 pqColorMapEditor::~pqColorMapEditor()
 {
   delete this->Form;
+  delete this->Model;
   delete this->EditDelay;
 }
 
@@ -178,6 +211,20 @@ void pqColorMapEditor::setDisplay(pqPipelineDisplay *display)
     }
 }
 
+int pqColorMapEditor::getTableSize() const
+{
+  if(this->Form->UseTable->isChecked())
+    {
+    QString text = this->Form->TableSizeText->text();
+    if(!text.isEmpty())
+      {
+      return text.toInt();
+      }
+    }
+
+  return 0;
+}
+
 void pqColorMapEditor::closeEvent(QCloseEvent *e)
 {
   // If the timer is running, cancel it.
@@ -187,6 +234,39 @@ void pqColorMapEditor::closeEvent(QCloseEvent *e)
     }
 
   QDialog::closeEvent(e);
+}
+
+void pqColorMapEditor::setUsingTable(bool)
+{
+}
+
+void pqColorMapEditor::setUsingGradient(bool on)
+{
+  if(on)
+    {
+    // Make sure the color scale is shown.
+    this->Form->ColorTable->hide();
+    this->Form->ColorScale->show();
+    this->Form->ColorLabel->setText("Color Scale");
+
+    // TODO: Make sure the color scale is up to date.
+    this->Form->ColorScale->setTableSize(this->getTableSize());
+    }
+  else
+    {
+    // Make sure the color table is shown.
+    this->Form->ColorScale->hide();
+    this->Form->ColorTable->show();
+    this->Form->ColorLabel->setText("Color Table");
+
+    // TODO: Make sure the color table is up to date.
+    this->Model->setTableSize(this->getTableSize());
+    }
+
+  // Adjust the size to fit the new contents.
+  QSize dialogSize = this->sizeHint();
+  dialogSize.setWidth(this->size().width());
+  this->resize(dialogSize);
 }
 
 void pqColorMapEditor::handleTextEdit(const QString &)
@@ -219,7 +299,15 @@ void pqColorMapEditor::setSizeFromSlider(int tableSize)
 void pqColorMapEditor::setTableSize(int tableSize)
 {
   // Set the table size for the color scale and the lookup table.
-  this->Form->ColorScale->setTableSize(tableSize);
+  if(this->Form->UseGradient->isChecked())
+    {
+    this->Form->ColorScale->setTableSize(tableSize);
+    }
+  else
+    {
+    this->Model->setTableSize(tableSize);
+    }
+
   if(this->LookupTable)
     {
     vtkSMProperty *prop = this->LookupTable->GetProperty(
@@ -230,7 +318,7 @@ void pqColorMapEditor::setTableSize(int tableSize)
     }
 }
 
-void pqColorMapEditor::changeColor(int, const QColor &)
+void pqColorMapEditor::changeControlColor(int, const QColor &)
 {
   if(this->LookupTable)
     {
@@ -255,6 +343,32 @@ void pqColorMapEditor::changeColor(int, const QColor &)
     this->LookupTable->UpdateVTKObjects();
     this->Form->Display->renderAllViews();
     }
+}
+
+void pqColorMapEditor::getTableColor(const QModelIndex &index)
+{
+  // Get the starting color from the model.
+  QColor color;
+  this->Model->getColor(index, color);
+
+  // Let the user pick a new color.
+  color = QColorDialog::getColor(color, this);
+  if(color.isValid())
+    {
+    this->Model->setColor(index, color);
+    }
+}
+
+void pqColorMapEditor::changeTableColor(int index, const QColor &color)
+{
+  // TODO: Set the lookup table color when the proxy interface
+  // supports it.
+}
+
+void pqColorMapEditor::updateTableRange(int first, int last)
+{
+  // TODO: Set the lookup table color when the proxy interface
+  // supports it.
 }
 
 void pqColorMapEditor::closeForm()

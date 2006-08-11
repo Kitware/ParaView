@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>209</height>
+    <height>399</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -24,6 +24,9 @@
    </property>
    <item>
     <widget class="QCheckBox" name="UseTable" >
+     <property name="whatsThis" >
+      <string>Check the box to use a fixed size color table. Uncheck the box to use a color transfer function.</string>
+     </property>
      <property name="text" >
       <string>Use Color Table</string>
      </property>
@@ -49,6 +52,9 @@
       </property>
       <item row="0" column="0" colspan="3" >
        <widget class="QCheckBox" name="UseGradient" >
+        <property name="whatsThis" >
+         <string>Check the box to use a color gradient. Uncheck the box to set individual colors in the color table.</string>
+        </property>
         <property name="text" >
          <string>Use Color Gradient</string>
         </property>
@@ -67,10 +73,16 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="whatsThis" >
+         <string>This displays the color table resolution. It can also be used to enter a new value for the table size.</string>
+        </property>
        </widget>
       </item>
       <item row="1" column="1" >
        <widget class="QSlider" name="TableSize" >
+        <property name="whatsThis" >
+         <string>You can change the color table size by moving the slider.</string>
+        </property>
         <property name="minimum" >
          <number>2</number>
         </property>
@@ -87,6 +99,9 @@
       </item>
       <item row="1" column="0" >
        <widget class="QLabel" name="label" >
+        <property name="whatsThis" >
+         <string>You can change the color table size by moving the slider.</string>
+        </property>
         <property name="text" >
          <string>Resolution</string>
         </property>
@@ -96,14 +111,37 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_2" >
+    <widget class="QLabel" name="ColorLabel" >
      <property name="text" >
       <string>Color Scale</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="pqColorMapWidget" name="ColorScale" />
+    <widget class="pqColorMapWidget" name="ColorScale" >
+     <property name="whatsThis" >
+      <string>This displays the color scale. The control points determine how the gradient is rendered.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QListView" name="ColorTable" >
+     <property name="whatsThis" >
+      <string>This displays the colors in the color table. Each entry in the color table can be changed.</string>
+     </property>
+     <property name="flow" >
+      <enum>QListView::LeftToRight</enum>
+     </property>
+     <property name="isWrapping" stdset="0" >
+      <bool>true</bool>
+     </property>
+     <property name="resizeMode" >
+      <enum>QListView::Adjust</enum>
+     </property>
+     <property name="spacing" >
+      <number>4</number>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" >

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqColorMapEditor.h
+   Module:    pqColorTableDelegate.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,60 +30,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqColorMapEditor.h
-/// \date 7/31/2006
+/// \file pqColorTableDelegate.h
+/// \date 8/11/2006
 
-#ifndef _pqColorMapEditor_h
-#define _pqColorMapEditor_h
-
-
-#include "pqComponentsExport.h"
-#include <QDialog>
-
-class pqColorMapEditorForm;
-class pqColorTableModel;
-class pqPipelineDisplay;
-class QCloseEvent;
-class QColor;
-class QModelIndex;
-class QString;
-class QTimer;
-class vtkSMLookupTableProxy;
+#ifndef _pqColorTableDelegate_h
+#define _pqColorTableDelegate_h
 
 
-class PQCOMPONENTS_EXPORT pqColorMapEditor : public QDialog
+#include "QtWidgetsExport.h"
+#include <QAbstractItemDelegate>
+
+
+class QTWIDGETS_EXPORT pqColorTableDelegate : public QAbstractItemDelegate
 {
-  Q_OBJECT
-
 public:
-  pqColorMapEditor(QWidget *parent=0);
-  virtual ~pqColorMapEditor();
+  pqColorTableDelegate(QObject *parent=0);
+  virtual ~pqColorTableDelegate() {}
 
-  void setDisplay(pqPipelineDisplay *display);
-  int getTableSize() const;
+  virtual QSize sizeHint(const QStyleOptionViewItem &option,
+      const QModelIndex &index) const;
+
+  virtual void paint(QPainter *painter, const QStyleOptionViewItem &option,
+      const QModelIndex &index) const;
+
+  void setColorSize(int size) {this->ColorSize = size > 3 ? size : 4;}
+  int getColorSize() const {return this->ColorSize;}
 
 protected:
-  virtual void closeEvent(QCloseEvent *e);
-
-private slots:
-  void setUsingTable(bool on);
-  void setUsingGradient(bool on);
-  void handleTextEdit(const QString &text);
-  void setSizeFromText();
-  void setSizeFromSlider(int tableSize);
-  void setTableSize(int tableSize);
-  void changeControlColor(int index, const QColor &color);
-  void getTableColor(const QModelIndex &index);
-  void changeTableColor(int index, const QColor &color);
-  void updateTableRange(int first, int last);
-  void closeForm();
+  // QAbstractItemDelegate disables copy.
+  pqColorTableDelegate(const pqColorTableDelegate &);
+  pqColorTableDelegate &operator=(const pqColorTableDelegate &);
 
 private:
-  pqColorMapEditorForm *Form;
-  pqColorTableModel *Model;
-  vtkSMLookupTableProxy *LookupTable;
-  QTimer *EditDelay;
+  int ColorSize;
 };
 
 #endif
-

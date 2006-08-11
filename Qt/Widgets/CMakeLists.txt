@@ -13,6 +13,10 @@ SET(QtWidgets_SRCS
   pqCollapsedGroup.h
   pqColorChooserButton.cxx
   pqColorChooserButton.h
+  pqColorTableDelegate.cxx
+  pqColorTableDelegate.h
+  pqColorTableModel.cxx
+  pqColorTableModel.h
   pqConnect.cxx
   pqConnect.h
   pqConsoleWidget.cxx
@@ -57,6 +61,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqChartContextMenu.h
   pqCollapsedGroup.h
   pqColorChooserButton.h
+  pqColorTableModel.h
   pqConsoleWidget.h
   pqDelimitedTextParser.h
   pqFileDialog.h
