@@ -44,6 +44,12 @@ public:
   virtual int ReadValueInternal(const char *key, char *value); 
 
   // Description:
+  // Read a DWORD value from the registry.
+  // Warning: this is not part of the cross-platform API 
+  // because it is aware of type (DWORD) to read.
+  virtual int ReadValueInternal(const char *key, int *value); 
+
+  // Description:
   // Delete a key from the registry.
   virtual int DeleteKeyInternal(const char *key);
 
@@ -54,11 +60,21 @@ public:
   // Description:
   // Set value in a given key.
   virtual int SetValueInternal(const char *key, const char *value);
-
+  
+  // Description:
+  // Set DWORD value in a given key.
+  // Warning: this is not part of the cross-platform API 
+  // because it is aware of type (DWORD) to write.
+  virtual int SetValueInternal(const char *key, int *value);
+  
   // Description:
   // Open the registry at toplevel/subkey.
   virtual int OpenInternal(const char *toplevel, const char *subkey, int readonly);
   
+  // Description:
+  // Open the registry at the given key.
+  virtual int OpenInternal(const char *key, int readonly);
+
   // Description:
   // Close the registry.
   virtual int CloseInternal();

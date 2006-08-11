@@ -14,8 +14,10 @@
 #include "vtkKWWin32RegistryHelper.h"
 
 #include "vtkObjectFactory.h"
+#include <vtksys/stl/string>
+#include <stdlib.h>
 
-vtkCxxRevisionMacro(vtkKWWin32RegistryHelper, "1.3");
+vtkCxxRevisionMacro(vtkKWWin32RegistryHelper, "1.4");
 vtkStandardNewMacro( vtkKWWin32RegistryHelper );
 
 #define BUFFER_SIZE 8192
@@ -39,32 +41,75 @@ int vtkKWWin32RegistryHelper::OpenInternal(const char *toplevel,
                                            const char *subkey, 
                                            int readonly)
 {
-  HKEY scope = HKEY_CURRENT_USER;
-  if ( this->GetGlobalScope() )
-    {
-    scope = HKEY_LOCAL_MACHINE;
-    }
   int res = 0;
   ostrstream str;
-  DWORD dwDummy;
+  if ( this->GetGlobalScope() )
+    {
+    str << "HKEY_LOCAL_MACHINE\\";
+    }
+  else
+    {
+    str << "HKEY_CURRENT_USER\\";
+    }
   str << "Software\\";
   if (this->Organization)
     {
     str << this->Organization << "\\";
     }
   str << toplevel << "\\" << subkey << ends;
+  
+  res = this->OpenInternal(str.str(), readonly);
+  str.rdbuf()->freeze(0);
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWin32RegistryHelper::OpenInternal(const char *key, int readonly)
+{
+  int res = 0;
+  vtksys_stl::string primary = key;
+  vtksys_stl::string second;
+ 
+  size_t start = primary.find("\\");
+  if (start == vtksys_stl::string::npos)
+    {
+    return res;
+    }
+
+  second = primary.substr(start+1, primary.length()-start-1);
+  primary = primary.substr(0, start);
+  
+  HKEY primaryKey = HKEY_CURRENT_USER;
+  if (primary == "HKEY_CURRENT_CONFIG")
+    {
+    primaryKey = HKEY_CURRENT_CONFIG;
+    }
+  else if (primary == "HKEY_CLASSES_ROOT")
+    {
+    primaryKey = HKEY_CLASSES_ROOT;
+    }
+  else if (primary == "HKEY_LOCAL_MACHINE")
+    {
+    primaryKey = HKEY_LOCAL_MACHINE;
+    }
+  else if (primary == "HKEY_USERS")
+    {
+    primaryKey = HKEY_USERS;
+    }
+  
+  DWORD dwDummy;
   if ( readonly == vtkKWRegistryHelper::ReadOnly )
     {
-    res = ( RegOpenKeyEx(scope, str.str(), 
+    res = ( RegOpenKeyEx(primaryKey, second.c_str(), 
                          0, KEY_READ, &this->HKey) == ERROR_SUCCESS );
     }
   else
     {
-    res = ( RegCreateKeyEx(scope, str.str(),
+    res = ( RegCreateKeyEx(primaryKey, second.c_str(),
                            0, "", REG_OPTION_NON_VOLATILE, KEY_READ|KEY_WRITE, 
                            NULL, &this->HKey, &dwDummy) == ERROR_SUCCESS );    
     }
-  str.rdbuf()->freeze(0);
+    
   return res;
 }
 
@@ -84,8 +129,32 @@ int vtkKWWin32RegistryHelper::ReadValueInternal(const char *key,
   DWORD dwType, dwSize;  
   dwType = REG_SZ;
   dwSize = BUFFER_SIZE;
+  char data[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
   res = ( RegQueryValueEx(this->HKey, key, NULL, &dwType, 
-                          (BYTE *)value, &dwSize) == ERROR_SUCCESS );
+                          (BYTE *)data, &dwSize) == ERROR_SUCCESS );
+                          
+  if (dwType == REG_SZ)
+    {
+    strcpy(value, data);
+    } 
+  else if(dwType == REG_DWORD)
+    {
+    int dwBuff;
+    res = this->ReadValueInternal(key, &dwBuff);
+    sprintf(value, "%d", dwBuff);
+   }                        
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWin32RegistryHelper::ReadValueInternal(const char *key, int *value)
+{
+  int res = 1;
+  DWORD dwType, dwSize;  
+  dwType = REG_SZ;
+  dwSize = BUFFER_SIZE;
+  res = ( RegQueryValueEx(this->HKey, key, NULL, &dwType, 
+                        (LPBYTE)value, &dwSize) == ERROR_SUCCESS );
   return res;
 }
 
@@ -114,6 +183,16 @@ int vtkKWWin32RegistryHelper::SetValueInternal(const char *key,
   res = ( RegSetValueEx(this->HKey, key, 0, REG_SZ, 
                         (CONST BYTE *)(const char *)value, 
                         len+1) == ERROR_SUCCESS );
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWin32RegistryHelper::SetValueInternal(const char *key, int *value)
+{
+  int res = 1;
+  res = ( RegSetValueEx(this->HKey, key, 0, REG_DWORD, 
+                        (PBYTE)value, 
+                         sizeof(PDWORD)) == ERROR_SUCCESS );
   return res;
 }
 
