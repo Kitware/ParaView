@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.295");
+vtkCxxRevisionMacro(vtkKWApplication, "1.296");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1415,12 +1415,15 @@ int vtkKWApplication::GetRegistryValue(int level, const char* subkey,
 
   vtkKWRegistryHelper *reg = this->GetRegistryHelper();
   reg->SetTopLevel(this->GetName());
+
+  buff[0] = 0;
   res = reg->ReadValue(buffer, key, buff);
-  if (*buff && value)
+  if (res && *buff && value)
     {
     *value = 0;
     strcpy(value, buff);
     }  
+
   return res;
 }
 

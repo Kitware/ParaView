@@ -17,7 +17,7 @@
 #include <vtksys/stl/string>
 #include <stdlib.h>
 
-vtkCxxRevisionMacro(vtkKWWin32RegistryHelper, "1.4");
+vtkCxxRevisionMacro(vtkKWWin32RegistryHelper, "1.5");
 vtkStandardNewMacro( vtkKWWin32RegistryHelper );
 
 #define BUFFER_SIZE 8192
@@ -130,19 +130,26 @@ int vtkKWWin32RegistryHelper::ReadValueInternal(const char *key,
   dwType = REG_SZ;
   dwSize = BUFFER_SIZE;
   char data[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
-  res = ( RegQueryValueEx(this->HKey, key, NULL, &dwType, 
+
+  data[0] = 0;
+
+  res = ( RegQueryValueEx(this->HKey, key, NULL, &dwType,
                           (BYTE *)data, &dwSize) == ERROR_SUCCESS );
-                          
-  if (dwType == REG_SZ)
+
+  if (res)
     {
-    strcpy(value, data);
-    } 
-  else if(dwType == REG_DWORD)
-    {
-    int dwBuff;
-    res = this->ReadValueInternal(key, &dwBuff);
-    sprintf(value, "%d", dwBuff);
-   }                        
+    if (dwType == REG_SZ)
+      {
+      strcpy(value, data);
+      }
+    else if(dwType == REG_DWORD)
+      {
+      int dwBuff;
+      res = this->ReadValueInternal(key, &dwBuff);
+      sprintf(value, "%d", dwBuff);
+     }
+    }
+
   return res;
 }
 
@@ -151,8 +158,8 @@ int vtkKWWin32RegistryHelper::ReadValueInternal(const char *key, int *value)
 {
   int res = 1;
   DWORD dwType, dwSize;  
-  dwType = REG_SZ;
-  dwSize = BUFFER_SIZE;
+  dwType = REG_DWORD;
+  dwSize = sizeof(DWORD);
   res = ( RegQueryValueEx(this->HKey, key, NULL, &dwType, 
                         (LPBYTE)value, &dwSize) == ERROR_SUCCESS );
   return res;
@@ -192,7 +199,7 @@ int vtkKWWin32RegistryHelper::SetValueInternal(const char *key, int *value)
   int res = 1;
   res = ( RegSetValueEx(this->HKey, key, 0, REG_DWORD, 
                         (PBYTE)value, 
-                         sizeof(PDWORD)) == ERROR_SUCCESS );
+                         sizeof(DWORD)) == ERROR_SUCCESS );
   return res;
 }
 
@@ -201,6 +208,3 @@ void vtkKWWin32RegistryHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
-
-
-
