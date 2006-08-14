@@ -72,6 +72,10 @@ public:
   // Clear all entries.
   void RemoveAllEntries();
 
+  // Description:
+  // Update self based on the "unchecked" values of all required
+  // properties. Overwritten by sub-classes.
+  virtual void Update(vtkSMProperty* property);
 protected:
   vtkSMEnumerationDomain();
   ~vtkSMEnumerationDomain();

@@ -1898,7 +1898,11 @@
          command="SetTable"
          number_of_elements="1"
          default_values="0">
-         <IntRangeDomain name="range" min="0"/>
+         <EnumerationDomain name="enum">
+           <RequiredProperties>
+             <Property name="TableIds" function="Enumeration"/>
+          </RequiredProperties>
+         </EnumerationDomain>
      </IntVectorProperty>
      <IntVectorProperty
          name="TableIds"
