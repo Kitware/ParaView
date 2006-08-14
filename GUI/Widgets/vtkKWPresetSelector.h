@@ -170,7 +170,7 @@ public:
   virtual int BuildPresetThumbnailAndScreenshotFromRenderWindow(
     int id, vtkRenderWindow *win);
   //ETX
-#endif KWWidgets_BUILD_VTK_WIDGETS
+#endif
 
   // Description:
   // Flip the thumbnail and screenshot vertically for a specific preset
