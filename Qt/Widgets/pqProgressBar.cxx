@@ -57,3 +57,13 @@ void pqProgressBar::setProgress(const QString& message, int _value)
   this->setValue(_value);
 }
 
+void pqProgressBar::enableProgress(bool e)
+{
+  this->setEnabled(e);
+  this->setTextVisible(e);
+  if(!e)
+    {
+    this->reset();
+    }
+}
+

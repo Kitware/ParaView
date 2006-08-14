@@ -53,6 +53,7 @@ public:
 
 public slots:
   void setProgress(const QString& message, int value);
+  void enableProgress(bool);
 
 private:
   QString Message;

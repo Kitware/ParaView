@@ -670,13 +670,13 @@ void pqMainWindowCore::setupProgressBar(QStatusBar* toolbar)
 {
   pqProgressBar* const progress_bar = new pqProgressBar(toolbar);
   toolbar->addPermanentWidget(progress_bar);
-  progress_bar->hide();
+  progress_bar->enableProgress(false);
 
   QObject::connect(
     pqApplicationCore::instance(),
     SIGNAL(enableProgress(bool)),
     progress_bar,
-    SLOT(setVisible(bool)));
+    SLOT(enableProgress(bool)));
     
   QObject::connect(
     pqApplicationCore::instance(), 
