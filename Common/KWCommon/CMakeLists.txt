@@ -151,12 +151,7 @@ INCLUDE_DIRECTORIES(
 ADD_LIBRARY(KWCommon ${KWCommon_SRCS})
 
 TARGET_LINK_LIBRARIES(KWCommon
-  vtkFiltering
-  vtkGenericFiltering
-  vtkGraphics
-  vtkIO
-  vtkImaging
-  vtkRendering
+  vtkCommon
   vtksys
   )
 
