@@ -268,6 +268,15 @@ public slots:
   // Called to show the settings dialog.
   void onEditSettings();
 
+  // Camera slots.
+  void resetCamera();
+  void resetViewDirectionPosX();
+  void resetViewDirectionNegX();
+  void resetViewDirectionPosY();
+  void resetViewDirectionNegY();
+  void resetViewDirectionPosZ();
+  void resetViewDirectionNegZ();
+
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);
@@ -313,6 +322,8 @@ private slots:
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
+
+  void resetViewDirection(double x, double y, double z);
 };
 
 #endif // !_pqMainWindowCore_h

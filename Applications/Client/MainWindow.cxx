@@ -278,6 +278,50 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionSelectionMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToSelection()));
 
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionResetCamera, SLOT(setEnabled(bool)));
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionPositiveX, SLOT(setEnabled(bool)));
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionNegativeX, SLOT(setEnabled(bool)));
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionPositiveY, SLOT(setEnabled(bool)));
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionNegativeY, SLOT(setEnabled(bool)));  
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionPositiveZ, SLOT(setEnabled(bool)));
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionNegativeZ, SLOT(setEnabled(bool)));
+  
+  connect(
+    this->Implementation->UI.actionResetCamera, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetCamera()));
+  connect(
+    this->Implementation->UI.actionPositiveX, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionPosX()));
+  connect(
+    this->Implementation->UI.actionNegativeX, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionNegX()));
+  connect(
+    this->Implementation->UI.actionPositiveY, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionPosY()));
+  connect(
+    this->Implementation->UI.actionNegativeY, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionNegY()));  
+  connect(
+    this->Implementation->UI.actionPositiveZ, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionPosZ()));
+  connect(
+    this->Implementation->UI.actionNegativeZ, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionNegZ()));
+
   // Setup the 'modes' so that they are exclusively selected
   QActionGroup *modeGroup = new QActionGroup(this);
     modeGroup->addAction(this->Implementation->UI.actionMoveMode);
@@ -345,6 +389,9 @@ MainWindow::MainWindow() :
 
   this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.VCRToolbar,
     this->Implementation->UI.VCRToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.cameraToolbar,
+    this->Implementation->UI.cameraToolbar->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(this->Implementation->UI.pipelineBrowserDock,
     this->Implementation->UI.pipelineBrowserDock->windowTitle());
@@ -446,6 +493,7 @@ MainWindow::MainWindow() :
   this->Implementation->UI.customFilterToolbar->layout()->setSpacing(0);
   this->Implementation->UI.undoRedoToolbar->layout()->setSpacing(0);
   this->Implementation->UI.VCRToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.cameraToolbar->layout()->setSpacing(0);
 
   // Now that we're ready, initialize everything ...
   this->Implementation->Core.initializeStates();

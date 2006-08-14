@@ -28,7 +28,7 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>21</height>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPipeline" >
@@ -80,18 +80,6 @@
     </widget>
     <addaction name="menuToolbars" />
    </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
-   </widget>
    <widget class="QMenu" name="menuServer" >
     <property name="title" >
      <string>&amp;Server</string>
@@ -123,6 +111,18 @@
     <addaction name="actionFileManageServers" />
     <addaction name="separator" />
     <addaction name="actionFileExit" />
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -306,6 +306,30 @@
    <addaction name="actionVCRPause" />
    <addaction name="actionVCRNextFrame" />
    <addaction name="actionVCRLastFrame" />
+  </widget>
+  <widget class="QToolBar" name="cameraToolbar" >
+   <property name="windowTitle" >
+    <string>Camera Controls</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>20</width>
+     <height>22</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
+   <addaction name="actionResetCamera" />
+   <addaction name="actionPositiveX" />
+   <addaction name="actionNegativeX" />
+   <addaction name="actionPositiveY" />
+   <addaction name="actionNegativeY" />
+   <addaction name="actionPositiveZ" />
+   <addaction name="actionNegativeZ" />
   </widget>
   <action name="actionFileOpen" >
    <property name="icon" >
@@ -587,6 +611,119 @@
    </property>
    <property name="text" >
     <string>Manage Servers ...</string>
+   </property>
+  </action>
+  <action name="actionResetCamera" >
+   <property name="text" >
+    <string>R</string>
+   </property>
+   <property name="statusTip" >
+    <string>Reset Camera</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Reset Camera</string>
+   </property>
+  </action>
+  <action name="actionPositiveX" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>+X</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to +X</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to +X</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to +X</string>
+   </property>
+  </action>
+  <action name="actionNegativeX" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>-X</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to -X</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to -X</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to -X</string>
+   </property>
+  </action>
+  <action name="actionPositiveY" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>+Y</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to +Y</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to +Y</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to +Y</string>
+   </property>
+  </action>
+  <action name="actionNegativeY" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>-Y</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to -Y</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to -Y</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to -Y</string>
+   </property>
+  </action>
+  <action name="actionPositiveZ" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>+Z</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to +Z</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to +Z</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to +Z</string>
+   </property>
+  </action>
+  <action name="actionNegativeZ" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>-Z</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to -Z</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to -Z</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to -Z</string>
    </property>
   </action>
  </widget>

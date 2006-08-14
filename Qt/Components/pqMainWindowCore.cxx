@@ -1885,6 +1885,7 @@ void pqMainWindowCore::createPendingDisplays()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::serverRemoved(pqServer* server)
 {
   if(server == this->Implementation->ActiveServer)
@@ -1893,6 +1894,7 @@ void pqMainWindowCore::serverRemoved(pqServer* server)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::serverAdded(pqServer* server)
 {
   // Create a render module.
@@ -1906,8 +1908,92 @@ void pqMainWindowCore::serverAdded(pqServer* server)
   //emit this->select(server);
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::filtersActivated()
 {
   this->Implementation->PipelineMenu->addFilter(this->getActiveSource());
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::resetCamera()
+{
+  pqRenderModule* ren = this->getActiveRenderModule();
+  if (ren)
+    {
+    ren->resetCamera();
+    ren->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::resetViewDirection(double x, double y, double z)
+{
+  pqRenderModule* ren = this->getActiveRenderModule();
+  if (ren)
+    {
+    vtkSMRenderModuleProxy* proxy = ren->getRenderModuleProxy();
+    proxy->SynchronizeCameraProperties();
+ 
+    pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("CameraPosition"), 0, 0);
+    pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("CameraPosition"), 1, 0);
+    pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("CameraPosition"), 2, 0);
+
+    pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("CameraFocalPoint"), 0, x);
+    pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("CameraFocalPoint"), 1, y);
+    pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("CameraFocalPoint"), 2, z);
+
+    pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("CameraViewUp"), 0, 0);
+    pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("CameraViewUp"), 1, (z==0.0? 0: 1));
+    pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("CameraViewUp"), 2, (z==0.0? 1 : 0));
+    proxy->UpdateVTKObjects();
+
+    ren->resetCamera();
+    ren->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::resetViewDirectionPosX()
+{
+  this->resetViewDirection(1, 0, 0);
+}
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::resetViewDirectionNegX()
+{
+  this->resetViewDirection(-1, 0, 0);
+
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::resetViewDirectionPosY()
+{
+  this->resetViewDirection(0, 1, 0);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::resetViewDirectionNegY()
+{
+  this->resetViewDirection(0, -1, 0);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::resetViewDirectionPosZ()
+{
+  this->resetViewDirection(0, 0, 1);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::resetViewDirectionNegZ()
+{
+  this->resetViewDirection(0, 0, -1);
 }
 
