@@ -19,11 +19,12 @@
 #include "vtkSMIntVectorProperty.h"
 
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMEnumerationDomain);
-vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.8");
+vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.9");
 
 struct vtkSMEnumerationDomainInternals
 {
@@ -181,6 +182,24 @@ int vtkSMEnumerationDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEleme
     this->AddEntry(text, value);
     }
   return 1;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMEnumerationDomain::Update(vtkSMProperty* prop)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
+  if (ivp && ivp->GetInformationOnly())
+    {
+    this->RemoveAllEntries();
+    unsigned int max = ivp->GetNumberOfElements();
+    for (unsigned int cc=0;cc < max; ++cc)
+      {
+      vtksys_ios::ostringstream stream;
+      stream << ivp->GetElement(cc);
+      this->AddEntry(stream.str().c_str(), ivp->GetElement(cc));
+      }
+    this->InvokeModified();
+    }
 }
 
 //---------------------------------------------------------------------------
