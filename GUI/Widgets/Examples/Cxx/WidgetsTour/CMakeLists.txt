@@ -69,7 +69,10 @@ CONFIGURE_FILE(
 # file or a CMakeLists.txt file.
 
 FILE(GLOB WIDGETS_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/Widgets/*.cxx")
-FOREACH(file ${WIDGETS_SRCS})
+IF(KWWidgets_BUILD_VTK_WIDGETS)
+  FILE(GLOB WIDGETS_VTK_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/Widgets/VTK/*.cxx")
+ENDIF(KWWidgets_BUILD_VTK_WIDGETS)
+FOREACH(file ${WIDGETS_SRCS} ${WIDGETS_VTK_SRCS})
   GET_FILENAME_COMPONENT(filename ${file} NAME)
   GET_FILENAME_COMPONENT(WIDGET_NAME ${file} NAME_WE)
   SET(WIDGET_ENTRY_POINT "${WIDGET_NAME}EntryPoint")
@@ -89,7 +92,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Create the executable, and link it against the KWWidgets libraries.
 
-ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${WIDGETS_SRCS} ${RC_FILENAME})
+ADD_EXECUTABLE(${EXE_NAME} WIN32 
+  ${EXE_SRCS} ${WIDGETS_SRCS} ${WIDGETS_VTK_SRCS} ${RC_FILENAME})
 TARGET_LINK_LIBRARIES(${EXE_NAME} ${LIB_NAME})
 
 # If we are building this example as a standalone external project:
@@ -137,6 +141,11 @@ IF(KWWidgets_BUILD_EXAMPLES)
   INSTALL_FILES(
     "${KWWidgets_INSTALL_DATA_DIR}/Examples/Cxx/${PROJECT_NAME}/Widgets"
     .cxx ${WIDGETS_SRCS})
+  IF(KWWidgets_BUILD_VTK_WIDGETS)
+    INSTALL_FILES(
+      "${KWWidgets_INSTALL_DATA_DIR}/Examples/Cxx/${PROJECT_NAME}/Widgets/VTK"
+      .cxx ${WIDGETS_VTK_SRCS})
+  ENDIF(KWWidgets_BUILD_VTK_WIDGETS)
 ENDIF(KWWidgets_BUILD_EXAMPLES)
 
 # Register this example as a test. Our executable supports a --test

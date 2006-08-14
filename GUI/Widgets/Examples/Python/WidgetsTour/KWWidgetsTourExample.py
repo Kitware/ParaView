@@ -233,6 +233,11 @@ def main(argv):
                                 os.path.abspath(__file__)),
                                 "Widgets", "*.py"))
 
+    if hasattr('kwwidgets', 'vtkKWRenderWidget'):
+        widgets.append(glob(os.path.join(os.path.dirname(
+                            os.path.abspath(__file__)),
+                            "Widgets/VTK", "*.py")))
+        
     modules = []
     python_source = {}
     cxx_source = {}

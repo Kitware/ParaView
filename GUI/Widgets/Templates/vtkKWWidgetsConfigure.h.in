@@ -17,6 +17,7 @@
 #cmakedefine KWWidgets_BUILD_SHARED_LIBS
 #cmakedefine KWWidgets_USE_HTML_HELP
 #cmakedefine KWWidgets_USE_INTERNATIONALIZATION
+#cmakedefine KWWidgets_BUILD_VTK_WIDGETS
 
 #define KWWidgets_MAJOR_VERSION @KWWidgets_MAJOR_VERSION@
 #define KWWidgets_MINOR_VERSION @KWWidgets_MINOR_VERSION@

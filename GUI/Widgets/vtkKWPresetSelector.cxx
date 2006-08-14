@@ -58,7 +58,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.49");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.50");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -1264,6 +1264,7 @@ vtkKWIcon* vtkKWPresetSelector::GetPresetScreenshot(int id)
 }
 
 //---------------------------------------------------------------------------
+#ifdef KWWidgets_BUILD_VTK_WIDGETS
 int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
   int id, vtkImageData *image)
 {
@@ -1400,8 +1401,10 @@ int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
 
   return 1;
 }
+#endif
 
 //---------------------------------------------------------------------------
+#ifdef KWWidgets_BUILD_VTK_WIDGETS
 int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromRenderWindow(
   int id, vtkRenderWindow *win)
 {
@@ -1418,6 +1421,7 @@ int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromRenderWindow(
     }
   return 0;
 }
+#endif
 
 //---------------------------------------------------------------------------
 int vtkKWPresetSelector::FlipPresetThumbnailAndScreenshotVertically(

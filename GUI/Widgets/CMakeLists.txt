@@ -141,6 +141,9 @@ ENDIF(KWWidgets_BUILD_SHARED_LIBS)
 # --------------------------------------------------------------------------
 # Sources
 
+OPTION(KWWidgets_BUILD_VTK_WIDGETS "Build the widgets that can be interfaced to complex VTK classes. Set it to OFF to build a core version of the library." ON)
+MARK_AS_ADVANCED(KWWidgets_BUILD_VTK_WIDGETS)
+
 SET(KWWidgets_SRCS
   vtkKWApplication.cxx
   vtkKWApplicationSettingsInterface.cxx
@@ -150,12 +153,9 @@ SET(KWWidgets_SRCS
   vtkKWCheckButton.cxx
   vtkKWCheckButtonWithChangeColorButton.cxx
   vtkKWCheckButtonWithPopupFrame.cxx
-  vtkKWColorPresetSelector.cxx
-  vtkKWColorTransferFunctionEditor.cxx
   vtkKWComboBox.cxx
   vtkKWCompositeWidget.cxx
   vtkKWCoreWidget.cxx
-  vtkKWCornerAnnotationEditor.cxx
   vtkKWDialog.cxx
   vtkKWDragAndDropTargetSet.cxx
   vtkKWEntry.cxx
@@ -165,11 +165,7 @@ SET(KWWidgets_SRCS
   vtkKWFrame.cxx
   vtkKWFrameWithLabel.cxx
   vtkKWFrameWithScrollbar.cxx
-  vtkKWGenericRenderWindowInteractor.cxx
   vtkKWHSVColorSelector.cxx
-  vtkKWHeaderAnnotationEditor.cxx
-  vtkKWHistogram.cxx
-  vtkKWHistogramSet.cxx
   vtkKWIcon.cxx
   vtkKWInternationalization.cxx
   vtkKWLabel.cxx
@@ -188,10 +184,7 @@ SET(KWWidgets_SRCS
   vtkKWNotebook.cxx
   vtkKWObject.cxx
   vtkKWOptionDataBase.cxx
-  vtkKWParameterValueFunctionEditor.cxx
-  vtkKWParameterValueFunctionInterface.cxx
-  vtkKWParameterValueHermiteFunctionEditor.cxx
-  vtkKWPiecewiseFunctionEditor.cxx
+  vtkKWOptions.cxx
   vtkKWPopupButton.cxx
   vtkKWPopupFrame.cxx
   vtkKWPresetSelector.cxx
@@ -202,30 +195,22 @@ SET(KWWidgets_SRCS
   vtkKWRadioButtonSet.cxx
   vtkKWRange.cxx
   vtkKWRegistryHelper.cxx
-  vtkKWRenderWidget.cxx
   vtkKWResourceUtilities.cxx
   vtkKWSaveImageDialog.cxx
-  vtkKWScalarBarAnnotation.cxx
   vtkKWScalarComponentSelectionWidget.cxx
   vtkKWScale.cxx
   vtkKWScaleWithEntry.cxx
   vtkKWScrollbar.cxx
-  vtkKWSelectionFrame.cxx
-  vtkKWSelectionFrameLayoutManager.cxx
   vtkKWSeparator.cxx
-  vtkKWSimpleAnimationWidget.cxx
   vtkKWSimpleEntryDialog.cxx
   vtkKWSpinBox.cxx
   vtkKWSpinButtons.cxx
   vtkKWSplashScreen.cxx
   vtkKWSplitFrame.cxx
-  vtkKWSurfaceMaterialPropertyWidget.cxx
   vtkKWTclInteractor.cxx
   vtkKWText.cxx
-  vtkKWTextPropertyEditor.cxx
   vtkKWTheme.cxx
   vtkKWThumbWheel.cxx
-  vtkKWOptions.cxx
   vtkKWTkUtilities.cxx
   vtkKWTkcon.cxx
   vtkKWToolbar.cxx
@@ -236,20 +221,43 @@ SET(KWWidgets_SRCS
   vtkKWUserInterfaceManagerDialog.cxx
   vtkKWUserInterfaceManagerNotebook.cxx
   vtkKWUserInterfacePanel.cxx
-  vtkKWVolumeMaterialPropertyWidget.cxx
-  vtkKWVolumePropertyPresetSelector.cxx
-  vtkKWVolumePropertyWidget.cxx
   vtkKWWidget.cxx
-  vtkKWWidgetsVersion.cxx
   vtkKWWidgetSet.cxx
   vtkKWWidgetWithLabel.cxx
   vtkKWWidgetWithScrollbars.cxx
   vtkKWWidgetWithSpinButtons.cxx
+  vtkKWWidgetsVersion.cxx
   vtkKWWindow.cxx
   vtkKWWindowBase.cxx
   vtkKWWindowLevelPresetSelector.cxx
 # vtkKWColorPicker.cxx
 )
+
+IF(KWWidgets_BUILD_VTK_WIDGETS)
+  SET(KWWidgets_SRCS ${KWWidgets_SRCS}
+    vtkKWColorPresetSelector.cxx
+    vtkKWColorTransferFunctionEditor.cxx
+    vtkKWCornerAnnotationEditor.cxx
+    vtkKWGenericRenderWindowInteractor.cxx
+    vtkKWHeaderAnnotationEditor.cxx
+    vtkKWHistogram.cxx
+    vtkKWHistogramSet.cxx
+    vtkKWParameterValueFunctionEditor.cxx
+    vtkKWParameterValueFunctionInterface.cxx
+    vtkKWParameterValueHermiteFunctionEditor.cxx
+    vtkKWPiecewiseFunctionEditor.cxx
+    vtkKWRenderWidget.cxx
+    vtkKWScalarBarAnnotation.cxx
+    vtkKWSelectionFrame.cxx
+    vtkKWSelectionFrameLayoutManager.cxx
+    vtkKWSimpleAnimationWidget.cxx
+    vtkKWSurfaceMaterialPropertyWidget.cxx
+    vtkKWTextPropertyEditor.cxx
+    vtkKWVolumeMaterialPropertyWidget.cxx
+    vtkKWVolumePropertyPresetSelector.cxx
+    vtkKWVolumePropertyWidget.cxx
+    )
+ENDIF(KWWidgets_BUILD_VTK_WIDGETS)
 
 # Utilities/Extra sources
 
@@ -566,9 +574,11 @@ IF(VTK_WRAP_PYTHON)
   ADD_LIBRARY(KWWidgetsPythonD ${KWWidgetsPython_SRCS}
               ${KWWidgetsPythonExtra_SRCS})
   TARGET_LINK_LIBRARIES(KWWidgetsPythonD KWWidgets ${KWWidgetsPython_LIBS})
-  IF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
+  IF(KWWidgets_BUILD_VTK_WIDGETS AND 
+      VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
     TARGET_LINK_LIBRARIES(KWWidgetsPythonD vtkRenderingPythonD)
-  ENDIF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
+  ENDIF(KWWidgets_BUILD_VTK_WIDGETS AND 
+    VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
 
   IF(WIN32 OR APPLE)
     TARGET_LINK_LIBRARIES(KWWidgetsPythonD ${VTK_PYTHON_LIBRARIES})
@@ -588,9 +598,11 @@ IF(VTK_WRAP_PYTHON)
   IF(WIN32 OR APPLE)
     TARGET_LINK_LIBRARIES(KWWidgetsPython ${VTK_PYTHON_LIBRARIES})
   ENDIF(WIN32 OR APPLE)
-  IF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
+  IF(KWWidgets_BUILD_VTK_WIDGETS AND 
+      VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
     # TARGET_LINK_LIBRARIES(KWWidgetsPython vtkRenderingPython)
-  ENDIF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
+  ENDIF(KWWidgets_BUILD_VTK_WIDGETS AND
+    VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
 
   FIND_PROGRAM(PYTHON_EXECUTABLE
     NAMES python2.6 python2.5 python2.4 python2.3 python2.2 python
@@ -614,31 +626,41 @@ ADD_LIBRARY(KWWidgets
   ${KWWidgets_UTILS_SRCS})
 
 TARGET_LINK_LIBRARIES(KWWidgets vtkCommonTCL)
-IF(VTK_WRAP_TCL)
-  IF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
-    TARGET_LINK_LIBRARIES(KWWidgets vtkRenderingTCL)
-    TARGET_LINK_LIBRARIES(KWWidgets vtkHybridTCL)
-    IF(VTK_MAJOR_VERSION GREATER 4)
-      TARGET_LINK_LIBRARIES(KWWidgets vtkWidgetsTCL)
-      TARGET_LINK_LIBRARIES(KWWidgets vtkVolumeRenderingTCL)
-    ENDIF(VTK_MAJOR_VERSION GREATER 4)
-  ENDIF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
-  IF(VTK_USE_PARALLEL OR VTK_USE_PARALLEL_ISSET)
-    TARGET_LINK_LIBRARIES(KWWidgets vtkParallelTCL)
-  ENDIF(VTK_USE_PARALLEL OR VTK_USE_PARALLEL_ISSET)
-ELSE(VTK_WRAP_TCL)
-  IF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
-    TARGET_LINK_LIBRARIES(KWWidgets vtkRendering)
-    TARGET_LINK_LIBRARIES(KWWidgets vtkHybrid)
-    IF(VTK_MAJOR_VERSION GREATER 4)
-      TARGET_LINK_LIBRARIES(KWWidgets vtkWidgets)
-      TARGET_LINK_LIBRARIES(KWWidgets vtkVolumeRendering)
-    ENDIF(VTK_MAJOR_VERSION GREATER 4)
-  ENDIF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
-  IF(VTK_USE_PARALLEL OR VTK_USE_PARALLEL_ISSET)
-    TARGET_LINK_LIBRARIES(KWWidgets vtkParallel)
-  ENDIF(VTK_USE_PARALLEL OR VTK_USE_PARALLEL_ISSET)
-ENDIF(VTK_WRAP_TCL)
+IF(KWWidgets_BUILD_VTK_WIDGETS)
+  IF(VTK_WRAP_TCL)
+    IF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
+      TARGET_LINK_LIBRARIES(KWWidgets vtkRenderingTCL)
+      TARGET_LINK_LIBRARIES(KWWidgets vtkHybridTCL)
+      IF(VTK_MAJOR_VERSION GREATER 4)
+        TARGET_LINK_LIBRARIES(KWWidgets vtkWidgetsTCL)
+        TARGET_LINK_LIBRARIES(KWWidgets vtkVolumeRenderingTCL)
+      ENDIF(VTK_MAJOR_VERSION GREATER 4)
+    ENDIF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
+    IF(VTK_USE_PARALLEL OR VTK_USE_PARALLEL_ISSET)
+      TARGET_LINK_LIBRARIES(KWWidgets vtkParallelTCL)
+    ENDIF(VTK_USE_PARALLEL OR VTK_USE_PARALLEL_ISSET)
+  ELSE(VTK_WRAP_TCL)
+    IF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
+      TARGET_LINK_LIBRARIES(KWWidgets vtkRendering)
+      TARGET_LINK_LIBRARIES(KWWidgets vtkHybrid)
+      IF(VTK_MAJOR_VERSION GREATER 4)
+        TARGET_LINK_LIBRARIES(KWWidgets vtkWidgets)
+        TARGET_LINK_LIBRARIES(KWWidgets vtkVolumeRendering)
+      ENDIF(VTK_MAJOR_VERSION GREATER 4)
+    ENDIF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
+    IF(VTK_USE_PARALLEL OR VTK_USE_PARALLEL_ISSET)
+      TARGET_LINK_LIBRARIES(KWWidgets vtkParallel)
+    ENDIF(VTK_USE_PARALLEL OR VTK_USE_PARALLEL_ISSET)
+  ENDIF(VTK_WRAP_TCL)
+ELSE(KWWidgets_BUILD_VTK_WIDGETS)
+  IF(TK_LIBRARY_DEBUG)
+    SET(KWWidgets_TK_LIBRARIES 
+      optimized ${TK_LIBRARY} debug ${TK_LIBRARY_DEBUG})
+  ELSE(TK_LIBRARY_DEBUG)
+    SET(KWWidgets_TK_LIBRARIES ${TK_LIBRARY})
+  ENDIF(TK_LIBRARY_DEBUG)
+  TARGET_LINK_LIBRARIES(KWWidgets ${KWWidgets_TK_LIBRARIES})
+ENDIF(KWWidgets_BUILD_VTK_WIDGETS)
 
 TARGET_LINK_LIBRARIES(KWWidgets
   ${VTK_PNG_LIBRARIES}

@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.294");
+vtkCxxRevisionMacro(vtkKWApplication, "1.295");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -78,28 +78,26 @@ extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 // we can only rely on Common and the two renderwidgets
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
+
+#ifdef KWWidgets_BUILD_VTK_WIDGETS
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtktkimageviewerwidget_Init(Tcl_Interp *interp);
-
 #ifdef VTK_WRAP_TCL
-
 extern "C" int Vtkfilteringtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkimagingtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkgraphicstcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkiotcl_Init(Tcl_Interp *interp);
-
 #ifdef VTK_USE_RENDERING
 extern "C" int Vtkrenderingtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkvolumerenderingtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkhybridtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkwidgetstcl_Init(Tcl_Interp *interp);
-#endif
-
+#endif // VTK_USE_RENDERING
 #ifdef VTK_USE_PARALLEL
 extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);
-#endif
-
-#endif
+#endif // VTK_USE_PARALLEL
+#endif // VTK_WRAP_TCL
+#endif // KWWidgets_BUILD_VTK_WIDGETS
 
 //----------------------------------------------------------------------------
 class vtkKWApplicationInternals
@@ -578,6 +576,8 @@ Tcl_Interp *vtkKWApplication::InitializeVTK(Tcl_Interp *interp, ostream *err)
     return NULL;
     }
 
+#ifdef KWWidgets_BUILD_VTK_WIDGETS
+
   if (Vtktkrenderwidget_Init(interp) != TCL_OK) 
     {
     if (err)
@@ -679,7 +679,7 @@ Tcl_Interp *vtkKWApplication::InitializeVTK(Tcl_Interp *interp, ostream *err)
       }
     return NULL;
     }
-#endif
+#endif // VTK_USE_RENDERING
 
 #ifdef VTK_USE_PARALLEL
   if (Vtkparalleltcl_Init(interp) != TCL_OK)
@@ -691,9 +691,11 @@ Tcl_Interp *vtkKWApplication::InitializeVTK(Tcl_Interp *interp, ostream *err)
       }
     return NULL;
     }
-#endif
+#endif // VTK_USE_PARALLEL
 
-#endif
+#endif // VTK_WRAP_TCL
+
+#endif // KWWidgets_BUILD_VTK_WIDGETS
 
   return interp;
 }

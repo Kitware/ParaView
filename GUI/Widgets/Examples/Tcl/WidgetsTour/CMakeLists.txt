@@ -39,6 +39,12 @@ IF(KWWidgets_BUILD_EXAMPLES)
   INSTALL_FILES(
     "${KWWidgets_INSTALL_DATA_DIR}/Examples/Tcl/${PROJECT_NAME}/Widgets" 
     .tcl ${WIDGETS_SRCS})
+  IF(KWWidgets_BUILD_VTK_WIDGETS)
+    FILE(GLOB WIDGETS_VTK_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/Widgets/VTK/*.tcl")
+    INSTALL_FILES(
+      "${KWWidgets_INSTALL_DATA_DIR}/Examples/Tcl/${PROJECT_NAME}/Widgets/VTK" 
+      .tcl ${WIDGETS_VTK_SRCS})
+  ENDIF(KWWidgets_BUILD_VTK_WIDGETS)
 ENDIF(KWWidgets_BUILD_EXAMPLES)
 
 # Register this example as a test. Our script supports a --test

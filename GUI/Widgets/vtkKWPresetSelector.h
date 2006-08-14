@@ -163,10 +163,14 @@ public:
   // to build both thumbnail and screenshot.
   // Both thumbnail and screenshot icons can be retrieved.
   // Return 1 on success, 0 on error
+#ifdef KWWidgets_BUILD_VTK_WIDGETS
+  //BTX
   virtual int BuildPresetThumbnailAndScreenshotFromImage(
     int id, vtkImageData *image);
   virtual int BuildPresetThumbnailAndScreenshotFromRenderWindow(
     int id, vtkRenderWindow *win);
+  //ETX
+#endif KWWidgets_BUILD_VTK_WIDGETS
 
   // Description:
   // Flip the thumbnail and screenshot vertically for a specific preset
