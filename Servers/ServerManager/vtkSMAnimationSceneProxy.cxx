@@ -51,7 +51,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.25");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.26");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -701,8 +701,11 @@ void vtkSMAnimationSceneProxy::CleanCache()
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::SetAnimationTime(double time)
 {
-  this->AnimationCue->Initialize();
-  this->AnimationCue->Tick(time,0);
+  if (this->AnimationCue)
+    {
+    this->AnimationCue->Initialize();
+    this->AnimationCue->Tick(time,0);
+    }
 }
 
 //----------------------------------------------------------------------------
