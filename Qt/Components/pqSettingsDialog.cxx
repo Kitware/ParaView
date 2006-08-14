@@ -96,6 +96,10 @@ void pqSettingsDialog::setupGUI()
     this->Internal->tabWidget->addTab(
       this->Internal->ViewProperties, "Active View Properties");
     }
+
+  // Add a place holder for application settings.
+  this->Internal->tabWidget->addTab(
+    new QWidget(), "Application Settings");
 }
 
 //-----------------------------------------------------------------------------
