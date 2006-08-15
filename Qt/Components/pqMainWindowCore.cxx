@@ -732,7 +732,7 @@ void pqMainWindowCore::onFileOpen()
     pqServerBrowser* const server_browser = new pqServerBrowser(this->Implementation->Parent);
     server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
     QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
-      this, SLOT(onFileOpen(pqServer*)));
+      this, SLOT(onFileOpen(pqServer*)), Qt::QueuedConnection);
     server_browser->setModal(true);
     server_browser->show();
     }
@@ -763,8 +763,8 @@ void pqMainWindowCore::onFileOpen(pqServer* server)
   file_dialog->setFileMode(pqFileDialog::ExistingFiles);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
     this, SLOT(onFileOpen(const QStringList&)));
+  file_dialog->setModal(true); 
   file_dialog->show(); 
-  QApplication::processEvents();
 }
 
 //-----------------------------------------------------------------------------
@@ -808,7 +808,7 @@ void pqMainWindowCore::onFileLoadServerState()
     pqServerBrowser* const server_browser = new pqServerBrowser(this->Implementation->Parent);
     server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
     QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
-      this, SLOT(onFileLoadServerState(pqServer*)));
+      this, SLOT(onFileLoadServerState(pqServer*)), Qt::QueuedConnection);
     server_browser->setModal(true);
     server_browser->show();
     }
@@ -827,6 +827,7 @@ void pqMainWindowCore::onFileLoadServerState(pqServer*)
   fileDialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList&)),
       this, SLOT(onFileLoadServerState(const QStringList&)));
+  fileDialog->setModal(true);
   fileDialog->show();
 }
 
@@ -876,6 +877,7 @@ void pqMainWindowCore::onFileSaveServerState()
   file_dialog->setObjectName("FileSaveServerStateDialog");
   file_dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveServerState(const QStringList&)));
+  file_dialog->setModal(true);
   file_dialog->show();
 }
 
@@ -990,6 +992,7 @@ void pqMainWindowCore::onFileSaveScreenshot()
   file_dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
     this, SLOT(onFileSaveScreenshot(const QStringList&)));
+  file_dialog->setModal(true);
   file_dialog->show();
 }
 
@@ -1047,6 +1050,7 @@ void pqMainWindowCore::onFileSaveAnimation()
   file_dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
     this, SLOT(onFileSaveAnimation(const QStringList&)));
+  file_dialog->setModal(true);
   file_dialog->show();
 }
 
@@ -1211,6 +1215,7 @@ void pqMainWindowCore::onToolsRecordTest()
   fileDialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList &)), 
       this, SLOT(onToolsRecordTest(const QStringList &)));
+  fileDialog->setModal(true);
   fileDialog->show();
 }
 
@@ -1250,6 +1255,7 @@ void pqMainWindowCore::onToolsRecordTestScreenshot()
   fileDialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList &)), 
       this, SLOT(onToolsRecordTestScreenshot(const QStringList &)));
+  fileDialog->setModal(true);
   fileDialog->show();
 }
 
@@ -1290,13 +1296,12 @@ void pqMainWindowCore::onToolsPlayTest()
   fileDialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList&)), 
       this, SLOT(onToolsPlayTest(const QStringList&)));
+  fileDialog->setModal(true);
   fileDialog->show();
 }
 
 void pqMainWindowCore::onToolsPlayTest(const QStringList &fileNames)
 {
-  QApplication::processEvents();
-
   pqEventPlayer player;
   pqTestUtility::Setup(player);
 
