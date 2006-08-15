@@ -17,8 +17,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
 #include "vtkProcessModule.h"
+#include "vtkIdTypeArray.h"
+#include "vtkIdentColoredPainter.h"
 
-vtkCxxRevisionMacro(vtkPVVisibleCellSelector, "1.2");
+vtkCxxRevisionMacro(vtkPVVisibleCellSelector, "1.3");
 vtkStandardNewMacro(vtkPVVisibleCellSelector);
 
 //----------------------------------------------------------------------------
@@ -47,17 +49,41 @@ void vtkPVVisibleCellSelector::LookupProcessorId()
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkPVVisibleCellSelector::MapActorIdToActorId(vtkIdType id)
+void vtkPVVisibleCellSelector::SetRenderer(vtkRenderer *r)
 {
-  vtkIdType ret = 0;
-  vtkProp *prop = this->GetActorFromId(id);
-  if (prop != NULL)
+  this->Superclass::SetRenderer(r);
+  
+  //Now create an actor map to render each renderer with its client server id.
+  vtkPropCollection *props = this->Renderer->GetViewProps();
+  if ( props->GetNumberOfItems() == 0 )
+    {
+    return;
+    }
+
+  vtkIdTypeArray *arr = vtkIdTypeArray::New();
+  arr->SetNumberOfComponents(2);
+
+  vtkCollectionSimpleIterator pit;
+  vtkProp *aProp;
+  vtkIdType aTuple[2];
+  for ( props->InitTraversal(pit); 
+        (aProp = props->GetNextProp(pit)); )
     {
     vtkClientServerID CSId = 
-      vtkProcessModule::GetProcessModule()->GetIDFromObject(prop);
-    ret = CSId.ID;
+      vtkProcessModule::GetProcessModule()->GetIDFromObject(aProp);
+    
+    aTuple[0] = (int)aProp;
+    aTuple[1] = CSId.ID;
+    arr->InsertNextTupleValue(aTuple);
     }
-  return ret;
+
+  vtkIdentColoredPainter *ip = vtkIdentColoredPainter::New();
+  ip->SetActorLookupTable(arr);
+  this->Superclass::SetIdentPainter(ip);
+
+  //now that we have given these away, we can delete our reference to them
+  ip->Delete();
+  arr->Delete();
 }
 
 //----------------------------------------------------------------------------
