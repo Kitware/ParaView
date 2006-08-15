@@ -52,7 +52,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkSelection.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.42");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.43");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1313,30 +1313,44 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(int x0, int y0, int x1,
     }
   iter->Delete();
 
-  vtkTypeInt64 needs_2_passes = (maxNumCells+1)/0x1000000;//> than 2^24-1 cells
-  vtkTypeInt64 needs_3_passes = needs_2_passes / 0x1000000; //more than 2^48-1
+  vtkTypeInt64 needs_2_passes = (maxNumCells+1)>>24;//more than 2^24-1 cells
+  vtkTypeInt64 needs_3_passes = needs_2_passes>>24; //more than 2^48-1
 
   vtkSMProxyManager* proxyManager = vtkSMObject::GetProxyManager();  
   vtkSMProxy *vcsProxy = proxyManager->NewProxy("PropPickers", "PVVisibleCellSelector");
+  vcsProxy->SetConnectionID(this->ConnectionID);
+  vcsProxy->SetServers(this->Servers);
+
+  //how we get access to the renderers
   vtkSMProxyProperty *setRendererMethod = vtkSMProxyProperty::SafeDownCast(
     vcsProxy->GetProperty("SetRenderer"));
   setRendererMethod->AddProxy(this->GetRendererProxy());
   vcsProxy->UpdateVTKObjects();   
 
+  //how we put the renderers into selection mode
   vtkSMIntVectorProperty *setModeMethod = vtkSMIntVectorProperty::SafeDownCast(
     vcsProxy->GetProperty("SetSelectMode"));
-
   vtkSMProperty *setPIdMethod = vcsProxy->GetProperty("LookupProcessorId");
 
   //I'm using the auto created PVVisCellSelectors in the vcsProxy above just
-  //to set the SelectionMode parameter of the renderers.
+  //to set the SelectionMode of the remote renderers.
   //I use this one below to convert the composited images that arrive here
   //into a selection.
   vtkPVVisibleCellSelector *pti = vtkPVVisibleCellSelector::New();
   pti->SetArea(x0,y0,x1,y1);
   pti->SetRenderer(this->GetRenderer());
 
-  this->RenderWindow->SwapBuffersOff();
+  ////Use the back buffer
+  //this->GetRenderWindow()->SetOffScreenRendering(1);
+  //this->GetRenderWindow()->SwapBuffersOff();
+
+  //Set background to black to indicate misses.
+  //vtkRenderer::UpdateGeometryForSelection does this also, but in that case
+  //iceT ignores it. Thus I duplicate the same effect here.
+  double origBG[3];
+  this->GetRenderer()->GetBackground(origBG);
+  double black[3] = {0.0,0.0,0.0};
+  this->SetBackgroundColorCM(black);
 
   unsigned char *buf;  
   for (int p = 0; p < 5; p++)
@@ -1345,14 +1359,15 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(int x0, int y0, int x1,
       {
       p++;
       }
-    if ((p==2) && (needs_3_passes>=1))
+    if ((p==2) && (needs_3_passes==0))
       {
       p++;
       }
-    if ((p==3) && (needs_2_passes>=1))
+    if ((p==3) && (needs_2_passes==0))
       {
       p++;
       }
+    //put into a selection mode
     setModeMethod->SetElements1(p+1);
     if (p==0)
       {
@@ -1360,25 +1375,30 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(int x0, int y0, int x1,
       }
     vcsProxy->UpdateVTKObjects();   
 
+    //draw
     this->StillRender();  
-    //renderwindow will allocate the buffer
-    buf = this->RenderWindow->GetRGBACharPixelData(x0,y0,x1,y1,0); 
+
+    //get the intermediate results
+    //renderwindow allocates this buffer
+    buf = this->GetRenderWindow()->GetRGBACharPixelData(x0,y0,x1,y1,1); 
     //pti will deallocate the buffer when it is deleted
     pti->SavePixelBuffer(p, buf); 
     }
   
+  //restore original rendering state
   //clear selection mode to resume normal rendering
   setModeMethod->SetElements1(0);
   vcsProxy->UpdateVTKObjects();   
-
-  this->RenderWindow->SwapBuffersOn();
+  this->SetBackgroundColorCM(origBG);
+  //this->GetRenderWindow()->SwapBuffersOn();
+  //this->GetRenderWindow()->SetOffScreenRendering(0);
   
+  //convert the intermediate results into  the selection data structure 
   pti->ComputeSelectedIds();
-
-  //test the selection data structure
   vtkSelection *selection = vtkSelection::New();
   pti->GetSelectedIds(selection);
 
+  //cleanup
   pti->Delete();
   vcsProxy->Delete();
 
