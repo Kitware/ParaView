@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.25");
+vtkCxxRevisionMacro(vtkKWTree, "1.26");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -307,6 +307,16 @@ void vtkKWTree::AddNode(const char *parent,
 
   vtkKWTkUtilities::EvaluateSimpleString(
     this->GetApplication(), cmd.c_str());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::DeleteNode(const char *node)
+{
+  if (this->IsCreated() && node && *node)
+      {
+      this->Script("%s delete %s", 
+                   this->GetWidgetName(), node);
+      }
 }
 
 //----------------------------------------------------------------------------

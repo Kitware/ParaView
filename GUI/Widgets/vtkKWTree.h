@@ -59,6 +59,11 @@ public:
   // of the node itself is provided by the 'text' parameter.
   // A new node is selectable and closed by default.
   virtual void AddNode(const char *parent, const char *node, const char *text);
+  
+  // Description:
+  // Delete a node identified by parameter 'node', which is the
+  // unique string identifier.
+  virtual void DeleteNode(const char *node);
 
   // Description:
   // Set/Get the label of the node.
