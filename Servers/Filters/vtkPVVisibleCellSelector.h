@@ -53,14 +53,11 @@ public:
   //ETX
   void SetSelectMode(int mode);
 
+  virtual void SetRenderer(vtkRenderer *);
 
 protected:
   vtkPVVisibleCellSelector() {};
   ~vtkPVVisibleCellSelector() {};
-
-  // Description:
-  // We override this to map from selection ids to client server ids.
-  virtual vtkIdType MapActorIdToActorId(vtkIdType id);
 
 private:
   vtkPVVisibleCellSelector(const vtkPVVisibleCellSelector&);  // Not implemented.

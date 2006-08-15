@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCellSelect);
-vtkCxxRevisionMacro(vtkPVCellSelect, "1.3");
+vtkCxxRevisionMacro(vtkPVCellSelect, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVCellSelect::vtkPVCellSelect()
@@ -263,10 +263,13 @@ void vtkPVCellSelect::DoSelect()
 
   selection = renderModuleProxy->SelectVisibleCells(this->Xs, this->Ys, this->Xe, this->Ye);
 
+  cerr << "Selection Result:" << endl;
   vtkSelectionSerializer *ser = vtkSelectionSerializer::New();
   ser->PrintXML(1, selection);
   ser->Delete();
   selection->Delete();
+  cerr << endl;
+
 }
 
 
