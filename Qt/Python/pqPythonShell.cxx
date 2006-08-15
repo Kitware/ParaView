@@ -168,6 +168,12 @@ void pqPythonShell::clear()
   this->Implementation->promptForInput();
 }
 
+void pqPythonShell::executeScript(const QString& script)
+{
+  this->Implementation->executeCommand(script);
+  this->Implementation->promptForInput();
+}
+
 void pqPythonShell::printStdout(const QString& String)
 {
   QTextCharFormat format = this->Implementation->Console.getFormat();

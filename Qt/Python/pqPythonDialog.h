@@ -53,7 +53,11 @@ public:
   pqPythonDialog(QWidget* Parent);
   
 private slots:
+  void runScript();
+  void runScript(const QStringList&);
+  
   void clearConsole();
+  
   void accept();
   void reject();
 

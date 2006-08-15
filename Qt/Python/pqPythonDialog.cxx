@@ -33,6 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonDialog.h"
 #include "ui_pqPythonDialog.h"
 
+#include <pqFiledialog.h>
+#include <pqLocalFileDialogModel.h>
+
+#include <QFile>
+#include <QtDebug>
+
 //////////////////////////////////////////////////////////////////////
 // pqPythonDialog::pqImplementation
 
@@ -54,11 +60,53 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent) :
     SIGNAL(clicked()),
     this,
     SLOT(clearConsole()));
+    
+  QObject::connect(
+    this->Implementation->Ui.runScript,
+    SIGNAL(clicked()),
+    this,
+    SLOT(runScript()));
 }
 
 pqPythonDialog::~pqPythonDialog()
 {
   delete Implementation;
+}
+
+void pqPythonDialog::runScript()
+{
+  pqFileDialog* const dialog = new pqFileDialog(
+    new pqLocalFileDialogModel(),
+    this,
+    tr("Run Script"),
+    QString(),
+    QString(tr("Python Script (*.py);;All files (*)")));
+    
+  dialog->setObjectName("PythonShellRunScriptDialog");
+  dialog->setFileMode(pqFileDialog::ExistingFiles);
+  QObject::connect(
+    dialog,
+    SIGNAL(filesSelected(const QStringList&)), 
+    this,
+    SLOT(runScript(const QStringList&)));
+  dialog->show(); 
+}
+
+void pqPythonDialog::runScript(const QStringList& files)
+{
+  for(int i = 0; i != files.size(); ++i)
+    {
+    QFile file(files[i]);
+    if(file.open(QIODevice::ReadOnly))
+      {
+      this->Implementation->Ui.shellWidget->executeScript(
+        file.readAll().data());
+      }
+    else
+      {
+      qCritical() << "Error opening " << files[i];
+      }
+    }
 }
 
 void pqPythonDialog::clearConsole()

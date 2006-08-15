@@ -55,6 +55,7 @@ public:
 
 public slots:
   void clear();
+  void executeScript(const QString&);
 
 private slots:
   void printStdout(const QString&);
