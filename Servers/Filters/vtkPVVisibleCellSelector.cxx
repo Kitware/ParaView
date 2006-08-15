@@ -20,7 +20,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkIdentColoredPainter.h"
 
-vtkCxxRevisionMacro(vtkPVVisibleCellSelector, "1.3");
+vtkCxxRevisionMacro(vtkPVVisibleCellSelector, "1.4");
 vtkStandardNewMacro(vtkPVVisibleCellSelector);
 
 //----------------------------------------------------------------------------
@@ -61,24 +61,25 @@ void vtkPVVisibleCellSelector::SetRenderer(vtkRenderer *r)
     }
 
   vtkIdTypeArray *arr = vtkIdTypeArray::New();
-  arr->SetNumberOfComponents(2);
+  arr->SetNumberOfComponents(1);
+  vtkProp **SaveProps = new vtkProp*[props->GetNumberOfItems()];
 
   vtkCollectionSimpleIterator pit;
+  int i = 0;
   vtkProp *aProp;
-  vtkIdType aTuple[2];
   for ( props->InitTraversal(pit); 
         (aProp = props->GetNextProp(pit)); )
     {
     vtkClientServerID CSId = 
       vtkProcessModule::GetProcessModule()->GetIDFromObject(aProp);
     
-    aTuple[0] = (int)aProp;
-    aTuple[1] = CSId.ID;
-    arr->InsertNextTupleValue(aTuple);
+    arr->InsertNextValue(CSId.ID);
+    SaveProps[i] = aProp;
+    i++;
     }
 
   vtkIdentColoredPainter *ip = vtkIdentColoredPainter::New();
-  ip->SetActorLookupTable(arr);
+  ip->SetActorLookupTable(SaveProps, arr);
   this->Superclass::SetIdentPainter(ip);
 
   //now that we have given these away, we can delete our reference to them
