@@ -1897,7 +1897,7 @@
          name="TableId"
          command="SetTable"
          number_of_elements="1"
-         default_values="0">
+         default_values="-1">
          <EnumerationDomain name="enum">
            <RequiredProperties>
              <Property name="TableIds" function="Enumeration"/>
