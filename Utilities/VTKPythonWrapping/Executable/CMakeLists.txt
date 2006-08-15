@@ -26,14 +26,14 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkPythonAppInitConfigure.h.in
 
 
 
-ADD_EXECUTABLE(pvpython
+ADD_EXECUTABLE(pvpython${PV_EXE_SUFFIX}
   vtkPythonAppInit.cxx
   vtkPVPythonOptions.cxx
   vtkPVProcessModulePythonHelper.cxx)
 IF(CMAKE_SYSTEM_NAME MATCHES "AIX")
   GET_FILENAME_COMPONENT(CMAKE_PYTHON_LIB_PREFIX "${PYTHON_LIBRARY}" PATH)
   FIND_FILE(CMAKE_PYTHON_LIBRARY_EXPORT python.exp "${CMAKE_PYTHON_LIB_PREFIX}")
-  SET_TARGET_PROPERTIES( pvpython PROPERTIES LINK_FLAGS
+  SET_TARGET_PROPERTIES( pvpython${PV_EXE_SUFFIX} PROPERTIES LINK_FLAGS
     "-Wl,-bE:${CMAKE_PYTHON_LIBRARY_EXPORT}")
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "AIX")
 
@@ -41,10 +41,10 @@ IF(VTK_USE_CARBON)
   FIND_PROGRAM(VTK_APPLE_RESOURCE Rez /Developer/Tools)
   IF(VTK_APPLE_RESOURCE)
     ADD_CUSTOM_COMMAND(
-      SOURCE pvpython
+      SOURCE pvpython${PV_EXE_SUFFIX}
       COMMAND ${VTK_APPLE_RESOURCE}
-      ARGS Carbon.r -o ${VTK_EXECUTABLE_DIR}/pvpython
-      TARGET pvpython 
+      ARGS Carbon.r -o ${VTK_EXECUTABLE_DIR}/pvpython${PV_EXE_SUFFIX}
+      TARGET pvpython${PV_EXE_SUFFIX}
       )
   ENDIF(VTK_APPLE_RESOURCE)
 ENDIF(VTK_USE_CARBON)
@@ -64,11 +64,11 @@ ENDIF(NOT APPLE)
 
 
 IF (APPLE)
-  SET_TARGET_PROPERTIES(pvpython PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress -u _PyMac_Error")
+  SET_TARGET_PROPERTIES(pvpython${PV_EXE_SUFFIX} PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress -u _PyMac_Error")
 ENDIF (APPLE)
 
 # Link against all the kit wrappers.
-TARGET_LINK_LIBRARIES(pvpython
+TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX}
   vtkPVServerManagerPythonD
   vtkCommon 
   vtkFiltering
@@ -78,7 +78,7 @@ TARGET_LINK_LIBRARIES(pvpython
   ${VTK_PYTHON_LIBRARIES}
   ${PYTHON_UTIL_LIBRARY_LIB})
 IF(VTK_WRAP_TCL)
-  TARGET_LINK_LIBRARIES(pvpython ${VTK_TK_LIBRARIES})
+  TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX} ${VTK_TK_LIBRARIES})
 ENDIF(VTK_WRAP_TCL)
 
 IF(BORLAND)
@@ -90,13 +90,45 @@ IF(BORLAND)
 ENDIF(BORLAND)
 
 
-TARGET_LINK_LIBRARIES(pvpython vtkPVServerManager)
+TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX} vtkPVServerManager)
 
-IF(NOT VTK_INSTALL_NO_RUNTIME)
-  INSTALL_TARGETS(${PV_INSTALL_BIN_DIR} pvpython)
-ENDIF(NOT VTK_INSTALL_NO_RUNTIME)
+# Install the pvpython executable.
+SET(PV_EXE_LIST pvpython)
+FOREACH(pvexe ${PV_EXE_LIST})
+  IF(NOT PV_INSTALL_NO_RUNTIME)
+    IF(PV_INSTALL_HAS_CMAKE_24)
+      INSTALL(TARGETS ${pvexe}${PV_EXE_SUFFIX} 
+        DESTINATION ${PV_EXE_INSTALL_CM24}
+        COMPONENT Runtime)
+    ELSE(PV_INSTALL_HAS_CMAKE_24)
+      INSTALL_TARGETS(${PV_EXE_INSTALL} ${pvexe}${PV_EXE_SUFFIX})
+    ENDIF(PV_INSTALL_HAS_CMAKE_24)
+  ENDIF(NOT PV_INSTALL_NO_RUNTIME)
+ENDFOREACH(pvexe)
 
 # Allow the user to customize their build with some local options
 #
 INCLUDE (${VTK_BINARY_DIR}/Wrapping/Tcl/LocalUserOptions.cmake OPTIONAL)
 INCLUDE (${VTK_SOURCE_DIR}/Wrapping/Tcl/LocalUserOptions.cmake OPTIONAL)
+
+# Add shared link forwarding executables if necessary.
+IF(PV_NEED_SHARED_FORWARD)
+  FOREACH(pvexe ${PV_EXE_LIST})
+    SET(PV_FORWARD_EXE ${pvexe}${PV_EXE_SUFFIX})
+    CONFIGURE_FILE(
+      ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
+      ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c
+      @ONLY IMMEDIATE)
+    ADD_EXECUTABLE(${pvexe} ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c)
+    ADD_DEPENDENCIES(${pvexe} ${pvexe}${PV_EXE_SUFFIX})
+    IF(NOT PV_INSTALL_NO_RUNTIME)
+      IF(PV_INSTALL_HAS_CMAKE_24)
+        INSTALL(TARGETS ${pvexe}
+          DESTINATION ${PV_INSTALL_BIN_DIR_CM24}
+          COMPONENT Runtime)
+      ELSE(PV_INSTALL_HAS_CMAKE_24)
+        INSTALL_TARGETS(${PV_INSTALL_BIN_DIR} ${pvexe})
+      ENDIF(PV_INSTALL_HAS_CMAKE_24)
+    ENDIF(NOT PV_INSTALL_NO_RUNTIME)
+  ENDFOREACH(pvexe)
+ENDIF(PV_NEED_SHARED_FORWARD)
