@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonDialog.h"
 #include "ui_pqPythonDialog.h"
 
-#include <pqFiledialog.h>
+#include <pqFileDialog.h>
 #include <pqLocalFileDialogModel.h>
 
 #include <QFile>
