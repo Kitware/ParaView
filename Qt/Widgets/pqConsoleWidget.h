@@ -66,6 +66,8 @@ signals:
 public slots:
   /// Writes the supplied text to the console
   void printString(const QString& Text);
+  /// Clears the contents of the console
+  void clear();
 
 private:
   pqConsoleWidget(const pqConsoleWidget&);

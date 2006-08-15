@@ -273,6 +273,11 @@ void pqConsoleWidget::printString(const QString& Text)
   this->Implementation->ensureCursorVisible();
 }
 
+void pqConsoleWidget::clear()
+{
+  this->Implementation->clear();
+}
+
 void pqConsoleWidget::internalExecuteCommand(const QString& Command)
 {
   emit this->executeCommand(Command);
