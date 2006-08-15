@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.81");
+vtkCxxRevisionMacro(vtkKWEntry, "1.82");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -355,6 +355,28 @@ void vtkKWEntry::SetBorderWidth(int width)
 int vtkKWEntry::GetBorderWidth()
 {
   return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetPasswordMode(int arg)
+{
+  if (this->GetPasswordMode() == arg)
+    {
+    return;
+    }
+
+  this->SetConfigurationOption("-show", arg ? "*" : "");
+}
+
+//----------------------------------------------------------------------------
+int vtkKWEntry::GetPasswordMode()
+{
+  const char *res = this->GetConfigurationOption("-show");
+  if (res && *res)
+    {
+    return 1;
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

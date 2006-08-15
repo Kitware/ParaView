@@ -32,19 +32,33 @@ void vtkKWEntryItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   // -----------------------------------------------------------------------
 
-  // Create another entry, but larger, and read-only
+  // Create another entry, but read-only
 
   vtkKWEntry *entry2 = vtkKWEntry::New();
   entry2->SetParent(parent);
   entry2->Create();
-  entry2->SetWidth(20);
   entry2->ReadOnlyOn();
   entry2->SetValue("read-only entry");
-  entry2->SetBalloonHelpString("Another entry, larger and read-only");
+  entry2->SetBalloonHelpString("Another entry, read-only");
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     entry2->GetWidgetName());
+
+  // -----------------------------------------------------------------------
+
+  // Create another entry, but password mode
+
+  vtkKWEntry *entry2b = vtkKWEntry::New();
+  entry2b->SetParent(parent);
+  entry2b->Create();
+  entry2b->PasswordModeOn();
+  entry2b->SetValue("foobar");
+  entry2b->SetBalloonHelpString("Another entry, password mode");
+
+  app->Script(
+    "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
+    entry2b->GetWidgetName());
 
   // -----------------------------------------------------------------------
 
@@ -102,6 +116,7 @@ void vtkKWEntryItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   entry1->Delete();
   entry2->Delete();
+  entry2b->Delete();
   entry3->Delete();
   entry_set->Delete();
 }

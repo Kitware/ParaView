@@ -58,10 +58,21 @@ public:
   vtkGetMacro(Width, int);
 
   // Description:
-  // Set or get readonly flag. This flags makes entry read only.
+  // Set/Get readonly flag. This flags makes the entry read only.
   virtual void SetReadOnly(int);
   vtkBooleanMacro(ReadOnly, int);
   vtkGetMacro(ReadOnly, int);
+
+  // Description:
+  // Set/Get password mode flag. If this flag is set, then the true contents
+  // of the entry are not displayed in the window. Instead, each character in
+  // the entry's value will be displayed as '*'. This is useful, for example, 
+  // if the entry is to be used to enter a password. If characters in the entry
+  // are selected and copied elsewhere, the information copied will be what is
+  // displayed, not the true contents of the entry. 
+  vtkBooleanMacro(PasswordMode, int);
+  virtual void SetPasswordMode(int);
+  virtual int GetPasswordMode();
 
   // Description:
   // Set/Get the background color of the widget.

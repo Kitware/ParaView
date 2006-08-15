@@ -15,17 +15,29 @@ proc vtkKWEntryEntryPoint {parent win} {
 
   # -----------------------------------------------------------------------
 
-  # Create another entry but larger and read-only
+  # Create another entry, but read-only
 
   set entry2 [vtkKWEntry New]
   $entry2 SetParent $parent
   $entry2 Create
-  $entry2 SetWidth 20
   $entry2 ReadOnlyOn
   $entry2 SetValue "read-only entry"
-  $entry2 SetBalloonHelpString "Another entry larger and read-only"
+  $entry2 SetBalloonHelpString "Another entry, read-only"
 
   pack [$entry2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+
+  # -----------------------------------------------------------------------
+
+  # Create another entry, but password mode
+
+  set entry2b [vtkKWEntry New]
+  $entry2b SetParent $parent
+  $entry2b Create
+  $entry2b PasswordModeOn
+  $entry2b SetValue "foobar"
+  $entry2b SetBalloonHelpString "Another entry, password mode"
+
+  pack [$entry2b GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
   # -----------------------------------------------------------------------
 

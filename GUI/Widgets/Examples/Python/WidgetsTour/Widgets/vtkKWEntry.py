@@ -25,19 +25,33 @@ def vtkKWEntryEntryPoint(parent, win):
     
     # -----------------------------------------------------------------------
     
-    # Create another entry, but larger, and read-only
+    # Create another entry, but read-only
     
     entry2 = vtkKWEntry()
     entry2.SetParent(parent)
     entry2.Create()
-    entry2.SetWidth(20)
     entry2.ReadOnlyOn()
     entry2.SetValue("read-only entry")
-    entry2.SetBalloonHelpString("Another entry, larger and read-only")
+    entry2.SetBalloonHelpString("Another entry, read-only")
     
     app.Script(
         "pack %s -side top -anchor nw -expand n -padx 2 -pady 6",
         entry2.GetWidgetName())
+    
+    # -----------------------------------------------------------------------
+    
+    # Create another entry, but password mode
+    
+    entry2b = vtkKWEntry()
+    entry2b.SetParent(parent)
+    entry2b.Create()
+    entry2b.PasswordModeOn()
+    entry2b.SetValue("foobar")
+    entry2b.SetBalloonHelpString("Another entry, password mode")
+    
+    app.Script(
+        "pack %s -side top -anchor nw -expand n -padx 2 -pady 6",
+        entry2b.GetWidgetName())
     
     # -----------------------------------------------------------------------
     
