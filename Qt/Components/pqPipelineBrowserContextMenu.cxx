@@ -156,7 +156,7 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   l->setMargin(0);
   l->setSpacing(6);
   pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(dialog);
-  editor->setDisplay(source->getDisplay(0));
+  editor->setDisplay(source->getDisplay(this->Browser->getRenderModule()));
   l->addWidget(editor);
   QObject::connect(editor, SIGNAL(dismiss()),
     dialog, SLOT(accept()));
