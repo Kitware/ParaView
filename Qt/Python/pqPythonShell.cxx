@@ -162,6 +162,12 @@ pqPythonShell::~pqPythonShell()
   delete this->Implementation;
 }
 
+void pqPythonShell::clear()
+{
+  this->Implementation->Console.clear();
+  this->Implementation->promptForInput();
+}
+
 void pqPythonShell::printStdout(const QString& String)
 {
   QTextCharFormat format = this->Implementation->Console.getFormat();

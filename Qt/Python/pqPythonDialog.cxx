@@ -48,11 +48,22 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent) :
   this->Implementation->Ui.setupUi(this);
   this->setObjectName("pythonDialog");
   this->setWindowTitle(tr("Python Shell"));
+  
+  QObject::connect(
+    this->Implementation->Ui.clear,
+    SIGNAL(clicked()),
+    this,
+    SLOT(clearConsole()));
 }
 
 pqPythonDialog::~pqPythonDialog()
 {
   delete Implementation;
+}
+
+void pqPythonDialog::clearConsole()
+{
+  this->Implementation->Ui.shellWidget->clear();
 }
 
 void pqPythonDialog::accept()

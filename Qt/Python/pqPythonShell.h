@@ -53,6 +53,9 @@ public:
   pqPythonShell(QWidget* Parent);
   ~pqPythonShell();
 
+public slots:
+  void clear();
+
 private slots:
   void printStdout(const QString&);
   void printStderr(const QString&);

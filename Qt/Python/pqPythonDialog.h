@@ -53,6 +53,7 @@ public:
   pqPythonDialog(QWidget* Parent);
   
 private slots:
+  void clearConsole();
   void accept();
   void reject();
 
