@@ -97,7 +97,7 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
     // Add the context menu items for a pipeline object.
     action = menu.addAction("Display Settings...", this, SLOT(showDisplayEditor()));
     action->setObjectName("Display Settings");
-    if(source->getDisplayCount() == 0)
+    if(source->getDisplay(this->Browser->getRenderModule()) == 0)
       {
       action->setEnabled(false);
       }
