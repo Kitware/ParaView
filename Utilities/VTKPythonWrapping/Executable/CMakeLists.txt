@@ -72,6 +72,7 @@ ENDIF (APPLE)
 
 TARGET_LINK_LIBRARIES(vtkPVPythonInterpretor
   vtkCommon
+  ${VTK_PYTHON_LIBRARIES}
   ${PYTHON_UTIL_LIBRARY_LIB})
 
 # Link against all the kit wrappers.
