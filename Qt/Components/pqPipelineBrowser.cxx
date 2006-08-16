@@ -296,6 +296,7 @@ void pqPipelineBrowser::changeCurrent(const QModelIndex &current,
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
 {
   // See if the index is associated with a source.
@@ -313,10 +314,7 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
       // display for the source in the current window.
       if(!display)
         {
-        pqApplicationCore* core = pqApplicationCore::instance();
-        core->getPipelineBuilder()->createDisplayProxy(source,
-          this->getRenderModule());
-        display = source->getDisplay(this->getRenderModule());
+        display = this->createDisplay(source, true);
         }
       else
         {
@@ -332,12 +330,25 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
     }
 }
 
+//-----------------------------------------------------------------------------
+pqPipelineDisplay* pqPipelineBrowser::createDisplay(pqPipelineSource* source, bool visible)
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  core->getPipelineBuilder()->createDisplayProxy(source, 
+    this->getRenderModule());
+  pqPipelineDisplay* display = source->getDisplay(this->getRenderModule());
+  display->setVisible(visible);
+  return display;
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineBrowser::setRenderModule(pqRenderModule* rm)
 {
   this->RenderModule = rm;
   emit this->renderModuleChanged(rm);
 }
 
+//-----------------------------------------------------------------------------
 pqRenderModule* pqPipelineBrowser::getRenderModule()
 {
   return this->RenderModule;

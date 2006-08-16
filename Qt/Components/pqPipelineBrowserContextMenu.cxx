@@ -97,7 +97,9 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
     // Add the context menu items for a pipeline object.
     action = menu.addAction("Display Settings...", this, SLOT(showDisplayEditor()));
     action->setObjectName("Display Settings");
-    if(source->getDisplay(this->Browser->getRenderModule()) == 0)
+    // here we check just the display count. If no display present at all,
+    // it implies mostly that the pending display is still pending.
+    if(source->getDisplayCount() == 0)
       {
       action->setEnabled(false);
       }
@@ -154,7 +156,15 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   l->setMargin(0);
   l->setSpacing(6);
   pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(dialog);
-  editor->setDisplay(source->getDisplay(this->Browser->getRenderModule()));
+  pqPipelineDisplay* display = source->getDisplay(this->Browser->getRenderModule());
+  if (!display)
+    {
+    // If display doesn't exist, as far as the user is concerned, it simply
+    // means the source is not visible. Create a new hidden display 
+    // and show its properties.
+    display = this->Browser->createDisplay(source, false);
+    }
+  editor->setDisplay(display);
   l->addWidget(editor);
   QObject::connect(editor, SIGNAL(dismiss()),
     dialog, SLOT(accept()));
