@@ -21,6 +21,9 @@
 
 #include <vtksys/SystemTools.hxx>
 
+#include <vtkstd/algorithm>
+#include <vtkstd/string>
+
 //-----------------------------------------------------------------------------
 #if defined(CMAKE_INTDIR)
 # define VTK_PYTHON_LIBRARY_DIR VTK_PYTHON_LIBRARY_DIR_BUILD "/" CMAKE_INTDIR
@@ -53,22 +56,14 @@ extern "C" {
 static void vtkPythonAppInitPrependPythonPath(const char* dir)
 {
   // Convert slashes for this platform.
-  vtkstd::string out_dir = dir;
+  vtkstd::string out_dir = dir ? dir : "";
 #if defined(_WIN32) && !defined(__CYGWIN__)
-  for(vtkstd::string::size_type i = 0; i < out_dir.length(); ++i)
-    {
-    if(out_dir[i] == '/')
-      {
-      out_dir[i] = '\\';
-      }
-    }
+  vtkstd::replace(out_dir.begin(), out_dir.end(), '/', '\\');
 #endif
 
   // Append the path to the python sys.path object.
-  char tmpPath[] = "path";
-  PyObject* path = PySys_GetObject(tmpPath);
-  PyObject* newpath;
-  newpath = PyString_FromString(out_dir.c_str());
+  PyObject* path = PySys_GetObject(const_cast<char*>("path"));
+  PyObject* newpath = PyString_FromString(out_dir.c_str());
   PyList_Insert(path, 0, newpath);
   Py_DECREF(newpath);
 }
@@ -182,7 +177,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.1");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -206,8 +201,7 @@ void vtkPVPythonInterpretor::InitializeInternal()
   // Compute the directory containing this executable.  The python
   // sys.executable variable contains the full path to the interpreter
   // executable.
-  char tmpExe[] = "executable";
-  PyObject* executable = PySys_GetObject(tmpExe);
+  PyObject* executable = PySys_GetObject(const_cast<char*>("executable"));
   if(const char* exe_str = PyString_AsString(executable))
     {
     // Use the executable location to try to set sys.path to include
@@ -259,6 +253,18 @@ int vtkPVPythonInterpretor::PyMain(int argc, char** argv)
 void vtkPVPythonInterpretor::MakeCurrent()
 {
   this->Internal->MakeCurrent();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::RunSimpleString(const char* const script)
+{
+  // The embedded python interpreter cannot handle DOS line-endings, see
+  // http://sourceforge.net/tracker/?group_id=5470&atid=105470&func=detail&aid=1167922
+  vtkstd::string buffer = script ? script : "";
+  buffer.erase(vtkstd::remove(buffer.begin(), buffer.end(), '\r'), buffer.end());
+  
+  // The cast is necessary because PyRun_SimpleString() hasn't always been const-correct
+  PyRun_SimpleString(const_cast<char*>(buffer.c_str()));
 }
 
 //-----------------------------------------------------------------------------

@@ -49,6 +49,11 @@ public:
   // the active one.
   void MakeCurrent();
 
+  // Description:
+  // Helper function that executes a script using PyRun_SimpleString() - handles
+  //some pesky details with DOS line endings. */
+  void RunSimpleString(const char* const script);
+
 protected:
   vtkPVPythonInterpretor();
   ~vtkPVPythonInterpretor();
