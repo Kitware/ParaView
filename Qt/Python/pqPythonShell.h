@@ -53,6 +53,7 @@ public:
   pqPythonShell(QWidget* Parent);
   ~pqPythonShell();
 
+  void InitializeInterpretor(int argc, char* argv[]);
 public slots:
   void clear();
   void executeScript(const QString&);

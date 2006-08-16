@@ -87,15 +87,10 @@ FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
 OPTION(PARAVIEW_EMBED_PYTHON "Embedded Python Interpreter" ON)
 
 IF(PARAVIEW_EMBED_PYTHON)
-
-  SUBDIRS(Utilities/pqPython)
   SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build ParaView using shared libraries" FORCE)
   SET(PARAVIEW_WRAP_PYTHON ON CACHE BOOL "Wrap ParaView server manager into Python" FORCE)
-
 ELSE(PARAVIEW_EMBED_PYTHON)
-
   SET(PARAVIEW_WRAP_PYTHON OFF CACHE BOOL "Wrap ParaView server manager into Python" FORCE)
-
 ENDIF(PARAVIEW_EMBED_PYTHON)
 
 #########################################################################

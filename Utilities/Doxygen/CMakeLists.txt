@@ -29,7 +29,7 @@ IF (BUILD_DOCUMENTATION)
   SET(DOXYGEN_SOURCE_LOCATIONS_DIR "${ParaView_SOURCE_DIR}")
   SET(DOXYGEN_SOURCE_LOCATIONS
        "\"${ParaView_SOURCE_DIR}/Utilities/Xdmf/vtk\" \\
-        \"${ParaView_SOURCE_DIR}/Utilities/pqPython\" \\
+        \"${ParaView_SOURCE_DIR}/Utilities/VTKPythonWrapping/Executable\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Chart\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Core\" \\
@@ -47,7 +47,7 @@ IF (BUILD_DOCUMENTATION)
        "")
   SET(DOXYGEN_PARSED_INPUT_DIRS
       " \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/Xdmf/vtk\" \\
-        \"${ParaView_SOURCE_DIR}/Utilities/pqPython\" \\
+        \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/VTKPythonWrapping/Executable\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Chart\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Core\" \\

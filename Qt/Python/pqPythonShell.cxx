@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonShell.h"
 #include "pqPythonStream.h"
 
-#include <pqPythonInterpreter.h>
+#include "vtkPVPythonInterpretor.h"
 
 #undef slots // Workaround for a conflict between Qt slots and the Python headers
 #include <vtkPython.h>
@@ -51,78 +51,70 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct pqPythonShell::pqImplementation
 {
-  pqImplementation(QWidget* Parent) :
-    Console(Parent)
-  {
-    this->Interpreter.MakeCurrent();
-    
+  pqImplementation(QWidget* Parent) 
+    : Console(Parent)
+    {
+    this->Interpreter = vtkPVPythonInterpretor::New();
+    }
+
+  void Initialize(int argc, char* argv[])
+    {
+
+    this->Interpreter->InitializeSubInterpretor(argc, argv);
     // Redirect Python's stdout and stderr
     PySys_SetObject(const_cast<char*>("stdout"), reinterpret_cast<PyObject*>(pqWrap(this->pythonStdout)));
     PySys_SetObject(const_cast<char*>("stderr"), reinterpret_cast<PyObject*>(pqWrap(this->pythonStderr)));
 
-    /** \todo Add the path to the *installed* paraview module to Python's path, or do some sort of dynamic lookup */
-
-    // For the convenience of developers, add the path to the server manager wrappers to Python's path
-    if(PyObject* path = PySys_GetObject(const_cast<char*>("path")))
-      {
-      PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PV_PYTHON_MODULE_DIR).toAscii().data());
-      PyList_Insert(path, 0, module_dir);
-      Py_XDECREF(module_dir);
-      }
-
-    // For the convenience of developers, add the path to the paraview libraries to Python's path
-    if(PyObject* path = PySys_GetObject(const_cast<char*>("path")))
-      {
-      PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PV_PYTHON_LIBRARY_DIR).toAscii().data());
-      PyList_Insert(path, 1, module_dir);
-      Py_XDECREF(module_dir);
-      }
-      
     // Setup Python's interactive prompts
     PyObject* ps1 = PySys_GetObject(const_cast<char*>("ps1"));
     if(!ps1)
       {
-        PySys_SetObject(const_cast<char*>("ps1"), ps1 = PyString_FromString(">>> "));
-        Py_XDECREF(ps1);
+      PySys_SetObject(const_cast<char*>("ps1"), ps1 = PyString_FromString(">>> "));
+      Py_XDECREF(ps1);
       }
-      
+
     PyObject* ps2 = PySys_GetObject(const_cast<char*>("ps2"));
     if(!ps2)
       {
-        PySys_SetObject(const_cast<char*>("ps2"), ps2 = PyString_FromString("... "));
-        Py_XDECREF(ps2);
+      PySys_SetObject(const_cast<char*>("ps2"), ps2 = PyString_FromString("... "));
+      Py_XDECREF(ps2);
       }
-  }
-  
+    }
+
   ~pqImplementation()
-  {
-    this->Interpreter.MakeCurrent();
-    
+    {
+    this->Interpreter->MakeCurrent();
+
     // Restore Python's original stdout and stderr
     PySys_SetObject(const_cast<char*>("stdout"), PySys_GetObject(const_cast<char*>("__stdout__")));
     PySys_SetObject(const_cast<char*>("stderr"), PySys_GetObject(const_cast<char*>("__stderr__")));
-  }
-  
+    this->Interpreter->Delete();
+    }
+
   void executeCommand(const QString& Command)
-  {
-    this->Interpreter.MakeCurrent();
-    
+    {
+    this->Interpreter->MakeCurrent();
+
     PyRun_SimpleString(Command.toAscii().data());
-  }
+    }
 
   void promptForInput()
-  {
-    this->Interpreter.MakeCurrent();
-    
+    {
+    this->Interpreter->MakeCurrent();
+
     QTextCharFormat format = this->Console.getFormat();
     format.setForeground(QColor(0, 0, 0));
     this->Console.setFormat(format);
 
     if(this->MultilineStatement.isEmpty())
+      {
       this->Console.printString(PyString_AsString(PySys_GetObject(const_cast<char*>("ps1"))));
+      }
     else
+      {
       this->Console.printString(PyString_AsString(PySys_GetObject(const_cast<char*>("ps2"))));
-  }
+      }
+    }
 
   /// Provides a console for gathering user input and displaying Python output
   pqConsoleWidget Console;
@@ -133,7 +125,7 @@ struct pqPythonShell::pqImplementation
   /// Redirects Python's stderr stream
   pqPythonStream pythonStderr;
   /// Separate Python interpreter that will be used for this shell
-  pqPythonInterpreter Interpreter;
+  vtkPVPythonInterpretor* Interpreter;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -153,13 +145,19 @@ pqPythonShell::pqPythonShell(QWidget* Parent) :
   QObject::connect(&this->Implementation->pythonStderr, SIGNAL(streamWrite(const QString&)), this, SLOT(printStderr(const QString&)));
   QObject::connect(&this->Implementation->Console, SIGNAL(executeCommand(const QString&)), this, SLOT(onExecuteCommand(const QString&)));
 
-  this->Implementation->Console.printString(QString("Python %1 on %2\n").arg(Py_GetVersion()).arg(Py_GetPlatform()));
-  this->promptForInput();
 }
 
 pqPythonShell::~pqPythonShell()
 {
   delete this->Implementation;
+}
+
+void pqPythonShell::InitializeInterpretor(int argc, char* argv[])
+{
+  this->Implementation->Initialize(argc, argv);
+  this->Implementation->Console.printString(
+    QString("Python %1 on %2\n").arg(Py_GetVersion()).arg(Py_GetPlatform()));
+  this->promptForInput();
 }
 
 void pqPythonShell::clear()

@@ -99,17 +99,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVTKWidget.h>
 
+#include <vtkProcessModule.h>
+#include <vtkPVOptions.h>
 #include <vtkPVXMLElement.h>
 #include <vtkPVXMLParser.h>
+#include <vtkSmartPointer.h>
+#include <vtkSMDoubleRangeDomain.h>
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include <vtkSMProxyManager.h>
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
-#include <vtkSmartPointer.h>
-#include <vtkSMDoubleRangeDomain.h>
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
 
 ///////////////////////////////////////////////////////////////////////////
 // pqMainWindowCore::pqImplementation
@@ -1318,8 +1320,10 @@ void pqMainWindowCore::onToolsPythonShell()
 #ifdef PARAVIEW_EMBED_PYTHON
   if (!this->Implementation->PythonDialog)
     {
+    const char* argv0 = vtkProcessModule::GetProcessModule()->
+      GetOptions()->GetArgv0();
     this->Implementation->PythonDialog = 
-      new pqPythonDialog(this->Implementation->Parent);
+      new pqPythonDialog(this->Implementation->Parent, 1, (char**)&argv0);
     }
   this->Implementation->PythonDialog->show();
   this->Implementation->PythonDialog->raise();

@@ -4,7 +4,7 @@ IF(PARAVIEW_EMBED_PYTHON)
   FIND_PACKAGE(PythonLibs)
 
   SET(PYTHON_LINK_LIBRARIES
-    pqPython
+    vtkPVPythonInterpretor
     QtPython
     vtkPVServerCommonPythonD
     vtkPVServerManagerPythonD

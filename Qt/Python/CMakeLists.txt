@@ -1,11 +1,11 @@
 PROJECT(QtPython)
 
 INCLUDE_DIRECTORIES(
-  ${pqPython_SOURCE_DIR}
   ${QtWidgets_SOURCE_DIR}
   ${QtPython_BINARY_DIR}
   ${VTK_INCLUDE_DIR}
   ${PYTHON_INCLUDE_PATH}
+  ${VTKPythonWrapping_SOURCE_DIR}/Executable
 )
 
 # Reduce the number of dirs that get included on moc command line
@@ -38,10 +38,10 @@ ADD_LIBRARY(QtPython
 )
 
 TARGET_LINK_LIBRARIES(QtPython
-  pqPython
   QtWidgets
   ${QT_LIBRARIES}
   ${PYTHON_LIBRARIES}
+  vtkPVPythonInterpretor
 )
 
 CONFIGURE_FILE(

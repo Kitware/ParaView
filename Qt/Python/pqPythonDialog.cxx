@@ -47,7 +47,7 @@ struct pqPythonDialog::pqImplementation
   Ui::pqPythonDialog Ui;
 };
 
-pqPythonDialog::pqPythonDialog(QWidget* Parent) :
+pqPythonDialog::pqPythonDialog(QWidget* Parent, int argc, char** argv) :
   QDialog(Parent),
   Implementation(new pqImplementation())
 {
@@ -66,6 +66,8 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent) :
     SIGNAL(clicked()),
     this,
     SLOT(runScript()));
+
+  this->Implementation->Ui.shellWidget->InitializeInterpretor(argc, argv);
 }
 
 pqPythonDialog::~pqPythonDialog()

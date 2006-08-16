@@ -50,7 +50,7 @@ class QTPYTHON_EXPORT pqPythonDialog :
   Q_OBJECT
 
 public:
-  pqPythonDialog(QWidget* Parent);
+  pqPythonDialog(QWidget* Parent, int argc, char** argv);
   
 private slots:
   void runScript();
