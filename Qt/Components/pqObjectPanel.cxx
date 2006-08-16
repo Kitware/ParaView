@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes
 #include "vtkSMSourceProxy.h"
+#include "vtkSMCompoundProxy.h"
 
 // ParaView includes
 #include "pqServerManagerObserver.h"
@@ -105,10 +106,28 @@ void pqObjectPanel::setProxyInternal(pqProxy* p)
     this->Proxy->getProxy()->UpdateVTKObjects();
     this->Proxy->getProxy()->UpdatePropertyInformation();
     vtkSMSourceProxy* sp;
+    vtkSMCompoundProxy* cp;
     sp = vtkSMSourceProxy::SafeDownCast(this->Proxy->getProxy());
+    cp = vtkSMCompoundProxy::SafeDownCast(this->Proxy->getProxy());
     if(sp)
       {
       sp->UpdatePipelineInformation();
+      }
+    else if(cp)
+      {
+      // TODO --  this is a workaround for a bug in the server manager
+      //          fix it the right way
+      //          does that mean calling UpdatePipelineInformation() above
+      //          for a source proxy goes away?
+      int num = cp->GetNumberOfProxies();
+      for(int i=0; i<num; i++)
+        {
+        sp = vtkSMSourceProxy::SafeDownCast(cp->GetProxy(i));
+        if(sp)
+          {
+          sp->UpdatePipelineInformation();
+          }
+        }
       }
     }
 }

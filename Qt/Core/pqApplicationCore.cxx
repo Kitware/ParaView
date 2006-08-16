@@ -635,31 +635,38 @@ pqPipelineSource* pqApplicationCore::createSourceOnServer(const QString& xmlname
   return source;
 }
 
-pqPipelineSource* pqApplicationCore::createCompoundFilterForSource(
+pqPipelineSource* pqApplicationCore::createCompoundFilter(
                          const QString& name,
-                         pqPipelineSource* source)
+                         pqServer* server,
+                         pqPipelineSource* input)
 {
-  // For starters all compoind proxies need an input..
-  if (!source)
-    {
-    qDebug() << "No source/filter specified. Cannot createCompoundFilterForSource.";
-    return 0;
-    }
-
   this->getUndoStack()->BeginUndoSet(QString("Create ") + name);
 
-  pqPipelineSource* filter = this->getPipelineBuilder()->createSource(
+  pqPipelineSource* source = this->getPipelineBuilder()->createSource(
     NULL, name.toStdString().c_str(), 
-    source->getServer(), NULL);
+    server, NULL);
 
-  if (filter)
+  vtkSMProperty* inputProperty = source->getProxy()->GetProperty("Input");
+  
+  if(inputProperty && input == NULL)
     {
-    this->getPipelineBuilder()->addConnection(source, filter);
+    this->removeSource(source);
+    source = NULL;
+    qWarning() << "Cannot create custom filter without active input source.";
+    }
+  else if(inputProperty && input)
+    {
+    this->getPipelineBuilder()->addConnection(input, source);
     }
 
-  emit this->sourceCreated(filter);
+  if(source)
+    {
+    source->getProxy()->UpdateVTKObjects();
+    emit this->sourceCreated(source);
+    }
+
   this->getUndoStack()->EndUndoSet();
-  return filter;
+  return source;
 }
 
 

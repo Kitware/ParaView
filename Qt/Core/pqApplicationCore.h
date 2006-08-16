@@ -133,8 +133,12 @@ public:
   pqPipelineSource* createSourceOnServer(const QString& xmlname, 
                                          pqServer* server);
 
-  pqPipelineSource* createCompoundFilterForSource(const QString& xmlname, 
-                                                  pqPipelineSource* source);
+  /// Create a compound proxy on a server with an input.
+  /// If the compound proxy doesn't have an "Input" property,
+  /// input is ignored.
+  pqPipelineSource* createCompoundFilter(const QString& xmlname, 
+                                         pqServer* server,
+                                         pqPipelineSource* input);
 
   pqPipelineSource* createReaderOnServer(const QString& filename, 
                                          pqServer* server);

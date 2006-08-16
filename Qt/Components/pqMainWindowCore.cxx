@@ -132,7 +132,10 @@ public:
     VariableToolbar(0),
     CustomFilterToolbar(0),
     ToolTipTrapper(0),
-    IgnoreBrowserSelectionChanges(false)
+    IgnoreBrowserSelectionChanges(false),
+    ActiveSource(NULL),
+    ActiveServer(NULL),
+    ActiveRenderModule(NULL)
   {
 #ifdef PARAVIEW_EMBED_PYTHON
   this->PythonDialog = 0;
@@ -1864,8 +1867,10 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
 pqPipelineSource* pqMainWindowCore::createCompoundSource(
   const QString& name)
 {
-  return pqApplicationCore::instance()->createCompoundFilterForSource(name,
-    this->getActiveSource());
+  pqPipelineSource* cp = pqApplicationCore::instance()->createCompoundFilter(name,
+      this->getActiveServer(), this->getActiveSource());
+  
+  return cp;
 }
 
 //-----------------------------------------------------------------------------
