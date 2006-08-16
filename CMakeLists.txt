@@ -168,7 +168,7 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   IF(WIN32 AND NOT UNIX)
     # There is a bug in NSI that does not handle full unix paths properly. Make
     # sure there is at least one set of four (4) backlasshes.
-    SET(CPACK_PACKAGE_ICON "${ParaQ_SOURCE_DIR}/Applications/Client\\\\ParaViewLogo.png")
+    SET(CPACK_PACKAGE_ICON "${ParaView_SOURCE_DIR}/Applications/Client\\\\ParaViewLogo.png")
     SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\paraview_alpha.exe")
     SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} a cross-platform, open-source visualization system")
     SET(CPACK_NSIS_HELP_LINK "http://www.paraview.org")
