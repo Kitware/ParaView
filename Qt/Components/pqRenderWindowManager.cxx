@@ -185,7 +185,11 @@ void pqRenderWindowManager::onRenderModuleRemoved(pqRenderModule* rm)
     {
     this->Internal->ActiveRenderModule = 0;
     emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
-
+    if (this->Internal->Frames.size() > 0)
+      {
+      // Activate some other view, so that atleast one view is active.
+      this->Internal->Frames[0]->setActive(true);
+      }
     }
 }
 
