@@ -648,6 +648,9 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
     SIGNAL(postAccept()),
     display_color,
     SLOT(reloadGUI()));
+
+  QObject::connect(this, SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+    display_color, SLOT(setRenderModule(pqRenderModule*)));
 }
 
 //-----------------------------------------------------------------------------

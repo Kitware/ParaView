@@ -301,6 +301,7 @@ void pqRenderModule::displaysChanged()
       // Update the render module pointer in the display.
       display->addRenderModule(this);
       this->Internal->Displays.append(QPointer<pqPipelineDisplay>(display));
+      emit this->displayAdded(display);
       }
     }
 
@@ -310,9 +311,11 @@ void pqRenderModule::displaysChanged()
     {
     if(*iter && !currentDisplays.contains(*iter))
       {
+      pqPipelineDisplay* display = (*iter);
       // Remove the render module pointer from the display.
-      (*iter)->removeRenderModule(this);
+      display->removeRenderModule(this);
       iter = this->Internal->Displays.erase(iter);
+      emit this->displayRemoved(display);
       }
     else
       {

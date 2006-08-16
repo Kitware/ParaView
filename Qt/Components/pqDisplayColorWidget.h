@@ -42,8 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QComboBox;
 class QHBoxLayout;
 
-class pqPipelineSource;
 class pqPipelineDisplay;
+class pqPipelineSource;
+class pqRenderModule;
 class vtkEventQtSlotConnect;
 
 /// Provides a standard user interface for selecting among a collection 
@@ -75,6 +76,11 @@ public slots:
   /// Affects the \c SelectedSource
   void onVariableChanged(pqVariableType type, const QString& name);
 
+  /// Called to set the current render module. This widget
+  /// shows the source's display properties in this render module 
+  /// alone.
+  void setRenderModule(pqRenderModule* renModule);
+
 signals:
   /// Signal emitted whenever the user chooses a variable, 
   /// or chooseVariable() is called.
@@ -92,6 +98,11 @@ private slots:
   /// Called when the GUI must reload the arrays shown in the widget.
   void reloadGUI();
 
+  /// Called when a display gets added to the selected render module.
+  /// Since a source may not have any display in a particular render module
+  /// when the rendermodule becomes active, we listen to this signal to 
+  /// update the GUI when a display gets added.
+  void displayAdded();
 private:
   /// Converts a variable type and name into a packed string representation 
   /// that can be used with a combo box.
@@ -107,6 +118,7 @@ private:
   bool PendingDisplayPropertyConnections;
   QPointer<pqPipelineSource> SelectedSource;
   vtkEventQtSlotConnect* VTKConnect;
+  QPointer<pqRenderModule> RenderModule;
 };
 
 #endif

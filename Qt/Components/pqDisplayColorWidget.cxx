@@ -199,19 +199,23 @@ const QString pqDisplayColorWidget::variableData(pqVariableType type,
 void pqDisplayColorWidget::onVariableChanged(pqVariableType vtkNotUsed(type), 
   const QString& name)
 {
-  if (!this->SelectedSource || !this->SelectedSource->getDisplayCount())
+  if (!this->SelectedSource || !this->RenderModule)
     {
     return;
     }
 
-  // I cannot decide if we should use signals here of directly 
-  // call the appropriate methods on undo stack.
-  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-  stack->BeginUndoSet("Color Change");
-  pqPipelineDisplay* display = this->SelectedSource->getDisplay(0);
-  display->setColorField(name);
-  stack->EndUndoSet();
-  display->renderAllViews();
+  pqPipelineDisplay* display = 
+    this->SelectedSource->getDisplay(this->RenderModule);
+  if (display)
+    {
+    // I cannot decide if we should use signals here of directly 
+    // call the appropriate methods on undo stack.
+    pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+    stack->BeginUndoSet("Color Change");
+    display->setColorField(name);
+    stack->EndUndoSet();
+    display->renderAllViews();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -235,16 +239,42 @@ void pqDisplayColorWidget::updateVariableSelector(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
+void pqDisplayColorWidget::displayAdded()
+{
+  if (this->SelectedSource && this->RenderModule)
+    {
+    this->reloadGUI();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayColorWidget::updateGUI()
 {
-  if (this->SelectedSource && this->SelectedSource->getDisplayCount())
+  if (this->SelectedSource && this->RenderModule && 
+    this->SelectedSource->getDisplay(this->RenderModule))
     {
     this->BlockEmission = true;
     this->Variables->setCurrentIndex(
       this->Variables->findText(
-        this->SelectedSource->getDisplay(0)->getColorField()));
+        this->SelectedSource->getDisplay(this->RenderModule)->getColorField()));
     this->BlockEmission = false;
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayColorWidget::setRenderModule(pqRenderModule* renModule)
+{
+  if (this->RenderModule)
+    {
+    QObject::disconnect(this->RenderModule, 0, this, 0);
+    }
+  this->RenderModule = renModule;
+  if (this->RenderModule)
+    {
+    QObject::connect(this->RenderModule, SIGNAL(displayAdded(pqPipelineDisplay*)), 
+      this, SLOT(displayAdded()), Qt::QueuedConnection);
+    }
+  this->reloadGUI();
 }
 
 //-----------------------------------------------------------------------------
@@ -260,7 +290,15 @@ void pqDisplayColorWidget::reloadGUI()
   this->clear();
   this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
 
-  pqPipelineDisplay* display = source->getDisplay(0);
+  pqPipelineDisplay* display = source->getDisplay(this->RenderModule);
+  if (!display)
+    {
+    this->BlockEmission = false;
+    this->setEnabled(false);
+    return;
+    }
+  this->setEnabled(true);
+
   vtkSMDataObjectDisplayProxy* displayProxy = display->getDisplayProxy();
 
   QList<QString> arrayList = display->getColorFields();

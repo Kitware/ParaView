@@ -92,6 +92,13 @@ public:
   /// on interaction is managed by this class.
   pqUndoStack* getInteractionUndoStack() const;
 
+signals:
+  // Fired after a display has been added to this render module.
+  void displayAdded(pqPipelineDisplay*);
+
+  // Fired after a display has been removed from this render module.
+  void displayRemoved(pqPipelineDisplay*);
+
 private slots:
   /// if renModule is not created when this object is instantianted, we
   /// must listen to UpdateVTKObjects event to bind the QVTKWidget and
