@@ -24,12 +24,15 @@ INCLUDE_DIRECTORIES(
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkPythonAppInitConfigure.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/vtkPythonAppInitConfigure.h)
 
-
+ADD_LIBRARY(vtkPVPythonInterpretor
+  vtkPVPythonInterpretor.cxx)
 
 ADD_EXECUTABLE(pvpython${PV_EXE_SUFFIX}
   vtkPythonAppInit.cxx
   vtkPVPythonOptions.cxx
   vtkPVProcessModulePythonHelper.cxx)
+
+
 IF(CMAKE_SYSTEM_NAME MATCHES "AIX")
   GET_FILENAME_COMPONENT(CMAKE_PYTHON_LIB_PREFIX "${PYTHON_LIBRARY}" PATH)
   FIND_FILE(CMAKE_PYTHON_LIBRARY_EXPORT python.exp "${CMAKE_PYTHON_LIB_PREFIX}")
@@ -67,6 +70,10 @@ IF (APPLE)
   SET_TARGET_PROPERTIES(pvpython${PV_EXE_SUFFIX} PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress -u _PyMac_Error")
 ENDIF (APPLE)
 
+TARGET_LINK_LIBRARIES(vtkPVPythonInterpretor
+  vtkCommon
+  ${PYTHON_UTIL_LIBRARY_LIB})
+
 # Link against all the kit wrappers.
 TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX}
   vtkPVServerManagerPythonD
@@ -75,6 +82,8 @@ TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX}
   vtkIO
   vtkGraphics
   vtkImaging
+  vtkPVPythonInterpretor
+  vtkPVServerManager
   ${VTK_PYTHON_LIBRARIES}
   ${PYTHON_UTIL_LIBRARY_LIB})
 IF(VTK_WRAP_TCL)
@@ -89,8 +98,15 @@ IF(BORLAND)
   ENDFOREACH(KIT)
 ENDIF(BORLAND)
 
-
-TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX} vtkPVServerManager)
+# Install vtkPVPythonInterpretor library.
+IF(PV_INSTALL_HAS_CMAKE_24)
+  INSTALL(TARGETS vtkPVPythonInterpretor
+    RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
+    LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
+    ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
+ELSE(PV_INSTALL_HAS_CMAKE_24)
+  INSTALL_TARGETS(${PV_INSTALL_LIB_DIR} vtkPVPythonInterpretor)
+ENDIF(PV_INSTALL_HAS_CMAKE_24)
 
 # Install the pvpython executable.
 SET(PV_EXE_LIST pvpython)
