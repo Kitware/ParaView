@@ -241,15 +241,23 @@ INSTALL(FILES ${ParaView_SOURCE_DIR}/Applications/Client/pqClient.adp
 # probably go to a local cmake file. Change to match the build system's
 # assistant. Make sure share forwarding for assistant (see up above) is
 # enabled if necessary
-# IF(PV_NEED_SHARED_FORWARD)
-#   INSTALL(FILES /opt/qt-4.1.3/bin/assistant 
-#     DESTINATION ${PV_EXE_INSTALL_CM24} 
-#     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
-#     COMPONENT Runtime
-#     RENAME assistant-real)
-# ELSE(PV_NEED_SHARED_FORWARD)
-#   INSTALL(FILES /opt/qt-4.1.3/bin/assistant 
+# IF(WIN32)
+#   INSTALL(FILES C:/Qt/4.1.4/bin/assistant.exe
 #     DESTINATION ${PV_EXE_INSTALL_CM24} 
 #     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
 #     COMPONENT Runtime)
-# ENDIF(PV_NEED_SHARED_FORWARD)
+# ELSE(WIN32)
+#   IF(PV_NEED_SHARED_FORWARD)
+#     INSTALL(FILES /opt/qt-4.1.3/bin/assistant 
+#       DESTINATION ${PV_EXE_INSTALL_CM24} 
+#       PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
+#       COMPONENT Runtime
+#       RENAME assistant-real)
+#   ELSE(PV_NEED_SHARED_FORWARD)
+#     INSTALL(FILES /opt/qt-4.1.3/bin/assistant 
+#       DESTINATION ${PV_EXE_INSTALL_CM24} 
+#       PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
+#       COMPONENT Runtime)
+#   ENDIF(PV_NEED_SHARED_FORWARD)
+# ENDIF(WIN32)
+
