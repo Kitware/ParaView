@@ -85,7 +85,10 @@ public:
 
   /// Gets the display for the specified index.
   pqPipelineDisplay* getDisplay(int index) const;
-  
+ 
+  /// Returns a list of displays in this render module.
+  QList<pqPipelineDisplay*> getDisplays() const;
+
   /// Each render module keeps a undo stack for interaction.
   /// This method returns that undo stack. External world
   /// typically uses it to Undo/Redo; pushing of elements on this stack

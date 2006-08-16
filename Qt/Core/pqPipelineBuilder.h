@@ -103,7 +103,8 @@ public:
   /// module.
   pqRenderModule* createWindow(pqServer* server);
 
-  /// Remove a viewing "window".
+  /// Remove a viewing "window". This also cleans up any displays that are
+  /// visible only in this render window.
   void removeWindow(pqRenderModule* rm);
 
   // Create a connection between a source and a sink. This method ensures

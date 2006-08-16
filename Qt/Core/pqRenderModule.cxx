@@ -429,6 +429,20 @@ pqPipelineDisplay* pqRenderModule::getDisplay(int index) const
 }
 
 //-----------------------------------------------------------------------------
+QList<pqPipelineDisplay*> pqRenderModule::getDisplays() const
+{
+  QList<pqPipelineDisplay*> list;
+  foreach (pqPipelineDisplay* disp, this->Internal->Displays)
+    {
+    if (disp)
+      {
+      list.push_back(disp);
+      }
+    }
+  return list;
+}
+
+//-----------------------------------------------------------------------------
 bool pqRenderModule::eventFilter(QObject* caller, QEvent* e)
 {
   // TODO, apparently, this should watch for window position changes, not resizes

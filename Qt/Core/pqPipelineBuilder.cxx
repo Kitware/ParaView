@@ -526,6 +526,11 @@ void pqPipelineBuilder::removeWindow(pqRenderModule* rm)
     qDebug() << "Nothing to remove.";
     return;
     }
+
+  // Get a list of all displays belonging to this render module. We delete
+  // all the displays that belong only to this render module.
+  QList<pqPipelineDisplay*> displays = rm->getDisplays();
+
   // Unregister the proxy....the rest of the GUI will(rather should) manage itself!
   QString name = rm->getProxyName();
   vtkSMMultiViewRenderModuleProxy* multiRM = rm->getServer()->GetRenderModule();
@@ -548,6 +553,15 @@ void pqPipelineBuilder::removeWindow(pqRenderModule* rm)
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   pxm->UnRegisterProxy("render_modules", name.toStdString().c_str());
   // rm is invalid at this point.
+ 
+  // Now clean up any orphan displays.
+  foreach (pqPipelineDisplay* disp, displays)
+    {
+    if (disp->getNumberOfRenderModules() == 0)
+      {
+      this->removeInternal(disp);      
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
