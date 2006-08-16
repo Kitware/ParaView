@@ -275,6 +275,28 @@ pqPipelineDisplay* pqPipelineSource::getDisplay(
 }
 
 //-----------------------------------------------------------------------------
+QList<pqRenderModule*> pqPipelineSource::getRenderModules() const
+{
+  QList<pqRenderModule*> renModules;
+ foreach(pqPipelineDisplay* disp, this->Internal->Displays)
+    {
+    if (disp)
+      {
+      unsigned int max = disp->getNumberOfRenderModules();
+      for (unsigned int cc=0; cc < max; ++cc)
+        {
+        pqRenderModule* ren = disp->getRenderModule(cc);
+        if (ren && !renModules.contains(ren))
+          {
+          renModules.push_back(ren);
+          }
+        }
+      }
+    }
+  return renModules; 
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineSource::renderAllViews(bool force /*=false*/)
 {
   foreach(pqPipelineDisplay* disp, this->Internal->Displays)

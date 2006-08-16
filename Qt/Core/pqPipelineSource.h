@@ -82,6 +82,10 @@ public:
   // added to the render module, this returns the first one.
   pqPipelineDisplay* getDisplay(pqRenderModule* renderModule) const;
 
+  // Returns a list of render modules in which this source
+  // has displays added (the displays may not be visible).
+  QList<pqRenderModule*> getRenderModules() const;
+
   // Use this method to initialize the pqObject state using the
   // underlying vtkSMProxy. This needs to be done only once,
   // after the object has been created. 

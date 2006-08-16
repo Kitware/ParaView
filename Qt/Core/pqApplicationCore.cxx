@@ -258,6 +258,8 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
     return;
     }
 
+  QList<pqRenderModule*> renModules = source->getRenderModules();
+
   // HACK: This will make sure that the panel for the source being
   // removed goes away before the source is deleted. Probably the selection
   // should also go into the undo stack, that way on undo, the GUI selection
@@ -266,6 +268,10 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
  
   this->getPipelineBuilder()->remove(source);
 
+  foreach (pqRenderModule* ren, renModules)
+    {
+    ren->render();
+    }
 }
 
 
