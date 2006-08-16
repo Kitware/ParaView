@@ -59,8 +59,8 @@ struct pqPythonShell::pqImplementation
 
   void Initialize(int argc, char* argv[])
     {
-
     this->Interpreter->InitializeSubInterpretor(argc, argv);
+    
     // Redirect Python's stdout and stderr
     PySys_SetObject(const_cast<char*>("stdout"), reinterpret_cast<PyObject*>(pqWrap(this->pythonStdout)));
     PySys_SetObject(const_cast<char*>("stderr"), reinterpret_cast<PyObject*>(pqWrap(this->pythonStderr)));
@@ -94,8 +94,7 @@ struct pqPythonShell::pqImplementation
   void executeCommand(const QString& Command)
     {
     this->Interpreter->MakeCurrent();
-
-    PyRun_SimpleString(Command.toAscii().data());
+    this->Interpreter->RunSimpleString(Command.toAscii().data());
     }
 
   void promptForInput()
@@ -168,6 +167,7 @@ void pqPythonShell::clear()
 
 void pqPythonShell::executeScript(const QString& script)
 {
+  this->printStdout("\n");
   this->Implementation->executeCommand(script);
   this->Implementation->promptForInput();
 }
