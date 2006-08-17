@@ -59,6 +59,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageAppend.h"
 #include "vtkImageConstantPad.h"
 
+#include "vtkStringArray.h"
+
 #include <vtksys/stl/vector>
 #include <vtksys/stl/string>
 
@@ -71,7 +73,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.62");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.63");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1645,13 +1647,13 @@ void vtkKWSelectionFrameLayoutManager::SwitchWidgetCallback(
   // (since this callback was most likely triggered by selecting a 
   // *different* title in the list
   
-  if (widget->GetSelectionList() && widget->GetTitle())
+  if (widget->GetSelectionListMenuButton() && widget->GetTitle())
     {
-    widget->GetSelectionList()->SetValue(widget->GetTitle());
+    widget->GetSelectionListMenuButton()->SetValue(widget->GetTitle());
     }
-  if (new_widget->GetSelectionList() && new_widget->GetTitle())
+  if (new_widget->GetSelectionListMenuButton() && new_widget->GetTitle())
     {
-    new_widget->GetSelectionList()->SetValue(new_widget->GetTitle());
+    new_widget->GetSelectionListMenuButton()->SetValue(new_widget->GetTitle());
     }
 }
 
@@ -1776,15 +1778,13 @@ void vtkKWSelectionFrameLayoutManager::UpdateSelectionLists()
   // Allocate array of titles
   // Separate each group
 
-  const char **titles_list = 
-    new const char *[this->Internals->Pool.size() * 2];
-
   vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
     this->Internals->Pool.end();
   vtkKWSelectionFrameLayoutManagerInternals::PoolIterator begin = 
     this->Internals->Pool.begin();
 
-  int nb_titles = 0;
+  vtkStringArray *str_array = vtkStringArray::New();
+
   const char *separator = "--";
   const char *prev_group = (begin != end ? begin->Group.c_str() : NULL);
 
@@ -1795,10 +1795,10 @@ void vtkKWSelectionFrameLayoutManager::UpdateSelectionLists()
       {
       if (strcmp(it->Group.c_str(), prev_group))
         {
-        titles_list[nb_titles++] = separator;
+        str_array->InsertNextValue(separator);
         prev_group = it->Group.c_str();
         }
-      titles_list[nb_titles++] = it->Widget->GetTitle();
+      str_array->InsertNextValue(it->Widget->GetTitle());
       }
     }
 
@@ -1807,17 +1807,16 @@ void vtkKWSelectionFrameLayoutManager::UpdateSelectionLists()
     {
     if (it->Widget)
       {
-      it->Widget->SetSelectionList(nb_titles, titles_list);
-      if (it->Widget->GetSelectionList() && it->Widget->GetTitle())
+      it->Widget->SetSelectionList(str_array);
+      if (it->Widget->GetSelectionListMenuButton() && it->Widget->GetTitle())
         {
-        it->Widget->GetSelectionList()->SetValue(it->Widget->GetTitle());
+        it->Widget->GetSelectionListMenuButton()->SetValue(
+          it->Widget->GetTitle());
         }
       }
     }
 
-  // Free titles
-
-  delete [] titles_list;
+  str_array->Delete();
 }
 
 //----------------------------------------------------------------------------

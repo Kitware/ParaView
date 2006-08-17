@@ -30,6 +30,7 @@ class vtkKWMenuButton;
 class vtkKWPushButton;
 class vtkKWSelectionFrameInternals;
 class vtkKWToolbarSet;
+class vtkStringArray;
 
 class KWWidgets_EXPORT vtkKWSelectionFrame : public vtkKWCompositeWidget
 {
@@ -58,7 +59,8 @@ public:
   // of other selection frames that can be switched with the current 
   // selection frame.
   virtual void SetSelectionList(int num, const char **list);
-  vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
+  virtual void SetSelectionList(vtkStringArray *list);
+  vtkGetObjectMacro(SelectionListMenuButton, vtkKWMenuButton);
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
@@ -163,7 +165,7 @@ public:
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
-  // typically invoked when the f frame title is double-clicked on.
+  // typically invoked when the frame title is double-clicked on.
   // Note that this will also invoke the SelectCommand, since the first
   // click acts as a select event.
   // The 'object' argument is the object that will have the method called on
@@ -222,16 +224,18 @@ public:
   vtkGetObjectMacro(BodyFrame, vtkKWFrame);
   
   // Description:
-  // Set/Get the left user frame visibility, and retrieve the frame.
-  // The left user frame is displayed on the left side of the BodyFrame.
+  // Set/Get the left user-frame visibility, and retrieve the frame.
+  // The left user-frame is displayed on the left side of the BodyFrame, as
+  // its name implies, can be used to put any extra UI the user wants.
   virtual vtkKWFrame* GetLeftUserFrame();
   virtual void SetLeftUserFrameVisibility(int);
   vtkGetMacro(LeftUserFrameVisibility, int);
   vtkBooleanMacro(LeftUserFrameVisibility, int);
 
   // Description:
-  // Set/Get the left user frame visibility, and retrieve the frame.
-  // The left user frame is displayed on the left side of the BodyFrame.
+  // Set/Get the right user-frame visibility, and retrieve the frame.
+  // The right user-frame is displayed on the right side of the BodyFrame, as
+  // its name implies, can be used to put any extra UI the user wants.
   virtual vtkKWFrame* GetRightUserFrame();
   virtual void SetRightUserFrameVisibility(int);
   vtkGetMacro(RightUserFrameVisibility, int);
@@ -242,7 +246,7 @@ public:
   // frame is a thin frame around the whole widget which color is changed
   // when the widget is selected. This is useful, for example, when the
   // title bar is not visible (the title bar color also changes when the
-  // widget is selected). Set the widget of the selection frame to 0 to
+  // widget is selected). Set the width of the selection frame to 0 to
   // discard this feature. Colors can be customized.
   virtual void SetOuterSelectionFrameWidth(int);
   vtkGetMacro(OuterSelectionFrameWidth, int);
@@ -283,9 +287,9 @@ protected:
   
   vtkKWFrame      *OuterSelectionFrame;
   vtkKWFrame      *TitleBarFrame;
-  vtkKWMenuButton *SelectionList;
+  vtkKWMenuButton *SelectionListMenuButton;
   vtkKWPushButton *CloseButton;
-  vtkKWLabel      *Title;
+  vtkKWLabel      *TitleLabel;
   vtkKWFrame      *BodyFrame;
 
   virtual void Pack();
@@ -294,7 +298,7 @@ protected:
 
   virtual int SetColor(double *color, double r, double g, double b);
   virtual void UpdateSelectedAspect();
-  virtual void UpdateSelectionList();
+  virtual void UpdateSelectionListMenuButton();
 
   double TitleColor[3];
   double TitleSelectedColor[3];
