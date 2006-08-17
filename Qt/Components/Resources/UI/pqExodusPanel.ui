@@ -94,7 +94,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="TimeStepSpin" />
+      <widget class="QSpinBox" name="TimeStep:Spin" />
      </item>
     </layout>
    </item>

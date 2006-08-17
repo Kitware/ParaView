@@ -87,7 +87,7 @@ void pqExodusPanel::linkServerManagerProperties()
        this->proxy()->getProxy()->GetProperty("TimeStep"));
 
   QSlider* timeSlider = this->findChild<QSlider*>("TimeStep");
-  QSpinBox* timeSpin = this->findChild<QSpinBox*>("TimeStepSpin");
+  QSpinBox* timeSpin = this->findChild<QSpinBox*>("TimeStep:Spin");
 
   if((range.size() == 2) && (range[1] != -1))
     {
