@@ -59,6 +59,10 @@ public:
   vtkBooleanMacro(Visibility, int);
   vtkGetMacro(Visibility, int);
 
+  // Description:
+  // Update the output
+  void Update();
+
 protected:
   vtkSMGenericViewDisplayProxy();
   ~vtkSMGenericViewDisplayProxy();
@@ -69,10 +73,6 @@ protected:
   // Connect the VTK data object to display pipeline.
   void SetInput(vtkSMProxy* input);
   void SetupCollectionFilter(vtkSMProxy* collectProxy);
-
-  // Description:
-  // Update the output
-  void Update();
 
 private:
   vtkSMProxy* CollectProxy;
