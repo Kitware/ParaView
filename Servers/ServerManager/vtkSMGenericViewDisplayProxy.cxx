@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -61,9 +61,11 @@ void vtkSMGenericViewDisplayProxy::CreateVTKObjects(int numObjects)
     return;
     }
   this->UpdateSuppressorProxy = this->GetSubProxy("UpdateSuppressor");
-  this->UpdateSuppressorProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+  this->UpdateSuppressorProxy->SetServers(
+    this->Servers | vtkProcessModule::CLIENT);
   this->CollectProxy = this->GetSubProxy("Collect");
-  this->CollectProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+  this->CollectProxy->SetServers(
+    this->Servers | vtkProcessModule::CLIENT);
 
   this->Superclass::CreateVTKObjects(numObjects);
 }
@@ -104,16 +106,12 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
   ip->AddProxy(input);
   this->CollectProxy->UpdateVTKObjects();
 
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
-
   unsigned int i;
   vtkClientServerStream stream;
   for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
     {
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
     if (this->CollectProxy)
       {
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
       stream
         << vtkClientServerStream::Invoke
         << this->CollectProxy->GetID(i) << "GetPolyDataOutput"
@@ -124,32 +122,22 @@ cout << __FILE__ << ":" << __LINE__ << " here" << endl;
         << vtkClientServerStream::End;
       }
     }
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
   if (stream.GetNumberOfMessages() > 0)
     {
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
     vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID, vtkProcessModule::CLIENT_AND_SERVERS, stream);
+      this->ConnectionID, 
+      this->CollectProxy->GetServers(), 
+      stream);
     }
-    /*
-  ip = vtkSMInputProperty::SafeDownCast(
-  this->UpdateSuppressorProxy->GetProperty("Input"));
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->CollectProxy);
-  this->UpdateSuppressorProxy->UpdateVTKObjects();
-  */
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
-  if ( vtkProcessModule::GetProcessModule()->IsRemote(this->GetConnectionID()) )
+
+  if ( vtkProcessModule::GetProcessModule()->IsRemote(this->GetConnectionID()))
     {
     unsigned int i;
 
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
     this->SetupCollectionFilter(this->CollectProxy);
 
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
     for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
       {
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
       vtkClientServerStream cmd;
       vtkClientServerStream stream;
       vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -170,7 +158,8 @@ cout << __FILE__ << ":" << __LINE__ << " here" << endl;
         << this->CollectProxy->GetID(i) << "AddObserver" << "EndEvent" << cmd
         << vtkClientServerStream::End;
       pm->SendStream(this->ConnectionID,
-        vtkProcessModule::CLIENT_AND_SERVERS, stream);
+                     this->CollectProxy->GetServers(),
+                     stream);
 
       // Handle collection setup with client server.
       stream
@@ -183,28 +172,16 @@ cout << __FILE__ << ":" << __LINE__ << " here" << endl;
         << vtkClientServerStream::LastResult
         << vtkClientServerStream::End;
       pm->SendStream(this->ConnectionID,
-        vtkProcessModule::CLIENT_AND_SERVERS, stream);
+                     this->CollectProxy->GetServers(),
+                     stream);
 
-      // Special condition to signal the client.
-      // Because both processes of the Socket controller think they are 0!!!!
-      if (pm->GetClientMode())
-        {
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
-        stream
-          << vtkClientServerStream::Invoke
-          << this->CollectProxy->GetID(i) << "SetController" << 0
-          << vtkClientServerStream::End;
-        pm->SendStream(this->ConnectionID,
-          vtkProcessModule::CLIENT, stream);
-        }
       }
-
-    //this->SetOrderedCompositing(0);
     }
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMGenericViewDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProxy)
+void vtkSMGenericViewDisplayProxy::SetupCollectionFilter(
+  vtkSMProxy* collectProxy)
 { 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
@@ -215,69 +192,29 @@ void vtkSMGenericViewDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProx
   num = collectProxy->GetNumberOfIDs();
   for (i = 0; i < num; ++i)
     {
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
-    // Default is pass through because it executes fastest.  
     stream
       << vtkClientServerStream::Invoke
-      << collectProxy->GetID(i) << "SetMoveModeToClone"
+      << collectProxy->GetID(i) << "SetMoveModeToCollect"
       << vtkClientServerStream::End;
     stream
       << vtkClientServerStream::Invoke
       << collectProxy->GetID(i) << "SetServerToDataServer"
       << vtkClientServerStream::End;
+    int mask = ~vtkProcessModule::CLIENT;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER,
-      stream);
+                   collectProxy->GetServers() & mask,
+                   stream);
     stream
       << vtkClientServerStream::Invoke
-      << collectProxy->GetID(i) << "SetMoveModeToClone"
+      << collectProxy->GetID(i) << "SetMoveModeToCollect"
       << vtkClientServerStream::End;
     stream
       << vtkClientServerStream::Invoke
       << collectProxy->GetID(i) << "SetServerToClient"
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT,
-      stream);
-    stream
-      << vtkClientServerStream::Invoke
-      << collectProxy->GetID(i) << "SetMPIMToNSocketConnection" 
-      << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
-      << vtkClientServerStream::End;
-    // create, SetPassThrough, and set the mToN connection
-    // object on all servers and client
-    pm->SendStream(this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
-    // always set client mode
-    stream
-      << vtkClientServerStream::Invoke
-      << collectProxy->GetID(i) << "SetServerToClient"
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT, stream);
-    // if running in client mode
-    // then set the server to be servermode
-    if(pm->GetClientMode())
-      {
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
-      stream
-        << vtkClientServerStream::Invoke
-        << collectProxy->GetID(i) << "SetServerToDataServer"
-        << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID,
-        vtkProcessModule::DATA_SERVER, stream);
-      }
-    // if running in render server mode
-    if(pm->GetOptions()->GetRenderServerMode())
-      {
-cout << __FILE__ << ":" << __LINE__ << " here" << endl;
-      stream
-        << vtkClientServerStream::Invoke
-        << collectProxy->GetID(i) << "SetServerToRenderServer"
-        << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID,
-        vtkProcessModule::RENDER_SERVER, stream);
-      }
+                   vtkProcessModule::CLIENT,
+                   stream);
     }
 }
 
