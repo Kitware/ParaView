@@ -206,6 +206,12 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
   const char* xmlname, const char* register_group, pqServer* server,
   bool is_undoable/*=true*/)
 {
+  if(!server)
+    {
+    qDebug() << "Cannot create proxy, no server specified.";
+    return NULL;
+    }
+
   if (!register_group)
     {
     qDebug() << "register_group cannot be null.";

@@ -651,9 +651,14 @@ pqPipelineSource* pqApplicationCore::createCompoundFilter(
   pqPipelineSource* source = this->getPipelineBuilder()->createSource(
     NULL, name.toStdString().c_str(), 
     server, NULL);
-
-  vtkSMProperty* inputProperty = source->getProxy()->GetProperty("Input");
   
+  vtkSMProperty* inputProperty = NULL;
+
+  if(source)
+    {
+    inputProperty = source->getProxy()->GetProperty("Input");
+    }
+
   if(inputProperty && input == NULL)
     {
     this->removeSource(source);
