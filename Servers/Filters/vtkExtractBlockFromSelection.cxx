@@ -20,14 +20,16 @@
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
+#include "vtkSelection.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkExtractBlockFromSelection, "1.1");
+vtkCxxRevisionMacro(vtkExtractBlockFromSelection, "1.2");
 vtkStandardNewMacro(vtkExtractBlockFromSelection);
 
 //----------------------------------------------------------------------------
 vtkExtractBlockFromSelection::vtkExtractBlockFromSelection()
 {
+  this->SourceID = 0;
 } 
 
 //----------------------------------------------------------------------------
@@ -61,7 +63,11 @@ int vtkExtractBlockFromSelection::RequestData(
       vtkUnstructuredGrid::SafeDownCast(iter->GetCurrentDataObject());
     if (ug)
       {
-      output->ShallowCopy(ug);
+      if (ug->GetInformation()->Get(vtkSelection::SOURCE_ID()) ==
+          this->SourceID)
+        {
+        output->ShallowCopy(ug);
+        }
       return 1;
       }
     }
@@ -78,7 +84,7 @@ void vtkExtractBlockFromSelection::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 int vtkExtractBlockFromSelection::FillInputPortInformation(
-  int port, vtkInformation *info)
+  int, vtkInformation *info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Set(vtkCompositeDataPipeline::INPUT_REQUIRED_COMPOSITE_DATA_TYPE(), 
