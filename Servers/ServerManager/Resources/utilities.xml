@@ -1688,17 +1688,25 @@
 
     <SourceProxy name="ExtractSelectionBlock" 
                  class="vtkExtractBlockFromSelection">
-       <InputProperty
-          name="Input"
-          command="SetInputConnection">
-          <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-             <DataType value="vtkMultiBlockDataSet"/>
-          </DataTypeDomain>
-        </InputProperty>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+         <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+         </ProxyGroupDomain>
+         <DataTypeDomain name="input_type">
+            <DataType value="vtkMultiBlockDataSet"/>
+         </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty
+         name="SourceID"
+         command="SetSourceID"
+         number_of_elements="1"
+         default_values="0" >
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
     </SourceProxy>
 
     <Proxy name="VolumeSelector" class="vtkVolumeSelector">
