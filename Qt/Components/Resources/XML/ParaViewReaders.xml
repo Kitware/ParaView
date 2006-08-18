@@ -159,5 +159,9 @@
           extensions="pht"
           file_description="Phasta Files">
   </Reader>
+  <Reader name="SESAMEReader"
+          extensions="sesame"
+          file_description="SESAME">
+  </Reader>
 
 </ParaViewReaders>
