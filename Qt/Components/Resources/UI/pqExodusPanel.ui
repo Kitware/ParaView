@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>253</width>
-    <height>487</height>
+    <height>501</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -30,6 +30,83 @@
    <property name="spacing" >
     <number>6</number>
    </property>
+   <item row="0" column="0" >
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label" >
+       <property name="font" >
+        <font>
+         <family>Sans Serif</family>
+         <pointsize>9</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+         <underline>false</underline>
+         <strikeout>false</strikeout>
+        </font>
+       </property>
+       <property name="text" >
+        <string>Time step</string>
+       </property>
+       <property name="wordWrap" >
+        <bool>true</bool>
+       </property>
+       <property name="buddy" >
+        <cstring></cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item row="1" column="1" >
+        <widget class="QLabel" name="TimeStepMax" >
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2" >
+        <widget class="QSlider" name="TimeStep" >
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition" >
+          <enum>QSlider::TicksBelow</enum>
+         </property>
+         <property name="tickInterval" >
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="TimeStepMin" >
+         <property name="text" >
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="TimeStep:Spin" />
+     </item>
+    </layout>
+   </item>
    <item row="1" column="0" >
     <widget class="QTreeWidget" name="Variables" >
      <property name="minimumSize" >
@@ -49,69 +126,6 @@
      <column>
       <property name="text" >
        <string>Range(s)</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item row="3" column="0" >
-    <widget class="QTreeWidget" name="BlockArrayStatus" >
-     <property name="minimumSize" >
-      <size>
-       <width>0</width>
-       <height>100</height>
-      </size>
-     </property>
-     <property name="rootIsDecorated" >
-      <bool>false</bool>
-     </property>
-     <column>
-      <property name="text" >
-       <string>Blocks</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item row="0" column="0" >
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="label" >
-       <property name="text" >
-        <string>Time step</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSlider" name="TimeStep" >
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="TimeStep:Spin" />
-     </item>
-    </layout>
-   </item>
-   <item row="4" column="0" >
-    <widget class="QTreeWidget" name="Sets" >
-     <property name="minimumSize" >
-      <size>
-       <width>0</width>
-       <height>100</height>
-      </size>
-     </property>
-     <property name="rootIsDecorated" >
-      <bool>false</bool>
-     </property>
-     <column>
-      <property name="text" >
-       <string>Sets</string>
       </property>
      </column>
     </widget>
@@ -145,6 +159,42 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="4" column="0" >
+    <widget class="QTreeWidget" name="Sets" >
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="rootIsDecorated" >
+      <bool>false</bool>
+     </property>
+     <column>
+      <property name="text" >
+       <string>Sets</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="3" column="0" >
+    <widget class="QTreeWidget" name="BlockArrayStatus" >
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="rootIsDecorated" >
+      <bool>false</bool>
+     </property>
+     <column>
+      <property name="text" >
+       <string>Blocks</string>
+      </property>
+     </column>
+    </widget>
    </item>
   </layout>
  </widget>

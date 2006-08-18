@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleSpinBox>
 #include <QAction>
 #include <QTimer>
+#include <QLabel>
 
 // VTK includes
 
@@ -88,6 +89,8 @@ void pqExodusPanel::linkServerManagerProperties()
 
   QSlider* timeSlider = this->findChild<QSlider*>("TimeStep");
   QSpinBox* timeSpin = this->findChild<QSpinBox*>("TimeStep:Spin");
+  QLabel* timeMin = this->findChild<QLabel*>("TimeStepMin");
+  QLabel* timeMax = this->findChild<QLabel*>("TimeStepMax");
 
   if((range.size() == 2) && (range[1] != -1))
     {
@@ -97,9 +100,13 @@ void pqExodusPanel::linkServerManagerProperties()
     timeSpin->setEnabled(true);
     timeSpin->setRange(range[0].toInt(), 
                        range[1].toInt());
+    timeMin->setText(range[0].toString());
+    timeMax->setText(range[1].toString());
     }
   else
     {
+    timeMin->setText("0");
+    timeMax->setText("0");
     timeSlider->setEnabled(false);
     timeSpin->setEnabled(false);
     }
