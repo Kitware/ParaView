@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
+#include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInteractorObserver.h"
 #include "vtkInteractorStyleRubberBandPick.h"
@@ -55,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -159,9 +161,22 @@ public:
      DisplaysType;
   DisplaysType Displays;
 
-  typedef vtkstd::map<vtkSMProxy*, vtkSmartPointer<vtkSMSourceProxy> >
-     ExtractorsType;
-  ExtractorsType Extractors;
+  struct ClientSideDisplay
+  {
+    ClientSideDisplay(vtkSMProxy* extractor, vtkSMProxy* display) :
+      Extractor(extractor), Display(display)
+      {
+      }
+    ClientSideDisplay()
+      {
+      }
+
+    vtkSmartPointer<vtkSMProxy> Extractor;
+    vtkSmartPointer<vtkSMProxy> Display;
+  };
+  typedef vtkstd::map<vtkSMProxy*, ClientSideDisplay >
+     ClientSideDisplaysType;
+  ClientSideDisplaysType ClientSideDisplays;
 
   double Verts[32];
 };
@@ -643,10 +658,6 @@ vtkSelection* pqSelectionManager::selectOnSurface(pqRenderModule* rm)
     displayProxy->SetVisibility(1);
     }
 
-  vtkSelectionSerializer* ser = vtkSelectionSerializer::New();
-  ser->PrintXML(cerr, vtkIndent(), 1, selection);
-  ser->Delete();
-
   this->convertSelection(rm, selection);
 
   vtkIdType connId = rmp->GetConnectionID();
@@ -879,8 +890,8 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
   
   vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
 
-  vtkSelection* sel = this->selectInFrustrum(eventpos, rm);
-  //vtkSelection* sel = this->selectOnSurface(rm);
+  //vtkSelection* sel = this->selectInFrustrum(eventpos, rm);
+  vtkSelection* sel = this->selectOnSurface(rm);
 
   if (!sel)
     {
@@ -963,12 +974,84 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
 //-----------------------------------------------------------------------------
 void pqSelectionManager::clearClientDisplays()
 {
+  pqSelectionManagerImplementation::ClientSideDisplaysType::iterator iter =
+    this->Implementation->ClientSideDisplays.begin();
+
+  for(; iter!= this->Implementation->ClientSideDisplays.end(); iter++)
+    {
+    pqSelectionManagerImplementation::ClientSideDisplay& displayS = 
+      iter->second;
+    vtkSMProxy* extractor = displayS.Extractor;
+
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      extractor->GetProperty("Input"));
+    if (pp)
+      {
+      pp->RemoveAllProxies();
+      }
+    extractor->UpdateVTKObjects();
+    }
+  this->Implementation->ClientSideDisplays.clear();
 }
 
 //-----------------------------------------------------------------------------
 void pqSelectionManager::createNewClientDisplays(
   pqServerManagerSelection& selection)
 {
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+
+  pqServerManagerSelection::iterator iter = selection.begin();
+  for (; iter != selection.end(); iter++)
+    {
+    pqServerManagerModelItem* item = *iter;
+    vtkSMProxy* source = static_cast<pqPipelineSource*>(item)->getProxy();
+
+    vtkIdType connId = source->GetConnectionID();
+
+    vtkSMProxy* selectionSource =
+      this->Implementation->ServerSelections[connId].SelectionDataSource;
+
+    vtkSMProxy* extractor = 
+      pxm->NewProxy("selection_helpers", "ExtractSelectionBlock");
+    extractor->SetConnectionID(connId);
+    extractor->SetServers(source->GetServers());
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      extractor->GetProperty("Input"));
+    if (pp)
+      {
+      pp->AddProxy(selectionSource);
+      }
+
+    vtkSMIntVectorProperty* sid = vtkSMIntVectorProperty::SafeDownCast(
+      extractor->GetProperty("SourceID"));
+    sid->SetElements1(source->GetID(0).ID); 
+    
+    extractor->UpdateVTKObjects();
+
+    vtkSMGenericViewDisplayProxy* display = 
+      vtkSMGenericViewDisplayProxy::SafeDownCast(
+        pxm->NewProxy("viewdisplays", "GenericViewDisplay"));
+    display->SetConnectionID(connId);
+    display->SetServers(source->GetServers());
+    pp = vtkSMProxyProperty::SafeDownCast(display->GetProperty("Input"));
+    if (pp)
+      {
+      pp->AddProxy(extractor);
+      }
+    display->UpdateVTKObjects();
+    
+    display->Update();
+
+    cout << display->GetOutput() << endl;
+    if (display->GetOutput())
+      {
+      display->GetOutput()->PrintSelf(cout, vtkIndent());
+      }
+
+    this->Implementation->ClientSideDisplays[source] = 
+      pqSelectionManagerImplementation::ClientSideDisplay(extractor, 0);
+    extractor->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------
