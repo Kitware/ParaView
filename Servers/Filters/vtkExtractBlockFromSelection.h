@@ -29,9 +29,18 @@ public:
   vtkTypeRevisionMacro(vtkExtractBlockFromSelection,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Set/Get the source id (clientserver id) of the selection object to
+  // extract. This is the id that will be matched with the SOURCE_ID()
+  // key of the data information of each block.
+  vtkSetMacro(SourceID, int);
+  vtkGetMacro(SourceID, int);
+
 protected:
   vtkExtractBlockFromSelection();
   ~vtkExtractBlockFromSelection();
+
+  int SourceID;
 
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
