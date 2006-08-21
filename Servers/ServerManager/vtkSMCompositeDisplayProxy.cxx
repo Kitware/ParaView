@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.21");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -578,6 +578,12 @@ void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
   ip->RemoveAllProxies();
   ip->AddProxy(this->VolumeDistributorSuppressorProxy);
   this->VolumePTMapperProxy->UpdateVTKObjects();
+
+  ip = vtkSMInputProperty::SafeDownCast(
+    this->VolumeHAVSMapperProxy->GetProperty("Input"));
+  ip->RemoveAllProxies();
+  ip->AddProxy(this->VolumeDistributorSuppressorProxy);
+  this->VolumeHAVSMapperProxy->UpdateVTKObjects();
 
   ip = vtkSMInputProperty::SafeDownCast(
     this->VolumeBunykMapperProxy->GetProperty("Input"));

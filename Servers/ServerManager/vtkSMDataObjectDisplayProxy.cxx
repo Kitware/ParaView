@@ -15,6 +15,7 @@
 #include "vtkSMDataObjectDisplayProxy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkHAVSVolumeMapper.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
@@ -36,7 +37,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.17");
 
 
 //-----------------------------------------------------------------------------
@@ -54,6 +55,7 @@ vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
   this->VolumeFilterProxy = 0;
   this->VolumeUpdateSuppressorProxy = 0;
   this->VolumePTMapperProxy = 0;
+  this->VolumeHAVSMapperProxy = 0;
   this->VolumeBunykMapperProxy = 0;
   this->VolumeZSweepMapperProxy = 0;
   this->VolumeActorProxy = 0;
@@ -64,6 +66,7 @@ vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
   this->HasVolumePipeline    = 0; // By Default, don't bother about the Volume Pipeline.
   this->SupportsBunykMapper  = 0;
   this->SupportsZSweepMapper = 0;
+  this->SupportsHAVSMapper   = 0;
   this->VolumeRenderMode     = 0;
 
   this->Visibility = 1;
@@ -86,6 +89,7 @@ vtkSMDataObjectDisplayProxy::~vtkSMDataObjectDisplayProxy()
   this->VolumeFilterProxy = 0;
   this->VolumeUpdateSuppressorProxy = 0;
   this->VolumePTMapperProxy = 0;
+  this->VolumeHAVSMapperProxy = 0;
   this->VolumeBunykMapperProxy = 0;
   this->VolumeZSweepMapperProxy = 0;
   this->VolumeActorProxy = 0;
@@ -122,6 +126,7 @@ void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
     this->VolumeUpdateSuppressorProxy
       = this->GetSubProxy("VolumeUpdateSuppressor");
     this->VolumePTMapperProxy = this->GetSubProxy("VolumePTMapper");
+    this->VolumeHAVSMapperProxy = this->GetSubProxy("VolumeHAVSMapper");
     this->VolumeBunykMapperProxy = this->GetSubProxy("VolumeBunykMapper");
     this->VolumeZSweepMapperProxy = this->GetSubProxy("VolumeZSweepMapper");
     this->VolumeActorProxy = this->GetSubProxy("VolumeActor");
@@ -135,6 +140,8 @@ void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
                                           vtkProcessModule::CLIENT_AND_SERVERS);
     this->VolumePTMapperProxy->SetServers(
       vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+    this->VolumeHAVSMapperProxy->SetServers(
+      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);    
     this->VolumeBunykMapperProxy->SetServers(
       vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
     this->VolumeZSweepMapperProxy->SetServers(
@@ -154,6 +161,7 @@ void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
     this->RemoveSubProxy("VolumeFilter");
     this->RemoveSubProxy("VolumeUpdateSuppressor");
     this->RemoveSubProxy("VolumePTMapper");
+    this->RemoveSubProxy("VolumeHAVSMapper");
     this->RemoveSubProxy("VolumeBunykMapper");
     this->RemoveSubProxy("VolumeZSweepMapper");
     this->RemoveSubProxy("VolumeActor");
@@ -240,10 +248,15 @@ void vtkSMDataObjectDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
     this->HasVolumePipeline =  (domain->IsInDomain(input))? 1 : 0;
     this->SupportsBunykMapper = 0;
     this->SupportsZSweepMapper = 0;
+    this->SupportsHAVSMapper = 0;
     }
   
   if ( this->HasVolumePipeline )
     {
+    if (vtkHAVSVolumeMapper::SupportedByHardware())
+      {
+      this->SupportsHAVSMapper = 1;
+      }
     if (input->GetDataInformation()->GetNumberOfCells() < 1000000)
       {
       this->SupportsZSweepMapper = 1;
@@ -581,6 +594,15 @@ void vtkSMDataObjectDisplayProxy::SetupVolumePipeline()
   ip->RemoveAllProxies();
   ip->AddProxy(this->VolumeUpdateSuppressorProxy);
 
+  ip = vtkSMInputProperty::SafeDownCast(
+    this->VolumeHAVSMapperProxy->GetProperty("Input"));
+  if (!ip)
+    {
+    vtkErrorMacro("Failed to find property Input on VolumeHAVSMapperProxy.");
+    return;
+    }
+  ip->RemoveAllProxies();
+  ip->AddProxy(this->VolumeUpdateSuppressorProxy);
 
   ip = vtkSMInputProperty::SafeDownCast(
     this->VolumeBunykMapperProxy->GetProperty("Input"));
@@ -611,7 +633,14 @@ void vtkSMDataObjectDisplayProxy::SetupVolumePipeline()
     return;
     }
   pp->RemoveAllProxies();
-  pp->AddProxy(this->VolumePTMapperProxy);
+  if (this->SupportsHAVSMapper)
+    {
+    pp->AddProxy(this->VolumeHAVSMapperProxy);
+    }
+  else
+    {
+    pp->AddProxy(this->VolumePTMapperProxy);
+    }
 
   pp = vtkSMProxyProperty::SafeDownCast(
     this->VolumeActorProxy->GetProperty("Property"));
@@ -997,6 +1026,30 @@ void vtkSMDataObjectDisplayProxy::SetVolumeMapperToPTCM()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetVolumeMapperToHAVSCM()
+{
+  if ( !this->HasVolumePipeline )
+    {
+    return;
+    }
+
+  vtkSMProxyProperty* pp;
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->VolumeActorProxy->GetProperty("Mapper"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Mapper on VolumeActorProxy.");
+    return;
+    }
+  if (pp->GetNumberOfProxies() != 1)
+    {
+    vtkErrorMacro("Expected one proxy in Mapper's VolumeActorProxy.");
+    }
+  pp->SetProxy(0, this->VolumeHAVSMapperProxy);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetVolumeMapperToZSweepCM()
 {
   if ( !this->HasVolumePipeline )
@@ -1048,6 +1101,11 @@ int vtkSMDataObjectDisplayProxy::GetVolumeMapperTypeCM()
   if ( !strcmp(p->GetVTKClassName(), "vtkProjectedTetrahedraMapper" ) )
     {
     return vtkSMDataObjectDisplayProxy::PROJECTED_TETRA_VOLUME_MAPPER;
+    }
+
+  if ( !strcmp(p->GetVTKClassName(), "vtkHAVSVolumeMapper" ) )
+    {
+    return vtkSMDataObjectDisplayProxy::HAVS_VOLUME_MAPPER;
     }
 
   if ( !strcmp(p->GetVTKClassName(), "vtkUnstructuredGridVolumeZSweepMapper" ) )
@@ -1826,6 +1884,7 @@ void vtkSMDataObjectDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
      << this->VolumeGeometryIsValid << endl;
   os << indent << "HasVolumePipeline: " << this->HasVolumePipeline << endl;
   os << indent << "VolumeRenderMode: " << this->VolumeRenderMode << endl;
+  os << indent << "SupportsHAVSMapper: " << this->SupportsHAVSMapper << endl;
   os << indent << "SupportsBunykMapper: " << this->SupportsBunykMapper << endl;
   os << indent << "SupportsZSweepMapper: " << this->SupportsZSweepMapper << endl;
 }

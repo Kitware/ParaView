@@ -627,6 +627,48 @@
       </StringVectorProperty>
     </SourceProxy>
 
+    <SourceProxy name="HAVSVolumeMapper" 
+      class="vtkHAVSVolumeMapper">
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <!-- 
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        -->
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty
+        name="ScalarMode"
+        command="SetScalarMode"
+        default_values="3"
+        number_of_elements="1"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Default"/>
+          <Entry value="1" text="PointData"/>
+          <Entry value="2" text="CellData"/>
+          <Entry value="3" text="PointFieldData"/>
+          <Entry value="4" text="CellFieldData"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty
+        name="SelectScalarArray"
+        command="SelectScalarArray"
+        number_of_elements="1"
+        animateable="0">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+    </SourceProxy>
+
     <SourceProxy name="UnstructuredGridVolumeRayCastMapper" 
       class="vtkUnstructuredGridVolumeRayCastMapper">
       <InputProperty
@@ -2706,6 +2748,16 @@
         <Proxy name="VolumePTMapper" 
           proxygroup="mappers" 
           proxyname="ProjectedTetrahedraMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeBunykMapper">
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeHAVSMapper" 
+          proxygroup="mappers" 
+          proxyname="HAVSVolumeMapper">
         </Proxy>
         <ShareProperties subproxy="VolumeBunykMapper">
           <Exception name="Input" />
