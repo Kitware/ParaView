@@ -370,10 +370,10 @@ bool pqRenderWindowManager::loadState(vtkPVXMLElement* rwRoot,
       // the view no longer lays out those extra render modules. We mark all
       // these render modules as "pending". As user splits new views, he will
       // see these old render modules that got hidden from view.
-      QVTKWidget* window = qobject_cast<QVTKWidget*>(frame->mainWidget());
-      if (window)
+      QVTKWidget* _window = qobject_cast<QVTKWidget*>(frame->mainWidget());
+      if (_window)
         {
-        pqRenderModule* ren = pqServerManagerModel::instance()->getRenderModule(window);
+        pqRenderModule* ren = pqServerManagerModel::instance()->getRenderModule(_window);
         if (ren)
           {
           this->Internal->PendingRenderModules.push_back(ren);
