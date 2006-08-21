@@ -30,6 +30,8 @@
 #include "vtkSMProxyUnRegisterUndoElement.h"
 #include "vtkSMUndoRedoStateLoader.h"
 
+#include <vtksys/RegularExpression.hxx>
+
 //*****************************************************************************
 class vtkSMUndoStackObserver : public vtkCommand
 {
@@ -151,11 +153,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.10");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.11");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.10");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.11");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
@@ -177,9 +179,11 @@ vtkSMUndoStack::vtkSMUndoStack()
     }
   else
     {
-    pxm->AddObserver(vtkCommand::RegisterEvent, this->Observer);
-    pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Observer);
-    pxm->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
+    // It is essential that the Undo/Redo system notices these events
+    // before anyone else, hence we put these observers on a high priority level.
+    pxm->AddObserver(vtkCommand::RegisterEvent, this->Observer, 100);
+    pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Observer, 100);
+    pxm->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer, 100);
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (pm)
@@ -283,7 +287,7 @@ void vtkSMUndoStack::Push(vtkIdType cid, const char* label, vtkUndoSet* set)
     }
   
   vtkPVXMLElement* state = set->SaveState(NULL);
-  //if (!this->ClientOnly)
+  // if (!this->ClientOnly)
   //   state->PrintXML();
   if (this->ClientOnly)
     {
@@ -374,8 +378,16 @@ void vtkSMUndoStack::AddToActiveUndoSet(vtkUndoElement* element)
 //-----------------------------------------------------------------------------
 void vtkSMUndoStack::OnRegisterProxy(void* data)
 {
-  vtkSMProxyManager::RegisteredProxyInformation &info =*(static_cast<
+  // proxies registered as prototypes don't participate in
+  // undo/redo.
+  vtksys::RegularExpression prototypesRe("_prototypes$");
+
+  vtkSMProxyManager::RegisteredProxyInformation &info =*(reinterpret_cast<
     vtkSMProxyManager::RegisteredProxyInformation*>(data));
+  if (prototypesRe.find(info.GroupName) != 0)
+    {
+    return;
+    }
 
   vtkSMProxyRegisterUndoElement* elem = vtkSMProxyRegisterUndoElement::New();
   elem->SetConnectionID(this->ActiveConnectionID);
@@ -387,9 +399,16 @@ void vtkSMUndoStack::OnRegisterProxy(void* data)
 //-----------------------------------------------------------------------------
 void vtkSMUndoStack::OnUnRegisterProxy(void* data)
 {
-  vtkSMProxyManager::RegisteredProxyInformation &info =*(static_cast<
-    vtkSMProxyManager::RegisteredProxyInformation*>(data));
+  // proxies registered as prototypes don't participate in
+  // undo/redo.
+  vtksys::RegularExpression prototypesRe("_prototypes$");
 
+  vtkSMProxyManager::RegisteredProxyInformation &info =*(reinterpret_cast<
+    vtkSMProxyManager::RegisteredProxyInformation*>(data));
+  if (prototypesRe.find(info.GroupName) != 0)
+    {
+    return;
+    }
   vtkSMProxyUnRegisterUndoElement* elem = 
     vtkSMProxyUnRegisterUndoElement::New();
   elem->SetConnectionID(this->ActiveConnectionID);
@@ -401,7 +420,12 @@ void vtkSMUndoStack::OnUnRegisterProxy(void* data)
 //-----------------------------------------------------------------------------
 void vtkSMUndoStack::OnPropertyModified(void* data)
 {
-  vtkSMProxyManager::ModifiedPropertyInformation &info =*(static_cast<
+  // TODO: We need to determine if the property is being changed on a proxy 
+  // that is registered only as a prototype. If so, we should not worry
+  // about recording its property changes. When we update the SM data structure
+  // to separately manage prototypes, this will be take care of automatically.
+  // Hence, we defer it for now.
+  vtkSMProxyManager::ModifiedPropertyInformation &info =*(reinterpret_cast<
     vtkSMProxyManager::ModifiedPropertyInformation*>(data)); 
  
   vtkSMProperty* prop = info.Proxy->GetProperty(info.PropertyName);
