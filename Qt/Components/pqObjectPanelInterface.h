@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqLoadedFormObjectPanel.cxx
+   Module:    pqObjectPanelInterface.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,68 +30,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-// this include
-#include "pqLoadedFormObjectPanel.h"
+#ifndef _pqObjectPanelInterface_h
+#define _pqObjectPanelInterface_h
 
-// Qt includes
-#include <QVBoxLayout>
-#include <QFormBuilder>
-#include <QFile>
+#include <QString>
+class QWidget;
+class pqObjectPanel;
 
-// VTK includes
-
-// Paraview Server Manager includes
-
-// ParaView includes
-#include "pqProxy.h"
-
-
-/// constructor
-pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, QWidget* p)
-  : pqNamedObjectPanel(p)
+/// interface class for plugins that create pqObjectPanels
+class pqObjectPanelInterface
 {
-  QBoxLayout* mainlayout = new QVBoxLayout(this);
-  mainlayout->setMargin(0);
+public:
+  /// destructor
+  virtual ~pqObjectPanelInterface() {}
 
-  QFile file(filename);
-  
-  if(file.open(QFile::ReadOnly))
-    {
-    QFormBuilder builder;
-    QWidget* customForm = builder.load(&file, NULL);
-    file.close();
-    mainlayout->addWidget(customForm);
-    }
-}
+  virtual pqObjectPanel* createPanel(QWidget* p) = 0;
 
-/// destructor
-pqLoadedFormObjectPanel::~pqLoadedFormObjectPanel()
-{
-  if(this->Proxy)
-    {
-    this->unlinkServerManagerProperties();
-    }
-  this->Proxy = NULL;
-}
+  virtual QString name() const = 0;
+};
 
-bool pqLoadedFormObjectPanel::isValid()
-{
-  return this->layout()->count() == 1;
-}
+Q_DECLARE_INTERFACE(pqObjectPanelInterface, "com.kitware.paraview.objectpanel")
 
-/// set the proxy to display properties for
-void pqLoadedFormObjectPanel::setProxyInternal(pqProxy* p)
-{
-  if(this->Proxy)
-    {
-    this->unlinkServerManagerProperties();
-    }
-
-  this->pqNamedObjectPanel::setProxyInternal(p);
-
-  if(this->Proxy)
-    {
-    this->linkServerManagerProperties();
-    }
-}
+#endif
 

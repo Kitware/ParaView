@@ -55,6 +55,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 
+// we include this for static plugins
+#define QT_STATICPLUGIN
+#include <QtPlugin>
+
+QString pqStreamTracerPanelInterface::name() const
+{
+  return "StreamTracer";
+}
+
+pqObjectPanel* pqStreamTracerPanelInterface::createPanel(QWidget* p)
+{
+  return new pqStreamTracerPanel(p);
+}
+
+Q_EXPORT_PLUGIN(pqStreamTracerPanelInterface)
+Q_IMPORT_PLUGIN(pqStreamTracerPanelInterface)
+
 //////////////////////////////////////////////////////////////////////////////
 // pqStreamTracerPanel::pqImplementation
 

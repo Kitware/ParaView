@@ -50,6 +50,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFrame>
 #include <QVBoxLayout>
 
+// we include this for static plugins
+#define QT_STATICPLUGIN
+#include <QtPlugin>
+
+QString pqClipPanelInterface::name() const
+{
+  return "Clip";
+}
+
+pqObjectPanel* pqClipPanelInterface::createPanel(QWidget* p)
+{
+  return new pqClipPanel(p);
+}
+
+Q_EXPORT_PLUGIN(pqClipPanelInterface)
+Q_IMPORT_PLUGIN(pqClipPanelInterface)
+
 //////////////////////////////////////////////////////////////////////////////
 // pqClipPanel::pqImplementation
 

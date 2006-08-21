@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqStreamTracerPanel_h
 
 #include "pqObjectPanel.h"
+#include "pqObjectPanelInterface.h"
 
 /// Custom panel for the StreamTracer filter that manages a combined Qt / 3D widget UI
 class pqStreamTracerPanel :
@@ -60,6 +61,16 @@ private:
 
   class pqImplementation;
   pqImplementation* const Implementation;
+};
+
+// make this panel available to the object inspector
+class pqStreamTracerPanelInterface : public QObject, public pqObjectPanelInterface
+{
+  Q_OBJECT
+  Q_INTERFACES(pqObjectPanelInterface)
+public:
+  virtual QString name() const;
+  virtual pqObjectPanel* createPanel(QWidget* p);
 };
 
 #endif

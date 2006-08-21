@@ -49,6 +49,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 
+// we include this for static plugins
+#define QT_STATICPLUGIN
+#include <QtPlugin>
+
+QString pqCutPanelInterface::name() const
+{
+  return "Cut";
+}
+
+pqObjectPanel* pqCutPanelInterface::createPanel(QWidget* p)
+{
+  return new pqCutPanel(p);
+}
+
+Q_EXPORT_PLUGIN(pqCutPanelInterface)
+Q_IMPORT_PLUGIN(pqCutPanelInterface)
+
 //////////////////////////////////////////////////////////////////////////////
 // pqCutPanel::pqImplementation
 

@@ -53,6 +53,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 #include <QVBoxLayout>
 
+// we include this for static plugins
+#define QT_STATICPLUGIN
+#include <QtPlugin>
+
+QString pqContourPanelInterface::name() const
+{
+  return "Contour";
+}
+
+pqObjectPanel* pqContourPanelInterface::createPanel(QWidget* p)
+{
+  return new pqContourPanel(p);
+}
+
+Q_EXPORT_PLUGIN(pqContourPanelInterface)
+Q_IMPORT_PLUGIN(pqContourPanelInterface)
+
+
 //////////////////////////////////////////////////////////////////////////////
 // pqContourPanel::pqImplementation
 

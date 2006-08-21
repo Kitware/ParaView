@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectPanel.h"
 #include "pqVariableType.h"
+#include "pqObjectPanelInterface.h"
 
 /// Custom panel for the Contour filter
 class pqContourPanel :
@@ -61,6 +62,16 @@ private:
 
   class pqImplementation;
   pqImplementation* const Implementation;
+};
+
+// make this panel available to the object inspector
+class pqContourPanelInterface : public QObject, public pqObjectPanelInterface
+{
+  Q_OBJECT
+  Q_INTERFACES(pqObjectPanelInterface)
+public:
+  virtual QString name() const;
+  virtual pqObjectPanel* createPanel(QWidget* p);
 };
 
 #endif

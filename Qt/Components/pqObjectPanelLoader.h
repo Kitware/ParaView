@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqLoadedFormObjectPanel.cxx
+   Module:    pqObjectPanelLoader.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,68 +30,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-// this include
-#include "pqLoadedFormObjectPanel.h"
+#ifndef _pqObjectPanelLoader_h
+#define _pqObjectPanelLoader_h
 
-// Qt includes
-#include <QVBoxLayout>
-#include <QFormBuilder>
-#include <QFile>
-
-// VTK includes
-
-// Paraview Server Manager includes
-
-// ParaView includes
-#include "pqProxy.h"
+#include <QObject>
+#include <QStringList>
+class pqObjectPanelInterface;
+class pqObjectPanel;
 
 
-/// constructor
-pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, QWidget* p)
-  : pqNamedObjectPanel(p)
+/// loader class that creates panels from plugins
+/// for now, it only supports static plugins
+class pqObjectPanelLoader : public QObject
 {
-  QBoxLayout* mainlayout = new QVBoxLayout(this);
-  mainlayout->setMargin(0);
+  Q_OBJECT
+public:
+  /// constructor
+  pqObjectPanelLoader(QObject* p=0);
+  /// destructor
+  ~pqObjectPanelLoader();
 
-  QFile file(filename);
-  
-  if(file.open(QFile::ReadOnly))
-    {
-    QFormBuilder builder;
-    QWidget* customForm = builder.load(&file, NULL);
-    file.close();
-    mainlayout->addWidget(customForm);
-    }
-}
+  /// create a widget from a plugin
+  pqObjectPanel* createPanel(const QString& className,
+                              QWidget* parent = 0);
 
-/// destructor
-pqLoadedFormObjectPanel::~pqLoadedFormObjectPanel()
-{
-  if(this->Proxy)
-    {
-    this->unlinkServerManagerProperties();
-    }
-  this->Proxy = NULL;
-}
+  QStringList availableWidgets() const;
 
-bool pqLoadedFormObjectPanel::isValid()
-{
-  return this->layout()->count() == 1;
-}
+private:
+  QList<pqObjectPanelInterface*> PanelPlugins;
 
-/// set the proxy to display properties for
-void pqLoadedFormObjectPanel::setProxyInternal(pqProxy* p)
-{
-  if(this->Proxy)
-    {
-    this->unlinkServerManagerProperties();
-    }
+};
 
-  this->pqNamedObjectPanel::setProxyInternal(p);
+#endif
 
-  if(this->Proxy)
-    {
-    this->linkServerManagerProperties();
-    }
-}
 

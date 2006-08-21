@@ -37,6 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSlider>
 #include <QComboBox>
 
+// we include this for static plugins
+#define QT_STATICPLUGIN
+#include <QtPlugin>
+
 // VTK includes
 
 // ParaView Server Manager includes
@@ -49,6 +53,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqDoubleSpinBoxDomain.h"
 #include "pqComboBoxDomain.h"
+
+
+QString pqThresholdPanelInterface::name() const
+{
+  return "Threshold";
+}
+
+pqObjectPanel* pqThresholdPanelInterface::createPanel(QWidget* p)
+{
+  return new pqThresholdPanel(p);
+}
+
+Q_EXPORT_PLUGIN(pqThresholdPanelInterface)
+Q_IMPORT_PLUGIN(pqThresholdPanelInterface)
 
 
 pqThresholdPanel::pqThresholdPanel(QWidget* p) :

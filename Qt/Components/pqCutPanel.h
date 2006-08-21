@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqCutPanel_h
 
 #include "pqObjectPanel.h"
+#include "pqObjectPanelInterface.h"
 
 class pqImplicitPlaneWidget;
 
@@ -64,6 +65,16 @@ private:
 
   class pqImplementation;
   pqImplementation* const Implementation;
+};
+
+// make this panel available to the object inspector
+class pqCutPanelInterface : public QObject, public pqObjectPanelInterface
+{
+  Q_OBJECT
+  Q_INTERFACES(pqObjectPanelInterface)
+public:
+  virtual QString name() const;
+  virtual pqObjectPanel* createPanel(QWidget* p);
 };
 
 #endif

@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMap>
 #include <QPointer>
 #include "pqProxy.h"
+#include "pqObjectPanelLoader.h"
 
 class pqObjectPanel;
 class QPushButton;
@@ -115,6 +116,9 @@ protected slots:
 
   
 private:
+
+  pqObjectPanelLoader Loader;
+
   // When in forceModified(), reset, should not disable accept button,
   // hence, we keep this flag. This behaviour may need rethinking, but currently,
   // since forceModified is only called on source creation with pending,

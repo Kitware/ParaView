@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPicking.h
+   Module:    pqCalculatorPanel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,49 +30,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#ifndef _pqCalculatorPanel_h
+#define _pqCalculatorPanel_h
 
-#ifndef _pqPicking_h
-#define _pqPicking_h
+#include "pqObjectPanel.h"
+#include "pqObjectPanelInterface.h"
 
-#include "pqWidgetsExport.h"
-#include <QObject>
-#include <vtkType.h>
-class vtkObject;
-class vtkCommand;
-class vtkRenderWindowInteractor;
-class vtkSMRenderModuleProxy;
-class vtkSMProxy;
-class vtkSMDisplayProxy;
-class vtkSMPointLabelDisplayProxy;
-class vtkUnstructuredGrid;
-
-/// class to do picking
-class PQWIDGETS_EXPORT pqPicking : public QObject
+/// Panel for vtkArrayCalculator proxy
+class pqCalculatorPanel : public pqObjectPanel
 {
   Q_OBJECT
 public:
-  pqPicking(vtkSMRenderModuleProxy* rm, QObject* p);
-  ~pqPicking();
+  /// constructor
+  pqCalculatorPanel(QWidget* p = 0);
+  /// destructor
+  ~pqCalculatorPanel();
 
-public slots:
+  /// accept the changes made to the properties
+  /// changes will be propogated down to the server manager
+  virtual void accept();
 
-  /// compute selection when given the render window interactor
-  void computeSelection(vtkObject* style, unsigned long, void*, void*, vtkCommand*);
-  
-  /// pick a cell on a current source proxy with given screen coordinates
-  void computeSelection(vtkRenderWindowInteractor* iren, int X, int Y);
+  /// reset the changes made
+  /// editor will query properties from the server manager
+  virtual void reset();
 
-signals:
-  /// emit selection changed, proxy and dataset is given
-  void selectionChanged(vtkSMProxy* p, vtkUnstructuredGrid* selections);
+protected slots:
+  /// slot called when any calculator button is pushed
+  void buttonPressed(const QString& t);
 
-private:
-  vtkSMRenderModuleProxy* RenderModule;
-  vtkSMProxy* PickFilter;
-  vtkSMDisplayProxy* PickDisplay;
-  vtkSMPointLabelDisplayProxy* PickRetriever;
-  vtkUnstructuredGrid* EmptySet;
+protected:
+  /// Internal method that actually sets the proxy. Subclasses must override
+  /// this instead of setProxy().
+  virtual void setProxyInternal(pqProxy* proxy);
 
+  class pqInternal;
+  pqInternal* Internal;
+};
+
+// make this panel available to the object inspector
+class pqCalculatorPanelInterface : public QObject, public pqObjectPanelInterface
+{
+  Q_OBJECT
+  Q_INTERFACES(pqObjectPanelInterface)
+public:
+  virtual QString name() const;
+  virtual pqObjectPanel* createPanel(QWidget* p);
 };
 
 #endif

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqLoadedFormObjectPanel.cxx
+   Module:    pqObjectPanelLoader.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -31,67 +31,59 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 // this include
-#include "pqLoadedFormObjectPanel.h"
+#include "pqObjectPanelLoader.h"
 
 // Qt includes
-#include <QVBoxLayout>
-#include <QFormBuilder>
-#include <QFile>
-
-// VTK includes
-
-// Paraview Server Manager includes
+#include <QPluginLoader>
 
 // ParaView includes
-#include "pqProxy.h"
+#include "pqObjectPanelInterface.h"
 
-
+//-----------------------------------------------------------------------------
 /// constructor
-pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, QWidget* p)
-  : pqNamedObjectPanel(p)
+pqObjectPanelLoader::pqObjectPanelLoader(QObject* p)
+  : QObject(p)
 {
-  QBoxLayout* mainlayout = new QVBoxLayout(this);
-  mainlayout->setMargin(0);
-
-  QFile file(filename);
-  
-  if(file.open(QFile::ReadOnly))
+  // for now, we only support static plugins 
+  // (plugins built into the application)
+  QObjectList plugins = QPluginLoader::staticInstances();
+  foreach(QObject* o, plugins)
     {
-    QFormBuilder builder;
-    QWidget* customForm = builder.load(&file, NULL);
-    file.close();
-    mainlayout->addWidget(customForm);
+    pqObjectPanelInterface* i = qobject_cast<pqObjectPanelInterface*>(o);
+    if(i)
+      {
+      this->PanelPlugins.append(i);
+      }
     }
 }
 
+//-----------------------------------------------------------------------------
 /// destructor
-pqLoadedFormObjectPanel::~pqLoadedFormObjectPanel()
+pqObjectPanelLoader::~pqObjectPanelLoader()
 {
-  if(this->Proxy)
+}
+  
+pqObjectPanel* pqObjectPanelLoader::createPanel(const QString& className,
+                                                 QWidget* p)
+{
+  foreach(pqObjectPanelInterface* i, this->PanelPlugins)
     {
-    this->unlinkServerManagerProperties();
+    if(i->name() == className)
+      {
+      return i->createPanel(p);
+      }
     }
-  this->Proxy = NULL;
+  return NULL;
 }
 
-bool pqLoadedFormObjectPanel::isValid()
+QStringList pqObjectPanelLoader::availableWidgets() const
 {
-  return this->layout()->count() == 1;
+  QStringList names;
+  foreach(pqObjectPanelInterface* i, this->PanelPlugins)
+    {
+    names.append(i->name());
+    }
+  return names;
 }
 
-/// set the proxy to display properties for
-void pqLoadedFormObjectPanel::setProxyInternal(pqProxy* p)
-{
-  if(this->Proxy)
-    {
-    this->unlinkServerManagerProperties();
-    }
-
-  this->pqNamedObjectPanel::setProxyInternal(p);
-
-  if(this->Proxy)
-    {
-    this->linkServerManagerProperties();
-    }
-}
 

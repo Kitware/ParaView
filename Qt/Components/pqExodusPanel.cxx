@@ -55,6 +55,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
 
+// we include this for static plugins
+#define QT_STATICPLUGIN
+#include <QtPlugin>
+
+QString pqExodusPanelInterface::name() const
+{
+  return "ExodusReader";
+}
+
+pqObjectPanel* pqExodusPanelInterface::createPanel(QWidget* p)
+{
+  return new pqExodusPanel(p);
+}
+
+Q_EXPORT_PLUGIN(pqExodusPanelInterface)
+Q_IMPORT_PLUGIN(pqExodusPanelInterface)
+
+
 pqExodusPanel::pqExodusPanel(QWidget* p) :
   pqLoadedFormObjectPanel(":/pqWidgets/UI/pqExodusPanel.ui", p)
 {
