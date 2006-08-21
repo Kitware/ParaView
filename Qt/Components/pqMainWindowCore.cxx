@@ -637,6 +637,26 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
     display_color, SLOT(setRenderModule(pqRenderModule*)));
 }
 
+#include "pqDisplayRepresentationWidget.h"
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setupRepresentationToolbar(QToolBar* toolbar)
+{
+  pqDisplayRepresentationWidget* display_representation = new pqDisplayRepresentationWidget(
+    toolbar)
+    << pqSetName("displayRepresentation");
+
+  toolbar->addWidget(display_representation);
+
+  QObject::connect(this, SIGNAL(activeSourceChanged(pqPipelineSource*)),
+    display_representation, SLOT(update(pqPipelineSource*)));
+
+  QObject::connect(this, SIGNAL(postAccept()),
+    display_representation, SLOT(reloadGUI()));
+
+  QObject::connect(this, SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+    display_representation, SLOT(setRenderModule(pqRenderModule*)));
+}
+
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* toolbar)
 {

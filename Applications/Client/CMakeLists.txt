@@ -137,6 +137,7 @@ ENDIF(APPLE)
     ObjectInspectorSphere
     OpenFile
     OpenSaveData
+    RepresentationSelector
     StreamTracer
     StreamTracerUpdates
     SubMenu

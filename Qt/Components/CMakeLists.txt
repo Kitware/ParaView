@@ -56,6 +56,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDataSetModel.h
   pqDisplayColorWidget.h
   pqDisplayProxyEditor.h
+  pqDisplayRepresentationWidget.h
   pqDoubleSpinBoxDomain.h
   pqElementInspectorWidget.h
   pqExodusPanel.h
@@ -118,6 +119,7 @@ SET(UI_FORMS
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqDisplayProxyEditor.ui
+  Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqLineWidget.ui
@@ -201,6 +203,8 @@ ADD_LIBRARY(pqComponents
   pqDisplayColorWidget.h
   pqDisplayProxyEditor.cxx
   pqDisplayProxyEditor.h
+  pqDisplayRepresentationWidget.cxx
+  pqDisplayRepresentationWidget.h
   pqDoubleSpinBoxDomain.cxx
   pqDoubleSpinBoxDomain.h
   pqElementInspectorWidget.cxx

@@ -248,6 +248,23 @@
     <number>4</number>
    </attribute>
   </widget>
+  <widget class="QToolBar" name="representationToolbar" >
+   <property name="windowTitle" >
+    <string>Representation</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>20</width>
+     <height>22</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
+  </widget>
   <widget class="QToolBar" name="customFilterToolbar" >
    <property name="windowTitle" >
     <string>Custom Filter Controls</string>

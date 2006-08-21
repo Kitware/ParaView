@@ -335,6 +335,14 @@ MainWindow::MainWindow() :
     this->Implementation->UI.variableToolbar,
     SLOT(setEnabled(bool)));
 
+  this->Implementation->Core.setupRepresentationToolbar(
+    this->Implementation->UI.representationToolbar);
+  connect(
+    &this->Implementation->Core,
+    SIGNAL(enableVariableToolbar(bool)),
+    this->Implementation->UI.representationToolbar,
+    SLOT(setEnabled(bool)));
+
   connect(
     &this->Implementation->Core,
     SIGNAL(enableSelectionToolbar(bool)),
@@ -380,6 +388,9 @@ MainWindow::MainWindow() :
 
   this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.variableToolbar,
     this->Implementation->UI.variableToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.representationToolbar,
+    this->Implementation->UI.representationToolbar->windowTitle());
 
   this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.customFilterToolbar,
     this->Implementation->UI.customFilterToolbar->windowTitle());
@@ -490,6 +501,7 @@ MainWindow::MainWindow() :
   this->Implementation->UI.mainToolBar->layout()->setSpacing(0);
   this->Implementation->UI.selectionToolbar->layout()->setSpacing(0);
   this->Implementation->UI.variableToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.representationToolbar->layout()->setSpacing(0);
   this->Implementation->UI.customFilterToolbar->layout()->setSpacing(0);
   this->Implementation->UI.undoRedoToolbar->layout()->setSpacing(0);
   this->Implementation->UI.VCRToolbar->layout()->setSpacing(0);

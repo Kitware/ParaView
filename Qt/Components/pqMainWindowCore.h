@@ -106,6 +106,8 @@ public:
   void setupVariableToolbar(QToolBar* parent);
   /// Setup a compound-proxy toolbar
   void setupCustomFilterToolbar(QToolBar* parent);
+  /// Setup a representation-selection toolbar
+  void setupRepresentationToolbar(QToolBar* parent);
   
   /// Setup a progress bar, attaching it to the given status bar
   void setupProgressBar(QStatusBar* parent);
