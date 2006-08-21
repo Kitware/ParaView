@@ -50,7 +50,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.2");
+vtkCxxRevisionMacro(pqStateLoader, "1.3");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -115,7 +115,7 @@ int pqStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
     for (unsigned int cc=0; cc < max; ++cc)
       {
       vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
-      if (element->GetName() == QString("Property") and
+      if (element->GetName() == QString("Property") &&
         element->GetAttribute("name") == QString("Displays"))
         {
         element->SetAttribute("clear", "0");
