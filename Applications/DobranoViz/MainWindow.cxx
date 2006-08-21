@@ -483,6 +483,7 @@ void MainWindow::onLoadSetup()
       this, tr("Open Setup:"))
     << pqSetName("fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(loadSetup(const QStringList&)));
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setFileMode(pqFileDialog::ExistingFiles);
     
   file_dialog->show();
@@ -494,6 +495,7 @@ void MainWindow::onSavePDF()
       this, tr("Save .pdf File:"))
     << pqSetName("fileSavePDFDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(savePDF(const QStringList&)));
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setFileMode(pqFileDialog::AnyFile);
     
   file_dialog->show();
@@ -505,6 +507,7 @@ void MainWindow::onSavePNG()
       this, tr("Save .png File:"))
     << pqSetName("fileSavePNGDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(saveImage(const QStringList&)));
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setFileMode(pqFileDialog::AnyFile);
     
   file_dialog->show();
@@ -516,6 +519,7 @@ void MainWindow::onLoadExperimentalData()
       this, tr("Open Experimental Data:"))
     << pqSetName("fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(loadExperimentalData(const QStringList&)));
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setFileMode(pqFileDialog::ExistingFiles);
     
   file_dialog->show();
@@ -527,6 +531,7 @@ void MainWindow::onLoadExperimentalUncertainty()
       this, tr("Open Experimental Uncertainty Data:"))
     << pqSetName("fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(loadExperimentalUncertainty(const QStringList&)));
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setFileMode(pqFileDialog::ExistingFiles);
     
   file_dialog->show();
@@ -538,6 +543,7 @@ void MainWindow::onLoadSimulationUncertainty()
       this, tr("Open Simulation Uncertainty Data:"))
     << pqSetName("fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(loadSimulationUncertainty(const QStringList&)));
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setFileMode(pqFileDialog::ExistingFiles);
     
   file_dialog->show();
@@ -549,6 +555,7 @@ void MainWindow::onLoadExperimentSimulationMap()
       this, tr("Open Experiment / Simulation Map:"))
     << pqSetName("fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(loadExperimentSimulationMap(const QStringList&)));
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setFileMode(pqFileDialog::ExistingFiles);
     
   file_dialog->show();

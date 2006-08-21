@@ -93,6 +93,8 @@ public:
 
   FileMode fileMode();
   void setFileMode(FileMode);
+
+  QStringList getSelectedFiles();
   
 signals:
   /// Signal emitted when the user has chosen a set of files and accepted the dialog
@@ -103,6 +105,7 @@ protected:
   Ui::pqFileDialog* const Ui;
   pqFileDialogFilter* Filter;
   FileMode Mode;
+  QStringList SelectedFiles;
   
 protected slots:
   void onDataChanged(const QModelIndex&, const QModelIndex&);

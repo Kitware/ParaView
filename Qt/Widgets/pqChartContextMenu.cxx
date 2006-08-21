@@ -60,7 +60,8 @@ void pqChartContextMenu::savePDF()
     if(chart)
       {
       pqFileDialog *file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
-          chart, tr("Save .pdf File:"), QString(), "PDF files (*.pdf)");
+          chart, tr("Save .pdf File:"), QString(), "PDF files (*.pdf)");    
+      file_dialog->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
       file_dialog->setObjectName("fileSavePDFDialog");
       file_dialog->setFileMode(pqFileDialog::AnyFile);
       QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)),
@@ -83,6 +84,7 @@ void pqChartContextMenu::savePNG()
       {
       pqFileDialog *file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
           chart, tr("Save .png File:"), QString(), "PNG files (*.png)");
+      file_dialog->setAttribute(Qt::WA_DeleteOnClose);
       file_dialog->setObjectName("fileSavePNGDialog");
       file_dialog->setFileMode(pqFileDialog::AnyFile);
       QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)),

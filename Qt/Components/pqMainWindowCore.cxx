@@ -751,6 +751,8 @@ void pqMainWindowCore::onFileOpen(pqServer* server)
   pqFileDialog* const file_dialog = new pqFileDialog(
     new pqServerFileDialogModel(NULL, server), 
     this->Implementation->Parent, tr("Open File:"), QString(), filters);
+    
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileOpenDialog");
   file_dialog->setFileMode(pqFileDialog::ExistingFiles);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
@@ -815,6 +817,7 @@ void pqMainWindowCore::onFileLoadServerState(pqServer*)
 
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
       this->Implementation->Parent, tr("Open Server State File:"), QString(), filters);
+  fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("FileLoadServerStateDialog");
   fileDialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList&)),
@@ -869,6 +872,7 @@ void pqMainWindowCore::onFileSaveServerState()
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
     this->Implementation->Parent, tr("Save Server State:"), QString(), filters);
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileSaveServerStateDialog");
   file_dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
@@ -987,6 +991,7 @@ void pqMainWindowCore::onFileSaveScreenshot()
   filters += ";;All files (*)";
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
     this->Implementation->Parent, tr("Save Screenshot:"), QString(), filters);
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileSaveScreenshotDialog");
   file_dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
@@ -1045,6 +1050,7 @@ void pqMainWindowCore::onFileSaveAnimation()
   filters +=";;All files(*)";
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
     this->Implementation->Parent, tr("Save Animation:"), QString(), filters);
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileSaveAnimationDialog");
   file_dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
@@ -1210,6 +1216,7 @@ void pqMainWindowCore::onToolsRecordTest()
   filters += ";;All Files (*)";
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
       QApplication::activeWindow(), tr("Record Test"), QString(), filters);
+  fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("ToolsRecordTestDialog");
   fileDialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList &)), 
@@ -1250,6 +1257,7 @@ void pqMainWindowCore::onToolsRecordTestScreenshot()
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
       QApplication::activeWindow(), tr("Save Test Screenshot"), QString(),
       filters);
+  fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("RecordTestScreenshotDialog");
   fileDialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList &)), 
@@ -1291,6 +1299,7 @@ void pqMainWindowCore::onToolsPlayTest()
   filters += ";;All Files (*)";
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
       QApplication::activeWindow(), tr("Play Test"), QString(), filters);
+  fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("ToolsPlayTestDialog");
   fileDialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList&)), 

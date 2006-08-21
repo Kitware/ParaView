@@ -95,8 +95,6 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, QWidget* p,
   Ui(new Ui::pqFileDialog()),
   Mode(ExistingFile)
 {
-  this->setAttribute(Qt::WA_DeleteOnClose);
-
   this->Ui->setupUi(this);
   this->Ui->NavigateBack->setIcon(style()->
       standardPixmap(QStyle::SP_FileDialogBack));
@@ -200,10 +198,15 @@ void pqFileDialog::emitFilesSelected(const QStringList& files)
 {
   // Ensure that we are hidden before broadcasting the selection, so we don't get caught by screen-captures
   this->setVisible(false);
+  this->SelectedFiles=files;
   emit filesSelected(files);
   this->done(QDialog::Accepted);
 }
   
+QStringList pqFileDialog::getSelectedFiles()
+{
+  return this->SelectedFiles;
+}
 pqFileDialog::FileMode pqFileDialog::fileMode()
 {
   return this->Mode;
@@ -301,6 +304,7 @@ void pqFileDialog::accept()
       if(this->Model->dirExists(fn))
         {
         this->hide();
+        this->SelectedFiles=selected_files;
         emit this->filesSelected(selected_files);
         base::accept();
         }
@@ -333,6 +337,7 @@ void pqFileDialog::accept()
           }
         }
       this->hide();
+      this->SelectedFiles=selected_files;
       emit this->filesSelected(selected_files);
       base::accept();
       }
@@ -379,6 +384,7 @@ void pqFileDialog::accept()
         this->hide();
         QStringList files;
         files.append(fn);
+        this->SelectedFiles=selected_files;
         emit this->filesSelected(files);
         base::accept();
         }

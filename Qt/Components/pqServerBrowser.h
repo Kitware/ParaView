@@ -60,6 +60,8 @@ public:
   pqServerBrowser(QWidget* Parent);
   ~pqServerBrowser();
 
+  pqServer* getConnectedServer();
+
 signals:
   /// This signal will be emitted iff a server connection is successfully created
   void serverConnected(pqServer*);

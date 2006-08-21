@@ -57,6 +57,7 @@ public:
   
   pqServerResource Server;
   pqSimpleServerStartup ServerStartup;
+  pqServer* ConnectedServer;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -78,6 +79,8 @@ pqServerBrowser::pqServerBrowser(QWidget* Parent) :
 
   this->Implementation->UI.serverType->setCurrentIndex(0);
   this->onServerTypeActivated(0);
+
+  this->Implementation->ConnectedServer=NULL;
   
   connect(
     &this->Implementation->ServerStartup,
@@ -101,6 +104,10 @@ pqServerBrowser::pqServerBrowser(QWidget* Parent) :
 pqServerBrowser::~pqServerBrowser()
 {
   delete this->Implementation;
+}
+pqServer* pqServerBrowser::getConnectedServer()
+{
+  return this->Implementation->ConnectedServer;
 }
 
 void pqServerBrowser::onServerTypeActivated(int Index)
@@ -188,6 +195,7 @@ void pqServerBrowser::onServerStarted(pqServer* server)
 
     resources.add(this->Implementation->Server);
 
+    this->Implementation->ConnectedServer=server;
     emit this->serverConnected(server);
     }
 

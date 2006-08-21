@@ -201,6 +201,7 @@ void pqManageServersDialog::onSave()
 
   pqFileDialog* const dialog  = new pqFileDialog(new pqLocalFileDialogModel(),
       this, tr("Save Server Configuration File:"), QString(), filters);
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->setObjectName("SaveServerConfigurationDialog");
   dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(dialog, SIGNAL(filesSelected(const QStringList&)),
@@ -232,6 +233,7 @@ void pqManageServersDialog::onLoad()
 
   pqFileDialog* const dialog  = new pqFileDialog(new pqLocalFileDialogModel(),
       this, tr("Load Server Configuration File:"), QString(), filters);
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->setObjectName("LoadServerConfigurationDialog");
   dialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(dialog, SIGNAL(filesSelected(const QStringList&)),
