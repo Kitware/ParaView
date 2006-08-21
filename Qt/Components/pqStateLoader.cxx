@@ -50,7 +50,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.1");
+vtkCxxRevisionMacro(pqStateLoader, "1.2");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -96,6 +96,11 @@ int pqStateLoader::LoadState(vtkPVXMLElement* root, int keep_proxies/*=0*/)
         return 0;
         }
       }
+    }
+
+  if (!keep_proxies)
+    {
+    this->ClearCreatedProxies();
     }
   return 1;
 }
