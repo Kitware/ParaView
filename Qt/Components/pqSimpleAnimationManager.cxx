@@ -367,6 +367,10 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
   QObject::connect(&abortDialog, SIGNAL(accepted()), 
     this, SLOT(abortSavingAnimation()));
 
+  this->Proxies->VTKConnect->Connect(this->Proxies->AnimationScene,
+    vtkCommand::AnimationCueTickEvent, this,
+    SLOT(onAnimationTick()));
+
 
   vtkSMAnimationSceneProxy* scene = vtkSMAnimationSceneProxy::SafeDownCast(
     this->Proxies->AnimationScene);
