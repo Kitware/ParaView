@@ -62,6 +62,7 @@ public:
   /// Call this method to assign a Window in which this render module will
   /// render.  This will set the QVTKWidget's parent.
   void setWindowParent(QWidget* parent);
+  QWidget* getWindowParent() const;
 
   /// Request a StillRender. 
   void render();

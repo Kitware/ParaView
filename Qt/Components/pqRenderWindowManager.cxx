@@ -34,37 +34,66 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // VTK includes.
 #include "QVTKWidget.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMStateLoader.h"
+#include "vtkSMRenderModuleProxy.h"
 
 // Qt includes.
 #include <QList>
 #include <QPointer>
+#include <QSet>
 #include <QSignalMapper>
 #include <QtDebug>
 
 // ParaView includes.
+#include "pqApplicationCore.h"
 #include "pqMultiViewFrame.h"
 #include "pqPipelineBuilder.h"
 #include "pqRenderModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqApplicationCore.h"
+#include "pqXMLUtil.h"
 
+template<class T>
+uint qHash(const QPointer<T> key)
+{
+  return qHash((T*)key);
+}
 //-----------------------------------------------------------------------------
 class pqRenderWindowManagerInternal
 {
 public:
   QPointer<pqServer> ActiveServer;
   QPointer<pqRenderModule> ActiveRenderModule;
-  QPointer<pqMultiViewFrame> FrameAdded;
+  QPointer<pqMultiViewFrame> FrameBeingRemoved;
 
-  QList<QPointer<pqMultiViewFrame> > Frames;
+  QSet<QPointer<pqMultiViewFrame> > Frames;
+
+  QList<QPointer<pqRenderModule> > PendingRenderModules;
+
+  pqRenderModule* getRenderModuleToAllocate()
+    {
+    foreach (pqRenderModule* ren, this->PendingRenderModules)
+      {
+      if (ren)
+        {
+        this->PendingRenderModules.removeAll(ren);
+        return ren;
+        }
+      }
+    pqRenderModule* ren  = pqPipelineBuilder::instance()->createWindow(
+      this->ActiveServer);
+    this->PendingRenderModules.removeAll(ren);
+    return ren;
+    }
 };
 
 //-----------------------------------------------------------------------------
-pqRenderWindowManager::pqRenderWindowManager(QObject* _parent/*=null*/)
-  : QObject(_parent)
+pqRenderWindowManager::pqRenderWindowManager(QWidget* _parent/*=null*/)
+  : pqMultiView(_parent)
 {
   this->Internal = new pqRenderWindowManagerInternal();
+
   pqServerManagerModel* smModel = pqServerManagerModel::instance();
   if (!smModel)
     {
@@ -77,6 +106,12 @@ pqRenderWindowManager::pqRenderWindowManager(QObject* _parent/*=null*/)
     this, SLOT(onRenderModuleAdded(pqRenderModule*)));
   QObject::connect(smModel, SIGNAL(renderModuleRemoved(pqRenderModule*)),
     this, SLOT(onRenderModuleRemoved(pqRenderModule*)));
+
+  QObject::connect(this, SIGNAL(frameAdded(pqMultiViewFrame*)), 
+    this, SLOT(onFrameAdded(pqMultiViewFrame*)));
+
+  QObject::connect(this, SIGNAL(frameRemoved(pqMultiViewFrame*)), 
+    this, SLOT(onFrameRemoved(pqMultiViewFrame*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -110,23 +145,25 @@ void pqRenderWindowManager::onFrameAdded(pqMultiViewFrame* frame)
     return;
     }
 
-  this->Internal->FrameAdded = frame;
-  pqRenderModule* rm =   
-    pqPipelineBuilder::instance()->createWindow(this->Internal->ActiveServer);
-  this->Internal->ActiveRenderModule =  rm;
-  emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
+  // Either use a previously unallocated render module, or create a new one.
+  pqRenderModule* rm = this->Internal->getRenderModuleToAllocate();
+
+  rm->setWindowParent(frame);
+  frame->setMainWidget(rm->getWidget());
+  rm->getWidget()->installEventFilter(this);
 
   QSignalMapper* sm = new QSignalMapper(frame);
   sm->setMapping(frame, frame);
   QObject::connect(frame, SIGNAL(activeChanged(bool)), sm, SLOT(map()));
   QObject::connect(sm, SIGNAL(mapped(QWidget*)), 
     this, SLOT(onActivate(QWidget*)));
-  rm->getWidget()->installEventFilter(this);
 
   frame->setActive(true);
-  this->Internal->FrameAdded = 0;
 
-  this->Internal->Frames.push_back(frame);
+  this->Internal->Frames.insert(frame);
+
+  this->Internal->ActiveRenderModule =  rm;
+  emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
 }
 
 //-----------------------------------------------------------------------------
@@ -138,48 +175,60 @@ void pqRenderWindowManager::onFrameRemoved(pqMultiViewFrame* frame)
   QVTKWidget* widget = qobject_cast<QVTKWidget*>(frame->mainWidget());
   if (widget)
     {
-    this->Internal->FrameAdded = frame;
+    this->Internal->FrameBeingRemoved = frame;
     pqRenderModule* rm = 
       pqServerManagerModel::instance()->getRenderModule(widget);
     rm->getWidget()->removeEventFilter(this);
     pqPipelineBuilder::instance()->removeWindow(rm);
-    this->Internal->FrameAdded = 0;
+    this->Internal->FrameBeingRemoved = 0;
     }
-  this->Internal->Frames.removeAll(frame);
+  this->Internal->Frames.remove(frame);
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderWindowManager::onRenderModuleAdded(pqRenderModule* rm)
 {
-  if (!this->Internal->FrameAdded)
+  this->Internal->PendingRenderModules.push_back(rm);
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderWindowManager::allocateWindowsToRenderModules()
+{
+  // Try to locate a frame that has no render module in it.
+  QList<pqMultiViewFrame*> frames = this->findChildren<pqMultiViewFrame*>();
+  foreach (pqMultiViewFrame* frame, frames)
     {
-    qDebug() << "RM creation not initiated by GUI. This case it not handled yet.";
-    return;
-    // SHould split the view and create a new window for this render module.
+    if (this->Internal->PendingRenderModules.size() == 0)
+      {
+      break;
+      }
+    if (!frame->mainWidget())
+      {
+      this->onFrameAdded(frame);
+      }
     }
-  rm->setWindowParent(this->Internal->FrameAdded);
-  this->Internal->FrameAdded->setMainWidget(rm->getWidget());
-  this->Internal->FrameAdded = 0; // since the frame cannot be reused
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderWindowManager::onRenderModuleRemoved(pqRenderModule* rm)
 {
   pqMultiViewFrame* frame = NULL;
-  if (!this->Internal->FrameAdded)
+  if (!this->Internal->FrameBeingRemoved)
     {
     ///TODO: locate the frame for this render module and close it.
     frame = qobject_cast<pqMultiViewFrame*>(rm->getWidget()->parentWidget());
     } 
   else
     {
-    frame = this->Internal->FrameAdded;
+    frame = this->Internal->FrameBeingRemoved;
     }
 
   if (frame)
     {
     frame->setMainWidget(NULL);
     }
+  rm->setWindowParent(NULL);
+  this->Internal->PendingRenderModules.removeAll(rm);
 
   if (this->Internal->ActiveRenderModule == rm)
     {
@@ -188,7 +237,7 @@ void pqRenderWindowManager::onRenderModuleRemoved(pqRenderModule* rm)
     if (this->Internal->Frames.size() > 0)
       {
       // Activate some other view, so that atleast one view is active.
-      this->Internal->Frames[0]->setActive(true);
+      (*this->Internal->Frames.begin())->setActive(true);
       }
     }
 }
@@ -215,6 +264,7 @@ void pqRenderWindowManager::onActivate(QWidget* obj)
   emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
 }
 
+//-----------------------------------------------------------------------------
 bool pqRenderWindowManager::eventFilter(QObject* caller, QEvent* e)
 {
   if(e->type() == QEvent::MouseButtonPress)
@@ -233,3 +283,98 @@ bool pqRenderWindowManager::eventFilter(QObject* caller, QEvent* e)
   return QObject::eventFilter(caller, e);
 }
 
+//-----------------------------------------------------------------------------
+void pqRenderWindowManager::saveState(vtkPVXMLElement* root)
+{
+  vtkPVXMLElement* rwRoot = vtkPVXMLElement::New();
+  rwRoot->SetName("RenderViewManager");
+  root->AddNestedElement(rwRoot);
+  rwRoot->Delete();
+
+  // Save the window layout.
+  this->pqMultiView::saveState(rwRoot);
+
+  // Save the render module - window mapping.
+  foreach(pqMultiViewFrame* frame, this->Internal->Frames)
+    {
+    pqMultiView::Index index = this->indexOf(frame);
+    vtkPVXMLElement* frameElem = vtkPVXMLElement::New();
+    frameElem->SetName("Frame");
+    frameElem->AddAttribute("index", index.getString().toStdString().c_str());
+
+    QVTKWidget* widget = qobject_cast<QVTKWidget*>(frame->mainWidget());
+    if (widget)
+      {
+      pqRenderModule* rm = 
+        pqServerManagerModel::instance()->getRenderModule(widget);
+      frameElem->AddAttribute("render_module", rm->getProxy()->GetSelfIDAsString());
+      }
+    rwRoot->AddNestedElement(frameElem);
+    frameElem->Delete();
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqRenderWindowManager::loadState(vtkPVXMLElement* rwRoot, 
+  vtkSMStateLoader* loader)
+{
+  if (!rwRoot || !rwRoot->GetName() || strcmp(rwRoot->GetName(), "RenderViewManager"))
+    {
+    qDebug() << "Argument must be <RenderViewManager /> element.";
+    return false;
+    }
+ 
+  QList<QWidget*> removed;
+  this->Internal->Frames.clear();
+  this->blockSignals(true);
+  this->reset(removed);
+  this->pqMultiView::loadState(rwRoot);
+  this->blockSignals(false);
+  this->Internal->PendingRenderModules.clear();
+  for(unsigned int cc=0; cc < rwRoot->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* elem = rwRoot->GetNestedElement(cc);
+    if (strcmp(elem->GetName(), "Frame") == 0)
+      {
+      QString index_string = elem->GetAttribute("index");
+
+      pqMultiView::Index index;
+      index.setFromString(index_string);
+      int id = 0;
+      elem->GetScalarAttribute("render_module", &id);
+      vtkSMRenderModuleProxy* renModuleProxy = 
+        vtkSMRenderModuleProxy::SafeDownCast(loader->NewProxy(id));
+      renModuleProxy->Delete();
+      pqRenderModule* rm =
+        pqServerManagerModel::instance()->getRenderModule(renModuleProxy);
+      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
+        this->widgetOfIndex(index));
+      this->onRenderModuleAdded(rm);
+      this->onFrameAdded(frame);
+      }
+    }
+  foreach(QWidget* wid, removed)
+    {
+    pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(wid);
+    if (frame)
+      {
+      // If the user has more windows open than the ones specified in the state,
+      // the view no longer lays out those extra render modules. We mark all
+      // these render modules as "pending". As user splits new views, he will
+      // see these old render modules that got hidden from view.
+      QVTKWidget* window = qobject_cast<QVTKWidget*>(frame->mainWidget());
+      if (window)
+        {
+        pqRenderModule* ren = pqServerManagerModel::instance()->getRenderModule(window);
+        if (ren)
+          {
+          this->Internal->PendingRenderModules.push_back(ren);
+          ren->setWindowParent(0);
+          frame->setMainWidget(0);
+          }
+        }
+      }
+    delete wid;
+    }
+  return true;
+}

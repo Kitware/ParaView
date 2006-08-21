@@ -610,24 +610,7 @@ void pqPipelineBuilder::deleteProxies(pqServer* server)
     return;
     }
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
-  vtkIdType serverCID= server->GetConnectionID();
-  for (iter->Begin(); !iter->IsAtEnd(); )
-    {
-    vtkSMProxy* proxy = iter->GetProxy();
-    QString groupname = iter->GetGroup();
-    QString proxyname = iter->GetKey();
-    iter->Next();
-    if (!proxy || proxy->GetConnectionID() != serverCID)
-      {
-      continue;
-      }
-
-    pxm->UnRegisterProxy(groupname.toStdString().c_str(),
-      proxyname.toStdString().c_str());
-    }
-
-  iter->Delete();
+  pxm->UnRegisterProxies(server->GetConnectionID());
 }
 
 //-----------------------------------------------------------------------------

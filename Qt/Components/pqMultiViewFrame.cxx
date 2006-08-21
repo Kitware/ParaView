@@ -188,7 +188,12 @@ void pqMultiViewFrame::setMainWidget(QWidget* w)
 
 QWidget* pqMultiViewFrame::mainWidget()
 {
-  return this->layout()->itemAt(1)->layout()->itemAt(0)->widget();
+  QLayout* l = this->layout()->itemAt(1)->layout();
+  if (l->itemAt(0))
+    {
+    return l->itemAt(0)->widget();
+    }
+  return NULL;
 }
 
 void pqMultiViewFrame::paintEvent(QPaintEvent* e)

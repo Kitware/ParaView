@@ -300,6 +300,8 @@ ADD_LIBRARY(pqComponents
   pqVCRController.h
   pqWidgetObjectPanel.cxx
   pqWidgetObjectPanel.h
+  pqStateLoader.cxx
+  pqStateLoader.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}

@@ -311,43 +311,36 @@ void pqApplicationCore::saveState(vtkPVXMLElement* rootElement)
 //-----------------------------------------------------------------------------
 void pqApplicationCore::loadState(vtkPVXMLElement* rootElement, 
                                   pqServer* server,
-                                  pqRenderModule* renModule)
+                                  vtkSMStateLoader* arg_loader/*=NULL*/)
 {
   if (!server)
     {
     return ;
     }
 
-  QSize old_size;
-  if (renModule)
+  vtkSmartPointer<vtkSMStateLoader> loader = arg_loader;
+  if (!loader)
     {
-    old_size = renModule->getWidget()->size();
+    loader.TakeReference(vtkSMPQStateLoader::New());
+    rootElement = pqXMLUtil::FindNestedElementByName(rootElement,
+      "ServerManagerState");
     }
-  vtkPVXMLElement* smState = pqXMLUtil::FindNestedElementByName(rootElement,
-    "ServerManagerState");
-  if (smState)
-    {
-    vtkSMPQStateLoader* loader = vtkSMPQStateLoader::New();
-    loader->SetUseExistingRenderModules(1);
-    loader->SetMultiViewRenderModuleProxy(server->GetRenderModule());
 
+  if (vtkSMPQStateLoader* pqLoader = vtkSMPQStateLoader::SafeDownCast(loader))
+    {
+    pqLoader->SetUseExistingRenderModules(1);
+    pqLoader->SetMultiViewRenderModuleProxy(server->GetRenderModule());
+    }
+
+  if (rootElement)
+    {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->LoadState(smState, server->GetConnectionID(),
-      loader);
+    pxm->LoadState(rootElement, server->GetConnectionID(), loader);
     pxm->UpdateRegisteredProxies("sources", 0);
     pxm->UpdateRegisteredProxies("displays", 0);
     pxm->UpdateRegisteredProxies(0);
-    loader->Delete();
     }
 
-  if (renModule)
-    {
-    // We force a size change so that the render window size indicated in the state
-    // can be overridden.
-    renModule->getWidget()->resize(old_size.width()-1, old_size.height());
-    renModule->getWidget()->resize(old_size);
-    renModule->render();
-    }
   // Clear undo stack.
   this->Internal->UndoStack->Clear();
 

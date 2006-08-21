@@ -171,6 +171,12 @@ void pqRenderModule::setWindowParent(QWidget* _parent)
 }
 
 //-----------------------------------------------------------------------------
+QWidget* pqRenderModule::getWindowParent() const
+{
+  return this->Internal->Viewport->parentWidget();
+}
+
+//-----------------------------------------------------------------------------
 void pqRenderModule::renderModuleInit()
 {
   if (!this->Internal->Viewport || !this->Internal->RenderViewProxy)
@@ -221,6 +227,9 @@ void pqRenderModule::renderModuleInit()
 
   iren->Enable();
 
+  // If the render module already has some displays in it when it is registered,
+  // this method will detect them and sync the GUI state with the SM state.
+  this->displaysChanged();
 }
 
 //-----------------------------------------------------------------------------

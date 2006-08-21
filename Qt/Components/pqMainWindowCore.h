@@ -53,6 +53,7 @@ class pqServerManagerModelItem;
 class pqToolsMenu;
 class pqVCRController;
 class pqViewMenu;
+class pqRenderWindowManager;
 
 class vtkUnstructuredGrid;
 
@@ -78,9 +79,8 @@ public:
   ~pqMainWindowCore();
 
   /// Returns a multi-view widget which can be embedded in the UI  
-  pqMultiView& multiViewManager();
-  /// Returns a render-window manager
-  pqRenderWindowManager& renderWindowManager();
+  pqRenderWindowManager& multiViewManager();
+
   /// Returns the selection manager, which handles interactive selection
   pqSelectionManager& selectionManager();
   /// Returns the VCR controller, which can control animation playback

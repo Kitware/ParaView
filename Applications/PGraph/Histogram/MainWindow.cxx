@@ -14,10 +14,10 @@
 #include <pqApplicationCore.h>
 #include <pqHistogramWidget.h>
 #include <pqMainWindowCore.h>
-#include <pqMultiView.h>
 #include <pqObjectInspectorWidget.h>
 #include <pqPipelineMenu.h>
 #include <pqPipelineSource.h>
+#include <pqRenderWindowManager.h>
 #include <pqSelectionManager.h>
 #include <pqUndoStack.h>
 #include <pqVCRController.h>

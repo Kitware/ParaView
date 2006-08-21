@@ -45,6 +45,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //-----------------------------------------------------------------------------
+QString pqMultiView::Index::getString() const
+{
+  QByteArray index_string;
+  QDataStream stream(&index_string, QIODevice::WriteOnly);
+  stream << *this;
+  return QString(index_string.toBase64());
+}
+
+void pqMultiView::Index::setFromString(const QString& str) 
+{
+  QByteArray data = QByteArray::fromBase64(str.toAscii());
+  QDataStream stream(data);
+  stream >> *this;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 pqMultiView::pqMultiView(QWidget* p)
   : QFrame(p)
 {

@@ -39,14 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pqApplicationCore.h>
 #include <pqMainWindowCore.h>
-#include <pqMultiView.h>
 #include <pqObjectInspectorWidget.h>
-#include <pqPipelineMenu.h>
-#include <pqUndoStack.h>
 #include <pqPipelineBrowser.h>
+#include <pqPipelineMenu.h>
 #include <pqRecentFilesMenu.h>
+#include <pqRenderWindowManager.h>
 #include <pqSelectionManager.h>
 #include <pqSetName.h>
+#include <pqUndoStack.h>
 #include <pqVCRController.h>
 #include <pqViewMenu.h>
 

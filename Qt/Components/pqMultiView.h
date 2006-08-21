@@ -46,7 +46,12 @@ class PQCOMPONENTS_EXPORT pqMultiView : public QFrame
 {
   Q_OBJECT
 public:
-  typedef QList<int> Index;
+  class Index: public QList<int>
+  {
+public:
+  QString getString() const;
+  void setFromString(const QString& string);
+  };
   
   pqMultiView(QWidget* parent = NULL);
   virtual ~pqMultiView();
@@ -77,8 +82,8 @@ public:
   /// get the widget from an index
   QWidget* widgetOfIndex(Index index);
 
-  void saveState(vtkPVXMLElement *root);
-  void loadState(vtkPVXMLElement *root);
+  virtual void saveState(vtkPVXMLElement *root);
+  virtual void loadState(vtkPVXMLElement *root);
 signals:
   /// signal for new frame added
   void frameAdded(pqMultiViewFrame*);

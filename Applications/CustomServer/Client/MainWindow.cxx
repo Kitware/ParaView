@@ -115,7 +115,7 @@ MainWindow::MainWindow() :
     SLOT(onActiveServerChanged(pqServer*)));
     
   this->connect(
-    &this->Implementation->Core.renderWindowManager(),
+    &this->Implementation->Core.multiViewManager(),
     SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
     this,
     SLOT(onActiveRenderModuleChanged(pqRenderModule*)));

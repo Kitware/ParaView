@@ -37,22 +37,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pq3DWidgetFactory;
 class pqApplicationCoreInternal;
+class pqPendingDisplayManager;
 class pqPipelineBuilder;
 class pqPipelineSource;
 class pqReaderFactory;
 class pqRenderModule;
 class pqServer;
-class pqServerStartups;
 class pqServerManagerModel;
 class pqServerManagerObserver;
 class pqServerManagerSelectionModel;
 class pqServerResource;
 class pqServerResources;
+class pqServerStartups;
 class pqSettings;
 class pqUndoStack;
 class pqWriterFactory;
 class vtkPVXMLElement;
-class pqPendingDisplayManager;
+class vtkSMStateLoader;
 
 /// This class is the crux of the ParaView application. It creates
 /// and manages various managers which are necessary for the PQClient
@@ -105,9 +106,8 @@ public:
 
   /// Loads the ServerManager state. Emits the signal
   /// stateLoaded() on loading state successfully.
-  void loadState(vtkPVXMLElement* root,
-                 pqServer* server,
-                 pqRenderModule* renModule);
+  void loadState(vtkPVXMLElement* root, pqServer* server, 
+    vtkSMStateLoader* loader=NULL);
 
   /// Returns the set of available server resources
   pqServerResources& serverResources();

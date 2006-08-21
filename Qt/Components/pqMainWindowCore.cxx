@@ -122,7 +122,6 @@ class pqMainWindowCore::pqImplementation
 public:
   pqImplementation(QWidget* parent) :
     Parent(parent),
-    RenderWindowManager(new pqRenderWindowManager(parent)),
     MultiViewManager(parent),
     CustomFilters(new pqCustomFilterManagerModel()),
     CustomFilterManager(0),
@@ -140,6 +139,7 @@ public:
 #ifdef PARAVIEW_EMBED_PYTHON
   this->PythonDialog = 0;
 #endif // PARAVIEW_EMBED_PYTHON
+
   }
   
   ~pqImplementation()
@@ -151,8 +151,7 @@ public:
   }
 
   QWidget* const Parent;
-  pqRenderWindowManager* const RenderWindowManager;
-  pqMultiView MultiViewManager;
+  pqRenderWindowManager MultiViewManager;
   pqVCRController VCRController;
   pqSelectionManager SelectionManager;
   pqCustomFilterManagerModel* const CustomFilters;
@@ -186,18 +185,9 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
 {
   this->setObjectName("MainWindowCore");
 
-  QObject::connect(&this->Implementation->MultiViewManager, 
-                   SIGNAL(frameAdded(pqMultiViewFrame*)), 
-                   this->Implementation->RenderWindowManager, 
-                   SLOT(onFrameAdded(pqMultiViewFrame*)));
-
-  QObject::connect(&this->Implementation->MultiViewManager, 
-                   SIGNAL(frameRemoved(pqMultiViewFrame*)), 
-                   this->Implementation->RenderWindowManager, 
-                   SLOT(onFrameRemoved(pqMultiViewFrame*)));
   QObject::connect(this,
                    SIGNAL(activeServerChanged(pqServer*)),
-                   this->Implementation->RenderWindowManager,
+                   &this->Implementation->MultiViewManager,
                    SLOT(setActiveServer(pqServer*)));
   
   QObject::connect(this,
@@ -216,11 +206,10 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   // Initialize supported file types.
   core->getReaderFactory()->loadFileTypes(":/pqWidgets/XML/ParaViewReaders.xml");
   core->getWriterFactory()->loadFileTypes(":/pqWidgets/XML/ParaViewWriters.xml");
-  
-  // Connect the renderModule manager with the view manager so that 
-  // new render modules are created as new frames are added.
+ 
+  // Listen to the active render module changed signals.
   QObject::connect(
-    this->Implementation->RenderWindowManager, 
+    &this->Implementation->MultiViewManager, 
     SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
     this, 
     SLOT(setActiveRenderModule(pqRenderModule*)));
@@ -288,14 +277,9 @@ pqMainWindowCore::~pqMainWindowCore()
   delete Implementation;
 }
 
-pqMultiView& pqMainWindowCore::multiViewManager()
+pqRenderWindowManager& pqMainWindowCore::multiViewManager()
 {
   return this->Implementation->MultiViewManager;
-}
-
-pqRenderWindowManager& pqMainWindowCore::renderWindowManager()
-{
-  return *this->Implementation->RenderWindowManager;
 }
 
 pqSelectionManager& pqMainWindowCore::selectionManager()
@@ -838,7 +822,7 @@ void pqMainWindowCore::onFileLoadServerState(pqServer*)
   fileDialog->setModal(true);
   fileDialog->show();
 }
-
+#include "pqStateLoader.h"
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileLoadServerState(const QStringList& files)
 {
@@ -853,8 +837,11 @@ void pqMainWindowCore::onFileLoadServerState(const QStringList& files)
     vtkPVXMLElement *root = xmlParser->GetRootElement();
     if (root)
       {
-      pqApplicationCore::instance()->loadState(root, this->getActiveServer(),
-                                              this->getActiveRenderModule());
+      pqStateLoader* loader = pqStateLoader::New();
+      loader->SetMainWindowCore(this);
+      pqApplicationCore::instance()->loadState(
+        root, this->getActiveServer(), loader);
+      loader->Delete();
                                               
       // Add this to the list of recent server resources ...
       pqServerResource resource;
@@ -884,7 +871,8 @@ void pqMainWindowCore::onFileSaveServerState()
     this->Implementation->Parent, tr("Save Server State:"), QString(), filters);
   file_dialog->setObjectName("FileSaveServerStateDialog");
   file_dialog->setFileMode(pqFileDialog::AnyFile);
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveServerState(const QStringList&)));
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
+    this, SLOT(onFileSaveServerState(const QStringList&)));
   file_dialog->setModal(true);
   file_dialog->show();
 }
@@ -894,6 +882,9 @@ void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
   vtkPVXMLElement *root = vtkPVXMLElement::New();
   root->SetName("ParaView");
   pqApplicationCore::instance()->saveState(root);
+  //this->Implementation->MultiViewManager.saveState(root);
+  this->multiViewManager().saveState(root);
+
 
   // Print the xml to the requested file(s).
   for(int i = 0; i != files.size(); ++i)
@@ -1914,12 +1905,14 @@ void pqMainWindowCore::serverRemoved(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::serverAdded(pqServer* server)
 {
-  // Create a render module.
   this->setActiveServer(server);
-  this->Implementation->RenderWindowManager->onFrameAdded(
-    qobject_cast<pqMultiViewFrame *>(
-      this->Implementation->MultiViewManager.widgetOfIndex(
-        pqMultiView::Index())));
+
+  // Create a render module.
+  pqPipelineBuilder::instance()->createWindow(this->getActiveServer());
+
+  // Tell the multiview manager to associate a window
+  // for the newly created render module.
+  this->Implementation->MultiViewManager.allocateWindowsToRenderModules();
 
   // Make the newly created server is selected.
   //emit this->select(server);

@@ -21,9 +21,9 @@
 #include <pqLineChartWidget.h>
 #include <pqLocalFileDialogModel.h>
 #include <pqMainWindowCore.h>
-#include <pqMultiView.h>
 #include <pqObjectInspectorWidget.h>
 #include <pqPipelineMenu.h>
+#include <pqRenderWindowManager.h>
 #include <pqSelectionManager.h>
 #include <pqSetName.h>
 #include <pqUndoStack.h>

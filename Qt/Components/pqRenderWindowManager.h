@@ -34,30 +34,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqComponentsExport.h"
-#include <QObject>
+#include "pqMultiView.h"
 
-class pqServer;
+class pqMultiView;
 class pqMultiViewFrame;
 class pqRenderModule;
 class pqRenderWindowManagerInternal;
+class pqServer;
+class vtkPVXMLElement;
+class vtkSMStateLoader;
 
 // This class manages all render windows. This class is an attempt to
-// take away some of the work form pqMainWindow. 
-class PQCOMPONENTS_EXPORT pqRenderWindowManager : public QObject 
+// take away some of the work form pqMainWindow. It extends pqMultiView
+// to add support to add render modules in multiview.
+class PQCOMPONENTS_EXPORT pqRenderWindowManager : public pqMultiView 
 {
   Q_OBJECT
 public:
-  pqRenderWindowManager(QObject* parent=NULL);
+  pqRenderWindowManager(QWidget* parent=NULL);
   virtual ~pqRenderWindowManager();
 
   // returns the active render module.
   pqRenderModule* getActiveRenderModule();
 
+  // Save the state of the render window manager.
+  void saveState(vtkPVXMLElement* root);
+
+  // Loads the state for the render window manager.
+  bool loadState(vtkPVXMLElement* rwRoot, vtkSMStateLoader* loader);
 signals:
   // Fired when the active render module changes.
   void activeRenderModuleChanged(pqRenderModule*);
 
-public slots:
+private slots:
   /// This will create a RenderWindow to fill the frame.
   /// the render window is created on the active server
   /// which must be set by the application.
@@ -68,12 +77,19 @@ public slots:
   void onRenderModuleRemoved(pqRenderModule* rm);
 
   void onActivate(QWidget* obj);
+
+public slots:
   void setActiveServer(pqServer* server);
+  void allocateWindowsToRenderModules();
 
 protected:
   // Event filter callback.
   bool eventFilter(QObject* caller, QEvent* e);
 
+  virtual void loadState(vtkPVXMLElement* root)
+    {
+    this->pqMultiView::loadState(root);
+    }
 private:
   pqRenderWindowManagerInternal* Internal;
 };
