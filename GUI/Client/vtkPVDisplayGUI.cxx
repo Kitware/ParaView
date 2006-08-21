@@ -94,6 +94,7 @@
 #define VTK_PV_POINTS_LABEL               "Points of Surface"
 #define VTK_PV_VOLUME_LABEL               "Volume Render"
 #define VTK_PV_VOLUME_PT_METHOD_LABEL     "Projection"
+#define VTK_PV_VOLUME_HAVS_METHOD_LABEL   "HAVS"
 #define VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL "ZSweep"
 #define VTK_PV_VOLUME_BUNYK_METHOD_LABEL  "Bunyk Ray Cast"
 #define VTK_PV_MATERIAL_NONE_LABEL        "None"
@@ -102,7 +103,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.67");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.68");
 
 //----------------------------------------------------------------------------
 
@@ -127,7 +128,17 @@ public:
         }
       if ( this->DisplayGUI->GetPVRenderView()->GetRenderWindow()->GetDesiredUpdateRate() >= 1 )
         {
-        this->DisplayGUI->DrawVolumePTInternal();
+        if ( this->DisplayGUI->VolumeRenderMethodMenu->GetMenu()->HasItem(
+               VTK_PV_VOLUME_HAVS_METHOD_LABEL) &&
+             strncmp(this->DisplayGUI->VolumeScalarSelectionWidget->GetValue(),
+                     "Cell", 4) != 0 )
+          {
+          this->DisplayGUI->DrawVolumeHAVSInternal();
+          }
+        else
+          {
+          this->DisplayGUI->DrawVolumePTInternal();
+          }
         }
       else
         {
@@ -135,6 +146,11 @@ public:
                      VTK_PV_VOLUME_PT_METHOD_LABEL ) )
           {
           this->DisplayGUI->DrawVolumePTInternal();
+          }
+        else if ( !strcmp( this->DisplayGUI->VolumeRenderMethodMenu->GetValue(),
+                          VTK_PV_VOLUME_HAVS_METHOD_LABEL ) )
+          {
+          this->DisplayGUI->DrawVolumeHAVSInternal();
           }
         else if ( !strcmp( this->DisplayGUI->VolumeRenderMethodMenu->GetValue(),
                           VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL ) )
@@ -687,7 +703,9 @@ void vtkPVDisplayGUI::CreateWidget()
   this->VolumeRenderMethodMenuLabel->SetBalloonHelpString(
     "Select the render method to be used when not interacting "
     "(during interaction projection is always used). "
-    "Projection is fast, ZSweep and Bunyk are much slower, but more accurate.");
+    "Projection is fast, ZSweep and Bunyk are much slower, but more accurate. "
+    "HAVS (listed if supported) is also fast, but cannot render cell data; in "
+    "this case, Projection will be automatically selected.");
 
   this->VolumeRenderMethodMenu->SetParent(
     this->VolumeAppearanceFrame->GetFrame());
@@ -1588,9 +1606,16 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
   this->VolumeScalarSelectionWidget->Update();
   
   this->VolumeRenderMethodMenu->GetMenu()->DeleteAllItems();
+  
+  if (pDisp->GetSupportsHAVSMapper() )
+    {
+    this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
+      VTK_PV_VOLUME_HAVS_METHOD_LABEL, this, "DrawVolumeHAVS" );
+    }
+
   this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
     VTK_PV_VOLUME_PT_METHOD_LABEL, this, "DrawVolumePT" );
-  
+
   if (pDisp->GetSupportsZSweepMapper() )
     {
     this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
@@ -1607,6 +1632,10 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
     case vtkSMDataObjectDisplayProxy::PROJECTED_TETRA_VOLUME_MAPPER:
       this->VolumeRenderMethodMenu->SetValue
         (VTK_PV_VOLUME_PT_METHOD_LABEL);
+      break;
+    case vtkSMDataObjectDisplayProxy::HAVS_VOLUME_MAPPER:
+      this->VolumeRenderMethodMenu->SetValue
+        (VTK_PV_VOLUME_HAVS_METHOD_LABEL);
       break;
     case vtkSMDataObjectDisplayProxy::ZSWEEP_VOLUME_MAPPER:
       this->VolumeRenderMethodMenu->SetValue
@@ -1726,6 +1755,17 @@ void vtkPVDisplayGUI::VolumeRenderByArray(const char* name, int field)
   this->PVSource->ColorByArray(name, field); // So the LOD Mapper remains 
         //synchronized with the Volume mapper.
         //Note that this call also invalidates the "name" pointer.
+  if (field == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+    {
+    this->VolumeRenderMethodMenu->GetMenu()->SetItemStateToDisabled(
+      VTK_PV_VOLUME_HAVS_METHOD_LABEL);
+    }
+  else
+    {
+    this->VolumeRenderMethodMenu->GetMenu()->SetItemStateToNormal(
+      VTK_PV_VOLUME_HAVS_METHOD_LABEL);
+    }
+
   if (this->GetPVRenderView())
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1886,6 +1926,29 @@ void vtkPVDisplayGUI::DrawVolumePT()
 void vtkPVDisplayGUI::DrawVolumePTInternal()
 {
   this->PVSource->GetDisplayProxy()->SetVolumeMapperToPTCM();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::DrawVolumeHAVS()
+{
+  this->DrawVolumeHAVSInternal();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::DrawVolumeHAVSInternal()
+{
+  if (strncmp( this->VolumeScalarSelectionWidget->GetValue(), "Cell", 4 ) != 0)
+    {
+    this->PVSource->GetDisplayProxy()->SetVolumeMapperToHAVSCM();
+    }
+  else
+    {
+    this->VolumeRenderMethodMenu->SetValue(VTK_PV_VOLUME_PT_METHOD_LABEL);
+    this->DrawVolumePTInternal();
+    }
 }
 
 //----------------------------------------------------------------------------

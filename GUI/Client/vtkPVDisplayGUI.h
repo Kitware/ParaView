@@ -174,6 +174,7 @@ public:
   // Description:
   // Methods called when item chosen from VolumeRenderMethodMenu
   void DrawVolumePT();
+  void DrawVolumeHAVS();
   void DrawVolumeBunyk();
   void DrawVolumeZSweep();
   
@@ -413,6 +414,7 @@ protected:
 
   // Internal versions without a render
   void DrawVolumePTInternal();
+  void DrawVolumeHAVSInternal();
   void DrawVolumeBunykInternal();
   void DrawVolumeZSweepInternal();
 

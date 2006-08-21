@@ -93,6 +93,7 @@ public:
   // Flag indicating if the display supports a volume rendering 
   // representation.
   vtkGetMacro(HasVolumePipeline,    int);
+  vtkGetMacro(SupportsHAVSMapper,   int);
   vtkGetMacro(SupportsBunykMapper,  int);
   vtkGetMacro(SupportsZSweepMapper, int);
   
@@ -113,6 +114,7 @@ public:
   // mappers.
   void SetVolumeMapperToBunykCM();
   void SetVolumeMapperToPTCM();
+  void SetVolumeMapperToHAVSCM();
   void SetVolumeMapperToZSweepCM();
   
   // Description:
@@ -137,6 +139,7 @@ public:
   enum 
   {
     PROJECTED_TETRA_VOLUME_MAPPER =0,
+    HAVS_VOLUME_MAPPER,
     ZSWEEP_VOLUME_MAPPER,
     BUNYK_RAY_CAST_VOLUME_MAPPER,
     UNKNOWN_VOLUME_MAPPER
@@ -310,6 +313,7 @@ protected:
   vtkSMProxy* VolumeFilterProxy;
   vtkSMProxy* VolumeUpdateSuppressorProxy;
   vtkSMProxy* VolumePTMapperProxy;
+  vtkSMProxy* VolumeHAVSMapperProxy;
   vtkSMProxy* VolumeBunykMapperProxy;
   vtkSMProxy* VolumeZSweepMapperProxy;
   vtkSMProxy* VolumeActorProxy;
@@ -318,6 +322,7 @@ protected:
   vtkSMProxy* ColorTransferFunctionProxy;
 
   int HasVolumePipeline; 
+  int SupportsHAVSMapper;
   int SupportsZSweepMapper;
   int SupportsBunykMapper;
   
