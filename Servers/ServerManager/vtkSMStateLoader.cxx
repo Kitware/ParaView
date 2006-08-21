@@ -29,7 +29,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.15");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.16");
 
 struct vtkSMStateLoaderRegistrationInfo
 {
@@ -110,7 +110,7 @@ vtkSMProxy* vtkSMStateLoader::NewProxyFromElement(
     }
   this->Internal->CreatedProxies[id] = proxy;
 
-  if (!proxy->LoadState(proxyElement, this))
+  if (!this->LoadProxyState(proxyElement, proxy))
     {
     vtkSMStateLoaderInternals::ProxyMapType::iterator iter2 =
       this->Internal->CreatedProxies.find(id);

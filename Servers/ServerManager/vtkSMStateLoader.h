@@ -44,7 +44,7 @@ public:
   // Returns 1 on success, 0 on failure.
   // If keep_proxies is set, then the internal map
   // of proxy ids to proxies is not cleared on loading of the state.
-  int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
+  virtual int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
 
   // Description:
   // Either create a new proxy or returns one from the map
@@ -99,7 +99,11 @@ protected:
   // to create a new proxy of the given type.
   virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
 
-  int LoadProxyState(vtkPVXMLElement*, vtkSMProxy*);
+  // Description:
+  // This method is called to load a proxy state. The implementation
+  // here merely calls proxy->LoadState() however, subclass can override to do
+  // some state pre-processing.
+  virtual int LoadProxyState(vtkPVXMLElement* proxyElement, vtkSMProxy* proxy);
 
   vtkSMStateLoaderInternals* Internal;
 
