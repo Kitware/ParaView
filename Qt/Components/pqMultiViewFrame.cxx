@@ -108,6 +108,7 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   this->Menu->addAction(this->SplitVerticalButton->defaultAction());
   this->Menu->addAction(this->CloseButton->defaultAction());
   
+  this->MenuHidden=false;
   // TODO: temporary until they can be implemented or wanted
   this->MaximizeButton->hide();
   this->ActiveButton->hide();
@@ -128,7 +129,23 @@ void pqMultiViewFrame::setTitle(const QString& title)
     this->MainWidget->setWindowTitle(title);
     }
 }
-
+void pqMultiViewFrame::hideMenu(bool hide)
+{
+  if(hide && !this->MenuHidden)
+  {
+    this->MenuHidden=true;
+    QLayout* layout=this->layout();
+    this->Menu->hide();
+    layout->removeWidget(this->Menu);
+  }
+  else if(!hide && this->MenuHidden)
+  {
+    this->MenuHidden=false;
+    QLayout* layout=this->layout();
+    layout->addWidget(this->Menu);
+    this->Menu->show();
+  }
+}
 bool pqMultiViewFrame::menuAutoHide() const
 {
   return this->AutoHide;
@@ -173,8 +190,17 @@ void pqMultiViewFrame::setBorderColor(QColor c)
 
 void pqMultiViewFrame::setMainWidget(QWidget* w)
 {
-  QLayout* l = this->layout()->itemAt(1)->layout();
-  l->removeItem(l->itemAt(0));
+  QLayout* l;
+  if(this->MenuHidden)
+    {
+     l = this->layout()->itemAt(0)->layout();
+    }
+  else
+    {
+    l = this->layout()->itemAt(1)->layout();
+    }
+    l->removeItem(l->itemAt(0));
+
   if(w)
     {
     l->addWidget(w);
@@ -188,12 +214,22 @@ void pqMultiViewFrame::setMainWidget(QWidget* w)
 
 QWidget* pqMultiViewFrame::mainWidget()
 {
-  QLayout* l = this->layout()->itemAt(1)->layout();
+  QLayout* l;
+  if(this->MenuHidden)
+    {
+    l = this->layout()->itemAt(0)->layout();
+    }
+  else
+    {
+    l = this->layout()->itemAt(1)->layout();
+    }
+
   if (l->itemAt(0))
     {
     return l->itemAt(0)->widget();
     }
   return NULL;
+
 }
 
 void pqMultiViewFrame::paintEvent(QPaintEvent* e)
@@ -206,13 +242,25 @@ void pqMultiViewFrame::paintEvent(QPaintEvent* e)
     pen.setColor(this->Color);
     pen.setWidth(gPenWidth);
     painter.setPen(pen);
-    QLayoutItem* i = this->layout()->itemAt(0);
-    QRect r = contentsRect();
-    r.adjust(-gPenWidth/2+2, 
-             i->geometry().height()+4-gPenWidth/2, 
-             gPenWidth/2-2, 
-             gPenWidth/2-2);
-    painter.drawRect(r);
+    if(this->MenuHidden)
+      {
+      QRect r = contentsRect();
+      r.adjust(-gPenWidth/2+2, 
+              gPenWidth/2, 
+              gPenWidth/2-2, 
+              gPenWidth/2-2);
+      painter.drawRect(r);
+     }
+    else
+      {
+      QLayoutItem* i = this->layout()->itemAt(0);
+      QRect r = contentsRect();
+      r.adjust(-gPenWidth/2+2, 
+              i->geometry().height()+4-gPenWidth/2, 
+              gPenWidth/2-2, 
+              gPenWidth/2-2);
+      painter.drawRect(r);
+      }
     }
 }
 

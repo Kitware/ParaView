@@ -66,6 +66,8 @@ public:
   /// get the color of the border
   QColor borderColor() const;
 
+  void hideMenu(bool hide);
+
 public slots:
 
   /// close this frame, emits closePressed() so receiver does the actual remove
@@ -100,6 +102,7 @@ private:
   QWidget* MainWidget;
   bool AutoHide;
   bool Active;
+  bool MenuHidden;
   QColor Color;
   QWidget* Menu;
 };
