@@ -79,16 +79,14 @@ void pqSignalAdaptorProxy::setProxy(const QVariant& var)
   if(var != this->proxy())
     {
     pqSMProxy p = var.value<pqSMProxy>();
-    /*
-    // TODO:  would like to use vtkSMProxyManager
-    vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
-    QString name = pm->GetProxyName(p);
-    */
-    pqPipelineSource* o = pqServerManagerModel::instance()->getPQSource(p);
-    if(o)
+    if(p)
       {
-      QString name = o->getProxyName();
-      this->parent()->setProperty(this->PropertyName, QVariant(name));
+      pqPipelineSource* o = pqServerManagerModel::instance()->getPQSource(p);
+      if(o)
+        {
+        QString name = o->getProxyName();
+        this->parent()->setProperty(this->PropertyName, QVariant(name));
+        }
       }
     }
 }
