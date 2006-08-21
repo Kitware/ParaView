@@ -26,6 +26,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -51,7 +52,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.26");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.27");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -475,7 +476,22 @@ void vtkSMAnimationSceneProxy::Play()
     this->AnimationCue);
   if (scene)
     {
+    int old_enable = 0;
+    vtkRenderWindowInteractor *iren=0;
+    if (this->RenderModuleProxy)
+      {
+      iren = this->RenderModuleProxy->GetInteractor();
+      old_enable = iren->GetEnabled();
+      if (old_enable)
+        {
+        iren->Disable();
+        }
+      }
     scene->Play();
+    if (old_enable && iren)
+      {
+      iren->Enable();
+      }
     }
 }
 
