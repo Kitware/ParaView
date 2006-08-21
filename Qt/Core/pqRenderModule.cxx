@@ -336,7 +336,7 @@ void pqRenderModule::displaysChanged()
 //-----------------------------------------------------------------------------
 void pqRenderModule::render()
 {
-  if (this->Internal->RenderModuleProxy)
+  if (this->Internal->RenderModuleProxy && this->Internal->Viewport)
     {
     this->Internal->Viewport->update();
     }

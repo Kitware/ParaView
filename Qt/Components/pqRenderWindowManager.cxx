@@ -117,6 +117,14 @@ pqRenderWindowManager::pqRenderWindowManager(QWidget* _parent/*=null*/)
 //-----------------------------------------------------------------------------
 pqRenderWindowManager::~pqRenderWindowManager()
 {
+  // Cleanup all render modules.
+  foreach (pqMultiViewFrame* frame , this->Internal->Frames)
+    {
+    if (frame)
+      {
+      this->onFrameRemoved(frame);
+      }
+    }
   pqServerManagerModel* smModel = pqServerManagerModel::instance();
   if (smModel)
     {
