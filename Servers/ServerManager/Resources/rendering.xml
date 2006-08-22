@@ -3191,6 +3191,9 @@
       <SubProxy>
         <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
         </Proxy>
+        <ExposedProperties>
+          <Property name="OutputDataType" />
+        </ExposedProperties>
       </SubProxy>
     </GenericViewDisplayProxy>
     <!-- End of view displays group -->
