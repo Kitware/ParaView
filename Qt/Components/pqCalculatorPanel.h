@@ -57,6 +57,12 @@ public:
 protected slots:
   /// slot called when any calculator button is pushed
   void buttonPressed(const QString& t);
+  
+  void updateVariables(const QString& mode);
+  void scalarChosen(int);
+  void vectorChosen(int);
+
+  void modified();
 
 protected:
   /// Internal method that actually sets the proxy. Subclasses must override

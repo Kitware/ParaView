@@ -952,9 +952,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
 
   if(dvp)
     {
-    unsigned int num1 = Value.size();
-    unsigned int num2 = dvp->GetNumberOfElements();
-    unsigned int num = num1 < num2 ? num1 : num2;
+    unsigned int num = Value.size();
     for(unsigned int i=0; i<num; i++)
       {
       bool ok = true;
@@ -967,9 +965,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     }
   else if(ivp)
     {
-    unsigned int num1 = Value.size();
-    unsigned int num2 = ivp->GetNumberOfElements();
-    unsigned int num = num1 < num2 ? num1 : num2;
+    unsigned int num = Value.size();
     for(unsigned int i=0; i<num; i++)
       {
       bool ok = true;
@@ -982,9 +978,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     }
   else if(svp)
     {
-    unsigned int num1 = Value.size();
-    unsigned int num2 = svp->GetNumberOfElements();
-    unsigned int num = num1 < num2 ? num1 : num2;
+    unsigned int num = Value.size();
     for(unsigned int i=0; i<num; i++)
       {
       QString v = Value[i].toString();
@@ -996,9 +990,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     }
   else if(idvp)
     {
-    unsigned int num1 = Value.size();
-    unsigned int num2 = idvp->GetNumberOfElements();
-    unsigned int num = num1 < num2 ? num1 : num2;
+    unsigned int num = Value.size();
     for(unsigned int i=0; i<num; i++)
       {
       bool ok = true;
@@ -1202,7 +1194,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
   idvp = vtkSMIdTypeVectorProperty::SafeDownCast(Property);
   svp = vtkSMStringVectorProperty::SafeDownCast(Property);
 
-  if(dvp && dvp->GetNumberOfElements() > Index)
+  if(dvp)
     {
     bool ok = true;
     double v = Value.toDouble(&ok);
@@ -1211,7 +1203,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
       dvp->SetElement(Index, v);
       }
     }
-  else if(ivp && ivp->GetNumberOfElements() > Index)
+  else if(ivp)
     {
     bool ok = true;
     int v = Value.toInt(&ok);
@@ -1220,7 +1212,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
       ivp->SetElement(Index, v);
       }
     }
-  else if(svp && svp->GetNumberOfElements() > Index)
+  else if(svp)
     {
     QString v = Value.toString();
     if(!v.isNull())
@@ -1228,7 +1220,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
       svp->SetElement(Index, v.toAscii().data());
       }
     }
-  else if(idvp && idvp->GetNumberOfElements() > Index)
+  else if(idvp)
     {
     bool ok = true;
     vtkIdType v;

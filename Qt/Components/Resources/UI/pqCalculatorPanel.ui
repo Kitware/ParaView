@@ -9,8 +9,11 @@
     <x>0</x>
     <y>0</y>
     <width>283</width>
-    <height>335</height>
+    <height>380</height>
    </rect>
+  </property>
+  <property name="focusPolicy" >
+   <enum>Qt::ClickFocus</enum>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
@@ -72,7 +75,11 @@
       <number>0</number>
      </property>
      <item row="7" column="3" colspan="4" >
-      <widget class="QComboBox" name="Vectors" />
+      <widget class="QComboBox" name="Vectors" >
+       <property name="focusPolicy" >
+        <enum>Qt::NoFocus</enum>
+       </property>
+      </widget>
      </item>
      <item row="4" column="2" >
       <widget class="QToolButton" name="tanh" >
@@ -225,7 +232,11 @@
       </widget>
      </item>
      <item row="6" column="3" colspan="4" >
-      <widget class="QComboBox" name="Scalars" />
+      <widget class="QComboBox" name="Scalars" >
+       <property name="focusPolicy" >
+        <enum>Qt::NoFocus</enum>
+       </property>
+      </widget>
      </item>
      <item row="4" column="0" >
       <widget class="QToolButton" name="sinh" >
@@ -426,7 +437,7 @@
       </widget>
      </item>
      <item row="5" column="2" >
-      <widget class="QToolButton" name="ex" >
+      <widget class="QToolButton" name="exp" >
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>5</hsizetype>
@@ -436,7 +447,7 @@
         </sizepolicy>
        </property>
        <property name="text" >
-        <string>e^x</string>
+        <string>exp</string>
        </property>
       </widget>
      </item>
@@ -723,6 +734,19 @@
       <widget class="QLineEdit" name="ReplacementValue" />
      </item>
     </layout>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

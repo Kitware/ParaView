@@ -40,9 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes
 #include "vtkSMProperty.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVArrayInformation.h"
 
 // ParaView includes
-#include "pqProxy.h"
+#include "pqPipelineFilter.h"
 #include "pqSMAdaptor.h"
 #include "ui_pqCalculatorPanel.h"
 
@@ -78,8 +82,35 @@ pqCalculatorPanel::pqCalculatorPanel(QWidget* p)
   this->Internal = new pqInternal();
   this->Internal->UI.setupUi(this);
 
-  // connect all the number buttons
-  foreach(QToolButton* tb, this->findChildren<QToolButton*>(QRegExp("^n[0-9]$")))
+  QObject::connect(this->Internal->UI.AttributeMode,
+                   SIGNAL(currentIndexChanged(const QString&)),
+                   this,
+                   SLOT(updateVariables(const QString&)));
+  
+  QObject::connect(this->Internal->UI.Vectors,
+                   SIGNAL(activated(int)),
+                   this,
+                   SLOT(vectorChosen(int)));
+  
+  QObject::connect(this->Internal->UI.Scalars,
+                   SIGNAL(activated(int)),
+                   this,
+                   SLOT(scalarChosen(int)));
+
+  // clicking on any button or any part of the panel where another button
+  // doesn't take focus will cause the line edit to have focus 
+  this->setFocusProxy(this->Internal->UI.Function);
+  
+  // connect all buttons for which the text of the button 
+  // is the same as what goes into the function
+  QRegExp regexp("^([ijk]Hat|n[0-9]|ln|log10|sin|cos|"
+                 "tan|asin|acos|atan|sinh|cosh|tanh|"
+                 "sqrt|exp|ceil|floor|abs|norm|mag|"
+                 "LeftParentheses|RightParentheses|"
+                 "Divide|Multiply|Minus|Plus|Dot)$");
+  QList<QToolButton*> buttons;
+  buttons = this->findChildren<QToolButton*>(regexp);
+  foreach(QToolButton* tb, buttons)
     {
     QSignalMapper* mapper = new QSignalMapper(tb);
     QObject::connect(tb,
@@ -92,6 +123,62 @@ pqCalculatorPanel::pqCalculatorPanel(QWidget* p)
                      this,
                      SLOT(buttonPressed(const QString&)));
     }
+  
+  QToolButton* tb = this->Internal->UI.xy;
+  QSignalMapper* mapper = new QSignalMapper(tb);
+  QObject::connect(tb,
+                   SIGNAL(pressed()),
+                   mapper,
+                   SLOT(map()));
+  mapper->setMapping(tb, "^");
+  QObject::connect(mapper,
+                   SIGNAL(mapped(const QString&)),
+                   this,
+                   SLOT(buttonPressed(const QString&)));
+  
+  tb = this->Internal->UI.v1v2;
+  mapper = new QSignalMapper(tb);
+  QObject::connect(tb,
+                   SIGNAL(pressed()),
+                   mapper,
+                   SLOT(map()));
+  mapper->setMapping(tb, ".");
+  QObject::connect(mapper,
+                   SIGNAL(mapped(const QString&)),
+                   this,
+                   SLOT(buttonPressed(const QString&)));
+
+  
+  QObject::connect(this->Internal->UI.Clear,
+                   SIGNAL(pressed()),
+                   this->Internal->UI.Function,
+                   SLOT(clear()));
+ 
+
+
+  // mark panel modified if the following are changed 
+  QObject::connect(this->Internal->UI.Function,
+                   SIGNAL(textEdited(const QString&)),
+                   this,
+                   SLOT(modified()));
+  QObject::connect(this->Internal->UI.ResultArrayName,
+                   SIGNAL(textEdited(const QString&)),
+                   this,
+                   SLOT(modified()));
+  QObject::connect(this->Internal->UI.AttributeMode,
+                   SIGNAL(currentIndexChanged(const QString&)),
+                   this,
+                   SLOT(modified()));
+  QObject::connect(this->Internal->UI.ReplaceInvalidResult,
+                   SIGNAL(stateChanged(int)),
+                   this,
+                   SLOT(modified()));
+  QObject::connect(this->Internal->UI.ReplacementValue,
+                   SIGNAL(textChanged(const QString&)),
+                   this,
+                   SLOT(modified()));
+
+
 }
 
 //-----------------------------------------------------------------------------
@@ -105,6 +192,8 @@ pqCalculatorPanel::~pqCalculatorPanel()
 void pqCalculatorPanel::setProxyInternal(pqProxy* p)
 {
   this->pqObjectPanel::setProxyInternal(p);
+  this->updateVariables(this->Internal->UI.AttributeMode->currentText());
+  this->reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -114,32 +203,83 @@ void pqCalculatorPanel::accept()
 {
   this->pqObjectPanel::accept();
 
-  if(!this->proxy())
+  if(!this->proxy() || !this->proxy()->getProxy())
     {
     return;
     }
 
-  vtkSMProperty* removeAllVariables =
-    this->proxy()->getProxy()->GetProperty("RemoveAllVariables");
-  if(removeAllVariables)
+  vtkSMProxy* CalcProxy = this->proxy()->getProxy();
+
+  // clean out old variables
+  vtkSMProperty* removeVars = CalcProxy->GetProperty("RemoveAllVariables");
+  if(removeVars)
     {
-    removeAllVariables->Modified();
+    removeVars->Modified();
     }
 
+  // put in new variables
+  QComboBox* scalarCombo = this->Internal->UI.Scalars;
+  vtkSMProperty* ScalarProperty = CalcProxy->GetProperty("AddScalarVariable");
+  if(ScalarProperty)
+    {
+    for(int i=0; i<scalarCombo->count()-1; i++)
+      {
+      QString VarName = scalarCombo->itemText(i+1);
+      QString ArrayName = VarName;
+      QString Component = QString("%1").arg(0);
+      QVariant d = scalarCombo->itemData(i+1, Qt::UserRole);
+      if(d.isValid())
+        {
+        QStringList v = d.toStringList();
+        if(v.size() == 2)
+          {
+          ArrayName = v[0];
+          Component = v[1];
+          }
+        }
+      pqSMAdaptor::setMultipleElementProperty(ScalarProperty, 3*i, VarName);
+      pqSMAdaptor::setMultipleElementProperty(ScalarProperty, 3*i+1, ArrayName);
+      pqSMAdaptor::setMultipleElementProperty(ScalarProperty, 3*i+2, Component);
+      }
+    }
+
+  QComboBox* vectorCombo = this->Internal->UI.Vectors;
+  vtkSMProperty* VectorProperty = CalcProxy->GetProperty("AddVectorVariable");
+  if(VectorProperty)
+    {
+    for(int i=0; i<vectorCombo->count()-1; i++)
+      {
+      QVariant VarName = vectorCombo->itemText(i+1);
+      pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i, VarName);
+      pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+1, VarName);
+      pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+2, "0");
+      pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+3, "1");
+      pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+4, "2");
+      }
+    }
+  
   pqSMAdaptor::setElementProperty(
-                 this->proxy()->getProxy()->GetProperty("AttributeMode"),
-                 this->Internal->UI.AttributeMode->currentText() == "Point Data"
-                 ? 1 : 2);
+                 CalcProxy->GetProperty("AttributeMode"),
+                 this->Internal->UI.AttributeMode->currentText() == 
+                 "Point Data" ? 1 : 2);
 
   pqSMAdaptor::setElementProperty(
-                 this->proxy()->getProxy()->GetProperty("ResultArrayName"),
+                 CalcProxy->GetProperty("ResultArrayName"),
                  this->Internal->UI.ResultArrayName->text());
+  
+  pqSMAdaptor::setEnumerationProperty(
+          CalcProxy->GetProperty("ReplaceInvalidValues"),
+          this->Internal->UI.ReplaceInvalidResult->isChecked());
+  
+  pqSMAdaptor::setElementProperty(
+          CalcProxy->GetProperty("ReplacementValue"),
+          this->Internal->UI.ResultArrayName->text());
 
   pqSMAdaptor::setElementProperty(
-                 this->proxy()->getProxy()->GetProperty("Function"),
+                 CalcProxy->GetProperty("Function"),
                  this->Internal->UI.Function->text());
 
-  this->proxy()->getProxy()->UpdateVTKObjects();
+  CalcProxy->UpdateVTKObjects();
 
 }
 
@@ -149,10 +289,131 @@ void pqCalculatorPanel::accept()
 void pqCalculatorPanel::reset()
 {
   this->pqObjectPanel::reset();
+  
+  vtkSMProxy* CalcProxy = this->proxy()->getProxy();
+
+
+  // restore the function
+  QVariant v = pqSMAdaptor::getElementProperty(
+                 CalcProxy->GetProperty("Function"));
+ 
+  this->Internal->UI.Function->setText(v.toString());
+
+  // restore the attribute mode
+  v = pqSMAdaptor::getElementProperty(CalcProxy->GetProperty("AttributeMode"));
+  this->Internal->UI.AttributeMode->setCurrentIndex(v.toInt() == 2 ? 1 : 0);
+  
+  // restore the results array name
+  v = pqSMAdaptor::getElementProperty(
+          CalcProxy->GetProperty("ResultArrayName"));
+  this->Internal->UI.ResultArrayName->setText(v.toString());
+  
+  // restore the replace invalid results
+  v = pqSMAdaptor::getEnumerationProperty(
+          CalcProxy->GetProperty("ReplaceInvalidValues"));
+  this->Internal->UI.ReplaceInvalidResult->setChecked(v.toBool());
+  
+  // restore the replacement value
+  v = pqSMAdaptor::getElementProperty(
+          CalcProxy->GetProperty("ReplacementValue"));
+  this->Internal->UI.ReplacementValue->setText(v.toString());
+
 }
 
 void pqCalculatorPanel::buttonPressed(const QString& buttonText)
 {
   this->Internal->UI.Function->insert(buttonText);
+}
+
+void pqCalculatorPanel::updateVariables(const QString& mode)
+{
+  this->Internal->UI.Vectors->clear();
+  this->Internal->UI.Scalars->clear();
+
+  this->Internal->UI.Vectors->addItem("Insert Vector...");
+  this->Internal->UI.Scalars->addItem("Insert Scalar...");
+
+  vtkPVDataSetAttributesInformation* fdi = NULL;
+  pqPipelineFilter* f = qobject_cast<pqPipelineFilter*>(this->proxy());
+  if(!f)
+    {
+    return;
+    }
+
+  if(mode == "Point Data")
+    {
+    fdi = vtkSMSourceProxy::SafeDownCast(f->getInput(0)->getProxy())->
+      GetDataInformation()->GetPointDataInformation();
+    }
+  else if(mode == "Cell Data")
+    {
+    fdi = vtkSMSourceProxy::SafeDownCast(f->getInput(0)->getProxy())->
+      GetDataInformation()->GetCellDataInformation();
+    }
+  
+  if(!fdi)
+    {
+    return;
+    }
+
+  for(int i=0; i<fdi->GetNumberOfArrays(); i++)
+    {
+    vtkPVArrayInformation* arrayInfo = fdi->GetArrayInformation(i);
+    if(arrayInfo->GetIsPartial())
+      {
+      continue;
+      }
+
+    int numComponents = arrayInfo->GetNumberOfComponents();
+    QString name = arrayInfo->GetName();
+
+    for(int j=0; j<numComponents; j++)
+      {
+      if(numComponents == 1)
+        {
+        this->Internal->UI.Scalars->addItem(name);
+        }
+      else
+        {
+        QString n = name + QString("_%1").arg(j);
+        QStringList d;
+        d.append(name);
+        d.append(QString("%1").arg(j));
+        int where = this->Internal->UI.Scalars->count();
+        this->Internal->UI.Scalars->insertItem(where, n, d);
+        }
+      }
+
+    if(numComponents == 3)
+      {
+      this->Internal->UI.Vectors->addItem(name);
+      }
+    }
+}
+
+void pqCalculatorPanel::scalarChosen(int i)
+{
+  if(i > 0)
+    {
+    QString text = this->Internal->UI.Scalars->itemText(i);
+    this->Internal->UI.Function->insert(text);
+
+    this->Internal->UI.Scalars->setCurrentIndex(0);
+    }
+}
+
+void pqCalculatorPanel::vectorChosen(int i)
+{
+  if(i > 0)
+    {
+    QString text = this->Internal->UI.Vectors->itemText(i);
+    this->Internal->UI.Function->insert(text);
+    this->Internal->UI.Vectors->setCurrentIndex(0);
+    }
+}
+
+void pqCalculatorPanel::modified()
+{
+  emit this->canAcceptOrReject(true);
 }
 
