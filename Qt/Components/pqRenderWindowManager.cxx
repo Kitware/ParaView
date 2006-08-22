@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqXMLUtil.h"
+#include "pqUndoStack.h"
 
 template<class T>
 uint qHash(const QPointer<T> key)
@@ -166,6 +167,16 @@ void pqRenderWindowManager::onFrameAdded(pqMultiViewFrame* frame)
   QObject::connect(sm, SIGNAL(mapped(QWidget*)), 
     this, SLOT(onActivate(QWidget*)));
 
+  frame->BackButton->show();
+  frame->ForwardButton->show();
+  QObject::connect(frame->BackButton, SIGNAL(pressed()),
+    rm->getInteractionUndoStack(), SLOT(Undo()));
+  QObject::connect(frame->ForwardButton, SIGNAL(pressed()),
+    rm->getInteractionUndoStack(), SLOT(Redo()));
+  QObject::connect(rm->getInteractionUndoStack(), SIGNAL(CanUndoChanged(bool)),
+    frame->BackButton, SLOT(setEnabled(bool)));
+  QObject::connect(rm->getInteractionUndoStack(), SIGNAL(CanRedoChanged(bool)),
+    frame->ForwardButton, SLOT(setEnabled(bool)));
   frame->setActive(true);
 
   this->Internal->Frames.insert(frame);
@@ -186,6 +197,10 @@ void pqRenderWindowManager::onFrameRemoved(pqMultiViewFrame* frame)
     this->Internal->FrameBeingRemoved = frame;
     pqRenderModule* rm = 
       pqServerManagerModel::instance()->getRenderModule(widget);
+    QObject::disconnect(frame->BackButton, 0, rm->getInteractionUndoStack(), 0);
+    QObject::disconnect(frame->ForwardButton, 0, rm->getInteractionUndoStack(), 0);
+    QObject::disconnect(rm->getInteractionUndoStack(), 0,frame->BackButton, 0);
+    QObject::disconnect(rm->getInteractionUndoStack(), 0,frame->ForwardButton, 0);
     rm->getWidget()->removeEventFilter(this);
     pqPipelineBuilder::instance()->removeWindow(rm);
     this->Internal->FrameBeingRemoved = 0;
