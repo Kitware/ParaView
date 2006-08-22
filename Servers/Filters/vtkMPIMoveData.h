@@ -12,37 +12,29 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
-// .NAME vtkMPIMoveData - For distributed tiled displays.
-//
+// .NAME vtkMPIMoveData - Moves/redistributes data between processes.
 // .SECTION Description
 // This class combines all the duplicate and collection requirements
-// into one filter.
+// into one filter. It can move polydata and unstructured grid between
+// processes. It can redistributed polydata from M to N processors.
 
 #ifndef __vtkMPIMoveData_h
 #define __vtkMPIMoveData_h
 
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
+
 class vtkMultiProcessController;
 class vtkSocketController;
 class vtkMPIMToNSocketConnection;
 class vtkDataSet;
 class vtkIndent;
 
-class VTK_EXPORT vtkMPIMoveData : public vtkDataSetToDataSetFilter
+class VTK_EXPORT vtkMPIMoveData : public vtkDataSetAlgorithm
 {
 public:
   static vtkMPIMoveData *New();
-  vtkTypeRevisionMacro(vtkMPIMoveData, vtkDataSetToDataSetFilter);
+  vtkTypeRevisionMacro(vtkMPIMoveData, vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // These methods assume the user knows the output type,
-  // a creates the output if necessary even when the input has
-  // not been set yet.
-  virtual vtkPolyData* GetPolyDataOutput();
-  virtual vtkUnstructuredGrid* GetUnstructuredGridOutput();
-  virtual vtkDataSet* GetOutput();
 
   // Description:
   // Objects for communication.
@@ -85,6 +77,18 @@ public:
   vtkBooleanMacro(DefineCollectAsClone,int);
 
   // Description:
+  // Controls the output type. This is required because processes receiving
+  // data cannot know their output type in RequestDataObject without
+  // communicating with other processes. Since communicating with other
+  // processes in RequestDataObject is dangerous (can cause deadlock because
+  // it may happen out-of-sync), the application has to set the output
+  // type. The default is VTK_POLY_DATA. Currently, only VTK_UNSTRUCTURED_GRID
+  // and VTK_POLY_DATA are supported. Make sure to call this before any
+  // pipeline updates occur.
+  vtkSetMacro(OutputDataType, int);
+  vtkGetMacro(OutputDataType, int);
+
+  // Description:
   // Legacy API for ParaView 1.4
   void SetPassThrough(int v) 
     {if(v){this->SetMoveModeToPassThrough();} else {this->SetMoveModeToClone();}}
@@ -95,20 +99,20 @@ protected:
   vtkMPIMoveData();
   ~vtkMPIMoveData();
 
-  // This is called by the superclass.
-  // This is the method you should override.
   virtual int RequestDataObject(vtkInformation* request, 
                            vtkInformationVector** inputVector, 
                            vtkInformationVector* outputVector);
+  virtual int RequestInformation(vtkInformation* request,
+                                 vtkInformationVector** inputVector,
+                                 vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request,
+                          vtkInformationVector** inputVector,
+                          vtkInformationVector* outputVector);
+  virtual int FillInputPortInformation(int port, vtkInformation *info);
 
   vtkMultiProcessController* Controller;
   vtkSocketController* ClientDataServerSocketController;
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
-
-  // Data generation method
-  virtual void ComputeInputUpdateExtents(vtkDataObject *output);
-  virtual void Execute();
-  virtual void ExecuteInformation();
 
   void DataServerAllToN(vtkDataSet* inData, vtkDataSet* outData, int n);
   void DataServerGatherAll(vtkDataSet* input, vtkDataSet* output);
@@ -151,7 +155,12 @@ protected:
   };
 //ETX
 
+  int OutputDataType;
+
 private:
+  int UpdateNumberOfPieces;
+  int UpdatePiece;
+
   vtkMPIMoveData(const vtkMPIMoveData&); // Not implemented
   void operator=(const vtkMPIMoveData&); // Not implemented
 };

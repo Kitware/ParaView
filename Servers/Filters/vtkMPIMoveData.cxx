@@ -14,28 +14,32 @@
 =========================================================================*/
 #include "vtkMPIMoveData.h"
 
-#include "vtkAppendPolyData.h"
 #include "vtkAppendFilter.h"
+#include "vtkAppendPolyData.h"
 #include "vtkCellData.h"
-#include "vtkMultiProcessController.h"
-#include "vtkDataSetWriter.h"
-#include "vtkDataSetReader.h"
 #include "vtkCharArray.h"
+#include "vtkDataSetReader.h"
+#include "vtkDataSetWriter.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkMPIMToNSocketConnection.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
-#include "vtkUnstructuredGrid.h"
+#include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
+#include "vtkUnstructuredGrid.h"
+
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
 #include "vtkAllToNRedistributePolyData.h"
 #endif
-#include "vtkMPIMToNSocketConnection.h"
-#include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.8");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.9");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -45,9 +49,6 @@ vtkCxxSetObjectMacro(vtkMPIMoveData,MPIMToNSocketConnection, vtkMPIMToNSocketCon
 //-----------------------------------------------------------------------------
 vtkMPIMoveData::vtkMPIMoveData()
 {
-  // Client has no inputs.
-  this->NumberOfRequiredInputs = 0;
-
   this->Controller = 0;
   this->ClientDataServerSocketController = 0;
   this->MPIMToNSocketConnection = 0;
@@ -68,6 +69,11 @@ vtkMPIMoveData::vtkMPIMoveData()
   this->BufferOffsets = 0;
   this->Buffers = 0;
   this->BufferTotalLength = 9;
+
+  this->OutputDataType = VTK_POLY_DATA;
+
+  this->UpdateNumberOfPieces = 0;
+  this->UpdatePiece = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -79,92 +85,70 @@ vtkMPIMoveData::~vtkMPIMoveData()
   this->ClearBuffer();
 }
 
-//-----------------------------------------------------------------------------
-int vtkMPIMoveData::RequestDataObject(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector)
+//----------------------------------------------------------------------------
+int vtkMPIMoveData::FillInputPortInformation(int, vtkInformation *info)
 {
-  this->Superclass::RequestDataObject(request, inputVector, outputVector);
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return 1;
 }
 
 //-----------------------------------------------------------------------------
-// Since this data set to data set fitler may not have an input,
-// We need to circumvent the check by the superclass.
-vtkDataSet* vtkMPIMoveData::GetOutput()
+int vtkMPIMoveData::RequestDataObject(vtkInformation*,
+                                      vtkInformationVector**,
+                                      vtkInformationVector* outputVector)
 {
-  if (this->NumberOfOutputs > 0)
+  vtkDataObject* output = 
+    outputVector->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT());
+  
+  vtkDataObject* outputCopy = 0;
+  if (this->OutputDataType == VTK_POLY_DATA)
     {
-    return static_cast<vtkDataSet*>(this->Outputs[0]);
+    if (output && output->IsA("vtkPolyData"))
+      {
+      return 1;
+      }
+    outputCopy = vtkPolyData::New();
     }
-  return this->Superclass::GetOutput();
+  else if (this->OutputDataType == VTK_UNSTRUCTURED_GRID)
+    {
+    if (output && output->IsA("vtkUnstructuredGrid"))
+      {
+      return 1;
+      }
+    outputCopy = vtkUnstructuredGrid::New();
+    }
+  else
+    {
+    vtkErrorMacro("Unrecognized output type: " << this->OutputDataType
+                  << ". Cannot create output.");
+    return 0;
+    }
+
+  outputCopy->SetPipelineInformation(outputVector->GetInformationObject(0));
+  outputCopy->Delete();
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
-vtkPolyData* vtkMPIMoveData::GetPolyDataOutput()
+int vtkMPIMoveData::RequestInformation(vtkInformation*,
+                                       vtkInformationVector** inputVector,
+                                       vtkInformationVector* outputVector)
 {
-  vtkPolyData* pd;
-  if (this->NumberOfOutputs == 0 || this->Outputs[0] == 0)
+  vtkInformationVector* inInfo = inputVector[0];
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  if (inputVector[0]->GetNumberOfInformationObjects() > 0)
     {
-    pd = vtkPolyData::New();
-    this->SetOutput(pd);
-    pd->Delete();
-    return pd;
+    outInfo->Set(
+      vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
+      inputVector[0]->GetInformationObject(0)->Get(
+        vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES()));
+    return 1;
     }
-  pd = vtkPolyData::SafeDownCast(this->Outputs[0]);
-  if (pd == 0)
-    {
-    vtkErrorMacro("Could not get the poly data output.");
-    }
-  return pd;
-}
 
-//-----------------------------------------------------------------------------
-vtkUnstructuredGrid* vtkMPIMoveData::GetUnstructuredGridOutput()
-{
-  vtkUnstructuredGrid* ug;
-  if (this->NumberOfOutputs == 0 || this->Outputs[0] == 0)
-    {
-    ug = vtkUnstructuredGrid::New();
-    this->SetOutput(ug);
-    ug->Delete();
-    return ug;
-    }
-    
-  ug = vtkUnstructuredGrid::SafeDownCast(this->Outputs[0]);
-  if (ug == 0)
-    {
-    vtkErrorMacro("Could not get the unstructured grid output.");
-    }
-  return ug;
-}
-
-//-----------------------------------------------------------------------------
-void vtkMPIMoveData::ExecuteInformation()
-{
-  if (this->GetOutput() == NULL)
-    {
-    vtkErrorMacro("Missing output");
-    return;
-    }
-  this->GetOutput()->SetMaximumNumberOfPieces(-1);
-}
-
-//-----------------------------------------------------------------------------
-void vtkMPIMoveData::ComputeInputUpdateExtents(vtkDataObject *output)
-{
-  vtkDataSet *input = this->GetInput();
-  int piece = output->GetUpdatePiece();
-  int numPieces = output->GetUpdateNumberOfPieces();
-  int ghostLevel = output->GetUpdateGhostLevel();
-
-  if (input == NULL)
-    {
-    return;
-    }
-  input->SetUpdatePiece(piece);
-  input->SetUpdateNumberOfPieces(numPieces);
-  input->SetUpdateGhostLevel(ghostLevel);
+    outInfo->Set(
+      vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
+  return 1;
 }
 
 // This filter  is going to replace the many variations of collection fitlers.
@@ -196,10 +180,27 @@ void vtkMPIMoveData::ComputeInputUpdateExtents(vtkDataObject *output)
 
 //-----------------------------------------------------------------------------
 // We should avoid marshalling more than once.
-void vtkMPIMoveData::Execute()
+int vtkMPIMoveData::RequestData(vtkInformation*,
+                                vtkInformationVector** inputVector,
+                                vtkInformationVector* outputVector)
 {
-  vtkDataSet* input = this->GetInput();
-  vtkDataSet* output = this->GetOutput();
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+
+  vtkDataSet* input = 0;
+  vtkDataSet* output = vtkDataSet::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  if (inputVector[0]->GetNumberOfInformationObjects() > 0)
+    {
+    input = vtkDataSet::SafeDownCast(
+      inputVector[0]->GetInformationObject(0)->Get(
+        vtkDataObject::DATA_OBJECT()));
+    }
+
+  this->UpdatePiece = outInfo->Get(
+    vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
+  this->UpdateNumberOfPieces = outInfo->Get(
+    vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
 
   // A hack to implement an onld API.
   if (this->DefineCollectAsClone && this->MoveMode == vtkMPIMoveData::COLLECT)
@@ -218,22 +219,22 @@ void vtkMPIMoveData::Execute()
     if (this->MoveMode == vtkMPIMoveData::CLONE)
       {
       this->DataServerGatherAll(input, output);
-      return;
+      return 1;
       }
     // Collect mode for rendering on node 0.
     if (this->MoveMode == vtkMPIMoveData::COLLECT)
       {
       this->DataServerGatherToZero(input, output);
-      return;
+      return 1;
       }
     // PassThrough mode for compositing.
     if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH)
       {
       output->ShallowCopy(input);
-      return;
+      return 1;
       }
     vtkErrorMacro("MoveMode not set.");
-    return;
+    return 0;
     }    
 
   // PassThrough with no RenderServer. (Distributed rendering on data server).
@@ -246,7 +247,7 @@ void vtkMPIMoveData::Execute()
       {
       output->ShallowCopy(input);
       }
-    return;
+    return 1;
     }
 
   // Passthrough and RenderServer (Distributed rendering on render server).
@@ -261,15 +262,15 @@ void vtkMPIMoveData::Execute()
                       this->MPIMToNSocketConnection->GetNumberOfConnections());
       this->DataServerSendToRenderServer(output);
       output->Initialize();
-      return;
+      return 1;
       }
     if (this->Server == 2/*vtkMPIMoveData::RENDER_SERVER*/)
       {
       this->RenderServerReceiveFromDataServer(output);
-      return;
+      return 1;
       }
     // Client does nothing.
-    return;
+    return 1;
     }
 
   // Duplicate with no RenderServer.(Tile rendering on data server and client).
@@ -282,12 +283,12 @@ void vtkMPIMoveData::Execute()
       {
       this->DataServerGatherAll(input, output);
       this->DataServerSendToClient(output);
-      return;
+      return 1;
       }
     if (this->Server == 0/*vtkMPIMoveData::CLIENT*/)
       {
       this->ClientReceiveFromDataServer(output);
-      return;
+      return 1;
       }
     }
 
@@ -304,12 +305,12 @@ void vtkMPIMoveData::Execute()
       this->DataServerGatherToZero(input, output);
       this->DataServerSendToClient(output);
       this->DataServerZeroSendToRenderServerZero(output);
-      return;
+      return 1;
       }
     if (this->Server == 0/*vtkMPIMoveData::CLIENT*/)
       {
       this->ClientReceiveFromDataServer(output);
-      return;
+      return 1;
       }
     if (this->Server == 2/*vtkMPIMoveData::RENDER_SERVER*/)
       {
@@ -327,16 +328,17 @@ void vtkMPIMoveData::Execute()
       {
       this->DataServerGatherToZero(input, output);
       this->DataServerSendToClient(output);
-      return;
+      return 1;
       }
     if (this->Server == 0/*vtkMPIMoveData::CLIENT*/)
       {
       this->ClientReceiveFromDataServer(output);
-      return;
+      return 1;
       }
     // Render server does nothing
-    return;
+    return 1;
     }
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -385,8 +387,8 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataSet* inData,
    AllToN->SetInput(inputCopy);
    inputCopy->Delete();
    tmp = AllToN->GetOutput();
-   tmp->SetUpdateNumberOfPieces(this->GetOutput()->GetUpdateNumberOfPieces());
-   tmp->SetUpdatePiece(this->GetOutput()->GetUpdatePiece());
+   tmp->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
+   tmp->SetUpdatePiece(this->UpdatePiece);
    tmp->Update();
    output->ShallowCopy(tmp);
    AllToN->Delete();
@@ -529,9 +531,6 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input,
   inBuffer = NULL;
 #endif
 }
-
-
-
 
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::DataServerSendToRenderServer(vtkDataSet* output)
@@ -905,10 +904,6 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
     appendUg = NULL;
     }
 }
-
-
-
-
 
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::PrintSelf(ostream& os, vtkIndent indent)
