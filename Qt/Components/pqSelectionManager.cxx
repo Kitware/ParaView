@@ -259,6 +259,7 @@ pqSelectionManager::~pqSelectionManager()
         "selection_objects", iter2->second.DisplayProxy->GetSelfIDAsString());
       }
     }
+  this->clearClientDisplays();
   delete this->Implementation;
 }
 
@@ -1038,19 +1039,25 @@ void pqSelectionManager::createNewClientDisplays(
       {
       pp->AddProxy(extractor);
       }
+
+    vtkSMIntVectorProperty* dataType = vtkSMIntVectorProperty::SafeDownCast(
+      display->GetProperty("OutputDataType"));
+    dataType->SetElements1(VTK_UNSTRUCTURED_GRID);
+
     display->UpdateVTKObjects();
     
     display->Update();
 
-    cout << display->GetOutput() << endl;
+    cout << display->GetOutput()->GetClassName() << endl;
     if (display->GetOutput())
       {
       display->GetOutput()->PrintSelf(cout, vtkIndent());
       }
 
     this->Implementation->ClientSideDisplays[source] = 
-      pqSelectionManagerImplementation::ClientSideDisplay(extractor, 0);
+      pqSelectionManagerImplementation::ClientSideDisplay(extractor, display);
     extractor->Delete();
+    display->Delete();
     }
 }
 
