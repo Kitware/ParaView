@@ -37,16 +37,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMLODRenderModuleProxy.h"
 #include "vtkSMCompositeRenderModuleProxy.h"
 #include "vtkSMIceTDesktopRenderModuleProxy.h"
+#include "vtkSmartPointer.h"
 
 // Qt includes.
-#include <QList>
 
 // ParaView Client includes.
 #include "pqApplicationCore.h"
-#include "pqRenderModule.h"
-#include "pqSMAdaptor.h"
 #include "pqPropertyLinks.h"
+#include "pqRenderModule.h"
+#include "pqSettings.h"
 #include "pqSignalAdaptors.h"
+#include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
 class pq3DViewPropertiesWidgetInternal : public Ui::pq3DViewProperties
@@ -54,7 +55,7 @@ class pq3DViewPropertiesWidgetInternal : public Ui::pq3DViewProperties
 public:
   pqPropertyLinks Links;
   pqSignalAdaptorColor *ColorAdaptor;
-  QList<vtkSMProxy*> Proxies;
+  vtkSmartPointer<vtkSMProxy> Proxy;
 
   pq3DViewPropertiesWidgetInternal() 
     {
@@ -108,6 +109,10 @@ public:
 
   void loadValues(vtkSMProxy* proxy);
   void accept();
+  // saves the user selections into pqSettings,
+  // so that new render windows created will use the
+  // user selected properties as default.
+  void writeSettings();
 };
 
 //-----------------------------------------------------------------------------
@@ -118,7 +123,7 @@ void pq3DViewPropertiesWidgetInternal::loadValues(vtkSMProxy* proxy)
     this->ColorAdaptor = new pqSignalAdaptorColor(this->backgroundColor, 
       "chosenColor", SIGNAL(chosenColorChanged(const QColor&)));
     }
-  this->Proxies.push_back(proxy);
+  this->Proxy = (proxy);
 
   this->Links.addPropertyLink(this->ColorAdaptor, "color",
     SIGNAL(colorChanged(const QVariant&)),
@@ -239,67 +244,97 @@ void pq3DViewPropertiesWidgetInternal::accept()
   // We need to accept user changes.
   this->Links.accept();
 
-  foreach(vtkSMProxy* renModule, this->Proxies)
+  vtkSMProxy* renModule = this->Proxy;
+  if (vtkSMLODRenderModuleProxy::SafeDownCast(renModule))
     {
-    if (vtkSMLODRenderModuleProxy::SafeDownCast(renModule))
+    // Push changes for LOD parameters.
+    if (this->enableLOD->checkState() == Qt::Checked)
       {
-      // Push changes for LOD parameters.
-      if (this->enableLOD->checkState() == Qt::Checked)
-        {
-        pqSMAdaptor::setElementProperty(
-          renModule->GetProperty("LODThreshold"), 
-          this->lodThreshold->value() / 10.0);
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("LODThreshold"), 
+        this->lodThreshold->value() / 10.0);
 
-        pqSMAdaptor::setElementProperty(
-          renModule->GetProperty("LODResolution"),
-          160-this->lodResolution->value() + 10);
-        }
-      else
-        {
-        pqSMAdaptor::setElementProperty(
-          renModule->GetProperty("LODThreshold"), VTK_LARGE_FLOAT);
-        }
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("LODResolution"),
+        160-this->lodResolution->value() + 10);
+      }
+    else
+      {
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("LODThreshold"), VTK_LARGE_FLOAT);
+      }
+    }
+
+  if (vtkSMCompositeRenderModuleProxy::SafeDownCast(renModule))
+    {
+    if (this->enableCompositing->checkState() == Qt::Checked)
+      {
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("CompositeThreshold"),
+        this->compositeThreshold->value() / 10.0);
+      }
+    else
+      {
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("CompositeThreshold"), VTK_LARGE_FLOAT);
       }
 
-    if (vtkSMCompositeRenderModuleProxy::SafeDownCast(renModule))
+    if (this->enableSubsampling->checkState() == Qt::Checked)
       {
-      if (this->enableCompositing->checkState() == Qt::Checked)
-        {
-        pqSMAdaptor::setElementProperty(
-          renModule->GetProperty("CompositeThreshold"),
-          this->compositeThreshold->value() / 10.0);
-        }
-      else
-        {
-        pqSMAdaptor::setElementProperty(
-          renModule->GetProperty("CompositeThreshold"), VTK_LARGE_FLOAT);
-        }
-
-      if (this->enableSubsampling->checkState() == Qt::Checked)
-        {
-        pqSMAdaptor::setElementProperty(
-          renModule->GetProperty("ReductionFactor"),
-          this->subsamplingRate->value());
-        }
-      else
-        {
-        pqSMAdaptor::setElementProperty(
-          renModule->GetProperty("ReductionFactor"), 1);
-        }
-
-      if (this->enableSquirt->checkState() == Qt::Checked)
-        {
-        pqSMAdaptor::setElementProperty(
-          renModule->GetProperty("SquirtLevel"),
-          this->squirtLevel->value());
-        }
-      else
-        {
-        pqSMAdaptor::setElementProperty(
-          renModule->GetProperty("SquirtLevel"), 0);
-        }
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("ReductionFactor"),
+        this->subsamplingRate->value());
       }
-    renModule->UpdateVTKObjects();
+    else
+      {
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("ReductionFactor"), 1);
+      }
+
+    if (this->enableSquirt->checkState() == Qt::Checked)
+      {
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("SquirtLevel"),
+        this->squirtLevel->value());
+      }
+    else
+      {
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("SquirtLevel"), 0);
+      }
+    }
+  renModule->UpdateVTKObjects();
+  this->writeSettings();
+}
+
+//-----------------------------------------------------------------------------
+void pq3DViewPropertiesWidgetInternal::writeSettings()
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+
+  settings->setValue("renderModule/Background",
+    pqSMAdaptor::getMultipleElementProperty(
+      this->Proxy->GetProperty("Background")));
+
+  QList<QString> propertyNames;
+  propertyNames.push_back("CameraParallelProjection");
+  propertyNames.push_back("UseTriangleStrips");
+  propertyNames.push_back("UseImmediateMode");
+  propertyNames.push_back("LODThreshold");
+  propertyNames.push_back("LODResolution");
+  propertyNames.push_back("RenderInterruptsEnabled");
+  propertyNames.push_back("CompositeThreshold");
+  propertyNames.push_back("ReductionFactor");
+  propertyNames.push_back("SquirtLevel");
+  propertyNames.push_back("OrderedCompositing");
+  foreach (QString name, propertyNames)
+    {
+    if (this->Proxy->GetProperty(name.toAscii().data()))
+      {
+      settings->setValue("renderModule/" + name, 
+        pqSMAdaptor::getElementProperty(
+          this->Proxy->GetProperty(name.toAscii().data())));
+      }
     }
 }
 
