@@ -136,10 +136,15 @@ void vtkSMPointLabelDisplayProxy::SetupPipeline()
   for (unsigned int i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs();i++)
     {
     stream << vtkClientServerStream::Invoke
-      << this->CollectProxy->GetID(i) << "GetUnstructuredGridOutput"
+           << this->CollectProxy->GetID(i) 
+           << "SetOutputDataType"
+           << VTK_UNSTRUCTURED_GRID
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+      << this->CollectProxy->GetID(i) << "GetOutputPort"
       << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
-      << this->UpdateSuppressorProxy->GetID(i) << "SetInput"
+      << this->UpdateSuppressorProxy->GetID(i) << "SetInputConnection"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     }

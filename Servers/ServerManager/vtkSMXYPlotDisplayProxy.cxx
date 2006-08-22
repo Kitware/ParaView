@@ -60,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.20");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -183,19 +183,24 @@ void vtkSMXYPlotDisplayProxy::SetupPipeline()
   vtkClientServerStream stream;
   for (unsigned int i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
     {
-    stream
-      << vtkClientServerStream::Invoke;
+    stream << vtkClientServerStream::Invoke
+           << this->CollectProxy->GetID(i)
+           << "SetOutputDataType";
     if (this->PolyOrUGrid)
       {
-      stream << this->CollectProxy->GetID(i) << "GetUnstructuredGridOutput";
+      stream <<  VTK_UNSTRUCTURED_GRID;
       }
     else
       {
-      stream << this->CollectProxy->GetID(i) << "GetPolyDataOutput";
+      stream << VTK_POLY_DATA;
       }
-    stream << vtkClientServerStream::End
+    stream << vtkClientServerStream::End;
+
+    stream << vtkClientServerStream::Invoke
+           << this->CollectProxy->GetID(i) << "GetOutputPort"
+           << vtkClientServerStream::End
            << vtkClientServerStream::Invoke
-           << this->UpdateSuppressorProxy->GetID(i) << "SetInput"
+           << this->UpdateSuppressorProxy->GetID(i) << "SetInputConnection"
            << vtkClientServerStream::LastResult
            << vtkClientServerStream::End;
     }

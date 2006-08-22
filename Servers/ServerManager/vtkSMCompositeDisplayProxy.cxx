@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.22");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -517,18 +517,24 @@ void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
     {
     stream
       << vtkClientServerStream::Invoke
-      << this->VolumeCollectProxy->GetID(i) << "GetUnstructuredGridOutput"
+      << this->VolumeCollectProxy->GetID(i) 
+      << "SetOutputDataType"
+      << VTK_UNSTRUCTURED_GRID
       << vtkClientServerStream::End;
     stream
       << vtkClientServerStream::Invoke
-      << this->VolumeUpdateSuppressorProxy->GetID(i) << "SetInput"
+      << this->VolumeCollectProxy->GetID(i) << "GetOutputPort"
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << this->VolumeUpdateSuppressorProxy->GetID(i) << "SetInputConnection"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-                                                     vtkProcessModule::CLIENT_AND_SERVERS, stream);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT_AND_SERVERS, stream);
     }
 
   // On the render server, insert a distributor.
