@@ -51,6 +51,7 @@ class pqDisplayRepresentationWidgetInternal :
 public:
   QPointer<pqRenderModule> RenderModule;
   QPointer<pqPipelineSource> Source;
+  QPointer<pqPipelineDisplay> Display;
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* Adaptor;
 };
@@ -68,6 +69,10 @@ pqDisplayRepresentationWidget::pqDisplayRepresentationWidget(
   QObject::connect(this->Internal->Adaptor, 
     SIGNAL(currentTextChanged(const QString&)),
     this, SLOT(onCurrentTextChanged(const QString&)), Qt::QueuedConnection);
+
+  QObject::connect(this->Internal->Adaptor, 
+    SIGNAL(currentTextChanged(const QString&)),
+    this, SIGNAL(currentTextChanged(const QString&)), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -94,6 +99,13 @@ void pqDisplayRepresentationWidget::setRenderModule(pqRenderModule* rm)
 }
 
 //-----------------------------------------------------------------------------
+void pqDisplayRepresentationWidget::setDisplay(pqPipelineDisplay* disp)
+{
+  this->Internal->Display = disp;
+  this->updateLinks();
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayRepresentationWidget::update(pqPipelineSource* source)
 {
   this->Internal->Source = source;
@@ -106,8 +118,9 @@ void pqDisplayRepresentationWidget::updateLinks()
   // break old links.
   this->Internal->Links.removeAllPropertyLinks();
 
-  pqPipelineDisplay* display = 0;
-  if (this->Internal->Source && this->Internal->RenderModule)
+  pqPipelineDisplay* display = this->Internal->Display;
+
+  if (!display && this->Internal->Source && this->Internal->RenderModule)
     {
     display = this->Internal->Source->getDisplay(this->Internal->RenderModule);
     }
@@ -148,6 +161,10 @@ void pqDisplayRepresentationWidget::reloadGUI()
 //-----------------------------------------------------------------------------
 void pqDisplayRepresentationWidget::onCurrentTextChanged(const QString&)
 {
+  if (this->Internal->Display)
+    {
+    this->Internal->Display->renderAllViews();
+    }
   if (this->Internal->RenderModule)
     {
     this->Internal->RenderModule->render();

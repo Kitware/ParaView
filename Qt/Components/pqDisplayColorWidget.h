@@ -66,7 +66,10 @@ public:
   /// Makes the given variable the "current" selection.  Emits the 
   /// variableChanged() signal.
   void chooseVariable(pqVariableType type, const QString& name);
- 
+
+  pqPipelineDisplay* getDisplay() const;
+
+  QString getCurrentText() const;
 public slots:
   /// Call to update the variable selector to show the variables
   /// provided by the \c source. \c source can be NULL.
@@ -81,6 +84,9 @@ public slots:
   /// alone.
   void setRenderModule(pqRenderModule* renModule);
 
+  /// When set, the source/renModule is not used to locate the
+  /// display, instead this display is used.
+  void setDisplay(pqPipelineDisplay* display);
 signals:
   /// Signal emitted whenever the user chooses a variable, 
   /// or chooseVariable() is called.
@@ -119,6 +125,8 @@ private:
   QPointer<pqPipelineSource> SelectedSource;
   vtkEventQtSlotConnect* VTKConnect;
   QPointer<pqRenderModule> RenderModule;
+  QPointer<pqPipelineDisplay> Display;
+  QList<QString> AvailableArrays;
 };
 
 #endif

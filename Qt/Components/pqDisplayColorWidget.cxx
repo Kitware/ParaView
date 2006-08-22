@@ -70,7 +70,7 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
 
   this->Variables = new QComboBox( this );
   this->Variables->setObjectName("Variables");
-  this->Variables->setMinimumSize( QSize( 150, 20 ) );
+  this->Variables->setMinimumSize( QSize( 150, 0 ) );
 
   this->Layout->setMargin( 0 );
   this->Layout->setSpacing( 1 );
@@ -196,23 +196,30 @@ const QString pqDisplayColorWidget::variableData(pqVariableType type,
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayColorWidget::onVariableChanged(pqVariableType vtkNotUsed(type), 
+void pqDisplayColorWidget::onVariableChanged(pqVariableType type, 
   const QString& name)
 {
-  if (!this->SelectedSource || !this->RenderModule)
-    {
-    return;
-    }
-
-  pqPipelineDisplay* display = 
-    this->SelectedSource->getDisplay(this->RenderModule);
+  pqPipelineDisplay* display = this->getDisplay();
   if (display)
     {
     // I cannot decide if we should use signals here of directly 
     // call the appropriate methods on undo stack.
     pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
     stack->BeginUndoSet("Color Change");
-    display->setColorField(name);
+    switch(type)
+      {
+    case VARIABLE_TYPE_NONE:
+      display->colorByArray(NULL, 0);
+      break;
+    case VARIABLE_TYPE_NODE:
+      display->colorByArray(name.toAscii().data(),
+        vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+      break;
+    case VARIABLE_TYPE_CELL:
+      display->colorByArray(name.toAscii().data(), 
+        vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+      break;
+      }
     stack->EndUndoSet();
     display->renderAllViews();
     }
@@ -222,18 +229,8 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType vtkNotUsed(type),
 void pqDisplayColorWidget::updateVariableSelector(pqPipelineSource* source)
 {
   this->VTKConnect->Disconnect();
-  this->SelectedSource = source;
   this->PendingDisplayPropertyConnections = true;
-  this->BlockEmission = true;
-  this->clear();
-  this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
-  this->BlockEmission = false;
-
-  if (!source || source->getDisplayCount() == 0)
-    {
-    // nothing more to do.
-    return;
-    }
+  this->SelectedSource = source;
 
   this->reloadGUI();
 }
@@ -241,7 +238,7 @@ void pqDisplayColorWidget::updateVariableSelector(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::displayAdded()
 {
-  if (this->SelectedSource && this->RenderModule)
+  if (this->getDisplay())
     {
     this->reloadGUI();
     }
@@ -250,13 +247,16 @@ void pqDisplayColorWidget::displayAdded()
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::updateGUI()
 {
-  if (this->SelectedSource && this->RenderModule && 
-    this->SelectedSource->getDisplay(this->RenderModule))
+  pqPipelineDisplay* display = this->getDisplay();
+  if (display)
     {
     this->BlockEmission = true;
-    this->Variables->setCurrentIndex(
-      this->Variables->findText(
-        this->SelectedSource->getDisplay(this->RenderModule)->getColorField()));
+    int index = this->AvailableArrays.indexOf(display->getColorField());
+    if (index < 0)
+      {
+      index = 0;
+      }
+    this->Variables->setCurrentIndex(index);
     this->BlockEmission = false;
     }
 }
@@ -278,19 +278,36 @@ void pqDisplayColorWidget::setRenderModule(pqRenderModule* renModule)
 }
 
 //-----------------------------------------------------------------------------
+void pqDisplayColorWidget::setDisplay(pqPipelineDisplay* disp) 
+{
+  this->VTKConnect->Disconnect();
+  this->Display = disp;
+  this->PendingDisplayPropertyConnections = false;
+  this->reloadGUI();
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineDisplay* pqDisplayColorWidget::getDisplay() const
+{
+  if (this->Display)
+    {
+    return this->Display;
+    }
+  if (this->RenderModule && this->SelectedSource)
+    {
+    return this->SelectedSource->getDisplay(this->RenderModule);
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayColorWidget::reloadGUI()
 {
-  pqPipelineSource* source = this->SelectedSource;
-  if (!source || source->getDisplayCount() == 0)
-    {
-    return;
-    }
-
   this->BlockEmission = true;
   this->clear();
   this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
 
-  pqPipelineDisplay* display = source->getDisplay(this->RenderModule);
+  pqPipelineDisplay* display = this->getDisplay();
   if (!display)
     {
     this->BlockEmission = false;
@@ -301,10 +318,10 @@ void pqDisplayColorWidget::reloadGUI()
 
   vtkSMDataObjectDisplayProxy* displayProxy = display->getDisplayProxy();
 
-  QList<QString> arrayList = display->getColorFields();
-  QRegExp regExpCell("\\(cell\\)\\w*$");
-  QRegExp regExpPoint("\\(point\\)\\w*$");
-  foreach(QString arrayName, arrayList)
+  this->AvailableArrays = display->getColorFields();
+  QRegExp regExpCell(" \\(cell\\)\\w*$");
+  QRegExp regExpPoint(" \\(point\\)\\w*$");
+  foreach(QString arrayName, this->AvailableArrays)
     {
     if (arrayName == "Solid Color")
       {
@@ -312,24 +329,15 @@ void pqDisplayColorWidget::reloadGUI()
       }
     else if (regExpCell.indexIn(arrayName) != -1)
       {
+      arrayName = arrayName.replace(regExpCell, "");
       this->addVariable(VARIABLE_TYPE_CELL, arrayName);
       }
     else if (regExpPoint.indexIn(arrayName) != -1)
       {
+      arrayName = arrayName.replace(regExpPoint, "");
       this->addVariable(VARIABLE_TYPE_NODE, arrayName);
       }
     }
-
-  QString currentArray = display->getColorField();
-  int index =  this->Variables->findText(currentArray);
-  if (index == -1)
-    {
-    index = 0;
-    }
-
-  this->Variables->blockSignals(true);
-  this->Variables->setCurrentIndex(index);
-  this->Variables->blockSignals(false);
 
   if (this->PendingDisplayPropertyConnections)
     {
@@ -347,4 +355,5 @@ void pqDisplayColorWidget::reloadGUI()
     this->PendingDisplayPropertyConnections = false;
     }
   this->BlockEmission = false;
+  this->updateGUI();
 }

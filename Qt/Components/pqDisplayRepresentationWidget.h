@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqDisplayRepresentationWidgetInternal;
 class pqPipelineSource;
 class pqRenderModule;
-
+class pqPipelineDisplay;
 /// A widget for representation of a display proxy.
 class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
 {
@@ -47,6 +47,9 @@ class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
 public:
   pqDisplayRepresentationWidget(QWidget* parent=0);
   virtual ~pqDisplayRepresentationWidget();
+
+signals:
+  void currentTextChanged(const QString&);
 
 public slots:
   /// Call to show the representation for a display of the given source.
@@ -58,6 +61,8 @@ public slots:
   // changes.
   void setRenderModule(pqRenderModule* renModule);
 
+  void setDisplay(pqPipelineDisplay* display);
+  
   void reloadGUI();
 
 private slots:

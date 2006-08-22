@@ -72,16 +72,12 @@ public:
   pqDisplayProxyEditorInternal()
     {
     this->Links = new pqPropertyLinks;
-    this->ColorAdaptor = 0;
-    this->RepresentationAdaptor = 0;
     this->InterpolationAdaptor = 0;
     }
 
   ~pqDisplayProxyEditorInternal()
     {
     delete this->Links;
-    delete this->ColorAdaptor;
-    delete this->RepresentationAdaptor;
     delete this->InterpolationAdaptor;
     }
 
@@ -89,8 +85,6 @@ public:
 
   // The display whose properties are being edited.
   QPointer<pqPipelineDisplay> Display;
-  pqSignalAdaptorColor* ColorAdaptor;
-  pqSignalAdaptorComboBox* RepresentationAdaptor;
   pqSignalAdaptorComboBox* InterpolationAdaptor;
   
 };
@@ -144,38 +138,12 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     "checked", SIGNAL(stateChanged(int)),
     displayProxy, displayProxy->GetProperty("Visibility"));
 
-  this->updateColorByMenu(true);
-
-  // set up actor color
-  this->Internal->Links->addPropertyLink(
-    this->Internal->ColorAdaptor, "color",
-    SIGNAL(colorChanged(const QVariant&)),
-    displayProxy, displayProxy->GetProperty("Color"));
-
-  // setup for representation
-  this->Internal->StyleRepresentation->clear();
-  vtkSMProperty* Property = displayProxy->GetProperty("Representation");
-  Property->UpdateDependentDomains();
-  QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(
-    Property);
-  foreach(QVariant item, items)
-    {
-    if (item == "Volume" && !displayProxy->GetHasVolumePipeline())
-      {
-      continue; // add volume only if volume representation is supported.
-      }
-    this->Internal->StyleRepresentation->addItem(item.toString());
-    }
-  this->Internal->Links->addPropertyLink(
-    this->Internal->RepresentationAdaptor, "currentText",
-    SIGNAL(currentTextChanged(const QString&)),
-    displayProxy, displayProxy->GetProperty("Representation"));
 
   // setup for interpolation
   this->Internal->StyleInterpolation->clear();
-  Property = displayProxy->GetProperty("Interpolation");
+  vtkSMProperty* Property = displayProxy->GetProperty("Interpolation");
   Property->UpdateDependentDomains();
-  items = pqSMAdaptor::getEnumerationPropertyDomain(
+  QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(
     Property);
   foreach(QVariant item, items)
     {
@@ -262,6 +230,16 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     this->Internal->ColorInterpolateColors, "checked", SIGNAL(stateChanged(int)),
     displayProxy, displayProxy->GetProperty("InterpolateScalarsBeforeMapping"));
 
+  this->Internal->ColorBy->setDisplay(display);
+  QObject::connect(this->Internal->ColorBy,
+    SIGNAL(variableChanged(pqVariableType, const QString&)),
+    this, SLOT(updateEnableState()));
+
+  this->Internal->StyleRepresentation->setDisplay(display);
+  QObject::connect(this->Internal->StyleRepresentation,
+    SIGNAL(currentTextChanged(const QString&)),
+    this->Internal->ColorBy, SLOT(reloadGUI()));
+
   this->DisableSlots = 0;
 
   this->updateEnableState();
@@ -301,9 +279,6 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->ColorMapScalars, SIGNAL(stateChanged(int)),
     this, SLOT(updateView()),
     Qt::QueuedConnection);
-  QObject::connect(
-    this->Internal->ColorBy, SIGNAL(currentIndexChanged(const QString&)),
-    this, SLOT(colorByChanged(const QString&)));
   QObject::connect(
     this->Internal->StylePointSize,  SIGNAL(valueChanged(double)), 
     this, SLOT(updateView()));
@@ -370,10 +345,6 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->DismissButton, SIGNAL(clicked(bool)),
     this, SIGNAL(dismiss()));
   QObject::connect(
-    this->Internal->StyleRepresentation, SIGNAL(currentIndexChanged(int)),
-    this, SLOT(updateColorByMenu()), 
-    Qt::QueuedConnection);
-  QObject::connect(
     this->Internal->EditColorMapButton, SIGNAL(clicked()),
     this, SLOT(openColorMapEditor()));
   
@@ -383,24 +354,6 @@ void pqDisplayProxyEditor::setupGUIConnections()
     qRegisterMetaType<QVariant>("QVariant");
     }
 
-  this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
-    this->Internal->ColorActorColor, "chosenColor",
-    SIGNAL(chosenColorChanged(const QColor&)));
-  this->Internal->ColorAdaptor->setObjectName("ActorColorAdaptor");
-  QObject::connect(this->Internal->ColorAdaptor, 
-    SIGNAL(colorChanged(const QVariant&)), this, SLOT(updateView()),
-    Qt::QueuedConnection);
-
-  this->Internal->RepresentationAdaptor = new pqSignalAdaptorComboBox(
-    this->Internal->StyleRepresentation);
-  this->Internal->RepresentationAdaptor->setObjectName(
-    "StyleRepresentationAdapator");
-  QObject::connect(
-    this->Internal->RepresentationAdaptor,
-    SIGNAL(currentTextChanged(const QString&)), 
-    this, SLOT(updateView()),
-    Qt::QueuedConnection);
-    
   this->Internal->InterpolationAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->StyleInterpolation);
   this->Internal->InterpolationAdaptor->setObjectName(
@@ -413,7 +366,7 @@ void pqDisplayProxyEditor::setupGUIConnections()
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::updateEnableState()
 {
-  QString val = this->Internal->ColorBy->currentText();
+  QString val = this->Internal->Display->getColorField(); 
 
   if(val == "Solid Color")
     {
@@ -479,68 +432,6 @@ void pqDisplayProxyEditor::colorByChanged(const QString& val)
     }
   this->updateEnableState();
   this->updateView();
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayProxyEditor::updateColorByMenu(bool forceUpdate)
-{
-  if (this->DisableSlots && !forceUpdate)
-    {
-    return;
-    }
-  
-  // changing the colorby combo will cause slots to be executed and change
-  // the array to be colored by to Solid Color. disabling slots to prevent
-  // that
-  this->DisableSlots = 1;
-  this->Internal->ColorBy->clear();
-
-  QRegExp regExpCell("\\(cell\\)\\w*$");
-  QRegExp regExpPoint("\\(point\\)\\w*$");
-  QList<QString> arrayNames = this->Internal->Display->getColorFields();
-  foreach (const QString& name, arrayNames)
-    {
-    if (regExpPoint.indexIn(name) != -1)
-      {
-      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/Icons/pqPointData16.png"),
-        name);
-      }
-    else if (regExpCell.indexIn(name)!= -1)
-      {
-      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/Icons/pqCellData16.png"),
-        name);
-      }
-    else
-      {
-      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/Icons/pqSolidColor16.png"),
-        name);
-      }
-    }
-  //this->Internal->ColorBy->addItems();
-  this->DisableSlots = 0;
-  QString currentArray = this->Internal->Display->getColorField();
-  int index = this->Internal->ColorBy->findText(currentArray);
-  if (index == -1)
-    {
-    // Menu changed. The array is no longer available
-    // Color by solid color
-    currentArray = "Solid Color";
-    this->Internal->ColorBy->setCurrentIndex(0);
-    this->colorByChanged(currentArray);
-    }
-  else
-    {
-    this->Internal->ColorBy->setCurrentIndex(index);
-    }
-  
-  if(currentArray == "Solid Color")
-    {
-    this->Internal->ColorActorColor->setEnabled(true);
-    }
-  else
-    {
-    this->Internal->ColorActorColor->setEnabled(false);
-    }
 }
 
 //-----------------------------------------------------------------------------

@@ -64,12 +64,11 @@ protected slots:
   void colorByChanged(const QString& val);
   void openColorMapEditor();
   void zoomToData();
-  void updateColorByMenu(bool forceUpdate=false);
+  void updateEnableState();
   
 protected:
   pqDisplayProxyEditorInternal* Internal;
   void setupGUIConnections();
-  void updateEnableState();
 
 private:
   bool DisableSlots;

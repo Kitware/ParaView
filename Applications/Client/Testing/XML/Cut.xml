@@ -10,7 +10,7 @@
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
   <pqevent object="PipelineObjectMenu" command="activate" arguments="Display Settings" />
-  <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/groupBox_2/StyleRepresentation" command="set_string" arguments="Wireframe" />
+  <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/groupBox_2/StyleRepresentation/comboBox" command="set_string" arguments="Wireframe" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/DismissButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
 </pqevents>

@@ -34,5 +34,5 @@
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="false" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/DismissButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0/0|0" />
-  <pqevent object="MainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="PedigreeElementId (cell)" />
+  <pqevent object="MainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="PedigreeElementId" />
 </pqevents>
