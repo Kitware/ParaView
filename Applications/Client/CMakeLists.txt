@@ -153,12 +153,12 @@ ENDIF(APPLE)
 
   FOREACH(test ${TESTS_WITHOUT_BASELINES})
     ADD_TEST(pqClient${test}
-      ${TEST_BINARY} --run-test=${TEST_XML}/${test}.xml --exit)
+      ${TEST_BINARY} -dr --run-test=${TEST_XML}/${test}.xml --exit)
   ENDFOREACH(test)
    
   FOREACH(test ${TESTS_WITH_BASELINES})
     ADD_TEST(pqClient${test}
-      ${TEST_BINARY} --run-test=${TEST_XML}/${test}.xml
+      ${TEST_BINARY} -dr --run-test=${TEST_XML}/${test}.xml
       --compare-view=${TEST_IMAGE}/${test}.png
       --exit)
   ENDFOREACH(test) 

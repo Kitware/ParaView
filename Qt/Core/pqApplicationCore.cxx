@@ -61,6 +61,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pq3DWidgetFactory.h"
+#include "pqOptions.h"
+#include "pqPendingDisplayManager.h"
 #include "pqPendingDisplayUndoElement.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
@@ -78,7 +80,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqWriterFactory.h"
 #include "pqXMLUtil.h"
-#include "pqPendingDisplayManager.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -392,8 +393,19 @@ pqSettings* pqApplicationCore::settings()
       {
       return 0;
       }
-    this->Internal->Settings = new pqSettings(this->Internal->OrganizationName,
-      this->Internal->ApplicationName);
+    pqOptions* options = pqOptions::SafeDownCast(
+      vtkProcessModule::GetProcessModule()->GetOptions());
+    if (options && options->GetDisableRegistry())
+      {
+      this->Internal->Settings = new pqSettings(this->Internal->OrganizationName,
+        this->Internal->ApplicationName + ".DisabledRegistry");
+      this->Internal->Settings->clear();
+      }
+    else
+      {
+      this->Internal->Settings = new pqSettings(this->Internal->OrganizationName,
+        this->Internal->ApplicationName);
+      }
     }
   return this->Internal->Settings;
 }

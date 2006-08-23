@@ -52,6 +52,7 @@ public:
   vtkGetStringMacro(BaselineImage);
   vtkGetMacro(ImageThreshold, int);
   vtkGetMacro(ExitAppWhenTestsDone, int);
+  vtkGetMacro(DisableRegistry, int);
 protected:
   pqOptions();
   virtual ~pqOptions();
@@ -64,6 +65,7 @@ protected:
   char* BaselineImage;
   int ImageThreshold;
   int ExitAppWhenTestsDone;
+  int DisableRegistry;
     
   vtkSetStringMacro(TestFileName);
   vtkSetStringMacro(TestDirectory);

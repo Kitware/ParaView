@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.2");
+vtkCxxRevisionMacro(pqOptions, "1.3");
 
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
@@ -46,7 +46,7 @@ pqOptions::pqOptions()
   this->TestFileName = 0;
   this->ImageThreshold = 12;
   this->ExitAppWhenTestsDone = 0;
-
+  this->DisableRegistry = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -78,6 +78,9 @@ void pqOptions::Initialize()
 
   this->AddBooleanArgument("--exit", NULL, &this->ExitAppWhenTestsDone,
     "Exit application when testing is done. Use for testing.");
+
+  this->AddBooleanArgument("--disable-registry", "-dr", &this->DisableRegistry,
+    "Do not use registry when running ParaView (for testing).");
 }
 
 //-----------------------------------------------------------------------------
