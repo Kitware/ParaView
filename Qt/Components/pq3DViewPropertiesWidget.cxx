@@ -121,7 +121,7 @@ void pq3DViewPropertiesWidgetInternal::loadValues(vtkSMProxy* proxy)
   if (!this->ColorAdaptor)
     {
     this->ColorAdaptor = new pqSignalAdaptorColor(this->backgroundColor, 
-      "chosenColor", SIGNAL(chosenColorChanged(const QColor&)));
+      "chosenColor", SIGNAL(chosenColorChanged(const QColor&)), false);
     }
   this->Proxy = (proxy);
 

@@ -71,8 +71,8 @@ void pqSignalAdaptorComboBox::setCurrentIndex(int index)
 }
 
 pqSignalAdaptorColor::pqSignalAdaptorColor(QObject* p, 
-              const char* colorProperty, const char* signal)
-  : QObject(p), PropertyName(colorProperty)
+              const char* colorProperty, const char* signal, bool enableAlpha)
+  : QObject(p), PropertyName(colorProperty), EnableAlpha(enableAlpha)
 {
   // assumes signal named after property 
   QObject::connect(p, signal,
@@ -88,7 +88,10 @@ QVariant pqSignalAdaptorColor::color() const
     rgba.append(col.red() / 255.0);
     rgba.append(col.green() / 255.0);
     rgba.append(col.blue() / 255.0);
-    rgba.append(col.alpha() / 255.0);
+    if (this->EnableAlpha)
+      {
+      rgba.append(col.alpha() / 255.0);
+      }
     }
   return rgba;
 }
@@ -103,7 +106,7 @@ void pqSignalAdaptorColor::setColor(const QVariant& var)
     int g = qRound(rgba[1].toDouble() * 255.0);
     int b = qRound(rgba[2].toDouble() * 255.0);
     int a = 255;
-    if(rgba.size() == 4)
+    if(rgba.size() == 4 && this->EnableAlpha)
       {
       a = qRound(rgba[3].toDouble() * 255.0);
       }

@@ -75,9 +75,11 @@ class QTWIDGETS_EXPORT pqSignalAdaptorColor : public QObject
   Q_PROPERTY(QVariant color READ color WRITE setColor)
 public:
   /// constructor requires a QObject, the name of the QColor property, and a signal for property changes
-  pqSignalAdaptorColor(QObject* p, const char* colorProperty, const char* signal);
+  pqSignalAdaptorColor(QObject* p, const char* colorProperty, const char* signal,
+    bool enableAlpha);
   /// get the color components
   QVariant color() const;
+
 signals:
   /// signal the color changed
   void colorChanged(const QVariant&);
@@ -88,6 +90,7 @@ protected slots:
   void handleColorChanged();
 protected:
   QByteArray PropertyName;
+  bool EnableAlpha;
 };
 
 

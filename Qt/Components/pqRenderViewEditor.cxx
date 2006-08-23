@@ -176,7 +176,8 @@ void pqRenderViewEditor::setRenderView(vtkSMRenderModuleProxy* view)
     // setup for background color
     QObject* signalAdaptor = new pqSignalAdaptorColor(this->Internal->BackgroundColor, 
                                                       "chosenColor",
-                                                      SIGNAL(chosenColorChanged(const QColor&)));
+                                                      SIGNAL(chosenColorChanged(const QColor&)),
+                                                      false);
     signalAdaptor->setObjectName("BackgroundColorAdaptor");
     this->Internal->Links->addPropertyLink(signalAdaptor,
                                            "color",
@@ -218,7 +219,8 @@ void pqRenderViewEditor::setRenderView(vtkSMRenderModuleProxy* view)
     // setup for light color
     signalAdaptor = new pqSignalAdaptorColor(this->Internal->SetLightColor, 
                                                       "chosenColor",
-                                                      SIGNAL(chosenColorChanged(const QColor&)));
+                                                      SIGNAL(chosenColorChanged(const QColor&)), 
+                                                      false);
     signalAdaptor->setObjectName("LightColorAdaptor");
     this->Internal->Links->addPropertyLink(signalAdaptor,
                                            "color",
