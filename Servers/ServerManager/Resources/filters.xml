@@ -953,18 +953,20 @@ The Calculator filter is available on the Toolbar.
      <StringVectorProperty 
         name="AddScalarVariable" 
         command="AddScalarVariable" 
+        clean_command="RemoveScalarVariables"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="3"
-        element_types="2 2 0" /> 
+        element_types="2 2 0" />
 
      <StringVectorProperty 
         name="AddVectorVariable" 
         command="AddVectorVariable" 
+        clean_command="RemoveVectorVariables"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="5"
-        element_types="2 2 0 0 0" /> 
+        element_types="2 2 0 0 0" />
 
      <IntVectorProperty 
         name="AttributeMode" 

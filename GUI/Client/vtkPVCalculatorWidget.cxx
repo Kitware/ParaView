@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.53");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -797,14 +797,8 @@ void vtkPVCalculatorWidget::Trace(ofstream *file)
 
 //----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::Accept()
-{
+{ 
   int i;
-
-  vtkSMProperty *removeAllVariablesProp = this->GetSMRemoveAllVariablesProperty();
-  if (removeAllVariablesProp)
-    {
-    removeAllVariablesProp->Modified();
-    }
 
   vtkSMStringVectorProperty *functionProp =
     vtkSMStringVectorProperty::SafeDownCast(this->GetSMFunctionProperty());
@@ -833,6 +827,7 @@ void vtkPVCalculatorWidget::Accept()
 
   if (scalarProp)
     {
+    scalarProp->SetNumberOfElements(0);
     for (i = 0; i < this->NumberOfScalarVariables; i++)
       {
       scalarProp->SetElement(3*i, this->ScalarVariableNames[i]);
@@ -846,6 +841,7 @@ void vtkPVCalculatorWidget::Accept()
   
   if (vectorProp)
     {
+    vectorProp->SetNumberOfElements(0);
     for (i = 0; i < this->NumberOfVectorVariables; i++)
       {
       vectorProp->SetElement(5*i, this->VectorVariableNames[i]);
