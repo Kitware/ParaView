@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.297");
+vtkCxxRevisionMacro(vtkKWApplication, "1.298");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -2099,11 +2099,11 @@ int vtkKWApplication::SendEmail(
 
 #else
 
-  void(to);
-  void(subject);
-  void(message);
-  void(attachment_filename);
-  void(extra_error_msg);
+  (void)to;
+  (void)subject;
+  (void)message;
+  (void)attachment_filename;
+  (void)extra_error_msg;
 
   return 0;
 #endif
