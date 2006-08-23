@@ -235,9 +235,6 @@ void pqCalculatorPanel::accept()
       pqSMAdaptor::setMultipleElementProperty(ScalarProperty, 3*i, VarName);
       pqSMAdaptor::setMultipleElementProperty(ScalarProperty, 3*i+1, ArrayName);
       pqSMAdaptor::setMultipleElementProperty(ScalarProperty, 3*i+2, Component);
-      printf("setting scalar: %s:%s:%i\n", VarName.toAscii().data(),
-                                           ArrayName.toAscii().data(),
-                                           Component.toInt());
       }
     }
 
@@ -254,8 +251,6 @@ void pqCalculatorPanel::accept()
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+2, "0");
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+3, "1");
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+4, "2");
-      printf("setting scalar: %s:%s:0:1:2\n", VarName.toAscii().data(),
-                                              VarName.toAscii().data());
       }
     }
   
