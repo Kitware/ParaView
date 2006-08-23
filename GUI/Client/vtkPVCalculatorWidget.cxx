@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.54");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.55");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -827,7 +827,6 @@ void vtkPVCalculatorWidget::Accept()
 
   if (scalarProp)
     {
-    scalarProp->SetNumberOfElements(0);
     for (i = 0; i < this->NumberOfScalarVariables; i++)
       {
       scalarProp->SetElement(3*i, this->ScalarVariableNames[i]);
@@ -837,11 +836,11 @@ void vtkPVCalculatorWidget::Accept()
       scalarProp->SetElement(3*i+2, compNum.str());
       compNum.rdbuf()->freeze(0);
       }
+    scalarProp->SetNumberOfElements(this->NumberOfScalarVariables*3);
     }
   
   if (vectorProp)
     {
-    vectorProp->SetNumberOfElements(0);
     for (i = 0; i < this->NumberOfVectorVariables; i++)
       {
       vectorProp->SetElement(5*i, this->VectorVariableNames[i]);
@@ -850,6 +849,7 @@ void vtkPVCalculatorWidget::Accept()
       vectorProp->SetElement(5*i+3, "1");
       vectorProp->SetElement(5*i+4, "2");
       }
+    vectorProp->SetNumberOfElements(this->NumberOfVectorVariables*5);
     }
 
   if (functionProp)
