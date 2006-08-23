@@ -114,19 +114,15 @@ void pqEventTranslator::ignoreObject(QObject* Object)
 
 bool pqEventTranslator::eventFilter(QObject* Object, QEvent* Event)
 {
-  if(Event->type() == QEvent::ContextMenu)
-    {
-    int dummy = 1;
-    dummy ++;
-    }
-
   for(int i = 0; i != this->Implementation->Translators.size(); ++i)
     {
     bool error = false;
     if(this->Implementation->Translators[i]->translateEvent(Object, Event, error))
       {
       if(error)
+        {
         qWarning() << "Error translating an event for object " << Object;
+        }
       return false;
       }
     }
