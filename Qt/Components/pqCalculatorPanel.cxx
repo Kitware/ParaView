@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkSMStringVectorProperty.h"
 
 // ParaView includes
 #include "pqPipelineFilter.h"
@@ -210,18 +211,12 @@ void pqCalculatorPanel::accept()
 
   vtkSMProxy* CalcProxy = this->proxy()->getProxy();
 
-  // clean out old variables
-  vtkSMProperty* removeVars = CalcProxy->GetProperty("RemoveAllVariables");
-  if(removeVars)
-    {
-    removeVars->Modified();
-    }
-
   // put in new variables
   QComboBox* scalarCombo = this->Internal->UI.Scalars;
   vtkSMProperty* ScalarProperty = CalcProxy->GetProperty("AddScalarVariable");
   if(ScalarProperty)
     {
+    vtkSMStringVectorProperty::SafeDownCast(ScalarProperty)->SetNumberOfElements(0);
     for(int i=0; i<scalarCombo->count()-1; i++)
       {
       QString VarName = scalarCombo->itemText(i+1);
@@ -240,6 +235,9 @@ void pqCalculatorPanel::accept()
       pqSMAdaptor::setMultipleElementProperty(ScalarProperty, 3*i, VarName);
       pqSMAdaptor::setMultipleElementProperty(ScalarProperty, 3*i+1, ArrayName);
       pqSMAdaptor::setMultipleElementProperty(ScalarProperty, 3*i+2, Component);
+      printf("setting scalar: %s:%s:%i\n", VarName.toAscii().data(),
+                                           ArrayName.toAscii().data(),
+                                           Component.toInt());
       }
     }
 
@@ -247,14 +245,17 @@ void pqCalculatorPanel::accept()
   vtkSMProperty* VectorProperty = CalcProxy->GetProperty("AddVectorVariable");
   if(VectorProperty)
     {
+    vtkSMStringVectorProperty::SafeDownCast(VectorProperty)->SetNumberOfElements(0);
     for(int i=0; i<vectorCombo->count()-1; i++)
       {
-      QVariant VarName = vectorCombo->itemText(i+1);
+      QString VarName = vectorCombo->itemText(i+1);
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i, VarName);
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+1, VarName);
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+2, "0");
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+3, "1");
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+4, "2");
+      printf("setting scalar: %s:%s:0:1:2\n", VarName.toAscii().data(),
+                                              VarName.toAscii().data());
       }
     }
   
