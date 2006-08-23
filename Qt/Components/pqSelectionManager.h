@@ -37,8 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
+class vtkDataObject;
 class vtkSMDisplayProxy;
 class vtkSMProxy;
+class vtkSMViewModuleProxy;
 class vtkSelection;
 class pqPipelineSource;
 class pqRenderModule;
@@ -64,6 +66,17 @@ public:
       return this->Mode;
     }
 
+  /// Returns the number of client-side data objects that were created by
+  /// the selection.
+  unsigned int getNumberOfSelectedObjects();
+
+  /// Given an index, returns a client-side data objects that was created
+  /// by the selection and the corresponding proxy. The return value is
+  /// 1 on success, 0 on failure.
+  int getSelectedObject(unsigned int idx, 
+                        vtkSMProxy*& proxy, 
+                        vtkDataObject*& dataObject);
+
   enum Modes
   {
     SELECT,
@@ -72,6 +85,9 @@ public:
 
   friend class vtkPQSelectionObserver;
 
+signals:
+  void selectionChanged(pqSelectionManager*);
+  
 public slots:
   /// Change mode to SELECT
   void switchToSelection();
@@ -90,6 +106,7 @@ private slots:
 private:
   pqSelectionManagerImplementation* Implementation;
   int Mode;
+
   int setInteractorStyleToSelect(pqRenderModule*);
   int setInteractorStyleToInteract(pqRenderModule*);
   void processEvents(unsigned long event);

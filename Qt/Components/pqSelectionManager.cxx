@@ -163,19 +163,21 @@ public:
 
   struct ClientSideDisplay
   {
-    ClientSideDisplay(vtkSMProxy* extractor, vtkSMProxy* display) :
-      Extractor(extractor), Display(display)
+    ClientSideDisplay(
+      vtkSMProxy* source, vtkSMProxy* extractor, vtkSMProxy* display) :
+      SourceProxy(source), Extractor(extractor), Display(display)
       {
       }
     ClientSideDisplay()
       {
       }
 
+    vtkSMProxy* SourceProxy;
     vtkSmartPointer<vtkSMProxy> Extractor;
-    vtkSmartPointer<vtkSMProxy> Display;
+    vtkSmartPointer<vtkSMGenericViewDisplayProxy> Display;
   };
-  typedef vtkstd::map<vtkSMProxy*, ClientSideDisplay >
-     ClientSideDisplaysType;
+
+  typedef vtkstd::vector<ClientSideDisplay > ClientSideDisplaysType;
   ClientSideDisplaysType ClientSideDisplays;
 
   double Verts[32];
@@ -970,6 +972,8 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
 
   this->clearClientDisplays();
   this->createNewClientDisplays(selection);
+
+  emit this->selectionChanged(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -980,10 +984,7 @@ void pqSelectionManager::clearClientDisplays()
 
   for(; iter!= this->Implementation->ClientSideDisplays.end(); iter++)
     {
-    pqSelectionManagerImplementation::ClientSideDisplay& displayS = 
-      iter->second;
-    vtkSMProxy* extractor = displayS.Extractor;
-
+    vtkSMProxy* extractor = iter->Extractor;
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
       extractor->GetProperty("Input"));
     if (pp)
@@ -1048,14 +1049,9 @@ void pqSelectionManager::createNewClientDisplays(
     
     display->Update();
 
-    cout << display->GetOutput()->GetClassName() << endl;
-    if (display->GetOutput())
-      {
-      display->GetOutput()->PrintSelf(cout, vtkIndent());
-      }
-
-    this->Implementation->ClientSideDisplays[source] = 
-      pqSelectionManagerImplementation::ClientSideDisplay(extractor, display);
+    this->Implementation->ClientSideDisplays.push_back( 
+      pqSelectionManagerImplementation::ClientSideDisplay(
+        source, extractor, display));
     extractor->Delete();
     display->Delete();
     }
@@ -1119,4 +1115,30 @@ void pqSelectionManager::proxyUnRegistered(
 void pqSelectionManager::sourceRemoved(pqPipelineSource* vtkNotUsed(source))
 {
   this->clearSelection();
+}
+
+//-----------------------------------------------------------------------------
+unsigned int pqSelectionManager::getNumberOfSelectedObjects()
+{
+  return this->Implementation->ClientSideDisplays.size();
+}
+
+//-----------------------------------------------------------------------------
+int pqSelectionManager::getSelectedObject(
+  unsigned int idx, vtkSMProxy*& proxy, vtkDataObject*& dataObject)
+{
+  proxy = 0;
+  dataObject = 0;
+
+  if (idx >= this->getNumberOfSelectedObjects())
+    {
+    return 0;
+    }
+
+  proxy = 
+    this->Implementation->ClientSideDisplays[idx].SourceProxy;
+  dataObject = 
+    this->Implementation->ClientSideDisplays[idx].Display->GetOutput();
+
+  return 1;
 }

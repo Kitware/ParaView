@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QWidget>
 
+class pqSelectionManager;
 class vtkUnstructuredGrid;
 
 /// Displays a collection of data set elements in spreadsheet form
@@ -56,9 +57,12 @@ public slots:
   /// Call this to clear the collection of elements
   void clear();
   /// Call this to add to the collection of elements
-  void addElements(vtkUnstructuredGrid* Elements);
+  void addElements(vtkUnstructuredGrid* ug);
   /// Call this to set the collection of elements
-  void setElements(vtkUnstructuredGrid* Elements);
+  void setElements(vtkUnstructuredGrid* ug);
+  /// Called when user selects in the 3D view.
+  void onSelectionChanged(pqSelectionManager*);
+
   
 private:
   void onElementsChanged();

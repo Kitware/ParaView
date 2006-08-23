@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDataSetModel.h"
 #include "pqElementInspectorWidget.h"
+#include "pqSelectionManager.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -103,7 +104,8 @@ pqElementInspectorWidget::pqElementInspectorWidget(QWidget *p) :
   this->Implementation->TreeView.setObjectName("View");
   this->Implementation->TreeView.setRootIsDecorated(false);
   this->Implementation->TreeView.setAlternatingRowColors(true);
-  this->Implementation->TreeView.setModel(new pqDataSetModel(&this->Implementation->TreeView));
+  this->Implementation->TreeView.setModel(
+    new pqDataSetModel(&this->Implementation->TreeView));
 
   QHBoxLayout* const hbox = new QHBoxLayout();
   hbox->addWidget(&this->Implementation->ClearButton);
@@ -127,27 +129,48 @@ void pqElementInspectorWidget::clear()
   onElementsChanged();    
 }
 
-void pqElementInspectorWidget::addElements(vtkUnstructuredGrid* Elements)
+void pqElementInspectorWidget::addElements(vtkUnstructuredGrid* ug)
 {
-  this->Implementation->addData(Elements);
+  this->Implementation->addData(ug);
   onElementsChanged();
 }
 
-void pqElementInspectorWidget::setElements(vtkUnstructuredGrid* Elements)
+void pqElementInspectorWidget::setElements(vtkUnstructuredGrid* ug)
 {
-  this->Implementation->setData(Elements);
+  this->Implementation->setData(ug);
   onElementsChanged();  
 }
 
 void pqElementInspectorWidget::onElementsChanged()
 {
   if(this->Implementation->Data->GetNumberOfCells())
+    {
     this->Implementation->ClearButton.show();
+    }
   else
+    {
     this->Implementation->ClearButton.hide();
+    }
     
-  qobject_cast<pqDataSetModel*>(this->Implementation->TreeView.model())->setDataSet(this->Implementation->Data);
+  qobject_cast<pqDataSetModel*>(
+    this->Implementation->TreeView.model())->setDataSet(
+      this->Implementation->Data);
   this->Implementation->TreeView.reset();
   this->Implementation->TreeView.update();
   emit elementsChanged(this->Implementation->Data);
+}
+
+void pqElementInspectorWidget::onSelectionChanged(pqSelectionManager* selMan)
+{
+  unsigned int numSelObjs = selMan->getNumberOfSelectedObjects();
+
+  if (numSelObjs > 0)
+    {
+    vtkSMProxy* source;
+    vtkDataObject* dObj;
+    if (selMan->getSelectedObject(0, source, dObj))
+      {
+      this->setElements(vtkUnstructuredGrid::SafeDownCast(dObj));
+      }
+    }
 }

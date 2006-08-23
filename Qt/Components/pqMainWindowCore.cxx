@@ -99,6 +99,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVTKWidget.h>
 
+#include <vtkDataObject.h>
 #include <vtkProcessModule.h>
 #include <vtkPVOptions.h>
 #include <vtkPVXMLElement.h>
@@ -154,6 +155,7 @@ public:
   pqRenderWindowManager MultiViewManager;
   pqVCRController VCRController;
   pqSelectionManager SelectionManager;
+  pqElementInspectorWidget* ElementInspector;
   pqCustomFilterManagerModel* const CustomFilters;
   pqCustomFilterManager* CustomFilterManager;
  
@@ -602,10 +604,16 @@ void pqMainWindowCore::setupStatisticsView(QDockWidget* dock_widget)
      
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::setupElementInspector(QDockWidget* dock_widget)
 {
   pqElementInspectorWidget* const element_inspector = 
     new pqElementInspectorWidget(dock_widget);
+
+  QObject::connect(&this->Implementation->SelectionManager,
+                   SIGNAL(selectionChanged(pqSelectionManager*)),
+                   element_inspector,
+                   SLOT(onSelectionChanged(pqSelectionManager*)));
     
   dock_widget->setWidget(element_inspector);
 }
