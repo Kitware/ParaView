@@ -109,7 +109,7 @@ pqRenderModule::pqRenderModule(const QString& name,
   this->Internal->UndoStack->setActiveServer(this->getServer());
 
   this->Internal->Viewport = new QVTKWidget() 
-    << pqSetName("Viewport" + this->Internal->Name);
+    << pqSetName("Viewport");
   this->Internal->Viewport->installEventFilter(this);
 
   // Listen to display add/remove events.
