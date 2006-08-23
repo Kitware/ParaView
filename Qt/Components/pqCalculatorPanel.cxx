@@ -88,13 +88,18 @@ pqCalculatorPanel::pqCalculatorPanel(QWidget* p)
                    this,
                    SLOT(updateVariables(const QString&)));
   
+  QObject::connect(this->Internal->UI.AttributeMode,
+                   SIGNAL(currentIndexChanged(const QString&)),
+                   this->Internal->UI.Function,
+                   SLOT(clear()));
+  
   QObject::connect(this->Internal->UI.Vectors,
-                   SIGNAL(activated(int)),
+                   SIGNAL(currentIndexChanged(int)),
                    this,
                    SLOT(vectorChosen(int)));
   
   QObject::connect(this->Internal->UI.Scalars,
-                   SIGNAL(activated(int)),
+                   SIGNAL(currentIndexChanged(int)),
                    this,
                    SLOT(scalarChosen(int)));
 
@@ -213,11 +218,13 @@ void pqCalculatorPanel::accept()
 
   // put in new variables
   QComboBox* scalarCombo = this->Internal->UI.Scalars;
-  vtkSMProperty* ScalarProperty = CalcProxy->GetProperty("AddScalarVariable");
+  vtkSMStringVectorProperty* ScalarProperty;
+  ScalarProperty = vtkSMStringVectorProperty::SafeDownCast(
+       CalcProxy->GetProperty("AddScalarVariable"));
   if(ScalarProperty)
     {
-    vtkSMStringVectorProperty::SafeDownCast(ScalarProperty)->SetNumberOfElements(0);
-    for(int i=0; i<scalarCombo->count()-1; i++)
+    int numVariables = scalarCombo->count()-1;
+    for(int i=0; i<numVariables; i++)
       {
       QString VarName = scalarCombo->itemText(i+1);
       QString ArrayName = VarName;
@@ -236,14 +243,17 @@ void pqCalculatorPanel::accept()
       pqSMAdaptor::setMultipleElementProperty(ScalarProperty, 3*i+1, ArrayName);
       pqSMAdaptor::setMultipleElementProperty(ScalarProperty, 3*i+2, Component);
       }
+    ScalarProperty->SetNumberOfElements(numVariables*3);
     }
 
   QComboBox* vectorCombo = this->Internal->UI.Vectors;
-  vtkSMProperty* VectorProperty = CalcProxy->GetProperty("AddVectorVariable");
+  vtkSMStringVectorProperty* VectorProperty;
+  VectorProperty = vtkSMStringVectorProperty::SafeDownCast(
+    CalcProxy->GetProperty("AddVectorVariable"));
   if(VectorProperty)
     {
-    vtkSMStringVectorProperty::SafeDownCast(VectorProperty)->SetNumberOfElements(0);
-    for(int i=0; i<vectorCombo->count()-1; i++)
+    int numVariables = vectorCombo->count()-1;
+    for(int i=0; i<numVariables; i++)
       {
       QString VarName = vectorCombo->itemText(i+1);
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i, VarName);
@@ -252,6 +262,7 @@ void pqCalculatorPanel::accept()
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+3, "1");
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+4, "2");
       }
+    VectorProperty->SetNumberOfElements(numVariables*5);
     }
   
   pqSMAdaptor::setElementProperty(

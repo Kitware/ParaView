@@ -122,6 +122,7 @@ ENDIF(APPLE)
 
   SET (TESTS_WITH_BASELINES
     3DWidgetInCustomFilter
+    Calculator
     Clip
     ClipHidden
     ClipUndo
