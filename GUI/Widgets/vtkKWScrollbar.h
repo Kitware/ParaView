@@ -105,6 +105,13 @@ public:
     { this->SetTroughColor(rgb[0], rgb[1], rgb[2]); };
 
   // Description:
+  // Set/Get the desired narrow dimension of the scrollbar widget, not 
+  // including 3-D border, if any. For vertical scrollbars this will be the
+  // width and for horizontal scrollbars this will be the height. 
+  virtual void SetWidth(int);
+  virtual int GetWidth();
+  
+  // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked to change the view in the widget associated with
   // the scrollbar. 

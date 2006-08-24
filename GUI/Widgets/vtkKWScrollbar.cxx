@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWScrollbar);
-vtkCxxRevisionMacro(vtkKWScrollbar, "1.9");
+vtkCxxRevisionMacro(vtkKWScrollbar, "1.10");
 
 //----------------------------------------------------------------------------
 void vtkKWScrollbar::CreateWidget()
@@ -154,6 +154,18 @@ void vtkKWScrollbar::SetBorderWidth(int width)
 int vtkKWScrollbar::GetBorderWidth()
 {
   return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWScrollbar::SetWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-width", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWScrollbar::GetWidth()
+{
+  return this->GetConfigurationOptionAsInt("-width");
 }
 
 //----------------------------------------------------------------------------
