@@ -204,9 +204,12 @@ int vtkKWSetApplicationIconCmd(ClientData clientdata,
 
   return vtkKWSetApplicationIconCmdInternal(
     interp, argv[1], icon_res_id, set_small);
-#endif
+
+#else
 
   return TCL_OK;
+
+#endif
 }
 
 //----------------------------------------------------------------------------

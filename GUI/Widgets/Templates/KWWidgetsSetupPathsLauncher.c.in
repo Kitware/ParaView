@@ -28,42 +28,42 @@
 #endif
 
 #if defined(PATH_MAX)
-#define MAXPATH PATH_MAX
+#define MAX_PATH_len PATH_MAX
 #elif defined(MAXPATHLEN)
-#define MAXPATH MAXPATHLEN
+#define MAX_PATH_len MAXPATHLEN
 #else
-#define MAXPATH 16384
+#define MAX_PATH_len 16384
 #endif
 
 #define MAX_QUOTED_ARGV 50
 
 int main(int argc, char** argv)
 {
-  char exe_path[MAXPATH];
-  char real_exe_path[MAXPATH];
+  char exe_path[MAX_PATH_len];
+  char real_exe_path[MAX_PATH_len];
 
-  char path_env[MAXPATH];
+  char path_env[MAX_PATH_len];
   const char *old_path_env;
 
-  char ld_path_env[MAXPATH];
+  char ld_path_env[MAX_PATH_len];
   const char *old_ld_path_env;
 
-  char tcllibpath_env[MAXPATH];
+  char tcllibpath_env[MAX_PATH_len];
   const char *old_tcllibpath_env;
 
-  char pythonpath_env[MAXPATH];
+  char pythonpath_env[MAX_PATH_len];
   const char *old_pythonpath_env;
 
-  char message[MAXPATH];
+  char message[MAX_PATH_len];
   char **arg;
 
-  char current_exe[MAXPATH];
+  char current_exe[MAX_PATH_len];
   char *slash_pos;
 
 #if defined(_WIN32)
   size_t exe_path_len;
 #if !defined(__CYGWIN__)
-  char quoted_argv[MAX_QUOTED_ARGV][MAXPATH];
+  char quoted_argv[MAX_QUOTED_ARGV][MAX_PATH_len];
   int nb_quoted_argv;
 #endif
 #endif
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
      our working dir to its location later on. */
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
-  GetFullPathName(argv[0], MAXPATH, current_exe, 0);
+  GetFullPathName(argv[0], MAX_PATH_len, current_exe, 0);
 #else
   realpath(argv[0], current_exe);
 #endif
@@ -171,7 +171,7 @@ int main(int argc, char** argv)
      current working dir if exe_path is relative. */
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
-  GetFullPathName(exe_path, MAXPATH, real_exe_path, 0);
+  GetFullPathName(exe_path, MAX_PATH_len, real_exe_path, 0);
 #else
   realpath(exe_path, real_exe_path);
 #endif

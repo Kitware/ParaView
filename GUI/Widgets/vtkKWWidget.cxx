@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.148");
+vtkCxxRevisionMacro(vtkKWWidget, "1.149");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -566,11 +566,12 @@ void vtkKWWidget::AddBalloonHelpBindings()
 //----------------------------------------------------------------------------
 vtkKWTopLevel* vtkKWWidget::GetParentTopLevel()
 {
-  vtkKWTopLevel* toplevel =0;
+  vtkKWTopLevel* toplevel = NULL;
   vtkKWWidget* widget = this->GetParent();
-  while(widget)
+  while (widget)
     {
-    if((toplevel = vtkKWTopLevel::SafeDownCast(widget)))
+    toplevel = vtkKWTopLevel::SafeDownCast(widget);
+    if (toplevel)
       {
       return toplevel;
       }

@@ -134,8 +134,8 @@ static PyObject *PyvtkKWObject_Script(PyObject *self, PyObject *args)
     }
 
 
-  if (((op = (vtkKWObject *)PyArg_VTKParseTuple(self, args, (char*)"s",
-                                                &input))))
+  op = (vtkKWObject *)PyArg_VTKParseTuple(self, args, (char*)"s", &input);
+  if (op)
     {
     PyObject *formatted_string;
 
@@ -212,9 +212,8 @@ static PyObject *PyvtkKWApplication_Script(PyObject *self, PyObject *args)
     return NULL;
     }
 
-  if (((op = 
-        (vtkKWApplication *)PyArg_VTKParseTuple(self, args, (char*)"s",
-                                                &input))))
+  op = (vtkKWApplication *)PyArg_VTKParseTuple(self, args, (char*)"s", &input);
+  if (op)
     {
     PyObject *formatted_string;
 
@@ -292,8 +291,8 @@ static PyObject *PyvtkKWApplication_EvaluateBooleanExpression(PyObject *self,
     return NULL;
     }
 
-  if (((op = (vtkKWApplication *)PyArg_VTKParseTuple(self, args, (char*)"s",
-                                                     &input))))
+  op = (vtkKWApplication *)PyArg_VTKParseTuple(self, args, (char*)"s", &input);
+  if (op)
     {
     PyObject *formatted_string;
 
@@ -429,7 +428,8 @@ static PyObject *PyvtkKWApplication_Start(PyObject *self, PyObject *args)
   {
   vtkKWApplication *op;
 
-  if ((op = (vtkKWApplication *)PyArg_VTKParseTuple(self, args, (char*)"")))
+  op = (vtkKWApplication *)PyArg_VTKParseTuple(self, args, (char*)"");
+  if (op)
     {
     if (PyVTKClass_Check(self))
       {
@@ -451,8 +451,8 @@ static PyObject *PyvtkKWApplication_Start(PyObject *self, PyObject *args)
   PyObject *pyargv;
   vtkKWApplication *op;
 
-  if ((op = (vtkKWApplication *)PyArg_VTKParseTuple(self, args, (char*)"iO",
-                                                    &argc, &pyargv)))
+  op = (vtkKWApplication *)PyArg_VTKParseTuple(self, args, (char*)"iO", &argc, &pyargv);
+  if (op)
     {
     static char emptystring[1] = "";
     int errcheck = 0;

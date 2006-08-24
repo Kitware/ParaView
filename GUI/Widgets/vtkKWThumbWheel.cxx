@@ -36,7 +36,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.53");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.54");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -524,26 +524,23 @@ char *vtkKWThumbWheel::GetInteractionModeAsString(int mode)
 {
   if (mode < 0 || mode > 2)
     {
-    return (char *)"Invalid mode";
+    return NULL;
     }
 
   switch (this->InteractionModes[mode])
     {
     case vtkKWThumbWheel::InteractionModeNone:
       return (char *)"None";
-      break;
     case vtkKWThumbWheel::InteractionModeLinearMotion:
       return (char *)"Linear";
-      break;
     case vtkKWThumbWheel::InteractionModeNonLinearMotion:
       return (char *)"NonLinear";
-      break;
     case vtkKWThumbWheel::InteractionModeToggleCenterIndicator:
       return (char *)"ToggleCenterIndicator";
-      break;
     default:
       return (char *)"Unknown";
     }
+  return NULL;
 }
 
 // ---------------------------------------------------------------------------
