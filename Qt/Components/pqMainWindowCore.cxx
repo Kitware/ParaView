@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayColorWidget.h"
 #include "pqElementInspectorWidget.h"
 #include "pqMainWindowCore.h"
-#include "pqManageServersDialog.h"
 #include "pqMultiView.h"
 #include "pqMultiViewFrame.h"
 #include "pqObjectInspectorWidget.h"
@@ -53,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderWindowManager.h"
 #include "pqSelectionManager.h"
 #include "pqServer.h"
-#include "pqServerBrowser.h"
+#include "pqServerStartupBrowser.h"
 #include "pqServerFileDialogModel.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
@@ -749,7 +748,10 @@ void pqMainWindowCore::onFileOpen()
   pqApplicationCore* core = pqApplicationCore::instance();
   if (core->getServerManagerModel()->getNumberOfServers() == 0)
     {
-    pqServerBrowser* const server_browser = new pqServerBrowser(this->Implementation->Parent);
+    pqServerStartupBrowser* const server_browser = new pqServerStartupBrowser(
+      pqApplicationCore::instance()->serverStartups(),
+      *pqApplicationCore::instance()->settings(),
+      this->Implementation->Parent);
     server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
     QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
       this, SLOT(onFileOpen(pqServer*)), Qt::QueuedConnection);
@@ -827,7 +829,10 @@ void pqMainWindowCore::onFileLoadServerState()
     }
   else
     {
-    pqServerBrowser* const server_browser = new pqServerBrowser(this->Implementation->Parent);
+    pqServerStartupBrowser* const server_browser = new pqServerStartupBrowser(
+      pqApplicationCore::instance()->serverStartups(),
+      *pqApplicationCore::instance()->settings(),
+      this->Implementation->Parent);
     server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
     QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
       this, SLOT(onFileLoadServerState(pqServer*)), Qt::QueuedConnection);
@@ -1105,17 +1110,6 @@ void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
     }
 }
 
-void pqMainWindowCore::onFileManageServers()
-{
-  pqManageServersDialog* const  dialog = new pqManageServersDialog(
-    pqApplicationCore::instance()->serverStartups(),
-    *pqApplicationCore::instance()->settings(),
-    this->Implementation->Parent);
-  dialog->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
-  dialog->setModal(false);
-  dialog->show();
-}
-
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onEditCameraUndo()
 {
@@ -1147,7 +1141,9 @@ void pqMainWindowCore::onEditCameraRedo()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onServerConnect()
 {
-  pqServerBrowser* const server_browser = new pqServerBrowser(
+  pqServerStartupBrowser* const server_browser = new pqServerStartupBrowser(
+    pqApplicationCore::instance()->serverStartups(),
+    *pqApplicationCore::instance()->settings(),
     this->Implementation->Parent);
   server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
   server_browser->setModal(true);
@@ -1399,7 +1395,10 @@ void pqMainWindowCore::onCreateSource(QAction* action)
   if (core->getServerManagerModel()->getNumberOfServers() == 0)
     {
     // We need to create a new connection.
-    pqServerBrowser* const server_browser = new pqServerBrowser(this->Implementation->Parent);
+    pqServerStartupBrowser* const server_browser = new pqServerStartupBrowser(
+      pqApplicationCore::instance()->serverStartups(),
+      *pqApplicationCore::instance()->settings(),
+      this->Implementation->Parent);
     server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
     server_browser->exec();
     }

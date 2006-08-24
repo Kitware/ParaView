@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqManageServersDialog.h
+   Module:    pqServerStartupBrowser.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,47 +29,64 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqManageServersDialog_h
-#define __pqManageServersDialog_h
+
+#ifndef _pqServerStartupBrowser_h
+#define _pqServerStartupBrowser_h
 
 #include "pqComponentsExport.h"
+#include "pqServerBrowser.h"
 
-#include <QDialog>
-
+class pqServer;
 class pqServerStartups;
 class pqSettings;
 class QListWidgetItem;
 
-class PQCOMPONENTS_EXPORT pqManageServersDialog :
-  public QDialog
+/**
+Provides a user-interface component for browsing through the set of
+configured servers for editing / making connections.
+
+To use, create an instance of pqServerStartupBrowser, and connect its
+serverConnected() signal to a slot.  If the user selects a server
+and a connection is established, the slot will be called with the
+new pqServer object that encapsulates the connection.
+
+\sa pqServer
+*/
+
+class PQCOMPONENTS_EXPORT pqServerStartupBrowser :
+  public pqServerBrowser
 {
-  typedef QDialog Superclass;
-  
+  typedef pqServerBrowser Superclass;
+
   Q_OBJECT
-  
+
 public:
-  pqManageServersDialog(pqServerStartups& startups, pqSettings& settings, QWidget* parent = 0);
-  ~pqManageServersDialog();
+  pqServerStartupBrowser(
+    pqServerStartups& startups,
+    pqSettings& settings,
+    QWidget* parent = 0);
+  ~pqServerStartupBrowser();
+
+  /// Returns the most-recently-connected server, or NULL
+  pqServer* getConnectedServer();
+
+signals:
+  /// This signal will be emitted iff a server connection is successfully created
+  void serverConnected(pqServer*);
 
 private slots:
-  void onStartupsChanged();
-  void onAddServer();
-  void onEditServer();
-  void onDeleteServer();
-  void onSelectAll();
-  void onSelectionChanged();
-  void onItemDoubleClicked(QListWidgetItem*);
-  void onSave();
-  void onSave(const QStringList&);
-  void onLoad();
-  void onLoad(const QStringList&);
+  void onServerCancelled();
+  void onServerFailed();
+  void onServerStarted(pqServer*);
 
 private:
-  void accept();
-
+  pqServerStartupBrowser(const pqServerStartupBrowser&);
+  pqServerStartupBrowser& operator=(const pqServerStartupBrowser&);
+  
+  virtual void onServerSelected(pqServerStartup&);
+ 
   class pqImplementation;
   pqImplementation* const Implementation;
 };
 
-#endif
-
+#endif // !_pqServerStartupBrowser_h

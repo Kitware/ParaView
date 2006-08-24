@@ -98,16 +98,20 @@ const bool pqCollapsedGroup::isExpanded()
   return this->Implementation->Expanded;
 }
 
+void pqCollapsedGroup::setExpanded(bool expanded)
+{
+  if(this->Implementation->Expanded != expanded)
+    this->toggle();
+}
+
 void pqCollapsedGroup::expand()
 {
-  if(!this->Implementation->Expanded)
-    this->toggle();
+  this->setExpanded(true);
 }
 
 void pqCollapsedGroup::collapse()
 {
-  if(this->Implementation->Expanded)
-    this->toggle();
+  this->setExpanded(false);
 }
 
 void pqCollapsedGroup::toggle()

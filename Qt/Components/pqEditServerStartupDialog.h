@@ -49,6 +49,7 @@ class PQCOMPONENTS_EXPORT pqEditServerStartupDialog :
 public:
   pqEditServerStartupDialog(
     pqServerStartups& startups,
+    const QString& name,
     const pqServerResource& server,
     QWidget* parent = 0);
   ~pqEditServerStartupDialog();
@@ -61,4 +62,3 @@ private:
 };
 
 #endif
-

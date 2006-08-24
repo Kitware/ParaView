@@ -43,7 +43,7 @@ class pqSettings;
 class QDomDocument;
 
 /** Manages a persistent collection of server "startups" - instructions
-on how to start a local / remote server prior to connection */
+on how to start a server prior to connection */
 class PQCORE_EXPORT pqServerStartups :
   public QObject
 {
@@ -53,36 +53,39 @@ public:
   pqServerStartups();
   ~pqServerStartups();
 
-  /** Returns "true" if the given server requires startup.  As an example,
-  the "builtin" server never requires startup */
-  bool startupRequired(const pqServerResource& server);
-  /** Returns "true" if a startup has already been configured for the given
-  sever.  If not, the caller will likely want to prompt the user for startup
-  information, or cancel any attempt to start/connect to the given server. */
-  bool startupAvailable(const pqServerResource& server);
-  /** Returns the configured startup for the given server, or NULL */
-  pqServerStartup* getStartup(const pqServerResource& server);
+  /// Defines a collection of startups
+  typedef QStringList StartupsT;
+  /// Returns the set of all configured startups that are configured
+  const StartupsT startups() const;
+  /** Returns the set of startups configured for a specific server
+  (could return zero-to-many results) */
+  const StartupsT startups(const pqServerResource& server) const;
+  /// Returns a configured startup by name, or NULL
+  pqServerStartup* startup(const QString& name) const;
 
-  /// Defines a collection of servers
-  typedef QVector<pqServerResource> ServersT;
-  /// Returns the set of servers that have startups configured.
-  const ServersT servers() const;
-  
-  /// Configures the given server for manual (i.e do nothing) startup.
-  void setManualStartup(const pqServerResource& server);
-  /** Configure the given server for command startup - the given command
+  /// Configures the given startup for manual (i.e do nothing) startup.
+  void setManualStartup(
+    const QString& name,
+    const pqServerResource& server,
+    const QString& owner);
+  /** Configures the given startup for command startup - the given command
   will be executed whenever the server needs to be started. */
   void setCommandStartup(
+    const QString& name,
     const pqServerResource& server,
-    const QString& command_line,
-    double delay);
+    const QString& owner,
+    const QString& binary,
+    double timeout,
+    double delay,
+    const QStringList& arguments);
+    
   /// Removes startup configuration for the given servers
-  void deleteStartups(const ServersT& servers);
+  void deleteStartups(const StartupsT& startups);
   
   /// Saves startup configurations to user preferences
-  void save(pqSettings&);
+  void save(pqSettings&) const;
   /// Saves startup configurations to an XML document
-  void save(QDomDocument&);
+  void save(QDomDocument&) const;
   /// Loads startup configurations from user preferences
   void load(pqSettings&);
   /// Loads startup configurations from an XML document

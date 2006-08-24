@@ -67,6 +67,8 @@ public:
   int indent() const;
   
 public slots:
+  /// Sets the expanded/collapsed state of the container
+  void setExpanded(bool);
   /// Expands the container so children are visible
   void expand();
   /// Collapses the container so children are hidden

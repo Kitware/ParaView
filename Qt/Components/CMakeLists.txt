@@ -48,7 +48,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqComboBoxDomain.h
   pqContourPanel.h
   pqCreateServerStartupDialog.h
-  pqEditServerStartupDialog.h
   pqCustomFilterDefinitionWizard.h
   pqCustomFilterManager.h
   pqCustomFilterManagerModel.h
@@ -61,6 +60,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDisplayProxyEditor.h
   pqDisplayRepresentationWidget.h
   pqDoubleSpinBoxDomain.h
+  pqEditServerStartupDialog.h
   pqElementInspectorWidget.h
   pqExodusPanel.h
   pqHandleWidget.h
@@ -69,7 +69,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLineWidget.h
   pqLoadedFormObjectPanel.h
   pqMainWindowCore.h
-  pqManageServersDialog.h
   pqMultiView.h
   pqMultiViewFrame.h
   pqNamedObjectPanel.h
@@ -90,6 +89,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSelectionManager.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
+  pqServerStartupBrowser.h
   pqServerStartupDialog.h
   pqSettingsDialog.h
   pqSignalAdaptorProxyList.h
@@ -127,7 +127,6 @@ SET(UI_FORMS
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqLineWidget.ui
-  Resources/UI/pqManageServersDialog.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqRenderViewEditor.ui
@@ -185,8 +184,6 @@ ADD_LIBRARY(pqComponents
   pqContourPanel.h
   pqCreateServerStartupDialog.cxx
   pqCreateServerStartupDialog.h
-  pqEditServerStartupDialog.cxx
-  pqEditServerStartupDialog.h
   pqCustomFilterDefinitionModel.cxx
   pqCustomFilterDefinitionModel.h
   pqCustomFilterDefinitionWizard.cxx
@@ -213,6 +210,8 @@ ADD_LIBRARY(pqComponents
   pqDisplayRepresentationWidget.h
   pqDoubleSpinBoxDomain.cxx
   pqDoubleSpinBoxDomain.h
+  pqEditServerStartupDialog.cxx
+  pqEditServerStartupDialog.h
   pqElementInspectorWidget.cxx
   pqElementInspectorWidget.h
   pqExodusPanel.cxx
@@ -229,8 +228,6 @@ ADD_LIBRARY(pqComponents
   pqLoadedFormObjectPanel.h
   pqMainWindowCore.cxx
   pqMainWindowCore.h
-  pqManageServersDialog.cxx
-  pqManageServersDialog.h
   pqMultiView.cxx
   pqMultiView.h
   pqMultiViewFrame.cxx
@@ -275,6 +272,8 @@ ADD_LIBRARY(pqComponents
   pqServerBrowser.h
   pqServerFileDialogModel.cxx
   pqServerFileDialogModel.h
+  pqServerStartupBrowser.cxx
+  pqServerStartupBrowser.h
   pqServerStartupDialog.cxx
   pqServerStartupDialog.h
   pqSignalAdaptorProxyList.cxx

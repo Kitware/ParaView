@@ -30,14 +30,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqCreateServerStartupDialog.h"
+#include "pqEditServerStartupDialog.h"
 #include "pqServerBrowser.h"
 #include "pqSimpleServerStartup.h"
 #include "ui_pqServerBrowser.h"
 
 #include <pqApplicationCore.h>
-#include <pqServerResource.h>
+#include <pqFileDialog.h>
+#include <pqLocalFileDialogModel.h>
 #include <pqServerResources.h>
+#include <pqServerStartup.h>
+#include <pqServerStartups.h>
 
+#include <QFile>
 #include <QtDebug>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -46,158 +52,270 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServerBrowser::pqImplementation
 {
 public:
-  pqImplementation() :
-    ServerStartup(
-      *pqApplicationCore::instance()->settings(),
-      pqApplicationCore::instance()->serverStartups())  
+  pqImplementation(pqServerStartups& startups, pqSettings& settings) :
+    Startups(startups),
+    Settings(settings),
+    SelectedServer(0)
   {
   }
 
   Ui::pqServerBrowser UI;
-  
-  pqServerResource Server;
-  pqSimpleServerStartup ServerStartup;
-  pqServer* ConnectedServer;
+  pqServerStartups& Startups;
+  pqSettings& Settings;
+  pqServerStartup* SelectedServer;
 };
 
 //////////////////////////////////////////////////////////////////////////////
 // pqServerBrowser
 
-pqServerBrowser::pqServerBrowser(QWidget* Parent) :
+pqServerBrowser::pqServerBrowser(
+    pqServerStartups& startups,
+    pqSettings& settings,
+    QWidget* Parent) :
   Superclass(Parent),
-  Implementation(new pqImplementation())
+  Implementation(new pqImplementation(startups, settings))
 {
   this->Implementation->UI.setupUi(this);
   this->setObjectName("ServerBrowser");
-  this->setWindowTitle(tr("Pick Server:"));
   
+  this->onStartupsChanged();
+  this->onCurrentItemChanged(0, 0);
+
   QObject::connect(
-    this->Implementation->UI.serverType,
-    SIGNAL(activated(int)),
+    &this->Implementation->Startups,
+    SIGNAL(changed()),
     this,
-    SLOT(onServerTypeActivated(int)));
-
-  this->Implementation->UI.serverType->setCurrentIndex(0);
-  this->onServerTypeActivated(0);
-
-  this->Implementation->ConnectedServer=NULL;
+    SLOT(onStartupsChanged()));
+  QObject::connect(
+    this->Implementation->UI.startups,
+    SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
+    this,
+    SLOT(onCurrentItemChanged(QListWidgetItem*, QListWidgetItem*)));
+  QObject::connect(
+    this->Implementation->UI.startups,
+    SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+    this,
+    SLOT(onItemDoubleClicked(QListWidgetItem*)));
   
-  connect(
-    &this->Implementation->ServerStartup,
-    SIGNAL(serverCancelled()),
-    this,
-    SLOT(onServerCancelled()));
-  
-  connect(
-    &this->Implementation->ServerStartup,
-    SIGNAL(serverFailed()),
-    this,
-    SLOT(onServerFailed()));
-  
-  connect(
-    &this->Implementation->ServerStartup,
-    SIGNAL(serverStarted(pqServer*)),
-    this,
-    SLOT(onServerStarted(pqServer*)));
+  QObject::connect(this->Implementation->UI.addServer, SIGNAL(clicked()),
+    this, SLOT(onAddServer()));
+  QObject::connect(this->Implementation->UI.editServer, SIGNAL(clicked()),
+    this, SLOT(onEditServer()));
+  QObject::connect(this->Implementation->UI.deleteServer, SIGNAL(clicked()),
+    this, SLOT(onDeleteServer()));
+  QObject::connect(this->Implementation->UI.save, SIGNAL(clicked()),
+    this, SLOT(onSave()));
+  QObject::connect(this->Implementation->UI.load, SIGNAL(clicked()),
+    this, SLOT(onLoad()));
+    
+  QObject::connect(this->Implementation->UI.connect, SIGNAL(clicked()),
+    this, SLOT(onConnect()));
+  QObject::connect(this->Implementation->UI.close, SIGNAL(clicked()),
+    this, SLOT(close()));
 }
 
 pqServerBrowser::~pqServerBrowser()
 {
   delete this->Implementation;
 }
-pqServer* pqServerBrowser::getConnectedServer()
+
+void pqServerBrowser::setMessage(const QString& message)
 {
-  return this->Implementation->ConnectedServer;
+  this->Implementation->UI.message->setText(message);
 }
 
-void pqServerBrowser::onServerTypeActivated(int Index)
+pqServerStartup* pqServerBrowser::getSelectedServer()
 {
-  switch(Index)
+  return this->Implementation->SelectedServer;
+}
+
+void pqServerBrowser::onStartupsChanged()
+{
+  this->Implementation->UI.startups->clear();
+  
+  const pqServerStartups::StartupsT startups = this->Implementation->Startups.startups();
+  for(int i = 0; i != startups.size(); ++i)
     {
-    case 0:
-      this->Implementation->UI.stackedWidget->setCurrentIndex(0);
-      break;
-    case 1:
-    case 2:
-      this->Implementation->UI.stackedWidget->setCurrentIndex(1);
-      break;
-    case 3:
-    case 4:
-      this->Implementation->UI.stackedWidget->setCurrentIndex(2);
-      break;
+    this->Implementation->UI.startups->addItem(startups[i]);
     }
 }
 
-void pqServerBrowser::accept()
+void pqServerBrowser::onCurrentItemChanged(QListWidgetItem* current, QListWidgetItem*)
 {
-  pqServerResource server;
-  
-  switch(this->Implementation->UI.serverType->currentIndex())
+  int editable_count = 0;
+  int deletable_count = 0;
+
+  if(current)
     {
-    case 0:
-      server.setScheme("builtin");
-      break;
-      
-    case 1:
-      server.setScheme("cs");
-      server.setHost(this->Implementation->UI.host->text());
-      server.setPort(this->Implementation->UI.port->value());
-      break;
-
-    case 2:
-      server.setScheme("csrc");
-      server.setHost(this->Implementation->UI.host->text());
-      server.setPort(this->Implementation->UI.port->value());
-      break;
-
-    case 3:
-      server.setScheme("cdsrs");
-      server.setDataServerHost(this->Implementation->UI.dataServerHost->text());
-      server.setDataServerPort(this->Implementation->UI.dataServerPort->value());
-      server.setRenderServerHost(this->Implementation->UI.renderServerHost->text());
-      server.setRenderServerPort(this->Implementation->UI.renderServerPort->value());
-      break;
+    editable_count += 1;
     
-    case 4:
-      server.setScheme("cdsrsrc");
-      server.setDataServerHost(this->Implementation->UI.dataServerHost->text());
-      server.setDataServerPort(this->Implementation->UI.dataServerPort->value());
-      server.setRenderServerHost(this->Implementation->UI.renderServerHost->text());
-      server.setRenderServerPort(this->Implementation->UI.renderServerPort->value());
-      break;
-
-    default:
-      qCritical() << "Unknown server type";
-      Superclass::accept();
-      return;
+    pqServerStartup* const startup = this->Implementation->Startups.startup(current->text());
+    if(startup && startup->owner() == "user")
+      {
+      deletable_count += 1;
+      }
     }
-  
-  this->Implementation->Server = server;
-  this->Implementation->ServerStartup.startServer(server);
+
+  this->Implementation->UI.editServer->setEnabled(editable_count == 1);
+  this->Implementation->UI.deleteServer->setEnabled(deletable_count == 1);
+  this->Implementation->UI.connect->setEnabled(current);
 }
 
-void pqServerBrowser::onServerCancelled()
+void pqServerBrowser::onItemDoubleClicked(QListWidgetItem* item)
 {
-  Superclass::accept();
-}
-
-void pqServerBrowser::onServerFailed()
-{
-  Superclass::accept();
-}
-
-void pqServerBrowser::onServerStarted(pqServer* server)
-{
-  if(server)
+  if(item)
     {
-    pqServerResources& resources =
-      pqApplicationCore::instance()->serverResources();
-
-    resources.add(this->Implementation->Server);
-
-    this->Implementation->ConnectedServer=server;
-    emit this->serverConnected(server);
+    if(pqServerStartup* const startup =
+      this->Implementation->Startups.startup(item->text()))
+      {
+      this->emitServerSelected(*startup);
+      }
     }
+}
 
-  Superclass::accept();
+void pqServerBrowser::onAddServer()
+{
+  pqCreateServerStartupDialog create_server_dialog;
+  if(QDialog::Accepted == create_server_dialog.exec())
+    {
+    pqEditServerStartupDialog edit_server_dialog(
+      this->Implementation->Startups,
+      create_server_dialog.name(),
+      create_server_dialog.server());
+    if(QDialog::Accepted == edit_server_dialog.exec())
+      {
+      this->Implementation->Startups.save(this->Implementation->Settings);
+      }
+    }
+}
+
+void pqServerBrowser::onEditServer()
+{
+  for(int row = 0; row != this->Implementation->UI.startups->count(); ++row)
+    {
+    QListWidgetItem* const item = this->Implementation->UI.startups->item(row);
+    if(this->Implementation->UI.startups->isItemSelected(item))
+      {
+      if(pqServerStartup* const startup = this->Implementation->Startups.startup(item->text()))
+        {
+        pqEditServerStartupDialog dialog(
+          this->Implementation->Startups,
+          startup->name(),
+          startup->server());
+        if(QDialog::Accepted == dialog.exec())
+          {
+          this->Implementation->Startups.save(this->Implementation->Settings);
+          }
+        }
+      }
+    }
+}
+
+void pqServerBrowser::onDeleteServer()
+{
+  pqServerStartups::StartupsT startups;
+  for(int row = 0; row != this->Implementation->UI.startups->count(); ++row)
+    {
+    QListWidgetItem* const item = this->Implementation->UI.startups->item(row);
+    if(this->Implementation->UI.startups->isItemSelected(item))
+      {
+      startups.push_back(item->text());
+      }
+    }
+    
+  this->Implementation->Startups.deleteStartups(startups);
+}
+
+void pqServerBrowser::onSave()
+{
+  QString filters;
+  filters += "ParaView server configuration file (*.pvsc)";
+  filters += ";;All files (*)";
+
+  pqFileDialog* const dialog  = new pqFileDialog(new pqLocalFileDialogModel(),
+      this, tr("Save Server Configuration File:"), QString(), filters);
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  dialog->setObjectName("SaveServerConfigurationDialog");
+  dialog->setFileMode(pqFileDialog::AnyFile);
+  QObject::connect(dialog, SIGNAL(filesSelected(const QStringList&)),
+      this, SLOT(onSave(const QStringList&)));
+  dialog->show();
+}
+
+void pqServerBrowser::onSave(const QStringList& files)
+{
+  QDomDocument xml;
+  this->Implementation->Startups.save(xml);
+
+  for(int i = 0; i != files.size(); ++i)
+    {
+    QFile file(files[i]);
+    if(!file.open(QIODevice::WriteOnly))
+      {
+      qCritical() << "Error opening " << files[i] << "for writing";
+      }
+    file.write(xml.toByteArray());
+    }
+}
+
+void pqServerBrowser::onLoad()
+{
+  QString filters;
+  filters += "ParaView server configuration file (*.pvsc)";
+  filters += ";;All files (*)";
+
+  pqFileDialog* const dialog  = new pqFileDialog(new pqLocalFileDialogModel(),
+      this, tr("Load Server Configuration File:"), QString(), filters);
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  dialog->setObjectName("LoadServerConfigurationDialog");
+  dialog->setFileMode(pqFileDialog::ExistingFile);
+  QObject::connect(dialog, SIGNAL(filesSelected(const QStringList&)),
+      this, SLOT(onLoad(const QStringList&)));
+  dialog->show();
+}
+
+void pqServerBrowser::onLoad(const QStringList& files)
+{
+  for(int i = 0; i != files.size(); ++i)
+    {
+    QFile file(files[i]);
+    QDomDocument xml;
+    if(xml.setContent(&file, false))
+      {
+      this->Implementation->Startups.load(xml);
+      }
+    else
+      {
+      qCritical() << "Error parsing " << files[i] << ": not a valid XML document";
+      }
+    }
+}
+
+void pqServerBrowser::onConnect()
+{
+  if(this->Implementation->UI.startups->currentItem())
+    {
+    if(pqServerStartup* const startup = this->Implementation->Startups.startup(
+      this->Implementation->UI.startups->currentItem()->text()))
+      {
+      this->emitServerSelected(*startup);
+      }
+    }
+}
+
+void pqServerBrowser::onClose()
+{
+  this->reject();
+}
+
+void pqServerBrowser::emitServerSelected(pqServerStartup& startup)
+{
+  this->Implementation->SelectedServer = &startup;
+  emit this->serverSelected(startup);
+  this->onServerSelected(startup);
+}
+
+void pqServerBrowser::onServerSelected(pqServerStartup& startup)
+{
+  this->accept();
 }

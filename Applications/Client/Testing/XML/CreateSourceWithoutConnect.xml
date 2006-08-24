@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <pqevents>
   <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
-  <pqevent object="MainWindow/ServerBrowser/OK" command="activate" arguments="" />
+  <pqevent object="MainWindow/ServerStartupBrowser/startups" command="currentChanged" arguments="/0|0" />
+  <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
 </pqevents>

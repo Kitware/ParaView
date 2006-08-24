@@ -41,36 +41,65 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 
+/////////////////////////////////////////////////////////////////////////
+// pqEditServerStartupDialog::pqImplementation
+
 class pqEditServerStartupDialog::pqImplementation
 {
 public:
   pqImplementation(
     pqServerStartups& startups,
+    const QString& name,
     const pqServerResource& server) :
     Startups(startups),
+    Name(name),
     Server(server)
   {
   }
 
   Ui::pqEditServerStartupDialog UI;
   pqServerStartups& Startups;
+  const QString Name;
   const pqServerResource Server;
 };
 
+/////////////////////////////////////////////////////////////////////////
+// pqEditServerStartupDialog
+
 pqEditServerStartupDialog::pqEditServerStartupDialog(
   pqServerStartups& startups,
+  const QString& name,
   const pqServerResource& server,
   QWidget* widget_parent) :
     Superclass(widget_parent),
-    Implementation(new pqImplementation(startups, server))
+    Implementation(new pqImplementation(startups, name, server))
 {
   this->Implementation->UI.setupUi(this);
+  
   this->Implementation->UI.message->setText(
-    QString("Configure server %1").arg(
+    QString(tr("Configure %1 (%2)")).arg(name).arg(
       server.schemeHosts().toString()));
-    
-  if(pqServerStartup* const startup = startups.getStartup(server))
+  this->Implementation->UI.secondaryMessage->setText(
+    tr("Please configure the startup procedure to be used when connecting to this server:"));
+  this->Implementation->UI.type->setEnabled(true);
+  this->Implementation->UI.commandLine->setEnabled(true);
+  this->Implementation->UI.delay->setEnabled(true);
+  
+  if(pqServerStartup* const startup = startups.startup(name))
     {
+      if(startup->owner() != "user")
+        {
+        this->Implementation->UI.message->setText(
+          QString(tr("%1 (%2) configuration")).arg(name).arg(
+            server.schemeHosts().toString()));
+        this->Implementation->UI.secondaryMessage->setText(
+          tr("This server was configured by site administrators and cannot be modified."));
+          
+        this->Implementation->UI.type->setEnabled(false);
+        this->Implementation->UI.commandLine->setEnabled(false);
+        this->Implementation->UI.delay->setEnabled(false);
+        }
+    
       if(pqCommandServerStartup* const command_startup =
           dynamic_cast<pqCommandServerStartup*>(startup))
         {
@@ -78,8 +107,8 @@ pqEditServerStartupDialog::pqEditServerStartupDialog(
         this->Implementation->UI.stackedWidget->setCurrentIndex(0);
 
         this->Implementation->UI.commandLine->setPlainText(
-          command_startup->CommandLine);
-        this->Implementation->UI.delay->setValue(command_startup->Delay);
+          command_startup->executable() + " " + command_startup->arguments().join(" "));
+        this->Implementation->UI.delay->setValue(command_startup->delay());
         }
       else if(dynamic_cast<pqManualServerStartup*>(startup))
         {
@@ -106,14 +135,58 @@ void pqEditServerStartupDialog::accept()
   switch(this->Implementation->UI.type->currentIndex())
     {
     case 0:
+      {
+      QStringList arguments;
+      QString command_line = this->Implementation->UI.commandLine->toPlainText().simplified();
+      while(command_line.size())
+        {
+        for(int i = 0; i != command_line.size(); ++i)
+          {
+          if(command_line.at(i).isSpace() && command_line[0] != '\"')
+            {
+            arguments.push_back(command_line.left(i));
+            command_line.remove(0, i+1);
+            break;
+            }
+            
+          if(i && command_line[0] == '\"' && command_line[i] == '\"')
+            {
+            arguments.push_back(command_line.mid(1, i-1));
+            command_line.remove(0, i+2);
+            break;
+            }
+            
+          if(i+1 == command_line.size())
+            {
+            arguments.push_back(command_line);
+            command_line.clear();
+            break;
+            }
+          }
+        }
+
+      QString executable;      
+      if(arguments.size())
+        {
+        executable = arguments[0];
+        arguments.erase(arguments.begin());
+        }
+        
       startups.setCommandStartup(
+        this->Implementation->Name,
         this->Implementation->Server,
-        this->Implementation->UI.commandLine->toPlainText(),
-        this->Implementation->UI.delay->value());
+        "user",
+        executable,
+        0,
+        this->Implementation->UI.delay->value(),
+        arguments);
+      }
       break;
     case 1:
       startups.setManualStartup(
-        this->Implementation->Server);
+        this->Implementation->Name,
+        this->Implementation->Server,
+        "user");
       break;
     default:
       qWarning() << "Unknown server startup type";

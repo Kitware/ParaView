@@ -36,8 +36,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /////////////////////////////////////////////////////////////////////////////
 // pqManualServerStartup
 
-void pqManualServerStartup::execute(
-  const pqServerResource& /*server*/, pqServerStartupContext& context)
+pqManualServerStartup::pqManualServerStartup(
+    const QString& name, 
+    const pqServerResource& server,
+    const QString& owner) :
+  Name(name),
+  Server(server.schemeHosts()),
+  Owner(owner)
+{
+}
+
+const QString pqManualServerStartup::name()
+{
+  return this->Name;
+}
+
+const pqServerResource pqManualServerStartup::server()
+{
+  return this->Server;
+}
+
+const QString pqManualServerStartup::owner()
+{
+  return this->Owner;
+}
+
+const QDomDocument pqManualServerStartup::configuration()
+{
+  QDomDocument xml;
+  xml.appendChild(xml.createElement("ManualStartup"));
+  
+  return xml;
+}
+
+void pqManualServerStartup::execute(const OptionsT& options, pqServerStartupContext& context)
 {
   context.onSucceeded();
 }

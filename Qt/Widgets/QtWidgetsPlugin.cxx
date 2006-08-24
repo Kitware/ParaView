@@ -43,7 +43,7 @@ QString pqCollapsedGroupPlugin::name() const
 
 QString pqCollapsedGroupPlugin::domXml() const
 {
-  return "<widget class=\"pqCollapsedGroup\" name=\"pqCollapsedGroup\">\n"
+  return "<widget class=\"pqCollapsedGroup\" name=\"collapsedGroup\">\n"
     " <property name=\"geometry\">\n"
     "  <rect>\n"
     "   <x>0</x>\n"

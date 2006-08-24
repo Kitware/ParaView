@@ -43,14 +43,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/algorithm>
 
+/////////////////////////////////////////////////////////////////////////////
+// pqRecentFilesMenu::pqImplementation
+
 class pqRecentFilesMenu::pqImplementation
 {
 public:
   pqImplementation(QMenu& menu) :
-    Menu(menu),
-    ServerStartup(
-      *pqApplicationCore::instance()->settings(),
-      pqApplicationCore::instance()->serverStartups())
+    Menu(menu)
   {
   }
   
@@ -80,6 +80,9 @@ public:
     const pqServerResource& LHS;
   };
 };
+
+/////////////////////////////////////////////////////////////////////////////
+// pqRecentFilesMenu
 
 pqRecentFilesMenu::pqRecentFilesMenu(QMenu& menu) :
   Implementation(new pqImplementation(menu))
@@ -139,7 +142,7 @@ void pqRecentFilesMenu::onResourcesChanged()
     {
     const pqServerResource& server = servers[i];
     
-    QString label = server.scheme() == "builtin" ? "builtin" : server.host();
+    const QString label = server.schemeHosts().toString();
     
     QAction* const action = new QAction(label, &this->Implementation->Menu);
     action->setData(server.toString());
@@ -211,8 +214,11 @@ void pqRecentFilesMenu::onOpenResource()
     resource.scheme() == "session"
       ? resource.sessionServer().schemeHostsPorts()
       : resource.schemeHostsPorts();
-  
-  this->Implementation->ServerStartup.startServer(server);
+
+  this->Implementation->ServerStartup.startServer(
+    pqApplicationCore::instance()->serverStartups(),
+    *pqApplicationCore::instance()->settings(),
+    server);
 }
 
 void pqRecentFilesMenu::onServerStarted(pqServer* server)

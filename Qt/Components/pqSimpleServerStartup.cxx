@@ -35,7 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSimpleServerStartup.h"
 
 #include <pqApplicationCore.h>
+#include <pqCommandServerStartup.h>
+#include <pqCreateServerStartupDialog.h>
+#include <pqEditServerStartupDialog.h>
 #include <pqServer.h>
+#include <pqServerBrowser.h>
 #include <pqServerManagerModel.h>
 #include <pqServerResource.h>
 #include <pqServerStartupContext.h>
@@ -44,20 +48,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkProcessModule.h>
 #include <vtkProcessModuleConnectionManager.h>
+#include <vtkMath.h>
 
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDoubleSpinBox>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QSpinBox>
 #include <QTimer>
 #include <QtDebug>
+
+#include <vtkstd/map>
+
+//////////////////////////////////////////////////////////////////////////////
+// pqSimpleServerStartup::pqImplementation
 
 class pqSimpleServerStartup::pqImplementation
 {
 public:
-  pqImplementation(pqSettings& settings, pqServerStartups& startups) :
-    Settings(settings),
-    Startups(startups),
+  pqImplementation() :
+    Startup(0),
     StartupContext(0),
     StartupDialog(0),
-    ServerReverseConnection(0)
+    ReverseConnectionID(0)
   {
+    this->Timer.setInterval(10);
   }
   
   ~pqImplementation()
@@ -67,40 +86,46 @@ public:
 
   void reset()
   {
-    this->Server = pqServerResource();
-  
+    this->Startup = 0;
+    this->Timer.stop();
+
     delete this->StartupContext;
     this->StartupContext = 0;
-    
+
     delete this->StartupDialog;
     this->StartupDialog = 0;
     
-    this->ServerReverseConnection = 0;
-    
-    this->ReverseTimer.stop();
+    this->ReverseConnectionID = 0;
+    this->Options.clear();
+    this->Server = pqServerResource();
   }
 
-  pqSettings& Settings;
-  pqServerStartups& Startups;
-  pqServerResource Server;
+  /// Stores a reference to the startup configuration to be used
+  pqServerStartup* Startup;
+  /// Used to check the reverse-connection status periodically
+  QTimer Timer;
+  /// Used to track the progress of a startup as it executes
   pqServerStartupContext* StartupContext;
+  /// Modal dialog used to display progress during startup
   pqServerStartupDialog* StartupDialog;
-  QTimer ReverseTimer;
-  int ServerReverseConnection;
-  
+  /// Connection identifier returned by the server manager during reverse-connection startup
+  int ReverseConnectionID;
+  /// Stores options defined by the user prior to startup
+  pqServerStartup::OptionsT Options;
+  /** Stores a complete description of the server to be started
+  (differs from the startup server if the user has chosen nonstandard ports */
+  pqServerResource Server;
 };
 
-pqSimpleServerStartup::pqSimpleServerStartup(
-    pqSettings& settings,
-    pqServerStartups& startups,
-    QObject* p) :
+//////////////////////////////////////////////////////////////////////////////
+// pqSimpleServerStartup
+
+pqSimpleServerStartup::pqSimpleServerStartup(QObject* p) :
   Superclass(p),
-  Implementation(new pqImplementation(settings, startups))
+  Implementation(new pqImplementation())
 {
-  this->Implementation->ReverseTimer.setInterval(10);
-  
   QObject::connect(
-    &this->Implementation->ReverseTimer,
+    &this->Implementation->Timer,
     SIGNAL(timeout()),
     this,
     SLOT(monitorReverseConnections()));
@@ -111,66 +136,360 @@ pqSimpleServerStartup::~pqSimpleServerStartup()
   delete this->Implementation;
 }
 
-void pqSimpleServerStartup::startServer(const pqServerResource& resource)
+void pqSimpleServerStartup::startServer(pqServerStartup& startup)
 {
-  // Cleanup old connections ...
-  this->Implementation->reset();
-  
-  // Get the actual server to be started ...
-  const pqServerResource server = resource.scheme() == "session"
-    ? resource.sessionServer().schemeHostsPorts()
-    : resource.schemeHostsPorts();
-  
-  this->Implementation->Server = server;
-  
-  // If no startup is required for this server, jump to make the connection ...
-  pqServerStartups& startups = this->Implementation->Startups;
-  if(startups.startupRequired(server))
+  // Get the named startup ...
+  this->Implementation->Startup = &startup;
+  this->Implementation->Server = startup.server();
+      
+  // Prompt the user for runtime server arguments ...
+  if(!this->promptRuntimeArguments())
     {
-    // If a startup isn't available for this server, prompt the user ...    
-    if(!startups.startupAvailable(server))
-      {
-      pqEditServerStartupDialog dialog(startups, server);
-      if(QDialog::Rejected == dialog.exec())
-        {
-        emit this->serverCancelled();
-        return;
-        }
-        
-      startups.save(this->Implementation->Settings);
-      }
-    }
+    this->cancelled();
+    return;
+    }    
 
   // Branch based on the connection type - builtin, forward, or reverse ...
-  if(server.scheme() == "builtin")
+  if(startup.server().scheme() == "builtin")
     {
     this->startBuiltinConnection();
     }
-  else if(server.scheme() == "cs" || server.scheme() == "cdsrs")
+  else if(startup.server().scheme() == "cs" || startup.server().scheme() == "cdsrs")
     {
     this->startForwardConnection();
     }
-  else if(server.scheme() == "csrc" || server.scheme() == "cdsrsrc")
+  else if(startup.server().scheme() == "csrc" || startup.server().scheme() == "cdsrsrc")
     {
     this->startReverseConnection();
     }
   else
     {
-    qCritical() << "Unknown server scheme: " << server.scheme();
-    emit this->serverFailed();
+    qCritical() << "Unknown server scheme: " << startup.server().scheme();
+    this->failed();
     }
+}
+
+void pqSimpleServerStartup::startServer(
+  pqServerStartups& server_startups,
+  pqSettings& settings,
+  const pqServerResource& server)
+{
+  // There may be zero, one, or more-than-one startup already configured for this server
+  const pqServerStartups::StartupsT startups =
+    server_startups.startups(server);
+    
+  // No startup, yet, so prompt the user to create one ...
+  if(0 == startups.size())
+    {
+    pqCreateServerStartupDialog create_server_dialog(server);
+    if(QDialog::Accepted == create_server_dialog.exec())
+      {
+      pqEditServerStartupDialog edit_server_dialog(
+        server_startups,
+        create_server_dialog.name(),
+        create_server_dialog.server());
+      if(QDialog::Accepted == edit_server_dialog.exec())
+        {
+        server_startups.save(settings);
+        if(pqServerStartup* const startup = server_startups.startup(
+          create_server_dialog.name()))
+          {
+          this->startServer(*startup);
+          }
+        }
+      }
+    }
+  // Exactly one startup, so just use it already ...
+  else if(1 == startups.size())
+    {
+    if(pqServerStartup* const startup = server_startups.startup(startups[0]))
+      {
+      this->startServer(*startup);
+      }
+    }
+  // More than one startup, so prompt the user to pick one ...
+  else
+    {
+    pqServerBrowser dialog(server_startups, settings);
+    dialog.setMessage(QString(tr("Pick the configuration for starting %1")).arg(server.schemeHosts().toString()));
+    
+    if(QDialog::Accepted == dialog.exec())
+      {
+      if(dialog.getSelectedServer())
+        {
+        this->startServer(*dialog.getSelectedServer());
+        }
+      }
+    else
+      {
+      this->cancelled();
+      }
+    }
+}
+
+void pqSimpleServerStartup::cancelled()
+{
+  this->Implementation->reset();
+  emit this->serverCancelled();
+}
+
+void pqSimpleServerStartup::failed()
+{
+  this->Implementation->reset();
+  emit this->serverFailed();
+}
+
+void pqSimpleServerStartup::started(pqServer* server)
+{
+  this->Implementation->reset();
+  emit this->serverStarted(server);
+}
+
+bool pqSimpleServerStartup::promptRuntimeArguments()
+{
+  // Never prompt for the builtin server
+  const pqServerResource& server = this->Implementation->Server;
+  if(server.scheme() == "builtin")
+    {
+    return true;
+    }
+
+  QDialog dialog;
+  dialog.setWindowTitle("Start " + this->Implementation->Server.toString());
+  
+  QGridLayout* const layout = new QGridLayout();
+  dialog.setLayout(layout);
+
+  const int label_column = 0;
+  const int widget_column = 1;
+  
+  typedef vtkstd::map<QString, QWidget*> widgets_t;
+  widgets_t widgets;
+  
+  vtkstd::map<QString, QString> true_values;
+  vtkstd::map<QString, QString> false_values;
+  
+  // Prompt for port numbers ...
+  if(server.scheme() == "cs" || server.scheme() == "csrc")
+    {
+    layout->addWidget(new QLabel("Port:"), 0, label_column, Qt::AlignLeft | Qt::AlignVCenter);
+
+    QSpinBox* const widget = new QSpinBox();
+    widget->setRange(1, 65535);
+    widget->setValue(11111);
+    layout->addWidget(widget, 0, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
+    widgets["PV_SERVER_PORT"] = widget;
+    }
+  else if(server.scheme() == "cdsrs" || server.scheme() == "cdsrsrc")
+    {
+    layout->addWidget(new QLabel("Data Server Port:"), 0, label_column, Qt::AlignLeft | Qt::AlignVCenter);
+    QSpinBox* const data_widget = new QSpinBox();
+    data_widget->setRange(1, 65535);
+    data_widget->setValue(11111);
+    layout->addWidget(data_widget, 0, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
+    widgets["PV_DATA_SERVER_PORT"] = data_widget;
+
+    layout->addWidget(new QLabel("Render Server Port:"), 1, label_column, Qt::AlignLeft | Qt::AlignVCenter);
+    QSpinBox* const render_widget = new QSpinBox();
+    render_widget->setRange(1, 65535);
+    render_widget->setValue(22221);
+    layout->addWidget(render_widget, 1, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
+    widgets["PV_RENDER_SERVER_PORT"] = render_widget;
+    }  
+
+  // Prompt for configured options ...  
+  QDomDocument xml = this->Implementation->Startup->configuration();
+  QDomElement xml_command_startup = xml.firstChildElement("CommandStartup");
+  if(!xml_command_startup.isNull())
+    {
+    QDomElement xml_options = xml_command_startup.firstChildElement("Options");
+    if(!xml_options.isNull())
+      {
+      for(QDomNode xml_option = xml_options.firstChild(); !xml_option.isNull(); xml_option = xml_option.nextSibling())
+        {
+        if(xml_option.isElement() && xml_option.toElement().tagName() == "Option")
+          {
+          const QString option_name = xml_option.toElement().attribute("name");
+          const QString option_label = xml_option.toElement().attribute("label");
+          const bool option_readonly = xml_option.toElement().attribute("readonly") == "true";
+
+          QDomNode xml_type = xml_option.firstChildElement();
+          if(xml_type.isElement())
+            {
+            const int row = layout->rowCount();
+            
+            QLabel* const label = new QLabel(option_label + ":");
+            layout->addWidget(label, row, label_column, Qt::AlignLeft | Qt::AlignVCenter);
+            
+            if(xml_type.toElement().tagName() == "Range")
+              {
+              const QString range_type = xml_type.toElement().attribute("type");
+              if(range_type == "int")
+                {
+                const QString widget_min = xml_type.toElement().attribute("min");
+                const QString widget_max = xml_type.toElement().attribute("max");
+                const QString widget_step = xml_type.toElement().attribute("step");
+                const QString widget_default = xml_type.toElement().attribute("default");
+
+                QSpinBox* const widget = new QSpinBox();
+                widget->setMinimum(widget_min.toInt());
+                widget->setMaximum(widget_max.toInt());
+                widget->setSingleStep(widget_step.toInt());
+                if(widget_default == "random")
+                  {
+                  widget->setValue(static_cast<int>(
+                    vtkMath::Random(widget_min.toInt(), widget_max.toInt())));
+                  }
+                else
+                  {
+                  widget->setValue(widget_default.toInt());
+                  }
+                widget->setEnabled(!option_readonly);
+                
+                layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
+                widgets[option_name] = widget;
+                }
+              else if(range_type == "double")
+                {
+                const QString widget_min = xml_type.toElement().attribute("min");
+                const QString widget_max = xml_type.toElement().attribute("max");
+                const QString widget_step = xml_type.toElement().attribute("step");
+                const QString widget_precision = xml_type.toElement().attribute("precision");
+                const QString widget_default = xml_type.toElement().attribute("default");
+
+                QDoubleSpinBox* const widget = new QDoubleSpinBox();
+                widget->setMinimum(widget_min.toDouble());
+                widget->setMaximum(widget_max.toDouble());
+                widget->setSingleStep(widget_step.toDouble());
+                widget->setDecimals(widget_precision.toInt());
+                widget->setValue(widget_default.toDouble());
+                widget->setEnabled(!option_readonly);
+                
+                layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
+                widgets[option_name] = widget;
+                }
+              }
+            else if(xml_type.toElement().tagName() == "String")
+              {
+              const QString widget_default = xml_type.toElement().attribute("default");
+              QLineEdit* const widget = new QLineEdit(widget_default);
+              widget->setEnabled(!option_readonly);
+              layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
+              widgets[option_name] = widget;
+              }
+            else if(xml_type.toElement().tagName() == "Boolean")
+              {
+              const QString widget_true = xml_type.toElement().attribute("true");
+              const QString widget_false = xml_type.toElement().attribute("false");
+              const QString widget_default = xml_type.toElement().attribute("default");
+              
+              QCheckBox* const widget = new QCheckBox();
+              widget->setChecked(widget_default == "true");
+              widget->setEnabled(!option_readonly);
+              
+              layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
+              widgets[option_name] = widget;
+              true_values[option_name] = widget_true;
+              false_values[option_name] = widget_false;
+              }
+            else if(xml_type.toElement().tagName() == "Enumeration")
+              {
+              const QString widget_default = xml_type.toElement().attribute("default");
+              QComboBox* const widget = new QComboBox();
+
+              for(QDomNode xml_enumeration = xml_type.firstChild(); !xml_enumeration.isNull(); xml_enumeration = xml_enumeration.nextSibling())
+                {
+                if(xml_enumeration.isElement() && xml_enumeration.toElement().tagName() == "Entry") 
+                  {
+                  const QString value = xml_enumeration.toElement().attribute("value");
+                  const QString label = xml_enumeration.toElement().attribute("label");
+                  widget->addItem(label, value);
+                  }
+                }
+              
+              widget->setCurrentIndex(widget->findData(widget_default));
+              widget->setEnabled(!option_readonly);
+              
+              layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
+              widgets[option_name] = widget;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+  layout->setRowStretch(layout->rowCount(), 1);
+  
+  QHBoxLayout* const button_layout = new QHBoxLayout();
+  button_layout->addStretch(1);
+  
+  QPushButton* const ok_button = new QPushButton(tr("Connect"));
+  QObject::connect(ok_button, SIGNAL(clicked()), &dialog, SLOT(accept()));
+  button_layout->addWidget(ok_button);
+  
+  QPushButton* const cancel_button = new QPushButton(tr("Cancel"));
+  QObject::connect(cancel_button, SIGNAL(clicked()), &dialog, SLOT(reject()));
+  button_layout->addWidget(cancel_button);
+  
+  layout->addLayout(button_layout, layout->rowCount(), 0, 1, 2);
+  
+  if(QDialog::Accepted != dialog.exec())
+    return false;
+
+  for(widgets_t::const_iterator option = widgets.begin(); option != widgets.end(); ++option)
+    {
+    const QString option_name = option->first;
+    QWidget* const option_widget = option->second;
+    
+    if(QSpinBox* const widget = qobject_cast<QSpinBox*>(option_widget))
+      {
+      this->Implementation->Options[option_name] = QString::number(widget->value());
+      }
+    else if(QDoubleSpinBox* const widget = qobject_cast<QDoubleSpinBox*>(option_widget))
+      {
+      this->Implementation->Options[option_name] = QString::number(widget->value());
+      }
+    else if(QLineEdit* const widget = qobject_cast<QLineEdit*>(option_widget))
+      {
+      this->Implementation->Options[option_name] = widget->text();
+      }
+    else if(QCheckBox* const widget = qobject_cast<QCheckBox*>(option_widget))
+      {
+      this->Implementation->Options[option_name] = widget->isChecked() ? true_values[option_name] : false_values[option_name];
+      }
+    else if(QComboBox* const widget = qobject_cast<QComboBox*>(option_widget))
+      {
+      this->Implementation->Options[option_name] = widget->itemData(widget->currentIndex()).toString();
+      }
+    }
+
+  if(!this->Implementation->Options["PV_SERVER_PORT"].isEmpty())
+    {
+    this->Implementation->Server.setPort(this->Implementation->Options["PV_SERVER_PORT"].toInt());
+    }
+  if(!this->Implementation->Options["PV_DATA_SERVER_PORT"].isEmpty())
+    {
+    this->Implementation->Server.setDataServerPort(this->Implementation->Options["PV_DATA_SERVER_PORT"].toInt());
+    }
+  if(!this->Implementation->Options["PV_RENDER_SERVER_PORT"].isEmpty())
+    {
+    this->Implementation->Server.setRenderServerPort(this->Implementation->Options["PV_RENDER_SERVER_PORT"].toInt());
+    }
+
+  return true;
 }
 
 void pqSimpleServerStartup::startBuiltinConnection()
 {
   if(pqServer* const server = pqApplicationCore::instance()->createServer(
-    this->Implementation->Server))
+    pqServerResource("builtin:")))
     {
-    emit this->serverStarted(server);
+    this->started(server);
     }
   else
     {
-    emit this->serverFailed();
+    this->failed();
     }
 }
 
@@ -180,47 +499,43 @@ void pqSimpleServerStartup::startForwardConnection()
     pqApplicationCore::instance()->getServerManagerModel()->getServer(
       this->Implementation->Server))
     {
-    emit this->serverStarted(existing_server);
+    this->started(existing_server);
+    return;
     }
 
-  if(pqServerStartup* const startup =
-    this->Implementation->Startups.getStartup(
-      this->Implementation->Server))
-    {
-    this->Implementation->StartupContext = new pqServerStartupContext();
+  this->Implementation->StartupContext = new pqServerStartupContext();
+  
+  this->Implementation->StartupDialog =
+    new pqServerStartupDialog(this->Implementation->Server);
+  this->Implementation->StartupDialog->show();
+  
+  QObject::connect(
+    this->Implementation->StartupContext,
+    SIGNAL(succeeded()),
+    this,
+    SLOT(forwardConnectServer()));
     
-    this->Implementation->StartupDialog =
-      new pqServerStartupDialog(this->Implementation->Server);
-    this->Implementation->StartupDialog->show();
+  QObject::connect(
+    this->Implementation->StartupContext,
+    SIGNAL(succeeded()),
+    this->Implementation->StartupDialog,
+    SLOT(hide()));
     
-    QObject::connect(
-      this->Implementation->StartupContext,
-      SIGNAL(succeeded()),
-      this,
-      SLOT(forwardConnectServer()));
-      
-    QObject::connect(
-      this->Implementation->StartupContext,
-      SIGNAL(succeeded()),
-      this->Implementation->StartupDialog,
-      SLOT(hide()));
-      
-    QObject::connect(
-      this->Implementation->StartupContext,
-      SIGNAL(failed()),
-      this,
-      SIGNAL(serverFailed()));
-    
-    QObject::connect(
-      this->Implementation->StartupContext,
-      SIGNAL(failed()),
-      this->Implementation->StartupDialog,
-      SLOT(hide()));
-    
-    startup->execute(
-      this->Implementation->Server,
-      *this->Implementation->StartupContext);
-    }
+  QObject::connect(
+    this->Implementation->StartupContext,
+    SIGNAL(failed()),
+    this,
+    SLOT(failed()));
+  
+  QObject::connect(
+    this->Implementation->StartupContext,
+    SIGNAL(failed()),
+    this->Implementation->StartupDialog,
+    SLOT(hide()));
+  
+  this->Implementation->Startup->execute(
+    this->Implementation->Options,
+    *this->Implementation->StartupContext);
 }
 
 void pqSimpleServerStartup::forwardConnectServer()
@@ -228,11 +543,11 @@ void pqSimpleServerStartup::forwardConnectServer()
   if(pqServer* const server = pqApplicationCore::instance()->createServer(
     this->Implementation->Server))
     {
-    emit this->serverStarted(server);
+    this->started(server);
     }
   else
     {
-    emit this->serverFailed();
+    this->failed();
     }
 }
 
@@ -242,7 +557,8 @@ void pqSimpleServerStartup::startReverseConnection()
     pqApplicationCore::instance()->getServerManagerModel()->getServer(
       this->Implementation->Server))
     {
-    emit this->serverStarted(existing_server);
+    this->started(existing_server);
+    return;
     }
 
   vtkProcessModule* const process_module = vtkProcessModule::GetProcessModule();
@@ -251,7 +567,7 @@ void pqSimpleServerStartup::startReverseConnection()
     pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)),
     this,
-    SLOT(reverseConnection(pqServer*)));
+    SLOT(finishReverseConnection(pqServer*)));
   
   if(this->Implementation->Server.scheme() == "csrc")
     {
@@ -268,44 +584,39 @@ void pqSimpleServerStartup::startReverseConnection()
       rsid);
     }
     
-  if(pqServerStartup* const startup =
-    this->Implementation->Startups.getStartup(
-      this->Implementation->Server))
-    {
-    this->Implementation->StartupContext = new pqServerStartupContext();
+  this->Implementation->StartupContext = new pqServerStartupContext();
 
-    this->Implementation->StartupDialog =
-      new pqServerStartupDialog(this->Implementation->Server);
-    this->Implementation->StartupDialog->show();
+  this->Implementation->StartupDialog =
+    new pqServerStartupDialog(this->Implementation->Server);
+  this->Implementation->StartupDialog->show();
 
-    QObject::connect(
-      this->Implementation->StartupContext,
-      SIGNAL(succeeded()),
-      &this->Implementation->ReverseTimer,
-      SLOT(start()));
-      
-    QObject::connect(
-      this->Implementation->StartupContext,
-      SIGNAL(failed()),
-      this,
-      SIGNAL(serverFailed()));
+  QObject::connect(
+    this->Implementation->StartupContext,
+    SIGNAL(succeeded()),
+    &this->Implementation->Timer,
+    SLOT(start()));
     
-    QObject::connect(
-      this->Implementation->StartupContext,
-      SIGNAL(failed()),
-      this->Implementation->StartupDialog,
-      SLOT(hide()));
+  QObject::connect(
+    this->Implementation->StartupContext,
+    SIGNAL(failed()),
+    this,
+    SLOT(failed()));
   
-    QObject::connect(
-      this->Implementation->StartupContext,
-      SIGNAL(failed()),
-      &this->Implementation->ReverseTimer,
-      SLOT(stop()));
-  
-    startup->execute(
-      this->Implementation->Server,
-      *this->Implementation->StartupContext);
-    }
+  QObject::connect(
+    this->Implementation->StartupContext,
+    SIGNAL(failed()),
+    this->Implementation->StartupDialog,
+    SLOT(hide()));
+
+  QObject::connect(
+    this->Implementation->StartupContext,
+    SIGNAL(failed()),
+    &this->Implementation->Timer,
+    SLOT(stop()));
+
+  this->Implementation->Startup->execute(
+    this->Implementation->Options,
+    *this->Implementation->StartupContext);
 }
 
 void pqSimpleServerStartup::monitorReverseConnections()
@@ -313,23 +624,23 @@ void pqSimpleServerStartup::monitorReverseConnections()
   vtkProcessModule* const process_module = vtkProcessModule::GetProcessModule();
   if(-1 == process_module->MonitorConnections(10))
     {
-    this->Implementation->ReverseTimer.stop();
+    this->Implementation->Timer.stop();
     this->Implementation->StartupDialog->hide();
-    emit this->serverFailed();
+    this->failed();
     }
 }
 
-void pqSimpleServerStartup::reverseConnection(pqServer* server)
+void pqSimpleServerStartup::finishReverseConnection(pqServer* server)
 {
   QObject::disconnect(
     pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)),
     this,
-    SLOT(reverseConnection(pqServer*)));
+    SLOT(finishReverseConnection(pqServer*)));
 
   server->setResource(this->Implementation->Server);
 
-  this->Implementation->ReverseTimer.stop();
+  this->Implementation->Timer.stop();
   this->Implementation->StartupDialog->hide();
-  emit this->serverStarted(server);
+  this->started(server);
 }

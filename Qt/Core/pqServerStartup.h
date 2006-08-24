@@ -33,7 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqServerStartup_h
 #define _pqServerStartup_h
 
-class pqServerResource;
+#include "pqServerResource.h"
+
+#include <QDomDocument>
+#include <QMap>
+
 class pqServerStartupContext;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -44,12 +48,25 @@ class pqServerStartup
 {
 public:
   virtual ~pqServerStartup() {}
+
+  /// Returns the name of this startup
+  virtual const QString name() = 0;
+  /// Returns the server for this startup
+  virtual const pqServerResource server() = 0;
+  /// Returns the user who owns this startup
+  virtual const QString owner() = 0;
+  /// Returns an XML description of the configuration for this startup
+  virtual const QDomDocument configuration() = 0;
   
+  /// Defines a generic collection of name-value-pair "options" that will be
+  /// set by the user prior to server startup
+  typedef QMap<QString, QString> OptionsT;
+    
   /** Begins (asynchronous) execution of the startup procedure.  Callers should
-  create a pqServerStartupContext object to pass to this funtion, and connect
+  create a pqServerStartupContext object to pass to this method, and connect
   to its startupSucceed() and startupFailed() signals to receive notification
   that the startup procedure has been completed. */
-  virtual void execute(const pqServerResource& server, pqServerStartupContext& context) = 0;
+  virtual void execute(const OptionsT& options, pqServerStartupContext& context) = 0;
   
 protected:
   pqServerStartup() {}

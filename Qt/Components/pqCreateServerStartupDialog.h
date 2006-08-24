@@ -44,17 +44,19 @@ class PQCOMPONENTS_EXPORT pqCreateServerStartupDialog :
   Q_OBJECT
   
 public:
-  pqCreateServerStartupDialog(QWidget* parent = 0);
+  pqCreateServerStartupDialog(
+    const pqServerResource& server = pqServerResource("cs://localhost"),
+    QWidget* parent = 0);
   ~pqCreateServerStartupDialog();
 
-  const pqServerResource getServer() const;
+  const QString name();
+  const pqServerResource server();
 
 private slots:
-  void onTypeChanged(int);
-  void onHostChanged(const QString&);
+  void updateServerType();
+  void updateConnectButton();
 
 private:
-  void updateServer();
   void accept();
 
   class pqImplementation;

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqServer;
 class pqServerResource;
+class pqServerStartup;
 class pqServerStartups;
 class pqSettings;
 
@@ -54,7 +55,7 @@ signals is emitted.
 If necessary, the user will be prompted to configure how to start the server,
 and optionally prompted for site-specific runtime parameters.
 
-A modal dialog will be displayed while the server starts.
+A modal dialog will indicate progress while the server starts.
 */
 class PQCOMPONENTS_EXPORT pqSimpleServerStartup :
   public QObject
@@ -64,14 +65,18 @@ class PQCOMPONENTS_EXPORT pqSimpleServerStartup :
   Q_OBJECT
   
 public:
-  pqSimpleServerStartup(
-    pqSettings& settings,
-    pqServerStartups& startups,
-    QObject* parent = 0);
-    
+  pqSimpleServerStartup(QObject* parent = 0);
   ~pqSimpleServerStartup();
 
-  void startServer(const pqServerResource& resource);
+  /// Start a server, using a specific startup procedure
+  void startServer(pqServerStartup& startup);
+  /** Start a server, prompting the user if there's any ambiguity
+  over which startup procedure to use, or if a startup isn't already
+  configured for the server */
+  void startServer(
+    pqServerStartups& startups,
+    pqSettings& settings,
+    const pqServerResource& server);
 
 signals:
   /// Signal emitted if the user cancels startup
@@ -82,14 +87,19 @@ signals:
   void serverStarted(pqServer*);
 
 private slots:
+  void cancelled();
+  void failed();
+  void started(pqServer*);
+
   void forwardConnectServer();
   void monitorReverseConnections();
-  void reverseConnection(pqServer*);
+  void finishReverseConnection(pqServer*);
 
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
-  
+
+  bool promptRuntimeArguments();
   void startBuiltinConnection();
   void startForwardConnection();
   void startReverseConnection();

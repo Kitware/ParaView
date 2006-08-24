@@ -45,7 +45,21 @@ class pqManualServerStartup :
   public pqServerStartup
 {
 public:
-  void execute(const pqServerResource& server, pqServerStartupContext& context);
+  pqManualServerStartup(
+    const QString& name,
+    const pqServerResource& server,
+    const QString& owner);
+
+  const QString name();
+  const pqServerResource server();
+  const QString owner();
+  const QDomDocument configuration();
+  void execute(const OptionsT& options, pqServerStartupContext& context);
+  
+private:
+  const QString Name;
+  const pqServerResource Server;
+  const QString Owner;
 };
 
 #endif // !_paManualServerStartup_h

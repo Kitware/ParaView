@@ -41,18 +41,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /////////////////////////////////////////////////////////////////////////////
 // pqCommandServerStartupContextHelper
 
-pqCommandServerStartupContextHelper::pqCommandServerStartupContextHelper(double delay, QObject* object_parent) :
+pqCommandServerStartupContextHelper::pqCommandServerStartupContextHelper(
+    double delay, QObject* object_parent) :
   QObject(object_parent),
   Delay(delay)
 {
 }
 
-void pqCommandServerStartupContextHelper::onFinished(int /*exitCode*/, QProcess::ExitStatus exitStatus)
+void pqCommandServerStartupContextHelper::onFinished(int /*exitCode*/,
+  QProcess::ExitStatus exitStatus)
 {
   switch(exitStatus)
     {
     case QProcess::NormalExit:
-      QTimer::singleShot(static_cast<int>(this->Delay * 1000), this, SLOT(onDelayComplete()));
+      QTimer::singleShot(
+        static_cast<int>(this->Delay * 1000), this, SLOT(onDelayComplete()));
       break;
     case QProcess::CrashExit:
       qWarning() << "The startup command crashed";
@@ -62,12 +65,14 @@ void pqCommandServerStartupContextHelper::onFinished(int /*exitCode*/, QProcess:
   
 }
 
-void pqCommandServerStartupContextHelper::onError(QProcess::ProcessError error)
+void pqCommandServerStartupContextHelper::onError(
+  QProcess::ProcessError error)
 {
   switch(error)
     {
     case QProcess::FailedToStart:
-      qWarning() << "The startup command failed to start ... check your PATH and file permissions";
+      qWarning() << "The startup command failed to start ... "
+        "check your PATH and file permissions";
       break;
     case QProcess::Crashed:
       qWarning() << "The startup command crashed";
@@ -88,42 +93,221 @@ void pqCommandServerStartupContextHelper::onDelayComplete()
 /////////////////////////////////////////////////////////////////////////////
 // pqCommandServerStartup
 
-pqCommandServerStartup::pqCommandServerStartup(const QString& command_line, double delay) :
-  CommandLine(command_line),
-  Delay(delay)
+pqCommandServerStartup::pqCommandServerStartup(
+    const QString& name,
+    const pqServerResource& server,
+    const QString& owner,
+    const QDomDocument& configuration) :
+  Name(name),
+  Server(server.schemeHosts()),
+  Owner(owner),
+  Configuration(configuration)
 {
 }
 
-void pqCommandServerStartup::execute(
-  const pqServerResource& server, pqServerStartupContext& context)
+const QString pqCommandServerStartup::name()
 {
-  if(this->CommandLine.isEmpty())
+  return this->Name;
+}
+
+const pqServerResource pqCommandServerStartup::server()
+{
+  return this->Server;
+}
+
+const QString pqCommandServerStartup::owner()
+{
+  return this->Owner;
+}
+
+const QDomDocument pqCommandServerStartup::configuration()
+{
+  return this->Configuration;
+}
+
+void pqCommandServerStartup::execute(const OptionsT& user_options,
+  pqServerStartupContext& context)
+{
+  // Generate predefined variables ...
+  OptionsT options;
+  options["PV_CONNECTION_URI"] =
+    this->Server.toString();
+  options["PV_CONNECTION_SCHEME"] =
+    this->Server.scheme();
+  options["PV_SERVER_HOST"] =
+    this->Server.host();
+  options["PV_SERVER_PORT"] =
+    QString::number(this->Server.port(11111));
+  options["PV_DATA_SERVER_HOST"] =
+    this->Server.dataServerHost();
+  options["PV_DATA_SERVER_PORT"] =
+    QString::number(this->Server.dataServerPort(11111));
+  options["PV_RENDER_SERVER_HOST"] =
+    this->Server.renderServerHost();
+  options["PV_RENDER_SERVER_PORT"] =
+    QString::number(this->Server.renderServerPort(22221));
+  options["PV_USERNAME"] =
+    ""; // Unused at the moment
+  
+  // Merge user variables, allowing user variables to "override" the predefined variables ...
+  for(OptionsT::const_iterator option = user_options.begin(); option != user_options.end(); ++option)
     {
-    qWarning() << "Can't execute empty command-line";
-    context.onFailed();
-    return;
+    options.erase(options.find(option.key()));
+    options.insert(option.key(), option.value());
     }
 
+  // Setup the process environment ...
   QStringList environment = QProcess::systemEnvironment();
-  environment.push_back("PV_CONNECTION_URI=" + server.toString());
-  environment.push_back("PV_CONNECTION_SCHEME=" + server.scheme());
-  environment.push_back("PV_SERVER_HOST=" + server.host());
-  environment.push_back("PV_SERVER_PORT=" + QString::number(server.port(11111)));
-  environment.push_back("PV_DATA_SERVER_HOST=" + server.dataServerHost());
-  environment.push_back("PV_DATA_SERVER_PORT=" + QString::number(server.dataServerPort(11111)));
-  environment.push_back("PV_RENDER_SERVER_HOST=" + server.renderServerHost());
-  environment.push_back("PV_RENDER_SERVER_PORT=" + QString::number(server.renderServerPort(22221)));
-  environment.push_back("PV_USERNAME=");
+  for(
+    OptionsT::const_iterator option = options.begin();
+    option != options.end();
+    ++option)
+    {
+    environment.push_back(option.key() + "=" + option.value());
+    }
+  
+  // Setup the process arguments ...
+  const QString executable = this->executable();
+  const double timeout = this->timeout();
+  const double delay = this->delay();
+  QStringList arguments = this->arguments();
 
-  QProcess* const process = new QProcess(&context);
+  // Do string-substitution on the process arguments ...
+  QRegExp regex("[$]([^$].*)[$]");
+  for(QStringList::iterator i = arguments.begin(); i != arguments.end(); )
+    {
+    QString& argument = *i;
+    if(regex.indexIn(argument) > -1)
+      {
+      const QString before = regex.cap(0);
+      const QString variable = regex.cap(1);
+      const QString after = options[variable];
+      argument.replace(before, after);
+      }
+      
+    if(argument.isEmpty())
+      {
+      i = arguments.erase(i);
+      }
+    else
+      {
+      ++i;
+      }
+    }
+
+  QProcess* const process = new QProcess();
   process->setEnvironment(environment);
 
-  pqCommandServerStartupContextHelper* const helper = new pqCommandServerStartupContextHelper(this->Delay, &context);
-  QObject::connect(process, SIGNAL(error(QProcess::ProcessError)), helper, SLOT(onError(QProcess::ProcessError)));
-  QObject::connect(process, SIGNAL(finished(int, QProcess::ExitStatus)), helper, SLOT(onFinished(int, QProcess::ExitStatus)));
+  pqCommandServerStartupContextHelper* const helper =
+    new pqCommandServerStartupContextHelper(delay, &context);
+  QObject::connect(
+    process,
+    SIGNAL(error(QProcess::ProcessError)),
+    helper,
+    SLOT(onError(QProcess::ProcessError)));
+  QObject::connect(
+    process,
+    SIGNAL(finished(int, QProcess::ExitStatus)),
+    helper,
+    SLOT(onFinished(int, QProcess::ExitStatus)));
 
-  QObject::connect(helper, SIGNAL(succeeded()), &context, SLOT(onSucceeded()));
-  QObject::connect(helper, SIGNAL(failed()), &context, SLOT(onFailed()));  
+  QObject::connect(
+    helper,
+    SIGNAL(succeeded()),
+    &context,
+    SLOT(onSucceeded()));
+  QObject::connect(
+    helper,
+    SIGNAL(failed()),
+    &context,
+    SLOT(onFailed()));  
   
-  process->start(this->CommandLine);
+  process->start(executable, arguments);
+}
+
+const QString pqCommandServerStartup::executable()
+{
+  QString result;
+
+  QDomElement xml = this->Configuration.documentElement();
+  if(xml.nodeName() == "CommandStartup")
+    {
+    QDomElement xml_command = xml.firstChildElement("Command");
+    if(!xml_command.isNull())
+      {
+      result = xml_command.attribute("exec");
+      }
+    }
+    
+  return result;
+}
+
+double pqCommandServerStartup::timeout()
+{
+  double result = 0.0;
+  
+  QDomElement xml = this->Configuration.documentElement();
+  if(xml.nodeName() == "CommandStartup")
+    {
+    QDomElement xml_command = xml.firstChildElement("Command");
+    if(!xml_command.isNull())
+      {
+      result = xml_command.attribute("timeout").toDouble();
+      }
+    }
+    
+  return result;
+}
+
+double pqCommandServerStartup::delay()
+{
+  double result = 0.0;
+  
+  QDomElement xml = this->Configuration.documentElement();
+  if(xml.nodeName() == "CommandStartup")
+    {
+    QDomElement xml_command = xml.firstChildElement("Command");
+    if(!xml_command.isNull())
+      {
+      result = xml_command.attribute("delay").toDouble();
+      }
+    }
+    
+  return result;
+}
+
+const QStringList pqCommandServerStartup::arguments()
+{
+  QStringList results;
+
+  QDomElement xml = this->Configuration.documentElement();
+  if(xml.nodeName() == "CommandStartup")
+    {
+    QDomElement xml_command = xml.firstChildElement("Command");
+    if(!xml_command.isNull())
+      {
+      QDomElement xml_arguments = xml_command.firstChildElement("Arguments");
+      if(!xml_arguments.isNull())
+        {
+        for(
+          QDomNode xml_argument = xml_arguments.firstChild();
+          !xml_argument.isNull();
+          xml_argument = xml_argument.nextSibling())
+          {
+          if(xml_argument.isElement()
+            && xml_argument.toElement().tagName() == "Argument")
+            {
+            const QString argument =
+              xml_argument.toElement().attribute("value");
+            if(!argument.isEmpty())
+              {
+              results.push_back(argument);
+              }
+            }
+          }
+        }
+      }
+    }
+    
+  return results;
 }

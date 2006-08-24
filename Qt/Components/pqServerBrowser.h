@@ -37,16 +37,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDialog>
 
-class pqServer;
+class pqServerStartups;
+class pqServerStartup;
+class pqSettings;
+class QListWidgetItem;
 
 /**
-Provides a user-interface component for creating server connections.
+Provides a user-interface component for browsing through the set of
+configured servers for editing and/or choosing connections.
 
-To use, create an instance of pqServerBrowser, and connect its serverConnected()
-method to a slot.  If the user selects a server and a connection is established,
-the slot will be called with the new pqServer object that encapsulates the connection.
+To use, create an instance of pqServerBrowser, and connect its
+serverSelected() signal to a slot.  If the user selects a server,
+the slot will be called with information sufficient to start
+the associated server.
 
-\sa pqServer
+You may want to use the pqServerStartupBrowser dialog, which
+does all of the above, and starts the server for you.
+
+\sa pqServer, pqServerStartupBrowser.
 */
 
 class PQCOMPONENTS_EXPORT pqServerBrowser :
@@ -57,28 +65,45 @@ class PQCOMPONENTS_EXPORT pqServerBrowser :
   Q_OBJECT
 
 public:
-  pqServerBrowser(QWidget* Parent);
+  pqServerBrowser(
+    pqServerStartups& startups,
+    pqSettings& settings,
+    QWidget* parent = 0);
   ~pqServerBrowser();
 
-  pqServer* getConnectedServer();
+  /// Sets a message to be displayed to the user
+  void setMessage(const QString& message);
+
+  /// Returns the startup selected by the user, or NULL
+  pqServerStartup* getSelectedServer();
 
 signals:
-  /// This signal will be emitted iff a server connection is successfully created
-  void serverConnected(pqServer*);
- 
-  
+  /// This signal will be emitted if the user picks a server to be started.
+  void serverSelected(pqServerStartup&);
+
 private slots:
-  void onServerTypeActivated(int);
-  void accept();
+  void onStartupsChanged();
+  void onCurrentItemChanged(QListWidgetItem*, QListWidgetItem*);
+  void onItemDoubleClicked(QListWidgetItem*);
   
-  void onServerCancelled();
-  void onServerFailed();
-  void onServerStarted(pqServer*);
+  void onAddServer();
+  void onEditServer();
+  void onDeleteServer();
+  void onSave();
+  void onSave(const QStringList&);
+  void onLoad();
+  void onLoad(const QStringList&);
+  
+  void onConnect();
+  void onClose();
 
 private:
   pqServerBrowser(const pqServerBrowser&);
   pqServerBrowser& operator=(const pqServerBrowser&);
- 
+
+  void emitServerSelected(pqServerStartup&);
+  virtual void onServerSelected(pqServerStartup&);
+
   class pqImplementation;
   pqImplementation* const Implementation;
 };

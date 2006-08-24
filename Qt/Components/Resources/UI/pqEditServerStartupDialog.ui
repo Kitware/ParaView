@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>536</width>
-    <height>231</height>
+    <width>558</width>
+    <height>397</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -110,8 +110,11 @@
    </item>
    <item>
     <widget class="QStackedWidget" name="stackedWidget" >
+     <property name="frameShape" >
+      <enum>QFrame::Box</enum>
+     </property>
      <property name="currentIndex" >
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_1" >
       <layout class="QVBoxLayout" >
@@ -196,6 +199,20 @@
        </property>
        <item>
         <widget class="QLabel" name="label_5" >
+         <property name="font" >
+          <font>
+           <family>MS Shell Dlg 2</family>
+           <pointsize>8</pointsize>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+           <underline>false</underline>
+           <strikeout>false</strikeout>
+          </font>
+         </property>
+         <property name="frameShape" >
+          <enum>QFrame::NoFrame</enum>
+         </property>
          <property name="text" >
           <string>Manual Startup - no attempt will be made to start the server.  You must start the server manually before trying to connect.</string>
          </property>

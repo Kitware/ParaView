@@ -370,9 +370,16 @@ pqServerStartups& pqApplicationCore::serverStartups()
     if(file.exists())
       {
       QDomDocument xml;
-      if(xml.setContent(&file, false))
+      QString error_message;
+      int error_line = 0;
+      int error_column = 0;
+      if(xml.setContent(&file, false, &error_message, &error_line, &error_column))
         {
         this->Internal->ServerStartups->load(xml);
+        }
+      else
+        {
+        qWarning() << "Error loading default_servers.pvsc: " << error_message << " line: " << error_line << " column: " << error_column;
         }
       }
     

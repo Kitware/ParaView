@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCommandServerStartup_h
 #define _pqCommandServerStartup_h
 
+#include "pqCoreExport.h"
 #include "pqServerStartup.h"
 
 #include <QProcess>
@@ -42,16 +43,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /// Concrete implementation of pqServerStartup that runs an external
 /// command to start a remote server.
-class pqCommandServerStartup :
+class PQCORE_EXPORT pqCommandServerStartup :
   public pqServerStartup
 {
 public:
-  pqCommandServerStartup(const QString& command_line, double delay);
-  
-  void execute(const pqServerResource& server, pqServerStartupContext& context);
+  pqCommandServerStartup(
+    const QString& name,
+    const pqServerResource& server,
+    const QString& owner,
+    const QDomDocument& configuration);
 
-  const QString CommandLine;
-  const double Delay;
+  const QString name();
+  const pqServerResource server();  
+  const QString owner();
+  const QDomDocument configuration();
+  
+  void execute(const OptionsT& options, pqServerStartupContext& context);
+
+  const QString executable();
+  double timeout();
+  double delay();
+  const QStringList arguments();
+
+private:
+  const QString Name;
+  const pqServerResource Server;
+  const QString Owner;
+  const QDomDocument Configuration;
 };
 
 /// Private implementation detail

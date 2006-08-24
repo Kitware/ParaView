@@ -44,25 +44,74 @@ public:
   }
 
   Ui::pqCreateServerStartupDialog UI;
-  pqServerResource Server;
 };
 
-pqCreateServerStartupDialog::pqCreateServerStartupDialog(QWidget* widget_parent) :
+pqCreateServerStartupDialog::pqCreateServerStartupDialog(
+  const pqServerResource& server, QWidget* widget_parent) :
     Superclass(widget_parent),
     Implementation(new pqImplementation())
 {
   this->Implementation->UI.setupUi(this);
-
-  QObject::connect(this->Implementation->UI.type, SIGNAL(currentIndexChanged(int)),
-    this, SLOT(onTypeChanged(int)));
-  QObject::connect(this->Implementation->UI.host, SIGNAL(textChanged(const QString&)),
-    this, SLOT(onHostChanged(const QString&)));
-  QObject::connect(this->Implementation->UI.dataServerHost, SIGNAL(textChanged(const QString&)),
-    this, SLOT(onHostChanged(const QString&)));
-  QObject::connect(this->Implementation->UI.renderServerHost, SIGNAL(textChanged(const QString&)),
-    this, SLOT(onHostChanged(const QString&)));
+  
+  if(server.scheme() == "cs")
+    {
+    this->Implementation->UI.type->setCurrentIndex(0);
+    }
+  else if(server.scheme() == "csrc")
+    {
+    this->Implementation->UI.type->setCurrentIndex(1);
+    }
+  else if(server.scheme() == "cdsrs")
+    {
+    this->Implementation->UI.type->setCurrentIndex(2);
+    }
+  else if(server.scheme() == "cdsrsrc")
+    {
+    this->Implementation->UI.type->setCurrentIndex(3);
+    }
     
-  this->updateServer();
+  this->Implementation->UI.host->setText(server.host());
+  this->Implementation->UI.dataServerHost->setText(server.dataServerHost());
+  this->Implementation->UI.renderServerHost->setText(server.renderServerHost());
+
+  QObject::connect(
+    this->Implementation->UI.type,
+    SIGNAL(currentIndexChanged(int)),
+    this,
+    SLOT(updateServerType()));
+    
+  QObject::connect(
+    this->Implementation->UI.type,
+    SIGNAL(currentIndexChanged(int)),
+    this,
+    SLOT(updateConnectButton()));
+
+  QObject::connect(
+    this->Implementation->UI.name,
+    SIGNAL(textChanged(const QString&)),
+    this,
+    SLOT(updateConnectButton()));
+
+  QObject::connect(
+    this->Implementation->UI.host,
+    SIGNAL(textChanged(const QString&)),
+    this,
+    SLOT(updateConnectButton()));
+
+  QObject::connect(
+    this->Implementation->UI.dataServerHost,
+    SIGNAL(textChanged(const QString&)),
+    this,
+    SLOT(updateConnectButton()));
+
+  QObject::connect(
+    this->Implementation->UI.renderServerHost,
+    SIGNAL(textChanged(const QString&)),
+    this,
+    SLOT(updateConnectButton()));
+
+  this->updateServerType();
+  this->updateConnectButton();
 }
 
 pqCreateServerStartupDialog::~pqCreateServerStartupDialog()
@@ -70,79 +119,104 @@ pqCreateServerStartupDialog::~pqCreateServerStartupDialog()
   delete this->Implementation;
 }
 
-const pqServerResource pqCreateServerStartupDialog::getServer() const
+const QString pqCreateServerStartupDialog::name()
 {
-  return this->Implementation->Server;
+  return this->Implementation->UI.name->text();
 }
 
-void pqCreateServerStartupDialog::onTypeChanged(int)
+const pqServerResource pqCreateServerStartupDialog::server()
 {
-  this->updateServer();
+  pqServerResource server;
+  
+  switch(this->Implementation->UI.type->currentIndex())
+    {
+    case 0:
+      server.setScheme("cs");
+      server.setHost(this->Implementation->UI.host->text());
+      break;
+      
+    case 1:
+      server.setScheme("csrc");
+      server.setHost(this->Implementation->UI.host->text());
+      break;
+      
+    case 2:
+      server.setScheme("cdsrs");
+      server.setDataServerHost(this->Implementation->UI.dataServerHost->text());
+      server.setRenderServerHost(this->Implementation->UI.renderServerHost->text());
+      break;
+      
+    case 3:
+      server.setScheme("cdsrsrc");
+      server.setDataServerHost(this->Implementation->UI.dataServerHost->text());
+      server.setRenderServerHost(this->Implementation->UI.renderServerHost->text());
+      break;
+    }
+  
+  return server;
 }
 
-void pqCreateServerStartupDialog::onHostChanged(const QString&)
-{
-  this->updateServer();
-}
-
-void pqCreateServerStartupDialog::updateServer()
+void pqCreateServerStartupDialog::updateServerType()
 {
   switch(this->Implementation->UI.type->currentIndex())
     {
     case 0:
-      this->Implementation->Server.setScheme("cs");
-
       this->Implementation->UI.hostLabel->setVisible(true);
       this->Implementation->UI.host->setVisible(true);
       this->Implementation->UI.dataServerHostLabel->setVisible(false);
       this->Implementation->UI.dataServerHost->setVisible(false);
       this->Implementation->UI.renderServerHostLabel->setVisible(false);
       this->Implementation->UI.renderServerHost->setVisible(false);
-      
       break;
       
     case 1:
-      this->Implementation->Server.setScheme("csrc");
-      
       this->Implementation->UI.hostLabel->setVisible(true);
       this->Implementation->UI.host->setVisible(true);
       this->Implementation->UI.dataServerHostLabel->setVisible(false);
       this->Implementation->UI.dataServerHost->setVisible(false);
       this->Implementation->UI.renderServerHostLabel->setVisible(false);
       this->Implementation->UI.renderServerHost->setVisible(false);
-
       break;
       
     case 2:
-      this->Implementation->Server.setScheme("cdsrs");
-      
       this->Implementation->UI.hostLabel->setVisible(false);
       this->Implementation->UI.host->setVisible(false);
       this->Implementation->UI.dataServerHostLabel->setVisible(true);
       this->Implementation->UI.dataServerHost->setVisible(true);
       this->Implementation->UI.renderServerHostLabel->setVisible(true);
       this->Implementation->UI.renderServerHost->setVisible(true);
-
       break;
       
     case 3:
-      this->Implementation->Server.setScheme("cdsrsrc");
-      
       this->Implementation->UI.hostLabel->setVisible(false);
       this->Implementation->UI.host->setVisible(false);
       this->Implementation->UI.dataServerHostLabel->setVisible(true);
       this->Implementation->UI.dataServerHost->setVisible(true);
       this->Implementation->UI.renderServerHostLabel->setVisible(true);
       this->Implementation->UI.renderServerHost->setVisible(true);
-
       break;
     }
-    
-  this->Implementation->Server.setHost(this->Implementation->UI.host->text());
-  this->Implementation->Server.setDataServerHost(this->Implementation->UI.dataServerHost->text());
-  this->Implementation->Server.setRenderServerHost(this->Implementation->UI.renderServerHost->text());
-  
-  this->Implementation->UI.message->setText(QString("Configure new server ... %1").arg(this->Implementation->Server.toString()));
+}
+
+void pqCreateServerStartupDialog::updateConnectButton()
+{
+  switch(this->Implementation->UI.type->currentIndex())
+    {
+    case 0:
+    case 1:
+      this->Implementation->UI.okButton->setEnabled(
+        !this->Implementation->UI.name->text().isEmpty() &&
+        !this->Implementation->UI.host->text().isEmpty());
+      break;
+      
+    case 2:
+    case 3:
+      this->Implementation->UI.okButton->setEnabled(
+        !this->Implementation->UI.name->text().isEmpty() &&
+        !this->Implementation->UI.dataServerHost->text().isEmpty() &&
+        !this->Implementation->UI.renderServerHost->text().isEmpty());
+      break;
+    }
 }
 
 void pqCreateServerStartupDialog::accept()
