@@ -140,7 +140,7 @@ void pqSimpleServerStartup::startServer(pqServerStartup& startup)
 {
   // Get the named startup ...
   this->Implementation->Startup = &startup;
-  this->Implementation->Server = startup.server();
+  this->Implementation->Server = startup.getServer();
       
   // Prompt the user for runtime server arguments ...
   if(!this->promptRuntimeArguments())
@@ -150,21 +150,21 @@ void pqSimpleServerStartup::startServer(pqServerStartup& startup)
     }    
 
   // Branch based on the connection type - builtin, forward, or reverse ...
-  if(startup.server().scheme() == "builtin")
+  if(startup.getServer().scheme() == "builtin")
     {
     this->startBuiltinConnection();
     }
-  else if(startup.server().scheme() == "cs" || startup.server().scheme() == "cdsrs")
+  else if(startup.getServer().scheme() == "cs" || startup.getServer().scheme() == "cdsrs")
     {
     this->startForwardConnection();
     }
-  else if(startup.server().scheme() == "csrc" || startup.server().scheme() == "cdsrsrc")
+  else if(startup.getServer().scheme() == "csrc" || startup.getServer().scheme() == "cdsrsrc")
     {
     this->startReverseConnection();
     }
   else
     {
-    qCritical() << "Unknown server scheme: " << startup.server().scheme();
+    qCritical() << "Unknown server scheme: " << startup.getServer().scheme();
     this->failed();
     }
 }
@@ -176,7 +176,7 @@ void pqSimpleServerStartup::startServer(
 {
   // There may be zero, one, or more-than-one startup already configured for this server
   const pqServerStartups::StartupsT startups =
-    server_startups.startups(server);
+    server_startups.getStartups(server);
     
   // No startup, yet, so prompt the user to create one ...
   if(0 == startups.size())
@@ -186,13 +186,13 @@ void pqSimpleServerStartup::startServer(
       {
       pqEditServerStartupDialog edit_server_dialog(
         server_startups,
-        create_server_dialog.name(),
-        create_server_dialog.server());
+        create_server_dialog.getName(),
+        create_server_dialog.getServer());
       if(QDialog::Accepted == edit_server_dialog.exec())
         {
         server_startups.save(settings);
-        if(pqServerStartup* const startup = server_startups.startup(
-          create_server_dialog.name()))
+        if(pqServerStartup* const startup = server_startups.getStartup(
+          create_server_dialog.getName()))
           {
           this->startServer(*startup);
           }
@@ -202,7 +202,7 @@ void pqSimpleServerStartup::startServer(
   // Exactly one startup, so just use it already ...
   else if(1 == startups.size())
     {
-    if(pqServerStartup* const startup = server_startups.startup(startups[0]))
+    if(pqServerStartup* const startup = server_startups.getStartup(startups[0]))
       {
       this->startServer(*startup);
       }
@@ -298,7 +298,7 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
     }  
 
   // Prompt for configured options ...  
-  QDomDocument xml = this->Implementation->Startup->configuration();
+  QDomDocument xml = this->Implementation->Startup->getConfiguration();
   QDomElement xml_command_startup = xml.firstChildElement("CommandStartup");
   if(!xml_command_startup.isNull())
     {
@@ -318,8 +318,7 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
             {
             const int row = layout->rowCount();
             
-            QLabel* const label = new QLabel(option_label + ":");
-            layout->addWidget(label, row, label_column, Qt::AlignLeft | Qt::AlignVCenter);
+            layout->addWidget(new QLabel(option_label + ":"), row, label_column, Qt::AlignLeft | Qt::AlignVCenter);
             
             if(xml_type.toElement().tagName() == "Range")
               {
@@ -401,9 +400,9 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
                 {
                 if(xml_enumeration.isElement() && xml_enumeration.toElement().tagName() == "Entry") 
                   {
-                  const QString value = xml_enumeration.toElement().attribute("value");
-                  const QString label = xml_enumeration.toElement().attribute("label");
-                  widget->addItem(label, value);
+                  const QString xml_value = xml_enumeration.toElement().attribute("value");
+                  const QString xml_label = xml_enumeration.toElement().attribute("label");
+                  widget->addItem(xml_label, xml_value);
                   }
                 }
               

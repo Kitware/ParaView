@@ -49,8 +49,8 @@ public:
     QWidget* parent = 0);
   ~pqCreateServerStartupDialog();
 
-  const QString name();
-  const pqServerResource server();
+  const QString getName();
+  const pqServerResource getServer();
 
 private slots:
   void updateServerType();

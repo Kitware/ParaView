@@ -91,7 +91,7 @@ pqServerStartups::~pqServerStartups()
   delete this->Implementation;
 }
 
-const pqServerStartups::StartupsT pqServerStartups::startups() const
+const pqServerStartups::StartupsT pqServerStartups::getStartups() const
 {
   StartupsT results;
 
@@ -106,7 +106,7 @@ const pqServerStartups::StartupsT pqServerStartups::startups() const
   return results;
 }
 
-const pqServerStartups::StartupsT pqServerStartups::startups(const pqServerResource& server) const
+const pqServerStartups::StartupsT pqServerStartups::getStartups(const pqServerResource& server) const
 {
   StartupsT results;
 
@@ -115,7 +115,7 @@ const pqServerStartups::StartupsT pqServerStartups::startups(const pqServerResou
     startup != this->Implementation->Startups.end();
     ++startup)
     {
-    if(startup->second->server().schemeHosts() == server.schemeHosts())
+    if(startup->second->getServer().schemeHosts() == server.schemeHosts())
       {
       results.push_back(startup->first);
       }
@@ -124,7 +124,7 @@ const pqServerStartups::StartupsT pqServerStartups::startups(const pqServerResou
   return results;
 }
 
-pqServerStartup* pqServerStartups::startup(const QString& startup) const
+pqServerStartup* pqServerStartups::getStartup(const QString& startup) const
 {
   return this->Implementation->Startups.count(startup)
     ? this->Implementation->Startups[startup]
@@ -212,8 +212,8 @@ void pqServerStartups::save(pqSettings& settings) const
     ++i)
     {
     const QString name = i->first;
-    const QString owner = i->second->owner();
-    const pqServerResource server = i->second->server();
+    const QString owner = i->second->getOwner();
+    const pqServerResource server = i->second->getServer();
     pqServerStartup* const startup = i->second;
 
     if(owner != "user")
@@ -235,10 +235,10 @@ void pqServerStartups::save(pqSettings& settings) const
       settings.setValue(server_key + "/type", "command");
       settings.setValue(server_key + "/server", encoded_server);
       settings.setValue(server_key + "/owner", owner);
-      settings.setValue(server_key + "/executable", command_startup->executable());
-      settings.setValue(server_key + "/timeout", command_startup->timeout());
-      settings.setValue(server_key + "/delay", command_startup->delay());
-      settings.setValue(server_key + "/arguments", command_startup->arguments());
+      settings.setValue(server_key + "/executable", command_startup->getExecutable());
+      settings.setValue(server_key + "/timeout", command_startup->getTimeout());
+      settings.setValue(server_key + "/delay", command_startup->getDelay());
+      settings.setValue(server_key + "/arguments", command_startup->getArguments());
       }
     }
 }
@@ -264,14 +264,14 @@ void pqServerStartups::save(QDomDocument& xml) const
     xml_server.setAttributeNode(xml_server_name);
 
     QDomAttr xml_server_resource = xml.createAttribute("resource");
-    xml_server_resource.setValue(startup_command->server().toString());
+    xml_server_resource.setValue(startup_command->getServer().toString());
     xml_server.setAttributeNode(xml_server_resource);
 
     QDomAttr xml_server_owner = xml.createAttribute("owner");
-    xml_server_owner.setValue(startup_command->owner());
+    xml_server_owner.setValue(startup_command->getOwner());
     xml_server.setAttributeNode(xml_server_owner);
 
-    xml_server.appendChild(xml.importNode(startup_command->configuration().documentElement(), true));
+    xml_server.appendChild(xml.importNode(startup_command->getConfiguration().documentElement(), true));
     }
 }
 

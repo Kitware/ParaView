@@ -133,7 +133,7 @@ void pqServerBrowser::onStartupsChanged()
 {
   this->Implementation->UI.startups->clear();
   
-  const pqServerStartups::StartupsT startups = this->Implementation->Startups.startups();
+  const pqServerStartups::StartupsT startups = this->Implementation->Startups.getStartups();
   for(int i = 0; i != startups.size(); ++i)
     {
     this->Implementation->UI.startups->addItem(startups[i]);
@@ -149,8 +149,8 @@ void pqServerBrowser::onCurrentItemChanged(QListWidgetItem* current, QListWidget
     {
     editable_count += 1;
     
-    pqServerStartup* const startup = this->Implementation->Startups.startup(current->text());
-    if(startup && startup->owner() == "user")
+    pqServerStartup* const startup = this->Implementation->Startups.getStartup(current->text());
+    if(startup && startup->getOwner() == "user")
       {
       deletable_count += 1;
       }
@@ -166,7 +166,7 @@ void pqServerBrowser::onItemDoubleClicked(QListWidgetItem* item)
   if(item)
     {
     if(pqServerStartup* const startup =
-      this->Implementation->Startups.startup(item->text()))
+      this->Implementation->Startups.getStartup(item->text()))
       {
       this->emitServerSelected(*startup);
       }
@@ -180,8 +180,8 @@ void pqServerBrowser::onAddServer()
     {
     pqEditServerStartupDialog edit_server_dialog(
       this->Implementation->Startups,
-      create_server_dialog.name(),
-      create_server_dialog.server());
+      create_server_dialog.getName(),
+      create_server_dialog.getServer());
     if(QDialog::Accepted == edit_server_dialog.exec())
       {
       this->Implementation->Startups.save(this->Implementation->Settings);
@@ -196,12 +196,12 @@ void pqServerBrowser::onEditServer()
     QListWidgetItem* const item = this->Implementation->UI.startups->item(row);
     if(this->Implementation->UI.startups->isItemSelected(item))
       {
-      if(pqServerStartup* const startup = this->Implementation->Startups.startup(item->text()))
+      if(pqServerStartup* const startup = this->Implementation->Startups.getStartup(item->text()))
         {
         pqEditServerStartupDialog dialog(
           this->Implementation->Startups,
-          startup->name(),
-          startup->server());
+          startup->getName(),
+          startup->getServer());
         if(QDialog::Accepted == dialog.exec())
           {
           this->Implementation->Startups.save(this->Implementation->Settings);
@@ -295,7 +295,7 @@ void pqServerBrowser::onConnect()
 {
   if(this->Implementation->UI.startups->currentItem())
     {
-    if(pqServerStartup* const startup = this->Implementation->Startups.startup(
+    if(pqServerStartup* const startup = this->Implementation->Startups.getStartup(
       this->Implementation->UI.startups->currentItem()->text()))
       {
       this->emitServerSelected(*startup);
@@ -315,7 +315,7 @@ void pqServerBrowser::emitServerSelected(pqServerStartup& startup)
   this->onServerSelected(startup);
 }
 
-void pqServerBrowser::onServerSelected(pqServerStartup& startup)
+void pqServerBrowser::onServerSelected(pqServerStartup& /*startup*/)
 {
   this->accept();
 }

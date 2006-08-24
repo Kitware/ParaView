@@ -56,12 +56,12 @@ public:
   /// Defines a collection of startups
   typedef QStringList StartupsT;
   /// Returns the set of all configured startups that are configured
-  const StartupsT startups() const;
+  const StartupsT getStartups() const;
   /** Returns the set of startups configured for a specific server
   (could return zero-to-many results) */
-  const StartupsT startups(const pqServerResource& server) const;
+  const StartupsT getStartups(const pqServerResource& server) const;
   /// Returns a configured startup by name, or NULL
-  pqServerStartup* startup(const QString& name) const;
+  pqServerStartup* getStartup(const QString& name) const;
 
   /// Configures the given startup for manual (i.e do nothing) startup.
   void setManualStartup(

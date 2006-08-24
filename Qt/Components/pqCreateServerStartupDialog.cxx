@@ -119,12 +119,12 @@ pqCreateServerStartupDialog::~pqCreateServerStartupDialog()
   delete this->Implementation;
 }
 
-const QString pqCreateServerStartupDialog::name()
+const QString pqCreateServerStartupDialog::getName()
 {
   return this->Implementation->UI.name->text();
 }
 
-const pqServerResource pqCreateServerStartupDialog::server()
+const pqServerResource pqCreateServerStartupDialog::getServer()
 {
   pqServerResource server;
   

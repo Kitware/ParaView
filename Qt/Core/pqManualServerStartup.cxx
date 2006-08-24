@@ -46,22 +46,22 @@ pqManualServerStartup::pqManualServerStartup(
 {
 }
 
-const QString pqManualServerStartup::name()
+const QString pqManualServerStartup::getName()
 {
   return this->Name;
 }
 
-const pqServerResource pqManualServerStartup::server()
+const pqServerResource pqManualServerStartup::getServer()
 {
   return this->Server;
 }
 
-const QString pqManualServerStartup::owner()
+const QString pqManualServerStartup::getOwner()
 {
   return this->Owner;
 }
 
-const QDomDocument pqManualServerStartup::configuration()
+const QDomDocument pqManualServerStartup::getConfiguration()
 {
   QDomDocument xml;
   xml.appendChild(xml.createElement("ManualStartup"));
@@ -69,7 +69,7 @@ const QDomDocument pqManualServerStartup::configuration()
   return xml;
 }
 
-void pqManualServerStartup::execute(const OptionsT& options, pqServerStartupContext& context)
+void pqManualServerStartup::execute(const OptionsT& /*options*/, pqServerStartupContext& context)
 {
   context.onSucceeded();
 }

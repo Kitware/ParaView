@@ -105,22 +105,22 @@ pqCommandServerStartup::pqCommandServerStartup(
 {
 }
 
-const QString pqCommandServerStartup::name()
+const QString pqCommandServerStartup::getName()
 {
   return this->Name;
 }
 
-const pqServerResource pqCommandServerStartup::server()
+const pqServerResource pqCommandServerStartup::getServer()
 {
   return this->Server;
 }
 
-const QString pqCommandServerStartup::owner()
+const QString pqCommandServerStartup::getOwner()
 {
   return this->Owner;
 }
 
-const QDomDocument pqCommandServerStartup::configuration()
+const QDomDocument pqCommandServerStartup::getConfiguration()
 {
   return this->Configuration;
 }
@@ -167,10 +167,10 @@ void pqCommandServerStartup::execute(const OptionsT& user_options,
     }
   
   // Setup the process arguments ...
-  const QString executable = this->executable();
-  const double timeout = this->timeout();
-  const double delay = this->delay();
-  QStringList arguments = this->arguments();
+  const QString executable = this->getExecutable();
+  const double timeout = this->getTimeout();
+  const double delay = this->getDelay();
+  QStringList arguments = this->getArguments();
 
   // Do string-substitution on the process arguments ...
   QRegExp regex("[$]([^$].*)[$]");
@@ -225,7 +225,7 @@ void pqCommandServerStartup::execute(const OptionsT& user_options,
   process->start(executable, arguments);
 }
 
-const QString pqCommandServerStartup::executable()
+const QString pqCommandServerStartup::getExecutable()
 {
   QString result;
 
@@ -242,7 +242,7 @@ const QString pqCommandServerStartup::executable()
   return result;
 }
 
-double pqCommandServerStartup::timeout()
+double pqCommandServerStartup::getTimeout()
 {
   double result = 0.0;
   
@@ -259,7 +259,7 @@ double pqCommandServerStartup::timeout()
   return result;
 }
 
-double pqCommandServerStartup::delay()
+double pqCommandServerStartup::getDelay()
 {
   double result = 0.0;
   
@@ -276,7 +276,7 @@ double pqCommandServerStartup::delay()
   return result;
 }
 
-const QStringList pqCommandServerStartup::arguments()
+const QStringList pqCommandServerStartup::getArguments()
 {
   QStringList results;
 

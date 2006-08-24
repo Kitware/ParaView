@@ -85,9 +85,9 @@ pqEditServerStartupDialog::pqEditServerStartupDialog(
   this->Implementation->UI.commandLine->setEnabled(true);
   this->Implementation->UI.delay->setEnabled(true);
   
-  if(pqServerStartup* const startup = startups.startup(name))
+  if(pqServerStartup* const startup = startups.getStartup(name))
     {
-      if(startup->owner() != "user")
+      if(startup->getOwner() != "user")
         {
         this->Implementation->UI.message->setText(
           QString(tr("%1 (%2) configuration")).arg(name).arg(
@@ -107,8 +107,8 @@ pqEditServerStartupDialog::pqEditServerStartupDialog(
         this->Implementation->UI.stackedWidget->setCurrentIndex(0);
 
         this->Implementation->UI.commandLine->setPlainText(
-          command_startup->executable() + " " + command_startup->arguments().join(" "));
-        this->Implementation->UI.delay->setValue(command_startup->delay());
+          command_startup->getExecutable() + " " + command_startup->getArguments().join(" "));
+        this->Implementation->UI.delay->setValue(command_startup->getDelay());
         }
       else if(dynamic_cast<pqManualServerStartup*>(startup))
         {

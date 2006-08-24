@@ -50,10 +50,10 @@ public:
     const pqServerResource& server,
     const QString& owner);
 
-  const QString name();
-  const pqServerResource server();
-  const QString owner();
-  const QDomDocument configuration();
+  const QString getName();
+  const pqServerResource getServer();
+  const QString getOwner();
+  const QDomDocument getConfiguration();
   void execute(const OptionsT& options, pqServerStartupContext& context);
   
 private:

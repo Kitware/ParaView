@@ -50,13 +50,13 @@ public:
   virtual ~pqServerStartup() {}
 
   /// Returns the name of this startup
-  virtual const QString name() = 0;
+  virtual const QString getName() = 0;
   /// Returns the server for this startup
-  virtual const pqServerResource server() = 0;
+  virtual const pqServerResource getServer() = 0;
   /// Returns the user who owns this startup
-  virtual const QString owner() = 0;
+  virtual const QString getOwner() = 0;
   /// Returns an XML description of the configuration for this startup
-  virtual const QDomDocument configuration() = 0;
+  virtual const QDomDocument getConfiguration() = 0;
   
   /// Defines a generic collection of name-value-pair "options" that will be
   /// set by the user prior to server startup

@@ -111,7 +111,7 @@ void pqServerStartupBrowser::onServerStarted(pqServer* server)
   if(server)
     {
     pqApplicationCore::instance()->serverResources().add(
-      this->Implementation->Startup->server());
+      this->Implementation->Startup->getServer());
 
     emit this->serverConnected(server);
     }
