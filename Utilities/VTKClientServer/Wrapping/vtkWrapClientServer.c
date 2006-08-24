@@ -39,6 +39,15 @@ void output_temp(FILE *fp, int i, int aType, char *Id, int count)
     fprintf(fp,"    ");
     }
 
+  /* Handle some objects of known type.  */
+  if(((aType % 0x1000) == 0x109 || (aType % 0x1000) == 0x309) &&
+     strcmp(Id, "vtkClientServerStream") == 0)
+    {
+    fprintf(fp, "vtkClientServerStream temp%i_inst, *temp%i = &temp%i_inst;\n",
+            i, i, i);
+    return;
+    }
+
   if ((aType % 0x100)/0x10 == 1)
     {
     fprintf(fp,"unsigned ");
@@ -205,9 +214,18 @@ void get_args(FILE *fp, int i)
       break;
     case 0x109:
     case 0x309:
-      fprintf(fp,
-              "vtkClientServerStreamGetArgumentObject(msg, 0, %i, &temp%i, \"%s\")",
-              i+2, i, currentFunction->ArgClasses[i]);
+      /* Handle some objects of known type.  */
+      if(strcmp(currentFunction->ArgClasses[i], "vtkClientServerStream") == 0)
+        {
+        fprintf(fp,
+                "msg.GetArgument(0, %i, temp%i)", i+2, i);
+        }
+      else
+        {
+        fprintf(fp,
+                "vtkClientServerStreamGetArgumentObject(msg, 0, %i, &temp%i, \"%s\")",
+                i+2, i, currentFunction->ArgClasses[i]);
+        }
       break;
     case 0x2:
     case 0x9:
@@ -361,7 +379,7 @@ void outputFunction(FILE *fp, FileInfo *data)
         {
         fprintf(fp,",");
         }
-      if (currentFunction->ArgTypes[i] == 0x109)
+      if ((currentFunction->ArgTypes[i] % 0x1000) == 0x109)
         {
         fprintf(fp,"*(temp%i)",i);
         }
