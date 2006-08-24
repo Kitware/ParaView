@@ -552,6 +552,59 @@ QList<QString> pqPipelineDisplay::getColorFields()
   return ret;
 }
 
+QList< QPair<double, double> >
+pqPipelineDisplay::getColorFieldRanges(const QString& array)
+{
+  QList< QPair<double,double> > ret;
+  
+  vtkSMDisplayProxy* displayProxy = this->getDisplayProxy();
+
+  if(!displayProxy)
+    {
+    return ret;
+    }
+
+  vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+  if(!geomInfo)
+    {
+    return ret;
+    }
+
+  QString field = array;
+  vtkPVArrayInformation* info = NULL;
+
+  if(field == "Solid Color")
+    {
+    return ret;
+    }
+  else
+    {
+    if(field.right(strlen(" (cell)")) == " (cell)")
+      {
+      field.chop(strlen(" (cell)"));
+      vtkPVDataSetAttributesInformation* cellinfo = 
+        geomInfo->GetCellDataInformation();
+      info = cellinfo->GetArrayInformation(field.toAscii().data());
+      }
+    else if(field.right(strlen(" (point)")) == " (point)")
+      {
+      field.chop(strlen(" (point)"));
+      vtkPVDataSetAttributesInformation* pointinfo = 
+        geomInfo->GetPointDataInformation();
+      info = pointinfo->GetArrayInformation(field.toAscii().data());
+      }
+    if(info)
+      {
+      double range[2];
+      for(int i=0; i<info->GetNumberOfComponents(); i++)
+        {
+        info->GetComponentRange(i, range);
+        ret.append(QPair<double,double>(range[0], range[1]));
+        }
+      }
+    }
+}
+
 //-----------------------------------------------------------------------------
 void pqPipelineDisplay::setColorField(const QString& value)
 {

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqProxy.h"
+#include <QPair>
 
 class pqPipelineDisplayInternal;
 class pqPipelineSource;
@@ -112,6 +113,9 @@ public:
 
   /// get the names of the arrays that a part may be colored by
   QList<QString> getColorFields();
+
+  /// get the data ranges for a color field
+  QList<QPair<double, double> > getColorFieldRanges(const QString& array);
 
   /// set the array to color the part by
   void setColorField(const QString& field);

@@ -49,7 +49,22 @@ bool pqAbstractStringEventPlayer::playEvent(QObject* Object, const QString& Comm
     
   if(QComboBox* const object = qobject_cast<QComboBox*>(Object))
     {
-    object->setCurrentIndex(object->findText(value));
+    int index = object->findText(value);
+    if(index != -1)
+      {
+      object->setCurrentIndex(index);
+      }
+    else
+      {
+      QString possibles;
+      for(int i=0; i<object->count(); i++)
+        {
+        possibles += QString("\t") + object->itemText(i) + QString("\n");
+        }
+      qCritical() << "Unable to find " << value << " in combo box\n"
+                  << "Possible values are:\n" << possibles;
+      Error = true;
+      }
     return true;
     }
 
