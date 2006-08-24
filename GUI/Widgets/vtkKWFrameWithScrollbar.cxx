@@ -17,16 +17,30 @@
 #include "vtkKWOptions.h"
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWScrollbar.h"
 
 #include "Utilities/BWidgets/vtkKWBWidgetsInit.h"
 
+#include <vtksys/stl/string>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.15");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.16");
+
+//----------------------------------------------------------------------------
+class vtkKWFrameWithScrollbarInternals
+{
+public:
+
+  vtkKWScrollbar *HorizontalScrollbar;
+  vtkKWScrollbar *VerticalScrollbar;
+};
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
 {
+  this->Internals = new vtkKWFrameWithScrollbarInternals;
+
   this->Frame   = NULL;
   this->ScrollableFrame = NULL;
 }
@@ -34,6 +48,21 @@ vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::~vtkKWFrameWithScrollbar()
 {
+  if (this->Internals)
+    {
+    if (this->Internals->HorizontalScrollbar)
+      {
+      this->Internals->HorizontalScrollbar->Delete();
+      this->Internals->HorizontalScrollbar = NULL;
+      }
+    if (this->Internals->VerticalScrollbar)
+      {
+      this->Internals->VerticalScrollbar->Delete();
+      this->Internals->VerticalScrollbar = NULL;
+      }
+    delete this->Internals;
+    }
+
   if (this->ScrollableFrame)
     {
     this->ScrollableFrame->Delete();
@@ -83,6 +112,24 @@ void vtkKWFrameWithScrollbar::CreateWidget()
   this->Frame->SetWidgetName(
     this->Script("%s getframe", this->ScrollableFrame->GetWidgetName()));
   this->Frame->Create();
+
+  // Create scrollbar wrappers so that we are sure it goes through the
+  // theming/option database framework
+
+  vtksys_stl::string name;
+  name = this->GetWidgetName();
+  name += ".hscroll";
+  this->Internals->HorizontalScrollbar = vtkKWScrollbar::New();
+  this->Internals->HorizontalScrollbar->SetApplication(this->GetApplication());
+  this->Internals->HorizontalScrollbar->SetWidgetName(name.c_str());
+  this->Internals->HorizontalScrollbar->Create();
+
+  name = this->GetWidgetName();
+  name += ".vscroll";
+  this->Internals->VerticalScrollbar = vtkKWScrollbar::New();
+  this->Internals->VerticalScrollbar->SetApplication(this->GetApplication());
+  this->Internals->VerticalScrollbar->SetWidgetName(name.c_str());
+  this->Internals->VerticalScrollbar->Create();
 }
 
 //----------------------------------------------------------------------------

@@ -22,6 +22,7 @@
 #include "vtkKWCoreWidget.h"
 
 class vtkKWFrame;
+class vtkKWFrameWithScrollbarInternals;
 
 class KWWidgets_EXPORT vtkKWFrameWithScrollbar : public vtkKWCoreWidget
 {
@@ -89,6 +90,11 @@ protected:
 
   vtkKWFrame *Frame;
   vtkKWCoreWidget *ScrollableFrame;
+
+  // PIMPL Encapsulation for STL containers
+  //BTX
+  vtkKWFrameWithScrollbarInternals *Internals;
+  //ETX
 
 private:
   vtkKWFrameWithScrollbar(const vtkKWFrameWithScrollbar&); // Not implemented
