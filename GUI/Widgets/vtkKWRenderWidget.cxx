@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.147");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.148");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1149,6 +1149,7 @@ void vtkKWRenderWidget::KeyPressCallback(char key,
   if (gen_interactor)
     {
     gen_interactor->KeyPressEvent();
+    gen_interactor->CharEvent();
     }
 }
 
