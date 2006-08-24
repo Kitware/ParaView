@@ -62,7 +62,7 @@ set tree [$widgets_tree GetWidget]
 $tree RedrawOnIdleOn
 $tree SelectionFillOn
 
-foreach {node text} {"core" "Core Widgets" "composite" "Composite Widgets" "vtk" "VTK Widgets"} {
+foreach {node text} {"core" "Core Widgets" "composite" "Composite Widgets" "VTK" "VTK Widgets"} {
   $tree AddNode "" $node $text
   $tree OpenNode $node
   $tree SetNodeSelectableFlag $node 0
@@ -226,7 +226,7 @@ foreach widget $widgets {
         set parent_node "composite"
       }
       "TypeVTK" {
-        set parent_node "vtk"
+        set parent_node "VTK"
       }
     }
     [$widgets_tree GetWidget] AddNode $parent_node $name $name
@@ -259,10 +259,15 @@ proc selection_callback {} {
     ${name}EntryPoint [$panel GetPageWidget [$panel GetName]] $win
   }
 
+  set in_vtk [[$widgets_tree GetWidget] GetNodeParent $name]
+  if {$in_vtk != "VTK"} {
+    set in_vtk ""
+  }
+  
   # Try to find the Tcl source
   
   set source {}
-  set tcl_source_name [file join [file dirname [info script]] ".." ".." Tcl WidgetsTour Widgets ${name}.tcl]
+  set tcl_source_name [file join [file dirname [info script]] ".." ".." Tcl WidgetsTour Widgets $in_vtk ${name}.tcl]
   if {[file exists $tcl_source_name]} {
     set source [read [open "$tcl_source_name"]]
   }
@@ -271,7 +276,7 @@ proc selection_callback {} {
   # Try to find the C++ source
   
   set source {}
-  set cxx_source_name [file join [file dirname [info script]] ".." ".." Cxx WidgetsTour Widgets ${name}.cxx]
+  set cxx_source_name [file join [file dirname [info script]] ".." ".." Cxx WidgetsTour Widgets $in_vtk ${name}.cxx]
   if {[file exists $cxx_source_name]} {
     set source [read [open "$cxx_source_name"]]
   }
@@ -280,7 +285,7 @@ proc selection_callback {} {
   # Try to find the Python source
   
   set source {}
-  set python_source_name [file join [file dirname [info script]] ".." ".." Python WidgetsTour Widgets ${name}.py]
+  set python_source_name [file join [file dirname [info script]] ".." ".." Python WidgetsTour Widgets $in_vtk ${name}.py]
   if {[file exists $python_source_name]} {
     set source [read [open "$python_source_name"]]
   }

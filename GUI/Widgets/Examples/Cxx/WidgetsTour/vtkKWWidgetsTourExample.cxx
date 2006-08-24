@@ -39,7 +39,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidgetsTourExample );
-vtkCxxRevisionMacro(vtkKWWidgetsTourExample, "1.4");
+vtkCxxRevisionMacro(vtkKWWidgetsTourExample, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetsTourExample::vtkKWWidgetsTourExample()
@@ -161,10 +161,10 @@ int vtkKWWidgetsTourExample::Run(int argc, char *argv[])
   tree->SetNodeSelectableFlag("composite", 0);
   tree->SetNodeFontWeightToBold("composite");
 
-  tree->AddNode(NULL, "vtk", "VTK Widgets");
-  tree->OpenNode("vtk");
-  tree->SetNodeSelectableFlag("vtk", 0);
-  tree->SetNodeFontWeightToBold("vtk");
+  tree->AddNode(NULL, "VTK", "VTK Widgets");
+  tree->OpenNode("VTK");
+  tree->SetNodeSelectableFlag("VTK", 0);
+  tree->SetNodeFontWeightToBold("VTK");
  
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
               this->WidgetsTree->GetWidgetName());
@@ -332,7 +332,7 @@ int vtkKWWidgetsTourExample::Run(int argc, char *argv[])
           parent_node = "composite";
           break;
         case KWWidgetsTourItem::TypeVTK:
-          parent_node = "vtk";
+          parent_node = "VTK";
           break;
         }
       this->WidgetsTree->GetWidget()->AddNode(
