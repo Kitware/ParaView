@@ -131,20 +131,20 @@ void pqMultiViewFrame::setTitle(const QString& title)
     this->MainWidget->setWindowTitle(title);
     }
 }
-void pqMultiViewFrame::hideMenu(bool hide)
+void pqMultiViewFrame::hideMenu(bool vis)
 {
-  if(hide && !this->MenuHidden)
+  if(vis && !this->MenuHidden)
   {
     this->MenuHidden=true;
-    QLayout* layout=this->layout();
+    QLayout* l=this->layout();
     this->Menu->hide();
-    layout->removeWidget(this->Menu);
+    l->removeWidget(this->Menu);
   }
-  else if(!hide && this->MenuHidden)
+  else if(!vis && this->MenuHidden)
   {
     this->MenuHidden=false;
-    QLayout* layout=this->layout();
-    layout->addWidget(this->Menu);
+    QLayout* l=this->layout();
+    l->addWidget(this->Menu);
     this->Menu->show();
   }
 }

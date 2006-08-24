@@ -359,13 +359,15 @@ void pqColorMapEditor::getTableColor(const QModelIndex &index)
     }
 }
 
-void pqColorMapEditor::changeTableColor(int index, const QColor &color)
+void pqColorMapEditor::changeTableColor(int vtkNotUsed(index), 
+                                        const QColor& vtkNotUsed(color))
 {
   // TODO: Set the lookup table color when the proxy interface
   // supports it.
 }
 
-void pqColorMapEditor::updateTableRange(int first, int last)
+void pqColorMapEditor::updateTableRange(int vtkNotUsed(first), 
+                                        int vtkNotUsed(last))
 {
   // TODO: Set the lookup table color when the proxy interface
   // supports it.

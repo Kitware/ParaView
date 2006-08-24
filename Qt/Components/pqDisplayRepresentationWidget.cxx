@@ -134,9 +134,9 @@ void pqDisplayRepresentationWidget::updateLinks()
     }
 
   vtkSMDataObjectDisplayProxy* displayProxy = display->getDisplayProxy();
-  vtkSMProperty* property = display->getProxy()->GetProperty("Representation");
-  property->UpdateDependentDomains();
-  QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(property);
+  vtkSMProperty* repProperty = display->getProxy()->GetProperty("Representation");
+  repProperty->UpdateDependentDomains();
+  QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(repProperty);
   foreach(QVariant item, items)
     {
     if (item == "Volume" && !display->getDisplayProxy()->GetHasVolumePipeline())
@@ -149,7 +149,7 @@ void pqDisplayRepresentationWidget::updateLinks()
   this->Internal->Links.addPropertyLink(
     this->Internal->Adaptor, "currentText",
     SIGNAL(currentTextChanged(const QString&)),
-    displayProxy, property);
+    displayProxy, repProperty);
 }
 
 //-----------------------------------------------------------------------------
