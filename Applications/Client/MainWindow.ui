@@ -28,7 +28,7 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>28</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPipeline" >
@@ -87,6 +87,18 @@
     <addaction name="actionServerConnect" />
     <addaction name="actionServerDisconnect" />
    </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
+   </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
      <string>&amp;File</string>
@@ -108,21 +120,8 @@
     <addaction name="separator" />
     <addaction name="actionServerConnect" />
     <addaction name="actionServerDisconnect" />
-    <addaction name="actionFileManageServers" />
     <addaction name="separator" />
     <addaction name="actionFileExit" />
-   </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -620,14 +619,6 @@
   <action name="actionEditSettings" >
    <property name="text" >
     <string>&amp;Settings</string>
-   </property>
-  </action>
-  <action name="actionFileManageServers" >
-   <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqConnect22.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Manage Servers ...</string>
    </property>
   </action>
   <action name="actionResetCamera" >
