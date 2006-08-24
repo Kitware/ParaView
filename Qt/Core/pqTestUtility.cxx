@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFileDialogEventPlayer.h"
 #include "pqFileDialogEventTranslator.h"
+#include "pqQVTKWidgetEventPlayer.h"
+#include "pqQVTKWidgetEventTranslator.h"
 #include "pqTestUtility.h"
 
 #include "pqEventTranslator.h"
@@ -80,12 +82,14 @@ pqTestUtility::pqTestUtility(pqProcessModuleGUIHelper& helper, QObject* p)
 
 void pqTestUtility::Setup(pqEventTranslator& translator)
 {
+  translator.addWidgetEventTranslator(new pqQVTKWidgetEventTranslator());
   translator.addWidgetEventTranslator(new pqFileDialogEventTranslator());
   translator.addDefaultWidgetEventTranslators();
 }
 
 void pqTestUtility::Setup(pqEventPlayer& player)
 {
+  player.addWidgetEventPlayer(new pqQVTKWidgetEventPlayer());
   player.addWidgetEventPlayer(new pqFileDialogEventPlayer());
   player.addDefaultWidgetEventPlayers();
 }

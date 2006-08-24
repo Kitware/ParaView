@@ -139,6 +139,7 @@ ENDIF(APPLE)
     OpenFile
     OpenSaveData
     RepresentationSelector
+    SimpleInteraction
     StreamTracer
     StreamTracerUpdates
     SubMenu

@@ -58,6 +58,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSettings.h
   pqTestUtility.h
   pqUndoStack.h
+  pqQVTKWidgetEventTranslator.h
+  pqQVTKWidgetEventPlayer.h
   )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
@@ -176,6 +178,10 @@ ADD_LIBRARY(pqCore
   pqWriterFactory.h
   pqXMLUtil.cxx
   pqXMLUtil.h
+  pqQVTKWidgetEventTranslator.cxx
+  pqQVTKWidgetEventTranslator.h
+  pqQVTKWidgetEventPlayer.cxx
+  pqQVTKWidgetEventPlayer.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
