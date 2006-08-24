@@ -603,6 +603,7 @@ pqPipelineDisplay::getColorFieldRanges(const QString& array)
         }
       }
     }
+  return ret;
 }
 
 //-----------------------------------------------------------------------------
