@@ -39,7 +39,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidgetsTourExample );
-vtkCxxRevisionMacro(vtkKWWidgetsTourExample, "1.3");
+vtkCxxRevisionMacro(vtkKWWidgetsTourExample, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetsTourExample::vtkKWWidgetsTourExample()
@@ -427,73 +427,57 @@ void vtkKWWidgetsTourExample::SelectExample(const char *name)
 
   vtksys_stl::string source;
   vtksys_stl::string line;
-
-  // Try to find the C++ source
-
   char buffer[1024];
-  sprintf(buffer, "%s/Cxx/WidgetsTour/Widgets/%s.cxx", 
-          KWWidgets_EXAMPLES_DIR, name);
-  if (!vtksys::SystemTools::FileExists(buffer))
-    {
-    sprintf(buffer, "%s/..%s/Examples/Cxx/WidgetsTour/Widgets/%s.cxx",
-            app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR, name);
-    }
-  source = "";
-  if (vtksys::SystemTools::FileExists(buffer))
-    {
-    ifstream ifs(buffer);
-    while (vtksys::SystemTools::GetLineFromStream(ifs, line))
-      {
-      source += line;
-      source += "\n";
-      }
-    ifs.close();
-    }
-  this->CxxSourceText->GetWidget()->GetWidget()->SetText(source.c_str());
 
-  // Try to find the Tcl source
+  typedef struct
+  {
+    const char *ext;
+    const char *dir;
+    vtkKWTextWithScrollbarsWithLabel *text;
+  } entry_type;
 
-  sprintf(buffer, "%s/Tcl/WidgetsTour/Widgets/%s.tcl", 
-          KWWidgets_EXAMPLES_DIR, name);
-  if (!vtksys::SystemTools::FileExists(buffer))
+  entry_type entries[] =
     {
-    sprintf(buffer, "%s/..%s/Examples/Tcl/WidgetsTour/Widgets/%s.tcl",
-            app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR, name);
-    }
-  source = "";
-  if (vtksys::SystemTools::FileExists(buffer))
-    {
-    ifstream ifs(buffer);
-    while (vtksys::SystemTools::GetLineFromStream(ifs, line))
-      {
-      source += line;
-      source += "\n";
-      }
-    ifs.close();
-    }
-  this->TclSourceText->GetWidget()->GetWidget()->SetText(source.c_str());
+      {"cxx", "Cxx", this->CxxSourceText},
+      {"tcl", "Tcl", this->TclSourceText},
+      {"py", "Python", this->PythonSourceText}
+    };
 
-  // Try to find the Python source
-  
-  sprintf(buffer, "%s/Python/WidgetsTour/Widgets/%s.py", 
-          KWWidgets_EXAMPLES_DIR, name);
-  if (!vtksys::SystemTools::FileExists(buffer))
+  for (int i = 0; i < sizeof(entries) / sizeof(entries[0]); i++)
     {
-    sprintf(buffer, "%s/..%s/Examples/Python/WidgetsTour/Widgets/%s.py",
-            app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR, name);
-    }
-  source = "";
-  if (vtksys::SystemTools::FileExists(buffer))
-    {
-    ifstream ifs(buffer);
-    while (vtksys::SystemTools::GetLineFromStream(ifs, line))
+    entry_type entry = entries[i];
+    sprintf(buffer, "%s/%s/WidgetsTour/Widgets/%s.%s", 
+            KWWidgets_EXAMPLES_DIR, entry.dir, name, entry.ext);
+    if (!vtksys::SystemTools::FileExists(buffer))
       {
-      source += line;
-      source += "\n";
+      sprintf(buffer, "%s/%s/WidgetsTour/Widgets/VTK/%s.%s", 
+              KWWidgets_EXAMPLES_DIR, entry.dir, name, entry.ext);
+      if (!vtksys::SystemTools::FileExists(buffer))
+        {
+        sprintf(buffer, "%s/..%s/Examples/%s/WidgetsTour/Widgets/%s.%s",
+                app->GetInstallationDirectory(), 
+                KWWidgets_INSTALL_DATA_DIR, entry.dir, name, entry.ext);
+        if (!vtksys::SystemTools::FileExists(buffer))
+          {
+          sprintf(buffer, "%s/..%s/Examples/%s/WidgetsTour/Widgets/VTK/%s.%s",
+                  app->GetInstallationDirectory(), 
+                  KWWidgets_INSTALL_DATA_DIR, entry.dir, name, entry.ext);
+          }
+        }
       }
-    ifs.close();
+    source = "";
+    if (vtksys::SystemTools::FileExists(buffer))
+      {
+      ifstream ifs(buffer);
+      while (vtksys::SystemTools::GetLineFromStream(ifs, line))
+        {
+        source += line;
+        source += "\n";
+        }
+      ifs.close();
+      }
+    entry.text->GetWidget()->GetWidget()->SetText(source.c_str());
     }
-  this->PythonSourceText->GetWidget()->GetWidget()->SetText(source.c_str());
 }
 
 //----------------------------------------------------------------------------
