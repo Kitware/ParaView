@@ -59,7 +59,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTestUtility.h
   pqUndoStack.h
   pqQVTKWidgetEventTranslator.h
-  pqQVTKWidgetEventPlayer.h
   )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
