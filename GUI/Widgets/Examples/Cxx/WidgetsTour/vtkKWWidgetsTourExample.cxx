@@ -39,7 +39,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidgetsTourExample );
-vtkCxxRevisionMacro(vtkKWWidgetsTourExample, "1.5");
+vtkCxxRevisionMacro(vtkKWWidgetsTourExample, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetsTourExample::vtkKWWidgetsTourExample()
@@ -443,7 +443,7 @@ void vtkKWWidgetsTourExample::SelectExample(const char *name)
       {"py", "Python", this->PythonSourceText}
     };
 
-  for (int i = 0; i < sizeof(entries) / sizeof(entries[0]); i++)
+  for (size_t i = 0; i < sizeof(entries) / sizeof(entries[0]); i++)
     {
     entry_type entry = entries[i];
     sprintf(buffer, "%s/%s/WidgetsTour/Widgets/%s.%s", 

@@ -36,7 +36,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.54");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.55");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -540,7 +540,6 @@ char *vtkKWThumbWheel::GetInteractionModeAsString(int mode)
     default:
       return (char *)"Unknown";
     }
-  return NULL;
 }
 
 // ---------------------------------------------------------------------------

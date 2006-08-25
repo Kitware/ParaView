@@ -207,6 +207,11 @@ int vtkKWSetApplicationIconCmd(ClientData clientdata,
 
 #else
 
+  (void)clientdata;
+  (void)interp;
+  (void)argc;
+  (void)argv;
+
   return TCL_OK;
 
 #endif
