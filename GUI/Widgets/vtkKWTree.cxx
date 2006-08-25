@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.26");
+vtkCxxRevisionMacro(vtkKWTree, "1.27");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -62,6 +62,7 @@ public:
 
   double SelectionBackgroundColorTemp[3];
   double SelectionForegroundColorTemp[3];
+  
 };
 
 //----------------------------------------------------------------------------
@@ -69,7 +70,8 @@ vtkKWTree::vtkKWTree()
 {
   this->SelectionMode = vtkKWOptions::SelectionModeSingle;
   this->SelectionChangedCommand = NULL;
-
+  this->KeyPressDeleteCommand = NULL;
+  
   this->Internals = new vtkKWTreeInternals;
 }
 
@@ -81,7 +83,12 @@ vtkKWTree::~vtkKWTree()
     delete [] this->SelectionChangedCommand;
     this->SelectionChangedCommand = NULL;
     }
-
+  if (this->KeyPressDeleteCommand)
+    {
+    delete [] this->KeyPressDeleteCommand;
+    this->KeyPressDeleteCommand = NULL;
+    }
+    
    delete this->Internals;
 }
 
@@ -105,6 +112,18 @@ void vtkKWTree::CreateWidget()
 
   this->SetBinding("<<TreeSelect>>", this, "SelectionCallback");
   this->SetBindText("<ButtonPress-3>", this, "RightClickOnNodeCallback");
+  
+  // Bind some extra hotkeys 
+  this->Script("bind %s.c <KeyPress-Next> [list %s yview scroll 1 pages]",
+               this->GetWidgetName(), this->GetWidgetName());
+  this->Script("bind %s.c <KeyPress-Prior> [list %s yview scroll -1 pages]",
+               this->GetWidgetName(), this->GetWidgetName());
+  this->Script("bind %s.c <KeyPress-Home> [list %s yview moveto 0]",
+               this->GetWidgetName(), this->GetWidgetName());
+  this->Script("bind %s.c <KeyPress-End> [list %s yview moveto 1]",
+               this->GetWidgetName(), this->GetWidgetName());
+  this->Script("bind %s.c <KeyPress-Delete> [list %s KeyPressDeleteCallback]",
+               this->GetWidgetName(), this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -158,6 +177,15 @@ void vtkKWTree::RightClickOnNodeCallback(const char *node)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWTree::KeyPressDeleteCallback()
+{
+  if (this->IsCreated() && this->HasSelection())
+    {
+    this->InvokeKeyPressDeleteCommand();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTree::SetSelectionMode(int arg)
 {
   if ((arg != vtkKWOptions::SelectionModeSingle &&
@@ -197,10 +225,23 @@ void vtkKWTree::SetSelectionChangedCommand(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWTree::SetKeyPressDeleteCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->KeyPressDeleteCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTree::InvokeSelectionChangedCommand()
 {
   this->InvokeObjectMethodCommand(this->SelectionChangedCommand);
   this->InvokeEvent(vtkKWTree::SelectionChangedEvent, NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::InvokeKeyPressDeleteCommand()
+{
+  this->InvokeObjectMethodCommand(this->KeyPressDeleteCommand);
 }
 
 //----------------------------------------------------------------------------
