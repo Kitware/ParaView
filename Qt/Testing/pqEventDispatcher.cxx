@@ -84,7 +84,8 @@ void pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
     QAbstractEventDispatcher::instance(),
     SIGNAL(aboutToBlock()),
     this,
-    SLOT(playNextEvent()));
+    SLOT(playNextEvent()),
+    Qt::QueuedConnection);
 }
   
 void pqEventDispatcher::playNextEvent()
@@ -107,8 +108,6 @@ void pqEventDispatcher::playNextEvent()
     emit this->failed();
     return;
     }
-  
-  QTest::qWait(100);
 }
 
 void pqEventDispatcher::stopPlayback()
