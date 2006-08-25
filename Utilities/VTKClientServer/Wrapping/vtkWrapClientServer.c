@@ -20,9 +20,22 @@ int numberOfWrappedFunctions = 0;
 FunctionInfo *wrappedFunctions[1000];
 extern FunctionInfo *currentFunction;
 
+int arg_is_pointer_to_data(int aType, int count)
+{
+  return
+    (count == 0 &&
+     (aType % 0x1000)/0x100 == 3 && /* T*   */
+     (aType % 0x100) != 0x02 && /* void*    */
+     (aType % 0x100) != 0x03 && /* char*    */
+     (aType % 0x100) != 0x08 && /* Foo*  */
+     (aType % 0x100) != 0x09 /* vtkFoo*  */);
+}
 
 void output_temp(FILE *fp, int i, int aType, char *Id, int count)
 {
+  /* Store whether this is pointer to data.  */
+  int isPointerToData = i != MAX_ARGS && arg_is_pointer_to_data(aType, count);
+
   /* ignore void */
   if (((aType % 0x10) == 0x2)&&(!((aType % 0x1000)/0x100)))
     {
@@ -48,6 +61,12 @@ void output_temp(FILE *fp, int i, int aType, char *Id, int count)
     return;
     }
 
+  /* Start pointer-to-data arguments.  */
+  if(isPointerToData)
+    {
+    fprintf(fp, "vtkClientServerStreamDataArg<");
+    }
+
   if ((aType % 0x100)/0x10 == 1)
     {
     fprintf(fp,"unsigned ");
@@ -68,6 +87,13 @@ void output_temp(FILE *fp, int i, int aType, char *Id, int count)
     case 0xD:     fprintf(fp,"signed char "); break;
     case 0x9:     fprintf(fp,"%s ",Id); break;
     case 0x8: return;
+    }
+
+  /* Finish pointer-to-data arguments.  */
+  if(isPointerToData)
+    {
+    fprintf(fp, "> temp%i(msg, 0, %i);\n", i, i+2);
+    return;
     }
 
   /* handle array arguements */
@@ -244,6 +270,13 @@ void get_args(FILE *fp, int i)
             break;
           }
         }
+      else if(arg_is_pointer_to_data(currentFunction->ArgTypes[i],
+                                     currentFunction->ArgCounts[i]))
+        {
+        /* Pointer-to-data arguments are handled by an object
+           convertible to bool.  */
+        fprintf(fp, "temp%i", i);
+        }
 
     }
 }
@@ -265,9 +298,13 @@ void outputFunction(FILE *fp, FileInfo *data)
   /* check to see if we can handle the args */
   for (i = 0; i < currentFunction->NumberOfArguments; i++)
     {
+    int isPointerToData =
+      arg_is_pointer_to_data(currentFunction->ArgTypes[i],
+                             currentFunction->ArgCounts[i]);
     if ((currentFunction->ArgTypes[i] % 0x10) == 0x8) args_ok = 0;
     /* if its a pointer arg make sure we have the ArgCount */
     if ((currentFunction->ArgTypes[i] % 0x1000 >= 0x100) &&
+        !isPointerToData &&
         (currentFunction->ArgTypes[i] % 0x1000 != 0x303)&&
         (currentFunction->ArgTypes[i] % 0x1000 != 0x309)&&
         (currentFunction->ArgTypes[i] % 0x1000 != 0x109))
@@ -283,7 +320,8 @@ void outputFunction(FILE *fp, FileInfo *data)
         (currentFunction->ArgTypes[i] != 0x14)&&
         (currentFunction->ArgTypes[i] != 0x15)&&
         (currentFunction->ArgTypes[i] != 0x16)&&
-        (currentFunction->ArgTypes[i] != 0x1A))
+        (currentFunction->ArgTypes[i] != 0x1A)&&
+        !isPointerToData)
       {
       args_ok = 0;
       }
