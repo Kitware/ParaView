@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqEventObserverXML.h
+   Module:    pqXMLEventObserver.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,38 +30,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqEventObserverXML_h
-#define _pqEventObserverXML_h
+#include "pqXMLEventObserver.h"
 
-#include <QObject>
-#include <vtkIOStream.h>
-
-/**
-Observes high-level ParaView events, and serializes them to a stream as XML for possible playback (as a test-case, demo, tutorial, etc).
-To use, connect the onRecordEvent() slot to the pqEventTranslator::recordEvent() signal.
-
-\note Output is sent to the stream when this object is initialized, and when it is destroyed, so you must ensure that this object
-goes out of scope before trying to playback the stream.
-
-\sa pqEventObserverStdout, pqEventTranslator, pqEventPlayerXML
-*/
-
-class pqEventObserverXML :
-  public QObject
+/// Escapes strings so they can be embedded in an XML document
+static const QString textToXML(const QString& string)
 {
-  Q_OBJECT
+  QString result = string;
+  result.replace("&", "&amp;");
+  result.replace("<", "&lt;");
+  result.replace(">", "&gt;");
+  result.replace("'", "&apos;");
+  result.replace("\"", "&quot;");
   
-public:
-  pqEventObserverXML(ostream& Stream);
-  ~pqEventObserverXML();
+  return result;
+}
 
-public slots:
-  void onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments);
+////////////////////////////////////////////////////////////////////////////////////
+// pqXMLEventObserver
 
-private:
-  /// Stores a stream that will be used to store the XML output
-  ostream& Stream;
-};
+pqXMLEventObserver::pqXMLEventObserver(ostream& stream) :
+  Stream(stream)
+{
+  this->Stream << "<?xml version=\"1.0\" ?>\n";
+  this->Stream << "<pqevents>\n";
+}
 
-#endif // !_pqEventObserverXML_h
+pqXMLEventObserver::~pqXMLEventObserver()
+{
+  this->Stream << "</pqevents>\n";
+}
 
+void pqXMLEventObserver::onRecordEvent(
+  const QString& Widget,
+  const QString& Command,
+  const QString& Arguments)
+{
+  this->Stream
+    << "  <pqevent "
+    << "object=\"" << textToXML(Widget).toAscii().data() << "\" "
+    << "command=\"" << textToXML(Command).toAscii().data() << "\" "
+    << "arguments=\"" << textToXML(Arguments).toAscii().data() << "\" "
+    << "/>\n";
+}

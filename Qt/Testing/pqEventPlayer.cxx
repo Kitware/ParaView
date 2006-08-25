@@ -41,23 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectNaming.h"
 
 #include <QApplication>
-#include <QObject>
 #include <QWidget>
 #include <QtDebug>
 #include <QAbstractEventDispatcher>
 
 pqEventPlayer::pqEventPlayer()
 {
-  // connect our play event queue
-  QObject::connect(this, 
-                   SIGNAL(signalPlayEvent(const QString&, 
-                                          const QString&, 
-                                          const QString&)),
-                   this,
-                   SLOT(internalPlayEvent(const QString&, 
-                                          const QString&, 
-                                          const QString&)),
-                   Qt::QueuedConnection);
 }
 
 pqEventPlayer::~pqEventPlayer()
@@ -85,92 +74,48 @@ void pqEventPlayer::addWidgetEventPlayer(pqWidgetEventPlayer* Player)
     }
 }
 
-void pqEventPlayer::playEvent(const QString& Object,
-       const QString& Command, const QString& Arguments)
+void pqEventPlayer::playEvent(
+  const QString& Object, 
+  const QString& Command,
+  const QString& Arguments,
+  bool& Error)
 {
-  // queue this on the event loop
-  // so internalPlayEvent will actually do it
-
-  // queuing it prevents callers from being blocked
-  emit this->signalPlayEvent(Object, Command, Arguments);
-}
-
-void pqEventPlayer::internalPlayEvent(const QString& Object, 
-        const QString& Command, const QString& Arguments)
-{
-  // if naming doesn't work out, let quit
+  // If we can't find an object with the right name, we're done ...
   QObject* const object = pqObjectNaming::GetObject(Object);
   if(!object)
     {
-    this->exit(false);
+    Error = true;
     return;
     }
 
-  // loop through players and have one of them handle our event
+  // Loop through players until the event gets handled ...
+  bool accepted = false;
+  bool error = false;
   for(int i = 0; i != this->Players.size(); ++i)
     {
-    bool error = false;
-    if(this->Players[i]->playEvent(object, Command, Arguments, error))
+    accepted = this->Players[i]->playEvent(object, Command, Arguments, error);
+    if(accepted)
       {
-      if(error)
-        {
-        qCritical() << "Error playing command " << Command << " object " << object;
-        this->exit(false);
-        return;
-        }
-      return;
+      break;
       }
     }
 
-  qCritical() << "No player for command " << Command << " object " << object;
-  this->exit(false);
-  return;
-}
-
-bool pqEventPlayer::exec()
-{
-  // aboutToBlock() from QAbstractEventDispatcher
-  // is an indication that *absolutely* every Qt event 
-  // has been processed, that's the time when we can say
-  // "let's play the next test event"
-  QObject::connect(QAbstractEventDispatcher::instance(),
-                   SIGNAL(aboutToBlock()),
-                   this, SIGNAL(readyPlayEvent()));
-
-  this->TopLevelWidgets.clear();
-  QWidgetList widgets = QApplication::topLevelWidgets();
-  foreach(QWidget* w, widgets)
+  // The event wasn't handled at all ...
+  if(!accepted)
     {
-    this->TopLevelWidgets.append(w);
+    qCritical() << "Unhandled event " << Command << " object " << object;
+    Error = true;
+    return;
     }
 
-  // start the loop
-  int ret = EventLoop.exec();
-  
-  QObject::disconnect(QAbstractEventDispatcher::instance(),
-                   SIGNAL(aboutToBlock()),
-                   this, SIGNAL(readyPlayEvent()));
-
-  return ret == 0 ? true : false;
-}
-
-void pqEventPlayer::exit(bool ret)
-{
-  // any visible top level widgets made while playing tests 
-  // will be closed
-  // some/all may be modal, and to exit properly, we have
-  // to get rid of the modal ones
-  foreach(QWidget* w, QApplication::topLevelWidgets())
+  // The event was handled, but there was a problem ...    
+  if(accepted && error)
     {
-    if(!this->TopLevelWidgets.contains(w) && w->isVisible())
-      {
-      w->hide();
-      w->close();
-      }
+    qCritical() << "Event error " << Command << " object " << object;
+    Error = true;
+    return;
     }
 
-  // exit our event loop
-  this->EventLoop.exit(ret ? 0 : 1);
+  // The event was handled successfully ...
+  Error = false;
 }
-
-

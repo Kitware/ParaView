@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqEventPlayerXML.h
+   Module:    pqXMLEventObserver.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,31 +30,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqEventPlayerXML_h
-#define _pqEventPlayerXML_h
+#ifndef _pqXMLEventObserver_h
+#define _pqXMLEventObserver_h
 
-#include "QtTestingExport.h"
 #include <QObject>
-#include <QString>
-#include <QDomNode>
+#include <vtkIOStream.h>
 
-class pqEventPlayer;
+/**
+Observes high-level ParaView events, and serializes them to a stream as XML
+for possible playback (as a test-case, demo, tutorial, etc).  To use,
+connect the onRecordEvent() slot to the pqEventTranslator::recordEvent()
+signal.
 
-class QTTESTING_EXPORT pqEventPlayerXML : public QObject
+\note Output is sent to the stream from this object's destructor, so you
+must ensure that it goes out of scope before trying to playback the stream.
+
+\sa pqEventObserverStdout, pqEventTranslator, pqEventPlayerXML
+*/
+
+class pqXMLEventObserver :
+  public QObject
 {
   Q_OBJECT
+  
 public:
-  /// Loads an XML test case from a file, and plays it with the given player, 
-  /// returning true iff every command was successfully executed
-  bool playXML(pqEventPlayer& Player, const QString& Path);
+  pqXMLEventObserver(ostream& Stream);
+  ~pqXMLEventObserver();
 
-protected slots:
-  void playNextEvent();
+public slots:
+  void onRecordEvent(
+    const QString& Widget,
+    const QString& Command,
+    const QString& Arguments);
 
-protected:
-  QDomNode mDomNode;
-  pqEventPlayer* Player;
+private:
+  /// Stores a stream that will be used to store the XML output
+  ostream& Stream;
 };
 
-#endif // !_pqEventPlayerXML_h
+#endif // !_pqXMLEventObserver_h
 

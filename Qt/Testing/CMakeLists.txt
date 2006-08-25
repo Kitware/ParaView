@@ -19,16 +19,16 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqBasicWidgetEventTranslator.h
   pqComboBoxEventTranslator.h
   pqDoubleSpinBoxEventTranslator.h
-  pqEventObserverStdout.h
-  pqEventObserverXML.h
+  pqEventDispatcher.h
   pqEventPlayer.h
-  pqEventPlayerXML.h
   pqEventTranslator.h
   pqLineEditEventTranslator.h
   pqMenuEventTranslator.h
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.h
+  pqStdoutEventObserver.h
   pqWidgetEventTranslator.h
+  pqXMLEventObserver.h
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -65,16 +65,13 @@ ADD_LIBRARY(QtTesting
   pqComboBoxEventTranslator.h
   pqDoubleSpinBoxEventTranslator.cxx
   pqDoubleSpinBoxEventTranslator.h
-  pqEventObserverStdout.cxx
-  pqEventObserverStdout.h
-  pqEventObserverXML.cxx
-  pqEventObserverXML.h
+  pqEventDispatcher.cxx
+  pqEventDispatcher.h
   pqEventPlayer.cxx
   pqEventPlayer.h
-  pqEventPlayerXML.cxx
-  pqEventPlayerXML.h
   pqEventTranslator.cxx
   pqEventTranslator.h
+  pqEventSource.h
   pqLineEditEventTranslator.cxx
   pqLineEditEventTranslator.h
   pqMenuEventTranslator.cxx
@@ -85,8 +82,14 @@ ADD_LIBRARY(QtTesting
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.cxx
   pqSpinBoxEventTranslator.h
+  pqStdoutEventObserver.cxx
+  pqStdoutEventObserver.h
   pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
+  pqXMLEventObserver.cxx
+  pqXMLEventObserver.h
+  pqXMLEventSource.cxx
+  pqXMLEventSource.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
 )

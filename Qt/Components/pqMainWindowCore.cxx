@@ -68,8 +68,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettingsDialog.h"
 
 #include <pqConnect.h>
+#include <pqEventDispatcher.h>
 #include <pqEventPlayer.h>
-#include <pqEventPlayerXML.h>
 #include <pqEventTranslator.h>
 #include <pqFileDialog.h>
 #include <pqLocalFileDialogModel.h>
@@ -81,6 +81,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSetName.h>
 #include <pqTestUtility.h>
 #include <pqUndoStack.h>
+#include <pqXMLEventSource.h>
 
 #ifdef PARAVIEW_EMBED_PYTHON
 #include <pqPythonDialog.h>
@@ -105,8 +106,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPVXMLParser.h>
 #include <vtkSmartPointer.h>
 #include <vtkSMDoubleRangeDomain.h>
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
+#include <vtkSMDoubleVectorProperty.h>
+#include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
@@ -140,6 +141,7 @@ public:
   this->PythonDialog = 0;
 #endif // PARAVIEW_EMBED_PYTHON
 
+    pqTestUtility::Setup(this->EventPlayer);
   }
   
   ~pqImplementation()
@@ -176,6 +178,10 @@ public:
 #ifdef PARAVIEW_EMBED_PYTHON
   QPointer<pqPythonDialog> PythonDialog;
 #endif // PARAVIEW_EMBED_PYTHON
+
+  pqXMLEventSource EventSource;
+  pqEventPlayer EventPlayer;
+  pqEventDispatcher EventDispatcher;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1334,14 +1340,12 @@ void pqMainWindowCore::onToolsPlayTest()
 
 void pqMainWindowCore::onToolsPlayTest(const QStringList &fileNames)
 {
-  pqEventPlayer player;
-  pqTestUtility::Setup(player);
-
-  QStringList::ConstIterator iter = fileNames.begin();
-  for( ; iter != fileNames.end(); ++iter)
+  if(1 == fileNames.size())
     {
-    pqEventPlayerXML xml_player;
-    xml_player.playXML(player, *iter);
+    this->Implementation->EventSource.setContent(fileNames[0]);
+    this->Implementation->EventDispatcher.playEvents(
+      this->Implementation->EventSource,
+      this->Implementation->EventPlayer);
     }
 }
 

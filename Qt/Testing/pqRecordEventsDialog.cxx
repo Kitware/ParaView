@@ -30,9 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqEventObserverXML.h"
 #include "pqEventTranslator.h"
 #include "pqRecordEventsDialog.h"
+#include "pqXMLEventObserver.h"
+
 #include "ui_pqRecordEventsDialog.h"
 
 #include <QPushButton>
@@ -62,7 +63,7 @@ public:
 
   pqEventTranslator* const Translator;
   ofstream File;
-  pqEventObserverXML Observer;
+  pqXMLEventObserver Observer;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqEventObserverStdout.cxx
+   Module:    pqEventDispatcher.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,12 +30,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqEventObserverStdout.h"
-#include <stdio.h>
+#ifndef _pqEventDispatcher_h
+#define _pqEventDispatcher_h
 
-void pqEventObserverStdout::onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments)
+#include "QtTestingExport.h"
+
+#include <QObject>
+
+class pqEventPlayer;
+class pqEventSource;
+
+class QTTESTING_EXPORT pqEventDispatcher :
+  public QObject
 {
-  printf("event: %s %s %s\n", Widget.toAscii().data(), Command.toAscii().data(),
-                              Arguments.toAscii().data());
-}
+  Q_OBJECT
+  
+public:
+  pqEventDispatcher();
+  ~pqEventDispatcher();
 
+  /** Retrieves events from the given event source, dispatching them to
+  the given event player for test case playback.  Note that playback is
+  asynchronous - the call to playEvents() returns immediately.  Callers
+  must ensure that the source, dispatcher, and player objects remain
+  in-scope until either the succeeded() or failed() signal is emitted
+  to indicate that playback has finished. */
+  void playEvents(pqEventSource& source, pqEventPlayer& player);
+
+signals:
+  void succeeded();
+  void failed();
+
+private slots:
+  void playNextEvent();
+
+private:
+  void stopPlayback();
+
+  class pqImplementation;
+  pqImplementation* const Implementation;
+};
+
+#endif // !_pqEventDispatcher_h

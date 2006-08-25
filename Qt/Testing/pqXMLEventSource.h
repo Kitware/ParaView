@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqWidgetEventTranslator.h
+   Module:    pqXMLEventSource.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,41 +30,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqWidgetEventTranslator_h
-#define _pqWidgetEventTranslator_h
+#ifndef _pqXMLEventSource_h
+#define _pqXMLEventSource_h
 
-#include "QtTestingExport.h"
-#include <QObject>
+#include "pqEventSource.h"
 
-/**
-Abstract interface for an object that can translate
-low-level Qt events into high-level, serializable ParaView
-events, for test-cases, demos, tutorials, etc.
+class QString;
 
-\sa pqEventTranslator
-*/
-class QTTESTING_EXPORT pqWidgetEventTranslator :
-  public QObject
+/** Concrete implementation of pqEventSource that retrieves events recorded
+by pqXMLEventObserver */
+class QTTESTING_EXPORT pqXMLEventSource :
+  public pqEventSource
 {
-  Q_OBJECT
-  
 public:
-  virtual ~pqWidgetEventTranslator() {}
-  
-  /** Derivatives should implement this and translate events into commands,
-  returning "true" if they handled the event, and setting Error
-  to "true" if there were any problems. */
-  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error) = 0;
+  pqXMLEventSource();
+  ~pqXMLEventSource();
 
-signals:
-  /// Derivatives should emit this signal whenever they wish to record a high-level event
-  void recordEvent(QObject* Object, const QString& Command, const QString& Arguments);
+  void setContent(const QString& path);
 
-protected:
-  pqWidgetEventTranslator() {}
-  pqWidgetEventTranslator(const pqWidgetEventTranslator&);
-  pqWidgetEventTranslator& operator=(const pqWidgetEventTranslator&);
+  virtual bool getNextEvent(
+    QString& object,
+    QString& command,
+    QString& arguments);
+
+private:
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
-#endif // !_pqWidgetEventTranslator_h
-
+#endif // !_pqXMLEventSource_h

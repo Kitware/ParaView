@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqEventObserverXML.cxx
+   Module:    pqStdoutEventObserver.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,42 +30,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqEventObserverXML.h"
+#include "pqStdoutEventObserver.h"
+#include <stdio.h>
 
-/// Escapes strings so they can be embedded in an XML document
-static const QString textToXML(const QString& string)
+void pqStdoutEventObserver::onRecordEvent(
+  const QString& Widget,
+  const QString& Command,
+  const QString& Arguments)
 {
-  QString result = string;
-  result.replace("&", "&amp;");
-  result.replace("<", "&lt;");
-  result.replace(">", "&gt;");
-  result.replace("'", "&apos;");
-  result.replace("\"", "&quot;");
-  
-  return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-// pqEventObserverXML
-
-pqEventObserverXML::pqEventObserverXML(ostream& stream) :
-  Stream(stream)
-{
-  this->Stream << "<?xml version=\"1.0\" ?>\n";
-  this->Stream << "<pqevents>\n";
-}
-
-pqEventObserverXML::~pqEventObserverXML()
-{
-  this->Stream << "</pqevents>\n";
-}
-
-void pqEventObserverXML::onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments)
-{
-  this->Stream
-    << "  <pqevent "
-    << "object=\"" << textToXML(Widget).toAscii().data() << "\" "
-    << "command=\"" << textToXML(Command).toAscii().data() << "\" "
-    << "arguments=\"" << textToXML(Arguments).toAscii().data() << "\" "
-    << "/>\n";
+  printf("event: %s %s %s\n",
+    Widget.toAscii().data(),
+    Command.toAscii().data(),
+    Arguments.toAscii().data());
 }

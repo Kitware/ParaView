@@ -36,12 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtTestingExport.h"
 
 #include <QObject>
-#include <QEventLoop>
 #include <QString>
 #include <QList>
-#include <QPointer>
 
-class QObject;
 class pqWidgetEventPlayer;
 
 /**
@@ -68,9 +65,11 @@ event playback, so you can also use this mechanism to
 \sa pqWidgetEventPlayer, pqEventTranslator, pqEventPlayerXML
 */
 
-class QTTESTING_EXPORT pqEventPlayer : public QObject
+class QTTESTING_EXPORT pqEventPlayer :
+  public QObject
 {
   Q_OBJECT
+  
 public:
   pqEventPlayer();
   ~pqEventPlayer();
@@ -82,43 +81,10 @@ public:
   /// Adds a new player to the current working set of widget players.  
   /// pqEventPlayer assumes control of the lifetime of the supplied object.
   void addWidgetEventPlayer(pqWidgetEventPlayer*);
-
   /// This method is called with each high-level ParaView event, which 
   /// will invoke the corresponding low-level Qt functionality in-turn.  
   /// If there was an error playing the event, the error() signal is emitted
-  void playEvent(const QString& Object, const QString& Command, 
-                 const QString& Arguments = QString());
-
-  /// Starts the execution of playing tests
-  /// The readyPlayEvent() signal will be emitted when 
-  /// things are ready for playEvent() to be called.
-  /// This is used to simulate a running application
-  /// while playing back events.
-  bool exec();
-
-  /// notifies the player that we want to quit playing
-  /// back test events.  retVal is the return value from
-  /// exec()
-  /// exit(false) is automatically called when there is
-  /// an error playing an event
-  void exit(bool retVal);
-
-
-signals:
-  /// readyPlayEvent emitted when playEvent is ready 
-  /// for the next playback event
-  void readyPlayEvent();
-
-
-  // Internals
-
-signals:
-  void signalPlayEvent(const QString& Object, const QString& Command,
-                       const QString& Arguments = QString());
-
-private slots:
-  void internalPlayEvent(const QString& Object, const QString& Command,
-                         const QString& Arguments = QString());
+  void playEvent(const QString& Object, const QString& Command, const QString& Arguments, bool& Error);
 
 private:
   pqEventPlayer(const pqEventPlayer&);
@@ -127,8 +93,6 @@ private:
 
   /// Stores the working set of widget players  
   QList<pqWidgetEventPlayer*> Players;
-  QEventLoop EventLoop;
-  QList<QPointer<QWidget> > TopLevelWidgets;
 };
 
 #endif // !_pqEventPlayer_h

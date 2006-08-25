@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqEventObserverStdout.h
+   Module:    pqEventSource.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,26 +30,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqEventObserverStdout_h
-#define _pqEventObserverStdout_h
+#ifndef _pqEventSource_h
+#define _pqEventSource_h
 
-#include <QObject>
+#include "QtTestingExport.h"
 
-/**
-Observes high-level ParaView "events" and writes them to stdout, mainly for debugging purposes.
-To use, connect the onRecordEvent() slot to the pqEventTranslator::recordEvent() signal.
+class QString;
 
-\sa pqEventTranslator, pqEventObserverXML
-*/
-
-class pqEventObserverStdout :
-  public QObject
+/// Abstract interface for objects that can supply high-level testing events
+class QTTESTING_EXPORT pqEventSource
 {
-  Q_OBJECT
+public:
+  virtual ~pqEventSource() {}
 
-public slots:
-  void onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments);
+  /// Retrieves the next available event.  Returns true if an event was returned, false if there are no more events
+  virtual bool getNextEvent(
+    QString& object,
+    QString& command,
+    QString& arguments) = 0;
+
+protected:
+  pqEventSource() {}
+  pqEventSource(const pqEventSource&) {}
+  pqEventSource& operator=(const pqEventSource&) { return *this; }
 };
 
-#endif // !_pqEventObserverStdout_h
-
+#endif // !_pqEventSource_h

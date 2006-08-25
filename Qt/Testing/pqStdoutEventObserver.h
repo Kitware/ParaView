@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqWidgetEventTranslator.h
+   Module:    pqStdoutEventObserver.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,41 +30,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqWidgetEventTranslator_h
-#define _pqWidgetEventTranslator_h
+#ifndef _pqStdoutEventObserver_h
+#define _pqStdoutEventObserver_h
 
-#include "QtTestingExport.h"
 #include <QObject>
 
 /**
-Abstract interface for an object that can translate
-low-level Qt events into high-level, serializable ParaView
-events, for test-cases, demos, tutorials, etc.
+Observes high-level ParaView "events" and writes them to stdout,
+mainly for debugging purposes. To use, connect the onRecordEvent()
+slot to the pqEventTranslator::recordEvent() signal.
 
-\sa pqEventTranslator
+\sa pqEventTranslator, pqEventObserverXML
 */
-class QTTESTING_EXPORT pqWidgetEventTranslator :
+
+class pqStdoutEventObserver :
   public QObject
 {
   Q_OBJECT
-  
-public:
-  virtual ~pqWidgetEventTranslator() {}
-  
-  /** Derivatives should implement this and translate events into commands,
-  returning "true" if they handled the event, and setting Error
-  to "true" if there were any problems. */
-  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error) = 0;
 
-signals:
-  /// Derivatives should emit this signal whenever they wish to record a high-level event
-  void recordEvent(QObject* Object, const QString& Command, const QString& Arguments);
-
-protected:
-  pqWidgetEventTranslator() {}
-  pqWidgetEventTranslator(const pqWidgetEventTranslator&);
-  pqWidgetEventTranslator& operator=(const pqWidgetEventTranslator&);
+public slots:
+  void onRecordEvent(
+    const QString& Widget,
+    const QString& Command,
+    const QString& Arguments);
 };
 
-#endif // !_pqWidgetEventTranslator_h
-
+#endif // !_pqStdoutEventObserver_h

@@ -39,7 +39,9 @@ class QObject;
 class QString;
 
 /**
-Abstract interface for an object that can playback high-level ParaView events by translating them into low-level Qt events, for test-cases, demos, tutorials, etc.
+Abstract interface for an object that can playback high-level
+ParaView events by translating them into low-level Qt events,
+for test-cases, demos, tutorials, etc.
 
 \sa pqEventPlayer
 */
@@ -49,8 +51,14 @@ class QTTESTING_EXPORT pqWidgetEventPlayer
 public:
   virtual ~pqWidgetEventPlayer() {}
 
-  /// Derivatives should implement this and play-back the given command, returning "true" if they handled the command, and setting Error to "true" if there were any problems.
-  virtual bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error) = 0;
+  /** Derivatives should implement this and play-back the given command,
+  returning "true" if they handled the command, and setting Error
+  to "true" if there were any problems. */
+  virtual bool playEvent(
+    QObject* Object,
+    const QString& Command,
+    const QString& Arguments,
+    bool& Error) = 0;
 
 protected:
   pqWidgetEventPlayer() {}
