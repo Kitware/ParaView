@@ -38,7 +38,7 @@ def vtkKWCornerAnnotationEditorEntryPoint(parent, win):
     cae_reader = vtkXMLImageDataReader()
     cae_reader.SetFileName(os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
-        "..", "..", "..", "Data", "head100x100x47.vti"))
+        "..", "..", "..", "..", "Data", "head100x100x47.vti"))
     
     # Create an image viewer
     # Use the render window and renderer of the renderwidget
