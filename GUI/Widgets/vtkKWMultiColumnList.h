@@ -46,7 +46,7 @@ public:
   static vtkKWMultiColumnList* New();
   vtkTypeRevisionMacro(vtkKWMultiColumnList,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
-
+  
   // Description:
   // Set the width (in chars) and height (in lines).
   // If width is set to 0, the widget will be large enough to show
@@ -463,6 +463,20 @@ public:
   virtual void SetColumnFormatCommandToEmptyOutput(int col_index);
 
   // Description:
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the "Delete" Key is pressed, but this will only
+  // invoke the 'method' passed in. This 'method' of the 'object' needs to 
+  // decide what to do with this <KeyPress-Delete> event. For examples, if
+  // user wants to go ahead and delete, the 'object' needs to find out the 
+  // selected rows/cells and delete them using API of this class.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  virtual void SetKeyPressDeleteCommand(vtkObject *object, 
+                                     const char *method);
+
+  // Description:
   // Specifies a boolean value that determines whether the rows can be 
   // moved interactively.
   vtkBooleanMacro(MovableRows, int);
@@ -470,10 +484,12 @@ public:
   virtual int GetMovableRows();
 
   // Description:
-  // Add a row at the end, or insert it at a given location.
+  // Add a row(rows) at the end, or insert it(them) at a given location.
   virtual void InsertRow(int row_index);
+  virtual void InsertRows(int row_index, int num_rows);
   virtual void AddRow();
-
+  virtual void AddRows(int num_rows);
+  
   // Description:
   // Get number of rows.
   // Returns -1 on error.
@@ -1242,7 +1258,8 @@ public:
     const char *w, int x, int y, int root_x, int root_y);
   virtual void RefreshColorsOfAllCellsWithWindowCommandCallback();
   virtual void RefreshAllCellsWithWindowCommandCallback();
-
+  virtual void KeyPressDeleteCallback();
+  
 protected:
   vtkKWMultiColumnList();
   ~vtkKWMultiColumnList();
@@ -1251,6 +1268,9 @@ protected:
   // Create the widget.
   virtual void CreateWidget();
 
+  char *KeyPressDeleteCommand;
+  void InvokeKeyPressDeleteCommand();
+  
   char *EditStartCommand;
   const char* InvokeEditStartCommand(int row, int col, const char *text);
 

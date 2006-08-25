@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.66");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.67");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -81,6 +81,7 @@ public:
 vtkKWMultiColumnList::vtkKWMultiColumnList()
 {
   this->EditStartCommand = NULL;
+  this->KeyPressDeleteCommand = NULL;
   this->EditEndCommand = NULL;
   this->CellUpdatedCommand = NULL;
   this->SelectionCommand = NULL;
@@ -106,6 +107,11 @@ vtkKWMultiColumnList::~vtkKWMultiColumnList()
     {
     delete [] this->EditStartCommand;
     this->EditStartCommand = NULL;
+    }
+  if (this->KeyPressDeleteCommand)
+    {
+    delete [] this->KeyPressDeleteCommand;
+    this->KeyPressDeleteCommand = NULL;
     }
   if (this->EditEndCommand)
     {
@@ -194,6 +200,9 @@ void vtkKWMultiColumnList::CreateWidget()
   this->AddBinding("<<TablelistColumnSorted>>", this, "ColumnSortedCallback");
 
   this->Script("bind [%s bodytag] <<Button3>> [list %s RightClickCallback %%W %%x %%y %%X %%Y]",
+               this->GetWidgetName(), this->GetTclName());
+ 
+  this->Script("bind [%s bodytag] <Delete> [list %s KeyPressDeleteCallback]",
                this->GetWidgetName(), this->GetTclName());
 }
 
@@ -1166,6 +1175,16 @@ void vtkKWMultiColumnList::SetColumnFormatCommandToEmptyOutput(int col_index)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::KeyPressDeleteCallback()
+{
+  if (this->IsCreated() && (this->GetNumberOfSelectedCells() > 0 ||
+                            this->GetNumberOfSelectedRows() > 0))
+    {
+    this->InvokeKeyPressDeleteCommand();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetMovableRows(int arg)
 {
   this->SetConfigurationOptionAsInt("-movablerows", arg ? 1 : 0);
@@ -1204,6 +1223,55 @@ void vtkKWMultiColumnList::InsertRow(int row_index)
         this->NumberOfRowsChanged();
         }
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::InsertRows(int row_index, int num_rows)
+{
+  if (this->IsCreated())
+    {
+    int nb_cols = this->GetNumberOfColumns();
+    if (nb_cols > 0)
+      {
+      vtksys_stl::string item;
+      for (int i = 0; i < nb_cols; i++)
+        {
+        item += "\"\" ";
+        }
+      int nb_rows = this->GetNumberOfRows();
+      int old_state = this->GetState();
+      if (this->GetState() != vtkKWOptions::StateNormal)
+        {
+        this->SetStateToNormal();
+        }
+      const char* name = this->GetWidgetName();
+      const char* pItem = item.c_str();
+      ostrstream tk_cmd;
+      for(int row=0; row<num_rows; row++)
+        {
+        tk_cmd << name << " insert " << (row+row_index) 
+          << " {" << pItem << "}" << endl;
+        }
+      tk_cmd << ends;
+      this->Script(tk_cmd.str());
+      tk_cmd.rdbuf()->freeze(0);
+      
+      this->SetState(old_state);
+      if (this->GetNumberOfRows() != nb_rows)
+        {
+        this->NumberOfRowsChanged();
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::AddRows(int num_rows)
+{
+  if (this->IsCreated())
+    {
+    this->InsertRows(this->GetNumberOfRows(), num_rows);
     }
 }
 
@@ -3712,6 +3780,19 @@ void vtkKWMultiColumnList::SetEditStartCommand(
   vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->EditStartCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::InvokeKeyPressDeleteCommand()
+{
+  this->InvokeObjectMethodCommand(this->KeyPressDeleteCommand);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetKeyPressDeleteCommand(
+     vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->KeyPressDeleteCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
