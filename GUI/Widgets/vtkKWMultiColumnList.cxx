@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.65");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.66");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -2459,8 +2459,8 @@ void vtkKWMultiColumnList::CellWindowCommandToCheckButtonCallback(
   child->SetWidgetName(widget);
   child->SetParent(this);
   child->Create();
-  child->SetHighlightThickness(0);
-  child->SetBorderWidth(0);
+  //child->SetHighlightThickness(0);
+  //child->SetBorderWidth(0);
   child->SetPadX(0);
   child->SetPadY(0);
   child->SetBackgroundColor(this->GetCellCurrentBackgroundColor(row, col));
