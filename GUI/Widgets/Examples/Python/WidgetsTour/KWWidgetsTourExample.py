@@ -90,7 +90,7 @@ def main(argv):
 
     for (node,text) in [("core","Core Widgets"),
                         ("composite","Composite Widgets"),
-                        ("vtk","VTK Widgets")]:
+                        ("VTK","VTK Widgets")]:
         tree.AddNode("", node, text)
         tree.OpenNode(node)
         tree.SetNodeSelectableFlag(node, 0)
@@ -267,12 +267,14 @@ def main(argv):
             widget_type = entry_func(panel.GetPageWidget(panel.GetName()), win)
             if widget_type:
                 parent_nome = None
+                in_vtk = ""
                 if widget_type == "TypeCore":
                     parent_node = "core"
                 elif widget_type == "TypeComposite":
                     parent_node = "composite"
                 elif widget_type == "TypeVTK":
-                    parent_node = "vtk"
+                    parent_node = "VTK"
+                    in_vtk = "VTK"
 
                 widgets_tree.GetWidget().AddNode(parent_node, name, name)
 
@@ -287,7 +289,7 @@ def main(argv):
 
                 cxx_source_name = os.path.join(
                     os.path.dirname(os.path.abspath(__file__)), "..", "..",
-                    "Cxx", "WidgetsTour", "Widgets", name + ".cxx")
+                    "Cxx", "WidgetsTour", "Widgets", in_vtk, name + ".cxx")
 
                 try:
                     file = open(cxx_source_name, "r")
@@ -303,7 +305,7 @@ def main(argv):
 
                 tcl_source_name = os.path.join(
                     os.path.dirname(os.path.abspath(__file__)), "..", "..",
-                    "Tcl", "WidgetsTour", "Widgets", name + ".tcl")
+                    "Tcl", "WidgetsTour", "Widgets", in_vtk, name + ".tcl")
 
                 try:
                     file = open(tcl_source_name, "r")
