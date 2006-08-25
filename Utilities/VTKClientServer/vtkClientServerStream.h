@@ -409,4 +409,54 @@ vtkClientServerStreamGetArgumentObject(const vtkClientServerStream& msg,
   return 0;
 }
 
+#if defined(VTK_WRAPPING_CXX)
+// Extract the given argument of the given message as a data array.
+// This is for use only in generated wrappers.
+template <class T>
+class vtkClientServerStreamDataArg
+{
+public:
+  // Constructor checks the argument type and length, allocates
+  // memory, and extracts the data from the message.
+  vtkClientServerStreamDataArg(const vtkClientServerStream& msg,
+                               int message, int argument): Data(0)
+    {
+    // Check the argument length.
+    vtkTypeUInt32 length = 0;
+    if(msg.GetArgumentLength(message, argument, &length) && length > 0)
+      {
+      // Allocate memory without throwing.
+      try
+        {
+        this->Data = new T[length];
+        }
+      catch(...)
+        {
+        }
+      }
+
+    // Extract the data into the allocated memory.
+    if(this->Data && !msg.GetArgument(message, argument, this->Data, length))
+      {
+      delete [] this->Data;
+      this->Data = 0;
+      }
+    }
+
+  // Destructor frees data memory.
+  ~vtkClientServerStreamDataArg()
+    {
+    if(this->Data)
+      {
+      delete [] this->Data;
+      }
+    }
+
+  // Allow this object to be passed as if it were a pointer.
+  operator T*() { return this->Data; }
+private:
+  T* Data;
+};
+#endif
+
 #endif
