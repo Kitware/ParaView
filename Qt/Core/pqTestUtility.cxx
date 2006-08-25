@@ -213,8 +213,12 @@ void pqTestUtility::runTests()
       this->Implementation->EventDispatcher.playEvents(
         this->Implementation->EventSource,
         this->Implementation->EventPlayer);
+      return;
       }
     }
+  
+  // No tests to run, so declare success!
+  this->testSucceeded();
 }
 
 void pqTestUtility::testSucceeded()
