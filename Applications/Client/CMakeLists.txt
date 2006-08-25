@@ -105,6 +105,19 @@ TARGET_LINK_LIBRARIES(paraview_alpha${PV_EXE_SUFFIX}
   ${QT_LIBRARIES}
 )
 
+IF(APPLE)
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/CompleteBundle.cmake"
+    @ONLY IMMEDIATE)
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/CreateBundle.sh"
+    @ONLY IMMEDIATE)
+#  ADD_CUSTOM_COMMAND(
+#    TARGET paraview_alpha${PV_EXE_SUFFIX}
+#    POST_BUILD
+#    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/CompleteBundle.cmake")
+ENDIF(APPLE)
+
 IF(WIN32)
   TARGET_LINK_LIBRARIES(paraview_alpha${PV_EXE_SUFFIX}
     optimized qtmain debug qtmaind

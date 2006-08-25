@@ -33,9 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ProcessModuleGUIHelper.h"
 #include <pqMain.h>
 #include <QApplication>
+#include <QDir>
 
 int main(int argc, char* argv[])
 {
   QApplication app(argc, argv);
+
+  QDir dir(QApplication::applicationDirPath());
+  dir.cdUp();
+  dir.cd("Plugins");
+  QApplication::setLibraryPaths(QStringList(dir.absolutePath()));
   return pqMain::Run(app, ProcessModuleGUIHelper::New());
 }
