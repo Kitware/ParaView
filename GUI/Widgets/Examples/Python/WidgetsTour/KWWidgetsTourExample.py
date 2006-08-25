@@ -8,6 +8,7 @@ import sys
 import os
 import imp
 import traceback
+import kwwidgets
 from glob import glob
 
 # Process some command-line arguments
@@ -233,8 +234,8 @@ def main(argv):
                                 os.path.abspath(__file__)),
                                 "Widgets", "*.py"))
 
-    if hasattr('kwwidgets', 'vtkKWRenderWidget'):
-        widgets.append(glob(os.path.join(os.path.dirname(
+    if hasattr(kwwidgets, 'vtkKWRenderWidget'):
+        widgets = widgets + list(glob(os.path.join(os.path.dirname(
                             os.path.abspath(__file__)),
                             "Widgets/VTK", "*.py")))
         
