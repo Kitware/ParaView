@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.36");
+vtkCxxRevisionMacro(vtkKWIcon, "1.37");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -750,6 +750,102 @@ void vtkKWIcon::SetImage(int image)
         image_window_level_width, image_window_level_height,
         image_window_level_pixel_size, 
         image_window_level_length);
+      break;
+
+    case vtkKWIcon::IconBrowserUp:
+      this->SetImage(
+        image_browserup, 
+        image_browserup_width, image_browserup_height,
+        image_browserup_pixel_size, 
+        image_browserup_length);
+      break;
+
+    case vtkKWIcon::IconBrowserBack:
+      this->SetImage(
+        image_browserback, 
+        image_browserback_width, image_browserback_height,
+        image_browserback_pixel_size, 
+        image_browserback_length);
+      break;
+
+    case vtkKWIcon::IconBrowserForward:
+      this->SetImage(
+        image_browserforward, 
+        image_browserforward_width, image_browserforward_height,
+        image_browserforward_pixel_size, 
+        image_browserforward_length);
+      break;
+
+    case vtkKWIcon::IconFileDelete:
+      this->SetImage(
+        image_filedelete, 
+        image_filedelete_width, image_filedelete_height,
+        image_filedelete_pixel_size, 
+        image_filedelete_length);
+      break;
+
+    case vtkKWIcon::IconFolderNew:
+      this->SetImage(
+        image_foldernew, 
+        image_foldernew_width, image_foldernew_height,
+        image_foldernew_pixel_size, 
+        image_foldernew_length);
+      break;
+
+    case vtkKWIcon::IconCdRom:
+      this->SetImage(
+        image_cdrom, 
+        image_cdrom_width, image_cdrom_height,
+        image_cdrom_pixel_size, 
+        image_cdrom_length);
+      break;
+
+    case vtkKWIcon::IconHardDrive:
+      this->SetImage(
+        image_harddisk, 
+        image_harddisk_width, image_harddisk_height,
+        image_harddisk_pixel_size, 
+        image_harddisk_length);
+      break;
+
+    case vtkKWIcon::IconFloppyDrive:
+      this->SetImage(
+        image_floppydrive, 
+        image_floppydrive_width, image_floppydrive_height,
+        image_floppydrive_pixel_size, 
+        image_floppydrive_length);
+      break;
+
+    case vtkKWIcon::IconNetDrive:
+      this->SetImage(
+        image_netdrive, 
+        image_netdrive_width, image_netdrive_height,
+        image_netdrive_pixel_size, 
+        image_netdrive_length);
+      break;
+
+    case vtkKWIcon::IconFavorites:
+      this->SetImage(
+        image_favorites, 
+        image_favorites_width, image_favorites_height,
+        image_favorites_pixel_size, 
+        image_favorites_length);
+      break;
+
+    case vtkKWIcon::IconFolder32:
+      this->SetImage(
+        image_folder32, 
+        image_folder32_width, image_folder32_height,
+        image_folder32_pixel_size, 
+        image_folder32_length);
+      break;
+
+    case vtkKWIcon::IconFolderXP:
+      this->SetImage(
+        image_folderxp, 
+        image_folderxp_width, image_folderxp_height,
+        image_folderxp_pixel_size, 
+        image_folderxp_length);
       break;
     }
 }

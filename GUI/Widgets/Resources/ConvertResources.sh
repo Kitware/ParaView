@@ -82,4 +82,16 @@ KWConvertImageToHeader --zlib --base64 \
     warning.png \
     warning_mini.png \
     window_level.png \
-    contour_segment.png
+    contour_segment.png \
+    browserup.png \
+    browserback.png \
+    browserforward.png \
+    filedelete.png \
+    foldernew.png \
+    cdrom.png \
+    harddisk.png \
+    floppydrive.png \
+    netdrive.png \
+    favorites.png \
+    folder32.png \
+    folderxp.png
