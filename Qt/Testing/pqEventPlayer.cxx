@@ -116,6 +116,7 @@ void pqEventPlayer::playEvent(
     return;
     }
 
+  QApplication::processEvents();
   // The event was handled successfully ...
   Error = false;
 }
