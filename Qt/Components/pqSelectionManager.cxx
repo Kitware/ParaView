@@ -217,6 +217,9 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
     observer, SIGNAL(proxyRegistered(QString, QString, vtkSMProxy*)),
     this, SLOT(proxyRegistered(QString, QString, vtkSMProxy*)));
 
+  // When server disconnects we must clean up the selection proxies
+  // explicitly. This is needed since the internal selection proxies
+  // aren't registered with the proxy manager.
   QObject::connect(
     model, SIGNAL(aboutToRemoveServer(pqServer*)),
     this, SLOT(cleanSelections()));
@@ -228,25 +231,7 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
 //-----------------------------------------------------------------------------
 pqSelectionManager::~pqSelectionManager()
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  if (pxm)
-    {
-    pqApplicationCore* core = pqApplicationCore::instance();
-    pqServerManagerObserver* observer = core->getPipelineData();
-    if (observer)
-      {
-      QObject::disconnect(observer, 0, this,0);
-      }
-    pqSelectionManagerImplementation::DisplaysType::iterator iter2 =
-      this->Implementation->Displays.begin();
-    for(; iter2 != this->Implementation->Displays.end(); iter2++)
-      {      
-      // pxm->UnRegisterProxy(
-      //  "selection_objects", iter2->second.DisplayProxy->GetSelfIDAsString());
-      }
-    }
-  this->clearClientDisplays();
-  this->clearSelection();
+  this->cleanSelections();
   delete this->Implementation;
 }
 
@@ -384,6 +369,10 @@ vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderModule* rm,
 
   vtkTypeUInt32 id = rmp->GetSelfID().ID;
 
+  // These displays are not registered. We treat them a GUI only.
+  // Python can surely change the "active_selection" which will
+  // get shown correctly, but it cannot affect the display for
+  // the selection.
   vtkSMDataObjectDisplayProxy* displayProxy = 0;
   pqSelectionManagerImplementation::DisplaysType::iterator iter = 
     this->Implementation->Displays.find(id);
@@ -397,14 +386,8 @@ vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderModule* rm,
     displayProxy = vtkSMDataObjectDisplayProxy::SafeDownCast(
       rmp->CreateDisplayProxy());
 
-    this->Implementation->Displays[id].DisplayProxy =
-      displayProxy;
-
-    // vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
-    // pm->RegisterProxy(
-    //  "selection_objects", displayProxy->GetSelfIDAsString(), displayProxy);
-    //pm->RegisterProxy(
-    //"displays", displayProxy->GetSelfIDAsString(), displayProxy);
+    this->Implementation->Displays[id].DisplayProxy = displayProxy;
+    displayProxy->Delete();
 
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
       displayProxy->GetProperty("Input"));
@@ -433,8 +416,6 @@ vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderModule* rm,
     pk->SetElements1(0); // do not pick self
 
     displayProxy->UpdateVTKObjects();
-
-    displayProxy->Delete();
     }
 
   return displayProxy;
@@ -507,18 +488,15 @@ void pqSelectionManager::clearSelection()
     {
     this->setActiveSelection(iter->first, NULL);
     }
+  this->clearClientDisplays();
 }
 
 //-----------------------------------------------------------------------------
 void pqSelectionManager::cleanSelections()
 {
-  pqSelectionManagerImplementation::ServerSelectionsType::iterator iter =
-    this->Implementation->ServerSelections.begin();
-  for(; iter != this->Implementation->ServerSelections.end(); iter++)
-    {
-    this->setActiveSelection(iter->first, NULL);
-    }
+  this->clearSelection();
   this->Implementation->ServerSelections.clear();
+  this->Implementation->Displays.clear();
 }
 
 //-----------------------------------------------------------------------------
