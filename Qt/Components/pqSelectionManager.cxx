@@ -347,10 +347,8 @@ void pqSelectionManager::createDisplayProxies(vtkSMProxy* input, bool show/*=tru
         pqSMAdaptor::setElementProperty(disp->GetProperty("Visibility"), (show? 1: 0));
         disp->UpdateVTKObjects();
         }
-      // TODO: I'd like to use render here instead of forceRender. However, on
-      // undo/redo calling render doesn't render the changed selection.
-      // Need to debug that.
-      rm->forceRender();
+      // push an EventuallyRender() request.
+      rm->render();
       }
     }
 }
@@ -453,7 +451,7 @@ void pqSelectionManager::setActiveRenderModule(pqRenderModule* rm)
     }
 
   QObject::connect(this->Implementation->RenderModule, SIGNAL(endRender()),
-    this, SLOT(updateSelections()), Qt::QueuedConnection);
+    this, SLOT(updateSelections()));
 
   // If no selection proxy for the current connection exists,
   // create one
@@ -846,6 +844,10 @@ void pqSelectionManager::updateSelections()
    return;
    }
  this->Implementation->InUpdateSelections  = true;
+
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
+
   pqSelectionManagerImplementation::ServerSelectionsType::iterator iter =
     this->Implementation->ServerSelections.begin();
   for(; iter != this->Implementation->ServerSelections.end(); iter++)
@@ -859,6 +861,15 @@ void pqSelectionManager::updateSelections()
         // this call leads to further renders, 
         // hence the InUpdateSelections guards.
         sel->UpdateSelection();
+
+        // Since we updated the selection, we need to trigger a render
+        // to ensure that the updated selection is displayed.
+        QList<pqRenderModule*> rms = model->getRenderModules(
+          model->getServer(iter->first));
+        foreach(pqRenderModule* rm, rms)
+          {
+          rm->render();
+          }
         }
       }
     }
