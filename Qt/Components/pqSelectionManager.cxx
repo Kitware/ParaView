@@ -613,7 +613,7 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
     3, this->Implementation->Ye);
   sourceSelection->UpdateVTKObjects();
   sourceSelection->UpdateCameraPropertiesFromRenderModule();
-  sourceSelection->UpdateSelection();
+  sourceSelection->UpdateVTKObjects();
   pqApplicationCore* core = pqApplicationCore::instance();
   core->getUndoStack()->BeginUndoSet("Selection");
   this->setActiveSelection(connId, sourceSelection); 
