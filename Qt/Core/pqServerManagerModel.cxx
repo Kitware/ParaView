@@ -166,6 +166,24 @@ QList<pqPipelineSource*> pqServerManagerModel::getSources(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
+QList<pqRenderModule*> pqServerManagerModel::getRenderModules(pqServer* server)
+{
+  if (!server)
+    {
+    return this->Internal->RenderModules;
+    }
+  QList<pqRenderModule*> list;
+  foreach(pqRenderModule* rm, this->Internal->RenderModules)
+    {
+    if (rm && rm->getServer() == server)
+      {
+      list.push_back(rm);
+      }
+    }
+  return list;
+}
+
+//-----------------------------------------------------------------------------
 void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
 {
   if (!source)
