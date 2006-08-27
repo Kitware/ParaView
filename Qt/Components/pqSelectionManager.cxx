@@ -35,10 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqRenderModule.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
+#include "pqUndoStack.h"
 
 #include <QtDebug>
 
@@ -214,6 +216,13 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
   QObject::connect(
     observer, SIGNAL(proxyRegistered(QString, QString, vtkSMProxy*)),
     this, SLOT(proxyRegistered(QString, QString, vtkSMProxy*)));
+
+  QObject::connect(
+    model, SIGNAL(aboutToRemoveServer(pqServer*)),
+    this, SLOT(cleanSelections()));
+  QObject::connect(
+    model, SIGNAL(serverRemoved(pqServer*)),
+    this, SLOT(cleanSelections()));
 }
 
 //-----------------------------------------------------------------------------
@@ -353,6 +362,10 @@ void pqSelectionManager::createDisplayProxies(vtkSMProxy* input, bool show/*=tru
         pqSMAdaptor::setElementProperty(disp->GetProperty("Visibility"), (show? 1: 0));
         disp->UpdateVTKObjects();
         }
+      // TODO: I'd like to use render here instead of forceRender. However, on
+      // undo/redo calling render doesn't render the changed selection.
+      // Need to debug that.
+      rm->forceRender();
       }
     }
 }
@@ -497,6 +510,18 @@ void pqSelectionManager::clearSelection()
 }
 
 //-----------------------------------------------------------------------------
+void pqSelectionManager::cleanSelections()
+{
+  pqSelectionManagerImplementation::ServerSelectionsType::iterator iter =
+    this->Implementation->ServerSelections.begin();
+  for(; iter != this->Implementation->ServerSelections.end(); iter++)
+    {
+    this->setActiveSelection(iter->first, NULL);
+    }
+  this->Implementation->ServerSelections.clear();
+}
+
+//-----------------------------------------------------------------------------
 void pqSelectionManager::setActiveSelection(
   vtkIdType cid, vtkSMSelectionProxy* selectionProxy)
 {
@@ -526,10 +551,6 @@ void pqSelectionManager::setActiveSelection(
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   if (old_selection)
     {
-    // HACK: this is a temporary hack to break cycles
-    pqSMAdaptor::setProxyProperty(old_selection->GetProperty("RenderModule"), 0);
-    old_selection->UpdateVTKObjects();
-
     // Unregister old selection.
     pxm->UnRegisterProxy("selection_objects", "active_selection", old_selection);
     }
@@ -617,7 +638,10 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
   sourceSelection->UpdateVTKObjects();
   sourceSelection->UpdateCameraPropertiesFromRenderModule();
   sourceSelection->UpdateSelection();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  core->getUndoStack()->BeginUndoSet("Selection");
   this->setActiveSelection(connId, sourceSelection); 
+  core->getUndoStack()->EndUndoSet();
   sourceSelection->Delete();
 
   
@@ -652,15 +676,6 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
   selectionModel->select(
     selection, pqServerManagerSelectionModel::ClearAndSelect);
 
-  int numRenModules = model->getNumberOfRenderModules();
-  for (int i=0; i<numRenModules; i++)
-    {
-    pqRenderModule* renModule = model->getRenderModule(i);
-    if (connId == renModule->getRenderModuleProxy()->GetConnectionID())
-      {
-      renModule->render();
-      }
-    }
 
   this->clearClientDisplays();
   this->createNewClientDisplays(selection);
@@ -789,7 +804,13 @@ void pqSelectionManager::proxyUnRegistered(
     if (this->Implementation->ServerSelections[proxy->GetConnectionID()].SourceSelectionProxy.GetPointer()
       == sel)
       {
+      this->Implementation->ServerSelections[
+        proxy->GetConnectionID()].SourceSelectionProxy = 0;
       this->setActiveSelection(sel->GetConnectionID(), 0);
+
+      // HACK: this is a temporary hack to break cycles
+      pqSMAdaptor::setProxyProperty(sel->GetProperty("RenderModule"), 0);
+      sel->UpdateVTKObjects();
       }
     }
 }
@@ -815,7 +836,8 @@ void pqSelectionManager::activeSelectionRegistered(vtkSMSelectionProxy* sel)
   // Hook up event listerners for vtkCommand::UpdateEvent
   this->Implementation->VTKConnect->Connect(
     sel, vtkCommand::UpdateEvent, 
-    this, SLOT(onSelectionUpdateVTKObjects(vtkObject*)));
+    this, SLOT(onSelectionUpdateVTKObjects(vtkObject*)), 0,
+    Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------

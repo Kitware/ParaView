@@ -101,6 +101,8 @@ public slots:
   void clearSelection();
   /// Used to keep track of active render module
   void setActiveRenderModule(pqRenderModule*);
+  /// cleans all internal proxies.
+  void cleanSelections();
 
 private slots:
   void sourceRemoved(pqPipelineSource*);
