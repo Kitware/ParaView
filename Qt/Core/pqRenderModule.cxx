@@ -224,7 +224,12 @@ void pqRenderModule::renderModuleInit()
   this->Internal->VTKConnect->Connect(style,
     vtkCommand::EndInteractionEvent, 
     this, SLOT(endInteraction()));
-
+  this->Internal->VTKConnect->Connect(
+    this->Internal->RenderModuleProxy,
+    vtkCommand::StartEvent, this, SLOT(onStartEvent()));
+  this->Internal->VTKConnect->Connect(
+    this->Internal->RenderModuleProxy,
+    vtkCommand::EndEvent,this, SLOT(onEndEvent()));  
   iren->Enable();
 
   // If the render module already has some displays in it when it is registered,
@@ -271,12 +276,25 @@ void pqRenderModule::endInteraction()
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderModule::onStartEvent()
+{
+  emit this->beginRender();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderModule::onEndEvent()
+{
+  emit this->endRender();
+}
+
+//-----------------------------------------------------------------------------
 void pqRenderModule::onUpdateVTKObjects()
 {
   this->renderModuleInit();
   // no need to listen to any more events.
   this->Internal->VTKConnect->Disconnect(
-    this->Internal->RenderModuleProxy);
+    this->Internal->RenderModuleProxy, vtkCommand::UpdateEvent,
+    this, SLOT(onUpdateVTKObjects()));
 }
 
 //-----------------------------------------------------------------------------

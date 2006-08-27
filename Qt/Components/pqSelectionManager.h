@@ -36,15 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerSelectionModel.h"
 
 #include <QObject>
+#include "vtkType.h"
 
-class vtkDataObject;
-class vtkSMDisplayProxy;
-class vtkSMProxy;
-class vtkSMViewModuleProxy;
-class vtkSelection;
 class pqPipelineSource;
 class pqRenderModule;
 class pqSelectionManagerImplementation;
+class vtkDataObject;
+class vtkObject;
+class vtkSelection;
+class vtkSMDisplayProxy;
+class vtkSMProxy;
+class vtkSMSelectionProxy;
+class vtkSMViewModuleProxy;
 
 /// pqSelectionManager is the link between the server manager level
 /// selection and the GUI. It keeps a list of selected proxies and
@@ -101,7 +104,10 @@ public slots:
 
 private slots:
   void sourceRemoved(pqPipelineSource*);
+  void proxyRegistered(QString, QString, vtkSMProxy*);
   void proxyUnRegistered(QString, QString, vtkSMProxy*);
+  void onSelectionUpdateVTKObjects(vtkObject* sel);
+  void updateSelections();
 
 private:
   pqSelectionManagerImplementation* Implementation;
@@ -110,17 +116,20 @@ private:
   int setInteractorStyleToSelect(pqRenderModule*);
   int setInteractorStyleToInteract(pqRenderModule*);
   void processEvents(unsigned long event);
-  vtkSMDisplayProxy* getDisplayProxy(pqRenderModule*, vtkSMProxy*);
-  void createDisplayProxies(vtkSMProxy*);
+  vtkSMDisplayProxy* getDisplayProxy(pqRenderModule*, vtkSMProxy*, bool create_new=true);
+  void createDisplayProxies(vtkSMProxy*, bool show=true);
 
   void updateSelection(int* eventpos, pqRenderModule* rm);
-  vtkSelection* selectInFrustrum(int* eventpos, pqRenderModule* rm);
-  void sendSelection(vtkSelection* sel, vtkSMProxy* proxy);
-  vtkSelection* selectOnSurface(pqRenderModule* rm);
-  void convertSelection(pqRenderModule* rm, vtkSelection* sel);
 
   void clearClientDisplays();
   void createNewClientDisplays(pqServerManagerSelection&);
+
+  /// set the active selection for a particular connection.
+  /// If selection is NULL, then the current active selection is
+  /// cleared.
+  void setActiveSelection(vtkIdType cid, vtkSMSelectionProxy* selection);
+
+  void activeSelectionRegistered(vtkSMSelectionProxy* selection);
 };
 
 

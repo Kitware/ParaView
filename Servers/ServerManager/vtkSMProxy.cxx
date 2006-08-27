@@ -17,6 +17,7 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
+#include "vtkGarbageCollector.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
@@ -36,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.78");
+vtkCxxRevisionMacro(vtkSMProxy, "1.79");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -130,6 +131,7 @@ vtkSMProxy::vtkSMProxy()
   this->SubProxyObserver->SetProxy(this);
 
   this->Documentation = vtkSMDocumentation::New();
+  this->InMarkModified = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -272,6 +274,13 @@ void vtkSMProxy::UnRegisterVTKObjects()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMProxy::Register(vtkObjectBase* obj)
+{
+//  this->RegisterInternal(obj, 1);
+  this->Superclass::Register(obj);
+}
+
+//-----------------------------------------------------------------------------
 // UnRegister is overloaded because the object has a reference to itself
 // through the clientserver id.
 void vtkSMProxy::UnRegister(vtkObjectBase* obj)
@@ -295,7 +304,35 @@ void vtkSMProxy::UnRegister(vtkObjectBase* obj)
         }
       }
     }
-  this->Superclass::UnRegister(obj);
+//this->UnRegisterInternal(obj, 1);
+ this->Superclass::UnRegister(obj);
+}
+
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::ReportReferences(vtkGarbageCollector* collector)
+{
+  this->Superclass::ReportReferences(collector);
+
+  /*
+  // Report references held by this object that may be in a loop.
+  // This includes the consumers.
+  vtkstd::vector<vtkSMProxyInternals::ConsumerInfo>::iterator i = 
+    this->Internals->Consumers.begin();
+  for(; i != this->Internals->Consumers.end(); i++)
+    {
+    if (i->Proxy)
+      {
+      vtkGarbageCollectorReport(collector, i->Proxy, "Consumer");
+      }
+    }
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for(; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    vtkGarbageCollectorReport(collector, it2->second, "SubProxy");
+    }
+    */
 }
 
 
@@ -1332,8 +1369,13 @@ void vtkSMProxy::MarkModified(vtkSMProxy* modifiedProxy)
     this->UpdatePropertyInformation();
     }
   */
-  this->InvokeEvent(vtkCommand::ModifiedEvent, (void*)modifiedProxy);
-  this->MarkConsumersAsModified(modifiedProxy);
+  if (!this->InMarkModified)
+    {
+    this->InMarkModified = 1;
+    this->InvokeEvent(vtkCommand::ModifiedEvent, (void*)modifiedProxy);
+    this->MarkConsumersAsModified(modifiedProxy);
+    this->InMarkModified = 0;
+    }
 }
 
 //----------------------------------------------------------------------------

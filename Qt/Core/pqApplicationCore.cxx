@@ -85,7 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqApplicationCoreInternal
 {
 public:
-  pqServerManagerObserver* PipelineData;
+  pqServerManagerObserver* ServerManagerObserver;
   pqServerManagerModel* ServerManagerModel;
   pqUndoStack* UndoStack;
   pqPipelineBuilder* PipelineBuilder;
@@ -122,14 +122,14 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   this->Internal->OrganizationName = "Humanity";
 
   // *  Create pqServerManagerObserver first. This is the vtkSMProxyManager observer.
-  this->Internal->PipelineData = new pqServerManagerObserver(this);
+  this->Internal->ServerManagerObserver = new pqServerManagerObserver(this);
 
   // *  Create pqServerManagerModel.
   //    This is the representation builder for the ServerManager state.
   this->Internal->ServerManagerModel = new pqServerManagerModel(this);
 
-  // *  Make signal-slot connections between PipelineData and ServerManagerModel.
-  this->connect(this->Internal->PipelineData, this->Internal->ServerManagerModel);
+  // *  Make signal-slot connections between ServerManagerObserver and ServerManagerModel.
+  this->connect(this->Internal->ServerManagerObserver, this->Internal->ServerManagerModel);
 
 
   // *  Create the Undo/Redo stack.
@@ -192,9 +192,9 @@ void pqApplicationCore::connect(pqServerManagerObserver* pdata,
 }
 
 //-----------------------------------------------------------------------------
-pqServerManagerObserver* pqApplicationCore::getPipelineData()
+pqServerManagerObserver* pqApplicationCore::getServerManagerObserver()
 {
-  return this->Internal->PipelineData;
+  return this->Internal->ServerManagerObserver;
 }
 
 //-----------------------------------------------------------------------------

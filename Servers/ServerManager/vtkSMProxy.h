@@ -126,6 +126,7 @@
 //BTX
 struct vtkSMProxyInternals;
 //ETX
+class vtkGarbageCollector;
 class vtkPVXMLElement;
 class vtkSMDocumentation;
 class vtkSMProperty;
@@ -216,7 +217,12 @@ public:
   // Description:
   // Overloaded to break the reference loop caused by the fact that
   // proxies store their own ClientServer ids.
+  // Overloaded also for garbage collection.
   virtual void UnRegister(vtkObjectBase* obj);
+
+  // Description:
+  // Overloaded also for garbage collection.
+  virtual void Register(vtkObjectBase* obj);
 //BTX
   // Description:
   // Returns the id of a server object.
@@ -363,6 +369,10 @@ public:
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
+
+  // Description:
+  // Overloaded for garbage collection.
+  virtual void ReportReferences(vtkGarbageCollector* collector);
 
   // Description:
   // Expose a subproxy property from the base proxy. The property with the name
@@ -641,6 +651,9 @@ protected:
   vtkIdType ConnectionID;
 
   vtkSMDocumentation* Documentation;
+
+  // Flag used to break consumer loops.
+  int InMarkModified;
 private:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;

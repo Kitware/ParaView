@@ -76,7 +76,9 @@ public:
   virtual ~pqApplicationCore();
 
 
-  pqServerManagerObserver* getPipelineData();
+  pqServerManagerObserver* getServerManagerObserver();
+  pqServerManagerObserver* getPipelineData()
+    {return this->getServerManagerObserver(); }
   pqServerManagerModel* getServerManagerModel();
   pqUndoStack* getUndoStack();
   pqPipelineBuilder* getPipelineBuilder();

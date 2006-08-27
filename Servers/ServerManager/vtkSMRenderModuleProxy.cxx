@@ -52,7 +52,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkSelection.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.44");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.45");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -143,6 +143,7 @@ vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
     this->Renderer->RemoveObserver(this->StartRenderEventTag);
     this->StartRenderEventTag = 0;
     }
+
   this->RendererProps->Delete();
   this->Renderer2DProps->Delete();
   this->RendererProxy = 0;
@@ -416,7 +417,7 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->StartRenderEventTag =
     this->GetRenderer()->AddObserver(vtkCommand::StartEvent, src);
   src->Delete();
-  
+
 }
 
 //-----------------------------------------------------------------------------
@@ -516,7 +517,10 @@ void vtkSMRenderModuleProxy::PerformRender()
     }
 
   vtkRenderWindow *renWindow = this->GetRenderWindow(); 
+
+  this->InvokeEvent(vtkCommand::StartEvent);
   renWindow->Render();
+  this->InvokeEvent(vtkCommand::EndEvent);
 
   if ( this->MeasurePolygonsPerSecond )
     {

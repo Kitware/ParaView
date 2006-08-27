@@ -103,6 +103,14 @@ signals:
   // Fired after a display has been removed from this render module.
   void displayRemoved(pqPipelineDisplay*);
 
+  // Fired when the render module fires a vtkCommand::StartEvent
+  // signalling the beginning of rendering.
+  void beginRender();
+
+  // Fired when the render module fires a vtkCommand::EndEvent
+  // signalling the end of rendering.
+  void endRender();
+
 private slots:
   /// if renModule is not created when this object is instantianted, we
   /// must listen to UpdateVTKObjects event to bind the QVTKWidget and
@@ -115,6 +123,10 @@ private slots:
   // Called on start/end interaction.
   void startInteraction();
   void endInteraction();
+
+  // Called on start/end rendering.
+  void onStartEvent();
+  void onEndEvent();
 
 
 protected:

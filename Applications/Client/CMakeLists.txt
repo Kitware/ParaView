@@ -148,6 +148,7 @@ ENDIF(APPLE)
     CutMulti
     ExodusPanel
     LoadState
+    LoadStateSelection
     ObjectInspectorSphere
     OpenFile
     OpenSaveData
