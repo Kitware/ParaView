@@ -298,7 +298,9 @@ protected:
   friend class vtkPVComparativeVis;
   friend class vtkSMComparativeVisProxy;
   friend class vtkSMRenderModuleProxy;
+  friend class vtkSMSelectionManager;
   friend class pqSelectionManager;
+  friend class vtkSMSelectionProxy;
   vtkGetObjectMacro(MapperProxy, vtkSMProxy);
   vtkGetObjectMacro(ActorProxy, vtkSMProxy);
   vtkGetObjectMacro(GeometryFilterProxy, vtkSMProxy);

@@ -24,6 +24,7 @@
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
 #include "vtkFloatArray.h"
+#include "vtkGarbageCollector.h"
 #include "vtkImageWriter.h"
 #include "vtkInstantiator.h"
 #include "vtkInteractorStyleTrackballCamera.h"
@@ -48,7 +49,7 @@
 #include "vtkPVClientServerIdCollectionInformation.h"
 #include "vtkProcessModuleConnectionManager.h"
 
-vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkSMAbstractViewModuleProxy::vtkSMAbstractViewModuleProxy()
