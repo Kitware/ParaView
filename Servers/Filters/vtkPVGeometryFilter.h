@@ -22,20 +22,22 @@
 
 #include "vtkPolyDataAlgorithm.h"
 
+class vtkAppendPolyData;
+class vtkCallbackCommand;
 class vtkDataObject;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;
 class vtkGenericDataSet;
-class vtkImageData;
-class vtkInformationVector;
-class vtkStructuredGrid;
-class vtkRectilinearGrid;
-class vtkUnstructuredGrid;
-class vtkOutlineSource;
-class vtkMultiProcessController;
-class vtkCallbackCommand;
 class vtkGenericGeometryFilter;
 class vtkHyperOctree;
+class vtkImageData;
+class vtkInformationVector;
+class vtkMultiGroupDataSet;
+class vtkMultiProcessController;
+class vtkOutlineSource;
+class vtkRectilinearGrid;
+class vtkStructuredGrid;
+class vtkUnstructuredGrid;
 
 class VTK_EXPORT vtkPVGeometryFilter : public vtkPolyDataAlgorithm
 {
@@ -123,6 +125,8 @@ protected:
     vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
   void DataSetSurfaceExecute(vtkDataSet* input, vtkPolyData* output);
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
+  int ExecuteCompositeDataSet(
+    vtkMultiGroupDataSet* mgInput, vtkAppendPolyData* append, int& numInputs);
 
   int OutlineFlag;
   int UseOutline;

@@ -50,7 +50,7 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.67");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.68");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -282,12 +282,42 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
 
   vtkMultiGroupDataSet *mgInput = vtkMultiGroupDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  if (!mgInput)
+    {
+    vtkErrorMacro("This filter cannot handle input of type: "
+              << inInfo->Get(vtkDataObject::DATA_OBJECT())->GetClassName());
+    return 0;
+    }
 
   if (this->CheckAttributes(mgInput))
     {
     return 0;
     }
 
+  vtkAppendPolyData* append = vtkAppendPolyData::New();
+  this->GenerateGroupScalars = 1;
+  int numInputs = 0;
+
+  int retVal = 0;
+  if (this->ExecuteCompositeDataSet(mgInput, append, numInputs))
+    {
+    this->GenerateGroupScalars = 0;
+    if (numInputs > 0)
+      {
+      append->Update();
+      }
+    output->ShallowCopy(append->GetOutput());
+    append->Delete();
+    retVal = 1;
+    }
+
+  return retVal;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGeometryFilter::ExecuteCompositeDataSet(
+  vtkMultiGroupDataSet* mgInput, vtkAppendPolyData* append, int& numInputs)
+{
   unsigned int numGroups = mgInput->GetNumberOfGroups();
 
   unsigned int group;
@@ -298,26 +328,21 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     unsigned int numDataSets = mgInput->GetNumberOfDataSets(group);
     for (dataset=0; dataset<numDataSets; dataset++)
       {
-      vtkDataSet* ds = 
-        vtkDataSet::SafeDownCast(mgInput->GetDataSet(group, dataset));
-      if (ds)
+      if (mgInput->GetDataSet(group, dataset))
         {
         totNumBlocks++;
         }
       }
     }
   
-  vtkAppendPolyData* append = vtkAppendPolyData::New();
-  int numInputs = 0;
-  this->GenerateGroupScalars = 1;
   for (group=0; group<numGroups; group++)
     {
     unsigned int numDataSets = mgInput->GetNumberOfDataSets(group);
     this->CurrentGroup = group;
     for (dataset=0; dataset<numDataSets; dataset++)
       {
-      vtkDataSet* ds = 
-        vtkDataSet::SafeDownCast(mgInput->GetDataSet(group, dataset));
+      vtkDataObject* block = mgInput->GetDataSet(group, dataset);
+      vtkDataSet* ds = vtkDataSet::SafeDownCast(block);
       if (ds)
         {
         vtkPolyData* tmpOut = vtkPolyData::New();
@@ -330,19 +355,19 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
 
         this->UpdateProgress(static_cast<float>(numInputs)/totNumBlocks);
         }
+      else
+        {
+        vtkMultiGroupDataSet* mgds = vtkMultiGroupDataSet::SafeDownCast(block);
+        if (mgds)
+          {
+          if (!this->ExecuteCompositeDataSet(mgds, append, numInputs))
+            {
+            return 0;
+            }
+          }
+        }
       }
     }
-  this->GenerateGroupScalars = 0;
-
-  if (numInputs > 0)
-    {
-    append->Update();
-    }
-
-  output->ShallowCopy(append->GetOutput());
-
-  append->Delete();
-
   return 1;
 }
 
@@ -899,8 +924,7 @@ int vtkPVGeometryFilter::FillInputPortInformation(int port,
     return 0;
     }
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
-  info->Set(vtkCompositeDataPipeline::INPUT_REQUIRED_COMPOSITE_DATA_TYPE(), 
-            "vtkMultiGroupDataSet");
+
   return 1;
 }
 

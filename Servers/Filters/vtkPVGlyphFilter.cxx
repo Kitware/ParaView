@@ -31,7 +31,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.25");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.26");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -91,8 +91,7 @@ int vtkPVGlyphFilter::FillInputPortInformation(int port,
     return 0;
     }
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
-  info->Set(vtkCompositeDataPipeline::INPUT_REQUIRED_COMPOSITE_DATA_TYPE(), 
-            "vtkCompositeDataSet");
+
   return 1;
 }
 
@@ -150,12 +149,26 @@ int vtkPVGlyphFilter::RequestData(
 {
   this->BlockOnRatio = 0;
 
-  vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
-    inputVector[0]->GetInformationObject(0)->Get(
-      vtkDataObject::DATA_OBJECT()));
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkCompositeDataSet *hdInput = 
+    vtkCompositeDataSet::SafeDownCast(input);
   if (hdInput) 
     {
     return this->RequestCompositeData(request, inputVector, outputVector);
+    }
+
+  vtkDataSet* dsInput = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  if (!dsInput)
+    {
+    if (input)
+      {
+      vtkErrorMacro("This filter cannot process input of type: "
+                    << input->GetClassName());
+      }
+    return 0;
     }
 
   if (!this->UseMaskPoints)
@@ -163,12 +176,8 @@ int vtkPVGlyphFilter::RequestData(
     return this->Superclass::RequestData(request, inputVector, outputVector);
     }
 
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkDataSet* input = vtkDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  
   vtkIdType maxNumPts = this->MaximumNumberOfPoints;
-  vtkIdType numPts = input->GetNumberOfPoints();
+  vtkIdType numPts = dsInput->GetNumberOfPoints();
 
   vtkIdType totalNumPts = this->GatherTotalNumberOfPoints(numPts);
 
@@ -189,7 +198,7 @@ int vtkPVGlyphFilter::RequestData(
   newInInfo->Delete();
   inputVs[1] = inputVector[1];
   
-  int retVal = this->MaskAndExecute(numPts, maxNumPts, input,
+  int retVal = this->MaskAndExecute(numPts, maxNumPts, dsInput,
                                     request, inputVs, outputVector);
   inputVs[0]->Delete();
   return retVal;

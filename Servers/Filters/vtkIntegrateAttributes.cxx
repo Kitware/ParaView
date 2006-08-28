@@ -35,7 +35,7 @@
 #include "vtkUnstructuredGrid.h"
 
 
-vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.6");
+vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.7");
 vtkStandardNewMacro(vtkIntegrateAttributes);
 
 //-----------------------------------------------------------------------------
@@ -75,9 +75,7 @@ int vtkIntegrateAttributes::FillInputPortInformation(int port,
     {
     return 0;
     }
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
-  info->Set(vtkCompositeDataPipeline::INPUT_REQUIRED_COMPOSITE_DATA_TYPE(), 
-            "vtkCompositeDataSet");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
 }
 
@@ -201,8 +199,10 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
   if (!output) {return 0;}
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(input);
+  vtkDataSet *dsInput = vtkDataSet::SafeDownCast(input);
   if (hdInput) 
     {
     vtkCompositeDataIterator* iter = hdInput->NewIterator();
@@ -210,7 +210,8 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
     int firstInput = 1;
     while (!iter->IsDoneWithTraversal())
       {
-      vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      vtkDataObject* dobj = iter->GetCurrentDataObject();
+      vtkDataSet* ds = vtkDataSet::SafeDownCast(dobj);
       if (ds)
         {
         if (firstInput)
@@ -221,20 +222,36 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
           }
         this->ExecuteBlock(ds, output);
         }
+      else
+        {
+        if (dobj)
+          {
+          vtkWarningMacro("This filter cannot handle sub-datasets of type : "
+                          << dobj->GetClassName()
+                          << ". Skipping block");
+          }
+        }
       iter->GoToNextItem();
       }
     iter->Delete();
     }
-  else
+  else if (dsInput)
     {
-    vtkDataSet *input = vtkDataSet::SafeDownCast(
-      inInfo->Get(vtkDataSet::DATA_OBJECT()));
     // Output will have all the same attribute arrays as input, but
     // only 1 entry per array, and arrays are double.
     // Set all values to 0.  All output attributes are type double.
-    this->AllocateAttributes(input->GetPointData(), output->GetPointData());
-    this->AllocateAttributes(input->GetCellData(), output->GetCellData());
-    this->ExecuteBlock(input, output);
+    this->AllocateAttributes(dsInput->GetPointData(), output->GetPointData());
+    this->AllocateAttributes(dsInput->GetCellData(), output->GetCellData());
+    this->ExecuteBlock(dsInput, output);
+    }
+  else
+    {
+    if (input)
+      {
+      vtkErrorMacro("This filter cannot handle data of type : "
+                    << input->GetClassName());
+      }
+    return 0;
     }
   
   // Here is the trick:  The satellites need a point and vertex to 
