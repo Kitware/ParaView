@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.5");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -132,14 +132,11 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
 
   if ( vtkProcessModule::GetProcessModule()->IsRemote(this->GetConnectionID()))
     {
-    unsigned int i;
-
     this->SetupCollectionFilter(this->CollectProxy);
 
     for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
       {
       vtkClientServerStream cmd;
-      vtkClientServerStream stream;
       vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
       cmd << vtkClientServerStream::Invoke
@@ -235,7 +232,7 @@ void vtkSMGenericViewDisplayProxy::Update()
 
 //-----------------------------------------------------------------------------
 void vtkSMGenericViewDisplayProxy::AddInput(vtkSMSourceProxy* input,
-  const char* method, int hasMultipleInputs)
+  const char* vtkNotUsed(method), int vtkNotUsed(hasMultipleInputs))
 {
   this->SetInput(input);
 }
