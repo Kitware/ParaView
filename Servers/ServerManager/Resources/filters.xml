@@ -4386,6 +4386,48 @@ This filter operates on all types of data sets, and it returns unstructured grid
      </InputProperty>
    </SourceProxy>
 
+   <SourceProxy name="TextureMapToPlane" class="vtkTextureMapToPlane">
+     <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+     </InputProperty>
+   </SourceProxy>
+
+   <SourceProxy name="TextureMapToSphere" class="vtkTextureMapToSphere">
+     <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+     </InputProperty>
+   </SourceProxy>
+
+   <SourceProxy name="TextureMapToCylinder" class="vtkTextureMapToCylinder">
+     <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+     </InputProperty>
+   </SourceProxy>
+
    </ProxyGroup>
 </ServerManagerConfiguration>
 

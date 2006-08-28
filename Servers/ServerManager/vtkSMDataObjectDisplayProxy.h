@@ -58,7 +58,12 @@ public:
   // Description:
   // Obtain the proxy for the algorithm that this displays the output of.
   vtkSMProxy *GetInput(int i=0);
-  
+
+  // Description:
+  // Set/get a texture to use in displaying the data object.
+  void SetTexture(vtkSMProxy *texture);
+  vtkSMProxy* GetTexture();
+
   // Description:
   // This method calls a ForceUpdate on the UpdateSuppressor
   // if the Geometry is not valid. 

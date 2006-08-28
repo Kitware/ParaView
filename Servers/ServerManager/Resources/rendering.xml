@@ -765,6 +765,20 @@
     </Proxy>
   </ProxyGroup>
 
+  <ProxyGroup name="textures">
+    <SourceProxy name="Texture" class="vtkTexture">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+  </ProxyGroup>
+
   <ProxyGroup name="props">
     <Proxy name="Actor2D" class="vtkActor2D">
       <ProxyProperty
@@ -841,6 +855,13 @@
         command="SetMapper">
         <ProxyGroupDomain name="groups">
           <Group name="mappers" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty
+        name="Texture"
+        command="SetTexture">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures"/>
         </ProxyGroupDomain>
       </ProxyProperty>
       <IntVectorProperty

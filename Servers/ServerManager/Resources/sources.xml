@@ -988,5 +988,10 @@ The output of the Wavelet source is image (uniform rectilinear) data.
       </IntVectorProperty>
    <!-- End Test3DWidget -->
    </SourceProxy>
+
+   <SourceProxy name="NetworkImageSource" class="vtkNetworkImageSource">
+   <!-- End NetworkImageSource -->
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
