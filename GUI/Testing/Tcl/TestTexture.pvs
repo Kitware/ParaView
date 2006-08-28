@@ -4,14 +4,14 @@ set kw(vtkTemp82) [$kw(vtkTemp2) GetMainView]
 source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp82) $argv $argc
 
-$kw(vtkTemp2) LoadTexture "C:/dev/ParaView/Data/Data/earth.ppm"
+$kw(vtkTemp2) LoadTexture "$DataDir/Data/earth.ppm"
 
-set kw(vtkTemp1188) [$kw(vtkTemp2) InitializeReadCustom "legacyreader" "C:/dev/ParaView/Data/Data/ironProt.vtk"]
-$kw(vtkTemp2) ReadFileInformation $kw(vtkTemp1188) "C:/dev/ParaView/Data/Data/ironProt.vtk"
-$kw(vtkTemp2) FinalizeRead $kw(vtkTemp1188) "C:/dev/ParaView/Data/Data/ironProt.vtk"
+set kw(vtkTemp1188) [$kw(vtkTemp2) InitializeReadCustom "legacyreader" "$DataDir/Data/ironProt.vtk"]
+$kw(vtkTemp2) ReadFileInformation $kw(vtkTemp1188) "$DataDir/Data/ironProt.vtk"
+$kw(vtkTemp2) FinalizeRead $kw(vtkTemp1188) "$DataDir/Data/ironProt.vtk"
 $kw(vtkTemp1188) SetLabel {ironProt.vtk}
 set kw(vtkTemp1190) [$kw(vtkTemp1188) GetPVWidget {Filename}]
-$kw(vtkTemp1190) SetValue "C:/dev/ParaView/Data/Data/ironProt.vtk"
+$kw(vtkTemp1190) SetValue "$DataDir/Data/ironProt.vtk"
 $kw(vtkTemp1188) AcceptCallback
 
 set kw(vtkTemp1240) [$kw(vtkTemp2) CreatePVSource Contour]
