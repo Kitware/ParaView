@@ -65,7 +65,7 @@ bool pqQVTKWidgetEventPlayer::playEvent(QObject* Object,
         v = mouseRegExp.cap(4);
         Qt::MouseButtons buttons = static_cast<Qt::MouseButton>(v.toInt());
         v = mouseRegExp.cap(5);
-        Qt::KeyboardModifiers keym = static_cast<Qt::KeyboardModifiers>(v.toInt());
+        Qt::KeyboardModifiers keym = static_cast<Qt::KeyboardModifier>(v.toInt());
         QEvent::Type type = (Command == "mousePress")? QEvent::MouseButtonPress :
           ((Command=="mouseMove")?  QEvent::MouseMove : QEvent::MouseButtonRelease);
         QMouseEvent e(type, QPoint(x,y), button, buttons, keym);
