@@ -3816,8 +3816,8 @@ Groups multiple datasets to create a multigroup dataset
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type" composite_data_supported="0">
-             <DataType value="vtkDataSet"/>
+           <DataTypeDomain name="input_type" composite_data_supported="1">
+             <DataType value="vtkDataObject"/>
            </DataTypeDomain>
      </InputProperty>
    <!-- End BlockScalars -->
