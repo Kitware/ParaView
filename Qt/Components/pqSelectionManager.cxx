@@ -100,7 +100,7 @@ struct pqSelectionProxies
   // These proxies are created on per-connection basis.
   // SelectionDataSource is created once for every connection, while
   // SourceSelectionProxy is created new for every new selection.
-  vtkSmartPointer<vtkSMProxy> SourceSelectionProxy;
+  vtkSmartPointer<vtkSMSelectionProxy> SourceSelectionProxy;
   vtkSmartPointer<vtkSMSourceProxy> SelectionDataSource;
 };
 
@@ -614,49 +614,18 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
   sourceSelection->UpdateVTKObjects();
   sourceSelection->UpdateCameraPropertiesFromRenderModule();
   sourceSelection->UpdateVTKObjects();
+
+  // We deliberately don't call UpdateSelection() explicitly here. We let the mechanism that
+  // manages the UpdateSelection() during undo/redo/load state manage it.
+  // At the end of any render, we inspect all Active Selection. If any is not up-to-date,
+  // we call UpdateSelection() on it and do the tasks necessary afer a selection change 
+  // (such as update of client displays etc).
+
   pqApplicationCore* core = pqApplicationCore::instance();
   core->getUndoStack()->BeginUndoSet("Selection");
   this->setActiveSelection(connId, sourceSelection); 
   core->getUndoStack()->EndUndoSet();
   sourceSelection->Delete();
-
-  
-  // Update the SelectionModel with the selected sources.
-  pqServerManagerModel* model = 
-    pqApplicationCore::instance()->getServerManagerModel();
-
-  pqServerManagerSelectionModel* selectionModel =
-    pqApplicationCore::instance()->getSelectionModel();
-
-  pqServerManagerSelection selection;
-
-  vtkCollection* selectedProxies = vtkCollection::New();
-  sourceSelection->GetSelectedSourceProxies(selectedProxies);
-
-  // push the selection to the selection model
-  for(int cc=0; cc < selectedProxies->GetNumberOfItems(); cc++)
-    {
-    vtkSMProxy* objProxy = vtkSMProxy::SafeDownCast(
-      selectedProxies->GetItemAsObject(cc));
-    if (objProxy)
-      {
-      // selected
-      pqPipelineSource* pqSource = model->getPQSource(objProxy);
-      if (pqSource)
-        {
-        selection.push_back(pqSource);
-        }
-      }
-    }
-  selectedProxies->Delete();
-  selectionModel->select(
-    selection, pqServerManagerSelectionModel::ClearAndSelect);
-
-
-  this->clearClientDisplays();
-  this->createNewClientDisplays(selection);
-
-  emit this->selectionChanged(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -845,9 +814,6 @@ void pqSelectionManager::updateSelections()
    }
  this->Implementation->InUpdateSelections  = true;
 
-  pqServerManagerModel* model = 
-    pqApplicationCore::instance()->getServerManagerModel();
-
   pqSelectionManagerImplementation::ServerSelectionsType::iterator iter =
     this->Implementation->ServerSelections.begin();
   for(; iter != this->Implementation->ServerSelections.end(); iter++)
@@ -862,18 +828,73 @@ void pqSelectionManager::updateSelections()
         // hence the InUpdateSelections guards.
         sel->UpdateSelection();
 
-        // Since we updated the selection, we need to trigger a render
-        // to ensure that the updated selection is displayed.
-        QList<pqRenderModule*> rms = model->getRenderModules(
-          model->getServer(iter->first));
-        foreach(pqRenderModule* rm, rms)
-          {
-          rm->render();
-          }
+        this->selectionChanged(iter->first);
         }
       }
     }
+
   this->Implementation->InUpdateSelections  = false;
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::selectionChanged(vtkIdType cid)
+{
+  pqSelectionManagerImplementation::ServerSelectionsType::iterator iter =
+    this->Implementation->ServerSelections.find(cid);
+  if (iter == this->Implementation->ServerSelections.end())
+    {
+    return;
+    }
+
+  vtkSMSelectionProxy* sourceSelection = iter->second.SourceSelectionProxy;
+  if (!sourceSelection)
+    {
+    return;
+    }
+
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
+
+  // Update the SelectionModel with the selected sources.
+  pqServerManagerSelectionModel* selectionModel =
+    pqApplicationCore::instance()->getSelectionModel();
+
+  pqServerManagerSelection selection;
+
+  vtkCollection* selectedProxies = vtkCollection::New();
+  sourceSelection->GetSelectedSourceProxies(selectedProxies);
+
+  // push the selection to the selection model
+  for(int cc=0; cc < selectedProxies->GetNumberOfItems(); cc++)
+    {
+    vtkSMProxy* objProxy = vtkSMProxy::SafeDownCast(
+      selectedProxies->GetItemAsObject(cc));
+    if (objProxy)
+      {
+      // selected
+      pqPipelineSource* pqSource = model->getPQSource(objProxy);
+      if (pqSource)
+        {
+        selection.push_back(pqSource);
+        }
+      }
+    }
+  selectedProxies->Delete();
+  selectionModel->select(
+    selection, pqServerManagerSelectionModel::ClearAndSelect);
+
+  this->clearClientDisplays();
+  this->createNewClientDisplays(selection);
+
+  emit this->selectionChanged(this);
+
+  // Since selection changed, we need to trigger render to show the selection.
+  QList<pqRenderModule*> rms = model->getRenderModules(model->getServer(cid));
+  foreach(pqRenderModule* rm, rms)
+    {
+    rm->render();
+    }
+
 }
 
 //-----------------------------------------------------------------------------

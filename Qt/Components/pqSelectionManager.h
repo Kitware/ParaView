@@ -132,6 +132,10 @@ private:
   void setActiveSelection(vtkIdType cid, vtkSMSelectionProxy* selection);
 
   void activeSelectionRegistered(vtkSMSelectionProxy* selection);
+
+  // called when selection is updated. Updates views/displays are fires
+  // selectionChanged() signal.
+  void selectionChanged(vtkIdType cid);
 };
 
 
