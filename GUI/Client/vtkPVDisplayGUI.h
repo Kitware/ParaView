@@ -240,6 +240,11 @@ public:
   void ColorByArray(const char* name, int field);
   void VolumeRenderByArray(const char* name ,int field);
   void ColorByProperty();
+  void ColorByTexture();
+
+  // Description:
+  // Callback method for item chosen from TextureMenu
+  void ApplyTexture(const char* textureName);
   
   // Description:
   // Called by vtkPVSource::DeleteCallback().
@@ -304,6 +309,7 @@ protected:
   // UpdateColorGUI calls them all.
   void UpdateScalarBarVisibilityCheck();
   void UpdateColorMenu();
+  void UpdateTextureMenu();
   void UpdateColorButton();
   void UpdateEditColorMapButton();
   void UpdateInterpolateColorsCheck();
@@ -317,6 +323,7 @@ protected:
   //==================================================================
   // Internal versions that do not add to the trace.
   void ColorByPropertyInternal();
+  void ColorByTextureInternal();
   void SetActorColor(double r, double g, double b);
 
   // Switch between showing the properties for actors and volumes
@@ -342,7 +349,10 @@ protected:
   
   vtkKWLabel *ColorMenuLabel;
   vtkPVColorSelectionWidget* ColorSelectionMenu;
-  
+
+  vtkKWLabel *TextureMenuLabel;
+  vtkKWMenuButton *TextureMenu;
+
   vtkKWChangeColorButton* ColorButton;
   vtkKWFrame*     EditColorMapButtonFrame;
   vtkKWPushButton* EditColorMapButton;
@@ -405,6 +415,7 @@ protected:
   int EditColorMapButtonVisible;
   int ColorButtonVisible;
   int ScalarBarCheckVisible;
+  int TextureMenuVisible;
 
   vtkPVVolumeAppearanceEditor *VolumeAppearanceEditor;
     

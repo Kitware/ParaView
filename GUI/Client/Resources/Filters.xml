@@ -2644,4 +2644,46 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
                input_name="Input"/>
   </Module>
 
+  <Module name="TextureMapToPlane"
+          root_name="TexturePlane"
+          menu_name="Texture Map to Plane"
+          module_type="Filter">
+    <Filter class="vtkTextureMapToPlane">
+      <Input name="Input"
+             class="vtkDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+  </Module>
+
+  <Module name="TextureMapToSphere"
+          root_name="TextureSphere"
+          menu_name="Texture Map to Sphere"
+          module_type="Filter">
+    <Filter class="vtkTextureMapToSphere">
+      <Input name="Input"
+             class="vtkDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+  </Module>
+
+  <Module name="TextureMapToCylinder"
+          root_name="TextureCylinder"
+          menu_name="Texture Map to Cylinder"
+          module_type="Filter">
+    <Filter class="vtkTextureMapToCylinder">
+      <Input name="Input"
+             class="vtkDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+  </Module>
+
 </ModuleInterfaces>

@@ -32,6 +32,7 @@ SET(Filters_SRCS
   vtkMultiActorHelper.cxx
   vtkMultiBlockExtractSelection.cxx
   vtkMultiDisplayManager.cxx
+  vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
   vtkPPhastaReader.cxx
   vtkPVArrowSource.cxx

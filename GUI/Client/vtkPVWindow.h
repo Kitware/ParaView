@@ -369,6 +369,12 @@ public:
   int OpenPackage(const char* fileName);
 
   // Description:
+  // Open an image file into ParaView (prompt the user for the filename)
+  // and load it as a texture. Returns VTK_OK on success.
+  int LoadTexture();
+  int LoadTexture(const char* fileName);
+
+  // Description:
   // Load in a Tcl based script to drive the application.
   virtual void LoadScript() { this->Superclass::LoadScript(); }
   virtual void LoadScript(const char *name);

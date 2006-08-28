@@ -16,13 +16,17 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
+#include "vtkBMPReader.h"
 #include "vtkCamera.h"
+#include "vtkCameraManipulator.h"
+#include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
 #include "vtkDataSet.h"
 #include "vtkDirectory.h"
 #include "vtkImageData.h"
+#include "vtkJPEGReader.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
@@ -45,62 +49,66 @@
 #include "vtkKWToolbarSet.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
+#include "vtkPNGReader.h"
+#include "vtkPNMReader.h"
+#include "vtkPolyData.h"
+#include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
+#include "vtkPVAnimationManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVApplicationSettingsInterface.h"
-#include "vtkCameraManipulator.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVComparativeVisManagerGUI.h"
+#include "vtkPVCredits.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVErrorLogDisplay.h"
+#include "vtkPVFileEntry.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGhostLevelDialog.h"
+#include "vtkPVGUIClientOptions.h"
 #include "vtkPVInitialize.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleControl.h"
-#include "vtkSMPart.h"
-#include "vtkProcessModule.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderViewProxyImplementation.h"
 #include "vtkPVSaveBatchScriptDialog.h"
 #include "vtkPVSelectCustomReader.h"
+#include "vtkPVServerFileDialog.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTimerLogDisplay.h"
+#include "vtkPVTraceHelper.h"
 #include "vtkPVVolumeAppearanceEditor.h"
 #include "vtkPVWriter.h"
+#include "vtkPVXMLElement.h"
 #include "vtkPVXMLPackageParser.h"
-#include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkStdString.h"
-#include "vtkStructuredGrid.h"
-#include "vtkStructuredPoints.h"
-#include "vtkToolkits.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkClientServerStream.h"
-#include "vtkTimerLog.h"
-#include "vtkPVRenderViewProxyImplementation.h"
 #include "vtkSMApplication.h"
-#include "vtkPVGUIClientOptions.h"
-#include <vtkstd/map>
 #include "vtkSMAxesProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkPVAnimationManager.h"
-#include "vtkPVTraceHelper.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMPart.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkPVFileEntry.h"
-#include "vtkPVCredits.h"
-#include "vtkPVXMLElement.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkStdString.h"
+#include "vtkStructuredGrid.h"
+#include "vtkStructuredPoints.h"
+#include "vtkStructuredPointsWriter.h"
+#include "vtkTIFFReader.h"
+#include "vtkTimerLog.h"
+#include "vtkToolkits.h"
+#include "vtkUnstructuredGrid.h"
+#include <vtkstd/map>
 
 #include "vtkPVLookmarkManager.h"
 
@@ -128,6 +136,7 @@
 #define VTK_PV_VTK_SOURCES_MENU_LABEL "Source"
 #define VTK_PV_OPEN_DATA_MENU_LABEL "Open Data"
 #define VTK_PV_SAVE_DATA_MENU_LABEL "Save Data"
+#define VTK_PV_LOAD_TEXTURE_MENU_LABEL "Load Texture"
 #define VTK_PV_SELECT_SOURCE_MENU_LABEL "Select"
 
 #define VTK_PV_TOOLBARS_INTERACTION_LABEL "Interaction"
@@ -181,7 +190,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.793");
+vtkCxxRevisionMacro(vtkPVWindow, "1.794");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -885,6 +894,13 @@ void vtkPVWindow::InitializeMenus()
 
   idx = menu->InsertCommand(idx, "Import Package", this,  "OpenPackage");
   menu->SetItemUnderline(idx, 3);
+  menu->SetItemHelpString(
+    idx, "Import modules defined in a ParaView package ");
+  idx++;
+  
+  idx = menu->InsertCommand(
+    idx, VTK_PV_LOAD_TEXTURE_MENU_LABEL, this, "LoadTexture");
+  menu->SetItemUnderline(idx, 5);
   menu->SetItemHelpString(
     idx, "Import modules defined in a ParaView package ");
   idx++;
@@ -3407,6 +3423,17 @@ void vtkPVWindow::SaveState(const char* filename)
     *file << endl;
     }
 
+  // Save any textures that have been loaded.
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  unsigned int numProxies = proxyManager->GetNumberOfProxies("TextureSources");
+  unsigned int i;
+  for (i = 0; i < numProxies; i++)
+    {
+    *file << "$kw(" << this->GetTclName() << ") LoadTexture \""
+          << proxyManager->GetProxyName("TextureSources", i) << "\"" << endl;
+    }
+  *file << endl;
+  
   // Save the state of the glyph sources
   vtkPVSourceCollection *glyphSources = this->GetSourceList("GlyphSources");
   vtkCollectionIterator* cit;
@@ -4496,6 +4523,144 @@ int vtkPVWindow::OpenPackage(const char* openFileName)
   // Add the package to the list that will be saved to state and batch
   // files.
   this->PackageFiles->AppendItem(openFileName);
+
+  return VTK_OK;
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVWindow::LoadTexture()
+{
+  int res = 0;
+  vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
+  loadDialog->SetParent(this);
+  loadDialog->Create();
+  loadDialog->RetrieveLastPathFromRegistry("TexturePath");
+  loadDialog->SetTitle("Open Texture");
+  loadDialog->SetDefaultExtension(".bmp");
+  loadDialog->SetFileTypes("{{Windows Bitmap} {*.bmp}} {{JPEG} {*.jpg}} {{PNG} {*.png}} {{Binary PPM} {*.ppm}} {{TIFF} {*.tif}}");
+  int enabled = this->GetEnabled();
+  this->SetEnabled(0);
+  if ( loadDialog->Invoke() && this->LoadTexture(loadDialog->GetFileName()) )
+    {
+    loadDialog->SaveLastPathToRegistry("TexturePath");
+    res = 1;
+    }
+  this->SetEnabled(enabled);
+  loadDialog->Delete();
+  return res;
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVWindow::LoadTexture(const char* filename)
+{
+  if ( !this->CheckIfFileIsReadable(filename) )
+    {
+    return VTK_ERROR;
+    }
+
+  int pos = 0;
+
+  // Store last path
+  if ( filename && strlen(filename) > 0 )
+    {
+    char *pth = vtksys::SystemTools::DuplicateString(filename);
+    pos = strlen(filename);
+    // Strip off the file name
+    while (pos && pth[pos] != '/' && pth[pos] != '\\')
+      {
+      pos--;
+      }
+    pth[pos] = '\0';
+    delete [] pth;
+    }
+
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  vtkImageReader2 *imageReader;
+
+  const char *ext = this->ExtractFileExtension(filename);
+  if ( !strcmp(ext, ".bmp") || !strcmp(ext, ".BMP") )
+    {
+    imageReader = vtkBMPReader::New();
+    }
+  else if ( !strcmp(ext, ".jpg") || !strcmp(ext, ".JPG") )
+    {
+    imageReader = vtkJPEGReader::New();
+    }
+  else if ( !strcmp(ext, ".png") || !strcmp(ext, ".png") )
+    {
+    imageReader = vtkPNGReader::New();
+    }
+  else if ( !strcmp(ext, ".ppm") || !strcmp(ext, ".PPM") )
+    {
+    imageReader = vtkPNMReader::New();
+    }
+  else if ( !strcmp(ext, ".tif") || !strcmp(ext, ".TIF") )
+    {
+    imageReader = vtkTIFFReader::New();
+    }
+  else
+    {
+    vtkErrorMacro("Unknown texture file extension.");
+    return VTK_ERROR;
+    }
+  
+  imageReader->SetFileName(filename);
+
+  // Read the texture image locally and write it out to a binary string.
+  vtkStructuredPointsWriter *writer = vtkStructuredPointsWriter::New();
+  writer->SetInputConnection(imageReader->GetOutputPort());
+  writer->SetFileTypeToBinary();
+  writer->WriteToOutputStringOn();
+  writer->Write();
+
+  vtkClientServerStream stream;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkProcessModule *pm = pvApp->GetProcessModule();
+
+  // Create a proxy for the dummy image source that "creates" the data
+  // used by the texture.
+  vtkSMProxy *parser = proxyManager->NewProxy("sources", "NetworkImageSource");
+  parser->SetServers(vtkProcessModule::RENDER_SERVER |
+                     vtkProcessModule::CLIENT);
+  proxyManager->RegisterProxy("TextureSources", filename, parser);
+  parser->UpdateVTKObjects();
+
+  // Pack the image string into a vtkClientServerStream, and pass it to
+  // vtkNetworkImageSource. We did this trick rather than pass the string
+  // directly because of problems with CSS-wrapping of a non-NULL-terminated
+  // char array.
+  vtkClientServerStream stream2;
+  stream2 << vtkClientServerStream::Reply
+          << vtkClientServerStream::InsertArray(
+            writer->GetOutputString(), writer->GetOutputStringLength())
+            << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << parser->GetID(0) << "ReadImageFromString"
+         << stream2
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT,
+    stream);
+
+  // Create a proxy for the vtkTexture itself.
+  vtkSMProxy *textureProxy =
+    proxyManager->NewProxy("textures", "Texture");
+  textureProxy->SetServers(vtkProcessModule::RENDER_SERVER |
+                           vtkProcessModule::CLIENT);
+  proxyManager->RegisterProxy("Textures", filename+pos+1, textureProxy);
+
+  // Connect the dummy source to the texture.
+  vtkSMProxyProperty *inputProp = vtkSMProxyProperty::SafeDownCast(
+    textureProxy->GetProperty("Input"));
+  inputProp->AddProxy(parser);
+
+  parser->Delete();
+  textureProxy->Delete();
+  
+  // Save the texture load command in the trace file.
+  this->GetTraceHelper()->AddEntry(
+    "$kw(%s) LoadTexture \"%s\"", this->GetTclName(), filename);
 
   return VTK_OK;
 }

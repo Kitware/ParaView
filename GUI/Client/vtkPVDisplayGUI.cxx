@@ -75,7 +75,9 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMLODDisplayProxy.h"
 #include "vtkSMPointLabelDisplayProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkStdString.h"
 #include "vtkStructuredGrid.h"
@@ -103,7 +105,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.68");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.69");
 
 //----------------------------------------------------------------------------
 
@@ -197,6 +199,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->ColorButtonVisible = 1;
   this->ScalarBarCheckVisible = 1;
   this->InterpolateColorsCheckVisible = 1;
+  this->TextureMenuVisible = 0;
 
   this->MainFrame = vtkKWFrameWithScrollbar::New();
   this->ColorFrame = vtkKWFrameWithLabel::New();
@@ -206,6 +209,9 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   
   this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorSelectionMenu = vtkPVColorSelectionWidget::New();
+
+  this->TextureMenuLabel = vtkKWLabel::New();
+  this->TextureMenu = vtkKWMenuButton::New();
 
   this->MapScalarsCheck = vtkKWCheckButton::New();
   this->InterpolateColorsCheck = vtkKWCheckButton::New();
@@ -297,9 +303,15 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
     
   this->ColorMenuLabel->Delete();
   this->ColorMenuLabel = NULL;
-  
+
   this->ColorSelectionMenu->Delete();
   this->ColorSelectionMenu = NULL;
+
+  this->TextureMenuLabel->Delete();
+  this->TextureMenuLabel = NULL;
+  
+  this->TextureMenu->Delete();
+  this->TextureMenu = NULL;
 
   this->EditColorMapButtonFrame->Delete();
   this->EditColorMapButtonFrame = NULL;
@@ -600,6 +612,20 @@ void vtkPVDisplayGUI::CreateWidget()
   this->ColorSelectionMenu->SetBalloonHelpString(
     "Select method for coloring dataset geometry.");
 
+  this->TextureMenuLabel->SetParent(this->ColorFrame->GetFrame());
+  this->TextureMenuLabel->Create();
+  this->TextureMenuLabel->SetText("Texture:");
+  this->TextureMenuLabel->SetBalloonHelpString(
+    "Select the texture to use in displaying dataset geometry. This menu is "
+    "enabled if Texture is chosen from the Color by menu.");
+
+  this->TextureMenu->SetParent(this->ColorFrame->GetFrame());
+  this->TextureMenu->Create();
+  this->TextureMenu->SetBalloonHelpString(
+    "Select the texture to use in displaying dataset geometry. This menu is "
+    "enabled if Texture is chosen from the Color by menu. Choose Load Texture "
+    "from the File menu to add entries to this menu.");
+
   this->ColorButton->SetParent(this->ColorFrame->GetFrame());
   this->ColorButton->GetLabel()->SetText("Actor Color");
   this->ColorButton->Create();
@@ -659,6 +685,13 @@ void vtkPVDisplayGUI::CreateWidget()
                col_1_padx, button_pady);
 
   this->Script("grid %s %s -sticky wns",
+               this->TextureMenuLabel->GetWidgetName(),
+               this->TextureMenu->GetWidgetName());
+  this->Script("grid %s -sticky news -padx %d -pady %d",
+               this->TextureMenu->GetWidgetName(),
+               col_1_padx, button_pady);
+
+  this->Script("grid %s %s -sticky wns",
                this->MapScalarsCheck->GetWidgetName(),
                this->ColorButton->GetWidgetName());
   this->Script("grid %s -column 1 -sticky news -padx %d -pady %d",
@@ -666,6 +699,7 @@ void vtkPVDisplayGUI::CreateWidget()
                col_1_padx, button_pady);
   this->ColorButtonVisible = 0;
   this->InterpolateColorsCheckVisible = 0;
+  this->TextureMenuVisible = 0;
 
   this->Script("grid %s %s -sticky wns",
                this->InterpolateColorsCheck->GetWidgetName(),
@@ -713,7 +747,9 @@ void vtkPVDisplayGUI::CreateWidget()
   this->VolumeRenderMethodMenu->SetBalloonHelpString(
     "Select the render method to be used when not interacting "
     "(during interaction projection is always used). "
-    "Projection is fast, ZSweep and Bunyk are much slower, but more accurate.");
+    "Projection is fast, ZSweep and Bunyk are much slower, but more accurate. "
+    "HAVS (listed if supported) is also fast, but cannot render cell data; in "
+    "this case, Projection will be automatically selected.");
   
   this->EditVolumeAppearanceButton->
     SetParent(this->VolumeAppearanceFrame->GetFrame());
@@ -1375,6 +1411,7 @@ void vtkPVDisplayGUI::UpdateColorGUI()
 {
   this->UpdateColorMenu();       // Computed value used in later methods.
   this->UpdateMapScalarsCheck(); // Computed value used in later methods.
+  this->UpdateTextureMenu();
   this->UpdateColorButton();
   this->UpdateEditColorMapButton();
   this->UpdateInterpolateColorsCheck();
@@ -1474,6 +1511,13 @@ void vtkPVDisplayGUI::UpdateColorMenu()
   this->ColorSelectionMenu->GetMenu()->DeleteAllItems();
   this->ColorSelectionMenu->GetMenu()->AddRadioButton(
     "Property", this, "ColorByProperty");
+  vtkPVDataSetAttributesInformation *pdInfo =
+    this->PVSource->GetDataInformation()->GetPointDataInformation();
+  if (pdInfo->GetAttributeInformation(vtkDataSetAttributes::TCOORDS))
+    {
+    this->ColorSelectionMenu->GetMenu()->AddRadioButton(
+      "Texture", this, "ColorByTexture");
+    }
   this->ColorSelectionMenu->SetPVSource(this->PVSource);
 
   this->ColorSelectionMenu->Update(0);
@@ -1503,7 +1547,11 @@ void vtkPVDisplayGUI::UpdateColorMenu()
     }
   else
     {
-    this->ColorSelectionMenu->SetValue("Property");
+    if ( strcmp(this->ColorSelectionMenu->GetValue(), "Texture") != 0 ||
+         ! pdInfo->GetAttributeInformation(vtkDataSetAttributes::TCOORDS) )
+      {
+      this->ColorSelectionMenu->SetValue("Property");
+      }
     }
 
   this->UpdateColorMapUI();
@@ -1518,7 +1566,8 @@ void vtkPVDisplayGUI::UpdateColorButton()
   
   // We could look at the color menu's value too.
   this->ColorButtonVisible = 1;
-  if (this->PVSource && this->PVSource->GetPVColorMap())
+  if ((this->PVSource && this->PVSource->GetPVColorMap()) ||
+      ! strcmp(this->ColorSelectionMenu->GetValue(), "Texture"))
     {
     this->ColorButtonVisible = 0;
     }
@@ -1685,6 +1734,7 @@ void vtkPVDisplayGUI::ColorByArray(const char* array, int field)
     array, field);
   
   this->PVSource->ColorByArray(array, field);
+  this->ApplyTexture(0);
   this->ColorSelectionMenu->SetValue(array, field);
   
   this->UpdateColorGUI(); // why?
@@ -1731,6 +1781,7 @@ void vtkPVDisplayGUI::ColorByPropertyInternal()
   // Instead use PVSource. Since, we need to remove the LUT from the proxy 
   // property otherwise the batch may be incorrect.
   this->PVSource->ColorByArray((char*) 0, 0);
+  this->ApplyTexture(0);
 
   double *color = this->ColorButton->GetColor();
   this->SetActorColor(color[0], color[1], color[2]);
@@ -1738,6 +1789,30 @@ void vtkPVDisplayGUI::ColorByPropertyInternal()
   this->PVSource->SetPVColorMap(0);
 
   this->UpdateColorGUI();
+  if (this->GetPVRenderView())
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::ColorByTexture()
+{
+  this->GetTraceHelper()->AddEntry("$kw(%s) ColorByTexture", 
+                                   this->GetTclName());
+  this->ColorSelectionMenu->SetValue("Texture");
+  this->ColorByTextureInternal();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::ColorByTextureInternal()
+{
+  this->PVSource->ColorByArray((char*) 0, 0);
+  this->PVSource->SetPVColorMap(0);
+  this->UpdateColorGUI();
+
+  this->ApplyTexture(this->TextureMenu->GetValue());
+
   if (this->GetPVRenderView())
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1770,6 +1845,78 @@ void vtkPVDisplayGUI::VolumeRenderByArray(const char* name, int field)
     {
     this->GetPVRenderView()->EventuallyRender();
     } 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::UpdateTextureMenu()
+{
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  unsigned int numProxies = proxyManager->GetNumberOfProxies("Textures");
+  unsigned int i;
+  ostrstream currentValue;
+  currentValue << this->TextureMenu->GetValue() << ends;
+  this->TextureMenu->GetMenu()->DeleteAllItems();
+  for (i = 0; i < numProxies; i++)
+    {
+    const char* textureName = proxyManager->GetProxyName("Textures", i);
+    ostrstream textureCmd;
+    textureCmd << "ApplyTexture \"" << textureName << "\"" << ends;
+    this->TextureMenu->GetMenu()->AddRadioButton(textureName, this,
+                                                 textureCmd.str());
+    textureCmd.rdbuf()->freeze(0);
+    }
+
+  if (numProxies > 0)
+    {
+    if ( currentValue.str() && currentValue.str()[0] &&
+         this->TextureMenu->GetMenu()->HasItem(currentValue.str()))
+      {
+      this->TextureMenu->SetValue(currentValue.str());
+      }
+    else
+      {
+      ostrstream newValue;
+      newValue << this->TextureMenu->GetMenu()->GetItemLabel(0) << ends;
+      this->TextureMenu->SetValue(newValue.str());
+      newValue.rdbuf()->freeze(0);
+      }
+    }
+  currentValue.rdbuf()->freeze(0);
+
+  this->TextureMenuVisible = 1;
+  if ( (this->PVSource && this->PVSource->GetPVColorMap()) ||
+       ! strcmp(this->ColorSelectionMenu->GetValue(), "Property") )
+    {
+    this->TextureMenuVisible = 0;
+    }
+  this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::ApplyTexture(const char* textureName)
+{
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  vtkPVSource *source = this->GetPVSource();
+  vtkSMDataObjectDisplayProxy *pDisp = source->GetDisplayProxy();
+
+  if (textureName && textureName[0])
+    {
+    vtkSMSourceProxy *textureProxy = vtkSMSourceProxy::SafeDownCast(
+      proxyManager->GetProxy("Textures", textureName));
+    textureProxy->UpdateVTKObjects();
+    pDisp->SetTexture(textureProxy);
+    this->GetTraceHelper()->AddEntry("$kw(%s) ApplyTexture %s",
+                                     this->GetTclName(), textureName);
+    }
+  else
+    {
+    pDisp->SetTexture(0);
+    }
+
+  if (this->GetPVRenderView())
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -3004,6 +3151,16 @@ void vtkPVDisplayGUI::UpdateEnableState()
   this->PropagateEnableState(this->EditVolumeAppearanceButton);
   this->PropagateEnableState(this->ColorSelectionMenu);
   this->PropagateEnableState(this->VolumeScalarSelectionWidget);
+  if ( this->TextureMenuVisible )
+    {
+    this->PropagateEnableState(this->TextureMenuLabel);
+    this->PropagateEnableState(this->TextureMenu);
+    }
+  else
+    {
+    this->TextureMenuLabel->SetEnabled(0);
+    this->TextureMenu->SetEnabled(0);
+    }
   if ( this->EditColorMapButtonVisible )
     {
     this->PropagateEnableState(this->EditColorMapButton);

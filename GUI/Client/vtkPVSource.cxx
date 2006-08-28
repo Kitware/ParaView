@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.482");
+vtkCxxRevisionMacro(vtkPVSource, "1.483");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2521,6 +2521,15 @@ void vtkPVSource::SaveStateDisplay(ofstream* file)
         << this->PVColorMap->GetArrayName() << "} " 
         << 4 << endl;
       }
+    }
+  else if (this->DisplayProxy->GetTexture())
+    {
+    vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+    *file << "[$kw(" << this->GetTclName() << ") GetPVOutput] ColorByTexture\n";
+    *file << "[$kw(" << this->GetTclName() << ") GetPVOutput] ApplyTexture \""
+          << proxyManager->GetProxyName("Textures",
+                                        this->DisplayProxy->GetTexture())
+          << "\"\n";
     }
   else
     {

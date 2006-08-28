@@ -1,0 +1,54 @@
+set kw(vtkTemp2) [$Application GetMainWindow]
+set kw(vtkTemp82) [$kw(vtkTemp2) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp82) $argv $argc
+
+$kw(vtkTemp2) LoadTexture "C:/dev/ParaView/Data/Data/earth.ppm"
+
+set kw(vtkTemp1188) [$kw(vtkTemp2) InitializeReadCustom "legacyreader" "C:/dev/ParaView/Data/Data/ironProt.vtk"]
+$kw(vtkTemp2) ReadFileInformation $kw(vtkTemp1188) "C:/dev/ParaView/Data/Data/ironProt.vtk"
+$kw(vtkTemp2) FinalizeRead $kw(vtkTemp1188) "C:/dev/ParaView/Data/Data/ironProt.vtk"
+$kw(vtkTemp1188) SetLabel {ironProt.vtk}
+set kw(vtkTemp1190) [$kw(vtkTemp1188) GetPVWidget {Filename}]
+$kw(vtkTemp1190) SetValue "C:/dev/ParaView/Data/Data/ironProt.vtk"
+$kw(vtkTemp1188) AcceptCallback
+
+set kw(vtkTemp1240) [$kw(vtkTemp2) CreatePVSource Contour]
+$kw(vtkTemp1240) SetLabel {Contour0}
+set kw(vtkTemp1241) [$kw(vtkTemp1240) GetPVWidget {Input}]
+$kw(vtkTemp1241) SetCurrentValue $kw(vtkTemp1188)
+set kw(vtkTemp1244) [$kw(vtkTemp1240) GetPVWidget {Scalars}]
+$kw(vtkTemp1244) SetValue {scalars}
+set kw(vtkTemp1247) [$kw(vtkTemp1240) GetPVWidget {Contour Values}]
+$kw(vtkTemp1247) RemoveAllValues
+$kw(vtkTemp1247) AddValue 100
+set kw(vtkTemp1277) [$kw(vtkTemp1240) GetPVWidget {Compute Normals}]
+$kw(vtkTemp1277) SetSelectedState 1
+set kw(vtkTemp1280) [$kw(vtkTemp1240) GetPVWidget {Compute Gradients}]
+$kw(vtkTemp1280) SetSelectedState 0
+set kw(vtkTemp1283) [$kw(vtkTemp1240) GetPVWidget {Compute Scalars}]
+$kw(vtkTemp1283) SetSelectedState 0
+$kw(vtkTemp1240) AcceptCallback
+
+set kw(vtkTemp1319) [$kw(vtkTemp2) CreatePVSource TextureMapToSphere]
+$kw(vtkTemp1319) SetLabel {TextureSphere0}
+set kw(vtkTemp1320) [$kw(vtkTemp1319) GetPVWidget {Input}]
+$kw(vtkTemp1320) SetCurrentValue $kw(vtkTemp1240)
+$kw(vtkTemp1319) AcceptCallback
+
+# Saving state of the Display Proxy associated with the source
+set pvDisp(vtkTemp1319) [$kw(vtkTemp1319) GetDisplayProxy] 
+$pvDisp(vtkTemp1319) UpdateVTKObjects
+[$kw(vtkTemp1319) GetPVOutput] ColorByTexture
+[$kw(vtkTemp1319) GetPVOutput] ApplyTexture "earth.ppm"
+$kw(vtkTemp1188) SetVisibility 1
+
+$kw(vtkTemp82) SetRendererBackgroundColor 0.33 0.35 0.43
+$kw(vtkTemp82) ParallelProjectionOff
+$kw(vtkTemp82) SetCameraState 130.228 41.147 174.384 3.462 31.125 -10.25 -0.0369961 0.998895 -0.0289969
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit
