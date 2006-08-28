@@ -34,6 +34,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMPropertyIterator.h"
 
+#include <vtkstd/algorithm>
 #include <vtkstd/list>
 #include <vtkstd/vector>
 
@@ -68,7 +69,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.2");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
