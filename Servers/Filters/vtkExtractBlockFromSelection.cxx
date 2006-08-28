@@ -23,7 +23,7 @@
 #include "vtkSelection.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkExtractBlockFromSelection, "1.4");
+vtkCxxRevisionMacro(vtkExtractBlockFromSelection, "1.5");
 vtkStandardNewMacro(vtkExtractBlockFromSelection);
 
 //----------------------------------------------------------------------------
@@ -87,9 +87,7 @@ void vtkExtractBlockFromSelection::PrintSelf(ostream& os, vtkIndent indent)
 int vtkExtractBlockFromSelection::FillInputPortInformation(
   int, vtkInformation *info)
 {
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
-  info->Set(vtkCompositeDataPipeline::INPUT_REQUIRED_COMPOSITE_DATA_TYPE(), 
-            "vtkMultiBlockDataSet");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
 
   return 1;
 }
