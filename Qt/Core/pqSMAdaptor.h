@@ -78,6 +78,8 @@ public:
   static pqSMProxy getProxyProperty(vtkSMProperty* Property);
   /// get the proxy for a property
   /// for example, glyph filter accepts a source (proxy) to glyph with
+  static void addProxyProperty(vtkSMProperty* Property, 
+                               pqSMProxy Value);
   static void setProxyProperty(vtkSMProperty* Property, 
                                pqSMProxy Value);
   static void setUncheckedProxyProperty(vtkSMProperty* Property, 
