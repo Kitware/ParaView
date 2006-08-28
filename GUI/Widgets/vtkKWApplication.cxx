@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.298");
+vtkCxxRevisionMacro(vtkKWApplication, "1.299");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -471,7 +471,7 @@ int vtkKWApplication::Exit()
     }
 
   // This call has to be here, not before the previous loop, so that
-  // (for example, the balloon help manager is not destroyed before
+  // for example, the balloon help manager is not destroyed before
   // all windows are removed (in some rare occasions, a user can be fast
   // enough to quit the app while moving the mouse on a widget that
   // has a binding to the balloon help manager
@@ -848,6 +848,10 @@ void vtkKWApplication::Start(int argc, char **argv)
     {
     this->DoOneTclEvent();
     }
+
+  // In case we never went through Exit()
+
+  this->PrepareForDelete();
 }
 
 //----------------------------------------------------------------------------
