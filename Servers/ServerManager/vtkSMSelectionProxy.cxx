@@ -69,7 +69,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.3");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -589,4 +589,40 @@ void vtkSMSelectionProxy::MarkModified(vtkSMProxy* modifiedProxy)
 void vtkSMSelectionProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "RenderModule: " << this->RenderModule << endl;
+  os << indent << "SelectionUpToDate: " << this->SelectionUpToDate << endl;
+  os << indent << "Selection: " 
+    << this->Selection[0] << ","
+    << this->Selection[1] << ","
+    << this->Selection[2] << ","
+    << this->Selection[3] << endl;
+  os << indent << "Mode: ";
+  switch (this->Mode)
+    {
+  case FRUSTRUM:
+    os << "FRUSTRUM";
+    break;
+
+  case SURFACE:
+    os << "SURFACE";
+    break;
+  default:
+    os << "(Unknown)";
+    }
+  os << endl;
+
+  os << indent << "Type: " ;
+  switch(this->Type)
+    {
+  case GEOMETRY:
+    os << "GEOMETRY";
+    break;
+  case SOURCE:
+    os << "SOURCE";
+    break;
+  default:
+    os << "(Unknown)";
+    break;
+    }
+  os << endl;
 }
