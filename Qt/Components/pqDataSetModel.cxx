@@ -32,15 +32,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDataSetModel.h"
 
-#include <vtkDataSet.h>
 #include <vtkDataArray.h>
 #include <vtkCellData.h>
+#include <vtkPointData.h>
+#include <vtkStdString.h>
 
+#include <QtDebug>
+//-----------------------------------------------------------------------------
 pqDataSetModel::pqDataSetModel(QObject* p)
   : QAbstractTableModel(p), DataSet(0)
 {
+  this->Type = pqDataSetModel::CELL_DATA_FIELD;
 }
 
+//-----------------------------------------------------------------------------
 pqDataSetModel::~pqDataSetModel()
 {
   if(this->DataSet)
@@ -49,51 +54,131 @@ pqDataSetModel::~pqDataSetModel()
     }
 }
 
+//-----------------------------------------------------------------------------
+vtkFieldData* pqDataSetModel::getFieldData() const
+{
+ if (this->DataSet)
+   {
+   switch (this->Type)
+     {
+   case DATA_OBJECT_FIELD:
+     return this->DataSet->GetFieldData();
 
+   case POINT_DATA_FIELD:
+     return this->DataSet->GetPointData();
+
+   case CELL_DATA_FIELD:
+     return this->DataSet->GetCellData();
+     }
+   }
+  return 0;
+}
+//-----------------------------------------------------------------------------
 int pqDataSetModel::rowCount(const QModelIndex&) const
 {
-  if(!this->DataSet)
-    {
-    return 0;
-    }
-  return this->DataSet->GetNumberOfCells();
+  vtkFieldData* fd = this->getFieldData();
+  return fd? fd->GetNumberOfTuples() : 0;
 }
 
+//-----------------------------------------------------------------------------
 int pqDataSetModel::columnCount(const QModelIndex&) const
 {
-  if(!this->DataSet)
-    {
-    return 0;
-    }
-
-  return this->DataSet->GetCellData()->GetNumberOfArrays();
+  vtkFieldData* fd = this->getFieldData();
+  return fd? fd->GetNumberOfArrays() : 0;
 }
 
+//-----------------------------------------------------------------------------
+template <class T>
+void pqDataSetModelPrintTuple(QString& str, T *tuple, int num_of_components)
+{
+  for (int cc=0; cc < num_of_components; cc++)
+    {
+    if (cc > 0)
+      {
+      str += ", ";
+      }
+    str += QString::number(tuple[cc]);
+    }
+}
+//-----------------------------------------------------------------------------
+VTK_TEMPLATE_SPECIALIZE
+void pqDataSetModelPrintTuple(QString& str, vtkStdString* tuple, int num_of_components)
+{
+  for (int cc=0; cc < num_of_components; cc++)
+    {
+    if (cc > 0)
+      {
+      str += ", ";
+      }
+    str += tuple[cc].c_str();
+    }
+}
+
+//-----------------------------------------------------------------------------
+VTK_TEMPLATE_SPECIALIZE
+void pqDataSetModelPrintTuple(QString& str, double* tuple, int num_of_components)
+{
+  for (int cc=0; cc < num_of_components; cc++)
+    {
+    if (cc > 0)
+      {
+      str += ", ";
+      }
+    str += QString::number(tuple[cc],'g');;
+    }
+}
+//-----------------------------------------------------------------------------
+VTK_TEMPLATE_SPECIALIZE
+void pqDataSetModelPrintTuple(QString& str, float* tuple, int num_of_components)
+{
+  for (int cc=0; cc < num_of_components; cc++)
+    {
+    if (cc > 0)
+      {
+      str += ", ";
+      }
+    str += QString::number(tuple[cc],'g');;
+    }
+}
+//-----------------------------------------------------------------------------
 QVariant pqDataSetModel::data(const QModelIndex& idx, int role) const
 {
   if(!idx.isValid() || !this->DataSet)
     {
     return QVariant();
     }
+  vtkFieldData* fd = this->getFieldData();
+  vtkDataArray* array = fd?  fd->GetArray(idx.column()) : 0;
 
-  vtkDataArray* array = this->DataSet->GetCellData()->GetArray(idx.column());
-
-  if(role == Qt::DisplayRole)
+  if(role == Qt::DisplayRole && array)
     {
-    return array->GetTuple1(idx.row());
+    QString text;
+    int num_of_components = array->GetNumberOfComponents();
+    switch (array->GetDataType())
+      {
+      vtkExtendedTemplateMacro(::pqDataSetModelPrintTuple(text,
+          static_cast<VTK_TT*>(array->GetVoidPointer(idx.row()*num_of_components)),
+          num_of_components));
+
+    default:
+      qDebug() << "Unsupported data type: " << array->GetDataType();
+      }
+    return text;
     }
   
   return QVariant();
 }
 
+//-----------------------------------------------------------------------------
 QVariant pqDataSetModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if(this->DataSet && orientation == Qt::Horizontal)
     {
     if(role == Qt::DisplayRole)
       {
-      vtkDataArray* array = this->DataSet->GetCellData()->GetArray(section);
-      return array->GetName();
+      vtkFieldData* fd = this->getFieldData();
+      vtkDataArray* array = fd?  fd->GetArray(section) : 0;
+      return array? array->GetName() : QVariant();
       }
     }
 
@@ -101,6 +186,7 @@ QVariant pqDataSetModel::headerData(int section, Qt::Orientation orientation, in
 }
 
 
+//-----------------------------------------------------------------------------
 void pqDataSetModel::setDataSet(vtkDataSet* ds)
 {
   if(ds == this->DataSet)
@@ -124,9 +210,20 @@ void pqDataSetModel::setDataSet(vtkDataSet* ds)
   this->reset();
 }
 
+//-----------------------------------------------------------------------------
 vtkDataSet* pqDataSetModel::dataSet() const
 {
   return this->DataSet;
 }
 
+//-----------------------------------------------------------------------------
+void pqDataSetModel::setFieldDataType(FieldDataType type)
+{
+  if (this->Type != type)
+    {
+    this->Type = type;
+    // Tell the view that we changed.
+    this->reset();
+    }
+}
 

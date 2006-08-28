@@ -63,7 +63,10 @@ public slots:
   /// Called when user selects in the 3D view.
   void onSelectionChanged(pqSelectionManager*);
 
-  
+private slots:
+  /// Called when current source seleciton changes.
+  void onCurrentSourceIndexChanged(int);
+  void onCurrentTypeTextChanged(const QString& text);
 private:
   void onElementsChanged();
   

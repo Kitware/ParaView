@@ -1,0 +1,72 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>ElementInspector</class>
+ <widget class="QWidget" name="ElementInspector" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="1" column="0" >
+    <widget class="QTreeView" name="TreeView" />
+   </item>
+   <item row="0" column="0" >
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QComboBox" name="SourceComboBox" />
+     </item>
+     <item>
+      <widget class="QComboBox" name="DataTypeComboBox" >
+       <item>
+        <property name="text" >
+         <string>Point Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Cell Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Field Data</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="ClearButton" >
+       <property name="text" >
+        <string>Clear</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <pixmapfunction></pixmapfunction>
+ <resources/>
+ <connections/>
+</ui>

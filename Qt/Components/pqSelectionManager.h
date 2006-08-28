@@ -80,6 +80,9 @@ public:
                         vtkSMProxy*& proxy, 
                         vtkDataObject*& dataObject);
 
+  void getSelectedObjects(QList<pqPipelineSource*> &sourceProxies, 
+    QList<vtkDataObject*> &dataObjects);
+
   enum Modes
   {
     SELECT,

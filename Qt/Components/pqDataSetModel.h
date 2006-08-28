@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include <QAbstractTableModel>
-class vtkDataSet;
 
+#include "vtkDataSet.h" // needed for FieldDataType
 /// provide a QAbstractTableModel for a vtkDataSet's cell scalars
 /// \ todo fix this class to watch for changes in the pipeline and update the view accordingly
 class PQCOMPONENTS_EXPORT pqDataSetModel : public QAbstractTableModel
@@ -61,9 +61,20 @@ public:
   /// get the vtkDataSet in use
   vtkDataSet* dataSet() const;
 
+  enum FieldDataType 
+    {
+    DATA_OBJECT_FIELD = vtkDataSet::DATA_OBJECT_FIELD,
+    POINT_DATA_FIELD = vtkDataSet::POINT_DATA_FIELD,
+    CELL_DATA_FIELD= vtkDataSet::CELL_DATA_FIELD
+    };
+
+  void setFieldDataType(FieldDataType type);
+  FieldDataType fieldDataType() const { return Type; }
 private:
   vtkDataSet* DataSet;
+  FieldDataType Type;
 
+  vtkFieldData* getFieldData() const;
 };
 
 #endif //_pqDataSetModel_h

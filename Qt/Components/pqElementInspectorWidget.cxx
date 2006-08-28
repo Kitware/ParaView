@@ -33,24 +33,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataSetModel.h"
 #include "pqElementInspectorWidget.h"
 #include "pqSelectionManager.h"
+#include "pqPipelineSource.h"
+#include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
 
+#include "ui_pqElementInspectorWidget.h"
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <QPointer>
 
 #include <vtkAppendFilter.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkSmartPointer.h>
 
 //////////////////////////////////////////////////////////////////////////////
 // pqElementInspectorWidget::pqImplementation
 
-struct pqElementInspectorWidget::pqImplementation
+struct pqElementInspectorWidget::pqImplementation : public Ui::ElementInspector
 {
 public:
   pqImplementation() :
-    ClearButton(tr("Clear")),
-    Data(vtkUnstructuredGrid::New())
+    Data(vtkUnstructuredGrid::New()),
+    SelectionManager(0)
   {
   }
   
@@ -61,7 +67,7 @@ public:
 
   void clearData()
   {
-    this->Data->Reset();
+    this->Data->Initialize();
   }
 
   void addData(vtkUnstructuredGrid* data)
@@ -83,9 +89,9 @@ public:
     this->Data->DeepCopy(data);
   }
 
-  QPushButton ClearButton;
-  QTreeView TreeView;
   vtkUnstructuredGrid* const Data;
+  QList<QPointer<pqPipelineSource> > Sources;
+  pqSelectionManager* SelectionManager;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -96,81 +102,146 @@ pqElementInspectorWidget::pqElementInspectorWidget(QWidget *p) :
   Implementation(new pqImplementation())
 {
   this->setObjectName("ElementInspectorWidget");
-  
-  this->Implementation->ClearButton.setObjectName("Clear");
-  this->Implementation->ClearButton.hide();
-  connect(&this->Implementation->ClearButton, SIGNAL(clicked()), SLOT(clear()));
-  
-  this->Implementation->TreeView.setObjectName("View");
-  this->Implementation->TreeView.setRootIsDecorated(false);
-  this->Implementation->TreeView.setAlternatingRowColors(true);
-  this->Implementation->TreeView.setModel(
-    new pqDataSetModel(&this->Implementation->TreeView));
 
-  QHBoxLayout* const hbox = new QHBoxLayout();
-  hbox->addWidget(&this->Implementation->ClearButton);
-  hbox->setMargin(0);
+  this->Implementation->setupUi(this);
+  QObject::connect(this->Implementation->ClearButton, 
+    SIGNAL(clicked()), SLOT(clear()));
+  QObject::connect(
+    this->Implementation->SourceComboBox, SIGNAL(currentIndexChanged(int)), 
+    this, SLOT(onCurrentSourceIndexChanged(int)));
+  QObject::connect(
+    this->Implementation->DataTypeComboBox, 
+    SIGNAL(currentIndexChanged(const QString&)), 
+    this, SLOT(onCurrentTypeTextChanged(const QString&)));
+  
+  this->Implementation->TreeView->setRootIsDecorated(false);
+  this->Implementation->TreeView->setAlternatingRowColors(true);
+  this->Implementation->TreeView->setModel(
+    new pqDataSetModel(this->Implementation->TreeView));
 
-  QVBoxLayout* const vbox = new QVBoxLayout();
-  vbox->setMargin(0);
-  vbox->addLayout(hbox);
-  vbox->addWidget(&this->Implementation->TreeView);
-  this->setLayout(vbox);
+  this->Implementation->DataTypeComboBox->setCurrentIndex(
+    this->Implementation->DataTypeComboBox->findText("Cell Data"));
 }
 
+//-----------------------------------------------------------------------------
 pqElementInspectorWidget::~pqElementInspectorWidget()
 {
   delete this->Implementation;
 }
 
+//-----------------------------------------------------------------------------
 void pqElementInspectorWidget::clear()
 {
   this->Implementation->clearData();
-  onElementsChanged();    
+  this->onElementsChanged(); 
 }
 
+//-----------------------------------------------------------------------------
 void pqElementInspectorWidget::addElements(vtkUnstructuredGrid* ug)
 {
   this->Implementation->addData(ug);
-  onElementsChanged();
+  this->onElementsChanged();
 }
 
+//-----------------------------------------------------------------------------
 void pqElementInspectorWidget::setElements(vtkUnstructuredGrid* ug)
 {
   this->Implementation->setData(ug);
-  onElementsChanged();  
+  this->onElementsChanged();  
 }
 
+//-----------------------------------------------------------------------------
 void pqElementInspectorWidget::onElementsChanged()
 {
-  if(this->Implementation->Data->GetNumberOfCells())
-    {
-    this->Implementation->ClearButton.show();
-    }
-  else
-    {
-    this->Implementation->ClearButton.hide();
-    }
-    
-  qobject_cast<pqDataSetModel*>(
-    this->Implementation->TreeView.model())->setDataSet(
-      this->Implementation->Data);
-  this->Implementation->TreeView.reset();
-  this->Implementation->TreeView.update();
+  pqDataSetModel* model = qobject_cast<pqDataSetModel*>(
+    this->Implementation->TreeView->model());
+  model->setDataSet(this->Implementation->Data);
+
+  this->Implementation->TreeView->reset();
+  this->Implementation->TreeView->update();
   emit elementsChanged(this->Implementation->Data);
 }
 
+//-----------------------------------------------------------------------------
 void pqElementInspectorWidget::onSelectionChanged(pqSelectionManager* selMan)
 {
-  unsigned int numSelObjs = selMan->getNumberOfSelectedObjects();
+  this->Implementation->SelectionManager = selMan;
 
-  if (numSelObjs > 0)
+  int currentIndex = this->Implementation->SourceComboBox->currentIndex();
+  QString currentDataAttributesType = 
+    this->Implementation->DataTypeComboBox->currentText();
+
+  pqPipelineSource* currentSource = 
+    (currentIndex >= 0 && this->Implementation->Sources.size() > currentIndex)?
+    this->Implementation->Sources[currentIndex] : NULL;
+  currentIndex =0;
+
+  this->Implementation->Sources.clear();
+  this->Implementation->SourceComboBox->blockSignals(true);
+  this->Implementation->SourceComboBox->clear();
+
+  QList<pqPipelineSource*> proxies;
+  QList<vtkDataObject*> dataObjects;
+
+  selMan->getSelectedObjects(proxies, dataObjects);
+
+  int index = 0;
+  foreach(pqPipelineSource* source, proxies)
     {
-    vtkSMProxy* source;
-    vtkDataObject* dObj;
-    if (selMan->getSelectedObject(0, source, dObj))
+    this->Implementation->SourceComboBox->addItem(
+      source->getProxyName(), index);
+    this->Implementation->Sources.push_back(source);
+    if (currentSource && currentSource->getProxy() && 
+      source->getProxy() == currentSource->getProxy())
       {
-      this->setElements(vtkUnstructuredGrid::SafeDownCast(dObj));
+      currentIndex = index;
       }
+    index++;
+    }
+  this->Implementation->SourceComboBox->blockSignals(false);
+
+  // set the current index. If previously selected source is present in the 
+  // new selection, we select that one, else the first source is selected.
+  this->Implementation->SourceComboBox->setCurrentIndex(currentIndex);
+  this->onCurrentSourceIndexChanged(currentIndex);
+}
+
+//-----------------------------------------------------------------------------
+void pqElementInspectorWidget::onCurrentSourceIndexChanged(int index)
+{
+  if (index >= 0 && index < this->Implementation->Sources.size())
+    {
+    vtkSMProxy* proxy = 0;
+    vtkDataObject* dataObject = 0;
+    this->Implementation->SelectionManager->getSelectedObject(
+      static_cast<unsigned int>(index), proxy, dataObject);
+    this->setElements(vtkUnstructuredGrid::SafeDownCast(dataObject));
+    }
+  else
+    {
+    this->clear();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqElementInspectorWidget::onCurrentTypeTextChanged(const QString& text)
+{
+  if (text == "Point Data")
+    {
+    qobject_cast<pqDataSetModel*>(
+      this->Implementation->TreeView->model())->setFieldDataType(
+      pqDataSetModel::POINT_DATA_FIELD);
+    }
+  else if (text == "Cell Data")
+    {
+    qobject_cast<pqDataSetModel*>(
+      this->Implementation->TreeView->model())->setFieldDataType(
+      pqDataSetModel::CELL_DATA_FIELD);
+    }
+  else if (text == "Field Data")
+    {
+    qobject_cast<pqDataSetModel*>(
+      this->Implementation->TreeView->model())->setFieldDataType(
+      pqDataSetModel::DATA_OBJECT_FIELD);
     }
 }

@@ -904,6 +904,26 @@ unsigned int pqSelectionManager::getNumberOfSelectedObjects()
 }
 
 //-----------------------------------------------------------------------------
+void pqSelectionManager::getSelectedObjects(QList<pqPipelineSource*> &proxies,
+  QList<vtkDataObject*> &dataObjects)
+{
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqSelectionManagerImplementation::ClientSideDisplaysType::iterator iter =
+    this->Implementation->ClientSideDisplays.begin();
+
+  for(; iter!= this->Implementation->ClientSideDisplays.end(); ++iter)
+    {
+    pqPipelineSource* source = model->getPQSource(iter->SourceProxy);
+    if (source)
+      {
+      proxies.push_back(source);
+      dataObjects.push_back(iter->Display->GetOutput());
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 int pqSelectionManager::getSelectedObject(
   unsigned int idx, vtkSMProxy*& proxy, vtkDataObject*& dataObject)
 {

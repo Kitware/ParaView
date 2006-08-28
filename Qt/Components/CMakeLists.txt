@@ -120,6 +120,7 @@ SET(UI_FORMS
   Resources/UI/pqContourControls.ui
   Resources/UI/pqCreateServerStartupDialog.ui
   Resources/UI/pqEditServerStartupDialog.ui
+  Resources/UI/pqElementInspectorWidget.ui
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqDisplayProxyEditor.ui
