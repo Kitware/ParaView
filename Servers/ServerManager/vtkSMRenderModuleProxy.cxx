@@ -51,8 +51,9 @@
 #include "vtkPVVisibleCellSelector.h"
 #include "vtkIdTypeArray.h"
 #include "vtkSelection.h"
+#include "vtkSMMPIRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.45");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.46");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1325,6 +1326,35 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(int x0, int y0, int x1,
   vcsProxy->SetConnectionID(this->ConnectionID);
   vcsProxy->SetServers(this->Servers);
 
+  //don't let the CompositeManager control back/front buffer swapping so that
+  //we can do it here instead.
+  vtkSMProxy *CM = this->GetSubProxy("CompositeManager");
+  vtkSMIntVectorProperty *setAllowBuffSwap = NULL;
+  if (CM)
+    {
+    setAllowBuffSwap = vtkSMIntVectorProperty::SafeDownCast(
+      CM->GetProperty("SetUseBackBuffer"));
+    }
+  if (setAllowBuffSwap != NULL)
+    {
+    setAllowBuffSwap->SetElements1(0);
+    CM->UpdateVTKObjects();
+    }
+
+  //MPIRenderServer mode uses an imageactor on the client 
+  //(see vtkClientCompositeManager) internally to do compositing, 
+  //which doesnt jive with selection mode rendering. This looks for that 
+  //particular case and deals with it by only doing selection on the 
+  //renderserver nodes.
+  vtkSMMPIRenderModuleProxy *meAsMPI_RMP = vtkSMMPIRenderModuleProxy::SafeDownCast(this);
+  if (!this->IsRenderLocal() && meAsMPI_RMP != NULL && CM != NULL)
+    {
+    if (!strcmp(CM->GetVTKClassName(), "vtkClientCompositeManager"))
+      {
+      vcsProxy->SetServers(vtkProcessModule::RENDER_SERVER);
+      }      
+    }
+
   //how we get access to the renderers
   vtkSMProxyProperty *setRendererMethod = vtkSMProxyProperty::SafeDownCast(
     vcsProxy->GetProperty("SetRenderer"));
@@ -1397,7 +1427,17 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(int x0, int y0, int x1,
   setModeMethod->SetElements1(0);
   vcsProxy->UpdateVTKObjects();   
   this->SetBackgroundColorCM(origBG);
-  this->GetRenderWindow()->SwapBuffersOn();
+  if (!usefrontbuf)
+    {
+    this->GetRenderWindow()->SwapBuffersOn();
+    }
+
+  if (setAllowBuffSwap != NULL)
+    {
+    //let the CompositeManager control back/front buffer swapping
+    setAllowBuffSwap->SetElements1(1);
+    CM->UpdateVTKObjects();
+    }
   
   //convert the intermediate results into  the selection data structure 
   pti->ComputeSelectedIds();

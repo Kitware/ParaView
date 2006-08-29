@@ -94,7 +94,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.38");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.39");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -1035,7 +1035,10 @@ void vtkIceTRenderManager::PreRenderProcessing()
 
   // Turn swap buffers off before the render so the end render method has a
   // chance to add to the back buffer.
-  this->RenderWindow->SwapBuffersOff();
+  if (this->UseBackBuffer)
+    {
+    this->RenderWindow->SwapBuffersOff();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1059,7 +1062,10 @@ void vtkIceTRenderManager::PostRenderProcessing()
   this->WriteFullImage();
 
   // Swap buffers here.
-  this->RenderWindow->SwapBuffersOn();
+  if (this->UseBackBuffer)
+    {
+    this->RenderWindow->SwapBuffersOn();
+    }
   this->RenderWindow->Frame();
 }
 

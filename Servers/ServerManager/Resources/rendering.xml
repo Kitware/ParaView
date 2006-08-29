@@ -1795,6 +1795,13 @@
       <SubProxy>
         <Proxy name="PKdTree" proxygroup="locators" proxyname="PKdTree" />
       </SubProxy>
+      <IntVectorProperty
+        name="SetUseBackBuffer"
+        command="SetUseBackBuffer"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="1" />
+      </IntVectorProperty>
     </IceTDesktopRenderModuleProxy>
 
       
@@ -1918,6 +1925,13 @@
           <Group name="renderers"/>
         </ProxyGroupDomain>
       </ProxyProperty>
+      <IntVectorProperty
+        name="SetUseBackBuffer"
+        command="SetUseBackBuffer"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="1" />
+      </IntVectorProperty>
     </Proxy>
 
     <Proxy name="DesktopDeliveryServer" class="vtkPVDesktopDeliveryServer"
@@ -2072,6 +2086,13 @@
           <Group name="renderers"/>
         </ProxyGroupDomain>
       </ProxyProperty>
+      <IntVectorProperty
+        name="SetUseBackBuffer"
+        command="SetUseBackBuffer"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="1" />
+      </IntVectorProperty>
     </Proxy>
 
     <Proxy name="ClientCompositeManager" class="vtkClientCompositeManager">
@@ -2132,6 +2153,13 @@
           <Group name="renderers"/>
         </ProxyGroupDomain>
       </ProxyProperty>
+      <IntVectorProperty
+        name="SetUseBackBuffer"
+        command="SetUseBackBuffer"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="1" />
+      </IntVectorProperty>
     </Proxy>
     
     <Proxy name="MPICompositeManager" class="vtkMPICompositeManager">
