@@ -125,6 +125,9 @@
        <property name="text" >
         <string>Connect</string>
        </property>
+       <property name="default" >
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -139,6 +142,16 @@
   </layout>
  </widget>
  <pixmapfunction></pixmapfunction>
+ <tabstops>
+  <tabstop>startups</tabstop>
+  <tabstop>addServer</tabstop>
+  <tabstop>editServer</tabstop>
+  <tabstop>deleteServer</tabstop>
+  <tabstop>save</tabstop>
+  <tabstop>load</tabstop>
+  <tabstop>connect</tabstop>
+  <tabstop>close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

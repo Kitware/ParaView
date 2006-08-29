@@ -79,7 +79,6 @@ pqServerBrowser::pqServerBrowser(
   this->setObjectName("ServerBrowser");
   
   this->onStartupsChanged();
-  this->onCurrentItemChanged(0, 0);
 
   QObject::connect(
     &this->Implementation->Startups,
@@ -112,6 +111,9 @@ pqServerBrowser::pqServerBrowser(
     this, SLOT(onConnect()));
   QObject::connect(this->Implementation->UI.close, SIGNAL(clicked()),
     this, SLOT(close()));
+    
+  this->Implementation->UI.startups->setCurrentRow(0);
+  this->Implementation->UI.connect->setFocus(Qt::OtherFocusReason);
 }
 
 pqServerBrowser::~pqServerBrowser()
