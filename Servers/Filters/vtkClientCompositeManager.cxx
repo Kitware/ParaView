@@ -56,7 +56,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.44");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.45");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -483,6 +483,8 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
     }
 
   this->ImageActor->VisibilityOn();
+  this->ImageActor->InterpolateOff(); //needs to be off for color buffer 
+  //selection, or we can't trust the ids encoded in the pixels.
   this->ImageActor->SetInput(this->CompositeData);
   this->ImageActor->SetDisplayExtent(0, this->PDataSize[0]-1,
                                      0, this->PDataSize[1]-1, 0, 0);

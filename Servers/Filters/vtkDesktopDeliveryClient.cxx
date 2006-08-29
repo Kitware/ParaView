@@ -45,7 +45,7 @@ static void vtkDesktopDeliveryClientReceiveImageCallback(vtkObject *,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.25");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.26");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -206,7 +206,10 @@ void vtkDesktopDeliveryClient::PreRenderProcessing()
 
   // Turn swap buffers off before the render so the end render method has a
   // chance to add to the back buffer.
-  this->RenderWindow->SwapBuffersOff();
+  if (this->UseBackBuffer)
+    {
+    this->RenderWindow->SwapBuffersOff();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -230,7 +233,10 @@ void vtkDesktopDeliveryClient::PostRenderProcessing()
     }
 
   // Swap buffers here.
-  this->RenderWindow->SwapBuffersOn();
+  if (this->UseBackBuffer)
+    {
+    this->RenderWindow->SwapBuffersOn();
+    }
   this->RenderWindow->Frame();
 }
 

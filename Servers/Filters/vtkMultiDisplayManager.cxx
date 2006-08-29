@@ -43,7 +43,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.5");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.6");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 // Structures to communicate render info.
@@ -316,7 +316,10 @@ void vtkMultiDisplayManager::ClientStartRender()
   
   vtkDebugMacro("StartRender");
   // Make sure they all swp buffers at the same time.
-  this->RenderWindow->SwapBuffersOff();
+  if (this->UseBackBuffer)
+    {
+    this->RenderWindow->SwapBuffersOff();
+    }
 
   // All this just gets information to send to the satellites.  
   if (updateRate > 2.0)
@@ -437,7 +440,10 @@ void vtkMultiDisplayManager::InternalSatelliteStartRender(vtkPVMultiDisplayInfo 
   // Delay swapping buffers untill all processes are finished.
   if (this->Controller)
     {
-    renWin->SwapBuffersOff();  
+    if (this->UseBackBuffer)
+      {
+      renWin->SwapBuffersOff();  
+      }
     }
 
   // Synchronize
@@ -505,7 +511,10 @@ void vtkMultiDisplayManager::InternalSatelliteStartRender(vtkPVMultiDisplayInfo 
     }
 
   // Force swap buffers here.
-  renWin->SwapBuffersOn();  
+  if (this->UseBackBuffer)
+    {
+    renWin->SwapBuffersOn();  
+    }
   renWin->Frame();
 }
 
@@ -985,7 +994,10 @@ void vtkMultiDisplayManager::ClientEndRender()
 
   if (renWin)
     {
-    renWin->SwapBuffersOn();  
+    if (this->UseBackBuffer)
+      {
+      renWin->SwapBuffersOn();  
+      }
     renWin->Frame();
     }
 }
