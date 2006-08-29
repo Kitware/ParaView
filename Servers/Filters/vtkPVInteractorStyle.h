@@ -24,16 +24,16 @@
 #ifndef __vtkPVInteractorStyle_h
 #define __vtkPVInteractorStyle_h
 
-#include "vtkInteractorStyle.h"
+#include "vtkInteractorStyleTrackballCamera.h"
 
 class vtkCameraManipulator;
 class vtkCollection;
 
-class VTK_EXPORT vtkPVInteractorStyle : public vtkInteractorStyle
+class VTK_EXPORT vtkPVInteractorStyle : public vtkInteractorStyleTrackballCamera
 {
 public:
   static vtkPVInteractorStyle *New();
-  vtkTypeRevisionMacro(vtkPVInteractorStyle, vtkInteractorStyle);
+  vtkTypeRevisionMacro(vtkPVInteractorStyle, vtkInteractorStyleTrackballCamera);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
