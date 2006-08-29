@@ -207,6 +207,9 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
                    SIGNAL(sourceRemoved(pqPipelineSource*)),
                    this, 
                    SLOT(sourceRemoved(pqPipelineSource*)));
+  QObject::connect(
+    model, SIGNAL(renderModuleRemoved(pqRenderModule*)),
+    this, SLOT(renderModuleRemoved(pqRenderModule*)));
 
   // Cleanup when a selection helper is unregistered.
   pqServerManagerObserver* observer = core->getServerManagerObserver();
@@ -944,4 +947,23 @@ int pqSelectionManager::getSelectedObject(
     this->Implementation->ClientSideDisplays[idx].Display->GetOutput();
 
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::renderModuleRemoved(pqRenderModule* rm)
+{
+  // locate displays in this render module, if any, are remove them.
+  vtkSMProxy* rmp = rm->getProxy();
+  if (!rmp)
+    {
+    return;
+    }
+  vtkTypeUInt32 id = rmp->GetSelfID().ID;
+  pqSelectionManagerImplementation::DisplaysType::iterator iter = 
+    this->Implementation->Displays.find(id);
+  if (iter != this->Implementation->Displays.end())
+    {
+    // since these displays are not registered or anything, simply clean it up.
+    this->Implementation->Displays.erase(iter);
+    }
 }
