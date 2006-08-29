@@ -98,7 +98,7 @@ class pyProxy:
     def __iter__(self):
         return pyPropertyIterator(self)
 
-    def __AddToProperty__(self, *args):
+    def __AddToProperty(self, *args):
         """Generic method for adding a proxy to a proxy property.
         Should not be directly called"""
         if not self.__LastAttrName:
@@ -121,7 +121,7 @@ class pyProxy:
         self.__LastAttrName = None
         return
 
-    def __RemoveFromProperty__(self, *args):
+    def __RemoveFromProperty(self, *args):
         """Generic method for removing a proxy from a proxy property.
         Should not be directly called."""
         if not self.__LastAttrName:
@@ -145,7 +145,7 @@ class pyProxy:
         return
 
 
-    def __SetProperty__(self, *args):
+    def __SetProperty(self, *args):
         """Generic method for setting the value of a property.
         Should not be directly called"""
         if not self.__LastAttrName:
@@ -172,7 +172,7 @@ class pyProxy:
                 property.SetElement(i, args[i])
         self.__LastAttrName = None
 
-    def __GetProperty__(self):
+    def __GetProperty(self):
         """Generic method for getting the value of a property.
            Should not be directly called."""
         if not self.__LastAttrName:
@@ -200,11 +200,11 @@ class pyProxy:
             return list 
         return []
       
-    def __CreateDisplayProxy__(self):
+    def __CreateDisplayProxy(self):
         "Overload RenderModule's CreateDisplayProxy() to return a pyProxy"
         return pyProxy(self.SMProxy.CreateDisplayProxy())
 
-    def __AddProxy__(self, name, proxy):
+    def __AddProxy(self, name, proxy):
         "Overload CompoundProxy's AddProxy()"
         if isinstance(proxy, pyProxy):
             self.SMProxy.AddProxy(name, proxy.SMProxy)
@@ -212,7 +212,7 @@ class pyProxy:
             self.SMProxy.AddProxy(name, proxy)
         return
 
-    def __SaveDefinition__(self, root=None):
+    def __SaveDefinition(self, root=None):
         "Overload for CompoundProxy's SaveDefinition."
         defn = self.SMProxy.SaveDefinition(root)
         if defn:
@@ -234,22 +234,22 @@ class pyProxy:
           return getattr(self, name)
         if re.compile("^Set").match(name) and self.SMProxy.GetProperty(name[3:]):
             self.__LastAttrName = name[3:]
-            return self.__SetProperty__
+            return self.__SetProperty
         if re.compile("^Get").match(name) and self.SMProxy.GetProperty(name[3:]):
             self.__LastAttrName = name[3:]
-            return self.__GetProperty__
+            return self.__GetProperty
         if re.compile("^AddTo").match(name) and self.SMProxy.GetProperty(name[5:]):
             self.__LastAttrName = name[5:]
-            return self.__AddToProperty__
+            return self.__AddToProperty
         if re.compile("^RemoveFrom").match(name) and self.SMProxy.GetProperty(name[10:]):
             self.__LastAttrName = name[10:]
-            return self.__RemoveFromProperty__
+            return self.__RemoveFromProperty
         if name == "CreateDisplayProxy" and hasattr(self.SMProxy, "CreateDisplayProxy"):
-            return self.__CreateDisplayProxy__
+            return self.__CreateDisplayProxy
         if name == "SaveDefinition" and hasattr(self.SMProxy, "SaveDefinition"):
-            return self.__SaveDefinition__
+            return self.__SaveDefinition
         if name == "AddProxy" and hasattr(self.SMProxy, "AddProxy"):
-            return self.__AddProxy__
+            return self.__AddProxy
         return getattr(self.SMProxy, name)
         
 class pyProxyManager:
