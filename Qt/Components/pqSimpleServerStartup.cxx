@@ -441,25 +441,25 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
     const QString option_name = option->first;
     QWidget* const option_widget = option->second;
     
-    if(QSpinBox* const widget = qobject_cast<QSpinBox*>(option_widget))
+    if(QSpinBox* const widget1 = qobject_cast<QSpinBox*>(option_widget))
       {
-      this->Implementation->Options[option_name] = QString::number(widget->value());
+      this->Implementation->Options[option_name] = QString::number(widget1->value());
       }
-    else if(QDoubleSpinBox* const widget = qobject_cast<QDoubleSpinBox*>(option_widget))
+    else if(QDoubleSpinBox* const widget2 = qobject_cast<QDoubleSpinBox*>(option_widget))
       {
-      this->Implementation->Options[option_name] = QString::number(widget->value());
+      this->Implementation->Options[option_name] = QString::number(widget2->value());
       }
-    else if(QLineEdit* const widget = qobject_cast<QLineEdit*>(option_widget))
+    else if(QLineEdit* const widget3 = qobject_cast<QLineEdit*>(option_widget))
       {
-      this->Implementation->Options[option_name] = widget->text();
+      this->Implementation->Options[option_name] = widget3->text();
       }
-    else if(QCheckBox* const widget = qobject_cast<QCheckBox*>(option_widget))
+    else if(QCheckBox* const widget4 = qobject_cast<QCheckBox*>(option_widget))
       {
-      this->Implementation->Options[option_name] = widget->isChecked() ? true_values[option_name] : false_values[option_name];
+      this->Implementation->Options[option_name] = widget4->isChecked() ? true_values[option_name] : false_values[option_name];
       }
-    else if(QComboBox* const widget = qobject_cast<QComboBox*>(option_widget))
+    else if(QComboBox* const widget5 = qobject_cast<QComboBox*>(option_widget))
       {
-      this->Implementation->Options[option_name] = widget->itemData(widget->currentIndex()).toString();
+      this->Implementation->Options[option_name] = widget5->itemData(widget5->currentIndex()).toString();
       }
     }
 

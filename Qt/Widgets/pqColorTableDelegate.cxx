@@ -51,7 +51,7 @@ pqColorTableDelegate::pqColorTableDelegate(QObject *parentObject)
   this->ColorSize = 16;
 }
 
-QSize pqColorTableDelegate::sizeHint(const QStyleOptionViewItem &option,
+QSize pqColorTableDelegate::sizeHint(const QStyleOptionViewItem &/*option*/,
     const QModelIndex &index) const
 {
   QVariant value = index.data(Qt::SizeHintRole);

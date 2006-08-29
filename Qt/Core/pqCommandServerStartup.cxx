@@ -168,7 +168,7 @@ void pqCommandServerStartup::execute(const OptionsT& user_options,
   
   // Setup the process arguments ...
   const QString executable = this->getExecutable();
-  const double timeout = this->getTimeout();
+  // const double timeout = this->getTimeout();
   const double delay = this->getDelay();
   QStringList arguments = this->getArguments();
 
