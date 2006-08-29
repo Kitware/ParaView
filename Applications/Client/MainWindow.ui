@@ -28,7 +28,7 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>21</height>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPipeline" >
@@ -64,40 +64,12 @@
      <string>F&amp;ilters</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuSources" >
-    <property name="title" >
-     <string>S&amp;ources</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuView" >
-    <property name="title" >
-     <string>&amp;View</string>
-    </property>
-    <widget class="QMenu" name="menuToolbars" >
-     <property name="title" >
-      <string>Toolbars</string>
-     </property>
-    </widget>
-    <addaction name="menuToolbars" />
-   </widget>
    <widget class="QMenu" name="menuServer" >
     <property name="title" >
      <string>&amp;Server</string>
     </property>
     <addaction name="actionServerConnect" />
     <addaction name="actionServerDisconnect" />
-   </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
    </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
@@ -122,6 +94,34 @@
     <addaction name="actionServerDisconnect" />
     <addaction name="separator" />
     <addaction name="actionFileExit" />
+   </widget>
+   <widget class="QMenu" name="menuSources" >
+    <property name="title" >
+     <string>S&amp;ources</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>&amp;View</string>
+    </property>
+    <widget class="QMenu" name="menuToolbars" >
+     <property name="title" >
+      <string>Toolbars</string>
+     </property>
+    </widget>
+    <addaction name="menuToolbars" />
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -503,7 +503,10 @@
     <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqSelectPointer22.png</iconset>
    </property>
    <property name="text" >
-    <string>Selection Mode</string>
+    <string>Selection Mode (s)</string>
+   </property>
+   <property name="shortcut" >
+    <string>s</string>
    </property>
   </action>
   <action name="actionEditUndo" >

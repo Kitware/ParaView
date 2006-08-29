@@ -626,6 +626,9 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
   this->setActiveSelection(connId, sourceSelection); 
   core->getUndoStack()->EndUndoSet();
   sourceSelection->Delete();
+
+  // Let the world know that the user has marked a selection.
+  emit this->selectionMarked();
 }
 
 //-----------------------------------------------------------------------------

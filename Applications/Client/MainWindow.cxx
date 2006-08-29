@@ -275,6 +275,11 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionSelectionMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToSelection()));
 
+  // At end of each selection, we want to switch back to the normal interaction mode.
+  connect(&this->Implementation->Core.selectionManager(), 
+    SIGNAL(selectionMarked()), 
+    this->Implementation->UI.actionMoveMode, SLOT(trigger()));
+
   connect(
     &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
     this->Implementation->UI.actionResetCamera, SLOT(setEnabled(bool)));

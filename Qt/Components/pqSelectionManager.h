@@ -92,7 +92,12 @@ public:
   friend class vtkPQSelectionObserver;
 
 signals:
+  // fired when the selection changes.
   void selectionChanged(pqSelectionManager*);
+
+  // emitted when the user has marked a selection i.e.
+  // on mouse up in selection mode.
+  void selectionMarked();
   
 public slots:
   /// Change mode to SELECT
