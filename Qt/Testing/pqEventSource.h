@@ -43,7 +43,8 @@ class QTTESTING_EXPORT pqEventSource
 public:
   virtual ~pqEventSource() {}
 
-  /// Retrieves the next available event.  Returns true if an event was returned, false if there are no more events
+  /** Retrieves the next available event.  Returns true if an event was
+  returned, false if there are no more events. */
   virtual bool getNextEvent(
     QString& object,
     QString& command,

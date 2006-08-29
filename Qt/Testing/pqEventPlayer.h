@@ -46,14 +46,16 @@ Manages playback of test-cases, demos, tutorials, etc.
 pqEventPlayer converts high-level ParaView events 
 (button click, row selection, etc) into low-level Qt events 
 that drive the user interface.
+
 The high-level events created by pqEventTranslator are fed to 
 pqEventPlayer::playEvent() one-by-one, which passes each event 
-through a collection of pqWidgetEventPlayer objects.  
-Once a pqWidgetEventPlayer accepts the event and updates Qt, 
-playEvent() returns, ready for the next high-level event.
+through a collection of pqWidgetEventPlayer objects.  Each
+pqWidgetEventPlayer has the chance to ignore the event or
+accept and update the program state using low-level Qt events.
 
-pqEventPlayerXML is an example of an object that can retrieve 
-high-level events from a file, feeding them to pqEventPlayer.
+pqEventDispatcher is an example of an object that can retrieve 
+high-level events from a pqEventSource object, feeding them
+to pqEventPlayer.
 
 For specialized Qt widgets it may be necessary to create "custom" 
 pqWidgetEventPlayer derivatives, which can be added to pqEventPlayer 
@@ -62,7 +64,8 @@ pqWidgetEventPlayer objects are searched in order for
 event playback, so you can also use this mechanism to
 "override" the builtin event players.
 
-\sa pqWidgetEventPlayer, pqEventTranslator, pqEventPlayerXML
+\sa pqWidgetEventPlayer, pqEventTranslator, pqEventDispatcher,
+pqEventSource, pqXMLEventSource
 */
 
 class QTTESTING_EXPORT pqEventPlayer :
@@ -74,17 +77,25 @@ public:
   pqEventPlayer();
   ~pqEventPlayer();
 
-  /// Adds the default set of widget players to the current working set.  
-  /// Players are executed in-order, so you can call addWidgetEventPlayer() 
-  /// before this function to override default players.
+  /** Adds the default set of widget players to the current working set.  
+  Players are executed in-order, so you can call addWidgetEventPlayer() 
+  before this function to override default players. */
   void addDefaultWidgetEventPlayers();
-  /// Adds a new player to the current working set of widget players.  
-  /// pqEventPlayer assumes control of the lifetime of the supplied object.
+  /** Adds a new player to the current working set of widget players.  
+  pqEventPlayer assumes control of the lifetime of the supplied object. */
   void addWidgetEventPlayer(pqWidgetEventPlayer*);
-  /// This method is called with each high-level ParaView event, which 
-  /// will invoke the corresponding low-level Qt functionality in-turn.  
-  /// If there was an error playing the event, the error() signal is emitted
-  void playEvent(const QString& Object, const QString& Command, const QString& Arguments, bool& Error);
+  
+  /** This method is called with each high-level ParaView event, which 
+  will invoke the corresponding low-level Qt functionality in-turn.  
+  If there was an error playing the event, Error argument will be set
+  to "true".  Note: Currently there is no guarantee that playEvent()
+  will return immediately, since the functionality it invokes may enter
+  a separate event loop (a modal dialog or context menu, for example). */
+  void playEvent(
+    const QString& Object,
+    const QString& Command,
+    const QString& Arguments,
+    bool& Error);
 
 private:
   pqEventPlayer(const pqEventPlayer&);
@@ -96,4 +107,3 @@ private:
 };
 
 #endif // !_pqEventPlayer_h
-

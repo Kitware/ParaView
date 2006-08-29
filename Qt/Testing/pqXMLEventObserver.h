@@ -45,7 +45,7 @@ signal.
 \note Output is sent to the stream from this object's destructor, so you
 must ensure that it goes out of scope before trying to playback the stream.
 
-\sa pqEventObserverStdout, pqEventTranslator, pqEventPlayerXML
+\sa pqEventTranslator, pqStdoutEventObserver, pqXMLEventSource.
 */
 
 class pqXMLEventObserver :
