@@ -481,8 +481,24 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
 
 void pqSimpleServerStartup::startBuiltinConnection()
 {
-  if(pqServer* const server = pqApplicationCore::instance()->createServer(
-    pqServerResource("builtin:")))
+  if(pqServer* const existing_server =
+    pqApplicationCore::instance()->getServerManagerModel()->getServer(
+      this->Implementation->Server))
+    {
+    this->started(existing_server);
+    return;
+    }
+
+  this->Implementation->StartupDialog =
+    new pqServerStartupDialog(this->Implementation->Server);
+  this->Implementation->StartupDialog->show();
+
+  pqServer* const server = pqApplicationCore::instance()->createServer(
+    pqServerResource("builtin:"));
+
+  this->Implementation->StartupDialog->hide();
+    
+  if(server)
     {
     this->started(server);
     }
