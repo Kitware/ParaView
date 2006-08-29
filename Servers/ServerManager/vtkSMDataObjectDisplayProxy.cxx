@@ -37,7 +37,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.20");
 
 
 //-----------------------------------------------------------------------------
@@ -319,6 +319,11 @@ void vtkSMDataObjectDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetTexture(vtkSMProxy *texture)
 {
+  if (!this->ActorProxy)
+    {
+    return;
+    }
+
   vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
     this->ActorProxy->GetProperty("Texture"));
   if (!pp)
@@ -326,14 +331,23 @@ void vtkSMDataObjectDisplayProxy::SetTexture(vtkSMProxy *texture)
     vtkErrorMacro("Failed to find property Texture on ActorProxy.");
     return;
     }
+  
   pp->RemoveAllProxies();
-  pp->AddProxy(texture);
-  this->ActorProxy->UpdateVTKObjects();
+  if (texture)
+    {
+    pp->AddProxy(texture);
+    }
+
+  this->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMDataObjectDisplayProxy::GetTexture()
 {
+  if (!this->ActorProxy)
+    {
+    return 0;
+    }
   vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
     this->ActorProxy->GetProperty("Texture"));
   if (!pp || !pp->GetNumberOfProxies())
