@@ -69,7 +69,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.5");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -188,6 +188,9 @@ void vtkSMSelectionProxy::UpdateSelection()
 
   this->SelectionUpToDate = 1;
   this->InvokeEvent(vtkCommand::EndEvent);
+
+  // Since selection changed, we mark all consumers modified.
+  this->MarkConsumersAsModified(0);
 }
 
 //-----------------------------------------------------------------------------

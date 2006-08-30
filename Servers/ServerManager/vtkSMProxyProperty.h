@@ -222,6 +222,14 @@ protected:
   vtkGetMacro(RepeatCommand, int);
   int RepeatCommand;
 
+  // Description:
+  // ivar determining it this property creates a consumer link 
+  // between the proxy on which this property is attached and the 
+  // proxy added to this property. Set by default, can be disabled
+  // by \c add_consumer="0" element in the XML configuration.
+  vtkSetMacro(AddConsumer, int);
+  int AddConsumer;
+
   void AppendCommandToStreamWithRemoveCommand(
   vtkSMProxy* cons, vtkClientServerStream* str, vtkClientServerID objectId );
 
