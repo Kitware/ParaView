@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqNamedObjectPanel.h"
 class QGridLayout;
+class QSignalMapper;
 
 /// Auto-generated Widget which provides an editor for editing properties of a proxy
 /// Widgets are created based on the types of the proxy properties
@@ -57,6 +58,11 @@ protected:
   void deleteWidgets();
 
   QGridLayout* PanelLayout;
+
+  QSignalMapper* FileSignalMapper;
+
+protected slots:
+  void getFileHelper(QWidget*);
 
 };
 
