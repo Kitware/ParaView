@@ -77,6 +77,9 @@ public:
   // be instantiated on the server will be considered.
   QString getSupportedFileTypes(pqServer* server);
 
+  // Returns the list of extensions for a reader
+  QString getExtensionTypeString(pqPipelineSource* reader);
+
   // Loads file type definitions from the xml file.
   // Format of this xml is:
   // \verbatim

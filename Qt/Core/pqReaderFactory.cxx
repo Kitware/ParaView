@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqPipelineBuilder.h"
+#include "pqPipelineSource.h"
 #include "pqServer.h"
 
 
@@ -298,6 +299,25 @@ QString pqReaderFactory::getSupportedFileTypes(pqServer* server)
   return types;
 }
 
+QString pqReaderFactory::getExtensionTypeString(pqPipelineSource* reader)
+{
+  QString ext;
+  foreach(const pqReaderInfo &info, this->Internal->ReaderList)
+    {
+    vtkSMSourceProxy* psp;
+    psp = vtkSMSourceProxy::SafeDownCast(info.PrototypeProxy);
+    vtkSMSourceProxy* sp;
+    sp = vtkSMSourceProxy::SafeDownCast(reader->getProxy());
+
+    if (sp && psp && 
+        strcmp(psp->GetXMLName(), sp->GetXMLName()) == 0)
+      {
+      ext = info.getTypeString();
+      }
+    }
+  return ext;
+}
+
 //-----------------------------------------------------------------------------
 void pqReaderFactory::loadFileTypes(const QString& xmlfilename)
 {
@@ -332,3 +352,4 @@ void pqReaderFactory::loadFileTypes(const QString& xmlfilename)
     this->addFileType(desc, exts, group, name.toStdString().c_str());
     }
 }
+
