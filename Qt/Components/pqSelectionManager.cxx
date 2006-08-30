@@ -600,7 +600,7 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
   vtkIdType connId = rmp->GetConnectionID();
 
   vtkSMSelectionProxy* sourceSelection = vtkSMSelectionProxy::SafeDownCast(
-      pxm->NewProxy("selection_helpers", "SelectionProxy"));
+      pxm->NewProxy("selection_helpers", "Selection"));
   sourceSelection->SetServers(vtkProcessModule::DATA_SERVER);
   sourceSelection->SetConnectionID(connId);
 
