@@ -56,7 +56,12 @@ QString pqSignalAdaptorComboBox::currentText() const
 void pqSignalAdaptorComboBox::setCurrentText(const QString& text)
 {
   QComboBox* combo = static_cast<QComboBox*>(this->parent());
-  combo->setCurrentIndex(combo->findText(text));
+  int idx = combo->findText(text);
+  combo->setCurrentIndex(idx);
+  if(idx == -1 && combo->count() > 0)
+    {
+    combo->setCurrentIndex(0);
+    }
 }
 
 int pqSignalAdaptorComboBox::currentIndex() const
