@@ -61,6 +61,7 @@ protected slots:
   void updateVariables(const QString& mode);
   void scalarChosen(int);
   void vectorChosen(int);
+  void disableResults(bool);
 
   void modified();
 

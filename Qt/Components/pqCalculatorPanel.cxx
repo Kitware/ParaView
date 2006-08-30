@@ -183,6 +183,14 @@ pqCalculatorPanel::pqCalculatorPanel(QWidget* p)
                    SIGNAL(textChanged(const QString&)),
                    this,
                    SLOT(modified()));
+  QObject::connect(this->Internal->UI.CoordinateResults,
+                   SIGNAL(toggled(bool)),
+                   this,
+                   SLOT(modified()));
+  QObject::connect(this->Internal->UI.CoordinateResults,
+                   SIGNAL(toggled(bool)),
+                   this,
+                   SLOT(disableResults(bool)));
 
 
 }
@@ -216,6 +224,9 @@ void pqCalculatorPanel::accept()
 
   vtkSMProxy* CalcProxy = this->proxy()->getProxy();
 
+  int mode = this->Internal->UI.AttributeMode->currentText() == 
+             "Point Data" ? 1 : 2;
+
   // put in new variables
   QComboBox* scalarCombo = this->Internal->UI.Scalars;
   vtkSMStringVectorProperty* ScalarProperty;
@@ -223,13 +234,19 @@ void pqCalculatorPanel::accept()
        CalcProxy->GetProperty("AddScalarVariable"));
   if(ScalarProperty)
     {
-    int numVariables = scalarCombo->count()-1;
+    int offset = 0;
+    if(mode == 1)
+      {
+      offset = 3;
+      }
+    int numVariables = scalarCombo->count()-(1+offset);
+
     for(int i=0; i<numVariables; i++)
       {
-      QString VarName = scalarCombo->itemText(i+1);
+      QString VarName = scalarCombo->itemText(i+1+offset);
       QString ArrayName = VarName;
       QString Component = QString("%1").arg(0);
-      QVariant d = scalarCombo->itemData(i+1, Qt::UserRole);
+      QVariant d = scalarCombo->itemData(i+1+offset, Qt::UserRole);
       if(d.isValid())
         {
         QStringList v = d.toStringList();
@@ -252,10 +269,15 @@ void pqCalculatorPanel::accept()
     CalcProxy->GetProperty("AddVectorVariable"));
   if(VectorProperty)
     {
-    int numVariables = vectorCombo->count()-1;
+    int offset = 0;
+    if(mode == 1)
+      {
+      offset = 1;
+      }
+    int numVariables = vectorCombo->count()-(1+offset);
     for(int i=0; i<numVariables; i++)
       {
-      QString VarName = vectorCombo->itemText(i+1);
+      QString VarName = vectorCombo->itemText(i+1+offset);
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i, VarName);
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+1, VarName);
       pqSMAdaptor::setMultipleElementProperty(VectorProperty, 5*i+2, "0");
@@ -265,14 +287,49 @@ void pqCalculatorPanel::accept()
     VectorProperty->SetNumberOfElements(numVariables*5);
     }
   
+  if(mode == 1)
+    {
+    vtkSMStringVectorProperty* CoordinateVectorProperty;
+    CoordinateVectorProperty = vtkSMStringVectorProperty::SafeDownCast(
+      CalcProxy->GetProperty("AddCoordinateVectorVariable"));
+    if(CoordinateVectorProperty)
+      {
+      pqSMAdaptor::setMultipleElementProperty(CoordinateVectorProperty, 0, "coords");
+      pqSMAdaptor::setMultipleElementProperty(CoordinateVectorProperty, 1, "0");
+      pqSMAdaptor::setMultipleElementProperty(CoordinateVectorProperty, 2, "1");
+      pqSMAdaptor::setMultipleElementProperty(CoordinateVectorProperty, 3, "2");
+      CoordinateVectorProperty->SetNumberOfElements(4);
+      }
+      
+    vtkSMStringVectorProperty* CoordinateScalarProperty;
+    CoordinateScalarProperty = vtkSMStringVectorProperty::SafeDownCast(
+      CalcProxy->GetProperty("AddCoordinateScalarVariable"));
+    if(CoordinateScalarProperty)
+      {
+      pqSMAdaptor::setMultipleElementProperty(CoordinateScalarProperty, 0, "coordsX");
+      pqSMAdaptor::setMultipleElementProperty(CoordinateScalarProperty, 1, "0");
+      pqSMAdaptor::setMultipleElementProperty(CoordinateScalarProperty, 2, "coordsY");
+      pqSMAdaptor::setMultipleElementProperty(CoordinateScalarProperty, 3, "1");
+      pqSMAdaptor::setMultipleElementProperty(CoordinateScalarProperty, 4, "coordsZ");
+      pqSMAdaptor::setMultipleElementProperty(CoordinateScalarProperty, 5, "2");
+      CoordinateScalarProperty->SetNumberOfElements(6);
+      }
+    }
+  
   pqSMAdaptor::setElementProperty(
                  CalcProxy->GetProperty("AttributeMode"),
-                 this->Internal->UI.AttributeMode->currentText() == 
-                 "Point Data" ? 1 : 2);
+                 mode);
 
-  pqSMAdaptor::setElementProperty(
-                 CalcProxy->GetProperty("ResultArrayName"),
-                 this->Internal->UI.ResultArrayName->text());
+  if(this->Internal->UI.ResultArrayName->isEnabled())
+    {
+    pqSMAdaptor::setElementProperty(
+                   CalcProxy->GetProperty("ResultArrayName"),
+                   this->Internal->UI.ResultArrayName->text());
+    }
+  
+  pqSMAdaptor::setEnumerationProperty(
+                 CalcProxy->GetProperty("CoordinateResults"), 
+                 this->Internal->UI.CoordinateResults->isChecked());
   
   pqSMAdaptor::setEnumerationProperty(
           CalcProxy->GetProperty("ReplaceInvalidValues"),
@@ -317,6 +374,11 @@ void pqCalculatorPanel::reset()
   
   // restore the replace invalid results
   v = pqSMAdaptor::getEnumerationProperty(
+         CalcProxy->GetProperty("CoordinateResults"));
+  this->Internal->UI.CoordinateResults->setChecked(v.toBool());
+
+  // restore the replace invalid results
+  v = pqSMAdaptor::getEnumerationProperty(
           CalcProxy->GetProperty("ReplaceInvalidValues"));
   this->Internal->UI.ReplaceInvalidResult->setChecked(v.toBool());
   
@@ -339,6 +401,14 @@ void pqCalculatorPanel::updateVariables(const QString& mode)
 
   this->Internal->UI.Vectors->addItem("Insert Vector...");
   this->Internal->UI.Scalars->addItem("Insert Scalar...");
+
+  if(mode == "Point Data")
+    {
+    this->Internal->UI.Vectors->addItem("coords");
+    this->Internal->UI.Scalars->addItem("coordsX");
+    this->Internal->UI.Scalars->addItem("coordsY");
+    this->Internal->UI.Scalars->addItem("coordsZ");
+    }
 
   vtkPVDataSetAttributesInformation* fdi = NULL;
   pqPipelineFilter* f = qobject_cast<pqPipelineFilter*>(this->proxy());
@@ -422,5 +492,10 @@ void pqCalculatorPanel::vectorChosen(int i)
 void pqCalculatorPanel::modified()
 {
   emit this->canAcceptOrReject(true);
+}
+
+void pqCalculatorPanel::disableResults(bool e)
+{
+  this->Internal->UI.ResultArrayName->setEnabled(!e);
 }
 
