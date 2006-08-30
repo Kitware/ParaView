@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.6");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -241,7 +241,11 @@ void vtkSMGenericViewDisplayProxy::AddInput(vtkSMSourceProxy* input,
 vtkDataObject* vtkSMGenericViewDisplayProxy::GetOutput()
 {
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-
+  if (!pm || !this->CollectProxy)
+    {
+    return NULL;
+    }
+    
   vtkMPIMoveData* dp = vtkMPIMoveData::SafeDownCast(
     pm->GetObjectFromID(this->CollectProxy->GetID(0)));
   if (dp == NULL)
