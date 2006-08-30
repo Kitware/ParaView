@@ -944,7 +944,7 @@ The Calculator filter is available on the Toolbar.
         command="SetResultArrayName" 
         number_of_elements="1"
         default_values="Result" /> 
-
+     
      <StringVectorProperty 
         name="Function" 
         command="SetFunction" 
@@ -967,6 +967,32 @@ The Calculator filter is available on the Toolbar.
         repeat_command="1"
         number_of_elements_per_command="5"
         element_types="2 2 0 0 0" />
+     
+        <StringVectorProperty 
+        name="AddCoordinateScalarVariable" 
+        command="AddCoordinateScalarVariable" 
+        clean_command="RemoveCoordinateScalarVariables"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" />
+
+     <StringVectorProperty 
+        name="AddCoordinateVectorVariable" 
+        command="AddCoordinateVectorVariable" 
+        clean_command="RemoveCoordinateVectorVariables"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="4"
+        element_types="2 0 0 0" />
+
+     <IntVectorProperty 
+        name="CoordinateResults" 
+        command="SetCoordinateResults" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="AttributeMode" 
