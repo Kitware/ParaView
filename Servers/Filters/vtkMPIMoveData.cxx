@@ -39,7 +39,7 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.10");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.11");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -135,7 +135,6 @@ int vtkMPIMoveData::RequestInformation(vtkInformation*,
                                        vtkInformationVector** inputVector,
                                        vtkInformationVector* outputVector)
 {
-  vtkInformationVector* inInfo = inputVector[0];
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   if (inputVector[0]->GetNumberOfInformationObjects() > 0)
     {
