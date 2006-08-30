@@ -69,7 +69,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.4");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -442,15 +442,15 @@ void vtkSMSelectionProxy::SelectInFrustrum(int in_rect[4],
     selectorProxy->GetProperty("OriginalSources"));
 
   unsigned int numProxies = geomFilters.size();
-  for (unsigned int i = 0; i < numProxies; i++)
+  for (unsigned int j = 0; j < numProxies; j++)
     {
     vtkSMDataObjectDisplayProxy* dp = 
-      vtkSMDataObjectDisplayProxy::SafeDownCast(displays[i]);
+      vtkSMDataObjectDisplayProxy::SafeDownCast(displays[j]);
     if (dp)
       {
-      dataSets->AddProxy(geomFilters[i]);
+      dataSets->AddProxy(geomFilters[j]);
       props->AddProxy(dp->GetActorProxy());
-      originalSources->AddProxy(sources[i]);
+      originalSources->AddProxy(sources[j]);
       }
     }
   idInfo->Delete();
