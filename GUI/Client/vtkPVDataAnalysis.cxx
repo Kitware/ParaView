@@ -87,7 +87,7 @@ protected:
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkPVDataAnalysis);
-vtkCxxRevisionMacro(vtkPVDataAnalysis, "1.5");
+vtkCxxRevisionMacro(vtkPVDataAnalysis, "1.6");
 //-----------------------------------------------------------------------------
 vtkPVDataAnalysis::vtkPVDataAnalysis()
 {
@@ -951,7 +951,9 @@ void vtkPVDataAnalysis::UpdateDataInformationList()
   if (this->LastAcceptedQueryMethod && 
     strcmp(this->LastAcceptedQueryMethod, "Line")==0 || 
     (this->TimeSupportAvailable 
-     && this->PlotOverTimeCheckButton->GetSelectedState()))
+     && this->PlotOverTimeCheckButton->GetSelectedState())
+    ||
+    !data)
     {
     // Don't show information if probing line, or when temporal is enabled.
     this->Script("pack forget %s", this->DataInformationFrame->GetWidgetName());
