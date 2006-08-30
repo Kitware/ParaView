@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPen>
 #include <QVBoxLayout>
 #include <QMenu>
+#include <QUuid>
+#include <QApplication>
+#include <QMouseEvent>
 
 static int gPenWidth = 2;
 
@@ -51,6 +54,7 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   this->Menu = new QWidget(this);
   this->setupUi(Menu);
   boxLayout->addWidget(this->Menu);
+  this->Menu->installEventFilter(this);
 
   QVBoxLayout* sublayout = new QVBoxLayout();
   boxLayout->addLayout(sublayout);
@@ -107,6 +111,7 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   this->Menu->addAction(this->SplitHorizontalButton->defaultAction());
   this->Menu->addAction(this->SplitVerticalButton->defaultAction());
   this->Menu->addAction(this->CloseButton->defaultAction());
+  this->Menu->setAcceptDrops(true);
   
   this->MenuHidden=false;
   // TODO: temporary until they can be implemented or wanted
@@ -117,6 +122,9 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
 //   this->CloseButton->hide();
 //   this->SplitVerticalButton->hide();
 //   this->SplitHorizontalButton->hide();
+
+
+  this->UniqueID=QUuid::createUuid();
 }
 
 pqMultiViewFrame::~pqMultiViewFrame()
@@ -201,7 +209,7 @@ void pqMultiViewFrame::setMainWidget(QWidget* w)
     {
     l = this->layout()->itemAt(1)->layout();
     }
-    l->removeItem(l->itemAt(0));
+  l->removeWidget(l->itemAt(0)->widget());
 
   if(w)
     {
@@ -286,4 +294,54 @@ void pqMultiViewFrame::splitHorizontal()
   emit this->splitHorizontalPressed();
 }
 
+QUuid pqMultiViewFrame::uniqueID() const
+{
+  return this->UniqueID;
+}
 
+
+bool pqMultiViewFrame::eventFilter(QObject* caller, QEvent* e)
+{
+  if(e->type() == QEvent::MouseButtonPress)
+    {     
+    QMouseEvent *mouseEvent=(QMouseEvent*)e;
+    if (mouseEvent->button() == Qt::LeftButton)
+      {
+      DragStartPosition = mouseEvent->pos();
+      }
+    return caller->event(e);
+    }
+  else if(e->type() == QEvent::MouseMove)
+    {
+    QMouseEvent *mouseEvent=(QMouseEvent*)e;
+    if (!(mouseEvent->buttons() & Qt::LeftButton))
+      {
+      return caller->event(e);
+      }
+    if ((mouseEvent->pos() - this->DragStartPosition).manhattanLength()
+      < QApplication::startDragDistance())
+      {
+      return caller->event(e);
+      }
+
+    emit(dragStart(this));
+
+    }
+  else if(e->type() == QEvent::DragEnter)
+    {
+    QDragEnterEvent* dragEvent=reinterpret_cast<QDragEnterEvent*>(e);
+    emit(dragEnter(this,dragEvent));
+    }
+  else if(e->type() == QEvent::DragMove)
+    {
+    QDragMoveEvent* dragEvent=reinterpret_cast<QDragMoveEvent*>(e);
+    emit(dragMove(this,dragEvent));
+    }
+  else if(e->type() == QEvent::Drop)
+    {
+    QDropEvent* dropEvent=reinterpret_cast<QDropEvent*>(e);
+    emit(drop(this,dropEvent));
+    }
+
+  return caller->event(e);
+}

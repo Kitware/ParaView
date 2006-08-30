@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include "pqComponentsExport.h"
 #include "ui_pqMultiViewFrameMenu.h"
+#include <QUuid>
 
 /// a holder for a widget in a multiview
 class PQCOMPONENTS_EXPORT pqMultiViewFrame : public QWidget, public Ui::MultiViewFrameMenu
@@ -68,6 +69,8 @@ public:
 
   void hideMenu(bool hide);
 
+  QUuid uniqueID() const;
+
 public slots:
 
   /// close this frame, emits closePressed() so receiver does the actual remove
@@ -94,9 +97,20 @@ signals:
   void splitVerticalPressed();
   /// signal split horizontal pressed
   void splitHorizontalPressed();
+  /// drag start event
+  void dragStart(pqMultiViewFrame*);
+  /// drag enter event
+  void dragEnter(pqMultiViewFrame*,QDragEnterEvent*);
+  /// drag move event
+  void dragMove(pqMultiViewFrame*,QDragMoveEvent*);
+  /// drop event
+  void drop(pqMultiViewFrame*,QDropEvent*);
+
+  
 
 protected:
   void paintEvent(QPaintEvent* e);
+  bool eventFilter(QObject*, QEvent* e);
 
 private:
   QWidget* MainWidget;
@@ -105,6 +119,8 @@ private:
   bool MenuHidden;
   QColor Color;
   QWidget* Menu;
+  QPoint DragStartPosition;
+  QUuid UniqueID;
 };
 
 #endif //_pqMultiViewFrame_h

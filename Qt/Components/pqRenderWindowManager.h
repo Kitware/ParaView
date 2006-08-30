@@ -78,6 +78,11 @@ private slots:
 
   void onActivate(QWidget* obj);
 
+  void frameDragStart(pqMultiViewFrame*);
+  void frameDragEnter(pqMultiViewFrame*,QDragEnterEvent*);
+  void frameDragMove(pqMultiViewFrame*,QDragMoveEvent*);
+  void frameDrop(pqMultiViewFrame*,QDropEvent*);
+
 public slots:
   void setActiveServer(pqServer* server);
   void allocateWindowsToRenderModules();

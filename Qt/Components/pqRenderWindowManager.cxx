@@ -44,6 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 #include <QSignalMapper>
 #include <QtDebug>
+#include <QMimeData>
+#include <QDrag>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QUuid>
 
 // ParaView includes.
 #include "pqApplicationCore.h"
@@ -177,6 +182,14 @@ void pqRenderWindowManager::onFrameAdded(pqMultiViewFrame* frame)
     frame->BackButton, SLOT(setEnabled(bool)));
   QObject::connect(rm->getInteractionUndoStack(), SIGNAL(CanRedoChanged(bool)),
     frame->ForwardButton, SLOT(setEnabled(bool)));
+
+
+  connect(frame,SIGNAL(dragStart(pqMultiViewFrame*)),this,SLOT(frameDragStart(pqMultiViewFrame*)));
+  connect(frame,SIGNAL(dragEnter(pqMultiViewFrame*,QDragEnterEvent*)),this,SLOT(frameDragEnter(pqMultiViewFrame*,QDragEnterEvent*)));
+  connect(frame,SIGNAL(dragMove(pqMultiViewFrame*,QDragMoveEvent*)),this,SLOT(frameDragMove(pqMultiViewFrame*,QDragMoveEvent*)));
+  connect(frame,SIGNAL(drop(pqMultiViewFrame*,QDropEvent*)),this,SLOT(frameDrop(pqMultiViewFrame*,QDropEvent*)));
+
+
   frame->setActive(true);
 
   this->Internal->Frames.insert(frame);
@@ -205,6 +218,11 @@ void pqRenderWindowManager::onFrameRemoved(pqMultiViewFrame* frame)
     pqPipelineBuilder::instance()->removeWindow(rm);
     this->Internal->FrameBeingRemoved = 0;
     }
+  disconnect(frame,SIGNAL(dragStart(pqMultiViewFrame*)),this,SLOT(frameDragStart(pqMultiViewFrame*)));
+  disconnect(frame,SIGNAL(dragEnter(pqMultiViewFrame*,QDragEnterEvent*)),this,SLOT(frameDragEnter(pqMultiViewFrame*,QDragEnterEvent*)));
+  disconnect(frame,SIGNAL(dragMove(pqMultiViewFrame*,QDragMoveEvent*)),this,SLOT(frameDragMove(pqMultiViewFrame*,QDragMoveEvent*)));
+  disconnect(frame,SIGNAL(drop(pqMultiViewFrame*,QDropEvent*)),this,SLOT(frameDrop(pqMultiViewFrame*,QDropEvent*)));
+
   this->Internal->Frames.remove(frame);
 }
 
@@ -401,3 +419,105 @@ bool pqRenderWindowManager::loadState(vtkPVXMLElement* rwRoot,
     }
   return true;
 }
+void pqRenderWindowManager::frameDragStart(pqMultiViewFrame* frame)
+{
+  QPixmap pixmap(":/pqWidgets/Icons/pqWindow16.png");
+
+  QByteArray output;
+  QDataStream dataStream(&output, QIODevice::WriteOnly);
+  dataStream<<frame->uniqueID();
+
+  QString mimeType("application/paraview3/");
+  mimeType.append(qApp->sessionId().toLower());
+
+  QMimeData *mimeData = new QMimeData;
+  mimeData->setData(mimeType, output);
+
+  QDrag *drag = new QDrag(this);
+  drag->setMimeData(mimeData);
+  drag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
+  drag->setPixmap(pixmap);
+
+  Qt::DropAction dropAction = drag->start();
+}
+void pqRenderWindowManager::frameDragEnter(pqMultiViewFrame* frame,QDragEnterEvent* event)
+{
+  QString mimeType("application/paraview3/");
+  mimeType.append(qApp->sessionId().toLower());
+
+  if(event->mimeData()->hasFormat(mimeType))
+    {
+    event->accept();
+    }
+  else
+    {
+    event->ignore();
+    }
+}
+void pqRenderWindowManager::frameDragMove(pqMultiViewFrame* frame,QDragMoveEvent* event)
+{
+  QString mimeType("application/paraview3/");
+  mimeType.append(qApp->sessionId().toLower());
+  if(event->mimeData()->hasFormat(mimeType))
+    {
+    event->accept();
+    }
+  else
+    {
+    event->ignore();
+    }
+}
+void pqRenderWindowManager::frameDrop(pqMultiViewFrame* acceptingFrame,QDropEvent* event)
+{
+  QString mimeType("application/paraview3/");
+  mimeType.append(qApp->sessionId().toLower());
+  if (event->mimeData()->hasFormat(mimeType))
+    {
+    QByteArray input= event->mimeData()->data(mimeType);
+    QDataStream dataStream(&input, QIODevice::ReadOnly);
+
+    QUuid uniqueID;
+    dataStream>>uniqueID;
+
+    pqMultiViewFrame* originatingFrame=NULL;
+    pqMultiViewFrame* f;
+    foreach(f,this->Internal->Frames)
+      {
+      if(f->uniqueID()==uniqueID)
+        {
+        originatingFrame=f;
+        break;
+        }
+      }
+
+    if(originatingFrame)
+      {
+      //Switch the originalFrame with the frame;
+      QWidget* originatingWidget= originatingFrame->mainWidget();
+      QWidget* acceptingWidget= acceptingFrame->mainWidget();
+      
+      this->hide();
+
+      originatingFrame->setMainWidget(NULL);
+      acceptingFrame->setMainWidget(NULL);
+
+      originatingWidget->setParent(NULL);
+      acceptingWidget->setParent(NULL);
+
+      acceptingFrame->setMainWidget(originatingWidget);
+      originatingFrame->setMainWidget(acceptingWidget);
+
+      acceptingFrame->setActive(true);
+
+      this->show();
+
+
+      }
+    event->accept();
+    }
+  else
+    {
+    event->ignore();
+    }
+}
+
