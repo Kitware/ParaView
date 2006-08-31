@@ -42,7 +42,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.21");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.22");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -197,28 +197,48 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
+int vtkPVDataInformation::AddFromCompositeDataSet(vtkCompositeDataSet* data)
 {
-  this->Initialize();
-
   int numDataSets = 0;
   vtkCompositeDataIterator* iter = data->NewIterator();
   iter->GoToFirstItem();
   while (!iter->IsDoneWithTraversal())
     {
-    vtkDataObject* dobj = iter->GetCurrentDataObject();
-    vtkPVDataInformation* dinf = vtkPVDataInformation::New();
-    dinf->CopyFromObject(dobj);
-    dinf->SetDataClassName(dobj->GetClassName());
-    dinf->DataSetType = dobj->GetDataObjectType();
-    this->AddInformation(dinf, 1);
-    dinf->Delete();
     numDataSets++;
+    vtkDataObject* dobj = iter->GetCurrentDataObject();
+    if (dobj->IsA("vtkCompositeDataSet"))
+      {
+      this->AddFromCompositeDataSet(
+        static_cast<vtkCompositeDataSet*>(dobj));
+      }
+    else
+      {
+      vtkPVDataInformation* dinf = vtkPVDataInformation::New();
+      dinf->CopyFromObject(dobj);
+      dinf->SetDataClassName(dobj->GetClassName());
+      dinf->DataSetType = dobj->GetDataObjectType();
+      this->AddInformation(dinf, 1);
+      dinf->Delete();
+      }
     iter->GoToNextItem();
     }
   iter->Delete();
 
-  this->CompositeDataInformation->CopyFromObject(data);
+  return numDataSets;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data,
+                                                    int recurse)
+{
+  this->Initialize();
+
+  int numDataSets = this->AddFromCompositeDataSet(data);
+
+  if (recurse)
+    {
+    this->CompositeDataInformation->CopyFromObject(data);
+    }
   this->SetCompositeDataClassName(data->GetClassName());
   this->CompositeDataSetType = data->GetDataObjectType();
   this->NumberOfDataSets = numDataSets;
