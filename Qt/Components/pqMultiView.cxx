@@ -63,20 +63,44 @@ void pqMultiView::Index::setFromString(const QString& str)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 pqMultiView::pqMultiView(QWidget* p)
-  : QFrame(p)
+  : QStackedWidget(p)
 {
-  QHBoxLayout* l = new QHBoxLayout(this);
+   this->installEventFilter(this);
+
+  this->SplitterFrame= new QFrame(this);
+  this->SplitterFrame->setObjectName("SplitterFrame");
+  this->addWidget(this->SplitterFrame);
+
+  this->MaximizeFrame= new QFrame(this);
+  this->MaximizeFrame->setObjectName("MaximizeFrame");
+  this->addWidget(this->MaximizeFrame);
+  
+  QHBoxLayout* l = new QHBoxLayout(this->SplitterFrame);
   l->setSpacing(0);
   l->setMargin(0);
-  this->setLayout(l);
-  QSplitter* splitter = new QSplitter(this);
+  this->SplitterFrame->setLayout(l);
+
+  QSplitter* splitter = new QSplitter(this->SplitterFrame);
   splitter->setObjectName("MultiViewSplitter");
   l->addWidget(splitter);
+
+  QHBoxLayout* ml = new QHBoxLayout(this->MaximizeFrame);
+  ml->setSpacing(0);
+  ml->setMargin(0);
+  this->MaximizeFrame->setLayout(ml);
+
+  this->FillerFrame= new pqMultiViewFrame(this->MaximizeFrame);
+  ml->addWidget(this->FillerFrame);
+  
+  this->setCurrentWidget(this->SplitterFrame);
+
   pqMultiViewFrame* frame = new pqMultiViewFrame;
   splitter->addWidget(frame);
-
-  this->installEventFilter(this);
   this->setup(frame);
+
+  this->ensurePolished();
+
+
 }
 
 //-----------------------------------------------------------------------------
@@ -96,7 +120,7 @@ void pqMultiView::reset(QList<QWidget*> &removed)
   pqMultiViewFrame* frame = new pqMultiViewFrame();
   // Remove all the widgets. Put them in the list. Then clean
   // up all the extra splitters.
-  QWidget *widget = this->layout()->itemAt(0)->widget();
+  QWidget *widget = this->SplitterFrame->layout()->itemAt(0)->widget();
   QSplitter *splitter = qobject_cast<QSplitter *>(widget);
   if(splitter)
     {
@@ -168,13 +192,13 @@ void pqMultiView::removeView(QWidget* widget)
     widget->setParent(NULL);
     
     // if splitter is empty, add place holder
-    if(splitter->count() == 0 && splitter->parentWidget() == this)
+    if(splitter->count() == 0 && splitter->parentWidget() == this->SplitterFrame)
       {
       pqMultiViewFrame* frame = new pqMultiViewFrame;
       splitter->addWidget(frame);
       }
     // if splitter can be merged with parent splitter
-    else if(splitter->count() < 2 && splitter->parentWidget() != this)
+    else if(splitter->count() < 2 && splitter->parentWidget() != this->SplitterFrame)
       {
       QWidget* otherWidget = splitter->widget(0);
       QSplitter* parentSplitter = qobject_cast<QSplitter*>(splitter->parentWidget());
@@ -394,15 +418,6 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
     sizes[splitter->indexOf(w)+1] = static_cast<int>(
       sizes_old[splitter->indexOf(w)]*percent);
 
-
-    // make equal spacing
- /*   QList<int> sizes = splitter->sizes();
-    int sum=0, i;
-    for(i=0; i<sizes.size(); i++)
-      sum += sizes[i];
-    for(i=0; i<sizes.size(); i++)
-      sizes[i] = sum / sizes.size();
-      */
     splitter->setSizes(sizes);
     }
     
@@ -420,7 +435,7 @@ pqMultiView::Index pqMultiView::indexOf(QWidget* widget) const
     return index;
 
   QWidget* p = widget->parentWidget();
-  while(p && p != this)
+  while(p && p != this->SplitterFrame)
     {
     QSplitter* splitter = qobject_cast<QSplitter*>(p);
     if(splitter)
@@ -443,9 +458,9 @@ pqMultiView::Index pqMultiView::indexOf(QWidget* widget) const
 QWidget* pqMultiView::widgetOfIndex(Index index)
 {
   if(index.empty() && static_cast<QSplitter*>(
-      this->layout()->itemAt(0)->widget())->count() == 1)
+      this->SplitterFrame->layout()->itemAt(0)->widget())->count() == 1)
     {
-    return static_cast<QSplitter*>(this->layout()->itemAt(0)->widget())->widget(0);
+    return static_cast<QSplitter*>(this->SplitterFrame->layout()->itemAt(0)->widget())->widget(0);
     }
   else if(index.empty())
     {
@@ -454,7 +469,7 @@ QWidget* pqMultiView::widgetOfIndex(Index index)
 
   Index::iterator iter = index.begin();
   Index::iterator end = index.end();
-  QWidget* w = this->layout()->itemAt(0)->widget();
+  QWidget* w = this->SplitterFrame->layout()->itemAt(0)->widget();
   for(; iter != end && w; ++iter)
     {
     QSplitter* splitter = qobject_cast<QSplitter*>(w);
@@ -485,17 +500,28 @@ void pqMultiView::saveState(vtkPVXMLElement *root)
     return;
     }
 
+  //TODO This restores the maximized view before the state is saved.
+  // Need to fix things so that the maximized view is saved.
+  this->restoreWidget(NULL);
+
+
   // Create an element to hold the multi-view state.
   vtkPVXMLElement *multiView = vtkPVXMLElement::New();
   multiView->SetName("MultiView");
 
   QSplitter *splitter = qobject_cast<QSplitter *>(
-      this->layout()->itemAt(0)->widget());
+      this->SplitterFrame->layout()->itemAt(0)->widget());
   if(splitter)
     {
     // Save the splitter. This will recursively save the children.
     this->saveSplitter(multiView, splitter, 0);
     }
+
+ // vtkPVXMLElement *MaximizedElement = vtkPVXMLElement::New();
+ // splitterElement->SetName("MaximizedWidget");
+
+
+
 
   root->AddNestedElement(multiView);
   multiView->Delete();
@@ -508,13 +534,19 @@ void pqMultiView::loadState(vtkPVXMLElement *root)
     return;
     }
 
+ //TODO This restores the maximized view before the state is restored.
+  // Need to fix things so that the maximized view is restored.
+  this->restoreWidget(NULL);
+
+
+
   // Look for the multi-view element in the xml.
   vtkPVXMLElement *multiView = pqXMLUtil::FindNestedElementByName(root,
       "MultiView");
   if(multiView)
     {
     QSplitter *splitter = qobject_cast<QSplitter *>(
-        this->layout()->itemAt(0)->widget());
+        this->SplitterFrame->layout()->itemAt(0)->widget());
     if(splitter)
       {
       QWidget *widget = splitter->widget(0);
@@ -534,7 +566,7 @@ void pqMultiView::removeWidget(QWidget* widget)
   // If this is the only widget in the multi-view, replace it
   // with a new one so there is always something in the space.
   QSplitter *splitter = qobject_cast<QSplitter *>(widget->parentWidget());
-  if(splitter && splitter->parentWidget() == this && splitter->count() < 2)
+  if(splitter && splitter->parentWidget() == this->SplitterFrame && splitter->count() < 2)
     {
     pqMultiViewFrame* frame = new pqMultiViewFrame();
     this->replaceView(this->indexOf(widget), frame);
@@ -580,25 +612,72 @@ pqMultiViewFrame* pqMultiView::splitWidgetVertical(QWidget* widget)
   return this->splitWidget(widget, Qt::Vertical);
 }
 
-void pqMultiView::maximizeWidget(QWidget* /*widget*/)
+void pqMultiView::maximizeWidget(QWidget* widget)
 {
-  /*
+
   pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(widget);
-  Q_ASSERT(frame != NULL);
-  
-  QWidget* holder = new QWidget;
-  holder->setAttribute(Qt::WA_ShowModal);
-  QWidget* w = frame->mainWidget();
-  w->setParent(holder);
-  QHBoxLayout* l = new QHBoxLayout(holder);
-  l->addWidget(w);
-  holder->setWindowState(Qt::WindowMaximized);
-  holder->showFullScreen();
-  */
+  if(!frame)
+    return;
+
+  QWidget *w = this->SplitterFrame->layout()->itemAt(0)->widget();
+  QSplitter *splitter = qobject_cast<QSplitter *>(w);
+  if(splitter)
+    {
+      this->hide();  
+
+      Index currentIndex=this->indexOf(frame);
+      QLayout *l=this->MaximizeFrame->layout();
+      l->removeWidget(this->FillerFrame);
+      this->replaceView(currentIndex,this->FillerFrame);
+      frame->setParent(this->MaximizeFrame);
+      this->MaximizeFrame->layout()->addWidget(frame);
+
+      this->CurrentMaximizedFrame=frame;
+
+      frame->MaximizeButton->hide();
+      frame->CloseButton->hide();
+      frame->SplitHorizontalButton->hide();
+      frame->SplitVerticalButton->hide();
+      frame->RestoreButton->show();
+        
+      this->setCurrentWidget(this->MaximizeFrame);
+      this->show();
+    }
+
 }
 
-void pqMultiView::restoreWidget(QWidget* /*widget*/)
+void pqMultiView::restoreWidget(QWidget* widget)
 {
+
+  if(this->CurrentMaximizedFrame)
+    {
+  QWidget *w = this->SplitterFrame->layout()->itemAt(0)->widget();
+  QSplitter *splitter = qobject_cast<QSplitter *>(w);
+  if(splitter)
+    {
+    this->hide();  
+
+    QLayout *l=this->MaximizeFrame->layout();
+    l->removeWidget(this->CurrentMaximizedFrame);
+
+    Index currentIndex=this->indexOf(this->FillerFrame);
+    this->replaceView(currentIndex,this->CurrentMaximizedFrame);
+
+    this->FillerFrame->setParent(this->MaximizeFrame);
+    this->MaximizeFrame->layout()->addWidget(this->FillerFrame);
+
+    this->CurrentMaximizedFrame->MaximizeButton->show();
+    this->CurrentMaximizedFrame->CloseButton->show();
+    this->CurrentMaximizedFrame->SplitHorizontalButton->show();
+    this->CurrentMaximizedFrame->SplitVerticalButton->show();
+    this->CurrentMaximizedFrame->RestoreButton->hide();
+
+    this->CurrentMaximizedFrame=NULL;
+
+    this->setCurrentWidget(this->SplitterFrame);
+    this->show();
+    }
+  }
 
 }
 bool pqMultiView::eventFilter(QObject*, QEvent* e)
@@ -641,18 +720,23 @@ void pqMultiView::setup(pqMultiViewFrame* frame)
   // Give the frame a name.
   QString name;
   pqMultiView::Index index=this->indexOf(frame);
-  name.setNum(index.front());
-  frame->setObjectName(name);
+  if(!index.isEmpty())
+    {
+    name.setNum(index.front());
+    frame->setObjectName(name);
+    }
 
   QSignalMapper* CloseSignalMapper = new QSignalMapper(frame);
   QSignalMapper* HorizontalSignalMapper = new QSignalMapper(frame);
   QSignalMapper* VerticalSignalMapper = new QSignalMapper(frame);
   QSignalMapper* MaximizeSignalMapper = new QSignalMapper(frame);
+  QSignalMapper* RestoreSignalMapper = new QSignalMapper(frame);
 
   CloseSignalMapper->setMapping(frame, frame);
   HorizontalSignalMapper->setMapping(frame, frame);
   VerticalSignalMapper->setMapping(frame, frame);
   MaximizeSignalMapper->setMapping(frame, frame);
+  RestoreSignalMapper->setMapping(frame, frame);
 
   // connect close button
   QObject::connect(frame, SIGNAL(closePressed()), 
@@ -675,6 +759,12 @@ void pqMultiView::setup(pqMultiViewFrame* frame)
                    MaximizeSignalMapper, SLOT(map()));
   QObject::connect(MaximizeSignalMapper, SIGNAL(mapped(QWidget*)), 
                    this, SLOT(maximizeWidget(QWidget*)));
+ 
+  QObject::connect(frame, SIGNAL(restorePressed()), 
+                   RestoreSignalMapper, SLOT(map()));
+  QObject::connect(RestoreSignalMapper, SIGNAL(mapped(QWidget*)), 
+                   this, SLOT(restoreWidget(QWidget*)));
+
 }
 void pqMultiView::saveSplitter(vtkPVXMLElement *element,
     QSplitter *splitter, int index)

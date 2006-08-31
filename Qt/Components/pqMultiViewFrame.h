@@ -75,8 +75,10 @@ public slots:
 
   /// close this frame, emits closePressed() so receiver does the actual remove
   void close();
-  /// maximize this frame, emits closePressed() so receiver does the actual maximize
+  /// maximize this frame, emits maximizePressed() so receiver does the actual maximize
   void maximize();
+  /// restores this frame, emits restoredPRessed() so receiver does the actual resotre
+  void restore();
   /// split this frame vertically, emits splitVerticalPressed so receiver does the actual split
   void splitVertical();
   /// split this frame horizontally, emits splitVerticalPressed so receiver does the actual split
@@ -93,6 +95,8 @@ signals:
   void closePressed();
   /// signal maximize pressed
   void maximizePressed();
+  /// signal restore pressed
+  void restorePressed();
   /// signal split vertical pressed
   void splitVerticalPressed();
   /// signal split horizontal pressed

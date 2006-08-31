@@ -236,7 +236,7 @@ void pqRenderWindowManager::onRenderModuleAdded(pqRenderModule* rm)
 void pqRenderWindowManager::allocateWindowsToRenderModules()
 {
   // Try to locate a frame that has no render module in it.
-  QList<pqMultiViewFrame*> frames = this->findChildren<pqMultiViewFrame*>();
+QList<pqMultiViewFrame*> frames = this->SplitterFrame->findChildren<pqMultiViewFrame*>();
   foreach (pqMultiViewFrame* frame, frames)
     {
     if (this->Internal->PendingRenderModules.size() == 0)
@@ -492,23 +492,20 @@ void pqRenderWindowManager::frameDrop(pqMultiViewFrame* acceptingFrame,QDropEven
 
     if(originatingFrame)
       {
+      this->hide(); 
       //Switch the originalFrame with the frame;
-      QWidget* originatingWidget= originatingFrame->mainWidget();
-      QWidget* acceptingWidget= acceptingFrame->mainWidget();
+
+      Index originatingIndex=this->indexOf(originatingFrame);
+      Index acceptingIndex=this->indexOf(acceptingFrame);
+      pqMultiViewFrame *tempFrame= new pqMultiViewFrame;
+
+      this->replaceView(originatingIndex,tempFrame);
+      this->replaceView(acceptingIndex,originatingFrame);
+      originatingIndex=this->indexOf(tempFrame);
+      this->replaceView(originatingIndex,acceptingFrame);
+
+      delete tempFrame;
       
-      this->hide();
-
-      originatingFrame->setMainWidget(NULL);
-      acceptingFrame->setMainWidget(NULL);
-
-      originatingWidget->setParent(NULL);
-      acceptingWidget->setParent(NULL);
-
-      acceptingFrame->setMainWidget(originatingWidget);
-      originatingFrame->setMainWidget(acceptingWidget);
-
-      acceptingFrame->setActive(true);
-
       this->show();
 
 

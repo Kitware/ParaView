@@ -64,6 +64,8 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
     QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton)));
   this->MaximizeButton->setIcon(
     QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarMaxButton)));
+  this->RestoreButton->setIcon(
+    QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarMinButton)));
 
   // set up actions
   QAction* a = new QAction(this->ActiveButton->icon(), tr("Active"), this->Menu);
@@ -85,6 +87,11 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
                   this->Menu);
   a->setObjectName("MaximizeAction");
   this->MaximizeButton->setDefaultAction(a);
+  a = new QAction(this->RestoreButton->icon(), 
+                  this->RestoreButton->text(), 
+                  this->Menu);
+  a->setObjectName("RestoreAction");
+  this->RestoreButton->setDefaultAction(a);
   a = new QAction(this->CloseButton->icon(), 
                   this->CloseButton->text(), 
                   this->Menu);
@@ -99,6 +106,9 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   this->connect(this->MaximizeButton->defaultAction(), 
                 SIGNAL(triggered(bool)), 
                 SLOT(maximize()));
+  this->connect(this->RestoreButton->defaultAction(), 
+                SIGNAL(triggered(bool)), 
+                SLOT(restore()));
   this->connect(this->SplitVerticalButton->defaultAction(), 
                 SIGNAL(triggered(bool)), 
                 SLOT(splitVertical()));
@@ -115,7 +125,8 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   
   this->MenuHidden=false;
   // TODO: temporary until they can be implemented or wanted
-  this->MaximizeButton->hide();
+  //this->MaximizeButton->hide();
+  this->RestoreButton->hide();
   this->ActiveButton->hide();
   this->BackButton->hide();
   this->ForwardButton->hide();
@@ -283,7 +294,10 @@ void pqMultiViewFrame::maximize()
 {
   emit this->maximizePressed();
 }
-
+void pqMultiViewFrame::restore()
+{
+  emit this->restorePressed();
+}
 void pqMultiViewFrame::splitVertical()
 {
   emit this->splitVerticalPressed();

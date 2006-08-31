@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqMultiView_h
 
 #include "pqComponentsExport.h"
-#include <QFrame>
+#include <QStackedWidget>
 #include <QList>
 
 class pqMultiViewFrame;
@@ -42,7 +42,7 @@ class vtkPVXMLElement;
 class QSplitter;
 
 /// class to manage locations of multiple view widgets
-class PQCOMPONENTS_EXPORT pqMultiView : public QFrame
+class PQCOMPONENTS_EXPORT pqMultiView : public QStackedWidget
 {
   Q_OBJECT
 public:
@@ -105,11 +105,15 @@ protected:
   pqMultiViewFrame* splitWidget(QWidget*, Qt::Orientation);
   void setup(pqMultiViewFrame*);
   void cleanup(pqMultiViewFrame*);
+  QFrame* SplitterFrame;
+  QFrame* MaximizeFrame;
 
 private:
   void saveSplitter(vtkPVXMLElement *element, QSplitter *splitter, int index);
   void restoreSplitter(QWidget *widget, vtkPVXMLElement *element);
   void cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed);
+  pqMultiViewFrame* FillerFrame;
+  pqMultiViewFrame* CurrentMaximizedFrame;
 };
 
 
