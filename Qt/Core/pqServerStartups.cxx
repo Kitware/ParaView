@@ -49,9 +49,15 @@ class pqServerStartups::pqImplementation
 public:
   pqImplementation()
   {
+    QDomDocument configuration;
+    configuration.setContent(QString("<ManualStartup/>"));
+  
     // Setup a builtin server as a hard-coded default ...
     Startups["builtin"] = new pqManualServerStartup(
-      "builtin", pqServerResource("builtin:"), "builtin");
+      "builtin",
+      pqServerResource("builtin:"),
+      "builtin",
+      configuration);
   }
   
   ~pqImplementation()
@@ -136,9 +142,12 @@ void pqServerStartups::setManualStartup(
   const pqServerResource& server,
   const QString& owner)
 {
+  QDomDocument configuration;
+  configuration.setContent(QString("<ManualStartup/>"));
+  
   this->Implementation->deleteStartup(name);
   this->Implementation->Startups.insert(
-    vtkstd::make_pair(name, new pqManualServerStartup(name, server, owner)));
+    vtkstd::make_pair(name, new pqManualServerStartup(name, server, owner, configuration)));
   emit this->changed();
 }
 
@@ -328,9 +337,11 @@ void pqServerStartups::load(QDomDocument& xml_document)
         {
         if(xml_startup.isElement() && xml_startup.toElement().tagName() == "ManualStartup")
           {
+          QDomDocument xml;
+          xml.appendChild(xml.importNode(xml_startup, true));
           this->Implementation->deleteStartup(name);
           this->Implementation->Startups.insert(vtkstd::make_pair(
-            name, new pqManualServerStartup(name, server, owner)));
+            name, new pqManualServerStartup(name, server, owner, xml)));
           }
         else if(xml_startup.isElement() && xml_startup.toElement().tagName() == "CommandStartup")
           {

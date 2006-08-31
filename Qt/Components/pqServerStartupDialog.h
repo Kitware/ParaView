@@ -46,12 +46,19 @@ class PQCOMPONENTS_EXPORT pqServerStartupDialog :
   Q_OBJECT
   
 public:
-  pqServerStartupDialog(const pqServerResource& server, QWidget* parent = 0);
+  pqServerStartupDialog(
+    const pqServerResource& server,
+    bool cancelable,
+    QWidget* parent = 0);
   ~pqServerStartupDialog();
 
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
+
+  void closeEvent(QCloseEvent* event);
+  
+  void reject();
 };
 
 #endif

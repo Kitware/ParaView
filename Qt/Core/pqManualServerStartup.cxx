@@ -39,10 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqManualServerStartup::pqManualServerStartup(
     const QString& name, 
     const pqServerResource& server,
-    const QString& owner) :
+    const QString& owner,
+    const QDomDocument& configuration) :
   Name(name),
   Server(server.schemeHosts()),
-  Owner(owner)
+  Owner(owner),
+  Configuration(configuration)
 {
 }
 
@@ -63,10 +65,7 @@ const QString pqManualServerStartup::getOwner()
 
 const QDomDocument pqManualServerStartup::getConfiguration()
 {
-  QDomDocument xml;
-  xml.appendChild(xml.createElement("ManualStartup"));
-  
-  return xml;
+  return this->Configuration;
 }
 
 void pqManualServerStartup::execute(const OptionsT& /*options*/, pqServerStartupContext& context)

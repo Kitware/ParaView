@@ -34,26 +34,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pqServerResource.h>
 
+#include <QCloseEvent>
+
 class pqServerStartupDialog::pqImplementation
 {
 public:
-  pqImplementation(const pqServerResource& server) :
-    Server(server)
+  pqImplementation(const pqServerResource& server, bool cancelable) :
+    Server(server),
+    Cancelable(cancelable)
   {
   }
 
   Ui::pqServerStartupDialog UI;
   const pqServerResource Server;
+  const bool Cancelable;
 };
 
 pqServerStartupDialog::pqServerStartupDialog(
-  const pqServerResource& server, QWidget* widget_parent) :
+  const pqServerResource& server,
+  bool cancelable,
+  QWidget* widget_parent) :
     Superclass(widget_parent),
-    Implementation(new pqImplementation(server))
+    Implementation(new pqImplementation(server, cancelable))
 {
   this->Implementation->UI.setupUi(this);
+  
+  this->Implementation->UI.cancel->setVisible(cancelable);
+  
+  pqServerResource full_server = server;
+  full_server.setPort(server.port(11111));
+  full_server.setDataServerPort(server.dataServerPort(11111));
+  full_server.setRenderServerPort(server.renderServerPort(22221));
+  
   this->Implementation->UI.message->setText(
-    QString("Please wait while server %1 starts ...").arg(server.schemeHosts().toString()));
+    QString("Please wait while server %1 starts ...").arg(full_server.toString()));
     
   this->setModal(true);
 }
@@ -61,4 +75,17 @@ pqServerStartupDialog::pqServerStartupDialog(
 pqServerStartupDialog::~pqServerStartupDialog()
 {
   delete this->Implementation;
+}
+
+void pqServerStartupDialog::closeEvent(QCloseEvent* event)
+{
+  event->ignore();
+}
+
+void pqServerStartupDialog::reject()
+{
+  if(this->Implementation->Cancelable)
+    {
+    Superclass::reject();
+    }
 }

@@ -48,7 +48,8 @@ public:
   pqManualServerStartup(
     const QString& name,
     const pqServerResource& server,
-    const QString& owner);
+    const QString& owner,
+    const QDomDocument& configuration);
 
   const QString getName();
   const pqServerResource getServer();
@@ -60,6 +61,7 @@ private:
   const QString Name;
   const pqServerResource Server;
   const QString Owner;
+  const QDomDocument Configuration;
 };
 
 #endif // !_paManualServerStartup_h
