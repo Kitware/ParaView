@@ -65,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMVectorProperty.h"
+#include "vtkSMExtentDomain.h"
 
 // ParaView includes
 #include "pqSMProxy.h"
@@ -1137,12 +1138,19 @@ QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(
     ivp = vtkSMIntVectorProperty::SafeDownCast(Property);
 
     unsigned int numElems = ivp->GetNumberOfElements();
+    vtkSMExtentDomain* extDomain = vtkSMExtentDomain::SafeDownCast(IntDomain);
+    
     for(unsigned int i=0; i<numElems; i++)
       {
+      int which = i;
+      if(extDomain)
+        {
+        which /= 2;
+        }
       QList<QVariant> domain;
       int exists1, exists2;
-      int min = IntDomain->GetMinimum(i, exists1);
-      int max = IntDomain->GetMaximum(i, exists2);
+      int min = IntDomain->GetMinimum(which, exists1);
+      int max = IntDomain->GetMaximum(which, exists2);
       if(exists1 && exists2)  // what if one of them exists?
         {
         domain.push_back(min);
