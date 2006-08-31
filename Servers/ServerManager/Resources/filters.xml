@@ -1431,28 +1431,52 @@ This filter creates a new cell array containing a geometric measure of each cell
         command="SetTriangleQualityMeasure"
         number_of_elements="1"
         default_values="2">
-       <IntRangeDomain name="range" min="0" max="6"/>
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Edge Ratio"/>
+         <Entry value="1" text="Aspect Ratio"/>
+         <Entry value="2" text="Radius Ratio"/>
+         <Entry value="3" text="Frobenius Norm"/>
+         <Entry value="6" text="Minimum Angle"/>
+       </EnumerationDomain>
      </IntVectorProperty>
      <IntVectorProperty
         name="QuadQualityMeasure"
         command="SetQuadQualityMeasure"
         number_of_elements="1"
         default_values="0">
-       <IntRangeDomain name="range" min="0" max="6"/>
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Edge Ratio"/>
+         <Entry value="1" text="Aspect Ratio"/>
+         <Entry value="2" text="Radius Ratio"/>
+         <Entry value="4" text="Average Frobenius Norm"/>
+         <Entry value="5" text="Maximal Frobenius Norm"/>
+         <Entry value="6" text="Minimum Angle"/>
+       </EnumerationDomain>
      </IntVectorProperty>
      <IntVectorProperty
         name="TetQualityMeasure"
         command="SetTetQualityMeasure"
         number_of_elements="1"
         default_values="2">
-       <IntRangeDomain name="range" min="0" max="7"/>
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Edge Ratio"/>
+         <Entry value="1" text="Aspect Ratio"/>
+         <Entry value="2" text="Radius Ratio"/>
+         <Entry value="3" text="Frobenius Norm"/>
+         <Entry value="6" text="Minimal Dihedral Angle"/>
+         <Entry value="7" text="Collapse Ratio"/>
+       </EnumerationDomain>
      </IntVectorProperty>
      <IntVectorProperty
         name="HexQualityMeasure"
         command="SetHexQualityMeasure"
         number_of_elements="1"
         default_values="5">
-       <IntRangeDomain name="range" min="0" max="6"/>
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Edge Ratio"/>
+         <Entry value="4" text="Average Frobenius Norm"/>
+         <Entry value="5" text="Maximal Frobenius Norm"/>
+       </EnumerationDomain>
      </IntVectorProperty>
    <!-- End MeshQuality -->
    </SourceProxy>
