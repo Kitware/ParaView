@@ -39,7 +39,7 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.11");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.12");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -145,8 +145,9 @@ int vtkMPIMoveData::RequestInformation(vtkInformation*,
     return 1;
     }
 
-    outInfo->Set(
-      vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
+  outInfo->Set(
+    vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
+
   return 1;
 }
 
