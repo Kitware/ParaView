@@ -24,7 +24,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.6");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.7");
 
 struct vtkPVCompositeDataInformationInternals
 {
@@ -136,7 +136,15 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
       if (dobj)
         {
         vtkPVDataInformation* dataInf = vtkPVDataInformation::New();
-        dataInf->CopyFromObject(dobj);
+        if (dobj->IsA("vtkCompositeDataSet"))
+          {
+          dataInf->CopyFromCompositeDataSet(
+            static_cast<vtkCompositeDataSet*>(dobj), 0);
+          }
+        else
+          {
+          dataInf->CopyFromObject(dobj);
+          }
         ldata[j] = dataInf;
         dataInf->Delete();
         }
@@ -201,9 +209,8 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
         }
       }
     }
-         
-
 }
+
 //----------------------------------------------------------------------------
 void vtkPVCompositeDataInformation::CopyToStream(
   vtkClientServerStream* css)
