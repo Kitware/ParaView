@@ -56,6 +56,9 @@ public:
   pqMultiView(QWidget* parent = NULL);
   virtual ~pqMultiView();
 
+  /// Must be called to initialize the first frame.
+  void init();
+
   /// \brief
   ///   Resets the multi-view to its original state.
   /// \param removed Used to return all the removed widgets.
@@ -101,7 +104,7 @@ protected slots:
 
 protected:
 
-  bool eventFilter(QObject*, QEvent* e);
+ // bool eventFilter(QObject*, QEvent* e);
   pqMultiViewFrame* splitWidget(QWidget*, Qt::Orientation);
   void setup(pqMultiViewFrame*);
   void cleanup(pqMultiViewFrame*);

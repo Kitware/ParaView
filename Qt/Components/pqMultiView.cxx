@@ -65,8 +65,6 @@ void pqMultiView::Index::setFromString(const QString& str)
 pqMultiView::pqMultiView(QWidget* p)
   : QStackedWidget(p)
 {
-   this->installEventFilter(this);
-
   this->SplitterFrame= new QFrame(this);
   this->SplitterFrame->setObjectName("SplitterFrame");
   this->addWidget(this->SplitterFrame);
@@ -94,13 +92,19 @@ pqMultiView::pqMultiView(QWidget* p)
   
   this->setCurrentWidget(this->SplitterFrame);
 
-  pqMultiViewFrame* frame = new pqMultiViewFrame;
-  splitter->addWidget(frame);
-  this->setup(frame);
+}
 
-  this->ensurePolished();
-
-
+void pqMultiView::init()
+{
+  QWidget *widget = this->SplitterFrame->layout()->itemAt(0)->widget();
+  QSplitter *splitter = qobject_cast<QSplitter *>(widget);
+  if(splitter)
+    {
+    pqMultiViewFrame* frame = new pqMultiViewFrame;
+    splitter->addWidget(frame);
+    this->setup(frame);
+    emit this->frameAdded(frame);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -680,6 +684,7 @@ void pqMultiView::restoreWidget(QWidget* widget)
   }
 
 }
+/*
 bool pqMultiView::eventFilter(QObject*, QEvent* e)
 {
   if(e->type() == QEvent::Polish)
@@ -687,10 +692,11 @@ bool pqMultiView::eventFilter(QObject*, QEvent* e)
     // delay emit of first signal
     emit this->frameAdded(qobject_cast<pqMultiViewFrame*>(
         this->widgetOfIndex(pqMultiView::Index())));
-    this->removeEventFilter(this);
+  //  this->removeEventFilter(this);
     }
   return false;
 }
+*/
 
 void pqMultiView::cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed)
 {

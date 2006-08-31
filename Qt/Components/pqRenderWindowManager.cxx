@@ -118,6 +118,8 @@ pqRenderWindowManager::pqRenderWindowManager(QWidget* _parent/*=null*/)
 
   QObject::connect(this, SIGNAL(frameRemoved(pqMultiViewFrame*)), 
     this, SLOT(onFrameRemoved(pqMultiViewFrame*)));
+
+  this->init();
 }
 
 //-----------------------------------------------------------------------------
