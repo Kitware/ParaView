@@ -146,14 +146,17 @@ void pqCommandServerStartup::execute(const OptionsT& user_options,
     this->Server.renderServerHost();
   options["PV_RENDER_SERVER_PORT"] =
     QString::number(this->Server.renderServerPort(22221));
-  options["PV_USERNAME"] =
-    ""; // Unused at the moment
+  options["PV_CONNECT_ID"] = "";
+  options["PV_USERNAME"] = ""; // Unused at the moment
   
   // Merge user variables, allowing user variables to "override" the predefined variables ...
   for(OptionsT::const_iterator option = user_options.begin(); option != user_options.end(); ++option)
     {
-    options.erase(options.find(option.key()));
-    options.insert(option.key(), option.value());
+    const QString key = option.key();
+    const QString value = option.value();
+    
+    options.erase(options.find(key));
+    options.insert(key, value);
     }
 
   // Setup the process environment ...

@@ -71,6 +71,11 @@ public:
   vtkGetStringMacro(ParaViewDataName);
 
   // Description:
+  // Clients need to set the ConnectID so they can handle server connections
+  // after the client has started.
+  vtkSetMacro(ConnectID, int);
+
+  // Description:
   // Get the various types of host names. 
   vtkGetStringMacro(ServerHostName);
   vtkGetStringMacro(DataServerHostName);

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqCommandServerStartup.h>
 #include <pqCreateServerStartupDialog.h>
 #include <pqEditServerStartupDialog.h>
+#include <pqOptions.h>
 #include <pqServer.h>
 #include <pqServerBrowser.h>
 #include <pqServerManagerModel.h>
@@ -462,17 +463,28 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
       }
     }
 
-  if(!this->Implementation->Options["PV_SERVER_PORT"].isEmpty())
+  if(this->Implementation->Options.contains("PV_SERVER_PORT"))
     {
-    this->Implementation->Server.setPort(this->Implementation->Options["PV_SERVER_PORT"].toInt());
+    if(!this->Implementation->Options["PV_SERVER_PORT"].isEmpty())
+      {
+      this->Implementation->Server.setPort(this->Implementation->Options["PV_SERVER_PORT"].toInt());
+      }
     }
-  if(!this->Implementation->Options["PV_DATA_SERVER_PORT"].isEmpty())
+    
+  if(this->Implementation->Options.contains("PV_DATA_SERVER_PORT"))
     {
-    this->Implementation->Server.setDataServerPort(this->Implementation->Options["PV_DATA_SERVER_PORT"].toInt());
+    if(!this->Implementation->Options["PV_DATA_SERVER_PORT"].isEmpty())
+      {
+      this->Implementation->Server.setDataServerPort(this->Implementation->Options["PV_DATA_SERVER_PORT"].toInt());
+      }
     }
-  if(!this->Implementation->Options["PV_RENDER_SERVER_PORT"].isEmpty())
+    
+  if(this->Implementation->Options.contains("PV_RENDER_SERVER_PORT"))
     {
-    this->Implementation->Server.setRenderServerPort(this->Implementation->Options["PV_RENDER_SERVER_PORT"].toInt());
+    if(!this->Implementation->Options["PV_RENDER_SERVER_PORT"].isEmpty())
+      {
+      this->Implementation->Server.setRenderServerPort(this->Implementation->Options["PV_RENDER_SERVER_PORT"].toInt());
+      }
     }
 
   return true;
@@ -546,6 +558,23 @@ void pqSimpleServerStartup::startForwardConnection()
     SIGNAL(failed()),
     this->Implementation->StartupDialog,
     SLOT(hide()));
+  
+  // Special-case: ensure that PV_CONNECT_ID is propagated to the global
+  // options object, so it is used by the connection
+  if(pqOptions* const options =
+    pqOptions::SafeDownCast(
+      vtkProcessModule::GetProcessModule()->GetOptions()))
+    {
+    if(this->Implementation->Options.contains("PV_CONNECT_ID"))
+      {
+      options->SetConnectID(
+        this->Implementation->Options["PV_CONNECT_ID"].toInt());
+      }
+    else
+      {
+      options->SetConnectID(0);
+      }
+    }
   
   this->Implementation->Startup->execute(
     this->Implementation->Options,
@@ -633,6 +662,23 @@ void pqSimpleServerStartup::startReverseConnection()
     &this->Implementation->Timer,
     SLOT(stop()));
 
+  // Special-case: ensure that PV_CONNECT_ID is propagated to the global
+  // options object, so it is used by the connection
+  if(pqOptions* const options =
+    pqOptions::SafeDownCast(
+      vtkProcessModule::GetProcessModule()->GetOptions()))
+    {
+    if(this->Implementation->Options.contains("PV_CONNECT_ID"))
+      {
+      options->SetConnectID(
+        this->Implementation->Options["PV_CONNECT_ID"].toInt());
+      }
+    else
+      {
+      options->SetConnectID(0);
+      }
+    }
+  
   this->Implementation->Startup->execute(
     this->Implementation->Options,
     *this->Implementation->StartupContext);
