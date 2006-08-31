@@ -102,6 +102,8 @@ ADD_LIBRARY(pqCore
   pqFileDialogEventPlayer.h
   pqFileDialogEventTranslator.cxx
   pqFileDialogEventTranslator.h
+  pqJoystickFly.cxx
+  pqJoystickFly.h
   pqMain.cxx
   pqMain.h
   pqManualServerStartup.cxx
