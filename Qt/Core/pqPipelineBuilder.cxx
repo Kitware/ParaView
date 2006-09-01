@@ -399,7 +399,8 @@ int pqPipelineBuilder::removeInternal(pqPipelineDisplay* display)
   // Unregister display.
   vtkSMProxyManager::GetProxyManager()->UnRegisterProxy(
     display->getSMGroup().toStdString().c_str(), 
-    display->getSMName().toStdString().c_str());
+    display->getSMName().toStdString().c_str(),
+    display->getProxy());
   return 1;
 }
 
@@ -466,7 +467,8 @@ void pqPipelineBuilder::remove(pqPipelineSource* source,
   // 3) Unregister proxy.
   vtkSMProxyManager::GetProxyManager()->UnRegisterProxy(
     source->getSMGroup().toStdString().c_str(), 
-    source->getSMName().toStdString().c_str());
+    source->getSMName().toStdString().c_str(),
+    source->getProxy());
 
   if (this->UndoStack && is_undoable)
     {
@@ -589,7 +591,7 @@ void pqPipelineBuilder::removeWindow(pqRenderModule* rm)
     }
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->UnRegisterProxy("render_modules", name.toStdString().c_str());
+  pxm->UnRegisterProxy("render_modules", name.toStdString().c_str(), rmProxy);
   // rm is invalid at this point.
  
   // Now clean up any orphan displays.
