@@ -73,7 +73,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.63");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.64");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -114,6 +114,8 @@ vtkKWSelectionFrameLayoutManager::vtkKWSelectionFrameLayoutManager()
   this->Internals->SelectionPositionBeforeMaximize[1] = 0;
 
   this->SetResolution(1, 1);
+
+  this->LayoutFrame = vtkKWFrame::New();
 }
 
 //----------------------------------------------------------------------------
@@ -128,6 +130,14 @@ vtkKWSelectionFrameLayoutManager::~vtkKWSelectionFrameLayoutManager()
   // Remove all widgets
 
   this->RemoveAllWidgets();
+
+  // Delete frame
+
+  if (this->LayoutFrame)
+    {
+    this->LayoutFrame->Delete();
+    this->LayoutFrame = NULL;
+    }
 
   // Delete our pool
 
@@ -167,6 +177,12 @@ void vtkKWSelectionFrameLayoutManager::CreateWidget()
 
   this->SetBackgroundColor(0.2, 0.2, 0.2);
 
+  // Create the layout frame
+
+  this->LayoutFrame->SetParent(this);
+  this->LayoutFrame->Create();
+  this->LayoutFrame->SetBackgroundColor(0.2, 0.2, 0.2);
+
   // Pack
 
   this->Pack();
@@ -184,9 +200,17 @@ void vtkKWSelectionFrameLayoutManager::Pack()
 
   this->UnpackChildren();
 
+  ostrstream tk_cmd;
+
+  // Pack layout
+
+  tk_cmd << "pack " << this->LayoutFrame->GetWidgetName() 
+         << " -side top -expand y -fill both -padx 0 -pady 0" << endl;
+
+  this->LayoutFrame->UnpackChildren();
+  
   // Pack each widgets, column first
 
-  ostrstream tk_cmd;
   int i, j;
 
   vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
@@ -218,26 +242,30 @@ void vtkKWSelectionFrameLayoutManager::Pack()
   // on the master)
 
   int nb_of_cols = 10, nb_of_rows = 10;
-  vtkKWTkUtilities::GetGridSize(this, &nb_of_cols, &nb_of_rows);
+  vtkKWTkUtilities::GetGridSize(this->LayoutFrame, &nb_of_cols, &nb_of_rows);
 
   for (j = 0; j < this->Resolution[1]; j++)
     {
-    tk_cmd << "grid rowconfigure " << this->GetWidgetName() << " " << j 
+    tk_cmd << "grid rowconfigure " 
+           << this->LayoutFrame->GetWidgetName() << " " << j 
            << " -weight 1" << endl;
     }
   for (j = this->Resolution[1]; j < nb_of_rows; j++)
     {
-    tk_cmd << "grid rowconfigure " << this->GetWidgetName() << " " << j 
+    tk_cmd << "grid rowconfigure " 
+           << this->LayoutFrame->GetWidgetName() << " " << j 
            << " -weight 0" << endl;
     }
   for (i = 0; i < this->Resolution[0]; i++)
     {
-    tk_cmd << "grid columnconfigure " << this->GetWidgetName() << " " << i
+    tk_cmd << "grid columnconfigure " 
+           << this->LayoutFrame->GetWidgetName() << " " << i
            << " -weight 1" << endl;
     }
   for (i = this->Resolution[0]; i < nb_of_cols; i++)
     {
-    tk_cmd << "grid columnconfigure " << this->GetWidgetName() << " " << i
+    tk_cmd << "grid columnconfigure " 
+           << this->LayoutFrame->GetWidgetName() << " " << i
            << " -weight 0" << endl;
     }
   
@@ -454,7 +482,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesMenu(
 
   // Allowed resolutions
 
-  vtksys_stl::string varname(this->GetWidgetName());
+  vtksys_stl::string varname(this->GetTclName());
   varname += "reschoice";
 
   char label[64], command[128], help[128];  
@@ -515,7 +543,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesMenu()
   int value = 
     (this->Resolution[0]-1) * VTK_KW_SFLMGR_MAX_SIZE + this->Resolution[1]-1;
 
-  vtksys_stl::string rbv(this->GetWidgetName());
+  vtksys_stl::string rbv(this->GetTclName());
   rbv += "reschoice";
   if (atoi(this->Script("set %s", rbv.c_str())) != value)
     {
@@ -615,7 +643,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
 
   // Allowed resolutions
 
-  vtksys_stl::string rbv(this->GetWidgetName());
+  vtksys_stl::string rbv(this->GetTclName());
   rbv += "reschoice";
 
   char command[128], help[128], icon[128];  
@@ -673,7 +701,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesToolbar()
   int value = 
     (this->Resolution[0]-1) * VTK_KW_SFLMGR_MAX_SIZE + this->Resolution[1]-1;
 
-  vtksys_stl::string rbv(this->GetWidgetName());
+  vtksys_stl::string rbv(this->GetTclName());
   rbv += "reschoice";
   if (atoi(this->Script("set %s", rbv.c_str())) != value)
     {
@@ -998,7 +1026,7 @@ void vtkKWSelectionFrameLayoutManager::CreateWidget(
 {
   if (this->IsCreated() && widget && !widget->IsCreated())
     {
-    widget->SetParent(this);
+    widget->SetParent(this->LayoutFrame);
     widget->Create();
     widget->SetWidth(350);
     widget->SetHeight(350);
@@ -1301,9 +1329,10 @@ int vtkKWSelectionFrameLayoutManager::SetWidgetGroup(
     this->Internals->Pool.end();
   for (; it != end; ++it)
     {
-    if (it->Widget && it->Widget == widget)
+    if (it->Widget && it->Widget == widget && strcmp(it->Group.c_str(), group))
       {
       it->Group = group;
+      this->UpdateSelectionLists();
       return 1;
       }
     }

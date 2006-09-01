@@ -35,6 +35,7 @@ class vtkKWRenderWidget;
 class vtkImageData;
 class vtkKWMenu;
 class vtkKWToolbar;
+class vtkKWFrame;
 
 class KWWidgets_EXPORT vtkKWSelectionFrameLayoutManager : public vtkKWCompositeWidget
 {
@@ -274,6 +275,8 @@ protected:
 
   virtual void InvokeSelectionChangedCommand();
   char *SelectionChangedCommand;
+
+  vtkKWFrame *LayoutFrame;
 
   // Description:
   // Allocate a new widget.
