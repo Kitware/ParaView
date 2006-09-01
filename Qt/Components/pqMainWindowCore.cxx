@@ -60,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqSimpleAnimationManager.h"
 #include "pqSourceProxyInfo.h"
+#include "pqStateLoader.h"
 #include "pqToolTipTrapper.h"
 #include "pqVCRController.h"
 #include "pqWriterFactory.h"
@@ -276,6 +277,11 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
 /*
   this->installEventFilter(this);
 */
+  // set up state loader.
+  pqStateLoader* loader = pqStateLoader::New();
+  loader->SetMainWindowCore(this);
+  core->setStateLoader(loader);
+  loader->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -864,7 +870,7 @@ void pqMainWindowCore::onFileLoadServerState(pqServer*)
   fileDialog->setModal(true);
   fileDialog->show();
 }
-#include "pqStateLoader.h"
+
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileLoadServerState(const QStringList& files)
 {
@@ -879,11 +885,8 @@ void pqMainWindowCore::onFileLoadServerState(const QStringList& files)
     vtkPVXMLElement *root = xmlParser->GetRootElement();
     if (root)
       {
-      pqStateLoader* loader = pqStateLoader::New();
-      loader->SetMainWindowCore(this);
       pqApplicationCore::instance()->loadState(
-        root, this->getActiveServer(), loader);
-      loader->Delete();
+        root, this->getActiveServer());
                                               
       // Add this to the list of recent server resources ...
       pqServerResource resource;

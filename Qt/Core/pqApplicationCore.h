@@ -148,6 +148,10 @@ public:
   /// Renders all windows
   void render();
 
+  /// Set the application specific state loader to use 
+  /// while loading states, if any. This is used
+  /// only when loadState is called with loader=NULL.
+  void setStateLoader(vtkSMStateLoader* loader);
 signals:
   // Fired to enable or disable progress bar.
   void enableProgress(bool enable);

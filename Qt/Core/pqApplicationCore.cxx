@@ -94,6 +94,7 @@ public:
   pqWriterFactory* WriterFactory;
   pqServerManagerSelectionModel* SelectionModel;
   pqPendingDisplayManager* PendingDisplayManager;
+  vtkSmartPointer<vtkSMStateLoader> StateLoader;
 
   QString OrganizationName;
   QString ApplicationName;
@@ -293,6 +294,13 @@ void pqApplicationCore::removeServer(pqServer* server)
 
 
 
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::setStateLoader(vtkSMStateLoader* loader)
+{
+  this->Internal->StateLoader = loader;
+}
+
 //-----------------------------------------------------------------------------
 void pqApplicationCore::saveState(vtkPVXMLElement* rootElement)
 {
@@ -320,6 +328,10 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     }
 
   vtkSmartPointer<vtkSMStateLoader> loader = arg_loader;
+  if (!loader)
+    {
+    loader = this->Internal->StateLoader;
+    }
   if (!loader)
     {
     loader.TakeReference(vtkSMPQStateLoader::New());
