@@ -97,8 +97,8 @@ pqMultiView::pqMultiView(QWidget* p)
 
 void pqMultiView::init()
 {
-  QWidget *widget = this->SplitterFrame->layout()->itemAt(0)->widget();
-  QSplitter *splitter = qobject_cast<QSplitter *>(widget);
+  QWidget *w = this->SplitterFrame->layout()->itemAt(0)->widget();
+  QSplitter *splitter = qobject_cast<QSplitter *>(w);
   if(splitter)
     {
     pqMultiViewFrame* frame = new pqMultiViewFrame;
@@ -125,8 +125,8 @@ void pqMultiView::reset(QList<QWidget*> &removed)
   pqMultiViewFrame* frame = new pqMultiViewFrame();
   // Remove all the widgets. Put them in the list. Then clean
   // up all the extra splitters.
-  QWidget *widget = this->SplitterFrame->layout()->itemAt(0)->widget();
-  QSplitter *splitter = qobject_cast<QSplitter *>(widget);
+  QWidget *w = this->SplitterFrame->layout()->itemAt(0)->widget();
+  QSplitter *splitter = qobject_cast<QSplitter *>(w);
   if(splitter)
     {
     this->cleanSplitter(splitter, removed);
@@ -148,9 +148,10 @@ void pqMultiView::reset(QList<QWidget*> &removed)
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqMultiView::replaceView(pqMultiView::Index index, QWidget* widget)
+QWidget* pqMultiView::replaceView(pqMultiView::Index index, 
+                                  QWidget* replaceWidget)
 {
-  if(!widget)
+  if(!replaceWidget)
     return NULL;
 
   QWidget* w = this->widgetOfIndex(index);
@@ -172,7 +173,7 @@ QWidget* pqMultiView::replaceView(pqMultiView::Index index, QWidget* widget)
     // remove widget
     w->setParent(NULL);
     // add replacement at same location
-    splitter->insertWidget(location, widget);
+    splitter->insertWidget(location, replaceWidget);
     
     splitter->show();
 
@@ -187,14 +188,14 @@ QWidget* pqMultiView::replaceView(pqMultiView::Index index, QWidget* widget)
 }
 
 //-----------------------------------------------------------------------------
-void pqMultiView::removeView(QWidget* widget)
+void pqMultiView::removeView(QWidget* w)
 {
-  QSplitter* splitter = qobject_cast<QSplitter*>(widget->parentWidget());
+  QSplitter* splitter = qobject_cast<QSplitter*>(w->parentWidget());
   if(splitter)
     {
 
     // remove widget
-    widget->setParent(NULL);
+    w->setParent(NULL);
     
     // if splitter is empty, add place holder
     if(splitter->count() == 0 && splitter->parentWidget() == this->SplitterFrame)
@@ -432,28 +433,28 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
 
 
 //-----------------------------------------------------------------------------
-pqMultiView::Index pqMultiView::indexOf(QWidget* widget) const
+pqMultiView::Index pqMultiView::indexOf(QWidget* w) const
 {
   Index index;
   
-  if(!widget)
+  if(!w)
     return index;
 
-  QWidget* p = widget->parentWidget();
+  QWidget* p = w->parentWidget();
   while(p && p != this->SplitterFrame)
     {
     QSplitter* splitter = qobject_cast<QSplitter*>(p);
     if(splitter)
       {
-      index.push_front(splitter->indexOf(widget));
+      index.push_front(splitter->indexOf(w));
       }
     else
       {
       QLayout* l = p->layout();
       Q_ASSERT(l != NULL);
-      index.push_front(l->indexOf(widget));
+      index.push_front(l->indexOf(w));
       }
-    widget = p;
+    w = p;
     p = p->parentWidget();
     }
   return index;
@@ -554,41 +555,41 @@ void pqMultiView::loadState(vtkPVXMLElement *root)
         this->SplitterFrame->layout()->itemAt(0)->widget());
     if(splitter)
       {
-      QWidget *widget = splitter->widget(0);
+      QWidget *w = splitter->widget(0);
       vtkPVXMLElement *element = pqXMLUtil::FindNestedElementByName(multiView,
           "Splitter");
-      if(element && widget)
+      if(element && w)
         {
         // This will be called recursively to restore the multi-view.
-        this->restoreSplitter(widget, element);
+        this->restoreSplitter(w, element);
         }
       }
     }
 }
 
-void pqMultiView::removeWidget(QWidget* widget)
+void pqMultiView::removeWidget(QWidget* w)
 {
   // If this is the only widget in the multi-view, replace it
   // with a new one so there is always something in the space.
-  QSplitter *splitter = qobject_cast<QSplitter *>(widget->parentWidget());
+  QSplitter *splitter = qobject_cast<QSplitter *>(w->parentWidget());
   if(splitter && splitter->parentWidget() == this->SplitterFrame && splitter->count() < 2)
     {
     pqMultiViewFrame* frame = new pqMultiViewFrame();
-    this->replaceView(this->indexOf(widget), frame);
+    this->replaceView(this->indexOf(w), frame);
     this->setup(frame);
     }
   else
     {
-    this->removeView(widget);
+    this->removeView(w);
     }
 
-  emit this->frameRemoved(qobject_cast<pqMultiViewFrame*>(widget));
-  delete widget;
+  emit this->frameRemoved(qobject_cast<pqMultiViewFrame*>(w));
+  delete w;
 }
 
-pqMultiViewFrame* pqMultiView::splitWidget(QWidget* widget, Qt::Orientation o)
+pqMultiViewFrame* pqMultiView::splitWidget(QWidget* w, Qt::Orientation o)
 {
-  pqMultiView::Index index = this->indexOf(widget);
+  pqMultiView::Index index = this->indexOf(w);
   pqMultiView::Index newindex = this->splitView(index, o);
   QWidget *newWidget=this->widgetOfIndex(newindex);
   pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(newWidget); 
@@ -596,9 +597,9 @@ pqMultiViewFrame* pqMultiView::splitWidget(QWidget* widget, Qt::Orientation o)
   emit this->frameAdded(frame);
   return frame;
 }
-pqMultiViewFrame* pqMultiView::splitWidget(QWidget* widget, Qt::Orientation o,float percent)
+pqMultiViewFrame* pqMultiView::splitWidget(QWidget* w, Qt::Orientation o,float percent)
 {
-  pqMultiView::Index index = this->indexOf(widget);
+  pqMultiView::Index index = this->indexOf(w);
   pqMultiView::Index newindex = this->splitView(index, o,percent);
   QWidget *newWidget=this->widgetOfIndex(newindex);
   pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(newWidget); 
@@ -606,21 +607,21 @@ pqMultiViewFrame* pqMultiView::splitWidget(QWidget* widget, Qt::Orientation o,fl
   emit this->frameAdded(frame);
   return frame;
 }
-pqMultiViewFrame* pqMultiView::splitWidgetHorizontal(QWidget* widget)
+pqMultiViewFrame* pqMultiView::splitWidgetHorizontal(QWidget* w)
 {
-  return this->splitWidget(widget, Qt::Horizontal);
+  return this->splitWidget(w, Qt::Horizontal);
 
 }
 
-pqMultiViewFrame* pqMultiView::splitWidgetVertical(QWidget* widget)
+pqMultiViewFrame* pqMultiView::splitWidgetVertical(QWidget* w)
 {
-  return this->splitWidget(widget, Qt::Vertical);
+  return this->splitWidget(w, Qt::Vertical);
 }
 
-void pqMultiView::maximizeWidget(QWidget* widget)
+void pqMultiView::maximizeWidget(QWidget* maxWidget)
 {
 
-  pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(widget);
+  pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(maxWidget);
   if(!frame)
     return;
 
@@ -630,10 +631,10 @@ void pqMultiView::maximizeWidget(QWidget* widget)
     {
       this->hide();  
 
-      Index currentIndex=this->indexOf(frame);
+      Index currentIdx=this->indexOf(frame);
       QLayout *l=this->MaximizeFrame->layout();
       l->removeWidget(this->FillerFrame);
-      this->replaceView(currentIndex,this->FillerFrame);
+      this->replaceView(currentIdx,this->FillerFrame);
       frame->setParent(this->MaximizeFrame);
       this->MaximizeFrame->layout()->addWidget(frame);
 
@@ -651,7 +652,7 @@ void pqMultiView::maximizeWidget(QWidget* widget)
 
 }
 
-void pqMultiView::restoreWidget(QWidget* widget)
+void pqMultiView::restoreWidget(QWidget*)
 {
 
   if(this->CurrentMaximizedFrame)
@@ -665,8 +666,8 @@ void pqMultiView::restoreWidget(QWidget* widget)
     QLayout *l=this->MaximizeFrame->layout();
     l->removeWidget(this->CurrentMaximizedFrame);
 
-    Index currentIndex=this->indexOf(this->FillerFrame);
-    this->replaceView(currentIndex,this->CurrentMaximizedFrame);
+    Index currentIdx=this->indexOf(this->FillerFrame);
+    this->replaceView(currentIdx,this->CurrentMaximizedFrame);
 
     this->FillerFrame->setParent(this->MaximizeFrame);
     this->MaximizeFrame->layout()->addWidget(this->FillerFrame);
@@ -701,20 +702,20 @@ bool pqMultiView::eventFilter(QObject*, QEvent* e)
 
 void pqMultiView::cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed)
 {
-  QWidget *widget = 0;
+  QWidget *w = 0;
   QSplitter *subsplitter = 0;
   for(int i = splitter->count() - 1; i >= 0; i--)
     {
-    widget = splitter->widget(i);
-    subsplitter = qobject_cast<QSplitter *>(widget);
+    w = splitter->widget(i);
+    subsplitter = qobject_cast<QSplitter *>(w);
     if(subsplitter)
       {
       this->cleanSplitter(subsplitter, removed);
       }
-    else if(widget)
+    else if(w)
       {
-      widget->setParent(0);
-      removed.append(widget);
+      w->setParent(0);
+      removed.append(w);
       }
     }
 }
@@ -820,7 +821,7 @@ void pqMultiView::saveSplitter(vtkPVXMLElement *element,
   splitterElement->Delete();
 }
 
-void pqMultiView::restoreSplitter(QWidget *widget,
+void pqMultiView::restoreSplitter(QWidget *w,
     vtkPVXMLElement *element)
 {
   // Set the orientation.
@@ -833,17 +834,17 @@ void pqMultiView::restoreSplitter(QWidget *widget,
 
   // Get the number of child widgets. Split the view to hold
   // enough child widgets.
-  int count = 0;
-  if(element->GetScalarAttribute("count", &count))
+  int num = 0;
+  if(element->GetScalarAttribute("count", &num))
     {
-    for(int i = 1; i < count; i++)
+    for(int i = 1; i < num; i++)
       {
-      this->splitWidget(widget, orientation);
+      this->splitWidget(w, orientation);
       }
 
     // Get the view sizes. Convert them to a list of ints to
     // restore the splitter sizes.
-    QSplitter *splitter = qobject_cast<QSplitter *>(widget->parentWidget());
+    QSplitter *splitter = qobject_cast<QSplitter *>(w->parentWidget());
     if(splitter)
       {
       QList<int> sizes = pqXMLUtil::GetIntListFromString(

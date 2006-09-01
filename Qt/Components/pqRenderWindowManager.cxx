@@ -206,12 +206,12 @@ void pqRenderWindowManager::onFrameRemoved(pqMultiViewFrame* frame)
   // For now when a frame is removed, its render module is destroyed.
   // Later we may want to just hide it or something...for now, let's just
   // destory the render window.
-  QVTKWidget* widget = qobject_cast<QVTKWidget*>(frame->mainWidget());
-  if (widget)
+  QVTKWidget* w = qobject_cast<QVTKWidget*>(frame->mainWidget());
+  if (w)
     {
     this->Internal->FrameBeingRemoved = frame;
     pqRenderModule* rm = 
-      pqServerManagerModel::instance()->getRenderModule(widget);
+      pqServerManagerModel::instance()->getRenderModule(w);
     QObject::disconnect(frame->BackButton, 0, rm->getInteractionUndoStack(), 0);
     QObject::disconnect(frame->ForwardButton, 0, rm->getInteractionUndoStack(), 0);
     QObject::disconnect(rm->getInteractionUndoStack(), 0,frame->BackButton, 0);
@@ -293,9 +293,9 @@ void pqRenderWindowManager::onActivate(QWidget* obj)
     {
     return;
     }
-  QVTKWidget* widget = qobject_cast<QVTKWidget*>(frame->mainWidget());
+  QVTKWidget* w = qobject_cast<QVTKWidget*>(frame->mainWidget());
   pqRenderModule* rm = 
-    pqServerManagerModel::instance()->getRenderModule(widget);
+    pqServerManagerModel::instance()->getRenderModule(w);
   this->Internal->ActiveRenderModule = rm;
   foreach(pqMultiViewFrame* fr, this->Internal->Frames)
     {
@@ -345,11 +345,11 @@ void pqRenderWindowManager::saveState(vtkPVXMLElement* root)
     frameElem->SetName("Frame");
     frameElem->AddAttribute("index", index.getString().toStdString().c_str());
 
-    QVTKWidget* widget = qobject_cast<QVTKWidget*>(frame->mainWidget());
-    if (widget)
+    QVTKWidget* w = qobject_cast<QVTKWidget*>(frame->mainWidget());
+    if (w)
       {
       pqRenderModule* rm = 
-        pqServerManagerModel::instance()->getRenderModule(widget);
+        pqServerManagerModel::instance()->getRenderModule(w);
       frameElem->AddAttribute("render_module", rm->getProxy()->GetSelfIDAsString());
       }
     rwRoot->AddNestedElement(frameElem);
@@ -440,42 +440,45 @@ void pqRenderWindowManager::frameDragStart(pqMultiViewFrame* frame)
   drag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
   drag->setPixmap(pixmap);
 
-  Qt::DropAction dropAction = drag->start();
+  drag->start();
 }
-void pqRenderWindowManager::frameDragEnter(pqMultiViewFrame* frame,QDragEnterEvent* event)
+void pqRenderWindowManager::frameDragEnter(pqMultiViewFrame*,
+                                           QDragEnterEvent* e)
 {
   QString mimeType("application/paraview3/");
   mimeType.append(qApp->sessionId().toLower());
 
-  if(event->mimeData()->hasFormat(mimeType))
+  if(e->mimeData()->hasFormat(mimeType))
     {
-    event->accept();
+    e->accept();
     }
   else
     {
-    event->ignore();
+    e->ignore();
     }
 }
-void pqRenderWindowManager::frameDragMove(pqMultiViewFrame* frame,QDragMoveEvent* event)
+void pqRenderWindowManager::frameDragMove(pqMultiViewFrame*,
+                                          QDragMoveEvent* e)
 {
   QString mimeType("application/paraview3/");
   mimeType.append(qApp->sessionId().toLower());
-  if(event->mimeData()->hasFormat(mimeType))
+  if(e->mimeData()->hasFormat(mimeType))
     {
-    event->accept();
+    e->accept();
     }
   else
     {
-    event->ignore();
+    e->ignore();
     }
 }
-void pqRenderWindowManager::frameDrop(pqMultiViewFrame* acceptingFrame,QDropEvent* event)
+void pqRenderWindowManager::frameDrop(pqMultiViewFrame* acceptingFrame,
+                                      QDropEvent* e)
 {
   QString mimeType("application/paraview3/");
   mimeType.append(qApp->sessionId().toLower());
-  if (event->mimeData()->hasFormat(mimeType))
+  if (e->mimeData()->hasFormat(mimeType))
     {
-    QByteArray input= event->mimeData()->data(mimeType);
+    QByteArray input= e->mimeData()->data(mimeType);
     QDataStream dataStream(&input, QIODevice::ReadOnly);
 
     QUuid uniqueID;
@@ -512,11 +515,11 @@ void pqRenderWindowManager::frameDrop(pqMultiViewFrame* acceptingFrame,QDropEven
 
 
       }
-    event->accept();
+    e->accept();
     }
   else
     {
-    event->ignore();
+    e->ignore();
     }
 }
 
