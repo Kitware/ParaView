@@ -347,6 +347,7 @@ FOREACH(WidgetType
     vtkKWPushButton
     vtkKWScale
     vtkKWScaleWithEntry
+    vtkKWScaleWithLabel
     vtkKWSpinBox
     )
   KWWidgets_AUTOGENERATE_CLASS(
