@@ -39,6 +39,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // overloaded to init state.
+  virtual int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
+
+  // Description:
   // Get/Set the vtkSMMultiViewRenderModuleProxy proxy to use to
   // create the render modules. This must be set before loading the state.
   vtkGetObjectMacro(MultiViewRenderModuleProxy, vtkSMMultiViewRenderModuleProxy);
