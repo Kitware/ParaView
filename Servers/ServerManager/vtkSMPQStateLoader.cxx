@@ -22,7 +22,7 @@
 #include "vtkSMRenderModuleProxy.h"
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.7");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.8");
 vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewRenderModuleProxy, 
   vtkSMMultiViewRenderModuleProxy);
 //-----------------------------------------------------------------------------
@@ -37,6 +37,14 @@ vtkSMPQStateLoader::vtkSMPQStateLoader()
 vtkSMPQStateLoader::~vtkSMPQStateLoader()
 {
   this->SetMultiViewRenderModuleProxy(0);
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMPQStateLoader::LoadState(vtkPVXMLElement* rootElement, 
+  int keep_proxies)
+{
+  this->UsedExistingRenderModules= 0;
+  return this->Superclass::LoadState(rootElement, keep_proxies);
 }
 
 //-----------------------------------------------------------------------------
