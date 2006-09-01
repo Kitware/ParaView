@@ -92,6 +92,7 @@ pqMultiView::pqMultiView(QWidget* p)
   
   this->setCurrentWidget(this->SplitterFrame);
 
+  this->CurrentMaximizedFrame=0;
 }
 
 void pqMultiView::init()
