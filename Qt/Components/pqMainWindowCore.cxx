@@ -1863,8 +1863,6 @@ void pqMainWindowCore::sourceRemoved(pqPipelineSource* source)
 
   pqApplicationCore::instance()->getPendingDisplayManager()->
     removePendingDisplayForSource(source);
-
-  this->getActiveRenderModule()->render();
 }
 
 //-----------------------------------------------------------------------------
