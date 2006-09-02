@@ -28,7 +28,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.59");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.60");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -916,11 +916,22 @@ void vtkKWSelectionFrame::UpdateSelectionListMenuButton()
     this->Internals->StringPool.begin();
   vtkKWSelectionFrameInternals::StringPoolIterator end = 
     this->Internals->StringPool.end();
+  int nb_entries = 0;
+  int insert_break = 0;
   for (; it != end; ++it)
     {
+    ++nb_entries;
     if (!strcmp((*it).c_str(), "--"))
       {
-      menu->AddSeparator();
+      if (nb_entries > 22)
+        {
+        nb_entries = 0;
+        insert_break = 1;
+        }
+      else
+        {
+        menu->AddSeparator();
+        }
       }
     else
       {
@@ -928,6 +939,11 @@ void vtkKWSelectionFrame::UpdateSelectionListMenuButton()
       callback += *it;
       callback += "}";
       menu->AddRadioButton((*it).c_str(), this, callback.c_str());
+      if (insert_break)
+        {
+        insert_break = 0;
+        menu->SetItemColumnBreak(menu->GetNumberOfItems() - 1, 1);
+        }
       }
     }
 
