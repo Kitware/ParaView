@@ -73,7 +73,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.64");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.65");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -224,8 +224,8 @@ void vtkKWSelectionFrameLayoutManager::Pack()
       this->CreateWidget(it->Widget);
       if (it->Widget->IsCreated())
         {
-        if (it->Position[0] < this->Resolution[0] && 
-            it->Position[1] < this->Resolution[1])
+        if (it->Position[0] >= 0 && it->Position[0] < this->Resolution[0] && 
+            it->Position[1] >= 0 && it->Position[1] < this->Resolution[1])
           {
           tk_cmd << "grid " << it->Widget->GetWidgetName() 
                  << " -sticky news "
@@ -275,7 +275,7 @@ void vtkKWSelectionFrameLayoutManager::Pack()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::SetWidgetPosition(
+int vtkKWSelectionFrameLayoutManager::SetWidgetPositionInternal(
   vtkKWSelectionFrame *widget, int col, int row)
 {
   if (widget)
@@ -290,10 +290,22 @@ int vtkKWSelectionFrameLayoutManager::SetWidgetPosition(
         {
         it->Position[0] = col;
         it->Position[1] = row;
-        this->Pack();
         return 1;
         }
       }
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::SetWidgetPosition(
+  vtkKWSelectionFrame *widget, int col, int row)
+{
+  if (this->SetWidgetPositionInternal(widget, col, row))
+    {
+    this->Pack();
+    return 1;
     }
 
   return 0;

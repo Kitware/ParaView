@@ -356,6 +356,11 @@ protected:
   // a helper to the public RemoveWidget methods.
   virtual void DeleteWidget(vtkKWSelectionFrame *widget);
 
+  // Description:
+  // Set the widget position without repacking
+  virtual int SetWidgetPositionInternal(
+    vtkKWSelectionFrame *w, int col, int row);
+
 private:
 
   vtkKWSelectionFrameLayoutManager(const vtkKWSelectionFrameLayoutManager&); // Not implemented
