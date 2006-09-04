@@ -73,7 +73,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.65");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.66");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -422,9 +422,47 @@ void vtkKWSelectionFrameLayoutManager::SetResolution(int i, int j)
   this->UpdateResolutionEntriesMenu();
   this->UpdateResolutionEntriesToolbar();
 
-  this->ReorganizeWidgetPositions();
+  // Save the selection position
 
+  int sel_pos[2];
+  vtkKWSelectionFrame *old_selection = this->GetSelectedWidget();
+  if (old_selection)
+    {
+    this->GetWidgetPosition(old_selection, sel_pos);
+    }
+
+  // Reorganize and pack
+
+  this->ReorganizeWidgetPositions();
   this->Pack();
+
+  // If the selection disappeared because the resolution shrunk, select
+  // something else
+  
+  if (old_selection &&
+      (sel_pos[0] >= this->Resolution[0] || sel_pos[1] >= this->Resolution[1]))
+    {
+    if (sel_pos[0] >= this->Resolution[0])
+      {
+      sel_pos[0] = this->Resolution[0] - 1;
+      }
+    if (sel_pos[1] >= this->Resolution[1])
+      {
+      sel_pos[1] = this->Resolution[1] - 1;
+      }
+    vtkKWSelectionFrame *try_selection = this->GetWidgetAtPosition(sel_pos);
+    if (!try_selection)
+      {
+      for (int row = 0; row < this->Resolution[1] && !try_selection; row++)
+        {
+        for (int col = 0; col < this->Resolution[0] && !try_selection; col++)
+          {
+          try_selection = this->GetWidgetAtPosition(col, row);
+         }
+        }
+      }
+    this->SelectWidget(try_selection);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1657,6 +1695,9 @@ int vtkKWSelectionFrameLayoutManager::SwitchWidgetsPosition(
     return 0;
     }
   
+  this->SetWidgetPositionInternal(w1, -1, -1);
+  this->SetWidgetPositionInternal(w2, -1, -1);
+
   this->SetWidgetPosition(w1, pos2);
   this->SetWidgetPosition(w2, pos1);
   
