@@ -343,18 +343,18 @@ bool pqMultiViewFrame::eventFilter(QObject* caller, QEvent* e)
     }
   else if(e->type() == QEvent::DragEnter)
     {
-    QDragEnterEvent* dragEvent=reinterpret_cast<QDragEnterEvent*>(e);
-    emit(dragEnter(this,dragEvent));
+    QDragEnterEvent* de=reinterpret_cast<QDragEnterEvent*>(e);
+    emit(dragEnter(this,de));
     }
   else if(e->type() == QEvent::DragMove)
     {
-    QDragMoveEvent* dragEvent=reinterpret_cast<QDragMoveEvent*>(e);
-    emit(dragMove(this,dragEvent));
+    QDragMoveEvent* de=reinterpret_cast<QDragMoveEvent*>(e);
+    emit(dragMove(this,de));
     }
   else if(e->type() == QEvent::Drop)
     {
-    QDropEvent* dropEvent=reinterpret_cast<QDropEvent*>(e);
-    emit(drop(this,dropEvent));
+    QDropEvent* de=reinterpret_cast<QDropEvent*>(e);
+    emit(drop(this,de));
     }
 
   return caller->event(e);
