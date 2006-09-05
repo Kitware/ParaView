@@ -73,6 +73,7 @@ public:
     {
     this->Links = new pqPropertyLinks;
     this->InterpolationAdaptor = 0;
+    this->ColorAdaptor = 0;
     }
 
   ~pqDisplayProxyEditorInternal()
@@ -86,6 +87,7 @@ public:
   // The display whose properties are being edited.
   QPointer<pqPipelineDisplay> Display;
   pqSignalAdaptorComboBox* InterpolationAdaptor;
+  pqSignalAdaptorColor*    ColorAdaptor;
   
 };
 
@@ -137,6 +139,11 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
   this->Internal->Links->addPropertyLink(this->Internal->ViewData,
     "checked", SIGNAL(stateChanged(int)),
     displayProxy, displayProxy->GetProperty("Visibility"));
+
+  // setup for choosing color
+  this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
+    "color", SIGNAL(colorChanged(const QVariant&)),
+    displayProxy, displayProxy->GetProperty("Color"));
 
 
   // setup for interpolation
@@ -361,6 +368,11 @@ void pqDisplayProxyEditor::setupGUIConnections()
   QObject::connect(this->Internal->InterpolationAdaptor, 
     SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateView()),
     Qt::QueuedConnection);
+    
+  this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
+                            this->Internal->ColorActorColor,
+                            "chosenColor",
+                            SIGNAL(chosenColorChanged(const QColor&)), false);
 }
 
 //-----------------------------------------------------------------------------

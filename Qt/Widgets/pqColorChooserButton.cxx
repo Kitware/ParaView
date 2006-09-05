@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QColorDialog>
+#include <QPainter>
 
 pqColorChooserButton::pqColorChooserButton(QWidget* p)
   : QPushButton(p)
@@ -52,8 +53,16 @@ void pqColorChooserButton::setChosenColor(const QColor& color)
   if(color.isValid() && color != this->Color)
     {
     this->Color = color;
-    QPixmap pix(20, 20);
-    pix.fill(this->Color);
+    int sz = qRound(this->height() * 0.5);
+    
+    QPixmap pix(sz, sz);
+    pix.fill(QColor(0,0,0,0));
+    QPainter painter(&pix);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setBrush(QBrush(color));
+    painter.drawEllipse(1,1,sz-2,sz-2);
+    painter.end();
+
     this->setIcon(QIcon(pix));
     emit this->chosenColorChanged(this->Color);
     }
