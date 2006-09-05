@@ -27,6 +27,7 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointLabelDisplayProxy);
 vtkCxxRevisionMacro(vtkSMPointLabelDisplayProxy, "Revision: 1.1$");
@@ -132,14 +133,15 @@ void vtkSMPointLabelDisplayProxy::SetupPipeline()
   vtkSMProxyProperty* pp;
 
   vtkClientServerStream stream;
+
+  vtkSMIntVectorProperty *otype = vtkSMIntVectorProperty::SafeDownCast(this->CollectProxy->GetProperty("OutputDataType"));
+  if (otype != NULL)
+    {
+    otype->SetElement(0,4); //vtkUnstructuredGrid
+    }
   
   for (unsigned int i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs();i++)
     {
-    stream << vtkClientServerStream::Invoke
-           << this->CollectProxy->GetID(i) 
-           << "SetOutputDataType"
-           << VTK_UNSTRUCTURED_GRID
-           << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
       << this->CollectProxy->GetID(i) << "GetOutputPort"
       << vtkClientServerStream::End;
