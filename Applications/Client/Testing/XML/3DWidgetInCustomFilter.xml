@@ -7,41 +7,7 @@
   <pqevent object="MainWindow/menubar/menuFilters/Released" command="activate" arguments="Clip" />
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionToolsCreateCustomFilter" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="M" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="M" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="My" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="My" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="M" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="P" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PVE" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PVE" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="P" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_T" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_T" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Te" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Tes" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_M" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_M" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_My" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_My_" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_My_C" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_My_CL" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_My_CL" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_My_CLi" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_My_CL" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_My_C" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_My_Cl" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_My_Clip" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="PV_Test_My_Clip" />
+  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="Clip" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputPipeline" command="currentChanged" arguments="/0|0" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="I" />
