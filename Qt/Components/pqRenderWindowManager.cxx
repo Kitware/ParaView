@@ -60,6 +60,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXMLUtil.h"
 #include "pqUndoStack.h"
 
+#if WIN32
+#include "process.h"
+#define getpid _getpid
+#else
+#include "unistd.h"
+#endif
+
 template<class T>
 uint qHash(const QPointer<T> key)
 {
@@ -429,8 +436,7 @@ void pqRenderWindowManager::frameDragStart(pqMultiViewFrame* frame)
   QDataStream dataStream(&output, QIODevice::WriteOnly);
   dataStream<<frame->uniqueID();
 
-  QString mimeType("application/paraview3/");
-  mimeType.append(qApp->sessionId().toLower());
+  QString mimeType = QString("application/paraview3/%1").arg(getpid());
 
   QMimeData *mimeData = new QMimeData;
   mimeData->setData(mimeType, output);
@@ -445,9 +451,7 @@ void pqRenderWindowManager::frameDragStart(pqMultiViewFrame* frame)
 void pqRenderWindowManager::frameDragEnter(pqMultiViewFrame*,
                                            QDragEnterEvent* e)
 {
-  QString mimeType("application/paraview3/");
-  mimeType.append(qApp->sessionId().toLower());
-
+  QString mimeType = QString("application/paraview3/%1").arg(getpid());
   if(e->mimeData()->hasFormat(mimeType))
     {
     e->accept();
@@ -460,8 +464,7 @@ void pqRenderWindowManager::frameDragEnter(pqMultiViewFrame*,
 void pqRenderWindowManager::frameDragMove(pqMultiViewFrame*,
                                           QDragMoveEvent* e)
 {
-  QString mimeType("application/paraview3/");
-  mimeType.append(qApp->sessionId().toLower());
+  QString mimeType = QString("application/paraview3/%1").arg(getpid());
   if(e->mimeData()->hasFormat(mimeType))
     {
     e->accept();
@@ -474,8 +477,7 @@ void pqRenderWindowManager::frameDragMove(pqMultiViewFrame*,
 void pqRenderWindowManager::frameDrop(pqMultiViewFrame* acceptingFrame,
                                       QDropEvent* e)
 {
-  QString mimeType("application/paraview3/");
-  mimeType.append(qApp->sessionId().toLower());
+  QString mimeType = QString("application/paraview3/%1").arg(getpid());
   if (e->mimeData()->hasFormat(mimeType))
     {
     QByteArray input= e->mimeData()->data(mimeType);
