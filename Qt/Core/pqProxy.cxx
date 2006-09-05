@@ -157,6 +157,7 @@ void pqProxy::rename(const QString& newname)
     newname.toStdString().c_str(), this->getProxy());
   pxm->UnRegisterProxy(this->getSMGroup().toStdString().c_str(),
     this->getSMName().toStdString().c_str(), this->getProxy());
+  this->SMName = newname;
 }
 
 //-----------------------------------------------------------------------------
