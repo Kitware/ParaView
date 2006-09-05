@@ -34,8 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqObjectPanelInterface_h
 
 #include <QString>
-class QWidget;
 class pqObjectPanel;
+class QWidget;
+class vtkSMProxy;
 
 /// interface class for plugins that create pqObjectPanels
 class pqObjectPanelInterface
@@ -43,6 +44,9 @@ class pqObjectPanelInterface
 public:
   /// destructor
   virtual ~pqObjectPanelInterface() {}
+
+  /// returns if panel can be created of the proxy.
+  virtual bool canCreatePanel(vtkSMProxy* proxy) const = 0;
 
   virtual pqObjectPanel* createPanel(QWidget* p) = 0;
 

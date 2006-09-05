@@ -69,6 +69,12 @@ pqObjectPanel* pqStreamTracerPanelInterface::createPanel(QWidget* p)
   return new pqStreamTracerPanel(p);
 }
 
+bool pqStreamTracerPanelInterface::canCreatePanel(vtkSMProxy* proxy) const
+{
+  return (proxy && QString("filters") == proxy->GetXMLGroup() &&
+    QString("StreamTracer") == proxy->GetXMLName());
+}
+
 Q_EXPORT_PLUGIN(pqStreamTracerPanelInterface)
 Q_IMPORT_PLUGIN(pqStreamTracerPanelInterface)
 

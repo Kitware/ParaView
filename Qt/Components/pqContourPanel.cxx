@@ -67,6 +67,12 @@ pqObjectPanel* pqContourPanelInterface::createPanel(QWidget* p)
   return new pqContourPanel(p);
 }
 
+bool pqContourPanelInterface::canCreatePanel(vtkSMProxy* p) const
+{
+  return (p && p->GetXMLName() == QString("Contour") 
+    && p->GetXMLGroup() == QString("filters"));
+}
+
 Q_EXPORT_PLUGIN(pqContourPanelInterface)
 Q_IMPORT_PLUGIN(pqContourPanelInterface)
 

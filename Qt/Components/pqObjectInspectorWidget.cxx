@@ -198,7 +198,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     const QString xml_name = proxy->getProxy()->GetXMLName();
       
     // search static plugins for a panel
-    this->CurrentPanel = this->Loader.createPanel(xml_name);
+    this->CurrentPanel = this->Loader.createPanel(proxy->getProxy());
 
     // if there's no panel from a plugin, check the ui resources
     if(!this->CurrentPanel)

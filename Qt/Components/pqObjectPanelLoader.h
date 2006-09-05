@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 class pqObjectPanelInterface;
 class pqObjectPanel;
-
+class vtkSMProxy;
 
 /// loader class that creates panels from plugins
 /// for now, it only supports static plugins
@@ -51,7 +51,7 @@ public:
   ~pqObjectPanelLoader();
 
   /// create a widget from a plugin
-  pqObjectPanel* createPanel(const QString& className,
+  pqObjectPanel* createPanel(vtkSMProxy* proxy,
                               QWidget* parent = 0);
 
   QStringList availableWidgets() const;

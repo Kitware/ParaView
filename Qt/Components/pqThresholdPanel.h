@@ -79,6 +79,7 @@ class pqThresholdPanelInterface : public QObject, public pqObjectPanelInterface
 public:
   virtual QString name() const;
   virtual pqObjectPanel* createPanel(QWidget* p);
+  virtual bool canCreatePanel(vtkSMProxy* proxy) const; 
 };
 
 #endif

@@ -66,6 +66,11 @@ pqObjectPanel* pqCalculatorPanelInterface::createPanel(QWidget* p)
   return new pqCalculatorPanel(p);
 }
 
+bool pqCalculatorPanelInterface::canCreatePanel(vtkSMProxy* p) const
+{
+  return (p && p->GetXMLName() == QString("Calculator") 
+    && p->GetXMLGroup() == QString("filters"));
+}
 Q_EXPORT_PLUGIN(pqCalculatorPanelInterface)
 Q_IMPORT_PLUGIN(pqCalculatorPanelInterface)
 

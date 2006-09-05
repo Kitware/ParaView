@@ -65,6 +65,12 @@ pqObjectPanel* pqThresholdPanelInterface::createPanel(QWidget* p)
   return new pqThresholdPanel(p);
 }
 
+bool pqThresholdPanelInterface::canCreatePanel(vtkSMProxy* proxy) const
+{
+  return (proxy && QString("Threshold") == proxy->GetXMLName()
+     && QString("filters") == proxy->GetXMLGroup());
+}
+
 Q_EXPORT_PLUGIN(pqThresholdPanelInterface)
 Q_IMPORT_PLUGIN(pqThresholdPanelInterface)
 

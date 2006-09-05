@@ -63,6 +63,12 @@ pqObjectPanel* pqCutPanelInterface::createPanel(QWidget* p)
   return new pqCutPanel(p);
 }
 
+bool pqCutPanelInterface::canCreatePanel(vtkSMProxy* p) const
+{
+  return (p && p->GetXMLName() == QString("Cut") 
+    && p->GetXMLGroup() == QString("filters"));
+}
+
 Q_EXPORT_PLUGIN(pqCutPanelInterface)
 Q_IMPORT_PLUGIN(pqCutPanelInterface)
 

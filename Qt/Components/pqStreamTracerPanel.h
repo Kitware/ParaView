@@ -71,6 +71,7 @@ class pqStreamTracerPanelInterface : public QObject, public pqObjectPanelInterfa
 public:
   virtual QString name() const;
   virtual pqObjectPanel* createPanel(QWidget* p);
+  virtual bool canCreatePanel(vtkSMProxy* proxy) const;
 };
 
 #endif

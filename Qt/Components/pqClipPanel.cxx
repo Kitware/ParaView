@@ -63,6 +63,12 @@ pqObjectPanel* pqClipPanelInterface::createPanel(QWidget* p)
 {
   return new pqClipPanel(p);
 }
+ 
+bool pqClipPanelInterface::canCreatePanel(vtkSMProxy* proxy) const
+{
+  return (proxy && QString("filters") == proxy->GetXMLGroup() &&
+    QString("Clip") == proxy->GetXMLName());
+}
 
 Q_EXPORT_PLUGIN(pqClipPanelInterface)
 Q_IMPORT_PLUGIN(pqClipPanelInterface)

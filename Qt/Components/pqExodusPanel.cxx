@@ -69,6 +69,12 @@ pqObjectPanel* pqExodusPanelInterface::createPanel(QWidget* p)
   return new pqExodusPanel(p);
 }
 
+bool pqExodusPanelInterface::canCreatePanel(vtkSMProxy* proxy) const
+{
+  return (proxy && QString("sources") == proxy->GetXMLGroup()
+    && QString("ExodusReader") == proxy->GetXMLName());
+}
+
 Q_EXPORT_PLUGIN(pqExodusPanelInterface)
 Q_IMPORT_PLUGIN(pqExodusPanelInterface)
 
