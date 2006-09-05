@@ -77,9 +77,9 @@ pqServerStartupDialog::~pqServerStartupDialog()
   delete this->Implementation;
 }
 
-void pqServerStartupDialog::closeEvent(QCloseEvent* event)
+void pqServerStartupDialog::closeEvent(QCloseEvent* e)
 {
-  event->ignore();
+  e->ignore();
 }
 
 void pqServerStartupDialog::reject()
