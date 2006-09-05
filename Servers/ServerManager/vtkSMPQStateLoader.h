@@ -62,6 +62,10 @@ protected:
   // types.
   virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
 
+  // Overridden to avoid registering the reused rendermodules twice.
+  virtual void RegisterProxyInternal(const char* group, 
+    const char* name, vtkSMProxy* proxy);
+
   vtkSMMultiViewRenderModuleProxy* MultiViewRenderModuleProxy;
   int UseExistingRenderModules;
   int UsedExistingRenderModules;
