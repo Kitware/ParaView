@@ -339,7 +339,8 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
       "ServerManagerState");
     }
 
-  if (vtkSMPQStateLoader* pqLoader = vtkSMPQStateLoader::SafeDownCast(loader))
+  vtkSMPQStateLoader* pqLoader = vtkSMPQStateLoader::SafeDownCast(loader);
+  if (pqLoader)
     {
     pqLoader->SetUseExistingRenderModules(1);
     pqLoader->SetMultiViewRenderModuleProxy(server->GetRenderModule());
@@ -357,6 +358,12 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
   // Clear undo stack.
   this->Internal->UndoStack->Clear();
 
+  if (pqLoader)
+    {
+    // this is necessary to avoid unnecesary references to the render module,
+    // enabling the proxy to be cleaned up before server disconnect.
+    pqLoader->SetMultiViewRenderModuleProxy(0);
+    }
   emit this->stateLoaded();
 }
 

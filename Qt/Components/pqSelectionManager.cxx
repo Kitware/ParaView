@@ -455,16 +455,19 @@ void pqSelectionManager::setActiveRenderModule(pqRenderModule* rm)
 
   QObject::connect(this->Implementation->RenderModule, SIGNAL(endRender()),
     this, SLOT(updateSelections()));
+}
 
+//-----------------------------------------------------------------------------
+void pqSelectionManager::initializeSelectionSource(vtkIdType connId)
+{
   // If no selection proxy for the current connection exists,
   // create one
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
-  vtkIdType connId = rmp->GetConnectionID();
-
   pqSelectionManagerImplementation::ServerSelectionsType::iterator iter = 
     this->Implementation->ServerSelections.find(connId);
-  if (iter == this->Implementation->ServerSelections.end())
+  if (iter == this->Implementation->ServerSelections.end()
+    || iter->second.SelectionDataSource == NULL)
     {
     // Create a selection source for this connection.
     vtkSMSourceProxy* selectionSource = 
@@ -477,7 +480,6 @@ void pqSelectionManager::setActiveRenderModule(pqRenderModule* rm)
       selectionSource;
     selectionSource->Delete();
     }
-
 }
 
 //-----------------------------------------------------------------------------
@@ -507,6 +509,12 @@ void pqSelectionManager::setActiveSelection(
   if (this->Implementation->InSetActiveSelection)
     {
     return;
+    }
+
+  if (selectionProxy)
+    {
+    // make sure that the selection source is set up for this connection.
+    this->initializeSelectionSource(cid);
     }
 
   this->Implementation->InSetActiveSelection = true;
@@ -593,11 +601,12 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
   this->Implementation->Xe = eventpos[0];
   this->Implementation->Ye = eventpos[1];
 
- 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
   vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
   vtkIdType connId = rmp->GetConnectionID();
+  // set up selection source if none already exists.
+  this->initializeSelectionSource(connId);
 
   vtkSMSelectionProxy* sourceSelection = vtkSMSelectionProxy::SafeDownCast(
       pxm->NewProxy("selection_helpers", "Selection"));

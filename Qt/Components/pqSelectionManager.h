@@ -145,6 +145,11 @@ private:
   // called when selection is updated. Updates views/displays are fires
   // selectionChanged() signal.
   void selectionChanged(vtkIdType cid);
+
+  // creates the SelectionSource proxy for the connection if none
+  // exists.
+  void initializeSelectionSource(vtkIdType cid);
+
 };
 
 
