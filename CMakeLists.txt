@@ -43,6 +43,15 @@ MARK_AS_ADVANCED(VTK_WRAP_HINTS)
 
 SET(VTK_GENERATE_TK_INTERNALS 1)
 
+#############################################################################
+# ParaView requires X on Apple.
+IF(APPLE)
+  SET(VTK_USE_CARBON OFF CACHE INTERNAL "ParaView needs X" FORCE)
+  SET(VTK_USE_COCOA OFF CACHE INTERNAL "ParaView needs X" FORCE)
+  SET(VTK_USE_X ON CACHE INTERNAL "ParaView needs X" FORCE)
+  MARK_AS_ADVANCED(VTK_USE_CARBON VTK_USE_COCOA VTK_USE_X)
+ENDIF(APPLE)
+
 #########################################################################
 # Include the file that most of the environment setup (except GUI).
 INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
