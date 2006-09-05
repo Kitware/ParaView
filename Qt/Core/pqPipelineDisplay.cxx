@@ -444,36 +444,6 @@ void pqPipelineDisplay::onVisibilityChanged()
 }
 
 //-----------------------------------------------------------------------------
-/*
-// This save state must go away. GUI just needs to save which window
-// contains rendermodule with what ID.  ProxyManager will manage the display.
-void pqPipelineDisplay::SaveState(vtkPVXMLElement *root,
-    pqMultiView *multiView)
-{
-  if(!root || !multiView || !this->Internal)
-    {
-    return;
-    }
-
-  vtkPVXMLElement *element = 0;
-  QList<pqPipelineDisplayItem *>::Iterator iter = this->Internal->begin();
-  for( ; iter != this->Internal->end(); ++iter)
-    {
-    if((*iter)->Window && !(*iter)->DisplayName.isEmpty())
-      {
-      element = vtkPVXMLElement::New();
-      element->SetName("Display");
-      element->AddAttribute("name", (*iter)->DisplayName.toAscii().data());
-      element->AddAttribute("windowID", pqXMLUtil::GetStringFromIntList(
-          multiView->indexOf((*iter)->Window->parentWidget())).toAscii().data());
-      root->AddNestedElement(element);
-      element->Delete();
-      }
-    }
-}*/
-
-
-//-----------------------------------------------------------------------------
 void pqPipelineDisplay::getColorArray(
   vtkPVDataSetAttributesInformation* attrInfo,
   vtkPVDataSetAttributesInformation* inAttrInfo,
