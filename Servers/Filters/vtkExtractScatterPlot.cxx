@@ -25,9 +25,9 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnsignedLongArray.h"
 
-#include <iostream>
+#include "vtkIOStream.h"
 
-vtkCxxRevisionMacro(vtkExtractScatterPlot, "1.5");
+vtkCxxRevisionMacro(vtkExtractScatterPlot, "1.6");
 vtkStandardNewMacro(vtkExtractScatterPlot);
 
 vtkExtractScatterPlot::vtkExtractScatterPlot() :
