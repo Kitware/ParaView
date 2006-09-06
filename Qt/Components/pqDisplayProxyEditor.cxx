@@ -373,6 +373,9 @@ void pqDisplayProxyEditor::setupGUIConnections()
                             this->Internal->ColorActorColor,
                             "chosenColor",
                             SIGNAL(chosenColorChanged(const QColor&)), false);
+  QObject::connect(
+    this->Internal->ColorActorColor, SIGNAL(chosenColorChanged(const QColor&)),
+    this, SLOT(updateView()));
 }
 
 //-----------------------------------------------------------------------------
