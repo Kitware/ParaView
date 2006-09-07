@@ -182,6 +182,15 @@ public:
   void UpdateRegisteredProxies(int modified_only=1);
 
   // Description:
+  // Updates all registered proxies in order, respecting dependencies
+  // among each other. This is used after loading state or after instantiating
+  // a compound proxy. This uses the "UpdateInputProxies" flag which 
+  // vtkSMProxy checks in UpdateVTKObjects() to call UpdateVTKObjects() on the input
+  // proxies as well if the flag is set.
+  void UpdateRegisteredProxiesInOrder(int modified_only=1);
+  void UpdateProxyInOrder(vtkSMProxy* proxy);
+
+  // Description:
   // Register proxy/property links with the server manager. The linknames
   // must be unique, if a link with the given name already exists, it will be replaced.
   void RegisterLink(const char* linkname, vtkSMLink* link);
@@ -326,6 +335,13 @@ public:
   // if any, otherwise returns NULL. 
   vtkPVXMLElement* GetHints(const char* xmlgroup, const char* xmlname);
 
+  // Description:
+  // Check if UpdateInputProxies flag is set.
+  // This is used after loading state or after instantiating
+  // a compound proxy. This uses the "UpdateInputProxies" flag which 
+  // vtkSMProxy checks in UpdateVTKObjects() to call UpdateVTKObjects() on the input
+  // proxies as well if the flag is set.
+  vtkGetMacro(UpdateInputProxies, int);
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
@@ -371,6 +387,7 @@ protected:
   void SaveStateInternal(vtkIdType connectionID, vtkPVXMLElement* root, 
     int revival);
 
+  int UpdateInputProxies;
 private:
   vtkSMProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;

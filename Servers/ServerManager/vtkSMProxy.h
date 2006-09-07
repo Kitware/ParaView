@@ -366,9 +366,11 @@ public:
   // if any, otherwise returns NULL. This method is a convenience method,
   // one can use the vtkSMProxyManager::GetHints() as well. 
   vtkPVXMLElement* GetHints();
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
+
 
   // Description:
   // Overloaded for garbage collection.
@@ -654,6 +656,7 @@ protected:
 
   // Flag used to break consumer loops.
   int InMarkModified;
+
 private:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
