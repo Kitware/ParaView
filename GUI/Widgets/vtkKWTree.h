@@ -111,7 +111,11 @@ public:
   // Description:
   // Delete all nodes
   virtual void DeleteAllNodes();
-
+  
+  // Description:
+  // Delete all child nodes of the given node
+  virtual void DeleteNodeChildren(const char *node);
+  
   // Description:
   // Get node's children as a space separated list of nodes
   virtual const char* GetNodeChildren(const char *node);
@@ -399,6 +403,10 @@ public:
   virtual void SelectionCallback();
   virtual void RightClickOnNodeCallback(const char *node);
   virtual void KeyPressDeleteCallback();
+  // This callback is used to add KeyPress-Home, End, Prior(PageUp),
+  // Next(PageDown) handling for the tree. These KeyPress envents will move
+  // the view area accordingly and also select the proper node.
+  virtual void KeyNavigationCallback(const char* key);
 
 protected:
   vtkKWTree();
