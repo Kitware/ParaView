@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventDispatcher.h"
 
 #include <QAbstractEventDispatcher>
+#include <QTimer>
 #include <QtDebug>
 #include <QtTest>
 
@@ -48,10 +49,13 @@ public:
     Source(0),
     Player(0)
   {
+    this->Timer.setInterval(1);
+    this->Timer.setSingleShot(true);
   }
   
   pqEventSource* Source;
   pqEventPlayer* Player;
+  QTimer Timer;
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -79,13 +83,18 @@ void pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
   this->Implementation->Player = &player;
     
   QApplication::setEffectEnabled(Qt::UI_General, false);
-  
+
   QObject::connect(
     QAbstractEventDispatcher::instance(),
     SIGNAL(aboutToBlock()),
+    &this->Implementation->Timer,
+    SLOT(start()));
+  
+  QObject::connect(
+    &this->Implementation->Timer,
+    SIGNAL(timeout()),
     this,
-    SLOT(playNextEvent()),
-    Qt::QueuedConnection);
+    SLOT(playNextEvent()));
 }
   
 void pqEventDispatcher::playNextEvent()
@@ -115,6 +124,12 @@ void pqEventDispatcher::stopPlayback()
   QObject::disconnect(
     QAbstractEventDispatcher::instance(),
     SIGNAL(aboutToBlock()),
+    &this->Implementation->Timer,
+    SLOT(start()));
+  
+  QObject::disconnect(
+    &this->Implementation->Timer,
+    SIGNAL(timeout()),
     this,
     SLOT(playNextEvent()));
     
