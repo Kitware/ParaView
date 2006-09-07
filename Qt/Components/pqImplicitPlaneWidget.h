@@ -55,6 +55,13 @@ public:
   /// 3D widget.
   virtual void setControlledProxy(vtkSMProxy*);
 
+  /// A implicit plane widget can optionally have  a ScaleFactor/ScaleOrigin
+  /// which affects how the widget is placed on reset bounds.
+  void setScaleFactor(double scale[3]);
+  void setScaleOrigin(double origin[3]);
+
+  /// Resets the bounds of the 3D widget to the reference proxy bounds.
+  virtual void resetBounds();
 public slots:
   /// Makes the 3D widget plane visible (respects the overall visibility flag)
   virtual void showPlane();
@@ -75,8 +82,7 @@ protected:
   virtual void set3DWidgetVisibility(bool visible);
 
 protected:
-  /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  virtual void resetBounds();
+
 
   /// Internal method to create the widget.
   void createWidget(pqServer*);
@@ -111,6 +117,8 @@ private:
   void setNormalProperty(vtkSMProperty*);
   void setOriginProperty(vtkSMProperty*);
 
+  double ScaleFactor[3];
+  double ScaleOrigin[3];
   class pqImplementation;
   pqImplementation* const Implementation;
 };

@@ -95,6 +95,14 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
   pq3DWidget(p),
   Implementation(new pqImplementation())
 {
+  this->ScaleFactor[0] = 1;
+  this->ScaleFactor[1] = 1;
+  this->ScaleFactor[2] = 1;
+
+  this->ScaleOrigin[0] = 0;
+  this->ScaleOrigin[1] = 0;
+  this->ScaleOrigin[2] = 0;
+
   this->Implementation->StartDragObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetStartDrag));
   this->Implementation->EndDragObserver.TakeReference(
@@ -309,6 +317,22 @@ void pqImplicitPlaneWidget::onShow3DWidget(bool show_widget)
 }
 
 //-----------------------------------------------------------------------------
+void pqImplicitPlaneWidget::setScaleFactor(double scale[3])
+{
+  this->ScaleFactor[0] = scale[0];
+  this->ScaleFactor[1] = scale[1];
+  this->ScaleFactor[2] = scale[2];
+}
+
+//-----------------------------------------------------------------------------
+void pqImplicitPlaneWidget::setScaleOrigin(double orgin[3])
+{
+  this->ScaleOrigin[0] = orgin[0];
+  this->ScaleOrigin[1] = orgin[1];
+  this->ScaleOrigin[2] = orgin[2];
+}
+
+//-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::onResetBounds()
 {
   this->resetBounds();
@@ -339,7 +363,8 @@ void pqImplicitPlaneWidget::resetBounds()
         input_size[0] = fabs(input_bounds[1] - input_bounds[0]) * 1.2;
         input_size[1] = fabs(input_bounds[3] - input_bounds[2]) * 1.2;
         input_size[2] = fabs(input_bounds[5] - input_bounds[4]) * 1.2;
-        
+
+       
         if(vtkSMDoubleVectorProperty* const origin =
           vtkSMDoubleVectorProperty::SafeDownCast(
             widget->GetProperty("Origin")))
@@ -358,6 +383,28 @@ void pqImplicitPlaneWidget::resetBounds()
           widget_bounds[3] = input_origin[1] + input_size[1];
           widget_bounds[4] = input_origin[2] - input_size[2];
           widget_bounds[5] = input_origin[2] + input_size[2];
+
+          if (this->ScaleFactor[0] != 1 || this->ScaleFactor[1] != 1
+            || this->ScaleFactor[2] != 1)
+            {
+            // We have some scale factor specified.
+            // widget bounds need to be scaled.
+            widget_bounds[0] = (widget_bounds[0] - this->ScaleOrigin[0])* 
+              this->ScaleFactor[0] + this->ScaleOrigin[0];
+            widget_bounds[1] = (widget_bounds[1] - this->ScaleOrigin[0])* 
+              this->ScaleFactor[0] + this->ScaleOrigin[0];
+
+            widget_bounds[2] = (widget_bounds[2] - this->ScaleOrigin[1])* 
+              this->ScaleFactor[1] + this->ScaleOrigin[1];
+            widget_bounds[3] = (widget_bounds[3] - this->ScaleOrigin[1])* 
+              this->ScaleFactor[1] + this->ScaleOrigin[1];
+
+            widget_bounds[4] = (widget_bounds[4] - this->ScaleOrigin[2])* 
+              this->ScaleFactor[2] + this->ScaleOrigin[2];
+            widget_bounds[5] = (widget_bounds[5] - this->ScaleOrigin[2])* 
+              this->ScaleFactor[2] + this->ScaleOrigin[2];
+            }
+
           
           place_widget->SetElements(widget_bounds);
           
