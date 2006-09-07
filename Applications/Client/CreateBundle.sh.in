@@ -130,3 +130,10 @@ for a in QtCore QtGui QtNetwork QtXml; do
     install_name_tool -change ${QT_LIB_DIR}/$a.framework/Versions/4.0/$a @executable_path/../Frameworks/$a.framework/Versions/4.0/$a $b
   done
 done
+
+echo "Remove unnecessary stuff"
+rm -rf paraview_alpha.app/Contents/Frameworks/*.framework/Versions/Current/Headers
+rm -rf paraview_alpha.app/Contents/Frameworks/*.framework/*debug*
+rm -rf paraview_alpha.app/Contents/Frameworks/*.framework/*.prl
+rm -rf paraview_alpha.app/Contents/Frameworks/*.framework/Versions/Current/*debug*
+rm -rf paraview_alpha.app/Contents/MacOS/doc/CVS
