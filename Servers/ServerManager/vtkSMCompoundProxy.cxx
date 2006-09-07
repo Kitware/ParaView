@@ -20,6 +20,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyInternals.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateLoader.h"
@@ -30,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.13");
 
 struct vtkSMCompoundProxyInternals
 {
@@ -244,7 +245,7 @@ void vtkSMCompoundProxy::UpdateVTKObjects()
     {
     return;
     }
-  this->MainProxy->UpdateVTKObjects();
+  vtkSMProxyManager::GetProxyManager()->UpdateProxyInOrder(this->MainProxy);
   this->Superclass::UpdateVTKObjects();
 }
 

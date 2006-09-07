@@ -88,10 +88,11 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.53");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.54");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
+  this->UpdateInputProxies = 0;
   this->Internals = new vtkSMProxyManagerInternals;
   this->Observer = vtkSMProxyManagerObserver::New();
   this->Observer->SetTarget(this);
@@ -846,6 +847,22 @@ void vtkSMProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
         }
       }
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UpdateRegisteredProxiesInOrder(int modified_only/*=1*/)
+{
+  this->UpdateInputProxies = 1;
+  this->UpdateRegisteredProxies(modified_only);
+  this->UpdateInputProxies = 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UpdateProxyInOrder(vtkSMProxy* proxy)
+{
+  this->UpdateInputProxies = 1;
+  proxy->UpdateVTKObjects();
+  this->UpdateInputProxies = 0;
 }
 
 //---------------------------------------------------------------------------

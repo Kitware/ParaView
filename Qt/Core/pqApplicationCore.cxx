@@ -350,9 +350,7 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     pxm->LoadState(rootElement, server->GetConnectionID(), loader);
-    pxm->UpdateRegisteredProxies("sources", 0);
-    pxm->UpdateRegisteredProxies("displays", 0);
-    pxm->UpdateRegisteredProxies(0);
+    pxm->UpdateRegisteredProxiesInOrder(0);
     }
 
   // Clear undo stack.

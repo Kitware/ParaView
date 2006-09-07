@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.79");
+vtkCxxRevisionMacro(vtkSMProxy, "1.80");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -903,6 +903,31 @@ void vtkSMProxy::UpdateVTKObjects()
       vtkSMProperty* prop = it->second.Property.GetPointer();
       if (prop->IsA("vtkSMInputProperty"))
         {
+        if (vtkSMProxyManager::GetProxyManager()->GetUpdateInputProxies())
+          {
+          // If proxy manager says that input proxies must be updated
+          // before updating ourselves, we must update all
+          // input proxies. Generally speaking, we never want to internally
+          // call UpdateVTKObjects on input proxy. However, while loading
+          // state or creating a compound proxy, we must update the
+          // proxies in order, otherwise the connections may not
+          // be set up correctly resulting in errors. Hence we have
+          // this mechanism that uses the "UpdateInputProxies"
+          // flag on the proxy manager.
+          vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+            it->second.Property);
+          if (pp)
+            {
+            for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); ++cc)
+              {
+              vtkSMProxy* inputProxy= pp->GetProxy(cc);
+              if (inputProxy)
+                {
+                inputProxy->UpdateVTKObjects();
+                }
+              }
+            }
+          }
         this->UpdateProperty(it->first.c_str());
         }
       }
