@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.27");
+vtkCxxRevisionMacro(vtkKWTree, "1.28");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -114,15 +114,15 @@ void vtkKWTree::CreateWidget()
   this->SetBindText("<ButtonPress-3>", this, "RightClickOnNodeCallback");
   
   // Bind some extra hotkeys 
-  this->Script("bind %s.c <KeyPress-Next> [list %s yview scroll 1 pages]",
-               this->GetWidgetName(), this->GetWidgetName());
-  this->Script("bind %s.c <KeyPress-Prior> [list %s yview scroll -1 pages]",
-               this->GetWidgetName(), this->GetWidgetName());
-  this->Script("bind %s.c <KeyPress-Home> [list %s yview moveto 0]",
-               this->GetWidgetName(), this->GetWidgetName());
-  this->Script("bind %s.c <KeyPress-End> [list %s yview moveto 1]",
-               this->GetWidgetName(), this->GetWidgetName());
   this->Script("bind %s.c <KeyPress-Delete> [list %s KeyPressDeleteCallback]",
+               this->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s.c <KeyPress-Next> [list %s KeyNavigationCallback Next]",
+               this->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s.c <KeyPress-Prior> [list %s KeyNavigationCallback Prior]",
+               this->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s.c <KeyPress-Home> [list %s KeyNavigationCallback Home]",
+               this->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s.c <KeyPress-End> [list %s KeyNavigationCallback End]",
                this->GetWidgetName(), this->GetTclName());
 }
 
@@ -182,6 +182,86 @@ void vtkKWTree::KeyPressDeleteCallback()
   if (this->IsCreated() && this->HasSelection())
     {
     this->InvokeKeyPressDeleteCommand();
+    }
+}
+
+//----------------------------------------------------------------------------
+//Reference: "proc Tree::_keynav {which win}" in tree.tcl
+//           "proc Tree::_see { path idn } in tree.tcl
+void vtkKWTree::KeyNavigationCallback(const char* key)
+{
+  if (this->IsCreated() && this->HasSelection() && key && *key)
+    {
+    ostrstream tk_cmd;
+    //Get all visible and seletable nodes
+    tk_cmd << "set nodes {}" << endl;
+    tk_cmd << "foreach nodeItem [" 
+           << this->GetWidgetName() 
+           << ".c find withtag node] {" << endl;
+    tk_cmd << "set node [Tree::_get_node_name "
+           <<this->GetWidgetName() << " $nodeItem 2]" << endl;
+    tk_cmd << "if { [Widget::cget " 
+           << this->GetWidgetName() << ".$node -selectable] } {" << endl;
+    tk_cmd << "lappend nodes $node}}" << endl;
+
+    if(strcmp(key, "Next")==0 || strcmp(key, "Prior")==0)
+      {
+      //Get current node
+      tk_cmd << "set node [Tree::_get_current_node "
+        << this->GetWidgetName() << "]" << endl;
+      //Figure out how many units in each page
+      tk_cmd << "set scrl [" << this->GetWidgetName() 
+        <<".c cget -scrollregion]" << endl;
+      tk_cmd << "set ymax [lindex $scrl 3]" << endl;
+      tk_cmd << "set dy   [" << this->GetWidgetName()
+        << ".c cget -yscrollincrement]" << endl;
+      tk_cmd << "set yv   [" << this->GetWidgetName()
+        << " yview]" << endl;
+      tk_cmd << "set yv0  [expr {round([lindex $yv 0]*$ymax/$dy)}]" << endl;
+      tk_cmd << "set yv1  [expr {round([lindex $yv 1]*$ymax/$dy)}]" << endl;
+      tk_cmd << "set pageunits [expr {$yv1-$yv0}]" << endl;
+      // Find out position of current node
+      tk_cmd << "set y    [expr {int([lindex [" 
+        << this->GetWidgetName() 
+        << ".c coords n:$node] 1]/$dy)}]" << endl;
+      if(strcmp(key, "Prior")==0)
+        {
+        tk_cmd << "set index [expr {$y-$pageunits}]" << endl;
+        tk_cmd << "if { $index < 0 } {set index 0}" << endl;
+        }
+      else
+        {
+        tk_cmd << "set index [expr {$y+$pageunits}]" << endl;
+        tk_cmd << "set len [llength $nodes]" << endl;
+        tk_cmd << "if { $index >= $len} {set index [expr {$len-1}]}" << endl;
+        }
+      }
+    else if(strcmp(key, "Home")==0 || strcmp(key, "End")==0)
+      {
+      if(strcmp(key, "Home") == 0)
+        {
+        tk_cmd << "set index 0" << endl;
+        }
+      else
+        {
+        tk_cmd << "set index [expr {[llength $nodes] - 1}]" << endl;
+        }
+      }
+    else
+      {
+      tk_cmd.rdbuf()->freeze(0);
+      return;
+      }
+    // Select and see the new node
+    tk_cmd << this->GetWidgetName() 
+      << " selection set [lindex $nodes $index]" << endl;
+    tk_cmd << "Tree::_set_current_node "
+      << this->GetWidgetName() << " [lindex $nodes $index]" << endl;
+    tk_cmd << this->GetWidgetName() << " see [lindex $nodes $index]" << endl;
+
+    tk_cmd << ends;
+    this->Script(tk_cmd.str());
+    tk_cmd.rdbuf()->freeze(0);
     }
 }
 
@@ -453,6 +533,16 @@ void vtkKWTree::DeleteAllNodes()
     {
     this->Script("%s delete [%s nodes root]", 
                  this->GetWidgetName(), this->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::DeleteNodeChildren(const char *node)
+{
+  if (this->IsCreated())
+    {
+    this->Script("%s delete [%s nodes %s]", 
+                 this->GetWidgetName(), this->GetWidgetName(), node);
     }
 }
 
