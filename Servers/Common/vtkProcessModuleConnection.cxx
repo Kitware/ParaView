@@ -20,8 +20,9 @@
 #include "vtkCommand.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkProcessModuleConnectionManager.h"
+#include "vtkProcessModule.h"
+#include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkSocket.h"
 
 class vtkProcessModuleConnectionObserver : public vtkCommand
@@ -57,14 +58,14 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.8");
+vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.9");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {
   this->SelfID.ID = 0;
   this->Controller = NULL;
   this->AbortConnection = 0;
-
+  this->OpenGLExtensionsInformation = 0;
 
   this->Observer = vtkProcessModuleConnectionObserver::New();
   this->Observer->SetTarget(this);
@@ -80,6 +81,12 @@ vtkProcessModuleConnection::~vtkProcessModuleConnection()
     {
     this->Controller->Delete();
     this->Controller = NULL;
+    }
+
+  if (this->OpenGLExtensionsInformation)
+    {
+    this->OpenGLExtensionsInformation->Delete();
+    this->OpenGLExtensionsInformation = 0;
     }
 }
 
@@ -316,11 +323,38 @@ int vtkProcessModuleConnection::LoadModule(const char* , const char* )
 }
 
 //-----------------------------------------------------------------------------
+vtkPVOpenGLExtensionsInformation* 
+vtkProcessModuleConnection::GetOpenGLExtensionsInformation()
+{
+  if (!this->OpenGLExtensionsInformation)
+    {
+    if (!this->OpenGLExtensionsInformation)
+      {
+      this->OpenGLExtensionsInformation = vtkPVOpenGLExtensionsInformation::New();
+      }
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    this->GatherInformation(vtkProcessModule::RENDER_SERVER,
+      this->OpenGLExtensionsInformation,
+      pm->GetProcessModuleID());
+    }
+  return this->OpenGLExtensionsInformation;
+}
+
+//-----------------------------------------------------------------------------
 void vtkProcessModuleConnection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "AbortConnection: " << this->AbortConnection << endl;
   os << indent << "SelfID: " << this->SelfID << endl;
+  os << indent << "OpenGLExtensionsInformation: " ;
+  if (this->OpenGLExtensionsInformation)
+    {
+    this->OpenGLExtensionsInformation->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
   os << indent << "Controller: ";
   if (this->Controller)
     {

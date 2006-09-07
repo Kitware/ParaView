@@ -27,6 +27,7 @@ SET(Kit_SRCS
   vtkPVInformation.cxx
   vtkPVLODPartDisplayInformation.cxx
   vtkPVNumberOfOutputsInformation.cxx
+  vtkPVOpenGLExtensionsInformation.cxx
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
   vtkPVProgressHandler.cxx
