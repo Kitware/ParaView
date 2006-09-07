@@ -95,6 +95,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
     // python's native prefix then he/she will have to get the
     // packages in sys.path himself/herself.
     const char* inst_dirs[] = {
+      "/MacOS/paraview", // Mac
       "/paraview",
       "/../lib/paraview-" PARAVIEW_VERSION "/paraview",
       "/../../lib/paraview-" PARAVIEW_VERSION "/paraview",
@@ -177,7 +178,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.2");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
