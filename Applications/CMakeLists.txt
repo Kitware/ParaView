@@ -29,11 +29,26 @@ INCLUDE_DIRECTORIES(
   ${QtPython_BINARY_DIR}
 )
 
-SUBDIRS(
-  Client
-  CustomServer
-  DobranoViz
-  Prism
-  PGraph
-)
+
+MACRO(paraview_build_optional_application name comment subdirectory default)
+  OPTION(PARAVIEW_BUILD_${name} "Build ${comment}" ${default})
+  MARK_AS_ADVANCED(PARAVIEW_BUILD_${name})
+  IF(PARAVIEW_BUILD_${name})
+    MESSAGE(STATUS "Application: ${comment} enabled")
+    SUBDIRS("${subdirectory}")
+  ELSE(PARAVIEW_BUILD_${name})
+    MESSAGE(STATUS "Application: ${comment} disabled")
+  ENDIF(PARAVIEW_BUILD_${name})
+ENDMACRO(paraview_build_optional_application)
+
+paraview_build_optional_application(
+  Client "default ParaView Client" Client ON)
+paraview_build_optional_application(
+  CustomServer "Custom Server" CustomServer ON)
+paraview_build_optional_application(
+  DobranoViz "DobranoViz" DobranoViz ON)
+paraview_build_optional_application(
+  Prism "Prism" Prism ON)
+paraview_build_optional_application(
+  PGraph "PGraph" PGraph ON)
 
