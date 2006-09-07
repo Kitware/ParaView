@@ -34,11 +34,12 @@ class vtkDataObject;
 class vtkKWProcessStatistics;
 class vtkMultiProcessController;
 class vtkProcessModuleConnection;
-class vtkProcessModuleInternals;
-class vtkProcessModuleObserver;
 class vtkProcessModuleConnectionManager;
 class vtkProcessModuleGUIHelper;
+class vtkProcessModuleInternals;
+class vtkProcessModuleObserver;
 class vtkPVInformation;
+class vtkPVOpenGLExtensionsInformation;
 class vtkPVOptions;
 class vtkPVProgressHandler;
 class vtkPVServerInformation;
@@ -367,13 +368,19 @@ public:
   unsigned int GetNumberOfMachines();
   const char* GetMachineName(unsigned int idx);
 
-//BTX
   // Description:
   // Earlier, the ServerInformation was synchronized with the
   // ClientOptions.  This no longer is appropriate. Hence, we provide
   // access to the server information on each connection.
   vtkPVServerInformation* GetServerInformation(vtkIdType id);
 
+  // Description:
+  // Returns the rendering extensions information for the given
+  // connection.
+  vtkPVOpenGLExtensionsInformation* 
+    GetOpenGLExtensionsInformation(vtkIdType connectionId);
+
+//BTX
   // Description:
   // Get the ID used for MPIMToNSocketConnection for the given connection.
   vtkClientServerID GetMPIMToNSocketConnectionID(vtkIdType id);

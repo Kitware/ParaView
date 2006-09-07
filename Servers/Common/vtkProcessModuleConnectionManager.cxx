@@ -72,7 +72,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.15");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.16");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -592,6 +592,19 @@ vtkPVServerInformation* vtkProcessModuleConnectionManager::GetServerInformation(
     }
   return 0;
 }
+
+//-----------------------------------------------------------------------------
+vtkPVOpenGLExtensionsInformation* vtkProcessModuleConnectionManager::
+GetOpenGLExtensionsInformation(vtkIdType id)
+{
+  vtkProcessModuleConnection* conn = this->GetConnectionFromID(id);
+  if (conn)
+    {
+    return conn->GetOpenGLExtensionsInformation();
+    }
+  return 0;
+}
+
 //-----------------------------------------------------------------------------
 vtkClientServerID vtkProcessModuleConnectionManager::GetMPIMToNSocketConnectionID(
   vtkIdType id)

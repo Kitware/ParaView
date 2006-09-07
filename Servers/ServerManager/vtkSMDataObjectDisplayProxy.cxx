@@ -19,11 +19,12 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
+#include "vtkProcessModule.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeometryInformation.h"
-#include "vtkProcessModule.h"
+#include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -37,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.21");
 
 
 //-----------------------------------------------------------------------------
@@ -253,17 +254,37 @@ void vtkSMDataObjectDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
   
   if ( this->HasVolumePipeline )
     {
-    // Shouldn't this check be on the render server?
-    vtkHAVSVolumeMapper* mapper = vtkHAVSVolumeMapper::New();
-    if (mapper && mapper->SupportedByHardware())
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkPVOpenGLExtensionsInformation* glinfo =
+    pm->GetOpenGLExtensionsInformation(this->GetConnectionID());
+    if (glinfo)
       {
-      this->SupportsHAVSMapper = 1;
+      // These are extensions needed for HAVS. It would be nice
+      // if these was some way of asking the HAVS mapper the extensions
+      // it needs rather than hardcoding it here.
+      int supports_GL_EXT_texture3D =
+        glinfo->ExtensionSupported( "GL_EXT_texture3D");
+      int supports_GL_EXT_framebuffer_object =
+        glinfo->ExtensionSupported( "GL_EXT_framebuffer_object");
+      int supports_GL_ARB_fragment_program =
+        glinfo->ExtensionSupported( "GL_ARB_fragment_program" );
+      int supports_GL_ARB_vertex_program =
+        glinfo->ExtensionSupported( "GL_ARB_vertex_program" );
+      int supports_GL_ARB_texture_float =
+        glinfo->ExtensionSupported( "GL_ARB_texture_float" );
+      int supports_GL_ATI_texture_float =
+        glinfo->ExtensionSupported( "GL_ATI_texture_float" );
+
+      if ( !supports_GL_EXT_texture3D ||
+        !supports_GL_EXT_framebuffer_object ||
+        !supports_GL_ARB_fragment_program ||
+        !supports_GL_ARB_vertex_program ||
+        !(supports_GL_ARB_texture_float || supports_GL_ATI_texture_float))
+        {
+        this->SupportsHAVSMapper = 1;
+        }
       }
-    if (mapper)
-      {
-      mapper->Delete();
-      mapper = 0;
-      }
+
     if (input->GetDataInformation()->GetNumberOfCells() < 1000000)
       {
       this->SupportsZSweepMapper = 1;

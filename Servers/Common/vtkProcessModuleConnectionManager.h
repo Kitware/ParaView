@@ -67,6 +67,7 @@ class vtkProcessModuleConnection;
 class vtkProcessModuleConnectionManagerObserver;
 class vtkProcessModuleConnectionManagerInternals;
 class vtkPVInformation;
+class vtkPVOpenGLExtensionsInformation;
 class vtkPVServerInformation;
 class vtkPVXMLElement;
 class vtkRemoteConnection;
@@ -280,6 +281,12 @@ public:
   // ClientOptions.  This no longer is appropriate. Hence, we provide
   // access to the server information on each connection.
   vtkPVServerInformation* GetServerInformation(vtkIdType id);
+
+  // Description:
+  // Returns the rendering extensions information for the given
+  // connection.
+  vtkPVOpenGLExtensionsInformation* 
+    GetOpenGLExtensionsInformation(vtkIdType connectionId);
 
   // Description:
   // Get the MPIMToNSocketConnectionID for a given connection.

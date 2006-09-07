@@ -102,7 +102,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.61");
+vtkCxxRevisionMacro(vtkProcessModule, "1.62");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1624,6 +1624,13 @@ vtkPVServerInformation* vtkProcessModule::GetServerInformation(
   vtkPVServerInformation* info = 
     this->ConnectionManager->GetServerInformation(id);
   return (info)? info : this->ServerInformation;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVOpenGLExtensionsInformation* 
+vtkProcessModule::GetOpenGLExtensionsInformation(vtkIdType id)
+{
+  return this->ConnectionManager->GetOpenGLExtensionsInformation(id);
 }
 
 //-----------------------------------------------------------------------------
