@@ -125,6 +125,10 @@ public:
   /// return the array name
   QString getColorField(bool raw=false);
 
+  // If lookuptable is set up and is used for coloring,
+  // then calling this method resets the table ranges to match the current 
+  // range of the selected array.
+  void resetLookupTableScalarRange();
 signals:
   // Fired when the visibility property of the underlying display changes.
   // It must be noted that this is fired on the property change, the property

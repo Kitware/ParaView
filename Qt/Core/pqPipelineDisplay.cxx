@@ -366,6 +366,70 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
 }
 
 //-----------------------------------------------------------------------------
+void pqPipelineDisplay::resetLookupTableScalarRange()
+{
+  vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
+  if (!displayProxy)
+    {
+    return;
+    }
+  if (pqSMAdaptor::getElementProperty(
+      displayProxy->GetProperty("ScalarVisibility")) == 0)
+    {
+    // scalar visibility is off, what to reset the range to?
+    return;
+    }
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    displayProxy->GetProperty("LookupTable"));
+  vtkSMProxy* lut = 0;
+  if (pp->GetNumberOfProxies() > 0)
+    {
+    lut = pp->GetProxy(0);
+    }
+  if (!lut)
+    {
+    // No LUT created, nothing to reset.
+    return;
+    }
+
+  QString arrayName  =  
+    pqSMAdaptor::getElementProperty(
+      displayProxy->GetProperty("ColorArray")).toString();
+  int fieldType = vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA;
+  if (pqSMAdaptor::getEnumerationProperty(
+      displayProxy->GetProperty("ScalarMode")).toString() == "UsePointFieldData")
+    {
+    fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
+    }
+
+  // Now get current array range.
+  vtkPVArrayInformation* ai=0;
+  if(fieldType == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+    {
+    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+    ai = geomInfo->GetCellDataInformation()->GetArrayInformation(
+      arrayName.toStdString().c_str());
+    }
+  else
+    {
+    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+    ai = geomInfo->GetPointDataInformation()->GetArrayInformation(
+      arrayName.toStdString().c_str());
+    }
+
+  double range[2] = {0,1};
+  if(ai)
+    {
+    ai->GetComponentRange(0, range);
+    }
+  QList<QVariant> tmp;
+  tmp += range[0];
+  tmp += range[1];
+  pqSMAdaptor::setMultipleElementProperty(lut->GetProperty("ScalarRange"), tmp);
+  lut->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
 bool pqPipelineDisplay::shownIn(pqRenderModule* rm) const
 {
   return this->Internal->RenderModules.contains(rm);
