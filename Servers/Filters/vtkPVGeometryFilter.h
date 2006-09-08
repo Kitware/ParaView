@@ -125,8 +125,10 @@ protected:
     vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
   void DataSetSurfaceExecute(vtkDataSet* input, vtkPolyData* output);
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
-  int ExecuteCompositeDataSet(
-    vtkMultiGroupDataSet* mgInput, vtkAppendPolyData* append, int& numInputs);
+  int ExecuteCompositeDataSet(vtkMultiGroupDataSet* mgInput, 
+                              vtkAppendPolyData* append, 
+                              int& numInputs,
+                              int updateGroup);
 
   int OutlineFlag;
   int UseOutline;
