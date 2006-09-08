@@ -14,18 +14,14 @@
 =========================================================================*/
 #include "vtkPVTrackballMoveActor.h"
 
+#include "vtkCameraManipulatorGUIHelper.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
-#include "vtkPVDisplayGUI.h"
-#include "vtkPVSource.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVWindow.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.14");
+vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.1");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
@@ -55,30 +51,23 @@ void vtkPVTrackballMoveActor::OnButtonUp(int, int, vtkRenderer *,
 void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
                                           vtkRenderWindowInteractor *rwi)
 {
-  if (ren == NULL)
+  if (ren == NULL || !this->GetGUIHelper())
     {
     return;
     }
 
   // These are different because y is flipped.
-  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
-  if ( !app )
+
+  double bounds[6];
+  // Get bounds
+  if (this->GetGUIHelper()->GetActiveSourceBounds(bounds))
     {
-    return;
-    }
-  vtkPVWindow *window = app->GetMainWindow();
-  vtkPVSource* pvs = window->GetCurrentPVSource();
-  if ( pvs )
-    {
-    double bounds[6];
     double center[4];
     double dpoint1[3];
     double startpoint[4];
     double endpoint[4];
     int cc;
 
-    // Get bounds
-    pvs->GetDataInformation()->GetBounds(bounds);
 
     // Calculate center of bounds.
     for ( cc = 0; cc < 3; cc ++ )
@@ -110,14 +99,15 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
       }
 
     double move[3];
-    pvs->GetPVOutput()->GetActorTranslate(move);
-    
-    for ( cc = 0; cc < 3; cc ++ )
-      {
-      move[cc] += endpoint[cc] - startpoint[cc];
+    if (this->GetGUIHelper()->GetActiveActorTranslate(move))
+      {    
+      for ( cc = 0; cc < 3; cc ++ )
+        {
+        move[cc] += endpoint[cc] - startpoint[cc];
+        }
+
+      this->GetGUIHelper()->SetActiveActorTranslate(move);
       }
-    
-    pvs->GetPVOutput()->SetActorTranslate(move);
 
     ren->ResetCameraClippingRange();
     rwi->Render();

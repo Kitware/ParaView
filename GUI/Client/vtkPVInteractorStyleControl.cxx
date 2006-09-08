@@ -20,21 +20,22 @@
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
-#include "vtkKWLabel.h"
 #include "vtkKWFrameWithLabel.h"
-#include "vtkKWMenu.h"
+#include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
+#include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVCameraManipulatorGUIHelper.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVScale.h"
+#include "vtkPVTraceHelper.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWidget.h"
-#include "vtkTclUtil.h"
 #include "vtkSmartPointer.h"
 #include "vtkStdString.h"
-#include "vtkPVTraceHelper.h"
+#include "vtkTclUtil.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/map>
@@ -43,7 +44,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.57");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.58");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -127,6 +128,8 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
 
   this->CurrentManipulator = 0;
 
+  this->ManipulatorHelper = 
+    vtkPVCameraManipulatorGUIHelper::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -175,6 +178,8 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
   this->ArgumentsFrame->Delete();
   this->Observer->Delete();
 
+  this->ManipulatorHelper->SetPVApplication(0);
+  this->ManipulatorHelper->Delete();
   delete this->Internals;
 }
 
@@ -439,12 +444,7 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
       else
         {
         // Otherwise remove it
-        vtkPVCameraManipulator* pvaccess
-          = vtkPVCameraManipulator::SafeDownCast(access);
-        if (pvaccess)
-          {
-          pvaccess->SetApplication(0);
-          }
+        access->SetGUIHelper(0);
         access->RemoveObserver(this->Observer);
         this->ManipulatorCollection->RemoveItem(access);
         }
@@ -459,13 +459,6 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
   if ( !clone )
     {
     clone = manipulator->NewInstance();
-    vtkPVApplication* pvApp = 
-      static_cast<vtkPVApplication*>(this->GetApplication());
-    if (vtkPVCameraManipulator* pvclone = 
-      vtkPVCameraManipulator::SafeDownCast(clone))
-      {
-      pvclone->SetApplication(pvApp);
-      }
     this->ManipulatorCollection->AddItem(clone); 
     clone->Delete();
     clone->AddObserver(vtkKWEvent::ManipulatorModifiedEvent, this->Observer);
@@ -475,6 +468,10 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
   clone->SetButton(mouse+1);
   clone->SetShift(shift);
   clone->SetControl(control);
+  vtkPVApplication* pvApp = 
+    static_cast<vtkPVApplication*>(this->GetApplication());
+  this->ManipulatorHelper->SetPVApplication(pvApp);
+  clone->SetGUIHelper(this->ManipulatorHelper);
 }
 
 //-----------------------------------------------------------------------------

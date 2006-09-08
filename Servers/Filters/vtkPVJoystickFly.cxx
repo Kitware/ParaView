@@ -15,15 +15,15 @@
 #include "vtkPVJoystickFly.h"
 
 #include "vtkCamera.h"
+#include "vtkCameraManipulatorGUIHelper.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
+#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.16");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.1");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
@@ -60,9 +60,9 @@ void vtkPVJoystickFly::OnButtonDown(int, int, vtkRenderer *ren,
     vtkErrorMacro("Joystick Fly manipulator has to be used from one of the two subclasses (In and Out)");
     return;
     }
-  if ( !this->GetApplication() )
+  if ( !this->GetGUIHelper() )
     {
-    vtkErrorMacro("Application is not defined");
+    vtkErrorMacro("GUIHelper is not defined");
     return;
     }
   if ( !ren ||!rwi )
@@ -94,7 +94,7 @@ void vtkPVJoystickFly::OnMouseMove(int, int, vtkRenderer*,
 void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
                            float, float ispeed)
 {
-  if ( this->FlyFlag || !this->GetApplication() )
+  if ( this->FlyFlag || !this->GetGUIHelper() )
     {
     return;
     }
@@ -227,7 +227,7 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
   
     // Update to process mouse events to get the new position
     // and to check for mouse up events
-    this->GetApplication()->Script("update");
+    this->GetGUIHelper()->UpdateGUI();
     }
     
   timer->Delete();

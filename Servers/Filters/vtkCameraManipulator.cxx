@@ -14,12 +14,15 @@
 =========================================================================*/
 #include "vtkCameraManipulator.h"
 
+#include "vtkCameraManipulatorGUIHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkCameraManipulator, "1.1");
+vtkCxxRevisionMacro(vtkCameraManipulator, "1.2");
 vtkStandardNewMacro(vtkCameraManipulator);
+vtkCxxSetObjectMacro(vtkCameraManipulator, GUIHelper,
+  vtkCameraManipulatorGUIHelper);
 
 //-------------------------------------------------------------------------
 vtkCameraManipulator::vtkCameraManipulator()
@@ -32,12 +35,14 @@ vtkCameraManipulator::vtkCameraManipulator()
   this->DisplayCenter[0] = this->DisplayCenter[1] = 0.0;
 
   this->ManipulatorName = 0;
+  this->GUIHelper = 0;
 }
 
 //-------------------------------------------------------------------------
 vtkCameraManipulator::~vtkCameraManipulator()
 {
   this->SetManipulatorName(0);
+  this->SetGUIHelper(0);
 }
 
 void vtkCameraManipulator::StartInteraction()
@@ -95,6 +100,7 @@ void vtkCameraManipulator::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "Center: " << this->Center[0] << ", " 
      << this->Center[1] << ", " << this->Center[2] << endl;
+  os << indent << "GUIHelper: " << this->GUIHelper << endl;
 }
 
 

@@ -23,13 +23,13 @@
 #ifndef __vtkPVTrackballMoveActor_h
 #define __vtkPVTrackballMoveActor_h
 
-#include "vtkPVCameraManipulator.h"
+#include "vtkCameraManipulator.h"
 
-class VTK_EXPORT vtkPVTrackballMoveActor : public vtkPVCameraManipulator
+class VTK_EXPORT vtkPVTrackballMoveActor : public vtkCameraManipulator
 {
 public:
   static vtkPVTrackballMoveActor *New();
-  vtkTypeRevisionMacro(vtkPVTrackballMoveActor, vtkPVCameraManipulator);
+  vtkTypeRevisionMacro(vtkPVTrackballMoveActor, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

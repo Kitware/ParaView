@@ -15,18 +15,14 @@
 #include "vtkPVTrackballPan.h"
 
 #include "vtkCamera.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVInteractorStyleCenterOfRotation.h"
-#include "vtkPVSource.h"
-#include "vtkPVWindow.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
+#include "vtkCameraManipulatorGUIHelper.h"
 #include "vtkMath.h"
+#include "vtkObjectFactory.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballPan, "1.8");
+vtkCxxRevisionMacro(vtkPVTrackballPan, "1.1");
 vtkStandardNewMacro(vtkPVTrackballPan);
 
 //-------------------------------------------------------------------------
@@ -56,7 +52,7 @@ void vtkPVTrackballPan::OnButtonUp(int, int, vtkRenderer *,
 void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
                                      vtkRenderWindowInteractor *rwi)
 {
-  if (ren == NULL)
+  if (ren == NULL || !this->GetGUIHelper())
     {
     return;
     }
@@ -101,15 +97,10 @@ void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
   else
     {
     double depth, worldPt[4], lastWorldPt[4];
-    vtkPVApplication *app =
-      static_cast<vtkPVApplication*>(this->GetApplication());
-    vtkPVWindow *window = app->GetMainWindow();
-    vtkPVSource *pvs = window->GetCurrentPVSource();
-    if (pvs)
+    double bounds[6], center[3];
+    if (this->GetGUIHelper()->GetActiveSourceBounds(bounds))
       {
-      double bounds[6], center[3];
       int idx;
-      pvs->GetDataInformation()->GetBounds(bounds);
       for (idx = 0; idx < 3; idx++)
         {
         center[idx] = (bounds[idx * 2] + bounds[idx * 2 + 1])/2.0;
@@ -118,9 +109,11 @@ void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
       }
     else
       {
-      float center[3];
-      window->GetCenterOfRotationStyle()->GetCenter(center);
-      ren->SetWorldPoint(center[0], center[1], center[2], 1.0);
+      double center[3];
+      if (this->GetGUIHelper()->GetCenterOfRotation(center))
+        {
+        ren->SetWorldPoint(center[0], center[1], center[2], 1.0);
+        }
       }
     
     ren->WorldToDisplay();

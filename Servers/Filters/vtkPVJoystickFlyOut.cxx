@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVJoystickFlyIn.cxx
+  Module:    vtkPVJoystickFlyOut.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,31 +12,26 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVJoystickFlyIn.h"
+#include "vtkPVJoystickFlyOut.h"
 
-#include "vtkMath.h"
-#include "vtkCamera.h"
 #include "vtkObjectFactory.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFlyIn, "1.3");
-vtkStandardNewMacro(vtkPVJoystickFlyIn);
+vtkCxxRevisionMacro(vtkPVJoystickFlyOut, "1.1");
+vtkStandardNewMacro(vtkPVJoystickFlyOut);
 
 //-------------------------------------------------------------------------
-vtkPVJoystickFlyIn::vtkPVJoystickFlyIn()
+vtkPVJoystickFlyOut::vtkPVJoystickFlyOut()
 {
-  this->In = 1;
+  this->In = 0;
 }
 
 //-------------------------------------------------------------------------
-vtkPVJoystickFlyIn::~vtkPVJoystickFlyIn()
+vtkPVJoystickFlyOut::~vtkPVJoystickFlyOut()
 {
 }
 
 //-------------------------------------------------------------------------
-void vtkPVJoystickFlyIn::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVJoystickFlyOut::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

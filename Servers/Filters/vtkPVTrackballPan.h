@@ -23,13 +23,13 @@
 #ifndef __vtkPVTrackballPan_h
 #define __vtkPVTrackballPan_h
 
-#include "vtkPVCameraManipulator.h"
+#include "vtkCameraManipulator.h"
 
-class VTK_EXPORT vtkPVTrackballPan : public vtkPVCameraManipulator
+class VTK_EXPORT vtkPVTrackballPan : public vtkCameraManipulator
 {
 public:
   static vtkPVTrackballPan *New();
-  vtkTypeRevisionMacro(vtkPVTrackballPan, vtkPVCameraManipulator);
+  vtkTypeRevisionMacro(vtkPVTrackballPan, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

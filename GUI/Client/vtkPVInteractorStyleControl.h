@@ -33,6 +33,7 @@ class vtkKWLabel;
 class vtkKWFrameWithLabel;
 class vtkKWMenuButton;
 class vtkCameraManipulator;
+class vtkPVCameraManipulatorGUIHelper;
 class vtkPVInteractorStyleControlCmd;
 class vtkPVWidget;
 
@@ -161,6 +162,7 @@ protected:
 
   vtkPVInteractorStyleControlInternal* Internals;
 
+  vtkPVCameraManipulatorGUIHelper* ManipulatorHelper;
 private:
   vtkPVInteractorStyleControl(const vtkPVInteractorStyleControl&); // Not implemented
   void operator=(const vtkPVInteractorStyleControl&); // Not implemented

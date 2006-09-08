@@ -20,14 +20,14 @@
 #ifndef __vtkPVJoystickFly_h
 #define __vtkPVJoystickFly_h
 
-#include "vtkPVCameraManipulator.h"
+#include "vtkCameraManipulator.h"
 
 class vtkRenderer;
 
-class VTK_EXPORT vtkPVJoystickFly : public vtkPVCameraManipulator
+class VTK_EXPORT vtkPVJoystickFly : public vtkCameraManipulator
 {
 public:
-  vtkTypeRevisionMacro(vtkPVJoystickFly, vtkPVCameraManipulator);
+  vtkTypeRevisionMacro(vtkPVJoystickFly, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

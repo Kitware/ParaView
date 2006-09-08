@@ -25,9 +25,9 @@
 
 #include "vtkObject.h"
 
+class vtkCameraManipulatorGUIHelper;
 class vtkRenderer;
 class vtkRenderWindowInteractor;
-class vtkPVApplication;
 
 class VTK_EXPORT vtkCameraManipulator : public vtkObject
 {
@@ -72,6 +72,10 @@ public:
   vtkSetStringMacro(ManipulatorName);
   vtkGetStringMacro(ManipulatorName);
 
+  // Description:
+  // Get/Set the GUI helper. 
+  void SetGUIHelper(vtkCameraManipulatorGUIHelper*);
+  vtkGetObjectMacro(GUIHelper, vtkCameraManipulatorGUIHelper);
 protected:
   vtkCameraManipulator();
   ~vtkCameraManipulator();
@@ -85,6 +89,8 @@ protected:
   float Center[3];
   float DisplayCenter[2];
   void ComputeDisplayCenter(vtkRenderer *ren);
+
+  vtkCameraManipulatorGUIHelper* GUIHelper;
 
 private:
   vtkCameraManipulator(const vtkCameraManipulator&); // Not implemented

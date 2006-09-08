@@ -29,13 +29,9 @@ SET( ParaViewSharedNotWrapped_SRCS
 
 SET(ParaViewSharedNotTclWrapped_SRCS
   vtkPVCameraManipulator.cxx
+  vtkPVCameraManipulatorGUIHelper.cxx
   vtkPVProcessModuleGUIHelper.cxx
   vtkPVRenderViewProxyImplementation.cxx
-  vtkPVJoystickFly.cxx
-  vtkPVJoystickFlyIn.cxx
-  vtkPVJoystickFlyOut.cxx
-  vtkPVTrackballMoveActor.cxx
-  vtkPVTrackballPan.cxx
   )
 
 SET( ParaViewExtraWrapper_SRCS
@@ -246,7 +242,6 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWView.cxx
   vtkPV3DWidget
-  vtkPVJoystickFly
   vtkPVKeyFrame
   vtkPVObjectWidget
   vtkPVPropertyKeyFrame
