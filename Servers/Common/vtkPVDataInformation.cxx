@@ -42,7 +42,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.22");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.23");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -206,20 +206,13 @@ int vtkPVDataInformation::AddFromCompositeDataSet(vtkCompositeDataSet* data)
     {
     numDataSets++;
     vtkDataObject* dobj = iter->GetCurrentDataObject();
-    if (dobj->IsA("vtkCompositeDataSet"))
-      {
-      this->AddFromCompositeDataSet(
-        static_cast<vtkCompositeDataSet*>(dobj));
-      }
-    else
-      {
-      vtkPVDataInformation* dinf = vtkPVDataInformation::New();
-      dinf->CopyFromObject(dobj);
-      dinf->SetDataClassName(dobj->GetClassName());
-      dinf->DataSetType = dobj->GetDataObjectType();
-      this->AddInformation(dinf, 1);
-      dinf->Delete();
-      }
+    vtkPVDataInformation* dinf = vtkPVDataInformation::New();
+    dinf->CopyFromObject(dobj);
+    dinf->SetDataClassName(dobj->GetClassName());
+    dinf->DataSetType = dobj->GetDataObjectType();
+    this->AddInformation(dinf, 1);
+    dinf->Delete();
+
     iter->GoToNextItem();
     }
   iter->Delete();
@@ -987,5 +980,12 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     return;
     }
   dcss.SetData(&*data.begin(), length);
-  this->CompositeDataInformation->CopyFromStream(&dcss);
+  if (dcss.GetNumberOfMessages() > 0)
+    {
+    this->CompositeDataInformation->CopyFromStream(&dcss);
+    }
+  else
+    {
+    this->CompositeDataInformation->Initialize();
+    }
 }
