@@ -286,7 +286,6 @@ SET (PROJECT_TESTS_NO_BATCH
   RecordAnimation
   TestDemo
   TestPackage
-  TestTexture
   Write
   TestComparativeVis
 )
@@ -423,11 +422,24 @@ ADD_TEST(VolumeRenderVox8Cell-ParaView
   -V ${PVClientTestData}/Baseline/VolumeRenderVox8Cell.png
   )
 
+ADD_TEST("TestTexture-ParaView"
+  ${PARAVIEW_EXECUTABLE} 
+  ${TIMEOUT}
+  ${PARAVIEW_MPI_RUN_ONE}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/TestTexture.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/TestTexture.png
+  )
+
 ADD_TEST("TestTextureClientServer-ParaView" 
   ${PARAVIEW_CS_EXECUTABLE} 
   --test-server
   ${TIMEOUT}
   --disable-registry
+  ${PARAVIEW_MPI_RUN_ONE}
   ${PVClientTests_SOURCE_DIR}/Tcl/TestTexture.pvs
   -D ${PVClientTestData}
   -C ${PVCompareImages}
@@ -439,6 +451,7 @@ ADD_TEST("TestTextureRenderServer-ParaView"
   --test-render-server
   ${TIMEOUT}
   --disable-registry
+  ${PARAVIEW_MPI_RUN_ONE}
   ${PVClientTests_SOURCE_DIR}/Tcl/TestTexture.pvs
   -D ${PVClientTestData}
   -C ${PVCompareImages}
