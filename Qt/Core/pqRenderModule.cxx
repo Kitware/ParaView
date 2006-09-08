@@ -214,6 +214,16 @@ void pqRenderModule::renderModuleInit()
   manip->SetButton(3);
   style->AddManipulator(manip);
   manip->Delete();
+  manip = vtkTrackballPan::New();
+  manip->SetButton(1);
+  manip->SetControl(1);
+  style->AddManipulator(manip);
+  manip->Delete();
+  manip = vtkPVTrackballZoom::New();
+  manip->SetButton(1);
+  manip->SetShift(1);
+  style->AddManipulator(manip);
+  manip->Delete();
    
   iren->SetInteractorStyle(style);
   style->Delete();
