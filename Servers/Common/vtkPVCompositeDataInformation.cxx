@@ -24,7 +24,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.7");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.8");
 
 struct vtkPVCompositeDataInformationInternals
 {
@@ -43,6 +43,7 @@ vtkPVCompositeDataInformation::vtkPVCompositeDataInformation()
 {
   this->Internal = new vtkPVCompositeDataInformationInternals;
   this->DataIsComposite = 0;
+  this->DataIsHierarchical = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -56,6 +57,7 @@ void vtkPVCompositeDataInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "DataIsComposite: " << this->DataIsComposite << endl;
+  os << indent << "DataIsHierarchical: " << this->DataIsHierarchical << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -118,6 +120,11 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
     return;
     }
 
+  if (hds->IsA("vtkHierarchicalDataSet"))
+    {
+    this->DataIsHierarchical = 1;
+    }
+
   vtkTimerLog::MarkStartEvent("Copying information from composite data");
 
   this->DataIsComposite = 1;
@@ -130,23 +137,28 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
       this->Internal->DataInformation[i];
     unsigned int numDataSets = hds->GetNumberOfDataSets(i);
     ldata.resize(numDataSets);
-    for (unsigned int j=0; j<numDataSets; j++)
+    // If data is a vtkHierarchicalDataSet or sub-class, do not get the
+    // information for sub-datasets. There may be a lot of them.
+    if (!this->DataIsHierarchical)
       {
-      vtkDataObject* dobj = hds->GetDataSet(i, j);
-      if (dobj)
+      for (unsigned int j=0; j<numDataSets; j++)
         {
-        vtkPVDataInformation* dataInf = vtkPVDataInformation::New();
-        if (dobj->IsA("vtkCompositeDataSet"))
+        vtkDataObject* dobj = hds->GetDataSet(i, j);
+        if (dobj)
           {
-          dataInf->CopyFromCompositeDataSet(
-            static_cast<vtkCompositeDataSet*>(dobj), 0);
+          vtkPVDataInformation* dataInf = vtkPVDataInformation::New();
+          if (dobj->IsA("vtkCompositeDataSet"))
+            {
+            dataInf->CopyFromCompositeDataSet(
+              static_cast<vtkCompositeDataSet*>(dobj), 0);
+            }
+          else
+            {
+            dataInf->CopyFromObject(dobj);
+            }
+          ldata[j] = dataInf;
+          dataInf->Delete();
           }
-        else
-          {
-          dataInf->CopyFromObject(dobj);
-          }
-        ldata[j] = dataInf;
-        dataInf->Delete();
         }
       }
     }
@@ -167,6 +179,7 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
     }
 
   this->DataIsComposite = info->GetDataIsComposite();
+  this->DataIsHierarchical = info->GetDataIsHierarchical();
 
   unsigned int otherNumGroups = info->Internal->DataInformation.size();
   unsigned int numGroups = this->Internal->DataInformation.size();
@@ -189,22 +202,27 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
       numDataSets = otherNumDataSets;
       ldata.resize(numDataSets);
       }
-    for (unsigned int j=0; j < otherNumDataSets; j++)
+    // If data is a vtkHierarchicalDataSet or sub-class, do not get the
+    // information for sub-datasets. There may be a lot of them.
+    if (!this->DataIsHierarchical)
       {
-      vtkPVDataInformation* otherInfo = otherldata[j];
-      vtkPVDataInformation* localInfo = ldata[j];
-      if (otherInfo)
+      for (unsigned int j=0; j < otherNumDataSets; j++)
         {
-        if (localInfo)
+        vtkPVDataInformation* otherInfo = otherldata[j];
+        vtkPVDataInformation* localInfo = ldata[j];
+        if (otherInfo)
           {
-          localInfo->AddInformation(otherInfo);
-          }
-        else
-          {
-          vtkPVDataInformation* dinf = vtkPVDataInformation::New();
-          dinf->AddInformation(otherInfo);
-          ldata[j] = dinf;
-          dinf->Delete();
+          if (localInfo)
+            {
+            localInfo->AddInformation(otherInfo);
+            }
+          else
+            {
+            vtkPVDataInformation* dinf = vtkPVDataInformation::New();
+            dinf->AddInformation(otherInfo);
+            ldata[j] = dinf;
+            dinf->Delete();
+            }
           }
         }
       }
@@ -221,6 +239,7 @@ void vtkPVCompositeDataInformation::CopyToStream(
   css->Reset();
   *css << vtkClientServerStream::Reply;
   *css << this->DataIsComposite;
+  *css << this->DataIsHierarchical;
   if (!this->DataIsComposite)
     {
     vtkTimerLog::MarkEndEvent("Copying composite information to stream");
@@ -236,31 +255,36 @@ void vtkPVCompositeDataInformation::CopyToStream(
     *css << ldata.size();
     }
 
-  vtkClientServerStream dcss;
-  size_t length;
-  const unsigned char* data;
-
-  for(i=0; i<numGroups; i++)
+  // If data is a vtkHierarchicalDataSet or sub-class, do not get the
+  // information for sub-datasets. There may be a lot of them.
+  if (!this->DataIsHierarchical)
     {
-    vtkPVCompositeDataInformationInternals::GroupDataInformationType& ldata = 
-      this->Internal->DataInformation[i];
-    unsigned int numDataSets = ldata.size();
-    for(j=0; j<numDataSets; j++)
+    vtkClientServerStream dcss;
+    size_t length;
+    const unsigned char* data;
+    
+    for(i=0; i<numGroups; i++)
       {
-      vtkPVDataInformation* dataInf = ldata[j];
-      if (dataInf)
+      vtkPVCompositeDataInformationInternals::GroupDataInformationType& ldata = 
+        this->Internal->DataInformation[i];
+      unsigned int numDataSets = ldata.size();
+      for(j=0; j<numDataSets; j++)
         {
-        *css << i;
-        *css << j;
-        dcss.Reset();
-        dataInf->CopyToStream(&dcss);
-        dcss.GetData(&data, &length);
-        *css << vtkClientServerStream::InsertArray(data, length);
+        vtkPVDataInformation* dataInf = ldata[j];
+        if (dataInf)
+          {
+          *css << i;
+          *css << j;
+          dcss.Reset();
+          dataInf->CopyToStream(&dcss);
+          dcss.GetData(&data, &length);
+          *css << vtkClientServerStream::InsertArray(data, length);
+          }
         }
       }
+    *css << numGroups;
+    *css << vtkClientServerStream::End;
     }
-  *css << numGroups;
-  *css << vtkClientServerStream::End;
   vtkTimerLog::MarkEndEvent("Copying composite information to stream");
 }
 
@@ -277,13 +301,18 @@ void vtkPVCompositeDataInformation::CopyFromStream(
     {
     return;
     }
-  unsigned int numGroups;
-  if(!css->GetArgument(0, 1, &numGroups))
+  if(!css->GetArgument(0, 1, &this->DataIsHierarchical))
     {
     vtkErrorMacro("Error parsing data set type.");
     return;
     }
-  int msgIdx = 1;
+  unsigned int numGroups;
+  if(!css->GetArgument(0, 2, &numGroups))
+    {
+    vtkErrorMacro("Error parsing data set type.");
+    return;
+    }
+  int msgIdx = 2;
   this->Internal->DataInformation.resize(numGroups);
   for (unsigned int i=0; i<numGroups; i++)
     {
@@ -297,6 +326,13 @@ void vtkPVCompositeDataInformation::CopyFromStream(
     vtkPVCompositeDataInformationInternals::GroupDataInformationType& ldata = 
       this->Internal->DataInformation[i];
     ldata.resize(numDataSets);
+    }
+
+  // If data is a vtkHierarchicalDataSet or sub-class, do not get the
+  // information for sub-datasets. There may be a lot of them.
+  if (this->DataIsHierarchical)
+    {
+    return;
     }
 
   while (1)

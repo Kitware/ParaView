@@ -57,6 +57,13 @@ public:
   vtkGetMacro(DataIsComposite, int);
 
   // Description:
+  // True if data is a vtkHierarchalDataSet or sub-class. Since these
+  // classes tend to have a very large number of sub-datasets, only
+  // information about the whole dataset is stored. In this case, 
+  // GetDataInformation() will always return 0.
+  vtkGetMacro(DataIsHierarchical, int);
+
+  // Description:
   // Clears all internal data structures.
   virtual void Initialize();
 
@@ -78,6 +85,7 @@ protected:
   ~vtkPVCompositeDataInformation();
 
   int DataIsComposite;
+  int DataIsHierarchical;
 
 private:
   vtkPVCompositeDataInformationInternals* Internal;
