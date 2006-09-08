@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractDataSetsWidget);
-vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.11");
+vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.12");
 
 struct vtkPVExtractDataSetsWidgetInternals
 {
@@ -247,19 +247,23 @@ void vtkPVExtractDataSetsWidget::CommonInit()
     for (unsigned int j=0; j<numDataSets; j++)
       {
       vtkPVDataInformation* dataInfo = cdi->GetDataInformation(i, j);
+      ostrstream dataStr;
       if (dataInfo)
         {
-        ostrstream dataStr;
         dataStr << "  " << dataInfo->GetName() << ends;
-        this->PartSelectionList->InsertEntry(idx++, dataStr.str());
-        delete[] dataStr.str();
-        if (firstTime)
-          {
-          //By default select first one
-          this->PartSelectionList->SetSelectionIndex(idx-1);
-          this->PartSelectionCallback();
-          firstTime = 0;
-          }
+        }
+      else
+        {
+        dataStr << "  block " << j << ends;
+        }
+      this->PartSelectionList->InsertEntry(idx++, dataStr.str());
+      delete[] dataStr.str();
+      if (firstTime)
+        {
+        //By default select first one
+        this->PartSelectionList->SetSelectionIndex(idx-1);
+        this->PartSelectionCallback();
+        firstTime = 0;
         }
       }
     }
