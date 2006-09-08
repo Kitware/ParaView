@@ -5,6 +5,7 @@ INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 SET(Filters_SRCS
   vtkAttributeEditor.cxx
   vtkCameraManipulator.cxx
+  vtkCameraManipulatorGUIHelper.cxx
   vtkCaveRenderManager.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkClientCompositeManager.cxx
@@ -35,6 +36,8 @@ SET(Filters_SRCS
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
   vtkPPhastaReader.cxx
+  vtkPhastaReader.cxx
+  vtkPPickFilter.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
   vtkPVCompositeBuffer.cxx
@@ -50,29 +53,32 @@ SET(Filters_SRCS
   vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryFilter.cxx
   vtkPVGeometryInformation.cxx
-  vtkPVInteractorStyle.cxx
   vtkPVGlyphFilter.cxx
+  vtkPVInteractorStyle.cxx
+  vtkPVJoystickFly.cxx
+  vtkPVJoystickFlyIn.cxx
+  vtkPVJoystickFlyOut.cxx
+  vtkPVLinearExtrusionFilter.cxx
   vtkPVLODActor.cxx
   vtkPVLODVolume.cxx
-  vtkPVLinearExtrusionFilter.cxx
   vtkPVMain.cxx
-  vtkPPickFilter.cxx
-  vtkPVRenderViewProxy.cxx
   vtkPVRenderModuleHelper.cxx
+  vtkPVRenderViewProxy.cxx
+  vtkPVServerArrayHelper.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
-  vtkPVServerArrayHelper.cxx
   vtkPVServerSelectTimeSet.cxx
   vtkPVServerTimeSteps.cxx
   vtkPVServerXDMFParameters.cxx
   vtkPVSummaryHelper.cxx
+  vtkPVTrackballMoveActor.cxx
+  vtkPVTrackballPan.cxx
   vtkPVTrackballRoll.cxx
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
   vtkPVTreeComposite.cxx
   vtkPVUpdateSuppressor.cxx
-  vtkPhastaReader.cxx
   vtkPickFilter.cxx
 #  vtkSelectInputs.cxx
   vtkSpyPlotReader.cxx
@@ -101,8 +107,10 @@ SET_SOURCE_FILES_PROPERTIES(
   WRAP_EXCLUDE)
 
 SET_SOURCE_FILES_PROPERTIES( 
+  vtkCameraManipulatorGUIHelper
   vtkImageCompressor.cxx
   vtkPVRenderViewProxy.cxx
+  vtkPVJoystickFly.cxx
   vtkSubdivisionAlgorithm.cxx 
   ABSTRACT)
 
