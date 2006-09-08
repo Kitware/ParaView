@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.15");
 
 struct vtkSMCompoundProxyInternals
 {
@@ -579,6 +579,16 @@ vtkSMProxy* vtkSMCompoundProxy::GetConsumableProxy()
     }
 
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMCompoundProxy::UpdatePipelineInformation()
+{
+  if (!this->MainProxy)
+    {
+    return;
+    }
+  this->MainProxy->UpdatePipelineInformation();
 }
 
 //----------------------------------------------------------------------------
