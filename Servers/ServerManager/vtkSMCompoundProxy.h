@@ -150,6 +150,10 @@ public:
   // Similar to UpdatePropertyInformation() but updates only the given property.
   // Overridden to relay the call over to the internal MainProxy.
   virtual void UpdatePropertyInformation(vtkSMProperty* prop);
+
+  // Description:
+  // Overridden to relay the call over to the internal MainProxy.
+  virtual void UpdatePipelineInformation();
 protected:
   vtkSMCompoundProxy();
   ~vtkSMCompoundProxy();
