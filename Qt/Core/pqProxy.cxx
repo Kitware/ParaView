@@ -85,8 +85,12 @@ void pqProxy::addInternalProxy(const QString& key,
     {
     this->Internal->ProxyLists[key].push_back(proxy);
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->RegisterProxy(group_name.toStdString().c_str(),
-      proxy->GetSelfIDAsString(), proxy);
+    if (!pxm->GetProxyName(group_name.toStdString().c_str(), proxy))
+      {
+      // register proxy only if it is not already registered.
+      pxm->RegisterProxy(group_name.toStdString().c_str(),
+        proxy->GetSelfIDAsString(), proxy);
+      }
     }
 }
 
@@ -105,8 +109,11 @@ void pqProxy::removeInternalProxy(const QString& key,
     {
     this->Internal->ProxyLists[key].removeAll(proxy);
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->RegisterProxy(group_name.toStdString().c_str(),
-      proxy->GetSelfIDAsString(), proxy);
+    const char* name = pxm->GetProxyName(group_name.toStdString().c_str(), proxy);
+    if (name)
+      {
+      pxm->UnRegisterProxy(group_name.toStdString().c_str(), name, proxy);
+      }
     }
 }
 
@@ -141,8 +148,12 @@ void pqProxy::clearInternalProxies()
 
       foreach(vtkSMProxy* proxy, iter.value())
         {
-        pxm->UnRegisterProxy(group_name.toStdString().c_str(), 
-          proxy->GetSelfIDAsString());
+        const char* name = pxm->GetProxyName(group_name.toStdString().c_str(),
+          proxy);
+        if (name)
+          {
+          pxm->UnRegisterProxy(group_name.toStdString().c_str(), name, proxy);
+          }
         }
       }
     }
