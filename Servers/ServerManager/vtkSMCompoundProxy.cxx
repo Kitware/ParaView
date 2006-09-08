@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.14");
 
 struct vtkSMCompoundProxyInternals
 {
@@ -257,6 +257,26 @@ vtkSMPropertyIterator* vtkSMCompoundProxy::NewPropertyIterator()
     return 0;
     }
   return this->MainProxy->NewPropertyIterator();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMCompoundProxy::UpdatePropertyInformation()
+{
+  if (!this->MainProxy)
+    {
+    return;
+    }
+  this->MainProxy->UpdatePropertyInformation();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMCompoundProxy::UpdatePropertyInformation(vtkSMProperty* prop)
+{
+  if (!this->MainProxy)
+    {
+    return;
+    }
+  this->MainProxy->UpdatePropertyInformation(prop);
 }
 
 //---------------------------------------------------------------------------

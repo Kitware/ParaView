@@ -140,6 +140,16 @@ public:
   // filtes/displays.
   vtkSMProxy* GetConsumableProxy();
 
+  // Description:
+  // Updates all property informations by calling UpdateInformation()
+  // and populating the values. Overridden to relay the call over
+  // to the internal MainProxy.
+  virtual void UpdatePropertyInformation();
+
+  // Description:
+  // Similar to UpdatePropertyInformation() but updates only the given property.
+  // Overridden to relay the call over to the internal MainProxy.
+  virtual void UpdatePropertyInformation(vtkSMProperty* prop);
 protected:
   vtkSMCompoundProxy();
   ~vtkSMCompoundProxy();
