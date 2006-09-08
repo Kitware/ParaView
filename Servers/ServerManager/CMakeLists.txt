@@ -44,6 +44,7 @@ SET(Kit_SRCS
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
+  vtkSMDoubleArrayInformationHelper.cxx
   vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
