@@ -50,7 +50,7 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.68");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.69");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -299,7 +299,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   int numInputs = 0;
 
   int retVal = 0;
-  if (this->ExecuteCompositeDataSet(mgInput, append, numInputs))
+  if (this->ExecuteCompositeDataSet(mgInput, append, numInputs, 1))
     {
     this->GenerateGroupScalars = 0;
     if (numInputs > 0)
@@ -316,7 +316,10 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
 
 //----------------------------------------------------------------------------
 int vtkPVGeometryFilter::ExecuteCompositeDataSet(
-  vtkMultiGroupDataSet* mgInput, vtkAppendPolyData* append, int& numInputs)
+  vtkMultiGroupDataSet* mgInput, 
+  vtkAppendPolyData* append, 
+  int& numInputs,
+  int updateGroup)
 {
   unsigned int numGroups = mgInput->GetNumberOfGroups();
 
@@ -338,7 +341,10 @@ int vtkPVGeometryFilter::ExecuteCompositeDataSet(
   for (group=0; group<numGroups; group++)
     {
     unsigned int numDataSets = mgInput->GetNumberOfDataSets(group);
-    this->CurrentGroup = group;
+    if (updateGroup)
+      {
+      this->CurrentGroup = group;
+      }
     for (dataset=0; dataset<numDataSets; dataset++)
       {
       vtkDataObject* block = mgInput->GetDataSet(group, dataset);
@@ -360,7 +366,9 @@ int vtkPVGeometryFilter::ExecuteCompositeDataSet(
         vtkMultiGroupDataSet* mgds = vtkMultiGroupDataSet::SafeDownCast(block);
         if (mgds)
           {
-          if (!this->ExecuteCompositeDataSet(mgds, append, numInputs))
+          // Do not show the group ids of the sub-composite datasets.
+          // Set updateGroup to 0.
+          if (!this->ExecuteCompositeDataSet(mgds, append, numInputs, 0))
             {
             return 0;
             }
