@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.483");
+vtkCxxRevisionMacro(vtkPVSource, "1.484");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1093,6 +1093,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
  
   this->MarkSourcesForUpdate();
 
+  int updateCalled = 0;
+
   // Initialize the output if necessary.
   if ( ! this->Initialized )
     { // This is the first time, initialize data. 
@@ -1109,7 +1111,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     input = this->GetPVInput(0);
     if (input)
       {
-      // I used to also check that the input was created by looking at the application of the DisplayGUI.
+      // I used to also check that the input was created by looking at the
+      // application of the DisplayGUI.
       if (this->ReplaceInput && hideSource)
         { // Application is set when the widget is created.
         input->SetVisibilityNoTrace(0);
@@ -1126,6 +1129,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       {
       // Update the VTK data.
       this->Update();
+      updateCalled = 1;
       }
 
     // The best test I could come up with to only reset
@@ -1233,8 +1237,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // Regenerate the data property page in case something has changed.
   if (this->Notebook)
     {
-    // Update the vtk data which has already been done ...
-    this->Update();
+    if (!updateCalled)
+      {
+      this->Update();
+      }
     // Causes the data information to be updated if the filter executed.
     // Note has to be done here because tcl update causes render which
     // causes the filter to execute.
