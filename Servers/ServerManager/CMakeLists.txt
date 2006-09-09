@@ -83,6 +83,7 @@ SET(Kit_SRCS
   vtkSMNumberOfGroupsDomain.cxx
   vtkSMNumberOfPartsDomain.cxx
   vtkSMObject.cxx
+  vtkSMOrderedPropertyIterator.cxx
   vtkSMPVDWriterProxy.cxx
   vtkSMPart.cxx
   vtkSMPickLineWidgetProxy.cxx
