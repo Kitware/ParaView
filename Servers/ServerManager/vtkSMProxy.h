@@ -392,6 +392,7 @@ protected:
   friend class vtkSMProperty;
   friend class vtkSMProxyManager;
   friend class vtkSMInputProperty;
+  friend class vtkSMOrderedPropertyIterator;
   friend class vtkSMPropertyIterator;
   friend class vtkSMProxyObserver;
   friend class vtkSMProxyProperty;

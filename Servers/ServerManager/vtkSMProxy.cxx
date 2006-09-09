@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.80");
+vtkCxxRevisionMacro(vtkSMProxy, "1.81");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -520,6 +520,11 @@ void vtkSMProxy::AddProperty(const char* name, vtkSMProperty* prop)
 //---------------------------------------------------------------------------
 void vtkSMProxy::RemoveProperty(const char* name)
 {
+  if (!name)
+    {
+    return;
+    }
+
   vtkSMProxyInternals::ProxyMap::iterator it2 =
     this->Internals->SubProxies.begin();
   for( ; it2 != this->Internals->SubProxies.end(); it2++)
@@ -532,6 +537,15 @@ void vtkSMProxy::RemoveProperty(const char* name)
   if (it != this->Internals->Properties.end())
     {
     this->Internals->Properties.erase(it);
+    }
+
+  vtkstd::vector<vtkStdString>::iterator iter =
+    vtkstd::find(this->Internals->PropertyNamesInOrder.begin(),
+                 this->Internals->PropertyNamesInOrder.end(),
+                 name);
+  if(iter != this->Internals->PropertyNamesInOrder.end())
+    {
+    this->Internals->PropertyNamesInOrder.erase(iter);
     }
 }
 
@@ -625,6 +639,11 @@ void vtkSMProxy::AddPropertyToSelf(
   newEntry.Property = prop;
   newEntry.ObserverTag = tag;
   this->Internals->Properties[name] = newEntry;
+
+  // Add the property name to the vector of property names.
+  // This vector keeps track of the order in which properties
+  // were added.
+  this->Internals->PropertyNamesInOrder.push_back(name);
 }
 
 //---------------------------------------------------------------------------
@@ -1844,14 +1863,17 @@ int vtkSMProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
       }
     else if (name && strcmp(name, "SubProxy") == 0)
       {
-      vtkSMProxy* subProxy = this->GetSubProxy(currentElement->GetAttribute("name"));
+      vtkSMProxy* subProxy = 
+        this->GetSubProxy(currentElement->GetAttribute("name"));
       if (!subProxy)
         {
-        vtkErrorMacro("Failed to load subproxy with name: " << 
-          currentElement->GetAttribute("name") << ". Cannot revive the subproxy.");
+        vtkErrorMacro("Failed to load subproxy with name: " 
+                      << currentElement->GetAttribute("name") 
+                      << ". Cannot revive the subproxy.");
         return 0;
         }
-      if (!subProxy->LoadRevivalState(currentElement->GetNestedElement(0), loader))
+      if (!subProxy->LoadRevivalState(
+            currentElement->GetNestedElement(0), loader))
         {
         return 0;
         }
@@ -2053,6 +2075,11 @@ void vtkSMProxy::ExposeSubProxyProperty(const char* subproxy_name,
   info.SubProxyName = subproxy_name;
   info.PropertyName = property_name;
   this->Internals->ExposedProperties[exposed_name] = info;
+
+  // Add the exposed property name to the vector of property names.
+  // This vector keeps track of the order in which properties
+  // were added.
+  this->Internals->PropertyNamesInOrder.push_back(exposed_name);
 }
 
 //---------------------------------------------------------------------------
