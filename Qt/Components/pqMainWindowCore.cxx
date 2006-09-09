@@ -370,7 +370,8 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     releasedFilters<<"Contour";
     releasedFilters<<"StreamTracer";
 
-    QMenu *releasedMenu = this->Implementation->FilterMenu->addMenu("Released") << pqSetName("Released");
+    QMenu *releasedMenu = this->Implementation->FilterMenu->addMenu("Released") 
+      << pqSetName("Released");
     for(iter = releasedFilters.begin(); iter != releasedFilters.end(); ++iter)
       {
       QAction* action = releasedMenu->addAction(*iter) << pqSetName(*iter)
@@ -430,6 +431,8 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     int numFilters = manager->GetNumberOfProxies("filters_prototypes");
     for(int i=0; i<numFilters; i++)
       {
+      int addToAlphabetical = 0;
+
       QStringList categoryList;
       QString proxyName = manager->GetProxyName("filters_prototypes",i);
       proxyInfo.GetFilterMenuCategories(proxyName, categoryList);
@@ -442,10 +445,13 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
           QAction* action = (*jter)->addAction(proxyName) << pqSetName(proxyName)
             << pqSetData(proxyName);
           action->setEnabled(false);
+          
+          // Add to the alphabetical list only if in one of the other menus.
+          addToAlphabetical = 1;
           }
         }
 
-      if(alphabetical)
+      if(alphabetical && addToAlphabetical)
         {
         QAction* action = alphabetical->addAction(proxyName) << pqSetName(proxyName)
           << pqSetData(proxyName);
