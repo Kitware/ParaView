@@ -46,12 +46,17 @@ struct vtkSMProxyInternals
     int ModifiedFlag;
     unsigned int ObserverTag;
   };
-  vtkstd::vector<vtkClientServerID > IDs;
-  vtkstd::vector<int> ServerIDs;
   // Note that the name of the property is the map key. That is the
   // only place where name is stored
   typedef vtkstd::map<vtkStdString,  PropertyInfo> PropertyInfoMap;
   PropertyInfoMap Properties;
+
+  // This vector keeps track of the order in which properties
+  // were added.
+  vtkstd::vector<vtkStdString> PropertyNamesInOrder;
+
+  vtkstd::vector<vtkClientServerID > IDs;
+  vtkstd::vector<int> ServerIDs;
 
   typedef vtkstd::map<vtkStdString,  vtkSmartPointer<vtkSMProxy> > ProxyMap;
   ProxyMap SubProxies;
