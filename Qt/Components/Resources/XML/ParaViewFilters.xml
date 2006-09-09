@@ -14,10 +14,12 @@
     </Category>
   </CategoryGroup>
   <CategoryGroup>
-    <Category name="CTH/AMR">
+    <Category name="CTH/AMR/MultiBlock">
       <Filter name="CTHPart" />
-      <Filter name="OctreeDepthLimit" />
       <Filter name="OctreeDepthScalars" />
+      <Filter name="GroupDataSets" />
+      <Filter name="GroupIdScalars" />
+      <Filter name="ExtractLevel" />
     </Category>
     <Category name="Geometric Operations">
       <Filter name="CellCenters" />
@@ -34,7 +36,6 @@
       <Filter name="ReflectionFilter" />
       <Filter name="RotationalExtrusionFilter" />
       <Filter name="ShrinkFilter" />
-      <Filter name="ShrunkContours" />
       <Filter name="Stripper" />
       <Filter name="TransformFilter" />
       <Filter name="TriangleFilter" />
@@ -55,7 +56,6 @@
       <Filter name="AttributeEditor" />
       <Filter name="GroupDataSets" />
       <Filter name="GroupIdScalars" />
-      <Filter name="GroupParts" />
     </Category>
     <Category name="Higher Order">
       <Filter name="Tessellator" />
@@ -69,7 +69,6 @@
       <Filter name="AllToN" />
       <Filter name="Balance" />
       <Filter name="D3" />
-      <Filter name="MPIMoveData" />
     </Category>
     <Category name="Make Pretty">
       <Filter name="CleanPolyData" />
@@ -89,11 +88,8 @@
       <Filter name="IntegrateFlowThroughSurface" />
       <Filter name="Median" />
       <Filter name="MeshQuality" />
-      <Filter name="OrderedCompositeDistributor" />
-      <Filter name="PartScalars" />
       <Filter name="ProcessIdScalars" />
       <Filter name="PVConnectivityFilter" />
-      <Filter name="UpdateSuppressor" />
     </Category>
     <Category name="Outline">
       <Filter name="OutlineCornerFilter" />
@@ -102,21 +98,16 @@
     </Category>
     <Category name="Quantitavite">
       <Filter name="Calculator" />
-      <Filter name="Pick" />
       <Filter name="Probe" />
       <Filter name="StreamTracer" />
-      <Filter name="TemporalPick" />
-      <Filter name="TemporalProbe" />
     </Category>
     <Category name="Tensors" />
     <Category name="Subset">
       <Filter name="Clip" />
       <Filter name="Cut" />
-      <Filter name="ExtractDataSets" />
       <Filter name="ExtractEdges" />
       <Filter name="ExtractGrid" />
       <Filter name="ExtractLevel" />
-      <Filter name="ExtractParts" />
       <Filter name="GeometryFilter" />
       <Filter name="MaskPoints" />
       <Filter name="QuadricClustering" />
