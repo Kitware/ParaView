@@ -87,6 +87,14 @@
           extensions="xmf xdmf"
           file_description="Xdmf Reader">
   </Reader>
+  <Reader name="pdbreader"
+          extensions="pdb"
+          file_description="Protein Data Bank Files">
+  </Reader>
+  <Reader name="xyzreader"
+          extensions="xyz"
+          file_description="XMol Molecule Files">
+  </Reader>
   <Reader name="P3DReader"
           extensions="xyz"
           file_description="PLOT3D Files">
@@ -112,14 +120,6 @@
   <Reader name="plyreader"
           extensions="ply"
           file_description="PLY Polygonal File Format">
-  </Reader>
-  <Reader name="pdbreader"
-          extensions="pdb"
-          file_description="Protein Data Bank Files">
-  </Reader>
-  <Reader name="xyzreader"
-          extensions="xyz"
-          file_description="XMol Molecule Files">
   </Reader>
   <Reader name="stlreader"
           extensions="stl"
