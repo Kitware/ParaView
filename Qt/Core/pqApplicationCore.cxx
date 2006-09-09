@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqApplicationCore.h"
 
+#include "QVTKWidget.h"
 // ParaView Server Manager includes.
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConnectionManager.h"
@@ -40,16 +41,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPQStateLoader.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "QVTKWidget.h"
+#include "vtkSmartPointer.h"
 
 // Qt includes.
 #include <QApplication>
@@ -730,13 +733,45 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
     }
 
   vtkSMProxy* proxy = reader->getProxy();
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("FileName"), 
-    filename);
+
+  // Find the first property that has a vtkSMFileListDomain. Assume that
+  // it is the property used to set the filename.
+  vtkSmartPointer<vtkSMPropertyIterator> piter;
+  piter.TakeReference(proxy->NewPropertyIterator());
+  piter->Begin();
+  while(!piter->IsAtEnd())
+    {
+    vtkSMProperty* prop = piter->GetProperty();
+    if (prop->IsA("vtkSMStringVectorProperty"))
+      {
+      vtkSmartPointer<vtkSMDomainIterator> diter;
+      diter.TakeReference(prop->NewDomainIterator());
+      diter->Begin();
+      while(!diter->IsAtEnd())
+        {
+        if (diter->GetDomain()->IsA("vtkSMFileListDomain"))
+          {
+          break;
+          }
+        diter->Next();
+        }
+      if (!diter->IsAtEnd())
+        {
+        break;
+        }
+      }
+    piter->Next();
+    }
+  if (!piter->IsAtEnd())
+    {
+    pqSMAdaptor::setElementProperty(piter->GetProperty(), 
+                                    filename);
+    proxy->UpdateVTKObjects();
+    }
   pqSMAdaptor::setElementProperty(proxy->GetProperty("FilePrefix"),
-    filename);
+                                  filename);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("FilePattern"),
-    filename);
-  proxy->UpdateVTKObjects();
+                                  filename);
 
   emit this->sourceCreated(reader);
   this->getUndoStack()->EndUndoSet();
