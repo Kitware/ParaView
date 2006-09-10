@@ -70,7 +70,7 @@ protected:
   ~vtkSMOrderedPropertyIterator();
 
   vtkSMProxy* Proxy;
-  int Index;
+  unsigned int Index;
 
 private:
   vtkSMOrderedPropertyIterator(const vtkSMOrderedPropertyIterator&); // Not implemented
