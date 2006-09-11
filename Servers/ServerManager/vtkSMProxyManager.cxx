@@ -88,7 +88,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.54");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.55");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -1379,4 +1379,5 @@ vtkPVXMLElement* vtkSMProxyManager::GetHints(const char* xmlgroup,
 void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent <<  "UpdateInputProxies: " <<  this->UpdateInputProxies << endl;
 }
