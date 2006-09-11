@@ -115,7 +115,11 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
           QTest::qWait(100);
         }
       }
-    
+
+    // set active action, will cause scrollable menus to scroll
+    // to make action visible
+    object->setActiveAction(action);
+
     // simulate mouse click on menu item
     QRect geom = object->actionGeometry(action);
     QMouseEvent button_press(QEvent::MouseButtonPress, 
