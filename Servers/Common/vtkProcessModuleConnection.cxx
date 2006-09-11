@@ -58,7 +58,7 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.10");
+vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.11");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {
@@ -328,13 +328,11 @@ vtkProcessModuleConnection::GetOpenGLExtensionsInformation()
 {
   if (!this->OpenGLExtensionsInformation)
     {
-    if (!this->OpenGLExtensionsInformation)
-      {
-      this->OpenGLExtensionsInformation = vtkPVOpenGLExtensionsInformation::New();
-      }
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     if (pm)
       {
+      this->OpenGLExtensionsInformation 
+        = vtkPVOpenGLExtensionsInformation::New();
       this->GatherInformation(vtkProcessModule::RENDER_SERVER,
         this->OpenGLExtensionsInformation,
         pm->GetProcessModuleID());
