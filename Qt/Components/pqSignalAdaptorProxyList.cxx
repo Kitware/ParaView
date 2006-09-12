@@ -255,7 +255,6 @@ void pqSignalAdaptorProxyList::initialize3DWidget()
 
   this->Internal->ActiveWidget = widget3D;
   this->Internal->ActiveWidget->setRenderModule(this->Internal->RenderModule);
-  this->Internal->ActiveWidget->select();
   this->Internal->WidgetFrame->setProperty("title", 
     QString(smProxy->GetXMLName()) + " Widget");
   this->Internal->WidgetFrame->show();
