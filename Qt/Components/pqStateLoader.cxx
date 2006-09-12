@@ -50,7 +50,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.3");
+vtkCxxRevisionMacro(pqStateLoader, "1.4");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -112,6 +112,7 @@ int pqStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
   if (strcmp(proxy->GetXMLGroup(), "rendermodules")==0)
     {
     unsigned int max = proxyElement->GetNumberOfNestedElements();
+    vtkPVXMLElement* toRemove = 0;
     for (unsigned int cc=0; cc < max; ++cc)
       {
       vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
@@ -121,8 +122,16 @@ int pqStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
         element->SetAttribute("clear", "0");
         // This will ensure that when the state for Displays property is loaded
         // all already present displays won't be cleared.
-        break;
         }
+      else if (element->GetName() == QString("Property") &&
+        element->GetAttribute("name") == QString("RenderWindowSize"))
+        {
+        toRemove = element;
+        }
+      }
+    if (toRemove)
+      {
+      proxyElement->RemoveNestedElement(toRemove);
       }
     }
   return this->Superclass::LoadProxyState(proxyElement, proxy);
