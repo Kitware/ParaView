@@ -11,10 +11,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include <stdlib.h>
+#include "vtkKWApplication.h"
 
 #include "vtkTclUtil.h"
-#include "vtkKWApplication.h"
 
 extern "C" {int VTK_TK_EXPORT Vtkkwwidgetsinitializecommand_Init(Tcl_Interp *interp);}
 
