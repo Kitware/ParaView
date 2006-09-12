@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventDispatcher.h"
 
 #include <QAbstractEventDispatcher>
-#include <QTimer>
 #include <QtDebug>
 #include <QtTest>
+#include <QTimer>
 
 ////////////////////////////////////////////////////////////////////////////
 // pqEventDispatcher::pqImplementation
@@ -49,13 +49,17 @@ public:
     Source(0),
     Player(0)
   {
+#if defined(Q_WS_MAC)
     this->Timer.setInterval(1);
     this->Timer.setSingleShot(true);
+#endif
   }
   
   pqEventSource* Source;
   pqEventPlayer* Player;
+#if defined(Q_WS_MAC)
   QTimer Timer;
+#endif
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -84,6 +88,7 @@ void pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
     
   QApplication::setEffectEnabled(Qt::UI_General, false);
 
+#if defined(Q_WS_MAC)
   QObject::connect(
     QAbstractEventDispatcher::instance(),
     SIGNAL(aboutToBlock()),
@@ -95,6 +100,14 @@ void pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
     SIGNAL(timeout()),
     this,
     SLOT(playNextEvent()));
+#else
+  QObject::connect(
+    QAbstractEventDispatcher::instance(),
+    SIGNAL(aboutToBlock()),
+    this,
+    SLOT(playNextEvent()),
+    Qt::QueuedConnection);
+#endif
 }
   
 void pqEventDispatcher::playNextEvent()
@@ -121,6 +134,7 @@ void pqEventDispatcher::playNextEvent()
 
 void pqEventDispatcher::stopPlayback()
 {
+#if defined(Q_WS_MAC)
   QObject::disconnect(
     QAbstractEventDispatcher::instance(),
     SIGNAL(aboutToBlock()),
@@ -132,6 +146,13 @@ void pqEventDispatcher::stopPlayback()
     SIGNAL(timeout()),
     this,
     SLOT(playNextEvent()));
+#else
+  QObject::disconnect(
+    QAbstractEventDispatcher::instance(),
+    SIGNAL(aboutToBlock()),
+    this,
+    SLOT(playNextEvent()));
+#endif
     
   this->Implementation->Source = 0;
   this->Implementation->Player = 0;
