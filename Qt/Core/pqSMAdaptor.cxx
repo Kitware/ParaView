@@ -140,9 +140,6 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     adaptor->Delete();
     }
 
-  // make sure we can know about all types
-  Q_ASSERT(type != pqSMAdaptor::UNKNOWN);
-
   return type;
 }
 
