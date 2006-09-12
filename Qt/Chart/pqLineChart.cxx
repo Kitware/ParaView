@@ -112,7 +112,9 @@ void pqLineChart::setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis,
 void pqLineChart::addData(pqAbstractPlot* plot)
 {
   if(!plot)
+    {
     return;
+    }
     
   if(vtkstd::find(this->Implementation->begin(), this->Implementation->end(), plot) != this->Implementation->end())
     return;
@@ -137,7 +139,9 @@ void pqLineChart::removeData(pqAbstractPlot *plot)
 void pqLineChart::layoutChart()
 {
   if(!this->Implementation->XAxis || !this->Implementation->YAxis)
+    {
     return;
+    }
 
   // Make sure the axes are valid.
   if(!this->Implementation->XAxis->isValid() || !this->Implementation->YAxis->isValid())

@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date   May 10, 2005
  */
 
+#include "pqHistogramWidget.h"
+
 #include "pqChartAxis.h"
 #include "pqChartLabel.h"
 #include "pqChartMouseBox.h"
@@ -49,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHistogramChart.h"
 #include "pqHistogramColor.h"
 #include "pqHistogramSelection.h"
-#include "pqHistogramWidget.h"
+#include "pqHistogramSelectionModel.h"
 #include "pqLineChart.h"
 
 #include <QCursor>
@@ -74,10 +76,7 @@ class pqHistogramWidgetData
 {
 public:
   pqHistogramWidgetData();
-  ~pqHistogramWidgetData();
-
-  /// Cleans up the memory for the previous selection list.
-  void cleanSelectionList();
+  ~pqHistogramWidgetData() {}
 
 public:
   /// Stores the previously used list of selected ranges.
@@ -88,23 +87,6 @@ public:
 pqHistogramWidgetData::pqHistogramWidgetData()
   : Selection()
 {
-}
-
-pqHistogramWidgetData::~pqHistogramWidgetData()
-{
-  cleanSelectionList();
-}
-
-void pqHistogramWidgetData::cleanSelectionList()
-{
-  pqHistogramSelectionList::Iterator iter = this->Selection.begin();
-  for( ; iter != this->Selection.end(); iter++)
-    {
-    if(*iter)
-      delete *iter;
-    }
-
-  this->Selection.clear();
 }
 
 
@@ -163,9 +145,6 @@ pqHistogramWidget::pqHistogramWidget(QWidget *p) :
   this->Histogram->setAxes(this->XAxis, this->YAxis);
   connect(this->Histogram, SIGNAL(repaintNeeded()), this,
       SLOT(repaintChart()));
-  connect(this->Histogram,
-      SIGNAL(selectionChanged(const pqHistogramSelectionList &)),
-      this, SLOT(changeSelection(const pqHistogramSelectionList &)));
 
   this->LineChart->setAxes(this->XAxis, this->FAxis);
   connect(this->LineChart, SIGNAL(repaintNeeded()), this,
@@ -259,22 +238,26 @@ void pqHistogramWidget::setEasyBinSelection(bool Enable)
 void pqHistogramWidget::selectAll()
 {
   if(this->Interact == pqHistogramWidget::Bin)
-    this->Histogram->selectAllBins();
+    this->Histogram->getSelectionModel()->selectAllBins();
   else if(this->Interact == pqHistogramWidget::Value)
-    this->Histogram->selectAllValues();
+    this->Histogram->getSelectionModel()->selectAllValues();
 }
 
 void pqHistogramWidget::selectNone()
 {
-  this->Histogram->selectNone();
+  this->Histogram->getSelectionModel()->selectNone();
 }
 
 void pqHistogramWidget::selectInverse()
 {
-  if(this->Histogram->hasSelection())
-    this->Histogram->selectInverse();
+  if(this->Histogram->getSelectionModel()->hasSelection())
+    {
+    this->Histogram->getSelectionModel()->selectInverse();
+    }
   else
+    {
     this->selectAll();
+    }
 }
 
 void pqHistogramWidget::updateLayout()
@@ -306,15 +289,9 @@ void pqHistogramWidget::layoutChart(int w, int h)
   this->LineChart->layoutChart();
 }
 
-void pqHistogramWidget::changeSelection(const pqHistogramSelectionList &list)
-{
-  emit this->selectionChanged(list);
-  this->viewport()->update();
-}
-
 void pqHistogramWidget::moveTimeout()
 {
-  this->sendSelectionNotification();
+  this->Histogram->getSelectionModel()->endInteractiveChange();
 }
 
 QSize pqHistogramWidget::sizeHint() const
@@ -434,12 +411,9 @@ void pqHistogramWidget::mousePressEvent(QMouseEvent *e)
     {
     // Block the selection changed signals in case the user is going to
     // drag the mouse. Use a timer to delay the signal if the user is
-    // simply picking. Only block the signals if the timer was allocated.
-    bool delaySignal = false;
-    if(this->MoveTimer)
-      this->Histogram->blockSignals(true);
-
+    // simply picking.
     pqHistogramSelection range;
+    pqHistogramSelectionModel *model = this->Histogram->getSelectionModel();
     if(this->Interact == pqHistogramWidget::Bin)
       {
       int bin = this->Histogram->getBinAt(point.x(), point.y(), this->EasyBinSelection);
@@ -449,16 +423,16 @@ void pqHistogramWidget::mousePressEvent(QMouseEvent *e)
         {
         if(bin != -1)
           {
-          delaySignal = true;
+          model->beginInteractiveChange();
           if(this->LastBin == -1)
             {
-            this->Histogram->setSelection(&range);
+            model->setSelection(range);
             this->LastBin = bin;
             }
           else
             {
             range.setFirst(this->LastBin);
-            this->Histogram->setSelection(&range);
+            model->setSelection(range);
             }
           }
         }
@@ -466,28 +440,32 @@ void pqHistogramWidget::mousePressEvent(QMouseEvent *e)
         {
         if(bin != -1)
           {
-          delaySignal = true;
-          this->Histogram->xorSelection(&range);
+          model->beginInteractiveChange();
+          model->xorSelection(range);
           this->LastBin = bin;
 
           // Set up the selection list so the first click doesn't
           // get changed.
-          this->Data->cleanSelectionList();
-          pqHistogramSelection *selection = new pqHistogramSelection(range);
-          if(selection)
-            this->Data->Selection.pushBack(selection);
+          this->Data->Selection.clear();
+          this->Data->Selection.append(range);
           }
         else
-          this->Data->cleanSelectionList();
+          {
+          this->Data->Selection.clear();
+          }
         }
       else
         {
-        delaySignal = true;
+        model->beginInteractiveChange();
         this->LastBin = bin;
         if(bin == -1)
-          this->Histogram->selectNone();
+          {
+          model->selectNone();
+          }
         else
-          this->Histogram->setSelection(&range);
+          {
+          model->setSelection(range);
+          }
         }
       }
     else if(this->Interact == pqHistogramWidget::Value)
@@ -500,11 +478,11 @@ void pqHistogramWidget::mousePressEvent(QMouseEvent *e)
         {
         if(valid)
           {
-          delaySignal = true;
+          model->beginInteractiveChange();
           if(this->LastValueX == -1)
             {
             this->LastValueX = point.x();
-            this->Histogram->setSelection(&range);
+            model->setSelection(range);
             }
           else
             {
@@ -512,7 +490,7 @@ void pqHistogramWidget::mousePressEvent(QMouseEvent *e)
             if(this->Histogram->getValueAt(this->LastValueX, point.y(), last))
               {
               range.setFirst(last);
-              this->Histogram->setSelection(&range);
+              model->setSelection(range);
               }
             }
           }
@@ -521,32 +499,32 @@ void pqHistogramWidget::mousePressEvent(QMouseEvent *e)
         {
         if(valid)
           {
-          delaySignal = true;
+          model->beginInteractiveChange();
           this->LastValueX = point.x();
-          this->Histogram->xorSelection(&range);
+          model->xorSelection(range);
 
           // Set up the selection list so the first click doesn't
           // get changed.
-          this->Data->cleanSelectionList();
-          pqHistogramSelection *selection = new pqHistogramSelection(range);
-          if(selection)
-            this->Data->Selection.pushBack(selection);
+          this->Data->Selection.clear();
+          this->Data->Selection.append(range);
           }
         else
-          this->Data->cleanSelectionList();
+          {
+          this->Data->Selection.clear();
+          }
         }
       else
         {
-        delaySignal = true;
+        model->beginInteractiveChange();
         if(valid)
           {
           this->LastValueX = point.x();
-          this->Histogram->setSelection(&range);
+          model->setSelection(range);
           }
         else
           {
           this->LastValueX = -1;
-          this->Histogram->selectNone();
+          model->selectNone();
           }
         }
       }
@@ -554,13 +532,16 @@ void pqHistogramWidget::mousePressEvent(QMouseEvent *e)
       {
       bool valid = this->Histogram->getValueRangeAt(point.x(), point.y(), range);
       if(valid)
+        {
         this->LastValueX = point.x();
+        }
       else
+        {
         this->LastValueX = -1;
+        }
       }
 
-    this->Histogram->blockSignals(false);
-    if(this->MoveTimer && delaySignal)
+    if(model->isInInteractiveChange())
       {
       this->Mode = pqHistogramWidget::MoveWait;
       this->MoveTimer->start(200);
@@ -590,17 +571,16 @@ void pqHistogramWidget::mouseReleaseEvent(QMouseEvent *e)
   else if(this->Mode == pqHistogramWidget::SelectBox)
     {
     this->Mode = pqHistogramWidget::NoMode;
-    // Send off a selection changed signal.
-    sendSelectionNotification();
-    this->Data->cleanSelectionList();
+    this->Histogram->getSelectionModel()->endInteractiveChange();
+    this->Data->Selection.clear();
 
+    this->Mouse->adjustBox(point);
     QRect area = this->Mouse->Box;
     this->Mouse->resetBox();
     if(area.isValid())
       {
       // Translate the area to viewport coordinates.
-      area.translate(-this->ZoomPan->contentsX(),
-          -this->ZoomPan->contentsY());
+      area.translate(-this->ZoomPan->contentsX(), -this->ZoomPan->contentsY());
       this->viewport()->update(area);
       }
     }
@@ -608,9 +588,8 @@ void pqHistogramWidget::mouseReleaseEvent(QMouseEvent *e)
     {
     this->Mode = pqHistogramWidget::NoMode;
     this->setCursor(Qt::ArrowCursor);
-    // Send off a selection changed signal.
-    sendSelectionNotification();
-    this->Data->cleanSelectionList();
+    this->Histogram->getSelectionModel()->endInteractiveChange();
+    this->Data->Selection.clear();
     }
   else if(this->Mode == pqHistogramWidget::Zoom ||
       this->Mode == pqHistogramWidget::Pan)
@@ -624,8 +603,12 @@ void pqHistogramWidget::mouseReleaseEvent(QMouseEvent *e)
     this->Mode = pqHistogramWidget::NoMode;
     this->setCursor(Qt::ArrowCursor);
     if(this->MoveTimer)
+      {
       this->MoveTimer->stop();
-    this->sendSelectionNotification();
+      }
+
+    this->Histogram->getSelectionModel()->endInteractiveChange();
+    this->Data->Selection.clear();
     }
   else if(this->Mode != pqHistogramWidget::NoMode)
     {
@@ -639,7 +622,9 @@ void pqHistogramWidget::mouseReleaseEvent(QMouseEvent *e)
 void pqHistogramWidget::mouseDoubleClickEvent(QMouseEvent *e)
 {
   if(e->button() == Qt::MidButton && this->ZoomPan)
+    {
     this->ZoomPan->resetZoom();
+    }
 
   e->accept();
 }
@@ -647,7 +632,9 @@ void pqHistogramWidget::mouseDoubleClickEvent(QMouseEvent *e)
 void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
 {
   if(!this->MouseDown)
+    {
     return;
+    }
 
   // Get the current mouse position and convert it to contents coords.
   QPoint point = e->pos();
@@ -658,21 +645,27 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
   // the timer so it does not send a selection update.
   if(this->Mode == pqHistogramWidget::MoveWait)
     {
-    if(this->MoveTimer)
-      this->MoveTimer->stop();
     this->Mode = pqHistogramWidget::NoMode;
+    if(this->MoveTimer)
+      {
+      this->MoveTimer->stop();
+      }
     }
 
   bool handled = true;
+  pqHistogramSelectionModel *model = this->Histogram->getSelectionModel();
   if(this->Mode == pqHistogramWidget::NoMode)
     {
     // Change the cursor for the mouse mode.
+    model->beginInteractiveChange();
     if(e->buttons() == Qt::LeftButton)
       {
       if(this->Interact == pqHistogramWidget::Value)
         {
         if(this->LastValueX != -1)
+          {
           this->Mode = pqHistogramWidget::ValueDrag;
+          }
         }
       else if(this->Interact == pqHistogramWidget::ValueMove)
         {
@@ -683,7 +676,9 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
           }
         }
       else
+        {
         this->Mode = pqHistogramWidget::SelectBox;
+        }
       }
     else if(e->buttons() == Qt::MidButton)
       {
@@ -705,7 +700,9 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
       this->ZoomPan->startInteraction(pqChartZoomPan::Pan);
       }
     else
+      {
       handled = false;
+      }
     }
 
   if(this->Mode == pqHistogramWidget::ZoomBox)
@@ -716,9 +713,13 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
     // Repaint the zoom box. Unite the previous area with the new
     // area to ensure all the changes get repainted.
     if(area.isValid())
+      {
       area = area.unite(this->Mouse->Box);
+      }
     else
+      {
       area = this->Mouse->Box;
+      }
 
     area.translate(-this->ZoomPan->contentsX(), -this->ZoomPan->contentsY());
     this->viewport()->update(area);
@@ -730,38 +731,44 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
     QRect area = this->Mouse->Box;
     this->Mouse->adjustBox(point);
     if(area.isValid())
+      {
       area = area.unite(this->Mouse->Box);
+      }
     else
+      {
       area = this->Mouse->Box;
+      }
 
     // Update the selection based on the new selection box.
     if(this->Interact == pqHistogramWidget::Bin)
       {
       // Block the selection changed signals. A single signal will
       // get sent when the mouse is released.
-      this->Histogram->blockSignals(true);
       pqHistogramSelectionList newSelection;
-      this->Histogram->getBinsIn(this->Mouse->Box, newSelection, this->EasyBinSelection);
+      this->Histogram->getBinsIn(this->Mouse->Box, newSelection,
+          this->EasyBinSelection);
       if(e->modifiers() & Qt::ShiftModifier)
         {
         if(!this->Data->Selection.isEmpty())
-          this->Histogram->subtractSelection(this->Data->Selection);
-        this->Histogram->addSelection(newSelection);
+          {
+          model->subtractSelection(this->Data->Selection);
+          }
+
+        model->addSelection(newSelection);
         }
       else if(e->modifiers() & Qt::ControlModifier)
         {
-        // Make a second copy of the new selection list so it doesn't
-        // get lost when finding the intersection.
-        pqHistogramSelectionList toDelete;
-        pqHistogramSelectionList copy;
-        copy.makeNewCopy(newSelection);
-        this->Data->Selection.Xor(copy, toDelete);
-        this->Histogram->xorSelection(this->Data->Selection);
-        this->Data->Selection += toDelete;
+        // Use a temporary selection model to find the intersection
+        // of the new selection and the previous one.
+        pqHistogramSelectionModel temp;
+        temp.setSelection(this->Data->Selection);
+        temp.xorSelection(newSelection);
+        model->xorSelection(temp.getSelection());
         }
       else
-        this->Histogram->setSelection(newSelection);
-      this->Histogram->blockSignals(false);
+        {
+        model->setSelection(newSelection);
+        }
 
       // Adjust the repaint area to include the highlight;
       int extra = this->Histogram->getBinWidth() + 1;
@@ -771,7 +778,7 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
       area.setBottom(this->ZoomPan->contentsHeight());
 
       // Save the new selection in place of the old one.
-      this->Data->cleanSelectionList();
+      this->Data->Selection.clear();
       this->Data->Selection = newSelection;
       }
 
@@ -799,22 +806,20 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
 
       pqHistogramSelectionList newSelection;
       this->Histogram->getValuesIn(area, newSelection);
-      this->Histogram->blockSignals(true);
       if((e->modifiers() & Qt::ControlModifier) &&
           !(e->modifiers() & Qt::ShiftModifier))
         {
-        // Make a second copy of the new selection list so it doesn't
-        // get lost when finding the intersection.
-        pqHistogramSelectionList toDelete;
-        pqHistogramSelectionList copy;
-        copy.makeNewCopy(newSelection);
-        this->Data->Selection.Xor(copy, toDelete);
-        this->Histogram->xorSelection(this->Data->Selection);
-        this->Data->Selection += toDelete;
+        // Use a temporary selection model to find the intersection
+        // of the new selection and the previous one.
+        pqHistogramSelectionModel temp;
+        temp.setSelection(this->Data->Selection);
+        temp.xorSelection(newSelection);
+        model->xorSelection(temp.getSelection());
         }
       else
-        this->Histogram->setSelection(newSelection);
-      this->Histogram->blockSignals(false);
+        {
+        model->setSelection(newSelection);
+        }
 
       // Adjust the repaint area to include the highlight;
       int extra = this->Histogram->getBinWidth() + 1;
@@ -822,7 +827,7 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
       area.setLeft(area.left() - extra);
 
       // Save the new selection in place of the old one.
-      this->Data->cleanSelectionList();
+      this->Data->Selection.clear();
       this->Data->Selection = newSelection;
 
       area.translate(-this->ZoomPan->contentsX(),
@@ -842,16 +847,16 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
         if(offset != 0)
           {
           // Save the last position and move the selection.
-          this->Histogram->blockSignals(true);
-          this->Histogram->moveSelection(range, offset);
-          this->Histogram->blockSignals(false);
+          model->moveSelection(range, offset);
           if(range.getFirst() == range.getSecond())
             {
             range.moveRange(offset);
             this->LastValueX = this->XAxis->getPixelFor(range.getFirst());
             }
           else
+            {
             this->LastValueX = point.x();
+            }
 
           this->viewport()->update();
           }
@@ -862,29 +867,46 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
     {
     pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
     if(e->modifiers() == Qt::ControlModifier)
+      {
       flags = pqChartZoomPan::ZoomXOnly;
+      }
     else if(e->modifiers() == Qt::AltModifier)
+      {
       flags = pqChartZoomPan::ZoomYOnly;
+      }
+
     this->ZoomPan->interact(e->globalPos(), flags);
     }
   else if(this->Mode == pqHistogramWidget::Pan)
+    {
     this->ZoomPan->interact(e->globalPos(), pqChartZoomPan::NoFlags);
+    }
   else
+    {
     handled = false;
+    }
 
   if(handled)
+    {
     e->accept();
+    }
   else
+    {
     e->ignore();
+    }
 }
 
 void pqHistogramWidget::wheelEvent(QWheelEvent *e)
 {
   pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
   if(e->modifiers() == Qt::ControlModifier)
+    {
     flags = pqChartZoomPan::ZoomXOnly;
+    }
   else if(e->modifiers() == Qt::AltModifier)
+    {
     flags = pqChartZoomPan::ZoomYOnly;
+    }
 
   // Get the current mouse position and convert it to contents coords.
   QPoint point = e->pos();
@@ -915,19 +937,6 @@ bool pqHistogramWidget::viewportEvent(QEvent *e)
     }
 
   return QAbstractScrollArea::viewportEvent(e);
-}
-
-void pqHistogramWidget::sendSelectionNotification()
-{
-  pqHistogramSelectionList list;
-  this->Histogram->getSelection(list);
-  emit selectionChanged(list);
-  pqHistogramSelectionList::Iterator iter = list.begin();
-  for( ; iter != list.end(); ++iter)
-    {
-    if(*iter)
-      delete *iter;
-    }
 }
 
 void pqHistogramWidget::draw(QPainter& painter, QRect area)

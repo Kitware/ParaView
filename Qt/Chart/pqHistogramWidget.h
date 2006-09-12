@@ -57,7 +57,6 @@ class pqChartValueList;
 class pqChartZoomPan;
 class pqHistogramChart;
 class pqHistogramColor;
-class pqHistogramSelectionList;
 class pqHistogramWidgetData;
 class pqLineChart;
 
@@ -232,14 +231,6 @@ private slots:
   /// \param height The contents height.
   void layoutChart(int width, int height);
 
-  /// \brief
-  ///   Called when the histogram chart's selection has changed.
-  ///
-  /// The chart will be repainted and the signal will be re-emitted.
-  ///
-  /// \param list The new selection list.
-  void changeSelection(const pqHistogramSelectionList &list);
-
   /// Called when the mouse move timer expires.
   void moveTimeout();
 
@@ -248,11 +239,6 @@ signals:
   ///   Called when the interaction mode has changed.
   /// \param mode The new interaction mode.
   void interactModeChanged(pqHistogramWidget::InteractMode mode);
-
-  /// \brief
-  ///   Called when the selection has changed.
-  /// \param list The new selection.
-  void selectionChanged(const pqHistogramSelectionList &list);
 
 public:
   /// \brief
@@ -337,9 +323,6 @@ private:
   ///
   /// \param e Event specific data.
   virtual bool viewportEvent(QEvent *e);
-
-  /// Does the work of sending a selection changed notification.
-  void sendSelectionNotification();
 
   enum MouseMode {
     NoMode,

@@ -13,6 +13,7 @@
 #include <pqChartLabel.h>
 #include <pqHistogramChart.h>
 #include <pqHistogramColor.h>
+#include <pqHistogramListModel.h>
 #include <pqHistogramWidget.h>
 
 #include <vtkAlgorithm.h>
@@ -66,6 +67,7 @@ struct ChartAdapter::pqImplementation
 {
   pqImplementation(pqHistogramWidget& chart) :
     Chart(chart),
+    Model(new pqHistogramListModel()),
     EventAdaptor(vtkSmartPointer<vtkEventQtSlotConnect>::New()),
     SourceProxy(0)
   {
@@ -107,12 +109,15 @@ struct ChartAdapter::pqImplementation
     this->Chart.getHistogramAxis().getLabel().setText("Count");
     this->Chart.getHistogramAxis().getLabel().setFont(bold);
     this->Chart.getHistogramAxis().getLabel().setOrientation(pqChartLabel::VERTICAL);
+
+    this->Chart.getHistogram().setModel(this->Model);
     
     this->updateChart();
   }
   
   ~pqImplementation()
   {
+    delete this->Model;
   }
   
   void setSource(vtkSMProxy* Proxy)
@@ -141,7 +146,7 @@ struct ChartAdapter::pqImplementation
   void updateChart()
   {
     // Set the default (no data) appearance of the chart
-    this->Chart.getHistogram().clearData();
+    this->Model->clearBinValues();
     this->Chart.getTitle().setText("Histogram (no data)");
     this->Chart.getHistogramAxis().setVisible(true);
     this->Chart.getHistogramAxis().setValueRange(0.0, 100.0);
@@ -189,12 +194,12 @@ struct ChartAdapter::pqImplementation
     this->Chart.getTitle().setText("Histogram");
     this->Chart.getHistogramAxis().setVisible(true);
     this->Chart.getHorizontalAxis().setVisible(true);
-    this->Chart.getHistogram().setData(
-      list,
-      pqChartValue(value_min), pqChartValue(value_max));
+    this->Model->setRangeX(pqChartValue(value_min), pqChartValue(value_max));
+    this->Model->setBinValues(list);
   }
   
   pqHistogramWidget& Chart;
+  pqHistogramListModel *Model;
   vtkSmartPointer<vtkEventQtSlotConnect> EventAdaptor;
   vtkSMProxy* SourceProxy;
 };

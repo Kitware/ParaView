@@ -97,7 +97,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  \code
  *  void SomeClass::mouseReleaseEvent(QMouseEvent *e)
  *  {
- *     this->mouseBox->setBox(e->pos());
+ *     this->mouseBox->adjustBox(e->pos());
  *     QRect area = this->mouseBox->Box;
  *     ...
  *     this->mouseBox->resetBox();

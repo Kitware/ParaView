@@ -33,12 +33,22 @@ SET(QtChart_SRCS
   pqHistogramChart.h
   pqHistogramColor.cxx
   pqHistogramColor.h
+  pqHistogramListModel.cxx
+  pqHistogramListModel.h
+  pqHistogramModel.cxx
+  pqHistogramModel.h
   pqHistogramSelection.cxx
   pqHistogramSelection.h
+  pqHistogramSelectionModel.cxx
+  pqHistogramSelectionModel.h
   pqHistogramWidget.cxx
   pqHistogramWidget.h
   pqLineChart.cxx
   pqLineChart.h
+  pqLineChartModel.cxx
+  pqLineChartModel.h
+  pqLineChartPlot.cxx
+  pqLineChartPlot.h
   pqLineChartWidget.cxx
   pqLineChartWidget.h
   pqLineErrorPlot.cxx
@@ -68,8 +78,13 @@ QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqColorMapColorChanger.h
   pqColorMapWidget.h
   pqHistogramChart.h
+  pqHistogramListModel.h
+  pqHistogramModel.h
+  pqHistogramSelectionModel.h
   pqHistogramWidget.h
   pqLineChart.h
+  pqLineChartModel.h
+  pqLineChartPlot.h
   pqLineChartWidget.h
 )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")

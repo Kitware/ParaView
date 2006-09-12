@@ -88,8 +88,10 @@ public:
   void setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis,
       bool shared=false);
 
-  /// Removes any line plots current tied to the chart.  Use the
-  /// \c addData method to add plots to the chart.
+  /// \brief
+  ///   Removes all the line plots from the chart.
+  /// \sa
+  ///   pqLineChart::addData(pqAbstractPlot *)
   void clearData();
 
   /// \brief
@@ -132,6 +134,7 @@ public:
 signals:
   /// Called when the line chart needs to be layed-out
   void layoutNeeded();
+
   /// Called when the line chart needs to be repainted.
   void repaintNeeded();
 

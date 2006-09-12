@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtChartExport.h"
 #include <QObject>
 
+#include "pqHistogramSelectionModel.h" // Needed for list type.
 #include <QColor> // Needed for select member.
 #include <QRect>  // Needed for bounds member.
 
@@ -55,8 +56,7 @@ class pqChartValue;
 class pqChartValueList;
 class pqHistogramChartData;
 class pqHistogramColor;
-class pqHistogramSelection;
-class pqHistogramSelectionList;
+class pqHistogramModel;
 class QPainter;
 
 
@@ -100,45 +100,20 @@ public:
   //@{
   /// \brief
   ///   Sets the axes for the chart.
-  ///
-  /// The axes must be set before the chart data can be set.
-  ///
   /// \param xAxis The x-axis object.
   /// \param yAxis The y-axis object.
   void setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis);
 
   /// \brief
-  ///   Used to set up the histogram data.
-  ///
-  /// The number of items in the value list determines the number
-  /// of bars on the histogram chart. The horizontal axis is set up
-  /// based on the \c min and \c max parameters. The interval
-  /// value on the horizontal axis is calculated using the minumum,
-  /// the maximum, and the number of values in the list. The
-  /// limits of the vertical axis are determined from the minimum
-  /// and maximum values in the list.
-  ///
-  /// \param values A list of values. One for each histogram bar.
-  /// \param min The minimum value for the histogram axis.
-  /// \param max The maximum value for the histogram axis.
-  /// \sa pqHistogramChart::setAxes(pqChartAxis *, pqChartAxis *)
-  void setData(const pqChartValueList &values, const pqChartValue &min,
-      const pqChartValue &max);
-
-  /// Clears data
-  void clearData();
+  ///   Sets the histogram model to be displayed.
+  /// \param model A pointer to the new histogram model.
+  void setModel(pqHistogramModel *model);
 
   /// \brief
-  ///   Gets the number of bins on the histogram.
+  ///   Gets the current histogram model.
   /// \return
-  ///   The number of bins on the histogram.
-  int getBinCount() const;
-
-  /// \brief
-  ///   Gets the index of the last bin on the histogram.
-  /// \return
-  ///   The index of the last bin on the histogram.
-  int getLastBin() const;
+  ///   A pointer to the currect histogram model.
+  pqHistogramModel *getModel() const {return this->Model;}
 
   /// \brief
   ///   Gets the pixel width of a bin on the chart.
@@ -149,6 +124,12 @@ public:
 
   /// \name Selection Methods
   //@{
+  /// \brief
+  ///   Gets the selection model for the histogram.
+  /// \return
+  ///   A pointer to the histogram selection model.
+  pqHistogramSelectionModel *getSelectionModel() const {return this->Selection;}
+
   /// \brief
   ///   Gets the bin index for the given location.
   ///
@@ -198,108 +179,6 @@ public:
   /// \param list Used to return the list of value ranges.
   /// \sa pqHistogramChart::getValueAt(int, int)
   void getValuesIn(const QRect &area, pqHistogramSelectionList &list) const;
-
-  /// \brief
-  ///   Gets whether or not the chart has selected range(s).
-  /// \return
-  ///   True if there is a selection.
-  bool hasSelection() const;
-
-  /// \brief
-  ///   Gets the current selection.
-  /// \param list Used to return the selection.
-  /// \sa pqHistogramChart::hasSelection()
-  void getSelection(pqHistogramSelectionList &list) const;
-
-  /// Selects all the bins on the chart.
-  void selectAllBins();
-
-  /// Selects all the values on the chart.
-  void selectAllValues();
-
-  /// Clears the selection.
-  void selectNone();
-
-  /// Inverts the selection.
-  void selectInverse();
-
-  /// \brief
-  ///   Sets the selection to the specified range(s).
-  /// \param list The list of selection range(s).
-  void setSelection(const pqHistogramSelectionList &list);
-
-  /// \brief
-  ///   Adds the specified range(s) to the selection.
-  ///
-  /// Each range in the list must be the same type of selection as
-  /// the current selection list. The range(s) in the supplied list
-  /// are merged with the current selection, which may cause items
-  /// to be removed.
-  ///
-  /// \param list The list of selection range(s).
-  /// \sa pqHistogramSelection::unite(pqHistogramSelection *,
-  ///         pqHistogramSelectionList &)
-  void addSelection(const pqHistogramSelectionList &list);
-
-  /// \brief
-  ///   Performs an exclusive or between the specified range(s) and
-  ///   the selection.
-  ///
-  /// Each range in the list must be the same type of selection as
-  /// the current selection list. The range(s) in the supplied list
-  /// are xored with the current selection, which may cause items
-  /// to be removed.
-  ///
-  /// \param list The list of selection range(s).
-  /// \sa pqHistogramSelection::Xor(pqHistogramSelection *,
-  ///         pqHistogramSelectionList &)
-  void xorSelection(const pqHistogramSelectionList &list);
-
-  /// \brief
-  ///   Subtracts the specified range(s) from the selection.
-  ///
-  /// Each range in the list must be the same type of selection as
-  /// the current selection list. The range(s) in the supplied list
-  /// are removed from the current selection, which may cause items
-  /// to be removed.
-  ///
-  /// \param list The list of selection range(s).
-  /// \sa pqHistogramSelection::unite(pqHistogramSelection *,
-  ///         pqHistogramSelectionList &)
-  void subtractSelection(const pqHistogramSelectionList &list);
-
-  /// \brief
-  ///   Sets the selection to the specified range.
-  /// \param range The selection range.
-  void setSelection(const pqHistogramSelection *range);
-
-  /// \brief
-  ///   Adds the specified range to the selection.
-  /// \param range The selection range.
-  /// \sa pqHistogramChart::addSelection(const pqHistogramSelectionList &)
-  void addSelection(const pqHistogramSelection *range);
-
-  /// \brief
-  ///   Performs an exclusive or between the specified range and
-  ///   the selection.
-  /// \param range The selection range.
-  /// \sa pqHistogramChart::xorSelection(const pqHistogramSelectionList &)
-  void xorSelection(const pqHistogramSelection *range);
-
-  /// \brief
-  ///   Moves the selection range if it exists.
-  ///
-  /// After finding the selection range, the offset will be added to
-  /// both ends of the range. The new range will be adjusted to fit
-  /// within the bounds of the chart. The new, adjusted range will be
-  /// united with the remaining selections in the list. In other words,
-  /// it is possible for the range to become shorter and/or combined
-  /// with overlapping selection ranges.
-  ///
-  /// \param range The selection range to move.
-  /// \param offset The amount to move the selection range.
-  void moveSelection(const pqHistogramSelection &range,
-      const pqChartValue &offset);
   //@}
 
   /// \name Drawing Parameters
@@ -378,20 +257,55 @@ public:
 
 signals:
   /// \brief
+  ///   Called when the chart needs to be layed out again.
+  void layoutNeeded();
+
+  /// \brief
   ///   Called when the chart needs to be repainted.
   void repaintNeeded();
 
+private slots:
+  /// Updates the layout of the histogram when the model is reset.
+  void handleModelReset();
+
   /// \brief
-  ///   Called when the selection has changed.
-  /// \param list The new selection.
-  void selectionChanged(const pqHistogramSelectionList &list);
+  ///   Starts the histogram bin insertion process.
+  /// \param first The first index of the new bins.
+  /// \param last The last index of the new bins.
+  void startBinInsertion(int first, int last);
+
+  /// Finishes the histogram bin insertion process.
+  void finishBinInsertion();
+
+  /// \brief
+  ///   Starts the histogram bin removal process.
+  /// \param first The first index of the old bins.
+  /// \param last The last index of the old bins.
+  void startBinRemoval(int first, int last);
+
+  /// Finishes the histogram bin removal process.
+  void finishBinRemoval();
+
+  /// \brief
+  ///   Updates the histogram highlights when the selection changes.
+  /// \param list The list of selected ranges.
+  void updateHighlights(const pqHistogramSelectionList &list);
 
 private:
   /// Used to layout the selection list.
   void layoutSelection();
 
-  /// Cleans up the bin and selection lists.
-  void resetData();
+  /// Used to update the axis ranges when the model changes.
+  void updateAxisRanges();
+
+  /// Used to update the x-axis range when the model changes.
+  void updateXAxisRange();
+
+  /// Used to update the y-axis range when the model changes.
+  void updateYAxisRange();
+
+  /// Cleans up the bar and highlight lists.
+  void clearData();
 
 public:
   QRect Bounds;              ///< Stores the chart area.
@@ -401,11 +315,18 @@ public:
 private:
   HighlightStyle Style;       ///< Stores the highlight style.
   OutlineStyle OutlineType;   ///< Stores the outline style.
-  QColor Select;              ///< Stores the selection background color.
+  QColor Select;              ///< Stores the highlight background color.
   pqHistogramColor *Colors;   ///< A pointer to the bar color scheme.
   pqChartAxis *XAxis;         ///< Stores the x-axis object.
   pqChartAxis *YAxis;         ///< Stores the y-axis object.
-  pqHistogramChartData *Data; ///< Stores the bar and selection lists.
+  pqHistogramModel *Model;    ///< A pointer to the histogram model.
+  pqHistogramChartData *Data; ///< Stores the bar and highlight lists.
+
+  /// Stores the selection model.
+  pqHistogramSelectionModel *Selection;
+
+  /// True if selection change is due to a model change.
+  bool InModelChange;
 };
 
 #endif
