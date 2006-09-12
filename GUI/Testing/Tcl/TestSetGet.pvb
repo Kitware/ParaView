@@ -21,6 +21,7 @@ set exceptions {
   vtkPointsProjectedHull-GetSizeCcwHullX
   vtkPointsProjectedHull-GetSizeCcwHullY
   vtkPointsProjectedHull-GetSizeCcwHullZ
+  vtkServerConnection-GetOpenGLExtensionsInformation
   vtkKWUserInterfaceManagerNotebook-GetNotebook
 }
 
