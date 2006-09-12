@@ -92,7 +92,7 @@ public:
 // pqImplicitPlaneWidget
 
 pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
-  pq3DWidget(p),
+  Superclass(p),
   Implementation(new pqImplementation())
 {
   this->ScaleFactor[0] = 1;
@@ -109,6 +109,7 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
     vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetEndDrag));
     
   this->Implementation->UI->setupUi(this);
+  this->Implementation->UI->show3DWidget->setChecked(this->widgetVisible());
 
   connect(this->Implementation->UI->show3DWidget,
     SIGNAL(toggled(bool)), this, SLOT(onShow3DWidget(bool)));
@@ -234,7 +235,7 @@ void pqImplicitPlaneWidget::setControlledProxy(vtkSMProxy* proxy)
     this->createWidget(smModel->getServer(proxy->GetConnectionID()));
     }
 
-  this->pq3DWidget::setControlledProxy(proxy);
+  this->Superclass::setControlledProxy(proxy);
 }
 
 //-----------------------------------------------------------------------------
@@ -249,7 +250,7 @@ void pqImplicitPlaneWidget::setControlledProperty(const char* function,
     {
     this->setNormalProperty(controlled_property);
     }
-  this->pq3DWidget::setControlledProperty(function, controlled_property);
+  this->Superclass::setControlledProperty(function, controlled_property);
 }
 
 //-----------------------------------------------------------------------------

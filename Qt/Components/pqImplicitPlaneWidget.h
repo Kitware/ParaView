@@ -43,6 +43,8 @@ class vtkSMDoubleVectorProperty;
 /// Provides a complete Qt UI for working with a 3D plane widget
 class pqImplicitPlaneWidget : public pq3DWidget
 {
+  typedef pq3DWidget Superclass;
+  
   Q_OBJECT
   
 public:
@@ -78,8 +80,6 @@ protected:
     vtkSMProperty * controlled_property);
 
 protected:
-
-
   /// Internal method to create the widget.
   void createWidget(pqServer*);
 
