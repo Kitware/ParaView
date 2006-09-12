@@ -129,6 +129,13 @@ void pqCollapsedGroup::toggle()
     }
 
   this->update();
+  
+  emit this->toggled();
+  
+  if(this->Implementation->Expanded)
+    emit this->expanded();
+  else
+    emit this->collapsed();
 }
 
 void pqCollapsedGroup::setTitle(const QString& txt)

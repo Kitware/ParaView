@@ -65,6 +65,14 @@ public:
 
   void setIndent(int indent);
   int indent() const;
+
+signals:
+  /// Signal emitted whenever the container is expanded
+  void expanded();
+  /// Signal emitted whenever the container is collapsed
+  void collapsed();
+  /// Signal emitted whenever the container is expanded or collapsed
+  void toggled();
   
 public slots:
   /// Sets the expanded/collapsed state of the container
@@ -79,7 +87,6 @@ public slots:
 private:
   pqCollapsedGroup(const pqCollapsedGroup&);
   pqCollapsedGroup& operator=(const pqCollapsedGroup&);
-
 
   void resizeEvent(QResizeEvent* event);
   void paintEvent(QPaintEvent* event);
