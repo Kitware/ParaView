@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCellSelect);
-vtkCxxRevisionMacro(vtkPVCellSelect, "1.4");
+vtkCxxRevisionMacro(vtkPVCellSelect, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVCellSelect::vtkPVCellSelect()
@@ -272,4 +272,8 @@ void vtkPVCellSelect::DoSelect()
 
 }
 
-
+//----------------------------------------------------------------------------
+void vtkPVCellSelect::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}

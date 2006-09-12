@@ -66,7 +66,7 @@ protected:
 
   vtkPVApplication* PVApplication;
 private:
-  vtkPVCameraManipulatorGUIHelper(const vtkPVCameraManipulatorGUIHelper&); /// Not implemented.
+  vtkPVCameraManipulatorGUIHelper(const vtkPVCameraManipulatorGUIHelper&); // Not implemented.
   void operator=(const vtkPVCameraManipulatorGUIHelper&); // Not implemented.
 };
 

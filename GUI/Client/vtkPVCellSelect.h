@@ -31,6 +31,7 @@ class VTK_EXPORT vtkPVCellSelect : public vtkPVSource
 public:
   static vtkPVCellSelect* New();
   vtkTypeRevisionMacro(vtkPVCellSelect, vtkPVSource);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set up the UI.
