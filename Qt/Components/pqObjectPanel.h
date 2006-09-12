@@ -56,7 +56,10 @@ public:
   void setProxy(pqProxy* proxy);
 
   /// get the proxy for which properties are displayed
-  virtual pqProxy* proxy();
+  pqProxy* proxy();
+
+  /// get the render module that this object panel works with
+  pqRenderModule* getRenderModule();
   
   /// size hint for this widget
   QSize sizeHint() const;
@@ -65,9 +68,6 @@ public:
   pqPropertyManager* getPropertyManager()
     { return this->PropertyManager; }
   
-  /// get the render module that this object panel works with
-  pqRenderModule* getRenderModule();
-
 public slots:
   /// accept the changes made to the properties
   /// changes will be propogated down to the server manager
@@ -79,14 +79,14 @@ public slots:
 
   /// Called when the panel becomes active. Default implemnetation does
   /// nothing.
-  virtual void select() { emit this->onselect();}
+  virtual void select();
 
   /// Called when the panel becomes inactive. Default implemnetation does
   /// nothing.
-  virtual void deselect() { emit this->ondeselect(); }
+  virtual void deselect();
 
   /// Set the render module that this panel works with
-  virtual void setRenderModule(pqRenderModule*);
+  void setRenderModule(pqRenderModule*);
 
 signals:
   void canAcceptOrReject(bool);

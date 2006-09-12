@@ -42,6 +42,8 @@ class pqHandleWidget : public pq3DWidget
   Q_OBJECT
   
 public:
+  typedef pq3DWidget Superclass;
+
   pqHandleWidget(QWidget* p);
   ~pqHandleWidget();
 
@@ -56,8 +58,6 @@ protected:
   virtual void resetBounds();
 
 private slots:
-  /// Called to show/hide the 3D widget
-  void onShow3DWidget(bool);
   /// Called to reset the 3D widget bounds to the reference proxy bounds
   void onResetBounds();
   /// Called when the user starts dragging the 3D widget
@@ -66,9 +66,6 @@ private slots:
   void on3DWidgetEndDrag();
 
 protected:
-  virtual void setControlledProperty(const char* function,
-    vtkSMProperty * controlled_property);
-  
   /// Overridden to make sure that the visibility check box is
   /// updated.
   virtual void set3DWidgetVisibility(bool visible);

@@ -75,8 +75,6 @@ public:
   
   /// Stores the Qt widgets
   Ui::pqHandleWidget* const UI;
-  // Controlled property for position.
-  vtkSmartPointer<vtkSMDoubleVectorProperty> PositionProperty;
 
   /// Callback object used to connect 3D widget events to member methods
   vtkSmartPointer<vtkCommand> StartDragObserver;
@@ -89,7 +87,7 @@ public:
 // pqHandleWidget
 
 pqHandleWidget::pqHandleWidget(QWidget* p) :
-  pq3DWidget(p),
+  Superclass(p),
   Implementation(new pqImplementation())
 {
   this->Implementation->StartDragObserver.TakeReference(
@@ -100,7 +98,7 @@ pqHandleWidget::pqHandleWidget(QWidget* p) :
   this->Implementation->UI->setupUi(this);
 
   connect(this->Implementation->UI->show3DWidget,
-    SIGNAL(toggled(bool)), this, SLOT(onShow3DWidget(bool)));
+    SIGNAL(toggled(bool)), this, SLOT(setVisibility(bool)));
 
   connect(this->Implementation->UI->useCenterBounds,
     SIGNAL(clicked()), this, SLOT(onResetBounds()));
@@ -183,19 +181,7 @@ void pqHandleWidget::setControlledProxy(vtkSMProxy* proxy)
     this->createWidget(smModel->getServer(proxy->GetConnectionID()));
     }
 
-  this->pq3DWidget::setControlledProxy(proxy);
-}
-
-//-----------------------------------------------------------------------------
-void pqHandleWidget::setControlledProperty(const char* function,
-    vtkSMProperty * controlled_property)
-{
-  if (strcmp(function, "WorldPosition") == 0)
-    {
-    this->Implementation->PositionProperty = 
-      vtkSMDoubleVectorProperty::SafeDownCast(controlled_property);
-    }
-  this->pq3DWidget::setControlledProperty(function, controlled_property);
+  this->Superclass::setControlledProxy(proxy);
 }
 
 //-----------------------------------------------------------------------------
@@ -205,20 +191,7 @@ void pqHandleWidget::set3DWidgetVisibility(bool visible)
   this->Implementation->UI->show3DWidget->setChecked(visible);
   this->Implementation->UI->show3DWidget->blockSignals(false);
 
-  this->pq3DWidget::set3DWidgetVisibility(visible);
-}
-
-//-----------------------------------------------------------------------------
-void pqHandleWidget::onShow3DWidget(bool show_widget)
-{
-  if (show_widget)
-    {
-    this->showWidget();
-    }
-  else
-    {
-    this->hideWidget();
-    }
+  this->Superclass::set3DWidgetVisibility(visible);
 }
 
 //-----------------------------------------------------------------------------

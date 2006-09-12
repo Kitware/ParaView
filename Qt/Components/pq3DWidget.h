@@ -99,9 +99,10 @@ signals:
   void widgetEndInteraction();
 
 public slots:
+  /// Sets 3D widget visibility
+  void setVisibility(bool);
   /// Makes the 3D widget visible. 
   virtual void showWidget();
-
   /// Hides the 3D widget.
   virtual void hideWidget();
 
@@ -139,6 +140,8 @@ protected:
   /// accept/reset.
   virtual void setControlledProperty(const char* function,
     vtkSMProperty * controlled_property);
+
+  void setControlledProperty(vtkSMProperty* widget_property, vtkSMProperty* controlled_property);
 
   /// Internal method to change the widget visibility.
   /// Changes made to visibility using this method are not saved in the

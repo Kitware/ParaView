@@ -310,6 +310,16 @@ void pq3DWidget::setControlledProperty(const char* function,
     this->Internal->ControlledPropertiesObserver);
 }
 
+void pq3DWidget::setControlledProperty(vtkSMProperty* widget_property, vtkSMProperty* controlled_property)
+{
+  this->Internal->PropertyMap.insert(
+    widget_property,
+    controlled_property);
+    
+  controlled_property->AddObserver(vtkCommand::ModifiedEvent,
+    this->Internal->ControlledPropertiesObserver);
+}
+
 //-----------------------------------------------------------------------------
 void pq3DWidget::accept()
 {
@@ -381,6 +391,14 @@ void pq3DWidget::deselect()
     {
     this->set3DWidgetVisibility(false);
     }
+}
+
+void pq3DWidget::setVisibility(bool visible)
+{
+  if(visible)
+    this->showWidget();
+  else
+    this->hideWidget();
 }
 
 //-----------------------------------------------------------------------------

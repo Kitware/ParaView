@@ -587,28 +587,6 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
       this->getUndoStack()->EndUndoSet();
       }
 
-    // As a special-case, set a default point source for new StreamTracer filters
-    if(xmlname == "StreamTracer")
-      {
-      this->Internal->UndoStack->BeginUndoSet("Set Point Source");
-      vtkSMProxyProperty* sourceProperty = vtkSMProxyProperty::SafeDownCast(
-        filter->getProxy()->GetProperty("Source"));
-      if(sourceProperty && sourceProperty->GetNumberOfProxies() > 0)
-        {
-        vtkSMProxy* const point_source = sourceProperty->GetProxy(0);
-        if(vtkSMIntVectorProperty* const number_of_points =
-          vtkSMIntVectorProperty::SafeDownCast(
-            point_source->GetProperty("NumberOfPoints")))
-          {
-          number_of_points->SetNumberOfElements(1);
-          number_of_points->SetElement(0, 100);
-          }
-        point_source->UpdateVTKObjects();
-        }
-        
-      this->getUndoStack()->EndUndoSet();
-      }
-      
     emit this->sourceCreated(filter);
 
     // As a special-case, set the default contour for new Contour filters

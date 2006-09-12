@@ -67,6 +67,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqImageTip.h
   pqImplicitPlaneWidget.h
   pqLineWidget.h
+  pqLineSourceWidget.h
   pqLoadedFormObjectPanel.h
   pqMainWindowCore.h
   pqMultiView.h
@@ -128,6 +129,7 @@ SET(UI_FORMS
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqLineWidget.ui
+  Resources/UI/pqLineSourceControls.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqRenderViewEditor.ui
@@ -136,7 +138,7 @@ SET(UI_FORMS
   Resources/UI/pqServerBrowser.ui
   Resources/UI/pqServerStartupDialog.ui
   Resources/UI/pqSettingsDialog.ui
-  Resources/UI/pqStreamTracerControls.ui
+  Resources/UI/pqStreamTracerPanel.ui
 )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
@@ -225,6 +227,8 @@ ADD_LIBRARY(pqComponents
   pqImplicitPlaneWidget.h
   pqLineWidget.cxx
   pqLineWidget.h
+  pqLineSourceWidget.cxx
+  pqLineSourceWidget.h
   pqLoadedFormObjectPanel.cxx
   pqLoadedFormObjectPanel.h
   pqMainWindowCore.cxx

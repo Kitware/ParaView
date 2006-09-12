@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqStreamTracerPanel :
   public pqObjectPanel
 {
-  typedef pqObjectPanel base;
+  typedef pqObjectPanel Superclass;
 
   Q_OBJECT
 
@@ -49,15 +49,13 @@ public:
   ~pqStreamTracerPanel();
   
 private slots:
-  /// Called if the user accepts pending modifications
-  void onAccepted();
-  /// Called if the user rejects pending modifications
-  void onRejected();
+  void onRenderModuleChanged(pqRenderModule*);
+  void onSeedTypeChanged(int);
 
 private:
   virtual void setProxyInternal(pqProxy* p);
-  virtual void select();
-  virtual void deselect();
+  void onUsePointSource();
+  void onUseLineSource();
 
   class pqImplementation;
   pqImplementation* const Implementation;

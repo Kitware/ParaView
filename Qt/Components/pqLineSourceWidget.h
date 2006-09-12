@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqLineWidget.h
+   Module:    pqLineSourceWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,42 +30,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqLineWidget_h
-#define _pqLineWidget_h
+#ifndef _pqLineSourceWidget_h
+#define _pqLineSourceWidget_h
 
-#include "pq3DWidget.h"
+#include "pqLineWidget.h"
 
 class pqServer;
 
 /// Provides a complete Qt UI for working with a 3D line widget
-class pqLineWidget :
-  public pq3DWidget
+class pqLineSourceWidget :
+  public pqLineWidget
 {
-  typedef pq3DWidget Superclass;
+  typedef pqLineWidget Superclass;
   
   Q_OBJECT
   
 public:
-  pqLineWidget(QWidget* p = 0);
-  ~pqLineWidget();
+  pqLineSourceWidget(QWidget* p = 0);
+  ~pqLineSourceWidget();
 
-  void setControlledProxy(vtkSMProxy* proxy);
-  void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2);
-
-public slots:
-  void onXAxis();
-  void onYAxis();
-  void onZAxis();
+  void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2, vtkSMProperty* resolution);
 
 private:
-  void createWidget(pqServer* server);
-  void resetBounds();
-  void getReferenceBoundingBox(double center[3], double size[3]);
-
-  /// Overridden to make sure that the visibility check box is
-  /// updated.
-  virtual void set3DWidgetVisibility(bool visible);
-
   class pqImplementation;
   pqImplementation* const Implementation;
 };

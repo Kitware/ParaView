@@ -42,6 +42,8 @@ class pqPropertyManager;
 /// Provides a complete Qt UI for working with a vtkPointSource filter
 class pqPointSourceWidget : public pqHandleWidget 
 {
+  typedef pqHandleWidget Superclass;
+  
   Q_OBJECT
   
 public:

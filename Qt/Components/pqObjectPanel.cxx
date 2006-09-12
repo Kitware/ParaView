@@ -167,6 +167,16 @@ void pqObjectPanel::reset()
   emit this->onreset();
 }
 
+void pqObjectPanel::select()
+{
+  emit this->onselect();
+}
+
+void pqObjectPanel::deselect()
+{
+  emit this->ondeselect();
+}
+
 void pqObjectPanel::setRenderModule(pqRenderModule* rm)
 {
   this->RenderModule = rm;
