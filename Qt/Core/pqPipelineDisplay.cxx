@@ -195,39 +195,45 @@ void pqPipelineDisplay::setDefaultColorParametes()
   // Look for a new point array.
   // I do not think the logic is exactly as describerd in this methods
   // comment.  I believe this method only looks at "Scalars".
-  attrInfo = geomInfo->GetPointDataInformation();
-  if (inGeomInfo)
+  if(geomInfo)
     {
-    inAttrInfo = inGeomInfo->GetPointDataInformation();
-    }
-  else
-    {
-    inAttrInfo = 0;
-    }
-  pqPipelineDisplay::getColorArray(attrInfo, inAttrInfo, arrayInfo);
-  if(arrayInfo)
-    {
-    this->colorByArray(arrayInfo->GetName(), 
-                       vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
-    return;
+    attrInfo = geomInfo->GetPointDataInformation();
+    if (inGeomInfo)
+      {
+      inAttrInfo = inGeomInfo->GetPointDataInformation();
+      }
+    else
+      {
+      inAttrInfo = 0;
+      }
+    pqPipelineDisplay::getColorArray(attrInfo, inAttrInfo, arrayInfo);
+    if(arrayInfo)
+      {
+      this->colorByArray(arrayInfo->GetName(), 
+                         vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+      return;
+      }
     }
     
   // Check for new cell scalars.
-  attrInfo = geomInfo->GetCellDataInformation();
-  if (inGeomInfo)
+  if(geomInfo)
     {
-    inAttrInfo = inGeomInfo->GetCellDataInformation();
-    }
-  else
-    {
-    inAttrInfo = 0;
-    }
-  pqPipelineDisplay::getColorArray(attrInfo, inAttrInfo, arrayInfo);
-  if(arrayInfo)
-    {
-    this->colorByArray(arrayInfo->GetName(), 
-                       vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
-    return;
+    attrInfo = geomInfo->GetCellDataInformation();
+    if (inGeomInfo)
+      {
+      inAttrInfo = inGeomInfo->GetCellDataInformation();
+      }
+    else
+      {
+      inAttrInfo = 0;
+      }
+    pqPipelineDisplay::getColorArray(attrInfo, inAttrInfo, arrayInfo);
+    if(arrayInfo)
+      {
+      this->colorByArray(arrayInfo->GetName(), 
+                         vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+      return;
+      }
     }
     
   if (geomInfo)
