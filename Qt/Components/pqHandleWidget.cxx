@@ -96,11 +96,15 @@ pqHandleWidget::pqHandleWidget(QWidget* p) :
     vtkMakeMemberFunctionCommand(*this, &pqHandleWidget::on3DWidgetEndDrag));
 
   this->Implementation->UI->setupUi(this);
+  this->Implementation->UI->show3DWidget->setChecked(this->widgetVisible());
 
-  connect(this->Implementation->UI->show3DWidget,
-    SIGNAL(toggled(bool)), this, SLOT(setVisibility(bool)));
+  QObject::connect(this->Implementation->UI->show3DWidget,
+    SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
 
-  connect(this->Implementation->UI->useCenterBounds,
+  QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
+    this, SLOT(onWidgetVisibilityChanged(bool)));
+
+  QObject::connect(this->Implementation->UI->useCenterBounds,
     SIGNAL(clicked()), this, SLOT(onResetBounds()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
@@ -185,13 +189,11 @@ void pqHandleWidget::setControlledProxy(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-void pqHandleWidget::set3DWidgetVisibility(bool visible)
+void pqHandleWidget::onWidgetVisibilityChanged(bool visible)
 {
   this->Implementation->UI->show3DWidget->blockSignals(true);
   this->Implementation->UI->show3DWidget->setChecked(visible);
   this->Implementation->UI->show3DWidget->blockSignals(false);
-
-  this->Superclass::set3DWidgetVisibility(visible);
 }
 
 //-----------------------------------------------------------------------------

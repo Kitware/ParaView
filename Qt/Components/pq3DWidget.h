@@ -83,14 +83,17 @@ public:
   /// Return the 3D Widget proxy.
   vtkSMNew3DWidgetProxy* getWidgetProxy() const;
 
-  /// Returns if the 3D widget is visible for the current
-  /// reference proxy.
-  bool widgetVisibile() const;
+  /// Returns true if 3D widget visibility is enabled.
+  /// Note: this *does not* indicate that the 3D widget is currently visible
+  /// in the display, since this widget's panel might not be visible.
+  bool widgetVisible() const;
   
   /// Get the render module that this widget works with
   pqRenderModule* getRenderModule() const;
 
 signals:
+  /// Notifies observers that widget visibility has changed
+  void widgetVisibilityChanged(bool);
   /// Notifies observers that the user is dragging the 3D widget
   void widgetStartInteraction();
   /// Notifies observers that the widget has been modified
@@ -100,11 +103,11 @@ signals:
 
 public slots:
   /// Sets 3D widget visibility
-  void setVisibility(bool);
+  void setWidgetVisible(bool);
   /// Makes the 3D widget visible. 
-  virtual void showWidget();
+  void showWidget();
   /// Hides the 3D widget.
-  virtual void hideWidget();
+  void hideWidget();
 
   /// Activates the widget. Respects the visibility flag.
   virtual void select();
@@ -143,13 +146,6 @@ protected:
 
   void setControlledProperty(vtkSMProperty* widget_property, vtkSMProperty* controlled_property);
 
-  /// Internal method to change the widget visibility.
-  /// Changes made to visibility using this method are not saved in the
-  /// internal datastructure, use showWidget()/hideWidget() if you want
-  /// the change to be recorded so that it will be respected when
-  /// the panel calls select().
-  virtual void set3DWidgetVisibility(bool visible);
-
   // Subclasses must set the widget proxy.
   void setWidgetProxy(vtkSMNew3DWidgetProxy*);
 
@@ -159,13 +155,10 @@ protected:
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   virtual void resetBounds() =0;
 
-  /// Used to avoid recursion when updating the controlled properties
-  bool IgnorePropertyChange;
-  
 private:
-  pq3DWidgetInternal* Internal;
+  void updateWidgetVisibility();
+  
+  pq3DWidgetInternal* const Internal;
 };
 
-
 #endif
-

@@ -85,9 +85,13 @@ pqLineWidget::pqLineWidget(QWidget* p) :
   Implementation(new pqImplementation())
 {
   this->Implementation->UI.setupUi(this);
+  this->Implementation->UI.visible->setChecked(this->widgetVisible());
 
   QObject::connect(this->Implementation->UI.visible,
-    SIGNAL(toggled(bool)), this, SLOT(setVisibility(bool)));
+    SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
+
+  QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
+    this, SLOT(onWidgetVisibilityChanged(bool)));
 
   QObject::connect(this->Implementation->UI.xAxis,
     SIGNAL(clicked()), this, SLOT(onXAxis()));
@@ -288,11 +292,9 @@ void pqLineWidget::getReferenceBoundingBox(double center[3], double size[3])
     }
 }
 
-void pqLineWidget::set3DWidgetVisibility(bool visible)
+void pqLineWidget::onWidgetVisibilityChanged(bool visible)
 {
   this->Implementation->UI.visible->blockSignals(true);
   this->Implementation->UI.visible->setChecked(visible);
   this->Implementation->UI.visible->blockSignals(false);
-
-  this->Superclass::set3DWidgetVisibility(visible);
 }

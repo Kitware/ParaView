@@ -77,10 +77,6 @@ protected:
   virtual void setControlledProperty(const char* function,
     vtkSMProperty * controlled_property);
 
-  /// Overridden to make sure that the visibility check box is
-  /// updated.
-  virtual void set3DWidgetVisibility(bool visible);
-
 protected:
 
 
@@ -89,6 +85,7 @@ protected:
 
   /// Internal method to cleanup widget.
   void cleanupWidget();
+  
 private slots:
   /// Called to show/hide the 3D widget
   void onShow3DWidget(bool);
@@ -108,6 +105,8 @@ private slots:
   void on3DWidgetStartDrag();
   /// Called when the user stops dragging the 3D widget
   void on3DWidgetEndDrag();
+  /// Called whenever the 3D widget visibility is modified
+  void onWidgetVisibilityChanged(bool visible);
 
 private:
   void get3DWidgetState(double* origin, double* normal);

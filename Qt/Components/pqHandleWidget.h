@@ -64,11 +64,10 @@ private slots:
   void on3DWidgetStartDrag();
   /// Called when the user stops dragging the 3D widget
   void on3DWidgetEndDrag();
+  /// Called when the user changes widget visibility
+  void onWidgetVisibilityChanged(bool visible);
 
 protected:
-  /// Overridden to make sure that the visibility check box is
-  /// updated.
-  virtual void set3DWidgetVisibility(bool visible);
   /// Internal method to create the widget.
   void createWidget(pqServer*);
 

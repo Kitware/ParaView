@@ -55,6 +55,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pq3DWidgetInternal
 {
 public:
+  pq3DWidgetInternal() :
+    IgnorePropertyChange(false),
+    WidgetVisible(true),
+    Selected(false)
+  {
+  }
+    
   QPointer<pqProxy> ReferenceProxy;
   QPointer<pqRenderModule> RenderModule;
   pqSMProxy ControlledProxy;
@@ -63,18 +70,23 @@ public:
 
   QMap<vtkSmartPointer<vtkSMProperty>, vtkSmartPointer<vtkSMProperty> > PropertyMap;
 
-  static QMap<pqProxy*, bool> Visibility;
+  /// Used to avoid recursion when updating the controlled properties
+  bool IgnorePropertyChange;
+  /// Stores the visible/hidden state of the 3D widget (controlled by the user)
+  bool WidgetVisible;
+  /// Stores the selected/not selected state of the 3D widget (controlled by the owning panel)
+  bool Selected;
 };
-QMap<pqProxy*, bool> pq3DWidgetInternal::Visibility;
 
 //-----------------------------------------------------------------------------
-pq3DWidget::pq3DWidget(QWidget* _p): QWidget(_p)
+pq3DWidget::pq3DWidget(QWidget* _p) :
+  QWidget(_p),
+  Internal(new pq3DWidgetInternal())
 {
-  this->Internal = new pq3DWidgetInternal;
   this->Internal->ControlledPropertiesObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, 
       &pq3DWidget::onControlledPropertyChanged));
-  this->IgnorePropertyChange = false;
+  this->Internal->IgnorePropertyChange = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -175,7 +187,7 @@ void pq3DWidget::render()
 //-----------------------------------------------------------------------------
 void pq3DWidget::onControlledPropertyChanged()
 {
-  if (this->IgnorePropertyChange)
+  if (this->Internal->IgnorePropertyChange)
     {
     return;
     }
@@ -225,10 +237,6 @@ vtkSMNew3DWidgetProxy* pq3DWidget::getWidgetProxy() const
 void pq3DWidget::setReferenceProxy(pqProxy* proxy)
 {
   this->Internal->ReferenceProxy = proxy;
-  if (proxy && !this->Internal->Visibility.contains(proxy))
-    {
-    this->Internal->Visibility.insert(proxy, true);
-    }
   this->resetBounds();
 }
 
@@ -323,7 +331,7 @@ void pq3DWidget::setControlledProperty(vtkSMProperty* widget_property, vtkSMProp
 //-----------------------------------------------------------------------------
 void pq3DWidget::accept()
 {
-  this->IgnorePropertyChange = true;
+  this->Internal->IgnorePropertyChange = true;
   QMap<vtkSmartPointer<vtkSMProperty>, vtkSmartPointer<vtkSMProperty> >::const_iterator
     iter;
   for (iter = this->Internal->PropertyMap.constBegin() ;
@@ -336,7 +344,7 @@ void pq3DWidget::accept()
     {
     this->Internal->ControlledProxy->UpdateVTKObjects();
     }
-  this->IgnorePropertyChange = false;
+  this->Internal->IgnorePropertyChange = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -365,77 +373,77 @@ void pq3DWidget::reset()
 }
 
 //-----------------------------------------------------------------------------
-bool pq3DWidget::widgetVisibile() const
+bool pq3DWidget::widgetVisible() const
 {
-  if (!this->Internal->ReferenceProxy || 
-    !this->Internal->Visibility.contains(this->Internal->ReferenceProxy))
-    {
-    return true;
-    }
-  return this->Internal->Visibility[this->Internal->ReferenceProxy];
+  return this->Internal->WidgetVisible;
 }
 
 //-----------------------------------------------------------------------------
 void pq3DWidget::select()
 {
-  if (this->widgetVisibile())
+  if(true != this->Internal->Selected)
     {
-    this->set3DWidgetVisibility(true);
+    this->Internal->Selected = true;
+    updateWidgetVisibility();
     }
 }
 
 //-----------------------------------------------------------------------------
 void pq3DWidget::deselect()
 {
-  if (this->widgetVisibile())
+  if(false != this->Internal->Selected)
     {
-    this->set3DWidgetVisibility(false);
+    this->Internal->Selected = false;
+    updateWidgetVisibility();
     }
 }
 
-void pq3DWidget::setVisibility(bool visible)
+//-----------------------------------------------------------------------------
+void pq3DWidget::setWidgetVisible(bool visible)
 {
-  if(visible)
-    this->showWidget();
-  else
-    this->hideWidget();
+  if(visible != this->Internal->WidgetVisible)
+    {
+    this->Internal->WidgetVisible = visible;
+    updateWidgetVisibility();
+    
+    emit this->widgetVisibilityChanged(visible);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pq3DWidget::showWidget()
 {
-  this->set3DWidgetVisibility(true);
-  this->Internal->Visibility.insert(this->Internal->ReferenceProxy, true);
+  this->setWidgetVisible(true);
 }
 
 //-----------------------------------------------------------------------------
 void pq3DWidget::hideWidget()
 {
-  this->set3DWidgetVisibility(false);
-    this->Internal->Visibility.insert(this->Internal->ReferenceProxy, false);
+  this->setWidgetVisible(false);
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::set3DWidgetVisibility(bool visible)
+void pq3DWidget::updateWidgetVisibility()
 {
-  if (visible && !this->Internal->RenderModule)
-    {
-    return;
-    }
+  const bool widget_visible = this->Internal->Selected
+    && this->Internal->WidgetVisible;
+    
+  const bool widget_enabled = widget_visible;
+  
   if(this->Internal->WidgetProxy)
     {
     if(vtkSMIntVectorProperty* const visibility =
       vtkSMIntVectorProperty::SafeDownCast(
         this->Internal->WidgetProxy->GetProperty("Visibility")))
       {
-      visibility->SetElement(0, visible);
+      visibility->SetElement(0, widget_visible);
       }
 
     if(vtkSMIntVectorProperty* const enabled =
       vtkSMIntVectorProperty::SafeDownCast(
         this->Internal->WidgetProxy->GetProperty("Enabled")))
       {
-      enabled->SetElement(0, visible);
+      enabled->SetElement(0, widget_enabled);
       }
 
     this->Internal->WidgetProxy->UpdateVTKObjects();

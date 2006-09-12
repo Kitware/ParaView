@@ -291,8 +291,8 @@ void pqStreamTracerPanel::setProxyInternal(pqProxy* p)
     source_property->RemoveAllProxies();
     source_property->AddProxy(sources[0]);
     this->Implementation->UI.seedType->setCurrentIndex(0);
-    this->Implementation->PointSourceWidget->setVisibility(true);
-    this->Implementation->LineSourceWidget->setVisibility(false);
+    this->Implementation->PointSourceWidget->setWidgetVisible(true);
+    this->Implementation->LineSourceWidget->setWidgetVisible(false);
     }
  
   if(this->Proxy)
@@ -386,8 +386,8 @@ void pqStreamTracerPanel::onUsePointSource()
         pqSMProxy source = sources[i];
         if(source->GetVTKClassName() == QString("vtkPointSource"))
           {
-          this->Implementation->PointSourceWidget->setVisibility(true);
-          this->Implementation->LineSourceWidget->setVisibility(false);
+          this->Implementation->PointSourceWidget->setWidgetVisible(true);
+          this->Implementation->LineSourceWidget->setWidgetVisible(false);
           source_property->RemoveAllProxies();
           source_property->AddProxy(source);
           this->Proxy->getProxy()->UpdateVTKObjects();
@@ -412,8 +412,8 @@ void pqStreamTracerPanel::onUseLineSource()
         pqSMProxy source = sources[i];
         if(source->GetVTKClassName() == QString("vtkLineSource"))
           {
-          this->Implementation->PointSourceWidget->setVisibility(false);
-          this->Implementation->LineSourceWidget->setVisibility(true);
+          this->Implementation->PointSourceWidget->setWidgetVisible(false);
+          this->Implementation->LineSourceWidget->setWidgetVisible(true);
           source_property->RemoveAllProxies();
           source_property->AddProxy(source);
           this->Proxy->getProxy()->UpdateVTKObjects();

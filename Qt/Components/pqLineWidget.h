@@ -57,14 +57,13 @@ public slots:
   void onYAxis();
   void onZAxis();
 
+private slots:
+  void onWidgetVisibilityChanged(bool visible);
+
 private:
   void createWidget(pqServer* server);
   void resetBounds();
   void getReferenceBoundingBox(double center[3], double size[3]);
-
-  /// Overridden to make sure that the visibility check box is
-  /// updated.
-  virtual void set3DWidgetVisibility(bool visible);
 
   class pqImplementation;
   pqImplementation* const Implementation;

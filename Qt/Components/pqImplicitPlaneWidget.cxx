@@ -112,6 +112,8 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
 
   connect(this->Implementation->UI->show3DWidget,
     SIGNAL(toggled(bool)), this, SLOT(onShow3DWidget(bool)));
+  QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
+    this, SLOT(onWidgetVisibilityChanged(bool)));
 
   connect(this->Implementation->UI->useXNormal,
     SIGNAL(clicked()), this, SLOT(onUseXNormal()));
@@ -266,13 +268,11 @@ void pqImplicitPlaneWidget::setNormalProperty(vtkSMProperty* normal_property)
 
 
 //-----------------------------------------------------------------------------
-void pqImplicitPlaneWidget::set3DWidgetVisibility(bool visible)
+void pqImplicitPlaneWidget::onWidgetVisibilityChanged(bool visible)
 {
   this->Implementation->UI->show3DWidget->blockSignals(true);
   this->Implementation->UI->show3DWidget->setChecked(visible);
   this->Implementation->UI->show3DWidget->blockSignals(false);
-
-  this->pq3DWidget::set3DWidgetVisibility(visible);
 }
 
 //-----------------------------------------------------------------------------
