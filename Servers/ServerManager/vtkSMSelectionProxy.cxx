@@ -69,7 +69,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.6");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -80,6 +80,11 @@ vtkSMSelectionProxy::vtkSMSelectionProxy()
   this->RenderModule = 0;
   this->ClientSideSelection = 0;
   this->SelectionUpToDate = 0;
+  this->Selection[0] = 0;
+  this->Selection[1] = 0;
+  this->Selection[2] = 0;
+  this->Selection[3] = 0;
+
 }
 
 //-----------------------------------------------------------------------------
