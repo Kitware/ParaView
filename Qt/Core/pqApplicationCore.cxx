@@ -707,6 +707,7 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
                                                                    server);
   if (!reader)
     {
+    this->getUndoStack()->EndUndoSet();
     return NULL;
     }
 
