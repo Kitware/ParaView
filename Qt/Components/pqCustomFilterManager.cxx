@@ -171,7 +171,7 @@ void pqCustomFilterManager::importFiles()
       this,
       tr("Open Custom Filter File"),
       QString(),
-      "Custom Filter Files (*.cpd, *.xml);;All Files (*)");
+      "Custom Filter Files (*.cpd *.xml);;All Files (*)");
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("FileOpenDialog");
   fileDialog->setFileMode(pqFileDialog::ExistingFiles);
@@ -191,7 +191,7 @@ void pqCustomFilterManager::exportSelected()
       this,
       tr("Save Custom Filter File"),
       QString(),
-      "Custom Filter Files (*.cpd, *.xml);;All Files (*)");
+      "Custom Filter Files (*.cpd *.xml);;All Files (*)");
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("FileSaveDialog");
   fileDialog->setFileMode(pqFileDialog::AnyFile);
