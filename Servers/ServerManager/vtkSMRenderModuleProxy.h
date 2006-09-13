@@ -188,7 +188,7 @@ public:
 
   // Description:
   // Return a list of visible cells within the provided screen area.
-  vtkSelection *SelectVisibleCells(int x0, int y0, int x1, int y1);
+  vtkSelection *SelectVisibleCells(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1);
 
 protected:
   vtkSMRenderModuleProxy();
