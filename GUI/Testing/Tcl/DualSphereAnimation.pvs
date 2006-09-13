@@ -19,6 +19,7 @@ $kw(vtkTemp844) SetValue 0
 $kw(vtkTemp2) SetCenterOfRotation 0.202009 0.000000 0.000000
 $kw(vtkTemp2) SetCenterOfRotation 0.202009 0.000000 0.000000
 $kw(vtkTemp843) AcceptCallback
+$pv(vtkTemp43) ResetCamera
 set kw(vtkTemp881) [$kw(vtkTemp2) GetAnimationManager]
 set kw(vtkTemp556) [$kw(vtkTemp881) GetAnimationScene]
 $kw(vtkTemp556) Play
