@@ -46,7 +46,7 @@ class pqNamedObjectPanel : public pqObjectPanel
   
 public:
   /// constructor
-  pqNamedObjectPanel(QWidget* p);
+  pqNamedObjectPanel(pqProxy& proxy, QWidget* p);
   /// destructor
   ~pqNamedObjectPanel();
 

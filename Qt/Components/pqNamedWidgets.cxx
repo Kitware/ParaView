@@ -272,7 +272,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
           pqObjectPanel* object_panel = qobject_cast<pqObjectPanel*>(parent);
           if (object_panel)
             {
-            proxyAdaptor->setRenderModule(object_panel->getRenderModule());
+            proxyAdaptor->setRenderModule(object_panel->renderModule());
             }
           QObject::connect(parent, SIGNAL(renderModuleChanged(pqRenderModule*)),
             proxyAdaptor, SLOT(setRenderModule(pqRenderModule*)));

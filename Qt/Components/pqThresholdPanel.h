@@ -44,7 +44,7 @@ class pqThresholdPanel :
   Q_OBJECT
 public:
   /// constructor
-  pqThresholdPanel(QWidget* p = NULL);
+  pqThresholdPanel(pqProxy& proxy, QWidget* p = NULL);
   /// destructor
   ~pqThresholdPanel();
 
@@ -78,8 +78,8 @@ class pqThresholdPanelInterface : public QObject, public pqObjectPanelInterface
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   virtual QString name() const;
-  virtual pqObjectPanel* createPanel(QWidget* p);
-  virtual bool canCreatePanel(vtkSMProxy* proxy) const; 
+  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy& proxy) const; 
 };
 
 #endif

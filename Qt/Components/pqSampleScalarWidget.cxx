@@ -164,6 +164,12 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
 
 pqSampleScalarWidget::~pqSampleScalarWidget()
 {
+  if(this->Implementation->RangeProperty)
+    {
+    this->Implementation->RangeProperty->RemoveObserver(
+      this->Implementation->DomainObserver);
+    }
+
   if(this->Implementation->SampleProperty)
     {
     this->Implementation->SampleProperty->RemoveObserver(

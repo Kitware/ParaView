@@ -59,15 +59,15 @@ QString pqClipPanelInterface::name() const
   return "Clip";
 }
 
-pqObjectPanel* pqClipPanelInterface::createPanel(QWidget* p)
+pqObjectPanel* pqClipPanelInterface::createPanel(pqProxy& proxy, QWidget* p)
 {
-  return new pqClipPanel(p);
+  return new pqClipPanel(proxy, p);
 }
  
-bool pqClipPanelInterface::canCreatePanel(vtkSMProxy* proxy) const
+bool pqClipPanelInterface::canCreatePanel(pqProxy& proxy) const
 {
-  return (proxy && QString("filters") == proxy->GetXMLGroup() &&
-    QString("Clip") == proxy->GetXMLName());
+  return (QString("filters") == proxy.getProxy()->GetXMLGroup() &&
+    QString("Clip") == proxy.getProxy()->GetXMLName());
 }
 
 Q_EXPORT_PLUGIN(pqClipPanelInterface)
@@ -91,8 +91,8 @@ public:
   pqImplicitPlaneWidget ImplicitPlaneWidget;
 };
 
-pqClipPanel::pqClipPanel(QWidget* p) :
-  Superclass(p),
+pqClipPanel::pqClipPanel(pqProxy& proxy, QWidget* p) :
+  Superclass(proxy, p),
   Implementation(new pqImplementation())
 {
   pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Clip"));
@@ -115,20 +115,62 @@ pqClipPanel::pqClipPanel(QWidget* p) :
                    SLOT(setRenderModule(pqRenderModule*)));
 
   connect(&this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onWidgetChanged()));
-  connect(this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
-  connect(this->getPropertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
+  connect(&this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
+  connect(&this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
+
+  pqProxy* reference_proxy = &this->proxy();
+  vtkSMProxy* controlled_proxy = NULL;
+   
+  if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
+    this->proxy().getProxy()->GetProperty("ClipFunction")))
+    {
+    if (clip_function_property->GetNumberOfProxies() == 0)
+      {
+      vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
+        clip_function_property->GetDomain("proxy_list"));
+      if (pld)
+        {
+        clip_function_property->AddProxy(pld->GetProxy(0));
+        this->proxy().getProxy()->UpdateVTKObjects();
+        }
+      }
+    controlled_proxy = clip_function_property->GetProxy(0);
+    controlled_proxy->UpdateVTKObjects();
+    }
+
+  this->Implementation->ImplicitPlaneWidget.setReferenceProxy(reference_proxy);
+  this->Implementation->ImplicitPlaneWidget.setControlledProxy(controlled_proxy);
+
+  if (controlled_proxy)
+    {
+    vtkPVXMLElement* hints = controlled_proxy->GetHints();
+    for (unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* elem = hints->GetNestedElement(cc);
+      if (QString("PropertyGroup") == elem->GetName() && 
+        QString("Plane") == elem->GetAttribute("type"))
+        {
+        this->Implementation->ImplicitPlaneWidget.setHints(elem);
+        break;
+        }
+      }
+    }
+
+  this->propertyManager().registerLink(
+    &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
+    this->proxy().getProxy(), 
+    this->proxy().getProxy()->GetProperty("InsideOut"));
 }
 
 pqClipPanel::~pqClipPanel()
 {
-  this->setProxy(0);
   delete this->Implementation;
 }
 
 void pqClipPanel::onWidgetChanged()
 {
   // Signal the UI that there are changes to accept/reject ...
-  this->getPropertyManager()->propertyChanged();
+  this->propertyManager().propertyChanged();
 }
 
 void pqClipPanel::onAccepted()
@@ -137,7 +179,7 @@ void pqClipPanel::onAccepted()
 
   // If this is the first time we've been accepted since our creation, hide the source
   if(pqPipelineFilter* const pipeline_filter = 
-           qobject_cast<pqPipelineFilter*>(this->Proxy))
+           qobject_cast<pqPipelineFilter*>(&this->proxy()))
     {
     if(0 == pipeline_filter->getDisplayCount())
       {
@@ -164,66 +206,6 @@ void pqClipPanel::onAccepted()
 void pqClipPanel::onRejected()
 {
   this->Implementation->ImplicitPlaneWidget.reset();
-}
-
-void pqClipPanel::setProxyInternal(pqProxy* p)
-{
-  if(this->Proxy)
-    {
-    this->PropertyManager->unregisterLink(
-      &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
-      this->Proxy->getProxy(), 
-      this->Proxy->getProxy()->GetProperty("InsideOut"));
-    }
-
-  Superclass::setProxyInternal(p);
- 
-  pqProxy* reference_proxy = p;
-  vtkSMProxy* controlled_proxy = NULL;
-   
-  if(this->Proxy)
-    {
-    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->getProxy()->GetProperty("ClipFunction")))
-      {
-      if (clip_function_property->GetNumberOfProxies() == 0)
-        {
-        vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-          clip_function_property->GetDomain("proxy_list"));
-        if (pld)
-          {
-          clip_function_property->AddProxy(pld->GetProxy(0));
-          this->Proxy->getProxy()->UpdateVTKObjects();
-          }
-        }
-      controlled_proxy = clip_function_property->GetProxy(0);
-      controlled_proxy->UpdateVTKObjects();
-      }
-    }
-  this->Implementation->ImplicitPlaneWidget.setReferenceProxy(reference_proxy);
-  this->Implementation->ImplicitPlaneWidget.setControlledProxy(controlled_proxy);
-  if (controlled_proxy)
-    {
-    vtkPVXMLElement* hints = controlled_proxy->GetHints();
-    for (unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
-      {
-      vtkPVXMLElement* elem = hints->GetNestedElement(cc);
-      if (QString("PropertyGroup") == elem->GetName() && 
-        QString("Plane") == elem->GetAttribute("type"))
-        {
-        this->Implementation->ImplicitPlaneWidget.setHints(elem);
-        break;
-        }
-      }
-    }
-
-  if(this->Proxy)
-    {
-    this->PropertyManager->registerLink(
-      &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
-      this->Proxy->getProxy(), 
-      this->Proxy->getProxy()->GetProperty("InsideOut"));
-    }
 }
 
 void pqClipPanel::select()

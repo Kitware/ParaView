@@ -41,17 +41,12 @@ class pqLoadedFormObjectPanel : public pqNamedObjectPanel
   Q_OBJECT
 public:
   /// constructor
-  pqLoadedFormObjectPanel(QString filename, QWidget* p);
+  pqLoadedFormObjectPanel(QString filename, pqProxy& proxy, QWidget* p);
   /// destructor
   ~pqLoadedFormObjectPanel();
 
   /// returns whether the form for the filename successfully loaded
   bool isValid();
-
-protected:
-  /// set the proxy to display properties for
-  virtual void setProxyInternal(pqProxy* proxy);
-
 };
 
 #endif

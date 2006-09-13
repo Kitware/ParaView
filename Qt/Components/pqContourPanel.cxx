@@ -62,15 +62,15 @@ QString pqContourPanelInterface::name() const
   return "Contour";
 }
 
-pqObjectPanel* pqContourPanelInterface::createPanel(QWidget* p)
+pqObjectPanel* pqContourPanelInterface::createPanel(pqProxy& proxy, QWidget* p)
 {
-  return new pqContourPanel(p);
+  return new pqContourPanel(proxy, p);
 }
 
-bool pqContourPanelInterface::canCreatePanel(vtkSMProxy* p) const
+bool pqContourPanelInterface::canCreatePanel(pqProxy& proxy) const
 {
-  return (p && p->GetXMLName() == QString("Contour") 
-    && p->GetXMLGroup() == QString("filters"));
+  return (proxy.getProxy()->GetXMLName() == QString("Contour") 
+    && proxy.getProxy()->GetXMLGroup() == QString("filters"));
 }
 
 Q_EXPORT_PLUGIN(pqContourPanelInterface)
@@ -96,8 +96,8 @@ public:
   pqSampleScalarWidget SampleScalarWidget;
 };
 
-pqContourPanel::pqContourPanel(QWidget* p) :
-  base(p),
+pqContourPanel::pqContourPanel(pqProxy& proxy, QWidget* p) :
+  base(proxy, p),
   Implementation(new pqImplementation())
 {
   this->Implementation->Controls.setupUi(
@@ -121,16 +121,24 @@ pqContourPanel::pqContourPanel(QWidget* p) :
   connect(
     &this->Implementation->SampleScalarWidget,
     SIGNAL(samplesChanged()),
-    this->getPropertyManager(),
+    &this->propertyManager(),
     SLOT(propertyChanged()));
     
-  connect(this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
-  connect(this->getPropertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
+  connect(&this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
+  connect(&this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
+
+  // Setup the sample scalar widget ...
+  this->Implementation->SampleScalarWidget.setDataSources(
+    this->proxy().getProxy(),
+    vtkSMDoubleVectorProperty::SafeDownCast(this->proxy().getProxy()->GetProperty("ContourValues")),
+    this->proxy().getProxy()->GetProperty("SelectInputScalars"));
+    
+  pqNamedWidgets::link(
+    &this->Implementation->ControlsContainer, this->proxy().getProxy(), &this->propertyManager());
 }
 
 pqContourPanel::~pqContourPanel()
 {
-  this->setProxy(0);
   delete this->Implementation;
 }
 
@@ -140,7 +148,7 @@ void pqContourPanel::onAccepted()
   
   // If this is the first time we've been accepted since our creation, hide the source
   if(pqPipelineFilter* const pipeline_filter =
-    qobject_cast<pqPipelineFilter*>(this->Proxy))
+    qobject_cast<pqPipelineFilter*>(&this->proxy()))
     {
     if(0 == pipeline_filter->getDisplayCount())
       {
@@ -167,37 +175,4 @@ void pqContourPanel::onAccepted()
 void pqContourPanel::onRejected()
 {
   this->Implementation->SampleScalarWidget.reset();
-}
-
-void pqContourPanel::setProxyInternal(pqProxy* p)
-{
-  if(this->Proxy)
-    {
-    pqNamedWidgets::unlink(
-      &this->Implementation->ControlsContainer, 
-      this->Proxy->getProxy(), this->PropertyManager);
-    }
-
-  base::setProxyInternal(p);
- 
-  // Setup the sample scalar widget ...
-  this->Implementation->SampleScalarWidget.setDataSources(
-    this->Proxy ? this->Proxy->getProxy() : NULL,
-    this->Proxy ?
-    vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->getProxy()->GetProperty("ContourValues")) : 0,
-    this->Proxy ? this->Proxy->getProxy()->GetProperty("SelectInputScalars") : 0);
-    
-  if(this->Proxy)
-    {
-    pqNamedWidgets::link(
-      &this->Implementation->ControlsContainer, this->Proxy->getProxy(), this->PropertyManager);
-    }
-}
-
-void pqContourPanel::select()
-{
-}
-
-void pqContourPanel::deselect()
-{
 }

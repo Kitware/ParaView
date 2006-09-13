@@ -47,27 +47,22 @@ class pqObjectPanel : public QWidget
   Q_OBJECT
 public:
   /// constructor
-  pqObjectPanel(QWidget* p);
+  pqObjectPanel(pqProxy& proxy, QWidget* p);
   /// destructor
   ~pqObjectPanel();
 
-  /// set the proxy to display properties for.
-  /// subclassess should override setProxyInternal().
-  void setProxy(pqProxy* proxy);
-
   /// get the proxy for which properties are displayed
-  pqProxy* proxy();
+  pqProxy& proxy();
+  
+  /// property manager
+  pqPropertyManager& propertyManager();
 
   /// get the render module that this object panel works with
-  pqRenderModule* getRenderModule();
+  pqRenderModule* renderModule();
   
   /// size hint for this widget
   QSize sizeHint() const;
 
-  /// property manager
-  pqPropertyManager* getPropertyManager()
-    { return this->PropertyManager; }
-  
 public slots:
   /// accept the changes made to the properties
   /// changes will be propogated down to the server manager
@@ -96,15 +91,9 @@ signals:
   void ondeselect();
   void renderModuleChanged(pqRenderModule*);
 
-protected:
-  /// Internal method that actually sets the proxy. Subclasses must override
-  /// this instead of setProxy().
-  virtual void setProxyInternal(pqProxy* proxy);
-
-  QPointer<pqProxy> Proxy;
-  pqPropertyManager* PropertyManager;
-  QPointer<pqRenderModule> RenderModule;
+private:
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif
-

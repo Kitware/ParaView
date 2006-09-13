@@ -63,13 +63,13 @@ pqObjectPanelLoader::~pqObjectPanelLoader()
 {
 }
   
-pqObjectPanel* pqObjectPanelLoader::createPanel(vtkSMProxy* proxy, QWidget* p)
+pqObjectPanel* pqObjectPanelLoader::createPanel(pqProxy& proxy, QWidget* p)
 {
   foreach(pqObjectPanelInterface* i, this->PanelPlugins)
     {
     if (i->canCreatePanel(proxy))
       {
-      return i->createPanel(p);
+      return i->createPanel(proxy, p);
       }
     }
   return NULL;

@@ -45,7 +45,7 @@ class pqExodusPanel :
   Q_OBJECT
 public:
   /// constructor
-  pqExodusPanel(QWidget* p = NULL);
+  pqExodusPanel(pqProxy& proxy, QWidget* p = NULL);
   /// destructor
   ~pqExodusPanel();
 
@@ -91,8 +91,8 @@ class pqExodusPanelInterface : public QObject, public pqObjectPanelInterface
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   virtual QString name() const;
-  virtual pqObjectPanel* createPanel(QWidget* p);
-  virtual bool canCreatePanel(vtkSMProxy* proxy) const;
+  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy& proxy) const;
 };
 
 #endif

@@ -45,7 +45,7 @@ class pqStreamTracerPanel :
   Q_OBJECT
 
 public:
-  pqStreamTracerPanel(QWidget* p);
+  pqStreamTracerPanel(pqProxy& proxy, QWidget* p);
   ~pqStreamTracerPanel();
   
 private slots:
@@ -53,7 +53,6 @@ private slots:
   void onSeedTypeChanged(int);
 
 private:
-  virtual void setProxyInternal(pqProxy* p);
   void onUsePointSource();
   void onUseLineSource();
 
@@ -68,8 +67,8 @@ class pqStreamTracerPanelInterface : public QObject, public pqObjectPanelInterfa
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   virtual QString name() const;
-  virtual pqObjectPanel* createPanel(QWidget* p);
-  virtual bool canCreatePanel(vtkSMProxy* proxy) const;
+  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy& proxy) const;
 };
 
 #endif

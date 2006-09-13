@@ -54,20 +54,81 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqRenderModule.h"
 
+//-----------------------------------------------------------------------------
+
+class pqObjectPanel::pqImplementation
+{
+public:
+  pqImplementation(pqProxy& proxy) :
+    Proxy(proxy)
+  {
+  }
+  
+  ~pqImplementation()
+  {
+    delete this->PropertyManager;
+  }
+  
+  pqProxy& Proxy;
+  pqPropertyManager* PropertyManager;
+  QPointer<pqRenderModule> RenderModule;
+};
 
 //-----------------------------------------------------------------------------
-/// constructor
-pqObjectPanel::pqObjectPanel(QWidget* p)
-  : QWidget(p), Proxy(NULL)
+pqObjectPanel::pqObjectPanel(pqProxy& proxy, QWidget* p) :
+  QWidget(p),
+  Implementation(new pqImplementation(proxy))
 {
-  this->PropertyManager = new pqPropertyManager(this);
+  this->Implementation->PropertyManager = new pqPropertyManager(this);
+
+  this->Implementation->Proxy.getProxy()->UpdateVTKObjects();
+  this->Implementation->Proxy.getProxy()->UpdatePropertyInformation();
+  vtkSMSourceProxy* sp;
+  vtkSMCompoundProxy* cp;
+  sp = vtkSMSourceProxy::SafeDownCast(this->Implementation->Proxy.getProxy());
+  cp = vtkSMCompoundProxy::SafeDownCast(this->Implementation->Proxy.getProxy());
+  if(sp)
+    {
+    sp->UpdatePipelineInformation();
+    }
+  else if(cp)
+    {
+    // TODO --  this is a workaround for a bug in the server manager
+    //          fix it the right way
+    //          does that mean calling UpdatePipelineInformation() above
+    //          for a source proxy goes away?
+    int num = cp->GetNumberOfProxies();
+    for(int i=0; i<num; i++)
+      {
+      sp = vtkSMSourceProxy::SafeDownCast(cp->GetProxy(i));
+      if(sp)
+        {
+        sp->UpdatePipelineInformation();
+        }
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
-/// destructor
 pqObjectPanel::~pqObjectPanel()
 {
-  delete this->PropertyManager;
+  delete this->Implementation;
+}
+
+//-----------------------------------------------------------------------------
+pqProxy& pqObjectPanel::proxy()
+{
+  return this->Implementation->Proxy;
+}
+
+pqPropertyManager& pqObjectPanel::propertyManager()
+{
+  return *this->Implementation->PropertyManager;
+}
+
+pqRenderModule* pqObjectPanel::renderModule()
+{
+  return this->Implementation->RenderModule;
 }
 
 //-----------------------------------------------------------------------------
@@ -88,68 +149,11 @@ QSize pqObjectPanel::sizeHint() const
 }
 
 //-----------------------------------------------------------------------------
-/// set the proxy to display properties for
-void pqObjectPanel::setProxy(pqProxy* p)
-{
-  if(p != this->Proxy)
-    {
-    this->setProxyInternal(p);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqObjectPanel::setProxyInternal(pqProxy* p)
-{
-  this->Proxy = p;
-  if(this->Proxy)
-    {
-    this->Proxy->getProxy()->UpdateVTKObjects();
-    this->Proxy->getProxy()->UpdatePropertyInformation();
-    vtkSMSourceProxy* sp;
-    vtkSMCompoundProxy* cp;
-    sp = vtkSMSourceProxy::SafeDownCast(this->Proxy->getProxy());
-    cp = vtkSMCompoundProxy::SafeDownCast(this->Proxy->getProxy());
-    if(sp)
-      {
-      sp->UpdatePipelineInformation();
-      }
-    else if(cp)
-      {
-      // TODO --  this is a workaround for a bug in the server manager
-      //          fix it the right way
-      //          does that mean calling UpdatePipelineInformation() above
-      //          for a source proxy goes away?
-      int num = cp->GetNumberOfProxies();
-      for(int i=0; i<num; i++)
-        {
-        sp = vtkSMSourceProxy::SafeDownCast(cp->GetProxy(i));
-        if(sp)
-          {
-          sp->UpdatePipelineInformation();
-          }
-        }
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-/// get the proxy for which properties are displayed
-pqProxy* pqObjectPanel::proxy()
-{
-  return this->Proxy;
-}
-
-//-----------------------------------------------------------------------------
 /// accept the changes made to the properties
 /// changes will be propogated down to the server manager
 void pqObjectPanel::accept()
 {
-  if(!this->Proxy)
-    {
-    return;
-    }
-
-  this->PropertyManager->accept();
+  this->Implementation->PropertyManager->accept();
   emit this->onaccept();
 }
 
@@ -158,12 +162,8 @@ void pqObjectPanel::accept()
 /// editor will query properties from the server manager
 void pqObjectPanel::reset()
 {
-  if(!this->Proxy)
-    {
-    return;
-    }
-  this->Proxy->getProxy()->UpdatePropertyInformation();
-  this->PropertyManager->reject();
+  this->Implementation->Proxy.getProxy()->UpdatePropertyInformation();
+  this->Implementation->PropertyManager->reject();
   emit this->onreset();
 }
 
@@ -179,12 +179,6 @@ void pqObjectPanel::deselect()
 
 void pqObjectPanel::setRenderModule(pqRenderModule* rm)
 {
-  this->RenderModule = rm;
-  emit this->renderModuleChanged(this->RenderModule);
+  this->Implementation->RenderModule = rm;
+  emit this->renderModuleChanged(this->Implementation->RenderModule);
 }
-
-pqRenderModule* pqObjectPanel::getRenderModule()
-{
-  return this->RenderModule;
-}
-

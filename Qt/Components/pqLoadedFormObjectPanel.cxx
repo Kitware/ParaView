@@ -47,8 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /// constructor
-pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, QWidget* p)
-  : pqNamedObjectPanel(p)
+pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, pqProxy& proxy, QWidget* p)
+  : pqNamedObjectPanel(proxy, p)
 {
   QBoxLayout* mainlayout = new QVBoxLayout(this);
   mainlayout->setMargin(0);
@@ -62,36 +62,17 @@ pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, QWidget* p)
     file.close();
     mainlayout->addWidget(customForm);
     }
+    
+  this->linkServerManagerProperties();
 }
 
 /// destructor
 pqLoadedFormObjectPanel::~pqLoadedFormObjectPanel()
 {
-  if(this->Proxy)
-    {
-    this->unlinkServerManagerProperties();
-    }
-  this->Proxy = NULL;
+  this->unlinkServerManagerProperties();
 }
 
 bool pqLoadedFormObjectPanel::isValid()
 {
   return this->layout()->count() == 1;
 }
-
-/// set the proxy to display properties for
-void pqLoadedFormObjectPanel::setProxyInternal(pqProxy* p)
-{
-  if(this->Proxy)
-    {
-    this->unlinkServerManagerProperties();
-    }
-
-  this->pqNamedObjectPanel::setProxyInternal(p);
-
-  if(this->Proxy)
-    {
-    this->linkServerManagerProperties();
-    }
-}
-

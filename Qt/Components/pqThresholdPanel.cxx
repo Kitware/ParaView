@@ -60,23 +60,23 @@ QString pqThresholdPanelInterface::name() const
   return "Threshold";
 }
 
-pqObjectPanel* pqThresholdPanelInterface::createPanel(QWidget* p)
+pqObjectPanel* pqThresholdPanelInterface::createPanel(pqProxy& proxy, QWidget* p)
 {
-  return new pqThresholdPanel(p);
+  return new pqThresholdPanel(proxy, p);
 }
 
-bool pqThresholdPanelInterface::canCreatePanel(vtkSMProxy* proxy) const
+bool pqThresholdPanelInterface::canCreatePanel(pqProxy& proxy) const
 {
-  return (proxy && QString("Threshold") == proxy->GetXMLName()
-     && QString("filters") == proxy->GetXMLGroup());
+  return (QString("Threshold") == proxy.getProxy()->GetXMLName()
+     && QString("filters") == proxy.getProxy()->GetXMLGroup());
 }
 
 Q_EXPORT_PLUGIN(pqThresholdPanelInterface)
 Q_IMPORT_PLUGIN(pqThresholdPanelInterface)
 
 
-pqThresholdPanel::pqThresholdPanel(QWidget* p) :
-  pqLoadedFormObjectPanel(":/pqWidgets/UI/pqThresholdPanel.ui", p)
+pqThresholdPanel::pqThresholdPanel(pqProxy& proxy, QWidget* p) :
+  pqLoadedFormObjectPanel(":/pqWidgets/UI/pqThresholdPanel.ui", proxy, p)
 {
   this->LowerSlider = this->findChild<QSlider*>("LowerThresholdSlider");
   this->UpperSlider = this->findChild<QSlider*>("UpperThresholdSlider");
@@ -92,6 +92,7 @@ pqThresholdPanel::pqThresholdPanel(QWidget* p) :
   QObject::connect(this->UpperSpin, SIGNAL(valueChanged(double)),
                    this, SLOT(upperSpinChanged()));
 
+  this->linkServerManagerProperties();
 }
 
 pqThresholdPanel::~pqThresholdPanel()
@@ -107,12 +108,12 @@ void pqThresholdPanel::accept()
 
   vtkSMStringVectorProperty* Property;
   Property = vtkSMStringVectorProperty::SafeDownCast(
-       this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
+       this->proxy().getProxy()->GetProperty("SelectInputScalars"));
 
   pqSMAdaptor::setFieldSelectionMode( Property,
          this->AttributeMode->currentText());
 
-  this->proxy()->getProxy()->UpdateVTKObjects();
+  this->proxy().getProxy()->UpdateVTKObjects();
   */
 }
 
@@ -146,18 +147,18 @@ void pqThresholdPanel::linkServerManagerProperties()
   // set up the attribute mode combo box
   vtkSMStringVectorProperty* AttributeProperty;
   AttributeProperty = vtkSMStringVectorProperty::SafeDownCast(
-       this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
+       this->proxy().getProxy()->GetProperty("SelectInputScalars"));
   AttributeProperty->UpdateDependentDomains();
 
   // TODO domain updates should be handled by auto-panel code
   QComboBox* Scalars = this->findChild<QComboBox*>("SelectInputScalars:scalars");
   // connect domain to scalar combo box
-  vtkSMProperty* Property = this->proxy()->getProxy()->GetProperty("SelectInputScalars");
+  vtkSMProperty* Property = this->proxy().getProxy()->GetProperty("SelectInputScalars");
   pqComboBoxDomain* d0 = new pqComboBoxDomain(Scalars, Property, 1);
   d0->setObjectName("ScalarsDomain");
 
   // connect domain to spin boxes
-  Property = this->proxy()->getProxy()->GetProperty("ThresholdBetween");
+  Property = this->proxy().getProxy()->GetProperty("ThresholdBetween");
   Property->UpdateDependentDomains();
   pqDoubleSpinBoxDomain* d1 = new pqDoubleSpinBoxDomain(this->LowerSpin,
                             Property,

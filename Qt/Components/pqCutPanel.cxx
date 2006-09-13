@@ -58,15 +58,15 @@ QString pqCutPanelInterface::name() const
   return "Cut";
 }
 
-pqObjectPanel* pqCutPanelInterface::createPanel(QWidget* p)
+pqObjectPanel* pqCutPanelInterface::createPanel(pqProxy& proxy, QWidget* p)
 {
-  return new pqCutPanel(p);
+  return new pqCutPanel(proxy, p);
 }
 
-bool pqCutPanelInterface::canCreatePanel(vtkSMProxy* p) const
+bool pqCutPanelInterface::canCreatePanel(pqProxy& proxy) const
 {
-  return (p && p->GetXMLName() == QString("Cut") 
-    && p->GetXMLGroup() == QString("filters"));
+  return (proxy.getProxy()->GetXMLName() == QString("Cut") 
+    && proxy.getProxy()->GetXMLGroup() == QString("filters"));
 }
 
 Q_EXPORT_PLUGIN(pqCutPanelInterface)
@@ -90,8 +90,8 @@ public:
   pqSampleScalarWidget SampleScalarWidget;
 };
 
-pqCutPanel::pqCutPanel(QWidget* p) :
-  Superclass(p),
+pqCutPanel::pqCutPanel(pqProxy& proxy, QWidget* p) :
+  Superclass(proxy, p),
   Implementation(new pqImplementation())
 {
   pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Implicit Plane"));
@@ -128,25 +128,68 @@ pqCutPanel::pqCutPanel(QWidget* p) :
   connect(
     &this->Implementation->ImplicitPlaneWidget,
     SIGNAL(widgetChanged()),
-    this->getPropertyManager(),
+    &this->propertyManager(),
     SLOT(propertyChanged()));
     
   connect(
     &this->Implementation->SampleScalarWidget,
     SIGNAL(samplesChanged()),
-    this->getPropertyManager(),
+    &this->propertyManager(),
     SLOT(propertyChanged()));
   
   connect(
-    this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
+    &this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
     
   connect(
-    this->getPropertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
+    &this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
+
+  // Setup the implicit plane widget ...
+  pqProxy* reference_proxy = &this->proxy();
+  pqSMProxy controlled_proxy = NULL;
+   
+  if(vtkSMProxyProperty* const cut_function_property = vtkSMProxyProperty::SafeDownCast(
+    this->proxy().getProxy()->GetProperty("CutFunction")))
+    {
+    if (cut_function_property->GetNumberOfProxies() == 0)
+      {
+      vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
+        cut_function_property->GetDomain("proxy_list"));
+      if (pld)
+        {
+        cut_function_property->AddProxy(pld->GetProxy(0));
+        this->proxy().getProxy()->UpdateVTKObjects();
+        }
+      }
+    controlled_proxy = cut_function_property->GetProxy(0);
+    controlled_proxy->UpdateVTKObjects();
+    }
+
+  this->Implementation->ImplicitPlaneWidget.setReferenceProxy(reference_proxy);
+  this->Implementation->ImplicitPlaneWidget.setControlledProxy(controlled_proxy);
+
+  if (controlled_proxy)
+    {
+    vtkPVXMLElement* hints = controlled_proxy->GetHints();
+    for (unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* elem = hints->GetNestedElement(cc);
+      if (QString("PropertyGroup") == elem->GetName() && 
+        QString("Plane") == elem->GetAttribute("type"))
+        {
+        this->Implementation->ImplicitPlaneWidget.setHints(elem);
+        break;
+        }
+      }
+    }
+
+  // Setup the sample scalar widget ...
+  this->Implementation->SampleScalarWidget.setDataSources(
+    this->proxy().getProxy(),
+    vtkSMDoubleVectorProperty::SafeDownCast(this->proxy().getProxy()->GetProperty("ContourValues")));
 }
 
 pqCutPanel::~pqCutPanel()
 {
-  this->setProxy(0);
   delete this->Implementation;
 }
 
@@ -157,7 +200,7 @@ void pqCutPanel::onAccepted()
       
   // If this is the first time we've been accepted since our creation, hide the source
   if(pqPipelineFilter* const pipeline_filter =
-    qobject_cast<pqPipelineFilter*>(this->Proxy))
+    qobject_cast<pqPipelineFilter*>(&this->proxy()))
     {
     if(0 == pipeline_filter->getDisplayCount())
       {
@@ -185,58 +228,6 @@ void pqCutPanel::onRejected()
 {
   this->Implementation->ImplicitPlaneWidget.reset();
   this->Implementation->SampleScalarWidget.reset();
-}
-
-void pqCutPanel::setProxyInternal(pqProxy* p)
-{
-  Superclass::setProxyInternal(p);
-
-  // Setup the implicit plane widget ...
-  pqProxy* reference_proxy = this->Proxy;
-  pqSMProxy controlled_proxy = NULL;
-   
-  if(this->Proxy)
-    {
-    if(vtkSMProxyProperty* const cut_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->getProxy()->GetProperty("CutFunction")))
-      {
-      if (cut_function_property->GetNumberOfProxies() == 0)
-        {
-        vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-          cut_function_property->GetDomain("proxy_list"));
-        if (pld)
-          {
-          cut_function_property->AddProxy(pld->GetProxy(0));
-          this->Proxy->getProxy()->UpdateVTKObjects();
-          }
-        }
-      controlled_proxy = cut_function_property->GetProxy(0);
-      controlled_proxy->UpdateVTKObjects();
-      }
-    }
-  this->Implementation->ImplicitPlaneWidget.setReferenceProxy(reference_proxy);
-  this->Implementation->ImplicitPlaneWidget.setControlledProxy(controlled_proxy);
-
-  if (controlled_proxy)
-    {
-    vtkPVXMLElement* hints = controlled_proxy->GetHints();
-    for (unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
-      {
-      vtkPVXMLElement* elem = hints->GetNestedElement(cc);
-      if (QString("PropertyGroup") == elem->GetName() && 
-        QString("Plane") == elem->GetAttribute("type"))
-        {
-        this->Implementation->ImplicitPlaneWidget.setHints(elem);
-        break;
-        }
-      }
-    }
-
-  // Setup the sample scalar widget ...
-  this->Implementation->SampleScalarWidget.setDataSources(
-    this->Proxy ? this->Proxy->getProxy() : NULL,
-    this->Proxy ?
-    vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->getProxy()->GetProperty("ContourValues")) : 0);
 }
 
 void pqCutPanel::select()

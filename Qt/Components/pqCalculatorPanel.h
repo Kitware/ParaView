@@ -42,7 +42,7 @@ class pqCalculatorPanel : public pqObjectPanel
   Q_OBJECT
 public:
   /// constructor
-  pqCalculatorPanel(QWidget* p = 0);
+  pqCalculatorPanel(pqProxy& proxy, QWidget* p = 0);
   /// destructor
   ~pqCalculatorPanel();
 
@@ -66,10 +66,6 @@ protected slots:
   void modified();
 
 protected:
-  /// Internal method that actually sets the proxy. Subclasses must override
-  /// this instead of setProxy().
-  virtual void setProxyInternal(pqProxy* proxy);
-
   class pqInternal;
   pqInternal* Internal;
 };
@@ -81,8 +77,8 @@ class pqCalculatorPanelInterface : public QObject, public pqObjectPanelInterface
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   virtual QString name() const;
-  virtual pqObjectPanel* createPanel(QWidget* p);
-  virtual bool canCreatePanel(vtkSMProxy* proxy) const;
+  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy& proxy) const;
 };
 
 #endif

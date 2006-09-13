@@ -108,7 +108,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqThresholdPanel.h
   pqToolTipTrapper.h
   pqVCRController.h
-  pqWidgetObjectPanel.h
 )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
@@ -316,8 +315,6 @@ ADD_LIBRARY(pqComponents
   pqVariableType.h
   pqVCRController.cxx
   pqVCRController.h
-  pqWidgetObjectPanel.cxx
-  pqWidgetObjectPanel.h
   pqStateLoader.cxx
   pqStateLoader.h
   ${MOC_BUILT_SOURCES}

@@ -61,15 +61,15 @@ QString pqCalculatorPanelInterface::name() const
   return "Calculator";
 }
 
-pqObjectPanel* pqCalculatorPanelInterface::createPanel(QWidget* p)
+pqObjectPanel* pqCalculatorPanelInterface::createPanel(pqProxy& proxy, QWidget* p)
 {
-  return new pqCalculatorPanel(p);
+  return new pqCalculatorPanel(proxy, p);
 }
 
-bool pqCalculatorPanelInterface::canCreatePanel(vtkSMProxy* p) const
+bool pqCalculatorPanelInterface::canCreatePanel(pqProxy& proxy) const
 {
-  return (p && p->GetXMLName() == QString("Calculator") 
-    && p->GetXMLGroup() == QString("filters"));
+  return (proxy.getProxy()->GetXMLName() == QString("Calculator") 
+    && proxy.getProxy()->GetXMLGroup() == QString("filters"));
 }
 Q_EXPORT_PLUGIN(pqCalculatorPanelInterface)
 Q_IMPORT_PLUGIN(pqCalculatorPanelInterface)
@@ -82,8 +82,8 @@ public:
 
 //-----------------------------------------------------------------------------
 /// constructor
-pqCalculatorPanel::pqCalculatorPanel(QWidget* p)
-  : pqObjectPanel(p)
+pqCalculatorPanel::pqCalculatorPanel(pqProxy& proxy, QWidget* p) :
+  pqObjectPanel(proxy, p)
 {
   this->Internal = new pqInternal();
   this->Internal->UI.setupUi(this);
@@ -197,7 +197,8 @@ pqCalculatorPanel::pqCalculatorPanel(QWidget* p)
                    this,
                    SLOT(disableResults(bool)));
 
-
+  this->updateVariables(this->Internal->UI.AttributeMode->currentText());
+  this->reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -208,26 +209,18 @@ pqCalculatorPanel::~pqCalculatorPanel()
 }
 
 //-----------------------------------------------------------------------------
-void pqCalculatorPanel::setProxyInternal(pqProxy* p)
-{
-  this->pqObjectPanel::setProxyInternal(p);
-  this->updateVariables(this->Internal->UI.AttributeMode->currentText());
-  this->reset();
-}
-
-//-----------------------------------------------------------------------------
 /// accept the changes made to the properties
 /// changes will be propogated down to the server manager
 void pqCalculatorPanel::accept()
 {
   this->pqObjectPanel::accept();
 
-  if(!this->proxy() || !this->proxy()->getProxy())
+  if(!this->proxy().getProxy())
     {
     return;
     }
 
-  vtkSMProxy* CalcProxy = this->proxy()->getProxy();
+  vtkSMProxy* CalcProxy = this->proxy().getProxy();
 
   int mode = this->Internal->UI.AttributeMode->currentText() == 
              "Point Data" ? 1 : 2;
@@ -359,7 +352,7 @@ void pqCalculatorPanel::reset()
 {
   this->pqObjectPanel::reset();
   
-  vtkSMProxy* CalcProxy = this->proxy()->getProxy();
+  vtkSMProxy* CalcProxy = this->proxy().getProxy();
 
 
   // restore the function
@@ -416,7 +409,7 @@ void pqCalculatorPanel::updateVariables(const QString& mode)
     }
 
   vtkPVDataSetAttributesInformation* fdi = NULL;
-  pqPipelineFilter* f = qobject_cast<pqPipelineFilter*>(this->proxy());
+  pqPipelineFilter* f = qobject_cast<pqPipelineFilter*>(&this->proxy());
   if(!f)
     {
     return;
