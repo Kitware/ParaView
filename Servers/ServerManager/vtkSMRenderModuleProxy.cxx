@@ -53,7 +53,7 @@
 #include "vtkSelection.h"
 #include "vtkSMMPIRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.47");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.48");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1277,8 +1277,8 @@ void vtkSMRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(int x0, int y0, int x1, int y1)
-{ 
+vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
+{  
   int *win_size=this->GetRenderWindow()->GetSize();
   x0 = (x0 < 0)? 0 : ((x0 >= win_size[0])? win_size[0]-1: x0);
   x1 = (x1 < 0)? 0 : ((x1 >= win_size[0])? win_size[0]-1: x1);
@@ -1376,10 +1376,11 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(int x0, int y0, int x1,
   //I use this one below to convert the composited images that arrive here
   //into a selection.
   vtkPVVisibleCellSelector *pti = vtkPVVisibleCellSelector::New();
-  pti->SetArea(x0,y0,x1,y1);
   pti->SetRenderer(this->GetRenderer());
+  pti->SetArea(x0,y0,x1,y1);
+  pti->GetArea(x0,y0,x1,y1);
 
-  ////Use the back buffer
+  //Use the back buffer
   int usefrontbuf = 0;
   if (!usefrontbuf)
     {
