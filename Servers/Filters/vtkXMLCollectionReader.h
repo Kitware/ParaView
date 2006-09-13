@@ -109,10 +109,6 @@ protected:
   // Get the name of the data set being read.
   virtual const char* GetDataSetName();
   
-  // We need to replace MarkGeneratedOutputs to mark only the one
-  // output from which the request came.
-  virtual void MarkGeneratedOutputs(vtkDataObject* output);
-
   virtual int ReadPrimaryElement(vtkXMLDataElement* ePrimary);
   virtual void SetupEmptyOutput();
   virtual int FillOutputPortInformation(int, vtkInformation* info);
