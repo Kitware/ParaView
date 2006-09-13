@@ -361,7 +361,8 @@ void pqFileDialog::accept()
              this->Ui->FileType->currentText()).first();
         QString wantedExtension =
           extensionWildcard.mid(extensionWildcard.indexOf('.')+1);
-        if(ext.isEmpty() && !wantedExtension.isEmpty())
+        if(ext.isEmpty() && !wantedExtension.isEmpty() &&
+           wantedExtension != "*")
           {
           if(fn.at(fn.size() - 1) != '.')
             {
