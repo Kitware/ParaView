@@ -67,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPendingDisplayManager.h"
 #include "pqSMAdaptor.h"
 #include "pqSettingsDialog.h"
+#include "pqSelectReaderDialog.h"
 
 #include <pqConnect.h>
 #include <pqEventDispatcher.h>
@@ -812,20 +813,35 @@ void pqMainWindowCore::onFileOpen(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileOpen(const QStringList& files)
 {
+  pqApplicationCore* core = pqApplicationCore::instance();
   for(int i = 0; i != files.size(); ++i)
     {
     pqPipelineSource* reader = this->createReaderOnActiveServer(files[i]);
     if (!reader)
       {
-      qDebug() << "Failed to create reader for : " << files[i];
-      continue;
+      pqSelectReaderDialog prompt(files[i], this->getActiveServer(),
+                                  qobject_cast<QWidget*>(this->parent()));
+      if(prompt.exec() == QDialog::Accepted)
+        {
+        QString whichReader = prompt.getReader();
+        reader = core->createReaderOnServer(files[i],
+                                            this->getActiveServer(),
+                                            whichReader);
+        }
+      else
+        {
+        continue;
+        }
       }
       
     // Add this to the list of recent server resources ...
-    pqServerResource resource = this->getActiveServer()->getResource();
-    resource.setPath(files[i]);
-    pqApplicationCore::instance()->serverResources().add(resource);
-    pqApplicationCore::instance()->serverResources().save(*pqApplicationCore::instance()->settings());
+    if(reader)
+      {
+      pqServerResource resource = this->getActiveServer()->getResource();
+      resource.setPath(files[i]);
+      core->serverResources().add(resource);
+      core->serverResources().save(*core->settings());
+      }
     }
 }
 

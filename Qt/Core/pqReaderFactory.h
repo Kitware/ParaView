@@ -67,18 +67,29 @@ public:
   void addFileType(const QString& description, const QList<QString>& extensions,
     vtkSMProxy* prototype);
 
-  // Create a reader that can read the given file present on the given server.
+  // Create a reader given by name on the given server.
   // File types must be registered before a file of the given type can be read.
   // This method creates and registers the reader proxy that can read
-  pqPipelineSource* createReader(const QString& filename, pqServer* server);
+  pqPipelineSource* createReader(const QString& readerName, pqServer* server);
 
   // Returns a list of file types suitable for use with file dialog.
   // \c server is required to ensure that only those readers that can
   // be instantiated on the server will be considered.
   QString getSupportedFileTypes(pqServer* server);
+  
+  // Returns a list of the supported readers on a server.
+  // \c server is required to ensure that only those readers that can
+  // be instantiated on the server will be considered.
+  QStringList getSupportedReaders(pqServer* server);
+
+  // Returns a short description of the reader.
+  QString getReaderDescription(const QString& readerName);
 
   // Returns the list of extensions for a reader
   QString getExtensionTypeString(pqPipelineSource* reader);
+
+  // Return the reader type for a file
+  QString getReaderType(const QString& filename, pqServer*);
 
   // Loads file type definitions from the xml file.
   // Format of this xml is:
@@ -95,7 +106,7 @@ public:
   // \endverbatim
   // By default, the reader is searched for under the \c sources group.
   void loadFileTypes(const QString& xmlfilename);
-protected:
+  
   bool checkIfFileIsReadable(const QString& name, pqServer*);
 
 private:

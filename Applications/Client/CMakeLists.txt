@@ -154,6 +154,7 @@ ENDIF(APPLE)
     OpenSaveData
     RepresentationSelector
     SelectionUndo
+    SelectReader
     SimpleInteraction
     StreamTracer
     StreamTracerUpdates

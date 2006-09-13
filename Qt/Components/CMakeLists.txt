@@ -88,6 +88,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqScalarSetModel.h
   pqSelectionAdaptor.h
   pqSelectionManager.h
+  pqSelectReaderDialog.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqServerStartupBrowser.h
@@ -135,6 +136,7 @@ SET(UI_FORMS
   Resources/UI/pqRenderViewEditor.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui
+  Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerBrowser.ui
   Resources/UI/pqServerStartupDialog.ui
   Resources/UI/pqSettingsDialog.ui
@@ -287,6 +289,8 @@ ADD_LIBRARY(pqComponents
   pqSimpleAnimationManager.h
   pqSimpleServerStartup.cxx
   pqSimpleServerStartup.h
+  pqSelectReaderDialog.cxx
+  pqSelectReaderDialog.h
   pqSettingsDialog.cxx
   pqSettingsDialog.h
   pqSliderDomain.cxx

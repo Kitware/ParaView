@@ -143,7 +143,8 @@ public:
                                          pqPipelineSource* input);
 
   pqPipelineSource* createReaderOnServer(const QString& filename, 
-                                         pqServer* server);
+                                         pqServer* server,
+                                         QString whichReader = QString());
 
   /// Renders all windows
   void render();

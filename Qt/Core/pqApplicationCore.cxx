@@ -693,17 +693,29 @@ pqPipelineSource* pqApplicationCore::createCompoundFilter(
 
 pqPipelineSource* pqApplicationCore::createReaderOnServer(
                const QString& filename,
-               pqServer* server)
+               pqServer* server,
+               QString whichReader)
 {
   if (!server)
     {
     qDebug() << "No active server. Cannot create reader.";
     return 0;
     }
+    
+  if(this->getReaderFactory()->checkIfFileIsReadable(filename, server))
+    {
+    qDebug() << "File \"" << filename << "\"  cannot be read.";
+    return NULL; 
+    }
   
   this->getUndoStack()->BeginUndoSet(QString("Create reader for ") + filename);
 
-  pqPipelineSource* reader= this->getReaderFactory()->createReader(filename, 
+  if(whichReader == QString::null)
+    {
+    whichReader = this->getReaderFactory()->getReaderType(filename, server);
+    }
+
+  pqPipelineSource* reader= this->getReaderFactory()->createReader(whichReader,
                                                                    server);
   if (!reader)
     {
