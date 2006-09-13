@@ -31,7 +31,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.16");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.17");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -113,15 +113,6 @@ vtkDataSet* vtkXMLCollectionReader::GetOutput(int index)
 
   // Now return the requested output.
   return this->GetOutputAsDataSet(index);
-}
-
-//----------------------------------------------------------------------------
-void vtkXMLCollectionReader::MarkGeneratedOutputs(vtkDataObject* output)
-{
-  if(output)
-    {
-    output->DataHasBeenGenerated();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -261,14 +252,11 @@ void vtkXMLCollectionReader::SetupEmptyOutput()
   this->SetNumberOfOutputPorts(0);
 }
 
-
-
 int vtkXMLCollectionReader::FillOutputPortInformation(int, vtkInformation *info)
 {
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
   return 1;
 }
-
 
 int vtkXMLCollectionReader::ProcessRequest(vtkInformation* request,
                                   vtkInformationVector** inputVector,
@@ -289,7 +277,6 @@ int vtkXMLCollectionReader::ProcessRequest(vtkInformation* request,
     }
   return this->Superclass::ProcessRequest(request, inputVector, outputVector);
 }
-
 
 //----------------------------------------------------------------------------
 int vtkXMLCollectionReader::RequestDataObject(
@@ -354,7 +341,6 @@ int vtkXMLCollectionReader::RequestDataObject(
 
   return 1;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkXMLCollectionReader::SetupOutput(const char* filePath, int index,
@@ -539,8 +525,11 @@ void vtkXMLCollectionReader::ReadXMLData()
     r->RemoveObserver(this->InternalProgressObserver);
 
     // Share the new data with our output.
-    this->GetExecutive()->GetOutputData(this->CurrentOutput)->ShallowCopy(out);
-
+    vtkDataObject* actualOutput = 
+      this->GetExecutive()->GetOutputData(this->CurrentOutput);
+    actualOutput->PrepareForNewData();
+    actualOutput->ShallowCopy(out);
+    actualOutput->DataHasBeenGenerated();
 
     // If a "name" attribute exists, store the name of the output in
     // its field data.
