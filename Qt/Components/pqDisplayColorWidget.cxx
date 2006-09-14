@@ -129,44 +129,12 @@ void pqDisplayColorWidget::addVariable(pqVariableType type,
         "Solid Color", this->variableData(type, name));
       break;
     case VARIABLE_TYPE_NODE:
-      {
-      QList<QPair<double,double> > ranges =
-        this->getDisplay()->getColorFieldRanges(name + " (point)");
-      QString rangestr = " {";
-      for(int i=0; i<ranges.size(); i++)
-        {
-        rangestr += QString("%1").arg(ranges[i].first, 0, 'g', 3) + 
-                    QString(",") +
-                    QString("%1").arg(ranges[i].second, 0, 'g', 3);
-        if(i+1 < ranges.size())
-          {
-          rangestr += "; ";
-          }
-        }
-      rangestr += QString("}");
-      this->Variables->addItem(*this->PointDataIcon, name + rangestr, 
+      this->Variables->addItem(*this->PointDataIcon, name, 
         this->variableData(type, name));
-      }
       break;
     case VARIABLE_TYPE_CELL:
-      {
-      QList<QPair<double,double> > ranges =
-        this->getDisplay()->getColorFieldRanges(name + " (cell)");
-      QString rangestr = " {";
-      for(int i=0; i<ranges.size(); i++)
-        {
-        rangestr += QString("%1").arg(ranges[i].first, 0, 'g', 3) + 
-                    QString(",") +
-                    QString("%1").arg(ranges[i].second, 0, 'g', 3);
-        if(i+1 < ranges.size())
-          {
-          rangestr += "; ";
-          }
-        }
-      rangestr += QString("}");
       this->Variables->addItem(*this->CellDataIcon,
-        name + rangestr, this->variableData(type, name));
-      }
+        name, this->variableData(type, name));
       break;
     }
   this->BlockEmission = old_value;
