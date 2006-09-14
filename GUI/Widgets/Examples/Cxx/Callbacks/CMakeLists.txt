@@ -31,7 +31,7 @@ SET(TARGET_BASE_NAME "KW${PROJECT_NAME}Example")
 # also demonstrated in this example.
 
 SET(LIB_NAME "KWCallbacksExampleLib")
-SET(LIB_SRCS 
+SET(LIB_SRCS
   vtkKWMyApplication.cxx
   vtkKWMyWidget.cxx
   )

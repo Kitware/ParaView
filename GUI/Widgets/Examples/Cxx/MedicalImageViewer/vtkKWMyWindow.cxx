@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMyWindow );
-vtkCxxRevisionMacro(vtkKWMyWindow, "1.1");
+vtkCxxRevisionMacro(vtkKWMyWindow, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWMyWindow::vtkKWMyWindow()
@@ -83,7 +83,7 @@ void vtkKWMyWindow::CreateWidget()
   vtkKWApplication *app = this->GetApplication();
 
   // Add a render widget, attach it to the view frame, and pack
-  
+
   if (!this->RenderWidget)
     {
     this->RenderWidget = vtkKWRenderWidget::New();
@@ -103,7 +103,7 @@ void vtkKWMyWindow::CreateWidget()
   sprintf(data_path, "%s/Data/head100x100x47.vti", KWWidgets_EXAMPLES_DIR);
   if (!vtksys::SystemTools::FileExists(data_path))
     {
-    sprintf(data_path, 
+    sprintf(data_path,
             "%s/..%s/Examples/Data/head100x100x47.vti",
             app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR);
     }
@@ -153,12 +153,12 @@ void vtkKWMyWindow::CreateWidget()
   this->SliceScale->Create();
   this->SliceScale->SetCommand(this, "SetSliceFromScaleCallback");
 
-  app->Script("pack %s -side top -expand n -fill x -padx 2 -pady 2", 
+  app->Script("pack %s -side top -expand n -fill x -padx 2 -pady 2",
               this->SliceScale->GetWidgetName());
 
   // Create a menu button to control the orientation
 
-  vtkKWMenuButtonWithSpinButtonsWithLabel *orientation_menubutton = 
+  vtkKWMenuButtonWithSpinButtonsWithLabel *orientation_menubutton =
     vtkKWMenuButtonWithSpinButtonsWithLabel::New();
 
   orientation_menubutton->SetParent(this->GetMainPanelFrame());
@@ -206,7 +206,7 @@ void vtkKWMyWindow::CreateWidget()
     this, "WindowLevelPresetUpdateCallback");
   this->WindowLevelPresetSelector->SetPresetHasChangedCommand(
     this, "WindowLevelPresetHasChangedCallback");
-  
+
   app->Script("pack %s -side top -anchor nw -expand n -fill x",
               this->WindowLevelPresetSelector->GetWidgetName());
 

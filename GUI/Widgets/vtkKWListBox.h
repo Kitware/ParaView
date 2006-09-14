@@ -13,7 +13,7 @@
 =========================================================================*/
 // .NAME vtkKWListBox - List Box
 // .SECTION Description
-// A widget that can have a list of items. 
+// A widget that can have a list of items.
 // Use vtkKWListBoxWithScrollbars if you need scrollbars.
 // .SECTION See Also
 // vtkKWListBoxWithScrollbars
@@ -37,7 +37,7 @@ public:
   virtual void SetBackgroundColor(double r, double g, double b);
   virtual void SetBackgroundColor(double rgb[3])
     { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
-  
+
   // Description:
   // Set/Get the foreground color of the widget.
   virtual void GetForegroundColor(double *r, double *g, double *b);
@@ -60,18 +60,18 @@ public:
   // widget when it has the input focus.
   virtual void SetHighlightThickness(int);
   virtual int GetHighlightThickness();
-  
+
   // Description:
   // Set/Get the border width, a non-negative value indicating the width of
   // the 3-D border to draw around the outside of the widget (if such a border
   // is being drawn; the Relief option typically determines this).
   virtual void SetBorderWidth(int);
   virtual int GetBorderWidth();
-  
+
   // Description:
-  // Set/Get the 3-D effect desired for the widget. 
+  // Set/Get the 3-D effect desired for the widget.
   // The value indicates how the interior of the widget should appear
-  // relative to its exterior. 
+  // relative to its exterior.
   // Valid constants can be found in vtkKWOptions::ReliefType.
   virtual void SetRelief(int);
   virtual int GetRelief();
@@ -83,12 +83,12 @@ public:
   virtual void SetReliefToGroove();
 
   // Description:
-  // Specifies the font to use when drawing text inside the widget. 
+  // Specifies the font to use when drawing text inside the widget.
   // You can use predefined font names (e.g. 'system'), or you can specify
   // a set of font attributes with a platform-independent name, for example,
   // 'times 12 bold'. In this example, the font is specified with a three
   // element list: the first element is the font family, the second is the
-  // size, the third is a list of style parameters (normal, bold, roman, 
+  // size, the third is a list of style parameters (normal, bold, roman,
   // italic, underline, overstrike). Example: 'times 12 {bold italic}'.
   // The Times, Courier and Helvetica font families are guaranteed to exist
   // and will be matched to the corresponding (closest) font on your system.
@@ -98,12 +98,12 @@ public:
   virtual const char* GetFont();
 
   // Description:
-  // Set/Get the one of several styles for manipulating the selection. 
+  // Set/Get the one of several styles for manipulating the selection.
   // Valid constants can be found in vtkKWOptions::SelectionModeType.
   virtual void SetSelectionMode(int);
   virtual int GetSelectionMode();
-  virtual void SetSelectionModeToSingle(); 
-  virtual void SetSelectionModeToBrowse(); 
+  virtual void SetSelectionModeToSingle();
+  virtual void SetSelectionModeToBrowse();
   virtual void SetSelectionModeToMultiple();
   virtual void SetSelectionModeToExtended();
 
@@ -112,11 +112,11 @@ public:
   // selection. If the selection is exported, then selecting in the widget
   // deselects the current X selection, selecting outside the widget deselects
   // any widget selection, and the widget will respond to selection retrieval
-  // requests when it has a selection.  
+  // requests when it has a selection.
   virtual void SetExportSelection(int);
   virtual int GetExportSelection();
   vtkBooleanMacro(ExportSelection, int);
-  
+
   // Description:
   // Get the current selected string in the list.  This is used when
   // Select mode is single or browse.
@@ -129,7 +129,7 @@ public:
   // be used to set and query the selection.
   virtual void SetSelectState(int idx, int state);
   virtual int GetSelectState(int idx);
-  
+
   // Description:
   // Add an entry.
   virtual void InsertEntry(int index, const char *name);
@@ -143,14 +143,14 @@ public:
   // Append a string to the list. This call does not check if the string
   // is unique.
   virtual int Append(const char* name);
-  
+
   // Description:
   // Specifies a command to be invoked when an element is selected/deselected
   // in the widget. Re-selecting an element will trigger this command too.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still
-  // evaluated as a simple command. 
+  // evaluated as a simple command.
   virtual void SetSelectionCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -160,14 +160,14 @@ public:
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still
-  // evaluated as a simple command. 
+  // evaluated as a simple command.
   // Set callback for single and double click on a list item.
   virtual void SetDoubleClickCommand(vtkObject *obj, const char *method);
   virtual void SetSingleClickCommand(vtkObject *obj, const char *method);
-  
+
   // Description:
-  // Events. The ListBoxSelectionChangedEvent is triggered when an element 
-  // is selected/deselected in the widget. Re-selecting an element will 
+  // Events. The ListBoxSelectionChangedEvent is triggered when an element
+  // is selected/deselected in the widget. Re-selecting an element will
   // trigger this event too. It is similar in concept as the 'SelectionCommand'
   /// callback but can be used by multiple listeners/observers at a time.
   //BTX
@@ -180,30 +180,30 @@ public:
   // Description:
   // Get number of items in the list.
   virtual int GetNumberOfItems();
-  
-  // Description: 
+
+  // Description:
   // Get the item at the given index.
   virtual const char* GetItem(int index);
 
   // Description:
   // Returns the index of the first given item.
   virtual int GetItemIndex(const char* item);
-  
+
   // Description:
   // Delete a range of items in the list.
   virtual void DeleteRange(int start, int end);
-  
+
   // Description:
   // Delete all items from the list.
   virtual void DeleteAll();
-  
-  // Description: 
+
+  // Description:
   // Set the width of the list box. If the width is less than or equal to 0,
   // then the width is set to the size of the largest string.
   virtual void SetWidth(int);
   virtual int GetWidth();
 
-  // Description: 
+  // Description:
   // Set the height of the list box. If the height is less than or equal to 0,
   // then the height is set to the size of the number of items in the listbox.
   virtual void SetHeight(int);
@@ -211,7 +211,7 @@ public:
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
-  // Depending on different Ivars (this->Enabled, the application's 
+  // Depending on different Ivars (this->Enabled, the application's
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
   // and propagated to its internal parts/subwidgets. This will, for example,
   // enable/disable parts of the widget UI, enable/disable the visibility
@@ -221,7 +221,7 @@ public:
   // Description:
   // Callbacks. Internal, do not use.
   virtual void SelectionCallback();
- 
+
 protected:
   vtkKWListBox();
   ~vtkKWListBox();

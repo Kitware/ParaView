@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.300");
+vtkCxxRevisionMacro(vtkKWApplication, "1.301");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -2221,7 +2221,7 @@ void vtkKWApplication::FindInstallationDirectory()
 }
 
 //----------------------------------------------------------------------------
-char* vtkKWApplication::GetUserDataDirectory()
+const char* vtkKWApplication::GetUserDataDirectory()
 {
   if (!this->UserDataDirectory)
     {

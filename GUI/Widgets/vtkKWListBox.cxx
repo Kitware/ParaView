@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.54");
+vtkCxxRevisionMacro(vtkKWListBox, "1.55");
 
 //----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
@@ -211,8 +211,6 @@ void vtkKWListBox::InsertEntry(int index, const char *name)
     this->SetEnabled(0);
     }
 }
-
-
  
 //----------------------------------------------------------------------------
 void vtkKWListBox::SetDoubleClickCommand(vtkObject *obj, 
@@ -328,22 +326,29 @@ void vtkKWListBox::SetSelectionMode(int relief)
     "-selectmode", vtkKWOptions::GetSelectionModeAsTkOptionValue(relief));
 }
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetSelectionModeToSingle() 
 { 
   this->SetSelectionMode(vtkKWOptions::SelectionModeSingle); 
-};
+}
+
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetSelectionModeToBrowse() 
 { 
   this->SetSelectionMode(vtkKWOptions::SelectionModeBrowse); 
-};
+}
+
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetSelectionModeToMultiple() 
 { 
   this->SetSelectionMode(vtkKWOptions::SelectionModeMultiple); 
-};
+}
+
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetSelectionModeToExtended() 
 { 
   this->SetSelectionMode(vtkKWOptions::SelectionModeExtended); 
-};
+}
 
 //----------------------------------------------------------------------------
 int vtkKWListBox::GetSelectionMode()
@@ -449,30 +454,41 @@ void vtkKWListBox::SetRelief(int relief)
     "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetReliefToRaised()     
 { 
   this->SetRelief(vtkKWOptions::ReliefRaised); 
-};
+}
+
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetReliefToSunken() 
 { 
   this->SetRelief(vtkKWOptions::ReliefSunken); 
-};
+}
+
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetReliefToFlat() 
 { 
   this->SetRelief(vtkKWOptions::ReliefFlat); 
-};
+}
+
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetReliefToRidge() 
 { 
   this->SetRelief(vtkKWOptions::ReliefRidge); 
-};
+}
+
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetReliefToSolid() 
 { 
   this->SetRelief(vtkKWOptions::ReliefSolid); 
-};
+}
+
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetReliefToGroove() 
 { 
   this->SetRelief(vtkKWOptions::ReliefGroove); 
-};
+}
 
 //----------------------------------------------------------------------------
 int vtkKWListBox::GetRelief()

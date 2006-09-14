@@ -7,7 +7,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMyWidget );
-vtkCxxRevisionMacro(vtkKWMyWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWMyWidget, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWMyWidget::vtkKWMyWidget()
@@ -63,7 +63,7 @@ void vtkKWMyWidget::CreateWidget()
   // Listen to the changes made to our internal scale widget through either
   // callbacks or events (for demonstration purposes, you would normally
   // just pick one), which will then modify the app's value accordingly
-  
+
   this->Scale->SetCommand(this, "ScaleChangeNotifiedByCommandCallback");
 
   this->AddCallbackCommandObserver(

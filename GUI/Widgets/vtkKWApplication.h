@@ -173,7 +173,7 @@ public:
   // Description:
   // Set/Get the directory in which the application can store
   // user data. 
-  virtual char* GetUserDataDirectory();
+  virtual const char* GetUserDataDirectory();
   vtkSetStringMacro(UserDataDirectory);
   
   // Description:
