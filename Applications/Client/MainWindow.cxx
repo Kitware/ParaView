@@ -65,6 +65,7 @@ public:
   pqImplementation(QWidget* parent) :
     AssistantClient(0),
     Core(parent),
+    RecentFilesMenu(0),
     ViewMenu(0),
     ToolbarsMenu(0)
   {
