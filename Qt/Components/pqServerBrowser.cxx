@@ -226,6 +226,7 @@ void pqServerBrowser::onDeleteServer()
     }
     
   this->Implementation->Startups.deleteStartups(startups);
+  this->Implementation->Startups.save(this->Implementation->Settings);
 }
 
 void pqServerBrowser::onSave()
