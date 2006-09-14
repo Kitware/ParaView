@@ -663,7 +663,7 @@ void pqHistogramChart::finishBinRemoval()
   this->InModelChange = false;
 }
 
-void pqHistogramChart::updateHighlights(const pqHistogramSelectionList &list)
+void pqHistogramChart::updateHighlights(const pqHistogramSelectionList &)
 {
   if(!this->InModelChange)
     {
