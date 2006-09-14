@@ -158,7 +158,6 @@ ENDIF(APPLE)
     SimpleInteraction
     StreamTracer
     StreamTracerUpdates
-    SubMenu
     Threshold
     UndoRedo
     VariableSelector
