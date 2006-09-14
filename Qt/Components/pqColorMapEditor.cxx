@@ -91,7 +91,6 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
   new pqColorMapColorChanger(this->Form->ColorScale);
 
   // TEMP: Disable the checkbox options until they can be supported.
-  this->Form->UseTable->setEnabled(false);
   this->Form->UseGradient->setEnabled(false);
 
   // Set up the color table model. Use the color table delegate to
@@ -112,8 +111,8 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
       this, SLOT(closeForm()));
 
   // Connect the check box options.
-  this->connect(this->Form->UseTable, SIGNAL(toggled(bool)),
-      this, SLOT(setUsingTable(bool)));
+  this->connect(this->Form->UseDiscreteColors, SIGNAL(toggled(bool)),
+      this, SLOT(setUseDiscreteColors(bool)));
   this->connect(this->Form->UseGradient, SIGNAL(toggled(bool)),
       this, SLOT(setUsingGradient(bool)));
 
@@ -139,6 +138,7 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
       this, SLOT(updateTableRange(int, int)));
 }
 
+//-----------------------------------------------------------------------------
 pqColorMapEditor::~pqColorMapEditor()
 {
   delete this->Form;
@@ -146,6 +146,7 @@ pqColorMapEditor::~pqColorMapEditor()
   delete this->EditDelay;
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::setDisplay(pqPipelineDisplay *display)
 {
   if(this->Form->Display == display)
@@ -166,65 +167,118 @@ void pqColorMapEditor::setDisplay(pqPipelineDisplay *display)
     return;
     }
 
-  // TODO: Support the color transfer function as well.
   // Get the lookup table from the display.
-  vtkSMProxyProperty *proxyProperty = vtkSMProxyProperty::SafeDownCast(
-      this->Form->Display->getProxy()->GetProperty("LookupTable"));
-  if(proxyProperty)
+  this->LookupTable = pqSMAdaptor::getProxyProperty(
+    display->getProxy()->GetProperty("LookupTable"));
+
+  this->updateEditor();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::updateEditor()
+{
+  if (!this->LookupTable)
     {
-    this->LookupTable = vtkSMLookupTableProxy::SafeDownCast(
-        proxyProperty->GetProxy(0));
+    return;
+    }
+  // TODO: enable/disable/show/hide widgets based on type
+  // of LUT.
+  bool isPVLookupTable = 
+    (this->LookupTable->GetXMLName() == QString("PVLookupTable"));
+
+  this->Form->UseDiscreteColors->setEnabled(isPVLookupTable);
+  this->resetGUI();
+
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::resetGUI()
+{
+  this->Form->ColorScale->clearPoints();
+  if (!this->LookupTable)
+    {
+    return;
     }
 
-  if(this->LookupTable)
-    {
-    // Set the resolution from the lookup table.
-    vtkSMProperty *prop = this->LookupTable->GetProperty("NumberOfTableValues");
-    int value = pqSMAdaptor::getElementProperty(prop).toInt();
-    this->Form->ColorScale->setTableSize(value);
-    this->Form->TableSize->setValue(value);
-    QString valueString;
-    valueString.setNum(value);
-    this->Form->TableSizeText->setText(valueString);
+  // Set the resolution from the lookup table.
+  int value = pqSMAdaptor::getElementProperty(
+    this->LookupTable->GetProperty("NumberOfTableValues")).toInt();
+  this->Form->ColorScale->setTableSize(value);
+  this->Form->TableSize->setValue(value);
+  QString valueString;
+  valueString.setNum(value);
+  this->Form->TableSizeText->setText(valueString);
 
-    // Set the end points from the lookup table.
-    prop = this->LookupTable->GetProperty("HueRange");
-    QList<QVariant> list = pqSMAdaptor::getMultipleElementProperty(prop);
-    double h1 = list[0].toDouble();
-    double h2 = list[1].toDouble();
-    prop = this->LookupTable->GetProperty("SaturationRange");
-    list = pqSMAdaptor::getMultipleElementProperty(prop);
-    double s1 = list[0].toDouble();
-    double s2 = list[1].toDouble();
-    prop = this->LookupTable->GetProperty("ValueRange");
-    list = pqSMAdaptor::getMultipleElementProperty(prop);
-    double v1 = list[0].toDouble();
-    double v2 = list[1].toDouble();
-    prop = this->LookupTable->GetProperty("ScalarRange");
-    list = pqSMAdaptor::getMultipleElementProperty(prop);
-    pqChartValue scalar = list[0].toDouble();
-    QColor color = QColor::fromHsvF(h1, s1, v1);
-    this->Form->ColorScale->addPoint(scalar, color);
-    scalar = list[1].toDouble();
-    color = QColor::fromHsvF(h2, s2, v2);
+  if (this->LookupTable->GetXMLName() == QString("PVLookupTable"))
+    {
+    this->resetFromPVLookupTable();
+    }
+  else
+    {
+    this->resetFromLookupTable();
+    }
+
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::resetFromLookupTable()
+{
+  this->Form->UseDiscreteColors->setCheckState(Qt::Checked);
+
+  // Set the end points from the lookup table.
+  vtkSMProperty* prop = this->LookupTable->GetProperty("HueRange");
+  QList<QVariant> list = pqSMAdaptor::getMultipleElementProperty(prop);
+  double h1 = list[0].toDouble();
+  double h2 = list[1].toDouble();
+  prop = this->LookupTable->GetProperty("SaturationRange");
+  list = pqSMAdaptor::getMultipleElementProperty(prop);
+  double s1 = list[0].toDouble();
+  double s2 = list[1].toDouble();
+  prop = this->LookupTable->GetProperty("ValueRange");
+  list = pqSMAdaptor::getMultipleElementProperty(prop);
+  double v1 = list[0].toDouble();
+  double v2 = list[1].toDouble();
+  prop = this->LookupTable->GetProperty("ScalarRange");
+  list = pqSMAdaptor::getMultipleElementProperty(prop);
+  pqChartValue scalar = list[0].toDouble();
+  QColor color = QColor::fromHsvF(h1, s1, v1);
+  this->Form->ColorScale->addPoint(scalar, color);
+  scalar = list[1].toDouble();
+  color = QColor::fromHsvF(h2, s2, v2);
+  this->Form->ColorScale->addPoint(scalar, color);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::resetFromPVLookupTable()
+{
+  int discretize = pqSMAdaptor::getElementProperty(
+    this->LookupTable->GetProperty("Discretize")).toInt();
+  this->Form->UseDiscreteColors->setCheckState(
+    discretize? Qt::Checked : Qt::Unchecked);
+
+  QList<QVariant> list = pqSMAdaptor::getMultipleElementProperty(
+    this->LookupTable->GetProperty("RGBPoints"));
+  for (int cc=0; (cc+3) < list.size(); cc+=4)
+    {
+    QColor color = QColor::fromRgbF(list[cc+1].toDouble(),
+      list[cc+2].toDouble(), list[cc+3].toDouble());
+    pqChartValue scalar = list[cc].toDouble();
     this->Form->ColorScale->addPoint(scalar, color);
     }
 }
 
+//-----------------------------------------------------------------------------
 int pqColorMapEditor::getTableSize() const
 {
-  if(this->Form->UseTable->isChecked())
+  QString text = this->Form->TableSizeText->text();
+  if(!text.isEmpty())
     {
-    QString text = this->Form->TableSizeText->text();
-    if(!text.isEmpty())
-      {
-      return text.toInt();
-      }
+    return text.toInt();
     }
-
   return 0;
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::closeEvent(QCloseEvent *e)
 {
   // If the timer is running, cancel it.
@@ -236,10 +290,29 @@ void pqColorMapEditor::closeEvent(QCloseEvent *e)
   QDialog::closeEvent(e);
 }
 
-void pqColorMapEditor::setUsingTable(bool)
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setUseDiscreteColors(bool discrete)
 {
+  if (discrete)
+    {
+    vtkSMProperty *prop = this->LookupTable->GetProperty(
+      "NumberOfTableValues");
+    this->Form->ColorScale->setTableSize(
+      pqSMAdaptor::getElementProperty(prop).toInt());
+    }
+  else
+    {
+    this->Form->ColorScale->setTableSize(256);
+    }
+
+  pqSMAdaptor::setElementProperty(
+    this->LookupTable->GetProperty("Discretize"), (discrete? 1 : 0));
+  this->Form->ResolutionFrame->setEnabled(discrete);
+  this->LookupTable->UpdateVTKObjects();
+  this->Form->Display->renderAllViews();
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::setUsingGradient(bool on)
 {
   if(on)
@@ -269,6 +342,7 @@ void pqColorMapEditor::setUsingGradient(bool on)
   this->resize(dialogSize);
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::handleTextEdit(const QString &)
 {
   // TODO: Validate the text.
@@ -278,6 +352,7 @@ void pqColorMapEditor::handleTextEdit(const QString &)
   this->EditDelay->start(600);
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::setSizeFromText()
 {
   // Get the size from the text. Set the size for the slider and the
@@ -288,6 +363,7 @@ void pqColorMapEditor::setSizeFromText()
   this->setTableSize(tableSize);
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::setSizeFromSlider(int tableSize)
 {
   QString sizeString;
@@ -296,6 +372,7 @@ void pqColorMapEditor::setSizeFromSlider(int tableSize)
   this->setTableSize(tableSize);
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::setTableSize(int tableSize)
 {
   // Set the table size for the color scale and the lookup table.
@@ -318,9 +395,30 @@ void pqColorMapEditor::setTableSize(int tableSize)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::changeControlColor(int, const QColor &)
 {
-  if(this->LookupTable)
+  if(!this->LookupTable)
+    {
+    return;
+    }
+
+  if (this->LookupTable->GetXMLName() == QString("PVLookupTable"))
+    {
+    QList<QVariant> rgbPoints;
+    for (int i =0; i < this->Form->ColorScale->getPointCount(); ++i)
+      {
+      pqChartValue scalar;
+      QColor color;
+      this->Form->ColorScale->getPointValue(i, scalar);
+      this->Form->ColorScale->getPointColor(i, color);
+      rgbPoints << scalar.getDoubleValue()
+        << color.redF() << color.greenF() << color.blueF();
+      }
+    pqSMAdaptor::setMultipleElementProperty(
+      this->LookupTable->GetProperty("RGBPoints"), rgbPoints);
+    }
+  else
     {
     // Set the colors for the lookup table.
     QColor color1;
@@ -340,11 +438,12 @@ void pqColorMapEditor::changeControlColor(int, const QColor &)
     list[1] = QVariant(color2.valueF());
     prop = this->LookupTable->GetProperty("ValueRange");
     pqSMAdaptor::setMultipleElementProperty(prop, list);
-    this->LookupTable->UpdateVTKObjects();
-    this->Form->Display->renderAllViews();
     }
+  this->LookupTable->UpdateVTKObjects();
+  this->Form->Display->renderAllViews();
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::getTableColor(const QModelIndex &index)
 {
   // Get the starting color from the model.
@@ -359,6 +458,7 @@ void pqColorMapEditor::getTableColor(const QModelIndex &index)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::changeTableColor(int vtkNotUsed(index), 
                                         const QColor& vtkNotUsed(color))
 {
@@ -366,6 +466,7 @@ void pqColorMapEditor::changeTableColor(int vtkNotUsed(index),
   // supports it.
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::updateTableRange(int vtkNotUsed(first), 
                                         int vtkNotUsed(last))
 {
@@ -373,6 +474,7 @@ void pqColorMapEditor::updateTableRange(int vtkNotUsed(first),
   // supports it.
 }
 
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::closeForm()
 {
   // If the edit delay timer is active, set the final user entry.

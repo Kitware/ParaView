@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>399</height>
+    <height>527</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -23,19 +23,6 @@
     <number>6</number>
    </property>
    <item>
-    <widget class="QCheckBox" name="UseTable" >
-     <property name="whatsThis" >
-      <string>Check the box to use a fixed size color table. Uncheck the box to use a color transfer function.</string>
-     </property>
-     <property name="text" >
-      <string>Use Color Table</string>
-     </property>
-     <property name="checked" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QFrame" name="TableFrame" >
      <property name="frameShape" >
       <enum>QFrame::NoFrame</enum>
@@ -43,14 +30,27 @@
      <property name="frameShadow" >
       <enum>QFrame::Plain</enum>
      </property>
-     <layout class="QGridLayout" >
+     <layout class="QVBoxLayout" >
       <property name="margin" >
        <number>0</number>
       </property>
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item row="0" column="0" colspan="3" >
+      <item>
+       <widget class="QCheckBox" name="UseDiscreteColors" >
+        <property name="whatsThis" >
+         <string>Check this box if the color table should have discrete colors, otherwise color values will be interpolated.</string>
+        </property>
+        <property name="text" >
+         <string>Use Discrete Colors</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="UseGradient" >
         <property name="whatsThis" >
          <string>Check the box to use a color gradient. Uncheck the box to set individual colors in the color table.</string>
@@ -63,48 +63,76 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
-       <widget class="QLineEdit" name="TableSizeText" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+      <item>
+       <widget class="QFrame" name="ResolutionFrame" >
+        <property name="frameShape" >
+         <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="whatsThis" >
-         <string>This displays the color table resolution. It can also be used to enter a new value for the table size.</string>
+        <property name="frameShadow" >
+         <enum>QFrame::Raised</enum>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QSlider" name="TableSize" >
-        <property name="whatsThis" >
-         <string>You can change the color table size by moving the slider.</string>
-        </property>
-        <property name="minimum" >
-         <number>2</number>
-        </property>
-        <property name="maximum" >
-         <number>256</number>
-        </property>
-        <property name="value" >
-         <number>256</number>
-        </property>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="whatsThis" >
-         <string>You can change the color table size by moving the slider.</string>
-        </property>
-        <property name="text" >
-         <string>Resolution</string>
-        </property>
+        <layout class="QGridLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item row="0" column="0" >
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label" >
+             <property name="whatsThis" >
+              <string>You can change the color table size by moving the slider.</string>
+             </property>
+             <property name="text" >
+              <string>Resolution</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSlider" name="TableSize" >
+             <property name="whatsThis" >
+              <string>You can change the color table size by moving the slider.</string>
+             </property>
+             <property name="minimum" >
+              <number>2</number>
+             </property>
+             <property name="maximum" >
+              <number>256</number>
+             </property>
+             <property name="value" >
+              <number>256</number>
+             </property>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="TableSizeText" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>5</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="whatsThis" >
+              <string>This displays the color table resolution. It can also be used to enter a new value for the table size.</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -179,14 +207,14 @@
  <customwidgets>
   <customwidget>
    <class>pqColorMapWidget</class>
-   <extends></extends>
+   <extends>QWidget</extends>
    <header>pqColorMapWidget.h</header>
    <container>0</container>
    <pixmap></pixmap>
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>UseTable</tabstop>
+  <tabstop>UseDiscreteColors</tabstop>
   <tabstop>UseGradient</tabstop>
   <tabstop>TableSize</tabstop>
   <tabstop>TableSizeText</tabstop>

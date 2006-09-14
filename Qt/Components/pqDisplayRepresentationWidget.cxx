@@ -92,7 +92,7 @@ void pqDisplayRepresentationWidget::setRenderModule(pqRenderModule* rm)
   if (this->Internal->RenderModule)
     {
     QObject::connect(this->Internal->RenderModule, 
-      SIGNAL(displayAdded(pqPipelineDisplay*)), 
+      SIGNAL(displayAdded(pqDisplay*)), 
       this, SLOT(reloadGUI()), Qt::QueuedConnection);
     }  
   this->updateLinks();

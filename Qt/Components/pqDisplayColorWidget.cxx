@@ -303,7 +303,7 @@ void pqDisplayColorWidget::setRenderModule(pqRenderModule* renModule)
   this->RenderModule = renModule;
   if (this->RenderModule)
     {
-    QObject::connect(this->RenderModule, SIGNAL(displayAdded(pqPipelineDisplay*)), 
+    QObject::connect(this->RenderModule, SIGNAL(displayAdded(pqDisplay*)), 
       this, SLOT(displayAdded()), Qt::QueuedConnection);
     }
   this->reloadGUI();

@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMap>
 #include <QPointer>
 #include <QtDebug>
+#include <QRegExp>
 
 // ParaView includes.
 #include "pqApplicationCore.h"
@@ -55,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqRenderModule.h"
+#include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
 
@@ -103,6 +105,9 @@ public:
   typedef QMap<vtkSMDataObjectDisplayProxy*, pqPipelineDisplay*>
     MapOfDisplayProxyToDisplay;
   MapOfDisplayProxyToDisplay Displays;
+
+  typedef QMap<vtkSMProxy*, pqProxy*> MapOfProxies;
+  MapOfProxies Proxies;
 
   // The pqServerManagerModel has taken on the responsibility
   // of assigning initial "cute" names for source and filters.
@@ -484,6 +489,64 @@ void pqServerManagerModel::onRemoveRenderModule(vtkSMRenderModuleProxy* rm)
   emit this->renderModuleRemoved(toRemove);
 
   delete toRemove;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::onProxyRegistered(QString group, QString name, 
+  vtkSMProxy* proxy)
+{
+  if (!proxy || group == "" || name == "" || 
+    group.indexOf(QRegExp(".*_prototypes$")) != -1 )
+    {
+    return;
+    }
+
+  if (this->Internal->Proxies.contains(proxy))
+    {
+    return;
+    }
+
+  pqServer * server = this->getServerForSource(proxy);
+  if (!server)
+    {
+    qDebug() << "Could not locate the server on which the new "
+      " proxy was added.";
+    return;
+    }
+
+  pqProxy *pq_proxy = NULL;
+  if (group == "lookup_tables")
+    {
+    // Lookup Table registered.
+    pq_proxy = new pqScalarsToColors(group, name, proxy, server, this);
+    }
+
+  if (pq_proxy)
+    {
+    emit this->preProxyAdded(pq_proxy);
+    this->Internal->Proxies.insert(proxy, pq_proxy);
+    emit this->proxyAdded(pq_proxy);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::onProxyUnRegistered(QString group,
+  QString name, vtkSMProxy* proxy)
+{
+  if (!this->Internal->Proxies.contains(proxy))
+    {
+    return;
+    }
+
+  pqProxy* pq_proxy = this->Internal->Proxies[proxy];
+  if (pq_proxy->getSMName() == name && pq_proxy->getSMGroup() == group)
+    {
+    emit this->preProxyRemoved(pq_proxy);
+    this->Internal->Proxies.remove(proxy);
+    emit this->proxyRemoved(pq_proxy);
+
+    delete pq_proxy;
+    }
 }
 
 //-----------------------------------------------------------------------------

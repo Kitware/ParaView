@@ -40,25 +40,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayColorWidget.h"
 #include "pqElementInspectorWidget.h"
 #include "pqMainWindowCore.h"
-#include "pqMultiView.h"
 #include "pqMultiViewFrame.h"
+#include "pqMultiView.h"
 #include "pqObjectInspectorWidget.h"
+#include "pqPendingDisplayManager.h"
 #include "pqPipelineBrowser.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineMenu.h"
 #include "pqPipelineSource.h"
+#include "pqPQLookupTableManager.h"
 #include "pqReaderFactory.h"
 #include "pqRenderModule.h"
 #include "pqRenderWindowManager.h"
 #include "pqSelectionManager.h"
-#include "pqServer.h"
-#include "pqServerStartupBrowser.h"
 #include "pqServerFileDialogModel.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
+#include "pqServerStartupBrowser.h"
+#include "pqSettingsDialog.h"
 #include "pqSettings.h"
 #include "pqSimpleAnimationManager.h"
+#include "pqSMAdaptor.h"
 #include "pqSourceProxyInfo.h"
 #include "pqStateLoader.h"
 #include "pqToolTipTrapper.h"
@@ -128,6 +132,7 @@ public:
     MultiViewManager(parent),
     CustomFilters(new pqCustomFilterManagerModel()),
     CustomFilterManager(0),
+    LookupTableManager(new pqPQLookupTableManager(parent)),
     RecentFilesMenu(0),
     FilterMenu(0),
     PipelineMenu(0),
@@ -152,6 +157,7 @@ public:
     delete this->PipelineMenu;
     delete this->CustomFilterManager;
     delete this->CustomFilters;
+    delete this->LookupTableManager;
   }
 
   QWidget* const Parent;
@@ -161,6 +167,7 @@ public:
   pqElementInspectorWidget* ElementInspector;
   pqCustomFilterManagerModel* const CustomFilters;
   pqCustomFilterManager* CustomFilterManager;
+  pqPQLookupTableManager* LookupTableManager;
  
   QMenu* RecentFilesMenu; 
   
@@ -211,6 +218,8 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   
   
   pqApplicationCore* const core = pqApplicationCore::instance();
+
+  core->setLookupTableManager(this->Implementation->LookupTableManager);
 
   // Initialize supported file types.
   core->getReaderFactory()->loadFileTypes(":/pqWidgets/XML/ParaViewReaders.xml");

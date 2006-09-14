@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 
-class pqPipelineDisplay;
+class pqDisplay;
 class pqRenderModuleInternal;
 class pqServer;
 class pqUndoStack;
@@ -79,16 +79,16 @@ public:
 
   /// This method checks if the display is one of the displays
   /// rendered by this render module.
-  bool hasDisplay(pqPipelineDisplay* display);
+  bool hasDisplay(pqDisplay* display);
 
   /// Gets the number of displays in the render module.
   int getDisplayCount() const;
 
   /// Gets the display for the specified index.
-  pqPipelineDisplay* getDisplay(int index) const;
+  pqDisplay* getDisplay(int index) const;
  
   /// Returns a list of displays in this render module.
-  QList<pqPipelineDisplay*> getDisplays() const;
+  QList<pqDisplay*> getDisplays() const;
 
   /// Each render module keeps a undo stack for interaction.
   /// This method returns that undo stack. External world
@@ -98,10 +98,10 @@ public:
 
 signals:
   // Fired after a display has been added to this render module.
-  void displayAdded(pqPipelineDisplay*);
+  void displayAdded(pqDisplay*);
 
   // Fired after a display has been removed from this render module.
-  void displayRemoved(pqPipelineDisplay*);
+  void displayRemoved(pqDisplay*);
 
   // Fired when the render module fires a vtkCommand::StartEvent
   // signalling the beginning of rendering.

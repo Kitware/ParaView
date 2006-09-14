@@ -53,11 +53,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
+#include "pqLookupTableManager.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqRenderModule.h"
 #include "pqSMAdaptor.h"
 #include "pqServerManagerModel.h"
+#include "pqScalarsToColors.h"
 
 
 //-----------------------------------------------------------------------------
@@ -67,17 +69,13 @@ public:
   vtkSmartPointer<vtkSMDataObjectDisplayProxy> DisplayProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   QPointer<pqPipelineSource> Input;
-
-  // Set of render modules showing this display. Typically,
-  // it will be 1, but theoretically there can be more.
-  QList<QPointer<pqRenderModule> > RenderModules;
 };
 
 //-----------------------------------------------------------------------------
 pqPipelineDisplay::pqPipelineDisplay(const QString& name,
   vtkSMDataObjectDisplayProxy* display,
   pqServer* server, QObject* p/*=null*/):
-  pqProxy("displays", name, display, server, p)
+  pqDisplay("displays", name, display, server, p)
 {
   this->Internal = new pqPipelineDisplayInternal();
   this->Internal->DisplayProxy = display;
@@ -284,18 +282,30 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     }
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqPipelineBuilder* builder = core->getPipelineBuilder();
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    displayProxy->GetProperty("LookupTable"));
+  pqLookupTableManager* lut_mgr = core->getLookupTableManager();
   vtkSMProxy* lut = 0;
-  if (pp->GetNumberOfProxies() == 0)
+
+  if (lut_mgr)
     {
-    lut = builder->createLookupTable(this);
+    pqScalarsToColors* pqlut = lut_mgr->getLookupTable(
+      this->getServer(), arrayname, 0);
+    lut = (pqlut)? pqlut->getProxy() : 0;
     }
   else
     {
-    lut = pp->GetProxy(0);
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      displayProxy->GetProperty("LookupTable"));
+    // When lookup table manager is not available,
+    // we simply create new lookup tables for each display.
+    if (pp->GetNumberOfProxies() == 0)
+      {
+      pqPipelineBuilder* builder = core->getPipelineBuilder();
+      lut = builder->createLookupTable(this);
+      }
+    else
+      {
+      lut = pp->GetProxy(0);
+      }
     }
 
   if (!lut)
@@ -306,6 +316,9 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     displayProxy->UpdateVTKObjects();
     return;
     }
+
+  pqSMAdaptor::setProxyProperty(
+    displayProxy->GetProperty("LookupTable"), lut);
 
   pqSMAdaptor::setElementProperty(
     displayProxy->GetProperty("ScalarVisibility"), 1);
@@ -325,12 +338,13 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     pqSMAdaptor::setEnumerationProperty(
       displayProxy->GetProperty("ScalarMode"), "UsePointFieldData");
     }
-
+#if 0
   // array couldn't be found, look for it on the reader
   // TODO: this support should be moved into the server manager and/or VTK
   if(!ai)
     {
-    pp = vtkSMProxyProperty::SafeDownCast(displayProxy->GetProperty("Input"));
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      displayProxy->GetProperty("Input"));
     vtkSMProxy* reader = pp->GetProxy(0);
     while((pp = vtkSMProxyProperty::SafeDownCast(reader->GetProperty("Input"))))
       reader = pp->GetProxy(0);
@@ -356,6 +370,7 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
       ai = geomInfo->GetPointDataInformation()->GetArrayInformation(arrayname);
       }
     }
+#endif
   double range[2] = {0,1};
   if(ai)
     {
@@ -436,66 +451,6 @@ void pqPipelineDisplay::resetLookupTableScalarRange()
 }
 
 //-----------------------------------------------------------------------------
-bool pqPipelineDisplay::shownIn(pqRenderModule* rm) const
-{
-  return this->Internal->RenderModules.contains(rm);
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineDisplay::addRenderModule(pqRenderModule* rm)
-{
-  if (!this->Internal->RenderModules.contains(rm))
-    {
-    this->Internal->RenderModules.push_back(rm);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineDisplay::removeRenderModule(pqRenderModule* rm)
-{
-  if (this->Internal->RenderModules.contains(rm))
-    {
-    this->Internal->RenderModules.removeAll(rm);
-    }
-}
-
-//-----------------------------------------------------------------------------
-unsigned int pqPipelineDisplay::getNumberOfRenderModules() const
-{
-  return this->Internal->RenderModules.size();
-}
-
-//-----------------------------------------------------------------------------
-pqRenderModule* pqPipelineDisplay::getRenderModule(unsigned int index) const
-{
-  if (index >= this->getNumberOfRenderModules())
-    {
-    qDebug() << "Invalid index : " << index;
-    return NULL;
-    }
-  return this->Internal->RenderModules[index];
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineDisplay::renderAllViews(bool force /*=false*/)
-{
-  foreach(pqRenderModule* rm, this->Internal->RenderModules)
-    {
-    if (rm)
-      {
-      if (force)
-        {
-        rm->forceRender();
-        }
-      else
-        {
-        rm->render();
-        }
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
 bool pqPipelineDisplay::isVisible() const
 {
   return this->getDisplayProxy()->GetVisibilityCM();
@@ -505,12 +460,6 @@ bool pqPipelineDisplay::isVisible() const
 void pqPipelineDisplay::setVisible(bool visible)
 {
   this->getDisplayProxy()->SetVisibilityCM((visible? 1 : 0));
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineDisplay::onVisibilityChanged()
-{
-  emit this->visibilityChanged(this->getDisplayProxy()->GetVisibilityCM());
 }
 
 //-----------------------------------------------------------------------------

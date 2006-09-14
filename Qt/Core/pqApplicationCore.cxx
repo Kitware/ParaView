@@ -64,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pq3DWidgetFactory.h"
+#include "pqLookupTableManager.h"
 #include "pqOptions.h"
 #include "pqPendingDisplayManager.h"
 #include "pqPendingDisplayUndoElement.h"
@@ -98,6 +99,7 @@ public:
   pqServerManagerSelectionModel* SelectionModel;
   pqPendingDisplayManager* PendingDisplayManager;
   vtkSmartPointer<vtkSMStateLoader> StateLoader;
+  QPointer<pqLookupTableManager> LookupTableManager;
 
   QString OrganizationName;
   QString ApplicationName;
@@ -192,7 +194,35 @@ void pqApplicationCore::connect(pqServerManagerObserver* pdata,
     smModel, SLOT(onAddDisplay(QString, vtkSMProxy*)));
   QObject::connect(pdata, SIGNAL(displayUnRegistered(vtkSMProxy*)),
     smModel, SLOT(onRemoveDisplay(vtkSMProxy*)));
+  QObject::connect(
+    pdata, SIGNAL(proxyRegistered(QString, QString, vtkSMProxy*)),
+    smModel, SLOT(onProxyRegistered(QString, QString, vtkSMProxy*)));
+  QObject::connect(
+    pdata, SIGNAL(proxyUnRegistered(QString, QString, vtkSMProxy*)),
+    smModel, SLOT(onProxyUnRegistered(QString, QString, vtkSMProxy*)));
       
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::setLookupTableManager(pqLookupTableManager* mgr)
+{
+  pqServerManagerModel* smModel = this->getServerManagerModel();
+  if (this->Internal->LookupTableManager)
+    {
+    QObject::disconnect(smModel, 0, this->Internal->LookupTableManager, 0);
+    }
+  this->Internal->LookupTableManager = mgr;
+  if (mgr)
+    {
+    QObject::connect(smModel, SIGNAL(proxyAdded(pqProxy*)),
+      mgr, SLOT(onAddProxy(pqProxy*)));
+    }
+}
+
+//-----------------------------------------------------------------------------
+pqLookupTableManager* pqApplicationCore::getLookupTableManager() const
+{
+  return this->Internal->LookupTableManager;
 }
 
 //-----------------------------------------------------------------------------
@@ -399,7 +429,8 @@ pqServerStartups& pqApplicationCore::serverStartups()
         }
       else
         {
-        qWarning() << "Error loading default_servers.pvsc: " << error_message << " line: " << error_line << " column: " << error_column;
+        qWarning() << "Error loading default_servers.pvsc: " << error_message 
+          << " line: " << error_line << " column: " << error_column;
         }
       }
     

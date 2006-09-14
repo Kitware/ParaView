@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineDisplay_h
 
 
-#include "pqProxy.h"
+#include "pqDisplay.h"
 #include <QPair>
 
 class pqPipelineDisplayInternal;
@@ -55,7 +55,7 @@ class vtkSMDataObjectDisplayProxy;
 /// a single vtkSMDataObjectDisplayProxy. The display can be added to
 /// only one render module or more (ofcouse on the same server, this class
 /// doesn't worry about that.
-class PQCORE_EXPORT pqPipelineDisplay : public pqProxy
+class PQCORE_EXPORT pqPipelineDisplay : public pqDisplay
 {
   Q_OBJECT
 public:
@@ -81,35 +81,17 @@ public:
   // Call to select the coloring array. 
   void colorByArray(const char* arrayname, int fieldtype);
 
-  // Returns if the display is shown in the given render module.
-  // Note that for a display to be visible in a render module,
-  // it must be \c shownIn that render modules as well as 
-  // visibility must be set to 1.
-  bool shownIn(pqRenderModule* rm) const;
-
   // Returns if the status of the visbility property of this display.
   // Note that for a display to be visible in a render module,
   // it must be \c shownIn that render modules as well as 
   // visibility must be set to 1.
-  bool isVisible() const;
+  virtual bool isVisible() const;
 
   // Set the visibility. Note that this affects the visibility of the
   // display in all render modules it is added to, and only in all the
   // render modules it is added to. This method does not call a re-render
   // on the render module, caller must call that explicitly.
-  void setVisible(bool visible);
-
-  // Get the number of render modules this display is present in.
-  unsigned int getNumberOfRenderModules() const;
-
-  // Get the render module this display is present in at the given 
-  // index.
-  pqRenderModule* getRenderModule(unsigned int index) const;
-
-  // This method updates all render modules to which this 
-  // display belongs, if force is true, it for an immediate render
-  // otherwise render on idle.
-  void renderAllViews(bool force=false);
+  virtual void setVisible(bool visible);
 
   /// get the names of the arrays that a part may be colored by
   QList<QString> getColorFields();
@@ -125,29 +107,16 @@ public:
   /// return the array name
   QString getColorField(bool raw=false);
 
+public slots:
   // If lookuptable is set up and is used for coloring,
   // then calling this method resets the table ranges to match the current 
   // range of the selected array.
   void resetLookupTableScalarRange();
-signals:
-  // Fired when the visibility property of the underlying display changes.
-  // It must be noted that this is fired on the property change, the property
-  // is not pushed yet, hence the visibility of the underlying VTK prop
-  // hasn't changed.
-  void visibilityChanged(bool visible);
 
 protected slots:
   // called when input property on display changes. We must detect if
   // (and when) the display is connected to a new proxy.
   virtual void onInputChanged();
-
-  // called when the display visibility property changes.
-  void onVisibilityChanged();
-
-protected:
-  friend class pqRenderModule;
-  void addRenderModule(pqRenderModule* rm);
-  void removeRenderModule(pqRenderModule* rm);
 
 private:
   pqPipelineDisplayInternal *Internal; 

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include "pqCoreExport.h"
-#include "vtkType.h" // neded for vtkIdType.
+#include "vtkType.h" // needed for vtkIdType.
 
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
@@ -157,6 +157,10 @@ public slots:
   void onAddDisplay(QString name, vtkSMProxy* display);
   void onRemoveDisplay(vtkSMProxy* display);
 
+  /// Call when a proxy is registered/unregistered. 
+ /// (other than sources/displays/render modules).
+ void onProxyRegistered(QString group, QString name, vtkSMProxy* proxy);
+ void onProxyUnRegistered(QString group, QString name, vtkSMProxy* proxy);
 signals:
   // Fired when a new connection is created on the vtkProcessModule.
   // a new pqServer encapsulator is created for it (thanks to
@@ -200,6 +204,15 @@ signals:
   /// Fired when a render module is gone for ever.
   void renderModuleRemoved(pqRenderModule* rm);
   void preRenderModuleRemoved(pqRenderModule* rm);
+
+  /// Fired when a pqProxy (or subclass) object is created for
+  /// any registered proxy which is not a 
+  /// source/filter/display/render module.
+  void preProxyAdded(pqProxy* proxy);
+  void proxyAdded(pqProxy* proxy);
+
+  void preProxyRemoved(pqProxy*);
+  void proxyRemoved(pqProxy*);
 
   /// Fired when the name of an item changes.
   void nameChanged(pqServerManagerModelItem *item);

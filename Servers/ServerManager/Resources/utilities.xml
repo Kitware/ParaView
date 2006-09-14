@@ -72,6 +72,86 @@
       </StringVectorProperty>
 
     </LookupTableProxy>
+
+    <Proxy name="PVLookupTable" class="vtkPVLookupTable">
+      <DoubleVectorProperty
+        name="RGBPoints"
+        command="AddRGBPoint"
+        repeat_command="1"
+        number_of_elements_per_command="4"
+        clean_command="RemoveAllPoints"
+        animateable="0">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ColorSpace"
+        command="SetColorSpace"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="RGB" />
+          <Entry value="1" text="HSV" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="HSVWrap"
+        command="SetHSVWrap"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="ScalarRange"
+         command="SetRange"
+         number_of_elements="2" 
+         default_values="0 1">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="NumberOfTableValues"
+         command="SetNumberOfValues"
+         number_of_elements="1"
+         default_values="256" >
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Discretize"
+        command="SetDiscretize"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <Property
+         name="Build"
+         command="Build">
+      </Property>
+
+      <IntVectorProperty
+         name="VectorComponent"
+         command="SetVectorComponent"
+         number_of_elements="1" 
+         default_values="0">
+        <IntRangeDomain name="range" min="0" /> 
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="VectorMode"
+         command="SetVectorMode"
+         number_of_elements="1" 
+         default_values="1">
+       <EnumerationDomain name="enum">
+          <Entry value="0" text="Magnitude" />
+          <Entry value="1" text="Component" />
+       </EnumerationDomain>
+      </IntVectorProperty>
+    </Proxy>
   </ProxyGroup>
 
   <ProxyGroup name="axes">

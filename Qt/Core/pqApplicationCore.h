@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pq3DWidgetFactory;
 class pqApplicationCoreInternal;
+class pqLookupTableManager;
 class pqPendingDisplayManager;
 class pqPipelineBuilder;
 class pqPipelineSource;
@@ -90,6 +91,9 @@ public:
   // Returns the server manager selection model.
   pqServerManagerSelectionModel* getSelectionModel();
 
+  // Set/Get the lookup table manager. 
+  void setLookupTableManager(pqLookupTableManager*);
+  pqLookupTableManager* getLookupTableManager() const;
 
   // Use this method to delete the active source. 
   // This involves following operations

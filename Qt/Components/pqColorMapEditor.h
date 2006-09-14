@@ -48,7 +48,7 @@ class QColor;
 class QModelIndex;
 class QString;
 class QTimer;
-class vtkSMLookupTableProxy;
+class vtkSMProxy;
 
 
 class PQCOMPONENTS_EXPORT pqColorMapEditor : public QDialog
@@ -65,8 +65,14 @@ public:
 protected:
   virtual void closeEvent(QCloseEvent *e);
 
+  // Updates the elements in the editor based on the type of the 
+  // lookup table.
+  void updateEditor();
+
+  void resetGUI();
+
 private slots:
-  void setUsingTable(bool on);
+  void setUseDiscreteColors(bool on);
   void setUsingGradient(bool on);
   void handleTextEdit(const QString &text);
   void setSizeFromText();
@@ -81,8 +87,11 @@ private slots:
 private:
   pqColorMapEditorForm *Form;
   pqColorTableModel *Model;
-  vtkSMLookupTableProxy *LookupTable;
+  vtkSMProxy *LookupTable;
   QTimer *EditDelay;
+
+  void resetFromPVLookupTable();
+  void resetFromLookupTable();
 };
 
 #endif

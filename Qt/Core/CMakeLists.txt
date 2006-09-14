@@ -35,7 +35,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DWidgetFactory.h
   pqApplicationCore.h
   pqCommandServerStartup.h
+  pqDisplay.h
   pqFileDialogEventTranslator.h
+  pqLookupTableManager.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
   pqPendingDisplayManager.h
@@ -47,6 +49,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPropertyManager.h
   pqProxy.h
   pqRenderModule.h
+  pqScalarsToColors.h
   pqServer.h
   pqServerManagerModel.h
   pqServerManagerModelItem.h
@@ -98,12 +101,16 @@ ADD_LIBRARY(pqCore
   pqCommandServerStartup.cxx
   pqCommandServerStartup.h
   pqCoreExport.h
+  pqDisplay.cxx
+  pqDisplay.h
   pqFileDialogEventPlayer.cxx
   pqFileDialogEventPlayer.h
   pqFileDialogEventTranslator.cxx
   pqFileDialogEventTranslator.h
   pqJoystickFly.cxx
   pqJoystickFly.h
+  pqLookupTableManager.cxx
+  pqLookupTableManager.h
   pqMain.cxx
   pqMain.h
   pqManualServerStartup.cxx
@@ -144,6 +151,8 @@ ADD_LIBRARY(pqCore
   pqRenderModule.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
+  pqScalarsToColors.cxx
+  pqScalarsToColors.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
   pqSMProxy.cxx

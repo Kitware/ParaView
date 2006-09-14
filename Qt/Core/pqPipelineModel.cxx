@@ -1277,7 +1277,7 @@ void pqPipelineModel::updateDisplays(pqRenderModule *module)
   int total = module->getDisplayCount();
   for(int i = 0; i < total; i++)
     {
-    display = module->getDisplay(i);
+    display = qobject_cast<pqPipelineDisplay*>(module->getDisplay(i));
     if(display)
       {
       item = this->getModelItemFor(display->getInput());

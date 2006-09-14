@@ -79,7 +79,7 @@ public:
   pqUndoStack* UndoStack;
 
   // List of displays shown by this render module.
-  QList<QPointer<pqPipelineDisplay> > Displays;
+  QList<QPointer<pqDisplay> > Displays;
 
   pqRenderModuleInternal()
     {
@@ -133,7 +133,7 @@ pqRenderModule::pqRenderModule(const QString& name,
 //-----------------------------------------------------------------------------
 pqRenderModule::~pqRenderModule()
 {
-  foreach(pqPipelineDisplay* disp, this->Internal->Displays)
+  foreach(pqDisplay* disp, this->Internal->Displays)
     {
     if (disp)
       {
@@ -313,7 +313,7 @@ void pqRenderModule::displaysChanged()
   // Determine what changed. Add the new displays and remove the old
   // ones. Make sure new displays have a reference to this render module.
   // Remove the reference to this render module in the removed displays.
-  QList<QPointer<pqPipelineDisplay> > currentDisplays;
+  QList<QPointer<pqDisplay> > currentDisplays;
   vtkSMProxyProperty* prop = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("Displays"));
   pqServerManagerModel* smModel = 
@@ -327,28 +327,28 @@ void pqRenderModule::displaysChanged()
       {
       continue;
       }
-    pqPipelineDisplay* display = smModel->getPQDisplay(proxy);
+    pqDisplay* display = smModel->getPQDisplay(proxy);
     if (!display)
       {
       continue;
       }
-    currentDisplays.append(QPointer<pqPipelineDisplay>(display));
+    currentDisplays.append(QPointer<pqDisplay>(display));
     if(!this->Internal->Displays.contains(display))
       {
       // Update the render module pointer in the display.
       display->addRenderModule(this);
-      this->Internal->Displays.append(QPointer<pqPipelineDisplay>(display));
+      this->Internal->Displays.append(QPointer<pqDisplay>(display));
       emit this->displayAdded(display);
       }
     }
 
-  QList<QPointer<pqPipelineDisplay> >::Iterator iter =
+  QList<QPointer<pqDisplay> >::Iterator iter =
       this->Internal->Displays.begin();
   while(iter != this->Internal->Displays.end())
     {
     if(*iter && !currentDisplays.contains(*iter))
       {
-      pqPipelineDisplay* display = (*iter);
+      pqDisplay* display = (*iter);
       // Remove the render module pointer from the display.
       display->removeRenderModule(this);
       iter = this->Internal->Displays.erase(iter);
@@ -443,7 +443,7 @@ bool pqRenderModule::saveImage(int width, int height, const QString& filename)
 }
 
 //-----------------------------------------------------------------------------
-bool pqRenderModule::hasDisplay(pqPipelineDisplay* display)
+bool pqRenderModule::hasDisplay(pqDisplay* display)
 {
   return this->Internal->Displays.contains(display);
 }
@@ -455,7 +455,7 @@ int pqRenderModule::getDisplayCount() const
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineDisplay* pqRenderModule::getDisplay(int index) const
+pqDisplay* pqRenderModule::getDisplay(int index) const
 {
   if(index >= 0 && index < this->Internal->Displays.size())
     {
@@ -466,10 +466,10 @@ pqPipelineDisplay* pqRenderModule::getDisplay(int index) const
 }
 
 //-----------------------------------------------------------------------------
-QList<pqPipelineDisplay*> pqRenderModule::getDisplays() const
+QList<pqDisplay*> pqRenderModule::getDisplays() const
 {
-  QList<pqPipelineDisplay*> list;
-  foreach (pqPipelineDisplay* disp, this->Internal->Displays)
+  QList<pqDisplay*> list;
+  foreach (pqDisplay* disp, this->Internal->Displays)
     {
     if (disp)
       {
