@@ -59,8 +59,7 @@ protected slots:
   void buttonPressed(const QString& t);
   
   void updateVariables(const QString& mode);
-  void scalarChosen(int);
-  void vectorChosen(int);
+  void variableChosen(QAction* a);
   void disableResults(bool);
 
   void modified();
