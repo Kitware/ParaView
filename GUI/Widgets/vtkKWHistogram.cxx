@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.10");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -233,6 +233,7 @@ void vtkKWHistogram::EstimateHistogramRangeAndNumberOfBins(
       comp < 0 || comp >= scalars->GetNumberOfComponents() ||
       !range || !nb_of_bins)
     {
+    vtkWarningMacro( "Missing parameters" );
     return;
     }
 
@@ -294,6 +295,7 @@ void vtkKWHistogram::EstimateHistogramRangeAndNumberOfBins(
       break;
 
     default:
+      vtkErrorMacro( "Unhandled data type: " << scalars->GetDataType() );
       return;
     }
 
