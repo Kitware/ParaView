@@ -196,6 +196,8 @@ struct ChartAdapter::pqImplementation
     this->Chart.getHorizontalAxis().setVisible(true);
     this->Model->setRangeX(pqChartValue(value_min), pqChartValue(value_max));
     this->Model->setBinValues(list);
+    
+    this->Chart.updateLayout();
   }
   
   pqHistogramWidget& Chart;

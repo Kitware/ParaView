@@ -1,11 +1,34 @@
-/*
- * Copyright 2004 Sandia Corporation.
- * Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
- * license for use of this work by or on behalf of the
- * U.S. Government. Redistribution and use in source and binary forms, with
- * or without modification, are permitted provided that this Notice and any
- * statement of authorship are reproduced on all copies.
- */
+/*=========================================================================
+
+   Program: ParaView
+   Module:    $RCS $
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
+
+   See License_v1.1.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
 
 #include "MainWindow.h"
 #include "ChartAdapter.h"
@@ -16,6 +39,7 @@
 #include <pqMainWindowCore.h>
 #include <pqObjectInspectorWidget.h>
 #include <pqPipelineMenu.h>
+#include <pqRecentFilesMenu.h>
 #include <pqPipelineSource.h>
 #include <pqRenderWindowManager.h>
 #include <pqSelectionManager.h>
@@ -35,7 +59,9 @@ class MainWindow::pqImplementation
 public:
   pqImplementation(QWidget* parent) :
     Core(parent),
+    RecentFilesMenu(0),
     ViewMenu(0),
+    ToolbarsMenu(0),
     Chart(0),
     Adapter(0)
   {
@@ -43,13 +69,16 @@ public:
   
   ~pqImplementation()
   {
+    delete this->ViewMenu;
     delete this->Chart;
     delete this->Adapter;
   }
   
   Ui::MainWindow UI;
   pqMainWindowCore Core;
+  pqRecentFilesMenu* RecentFilesMenu;
   pqViewMenu* ViewMenu;
+  pqViewMenu* ToolbarsMenu;
   pqHistogramWidget* Chart;
   ChartAdapter* Adapter;
 };
@@ -58,12 +87,16 @@ MainWindow::MainWindow() :
   Implementation(new pqImplementation(this))
 {
   this->Implementation->UI.setupUi(this);
+  
+  this->Implementation->RecentFilesMenu = new pqRecentFilesMenu(*this->Implementation->UI.menuRecentFiles);
+  
   this->Implementation->ViewMenu = new pqViewMenu(*this->Implementation->UI.menuView);
+  this->Implementation->ToolbarsMenu = new pqViewMenu(*this->Implementation->UI.menuToolbars);
+
+  this->setWindowTitle(
+    QString("ParaView PGraph Histogram Test"));
 
   // Setup menus and toolbars ...
-  connect(this->Implementation->UI.actionFileNew,
-    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onFileNew()));
-
   connect(this->Implementation->UI.actionFileOpen,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onFileOpen()));
   connect(
@@ -121,6 +154,9 @@ MainWindow::MainWindow() :
     SIGNAL(CanUndoChanged(bool)), this->Implementation->UI.actionEditUndo, SLOT(setEnabled(bool)));
   connect(pqApplicationCore::instance()->getUndoStack(),
     SIGNAL(UndoLabelChanged(const QString&)), this, SLOT(onUndoLabel(const QString&)));
+
+  connect(this->Implementation->UI.actionEditSettings,
+    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEditSettings()));
     
   connect(this->Implementation->UI.actionEditRedo,
     SIGNAL(triggered()), pqApplicationCore::instance()->getUndoStack(), SLOT(Redo()));
@@ -204,8 +240,8 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionToolsPythonShell,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsPythonShell()));
 
-  this->Implementation->Core.pipelineMenu().addActionsToMenu(
-    this->Implementation->UI.menuPipeline);
+  //this->Implementation->Core.pipelineMenu().addActionsToMenu(
+  //this->Implementation->UI.menuPipeline);
 
   connect(this->Implementation->UI.actionHelpEnableTooltips,
     SIGNAL(triggered(bool)), &this->Implementation->Core, SLOT(onHelpEnableTooltips(bool)));
@@ -224,20 +260,65 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionVCRLastFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onLastFrame()));
 
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.VCRToolbar,
-    this->Implementation->UI.VCRToolbar->windowTitle());
-
   connect(this->Implementation->UI.actionMoveMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToInteraction()));
     
   connect(this->Implementation->UI.actionSelectionMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToSelection()));
 
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.selectionToolbar,
-    this->Implementation->UI.selectionToolbar->windowTitle());
+  // At end of each selection, we want to switch back to the normal interaction mode.
+  connect(&this->Implementation->Core.selectionManager(), 
+    SIGNAL(selectionMarked()), 
+    this->Implementation->UI.actionMoveMode, SLOT(trigger()));
 
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.undoRedoToolbar,
-    this->Implementation->UI.undoRedoToolbar->windowTitle());
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionResetCamera, SLOT(setEnabled(bool)));
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionPositiveX, SLOT(setEnabled(bool)));
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionNegativeX, SLOT(setEnabled(bool)));
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionPositiveY, SLOT(setEnabled(bool)));
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionNegativeY, SLOT(setEnabled(bool)));  
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionPositiveZ, SLOT(setEnabled(bool)));
+  connect(
+    &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
+    this->Implementation->UI.actionNegativeZ, SLOT(setEnabled(bool)));
+  
+  connect(
+    this->Implementation->UI.actionResetCamera, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetCamera()));
+  connect(
+    this->Implementation->UI.actionPositiveX, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionPosX()));
+  connect(
+    this->Implementation->UI.actionNegativeX, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionNegX()));
+  connect(
+    this->Implementation->UI.actionPositiveY, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionPosY()));
+  connect(
+    this->Implementation->UI.actionNegativeY, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionNegY()));  
+  connect(
+    this->Implementation->UI.actionPositiveZ, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionPosZ()));
+  connect(
+    this->Implementation->UI.actionNegativeZ, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(resetViewDirectionNegZ()));
+
+  // Setup the 'modes' so that they are exclusively selected
+  QActionGroup *modeGroup = new QActionGroup(this);
+    modeGroup->addAction(this->Implementation->UI.actionMoveMode);
+    modeGroup->addAction(this->Implementation->UI.actionSelectionMode);
 
   this->Implementation->Core.setupVariableToolbar(
     this->Implementation->UI.variableToolbar);
@@ -246,8 +327,14 @@ MainWindow::MainWindow() :
     SIGNAL(enableVariableToolbar(bool)),
     this->Implementation->UI.variableToolbar,
     SLOT(setEnabled(bool)));
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.variableToolbar,
-    this->Implementation->UI.variableToolbar->windowTitle());
+
+  this->Implementation->Core.setupRepresentationToolbar(
+    this->Implementation->UI.representationToolbar);
+  connect(
+    &this->Implementation->Core,
+    SIGNAL(enableVariableToolbar(bool)),
+    this->Implementation->UI.representationToolbar,
+    SLOT(setEnabled(bool)));
 
   connect(
     &this->Implementation->Core,
@@ -257,16 +344,10 @@ MainWindow::MainWindow() :
 
   this->Implementation->Core.setupCustomFilterToolbar(
     this->Implementation->UI.customFilterToolbar);
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.customFilterToolbar,
-    this->Implementation->UI.customFilterToolbar->windowTitle());
-
-  this->Implementation->ViewMenu->addSeparator();
 
   // Setup dockable windows ...
   this->Implementation->Core.setupPipelineBrowser(
     this->Implementation->UI.pipelineBrowserDock);
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.pipelineBrowserDock,
-    this->Implementation->UI.pipelineBrowserDock->windowTitle());
 
   pqObjectInspectorWidget* const object_inspector =
     this->Implementation->Core.setupObjectInspector(
@@ -284,18 +365,50 @@ MainWindow::MainWindow() :
     this,
     SLOT(onPostAccept()));
       
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.objectInspectorDock,
-    this->Implementation->UI.objectInspectorDock->windowTitle());
     
   this->Implementation->Core.setupStatisticsView(
     this->Implementation->UI.statisticsViewDock);
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.statisticsViewDock,
-    this->Implementation->UI.statisticsViewDock->windowTitle());
     
   this->Implementation->Core.setupElementInspector(
     this->Implementation->UI.elementInspectorDock);
+  
+  // Setup the view menu ...
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.mainToolBar,
+    this->Implementation->UI.mainToolBar->windowTitle());
+  
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.selectionToolbar,
+    this->Implementation->UI.selectionToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.variableToolbar,
+    this->Implementation->UI.variableToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.representationToolbar,
+    this->Implementation->UI.representationToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.customFilterToolbar,
+    this->Implementation->UI.customFilterToolbar->windowTitle());
+    
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.undoRedoToolbar,
+    this->Implementation->UI.undoRedoToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.VCRToolbar,
+    this->Implementation->UI.VCRToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.cameraToolbar,
+    this->Implementation->UI.cameraToolbar->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.pipelineBrowserDock,
+    this->Implementation->UI.pipelineBrowserDock->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.objectInspectorDock,
+    this->Implementation->UI.objectInspectorDock->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.statisticsViewDock,
+    this->Implementation->UI.statisticsViewDock->windowTitle());
+    
   this->Implementation->ViewMenu->addWidget(this->Implementation->UI.elementInspectorDock,
     this->Implementation->UI.elementInspectorDock->windowTitle());
+  
 
   // Add the chart dock window.
   QDockWidget* const chart_dock = new QDockWidget("Chart View", this);
@@ -309,19 +422,21 @@ MainWindow::MainWindow() :
   QLabel* const proxy_label = new QLabel("Chart Source: ");
   proxy_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   
+/*
   QComboBox* const proxy_selector = new QComboBox();
 
   QHBoxLayout* const hbox = new QHBoxLayout();
   hbox->setMargin(0);
   hbox->addWidget(proxy_label);
   hbox->addWidget(proxy_selector);
+*/
 
   this->Implementation->Chart = new pqHistogramWidget(0); 
   this->Implementation->Adapter = new ::ChartAdapter(*this->Implementation->Chart);
 
   QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
-  vbox->addLayout(hbox);
+//  vbox->addLayout(hbox);
   vbox->addWidget(this->Implementation->Chart);
   
   QWidget* const widget = new QWidget();
@@ -331,7 +446,7 @@ MainWindow::MainWindow() :
   this->addDockWidget(Qt::BottomDockWidgetArea, chart_dock);
 
   connect(
-    pqApplicationCore::instance(),
+    &this->Implementation->Core,
     SIGNAL(activeSourceChanged(pqPipelineSource*)),
     this,
     SLOT(onActiveSourceChanged(pqPipelineSource*)));
@@ -350,11 +465,96 @@ MainWindow::MainWindow() :
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
   // Setup the default dock configuration ...
-  this->Implementation->UI.elementInspectorDock->hide();
   this->Implementation->UI.statisticsViewDock->hide();
+  this->Implementation->UI.elementInspectorDock->hide();
+
+  // Set up the action icons ...
+  QIcon icon;
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqOpen16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqOpen22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqOpen32.png", QSize(32, 32));
+  this->Implementation->UI.actionFileOpen->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqFloppyDisk16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqFloppyDisk22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqFloppyDisk32.png", QSize(32, 32));
+  this->Implementation->UI.actionFileSaveData->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqConnect16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqConnect22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqConnect32.png", QSize(32, 32));
+  this->Implementation->UI.actionServerConnect->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqDisconnect16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqDisconnect22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqDisconnect32.png", QSize(32, 32));
+  this->Implementation->UI.actionServerDisconnect->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqHelp16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqHelp22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqHelp32.png", QSize(32, 32));
+  this->Implementation->UI.actionHelpHelp->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqUndo16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqUndo22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqUndo32.png", QSize(32, 32));
+  this->Implementation->UI.actionEditUndo->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqRedo16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqRedo22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqRedo32.png", QSize(32, 32));
+  this->Implementation->UI.actionEditRedo->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrFirst16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrFirst22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrFirst32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRFirstFrame->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrBack16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrBack22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrBack32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRPreviousFrame->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrPlay16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrPlay22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrPlay32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRPlay->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrPause16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrPause22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrPause32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRPause->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrForward16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrForward22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrForward32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRNextFrame->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrLast16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrLast22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrLast32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRLastFrame->setIcon(icon);
+
+  // Fix the toolbar layouts from designer.
+  this->Implementation->UI.mainToolBar->layout()->setSpacing(0);
+  this->Implementation->UI.selectionToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.variableToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.representationToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.customFilterToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.undoRedoToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.VCRToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.cameraToolbar->layout()->setSpacing(0);
 
   // Now that we're ready, initialize everything ...
   this->Implementation->Core.initializeStates();
+  
+  this->Implementation->UI.actionEditUndo->setEnabled(
+    pqApplicationCore::instance()->getUndoStack()->CanUndo());
+  this->Implementation->UI.actionEditRedo->setEnabled(
+    pqApplicationCore::instance()->getUndoStack()->CanRedo());
+  this->onUndoLabel(pqApplicationCore::instance()->getUndoStack()->UndoLabel());
+  this->onRedoLabel(pqApplicationCore::instance()->getUndoStack()->RedoLabel());
 }
 
 MainWindow::~MainWindow()
@@ -401,4 +601,5 @@ void MainWindow::onPostAccept()
 void MainWindow::onActiveSourceChanged(pqPipelineSource* source)
 {
   this->Implementation->Adapter->setSource(source ? source->getProxy() : 0);
+//  this->Implementation->Chart->update();
 }
