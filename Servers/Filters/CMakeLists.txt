@@ -61,6 +61,7 @@ SET(Filters_SRCS
   vtkPVLinearExtrusionFilter.cxx
   vtkPVLODActor.cxx
   vtkPVLODVolume.cxx
+  vtkPVLookupTable.cxx
   vtkPVMain.cxx
   vtkPVRenderModuleHelper.cxx
   vtkPVRenderViewProxy.cxx
