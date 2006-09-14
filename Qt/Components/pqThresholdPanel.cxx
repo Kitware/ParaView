@@ -75,8 +75,8 @@ Q_EXPORT_PLUGIN(pqThresholdPanelInterface)
 Q_IMPORT_PLUGIN(pqThresholdPanelInterface)
 
 
-pqThresholdPanel::pqThresholdPanel(pqProxy& proxy, QWidget* p) :
-  pqLoadedFormObjectPanel(":/pqWidgets/UI/pqThresholdPanel.ui", proxy, p)
+pqThresholdPanel::pqThresholdPanel(pqProxy& pxy, QWidget* p) :
+  pqLoadedFormObjectPanel(":/pqWidgets/UI/pqThresholdPanel.ui", pxy, p)
 {
   this->LowerSlider = this->findChild<QSlider*>("LowerThresholdSlider");
   this->UpperSlider = this->findChild<QSlider*>("UpperThresholdSlider");

@@ -266,7 +266,7 @@ void pqLineWidget::resetBounds()
 {
 }
 
-void pqLineWidget::getReferenceBoundingBox(double center[3], double size[3])
+void pqLineWidget::getReferenceBoundingBox(double center[3], double sz[3])
 {
   if(this->getReferenceProxy())
     {
@@ -284,9 +284,9 @@ void pqLineWidget::getReferenceBoundingBox(double center[3], double size[3])
         center[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
         center[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
 
-        size[0] = fabs(input_bounds[1] - input_bounds[0]);
-        size[1] = fabs(input_bounds[3] - input_bounds[2]);
-        size[2] = fabs(input_bounds[5] - input_bounds[4]);
+        sz[0] = fabs(input_bounds[1] - input_bounds[0]);
+        sz[1] = fabs(input_bounds[3] - input_bounds[2]);
+        sz[2] = fabs(input_bounds[5] - input_bounds[4]);
         }
       }
     }
