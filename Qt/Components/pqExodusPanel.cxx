@@ -79,8 +79,8 @@ Q_EXPORT_PLUGIN(pqExodusPanelInterface)
 Q_IMPORT_PLUGIN(pqExodusPanelInterface)
 
 
-pqExodusPanel::pqExodusPanel(pqProxy& proxy, QWidget* p) :
-  pqLoadedFormObjectPanel(":/pqWidgets/UI/pqExodusPanel.ui", proxy, p)
+pqExodusPanel::pqExodusPanel(pqProxy& object_proxy, QWidget* p) :
+  pqLoadedFormObjectPanel(":/pqWidgets/UI/pqExodusPanel.ui", object_proxy, p)
 {
   this->DisplItem = 0;
   QObject::connect(&this->propertyManager(), 

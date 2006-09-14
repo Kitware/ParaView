@@ -90,8 +90,8 @@ public:
   pqSampleScalarWidget SampleScalarWidget;
 };
 
-pqCutPanel::pqCutPanel(pqProxy& proxy, QWidget* p) :
-  Superclass(proxy, p),
+pqCutPanel::pqCutPanel(pqProxy& object_proxy, QWidget* p) :
+  Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
   pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Implicit Plane"));

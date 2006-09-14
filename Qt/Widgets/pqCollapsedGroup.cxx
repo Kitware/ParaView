@@ -98,9 +98,9 @@ const bool pqCollapsedGroup::isExpanded()
   return this->Implementation->Expanded;
 }
 
-void pqCollapsedGroup::setExpanded(bool expanded)
+void pqCollapsedGroup::setExpanded(bool expanded_state)
 {
-  if(this->Implementation->Expanded != expanded)
+  if(this->Implementation->Expanded != expanded_state)
     this->toggle();
 }
 

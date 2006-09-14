@@ -91,8 +91,8 @@ public:
   pqImplicitPlaneWidget ImplicitPlaneWidget;
 };
 
-pqClipPanel::pqClipPanel(pqProxy& proxy, QWidget* p) :
-  Superclass(proxy, p),
+pqClipPanel::pqClipPanel(pqProxy& object_proxy, QWidget* p) :
+  Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
   pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Clip"));

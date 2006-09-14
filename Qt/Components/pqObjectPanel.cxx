@@ -75,9 +75,9 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqObjectPanel::pqObjectPanel(pqProxy& proxy, QWidget* p) :
+pqObjectPanel::pqObjectPanel(pqProxy& object_proxy, QWidget* p) :
   QWidget(p),
-  Implementation(new pqImplementation(proxy))
+  Implementation(new pqImplementation(object_proxy))
 {
   this->Implementation->PropertyManager = new pqPropertyManager(this);
 

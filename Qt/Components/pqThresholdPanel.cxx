@@ -60,9 +60,9 @@ QString pqThresholdPanelInterface::name() const
   return "Threshold";
 }
 
-pqObjectPanel* pqThresholdPanelInterface::createPanel(pqProxy& proxy, QWidget* p)
+pqObjectPanel* pqThresholdPanelInterface::createPanel(pqProxy& object_proxy, QWidget* p)
 {
-  return new pqThresholdPanel(proxy, p);
+  return new pqThresholdPanel(object_proxy, p);
 }
 
 bool pqThresholdPanelInterface::canCreatePanel(pqProxy& proxy) const

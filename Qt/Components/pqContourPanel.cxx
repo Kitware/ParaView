@@ -96,8 +96,8 @@ public:
   pqSampleScalarWidget SampleScalarWidget;
 };
 
-pqContourPanel::pqContourPanel(pqProxy& proxy, QWidget* p) :
-  base(proxy, p),
+pqContourPanel::pqContourPanel(pqProxy& object_proxy, QWidget* p) :
+  base(object_proxy, p),
   Implementation(new pqImplementation())
 {
   this->Implementation->Controls.setupUi(

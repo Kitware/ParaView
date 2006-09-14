@@ -109,8 +109,8 @@ public:
   Ui::pqStreamTracerPanel UI;
 };
 
-pqStreamTracerPanel::pqStreamTracerPanel(pqProxy& proxy, QWidget* p) :
-  Superclass(proxy, p),
+pqStreamTracerPanel::pqStreamTracerPanel(pqProxy& object_proxy, QWidget* p) :
+  Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
   this->Implementation->UI.setupUi(

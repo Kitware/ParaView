@@ -99,6 +99,6 @@ void pqLineSourceWidget::setControlledProperties(vtkSMProperty* point1, vtkSMPro
   this->Implementation->Links.addPropertyLink(
     this->Implementation->UI.resolution, "value", 
     SIGNAL(valueChanged(int)),
-    this->getControlledProxy(), this->getControlledProxy()->GetProperty("Resolution"));
+    this->getControlledProxy(), resolution);
 }
 

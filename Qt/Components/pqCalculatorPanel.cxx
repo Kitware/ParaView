@@ -61,9 +61,9 @@ QString pqCalculatorPanelInterface::name() const
   return "Calculator";
 }
 
-pqObjectPanel* pqCalculatorPanelInterface::createPanel(pqProxy& proxy, QWidget* p)
+pqObjectPanel* pqCalculatorPanelInterface::createPanel(pqProxy& object_proxy, QWidget* p)
 {
-  return new pqCalculatorPanel(proxy, p);
+  return new pqCalculatorPanel(object_proxy, p);
 }
 
 bool pqCalculatorPanelInterface::canCreatePanel(pqProxy& proxy) const

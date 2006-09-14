@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
 
-pqNamedObjectPanel::pqNamedObjectPanel(pqProxy& proxy, QWidget* p) :
-  pqObjectPanel(proxy, p)
+pqNamedObjectPanel::pqNamedObjectPanel(pqProxy& object_proxy, QWidget* p) :
+  pqObjectPanel(object_proxy, p)
 {
 }
 

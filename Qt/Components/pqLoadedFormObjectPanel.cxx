@@ -47,8 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /// constructor
-pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, pqProxy& proxy, QWidget* p)
-  : pqNamedObjectPanel(proxy, p)
+pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, pqProxy& object_proxy, QWidget* p)
+  : pqNamedObjectPanel(object_proxy, p)
 {
   QBoxLayout* mainlayout = new QVBoxLayout(this);
   mainlayout->setMargin(0);

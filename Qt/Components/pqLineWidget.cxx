@@ -146,19 +146,19 @@ void pqLineWidget::setControlledProperties(vtkSMProperty* point1, vtkSMProperty*
 
 void pqLineWidget::onXAxis()
 {
-  double center[3];
-  double size[3];
-  this->getReferenceBoundingBox(center, size);
+  double object_center[3];
+  double object_size[3];
+  this->getReferenceBoundingBox(object_center, object_size);
        
   if(this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
     {
-    this->Implementation->WidgetPoint1->SetElement(0, center[0] - size[0] * 0.6);
-    this->Implementation->WidgetPoint1->SetElement(1, center[1]);
-    this->Implementation->WidgetPoint1->SetElement(2, center[2]);
+    this->Implementation->WidgetPoint1->SetElement(0, object_center[0] - object_size[0] * 0.6);
+    this->Implementation->WidgetPoint1->SetElement(1, object_center[1]);
+    this->Implementation->WidgetPoint1->SetElement(2, object_center[2]);
 
-    this->Implementation->WidgetPoint2->SetElement(0, center[0] + size[0] * 0.6);
-    this->Implementation->WidgetPoint2->SetElement(1, center[1]);
-    this->Implementation->WidgetPoint2->SetElement(2, center[2]);
+    this->Implementation->WidgetPoint2->SetElement(0, object_center[0] + object_size[0] * 0.6);
+    this->Implementation->WidgetPoint2->SetElement(1, object_center[1]);
+    this->Implementation->WidgetPoint2->SetElement(2, object_center[2]);
   
     this->getWidgetProxy()->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
@@ -167,19 +167,19 @@ void pqLineWidget::onXAxis()
 
 void pqLineWidget::onYAxis()
 {
-  double center[3];
-  double size[3];
-  this->getReferenceBoundingBox(center, size);
+  double object_center[3];
+  double object_size[3];
+  this->getReferenceBoundingBox(object_center, object_size);
        
   if(this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
     {
-    this->Implementation->WidgetPoint1->SetElement(0, center[0]);
-    this->Implementation->WidgetPoint1->SetElement(1, center[1] - size[1] * 0.6);
-    this->Implementation->WidgetPoint1->SetElement(2, center[2]);
+    this->Implementation->WidgetPoint1->SetElement(0, object_center[0]);
+    this->Implementation->WidgetPoint1->SetElement(1, object_center[1] - object_size[1] * 0.6);
+    this->Implementation->WidgetPoint1->SetElement(2, object_center[2]);
 
-    this->Implementation->WidgetPoint2->SetElement(0, center[0]);
-    this->Implementation->WidgetPoint2->SetElement(1, center[1] + size[1] * 0.6);
-    this->Implementation->WidgetPoint2->SetElement(2, center[2]);
+    this->Implementation->WidgetPoint2->SetElement(0, object_center[0]);
+    this->Implementation->WidgetPoint2->SetElement(1, object_center[1] + object_size[1] * 0.6);
+    this->Implementation->WidgetPoint2->SetElement(2, object_center[2]);
   
     this->getWidgetProxy()->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
@@ -188,19 +188,19 @@ void pqLineWidget::onYAxis()
 
 void pqLineWidget::onZAxis()
 {
-  double center[3];
-  double size[3];
-  this->getReferenceBoundingBox(center, size);
+  double object_center[3];
+  double object_size[3];
+  this->getReferenceBoundingBox(object_center, object_size);
        
   if(this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
     {
-    this->Implementation->WidgetPoint1->SetElement(0, center[0]);
-    this->Implementation->WidgetPoint1->SetElement(1, center[1]);
-    this->Implementation->WidgetPoint1->SetElement(2, center[2] - size[2] * 0.6);
+    this->Implementation->WidgetPoint1->SetElement(0, object_center[0]);
+    this->Implementation->WidgetPoint1->SetElement(1, object_center[1]);
+    this->Implementation->WidgetPoint1->SetElement(2, object_center[2] - object_size[2] * 0.6);
 
-    this->Implementation->WidgetPoint2->SetElement(0, center[0]);
-    this->Implementation->WidgetPoint2->SetElement(1, center[1]);
-    this->Implementation->WidgetPoint2->SetElement(2, center[2] + size[2] * 0.6);
+    this->Implementation->WidgetPoint2->SetElement(0, object_center[0]);
+    this->Implementation->WidgetPoint2->SetElement(1, object_center[1]);
+    this->Implementation->WidgetPoint2->SetElement(2, object_center[2] + object_size[2] * 0.6);
   
     this->getWidgetProxy()->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
