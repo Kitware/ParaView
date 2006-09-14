@@ -65,6 +65,18 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
         action = actions[j];
         }
       }
+    
+    // fall back to the text of the action
+    if(!action)
+      {
+      for(int j = 0; j != actions.size() && !action; ++j)
+        {
+        if(actions[j]->text() == Arguments)
+          {
+          action = actions[j];
+          }
+        }
+      }
 
     if(!action)
       {

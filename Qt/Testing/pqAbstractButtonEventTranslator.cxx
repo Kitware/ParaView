@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QKeyEvent>
 #include <QMouseEvent>
-#include <QToolButton>
+#include <QPushButton>
 
 #include <iostream>
 
@@ -61,6 +61,19 @@ bool pqAbstractButtonEventTranslator::translateEvent(QObject* Object, QEvent* Ev
         }
       }
       break;
+    case QEvent::MouseButtonPress:
+      {
+      QMouseEvent* const e = static_cast<QMouseEvent*>(Event);
+      QPushButton* pushButton = qobject_cast<QPushButton*>(object);
+      if(pushButton && 
+         e->button() == Qt::LeftButton && 
+         object->rect().contains(e->pos()) &&
+         pushButton->menu())
+        {
+        onActivate(object);
+        }
+      }
+    break;
     case QEvent::MouseButtonRelease:
       {
       QMouseEvent* const e = static_cast<QMouseEvent*>(Event);

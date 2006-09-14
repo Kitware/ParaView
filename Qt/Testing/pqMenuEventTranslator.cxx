@@ -60,7 +60,12 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event,
       QAction* action = menu->activeAction();
       if(action)
         {
-        emit recordEvent(menu, "activate", action->objectName());
+        QString which = action->objectName();
+        if(which == QString::null)
+          {
+          which = action->text();
+          }
+        emit recordEvent(menu, "activate", which);
         return true;
         }
       }
@@ -74,7 +79,12 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event,
       QAction* action = menu->actionAt(e->pos());
       if(action && !action->menu())
         {
-        emit recordEvent(menu, "activate", action->objectName());
+        QString which = action->objectName();
+        if(which == QString::null)
+          {
+          which = action->text();
+          }
+        emit recordEvent(menu, "activate", which);
         return true;
         }
       }
