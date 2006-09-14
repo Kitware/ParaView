@@ -96,7 +96,7 @@
       <Filter name="OutlineFilter" />
       <Filter name="StructuredGridOutlineFilter" />
     </Category>
-    <Category name="Quantitavite">
+    <Category name="Quantitative">
       <Filter name="Calculator" />
       <Filter name="Probe" />
       <Filter name="StreamTracer" />
