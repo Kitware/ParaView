@@ -9,6 +9,6 @@
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
   <pqevent object="PipelineObjectMenu" command="activate" arguments="Display Settings" />
-  <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="displacement2 {0,1.43; -0.063,0.0623; -1.4,1.4}" />
+  <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="displacement2" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/DismissButton" command="activate" arguments="" />
 </pqevents>
