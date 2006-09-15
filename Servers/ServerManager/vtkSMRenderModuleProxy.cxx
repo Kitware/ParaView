@@ -53,7 +53,7 @@
 #include "vtkSelection.h"
 #include "vtkSMMPIRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.49");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.50");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1282,10 +1282,10 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
   int *win_size=this->GetRenderWindow()->GetSize();
   unsigned int wsx = (unsigned int) win_size[0];
   unsigned int wsy = (unsigned int) win_size[1];
-  x0 = (x0 < 0)? 0 : ((x0 >= wsx)? wsx-1: x0);
-  x1 = (x1 < 0)? 0 : ((x1 >= wsx)? wsx-1: x1);
-  y0 = (y0 < 0)? 0 : ((y0 >= wsy)? wsy-1: y0);
-  y1 = (y1 < 0)? 0 : ((y1 >= wsy)? wsy-1: y1);
+  x0 = (x0 >= wsx)? wsx-1: x0;
+  x1 = (x1 >= wsx)? wsx-1: x1;
+  y0 = (y0 >= wsy)? wsy-1: y0;
+  y1 = (y1 >= wsy)? wsy-1: y1;
 
   //Find number of rendering processors.
   int numProcessors = 1;
