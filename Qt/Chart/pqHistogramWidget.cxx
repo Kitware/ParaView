@@ -143,6 +143,7 @@ pqHistogramWidget::pqHistogramWidget(QWidget *p) :
   connect(this->FAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
 
   this->Histogram->setAxes(this->XAxis, this->YAxis);
+  connect(this->Histogram, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
   connect(this->Histogram, SIGNAL(repaintNeeded()), this,
       SLOT(repaintChart()));
 
