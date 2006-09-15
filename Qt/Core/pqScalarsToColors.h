@@ -49,6 +49,12 @@ public:
   // Returns the first scalar bar visible in the given render module,
   // if any.
   pqScalarBarDisplay* getScalarBar(pqRenderModule* ren) const;
+
+public slots:
+  // This method checks if this LUT is used by any display,
+  // if not, it hides all the scalars bar showing this LUT.
+  void hideUnusedScalarBars();
+
 protected:
   friend class pqScalarBarDisplay;
 

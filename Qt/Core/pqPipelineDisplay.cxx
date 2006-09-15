@@ -317,9 +317,26 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     return;
     }
 
+  vtkSMProxy* oldlutProxy = 
+    pqSMAdaptor::getProxyProperty(displayProxy->GetProperty("LookupTable"));
+  pqScalarsToColors* old_stc = 0;
+  if (oldlutProxy != lut)
+    {
+    // Localte pqScalarsToColors for the old LUT and update 
+    // it's scalar bar visibility.
+    pqServerManagerModel* smmodel = core->getServerManagerModel();
+    old_stc = qobject_cast<pqScalarsToColors*>(
+      smmodel->getPQProxy(oldlutProxy));
+    }
+  
   pqSMAdaptor::setProxyProperty(
     displayProxy->GetProperty("LookupTable"), lut);
 
+  // If old LUT was present update the visibility of the scalar bars
+  if (old_stc)
+      {
+      old_stc->hideUnusedScalarBars();
+      }
   pqSMAdaptor::setElementProperty(
     displayProxy->GetProperty("ScalarVisibility"), 1);
 
@@ -384,6 +401,13 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
                                   arrayname);
   lut->UpdateVTKObjects();
   displayProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqPipelineDisplay::getLookupTableProxy()
+{
+  return pqSMAdaptor::getProxyProperty(
+    this->getProxy()->GetProperty("LookupTable"));
 }
 
 //-----------------------------------------------------------------------------

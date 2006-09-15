@@ -107,6 +107,9 @@ public:
   /// return the array name
   QString getColorField(bool raw=false);
 
+  /// Returns the lookuptable proxy, if any.
+  vtkSMProxy* getLookupTableProxy();
+
 public slots:
   // If lookuptable is set up and is used for coloring,
   // then calling this method resets the table ranges to match the current 

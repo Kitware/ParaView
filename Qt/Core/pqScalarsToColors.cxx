@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QtDebug>
 
-#include "pqSMAdaptor.h"
-#include "pqDisplay.h"
+#include "pqApplicationCore.h"
+#include "pqPipelineDisplay.h"
 #include "pqScalarBarDisplay.h"
+#include "pqServerManagerModel.h"
+#include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarsToColorsInternal
@@ -88,4 +90,32 @@ pqScalarBarDisplay* pqScalarsToColors::getScalarBar(pqRenderModule* ren) const
       }
     }
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarsToColors::hideUnusedScalarBars()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
+
+  QList<pqPipelineDisplay*> displays = smmodel->getPipelineDisplays(
+    this->getServer());
+
+  bool used_at_all = false;
+  foreach(pqPipelineDisplay* display, displays)
+    {
+    if (display->getLookupTableProxy() == this->getProxy())
+      {
+      used_at_all = true;
+      break;
+      }
+    }
+  if (!used_at_all)
+    {
+    foreach(pqScalarBarDisplay* sb, this->Internal->ScalarBars)
+      {
+      sb->setVisible(false);
+      sb->renderAllViews();
+      }
+    }
 }

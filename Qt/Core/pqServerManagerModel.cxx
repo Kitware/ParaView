@@ -153,6 +153,27 @@ QList<pqServer*> pqServerManagerModel::getServers()
 }
 
 //-----------------------------------------------------------------------------
+QList<pqPipelineDisplay*> pqServerManagerModel::getPipelineDisplays(
+  pqServer* server)
+{
+  QList<pqPipelineDisplay*> list;
+  if (!server)
+    {
+    return list;
+    }
+
+  foreach(pqPipelineDisplay* display, this->Internal->Displays)
+    {
+    if (display && display->getServer() == server)
+      {
+      list.push_back(display);
+      }
+    }
+
+  return list;
+}
+
+//-----------------------------------------------------------------------------
 QList<pqPipelineSource*> pqServerManagerModel::getSources(pqServer* server)
 {
   QList<pqPipelineSource*> list;

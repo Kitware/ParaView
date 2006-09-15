@@ -127,6 +127,9 @@ public:
   /// Returns a list of sources on the particular server.
   QList<pqPipelineSource*> getSources(pqServer* server);
 
+  /// Returns a list of displays on the server.
+  QList<pqPipelineDisplay*> getPipelineDisplays(pqServer* server);
+
   // Returns a list of render modules on the particular server.
   // If server==NULL, returns all render modules.
   QList<pqRenderModule*> getRenderModules(pqServer* server);
