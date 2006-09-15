@@ -49,6 +49,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPropertyManager.h
   pqProxy.h
   pqRenderModule.h
+  pqScalarBarDisplay.h
   pqScalarsToColors.h
   pqServer.h
   pqServerManagerModel.h
@@ -151,6 +152,8 @@ ADD_LIBRARY(pqCore
   pqRenderModule.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
+  pqScalarBarDisplay.cxx
+  pqScalarBarDisplay.h
   pqScalarsToColors.cxx
   pqScalarsToColors.h
   pqSMAdaptor.cxx

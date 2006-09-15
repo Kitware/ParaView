@@ -71,6 +71,12 @@ protected:
 
   void resetGUI();
 
+public slots:
+  void setPresetBlueToRed();
+  void setPresetRedToBlue();
+  void setPresetGrayscale();
+  void setPresetCIELabBlueToRed();
+
 private slots:
   void setUseDiscreteColors(bool on);
   void setUsingGradient(bool on);
@@ -83,6 +89,7 @@ private slots:
   void changeTableColor(int index, const QColor &color);
   void updateTableRange(int first, int last);
   void closeForm();
+  void setColorBarVisibility(bool visible);
 
 private:
   pqColorMapEditorForm *Form;

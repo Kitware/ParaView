@@ -65,6 +65,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
+#include "pqScalarBarDisplay.h"
+#include "pqScalarsToColors.h"
 
 //-----------------------------------------------------------------------------
 pqPipelineBuilder* pqPipelineBuilder::Instance = 0;
@@ -367,7 +369,7 @@ vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxyInternal(
 }
 
 //-----------------------------------------------------------------------------
-int pqPipelineBuilder::removeInternal(pqPipelineDisplay* display)
+int pqPipelineBuilder::removeInternal(pqDisplay* display)
 {
   if (!display)
     {
@@ -389,12 +391,6 @@ int pqPipelineBuilder::removeInternal(pqPipelineDisplay* display)
     renModule->getProxy()->UpdateVTKObjects();
 
     }
-
-  /*
-  pp = vtkSMProxyProperty::SafeDownCast(
-    display->getProxy()->GetProperty("Input"));
-  pp->RemoveAllProxies();
-  */
 
   // Unregister display.
   vtkSMProxyManager::GetProxyManager()->UnRegisterProxy(
@@ -595,10 +591,9 @@ void pqPipelineBuilder::removeWindow(pqRenderModule* rm)
   // rm is invalid at this point.
  
   // Now clean up any orphan displays.
-  foreach (pqDisplay* _disp, displays)
+  foreach (pqDisplay* disp, displays)
     {
-    pqPipelineDisplay* disp = qobject_cast<pqPipelineDisplay*>(_disp);
-    if (disp->getNumberOfRenderModules() == 0)
+    if (disp && disp->getNumberOfRenderModules() == 0)
       {
       this->removeInternal(disp);      
       }
@@ -667,3 +662,46 @@ void pqPipelineBuilder::getSupportedProxies(const QString& xmlgroup,
     }
 }
 
+//-----------------------------------------------------------------------------
+pqScalarBarDisplay* pqPipelineBuilder::createScalarBar(pqScalarsToColors *lut,
+  pqRenderModule* renModule)
+{
+  if (!lut && !renModule)
+    {
+    qDebug() << "Both lut and renModule cannot be null. Cannot create scalar bar.";
+    return 0;
+    }
+
+  if (this->UndoStack)
+    {
+    this->UndoStack->BeginUndoSet("Create ScalarBar");
+    }
+  pqServer* server = (lut? lut->getServer() : renModule->getServer());
+  vtkSMProxy* scalarBarProxy = this->createProxy("displays", "ScalarBarWidget",
+    "scalar_bars", server, true);
+  pqScalarBarDisplay* scalarBar = 0;
+
+  if (scalarBarProxy)
+    {
+    scalarBar = qobject_cast<pqScalarBarDisplay*>(
+      pqServerManagerModel::instance()->getPQProxy(scalarBarProxy));
+    if (scalarBar && lut)
+      {
+      pqSMAdaptor::setProxyProperty(scalarBarProxy->GetProperty("LookupTable"),
+        lut->getProxy());
+      scalarBarProxy->UpdateVTKObjects();
+      }
+    if (scalarBar && renModule)
+      {
+      pqSMAdaptor::addProxyProperty(renModule->getProxy()->GetProperty("Displays"),
+        scalarBarProxy);
+      renModule->getProxy()->UpdateVTKObjects();
+      }
+    }
+
+  if (this->UndoStack)
+    {
+    this->UndoStack->EndUndoSet();
+    } 
+  return scalarBar;
+}

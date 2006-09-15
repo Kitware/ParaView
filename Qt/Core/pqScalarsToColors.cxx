@@ -32,17 +32,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 
 #include "vtkSMProxy.h"
-#include "vtkSmartPointer.h"
 
+#include <QPointer>
+#include <QList>
 #include <QtDebug>
 
 #include "pqSMAdaptor.h"
+#include "pqDisplay.h"
+#include "pqScalarBarDisplay.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarsToColorsInternal
 {
 public:
-  vtkSmartPointer<vtkSMProxy> ScalarBarProxy;
+  QList<QPointer<pqScalarBarDisplay> > ScalarBars;
 };
 
 //-----------------------------------------------------------------------------
@@ -60,17 +63,29 @@ pqScalarsToColors::~pqScalarsToColors()
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarsToColors::setScalarBarProxy(vtkSMProxy* scalarbar)
+void pqScalarsToColors::addScalarBar(pqScalarBarDisplay* sb)
 {
-  this->Internal->ScalarBarProxy = scalarbar;
-  if (scalarbar)
+  if (this->Internal->ScalarBars.indexOf(sb) == -1)
     {
-    pqSMAdaptor::setProxyProperty(scalarbar->GetProperty("LookupTable"),
-      this->getProxy());
-    scalarbar->UpdateVTKObjects();
+    this->Internal->ScalarBars.push_back(sb);
     }
 }
 
 //-----------------------------------------------------------------------------
+void pqScalarsToColors::removeScalarBar(pqScalarBarDisplay* sb)
+{
+  this->Internal->ScalarBars.removeAll(sb);
+}
 
-
+//-----------------------------------------------------------------------------
+pqScalarBarDisplay* pqScalarsToColors::getScalarBar(pqRenderModule* ren) const
+{
+  foreach(pqScalarBarDisplay* sb, this->Internal->ScalarBars)
+    {
+    if (sb && sb->shownIn(ren))
+      {
+      return sb;
+      }
+    }
+  return 0;
+}

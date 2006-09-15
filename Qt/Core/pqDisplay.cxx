@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSmartPointer.h" 
-#include "vtkSMDisplayProxy.h"
 
 // Qt includes.
 #include <QPointer>
@@ -64,7 +63,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqDisplay::pqDisplay(const QString& group, const QString& name,
-  vtkSMDisplayProxy* display,
+  vtkSMProxy* display,
   pqServer* server, QObject* p/*=null*/):
   pqProxy(group, name, display, server, p)
 {

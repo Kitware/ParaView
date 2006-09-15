@@ -39,10 +39,13 @@ class vtkSMDisplayProxy;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
 
+class pqDisplay;
 class pqNameCount;
 class pqPipelineDisplay;
 class pqPipelineSource;
 class pqRenderModule;
+class pqScalarBarDisplay;
+class pqScalarsToColors;
 class pqServer;
 class pqUndoStack;
 
@@ -96,6 +99,10 @@ public:
   // Create a display proxy for the given proxy(source/filter) and add 
   // it to the given render module. 
   pqPipelineDisplay* createDisplayProxy(pqPipelineSource* src,
+    pqRenderModule* renModule);
+
+  // Create a scalar bar for the lookuptable proxy in the given render window.
+  pqScalarBarDisplay* createScalarBar(pqScalarsToColors *lut,
     pqRenderModule* renModule);
 
   /// Create new viewing "window" on the server. It uses the 
@@ -170,7 +177,7 @@ protected:
   pqUndoStack* UndoStack;
 
   /// internal method to remove display. does not bother about undo/redo.
-  int removeInternal(pqPipelineDisplay* display);
+  int removeInternal(pqDisplay* display);
 private:
   static pqPipelineBuilder* Instance;
 };

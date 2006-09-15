@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqScalarsToColors.h
+   Module:    pqScalarBarDisplay.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,35 +29,46 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqScalarsToColors_h
-#define __pqScalarsToColors_h
+#ifndef __pqScalarBarDisplay_h
+#define __pqScalarBarDisplay_h
 
-#include "pqProxy.h"
+#include "pqDisplay.h"
+class pqScalarBarDisplayInternal;
+class pqScalarsToColors;
 
-class pqScalarsToColorsInternal;
-class pqScalarBarDisplay;
-
-/// pqScalarsToColors is a represents a vtkScalarsToColors proxy.
-class PQCORE_EXPORT pqScalarsToColors : public pqProxy
+// PQ object for a scalar bar. Keeps itself connected with the pqScalarsToColors
+// object, if any.
+class PQCORE_EXPORT pqScalarBarDisplay : public pqDisplay
 {
   Q_OBJECT
 public:
-  pqScalarsToColors(const QString& group, const QString& name,
-    vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
-  virtual ~pqScalarsToColors();
+  pqScalarBarDisplay(const QString& group, const QString& name,
+    vtkSMProxy* scalarbar, pqServer* server,
+    QObject* parent=0);
+  virtual ~pqScalarBarDisplay();
 
-  // Returns the first scalar bar visible in the given render module,
-  // if any.
-  pqScalarBarDisplay* getScalarBar(pqRenderModule* ren) const;
-protected:
-  friend class pqScalarBarDisplay;
+  // Get the lookup table this scalar bar shows, if any.
+  pqScalarsToColors* getLookupTable() const;
 
-  void addScalarBar(pqScalarBarDisplay*);
-  void removeScalarBar(pqScalarBarDisplay*);
+  // Returns if the status of the visbility property of this display.
+  // Note that for a display to be visible in a render module,
+  // it must be \c shownIn that render modules as well as 
+  // visibility must be set to 1.
+  virtual bool isVisible() const;
 
+  // Set the visibility. Note that this affects the visibility of the
+  // display in all render modules it is added to, and only in all the
+  // render modules it is added to. This method does not call a re-render
+  // on the render module, caller must call that explicitly.
+  virtual void setVisible(bool visible);
+
+protected slots:
+  void onLookupTableModified();
 private:
-  pqScalarsToColorsInternal* Internal;
+  pqScalarBarDisplayInternal* Internal;
 };
+
+
 
 #endif
 

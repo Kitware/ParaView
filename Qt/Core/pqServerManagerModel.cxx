@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqRenderModule.h"
+#include "pqScalarBarDisplay.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
@@ -520,6 +521,10 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
     // Lookup Table registered.
     pq_proxy = new pqScalarsToColors(group, name, proxy, server, this);
     }
+  else if (group == "scalar_bars")
+    {
+    pq_proxy = new pqScalarBarDisplay(group, name, proxy, server, this);
+    }
 
   if (pq_proxy)
     {
@@ -668,6 +673,33 @@ pqPipelineDisplay* pqServerManagerModel::getPQDisplay(vtkSMProxy* proxy)
     return this->Internal->Displays[disp];
     }
   return NULL;
+}
+
+//-----------------------------------------------------------------------------
+pqProxy* pqServerManagerModel::getPQProxy(vtkSMProxy* proxy)
+{
+  pqProxy* pqproxy = 0;
+  if (proxy)
+    {
+    if (this->Internal->Proxies.contains(proxy))
+      {
+      pqproxy = this->Internal->Proxies[proxy];
+      }
+    if (!pqproxy)
+      {
+      pqproxy = this->getPQDisplay(proxy);
+      }
+    if (!pqproxy)
+      {
+      pqproxy = this->getPQSource(proxy);
+      }
+    if (!pqproxy)
+      {
+      pqproxy = this->getRenderModule(
+        vtkSMRenderModuleProxy::SafeDownCast(proxy));
+      }
+    }
+  return pqproxy;
 }
 
 //-----------------------------------------------------------------------------

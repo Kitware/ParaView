@@ -103,6 +103,9 @@ public:
   /// object for it, if one exists.
   pqPipelineDisplay* getPQDisplay(vtkSMProxy*);
 
+  /// Given a vtkSMProxy gets the pqProxy for it.
+  pqProxy* getPQProxy(vtkSMProxy*);
+
   /// Returns the number of render modules
   int getNumberOfRenderModules();
 

@@ -327,7 +327,8 @@ void pqRenderModule::displaysChanged()
       {
       continue;
       }
-    pqDisplay* display = smModel->getPQDisplay(proxy);
+    pqDisplay* display = qobject_cast<pqDisplay*>(
+      smModel->getPQProxy(proxy));
     if (!display)
       {
       continue;

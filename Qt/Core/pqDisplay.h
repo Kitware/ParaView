@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqDisplayInternal;
 class pqRenderModule;
 class pqServer;
-class vtkSMDisplayProxy;
 
 /// This is PQ representation for a single display. A pqDisplay represents
 /// a single vtkSMDisplayProxy. The display can be added to
@@ -54,7 +53,7 @@ class PQCORE_EXPORT pqDisplay : public pqProxy
   Q_OBJECT
 public:
   pqDisplay(const QString& group, const QString& name, 
-    vtkSMDisplayProxy* display, pqServer* server,
+    vtkSMProxy* display, pqServer* server,
     QObject* parent=NULL);
   virtual ~pqDisplay();
 

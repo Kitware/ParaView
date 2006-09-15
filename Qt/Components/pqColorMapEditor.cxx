@@ -36,13 +36,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorMapEditor.h"
 #include "ui_pqColorMapEditor.h"
 
+#include "pqApplicationCore.h"
 #include "pqChartValue.h"
 #include "pqColorMapColorChanger.h"
 #include "pqColorMapWidget.h"
 #include "pqColorTableDelegate.h"
 #include "pqColorTableModel.h"
 #include "pqPipelineDisplay.h"
+#include "pqRenderModule.h"
+#include "pqScalarsToColors.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqPipelineBuilder.h"
+#include "pqScalarBarDisplay.h"
 
 #include <QColor>
 #include <QColorDialog>
@@ -51,28 +57,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QTimer>
 #include <QVariant>
+#include <QtDebug>
+#include <QMenu>
 
 #include "vtkSMLookupTableProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyProperty.h"
 
 
+//-----------------------------------------------------------------------------
 class pqColorMapEditorForm : public Ui::pqColorMapEditor
 {
 public:
-  pqColorMapEditorForm();
-  ~pqColorMapEditorForm() {}
+  pqColorMapEditorForm()
+    {
+    this->Display = 0;
+    this->PresetsMenu = 0;
+    }
+  ~pqColorMapEditorForm() 
+    {
+    delete this->PresetsMenu;
+    }
 
   QPointer<pqPipelineDisplay> Display;
+  QMenu* PresetsMenu;
 };
 
-
-pqColorMapEditorForm::pqColorMapEditorForm()
-{
-  this->Display = 0;
-}
-
-
+//-----------------------------------------------------------------------------
 pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
   : QDialog(widgetParent)
 {
@@ -81,6 +92,20 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
   this->LookupTable = 0;
   this->EditDelay = new QTimer(this);
   this->Form->setupUi(this);
+  this->Form->PresetsMenu = new QMenu(this);
+  this->Form->PresetsMenu->addAction("Blue to Red",
+    this, SLOT(setPresetBlueToRed()));
+  this->Form->PresetsMenu->addAction("Red to Blue",
+    this, SLOT(setPresetRedToBlue()));
+  this->Form->PresetsMenu->addAction("Grayscale",
+    this, SLOT(setPresetGrayscale()));
+  /*
+  this->Form->PresetsMenu->addAction("CIELab Blue to Red",
+    this, SLOT(setPresetCIELabBlueToRed()));
+  */
+
+  this->Form->PresetsButton->setMenu(this->Form->PresetsMenu);
+  this->Form->PresetsButton->setPopupMode(QToolButton::InstantPopup);
 
   // Set up the timer. The timer is used when the user edits the
   // table size.
@@ -115,6 +140,8 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
       this, SLOT(setUseDiscreteColors(bool)));
   this->connect(this->Form->UseGradient, SIGNAL(toggled(bool)),
       this, SLOT(setUsingGradient(bool)));
+  this->connect(this->Form->ColorBarVisibility, SIGNAL(toggled(bool)),
+    this, SLOT(setColorBarVisibility(bool)));
 
   // Link the resolution slider and text box with the color scale.
   this->connect(this->Form->TableSize, SIGNAL(valueChanged(int)),
@@ -218,6 +245,25 @@ void pqColorMapEditor::resetGUI()
     this->resetFromLookupTable();
     }
 
+  // this class will eventuall work on a pqScalarsToColors object.
+  // Until then, we try to get the pqScalarsToColors for the lut proxy.
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
+
+  pqScalarsToColors* stc = qobject_cast<pqScalarsToColors*>(
+    smmodel->getPQProxy(this->LookupTable));
+  if (!stc)
+    {
+    qDebug() << "Cannot add scalar bar for this lookup table.";
+    return;
+    }
+
+  pqRenderModule* rm = this->Form->Display->getRenderModule(0);
+
+  // Update Scalar Bar GUI.
+  pqScalarBarDisplay* sb = stc->getScalarBar(rm);
+  this->Form->ColorBarVisibility->setCheckState( 
+    (sb && sb->isVisible()) ? Qt::Checked : Qt::Unchecked);
 }
 
 //-----------------------------------------------------------------------------
@@ -487,4 +533,79 @@ void pqColorMapEditor::closeForm()
   this->accept();
 }
 
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setColorBarVisibility(bool visible)
+{
+  // this class will eventuall work on a pqScalarsToColors object.
+  // Until then, we try to get the pqScalarsToColors for the lut proxy.
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
 
+  pqScalarsToColors* stc = qobject_cast<pqScalarsToColors*>(
+    smmodel->getPQProxy(this->LookupTable));
+  if (!stc)
+    {
+    qDebug() << "Cannot add scalar bar for this lookup table.";
+    return;
+    }
+
+  pqRenderModule* rm = this->Form->Display->getRenderModule(0);
+  pqScalarBarDisplay* sb = stc->getScalarBar(rm);
+  if (!sb && visible)
+    {
+    pqPipelineBuilder* builder = core->getPipelineBuilder();
+    sb = builder->createScalarBar(stc, rm);
+
+    }
+  if (sb)
+    {
+    sb->setVisible(visible);
+    sb->renderAllViews();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setPresetBlueToRed()
+{
+  this->Form->ColorScale->blockSignals(true);
+  this->Form->ColorScale->clearPoints();
+  this->Form->ColorScale->addPoint(0.0, QColor::fromRgbF(0,0,1.0));
+  this->Form->ColorScale->addPoint(1.0, QColor::fromRgbF(1.0,0,0));
+  this->Form->ColorScale->blockSignals(false);
+  this->changeControlColor(0, QColor());
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setPresetRedToBlue()
+{
+  this->Form->ColorScale->blockSignals(true);
+  this->Form->ColorScale->clearPoints();
+  this->Form->ColorScale->addPoint(0.0, QColor::fromRgbF(1.0,0,0));
+  this->Form->ColorScale->addPoint(1.0, QColor::fromRgbF(0,0,1.0));
+  this->Form->ColorScale->blockSignals(false);
+  this->changeControlColor(0, QColor());
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setPresetGrayscale()
+{
+  this->Form->ColorScale->blockSignals(true);
+  this->Form->ColorScale->clearPoints();
+  this->Form->ColorScale->addPoint(0.0, QColor::fromRgbF(0,0,0));
+  this->Form->ColorScale->addPoint(1.0, QColor::fromRgbF(1.0,1.0,1.0));
+  this->Form->ColorScale->blockSignals(false);
+  this->changeControlColor(0, QColor());
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setPresetCIELabBlueToRed()
+{
+  this->Form->ColorScale->blockSignals(true);
+  this->Form->ColorScale->clearPoints();
+  this->Form->ColorScale->addPoint(0.0, QColor::fromRgb(0, 153, 191));
+  this->Form->ColorScale->addPoint(1.0, QColor::fromRgb(196, 119, 87));
+  this->Form->ColorScale->blockSignals(false);
+  this->changeControlColor(0, QColor());
+}
+
+//-----------------------------------------------------------------------------
