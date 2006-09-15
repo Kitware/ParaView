@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.81");
+vtkCxxRevisionMacro(vtkSMProxy, "1.82");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -920,7 +920,7 @@ void vtkSMProxy::UpdateVTKObjects()
       ++it)
       {
       vtkSMProperty* prop = it->second.Property.GetPointer();
-      if (prop->IsA("vtkSMInputProperty"))
+      if (prop->IsA("vtkSMProxyProperty"))
         {
         if (vtkSMProxyManager::GetProxyManager()->GetUpdateInputProxies())
           {
@@ -947,6 +947,9 @@ void vtkSMProxy::UpdateVTKObjects()
               }
             }
           }
+        }
+      if (prop->IsA("vtkSMInputProperty"))
+        {
         this->UpdateProperty(it->first.c_str());
         }
       }
