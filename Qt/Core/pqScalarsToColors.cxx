@@ -48,6 +48,7 @@ class pqScalarsToColorsInternal
 {
 public:
   QList<QPointer<pqScalarBarDisplay> > ScalarBars;
+  bool ScalarRangeInitialized;
 };
 
 //-----------------------------------------------------------------------------
@@ -56,6 +57,7 @@ pqScalarsToColors::pqScalarsToColors(const QString& group, const QString& name,
 : pqProxy(group, name, proxy, server, _parent)
 {
   this->Internal = new pqScalarsToColorsInternal;
+  this->Internal->ScalarRangeInitialized = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -133,19 +135,32 @@ void pqScalarsToColors::hideUnusedScalarBars()
 }
 
 //-----------------------------------------------------------------------------
+void pqScalarsToColors::setScalarRange(double min, double max)
+{
+  QList<QVariant> curRange;
+  curRange << min << max;
+
+  pqSMAdaptor::setMultipleElementProperty(
+    this->getProxy()->GetProperty("ScalarRange"), curRange);
+  this->getProxy()->UpdateVTKObjects();
+
+  this->Internal->ScalarRangeInitialized = true;
+}
+
+//-----------------------------------------------------------------------------
 void pqScalarsToColors::setWholeScalarRange(double min, double max)
 {
   if (this->getScalarRangeLock())
     {
     return;
     }
+
   QList<QVariant> curRange = pqSMAdaptor::getMultipleElementProperty(
     this->getProxy()->GetProperty("ScalarRange"));
-  min = (min < curRange[0].toDouble())? min :  curRange[0].toDouble();
-  max = (max > curRange[1].toDouble())? max :  curRange[1].toDouble();
-  curRange.clear();
-  curRange << min << max;
-  pqSMAdaptor::setMultipleElementProperty(
-    this->getProxy()->GetProperty("ScalarRange"), curRange);
-  this->getProxy()->UpdateVTKObjects();
+  min = (!this->Internal->ScalarRangeInitialized || min < curRange[0].toDouble())? 
+    min :  curRange[0].toDouble();
+  max = (!this->Internal->ScalarRangeInitialized || max > curRange[1].toDouble())? 
+    max :  curRange[1].toDouble();
+
+  this->setScalarRange(min, max);
 }

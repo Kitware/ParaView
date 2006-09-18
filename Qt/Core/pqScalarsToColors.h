@@ -57,6 +57,9 @@ public:
   // the current scalar range. This call respects the ScalarRangeLock.
   // If the lock is set, then this call has no effect.
   void setWholeScalarRange(double min, double max);
+
+  // Sets the scalar range. Does not consider the ScalarRangeLock.
+  void setScalarRange(double min, double max);
 public slots:
   // This method checks if this LUT is used by any display,
   // if not, it hides all the scalars bar showing this LUT.

@@ -380,18 +380,18 @@ pqScalarsToColors* pqPipelineDisplay::getLookupTable()
 //-----------------------------------------------------------------------------
 void pqPipelineDisplay::resetLookupTableScalarRange()
 {
-  QPair<double, double> range = QPair<double, double>(0.0, 1.0);
 
-  vtkSMProxy* lut = this->getLookupTableProxy();
+  pqScalarsToColors* lut = this->getLookupTable();
   QString colorField = this->getColorField();
   if (lut && colorField!= "" && colorField != "Solid Color")
     {
-    range = this->getColorFieldRanges(colorField);
-    QList<QVariant> tmp;
-    tmp += range.first;
-    tmp += range.second;
-    pqSMAdaptor::setMultipleElementProperty(lut->GetProperty("ScalarRange"), tmp);
-    lut->UpdateVTKObjects();
+    QList<QPair<double,double> > ranges = this->getColorFieldRanges(colorField);
+    if (ranges.size() > 0)
+      {
+      // TODO: use the correct array component.
+      QPair<double, double> range = ranges[0];
+      lut->setScalarRange(range.first, range.second);
+      }
     }
 }
 
@@ -410,8 +410,12 @@ void pqPipelineDisplay::updateLookupTableScalarRange()
     return;
     }
 
-  QPair<double, double> range = this->getColorFieldRanges(colorField);
-  lut->setWholeScalarRange(range.first, range.second);
+  QList<QPair<double, double> >ranges = this->getColorFieldRanges(colorField);
+  if (ranges.size() > 0)
+    {
+    QPair<double, double> range = ranges[0];
+    lut->setWholeScalarRange(range.first, range.second);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -505,10 +509,10 @@ QList<QString> pqPipelineDisplay::getColorFields()
   return ret;
 }
 
-QPair<double, double>
+QList<QPair<double, double> >
 pqPipelineDisplay::getColorFieldRanges(const QString& array)
 {
-  QPair<double,double> ret = QPair<double, double>(0.0, 1.0);
+  QList<QPair<double,double> > ret;
   
   vtkSMDisplayProxy* displayProxy = this->getDisplayProxy();
 
@@ -552,7 +556,7 @@ pqPipelineDisplay::getColorFieldRanges(const QString& array)
       for(int i=0; i<info->GetNumberOfComponents(); i++)
         {
         info->GetComponentRange(i, range);
-        ret = QPair<double,double>(range[0], range[1]);
+        ret.append(QPair<double,double>(range[0], range[1]));
         }
       }
     }

@@ -182,7 +182,7 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
 void pqPQLookupTableManager::updateLookupTableScalarRanges()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel* smmodel = pqServerManagerModel::instance();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
   
   QList<pqPipelineDisplay*> displays = smmodel->getPipelineDisplays(0);
   foreach(pqPipelineDisplay* display, displays)

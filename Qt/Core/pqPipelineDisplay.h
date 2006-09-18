@@ -98,7 +98,7 @@ public:
   QList<QString> getColorFields();
 
   /// get the data ranges for a color field
-  QPair<double, double> getColorFieldRanges(const QString& array);
+  QList<QPair<double, double> >getColorFieldRanges(const QString& array);
 
   /// set the array to color the part by
   void setColorField(const QString& field);
