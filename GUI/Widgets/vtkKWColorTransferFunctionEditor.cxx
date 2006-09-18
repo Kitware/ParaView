@@ -32,7 +32,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.55");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.56");
 
 #define VTK_KW_CTFE_COLOR_RAMP_TAG "color_ramp_tag"
 
@@ -1657,7 +1657,7 @@ void vtkKWColorTransferFunctionEditor::RedrawHistogram()
 
   const char *canv = this->Canvas->GetWidgetName();
 
-  int has_hist_tag, has_secondary_hist_tag; 
+  int has_hist_tag = 0, has_secondary_hist_tag = 0; 
   if (this->ColorRampPosition == 
       vtkKWColorTransferFunctionEditor::ColorRampPositionCanvas)
     {

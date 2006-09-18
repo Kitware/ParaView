@@ -49,7 +49,7 @@
 #include "vtkPickFilter.h"
 
 
-vtkCxxRevisionMacro(vtkAttributeEditor, "1.9");
+vtkCxxRevisionMacro(vtkAttributeEditor, "1.10");
 vtkStandardNewMacro(vtkAttributeEditor);
 vtkCxxSetObjectMacro(vtkAttributeEditor,ClipFunction,vtkImplicitFunction);
 vtkCxxSetObjectMacro(vtkAttributeEditor,Controller,vtkMultiProcessController);
@@ -163,9 +163,9 @@ int vtkAttributeEditor::RequestData(
 
   vtkDataSet *readerInput;
   vtkUnstructuredGrid *readerOutput;
-  vtkDataSetAttributes *field;
-  vtkDataSetAttributes *readerfield;
-  vtkDataSetAttributes *filterfield;
+  vtkDataSetAttributes *field = NULL;
+  vtkDataSetAttributes *readerfield = NULL;
+  vtkDataSetAttributes *filterfield = NULL;
   vtkInformation *info;
   vtkDataSet *filterInput;
   vtkUnstructuredGrid *filterOutput;

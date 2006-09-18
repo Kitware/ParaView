@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPointSet.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPhastaReader, "1.4");
+vtkCxxRevisionMacro(vtkPhastaReader, "1.5");
 vtkStandardNewMacro(vtkPhastaReader);
 
 #define swap_char(A,B) { ucTmp = A; A = B ; B = ucTmp; }
@@ -522,7 +522,7 @@ void vtkPhastaReader::ReadGeomFile(char* geomFileName,
   //int *nlworkdata;
   /* element information */ 
   int num_elems,num_vertices,num_per_line;
-  int *connectivity;
+  int *connectivity = NULL;
 
 
   /* misc variables*/

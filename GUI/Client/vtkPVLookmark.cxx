@@ -88,7 +88,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.73");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.74");
 
 
 //*****************************************************************************
@@ -1375,7 +1375,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   int updateLookmarkFlag = 0;
   double fval1,fval2,fval3,fval4;
   vtkPVReaderModule *mod;
-  vtkXDMFReaderModule *xdmfmod;
+  vtkXDMFReaderModule *xdmfmod = NULL;
   vtkPVXDMFParameters *xdmfParameters;
   char sourceLabel[50];
   vtkstd::string str;
