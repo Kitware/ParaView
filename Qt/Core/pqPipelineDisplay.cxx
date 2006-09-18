@@ -47,8 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInputProperty.h"
 
 // Qt includes.
-#include <QPointer>
 #include <QList>
+#include <QPair>
+#include <QPointer>
 #include <QtDebug>
 
 // ParaView includes.
@@ -340,67 +341,23 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
   pqSMAdaptor::setElementProperty(
     displayProxy->GetProperty("ScalarVisibility"), 1);
 
-  vtkPVArrayInformation* ai;
+
   if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
     {
-    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
-    ai = geomInfo->GetCellDataInformation()->GetArrayInformation(arrayname);
     pqSMAdaptor::setEnumerationProperty(
       displayProxy->GetProperty("ScalarMode"), "UseCellFieldData");
     }
   else
     {
-    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
-    ai = geomInfo->GetPointDataInformation()->GetArrayInformation(arrayname);
     pqSMAdaptor::setEnumerationProperty(
       displayProxy->GetProperty("ScalarMode"), "UsePointFieldData");
     }
-#if 0
-  // array couldn't be found, look for it on the reader
-  // TODO: this support should be moved into the server manager and/or VTK
-  if(!ai)
-    {
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      displayProxy->GetProperty("Input"));
-    vtkSMProxy* reader = pp->GetProxy(0);
-    while((pp = vtkSMProxyProperty::SafeDownCast(reader->GetProperty("Input"))))
-      reader = pp->GetProxy(0);
-    QList<QVariant> prop;
-    prop += arrayname;
-    prop += 1;
-    QList<QList<QVariant> > propertyList;
-    propertyList.push_back(prop);
-    if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
-      {
-      pqSMAdaptor::setSelectionProperty(
-        reader->GetProperty("CellArrayStatus"), propertyList);
-      reader->UpdateVTKObjects();
-      vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
-      ai = geomInfo->GetCellDataInformation()->GetArrayInformation(arrayname);
-      }
-    else
-      {
-      pqSMAdaptor::setSelectionProperty(
-        reader->GetProperty("PointArrayStatus"), propertyList);
-      reader->UpdateVTKObjects();
-      vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
-      ai = geomInfo->GetPointDataInformation()->GetArrayInformation(arrayname);
-      }
-    }
-#endif
-  double range[2] = {0,1};
-  if(ai)
-    {
-    ai->GetComponentRange(0, range);
-    }
-  QList<QVariant> tmp;
-  tmp += range[0];
-  tmp += range[1];
-  pqSMAdaptor::setMultipleElementProperty(lut->GetProperty("ScalarRange"), tmp);
-  pqSMAdaptor::setElementProperty(displayProxy->GetProperty("ColorArray"), 
-                                  arrayname);
+  pqSMAdaptor::setElementProperty(
+    displayProxy->GetProperty("ColorArray"), arrayname);
   lut->UpdateVTKObjects();
   displayProxy->UpdateVTKObjects();
+
+  this->updateLookupTableScalarRange();
 }
 
 //-----------------------------------------------------------------------------
@@ -411,67 +368,50 @@ vtkSMProxy* pqPipelineDisplay::getLookupTableProxy()
 }
 
 //-----------------------------------------------------------------------------
+pqScalarsToColors* pqPipelineDisplay::getLookupTable()
+{
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  vtkSMProxy* lut = this->getLookupTableProxy();
+
+  return (lut? qobject_cast<pqScalarsToColors*>(smmodel->getPQProxy(lut)): 0);
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineDisplay::resetLookupTableScalarRange()
 {
-  vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
-  if (!displayProxy)
+  QPair<double, double> range = QPair<double, double>(0.0, 1.0);
+
+  vtkSMProxy* lut = this->getLookupTableProxy();
+  QString colorField = this->getColorField();
+  if (lut && colorField!= "" && colorField != "Solid Color")
+    {
+    range = this->getColorFieldRanges(colorField);
+    QList<QVariant> tmp;
+    tmp += range.first;
+    tmp += range.second;
+    pqSMAdaptor::setMultipleElementProperty(lut->GetProperty("ScalarRange"), tmp);
+    lut->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::updateLookupTableScalarRange()
+{
+  pqScalarsToColors* lut = this->getLookupTable();
+  if (!lut || lut->getScalarRangeLock())
     {
     return;
     }
-  if (pqSMAdaptor::getElementProperty(
-      displayProxy->GetProperty("ScalarVisibility")) == 0)
+
+  QString colorField = this->getColorField();
+  if (colorField == "" || colorField == "Solid Color")
     {
-    // scalar visibility is off, what to reset the range to?
-    return;
-    }
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    displayProxy->GetProperty("LookupTable"));
-  vtkSMProxy* lut = 0;
-  if (pp->GetNumberOfProxies() > 0)
-    {
-    lut = pp->GetProxy(0);
-    }
-  if (!lut)
-    {
-    // No LUT created, nothing to reset.
     return;
     }
 
-  QString arrayName  =  
-    pqSMAdaptor::getElementProperty(
-      displayProxy->GetProperty("ColorArray")).toString();
-  int fieldType = vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA;
-  if (pqSMAdaptor::getEnumerationProperty(
-      displayProxy->GetProperty("ScalarMode")).toString() == "UsePointFieldData")
-    {
-    fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
-    }
-
-  // Now get current array range.
-  vtkPVArrayInformation* ai=0;
-  if(fieldType == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
-    {
-    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
-    ai = geomInfo->GetCellDataInformation()->GetArrayInformation(
-      arrayName.toStdString().c_str());
-    }
-  else
-    {
-    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
-    ai = geomInfo->GetPointDataInformation()->GetArrayInformation(
-      arrayName.toStdString().c_str());
-    }
-
-  double range[2] = {0,1};
-  if(ai)
-    {
-    ai->GetComponentRange(0, range);
-    }
-  QList<QVariant> tmp;
-  tmp += range[0];
-  tmp += range[1];
-  pqSMAdaptor::setMultipleElementProperty(lut->GetProperty("ScalarRange"), tmp);
-  lut->UpdateVTKObjects();
+  QPair<double, double> range = this->getColorFieldRanges(colorField);
+  lut->setWholeScalarRange(range.first, range.second);
 }
 
 //-----------------------------------------------------------------------------
@@ -565,10 +505,10 @@ QList<QString> pqPipelineDisplay::getColorFields()
   return ret;
 }
 
-QList< QPair<double, double> >
+QPair<double, double>
 pqPipelineDisplay::getColorFieldRanges(const QString& array)
 {
-  QList< QPair<double,double> > ret;
+  QPair<double,double> ret = QPair<double, double>(0.0, 1.0);
   
   vtkSMDisplayProxy* displayProxy = this->getDisplayProxy();
 
@@ -612,7 +552,7 @@ pqPipelineDisplay::getColorFieldRanges(const QString& array)
       for(int i=0; i<info->GetNumberOfComponents(); i++)
         {
         info->GetComponentRange(i, range);
-        ret.append(QPair<double,double>(range[0], range[1]));
+        ret = QPair<double,double>(range[0], range[1]);
         }
       }
     }

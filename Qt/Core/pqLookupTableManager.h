@@ -55,6 +55,7 @@ public:
   // can implemenent their own policy for managing lookup tables.
   virtual pqScalarsToColors* getLookupTable(pqServer* server, const QString& arrayname,
     int component) = 0;
+
 public slots:
   // Called when any proxy is added. Subclasses can override
   // onAddLookupTable() which is called by this method when it is
@@ -63,6 +64,9 @@ public slots:
 
   // Called when a LUT is added.
   virtual void onAddLookupTable(pqScalarsToColors* lut) = 0;
+
+  // Called to update scalar ranges of all lookup tables.
+  virtual void updateLookupTableScalarRanges()=0;
 protected:
  
 };

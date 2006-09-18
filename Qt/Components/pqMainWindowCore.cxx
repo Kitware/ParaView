@@ -220,6 +220,9 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   pqApplicationCore* const core = pqApplicationCore::instance();
 
   core->setLookupTableManager(this->Implementation->LookupTableManager);
+  QObject::connect(this, SIGNAL(postAccept()),
+    this->Implementation->LookupTableManager, 
+    SLOT(updateLookupTableScalarRanges()));
 
   // Initialize supported file types.
   core->getReaderFactory()->loadFileTypes(":/pqWidgets/XML/ParaViewReaders.xml");
@@ -1694,7 +1697,7 @@ void pqMainWindowCore::onInitializeInteractionStates()
 void pqMainWindowCore::onPostAccept()
 {
   this->updateFiltersMenu(this->getActiveSource());
-  
+
   emit this->postAccept();
 }
 

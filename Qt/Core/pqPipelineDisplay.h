@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPipelineDisplayInternal;
 class pqPipelineSource;
 class pqRenderModule;
+class pqScalarsToColors;
 class pqServer;
 
 class vtkPVDataSetAttributesInformation;
@@ -97,7 +98,7 @@ public:
   QList<QString> getColorFields();
 
   /// get the data ranges for a color field
-  QList<QPair<double, double> > getColorFieldRanges(const QString& array);
+  QPair<double, double> getColorFieldRanges(const QString& array);
 
   /// set the array to color the part by
   void setColorField(const QString& field);
@@ -110,12 +111,20 @@ public:
   /// Returns the lookuptable proxy, if any.
   vtkSMProxy* getLookupTableProxy();
 
+  /// Returns the pqScalarsToColors object for the lookup table
+  /// proxy if any.
+  pqScalarsToColors* getLookupTable();
 public slots:
   // If lookuptable is set up and is used for coloring,
   // then calling this method resets the table ranges to match the current 
   // range of the selected array.
   void resetLookupTableScalarRange();
 
+  // If lookuptable is set up and coloring is enabled, the this
+  // ensure that the lookuptable scalar range is greater than than the
+  // color array's scalar range. This call respects the lookup table's
+  // "lock" on scalar range.
+  void updateLookupTableScalarRange();
 protected slots:
   // called when input property on display changes. We must detect if
   // (and when) the display is connected to a new proxy.

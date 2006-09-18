@@ -50,6 +50,13 @@ public:
   // if any.
   pqScalarBarDisplay* getScalarBar(pqRenderModule* ren) const;
 
+  // Returns if the lookup table's scalar range is locked.
+  bool getScalarRangeLock() const;
+
+  // Set the scalar range if the range specified is greater than
+  // the current scalar range. This call respects the ScalarRangeLock.
+  // If the lock is set, then this call has no effect.
+  void setWholeScalarRange(double min, double max);
 public slots:
   // This method checks if this LUT is used by any display,
   // if not, it hides all the scalars bar showing this LUT.

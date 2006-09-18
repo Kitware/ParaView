@@ -93,6 +93,18 @@ pqScalarBarDisplay* pqScalarsToColors::getScalarBar(pqRenderModule* ren) const
 }
 
 //-----------------------------------------------------------------------------
+bool pqScalarsToColors::getScalarRangeLock() const
+{
+  vtkSMProperty* prop = this->getProxy()->GetProperty("LockScalarRange");
+  if (prop && pqSMAdaptor::getElementProperty(prop).toInt() != 0)
+    {
+    return true;
+    }
+  // we may keep some GUI only state for vtkLookupTable proxies.
+  return false;
+}
+
+//-----------------------------------------------------------------------------
 void pqScalarsToColors::hideUnusedScalarBars()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -118,4 +130,22 @@ void pqScalarsToColors::hideUnusedScalarBars()
       sb->renderAllViews();
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarsToColors::setWholeScalarRange(double min, double max)
+{
+  if (this->getScalarRangeLock())
+    {
+    return;
+    }
+  QList<QVariant> curRange = pqSMAdaptor::getMultipleElementProperty(
+    this->getProxy()->GetProperty("ScalarRange"));
+  min = (min < curRange[0].toDouble())? min :  curRange[0].toDouble();
+  max = (max > curRange[1].toDouble())? max :  curRange[1].toDouble();
+  curRange.clear();
+  curRange << min << max;
+  pqSMAdaptor::setMultipleElementProperty(
+    this->getProxy()->GetProperty("ScalarRange"), curRange);
+  this->getProxy()->UpdateVTKObjects();
 }

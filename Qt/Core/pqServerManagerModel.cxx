@@ -157,14 +157,10 @@ QList<pqPipelineDisplay*> pqServerManagerModel::getPipelineDisplays(
   pqServer* server)
 {
   QList<pqPipelineDisplay*> list;
-  if (!server)
-    {
-    return list;
-    }
 
   foreach(pqPipelineDisplay* display, this->Internal->Displays)
     {
-    if (display && display->getServer() == server)
+    if (display && (!server || display->getServer() == server))
       {
       list.push_back(display);
       }
@@ -178,15 +174,12 @@ QList<pqPipelineSource*> pqServerManagerModel::getSources(pqServer* server)
 {
   QList<pqPipelineSource*> list;
 
-  if(server)
+  vtkIdType cid = server->GetConnectionID();
+  foreach (pqPipelineSource* source, this->Internal->Sources)
     {
-    vtkIdType cid = server->GetConnectionID();
-    foreach (pqPipelineSource* source, this->Internal->Sources)
+    if (!server || source->getProxy()->GetConnectionID() == cid) 
       {
-      if (source->getProxy()->GetConnectionID() == cid) 
-        {
-        list.push_back(source);
-        }
+      list.push_back(source);
       }
     }
   return list;
@@ -202,7 +195,7 @@ QList<pqRenderModule*> pqServerManagerModel::getRenderModules(pqServer* server)
   QList<pqRenderModule*> list;
   foreach(pqRenderModule* rm, this->Internal->RenderModules)
     {
-    if (rm && rm->getServer() == server)
+    if (rm && (!server || rm->getServer() == server))
       {
       list.push_back(rm);
       }

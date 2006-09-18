@@ -43,6 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqSMAdaptor.h"
+#include "pqPipelineDisplay.h"
+#include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
+
 //-----------------------------------------------------------------------------
 class pqPQLookupTableManagerInternal
 {
@@ -175,3 +179,15 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
 }
 
 //-----------------------------------------------------------------------------
+void pqPQLookupTableManager::updateLookupTableScalarRanges()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smmodel = pqServerManagerModel::instance();
+  
+  QList<pqPipelineDisplay*> displays = smmodel->getPipelineDisplays(0);
+  foreach(pqPipelineDisplay* display, displays)
+    {
+    display->updateLookupTableScalarRange();
+    }
+
+}

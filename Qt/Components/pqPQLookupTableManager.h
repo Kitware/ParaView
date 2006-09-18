@@ -56,6 +56,9 @@ public slots:
   // registering a LUT proxy.
   virtual void onAddLookupTable(pqScalarsToColors* lut);
 
+  // Called to update scalar ranges of all lookup tables.
+  virtual void updateLookupTableScalarRanges();
+
 protected:
   // creates a new LUT.
   pqScalarsToColors* createLookupTable(pqServer* server,
