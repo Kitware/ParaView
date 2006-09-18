@@ -431,25 +431,6 @@ void pqDisplayProxyEditor::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayProxyEditor::colorByChanged(const QString& val)
-{
-  if (this->DisableSlots)
-    {
-    return;
-    }
-  if(val == "Solid Color")
-    {
-    this->Internal->Display->colorByArray(NULL, 0);
-    }
-  else
-    {
-    this->Internal->Display->setColorField(val);
-    }
-  this->updateEnableState();
-  this->updateView();
-}
-
-//-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::openColorMapEditor()
 {
   if(this->Internal->Display.isNull())
