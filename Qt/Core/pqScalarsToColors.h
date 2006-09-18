@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqScalarsToColors_h
 
 #include "pqProxy.h"
+#include <QPair>
 
 class pqScalarsToColorsInternal;
 class pqScalarBarDisplay;
@@ -60,10 +61,14 @@ public:
 
   // Sets the scalar range. Does not consider the ScalarRangeLock.
   void setScalarRange(double min, double max);
+
+  QPair<double, double> getScalarRange() const;
 public slots:
   // This method checks if this LUT is used by any display,
   // if not, it hides all the scalars bar showing this LUT.
   void hideUnusedScalarBars();
+
+  void setScalarRangeLock(bool lock);
 
 protected:
   friend class pqScalarBarDisplay;

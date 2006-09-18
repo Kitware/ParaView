@@ -76,6 +76,10 @@ public slots:
   void setPresetRedToBlue();
   void setPresetGrayscale();
   void setPresetCIELabBlueToRed();
+  void setLockScalarRange(bool);
+  void resetScalarRangeToCurrent();
+  void setScalarRange(double, double);
+  void resetScalarRange();
 
 private slots:
   void setUseDiscreteColors(bool on);
@@ -90,6 +94,8 @@ private slots:
   void updateTableRange(int first, int last);
   void closeForm();
   void setColorBarVisibility(bool visible);
+  void setScalarRangeMin(double);
+  void setScalarRangeMax(double);
 
 private:
   pqColorMapEditorForm *Form;

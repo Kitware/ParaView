@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>427</height>
+    <height>575</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -168,6 +168,61 @@
      <property name="spacing" >
       <number>4</number>
      </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
+      <string>Scalar Ranges</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QDoubleSpinBox" name="ScalarRangeMin" />
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="ScalarRangeMax" />
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="LockScalarRange" >
+        <property name="text" >
+         <string>Lock Scalar Range</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ResetScalarRange" >
+        <property name="enabled" >
+         <bool>false</bool>
+        </property>
+        <property name="text" >
+         <string>Reset Range</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ResetScalarRangeToCurrent" >
+        <property name="text" >
+         <string>Reset Range to Current</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>

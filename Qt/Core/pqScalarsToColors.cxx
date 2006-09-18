@@ -95,6 +95,17 @@ pqScalarBarDisplay* pqScalarsToColors::getScalarBar(pqRenderModule* ren) const
 }
 
 //-----------------------------------------------------------------------------
+void pqScalarsToColors::setScalarRangeLock(bool lock)
+{
+  vtkSMProperty* prop = this->getProxy()->GetProperty("LockScalarRange");
+  if (prop)
+    {
+    pqSMAdaptor::setElementProperty(prop, (lock? 1: 0));
+    }
+  this->getProxy()->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
 bool pqScalarsToColors::getScalarRangeLock() const
 {
   vtkSMProperty* prop = this->getProxy()->GetProperty("LockScalarRange");
@@ -137,6 +148,12 @@ void pqScalarsToColors::hideUnusedScalarBars()
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::setScalarRange(double min, double max)
 {
+  if (min > max)
+    {
+    double t = min;
+    min = max;
+    max = t;
+    }
   QList<QVariant> curRange;
   curRange << min << max;
 
@@ -145,6 +162,14 @@ void pqScalarsToColors::setScalarRange(double min, double max)
   this->getProxy()->UpdateVTKObjects();
 
   this->Internal->ScalarRangeInitialized = true;
+}
+
+//-----------------------------------------------------------------------------
+QPair<double, double> pqScalarsToColors::getScalarRange() const
+{
+  QList<QVariant> range = pqSMAdaptor::getMultipleElementProperty(
+    this->getProxy()->GetProperty("ScalarRange"));
+  return QPair<double, double>(range[0].toDouble(), range[1].toDouble());
 }
 
 //-----------------------------------------------------------------------------

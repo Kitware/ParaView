@@ -79,6 +79,15 @@ public:
     delete this->PresetsMenu;
     }
 
+  pqScalarsToColors* getScalarsToColors(vtkSMProxy* lut)
+    {
+    // this class will eventuall work on a pqScalarsToColors object.
+    // Until then, we try to get the pqScalarsToColors for the lut proxy.
+    pqApplicationCore* core = pqApplicationCore::instance();
+    pqServerManagerModel* smmodel = core->getServerManagerModel();
+    return qobject_cast<pqScalarsToColors*>(smmodel->getPQProxy(lut));
+    }
+
   QPointer<pqPipelineDisplay> Display;
   QMenu* PresetsMenu;
 };
@@ -99,10 +108,16 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
     this, SLOT(setPresetRedToBlue()));
   this->Form->PresetsMenu->addAction("Grayscale",
     this, SLOT(setPresetGrayscale()));
+
   /*
   this->Form->PresetsMenu->addAction("CIELab Blue to Red",
     this, SLOT(setPresetCIELabBlueToRed()));
   */
+
+  QObject::connect(this->Form->LockScalarRange, SIGNAL(toggled(bool)),
+    this, SLOT(setLockScalarRange(bool)));
+  QObject::connect(this->Form->ResetScalarRangeToCurrent, SIGNAL(clicked(bool)),
+    this, SLOT(resetScalarRangeToCurrent()));
 
   this->Form->PresetsButton->setMenu(this->Form->PresetsMenu);
   this->Form->PresetsButton->setPopupMode(QToolButton::InstantPopup);
@@ -163,6 +178,15 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
       this, SLOT(changeTableColor(int, const QColor &)));
   this->connect(this->Model, SIGNAL(colorRangeChanged(int, int)),
       this, SLOT(updateTableRange(int, int)));
+
+  this->Form->ScalarRangeMin->setMinimum(-VTK_DOUBLE_MAX);
+  this->Form->ScalarRangeMin->setMaximum(VTK_DOUBLE_MAX);
+  this->Form->ScalarRangeMax->setMinimum(-VTK_DOUBLE_MAX);
+  this->Form->ScalarRangeMax->setMaximum(VTK_DOUBLE_MAX);
+  QObject::connect(this->Form->ScalarRangeMin, SIGNAL(valueChanged(double)),
+    this, SLOT(setScalarRangeMin(double)));
+  QObject::connect(this->Form->ScalarRangeMax, SIGNAL(valueChanged(double)),
+    this, SLOT(setScalarRangeMax(double)));
 }
 
 //-----------------------------------------------------------------------------
@@ -245,16 +269,9 @@ void pqColorMapEditor::resetGUI()
     this->resetFromLookupTable();
     }
 
-  // this class will eventuall work on a pqScalarsToColors object.
-  // Until then, we try to get the pqScalarsToColors for the lut proxy.
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel* smmodel = core->getServerManagerModel();
-
-  pqScalarsToColors* stc = qobject_cast<pqScalarsToColors*>(
-    smmodel->getPQProxy(this->LookupTable));
+  pqScalarsToColors* stc = this->Form->getScalarsToColors(this->LookupTable); 
   if (!stc)
     {
-    qDebug() << "Cannot add scalar bar for this lookup table.";
     return;
     }
 
@@ -264,6 +281,16 @@ void pqColorMapEditor::resetGUI()
   pqScalarBarDisplay* sb = stc->getScalarBar(rm);
   this->Form->ColorBarVisibility->setCheckState( 
     (sb && sb->isVisible()) ? Qt::Checked : Qt::Unchecked);
+
+  this->Form->LockScalarRange->setCheckState(
+    stc->getScalarRangeLock()? Qt::Checked : Qt::Unchecked);
+
+  QPair<double, double> range = stc->getScalarRange();
+  this->Form->ScalarRangeMin->setValue(range.first);
+  this->Form->ScalarRangeMax->setMinimum(range.first);
+  this->Form->ScalarRangeMax->setValue(range.second);
+  this->Form->ScalarRangeMin->setMaximum(range.second);
+  
 }
 
 //-----------------------------------------------------------------------------
@@ -536,13 +563,7 @@ void pqColorMapEditor::closeForm()
 //-----------------------------------------------------------------------------
 void pqColorMapEditor::setColorBarVisibility(bool visible)
 {
-  // this class will eventuall work on a pqScalarsToColors object.
-  // Until then, we try to get the pqScalarsToColors for the lut proxy.
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel* smmodel = core->getServerManagerModel();
-
-  pqScalarsToColors* stc = qobject_cast<pqScalarsToColors*>(
-    smmodel->getPQProxy(this->LookupTable));
+  pqScalarsToColors* stc = this->Form->getScalarsToColors(this->LookupTable); 
   if (!stc)
     {
     qDebug() << "Cannot add scalar bar for this lookup table.";
@@ -553,10 +574,11 @@ void pqColorMapEditor::setColorBarVisibility(bool visible)
   pqScalarBarDisplay* sb = stc->getScalarBar(rm);
   if (!sb && visible)
     {
-    pqPipelineBuilder* builder = core->getPipelineBuilder();
+    pqPipelineBuilder* builder = 
+      pqApplicationCore::instance()->getPipelineBuilder();
     sb = builder->createScalarBar(stc, rm);
-
     }
+
   if (sb)
     {
     sb->setVisible(visible);
@@ -609,3 +631,59 @@ void pqColorMapEditor::setPresetCIELabBlueToRed()
 }
 
 //-----------------------------------------------------------------------------
+void pqColorMapEditor::setLockScalarRange(bool lock)
+{
+  pqScalarsToColors* stc = this->Form->getScalarsToColors(this->LookupTable);
+  if (!stc)
+    {
+    return;
+    }
+  stc->setScalarRangeLock(lock);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::resetScalarRangeToCurrent()
+{
+  QString colorField = this->Form->Display->getColorField();
+  QList<QPair<double, double> > ranges = 
+    this->Form->Display->getColorFieldRanges(colorField);
+  if (ranges.size() > 0)
+    {
+    this->setScalarRange(ranges[0].first, ranges[0].second);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setScalarRange(double min, double max)
+{
+  this->Form->ScalarRangeMin->setValue(min);
+  this->Form->ScalarRangeMax->setMinimum(min);
+  this->Form->ScalarRangeMax->setValue(max);
+  this->Form->ScalarRangeMin->setMaximum(max);
+  pqScalarsToColors* stc = this->Form->getScalarsToColors(this->LookupTable);
+  if (!stc)
+    {
+    return;
+    }
+  stc->setScalarRange(min, max);
+  this->Form->Display->renderAllViews();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setScalarRangeMin(double min)
+{
+  double max = this->Form->ScalarRangeMax->value();
+  this->setScalarRange(min, max);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setScalarRangeMax(double max)
+{
+  double min = this->Form->ScalarRangeMin->value();
+  this->setScalarRange(min, max);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::resetScalarRange()
+{
+}
