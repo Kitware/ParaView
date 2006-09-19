@@ -19,7 +19,7 @@
 #include "vtkColorTransferFunction.h"
 
 vtkStandardNewMacro(vtkPVLookupTable);
-vtkCxxRevisionMacro(vtkPVLookupTable, "1.1");
+vtkCxxRevisionMacro(vtkPVLookupTable, "1.2");
 //-----------------------------------------------------------------------------
 vtkPVLookupTable::vtkPVLookupTable()
 {
@@ -74,7 +74,7 @@ void vtkPVLookupTable::Build()
       lut_ptr[4*cc+2] = (unsigned char)(255.0*table[3*cc+2] + 0.5);
       lut_ptr[4*cc+3] = 255;
       }
-    delete table;
+    delete [] table;
 
     this->BuildTime.Modified();
     }
