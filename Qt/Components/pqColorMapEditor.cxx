@@ -49,6 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqPipelineBuilder.h"
 #include "pqScalarBarDisplay.h"
+#include "pqPropertyLinks.h"
+#include "pqSignalAdaptors.h"
 
 #include <QColor>
 #include <QColorDialog>
@@ -73,10 +75,19 @@ public:
     {
     this->Display = 0;
     this->PresetsMenu = 0;
+    this->LabelColorSignalAdaptor = 0;
+    this->TitleColorSignalAdaptor = 0;
+    this->LabelFontFamilyAdaptor = 0;
+    this->TitleFontFamilyAdaptor = 0;
     }
+
   ~pqColorMapEditorForm() 
     {
     delete this->PresetsMenu;
+    delete this->LabelColorSignalAdaptor;
+    delete this->TitleColorSignalAdaptor;
+    delete this->LabelFontFamilyAdaptor;
+    delete this->TitleFontFamilyAdaptor;
     }
 
   pqScalarsToColors* getScalarsToColors(vtkSMProxy* lut)
@@ -90,6 +101,11 @@ public:
 
   QPointer<pqPipelineDisplay> Display;
   QMenu* PresetsMenu;
+  pqPropertyLinks Links;
+  pqSignalAdaptorColor* LabelColorSignalAdaptor;
+  pqSignalAdaptorColor* TitleColorSignalAdaptor;
+  pqSignalAdaptorComboBox* LabelFontFamilyAdaptor;
+  pqSignalAdaptorComboBox* TitleFontFamilyAdaptor;
 };
 
 //-----------------------------------------------------------------------------
@@ -190,6 +206,34 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
 
   QObject::connect(this->Form->Component, SIGNAL(activated(int)),
     this, SLOT(setComponent(int)));
+
+  QObject::connect(&this->Form->Links, SIGNAL(qtWidgetChanged()),
+    this, SLOT(renderAllViews()));
+
+  this->Form->LabelFontFamily->addItem("Arial");
+  this->Form->LabelFontFamily->addItem("Courier");
+  this->Form->LabelFontFamily->addItem("Times");
+  this->Form->TitleFontFamily->addItem("Arial");
+  this->Form->TitleFontFamily->addItem("Courier");
+  this->Form->TitleFontFamily->addItem("Times");
+
+  this->Form->LabelColorSignalAdaptor = new pqSignalAdaptorColor(
+    this->Form->LabelColor, "chosenColor", 
+    SIGNAL(chosenColorChanged(const QColor&)), false);
+  this->Form->TitleColorSignalAdaptor = new pqSignalAdaptorColor(
+    this->Form->TitleColor, "chosenColor", 
+    SIGNAL(chosenColorChanged(const QColor&)), false);
+
+  this->Form->LabelFontFamilyAdaptor = new pqSignalAdaptorComboBox(
+    this->Form->LabelFontFamily);
+  this->Form->TitleFontFamilyAdaptor = new pqSignalAdaptorComboBox(
+    this->Form->TitleFontFamily);
+
+  QObject::connect(this->Form->TitleName, SIGNAL(textChanged(const QString&)),
+    this, SLOT(setTitleName(const QString&)));
+  QObject::connect(this->Form->TitleComponent, 
+    SIGNAL(textChanged(const QString&)),
+    this, SLOT(setTitleComponent(const QString&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -207,6 +251,8 @@ void pqColorMapEditor::setDisplay(pqPipelineDisplay *display)
     {
     return;
     }
+
+  this->setupScalarBarLinks(0);
 
   if(!this->Form->Display.isNull())
     {
@@ -315,6 +361,7 @@ void pqColorMapEditor::resetGUI()
   pqScalarBarDisplay* sb = stc->getScalarBar(rm);
   this->Form->ColorBarVisibility->setCheckState( 
     (sb && sb->isVisible()) ? Qt::Checked : Qt::Unchecked);
+  this->setupScalarBarLinks(sb);
 
   this->Form->LockScalarRange->setCheckState(
     stc->getScalarRangeLock()? Qt::Checked : Qt::Unchecked);
@@ -325,6 +372,64 @@ void pqColorMapEditor::resetGUI()
   this->Form->ScalarRangeMax->setValue(range.second);
   this->Form->ScalarRangeMin->setMaximum(range.second);
   
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setupScalarBarLinks(pqScalarBarDisplay* sb)
+{
+  this->Form->Links.removeAllPropertyLinks();
+
+  if (!sb)
+    {
+    return;
+    }
+
+  vtkSMProxy* proxy = sb->getProxy();
+
+  this->Form->Links.addPropertyLink(
+    this->Form->LabelBold, "checked", SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("LabelBold"));
+  this->Form->Links.addPropertyLink(
+    this->Form->LabelItalic, "checked", SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("LabelItalic"));
+  this->Form->Links.addPropertyLink(
+    this->Form->LabelShadow, "checked", SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("LabelShadow"));   
+  this->Form->Links.addPropertyLink(
+    this->Form->LabelFormat, "text", SIGNAL(textChanged(const QString&)),
+    proxy, proxy->GetProperty("LabelFormat"));   
+  this->Form->Links.addPropertyLink(
+    this->Form->LabelOpacity, "value", SIGNAL(valueChanged(double)),
+    proxy, proxy->GetProperty("LabelOpacity"));
+  this->Form->Links.addPropertyLink(this->Form->LabelColorSignalAdaptor, 
+    "color", SIGNAL(colorChanged(const QVariant&)),
+    proxy, proxy->GetProperty("LabelColor"));
+  this->Form->Links.addPropertyLink(this->Form->LabelFontFamilyAdaptor,
+    "currentText", SIGNAL(currentTextChanged(const QString&)),
+    proxy, proxy->GetProperty("LabelFontFamily"));
+
+  this->Form->Links.addPropertyLink(
+    this->Form->TitleBold, "checked", SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("TitleBold"));
+  this->Form->Links.addPropertyLink(
+    this->Form->TitleItalic, "checked", SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("TitleItalic"));
+  this->Form->Links.addPropertyLink(
+    this->Form->TitleShadow, "checked", SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("TitleShadow"));   
+  this->Form->Links.addPropertyLink(
+    this->Form->TitleOpacity, "value", SIGNAL(valueChanged(double)),
+    proxy, proxy->GetProperty("TitleOpacity"));
+  this->Form->Links.addPropertyLink(this->Form->TitleColorSignalAdaptor, 
+    "color", SIGNAL(colorChanged(const QVariant&)),
+    proxy, proxy->GetProperty("TitleColor"));
+  this->Form->Links.addPropertyLink(this->Form->TitleFontFamilyAdaptor,
+    "currentText", SIGNAL(currentTextChanged(const QString&)),
+    proxy, proxy->GetProperty("TitleFontFamily"));
+
+  this->Form->Links.addPropertyLink(this->Form->NumberOfLabels,
+    "value", SIGNAL(valueChanged(int)),
+    proxy, proxy->GetProperty("NumberOfLabels"));
 }
 
 //-----------------------------------------------------------------------------
@@ -611,6 +716,14 @@ void pqColorMapEditor::setColorBarVisibility(bool visible)
     pqPipelineBuilder* builder = 
       pqApplicationCore::instance()->getPipelineBuilder();
     sb = builder->createScalarBar(stc, rm);
+    this->setupScalarBarLinks(sb);
+    // Set up scalar bar title only when the scalar bar is created.
+    this->setTitleName(this->Form->Display->getColorField(true));
+    if (this->Form->Component->count() > 1)
+      {
+      int index = this->getComponent() +1;
+      this->setTitleComponent(this->Form->Component->itemText(index));
+      }
     }
 
   if (sb)
@@ -723,6 +836,8 @@ void pqColorMapEditor::setComponent(int index)
     (component_no == -1)? "Magnitude" : "Component");
   pqSMAdaptor::setElementProperty(this->LookupTable->GetProperty("VectorComponent"),
     (component_no == -1)? 0 : component_no);
+
+  this->setTitleComponent(this->Form->Component->itemText(index));
   this->LookupTable->UpdateVTKObjects();
   this->Form->Display->renderAllViews();
 }
@@ -742,4 +857,62 @@ int pqColorMapEditor::getComponent()
 //-----------------------------------------------------------------------------
 void pqColorMapEditor::resetScalarRange()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::renderAllViews()
+{
+  if (this->Form->Display)
+    {
+    this->Form->Display->renderAllViews();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setTitleName(const QString& name)
+{
+  QString comp = this->Form->TitleComponent->text();
+  this->setTitle(name, comp);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setTitleComponent(const QString& comp)
+{
+  this->setTitle(this->Form->TitleName->text(), comp);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setTitle(const QString& name, const QString& comp)
+{
+  QString title ;
+  if (name != "" && comp != "")
+    {
+    title = name + " " + comp;
+    }
+  else
+    {
+    title = name + comp;
+    }
+  pqScalarsToColors* stc = this->Form->getScalarsToColors(this->LookupTable);
+  if (!stc || !this->Form->Display)
+    {
+    return;
+    }
+
+  pqRenderModule* rm = this->Form->Display->getRenderModule(0);
+
+  // Update Scalar Bar GUI.
+  pqScalarBarDisplay* sb = stc->getScalarBar(rm);
+  pqSMAdaptor::setElementProperty( 
+    sb->getProxy()->GetProperty("Title"), QVariant(title.toAscii().data()));
+  sb->getProxy()->UpdateVTKObjects();
+  sb->renderAllViews();
+
+  this->Form->TitleName->blockSignals(true);
+  this->Form->TitleName->setText(name);
+  this->Form->TitleName->blockSignals(false);
+
+  this->Form->TitleComponent->blockSignals(true);
+  this->Form->TitleComponent->setText(comp);
+  this->Form->TitleComponent->blockSignals(false);
 }

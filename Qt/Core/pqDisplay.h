@@ -85,7 +85,10 @@ public:
   // This method updates all render modules to which this 
   // display belongs, if force is true, it for an immediate render
   // otherwise render on idle.
-  void renderAllViews(bool force=false);
+  void renderAllViews(bool force);
+
+public slots:
+  void renderAllViews() { this->renderAllViews(false); }
 
 signals:
   // Fired when the visibility property of the underlying display changes.

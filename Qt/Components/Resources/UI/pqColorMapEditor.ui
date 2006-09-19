@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>733</height>
+    <width>495</width>
+    <height>864</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -270,6 +270,186 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QFrame" name="ColorBarPropertiesFrame" >
+        <property name="enabled" >
+         <bool>false</bool>
+        </property>
+        <property name="frameShape" >
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow" >
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" >
+         <property name="margin" >
+          <number>9</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item rowspan="3" row="1" column="0" >
+          <widget class="QLabel" name="label_4" >
+           <property name="text" >
+            <string>Labels</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0" colspan="2" >
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_5" >
+             <property name="text" >
+              <string>Number Of Labels</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="NumberOfLabels" />
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="1" >
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>1</number>
+           </property>
+           <item>
+            <widget class="pqColorChooserButton" name="LabelColor" >
+             <property name="text" >
+              <string>Color</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="LabelFontFamily" />
+           </item>
+           <item>
+            <widget class="QToolButton" name="LabelBold" >
+             <property name="text" >
+              <string>B</string>
+             </property>
+             <property name="checkable" >
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="LabelItalic" >
+             <property name="text" >
+              <string>I</string>
+             </property>
+             <property name="checkable" >
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="LabelShadow" >
+             <property name="text" >
+              <string>S</string>
+             </property>
+             <property name="checkable" >
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="LabelOpacity" />
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="1" >
+          <widget class="QLineEdit" name="LabelFormat" />
+         </item>
+         <item row="1" column="1" >
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>1</number>
+           </property>
+           <item>
+            <widget class="pqColorChooserButton" name="TitleColor" >
+             <property name="text" >
+              <string>Color</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="TitleFontFamily" />
+           </item>
+           <item>
+            <widget class="QToolButton" name="TitleBold" >
+             <property name="text" >
+              <string>B</string>
+             </property>
+             <property name="checkable" >
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="TitleItalic" >
+             <property name="text" >
+              <string>I</string>
+             </property>
+             <property name="checkable" >
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="TitleShadow" >
+             <property name="text" >
+              <string>S</string>
+             </property>
+             <property name="checkable" >
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="TitleOpacity" />
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="1" >
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QLineEdit" name="TitleName" />
+           </item>
+           <item>
+            <widget class="QLineEdit" name="TitleComponent" />
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="0" >
+          <widget class="QLabel" name="label_3" >
+           <property name="text" >
+            <string>Title</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -314,6 +494,13 @@
    <container>0</container>
    <pixmap></pixmap>
   </customwidget>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
+   <container>0</container>
+   <pixmap></pixmap>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>UseDiscreteColors</tabstop>
@@ -323,5 +510,22 @@
   <tabstop>CloseButton</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>ColorBarVisibility</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ColorBarPropertiesFrame</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>247</x>
+     <y>550</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>247</x>
+     <y>639</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -49,7 +49,7 @@ class QModelIndex;
 class QString;
 class QTimer;
 class vtkSMProxy;
-
+class pqScalarBarDisplay;
 
 class PQCOMPONENTS_EXPORT pqColorMapEditor : public QDialog
 {
@@ -97,6 +97,10 @@ private slots:
   void setScalarRangeMin(double);
   void setScalarRangeMax(double);
   void setComponent(int index);
+  void renderAllViews();
+  void setTitleName(const QString&);
+  void setTitleComponent(const QString&);
+  void setTitle(const QString& name, const QString& comp);
 
 private:
   pqColorMapEditorForm *Form;
@@ -107,6 +111,8 @@ private:
   void resetFromPVLookupTable();
   void resetFromLookupTable();
   int getComponent();
+
+  void setupScalarBarLinks(pqScalarBarDisplay* sb);
 };
 
 #endif
