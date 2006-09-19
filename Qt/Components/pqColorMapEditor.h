@@ -96,6 +96,7 @@ private slots:
   void setColorBarVisibility(bool visible);
   void setScalarRangeMin(double);
   void setScalarRangeMax(double);
+  void setComponent(int index);
 
 private:
   pqColorMapEditorForm *Form;
@@ -105,6 +106,7 @@ private:
 
   void resetFromPVLookupTable();
   void resetFromLookupTable();
+  int getComponent();
 };
 
 #endif

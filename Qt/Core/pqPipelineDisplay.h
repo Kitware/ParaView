@@ -100,6 +100,10 @@ public:
   /// get the data ranges for a color field
   QList<QPair<double, double> >getColorFieldRanges(const QString& array);
 
+  /// get the data range for a particular component. if component == -1,
+  /// range for the vector magnitude is returned.
+  QPair<double, double> getColorFieldRange(const QString& array, int component);
+
   /// set the array to color the part by
   void setColorField(const QString& field);
 
@@ -114,6 +118,10 @@ public:
   /// Returns the pqScalarsToColors object for the lookup table
   /// proxy if any.
   pqScalarsToColors* getLookupTable();
+
+  /// Returns the number of components for the given field.
+  /// field is a string of format "<arrayname> (cell|point)".
+  int getColorFieldNumberOfComponents(const QString& field);
 public slots:
   // If lookuptable is set up and is used for coloring,
   // then calling this method resets the table ranges to match the current 

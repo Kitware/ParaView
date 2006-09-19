@@ -552,6 +552,69 @@ QList<QString> pqPipelineDisplay::getColorFields()
 }
 
 //-----------------------------------------------------------------------------
+int pqPipelineDisplay::getColorFieldNumberOfComponents(const QString& array)
+{
+  QString field = array;
+  int fieldType;
+
+  if(field == "Solid Color")
+    {
+    return 0;
+    }
+  if(field.right(strlen(" (cell)")) == " (cell)")
+    {
+    field.chop(strlen(" (cell)"));
+    fieldType = vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA;
+    }
+  else if(field.right(strlen(" (point)")) == " (point)")
+    {
+    field.chop(strlen(" (point)"));
+    fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
+    }
+
+  return this->getNumberOfComponents(field.toAscii().data(),
+    fieldType);
+}
+
+//-----------------------------------------------------------------------------
+QPair<double, double> 
+pqPipelineDisplay::getColorFieldRange(const QString& array, int component)
+{
+  QPair<double,double>ret(0.0, 1.0);
+
+  QString field = array;
+  int fieldType;
+
+  if(field == "Solid Color")
+    {
+    return ret;
+    }
+  if(field.right(strlen(" (cell)")) == " (cell)")
+    {
+    field.chop(strlen(" (cell)"));
+    fieldType = vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA;
+    }
+  else if(field.right(strlen(" (point)")) == " (point)")
+    {
+    field.chop(strlen(" (point)"));
+    fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
+    }
+
+  vtkPVArrayInformation* info = this->Internal->getArrayInformation(
+    field.toAscii().data(), fieldType);
+  if(info)
+    {
+    if (component <info->GetNumberOfComponents())
+      {
+      double range[2];
+      info->GetComponentRange(component, range);
+      return QPair<double,double>(range[0], range[1]);
+      }
+    }
+  return ret;
+}
+
+//-----------------------------------------------------------------------------
 QList<QPair<double, double> >
 pqPipelineDisplay::getColorFieldRanges(const QString& array)
 {

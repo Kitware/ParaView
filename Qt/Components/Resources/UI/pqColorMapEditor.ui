@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>575</height>
+    <height>733</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -119,6 +119,26 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_2" >
+       <property name="text" >
+        <string>Component</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="Component" />
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QLabel" name="ColorLabel" >

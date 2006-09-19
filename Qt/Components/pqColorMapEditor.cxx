@@ -187,6 +187,9 @@ pqColorMapEditor::pqColorMapEditor(QWidget *widgetParent)
     this, SLOT(setScalarRangeMin(double)));
   QObject::connect(this->Form->ScalarRangeMax, SIGNAL(valueChanged(double)),
     this, SLOT(setScalarRangeMax(double)));
+
+  QObject::connect(this->Form->Component, SIGNAL(activated(int)),
+    this, SLOT(setComponent(int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -246,10 +249,41 @@ void pqColorMapEditor::updateEditor()
 void pqColorMapEditor::resetGUI()
 {
   this->Form->ColorScale->clearPoints();
+  this->Form->Component->clear();
   if (!this->LookupTable)
     {
     return;
     }
+  
+  this->Form->Component->setEnabled(true);
+  this->Form->Component->addItem("Magnitude", QVariant(-1));
+  int number_of_components = 
+    this->Form->Display->getColorFieldNumberOfComponents(
+      this->Form->Display->getColorField());
+  if (number_of_components == 1)
+    {
+    // Not a vector.
+    this->Form->Component->setCurrentIndex(0);
+    this->Form->Component->setEnabled(false);
+    }
+  else if (number_of_components <=3)
+    {
+    const char* titles[]={"X", "Y", "Z"};
+    for (int cc=0; cc < number_of_components; cc++)
+      {
+      this->Form->Component->addItem(titles[cc], QVariant(cc));
+      }
+    }
+  else
+    {
+    for (int cc=0; cc < number_of_components; cc++)
+      {
+      this->Form->Component->addItem(QString::number(cc), QVariant(cc));
+      }
+    }
+  int component_index = this->getComponent() + 1;
+  this->Form->Component->setCurrentIndex(component_index);
+
 
   // Set the resolution from the lookup table.
   int value = pqSMAdaptor::getElementProperty(
@@ -645,12 +679,10 @@ void pqColorMapEditor::setLockScalarRange(bool lock)
 void pqColorMapEditor::resetScalarRangeToCurrent()
 {
   QString colorField = this->Form->Display->getColorField();
-  QList<QPair<double, double> > ranges = 
-    this->Form->Display->getColorFieldRanges(colorField);
-  if (ranges.size() > 0)
-    {
-    this->setScalarRange(ranges[0].first, ranges[0].second);
-    }
+  int component_no = this->getComponent();
+  QPair<double, double> range = 
+    this->Form->Display->getColorFieldRange(colorField, component_no);
+  this->setScalarRange(range.first, range.second);
 }
 
 //-----------------------------------------------------------------------------
@@ -681,6 +713,30 @@ void pqColorMapEditor::setScalarRangeMax(double max)
 {
   double min = this->Form->ScalarRangeMin->value();
   this->setScalarRange(min, max);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::setComponent(int index)
+{
+  int component_no = this->Form->Component->itemData(index).toInt();
+  pqSMAdaptor::setEnumerationProperty(this->LookupTable->GetProperty("VectorMode"),
+    (component_no == -1)? "Magnitude" : "Component");
+  pqSMAdaptor::setElementProperty(this->LookupTable->GetProperty("VectorComponent"),
+    (component_no == -1)? 0 : component_no);
+  this->LookupTable->UpdateVTKObjects();
+  this->Form->Display->renderAllViews();
+}
+
+//-----------------------------------------------------------------------------
+int pqColorMapEditor::getComponent()
+{
+  if (pqSMAdaptor::getEnumerationProperty(
+      this->LookupTable->GetProperty("VectorMode")).toString() == "Magnitude")
+    {
+    return -1;
+    }
+  return pqSMAdaptor::getElementProperty(
+    this->LookupTable->GetProperty("VectorComponent")).toInt();
 }
 
 //-----------------------------------------------------------------------------
