@@ -70,6 +70,37 @@ public:
   vtkSmartPointer<vtkSMDataObjectDisplayProxy> DisplayProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   QPointer<pqPipelineSource> Input;
+
+  // Convenience method to get array information.
+  vtkPVArrayInformation* getArrayInformation(
+    const char* arrayname, int fieldType)
+    {
+    if (!arrayname || !arrayname[0] || !this->DisplayProxy)
+      {
+      return 0; 
+      }
+    vtkSMDataObjectDisplayProxy* displayProxy = this->DisplayProxy;
+    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+    if(!geomInfo)
+      {
+      return 0;
+      }
+
+    vtkPVArrayInformation* info = NULL;
+    if(fieldType == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+      {
+      vtkPVDataSetAttributesInformation* cellinfo = 
+        geomInfo->GetCellDataInformation();
+      info = cellinfo->GetArrayInformation(arrayname);
+      }
+    else
+      {
+      vtkPVDataSetAttributesInformation* pointinfo = 
+        geomInfo->GetPointDataInformation();
+      info = pointinfo->GetArrayInformation(arrayname);
+      }
+    return info;
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -266,6 +297,15 @@ void pqPipelineDisplay::setDefaultColorParametes()
 }
 
 //-----------------------------------------------------------------------------
+int pqPipelineDisplay::getNumberOfComponents(
+  const char* arrayname, int fieldtype)
+{
+  vtkPVArrayInformation* info = this->Internal->getArrayInformation(
+    arrayname, fieldtype);
+  return (info? info->GetNumberOfComponents() : 0);
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
 {
   vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
@@ -288,8 +328,10 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
 
   if (lut_mgr)
     {
+    int number_of_components = this->getNumberOfComponents(
+      arrayname, fieldtype);
     pqScalarsToColors* pqlut = lut_mgr->getLookupTable(
-      this->getServer(), arrayname, 0);
+      this->getServer(), arrayname, number_of_components, 0);
     lut = (pqlut)? pqlut->getProxy() : 0;
     }
   else
@@ -509,55 +551,39 @@ QList<QString> pqPipelineDisplay::getColorFields()
   return ret;
 }
 
+//-----------------------------------------------------------------------------
 QList<QPair<double, double> >
 pqPipelineDisplay::getColorFieldRanges(const QString& array)
 {
   QList<QPair<double,double> > ret;
   
-  vtkSMDisplayProxy* displayProxy = this->getDisplayProxy();
-
-  if(!displayProxy)
-    {
-    return ret;
-    }
-
-  vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
-  if(!geomInfo)
-    {
-    return ret;
-    }
-
   QString field = array;
-  vtkPVArrayInformation* info = NULL;
+  int fieldType;
 
   if(field == "Solid Color")
     {
     return ret;
     }
-  else
+  if(field.right(strlen(" (cell)")) == " (cell)")
     {
-    if(field.right(strlen(" (cell)")) == " (cell)")
+    field.chop(strlen(" (cell)"));
+    fieldType = vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA;
+    }
+  else if(field.right(strlen(" (point)")) == " (point)")
+    {
+    field.chop(strlen(" (point)"));
+    fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
+    }
+ 
+  vtkPVArrayInformation* info = this->Internal->getArrayInformation(
+    field.toAscii().data(), fieldType);
+  if(info)
+    {
+    double range[2];
+    for(int i=0; i<info->GetNumberOfComponents(); i++)
       {
-      field.chop(strlen(" (cell)"));
-      vtkPVDataSetAttributesInformation* cellinfo = 
-        geomInfo->GetCellDataInformation();
-      info = cellinfo->GetArrayInformation(field.toAscii().data());
-      }
-    else if(field.right(strlen(" (point)")) == " (point)")
-      {
-      field.chop(strlen(" (point)"));
-      vtkPVDataSetAttributesInformation* pointinfo = 
-        geomInfo->GetPointDataInformation();
-      info = pointinfo->GetArrayInformation(field.toAscii().data());
-      }
-    if(info)
-      {
-      double range[2];
-      for(int i=0; i<info->GetNumberOfComponents(); i++)
-        {
-        info->GetComponentRange(i, range);
-        ret.append(QPair<double,double>(range[0], range[1]));
-        }
+      info->GetComponentRange(i, range);
+      ret.append(QPair<double,double>(range[0], range[1]));
       }
     }
   return ret;

@@ -136,6 +136,8 @@ private:
     vtkPVDataSetAttributesInformation* attrInfo,
     vtkPVDataSetAttributesInformation* inAttrInfo,
     vtkPVArrayInformation*& arrayInfo);
+
+  int getNumberOfComponents(const char* arrayname, int fieldType);
 };
 
 #endif

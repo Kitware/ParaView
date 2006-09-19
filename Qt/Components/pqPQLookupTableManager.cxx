@@ -58,42 +58,51 @@ public:
       {
       this->ConnectionID = 0;
       this->Arrayname = "";
+      this->NumberOfComponents = 0;
       }
-    Key(vtkIdType cid, QString arrayname)
+    Key(vtkIdType cid, QString arrayname, int num)
       {
       this->ConnectionID = cid;
       this->Arrayname = arrayname;
+      this->NumberOfComponents = num;
       }
 
     bool operator<(const Key& k) const
       {
-      if (this->ConnectionID == k.ConnectionID)
+      if (this->NumberOfComponents == k.NumberOfComponents)
         {
-        return this->Arrayname < k.Arrayname;
+        if (this->ConnectionID == k.ConnectionID)
+          {
+          return this->Arrayname < k.Arrayname;
+          }
+        return (this->ConnectionID < k.ConnectionID);
         }
-      return (this->ConnectionID < k.ConnectionID);
+      return (this->NumberOfComponents < k.NumberOfComponents); 
       }
 
   private:
     vtkIdType ConnectionID;
     QString Arrayname;
+    int NumberOfComponents;
     };
 
   typedef QMap<Key, QPointer<pqScalarsToColors> > MapOfLUT;
   MapOfLUT LookupTables;
 
   QString getRegistrationName(const QString& arrayname, 
-    int vtkNotUsed(component)) const
+    int number_of_components, int vtkNotUsed(component)) const
     {
-    return arrayname;
+    return QString::number(number_of_components) + "." + arrayname;
     }
 
   Key getKey(vtkIdType cid, const QString& registration_name)
     {
-    QString arrayname = registration_name;
-    if (arrayname != "")
+    QRegExp rex ("(\\d+)\\.(.+)");
+    if (rex.exactMatch(registration_name))
       {
-      return Key(cid, arrayname);
+      int number_of_components = QVariant(rex.cap(1)).toInt();
+      QString arrayname = rex.cap(2);
+      return Key(cid, arrayname, number_of_components);
       }
     return Key();
     }
@@ -127,10 +136,10 @@ void pqPQLookupTableManager::onAddLookupTable(pqScalarsToColors* lut)
 
 //-----------------------------------------------------------------------------
 pqScalarsToColors* pqPQLookupTableManager::getLookupTable(pqServer* server,
-  const QString& arrayname,  int component)
+  const QString& arrayname,  int number_of_components, int component)
 {
   pqPQLookupTableManagerInternal::Key key(
-    server->GetConnectionID(), arrayname);
+    server->GetConnectionID(), arrayname, number_of_components);
 
   if (this->Internal->LookupTables.contains(key))
     {
@@ -138,18 +147,20 @@ pqScalarsToColors* pqPQLookupTableManager::getLookupTable(pqServer* server,
     }
 
   // Create a new lookuptable.
-  return this->createLookupTable(server, arrayname, component);
+  return this->createLookupTable(
+    server, arrayname, number_of_components, component);
 }
 
 //-----------------------------------------------------------------------------
 pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
-  const QString& arrayname, int component)
+  const QString& arrayname, int number_of_components, int component)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* lutProxy = 
     pxm->NewProxy("lookup_tables", "PVLookupTable");
   lutProxy->SetConnectionID(server->GetConnectionID());
-  QString name = this->Internal->getRegistrationName(arrayname, component);
+  QString name = this->Internal->getRegistrationName(
+    arrayname, number_of_components, component);
   // This will lead to the creation of pqScalarsToColors object
   // which this class will be intimated of (onAddLookupTable)
   // and our internal DS will be updated.
@@ -168,7 +179,7 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
   lutProxy->UpdateVTKObjects();
   lutProxy->InvokeCommand("Build");
   pqPQLookupTableManagerInternal::Key key(
-    server->GetConnectionID(), arrayname);
+    server->GetConnectionID(), arrayname, number_of_components);
   if (!this->Internal->LookupTables.contains(key))
     {
     qDebug() << "Creation of LUT failed!" ;

@@ -53,8 +53,8 @@ public:
   // Get a LookupTable for the array with name \c arrayname 
   // and component. component = -1 represents magnitude. Subclasses
   // can implemenent their own policy for managing lookup tables.
-  virtual pqScalarsToColors* getLookupTable(pqServer* server, const QString& arrayname,
-    int component) = 0;
+  virtual pqScalarsToColors* getLookupTable(pqServer* server, 
+    const QString& arrayname, int number_of_components, int component) = 0;
 
 public slots:
   // Called when any proxy is added. Subclasses can override

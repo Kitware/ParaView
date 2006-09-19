@@ -49,7 +49,7 @@ public:
   // This subclass associates a LUT with arrayname:component
   // pair. If  none exists, a new one will be created.
   pqScalarsToColors* getLookupTable(pqServer* server, const QString& arrayname,
-    int component);
+    int number_of_components, int component);
 public slots:
   // Called when a new LUT pq object is created. 
   // This happens as a result of either the GUI or python
@@ -62,7 +62,7 @@ public slots:
 protected:
   // creates a new LUT.
   pqScalarsToColors* createLookupTable(pqServer* server,
-  const QString& arrayname, int component);
+    const QString& arrayname, int number_of_components, int component);
 private:
   pqPQLookupTableManagerInternal* Internal;
 };
