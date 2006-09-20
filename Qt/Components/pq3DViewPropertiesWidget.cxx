@@ -241,6 +241,12 @@ void pq3DViewPropertiesWidgetInternal::loadValues(vtkSMProxy* proxy)
 //-----------------------------------------------------------------------------
 void pq3DViewPropertiesWidgetInternal::accept()
 {
+
+  if(!this->Proxy)
+    {
+    return;
+    }
+
   // We need to accept user changes.
   this->Links.accept();
 
