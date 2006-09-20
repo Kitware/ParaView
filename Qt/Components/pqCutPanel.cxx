@@ -58,15 +58,15 @@ QString pqCutPanelInterface::name() const
   return "Cut";
 }
 
-pqObjectPanel* pqCutPanelInterface::createPanel(pqProxy& proxy, QWidget* p)
+pqObjectPanel* pqCutPanelInterface::createPanel(pqProxy* proxy, QWidget* p)
 {
   return new pqCutPanel(proxy, p);
 }
 
-bool pqCutPanelInterface::canCreatePanel(pqProxy& proxy) const
+bool pqCutPanelInterface::canCreatePanel(pqProxy* proxy) const
 {
-  return (proxy.getProxy()->GetXMLName() == QString("Cut") 
-    && proxy.getProxy()->GetXMLGroup() == QString("filters"));
+  return (proxy->getProxy()->GetXMLName() == QString("Cut") 
+    && proxy->getProxy()->GetXMLGroup() == QString("filters"));
 }
 
 Q_EXPORT_PLUGIN(pqCutPanelInterface)
@@ -90,7 +90,7 @@ public:
   pqSampleScalarWidget SampleScalarWidget;
 };
 
-pqCutPanel::pqCutPanel(pqProxy& object_proxy, QWidget* p) :
+pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
   Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
@@ -128,27 +128,27 @@ pqCutPanel::pqCutPanel(pqProxy& object_proxy, QWidget* p) :
   connect(
     &this->Implementation->ImplicitPlaneWidget,
     SIGNAL(widgetChanged()),
-    &this->propertyManager(),
+    this->propertyManager(),
     SLOT(propertyChanged()));
     
   connect(
     &this->Implementation->SampleScalarWidget,
     SIGNAL(samplesChanged()),
-    &this->propertyManager(),
+    this->propertyManager(),
     SLOT(propertyChanged()));
   
   connect(
-    &this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
+    this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
     
   connect(
-    &this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
+    this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
 
   // Setup the implicit plane widget ...
-  pqProxy* reference_proxy = &this->proxy();
+  pqProxy* reference_proxy = this->proxy();
   pqSMProxy controlled_proxy = NULL;
    
   if(vtkSMProxyProperty* const cut_function_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy().getProxy()->GetProperty("CutFunction")))
+    this->proxy()->getProxy()->GetProperty("CutFunction")))
     {
     if (cut_function_property->GetNumberOfProxies() == 0)
       {
@@ -157,7 +157,7 @@ pqCutPanel::pqCutPanel(pqProxy& object_proxy, QWidget* p) :
       if (pld)
         {
         cut_function_property->AddProxy(pld->GetProxy(0));
-        this->proxy().getProxy()->UpdateVTKObjects();
+        this->proxy()->getProxy()->UpdateVTKObjects();
         }
       }
     controlled_proxy = cut_function_property->GetProxy(0);
@@ -184,8 +184,8 @@ pqCutPanel::pqCutPanel(pqProxy& object_proxy, QWidget* p) :
 
   // Setup the sample scalar widget ...
   this->Implementation->SampleScalarWidget.setDataSources(
-    this->proxy().getProxy(),
-    vtkSMDoubleVectorProperty::SafeDownCast(this->proxy().getProxy()->GetProperty("ContourValues")));
+    this->proxy()->getProxy(),
+    vtkSMDoubleVectorProperty::SafeDownCast(this->proxy()->getProxy()->GetProperty("ContourValues")));
 }
 
 pqCutPanel::~pqCutPanel()
@@ -200,7 +200,7 @@ void pqCutPanel::onAccepted()
       
   // If this is the first time we've been accepted since our creation, hide the source
   if(pqPipelineFilter* const pipeline_filter =
-    qobject_cast<pqPipelineFilter*>(&this->proxy()))
+    qobject_cast<pqPipelineFilter*>(this->proxy()))
     {
     if(0 == pipeline_filter->getDisplayCount())
       {

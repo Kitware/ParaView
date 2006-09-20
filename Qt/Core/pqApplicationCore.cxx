@@ -402,7 +402,7 @@ pqServerResources& pqApplicationCore::serverResources()
 {
   if(!this->Internal->ServerResources)
     {
-    this->Internal->ServerResources = new pqServerResources();
+    this->Internal->ServerResources = new pqServerResources(this);
     this->Internal->ServerResources->load(*this->settings());
     }
     
@@ -413,7 +413,7 @@ pqServerStartups& pqApplicationCore::serverStartups()
 {
   if(!this->Internal->ServerStartups)
     {
-    this->Internal->ServerStartups = new pqServerStartups();
+    this->Internal->ServerStartups = new pqServerStartups(this);
     
     // Load default settings ...
     QFile file(QApplication::applicationDirPath() + "/default_servers.pvsc");
@@ -456,13 +456,13 @@ pqSettings* pqApplicationCore::settings()
     if (options && options->GetDisableRegistry())
       {
       this->Internal->Settings = new pqSettings(this->Internal->OrganizationName,
-        this->Internal->ApplicationName + ".DisabledRegistry");
+        this->Internal->ApplicationName + ".DisabledRegistry", this);
       this->Internal->Settings->clear();
       }
     else
       {
       this->Internal->Settings = new pqSettings(this->Internal->OrganizationName,
-        this->Internal->ApplicationName);
+        this->Internal->ApplicationName, this);
       }
     }
   return this->Internal->Settings;

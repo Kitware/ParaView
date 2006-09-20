@@ -54,7 +54,7 @@ class QTWIDGETS_EXPORT pqViewMenu : public QObject
   Q_OBJECT
 
 public:
-  pqViewMenu(QMenu& menu);
+  pqViewMenu(QMenu& menu, QObject* p=0);
   ~pqViewMenu();
 
   /// \brief

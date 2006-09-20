@@ -47,16 +47,13 @@ class pqObjectPanel : public QWidget
   Q_OBJECT
 public:
   /// constructor
-  pqObjectPanel(pqProxy& proxy, QWidget* p);
+  pqObjectPanel(pqProxy* proxy, QWidget* p);
   /// destructor
   ~pqObjectPanel();
 
   /// get the proxy for which properties are displayed
-  pqProxy& proxy();
+  pqProxy* proxy();
   
-  /// property manager
-  pqPropertyManager& propertyManager();
-
   /// get the render module that this object panel works with
   pqRenderModule* renderModule();
   
@@ -90,6 +87,10 @@ signals:
   void onselect();
   void ondeselect();
   void renderModuleChanged(pqRenderModule*);
+
+protected:
+  /// property manager belongs to this panel
+  pqPropertyManager* propertyManager();
 
 private:
   class pqImplementation;

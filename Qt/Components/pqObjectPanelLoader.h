@@ -51,7 +51,7 @@ public:
   ~pqObjectPanelLoader();
 
   /// create a widget from a plugin
-  pqObjectPanel* createPanel(pqProxy& proxy,
+  pqObjectPanel* createPanel(pqProxy* proxy,
                               QWidget* parent = 0);
 
   QStringList availableWidgets() const;

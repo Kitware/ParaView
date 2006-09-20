@@ -59,15 +59,15 @@ QString pqClipPanelInterface::name() const
   return "Clip";
 }
 
-pqObjectPanel* pqClipPanelInterface::createPanel(pqProxy& proxy, QWidget* p)
+pqObjectPanel* pqClipPanelInterface::createPanel(pqProxy* proxy, QWidget* p)
 {
   return new pqClipPanel(proxy, p);
 }
  
-bool pqClipPanelInterface::canCreatePanel(pqProxy& proxy) const
+bool pqClipPanelInterface::canCreatePanel(pqProxy* proxy) const
 {
-  return (QString("filters") == proxy.getProxy()->GetXMLGroup() &&
-    QString("Clip") == proxy.getProxy()->GetXMLName());
+  return (QString("filters") == proxy->getProxy()->GetXMLGroup() &&
+    QString("Clip") == proxy->getProxy()->GetXMLName());
 }
 
 Q_EXPORT_PLUGIN(pqClipPanelInterface)
@@ -91,7 +91,7 @@ public:
   pqImplicitPlaneWidget ImplicitPlaneWidget;
 };
 
-pqClipPanel::pqClipPanel(pqProxy& object_proxy, QWidget* p) :
+pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
   Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
@@ -115,14 +115,14 @@ pqClipPanel::pqClipPanel(pqProxy& object_proxy, QWidget* p) :
                    SLOT(setRenderModule(pqRenderModule*)));
 
   connect(&this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onWidgetChanged()));
-  connect(&this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
-  connect(&this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
+  connect(this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
+  connect(this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
 
-  pqProxy* reference_proxy = &this->proxy();
+  pqProxy* reference_proxy = this->proxy();
   vtkSMProxy* controlled_proxy = NULL;
    
   if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy().getProxy()->GetProperty("ClipFunction")))
+    this->proxy()->getProxy()->GetProperty("ClipFunction")))
     {
     if (clip_function_property->GetNumberOfProxies() == 0)
       {
@@ -131,7 +131,7 @@ pqClipPanel::pqClipPanel(pqProxy& object_proxy, QWidget* p) :
       if (pld)
         {
         clip_function_property->AddProxy(pld->GetProxy(0));
-        this->proxy().getProxy()->UpdateVTKObjects();
+        this->proxy()->getProxy()->UpdateVTKObjects();
         }
       }
     controlled_proxy = clip_function_property->GetProxy(0);
@@ -156,10 +156,10 @@ pqClipPanel::pqClipPanel(pqProxy& object_proxy, QWidget* p) :
       }
     }
 
-  this->propertyManager().registerLink(
+  this->propertyManager()->registerLink(
     &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
-    this->proxy().getProxy(), 
-    this->proxy().getProxy()->GetProperty("InsideOut"));
+    this->proxy()->getProxy(), 
+    this->proxy()->getProxy()->GetProperty("InsideOut"));
 }
 
 pqClipPanel::~pqClipPanel()
@@ -170,7 +170,7 @@ pqClipPanel::~pqClipPanel()
 void pqClipPanel::onWidgetChanged()
 {
   // Signal the UI that there are changes to accept/reject ...
-  this->propertyManager().propertyChanged();
+  this->propertyManager()->propertyChanged();
 }
 
 void pqClipPanel::onAccepted()
@@ -179,7 +179,7 @@ void pqClipPanel::onAccepted()
 
   // If this is the first time we've been accepted since our creation, hide the source
   if(pqPipelineFilter* const pipeline_filter = 
-           qobject_cast<pqPipelineFilter*>(&this->proxy()))
+           qobject_cast<pqPipelineFilter*>(this->proxy()))
     {
     if(0 == pipeline_filter->getDisplayCount())
       {

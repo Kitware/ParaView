@@ -47,9 +47,9 @@ public:
   virtual ~pqObjectPanelInterface() {}
 
   /// Returns true if this panel can be created for the given the proxy.
-  virtual bool canCreatePanel(pqProxy& proxy) const = 0;
+  virtual bool canCreatePanel(pqProxy* proxy) const = 0;
   /// Creates a panel for the given proxy
-  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p) = 0;
+  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p) = 0;
 
   virtual QString name() const = 0;
 };

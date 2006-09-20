@@ -65,8 +65,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqViewMenu::pqViewMenu(QMenu& menu) :
-  Implementation(new pqImplementation(menu))
+pqViewMenu::pqViewMenu(QMenu& menu, QObject* p) :
+  QObject(p), Implementation(new pqImplementation(menu))
 {
 }
 

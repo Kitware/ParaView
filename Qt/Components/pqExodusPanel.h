@@ -45,7 +45,7 @@ class pqExodusPanel :
   Q_OBJECT
 public:
   /// constructor
-  pqExodusPanel(pqProxy& proxy, QWidget* p = NULL);
+  pqExodusPanel(pqProxy* proxy, QWidget* p = NULL);
   /// destructor
   ~pqExodusPanel();
 
@@ -73,8 +73,6 @@ protected slots:
 protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
-  /// set the properties in the server manager with properties in the widgets
-  virtual void unlinkServerManagerProperties();
 
   static QString formatDataFor(vtkPVArrayInformation* ai);
 
@@ -91,8 +89,8 @@ class pqExodusPanelInterface : public QObject, public pqObjectPanelInterface
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   virtual QString name() const;
-  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p);
-  virtual bool canCreatePanel(pqProxy& proxy) const;
+  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy* proxy) const;
 };
 
 #endif

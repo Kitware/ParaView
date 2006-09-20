@@ -42,7 +42,7 @@ class pqCalculatorPanel : public pqObjectPanel
   Q_OBJECT
 public:
   /// constructor
-  pqCalculatorPanel(pqProxy& proxy, QWidget* p = 0);
+  pqCalculatorPanel(pqProxy* proxy, QWidget* p = 0);
   /// destructor
   ~pqCalculatorPanel();
 
@@ -76,8 +76,8 @@ class pqCalculatorPanelInterface : public QObject, public pqObjectPanelInterface
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   virtual QString name() const;
-  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p);
-  virtual bool canCreatePanel(pqProxy& proxy) const;
+  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy* proxy) const;
 };
 
 #endif

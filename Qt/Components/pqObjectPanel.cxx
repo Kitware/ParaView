@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqObjectPanel::pqImplementation
 {
 public:
-  pqImplementation(pqProxy& proxy) :
+  pqImplementation(pqProxy* proxy) :
     Proxy(proxy)
   {
   }
@@ -69,24 +69,29 @@ public:
     delete this->PropertyManager;
   }
   
-  pqProxy& Proxy;
+  pqProxy* Proxy;
   pqPropertyManager* PropertyManager;
   QPointer<pqRenderModule> RenderModule;
 };
 
 //-----------------------------------------------------------------------------
-pqObjectPanel::pqObjectPanel(pqProxy& object_proxy, QWidget* p) :
+pqObjectPanel::pqObjectPanel(pqProxy* object_proxy, QWidget* p) :
   QWidget(p),
   Implementation(new pqImplementation(object_proxy))
 {
   this->Implementation->PropertyManager = new pqPropertyManager(this);
 
-  this->Implementation->Proxy.getProxy()->UpdateVTKObjects();
-  this->Implementation->Proxy.getProxy()->UpdatePropertyInformation();
+  QObject::connect(this->Implementation->PropertyManager,
+                   SIGNAL(canAcceptOrReject(bool)),
+                   this,
+                   SIGNAL(canAcceptOrReject(bool)));
+
+  this->Implementation->Proxy->getProxy()->UpdateVTKObjects();
+  this->Implementation->Proxy->getProxy()->UpdatePropertyInformation();
   vtkSMSourceProxy* sp;
   vtkSMCompoundProxy* cp;
-  sp = vtkSMSourceProxy::SafeDownCast(this->Implementation->Proxy.getProxy());
-  cp = vtkSMCompoundProxy::SafeDownCast(this->Implementation->Proxy.getProxy());
+  sp = vtkSMSourceProxy::SafeDownCast(this->Implementation->Proxy->getProxy());
+  cp = vtkSMCompoundProxy::SafeDownCast(this->Implementation->Proxy->getProxy());
   if(sp)
     {
     sp->UpdatePipelineInformation();
@@ -116,14 +121,14 @@ pqObjectPanel::~pqObjectPanel()
 }
 
 //-----------------------------------------------------------------------------
-pqProxy& pqObjectPanel::proxy()
+pqProxy* pqObjectPanel::proxy()
 {
   return this->Implementation->Proxy;
 }
 
-pqPropertyManager& pqObjectPanel::propertyManager()
+pqPropertyManager* pqObjectPanel::propertyManager()
 {
-  return *this->Implementation->PropertyManager;
+  return this->Implementation->PropertyManager;
 }
 
 pqRenderModule* pqObjectPanel::renderModule()
@@ -162,7 +167,7 @@ void pqObjectPanel::accept()
 /// editor will query properties from the server manager
 void pqObjectPanel::reset()
 {
-  this->Implementation->Proxy.getProxy()->UpdatePropertyInformation();
+  this->Implementation->Proxy->getProxy()->UpdatePropertyInformation();
   this->Implementation->PropertyManager->reject();
   emit this->onreset();
 }

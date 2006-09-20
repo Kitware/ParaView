@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /// constructor
-pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, pqProxy& object_proxy, QWidget* p)
+pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, pqProxy* object_proxy, QWidget* p)
   : pqNamedObjectPanel(object_proxy, p)
 {
   QBoxLayout* mainlayout = new QVBoxLayout(this);
@@ -69,7 +69,6 @@ pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, pqProxy& obje
 /// destructor
 pqLoadedFormObjectPanel::~pqLoadedFormObjectPanel()
 {
-  this->unlinkServerManagerProperties();
 }
 
 bool pqLoadedFormObjectPanel::isValid()

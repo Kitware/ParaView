@@ -67,15 +67,15 @@ QString pqStreamTracerPanelInterface::name() const
   return "StreamTracer";
 }
 
-pqObjectPanel* pqStreamTracerPanelInterface::createPanel(pqProxy& proxy, QWidget* p)
+pqObjectPanel* pqStreamTracerPanelInterface::createPanel(pqProxy* proxy, QWidget* p)
 {
   return new pqStreamTracerPanel(proxy, p);
 }
 
-bool pqStreamTracerPanelInterface::canCreatePanel(pqProxy& proxy) const
+bool pqStreamTracerPanelInterface::canCreatePanel(pqProxy* proxy) const
 {
-  return (QString("filters") == proxy.getProxy()->GetXMLGroup() &&
-    QString("StreamTracer") == proxy.getProxy()->GetXMLName());
+  return (QString("filters") == proxy->getProxy()->GetXMLGroup() &&
+    QString("StreamTracer") == proxy->getProxy()->GetXMLName());
 }
 
 Q_EXPORT_PLUGIN(pqStreamTracerPanelInterface)
@@ -109,7 +109,7 @@ public:
   Ui::pqStreamTracerPanel UI;
 };
 
-pqStreamTracerPanel::pqStreamTracerPanel(pqProxy& object_proxy, QWidget* p) :
+pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
@@ -144,13 +144,13 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy& object_proxy, QWidget* p) :
   QObject::connect(
     this->Implementation->PointSourceWidget,
     SIGNAL(widgetChanged()),
-    &this->propertyManager(),
+    this->propertyManager(),
     SLOT(propertyChanged()));
 
   QObject::connect(
     this->Implementation->LineSourceWidget,
     SIGNAL(widgetChanged()),
-    &this->propertyManager(),
+    this->propertyManager(),
     SLOT(propertyChanged()));
   
   QObject::connect(
@@ -176,7 +176,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy& object_proxy, QWidget* p) :
   
   if(vtkSMProxyProperty* const input_property =
     vtkSMProxyProperty::SafeDownCast(
-      this->proxy().getProxy()->GetProperty("Input")))
+      this->proxy()->getProxy()->GetProperty("Input")))
     {
     if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
       input_property->GetProxy(0)))
@@ -195,7 +195,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy& object_proxy, QWidget* p) :
     }
       
   if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy().getProxy()->GetProperty("Source")))
+    this->proxy()->getProxy()->GetProperty("Source")))
     {
     // Setup initial defaults for our seed sources ...  
     const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
@@ -269,7 +269,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy& object_proxy, QWidget* p) :
     }
 
   pqNamedWidgets::link(
-    &this->Implementation->UIContainer, this->proxy().getProxy(), &this->propertyManager());
+    &this->Implementation->UIContainer, this->proxy()->getProxy(), this->propertyManager());
 }
 
 pqStreamTracerPanel::~pqStreamTracerPanel()
@@ -281,7 +281,7 @@ void pqStreamTracerPanel::onRenderModuleChanged(pqRenderModule* render_module)
 {
   // Setup widgets for each available source ...
   if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy().getProxy()->GetProperty("Source")))
+    this->proxy()->getProxy()->GetProperty("Source")))
     {
     const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
     
@@ -293,7 +293,7 @@ void pqStreamTracerPanel::onRenderModuleChanged(pqRenderModule* render_module)
       if(source->GetVTKClassName() == QString("vtkPointSource"))
         {
         this->Implementation->PointSourceWidget->setReferenceProxy(
-          &this->proxy());
+          this->proxy());
         this->Implementation->PointSourceWidget->setControlledProxy(
           source);
         this->Implementation->PointSourceWidget->setRenderModule(render_module);
@@ -317,7 +317,7 @@ void pqStreamTracerPanel::onRenderModuleChanged(pqRenderModule* render_module)
       // Setup the line widget ...
       else if(source->GetVTKClassName() == QString("vtkLineSource"))
         {
-        this->Implementation->LineSourceWidget->setReferenceProxy(&this->proxy());
+        this->Implementation->LineSourceWidget->setReferenceProxy(this->proxy());
         this->Implementation->LineSourceWidget->setControlledProxy(source);
         this->Implementation->LineSourceWidget->setRenderModule(render_module);
         
@@ -348,7 +348,7 @@ void pqStreamTracerPanel::onSeedTypeChanged(int type)
 void pqStreamTracerPanel::onUsePointSource()
 {
   if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy().getProxy()->GetProperty("Source")))
+    this->proxy()->getProxy()->GetProperty("Source")))
     {
     const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
     for(int i = 0; i != sources.size(); ++i)
@@ -360,7 +360,7 @@ void pqStreamTracerPanel::onUsePointSource()
         this->Implementation->LineSourceWidget->setWidgetVisible(false);
         source_property->RemoveAllProxies();
         source_property->AddProxy(source);
-        this->proxy().getProxy()->UpdateVTKObjects();
+        this->proxy()->getProxy()->UpdateVTKObjects();
         pqApplicationCore::instance()->render();
         break;
         }
@@ -371,7 +371,7 @@ void pqStreamTracerPanel::onUsePointSource()
 void pqStreamTracerPanel::onUseLineSource()
 {
   if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy().getProxy()->GetProperty("Source")))
+    this->proxy()->getProxy()->GetProperty("Source")))
     {
     const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
     for(int i = 0; i != sources.size(); ++i)
@@ -383,7 +383,7 @@ void pqStreamTracerPanel::onUseLineSource()
         this->Implementation->LineSourceWidget->setWidgetVisible(true);
         source_property->RemoveAllProxies();
         source_property->AddProxy(source);
-        this->proxy().getProxy()->UpdateVTKObjects();
+        this->proxy()->getProxy()->UpdateVTKObjects();
         pqApplicationCore::instance()->render();
         break;
         }

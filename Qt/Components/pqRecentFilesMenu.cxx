@@ -84,8 +84,8 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // pqRecentFilesMenu
 
-pqRecentFilesMenu::pqRecentFilesMenu(QMenu& menu) :
-  Implementation(new pqImplementation(menu))
+pqRecentFilesMenu::pqRecentFilesMenu(QMenu& menu, QObject* p) :
+  QObject(p), Implementation(new pqImplementation(menu))
 {
   connect(
     &pqApplicationCore::instance()->serverResources(),

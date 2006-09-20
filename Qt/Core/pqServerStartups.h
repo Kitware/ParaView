@@ -50,7 +50,7 @@ class PQCORE_EXPORT pqServerStartups :
   Q_OBJECT
 
 public:
-  pqServerStartups();
+  pqServerStartups(QObject* p);
   ~pqServerStartups();
 
   /// Defines a collection of startups

@@ -41,7 +41,7 @@ class pqLoadedFormObjectPanel : public pqNamedObjectPanel
   Q_OBJECT
 public:
   /// constructor
-  pqLoadedFormObjectPanel(QString filename, pqProxy& proxy, QWidget* p);
+  pqLoadedFormObjectPanel(QString filename, pqProxy* proxy, QWidget* p);
   /// destructor
   ~pqLoadedFormObjectPanel();
 

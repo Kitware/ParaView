@@ -47,7 +47,7 @@ class pqCutPanel :
   Q_OBJECT
 
 public:
-  pqCutPanel(pqProxy& proxy, QWidget* p);
+  pqCutPanel(pqProxy* proxy, QWidget* p);
   ~pqCutPanel();
 
   pqImplicitPlaneWidget* getImplicitPlaneWidget();
@@ -73,8 +73,8 @@ class pqCutPanelInterface : public QObject, public pqObjectPanelInterface
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   virtual QString name() const;
-  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p);
-  virtual bool canCreatePanel(pqProxy& proxy) const;
+  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy* proxy) const;
 };
 
 #endif

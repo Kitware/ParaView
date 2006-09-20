@@ -44,7 +44,7 @@ class pqThresholdPanel :
   Q_OBJECT
 public:
   /// constructor
-  pqThresholdPanel(pqProxy& proxy, QWidget* p = NULL);
+  pqThresholdPanel(pqProxy* proxy, QWidget* p = NULL);
   /// destructor
   ~pqThresholdPanel();
 
@@ -60,8 +60,6 @@ protected slots:
 protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
-  /// set the properties in the server manager with properties in the widgets
-  virtual void unlinkServerManagerProperties();
 
   QSlider* LowerSlider;
   QSlider* UpperSlider;
@@ -78,8 +76,8 @@ class pqThresholdPanelInterface : public QObject, public pqObjectPanelInterface
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   virtual QString name() const;
-  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p);
-  virtual bool canCreatePanel(pqProxy& proxy) const; 
+  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy* proxy) const; 
 };
 
 #endif

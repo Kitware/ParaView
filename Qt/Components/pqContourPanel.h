@@ -46,7 +46,7 @@ class pqContourPanel :
   Q_OBJECT
 
 public:
-  pqContourPanel(pqProxy& proxy, QWidget* p);
+  pqContourPanel(pqProxy* proxy, QWidget* p);
   ~pqContourPanel();
   
 private slots:
@@ -67,8 +67,8 @@ class pqContourPanelInterface : public QObject, public pqObjectPanelInterface
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   virtual QString name() const;
-  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p);
-  virtual bool canCreatePanel(pqProxy& proxy) const;
+  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy* proxy) const;
 };
 
 #endif

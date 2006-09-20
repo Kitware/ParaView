@@ -46,15 +46,13 @@ class pqNamedObjectPanel : public pqObjectPanel
   
 public:
   /// constructor
-  pqNamedObjectPanel(pqProxy& proxy, QWidget* p);
+  pqNamedObjectPanel(pqProxy* proxy, QWidget* p);
   /// destructor
   ~pqNamedObjectPanel();
 
 protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
-  /// set the properties in the server manager with properties in the widgets
-  virtual void unlinkServerManagerProperties();
 };
 
 #endif

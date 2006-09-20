@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqRecentFilesMenu :
 
 public:
   /// Assigns the menu that will display the list of files
-  pqRecentFilesMenu(QMenu& menu);
+  pqRecentFilesMenu(QMenu& menu, QObject* p=0);
 
 private slots:
   void onResourcesChanged();

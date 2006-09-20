@@ -68,8 +68,8 @@ private:
   const pqServerResource& Resource;
 };
 
-pqServerResources::pqServerResources() :
-  Implementation(new pqImplementation())
+pqServerResources::pqServerResources(QObject* p) :
+  QObject(p), Implementation(new pqImplementation())
 {
 }
 

@@ -53,7 +53,7 @@ class PQCORE_EXPORT pqServerResources :
   Q_OBJECT
 
 public:
-  pqServerResources();
+  pqServerResources(QObject* p);
   ~pqServerResources();
 
   /// Defines an ordered collection of resources

@@ -63,7 +63,7 @@ pqObjectPanelLoader::~pqObjectPanelLoader()
 {
 }
   
-pqObjectPanel* pqObjectPanelLoader::createPanel(pqProxy& proxy, QWidget* p)
+pqObjectPanel* pqObjectPanelLoader::createPanel(pqProxy* proxy, QWidget* p)
 {
   foreach(pqObjectPanelInterface* i, this->PanelPlugins)
     {

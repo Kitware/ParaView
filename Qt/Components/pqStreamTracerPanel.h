@@ -45,7 +45,7 @@ class pqStreamTracerPanel :
   Q_OBJECT
 
 public:
-  pqStreamTracerPanel(pqProxy& proxy, QWidget* p);
+  pqStreamTracerPanel(pqProxy* proxy, QWidget* p);
   ~pqStreamTracerPanel();
   
 private slots:
@@ -67,8 +67,8 @@ class pqStreamTracerPanelInterface : public QObject, public pqObjectPanelInterfa
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   virtual QString name() const;
-  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p);
-  virtual bool canCreatePanel(pqProxy& proxy) const;
+  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy* proxy) const;
 };
 
 #endif

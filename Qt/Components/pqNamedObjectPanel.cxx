@@ -35,22 +35,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
 
-pqNamedObjectPanel::pqNamedObjectPanel(pqProxy& object_proxy, QWidget* p) :
+pqNamedObjectPanel::pqNamedObjectPanel(pqProxy* object_proxy, QWidget* p) :
   pqObjectPanel(object_proxy, p)
 {
 }
 
 pqNamedObjectPanel::~pqNamedObjectPanel()
 {
-  pqNamedWidgets::unlink(this, this->proxy().getProxy(), &this->propertyManager());
+  pqNamedWidgets::unlink(this, this->proxy()->getProxy(), this->propertyManager());
 }
 
 void pqNamedObjectPanel::linkServerManagerProperties()
 {
-  pqNamedWidgets::link(this, this->proxy().getProxy(), &this->propertyManager());
+  pqNamedWidgets::link(this, this->proxy()->getProxy(), this->propertyManager());
 }
 
-void pqNamedObjectPanel::unlinkServerManagerProperties()
-{
-  pqNamedWidgets::unlink(this, this->proxy().getProxy(), &this->propertyManager());
-}

@@ -48,7 +48,8 @@ class PQCORE_EXPORT pqSettings :
   Q_OBJECT
 
 public:
-  pqSettings(const QString& organization, const QString& application);
+  pqSettings(const QString& organization, const QString& application,
+             QObject* p);
 };
 
 #endif

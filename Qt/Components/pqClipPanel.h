@@ -45,7 +45,7 @@ class pqClipPanel :
   Q_OBJECT
 
 public:
-  pqClipPanel(pqProxy& proxy, QWidget* p);
+  pqClipPanel(pqProxy* proxy, QWidget* p);
   ~pqClipPanel();
   
 private slots:
@@ -71,8 +71,8 @@ class pqClipPanelInterface : public QObject, public pqObjectPanelInterface
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   virtual QString name() const;
-  virtual pqObjectPanel* createPanel(pqProxy& proxy, QWidget* p);
-  virtual bool canCreatePanel(pqProxy& proxy) const;
+  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy* proxy) const;
 };
 
 #endif

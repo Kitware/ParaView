@@ -96,6 +96,7 @@ pqDisplayColorWidget::~pqDisplayColorWidget()
   delete this->Variables;
   delete this->CellDataIcon;
   delete this->PointDataIcon;
+  delete this->SolidColorIcon;
   
   this->Layout = 0;
   this->Variables = 0;

@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSettings.h>
 
 //-----------------------------------------------------------------------------
-pqSettings::pqSettings(const QString& organization, const QString& application) :
-  QSettings(organization, application)
+pqSettings::pqSettings(const QString& organization, 
+                       const QString& application,
+                       QObject* p) :
+  QSettings(organization, application, p)
 {
 }

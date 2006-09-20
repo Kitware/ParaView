@@ -87,8 +87,8 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // pqServerStartups
 
-pqServerStartups::pqServerStartups() :
-  Implementation(new pqImplementation())
+pqServerStartups::pqServerStartups(QObject* p) :
+  QObject(p), Implementation(new pqImplementation())
 {
 }
 

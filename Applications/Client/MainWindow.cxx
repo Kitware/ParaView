@@ -92,9 +92,11 @@ MainWindow::MainWindow() :
 {
   this->Implementation->UI.setupUi(this);
   
-  this->Implementation->RecentFilesMenu = new pqRecentFilesMenu(*this->Implementation->UI.menuRecentFiles);
+  this->Implementation->RecentFilesMenu = new
+    pqRecentFilesMenu(*this->Implementation->UI.menuRecentFiles, this);
   
-  this->Implementation->ViewMenu = new pqViewMenu(*this->Implementation->UI.menuView);
+  this->Implementation->ViewMenu = new
+    pqViewMenu(*this->Implementation->UI.menuView, this);
   this->Implementation->ToolbarsMenu = new pqViewMenu(*this->Implementation->UI.menuToolbars);
 
   this->setWindowTitle(

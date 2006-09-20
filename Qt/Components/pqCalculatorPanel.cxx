@@ -62,15 +62,15 @@ QString pqCalculatorPanelInterface::name() const
   return "Calculator";
 }
 
-pqObjectPanel* pqCalculatorPanelInterface::createPanel(pqProxy& object_proxy, QWidget* p)
+pqObjectPanel* pqCalculatorPanelInterface::createPanel(pqProxy* object_proxy, QWidget* p)
 {
   return new pqCalculatorPanel(object_proxy, p);
 }
 
-bool pqCalculatorPanelInterface::canCreatePanel(pqProxy& proxy) const
+bool pqCalculatorPanelInterface::canCreatePanel(pqProxy* proxy) const
 {
-  return (proxy.getProxy()->GetXMLName() == QString("Calculator") 
-    && proxy.getProxy()->GetXMLGroup() == QString("filters"));
+  return (proxy->getProxy()->GetXMLName() == QString("Calculator") 
+    && proxy->getProxy()->GetXMLGroup() == QString("filters"));
 }
 Q_EXPORT_PLUGIN(pqCalculatorPanelInterface)
 Q_IMPORT_PLUGIN(pqCalculatorPanelInterface)
@@ -86,7 +86,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /// constructor
-pqCalculatorPanel::pqCalculatorPanel(pqProxy& pxy, QWidget* p) :
+pqCalculatorPanel::pqCalculatorPanel(pqProxy* pxy, QWidget* p) :
   pqObjectPanel(pxy, p)
 {
   this->Internal = new pqInternal(this);
@@ -221,12 +221,12 @@ void pqCalculatorPanel::accept()
 {
   this->pqObjectPanel::accept();
 
-  if(!this->proxy().getProxy())
+  if(!this->proxy()->getProxy())
     {
     return;
     }
 
-  vtkSMProxy* CalcProxy = this->proxy().getProxy();
+  vtkSMProxy* CalcProxy = this->proxy()->getProxy();
 
   int mode = this->Internal->AttributeMode->currentText() == 
              "Point Data" ? 1 : 2;
@@ -360,7 +360,7 @@ void pqCalculatorPanel::reset()
 {
   this->pqObjectPanel::reset();
   
-  vtkSMProxy* CalcProxy = this->proxy().getProxy();
+  vtkSMProxy* CalcProxy = this->proxy()->getProxy();
 
 
   // restore the function
@@ -414,7 +414,7 @@ void pqCalculatorPanel::updateVariables(const QString& mode)
     }
 
   vtkPVDataSetAttributesInformation* fdi = NULL;
-  pqPipelineFilter* f = qobject_cast<pqPipelineFilter*>(&this->proxy());
+  pqPipelineFilter* f = qobject_cast<pqPipelineFilter*>(this->proxy());
   if(!f)
     {
     return;
