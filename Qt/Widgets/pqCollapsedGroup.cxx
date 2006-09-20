@@ -188,22 +188,20 @@ void pqCollapsedGroup::paintEvent(QPaintEvent*)
   button_options.initFrom(this);
   button_options.features = QStyleOptionButton::None;
   button_options.rect = button_rect;
-
   button_options.state = QStyle::State_Enabled;
 
-  if(this->Implementation->Inside && !this->Implementation->Pressed)
-    button_options.state |= QStyle::State_MouseOver;
-/*
-  else
-    button_options.state &= ~QStyle::State_Default;
-*/
+  if(this->Implementation->Inside)
+    {
+    if(!this->Implementation->Pressed)
+      button_options.state |= QStyle::State_MouseOver;
 
-  if(this->Implementation->Pressed && this->Implementation->Inside)
-    button_options.state |= QStyle::State_Sunken;
-  else
-    button_options.state |= QStyle::State_Raised;
+    if(this->Implementation->Pressed)
+      button_options.state |= QStyle::State_Sunken;
+    else
+      button_options.state |= QStyle::State_Raised;
 
-  painter.drawControl(QStyle::CE_PushButton, button_options);
+    painter.drawControl(QStyle::CE_PushButton, button_options);
+    }
 
   const int icon_size = 9; // hardcoded in qcommonstyle.cpp
 
