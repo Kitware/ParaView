@@ -80,6 +80,55 @@ public:
     }
   }
   
+  static QDomElement save(QDomDocument& xml, const QString& name, pqServerStartup& startup)
+  {
+    QDomElement xml_server = xml.createElement("Server");
+
+    QDomAttr xml_server_name = xml.createAttribute("name");
+    xml_server_name.setValue(name);
+    xml_server.setAttributeNode(xml_server_name);
+
+    QDomAttr xml_server_resource = xml.createAttribute("resource");
+    xml_server_resource.setValue(startup.getServer().toString());
+    xml_server.setAttributeNode(xml_server_resource);
+
+    QDomAttr xml_server_owner = xml.createAttribute("owner");
+    xml_server_owner.setValue(startup.getOwner());
+    xml_server.setAttributeNode(xml_server_owner);
+
+    xml_server.appendChild(xml.importNode(startup.getConfiguration().documentElement(), true));
+    
+    return xml_server;
+  }
+  
+  static pqServerStartup* load(QDomElement xml_server)
+  {
+    const QString name = xml_server.toElement().attribute("name");
+  
+    const pqServerResource server =
+      pqServerResource(xml_server.toElement().attribute("resource"));
+      
+    const QString owner = xml_server.toElement().attribute("owner");
+
+    for(QDomNode xml_startup = xml_server.firstChild(); !xml_startup.isNull(); xml_startup = xml_startup.nextSibling())
+      {
+      if(xml_startup.isElement() && xml_startup.toElement().tagName() == "ManualStartup")
+        {
+        QDomDocument xml;
+        xml.appendChild(xml.importNode(xml_startup, true));
+        return new pqManualServerStartup(name, server, owner, xml);
+        }
+      else if(xml_startup.isElement() && xml_startup.toElement().tagName() == "CommandStartup")
+        {
+        QDomDocument xml;
+        xml.appendChild(xml.importNode(xml_startup, true));
+        return new pqCommandServerStartup(name, server, owner, xml);
+        }
+      }
+
+    return 0;
+  }
+
   typedef vtkstd::map<QString, pqServerStartup*> StartupsT;
   StartupsT Startups;
 };
@@ -213,7 +262,7 @@ void pqServerStartups::deleteStartups(const StartupsT& startups)
 
 void pqServerStartups::save(pqSettings& settings) const
 {
-  settings.remove("ServerStartups");
+  settings.remove("Servers");
 
   for(
     pqImplementation::StartupsT::iterator i = this->Implementation->Startups.begin();
@@ -222,33 +271,16 @@ void pqServerStartups::save(pqSettings& settings) const
     {
     const QString name = i->first;
     const QString owner = i->second->getOwner();
-    const pqServerResource server = i->second->getServer();
     pqServerStartup* const startup = i->second;
 
     if(owner != "user")
       continue;
 
-    QString encoded_server = server.toString();
-    encoded_server.replace("/", "|");
-    
-    const QString server_key = "ServerStartups/" + name;
-    if(dynamic_cast<pqManualServerStartup*>(startup))
-      {
-      settings.setValue(server_key + "/type", "manual");
-      settings.setValue(server_key + "/server", encoded_server);
-      settings.setValue(server_key + "/owner", owner);
-      }
-    else if(pqCommandServerStartup* const command_startup =
-      dynamic_cast<pqCommandServerStartup*>(startup))
-      {
-      settings.setValue(server_key + "/type", "command");
-      settings.setValue(server_key + "/server", encoded_server);
-      settings.setValue(server_key + "/owner", owner);
-      settings.setValue(server_key + "/executable", command_startup->getExecutable());
-      settings.setValue(server_key + "/timeout", command_startup->getTimeout());
-      settings.setValue(server_key + "/delay", command_startup->getDelay());
-      settings.setValue(server_key + "/arguments", command_startup->getArguments());
-      }
+    QDomDocument xml;
+    xml.appendChild(pqImplementation::save(xml, name, *startup));
+
+    const QString server_key = "Servers/" + name;
+    settings.setValue(server_key, xml.toByteArray().data());
     }
 }
 
@@ -264,52 +296,27 @@ void pqServerStartups::save(QDomDocument& xml) const
     {
     const QString startup_name = startup->first;
     pqServerStartup* const startup_command = startup->second;
-
-    QDomElement xml_server = xml.createElement("Server");
-    xml_servers.appendChild(xml_server);
-
-    QDomAttr xml_server_name = xml.createAttribute("name");
-    xml_server_name.setValue(startup_name);
-    xml_server.setAttributeNode(xml_server_name);
-
-    QDomAttr xml_server_resource = xml.createAttribute("resource");
-    xml_server_resource.setValue(startup_command->getServer().toString());
-    xml_server.setAttributeNode(xml_server_resource);
-
-    QDomAttr xml_server_owner = xml.createAttribute("owner");
-    xml_server_owner.setValue(startup_command->getOwner());
-    xml_server.setAttributeNode(xml_server_owner);
-
-    xml_server.appendChild(xml.importNode(startup_command->getConfiguration().documentElement(), true));
+    
+    xml_servers.appendChild(pqImplementation::save(xml, startup_name, *startup_command));
     }
 }
 
 void pqServerStartups::load(pqSettings& settings)
 {
-  settings.beginGroup("ServerStartups");
-  const QStringList startups = settings.childGroups();
+  settings.beginGroup("Servers");
+  const QStringList startups = settings.childKeys();
   for(int i = 0; i != startups.size(); ++i)
     {
     const QString name = startups[i];
-    const QString server_type = settings.value(name + "/type").toString();
-
-    QString server = settings.value(name + "/server").toString();
-    server.replace("|", "/");
+    const QString value = settings.value(name).toString();
     
-    if(server_type == "manual")
+    QDomDocument xml_server;
+    QString error_message;
+    xml_server.setContent(value, &error_message);
+    if(pqServerStartup* const startup = pqImplementation::load(xml_server.documentElement()))
       {
-      const QString owner = settings.value(name + "/owner").toString();
-      this->setManualStartup(name, server, owner);
-      }
-    else if(server_type == "command")
-      {
-      const QString owner = settings.value(name + "/owner").toString();
-      const QString executable = settings.value(name + "/executable").toString();
-      const double timeout = settings.value(name + "/timeout").toDouble();
-      const double delay = settings.value(name + "/delay").toDouble();
-      const QStringList arguments = settings.value(name + "/arguments").toStringList();
-      
-      this->setCommandStartup(name, server, owner, executable, timeout, delay, arguments);
+      this->Implementation->deleteStartup(name);
+      this->Implementation->Startups.insert(vtkstd::make_pair(name, startup));
       }
     }
   settings.endGroup();
@@ -329,28 +336,10 @@ void pqServerStartups::load(QDomDocument& xml_document)
     if(xml_server.isElement() && xml_server.toElement().tagName() == "Server")
       {
       const QString name = xml_server.toElement().attribute("name");
-      const pqServerResource server =
-        pqServerResource(xml_server.toElement().attribute("resource"));
-      const QString owner = xml_server.toElement().attribute("owner");
-
-      for(QDomNode xml_startup = xml_server.firstChild(); !xml_startup.isNull(); xml_startup = xml_startup.nextSibling())
+      if(pqServerStartup* const startup = pqImplementation::load(xml_server.toElement()))
         {
-        if(xml_startup.isElement() && xml_startup.toElement().tagName() == "ManualStartup")
-          {
-          QDomDocument xml;
-          xml.appendChild(xml.importNode(xml_startup, true));
-          this->Implementation->deleteStartup(name);
-          this->Implementation->Startups.insert(vtkstd::make_pair(
-            name, new pqManualServerStartup(name, server, owner, xml)));
-          }
-        else if(xml_startup.isElement() && xml_startup.toElement().tagName() == "CommandStartup")
-          {
-          QDomDocument xml;
-          xml.appendChild(xml.importNode(xml_startup, true));
-          this->Implementation->deleteStartup(name);
-          this->Implementation->Startups.insert(vtkstd::make_pair(
-            name, new pqCommandServerStartup(name, server, owner, xml)));
-          }
+        this->Implementation->deleteStartup(name);
+        this->Implementation->Startups.insert(vtkstd::make_pair(name, startup));
         }
       }
     }

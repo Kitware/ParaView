@@ -35,6 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqSettings::pqSettings(const QString& organization, 
                        const QString& application,
                        QObject* p) :
-  QSettings(organization, application, p)
+  QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application, p)
 {
 }
