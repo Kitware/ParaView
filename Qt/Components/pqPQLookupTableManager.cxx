@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-
+#include "vtkProcessModule.h"
 #include <QList>
 #include <QMap>
 #include <QPointer>
@@ -158,6 +158,7 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* lutProxy = 
     pxm->NewProxy("lookup_tables", "PVLookupTable");
+  lutProxy->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   lutProxy->SetConnectionID(server->GetConnectionID());
   QString name = this->Internal->getRegistrationName(
     arrayname, number_of_components, component);
