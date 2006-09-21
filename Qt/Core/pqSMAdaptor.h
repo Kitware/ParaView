@@ -80,6 +80,8 @@ public:
   /// for example, glyph filter accepts a source (proxy) to glyph with
   static void addProxyProperty(vtkSMProperty* Property, 
                                pqSMProxy Value);
+  static void removeProxyProperty(vtkSMProperty* Property,
+                                  pqSMProxy Value);
   static void setProxyProperty(vtkSMProperty* Property, 
                                pqSMProxy Value);
   static void setUncheckedProxyProperty(vtkSMProperty* Property, 

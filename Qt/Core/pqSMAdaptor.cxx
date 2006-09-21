@@ -169,6 +169,15 @@ pqSMProxy pqSMAdaptor::getProxyProperty(vtkSMProperty* Property)
   return pqSMProxy(NULL);
 }
 
+void pqSMAdaptor::removeProxyProperty(vtkSMProperty* Property, pqSMProxy Value)
+{
+  vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
+  if(proxyProp)
+    {
+    proxyProp->RemoveProxy(Value);
+    }
+}
+
 void pqSMAdaptor::addProxyProperty(vtkSMProperty* Property, 
                                    pqSMProxy Value)
 {
