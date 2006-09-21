@@ -306,6 +306,7 @@ protected:
   friend class vtkSMSelectionManager;
   friend class pqSelectionManager;
   friend class vtkSMSelectionProxy;
+  friend class vtkSMCellLabelAnnotationDisplayProxy;
   vtkGetObjectMacro(MapperProxy, vtkSMProxy);
   vtkGetObjectMacro(ActorProxy, vtkSMProxy);
   vtkGetObjectMacro(GeometryFilterProxy, vtkSMProxy);
