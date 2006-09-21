@@ -110,12 +110,12 @@ protected:
   void cleanup(pqMultiViewFrame*);
   QFrame* SplitterFrame;
   QFrame* MaximizeFrame;
+  pqMultiViewFrame* FillerFrame;
 
 private:
   void saveSplitter(vtkPVXMLElement *element, QSplitter *splitter, int index);
   void restoreSplitter(QWidget *widget, vtkPVXMLElement *element);
   void cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed);
-  pqMultiViewFrame* FillerFrame;
   pqMultiViewFrame* CurrentMaximizedFrame;
 };
 

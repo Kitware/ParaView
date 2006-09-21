@@ -115,6 +115,7 @@ pqRenderWindowManager::pqRenderWindowManager(QWidget* _parent/*=null*/)
     return;
     }
 
+
   QObject::connect(smModel, SIGNAL(renderModuleAdded(pqRenderModule*)),
     this, SLOT(onRenderModuleAdded(pqRenderModule*)));
   QObject::connect(smModel, SIGNAL(renderModuleRemoved(pqRenderModule*)),
@@ -183,6 +184,11 @@ void pqRenderWindowManager::onFrameAdded(pqMultiViewFrame* frame)
 
   frame->BackButton->show();
   frame->ForwardButton->show();
+  frame->MaximizeButton->show();
+  frame->CloseButton->show();
+  frame->SplitVerticalButton->show();
+  frame->SplitHorizontalButton->show();
+
   QObject::connect(frame->BackButton, SIGNAL(pressed()),
     rm->getInteractionUndoStack(), SLOT(Undo()));
   QObject::connect(frame->ForwardButton, SIGNAL(pressed()),
@@ -205,6 +211,7 @@ void pqRenderWindowManager::onFrameAdded(pqMultiViewFrame* frame)
 
   this->Internal->ActiveRenderModule =  rm;
   emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
+
 }
 
 //-----------------------------------------------------------------------------

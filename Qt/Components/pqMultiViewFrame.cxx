@@ -125,14 +125,14 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   
   this->MenuHidden=false;
   // TODO: temporary until they can be implemented or wanted
-  //this->MaximizeButton->hide();
   this->RestoreButton->hide();
   this->ActiveButton->hide();
   this->BackButton->hide();
   this->ForwardButton->hide();
-//   this->CloseButton->hide();
-//   this->SplitVerticalButton->hide();
-//   this->SplitHorizontalButton->hide();
+  this->MaximizeButton->hide();
+  this->CloseButton->hide();
+  this->SplitVerticalButton->hide();
+  this->SplitHorizontalButton->hide();
 
 
   this->UniqueID=QUuid::createUuid();
@@ -220,7 +220,8 @@ void pqMultiViewFrame::setMainWidget(QWidget* w)
     {
     l = this->layout()->itemAt(1)->layout();
     }
-  l->removeWidget(l->itemAt(0)->widget());
+    l->removeItem(l->itemAt(0));
+
 
   if(w)
     {
