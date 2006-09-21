@@ -37,19 +37,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 
 class pqFileDialogModel;
-class pqFileDialogFilter;
-namespace Ui { class pqFileDialog; }
 class QModelIndex;
 
 /**
-  Provides a standard file dialog "front-end" for the pqFileDialogModel "back-end", i.e. it can be used for both local and remote file browsing.
+  Provides a standard file dialog "front-end" for the pqFileDialogModel
+  "back-end", i.e. it can be used for both local and remote file browsing.
 
-  When creating an instance of pqFileDialog, you must provide an instance of the back-end.  To get the file(s) selected by the user, connect
-  to the filesSelected() signal:
+  pqFileDialog can be used in both "modal" and "non-modal" operations.
+  For "non-modal" operation, create an instance of pqFileDialog on the heap,
+  set the Qt::WA_DeleteOnClose flag, connect to the fileSelected() signal,
+  and show the dialog.  The dialog will be automatically destroyed when the
+  user completes their file selection, and your slot will be called with
+  the files the user selected:
+
+  /code
+  pqFileDialog* dialog = new pqFileDialog(
+    new pqLocalFileDialogModel(),
+    this);
+    
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+  QObject::connect(
+    dialog,
+    SIGNAL(filesSelected(const QStringList&)),
+    this,
+    SLOT(onOpenSessionFile(const QStringList&)));
+  
+  dialog->show();
+  /endcode
+
+  For "modal" operation, create an instance of pqFileDialog on the stack,
+  call its exec() method, and retrieve the user's file selection with the
+  getSelectedFiles() method:
   
   /code
-  pqFileDialog* dialog = new pqFileDialog(new pqLocalFileDialogModel(), "Open Session File", this, "OpenSessionFile");
-  dialog << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(onOpenSessionFile(const QStringList&)));
+  pqFileDialog dialog(
+    new pqLocalFileDialogModel(),
+    this);
+  if(Qt::Accepted == dialog.exec())
+    {
+    QStringList files = dialog.getSelectedFiles();
+    }
   /endcode
   
   \sa pqLocalFileDialogModel, pqServerFileDialogModel
@@ -58,10 +86,8 @@ class QModelIndex;
 class QTWIDGETS_EXPORT pqFileDialog :
   public QDialog
 {
-  typedef QDialog base;
-  
+  typedef QDialog Superclass;
   Q_OBJECT
-  
 public:
 
   /// choose mode for selecting file/folder.
@@ -73,56 +99,58 @@ public:
   /// Directory: The name of a directory.
   enum FileMode { AnyFile, ExistingFile, ExistingFiles, Directory };
     
-  /// creates a file dialog using the dialog model
+  /// Creates a file dialog using the dialog model
   /// the title, and start directory may be specified
   /// the filter is a string of semi-colon separated filters
-  pqFileDialog(pqFileDialogModel* Model, QWidget* Parent, 
-               const QString& Title = QString(), 
-               const QString& Directory = QString(), 
-               const QString& Filter = QString());
+  pqFileDialog(
+    pqFileDialogModel* Model,
+    QWidget* Parent, 
+    const QString& Title = QString(), 
+    const QString& Directory = QString(), 
+    const QString& Filter = QString());
   ~pqFileDialog();
 
-  /// Forces the dialog to emit the filesSelected() signal and close, as if receiving user input
-  void emitFilesSelected(const QStringList&);
-
-  /// returns the current file filter
-  QString currentFilter();
-
-  void accept();
-  void reject();
-
-  FileMode fileMode();
   void setFileMode(FileMode);
 
+  /// Emits the filesSelected() signal and closes the dialog,
+  void emitFileSelected(const QString&);
+  /// Emits the filesSelected() signal and closes the dialog,
+  void emitFilesSelected(const QStringList&);
+
+  /// Returns the set of files
   QStringList getSelectedFiles();
-  
+
+  void accept();
+
 signals:
-  /// Signal emitted when the user has chosen a set of files and accepted the dialog
+  /// Signal emitted when the user has chosen a set of files
+  /// and accepted the dialog
   void filesSelected(const QStringList&);
 
-protected:
-  pqFileDialogModel* const Model;
-  Ui::pqFileDialog* const Ui;
-  pqFileDialogFilter* Filter;
-  FileMode Mode;
-  QStringList SelectedFiles;
-  
-protected slots:
+private slots:
   void onDataChanged(const QModelIndex&, const QModelIndex&);
-  void onActivated(const QModelIndex&);
-  void onClickedFiles(const QModelIndex&);
-  void onClickedFavorites(const QModelIndex&);
-  void onManualEntry(const QString&);
   void onNavigate(const QString&);
   void onNavigateUp();
   void onNavigateDown(const QModelIndex&);
   void onFilterChange(const QString&);
 
+  void onClickedFavorite(const QModelIndex&);
+  void onClickedFile(const QModelIndex&);
+  
+  void onActivateFavorite(const QModelIndex&);
+  void onActivateFile(const QModelIndex&);
+  
+  void onTextEdited(const QString&);
+  
+  void acceptManual();
+  void acceptFiles();
+  
 private:
   pqFileDialog(const pqFileDialog&);
   pqFileDialog& operator=(const pqFileDialog&);
   
-  void onClicked(const QModelIndex&);
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif // !_pqFileDialog_h
