@@ -50,10 +50,10 @@ public:
 // pqSampleScalarAddRangeDialog
 
 pqSampleScalarAddRangeDialog::pqSampleScalarAddRangeDialog(
-    double from,
-    double to,
-    unsigned long steps,
-    bool logarithmic,
+    double default_from,
+    double default_to,
+    unsigned long default_steps,
+    bool default_logarithmic,
     QWidget* Parent) :
   Superclass(Parent),
   Implementation(new pqImplementation())
@@ -62,17 +62,17 @@ pqSampleScalarAddRangeDialog::pqSampleScalarAddRangeDialog(
   
   this->Implementation->Ui.from->setValidator(
     new QDoubleValidator(this->Implementation->Ui.from));
-  this->Implementation->Ui.from->setText(QString::number(from));
+  this->Implementation->Ui.from->setText(QString::number(default_from));
     
   this->Implementation->Ui.to->setValidator(
     new QDoubleValidator(this->Implementation->Ui.to));
-  this->Implementation->Ui.to->setText(QString::number(to));
+  this->Implementation->Ui.to->setText(QString::number(default_to));
   
   this->Implementation->Ui.steps->setValidator(
     new QIntValidator(2, 9999, this->Implementation->Ui.steps));
-  this->Implementation->Ui.steps->setText(QString::number(steps));
+  this->Implementation->Ui.steps->setText(QString::number(default_steps));
   
-  this->Implementation->Ui.log->setChecked(logarithmic);
+  this->Implementation->Ui.log->setChecked(default_logarithmic);
   
   QObject::connect(
     this->Implementation->Ui.from,
@@ -116,11 +116,11 @@ const bool pqSampleScalarAddRangeDialog::logarithmic() const
 
 void pqSampleScalarAddRangeDialog::onRangeChanged()
 {
-  double from = this->from();
-  double to = this->to();
-  if(to < from)
-    vtkstd::swap(from, to);
-  const bool signs_differ = from < 0 && to > 0;
+  double from_value = this->from();
+  double to_value = this->to();
+  if(to_value < from_value)
+    vtkstd::swap(from_value, to_value);
+  const bool signs_differ = from_value < 0 && to_value > 0;
   
   if(signs_differ)
     this->Implementation->Ui.log->setChecked(false);
