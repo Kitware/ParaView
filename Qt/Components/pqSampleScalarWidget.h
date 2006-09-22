@@ -38,10 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 
-namespace Ui { class pqSampleScalarWidget; }
-
 class QItemSelection;
-class QModelIndex;
 
 class vtkSMDoubleVectorProperty;
 
@@ -53,7 +50,7 @@ the Cut filter, and specifying the set of contour values for the Contour filter.
 class PQCOMPONENTS_EXPORT pqSampleScalarWidget :
   public QWidget
 {
-  typedef QWidget base;
+  typedef QWidget Superclass;
 
   Q_OBJECT
 
@@ -93,7 +90,7 @@ private:
   pqSampleScalarWidget(const pqSampleScalarWidget&);
   pqSampleScalarWidget& operator=(const pqSampleScalarWidget&);
   
-  class pqAddRangeDialog;
+  bool getRange(double& range_min, double& range_max);
   
   class pqImplementation;
   pqImplementation* const Implementation;

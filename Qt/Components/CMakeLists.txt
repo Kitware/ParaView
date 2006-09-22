@@ -87,6 +87,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqRecentFilesMenu.h
   pqRenderViewEditor.h
   pqRenderWindowManager.h
+  pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.h
   pqScalarSetModel.h
   pqSelectionAdaptor.h
@@ -277,6 +278,8 @@ ADD_LIBRARY(pqComponents
   pqRenderWindowManager.h
   pqSMSignalAdaptors.cxx
   pqSMSignalAdaptors.h
+  pqSampleScalarAddRangeDialog.cxx
+  pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.cxx
   pqSampleScalarWidget.h
   pqScalarSetModel.cxx

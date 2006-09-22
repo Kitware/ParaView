@@ -30,39 +30,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqSampleScalarAddRangeDialog.h"
 #include "pqSampleScalarWidget.h"
 #include "pqScalarSetModel.h"
 
-#include "ui_pqSampleScalarAddRangeDialog.h"
 #include "ui_pqSampleScalarWidget.h"
 
 #include <vtkMemberFunctionCommand.h>
 #include <vtkSMDoubleRangeDomain.h>
 #include <vtkSMDoubleVectorProperty.h>
-
-///////////////////////////////////////////////////////////////////////////
-// pqSampleScalarWidget::pqAddRangeDialog
-
-class pqSampleScalarWidget::pqAddRangeDialog :
-  public QDialog
-{
-public:
-  pqAddRangeDialog()
-  {
-    this->UI.setupUi(this);
-
-    this->UI.From->setValidator(
-      new QDoubleValidator(this->UI.From));
-      
-    this->UI.To->setValidator(
-      new QDoubleValidator(this->UI.To));
-    
-    this->UI.Steps->setValidator(
-      new QIntValidator(2, 9999, this->UI.Steps));
-  }
-  
-  Ui::pqSampleScalarAddRangeDialog UI;
-};
 
 ///////////////////////////////////////////////////////////////////////////
 // pqSampleScalarWidget::pqImplementation
@@ -95,7 +71,7 @@ public:
 };
 
 pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
-  base(Parent),
+  Superclass(Parent),
   Implementation(new pqImplementation())
 {
   this->Implementation->PropertyObserver.TakeReference(
@@ -312,26 +288,46 @@ void pqSampleScalarWidget::onNewValue()
 
 void pqSampleScalarWidget::onNewRange()
 {
-  pqAddRangeDialog dialog;
+  double current_min = 0.0;
+  double current_max = 1.0;
+  this->getRange(current_min, current_max);
+  
+  pqSampleScalarAddRangeDialog dialog(current_min, current_max, 10, false);
   if(QDialog::Accepted != dialog.exec())
     {
     return;
     }
     
-  const double range_min = dialog.UI.From->text().toDouble();
-  const double range_max = dialog.UI.To->text().toDouble();
-  const int range_count = dialog.UI.Steps->text().toInt();
+  const double from = dialog.from();
+  const double to = dialog.to();
+  const unsigned long steps = dialog.steps();
+  const bool logarithmic = dialog.logarithmic();
 
-  if(range_count < 2)
+  if(steps < 2)
     return;
     
-  if(range_min == range_max)
+  if(from == to)
     return;
 
-  for(int i = 0; i != range_count; ++i)
+  if(logarithmic)
     {
-    const double mix = static_cast<double>(i) / static_cast<double>(range_count - 1);
-    this->Implementation->Model.insert((1.0 - mix) * range_min + (mix) * range_max);
+    const double sign = from < 0 ? -1.0 : 1.0;
+    const double log_from = log10(fabs(from ? from : 1.0e-6 * (from - to)));
+    const double log_to = log10(fabs(to ? to : 1.0e-6 * (to - from)));
+    
+    for(unsigned long i = 0; i != steps; ++i)
+      {
+      const double mix = static_cast<double>(i) / static_cast<double>(steps - 1);
+      this->Implementation->Model.insert(sign * pow(10.0, (1.0 - mix) * log_from + (mix) * log_to));
+      }
+    }
+  else
+    {
+    for(unsigned long i = 0; i != steps; ++i)
+      {
+      const double mix = static_cast<double>(i) / static_cast<double>(steps - 1);
+      this->Implementation->Model.insert((1.0 - mix) * from + (mix) * to);
+      }
     }
   
   emit samplesChanged();
@@ -371,7 +367,23 @@ void pqSampleScalarWidget::onControlledPropertyChanged()
 
 void pqSampleScalarWidget::onControlledPropertyDomainChanged()
 {
-  // Display the range of values in the input (if any)
+  double range_min;
+  double range_max;
+  if(this->getRange(range_min, range_max))
+    {
+    this->Implementation->UI->ScalarRange->setText(
+      tr("Scalar Range: [%1, %2]").arg(range_min).arg(range_max));
+    }
+  else
+    {
+    this->Implementation->UI->ScalarRange->setText(
+      tr("Scalar Range: unlimited"));
+    }
+}
+
+bool pqSampleScalarWidget::getRange(double& range_min, double& range_max)
+{
+  // Return the range of values in the input (if available)
   if(this->Implementation->SampleProperty)
     {
     this->Implementation->SampleProperty->UpdateDependentDomains();
@@ -381,22 +393,17 @@ void pqSampleScalarWidget::onControlledPropertyDomainChanged()
         this->Implementation->SampleProperty->GetDomain("scalar_range")))
       {
       int min_exists = 0;
-      const double min_value = domain->GetMinimum(0, min_exists);
+      range_min = domain->GetMinimum(0, min_exists);
       
       int max_exists = 0;
-      const double max_value = domain->GetMaximum(0, max_exists);
+      range_max = domain->GetMaximum(0, max_exists);
       
       if(min_exists && max_exists)
         {
-        this->Implementation->UI->ScalarRange->setText(
-          tr("Scalar Range: [%1, %2]").arg(min_value).arg(max_value));
-        }
-      else
-        {
-        this->Implementation->UI->ScalarRange->setText(
-          tr("Scalar Range: unlimited"));
+        return true;
         }
       }
     }
+    
+  return false;
 }
-

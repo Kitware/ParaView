@@ -39,15 +39,15 @@
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/1QScrollBar0" command="set_int" arguments="116" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/1QScrollBar0" command="set_int" arguments="118" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1pqCollapsedGroup1/pqSampleScalarWidget/NewRange" command="activate" arguments="" />
-  <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments="-" />
-  <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments="-." />
-  <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments="-.5" />
-  <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments="" />
-  <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments="." />
-  <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments=".5" />
-  <pqevent object="pqSampleScalarAddRangeDialog/Steps" command="set_string" arguments="" />
-  <pqevent object="pqSampleScalarAddRangeDialog/Steps" command="set_string" arguments="20" />
-  <pqevent object="pqSampleScalarAddRangeDialog/Steps" command="set_string" arguments="20" />
+  <pqevent object="pqSampleScalarAddRangeDialog/from" command="set_string" arguments="-" />
+  <pqevent object="pqSampleScalarAddRangeDialog/from" command="set_string" arguments="-." />
+  <pqevent object="pqSampleScalarAddRangeDialog/from" command="set_string" arguments="-.5" />
+  <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments="" />
+  <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments="." />
+  <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments=".5" />
+  <pqevent object="pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="" />
+  <pqevent object="pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="20" />
+  <pqevent object="pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="20" />
   <pqevent object="pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/1QScrollBar0" command="set_int" arguments="116" />
