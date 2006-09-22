@@ -32,6 +32,7 @@ int my_main(int argc, char *argv[])
   app->Delete();
 
   Tcl_DeleteInterp(interp);
+  Tcl_Finalize();
 
   return res;
 }
