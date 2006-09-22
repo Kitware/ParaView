@@ -226,4 +226,5 @@ void pqRecentFilesMenu::onServerStarted(pqServer* server)
   pqServerResources& resources = pqApplicationCore::instance()->serverResources();
   resources.open(server, this->Implementation->RecentResource);
   resources.add(this->Implementation->RecentResource);
+  resources.save(*pqApplicationCore::instance()->settings());
 }
