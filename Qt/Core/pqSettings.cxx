@@ -31,10 +31,70 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <pqSettings.h>
 
+#include <QDialog>
+#include <QMainWindow>
+
 //-----------------------------------------------------------------------------
-pqSettings::pqSettings(const QString& organization, 
-                       const QString& application,
-                       QObject* p) :
+pqSettings::pqSettings(
+    const QString& organization, 
+    const QString& application,
+    QObject* p) :
   QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application, p)
 {
+}
+
+void pqSettings::saveState(const QMainWindow& window, const QString& key)
+{
+  this->beginGroup(key);
+  this->setValue("Position", window.pos());
+  this->setValue("Size", window.size());
+  this->setValue("Layout", window.saveState());
+  this->endGroup();
+}
+
+void pqSettings::saveState(const QDialog& dialog, const QString& key)
+{
+  this->beginGroup(key);
+  this->setValue("Position", dialog.pos());
+  this->setValue("Size", dialog.size());
+  this->endGroup();
+}
+
+void pqSettings::restoreState(const QString& key, QMainWindow& window)
+{
+  this->beginGroup(key);
+  
+  if(this->contains("Size"))
+    {
+    window.resize(this->value("Size").toSize());
+    }
+    
+  if(this->contains("Position"))
+    {
+    window.move(this->value("Position").toPoint());
+    }
+
+  if(this->contains("Layout"))
+    {
+    window.restoreState(this->value("Layout").toByteArray());
+    }
+  
+  this->endGroup();
+}
+
+void pqSettings::restoreState(const QString& key, QDialog& dialog)
+{
+  this->beginGroup(key);
+  
+  if(this->contains("Size"))
+    {
+    dialog.resize(this->value("Size").toSize());
+    }
+    
+  if(this->contains("Position"))
+    {
+    dialog.move(this->value("Position").toPoint());
+    }
+
+  this->endGroup();
 }

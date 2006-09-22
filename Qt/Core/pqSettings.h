@@ -37,10 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqSettings_h
 #define _pqSettings_h
 
-
 #include "pqCoreExport.h"
 #include <QSettings>
-#include <QStringList>
+
+class QDialog;
+class QMainWindow;
 
 class PQCORE_EXPORT pqSettings :
   public QSettings
@@ -48,8 +49,16 @@ class PQCORE_EXPORT pqSettings :
   Q_OBJECT
 
 public:
-  pqSettings(const QString& organization, const QString& application,
-             QObject* p);
+  pqSettings(
+    const QString& organization,
+    const QString& application,
+    QObject* p);
+    
+  void saveState(const QMainWindow& window, const QString& key);
+  void saveState(const QDialog& dialog, const QString& key);
+  
+  void restoreState(const QString& key, QMainWindow& window);
+  void restoreState(const QString& key, QDialog& dialog);
 };
 
 #endif

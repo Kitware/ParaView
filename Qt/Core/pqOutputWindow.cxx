@@ -30,10 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqApplicationCore.h"
 #include "pqOutputWindow.h"
+#include "pqSettings.h"
+
 #include "ui_pqOutputWindow.h"
-#include "vtkObjectFactory.h"
-//#include <QTextCharFormat>
+
+#include <vtkObjectFactory.h>
 
 //////////////////////////////////////////////////////////////////////
 // pqOutputWindow::pqImplementation
@@ -47,7 +50,7 @@ struct pqOutputWindow::pqImplementation
 // pqOutputWindow
 
 pqOutputWindow::pqOutputWindow(QWidget* Parent) :
-  QDialog(Parent),
+  Superclass(Parent),
   Implementation(new pqImplementation())
 {
   this->Implementation->Ui.setupUi(this);
@@ -120,11 +123,23 @@ void pqOutputWindow::onDisplayErrorText(const QString& text)
 void pqOutputWindow::accept()
 {
   this->hide();
-  QDialog::accept();
+  Superclass::accept();
 }
 
 void pqOutputWindow::reject()
 {
   this->hide();
-  QDialog::reject();
+  Superclass::reject();
+}
+
+void pqOutputWindow::showEvent(QShowEvent* e)
+{
+  pqApplicationCore::instance()->settings()->restoreState("OutputWindow", *this);
+  Superclass::showEvent(e);
+}
+
+void pqOutputWindow::hideEvent(QHideEvent* e)
+{
+  pqApplicationCore::instance()->settings()->saveState(*this, "OutputWindow");
+  Superclass::hideEvent(e);
 }

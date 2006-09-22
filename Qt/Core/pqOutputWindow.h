@@ -48,6 +48,8 @@ to the corresponding pqOutputWindow slots.
 class PQCORE_EXPORT pqOutputWindow :
   public QDialog
 {
+  typedef QDialog Superclass;
+  
   Q_OBJECT
 
 public:
@@ -67,6 +69,9 @@ private slots:
 private:
   pqOutputWindow(const pqOutputWindow&);
   pqOutputWindow& operator=(const pqOutputWindow&);
+  
+  virtual void showEvent(QShowEvent*);
+  virtual void hideEvent(QHideEvent*);
   
   struct pqImplementation;
   pqImplementation* const Implementation;

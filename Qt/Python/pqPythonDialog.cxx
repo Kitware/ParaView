@@ -33,8 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonDialog.h"
 #include "ui_pqPythonDialog.h"
 
+#include <pqApplicationCore.h>
 #include <pqFileDialog.h>
 #include <pqLocalFileDialogModel.h>
+#include <pqSettings.h>
 
 #include <QFile>
 #include <QtDebug>
@@ -68,10 +70,13 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent, int argc, char** argv) :
     SLOT(runScript()));
 
   this->Implementation->Ui.shellWidget->InitializeInterpretor(argc, argv);
+  
+  pqApplicationCore::instance()->settings()->restoreState("PythonDialog", *this);
 }
 
 pqPythonDialog::~pqPythonDialog()
 {
+  pqApplicationCore::instance()->settings()->saveState(*this, "PythonDialog");
   delete Implementation;
 }
 

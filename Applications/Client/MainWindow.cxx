@@ -524,23 +524,13 @@ MainWindow::MainWindow() :
   this->onRedoLabel(pqApplicationCore::instance()->getUndoStack()->RedoLabel());
 
   // Restore the state of the window ...
-  pqSettings& settings = *pqApplicationCore::instance()->settings();
-  settings.beginGroup("MainWindow");
-  this->resize(settings.value("Size", QSize(1024, 768)).toSize());
-  this->move(settings.value("Position", QPoint(50, 50)).toPoint());
-  this->restoreState(settings.value("Layout").toByteArray());
-  settings.endGroup();
+  pqApplicationCore::instance()->settings()->restoreState("MainWindow", *this);
 }
 
 MainWindow::~MainWindow()
 {
   // Save the state of the window ...
-  pqSettings& settings = *pqApplicationCore::instance()->settings();
-  settings.beginGroup("MainWindow");
-  settings.setValue("Position", this->pos());
-  settings.setValue("Size", this->size());
-  settings.setValue("Layout", this->saveState());
-  settings.endGroup();
+  pqApplicationCore::instance()->settings()->saveState(*this, "MainWindow");
 
   delete this->Implementation;
 }

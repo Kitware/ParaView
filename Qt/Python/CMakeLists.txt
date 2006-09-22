@@ -1,6 +1,7 @@
 PROJECT(QtPython)
 
 INCLUDE_DIRECTORIES(
+  ${pqCore_SOURCE_DIR}
   ${QtWidgets_SOURCE_DIR}
   ${QtPython_BINARY_DIR}
   ${VTK_INCLUDE_DIR}
@@ -38,6 +39,7 @@ ADD_LIBRARY(QtPython
 )
 
 TARGET_LINK_LIBRARIES(QtPython
+  pqCore
   QtWidgets
   ${QT_LIBRARIES}
   ${PYTHON_LIBRARIES}
