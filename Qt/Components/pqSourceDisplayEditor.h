@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDisplayProxyEditor.h
+   Module:    pqSourceDisplayEditor.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,51 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqDisplayProxyEditor_h
-#define _pqDisplayProxyEditor_h
+#ifndef _pqSourceDisplayProxy_h
+#define _pqSourceDisplayProxy_h
 
 #include <QWidget>
+#include <QPointer>
 #include "pqComponentsExport.h"
 
-class pqDisplayProxyEditorInternal;
+class pqProxy;
+class pqPipelineSource;
 class pqPipelineDisplay;
+class QComboBox;
+class QStackedWidget;
 
-/// Widget which provides an editor for the properties of a display.
-class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public QWidget
+/// shows the displays for a source
+class PQCOMPONENTS_EXPORT pqSourceDisplayEditor : public QWidget
 {
   Q_OBJECT
 public:
   /// constructor
-  pqDisplayProxyEditor(QWidget* p);
+  pqSourceDisplayEditor(QWidget* p=0);
   /// destructor
-  ~pqDisplayProxyEditor();
-
-  /// Set the display whose properties we want to edit. 
-  void setDisplay(pqPipelineDisplay* display);
-
+  ~pqSourceDisplayEditor();
+  
   /// get the proxy for which properties are displayed
-  pqPipelineDisplay* getDisplay();
+  pqProxy* getProxy();
+
+public slots:
+  /// Set the display whose properties we want to edit. 
+  void setProxy(pqProxy* source);
 
 protected slots:
-  /// internally used to update the graphics window when a property changes
-  void updateView();
-  void openColorMapEditor();
-  void zoomToData();
-  void updateEnableState();
-  
+  void displayAdded(pqPipelineSource* source, pqPipelineDisplay* display);
+  void displayRemoved(pqPipelineSource* source, pqPipelineDisplay* display);
+  void proxyDestroyed();
+  void changePage();
+
 protected:
-  pqDisplayProxyEditorInternal* Internal;
-  void setupGUIConnections();
+  void removePage(pqPipelineDisplay*);
+  void addPage(pqPipelineDisplay*);
 
 private:
-  bool DisableSlots;
+  QStackedWidget* StackWidget;
+  QComboBox* DisplayCombo;
+  QPointer<pqProxy> Proxy;
+
 };
 
 #endif

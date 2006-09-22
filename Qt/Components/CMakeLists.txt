@@ -80,7 +80,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineBrowserContextMenu.h
   pqPipelineMenu.h
   pqPipelineModelSelectionAdaptor.h
+  pqProxyInformationWidget.h
   pqPointSourceWidget.h
+  pqProxyTabWidget.h
   pqPQLookupTableManager.h
   pqRecentFilesMenu.h
   pqRenderViewEditor.h
@@ -100,6 +102,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSimpleServerStartup.h
   pqSliderDomain.h
   pqSMSignalAdaptors.h
+  pqSourceDisplayEditor.h
   pqSourceHistoryModel.h
   pqSourceInfoFilterModel.h
   pqSourceInfoGroupMap.h
@@ -133,6 +136,7 @@ SET(UI_FORMS
   Resources/UI/pqLineSourceControls.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqPointSourceControls.ui
+  Resources/UI/pqProxyInformationWidget.ui
   Resources/UI/pqRenderViewEditor.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui
@@ -257,8 +261,12 @@ ADD_LIBRARY(pqComponents
   pqPipelineMenu.h
   pqPipelineModelSelectionAdaptor.cxx
   pqPipelineModelSelectionAdaptor.h
+  pqProxyInformationWidget.cxx
+  pqProxyInformationWidget.h
   pqPointSourceWidget.cxx
   pqPointSourceWidget.h
+  pqProxyTabWidget.cxx
+  pqProxyTabWidget.h
   pqPQLookupTableManager.cxx
   pqPQLookupTableManager.h
   pqRecentFilesMenu.cxx
@@ -297,6 +305,8 @@ ADD_LIBRARY(pqComponents
   pqSettingsDialog.h
   pqSliderDomain.cxx
   pqSliderDomain.h
+  pqSourceDisplayEditor.cxx
+  pqSourceDisplayEditor.h
   pqSourceHistoryModel.cxx
   pqSourceHistoryModel.h
   pqSourceInfoFilterModel.cxx

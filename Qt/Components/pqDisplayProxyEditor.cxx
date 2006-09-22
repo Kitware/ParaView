@@ -349,9 +349,6 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->ViewZoomToData, SIGNAL(clicked(bool)), 
     this, SLOT(zoomToData()));
   QObject::connect(
-    this->Internal->DismissButton, SIGNAL(clicked(bool)),
-    this, SIGNAL(dismiss()));
-  QObject::connect(
     this->Internal->EditColorMapButton, SIGNAL(clicked()),
     this, SLOT(openColorMapEditor()));
   

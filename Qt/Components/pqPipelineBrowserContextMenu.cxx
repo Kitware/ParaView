@@ -46,7 +46,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 
 #include <QDialog>
+#include <QPushButton>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QMenu>
 
 #include "vtkSMProxy.h"
@@ -148,14 +150,13 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
     topParent = topParent->parentWidget();
     }
 
-  QDialog* dialog = new QDialog(topParent);
-  dialog->setObjectName("ObjectDisplayProperties");
-  dialog->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
-  dialog->setWindowTitle("Display Settings");
-  QHBoxLayout* l = new QHBoxLayout(dialog);
+  QDialog dialog(topParent);
+  dialog.setObjectName("ObjectDisplayProperties");
+  dialog.setWindowTitle("Display Settings");
+  QVBoxLayout* l = new QVBoxLayout(&dialog);
   l->setMargin(0);
   l->setSpacing(6);
-  pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(dialog);
+  pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(&dialog);
   pqPipelineDisplay* display = source->getDisplay(this->Browser->getRenderModule());
   if (!display)
     {
@@ -166,13 +167,24 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
     }
   editor->setDisplay(display);
   l->addWidget(editor);
-  QObject::connect(editor, SIGNAL(dismiss()),
-    dialog, SLOT(accept()));
-  //dialog->setModal(true);
-  //dialog->show();
+
+  QHBoxLayout* hl = new QHBoxLayout;
+  hl->setMargin(6);
+  l->addLayout(hl);
+  hl->addStretch();
+
+  QPushButton* closeButton = new QPushButton(&dialog);
+  closeButton->setObjectName("DismissButton");
+  closeButton->setText(tr("Close"));
+  closeButton->setAutoDefault(true);
+  hl->addWidget(closeButton);
+
+  QObject::connect(closeButton, SIGNAL(clicked(bool)),
+    &dialog, SLOT(accept()));
+  
   pqApplicationCore::instance()->getUndoStack()->
     BeginUndoSet("Display Settings");
-  dialog->exec();
+  dialog.exec();
   pqApplicationCore::instance()->getUndoStack()->
     EndUndoSet();
 }

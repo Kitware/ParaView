@@ -3,7 +3,7 @@
   <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
   <pqevent object="MainWindow/ServerStartupBrowser/startups" command="currentChanged" arguments="/0|0" />
   <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/selectionToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.443077,0.518625,1,1,0)" />
   <pqevent object="MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.604615,0.799427,1,0,0)" />

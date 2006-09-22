@@ -3,7 +3,7 @@
   <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Cone" />
   <pqevent object="MainWindow/ServerStartupBrowser/startups" command="currentChanged" arguments="/0|0" />
   <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="vtkOriginalCellIds" />
   <pqevent object="MainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Wireframe" />
   <pqevent object="MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.673846,0.555874,1,1,0)" />

@@ -4,10 +4,10 @@
   <pqevent object="MainWindow/ServerStartupBrowser/startups" command="currentChanged" arguments="/0|0" />
   <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
   <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/multicomb_2.vts" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuFilters/Thermal" command="activate" arguments="Contour" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1pqCollapsedGroup1/pqSampleScalarWidget/NewRange" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1pqCollapsedGroup1/pqSampleScalarWidget/NewRange" command="activate" arguments="" />
   <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments="." />
   <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments=".2" />
   <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments="" />
@@ -17,9 +17,9 @@
   <pqevent object="pqSampleScalarAddRangeDialog/Steps" command="set_string" arguments="10" />
   <pqevent object="pqSampleScalarAddRangeDialog/Steps" command="set_string" arguments="10" />
   <pqevent object="pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
   <pqevent object="PipelineObjectMenu" command="activate" arguments="Display Settings" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="Momentum" />
-  <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/DismissButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectDisplayProperties/DismissButton" command="activate" arguments="" />
 </pqevents>

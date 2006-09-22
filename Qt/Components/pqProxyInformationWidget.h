@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDisplayProxyEditor.h
+   Module:    pqProxyInformationWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,41 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqDisplayProxyEditor_h
-#define _pqDisplayProxyEditor_h
+#ifndef _pqProxyInformationWidget_h
+#define _pqProxyInformationWidget_h
 
 #include <QWidget>
+#include <QPointer>
 #include "pqComponentsExport.h"
 
-class pqDisplayProxyEditorInternal;
-class pqPipelineDisplay;
+class pqProxy;
 
-/// Widget which provides an editor for the properties of a display.
-class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public QWidget
+/// Widget which provides information about a source proxy
+class PQCOMPONENTS_EXPORT pqProxyInformationWidget : public QWidget
 {
   Q_OBJECT
 public:
   /// constructor
-  pqDisplayProxyEditor(QWidget* p);
+  pqProxyInformationWidget(QWidget* p=0);
   /// destructor
-  ~pqDisplayProxyEditor();
+  ~pqProxyInformationWidget();
 
   /// Set the display whose properties we want to edit. 
-  void setDisplay(pqPipelineDisplay* display);
+  void setProxy(pqProxy* source);
 
   /// get the proxy for which properties are displayed
-  pqPipelineDisplay* getDisplay();
+  pqProxy* getProxy();
 
-protected slots:
-  /// internally used to update the graphics window when a property changes
-  void updateView();
-  void openColorMapEditor();
-  void zoomToData();
-  void updateEnableState();
-  
-protected:
-  pqDisplayProxyEditorInternal* Internal;
-  void setupGUIConnections();
+public slots:
+  /// TODO: have this become automatic instead of relying on 
+  /// the accept button in case another client modifies the pipeline.
+  void updateInformation();
 
 private:
-  bool DisableSlots;
+  QPointer<pqProxy> Source;
+  class pqUi;
+  pqUi* Ui;
+  
 };
 
 #endif

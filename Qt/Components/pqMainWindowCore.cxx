@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
 #include "pqObjectInspectorWidget.h"
+#include "pqProxyTabWidget.h"
 #include "pqPendingDisplayManager.h"
 #include "pqPipelineBrowser.h"
 #include "pqPipelineBuilder.h"
@@ -536,11 +537,73 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
     SLOT(setRenderModule(pqRenderModule*)));
 }
 
+pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget)
+{
+  pqProxyTabWidget* const proxyPanel = 
+    new pqProxyTabWidget(dock_widget);
+
+  pqObjectInspectorWidget* object_inspector = proxyPanel->getObjectInspector();
+    
+  dock_widget->setWidget(proxyPanel);
+
+  pqUndoStack* const undoStack = pqApplicationCore::instance()->getUndoStack();
+  
+  // Connect Accept/reset signals.
+  QObject::connect(
+    object_inspector,
+    SIGNAL(preaccept()),
+    undoStack,
+    SLOT(Accept()));
+    
+  QObject::connect(
+    object_inspector,
+    SIGNAL(preaccept()),
+    &this->Implementation->SelectionManager,
+    SLOT(clearSelection()));
+
+  QObject::connect(
+    object_inspector, 
+    SIGNAL(postaccept()),
+    undoStack,
+    SLOT(EndUndoSet()));
+
+  QObject::connect(
+    object_inspector,
+    SIGNAL(postaccept()),
+    this,
+    SLOT(onPostAccept()));
+
+  QObject::connect(
+    object_inspector,
+    SIGNAL(accepted()), 
+    this,
+    SLOT(createPendingDisplays()));
+    
+  QObject::connect(
+    pqApplicationCore::instance()->getPendingDisplayManager(),
+    SIGNAL(pendingDisplays(bool)),
+    object_inspector,
+    SLOT(forceModified(bool)));
+
+  QObject::connect(
+    this,
+    SIGNAL(activeSourceChanged(pqProxy*)),
+    proxyPanel,
+    SLOT(setProxy(pqProxy*)));
+  
+  QObject::connect(this,
+                   SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+                   proxyPanel,
+                   SLOT(setRenderModule(pqRenderModule*)));
+
+  return proxyPanel;
+}
+
 pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* dock_widget)
 {
   pqObjectInspectorWidget* const object_inspector = 
     new pqObjectInspectorWidget(dock_widget);
-    
+
   dock_widget->setWidget(object_inspector);
 
   pqUndoStack* const undoStack = pqApplicationCore::instance()->getUndoStack();

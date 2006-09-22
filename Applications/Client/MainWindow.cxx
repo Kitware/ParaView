@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqApplicationCore.h>
 #include <pqMainWindowCore.h>
 #include <pqObjectInspectorWidget.h>
+#include <pqProxyTabWidget.h>
 #include <pqPipelineBrowser.h>
 #include <pqPipelineMenu.h>
 #include <pqRecentFilesMenu.h>
@@ -362,18 +363,18 @@ MainWindow::MainWindow() :
   this->Implementation->Core.setupPipelineBrowser(
     this->Implementation->UI.pipelineBrowserDock);
 
-  pqObjectInspectorWidget* const object_inspector =
-    this->Implementation->Core.setupObjectInspector(
+  pqProxyTabWidget* const proxyTab =
+    this->Implementation->Core.setupProxyTabWidget(
       this->Implementation->UI.objectInspectorDock);
       
   QObject::connect(
-    object_inspector,
+    proxyTab->getObjectInspector(),
     SIGNAL(preaccept()), 
     this,
     SLOT(onPreAccept()));
 
   QObject::connect(
-    object_inspector,
+    proxyTab->getObjectInspector(),
     SIGNAL(postaccept()), 
     this,
     SLOT(onPostAccept()));

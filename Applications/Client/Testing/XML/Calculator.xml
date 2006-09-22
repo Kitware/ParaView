@@ -2,32 +2,32 @@
 <pqevents>
   <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
   <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Calculator" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Scalars" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Scalars" command="activate" arguments="" />
   <pqevent object="1QMenu0" command="activate" arguments="Normals_0" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Multiply" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/iHat" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Plus" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/sqrt" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/LeftParentheses" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Scalars" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Multiply" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/iHat" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Plus" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/sqrt" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/LeftParentheses" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Scalars" command="activate" arguments="" />
   <pqevent object="1QMenu0" command="activate" arguments="Normals_1" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/RightParentheses" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Multiply" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/jHat" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Plus" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Scalars" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/RightParentheses" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Multiply" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/jHat" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Plus" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Scalars" command="activate" arguments="" />
   <pqevent object="1QMenu0" command="activate" arguments="Normals_2" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Multiply" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/kHat" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Multiply" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/kHat" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="WarpVector" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/SelectInputVectors" command="set_string" arguments="Result" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/SelectInputVectors" command="set_string" arguments="Result" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
   <pqevent object="PipelineObjectMenu" command="activate" arguments="Display Settings" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="Result" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/ViewGroup/ViewZoomToData" command="activate" arguments="" />
-  <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/DismissButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectDisplayProperties/DismissButton" command="activate" arguments="" />
 </pqevents>

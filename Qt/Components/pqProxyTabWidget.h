@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDisplayProxyEditor.h
+   Module:    pqProxyTabWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,46 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqDisplayProxyEditor_h
-#define _pqDisplayProxyEditor_h
+#ifndef _pqProxyTabWidget_h
+#define _pqProxyTabWidget_h
 
-#include <QWidget>
+#include <QTabWidget>
 #include "pqComponentsExport.h"
 
-class pqDisplayProxyEditorInternal;
-class pqPipelineDisplay;
+class pqProxy;
+class pqRenderModule;
+class pqObjectInspectorWidget;
+class pqSourceDisplayEditor;
+class pqProxyInformationWidget;
 
-/// Widget which provides an editor for the properties of a display.
-class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public QWidget
+/// Tabbed widget with 3 tabs (object inspector, display editor, information)
+class PQCOMPONENTS_EXPORT pqProxyTabWidget : public QTabWidget
 {
   Q_OBJECT
 public:
   /// constructor
-  pqDisplayProxyEditor(QWidget* p);
+  pqProxyTabWidget(QWidget* p);
   /// destructor
-  ~pqDisplayProxyEditor();
+  ~pqProxyTabWidget();
 
-  /// Set the display whose properties we want to edit. 
-  void setDisplay(pqPipelineDisplay* display);
-
-  /// get the proxy for which properties are displayed
-  pqPipelineDisplay* getDisplay();
-
-protected slots:
-  /// internally used to update the graphics window when a property changes
-  void updateView();
-  void openColorMapEditor();
-  void zoomToData();
-  void updateEnableState();
+  /// get the object inspector
+  pqObjectInspectorWidget* getObjectInspector();
   
-protected:
-  pqDisplayProxyEditorInternal* Internal;
-  void setupGUIConnections();
+  /// get the proxy for which properties are displayed
+  pqProxy* getProxy();
+
+public slots:
+  /// Set the display whose properties we want to edit. 
+  void setProxy(pqProxy* source);
+  
+  /// set the current render module that these panels work on
+  void setRenderModule(pqRenderModule* rm);
 
 private:
-  bool DisableSlots;
+  pqObjectInspectorWidget* Inspector;
+  pqSourceDisplayEditor* Display;
+  pqProxyInformationWidget* Information;
+
 };
 
 #endif

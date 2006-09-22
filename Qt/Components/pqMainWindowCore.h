@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class pqMultiView;
+class pqProxyTabWidget;
 class pqObjectInspectorWidget;
 class pqPipelineMenu;
 class pqPipelineSource;
@@ -95,6 +96,8 @@ public:
   
   /// Setup a pipeline browser, attaching it to the given dock
   void setupPipelineBrowser(QDockWidget* parent);
+  /// Setup a proxy tab widget, attaching it to the given dock
+  pqProxyTabWidget* setupProxyTabWidget(QDockWidget* parent);
   /// Setup an object inspector, attaching it to the given dock
   pqObjectInspectorWidget* setupObjectInspector(QDockWidget* parent);
   /// Setup a statistics view, attaching it to the given dock
