@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqRenderWindowManager.h>
 #include <pqSelectionManager.h>
 #include <pqSetName.h>
+#include <pqSettings.h>
 #include <pqUndoStack.h>
 #include <pqVCRController.h>
 #include <pqViewMenu.h>
@@ -521,10 +522,26 @@ MainWindow::MainWindow() :
     pqApplicationCore::instance()->getUndoStack()->CanRedo());
   this->onUndoLabel(pqApplicationCore::instance()->getUndoStack()->UndoLabel());
   this->onRedoLabel(pqApplicationCore::instance()->getUndoStack()->RedoLabel());
+
+  // Restore the state of the window ...
+  pqSettings& settings = *pqApplicationCore::instance()->settings();
+  settings.beginGroup("MainWindow");
+  this->resize(settings.value("Size", QSize(1024, 768)).toSize());
+  this->move(settings.value("Position", QPoint(50, 50)).toPoint());
+  this->restoreState(settings.value("Layout").toByteArray());
+  settings.endGroup();
 }
 
 MainWindow::~MainWindow()
 {
+  // Save the state of the window ...
+  pqSettings& settings = *pqApplicationCore::instance()->settings();
+  settings.beginGroup("MainWindow");
+  settings.setValue("Position", this->pos());
+  settings.setValue("Size", this->size());
+  settings.setValue("Layout", this->saveState());
+  settings.endGroup();
+
   delete this->Implementation;
 }
 
