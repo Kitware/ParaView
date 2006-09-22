@@ -102,10 +102,23 @@ ELSE(UNIX)
   SET(TCL_TK_WIN_DISTRIB_DIR 
     "${TclTk_SOURCE_DIR}/TclTk${TCL_TK_WIN_VERSION}Win")
 
-  IF(BUILD_SHARED_LIBS)
+  # A parent project can set TCL_TK_USE_SHARED_LIBS to ON or OFF.
+  # The default value is the same as BUILD_SHARED_LIBS, but
+  # this mechanism allows a parent project to use the shared
+  # tcl/tk dlls independent of the BUILD_SHARED_LIBS setting.
+  #
+  IF (NOT DEFINED TCL_TK_USE_SHARED_LIBS)
+    IF (BUILD_SHARED_LIBS)
+      SET(TCL_TK_USE_SHARED_LIBS ON)
+    ELSE (BUILD_SHARED_LIBS)
+      SET(TCL_TK_USE_SHARED_LIBS OFF)
+    ENDIF (BUILD_SHARED_LIBS)
+  ENDIF (NOT DEFINED TCL_TK_USE_SHARED_LIBS)
+
+  IF (TCL_TK_USE_SHARED_LIBS)
     SET(SUFFIX "")
     SET(SUFFIX_DEBUG "g")
-  ELSE (BUILD_SHARED_LIBS)
+  ELSE (TCL_TK_USE_SHARED_LIBS)
     SET(SUFFIX "sx")
     SET(SUFFIX_DEBUG "sgx")
     IF("${CMAKE_CXX_FLAGS_RELEASE}" MATCHES "/MT")
@@ -114,7 +127,7 @@ ELSE(UNIX)
     IF("${CMAKE_CXX_FLAGS_DEBUG}" MATCHES "/MT")
       SET(SUFFIX_DEBUG "sg")
     ENDIF("${CMAKE_CXX_FLAGS_DEBUG}" MATCHES "/MT")
-  ENDIF (BUILD_SHARED_LIBS)
+  ENDIF (TCL_TK_USE_SHARED_LIBS)
 
   SET(TCL_LIBRARY ${TCL_TK_WIN_DISTRIB_DIR}/lib/tcl84${SUFFIX}.lib
     CACHE INTERNAL "Path to tcl library" FORCE)
@@ -146,7 +159,7 @@ ELSE(UNIX)
   SET(VTK_TK_SUPPORT_LIBRARY_PATH 
     "${TclTk_SOURCE_DIR}/tk${TCL_TK_WIN_VERSION}/library")
 
-  IF(BUILD_SHARED_LIBS)
+  IF (TCL_TK_USE_SHARED_LIBS)
     # There is *no* choice but installing the debug libs
     # as well. VTK makes its choice regarding what to link against at
     # link time, picking from either TCL_LIBRARY or (TCL_LIBRARY_DEBUG for
@@ -174,7 +187,7 @@ ELSE(UNIX)
           FILES ${TclTk_SOURCE_DIR}/${dll})
       ENDIF(NOT TclTk_INSTALL_NO_RUNTIME)
     ENDFOREACH(dll)
-  ENDIF (BUILD_SHARED_LIBS)
+  ENDIF (TCL_TK_USE_SHARED_LIBS)
 
 ENDIF(UNIX)
 
