@@ -1,17 +1,5 @@
 PROJECT(pqCore)
 
-IF(PARAVIEW_EMBED_PYTHON)
-  FIND_PACKAGE(PythonLibs)
-
-  SET(PYTHON_LINK_LIBRARIES
-    vtkPVPythonInterpretor
-    QtPython
-    vtkPVServerCommonPythonD
-    vtkPVServerManagerPythonD
-    ${PYTHON_LIBRARIES}
-  )
-ENDIF(PARAVIEW_EMBED_PYTHON)
-
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
   ${PARAVIEW_INCLUDE_DIRS}
@@ -211,7 +199,6 @@ TARGET_LINK_LIBRARIES(pqCore
   QtWidgets
   vtkPVServerManager
   QVTK
-  ${PYTHON_LINK_LIBRARIES}
 )
 
 
