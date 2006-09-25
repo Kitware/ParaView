@@ -23,7 +23,7 @@
 #ifndef __vtkPickFilter_h
 #define __vtkPickFilter_h
 
-#include "vtkUnstructuredGridSource.h"
+#include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkMultiProcessController;
 class vtkIdList;
@@ -32,21 +32,12 @@ class vtkPoints;
 class vtkDataSet;
 class vtkAppendFilter;
 
-class VTK_EXPORT vtkPickFilter : public vtkUnstructuredGridSource
+class VTK_EXPORT vtkPickFilter : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkPickFilter *New();
-  vtkTypeRevisionMacro(vtkPickFilter,vtkUnstructuredGridSource);
+  vtkTypeRevisionMacro(vtkPickFilter,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Multiple inputs for multiblock.
-  void AddInput(vtkDataSet* input);
-  void AddInput(vtkDataObject*){vtkErrorMacro("NotDefined");}
-  vtkDataSet* GetInput(int idx);
-  void RemoveInput(vtkDataSet* input);
-  void RemoveInput(vtkDataObject*){vtkErrorMacro("NotDefined");}
-  void RemoveAllInputs();
 
   // Description:
   // Set your picking point here.
@@ -89,15 +80,31 @@ protected:
   vtkPickFilter();
   ~vtkPickFilter();
 
-  virtual void Execute();
-  void PointExecute();
-  void CellExecute();
-  int CompareProcesses(double bestDist2);
-  void CreateOutput(vtkIdList* regionCellIds);
+  virtual int FillInputPortInformation(int, vtkInformation *);
 
-  virtual void IdExecute();
-  int CellIdExecute(vtkDataSet* input, int inputIdx,  vtkAppendFilter* append);
-  int PointIdExecute(vtkDataSet* input, int inputIdx, vtkAppendFilter* append);
+  virtual int RequestData(
+    vtkInformation *vtkNotUsed(request),
+    vtkInformationVector **inputVector,
+    vtkInformationVector *outputVector);
+  void PointExecute(vtkInformationVector **inputVector,
+                    vtkInformationVector *outputVector);
+  void CellExecute(vtkInformationVector **inputVector,
+                   vtkInformationVector *outputVector);
+  int CompareProcesses(double bestDist2);
+  void CreateOutput(vtkInformationVector **inputVector,
+                    vtkInformationVector *outputVector,
+                    vtkIdList* regionCellIds);
+
+  virtual void IdExecute(vtkInformationVector **inputVector,
+                         vtkInformationVector *outputVector);
+  int CellIdExecute(int numInputs, 
+                    vtkDataSet* input, 
+                    int inputIdx,  
+                    vtkAppendFilter* append);
+  int PointIdExecute(int numInputs, 
+                     vtkDataSet* input, 
+                     int inputIdx, 
+                     vtkAppendFilter* append);
 
   // Flag that toggles between picking cells or picking points.
   int PickCell;

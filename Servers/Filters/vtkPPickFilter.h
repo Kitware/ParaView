@@ -37,7 +37,8 @@ protected:
 
   // We only need to collect for IdExecute, since when picking with
   // world point, the super class already does the collection.
-  virtual void IdExecute();
+  virtual void IdExecute(vtkInformationVector **inputVector,
+                         vtkInformationVector *outputVector);
 private:
   vtkPPickFilter(const vtkPPickFilter&); // Not implemented.
   void operator=(const vtkPPickFilter&); // Not implemented.
