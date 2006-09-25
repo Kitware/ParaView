@@ -6,7 +6,7 @@ import paraview
 import os.path
 import sys
 
-paraview.ActiveConnection = paraview.connect()
+paraview.ActiveConnection = paraview.Connect()
 
 SMPythonTesting.ProcessCommandLineArguments()
 

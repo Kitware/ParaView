@@ -7,7 +7,7 @@ import os.path
 import sys
 import time
 import paraview
-paraview.ActiveConnection = paraview.connect()
+paraview.ActiveConnection = paraview.Connect()
 
 
 def RenderAndWait(ren):

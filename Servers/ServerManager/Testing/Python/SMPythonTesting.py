@@ -116,7 +116,7 @@ if __name__ == "__main__":
   # This script loads the state, saves out a temp state and loads the saved state.
   # This saved state is used for testing -- this will ensure load/save SM state
   # is working fine.
-  paraview.ActiveConnection = paraview.connect()
+  paraview.ActiveConnection = paraview.Connect()
   ProcessCommandLineArguments()
   ret = 1
   if StateXMLFileName:
