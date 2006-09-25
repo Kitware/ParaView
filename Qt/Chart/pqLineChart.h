@@ -49,7 +49,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqChartAxis;
 class pqChartCoordinate;
-class pqAbstractPlot;
+class pqLineChartInternal;
+class pqLineChartItem;
+class pqLineChartModel;
+class pqLineChartPlot;
+class pqLineChartPlotOptions;
 class QPainter;
 class QHelpEvent;
 
@@ -61,8 +65,7 @@ class QHelpEvent;
 /// same chart. The line chart can also be drawn over a
 /// histogram as well. When combined with another chart, the
 /// x-axis should be marked as a shared axis.
-class QTCHART_EXPORT pqLineChart :
-  public QObject
+class QTCHART_EXPORT pqLineChart : public QObject
 {
   Q_OBJECT
 
@@ -78,8 +81,7 @@ public:
   /// \brief
   ///   Sets the axes for the chart.
   ///
-  /// The axes must be set before the chart data can be set. If
-  /// the x-axis is shared by another chart, the lie chart will
+  /// If the x-axis is shared by another chart, the line chart will
   /// not modify the x-axis.
   ///
   /// \param xAxis The x-axis object.
@@ -89,23 +91,37 @@ public:
       bool shared=false);
 
   /// \brief
-  ///   Removes all the line plots from the chart.
-  /// \sa
-  ///   pqLineChart::addData(pqAbstractPlot *)
-  void clearData();
+  ///   Sets the line chart model to be displayed.
+  /// \param model A pointer to the new line chart model.
+  void setModel(pqLineChartModel *model);
 
   /// \brief
-  ///   Adds another line plot to the chart.
-  /// \param plot The line plot to add.
-  void addData(pqAbstractPlot *plot);
-
-  /// \brief
-  ///   Removes the specified line plot from the chart.
-  /// \param plot The line plot to remove.
-  void removeData(pqAbstractPlot *plot);
+  ///   Gets the current line chart model.
+  /// \return
+  ///   A pointer to the currect line chart model.
+  pqLineChartModel *getModel() const {return this->Model;}
   //@}
 
-  /// \name Layout Methods
+  /// \name Drawing Parameters
+  //@{
+  /// \brief
+  ///   Sets the drawing parameters for a plot.
+  /// \param options The plot options object.
+  /// \param plot The plot index to set.
+  void setPlotOptions(pqLineChartPlotOptions *options, int plot);
+
+  /// \brief
+  ///   Gets the drawing parameters for a plot.
+  /// \param plot The plot index to look up.
+  /// \return
+  ///   A pointer to the drawing parameters for a plot.
+  pqLineChartPlotOptions *getPlotOptions(int plot) const;
+
+  /// Clears the list of plot options.
+  void clearPlotOptions();
+  //@}
+
+  /// \name Display Methods
   //@{
   /// \brief
   ///   Used to layout the line chart.
@@ -125,11 +141,11 @@ public:
   ///
   /// \param painter The painter to use.
   /// \param area The area that needs to be painted.
-  void drawChart(QPainter& painter, const QRect& area);
+  void drawChart(QPainter &painter, const QRect &area);
   //@}
 
   /// Displays a tooltip based on the position of the given event, relative to the chart data
-  void showTooltip(QHelpEvent& event);
+  //void showTooltip(QHelpEvent *event);
 
 signals:
   /// Called when the line chart needs to be layed-out
@@ -138,17 +154,59 @@ signals:
   /// Called when the line chart needs to be repainted.
   void repaintNeeded();
 
+private slots:
+  /// Updates the layout of the line chart when the model is reset.
+  void handleModelReset();
+
+  void startPlotInsertion(int first, int last);
+  void finishPlotInsertion(int first, int last);
+  void startPlotRemoval(int first, int last);
+  void finishPlotRemoval(int first, int last);
+
+  void handlePlotMoved(int current, int index);
+  void handlePlotReset(const pqLineChartPlot *plot);
+
+  void startPointInsertion(const pqLineChartPlot *plot, int series, int first,
+      int last);
+  void finishPointInsertion(const pqLineChartPlot *plot, int series);
+  void startPointRemoval(const pqLineChartPlot *plot, int series, int first,
+      int last);
+  void finishPointRemoval(const pqLineChartPlot *plot, int series);
+  void startMultiSeriesChange(const pqLineChartPlot *plot);
+  void finishMultiSeriesChange(const pqLineChartPlot *plot);
+  void handlePlotErrorBoundsChanged(const pqLineChartPlot *plot, int series,
+      int first, int last);
+  void handlePlotErrorWidthChanged(const pqLineChartPlot *plot, int series);
+
 private:
-  /// Internal implementation detail
-  void updateAxes();
+  /// \brief
+  ///   Updates the axis ranges when the model changes.
+  /// \param force True if the ranges should be set unchecked.
+  void updateAxisRanges(bool force=true);
+
+  /// Removes all the line plots from the chart.
+  void clearData();
+
+  /// Builds the plot list when the model is reset.
+  void buildPlotList();
+
+  /// \brief
+  ///   Gets the internal line chart item for the given plot.
+  /// \param plot The plot to look up.
+  /// \return
+  ///   A pointer to the internal chart item for the given plot.
+  pqLineChartItem *getItem(const pqLineChartPlot *plot) const;
 
 public:
-  QRect Bounds;          ///< Stores the chart area.
+  QRect Bounds;                  ///< Stores the chart area.
 
 private:
-  /// Private implementation details
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  pqLineChartInternal *Internal; ///< Stores the plot layout.
+  pqLineChartModel *Model;       ///< A pointer to the model.
+  pqChartAxis *XAxis;            ///< A pointer to the x-axis.
+  pqChartAxis *YAxis;            ///< A pointer to the y-axis.
+  bool XShared;                  ///< True if the x-axis is shared.
+  bool NeedsLayout;              ///< True if a chart layout is needed.
 };
 
 #endif

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqLineChartPlot.cxx
+   Module:    pqLineChartPlotOptions.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,53 +30,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqLineChartPlot.cxx
-/// \date 9/7/2006
+/// \file pqLineChartPlotOptions.h
+/// \date 9/18/2006
 
-#include "pqLineChartPlot.h"
-
-#include "pqChartCoordinate.h"
-#include "pqChartValue.h"
+#ifndef _pqLineChartPlotOptions_h
+#define _pqLineChartPlotOptions_h
 
 
-pqLineChartPlot::pqLineChartPlot(QObject *parentObject)
-  : QObject(parentObject)
+#include "QtChartExport.h"
+#include <QObject>
+
+class pqLineChartPlotOptionsInternal;
+class pqPointMarker;
+class QBrush;
+class QPainter;
+class QPen;
+
+
+class QTCHART_EXPORT pqLineChartPlotOptions : public QObject
 {
-}
+  Q_OBJECT
 
-void pqLineChartPlot::resetPlot()
-{
-  emit this->plotReset();
-}
+public:
+  pqLineChartPlotOptions(QObject *parent=0);
+  ~pqLineChartPlotOptions();
 
-void pqLineChartPlot::beginInsertPoints(int series, int first, int last)
-{
-  emit this->aboutToInsertPoints(series, first, last);
-}
+  void setPen(int series, const QPen &pen);
+  void setBrush(int series, const QBrush &brush);
+  void setMarker(int series, pqPointMarker *marker);
 
-void pqLineChartPlot::endInsertPoints(int series)
-{
-  emit this->pointsInserted(series);
-}
+  void setupPainter(QPainter &painter, int series) const;
+  pqPointMarker *getMarker(int series) const;
 
-void pqLineChartPlot::beginRemovePoints(int series, int first, int last)
-{
-  emit this->aboutToRemovePoints(series, first, last);
-}
+signals:
+  void optionsChanged();
 
-void pqLineChartPlot::endRemovePoints(int series)
-{
-  emit this->pointsRemoved(series);
-}
+private:
+  pqLineChartPlotOptionsInternal *Internal;
+};
 
-void pqLineChartPlot::beginMultiSeriesChange()
-{
-  emit this->aboutToChangeMultipleSeries();
-}
-
-void pqLineChartPlot::endMultiSeriesChange()
-{
-  emit this->changedMultipleSeries();
-}
-
-
+#endif

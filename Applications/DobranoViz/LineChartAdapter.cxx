@@ -20,9 +20,12 @@
 #include <pqChartLabel.h>
 #include <pqChartLegend.h>
 #include <pqLineChart.h>
+#include <pqLineChartModel.h>
+#include <pqLineChartPlotOptions.h>
 #include <pqLineChartWidget.h>
-#include <pqLinePlot.h>
+#include <pqSimpleLineChartPlot.h>
 #include <pqMarkerPen.h>
+#include <pqPointMarker.h>
 #include <pqWaitCursor.h>
 
 #include <QDir>
@@ -101,6 +104,10 @@ struct LineChartAdapter::pqImplementation
     SourceProxy(0),
     EventAdaptor(vtkSmartPointer<vtkEventQtSlotConnect>::New()),
     Chart(chart),
+    ChartModel(new pqLineChartModel()),
+    ChartPlots(),
+    ChartPlotOptions(),
+    CircleMarker(new pqCirclePointMarker(QSize(4, 4))),
     ExodusVariableType(VARIABLE_TYPE_CELL),
     Samples(50),
     ErrorBarWidth(0.5),
@@ -124,6 +131,8 @@ struct LineChartAdapter::pqImplementation
     bold_italic.setBold(true);
     bold_italic.setItalic(true);
     bold_italic.setStyleStrategy(QFont::PreferAntialias);
+
+    this->Chart.getLineChart().setModel(this->ChartModel);
     
     this->Chart.setBackgroundColor(Qt::white);
     
@@ -149,6 +158,26 @@ struct LineChartAdapter::pqImplementation
   
   ~pqImplementation()
   {
+    // Clean up the chart model.
+    delete this->ChartModel;
+
+    // Clean up the plots in the model.
+    QList<pqSimpleLineChartPlot *>::Iterator plot = this->ChartPlots.begin();
+    for( ; plot != this->ChartPlots.end(); ++plot)
+      {
+      delete *plot;
+      }
+
+    QList<pqLineChartPlotOptions *>::Iterator options =
+        this->ChartPlotOptions.begin();
+    for( ; options != this->ChartPlotOptions.end(); ++options)
+      {
+      delete *options;
+      }
+
+    this->ChartPlots.clear();
+    this->ChartPlotOptions.clear();
+    delete this->CircleMarker;
   }
   
   void setExodusProxy(vtkSMProxy* Proxy)
@@ -568,8 +597,24 @@ struct LineChartAdapter::pqImplementation
   
     const int samples = vtkstd::min(data.Values.size(), this->Samples);
 
+    // Set up the plot drawing parameters.
+    pqLineChartPlotOptions *options = new pqLineChartPlotOptions();
+    this->ChartPlotOptions.append(options);
+    options->setPen(0, plot_pen);
+    options->setPen(1, whisker_pen);
+    options->setPen(2, QPen(plot_pen.color(), 0.5));
+    options->setBrush(2, QBrush(Qt::white));
+    options->setMarker(2, this->CircleMarker);
+
+    // Set up the error plot.
+    // TODO: handle the image tooltip.
+    pqSimpleLineChartPlot *plot = new pqSimpleLineChartPlot();
+    this->ChartPlots.append(plot);
+    plot->addSeries(pqLineChartPlot::Line);
+    plot->addSeries(pqLineChartPlot::Error);
+    plot->addSeries(pqLineChartPlot::Point);
+
     double time_delta = VTK_DOUBLE_MAX;
-    pqLineErrorPlot::CoordinatesT coordinates;
     for(int i = 0; i != samples; ++i)
       {
       const int index = static_cast<int>(static_cast<double>(i) / static_cast<double>(samples - 1) * (data.Times.size() - 1));
@@ -580,22 +625,37 @@ struct LineChartAdapter::pqImplementation
         const int index2 = static_cast<int>(static_cast<double>(i-1) / static_cast<double>(samples - 1) * (data.Times.size() - 1));
         time_delta = vtkstd::min(time_delta, data.Times[index] - data.Times[index2]);
         }
-        
-      coordinates.push_back(
-        pqLineErrorPlot::Coordinate(
-          data.Times[index],
-          data.Values[index],
-          data.UpperBounds[index],
-          data.LowerBounds[index]));
+
+      // Add the coordinates to the plot. Add the error bounds to the
+      // plot as well.
+      plot->addPoint(1, pqChartCoordinate(pqChartValue(data.Times[index]),
+          pqChartValue(data.Values[index])));
+      plot->setErrorBounds(1, index,
+          pqChartValue(data.Values[index] + data.UpperBounds[index]),
+          pqChartValue(data.Values[index] - data.LowerBounds[index]));
       }
 
-    this->Chart.getLineChart().addData(
+    // Set the error bar width based on the calculated time_delta.
+    plot->setErrorWidth(1, pqChartValue(this->ErrorBarWidth * time_delta * 0.5));
+
+    // Copy the point data from the error series to the point and line
+    // series.
+    plot->copySeriesPoints(1, 0);
+    plot->copySeriesPoints(1, 2);
+
+    // Add the plot options to the chart. Add the plot to the line
+    // chart model.
+    this->Chart.getLineChart().setPlotOptions(options,
+        this->ChartModel->getNumberOfPlots());
+    this->ChartModel->appendPlot(plot);
+
+    /*this->Chart.getLineChart().addData(
       new ImageLineErrorPlot(
         new pqCircleMarkerPen(plot_pen, QSize(4, 4), QPen(plot_pen.color(), 0.5), QBrush(Qt::white)),
         whisker_pen,
         this->ErrorBarWidth * time_delta,
         coordinates,
-        getReferenceImage(experimental_data)));
+        getReferenceImage(experimental_data)));*/
 
     this->Chart.getLegend().addEntry(
       new pqCircleMarkerPen(plot_pen, QSize(4, 4), QPen(plot_pen.color(), 0.5), QBrush(Qt::white)),
@@ -606,8 +666,23 @@ struct LineChartAdapter::pqImplementation
   {
     const DataT data = getSimulationData(reader, simulation_element_id);
 
+    // Set up the plot drawing parameters.
+    pqLineChartPlotOptions *options = new pqLineChartPlotOptions();
+    this->ChartPlotOptions.append(options);
+    options->setPen(0, pen);
+    options->setPen(1, pen);
+    options->setPen(2, QPen(pen.color(), 0.5));
+    options->setBrush(2, QBrush(Qt::white));
+    options->setMarker(2, this->CircleMarker);
+
+    // Set up the error plot.
+    pqSimpleLineChartPlot *plot = new pqSimpleLineChartPlot();
+    this->ChartPlots.append(plot);
+    plot->addSeries(pqLineChartPlot::Line);
+    plot->addSeries(pqLineChartPlot::Error);
+    plot->addSeries(pqLineChartPlot::Point);
+
     double time_delta = VTK_DOUBLE_MAX;
-    pqLineErrorPlot::CoordinatesT coordinates;
     for(int i = 0; i != data.Times.size(); ++i)
       {
       // Keep track of the distance between samples so we can size our error-bar whiskers appropriately ...
@@ -615,21 +690,29 @@ struct LineChartAdapter::pqImplementation
         {
         time_delta = vtkstd::min(time_delta, data.Times[i] - data.Times[i-1]);
         }
-        
-      coordinates.push_back(
-        pqLineErrorPlot::Coordinate(
-          data.Times[i],
-          data.Values[i],
-          data.UpperBounds[i],
-          data.LowerBounds[i]));
+
+      // Add the coordinates to the plot. Add the error bounds to the
+      // plot as well.
+      plot->addPoint(1, pqChartCoordinate(pqChartValue(data.Times[i]),
+          pqChartValue(data.Values[i])));
+      plot->setErrorBounds(1, i,
+          pqChartValue(data.Values[i] + data.UpperBounds[i]),
+          pqChartValue(data.Values[i] - data.LowerBounds[i]));
       }
 
-    this->Chart.getLineChart().addData(
-      new pqLineErrorPlot(
-        new pqCircleMarkerPen(pen, QSize(4, 4), QPen(pen.color(), 0.5), QBrush(Qt::white)),
-        pen,
-        this->ErrorBarWidth * time_delta,
-        coordinates));
+    // Set the error bar width based on the calculated time_delta.
+    plot->setErrorWidth(1, pqChartValue(this->ErrorBarWidth * time_delta * 0.5));
+
+    // Copy the point data from the error series to the point and line
+    // series.
+    plot->copySeriesPoints(1, 0);
+    plot->copySeriesPoints(1, 2);
+
+    // Add the plot options to the chart. Add the plot to the line
+    // chart model.
+    this->Chart.getLineChart().setPlotOptions(options,
+        this->ChartModel->getNumberOfPlots());
+    this->ChartModel->appendPlot(plot);
 
     this->Chart.getLegend().addEntry(
       new pqCircleMarkerPen(pen, QSize(4, 4), QPen(pen.color(), 0.5), QBrush(Qt::white)),
@@ -648,9 +731,24 @@ struct LineChartAdapter::pqImplementation
   
     const int samples = vtkstd::min(experimental_data.Values.size(), this->Samples);
 
+    // Set up the plot drawing parameters.
+    pqLineChartPlotOptions *options = new pqLineChartPlotOptions();
+    this->ChartPlotOptions.append(options);
+    options->setPen(0, QPen(Qt::gray));
+    options->setPen(1, QPen(Qt::gray));
+    options->setPen(2, QPen(Qt::gray, 0.5));
+    options->setBrush(2, QBrush(Qt::white));
+    options->setMarker(2, this->CircleMarker);
+
+    // Set up the error plot.
+    pqSimpleLineChartPlot *plot = new pqSimpleLineChartPlot();
+    this->ChartPlots.append(plot);
+    plot->addSeries(pqLineChartPlot::Line);
+    plot->addSeries(pqLineChartPlot::Error);
+    plot->addSeries(pqLineChartPlot::Point);
+
     // For each experimental value ...   
     double time_delta = VTK_DOUBLE_MAX;
-    pqLineErrorPlot::CoordinatesT coordinates;
     for(int i = 0; i != samples; ++i)
       {
       const int index = static_cast<int>(static_cast<double>(i) / static_cast<double>(samples - 1) * (experimental_data.Times.size() - 1));
@@ -688,21 +786,32 @@ struct LineChartAdapter::pqImplementation
       const double simulation_value = lerp(simulation_data.Values[s1], simulation_data.Values[s2], amount);
       const double simulation_upper_bound = lerp(simulation_data.UpperBounds[s1], simulation_data.UpperBounds[s2], amount);
       const double simulation_lower_bound = lerp(simulation_data.LowerBounds[s1], simulation_data.LowerBounds[s2], amount);
-      
-      coordinates.push_back(
-        pqLineErrorPlot::Coordinate(
-          experimental_time,
-          simulation_value - experimental_value,
-          sqrt(experimental_upper_bound * experimental_upper_bound + simulation_upper_bound * simulation_upper_bound),
-          sqrt(experimental_lower_bound * experimental_lower_bound + simulation_lower_bound * simulation_lower_bound)));
+
+      // Add the coordinates to the plot. Add the error bounds to the
+      // plot as well.
+      pqChartValue value(simulation_value - experimental_value);
+      plot->addPoint(1, pqChartCoordinate(pqChartValue(experimental_time),
+          value));
+      plot->setErrorBounds(1, i,
+          value + sqrt(experimental_upper_bound * experimental_upper_bound +
+          simulation_upper_bound * simulation_upper_bound),
+          value - sqrt(experimental_lower_bound * experimental_lower_bound +
+          simulation_lower_bound * simulation_lower_bound));
       }
 
-    this->Chart.getLineChart().addData(
-      new pqLineErrorPlot(
-        new pqCircleMarkerPen(QPen(Qt::gray), QSize(4, 4), QPen(Qt::gray, 0.5), QBrush(Qt::white)),
-        QPen(Qt::gray),
-        this->ErrorBarWidth * time_delta,
-        coordinates));
+    // Set the error bar width based on the calculated time_delta.
+    plot->setErrorWidth(1, pqChartValue(this->ErrorBarWidth * time_delta * 0.5));
+
+    // Copy the point data from the error series to the point and line
+    // series.
+    plot->copySeriesPoints(1, 0);
+    plot->copySeriesPoints(1, 2);
+
+    // Add the plot options to the chart. Add the plot to the line
+    // chart model.
+    this->Chart.getLineChart().setPlotOptions(options,
+        this->ChartModel->getNumberOfPlots());
+    this->ChartModel->appendPlot(plot);
 
     this->Chart.getLegend().addEntry(
       new pqCircleMarkerPen(QPen(Qt::gray), QSize(4, 4), QPen(Qt::gray, 0.5), QBrush(Qt::white)),
@@ -712,7 +821,23 @@ struct LineChartAdapter::pqImplementation
   void updateChart()
   {
     // Set the default (no data) appearance of the chart ...
-    this->Chart.getLineChart().clearData();
+    // Clean up the plots in the model.
+    this->ChartModel->clearPlots();
+    QList<pqSimpleLineChartPlot *>::Iterator plot = this->ChartPlots.begin();
+    for( ; plot != this->ChartPlots.end(); ++plot)
+      {
+      delete *plot;
+      }
+
+    QList<pqLineChartPlotOptions *>::Iterator options = this->ChartPlotOptions.begin();
+    for( ; options != this->ChartPlotOptions.end(); ++options)
+      {
+      delete *options;
+      }
+
+    this->ChartPlots.clear();
+    this->ChartPlotOptions.clear();
+
     this->Chart.getTitle().setText("Time Plot (no data)");
     this->Chart.getXAxis().setVisible(true);
     this->Chart.getXAxis().setValueRange(0.0, 100.0);
@@ -809,6 +934,10 @@ struct LineChartAdapter::pqImplementation
   vtkSMProxy* SourceProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> EventAdaptor;
   pqLineChartWidget& Chart;
+  pqLineChartModel *ChartModel;
+  QList<pqSimpleLineChartPlot *> ChartPlots;
+  QList<pqLineChartPlotOptions *> ChartPlotOptions;
+  pqCirclePointMarker *CircleMarker;
   
   pqVariableType ExodusVariableType;
   QString ExodusVariableName;

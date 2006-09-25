@@ -49,6 +49,8 @@ SET(QtChart_SRCS
   pqLineChartModel.h
   pqLineChartPlot.cxx
   pqLineChartPlot.h
+  pqLineChartPlotOptions.cxx
+  pqLineChartPlotOptions.h
   pqLineChartWidget.cxx
   pqLineChartWidget.h
   pqLineErrorPlot.cxx
@@ -59,8 +61,12 @@ SET(QtChart_SRCS
   pqMarkerPen.h
   pqPixelTransferFunction.cxx
   pqPixelTransferFunction.h
+  pqPointMarker.cxx
+  pqPointMarker.h
   pqScatterPlot.cxx
   pqScatterPlot.h
+  pqSimpleLineChartPlot.cxx
+  pqSimpleLineChartPlot.h
   QtChartExport.h
 )
 
@@ -85,6 +91,7 @@ QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqLineChart.h
   pqLineChartModel.h
   pqLineChartPlot.h
+  pqLineChartPlotOptions.h
   pqLineChartWidget.h
 )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")

@@ -128,8 +128,7 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p) :
   connect(this->YAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
 
   this->LineChart->setAxes(this->XAxis, this->YAxis);
-  connect(this->LineChart, SIGNAL(layoutNeeded()), this,
-      SLOT(updateLayout()));
+  connect(this->LineChart, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
   connect(this->LineChart, SIGNAL(repaintNeeded()), this,
       SLOT(repaintChart()));
 
@@ -245,7 +244,9 @@ QSize pqLineChartWidget::sizeHint() const
 bool pqLineChartWidget::event(QEvent *e)
 {
   if(e->type() == QEvent::ToolTip)
-    this->LineChart->showTooltip(*static_cast<QHelpEvent*>(e));
+    {
+    //this->LineChart->showTooltip(static_cast<QHelpEvent*>(e));
+    }
   
   return QAbstractScrollArea::event(e);
 }
