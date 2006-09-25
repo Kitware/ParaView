@@ -2001,6 +2001,8 @@ pqPipelineSource* pqMainWindowCore::createCompoundSource(
 {
   pqPipelineSource* cp = pqApplicationCore::instance()->createCompoundFilter(name,
       this->getActiveServer(), this->getActiveSource());
+
+  cp->getProxy()->UpdateVTKObjects();
   
   return cp;
 }

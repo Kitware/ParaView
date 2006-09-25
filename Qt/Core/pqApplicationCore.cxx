@@ -713,7 +713,7 @@ pqPipelineSource* pqApplicationCore::createCompoundFilter(
 
   if(source)
     {
-    source->getProxy()->UpdateVTKObjects();
+    //source->getProxy()->UpdateVTKObjects();
     emit this->sourceCreated(source);
     }
 
