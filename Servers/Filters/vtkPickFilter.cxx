@@ -21,6 +21,8 @@
 #include "vtkCell.h"
 #include "vtkIdList.h"
 #include "vtkIdTypeArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkIntArray.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
@@ -33,7 +35,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.20");
+vtkCxxRevisionMacro(vtkPickFilter, "1.21");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -66,76 +68,45 @@ vtkPickFilter::~vtkPickFilter ()
 }
 
 //----------------------------------------------------------------------------
-// Specify the input data or filter.
-vtkDataSet *vtkPickFilter::GetInput(int idx)
+int vtkPickFilter::FillInputPortInformation(int port, vtkInformation *info)
 {
-  if (this->NumberOfInputs <= idx)
-    {
-    return NULL;
-    }
-  
-  return (vtkDataSet *)(this->Inputs[idx]);
-}
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
+  info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
 
-//----------------------------------------------------------------------------
-// Specify the input data or filter.
-void vtkPickFilter::AddInput(vtkDataSet *input)
-{
-  this->vtkProcessObject::AddInput(input);
-}
-
-//----------------------------------------------------------------------------
-// Remove a dataset from the list of data to append.
-void vtkPickFilter::RemoveInput(vtkDataSet *ds)
-{
-  this->vtkProcessObject::RemoveInput(ds);
-  this->vtkProcessObject::SqueezeInputArray();
-}
-
-
-//----------------------------------------------------------------------------
-// Specify the input data or filter.
-void vtkPickFilter::RemoveAllInputs()
-{
-  int num, idx;
-  num = this->NumberOfInputs;
-  vtkDataSet* input; 
-  if (num > 0)
-    {
-    this->Modified();
-    }
-  for (idx = num-1; idx >= 0; --idx)
-    {
-    input = this->GetInput(idx);
-    this->RemoveInput(input);
-    }
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPickFilter::Execute()
+int vtkPickFilter::RequestData(
+  vtkInformation *vtkNotUsed(request),
+  vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
   if (this->UseIdToPick)
     {
-    this->IdExecute();
-    return;
+    this->IdExecute(inputVector, outputVector);
+    return 1;
     }
 
   this->BestInputIndex = -1;
 
   if (this->PickCell)
     {
-    this->CellExecute();
+    this->CellExecute(inputVector, outputVector);
     }
   else
     {
-    this->PointExecute();
+    this->PointExecute(inputVector, outputVector);
     }
 
   this->DeletePointMap();
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPickFilter::PointExecute()
+void vtkPickFilter::PointExecute(vtkInformationVector **inputVector,
+                                 vtkInformationVector *outputVector)
 {
   double pt[3];
   double distance2;
@@ -143,10 +114,11 @@ void vtkPickFilter::PointExecute()
   double bestDistance2;
   vtkIdType bestId = 0;
   double tmp;
-  int numInputs = this->GetNumberOfInputs();
   int inputIdx;
   vtkDataSet* input;
   vtkIdType numPts = 0, ptId;
+
+  int numInputs = inputVector[0]->GetNumberOfInformationObjects();
 
   if (numInputs == 0)
     {
@@ -159,7 +131,7 @@ void vtkPickFilter::PointExecute()
 
   for (inputIdx = 0; inputIdx < numInputs; ++inputIdx)
     {
-    input = this->GetInput(inputIdx);
+    input = vtkDataSet::GetData(inputVector[0], inputIdx);
     numPts = input->GetNumberOfPoints();
     for (ptId = 0; ptId < numPts; ++ptId)
       {
@@ -188,16 +160,18 @@ void vtkPickFilter::PointExecute()
     {
     // Only one point in map.
     this->InitializePointMap(
-          this->GetInput(this->BestInputIndex)->GetNumberOfPoints());
+      vtkDataSet::GetData(
+        inputVector[0], this->BestInputIndex)->GetNumberOfPoints());
     this->InsertIdInPointMap(bestId);
     }
 
-  this->CreateOutput(regionCellIds);
+  this->CreateOutput(inputVector, outputVector, regionCellIds);
   regionCellIds->Delete();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPickFilter::CellExecute()
+void vtkPickFilter::CellExecute(vtkInformationVector **inputVector,
+                                vtkInformationVector *outputVector)
 {
   // Loop over all of the cells.
   vtkDataSet* input;
@@ -214,7 +188,7 @@ void vtkPickFilter::CellExecute()
   vtkIdType numCells;
   vtkIdType bestId = -1;
 
-  numInputs = this->NumberOfInputs;
+  numInputs = inputVector[0]->GetNumberOfInformationObjects();
   if (numInputs == 0)
     {
     return;
@@ -222,7 +196,7 @@ void vtkPickFilter::CellExecute()
 
   for (inputIdx = 0; inputIdx < numInputs; ++inputIdx)
     {
-    input = this->GetInput(inputIdx);
+    input = vtkDataSet::GetData(inputVector[0], inputIdx);
     weights = new double[input->GetMaxCellSize()];
     numCells = input->GetNumberOfCells();
     for (cellId=0; cellId < numCells; cellId++)
@@ -250,7 +224,7 @@ void vtkPickFilter::CellExecute()
   vtkIdList* regionCellIds = vtkIdList::New();
   if ( ! this->CompareProcesses(bestDist2) && bestId >= 0)
     {
-    input = this->GetInput(this->BestInputIndex);
+    input = vtkDataSet::GetData(inputVector[0], this->BestInputIndex);
     this->InitializePointMap(input->GetNumberOfPoints());
     regionCellIds->InsertNextId(bestId);
     // Insert the cell points.
@@ -264,7 +238,7 @@ void vtkPickFilter::CellExecute()
     cellPtIds->Delete();
     }
 
-  this->CreateOutput(regionCellIds);
+  this->CreateOutput(inputVector, outputVector, regionCellIds);
   regionCellIds->Delete();
 }
 
@@ -366,14 +340,17 @@ int vtkPickFilter::CompareProcesses(double bestDist2)
 
 //-----------------------------------------------------------------------------
 // I made this general so we could grow the region from the seed.
-void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds)
+void vtkPickFilter::CreateOutput(vtkInformationVector **inputVector,
+                                 vtkInformationVector *outputVector,
+                                 vtkIdList* regionCellIds)
 {
   if (this->BestInputIndex < 0 || this->RegionPointIds == 0)
     {
     return;
     }
-  vtkDataSet* input = this->GetInput(this->BestInputIndex);
-  vtkUnstructuredGrid* output = this->GetOutput();
+  vtkDataSet* input = vtkDataSet::GetData(inputVector[0], this->BestInputIndex);
+  vtkUnstructuredGrid* output = vtkUnstructuredGrid::GetData(outputVector);
+
   double pt[3];
   // Preserve the original Ids.
   // Us int here because mapper has a problem with vtkIdTypeArray.
@@ -437,8 +414,10 @@ void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds)
   ptIds = NULL;
   
   // Add an array that shows which part this point comes from.
-  if (this->GetNumberOfInputs() > 1)
+  if (inputVector[0]->GetNumberOfInformationObjects() > 1)
     {
+    vtkUnstructuredGrid* output = 
+      vtkUnstructuredGrid::GetData(outputVector);
     if (this->PickCell)
       {
       vtkIntArray* partArray = vtkIntArray::New();
@@ -451,7 +430,7 @@ void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds)
         partArray->SetComponent(id, 0, this->BestInputIndex);
         }
       partArray->SetName("PartIndex");
-      this->GetOutput()->GetCellData()->AddArray(partArray);
+      output->GetCellData()->AddArray(partArray);
       partArray->Delete();
       partArray = 0;
       }
@@ -467,7 +446,7 @@ void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds)
         partArray->SetComponent(id, 0, this->BestInputIndex);
         }
       partArray->SetName("PartIndex");
-      this->GetOutput()->GetPointData()->AddArray(partArray);
+      output->GetPointData()->AddArray(partArray);
       partArray->Delete();
       partArray = 0;
       }
@@ -557,22 +536,24 @@ void vtkPickFilter::PrintSelf(ostream& os, vtkIndent indent)
 //-----------------------------------------------------------------------------
 // Execute for each input, then append the separate outputs.
 // Completely separate logic for picking by id
-void vtkPickFilter::IdExecute()
+void vtkPickFilter::IdExecute(vtkInformationVector **inputVector,
+                              vtkInformationVector *outputVector)
 {
   int numInputs, idx;
   vtkAppendFilter* append = vtkAppendFilter::New();
 
   int execOK = 0;
-  numInputs = this->GetNumberOfInputs();
+  numInputs = inputVector[0]->GetNumberOfInformationObjects();
   for (idx = 0; idx < numInputs; ++idx)
     {
+    vtkDataSet* input = vtkDataSet::GetData(inputVector[0], idx);
     if (this->PickCell)
       {
-      execOK += this->CellIdExecute(this->GetInput(idx), idx, append);
+      execOK += this->CellIdExecute(numInputs, input, idx, append);
       }
     else
       {
-      execOK += this->PointIdExecute(this->GetInput(idx), idx, append);
+      execOK += this->PointIdExecute(numInputs, input, idx, append);
       }
     }
   
@@ -603,7 +584,8 @@ void vtkPickFilter::IdExecute()
   if (execOK > 0)
     {
     append->Update();
-    vtkUnstructuredGrid* output = this->GetOutput();
+    vtkUnstructuredGrid* output = 
+      vtkUnstructuredGrid::GetData(outputVector);
     output->CopyStructure(append->GetOutput());
     output->GetPointData()->PassData(append->GetOutput()->GetPointData());
     output->GetCellData()->PassData(append->GetOutput()->GetCellData());
@@ -614,7 +596,9 @@ void vtkPickFilter::IdExecute()
 
 //-----------------------------------------------------------------------------
 // Execute for each input, then append the separate outputs.
-int vtkPickFilter::PointIdExecute(vtkDataSet* input, int inputIdx, 
+int vtkPickFilter::PointIdExecute(int numInputs,
+                                  vtkDataSet* input, 
+                                  int inputIdx, 
                                   vtkAppendFilter* append)
 {
   vtkIdType bestId = -1;
@@ -718,7 +702,7 @@ int vtkPickFilter::PointIdExecute(vtkDataSet* input, int inputIdx,
   newPts->Delete();
 
   // Add an array that shows which part this point comes from.
-  if (this->GetNumberOfInputs() > 1)
+  if (numInputs > 1)
     {
     vtkIntArray* partArray = vtkIntArray::New();
     partArray->SetNumberOfTuples(1);
@@ -750,7 +734,9 @@ int vtkPickFilter::PointIdExecute(vtkDataSet* input, int inputIdx,
 
 //-----------------------------------------------------------------------------
 // Execute for each input, then append the separate outputs.
-int vtkPickFilter::CellIdExecute(vtkDataSet* input, int inputIdx, 
+int vtkPickFilter::CellIdExecute(int numInputs,
+                                 vtkDataSet* input, 
+                                 int inputIdx, 
                                  vtkAppendFilter* append)
 {
   vtkIdType cellId;
@@ -876,7 +862,7 @@ int vtkPickFilter::CellIdExecute(vtkDataSet* input, int inputIdx,
   cellPtIds = 0;
   
   // Add an array that shows which part this point comes from.
-  if (this->GetNumberOfInputs() > 1)
+  if (numInputs > 1)
     {
     vtkIntArray* partArray = vtkIntArray::New();
     partArray->SetNumberOfTuples(1);
