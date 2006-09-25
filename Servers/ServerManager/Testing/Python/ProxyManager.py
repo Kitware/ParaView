@@ -5,12 +5,12 @@ import paraview
 def Error(message):
   raise "ERROR: %s" % message
   
-paraview.ActiveConnection = paraview.connect()
+paraview.ActiveConnection = paraview.Connect()
 pxm = paraview.pyProxyManager()
 
-p1 = paraview.createProxy("sources", "SphereSource");
-p2 = paraview.createProxy("sources", "ConeSource");
-p3 = paraview.createProxy("sources", "ArrowSource");
+p1 = paraview.CreateProxy("sources", "SphereSource");
+p2 = paraview.CreateProxy("sources", "ConeSource");
+p3 = paraview.CreateProxy("sources", "ArrowSource");
 
 pxm.RegisterProxy("sources", "source1_2", p1);
 pxm.RegisterProxy("sources", "source1_2", p2);

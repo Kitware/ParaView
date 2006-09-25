@@ -9,7 +9,7 @@ import paraview
 import SMPythonTesting
   
 SMPythonTesting.ProcessCommandLineArguments()
-paraview.ActiveConnection = paraview.connect()
+paraview.ActiveConnection = paraview.Connect()
 
 pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "ProxyPropertyLinks.pvsm")
 print "State file: %s" % pvsm_file
