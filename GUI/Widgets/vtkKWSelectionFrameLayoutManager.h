@@ -172,6 +172,17 @@ public:
     vtkObject *object, const char *method);
 
   // Description:
+  // Events. The SelectionChangedEvent is triggered when the selection
+  // is changed. It is similar in concept as the 'SelectionChangedCommand' 
+  // callbacks but can be used by multiple listeners/observers at a time.
+  //BTX
+  enum
+  {
+    SelectionChangedEvent = 10000,
+  };
+  //ETX
+
+  // Description:
   // Remove a widget, or all of them, or all of the widgets in a group.
   // This will call each widget's Close() method, and UnRegister() it.
   // Return 1 on success, 0 on error
