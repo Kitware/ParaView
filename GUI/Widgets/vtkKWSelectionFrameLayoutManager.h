@@ -109,7 +109,14 @@ public:
     int index, const char *group);
 
   // Description:
-  // Set/Get position of widget
+  // Set/Get position of widget.
+  // Note that the position is independent of the resolution, you can
+  // still set the position of a widget anywhere while displaying only
+  // a subset of the largest grid encompassing all widgets (i.e. you can
+  // set a widget at (2, 3), i.e. third column, fourth row, but set the
+  // resolution to (1, 1) to display only the first column and first row: the
+  // next time the resolution is set to, say, (4, 4), the widget at (2, 3)
+  // will be shown).
   // Return 1 (or widget) on success, 0 (or NULL) on error
   virtual int GetWidgetPosition(vtkKWSelectionFrame *w, int *col, int *row);
   virtual int GetWidgetPosition(vtkKWSelectionFrame *w, int pos[2])
@@ -126,6 +133,11 @@ public:
   // Return 1 (or widget) on success, 0 (or NULL) on error
   virtual int SwitchWidgetsPosition(
     vtkKWSelectionFrame *w1, vtkKWSelectionFrame *w2);
+
+  // Description:
+  // Return if a specific widget is visible at this point, i.e. mapped
+  // on screen at a specific position given the current resolution.
+  virtual int GetWidgetVisibility(vtkKWSelectionFrame *w);
 
   // Description:
   // Check if a widget is maximized, i.e. at position (0,0) in a (1,1)
@@ -179,7 +191,7 @@ public:
   // clipboard (win32). If no filename, the user is prompted for one
   // (provided that this widget is part of a window).
   // Return 1 on success, 0 otherwise
-  // GetVisibleRenderWidget() need to be implemented accordingly.
+  // GetRenderWidget() need to be implemented accordingly.
   virtual int SaveScreenshotAllWidgets();
   virtual int SaveScreenshotAllWidgetsToFile(const char* fileName);
   virtual int CopyScreenshotAllWidgetsToClipboard();
@@ -191,7 +203,7 @@ public:
   // and re-render them, the backbuffer of the render widget is taken as-is 
   // (this is useful for lower quality screenshot or thumbnails). 
   // Return 1 on success, 0 otherwise
-  // GetVisibleRenderWidget() need to be implemented accordingly.
+  // GetRenderWidget() need to be implemented accordingly.
   virtual int AppendAllWidgetsToImageData(vtkImageData *image, 
                                           int OnScreenRendering = 0);
   virtual int AppendAllWidgetsToImageDataFast(vtkImageData *image);
@@ -202,7 +214,7 @@ public:
   // Print all widgets or the selected one.
   // If no DPI is provided, the DPI settings of the Window ivar is used.
   // Return 1 on success, 0 otherwise
-  // GetVisibleRenderWidget() need to be implemented accordingly.
+  // GetRenderWidget() need to be implemented accordingly.
   virtual int PrintAllWidgets();
   virtual int PrintAllWidgetsAtResolution(double dpi);
   virtual int PrintSelectedWidget();
@@ -291,12 +303,12 @@ protected:
 
   // Description:
   // Get the render widget (if any) associated to the selection
-  // frame and visible at that point. 
+  // frame at that point. 
   // Used to Print, Save/Copy screenshot, etc.
   // This should be reimplemented by subclasses.
   // This implementation searches for a vtkKWRenderWidget in the children
   // of the frame.
-  virtual vtkKWRenderWidget* GetVisibleRenderWidget(vtkKWSelectionFrame*);
+  virtual vtkKWRenderWidget* GetRenderWidget(vtkKWSelectionFrame*);
 
   // Description:
   // Pack all widgets

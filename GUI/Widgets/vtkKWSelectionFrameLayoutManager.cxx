@@ -73,7 +73,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.66");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.67");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1122,7 +1122,7 @@ void vtkKWSelectionFrameLayoutManager::RemoveCallbacksFromWidget(
 }
 
 //----------------------------------------------------------------------------
-vtkKWRenderWidget* vtkKWSelectionFrameLayoutManager::GetVisibleRenderWidget(
+vtkKWRenderWidget* vtkKWSelectionFrameLayoutManager::GetRenderWidget(
   vtkKWSelectionFrame *widget)
 {
   vtkKWRenderWidget *rw = NULL;
@@ -1680,6 +1680,16 @@ void vtkKWSelectionFrameLayoutManager::SelectAndMaximizeWidgetCallback(
 }
 
 //---------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::GetWidgetVisibility(
+  vtkKWSelectionFrame *w)
+{
+  int row, col;
+  return (this->GetWidgetPosition(w, &col, &row) &&
+          col >= 0 && row >= 0 && 
+          col < this->Resolution[0] && row < this->Resolution[1]);
+}
+
+//---------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::SwitchWidgetsPosition(
   vtkKWSelectionFrame *w1, vtkKWSelectionFrame *w2)
 {
@@ -1945,7 +1955,7 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
       vtkKWSelectionFrame *widget = this->GetWidgetAtPosition(pos);
       if (widget && (!selection_only || widget->GetSelected()))
         {
-        vtkKWRenderWidget *rwwidget = this->GetVisibleRenderWidget(widget);
+        vtkKWRenderWidget *rwwidget = this->GetRenderWidget(widget);
         if (rwwidget)
           {
           int idx = j * this->Resolution[0] + i;
@@ -2010,7 +2020,7 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
       vtkKWSelectionFrame *widget = this->GetWidgetAtPosition(pos);
       if (widget && (!selection_only || widget->GetSelected()))
         {
-        vtkKWRenderWidget *rwwidget = this->GetVisibleRenderWidget(widget);
+        vtkKWRenderWidget *rwwidget = this->GetRenderWidget(widget);
         if (rwwidget && !direct)
           {
           rwwidget->Render();
@@ -2228,7 +2238,7 @@ int vtkKWSelectionFrameLayoutManager::CopyScreenshotAllWidgetsToClipboard()
     return 0;
     }
 
-  vtkKWRenderWidget *rwwidget = this->GetVisibleRenderWidget(widget);
+  vtkKWRenderWidget *rwwidget = this->GetRenderWidget(widget);
   if (!rwwidget)
     {
     return 0;
@@ -2308,7 +2318,7 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
 
   pd.lStructSize = sizeof(PRINTDLG);
   vtkKWRenderWidget *first_rwwidget = 
-    this->GetVisibleRenderWidget(first_widget);
+    this->GetRenderWidget(first_widget);
   if (first_rwwidget)
     {
     pd.hwndOwner = (HWND)first_rwwidget->GetRenderWindow()->GetGenericWindowId();
@@ -2386,7 +2396,7 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
       vtkKWSelectionFrame *widget = this->GetWidgetAtPosition(pos);
       if (widget && (!selection_only || widget->GetSelected()))
         {
-        vtkKWRenderWidget *rwwidget = this->GetVisibleRenderWidget(widget);
+        vtkKWRenderWidget *rwwidget = this->GetRenderWidget(widget);
         if (rwwidget)
           {
           int *size = rwwidget->GetRenderWindow()->GetSize();
@@ -2423,7 +2433,7 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
       vtkKWSelectionFrame *widget = this->GetWidgetAtPosition(pos);
       if (widget && (!selection_only || widget->GetSelected()))
         {
-        vtkKWRenderWidget *rwwidget = this->GetVisibleRenderWidget(widget);
+        vtkKWRenderWidget *rwwidget = this->GetRenderWidget(widget);
         if (rwwidget)
           {
           int i2, j2;
