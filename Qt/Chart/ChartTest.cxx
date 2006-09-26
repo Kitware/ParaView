@@ -10,7 +10,7 @@
 #include "pqLineChartModel.h"
 #include "pqLineChartPlotOptions.h"
 #include "pqPointMarker.h"
-#include "pqSimpleLinechartPlot.h"
+#include "pqSimpleLineChartPlot.h"
 
 #include <QApplication>
 #include <QBrush>
