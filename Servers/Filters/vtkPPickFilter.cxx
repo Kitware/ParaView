@@ -23,7 +23,7 @@
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkPPickFilter);
-vtkCxxRevisionMacro(vtkPPickFilter, "1.2");
+vtkCxxRevisionMacro(vtkPPickFilter, "1.3");
 //-----------------------------------------------------------------------------
 vtkPPickFilter::vtkPPickFilter()
 {
@@ -78,7 +78,6 @@ void vtkPPickFilter::IdExecute(vtkInformationVector **inputVector,
         this->Controller->Receive(tmp, i,  1021);
         if (!dataReceived)
           {
-          vtkUnstructuredGrid* output = this->GetOutput();
           output->CopyStructure(tmp);
           output->GetPointData()->PassData(tmp->GetPointData());
           output->GetCellData()->PassData(tmp->GetCellData());

@@ -35,7 +35,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.21");
+vtkCxxRevisionMacro(vtkPickFilter, "1.22");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -68,7 +68,7 @@ vtkPickFilter::~vtkPickFilter ()
 }
 
 //----------------------------------------------------------------------------
-int vtkPickFilter::FillInputPortInformation(int port, vtkInformation *info)
+int vtkPickFilter::FillInputPortInformation(int, vtkInformation *info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
@@ -416,8 +416,6 @@ void vtkPickFilter::CreateOutput(vtkInformationVector **inputVector,
   // Add an array that shows which part this point comes from.
   if (inputVector[0]->GetNumberOfInformationObjects() > 1)
     {
-    vtkUnstructuredGrid* output = 
-      vtkUnstructuredGrid::GetData(outputVector);
     if (this->PickCell)
       {
       vtkIntArray* partArray = vtkIntArray::New();
