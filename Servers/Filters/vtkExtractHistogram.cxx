@@ -12,53 +12,23 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkExtractHistogram.h"
 
 #include "vtkCellData.h"
 #include "vtkDoubleArray.h"
-#include "vtkExtractHistogram.h"
+#include "vtkExtractHistogramExtentTranslator.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkIOStream.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnsignedLongArray.h"
-#include "vtkExtentTranslator.h"
-#include "vtkIOStream.h"
-//-----------------------------------------------------------------------------
-class vtkExtractHistogramExtentTranslator : public vtkExtentTranslator
-{
-public:
-  static vtkExtractHistogramExtentTranslator* New();
-  vtkTypeRevisionMacro(vtkExtractHistogramExtentTranslator, vtkExtentTranslator);
 
-protected:
-  vtkExtractHistogramExtentTranslator() {}
-  ~vtkExtractHistogramExtentTranslator() {}
-
-  virtual int PieceToExtentThreadSafe(int vtkNotUsed(piece), 
-                                      int vtkNotUsed(numPieces), 
-                                      int vtkNotUsed(ghostLevel), 
-                                      int *wholeExtent, int *resultExtent, 
-                                      int vtkNotUsed(splitMode), 
-                                      int vtkNotUsed(byPoints))
-    {
-    memcpy(resultExtent, wholeExtent, sizeof(int)*6);
-    return 1;
-    }
-private:
-  vtkExtractHistogramExtentTranslator(const vtkExtractHistogramExtentTranslator&);
-  void operator=(const vtkExtractHistogramExtentTranslator&);
-  
-};
-vtkStandardNewMacro(vtkExtractHistogramExtentTranslator);
-vtkCxxRevisionMacro(vtkExtractHistogramExtentTranslator, "1.6");
-
-//-----------------------------------------------------------------------------
-
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.6");
 vtkStandardNewMacro(vtkExtractHistogram);
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.7");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -164,6 +134,7 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   vtkInformation* const output_info = outputVector->GetInformationObject(0);
   vtkRectilinearGrid* const output_data = vtkRectilinearGrid::SafeDownCast(
     output_info->Get(vtkDataObject::DATA_OBJECT()));
+  output_data->Initialize();
   output_data->SetDimensions(this->BinCount+1, 1, 1);
 
   vtkDoubleArray* const bin_extents = vtkDoubleArray::New();
@@ -244,7 +215,7 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
         }
       }
     }
-#if 0
+
   vtkRectilinearGrid* temp = output_data->NewInstance();
   temp->ShallowCopy(output_data);
   vtkDataSetWriter* writer = vtkDataSetWriter::New();
@@ -254,6 +225,6 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   writer->Write();
   writer->Delete();
   temp->Delete();
-#endif
+
   return 1;
 }
