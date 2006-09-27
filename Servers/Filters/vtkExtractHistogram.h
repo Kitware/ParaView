@@ -16,7 +16,7 @@
 #ifndef __vtkExtractHistogram_h
 #define __vtkExtractHistogram_h
 
-#include "vtkPolyDataAlgorithm.h"
+#include "vtkRectilinearGridAlgorithm.h"
 
 // .NAME vtkExtractHistogram - Extract histogram data (binned values) from any dataset
 // .SECTION Description
@@ -26,11 +26,11 @@
 // the boundaries between each histogram bin, and a vtkUnsignedLongArray
 // named "bin_values" which will contain the value for each bin.
 
-class VTK_EXPORT vtkExtractHistogram : public vtkPolyDataAlgorithm
+class VTK_EXPORT vtkExtractHistogram : public vtkRectilinearGridAlgorithm
 {
 public:
   static vtkExtractHistogram* New();
-  vtkTypeRevisionMacro(vtkExtractHistogram, vtkPolyDataAlgorithm);
+  vtkTypeRevisionMacro(vtkExtractHistogram, vtkRectilinearGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -51,9 +51,20 @@ private:
   ~vtkExtractHistogram();
 
   virtual int FillInputPortInformation (int port, vtkInformation *info);
+
+  // convenience method
+  virtual int RequestInformation(vtkInformation* request,
+                                 vtkInformationVector** inputVector,
+                                 vtkInformationVector* outputVector);
+
   virtual int RequestData(vtkInformation *request, 
                           vtkInformationVector **inputVector, 
                           vtkInformationVector *outputVector);
+
+  virtual int RequestUpdateExtent(vtkInformation*,
+                                  vtkInformationVector**,
+                                  vtkInformationVector*);
+
 
   int Component;
   int BinCount;
