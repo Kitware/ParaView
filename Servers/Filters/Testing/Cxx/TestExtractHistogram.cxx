@@ -34,11 +34,11 @@ int main(int, char*[])
   extraction->SetInputArrayToProcess(0, 0, 0, vtkDataSet::FIELD_ASSOCIATION_POINTS_THEN_CELLS, "Normals");
   extraction->SetComponent(0);
   extraction->SetBinCount(bin_count);
-  
-  vtkPolyData* const histogram = extraction->GetOutput();
+
+  vtkRectilinearGrid* const histogram = extraction->GetOutput();
   histogram->Update();
 
-  vtkDoubleArray* const bin_extents = vtkDoubleArray::SafeDownCast(histogram->GetCellData()->GetArray("bin_extents"));
+  vtkDoubleArray* const bin_extents = vtkDoubleArray::SafeDownCast(histogram->GetXCoordinates());
   if(!bin_extents)
     {
     return 1;
@@ -54,7 +54,8 @@ int main(int, char*[])
     return 1;
     }
 
-  vtkUnsignedLongArray* const bin_values = vtkUnsignedLongArray::SafeDownCast(histogram->GetCellData()->GetArray("bin_values"));
+  vtkUnsignedLongArray* const bin_values = vtkUnsignedLongArray::SafeDownCast(
+    histogram->GetCellData()->GetArray("bin_values"));
   if(!bin_values)
     {
     return 1;
@@ -81,6 +82,5 @@ int main(int, char*[])
     {
     return 1;
     }
-  
   return 0;
 }
