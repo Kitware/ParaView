@@ -1836,7 +1836,7 @@ The Reflection filter reflects the input data set across the specified plane. If
             <Group name="sources"/>
             <Group name="filters"/>
           </ProxyGroupDomain>
-          <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
      </InputProperty>
@@ -2177,7 +2177,7 @@ The Max Num Of Subdivisions setting specifies the maximum number of times an edg
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type" composite_data_supported="0">
+           <DataTypeDomain name="input_type">
              <DataType value="vtkPolyData"/>
              <DataType value="vtkDataSet"/>
              <DataType value="vtkUnstructuredGrid"/>
@@ -3831,7 +3831,7 @@ This filter operates on any type of data set, provided it has point-centered vec
    <!-- End GenericStreamTracer -->
    </SourceProxy>
 
-  <SourceProxy name="Tessellator" class="vtkGenericDataSetTessellator">
+  <SourceProxy name="GenericTessellator" class="vtkGenericDataSetTessellator">
      <Documentation
          long_help="Tessellate a higher-order dataset"
          short_help="Tessellate a higher-order dataset">
@@ -3849,7 +3849,7 @@ Tessellate a higher-order dataset.
            </DataTypeDomain>
       </InputProperty>
 
-   <!-- End Tessellator -->
+   <!-- End GenericTessellator -->
    </SourceProxy>
 
    <SourceProxy name="GroupDataSets" class="vtkMultiGroupDataGroupFilter">
