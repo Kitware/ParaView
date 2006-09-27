@@ -178,7 +178,7 @@ public:
   //BTX
   enum
   {
-    SelectionChangedEvent = 10000,
+    SelectionChangedEvent = 10000
   };
   //ETX
 
