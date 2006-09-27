@@ -134,12 +134,20 @@ void pqOutputWindow::reject()
 
 void pqOutputWindow::showEvent(QShowEvent* e)
 {
-  pqApplicationCore::instance()->settings()->restoreState("OutputWindow", *this);
+  pqApplicationCore* core = pqApplicationCore::instance();
+  if (core)
+    {
+    core->settings()->restoreState("OutputWindow", *this);
+    }
   Superclass::showEvent(e);
 }
 
 void pqOutputWindow::hideEvent(QHideEvent* e)
 {
-  pqApplicationCore::instance()->settings()->saveState(*this, "OutputWindow");
+  pqApplicationCore* core = pqApplicationCore::instance();
+  if (core)
+    {
+    core->settings()->saveState(*this, "OutputWindow");
+    }
   Superclass::hideEvent(e);
 }
