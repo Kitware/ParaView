@@ -43,6 +43,7 @@ class pqPipelineDisplay;
 class pqPipelineSourceInternal;
 class pqRenderModule;
 class vtkObject;
+class pqGenericViewModule;
 
 
 /// PQ representation for a vtkSMProxy that can be involved in a pipeline.
@@ -84,7 +85,7 @@ public:
 
   // Returns a list of render modules in which this source
   // has displays added (the displays may not be visible).
-  QList<pqRenderModule*> getRenderModules() const;
+  QList<pqGenericViewModule*> getViewModules() const;
 
   // Use this method to initialize the pqObject state using the
   // underlying vtkSMProxy. This needs to be done only once,

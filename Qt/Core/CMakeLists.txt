@@ -25,6 +25,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCommandServerStartup.h
   pqDisplay.h
   pqFileDialogEventTranslator.h
+  pqGenericViewModule.h
   pqLookupTableManager.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
@@ -96,6 +97,8 @@ ADD_LIBRARY(pqCore
   pqFileDialogEventPlayer.h
   pqFileDialogEventTranslator.cxx
   pqFileDialogEventTranslator.h
+  pqGenericViewModule.cxx
+  pqGenericViewModule.h
   pqJoystickFly.cxx
   pqJoystickFly.h
   pqLookupTableManager.cxx

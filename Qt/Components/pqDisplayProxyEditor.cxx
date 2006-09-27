@@ -462,14 +462,18 @@ void pqDisplayProxyEditor::zoomToData()
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
     unsigned int numRenModules;
-    numRenModules = this->Internal->Display->getNumberOfRenderModules();
+    numRenModules = this->Internal->Display->getNumberOfViewModules();
     for(unsigned int i=0; i<numRenModules; i++)
       {
-      pqRenderModule* renModule = this->Internal->Display->getRenderModule(i);
-      vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy();
-      rm->ResetCamera(bounds);
-      rm->ResetCameraClippingRange();
-      renModule->render();
+      pqRenderModule* renModule = qobject_cast<pqRenderModule*>(
+        this->Internal->Display->getViewModule(i));
+      if (renModule)
+        {
+        vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy();
+        rm->ResetCamera(bounds);
+        rm->ResetCameraClippingRange();
+        renModule->render();
+        }
       }
     }
 }

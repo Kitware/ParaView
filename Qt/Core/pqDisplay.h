@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPair>
 
 class pqDisplayInternal;
-class pqRenderModule;
+class pqGenericViewModule;
 class pqServer;
 
 /// This is PQ representation for a single display. A pqDisplay represents
@@ -61,7 +61,7 @@ public:
   // Note that for a display to be visible in a render module,
   // it must be \c shownIn that render modules as well as 
   // visibility must be set to 1.
-  bool shownIn(pqRenderModule* rm) const;
+  bool shownIn(pqGenericViewModule* rm) const;
 
   // Returns if the status of the visbility property of this display.
   // Note that for a display to be visible in a render module,
@@ -76,11 +76,11 @@ public:
   virtual void setVisible(bool visible)=0;
 
   // Get the number of render modules this display is present in.
-  unsigned int getNumberOfRenderModules() const;
+  unsigned int getNumberOfViewModules() const;
 
   // Get the render module this display is present in at the given 
   // index.
-  pqRenderModule* getRenderModule(unsigned int index) const;
+  pqGenericViewModule* getViewModule(unsigned int index) const;
 
   // This method updates all render modules to which this 
   // display belongs, if force is true, it for an immediate render
@@ -102,9 +102,9 @@ protected slots:
   virtual void onVisibilityChanged();
 
 protected:
-  friend class pqRenderModule;
-  void addRenderModule(pqRenderModule* rm);
-  void removeRenderModule(pqRenderModule* rm);
+  friend class pqGenericViewModule;
+  void addRenderModule(pqGenericViewModule* rm);
+  void removeRenderModule(pqGenericViewModule* rm);
 
 private:
   pqDisplayInternal *Internal; 

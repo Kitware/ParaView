@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
-#include "pqRenderModule.h"
+#include "pqGenericViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
@@ -58,7 +58,7 @@ class pqDisplayInternal
 public:
   // Set of render modules showing this display. Typically,
   // it will be 1, but theoretically there can be more.
-  QList<QPointer<pqRenderModule> > RenderModules;
+  QList<QPointer<pqGenericViewModule> > RenderModules;
 };
 
 //-----------------------------------------------------------------------------
@@ -77,13 +77,13 @@ pqDisplay::~pqDisplay()
 }
 
 //-----------------------------------------------------------------------------
-bool pqDisplay::shownIn(pqRenderModule* rm) const
+bool pqDisplay::shownIn(pqGenericViewModule* rm) const
 {
   return this->Internal->RenderModules.contains(rm);
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplay::addRenderModule(pqRenderModule* rm)
+void pqDisplay::addRenderModule(pqGenericViewModule* rm)
 {
   if (!this->Internal->RenderModules.contains(rm))
     {
@@ -92,7 +92,7 @@ void pqDisplay::addRenderModule(pqRenderModule* rm)
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplay::removeRenderModule(pqRenderModule* rm)
+void pqDisplay::removeRenderModule(pqGenericViewModule* rm)
 {
   if (this->Internal->RenderModules.contains(rm))
     {
@@ -101,15 +101,15 @@ void pqDisplay::removeRenderModule(pqRenderModule* rm)
 }
 
 //-----------------------------------------------------------------------------
-unsigned int pqDisplay::getNumberOfRenderModules() const
+unsigned int pqDisplay::getNumberOfViewModules() const
 {
   return this->Internal->RenderModules.size();
 }
 
 //-----------------------------------------------------------------------------
-pqRenderModule* pqDisplay::getRenderModule(unsigned int index) const
+pqGenericViewModule* pqDisplay::getViewModule(unsigned int index) const
 {
-  if (index >= this->getNumberOfRenderModules())
+  if (index >= this->getNumberOfViewModules())
     {
     qDebug() << "Invalid index : " << index;
     return NULL;
@@ -120,7 +120,7 @@ pqRenderModule* pqDisplay::getRenderModule(unsigned int index) const
 //-----------------------------------------------------------------------------
 void pqDisplay::renderAllViews(bool force /*=false*/)
 {
-  foreach(pqRenderModule* rm, this->Internal->RenderModules)
+  foreach(pqGenericViewModule* rm, this->Internal->RenderModules)
     {
     if (rm)
       {

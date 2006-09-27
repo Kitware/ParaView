@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
+#include "pqRenderModule.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineSourceInternal 
@@ -275,17 +276,17 @@ pqPipelineDisplay* pqPipelineSource::getDisplay(
 }
 
 //-----------------------------------------------------------------------------
-QList<pqRenderModule*> pqPipelineSource::getRenderModules() const
+QList<pqGenericViewModule*> pqPipelineSource::getViewModules() const
 {
-  QList<pqRenderModule*> renModules;
+  QList<pqGenericViewModule*> renModules;
  foreach(pqPipelineDisplay* disp, this->Internal->Displays)
     {
     if (disp)
       {
-      unsigned int max = disp->getNumberOfRenderModules();
+      unsigned int max = disp->getNumberOfViewModules();
       for (unsigned int cc=0; cc < max; ++cc)
         {
-        pqRenderModule* ren = disp->getRenderModule(cc);
+        pqGenericViewModule* ren = disp->getViewModule(cc);
         if (ren && !renModules.contains(ren))
           {
           renModules.push_back(ren);

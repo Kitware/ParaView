@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarDisplay.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqRenderModule.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarsToColorsInternal

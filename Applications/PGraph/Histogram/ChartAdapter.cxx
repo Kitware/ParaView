@@ -21,7 +21,7 @@
 #include <vtkDoubleArray.h>
 #include <vtkEventQtSlotConnect.h>
 #include <vtkProcessModule.h>
-#include <vtkPolyData.h>
+#include <vtkRectilinearGrid.h>
 #include <vtkSMCompoundProxy.h>
 #include <vtkSMInputProperty.h>
 #include <vtkSMProxyManager.h>
@@ -161,14 +161,16 @@ struct ChartAdapter::pqImplementation
       
     if(!algorithm)
       return;
+    algorithm->Update();
       
-    vtkPolyData* const histogram = vtkPolyData::SafeDownCast(algorithm->GetOutputDataObject(0));
+    vtkRectilinearGrid* const histogram = vtkRectilinearGrid::SafeDownCast(algorithm->GetOutputDataObject(0));
     if(!histogram)
       return;
     
-    histogram->Update();
 
-    vtkDoubleArray* const bin_extents = vtkDoubleArray::SafeDownCast(histogram->GetCellData()->GetArray("bin_extents"));
+    histogram->Print(cout);
+
+    vtkDoubleArray* const bin_extents = vtkDoubleArray::SafeDownCast(histogram->GetXCoordinates());
     if(!bin_extents)
       return;
     if(bin_extents->GetNumberOfComponents() != 1)

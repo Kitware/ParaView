@@ -293,7 +293,7 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
     return;
     }
 
-  QList<pqRenderModule*> renModules = source->getRenderModules();
+  QList<pqGenericViewModule*> viewModules = source->getViewModules();
 
   // HACK: This will make sure that the panel for the source being
   // removed goes away before the source is deleted. Probably the selection
@@ -303,9 +303,9 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
  
   this->getPipelineBuilder()->remove(source);
 
-  foreach (pqRenderModule* ren, renModules)
+  foreach (pqGenericViewModule* view, viewModules)
     {
-    ren->render();
+    view->render();
     }
 }
 

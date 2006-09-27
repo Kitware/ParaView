@@ -33,22 +33,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqRenderModule_h
 
 
-#include "pqProxy.h"
+#include "pqGenericViewModule.h"
 
-class pqDisplay;
 class pqRenderModuleInternal;
-class pqServer;
 class pqUndoStack;
 class QVTKWidget;
-class QWidget;
 class vtkSMRenderModuleProxy;
 
 
 // This is a PQ abstraction of a render module.
-class PQCORE_EXPORT pqRenderModule : public pqProxy
+class PQCORE_EXPORT pqRenderModule : public pqGenericViewModule
 {
   Q_OBJECT
 public:
+  typedef pqGenericViewModule Superclass;
+
   pqRenderModule(const QString& name, vtkSMRenderModuleProxy* renModule, 
     pqServer* server, QObject* parent=NULL);
   virtual ~pqRenderModule();
@@ -61,34 +60,18 @@ public:
 
   /// Call this method to assign a Window in which this render module will
   /// render.  This will set the QVTKWidget's parent.
-  void setWindowParent(QWidget* parent);
-  QWidget* getWindowParent() const;
+  virtual void setWindowParent(QWidget* parent);
+  virtual QWidget* getWindowParent() const;
 
   /// Request a StillRender. 
-  void render();
-
-  /// Forces an immediate render.
-  void forceRender();
+  virtual void render();
 
   /// Resets the camera to include all visible data.
   void resetCamera();
 
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.
-  bool saveImage(int width, int height, const QString& filename);
-
-  /// This method checks if the display is one of the displays
-  /// rendered by this render module.
-  bool hasDisplay(pqDisplay* display);
-
-  /// Gets the number of displays in the render module.
-  int getDisplayCount() const;
-
-  /// Gets the display for the specified index.
-  pqDisplay* getDisplay(int index) const;
- 
-  /// Returns a list of displays in this render module.
-  QList<pqDisplay*> getDisplays() const;
+  virtual bool saveImage(int width, int height, const QString& filename);
 
   /// Each render module keeps a undo stack for interaction.
   /// This method returns that undo stack. External world
@@ -96,30 +79,7 @@ public:
   /// on interaction is managed by this class.
   pqUndoStack* getInteractionUndoStack() const;
 
-signals:
-  // Fired after a display has been added to this render module.
-  void displayAdded(pqDisplay*);
-
-  // Fired after a display has been removed from this render module.
-  void displayRemoved(pqDisplay*);
-
-  // Fired when the render module fires a vtkCommand::StartEvent
-  // signalling the beginning of rendering.
-  void beginRender();
-
-  // Fired when the render module fires a vtkCommand::EndEvent
-  // signalling the end of rendering.
-  void endRender();
-
 private slots:
-  /// if renModule is not created when this object is instantianted, we
-  /// must listen to UpdateVTKObjects event to bind the QVTKWidget and
-  /// then render window.
-  void onUpdateVTKObjects();
-
-  /// Called when the "Displays" property changes.
-  void displaysChanged();
-
   // Called on start/end interaction.
   void startInteraction();
   void endInteraction();
@@ -130,13 +90,10 @@ private slots:
 
 
 protected:
-  // Event filter callback.
-  bool eventFilter(QObject* caller, QEvent* e);
-
-private:
   /// setups up RM and QVTKWidget binding.
-  void renderModuleInit();
-  
+  virtual void viewModuleInit();
+
+private: 
   pqRenderModuleInternal* Internal;
 };
 

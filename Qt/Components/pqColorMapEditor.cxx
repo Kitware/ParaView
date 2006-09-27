@@ -355,7 +355,8 @@ void pqColorMapEditor::resetGUI()
     return;
     }
 
-  pqRenderModule* rm = this->Form->Display->getRenderModule(0);
+  pqRenderModule* rm = qobject_cast<pqRenderModule*>(
+    this->Form->Display->getViewModule(0));
 
   // Update Scalar Bar GUI.
   pqScalarBarDisplay* sb = stc->getScalarBar(rm);
@@ -709,7 +710,8 @@ void pqColorMapEditor::setColorBarVisibility(bool visible)
     return;
     }
 
-  pqRenderModule* rm = this->Form->Display->getRenderModule(0);
+  pqRenderModule* rm = qobject_cast<pqRenderModule*>(
+    this->Form->Display->getViewModule(0));
   pqScalarBarDisplay* sb = stc->getScalarBar(rm);
   if (!sb && visible)
     {
@@ -899,7 +901,8 @@ void pqColorMapEditor::setTitle(const QString& name, const QString& comp)
     return;
     }
 
-  pqRenderModule* rm = this->Form->Display->getRenderModule(0);
+  pqRenderModule* rm = qobject_cast<pqRenderModule*>(
+    this->Form->Display->getViewModule(0));
 
   // Update Scalar Bar GUI.
   pqScalarBarDisplay* sb = stc->getScalarBar(rm);

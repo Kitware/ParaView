@@ -380,16 +380,15 @@ int pqPipelineBuilder::removeInternal(pqDisplay* display)
   // 1) Remove display from the render module.
   // eventually, the pqPipelineDisplay can tell us which render module
   // it belongs to. For now, we just use the active render module.
-  unsigned int numRenModules = display->getNumberOfRenderModules();
+  unsigned int numRenModules = display->getNumberOfViewModules();
   for(unsigned int i=0; i<numRenModules; i++)
     {
-    pqRenderModule* renModule = display->getRenderModule(i);
+    pqGenericViewModule* renModule = display->getViewModule(i);
     
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
       renModule->getProxy()->GetProperty("Displays"));
     pp->RemoveProxy(display->getProxy());
     renModule->getProxy()->UpdateVTKObjects();
-
     }
 
   // Unregister display.
@@ -593,7 +592,7 @@ void pqPipelineBuilder::removeWindow(pqRenderModule* rm)
   // Now clean up any orphan displays.
   foreach (pqDisplay* disp, displays)
     {
-    if (disp && disp->getNumberOfRenderModules() == 0)
+    if (disp && disp->getNumberOfViewModules() == 0)
       {
       this->removeInternal(disp);      
       }

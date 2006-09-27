@@ -53,10 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
-#include "pqApplicationCore.h"
-#include "pqPipelineDisplay.h"
 #include "pqRenderViewProxy.h"
-#include "pqServerManagerModel.h"
 #include "pqSetName.h"
 #include "pqUndoStack.h"
 #include "vtkPVAxesWidget.h"
@@ -71,15 +68,11 @@ class pqRenderModuleInternal
 {
 public:
   QPointer<QVTKWidget> Viewport;
-  QString Name;
   vtkSmartPointer<pqRenderViewProxy> RenderViewProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   vtkSmartPointer<vtkSMRenderModuleProxy> RenderModuleProxy;
   vtkSmartPointer<vtkPVAxesWidget> AxesWidget;
   pqUndoStack* UndoStack;
-
-  // List of displays shown by this render module.
-  QList<QPointer<pqDisplay> > Displays;
 
   pqRenderModuleInternal()
     {
@@ -100,47 +93,20 @@ public:
 //-----------------------------------------------------------------------------
 pqRenderModule::pqRenderModule(const QString& name, 
   vtkSMRenderModuleProxy* renModule, pqServer* server, QObject* _parent/*=null*/)
-: pqProxy("render_modules", name, renModule, server, _parent)
+: pqGenericViewModule("render_modules", name, renModule, server, _parent)
 {
   this->Internal = new pqRenderModuleInternal();
-  this->Internal->Name = name;
   this->Internal->RenderViewProxy->setRenderModule(this);
   this->Internal->RenderModuleProxy = renModule;
   this->Internal->UndoStack->setActiveServer(this->getServer());
 
   this->Internal->Viewport = new QVTKWidget() 
     << pqSetName("Viewport");
-  this->Internal->Viewport->installEventFilter(this);
-
-  // Listen to display add/remove events.
-  this->Internal->VTKConnect->Connect(renModule->GetProperty("Displays"),
-    vtkCommand::ModifiedEvent, this, SLOT(displaysChanged()));
-
-  vtkRenderWindow* renWin = renModule->GetRenderWindow();
-  if (renWin)
-    {
-    this->renderModuleInit();
-    }
-  else
-    {
-    // the render module hasn't been created yet.
-    // listen to the create event to connect the QVTKWidget.
-    this->Internal->VTKConnect->Connect(renModule, vtkCommand::UpdateEvent,
-      this, SLOT(onUpdateVTKObjects()));
-    }
 }
 
 //-----------------------------------------------------------------------------
 pqRenderModule::~pqRenderModule()
 {
-  foreach(pqDisplay* disp, this->Internal->Displays)
-    {
-    if (disp)
-      {
-      disp->removeRenderModule(this);
-      }
-    }
-
   delete this->Internal->Viewport;
   delete this->Internal;
 }
@@ -177,11 +143,11 @@ QWidget* pqRenderModule::getWindowParent() const
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::renderModuleInit()
+void pqRenderModule::viewModuleInit()
 {
   if (!this->Internal->Viewport || !this->Internal->RenderViewProxy)
     {
-    qDebug() << "renderModuleInit() missing information.";
+    qDebug() << "viewModuleInit() missing information.";
     return;
     }
   this->Internal->Viewport->SetRenderWindow(
@@ -242,9 +208,7 @@ void pqRenderModule::renderModuleInit()
     vtkCommand::EndEvent,this, SLOT(onEndEvent()));  
   iren->Enable();
 
-  // If the render module already has some displays in it when it is registered,
-  // this method will detect them and sync the GUI state with the SM state.
-  this->displaysChanged();
+  this->Superclass::viewModuleInit();
 }
 
 //-----------------------------------------------------------------------------
@@ -298,89 +262,11 @@ void pqRenderModule::onEndEvent()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::onUpdateVTKObjects()
-{
-  this->renderModuleInit();
-  // no need to listen to any more events.
-  this->Internal->VTKConnect->Disconnect(
-    this->Internal->RenderModuleProxy, vtkCommand::UpdateEvent,
-    this, SLOT(onUpdateVTKObjects()));
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderModule::displaysChanged()
-{
-  // Determine what changed. Add the new displays and remove the old
-  // ones. Make sure new displays have a reference to this render module.
-  // Remove the reference to this render module in the removed displays.
-  QList<QPointer<pqDisplay> > currentDisplays;
-  vtkSMProxyProperty* prop = vtkSMProxyProperty::SafeDownCast(
-    this->getProxy()->GetProperty("Displays"));
-  pqServerManagerModel* smModel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-
-  unsigned int max = prop->GetNumberOfProxies();
-  for (unsigned int cc=0; cc < max; ++cc)
-    {
-    vtkSMProxy* proxy = prop->GetProxy(cc);
-    if (!proxy)
-      {
-      continue;
-      }
-    pqDisplay* display = qobject_cast<pqDisplay*>(
-      smModel->getPQProxy(proxy));
-    if (!display)
-      {
-      continue;
-      }
-    currentDisplays.append(QPointer<pqDisplay>(display));
-    if(!this->Internal->Displays.contains(display))
-      {
-      // Update the render module pointer in the display.
-      display->addRenderModule(this);
-      this->Internal->Displays.append(QPointer<pqDisplay>(display));
-      emit this->displayAdded(display);
-      }
-    }
-
-  QList<QPointer<pqDisplay> >::Iterator iter =
-      this->Internal->Displays.begin();
-  while(iter != this->Internal->Displays.end())
-    {
-    if(*iter && !currentDisplays.contains(*iter))
-      {
-      pqDisplay* display = (*iter);
-      // Remove the render module pointer from the display.
-      display->removeRenderModule(this);
-      iter = this->Internal->Displays.erase(iter);
-      emit this->displayRemoved(display);
-      }
-    else
-      {
-      ++iter;
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
 void pqRenderModule::render()
 {
   if (this->Internal->RenderModuleProxy && this->Internal->Viewport)
     {
     this->Internal->Viewport->update();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderModule::forceRender()
-{
-  if (this->Internal->RenderModuleProxy)
-    {
-    vtkProcessModule::GetProcessModule()->SendPrepareProgress(
-      this->Internal->RenderModuleProxy->GetConnectionID());
-    this->Internal->RenderModuleProxy->StillRender();
-    vtkProcessModule::GetProcessModule()->SendCleanupPendingProgress(
-      this->Internal->RenderModuleProxy->GetConnectionID());
     }
 }
 
@@ -441,75 +327,5 @@ bool pqRenderModule::saveImage(int width, int height, const QString& filename)
     this->render();
     }
   return (ret == vtkErrorCode::NoError);
-}
-
-//-----------------------------------------------------------------------------
-bool pqRenderModule::hasDisplay(pqDisplay* display)
-{
-  return this->Internal->Displays.contains(display);
-}
-
-//-----------------------------------------------------------------------------
-int pqRenderModule::getDisplayCount() const
-{
-  return this->Internal->Displays.size();
-}
-
-//-----------------------------------------------------------------------------
-pqDisplay* pqRenderModule::getDisplay(int index) const
-{
-  if(index >= 0 && index < this->Internal->Displays.size())
-    {
-    return this->Internal->Displays[index];
-    }
-
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
-QList<pqDisplay*> pqRenderModule::getDisplays() const
-{
-  QList<pqDisplay*> list;
-  foreach (pqDisplay* disp, this->Internal->Displays)
-    {
-    if (disp)
-      {
-      list.push_back(disp);
-      }
-    }
-  return list;
-}
-
-//-----------------------------------------------------------------------------
-bool pqRenderModule::eventFilter(QObject* caller, QEvent* e)
-{
-  // TODO, apparently, this should watch for window position changes, not resizes
-  /* FIXME
-  if(e->type() == QEvent::Resize)
-    {
-    // find top level window;
-    QWidget* me = qobject_cast<QWidget*>(caller);
-
-    vtkSMIntVectorProperty* prop = 0;
-
-    // set size of main window
-    prop = vtkSMIntVectorProperty::SafeDownCast(this->View->GetProperty("GUISize"));
-    if(prop)
-      {
-      prop->SetElements2(this->TopWidget->width(), this->TopWidget->height());
-      }
-
-    // position relative to main window
-    prop = vtkSMIntVectorProperty::SafeDownCast(this->View->GetProperty("WindowPosition"));
-    if(prop)
-      {
-      QPoint pos(0,0);
-      pos = me->mapTo(this->TopWidget, pos);
-      prop->SetElements2(pos.x(), pos.y());
-      }
-    }
-    */
-  
-  return QObject::eventFilter(caller, e);
 }
 
