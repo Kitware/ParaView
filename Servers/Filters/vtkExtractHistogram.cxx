@@ -53,11 +53,11 @@ private:
   
 };
 vtkStandardNewMacro(vtkExtractHistogramExtentTranslator);
-vtkCxxRevisionMacro(vtkExtractHistogramExtentTranslator, "1.5");
+vtkCxxRevisionMacro(vtkExtractHistogramExtentTranslator, "1.6");
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.5");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.6");
 vtkStandardNewMacro(vtkExtractHistogram);
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
@@ -98,7 +98,7 @@ int vtkExtractHistogram::FillInputPortInformation (int port,
 //----------------------------------------------------------------------------
 int vtkExtractHistogram::RequestInformation(
   vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector,
+  vtkInformationVector** vtkNotUsed(inputVector),
   vtkInformationVector* outputVector)
 {
   // get the info objects
@@ -125,7 +125,8 @@ int vtkExtractHistogram::RequestInformation(
   return 1;
 }
 //-----------------------------------------------------------------------------
-int vtkExtractHistogram::RequestUpdateExtent(vtkInformation* request,
+int vtkExtractHistogram::RequestUpdateExtent(
+  vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // This filter changes the ExtentTranslator on the output
