@@ -186,6 +186,8 @@ ADD_LIBRARY(pqCore
   pqQVTKWidgetEventTranslator.h
   pqQVTKWidgetEventPlayer.cxx
   pqQVTKWidgetEventPlayer.h
+  pqVTKHistogramModel.cxx
+  pqVTKHistogramModel.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
