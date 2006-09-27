@@ -4027,6 +4027,29 @@ This filter uses colors to show levels of a hiearchical dataset.
       </IntVectorProperty>
     </SourceProxy>
 
+    <SourceProxy name="ClientServerMoveData" class="vtkClientServerMoveData">
+      <InputProperty name="Input"
+        command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+      </InputProperty>
+    </SourceProxy>
+        
+    <SourceProxy name="ReductionFilter" class="vtkReductionFilter">
+      <InputProperty name="Input"
+        command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+      </InputProperty>
+      <ProxyProperty name="ReductionHelper"
+         command="SetReductionHelper">
+      </ProxyProperty>
+    </SourceProxy>
+
    <SourceProxy name="ExtractLevel" class="vtkMultiGroupDataExtractGroup">
      <Documentation
         long_help="This filter extracts a range of groups from a multigroup dataset."

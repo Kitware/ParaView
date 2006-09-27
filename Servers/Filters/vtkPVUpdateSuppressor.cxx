@@ -28,7 +28,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.36");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.37");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -84,7 +84,8 @@ void vtkPVUpdateSuppressor::ForceUpdate()
        source->IsA("vtkM2NCollect") ||
        source->IsA("vtkMPIDuplicateUnstructuredGrid") ||
        source->IsA("vtkPVDuplicatePolyData") ||
-       source->IsA("vtkOrderedCompositeDistributor")))
+       source->IsA("vtkOrderedCompositeDistributor") || 
+       source->IsA("vtkClientServerMoveData")))
     {
     source->Modified();
     }
@@ -108,6 +109,8 @@ void vtkPVUpdateSuppressor::ForceUpdate()
     }
 
   input->Update();
+  // Input may have changed, we obtain the pointer again.
+  input = vtkDataSet::SafeDownCast(this->GetInput());
 
   unsigned long t2 = 0;
   vtkDemandDrivenPipeline *ddp = 0;

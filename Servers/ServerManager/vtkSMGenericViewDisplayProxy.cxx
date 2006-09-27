@@ -26,13 +26,14 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.7");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
 {
   this->UpdateSuppressorProxy = 0;
   this->CollectProxy = 0;
+  this->ReduceProxy = 0;
 
   // When created, collection is off.
   // I set these to -1 to ensure the decision is propagated.
@@ -67,7 +68,62 @@ void vtkSMGenericViewDisplayProxy::CreateVTKObjects(int numObjects)
   this->CollectProxy->SetServers(
     this->Servers | vtkProcessModule::CLIENT);
 
+  this->ReduceProxy =  this->GetSubProxy("Reduce");
+  this->ReduceProxy->SetServers(this->Servers);
+
   this->Superclass::CreateVTKObjects(numObjects);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMGenericViewDisplayProxy::SetReductionType(int type)
+{
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Cannot set reduction type before CreateVTKObjects().");
+    return;
+    }
+
+  if (!this->ReduceProxy)
+    {
+    vtkErrorMacro("Could not locate the Reduction proxy.");
+    return;
+    }
+
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  const char* classname = 0;
+  switch (type)
+    {
+  case ADD:
+    classname = "vtkAttributeDataReductionFilter";
+    break;
+
+  case POLYDATA_APPEND:
+    classname = "vtkAppendPolyData";
+    break;
+
+  case UNSTRUCTURED_APPEND:
+    classname = "vtkAppendFilter";
+    break;
+
+  default:
+    vtkErrorMacro("Unknown reduction type: " << type);
+    return;
+    }
+
+  vtkClientServerID rfid = pm->NewStreamObject(classname, stream);
+  for (unsigned int i=0; i < this->ReduceProxy->GetNumberOfIDs(); i++)
+    {
+    stream
+      << vtkClientServerStream::Invoke
+      << this->ReduceProxy->GetID(i) << "SetReductionHelper"
+      << rfid
+      << vtkClientServerStream::End;
+    }
+  pm->DeleteStreamObject(rfid, stream);
+
+  pm->SendStream(this->GetConnectionID(),
+    this->ReduceProxy->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -97,48 +153,67 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
     }
 
   this->CreateVTKObjects(num);
-
+  unsigned int i;
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMInputProperty* ip = 0;
+
+  ip = vtkSMInputProperty::SafeDownCast(
+    this->ReduceProxy->GetProperty("Input"));
+  ip->RemoveAllProxies();
+  ip->AddProxy(input);
+  this->ReduceProxy->UpdateVTKObjects();
+
+  for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
+    {
+    stream
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetController"
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << this->ReduceProxy->GetID(i) << "SetController"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->ConnectionID, 
+      this->ReduceProxy->GetServers(), stream);
+    }
 
   ip = vtkSMInputProperty::SafeDownCast(
     this->CollectProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
-  ip->AddProxy(input);
+  ip->AddProxy(this->ReduceProxy);
   this->CollectProxy->UpdateVTKObjects();
 
-  unsigned int i;
-  vtkClientServerStream stream;
+
   for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
     {
-    if (this->CollectProxy)
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(i) << "GetOutputPort"
-        << vtkClientServerStream::End
-        << vtkClientServerStream::Invoke
-        << this->UpdateSuppressorProxy->GetID(i) << "SetInputConnection"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      }
+    stream
+      << vtkClientServerStream::Invoke
+      << this->CollectProxy->GetID(i) << "SetProcessModuleConnection"
+      << pm->GetConnectionClientServerID(this->GetConnectionID())
+      << vtkClientServerStream::End;
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID, 
-      this->CollectProxy->GetServers(), 
-      stream);
+    pm->SendStream(this->ConnectionID, 
+      this->CollectProxy->GetServers(), stream);
     }
+
+  ip = vtkSMInputProperty::SafeDownCast(
+    this->UpdateSuppressorProxy->GetProperty("Input"));
+  ip->RemoveAllProxies();
+  ip->AddProxy(this->CollectProxy);
+  this->UpdateSuppressorProxy->UpdateVTKObjects();
 
   if ( vtkProcessModule::GetProcessModule()->IsRemote(this->GetConnectionID()))
     {
-    this->SetupCollectionFilter(this->CollectProxy);
-
     for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
       {
       vtkClientServerStream cmd;
-      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
       cmd << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID() << "LogStartEvent" << "Execute Collect"
         << vtkClientServerStream::End;
@@ -154,24 +229,8 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
         << vtkClientServerStream::Invoke
         << this->CollectProxy->GetID(i) << "AddObserver" << "EndEvent" << cmd
         << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID,
-                     this->CollectProxy->GetServers(),
+      pm->SendStream(this->ConnectionID, this->CollectProxy->GetServers(),
                      stream);
-
-      // Handle collection setup with client server.
-      stream
-        << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "GetSocketController"
-        << pm->GetConnectionClientServerID(this->ConnectionID)
-        << vtkClientServerStream::End
-        << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(i) << "SetSocketController"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID,
-                     this->CollectProxy->GetServers(),
-                     stream);
-
       }
     }
 }
@@ -246,7 +305,7 @@ vtkDataObject* vtkSMGenericViewDisplayProxy::GetOutput()
     return NULL;
     }
     
-  vtkMPIMoveData* dp = vtkMPIMoveData::SafeDownCast(
+  vtkDataSetAlgorithm* dp = vtkDataSetAlgorithm::SafeDownCast(
     pm->GetObjectFromID(this->CollectProxy->GetID(0)));
   if (dp == NULL)
     {

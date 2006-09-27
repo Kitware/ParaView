@@ -3,12 +3,15 @@ INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 
 SET(Filters_SRCS
+  vtkAttributeDataReductionFilter.cxx
   vtkAttributeEditor.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCaveRenderManager.cxx
+  vtkCellSelect.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkClientCompositeManager.cxx
+  vtkClientServerMoveData.cxx
 #  vtkColorByPart.cxx
   vtkCompleteArrays.cxx
   vtkCVGeometryCache.cxx
@@ -25,18 +28,19 @@ SET(Filters_SRCS
   vtkImageCompressor.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
+  vtkMergeArrays.cxx
   vtkMPICompositeManager.cxx
   vtkMPIDuplicatePolyData.cxx
   vtkMPIDuplicateUnstructuredGrid.cxx
   vtkMPIMoveData.cxx
-  vtkMergeArrays.cxx
   vtkMultiActorHelper.cxx
   vtkMultiBlockExtractSelection.cxx
   vtkMultiDisplayManager.cxx
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
-  vtkPPhastaReader.cxx
   vtkPhastaReader.cxx
+  vtkPickFilter.cxx
+  vtkPPhastaReader.cxx
   vtkPPickFilter.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
@@ -80,27 +84,26 @@ SET(Filters_SRCS
   vtkPVTrackballZoom.cxx
   vtkPVTreeComposite.cxx
   vtkPVUpdateSuppressor.cxx
-  vtkPickFilter.cxx
+  vtkPVVisibleCellSelector.cxx
+  vtkReductionFilter.cxx
 #  vtkSelectInputs.cxx
   vtkSpyPlotReader.cxx
+  vtkSquirtCompressor.cxx
   vtkStreamingTessellator.cxx
   vtkSubdivisionAlgorithm.cxx
   vtkSurfaceVectors.cxx
-  vtkSquirtCompressor.cxx
   vtkTemporalCacheFilter.cxx
-  vtkTemporalProbeFilter.cxx
   vtkTemporalPickFilter.cxx
+  vtkTemporalProbeFilter.cxx
   vtkTessellatorFilter.cxx
   vtkTiledDisplaySchedule.cxx
   vtkTrackballPan.cxx
   vtkUpdateSuppressorPipeline.cxx
-  vtkVRMLSource.cxx
   vtkVolumeSelector.cxx
+  vtkVRMLSource.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
-  vtkCellSelect.cxx
-  vtkPVVisibleCellSelector.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
