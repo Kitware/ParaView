@@ -63,6 +63,18 @@ public:
   // Update the output
   void Update();
 
+  // Description:
+  // Set the reduction algorithm type. Cannot be called before
+  // objects are created.
+  void SetReductionType(int type);
+  //BTX
+  enum ReductionType
+    {
+    ADD = 0,
+    POLYDATA_APPEND = 1,
+    UNSTRUCTURED_APPEND = 2
+    };
+  //ETX
 protected:
   vtkSMGenericViewDisplayProxy();
   ~vtkSMGenericViewDisplayProxy();
@@ -77,6 +89,7 @@ protected:
 private:
   vtkSMProxy* CollectProxy;
   vtkSMProxy *UpdateSuppressorProxy;
+  vtkSMProxy* ReduceProxy;
 
   int CanCreateProxy;
   int CollectionDecision;

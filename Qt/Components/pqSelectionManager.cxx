@@ -708,10 +708,13 @@ void pqSelectionManager::createNewClientDisplays(
       pp->AddProxy(extractor);
       }
 
+    /* 
     vtkSMIntVectorProperty* dataType = vtkSMIntVectorProperty::SafeDownCast(
       display->GetProperty("OutputDataType"));
     dataType->SetElements1(VTK_UNSTRUCTURED_GRID);
-
+    */
+    pqSMAdaptor::setEnumerationProperty(display->GetProperty("ReductionType"),
+      "UNSTRUCTURED_APPEND");
     display->UpdateVTKObjects();
     
     display->Update();
