@@ -22,10 +22,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSelection.h"
+#include "vtkSelectionSerializer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkMultiBlockExtractSelection, "1.4");
+vtkCxxRevisionMacro(vtkMultiBlockExtractSelection, "1.5");
 vtkStandardNewMacro(vtkMultiBlockExtractSelection);
 vtkCxxSetObjectMacro(vtkMultiBlockExtractSelection, Selection,vtkSelection);
 
@@ -73,6 +74,9 @@ int vtkMultiBlockExtractSelection::RequestData(
   vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(
     info->Get(vtkDataObject::DATA_OBJECT()));
 
+  int piece = info->Get(
+    vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
+
   vtkInformation* prop = sel->GetProperties();
   if (!prop->Has(vtkSelection::CONTENT_TYPE()) ||
       prop->Get(vtkSelection::CONTENT_TYPE()) != vtkSelection::SELECTIONS)
@@ -87,7 +91,16 @@ int vtkMultiBlockExtractSelection::RequestData(
 
   for (unsigned int i=0; i<numChildren; i++)
     {
-    vtkDataSet* selDS = this->SelectFromDataSet(sel->GetChild(i));
+    vtkSelection* child = sel->GetChild(i);
+    vtkInformation* childProp = child->GetProperties();
+    if (childProp->Has(vtkSelection::PROCESS_ID()))
+      {
+      if (childProp->Get(vtkSelection::PROCESS_ID()) != piece)
+        {
+        continue;
+        }
+      }
+    vtkDataSet* selDS = this->SelectFromDataSet(child);
     if (selDS)
       {
       mb->SetDataSet(idx, pm->GetPartitionId(), selDS);
