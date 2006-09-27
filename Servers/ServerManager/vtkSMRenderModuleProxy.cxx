@@ -53,7 +53,7 @@
 #include "vtkSelection.h"
 #include "vtkSMMPIRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.50");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.51");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1290,11 +1290,8 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
   //Find number of rendering processors.
   int numProcessors = 1;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (!pm->GetOptions()->GetClientMode())
-    {
-    numProcessors = pm->GetNumberOfPartitions(this->ConnectionID);
-    }
-  
+  numProcessors = pm->GetNumberOfPartitions(this->ConnectionID);
+
   //Find largest polygon count in any actor
   vtkTypeInt64 maxNumCells = 0;
   vtkCollection *displays = this->GetDisplays();
