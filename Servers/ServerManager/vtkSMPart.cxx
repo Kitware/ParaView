@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.25");
+vtkCxxRevisionMacro(vtkSMPart, "1.26");
 
 
 //----------------------------------------------------------------------------
@@ -410,8 +410,6 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
 // Needs to be before "ExtractPieces" because translator propagates.
 void vtkSMPart::CreateTranslatorIfNecessary()
 {
-  return;
-
   if (this->GetNumberOfIDs() < 1)
     {
     return;
@@ -434,7 +432,9 @@ void vtkSMPart::CreateTranslatorIfNecessary()
     // PVExtent translator should really be the default,
     // Then we would not need to do this.
     stream << vtkClientServerStream::Invoke
-           << this->GetExecutiveID() << "GetExtentTranslator"
+           << this->GetExecutiveID() 
+           << "GetExtentTranslator" 
+           << this->PortIndex
            << vtkClientServerStream::End
            << vtkClientServerStream::Invoke
            << vtkClientServerStream::LastResult
@@ -454,7 +454,9 @@ void vtkSMPart::CreateTranslatorIfNecessary()
       vtkClientServerID translatorID =
         pm->NewStreamObject("vtkPVExtentTranslator", stream);
       stream << vtkClientServerStream::Invoke
-             << this->GetExecutiveID() << "SetExtentTranslator"
+             << this->GetExecutiveID() 
+             << "SetExtentTranslator" 
+             << this->PortIndex
              << translatorID
              << vtkClientServerStream::End;
       // Translator has to be set on source because it is propagated.
