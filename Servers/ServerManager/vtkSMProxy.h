@@ -367,6 +367,9 @@ public:
   // one can use the vtkSMProxyManager::GetHints() as well. 
   vtkPVXMLElement* GetHints();
 
+  // Description:
+  // Retuns if the VTK objects for this proxy have been created.
+  vtkGetMacro(ObjectsCreated, int);
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
