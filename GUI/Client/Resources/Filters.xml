@@ -2472,8 +2472,10 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
                  help="Terminal speed. The integration will be stopped if the speed (absolute value) is smaller than this threshold"/>
   </Module>
 
-<Module name="Tessellator" menu_name="Tessellator" root_name="UnstructuredGrid"
-         module_type="Filter">
+<Module name="GenericTessellator" 
+        menu_name="GenericTessellator" 
+        root_name="UnstructuredGrid"
+        module_type="Filter">
  
  <Filter class="vtkGenericDataSetTessellator">
       <Input name="Input"
