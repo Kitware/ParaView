@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqScalarBarDisplay.h
+   Module:    pqPlotManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,33 +29,50 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqScalarBarDisplay_h
-#define __pqScalarBarDisplay_h
+#ifndef __pqGraphWindowManager_h
+#define __pqGraphWindowManager_h
 
-#include "pqDisplay.h"
-class pqScalarBarDisplayInternal;
-class pqScalarsToColors;
+#include <QObject>
+#include "pqComponentsExport.h"
 
-// PQ object for a scalar bar. Keeps itself connected with the pqScalarsToColors
-// object, if any.
-class PQCORE_EXPORT pqScalarBarDisplay : public pqDisplay
+class pqPlotManagerInternal;
+class pqPlotViewModule;
+class pqProxy;
+
+class PQCOMPONENTS_EXPORT pqPlotManager : public QObject
 {
   Q_OBJECT
 public:
-  pqScalarBarDisplay(const QString& group, const QString& name,
-    vtkSMProxy* scalarbar, pqServer* server,
-    QObject* parent=0);
-  virtual ~pqScalarBarDisplay();
+  pqPlotManager(QObject* parent=0);
+  virtual ~pqPlotManager();
 
-  // Get the lookup table this scalar bar shows, if any.
-  pqScalarsToColors* getLookupTable() const;
+signals:
+  // Fired after a new plot module is noticed by the manager.
+  void plotAdded(pqPlotViewModule*);
 
-protected slots:
-  void onLookupTableModified();
+  // Fored just before the manager let's go of a plot view.
+  void plotRemoved(pqPlotViewModule*);
+
+  void activeViewChanged(pqPlotViewModule*);
+
+protected:
+  void onPlotAdded(pqPlotViewModule*);
+  void onPlotRemoved(pqPlotViewModule*);
+  void setActiveView(pqPlotViewModule* view);
+
+  // event filter callback.
+  bool eventFilter(QObject* obj, QEvent* event);
+
+private slots:
+  void onProxyAdded(pqProxy* proxy);
+  void onProxyRemoved(pqProxy* proxy);
+  
 private:
-  pqScalarBarDisplayInternal* Internal;
-};
+  pqPlotManager(const pqPlotManager&); // Not implemented.
+  void operator=(const pqPlotManager&); // Not implemented.
 
+  pqPlotManagerInternal* Internal;
+};
 
 
 #endif

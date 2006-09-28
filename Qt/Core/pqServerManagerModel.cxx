@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
+#include "pqPlotViewModule.h"
 #include "pqRenderModule.h"
 #include "pqScalarBarDisplay.h"
 #include "pqScalarsToColors.h"
@@ -103,8 +104,7 @@ public:
   typedef QList<pqRenderModule*> ListOfRenderModules;
   ListOfRenderModules RenderModules;
 
-  typedef QMap<vtkSMDataObjectDisplayProxy*, pqPipelineDisplay*>
-    MapOfDisplayProxyToDisplay;
+  typedef QMap<vtkSMProxy*, pqConsumerDisplay*> MapOfDisplayProxyToDisplay;
   MapOfDisplayProxyToDisplay Displays;
 
   typedef QMap<vtkSMProxy*, pqProxy*> MapOfProxies;
@@ -158,7 +158,24 @@ QList<pqPipelineDisplay*> pqServerManagerModel::getPipelineDisplays(
 {
   QList<pqPipelineDisplay*> list;
 
-  foreach(pqPipelineDisplay* display, this->Internal->Displays)
+  foreach(pqConsumerDisplay* cd, this->Internal->Displays)
+    {
+    pqPipelineDisplay* display = qobject_cast<pqPipelineDisplay*>(cd);
+    if (display && (!server || display->getServer() == server))
+      {
+      list.push_back(display);
+      }
+    }
+
+  return list;
+}
+
+//-----------------------------------------------------------------------------
+QList<pqConsumerDisplay*> pqServerManagerModel::getDisplays(pqServer* server)
+{
+  QList<pqConsumerDisplay*> list;
+
+  foreach(pqConsumerDisplay* display, this->Internal->Displays)
     {
     if (display && (!server || display->getServer() == server))
       {
@@ -263,11 +280,11 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
     SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*)),
     this, SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*)));
   QObject::connect(pqSource, 
-    SIGNAL(displayAdded(pqPipelineSource*, pqPipelineDisplay*)),
-    this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqPipelineDisplay*)));
+    SIGNAL(displayAdded(pqPipelineSource*, pqConsumerDisplay*)),
+    this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqConsumerDisplay*)));
   QObject::connect(pqSource, 
-    SIGNAL(displayRemoved(pqPipelineSource*, pqPipelineDisplay*)),
-    this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqPipelineDisplay*)));
+    SIGNAL(displayRemoved(pqPipelineSource*, pqConsumerDisplay*)),
+    this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqConsumerDisplay*)));
   this->connect(pqSource, SIGNAL(nameChanged(pqServerManagerModelItem*)), 
     this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
 
@@ -334,16 +351,13 @@ void pqServerManagerModel::onRemoveSource(QString name, vtkSMProxy* proxy)
 void pqServerManagerModel::onAddDisplay(QString name, 
   vtkSMProxy* proxy)
 {
-  vtkSMDataObjectDisplayProxy* dProxy =
-    vtkSMDataObjectDisplayProxy::SafeDownCast(proxy);
-
-  if (!proxy || !dProxy)
+  if (!proxy)
     {
     qDebug() << "onAddDisplay cannot be called with a null proxy.";
     return;
     }
 
-  if (this->Internal->Displays.contains(dProxy))
+  if (this->Internal->Displays.contains(proxy))
     {
     qDebug() << "Display already added. Are you registering the display?";
     return;
@@ -351,7 +365,7 @@ void pqServerManagerModel::onAddDisplay(QString name,
 
   // Called when a new display is registered.
   // 1) determine server on which the display is created.
-  pqServer* server = this->getServerForSource(dProxy);
+  pqServer* server = this->getServerForSource(proxy);
   if (!server)
     {
     qDebug() << "Could not locate the server on which the new display "
@@ -359,11 +373,21 @@ void pqServerManagerModel::onAddDisplay(QString name,
     return;
     }
 
-  // 2) create a new pqPipelineDisplay;
-  pqPipelineDisplay* display = new pqPipelineDisplay(name,
-    dProxy, server, this);
+  pqConsumerDisplay* display = 0;
 
-  this->Internal->Displays[dProxy] = display;
+  vtkSMDataObjectDisplayProxy* dProxy =
+    vtkSMDataObjectDisplayProxy::SafeDownCast(proxy);
+  if (dProxy)
+    {
+    // 2) create a new pqConsumerDisplay;
+    display = new pqPipelineDisplay(name, dProxy, server, this);
+    }
+  else
+    {
+    display = new pqConsumerDisplay("displays", name, proxy, server, this);
+    }
+
+  this->Internal->Displays[proxy] = display;
 
   // Listen for visibility changes.
   QObject::connect(display, SIGNAL(visibilityChanged(bool)),
@@ -375,18 +399,15 @@ void pqServerManagerModel::onAddDisplay(QString name,
 //-----------------------------------------------------------------------------
 void pqServerManagerModel::onRemoveDisplay(vtkSMProxy* proxy)
 {
-  vtkSMDataObjectDisplayProxy* dProxy =
-    vtkSMDataObjectDisplayProxy::SafeDownCast(proxy);
-
-  pqPipelineDisplay* display = NULL;
-  if (!proxy || !dProxy)
+  if (!proxy)
     {
     qDebug() << "onRemoveDisplay cannot be called with a null proxy.";
     return;
     }
-  if (this->Internal->Displays.contains(dProxy))
+  pqConsumerDisplay* display = NULL;
+  if (this->Internal->Displays.contains(proxy))
     {
-    display = this->Internal->Displays.take(dProxy);
+    display = this->Internal->Displays.take(proxy);
     }
   QObject::disconnect(display, 0, this, 0);
   // emit this->displayRemoved(display);
@@ -539,6 +560,26 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
     {
     pq_proxy = new pqScalarBarDisplay(group, name, proxy, server, this);
     }
+  else if (group == "plot_modules")
+    {
+    int type;
+    QString xmlType = proxy->GetXMLName();
+    if (xmlType == "HistogramViewModule")
+      {
+      type = pqPlotViewModule::BAR_CHART;
+      }
+    else
+      {
+      qDebug() << "Don't know what kind of plot is a " << xmlType;
+      return;
+      }
+    vtkSMAbstractViewModuleProxy* ren = 
+      vtkSMAbstractViewModuleProxy::SafeDownCast(proxy);
+    if (ren)
+      {
+      pq_proxy = new pqPlotViewModule(type, group, name, ren, server, this);
+      }
+    }
 
   if (pq_proxy)
     {
@@ -678,10 +719,8 @@ pqPipelineSource* pqServerManagerModel::getPQSource(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineDisplay* pqServerManagerModel::getPQDisplay(vtkSMProxy* proxy)
+pqConsumerDisplay* pqServerManagerModel::getPQDisplay(vtkSMProxy* disp)
 {
-  vtkSMDataObjectDisplayProxy* disp = 
-    vtkSMDataObjectDisplayProxy::SafeDownCast(proxy);
   if (disp && this->Internal->Displays.contains(disp))
     {
     return this->Internal->Displays[disp];
@@ -743,7 +782,7 @@ void pqServerManagerModel::updateServerName()
 void pqServerManagerModel::updateDisplayVisibility(bool)
 {
   // Get the display object from the sender.
-  pqPipelineDisplay *display = qobject_cast<pqPipelineDisplay *>(this->sender());
+  pqConsumerDisplay *display = qobject_cast<pqConsumerDisplay *>(this->sender());
   if(display)
     {
     pqPipelineSource *source = display->getInput();

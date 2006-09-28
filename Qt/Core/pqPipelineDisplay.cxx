@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGeometryInformation.h"
 #include "vtkSmartPointer.h" 
 #include "vtkSMDataObjectDisplayProxy.h"
-#include "vtkSMInputProperty.h"
+#include "vtkSMProxyProperty.h"
 
 // Qt includes.
 #include <QList>
@@ -69,7 +69,6 @@ class pqPipelineDisplayInternal
 public:
   vtkSmartPointer<vtkSMDataObjectDisplayProxy> DisplayProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  QPointer<pqPipelineSource> Input;
 
   // Convenience method to get array information.
   vtkPVArrayInformation* getArrayInformation(
@@ -107,35 +106,21 @@ public:
 pqPipelineDisplay::pqPipelineDisplay(const QString& name,
   vtkSMDataObjectDisplayProxy* display,
   pqServer* server, QObject* p/*=null*/):
-  pqDisplay("displays", name, display, server, p)
+  pqConsumerDisplay("displays", name, display, server, p)
 {
   this->Internal = new pqPipelineDisplayInternal();
   this->Internal->DisplayProxy = display;
   this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-  this->Internal->Input = 0;
   if (display)
     {
-    this->Internal->VTKConnect->Connect(display->GetProperty("Input"),
-      vtkCommand::ModifiedEvent, this, SLOT(onInputChanged()));
     this->Internal->VTKConnect->Connect(display->GetProperty("Visibility"),
       vtkCommand::ModifiedEvent, this, SLOT(onVisibilityChanged()));
     }
-  // This will make sure that if the input is already set.
-  this->onInputChanged();
 }
 
 //-----------------------------------------------------------------------------
 pqPipelineDisplay::~pqPipelineDisplay()
 {
-  if (this->Internal->DisplayProxy)
-    {
-    this->Internal->VTKConnect->Disconnect(
-      this->Internal->DisplayProxy->GetProperty("Input"));
-    }
-  if (this->Internal->Input)
-    {
-    this->Internal->Input->removeDisplay(this);
-    }
   delete this->Internal;
 }
 
@@ -146,62 +131,7 @@ vtkSMDataObjectDisplayProxy* pqPipelineDisplay::getDisplayProxy() const
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqPipelineDisplay::getInput() const
-{
-  return this->Internal->Input;
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineDisplay::onInputChanged()
-{
-  vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
-    this->Internal->DisplayProxy->GetProperty("Input"));
-  if (!ivp)
-    {
-    qDebug() << "Display proxy has no input property!";
-    return;
-    }
-  pqPipelineSource* added = 0;
-  pqPipelineSource* removed = 0;
-
-  int new_proxes_count = ivp->GetNumberOfProxies();
-  if (new_proxes_count == 0)
-    {
-    removed = this->Internal->Input;
-    this->Internal->Input = 0;
-    }
-  else if (new_proxes_count == 1)
-    {
-    pqServerManagerModel* model = pqServerManagerModel::instance();
-    removed = this->Internal->Input;
-    this->Internal->Input = model->getPQSource(ivp->GetProxy(0));
-    added = this->Internal->Input;
-    if (ivp->GetProxy(0) && !this->Internal->Input)
-      {
-      qDebug() << "Display could not locate the pqPipelineSource object "
-        << "for the input proxy.";
-      }
-    }
-  else if (new_proxes_count > 1)
-    {
-    qDebug() << "Displays with more than 1 input are not handled.";
-    return;
-    }
-
-  // Now tell the pqPipelineSource about the changes in the displays.
-  if (removed)
-    {
-    removed->removeDisplay(this);
-    }
-  if (added)
-    {
-    added->addDisplay(this);
-    }
-
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineDisplay::setDefaultColorParametes()
+void pqPipelineDisplay::setDefaults()
 {
   vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
   if (!displayProxy)
@@ -458,18 +388,6 @@ void pqPipelineDisplay::updateLookupTableScalarRange()
     QPair<double, double> range = ranges[0];
     lut->setWholeScalarRange(range.first, range.second);
     }
-}
-
-//-----------------------------------------------------------------------------
-bool pqPipelineDisplay::isVisible() const
-{
-  return this->getDisplayProxy()->GetVisibilityCM();
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineDisplay::setVisible(bool visible)
-{
-  this->getDisplayProxy()->SetVisibilityCM((visible? 1 : 0));
 }
 
 //-----------------------------------------------------------------------------

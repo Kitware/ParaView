@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 class pqFlatTreeView;
-class pqPipelineDisplay;
+class pqConsumerDisplay;
 class pqPipelineModel;
 class pqPipelineSource;
 class pqRenderModule;
@@ -83,6 +83,9 @@ public:
   /// get the render module this pipeline browser works with
   pqRenderModule *getRenderModule();
 
+  /// Helper method to create a display for the source
+  /// on the current render module.
+  pqConsumerDisplay* createDisplay(pqPipelineSource* source, bool visible);
 public slots:
   // Call this to select the particular item.
   void select(pqServerManagerModelItem* item);
@@ -94,9 +97,6 @@ public slots:
   /// set the current render module for the pipeline browser
   void setRenderModule(pqRenderModule* rm);
 
-  /// Helper method to create a display for the source
-  /// on the current render module.
-  pqPipelineDisplay* createDisplay(pqPipelineSource* source, bool visible);
 signals:
   // Fired when the selection is changed. Argument is the newly selected
   // item.

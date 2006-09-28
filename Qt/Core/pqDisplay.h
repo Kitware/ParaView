@@ -67,13 +67,13 @@ public:
   // Note that for a display to be visible in a render module,
   // it must be \c shownIn that render modules as well as 
   // visibility must be set to 1.
-  virtual bool isVisible() const =0;
+  virtual bool isVisible() const;
 
   // Set the visibility. Note that this affects the visibility of the
   // display in all render modules it is added to, and only in all the
   // render modules it is added to. This method does not call a re-render
   // on the render module, caller must call that explicitly.
-  virtual void setVisible(bool visible)=0;
+  virtual void setVisible(bool visible);
 
   // Get the number of render modules this display is present in.
   unsigned int getNumberOfViewModules() const;
@@ -87,6 +87,10 @@ public:
   // otherwise render on idle.
   void renderAllViews(bool force);
 
+  // This method is called on all displays after creation to
+  // fill it up with default parameters. This is called only when the GUI
+  // creates the display using the pipeline builder.
+  virtual void setDefaults() { };
 public slots:
   void renderAllViews() { this->renderAllViews(false); }
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqScalarBarDisplay.h
+   Module:    pqConsumerDisplay.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,34 +29,41 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqScalarBarDisplay_h
-#define __pqScalarBarDisplay_h
+#ifndef __pqConsumerDisplay_h
+#define __pqConsumerDisplay_h
 
 #include "pqDisplay.h"
-class pqScalarBarDisplayInternal;
-class pqScalarsToColors;
 
-// PQ object for a scalar bar. Keeps itself connected with the pqScalarsToColors
-// object, if any.
-class PQCORE_EXPORT pqScalarBarDisplay : public pqDisplay
+class pqConsumerDisplayInternal;
+class pqPipelineSource;
+
+// pqConsumerDisplay is the superclass for a display for a pqPiplineSource 
+// i.e. the input for this display proxy is a pqPiplineSource.
+// This class manages the linking between the pqPiplineSource 
+// and pqConsumerDisplay.
+class PQCORE_EXPORT pqConsumerDisplay : public pqDisplay
 {
   Q_OBJECT
 public:
-  pqScalarBarDisplay(const QString& group, const QString& name,
-    vtkSMProxy* scalarbar, pqServer* server,
+  pqConsumerDisplay(const QString& group, const QString& name,
+    vtkSMProxy* display, pqServer* server,
     QObject* parent=0);
-  virtual ~pqScalarBarDisplay();
+  virtual ~pqConsumerDisplay();
 
-  // Get the lookup table this scalar bar shows, if any.
-  pqScalarsToColors* getLookupTable() const;
+  // Get the source/filter of which this is a display.
+  pqPipelineSource* getInput() const;
 
-protected slots:
-  void onLookupTableModified();
+private slots:
+  // called when input property on display changes. We must detect if
+  // (and when) the display is connected to a new proxy.
+  virtual void onInputChanged();
+
 private:
-  pqScalarBarDisplayInternal* Internal;
+  pqConsumerDisplay(const pqConsumerDisplay&); // Not implemented.
+  void operator=(const pqConsumerDisplay&); // Not implemented.
+
+  pqConsumerDisplayInternal* Internal;
 };
-
-
 
 #endif
 

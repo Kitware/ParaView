@@ -35,19 +35,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqCoreExport.h"
 
-class vtkSMDisplayProxy;
-class vtkSMProxy;
-class vtkSMRenderModuleProxy;
-
+class pqConsumerDisplay;
 class pqDisplay;
+class pqGenericViewModule;
 class pqNameCount;
 class pqPipelineDisplay;
 class pqPipelineSource;
+class pqPlotViewModule;
 class pqRenderModule;
 class pqScalarBarDisplay;
 class pqScalarsToColors;
 class pqServer;
 class pqUndoStack;
+class vtkSMAbstractViewModuleProxy;
+class vtkSMProxy;
+class vtkSMRenderModuleProxy;
 
 /// This is a class that can build pipelines. Use this class to create 
 /// sources/filters/readers etc etc. This class will ensure that all
@@ -98,8 +100,8 @@ public:
 
   // Create a display proxy for the given proxy(source/filter) and add 
   // it to the given render module. 
-  pqPipelineDisplay* createDisplayProxy(pqPipelineSource* src,
-    pqRenderModule* renModule);
+  pqConsumerDisplay* createDisplay(pqPipelineSource* src,
+    pqGenericViewModule* viewModule);
 
   // Create a scalar bar for the lookuptable proxy in the given render window.
   pqScalarBarDisplay* createScalarBar(pqScalarsToColors *lut,
@@ -113,6 +115,10 @@ public:
   /// Remove a viewing "window". This also cleans up any displays that are
   /// visible only in this render window.
   void removeWindow(pqRenderModule* rm);
+
+  // Called to create a new plot view on the server. \c type is the enum
+  // pqPlotViewModule::PlotType, which is the supported plot type.
+  pqPlotViewModule* createPlotWindow(int type, pqServer* server);
 
   // Create a connection between a source and a sink. This method ensures
   // that the UndoState is recoreded. Remember this "connection" is not a 
@@ -166,8 +172,8 @@ public:
 protected:
   /// this method does what it says. Note that it does not worry about undo stack
   /// at all. The caller would have managed it.
-  vtkSMDisplayProxy* createDisplayProxyInternal(
-    vtkSMProxy* proxy, vtkSMRenderModuleProxy*);
+  pqConsumerDisplay* createDisplayProxyInternal(
+    vtkSMProxy* proxy, vtkSMAbstractViewModuleProxy*);
 
   // Internal create method.
   vtkSMProxy* createPipelineProxy(const char* xmlgroup,

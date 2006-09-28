@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineDisplay_h
 
 
-#include "pqDisplay.h"
+#include "pqConsumerDisplay.h"
 #include <QPair>
 
 class pqPipelineDisplayInternal;
@@ -56,7 +56,7 @@ class vtkSMDataObjectDisplayProxy;
 /// a single vtkSMDataObjectDisplayProxy. The display can be added to
 /// only one render module or more (ofcouse on the same server, this class
 /// doesn't worry about that.
-class PQCORE_EXPORT pqPipelineDisplay : public pqDisplay
+class PQCORE_EXPORT pqPipelineDisplay : public pqConsumerDisplay
 {
   Q_OBJECT
 public:
@@ -68,31 +68,16 @@ public:
   // Get the internal display proxy.
   vtkSMDataObjectDisplayProxy* getDisplayProxy() const;
 
-  // Get the source/filter of which this is a display.
-  pqPipelineSource* getInput() const;
-
   // Sets the default color mapping for the display.
   // The rules are:
   // If the source created a NEW point scalar array, use it.
   // Else if the source created a NEW cell scalar array, use it.
   // Else if the input color by array exists in this source, use it.
   // Else color by property.
-  void setDefaultColorParametes(); 
+  virtual void setDefaults(); 
 
   // Call to select the coloring array. 
   void colorByArray(const char* arrayname, int fieldtype);
-
-  // Returns if the status of the visbility property of this display.
-  // Note that for a display to be visible in a render module,
-  // it must be \c shownIn that render modules as well as 
-  // visibility must be set to 1.
-  virtual bool isVisible() const;
-
-  // Set the visibility. Note that this affects the visibility of the
-  // display in all render modules it is added to, and only in all the
-  // render modules it is added to. This method does not call a re-render
-  // on the render module, caller must call that explicitly.
-  virtual void setVisible(bool visible);
 
   /// get the names of the arrays that a part may be colored by
   QList<QString> getColorFields();
@@ -133,10 +118,6 @@ public slots:
   // color array's scalar range. This call respects the lookup table's
   // "lock" on scalar range.
   void updateLookupTableScalarRange();
-protected slots:
-  // called when input property on display changes. We must detect if
-  // (and when) the display is connected to a new proxy.
-  virtual void onInputChanged();
 
 private:
   pqPipelineDisplayInternal *Internal; 

@@ -59,14 +59,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNameCount.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
+#include "pqPlotViewModule.h"
 #include "pqRenderModule.h"
+#include "pqScalarBarDisplay.h"
+#include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
-#include "pqScalarBarDisplay.h"
-#include "pqScalarsToColors.h"
 
 //-----------------------------------------------------------------------------
 pqPipelineBuilder* pqPipelineBuilder::Instance = 0;
@@ -285,8 +286,8 @@ vtkSMProxy* pqPipelineBuilder::createPipelineProxy(const char* xmlgroup,
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineDisplay* pqPipelineBuilder::createDisplayProxy(pqPipelineSource* src,
-  pqRenderModule* renModule)
+pqConsumerDisplay* pqPipelineBuilder::createDisplay(pqPipelineSource* src,
+  pqGenericViewModule* renModule)
 {
   if (!src || !renModule )
     {
@@ -307,65 +308,53 @@ pqPipelineDisplay* pqPipelineBuilder::createDisplayProxy(pqPipelineSource* src,
     label << "Display " << (proxy->GetXMLName()? proxy->GetXMLName() : "" );
     this->UndoStack->BeginUndoSet(QString(label.str().c_str()));
     }
-  vtkSMDisplayProxy* display = 
-    this->createDisplayProxyInternal(proxy, renModule->getRenderModuleProxy());
+  pqConsumerDisplay* display = 
+    this->createDisplayProxyInternal(proxy, renModule->getViewModuleProxy());
   if (this->UndoStack)
     {
     this->UndoStack->EndUndoSet();
     }
 
-  if (display)
-    {
-    return pqServerManagerModel::instance()->getPQDisplay(display);
-    }
-  return NULL;
+  return display;
 }
 
 //-----------------------------------------------------------------------------
-vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxyInternal(
-  vtkSMProxy* proxy, vtkSMRenderModuleProxy* renModule)
+pqConsumerDisplay* pqPipelineBuilder::createDisplayProxyInternal(
+  vtkSMProxy* proxy, vtkSMAbstractViewModuleProxy* renModule)
 {
   if (!proxy)
     {
     qDebug() << "Cannot connect display to NULL source proxy.";
     return NULL;
     }
-  //proxy->CreateParts();
-  vtkSMAbstractDisplayProxy* adisplay = renModule->CreateDisplayProxy();
-  vtkSMDisplayProxy* display = vtkSMDisplayProxy::SafeDownCast(adisplay);
-  if ( !display )
+  
+  vtkSMProxy* display = renModule->CreateDisplayProxy();
+  if (!display)
     {
-    adisplay->Delete();
-    qDebug() << "Cannot create display.";
+    qDebug() << "Cannot create display. "
+      << "View module does not support calling CreateDisplayProxy()";
     return NULL;
     }
- 
+
   // Register the proxy -- must be done first before any property changes 
   // (of undo/redo to work).
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
   pxm->RegisterProxy("displays", display->GetSelfIDAsString(), display);
   display->Delete();
-  
-  vtkSMProxyProperty* pp;
-  
+
   // Set the display proxy input.
-  pp = vtkSMProxyProperty::SafeDownCast(
-    display->GetProperty("Input"));
-  pp->AddProxy(proxy);
-
-  // Add the display proxy to render module.
-  pp = vtkSMProxyProperty::SafeDownCast(
-    renModule->GetProperty("Displays"));
-  pp->AddProxy(display);
-  renModule->UpdateVTKObjects();
-
+  pqSMAdaptor::setProxyProperty(display->GetProperty("Input"), proxy);
   display->UpdateVTKObjects();
 
-  pqPipelineDisplay* dispObject = 
+  // Add the display proxy to render module.
+  pqSMAdaptor::addProxyProperty(renModule->GetProperty("Displays"), display);
+  renModule->UpdateVTKObjects();
+
+  pqConsumerDisplay* dispObject = 
     pqServerManagerModel::instance()->getPQDisplay(display);
-  dispObject->setDefaultColorParametes();
-  return display;
+  dispObject->setDefaults();
+  return dispObject;
 }
 
 //-----------------------------------------------------------------------------
@@ -469,6 +458,55 @@ void pqPipelineBuilder::remove(pqPipelineSource* source,
     {
     this->UndoStack->EndUndoSet();
     }
+}
+
+//-----------------------------------------------------------------------------
+pqPlotViewModule* pqPipelineBuilder::createPlotWindow(int type, pqServer* server)
+{
+  if (!server)
+    {
+    qDebug() << "Cannot createPlotWindow on null server.";
+    return 0;
+    }
+
+  const char* proxyname;
+  switch (type)
+    {
+  case pqPlotViewModule::BAR_CHART:
+    proxyname = "HistogramViewModule";
+    break;
+  default:
+    qDebug() << "Cannot determine proxy to create for type: " << type;
+    return 0;
+    }
+
+  // This is not an undo-able operation (atleast for now)
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* proxy = pxm->NewProxy("rendermodules", proxyname);
+  if (!proxy)
+    {
+    qDebug() << "Cannot create proxy: rendermodules:" << proxyname;
+    return 0;
+    }
+  proxy->SetConnectionID(server->GetConnectionID());
+  proxy->UpdateVTKObjects();
+  vtksys_ios::ostringstream name_stream;
+  name_stream << proxy->GetXMLName() 
+    << this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName());
+  pxm->RegisterProxy("plot_modules", name_stream.str().c_str(), proxy);
+  proxy->Delete();
+
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqPlotViewModule* pqView = qobject_cast<pqPlotViewModule*>(
+    model->getPQProxy(proxy));
+  if (!pqView)
+    {
+    qDebug() << "Cannot locate the pqPlotViewModule for the " 
+      << "view module proxy.";
+    }
+  return pqView;
 }
 
 //-----------------------------------------------------------------------------

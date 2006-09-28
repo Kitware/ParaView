@@ -159,12 +159,15 @@ void pqContourPanel::onAccepted()
           for(int j = 0; j != pipeline_source->getDisplayCount(); ++j)
             {
             pqPipelineDisplay* const pipeline_display =
-              pipeline_source->getDisplay(j);
-              
-            vtkSMDataObjectDisplayProxy* const display_proxy =
-              pipeline_display->getDisplayProxy();
+              qobject_cast<pqPipelineDisplay*>(pipeline_source->getDisplay(j));
+            if (pipeline_display)
+              {
 
-            display_proxy->SetVisibilityCM(false);
+              vtkSMDataObjectDisplayProxy* const display_proxy =
+                pipeline_display->getDisplayProxy();
+
+              display_proxy->SetVisibilityCM(false);
+              }
             }
           }
         }

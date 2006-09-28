@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqScalarBarDisplay.cxx
+   Module:    pqPlotViewModule.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,85 +29,83 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqScalarBarDisplay.h"
-
-#include "vtkCommand.h"
-#include "vtkEventQtSlotConnect.h"
-#include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
+#include "pqPlotViewModule.h"
 
 #include <QtDebug>
 #include <QPointer>
 
-#include "pqApplicationCore.h"
-#include "pqProxy.h"
-#include "pqScalarsToColors.h"
-#include "pqServerManagerModel.h"
-#include "pqSMAdaptor.h"
+#include "pqHistogramWidget.h"
 
 //-----------------------------------------------------------------------------
-class pqScalarBarDisplayInternal
+class pqPlotViewModuleInternal
 {
 public:
-  QPointer<pqScalarsToColors> LookupTable;
-  vtkEventQtSlotConnect* VTKConnect;
+  QPointer<QWidget> PlotWidget; 
+  pqPlotViewModuleInternal()
+    {
+    }
+  ~pqPlotViewModuleInternal()
+    {
+    delete this->PlotWidget;
+    }
 };
 
 //-----------------------------------------------------------------------------
-pqScalarBarDisplay::pqScalarBarDisplay(const QString& group, const QString& name,
-    vtkSMProxy* scalarbar, pqServer* server,
-    QObject* _parent)
-: pqDisplay(group, name, scalarbar, server, _parent)
+pqPlotViewModule::pqPlotViewModule(int type,
+  const QString& group, const QString& name, 
+  vtkSMAbstractViewModuleProxy* renModule, pqServer* server, QObject* _parent)
+: pqGenericViewModule(group, name, renModule, server, _parent)
 {
-  this->Internal = new pqScalarBarDisplayInternal;
+  this->Type = type;
+  this->Internal = new pqPlotViewModuleInternal();
 
-  this->Internal->VTKConnect = vtkEventQtSlotConnect::New();
-  this->Internal->VTKConnect->Connect(scalarbar->GetProperty("LookupTable"),
-    vtkCommand::ModifiedEvent, this, SLOT(onLookupTableModified()));
+  switch (this->Type)
+    {
+  case BAR_CHART:
+    this->Internal->PlotWidget = new pqHistogramWidget();
+    break;
 
-  // load default values.
-  this->onLookupTableModified();
+  default:
+    qDebug() << "PlotType: " << type << " not supported yet.";
+    }
 }
 
 //-----------------------------------------------------------------------------
-pqScalarBarDisplay::~pqScalarBarDisplay()
+pqPlotViewModule::~pqPlotViewModule()
 {
-  this->Internal->VTKConnect->Disconnect();
-  this->Internal->VTKConnect->Delete();
-
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-pqScalarsToColors* pqScalarBarDisplay::getLookupTable() const
+QWidget* pqPlotViewModule::getWidget() const
 {
-  return this->Internal->LookupTable;
+  return this->Internal->PlotWidget;
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarBarDisplay::onLookupTableModified()
+void pqPlotViewModule::setWindowParent(QWidget* p)
 {
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  vtkSMProxy* curLUTProxy = 
-    pqSMAdaptor::getProxyProperty(this->getProxy()->GetProperty("LookupTable"));
-  pqScalarsToColors* curLUT = qobject_cast<pqScalarsToColors*>(
-    smmodel->getPQProxy(curLUTProxy));
-
-  if (curLUT == this->Internal->LookupTable)
+  if (this->Internal->PlotWidget)
     {
-    return;
+    this->Internal->PlotWidget->setParent(p);
     }
-
-  if (this->Internal->LookupTable)
+  else
     {
-    this->Internal->LookupTable->removeScalarBar(this);
-    }
-
-  this->Internal->LookupTable = curLUT;
-  if (this->Internal->LookupTable)
-    {
-    this->Internal->LookupTable->addScalarBar(this);
+    qDebug() << "setWindowParent() failed since PlotWidget not yet created.";
     }
 }
+//-----------------------------------------------------------------------------
+QWidget* pqPlotViewModule::getWindowParent() const
+{
+  if (this->Internal->PlotWidget)
+    {
+    return this->Internal->PlotWidget->parentWidget();
+    }
+  qDebug() << "getWindowParent() failed since PlotWidget not yet created.";
+  return 0;
+}
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------

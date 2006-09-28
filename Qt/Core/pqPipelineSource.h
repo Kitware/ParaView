@@ -39,9 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include "pqProxy.h"
 
-class pqPipelineDisplay;
+class pqConsumerDisplay;
 class pqPipelineSourceInternal;
-class pqRenderModule;
 class vtkObject;
 class pqGenericViewModule;
 
@@ -73,7 +72,7 @@ public:
   bool hasConsumer(pqPipelineSource *) const;
 
   /// Get the display at given index.
-  pqPipelineDisplay *getDisplay(int index) const;
+  pqConsumerDisplay *getDisplay(int index) const;
 
   // Get number of displays.
   int getDisplayCount() const; 
@@ -81,7 +80,7 @@ public:
   // Get the display(if any) that is present in the \c renderModule. 
   // NOTE: In case more than one display exists for this source
   // added to the render module, this returns the first one.
-  pqPipelineDisplay* getDisplay(pqRenderModule* renderModule) const;
+  pqConsumerDisplay* getDisplay(pqGenericViewModule* renderModule) const;
 
   // Returns a list of render modules in which this source
   // has displays added (the displays may not be visible).
@@ -107,10 +106,10 @@ signals:
   void preConnectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
 
   /// fired when a display is added.
-  void displayAdded(pqPipelineSource* source, pqPipelineDisplay* display);
+  void displayAdded(pqPipelineSource* source, pqConsumerDisplay* display);
 
   /// fired when a display is removed.
-  void displayRemoved(pqPipelineSource* source, pqPipelineDisplay* display);
+  void displayRemoved(pqPipelineSource* source, pqConsumerDisplay* display);
 
 protected slots:
   // process some change in the input property for the proxy--needed for subclass
@@ -119,7 +118,7 @@ protected slots:
 
 protected:
   friend class pqPipelineFilter;
-  friend class pqPipelineDisplay;
+  friend class pqConsumerDisplay;
   /// For every source registered if it has any property that defines a proxy_list
   /// domain, we create and register proxies for every type of proxy indicated 
   /// in that domain. These are "internal proxies" for this pqProxy. Internal
@@ -134,9 +133,9 @@ protected:
   void removeConsumer(pqPipelineSource *);
   void addConsumer(pqPipelineSource*);
 
-  // called by pqPipelineDisplay when the connections change.
-  void addDisplay(pqPipelineDisplay*);
-  void removeDisplay(pqPipelineDisplay*);
+  // called by pqConsumerDisplay when the connections change.
+  void addDisplay(pqConsumerDisplay*);
+  void removeDisplay(pqConsumerDisplay*);
 private:
   pqPipelineSourceInternal *Internal; ///< Stores the output connections.
 };

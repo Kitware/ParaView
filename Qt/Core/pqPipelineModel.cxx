@@ -353,7 +353,7 @@ pqPipelineModelItem::VisibleState pqPipelineModelSource::getVisibleState(
   pqPipelineModelItem::VisibleState state = pqPipelineModelItem::NotAllowed;
   if(module && module->getServer() == this->Source->getServer())
     {
-    pqPipelineDisplay *display = this->Source->getDisplay(module);
+    pqConsumerDisplay*display = this->Source->getDisplay(module);
     if(display && display->isVisible())
       {
       state = pqPipelineModelItem::Visible;
@@ -1030,7 +1030,7 @@ void pqPipelineModel::updateItemName(pqServerManagerModelItem *item)
 }
 
 void pqPipelineModel::updateDisplays(pqPipelineSource *source,
-    pqPipelineDisplay *)
+    pqConsumerDisplay*)
 {
   pqPipelineModelItem *item = this->getModelItemFor(source);
   if(item)

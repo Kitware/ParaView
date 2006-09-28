@@ -280,6 +280,9 @@ public slots:
   void resetViewDirectionPosZ();
   void resetViewDirectionNegZ();
 
+  // Create New Plot Views.
+  void createBarCharView();
+
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);

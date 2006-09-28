@@ -43,17 +43,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
 #include "pqObjectInspectorWidget.h"
-#include "pqProxyTabWidget.h"
+#include "pqPendingDisplayManager.h"
 #include "pqPendingDisplayManager.h"
 #include "pqPipelineBrowser.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineMenu.h"
 #include "pqPipelineSource.h"
+#include "pqPlotManager.h"
+#include "pqPlotViewModule.h"
 #include "pqPQLookupTableManager.h"
+#include "pqProxyTabWidget.h"
 #include "pqReaderFactory.h"
 #include "pqRenderModule.h"
 #include "pqRenderWindowManager.h"
 #include "pqSelectionManager.h"
+#include "pqSelectReaderDialog.h"
 #include "pqServerFileDialogModel.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -61,18 +65,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerSelectionModel.h"
 #include "pqServerStartupBrowser.h"
 #include "pqSettingsDialog.h"
+#include "pqSettingsDialog.h"
 #include "pqSettings.h"
 #include "pqSimpleAnimationManager.h"
+#include "pqSMAdaptor.h"
 #include "pqSMAdaptor.h"
 #include "pqSourceProxyInfo.h"
 #include "pqStateLoader.h"
 #include "pqToolTipTrapper.h"
 #include "pqVCRController.h"
 #include "pqWriterFactory.h"
-#include "pqPendingDisplayManager.h"
-#include "pqSMAdaptor.h"
-#include "pqSettingsDialog.h"
-#include "pqSelectReaderDialog.h"
 
 #include <pqConnect.h>
 #include <pqEventDispatcher.h>
@@ -131,9 +133,10 @@ public:
   pqImplementation(QWidget* parent) :
     Parent(parent),
     MultiViewManager(parent),
-    CustomFilters(new pqCustomFilterManagerModel()),
+    CustomFilters(new pqCustomFilterManagerModel(parent)),
     CustomFilterManager(0),
     LookupTableManager(new pqPQLookupTableManager(parent)),
+    PlotManager(new pqPlotManager(parent)),
     RecentFilesMenu(0),
     FilterMenu(0),
     PipelineMenu(0),
@@ -159,6 +162,7 @@ public:
     delete this->CustomFilterManager;
     delete this->CustomFilters;
     delete this->LookupTableManager;
+    delete this->PlotManager;
   }
 
   QWidget* const Parent;
@@ -169,6 +173,7 @@ public:
   pqCustomFilterManagerModel* const CustomFilters;
   pqCustomFilterManager* CustomFilterManager;
   pqPQLookupTableManager* LookupTableManager;
+  pqPlotManager* PlotManager;
  
   QMenu* RecentFilesMenu; 
   
@@ -2147,3 +2152,10 @@ void pqMainWindowCore::resetViewDirectionNegZ()
   this->resetViewDirection(0, 0, -1);
 }
 
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::createBarCharView()
+{
+  pqPlotViewModule* barCharView = 
+    pqApplicationCore::instance()->getPipelineBuilder()->createPlotWindow(
+      pqPlotViewModule::BAR_CHART, this->getActiveServer());
+}

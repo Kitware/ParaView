@@ -117,7 +117,7 @@ void pqPendingDisplayManager::createPendingDisplays(pqRenderModule* rm)
       {
       continue;
       }
-    pb->createDisplayProxy(source, rm);
+    pb->createDisplay(source, rm);
     
     rm->render();
 

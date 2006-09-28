@@ -122,7 +122,10 @@ void pqDisplayRepresentationWidget::updateLinks()
 
   if (!display && this->Internal->Source && this->Internal->RenderModule)
     {
-    display = this->Internal->Source->getDisplay(this->Internal->RenderModule);
+    // this widget cannot work on other consumer displays like plot displays.
+    display = 
+      qobject_cast<pqPipelineDisplay*>(
+        this->Internal->Source->getDisplay(this->Internal->RenderModule));
     }
 
   this->Internal->comboBox->setEnabled(display!=0);

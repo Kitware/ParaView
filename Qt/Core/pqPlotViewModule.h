@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqScalarBarDisplay.h
+   Module:    pqPlotViewModule.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,33 +29,55 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqScalarBarDisplay_h
-#define __pqScalarBarDisplay_h
+#ifndef __pqPlotViewModule_h
+#define __pqPlotViewModule_h
 
-#include "pqDisplay.h"
-class pqScalarBarDisplayInternal;
-class pqScalarsToColors;
+#include "pqGenericViewModule.h"
 
-// PQ object for a scalar bar. Keeps itself connected with the pqScalarsToColors
-// object, if any.
-class PQCORE_EXPORT pqScalarBarDisplay : public pqDisplay
+class pqPlotViewModuleInternal;
+
+class PQCORE_EXPORT pqPlotViewModule : public pqGenericViewModule
 {
   Q_OBJECT
 public:
-  pqScalarBarDisplay(const QString& group, const QString& name,
-    vtkSMProxy* scalarbar, pqServer* server,
-    QObject* parent=0);
-  virtual ~pqScalarBarDisplay();
+  pqPlotViewModule(int type, const QString& group, const QString& name, 
+    vtkSMAbstractViewModuleProxy* renModule, 
+    pqServer* server, QObject* parent=NULL);
+  virtual ~pqPlotViewModule();
 
-  // Get the lookup table this scalar bar shows, if any.
-  pqScalarsToColors* getLookupTable() const;
+  enum PlotType
+    {
+    BAR_CHART = 0,
+    XY_PLOT =1
+    };
 
-protected slots:
-  void onLookupTableModified();
+  QWidget* getWidget() const;
+
+  /// Call this method to assign a Window in which this view module will
+  /// be displayed.
+  virtual void setWindowParent(QWidget* parent);
+  virtual QWidget* getWindowParent() const;
+
+  /// Save a screenshot for the render module. If width or height ==0,
+  /// the current window size is used.
+  virtual bool saveImage(int /*width*/, int /*height*/, 
+    const QString& /*filename*/) 
+    {
+    // Not supported yet.
+    return false;
+    };
+
+  int getType()
+    { return this->Type; }
+     
+protected:
+  int Type;
 private:
-  pqScalarBarDisplayInternal* Internal;
-};
+  pqPlotViewModule(const pqPlotViewModule&); // Not implemented.
+  void operator=(const pqPlotViewModule&); // Not implemented.
 
+  pqPlotViewModuleInternal* Internal;
+};
 
 
 #endif

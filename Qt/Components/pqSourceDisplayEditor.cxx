@@ -88,14 +88,18 @@ void pqSourceDisplayEditor::setProxy(pqProxy* proxy)
     int num = source->getDisplayCount();
     for(int i=0; i<num; i++)
       {
-      pqPipelineDisplay* display = source->getDisplay(i);
-      this->removePage(display);
+      pqPipelineDisplay* display = 
+        qobject_cast<pqPipelineDisplay*>(source->getDisplay(i));
+      if (display)
+        {
+        this->removePage(display);
+        }
       }
     QObject::disconnect(
               source, 
-              SIGNAL(displayAdded(pqPipelineSource*, pqPipelineDisplay*)),
+              SIGNAL(displayAdded(pqPipelineSource*, pqConsumerDisplay*)),
               this,
-              SLOT(displayAdded(pqPipelineSource*, pqPipelineDisplay*)));
+              SLOT(displayAdded(pqPipelineSource*, pqConsumerDisplay*)));
     QObject::disconnect(
               source, 
               SIGNAL(destroyed(QObject*)),
@@ -111,14 +115,18 @@ void pqSourceDisplayEditor::setProxy(pqProxy* proxy)
     int num = source->getDisplayCount();
     for(int i=0; i<num; i++)
       {
-      pqPipelineDisplay* display = source->getDisplay(i);
-      this->addPage(display);
+      pqPipelineDisplay* display = qobject_cast<pqPipelineDisplay*>(
+        source->getDisplay(i));
+      if (display)
+        {
+        this->addPage(display);
+        }
       }
     QObject::connect(
               source, 
-              SIGNAL(displayAdded(pqPipelineSource*, pqPipelineDisplay*)),
+              SIGNAL(displayAdded(pqPipelineSource*, pqConsumerDisplay*)),
               this,
-              SLOT(displayAdded(pqPipelineSource*, pqPipelineDisplay*)),
+              SLOT(displayAdded(pqPipelineSource*, pqConsumerDisplay*)),
               Qt::QueuedConnection);
               // allow chance for updates before really adding the page
               // or change the emission of the signal to be after the display is
@@ -145,15 +153,23 @@ pqProxy* pqSourceDisplayEditor::getProxy()
 }
 
 void pqSourceDisplayEditor::displayAdded(pqPipelineSource*, 
-                                         pqPipelineDisplay* display)
+                                         pqConsumerDisplay* cdisplay)
 {
-  this->addPage(display);
+  pqPipelineDisplay* display = qobject_cast<pqPipelineDisplay*>(cdisplay);
+  if (display)
+    {
+    this->addPage(display);
+    }
 }
 
 void pqSourceDisplayEditor::displayRemoved(pqPipelineSource*, 
-                                           pqPipelineDisplay* display)
+                                           pqConsumerDisplay* cdisplay)
 {
-  this->removePage(display);
+  pqPipelineDisplay* display = qobject_cast<pqPipelineDisplay*>(cdisplay);
+  if (display)
+    {
+    this->removePage(display);
+    }
 }
 
 void pqSourceDisplayEditor::removePage(pqPipelineDisplay* display)

@@ -48,8 +48,7 @@ public:
     pb->addConnection(source, elevation);
 
     // put the elevation in the window
-    pqPipelineDisplay* disp;
-    disp = pb->createDisplayProxy(elevation, this->RenderModule);
+    pb->createDisplay(elevation, this->RenderModule);
 
     // zoom to sphere
     this->RenderModule->resetCamera();

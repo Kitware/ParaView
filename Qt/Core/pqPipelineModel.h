@@ -40,10 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include <QAbstractItemModel>
 
+class pqConsumerDisplay;
 class pqPipelineDisplay;
+class pqPipelineModelFilter;
 class pqPipelineModelInternal;
 class pqPipelineModelItem;
-class pqPipelineModelFilter;
 class pqPipelineModelSource;
 class pqPipelineSource;
 class pqRenderModule;
@@ -260,7 +261,7 @@ public slots:
   ///   Updates the display columns for the given source.
   /// \param source The source to update.
   /// \param display The display that is changing.
-  void updateDisplays(pqPipelineSource *source, pqPipelineDisplay *display);
+  void updateDisplays(pqPipelineSource *source, pqConsumerDisplay* display);
 
   /// \brief
   ///   Updates the icons in the current window column.

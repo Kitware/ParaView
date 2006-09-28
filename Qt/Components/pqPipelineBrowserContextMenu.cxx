@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
+#include "pqRenderModule.h"
 #include "pqServer.h"
 #include "pqUndoStack.h"
 
@@ -157,13 +158,16 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   l->setMargin(0);
   l->setSpacing(6);
   pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(&dialog);
-  pqPipelineDisplay* display = source->getDisplay(this->Browser->getRenderModule());
+  pqPipelineDisplay* display = 
+    qobject_cast<pqPipelineDisplay*>(source->getDisplay(
+      this->Browser->getRenderModule()));
   if (!display)
     {
     // If display doesn't exist, as far as the user is concerned, it simply
     // means the source is not visible. Create a new hidden display 
     // and show its properties.
-    display = this->Browser->createDisplay(source, false);
+    display = qobject_cast<pqPipelineDisplay*>(
+      this->Browser->createDisplay(source, false));
     }
   editor->setDisplay(display);
   l->addWidget(editor);

@@ -94,9 +94,9 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   QObject::connect(smModel, SIGNAL(nameChanged(pqServerManagerModelItem *)),
     this->ListModel, SLOT(updateItemName(pqServerManagerModelItem *)));
   QObject::connect(smModel,
-    SIGNAL(sourceDisplayChanged(pqPipelineSource *, pqPipelineDisplay *)),
+    SIGNAL(sourceDisplayChanged(pqPipelineSource *, pqConsumerDisplay*)),
     this->ListModel,
-    SLOT(updateDisplays(pqPipelineSource *, pqPipelineDisplay *)));
+    SLOT(updateDisplays(pqPipelineSource *, pqConsumerDisplay*)));
 
   // Create a flat tree view to display the pipeline.
   this->TreeView = new pqFlatTreeView(this);
@@ -308,7 +308,7 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
       {
       // If the column clicked is 1, the user clicked the visible icon.
       // Get the display object for the current window.
-      pqPipelineDisplay *display = source->getDisplay(this->getRenderModule());
+      pqConsumerDisplay* display = source->getDisplay(this->getRenderModule());
 
       // If the display exists, toggle the display. Otherwise, create a
       // display for the source in the current window.
@@ -331,12 +331,12 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineDisplay* pqPipelineBrowser::createDisplay(pqPipelineSource* source, bool visible)
+pqConsumerDisplay* pqPipelineBrowser::createDisplay(pqPipelineSource* source, 
+  bool visible)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
-  core->getPipelineBuilder()->createDisplayProxy(source, 
-    this->getRenderModule());
-  pqPipelineDisplay* display = source->getDisplay(this->getRenderModule());
+  pqConsumerDisplay* display = 
+    core->getPipelineBuilder()->createDisplay(source, this->getRenderModule());
   display->setVisible(visible);
   return display;
 }

@@ -142,3 +142,19 @@ void pqDisplay::onVisibilityChanged()
   emit this->visibilityChanged(this->isVisible());
 }
 
+//-----------------------------------------------------------------------------
+bool pqDisplay::isVisible() const
+{
+  int visible = pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("Visibility")).toInt();
+  return (visible != 0);
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplay::setVisible(bool visible)
+{
+  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("Visibility"),
+    (visible? 1 : 0));
+  this->getProxy()->UpdateVTKObjects();
+}
+

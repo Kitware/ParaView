@@ -23,6 +23,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DWidgetFactory.h
   pqApplicationCore.h
   pqCommandServerStartup.h
+  pqConsumerDisplay.h
   pqDisplay.h
   pqFileDialogEventTranslator.h
   pqGenericViewModule.h
@@ -34,6 +35,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineDisplay.h
   pqPipelineModel.h
   pqPipelineSource.h
+  pqPlotViewModule.h
   pqPropertyLinks.h
   pqPropertyManager.h
   pqProxy.h
@@ -90,6 +92,8 @@ ADD_LIBRARY(pqCore
   pqApplicationCore.h
   pqCommandServerStartup.cxx
   pqCommandServerStartup.h
+  pqConsumerDisplay.cxx
+  pqConsumerDisplay.h
   pqCoreExport.h
   pqDisplay.cxx
   pqDisplay.h
@@ -129,6 +133,8 @@ ADD_LIBRARY(pqCore
   pqPipelineModel.h
   pqPipelineSource.cxx
   pqPipelineSource.h
+  pqPlotViewModule.cxx
+  pqPlotViewModule.h
   pqProcessModuleGUIHelper.cxx
   pqProcessModuleGUIHelper.h
   pqPropertyLinks.cxx

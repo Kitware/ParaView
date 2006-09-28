@@ -36,9 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include "pqComponentsExport.h"
 
-class pqProxy;
-class pqPipelineSource;
+class pqConsumerDisplay;
 class pqPipelineDisplay;
+class pqPipelineSource;
+class pqProxy;
 class QComboBox;
 class QStackedWidget;
 
@@ -60,8 +61,8 @@ public slots:
   void setProxy(pqProxy* source);
 
 protected slots:
-  void displayAdded(pqPipelineSource* source, pqPipelineDisplay* display);
-  void displayRemoved(pqPipelineSource* source, pqPipelineDisplay* display);
+  void displayAdded(pqPipelineSource* source, pqConsumerDisplay* display);
+  void displayRemoved(pqPipelineSource* source, pqConsumerDisplay* display);
   void proxyDestroyed();
   void changePage();
 

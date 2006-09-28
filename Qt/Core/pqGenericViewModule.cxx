@@ -57,7 +57,6 @@ inline uint qHash(QPointer<T> p)
 class pqGenericViewModuleInternal
 {
 public:
-  vtkSmartPointer<vtkSMAbstractViewModuleProxy> AbstractViewModuleProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
   // List of displays shown by this render module.
@@ -76,7 +75,6 @@ pqGenericViewModule::pqGenericViewModule(const QString& group, const QString& na
 : pqProxy(group, name, renModule, server, _parent)
 {
   this->Internal = new pqGenericViewModuleInternal();
-  this->Internal->AbstractViewModuleProxy = renModule;
 
   // Listen to updates on the displays property.
   this->Internal->VTKConnect->Connect(renModule->GetProperty("Displays"),
@@ -112,20 +110,21 @@ pqGenericViewModule::~pqGenericViewModule()
 //-----------------------------------------------------------------------------
 vtkSMAbstractViewModuleProxy* pqGenericViewModule::getViewModuleProxy() const
 {
-  return this->Internal->AbstractViewModuleProxy;
+  return vtkSMAbstractViewModuleProxy::SafeDownCast(this->getProxy());
 }
 
 
 //-----------------------------------------------------------------------------
 void pqGenericViewModule::forceRender()
 {
-  if (this->Internal->AbstractViewModuleProxy)
+  vtkSMAbstractViewModuleProxy* view = this->getViewModuleProxy();
+  if (view)
     {
     vtkProcessModule::GetProcessModule()->SendPrepareProgress(
-      this->Internal->AbstractViewModuleProxy->GetConnectionID());
-    this->Internal->AbstractViewModuleProxy->StillRender();
+      view->GetConnectionID());
+    view->StillRender();
     vtkProcessModule::GetProcessModule()->SendCleanupPendingProgress(
-      this->Internal->AbstractViewModuleProxy->GetConnectionID());
+      view->GetConnectionID());
     }
 }
 
@@ -235,7 +234,7 @@ void pqGenericViewModule::onUpdateVTKObjects()
   this->viewModuleInit();
   // no need to listen to any more events.
   this->Internal->VTKConnect->Disconnect(
-    this->Internal->AbstractViewModuleProxy, vtkCommand::UpdateEvent,
+    this->getProxy(), vtkCommand::UpdateEvent,
     this, SLOT(onUpdateVTKObjects()));
 }
 

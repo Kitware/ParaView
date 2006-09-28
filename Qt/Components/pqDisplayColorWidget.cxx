@@ -296,7 +296,9 @@ pqPipelineDisplay* pqDisplayColorWidget::getDisplay() const
     }
   if (this->RenderModule && this->SelectedSource)
     {
-    return this->SelectedSource->getDisplay(this->RenderModule);
+    return 
+      qobject_cast<pqPipelineDisplay*>(
+        this->SelectedSource->getDisplay(this->RenderModule));
     }
   return 0;
 }

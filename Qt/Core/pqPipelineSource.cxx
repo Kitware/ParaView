@@ -49,9 +49,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView
-#include "pqPipelineDisplay.h"
+#include "pqGenericViewModule.h"
+#include "pqConsumerDisplay.h"
 #include "pqPipelineFilter.h"
-#include "pqRenderModule.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineSourceInternal 
@@ -61,7 +61,7 @@ public:
 
   QString Name;
   QList<pqPipelineSource*> Consumers;
-  QList<pqPipelineDisplay*> Displays;
+  QList<pqConsumerDisplay*> Displays;
 
   pqPipelineSourceInternal(QString name, vtkSMProxy* proxy)
     {
@@ -227,7 +227,7 @@ void pqPipelineSource::removeConsumer(pqPipelineSource* cons)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineSource::addDisplay(pqPipelineDisplay* display)
+void pqPipelineSource::addDisplay(pqConsumerDisplay* display)
 {
   this->Internal->Displays.push_back(display);
 
@@ -235,7 +235,7 @@ void pqPipelineSource::addDisplay(pqPipelineDisplay* display)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineSource::removeDisplay(pqPipelineDisplay* display)
+void pqPipelineSource::removeDisplay(pqConsumerDisplay* display)
 {
   int index = this->Internal->Displays.indexOf(display);
   if (index != -1)
@@ -252,7 +252,7 @@ int pqPipelineSource::getDisplayCount() const
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineDisplay* pqPipelineSource::getDisplay(int index) const
+pqConsumerDisplay* pqPipelineSource::getDisplay(int index) const
 {
   if (index >= 0 && index < this->Internal->Displays.size())
     {
@@ -262,10 +262,10 @@ pqPipelineDisplay* pqPipelineSource::getDisplay(int index) const
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineDisplay* pqPipelineSource::getDisplay(
-  pqRenderModule* renderModule) const
+pqConsumerDisplay* pqPipelineSource::getDisplay(
+  pqGenericViewModule* renderModule) const
 {
-  foreach(pqPipelineDisplay* disp, this->Internal->Displays)
+  foreach(pqConsumerDisplay* disp, this->Internal->Displays)
     {
     if (disp && disp->shownIn(renderModule))
       {
@@ -279,7 +279,7 @@ pqPipelineDisplay* pqPipelineSource::getDisplay(
 QList<pqGenericViewModule*> pqPipelineSource::getViewModules() const
 {
   QList<pqGenericViewModule*> renModules;
- foreach(pqPipelineDisplay* disp, this->Internal->Displays)
+ foreach(pqConsumerDisplay* disp, this->Internal->Displays)
     {
     if (disp)
       {
@@ -300,7 +300,7 @@ QList<pqGenericViewModule*> pqPipelineSource::getViewModules() const
 //-----------------------------------------------------------------------------
 void pqPipelineSource::renderAllViews(bool force /*=false*/)
 {
-  foreach(pqPipelineDisplay* disp, this->Internal->Displays)
+  foreach(pqConsumerDisplay* disp, this->Internal->Displays)
     {
     if (disp)
       {

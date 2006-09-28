@@ -40,9 +40,10 @@ class vtkSMProxy;
 class vtkSMRenderModuleProxy;
 class QVTKWidget;
 
-class pqProxy;
+class pqConsumerDisplay;
 class pqPipelineDisplay;
 class pqPipelineSource;
+class pqProxy;
 class pqRenderModule;
 class pqServer;
 class pqServerManagerModelInternal;
@@ -99,9 +100,9 @@ public:
   /// if one exists.
   pqPipelineSource* getPQSource(vtkSMProxy*);
 
-  /// Given a vtkSMProxy for a display get the pqPipelineDisplay
+  /// Given a vtkSMProxy for a display get the pqConsumerDisplay
   /// object for it, if one exists.
-  pqPipelineDisplay* getPQDisplay(vtkSMProxy*);
+  pqConsumerDisplay* getPQDisplay(vtkSMProxy*);
 
   /// Given a vtkSMProxy gets the pqProxy for it.
   pqProxy* getPQProxy(vtkSMProxy*);
@@ -127,8 +128,13 @@ public:
   /// Returns a list of sources on the particular server.
   QList<pqPipelineSource*> getSources(pqServer* server);
 
-  /// Returns a list of displays on the server.
+  /// Returns a list of render displays on the server.
   QList<pqPipelineDisplay*> getPipelineDisplays(pqServer* server);
+
+  /// returns a list of all displays on the server. This includes
+  /// render displays as well as other consumer displays such as 
+  /// plot displays.
+  QList<pqConsumerDisplay*> getDisplays(pqServer* server);
 
   // Returns a list of render modules on the particular server.
   // If server==NULL, returns all render modules.
@@ -225,7 +231,7 @@ signals:
 
   /// Fired when the displays for an item changes.
   void sourceDisplayChanged(pqPipelineSource *source,
-      pqPipelineDisplay *display);
+      pqConsumerDisplay* display);
 
 private slots:
   /// Used to map a server name change to the name changed signal.

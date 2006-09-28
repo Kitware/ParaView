@@ -70,20 +70,21 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLineSourceWidget.h
   pqLoadedFormObjectPanel.h
   pqMainWindowCore.h
-  pqMultiView.h
   pqMultiViewFrame.h
+  pqMultiView.h
   pqNamedObjectPanel.h
   pqObjectInspectorWidget.h
   pqObjectPanel.h
   pqObjectPanelLoader.h
-  pqPipelineBrowser.h
   pqPipelineBrowserContextMenu.h
+  pqPipelineBrowser.h
   pqPipelineMenu.h
   pqPipelineModelSelectionAdaptor.h
-  pqProxyInformationWidget.h
+  pqPlotManager.h
   pqPointSourceWidget.h
-  pqProxyTabWidget.h
   pqPQLookupTableManager.h
+  pqProxyInformationWidget.h
+  pqProxyTabWidget.h
   pqRecentFilesMenu.h
   pqRenderViewEditor.h
   pqRenderWindowManager.h
@@ -262,14 +263,16 @@ ADD_LIBRARY(pqComponents
   pqPipelineMenu.h
   pqPipelineModelSelectionAdaptor.cxx
   pqPipelineModelSelectionAdaptor.h
-  pqProxyInformationWidget.cxx
-  pqProxyInformationWidget.h
+  pqPlotManager.cxx
+  pqPlotManager.h
   pqPointSourceWidget.cxx
   pqPointSourceWidget.h
-  pqProxyTabWidget.cxx
-  pqProxyTabWidget.h
   pqPQLookupTableManager.cxx
   pqPQLookupTableManager.h
+  pqProxyInformationWidget.cxx
+  pqProxyInformationWidget.h
+  pqProxyTabWidget.cxx
+  pqProxyTabWidget.h
   pqRecentFilesMenu.cxx
   pqRecentFilesMenu.h
   pqRenderViewEditor.cxx
