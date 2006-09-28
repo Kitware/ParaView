@@ -42,8 +42,8 @@ protected:
     return 1;
     }
 private:
-  vtkExtractHistogramExtentTranslator(const vtkExtractHistogramExtentTranslator&);
-  void operator=(const vtkExtractHistogramExtentTranslator&);
+  vtkExtractHistogramExtentTranslator(const vtkExtractHistogramExtentTranslator&); // Not implemented.
+  void operator=(const vtkExtractHistogramExtentTranslator&); // Not implemented.
   
 };
 
