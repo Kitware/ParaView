@@ -1850,6 +1850,13 @@
         </ProxyGroupDomain>
       </ProxyProperty>
     </ViewModuleProxy>
+
+    <ViewModuleProxy name="HistogramViewModule"
+      base_proxygroup="rendermodules" base_proxyname="ViewModule">
+      <!-- Add non-command properties that will help
+          keep client-only Histogram properties in SM such as colors etc etc -->
+    </ViewModuleProxy>
+
   </ProxyGroup>
   
   <ProxyGroup name="interactors">
