@@ -32,6 +32,8 @@ class VTK_EXPORT vtkPVRenderViewProxy : public vtkObject
 {
 public:
   vtkTypeRevisionMacro(vtkPVRenderViewProxy, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
   // Description:
   // Forward these calls to an actual vtkPVRenderView in a sub class.
   virtual void EventuallyRender() = 0;
