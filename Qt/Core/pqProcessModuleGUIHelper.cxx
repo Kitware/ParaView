@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMApplication.h>
 #include <vtkSMProperty.h>
 #include <vtkSmartPointer.h>
+#include <vtkTimerLog.h>
 
 #include <QApplication>
 #include <QWidget>
@@ -59,7 +60,8 @@ public:
     SMApplication(vtkSMApplication::New()),
     ApplicationCore(0),
     Window(0),
-    EnableProgress(false)
+    EnableProgress(false),
+    LastProgress(0)
   {
     // Redirect Qt debug output to VTK ...
     qInstallMsgHandler(QtMessageOutput);
@@ -103,12 +105,13 @@ public:
   pqApplicationCore* ApplicationCore;
   QWidget* Window;
   bool EnableProgress;
+  double LastProgress;
 };
 
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.3");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.4");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -211,14 +214,34 @@ void pqProcessModuleGUIHelper::SendCleanupPendingProgress()
 }
 
 //-----------------------------------------------------------------------------
-void pqProcessModuleGUIHelper::SetLocalProgress(const char* name, 
+void pqProcessModuleGUIHelper::SetLocalProgress(const char* text, 
   int progress)
 {
+  double lastprog = vtkTimerLog::GetUniversalTime();
   if (!this->Implementation->EnableProgress)
+    {
+    this->Implementation->LastProgress = lastprog;
+    return;
+    }
+  if ( lastprog - this->Implementation->LastProgress < .3 )
     {
     return;
     }
-  this->Implementation->ApplicationCore->sendProgress(name, progress);
+  this->Implementation->LastProgress = lastprog;
+  if ( progress == 0 || progress > 100 )
+    {
+    return;
+    }
+  if ( strlen(text) > 4 && text[0] == 'v' && text[1] == 't' && text[2] == 'k' )
+    {
+    text += 3;
+    }
+  /*
+  this->ModifiedEnableState = 1;
+  this->SetStatusText(text);
+  this->GetProgressGauge()->SetValue(val);
+  */
+  this->Implementation->ApplicationCore->sendProgress(text, progress);
   //cout << (name? name : "(null)") << " : " << progress << endl;
   // Here we would call something like
   // this->Window->SetProgress(name, progress). 
