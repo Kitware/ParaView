@@ -20,7 +20,7 @@
 
 #include "vtkExtentTranslator.h"
 
-class vtkExtractHistogramExtentTranslator : public vtkExtentTranslator
+class VTK_EXPORT vtkExtractHistogramExtentTranslator : public vtkExtentTranslator
 {
 public:
   static vtkExtractHistogramExtentTranslator* New();
