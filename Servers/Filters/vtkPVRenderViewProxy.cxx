@@ -13,9 +13,9 @@
 
 =========================================================================*/
 #include "vtkPVRenderViewProxy.h"
-vtkCxxRevisionMacro(vtkPVRenderViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkPVRenderViewProxy, "1.3");
 
-vtkPVRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
 this->Superclass::PrintSelf(os, indent);
 }

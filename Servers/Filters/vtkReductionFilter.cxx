@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.1");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.2");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, ReductionHelper, vtkAlgorithm);
 //-----------------------------------------------------------------------------
@@ -218,4 +218,6 @@ vtkDataSet* vtkReductionFilter::Reconstruct(char* raw_data, int data_length)
 void vtkReductionFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ReductionHelper: " << this->ReductionHelper << endl;
+  os << indent << "Controller: " << this->Controller << endl;
 }

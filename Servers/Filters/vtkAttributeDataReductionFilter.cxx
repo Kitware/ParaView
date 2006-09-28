@@ -24,7 +24,7 @@
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkAttributeDataReductionFilter);
-vtkCxxRevisionMacro(vtkAttributeDataReductionFilter, "1.1");
+vtkCxxRevisionMacro(vtkAttributeDataReductionFilter, "1.2");
 //-----------------------------------------------------------------------------
 vtkAttributeDataReductionFilter::vtkAttributeDataReductionFilter()
 {
@@ -255,4 +255,6 @@ int vtkAttributeDataReductionFilter::RequestData(
 void vtkAttributeDataReductionFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ReductionType: " << this->GetReductionTypeAsString() 
+    << endl;
 }
