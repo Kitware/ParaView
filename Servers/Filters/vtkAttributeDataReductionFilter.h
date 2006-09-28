@@ -44,6 +44,19 @@ public:
   // data is combined. Default is ADD.
   vtkSetMacro(ReductionType, int);
   vtkGetMacro(ReductionType, int);
+  const char* GetReductionTypeAsString()
+    {
+    switch (this->ReductionType)
+      {
+    case ADD:
+      return "ADD";
+    case MAX:
+      return "MAX";
+    case MIN:
+      return "MIN";
+      }
+    return "";
+    }
   void SetReductionTypeToAdd() 
     { this->SetReductionType(vtkAttributeDataReductionFilter::ADD); }
   void SetReductionTypeToMax() 
