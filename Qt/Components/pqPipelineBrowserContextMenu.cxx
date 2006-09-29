@@ -160,7 +160,7 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(&dialog);
   pqPipelineDisplay* display = 
     qobject_cast<pqPipelineDisplay*>(source->getDisplay(
-      this->Browser->getRenderModule()));
+      this->Browser->getViewModule()));
   if (!display)
     {
     // If display doesn't exist, as far as the user is concerned, it simply

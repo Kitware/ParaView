@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineModel.h"
 
-#include "pqPipelineDisplay.h"
+#include "pqConsumerDisplay.h"
+#include "pqGenericViewModule.h"
 #include "pqPipelineSource.h"
-#include "pqRenderModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModelItem.h"
 
@@ -71,7 +71,7 @@ public:
   virtual ~pqPipelineModelItem() {}
 
   virtual QString getName() const=0;
-  virtual VisibleState getVisibleState(pqRenderModule *module) const=0;
+  virtual VisibleState getVisibleState(pqGenericViewModule *module) const=0;
   virtual pqPipelineModelItem *getParent() const=0;
   virtual pqServerManagerModelItem *getObject() const=0;
   virtual int getChildCount() const=0;
@@ -98,7 +98,7 @@ public:
 
   virtual QString getName() const;
   virtual pqPipelineModelItem::VisibleState getVisibleState(
-      pqRenderModule *module) const;
+      pqGenericViewModule *module) const;
   virtual pqPipelineModelItem *getParent() const {return 0;}
   virtual pqServerManagerModelItem *getObject() const {return this->Server;}
   virtual int getChildCount() const {return this->Sources.size();}
@@ -142,7 +142,7 @@ public:
 
   virtual QString getName() const;
   virtual pqPipelineModelItem::VisibleState getVisibleState(
-      pqRenderModule *module) const;
+      pqGenericViewModule *module) const;
   virtual pqPipelineModelItem *getParent() const {return this->getServer();}
   virtual pqServerManagerModelItem *getObject() const {return this->Source;}
   virtual int getChildCount() const {return this->Outputs.size();}
@@ -189,7 +189,7 @@ public:
 
   virtual QString getName() const;
   virtual pqPipelineModelItem::VisibleState getVisibleState(
-      pqRenderModule *module) const;
+      pqGenericViewModule *module) const;
   virtual pqPipelineModelItem *getParent() const {return this->Source;}
   virtual pqServerManagerModelItem *getObject() const;
   virtual int getChildCount() const {return 0;}
@@ -229,7 +229,7 @@ public:
 
   QList<pqPipelineModelServer *> Servers;
   QMap<pqServerManagerModelItem *, QPointer<pqPipelineModelItem> > ItemMap;
-  pqRenderModule *RenderModule;
+  pqGenericViewModule *RenderModule;
   pqServer *CleanupServer;
 };
 
@@ -275,7 +275,7 @@ QString pqPipelineModelServer::getName() const
 }
 
 pqPipelineModelItem::VisibleState pqPipelineModelServer::getVisibleState(
-    pqRenderModule *) const
+    pqGenericViewModule *) const
 {
   return pqPipelineModelItem::NotAllowed;
 }
@@ -348,7 +348,7 @@ QString pqPipelineModelSource::getName() const
 }
 
 pqPipelineModelItem::VisibleState pqPipelineModelSource::getVisibleState(
-    pqRenderModule *module) const
+    pqGenericViewModule *module) const
 {
   pqPipelineModelItem::VisibleState state = pqPipelineModelItem::NotAllowed;
   if(module && module->getServer() == this->Source->getServer())
@@ -358,9 +358,13 @@ pqPipelineModelItem::VisibleState pqPipelineModelSource::getVisibleState(
       {
       state = pqPipelineModelItem::Visible;
       }
-    else
+    else if (module->canDisplaySource(this->Source))
       {
       state = pqPipelineModelItem::NotVisible;
+      }
+    else
+      {
+      state = pqPipelineModelItem::NotAllowed;
       }
     }
 
@@ -458,7 +462,7 @@ QString pqPipelineModelLink::getName() const
 }
 
 pqPipelineModelItem::VisibleState pqPipelineModelLink::getVisibleState(
-    pqRenderModule *module) const
+    pqGenericViewModule *module) const
 {
   if(this->Sink)
     {
@@ -669,11 +673,11 @@ Qt::ItemFlags pqPipelineModel::flags(const QModelIndex &idx) const
   if(idx.column() == 0)
     {
     indexFlags |= Qt::ItemIsSelectable;
-    }
-  pqServerManagerModelItem* item = this->getItemFor(idx);
-  if (item && qobject_cast<pqPipelineSource*>(item))
-    {
-    indexFlags |= Qt::ItemIsEditable;
+    pqServerManagerModelItem* item = this->getItemFor(idx);
+    if (item && qobject_cast<pqPipelineSource*>(item))
+      {
+      indexFlags |= Qt::ItemIsEditable;
+      }
     }
 
   return indexFlags;
@@ -1044,7 +1048,7 @@ void pqPipelineModel::updateDisplays(pqPipelineSource *source,
     }
 }
 
-void pqPipelineModel::setRenderModule(pqRenderModule *module)
+void pqPipelineModel::setViewModule(pqGenericViewModule *module)
 {
   if(module == this->Internal->RenderModule)
     {
@@ -1269,15 +1273,15 @@ void pqPipelineModel::removeConnection(pqPipelineModelSource *source,
     }
 }
 
-void pqPipelineModel::updateDisplays(pqRenderModule *module)
+void pqPipelineModel::updateDisplays(pqGenericViewModule *module)
 {
   QModelIndex changed;
   pqPipelineModelItem *item = 0;
-  pqPipelineDisplay *display = 0;
+  pqConsumerDisplay* display = 0;
   int total = module->getDisplayCount();
   for(int i = 0; i < total; i++)
     {
-    display = qobject_cast<pqPipelineDisplay*>(module->getDisplay(i));
+    display = qobject_cast<pqConsumerDisplay*>(module->getDisplay(i));
     if(display)
       {
       item = this->getModelItemFor(display->getInput());

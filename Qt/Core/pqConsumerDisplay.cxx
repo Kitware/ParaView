@@ -71,6 +71,8 @@ pqConsumerDisplay::pqConsumerDisplay(const QString& group,
     {
     this->Internal->VTKConnect->Connect(display->GetProperty("Input"),
       vtkCommand::ModifiedEvent, this, SLOT(onInputChanged()));
+    this->Internal->VTKConnect->Connect(display->GetProperty("Visibility"),
+      vtkCommand::ModifiedEvent, this, SLOT(onVisibilityChanged()));
     }
   // This will make sure that if the input is already set.
   this->onInputChanged();

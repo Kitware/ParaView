@@ -29,7 +29,7 @@
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.1");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.2");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 //-----------------------------------------------------------------------------
@@ -138,10 +138,11 @@ int vtkClientServerMoveData::SendData(vtkSocketController* controller,
   data->ShallowCopy(in_data);
 
   vtkDataSetWriter* writer = vtkDataSetWriter::New();
-  writer->SetFileTypeToBinary();
-  writer->WriteToOutputStringOn();
   writer->SetInput(data);
+  writer->SetFileTypeToASCII();
+  writer->WriteToOutputStringOn();
   writer->Write();
+
 
   int data_length = writer->GetOutputStringLength();
   char* raw_data = writer->RegisterAndGetOutputString();

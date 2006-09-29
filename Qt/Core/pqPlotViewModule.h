@@ -40,6 +40,8 @@ class PQCORE_EXPORT pqPlotViewModule : public pqGenericViewModule
 {
   Q_OBJECT
 public:
+  typedef pqGenericViewModule Superclass;
+
   pqPlotViewModule(int type, const QString& group, const QString& name, 
     vtkSMAbstractViewModuleProxy* renModule, 
     pqServer* server, QObject* parent=NULL);
@@ -69,9 +71,24 @@ public:
 
   int getType()
     { return this->Type; }
-     
+   
+  /// This method returns is any pqPipelineSource can be dislayed in this
+  /// view. Overridden to make sure that the source can be displayed
+  /// in this type of plot.
+  virtual bool canDisplaySource(pqPipelineSource* source) const;
+
+  /// Forces an immediate render. Overridden since for plots
+  /// rendering actually happens on the GUI side, not merely
+  /// in the ServerManager.
+  virtual void forceRender();
+
+private slots:
+  void visibilityChanged(pqDisplay* disp);
+
 protected:
   int Type;
+  void renderBarChar();
+
 private:
   pqPlotViewModule(const pqPlotViewModule&); // Not implemented.
   void operator=(const pqPlotViewModule&); // Not implemented.

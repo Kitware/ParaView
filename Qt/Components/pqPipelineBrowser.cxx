@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModelSelectionAdaptor.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
-#include "pqRenderModule.h"
+#include "pqGenericViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 
@@ -65,8 +65,8 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
 
   // Get the pipeline model from the pipeline data.
   this->ListModel = new pqPipelineModel(this);
-  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)),
-                   this->ListModel, SLOT(setRenderModule(pqRenderModule*)));
+  QObject::connect(this, SIGNAL(viewModuleChanged(pqGenericViewModule*)),
+                   this->ListModel, SLOT(setViewModule(pqGenericViewModule*)));
 
   // Connect the model to the ServerManager model.
   pqServerManagerModel* smModel = 
@@ -308,7 +308,7 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
       {
       // If the column clicked is 1, the user clicked the visible icon.
       // Get the display object for the current window.
-      pqConsumerDisplay* display = source->getDisplay(this->getRenderModule());
+      pqConsumerDisplay* display = source->getDisplay(this->ViewModule);
 
       // If the display exists, toggle the display. Otherwise, create a
       // display for the source in the current window.
@@ -320,7 +320,10 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
         {
         display->setVisible(!display->isVisible());
         }
-      display->renderAllViews(false);
+      if (display)
+        {
+        display->renderAllViews(false);
+        }
       }
     // TODO
     //else if(index.column() == 2)
@@ -334,24 +337,28 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
 pqConsumerDisplay* pqPipelineBrowser::createDisplay(pqPipelineSource* source, 
   bool visible)
 {
+  if (!this->ViewModule || !this->ViewModule->canDisplaySource(source))
+    {
+    return 0;
+    }
   pqApplicationCore* core = pqApplicationCore::instance();
   pqConsumerDisplay* display = 
-    core->getPipelineBuilder()->createDisplay(source, this->getRenderModule());
+    core->getPipelineBuilder()->createDisplay(source, this->ViewModule);
   display->setVisible(visible);
   return display;
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineBrowser::setRenderModule(pqRenderModule* rm)
+void pqPipelineBrowser::setViewModule(pqGenericViewModule* rm)
 {
-  this->RenderModule = rm;
-  emit this->renderModuleChanged(rm);
+  this->ViewModule = rm;
+  emit this->viewModuleChanged(rm);
 }
 
 //-----------------------------------------------------------------------------
-pqRenderModule* pqPipelineBrowser::getRenderModule()
+pqGenericViewModule* pqPipelineBrowser::getViewModule()
 {
-  return this->RenderModule;
+  return this->ViewModule;
 }
 
 

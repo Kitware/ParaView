@@ -329,6 +329,10 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionNegativeZ, SIGNAL(triggered()),
     &this->Implementation->Core, SLOT(resetViewDirectionNegZ()));
 
+  connect(
+    this->Implementation->UI.actionHistogram, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(createBarCharView()));
+
   // Setup the 'modes' so that they are exclusively selected
   QActionGroup *modeGroup = new QActionGroup(this);
     modeGroup->addAction(this->Implementation->UI.actionMoveMode);
@@ -378,6 +382,12 @@ MainWindow::MainWindow() :
     SIGNAL(postaccept()), 
     this,
     SLOT(onPostAccept()));
+
+  QObject::connect(
+    &this->Implementation->Core,
+    SIGNAL(enableServerDisconnect(bool)),
+    this->Implementation->UI.menuNew,
+    SLOT(setEnabled(bool)));
       
     
   this->Implementation->Core.setupStatisticsView(

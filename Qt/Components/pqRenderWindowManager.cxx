@@ -322,6 +322,37 @@ void pqRenderWindowManager::onActivate(QWidget* obj)
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderWindowManager::setActiveRenderModule(pqRenderModule* ren)
+{
+  if (this->Internal->ActiveRenderModule == ren)
+    {
+    return;
+    }
+  if (this->Internal->ActiveRenderModule)
+    {
+    pqMultiViewFrame* frame = 
+      qobject_cast<pqMultiViewFrame*>(
+        this->Internal->ActiveRenderModule->getWindowParent());
+    frame->setActive(false);
+    }
+  this->Internal->ActiveRenderModule = ren;
+  if (ren)
+    {
+    pqMultiViewFrame* frame = 
+      qobject_cast<pqMultiViewFrame*>(ren->getWindowParent());
+    frame->setActive(false);    
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderWindowManager::setActiveRenderModuleSilently(pqRenderModule* ren)
+{
+  this->blockSignals(true);
+  this->setActiveRenderModule(ren);
+  this->blockSignals(false);
+}
+
+//-----------------------------------------------------------------------------
 bool pqRenderWindowManager::eventFilter(QObject* caller, QEvent* e)
 {
   if(e->type() == QEvent::MouseButtonPress)

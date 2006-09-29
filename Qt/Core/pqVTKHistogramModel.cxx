@@ -18,6 +18,8 @@ public:
 
   pqChartCoordinate Minimum;
   pqChartCoordinate Maximum;
+  vtkTimeStamp LastUpdateTime;
+  vtkTimeStamp MTime;
 };
 
 
@@ -47,11 +49,14 @@ pqVTKHistogramModel::~pqVTKHistogramModel()
 
 int pqVTKHistogramModel::getNumberOfBins() const
 {
-  vtkUnsignedLongArray *const values = vtkUnsignedLongArray::SafeDownCast(
-      this->Data->GetCellData()->GetArray("bin_values"));
-  if(values && values->GetNumberOfComponents() == 1)
+  if (this->Data)
     {
-    return values->GetNumberOfTuples();
+    vtkUnsignedLongArray *const values = vtkUnsignedLongArray::SafeDownCast(
+      this->Data->GetCellData()->GetArray("bin_values"));
+    if(values && values->GetNumberOfComponents() == 1)
+      {
+      return values->GetNumberOfTuples();
+      }
     }
 
   return 0;
@@ -59,12 +64,15 @@ int pqVTKHistogramModel::getNumberOfBins() const
 
 void pqVTKHistogramModel::getBinValue(int index, pqChartValue &bin) const
 {
-  vtkUnsignedLongArray *const values = vtkUnsignedLongArray::SafeDownCast(
-      this->Data->GetCellData()->GetArray("bin_values"));
-  if(values && values->GetNumberOfComponents() == 1 && index >= 0 &&
-      index < values->GetNumberOfTuples())
+  if (this->Data)
     {
-    bin = static_cast<double>(values->GetValue(index));
+    vtkUnsignedLongArray *const values = vtkUnsignedLongArray::SafeDownCast(
+      this->Data->GetCellData()->GetArray("bin_values"));
+    if(values && values->GetNumberOfComponents() == 1 && index >= 0 &&
+      index < values->GetNumberOfTuples())
+      {
+      bin = static_cast<double>(values->GetValue(index));
+      }
     }
 }
 
@@ -80,8 +88,20 @@ void pqVTKHistogramModel::getRangeY(pqChartValue &min, pqChartValue &max) const
   max = this->Internal->Maximum.Y;
 }
 
+void pqVTKHistogramModel::updateData(vtkDataObject* d)
+{
+  this->updateData(vtkRectilinearGrid::SafeDownCast(d));
+}
+
 void pqVTKHistogramModel::updateData(vtkRectilinearGrid *data)
 {
+  if (this->Data == data)
+    {
+    this->update();
+    return;
+    }
+
+
   // Release the reference to the old data if there is any.
   if(this->Data)
     {
@@ -95,65 +115,91 @@ void pqVTKHistogramModel::updateData(vtkRectilinearGrid *data)
 
   // Keep a reference to the new data.
   this->Data = data;
-  this->Data->Register(0);
+  if (this->Data)
+    {
+    this->Data->Register(0);
+    }
 
-  // Get the overall range for the histogram. The bin ranges are
-  // stored in the x coordinate array.
-  vtkDoubleArray *const extents = vtkDoubleArray::SafeDownCast(
+  this->Internal->MTime.Modified();
+  this->update();
+}
+
+void pqVTKHistogramModel::update()
+{
+  if ( (this->Internal->MTime > this->Internal->LastUpdateTime) ||
+    (this->Data && this->Data->GetMTime() > this->Internal->LastUpdateTime))
+    {
+    this->forceUpdate();
+    }
+}
+
+void pqVTKHistogramModel::forceUpdate()
+{
+  if (this->Data)
+    {
+    // Get the overall range for the histogram. The bin ranges are
+    // stored in the x coordinate array.
+    vtkDoubleArray *const extents = vtkDoubleArray::SafeDownCast(
       this->Data->GetXCoordinates());
-  if(!extents || extents->GetNumberOfComponents() != 1)
-    {
-    qWarning("Unrecognized histogram extent data. The histogram model expects "
-        "a double array of tuples with one component.");
-    }
-  else if(extents->GetNumberOfTuples() < 2)
-    {
-    qWarning("The histogram range must have at least two values.");
-    }
-  else
-    {
-    this->Internal->Minimum.X = extents->GetValue(0);
-    this->Internal->Maximum.X = extents->GetValue(
-        extents->GetNumberOfTuples() - 1);
-
-    // Search through the bin values to find the y-axis range.
-    vtkUnsignedLongArray *const values = vtkUnsignedLongArray::SafeDownCast(
-        this->Data->GetCellData()->GetArray("bin_values"));
-    if(!values || values->GetNumberOfComponents() != 1)
+    if(!extents || extents->GetNumberOfComponents() != 1)
       {
-      qWarning("Unrecognized histogram data. The histogram model expects "
-          "an unsigned long array of tuples with one component.");
+      qWarning("Unrecognized histogram extent data. The histogram model expects "
+        "a double array of tuples with one component.");
+      }
+    else if(extents->GetNumberOfTuples() < 2)
+      {
+      qWarning("The histogram range must have at least two values.");
       }
     else
       {
-      unsigned long min = 0;
-      unsigned long max = 0;
-      unsigned long value = 0;
-      for(int i = 0; i != values->GetNumberOfTuples(); ++i)
-        {
-        value = values->GetValue(i);
-        if(i == 0)
-          {
-          min = value;
-          max = value;
-          }
-        else if(value < min)
-          {
-          min = value;
-          }
-        else if(value > max)
-          {
-          max = value;
-          }
-        }
+      this->Internal->Minimum.X = extents->GetValue(0);
+      this->Internal->Maximum.X = extents->GetValue(
+        extents->GetNumberOfTuples() - 1);
 
-      this->Internal->Minimum.Y = static_cast<double>(min);
-      this->Internal->Maximum.Y = static_cast<double>(max);
+      // Search through the bin values to find the y-axis range.
+      vtkUnsignedLongArray *const values = vtkUnsignedLongArray::SafeDownCast(
+        this->Data->GetCellData()->GetArray("bin_values"));
+      if(!values || values->GetNumberOfComponents() != 1)
+        {
+        qWarning("Unrecognized histogram data. The histogram model expects "
+          "an unsigned long array of tuples with one component.");
+        }
+      else
+        {
+        unsigned long min = 0;
+        unsigned long max = 0;
+        unsigned long value = 0;
+        for(int i = 0; i != values->GetNumberOfTuples(); ++i)
+          {
+          value = values->GetValue(i);
+          if(i == 0)
+            {
+            min = value;
+            max = value;
+            }
+          else if(value < min)
+            {
+            min = value;
+            }
+          else if(value > max)
+            {
+            max = value;
+            }
+          }
+
+        this->Internal->Minimum.Y = static_cast<double>(min);
+        this->Internal->Maximum.Y = static_cast<double>(max);
+        }
       }
     }
+  else
+    {
+    this->Internal->Minimum.Y = 0;
+    this->Internal->Maximum.Y = 0;
+    this->Internal->Minimum.X = 0;
+    this->Internal->Maximum.X = 0;
+    }
 
-  // Notify the chart of the change.
-  this->resetBinValues();
+  this->Internal->LastUpdateTime.Modified();
+  emit this->resetBinValues();
 }
-
-

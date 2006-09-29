@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.8");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -42,6 +42,7 @@ vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
   this->Visibility = 1;
 
   this->Output = 0;
+  this->UpdateRequiredFlag = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -51,6 +52,16 @@ vtkSMGenericViewDisplayProxy::~vtkSMGenericViewDisplayProxy()
     {
     this->Output->Delete();
     this->Output = 0;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMGenericViewDisplayProxy::MarkModified(vtkSMProxy* modifiedProxy)
+{
+  this->Superclass::MarkModified(modifiedProxy);
+  if (modifiedProxy != this)
+    {
+    this->UpdateRequiredFlag= 1;
     }
 }
 
@@ -287,6 +298,13 @@ void vtkSMGenericViewDisplayProxy::Update()
   p->Modified();
   this->UpdateVTKObjects();
   this->Superclass::Update();
+  this->UpdateRequiredFlag = 0;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMGenericViewDisplayProxy::UpdateRequired()
+{
+  return this->UpdateRequiredFlag;
 }
 
 //-----------------------------------------------------------------------------

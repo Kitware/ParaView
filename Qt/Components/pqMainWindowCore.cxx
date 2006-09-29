@@ -146,7 +146,7 @@ public:
     IgnoreBrowserSelectionChanges(false),
     ActiveSource(NULL),
     ActiveServer(NULL),
-    ActiveRenderModule(NULL)
+    ActiveView(NULL)
   {
 #ifdef PARAVIEW_EMBED_PYTHON
   this->PythonDialog = 0;
@@ -188,7 +188,7 @@ public:
   
   QPointer<pqPipelineSource> ActiveSource;
   QPointer<pqServer> ActiveServer;
-  QPointer<pqRenderModule> ActiveRenderModule;
+  QPointer<pqGenericViewModule> ActiveView;
 
 #ifdef PARAVIEW_EMBED_PYTHON
   QPointer<pqPythonDialog> PythonDialog;
@@ -206,6 +206,13 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   Implementation(new pqImplementation(parent_widget))
 {
   this->setObjectName("MainWindowCore");
+
+  QObject::connect(this, SIGNAL(activePlotModuleChanged(pqPlotViewModule*)),
+    this->Implementation->PlotManager, 
+    SLOT(setActiveViewSilently(pqPlotViewModule*)));
+  QObject::connect(this->Implementation->PlotManager,
+    SIGNAL(activeViewChanged(pqPlotViewModule*)),
+    this, SLOT(setActivePlotModule(pqPlotViewModule*)));
 
   QObject::connect(this,
                    SIGNAL(activeServerChanged(pqServer*)),
@@ -240,6 +247,9 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
     this, 
     SLOT(setActiveRenderModule(pqRenderModule*)));
+  QObject::connect( this, SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+    &this->Implementation->MultiViewManager, 
+    SLOT(setActiveRenderModuleSilently(pqRenderModule*)));
 
   // Listen for compound proxy register events.
   pqServerManagerObserver *observer =
@@ -537,9 +547,9 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
   
   QObject::connect(
     this,
-    SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+    SIGNAL(activeViewChanged(pqGenericViewModule*)),
     pipeline_browser,
-    SLOT(setRenderModule(pqRenderModule*)));
+    SLOT(setViewModule(pqGenericViewModule*)));
 }
 
 pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget)
@@ -1764,6 +1774,7 @@ void pqMainWindowCore::onInitializeInteractionStates()
 
 void pqMainWindowCore::onPostAccept()
 {
+  this->Implementation->PlotManager->renderAllViews();
   this->updateFiltersMenu(this->getActiveSource());
 
   emit this->postAccept();
@@ -1894,7 +1905,13 @@ pqServer* pqMainWindowCore::getActiveServer()
 //-----------------------------------------------------------------------------
 pqRenderModule* pqMainWindowCore::getActiveRenderModule()
 {
-  return this->Implementation->ActiveRenderModule;
+  return qobject_cast<pqRenderModule*>(this->Implementation->ActiveView);
+}
+
+//-----------------------------------------------------------------------------
+pqGenericViewModule* pqMainWindowCore::getActiveView()
+{
+  return this->Implementation->ActiveView;
 }
 
 //-----------------------------------------------------------------------------
@@ -1922,16 +1939,30 @@ void pqMainWindowCore::setActiveServer(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::setActiveRenderModule(pqRenderModule* rm)
+void pqMainWindowCore::setActivePlotModule(pqPlotViewModule* view)
 {
- if (this->Implementation->ActiveRenderModule == rm)
-    {
-    return;
-    }
-  this->Implementation->ActiveRenderModule = rm;
-  emit this->activeRenderModuleChanged(rm);
+  this->setActiveView(view);
 }
 
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setActiveRenderModule(pqRenderModule* rm)
+{
+  this->setActiveView(rm);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setActiveView(pqGenericViewModule* view)
+{
+  if (this->Implementation->ActiveView != view)
+    {
+    this->Implementation->ActiveView = view;
+    emit this->activeRenderModuleChanged(qobject_cast<pqRenderModule*>(view));
+    emit this->activePlotModuleChanged(qobject_cast<pqPlotViewModule*>(view));
+    emit this->activeViewChanged(view);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::removeActiveSource()
 {
   pqPipelineSource* source = this->getActiveSource();

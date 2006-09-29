@@ -40,13 +40,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
+class pqGenericViewModule;
 class pqMultiView;
-class pqProxyTabWidget;
 class pqObjectInspectorWidget;
 class pqPipelineMenu;
 class pqPipelineSource;
+class pqPlotViewModule;
 class pqProxy;
+class pqProxyTabWidget;
 class pqRenderModule;
+class pqRenderWindowManager;
 class pqRenderWindowManager;
 class pqSelectionManager;
 class pqServer;
@@ -54,7 +57,6 @@ class pqServerManagerModelItem;
 class pqToolsMenu;
 class pqVCRController;
 class pqViewMenu;
-class pqRenderWindowManager;
 
 class vtkUnstructuredGrid;
 
@@ -135,6 +137,7 @@ public:
 
   /// returns the active render module.
   pqRenderModule* getActiveRenderModule();
+  pqGenericViewModule* getActiveView();
   
   void removeActiveSource();
   void removeActiveServer();
@@ -201,7 +204,12 @@ signals:
   void activeServerChanged(pqServer*);
 
   // Fired when the active render module changes.
+  // All these are fired at the same time, expect
+  // that depending upon the type of the active view
+  // some signals may have null arguments.
   void activeRenderModuleChanged(pqRenderModule*);
+  void activePlotModuleChanged(pqPlotViewModule*);
+  void activeViewChanged(pqGenericViewModule*);
   
   // Fired when a source/filter/reader/compound proxy is
   // created without a display.
@@ -260,8 +268,16 @@ public slots:
   void setActiveServer(pqServer*);
 
   // Call this slot to set the active render module.
-  void setActiveRenderModule(pqRenderModule*);
+  // Internally calls setActiveView().
+  void setActiveRenderModule(pqRenderModule* ren);
   
+  // Internally calls setActiveView().
+  void setActivePlotModule(pqPlotViewModule* plot);
+
+  // Changes the active view. At one time either 1 render view
+  // or 1 plot view can be active.
+  void setActiveView(pqGenericViewModule* view);
+
   // Call this slot when accept is called. This method will create
   // displays for any sources/filters that are pending.
   void createPendingDisplays();

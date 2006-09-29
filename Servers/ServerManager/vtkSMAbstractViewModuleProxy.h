@@ -89,6 +89,9 @@ public:
   virtual void UpdateAllDisplays();  
 
 protected:
+  vtkSMAbstractViewModuleProxy();
+  ~vtkSMAbstractViewModuleProxy();
+
   // This is the XMLName of the proxy to get created when CreateDisplayProxy
   // is called. It must be a proxy belonging to the group "displays"
   // and must be a subclass of vtkSMAbstractDisplayProxy.
@@ -119,9 +122,9 @@ protected:
   // the objects on the server(s)
   virtual void CreateVTKObjects(int numObjects);
 
-  vtkSMAbstractViewModuleProxy();
-  ~vtkSMAbstractViewModuleProxy();
-
+  // Description:
+  // Read attributes from an XML element.
+  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 private:
   // Description:
   // Overridden since Interactor properties must be cleared.

@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // ParaView Server Manager includes.
-#include "vtkCommand.h"
-#include "vtkEventQtSlotConnect.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeometryInformation.h"
@@ -68,7 +66,6 @@ class pqPipelineDisplayInternal
 {
 public:
   vtkSmartPointer<vtkSMDataObjectDisplayProxy> DisplayProxy;
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
   // Convenience method to get array information.
   vtkPVArrayInformation* getArrayInformation(
@@ -110,12 +107,6 @@ pqPipelineDisplay::pqPipelineDisplay(const QString& name,
 {
   this->Internal = new pqPipelineDisplayInternal();
   this->Internal->DisplayProxy = display;
-  this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-  if (display)
-    {
-    this->Internal->VTKConnect->Connect(display->GetProperty("Visibility"),
-      vtkCommand::ModifiedEvent, this, SLOT(onVisibilityChanged()));
-    }
 }
 
 //-----------------------------------------------------------------------------

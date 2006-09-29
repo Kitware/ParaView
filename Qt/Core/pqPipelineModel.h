@@ -47,7 +47,7 @@ class pqPipelineModelInternal;
 class pqPipelineModelItem;
 class pqPipelineModelSource;
 class pqPipelineSource;
-class pqRenderModule;
+class pqGenericViewModule;
 class pqServer;
 class pqServerManagerModelItem;
 class QPixmap;
@@ -271,7 +271,7 @@ public slots:
   /// the entire column needs to be updated.
   ///
   /// \param module The current render module.
-  void setRenderModule(pqRenderModule *module);
+  void setViewModule(pqGenericViewModule *module);
   //@}
 
 signals:
@@ -349,7 +349,7 @@ private:
   ///   Updates the display columns for sources displayed in the
   ///   render module.
   /// \param module The modified render module.
-  void updateDisplays(pqRenderModule *module);
+  void updateDisplays(pqGenericViewModule *module);
 
   /// \brief
   ///   Gets the pipeline model item for the server manager model item.

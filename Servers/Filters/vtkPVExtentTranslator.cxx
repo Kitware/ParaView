@@ -14,13 +14,15 @@
 =========================================================================*/
 #include "vtkPVExtentTranslator.h"
 
-#include "vtkDataSet.h"
+#include "vtkAlgorithm.h"
+#include "vtkExecutive.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
-#include "vtkSource.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentTranslator);
-vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.2");
+vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.3");
 
 //vtkCxxSetObjectMacro(vtkPVExtentTranslator, OriginalSource, vtkDataSet);
 
@@ -28,6 +30,7 @@ vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.2");
 vtkPVExtentTranslator::vtkPVExtentTranslator()
 {
   this->OriginalSource = NULL;
+  this->PortIndex = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -37,7 +40,7 @@ vtkPVExtentTranslator::~vtkPVExtentTranslator()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExtentTranslator::SetOriginalSource(vtkDataSet *d)
+void vtkPVExtentTranslator::SetOriginalSource(vtkAlgorithm *d)
 {
   // No reference counting because of nasty loop. (TransmitPolyData ...)
   // Propagation should make it safe to ignore reference counting.
@@ -52,18 +55,27 @@ int vtkPVExtentTranslator::PieceToExtentThreadSafe(int piece, int numPieces,
                                       int byPoints)
 {
   int ret;
-  int origWholeExt[6];
 
   if (this->OriginalSource == NULL)
     {
-    memcpy(origWholeExt, wholeExtent, sizeof(int)*6);    
+    memcpy(resultExtent, wholeExtent, sizeof(int)*6);    
     }
   else
     {
-    this->OriginalSource->GetWholeExtent(origWholeExt);
+    vtkInformation* info = 
+      this->OriginalSource->GetExecutive()->GetOutputInformation(
+      this->PortIndex);
+    if (!info->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
+      {
+      memcpy(resultExtent, wholeExtent, sizeof(int)*6);    
+      }
+    else
+      {
+      info->Get(
+        vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), resultExtent);
+      }
     }
 
-  memcpy(resultExtent, origWholeExt, sizeof(int)*6);
   if (byPoints)
     {
     ret = this->SplitExtentByPoints(piece, numPieces, resultExtent, splitMode);

@@ -31,9 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPlotManager.h"
 
-#include <QtDebug>
 #include <QDockWidget>
 #include <QEvent>
+#include <QPointer>
+#include <QtDebug>
+#include <QMainWindow>
 
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
@@ -44,6 +46,7 @@ class pqPlotManagerInternal
 {
 public:
   QMap<QObject*, pqPlotViewModule*> DockViewMap;
+  QPointer<pqPlotViewModule> ActiveView;
 };
 
 //-----------------------------------------------------------------------------
@@ -91,14 +94,21 @@ void pqPlotManager::onPlotAdded(pqPlotViewModule* p)
 {
   QDockWidget* widget = new QDockWidget(p->getSMName(),
     qobject_cast<QWidget*>(this->parent()));
-  widget->setFloating(true);
   widget->setObjectName(p->getSMName());
   p->setWindowParent(widget);
   widget->setWidget(p->getWidget());
   widget->show();
 
-  widget->setFocusPolicy(Qt::ClickFocus);
-  widget->installEventFilter(this);
+  QMainWindow* win = qobject_cast<QMainWindow*>(this->parent());
+  if (win)
+    {
+    win->addDockWidget(Qt::BottomDockWidgetArea, widget);
+    }
+  else
+    {
+    widget->setFloating(true);
+    }
+  p->getWidget()->installEventFilter(this);
   this->Internal->DockViewMap[widget] = p;
   emit this->plotAdded(p);
 }
@@ -114,23 +124,52 @@ void pqPlotManager::onPlotRemoved(pqPlotViewModule* p)
 //-----------------------------------------------------------------------------
 bool pqPlotManager::eventFilter(QObject* obj, QEvent* evt)
 {
-  if (evt->type() == QEvent::FocusIn)
+  QWidget* wdg = qobject_cast<QWidget*>(obj);
+  if (wdg && evt ->type() == QEvent::FocusIn)
     {
-    if (this->Internal->DockViewMap.contains(obj))
+    this->setActiveView(this->getViewModule(wdg));
+    }
+
+  return QObject::eventFilter(obj, evt);
+}
+
+//-----------------------------------------------------------------------------
+pqPlotViewModule* pqPlotManager::getViewModule(QWidget* widget)
+{
+  foreach (pqPlotViewModule* view, this->Internal->DockViewMap)
+    {
+    if (view->getWidget() == widget)
       {
-      this->setActiveView(this->Internal->DockViewMap[obj]);
+      return view;
       }
     }
-  else if (evt->type() == QEvent::FocusOut)
-    {
-    this->setActiveView(0);
-    }
-  return QObject::eventFilter(obj, evt);
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqPlotManager::setActiveViewSilently(pqPlotViewModule* view)
+{
+  this->Internal->ActiveView = view;
 }
 
 //-----------------------------------------------------------------------------
 void pqPlotManager::setActiveView(pqPlotViewModule* view)
 {
-  cout << "Active: " << view << endl;
-  emit this->activeViewChanged(view);
+  if (this->Internal->ActiveView != view)
+    {
+    this->Internal->ActiveView = view;
+    emit this->activeViewChanged(view);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPlotManager::renderAllViews()
+{
+  foreach (pqPlotViewModule* view, this->Internal->DockViewMap)
+    {
+    if (view)
+      {
+      view->render();
+      }
+    }
 }

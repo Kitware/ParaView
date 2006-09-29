@@ -86,6 +86,12 @@ public:
   /// Returns a list of displays in this render module.
   QList<pqDisplay*> getDisplays() const;
 
+  /// This method returns is any pqPipelineSource can be dislayed in this
+  /// view. Default implementation simply checks if the 
+  /// source and the view module are on the same server, of so
+  /// returns true, otherwise false.
+  virtual bool canDisplaySource(pqPipelineSource* source) const;
+
 signals:
   // Fired after a display has been added to this render module.
   void displayAdded(pqDisplay*);
@@ -103,6 +109,9 @@ signals:
   // Subclasses must fire these signals at appropriate times.
   void endRender();
 
+  // Fired when any displays visibility changes.
+  void displayVisibilityChanged(pqDisplay* display, bool visible);
+
 private slots:
   /// if renModule is not created when this object is instantianted, we
   /// must listen to UpdateVTKObjects event to bind the QVTKWidget and
@@ -111,6 +120,8 @@ private slots:
 
   /// Called when the "Displays" property changes.
   void displaysChanged();
+
+  void onDisplayVisibilityChanged(bool);
 
 protected:
   // Called to initialize the view module either when this object is created

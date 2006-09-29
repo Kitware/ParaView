@@ -44,8 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
-#include "pqDisplay.h"
 #include "pqApplicationCore.h"
+#include "pqDisplay.h"
+#include "pqPipelineSource.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 
 template<class T>
@@ -197,6 +199,8 @@ void pqGenericViewModule::displaysChanged()
       // Update the render module pointer in the display.
       display->addRenderModule(this);
       this->Internal->Displays.append(QPointer<pqDisplay>(display));
+      QObject::connect(display, SIGNAL(visibilityChanged(bool)),
+        this, SLOT(onDisplayVisibilityChanged(bool)));
       emit this->displayAdded(display);
       }
     }
@@ -211,6 +215,7 @@ void pqGenericViewModule::displaysChanged()
       // Remove the render module pointer from the display.
       display->removeRenderModule(this);
       iter = this->Internal->Displays.erase(iter);
+      QObject::disconnect(display, 0, this, 0);
       emit this->displayRemoved(display);
       }
     else
@@ -238,3 +243,23 @@ void pqGenericViewModule::onUpdateVTKObjects()
     this, SLOT(onUpdateVTKObjects()));
 }
 
+//-----------------------------------------------------------------------------
+bool pqGenericViewModule::canDisplaySource(pqPipelineSource* source) const
+{
+  if (!source)
+    {
+    return false;
+    }
+  return (source->getServer()->GetConnectionID() 
+    == this->getServer()->GetConnectionID());
+}
+
+//-----------------------------------------------------------------------------
+void pqGenericViewModule::onDisplayVisibilityChanged(bool visible)
+{
+  pqDisplay* disp = qobject_cast<pqDisplay*>(this->sender());
+  if (disp)
+    {
+    emit this->displayVisibilityChanged(disp, visible);
+    }
+}

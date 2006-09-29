@@ -41,11 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QPointer>
 
-class pqFlatTreeView;
 class pqConsumerDisplay;
+class pqFlatTreeView;
+class pqGenericViewModule;
 class pqPipelineModel;
 class pqPipelineSource;
-class pqRenderModule;
 class pqServer;
 class pqServerManagerModelItem;
 class QItemSelectionModel;
@@ -80,11 +80,11 @@ public:
   /// This is a convienience method.
   pqServer *getCurrentServer() const;
   
-  /// get the render module this pipeline browser works with
-  pqRenderModule *getRenderModule();
+  /// get the view module this pipeline browser works with
+  pqGenericViewModule* getViewModule();
 
   /// Helper method to create a display for the source
-  /// on the current render module.
+  /// on the current view module.
   pqConsumerDisplay* createDisplay(pqPipelineSource* source, bool visible);
 public slots:
   // Call this to select the particular item.
@@ -95,15 +95,15 @@ public slots:
   void deleteSelected();
 
   /// set the current render module for the pipeline browser
-  void setRenderModule(pqRenderModule* rm);
+  void setViewModule(pqGenericViewModule* rm);
 
 signals:
   // Fired when the selection is changed. Argument is the newly selected
   // item.
   void selectionChanged(pqServerManagerModelItem* selectedItem);
   
-  /// Fired when the render module changes
-  void renderModuleChanged(pqRenderModule*);
+  /// Fired when the view module changes
+  void viewModuleChanged(pqGenericViewModule*);
 
 private slots:
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
@@ -112,7 +112,7 @@ private slots:
 private:
   pqPipelineModel *ListModel;
   pqFlatTreeView *TreeView;
-  QPointer<pqRenderModule> RenderModule;
+  QPointer<pqGenericViewModule> ViewModule;
 };
 
 #endif

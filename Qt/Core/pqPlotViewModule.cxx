@@ -31,21 +31,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPlotViewModule.h"
 
+#include "vtkSMProxy.h"
+#include "vtkSMGenericViewDisplayProxy.h"
+
 #include <QtDebug>
 #include <QPointer>
 
 #include "pqHistogramWidget.h"
+#include "pqPipelineSource.h"
+#include "pqVTKHistogramModel.h"
+#include "pqHistogramChart.h"
+#include "pqDisplay.h"
 
 //-----------------------------------------------------------------------------
 class pqPlotViewModuleInternal
 {
 public:
-  QPointer<QWidget> PlotWidget; 
+  QPointer<QWidget> PlotWidget;
+  QPointer<QObject> VTKModel;
+  int MaxNumberOfVisibleDisplays;
   pqPlotViewModuleInternal()
     {
+    this->MaxNumberOfVisibleDisplays = -1;
     }
   ~pqPlotViewModuleInternal()
     {
+    delete this->VTKModel;
     delete this->PlotWidget;
     }
 };
@@ -62,12 +73,23 @@ pqPlotViewModule::pqPlotViewModule(int type,
   switch (this->Type)
     {
   case BAR_CHART:
-    this->Internal->PlotWidget = new pqHistogramWidget();
-    break;
+      {
+      pqHistogramWidget* widget = new pqHistogramWidget();
+      pqVTKHistogramModel* model = new pqVTKHistogramModel();
+      widget->getHistogram().setModel(model);
+      this->Internal->PlotWidget = widget;
+      this->Internal->VTKModel = model;
+      this->Internal->MaxNumberOfVisibleDisplays = 1;
+      break;
+      }
 
   default:
     qDebug() << "PlotType: " << type << " not supported yet.";
     }
+  QObject::connect(this, SIGNAL(displayVisibilityChanged(pqDisplay*, bool)),
+    this, SLOT(visibilityChanged(pqDisplay*)));
+  QObject::connect(this, SIGNAL(displayAdded(pqDisplay*)),
+    this, SLOT(visibilityChanged(pqDisplay*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -106,6 +128,80 @@ QWidget* pqPlotViewModule::getWindowParent() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqPlotViewModule::canDisplaySource(pqPipelineSource* source) const
+{
+  if (!this->Superclass::canDisplaySource(source))
+    {
+    return false;
+    }
+  switch (this->Type)
+    {
+  case BAR_CHART:
+    return (source->getProxy()->GetXMLName() == QString("ExtractHistogram"));
+
+    }
+
+  return false;
+}
+
 //-----------------------------------------------------------------------------
+void pqPlotViewModule::visibilityChanged(pqDisplay* disp)
+{
+  if (disp->isVisible())
+    {
+    int max_visible = this->Internal->MaxNumberOfVisibleDisplays-1;
+    int cc=0;
+    QList<pqDisplay*> dislays = this->getDisplays();
+    foreach(pqDisplay* d, dislays)
+      {
+      if (d != disp && d->isVisible())
+        {
+        cc++;
+        if (cc > max_visible)
+          {
+          d->setVisible(false);
+          }
+        }
+      }
+    }
+}
+
 //-----------------------------------------------------------------------------
+void pqPlotViewModule::forceRender()
+{
+  this->Superclass::forceRender();
+
+  // Now update the GUI.
+  switch (this->Type)
+    {
+  case BAR_CHART:
+    this->renderBarChar();
+    break;
+    }
+}
+
 //-----------------------------------------------------------------------------
+void pqPlotViewModule::renderBarChar()
+{
+  pqVTKHistogramModel* model = 
+    qobject_cast<pqVTKHistogramModel*>(this->Internal->VTKModel);
+  if (!model)
+    {
+    qDebug() << "Cannot locate pqVTKHistogramModel.";
+    return;
+    }
+
+  QList<pqDisplay*> displays = this->getDisplays();
+  foreach (pqDisplay* display, displays)
+    {
+    if (display->isVisible())
+      {
+      vtkSMGenericViewDisplayProxy* disp = 
+        vtkSMGenericViewDisplayProxy::SafeDownCast(display->getProxy());
+      model->updateData(disp->GetOutput());
+      return;
+      }
+    }
+  model->updateData((vtkDataObject*)0);
+}
+

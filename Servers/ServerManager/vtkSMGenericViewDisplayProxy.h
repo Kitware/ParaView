@@ -64,6 +64,12 @@ public:
   void Update();
 
   // Description:
+  // This method returns if the Update() or UpdateDistributedGeometry()
+  // calls will actually lead to an Update. This is used by the render module
+  // to decide if it can expect any pipeline updates.
+  virtual int UpdateRequired();
+
+  // Description:
   // Set the reduction algorithm type. Cannot be called before
   // objects are created.
   void SetReductionType(int type);
@@ -75,6 +81,10 @@ public:
     UNSTRUCTURED_APPEND = 2
     };
   //ETX
+
+  // Description:
+  // Chains to superclass and update UpdateRequiredFlag.
+  virtual void MarkModified(vtkSMProxy* modifiedProxy); 
 protected:
   vtkSMGenericViewDisplayProxy();
   ~vtkSMGenericViewDisplayProxy();
@@ -85,6 +95,7 @@ protected:
   // Connect the VTK data object to display pipeline.
   void SetInput(vtkSMProxy* input);
   void SetupCollectionFilter(vtkSMProxy* collectProxy);
+  int UpdateRequiredFlag;
 
 private:
   vtkSMProxy* CollectProxy;

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqScalarsToColorsInternal;
 class pqScalarBarDisplay;
+class pqRenderModule;
 
 /// pqScalarsToColors is a represents a vtkScalarsToColors proxy.
 class PQCORE_EXPORT pqScalarsToColors : public pqProxy

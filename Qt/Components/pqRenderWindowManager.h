@@ -85,6 +85,8 @@ private slots:
 
 public slots:
   void setActiveServer(pqServer* server);
+  void setActiveRenderModule(pqRenderModule* ren);
+  void setActiveRenderModuleSilently(pqRenderModule* ren);
   void allocateWindowsToRenderModules();
 
 protected:

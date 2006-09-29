@@ -699,7 +699,7 @@ void pqSelectionManager::createNewClientDisplays(
 
     vtkSMGenericViewDisplayProxy* display = 
       vtkSMGenericViewDisplayProxy::SafeDownCast(
-        pxm->NewProxy("viewdisplays", "GenericViewDisplay"));
+        pxm->NewProxy("displays", "GenericViewDisplay"));
     display->SetConnectionID(connId);
     display->SetServers(source->GetServers());
     pp = vtkSMProxyProperty::SafeDownCast(display->GetProperty("Input"));

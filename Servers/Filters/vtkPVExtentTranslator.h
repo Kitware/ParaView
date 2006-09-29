@@ -29,7 +29,7 @@
 
 #include "vtkExtentTranslator.h"
 
-class vtkDataSet;
+class vtkAlgorithm;
 
 class VTK_EXPORT vtkPVExtentTranslator : public vtkExtentTranslator
 {
@@ -41,8 +41,14 @@ public:
 
   // Description:
   // This is the original upstream data set
-  virtual void SetOriginalSource(vtkDataSet*);
-  vtkGetObjectMacro(OriginalSource,vtkDataSet);
+  virtual void SetOriginalSource(vtkAlgorithm*);
+  vtkGetObjectMacro(OriginalSource,vtkAlgorithm);
+
+  // Description:
+  // Get/Set the port index for the OriginalSource from which to obtain
+  // the extents.
+  vtkSetMacro(PortIndex, int);
+  vtkGetMacro(PortIndex, int);
 
   virtual int PieceToExtentThreadSafe(int piece, int numPieces, 
                                       int ghostLevel, int *wholeExtent, 
@@ -53,7 +59,8 @@ protected:
   vtkPVExtentTranslator();
   ~vtkPVExtentTranslator();
 
-  vtkDataSet *OriginalSource;
+  vtkAlgorithm* OriginalSource;
+  int PortIndex;
 
   vtkPVExtentTranslator(const vtkPVExtentTranslator&); // Not implemented
   void operator=(const vtkPVExtentTranslator&); // Not implemented

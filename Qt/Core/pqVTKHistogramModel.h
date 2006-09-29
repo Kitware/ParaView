@@ -10,6 +10,7 @@
 
 class pqVTKHistogramModelInternal;
 class vtkRectilinearGrid;
+class vtkDataObject;
 
 
 class pqVTKHistogramModel : public pqHistogramModel
@@ -30,10 +31,14 @@ public:
 
   /// Fetches the histogram data from the pipeline.
   void updateData(vtkRectilinearGrid *data);
+  void updateData(vtkDataObject* data);
 
+  void update();
+  void forceUpdate();
 private:
   pqVTKHistogramModelInternal *Internal; ///< Stores the data bounds.
   vtkRectilinearGrid *Data;              ///< A pointer to the data.
 };
 
 #endif
+

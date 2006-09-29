@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPlotManagerInternal;
 class pqPlotViewModule;
 class pqProxy;
+class QWidget;
 
 class PQCOMPONENTS_EXPORT pqPlotManager : public QObject
 {
@@ -50,19 +51,25 @@ signals:
   // Fired after a new plot module is noticed by the manager.
   void plotAdded(pqPlotViewModule*);
 
-  // Fored just before the manager let's go of a plot view.
+  // Fired just before the manager let's go of a plot view.
   void plotRemoved(pqPlotViewModule*);
 
+  // Fired when the activeView changes.
   void activeViewChanged(pqPlotViewModule*);
+
+public slots:
+  void setActiveViewSilently(pqPlotViewModule*);
+  void setActiveView(pqPlotViewModule* view);
+  void renderAllViews();
 
 protected:
   void onPlotAdded(pqPlotViewModule*);
   void onPlotRemoved(pqPlotViewModule*);
-  void setActiveView(pqPlotViewModule* view);
 
   // event filter callback.
   bool eventFilter(QObject* obj, QEvent* event);
 
+  pqPlotViewModule* getViewModule(QWidget* widget);
 private slots:
   void onProxyAdded(pqProxy* proxy);
   void onProxyRemoved(pqProxy* proxy);
