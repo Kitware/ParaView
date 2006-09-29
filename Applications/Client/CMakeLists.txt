@@ -166,6 +166,7 @@ ENDIF(APPLE)
 
   SET (TESTS_WITHOUT_BASELINES
     AboutDialog
+    LoadStateHistogram
     )
 
   FOREACH(test ${TESTS_WITHOUT_BASELINES})

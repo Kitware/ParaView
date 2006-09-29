@@ -483,7 +483,7 @@ pqPlotViewModule* pqPipelineBuilder::createPlotWindow(int type, pqServer* server
   // This is not an undo-able operation (atleast for now)
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxy* proxy = pxm->NewProxy("rendermodules", proxyname);
+  vtkSMProxy* proxy = pxm->NewProxy("plotmodules", proxyname);
   if (!proxy)
     {
     qDebug() << "Cannot create proxy: rendermodules:" << proxyname;

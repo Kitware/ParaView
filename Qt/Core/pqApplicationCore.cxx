@@ -395,6 +395,7 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     // enabling the proxy to be cleaned up before server disconnect.
     pqLoader->SetMultiViewRenderModuleProxy(0);
     }
+  this->render();
   emit this->stateLoaded();
 }
 
