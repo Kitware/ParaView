@@ -24,7 +24,7 @@
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkAttributeDataReductionFilter);
-vtkCxxRevisionMacro(vtkAttributeDataReductionFilter, "1.3");
+vtkCxxRevisionMacro(vtkAttributeDataReductionFilter, "1.4");
 //-----------------------------------------------------------------------------
 vtkAttributeDataReductionFilter::vtkAttributeDataReductionFilter()
 {
@@ -47,7 +47,7 @@ int vtkAttributeDataReductionFilter::FillInputPortInformation(
 //-----------------------------------------------------------------------------
 template<class iterT>
 void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter* self,
-  iterT* toIter, iterT* fromIter)
+  iterT* toIter, iterT* fromIter, double progress_offset, double progress_factor)
 {
   int mode = self->GetReductionType();
   vtkIdType numValues = toIter->GetNumberOfValues();
@@ -77,6 +77,7 @@ void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter* self
       break;
       }
     toIter->SetValue(cc, result);
+    self->UpdateProgress(progress_offset + progress_factor * cc/numValues);
     }
 }
 
@@ -84,7 +85,7 @@ void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter* self
 VTK_TEMPLATE_SPECIALIZE
 void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter*,
   vtkArrayIteratorTemplate<vtkStdString>* , 
-  vtkArrayIteratorTemplate<vtkStdString>*)
+  vtkArrayIteratorTemplate<vtkStdString>*, double, double)
 {
   // Cannot reduce strings.
 }
@@ -92,7 +93,7 @@ void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter*,
 //-----------------------------------------------------------------------------
 VTK_TEMPLATE_SPECIALIZE
 void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter*,
-  vtkBitArrayIterator* , vtkBitArrayIterator*)
+  vtkBitArrayIterator* , vtkBitArrayIterator*, double, double)
 {
   // Cannot reduce bit arrays.
 }
@@ -178,6 +179,9 @@ int vtkAttributeDataReductionFilter::RequestData(
     outputCD->CopyData(cellList, input0CD, 0, idx, idx);
     }
 
+  this->UpdateProgress(0.1);
+  double progress_offset = 0.1;
+  double progress_factor = (numInputs > 1)? (0.9*0.5/(numInputs-1)) : 0;
 
   for (cc=1; cc < numInputs; ++cc)
     {
@@ -216,7 +220,8 @@ int vtkAttributeDataReductionFilter::RequestData(
           {
           vtkArrayIteratorTemplateMacro(
             vtkAttributeDataReductionFilterReduce(this,
-              VTK_TT::SafeDownCast(toIter), VTK_TT::SafeDownCast(fromIter)));
+              VTK_TT::SafeDownCast(toIter), VTK_TT::SafeDownCast(fromIter), 
+              progress_offset, progress_factor));
         default:
           vtkWarningMacro("Cannot reduce arrays of type: " <<
             toDA->GetDataTypeAsString());
@@ -226,6 +231,7 @@ int vtkAttributeDataReductionFilter::RequestData(
 
     // Process cell data.
     vtkCellData* inCD = inputCC->GetCellData();
+    progress_offset += progress_factor;
 
     // Now combine this inCD with the outCD using the reduction indicated.
     for (i=0; i < cellList.GetNumberOfFields(); ++i)
@@ -247,13 +253,15 @@ int vtkAttributeDataReductionFilter::RequestData(
           {
           vtkArrayIteratorTemplateMacro(
             vtkAttributeDataReductionFilterReduce(this,
-              VTK_TT::SafeDownCast(toIter), VTK_TT::SafeDownCast(fromIter)));
+              VTK_TT::SafeDownCast(toIter), VTK_TT::SafeDownCast(fromIter),
+              progress_offset, progress_factor));
         default:
           vtkWarningMacro("Cannot reduce arrays of type: " <<
             toDA->GetDataTypeAsString());
           }
         }
       }
+    progress_offset += progress_factor;
     }
   return 1; 
 }
