@@ -2155,7 +2155,7 @@ void pqMainWindowCore::resetViewDirectionNegZ()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::createBarCharView()
 {
-  pqPlotViewModule* barCharView = 
+  /* pqPlotViewModule* barCharView = */
     pqApplicationCore::instance()->getPipelineBuilder()->createPlotWindow(
       pqPlotViewModule::BAR_CHART, this->getActiveServer());
 }

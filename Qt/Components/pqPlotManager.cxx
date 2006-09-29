@@ -112,20 +112,20 @@ void pqPlotManager::onPlotRemoved(pqPlotViewModule* p)
 }
 
 //-----------------------------------------------------------------------------
-bool pqPlotManager::eventFilter(QObject* obj, QEvent* event)
+bool pqPlotManager::eventFilter(QObject* obj, QEvent* evt)
 {
-  if (event->type() == QEvent::FocusIn)
+  if (evt->type() == QEvent::FocusIn)
     {
     if (this->Internal->DockViewMap.contains(obj))
       {
       this->setActiveView(this->Internal->DockViewMap[obj]);
       }
     }
-  else if (event->type() == QEvent::FocusOut)
+  else if (evt->type() == QEvent::FocusOut)
     {
     this->setActiveView(0);
     }
-  return QObject::eventFilter(obj, event);
+  return QObject::eventFilter(obj, evt);
 }
 
 //-----------------------------------------------------------------------------
