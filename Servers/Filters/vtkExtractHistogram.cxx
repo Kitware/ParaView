@@ -28,7 +28,7 @@
 #include "vtkUnsignedLongArray.h"
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.8");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.9");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -111,17 +111,21 @@ int vtkExtractHistogram::RequestUpdateExtent(
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkStreamingDemandDrivenPipeline* sddp = 
     vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
-  int piece = outInfo->Get(sddp->UPDATE_PIECE_NUMBER());
-  int numPieces = outInfo->Get(sddp->UPDATE_NUMBER_OF_PIECES());
-  int ghostLevel = outInfo->Get(sddp->UPDATE_NUMBER_OF_GHOST_LEVELS());
+  if (outInfo->Has(sddp->UPDATE_NUMBER_OF_PIECES()) && 
+    outInfo->Has(sddp->UPDATE_PIECE_NUMBER()) &&
+    outInfo->Has(sddp->UPDATE_NUMBER_OF_GHOST_LEVELS()))
+    {
+    int piece = outInfo->Get(sddp->UPDATE_PIECE_NUMBER());
+    int numPieces = outInfo->Get(sddp->UPDATE_NUMBER_OF_PIECES());
+    int ghostLevel = outInfo->Get(sddp->UPDATE_NUMBER_OF_GHOST_LEVELS());
 
-  sddp->SetUpdateExtent(inInfo, piece, numPieces, ghostLevel);
+    sddp->SetUpdateExtent(inInfo, piece, numPieces, ghostLevel);
+    }
   return 1;
 }
 
 
 
-#include "vtkDataSetWriter.h"
 //-----------------------------------------------------------------------------
 int vtkExtractHistogram::RequestData(vtkInformation* /*request*/, 
                                      vtkInformationVector** inputVector, 
@@ -169,12 +173,13 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   output_data->SetYCoordinates(otherCoords);
   output_data->SetZCoordinates(otherCoords);
   otherCoords->Delete();
-  
+
   // Find the field to process, if we can't find anything, we return an
   // empty dataset
   vtkDataArray* const data_array = this->GetInputArrayToProcess(0, inputVector);
   if(!data_array)
     {
+    vtkErrorMacro("Cannot locate array to process.");
     return 1;
     }
 
@@ -183,7 +188,7 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   if(this->Component < 0 || 
      this->Component >= data_array->GetNumberOfComponents())
     {
-    return 1;
+    return 0;
     }
 
   // Calculate the extents of each bin, based on the range of values in the
@@ -215,16 +220,6 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
         }
       }
     }
-
-  vtkRectilinearGrid* temp = output_data->NewInstance();
-  temp->ShallowCopy(output_data);
-  vtkDataSetWriter* writer = vtkDataSetWriter::New();
-  writer->SetInput(temp);
-  writer->SetFileTypeToASCII();
-  writer->SetFileName("/tmp/histogram.vtk");
-  writer->Write();
-  writer->Delete();
-  temp->Delete();
 
   return 1;
 }
