@@ -28,7 +28,7 @@
 #include "vtkUnsignedLongArray.h"
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.9");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.10");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -180,7 +180,7 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   if(!data_array)
     {
     vtkErrorMacro("Cannot locate array to process.");
-    return 1;
+    return 0;
     }
 
   // If the requested component is out-of-range for the input, we return an
@@ -188,6 +188,8 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   if(this->Component < 0 || 
      this->Component >= data_array->GetNumberOfComponents())
     {
+    vtkErrorMacro("Requested component " 
+      <<  this->Component << " is not available."); 
     return 0;
     }
 
@@ -207,8 +209,10 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
     }
   bin_extents->SetValue(this->BinCount, range[1] + VTK_DBL_EPSILON);
 
-  
-  for(i = 0; i != data_array->GetNumberOfTuples(); ++i)
+  int num_of_tuples = data_array->GetNumberOfTuples();
+
+  this->UpdateProgress(0.1);
+  for(i = 0; i != num_of_tuples; ++i)
     {
     const double value = data_array->GetComponent(i, this->Component);
     for(int j = 0; j != this->BinCount; ++j)
@@ -219,6 +223,7 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
         break;
         }
       }
+    this->UpdateProgress(0.10 + 0.90*i/num_of_tuples);
     }
 
   return 1;
