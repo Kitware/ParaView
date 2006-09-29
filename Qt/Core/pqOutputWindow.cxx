@@ -79,7 +79,8 @@ void pqOutputWindow::onDisplayText(const QString& text)
 void pqOutputWindow::onDisplayWarningText(const QString& text)
 {
   if (
-    text.contains("QEventDispatcherUNIX::unregisterTimer", Qt::CaseSensitive))
+    text.contains("QEventDispatcherUNIX::unregisterTimer", Qt::CaseSensitive) ||
+    text.contains("looking for 'HistogramView"))
     {
     return;
     }
