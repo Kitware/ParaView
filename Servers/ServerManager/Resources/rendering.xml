@@ -1846,13 +1846,14 @@
         update_self="1"
         remove_command="RemoveDisplay">
         <ProxyGroupDomain name="groups">
-          <Group name="viewdisplays" />
+          <Group name="displays" />
         </ProxyGroupDomain>
       </ProxyProperty>
     </ViewModuleProxy>
 
     <ViewModuleProxy name="HistogramViewModule"
-      base_proxygroup="rendermodules" base_proxyname="ViewModule">
+      base_proxygroup="rendermodules" base_proxyname="ViewModule"
+      display_name="HistogramDisplay">
       <!-- Add non-command properties that will help
           keep client-only Histogram properties in SM such as colors etc etc -->
     </ViewModuleProxy>
@@ -3208,7 +3209,7 @@
     <!-- End of displays group -->
   </ProxyGroup>
 
-  <ProxyGroup name="viewdisplays">
+  <ProxyGroup name="displays">
     <GenericViewDisplayProxy name="GenericViewDisplay">
        <InputProperty
         name="Input"
@@ -3260,6 +3261,11 @@
         </Proxy>
       </SubProxy>
     </GenericViewDisplayProxy>
+
+    <GenericViewDisplayProxy name="HistogramDisplay"
+      base_proxygroup="displays" base_proxyname="GenericViewDisplay">
+    </GenericViewDisplayProxy>
+
     <!-- End of view displays group -->
   </ProxyGroup>
 

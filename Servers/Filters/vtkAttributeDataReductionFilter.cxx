@@ -24,7 +24,7 @@
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkAttributeDataReductionFilter);
-vtkCxxRevisionMacro(vtkAttributeDataReductionFilter, "1.2");
+vtkCxxRevisionMacro(vtkAttributeDataReductionFilter, "1.3");
 //-----------------------------------------------------------------------------
 vtkAttributeDataReductionFilter::vtkAttributeDataReductionFilter()
 {
@@ -36,6 +36,13 @@ vtkAttributeDataReductionFilter::~vtkAttributeDataReductionFilter()
 {
 }
 
+//----------------------------------------------------------------------------
+int vtkAttributeDataReductionFilter::FillInputPortInformation(
+  int port, vtkInformation *info)
+{
+  info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
+  return this->Superclass::FillInputPortInformation(port, info);
+}
 
 //-----------------------------------------------------------------------------
 template<class iterT>

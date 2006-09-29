@@ -28,7 +28,7 @@
 #include "vtkUnsignedLongArray.h"
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.7");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.8");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -85,7 +85,7 @@ int vtkExtractHistogram::RequestInformation(
     vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
   if (strcmp(
       sddp->GetExtentTranslator(outInfo)->GetClassName(), 
-      "vtkExtentTranslator") == 0)
+      "vtkExtractHistogramExtentTranslator") != 0)
     {
     vtkExtentTranslator* et = vtkExtractHistogramExtentTranslator::New();
     sddp->SetExtentTranslator(outInfo, et);

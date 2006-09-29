@@ -29,10 +29,16 @@
 #include "vtkInstantiator.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
+#include "vtkPVClientServerIdCollectionInformation.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVRenderModuleHelper.h"
+#include "vtkPVXMLElement.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
@@ -41,15 +47,9 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
 #include "vtkWindowToImageFilter.h"
 
-#include "vtkPVClientServerIdCollectionInformation.h"
-#include "vtkProcessModuleConnectionManager.h"
-
-vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkSMAbstractViewModuleProxy::vtkSMAbstractViewModuleProxy()
@@ -349,6 +349,23 @@ void vtkSMAbstractViewModuleProxy::SaveInBatchScript(ofstream* file)
       }
     }
   iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMAbstractViewModuleProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
+  vtkPVXMLElement* element)
+{
+  if (!this->Superclass::ReadXMLAttributes(pm, element))
+    {
+    return 0;
+    }
+
+  const char* display_name = element->GetAttribute("display_name");
+  if (display_name)
+    {
+    this->SetDisplayXMLName(display_name);
+    }
+  return 1;
 }
 
 //-----------------------------------------------------------------------------

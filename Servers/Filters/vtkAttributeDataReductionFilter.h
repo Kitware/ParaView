@@ -71,6 +71,7 @@ protected:
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
   
+  virtual int FillInputPortInformation(int port, vtkInformation *info);
   int ReductionType;
 private:
   vtkAttributeDataReductionFilter(const vtkAttributeDataReductionFilter&); // Not implemented.
