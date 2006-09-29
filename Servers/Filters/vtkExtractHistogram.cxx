@@ -25,10 +25,10 @@
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkUnsignedLongArray.h"
+#include "vtkIntArray.h"
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.10");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.11");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -149,7 +149,7 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   bin_extents->Delete();
 
   // Insert values into bins ...
-  vtkUnsignedLongArray* const bin_values = vtkUnsignedLongArray::New();
+  vtkIntArray* const bin_values = vtkIntArray::New();
   bin_values->SetNumberOfComponents(1);
   bin_values->SetNumberOfTuples(this->BinCount);
   bin_values->SetName("bin_values");

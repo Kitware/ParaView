@@ -19,7 +19,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
 #include "vtkSphereSource.h"
-#include "vtkUnsignedLongArray.h"
+#include "vtkIntArray.h"
 
 /// Test the output of the vtkExtractHistogram filter in a simple serial case
 int main(int, char*[])
@@ -57,7 +57,7 @@ int main(int, char*[])
     return 1;
     }
 
-  vtkUnsignedLongArray* const bin_values = vtkUnsignedLongArray::SafeDownCast(
+  vtkIntArray* const bin_values = vtkIntArray::SafeDownCast(
     histogram->GetCellData()->GetArray("bin_values"));
   if(!bin_values)
     {
