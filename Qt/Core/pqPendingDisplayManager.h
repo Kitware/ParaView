@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include <QObject>
 
-class pqPipelineSource;
-class pqRenderModule;
+class pqGenericViewModule;
 class pqPendingDisplayUndoElement;
+class pqPipelineSource;
 
 /// This class helps manage deferred displays for an application.
 /// An application may add sources for which displays will eventually 
@@ -62,7 +62,7 @@ public slots:
   
   /// create deferred displays for the sources on a particular
   /// render module
-  void createPendingDisplays(pqRenderModule* rm);
+  void createPendingDisplays(pqGenericViewModule* rm);
 
   /// get the number of deferred displays
   int getNumberOfPendingDisplays();

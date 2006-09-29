@@ -802,13 +802,11 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
 
 void pqApplicationCore::render()
 {
-  unsigned int numRenderModules =
-    this->getServerManagerModel()->getNumberOfRenderModules();
-  for(unsigned int i=0; i<numRenderModules; i++)
+  QList<pqGenericViewModule*> list = 
+    this->getServerManagerModel()->getViewModules(NULL);
+  foreach(pqGenericViewModule* view, list)
     {
-    pqRenderModule* renModule =
-      this->getServerManagerModel()->getRenderModule(i);
-    renModule->render();
+    view->render();
     }
 }
 

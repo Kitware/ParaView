@@ -41,6 +41,7 @@ class vtkSMRenderModuleProxy;
 class QVTKWidget;
 
 class pqConsumerDisplay;
+class pqGenericViewModule;
 class pqPipelineDisplay;
 class pqPipelineSource;
 class pqProxy;
@@ -139,6 +140,11 @@ public:
   // Returns a list of render modules on the particular server.
   // If server==NULL, returns all render modules.
   QList<pqRenderModule*> getRenderModules(pqServer* server);
+
+  // Returns a list of views on the particular server.
+  // If server==NULL, returns all view modules. This includes
+  // render modules as well as plotting modules.
+  QList<pqGenericViewModule*> getViewModules(pqServer* server);
 
 public slots:
   /// Call when a  new vtkSMProxy is registered with the proxy manager

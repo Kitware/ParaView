@@ -221,6 +221,27 @@ QList<pqRenderModule*> pqServerManagerModel::getRenderModules(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
+QList<pqGenericViewModule*> pqServerManagerModel::getViewModules(pqServer* server)
+{
+  QList<pqGenericViewModule*> list;
+  QList<pqRenderModule*> rmlist = this->getRenderModules(server);
+  foreach(pqRenderModule* rm, rmlist)
+    {
+    list.push_back(rm);
+    }
+
+  foreach(pqProxy* proxy, this->Internal->Proxies)
+    {
+    pqGenericViewModule* view = qobject_cast<pqGenericViewModule*>(proxy);
+    if (view && (!server || view->getServer() == server))
+      {
+      list.push_back(view);
+      }
+    }
+  return list;
+}
+
+//-----------------------------------------------------------------------------
 void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
 {
   if (!source)

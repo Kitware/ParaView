@@ -103,25 +103,25 @@ void pqPendingDisplayManager::removePendingDisplayForSource(pqPipelineSource* s)
 }
 
 
-void pqPendingDisplayManager::createPendingDisplays(pqRenderModule* rm)
+void pqPendingDisplayManager::createPendingDisplays(pqGenericViewModule* view)
 {
-  if (!rm)
+  if (!view)
     {
     return;
     }
   pqPipelineBuilder* pb = pqApplicationCore::instance()->getPipelineBuilder();
-
   foreach (pqPipelineSource* source, this->Internal->SourcesSansDisplays)
     {
-    if (!source)
+    if (!source || !view->canDisplaySource(source))
       {
       continue;
       }
-    pb->createDisplay(source, rm);
-    
-    rm->render();
+    pb->createDisplay(source, view);
+    view->render();
 
-    if (pqApplicationCore::instance()->getServerManagerModel()->getNumberOfSources() == 1)
+    pqRenderModule* rm = qobject_cast<pqRenderModule*>(view);
+    if (rm && pqApplicationCore::instance()->getServerManagerModel()
+      ->getNumberOfSources() == 1)
       {
       rm->resetCamera();
       }
