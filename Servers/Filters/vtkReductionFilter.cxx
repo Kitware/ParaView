@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.3");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.4");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, ReductionHelper, vtkAlgorithm);
 //-----------------------------------------------------------------------------
@@ -184,7 +184,7 @@ void vtkReductionFilter::MarshallData(vtkDataSet* input)
   data->ShallowCopy(input);
 
   vtkDataSetWriter* writer = vtkDataSetWriter::New();
-  writer->SetFileTypeToASCII();
+  writer->SetFileTypeToBinary();
   writer->WriteToOutputStringOn();
   writer->SetInput(data);
   writer->Write();

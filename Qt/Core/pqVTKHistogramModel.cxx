@@ -7,7 +7,7 @@
 #include "vtkCellData.h"
 #include "vtkDoubleArray.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkUnsignedLongArray.h"
+#include "vtkIntArray.h"
 
 
 class pqVTKHistogramModelInternal
@@ -51,7 +51,7 @@ int pqVTKHistogramModel::getNumberOfBins() const
 {
   if (this->Data)
     {
-    vtkUnsignedLongArray *const values = vtkUnsignedLongArray::SafeDownCast(
+    vtkIntArray *const values = vtkIntArray::SafeDownCast(
       this->Data->GetCellData()->GetArray("bin_values"));
     if(values && values->GetNumberOfComponents() == 1)
       {
@@ -66,7 +66,7 @@ void pqVTKHistogramModel::getBinValue(int index, pqChartValue &bin) const
 {
   if (this->Data)
     {
-    vtkUnsignedLongArray *const values = vtkUnsignedLongArray::SafeDownCast(
+    vtkIntArray *const values = vtkIntArray::SafeDownCast(
       this->Data->GetCellData()->GetArray("bin_values"));
     if(values && values->GetNumberOfComponents() == 1 && index >= 0 &&
       index < values->GetNumberOfTuples())
@@ -157,7 +157,7 @@ void pqVTKHistogramModel::forceUpdate()
         extents->GetNumberOfTuples() - 1);
 
       // Search through the bin values to find the y-axis range.
-      vtkUnsignedLongArray *const values = vtkUnsignedLongArray::SafeDownCast(
+      vtkIntArray *const values = vtkIntArray::SafeDownCast(
         this->Data->GetCellData()->GetArray("bin_values"));
       if(!values || values->GetNumberOfComponents() != 1)
         {
