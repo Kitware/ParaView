@@ -692,7 +692,7 @@ void MainWindow::onPlotAdded(pqPlotViewModule* view)
 
 void MainWindow::onPlotRemoved(pqPlotViewModule* view)
 {
-  this->Implementation->ViewMenu->removeWidget(view->getWindowParent());
+  this->Implementation->PlotsMenu->removeWidget(view->getWindowParent());
   if (this->Implementation->PlotsMenu->getNumberOfWidgets() == 0)
     {
     this->Implementation->UI.menuPlots->setEnabled(false);
