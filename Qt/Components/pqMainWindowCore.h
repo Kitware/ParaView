@@ -215,6 +215,10 @@ signals:
   // created without a display.
   void pendingDisplays(bool status);
 
+  // Fired when a new plot view is added.
+  void plotAdded(pqPlotViewModule*);
+  // Fired when a new plot view is removed.
+  void plotRemoved(pqPlotViewModule*);
 
 public slots:
   virtual void onFileOpen();

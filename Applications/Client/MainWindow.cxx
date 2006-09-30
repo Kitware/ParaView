@@ -40,9 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqApplicationCore.h>
 #include <pqMainWindowCore.h>
 #include <pqObjectInspectorWidget.h>
-#include <pqProxyTabWidget.h>
 #include <pqPipelineBrowser.h>
 #include <pqPipelineMenu.h>
+#include <pqPlotViewModule.h>
+#include <pqProxyTabWidget.h>
 #include <pqRecentFilesMenu.h>
 #include <pqRenderWindowManager.h>
 #include <pqSelectionManager.h>
@@ -69,13 +70,16 @@ public:
     Core(parent),
     RecentFilesMenu(0),
     ViewMenu(0),
-    ToolbarsMenu(0)
+    ToolbarsMenu(0),
+    PlotsMenu(0)
   {
   }
   
   ~pqImplementation()
   {
     delete this->ViewMenu;
+    delete this->ToolbarsMenu;
+    delete this->PlotsMenu;
   }
 
   QAssistantClient* AssistantClient;
@@ -84,6 +88,7 @@ public:
   pqRecentFilesMenu* RecentFilesMenu;
   pqViewMenu* ViewMenu;
   pqViewMenu* ToolbarsMenu;
+  pqViewMenu* PlotsMenu;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -99,7 +104,12 @@ MainWindow::MainWindow() :
   
   this->Implementation->ViewMenu = new
     pqViewMenu(*this->Implementation->UI.menuView, this);
-  this->Implementation->ToolbarsMenu = new pqViewMenu(*this->Implementation->UI.menuToolbars);
+  this->Implementation->ToolbarsMenu = 
+    new pqViewMenu(*this->Implementation->UI.menuToolbars);
+  this->Implementation->PlotsMenu = new
+    pqViewMenu(*this->Implementation->UI.menuPlots, this);
+
+  this->Implementation->UI.menuPlots->setEnabled(false);
 
   this->setWindowTitle(
     QString("ParaView %1 (alpha)").arg(PARAVIEW_VERSION_FULL));
@@ -333,6 +343,13 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionHistogram, SIGNAL(triggered()),
     &this->Implementation->Core, SLOT(createBarCharView()));
 
+  connect(
+    &this->Implementation->Core, SIGNAL(plotAdded(pqPlotViewModule*)),
+    this, SLOT(onPlotAdded(pqPlotViewModule*)));
+  connect(
+    &this->Implementation->Core, SIGNAL(plotRemoved(pqPlotViewModule*)),
+    this, SLOT(onPlotRemoved(pqPlotViewModule*)));
+
   // Setup the 'modes' so that they are exclusively selected
   QActionGroup *modeGroup = new QActionGroup(this);
     modeGroup->addAction(this->Implementation->UI.actionMoveMode);
@@ -386,7 +403,7 @@ MainWindow::MainWindow() :
   QObject::connect(
     &this->Implementation->Core,
     SIGNAL(enableServerDisconnect(bool)),
-    this->Implementation->UI.menuNew,
+    this->Implementation->UI.menuAddPlot,
     SLOT(setEnabled(bool)));
       
     
@@ -661,4 +678,23 @@ void MainWindow::onHelpHelp()
   
   this->Implementation->AssistantClient->setArguments(args);
   this->Implementation->AssistantClient->openAssistant();
+}
+
+void MainWindow::onPlotAdded(pqPlotViewModule* view)
+{
+  this->Implementation->PlotsMenu->addWidget(view->getWindowParent(),
+    view->getSMName());
+  if (this->Implementation->PlotsMenu->getNumberOfWidgets() > 0)
+    {
+    this->Implementation->UI.menuPlots->setEnabled(true);
+    }
+}
+
+void MainWindow::onPlotRemoved(pqPlotViewModule* view)
+{
+  this->Implementation->ViewMenu->removeWidget(view->getWindowParent());
+  if (this->Implementation->PlotsMenu->getNumberOfWidgets() == 0)
+    {
+    this->Implementation->UI.menuPlots->setEnabled(false);
+    }
 }

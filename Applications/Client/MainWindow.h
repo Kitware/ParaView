@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <vtkIOStream.h>
 
+class pqPlotViewModule;
 /// Provides the main window for the ParaView application
 class MainWindow :
   public QMainWindow
@@ -60,6 +61,9 @@ private slots:
 
   void onHelpAbout();
   void onHelpHelp();
+
+  void onPlotAdded(pqPlotViewModule*);
+  void onPlotRemoved(pqPlotViewModule*);
 
 private:
   class pqImplementation;

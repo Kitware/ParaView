@@ -90,6 +90,7 @@ public:
   /// \param widget The widget to remove.
   void removeWidget(QWidget* widget);
 
+  int getNumberOfWidgets() const;
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

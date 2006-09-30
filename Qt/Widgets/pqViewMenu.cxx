@@ -146,3 +146,8 @@ void pqViewMenu::removeWidget(QWidget* widget)
 
   delete action;
 }
+
+int pqViewMenu::getNumberOfWidgets() const
+{
+  return this->Implementation->ActionMap.size();
+}

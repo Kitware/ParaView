@@ -213,6 +213,12 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   QObject::connect(this->Implementation->PlotManager,
     SIGNAL(activeViewChanged(pqPlotViewModule*)),
     this, SLOT(setActivePlotModule(pqPlotViewModule*)));
+  QObject::connect(this->Implementation->PlotManager,
+    SIGNAL(plotAdded(pqPlotViewModule*)), 
+    this, SIGNAL(plotAdded(pqPlotViewModule*)));
+  QObject::connect(this->Implementation->PlotManager,
+    SIGNAL(plotRemoved(pqPlotViewModule*)), 
+    this, SIGNAL(plotRemoved(pqPlotViewModule*)));
 
   QObject::connect(this,
                    SIGNAL(activeServerChanged(pqServer*)),
