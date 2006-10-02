@@ -414,40 +414,52 @@ MainWindow::MainWindow() :
     this->Implementation->UI.elementInspectorDock);
   
   // Setup the view menu ...
-  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.mainToolBar,
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.mainToolBar,
     this->Implementation->UI.mainToolBar->windowTitle());
   
-  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.selectionToolbar,
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.selectionToolbar,
     this->Implementation->UI.selectionToolbar->windowTitle());
 
-  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.variableToolbar,
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.variableToolbar,
     this->Implementation->UI.variableToolbar->windowTitle());
 
-  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.representationToolbar,
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.representationToolbar,
     this->Implementation->UI.representationToolbar->windowTitle());
 
-  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.customFilterToolbar,
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.customFilterToolbar,
     this->Implementation->UI.customFilterToolbar->windowTitle());
     
-  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.undoRedoToolbar,
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.undoRedoToolbar,
     this->Implementation->UI.undoRedoToolbar->windowTitle());
 
-  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.VCRToolbar,
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.VCRToolbar,
     this->Implementation->UI.VCRToolbar->windowTitle());
 
-  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.cameraToolbar,
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.cameraToolbar,
     this->Implementation->UI.cameraToolbar->windowTitle());
 
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.pipelineBrowserDock,
+  this->Implementation->ViewMenu->addWidget(
+    this->Implementation->UI.pipelineBrowserDock,
     this->Implementation->UI.pipelineBrowserDock->windowTitle());
 
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.objectInspectorDock,
+  this->Implementation->ViewMenu->addWidget(
+    this->Implementation->UI.objectInspectorDock,
     this->Implementation->UI.objectInspectorDock->windowTitle());
 
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.statisticsViewDock,
+  this->Implementation->ViewMenu->addWidget(
+    this->Implementation->UI.statisticsViewDock,
     this->Implementation->UI.statisticsViewDock->windowTitle());
     
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.elementInspectorDock,
+  this->Implementation->ViewMenu->addWidget(
+    this->Implementation->UI.elementInspectorDock,
     this->Implementation->UI.elementInspectorDock->windowTitle());
   
   // Setup the multiview render window ...
@@ -462,6 +474,7 @@ MainWindow::MainWindow() :
 
   // Setup the default dock configuration ...
   this->Implementation->UI.elementInspectorDock->hide();
+  this->Implementation->UI.statisticsViewDock->hide();
 
   // Set up the action icons ...
   QIcon icon;
@@ -563,9 +576,13 @@ MainWindow::~MainWindow()
   delete this->Implementation;
 }
 
-bool MainWindow::compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
+bool MainWindow::compareView(const QString& ReferenceImage, 
+                             double Threshold, 
+                             ostream& Output, 
+                             const QString& TempDirectory)
 {
-  return this->Implementation->Core.compareView(ReferenceImage, Threshold, Output, TempDirectory);
+  return this->Implementation->Core.compareView(
+    ReferenceImage, Threshold, Output, TempDirectory);
 }
 
 void MainWindow::onUndoLabel(const QString& label)
@@ -640,12 +657,14 @@ void MainWindow::onHelpHelp()
   assistant += assistantName;
   if(QFile::exists(assistant))
     {
-    this->Implementation->AssistantClient = new QAssistantClient(assistant, this);
+    this->Implementation->AssistantClient = 
+      new QAssistantClient(assistant, this);
     }
   else
     {
     // not bundled, see if it can can be found in PATH
-    this->Implementation->AssistantClient = new QAssistantClient(QString(), this);
+    this->Implementation->AssistantClient = 
+      new QAssistantClient(QString(), this);
     }
 
   QStringList args;
@@ -667,9 +686,10 @@ void MainWindow::onHelpHelp()
   else
     {
     // no help, error out
-    QMessageBox::critical(this, "Help error", "Couldn't find"
-                          " pqClient.adp.\nTry setting the PARAVIEW_HELP environment variable which"
-                          " points to that file");
+    QMessageBox::critical(
+      this, "Help error", "Couldn't find"
+      " pqClient.adp.\nTry setting the PARAVIEW_HELP environment variable which"
+      " points to that file");
     
     delete this->Implementation->AssistantClient;
     this->Implementation->AssistantClient = NULL;
