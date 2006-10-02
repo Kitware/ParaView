@@ -110,7 +110,11 @@ public:
   // Saves the animation as a sequence of images or a movie file.
   // The method is not accessible using property interface.
   // Return 0 on success.
-  int SaveImages(const char* fileRoot, const char* ext, int width, int height, double framerate, int quality);
+  // \c dont_update_write_framerate is used for backwards compatibility with 
+  // ParaView 2.4. When set to true, the frame rate is not passed on to the
+  // AVI writers, thus AVI play back with the default frame rate.
+  int SaveImages(const char* fileRoot, const char* ext, int width, int height, 
+    double framerate, int quality, bool dont_update_write_framerate=false);
 
   // Description:
   // Save the geometry of the animation.

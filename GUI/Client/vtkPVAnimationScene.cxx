@@ -73,7 +73,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.68");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.69");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -474,7 +474,7 @@ void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext,
  
   this->OnBeginPlay();
   int savefailed = this->AnimationSceneProxy->SaveImages(fileRoot, ext, 
-    width, height, framerate, quality);
+    width, height, framerate, quality, true);
   this->OnEndPlay();
 
   if (savefailed)
