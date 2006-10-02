@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.27");
+vtkCxxRevisionMacro(vtkSMPart, "1.28");
 
 
 //----------------------------------------------------------------------------
@@ -463,6 +463,10 @@ void vtkSMPart::CreateTranslatorIfNecessary()
       stream << vtkClientServerStream::Invoke
              << translatorID << "SetOriginalSource"
              << this->GetProducerID()
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << translatorID << "SetPortIndex"
+             << this->PortIndex
              << vtkClientServerStream::End;
       pm->DeleteStreamObject(translatorID, stream);
       pm->SendStream(this->ConnectionID,
