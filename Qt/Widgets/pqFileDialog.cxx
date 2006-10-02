@@ -208,7 +208,7 @@ pqFileDialog::pqFileDialog(
   this->onFilterChange(this->Implementation->Ui.FileType->currentText());
   
   QString startPath = startDirectory;
-  if(startPath.isNull())
+  if(startPath.isEmpty())
     {
     startPath = this->Implementation->Model->getStartPath();
     }
@@ -285,23 +285,13 @@ void pqFileDialog::onDataChanged(const QModelIndex&, const QModelIndex&)
 {
   this->Implementation->Ui.Parents->clear();
   
-  const QStringList split_path = this->Implementation->Model->splitPath(this->Implementation->Model->getCurrentPath());
-  for(int i = 0; i != split_path.size(); ++i)
+  const QStringList parents = this->Implementation->Model->getParentPaths(this->Implementation->Model->getCurrentPath());
+  for(int i = 0; i != parents.size(); ++i)
     {
-    QString path;
-    for(int j = 0; j <= i; ++j)
-      {
-      if(j)
-        {
-        path += QDir::separator();
-        }
-        
-      path += split_path[j];
-      }
-    this->Implementation->Ui.Parents->addItem(path);
+    this->Implementation->Ui.Parents->addItem(parents[i]);
     }
     
-  this->Implementation->Ui.Parents->setCurrentIndex(split_path.size() - 1);
+  this->Implementation->Ui.Parents->setCurrentIndex(parents.size() - 1);
 }
 
 void pqFileDialog::onNavigate(const QString& Path)
@@ -311,9 +301,7 @@ void pqFileDialog::onNavigate(const QString& Path)
 
 void pqFileDialog::onNavigateUp()
 {
-  this->Implementation->Model->setCurrentPath(
-    this->Implementation->Model->getParentPath(
-      this->Implementation->Model->getCurrentPath()));
+  this->Implementation->Model->setParentPath();
 }
 
 void pqFileDialog::onNavigateDown(const QModelIndex& idx)

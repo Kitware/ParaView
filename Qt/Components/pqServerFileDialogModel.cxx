@@ -46,8 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
   
-  /// the last path accessed by this file dialog model
-  /// used to remember paths across the session
+/// The last path accessed by this file dialog model
+/// used to remember paths across the session
 QString gLastPath;
 
 /////////////////////////////////////////////////////////////////////
@@ -110,17 +110,19 @@ private:
 /////////////////////////////////////////////////////////////////////////////////
 // pqFileModel
 
-class pqFileModel :  public QAbstractItemModel
+class pqFileModel :
+  public QAbstractItemModel
 {
 public:
-  pqFileModel(pqServer* server) : Server(server)
+  pqFileModel(pqServer* server) :
+    Server(server)
   {
   } 
 
   void SetCurrentPath(const QString& Path)
   {
     this->beginRemoveRows(QModelIndex(), 0, this->FileList.size());
-    this->CurrentPath.setPath(QDir::cleanPath(Path));
+    this->CurrentPath = Path;
     this->FileList.clear();
 
     this->FileList.push_back(FileInfo(".", ".", true, false));
@@ -152,14 +154,14 @@ public:
     this->dataChanged(QModelIndex(), QModelIndex());
   }
 
-  QStringList getFilePaths(const QModelIndex& Index)
+  QStringList getFilePaths(const QModelIndex& Index, const QChar Separator)
   {
     QStringList results;
     
     if(Index.row() < this->FileList.size())
       { 
       FileInfo& file = this->FileList[Index.row()];
-      results.push_back(QDir::convertSeparators(this->CurrentPath.path() + "/" + file.filePath()));
+      results.push_back(this->CurrentPath + Separator + file.filePath());
       }
       
     return results;
@@ -246,8 +248,11 @@ public:
     return QVariant();
   }
 
-  pqServer* Server;  // Connection from which the dir listing is to be fetched.
-  QDir CurrentPath;
+  /// Connection from which the dir listing is to be fetched.
+  pqServer* Server;
+  /// Current path being displayed (server's filesystem).
+  QString CurrentPath;
+  /// Caches information about the set of files within the current path.
   QList<FileInfo> FileList;
 };
 
@@ -303,7 +308,7 @@ public:
     if(Index.row() < this->FavoriteList.size())
       {
       FileInfo& file = this->FavoriteList[Index.row()];
-      results.push_back(QDir::convertSeparators(file.filePath()));
+      results.push_back(file.filePath());
       }
     
     return results;
@@ -397,6 +402,15 @@ public:
   QList<FileInfo> FavoriteList;
 };
 
+/// Removes multiple-slashes, ".", and ".." from the given path string,
+/// and points slashes in the correct direction for the server
+const QString cleanPath(const QString& Path, const char Separator)
+{
+  QString result = QDir::cleanPath(Path);
+  result.replace('/', Separator);
+  return result;
+}
+
 } // namespace
 
 /////////////////////////////////////////////////////////////////////////
@@ -406,6 +420,7 @@ class pqServerFileDialogModel::pqImplementation
 {
 public:
   pqImplementation(pqServer* server) :
+    Separator(0),
     FileModel(new pqFileModel(server)),
     FavoriteModel(new pqFavoriteModel(server))
   {
@@ -417,6 +432,7 @@ public:
     delete this->FavoriteModel;
   }
 
+  char Separator; // Path separator for the connected server's filesystem.
   pqFileModel* const FileModel;
   pqFavoriteModel* const FavoriteModel;
   vtkSmartPointer<vtkSMProxy> ServerFileListingProxy;
@@ -429,12 +445,26 @@ pqServerFileDialogModel::pqServerFileDialogModel(QObject* Parent, pqServer* serv
   base(Parent),
   Implementation(new pqImplementation(server))
 {
-  this->Server = server;
-  vtkSMProxy* proxy = vtkSMObject::GetProxyManager()->NewProxy("file_listing",
-    "ServerFileListing");
-  proxy->SetConnectionID(this->Server->GetConnectionID());
+  // Setup the connection to the server ...
+  vtkSMProxy* proxy = vtkSMObject::GetProxyManager()->NewProxy(
+    "file_listing", "ServerFileListing");
+  proxy->SetConnectionID(server->GetConnectionID());
   proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
   proxy->UpdateVTKObjects();
+  
+  // Use an ugly heuristic to figure-out what the server uses as a path separator
+  proxy->UpdatePropertyInformation();
+  if(vtkSMStringVectorProperty* const svp =
+    vtkSMStringVectorProperty::SafeDownCast(
+      proxy->GetProperty("CurrentWorkingDirectory")))
+    {
+    QString cwd = svp->GetElement(0);
+    if(cwd[0] == '/')
+      this->Implementation->Separator = '/';
+    else
+      this->Implementation->Separator = '\\';
+    }
+  
   this->Implementation->ServerFileListingProxy = proxy;
   proxy->Delete();
 }
@@ -446,36 +476,43 @@ pqServerFileDialogModel::~pqServerFileDialogModel()
 
 QString pqServerFileDialogModel::getStartPath()
 {
-  if(!gLastPath.isNull())
+  if(gLastPath.isEmpty())
     {
-    return gLastPath;
+    if(vtkSMProxy* const proxy = this->Implementation->ServerFileListingProxy)
+      {
+      proxy->UpdatePropertyInformation();
+      if(vtkSMStringVectorProperty* const svp =
+        vtkSMStringVectorProperty::SafeDownCast(
+          proxy->GetProperty("CurrentWorkingDirectory")))
+        {
+        gLastPath = svp->GetElement(0);
+        }
+      }
     }
 
-  vtkSMProxy* proxy = this->Implementation->ServerFileListingProxy;
-  proxy->UpdatePropertyInformation();
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-    proxy->GetProperty("CurrentWorkingDirectory"));
-  const char* cwd = (svp)? svp->GetElement(0) : "";
-  
-  gLastPath = cwd;
   return gLastPath;
 }
 
 void pqServerFileDialogModel::setCurrentPath(const QString& Path)
 {
   gLastPath = Path;
-  this->Implementation->FileModel->SetCurrentPath(Path);
+  this->Implementation->FileModel->SetCurrentPath(cleanPath(Path, this->Implementation->Separator));
+}
+
+void pqServerFileDialogModel::setParentPath()
+{
+  this->setCurrentPath(this->Implementation->FileModel->CurrentPath + this->Implementation->Separator + "..");
 }
 
 QString pqServerFileDialogModel::getCurrentPath()
 {
-  return QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path());
+  return this->Implementation->FileModel->CurrentPath;
 }
 
 QStringList pqServerFileDialogModel::getFilePaths(const QModelIndex& Index)
 {
   if(Index.model() == this->Implementation->FileModel)
-    return this->Implementation->FileModel->getFilePaths(Index);
+    return this->Implementation->FileModel->getFilePaths(Index, this->Implementation->Separator);
   
   if(Index.model() == this->Implementation->FavoriteModel)
     return this->Implementation->FavoriteModel->getFilePaths(Index);  
@@ -485,17 +522,11 @@ QStringList pqServerFileDialogModel::getFilePaths(const QModelIndex& Index)
 
 QString pqServerFileDialogModel::getFilePath(const QString& Path)
 {
+  /** \todo Use the server's definition of absolute */
   if(QDir::isAbsolutePath(Path))
     return Path;
-    
-  return QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path() + "/" + Path);
-}
 
-QString pqServerFileDialogModel::getParentPath(const QString& Path)
-{
-  QDir temp(Path);
-  temp.cdUp();
-  return temp.path();
+  return this->Implementation->FileModel->CurrentPath + this->Implementation->Separator + Path;
 }
 
 bool pqServerFileDialogModel::isDir(const QModelIndex& Index)
@@ -509,34 +540,30 @@ bool pqServerFileDialogModel::isDir(const QModelIndex& Index)
   return false;    
 }
 
-QStringList pqServerFileDialogModel::splitPath(const QString& Path)
+QStringList pqServerFileDialogModel::getParentPaths(const QString& Path)
 {
-  return Path.split(QDir::separator());
+  QStringList paths = Path.split(this->Implementation->Separator);
+  for(int i = 1; i < paths.size(); ++i)
+    {
+    paths[i] = paths[i-1] + this->Implementation->Separator + paths[i];
+    }
+
+  return paths;
 }
 
 bool pqServerFileDialogModel::fileExists(const QString& FilePath)
 {
-  QDir dir(FilePath);
-  dir.cdUp();
-  QString Path = dir.path();
-  QString File = this->splitPath(FilePath).last();
-
-  vtkSmartPointer<vtkStringList> dirs = vtkSmartPointer<vtkStringList>::New();
-  vtkSmartPointer<vtkStringList> files = vtkSmartPointer<vtkStringList>::New();
-  
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (!pm->GetDirectoryListing(this->Server->GetConnectionID(),
-    Path.toAscii().data(), dirs.GetPointer(), files.GetPointer(), 0))
+  vtkSMProxy* proxy = this->Implementation->ServerFileListingProxy;
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    proxy->GetProperty("ActiveFileName"));
+  svp->SetElement(0, FilePath.toAscii().data());
+  proxy->UpdateVTKObjects();
+  proxy->UpdatePropertyInformation();
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      proxy->GetProperty("ActiveFileIsReadable"));
+  if (ivp->GetElement(0))
     {
-    // error failed to obtain directory listing.
-    return false;
-    }
-  for(int i=0; i<files->GetNumberOfStrings(); i++)
-    {
-    if(File == files->GetString(i))
-      {
       return true;
-      }
     }
   return false;
 }

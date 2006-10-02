@@ -57,6 +57,9 @@ public:
   virtual QString getStartPath() = 0;
   /// Sets the path that the file dialog will display
   virtual void setCurrentPath(const QString&) = 0;
+  /// Changes the current path to its immediate parent path (this is a no-op if
+  /// the current path is already at the root of the filesystem)
+  virtual void setParentPath() = 0;
   /// Returns the path the the file dialog will display
   virtual QString getCurrentPath() = 0;
   /// Return true iff the given row is a directory
@@ -66,14 +69,10 @@ public:
   virtual QStringList getFilePaths(const QModelIndex&) = 0;
   /// Converts a file into an absolute path
   virtual QString getFilePath(const QString&) = 0;
-  /// Returns the parent path of the given file path 
-  /// (this is handled by the back-end so it can deal 
-  /// with issues of delimiters, symlinks, network resources, etc)
-  virtual QString getParentPath(const QString&) = 0;
-  /// Splits a path into its components 
+  /// Returns all of the paths that are parents of the given path 
   /// (this is handled by the back-end so it can deal with 
   /// issues of delimiters, symlinks, multi-root filesystems, etc)
-  virtual QStringList splitPath(const QString&) = 0;
+  virtual QStringList getParentPaths(const QString&) = 0;
   /// Returns whether the file exists
   virtual bool fileExists(const QString&) = 0;
   /// Returns whether a directory exists

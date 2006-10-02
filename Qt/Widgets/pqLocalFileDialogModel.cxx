@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
 
-  /// the last path accessed by this file dialog model
-  /// used to remember paths across the session
+/// the last path accessed by this file dialog model
+/// used to remember paths across the session
 QString gLastPath;
 
 //////////////////////////////////////////////////////////////////////
@@ -492,11 +492,10 @@ pqLocalFileDialogModel::~pqLocalFileDialogModel()
 
 QString pqLocalFileDialogModel::getStartPath()
 {
-  if(!gLastPath.isNull())
+  if(gLastPath.isEmpty())
     {
-    return gLastPath;
+    gLastPath = QDir::currentPath();
     }
-  gLastPath = QDir::currentPath();
   return gLastPath;
 }
 
@@ -504,6 +503,13 @@ void pqLocalFileDialogModel::setCurrentPath(const QString& Path)
 {
   gLastPath = Path;
   this->Implementation->FileModel->setCurrentPath(Path);
+}
+
+void pqLocalFileDialogModel::setParentPath()
+{
+  QDir parent = this->Implementation->FileModel->CurrentPath;
+  parent.cdUp();
+  this->setCurrentPath(parent.path());
 }
 
 QString pqLocalFileDialogModel::getCurrentPath()
@@ -530,13 +536,6 @@ QString pqLocalFileDialogModel::getFilePath(const QString& Path)
   return QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path() + "/" + Path);
 }
 
-QString pqLocalFileDialogModel::getParentPath(const QString& Path)
-{
-  QDir temp(Path);
-  temp.cdUp();
-  return temp.path();
-}
-
 bool pqLocalFileDialogModel::isDir(const QModelIndex& Index)
 {
   if(Index.model() == this->Implementation->FileModel)
@@ -548,9 +547,15 @@ bool pqLocalFileDialogModel::isDir(const QModelIndex& Index)
   return false;    
 }
 
-QStringList pqLocalFileDialogModel::splitPath(const QString& Path)
+QStringList pqLocalFileDialogModel::getParentPaths(const QString& Path)
 {
-  return Path.split(QDir::separator());
+  QStringList paths = Path.split(QDir::separator());
+  for(int i = 1; i < paths.size(); ++i)
+    {
+    paths[i] = paths[i-1] + QDir::separator() + paths[i];
+    }
+
+  return paths;
 }
 
 bool pqLocalFileDialogModel::fileExists(const QString& File)

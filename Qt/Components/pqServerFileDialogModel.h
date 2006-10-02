@@ -60,12 +60,12 @@ public:
 
   QString getStartPath();
   void setCurrentPath(const QString&);
+  void setParentPath();
   QString getCurrentPath();
   bool isDir(const QModelIndex&);
   QStringList getFilePaths(const QModelIndex&);
   QString getFilePath(const QString&);
-  QString getParentPath(const QString&);
-  QStringList splitPath(const QString&);
+  QStringList getParentPaths(const QString&);
   bool fileExists(const QString&);
   bool dirExists(const QString&);
   QAbstractItemModel* fileModel();
@@ -74,7 +74,6 @@ public:
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
-  pqServer* Server;
 };
 
 #endif // !_pqServerFileDialogModel_h
