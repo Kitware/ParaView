@@ -52,7 +52,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.29");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.30");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -291,6 +291,8 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot,
 #ifndef VTK_USE_FFMPEG_ENCODER
   quality = quality + 1; //prevent unused parameter warning when no AVI
 #endif
+  // to avoid warnings.
+  (void)dont_update_write_framerate;
 
   this->SetFileRoot(fileRoot);
   this->SetFileExtension(ext);
