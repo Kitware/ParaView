@@ -304,10 +304,11 @@ void pqLineChartModel::updateChartRanges()
     {
     (*plot)->getRangeX(this->Internal->MinimumX, this->Internal->MaximumX);
     (*plot)->getRangeY(this->Internal->MinimumY, this->Internal->MaximumY);
+    ++plot;
     }
 
   pqChartValue min, max;
-  for(++plot; plot != this->Internal->List.end(); ++plot)
+  for( ; plot != this->Internal->List.end(); ++plot)
     {
     (*plot)->getRangeX(min, max);
     if(min < this->Internal->MinimumX)
