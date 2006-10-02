@@ -1,6 +1,5 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/statisticsViewDock/1QDockWidgetTitleButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileLoadServerState" />
   <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
   <pqevent object="MainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/LoadStateHistogram.pvsm" />
