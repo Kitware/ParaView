@@ -507,9 +507,9 @@ void pqLocalFileDialogModel::setCurrentPath(const QString& Path)
 
 void pqLocalFileDialogModel::setParentPath()
 {
-  QDir parent = this->Implementation->FileModel->CurrentPath;
-  parent.cdUp();
-  this->setCurrentPath(parent.path());
+  QDir temp = this->Implementation->FileModel->CurrentPath;
+  temp.cdUp();
+  this->setCurrentPath(temp.path());
 }
 
 QString pqLocalFileDialogModel::getCurrentPath()
