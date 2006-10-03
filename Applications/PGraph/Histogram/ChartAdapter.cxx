@@ -178,8 +178,8 @@ struct ChartAdapter::pqImplementation
     if(bin_extents->GetNumberOfTuples() < 2)
       return;
     
-    const double value_min = bin_extents->GetValue(0);
-    const double value_max = bin_extents->GetValue(bin_extents->GetNumberOfTuples() - 1);
+    this->Model->setRangeX(pqChartValue(bin_extents->GetValue(0)),
+        pqChartValue(bin_extents->GetValue(bin_extents->GetNumberOfTuples() - 1)));
     
     vtkUnsignedLongArray* const bin_values = vtkUnsignedLongArray::SafeDownCast(histogram->GetCellData()->GetArray("bin_values"));
     if(!bin_values)
@@ -187,17 +187,16 @@ struct ChartAdapter::pqImplementation
     if(bin_values->GetNumberOfComponents() != 1)
       return;
       
-    pqChartValueList list;
-    for(int i = 0; i != bin_values->GetNumberOfTuples(); ++i)
-      {
-      list.pushBack(static_cast<double>(bin_values->GetValue(i)));
-      }
-
     this->Chart.getTitle().setText("Histogram");
     this->Chart.getHistogramAxis().setVisible(true);
     this->Chart.getHorizontalAxis().setVisible(true);
-    this->Model->setRangeX(pqChartValue(value_min), pqChartValue(value_max));
-    this->Model->setBinValues(list);
+    pqChartValueList list;
+    for(int i = 0; i != bin_values->GetNumberOfTuples(); ++i)
+      {
+      this->Model->addBinValue(pqChartValue(static_cast<double>(
+          bin_values->GetValue(i))));
+      }
+
   }
   
   pqHistogramWidget& Chart;
