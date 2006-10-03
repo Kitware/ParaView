@@ -96,9 +96,7 @@
 #  include "vtkDesktopDeliveryClient.h"
 #  include "vtkDesktopDeliveryServer.h"
 //#include "vtkExtractCTHPart2.h"
-#  include "vtkIceTClientCompositeManager.h"
 #  include "vtkIceTContext.h"
-#  include "vtkIceTFactory.h"
 #  include "vtkIceTRenderer.h"
 #  include "vtkIceTRenderManager.h"
 # endif
@@ -189,9 +187,7 @@ int main(int , char *[])
   c = vtkDesktopDeliveryClient::New(); c->Print(cout); c->Delete();
   c = vtkDesktopDeliveryServer::New(); c->Print(cout); c->Delete();
 //  c = vtkExtractCTHPart2::New(); c->Print(cout); c->Delete();
-  c = vtkIceTClientCompositeManager::New(); c->Print(cout); c->Delete();
   c = vtkIceTContext::New(); c->Print(cout); c->Delete();
-  c = vtkIceTFactory::New(); c->Print(cout); c->Delete();
   c = vtkIceTRenderer::New(); c->Print(cout); c->Delete();
   c = vtkIceTRenderManager::New(); c->Print(cout); c->Delete();
 # endif

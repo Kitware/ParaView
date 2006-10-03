@@ -130,23 +130,14 @@ IF(VTK_USE_MPI)
 ENDIF(VTK_USE_MPI)
 
 IF (PARAVIEW_USE_ICE_T)
-  SET(Filters_SRCS 
-    ${Filters_SRCS}
-    vtkIceTFactory.cxx
-    )
   IF(VTK_USE_MPI)
     SET(Filters_SRCS 
       ${Filters_SRCS}
-      vtkIceTClientCompositeManager.cxx
       vtkIceTContext.cxx
       vtkIceTRenderManager.cxx
       vtkIceTRenderer.cxx
       )
   ENDIF(VTK_USE_MPI)
-  SET_SOURCE_FILES_PROPERTIES(
-    vtkIceTFactory.cxx
-    ABSTRACT
-    )
 ENDIF (PARAVIEW_USE_ICE_T)
 
 
