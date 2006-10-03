@@ -28,6 +28,7 @@ class vtkKWFrameWithLabel;
 class vtkKWLabel;
 class vtkKWMenuButton;
 class vtkKWMenuButtonWithLabel;
+class vtkKWPushButton;
 class vtkKWRange;
 class vtkKWScaleWithEntry;
 class vtkKWThumbWheel;
@@ -73,6 +74,7 @@ public:
   void LabelTextPropertyWidgetCallback();
   void VectorComponentMenuCallback(int idx);
   void NumberOfLabelsThumbWheelCallback(int num);
+  void BackButtonCallback();
 
   // Description:
   // Update the list of arrays in the Parameter menu
@@ -141,6 +143,7 @@ protected:
   vtkKWEntry *ScalarBarLabelFormatEntry;
   vtkPVTextPropertyEditor *LabelTextPropertyWidget;
   vtkKWThumbWheel *NumberOfLabelsThumbWheel;
+  vtkKWPushButton *BackButton;
 
   void UpdateMapFromCurrentColorMap();
   void UpdateScalarBarTitle();

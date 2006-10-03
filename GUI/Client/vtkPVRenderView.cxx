@@ -146,7 +146,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.423");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.424");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -1709,10 +1709,8 @@ void vtkPVRenderView::CreateViewProperties()
     }
   
   // Scalar Color Bar
-  this->ColorMapUI->SetParent(this->AnnotationPropertiesFrame->GetFrame());
+  this->ColorMapUI->SetParent(this->GetPropertiesParent());
   this->ColorMapUI->Create();
-  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-               this->ColorMapUI->GetWidgetName());
 
   // Camera settings
   this->Notebook->AddPage("Camera", 

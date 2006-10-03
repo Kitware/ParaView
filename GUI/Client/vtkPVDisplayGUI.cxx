@@ -105,7 +105,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.69");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.70");
 
 //----------------------------------------------------------------------------
 
@@ -1197,8 +1197,10 @@ void vtkPVDisplayGUI::CreateWidget()
 void vtkPVDisplayGUI::EditColorMapCallback()
 {
   vtkPVRenderView *rv = this->GetPVRenderView();
-  rv->ShowViewProperties();
-  rv->GetNotebook()->RaisePage("Annotate");
+  this->Script("pack forget [pack slaves %s]",
+               rv->GetPropertiesParent()->GetWidgetName());
+  this->Script("pack %s -side top -fill both -expand t",
+               rv->GetColorMapUI()->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

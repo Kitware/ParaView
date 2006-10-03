@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMapUI);
-vtkCxxRevisionMacro(vtkPVColorMapUI, "1.7");
+vtkCxxRevisionMacro(vtkPVColorMapUI, "1.8");
 
 vtkCxxSetObjectMacro(vtkPVColorMapUI, CurrentColorMap, vtkPVColorMap);
 
@@ -107,6 +107,7 @@ vtkPVColorMapUI::vtkPVColorMapUI()
   this->ScalarBarLabelFormatEntry = vtkKWEntry::New();
   this->LabelTextPropertyWidget = vtkPVTextPropertyEditor::New();
   this->NumberOfLabelsThumbWheel = vtkKWThumbWheel::New();
+  this->BackButton = vtkKWPushButton::New();
 }
 
 //----------------------------------------------------------------------------
@@ -149,6 +150,7 @@ vtkPVColorMapUI::~vtkPVColorMapUI()
   this->ScalarBarLabelFormatEntry->Delete();
   this->LabelTextPropertyWidget->Delete();
   this->NumberOfLabelsThumbWheel->Delete();
+  this->BackButton->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -558,6 +560,12 @@ void vtkPVColorMapUI::CreateWidget()
   this->NumberOfLabelsThumbWheel->SetEntryCommand(
     this, "NumberOfLabelsThumbWheelCallback");
 
+  // Back button
+  this->BackButton->SetParent(this);
+  this->BackButton->Create();
+  this->BackButton->SetText("Back");
+  this->BackButton->SetCommand(this, "BackButtonCallback");
+  
   // Pack
   this->Script("pack %s %s -side top -expand t -anchor nw",
                this->VisibilityCheck->GetWidgetName(),
@@ -576,8 +584,9 @@ void vtkPVColorMapUI::CreateWidget()
                this->ScalarBarTitleFrame->GetWidgetName(),
                this->ScalarBarLabelFormatFrame->GetWidgetName());
 
-  this->Script("pack %s -side top -anchor n -fill x -padx 2 -pady 2",
-               this->ScalarColorBarFrame->GetWidgetName());
+  this->Script("pack %s %s -side top -anchor n -fill x -padx 2 -pady 2",
+               this->ScalarColorBarFrame->GetWidgetName(),
+               this->BackButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -1484,6 +1493,15 @@ void vtkPVColorMapUI::NumberOfLabelsThumbWheelCallback(int num)
                                              "ColorMapNumberOfLabels", "%d",
                                              num);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMapUI::BackButtonCallback()
+{
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(
+    this->GetApplication());
+  vtkPVWindow *win = pvApp->GetMainWindow();
+  win->ShowCurrentSourceProperties();
 }
 
 //----------------------------------------------------------------------------
