@@ -41,33 +41,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHistogramModel.h"
 
 class pqChartValue;
-class pqChartValueList;
 class pqHistogramListModelInternal;
 
 
+/// \class pqHistogramListModel
+/// \brief
+///   The pqHistogramListModel class is a generic histogram model.
 class QTCHART_EXPORT pqHistogramListModel : public pqHistogramModel
 {
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Creates a histogram list model object.
+  /// \param parent The parent object.
   pqHistogramListModel(QObject *parent=0);
   virtual ~pqHistogramListModel();
 
+  /// \name pqHistogramModel Methods
+  //@{
   virtual int getNumberOfBins() const;
   virtual void getBinValue(int index, pqChartValue &bin) const;
 
   virtual void getRangeX(pqChartValue &min, pqChartValue &max) const;
   virtual void getRangeY(pqChartValue &min, pqChartValue &max) const;
+  //@}
 
+  /// \name Data Setup Methods
+  //@{
+  /// Removes all the histogram data.
   void clearBinValues();
-  void setBinValues(const pqChartValueList &values);
+
+  /// \brief
+  ///   Adds a bin value to the end of the histogram.
+  /// \param bin The new histogram value.
   void addBinValue(const pqChartValue &bin);
+
+  /// \brief
+  ///   Inserts a new bin value into the histogram.
+  /// \param index Where to insert the bin.
+  /// \param bin The new histogram value.
   void insertBinValue(int index, const pqChartValue &bin);
+
+  /// \brief
+  ///   Removes the specified bin value from the histogram.
+  /// \param index The index of the bin to remove.
   void removeBinValue(int index);
 
   void setRangeX(const pqChartValue &min, const pqChartValue &max);
   void setMinimumX(const pqChartValue &min);
   void setMaximumX(const pqChartValue &max);
+  //@}
 
 private:
   pqHistogramListModelInternal *Internal; ///< Stores the histogram data.

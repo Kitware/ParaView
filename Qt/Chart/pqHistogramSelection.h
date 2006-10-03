@@ -156,6 +156,11 @@ public:
   ///   A reference the object being assigned.
   pqHistogramSelection &operator=(const pqHistogramSelection &other);
 
+  /// \brief
+  ///   Tests whether two histogram selection ranges are equal.
+  /// \param other The selection range to compare to this.
+  /// \return
+  ///   True if the two histogram selection ranges are equal.
   bool operator==(const pqHistogramSelection &other) const;
 
 private:

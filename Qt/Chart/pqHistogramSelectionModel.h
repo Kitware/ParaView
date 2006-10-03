@@ -49,19 +49,68 @@ class pqHistogramModel;
 typedef QList<pqHistogramSelection> pqHistogramSelectionList;
 
 
+/// \class pqHistogramSelectionModel
+/// \brief
+///   The pqHistogramSelectionModel class stores the selection ranges
+///   for an associated histogram model.
 class QTCHART_EXPORT pqHistogramSelectionModel : public QObject
 {
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Creates a histogram selection model object.
+  /// \param parent The parent object.
   pqHistogramSelectionModel(QObject *parent=0);
   virtual ~pqHistogramSelectionModel() {}
 
+  /// \brief
+  ///   Gets the histogram model associated with the selection model.
+  /// \return
+  ///   The histogram model associated with the selection model.
   pqHistogramModel *getModel() const {return this->Model;}
+
+  /// \brief
+  ///   Sets the histogram model associated with the selection model.
+  /// \param model The new histogram model.
   void setModel(pqHistogramModel *model);
 
+  /// \brief
+  ///   Gets whether or not the selection model is in an interactive
+  ///   change.
+  /// \return
+  ///   Trure if the selection model is in an interactive change.
+  /// \sa pqHistogramSelectionModel::beginInteractiveChange()
   bool isInInteractiveChange() const {return this->InInteractMode;}
+
+  /// \brief
+  ///   Called to begin an interactive selection change.
+  ///
+  /// Interactive selection changes such as a selection box can send
+  /// a lot of change signals as the user drags the mouse around. The
+  /// chart needs to update the selection based on those signals in
+  /// order for the user to see the changes. If an expensive process
+  /// is attached to the selection change signal, this can cause a
+  /// visible slow-down in the application. This method allows the
+  /// selection to keep the chart painter up to date while allowing
+  /// the expensive process to delay execution.
+  ///
+  /// The interactive controller should call this method before
+  /// starting a change such as with a selection box. It should call
+  /// the \c endInteractiveChange method when the interaction is done.
+  /// The expensive process should listen to the \c selectionChanged
+  /// and \c interactionFinished signals. The \c interactionFinished
+  /// is emitted at the end of the interactive change. In order to
+  /// keep track of non-interactive changes, the \c selectionChanged
+  /// signal must be monitored. This signal will be emitted for every
+  /// selection change. Therefore, the listening code should check
+  /// to see if the model is in an interactive change before executing
+  /// an expensive process.
   void beginInteractiveChange();
+
+  /// \brief
+  ///   Called to end an interactive selection change.
+  /// \sa pqHistogramSelectionModel::beginInteractiveChange()
   void endInteractiveChange();
 
   /// \brief
@@ -199,7 +248,18 @@ public:
   static void sortAndMerge(pqHistogramSelectionList &list);
 
 signals:
+  /// \brief
+  ///   Emitted when the selection changes.
+  /// \param list The list of selected histogram ranges.
   void selectionChanged(const pqHistogramSelectionList &list);
+
+  /// \brief
+  ///   Emitted when an interactive selection change is finished.
+  ///
+  /// This signal can be used to delay expensive processes until
+  /// after the selection change is complete.
+  ///
+  /// \sa pqHistogramSelectionModel::beginInteractiveChange()
   void interactionFinished();
 
 public slots:
@@ -222,10 +282,10 @@ private:
 private:
   /// Stores the current selection type.
   pqHistogramSelection::SelectionType Type;
-  pqHistogramSelectionList List;  ///< Stores the selection list.
-  pqHistogramModel *Model;        ///< A pointer to the histogram.
-  bool PendingSignal;             ///< Used during model changes.
-  bool InInteractMode;            ///< True if in interact mode.
+  pqHistogramSelectionList List; ///< Stores the selection list.
+  pqHistogramModel *Model;       ///< A pointer to the histogram.
+  bool PendingSignal;            ///< Used during model changes.
+  bool InInteractMode;           ///< True if in interact mode.
 };
 
 #endif

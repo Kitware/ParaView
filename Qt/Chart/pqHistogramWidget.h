@@ -53,7 +53,6 @@ class pqChartAxis;
 class pqChartLabel;
 class pqChartMouseBox;
 class pqChartValue;
-class pqChartValueList;
 class pqChartZoomPan;
 class pqHistogramChart;
 class pqHistogramColor;

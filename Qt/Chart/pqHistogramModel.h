@@ -43,34 +43,93 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqChartValue;
 
 
+/// \class pqHistogramModel
+/// \brief
+///   The pqHistogramModel class is the histogram chart's interface
+///   to the histogram data.
 class QTCHART_EXPORT pqHistogramModel : public QObject
 {
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Creates a histogram model object.
+  /// \param parent The parent object.
   pqHistogramModel(QObject *parent=0);
   virtual ~pqHistogramModel() {}
 
+  /// \name Histogram Data Methods
+  //@{
+  /// \brief
+  ///   Gets the number of bins in the model.
+  /// \return
+  ///   The number of bins in the model.
   virtual int getNumberOfBins() const=0;
-  virtual void getBinValue(int index, pqChartValue &bin) const=0;
 
+  /// \brief
+  ///   Get the value for a particular bin.
+  /// \param index The index of the bin value.
+  /// \param bin Used to return the bin value.
+  virtual void getBinValue(int index, pqChartValue &bin) const=0;
+  //@}
+
+  /// \name Histogram Range Methods
+  //@{
+  /// \brief
+  ///   Get the x-axis range for the histogram.
+  /// \param min Used to return the minimum x-axis value.
+  /// \param max Used to return the maximum x-axis value.
   virtual void getRangeX(pqChartValue &min, pqChartValue &max) const=0;
 
+  /// \brief
+  ///   Get the y-axis range for the histogram.
+  /// \param min Used to return the minimum y-axis value.
+  /// \param max Used to return the maximum y-axis value.
   virtual void getRangeY(pqChartValue &min, pqChartValue &max) const=0;
+  //@}
 
 signals:
+  /// Emitted when the histogram has been reset of changed dramatically.
   void binValuesReset();
+
+  /// \brief
+  ///   Emitted when new bins will be inserted.
+  /// \param first The first index of the bin insertion.
+  /// \param last The last index of the bin insertion.
   void aboutToInsertBinValues(int first, int last);
+
+  /// Emitted when new points have been inserted.
   void binValuesInserted();
+
+  /// \brief
+  ///   Emitted when bins will be removed.
+  /// \param first The first index of the bin removal.
+  /// \param last The last index of the bin removal.
   void aboutToRemoveBinValues(int first, int last);
+
+  /// Emitted when bins have been removed.
   void binValuesRemoved();
-  void rangeChanged(const pqChartValue &min, const pqChartValue &max);
 
 protected:
+  /// Called to emit the bin values reset signal.
   void resetBinValues();
+
+  /// \brief
+  ///   Called to begin the bin insertion process.
+  /// \param first The first index of the bin insertion.
+  /// \param last The last index of the bin insertion.
   void beginInsertBinValues(int first, int last);
+
+  /// Called to end the bin insertion process.
   void endInsertBinValues();
+
+  /// \brief
+  ///   Called to begin the bin removal process.
+  /// \param first The first index of the bin removal.
+  /// \param last The last index of the bin removal.
   void beginRemoveBinValues(int first, int last);
+
+  /// Called to end the bin removal process.
   void endRemoveBinValues();
 };
 

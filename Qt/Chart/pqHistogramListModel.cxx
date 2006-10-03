@@ -106,41 +106,6 @@ void pqHistogramListModel::clearBinValues()
     }
 }
 
-void pqHistogramListModel::setBinValues(const pqChartValueList &values)
-{
-  // Clear the previous bin values.
-  this->Internal->Values.clear();
-
-  // Copy the new list of bin values. Find the range of the new
-  // values as well.
-  pqChartValue yMin;
-  pqChartValueList::ConstIterator iter = values.begin();
-  if(iter != values.end())
-    {
-    yMin = *iter;
-    }
-
-  pqChartValue yMax = yMin;
-  for( ; iter != values.end(); ++iter)
-    {
-    this->Internal->Values.append(*iter);
-    if(*iter > yMax)
-      {
-      yMax = *iter;
-      }
-    else if(*iter < yMin)
-      {
-      yMin = *iter;
-      }
-    }
-
-  // Set the bin value range and notify the chart that the model has
-  // changed.
-  this->Internal->MinimumY = yMin;
-  this->Internal->MaximumY = yMax;
-  this->resetBinValues();
-}
-
 void pqHistogramListModel::addBinValue(const pqChartValue &value)
 {
   int index = this->Internal->Values.size();
@@ -223,7 +188,7 @@ void pqHistogramListModel::setRangeX(const pqChartValue &min,
 
   if(isRangeChanged)
     {
-    emit this->rangeChanged(this->Internal->MinimumX, this->Internal->MaximumX);
+    this->binValuesReset();
     }
 }
 

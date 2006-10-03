@@ -47,26 +47,61 @@ class QPainter;
 class QPen;
 
 
+/// \class pqLineChartPlotOptions
+/// \brief
+///   The pqLineChartPlotOptions class stores the drawing options for
+///   a line chart plot.
 class QTCHART_EXPORT pqLineChartPlotOptions : public QObject
 {
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Creates a line chart plot options object.
+  /// \param parent The parent object.
   pqLineChartPlotOptions(QObject *parent=0);
   ~pqLineChartPlotOptions();
 
+  /// \brief
+  ///   Sets the pen to use when drawing the plot series.
+  /// \param series The index of the series in the plot.
+  /// \param pen The pen to use when drawing the series.
   void setPen(int series, const QPen &pen);
+
+  /// \brief
+  ///   Sets the brush to use when filling series points.
+  /// \param series The index of the series in the plot.
+  /// \param brush The brush to use when filling series points.
   void setBrush(int series, const QBrush &brush);
+
+  /// \brief
+  ///   Sets the marker to use when drawing series points.
+  /// \param series The index of the series in the plot.
+  /// \param marker The marker to use when drawing series points.
   void setMarker(int series, pqPointMarker *marker);
 
+  /// \brief
+  ///   Sets up the painter for drawing a series.
+  ///
+  /// The pen and brush for a given series are set on the painter.
+  ///
+  /// \param painter The painter to set up.
+  /// \param series The index of the series in the plot.
   void setupPainter(QPainter &painter, int series) const;
+
+  /// \brief
+  ///   Gets the point marker for a series.
+  /// \param series The index of the series in the plot.
+  /// \return
+  ///   A pointer to the point marker for a series.
   pqPointMarker *getMarker(int series) const;
 
 signals:
+  /// Emitted when the drawing options for a plot have changed.
   void optionsChanged();
 
 private:
-  pqLineChartPlotOptionsInternal *Internal;
+  pqLineChartPlotOptionsInternal *Internal; ///< Stores the options.
 };
 
 #endif

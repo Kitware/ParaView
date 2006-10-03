@@ -158,24 +158,111 @@ private slots:
   /// Updates the layout of the line chart when the model is reset.
   void handleModelReset();
 
+  /// \brief
+  ///   Prepares the chart for a plot insertion.
+  /// \param first The first index of the new plots.
+  /// \param last The last index of the new plots.
   void startPlotInsertion(int first, int last);
+
+  /// \brief
+  ///   Updates the chart layout after a plot is inserted.
+  /// \param first The first index of the new plots.
+  /// \param last The last index of the new plots.
   void finishPlotInsertion(int first, int last);
+
+  /// \brief
+  ///   Prepares the chart for a plot removal.
+  /// \param first The first index of the plots being removed.
+  /// \param last The last index of the plots being removed.
   void startPlotRemoval(int first, int last);
+
+  /// \brief
+  ///   Updates the chart layout after a plot is removed.
+  ///
+  /// If the chart ranges do not change after removing the plots, the
+  /// chart only has to be repainted. Otherwise, the layout has to be
+  /// re-calculated.
+  ///
+  /// \param first The first index of the plots being removed.
+  /// \param last The last index of the plots being removed.
   void finishPlotRemoval(int first, int last);
 
+  /// \brief
+  ///   Changes the plot painting order.
+  /// \param current The current index of the moving plot.
+  /// \param index The index to move the plot to.
   void handlePlotMoved(int current, int index);
+
+  /// \brief
+  ///   Updates the plot layout after a major change.
+  /// \param plot The plot that changed.
   void handlePlotReset(const pqLineChartPlot *plot);
 
+  /// \brief
+  ///   Prepares the chart for a plot point insertion.
+  /// \param plot The affected plot.
+  /// \param series The index of the point series.
+  /// \param first The first index of the new points.
+  /// \param last The last index of the new points.
   void startPointInsertion(const pqLineChartPlot *plot, int series, int first,
       int last);
+
+  /// \brief
+  ///   Updates the plot layout after a point is inserted.
+  ///
+  /// If the new points modify the overall chart ranges, the layout
+  /// for all the plots is re-calculated.
+  ///
+  /// \param plot The affected plot.
+  /// \param series The index of the point series.
   void finishPointInsertion(const pqLineChartPlot *plot, int series);
+
+  /// \brief
+  ///   Prepares the chart for a plot point removal.
+  /// \param plot The affected plot.
+  /// \param series The index of the point series.
+  /// \param first The first index of the points being removed.
+  /// \param last The last index of the points being removed.
   void startPointRemoval(const pqLineChartPlot *plot, int series, int first,
       int last);
+
+  /// \brief
+  ///   Updates the plot layout after a point is removed.
+  ///
+  /// If the new plot ranges modify the overall chart ranges, the
+  /// layout for all the plots is re-calculated.
+  ///
+  /// \param plot The affected plot.
+  /// \param series The index of the point series.
   void finishPointRemoval(const pqLineChartPlot *plot, int series);
+
+  /// \brief
+  ///   Prepares the chart for a multi-series change.
+  /// \param plot The plot to be modified.
   void startMultiSeriesChange(const pqLineChartPlot *plot);
+
+  /// \brief
+  ///   Updates the chart layout after a multi-series change.
+  /// \param plot The plot that was modified.
   void finishMultiSeriesChange(const pqLineChartPlot *plot);
+
+  /// \brief
+  ///   Updates the plot layout when its error boundaries change.
+  ///
+  /// The entire chart layout may need to be re-calculated if the new
+  /// plot ranges affect the chart ranges.
+  ///
+  /// \param plot The plot that was modified.
+  /// \param series The index of the point series.
+  /// \param first The first index of the modified points.
+  /// \param last The last index of the modified points.
   void handlePlotErrorBoundsChanged(const pqLineChartPlot *plot, int series,
       int first, int last);
+
+  /// \brief
+  ///   Updates the plot layout when the error bar width is changed.
+  /// \param plot The plot that was modified.
+  /// \param series The index of the modified point series.
   void handlePlotErrorWidthChanged(const pqLineChartPlot *plot, int series);
 
 private:

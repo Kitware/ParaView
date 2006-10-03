@@ -123,7 +123,7 @@ public:
 
   /// \brief
   ///   Sets the maximum pixel location.
-  /// \param min The maximum pixel location.
+  /// \param max The maximum pixel location.
   void setMaxPixel(int max);
 
   /// \brief

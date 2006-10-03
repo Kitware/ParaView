@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFontMetrics>
 #include <QPainter>
 #include <QVector>
-#include <vtkstd/vector>
 
 
 /// \class pqHistogramChartData
