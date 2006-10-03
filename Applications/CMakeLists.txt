@@ -48,7 +48,5 @@ paraview_build_optional_application(
 paraview_build_optional_application(
   DobranoViz "DobranoViz" DobranoViz ON)
 paraview_build_optional_application(
-  Prism "Prism" Prism ON)
-paraview_build_optional_application(
   PGraph "PGraph" PGraph ON)
 
