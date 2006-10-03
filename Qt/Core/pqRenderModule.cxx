@@ -45,18 +45,76 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkTrackballPan.h"
+#include "vtkSMIntVectorProperty.h"
 
 // Qt includes.
 #include <QFileInfo>
 #include <QList>
 #include <QPointer>
 #include <QtDebug>
+#include <QEvent>
+#include <QSet>
 
 // ParaView includes.
 #include "pqRenderViewProxy.h"
 #include "pqSetName.h"
 #include "pqUndoStack.h"
 #include "vtkPVAxesWidget.h"
+
+
+static QSet<pqRenderModule*> RenderModules;
+
+/// method to keep server side views in sync with client side views
+/// the client has multiple windows, whereas the server has just one window with
+/// multiple sub views.  We need to tell the server where to put the views.
+static void UpdateServerViews(pqRenderModule* renderModule)
+{
+  // get all the render modules on the server
+  pqServer* server = renderModule->getServer();
+  QList<pqRenderModule*> rms;
+  foreach(pqRenderModule* rm, RenderModules)
+    {
+    if(rm->getServer() == server)
+      {
+      rms.append(rm);
+      }
+    }
+
+  // find a rectangle that bounds all views
+  QRect totalBounds;
+  
+  foreach(pqRenderModule* rm, rms)
+    {
+    QRect bounds = rm->getWidget()->rect();
+    bounds.moveTo(rm->getWidget()->mapToGlobal(QPoint(0,0)));
+    totalBounds |= bounds;
+    }
+
+  // now loop through all render modules and set the server size window size
+  foreach(pqRenderModule* rm, rms)
+    {
+    vtkSMIntVectorProperty* prop = 0;
+
+    // set size containing all views
+    prop = vtkSMIntVectorProperty::SafeDownCast(
+      rm->getRenderModuleProxy()->GetProperty("GUISize"));
+    if(prop)
+      {
+      prop->SetElements2(totalBounds.width(), totalBounds.height());
+      }
+
+    // position relative to the bounds of all views
+    prop = vtkSMIntVectorProperty::SafeDownCast(
+      rm->getRenderModuleProxy()->GetProperty("WindowPosition"));
+    if(prop)
+      {
+      QPoint pos = rm->getWidget()->mapToGlobal(QPoint(0,0));
+      pos -= totalBounds.topLeft();
+      prop->SetElements2(pos.x(), pos.y());
+      }
+    }
+
+}
 
 template<class T>
 inline uint qHash(QPointer<T> p)
@@ -102,11 +160,17 @@ pqRenderModule::pqRenderModule(const QString& name,
 
   this->Internal->Viewport = new QVTKWidget() 
     << pqSetName("Viewport");
+
+  RenderModules.insert(this);
+
+  this->Internal->Viewport->installEventFilter(this);
 }
 
 //-----------------------------------------------------------------------------
 pqRenderModule::~pqRenderModule()
 {
+  RenderModules.remove(this);
+
   delete this->Internal->Viewport;
   delete this->Internal;
 }
@@ -327,5 +391,18 @@ bool pqRenderModule::saveImage(int width, int height, const QString& filename)
     this->render();
     }
   return (ret == vtkErrorCode::NoError);
+}
+
+//-----------------------------------------------------------------------------
+bool pqRenderModule::eventFilter(QObject* caller, QEvent* e)
+{
+  // TODO, apparently, this should watch for window position changes, not resizes
+  
+  if(e->type() == QEvent::Resize)
+    {
+    UpdateServerViews(this);
+    }
+  
+  return QObject::eventFilter(caller, e);
 }
 

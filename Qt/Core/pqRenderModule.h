@@ -93,6 +93,8 @@ protected:
   /// setups up RM and QVTKWidget binding.
   virtual void viewModuleInit();
 
+  bool eventFilter(QObject* caller, QEvent* e);
+
 private: 
   pqRenderModuleInternal* Internal;
 };
