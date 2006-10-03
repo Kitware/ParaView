@@ -23,7 +23,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkPVServerArrayHelper);
-vtkCxxRevisionMacro(vtkPVServerArrayHelper, "1.1");
+vtkCxxRevisionMacro(vtkPVServerArrayHelper, "1.2");
 //-----------------------------------------------------------------------------
 vtkPVServerArrayHelper::vtkPVServerArrayHelper()
 {
@@ -89,7 +89,7 @@ vtkPVServerArrayHelper::GetArray(vtkObject* object,
     {
     vtkArrayIteratorTemplateMacro(
       vtkPVServerArrayHelperSerializer(
-        VTK_TT::SafeDownCast(iter), *this->Result));
+        static_cast<VTK_TT*>(iter), *this->Result));
     }
   iter->Delete();
 
