@@ -35,6 +35,9 @@ proxy2 = pxm.NewProxy("sources","CubeSource")
 
 filter = pxm.NewProxy("filters", "ElevationFilter")
 display = renModule.CreateDisplayProxy()
+# CreateDisplayProxy() returns a proxy with an extra reference
+# hence we need to unregister it.
+display.UnRegister(None)
  
 undoStack.BeginOrContinueUndoSet(self_cid, "CreateFilter")
 pxm.RegisterProxy("mygroup", "sphere", proxy)
