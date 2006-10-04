@@ -1917,6 +1917,129 @@
      </StringVectorProperty>
      <!-- End SESAMEReader -->
    </SourceProxy>
-   
+
+    <!-- Beginning of FOAM Reader -->
+    <SourceProxy name="OpenFOAMReader" 
+                    class="vtkOpenFOAMReader">
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
+                            animateable="1"
+                            number_of_elements="1">
+        <StringListDomain name="files"/>
+      </StringVectorProperty>
+      <StringVectorProperty name="CellArrayInfo"
+                            information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+      </StringVectorProperty>
+      <StringVectorProperty name="CellArrayStatus"
+                            command="SetCellArrayStatus"
+                            number_of_elements="0" 
+                            repeat_command="1"
+                            number_of_elements_per_command="2"
+                            element_types="2 0" 
+                      information_property="CellArrayInfo"> 
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+      </StringVectorProperty>
+      <IntVectorProperty name="TimeStepRangeInfo"
+                         command="GetTimeStepRange"
+                         information_only="1">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+      <IntVectorProperty name="TimeStep"
+                           command="SetTimeStep"
+                           number_of_elements="1"
+                           animateable="1"
+                           default_values="0">
+        <IntRangeDomain name="range">
+          <RequiredProperties>
+            <Property name="TimeStepRangeInfo" function="Range"/>
+          </RequiredProperties>
+        </IntRangeDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="TimestepValues"
+                            information_only="1">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
+    </SourceProxy>
+    <!-- End of foam Reader -->
+
+    <!-- Beginning of MFIX Reader -->
+    <SourceProxy name="MFIXReader" class="vtkMFIXReader">
+      <StringVectorProperty name="FileName" 
+                            command="SetFileName" 
+                            animateable="1" 
+                            number_of_elements="1">
+        <StringListDomain name="files"/>
+      </StringVectorProperty>
+      <StringVectorProperty name="CellArrayInfo"
+                           information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+      </StringVectorProperty>
+      <StringVectorProperty name="CellArrayStatus"
+                            command="SetCellArrayStatus"
+                            number_of_elements="0"
+                            repeat_command="1" 
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            information_property="CellArrayInfo">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+      </StringVectorProperty>
+      <IntVectorProperty name="TimeStepRangeInfo" 
+                         command="GetTimeStepRange" 
+                         information_only="1">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+      <IntVectorProperty name="TimeStep" 
+                         command="SetTimeStep" 
+                         number_of_elements="1" 
+                         animateable="1" 
+                         default_values="0">
+        <IntRangeDomain name="range">
+          <RequiredProperties>
+            <Property name="TimeStepRangeInfo"
+                      function="Range"/>
+          </RequiredProperties>
+        </IntRangeDomain>
+      </IntVectorProperty>
+    </SourceProxy>
+    <!-- End of MFIX Reader -->
+
+   <!-- Beginning of FLUENT Reader -->
+   <SourceProxy name="FLUENTReader"
+                class="vtkFLUENTReader">
+     <StringVectorProperty name="FileName"
+                           command="SetFileName"
+                           animateable="1"
+                           number_of_elements="1">
+       <StringListDomain name="files"/>
+     </StringVectorProperty>
+     <StringVectorProperty name="CellArrayInfo"
+                           information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+     <StringVectorProperty name="CellArrayStatus"
+                           command="SetCellArrayStatus"
+                           number_of_elements="0"
+                           repeat_command="1" 
+                           number_of_elements_per_command="2"
+                           element_types="2 0"
+                           information_property="CellArrayInfo">
+       <ArraySelectionDomain name="array_list">
+         <RequiredProperties>
+           <Property name="CellArrayInfo"
+                     function="ArrayList"/>
+         </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+   </SourceProxy>
+   <!-- End of FLUENT Reader -->
   </ProxyGroup>
 </ServerManagerConfiguration>

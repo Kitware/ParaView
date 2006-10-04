@@ -731,4 +731,53 @@
            display_value="0"
            help="Set the current timestep."/>
   </Module>
+
+  <Module name="OpenFOAMReader" 
+          root_name="OpenFOAMReader" 
+          class="vtkPVAdvancedReaderModule" 
+          module_type="Reader" 
+          extensions=".foam" 
+          file_description="OpenFOAM  Files"> 
+    <Source class="vtkOpenFOAMReader"/> 
+    <Scale property="TimeStep" 
+           label="Time step" 
+           trace_name="TimeStep" 
+           keeps_timesteps="1" 
+           help="Set the current timestep."/> 
+    <ArraySelection label_text="Cell Arrays" 
+                    property="CellArrayStatus" 
+                    trace_name="CellSelection"/> 
+  </Module> 
+
+  <Module name="MFIXReader" 
+          root_name="MFIXReader" 
+          class="vtkPVAdvancedReaderModule" 
+          module_type="Reader" 
+          extensions=".RES" 
+          file_description="MFIX UnstructuredGrid Files">
+  <Source class="vtkMFIXReader"/>
+
+  <Scale property="TimeStep" 
+         label="Time step" 
+         trace_name="TimeStep" 
+         keeps_timesteps="1" 
+         help="Set the current timestep."/>
+  <ArraySelection label_text="Cell Arrays"
+                  property="CellArrayStatus" 
+                  trace_name="CellSelection"/>
+  </Module>
+
+  <Module name="FLUENTReader"
+          root_name="FLUENTReader"
+          class="vtkPVAdvancedReaderModule"
+          module_type="Reader" 
+          extensions=".cas" 
+          file_description="Fluent Case File">
+  <Source class="vtkFLUENTReader"/>
+
+  <ArraySelection label_text="Cell Arrays"
+                  property="CellArrayStatus"
+                  trace_name="CellSelection"/>
+  </Module>
+
 </ModuleInterfaces>
