@@ -69,7 +69,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.7");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -250,9 +250,16 @@ void vtkSMSelectionProxy::ConvertSelection(vtkSelection* sel,
   vtkSMProxy* geomProxy = 
     rmp->GetProxyFromPropID(&propId, vtkSMRenderModuleProxy::GEOMETRY);
 
-  properties->Set(vtkSelection::SOURCE_ID(), geomProxy->GetID(0).ID);
-  properties->Set(vtkSelectionSerializer::ORIGINAL_SOURCE_ID(), 
-                  objProxy->GetID(0).ID);
+  if (geomProxy)
+    {
+    properties->Set(vtkSelection::SOURCE_ID(), geomProxy->GetID(0).ID);
+    }
+
+  if (objProxy)
+    {
+    properties->Set(vtkSelectionSerializer::ORIGINAL_SOURCE_ID(), 
+                    objProxy->GetID(0).ID);
+    }
 }
 
 //-----------------------------------------------------------------------------
