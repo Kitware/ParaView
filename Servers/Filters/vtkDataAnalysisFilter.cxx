@@ -25,9 +25,10 @@
 #include "vtkPPickFilter.h"
 #include "vtkPProbeFilter.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkDataAnalysisFilter);
-vtkCxxRevisionMacro(vtkDataAnalysisFilter, "1.2");
+vtkCxxRevisionMacro(vtkDataAnalysisFilter, "1.3");
 vtkCxxSetObjectMacro(vtkDataAnalysisFilter, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkDataAnalysisFilter::vtkDataAnalysisFilter()
@@ -118,10 +119,23 @@ int vtkDataAnalysisFilter::RequestData(vtkInformation *vtkNotUsed(request),
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
   // get the input and ouptut
-  vtkDataSet *input = vtkDataSet::SafeDownCast(
+  vtkDataSet *inputOriginal = vtkDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkDataSet *source = (!sourceInfo)? 0: vtkDataSet::SafeDownCast(
+  vtkDataSet *sourceOriginal = (!sourceInfo)? 0: vtkDataSet::SafeDownCast(
     sourceInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkSmartPointer<vtkDataSet> input ;
+  vtkSmartPointer<vtkDataSet> source;
+  if (inputOriginal)
+    {
+    input.TakeReference(inputOriginal->NewInstance());
+    input->ShallowCopy(inputOriginal);
+    }
+  if (sourceOriginal)
+    {
+    source.TakeReference(sourceOriginal->NewInstance());
+    source->ShallowCopy(sourceOriginal);
+    }
+
   vtkDataSet *output = vtkDataSet::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
