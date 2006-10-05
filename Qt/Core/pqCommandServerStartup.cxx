@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerStartupContext.h"
 #include "pqCommandServerStartup.h"
 
+#include <QtNetwork/QHostInfo>
 #include <QProcess>
 #include <QTimer>
 #include <QtDebug>
@@ -134,6 +135,8 @@ void pqCommandServerStartup::execute(const OptionsT& user_options,
     this->Server.toString();
   options["PV_CONNECTION_SCHEME"] =
     this->Server.scheme();
+  options["PV_CLIENT_HOST"] =
+    QHostInfo::localHostName();
   options["PV_SERVER_HOST"] =
     this->Server.host();
   options["PV_SERVER_PORT"] =
