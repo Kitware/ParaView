@@ -26,15 +26,16 @@
 #include "vtkPProbeFilter.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkSmartPointer.h"
+#include "vtkPointData.h"
 
 vtkStandardNewMacro(vtkDataAnalysisFilter);
-vtkCxxRevisionMacro(vtkDataAnalysisFilter, "1.3");
+vtkCxxRevisionMacro(vtkDataAnalysisFilter, "1.4");
 vtkCxxSetObjectMacro(vtkDataAnalysisFilter, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkDataAnalysisFilter::vtkDataAnalysisFilter()
 {
   this->SetNumberOfInputPorts(2);
-  this->Mode = vtkDataAnalysisFilter::PROBE;
+  this->Mode = vtkDataAnalysisFilter::PICK;
   this->ProbeFilter = 0;
   this->PickFilter = 0;
   this->DataSetToUnstructuredGridFilter =0;
@@ -139,13 +140,21 @@ int vtkDataAnalysisFilter::RequestData(vtkInformation *vtkNotUsed(request),
   vtkDataSet *output = vtkDataSet::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  if ( this->Mode == vtkDataAnalysisFilter::PROBE && !source)
+  if ( this->Mode == vtkDataAnalysisFilter::PROBE)
     {
-    vtkErrorMacro("No source provided.");
-    return 0;
-    }
-  if (this->Mode == vtkDataAnalysisFilter::PROBE)
-    {
+    if (!source)
+      {
+      vtkErrorMacro("No source provided.");
+      return 1;
+      }
+
+    if ((input->GetPointData() == NULL) || 
+        (input->GetPointData()->GetNumberOfTuples() < 1))
+      {
+      vtkErrorMacro("No point data to probe.");
+      return 1;
+      }
+
     if (!this->ProbeFilter)
       {
       this->ProbeFilter = vtkPProbeFilter::New();
@@ -170,7 +179,7 @@ int vtkDataAnalysisFilter::RequestData(vtkInformation *vtkNotUsed(request),
     output->ShallowCopy(this->ProbeFilter->GetOutput());
     }
   else
-    {
+    { //pick mode
     if (!this->PickFilter)
       {
       this->PickFilter = vtkPPickFilter::New();

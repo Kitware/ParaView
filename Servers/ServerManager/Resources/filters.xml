@@ -2982,7 +2982,6 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
           </DataTypeDomain>
           <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
           <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
-          <InputArrayDomain name="input_array" attribute_type="point"/>
      </InputProperty>
 
      <InputProperty
