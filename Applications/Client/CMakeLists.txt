@@ -147,11 +147,13 @@ ENDIF(APPLE)
     Cut
     CutMulti
     ExodusPanel
+    ImageShrink
     LoadState
     LoadStateSelection
     ObjectInspectorSphere
     OpenFile
     OpenSaveData
+    Plot3DReader
     RepresentationSelector
     SelectionUndo
     SelectReader
