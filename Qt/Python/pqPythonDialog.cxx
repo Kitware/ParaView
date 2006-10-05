@@ -69,6 +69,24 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent, int argc, char** argv) :
     this,
     SLOT(runScript()));
 
+  QObject::connect(
+    this->Implementation->Ui.shellWidget,
+    SIGNAL(executing(bool)),
+    this->Implementation->Ui.runScript,
+    SLOT(setDisabled(bool)));
+
+  QObject::connect(
+    this->Implementation->Ui.shellWidget,
+    SIGNAL(executing(bool)),
+    this->Implementation->Ui.clear,
+    SLOT(setDisabled(bool)));
+
+  QObject::connect(
+    this->Implementation->Ui.shellWidget,
+    SIGNAL(executing(bool)),
+    this->Implementation->Ui.close,
+    SLOT(setDisabled(bool)));
+
   this->Implementation->Ui.shellWidget->InitializeInterpretor(argc, argv);
   
   pqApplicationCore::instance()->settings()->restoreState("PythonDialog", *this);

@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #undef slots // Workaround for a conflict between Qt slots and the Python headers
 #include <vtkPython.h>
 
-#include <QDir>
+#include <QCoreApplication>
 #include <QResizeEvent>
 #include <QTextCharFormat>
 #include <QVBoxLayout>
@@ -53,12 +53,12 @@ struct pqPythonShell::pqImplementation
 {
   pqImplementation(QWidget* Parent) 
     : Console(Parent)
-    {
+  {
     this->Interpreter = vtkPVPythonInterpretor::New();
-    }
+  }
 
   void Initialize(int argc, char* argv[])
-    {
+  {
     this->Interpreter->InitializeSubInterpretor(argc, argv);
     
     // Redirect Python's stdout and stderr
@@ -79,26 +79,26 @@ struct pqPythonShell::pqImplementation
       PySys_SetObject(const_cast<char*>("ps2"), ps2 = PyString_FromString("... "));
       Py_XDECREF(ps2);
       }
-    }
+  }
 
   ~pqImplementation()
-    {
+  {
     this->Interpreter->MakeCurrent();
 
     // Restore Python's original stdout and stderr
     PySys_SetObject(const_cast<char*>("stdout"), PySys_GetObject(const_cast<char*>("__stdout__")));
     PySys_SetObject(const_cast<char*>("stderr"), PySys_GetObject(const_cast<char*>("__stderr__")));
     this->Interpreter->Delete();
-    }
+  }
 
   void executeCommand(const QString& Command)
-    {
+  {
     this->Interpreter->MakeCurrent();
     this->Interpreter->RunSimpleString(Command.toAscii().data());
-    }
+  }
 
   void promptForInput()
-    {
+  {
     this->Interpreter->MakeCurrent();
 
     QTextCharFormat format = this->Console.getFormat();
@@ -113,7 +113,7 @@ struct pqPythonShell::pqImplementation
       {
       this->Console.printString(PyString_AsString(PySys_GetObject(const_cast<char*>("ps2"))));
       }
-    }
+  }
 
   /// Provides a console for gathering user input and displaying Python output
   pqConsoleWidget Console;
@@ -168,7 +168,7 @@ void pqPythonShell::clear()
 void pqPythonShell::executeScript(const QString& script)
 {
   this->printStdout("\n");
-  this->Implementation->executeCommand(script);
+  this->internalExecuteCommand(script);
   this->Implementation->promptForInput();
 }
 
@@ -179,6 +179,8 @@ void pqPythonShell::printStdout(const QString& String)
   this->Implementation->Console.setFormat(format);
   
   this->Implementation->Console.printString(String);
+  
+  QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
 void pqPythonShell::printStderr(const QString& String)
@@ -188,6 +190,8 @@ void pqPythonShell::printStderr(const QString& String)
   this->Implementation->Console.setFormat(format);
   
   this->Implementation->Console.printString(String);
+  
+  QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
 void pqPythonShell::onExecuteCommand(const QString& Command)
@@ -204,7 +208,7 @@ void pqPythonShell::onExecuteCommand(const QString& Command)
       }
     else
       {
-      this->Implementation->executeCommand(command);
+      this->internalExecuteCommand(command);
       }
     }
   else
@@ -212,7 +216,7 @@ void pqPythonShell::onExecuteCommand(const QString& Command)
     if(command.isEmpty())
       {
       this->Implementation->MultilineStatement.append("\n");
-      this->Implementation->executeCommand(this->Implementation->MultilineStatement);
+      this->internalExecuteCommand(this->Implementation->MultilineStatement);
       this->Implementation->MultilineStatement.clear();
       }
     else
@@ -230,3 +234,9 @@ void pqPythonShell::promptForInput()
   this->Implementation->promptForInput();
 }
 
+void pqPythonShell::internalExecuteCommand(const QString& command)
+{
+  emit this->executing(true);  
+  this->Implementation->executeCommand(command);
+  emit this->executing(false);
+}

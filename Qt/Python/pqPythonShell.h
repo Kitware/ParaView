@@ -54,6 +54,10 @@ public:
   ~pqPythonShell();
 
   void InitializeInterpretor(int argc, char* argv[]);
+
+signals:
+  void executing(bool);
+
 public slots:
   void clear();
   void executeScript(const QString&);
@@ -68,6 +72,7 @@ private:
   pqPythonShell& operator=(const pqPythonShell&);
 
   void promptForInput();
+  void internalExecuteCommand(const QString&);
 
   struct pqImplementation;
   pqImplementation* const Implementation;
