@@ -1153,6 +1153,11 @@ QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(
         {
         which /= 2;
         }
+      else
+        {  
+        // one min/max for all elements
+        which = 0;
+        }
       QList<QVariant> domain;
       int exists1, exists2;
       int min = IntDomain->GetMinimum(which, exists1);
