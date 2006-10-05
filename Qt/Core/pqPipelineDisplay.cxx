@@ -464,7 +464,7 @@ QList<QString> pqPipelineDisplay::getColorFields()
 int pqPipelineDisplay::getColorFieldNumberOfComponents(const QString& array)
 {
   QString field = array;
-  int fieldType;
+  int fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
 
   if(field == "Solid Color")
     {
@@ -492,7 +492,7 @@ pqPipelineDisplay::getColorFieldRange(const QString& array, int component)
   QPair<double,double>ret(0.0, 1.0);
 
   QString field = array;
-  int fieldType;
+  int fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
 
   if(field == "Solid Color")
     {
@@ -530,7 +530,7 @@ pqPipelineDisplay::getColorFieldRanges(const QString& array)
   QList<QPair<double,double> > ret;
   
   QString field = array;
-  int fieldType;
+  int fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
 
   if(field == "Solid Color")
     {
