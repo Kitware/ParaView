@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.484");
+vtkCxxRevisionMacro(vtkPVSource, "1.485");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -78,6 +78,7 @@ vtkPVSource::vtkPVSource()
 {
   this->SavedColorArrayName = 0;
   this->SavedColorArrayField = -1;
+  this->SavedColor[0] = this->SavedColor[1] = this->SavedColor[2] = -1;
 
   this->DataInformationValid = 0;
 
@@ -1512,7 +1513,7 @@ void vtkPVSource::SetDefaultColorParameters()
     {
     return;
     }    
-    
+
   // Inherit property color from input.
   if (input)
     {
@@ -1524,7 +1525,15 @@ void vtkPVSource::SetDefaultColorParameters()
       return;
       }
     double rgb[3] = { 1, 1, 1};
-    input->GetDisplayProxy()->GetColorCM(rgb);
+    // If a color has already been chosen by the user, use it.
+    if (this->SavedColor[0] != -1)
+      {
+      memcpy(rgb, this->SavedColor, 3*sizeof(double));
+      }
+    else
+      {
+      input->GetDisplayProxy()->GetColorCM(rgb);
+      }
     this->DisplayProxy->SetColorCM(rgb);
     this->DisplayProxy->UpdateVTKObjects();
     } 
@@ -3092,6 +3101,8 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "No saved color information.\n";
     }
+  os << indent << "SavedColor: " << this->SavedColor[0] << " "
+     << this->SavedColor[1] << " " << this->SavedColor[2] << endl;
 }
 
 //----------------------------------------------------------------------------

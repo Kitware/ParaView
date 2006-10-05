@@ -517,6 +517,8 @@ public:
   vtkGetStringMacro(SavedColorArrayName);
   vtkSetMacro(SavedColorArrayField,int);
   vtkGetMacro(SavedColorArrayField,int);
+  vtkSetVector3Macro(SavedColor, double);
+  vtkGetVector3Macro(SavedColor, double);
 
 protected:
   vtkPVSource();
@@ -538,6 +540,7 @@ protected:
   // When surface is reselected, I want the previous selection to be set again.
   char *SavedColorArrayName;
   int SavedColorArrayField;
+  double SavedColor[3];
 
   void SetPVInputInternal(const char* name, 
                           int idx, 

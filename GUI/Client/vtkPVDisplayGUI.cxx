@@ -105,7 +105,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.70");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.71");
 
 //----------------------------------------------------------------------------
 
@@ -1461,13 +1461,18 @@ void vtkPVDisplayGUI::UpdateColorMenu()
   vtkPVDataSetAttributesInformation *attrInfo;
   vtkPVArrayInformation *arrayInfo;
   int colorField = this->PVSource->GetSavedColorArrayField();
+  double color[3];
+  this->PVSource->GetSavedColor(color);
   const char* colorArrayName = this->PVSource->GetSavedColorArrayName();
 
   // Detect the case where the color has never been set, 
   // and we are switching from outline to surface.
-  // SavedColorField is initialized to -1 in PVSOurce contructor.
-  // It is set to 0 when the user colors by property.
-  if (colorField == -1)
+  // SavedColorField is initialized to -1 in PVSource contructor.
+  // It is set to something larger when the user colors by array.
+  // SavedColor is initialized to {-1, -1, -1} in PVSource constructor.
+  // It is set to something meaningful when the user colors by property
+  // and selects a color.
+  if (colorField == -1 && color[0] != -1)
     {
     this->PVSource->SetDefaultColorParameters();
     vtkPVColorMap* colorMap = this->PVSource->GetPVColorMap();
@@ -1714,6 +1719,7 @@ void vtkPVDisplayGUI::ChangeActorColor(double r, double g, double b)
                       this->GetTclName(), r, g, b);
 
   this->SetActorColor(r, g, b);
+  this->PVSource->SetSavedColor(r, g, b);
   this->ColorButton->SetColor(r, g, b);
 
   if ( this->GetPVRenderView() )

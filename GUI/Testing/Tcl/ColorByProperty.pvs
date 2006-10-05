@@ -1,0 +1,29 @@
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp81) [$kw(vtkTemp1) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp81) $argv $argc
+
+set kw(vtkTemp1194) [$kw(vtkTemp1) CreatePVSource ConeSource]
+$kw(vtkTemp1) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp1) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp1) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp1) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp1194) AcceptCallback
+set kw(vtkTemp1263) [$kw(vtkTemp1) CreatePVSource OutlineFilter]
+set kw(vtkTemp1264) [$kw(vtkTemp1263) GetPVWidget {Input}]
+$kw(vtkTemp1264) SetCurrentValue $kw(vtkTemp1194)
+$kw(vtkTemp1263) AcceptCallback
+set kw(vtkTemp98) [$kw(vtkTemp1263) GetPVOutput]
+$kw(vtkTemp98) ChangeActorColor 0.000000 0.000000 1.000000
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1194)
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1263)
+$kw(vtkTemp98) ColorByArray {vtkOriginalCellIds} 4
+$kw(vtkTemp98) DrawOutline
+$kw(vtkTemp98) DrawSurface
+$kw(vtkTemp98) ColorByProperty
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit

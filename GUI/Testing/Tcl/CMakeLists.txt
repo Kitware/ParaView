@@ -31,6 +31,7 @@ SET(PROJECT_TESTS
   CalcInput
   Calculator
   ClipCut
+  ColorByProperty
   ColorMap
   CombustorTest
   #Composite
