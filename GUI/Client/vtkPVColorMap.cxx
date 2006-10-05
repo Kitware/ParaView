@@ -53,7 +53,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.143");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.144");
 
 //===========================================================================
 //***************************************************************************
@@ -245,6 +245,11 @@ void vtkPVColorMap::CreateWidget()
     this->GetApplication());
 
   this->CreateParallelTclObjects(pvApp);
+
+  if (this->NumberOfVectorComponents > 1)
+    {
+    this->SetVectorMode(vtkLookupTable::MAGNITUDE);
+    }
 
   // Scalar bar : Label control
 
