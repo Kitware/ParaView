@@ -214,7 +214,8 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       }
     if(strcmp(argv[i], "--one-mpi-np") == 0)
       {
-      this->MPIClientNumProcessFlag = this->MPIServerNumProcessFlag = "1";
+      this->MPIClientNumProcessFlag = this->MPIServerNumProcessFlag = 
+        this->MPIRenderServerNumProcessFlag = "1";
       this->ArgStart = i+1;
       fprintf(stderr, "Test with one mpi process.\n");
       }
