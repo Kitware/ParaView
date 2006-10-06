@@ -347,6 +347,11 @@ IF(VTK_USE_MPI)
   IF (BUILD_TESTING)
     OPTION(ICET_BUILD_TESTING "Build and run the ICE-T tests." OFF)
     MARK_AS_ADVANCED(ICET_BUILD_TESTING)
+    IF (PARAVIEW_TEST_COMPOSITING)
+      # Force the testing of IceT if we are testing compositing.
+      SET(ICET_BUILD_TESTING ON
+        CACHE BOOL "Build and run the ICE-T tests." FORCE)
+    ENDIF (PARAVIEW_TEST_COMPOSITING)
   ENDIF (BUILD_TESTING)
   IF(PARAVIEW_USE_ICE_T)
     SET(ICE_T_INCLUDE_DIR 
