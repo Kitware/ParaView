@@ -81,6 +81,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "python.+/pyconfig.h"
   "vtkfreetype/src"
   "OSServices.framework"
+  "QD.framework/Headers/Quickdraw.h"
   "warning: argument .+ might be clobbered by .longjmp. or .vfork."
   )
 
