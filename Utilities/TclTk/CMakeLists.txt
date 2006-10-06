@@ -79,7 +79,14 @@ IF(UNIX)
     "${TclTk_BINARY_DIR}/build_tcltk.sh" IMMEDIATE @ONLY)
 
   IF(RUN_CONFIGURE)
-    EXEC_PROGRAM( "/bin/sh \"${TclTk_BINARY_DIR}/configure_tcltk.sh\"")
+    EXECUTE_PROCESS(
+      COMMAND "/bin/sh" "${TclTk_BINARY_DIR}/configure_tcltk.sh"
+      OUTPUT_VARIABLE TCLTK_CONFIGURE_OUTPUT
+      ERROR_VARIABLE TCLTK_CONFIGURE_ERROR
+      RESULT_VARIABLE TCLTK_CONFIGURE_RETURN)
+    IF (TCLTK_CONFIGURE_RETURN)
+      MESSAGE(FATAL_ERROR "Tcl/Tk configuration script failed with the following output :\n ${TCLTK_CONFIGURE_OUTPUT}\n ${TCLTK_CONFIGURE_ERROR}\n Please fix the configuration error and re-run cmake")
+    ENDIF (TCLTK_CONFIGURE_RETURN)
   ENDIF(RUN_CONFIGURE)
   ADD_CUSTOM_TARGET(maketcltk ALL "/bin/sh" "${TclTk_BINARY_DIR}/build_tcltk.sh")
 
