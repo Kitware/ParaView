@@ -38,8 +38,6 @@ SET(PROJECT_TESTS
   CTH
   CutContours
   Data
-  DataAnalysisPointId
-  DataAnalysisCellIdTemporal
   DefaultAnimation
   Delete
   DeleteSource
@@ -386,6 +384,29 @@ ADD_TEST(OtherTests-ParaView
 #   -B ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch
 #   -V ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch00001.png
 #   )
+ADD_TEST(DataAnalysisCellIdTemporal-ParaView
+  ${PARAVIEW_EXECUTABLE}
+  ${TIMEOUT}
+  ${PARAVIEW_MPI_RUN_ONE}
+   --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/DataAnalysisCellIdTemporal.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/DataAnalysisCellIdTemporal.png
+  )
+ADD_TEST(DataAnalysisPointId-ParaView
+  ${PARAVIEW_EXECUTABLE}
+  ${TIMEOUT}
+  ${PARAVIEW_MPI_RUN_ONE}
+   --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/DataAnalysisPointId.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/DataAnalysisPointId.png
+  )
+
 ADD_TEST(LabelPointIds-ParaView
   ${PARAVIEW_EXECUTABLE}
   ${TIMEOUT}
