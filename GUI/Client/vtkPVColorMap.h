@@ -234,8 +234,8 @@ public:
   vtkGetStringMacro(VectorMagnitudeTitle);
   const char* GetVectorComponentTitle(int idx);
   const char* GetScalarBarLabelFormat();
-  vtkGetObjectMacro(TitleTextProperty, vtkTextProperty);
-  vtkGetObjectMacro(LabelTextProperty, vtkTextProperty);
+  vtkTextProperty* GetTitleTextProperty();
+  vtkTextProperty* GetLabelTextProperty();
   void UpdateMap(int width, int height);
   void StartColorButtonCallback(double r, double g, double b);
   void EndColorButtonCallback(double r, double g, double b);

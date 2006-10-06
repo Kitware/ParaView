@@ -190,7 +190,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.794");
+vtkCxxRevisionMacro(vtkPVWindow, "1.795");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -3491,7 +3491,17 @@ void vtkPVWindow::SaveState(const char* filename)
     cit->GoToNextItem();
     }
   cit->Delete();
+
+  // Save the state of all of the color maps.
+  this->PVColorMaps->InitTraversal();
+  while( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
+    {    
+    cm->SaveState(file);
+    }
+
   // Visibility has to be done in a second pass.
+  // Save visibility after color maps so the visibility in the color
+  // map GUI gets set correctly.
   cit = modules->NewIterator();
   cit->InitTraversal();
   while ( !cit->IsDoneWithTraversal() )
@@ -3504,13 +3514,6 @@ void vtkPVWindow::SaveState(const char* filename)
     cit->GoToNextItem();
     }
   cit->Delete();
-
-  // Save the state of all of the color maps.
-  this->PVColorMaps->InitTraversal();
-  while( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
-    {    
-    cm->SaveState(file);
-    }
 
   // Save the view at the end so camera get set properly.
   this->GetMainView()->SaveState(file);

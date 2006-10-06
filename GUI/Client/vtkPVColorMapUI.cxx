@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMapUI);
-vtkCxxRevisionMacro(vtkPVColorMapUI, "1.8");
+vtkCxxRevisionMacro(vtkPVColorMapUI, "1.9");
 
 vtkCxxSetObjectMacro(vtkPVColorMapUI, CurrentColorMap, vtkPVColorMap);
 
@@ -1238,8 +1238,10 @@ void vtkPVColorMapUI::UpdateColorMapUI(const char* name, int numComponents,
     colorMap->GetScalarBarLabelFormat());
   this->TitleTextPropertyWidget->SetTextProperty(
     colorMap->GetTitleTextProperty());
+  this->TitleTextPropertyWidget->Update();
   this->LabelTextPropertyWidget->SetTextProperty(
     colorMap->GetLabelTextProperty());
+  this->LabelTextPropertyWidget->Update();
 
   int outOfRange = 0;
   if (colorMap->GetUseLowOutOfRangeColor() ||

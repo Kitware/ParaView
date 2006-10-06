@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.485");
+vtkCxxRevisionMacro(vtkPVSource, "1.486");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2356,9 +2356,9 @@ void vtkPVSource::SaveWidgetsInBatchScript(ofstream* file)
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveStateVisibility(ofstream *file)
 {
-
   *file << "$kw(" << this->GetTclName() << ") SetVisibility " 
         << this->GetVisibility() << endl;
+  *file << "[$kw(" << this->GetTclName() << ") GetPVOutput] Update" << endl;
 }
 
 //----------------------------------------------------------------------------

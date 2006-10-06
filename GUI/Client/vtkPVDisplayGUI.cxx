@@ -105,7 +105,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.71");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.72");
 
 //----------------------------------------------------------------------------
 
@@ -1199,6 +1199,7 @@ void vtkPVDisplayGUI::EditColorMapCallback()
   vtkPVRenderView *rv = this->GetPVRenderView();
   this->Script("pack forget [pack slaves %s]",
                rv->GetPropertiesParent()->GetWidgetName());
+  this->UpdateColorMapUI();
   this->Script("pack %s -side top -fill both -expand t",
                rv->GetColorMapUI()->GetWidgetName());
 }

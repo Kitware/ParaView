@@ -53,7 +53,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.144");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.145");
 
 //===========================================================================
 //***************************************************************************
@@ -259,6 +259,13 @@ void vtkPVColorMap::CreateWidget()
 }
 
 //----------------------------------------------------------------------------
+vtkTextProperty* vtkPVColorMap::GetLabelTextProperty()
+{
+  this->GetLabelTextPropertyInternal();
+  return this->LabelTextProperty;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVColorMap::GetLabelTextPropertyInternal()
 {
   vtkSMDoubleVectorProperty* dvp;
@@ -305,6 +312,13 @@ void vtkPVColorMap::GetLabelTextPropertyInternal()
     {
     this->LabelTextProperty->SetShadow(ivp->GetElement(0));
     }
+}
+
+//----------------------------------------------------------------------------
+vtkTextProperty* vtkPVColorMap::GetTitleTextProperty()
+{
+  this->GetTitleTextPropertyInternal();
+  return this->TitleTextProperty;
 }
 
 //----------------------------------------------------------------------------
@@ -1888,11 +1902,42 @@ void vtkPVColorMap::SaveState(ofstream *file)
     << this->ScalarBarTitle << "}\n";
   
   *file << "$kw(" << this->GetTclName() << ") SetScalarBarVectorTitle {" 
-    << this->VectorMagnitudeTitle << "}\n"; 
+    << this->VectorMagnitudeTitle << "}\n";
   
   *file << "$kw(" << this->GetTclName() << ") SetScalarBarLabelFormat {" 
-    << this->GetLabelFormatInternal() << "}\n"; 
- 
+    << this->GetLabelFormatInternal() << "}\n";
+
+  double color[3];
+  this->GetTitleTextProperty()->GetColor(color);
+  
+  *file << "$kw(" << this->GetTclName() << ") SetTitleColor "
+        << color[0] << " " << color[1] << " " << color[2] << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetTitleOpacity "
+        << this->GetTitleTextProperty()->GetOpacity() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetTitleFontFamily "
+        << this->GetTitleTextProperty()->GetFontFamily() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetTitleBold "
+        << this->GetTitleTextProperty()->GetBold() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetTitleItalic "
+        << this->GetTitleTextProperty()->GetItalic() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetTitleShadow "
+        << this->GetTitleTextProperty()->GetShadow() << endl;
+
+  this->GetLabelTextProperty()->GetColor(color);
+  
+  *file << "$kw(" << this->GetTclName() << ") SetLabelColor "
+        << color[0] << " " << color[1] << " " << color[2] << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetLabelOpacity "
+        << this->GetLabelTextProperty()->GetOpacity() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetLabelFontFamily "
+        << this->GetLabelTextProperty()->GetFontFamily() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetLabelBold "
+        << this->GetLabelTextProperty()->GetBold() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetLabelItalic "
+        << this->GetLabelTextProperty()->GetItalic() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetLabelShadow "
+        << this->GetLabelTextProperty()->GetShadow() << endl;
+
   double hr[2],sr[2],vr[2];
   this->GetHueRangeInternal(hr);
   this->GetSaturationRangeInternal(sr);
