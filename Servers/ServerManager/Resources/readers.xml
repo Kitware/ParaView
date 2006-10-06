@@ -1925,7 +1925,7 @@
                             command="SetFileName"
                             animateable="1"
                             number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
       </StringVectorProperty>
       <StringVectorProperty name="CellArrayInfo"
                             information_only="1">
@@ -1973,7 +1973,7 @@
                             command="SetFileName" 
                             animateable="1" 
                             number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
       </StringVectorProperty>
       <StringVectorProperty name="CellArrayInfo"
                            information_only="1">
@@ -2019,7 +2019,7 @@
                            command="SetFileName"
                            animateable="1"
                            number_of_elements="1">
-       <StringListDomain name="files"/>
+       <FileListDomain name="files"/>
      </StringVectorProperty>
      <StringVectorProperty name="CellArrayInfo"
                            information_only="1">
