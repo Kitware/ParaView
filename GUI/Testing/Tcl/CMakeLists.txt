@@ -35,7 +35,6 @@ SET(PROJECT_TESTS
   ColorMap
   CombustorTest
   #Composite
-  ConeCubeCylSQ
   CTH
   CutContours
   Data
