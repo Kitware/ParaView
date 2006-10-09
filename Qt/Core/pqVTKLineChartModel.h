@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqComboBoxDomain.h
+   Module:    pqVTKLineChartModel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,41 +29,37 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef __pqVTKLineChartModel_h
+#define __pqVTKLineChartModel_h
 
-#ifndef pq_ComboBoxDomain_h
-#define pq_ComboBoxDomain_h
+#include "pqLineChartModel.h"
+#include "pqCoreExport.h"
 
-#include <QObject>
-#include "pqComponentsExport.h"
+class pqDisplay;
 
-class QComboBox;
-class vtkSMProperty;
+class pqVTKLineChartModelInternal;
 
-/// combo box domain 
-/// observers the domain for a combo box and updates accordingly
-class PQCOMPONENTS_EXPORT pqComboBoxDomain : public QObject
+class PQCORE_EXPORT pqVTKLineChartModel : public pqLineChartModel
 {
-  Q_OBJECT
 public:
-  /// constructor requires a QComboBox, 
-  /// and the property with the domain to observe
-  /// the list of values in the combo box is automatically 
-  /// updated when the domain changes
-  pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, int idx = -1);
-  ~pqComboBoxDomain();
+  typedef pqLineChartModel Superclass;
 
-  // explicitly trigger a domain change.
-  // simply calls internalDomainChanged();
-  void forceDomainChanged() 
-    { this->internalDomainChanged(); }
+  pqVTKLineChartModel(QObject* parent=0);
+  virtual ~pqVTKLineChartModel();
 
-protected slots:
-  void internalDomainChanged();
-signals:
-  void domainChanged();
-protected:
-  class pqInternal;
-  pqInternal* Internal;
+  void update(QList<pqDisplay*>& visibleDisplays);
+
+  void update();
+
+  /// Removes all the plots from the model.
+  virtual void clearPlots();
+private:
+  pqVTKLineChartModel(const pqVTKLineChartModel&); // Not implemented.
+  void operator=(const pqVTKLineChartModel&); // Not implemented.
+
+  pqVTKLineChartModelInternal* Internal;
+
+  void createPlotsForDisplay(pqDisplay*);
 };
 
 #endif

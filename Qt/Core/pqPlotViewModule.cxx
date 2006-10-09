@@ -31,17 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPlotViewModule.h"
 
-#include "vtkSMProxy.h"
+#include "vtkDataSet.h"
 #include "vtkSMGenericViewDisplayProxy.h"
+#include "vtkSMProxy.h"
 
 #include <QtDebug>
 #include <QPointer>
 
+#include "pqDisplay.h"
+#include "pqHistogramChart.h"
 #include "pqHistogramWidget.h"
+#include "pqLineChart.h"
+#include "pqLineChartModel.h"
+#include "pqLineChartWidget.h"
 #include "pqPipelineSource.h"
 #include "pqVTKHistogramModel.h"
-#include "pqHistogramChart.h"
-#include "pqDisplay.h"
+#include "pqVTKLineChartModel.h"
 
 //-----------------------------------------------------------------------------
 class pqPlotViewModuleInternal
@@ -75,13 +80,24 @@ pqPlotViewModule::pqPlotViewModule(int type,
   case BAR_CHART:
       {
       pqHistogramWidget* widget = new pqHistogramWidget();
-      pqVTKHistogramModel* model = new pqVTKHistogramModel();
+      pqVTKHistogramModel* model = new pqVTKHistogramModel(this);
       widget->getHistogram().setModel(model);
       this->Internal->PlotWidget = widget;
       this->Internal->VTKModel = model;
       this->Internal->MaxNumberOfVisibleDisplays = 1;
-      break;
       }
+    break;
+
+  case XY_PLOT:
+      {
+      pqLineChartWidget* widget = new pqLineChartWidget();
+      pqVTKLineChartModel* model = new pqVTKLineChartModel(this);
+      widget->getLineChart().setModel(model);
+      this->Internal->PlotWidget = widget; 
+      this->Internal->VTKModel = model;
+      this->Internal->MaxNumberOfVisibleDisplays = -1;
+      }
+    break;
 
   default:
     qDebug() << "PlotType: " << type << " not supported yet.";
@@ -139,6 +155,8 @@ bool pqPlotViewModule::canDisplaySource(pqPipelineSource* source) const
   case BAR_CHART:
     return (source->getProxy()->GetXMLName() == QString("ExtractHistogram"));
 
+  case XY_PLOT:
+    return (source->getProxy()->GetXMLName() == QString("Probe2"));
     }
 
   return false;
@@ -177,7 +195,34 @@ void pqPlotViewModule::forceRender()
   case BAR_CHART:
     this->renderBarChar();
     break;
+
+  case XY_PLOT:
+    this->renderXYPlot();
+    break;
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqPlotViewModule::renderXYPlot()
+{
+  pqVTKLineChartModel* model = 
+    qobject_cast<pqVTKLineChartModel*>(this->Internal->VTKModel);
+  if (!model)
+    {
+    qDebug() << "Cannot locate pqVTKLineChartModel.";
+    return;
+    }
+
+  QList<pqDisplay*> displays = this->getDisplays();
+  QList<pqDisplay*> visibleDisplays;
+  foreach (pqDisplay* display, displays)
+    {
+    if (display->isVisible())
+      {
+      visibleDisplays.push_back(display);
+      }
+    }
+  model->update(visibleDisplays);
 }
 
 //-----------------------------------------------------------------------------

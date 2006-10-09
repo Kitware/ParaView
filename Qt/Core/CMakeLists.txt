@@ -41,6 +41,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqProxy.h
   pqRenderModule.h
   pqScalarBarDisplay.h
+  pqScalarBarVisibilityAdaptor.h
   pqScalarsToColors.h
   pqServer.h
   pqServerManagerModel.h
@@ -151,6 +152,8 @@ ADD_LIBRARY(pqCore
   pqRenderViewProxy.h
   pqScalarBarDisplay.cxx
   pqScalarBarDisplay.h
+  pqScalarBarVisibilityAdaptor.cxx
+  pqScalarBarVisibilityAdaptor.h
   pqScalarsToColors.cxx
   pqScalarsToColors.h
   pqSMAdaptor.cxx
@@ -194,6 +197,11 @@ ADD_LIBRARY(pqCore
   pqQVTKWidgetEventPlayer.h
   pqVTKHistogramModel.cxx
   pqVTKHistogramModel.h
+  pqVTKLineChartModel.cxx
+  pqVTKLineChartModel.h
+  pqVTKLineChartPlot.cxx
+  pqVTKLineChartPlot.h
+
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}

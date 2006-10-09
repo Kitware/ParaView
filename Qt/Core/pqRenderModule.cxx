@@ -160,7 +160,6 @@ pqRenderModule::pqRenderModule(const QString& name,
 
   this->Internal->Viewport = new QVTKWidget() 
     << pqSetName("Viewport");
-
   RenderModules.insert(this);
 
   this->Internal->Viewport->installEventFilter(this);

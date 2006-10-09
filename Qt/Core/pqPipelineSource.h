@@ -96,6 +96,9 @@ public:
   // render otherwise render on idle.
   void renderAllViews(bool force=false);
 
+  /// Sets default values for the underlying proxy. This is typically called
+  /// only on proxies created by the GUI itself.
+  void setDefaultValues();
 signals:
   /// fired when a connection is created between two pqPipelineSources.
   void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);

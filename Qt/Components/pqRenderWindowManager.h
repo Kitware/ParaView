@@ -62,6 +62,10 @@ public:
 
   // Loads the state for the render window manager.
   bool loadState(vtkPVXMLElement* rwRoot, vtkSMStateLoader* loader);
+
+  // This option is used for testing. When size.isEmpty() is true,
+  // it resets the maximum bounds on the render windows.
+  void setMaxRenderWindowSize(const QSize& size);
 signals:
   // Fired when the active render module changes.
   void activeRenderModuleChanged(pqRenderModule*);

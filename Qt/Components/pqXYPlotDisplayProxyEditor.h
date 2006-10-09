@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqComboBoxDomain.h
+   Module:    pqXYPlotDisplayProxyEditor.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,39 +29,37 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef __pqXYPlotDisplayProxyEditor_h
+#define __pqXYPlotDisplayProxyEditor_h
 
-#ifndef pq_ComboBoxDomain_h
-#define pq_ComboBoxDomain_h
-
-#include <QObject>
+#include <QWidget>
 #include "pqComponentsExport.h"
 
-class QComboBox;
-class vtkSMProperty;
+class pqDisplay;
 
-/// combo box domain 
-/// observers the domain for a combo box and updates accordingly
-class PQCOMPONENTS_EXPORT pqComboBoxDomain : public QObject
+class PQCOMPONENTS_EXPORT pqXYPlotDisplayProxyEditor : public QWidget
 {
   Q_OBJECT
 public:
-  /// constructor requires a QComboBox, 
-  /// and the property with the domain to observe
-  /// the list of values in the combo box is automatically 
-  /// updated when the domain changes
-  pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, int idx = -1);
-  ~pqComboBoxDomain();
+  pqXYPlotDisplayProxyEditor(QWidget* parent=0);
+  virtual ~pqXYPlotDisplayProxyEditor();
 
-  // explicitly trigger a domain change.
-  // simply calls internalDomainChanged();
-  void forceDomainChanged() 
-    { this->internalDomainChanged(); }
+  // Get/Set the display whose properties this editor is editing.
+  // This call will raise an error is the display is not
+  // an XYPlotDisplay2 proxy.
+  void setDisplay(pqDisplay* display);
+  pqDisplay* getDisplay();
 
 protected slots:
-  void internalDomainChanged();
-signals:
-  void domainChanged();
-protected:
+  // Called to render all views in which this display is visible.
+  void updateAllViews();
+
+  void yArraySelectionChanged();
+
+private:
+  pqXYPlotDisplayProxyEditor(const pqXYPlotDisplayProxyEditor&); // Not implemented.
+  void operator=(const pqXYPlotDisplayProxyEditor&); // Not implemented.
+
   class pqInternal;
   pqInternal* Internal;
 };

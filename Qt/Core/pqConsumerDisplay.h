@@ -53,6 +53,7 @@ public:
   // Get the source/filter of which this is a display.
   pqPipelineSource* getInput() const;
 
+  virtual void setDefaults();
 private slots:
   // called when input property on display changes. We must detect if
   // (and when) the display is connected to a new proxy.

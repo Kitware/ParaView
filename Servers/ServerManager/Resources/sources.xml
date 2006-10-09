@@ -448,6 +448,13 @@ The output of the Line source is polygonal data.
          default_values="6" >
         <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
+      <Hints>
+        <PropertyGroup type="LineSource" >
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+          <Property function="Resolution"          name="Resolution" />
+        </PropertyGroup>
+      </Hints>
    <!-- End Line -->
    </SourceProxy>
 

@@ -107,6 +107,11 @@ public:
   /// Returns the number of components for the given field.
   /// field is a string of format "<arrayname> (cell|point)".
   int getColorFieldNumberOfComponents(const QString& field);
+
+signals:
+  // emitted when colorByArray()/setColorField() is called.
+  void colorChanged();
+
 public slots:
   // If lookuptable is set up and is used for coloring,
   // then calling this method resets the table ranges to match the current 

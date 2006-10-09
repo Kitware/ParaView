@@ -475,6 +475,9 @@ pqPlotViewModule* pqPipelineBuilder::createPlotWindow(int type, pqServer* server
   case pqPlotViewModule::BAR_CHART:
     proxyname = "HistogramViewModule";
     break;
+  case pqPlotViewModule::XY_PLOT:
+    proxyname = "XYPlotViewModule";
+    break;
   default:
     qDebug() << "Cannot determine proxy to create for type: " << type;
     return 0;

@@ -88,6 +88,7 @@ private slots:
 protected:
   int Type;
   void renderBarChar();
+  void renderXYPlot();
 
 private:
   pqPlotViewModule(const pqPlotViewModule&); // Not implemented.

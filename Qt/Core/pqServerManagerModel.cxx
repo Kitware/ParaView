@@ -589,6 +589,10 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
       {
       type = pqPlotViewModule::BAR_CHART;
       }
+    else if (xmlType == "XYPlotViewModule")
+      {
+      type = pqPlotViewModule::XY_PLOT;
+      }
     else
       {
       qDebug() << "Don't know what kind of plot is a " << xmlType;

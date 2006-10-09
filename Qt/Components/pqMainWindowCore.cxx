@@ -2191,9 +2191,29 @@ void pqMainWindowCore::resetViewDirectionNegZ()
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindowCore::enableTestingRenderWindowSize(bool enable)
+{
+  this->setMaxRenderWindowSize(
+    enable? QSize(300, 300) : QSize(-1, -1));
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setMaxRenderWindowSize(const QSize& size)
+{
+  this->Implementation->MultiViewManager.setMaxRenderWindowSize(size);
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::createBarCharView()
 {
   /* pqPlotViewModule* barCharView = */
     pqApplicationCore::instance()->getPipelineBuilder()->createPlotWindow(
       pqPlotViewModule::BAR_CHART, this->getActiveServer());
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::createXYPlotView()
+{
+  pqApplicationCore::instance()->getPipelineBuilder()->createPlotWindow(
+    pqPlotViewModule::XY_PLOT, this->getActiveServer());
 }

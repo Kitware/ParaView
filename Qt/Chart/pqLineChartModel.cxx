@@ -189,6 +189,10 @@ void pqLineChartModel::movePlot(int current, int index)
 
 void pqLineChartModel::clearPlots()
 {
+  foreach (const pqLineChartPlot* plot, this->Internal->List)
+    {
+    QObject::disconnect(plot, 0, this, 0);
+    }
   this->Internal->List.clear();
   this->updateChartRanges();
   emit this->plotsReset();

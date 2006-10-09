@@ -36,29 +36,6 @@
      <string>&amp;Pipeline</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuHelp" >
-    <property name="title" >
-     <string>&amp;Help</string>
-    </property>
-    <addaction name="actionHelpAbout" />
-    <addaction name="actionHelpHelp" />
-    <addaction name="separator" />
-    <addaction name="actionHelpEnableTooltips" />
-   </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>&amp;Tools</string>
-    </property>
-    <addaction name="actionToolsCreateCustomFilter" />
-    <addaction name="actionToolsManageCustomFilters" />
-    <addaction name="separator" />
-    <addaction name="actionToolsDumpWidgetNames" />
-    <addaction name="actionToolsRecordTest" />
-    <addaction name="actionToolsRecordTestScreenshot" />
-    <addaction name="actionToolsPlayTest" />
-    <addaction name="separator" />
-    <addaction name="actionToolsPythonShell" />
-   </widget>
    <widget class="QMenu" name="menuFilters" >
     <property name="title" >
      <string>F&amp;ilters</string>
@@ -95,26 +72,6 @@
     <addaction name="separator" />
     <addaction name="actionFileExit" />
    </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <widget class="QMenu" name="menuAddPlot" >
-     <property name="title" >
-      <string>Add &amp;Plot</string>
-     </property>
-     <addaction name="actionHistogram" />
-    </widget>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="menuAddPlot" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
-   </widget>
    <widget class="QMenu" name="menuSources" >
     <property name="title" >
      <string>S&amp;ources</string>
@@ -137,6 +94,51 @@
     <addaction name="menuToolbars" />
     <addaction name="menuPlots" />
     <addaction name="separator" />
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <widget class="QMenu" name="menuAddPlot" >
+     <property name="title" >
+      <string>Add &amp;Plot</string>
+     </property>
+     <addaction name="actionHistogram" />
+     <addaction name="actionXY_Plot" />
+    </widget>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="menuAddPlot" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
+   </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionHelpAbout" />
+    <addaction name="actionHelpHelp" />
+    <addaction name="separator" />
+    <addaction name="actionHelpEnableTooltips" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionToolsCreateCustomFilter" />
+    <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="separator" />
+    <addaction name="actionToolsDumpWidgetNames" />
+    <addaction name="actionToolsRecordTest" />
+    <addaction name="actionToolsRecordTestScreenshot" />
+    <addaction name="actionToolsPlayTest" />
+    <addaction name="actionTesting_Window_Size" />
+    <addaction name="separator" />
+    <addaction name="actionToolsPythonShell" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -223,6 +225,8 @@
    <addaction name="separator" />
    <addaction name="actionServerConnect" />
    <addaction name="actionServerDisconnect" />
+   <addaction name="separator" />
+   <addaction name="actionScalarBarVisibility" />
    <addaction name="separator" />
    <addaction name="actionHelpHelp" />
   </widget>
@@ -398,6 +402,17 @@
    </property>
    <property name="text" >
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionScalarBarVisibility" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>SbV</string>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionServerConnect" >
@@ -755,6 +770,22 @@
   <action name="actionHistogram" >
    <property name="text" >
     <string>&amp;Histogram</string>
+   </property>
+  </action>
+  <action name="actionXY_Plot" >
+   <property name="text" >
+    <string>XY &amp;Plot</string>
+   </property>
+  </action>
+  <action name="actionTesting_Window_Size" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Max Window Size: 300x300</string>
    </property>
   </action>
  </widget>

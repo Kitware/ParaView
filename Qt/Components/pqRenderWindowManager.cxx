@@ -83,6 +83,7 @@ public:
   QSet<QPointer<pqMultiViewFrame> > Frames;
 
   QList<QPointer<pqRenderModule> > PendingRenderModules;
+  QSize MaxRenderWindowSize;
 
   pqRenderModule* getRenderModuleToAllocate()
     {
@@ -106,7 +107,8 @@ pqRenderWindowManager::pqRenderWindowManager(QWidget* _parent/*=null*/)
   : pqMultiView(_parent)
 {
   this->Internal = new pqRenderWindowManagerInternal();
-
+  this->Internal->MaxRenderWindowSize = 
+    QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   pqServerManagerModel* smModel = pqServerManagerModel::instance();
   if (!smModel)
     {
@@ -175,6 +177,7 @@ void pqRenderWindowManager::onFrameAdded(pqMultiViewFrame* frame)
   rm->setWindowParent(frame);
   frame->setMainWidget(rm->getWidget());
   rm->getWidget()->installEventFilter(this);
+  rm->getWidget()->setMaximumSize(this->Internal->MaxRenderWindowSize);
 
   QSignalMapper* sm = new QSignalMapper(frame);
   sm->setMapping(frame, frame);
@@ -369,6 +372,16 @@ bool pqRenderWindowManager::eventFilter(QObject* caller, QEvent* e)
       }
     }
   return QObject::eventFilter(caller, e);
+}
+//-----------------------------------------------------------------------------
+void pqRenderWindowManager::setMaxRenderWindowSize(const QSize& size)
+{
+  this->Internal->MaxRenderWindowSize = size.isEmpty()?
+      QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX) : size;
+  foreach (pqMultiViewFrame* frame, this->Internal->Frames)
+    {
+    frame->mainWidget()->setMaximumSize(this->Internal->MaxRenderWindowSize);
+    }
 }
 
 //-----------------------------------------------------------------------------

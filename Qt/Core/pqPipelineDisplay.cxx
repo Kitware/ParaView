@@ -240,6 +240,7 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     pqSMAdaptor::setElementProperty(
       displayProxy->GetProperty("ScalarVisibility"), 0);
     displayProxy->UpdateVTKObjects();
+    emit this->colorChanged();
     return;
     }
 
@@ -278,6 +279,7 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     pqSMAdaptor::setElementProperty(
       displayProxy->GetProperty("ScalarVisibility"), 0);
     displayProxy->UpdateVTKObjects();
+    emit this->colorChanged();
     return;
     }
 
@@ -321,6 +323,7 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
   displayProxy->UpdateVTKObjects();
 
   this->updateLookupTableScalarRange();
+  emit this->colorChanged();
 }
 
 //-----------------------------------------------------------------------------

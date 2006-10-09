@@ -98,7 +98,9 @@
     </Category>
     <Category name="Quantitative">
       <Filter name="Calculator" />
-      <Filter name="Probe" />
+      <Filter name="DataAnalysis" />
+      <Filter name="ExtractHistogram" />
+      <Filter name="Probe2" />
       <Filter name="StreamTracer" />
     </Category>
     <Category name="Tensors" />

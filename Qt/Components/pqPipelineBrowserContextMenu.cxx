@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderModule.h"
 #include "pqServer.h"
 #include "pqUndoStack.h"
+#include "pqXYPlotDisplayProxyEditor.h"
 
 #include <QDialog>
 #include <QPushButton>
@@ -157,20 +158,34 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   QVBoxLayout* l = new QVBoxLayout(&dialog);
   l->setMargin(0);
   l->setSpacing(6);
-  pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(&dialog);
-  pqPipelineDisplay* display = 
-    qobject_cast<pqPipelineDisplay*>(source->getDisplay(
-      this->Browser->getViewModule()));
+  pqDisplay* display = source->getDisplay(this->Browser->getViewModule());
   if (!display)
     {
     // If display doesn't exist, as far as the user is concerned, it simply
     // means the source is not visible. Create a new hidden display 
     // and show its properties.
-    display = qobject_cast<pqPipelineDisplay*>(
-      this->Browser->createDisplay(source, false));
+    display = this->Browser->createDisplay(source, false);
     }
-  editor->setDisplay(display);
-  l->addWidget(editor);
+  if (!display)
+    {
+    // no display properties to show.
+    return;
+    }
+
+  pqPipelineDisplay* pipelineDisplay = 
+    qobject_cast<pqPipelineDisplay*>(display);
+  if (pipelineDisplay)
+    {
+    pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(&dialog);
+    editor->setDisplay(pipelineDisplay);
+    l->addWidget(editor);
+    }
+  else 
+    {
+    pqXYPlotDisplayProxyEditor* editor = new pqXYPlotDisplayProxyEditor(&dialog);
+    editor->setDisplay(display);
+    l->addWidget(editor);
+    }
 
   QHBoxLayout* hl = new QHBoxLayout;
   hl->setMargin(6);

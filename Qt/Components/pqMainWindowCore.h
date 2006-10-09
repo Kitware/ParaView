@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkIOStream.h>
 
 #include <QObject>
-
+class QSize;
 class pqGenericViewModule;
 class pqMultiView;
 class pqObjectInspectorWidget;
@@ -302,6 +302,13 @@ public slots:
 
   // Create New Plot Views.
   void createBarCharView();
+  void createXYPlotView();
+
+  // This option is used for testing. Sets the maximum size for
+  // all render windows. When size.isEmpty() is true,
+  // it resets the maximum bounds on the render windows.
+  void setMaxRenderWindowSize(const QSize& size);
+  void enableTestingRenderWindowSize(bool enable);
 
 private slots:
   void onCreateSource(QAction*);

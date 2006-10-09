@@ -215,6 +215,7 @@ void pqSignalAdaptorProxyList::initialize3DWidget()
     this->Internal->WidgetFrame->hide();
     if (this->Internal->ActiveWidget)
       {
+      this->Internal->ActiveWidget->hide();
       this->Internal->ActiveWidget->setRenderModule(0);
       this->Internal->ActiveWidget->deselect();
       this->Internal->ActiveWidget = 0;
@@ -231,6 +232,8 @@ void pqSignalAdaptorProxyList::initialize3DWidget()
       this->Internal->WidgetFrame->hide();
         if (this->Internal->ActiveWidget)
           {
+          this->Internal->ActiveWidget->hide();
+          this->Internal->ActiveWidget->setRenderModule(0);
           this->Internal->ActiveWidget->deselect();
           this->Internal->ActiveWidget = 0;
           }
@@ -251,6 +254,9 @@ void pqSignalAdaptorProxyList::initialize3DWidget()
   else if (this->Internal->ActiveWidget)
     {
     this->Internal->ActiveWidget->deselect();
+    this->Internal->ActiveWidget->hide();
+    this->Internal->ActiveWidget->setRenderModule(0);
+    this->Internal->ActiveWidget = 0;
     }
 
   this->Internal->ActiveWidget = widget3D;
@@ -258,6 +264,7 @@ void pqSignalAdaptorProxyList::initialize3DWidget()
   this->Internal->WidgetFrame->setProperty("title", 
     QString(smProxy->GetXMLName()) + " Widget");
   this->Internal->WidgetFrame->show();
+  this->Internal->ActiveWidget->show();
 }
 
 //-----------------------------------------------------------------------------

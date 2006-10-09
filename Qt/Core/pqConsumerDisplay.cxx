@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
+#include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
 class pqConsumerDisplayInternal
@@ -144,4 +145,34 @@ void pqConsumerDisplay::onInputChanged()
 }
 
 //-----------------------------------------------------------------------------
+void pqConsumerDisplay::setDefaults()
+{
+  // Setup default display parameters.
+  // This is more of a catch-all method. All different displays that
+  // don;t have special classes setup their defaults here.
+  vtkSMProxy* proxy = this->getProxy();
+
+  // defaults for XY Plot displays.
+  if (proxy->GetXMLName() == QString("XYPlotDisplay2"))
+    {
+    proxy->GetProperty("Input")->UpdateDependentDomains();
+    vtkSMProperty* prop = proxy->GetProperty("XArrayName");
+
+    QList<QString> input_scalars = 
+      pqSMAdaptor::getFieldSelectionScalarDomain(prop);
+    if (input_scalars.size() > 0)
+      {
+      pqSMAdaptor::setElementProperty(prop, input_scalars[0]);
+      }
+    QList<QVariant> vscalars;
+    foreach(QString val, input_scalars)
+      {
+      vscalars.push_back(val);
+      }
+    pqSMAdaptor::setMultipleElementProperty(
+        proxy->GetProperty("YArrayNames"), vscalars);
+    proxy->UpdateVTKObjects();
+    }
+}
+
 //-----------------------------------------------------------------------------

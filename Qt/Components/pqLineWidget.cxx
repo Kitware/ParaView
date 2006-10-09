@@ -211,11 +211,13 @@ void pqLineWidget::createWidget(pqServer* server)
 {
   vtkSMNew3DWidgetProxy* const widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-      get3DWidget("LineWidgetDisplay", server);
+      get3DWidget("LineSourceWidgetDisplay", server);
   this->setWidgetProxy(widget);
   
-  this->Implementation->WidgetPoint1 = vtkSMDoubleVectorProperty::SafeDownCast(widget->GetProperty("Point1WorldPosition"));
-  this->Implementation->WidgetPoint2 = vtkSMDoubleVectorProperty::SafeDownCast(widget->GetProperty("Point2WorldPosition"));
+  this->Implementation->WidgetPoint1 = vtkSMDoubleVectorProperty::SafeDownCast(
+    widget->GetProperty("Point1WorldPosition"));
+  this->Implementation->WidgetPoint2 = vtkSMDoubleVectorProperty::SafeDownCast(
+    widget->GetProperty("Point2WorldPosition"));
 
   pqSignalAdaptorDouble* adaptor = new pqSignalAdaptorDouble(
     this->Implementation->UI.point1X, "text",

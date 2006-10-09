@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqComboBoxDomain.h
+   Module:    pqScalarBarVisibilityAdaptor.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,42 +29,56 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-#ifndef pq_ComboBoxDomain_h
-#define pq_ComboBoxDomain_h
+#ifndef __pqScalarBarVisibilityAdaptor_h
+#define __pqScalarBarVisibilityAdaptor_h
 
 #include <QObject>
-#include "pqComponentsExport.h"
+#include "pqCoreExport.h"
 
-class QComboBox;
-class vtkSMProperty;
+class pqPipelineSource;
+class pqRenderModule;
+class QAction;
 
-/// combo box domain 
-/// observers the domain for a combo box and updates accordingly
-class PQCOMPONENTS_EXPORT pqComboBoxDomain : public QObject
+// pqScalarBarVisibilityAdaptor is an adptor that can be hooked on to
+// any action to make it control the scalar bar 
+// visibility of the scalar bar for the selected source 
+// in the selected render window.
+class PQCORE_EXPORT pqScalarBarVisibilityAdaptor : public QObject
 {
   Q_OBJECT
 public:
-  /// constructor requires a QComboBox, 
-  /// and the property with the domain to observe
-  /// the list of values in the combo box is automatically 
-  /// updated when the domain changes
-  pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, int idx = -1);
-  ~pqComboBoxDomain();
+  pqScalarBarVisibilityAdaptor(QAction* parent=0);
+  virtual ~pqScalarBarVisibilityAdaptor();
 
-  // explicitly trigger a domain change.
-  // simply calls internalDomainChanged();
-  void forceDomainChanged() 
-    { this->internalDomainChanged(); }
+signals:
+  // Fired when to indicate if the visibility of the scalar bar can
+  // be changed in the current setup.
+  void canChangeVisibility(bool);
+
+  // Fired to update the scalarbar visibility state.
+  void scalarBarVisible(bool);
+
+public slots:
+   
+  // set the active source.
+  void setActiveSource(pqPipelineSource* source);
+
+  // set the active view.
+  void setActiveRenderModule(pqRenderModule* rm);
 
 protected slots:
-  void internalDomainChanged();
-signals:
-  void domainChanged();
-protected:
+  void updateEnableState();
+  void setScalarBarVisibility(bool visible);
+
+private:
+  pqScalarBarVisibilityAdaptor(const pqScalarBarVisibilityAdaptor&); // Not implemented.
+  void operator=(const pqScalarBarVisibilityAdaptor&); // Not implemented.
+
   class pqInternal;
   pqInternal* Internal;
+  void updateDisplay();
 };
+
 
 #endif
 

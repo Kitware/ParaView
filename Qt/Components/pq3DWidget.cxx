@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView GUI includes.
 #include "pqApplicationCore.h"
 #include "pqImplicitPlaneWidget.h"
+#include "pqLineSourceWidget.h"
 #include "pqPipelineSource.h"
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
@@ -123,6 +124,10 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* proxy)
         {
         widget = new pqPointSourceWidget(0);
         }
+      else if (widgetType == "LineSource")
+        {
+        widget = new pqLineSourceWidget(0);
+        }
 
       if (widget)
         {
@@ -143,6 +148,9 @@ void pq3DWidget::setRenderModule(pqRenderModule* renModule)
     return;
     }
 
+  bool cur_visbility = this->widgetVisible();
+  this->hideWidget();
+
   vtkSMProxy* widget = this->getWidgetProxy();
   if (this->Internal->RenderModule && widget)
     {
@@ -152,7 +160,6 @@ void pq3DWidget::setRenderModule(pqRenderModule* renModule)
       {
       pp->RemoveProxy(widget);
       rm->UpdateVTKObjects();
-      this->Internal->RenderModule->render();
       }
     }
   this->Internal->RenderModule = renModule;
@@ -164,8 +171,11 @@ void pq3DWidget::setRenderModule(pqRenderModule* renModule)
       {
       pp->AddProxy(widget);
       rm->UpdateVTKObjects();
-      this->Internal->RenderModule->render();
       }
+    }
+  if (cur_visbility)
+    {
+    this->showWidget();
     }
 }
 
@@ -384,7 +394,7 @@ void pq3DWidget::select()
   if(true != this->Internal->Selected)
     {
     this->Internal->Selected = true;
-    updateWidgetVisibility();
+    this->updateWidgetVisibility();
     }
 }
 
@@ -394,7 +404,7 @@ void pq3DWidget::deselect()
   if(false != this->Internal->Selected)
     {
     this->Internal->Selected = false;
-    updateWidgetVisibility();
+    this->updateWidgetVisibility();
     }
 }
 
@@ -404,7 +414,7 @@ void pq3DWidget::setWidgetVisible(bool visible)
   if(visible != this->Internal->WidgetVisible)
     {
     this->Internal->WidgetVisible = visible;
-    updateWidgetVisibility();
+    this->updateWidgetVisibility();
     
     emit this->widgetVisibilityChanged(visible);
     }
@@ -438,6 +448,10 @@ void pq3DWidget::updateWidgetVisibility()
       {
       visibility->SetElement(0, widget_visible);
       }
+    // It is essential that Visibility state is pushed before Enabled
+    // since vtkAbstractWidget::SetEnabled(true) has no effect
+    // if vtkAbstractWidget::Visibility == false.
+    this->Internal->WidgetProxy->UpdateVTKObjects();
 
     if(vtkSMIntVectorProperty* const enabled =
       vtkSMIntVectorProperty::SafeDownCast(
@@ -447,6 +461,10 @@ void pq3DWidget::updateWidgetVisibility()
       }
 
     this->Internal->WidgetProxy->UpdateVTKObjects();
-    pqApplicationCore::instance()->render();
+
+    // We don't need to explicitly call a render here since the 
+    // vtkAbstractWidget render the views when enable/visibily 
+    // state changes.
+    //pqApplicationCore::instance()->render();
     }
 }

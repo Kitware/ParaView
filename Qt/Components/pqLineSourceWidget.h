@@ -51,6 +51,12 @@ public:
 
   void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2, vtkSMProperty* resolution);
 
+  /// Subclasses can override this method to map properties to
+  /// GUI. Default implementation updates the internal datastructures
+  /// so that default implementations can be provided for 
+  /// accept/reset.
+  virtual void setControlledProperty(const char* function,
+    vtkSMProperty * controlled_property);
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

@@ -121,7 +121,7 @@ public:
   void movePlot(int current, int index);
 
   /// Removes all the plots from the model.
-  void clearPlots();
+  virtual void clearPlots();
   //@}
 
   /// \name Chart Range Methods

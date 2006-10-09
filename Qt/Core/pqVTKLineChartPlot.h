@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqVTKHistogramModel.h
+   Module:    pqVTKLineChartPlot.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,60 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef __pqVTKLineChartPlot_h
+#define __pqVTKLineChartPlot_h
 
-#ifndef _pqVTKHistogramModel_h
-#define _pqVTKHistogramModel_h
-
-
-#include "pqHistogramModel.h"
+#include "pqLineChartPlot.h"
 #include "pqCoreExport.h"
 
-class pqVTKHistogramModelInternal;
 class vtkRectilinearGrid;
-class vtkDataObject;
+class pqVTKLineChartPlotInternal;
 
-
-class PQCORE_EXPORT pqVTKHistogramModel : public pqHistogramModel
+class PQCORE_EXPORT pqVTKLineChartPlot : public pqLineChartPlot
 {
 public:
-  pqVTKHistogramModel(QObject *parent=0);
-  virtual ~pqVTKHistogramModel();
+  pqVTKLineChartPlot(vtkRectilinearGrid* dataset, QObject* parent);
+  virtual ~pqVTKLineChartPlot();
 
-  /// \name pqHistogramModel Methods
-  //@{
-  virtual int getNumberOfBins() const;
-  virtual void getBinValue(int index, pqChartValue &bin) const;
+  // pqLineChartPlot API.
+  virtual int getNumberOfSeries() const;
+  virtual int getTotalNumberOfPoints() const;
+  virtual SeriesType getSeriesType(int series) const;
+  virtual int getNumberOfPoints(int series) const;
+  virtual void getPoint(int series, int index,
+    pqChartCoordinate &coord) const;
+  virtual void getErrorBounds(int series, int index, pqChartValue &upper,
+    pqChartValue &lower) const;
+  virtual void getErrorWidth(int series, pqChartValue &width) const;
 
   virtual void getRangeX(pqChartValue &min, pqChartValue &max) const;
-
   virtual void getRangeY(pqChartValue &min, pqChartValue &max) const;
-  //@}
 
-  /// Fetches the histogram data from the pipeline.
-  void updateData(vtkRectilinearGrid *data);
-  void updateData(vtkDataObject* data);
 
   void update();
   void forceUpdate();
+
+  void setYArray(const QString& arrayname);
+  void setXArray(const QString& arrayname);
+  enum XAxisModes
+    {
+    INDEX = 0,
+    DATA_ARRAY = 1,
+    ARC_LENGTH=2
+    };
+  void setXAxisMode(int mode);
 private:
-  pqVTKHistogramModelInternal *Internal; ///< Stores the data bounds.
-  vtkRectilinearGrid *Data;              ///< A pointer to the data.
+  pqVTKLineChartPlot(const pqVTKLineChartPlot&); // Not implemented.
+  void operator=(const pqVTKLineChartPlot&); // Not implemented.
+
+  pqVTKLineChartPlotInternal* Internal;
+
+  double getXPoint(int index) const;
+  double getYPoint(int index) const;
+
+  // This method returns the arrayname set by calling setXArray() if mode is
+  // DATA_ARRAY/INDEX, if mode is ARC_LENGTH returns "arc_length".
+  QString getXArrayNameToUse() const;
 };
 
 #endif

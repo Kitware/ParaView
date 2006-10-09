@@ -157,7 +157,6 @@ protected:
 
 private:
   void updateWidgetVisibility();
-  
   pq3DWidgetInternal* const Internal;
 };
 

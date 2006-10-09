@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqProxyTabWidget.h>
 #include <pqRecentFilesMenu.h>
 #include <pqRenderWindowManager.h>
+#include <pqScalarBarVisibilityAdaptor.h>
 #include <pqSelectionManager.h>
 #include <pqSetName.h>
 #include <pqSettings.h>
@@ -342,6 +343,9 @@ MainWindow::MainWindow() :
   connect(
     this->Implementation->UI.actionHistogram, SIGNAL(triggered()),
     &this->Implementation->Core, SLOT(createBarCharView()));
+  connect(
+    this->Implementation->UI.actionXY_Plot, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(createXYPlotView()));
 
   connect(
     &this->Implementation->Core, SIGNAL(plotAdded(pqPlotViewModule*)),
@@ -406,7 +410,12 @@ MainWindow::MainWindow() :
     this->Implementation->UI.menuAddPlot,
     SLOT(setEnabled(bool)));
       
-    
+  QObject::connect(
+    this->Implementation->UI.actionTesting_Window_Size,
+    SIGNAL(toggled(bool)),
+    &this->Implementation->Core,
+    SLOT(enableTestingRenderWindowSize(bool)));
+
   this->Implementation->Core.setupStatisticsView(
     this->Implementation->UI.statisticsViewDock);
     
@@ -563,6 +572,17 @@ MainWindow::MainWindow() :
     pqApplicationCore::instance()->getUndoStack()->CanRedo());
   this->onUndoLabel(pqApplicationCore::instance()->getUndoStack()->UndoLabel());
   this->onRedoLabel(pqApplicationCore::instance()->getUndoStack()->RedoLabel());
+
+  // Set up scalar bar visibility tool bar item.
+  pqScalarBarVisibilityAdaptor* sbva = new pqScalarBarVisibilityAdaptor(
+      this->Implementation->UI.actionScalarBarVisibility);
+  QObject::connect(
+    &this->Implementation->Core, SIGNAL(activeSourceChanged(pqPipelineSource*)),
+    sbva, SLOT(setActiveSource(pqPipelineSource*)));
+  QObject::connect(
+    &this->Implementation->Core, SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+    sbva, SLOT(setActiveRenderModule(pqRenderModule*)));
+
 
   // Restore the state of the window ...
   pqApplicationCore::instance()->settings()->restoreState("MainWindow", *this);

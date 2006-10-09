@@ -601,6 +601,7 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
 
   if(filter)
     {
+    filter->setDefaultValues();
     this->getPipelineBuilder()->addConnection(input, filter);
 
     // As a special-case, set a default implicit function for new Cut filters
@@ -627,7 +628,7 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
       double min_value = 0.0;
       double max_value = 0.0;
 
-      SetDefaultInputArray(filter->getProxy(), "SelectInputScalars");
+      ::SetDefaultInputArray(filter->getProxy(), "SelectInputScalars");
 
       if(vtkSMDoubleVectorProperty* const contours =
         vtkSMDoubleVectorProperty::SafeDownCast(
@@ -652,7 +653,7 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
     // As a special-case, set a default point source for new StreamTracer filters
     if(xmlname == "StreamTracer")
       {
-      SetDefaultInputArray(filter->getProxy(), "SelectInputVectors");
+      ::SetDefaultInputArray(filter->getProxy(), "SelectInputVectors");
       }
     }
     

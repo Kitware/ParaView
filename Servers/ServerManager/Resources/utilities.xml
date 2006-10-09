@@ -787,6 +787,12 @@
                          default_values="0">
         <BooleanDomain/>
       </IntVectorProperty>
+      <IntVectorProperty name="Visibility" 
+                         command="SetVisibility"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain/>
+      </IntVectorProperty>
     </Proxy>
 
   </ProxyGroup>

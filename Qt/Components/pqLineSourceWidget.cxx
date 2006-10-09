@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkSMProxyProperty.h>
 #include <vtkSMSourceProxy.h>
+#include <vtkSMNew3DWidgetProxy.h>
 
 /////////////////////////////////////////////////////////////////////////
 // pqLineSourceWidget::pqImplementation
@@ -87,12 +88,15 @@ pqLineSourceWidget::pqLineSourceWidget(QWidget* p) :
     this, SIGNAL(widgetChanged()));
 }
 
+//-----------------------------------------------------------------------------
 pqLineSourceWidget::~pqLineSourceWidget()
 {
   delete this->Implementation;
 }
 
-void pqLineSourceWidget::setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2, vtkSMProperty* resolution)
+//-----------------------------------------------------------------------------
+void pqLineSourceWidget::setControlledProperties(vtkSMProperty* point1, 
+  vtkSMProperty* point2, vtkSMProperty* resolution)
 {
   Superclass::setControlledProperties(point1, point2);
   
@@ -100,5 +104,20 @@ void pqLineSourceWidget::setControlledProperties(vtkSMProperty* point1, vtkSMPro
     this->Implementation->UI.resolution, "value", 
     SIGNAL(valueChanged(int)),
     this->getControlledProxy(), resolution);
+}
+
+//-----------------------------------------------------------------------------
+void pqLineSourceWidget::setControlledProperty(const char* function,
+  vtkSMProperty* _property)
+{
+  if (strcmp(function, "Resolution") == 0)
+    {
+    this->Implementation->Links.addPropertyLink(
+      this->Implementation->UI.resolution, "value", 
+      SIGNAL(valueChanged(int)),
+      this->getWidgetProxy(), 
+      this->getWidgetProxy()->GetProperty("Resolution"));
+    }
+  this->Superclass::setControlledProperty(function, _property);
 }
 
