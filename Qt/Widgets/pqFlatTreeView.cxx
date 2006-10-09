@@ -143,6 +143,10 @@ pqFlatTreeView::pqFlatTreeView(QWidget *p)
   this->ManageSizes = true;
   this->InUpdateWidth = false;
 
+  // Set the default edit triggers.
+  this->setEditTriggers(QAbstractItemView::SelectedClicked |
+      QAbstractItemView::EditKeyPressed);
+
   // Set up the default header view.
   QHeaderView *headerView = new QHeaderView(Qt::Horizontal, this->viewport());
   headerView->setClickable(false);
