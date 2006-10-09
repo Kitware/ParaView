@@ -305,6 +305,8 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
                    SIGNAL(sourceCreated(pqPipelineSource*)),
                    this, 
                    SLOT(onSourceCreated(pqPipelineSource*)));
+  QObject::connect(core, SIGNAL(postSourceCreated(pqPipelineSource*)),
+                   this, SLOT(setActiveSource(pqPipelineSource*)));
   
   QObject::connect(this, SIGNAL(activeSourceChanged(pqPipelineSource*)),
                    &this->VCRController(), SLOT(setSource(pqPipelineSource*)));
@@ -2017,7 +2019,6 @@ void pqMainWindowCore::onSourceCreated(pqPipelineSource* source)
 
   pqApplicationCore::instance()->getPendingDisplayManager()->
         addPendingDisplayForSource(source);
-  this->setActiveSource(source);
 }
 
 //-----------------------------------------------------------------------------

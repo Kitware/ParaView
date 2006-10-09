@@ -607,8 +607,6 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
     // As a special-case, set a default implicit function for new Cut filters
     if(xmlname == "Cut")
       {
-      this->Internal->UndoStack->BeginUndoSet("Set CutConnection");
-      
       if(vtkSMDoubleVectorProperty* const contours =
         vtkSMDoubleVectorProperty::SafeDownCast(
           filter->getProxy()->GetProperty("ContourValues")))
@@ -616,11 +614,7 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
         contours->SetNumberOfElements(1);
         contours->SetElement(0, 0.0);
         }
-        
-      this->getUndoStack()->EndUndoSet();
       }
-
-    emit this->sourceCreated(filter);
 
     // As a special-case, set the default contour for new Contour filters
     if(xmlname == "Contour")
@@ -655,10 +649,12 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
       {
       ::SetDefaultInputArray(filter->getProxy(), "SelectInputVectors");
       }
+
+    emit this->sourceCreated(filter);
     }
     
   this->getUndoStack()->EndUndoSet();
-  
+  emit this->postSourceCreated(filter);
   return filter;
 }
 
@@ -681,6 +677,7 @@ pqPipelineSource* pqApplicationCore::createSourceOnServer(const QString& xmlname
   emit this->sourceCreated(source);
   this->getUndoStack()->EndUndoSet();
   
+  emit this->postSourceCreated(source);
   return source;
 }
 
@@ -720,6 +717,7 @@ pqPipelineSource* pqApplicationCore::createCompoundFilter(
     }
 
   this->getUndoStack()->EndUndoSet();
+  emit this->postSourceCreated(source);
   return source;
 }
 
@@ -799,6 +797,7 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
 
   emit this->sourceCreated(reader);
   this->getUndoStack()->EndUndoSet();
+  emit this->postSourceCreated(reader);
   return reader;
 }
 

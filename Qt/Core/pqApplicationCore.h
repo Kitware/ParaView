@@ -172,6 +172,14 @@ signals:
   
   void sourceCreated(pqPipelineSource*);
 
+  // sourceCreated is fired while the source creation undo 
+  // element is still active. On the contrary, this signal
+  // is fired after the undo stack is closed. This is
+  // signal to listen to for updated object panels etc which
+  // are usually consequence on non-undoable action such
+  // as selecting a source in the panel etc etc.
+  void postSourceCreated(pqPipelineSource*);
+
 protected:
   /// create signal/slot connections between pdata and smModel.
   void connect(pqServerManagerObserver* pdata, pqServerManagerModel* smModel);
