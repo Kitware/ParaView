@@ -1861,6 +1861,13 @@
       <!-- Add non-command properties that will help
           keep client-only Histogram properties in SM such as colors etc etc -->
     </ViewModuleProxy>
+
+    <ViewModuleProxy name="XYPlotViewModule"
+      base_proxygroup="rendermodules" base_proxyname="ViewModule"
+      display_name="XYPlotDisplay2">
+      <!-- Add non-command properties that will help
+          keep client-only Histogram properties in SM such as colors etc etc -->
+    </ViewModuleProxy>
     <!-- End ProxyGroup plotmodules -->
   </ProxyGroup>
   
@@ -3154,19 +3161,33 @@
       </SubProxy>
     </New3DWidgetProxy>
 
+    <New3DWidgetProxy name="LineSourceWidgetDisplay"
+      base_proxygroup="displays" base_proxyname="LineWidgetDisplay">
+      <!-- 
+        This is same as LineWidgetDisplay except that it provides
+        dummy property for the resolution for the line source. 
+      -->
+      <IntVectorProperty
+        name="Resolution"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+    </New3DWidgetProxy>
+
     <New3DWidgetProxy name="ImplicitPlaneWidgetDisplay">
       <SubProxy>
         <Proxy name="Prop"
           proxygroup="props" proxyname="ImplicitPlaneRepresentation">
         </Proxy>
         <ExposedProperties>
-          <Property name="Visibility" />
           <Property name="DrawPlane" />
           <Property name="OriginInfo" />
           <Property name="Origin" />
           <Property name="NormalInfo" />
           <Property name="Normal" />
           <Property name="PlaceWidget" />
+          <Property name="Visibility" />
         </ExposedProperties>
       </SubProxy>
 
@@ -3177,6 +3198,11 @@
         <ExposedProperties>
           <Property name="Enabled" />
         </ExposedProperties>
+        <ShareProperties subproxy="Prop">
+          <!-- We share the Visibility property between the widget 
+              and the representation. -->
+          <Exception name="Enabled" />
+        </ShareProperties>
       </SubProxy>
     </New3DWidgetProxy>
 
@@ -3270,6 +3296,98 @@
       base_proxygroup="displays" base_proxyname="GenericViewDisplay">
     </GenericViewDisplayProxy>
 
+    <GenericViewDisplayProxy name="XYPlotDisplay2">
+
+       <InputProperty name="Input"
+        command="SetInput-not-used"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+          <Group name="glyph_sources" />
+        </ProxyGroupDomain>
+        <InputArrayDomain name="input_array" attribute_type="point"
+                          number_of_components="1"/>
+      </InputProperty>
+
+      <Property name="Update"
+        command="Update"
+        is_internal="1"
+        update_self="1">
+      </Property>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ReductionType"
+        command="SetReductionType"
+        default_values="1"
+        number_of_elements="1"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="ADD" />
+          <Entry value="1" text="POLYDATA_APPEND" />
+          <Entry value="2" text="UNSTRUCTURED_APPEND" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="YArrayNames"
+         repeat_command="1"
+         number_of_elements="0">
+         <!-- This state property will save the list of selected arrays
+              that are plotted. -->
+          <ArrayListDomain name="array_list" attribute_type="Scalars">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty> 
+
+      <StringVectorProperty name="XArrayName"
+         number_of_elements="1">
+         <!-- Set the array to use on X axis. This is used only if
+          XAxisMode is set to DataArray. -->
+          <ArrayListDomain name="array_list" attribute_type="Scalars">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="XAxisMode" 
+         number_of_elements="1"
+         default_values="0">
+         <EnumerationDomain name="enum">
+          <Entry value="0" text="Index" />
+          <Entry value="1" text="DataArray" />
+          <Entry value="2" text="Arc Length" />
+         </EnumerationDomain>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressor" 
+          proxygroup="filters" proxyname="UpdateSuppressor" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="ClientServerMoveData">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Reduce" proxygroup="filters" proxyname="ReductionFilter">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="PostProcessor" 
+          proxygroup="filters" proxyname="PolyLineToRectilinearGrid">
+        </Proxy>
+      </SubProxy>
+    </GenericViewDisplayProxy>
     <!-- End of view displays group -->
   </ProxyGroup>
 

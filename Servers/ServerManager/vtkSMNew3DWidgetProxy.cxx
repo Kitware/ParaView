@@ -33,7 +33,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNew3DWidgetProxy);
-vtkCxxRevisionMacro(vtkSMNew3DWidgetProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMNew3DWidgetProxy, "1.6");
 
 class vtkSMNew3DWidgetObserver : public vtkCommand
 {
@@ -96,7 +96,6 @@ vtkSMNew3DWidgetProxy::~vtkSMNew3DWidgetProxy()
 void vtkSMNew3DWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
   this->Superclass::AddToRenderModule(rm);
-
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (this->WidgetProxy)
     {
@@ -119,19 +118,15 @@ void vtkSMNew3DWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
       this->RepresentationProxy->UpdateProperty("Renderer");
       }
     }
-  this->SetEnabled(1);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMNew3DWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  this->Superclass::RemoveFromRenderModule(rm);
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (this->WidgetProxy)
     {
-    this->SetEnabled(0);
-
     vtkAbstractWidget* widget = vtkAbstractWidget::SafeDownCast(
       pm->GetObjectFromID(this->WidgetProxy->GetID(0)));
     if (this->Widget)
@@ -151,6 +146,7 @@ void vtkSMNew3DWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
       this->RepresentationProxy->UpdateProperty("Renderer");
       }
     }
+  this->Superclass::RemoveFromRenderModule(rm);
 }
 
 //-----------------------------------------------------------------------------

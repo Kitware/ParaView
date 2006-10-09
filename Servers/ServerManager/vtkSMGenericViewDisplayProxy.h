@@ -101,6 +101,7 @@ private:
   vtkSMProxy* CollectProxy;
   vtkSMProxy *UpdateSuppressorProxy;
   vtkSMProxy* ReduceProxy;
+  vtkSMProxy* PostProcessorProxy;
 
   int CanCreateProxy;
   int CollectionDecision;

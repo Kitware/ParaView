@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.9");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -81,6 +81,12 @@ void vtkSMGenericViewDisplayProxy::CreateVTKObjects(int numObjects)
 
   this->ReduceProxy =  this->GetSubProxy("Reduce");
   this->ReduceProxy->SetServers(this->Servers);
+
+  this->PostProcessorProxy = this->GetSubProxy("PostProcessor");
+  if (this->PostProcessorProxy)
+    {
+    this->PostProcessorProxy->SetServers(vtkProcessModule::CLIENT);
+    }
 
   this->Superclass::CreateVTKObjects(numObjects);
 }
@@ -220,6 +226,7 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
   ip->AddProxy(this->CollectProxy);
   this->UpdateSuppressorProxy->UpdateVTKObjects();
 
+
   if ( vtkProcessModule::GetProcessModule()->IsRemote(this->GetConnectionID()))
     {
     for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
@@ -243,6 +250,15 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
       pm->SendStream(this->ConnectionID, this->CollectProxy->GetServers(),
                      stream);
       }
+    }
+
+  if (this->PostProcessorProxy)
+    {
+    ip = vtkSMInputProperty::SafeDownCast(
+      this->PostProcessorProxy->GetProperty("Input"));
+    ip->RemoveAllProxies();
+    ip->AddProxy(this->CollectProxy);
+    this->PostProcessorProxy->UpdateVTKObjects();
     }
 }
 
@@ -299,6 +315,21 @@ void vtkSMGenericViewDisplayProxy::Update()
   this->UpdateVTKObjects();
   this->Superclass::Update();
   this->UpdateRequiredFlag = 0;
+
+  if (this->PostProcessorProxy)
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkAlgorithm* dp = vtkAlgorithm::SafeDownCast(
+      pm->GetObjectFromID(this->PostProcessorProxy->GetID(0))); 
+    if (!dp)
+      {
+      vtkErrorMacro("Failed to get algorithm for PostProcessorProxy.");
+      }
+    else
+      {
+      dp->Update();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -313,7 +344,6 @@ void vtkSMGenericViewDisplayProxy::AddInput(vtkSMSourceProxy* input,
 {
   this->SetInput(input);
 }
-
 //-----------------------------------------------------------------------------
 vtkDataObject* vtkSMGenericViewDisplayProxy::GetOutput()
 {
@@ -322,15 +352,25 @@ vtkDataObject* vtkSMGenericViewDisplayProxy::GetOutput()
     {
     return NULL;
     }
-    
-  vtkDataSetAlgorithm* dp = vtkDataSetAlgorithm::SafeDownCast(
-    pm->GetObjectFromID(this->CollectProxy->GetID(0)));
+
+  vtkAlgorithm* dp;
+  if (this->PostProcessorProxy)
+    {
+    dp = vtkAlgorithm::SafeDownCast(
+      pm->GetObjectFromID(this->PostProcessorProxy->GetID(0))); 
+    }
+  else
+    {
+    dp = vtkAlgorithm::SafeDownCast(
+      pm->GetObjectFromID(this->CollectProxy->GetID(0)));
+    }
+
   if (dp == NULL)
     {
     return NULL;
     }
 
-  return dp->GetOutput();
+  return dp->GetOutputDataObject(0);
 }
 
 //-----------------------------------------------------------------------------

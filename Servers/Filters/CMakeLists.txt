@@ -41,6 +41,7 @@ SET(Filters_SRCS
   vtkOrderedCompositeDistributor.cxx
   vtkPhastaReader.cxx
   vtkPickFilter.cxx
+  vtkPolyLineToRectilinearGridFilter.cxx
   vtkPPhastaReader.cxx
   vtkPPickFilter.cxx
   vtkPVArrowSource.cxx

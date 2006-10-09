@@ -3063,6 +3063,49 @@ The Probe filter operates on any type of data and produces polygonal output (a p
    <!-- End Probe -->
    </SourceProxy>
 
+   <SourceProxy name="Probe2" class="vtkPProbeFilter">
+    <!-- This is same a Probe except that the Input is the data in which we are probing,
+         while source is the dataset with which we are probing. The output is of the
+         type of the source.
+      -->
+    <Documentation
+       long_help="Sample data attributes at a point or along a line.  Probed lines will be displayed in a graph of the attributes."
+       short_help="Sample data values at a point or along a line.">
+The Probe filter samples the data set attributes of the current data set at a point or along a line. Selecting either Point or Line from the menu button in the Probe object portion of the interface displays the appropriate 3D widget and its associated user interface controls. See section 7.4 for more information about using 3D widgets.
+If you are probing with a point, the values of the point-centered variables at the selected point will be listed on the Parameters tab for this filter. If you are probing with a line, the values of the point-centered variables along that line will be displayed in a 2D graph in the display area if Show XY-Plot is selected.
+Probing with a point is different from using the Pick filter at a point because the Pick filter displays the values for the input point closest to the selected point. Instead the Probe filter uses interpolation to determine the value at the selected point, whether or not it lies at an input point.
+The Probe filter operates on any type of data and produces polygonal output (a point or a line).
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetSourceConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+            <DataType value="vtkMultiGroupDataSet"/>
+          </DataTypeDomain>
+          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
+          <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
+          <InputArrayDomain name="input_array" attribute_type="point"/>
+     </InputProperty>
+
+     <InputProperty
+        name="Source"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+           </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+             <Proxy group="sources" name="LineSource" />
+             <Proxy group="sources" name="PointSource" />
+           </ProxyListDomain>
+      </InputProperty>
+   <!-- End Probe2 -->
+   </SourceProxy>
+
    <SourceProxy name="TemporalProbe" class="vtkTemporalProbeFilter">
     <InputProperty
        name="Input"
@@ -4508,6 +4551,21 @@ This filter operates on all types of data sets, and it returns unstructured grid
      </InputProperty>
    </SourceProxy>
 
+   <SourceProxy name="PolyLineToRectilinearGrid" class="vtkPolyLineToRectilinearGridFilter">
+      <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkPolyData"/>
+          </DataTypeDomain>
+     </InputProperty>     
+   </SourceProxy>
+   
    </ProxyGroup>
+
 </ServerManagerConfiguration>
 
