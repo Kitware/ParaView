@@ -603,6 +603,10 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
     {
     filter->setDefaultValues();
     this->getPipelineBuilder()->addConnection(input, filter);
+    if (vtkSMProperty* const input_prop = filter->getProxy()->GetProperty("Input"))
+      {
+      input_prop->UpdateDependentDomains();
+      }
 
     // As a special-case, set a default implicit function for new Cut filters
     if(xmlname == "Cut")
