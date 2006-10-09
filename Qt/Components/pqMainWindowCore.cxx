@@ -2120,7 +2120,9 @@ void pqMainWindowCore::resetCamera()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::resetViewDirection(double x, double y, double z)
+void pqMainWindowCore::resetViewDirection(
+    double look_x, double look_y, double look_z,
+    double up_x, double up_y, double up_z)
 {
   pqRenderModule* ren = this->getActiveRenderModule();
   if (ren)
@@ -2136,18 +2138,18 @@ void pqMainWindowCore::resetViewDirection(double x, double y, double z)
       proxy->GetProperty("CameraPosition"), 2, 0);
 
     pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraFocalPoint"), 0, x);
+      proxy->GetProperty("CameraFocalPoint"), 0, look_x);
     pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraFocalPoint"), 1, y);
+      proxy->GetProperty("CameraFocalPoint"), 1, look_y);
     pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraFocalPoint"), 2, z);
+      proxy->GetProperty("CameraFocalPoint"), 2, look_z);
 
     pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraViewUp"), 0, 0);
+      proxy->GetProperty("CameraViewUp"), 0, up_x);
     pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraViewUp"), 1, (z==0.0? 0: 1));
+      proxy->GetProperty("CameraViewUp"), 1, up_y);
     pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraViewUp"), 2, (z==0.0? 1 : 0));
+      proxy->GetProperty("CameraViewUp"), 2, up_z);
     proxy->UpdateVTKObjects();
 
     ren->resetCamera();
@@ -2158,37 +2160,37 @@ void pqMainWindowCore::resetViewDirection(double x, double y, double z)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::resetViewDirectionPosX()
 {
-  this->resetViewDirection(1, 0, 0);
+  this->resetViewDirection(1, 0, 0, 0, 0, 1);
 }
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::resetViewDirectionNegX()
 {
-  this->resetViewDirection(-1, 0, 0);
+  this->resetViewDirection(-1, 0, 0, 0, 0, 1);
 
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::resetViewDirectionPosY()
 {
-  this->resetViewDirection(0, 1, 0);
+  this->resetViewDirection(0, 1, 0, 0, 0, 1);
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::resetViewDirectionNegY()
 {
-  this->resetViewDirection(0, -1, 0);
+  this->resetViewDirection(0, -1, 0, 0, 0, 1);
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::resetViewDirectionPosZ()
 {
-  this->resetViewDirection(0, 0, 1);
+  this->resetViewDirection(0, 0, 1, 0, 1, 0);
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::resetViewDirectionNegZ()
 {
-  this->resetViewDirection(0, 0, -1);
+  this->resetViewDirection(0, 0, -1, 0, 1, 0);
 }
 
 //-----------------------------------------------------------------------------

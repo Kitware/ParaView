@@ -300,6 +300,10 @@ public slots:
   void resetViewDirectionPosZ();
   void resetViewDirectionNegZ();
 
+  void resetViewDirection(
+    double look_x, double look_y, double look_z,
+    double up_x, double up_y, double up_z);
+
   // Create New Plot Views.
   void createBarCharView();
   void createXYPlotView();
@@ -355,8 +359,6 @@ private slots:
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
-
-  void resetViewDirection(double x, double y, double z);
 };
 
 #endif // !_pqMainWindowCore_h
