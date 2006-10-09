@@ -374,10 +374,10 @@ bool pqRenderWindowManager::eventFilter(QObject* caller, QEvent* e)
   return QObject::eventFilter(caller, e);
 }
 //-----------------------------------------------------------------------------
-void pqRenderWindowManager::setMaxRenderWindowSize(const QSize& size)
+void pqRenderWindowManager::setMaxRenderWindowSize(const QSize& win_size)
 {
-  this->Internal->MaxRenderWindowSize = size.isEmpty()?
-      QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX) : size;
+  this->Internal->MaxRenderWindowSize = win_size.isEmpty()?
+      QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX) : win_size;
   foreach (pqMultiViewFrame* frame, this->Internal->Frames)
     {
     frame->mainWidget()->setMaximumSize(this->Internal->MaxRenderWindowSize);
