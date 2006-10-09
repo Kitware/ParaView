@@ -45,6 +45,9 @@ public:
   pqVCRController(QObject* parent = 0);
   virtual ~pqVCRController();
 
+signals:
+  void timestepChanged();
+
 public slots:
   // Connect these signals to appropriate VCR buttons.
   void onFirstFrame();

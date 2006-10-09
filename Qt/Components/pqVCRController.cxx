@@ -136,6 +136,8 @@ void pqVCRController::updateSource(bool first, bool last, int offset)
     new_time = (new_time <= max_step)? new_time : max_step;
     timestep->SetElement(0, new_time);
     }
+
+  emit this->timestepChanged();
   
   activeProxy->UpdateVTKObjects();
   this->Source->renderAllViews();
