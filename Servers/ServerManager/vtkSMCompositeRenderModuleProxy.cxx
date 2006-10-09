@@ -38,7 +38,7 @@
 #include "vtkWindowToImageFilter.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.16");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -392,13 +392,7 @@ void vtkSMCompositeRenderModuleProxy::ComputeReductionFactor(int inReductionFact
 
   if (this->CompositeManagerProxy)
     {
-    // Will using properties here slow us down considerably?
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-      << this->CompositeManagerProxy->GetID(0) 
-      << "SetImageReductionFactor" << int(newReductionFactor)
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
+    this->SetImageReductionFactor(this->CompositeManagerProxy, newReductionFactor);
     }
 
 }
