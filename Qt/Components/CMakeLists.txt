@@ -110,6 +110,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSourceInfoGroupMap.h
   pqSourceInfoIcons.h
   pqSourceInfoModel.h
+  pqSpinBoxDomain.h
   pqStreamTracerPanel.h
   pqThresholdPanel.h
   pqToolTipTrapper.h
@@ -327,6 +328,8 @@ ADD_LIBRARY(pqComponents
   pqSourceInfoModel.h
   pqSourceProxyInfo.cxx
   pqSourceProxyInfo.h
+  pqSpinBoxDomain.cxx
+  pqSpinBoxDomain.h
   pqStreamTracerPanel.cxx
   pqStreamTracerPanel.h
   pqThresholdPanel.cxx

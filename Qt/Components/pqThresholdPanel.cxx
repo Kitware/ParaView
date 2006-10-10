@@ -103,18 +103,6 @@ void pqThresholdPanel::accept()
 {
   // accept widgets controlled by the parent class
   pqLoadedFormObjectPanel::accept();
-
-  /*
-
-  vtkSMStringVectorProperty* Property;
-  Property = vtkSMStringVectorProperty::SafeDownCast(
-       this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
-
-  pqSMAdaptor::setFieldSelectionMode( Property,
-         this->AttributeMode->currentText());
-
-  this->proxy()->getProxy()->UpdateVTKObjects();
-  */
 }
 
 void pqThresholdPanel::reset()
@@ -138,27 +126,13 @@ void pqThresholdPanel::reset()
 
 void pqThresholdPanel::linkServerManagerProperties()
 {
-  
-
-  
   // parent class hooks up some of our widgets in the ui
   pqLoadedFormObjectPanel::linkServerManagerProperties();
   
-  // set up the attribute mode combo box
-  vtkSMStringVectorProperty* AttributeProperty;
-  AttributeProperty = vtkSMStringVectorProperty::SafeDownCast(
-       this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
-  AttributeProperty->UpdateDependentDomains();
-
-  // TODO domain updates should be handled by auto-panel code
   QComboBox* Scalars = this->findChild<QComboBox*>("SelectInputScalars:scalars");
-  // connect domain to scalar combo box
-  vtkSMProperty* Property = this->proxy()->getProxy()->GetProperty("SelectInputScalars");
-  pqComboBoxDomain* d0 = new pqComboBoxDomain(Scalars, Property, 1);
-  d0->setObjectName("ScalarsDomain");
 
   // connect domain to spin boxes
-  Property = this->proxy()->getProxy()->GetProperty("ThresholdBetween");
+  vtkSMProperty* Property = this->proxy()->getProxy()->GetProperty("ThresholdBetween");
   Property->UpdateDependentDomains();
   pqDoubleSpinBoxDomain* d1 = new pqDoubleSpinBoxDomain(this->LowerSpin,
                             Property,
@@ -177,14 +151,6 @@ void pqThresholdPanel::linkServerManagerProperties()
   QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
                    d2, SIGNAL(domainChanged()), Qt::QueuedConnection);
 
-
-  // some hacks to get things working
-  this->reset();
-
-  if(Scalars->currentIndex() == -1 && Scalars->count())
-    {
-    Scalars->setCurrentIndex(0);
-    }
 }
 
 static bool IsSetting = false;

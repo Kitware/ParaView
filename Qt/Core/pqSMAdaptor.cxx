@@ -1346,11 +1346,14 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
     }
   iter->Delete();
 
+  int which = Index;
+  which = 0;  // TODO: extent domains
+
   if(DoubleDomain)
     {
     int exists1, exists2;
-    double min = DoubleDomain->GetMinimum(Index, exists1);
-    double max = DoubleDomain->GetMaximum(Index, exists2);
+    double min = DoubleDomain->GetMinimum(which, exists1);
+    double max = DoubleDomain->GetMaximum(which, exists2);
     if(exists1 && exists2)  // what if one of them exists?
       {
       domain.push_back(min);
@@ -1360,8 +1363,8 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
   else if(IntDomain)
     {
     int exists1, exists2;
-    int min = IntDomain->GetMinimum(Index, exists1);
-    int max = IntDomain->GetMaximum(Index, exists2);
+    int min = IntDomain->GetMinimum(which, exists1);
+    int max = IntDomain->GetMaximum(which, exists2);
     if(exists1 && exists2)  // what if one of them exists?
       {
       domain.push_back(min);

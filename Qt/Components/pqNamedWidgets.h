@@ -62,6 +62,11 @@ is not significant, as long as it is unique.
 The third and fourth forms are used when Qt widgets will be associated with
 multi-element properties.  The digits are used as indices to control with
 which property element a given widget will be associated.
+
+If widgets can also represent domains (combo boxes has a fixed list of items,
+sliders or spin boxes have a minimum or maximum value), their domains will be
+linked as well so if the domain changes, the possible values or
+minimums/maximums will automatically updated.
 */
 class pqNamedWidgets
 {

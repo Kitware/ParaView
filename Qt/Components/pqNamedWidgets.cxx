@@ -67,6 +67,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMProxy.h"
 #include "pqSMSignalAdaptors.h"
 #include "pqTreeWidgetItemObject.h"
+#include "pqComboBoxDomain.h"
+#include "pqSpinBoxDomain.h"
+#include "pqDoubleSpinBoxDomain.h"
+#include "pqSliderDomain.h"
 
 void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
 {
@@ -126,17 +130,26 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
               }
             else if(sl)
               {
+              pqSliderDomain* d0 = new
+                pqSliderDomain(sl, SMProperty, index);
+              d0->setObjectName("SliderDomain");
               property_manager->registerLink(
                 sl, "value", SIGNAL(valueChanged(int)),
                 proxy, SMProperty, index);
               }
             else if(doubleSpinBox)
               {
+              pqDoubleSpinBoxDomain* d0 = new
+                pqDoubleSpinBoxDomain(doubleSpinBox, SMProperty, index);
+              d0->setObjectName("DoubleSpinBoxDomain");
               property_manager->registerLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
                                                  proxy, SMProperty, index);
               }
             else if(spinBox)
               {
+              pqSpinBoxDomain* d0 = new
+                pqSpinBoxDomain(spinBox, SMProperty, index);
+              d0->setObjectName("SpinBoxDomain");
               property_manager->registerLink(spinBox, "value",
                                              SIGNAL(valueChanged(int)),
                                              proxy, SMProperty, index);
@@ -158,13 +171,9 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
           }
         else if(comboBox)
           {
-          QList<QVariant> domain = 
-            pqSMAdaptor::getEnumerationPropertyDomain(SMProperty);
-          comboBox->clear();
-          foreach(QVariant v, domain)
-            {
-            comboBox->addItem(v.toString());
-            }
+          pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty);
+          d0->setObjectName("ComboBoxDomain");
+          
           pqSignalAdaptorComboBox* adaptor = 
             new pqSignalAdaptorComboBox(comboBox);
           adaptor->setObjectName("ComboBoxAdaptor");
@@ -182,6 +191,8 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
       else if(pt == pqSMAdaptor::SELECTION)
         {
         // selections can be list widgets
+        // for now, we're assuming selection domains don't change
+        // if they do, we need to observe those changes
         QListWidget* listWidget = qobject_cast<QListWidget*>(foundObject);
         QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(foundObject);
         if(listWidget)
@@ -221,6 +232,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
         QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
         if(comboBox)
           {
+          // TODO: use pqComboBoxDomain
           QList<pqSMProxy> propertyDomain = 
             pqSMAdaptor::getProxyPropertyDomain(SMProperty);
           comboBox->clear();
@@ -252,18 +264,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
           QString("WidgetBox.%1").arg(iter->GetKey()));
         if (comboBox)
           {
-          comboBox->clear();
-          /*
-          QList<pqSMProxy> propertyDomain = 
-            pqSMAdaptor::getProxyPropertyDomain(SMProperty);
-          foreach(pqSMProxy v, propertyDomain)
-            {
-            comboBox->addItem(v->GetXMLName());
-            }
-          pqSignalAdaptorComboBox* comboAdaptor = 
-            new pqSignalAdaptorComboBox(comboBox);
-          comboAdaptor->setObjectName("ComboBoxAdaptor");
-          */
+          comboBox->clear();  //TODO: why is this here?  is a domain helper needed?
           pqProxy* pq_proxy =
             pqApplicationCore::instance()->getServerManagerModel()->getPQSource(proxy);
           pqSignalAdaptorProxyList* proxyAdaptor = 
@@ -302,13 +303,9 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
           qobject_cast<QDoubleSpinBox*>(foundObject);
         if(comboBox)
           {
-          QList<QVariant> domain = 
-            pqSMAdaptor::getElementPropertyDomain(SMProperty);
-          comboBox->clear();
-          for(int j=0; j<domain.size(); j++)
-            {
-            comboBox->addItem(domain[j].toString());
-            }
+          // these combo boxes tend to be true/false combos
+          pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty);
+          d0->setObjectName("ComboBoxDomain");
 
           pqSignalAdaptorComboBox* adaptor = 
             new pqSignalAdaptorComboBox(comboBox);
@@ -325,18 +322,28 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
           }
         else if(slider)
           {
+          pqSliderDomain* d0 = new
+            pqSliderDomain(slider, SMProperty);
+          d0->setObjectName("SliderDomain");
           property_manager->registerLink(
             slider, "value", SIGNAL(valueChanged(int)),
             proxy, SMProperty);
           }
         else if(doubleSpinBox)
           {
+          pqDoubleSpinBoxDomain* d0 = new
+            pqDoubleSpinBoxDomain(doubleSpinBox, SMProperty);
+          d0->setObjectName("DoubleSpinBoxDomain");
           property_manager->registerLink(
             doubleSpinBox, "value", SIGNAL(valueChanged(double)),
             proxy, SMProperty);
           }
         else if(spinBox)
           {
+          pqSpinBoxDomain* d0 = new
+            pqSpinBoxDomain(spinBox, SMProperty);
+          d0->setObjectName("SpinBoxDomain");
+
           property_manager->registerLink(
             spinBox, "value", SIGNAL(valueChanged(int)),
             proxy, SMProperty);
@@ -359,10 +366,8 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
           {
           if(comboBox->objectName().contains(QRegExp(":mode$")))
             {
-            QList<QString> domain = 
-              pqSMAdaptor::getFieldSelectionModeDomain(SMProperty);
-            comboBox->clear();
-            comboBox->addItems(domain);
+            pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty, 0);
+            d0->setObjectName("FieldModeDomain");
 
             pqSignalAdaptorComboBox* adaptor = 
               new pqSignalAdaptorComboBox(comboBox);
@@ -373,10 +378,8 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
             }
           if(comboBox->objectName().contains(QRegExp(":scalars$")))
             {
-            QList<QString> domain = 
-              pqSMAdaptor::getFieldSelectionScalarDomain(SMProperty);
-            comboBox->clear();
-            comboBox->addItems(domain);
+            pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty, 1);
+            d0->setObjectName("FieldScalarsDomain");
 
             pqSignalAdaptorComboBox* adaptor = 
               new pqSignalAdaptorComboBox(comboBox);
@@ -450,12 +453,24 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
               }
             else if(sl)
               {
+              pqSliderDomain* d0 = 
+                sl->findChild<pqSliderDomain*>("SliderDomain");
+              if(d0)
+                {
+                delete d0;
+                }
               property_manager->unregisterLink(
                 sl, "value", SIGNAL(valueChanged(int)),
                 proxy, SMProperty, index);
               }
             else if(doubleSpinBox)
               {
+              pqDoubleSpinBoxDomain* d0 = 
+                doubleSpinBox->findChild<pqDoubleSpinBoxDomain*>("DoubleSpinBoxDomain");
+              if(d0)
+                {
+                delete d0;
+                }
               property_manager->unregisterLink(doubleSpinBox, 
                                                   "value", 
                                                   SIGNAL(valueChanged(double)),
@@ -463,6 +478,12 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
               }
             else if(spinBox)
               {
+              pqSpinBoxDomain* d0 = 
+                spinBox->findChild<pqSpinBoxDomain*>("SpinBoxDomain");
+              if(d0)
+                {
+                delete d0;
+                }
               property_manager->unregisterLink(spinBox, 
                                                "value", 
                                                SIGNAL(valueChanged(int)),
@@ -485,12 +506,22 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
           }
         else if(comboBox)
           {
+          pqComboBoxDomain* d0 =
+            comboBox->findChild<pqComboBoxDomain*>("ComboBoxDomain");
+          if(d0)
+            {
+            delete d0;
+            }
+
           pqSignalAdaptorComboBox* adaptor = 
             comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
-          property_manager->unregisterLink(
-            adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
-            proxy, SMProperty);
-          delete adaptor;
+          if(adaptor)
+            {
+            property_manager->unregisterLink(
+              adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
+              proxy, SMProperty);
+            delete adaptor;
+            }
           }
         else if(lineEdit)
           {
@@ -556,6 +587,13 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
         QSpinBox* spinBox = qobject_cast<QSpinBox*>(foundObject);
         if(comboBox)
           {
+          pqComboBoxDomain* d0 =
+            comboBox->findChild<pqComboBoxDomain*>("ComboBoxDomain");
+          if(d0)
+            {
+            delete d0;
+            }
+
           pqSignalAdaptorComboBox* adaptor = 
             comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
           property_manager->unregisterLink(
@@ -571,18 +609,36 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
           }
         else if(slider)
           {
+          pqSliderDomain* d0 = 
+            slider->findChild<pqSliderDomain*>("SliderDomain");
+          if(d0)
+            {
+            delete d0;
+            }
           property_manager->unregisterLink(
             slider, "value", SIGNAL(valueChanged(int)),
             proxy, SMProperty);
           }
         else if(doubleSpinBox)
           {
+          pqDoubleSpinBoxDomain* d0 = 
+            doubleSpinBox->findChild<pqDoubleSpinBoxDomain*>("DoubleSpinBoxDomain");
+          if(d0)
+            {
+            delete d0;
+            }
           property_manager->unregisterLink(
             doubleSpinBox, "value", SIGNAL(valueChanged(double)),
             proxy, SMProperty);
           }
         else if(spinBox)
           {
+          pqSpinBoxDomain* d0 = 
+            spinBox->findChild<pqSpinBoxDomain*>("SpinBoxDomain");
+          if(d0)
+            {
+            delete d0;
+            }
           property_manager->unregisterLink(
             spinBox, "value", SIGNAL(valueChanged(int)),
             proxy, SMProperty);
@@ -596,6 +652,53 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
           property_manager->unregisterLink(
             lineEdit, "text", SIGNAL(textChanged(const QString&)),
             proxy, SMProperty);
+          }
+        }
+      else if(pt == pqSMAdaptor::FIELD_SELECTION)
+        {
+        QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
+        if(comboBox)
+          {
+          if(comboBox->objectName().contains(QRegExp(":mode$")))
+            {
+            pqComboBoxDomain* d0 =
+              comboBox->findChild<pqComboBoxDomain*>("FieldModeDomain");
+            if(d0)
+              {
+              delete d0;
+              }
+
+            pqSignalAdaptorComboBox* adaptor = 
+              comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
+            if(adaptor)
+              {
+              property_manager->unregisterLink(
+                adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
+                proxy, SMProperty, 0);  // 0 means link mode for field selection
+              
+              delete adaptor;
+              }
+            }
+          if(comboBox->objectName().contains(QRegExp(":scalars$")))
+            {
+            pqComboBoxDomain* d0 =
+              comboBox->findChild<pqComboBoxDomain*>("FieldScalarsDomain");
+            if(d0)
+              {
+              delete d0;
+              }
+
+            pqSignalAdaptorComboBox* adaptor = 
+              comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
+            if(adaptor)
+              {
+              property_manager->unregisterLink(
+                adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
+                proxy, SMProperty, 1);  // 1 means link scalars for field selection
+              
+              delete adaptor;
+              }
+            }
           }
         }
       }

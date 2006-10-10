@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqComboBoxDomain.cxx
+   Module:    pqSpinBoxDomain.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -31,10 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 // self include
-#include "pqComboBoxDomain.h"
+#include "pqSpinBoxDomain.h"
 
 // Qt includes
-#include <QComboBox>
+#include <QSpinBox>
 
 // VTK includes
 #include <vtkSmartPointer.h>
@@ -44,68 +44,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMProperty.h>
 #include <vtkSMDomain.h>
 #include <vtkSMDomainIterator.h>
-#include <vtkSMEnumerationDomain.h>
+#include <vtkSMDoubleRangeDomain.h>
 
 
 // ParaView includes
 #include <pqSMAdaptor.h>
 
   
-class pqComboBoxDomain::pqInternal
+class pqSpinBoxDomain::pqInternal
 {
 public:
   pqInternal()
     {
     this->Connection = vtkEventQtSlotConnect::New();
-    IsSetting = false;
     }
   ~pqInternal()
     {
     this->Connection->Delete();
     }
   vtkSmartPointer<vtkSMProperty> Property;
+  int Index;
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
-  bool IsSetting;
-  int Index;
 };
   
 
-pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, int idx)
+pqSpinBoxDomain::pqSpinBoxDomain(QSpinBox* p, vtkSMProperty* prop, int index)
   : QObject(p)
 {
   this->Internal = new pqInternal();
   this->Internal->Property = prop;
-  this->Internal->Index = idx;
+  this->Internal->Index = index;
 
-  if(pqSMAdaptor::getPropertyType(prop) == pqSMAdaptor::FIELD_SELECTION)
+  // get domain
+  vtkSMDomainIterator* iter = prop->NewDomainIterator();
+  iter->Begin();
+  while(!iter->IsAtEnd() && !this->Internal->Domain)
     {
-    if(idx == 0)
+    vtkSMDoubleRangeDomain* drange;
+    drange = vtkSMDoubleRangeDomain::SafeDownCast(iter->GetDomain());
+    if(drange)
       {
-      this->Internal->Domain = prop->GetDomain("field_list");
+      this->Internal->Domain = drange;
       }
-    else if(idx == 1)
-      {
-      this->Internal->Domain = prop->GetDomain("array_list");
-      }
+    iter->Next();
     }
-  else
-    {
-    // get domain
-    vtkSMDomainIterator* iter = prop->NewDomainIterator();
-    iter->Begin();
-    while(!iter->IsAtEnd() && !this->Internal->Domain)
-      {
-      vtkSMEnumerationDomain* enumeration;
-      enumeration = vtkSMEnumerationDomain::SafeDownCast(iter->GetDomain());
-      if(enumeration)
-        {
-        this->Internal->Domain = enumeration;
-        }
-      iter->Next();
-      }
-    iter->Delete();
-    }
+  iter->Delete();
 
   if(this->Internal->Domain)
     {
@@ -123,83 +107,60 @@ pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, int idx)
                    Qt::QueuedConnection);
 }
 
-pqComboBoxDomain::~pqComboBoxDomain()
+pqSpinBoxDomain::~pqSpinBoxDomain()
 {
   delete this->Internal;
 }
-
-void pqComboBoxDomain::internalDomainChanged()
+  
+void pqSpinBoxDomain::internalDomainChanged()
 {
-  QComboBox* combo = qobject_cast<QComboBox*>(this->parent());
-  Q_ASSERT(combo != NULL);
-  if(!combo)
+  QSpinBox* spinbox = qobject_cast<QSpinBox*>(this->parent());
+  Q_ASSERT(spinbox != NULL);
+  if(!spinbox)
     {
     return;
     }
 
-  if(this->Internal->IsSetting)
-    {
-    return;
-    }
-
-  this->Internal->IsSetting = true;
-
-  QList<QString> domain;
   pqSMAdaptor::PropertyType type;
-
   type = pqSMAdaptor::getPropertyType(this->Internal->Property);
-  if(type == pqSMAdaptor::ENUMERATION)
+  QList<QVariant> range;
+  if(type == pqSMAdaptor::SINGLE_ELEMENT)
     {
-    QList<QVariant> enums;
-    enums = pqSMAdaptor::getEnumerationPropertyDomain(this->Internal->Property);
-    foreach(QVariant var, enums)
+    range = pqSMAdaptor::getElementPropertyDomain(this->Internal->Property);
+    if(range.size() == 2)
       {
-      domain.append(var.toString());
+      int min = range[0].toInt();
+      int max = range[1].toInt();
+      if(range[0].type() == QVariant::Int)
+        {
+        spinbox->setSingleStep( (max - min) / 50 );  // arbitrary
+        }
+      else
+        {
+        spinbox->setSingleStep(1);
+        }
+      spinbox->setRange(min, max);
       }
     }
-  else if(type == pqSMAdaptor::SINGLE_ELEMENT)
+  else if(type == pqSMAdaptor::MULTIPLE_ELEMENTS)
     {
-    }
-  else if(type == pqSMAdaptor::FIELD_SELECTION)
-    {
-    if(this->Internal->Index == 0)
+    range = pqSMAdaptor::getMultipleElementPropertyDomain(this->Internal->Property,
+                                                          this->Internal->Index);
+    if(range.size() == 2)
       {
-      domain = pqSMAdaptor::getFieldSelectionModeDomain(this->Internal->Property);
-      }
-    else if(this->Internal->Index == 1)
-      {
-      domain = pqSMAdaptor::getFieldSelectionScalarDomain(this->Internal->Property);
-      }
-    }
-
-  // check if the domain didn't change
-  QList<QString> oldDomain;
-
-  for(int i=0; i<combo->count(); i++)
-    {
-    oldDomain.append(combo->itemText(i));
-    }
-
-  if(oldDomain != domain)
-    {
-    // save previous value to put back
-    QString old = combo->currentText();
-    combo->blockSignals(true);
-    combo->clear();
-    combo->addItems(domain);
-    combo->setCurrentIndex(-1);
-    combo->blockSignals(false);
-    int foundOld = combo->findText(old);
-    if(foundOld >= 0)
-      {
-      combo->setCurrentIndex(foundOld);
-      }
-    else
-      {
-      combo->setCurrentIndex(0);
+      int min = range[0].toInt();
+      int max = range[1].toInt();
+      if(range[0].type() == QVariant::Int)
+        {
+        spinbox->setSingleStep( (max - min) / 50 );  // arbitrary
+        }
+      else
+        {
+        spinbox->setSingleStep(1);
+        }
+      spinbox->setRange(min, max);
       }
     }
-  this->Internal->IsSetting = false;
 }
 
 
