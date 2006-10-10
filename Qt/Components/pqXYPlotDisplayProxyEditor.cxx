@@ -85,6 +85,11 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(QWidget* p)
     SIGNAL(currentTextChanged(const QString&)), 
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
+  QObject::connect(this->Internal->XAxisModeAdaptor,
+    SIGNAL(currentTextChanged(const QString&)), 
+    this, SLOT(updateXArrayNameEnableState()),
+    Qt::QueuedConnection);
+
   QObject::connect(this->Internal->XAxisArrayAdaptor,
     SIGNAL(currentTextChanged(const QString&)), 
     this, SLOT(updateAllViews()),
@@ -234,5 +239,24 @@ void pqXYPlotDisplayProxyEditor::updateAllViews()
   if (this->Internal->Display)
     {
     this->Internal->Display->renderAllViews();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqXYPlotDisplayProxyEditor::updateXArrayNameEnableState()
+{
+  if (!this->Internal->Display)
+    {
+    return;
+    }
+  vtkSMProperty* prop = 
+    this->Internal->Display->getProxy()->GetProperty("XAxisMode");
+  if (pqSMAdaptor::getEnumerationProperty(prop) == "DataArray")
+    {
+    this->Internal->XAxisArray->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->XAxisArray->setEnabled(false);
     }
 }

@@ -54,6 +54,8 @@ protected slots:
   // Called to render all views in which this display is visible.
   void updateAllViews();
 
+  void updateXArrayNameEnableState();
+
   void yArraySelectionChanged();
 
 private:
