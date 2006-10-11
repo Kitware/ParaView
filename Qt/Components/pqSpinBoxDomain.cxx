@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMProperty.h>
 #include <vtkSMDomain.h>
 #include <vtkSMDomainIterator.h>
-#include <vtkSMDoubleRangeDomain.h>
+#include <vtkSMIntRangeDomain.h>
 
 
 // ParaView includes
@@ -81,8 +81,8 @@ pqSpinBoxDomain::pqSpinBoxDomain(QSpinBox* p, vtkSMProperty* prop, int index)
   iter->Begin();
   while(!iter->IsAtEnd() && !this->Internal->Domain)
     {
-    vtkSMDoubleRangeDomain* drange;
-    drange = vtkSMDoubleRangeDomain::SafeDownCast(iter->GetDomain());
+    vtkSMIntRangeDomain* drange;
+    drange = vtkSMIntRangeDomain::SafeDownCast(iter->GetDomain());
     if(drange)
       {
       this->Internal->Domain = drange;

@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMDomain.h>
 #include <vtkSMDomainIterator.h>
 #include <vtkSMEnumerationDomain.h>
+#include <vtkSMStringListDomain.h>
+#include <vtkSMArrayListDomain.h>
 
 
 // ParaView includes
@@ -96,11 +98,11 @@ pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, int idx)
     iter->Begin();
     while(!iter->IsAtEnd() && !this->Internal->Domain)
       {
-      vtkSMEnumerationDomain* enumeration;
-      enumeration = vtkSMEnumerationDomain::SafeDownCast(iter->GetDomain());
-      if(enumeration)
+      if(vtkSMEnumerationDomain::SafeDownCast(iter->GetDomain()) ||
+         vtkSMStringListDomain::SafeDownCast(iter->GetDomain()) ||
+         vtkSMArrayListDomain::SafeDownCast(iter->GetDomain()))
         {
-        this->Internal->Domain = enumeration;
+        this->Internal->Domain = iter->GetDomain();
         }
       iter->Next();
       }
