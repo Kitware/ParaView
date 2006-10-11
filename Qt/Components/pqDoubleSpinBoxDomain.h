@@ -53,9 +53,9 @@ public:
   ~pqDoubleSpinBoxDomain();
 
 public slots:
-  void internalDomainChanged();
-signals:
   void domainChanged();
+protected slots:
+  void internalDomainChanged();
 
 protected:
   class pqInternal;

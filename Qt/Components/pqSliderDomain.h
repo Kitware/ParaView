@@ -57,10 +57,10 @@ public:
   void setScaleFactor(double scale);
   double scaleFactor() const;
 
+public slots:
+  void domainChanged();
 protected slots:
   void internalDomainChanged();
-signals:
-  void domainChanged();
 
 protected:
   class pqInternal;

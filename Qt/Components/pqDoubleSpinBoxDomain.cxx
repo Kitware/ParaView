@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QDoubleSpinBox>
+#include <QTimer>
 
 // VTK includes
 #include <vtkSmartPointer.h>
@@ -57,6 +58,7 @@ public:
   pqInternal()
     {
     this->Connection = vtkEventQtSlotConnect::New();
+    this->MarkedForUpdate = false;
     }
   ~pqInternal()
     {
@@ -66,6 +68,7 @@ public:
   int Index;
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
+  bool MarkedForUpdate;
 };
   
 
@@ -94,22 +97,29 @@ pqDoubleSpinBoxDomain::pqDoubleSpinBoxDomain(QDoubleSpinBox* p, vtkSMProperty* p
   if(this->Internal->Domain)
     {
     this->Internal->Connection->Connect(this->Internal->Domain, 
-                                        vtkCommand::ModifiedEvent,
+                                        vtkCommand::DomainModifiedEvent,
                                         this,
-                                        SIGNAL(domainChanged()));
+                                        SLOT(domainChanged()));
     this->internalDomainChanged();
     }
   
-  // queued connection, otherwise, we get modified events during the
-  // modification of the domain, which we don't want
-  QObject::connect(this, SIGNAL(domainChanged()),
-                   this, SLOT(internalDomainChanged()),
-                   Qt::QueuedConnection);
 }
+
 
 pqDoubleSpinBoxDomain::~pqDoubleSpinBoxDomain()
 {
   delete this->Internal;
+}
+
+void pqDoubleSpinBoxDomain::domainChanged()
+{
+  if(this->Internal->MarkedForUpdate)
+    {
+    return;
+    }
+
+  this->Internal->MarkedForUpdate = true;
+  QTimer::singleShot(0, this, SLOT(internalDomainChanged()));
 }
   
 void pqDoubleSpinBoxDomain::internalDomainChanged()
@@ -161,6 +171,7 @@ void pqDoubleSpinBoxDomain::internalDomainChanged()
       spinbox->setRange(min, max);
       }
     }
+  this->Internal->MarkedForUpdate = false;
 }
 
 

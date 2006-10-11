@@ -97,7 +97,7 @@ pqSpinBoxDomain::pqSpinBoxDomain(QSpinBox* p, vtkSMProperty* prop, int index)
   if(this->Internal->Domain)
     {
     this->Internal->Connection->Connect(this->Internal->Domain, 
-                                        vtkCommand::ModifiedEvent,
+                                        vtkCommand::DomainModifiedEvent,
                                         this,
                                         SLOT(domainChanged()));
     this->internalDomainChanged();

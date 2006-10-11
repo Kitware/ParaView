@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QSlider>
+#include <QTimer>
 
 // VTK includes
 #include <vtkSmartPointer.h>
@@ -60,6 +61,7 @@ public:
     {
     this->ScaleFactor = 1.0;
     this->Connection = vtkEventQtSlotConnect::New();
+    this->MarkedForUpdate = false;
     }
   ~pqInternal()
     {
@@ -70,6 +72,7 @@ public:
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
   double ScaleFactor;
+  bool MarkedForUpdate;
 };
   
 
@@ -112,17 +115,11 @@ pqSliderDomain::pqSliderDomain(QSlider* p, vtkSMProperty* prop, int index)
   if(this->Internal->Domain)
     {
     this->Internal->Connection->Connect(this->Internal->Domain, 
-                                        vtkCommand::ModifiedEvent,
+                                        vtkCommand::DomainModifiedEvent,
                                         this,
-                                        SIGNAL(domainChanged()));
+                                        SLOT(domainChanged()));
     this->internalDomainChanged();
     }
-
-  // queued connection, otherwise, we get modified events during the
-  // modification of the domain, which we don't want
-  QObject::connect(this, SIGNAL(domainChanged()),
-                   this, SLOT(internalDomainChanged()),
-                   Qt::QueuedConnection);
 
 }
 
@@ -141,6 +138,16 @@ double pqSliderDomain::scaleFactor() const
   return this->Internal->ScaleFactor;
 }
 
+void pqSliderDomain::domainChanged()
+{
+  if(this->Internal->MarkedForUpdate)
+    {
+    return;
+    }
+
+  this->Internal->MarkedForUpdate = true;
+  QTimer::singleShot(0, this, SLOT(internalDomainChanged()));
+}
 
 void pqSliderDomain::internalDomainChanged()
 {
@@ -178,6 +185,7 @@ void pqSliderDomain::internalDomainChanged()
       slider->setMaximum(qRound(max));
       }
     }
+  this->Internal->MarkedForUpdate = false;
 }
 
 

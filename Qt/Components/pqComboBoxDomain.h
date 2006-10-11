@@ -57,10 +57,10 @@ public:
   void forceDomainChanged() 
     { this->internalDomainChanged(); }
 
+public slots:
+  void domainChanged();
 protected slots:
   void internalDomainChanged();
-signals:
-  void domainChanged();
 protected:
   class pqInternal;
   pqInternal* Internal;

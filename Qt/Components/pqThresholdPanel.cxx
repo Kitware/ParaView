@@ -110,47 +110,16 @@ void pqThresholdPanel::reset()
   // reset widgets controlled by the parent class
   pqLoadedFormObjectPanel::reset();
   
-  pqDoubleSpinBoxDomain* d1;
-  d1 = this->LowerSpin->findChild<pqDoubleSpinBoxDomain*>("lowerSpinDomain");
-  
-  pqDoubleSpinBoxDomain* d2;
-  d2 = this->UpperSpin->findChild<pqDoubleSpinBoxDomain*>("upperSpinDomain");
-
-  d1->internalDomainChanged();
-  d2->internalDomainChanged();
-
+  // TODO: better linking of spin boxes and sliders,
+  //       so we don't do this manually on reset
   this->upperSpinChanged();
   this->lowerSpinChanged();
-
 }
 
 void pqThresholdPanel::linkServerManagerProperties()
 {
   // parent class hooks up some of our widgets in the ui
   pqLoadedFormObjectPanel::linkServerManagerProperties();
-  
-  QComboBox* Scalars = this->findChild<QComboBox*>("SelectInputScalars:scalars");
-
-  // connect domain to spin boxes
-  vtkSMProperty* Property = this->proxy()->getProxy()->GetProperty("ThresholdBetween");
-  Property->UpdateDependentDomains();
-  pqDoubleSpinBoxDomain* d1 = new pqDoubleSpinBoxDomain(this->LowerSpin,
-                            Property,
-                            0);
-  d1->setObjectName("lowerSpinDomain");
-  pqDoubleSpinBoxDomain* d2 = new pqDoubleSpinBoxDomain(this->UpperSpin,
-                            Property,
-                            0);
-  d2->setObjectName("upperSpinDomain");
-
-
-  // TODO -- pqDoubleSpinBoxDomain::updateDomain should automatically be called
-  //         let's hack and help out a bit.
-  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   d1, SIGNAL(domainChanged()), Qt::QueuedConnection);
-  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   d2, SIGNAL(domainChanged()), Qt::QueuedConnection);
-
 }
 
 static bool IsSetting = false;

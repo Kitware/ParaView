@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QComboBox>
+#include <QTimer>
 
 // VTK includes
 #include <vtkSmartPointer.h>
@@ -59,7 +60,7 @@ public:
   pqInternal()
     {
     this->Connection = vtkEventQtSlotConnect::New();
-    IsSetting = false;
+    this->MarkedForUpdate = false;
     }
   ~pqInternal()
     {
@@ -68,8 +69,8 @@ public:
   vtkSmartPointer<vtkSMProperty> Property;
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
-  bool IsSetting;
   int Index;
+  bool MarkedForUpdate;
 };
   
 
@@ -112,22 +113,28 @@ pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, int idx)
   if(this->Internal->Domain)
     {
     this->Internal->Connection->Connect(this->Internal->Domain, 
-                                        vtkCommand::ModifiedEvent,
+                                        vtkCommand::DomainModifiedEvent,
                                         this,
-                                        SIGNAL(domainChanged()));
+                                        SLOT(domainChanged()));
     this->internalDomainChanged();
     }
   
-  // queued connection, otherwise, we get modified events during the
-  // modification of the domain, which we don't want
-  QObject::connect(this, SIGNAL(domainChanged()),
-                   this, SLOT(internalDomainChanged()),
-                   Qt::QueuedConnection);
 }
 
 pqComboBoxDomain::~pqComboBoxDomain()
 {
   delete this->Internal;
+}
+
+void pqComboBoxDomain::domainChanged()
+{
+  if(this->Internal->MarkedForUpdate)
+    {
+    return;
+    }
+
+  this->Internal->MarkedForUpdate = true;
+  QTimer::singleShot(0, this, SLOT(internalDomainChanged()));
 }
 
 void pqComboBoxDomain::internalDomainChanged()
@@ -138,13 +145,6 @@ void pqComboBoxDomain::internalDomainChanged()
     {
     return;
     }
-
-  if(this->Internal->IsSetting)
-    {
-    return;
-    }
-
-  this->Internal->IsSetting = true;
 
   QList<QString> domain;
   pqSMAdaptor::PropertyType type;
@@ -201,7 +201,7 @@ void pqComboBoxDomain::internalDomainChanged()
       combo->setCurrentIndex(0);
       }
     }
-  this->Internal->IsSetting = false;
+  this->Internal->MarkedForUpdate = false;
 }
 
 
