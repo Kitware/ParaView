@@ -226,8 +226,6 @@
    <addaction name="actionServerConnect" />
    <addaction name="actionServerDisconnect" />
    <addaction name="separator" />
-   <addaction name="actionScalarBarVisibility" />
-   <addaction name="separator" />
    <addaction name="actionHelpHelp" />
   </widget>
   <widget class="QToolBar" name="selectionToolbar" >
@@ -265,6 +263,7 @@
    <attribute name="toolBarArea" >
     <number>4</number>
    </attribute>
+   <addaction name="actionScalarBarVisibility" />
   </widget>
   <widget class="QToolBar" name="representationToolbar" >
    <property name="windowTitle" >
@@ -408,11 +407,11 @@
    <property name="checkable" >
     <bool>true</bool>
    </property>
-   <property name="text" >
-    <string>SbV</string>
-   </property>
    <property name="enabled" >
     <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>SbV</string>
    </property>
   </action>
   <action name="actionServerConnect" >
