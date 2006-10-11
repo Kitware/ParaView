@@ -56,11 +56,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 
 // ParaView includes.
+#include "pqApplicationCore.h"
 #include "pqRenderViewProxy.h"
 #include "pqSetName.h"
+#include "pqSettings.h"
+#include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "vtkPVAxesWidget.h"
-
 
 static QSet<pqRenderModule*> RenderModules;
 
@@ -390,6 +392,47 @@ bool pqRenderModule::saveImage(int width, int height, const QString& filename)
     this->render();
     }
   return (ret == vtkErrorCode::NoError);
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderModule::setDefaults()
+{
+  vtkSMProxy* proxy = this->getProxy();
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("LODResolution"), 50);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("LODThreshold"), 5);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("CompositeThreshold"), 3);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("SquirtLevel"), 3);
+
+  // Now load default values from the QSettings, if available.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  QList<QString> propertyNames;
+  propertyNames.push_back("CameraParallelProjection");
+  propertyNames.push_back("UseTriangleStrips");
+  propertyNames.push_back("UseImmediateMode");
+  propertyNames.push_back("LODThreshold");
+  propertyNames.push_back("LODResolution");
+  propertyNames.push_back("RenderInterruptsEnabled");
+  propertyNames.push_back("CompositeThreshold");
+  propertyNames.push_back("ReductionFactor");
+  propertyNames.push_back("SquirtLevel");
+  propertyNames.push_back("OrderedCompositing");
+  foreach(QString property_name, propertyNames)
+    {
+    QString key = QString("renderModule/") + property_name;
+    if (proxy->GetProperty(property_name.toAscii().data()) && settings->contains(key))
+      {
+      pqSMAdaptor::setElementProperty(
+        proxy->GetProperty(property_name.toAscii().data()),
+        settings->value("renderModule/" + property_name));
+      }
+    }
+  if (settings->contains("renderModule/Background"))
+    {
+    pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("Background"),
+      settings->value("renderModule/Background").value<QList<QVariant> >());
+    }
+  proxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

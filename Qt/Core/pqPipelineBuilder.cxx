@@ -61,11 +61,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPlotViewModule.h"
 #include "pqRenderModule.h"
+#include "pqRenderModule.h"
 #include "pqScalarBarDisplay.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 
@@ -537,50 +537,7 @@ pqRenderModule* pqPipelineBuilder::createWindow(pqServer* server)
     {
     qDebug() << "Failed to create pqRenderModule.";
     }
-
-  // Now set up default RM properties.
-  // if this property exists (server/client mode), render remotely
-  // this should change to a user controlled setting, but this is here for testing
-  vtkSMProperty* prop = renModule->GetProperty("CompositeThreshold");
-  if(prop)
-    {
-    pqSMAdaptor::setElementProperty(prop, 0.0);  // remote render
-    }
-  // disable LOD.
-  pqSMAdaptor::setElementProperty(renModule->GetProperty("LODThreshold"),
-      VTK_LARGE_FLOAT);
-
-  // Now load default values from the QSettings, if available.
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  QList<QString> propertyNames;
-  propertyNames.push_back("CameraParallelProjection");
-  propertyNames.push_back("UseTriangleStrips");
-  propertyNames.push_back("UseImmediateMode");
-  propertyNames.push_back("LODThreshold");
-  propertyNames.push_back("LODResolution");
-  propertyNames.push_back("RenderInterruptsEnabled");
-  propertyNames.push_back("CompositeThreshold");
-  propertyNames.push_back("ReductionFactor");
-  propertyNames.push_back("SquirtLevel");
-  propertyNames.push_back("OrderedCompositing");
-  foreach(QString property_name, propertyNames)
-    {
-    QString key = QString("renderModule/") + property_name;
-    if (renModule->GetProperty(property_name.toAscii().data()) && settings->contains(key))
-      {
-      pqSMAdaptor::setElementProperty(
-        renModule->GetProperty(property_name.toAscii().data()),
-        settings->value("renderModule/" + property_name));
-      }
-    }
-  if (settings->contains("renderModule/Background"))
-    {
-    pqSMAdaptor::setMultipleElementProperty(
-      renModule->GetProperty("Background"),
-      settings->value("renderModule/Background").value<QList<QVariant> >());
-    }
-
-  renModule->UpdateVTKObjects();
+  pqRM->setDefaults();
 
 #if 0
   // turn on vtk light kit

@@ -79,6 +79,9 @@ public:
   /// on interaction is managed by this class.
   pqUndoStack* getInteractionUndoStack() const;
 
+  /// Sets default values for the underlying proxy. This is typically called
+  /// only on proxies created by the GUI itself.
+  virtual void setDefaults();
 private slots:
   // Called on start/end interaction.
   void startInteraction();
