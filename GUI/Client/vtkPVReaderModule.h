@@ -104,6 +104,16 @@ public:
   vtkGetMacro(AcceptAfterRead, int);
 
   // Description:
+  // Set/Get whether the reader's CanReadFile method will be called
+  // when an extension matches or all of the time.
+  // This defaults to OFF.
+  // If a reader's list of extensions includes "trycanread", this
+  // will be set to ON.
+  vtkSetMacro(AlwaysTryCanRead, int);
+  vtkGetMacro(AlwaysTryCanRead, int);
+  vtkBooleanMacro(AlwaysTryCanRead, int);
+
+  // Description:
   // Get the file entry.
   vtkGetObjectMacro(FileEntry, vtkPVFileEntry);
 
@@ -163,6 +173,7 @@ protected:
 
   int PackFileEntry;
   int AddFileEntry;
+  int AlwaysTryCanRead;
 
 private:
   vtkPVReaderModule(const vtkPVReaderModule&); // Not implemented

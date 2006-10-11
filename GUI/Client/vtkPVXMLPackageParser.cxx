@@ -40,7 +40,7 @@
 #include <ctype.h>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.59");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.60");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -279,6 +279,15 @@ void vtkPVXMLPackageParser::CreateReaderModule(vtkPVXMLElement* me)
   else
     {
     pvm = vtkPVReaderModule::New();
+    }
+
+  const char* always_try_can_read = me->GetAttribute("always_try_can_read");
+  if ( always_try_can_read )
+    {
+    if ( ! strcmp( always_try_can_read, "true" ) || ! strcmp( always_try_can_read, "1" ) )
+      {
+      pvm->AlwaysTryCanReadOn();
+      }
     }
 
   const char* extensions = me->GetAttribute("extensions");

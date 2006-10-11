@@ -780,4 +780,62 @@
                   trace_name="CellSelection"/>
   </Module>
 
+  <Module name="LSDynaReader"
+          root_name="LSDynaReader"
+          output="vtkMultiBlockDataSet"
+          class="vtkPVAdvancedReaderModule"
+          module_type="Reader"
+          extensions="d3plot .k .lsdyna"
+          always_try_can_read="1"
+          file_description="LSDyna">
+    <Source class="vtkLSDynaReader"/>
+
+    <Scale property="TimeStep"
+           label="Time step" trace_name="TimeStep"
+           keeps_timesteps="1"
+           help="Set the current timestep."/>
+
+    <ArraySelection trace_name="solid_array_sel"
+                    property="SolidArrayStatus"
+                    label_text="Solid Element Variables" />
+    <ArraySelection trace_name="thick_shell_array_sel"
+                    property="ThickShellArrayStatus"
+                    label_text="Thick Shell Element Variables" />
+    <ArraySelection trace_name="shell_array_sel"
+                    property="ShellArrayStatus"
+                    label_text="Shell Element Variables" />
+    <ArraySelection trace_name="rigid_body_array_sel"
+                    property="RigidBodyArrayStatus"
+                    label_text="Rigid Body Element Variables" />
+    <ArraySelection trace_name="road_surface_array_sel"
+                    property="RoadSurfaceArrayStatus"
+                    label_text="Road Surface Element Variables" />
+    <ArraySelection trace_name="beam_array_sel"
+                    property="BeamArrayStatus"
+                    label_text="Beam Element Variables" />
+    <ArraySelection trace_name="particle_array_sel"
+                    property="ParticleArrayStatus"
+                    label_text="Particle Element Variables" />
+
+    <ArraySelection trace_name="point_array_sel"
+                    property="PointArrayStatus"
+                    label_text="Node Variables" />
+
+    <ArraySelection trace_name="part_array_sel"
+                    property="PartArrayStatus"
+                    label_text="Parts" />
+
+    <LabeledToggle label="Deformed mesh"
+                   trace_name="DeformedMesh"
+                   property="DeformedMesh"
+                   help="Should the mesh be deformed over time (if the Deflection node array is set to load)?"/>
+    <LabeledToggle label="Remove deleted cells"
+                   trace_name="RemoveDeletedCells"
+                   property="RemoveDeletedCells"
+                   help="Should cells that have been deleted (failed structurally, for example) be removed from the mesh?"/>
+    <LabeledToggle label="Split parts by material"
+                   trace_name="SplitByMaterialId"
+                   property="SplitByMaterialId"
+                   help="Should each material have its own mesh, or should there be one mesh for all materials?"/>
+  </Module>
 </ModuleInterfaces>

@@ -2041,5 +2041,158 @@
      </StringVectorProperty>
    </SourceProxy>
    <!-- End of FLUENT Reader -->
+
+   <!-- Beginning of LSDyna Reader -->
+   <SourceProxy name="LSDynaReader" class="vtkLSDynaReader">
+
+     <StringVectorProperty name="FileName" command="SetFileName" number_of_elements="1">
+        <FileListDomain name="files"/>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="TimeStepRangeInfo" command="GetTimeStepRange" information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="TimeStep" command="SetTimeStep" number_of_elements="1" animateable="1"
+         default_values="0" information_property="TimestepValues">
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="TimeStepRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+     </IntVectorProperty>
+
+     <StringVectorProperty name="SolidArrayInfo" information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Solid"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="SolidArrayStatus" command="SetSolidArrayStatus" number_of_elements="2" repeat_command="1"
+        number_of_elements_per_command="2" element_types="2 0" information_property="SolidArrayInfo">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="SolidArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="ThickShellArrayInfo" information_only="1">
+        <ArraySelectionInformationHelper attribute_name="ThickShell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="ThickShellArrayStatus" command="SetThickShellArrayStatus" number_of_elements="2" repeat_command="1"
+        number_of_elements_per_command="2" element_types="2 0" information_property="ThickShellArrayInfo">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ThickShellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="ShellArrayInfo" information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Shell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="ShellArrayStatus" command="SetShellArrayStatus" number_of_elements="2" repeat_command="1"
+        number_of_elements_per_command="2" element_types="2 0" information_property="ShellArrayInfo">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ShellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="RigidBodyArrayInfo" information_only="1">
+        <ArraySelectionInformationHelper attribute_name="RigidBody"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="RigidBodyArrayStatus" command="SetRigidBodyArrayStatus" number_of_elements="2" repeat_command="1"
+        number_of_elements_per_command="2" element_types="2 0" information_property="RigidBodyArrayInfo">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="RigidBodyArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="RoadSurfaceArrayInfo" information_only="1">
+        <ArraySelectionInformationHelper attribute_name="RoadSurface"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="RoadSurfaceArrayStatus" command="SetRoadSurfaceArrayStatus" number_of_elements="2" repeat_command="1"
+        number_of_elements_per_command="2" element_types="2 0" information_property="RoadSurfaceArrayInfo">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="RoadSurfaceArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="BeamArrayInfo" information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Beam"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="BeamArrayStatus" command="SetBeamArrayStatus" number_of_elements="2" repeat_command="1"
+        number_of_elements_per_command="2" element_types="2 0" information_property="BeamArrayInfo">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="BeamArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="ParticleArrayInfo" information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Particle"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="ParticleArrayStatus" command="SetParticleArrayStatus" number_of_elements="2" repeat_command="1"
+        number_of_elements_per_command="2" element_types="2 0" information_property="ParticleArrayInfo">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ParticleArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="PointArrayInfo" information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="PointArrayStatus" command="SetPointArrayStatus" number_of_elements="2" repeat_command="1"
+        number_of_elements_per_command="2" element_types="2 0" information_property="PointArrayInfo">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="PartArrayInfo" information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Part"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="PartArrayStatus" command="SetPartArrayStatus" number_of_elements="2" repeat_command="1"
+        number_of_elements_per_command="2" element_types="2 0" information_property="PartArrayInfo">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PartArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="DeformedMesh" command="SetDeformedMesh" number_of_elements="1" default_values="1" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="RemoveDeletedCells" command="SetRemoveDeletedCells" number_of_elements="1" default_values="1" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="SplitByMaterialId" command="SetSplitByMaterialId" number_of_elements="1" default_values="0" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+   </SourceProxy>
+   <!-- End of LSDyna Reader -->
+
   </ProxyGroup>
 </ServerManagerConfiguration>

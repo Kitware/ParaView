@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.73");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.74");
 
 //----------------------------------------------------------------------------
 vtkPVReaderModule::vtkPVReaderModule()
@@ -48,6 +48,7 @@ vtkPVReaderModule::vtkPVReaderModule()
   this->Iterator = this->Extensions->NewIterator();
   this->PackFileEntry = 1;
   this->AddFileEntry = 1;
+  this->AlwaysTryCanRead = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -123,15 +124,22 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
   int canRead = 0;
 
   // Check if the file name matches any of our extensions.
-  for(this->Iterator->GoToFirstItem();
+  if ( this->AlwaysTryCanRead )
+    {
+    matches = 1;
+    }
+  else
+    {
+    for(this->Iterator->GoToFirstItem();
       !this->Iterator->IsDoneWithTraversal() && !matches;
       this->Iterator->GoToNextItem())
-    {
-    const char* val = 0;
-    this->Iterator->GetData(val);
-    if(ext && strcmp(ext, val) == 0)
       {
-      matches = 1;
+      const char* val = 0;
+      this->Iterator->GetData(val);
+      if(ext && strcmp(ext, val) == 0)
+        {
+        matches = 1;
+        }
       }
     }
 
@@ -170,7 +178,14 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
 //----------------------------------------------------------------------------
 void vtkPVReaderModule::AddExtension(const char* ext)
 {
-  this->Extensions->AppendItem(ext);
+  if ( ! strcmp( ext, "trycanread" ) )
+    {
+    this->AlwaysTryCanRead = 1;
+    }
+  else
+    {
+    this->Extensions->AppendItem(ext);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -487,4 +502,5 @@ void vtkPVReaderModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AcceptAfterRead: " << this->AcceptAfterRead << endl;
   os << indent << "PackFileEntry: " << this->PackFileEntry << endl;
   os << indent << "FileEntry: " << this->FileEntry << endl;
+  os << indent << "AlwaysTryCanRead: " << this->AlwaysTryCanRead << endl;
 }
