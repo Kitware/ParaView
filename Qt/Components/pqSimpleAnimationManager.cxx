@@ -255,8 +255,8 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
   Ui::Dialog dialogUI;
   dialogUI.setupUi(&dialog);
   dialogUI.checkBoxDisconnect->setEnabled(this->Server->isRemote());
-
-  if (extension == "mpg")
+  bool isMPEG = (extension == "mpg");
+  if (isMPEG)
     {
     // Size bounds for mpeg.
     dialogUI.spinBoxWidth->setMaximum(1920);
@@ -318,6 +318,43 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
   QSize oldMaxSize = activeView->getWidget()->maximumSize();
   QSize newSize(dialogUI.spinBoxWidth->value(),
     dialogUI.spinBoxHeight->value());
+
+  // Enfore the multiple of 4 criteria.
+  if (isMPEG)
+    {
+    int &width = newSize.rwidth();
+    int &height = newSize.rheight();
+    if ((width % 32) > 0)
+      {
+      width -= width % 32;
+      }
+    if ((height % 8) > 0)
+      {
+      height -= height % 8;
+      }
+    if (width > 1920)
+      {
+      width = 1920;
+      }
+    if (height > 1080)
+      {
+      height = 1080;
+      }
+    }
+  else
+    {
+    int &width = newSize.rwidth();
+    int &height = newSize.rheight();
+    if ((width % 4) > 0)
+      {
+      width -= width % 4;
+      }
+    if ((height % 4) > 0)
+      {
+      height -= height % 4;
+      }
+    }
+
   activeView->getWidget()->setMaximumSize(newSize);
   activeView->getWidget()->resize(newSize);
 
@@ -340,9 +377,9 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
     pqSMAdaptor::setElementProperty(cleaner->GetProperty("AnimationFileName"),
       filename.toStdString().c_str());
     pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 0,
-      dialogUI.spinBoxWidth->value());
+      newSize.width());
     pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 1,
-      dialogUI.spinBoxHeight->value());
+      newSize.height());
     pqSMAdaptor::setElementProperty(cleaner->GetProperty("FrameRate"),
       dialogUI.spinBoxFrameRate->value());
     cleaner->UpdateVTKObjects();
@@ -383,8 +420,8 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
     status = scene->SaveImages(
       filePrefix.toStdString().c_str(),
       extension.toStdString().c_str(), 
-      dialogUI.spinBoxWidth->value(),
-      dialogUI.spinBoxHeight->value(),
+      newSize.width(),
+      newSize.height(),
       dialogUI.spinBoxFrameRate->value(), 0);
     }
  
