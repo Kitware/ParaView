@@ -72,7 +72,7 @@ private:
   const QDomDocument Configuration;
 };
 
-/// Private implementation detail
+/// Private implementation detail ... pretend you didn't see this
 class pqCommandServerStartupContextHelper :
   public QObject
 {
@@ -83,15 +83,18 @@ signals:
   void failed();
 
 private slots:
+  void onReadyReadStandardOutput();
+  void onReadyReadStandardError();
   void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
   void onError(QProcess::ProcessError error);
   void onDelayComplete();
   
 private:
-  pqCommandServerStartupContextHelper(double Delay, QObject* parent);
+  pqCommandServerStartupContextHelper(QProcess* process, double delay, QObject* parent);
   
   friend class pqCommandServerStartup;
   
+  QProcess* const Process;
   const double Delay;
 };
 

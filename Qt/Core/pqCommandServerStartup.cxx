@@ -43,10 +43,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // pqCommandServerStartupContextHelper
 
 pqCommandServerStartupContextHelper::pqCommandServerStartupContextHelper(
-    double delay, QObject* object_parent) :
+    QProcess* process, double delay, QObject* object_parent) :
   QObject(object_parent),
+  Process(process),
   Delay(delay)
 {
+  QObject::connect(
+    this->Process,
+    SIGNAL(readyReadStandardError()),
+    this,
+    SLOT(onReadyReadStandardError()));
+    
+  QObject::connect(
+    this->Process,
+    SIGNAL(readyReadStandardOutput()),
+    this,
+    SLOT(onReadyReadStandardOutput()));
+    
+  QObject::connect(
+    this->Process,
+    SIGNAL(error(QProcess::ProcessError)),
+    this,
+    SLOT(onError(QProcess::ProcessError)));
+
+  QObject::connect(
+    this->Process,
+    SIGNAL(finished(int, QProcess::ExitStatus)),
+    this,
+    SLOT(onFinished(int, QProcess::ExitStatus)));
+}
+
+void pqCommandServerStartupContextHelper::onReadyReadStandardOutput()
+{
+  qDebug() << this->Process->readAllStandardOutput().data();
+}
+
+void pqCommandServerStartupContextHelper::onReadyReadStandardError()
+{
+  qWarning() << this->Process->readAllStandardError().data();
 }
 
 void pqCommandServerStartupContextHelper::onFinished(int /*exitCode*/,
@@ -205,23 +239,14 @@ void pqCommandServerStartup::execute(const OptionsT& user_options,
   process->setEnvironment(environment);
 
   pqCommandServerStartupContextHelper* const helper =
-    new pqCommandServerStartupContextHelper(delay, &context);
-  QObject::connect(
-    process,
-    SIGNAL(error(QProcess::ProcessError)),
-    helper,
-    SLOT(onError(QProcess::ProcessError)));
-  QObject::connect(
-    process,
-    SIGNAL(finished(int, QProcess::ExitStatus)),
-    helper,
-    SLOT(onFinished(int, QProcess::ExitStatus)));
-
+    new pqCommandServerStartupContextHelper(process, delay, &context);
+    
   QObject::connect(
     helper,
     SIGNAL(succeeded()),
     &context,
     SLOT(onSucceeded()));
+
   QObject::connect(
     helper,
     SIGNAL(failed()),
