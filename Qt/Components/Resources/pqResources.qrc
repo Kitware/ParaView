@@ -114,8 +114,8 @@
         <file>Icons/pqWindowd22.png</file>
         <file>Icons/pqWindowd32.png</file>
         <file>Icons/pqWindowh16.png</file>
-        <file>UI/pqThresholdPanel.ui</file>
         <file>UI/pqExodusPanel.ui</file>
+        <file>UI/pqThresholdPanel.ui</file>
         <file>XML/ParaViewFilters.xml</file>
         <file>XML/ParaViewReaders.xml</file>
         <file>XML/ParaViewWriters.xml</file>
