@@ -85,6 +85,7 @@ void output_temp(FILE *fp, int i, int aType, char *Id, int count)
     case 0xB:     fprintf(fp,"long long "); break;
     case 0xC:     fprintf(fp,"__int64 "); break;
     case 0xD:     fprintf(fp,"signed char "); break;
+    case 0xE:     fprintf(fp,"bool "); break;
     case 0x9:     fprintf(fp,"%s ",Id); break;
     case 0x8: return;
     }
@@ -142,7 +143,7 @@ void return_result(FILE *fp)
     case 0x2:
       break;
     case 0x1: case 0x3: case 0x4: case 0x5: case 0x6: case 0x7: case 0xA:
-    case 0xB: case 0xC: case 0xD: case 0x13: case 0x14: case 0x15: case 0x16:
+    case 0xB: case 0xC: case 0xD: case 0xE: case 0x13: case 0x14: case 0x15: case 0x16:
     case 0x1A: case 0x1B: case 0x1C:
     case 0x303:
       fprintf(fp,
@@ -229,6 +230,7 @@ void get_args(FILE *fp, int i)
     case 0xB:
     case 0xC:
     case 0xD:
+    case 0xE:
     case 0x3:
     case 0x13:
     case 0x14:
@@ -262,7 +264,7 @@ void get_args(FILE *fp, int i)
         switch (currentFunction->ArgTypes[i] % 0x100)
           {
           case 0x1: case 0x7:
-          case 0x4: case 0x5: case 0x6: case 0xA: case 0xB: case 0xC: case 0xD:
+          case 0x4: case 0x5: case 0x6: case 0xA: case 0xB: case 0xC: case 0xD: case 0xE:
           case 0x13: case 0x14: case 0x15: case 0x16:
           case 0x1A: case 0x1B: case 0x1C:
             fprintf(fp, "msg.GetArgument(0, %i, temp%i, %i)",
