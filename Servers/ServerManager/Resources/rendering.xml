@@ -3157,6 +3157,7 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Enabled" />
+          <Property name="ProcessEvents" />
         </ExposedProperties>
       </SubProxy>
     </New3DWidgetProxy>
@@ -3198,11 +3199,6 @@
         <ExposedProperties>
           <Property name="Enabled" />
         </ExposedProperties>
-        <ShareProperties subproxy="Prop">
-          <!-- We share the Visibility property between the widget 
-              and the representation. -->
-          <Exception name="Enabled" />
-        </ShareProperties>
       </SubProxy>
     </New3DWidgetProxy>
 
@@ -3447,3 +3443,4 @@
   </ProxyGroup>
 
 </ServerManagerConfiguration>
+

@@ -440,7 +440,7 @@ void pq3DWidget::updateWidgetVisibility()
     
   const bool widget_enabled = widget_visible;
   
-  if(this->Internal->WidgetProxy)
+  if(this->Internal->WidgetProxy && this->Internal->RenderModule)
     {
     if(vtkSMIntVectorProperty* const visibility =
       vtkSMIntVectorProperty::SafeDownCast(
@@ -448,10 +448,6 @@ void pq3DWidget::updateWidgetVisibility()
       {
       visibility->SetElement(0, widget_visible);
       }
-    // It is essential that Visibility state is pushed before Enabled
-    // since vtkAbstractWidget::SetEnabled(true) has no effect
-    // if vtkAbstractWidget::Visibility == false.
-    this->Internal->WidgetProxy->UpdateVTKObjects();
 
     if(vtkSMIntVectorProperty* const enabled =
       vtkSMIntVectorProperty::SafeDownCast(
