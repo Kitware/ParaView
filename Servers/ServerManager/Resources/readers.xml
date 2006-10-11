@@ -1438,7 +1438,8 @@
      <StringVectorProperty
         name="FilePrefix"
         command="SetFilePrefix"
-        number_of_elements="1" >
+        number_of_elements="1"
+        information_property="FilePrefixInfo" >
        <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
              <Property name="FilePrefixInfo" function="Prefix"/>
@@ -1456,7 +1457,8 @@
      <StringVectorProperty
         name="FilePattern"
         command="SetFilePattern"
-        number_of_elements="1" >
+        number_of_elements="1"
+        information_property="FilePatternInfo" >
        <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
              <Property name="FilePatternInfo" function="Pattern"/>
@@ -1475,7 +1477,8 @@
         name="FileRange"
         command="SetFileRange"
         number_of_elements="2" 
-        default_values="0 0">
+        default_values="-1 -1"
+        information_property="FileRangeInfo" >
        <IntRangeDomain name="range">
           <RequiredProperties>
              <Property name="FileRangeInfo" function="Range"/>
