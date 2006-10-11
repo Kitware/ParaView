@@ -780,6 +780,7 @@
                   trace_name="CellSelection"/>
   </Module>
 
+  <!--
   <Module name="LSDynaReader"
           root_name="LSDynaReader"
           output="vtkMultiBlockDataSet"
@@ -838,4 +839,5 @@
                    property="SplitByMaterialId"
                    help="Should each material have its own mesh, or should there be one mesh for all materials?"/>
   </Module>
+  -->
 </ModuleInterfaces>
