@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QSpinBox>
+#include <QTimer>
 
 // VTK includes
 #include <vtkSmartPointer.h>
@@ -57,6 +58,7 @@ public:
   pqInternal()
     {
     this->Connection = vtkEventQtSlotConnect::New();
+    this->MarkedForUpdate = false;
     }
   ~pqInternal()
     {
@@ -66,6 +68,7 @@ public:
   int Index;
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
+  bool MarkedForUpdate;
 };
   
 
@@ -96,15 +99,9 @@ pqSpinBoxDomain::pqSpinBoxDomain(QSpinBox* p, vtkSMProperty* prop, int index)
     this->Internal->Connection->Connect(this->Internal->Domain, 
                                         vtkCommand::ModifiedEvent,
                                         this,
-                                        SIGNAL(domainChanged()));
+                                        SLOT(domainChanged()));
     this->internalDomainChanged();
     }
-  
-  // queued connection, otherwise, we get modified events during the
-  // modification of the domain, which we don't want
-  QObject::connect(this, SIGNAL(domainChanged()),
-                   this, SLOT(internalDomainChanged()),
-                   Qt::QueuedConnection);
 }
 
 pqSpinBoxDomain::~pqSpinBoxDomain()
@@ -112,6 +109,17 @@ pqSpinBoxDomain::~pqSpinBoxDomain()
   delete this->Internal;
 }
   
+void pqSpinBoxDomain::domainChanged()
+{
+  if(this->Internal->MarkedForUpdate)
+    {
+    return;
+    }
+
+  this->Internal->MarkedForUpdate = true;
+  QTimer::singleShot(0, this, SLOT(internalDomainChanged()));
+}
+
 void pqSpinBoxDomain::internalDomainChanged()
 {
   QSpinBox* spinbox = qobject_cast<QSpinBox*>(this->parent());
@@ -133,7 +141,8 @@ void pqSpinBoxDomain::internalDomainChanged()
       int max = range[1].toInt();
       if(range[0].type() == QVariant::Int)
         {
-        spinbox->setSingleStep( (max - min) / 50 );  // arbitrary
+        //spinbox->setSingleStep( (max - min) / 50 );  // arbitrary
+        spinbox->setSingleStep(1);
         }
       else
         {
@@ -152,7 +161,8 @@ void pqSpinBoxDomain::internalDomainChanged()
       int max = range[1].toInt();
       if(range[0].type() == QVariant::Int)
         {
-        spinbox->setSingleStep( (max - min) / 50 );  // arbitrary
+        //spinbox->setSingleStep( (max - min) / 50 );  // arbitrary
+        spinbox->setSingleStep(1);
         }
       else
         {
@@ -161,6 +171,7 @@ void pqSpinBoxDomain::internalDomainChanged()
       spinbox->setRange(min, max);
       }
     }
+  this->Internal->MarkedForUpdate = false;
 }
 
 
