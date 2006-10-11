@@ -64,6 +64,7 @@ public:
     uint64_value, uint64_array,
     float32_value, float32_array,
     float64_value, float64_array,
+    bool_value,
     string_value,
     id_value,
     vtk_object_pointer,
@@ -112,6 +113,7 @@ public:
   // Get the value of the given argument in the given message.
   // Returns whether the argument could be converted to the requested
   // type.
+  int GetArgument(int message, int argument, bool* value) const;
   int GetArgument(int message, int argument, signed char* value) const;
   int GetArgument(int message, int argument, char* value) const;
   int GetArgument(int message, int argument, short* value) const;
@@ -217,6 +219,7 @@ public:
 
   // Description:
   // Stream operators for native types.
+  vtkClientServerStream& operator << (bool value);
   vtkClientServerStream& operator << (char value);
   vtkClientServerStream& operator << (short value);
   vtkClientServerStream& operator << (int value);

@@ -424,6 +424,16 @@ vtkClientServerStream::operator << (vtkObjectBase* obj)
 }
 
 //----------------------------------------------------------------------------
+vtkClientServerStream& vtkClientServerStream::operator << (bool x)
+{
+  // Store the type first, then the value.
+  // Boolean values in the stream are represented by vtkTypeUInt8.
+  *this << vtkClientServerStream::bool_value;
+  vtkTypeUInt8 b = x?1:0;
+  return this->Write(&b, sizeof(b));
+}
+
+//----------------------------------------------------------------------------
 // Template and macro to implement all insertion operators in the same way.
 template <class T>
 vtkClientServerStream&
@@ -544,21 +554,55 @@ VTK_CLIENT_SERVER_INSERT_ARRAY(double)
 
 //----------------------------------------------------------------------------
 // Template to implement each type conversion in the lookup tables below.
+// The "long, long, long" arguments are used to convince VS6 to select
+// the proper overload when more than one of these functions otherwise
+// looks the same after template instantiation.  This works around the
+// lack of partial ordering of templates in VS6.
 template <class SourceType, class T>
 void vtkClientServerStreamGetArgumentCase(SourceType*,
-                                          const unsigned char* src, T* dest)
+                                          const unsigned char* src, T* dest,
+                                          long, long, long)
 {
   // Copy the value out of the stream and convert it.
   SourceType value;
   memcpy(&value, src, sizeof(value));
   *dest = static_cast<T>(value);
 }
+template <class SourceType>
+void vtkClientServerStreamGetArgumentCase(SourceType*,
+                                          const unsigned char* src,
+                                          bool* dest, long, long, int)
+{
+  // Copy the value out of the stream and convert it.
+  SourceType value;
+  memcpy(&value, src, sizeof(value));
+  *dest = value? true:false;
+}
+template <class T>
+void vtkClientServerStreamGetArgumentCase(bool*,
+                                          const unsigned char* src,
+                                          T* dest, long, int, int)
+{
+  // Boolean values in the stream are represented by vtkTypeUInt8.
+  vtkTypeUInt8 value;
+  memcpy(&value, src, sizeof(value));
+  *dest = static_cast<T>(value);
+}
+void vtkClientServerStreamGetArgumentCase(bool*,
+                                          const unsigned char* src,
+                                          bool* dest, int, int, int)
+{
+  // Boolean values in the stream are represented by vtkTypeUInt8.
+  vtkTypeUInt8 value;
+  memcpy(&value, src, sizeof(value));
+  *dest = value? true:false;
+}
 
 #define VTK_CSS_GET_ARGUMENT_CASE(TypeId, SourceType) \
   case vtkClientServerStream::TypeId:                 \
   {                                                   \
   SourceType* T = 0;                                  \
-  vtkClientServerStreamGetArgumentCase(T, src, dest); \
+  vtkClientServerStreamGetArgumentCase(T, src, dest, 1, 1, 1); \
   } break
 
 int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
@@ -570,6 +614,7 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
     {
     // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
+    VTK_CSS_GET_ARGUMENT_CASE(bool_value, bool);
 
     // Unsafe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
@@ -592,6 +637,7 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
     VTK_CSS_GET_ARGUMENT_CASE(int16_value, vtkTypeInt16);
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
+    VTK_CSS_GET_ARGUMENT_CASE(bool_value, bool);
 
     // Unsafe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
@@ -615,6 +661,7 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
     VTK_CSS_GET_ARGUMENT_CASE(int32_value, vtkTypeInt32);
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
+    VTK_CSS_GET_ARGUMENT_CASE(bool_value, bool);
 
     // Unsafe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
@@ -641,6 +688,7 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
+    VTK_CSS_GET_ARGUMENT_CASE(bool_value, bool);
 
     // Unsafe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(uint64_value, vtkTypeUInt64);
@@ -660,6 +708,7 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
     {
     // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
+    VTK_CSS_GET_ARGUMENT_CASE(bool_value, bool);
 
     // Unsafe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
@@ -682,6 +731,7 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
     // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
+    VTK_CSS_GET_ARGUMENT_CASE(bool_value, bool);
 
     // Unsafe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
@@ -705,6 +755,7 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
+    VTK_CSS_GET_ARGUMENT_CASE(bool_value, bool);
 
     // Unsafe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
@@ -730,6 +781,7 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
     VTK_CSS_GET_ARGUMENT_CASE(uint64_value, vtkTypeUInt64);
+    VTK_CSS_GET_ARGUMENT_CASE(bool_value, bool);
 
     // Unsafe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
@@ -787,6 +839,30 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
   return 1;
 }
 
+int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
+                                     const unsigned char* src,
+                                     bool* dest)
+{
+  // Lookup what types can be converted safely to a bool.
+  switch(type)
+    {
+    // Safe conversions:
+    VTK_CSS_GET_ARGUMENT_CASE(bool_value, bool);
+    VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
+    VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
+    VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
+    VTK_CSS_GET_ARGUMENT_CASE(uint64_value, vtkTypeUInt64);
+    VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
+    VTK_CSS_GET_ARGUMENT_CASE(int16_value, vtkTypeInt16);
+    VTK_CSS_GET_ARGUMENT_CASE(int32_value, vtkTypeInt32);
+    VTK_CSS_GET_ARGUMENT_CASE(int64_value, vtkTypeInt64);
+    VTK_CSS_GET_ARGUMENT_CASE(float32_value, vtkTypeFloat32);
+    VTK_CSS_GET_ARGUMENT_CASE(float64_value, vtkTypeFloat64);
+    default: return 0;
+    };
+  return 1;
+}
+
 #undef VTK_CSS_GET_ARGUMENT_CASE
 
 //----------------------------------------------------------------------------
@@ -794,7 +870,8 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
 template <class T>
 int
 vtkClientServerStreamGetArgumentValue(const vtkClientServerStream* self,
-                                      int midx, int argument, T* value)
+                                      int midx, int argument, T* value,
+                                      long)
 {
   typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::SizedType Type;
   if(const unsigned char* data =
@@ -812,14 +889,34 @@ vtkClientServerStreamGetArgumentValue(const vtkClientServerStream* self,
     }
   return 0;
 }
+int
+vtkClientServerStreamGetArgumentValue(const vtkClientServerStream* self,
+                                      int midx, int argument, bool* value,
+                                      int)
+{
+  if(const unsigned char* data =
+     vtkClientServerStreamInternals::GetValue(*self, midx, 1+argument))
+    {
+    // Get the type of the value in the stream.
+    vtkTypeUInt32 tp;
+    memcpy(&tp, data, sizeof(tp));
+    data += sizeof(tp);
+
+    // Call the type conversion function for this type.
+    return vtkClientServerStreamGetArgument(
+      static_cast<vtkClientServerStream::Types>(tp), data, value);
+    }
+  return 0;
+}
 
 #define VTK_CSS_GET_ARGUMENT(type)                                          \
   int vtkClientServerStream::GetArgument(int message, int argument,         \
                                          type* value) const                 \
   {                                                                         \
     return vtkClientServerStreamGetArgumentValue(this, message,             \
-                                                 argument, value);          \
+                                                 argument, value, 1);       \
   }
+VTK_CSS_GET_ARGUMENT(bool)
 VTK_CSS_GET_ARGUMENT(signed char)
 VTK_CSS_GET_ARGUMENT(char)
 VTK_CSS_GET_ARGUMENT(int)
@@ -1945,6 +2042,20 @@ void vtkClientServerStream::PrintArgumentInternal(ostream& os, int message,
                            (this, os, indent, message, argument, annotate, T));
     VTK_CSS_TEMPLATE_MACRO(array, vtkClientServerStreamPrintArray
                            (this, os, indent, message, argument, annotate, T));
+    case vtkClientServerStream::bool_value:
+      {
+      bool arg;
+      int result = this->GetArgument(message, argument, &arg);
+      if(annotate)
+        {
+        os << indent << "Argument " << argument << " = bool_value ";
+        os << "{" << (arg? "true" : "false") << "}\n";
+        }
+      else if(result)
+        {
+        os << (arg? "true" : "false");
+        }
+      } break;
     case vtkClientServerStream::string_value:
       {
       const char* arg;
@@ -2153,6 +2264,12 @@ void vtkClientServerStream::ArgumentValueToString(ostream& os,
                            (this, os, m, a, T));
     VTK_CSS_TEMPLATE_MACRO(array, vtkClientServerStreamArrayToString
                            (this, os, m, a, T));
+    case vtkClientServerStream::bool_value:
+      {
+      bool arg;
+      this->GetArgument(m, a, &arg);
+      os << (arg? "true" : "false");
+      } break;
     case vtkClientServerStream::string_value:
       {
       const char* arg;
@@ -2387,6 +2504,57 @@ int vtkClientServerStreamValueFromString(const char* begin, const char* end,
 }
 
 //----------------------------------------------------------------------------
+int vtkClientServerStreamBoolFromString(const char* begin, const char* end,
+                                        bool* value)
+{
+  // Scan for the beginning of the value.
+  const char* valueBegin = begin;
+  while(valueBegin < end && (*valueBegin == ' ' || *valueBegin == '\t' ||
+                             *valueBegin == '\r' || *valueBegin == '\n'))
+    {
+    ++valueBegin;
+    }
+
+  // Scan for the end of the value.
+  const char* valueEnd = valueBegin;
+  while(valueEnd < end && (*valueEnd != ' ' && *valueEnd != '\t' &&
+                           *valueEnd != '\r' && *valueEnd != '\n'))
+    {
+    ++valueEnd;
+    }
+
+  // Make sure this was the only value.
+  while(valueEnd < end)
+    {
+    if(*valueEnd != ' ' && *valueEnd != '\t' &&
+       *valueEnd != '\r' && *valueEnd != '\n')
+      {
+      return 0;
+      }
+    }
+
+  // Check the value.
+  if(valueEnd-valueBegin == 4 && (valueBegin[0] == 't' &&
+                                  valueBegin[1] == 'r' &&
+                                  valueBegin[2] == 'u' &&
+                                  valueBegin[3] == 'e'))
+    {
+    *value = true;
+    return 1;
+    }
+  else if(valueEnd-valueBegin == 5 && (valueBegin[0] == 'f' &&
+                                       valueBegin[1] == 'a' &&
+                                       valueBegin[2] == 'l' &&
+                                       valueBegin[3] == 's' &&
+                                       valueBegin[4] == 'e'))
+    {
+    *value = false;
+    return 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 template <class T>
 int vtkClientServerStreamValueFromString(vtkClientServerStream* self,
                                          const char* begin, const char* end,
@@ -2609,6 +2777,17 @@ int vtkClientServerStream::AddArgumentFromString(const char* begin,
     VTK_CSS_TEMPLATE_MACRO(array,
                            result = vtkClientServerStreamArrayFromString
                            (this, valueBegin, valueEnd, T));
+    case vtkClientServerStream::bool_value:
+      {
+      // Convert the bool value from a string.
+      bool arg;
+      result = vtkClientServerStreamBoolFromString(valueBegin, valueEnd,
+                                                   &arg);
+      if(result)
+        {
+        *this << arg;
+        }
+      } break;
     case vtkClientServerStream::string_value:
       {
       // Allocate a buffer for the string.
