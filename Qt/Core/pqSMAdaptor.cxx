@@ -1179,15 +1179,26 @@ QVariant pqSMAdaptor::getMultipleElementProperty(vtkSMProperty* Property,
 {
   QVariant var;
   
-  vtkSMDoubleVectorProperty* dvp;
-  vtkSMIntVectorProperty* ivp;
-  vtkSMIdTypeVectorProperty* idvp;
-  vtkSMStringVectorProperty* svp;
-  
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(Property);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(Property);
-  idvp = vtkSMIdTypeVectorProperty::SafeDownCast(Property);
-  svp = vtkSMStringVectorProperty::SafeDownCast(Property);
+  vtkSMDoubleVectorProperty* dvp = NULL;
+  vtkSMIntVectorProperty* ivp = NULL;
+  vtkSMIdTypeVectorProperty* idvp = NULL;
+  vtkSMStringVectorProperty* svp = NULL;
+
+  vtkSMProperty* info = Property->GetInformationProperty();
+  if(info)
+    {
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(info);
+    ivp = vtkSMIntVectorProperty::SafeDownCast(info);
+    idvp = vtkSMIdTypeVectorProperty::SafeDownCast(info);
+    svp = vtkSMStringVectorProperty::SafeDownCast(info);
+    }
+  else
+    {
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(Property);
+    ivp = vtkSMIntVectorProperty::SafeDownCast(Property);
+    idvp = vtkSMIdTypeVectorProperty::SafeDownCast(Property);
+    svp = vtkSMStringVectorProperty::SafeDownCast(Property);
+    }
 
   if(dvp && dvp->GetNumberOfElements() > Index)
     {
@@ -1378,9 +1389,18 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
 QString pqSMAdaptor::getFileListProperty(vtkSMProperty* Property)
 {
   QString file;
-  
+
   vtkSMStringVectorProperty* svp;
-  svp = vtkSMStringVectorProperty::SafeDownCast(Property);
+
+  vtkSMProperty* info = Property->GetInformationProperty();
+  if(info)
+    {
+    svp = vtkSMStringVectorProperty::SafeDownCast(info);
+    }
+  else
+    {
+    svp = vtkSMStringVectorProperty::SafeDownCast(Property);
+    }
 
   if(svp && svp->GetNumberOfElements() > 0)
     {

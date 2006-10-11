@@ -794,10 +794,6 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
                                     filename);
     proxy->UpdateVTKObjects();
     }
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("FilePrefix"),
-                                  filename);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("FilePattern"),
-                                  filename);
 
   emit this->sourceCreated(reader);
   this->getUndoStack()->EndUndoSet();
