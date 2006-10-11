@@ -906,10 +906,13 @@ void pqColorMapEditor::setTitle(const QString& name, const QString& comp)
 
   // Update Scalar Bar GUI.
   pqScalarBarDisplay* sb = stc->getScalarBar(rm);
-  pqSMAdaptor::setElementProperty( 
-    sb->getProxy()->GetProperty("Title"), QVariant(title.toAscii().data()));
-  sb->getProxy()->UpdateVTKObjects();
-  sb->renderAllViews();
+  if (sb)
+    {
+    pqSMAdaptor::setElementProperty( 
+      sb->getProxy()->GetProperty("Title"), QVariant(title.toAscii().data()));
+    sb->getProxy()->UpdateVTKObjects();
+    sb->renderAllViews();
+    }
 
   this->Form->TitleName->blockSignals(true);
   this->Form->TitleName->setText(name);
