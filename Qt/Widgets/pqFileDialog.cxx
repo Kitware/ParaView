@@ -148,13 +148,10 @@ pqFileDialog::pqFileDialog(
 
   this->setFileMode(ExistingFile);
 
-  // TODO:  This connection seems weird.
-  //        What we're really after is whether the view's rootIndex/currentIndex changed.
-  //        The model's dataChanged signal isn't an equivalent of that.
   QObject::connect(this->Implementation->Model->fileModel(),
-                   SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), 
+                   SIGNAL(modelReset()), 
                    this, 
-                   SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));
+                   SLOT(onModelReset()));
 
   QObject::connect(this->Implementation->Ui.NavigateUp, 
                    SIGNAL(clicked()), 
@@ -281,7 +278,7 @@ void pqFileDialog::accept()
     }
 }
 
-void pqFileDialog::onDataChanged(const QModelIndex&, const QModelIndex&)
+void pqFileDialog::onModelReset()
 {
   this->Implementation->Ui.Parents->clear();
   

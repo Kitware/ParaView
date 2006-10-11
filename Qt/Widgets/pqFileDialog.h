@@ -128,7 +128,7 @@ signals:
   void filesSelected(const QStringList&);
 
 private slots:
-  void onDataChanged(const QModelIndex&, const QModelIndex&);
+  void onModelReset();
   void onNavigate(const QString&);
   void onNavigateUp();
   void onNavigateDown(const QModelIndex&);
