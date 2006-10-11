@@ -33,7 +33,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNew3DWidgetProxy);
-vtkCxxRevisionMacro(vtkSMNew3DWidgetProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMNew3DWidgetProxy, "1.7");
 
 class vtkSMNew3DWidgetObserver : public vtkCommand
 {
@@ -104,6 +104,7 @@ void vtkSMNew3DWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     if (widget)
       {
       widget->SetInteractor(rm->GetInteractor());
+      widget->SetCurrentRenderer(rm->GetRenderer());
       }
     }
 
@@ -131,6 +132,7 @@ void vtkSMNew3DWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
       pm->GetObjectFromID(this->WidgetProxy->GetID(0)));
     if (this->Widget)
       {
+      widget->SetCurrentRenderer(0);
       widget->SetInteractor(0);
       }
     }

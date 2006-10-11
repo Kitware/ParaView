@@ -772,6 +772,12 @@
                          default_values="0">
         <BooleanDomain/>
       </IntVectorProperty>
+      <IntVectorProperty name="ProcessEvents" 
+                         command="SetProcessEvents"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain/>
+      </IntVectorProperty>
     </Proxy>
 
     <Proxy name="ImplicitPlaneWidget2" class="vtkImplicitPlaneWidget2">
@@ -783,12 +789,6 @@
       </ProxyProperty>
       <IntVectorProperty name="Enabled" 
                          command="SetEnabled"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain/>
-      </IntVectorProperty>
-      <IntVectorProperty name="Visibility" 
-                         command="SetVisibility"
                          number_of_elements="1"
                          default_values="0">
         <BooleanDomain/>
