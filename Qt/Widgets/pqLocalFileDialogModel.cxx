@@ -111,8 +111,8 @@ bool SortFileByTypeThenAlpha(const QFileInfo& A, const QFileInfo& B)
   if(A.isDir() != B.isDir())
     return A.isDir() > B.isDir();
   
-  // Then sort alphabetically
-  return A.absoluteFilePath() < B.absoluteFilePath();
+  // Then sort alphabetically (but case-insensitively)
+  return A.absoluteFilePath().toLower() < B.absoluteFilePath().toLower();
 }
 
 ///////////////////////////////////////////////////////////////////////

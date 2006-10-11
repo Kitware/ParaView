@@ -107,6 +107,15 @@ private:
   bool IsRoot;
 };
 
+///////////////////////////////////////////////////////////////////////
+// CaseInsensitiveSort
+
+bool CaseInsensitiveSort(const QString& A, const QString& B)
+{
+  // Sort alphabetically (but case-insensitively)
+  return A.toLower() < B.toLower();
+}
+
 /////////////////////////////////////////////////////////////////////////////////
 // pqFileModel
 
@@ -128,26 +137,39 @@ public:
     this->FileList.push_back(FileInfo(".", ".", true, false));
     this->FileList.push_back(FileInfo("..", "..", true, false));
     
-    vtkSmartPointer<vtkStringList> dirs = vtkSmartPointer<vtkStringList>::New();
-    vtkSmartPointer<vtkStringList> files = vtkSmartPointer<vtkStringList>::New();
+    vtkSmartPointer<vtkStringList> vtk_dirs = vtkSmartPointer<vtkStringList>::New();
+    vtkSmartPointer<vtkStringList> vtk_files = vtkSmartPointer<vtkStringList>::New();
     
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     if (!pm->GetDirectoryListing(this->Server->GetConnectionID(),
-      Path.toAscii().data(), dirs.GetPointer(), files.GetPointer(), 0))
+      Path.toAscii().data(), vtk_dirs.GetPointer(), vtk_files.GetPointer(), 0))
       {
       // error failed to obtain directory listing.
       return;
       }
 
-    int cc;
-    for (cc=0; cc < dirs->GetNumberOfStrings(); cc++)
+    QStringList dirs;
+    for(int i = 0; i != vtk_dirs->GetNumberOfStrings(); ++i)
       {
-      const char* directory_name = dirs->GetString(cc);
+      dirs.push_back(vtk_dirs->GetString(i));
+      }
+    QStringList files;
+    for(int i = 0; i != vtk_files->GetNumberOfStrings(); ++i)
+      {
+      files.push_back(vtk_files->GetString(i));
+      }
+
+    qSort(dirs.begin(), dirs.end(), CaseInsensitiveSort);
+    qSort(files.begin(), files.end(), CaseInsensitiveSort);
+
+    for(int i = 0; i != dirs.size(); ++i)
+      {
+      const QString directory_name = dirs[i];
       this->FileList.push_back(FileInfo(directory_name, directory_name, true, false));
       }
-    for (cc=0; cc < files->GetNumberOfStrings(); cc++)
+    for(int i = 0; i != files.size(); ++i)
       {
-      const char* file_name = files->GetString(cc);
+      const QString file_name = files[i];
       this->FileList.push_back(FileInfo(file_name, file_name, false, false));
       }
     this->endRemoveRows();
