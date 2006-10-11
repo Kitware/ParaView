@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqRenderModule.h"
+#include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
 pqVCRController::pqVCRController(QObject* _parent/*=null*/) : QObject(_parent)
@@ -116,6 +117,8 @@ void pqVCRController::updateSource(bool first, bool last, int offset)
     return;
     }
 
+  pqApplicationCore::instance()->getUndoStack()->BeginUndoSet("VCR");
+
   int min_exists = 0;
   int max_exists = 0;
   int min_step = timestep_range->GetMinimum(0, min_exists);
@@ -136,10 +139,11 @@ void pqVCRController::updateSource(bool first, bool last, int offset)
     new_time = (new_time <= max_step)? new_time : max_step;
     timestep->SetElement(0, new_time);
     }
+  activeProxy->UpdateVTKObjects();
+  pqApplicationCore::instance()->getUndoStack()->EndUndoSet();
 
   emit this->timestepChanged();
   
-  activeProxy->UpdateVTKObjects();
   this->Source->renderAllViews();
 }
 
