@@ -315,8 +315,11 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
     this->Proxies->AnimationScene->GetProperty("RenderModule"), 
     activeView->getProxy());
 
-  activeView->getWidget()->resize(dialogUI.spinBoxWidth->value(),
+  QSize oldMaxSize = activeView->getWidget()->maximumSize();
+  QSize newSize(dialogUI.spinBoxWidth->value(),
     dialogUI.spinBoxHeight->value());
+  activeView->getWidget()->setMaximumSize(newSize);
+  activeView->getWidget()->resize(newSize);
 
   pqSMAdaptor::setElementProperty(
     this->Proxies->AnimationScene->GetProperty("StartTime"),    0);
@@ -385,6 +388,7 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
       dialogUI.spinBoxFrameRate->value(), 0);
     }
  
+  activeView->getWidget()->setMaximumSize(oldMaxSize);
   activeView->getWidget()->resize(viewSize);   
   delete this->Proxies;
   this->Proxies = 0;
