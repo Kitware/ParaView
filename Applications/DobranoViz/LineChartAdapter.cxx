@@ -645,8 +645,7 @@ struct LineChartAdapter::pqImplementation
 
     // Add the plot options to the chart. Add the plot to the line
     // chart model.
-    this->Chart.getLineChart().setPlotOptions(options,
-        this->ChartModel->getNumberOfPlots());
+    this->ChartModel->setOptions(this->ChartModel->getNumberOfPlots(), options);
     this->ChartModel->appendPlot(plot);
 
     /*this->Chart.getLineChart().addData(
@@ -710,8 +709,7 @@ struct LineChartAdapter::pqImplementation
 
     // Add the plot options to the chart. Add the plot to the line
     // chart model.
-    this->Chart.getLineChart().setPlotOptions(options,
-        this->ChartModel->getNumberOfPlots());
+    this->ChartModel->setOptions(this->ChartModel->getNumberOfPlots(), options);
     this->ChartModel->appendPlot(plot);
 
     this->Chart.getLegend().addEntry(
@@ -809,8 +807,7 @@ struct LineChartAdapter::pqImplementation
 
     // Add the plot options to the chart. Add the plot to the line
     // chart model.
-    this->Chart.getLineChart().setPlotOptions(options,
-        this->ChartModel->getNumberOfPlots());
+    this->ChartModel->setOptions(this->ChartModel->getNumberOfPlots(), options);
     this->ChartModel->appendPlot(plot);
 
     this->Chart.getLegend().addEntry(

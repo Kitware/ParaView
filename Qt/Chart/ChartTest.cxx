@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
   options->setBrush(1, QBrush(Qt::white));
   options->setMarker(1, &circle);
 
-  histogram->getLineChart().setPlotOptions(options, 0);
+  lines->setOptions(0, options);
   histogram->getLineChart().setModel(lines);
 
   histogram->show();

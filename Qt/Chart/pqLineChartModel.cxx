@@ -38,7 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartCoordinate.h"
 #include "pqChartValue.h"
 #include "pqLineChartPlot.h"
+#include "pqLineChartPlotOptions.h"
+
 #include <QList>
+#include <QVector>
 
 
 class pqLineChartModelInternal
@@ -47,8 +50,9 @@ public:
   pqLineChartModelInternal();
   ~pqLineChartModelInternal() {}
 
-  QList<const pqLineChartPlot *> List;
-  QList<const pqLineChartPlot *> MultiSeries;
+  QList<pqLineChartPlot *> List;
+  QList<pqLineChartPlot *> MultiSeries;
+  QVector<pqLineChartPlotOptions *> Options;
   pqChartValue MinimumX;
   pqChartValue MaximumX;
   pqChartValue MinimumY;
@@ -58,7 +62,8 @@ public:
 
 //----------------------------------------------------------------------------
 pqLineChartModelInternal::pqLineChartModelInternal()
-  : List(), MultiSeries(), MinimumX(), MaximumX(), MinimumY(), MaximumY()
+  : List(), MultiSeries(), Options(), MinimumX(), MaximumX(), MinimumY(),
+    MaximumY()
 {
 }
 
@@ -80,12 +85,12 @@ int pqLineChartModel::getNumberOfPlots() const
   return this->Internal->List.size();
 }
 
-int pqLineChartModel::getIndexOf(const pqLineChartPlot *plot) const
+int pqLineChartModel::getIndexOf(pqLineChartPlot *plot) const
 {
   return this->Internal->List.indexOf(plot);
 }
 
-const pqLineChartPlot *pqLineChartModel::getPlot(int index) const
+pqLineChartPlot *pqLineChartModel::getPlot(int index) const
 {
   if(index >= 0 && index < this->Internal->List.size())
     {
@@ -95,12 +100,12 @@ const pqLineChartPlot *pqLineChartModel::getPlot(int index) const
   return 0;
 }
 
-void pqLineChartModel::appendPlot(const pqLineChartPlot *plot)
+void pqLineChartModel::appendPlot(pqLineChartPlot *plot)
 {
   this->insertPlot(plot, this->Internal->List.size());
 }
 
-void pqLineChartModel::insertPlot(const pqLineChartPlot *plot, int index)
+void pqLineChartModel::insertPlot(pqLineChartPlot *plot, int index)
 {
   // Make sure the plot is not in the list.
   if(!plot || this->Internal->List.indexOf(plot) != -1)
@@ -135,7 +140,7 @@ void pqLineChartModel::insertPlot(const pqLineChartPlot *plot, int index)
   emit this->plotsInserted(index, index);
 }
 
-void pqLineChartModel::removePlot(const pqLineChartPlot *plot)
+void pqLineChartModel::removePlot(pqLineChartPlot *plot)
 {
   if(plot)
     {
@@ -152,7 +157,7 @@ void pqLineChartModel::removePlot(int index)
     }
 
   emit this->aboutToRemovePlots(index, index);
-  const pqLineChartPlot *plot = this->Internal->List.takeAt(index);
+  pqLineChartPlot *plot = this->Internal->List.takeAt(index);
   this->disconnect(plot, 0, this, 0);
 
   // Re-calculate the chart ranges.
@@ -160,7 +165,7 @@ void pqLineChartModel::removePlot(int index)
   emit this->plotsRemoved(index, index);
 }
 
-void pqLineChartModel::movePlot(const pqLineChartPlot *plot, int index)
+void pqLineChartModel::movePlot(pqLineChartPlot *plot, int index)
 {
   if(plot)
     {
@@ -171,28 +176,78 @@ void pqLineChartModel::movePlot(const pqLineChartPlot *plot, int index)
 
 void pqLineChartModel::movePlot(int current, int index)
 {
-  if(current < 0 || current >= this->Internal->List.size())
+  if(current < 0 || current >= this->Internal->List.size() ||
+      index < 0 || index >= this->Internal->List.size())
     {
     return;
     }
 
-  if(index < 0 || index >= this->Internal->List.size())
+  // Adjust the index if it is after the current one.
+  if(index > current)
     {
-    index = this->Internal->List.size() - 1;
+    index--;
     }
 
-  // Move the chart to the new place in the list.
-  const pqLineChartPlot *plot = this->Internal->List.takeAt(current);
-  this->Internal->List.insert(index, plot);
+  // Move the plot to the new place in the list.
+  pqLineChartPlot *plot = this->Internal->List.takeAt(current);
+  if(index < this->Internal->List.size())
+    {
+    this->Internal->List.insert(index, plot);
+    }
+  else
+    {
+    this->Internal->List.append(plot);
+    }
+
   emit this->plotMoved(current, index);
+}
+
+void pqLineChartModel::movePlotAndOptions(int current, int index)
+{
+  if(current < 0 || current >= this->Internal->List.size() ||
+      index < 0 || index >= this->Internal->List.size())
+    {
+    return;
+    }
+
+  // Check if the options have been set for the current location.
+  pqLineChartPlotOptions *options = 0;
+  if(current >= 0 && current < this->Internal->Options.size())
+    {
+    // Remove the options from the list.
+    options = this->Internal->Options[current];
+    this->Internal->Options.remove(current);
+    }
+
+  // Adjust the index if it is after the current one.
+  if(index > current)
+    {
+    index--;
+    }
+
+  // Move the plot options to the new place.
+  if(index < this->Internal->Options.size())
+    {
+    this->Internal->Options.insert(index, options);
+    }
+  else
+    {
+    this->blockSignals(true);
+    this->setOptions(index, options);
+    this->blockSignals(false);
+    }
+
+  this->movePlot(current, index);
 }
 
 void pqLineChartModel::clearPlots()
 {
-  foreach (const pqLineChartPlot* plot, this->Internal->List)
+  QList<pqLineChartPlot *>::Iterator iter = this->Internal->List.begin();
+  for( ; iter != this->Internal->List.end(); ++iter)
     {
-    QObject::disconnect(plot, 0, this, 0);
+    QObject::disconnect(*iter, 0, this, 0);
     }
+
   this->Internal->List.clear();
   this->updateChartRanges();
   emit this->plotsReset();
@@ -208,6 +263,70 @@ void pqLineChartModel::getRangeY(pqChartValue &min, pqChartValue &max) const
 {
   min = this->Internal->MinimumY;
   max = this->Internal->MaximumY;
+}
+
+pqLineChartPlotOptions *pqLineChartModel::getOptions(int index) const
+{
+  if(index >= 0 && index < this->Internal->Options.size())
+    {
+    return this->Internal->Options[index];
+    }
+
+  return 0;
+}
+
+void pqLineChartModel::setOptions(int index, pqLineChartPlotOptions *options)
+{
+  if(index < 0)
+    {
+    return;
+    }
+
+  // Expand the vector to fit the plot index if needed.
+  if(index >= this->Internal->Options.size())
+    {
+    int i = this->Internal->Options.size();
+    this->Internal->Options.resize(index + 1);
+    for( ; i < this->Internal->Options.size(); i++)
+      {
+      this->Internal->Options[i] = 0;
+      }
+    }
+
+  if(this->Internal->Options[index])
+    {
+    QObject::disconnect(this->Internal->Options[index], 0, this, 0);
+    }
+
+  this->Internal->Options[index] = options;
+  if(options)
+    {
+    // Forward the options changed signal from the object.
+    this->connect(options, SIGNAL(optionsChanged()),
+        this, SIGNAL(optionsChanged()));
+    }
+
+  if(index < this->Internal->List.size())
+    {
+    emit this->optionsChanged();
+    }
+}
+
+void pqLineChartModel::clearOptions()
+{
+  QVector<pqLineChartPlotOptions *>::Iterator iter =
+      this->Internal->Options.begin();
+  for( ; iter != this->Internal->Options.end(); ++iter)
+    {
+    QObject::disconnect(*iter, 0, this, 0);
+    }
+
+  bool hadOptions = this->Internal->Options.size() > 0;
+  this->Internal->Options.clear();
+  if(hadOptions && this->Internal->List.size() > 0)
+    {
+    emit this->optionsChanged();
+    }
 }
 
 void pqLineChartModel::handlePlotReset()
@@ -303,7 +422,7 @@ void pqLineChartModel::updateChartRanges()
   this->Internal->MaximumY = (int)0;
 
   // Find the extents of the plot data.
-  QList<const pqLineChartPlot *>::Iterator plot = this->Internal->List.begin();
+  QList<pqLineChartPlot *>::Iterator plot = this->Internal->List.begin();
   if(plot != this->Internal->List.end())
     {
     (*plot)->getRangeX(this->Internal->MinimumX, this->Internal->MaximumX);

@@ -137,7 +137,6 @@ public:
   ~pqLineChartInternal() {}
 
   QList<pqLineChartItem *> Plots;
-  QVector<pqLineChartPlotOptions *> PlotOptions;
   QList<const pqLineChartPlot *> MultiSeries;
 };
 
@@ -184,7 +183,7 @@ pqLineChartItem::pqLineChartItem(const pqLineChartPlot *plot)
 
 //----------------------------------------------------------------------------
 pqLineChartInternal::pqLineChartInternal()
-  : Plots(), PlotOptions(), MultiSeries()
+  : Plots(), MultiSeries()
 {
 }
 
@@ -244,52 +243,51 @@ void pqLineChart::setModel(pqLineChartModel *model)
     // Connect to the new model's signals.
     this->connect(this->Model, SIGNAL(plotsReset()),
         this, SLOT(handleModelReset()));
+    this->connect(this->Model, SIGNAL(aboutToInsertPlots(int, int)),
+        this, SLOT(startPlotInsertion(int, int)));
+    this->connect(this->Model, SIGNAL(plotsInserted(int, int)),
+        this, SLOT(finishPlotInsertion(int, int)));
+    this->connect(this->Model, SIGNAL(aboutToRemovePlots(int, int)),
+        this, SLOT(startPlotRemoval(int, int)));
+    this->connect(this->Model, SIGNAL(plotsRemoved(int, int)),
+        this, SLOT(finishPlotRemoval(int, int)));
     this->connect(this->Model, SIGNAL(plotMoved(int, int)),
         this, SLOT(handlePlotMoved(int, int)));
     this->connect(this->Model, SIGNAL(plotReset(const pqLineChartPlot *)),
         this, SLOT(handlePlotReset(const pqLineChartPlot *)));
+    this->connect(this->Model,
+        SIGNAL(aboutToInsertPoints(const pqLineChartPlot *, int, int, int)),
+        this, SLOT(startPointInsertion(const pqLineChartPlot *, int, int, int)));
+    this->connect(this->Model,
+        SIGNAL(pointsInserted(const pqLineChartPlot *, int)),
+        this, SLOT(finishPointInsertion(const pqLineChartPlot *, int)));
+    this->connect(this->Model,
+        SIGNAL(aboutToRemovePoints(const pqLineChartPlot *, int, int, int)),
+        this, SLOT(startPointRemoval(const pqLineChartPlot *, int, int, int)));
+    this->connect(this->Model,
+        SIGNAL(pointsRemoved(const pqLineChartPlot *, int)),
+        this, SLOT(finishPointRemoval(const pqLineChartPlot *, int)));
+    this->connect(this->Model,
+        SIGNAL(aboutToChangeMultipleSeries(const pqLineChartPlot *)),
+        this, SLOT(startMultiSeriesChange(const pqLineChartPlot *)));
+    this->connect(this->Model,
+        SIGNAL(changedMultipleSeries(const pqLineChartPlot *)),
+        this, SLOT(finishMultiSeriesChange(const pqLineChartPlot *)));
+    this->connect(this->Model,
+        SIGNAL(errorBoundsChanged(const pqLineChartPlot *, int, int, int)),
+        this,
+        SLOT(handlePlotErrorBoundsChanged(const pqLineChartPlot *, int, int, int)));
+    this->connect(this->Model,
+        SIGNAL(errorWidthChanged(const pqLineChartPlot *, int)),
+        this, SLOT(handlePlotErrorWidthChanged(const pqLineChartPlot *, int)));
+    this->connect(this->Model, SIGNAL(optionsChanged),
+        this, SLOT(handlePlotOptionsChanged()));
     }
 
   // Set up the axis ranges and update the chart layout.
   this->buildPlotList();
   this->updateAxisRanges();
   emit this->layoutNeeded();
-}
-
-void pqLineChart::setPlotOptions(pqLineChartPlotOptions *options, int plot)
-{
-  if(plot < 0)
-    {
-    return;
-    }
-
-  // Expand the vector to fit the plot index if needed.
-  if(plot >= this->Internal->PlotOptions.size())
-    {
-    int i = this->Internal->PlotOptions.size();
-    this->Internal->PlotOptions.resize(plot + 1);
-    for( ; i < this->Internal->PlotOptions.size(); i++)
-      {
-      this->Internal->PlotOptions[i] = 0;
-      }
-    }
-
-  this->Internal->PlotOptions[plot] = options;
-}
-
-void pqLineChart::clearPlotOptions()
-{
-  this->Internal->PlotOptions.clear();
-}
-
-pqLineChartPlotOptions *pqLineChart::getPlotOptions(int plot) const
-{
-  if(plot >= 0 && plot < this->Internal->PlotOptions.size())
-    {
-    return this->Internal->PlotOptions[plot];
-    }
-
-  return 0;
 }
 
 void pqLineChart::layoutChart()
@@ -465,7 +463,12 @@ void pqLineChart::drawChart(QPainter& painter, const QRect& area)
   QList<pqLineChartItem *>::Iterator iter = this->Internal->Plots.begin();
   for(int i = 0; iter != this->Internal->Plots.end(); ++iter, ++i)
     {
-    pqLineChartPlotOptions *options = this->getPlotOptions(i);
+    pqLineChartPlotOptions *options = 0;
+    if(this->Model)
+      {
+      options = this->Model->getOptions(i);
+      }
+
     QList<pqLineChartItemData *>::Iterator series = (*iter)->Series.begin();
     for(int j = 0; series != (*iter)->Series.end(); ++series, ++j)
       {
@@ -729,6 +732,11 @@ void pqLineChart::handlePlotErrorWidthChanged(const pqLineChartPlot *plot, int)
   pqLineChartItem *item = this->getItem(plot);
   item->NeedsLayout = true;
   emit this->layoutNeeded();
+}
+
+void pqLineChart::handlePlotOptionsChanged()
+{
+  emit this->repaintNeeded();
 }
 
 void pqLineChart::updateAxisRanges(bool force)

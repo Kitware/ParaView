@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqChartValue;
 class pqLineChartModelInternal;
 class pqLineChartPlot;
+class pqLineChartPlotOptions;
 
 
 /// \class pqLineChartModel
@@ -78,30 +79,30 @@ public:
   /// \param plot The line chart plot to look up.
   /// \return
   ///   The index for the given plot.
-  int getIndexOf(const pqLineChartPlot *plot) const;
+  int getIndexOf(pqLineChartPlot *plot) const;
 
   /// \brief
   ///   Gets the plot at the given index.
   /// \param index The plot's model index.
   /// \return
   ///   A pointer to the plot or null if the index is out of range.
-  const pqLineChartPlot *getPlot(int index) const;
+  pqLineChartPlot *getPlot(int index) const;
 
   /// \brief
   ///   Appends a new plot to the end of the model list.
   /// \param plot The new plot to add.
-  void appendPlot(const pqLineChartPlot *plot);
+  void appendPlot(pqLineChartPlot *plot);
 
   /// \brief
   ///   Inserts a new plot in the model list.
   /// \param plot The new plot to add.
   /// \param index Where to insert the plot.
-  void insertPlot(const pqLineChartPlot *plot, int index);
+  void insertPlot(pqLineChartPlot *plot, int index);
 
   /// \brief
   ///   Removes the given plot from the model.
   /// \param plot The plot to remove.
-  void removePlot(const pqLineChartPlot *plot);
+  void removePlot(pqLineChartPlot *plot);
 
   /// \brief
   ///   Removes the plot at the given index from the model.
@@ -112,13 +113,23 @@ public:
   ///   Moves the given plot to the new position.
   /// \param plot The plot to move.
   /// \param index Where to move the plot to.
-  void movePlot(const pqLineChartPlot *plot, int index);
+  void movePlot(pqLineChartPlot *plot, int index);
 
   /// \brief
   ///   Moves the plot at the given index to the new position.
   /// \param current The index of the plot to move.
   /// \param index Where to move the plot to.
   void movePlot(int current, int index);
+
+  /// \brief
+  ///   Moves the plot at the given index to the new position.
+  ///
+  /// The corresponding display options will also get moved with the
+  /// plot.
+  ///
+  /// \param current The index of the plot to move.
+  /// \param index Where to move the plot to.
+  void movePlotAndOptions(int current, int index);
 
   /// Removes all the plots from the model.
   virtual void clearPlots();
@@ -137,6 +148,23 @@ public:
   /// \param min Used to return the minimum y-axis value.
   /// \param max Used to return the maximum y-axis value.
   void getRangeY(pqChartValue &min, pqChartValue &max) const;
+  //@}
+
+  /// \name Chart Display Options
+  //@{
+  /// \brief
+  ///   Gets the line chart plot's display options.
+  /// \return
+  ///   A pointer to the line chart plot's display options.
+  pqLineChartPlotOptions *getOptions(int index) const;
+
+  /// \brief
+  ///   Sets the line chart plot's display options.
+  /// \param options The new display options.
+  void setOptions(int index, pqLineChartPlotOptions *options);
+
+  /// Removes all the display options from the model.
+  void clearOptions();
   //@}
 
 signals:
@@ -237,6 +265,9 @@ signals:
   /// \param plot The modified plot.
   /// \param series The index of the modified series.
   void errorWidthChanged(const pqLineChartPlot *plot, int series);
+
+  /// Emitted when the drawing options for a plot change.
+  void optionsChanged();
 
 private slots:
   /// \name Plot Modification Handlers

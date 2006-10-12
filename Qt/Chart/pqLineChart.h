@@ -102,25 +102,6 @@ public:
   pqLineChartModel *getModel() const {return this->Model;}
   //@}
 
-  /// \name Drawing Parameters
-  //@{
-  /// \brief
-  ///   Sets the drawing parameters for a plot.
-  /// \param options The plot options object.
-  /// \param plot The plot index to set.
-  void setPlotOptions(pqLineChartPlotOptions *options, int plot);
-
-  /// \brief
-  ///   Gets the drawing parameters for a plot.
-  /// \param plot The plot index to look up.
-  /// \return
-  ///   A pointer to the drawing parameters for a plot.
-  pqLineChartPlotOptions *getPlotOptions(int plot) const;
-
-  /// Clears the list of plot options.
-  void clearPlotOptions();
-  //@}
-
   /// \name Display Methods
   //@{
   /// \brief
@@ -264,6 +245,9 @@ private slots:
   /// \param plot The plot that was modified.
   /// \param series The index of the modified point series.
   void handlePlotErrorWidthChanged(const pqLineChartPlot *plot, int series);
+
+  /// Initiates a chart repaint for the changed drawing options.
+  void handlePlotOptionsChanged();
 
 private:
   /// \brief
