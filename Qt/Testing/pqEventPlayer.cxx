@@ -30,14 +30,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqEventPlayer.h"
+
 #include "pqAbstractActivateEventPlayer.h"
 #include "pqAbstractBooleanEventPlayer.h"
 #include "pqAbstractDoubleEventPlayer.h"
 #include "pqAbstractIntEventPlayer.h"
 #include "pqAbstractItemViewEventPlayer.h"
 #include "pqAbstractStringEventPlayer.h"
+#include "pqTabBarEventPlayer.h"
 #include "pqBasicWidgetEventPlayer.h"
-#include "pqEventPlayer.h"
 #include "pqObjectNaming.h"
 
 #include <QApplication>
@@ -63,6 +65,7 @@ void pqEventPlayer::addDefaultWidgetEventPlayers()
   addWidgetEventPlayer(new pqAbstractIntEventPlayer());
   addWidgetEventPlayer(new pqAbstractItemViewEventPlayer());
   addWidgetEventPlayer(new pqAbstractStringEventPlayer());
+  addWidgetEventPlayer(new pqTabBarEventPlayer());
   addWidgetEventPlayer(new pqBasicWidgetEventPlayer());
 }
 

@@ -4,7 +4,6 @@ INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
   ${QtTesting_SOURCE_DIR}
   ${QT_QTTEST_INCLUDE_DIR}
-  ${VTK_INCLUDE_DIR}
 )
 
 # Reduce the number of dirs that get included on moc command line
@@ -27,6 +26,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.h
   pqStdoutEventObserver.h
+  pqTabBarEventTranslator.h
   pqWidgetEventTranslator.h
   pqXMLEventObserver.h
 )
@@ -84,6 +84,10 @@ ADD_LIBRARY(QtTesting
   pqSpinBoxEventTranslator.h
   pqStdoutEventObserver.cxx
   pqStdoutEventObserver.h
+  pqTabBarEventPlayer.cxx
+  pqTabBarEventPlayer.h
+  pqTabBarEventTranslator.cxx
+  pqTabBarEventTranslator.h
   pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
   pqXMLEventObserver.cxx

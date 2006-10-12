@@ -38,8 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPushButton>
 #include <QTimer>
-
-#include <vtkIOStream.h>
+#include <QFile>
+#include <QTextStream>
 
 //////////////////////////////////////////////////////////////////////////////////
 // pqImplementation
@@ -49,21 +49,26 @@ struct pqRecordEventsDialog::pqImplementation
 public:
   pqImplementation(pqEventTranslator* translator, const QString& path) :
     Translator(translator),
-    File(path.toAscii().data()),
-    Observer(File)
+    File(path)
   {
+  this->File.open(QIODevice::WriteOnly);
+  this->Stream.setDevice(&this->File);
+  this->Observer = new pqXMLEventObserver(this->Stream);
   }
   
   ~pqImplementation()
   {
     delete this->Translator;
+    delete this->Observer;
+    this->Stream.flush();
   }
 
   Ui::pqRecordEventsDialog Ui;
 
   pqEventTranslator* const Translator;
-  ofstream File;
-  pqXMLEventObserver Observer;
+  QFile File;
+  QTextStream Stream;
+  pqXMLEventObserver* Observer;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -81,7 +86,7 @@ pqRecordEventsDialog::pqRecordEventsDialog(pqEventTranslator* Translator, const 
   QObject::connect(
     this->Implementation->Translator,
     SIGNAL(recordEvent(const QString&, const QString&, const QString&)),
-    &this->Implementation->Observer,
+    this->Implementation->Observer,
     SLOT(onRecordEvent(const QString&, const QString&, const QString&)));
   
   this->setWindowTitle(tr("Recording User Input"));

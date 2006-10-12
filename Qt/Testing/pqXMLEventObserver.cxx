@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqXMLEventObserver.h"
 
+#include <QTextStream>
+
 /// Escapes strings so they can be embedded in an XML document
 static const QString textToXML(const QString& string)
 {
@@ -48,7 +50,7 @@ static const QString textToXML(const QString& string)
 ////////////////////////////////////////////////////////////////////////////////////
 // pqXMLEventObserver
 
-pqXMLEventObserver::pqXMLEventObserver(ostream& stream) :
+pqXMLEventObserver::pqXMLEventObserver(QTextStream& stream) :
   Stream(stream)
 {
   this->Stream << "<?xml version=\"1.0\" ?>\n";

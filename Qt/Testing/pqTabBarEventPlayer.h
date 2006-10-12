@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqXMLEventObserver.h
+   Module:    pqTabBarEventPlayer.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,43 +30,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqXMLEventObserver_h
-#define _pqXMLEventObserver_h
+#ifndef _pqTabBarEventPlayer_h
+#define _pqTabBarEventPlayer_h
 
-#include <QObject>
-class QTextStream;
+#include "pqWidgetEventPlayer.h"
 
 /**
-Observes high-level ParaView events, and serializes them to a stream as XML
-for possible playback (as a test-case, demo, tutorial, etc).  To use,
-connect the onRecordEvent() slot to the pqEventTranslator::recordEvent()
-signal.
+Concrete implementation of pqWidgetEventPlayer that translates high-level ParaView events into low-level Qt events.
 
-\note Output is sent to the stream from this object's destructor, so you
-must ensure that it goes out of scope before trying to playback the stream.
-
-\sa pqEventTranslator, pqStdoutEventObserver, pqXMLEventSource.
+\sa pqEventPlayer
 */
 
-class pqXMLEventObserver :
-  public QObject
+class pqTabBarEventPlayer :
+  public pqWidgetEventPlayer
 {
-  Q_OBJECT
-  
 public:
-  pqXMLEventObserver(QTextStream& Stream);
-  ~pqXMLEventObserver();
+  pqTabBarEventPlayer();
 
-public slots:
-  void onRecordEvent(
-    const QString& Widget,
-    const QString& Command,
-    const QString& Arguments);
+  bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error);
 
 private:
-  /// Stores a stream that will be used to store the XML output
-  QTextStream& Stream;
+  pqTabBarEventPlayer(const pqTabBarEventPlayer&);
+  pqTabBarEventPlayer& operator=(const pqTabBarEventPlayer&);
 };
 
-#endif // !_pqXMLEventObserver_h
+#endif // !_pqTabBarEventPlayer_h
 

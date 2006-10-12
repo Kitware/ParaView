@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqXMLEventObserver.h
+   Module:    pqTabBarEventPlayer.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,43 +30,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqXMLEventObserver_h
-#define _pqXMLEventObserver_h
+#include "pqTabBarEventPlayer.h"
 
-#include <QObject>
-class QTextStream;
+#include <QComboBox>
+#include <QLineEdit>
+#include <QtDebug>
 
-/**
-Observes high-level ParaView events, and serializes them to a stream as XML
-for possible playback (as a test-case, demo, tutorial, etc).  To use,
-connect the onRecordEvent() slot to the pqEventTranslator::recordEvent()
-signal.
-
-\note Output is sent to the stream from this object's destructor, so you
-must ensure that it goes out of scope before trying to playback the stream.
-
-\sa pqEventTranslator, pqStdoutEventObserver, pqXMLEventSource.
-*/
-
-class pqXMLEventObserver :
-  public QObject
+pqTabBarEventPlayer::pqTabBarEventPlayer()
 {
-  Q_OBJECT
-  
-public:
-  pqXMLEventObserver(QTextStream& Stream);
-  ~pqXMLEventObserver();
+}
 
-public slots:
-  void onRecordEvent(
-    const QString& Widget,
-    const QString& Command,
-    const QString& Arguments);
+bool pqTabBarEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
+{
+  if(Command != "set_tab")
+    return false;
 
-private:
-  /// Stores a stream that will be used to store the XML output
-  QTextStream& Stream;
-};
+  const QString value = Arguments;
+    
+  if(QTabBar* const object = qobject_cast<QTabBar*>(Object))
+    {
+    bool ok = false;
+    int which = value.toInt(&ok);
+    if(!ok)
+      {
+      qCritical() << "calling set_tab with invalid argument on " << Object;
+      Error = true;
+      }
+    else if(object->count() < which)
+      {
+      qCritical() << "calling set_tab with out of bounds index on " << Object;
+      Error = true;
+      }
+    else
+      {
+      object->setCurrentIndex(which);
+      }
+    return true;
+    }
 
-#endif // !_pqXMLEventObserver_h
+  qCritical() << "calling set_tab on unhandled type " << Object;
+
+  Error = true;
+  return true;
+}
 

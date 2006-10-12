@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAbstractEventDispatcher>
 #include <QtDebug>
-#include <QtTest>
 #include <QTimer>
+#include <QApplication>
 
 ////////////////////////////////////////////////////////////////////////////
 // pqEventDispatcher::pqImplementation

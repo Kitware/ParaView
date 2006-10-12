@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqXMLEventObserver.h
+   Module:    pqTabBarEventTranslator.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,43 +30,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqXMLEventObserver_h
-#define _pqXMLEventObserver_h
+#ifndef _pqTabBarEventTranslator_h
+#define _pqTabBarEventTranslator_h
 
-#include <QObject>
-class QTextStream;
+#include "pqWidgetEventTranslator.h"
+#include <QPointer>
+class QTabBar;
 
 /**
-Observes high-level ParaView events, and serializes them to a stream as XML
-for possible playback (as a test-case, demo, tutorial, etc).  To use,
-connect the onRecordEvent() slot to the pqEventTranslator::recordEvent()
-signal.
+Translates low-level Qt events into high-level ParaView events that can be recorded as test cases.
 
-\note Output is sent to the stream from this object's destructor, so you
-must ensure that it goes out of scope before trying to playback the stream.
-
-\sa pqEventTranslator, pqStdoutEventObserver, pqXMLEventSource.
+\sa pqEventTranslator
 */
 
-class pqXMLEventObserver :
-  public QObject
+class pqTabBarEventTranslator :
+  public pqWidgetEventTranslator
 {
   Q_OBJECT
   
 public:
-  pqXMLEventObserver(QTextStream& Stream);
-  ~pqXMLEventObserver();
+  pqTabBarEventTranslator();
+  
+  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 
-public slots:
-  void onRecordEvent(
-    const QString& Widget,
-    const QString& Command,
-    const QString& Arguments);
+protected slots:
+  void indexChanged(int);
 
 private:
-  /// Stores a stream that will be used to store the XML output
-  QTextStream& Stream;
+  pqTabBarEventTranslator(const pqTabBarEventTranslator&);
+  pqTabBarEventTranslator& operator=(const pqTabBarEventTranslator&);
+
+  QPointer<QTabBar> CurrentObject;
+
 };
 
-#endif // !_pqXMLEventObserver_h
+#endif // !_pqTabBarEventTranslator_h
 

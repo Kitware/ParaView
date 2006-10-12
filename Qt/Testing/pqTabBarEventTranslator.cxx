@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqXMLEventObserver.h
+   Module:    pqTabBarEventTranslator.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,43 +30,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqXMLEventObserver_h
-#define _pqXMLEventObserver_h
+#include "pqTabBarEventTranslator.h"
 
-#include <QObject>
-class QTextStream;
+#include <QTabBar>
+#include <QEvent>
 
-/**
-Observes high-level ParaView events, and serializes them to a stream as XML
-for possible playback (as a test-case, demo, tutorial, etc).  To use,
-connect the onRecordEvent() slot to the pqEventTranslator::recordEvent()
-signal.
-
-\note Output is sent to the stream from this object's destructor, so you
-must ensure that it goes out of scope before trying to playback the stream.
-
-\sa pqEventTranslator, pqStdoutEventObserver, pqXMLEventSource.
-*/
-
-class pqXMLEventObserver :
-  public QObject
+pqTabBarEventTranslator::pqTabBarEventTranslator() :
+  CurrentObject(0)
 {
-  Q_OBJECT
-  
-public:
-  pqXMLEventObserver(QTextStream& Stream);
-  ~pqXMLEventObserver();
+}
 
-public slots:
-  void onRecordEvent(
-    const QString& Widget,
-    const QString& Command,
-    const QString& Arguments);
+bool pqTabBarEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
+{
+  QTabBar* const object = qobject_cast<QTabBar*>(Object);
+  if(!object)
+    return false;
+    
+  switch(Event->type())
+    {
+    case QEvent::Enter:
+      if(this->CurrentObject != Object)
+        {
+        if(this->CurrentObject)
+          {
+          disconnect(this->CurrentObject, 0, this, 0);
+          }
+        
+        this->CurrentObject = object;
+        connect(object, SIGNAL(currentChanged(int)), this, SLOT(indexChanged(int)));
+        }
+      break;
+    default:
+      break;
+    }
 
-private:
-  /// Stores a stream that will be used to store the XML output
-  QTextStream& Stream;
-};
+  return true;
+}
 
-#endif // !_pqXMLEventObserver_h
+void pqTabBarEventTranslator::indexChanged(int which)
+{
+  emit recordEvent(this->CurrentObject, "set_tab",
+                   QString("%1").arg(which));
+}
 
