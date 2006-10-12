@@ -44,7 +44,7 @@ class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public QWidget
   Q_OBJECT
 public:
   /// constructor
-  pqDisplayProxyEditor(QWidget* p);
+  pqDisplayProxyEditor(QWidget* p = NULL);
   /// destructor
   ~pqDisplayProxyEditor();
 

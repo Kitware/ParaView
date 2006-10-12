@@ -99,6 +99,9 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(QWidget* p)
   this->Internal = new pqDisplayProxyEditorInternal;
   this->Internal->setupUi(this);
   this->setupGUIConnections();
+
+  // setting a display proxy will enable this
+  this->setEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -128,7 +131,12 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
   this->Internal->Display = display;
   if (!display )
     {
+    this->setEnabled(false);
     return;
+    }
+  else
+    {
+    this->setEnabled(true);
     }
   
   // The slots are already connected but we do not want them to execute

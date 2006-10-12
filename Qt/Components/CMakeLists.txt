@@ -104,7 +104,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSimpleServerStartup.h
   pqSliderDomain.h
   pqSMSignalAdaptors.h
-  pqSourceDisplayEditor.h
   pqSourceHistoryModel.h
   pqSourceInfoFilterModel.h
   pqSourceInfoGroupMap.h
@@ -314,8 +313,6 @@ ADD_LIBRARY(pqComponents
   pqSettingsDialog.h
   pqSliderDomain.cxx
   pqSliderDomain.h
-  pqSourceDisplayEditor.cxx
-  pqSourceDisplayEditor.h
   pqSourceHistoryModel.cxx
   pqSourceHistoryModel.h
   pqSourceInfoFilterModel.cxx

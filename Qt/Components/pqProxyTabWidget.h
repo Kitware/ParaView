@@ -33,12 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqProxyTabWidget_h
 
 #include <QTabWidget>
+#include <QPointer>
 #include "pqComponentsExport.h"
 
 class pqProxy;
 class pqRenderModule;
 class pqObjectInspectorWidget;
-class pqSourceDisplayEditor;
+class pqDisplayProxyEditor;
 class pqProxyInformationWidget;
 
 /// Tabbed widget with 3 tabs (object inspector, display editor, information)
@@ -64,10 +65,16 @@ public slots:
   /// set the current render module that these panels work on
   void setRenderModule(pqRenderModule* rm);
 
+protected slots:
+  void updateDisplayTab();
+
 private:
   pqObjectInspectorWidget* Inspector;
-  pqSourceDisplayEditor* Display;
+  pqDisplayProxyEditor* Display;
   pqProxyInformationWidget* Information;
+  
+  QPointer<pqProxy> Proxy;
+  QPointer<pqRenderModule> RenderModule;
 
 };
 

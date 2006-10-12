@@ -43,17 +43,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView widget includes
 
 // ParaView core includes
+#include "pqPipelineSource.h"
+#include "pqPipelineDisplay.h"
+#include "pqRenderModule.h"
 
 // ParaView components includes
 #include "pqObjectInspectorWidget.h"
 #include "pqProxyInformationWidget.h"
-#include "pqSourceDisplayEditor.h"
+#include "pqDisplayProxyEditor.h"
 
 
 //-----------------------------------------------------------------------------
 pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   : QTabWidget(p)
 {
+  this->Proxy = NULL;
+  this->RenderModule = NULL;
+
   QScrollArea* scr = new QScrollArea;
   scr->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   scr->setWidgetResizable(true);
@@ -66,7 +72,7 @@ pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   scr->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   scr->setWidgetResizable(true);
   scr->setFrameShape(QFrame::NoFrame);
-  this->Display = new pqSourceDisplayEditor();
+  this->Display = new pqDisplayProxyEditor();
   scr->setWidget(this->Display);
   this->addTab(scr, tr("Display"));
 
@@ -92,14 +98,50 @@ pqProxyTabWidget::~pqProxyTabWidget()
 //-----------------------------------------------------------------------------
 void pqProxyTabWidget::setProxy(pqProxy* proxy) 
 {
+  if(this->Proxy)
+    {
+    QObject::disconnect(this->Proxy, 
+      SIGNAL(displayAdded(pqPipelineSource*, pqConsumerDisplay*)),
+      this,
+      SLOT(updateDisplayTab()));
+    }
+  
+  this->Proxy = proxy;
+  
+  if(this->Proxy)
+    {
+    QObject::connect(this->Proxy, 
+      SIGNAL(displayAdded(pqPipelineSource*, pqConsumerDisplay*)),
+      this,
+      SLOT(updateDisplayTab()),
+      Qt::QueuedConnection);
+    }
+
   this->Inspector->setProxy(proxy);
-  this->Display->setProxy(proxy);
   this->Information->setProxy(proxy);
+
+  this->updateDisplayTab();
 }
 
 void pqProxyTabWidget::setRenderModule(pqRenderModule* rm) 
 {
+  this->RenderModule = rm;
   this->Inspector->setRenderModule(rm);
+  
+  this->updateDisplayTab();
+}
+
+void pqProxyTabWidget::updateDisplayTab()
+{
+  pqPipelineDisplay* display = NULL;
+  pqPipelineSource* source = qobject_cast<pqPipelineSource*>(this->Proxy);
+  if(source && this->RenderModule)
+    {
+    display =
+      qobject_cast<pqPipelineDisplay*>(source->getDisplay(this->RenderModule));
+    }
+
+  this->Display->setDisplay(display);
 }
 
 //-----------------------------------------------------------------------------
