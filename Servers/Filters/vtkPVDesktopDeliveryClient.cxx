@@ -43,7 +43,7 @@ static void vtkPVDesktopDeliveryClientReceiveImageCallback(vtkObject *,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.3");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.4");
 vtkStandardNewMacro(vtkPVDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -181,6 +181,23 @@ void vtkPVDesktopDeliveryClient::SendWindowInformation()
                          vtkPVDesktopDeliveryServer::SQUIRT_OPTIONS_SIZE,
                          this->ServerProcessId,
                          vtkPVDesktopDeliveryServer::SQUIRT_OPTIONS_TAG);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVDesktopDeliveryClient::SendRendererInformation(vtkRenderer *renderer)
+{
+  // The server needs to shift around the viewport and then resize it.  To do
+  // this, it needs the original viewport.  Undo the "helpful" resizing of the
+  // superclass.
+  double viewport[4];
+  renderer->GetViewport(viewport);
+  viewport[0] *= this->ImageReductionFactor;
+  viewport[1] *= this->ImageReductionFactor;
+  viewport[2] *= this->ImageReductionFactor;
+  viewport[3] *= this->ImageReductionFactor;
+
+  this->Controller->Send(viewport, 4, this->ServerProcessId,
+                         vtkPVDesktopDeliveryServer::RENDERER_VIEWPORT_TAG);
 }
 
 //----------------------------------------------------------------------------
