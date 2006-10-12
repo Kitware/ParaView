@@ -61,7 +61,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.6");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.7");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -332,19 +332,10 @@ void vtkPVDesktopDeliveryServer::ReceiveWindowInformation()
 //-----------------------------------------------------------------------------
 void vtkPVDesktopDeliveryServer::ReceiveRendererInformation(vtkRenderer *ren)
 {
-  // Not really receiving anything.  Just correcting the viewport.
+  // Get the original viewport from the client.
   double viewport[4];
-  ren->GetViewport(viewport);
-
-  if (this->ParallelRenderManager && (this->ImageReductionFactor > 1.0))
-    {
-    // Undo the image reduction so that the other parallel render manager may
-    // take care of it correctly.
-    viewport[0] *= this->ImageReductionFactor;
-    viewport[1] *= this->ImageReductionFactor;
-    viewport[2] *= this->ImageReductionFactor;
-    viewport[3] *= this->ImageReductionFactor;
-    }
+  this->Controller->Receive(viewport, 4, this->RootProcessId,
+                            vtkPVDesktopDeliveryServer::RENDERER_VIEWPORT_TAG);
 
   double scaleX = (double)this->ClientWindowSize[0]/this->ClientGUISize[0];
   double scaleY = (double)this->ClientWindowSize[1]/this->ClientGUISize[1];

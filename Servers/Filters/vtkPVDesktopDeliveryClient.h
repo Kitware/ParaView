@@ -170,6 +170,7 @@ protected:
   double TransferTime;
 
   virtual void SendWindowInformation();
+  virtual void SendRendererInformation(vtkRenderer *);
 
   // Squirt options (probably to be replaced later).
   int Squirt;
