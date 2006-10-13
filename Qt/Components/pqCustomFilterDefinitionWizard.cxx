@@ -98,6 +98,8 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
   this->Form->OutputPipeline->setModel(this->Model);
   this->Form->PropertyPipeline->setModel(this->Model);
 
+  this->setupDefaultInputOutput();
+
   // Listen to the button click events.
   QObject::connect(this->Form->CancelButton, SIGNAL(clicked()),
       this, SLOT(reject()));
@@ -247,7 +249,7 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
     }
 
   // Include any internal proxies.
-  this->addAutoIncludedProxies(this->Filter);
+  this->addAutoIncludedProxies();
 
   // Register the compound proxy definition with the server manager.
   vtkPVXMLElement *root = this->Filter->SaveDefinition(0);
@@ -258,17 +260,16 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
 }
 
 //-----------------------------------------------------------------------------
-void pqCustomFilterDefinitionWizard::addAutoIncludedProxies(
-  vtkSMCompoundProxy* customFilter)
+void pqCustomFilterDefinitionWizard::addAutoIncludedProxies()
 {
-  unsigned int num_of_proxies = customFilter->GetNumberOfProxies();
+  unsigned int num_of_proxies = this->Filter->GetNumberOfProxies();
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
   QSet<vtkSMProxy*> autoIncludeSet;
 
   for (unsigned int cc=0; cc < num_of_proxies; cc++)
     {
-    vtkSMProxy* subProxy = customFilter->GetProxy(cc);
+    vtkSMProxy* subProxy = this->Filter->GetProxy(cc);
     vtkSmartPointer<vtkSMPropertyIterator> iter;
     iter.TakeReference(subProxy->NewPropertyIterator());
 
@@ -296,7 +297,7 @@ void pqCustomFilterDefinitionWizard::addAutoIncludedProxies(
     {
     QString name = "auto_";
     name += proxy->GetSelfIDAsString();
-    customFilter->AddProxy(name.toStdString().c_str(), proxy);
+    this->Filter->AddProxy(name.toStdString().c_str(), proxy);
     }
 }
 
@@ -335,6 +336,82 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
     }
 
   return true;
+}
+
+void pqCustomFilterDefinitionWizard::setupDefaultInputOutput()
+{
+  if(this->Model->rowCount() == 1)
+    {
+    // Set up the default input property.
+    QModelIndex index = this->Model->index(0, 0);
+    pqPipelineSource *source = this->Model->getSourceFor(index);
+    if(source)
+      {
+      vtkSMProxy *proxy = source->getProxy();
+      if(proxy)
+        {
+        QStringList inputNames;
+        vtkSMInputProperty *input = 0;
+        vtkSMPropertyIterator *iter = proxy->NewPropertyIterator();
+        for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+          {
+          input = vtkSMInputProperty::SafeDownCast(iter->GetProperty());
+          if(input)
+            {
+            inputNames.append(QString(iter->GetKey()));
+            }
+          }
+
+        iter->Delete();
+        if(inputNames.size() > 0)
+          {
+          // Add the "Input" property if it exists. Otherwise, use the
+          // first property.
+          QString propertyName = "Input";
+          if(!inputNames.contains("Input"))
+            {
+            propertyName = inputNames[0];
+            }
+
+          QStringList list;
+          list.append(source->getProxyName());
+          list.append(propertyName);
+          list.append("Input");
+          QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->InputPorts,
+              list);
+          this->Form->InputPorts->setCurrentItem(item);
+          this->Form->ListNames.append("Input");
+          }
+        }
+      }
+
+    // Set up the default output property.
+    while(this->Model->hasChildren(index))
+      {
+      if(this->Model->rowCount(index) == 1)
+        {
+        index = this->Model->index(0, 0, index);
+        }
+      else
+        {
+        index = QModelIndex();
+        break;
+        }
+      }
+
+    pqPipelineSource *output = this->Model->getSourceFor(index);
+    if(output)
+      {
+      // Add the exposed output port to the list.
+      QStringList list;
+      list.append(output->getProxyName());
+      list.append("Output");
+      QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->OutputPorts,
+          list);
+      this->Form->OutputPorts->setCurrentItem(item);
+      this->Form->ListNames.append("Output");
+      }
+    }
 }
 
 void pqCustomFilterDefinitionWizard::navigateBack()

@@ -124,6 +124,18 @@ public slots:
 
 private:
   /// \brief
+  ///   Adds proxies referred to by the proxies in the custom filter that
+  ///   the user could not have explicitly selected/deselected.
+  /// 
+  /// A custom filter may includes proxies which refer to other internal 
+  /// proxies such as implicit functions, internal sources which are not shown
+  /// in the pipeline browser. We include these proxies into the custom filter
+  /// so that its definition is complete. This method is called after all proxies
+  /// have been added to the custom filter and before its definition is 
+  /// created.
+  void addAutoIncludedProxies();
+
+  /// \brief
   ///   Validates the custom filter name field.
   ///
   /// This method will pop up message boxes for the user if there is
@@ -132,17 +144,13 @@ private:
   /// \return
   ///   True if the custom filter name is valid.
   bool validateCustomFilterName();
+
   /// \brief
-  ///   Adds proxies referred to by the proxies in the custom filter that
-  ///   that the user could not have explicitly selected/deselected.
-  /// 
-  /// A custom filter may includes proxies which refer to other internal 
-  /// proxies such as implicit functions, internal sources which are not shown
-  /// in the pipeline browser. We include these proxies into the custom filter
-  /// so that its definition is complete. This method is called after all proxies
-  /// have been added to the custom filter and before its definition is 
-  /// created.
-  void addAutoIncludedProxies(vtkSMCompoundProxy* customFilter);
+  ///   Adds the default input and output to the forms.
+  ///
+  /// The current implementation only works for straight pipelines
+  /// with one input and no branches.
+  void setupDefaultInputOutput();
 
 private slots:
   /// \name Page Navigation
