@@ -28,7 +28,7 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>28</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPipeline" >
@@ -72,29 +72,6 @@
     <addaction name="separator" />
     <addaction name="actionFileExit" />
    </widget>
-   <widget class="QMenu" name="menuSources" >
-    <property name="title" >
-     <string>S&amp;ources</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuView" >
-    <property name="title" >
-     <string>&amp;View</string>
-    </property>
-    <widget class="QMenu" name="menuToolbars" >
-     <property name="title" >
-      <string>Toolbars</string>
-     </property>
-    </widget>
-    <widget class="QMenu" name="menuPlots" >
-     <property name="title" >
-      <string>Plots</string>
-     </property>
-    </widget>
-    <addaction name="menuToolbars" />
-    <addaction name="menuPlots" />
-    <addaction name="separator" />
-   </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
      <string>&amp;Edit</string>
@@ -125,6 +102,37 @@
     <addaction name="separator" />
     <addaction name="actionHelpEnableTooltips" />
    </widget>
+   <widget class="QMenu" name="menuSources" >
+    <property name="title" >
+     <string>S&amp;ources</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>&amp;View</string>
+    </property>
+    <widget class="QMenu" name="menuToolbars" >
+     <property name="title" >
+      <string>Toolbars</string>
+     </property>
+    </widget>
+    <widget class="QMenu" name="menuPlots" >
+     <property name="title" >
+      <string>Plots</string>
+     </property>
+    </widget>
+    <addaction name="actionResetCamera" />
+    <addaction name="actionPositiveX" />
+    <addaction name="actionNegativeX" />
+    <addaction name="actionPositiveY" />
+    <addaction name="actionNegativeY" />
+    <addaction name="actionPositiveZ" />
+    <addaction name="actionNegativeZ" />
+    <addaction name="separator" />
+    <addaction name="menuToolbars" />
+    <addaction name="menuPlots" />
+    <addaction name="separator" />
+   </widget>
    <widget class="QMenu" name="menuTools" >
     <property name="title" >
      <string>&amp;Tools</string>
@@ -140,21 +148,42 @@
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
    </widget>
+   <widget class="QMenu" name="menuAnimation" >
+    <property name="title" >
+     <string>&amp;Animation</string>
+    </property>
+    <addaction name="actionVCRFirstFrame" />
+    <addaction name="actionVCRPreviousFrame" />
+    <addaction name="actionVCRPlay" />
+    <addaction name="actionVCRPause" />
+    <addaction name="actionVCRNextFrame" />
+    <addaction name="actionVCRLastFrame" />
+   </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
    <addaction name="menuView" />
    <addaction name="menuSources" />
    <addaction name="menuFilters" />
+   <addaction name="menuAnimation" />
    <addaction name="menuTools" />
    <addaction name="menuHelp" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" />
-  <widget class="QDockWidget" name="pipelineBrowserDock" >
-   <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+  <widget class="QStatusBar" name="statusbar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>671</y>
+     <width>920</width>
+     <height>19</height>
+    </rect>
    </property>
+  </widget>
+  <widget class="QDockWidget" name="pipelineBrowserDock" >
    <property name="windowTitle" >
     <string>Pipeline Browser</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -169,11 +198,11 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="objectInspectorDock" >
-   <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
    <property name="windowTitle" >
     <string>Object Inspector</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -181,11 +210,11 @@
    <widget class="QWidget" name="dockWidgetContents_3" />
   </widget>
   <widget class="QDockWidget" name="statisticsViewDock" >
-   <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
    <property name="windowTitle" >
     <string>Statistics View</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -193,11 +222,11 @@
    <widget class="QWidget" name="dockWidgetContents_4" />
   </widget>
   <widget class="QDockWidget" name="elementInspectorDock" >
-   <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
    <property name="windowTitle" >
     <string>Element Inspector</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -445,7 +474,7 @@
     <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrBack22.png</iconset>
    </property>
    <property name="text" >
-    <string>Previous Frame</string>
+    <string>Pre&amp;vious Frame</string>
    </property>
   </action>
   <action name="actionVCRFirstFrame" >
@@ -453,7 +482,7 @@
     <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrFirst22.png</iconset>
    </property>
    <property name="text" >
-    <string>First Frame</string>
+    <string>&amp;First Frame</string>
    </property>
   </action>
   <action name="actionVCRNextFrame" >
@@ -461,7 +490,7 @@
     <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrForward22.png</iconset>
    </property>
    <property name="text" >
-    <string>Next Frame</string>
+    <string>&amp;Next Frame</string>
    </property>
   </action>
   <action name="actionVCRLastFrame" >
@@ -469,7 +498,7 @@
     <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrLast22.png</iconset>
    </property>
    <property name="text" >
-    <string>Last Frame</string>
+    <string>&amp;Last Frame</string>
    </property>
   </action>
   <action name="actionFileSaveData" >
@@ -629,7 +658,7 @@
     <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrPlay22.png</iconset>
    </property>
    <property name="text" >
-    <string>Play</string>
+    <string>&amp;Play</string>
    </property>
   </action>
   <action name="actionVCRPause" >
@@ -640,7 +669,7 @@
     <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrPause22.png</iconset>
    </property>
    <property name="text" >
-    <string>Pause</string>
+    <string>Pa&amp;use</string>
    </property>
   </action>
   <action name="actionToolsPlayTest" >
