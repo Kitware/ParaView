@@ -1,8 +1,9 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Statistics View" />
+  <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
   <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileLoadServerState" />
-  <pqevent object="MainWindow/ServerStartupBrowser/startups" command="currentChanged" arguments="/0|0" />
   <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
   <pqevent object="MainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/LoadStateSelection.pvsm" />
+  <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionToolsRecordTestScreenshot" />
+  <pqevent object="MainWindow/RecordTestScreenshotDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Baseline/LoadStateSelection.png" />
 </pqevents>
