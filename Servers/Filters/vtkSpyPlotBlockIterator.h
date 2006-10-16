@@ -3,6 +3,7 @@
 
 #include "vtkSpyPlotUniReader.h"
 #include "vtkSpyPlotReaderMap.h"
+#include "assert.h"
 
 class vtkSpyBlock;
 class vtkSpyPlotReaderMap;
