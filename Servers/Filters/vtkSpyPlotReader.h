@@ -1,15 +1,15 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    vtkSpyPlotReader.h
+Program:   Visualization Toolkit
+Module:    vtkSpyPlotReader.h
 
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+All rights reserved.
+See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 // .NAME vtkSpyPlotReader - Read SPCTH Spy Plot file format
@@ -57,6 +57,12 @@ class vtkSpyPlotReaderMap;
 class vtkMultiProcessController;
 class vtkDataSetAttributes;
 class vtkDataArray;
+class vtkSpyPlotBlockIterator;
+class vtkSpyPlotBlock;
+class vtkSpyPlotUniReader;
+class vtkCellData;
+class vtkRectilinearGrid;
+class vtkSimpleBoundingBox;
 
 class VTK_EXPORT vtkSpyPlotReader : public vtkHierarchicalDataSetAlgorithm
 {
@@ -150,6 +156,52 @@ protected:
   vtkSpyPlotReader();
   ~vtkSpyPlotReader();
 
+  // Determine the bounds of just this reader
+  void GetLocalBounds(vtkSpyPlotBlockIterator *biter,
+                      vtkSimpleBoundingBox *bbox,
+                      int nBlocks, int progressInterval);
+
+  // Set the global bounds of all readers
+  int SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
+                      int total_num_of_block, 
+                      int progressInterval,
+                      int *rightHasBounds,
+                      int *leftHasBounds);
+
+  // Set things up to process an AMR Block
+  int PrepareAMRData(vtkHierarchicalDataSet *hb,
+                     vtkSpyPlotBlock *block, 
+                     int *level,
+                     int extents[6],
+                     int realExtents[6],
+                     int realDims[3],
+                     vtkCellData **cd);
+
+  // Set things up to process a non-AMR Block
+  int PrepareData(vtkHierarchicalDataSet *hb,
+                  vtkSpyPlotBlock *block,
+                  vtkRectilinearGrid **rg,
+                  int extents[6],
+                  int realExtents[6],
+                  int realDims[3],
+                  vtkCellData **cd);
+
+  // Update the field data (interms of ghost cells) that
+  // contain whose block did not contain any bad ghost cells
+  void UpdateFieldData(int numFields, int dims[3],
+                       int level, int blockID,
+                       vtkSpyPlotUniReader *uniReader,
+                       vtkCellData *cd);
+
+
+  // Update the field data (interms of ghost cells) that
+  // contain whose block did contain bad ghost cells
+  void UpdateBadGhostFieldData(int numFields, int dims[3],
+                               int realDims[3],
+                               int realExtents[6],
+                               int level, int blockID,
+                               vtkSpyPlotUniReader *uniReader,
+                               vtkCellData *cd);
   // The array selections.
   vtkDataArraySelection *CellDataArraySelection;
   
@@ -186,12 +238,17 @@ protected:
 
   // Description:
   // This does the updating of the meta data for a series, when no case file provided
-  int UpdateNoCaseFile(const char *ext,
-                       vtkInformation* request, 
-                       vtkInformationVector* outputVector);
+  int UpdateSpyDataFile(vtkInformation* request, 
+                        vtkInformationVector* outputVector);
 
   void AddGhostLevelArray(int numLevels);
 
+  // Have all the readers have the same global level structure
+  void SetGlobalLevels(vtkHierarchicalDataSet *hb,
+                       int processNumber,
+                       int numProcessors,
+                       int rightHasBounds,
+                       int leftHasBounds);
   // Description:
   // Get and set the current file name. Protected because
   // this method should only be used internally

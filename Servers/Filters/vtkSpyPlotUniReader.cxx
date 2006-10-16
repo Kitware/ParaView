@@ -11,7 +11,7 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.1");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.2");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -172,112 +172,13 @@ int vtkSpyPlotUniReader::ReadInformation()
   vtkSpyPlotIStream spis;
   spis.SetStream(&ifs);
 
-  vtkDebugMacro( << this << " Reading file: " << this->FileName );
-  //printf("Before anything: %ld\n", ifs.tellg());
+  if (!this->ReadHeader(&spis))
+    {
+    vtkErrorMacro("Invalid Header");
+    return 0;
+    }
 
-
-  // Ok, file is open, so read the header
-  char magic[8];
-  if ( !spis.ReadString(magic, 8) )
-    {
-    vtkErrorMacro( "Cannot read magic" );
-    return 0;
-    }
-  if ( strncmp(magic, "spydata", 7) != 0 || magic[7] != 0)
-    {
-    vtkErrorMacro( "Bad magic: " << vtkSpyPlotWriteString(magic, 7) );
-    return 0;
-    }
-  if ( !spis.ReadString(this->FileDescription, 128) )
-    {
-    vtkErrorMacro( "Cannot read FileDescription" );
-    return 0;
-    }
-  //printf("here: %ld\n", ifs.tellg());
-  if ( !spis.ReadInt32s(&(this->FileVersion), 1) )
-    {
-    vtkErrorMacro( "Cannot read file version" );
-    return 0;
-    }
-  //cout << "File version: " << this->FileVersion << endl;
-  if ( this->FileVersion >= 102 )
-    {
-    if ( !spis.ReadInt32s(&(this->SizeOfFilePointer), 1) )
-      {
-      vtkErrorMacro( "Cannot read the seize of file pointer" );
-      return 0;
-      }
-    switch ( this->SizeOfFilePointer )
-      {
-      case 32:
-      case 64:
-        break;
-      default:
-        vtkErrorMacro( "Unknown size of file pointer: " 
-                       << this->SizeOfFilePointer
-                       << ". Only handle 32 and 64 bit sizes." );
-        return 0;
-      }
-    //cout << "File pointer size: " << this->SizeOfFilePointer << endl;
-    }
-  if ( !spis.ReadInt32s(&(this->FileCompressionFlag), 1) )
-    {
-    vtkErrorMacro( "Cannot read compression flag" );
-    return 0;
-    }
-  if ( !spis.ReadInt32s(&(this->FileProcessorId), 1) )
-    {
-    vtkErrorMacro( "Cannot read processor id" );
-    return 0;
-    }
-  if ( !spis.ReadInt32s(&(this->NumberOfProcessors), 1) )
-    {
-    vtkErrorMacro( "Cannot read number of processors" );
-    return 0;
-    }
-  if ( !spis.ReadInt32s(&(this->IGM), 1) )
-    {
-    vtkErrorMacro( "Cannot read IGM" );
-    return 0;
-    }
-  if ( !spis.ReadInt32s(&(this->NumberOfDimensions), 1) )
-    {
-    vtkErrorMacro( "Cannot read number of dimensions" );
-    return 0;
-    }
-  if ( !spis.ReadInt32s(&(this->NumberOfMaterials), 1) )
-    {
-    vtkErrorMacro( "Cannot read number of materials" );
-    return 0;
-    }
-  if ( !spis.ReadInt32s(&(this->MaximumNumberOfMaterials), 1) )
-    {
-    vtkErrorMacro( "Cannot read maximum number of materials" );
-    return 0;
-    }
-  //printf("here: %ld\n", ifs.tellg());
-  if ( !spis.ReadDoubles(this->GlobalMin, 3) )
-    {
-    vtkErrorMacro( "Cannot read global min" );
-    return 0;
-    }
-  if ( !spis.ReadDoubles(this->GlobalMax, 3) )
-    {
-    vtkErrorMacro( "Cannot read global max" );
-    return 0;
-    }
-  //printf("here: %ld\n", ifs.tellg());
-  if ( !spis.ReadInt32s(&(this->NumberOfBlocks), 1) )
-    {
-    vtkErrorMacro( "Cannot read number of blocks" );
-    return 0;
-    }
-  if ( !spis.ReadInt32s(&(this->MaximumNumberOfLevels), 1) )
-    {
-    vtkErrorMacro( "Cannot read maximum number of levels" );
-    return 0;
-    }
-  // Done with header
+  // Process all the Cell Material  Fields
 
   //printf("Before cell fields: %ld\n", ifs.tellg());
   // Read all possible cell fields
@@ -759,10 +660,7 @@ int vtkSpyPlotUniReader::ReadData()
     { 
     vtkDebugMacro( << __LINE__ << " " << this << " Read: " 
                    << this->HaveInformation ); 
-    }
 
-  if ( !this->HaveInformation )
-    {
     if ( !this->ReadInformation() )
       {
       return 0;
@@ -1500,3 +1398,112 @@ int vtkSpyPlotUniReader::MarkCellFieldDataFixed(int block, int field)
   return 1;
 }
 
+//-----------------------------------------------------------------------------
+int vtkSpyPlotUniReader::ReadHeader(vtkSpyPlotIStream *spis)
+{
+  vtkDebugMacro( << this << " Reading file header: " << this->FileName );
+  
+  // Ok, file is open, so read the header
+  char magic[8];
+  if ( !spis->ReadString(magic, 8) )
+    {
+    vtkErrorMacro( "Cannot read magic" );
+    return 0;
+    }
+  if ( strncmp(magic, "spydata", 7) != 0 || magic[7] != 0)
+    {
+    vtkErrorMacro( "Bad magic: " << vtkSpyPlotWriteString(magic, 7) );
+    return 0;
+    }
+  if ( !spis->ReadString(this->FileDescription, 128) )
+    {
+    vtkErrorMacro( "Cannot read FileDescription" );
+    return 0;
+    }
+  //printf("here: %ld\n", ifs.tellg());
+  if ( !spis->ReadInt32s(&(this->FileVersion), 1) )
+    {
+    vtkErrorMacro( "Cannot read file version" );
+    return 0;
+    }
+  //cout << "File version: " << this->FileVersion << endl;
+  if ( this->FileVersion >= 102 )
+    {
+    if ( !spis->ReadInt32s(&(this->SizeOfFilePointer), 1) )
+      {
+      vtkErrorMacro( "Cannot read the seize of file pointer" );
+      return 0;
+      }
+    switch ( this->SizeOfFilePointer )
+      {
+      case 32:
+      case 64:
+        break;
+      default:
+        vtkErrorMacro( "Unknown size of file pointer: " 
+                       << this->SizeOfFilePointer
+                       << ". Only handle 32 and 64 bit sizes." );
+        return 0;
+      }
+    //cout << "File pointer size: " << this->SizeOfFilePointer << endl;
+    }
+  if ( !spis->ReadInt32s(&(this->FileCompressionFlag), 1) )
+    {
+    vtkErrorMacro( "Cannot read compression flag" );
+    return 0;
+    }
+  if ( !spis->ReadInt32s(&(this->FileProcessorId), 1) )
+    {
+    vtkErrorMacro( "Cannot read processor id" );
+    return 0;
+    }
+  if ( !spis->ReadInt32s(&(this->NumberOfProcessors), 1) )
+    {
+    vtkErrorMacro( "Cannot read number of processors" );
+    return 0;
+    }
+  if ( !spis->ReadInt32s(&(this->IGM), 1) )
+    {
+    vtkErrorMacro( "Cannot read IGM" );
+    return 0;
+    }
+  if ( !spis->ReadInt32s(&(this->NumberOfDimensions), 1) )
+    {
+    vtkErrorMacro( "Cannot read number of dimensions" );
+    return 0;
+    }
+  if ( !spis->ReadInt32s(&(this->NumberOfMaterials), 1) )
+    {
+    vtkErrorMacro( "Cannot read number of materials" );
+    return 0;
+    }
+  if ( !spis->ReadInt32s(&(this->MaximumNumberOfMaterials), 1) )
+    {
+    vtkErrorMacro( "Cannot read maximum number of materials" );
+    return 0;
+    }
+  //printf("here: %ld\n", ifs.tellg());
+  if ( !spis->ReadDoubles(this->GlobalMin, 3) )
+    {
+    vtkErrorMacro( "Cannot read global min" );
+    return 0;
+    }
+  if ( !spis->ReadDoubles(this->GlobalMax, 3) )
+    {
+    vtkErrorMacro( "Cannot read global max" );
+    return 0;
+    }
+  //printf("here: %ld\n", ifs.tellg());
+  if ( !spis->ReadInt32s(&(this->NumberOfBlocks), 1) )
+    {
+    vtkErrorMacro( "Cannot read number of blocks" );
+    return 0;
+    }
+  if ( !spis->ReadInt32s(&(this->MaximumNumberOfLevels), 1) )
+    {
+    vtkErrorMacro( "Cannot read maximum number of levels" );
+    return 0;
+    }
+  // Done with header
+  return 1;
+}

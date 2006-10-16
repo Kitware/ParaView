@@ -24,8 +24,9 @@ PURPOSE.  See the above copyright notice for more information.
 #define __vtkSpyPlotIStream_h
 #include "vtkType.h"
 #include "istream.h"
+#include "vtkSystemIncludes.h"
 
-class vtkSpyPlotIStream {
+class VTK_EXPORT vtkSpyPlotIStream {
 public:
   vtkSpyPlotIStream();
   void SetStream(istream *);
