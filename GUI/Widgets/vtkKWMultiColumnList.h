@@ -275,7 +275,8 @@ public:
     { this->SortByColumn(
       col_index, vtkKWMultiColumnList::SortByDecreasingOrder); };
   virtual int GetLastSortedColumn();
-
+  virtual int GetLastSortedOrder();
+  
   // Description:
   // Set/Get each column sort mode
   //BTX
