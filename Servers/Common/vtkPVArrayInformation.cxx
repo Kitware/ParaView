@@ -19,7 +19,7 @@ cxx     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.5");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -418,6 +418,11 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     return;
     }
   this->SetNumberOfComponents(num);
+
+  if (num > 1)
+    {
+    num++;
+    }
 
   // Range of each component.
   for(int i=0; i < num; ++i)
