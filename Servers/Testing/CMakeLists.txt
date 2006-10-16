@@ -11,6 +11,12 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkSMPropertyInternals.h
       vtkSMProxyManagerInternals.h      
       vtkUndoStackInternal.h
+      vtkSpyPlotBlock.h
+      vtkSpyPlotBlockIterator.h
+      vtkSpyPlotUniReader.h
+      vtkSimpleBoundingBox.h
+      vtkSpyPlotIStream.h
+      vtkSpyPlotReaderMap.h
       )
   ENDFOREACH(part)
 ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
