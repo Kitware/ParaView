@@ -90,6 +90,11 @@ SET(Filters_SRCS
   vtkReductionFilter.cxx
 #  vtkSelectInputs.cxx
   vtkSpyPlotReader.cxx
+  vtkSpyPlotBlock.cxx
+  vtkSpyPlotBlockIterator.cxx
+  vtkSpyPlotIStream.cxx
+  vtkSpyPlotReaderMap.cxx
+  vtkSpyPlotUniReader.cxx
   vtkSquirtCompressor.cxx
   vtkStreamingTessellator.cxx
   vtkSubdivisionAlgorithm.cxx
@@ -110,6 +115,11 @@ SET(Filters_SRCS
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVMain.cxx
+  vtkSpyPlotBlock.cxx
+  vtkSpyPlotUniReader.cxx
+  vtkSpyPlotIStream.cxx
+  vtkSpyPlotBlockIterator.cxx
+  vtkSpyPlotReaderMap.cxx
   WRAP_EXCLUDE)
 
 SET_SOURCE_FILES_PROPERTIES( 
