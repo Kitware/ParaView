@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notice for more information.
 class vtkDataArray;
 class vtkFloatArray;
 class vtkSpyPlotIStream;
-class vtkSpyPlotBlock {
+class VTK_EXPORT vtkSpyPlotBlock {
 public:
   vtkSpyPlotBlock();
   ~vtkSpyPlotBlock();

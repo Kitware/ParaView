@@ -23,10 +23,12 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkstd/string>
 #include <vtkstd/vector>
 #include <vtkstd/map>
+#include "vtkSystemIncludes.h"
+
 class vtkSpyPlotReader;
 class vtkSpyPlotUniReader;
 
-class vtkSpyPlotReaderMap
+class VTK_EXPORT vtkSpyPlotReaderMap
 {
 public:
   typedef vtkstd::map<vtkstd::string, vtkSpyPlotUniReader*> MapOfStringToSPCTH;

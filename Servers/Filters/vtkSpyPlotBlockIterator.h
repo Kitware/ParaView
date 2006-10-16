@@ -9,7 +9,7 @@ class vtkSpyPlotReaderMap;
 class vtkSpyPlotReader;
 
 //-----------------------------------------------------------------------------
-class vtkSpyPlotBlockIterator
+class VTK_EXPORT vtkSpyPlotBlockIterator
 {
 public:
   // Description:
@@ -95,7 +95,7 @@ protected:
 
 
 
-class vtkSpyPlotBlockDistributionBlockIterator
+class VTK_EXPORT vtkSpyPlotBlockDistributionBlockIterator
   : public vtkSpyPlotBlockIterator
 {
 public:
@@ -108,7 +108,7 @@ protected:
 };
 
 
-class vtkSpyPlotFileDistributionBlockIterator
+class VTK_EXPORT vtkSpyPlotFileDistributionBlockIterator
   : public vtkSpyPlotBlockIterator
 {
 public:

@@ -36,8 +36,10 @@ class vtkDataArraySelection;
 class vtkDataArray;
 class vtkFloatArray;
 class vtkUnsignedCharArray;
+class vtkSpyPlotIStream;
 
-class vtkSpyPlotUniReader : public vtkObject
+
+class VTK_EXPORT vtkSpyPlotUniReader : public vtkObject
 {
 public:
   vtkTypeRevisionMacro(vtkSpyPlotUniReader, vtkObject);
@@ -151,6 +153,8 @@ private:
                           int outSize);
   int RunLengthDataDecode(const unsigned char* in, int inSize, 
                           unsigned char* out, int outSize);
+
+  int ReadHeader(vtkSpyPlotIStream *spis);
 
   // Header information
   char FileDescription[128];
