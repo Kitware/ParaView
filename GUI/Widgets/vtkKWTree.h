@@ -346,6 +346,8 @@ public:
     vtkObject *object, const char *method);
   virtual void SetSingleClickOnNodeCommand(
     vtkObject *object, const char *method);
+  virtual void SetRightClickOnNodeCommand(
+    vtkObject *object, const char *method);
   
   // Description:
   // Specifies a command to associate with the widget. This command is 

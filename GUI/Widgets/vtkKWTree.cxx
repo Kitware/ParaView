@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.28");
+vtkCxxRevisionMacro(vtkKWTree, "1.29");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -1066,6 +1066,13 @@ void vtkKWTree::SetSingleClickOnNodeCommand(vtkObject *object,
                                             const char *method)
 {
   this->SetBindText("<ButtonPress-1>", object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetRightClickOnNodeCommand(vtkObject *object, 
+                                            const char *method)
+{
+  this->SetBindText("<ButtonPress-3>", object, method);
 }
 
 //----------------------------------------------------------------------------
