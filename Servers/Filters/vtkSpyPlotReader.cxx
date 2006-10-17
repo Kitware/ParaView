@@ -57,7 +57,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.44");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.45");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -532,7 +532,6 @@ int vtkSpyPlotReader::RequestData(
 {
   vtkDebugMacro( "--------------------------- Request Data --------------------------------" );
   vtkSpyPlotUniReader* uniReader = 0;
-  const char *fname=0;
 
   vtkstd::vector<vtkRectilinearGrid*> grids;
 
@@ -575,7 +574,6 @@ int vtkSpyPlotReader::RequestData(
   this->UpdateMetaData(request, outputVector);
   
   vtkSpyPlotBlock *block;
-  int field;
   vtkSpyPlotBlockIterator *blockIterator;
   if(this->DistributeFiles)
     {
@@ -1310,11 +1308,11 @@ void vtkSpyPlotReader::GetLocalBounds(vtkSpyPlotBlockIterator *biter,
                                       vtkSimpleBoundingBox *bbox,
                                       int nBlocks, int progressInterval)
 {
-  int i, j, k;
+  int i;
   double bounds[6];
   double progressFactor = 0.4 / static_cast<double>(nBlocks);
   vtkSpyPlotBlock *block;
-  vtkSpyPlotUniReader* uniReader = 0;
+
   biter->Start();
   for (i = 0; biter->IsActive(); i++, biter->Next())
     {
@@ -1430,6 +1428,7 @@ int vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
         }
       }
     }
+  return 1;
 }
   
 int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalDataSet *hb,
@@ -1467,8 +1466,7 @@ int vtkSpyPlotReader::PrepareData(vtkHierarchicalDataSet *hb,
                                   int realDims[3],
                                   vtkCellData **cd)
 {
-  double spacing[3];
-  double origin[3];
+
   int needsFixing;
   vtkDataArray *coordinates[3];
   needsFixing = block->FixInformation(this->Bounds,
@@ -1559,7 +1557,7 @@ void vtkSpyPlotReader::UpdateFieldData(int numFields, int dims[3],
   cd->AddArray(ghostArray);
   ghostArray->Delete();
   int planeSize = dims[0]*dims[1];
-  int i, j, k;
+  int j, k;
   unsigned char *ptr =
     static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
   for (k = 0; k < dims[2]; k++)

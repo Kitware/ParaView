@@ -72,6 +72,8 @@ public:
   int HasObserver(const char *) const;
   int InvokeEvent(const char *, void *) const;
 protected:
+  int RunLengthDeltaDecode(const unsigned char* in, int inSize, float* out, 
+                           int outSize);
   int Dimensions[3];
   int Allocated;
   int Active;
