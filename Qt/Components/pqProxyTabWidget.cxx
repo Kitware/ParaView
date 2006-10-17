@@ -104,6 +104,10 @@ void pqProxyTabWidget::setProxy(pqProxy* proxy)
       SIGNAL(displayAdded(pqPipelineSource*, pqConsumerDisplay*)),
       this,
       SLOT(updateDisplayTab()));
+    QObject::disconnect(this->Proxy, 
+      SIGNAL(displayRemoved(pqPipelineSource*, pqConsumerDisplay*)),
+      this,
+      SLOT(updateDisplayTab()));
     }
   
   this->Proxy = proxy;
@@ -115,6 +119,10 @@ void pqProxyTabWidget::setProxy(pqProxy* proxy)
       this,
       SLOT(updateDisplayTab()),
       Qt::QueuedConnection);
+    QObject::connect(this->Proxy, 
+      SIGNAL(displayRemoved(pqPipelineSource*, pqConsumerDisplay*)),
+      this,
+      SLOT(updateDisplayTab()));
     }
 
   this->Inspector->setProxy(proxy);
