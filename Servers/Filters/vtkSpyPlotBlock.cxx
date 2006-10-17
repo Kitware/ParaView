@@ -1,6 +1,7 @@
 #include "vtkFloatArray.h"
 #include "vtkSpyPlotBlock.h"
 #include "vtkSpyPlotIStream.h"
+#include "vtkByteSwap.h"
 
 #define MinBlockBound(i) this->XYZArrays[i]->GetTuple1(0)
 #define MaxBlockBound(i)  \
@@ -67,10 +68,9 @@ void vtkSpyPlotBlock::GetRealBounds(double rbounds[6],
                                     int assumeAMR) const
 {
   int i, j = 0;
-  double minV, maxV;
   if (assumeAMR)
     {
-    double spacing, maxVm, minV;
+    double spacing, maxV, minV;
     for ( i = 0; i < 3; i++)
       {
       if (this->Dimensions[i] > 1)
@@ -337,3 +337,97 @@ int vtkSpyPlotBlock::InvokeEvent(const char *, void *) const
 }
 
  
+//-----------------------------------------------------------------------------
+/* Routine run-length-encodes the data pointed to by *data, placing
+   the result in *out. n is the number of doubles to encode. n_out
+   is the number of bytes used for the compression (and stored at
+   *out). delta is the smallest change of adjacent values that will
+   be accepted (changes smaller than delta will be ignored). 
+
+   Note: *out needs to be allocated by the calling application. 
+   Its worst-case size is 5*n bytes. */
+
+
+
+/* Routine run-length-decodes the data pointed to by *in and
+   returns a collection of doubles in *data. Performs the
+   inverse of rle above. Application should provide both
+   n (the expected number of doubles) and n_in the number
+   of bytes to decode from *in. Again, the application needs
+   to provide allocated space for *data which will be
+   n bytes long. */
+
+int vtkSpyPlotBlock::RunLengthDeltaDecode(const unsigned char* in, 
+                                          int inSize, float* out, 
+                                          int outSize)
+{
+  int outIndex = 0, inIndex = 0;
+
+  const unsigned char* ptmp = in;
+
+  /* Run-length decode */
+
+  // Get first value
+  float val;
+  memcpy(&val, ptmp, sizeof(float));
+  vtkByteSwap::SwapBE(&val);
+  ptmp += 4;
+
+  // Get delta
+  float delta;
+  memcpy(&delta, ptmp, sizeof(float));
+  vtkByteSwap::SwapBE(&delta);
+  ptmp += 4;
+
+  // Now loop around until I get to the end of
+  // the input array
+  inIndex += 8;
+  while ((outIndex<outSize) && (inIndex<inSize))
+    {
+    // Okay get the run length
+    unsigned char runLength = *ptmp;
+    ptmp ++;
+    if (runLength < 128)
+      {
+      ptmp += 4;
+      // Now populate the out data
+      int k;
+      for (k=0; k<runLength; ++k)
+        {
+        if ( outIndex >= outSize )
+          {
+          vtkErrorMacro( "Problem doing RLD decode. "
+                         << "Too much data generated. Excpected: " 
+                         << outSize );
+          return 0;
+          }
+        out[outIndex] = val + outIndex*delta;
+        outIndex++;
+        }
+      inIndex += 5;
+      }
+    else  // runLength >= 128
+      {
+      int k;
+      for (k=0; k<runLength-128; ++k)
+        {
+        if ( outIndex >= outSize )
+          {
+          vtkErrorMacro( "Problem doing RLD decode. "
+                         << "Too much data generated. Excpected: " 
+                         << outSize );
+          return 0;
+          }
+        float nval;
+        memcpy(&nval, ptmp, sizeof(float));
+        vtkByteSwap::SwapBE(&nval);
+        out[outIndex] = nval + outIndex*delta;
+        outIndex++;
+        ptmp += 4;
+        }
+      inIndex += 4*(runLength-128)+1;
+      }
+    } // while 
+
+  return 1;
+} 
