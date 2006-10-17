@@ -9,40 +9,9 @@
   <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionToolsCreateCustomFilter" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="Clip" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputPipeline" command="currentChanged" arguments="/0|0" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="I" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="I" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="In" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="Inpu" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="Inpu" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="Input" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/AddInputButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPipeline" command="currentChanged" arguments="/0|0" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="O" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="O" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="Ou" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="Out" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="Output" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="Output" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="Output" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/AddOutputButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyPipeline" command="currentChanged" arguments="/0|0" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="C" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Cl" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Cl" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip " />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip F" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip F" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip Fun" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip Func" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip Func" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip Functio" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip Function" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip Function" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip Function" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/AddPropertyButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/FinishButton" command="activate" arguments="" />
