@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.68");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.69");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -899,7 +899,7 @@ int vtkKWMultiColumnList::GetLastSortedOrder()
     return vtkKWMultiColumnList::SortByUnknownOrder;
     }
 
-  vtksys::String strOrder = this->Script("%s sortorder", this->GetWidgetName());
+  vtksys_stl::string strOrder = this->Script("%s sortorder", this->GetWidgetName());
   if(strcmp(strOrder.c_str(), "decreasing")==0)
     {
     return vtkKWMultiColumnList::SortByDecreasingOrder;
