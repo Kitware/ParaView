@@ -42,8 +42,6 @@ ENDIF(WIN32)
 ADD_EXECUTABLE(DobranoViz WIN32 MACOSX_BUNDLE
   AboutDialog.cxx
   AboutDialog.h
-  ImageLinePlot.cxx
-  ImageLinePlot.h
   LineChartAdapter.cxx
   LineChartAdapter.h
   MainWindow.cxx

@@ -7,7 +7,6 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "ImageLinePlot.h"
 #include "LineChartAdapter.h"
 
 #include <pqConnect.h>
