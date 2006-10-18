@@ -1,4 +1,25 @@
+
 PROJECT(QtTesting)
+
+#OPTION(QT_TESTING_WITH_PYTHON "Build Testing with Python" ON)
+SET(QT_TESTING_WITH_PYTHON OFF)
+SET(QT_TESTING_WITH_XML ON)
+
+IF(QT_TESTING_WITH_PYTHON)
+  INCLUDE_DIRECTORIES(
+    ${PYTHON_INCLUDE_PATH}
+  )
+  SET(PYTHON_MOCS
+    pqPythonEventObserver.h
+  )
+  SET(PYTHON_SRCS
+    pqPythonEventObserver.cxx
+    pqPythonEventObserver.h
+    pqPythonEventSource.cxx
+    pqPythonEventSource.h
+  )
+ENDIF(QT_TESTING_WITH_PYTHON)
+
 
 INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
@@ -20,15 +41,18 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDoubleSpinBoxEventTranslator.h
   pqEventDispatcher.h
   pqEventPlayer.h
+  pqEventSource.h
   pqEventTranslator.h
   pqLineEditEventTranslator.h
   pqMenuEventTranslator.h
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.h
   pqStdoutEventObserver.h
+  pqThreadedEventSource.h
   pqTabBarEventTranslator.h
   pqWidgetEventTranslator.h
   pqXMLEventObserver.h
+  ${PYTHON_MOCS}
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -88,6 +112,8 @@ ADD_LIBRARY(QtTesting
   pqTabBarEventPlayer.h
   pqTabBarEventTranslator.cxx
   pqTabBarEventTranslator.h
+  pqThreadedEventSource.cxx
+  pqThreadedEventSource.h
   pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
   pqXMLEventObserver.cxx
@@ -96,6 +122,7 @@ ADD_LIBRARY(QtTesting
   pqXMLEventSource.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
+  ${PYTHON_SRCS}
 )
 
 SOURCE_GROUP("Generated" FILES
@@ -108,7 +135,18 @@ TARGET_LINK_LIBRARIES(QtTesting
   ${QT_QTTEST_LIBRARY}
 )
 
+IF(QT_TESTING_WITH_PYTHON)
+  TARGET_LINK_LIBRARIES(QtTesting
+    ${PYTHON_LIBRARIES}
+  )
+ENDIF(QT_TESTING_WITH_PYTHON)
+
+CONFIGURE_FILE(${QtTesting_SOURCE_DIR}/QtTestingConfigure.h.in
+               ${QtTesting_BINARY_DIR}/QtTestingConfigure.h)
+
 INSTALL(TARGETS QtTesting
   RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
   LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
   ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
+
+

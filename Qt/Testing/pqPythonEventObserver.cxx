@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqEventDispatcher.h
+   Module:    pqPythonEventObserver.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,46 +30,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqEventDispatcher_h
-#define _pqEventDispatcher_h
+#include "pqPythonEventObserver.h"
 
-#include "QtTestingExport.h"
+#include <QTextStream>
 
-#include <QObject>
+////////////////////////////////////////////////////////////////////////////////////
+// pqPythonEventObserver
 
-class pqEventPlayer;
-class pqEventSource;
-
-class QTTESTING_EXPORT pqEventDispatcher :
-  public QObject
+pqPythonEventObserver::pqPythonEventObserver(QTextStream& stream) :
+  Stream(stream)
 {
-  Q_OBJECT
-  
-public:
-  pqEventDispatcher();
-  ~pqEventDispatcher();
+  this->Stream << "#/usr/bin/env python\n\n";
+  this->Stream << "import QtTesting\n\n";
+}
 
-  /** Retrieves events from the given event source, dispatching them to
-  the given event player for test case playback.  Note that playback is
-  asynchronous - the call to playEvents() returns immediately.  Callers
-  must ensure that the source, dispatcher, and player objects remain
-  in-scope until either the succeeded() or failed() signal is emitted
-  to indicate that playback has finished. */
-  void playEvents(pqEventSource& source, pqEventPlayer& player);
+pqPythonEventObserver::~pqPythonEventObserver()
+{
+  this->Stream.flush();
+}
 
-signals:
-  void succeeded();
-  void failed();
-  void readyPlayNextEvent();
+void pqPythonEventObserver::onRecordEvent(
+  const QString& Widget,
+  const QString& Command,
+  const QString& Arguments)
+{
 
-private slots:
-  void playNextEvent();
+  QString varname = this->Names[Widget];
+  if(varname == QString::null)
+    {
+    varname = QString("object%1").arg(this->Names.count());
+    this->Names.insert(Widget, varname);
+    QString objname("%1 = '%2'");
+    objname = objname.arg(varname);
+    objname = objname.arg(Widget);
+    this->Stream << objname << "\n";
+    }
 
-private:
-  void stopPlayback();
+  QString pycommand("QtTesting.playCommand(%1, '%2', '%3')");
+  pycommand = pycommand.arg(varname);
+  pycommand = pycommand.arg(Command);
+  pycommand = pycommand.arg(Arguments);
+  this->Stream << pycommand << "\n";
+}
 
-  class pqImplementation;
-  pqImplementation* const Implementation;
-};
 
-#endif // !_pqEventDispatcher_h

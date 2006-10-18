@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqEventDispatcher.h
+   Module:    QtTestingConfigure.h.in
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,46 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqEventDispatcher_h
-#define _pqEventDispatcher_h
+#ifndef _QtTestingConfigure_h
+#define _QtTestingConfigure_h
 
-#include "QtTestingExport.h"
+#cmakedefine QT_TESTING_WITH_XML
 
-#include <QObject>
+#cmakedefine QT_TESTING_WITH_PYTHON
 
-class pqEventPlayer;
-class pqEventSource;
+#endif // _QtTestingConfigure_h
 
-class QTTESTING_EXPORT pqEventDispatcher :
-  public QObject
-{
-  Q_OBJECT
-  
-public:
-  pqEventDispatcher();
-  ~pqEventDispatcher();
 
-  /** Retrieves events from the given event source, dispatching them to
-  the given event player for test case playback.  Note that playback is
-  asynchronous - the call to playEvents() returns immediately.  Callers
-  must ensure that the source, dispatcher, and player objects remain
-  in-scope until either the succeeded() or failed() signal is emitted
-  to indicate that playback has finished. */
-  void playEvents(pqEventSource& source, pqEventPlayer& player);
-
-signals:
-  void succeeded();
-  void failed();
-  void readyPlayNextEvent();
-
-private slots:
-  void playNextEvent();
-
-private:
-  void stopPlayback();
-
-  class pqImplementation;
-  pqImplementation* const Implementation;
-};
-
-#endif // !_pqEventDispatcher_h

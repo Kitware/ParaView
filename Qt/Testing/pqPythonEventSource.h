@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqEventDispatcher.h
+   Module:    pqPythonEventSource.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,46 +30,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqEventDispatcher_h
-#define _pqEventDispatcher_h
+#ifndef _pqPythonEventSource_h
+#define _pqPythonEventSource_h
 
-#include "QtTestingExport.h"
+#include "pqThreadedEventSource.h"
 
-#include <QObject>
+class QString;
 
-class pqEventPlayer;
-class pqEventSource;
-
-class QTTESTING_EXPORT pqEventDispatcher :
-  public QObject
+/** Concrete implementation of pqEventSource that retrieves events recorded
+by pqPythonEventObserver */
+class QTTESTING_EXPORT pqPythonEventSource :
+  public pqThreadedEventSource
 {
-  Q_OBJECT
-  
 public:
-  pqEventDispatcher();
-  ~pqEventDispatcher();
+  pqPythonEventSource();
+  ~pqPythonEventSource();
 
-  /** Retrieves events from the given event source, dispatching them to
-  the given event player for test case playback.  Note that playback is
-  asynchronous - the call to playEvents() returns immediately.  Callers
-  must ensure that the source, dispatcher, and player objects remain
-  in-scope until either the succeeded() or failed() signal is emitted
-  to indicate that playback has finished. */
-  void playEvents(pqEventSource& source, pqEventPlayer& player);
+  void setContent(const QString& path);
 
-signals:
-  void succeeded();
-  void failed();
-  void readyPlayNextEvent();
+protected:
+  virtual void run();
+  virtual bool event(QEvent*);
 
-private slots:
-  void playNextEvent();
+  class pqInternal;
+  pqInternal* Internal;
 
-private:
-  void stopPlayback();
-
-  class pqImplementation;
-  pqImplementation* const Implementation;
 };
 
-#endif // !_pqEventDispatcher_h
+#endif // !_pqPythonEventSource_h
+

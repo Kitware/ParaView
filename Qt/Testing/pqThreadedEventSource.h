@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqEventSource.h
+   Module:    pqThreadedEventSource.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,27 +30,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqEventSource_h
-#define _pqEventSource_h
+#ifndef _pqThreadedEventSource_h
+#define _pqThreadedEventSource_h
 
 #include "QtTestingExport.h"
-#include <QObject>
+#include "pqEventSource.h"
+
 class QString;
 
 /// Abstract interface for objects that can supply high-level testing events
-class QTTESTING_EXPORT pqEventSource : public QObject
+/// on a separte thread.  This class is derived from, and run() is
+/// implemented.
+class QTTESTING_EXPORT pqThreadedEventSource : public pqEventSource
 {
   Q_OBJECT
 public:
-  virtual ~pqEventSource() {}
+  pqThreadedEventSource();
+  ~pqThreadedEventSource();
 
-  /** Retrieves the next available event.  Returns true if an event was
-  returned, false if there are no more events. */
+  /** Called by the dispatcher on the GUI thread.
+    Retrieves the next available event.  Returns true if an event was
+    returned, false if there are no more events. 
+    In the case of a threaded event source, this function is called by the GUI
+    thread and waits for the other thread to pos and event. */
   virtual bool getNextEvent(
     QString& object,
     QString& command,
-    QString& arguments) = 0;
+    QString& arguments);
+  
+  /** The testing thread may post an event for the GUI to process.
+      This function blocks until there are no previously queued events to play.  */
+  void postNextEvent(const QString& object,
+                     const QString& command,
+                     const QString& argument);
+  
+protected:
+
+  // start the thread
+  void start();
+
+  // called by the testing thread to signify it is done
+  void done();
+
+  // run the thread, return 
+  virtual void run() = 0;
+
+protected slots:
+  void unlockTestingMutex();
+
+private:
+  class pqInternal;
+  friend class pqInternal;
+  pqInternal* Internal;
 
 };
 
-#endif // !_pqEventSource_h
+#endif // !_pqThreadedEventSource_h
+

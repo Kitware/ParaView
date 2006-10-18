@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqEventDispatcher.h
+   Module:    pqPythonEventObserver.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,46 +30,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqEventDispatcher_h
-#define _pqEventDispatcher_h
-
-#include "QtTestingExport.h"
+#ifndef _pqPythonEventObserver_h
+#define _pqPythonEventObserver_h
 
 #include <QObject>
+#include <QHash>
+#include <QString>
+class QTextStream;
 
-class pqEventPlayer;
-class pqEventSource;
+/**
+Observes high-level ParaView events, and serializes them to a stream as Python
+for possible playback (as a test-case, demo, tutorial, etc).  To use,
+connect the onRecordEvent() slot to the pqEventTranslator::recordEvent()
+signal.
 
-class QTTESTING_EXPORT pqEventDispatcher :
+\note Output is sent to the stream from this object's destructor, so you
+must ensure that it goes out of scope before trying to playback the stream.
+
+\sa pqEventTranslator, pqStdoutEventObserver, pqPythonEventSource.
+*/
+
+class pqPythonEventObserver :
   public QObject
 {
   Q_OBJECT
   
 public:
-  pqEventDispatcher();
-  ~pqEventDispatcher();
+  pqPythonEventObserver(QTextStream& Stream);
+  ~pqPythonEventObserver();
 
-  /** Retrieves events from the given event source, dispatching them to
-  the given event player for test case playback.  Note that playback is
-  asynchronous - the call to playEvents() returns immediately.  Callers
-  must ensure that the source, dispatcher, and player objects remain
-  in-scope until either the succeeded() or failed() signal is emitted
-  to indicate that playback has finished. */
-  void playEvents(pqEventSource& source, pqEventPlayer& player);
-
-signals:
-  void succeeded();
-  void failed();
-  void readyPlayNextEvent();
-
-private slots:
-  void playNextEvent();
+public slots:
+  void onRecordEvent(
+    const QString& Widget,
+    const QString& Command,
+    const QString& Arguments);
 
 private:
-  void stopPlayback();
-
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  /// Stores a stream that will be used to store the Python output
+  QTextStream& Stream;
+  QHash<QString, QString> Names;
 };
 
-#endif // !_pqEventDispatcher_h
+#endif // !_pqPythonEventObserver_h
+

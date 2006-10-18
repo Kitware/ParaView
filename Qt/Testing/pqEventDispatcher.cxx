@@ -68,6 +68,8 @@ public:
 pqEventDispatcher::pqEventDispatcher() :
   Implementation(new pqImplementation())
 {
+  QObject::connect(this, SIGNAL(readyPlayNextEvent()),
+                   this, SLOT(playNextEvent()));
 }
 
 pqEventDispatcher::~pqEventDispatcher()
@@ -99,23 +101,37 @@ void pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
     &this->Implementation->Timer,
     SIGNAL(timeout()),
     this,
-    SLOT(playNextEvent()));
+    SIGNAL(readyPlayNextEvent()));
 #else
   QObject::connect(
     QAbstractEventDispatcher::instance(),
     SIGNAL(aboutToBlock()),
     this,
-    SLOT(playNextEvent()),
+    SIGNAL(readyPlayNextEvent()),
     Qt::QueuedConnection);
 #endif
 }
   
 void pqEventDispatcher::playNextEvent()
 {
+
+  if(!this->Implementation->Source)
+    {
+    return;
+    }
+
   QString object;
   QString command;
   QString arguments;
-  if(!this->Implementation->Source->getNextEvent(object, command, arguments))
+  
+  // block signals as some event sources may interact with the event loop
+  this->blockSignals(true);
+
+  bool result = this->Implementation->Source->getNextEvent(
+                              object, command, arguments);
+  this->blockSignals(false);
+
+  if(!result)
     {
     this->stopPlayback();
     emit this->succeeded();
@@ -145,15 +161,16 @@ void pqEventDispatcher::stopPlayback()
     &this->Implementation->Timer,
     SIGNAL(timeout()),
     this,
-    SLOT(playNextEvent()));
+    SIGNAL(readyPlayNextEvent()));
 #else
   QObject::disconnect(
     QAbstractEventDispatcher::instance(),
     SIGNAL(aboutToBlock()),
     this,
-    SLOT(playNextEvent()));
+    SIGNAL(readyPlayNextEvent()));
 #endif
     
   this->Implementation->Source = 0;
   this->Implementation->Player = 0;
 }
+
