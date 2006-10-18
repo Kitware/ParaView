@@ -190,7 +190,6 @@ struct ChartAdapter::pqImplementation
     this->Chart.getTitle().setText("Histogram");
     this->Chart.getHistogramAxis().setVisible(true);
     this->Chart.getHorizontalAxis().setVisible(true);
-    pqChartValueList list;
     for(int i = 0; i != bin_values->GetNumberOfTuples(); ++i)
       {
       this->Model->addBinValue(pqChartValue(static_cast<double>(
