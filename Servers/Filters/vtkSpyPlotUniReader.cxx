@@ -11,7 +11,7 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.2");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.3");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -1507,3 +1507,22 @@ int vtkSpyPlotUniReader::ReadHeader(vtkSpyPlotIStream *spis)
   // Done with header
   return 1;
 }
+
+//-----------------------------------------------------------------------------
+void vtkSpyPlotUniReader::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "FileName: " 
+     << (this->FileName?this->FileName:"(none)") << endl;
+  os << indent << "TimeStepRange: [" << this->TimeStepRange[0]
+     << ", " << this->TimeStepRange[1] << "]" << endl;
+  os << indent << "CurrentTimeStep: " << this->CurrentTimeStep << endl;
+  os << indent << "TimeRange: [" << this->TimeRange[0]
+     << ", " << this->TimeRange[1] << "]" << endl;
+  os << indent << "CurrentTime: " << this->CurrentTime << endl;
+  os << indent << "DataTypeChanged: " << this->DataTypeChanged << endl;
+  os << indent << "NumberOfCellFields: " << this->NumberOfCellFields << endl;
+}
+
+

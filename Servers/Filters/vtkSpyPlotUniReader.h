@@ -44,6 +44,7 @@ class VTK_EXPORT vtkSpyPlotUniReader : public vtkObject
 public:
   vtkTypeRevisionMacro(vtkSpyPlotUniReader, vtkObject);
   static vtkSpyPlotUniReader* New();
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   //Description:
   // Set and get the Binary SpyPlot File name the reader will process
