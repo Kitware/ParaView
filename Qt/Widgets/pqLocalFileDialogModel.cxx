@@ -332,7 +332,7 @@ public:
     TCHAR szPath[MAX_PATH];
 
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, szPath)))
-      this->FavoriteList.push_back(FileInfo(tr("My Projects"), szPath));
+      this->FavoriteList.push_back(FileInfo(tr("My Documents"), szPath));
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, szPath)))
       this->FavoriteList.push_back(FileInfo(tr("Desktop"), szPath));
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_FAVORITES, NULL, 0, szPath)))
