@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLineChart.h"
 
-#include "pqAbstractPlot.h"
 #include "pqChartAxis.h"
 #include "pqChartCoordinate.h"
 #include "pqLineChartModel.h"

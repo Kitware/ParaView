@@ -5,8 +5,6 @@ INCLUDE_DIRECTORIES(
 )
 
 SET(QtChart_SRCS
-  pqAbstractPlot.cxx
-  pqAbstractPlot.h
   pqChartAxis.cxx
   pqChartAxis.h
   pqChartCoordinate.cxx
@@ -53,18 +51,12 @@ SET(QtChart_SRCS
   pqLineChartPlotOptions.h
   pqLineChartWidget.cxx
   pqLineChartWidget.h
-  pqLineErrorPlot.cxx
-  pqLineErrorPlot.h
-  pqLinePlot.cxx
-  pqLinePlot.h
   pqMarkerPen.cxx
   pqMarkerPen.h
   pqPixelTransferFunction.cxx
   pqPixelTransferFunction.h
   pqPointMarker.cxx
   pqPointMarker.h
-  pqScatterPlot.cxx
-  pqScatterPlot.h
   pqSimpleLineChartPlot.cxx
   pqSimpleLineChartPlot.h
   QtChartExport.h

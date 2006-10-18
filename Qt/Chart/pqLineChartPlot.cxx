@@ -79,4 +79,61 @@ void pqLineChartPlot::endMultiSeriesChange()
   emit this->changedMultipleSeries();
 }
 
+/* TODO: Add tooltips to new model-view charts.
+const double pqLinePlot::getDistance(const QPoint& coords) const
+{
+  double distance = VTK_DOUBLE_MAX;
+  for(int i = 0; i != this->Implementation->ScreenCoords.size(); ++i)
+    distance = vtkstd::min(distance, static_cast<double>((this->Implementation->ScreenCoords[i] - coords).manhattanLength()));
+  return distance;
+}
+
+void pqLinePlot::showChartTip(QHelpEvent& event) const
+{
+  double tip_distance = VTK_DOUBLE_MAX;
+  pqChartCoordinate tip_coordinate;
+  for(int i = 0; i != this->Implementation->ScreenCoords.size(); ++i)
+    {
+    const double distance = (this->Implementation->ScreenCoords[i] - event.pos()).manhattanLength();
+    if(distance < tip_distance)
+      {
+      tip_distance = distance;
+      tip_coordinate = this->Implementation->WorldCoords[i];
+      }
+    }
+
+  if(tip_distance < VTK_DOUBLE_MAX)    
+    QToolTip::showText(event.globalPos(), QString("%1, %2").arg(tip_coordinate.X.getDoubleValue()).arg(tip_coordinate.Y.getDoubleValue()));
+}
+
+void pqLineErrorPlot::showChartTip(QHelpEvent& event) const
+{
+  double tip_distance = VTK_DOUBLE_MAX;
+  pqChartCoordinate tip_coordinate;
+  for(int i = 0; i != this->Implementation->PlotScreenCoords.size(); ++i)
+    {
+    const double distance = (this->Implementation->PlotScreenCoords[i] - event.pos()).manhattanLength();
+    if(distance < tip_distance)
+      {
+      tip_distance = distance;
+      tip_coordinate = pqChartCoordinate(this->Implementation->WorldCoords[i].X, this->Implementation->WorldCoords[i].Y);
+      }
+    }
+
+  if(tip_distance < VTK_DOUBLE_MAX)    
+    QToolTip::showText(event.globalPos(), QString("%1, %2").arg(tip_coordinate.X.getDoubleValue()).arg(tip_coordinate.Y.getDoubleValue()));
+}
+
+void ImageLineErrorPlot::showChartTip(QHelpEvent& event) const
+{
+  if(this->Image.isNull())
+    {
+    pqLineErrorPlot::showChartTip(event);
+    return;
+    }
+  
+  pqImageTip::showTip(this->Image, event.globalPos());
+}
+*/
+
 
