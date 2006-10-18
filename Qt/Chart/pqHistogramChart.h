@@ -53,7 +53,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqChartAxis;
 class pqChartValue;
-class pqChartValueList;
 class pqHistogramChartData;
 class pqHistogramColor;
 class pqHistogramModel;

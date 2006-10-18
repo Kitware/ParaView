@@ -33,66 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*!
  * \file pqChartValue.cxx
  *
- * \brief
- *   The pqChartValue and pqChartValueList classes are used to define
- *   the data for a pqHistogramChart.
- *
  * \author Mark Richardson
  * \date   May 10, 2005
  */
 
 #include "pqChartValue.h"
-#include <vtkstd/vector>
 #include <float.h>
 #include <math.h>
-#include <iostream>
-using namespace std;
-
-/// \class pqChartValueIteratorData
-/// \brief
-///   The pqChartValueIteratorData class hides the private data of
-///   the pqChartValueIterator class.
-class pqChartValueIteratorData : public vtkstd::vector<pqChartValue>::iterator
-{
-public:
-  pqChartValueIteratorData& operator=(
-      const vtkstd::vector<pqChartValue>::iterator& iter)
-    {
-    vtkstd::vector<pqChartValue>::iterator::operator=(iter);
-    return *this;
-    }
-};
-
-
-/// \class pqChartValueConstIteratorData
-/// \brief
-///   The pqChartValueConstIteratorData class hides the private
-///   data of the pqChartValueConstIterator class.
-class pqChartValueConstIteratorData :
-    public vtkstd::vector<pqChartValue>::const_iterator
-{
-public:
-  pqChartValueConstIteratorData& operator=(
-      const vtkstd::vector<pqChartValue>::iterator& iter)
-    {
-    vtkstd::vector<pqChartValue>::const_iterator::operator=(iter);
-    return *this;
-    }
-
-  pqChartValueConstIteratorData& operator=(
-      const vtkstd::vector<pqChartValue>::const_iterator& iter)
-    {
-    vtkstd::vector<pqChartValue>::const_iterator::operator=(iter);
-    return *this;
-    }
-};
-
-
-/// \class pqChartValueListData
-/// \brief
-///   The pqChartValueListData class hides the private data of the
-///   pqChartValueList class.
-class pqChartValueListData : public vtkstd::vector<pqChartValue> {};
 
 
 pqChartValue::pqChartValue()
@@ -220,34 +167,52 @@ QString pqChartValue::getString(int precision,
       {
       int offset = exponent%3;
       if(offset<0)
+        {
         offset+=3;
+        }
+
       // if using engineering notation we may be moving decimal to right
       // get a new string representation with increased precision
       if(this->Type == FloatValue)
+        {
         result2.setNum(this->Value.Float, 'e', precision+offset);
+        }
       else
+        {
         result2.setNum(this->Value.Double, 'e', precision+offset);
+        }
 
       if(offset!=0)
         {
-        // string is not already in engineering notation so...
-        // decrease the exponent
+        // The string is not already in engineering notation so...
+        // decrease the exponent.
         exponent -= offset;
         int eIdx = result2.indexOf('e');
         QString exponentString;
         exponentString.setNum(exponent);
-        // add a plus sign to exponent if need be
-        if(exponent>0)
-          exponentString.insert(0,'+');
-        result2.replace(eIdx+1,result2.mid(eIdx+1,result2.length()-1).length(),exponentString);
-        // move the decimal point to the right
-        // (there's guaranteed to be one since offset is non-zero even if precison==0)
+
+        // Add a plus sign to the exponent if needed.
+        if(exponent > 0)
+          {
+          exponentString.insert(0, '+');
+          }
+
+        result2.replace(eIdx + 1,
+            result2.mid(eIdx + 1, result2.length() - 1).length(),
+            exponentString);
+
+        // Move the decimal point to the right (there's guaranteed to
+        // be one since offset is non-zero even if precison==0).
         int idx = result2.indexOf('.');
         result2.remove(idx,1);
-        // only insert if we have a non-zero precision
-        if(precision>0)
-          result2.insert(idx+offset,'.');
+
+        // Only insert if we have a non-zero precision.
+        if(precision > 0)
+          {
+          result2.insert(idx+offset, '.');
+          }
         }
+
       result = result2;
       }
     else if(notation == pqChartValue::Exponential)
@@ -268,6 +233,7 @@ QString pqChartValue::getString(int precision,
       }
     //else if(notation == pqChartValue::Standard) use result as is.
     }
+
   return result;
 }
 
@@ -917,335 +883,6 @@ bool pqChartValue::operator<=(double value) const
     return this->Value.Float <= static_cast<float>(value);
   else
     return this->Value.Double <= value;
-}
-
-
-pqChartValueIterator::pqChartValueIterator()
-{
-  this->Data = new pqChartValueIteratorData();
-}
-
-pqChartValueIterator::pqChartValueIterator(const pqChartValueIterator &iter)
-{
-  this->Data = new pqChartValueIteratorData();
-  if(this->Data && iter.Data)
-    *this->Data = *iter.Data;
-}
-
-pqChartValueIterator::~pqChartValueIterator()
-{
-  if(this->Data)
-    delete this->Data;
-}
-
-bool pqChartValueIterator::operator==(const pqChartValueIterator &iter) const
-{
-  if(this->Data && iter.Data)
-    return *this->Data == *iter.Data;
-  else if(!this->Data && !iter.Data)
-    return true;
-
-  return false;
-}
-
-bool pqChartValueIterator::operator!=(const pqChartValueIterator &iter) const
-{
-  if(this->Data && iter.Data)
-    return *this->Data != *iter.Data;
-  else if(!this->Data && !iter.Data)
-    return false;
-
-  return true;
-}
-
-bool pqChartValueIterator::operator==(
-    const pqChartValueConstIterator &iter) const
-{
-  if(this->Data && iter.Data)
-    return *this->Data == *iter.Data;
-  else if(!this->Data && !iter.Data)
-    return true;
-
-  return false;
-}
-
-bool pqChartValueIterator::operator!=(
-    const pqChartValueConstIterator &iter) const
-{
-  if(this->Data && iter.Data)
-    return *this->Data != *iter.Data;
-  else if(!this->Data && !iter.Data)
-    return false;
-
-  return true;
-}
-
-const pqChartValue &pqChartValueIterator::operator*() const
-{
-  return *(*this->Data);
-}
-
-pqChartValue &pqChartValueIterator::operator*()
-{
-  return *(*this->Data);
-}
-
-pqChartValue *pqChartValueIterator::operator->()
-{
-  if(this->Data)
-    return &(*(*this->Data));
-  return 0;
-}
-
-pqChartValueIterator &pqChartValueIterator::operator++()
-{
-  if(this->Data)
-    ++(*this->Data);
-  return *this;
-}
-
-pqChartValueIterator pqChartValueIterator::operator++(int)
-{
-  pqChartValueIterator result(*this);
-  if(this->Data)
-    ++(this->Data);
-  return result;
-}
-
-pqChartValueIterator &pqChartValueIterator::operator=(
-    const pqChartValueIterator &iter)
-{
-  if(this->Data && iter.Data)
-    *this->Data = *iter.Data;
-  return *this;
-}
-
-
-pqChartValueConstIterator::pqChartValueConstIterator()
-{
-  this->Data = new pqChartValueConstIteratorData();
-}
-
-pqChartValueConstIterator::pqChartValueConstIterator(
-    const pqChartValueIterator &iter)
-{
-  this->Data = new pqChartValueConstIteratorData();
-  if(this->Data && iter.Data)
-    *this->Data = *iter.Data;
-}
-
-pqChartValueConstIterator::pqChartValueConstIterator(
-    const pqChartValueConstIterator &iter)
-{
-  this->Data = new pqChartValueConstIteratorData();
-  if(this->Data && iter.Data)
-    *this->Data = *iter.Data;
-}
-
-pqChartValueConstIterator::~pqChartValueConstIterator()
-{
-  if(this->Data)
-    delete this->Data;
-}
-
-bool pqChartValueConstIterator::operator==(
-    const pqChartValueConstIterator &iter) const
-{
-  if(this->Data && iter.Data)
-    return *this->Data == *iter.Data;
-  else if(!this->Data && !iter.Data)
-    return true;
-
-  return false;
-}
-
-bool pqChartValueConstIterator::operator!=(
-    const pqChartValueConstIterator &iter) const
-{
-  if(this->Data && iter.Data)
-    return *this->Data != *iter.Data;
-  else if(!this->Data && !iter.Data)
-    return false;
-
-  return true;
-}
-
-bool pqChartValueConstIterator::operator==(
-    const pqChartValueIterator &iter) const
-{
-  if(this->Data && iter.Data)
-    return *this->Data == *iter.Data;
-  else if(!this->Data && !iter.Data)
-    return true;
-
-  return false;
-}
-
-bool pqChartValueConstIterator::operator!=(
-    const pqChartValueIterator &iter) const
-{
-  if(this->Data && iter.Data)
-    return *this->Data != *iter.Data;
-  else if(!this->Data && !iter.Data)
-    return false;
-
-  return true;
-}
-
-const pqChartValue &pqChartValueConstIterator::operator*() const
-{
-  return *(*this->Data);
-}
-
-const pqChartValue *pqChartValueConstIterator::operator->() const
-{
-  if(this->Data)
-    return &(*(*this->Data));
-  return 0;
-}
-
-pqChartValueConstIterator &pqChartValueConstIterator::operator++()
-{
-  if(this->Data)
-    ++(*this->Data);
-  return *this;
-}
-
-pqChartValueConstIterator pqChartValueConstIterator::operator++(int)
-{
-  pqChartValueConstIterator result(*this);
-  if(this->Data)
-    ++(this->Data);
-  return result;
-}
-
-pqChartValueConstIterator &pqChartValueConstIterator::operator=(
-    const pqChartValueConstIterator &iter)
-{
-  if(this->Data && iter.Data)
-    *this->Data = *iter.Data;
-  return *this;
-}
-
-pqChartValueConstIterator &pqChartValueConstIterator::operator=(
-    const pqChartValueIterator &iter)
-{
-  if(this->Data && iter.Data)
-    *this->Data = *iter.Data;
-  return *this;
-}
-
-
-pqChartValueList::pqChartValueList()
-{
-  this->Data = new pqChartValueListData();
-}
-
-pqChartValueList::~pqChartValueList()
-{
-  if(this->Data)
-    delete this->Data;
-}
-
-pqChartValueList::Iterator pqChartValueList::begin()
-{
-  pqChartValueIterator iter;
-  if(this->Data && iter.Data)
-    *iter.Data = this->Data->begin();
-  return iter;
-}
-
-pqChartValueList::Iterator pqChartValueList::end()
-{
-  pqChartValueIterator iter;
-  if(this->Data && iter.Data)
-    *iter.Data = this->Data->end();
-  return iter;
-}
-
-pqChartValueList::ConstIterator pqChartValueList::begin() const
-{
-  pqChartValueConstIterator iter;
-  if(this->Data && iter.Data)
-    *iter.Data = this->Data->begin();
-  return iter;
-}
-
-pqChartValueList::ConstIterator pqChartValueList::end() const
-{
-  pqChartValueConstIterator iter;
-  if(this->Data && iter.Data)
-    *iter.Data = this->Data->end();
-  return iter;
-}
-
-pqChartValueList::ConstIterator pqChartValueList::constBegin() const
-{
-  pqChartValueConstIterator iter;
-  if(this->Data && iter.Data)
-    *iter.Data = this->Data->begin();
-  return iter;
-}
-
-pqChartValueList::ConstIterator pqChartValueList::constEnd() const
-{
-  pqChartValueConstIterator iter;
-  if(this->Data && iter.Data)
-    *iter.Data = this->Data->end();
-  return iter;
-}
-
-bool pqChartValueList::isEmpty() const
-{
-  if(this->Data)
-    return this->Data->size() == 0;
-  return true;
-}
-
-int pqChartValueList::getSize() const
-{
-  if(this->Data)
-    return static_cast<int>(this->Data->size());
-  return 0;
-}
-
-void pqChartValueList::clear()
-{
-  if(this->Data)
-    this->Data->clear();
-}
-
-void pqChartValueList::pushBack(const pqChartValue &value)
-{
-  if(this->Data)
-    this->Data->push_back(value);
-}
-
-pqChartValueList &pqChartValueList::operator=(
-    const pqChartValueList &list)
-{
-  this->clear();
-  if(this->Data && list.Data)
-    {
-    vtkstd::vector<pqChartValue>::iterator iter = list.Data->begin();
-    for( ; iter != list.Data->end(); iter++)
-      this->Data->push_back(*iter);
-    }
-
-  return *this;
-}
-
-pqChartValueList &pqChartValueList::operator+=(
-    const pqChartValueList &list)
-{
-  if(this->Data && list.Data)
-    {
-    vtkstd::vector<pqChartValue>::iterator iter = list.Data->begin();
-    for( ; iter != list.Data->end(); iter++)
-      this->Data->push_back(*iter);
-    }
-
-  return *this;
 }
 
 
