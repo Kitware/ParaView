@@ -2046,7 +2046,6 @@
    <!-- End of FLUENT Reader -->
 
    <!-- Beginning of LSDyna Reader -->
-   <!--
    <SourceProxy name="LSDynaReader" class="vtkLSDynaReader">
 
      <StringVectorProperty name="FileName" command="SetFileName" number_of_elements="1">
@@ -2196,7 +2195,6 @@
      </IntVectorProperty>
 
    </SourceProxy>
-   -->
    <!-- End of LSDyna Reader -->
 
   </ProxyGroup>
