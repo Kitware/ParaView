@@ -195,13 +195,17 @@ public:
   // Description:
   // Called when the user presses the "Edit Color Map" button.
   void EditColorMapCallback();
+
+  // Description:
+  // Called when the user presses "Reset Range" button.
   void DataColorRangeCallback();
+  void VolumeDataColorRangeCallback();
 
   // Description:
   // Called when the user presses the "Edit Volume Appearance" button.
   void EditVolumeAppearanceCallback();
   void ShowVolumeAppearanceEditor();
-  
+
   void ScalarBarCheckCallback();
   vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
 
@@ -365,6 +369,7 @@ protected:
   vtkKWMenuButton *VolumeRenderMethodMenu;
   
   vtkKWPushButton *EditVolumeAppearanceButton;
+  vtkKWPushButton *VolumeDataColorRangeButton;
 
   vtkKWLabel *RepresentationMenuLabel;
   vtkKWMenuButton *RepresentationMenu;

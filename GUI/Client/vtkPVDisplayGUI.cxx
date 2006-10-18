@@ -105,7 +105,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.72");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.73");
 
 //----------------------------------------------------------------------------
 
@@ -228,6 +228,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->VolumeRenderMethodMenu = vtkKWMenuButton::New();
   
   this->EditVolumeAppearanceButton = vtkKWPushButton::New();
+  this->VolumeDataColorRangeButton = vtkKWPushButton::New();
 
   this->RepresentationMenuLabel = vtkKWLabel::New();
   this->RepresentationMenu = vtkKWMenuButton::New();
@@ -288,7 +289,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
 
 //----------------------------------------------------------------------------
 vtkPVDisplayGUI::~vtkPVDisplayGUI()
-{  
+{
   this->VRObserver->SetDisplayGUI( NULL );
   delete this->Internal;
   this->Internal = 0;
@@ -341,7 +342,10 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   
   this->EditVolumeAppearanceButton->Delete();
   this->EditVolumeAppearanceButton = NULL;
-  
+
+  this->VolumeDataColorRangeButton->Delete();
+  this->VolumeDataColorRangeButton = NULL;
+
   this->RepresentationMenuLabel->Delete();
   this->RepresentationMenuLabel = NULL;  
   this->RepresentationMenu->Delete();
@@ -751,8 +755,8 @@ void vtkPVDisplayGUI::CreateWidget()
     "HAVS (listed if supported) is also fast, but cannot render cell data; in "
     "this case, Projection will be automatically selected.");
   
-  this->EditVolumeAppearanceButton->
-    SetParent(this->VolumeAppearanceFrame->GetFrame());
+  this->EditVolumeAppearanceButton->SetParent(
+    this->VolumeAppearanceFrame->GetFrame());
   this->EditVolumeAppearanceButton->Create();
   this->EditVolumeAppearanceButton->SetText("Edit Volume Appearance...");
   this->EditVolumeAppearanceButton->
@@ -760,7 +764,19 @@ void vtkPVDisplayGUI::CreateWidget()
   this->EditVolumeAppearanceButton->SetBalloonHelpString(
     "Edit the color and opacity functions for the volume.");
 
-  
+  this->VolumeDataColorRangeButton->SetParent(
+    this->VolumeAppearanceFrame->GetFrame());
+  this->VolumeDataColorRangeButton->Create();
+  this->VolumeDataColorRangeButton->SetText("Reset Range");
+  this->VolumeDataColorRangeButton->SetCommand(this,
+                                               "VolumeDataColorRangeCallback");
+  this->VolumeDataColorRangeButton->SetBalloonHelpString(
+    "Sets the range of the transfer functions to this module's scalar range.");
+
+  this->Script("pack %s %s -side left -fill x -expand t -pady 2",
+               this->EditVolumeAppearanceButton->GetWidgetName(),
+               this->VolumeDataColorRangeButton->GetWidgetName());
+
   this->Script("grid %s %s -sticky wns",
                this->VolumeScalarsMenuLabel->GetWidgetName(),
                this->VolumeScalarSelectionWidget->GetWidgetName());
@@ -781,6 +797,9 @@ void vtkPVDisplayGUI::CreateWidget()
                this->EditVolumeAppearanceButton->GetWidgetName(),
                col_1_padx, button_pady);
 
+  this->Script("grid %s -row 3 -column 1 -sticky news -padx %d -pady %d",
+               this->VolumeDataColorRangeButton->GetWidgetName(),
+               col_1_padx, button_pady);
 
   // Display style
   this->DisplayStyleFrame->SetParent(this->MainFrame->GetFrame());
@@ -1219,6 +1238,111 @@ void vtkPVDisplayGUI::DataColorRangeCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDisplayGUI::VolumeDataColorRangeCallback()
+{
+  vtkPVSource *source = this->GetPVSource();
+  if (!source)
+    {
+    return;
+    }
+
+  vtkSMDataObjectDisplayProxy *dispProxy = source->GetDisplayProxy();
+  const char *arrayName = dispProxy->GetScalarArrayCM();
+  int colorField = source->GetDisplayProxy()->GetScalarModeCM();
+
+  if (!arrayName)
+    {
+    return;
+    }
+
+  vtkPVDataInformation* dataInfo = source->GetDataInformation();
+  vtkPVArrayInformation *arrayInfo;
+  vtkPVDataSetAttributesInformation *attrInfo;
+
+  if (colorField == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
+    {
+    attrInfo = dataInfo->GetPointDataInformation();
+    }
+  else
+    {
+    attrInfo = dataInfo->GetCellDataInformation();
+    }
+  arrayInfo = attrInfo->GetArrayInformation(arrayName);
+  double range[2];
+  arrayInfo->GetComponentRange(0, range);
+
+  vtkSMDoubleVectorProperty *opacityProxy =
+    vtkSMDoubleVectorProperty::SafeDownCast(dispProxy->GetProperty("Points"));
+  vtkSMDoubleVectorProperty *colorProxy = 
+    vtkSMDoubleVectorProperty::SafeDownCast(dispProxy->GetProperty("RGBPoints"));
+
+  if (!opacityProxy || !colorProxy)
+    {
+    return;
+    }
+
+  double oldRange[2];
+  int numOpacities = opacityProxy->GetNumberOfElements()/2;
+  int numColors = colorProxy->GetNumberOfElements()/4;
+  oldRange[0] = opacityProxy->GetElement(0);
+  oldRange[1] = opacityProxy->GetElement(2*(numOpacities-1));
+
+  int i;
+  double scalar;
+
+  if (oldRange[0] == oldRange[1])
+    {
+    opacityProxy->SetElement(0, range[0]);
+    opacityProxy->SetElement(2*(numOpacities-1), range[1]);
+    colorProxy->SetElement(0, range[0]);
+    colorProxy->SetElement(4*(numColors-1), range[1]);
+
+    double step = (range[1] - range[0]) / (double)(numOpacities-1);
+
+    for (i = 1; i < numOpacities-1; i++)
+      {
+      opacityProxy->SetElement(2*i, range[0] + i*step);
+      }
+
+    step = (range[1] - range[0]) / (double)(numColors-1);
+    for (i = 1; i < numColors-1; i++)
+      {
+      colorProxy->SetElement(4*i, range[0] + i*step);
+      }
+    }
+  else
+    {
+    double shift1, shift2, scale;
+    shift1 = -oldRange[0];
+    shift2 = range[0];
+    scale = (range[1] - range[0]) / (oldRange[1] - oldRange[0]);
+
+    for (i = 0; i < numOpacities; i++)
+      {
+      scalar = opacityProxy->GetElement(2*i);
+      scalar += shift1;
+      scalar *= scale;
+      scalar += shift2;
+      opacityProxy->SetElement(2*i, scalar);
+      }
+
+    for (i = 0; i < numColors; i++)
+      {
+      scalar = colorProxy->GetElement(4*i);
+      scalar += shift1;
+      scalar *= scale;
+      scalar += shift2;
+      colorProxy->SetElement(4*i, scalar);
+      }
+    }
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDisplayGUI::EditVolumeAppearanceCallback()
 {
   if (this->VolumeAppearanceEditor == NULL)
@@ -1306,9 +1430,9 @@ void vtkPVDisplayGUI::UpdateInternal()
   vtkSMDataObjectDisplayProxy* pDisp = source->GetDisplayProxy();
   
   // First reset all the values of the widgets.
-  // Active states, and menu items will ge generated later.  
+  // Active states, and menu items will be generated later.  
   // This could be done with a mechanism similar to reset
-  // of parameters page.  
+  // of parameters page.
   // Parameters pages could just use/share the prototype UI instead of cloning.
   
   //law int fixmeEventually; // Use proper SM properties with reset.
@@ -1325,23 +1449,33 @@ void vtkPVDisplayGUI::UpdateInternal()
   // Representation menu.
   switch(pDisp->GetRepresentationCM())
     {
-  case vtkSMDataObjectDisplayProxy::OUTLINE:
-    this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
-    break;
-  case vtkSMDataObjectDisplayProxy::SURFACE:
-    this->RepresentationMenu->SetValue(VTK_PV_SURFACE_LABEL);
-    break;
-  case vtkSMDataObjectDisplayProxy::WIREFRAME:
-    this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
-    break;
-  case vtkSMDataObjectDisplayProxy::POINTS:
-    this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
-    break;
-  case vtkSMDataObjectDisplayProxy::VOLUME:
-    this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
-    break;
-  default:
-    vtkErrorMacro("Unknown representation.");
+    case vtkSMDataObjectDisplayProxy::OUTLINE:
+      this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
+      this->UpdateColorMenu();
+      this->VolumeRenderModeOff();
+      break;
+    case vtkSMDataObjectDisplayProxy::SURFACE:
+      this->RepresentationMenu->SetValue(VTK_PV_SURFACE_LABEL);
+      this->UpdateColorMenu();
+      this->VolumeRenderModeOff();
+      break;
+    case vtkSMDataObjectDisplayProxy::WIREFRAME:
+      this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
+      this->UpdateColorMenu();
+      this->VolumeRenderModeOff();
+      break;
+    case vtkSMDataObjectDisplayProxy::POINTS:
+      this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
+      this->UpdateColorMenu();
+      this->VolumeRenderModeOff();
+      break;
+    case vtkSMDataObjectDisplayProxy::VOLUME:
+      this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
+      this->UpdateVolumeGUI();
+      this->VolumeRenderModeOn();
+      break;
+    default:
+      vtkErrorMacro("Unknown representation.");
     }
 
   // Interpolation menu.
@@ -2204,7 +2338,10 @@ void vtkPVDisplayGUI::VolumeRenderModeOff()
       pDisp->GetProperty("SelectScalarArray"));
     if (svp)
       {
-      this->ColorByArray(svp->GetElement(0), pDisp->GetScalarModeCM());
+      if (strlen(svp->GetElement(0)) > 0)
+        {
+        this->ColorByArray(svp->GetElement(0), pDisp->GetScalarModeCM());
+        }
       }
     else
       {
@@ -3158,6 +3295,7 @@ void vtkPVDisplayGUI::UpdateEnableState()
   this->PropagateEnableState(this->ColorMenuLabel);
   this->PropagateEnableState(this->VolumeScalarsMenuLabel);
   this->PropagateEnableState(this->EditVolumeAppearanceButton);
+  this->PropagateEnableState(this->VolumeDataColorRangeButton);
   this->PropagateEnableState(this->ColorSelectionMenu);
   this->PropagateEnableState(this->VolumeScalarSelectionWidget);
   if ( this->TextureMenuVisible )
