@@ -163,7 +163,7 @@ pqRenderModule::pqRenderModule(const QString& name,
   this->Internal->Viewport = new QVTKWidget() 
     << pqSetName("Viewport");
   // do image caching for performance
-  this->Internal->Viewport->setAutomaticImageCacheEnabled(true);
+  //this->Internal->Viewport->setAutomaticImageCacheEnabled(true);
   RenderModules.insert(this);
 
   this->Internal->Viewport->installEventFilter(this);
