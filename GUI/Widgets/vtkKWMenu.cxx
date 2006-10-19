@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.109");
+vtkCxxRevisionMacro(vtkKWMenu, "1.110");
 
 //----------------------------------------------------------------------------
 class vtkKWMenuInternals
@@ -789,6 +789,7 @@ int vtkKWMenu::SelectItemInGroupWithSelectedValue(
       {
       this->SelectItem(index);
       }
+    delete [] varname;
     }
   return index;
 }
