@@ -1,4 +1,4 @@
-Multi-column listbox package Tablelist, version 4.3
+Multi-column listbox package Tablelist, version 4.5
 Copyright (c) 2000-2006  Csaba Nemethi (E-mail: csaba.nemethi@t-online.de)
 
 This library is free software; you can use, modify, and redistribute it

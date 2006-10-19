@@ -81,55 +81,6 @@ proc tablelist::removeActiveTag win {
 }
 
 #------------------------------------------------------------------------------
-# tablelist::updateConfigSpecs
-#
-# This procedure handles the virtual event <<ThemeChanged>> by updating the
-# theme-specific default values of some tablelist configuration options.
-#------------------------------------------------------------------------------
-proc tablelist::updateConfigSpecs win {
-    upvar ::tablelist::ns${win}::data data
-
-    if {[string compare $tile::currentTheme $data(currentTheme)] == 0 &&
-	[string compare $tile::currentTheme "tileqt"] != 0} {
-	return ""
-    }
-
-    variable themeDefaults
-    variable configSpecs
-
-    #
-    # Populate the array tmp with values corresponding to the old theme
-    # and the array themeDefaults with values corresponding to the new one
-    #
-    array set tmp $data(themeDefaults)	;# populates the array tmp
-    set tmp(-arrowdisabledcolor) $tmp(-arrowcolor)
-    setThemeDefaults			;# populates the array themeDefaults
-    set themeDefaults(-arrowdisabledcolor) $themeDefaults(-arrowcolor)
-
-    #
-    # Update the default values in the array configSpecs and
-    # set those configuration options whose values equal the old
-    # theme-specific defaults to the new theme-specific ones
-    #
-    foreach opt {-background -foreground -disabledforeground -stripebackground
-		 -selectbackground -selectforeground -selectborderwidth -font
-		 -labelbackground -labelforeground -labelfont
-		 -labelborderwidth -labelpady
-		 -arrowcolor -arrowdisabledcolor -arrowstyle} {
-	lset configSpecs($opt) 3 $themeDefaults($opt)
-	if {[string compare $data($opt) $tmp($opt)] == 0} {
-	    doConfig $win $opt $themeDefaults($opt)
-	}
-    }
-    foreach opt {-background -foreground} {
-	doConfig $win $opt $data($opt)	;# sets the bg color of the separators
-    }
-
-    set data(currentTheme) $tile::currentTheme
-    set data(themeDefaults) [array get themeDefaults]
-}
-
-#------------------------------------------------------------------------------
 # tablelist::cleanup
 #
 # This procedure is invoked when the tablelist widget win is destroyed.  It
@@ -140,12 +91,12 @@ proc tablelist::cleanup win {
 
     #
     # Cancel the execution of all delayed adjustSeps, makeStripes,
-    # stretchColumns, updateColors, updateScrlColOffset,
+    # showLineNumbers, stretchColumns, updateColors, updateScrlColOffset,
     # updateHScrlbar, updateVScrlbar, adjustElidedText, synchronize,
     # horizAutoScan, doCellConfig, redisplay, and redisplayCol commands
     #
-    foreach id {sepsId stripesId stretchId colorId offsetId hScrlbarId \
-		vScrlbarId elidedId syncId afterId reconfigId} {
+    foreach id {sepsId stripesId lineNumsId stretchId colorId offsetId \
+		hScrlbarId vScrlbarId elidedId syncId afterId reconfigId} {
 	if {[info exists data($id)]} {
 	    after cancel $data($id)
 	}
@@ -167,6 +118,101 @@ proc tablelist::cleanup win {
     catch {rename ::$win ""}
 }
 
+#------------------------------------------------------------------------------
+# tablelist::updateConfigSpecs
+#
+# This procedure handles the virtual event <<ThemeChanged>> by updating the
+# theme-specific default values of some tablelist configuration options.
+#------------------------------------------------------------------------------
+proc tablelist::updateConfigSpecs win {
+    #
+    # This might be an "after idle" callback; check whether the window exists
+    #
+    if {![winfo exists $win]} {
+	return ""
+    }
+
+    upvar ::tablelist::ns${win}::data data
+
+    if {[string compare $tile::currentTheme $data(currentTheme)] == 0} {
+	if {[string compare $tile::currentTheme "tileqt"] == 0} {
+	    set widgetStyle [tile::theme::tileqt::currentThemeName]
+	    set colorScheme [getKdeConfigVal "KDE" "colorScheme"]
+	    if {[string compare $widgetStyle $data(widgetStyle)] == 0 &&
+		[string compare $colorScheme $data(colorScheme)] == 0} {
+		return ""
+	    }
+	} else {
+	    return ""
+	}
+    }
+
+    variable themeDefaults
+    variable configSpecs
+
+    #
+    # Populate the array tmp with values corresponding to the old theme
+    # and the array themeDefaults with values corresponding to the new one
+    #
+    array set tmp $data(themeDefaults)
+    setThemeDefaults
+
+    #
+    # Update the default values in the array configSpecs and
+    # set those configuration options whose values equal the old
+    # theme-specific defaults to the new theme-specific ones
+    #
+    foreach opt {-background -foreground -disabledforeground -stripebackground
+		 -selectbackground -selectforeground -selectborderwidth -font
+		 -labelbackground -labelforeground -labelfont
+		 -labelborderwidth -labelpady
+		 -arrowcolor -arrowdisabledcolor -arrowstyle} {
+	lset configSpecs($opt) 3 $themeDefaults($opt)
+	if {[string compare $data($opt) $tmp($opt)] == 0} {
+	    doConfig $win $opt $themeDefaults($opt)
+	}
+    }
+    foreach opt {-background -foreground} {
+	doConfig $win $opt $data($opt)	;# sets the bg color of the separators
+    }
+
+    #
+    # Destroy and recreate the edit window if present
+    #
+    if {[set editCol $data(editCol)] >= 0} {
+	set editRow $data(editRow)
+	saveEditData $win
+	destroy $data(bodyFr)
+	editcellSubCmd $win $editRow $editCol 1
+    }
+
+    #
+    # Destroy and recreate the embedded windows
+    #
+    if {$data(winCount) != 0} {
+	for {set row 0} {$row < $data(itemCount)} {incr row} {
+	    for {set col 0} {$col < $data(colCount)} {incr col} {
+		set key [lindex [lindex $data(itemList) $row] end]
+		if {[info exists data($key,$col-window)]} {
+		    set val $data($key,$col-window)
+		    doCellConfig $row $col $win -window ""
+		    doCellConfig $row $col $win -window $val
+		}
+	    }
+	}
+    }
+
+    set data(currentTheme) $tile::currentTheme
+    set data(themeDefaults) [array get themeDefaults]
+    if {[string compare $tile::currentTheme "tileqt"] == 0} {
+	set data(widgetStyle) [tile::theme::tileqt::currentThemeName]
+	set data(colorScheme) [getKdeConfigVal "KDE" "colorScheme"]
+    } else {
+	set data(widgetStyle) ""
+	set data(colorScheme) ""
+    }
+}
+
 #
 # Binding tag TablelistWindow
 # ===========================
@@ -183,9 +229,9 @@ proc tablelist::cleanupWindow aux {
     regexp {^(.+)\.body\.f(k[0-9]+),([0-9]+)$} $aux dummy win key col
     upvar ::tablelist::ns${win}::data data
 
-    if {[info exists data($key-$col-windowdestroy)]} {
+    if {[info exists data($key,$col-windowdestroy)]} {
 	set row [lsearch $data(itemList) "* $key"]
-	uplevel #0 $data($key-$col-windowdestroy) [list $win $row $col $aux.w]
+	uplevel #0 $data($key,$col-windowdestroy) [list $win $row $col $aux.w]
     }
 }
 
@@ -202,13 +248,15 @@ proc tablelist::cleanupWindow aux {
 proc tablelist::defineTablelistBody {} {
     variable priv
     array set priv {
-	x		""
-	y		""
-	afterId		""
-	prevRow		""
-	prevCol		""
-	selection	{}
-	clicked		0
+	x			""
+	y			""
+	afterId			""
+	prevRow			""
+	prevCol			""
+	selection		{}
+	clicked			0
+	clickTime		0
+	clickedInEditWin	0
     }
 
     bind TablelistBody <Button-1> {
@@ -279,6 +327,7 @@ proc tablelist::defineTablelistBody {} {
 
 	set tablelist::priv(x) ""
 	set tablelist::priv(y) ""
+	set tablelist::priv(clicked) 0
 	after cancel $tablelist::priv(afterId)
 	set tablelist::priv(afterId) ""
 	set tablelist::priv(releasedInEditWin) 0
@@ -291,7 +340,6 @@ proc tablelist::defineTablelistBody {} {
 		[$tablelist::W nearest       $tablelist::y] \
 		[$tablelist::W nearestcolumn $tablelist::x]
 	}
-	set tablelist::priv(clicked) 0
 	tablelist::condEvalInvokeCmd $tablelist::W
     }
     bind TablelistBody <Shift-Button-1> {
@@ -479,10 +527,10 @@ proc tablelist::condEditContainingCell {win x y} {
 	#
 	if {$data(editRow) >= 0} {
 	    finisheditingSubCmd $win
-    } else {
-      event generate $win <<TablelistUneditableCellSelected>>
+	} else {
+            event generate $win <<TablelistUneditableCellSelected>>
     }
-  }
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -787,14 +835,11 @@ proc tablelist::condShowTarget {win y} {
 #------------------------------------------------------------------------------
 proc tablelist::moveOrActivate {win row col} {
     #
-    # Return if <ButtonRelease-1> was not preceded by a <Button-1> event (e.g.,
-    # the tile combobox generates a <ButtonRelease-1> event when popping down
-    # its associated listbox) or both <Button-1> and <ButtonRelease-1> occurred
-    # in the temporary embedded widget used for interactive cell editing
+    # Return if both <Button-1> and <ButtonRelease-1> occurred in the
+    # temporary embedded widget used for interactive cell editing
     #
     variable priv
-    if {!$priv(clicked) ||
-	($priv(clickedInEditWin) && $priv(releasedInEditWin))} {
+    if {$priv(clickedInEditWin) && $priv(releasedInEditWin)} {
 	return ""
     }
 
@@ -852,14 +897,11 @@ proc tablelist::condEvalInvokeCmd win {
     }
 
     #
-    # Set data(invoked) to 1 BEFORE evaluating the invoke command, because
-    # the latter might generate a <ButtonRelease-1> event (e.g., the
-    # tile combobox behaves this way), thus resulting in an endless
-    # loop of recursive invocations of the script bound to that event
+    # Evaluate the edit window's invoke command
     #
     update 
-    set data(invoked) 1
     eval [strMap {"%W" "$data(bodyFrEd)"} $editWin($name-invokeCmd)]
+    set data(invoked) 1
 }
 
 #------------------------------------------------------------------------------
@@ -1690,8 +1732,7 @@ proc tablelist::labelEnter {w x} {
     } elseif {$x < 5} {
 	set X [expr {[winfo rootx $w] - 3}]
 	set contW [winfo containing -displayof $w $X [winfo rooty $w]]
-	parseLabelPath $contW dummy col2
-	set inResizeArea [info exists col2]
+	set inResizeArea [parseLabelPath $contW dummy col2]
     } else {
 	set inResizeArea 0
     }
@@ -1760,8 +1801,7 @@ proc tablelist::labelB1Down {w x shiftPressed} {
     } elseif {$x < 5} {
 	set X [expr {[winfo rootx $w] - 3}]
 	set contW [winfo containing -displayof $w $X [winfo rooty $w]]
-	parseLabelPath $contW dummy col2
-	set inResizeArea [info exists col2]
+	set inResizeArea [parseLabelPath $contW dummy col2]
     } else {
 	set inResizeArea 0
     }
@@ -1869,7 +1909,7 @@ proc tablelist::labelB1Motion {w X x y} {
 	    set data(afterId) ""
 	}
 	set data(X) $X
-	if ($scroll) {
+	if {$scroll} {
 	    horizAutoScan $win
 	}
 
@@ -1900,8 +1940,7 @@ proc tablelist::labelB1Motion {w X x y} {
 		# Get the target column index
 		#
 		set contW [winfo containing -displayof $w $X [winfo rooty $w]]
-		parseLabelPath $contW dummy targetCol
-		if {[info exists targetCol]} {
+		if {[parseLabelPath $contW dummy targetCol]} {
 		    set master $contW
 		    if {$X < [winfo rootx $contW] + [winfo width $contW]/2} {
 			set relx 0.0
@@ -2053,6 +2092,8 @@ proc tablelist::labelB1Up {w X} {
 	redisplayColWhenIdle $win $col
 	if {$data(-width) <= 0} {
 	    $data(hdr) configure -width $data(hdrPixels)
+	    $data(lb) configure -width \
+		      [expr {$data(hdrPixels) / $data(charWidth)}]
 	} elseif {[info exists data(stretchableCols)] &&
 		  [lsearch -exact $data(stretchableCols) $col] >= 0} {
 	    set oldColWidth \
@@ -2190,18 +2231,6 @@ proc tablelist::escape {win col} {
 	}
 	set data(labelClicked) 0
     }
-}
-
-#------------------------------------------------------------------------------
-# tablelist::parseLabelPath
-#
-# Extracts the path name of the tablelist widget as well as the column number
-# from the path name w of a header label.
-#------------------------------------------------------------------------------
-proc tablelist::parseLabelPath {w winName colName} {
-    upvar $winName win $colName col
-
-    regexp {^(.+)\.hdr\.t\.f\.l([0-9]+)$} $w dummy win col
 }
 
 #------------------------------------------------------------------------------

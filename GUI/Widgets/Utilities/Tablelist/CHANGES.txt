@@ -1,5 +1,103 @@
-What is new in Tablelist 4.3?
+What is new in Tablelist 4.5?
 -----------------------------
+
+1.  Static-width columns are now displayed much faster than in earlier
+    Tablelist releases.
+
+2.  Quite significantly reduced the performance penalty imposed by
+    various column, row, and cell configuration options when sorting,
+    redisplaying, moving, or deleting tablelist items.
+
+3.  Embedded images are now handled much more efficiently and are
+    displayed much faster than in earlier Tablelist versions.
+
+4.  New column configuration option "-showlinenumbers" (thanks to Rolf
+    Schroedter and Sean Xu for their proposals and to Kathrin Kl‰s for
+    testing the implementation).
+
+5.  Support for tile-based multi-entry widgets (introduced in Mentry
+    3.0) used as edit windows.
+
+6.  Significantly improved the handling of the <<ThemeChanged>> virtual
+    event.
+
+7.  Defined more reasonable windowing system- and theme-specific default
+    values for the "-arrowdisabledcolor" option.
+
+8.  Improved and simplified the package loading mechanism (thanks to
+    Andreas Kupries for his valuable contribution).
+
+9.  Eliminated the "togglevisibility" subcommand, which was deprecated
+    in the previous Tablelist version in favor of "togglecolumnhide".
+
+10. Fixed a bug in the implementation of the "deletecolumns" subcommand,
+    introduced in the previous Tablelist release (thanks to Kai Morich,
+    Kurt Kurczyk, and Dave Leslie for their bug reports).
+
+11. Fixed two binding-related bugs (thanks to Mark Garvey and Kurt
+    Kurczyk for their bug reports).
+
+12. Fixed a bug related to the handling of the "tileqt" theme (thanks to
+    Andres Garcia for his bug report).
+
+13. Fixed a small but annoying bug related to the "-maxwidth" column
+    configuration option, introduced in the previous Tablelist version.
+
+14. Numerous further improvements and minor bug fixes (thanks to
+    Patrick Fradin and Georgios Petasis for their valuable feedback).
+
+What was new in Tablelist 4.4?
+------------------------------
+
+1.  New row configuration option "-hide" (thanks to Jeff Godfrey,
+    Patrick Fradin. Hemang Lavana, and Martyn Smith for their
+    proposals, and especially to Harold Campbell for providing the
+    initial implementation and testing the final one.)  For performance
+    reasons this option is implemented by using elided text in the
+    underlying text widget, and therefore it is not supported for Tk
+    versions earlier than 8.3.
+
+2.  New subcommand "togglerowhide" for hiding/unhiding several rows at
+    a time (not supported for Tk versions earlier than 8.3).
+
+3.  Renamed the "togglevisibility" subcommand to "togglecolumnhide".
+    The old name is still supported, but will be eliminated in the next
+    Tablelist release.
+
+4.  New command "tablelist::setThemeDefaults", which can be used to
+    make sure that classical Tk widgets, e.g., text, will have a theme-
+    specific appearance, just like the tile widgets.  The tile-based
+    demo scripts now make use of this command.
+
+5.  When using the "tileqt" theme, the version number of TileQt must be
+    0.3 or higher (thanks to Georgios Petasis for providing the new
+    "tileqt" features used in this Tablelist release).
+
+6.  For Tk 8.3 or later, hidden columns are now handled by using elided
+    text, which results in very significant performance improvements
+    (thanks to Harold Campbell for his valuable contribution).
+
+7.  Improved the handling of the "-listvariable" option in connection
+    with snit widgetadaptors (thanks to Rolf Ade for his bug-fix).
+
+8.  Corrected a typo in the implementation of the "move" subcommand,
+    introduced in the previous release (thanks to JÈrome Siot for his
+    bug report).
+
+9.  Improved the handling of the virtual event <<ThemeChanged>> (thanks
+    to Wofgang Groﬂer for his bug report).
+
+10. Fixed a long-standing bug related to hidden columns (thanks to Dave
+    Leslie for his bug report).
+
+11. Worked around a peculiarity of the "place" command on Windows,
+    which caused refresh problems in column labels with images (thanks
+    to Sebastien Barre for his bug report).
+
+12. Numerous further improvements and minor bug fixes.
+
+What was new in Tablelist 4.3?
+------------------------------
 
 1. Support for multi-line cells:  Newline characters now force line
    breaks when displaying the items (thanks to Sebastien Barre,
@@ -16,7 +114,7 @@ What is new in Tablelist 4.3?
    <Shift-Button-1> events.  Multi-column sorting is visualized by
    means of multiple sort arrows, which are displayed together with the
    corresponding sort ranks.  (Thanks to Harold Campbell for proposing
-   most of these features, providing an initial implementation, and
+   most of these features, providing the initial implementation, and
    testing the final one.)
 
 3. New configuration option "-setfocus", specifying whether mouse
@@ -25,7 +123,7 @@ What is new in Tablelist 4.3?
 
 4. Replaced the contents of the directory "images" with a script file
    containing procedures that create the bitmap images from inline data
-   (thanks to Mats Bengtsson, Patrick Fradin, and Kai Morrich for their
+   (thanks to Mats Bengtsson, Patrick Fradin, and Kai Morich for their
    proposals).
 
 5. Fixed a bug related to the use of a tile entry within a non-tile-
@@ -186,15 +284,15 @@ What was new in Tablelist 4.0?
     (thanks to Kenneth Green for his proposal).
 
 6.  New subcommand "togglevisibility" for hiding/unhiding several
-    columns at a time (thanks to Stefan Finzel and Kai Morrich for
-    their proposals).
+    columns at a time (thanks to Stefan Finzel and Kai Morich for their
+    proposals).
 
 7.  Support for the new virtual event <<TablelistSelectionLost>>,
     generated when a tablelist widget having "-exportselection 1" loses
     the selection (thanks to Aldo Buratti for his proposal).
 
 8.  After sorting the items, the "most important" row is automatically
-    brought into view (thanks to Kai Morrich for his valuable input).
+    brought into view (thanks to Kai Morich for his valuable input).
 
 9.  Worked around a peculiarity of Tk for Windows, related to mouse
     events (thanks to Tore Morkemo and Mike Collins for their bug

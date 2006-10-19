@@ -1,6 +1,7 @@
 #==============================================================================
-# Contains the implementation of the tablelist::sortByColumn command as well as
-# of the tablelist sort and sortbycolumn subcommands.
+# Contains the implementation of the tablelist::sortByColumn and
+# tablelist::addToSortColumns commands, as well as of the tablelist sort,
+# sortbycolumn, and sortbycolumnlist subcommands.
 #
 # Copyright (c) 2000-2006  Csaba Nemethi (E-mail: csaba.nemethi@t-online.de)
 #==============================================================================
@@ -27,11 +28,14 @@ proc tablelist::sortByColumn {win col} {
     if {$result < 0 || $result >= [::$win columncount]} {
 	return -code error "column index \"$col\" out of range"
     }
+    set col $result
+    if {[::$win columncget $col -showlinenumbers]} {
+	return ""
+    }
 
     #
     # Determine the sort order
     #
-    set col $result
     if {[set idx [lsearch -exact [::$win sortcolumnlist] $col]] >= 0 &&
 	[string compare [lindex [::$win sortorderlist] $idx] "increasing"]
 	== 0} {
@@ -74,11 +78,14 @@ proc tablelist::addToSortColumns {win col} {
     if {$result < 0 || $result >= [::$win columncount]} {
 	return -code error "column index \"$col\" out of range"
     }
+    set col $result
+    if {[::$win columncget $col -showlinenumbers]} {
+	return ""
+    }
 
     #
     # Update the lists of sort columns and orders
     #
-    set col $result
     set sortColList [::$win sortcolumnlist]
     set sortOrderList [::$win sortorderlist]
     if {[set idx [lsearch -exact $sortColList $col]] >= 0} {
@@ -152,10 +159,12 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
     #
     if {[llength $sortColList] == 1 && [lindex $sortColList 0] == -1} {
 	if {[string compare $data(-sortcommand) ""] == 0} {
-	    return -code error \
-		   "value of the -sortcommand option is empty"
+	    return -code error "value of the -sortcommand option is empty"
 	}
 
+	#
+	# Update the sort info
+	#
 	for {set col 0} {$col < $data(colCount)} {incr col} {
 	    set data($col-sortRank) 0
 	    set data($col-sortOrder) ""
@@ -165,67 +174,102 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
 	set order [lindex $sortOrderList 0]
 	set data(sortOrder) $order
 
+	#
+	# Sort the item list
+	#
 	set data(itemList) \
 	    [lsort -$order -command $data(-sortcommand) $data(itemList)]
     } else {					;# sorting by a column (list)
-	set sortColCount [llength $sortColList]
-	if {$sortColCount == 0} {
+	#
+	# Check the specified column indices
+	#
+	set sortColCount2 $sortColCount
+	foreach col $sortColList {
+	    if {$data($col-showlinenumbers)} {
+		incr sortColCount2 -1
+	    }
+	}
+	if {$sortColCount2 == 0} {
 	    return ""
 	}
 
+	#
+	# Update the sort info
+	#
 	for {set col 0} {$col < $data(colCount)} {incr col} {
 	    set data($col-sortRank) 0
 	    set data($col-sortOrder) ""
 	}
 	set rank 1
 	foreach col $sortColList order $sortOrderList {
+	    if {$data($col-showlinenumbers)} {
+		continue
+	    }
+
 	    set data($col-sortRank) $rank
 	    set data($col-sortOrder) $order
 	    incr rank
 	}
 	makeSortAndArrowColLists $win
 
+	#
+	# Sort the item list based on the specified columns
+	#
 	for {set idx [expr {$sortColCount - 1}]} {$idx >= 0} {incr idx -1} {
 	    set col [lindex $sortColList $idx]
+	    if {$data($col-showlinenumbers)} {
+		continue
+	    }
+
 	    set order $data($col-sortOrder)
 	    if {[string compare $data($col-sortmode) "command"] == 0} {
-		if {[info exists data($col-sortcommand)]} {
-		    set data(itemList) \
-			[lsort -$order -index $col \
-			 -command $data($col-sortcommand) $data(itemList)]
-		} else {
-		    return -code error \
-			   "value of the -sortcommand option for\
-			    column $col is missing or empty"
+		if {![info exists data($col-sortcommand)]} {
+		    return -code error "value of the -sortcommand option for\
+					column $col is missing or empty"
 		}
+
+		set data(itemList) [lsort -$order -index $col \
+		    -command $data($col-sortcommand) $data(itemList)]
 	    } else {
-		set data(itemList) \
-		    [lsort -$order -index $col \
-		     -$data($col-sortmode) $data(itemList)]
+		set data(itemList) [lsort -$order -index $col \
+		    -$data($col-sortmode) $data(itemList)]
 	    }
 	}
     }
 
     #
+    # Update the line numbers (if any)
+    #
+    for {set col 0} {$col < $data(colCount)} {incr col} {
+	if {!$data($col-showlinenumbers)} {
+	    continue
+	}
+
+	set newItemList {}
+	set line 1
+	foreach item $data(itemList) {
+	    set item [lreplace $item $col $col $line]
+	    lappend newItemList $item
+	    set key [lindex $item end]
+	    if {![info exists data($key-hide)]} {
+		incr line
+	    }
+	}
+	set data(itemList) $newItemList
+    }
+
+    #
     # Replace the contents of the list variable if present
     #
-    if {$data(hasListVar)} {
-	upvar #0 $data(-listvariable) var
-	trace vdelete var wu $data(listVarTraceCmd)
-	set var {}
-	foreach item $data(itemList) {
-	    lappend var [lrange $item 0 $data(lastCol)]
-	}
-	trace variable var wu $data(listVarTraceCmd)
-    }
+    condUpdateListVar $win
 
     #
     # Update anchorRow and activeRow
     #
     foreach type {anchor active} {
-	upvar 0 ${type}Key key
-	if {[string compare $key ""] != 0} {
-	    set data(${type}Row) [lsearch $data(itemList) "* $key"]
+	upvar 0 ${type}Key key2
+	if {[string compare $key2 ""] != 0} {
+	    set data(${type}Row) [lsearch $data(itemList) "* $key2"]
 	}
     }
 
@@ -277,10 +321,9 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
     for {set line 1} {$line <= $data(itemCount)} {incr line} {
 	$w delete $line.0 $line.end
     }
-    set widgetFont $data(-font)
     set snipStr $data(-snipstring)
-    set isSimple [expr {$data(tagRefCount) == 0 && $data(imgCount) == 0 &&
-			$data(winCount) == 0 && !$data(hasColTags)}]
+    set tagRefCount $data(tagRefCount)
+    set isSimple [expr {$data(imgCount) == 0 && $data(winCount) == 0}]
     set hasFmtCmds [expr {[lsearch -exact $data(fmtCmdFlagList) 1] >= 0}]
     set row 0
     set line 1
@@ -298,13 +341,29 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
 	set key [lindex $item end]
 	set col 0
 	if {$isSimple} {
-	    set insertStr ""
+	    set insertArgs {}
 	    set multilineData {}
 	    foreach text [strToDispStr $formattedItem] \
+		    colFont $data(colFontList) \
+		    colTags $data(colTagsList) \
 		    {pixels alignment} $data(colList) {
 		if {$data($col-hide) && !$canElide} {
 		    incr col
 		    continue
+		}
+
+		#
+		# Build the list of tags to be applied to the cell
+		#
+		set cellFont $colFont
+		set cellTags $colTags
+		if {$tagRefCount != 0} {
+		    set cellFont [getCellFont $win $key $col]
+		    foreach opt {-background -foreground -font} {
+			if {[info exists data($key,$col$opt)]} {
+			    lappend cellTags cell$opt-$data($key,$col$opt)
+			}
+		    }
 		}
 
 		#
@@ -326,47 +385,42 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
 		if {$pixels != 0} {
 		    incr pixels $data($col-delta)
 		    if {$multiline} {
-			set text [joinList $win $list $widgetFont \
+			set text [joinList $win $list $cellFont \
 				  $pixels $alignment $snipStr]
 		    } else {
-			set text [strRangeExt $win $text $widgetFont \
+			set text [strRange $win $text $cellFont \
 				  $pixels $alignment $snipStr]
 		    }
 		}
 
 		if {$multiline} {
-		    append insertStr "\t\t"
-		    lappend multilineData $col $text $alignment
+		    lappend insertArgs "\t\t" $cellTags
+		    lappend multilineData $col $text $colFont $alignment
 		} else {
-		    append insertStr "\t$text\t"
+		    lappend insertArgs "\t$text\t" $cellTags
 		}
+
 		incr col
 	    }
 
 	    #
 	    # Insert the item into the body text widget
 	    #
-	    $w insert $line.0 $insertStr
+	    if {[llength $insertArgs] != 0} {
+		eval [list $w insert $line.0] $insertArgs
+	    }
 
 	    #
 	    # Embed the message widgets displaying multiline elements
 	    #
-	    foreach {col text alignment} $multilineData {
+	    foreach {col text font alignment} $multilineData {
 		findTabs $win $line $col $col tabIdx1 tabIdx2
 		set msgScript [list ::tablelist::displayText $win $key \
-			       $col $text $widgetFont $alignment]
+			       $col $text $font $alignment]
 		$w window create $tabIdx2 -pady 1 -create $msgScript
 	    }
 
 	} else {
-	    array set itemData [array get data $key*-\[bf\]*]	;# for speed
-
-	    set rowTags {}
-	    foreach name [array names itemData $key-\[bf\]*] {
-		set tail [lindex [split $name "-"] 1]
-		lappend rowTags row-$tail-$itemData($name)
-	    }
-
 	    foreach text [strToDispStr $formattedItem] \
 		    colTags $data(colTagsList) \
 		    {pixels alignment} $data(colList) {
@@ -376,68 +430,34 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
 		}
 
 		#
-		# Adjust the cell text and the image or window width
+		# Build the list of tags to be applied to the cell
 		#
-		if {[string match "*\n*" $text]} {
-		    set multiline 1
-		    set list [split $text "\n"]
-		} else {
-		    set multiline 0
-		}
-		set aux [getAuxData $win $key $col auxType auxWidth]
-		set cellFont [getCellFont $win $key $col]
-		if {$pixels == 0} {		;# convention: dynamic width
-		    if {$data($col-maxPixels) > 0} {
-			if {$data($col-reqPixels) > $data($col-maxPixels)} {
-			    set pixels $data($col-maxPixels)
+		set cellTags $colTags
+		if {$tagRefCount != 0} {
+		    foreach opt {-background -foreground -font} {
+			if {[info exists data($key,$col$opt)]} {
+			    lappend cellTags cell$opt-$data($key,$col$opt)
 			}
 		    }
 		}
-		if {$pixels != 0} {
-		    incr pixels $data($col-delta)
-		}
-		if {$multiline} {
-		    adjustMlElem $win list auxWidth $cellFont \
-				 $pixels $alignment $snipStr
-		    set msgScript [list ::tablelist::displayText $win $key \
-				   $col [join $list "\n"] $cellFont $alignment]
-		} else {
-		    adjustElem $win text auxWidth $cellFont \
-			       $pixels $alignment $snipStr
-		}
 
 		#
-		# Insert the text and the auxiliary object
+		# Insert the text and the label or window
+		# (if any) into the body text widget
 		#
-		set cellTags {}
-		foreach name [array names itemData $key-$col-\[bf\]*] {
-		    set tail [lindex [split $name "-"] 2]
-		    lappend cellTags cell-$tail-$itemData($name)
-		}
-		set tagNames [concat $colTags $rowTags $cellTags]
-		if {$auxType == 0} {
-		    if {$multiline} {
-			$w insert $line.end "\t\t" $tagNames
-			$w window create $line.end-1c -pady 1 -create $msgScript
-		    } else {
-			$w insert $line.end "\t$text\t" $tagNames
-		    }
-		} else {
-		    $w insert $line.end "\t\t" $tagNames
-		    createAuxObject $win $key $row $col $aux $auxType $auxWidth
-		    if {$multiline} {
-			insertMlElem $w $line.end-1c $msgScript \
-				     $aux $auxType $alignment
-		    } else {
-			insertElem $w $line.end-1c $text \
-				   $aux $auxType $alignment
-		    }
-		}
+		appendComplexElem $win $key $row $col $text $pixels \
+				  $alignment $snipStr $cellTags $line
 
 		incr col
 	    }
+	}
 
-	    unset itemData
+	if {$tagRefCount != 0} {
+	    foreach opt {-background -foreground -font} {
+		if {[info exists data($key$opt)]} {
+		    $w tag add row$opt-$data($key$opt) $line.0 $line.end
+		}
+	    }
 	}
 
 	if {[info exists data($key-hide)]} {
@@ -454,24 +474,11 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
     set data(nonHiddenRowList) {-1}
 
     #
-    # Restore the stripes in the body text widget
-    #
-    makeStripes $win
-
-    #
     # Select the cells that were selected before
     #
     foreach {key col} $selCells {
 	set row [lsearch $data(itemList) "* $key"]
 	cellselectionSubCmd $win set $row $col $row $col
-    }
-
-    #
-    # Restore the edit window if it was present before
-    #
-    if {$editCol >= 0} {
-	set editRow [lsearch $data(itemList) "* $editKey"]
-	editcellSubCmd $win $editRow $editCol 1
     }
 
     #
@@ -483,14 +490,10 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
     }
 
     #
-    # Adjust the elided text
-    #
-    adjustElidedTextWhenIdle $win
-
-    #
     # Bring the "most important" row into view
     #
     if {$editCol >= 0} {
+	set editRow [lsearch $data(itemList) "* $editKey"]
 	seeSubCmd $win $editRow
     } else {
 	set selRows [curselectionSubCmd $win]
@@ -499,6 +502,19 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
 	} elseif {[string compare [focus -lastfor $w] $w] == 0} {
 	    seeSubCmd $win $data(activeRow)
 	}
+    }
+
+    #
+    # Adjust the elided text and restore the stripes in the body text widget
+    #
+    adjustElidedText $win
+    makeStripes $win
+
+    #
+    # Restore the edit window if it was present before
+    #
+    if {$editCol >= 0} {
+	editcellSubCmd $win $editRow $editCol 1
     }
 
     #
@@ -512,6 +528,5 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
 	}
     }
 
-    set data(sorting) 0
     return ""
 }

@@ -85,12 +85,6 @@ proc tablelist::moveSubCmd {win source target} {
 	set formattedItem [lrange $sourceItem 0 $data(lastCol)]
     }
     set key [lindex $sourceItem end]
-    array set itemData [array get data $key*-\[bf\]*]		;# for speed
-    set rowTags {}
-    foreach name [array names itemData $key-\[bf\]*] {
-	set tail [lindex [split $name "-"] 1]
-	lappend rowTags row-$tail-$itemData($name)
-    }
     set col 0
     foreach text [strToDispStr $formattedItem] \
 	    colTags $data(colTagsList) \
@@ -101,63 +95,28 @@ proc tablelist::moveSubCmd {win source target} {
 	}
 
 	#
-	# Adjust the cell text and the image or window width
+	# Build the list of tags to be applied to the cell
 	#
-	if {[string match "*\n*" $text]} {
-	    set multiline 1
-	    set list [split $text "\n"]
-	} else {
-	    set multiline 0
-	}
-	set aux [getAuxData $win $key $col auxType auxWidth]
-	set cellFont [getCellFont $win $key $col]
-	if {$pixels == 0} {			;# convention: dynamic width
-	    if {$data($col-maxPixels) > 0} {
-		if {$data($col-reqPixels) > $data($col-maxPixels)} {
-		    set pixels $data($col-maxPixels)
-		}
+	set cellTags $colTags
+	foreach opt {-background -foreground -font} {
+	    if {[info exists data($key,$col$opt)]} {
+		lappend cellTags cell$opt-$data($key,$col$opt)
 	    }
-	}
-	if {$pixels != 0} {
-	    incr pixels $data($col-delta)
-	}
-	if {$multiline} {
-	    adjustMlElem $win list auxWidth $cellFont \
-			 $pixels $alignment $snipStr
-	    set msgScript [list ::tablelist::displayText $win $key \
-			   $col [join $list "\n"] $cellFont $alignment]
-	} else {
-	    adjustElem $win text auxWidth $cellFont $pixels $alignment $snipStr
 	}
 
 	#
-	# Insert the text and the auxiliary object
+	# Append the text and the label or window
+	# (if any) to the target line of body text widget
 	#
-	set cellTags {}
-	foreach name [array names itemData $key-$col-\[bf\]*] {
-	    set tail [lindex [split $name "-"] 2]
-	    lappend cellTags cell-$tail-$itemData($name)
-	}
-	set tagNames [concat $colTags $rowTags $cellTags]
-	if {$auxType == 0} {
-	    if {$multiline} {
-		$w insert $targetLine.end "\t\t" $tagNames
-		$w window create $targetLine.end-1c -pady 1 -create $msgScript
-	    } else {
-		$w insert $targetLine.end "\t$text\t" $tagNames
-	    }
-	} else {
-	    $w insert $targetLine.end "\t\t" $tagNames
-	    createAuxObject $win $key $source $col $aux $auxType $auxWidth
-	    if {$multiline} {
-		insertMlElem $w $targetLine.end-1c $msgScript \
-			     $aux $auxType $alignment
-	    } else {
-		insertElem $w $targetLine.end-1c $text $aux $auxType $alignment
-	    }
-	}
+	appendComplexElem $win $key $source $col $text $pixels \
+			  $alignment $snipStr $cellTags $targetLine
 
 	incr col
+    }
+    foreach opt {-background -foreground -font} {
+	if {[info exists data($key$opt)]} {
+	    $w tag add row$opt-$data($key$opt) $targetLine.0 $targetLine.end
+	}
     }
 
     #
@@ -202,16 +161,19 @@ proc tablelist::moveSubCmd {win source target} {
     set data(nonHiddenRowList) {-1}
 
     #
-    # Restore the stripes in the body text widget
-    #
-    makeStripesWhenIdle $win
-
-    #
     # Select those source elements that were selected before
     #
     foreach col $selectedCols {
 	cellselectionSubCmd $win set $target1 $col $target1 $col
     }
+
+    #
+    # Adjust the elided text, restore the stripes in the body
+    # text widget, and redisplay the line numbers (if any)
+    #
+    adjustElidedText $win
+    makeStripes $win
+    showLineNumbersWhenIdle $win
 
     #
     # Restore the edit window if it was present before
@@ -223,11 +185,6 @@ proc tablelist::moveSubCmd {win source target} {
 	    set data(editRow) [lsearch $data(itemList) "* $editKey"]
 	}
     }
-
-    #
-    # Adjust the elided text
-    #
-    adjustElidedTextWhenIdle $win
 
     return ""
 }
@@ -273,7 +230,7 @@ proc tablelist::movecolumnSubCmd {win source target} {
     # Save some elements of data corresponding to source
     #
     array set tmp [array get data $source-*]
-    array set tmp [array get data k*-$source-*]
+    array set tmp [array get data k*,$source-*]
     foreach specialCol {activeCol anchorCol editCol} {
 	set tmp($specialCol) $data($specialCol)
     }

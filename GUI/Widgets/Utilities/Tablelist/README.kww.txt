@@ -1,4 +1,4 @@
-This is the Tablelist 4.3 widget. See info and license below.
+This is the Tablelist 4.5 widget. See info and license below.
 
 The changes are:
 
@@ -11,7 +11,7 @@ The changes are:
   double-click only. In tablelist::defineTablelistBody:
   a) copy the contents of: bind TablelistBody <Button-1> {...}
      to the empty script: bind TablelistBody <Double-Button-1> { ... }
-     then in bind TablelistBody <Double-Button-1> { remove everything below: 
+     then in bind TablelistBody <Double-Button-1> { remove everything *below*: 
         tablelist::condEditContainingCell ... \ 
          $tablelist::x $tablelist::y     
   b) in: bind TablelistBody <Button-1> {...}
@@ -29,3 +29,9 @@ The changes are:
     	  } else {
             event generate $win <<TablelistUneditableCellSelected>>
           }
+
+- in tablelistPublic.tcl
+  replace:
+    variable library	[DIR]
+  by:
+	variable library	[file dirname [info script]]

@@ -49,9 +49,10 @@ respective column.
 Interactive editing of the elements of a tablelist widget can be
 enabled for individual cells and for entire columns.  A great variety
 of widgets from the Tk core and from the packages tile, BWidget,
-Iwidgets, combobox, and Mentry is supported for being used as embedded
-edit window.  In addition, a rich set of keyboard bindings is provided
-for a comfortable navigation between the editable cells.
+Iwidgets, combobox, and Mentry (or Mentry_tile) is supported for being
+used as embedded edit window.  In addition, a rich set of keyboard
+bindings is provided for a comfortable navigation between the editable
+cells.
 
 The Tcl command corresponding to a tablelist widget is very similar to
 the one associated with a normal listbox.  There are column-, row-, and
@@ -61,8 +62,8 @@ used, among others, to insert images into the cells and the header
 labels, or to insert embedded windows into the cells.  The "index",
 "nearest", and "see" command options refer to the rows, but similar
 subcommands are provided for the columns and cells ("columnindex",
-"cellindex", ...).  The items can be sorted with the "sort" and
-"sortbycolumn" command options.
+"cellindex", ...).  The items can be sorted with the "sort",
+"sortbycolumn", and "sortbycolumnlist" command options.
 
 The bindings defined for the body of a tablelist widget make it behave
 just like a normal listbox.  This includes the support for the virtual
@@ -80,8 +81,8 @@ How to get it?
 --------------
 
 Tablelist is available for free download from the same URL as Wcb.  The
-distribution file is "tablelist4.3.tar.gz" for UNIX and
-"tablelist4_3.zip" for Windows.  These files contain the same
+distribution file is "tablelist4.5.tar.gz" for UNIX and
+"tablelist4_5.zip" for Windows.  These files contain the same
 information, except for the additional carriage return character
 preceding the linefeed at the end of each line in the text files for
 Windows.
@@ -101,15 +102,15 @@ locations of these library directories are given by the "tcl_library"
 and "tk_library" variables, respectively.
 
 To install Tablelist on UNIX, "cd" to the desired directory and unpack
-the distribution file "tablelist4.3.tar.gz":
+the distribution file "tablelist4.5.tar.gz":
 
-    gunzip -c tablelist4.3.tar.gz | tar -xf -
+    gunzip -c tablelist4.5.tar.gz | tar -xf -
 
-This command will create a directory named "tablelist4.3", with the
+This command will create a directory named "tablelist4.5", with the
 subdirectories "demos", "doc", and "scripts".
 
 On Windows, use WinZip or some other program capable of unpacking the
-distribution file "tablelist4_3.zip" into the directory "tablelist4.3",
+distribution file "tablelist4_5.zip" into the directory "tablelist4.5",
 with the subdirectories "demos", "doc", and "scripts".
 
 Note that the file "tablelistEdit.tcl" in the "scripts" directory is
