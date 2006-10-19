@@ -34,7 +34,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.281");
+vtkCxxRevisionMacro(vtkKWWindow, "1.282");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -314,14 +314,17 @@ void vtkKWWindow::CreateWidget()
 
   // Menu : Window : Tcl Interactor
 
-  this->GetWindowMenu()->AddSeparator();
-
-  idx = this->GetWindowMenu()->AddCommand(
-    this->GetTclInteractorMenuLabel(), 
-    this, "DisplayTclInteractor");
-  this->GetWindowMenu()->SetItemHelpString(
-    idx, k_("Display a prompt to interact with the Tcl engine"));
-  this->GetWindowMenu()->SetItemAccelerator(idx, "Ctrl+T");
+  if (!this->GetApplication()->GetReleaseMode())
+    {
+    this->GetWindowMenu()->AddSeparator();
+    
+    idx = this->GetWindowMenu()->AddCommand(
+      this->GetTclInteractorMenuLabel(), 
+      this, "DisplayTclInteractor");
+    this->GetWindowMenu()->SetItemHelpString(
+      idx, k_("Display a prompt to interact with the Tcl engine"));
+    this->GetWindowMenu()->SetItemAccelerator(idx, "Ctrl+T");
+    }
 }
 
 //----------------------------------------------------------------------------

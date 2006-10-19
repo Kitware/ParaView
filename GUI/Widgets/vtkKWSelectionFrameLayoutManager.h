@@ -22,7 +22,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 // .NAME vtkKWSelectionFrameLayoutManager - a MxN layout manager for a set of vtkKWSelectionFrame
 // .SECTION Description
 // This class is a layout manager for vtkKWSelectionFrame. It will grid them
-// according to a given MxN resolution, allocate new ones, handle print/screenshots, etc. 
+// according to a given MxN resolution, allocate new ones, handle 
+// print/screenshots, etc. 
+// Note that the selection frame can be given any position, the resolution
+// and the origin of the layout manager are actually the parameters that
+// specify which one are visible. For example, one can set 4 widgets on
+// a 2x2 grid, set the resolution to 1x1, but set the origin at (0,0) or
+// (1,1) to zoom on a specific widget. 
 
 #ifndef __vtkKWSelectionFrameLayoutManager_h
 #define __vtkKWSelectionFrameLayoutManager_h
@@ -45,17 +51,27 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Control the resolution in widget by widget (columns, rows)
-  virtual void SetResolution(int i, int j);
+  // Set/Get the resolution of the layout (number of columns, number of rows).
+  virtual void SetResolution(int nb_cols, int nb_rows);
   virtual void SetResolution(int res[2])
     { this->SetResolution(res[0], res[1]); };
   vtkGetVector2Macro(Resolution, int);
+
+  // Description:
+  // Set/Get the origin of the layout (column, row), i.e. where to start
+  // displaying widget from in the virtual grid on which they are set.
+  virtual void SetOrigin(int col, int row);
+  virtual void SetOrigin(int origin[2])
+    { this->SetOrigin(origin[0], origin[1]); };
+  vtkGetVector2Macro(Origin, int);
 
   // Description:
   // Add a new selection frame to the pool
   // This will call Register() on the widget (increasing its ref count).
   // Return 1 on success, 0 otherwise
   virtual int AddWidget(vtkKWSelectionFrame *widget);
+  virtual int AddWidgetWithTagAndGroup(
+    vtkKWSelectionFrame *widget, const char *tag, const char *group);
 
   // Description:
   // Allocate a new selection frame and add it to the pool.
@@ -135,6 +151,13 @@ public:
     vtkKWSelectionFrame *w1, vtkKWSelectionFrame *w2);
 
   // Description:
+  // Reorganize the widgets position automatically (for example, to try
+  // to avoid empty spaces).
+  vtkBooleanMacro(ReorganizeWidgetPositionsAutomatically, int);
+  virtual void SetReorganizeWidgetPositionsAutomatically(int);
+  vtkGetMacro(ReorganizeWidgetPositionsAutomatically, int);
+
+  // Description:
   // Return if a specific widget is visible at this point, i.e. mapped
   // on screen at a specific position given the current resolution.
   virtual int GetWidgetVisibility(vtkKWSelectionFrame *w);
@@ -170,17 +193,7 @@ public:
   // evaluated as a simple command. 
   virtual void SetSelectionChangedCommand(
     vtkObject *object, const char *method);
-
-  // Description:
-  // Events. The SelectionChangedEvent is triggered when the selection
-  // is changed. It is similar in concept as the 'SelectionChangedCommand' 
-  // callbacks but can be used by multiple listeners/observers at a time.
-  //BTX
-  enum
-  {
-    SelectionChangedEvent = 10000
-  };
-  //ETX
+  vtkGetStringMacro(SelectionChangedCommand);
 
   // Description:
   // Remove a widget, or all of them, or all of the widgets in a group.
@@ -252,11 +265,14 @@ public:
   virtual void UpdateResolutionEntriesToolbar();
 
   // Description:
-  // Events. 
+  // Events. The SelectionChangedEvent is triggered when the selection
+  // is changed. It is similar in concept as the 'SelectionChangedCommand' 
+  // callbacks but can be used by multiple listeners/observers at a time.
   //BTX
   enum
   {
-    ResolutionChangedEvent = 10000
+    SelectionChangedEvent = 10000,
+    ResolutionChangedEvent
   };
   //ETX
 
@@ -283,16 +299,27 @@ public:
   virtual void SwitchWidgetCallback(
     const char *title, vtkKWSelectionFrame *widget);
   virtual void ResolutionCallback(int i, int j);
+  virtual void NumberOfWidgetsHasChangedCallback();
 
 protected:
   vtkKWSelectionFrameLayoutManager();
   ~vtkKWSelectionFrameLayoutManager();
 
   // Description:
+  // Get if a specific position is inside the layout defined by the
+  // current resolution and origin.
+  virtual int IsPositionInLayout(int col, int row);
+  virtual int IsPositionInLayout(int pos[2]) 
+    { return this->IsPositionInLayout(pos[0], pos[1]); };
+
+  // Description:
   // Create the widget.
   virtual void CreateWidget();
   
   int Resolution[2];
+  int Origin[2];
+  int ReorganizeWidgetPositionsAutomatically;
+
   vtkKWMenu    *ResolutionEntriesMenu;
   vtkKWToolbar *ResolutionEntriesToolbar;
 
@@ -352,6 +379,7 @@ protected:
   // Description:
   // Called when the number of widgets has changed
   virtual void NumberOfWidgetsHasChanged();
+  virtual void ScheduleNumberOfWidgetsHasChanged();
 
   // Description:
   // Reorganize positions of widgets so that the grid defined
@@ -383,6 +411,42 @@ protected:
   // Set the widget position without repacking
   virtual int SetWidgetPositionInternal(
     vtkKWSelectionFrame *w, int col, int row);
+
+  // Description:
+  // Automatically move the selection inside the visible layout, i.e. if
+  // the selected widget is not visible, select a visible one.
+  // If pos_hint is non-null, use it as a hint regarding where the most
+  // likely selection could be (array of 2 ints).
+  virtual void MoveSelectionInsideVisibleLayout(int *pos_hint);
+
+  // Description:
+  // Set resolution and origin at the same time, to minimize redraw
+  virtual void SetResolutionAndOrigin(int res[2], int origin[2])
+    { this->SetResolutionAndOrigin(res[0], res[1], origin[0], origin[1]); };
+  virtual void SetResolutionAndOrigin(
+    int nb_cols, int nb_rows, int col, int row);
+
+  // Description:
+  // Push/Pop resolutions or origins on a stack
+  // Is used by the maximize/minimize code.
+  virtual int PushResolution(int nb_cols, int nb_rows);
+  virtual int PushResolution(int res[2])
+    { return this->PushResolution(res[0], res[1]); };
+  virtual int PopResolution(int *nb_cols, int *nb_rows);
+  virtual int PopResolution(int res[2])
+    { return this->PopResolution(&res[0], &res[1]); };
+  virtual int PushPosition(int col, int row);
+  virtual int PushPosition(int origin[2])
+    { return this->PushPosition(origin[0], origin[1]); };
+  virtual int PopPosition(int *col, int *row);
+  virtual int PopPosition(int origin[2])
+    { return this->PopPosition(&origin[0], &origin[1]); };
+
+  // Description:
+  // Save/Restore layout before maximize/minimize.
+  // Return 1 on success, 0 otherwise
+  virtual int SaveLayoutBeforeMaximize();
+  virtual int RestoreLayoutBeforeMaximize();
 
 private:
 

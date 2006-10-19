@@ -62,6 +62,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkStringArray.h"
 
 #include <vtksys/stl/vector>
+#include <vtksys/stl/list>
 #include <vtksys/stl/string>
 
 #include "Resources/vtkKWWindowLayoutResources.h"
@@ -73,7 +74,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.68");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.66");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -90,10 +91,19 @@ public:
   typedef vtksys_stl::vector<PoolNode> PoolType;
   typedef vtksys_stl::vector<PoolNode>::iterator PoolIterator;
 
-  int ResolutionBeforeMaximize[2];
-  int SelectionPositionBeforeMaximize[2];
-
   PoolType Pool;
+
+  struct CellCoordinate
+  {
+    int Col;
+    int Row;
+  };
+  typedef vtksys_stl::list<CellCoordinate> CellCoordinatePoolType;
+
+  CellCoordinatePoolType ResolutionStack;
+  CellCoordinatePoolType PositionStack;
+
+  vtksys_stl::string ScheduleNumberOfWidgetsHasChangedTimerId;
 };
 
 //----------------------------------------------------------------------------
@@ -101,19 +111,18 @@ vtkKWSelectionFrameLayoutManager::vtkKWSelectionFrameLayoutManager()
 {
   this->Internals = new vtkKWSelectionFrameLayoutManagerInternals;
 
-  this->Resolution[0] = 0;
-  this->Resolution[1] = 0;
+  this->Resolution[0] = 1;
+  this->Resolution[1] = 1;
+
+  this->Origin[0] = 0;
+  this->Origin[1] = 0;
 
   this->ResolutionEntriesMenu    = NULL;
   this->ResolutionEntriesToolbar = NULL;
 
   this->SelectionChangedCommand = NULL;
 
-  this->GetResolution(this->Internals->ResolutionBeforeMaximize);
-  this->Internals->SelectionPositionBeforeMaximize[0] = 0;
-  this->Internals->SelectionPositionBeforeMaximize[1] = 0;
-
-  this->SetResolution(1, 1);
+  this->ReorganizeWidgetPositionsAutomatically = 1;
 
   this->LayoutFrame = vtkKWFrame::New();
 }
@@ -189,6 +198,15 @@ void vtkKWSelectionFrameLayoutManager::CreateWidget()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::IsPositionInLayout(int col, int row)
+{
+  return (col >= this->Origin[0] && 
+          col < this->Origin[0] + this->Resolution[0] && 
+          row >= this->Origin[1] && 
+          row < this->Origin[1] + this->Resolution[1]);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrameLayoutManager::Pack()
 {
   if (!this->IsAlive())
@@ -211,8 +229,6 @@ void vtkKWSelectionFrameLayoutManager::Pack()
   
   // Pack each widgets, column first
 
-  int i, j;
-
   vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
     this->Internals->Pool.begin();
   vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
@@ -222,16 +238,12 @@ void vtkKWSelectionFrameLayoutManager::Pack()
     if (it->Widget)
       {
       this->CreateWidget(it->Widget);
-      if (it->Widget->IsCreated())
+      if (it->Widget->IsCreated() && this->IsPositionInLayout(it->Position))
         {
-        if (it->Position[0] >= 0 && it->Position[0] < this->Resolution[0] && 
-            it->Position[1] >= 0 && it->Position[1] < this->Resolution[1])
-          {
-          tk_cmd << "grid " << it->Widget->GetWidgetName() 
-                 << " -sticky news "
-                 << " -column " << it->Position[0] 
-                 << " -row " << it->Position[1] << endl;
-          }
+        tk_cmd << "grid " << it->Widget->GetWidgetName() 
+               << " -sticky news "
+               << " -column " << it->Position[0] - this->Origin[0]
+               << " -row " << it->Position[1] - this->Origin[1] << endl;
         }
       }
     }
@@ -244,29 +256,30 @@ void vtkKWSelectionFrameLayoutManager::Pack()
   int nb_of_cols = 10, nb_of_rows = 10;
   vtkKWTkUtilities::GetGridSize(this->LayoutFrame, &nb_of_cols, &nb_of_rows);
 
+  int i, j;
   for (j = 0; j < this->Resolution[1]; j++)
     {
     tk_cmd << "grid rowconfigure " 
            << this->LayoutFrame->GetWidgetName() << " " << j 
-           << " -weight 1" << endl;
+           << " -weight 1 -uniform row" << endl;
     }
   for (j = this->Resolution[1]; j < nb_of_rows; j++)
     {
     tk_cmd << "grid rowconfigure " 
            << this->LayoutFrame->GetWidgetName() << " " << j 
-           << " -weight 0" << endl;
+           << " -weight 0 -uniform {}" << endl;
     }
   for (i = 0; i < this->Resolution[0]; i++)
     {
     tk_cmd << "grid columnconfigure " 
            << this->LayoutFrame->GetWidgetName() << " " << i
-           << " -weight 1" << endl;
+           << " -weight 1 -uniform col" << endl;
     }
   for (i = this->Resolution[0]; i < nb_of_cols; i++)
     {
     tk_cmd << "grid columnconfigure " 
            << this->LayoutFrame->GetWidgetName() << " " << i
-           << " -weight 0" << endl;
+           << " -weight 0 -uniform {}" << endl;
     }
   
   tk_cmd << ends;
@@ -356,8 +369,34 @@ vtkKWSelectionFrameLayoutManager::GetWidgetAtPosition(int col, int row)
 }
 
 //----------------------------------------------------------------------------
+void 
+vtkKWSelectionFrameLayoutManager::SetReorganizeWidgetPositionsAutomatically(
+  int arg)
+{
+  if (this->ReorganizeWidgetPositionsAutomatically == arg)
+    {
+    return;
+    }
+
+  this->ReorganizeWidgetPositionsAutomatically = arg;
+  this->Modified();
+
+  if (this->ReorganizeWidgetPositionsAutomatically)
+    {
+    this->ReorganizeWidgetPositions();
+    this->Pack();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrameLayoutManager::ReorganizeWidgetPositions()
 {
+  // Save selection, that could be affected by reorg
+
+  int sel_pos[2];
+  vtkKWSelectionFrame *sel = this->GetSelectedWidget();
+  this->GetWidgetPosition(sel, sel_pos);
+
   // Given the resolution, fill in the corresponding grid with 
   // widgets that have a valid position inside that grid
 
@@ -370,11 +409,10 @@ void vtkKWSelectionFrameLayoutManager::ReorganizeWidgetPositions()
     this->Internals->Pool.end();
   for (; it != end; ++it)
     {
-    if (it->Widget &&
-        (it->Position[0] >= 0 && it->Position[0] < this->Resolution[0] && 
-         it->Position[1] >= 0 && it->Position[1] < this->Resolution[1]))
+    if (it->Widget && this->IsPositionInLayout(it->Position))
       {
-      grid[it->Position[1] * this->Resolution[0] + it->Position[0]] = 1;
+      grid[(it->Position[1] - this->Origin[1]) * this->Resolution[0] + 
+           it->Position[0] - this->Origin[0]] = 1;
       }
     }
 
@@ -391,12 +429,10 @@ void vtkKWSelectionFrameLayoutManager::ReorganizeWidgetPositions()
         {
         while (it != end)
           {
-          if (it->Widget &&
-              (it->Position[0] < 0 || it->Position[0] >= this->Resolution[0] ||
-               it->Position[1] < 0 || it->Position[1] >= this->Resolution[1]))
+          if (it->Widget &&  !this->IsPositionInLayout(it->Position))
             {
-            it->Position[0] = i;
-            it->Position[1] = j;
+            it->Position[0] = this->Origin[0] + i;
+            it->Position[1] = this->Origin[1] + j;
             ++it;
             break;
             }
@@ -405,60 +441,157 @@ void vtkKWSelectionFrameLayoutManager::ReorganizeWidgetPositions()
         }
       }
     }
+
+  // Fix the selection, just in case it is not visible anymore for example
+
+  if (sel)
+    {
+    this->MoveSelectionInsideVisibleLayout(sel_pos);
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrameLayoutManager::SetResolution(int i, int j)
+int vtkKWSelectionFrameLayoutManager::PushResolution(int nb_cols, int nb_rows)
 {
-  if (i < 0 || j < 0 || 
-      (i == this->Resolution[0] && j == this->Resolution[1]))
+  if (this->Internals)
+    {
+    vtkKWSelectionFrameLayoutManagerInternals::CellCoordinate res;
+    res.Col = nb_cols;
+    res.Row = nb_rows;
+    this->Internals->ResolutionStack.push_back(res);
+    return 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::PopResolution(int *nb_cols, int *nb_rows)
+{
+  if (this->Internals && this->Internals->ResolutionStack.size())
+    {
+    vtkKWSelectionFrameLayoutManagerInternals::CellCoordinate &res =
+      this->Internals->ResolutionStack.back();
+    *nb_cols = res.Col;
+    *nb_rows = res.Row;
+    this->Internals->ResolutionStack.pop_back();
+    return 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::SetResolution(int nb_cols, int nb_rows)
+{
+  this->SetResolutionAndOrigin(
+    nb_cols, nb_rows, this->Origin[0], this->Origin[1]);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::PushPosition(int col, int row)
+{
+  if (this->Internals)
+    {
+    vtkKWSelectionFrameLayoutManagerInternals::CellCoordinate res;
+    res.Col = col;
+    res.Row = row;
+    this->Internals->PositionStack.push_back(res);
+    return 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::PopPosition(int *col, int *row)
+{
+  if (this->Internals && this->Internals->PositionStack.size())
+    {
+    vtkKWSelectionFrameLayoutManagerInternals::CellCoordinate &res =
+      this->Internals->PositionStack.back();
+    *col = res.Col;
+    *row = res.Row;
+    this->Internals->PositionStack.pop_back();
+    return 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::SetOrigin(int col, int row)
+{
+  this->SetResolutionAndOrigin(
+    this->Resolution[0], this->Resolution[1], col, row);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::SetResolutionAndOrigin(
+  int nb_cols, int nb_rows, int col, int row)
+{
+  if (nb_cols < 0 || nb_rows < 0 || col < 0 || row < 0)
     {
     return;
     }
 
-  this->Resolution[0] = i;
-  this->Resolution[1] = j;
+  int res_has_changed = 
+    (nb_cols != this->Resolution[0] || nb_rows != this->Resolution[1]);
 
-  this->UpdateResolutionEntriesMenu();
-  this->UpdateResolutionEntriesToolbar();
+  int origin_has_changed = 
+    (col != this->Origin[0] || row != this->Origin[1]);
 
-  // Save the selection position
-
-  int sel_pos[2];
-  vtkKWSelectionFrame *old_selection = this->GetSelectedWidget();
-  if (old_selection)
+  if (!res_has_changed && !origin_has_changed)
     {
-    this->GetWidgetPosition(old_selection, sel_pos);
+    return;
+    }
+
+  this->Resolution[0] = nb_cols;
+  this->Resolution[1] = nb_rows;
+
+  this->Origin[0] = col;
+  this->Origin[1] = row;
+
+  if (res_has_changed)
+    {
+    this->UpdateResolutionEntriesMenu();
+    this->UpdateResolutionEntriesToolbar();
     }
 
   // Reorganize and pack
 
-  this->ReorganizeWidgetPositions();
-  this->Pack();
-
-  // If the selection disappeared because the resolution shrunk, select
-  // something else
-  
-  if (old_selection &&
-      (sel_pos[0] >= this->Resolution[0] || sel_pos[1] >= this->Resolution[1]))
+  if (this->ReorganizeWidgetPositionsAutomatically)
     {
-    if (sel_pos[0] >= this->Resolution[0])
+    this->ReorganizeWidgetPositions();
+    this->Pack();
+    }
+
+  if (res_has_changed)
+    {
+    this->InvokeEvent(
+      vtkKWSelectionFrameLayoutManager::ResolutionChangedEvent, 
+      NULL);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::MoveSelectionInsideVisibleLayout(
+  int *pos_hint)
+{
+  // If the selection disappeared, try to select
+  // something else. Let's try the lower right corners first.
+  
+  vtkKWSelectionFrame *sel = this->GetSelectedWidget();
+  if (sel && !this->GetWidgetVisibility(sel))
+    {
+    vtkKWSelectionFrame *try_selection = NULL;
+    if (pos_hint)
       {
-      sel_pos[0] = this->Resolution[0] - 1;
+      try_selection = this->GetWidgetAtPosition(pos_hint);
       }
-    if (sel_pos[1] >= this->Resolution[1])
+    for (int row = this->Origin[1] + this->Resolution[1] - 1; 
+         row >= this->Origin[1] && !try_selection; row--)
       {
-      sel_pos[1] = this->Resolution[1] - 1;
-      }
-    vtkKWSelectionFrame *try_selection = this->GetWidgetAtPosition(sel_pos);
-    if (!try_selection)
-      {
-      for (int row = 0; row < this->Resolution[1] && !try_selection; row++)
+      for (int col = this->Origin[0] + this->Resolution[0] - 1; 
+           col >= this->Origin[0] && !try_selection; col--)
         {
-        for (int col = 0; col < this->Resolution[0] && !try_selection; col++)
-          {
-          try_selection = this->GetWidgetAtPosition(col, row);
-         }
+        try_selection = this->GetWidgetAtPosition(col, row);
         }
       }
     this->SelectWidget(try_selection);
@@ -572,7 +705,8 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesMenu()
   // Enabled/Disabled some resolutions
 
   int normal_state = 
-    this->GetEnabled() ? vtkKWOptions::StateNormal : vtkKWOptions::StateDisabled;
+    this->GetEnabled() ? 
+    vtkKWOptions::StateNormal : vtkKWOptions::StateDisabled;
   size_t size = this->Internals->Pool.size();
 
   char label[64];
@@ -991,6 +1125,13 @@ int vtkKWSelectionFrameLayoutManager::HasWidgetWithTagAndGroup(
 int vtkKWSelectionFrameLayoutManager::AddWidget(
   vtkKWSelectionFrame *widget)
 {
+  return this->AddWidgetWithTagAndGroup(widget, NULL, NULL);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::AddWidgetWithTagAndGroup(
+  vtkKWSelectionFrame *widget, const char *tag, const char *group)
+{
   if (!widget)
     {
     return 0;
@@ -1007,6 +1148,14 @@ int vtkKWSelectionFrameLayoutManager::AddWidget(
 
   vtkKWSelectionFrameLayoutManagerInternals::PoolNode node;
   node.Widget = widget;
+  if (tag)
+    {
+    node.Tag = tag;
+    }
+  if (group)
+    {
+    node.Group = group;
+    }
   node.Widget->Register(this);
 
   // Create the widget (if needed), configure the callbacks
@@ -1029,7 +1178,7 @@ int vtkKWSelectionFrameLayoutManager::AddWidget(
 
   this->Internals->Pool.push_back(node);
 
-  this->NumberOfWidgetsHasChanged();
+  this->ScheduleNumberOfWidgetsHasChanged();
 
   // If we just added a widget, and there was nothing else before, let's
   // select it for convenience purposes
@@ -1172,12 +1321,46 @@ void vtkKWSelectionFrameLayoutManager::NumberOfWidgetsHasChanged()
   // Adjust the resolution
 
   this->AdjustResolution();
-  this->ReorganizeWidgetPositions();
   this->UpdateEnableState();
 
   // Pack
 
-  this->Pack();
+  if (this->ReorganizeWidgetPositionsAutomatically)
+    {
+    this->ReorganizeWidgetPositions();
+    this->Pack();
+    }
+}
+
+//----------------------------------------------------------------------------
+void 
+vtkKWSelectionFrameLayoutManager::ScheduleNumberOfWidgetsHasChanged()
+{
+  // Already scheduled
+
+  if (!this->GetApplication() ||
+      this->Internals->ScheduleNumberOfWidgetsHasChangedTimerId.size())
+    {
+    return;
+    }
+
+  this->Internals->ScheduleNumberOfWidgetsHasChangedTimerId =
+    this->Script("after idle {catch {%s NumberOfWidgetsHasChangedCallback}}", 
+                 this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::NumberOfWidgetsHasChangedCallback()
+{
+  if (!this->GetApplication() || this->GetApplication()->GetInExit() ||
+      !this->IsAlive())
+    {
+    return;
+    }
+
+  this->NumberOfWidgetsHasChanged();
+
+  this->Internals->ScheduleNumberOfWidgetsHasChangedTimerId = "";
 }
 
 //----------------------------------------------------------------------------
@@ -1215,7 +1398,7 @@ int vtkKWSelectionFrameLayoutManager::RemoveWidget(
           this->SelectWidget(this->GetNthWidget(0));
           }
         this->DeleteWidget(widget);
-        this->NumberOfWidgetsHasChanged();
+        this->ScheduleNumberOfWidgetsHasChanged();
         return 1;
         }
       }
@@ -1252,7 +1435,7 @@ int vtkKWSelectionFrameLayoutManager::RemoveAllWidgets()
     this->Internals->Pool.clear();
     if (nb_deleted)
       {
-      this->NumberOfWidgetsHasChanged();
+      this->ScheduleNumberOfWidgetsHasChanged();
       }
     }
 
@@ -1300,7 +1483,7 @@ int vtkKWSelectionFrameLayoutManager::RemoveAllWidgetsWithGroup(
         {
         this->SelectWidget(this->GetNthWidget(0));
         }
-      this->NumberOfWidgetsHasChanged();
+      this->ScheduleNumberOfWidgetsHasChanged();
       }
     }
 
@@ -1423,19 +1606,20 @@ int vtkKWSelectionFrameLayoutManager::ShowWidgetsWithGroup(const char *group)
   int nb_widgets_in_group = this->GetNumberOfWidgetsWithGroup(group);
   int row, col, i;
 
-  int sel_row, sel_col;
-  vtkKWSelectionFrame *old_selection = this->GetSelectedWidget();
-  if (old_selection)
-    {
-    this->GetWidgetPosition(old_selection, &sel_col, &sel_row);
-    }
+  // Save selection
+
+  int old_sel_pos[2];
+  vtkKWSelectionFrame *old_sel = this->GetSelectedWidget();
+  this->GetWidgetPosition(old_sel, old_sel_pos);
 
   // Inspect all selection frame, and check if they already display the group
   // we want to make visible
 
-  for (row = 0; row < this->Resolution[1]; row++)
+  for (row = this->Origin[1]; 
+       row < this->Origin[1] + this->Resolution[1]; row++)
     {
-    for (col = 0; col < this->Resolution[0]; col++)
+    for (col = this->Origin[0]; 
+         col < this->Origin[0] + this->Resolution[0]; col++)
       {
       vtkKWSelectionFrame *widget = this->GetWidgetAtPosition(col, row);
       if (widget)
@@ -1454,7 +1638,7 @@ int vtkKWSelectionFrameLayoutManager::ShowWidgetsWithGroup(const char *group)
               {
               int new_row, new_col;
               this->GetWidgetPosition(new_widget, &new_col, &new_row);
-              if (new_col < 0 || new_row < 0 || 
+              if (new_col < this->Origin[0] || new_row < this->Origin[1] || 
                   new_row > row || (new_row == row && new_col > col))
                 {
                 this->SetWidgetPosition(new_widget, col, row);
@@ -1470,10 +1654,10 @@ int vtkKWSelectionFrameLayoutManager::ShowWidgetsWithGroup(const char *group)
 
   // Restore the selection
 
-  if (old_selection)
+  if (old_sel)
     {
-    vtkKWSelectionFrame *atpos = this->GetWidgetAtPosition(sel_col, sel_row);
-    if (atpos && atpos != old_selection)
+    vtkKWSelectionFrame *atpos = this->GetWidgetAtPosition(old_sel_pos);
+    if (atpos && atpos != old_sel)
       {
       this->SelectWidget(atpos);
       }
@@ -1514,13 +1698,12 @@ void vtkKWSelectionFrameLayoutManager::SelectWidget(
     {
     if (it->Widget && it->Widget != widget)
       {
-      it->Widget->SelectedOff();
+      it->Widget->SetSelected(0);
       }
     }
   if (widget)
     {
-    widget->SelectedOn();
-
+    widget->SetSelected(1);
     this->InvokeSelectionChangedCommand();
     }
 }
@@ -1547,14 +1730,40 @@ void vtkKWSelectionFrameLayoutManager::SelectWidgetCallback(
   this->SelectWidget(selection);
 }
 
+//---------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::GetWidgetVisibility(
+  vtkKWSelectionFrame *widget)
+{
+  int col, row;
+  return (this->GetWidgetPosition(widget, &col, &row) &&
+          this->IsPositionInLayout(col, row));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::SaveLayoutBeforeMaximize()
+{
+  this->PushResolution(this->GetResolution());
+  this->PushPosition(this->GetOrigin());
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::RestoreLayoutBeforeMaximize()
+{
+  int res[2], origin[2];
+  if (this->PopResolution(res) && this->PopPosition(origin))
+    {
+    this->SetResolutionAndOrigin(res, origin);
+    return 1;
+    }
+  return 0;
+}
+
 //----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::IsWidgetMaximized(
   vtkKWSelectionFrame *widget)
 {
-  int col, row;
-  return (widget && 
-          this->GetWidgetPosition(widget, &col, &row) &&
-          col == 0 && row == 0 && 
+  return (this->GetWidgetVisibility(widget) &&
           this->Resolution[0] == 1 && this->Resolution[1] == 1);
 }
 
@@ -1565,28 +1774,16 @@ int vtkKWSelectionFrameLayoutManager::MaximizeWidget(
   // Save the resolution and the position so that both can
   // be restored on UndoMaximize
 
-  if (widget && this->Internals &&
-      this->GetWidgetPosition(
-        widget, 
-        this->Internals->SelectionPositionBeforeMaximize))
+  int pos[2];
+  if (!this->IsWidgetMaximized(widget) &&
+      this->GetWidgetPosition(widget, pos))
     {
-    this->GetResolution(this->Internals->ResolutionBeforeMaximize);
+    this->SaveLayoutBeforeMaximize();
 
-    // Set the resolution to full (1, 1)
-    // then switch whichever widget was at [0, 0] with our widget
+    // Set the resolution to full (1, 1) and origin to the widget pos
 
-    this->SetResolution(1, 1);
+    this->SetResolutionAndOrigin(1, 1, pos[0], pos[1]);
     
-    vtkKWSelectionFrame *at00 = this->GetWidgetAtPosition(0, 0);
-    if (at00)
-      {
-      this->SwitchWidgetsPosition(widget, at00);
-      }
-    else
-      {
-      this->SetWidgetPosition(widget, 0, 0);
-      }
-
     return 1;
     }
 
@@ -1598,62 +1795,7 @@ int vtkKWSelectionFrameLayoutManager::UndoMaximizeWidget()
 {
   if (this->Resolution[0] == 1 && this->Resolution[1] == 1 && this->Internals)
     {
-#if 0
-    // I don't want to see hardcoded values in KWWidgets.
-    // the problem can be solved correctly.
-
-    const int nw = this->GetNumberOfWidgets();
-    
-    // If we have only one widget, do not go back (to having nothing)
-    if ( nw == 1 )
-      {
-      return 0;
-      }
-
-    // And if the previous resolution is 0 and we have more than one
-    // widget (yes this case occurs), estimate a sensible resolution.
-    if ( this->Internals->ResolutionBeforeMaximize[0] == 0 && 
-         this->Internals->ResolutionBeforeMaximize[1] == 0 &&
-         nw > 1 )
-      {
-      if (nw > 6)
-        {
-        this->SetResolution( 2, 3 );
-        }
-      else if (nw >= 4)
-        {
-        this->SetResolution( 2, 2 );
-        }
-      else if (nw >= 2)
-        { 
-        this->SetResolution( 2, 1 );
-        }
-      else
-        {
-        this->SetResolution( 1, 1 );
-        }
-      return 1;
-      }
-#endif    
-    this->SetResolution(this->Internals->ResolutionBeforeMaximize);
-
-    vtkKWSelectionFrame *at00 = this->GetWidgetAtPosition(0, 0);
-    vtkKWSelectionFrame *atpos = this->GetWidgetAtPosition(
-      this->Internals->SelectionPositionBeforeMaximize);
-    if (atpos && at00)
-      {
-      this->SwitchWidgetsPosition(at00, atpos);
-      }
-    else if (at00)
-      {
-      this->SetWidgetPosition(
-        at00, this->Internals->SelectionPositionBeforeMaximize);
-      }
-    else if (atpos)
-      {
-      this->SetWidgetPosition(atpos, 0, 0);
-      }
-    return 1;
+    return this->RestoreLayoutBeforeMaximize();
     }
 
   return 0;
@@ -1678,17 +1820,7 @@ void vtkKWSelectionFrameLayoutManager::SelectAndMaximizeWidgetCallback(
   vtkKWSelectionFrame *selection)
 {
   this->SelectWidget(selection);
-  this->MaximizeWidget(selection);
-}
-
-//---------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::GetWidgetVisibility(
-  vtkKWSelectionFrame *w)
-{
-  int row, col;
-  return (this->GetWidgetPosition(w, &col, &row) &&
-          col >= 0 && row >= 0 && 
-          col < this->Resolution[0] && row < this->Resolution[1]);
+  this->ToggleMaximizeWidget(selection);
 }
 
 //---------------------------------------------------------------------------
@@ -1823,17 +1955,40 @@ int vtkKWSelectionFrameLayoutManager::CanWidgetTitleBeChanged(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrameLayoutManager::ResolutionCallback(int i, int j)
+void vtkKWSelectionFrameLayoutManager::ResolutionCallback(
+  int nb_cols, int nb_rows)
 {
-  int old_i, old_j;
-  this->GetResolution(old_i, old_j);
-  this->SetResolution(i, j);
-  this->GetResolution(i, j);
-  if (i != old_i || j != old_j)
+  // If something is selected, let's try to center the origin around it
+  // If 1x1 is requested, use maximize code instead, so that the previous
+  // resolution is remembered and we can minimize later on.
+
+  vtkKWSelectionFrame *sel = this->GetSelectedWidget();
+  if (!sel)
     {
-    this->InvokeEvent(
-      vtkKWSelectionFrameLayoutManager::ResolutionChangedEvent, 
-      NULL);
+    this->SetResolutionAndOrigin(nb_cols, nb_rows, 0, 0);
+    }
+  else
+    {
+    if (nb_cols == 1 && nb_rows == 1)
+      {
+      this->ToggleMaximizeWidget(sel);
+      }
+    else
+      {
+      int origin[2];
+      this->GetWidgetPosition(sel, origin);
+      origin[0] = origin[0] - nb_cols + 1;
+      if (origin[0] < 0)
+        {
+        origin[0] = 0;
+        }
+      origin[1] = origin[1] - nb_rows + 1;
+      if (origin[1] < 0)
+        {
+        origin[1] = 0;
+        }
+      this->SetResolutionAndOrigin(nb_cols, nb_rows, origin[0], origin[1]);
+      }
     }
 }
 
@@ -1947,13 +2102,15 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
   // Build the whole pipeline
 
   int i, j;
+  int pos[2]; 
   for (j = this->Resolution[1] - 1; j >= 0; j--)
     {
     append_filters[j] = vtkImageAppend::New();
     append_filters[j]->SetAppendAxis(0);
     for (i = 0; i < this->Resolution[0]; i++)
       {
-      int pos[2]; pos[0] = i; pos[1] = j;
+      pos[0] = this->Origin[0] + i; 
+      pos[1] = this->Origin[1] + j;
       vtkKWSelectionFrame *widget = this->GetWidgetAtPosition(pos);
       if (widget && (!selection_only || widget->GetSelected()))
         {
@@ -2012,13 +2169,14 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
   // Deallocate
 
   append_all->Delete();
-  
+
   for (j = 0; j < this->Resolution[1]; j++)
     {
     append_filters[j]->Delete();
     for (i = 0; i < this->Resolution[0]; i++)
       {
-      int pos[2]; pos[0] = i; pos[1] = j;
+      pos[0] = this->Origin[0] + i; 
+      pos[1] = this->Origin[1] + j;
       vtkKWSelectionFrame *widget = this->GetWidgetAtPosition(pos);
       if (widget && (!selection_only || widget->GetSelected()))
         {
@@ -2390,11 +2548,13 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
   int max_size[2] = { -1, -1 };
 
   int i, j;
+  int pos[2]; 
   for (j = 0; j < this->Resolution[1]; j++)
     {
     for (i = 0; i < this->Resolution[0]; i++)
       {
-      int pos[2]; pos[0] = i; pos[1] = j;
+      pos[0] = this->Origin[0] + i; 
+      pos[1] = this->Origin[1] + j;
       vtkKWSelectionFrame *widget = this->GetWidgetAtPosition(pos);
       if (widget && (!selection_only || widget->GetSelected()))
         {
@@ -2431,7 +2591,8 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
     {
     for (i = 0; i < this->Resolution[0]; i++)
       {
-      int pos[2]; pos[0] = i; pos[1] = j;
+      pos[0] = this->Origin[0] + i; 
+      pos[1] = this->Origin[1] + j;
       vtkKWSelectionFrame *widget = this->GetWidgetAtPosition(pos);
       if (widget && (!selection_only || widget->GetSelected()))
         {
@@ -2549,4 +2710,5 @@ void vtkKWSelectionFrameLayoutManager::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "ResolutionEntriesMenu: " << this->ResolutionEntriesMenu << endl;
   os << indent << "ResolutionEntriesToolbar: " << this->ResolutionEntriesToolbar << endl;
+  os << indent << "ReorganizeWidgetPositionsAutomatically: " << this->ReorganizeWidgetPositionsAutomatically << endl;
 }

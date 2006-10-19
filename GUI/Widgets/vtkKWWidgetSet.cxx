@@ -21,7 +21,7 @@
 #include <vtksys/stl/vector>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.16");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.17");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetSetInternals
@@ -484,6 +484,24 @@ int vtkKWWidgetSet::GetNumberOfVisibleWidgets()
     return 0;
     }
   return atoi(this->Script("llength [grid slaves %s]", this->GetWidgetName()));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWidgetSet::GetIdOfNthVisibleWidget(int rank)
+{
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
+    {
+    if (it->Visibility && !rank--)
+      {
+      return it->Id;
+      }
+    }
+
+  return -1;
 }
 
 //----------------------------------------------------------------------------

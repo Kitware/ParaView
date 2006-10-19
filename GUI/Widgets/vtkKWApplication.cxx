@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWApplication.cxx
+  Module:    vtkKWApplication.cxx,v
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -146,6 +146,7 @@ vtkKWApplication::vtkKWApplication()
   this->VersionName               = NULL;
   this->ReleaseName               = NULL;
   this->PrettyName                = NULL;
+  this->ReleaseMode               = 0;
   this->LimitedEditionMode        = 0;
   this->LimitedEditionModeName    = NULL;
   this->HelpDialogStartingPage    = NULL;
@@ -240,6 +241,11 @@ vtkKWApplication::vtkKWApplication()
   this->SetCharacterEncoding(VTK_ENCODING_ISO_8859_1);
 
   vtksys::SystemTools::EnableMSVCDebugHook();
+
+  if (this->ReleaseMode)
+    {
+    vtkObject::GlobalWarningDisplayOff();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1618,6 +1624,20 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWApplication::SetReleaseMode(int arg)
+{
+  if (this->ReleaseMode == arg)
+    {
+    return;
+    }
+
+  this->ReleaseMode = arg;
+  this->Modified();
+
+  vtkObject::SetGlobalWarningDisplay(this->ReleaseMode ? 0 : 1);
+}
+
+//----------------------------------------------------------------------------
 const char* vtkKWApplication::GetVersionName()
 {
   if (this->VersionName)
@@ -2366,5 +2386,7 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LimitedEditionModeName: " 
      << (this->LimitedEditionModeName ? this->LimitedEditionModeName
          : "None") << endl;
+  os << indent << "ReleaseMode: " 
+     << (this->ReleaseMode ? "On" : "Off") << endl;
   os << indent << "PrintTargetDPI: " << this->GetPrintTargetDPI() << endl;
 }

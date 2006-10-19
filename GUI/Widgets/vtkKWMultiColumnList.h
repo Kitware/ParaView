@@ -39,6 +39,10 @@
 
 class vtkKWIcon;
 class vtkKWMultiColumnListInternals;
+class vtkKWCheckButton;
+class vtkKWComboBox;
+class vtkKWFrame;
+class vtkStringArray;
 
 class KWWidgets_EXPORT vtkKWMultiColumnList : public vtkKWCoreWidget
 {
@@ -664,7 +668,8 @@ public:
   //   - use images that do not have an alpha component, or 
   //   - refresh the image periodically (each time a row is added/removed)
   //     also check SetPotentialCellColorsChangedCommand and
-  //     ScheduleRefreshAllCellWindowCommands.
+  //     ScheduleRefreshAllCellsWithWindowCommand or 
+  //     ScheduleRefreshAllRowsWithWindowCommand.
   virtual void SetCellImage(int row_index, int col_index, const char *);
   virtual void SetCellImageToIcon(
     int row_index, int col_index, vtkKWIcon *icon);
@@ -755,18 +760,29 @@ public:
   // EditEndCommand and CellUpdatedCommand are handled the same way.
   // Check the SetCellWindowCommand method for more information.
   virtual void SetCellWindowCommandToCheckButton(int row_index, int col_index);
+  virtual vtkKWCheckButton *GetCellWindowAsCheckButton(
+    int row_index, int col_index);
 
   // Description:
-  // The SetCellWindowCommandToReadOnlyComboBox is a convenience method to 
+  // The SetCellWindowCommandToComboBox is a convenience method to 
   // add a list of items in a combo box within one of the cells. For instance, 
   // similar items may be grouped and added in a pull down list. This also
   // prevents overcrowding the Multi-column list by having things hidden in a 
   // combo box.
-  virtual void SetCellWindowCommandToReadOnlyComboBox(int row_index, int col_index);
-  virtual void SetNthEntryInReadOnlyComboBox(int i, const char *value, 
-                                                      int row, int col);
-  virtual void DeleteNthEntryInReadOnlyComboBox(int i, int row, int col);
-  virtual void DeleteAllEntriesInReadOnlyComboBox(int row, int col);
+  virtual void SetCellWindowCommandToComboBox(int row_index, int col_index);
+  virtual void SetCellWindowCommandToComboBoxWithValues(
+    int row_index, int col_index, int nb_values, const char *values[]);
+  virtual void SetCellWindowCommandToComboBoxWithValuesAsArray(
+    int row_index, int col_index, vtkStringArray *values);
+  virtual void SetCellWindowCommandToComboBoxWithValuesAsSemiColonSeparated(
+    int row_index, int col_index, const char *values);
+  virtual vtkKWComboBox *GetCellWindowAsComboBox(int row_index, int col_index);
+  virtual void SetCellWindowComboBoxValues(
+    int row_index, int col_index, int nb_values, const char *values[]);
+  virtual void SetCellWindowComboBoxValuesAsArray(
+    int row_index, int col_index, vtkStringArray *values);
+  virtual void SetCellWindowComboBoxValuesAsSemiColonSeparated(
+    int row_index, int col_index, const char *values);
 
   // Description:
   // The SetCellWindowCommandToColorButton method is a convenient
@@ -783,6 +799,7 @@ public:
   // EditEndCommand and CellUpdatedCommand are handled the same way.
   // Check the SetCellWindowCommand method for more information.
   virtual void SetCellWindowCommandToColorButton(int row_index, int col_index);
+  virtual vtkKWFrame* GetCellWindowAsFrame(int row_index, int col_index);
 
   // Description:
   // Specifies a command to be invoked when the window embedded into the cell
@@ -812,15 +829,21 @@ public:
     int row_index, int col_index);
 
   // Description:
-  // Force a cell (or all cells) for which a WindowCommand has been defined
-  // to recreate its dynamic content. It does so by setting the WindowCommand
-  // to NULL, than setting it to its previous value (per author's suggestion).
+  // Force a cell (or all cells, or all rows in a column) for which a 
+  // WindowCommand has been defined to recreate its dynamic content. It does
+  // so by setting the WindowCommand to NULL, than setting it to its previous
+  // value (per author's suggestion).
   // The ScheduleRefreshAllCellsWithWindowCommand method will
-  // schedule RefreshAllCellsWithWindowCommand when the application
-  // is idle.
+  // schedule RefreshAllCellsWithWindowCommand when the application is idle.
+  // The ScheduleRefreshAllRowsWithWindowCommand method will
+  // schedule RefreshAllRowsWithWindowCommand when the application is idle.
   virtual void RefreshCellWithWindowCommand(int row_index, int col_index);
   virtual void RefreshAllCellsWithWindowCommand();
   virtual void ScheduleRefreshAllCellsWithWindowCommand();
+  virtual void RefreshAllRowsWithWindowCommand(int col);
+  virtual void ScheduleRefreshAllRowsWithWindowCommand(int col);
+  virtual void RefreshEnabledStateOfAllCellsWithWindowCommand();
+  virtual void ScheduleRefreshEnabledStateOfAllCellsWithWindowCommand();
 
   // Description:
   // Force a cell (or all cells) for which a WindowCommand has been defined
@@ -1246,12 +1269,14 @@ public:
     const char *widget, int row, int col, const char *text);
   virtual const char* EditEndCallback(
     const char *widget, int row, int col, const char *text);
-  virtual void CellWindowCommandToCheckButtonCallback(
-    const char*, int, int, const char*);
-  virtual void CellWindowCommandToReadOnlyComboBoxCallback(
+  virtual void CellWindowCommandToCheckButtonCreateCallback(
     const char*, int, int, const char*);
   virtual void CellWindowCommandToCheckButtonSelectCallback(
     vtkKWWidget*, int, int, int);
+  virtual void CellWindowCommandToComboBoxCreateCallback(
+    const char *values, const char*, int, int, const char*);
+  virtual void CellWindowCommandToComboBoxValueCallback(
+    vtkKWWidget*, int, int, const char *);
   virtual void CellWindowCommandToColorButtonCallback(
     const char*, int, int, const char*);
   virtual void ColumnSortedCallback();
@@ -1259,6 +1284,8 @@ public:
     const char *w, int x, int y, int root_x, int root_y);
   virtual void RefreshColorsOfAllCellsWithWindowCommandCallback();
   virtual void RefreshAllCellsWithWindowCommandCallback();
+  virtual void RefreshEnabledStateOfAllCellsWithWindowCommandCallback();
+  virtual void RefreshAllRowsWithWindowCommandCallback(int col);
   virtual void KeyPressDeleteCallback();
   
 protected:

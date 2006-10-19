@@ -311,6 +311,15 @@ public:
   virtual void FocusInCallback();
   virtual void FocusOutCallback();
 
+  // Description:
+  // Event list
+  //BTX
+  enum
+  {
+    CornerAnnotationVisibilityChangedEvent = 24000
+  };
+  //ETX
+
 protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();

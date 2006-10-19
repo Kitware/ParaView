@@ -58,7 +58,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.50");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.51");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -602,13 +602,19 @@ void vtkKWPresetSelector::PopulatePresetContextMenu(vtkKWMenu *menu, int id)
   
   // apply preset
 
-  sprintf(command, "PresetApplyCallback %d", id);
-  menu->AddCommand("Apply", this, command);
+  if (this->PresetApplyCommand)
+    {
+    sprintf(command, "PresetApplyCallback %d", id);
+    menu->AddCommand("Apply", this, command);
+    }
 
   // update preset
 
-  sprintf(command, "PresetUpdateCallback %d", id);
-  menu->AddCommand("Update", this, command);
+  if (this->PresetUpdateCommand)
+    {
+    sprintf(command, "PresetUpdateCallback %d", id);
+    menu->AddCommand("Update", this, command);
+    }
 
   // remove preset
 

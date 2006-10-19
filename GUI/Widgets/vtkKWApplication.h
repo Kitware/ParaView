@@ -164,6 +164,19 @@ public:
   vtkSetStringMacro(LimitedEditionModeName);
   virtual const char *GetLimitedEditionModeName();
 
+  // Descrition:
+  // Set/Get if the application is running in release/production mode.
+  // This should be set as soon as possible, before creating any UI.
+  // The release mode (as opposed to debug/development mode) can be used
+  // to prevent the output window from showing up, to disable the support of
+  // specific file formats that should only be used during development, to
+  // remove the Tcl Command Prompt, etc.
+  //BTX 
+  virtual void SetReleaseMode(int);
+  vtkBooleanMacro(ReleaseMode, int);
+  vtkGetMacro(ReleaseMode, int);
+  //ETX
+
   // Description:
   // Set/Get the directory in which the application is supposed
   // to be installed. 
@@ -588,6 +601,10 @@ private:
   // Limited edition mode, name of the application when in limited edition mode
   int LimitedEditionMode;
   char *LimitedEditionModeName;
+
+  // Description:
+  // Release mode
+  int ReleaseMode;
 
   vtkKWApplication(const vtkKWApplication&);   // Not implemented.
   void operator=(const vtkKWApplication&);  // Not implemented.

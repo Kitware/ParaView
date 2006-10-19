@@ -21,6 +21,7 @@
 #include "vtkKWComboBox.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWOptions.h"
+#include "vtkStringArray.h"
 
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
@@ -31,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.69");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.70");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -40,6 +41,8 @@ public:
   
   vtksys_stl::string ScheduleRefreshColorsOfAllCellsWithWindowCommandTimerId;
   vtksys_stl::string ScheduleRefreshAllCellsWithWindowCommandTimerId;
+  vtksys_stl::string ScheduleRefreshAllRowsWithWindowCommandTimerId;
+  vtksys_stl::string ScheduleRefreshEnabledStateOfAllCellsWithWindowCommandTimerId;
 
   vtksys_stl::vector<int> LastSelectionRowIndices;
   vtksys_stl::vector<int> LastSelectionColIndices;
@@ -477,7 +480,16 @@ const char* vtkKWMultiColumnList::GetColumnTitle(int col_index)
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetColumnWidth(int col_index, int width)
 {
+  int old_width = this->GetColumnWidth(col_index);
   this->SetColumnConfigurationOptionAsInt(col_index, "-width", width);
+
+  // Give a chance to user-defined widgets to redraw themselves according
+  // to the new column width
+
+  if (old_width != this->GetColumnWidth(col_index))
+    {
+    this->ScheduleRefreshAllRowsWithWindowCommand(col_index);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2408,6 +2420,145 @@ void vtkKWMultiColumnList::RefreshAllCellsWithWindowCommandCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RefreshEnabledStateOfAllCellsWithWindowCommand()
+{
+  // Let's try to propagate the Enabled state without recreating the
+  // cell for native types.
+
+  int old_state = this->GetState();
+  if (this->GetState() != vtkKWOptions::StateNormal)
+    {
+    this->SetStateToNormal();
+    }
+  vtksys_stl::string command_str;
+  int nb_rows = this->GetNumberOfRows();
+  int nb_cols = this->GetNumberOfColumns();
+  for (int row = 0; row < nb_rows; row++)
+    {
+    for (int col = 0; col < nb_cols; col++)
+      {
+      const char *command = 
+        this->GetCellConfigurationOption(row, col, "-window");
+      if (command && *command)
+        {
+        command_str = command;
+        const char *child_name = this->GetCellWindowWidgetName(row, col);
+        if (child_name && *child_name)
+          {
+          vtkKWCoreWidget *child = vtkKWCoreWidget::SafeDownCast(
+            this->GetChildWidgetWithName(child_name));
+          if (child)
+            {
+            if (vtkKWCheckButton::SafeDownCast(child) ||
+                vtkKWComboBox::SafeDownCast(child) ||
+                vtkKWRadioButton::SafeDownCast(child))
+              {
+              child->SetEnabled(this->GetEnabled());
+              this->RefreshColorsOfCellWithWindowCommand(row, col);
+              }
+            else
+              {
+              this->SetCellConfigurationOption(
+                row, col, "-window", "");
+              this->SetCellConfigurationOption(
+                row, col, "-window", command_str.c_str());
+              }
+            }
+          }
+        }
+      }
+    }
+  this->SetState(old_state);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::ScheduleRefreshEnabledStateOfAllCellsWithWindowCommand()
+{
+  // Already scheduled
+
+  if (this->Internals->ScheduleRefreshEnabledStateOfAllCellsWithWindowCommandTimerId.size())
+    {
+    return;
+    }
+
+  this->Internals->ScheduleRefreshEnabledStateOfAllCellsWithWindowCommandTimerId =
+    this->Script(
+      "after idle {catch {%s RefreshEnabledStateOfAllCellsWithWindowCommandCallback}}", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RefreshEnabledStateOfAllCellsWithWindowCommandCallback()
+{
+  if (!this->GetApplication() || this->GetApplication()->GetInExit() ||
+      !this->IsAlive())
+    {
+    return;
+    }
+
+  this->RefreshEnabledStateOfAllCellsWithWindowCommand();
+  this->Internals->ScheduleRefreshEnabledStateOfAllCellsWithWindowCommandTimerId = "";
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RefreshAllRowsWithWindowCommand(int col)
+{
+  // Instead of calling RefreshCellWithWindowCommand, unwrap the loop
+  // to avoid the change of State (especially since this is called
+  // from UpdateEnableState())
+
+  int old_state = this->GetState();
+  if (this->GetState() != vtkKWOptions::StateNormal)
+    {
+    this->SetStateToNormal();
+    }
+  vtksys_stl::string command_str;
+  int nb_rows = this->GetNumberOfRows();
+  for (int row = 0; row < nb_rows; row++)
+    {
+    const char *command = 
+      this->GetCellConfigurationOption(row, col, "-window");
+    if (command && *command)
+      {
+      command_str = command;
+      this->SetCellConfigurationOption(
+        row, col, "-window", "");
+      this->SetCellConfigurationOption(
+        row, col, "-window", command_str.c_str());
+      }
+    }
+  this->SetState(old_state);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::ScheduleRefreshAllRowsWithWindowCommand(int col)
+{
+  // Already scheduled
+
+  if (this->Internals->ScheduleRefreshAllRowsWithWindowCommandTimerId.size())
+    {
+    return;
+    }
+
+  this->Internals->ScheduleRefreshAllRowsWithWindowCommandTimerId =
+    this->Script(
+      "after idle {catch {%s RefreshAllRowsWithWindowCommandCallback %d}}", 
+      this->GetTclName(), col);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RefreshAllRowsWithWindowCommandCallback(int col)
+{
+  if (!this->GetApplication() || this->GetApplication()->GetInExit() ||
+      !this->IsAlive())
+    {
+    return;
+    }
+
+  this->RefreshAllRowsWithWindowCommand(col);
+  this->Internals->ScheduleRefreshAllRowsWithWindowCommandTimerId = "";
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::RefreshColorsOfCellWithWindowCommand(
   int row_index, 
   int col_index)
@@ -2429,6 +2580,8 @@ void vtkKWMultiColumnList::RefreshColorsOfCellWithWindowCommand(
           vtkKWCheckButton::SafeDownCast(child);
         vtkKWRadioButton *child_as_radiobutton = 
           vtkKWRadioButton::SafeDownCast(child);
+        vtkKWComboBox *child_as_combobox = 
+          vtkKWComboBox::SafeDownCast(child);
 
         double br, bg, bb, fr, fg, fb;
         this->GetCellCurrentBackgroundColor(
@@ -2443,15 +2596,42 @@ void vtkKWMultiColumnList::RefreshColorsOfCellWithWindowCommand(
         // unless the widget is disabled in that case do it anyhow
         if (!(child_as_frame && nb_grand_children == 0) || !this->GetEnabled())
           {
-          child->SetConfigurationOptionAsColor("-bg", br, bg, bb);
+          if (child_as_frame)
+            {
+            child_as_frame->SetBackgroundColor(br, bg, bb);
+            }
+          else if (child_as_checkbutton)
+            {
+            child_as_checkbutton->SetBackgroundColor(br, bg, bb);
+            }
+          else if (child_as_radiobutton)
+            {
+            child_as_radiobutton->SetBackgroundColor(br, bg, bb);
+            }
+          else if (child_as_combobox)
+            {
+            child_as_combobox->SetBackgroundColor(br, bg, bb);
+            }
+          else
+            {
+            child->SetConfigurationOptionAsColor("-bg", br, bg, bb);
+            }
           }
-        // If it a frame, no foreground color option. If it is a check
+        // If it is a frame, no foreground color option. If it is a check
         // or radio button, do not change its foreground color since it
         // controls the color of the 'tick' mark
         if (!child_as_frame && 
-            !child_as_checkbutton && !child_as_radiobutton)
+            !child_as_checkbutton && 
+            !child_as_radiobutton)
           {
-          child->SetConfigurationOptionAsColor("-fg", fr, fg, fb);
+          if (child_as_combobox)
+            {
+            child_as_combobox->SetForegroundColor(fr, fg, fb);
+            }
+          else
+            {
+            child->SetConfigurationOptionAsColor("-fg", fr, fg, fb);
+            }
           }
         for (int i = 0; i < nb_grand_children; i++)
           {
@@ -2462,11 +2642,39 @@ void vtkKWMultiColumnList::RefreshColorsOfCellWithWindowCommand(
             child_as_frame = vtkKWFrame::SafeDownCast(grand_child);
             child_as_checkbutton = vtkKWCheckButton::SafeDownCast(grand_child);
             child_as_radiobutton = vtkKWRadioButton::SafeDownCast(grand_child);
-            grand_child->SetConfigurationOptionAsColor("-bg", br, bg, bb);
-            if (!child_as_frame && 
-                !child_as_checkbutton && !child_as_radiobutton)
+            child_as_combobox = vtkKWComboBox::SafeDownCast(grand_child);
+            if (child_as_frame)
               {
-              grand_child->SetConfigurationOptionAsColor("-fg", fr, fg, fb);
+              child_as_frame->SetBackgroundColor(br, bg, bb);
+              }
+            else if (child_as_checkbutton)
+              {
+              child_as_checkbutton->SetBackgroundColor(br, bg, bb);
+              }
+            else if (child_as_radiobutton)
+              {
+              child_as_radiobutton->SetBackgroundColor(br, bg, bb);
+              }
+            else if (child_as_combobox)
+              {
+              child_as_combobox->SetBackgroundColor(br, bg, bb);
+              }
+            else
+              {
+              grand_child->SetConfigurationOptionAsColor("-bg", br, bg, bb);
+              }
+            if (!child_as_frame && 
+                !child_as_checkbutton && 
+                !child_as_radiobutton)
+              {
+              if (child_as_combobox)
+                {
+                child_as_combobox->SetForegroundColor(fr, fg, fb);
+                }
+              else
+                {
+                grand_child->SetConfigurationOptionAsColor("-fg", fr, fg, fb);
+                }
               }
             }
           }
@@ -2535,23 +2743,34 @@ void vtkKWMultiColumnList::SetCellWindowCommandToCheckButton(
 {
   this->SetCellWindowCommand(row_index, col_index, NULL, NULL);
   this->SetCellWindowCommand(
-    row_index, col_index, this, "CellWindowCommandToCheckButtonCallback");
+    row_index, col_index, this, "CellWindowCommandToCheckButtonCreateCallback");
   this->SetCellWindowDestroyCommandToRemoveChild(row_index, col_index);
   this->SetCellEditable(row_index, col_index, 0);
 }
 
 //---------------------------------------------------------------------------
-void vtkKWMultiColumnList::CellWindowCommandToCheckButtonCallback(
+vtkKWCheckButton* vtkKWMultiColumnList::GetCellWindowAsCheckButton( 
+  int row, int col)
+{
+  const char *child_name = this->GetCellWindowWidgetName(row, col);
+  return vtkKWCheckButton::SafeDownCast(
+    this->GetChildWidgetWithName(child_name));
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::CellWindowCommandToCheckButtonCreateCallback(
   const char *, int row, int col, const char *widget)
 {
-  vtkKWCheckButton *child = vtkKWCheckButton::New();
-  child->SetWidgetName(widget);
-  child->SetParent(this);
-  child->Create();
-  //child->SetHighlightThickness(0);
-  //child->SetBorderWidth(0);
-  child->SetPadX(0);
-  child->SetPadY(0);
+  vtkKWCheckButton *child = this->GetCellWindowAsCheckButton(row, col);
+  if (!child)
+    {
+    child = vtkKWCheckButton::New();
+    child->SetWidgetName(widget);
+    child->SetParent(this);
+    child->Create();
+    child->Delete();
+    }
+
   child->SetBackgroundColor(this->GetCellCurrentBackgroundColor(row, col));
   child->SetSelectedState(this->GetCellTextAsInt(row, col));
   child->SetEnabled(this->GetEnabled()); 
@@ -2560,7 +2779,6 @@ void vtkKWMultiColumnList::CellWindowCommandToCheckButtonCallback(
           "CellWindowCommandToCheckButtonSelectCallback %s %d %d", 
           child->GetTclName(), row, col);
   child->SetCommand(this, command);
-  child->Delete();
 }
 
 //---------------------------------------------------------------------------
@@ -2623,10 +2841,16 @@ void vtkKWMultiColumnList::SetCellWindowCommandToColorButton(
 void vtkKWMultiColumnList::CellWindowCommandToColorButtonCallback(
   const char *, int row, int col, const char *widget)
 {
-  vtkKWFrame *child = vtkKWFrame::New();
-  child->SetWidgetName(widget);
-  child->SetParent(this);
-  child->Create();
+  vtkKWFrame *child = this->GetCellWindowAsFrame(row, col);
+  if (!child)
+    {
+    child = vtkKWFrame::New();
+    child->SetWidgetName(widget);
+    child->SetParent(this);
+    child->Create();
+    child->Delete();
+    }
+
   child->SetBorderWidth(1);
   child->SetReliefToSolid();
   child->SetWidth(16);
@@ -2642,116 +2866,242 @@ void vtkKWMultiColumnList::CellWindowCommandToColorButtonCallback(
   child->SetBackgroundColor(r, g, b);
   child->SetEnabled(this->GetEnabled()); 
   this->AddBindingsToWidget(child);
-  child->Delete();
+}
+
+//---------------------------------------------------------------------------
+vtkKWFrame* vtkKWMultiColumnList::GetCellWindowAsFrame( 
+  int row, int col)
+{
+  const char *child_name = this->GetCellWindowWidgetName(row, col);
+  return vtkKWFrame::SafeDownCast(
+    this->GetChildWidgetWithName(child_name));
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetCellWindowCommandToReadOnlyComboBox(
-  int row_index, int col_index)
+void vtkKWMultiColumnList::SetCellWindowCommandToComboBoxWithValuesAsSemiColonSeparated(
+  int row_index, int col_index, const char *values)
 {
+  vtksys_stl::string command("CellWindowCommandToComboBoxCreateCallback {");
+  if (values)
+    {
+    command += values;
+    }
+  command += "}";
+
   this->SetCellWindowCommand(row_index, col_index, NULL, NULL);
   this->SetCellWindowCommand(
-    row_index, col_index, this, "CellWindowCommandToReadOnlyComboBoxCallback");
+    row_index, col_index, this, command.c_str());
   this->SetCellWindowDestroyCommandToRemoveChild(row_index, col_index);
   this->SetCellEditable(row_index, col_index, 0);
 }
 
-//---------------------------------------------------------------------------
-void vtkKWMultiColumnList::CellWindowCommandToReadOnlyComboBoxCallback(
-  const char *, int row, int col, const char *widget)
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellWindowCommandToComboBox(
+  int row_index, int col_index)
 {
-  vtkKWComboBox *child = vtkKWComboBox::New();
-  child->SetWidgetName(widget);
-  child->SetParent(this);
-  child->Create();
-  child->SetHighlightThickness(0);
-  child->SetBorderWidth(0);
+  this->SetCellWindowCommandToComboBoxWithValuesAsSemiColonSeparated(
+    row_index, col_index, NULL);
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellWindowCommandToComboBoxWithValuesAsArray(
+  int row_index, int col_index, vtkStringArray *values)
+{
+  if (values && values->GetNumberOfValues())
+    {
+    vtksys_stl::string str(values->GetValue(0));
+    for (int i = 1; i < values->GetNumberOfValues(); i++)
+      {
+      str += ";";
+      str += values->GetValue(i);
+      }
+    this->SetCellWindowCommandToComboBoxWithValuesAsSemiColonSeparated(
+      row_index, col_index, str.c_str());
+    }
+  else
+    {
+    this->SetCellWindowCommandToComboBox(row_index, col_index);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellWindowCommandToComboBoxWithValues(
+  int row_index, int col_index, int nb_values, const char *values[])
+{
+  if (values && nb_values > 0)
+    {
+    vtksys_stl::string str(values[0]);
+    for (int i = 1; i < nb_values; i++)
+      {
+      str += ";";
+      str += values[i];
+      }
+    this->SetCellWindowCommandToComboBoxWithValuesAsSemiColonSeparated(
+      row_index, col_index, str.c_str());
+    }
+  else
+    {
+    this->SetCellWindowCommandToComboBox(row_index, col_index);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::CellWindowCommandToComboBoxCreateCallback(
+  const char *values, const char *, int row, int col, const char *widget)
+{
+  vtkKWComboBox *child = this->GetCellWindowAsComboBox(row, col);
+  if (!child)
+    {
+    child = vtkKWComboBox::New();
+    child->SetWidgetName(widget);
+    child->SetParent(this);
+    child->Create();
+    child->ReadOnlyOn();
+    child->Delete();
+    }
+
+  child->SetBackgroundColor(this->GetCellCurrentBackgroundColor(row, col));
+  child->SetForegroundColor(this->GetCellCurrentForegroundColor(row, col));
+  child->SetEnabled(this->GetEnabled()); 
+
+  char command[256];
+  sprintf(command, 
+          "CellWindowCommandToComboBoxValueCallback %s %d %d", 
+          child->GetTclName(), row, col);
+  child->SetCommand(this, command);
   
   // Set the default based on the current column width.. 
-  child->SetWidth( this->GetColumnWidth(col)-2 );
 
-  // If the column width is too small make the list box, when it drops down is
-  // at least wide enough to display enough text, instead of displaying an 
-  // annoying scroll bar.
-  if( this->GetColumnWidth(col) < 20 ) 
+  int column_width = this->GetColumnWidth(col);
+  if (column_width != 0)
     {
-    child->SetListboxWidth( 20 ); 
+    if (column_width > 0) // in chars
+      {
+      child->SetWidth(column_width - 4);
+      column_width *= 8; // let's say 10 pixels per char...
+      child->SetListboxWidth(column_width < 150 ? 150 : column_width);
+      }
+    else // in pixels
+      {
+      column_width = -column_width;
+      child->SetListboxWidth(column_width < 150 ? 150 : column_width);
+      column_width /= 8; // let's say 10 pixels per char...
+      child->SetWidth(column_width - 4);
+      }
     }
+
+  // Put the values that were hidden in the -image option
+
+  vtksys_stl::vector<vtksys_stl::string> split_elems;
+  vtksys::SystemTools::Split(values, split_elems, ';');
   
-  //child->SetWidth( 20 );
-  child->SetBackgroundColor(this->GetCellCurrentBackgroundColor(row, col));
-  child->SetEnabled(this->GetEnabled()); 
-  child->ReadOnlyOn();
-  child->Delete();
+  vtksys_stl::vector<vtksys_stl::string>::iterator it = split_elems.begin();
+  vtksys_stl::vector<vtksys_stl::string>::iterator end = split_elems.end();
+  for (; it != end; it++)
+    {
+    child->AddValue((*it).c_str());
+    }
+
+  vtksys_stl::string cell_content(this->GetCellText(row, col));
+  child->SetValue(cell_content.c_str());
+
+  // The combobox is readonly, but we still want to be able to select the
+  // cell/row if we click in the entry. Remove its default bindings manually
+  // and add ours
+
+  vtksys_stl::string entryw(child->GetWidgetName());
+  entryw += ".e";        // see BWidget's ComboBox implementation
+  this->Script("bind %s <Button-1> {}", entryw.c_str());
+  this->AddBindingsToWidgetName(entryw.c_str());
 }
 
 //---------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetNthEntryInReadOnlyComboBox( 
-                int i, const char *value, int row, int col)
+vtkKWComboBox* vtkKWMultiColumnList::GetCellWindowAsComboBox( 
+  int row, int col)
 {
   const char *child_name = this->GetCellWindowWidgetName(row, col);
-  vtkKWComboBox *child = vtkKWComboBox::SafeDownCast(
-                  this->GetChildWidgetWithName(child_name));
+  return vtkKWComboBox::SafeDownCast(
+    this->GetChildWidgetWithName(child_name));
+}
 
-  // If it is a combo box
-  if ( child )
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellWindowComboBoxValuesAsSemiColonSeparated(
+  int row_index, int col_index, const char *values)
+{
+  this->SetCellWindowCommandToComboBoxWithValuesAsSemiColonSeparated(
+    row_index, col_index, values);
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellWindowComboBoxValuesAsArray(
+  int row_index, int col_index, vtkStringArray *values)
+{
+  this->SetCellWindowCommandToComboBoxWithValuesAsArray(
+    row_index, col_index, values);
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellWindowComboBoxValues(
+  int row_index, int col_index, int nb_values, const char *values[])
+{
+  this->SetCellWindowCommandToComboBoxWithValues(
+    row_index, col_index, nb_values, values);
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::CellWindowCommandToComboBoxValueCallback(
+  vtkKWWidget *widget, int row, int col, const char *value)
+{
+  static int in_CellWindowCommandToComboBoxValueCallback = 0;
+  if (in_CellWindowCommandToComboBoxValueCallback)
     {
-    // If we have (i+1) entries, remove that entry and add a fresh one
-    if ( i < child->GetNumberOfValues() ) 
-      {
-      child->ReplaceNthValue( i, value );
+    return;
+    }
+  in_CellWindowCommandToComboBoxValueCallback = 1;
 
-      // Set the title of the combo box to be the same as the first entry.
-      // The main title will be present because of the MulticolumnList anyway
-      if ( i == 0 ) 
+  vtkKWComboBox *cb = vtkKWComboBox::SafeDownCast(widget);
+  if (widget)
+    {
+    // Make sure we are dealing with the right one
+    // Sometimes when a column is sorted, not *all* cells with a user-defined
+    // window are re-created. In our case, our user-defined combobox
+    // has its row,col location coded in its callback. Yet, sorting the
+    // column might have moved the combobox around, without re-creating
+    // it, i.e. without updating its callback. Let's check if this is the
+    // case, and look for the right location if not matching.
+
+    if (strcmp(widget->GetWidgetName(), 
+               this->GetCellWindowWidgetName(row, col)))
+      {
+      for (row = 0; row < this->GetNumberOfRows(); row++)
         {
-        child->SetValue( value );    
+        if (!strcmp(widget->GetWidgetName(), 
+                    this->GetCellWindowWidgetName(row, col)))
+          {
+          break;
+          }
         }
       }
-    else
-      {
-      child->AddValue( value );
 
-      // Set the title of the combo box to be the same as the first entry.
-      if ( child->GetNumberOfValues() == 1 )
+    if (row < this->GetNumberOfRows())
+      {
+      vtksys_stl::string cell_content(this->GetCellText(row, col));
+      if (strcmp(cell_content.c_str(), value))
         {
-        child->SetValue( value );    
+        vtksys_stl::string validated(
+          this->InvokeEditEndCommand(row, col, value));
+        cb->SetValue(validated.c_str());
+        if (strcmp(cell_content.c_str(), validated.c_str()))
+          {
+          this->SetCellText(row, col, validated.c_str());
+          cell_content = this->GetCellText(row, col);
+          this->InvokeCellUpdatedCommand(row, col, cell_content.c_str());
+          }
         }
       }
     }
-}
 
-//---------------------------------------------------------------------------
-void vtkKWMultiColumnList::DeleteNthEntryInReadOnlyComboBox( 
-                                     int i, int row, int col)
-{
-  const char *child_name = this->GetCellWindowWidgetName(row, col);
-  vtkKWComboBox *child = vtkKWComboBox::SafeDownCast(
-                  this->GetChildWidgetWithName(child_name));
-
-  // If it is a combo box
-  if ( child )
-    {
-    // If we have (i+1) entries, remove that entry 
-    if ( i < child->GetNumberOfValues() ) 
-      {
-      child->DeleteValue( i );
-      }
-    }
-}
-
-//---------------------------------------------------------------------------
-void vtkKWMultiColumnList::DeleteAllEntriesInReadOnlyComboBox( int row, int col)
-{
-  const char *child_name = this->GetCellWindowWidgetName(row, col);
-  vtkKWComboBox *child = vtkKWComboBox::SafeDownCast(
-                  this->GetChildWidgetWithName(child_name));
-
-  // If it is a combo box
-  if ( child )
-    {
-    child->DeleteAllValues();
-    }
+  in_CellWindowCommandToComboBoxValueCallback = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -4159,7 +4509,7 @@ void vtkKWMultiColumnList::UpdateEnableState()
 
   this->SetState(this->GetEnabled());
 
-  this->ScheduleRefreshAllCellsWithWindowCommand();
+  this->ScheduleRefreshEnabledStateOfAllCellsWithWindowCommand();
 }
 
 //----------------------------------------------------------------------------

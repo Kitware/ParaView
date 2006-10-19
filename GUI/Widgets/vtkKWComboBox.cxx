@@ -20,12 +20,17 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.16");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWComboBox::vtkKWComboBox()
 {
   this->Width = 20;
+}
+
+//----------------------------------------------------------------------------
+vtkKWComboBox::~vtkKWComboBox()
+{
 }
 
 //----------------------------------------------------------------------------
@@ -221,6 +226,16 @@ void vtkKWComboBox::SetListboxWidth(int n)
     {
     this->SetConfigurationOptionAsInt("-listboxwidth", n);
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWComboBox::GetListboxWidth()
+{
+  if (this->IsCreated())
+    {
+    return this->GetConfigurationOptionAsInt("-listboxwidth");
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

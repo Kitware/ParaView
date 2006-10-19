@@ -92,6 +92,7 @@ public:
   virtual int GetWidgetVisibility(int id);
   virtual void SetWidgetVisibility(int id, int flag);
   virtual int GetNumberOfVisibleWidgets();
+  virtual int GetIdOfNthVisibleWidget(int rank);
 
   // Description:
   // Delete all widgets.

@@ -78,8 +78,9 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Specify the width of the listbox in the dropdown. 
+  // Set/Get the width of the listbox in the dropdown, in pixels. 
   virtual void SetListboxWidth(int n);
+  virtual int GetListboxWidth();
 
   // Description:
   // Set/Get the background color of the widget.
@@ -90,7 +91,7 @@ public:
 
 protected:
   vtkKWComboBox();
-  ~vtkKWComboBox() {};
+  ~vtkKWComboBox();
   
   // Description:
   // Create the widget.

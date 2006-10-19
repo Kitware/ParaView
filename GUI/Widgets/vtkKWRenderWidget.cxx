@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.148");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.149");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1626,6 +1626,8 @@ void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
     if (this->SupportCornerAnnotation)
       {
       this->CornerAnnotation->VisibilityOn();
+      this->InvokeEvent(vtkKWRenderWidget::
+          CornerAnnotationVisibilityChangedEvent, &v);
       if (!this->HasViewProp(this->CornerAnnotation))
         {
         this->AddOverlayViewProp(this->CornerAnnotation);
@@ -1635,6 +1637,8 @@ void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
   else
     {
     this->CornerAnnotation->VisibilityOff();
+    this->InvokeEvent(vtkKWRenderWidget::
+        CornerAnnotationVisibilityChangedEvent, &v);
     if (this->HasViewProp(this->CornerAnnotation))
       {
       this->RemoveViewProp(this->CornerAnnotation);

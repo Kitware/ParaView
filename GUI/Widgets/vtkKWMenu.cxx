@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.110");
+vtkCxxRevisionMacro(vtkKWMenu, "1.111");
 
 //----------------------------------------------------------------------------
 class vtkKWMenuInternals
@@ -999,15 +999,15 @@ int vtkKWMenu::GetIndexOfItem(const char *label)
     int underline_index, cleaned =
       this->GetLabelWithoutUnderline(label, &clean_label, &underline_index);
 
-    int not_ok = atoi(
+    const char *res = 
       this->Script("catch {%s index {%s}} %s_getindex", 
-                   this->GetWidgetName(), clean_label, this->GetTclName()));
+                   this->GetWidgetName(), clean_label, this->GetTclName());
     if (cleaned)
       {
       delete [] clean_label;
       }
-
-    if (not_ok)
+    
+    if (!res || atoi(res))
       {
       return -1;
       }
