@@ -105,7 +105,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.73");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.74");
 
 //----------------------------------------------------------------------------
 
@@ -1445,33 +1445,29 @@ void vtkPVDisplayGUI::UpdateInternal()
   this->UpdatePointLabelVisibilityCheck();
   // Colors
   this->UpdateColorGUI();
-    
+  this->UpdateVolumeGUI();
+
   // Representation menu.
   switch(pDisp->GetRepresentationCM())
     {
     case vtkSMDataObjectDisplayProxy::OUTLINE:
       this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
-      this->UpdateColorMenu();
       this->VolumeRenderModeOff();
       break;
     case vtkSMDataObjectDisplayProxy::SURFACE:
       this->RepresentationMenu->SetValue(VTK_PV_SURFACE_LABEL);
-      this->UpdateColorMenu();
       this->VolumeRenderModeOff();
       break;
     case vtkSMDataObjectDisplayProxy::WIREFRAME:
       this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
-      this->UpdateColorMenu();
       this->VolumeRenderModeOff();
       break;
     case vtkSMDataObjectDisplayProxy::POINTS:
       this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
-      this->UpdateColorMenu();
       this->VolumeRenderModeOff();
       break;
     case vtkSMDataObjectDisplayProxy::VOLUME:
       this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
-      this->UpdateVolumeGUI();
       this->VolumeRenderModeOn();
       break;
     default:
