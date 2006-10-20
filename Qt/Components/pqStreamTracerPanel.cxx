@@ -358,10 +358,7 @@ void pqStreamTracerPanel::onUsePointSource()
         {
         this->Implementation->PointSourceWidget->setWidgetVisible(true);
         this->Implementation->LineSourceWidget->setWidgetVisible(false);
-        source_property->RemoveAllProxies();
-        source_property->AddProxy(source);
-        this->proxy()->getProxy()->UpdateVTKObjects();
-        pqApplicationCore::instance()->render();
+        pqSMAdaptor::setUncheckedProxyProperty(source_property, source);
         break;
         }
       }
@@ -381,12 +378,50 @@ void pqStreamTracerPanel::onUseLineSource()
         {
         this->Implementation->PointSourceWidget->setWidgetVisible(false);
         this->Implementation->LineSourceWidget->setWidgetVisible(true);
-        source_property->RemoveAllProxies();
-        source_property->AddProxy(source);
-        this->proxy()->getProxy()->UpdateVTKObjects();
-        pqApplicationCore::instance()->render();
+        pqSMAdaptor::setUncheckedProxyProperty(source_property, source);
         break;
         }
       }
     }
 }
+  
+void pqStreamTracerPanel::accept()
+{
+  int seedType = this->Implementation->UI.seedType->currentIndex();
+  if(seedType == 0)  // point source
+    {
+    if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("Source")))
+      {
+      const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
+      for(int i = 0; i != sources.size(); ++i)
+        {
+        pqSMProxy source = sources[i];
+        if(source->GetVTKClassName() == QString("vtkPointSource"))
+          {
+          pqSMAdaptor::setProxyProperty(source_property, source);
+          break;
+          }
+        }
+      }
+    }
+  else if(seedType == 1) // line source
+    {
+    if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("Source")))
+      {
+      const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
+      for(int i = 0; i != sources.size(); ++i)
+        {
+        pqSMProxy source = sources[i];
+        if(source->GetVTKClassName() == QString("vtkLineSource"))
+          {
+          pqSMAdaptor::setProxyProperty(source_property, source);
+          break;
+          }
+        }
+      }
+    }
+  pqObjectPanel::accept();
+}
+

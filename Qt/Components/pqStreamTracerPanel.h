@@ -47,6 +47,8 @@ class pqStreamTracerPanel :
 public:
   pqStreamTracerPanel(pqProxy* proxy, QWidget* p);
   ~pqStreamTracerPanel();
+
+  virtual void accept();
   
 private slots:
   void onRenderModuleChanged(pqRenderModule*);
