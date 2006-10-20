@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTestUtility.cxx
+   Module:    pqCoreTestUtility.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,38 +30,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqCoreTestUtility.h"
+
+#include <QDir>
+#include <QFileInfo>
+#include <QApplication>
+
+#include "QtTestingConfigure.h"
+
+#include "vtkProcessModule.h"
+#include "vtkWindowToImageFilter.h"
+#include "vtkBMPWriter.h"
+#include "vtkTIFFWriter.h"
+#include "vtkPNMWriter.h"
+#include "vtkPNGWriter.h"
+#include "vtkJPEGWriter.h"
+#include "vtkErrorCode.h"
+#include "vtkSmartPointer.h"
+#include "vtkPNGReader.h"
+#include "vtkImageDifference.h"
+#include "vtkImageShiftScale.h"
+#include "vtkPQConfig.h"
+#include "vtkRenderWindow.h"
+#include "vtkTesting.h"
+
 #include "pqFileDialogEventPlayer.h"
 #include "pqFileDialogEventTranslator.h"
 #include "pqOptions.h"
 #include "pqProcessModuleGUIHelper.h"
 #include "pqQVTKWidgetEventPlayer.h"
 #include "pqQVTKWidgetEventTranslator.h"
-#include "pqTestUtility.h"
-
-#include <pqEventDispatcher.h>
-#include <pqEventPlayer.h>
-#include <pqEventTranslator.h>
-#include <pqXMLEventSource.h>
-
-#include <vtkProcessModule.h>
-#include <vtkWindowToImageFilter.h>
-#include <vtkBMPWriter.h>
-#include <vtkTIFFWriter.h>
-#include <vtkPNMWriter.h>
-#include <vtkPNGWriter.h>
-#include <vtkJPEGWriter.h>
-#include <vtkErrorCode.h>
-#include <vtkSmartPointer.h>
-#include <vtkPNGReader.h>
-#include <vtkImageDifference.h>
-#include <vtkImageShiftScale.h>
-#include <vtkPQConfig.h>
-#include <vtkRenderWindow.h>
-#include <vtkTesting.h>
-
-#include <QDir>
-#include <QFileInfo>
-#include <QApplication>
+#ifdef QT_TESTING_WITH_PYTHON
+# include "pqPythonEventSourceImage.h"
+#endif
 
 template<typename WriterT>
 bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
@@ -77,64 +78,33 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// pqTestUtility::pqImplementation
+// pqCoreTestUtility
 
-class pqTestUtility::pqImplementation
+pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
+  pqTestUtility(p)
 {
-public:
-  pqImplementation(pqProcessModuleGUIHelper& helper) :
-    GUIHelper(helper)
-  {
-  }
 
-  pqProcessModuleGUIHelper& GUIHelper;
-  pqXMLEventSource EventSource;
-  pqEventPlayer EventPlayer;
-  pqEventDispatcher EventDispatcher;
-};
+#ifdef QT_TESTING_WITH_PYTHON
+  this->addEventSource("py", new pqPythonEventSourceImage(this));
+#endif
 
-/////////////////////////////////////////////////////////////////////////////
-// pqTestUtility
+  this->eventTranslator()->addWidgetEventTranslator(
+       new pqQVTKWidgetEventTranslator(this));
+  this->eventTranslator()->addWidgetEventTranslator(
+       new pqFileDialogEventTranslator(this));
 
-pqTestUtility::pqTestUtility(pqProcessModuleGUIHelper& helper, QObject* p) :
-  QObject(p),
-  Implementation(new pqImplementation(helper))
-{
-  this->Setup(this->Implementation->EventPlayer);
-  
-  QObject::connect(
-    &this->Implementation->EventDispatcher,
-    SIGNAL(succeeded()),
-    this,
-    SLOT(testSucceeded()));
-    
-  QObject::connect(
-    &this->Implementation->EventDispatcher,
-    SIGNAL(failed()),
-    this,
-    SLOT(testFailed()));
+  this->eventPlayer()->addWidgetEventPlayer(
+       new pqQVTKWidgetEventPlayer(this));
+  this->eventPlayer()->addWidgetEventPlayer(
+       new pqFileDialogEventPlayer(this));
+
 }
 
-pqTestUtility::~pqTestUtility()
+pqCoreTestUtility::~pqCoreTestUtility()
 {
-  delete this->Implementation;
 }
 
-void pqTestUtility::Setup(pqEventTranslator& translator)
-{
-  translator.addWidgetEventTranslator(new pqQVTKWidgetEventTranslator());
-  translator.addWidgetEventTranslator(new pqFileDialogEventTranslator());
-  translator.addDefaultWidgetEventTranslators();
-}
-
-void pqTestUtility::Setup(pqEventPlayer& player)
-{
-  player.addWidgetEventPlayer(new pqQVTKWidgetEventPlayer());
-  player.addWidgetEventPlayer(new pqFileDialogEventPlayer());
-  player.addDefaultWidgetEventPlayers();
-}
-
-QString pqTestUtility::DataRoot()
+QString pqCoreTestUtility::DataRoot()
 {
   // Let the user override the defaults by setting an environment variable ...
   QString result = getenv("PARAVIEW_DATA_ROOT");
@@ -160,7 +130,7 @@ QString pqTestUtility::DataRoot()
   return result;
 }
 
-bool pqTestUtility::SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File)
+bool pqCoreTestUtility::SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File)
 {
   vtkWindowToImageFilter* const capture = vtkWindowToImageFilter::New();
   capture->SetInput(RenderWindow);
@@ -185,7 +155,7 @@ bool pqTestUtility::SaveScreenshot(vtkRenderWindow* RenderWindow, const QString&
   return success;
 }
 
-bool pqTestUtility::CompareImage(vtkRenderWindow* RenderWindow, 
+bool pqCoreTestUtility::CompareImage(vtkRenderWindow* RenderWindow, 
   const QString& ReferenceImage, double Threshold, 
   ostream& vtkNotUsed(Output), const QString& TempDirectory)
 {
@@ -202,17 +172,14 @@ bool pqTestUtility::CompareImage(vtkRenderWindow* RenderWindow,
   return false;
 }
   
-void pqTestUtility::runTests()
+void pqCoreTestUtility::playTests()
 {
   if(pqOptions* const options = pqOptions::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetOptions()))
     {
     if(options->GetTestFileName())
       {
-      this->Implementation->EventSource.setContent(options->GetTestFileName());
-      this->Implementation->EventDispatcher.playEvents(
-        this->Implementation->EventSource,
-        this->Implementation->EventPlayer);
+      this->playTests(options->GetTestFileName());
       return;
       }
     }
@@ -221,7 +188,12 @@ void pqTestUtility::runTests()
   this->testSucceeded();
 }
 
-void pqTestUtility::testSucceeded()
+void pqCoreTestUtility::playTests(const QString& filename)
+{
+  pqTestUtility::playTests(filename);
+}
+
+void pqCoreTestUtility::testSucceeded()
 {
   if(pqOptions* const options = pqOptions::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetOptions()))
@@ -234,7 +206,11 @@ void pqTestUtility::testSucceeded()
     bool comparison_succeeded = true;
     if(options->GetBaselineImage())
       {
-      comparison_succeeded = this->Implementation->GUIHelper.compareView(options->GetBaselineImage(),
+      pqProcessModuleGUIHelper * helper;
+      helper = pqProcessModuleGUIHelper::SafeDownCast(
+           vtkProcessModule::GetProcessModule()->GetGUIHelper());
+
+      comparison_succeeded = helper->compareView(options->GetBaselineImage(),
         options->GetImageThreshold(), cout, options->GetTestDirectory());
       }
       
@@ -245,7 +221,7 @@ void pqTestUtility::testSucceeded()
     }
 }
 
-void pqTestUtility::testFailed()
+void pqCoreTestUtility::testFailed()
 {
   if(pqOptions* const options = pqOptions::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetOptions()))
@@ -256,3 +232,4 @@ void pqTestUtility::testFailed()
       }
     }
 }
+

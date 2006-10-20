@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTestUtility.h
+   Module:    pqCoreTestUtility.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,12 +30,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqTestUtility_h
-#define _pqTestUtility_h
+#ifndef _pqCoreTestUtility_h
+#define _pqCoreTestUtility_h
 
 #include "pqCoreExport.h"
+#include "pqTestUtility.h"
 #include <vtkIOStream.h>
-#include <QObject>
 
 class QString;
 class pqEventPlayer;
@@ -44,22 +44,15 @@ class pqProcessModuleGUIHelper;
 class vtkRenderWindow;
 
 /// Provides ParaView-specific functionality for regression testing
-class PQCORE_EXPORT pqTestUtility :
-  public QObject
+class PQCORE_EXPORT pqCoreTestUtility : public pqTestUtility
 {
   Q_OBJECT
 
 public:
-  pqTestUtility(pqProcessModuleGUIHelper&, QObject* parent = 0);
-  ~pqTestUtility();
+  pqCoreTestUtility(QObject* parent = 0);
+  ~pqCoreTestUtility();
 
 public:
-  /// Handles ParaView-specific setup of a QtTesting event translator
-  /// object (so QtTesting doesn't have any dependencies on ParaView/VTK)
-  static void Setup(pqEventTranslator&);
-  /// Handles ParaView-specific setup of a QtTesting event player object
-  /// (so QtTesting doesn't have any dependencies on ParaView/VTK)
-  static void Setup(pqEventPlayer&);
   /// Returns the absolute path to the PARAVIEW_DATA_ROOT in canonical form
   /// (slashes forward), or empty string
   static QString DataRoot();
@@ -75,16 +68,14 @@ public:
                            const QString& TempDirectory);
 
 public slots:
-  void runTests();
+  void playTests();
+  void playTests(const QString& filename);
 
-private slots:
+protected slots:
   void testSucceeded();
   void testFailed();
 
-private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
 };
 
-#endif // !_pqTestUtility_h
+#endif // !_pqCoreTestUtility_h
 
