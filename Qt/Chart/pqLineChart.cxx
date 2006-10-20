@@ -279,7 +279,7 @@ void pqLineChart::setModel(pqLineChartModel *model)
     this->connect(this->Model,
         SIGNAL(errorWidthChanged(const pqLineChartPlot *, int)),
         this, SLOT(handlePlotErrorWidthChanged(const pqLineChartPlot *, int)));
-    this->connect(this->Model, SIGNAL(optionsChanged),
+    this->connect(this->Model, SIGNAL(optionsChanged()),
         this, SLOT(handlePlotOptionsChanged()));
     }
 
