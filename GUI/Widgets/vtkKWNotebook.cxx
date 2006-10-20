@@ -28,12 +28,6 @@
 #include <vtksys/stl/list>
 #include <vtksys/stl/algorithm>
 
-// The amount of padding that is to be added to the internal vertical padding
-// of the selected tab (basically defines the additional height of the 
-// selected tab compared to an unselected tab).
-
-#define VTK_KW_NB_TAB_SELECT_BD_Y  2
-
 // The amount of horizontal padding separating each tab in the top tab row.
 
 #define VTK_KW_NB_TAB_PADX         1
@@ -53,15 +47,9 @@
 
 #define VTK_KW_NB_TAB_UNSELECTED_VALUE 0.93
 
-// The color of the border of a pinned tab
-
-#define VTK_KW_NB_TAB_PIN_R 1.0
-#define VTK_KW_NB_TAB_PIN_G 1.0
-#define VTK_KW_NB_TAB_PIN_B 0.76
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.104");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.105");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -233,6 +221,20 @@ vtkKWNotebook::vtkKWNotebook()
   this->Mask            = vtkKWFrame::New();
   this->TabsFrame       = vtkKWFrame::New();
   this->TabPopupMenu    = 0;
+
+  this->SelectedPageTabPadding    = 2;
+
+  this->PageTabColor[0] = -1;
+  this->PageTabColor[1] = -1;
+  this->PageTabColor[2] = -1;
+
+  this->SelectedPageTabColor[0] = -1;
+  this->SelectedPageTabColor[1] = -1;
+  this->SelectedPageTabColor[2] = -1;
+
+  this->PinnedPageTabOutlineColor[0] = 1.0;
+  this->PinnedPageTabOutlineColor[1] = 1.0;
+  this->PinnedPageTabOutlineColor[2] = 0.76;
 
   // Internal structs
 
@@ -816,6 +818,16 @@ int vtkKWNotebook::AddPage(const char *title,
     }
   page->Frame->SetParent(this->Body);
   page->Frame->Create();
+  if (this->UseFrameWithScrollbars)
+    {
+    vtkKWFrameWithScrollbar::SafeDownCast(page->Frame)->SetBackgroundColor(
+      this->GetBackgroundColor());
+    }
+  else
+    {
+    vtkKWFrame::SafeDownCast(page->Frame)->SetBackgroundColor(
+      this->GetBackgroundColor());
+    }
 
   // Store the page title for fast page retrieval on title
 
@@ -1071,13 +1083,6 @@ void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
 
   this->ShowPageTab(page);
   
-  // Select the page tab: enlarge it
-
-  cmd << "pack " << page->TabFrame->GetWidgetName() 
-      << " -ipadx 0 -ipady " << VTK_KW_NB_TAB_SELECT_BD_Y 
-      << " -padx " << VTK_KW_NB_TAB_PADX
-      << endl;
-
   // Warning: the following can have *very* nasty side effects. For example, 
   // select a vtkKWView might trigger a ViewSelectedEvent that will bring
   // up the UI for that view. If showing that UI involves raising a page,
@@ -1091,9 +1096,9 @@ void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
   this->Script(cmd.str());
   cmd.rdbuf()->freeze(0);
   
-  // Update the page color
+  // Update the page aspect
 
-  this->UpdatePageTabBackgroundColor(page, 1);
+  this->UpdatePageTabAspect(page);
  
   // Bring or remove more pages depending on options
   
@@ -1192,14 +1197,9 @@ void vtkKWNotebook::ShowPageTabAsLow(vtkKWNotebook::Page *page)
 
   this->ShowPageTab(page);
 
-  // Unselect the page tab: shrink it (no ipady)
+  // Update the page aspect
 
-  this->Script("pack %s -ipadx 0 -ipady 0 -padx %d",
-               page->TabFrame->GetWidgetName(), VTK_KW_NB_TAB_PADX);
-
-  // Update the page color (dim it)
-
-  this->UpdatePageTabBackgroundColor(page, 0);
+  this->UpdatePageTabAspect(page);
 
   // Make sure everything has been resized properly
 
@@ -1223,6 +1223,8 @@ void vtkKWNotebook::LowerPage(vtkKWNotebook::Page *page)
   cmd << ends;
   this->Script(cmd.str());
   cmd.rdbuf()->freeze(0);
+
+  this->CurrentId = -1;
 
   // Lower the tab (which will schedule a resize)
 
@@ -1416,7 +1418,6 @@ void vtkKWNotebook::HidePage(vtkKWNotebook::Page *page)
     else
       {
       this->LowerPage(page);
-      this->CurrentId = -1;
       }
     }
 
@@ -1790,7 +1791,7 @@ void vtkKWNotebook::PinPage(vtkKWNotebook::Page *page)
     }
 
   page->Pinned = 1;
-  this->UpdatePageTabBackgroundColor(page, this->CurrentId == page->Id);
+  this->UpdatePageTabAspect(page);
 }
 
 //----------------------------------------------------------------------------
@@ -1820,7 +1821,7 @@ void vtkKWNotebook::UnpinPage(vtkKWNotebook::Page *page)
     }
 
   page->Pinned = 0;
-  this->UpdatePageTabBackgroundColor(page, this->CurrentId == page->Id);
+  this->UpdatePageTabAspect(page);
 }
 
 //----------------------------------------------------------------------------
@@ -2092,99 +2093,74 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page, 
-                                                 int selected)
+void vtkKWNotebook::UpdatePageTabAspect(vtkKWNotebook::Page *page)
 {
-  // If selected, use the same tab color as the page, otherwise use
-  // a shade of that page color.
-
-  if (selected)
+  if (!page)
     {
-    double fr, fg, fb;
-    this->GetBackgroundColor(&fr, &fg, &fb);
+    return;
+    }
 
-    page->Label->SetBackgroundColor(fr, fr, fb);
+  int selected = this->CurrentId == page->Id;
 
-    if (page->Icon)
-      {
-      page->ImageLabel->SetBackgroundColor(fr, fr, fb);
-      // Reset the imagelabel so that the icon is blended with the background
-      page->ImageLabel->SetImageToIcon(page->Icon);
-      }
-
-    // If the tab is pinned, use a color for the border of the tab
-    // and render text italic
-
-    if (!page->Pinned)
-      {
-      page->TabFrame->SetBackgroundColor(fr, fr, fb);
-      vtkKWTkUtilities::ChangeFontSlantToRoman(page->Label);
-      }
-    else
-      {
-      page->TabFrame->SetBackgroundColor(
-        VTK_KW_NB_TAB_PIN_R, VTK_KW_NB_TAB_PIN_G, VTK_KW_NB_TAB_PIN_B);
-      vtkKWTkUtilities::ChangeFontSlantToItalic(page->Label);
-      }
+  double frgb[3];
+  double *override = 
+    selected ? this->SelectedPageTabColor : this->PageTabColor;
+  if (override[0] >= 0.0 && override[1] >= 0.0 && override[2] >= 0.0)
+    {
+    frgb[0] = override[0];
+    frgb[1] = override[1];
+    frgb[2] = override[2];
     }
   else
     {
-    // Compute the shaded color based on the current frame background color
-
-    double fr, fg, fb;
-    this->GetBackgroundColor(&fr, &fg, &fb);
-
-    double fh, fs, fv;
-    if (fr == fg && fg == fb)
+    this->GetBackgroundColor(&frgb[0], &frgb[1], &frgb[2]);
+    if (!selected)
       {
-      fh = fs = 0.0;
-      fv = fr;
-      }
-    else
-      {
-      vtkMath::RGBToHSV(fr, fg, fb, &fh, &fs, &fv);
-      }
-
-    double r, g, b;
-    fv *= VTK_KW_NB_TAB_UNSELECTED_VALUE;
-    vtkMath::HSVToRGB(fh, fs, fv, &r, &g, &b);
-
-    page->Label->SetBackgroundColor(r, g, b);
-
-    if (page->Icon)
-      {
-      page->ImageLabel->SetBackgroundColor(r, g, b);
-      // Reset the imagelabel so that the icon is blended with the background
-      page->ImageLabel->SetImageToIcon(page->Icon);
-      }
-
-    // If the tab is pinned, use a different hue for the border of the tab
-
-    if (!page->Pinned)
-      {
-      page->TabFrame->SetBackgroundColor(r, g, b);
-      }
-    else
-      {
-      fr = (double)VTK_KW_NB_TAB_PIN_R;
-      fg = (double)VTK_KW_NB_TAB_PIN_G;
-      fb = (double)VTK_KW_NB_TAB_PIN_B;
-
-      if (fr == fg && fg == fb)
+      double fh, fs, fv;
+      if (frgb[0] == frgb[1] && frgb[1] == frgb[2])
         {
         fh = fs = 0.0;
-        fv = fr;
+        fv = frgb[0];
         }
       else
         {
-        vtkMath::RGBToHSV(fr, fg, fb, &fh, &fs, &fv);
+        vtkMath::RGBToHSV(frgb[0], frgb[1], frgb[2], &fh, &fs, &fv);
         }
-
       fv *= VTK_KW_NB_TAB_UNSELECTED_VALUE;
-      vtkMath::HSVToRGB(fh, fs, fv, &r, &g, &b);
-
-      page->TabFrame->SetBackgroundColor(r, g, b);
+      vtkMath::HSVToRGB(fh, fs, fv, &frgb[0], &frgb[1], &frgb[2]);
       }
+    }
+
+  page->Label->SetBackgroundColor(frgb);
+
+  if (page->Icon)
+    {
+    page->ImageLabel->SetBackgroundColor(frgb);
+    // Reset the imagelabel so that the icon is blended with the background
+    page->ImageLabel->SetImageToIcon(page->Icon);
+    }
+  
+  // If the tab is pinned, render text italic
+  
+  if (page->Pinned)
+    {
+    vtkKWTkUtilities::ChangeFontSlantToItalic(page->Label);
+    page->TabFrame->SetBackgroundColor(this->PinnedPageTabOutlineColor);
+    }
+  else
+    {
+    vtkKWTkUtilities::ChangeFontSlantToRoman(page->Label);
+    page->TabFrame->SetBackgroundColor(frgb);
+    }
+
+  // Update the space around
+
+  if (page->TabFrame->IsPacked())
+    {
+    this->Script("pack %s -ipadx 0 -ipady %d -padx %d",
+                 page->TabFrame->GetWidgetName(), 
+                 selected ? this->SelectedPageTabPadding : 0, 
+                 VTK_KW_NB_TAB_PADX);
     }
 
   // If the page that has just been update was the selected page, update the
@@ -2196,6 +2172,25 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
     this->UpdateMaskPosition();
     }
 #endif
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::UpdateAllPagesTabAspect()
+{
+  if (this->Internals)
+    {
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
+      {
+      if (*it)
+        {
+        this->UpdatePageTabAspect(*it);
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2760,6 +2755,95 @@ void vtkKWNotebook::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWNotebook::SetSelectedPageTabPadding(int arg)
+{
+  if (this->SelectedPageTabPadding == arg)
+    {
+    return;
+    }
+
+  this->SelectedPageTabPadding = arg;
+  
+  this->Modified();
+  this->UpdateAllPagesTabAspect();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::SetPageTabColor(double r, double g, double b)
+{
+  if (this->PageTabColor[0] == r && 
+      this->PageTabColor[1] == g &&
+      this->PageTabColor[2] == b)
+    {
+    return;
+    }
+
+  this->PageTabColor[0] = r;
+  this->PageTabColor[1] = g;
+  this->PageTabColor[2] = b;
+  
+  this->Modified();
+  this->UpdateAllPagesTabAspect();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::SetSelectedPageTabColor(double r, double g, double b)
+{
+  if (this->SelectedPageTabColor[0] == r && 
+      this->SelectedPageTabColor[1] == g &&
+      this->SelectedPageTabColor[2] == b)
+    {
+    return;
+    }
+
+  this->SelectedPageTabColor[0] = r;
+  this->SelectedPageTabColor[1] = g;
+  this->SelectedPageTabColor[2] = b;
+  
+  this->Modified();
+  this->UpdateAllPagesTabAspect();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::SetPinnedPageTabOutlineColor(double r, double g, double b)
+{
+  if (this->PinnedPageTabOutlineColor[0] == r && 
+      this->PinnedPageTabOutlineColor[1] == g &&
+      this->PinnedPageTabOutlineColor[2] == b)
+    {
+    return;
+    }
+
+  this->PinnedPageTabOutlineColor[0] = r;
+  this->PinnedPageTabOutlineColor[1] = g;
+  this->PinnedPageTabOutlineColor[2] = b;
+  
+  this->Modified();
+  this->UpdateAllPagesTabAspect();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::SetBackgroundColor(double r, double g, double b)
+{
+  this->Superclass::SetBackgroundColor(r, g, b);
+
+  if (this->TabsFrame)
+    {
+    this->TabsFrame->SetBackgroundColor(r, g, b);
+    }
+  if (this->Body)
+    {
+    this->Body->SetBackgroundColor(r, g, b);
+    }
+  if (this->Mask)
+    {
+    this->Mask->SetBackgroundColor(r, g, b);
+    }
+
+  this->UpdateAllPagesTabAspect();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWNotebook::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -2785,5 +2869,20 @@ void vtkKWNotebook::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "EnablePageTabContextMenu: " 
      << (this->EnablePageTabContextMenu ? "On" : "Off")
      << endl;
-}
 
+  os << indent << "SelectedPageTabPadding: " 
+     << this->SelectedPageTabPadding << ")\n";
+
+  os << indent << "PageTabColor: (" 
+     << this->PageTabColor[0] << ", " 
+     << this->PageTabColor[1] << ", " 
+     << this->PageTabColor[2] << ")\n";
+  os << indent << "SelectedPageTabColor: (" 
+     << this->SelectedPageTabColor[0] << ", " 
+     << this->SelectedPageTabColor[1] << ", " 
+     << this->SelectedPageTabColor[2] << ")\n";
+  os << indent << "PinnedPageTabOutlineColor: (" 
+     << this->PinnedPageTabOutlineColor[0] << ", " 
+     << this->PinnedPageTabOutlineColor[1] << ", " 
+     << this->PinnedPageTabOutlineColor[2] << ")\n";
+}

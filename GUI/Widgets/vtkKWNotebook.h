@@ -291,9 +291,44 @@ public:
   vtkBooleanMacro(EnablePageTabContextMenu, int);
   
   // Description:
+  // Set/Get the background color of the widget.
+  // Override the super to make sure all elements are set correctly.
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the color of the page tabs, the outline of the pinned page tabs
+  // and the selected page tab. 
+  // Note that PageTabColor, and SelectedPageTabColor are
+  // undefined by default (i.e. one of the RGB component is < 0), meaning that
+  // the background color of the native window system will be used in place of
+  // SelectedTabColor, and a slightly darker shade of that background color in
+  // place of TabColor. 
+  vtkGetVector3Macro(PageTabColor,double);
+  virtual void SetPageTabColor(double r, double g, double b);
+  virtual void SetPageTabColor(double rgb[3]) 
+    { this->SetPageTabColor(rgb[0], rgb[1], rgb[2]); };
+  vtkGetVector3Macro(SelectedPageTabColor,double);
+  virtual void SetSelectedPageTabColor(double r, double g, double b);
+  virtual void SetSelectedPageTabColor(double rgb[3]) 
+    { this->SetSelectedPageTabColor(rgb[0], rgb[1], rgb[2]); };
+  vtkGetVector3Macro(PinnedPageTabOutlineColor,double);
+  virtual void SetPinnedPageTabOutlineColor(double r, double g, double b);
+  virtual void SetPinnedPageTabOutlineColor(double rgb[3]) 
+    { this->SetPinnedPageTabOutlineColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the amount of padding that is to be added to the internal
+  // vertical padding of the selected tab (basically defines the additional
+  // height of the selected tab compared to an unselected tabs).
+  vtkGetMacro(SelectedPageTabPadding, int);
+  virtual void SetSelectedPageTabPadding(int arg);
+
+  // Description:
   // Get the id of the visible page which tab contains a given pair of screen
   // coordinates (-1 if not found).
-  int GetPageIdContainingCoordinatesInTab(int x, int y);
+  virtual int GetPageIdContainingCoordinatesInTab(int x, int y);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -335,6 +370,11 @@ protected:
   int PagesCanBePinned;
   int EnablePageTabContextMenu;
   int UseFrameWithScrollbars;
+
+  double PageTabColor[3];
+  double SelectedPageTabColor[3];
+  double PinnedPageTabOutlineColor[3];
+  int SelectedPageTabPadding;
 
   vtkKWFrame *TabsFrame;
   vtkKWFrame *Body;
@@ -413,9 +453,10 @@ protected:
   int RemoveFromMostRecentPages(Page*);
   int PutOnTopOfMostRecentPages(Page*);
 
-  // Update the tab frame color of a page given a selection status
+  // Update the tab frame color of a page
 
-  void UpdatePageTabBackgroundColor(Page*, int selected);
+  virtual void UpdatePageTabAspect(Page*);
+  virtual void UpdateAllPagesTabAspect();
 
   //ETX
 
