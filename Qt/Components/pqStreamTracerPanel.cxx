@@ -359,6 +359,7 @@ void pqStreamTracerPanel::onUsePointSource()
         this->Implementation->PointSourceWidget->setWidgetVisible(true);
         this->Implementation->LineSourceWidget->setWidgetVisible(false);
         pqSMAdaptor::setUncheckedProxyProperty(source_property, source);
+        emit this->canAcceptOrReject(true);
         break;
         }
       }
@@ -379,6 +380,7 @@ void pqStreamTracerPanel::onUseLineSource()
         this->Implementation->PointSourceWidget->setWidgetVisible(false);
         this->Implementation->LineSourceWidget->setWidgetVisible(true);
         pqSMAdaptor::setUncheckedProxyProperty(source_property, source);
+        emit this->canAcceptOrReject(true);
         break;
         }
       }
