@@ -45,7 +45,7 @@ class pqAbstractItemViewEventPlayer :
   public pqWidgetEventPlayer
 {
 public:
-  pqAbstractItemViewEventPlayer();
+  pqAbstractItemViewEventPlayer(QObject* p=0);
 
   bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error);
 

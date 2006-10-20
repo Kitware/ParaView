@@ -49,7 +49,8 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////
 // pqXMLEventSource
 
-pqXMLEventSource::pqXMLEventSource() :
+pqXMLEventSource::pqXMLEventSource(QObject* p) :
+  pqEventSource(p),
   Implementation(new pqImplementation())
 {
 }
@@ -78,19 +79,19 @@ void pqXMLEventSource::setContent(const QString& path)
   this->Implementation->CurrentEvent = xml_events.firstChild();
 }
 
-bool pqXMLEventSource::getNextEvent(
+int pqXMLEventSource::getNextEvent(
   QString& object,
   QString& command,
   QString& arguments)
 {
   if(this->Implementation->CurrentEvent.isNull())
-    return false;
+    return DONE;
     
   if(!this->Implementation->CurrentEvent.isElement())
-    return false;
+    return FAILURE;
     
   if(this->Implementation->CurrentEvent.nodeName() != "pqevent")
-    return false;
+    return FAILURE;
     
   object = this->Implementation->CurrentEvent.toElement().attribute("object");
   command = this->Implementation->CurrentEvent.toElement().attribute("command");
@@ -99,5 +100,6 @@ bool pqXMLEventSource::getNextEvent(
   this->Implementation->CurrentEvent =
     this->Implementation->CurrentEvent.nextSibling();
 
-  return true;
+  return SUCCESS;
 }
+

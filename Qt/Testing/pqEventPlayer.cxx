@@ -45,7 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QWidget>
 #include <QtDebug>
-#include <QAbstractEventDispatcher>
 
 pqEventPlayer::pqEventPlayer()
 {
@@ -53,12 +52,11 @@ pqEventPlayer::pqEventPlayer()
 
 pqEventPlayer::~pqEventPlayer()
 {
-  for(int i = 0; i != this->Players.size(); ++i)
-    delete this->Players[i];
 }
 
 void pqEventPlayer::addDefaultWidgetEventPlayers()
 {
+  addWidgetEventPlayer(new pqBasicWidgetEventPlayer());
   addWidgetEventPlayer(new pqAbstractActivateEventPlayer());
   addWidgetEventPlayer(new pqAbstractBooleanEventPlayer());
   addWidgetEventPlayer(new pqAbstractDoubleEventPlayer());
@@ -66,14 +64,14 @@ void pqEventPlayer::addDefaultWidgetEventPlayers()
   addWidgetEventPlayer(new pqAbstractItemViewEventPlayer());
   addWidgetEventPlayer(new pqAbstractStringEventPlayer());
   addWidgetEventPlayer(new pqTabBarEventPlayer());
-  addWidgetEventPlayer(new pqBasicWidgetEventPlayer());
 }
 
 void pqEventPlayer::addWidgetEventPlayer(pqWidgetEventPlayer* Player)
 {
   if(Player)
     {
-    this->Players.push_back(Player);
+    this->Players.push_front(Player);
+    Player->setParent(this);
     }
 }
 
@@ -123,3 +121,4 @@ void pqEventPlayer::playEvent(
   // The event was handled successfully ...
   Error = false;
 }
+

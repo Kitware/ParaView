@@ -44,7 +44,7 @@ class pqAbstractBooleanEventPlayer :
   public pqWidgetEventPlayer
 {
 public:
-  pqAbstractBooleanEventPlayer();
+  pqAbstractBooleanEventPlayer(QObject* p=0);
 
   bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error);
 

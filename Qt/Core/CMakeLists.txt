@@ -12,7 +12,16 @@ INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
   ${pqCore_BINARY_DIR}
   ${pqCore_SOURCE_DIR}
+  ${PYTHON_INCLUDE_PATH}
 )
+
+IF(QT_TESTING_WITH_PYTHON)
+  SET(PYTHON_CORE_SRCS 
+    pqPythonEventSourceImage.cxx
+    pqPythonEventSourceImage.h
+  )
+ENDIF(QT_TESTING_WITH_PYTHON)
+
 
 # Reduce the number of dirs that get included on moc command line
 # since it causes issues on Windows 2000.
@@ -52,7 +61,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerStartupContext.h
   pqServerStartups.h
   pqSettings.h
-  pqTestUtility.h
+  pqCoreTestUtility.h
   pqUndoStack.h
   pqQVTKWidgetEventTranslator.h
   )
@@ -181,8 +190,8 @@ ADD_LIBRARY(pqCore
   pqServerStartups.h
   pqSettings.cxx
   pqSettings.h
-  pqTestUtility.cxx
-  pqTestUtility.h
+  pqCoreTestUtility.cxx
+  pqCoreTestUtility.h
   pqUndoRedoStateLoader.cxx
   pqUndoRedoStateLoader.h
   pqUndoStack.cxx
@@ -206,6 +215,8 @@ ADD_LIBRARY(pqCore
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
 
+  ${PYTHON_CORE_SRCS}
+
   vtkPVAxesWidget.cxx
   vtkPVAxesWidget.h
   vtkPVAxesActor.cxx
@@ -219,6 +230,12 @@ TARGET_LINK_LIBRARIES(pqCore
   vtkPVServerManager
   QVTK
 )
+
+IF(QT_TESTING_WITH_PYTHON)
+  TARGET_LINK_LIBRARIES(pqCore
+    ${PYTHON_LIBRARIES}
+  )
+ENDIF(QT_TESTING_WITH_PYTHON)
 
 
 INSTALL(TARGETS pqCore

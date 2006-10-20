@@ -37,7 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QtDebug>
 
-pqBasicWidgetEventPlayer::pqBasicWidgetEventPlayer()
+pqBasicWidgetEventPlayer::pqBasicWidgetEventPlayer(QObject* p)
+  : pqWidgetEventPlayer(p)
 {
 }
 

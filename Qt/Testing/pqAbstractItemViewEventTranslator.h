@@ -51,7 +51,7 @@ class pqAbstractItemViewEventTranslator :
   Q_OBJECT
   
 public:
-  pqAbstractItemViewEventTranslator();
+  pqAbstractItemViewEventTranslator(QObject* p=0);
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 

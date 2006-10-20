@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractButton>
 #include <QtDebug>
 
-pqAbstractBooleanEventPlayer::pqAbstractBooleanEventPlayer()
+pqAbstractBooleanEventPlayer::pqAbstractBooleanEventPlayer(QObject* p)
+  : pqWidgetEventPlayer(p)
 {
 }
 

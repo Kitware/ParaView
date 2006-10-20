@@ -45,7 +45,7 @@ class QTTESTING_EXPORT pqThreadedEventSource : public pqEventSource
 {
   Q_OBJECT
 public:
-  pqThreadedEventSource();
+  pqThreadedEventSource(QObject* p);
   ~pqThreadedEventSource();
 
   /** Called by the dispatcher on the GUI thread.
@@ -53,7 +53,7 @@ public:
     returned, false if there are no more events. 
     In the case of a threaded event source, this function is called by the GUI
     thread and waits for the other thread to pos and event. */
-  virtual bool getNextEvent(
+  virtual int getNextEvent(
     QString& object,
     QString& command,
     QString& arguments);
@@ -70,7 +70,8 @@ protected:
   void start();
 
   // called by the testing thread to signify it is done
-  void done();
+  // pass in zero for success, non-zero for failure
+  void done(int);
 
   // run the thread, return 
   virtual void run() = 0;

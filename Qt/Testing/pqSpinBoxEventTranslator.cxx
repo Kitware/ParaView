@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSpinBox>
 #include <QEvent>
 
-pqSpinBoxEventTranslator::pqSpinBoxEventTranslator() :
+pqSpinBoxEventTranslator::pqSpinBoxEventTranslator(QObject* p)
+  : pqWidgetEventTranslator(p),
   CurrentObject(0)
 {
 }

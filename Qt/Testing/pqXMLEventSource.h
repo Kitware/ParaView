@@ -43,12 +43,12 @@ class QTTESTING_EXPORT pqXMLEventSource :
   public pqEventSource
 {
 public:
-  pqXMLEventSource();
+  pqXMLEventSource(QObject* p = 0);
   ~pqXMLEventSource();
 
-  void setContent(const QString& path);
+  virtual void setContent(const QString& path);
 
-  virtual bool getNextEvent(
+  virtual int getNextEvent(
     QString& object,
     QString& command,
     QString& arguments);

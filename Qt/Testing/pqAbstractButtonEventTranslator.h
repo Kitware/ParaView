@@ -49,7 +49,7 @@ class pqAbstractButtonEventTranslator :
   Q_OBJECT
   
 public:
-  pqAbstractButtonEventTranslator();
+  pqAbstractButtonEventTranslator(QObject* p=0);
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 

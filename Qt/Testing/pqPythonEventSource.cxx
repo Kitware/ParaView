@@ -163,7 +163,8 @@ public:
   PyThreadState* MainThreadState;
 };
 
-pqPythonEventSource::pqPythonEventSource()
+pqPythonEventSource::pqPythonEventSource(QObject* p)
+  : pqThreadedEventSource(p)
 {
   this->Internal = new pqInternal;
   
@@ -213,11 +214,12 @@ bool pqPythonEventSource::event(QEvent* e)
 
 void pqPythonEventSource::run()
 {
-  const char* filename = this->Internal->FileName.toAscii().data();
-  FILE* pythonScript = fopen(filename, "r");
+
+  QString filename = this->Internal->FileName;
+  FILE* pythonScript = fopen(filename.toAscii().data(), "r");
   if(!pythonScript)
     {
-    // TODO: report error
+    printf("Unable to open python script\n");
     return;
     }
   
@@ -230,7 +232,11 @@ void pqPythonEventSource::run()
   Instance = this;
 
   // finally run the script
-  PyRun_SimpleFile(pythonScript, filename);
+  int result = PyRun_SimpleFile(pythonScript, filename.toAscii().data());
+  if( result == 2 )
+    {
+    printf("invalid python file\n");
+    }
   
   PyThreadState_Swap(NULL);
 
@@ -241,6 +247,6 @@ void pqPythonEventSource::run()
   
   fclose(pythonScript);
 
-  this->done();
+  this->done(result);
 }
 

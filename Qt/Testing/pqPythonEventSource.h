@@ -43,7 +43,7 @@ class QTTESTING_EXPORT pqPythonEventSource :
   public pqThreadedEventSource
 {
 public:
-  pqPythonEventSource();
+  pqPythonEventSource(QObject* p = 0);
   ~pqPythonEventSource();
 
   void setContent(const QString& path);

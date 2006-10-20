@@ -77,20 +77,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWriterFactory.h"
 
 #include <pqConnect.h>
-#include <pqEventDispatcher.h>
-#include <pqEventPlayer.h>
-#include <pqEventTranslator.h>
 #include <pqFileDialog.h>
 #include <pqLocalFileDialogModel.h>
 #include <pqObjectNaming.h>
 #include <pqProgressBar.h>
-#include <pqRecordEventsDialog.h>
 #include <pqServerResources.h>
 #include <pqSetData.h>
 #include <pqSetName.h>
-#include <pqTestUtility.h>
+#include <pqCoreTestUtility.h>
 #include <pqUndoStack.h>
-#include <pqXMLEventSource.h>
+#include "QtTestingConfigure.h"
 
 #ifdef PARAVIEW_EMBED_PYTHON
 #include <pqPythonDialog.h>
@@ -151,8 +147,6 @@ public:
 #ifdef PARAVIEW_EMBED_PYTHON
   this->PythonDialog = 0;
 #endif // PARAVIEW_EMBED_PYTHON
-
-    pqTestUtility::Setup(this->EventPlayer);
   }
   
   ~pqImplementation()
@@ -194,9 +188,7 @@ public:
   QPointer<pqPythonDialog> PythonDialog;
 #endif // PARAVIEW_EMBED_PYTHON
 
-  pqXMLEventSource EventSource;
-  pqEventPlayer EventPlayer;
-  pqEventDispatcher EventDispatcher;
+  pqCoreTestUtility TestUtility;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -847,7 +839,7 @@ bool pqMainWindowCore::compareView(
   // All tests need a 300x300 render window size.
   QSize cur_size = renModule->getWidget()->size();
   renModule->getWidget()->resize(300,300);
-  bool ret = pqTestUtility::CompareImage(render_window, referenceImage, 
+  bool ret = pqCoreTestUtility::CompareImage(render_window, referenceImage, 
     threshold, output, tempDirectory);
   renModule->getWidget()->resize(cur_size);
   renModule->render();
@@ -1174,7 +1166,7 @@ void pqMainWindowCore::onFileSaveScreenshot(const QStringList& files)
 
   for(int i = 0; i != files.size(); ++i)
     {
-    if(!pqTestUtility::SaveScreenshot(rm->getWidget()->GetRenderWindow(), files[i]))
+    if(!pqCoreTestUtility::SaveScreenshot(rm->getWidget()->GetRenderWindow(), files[i]))
       {
       qCritical() << "Save Image failed.";
       }
@@ -1365,8 +1357,13 @@ void pqMainWindowCore::onToolsDumpWidgetNames()
 void pqMainWindowCore::onToolsRecordTest()
 {
   QString filters;
-  filters += "XML Files (*.xml)";
-  filters += ";;All Files (*)";
+#ifdef QT_TESTING_WITH_XML
+  filters += "XML Files (*.xml);;";
+#endif
+#ifdef QT_TESTING_WITH_PYTHON
+  filters += "Python Files (*.py);;";
+#endif
+  filters += "All Files (*)";
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
       QApplication::activeWindow(), tr("Record Test"), QString(), filters);
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -1380,16 +1377,12 @@ void pqMainWindowCore::onToolsRecordTest()
 
 void pqMainWindowCore::onToolsRecordTest(const QStringList &fileNames)
 {
-  QStringList::ConstIterator iter = fileNames.begin();
-  for( ; iter != fileNames.end(); ++iter)
+  if(fileNames.empty())
     {
-    pqEventTranslator* const translator = new pqEventTranslator();
-    pqTestUtility::Setup(*translator);
-
-    pqRecordEventsDialog* const dialog = new pqRecordEventsDialog(
-        translator, *iter, QApplication::activeWindow());
-    dialog->show();
+    return;
     }
+
+  this->Implementation->TestUtility.recordTests(fileNames[0]);
 }
 
 void pqMainWindowCore::onToolsRecordTestScreenshot()
@@ -1434,7 +1427,7 @@ void pqMainWindowCore::onToolsRecordTestScreenshot(const QStringList &fileNames)
   QStringList::ConstIterator iter = fileNames.begin();
   for( ; iter != fileNames.end(); ++iter)
     {
-    if(!pqTestUtility::SaveScreenshot(
+    if(!pqCoreTestUtility::SaveScreenshot(
         render_module->getWidget()->GetRenderWindow(), *iter))
       {
       qCritical() << "Save Image failed.";
@@ -1448,8 +1441,13 @@ void pqMainWindowCore::onToolsRecordTestScreenshot(const QStringList &fileNames)
 void pqMainWindowCore::onToolsPlayTest()
 {
   QString filters;
-  filters += "XML Files (*.xml)";
-  filters += ";;All Files (*)";
+#ifdef QT_TESTING_WITH_XML
+  filters += "XML Files (*.xml);;";
+#endif
+#ifdef QT_TESTING_WITH_PYTHON
+  filters += "Python Files (*.py);;";
+#endif
+  filters += "All Files (*)";
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
       QApplication::activeWindow(), tr("Play Test"), QString(), filters);
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -1465,10 +1463,7 @@ void pqMainWindowCore::onToolsPlayTest(const QStringList &fileNames)
 {
   if(1 == fileNames.size())
     {
-    this->Implementation->EventSource.setContent(fileNames[0]);
-    this->Implementation->EventDispatcher.playEvents(
-      this->Implementation->EventSource,
-      this->Implementation->EventPlayer);
+    this->Implementation->TestUtility.playTests(fileNames[0]);
     }
 }
 

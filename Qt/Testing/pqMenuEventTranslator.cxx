@@ -37,7 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QKeyEvent>
 #include <QMenu>
 
-pqMenuEventTranslator::pqMenuEventTranslator()
+pqMenuEventTranslator::pqMenuEventTranslator(QObject* p)
+  : pqWidgetEventTranslator(p)
 {
 }
 

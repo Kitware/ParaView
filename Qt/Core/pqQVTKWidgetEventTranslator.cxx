@@ -36,7 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 
 #include "QVTKWidget.h"
-pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator()
+pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator(QObject* p)
+  : pqWidgetEventTranslator(p)
 {
 }
 

@@ -47,7 +47,7 @@ class pqDoubleSpinBoxEventTranslator :
   Q_OBJECT
   
 public:
-  pqDoubleSpinBoxEventTranslator();
+  pqDoubleSpinBoxEventTranslator(QObject* p=0);
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 

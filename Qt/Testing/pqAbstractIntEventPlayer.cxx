@@ -36,7 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSpinBox>
 #include <QtDebug>
 
-pqAbstractIntEventPlayer::pqAbstractIntEventPlayer()
+pqAbstractIntEventPlayer::pqAbstractIntEventPlayer(QObject* p)
+  : pqWidgetEventPlayer(p)
 {
 }
 

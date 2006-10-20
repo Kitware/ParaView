@@ -36,7 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLineEdit>
 #include <QtDebug>
 
-pqAbstractStringEventPlayer::pqAbstractStringEventPlayer()
+pqAbstractStringEventPlayer::pqAbstractStringEventPlayer(QObject* p)
+  : pqWidgetEventPlayer(p)
 {
 }
 

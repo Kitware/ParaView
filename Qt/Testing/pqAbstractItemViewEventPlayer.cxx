@@ -62,7 +62,8 @@ static QModelIndex GetIndex(QAbstractItemView& View, const QString& Name)
 ///////////////////////////////////////////////////////////////////////////////
 // pqAbstractItemViewEventPlayer
 
-pqAbstractItemViewEventPlayer::pqAbstractItemViewEventPlayer()
+pqAbstractItemViewEventPlayer::pqAbstractItemViewEventPlayer(QObject* p)
+  : pqWidgetEventPlayer(p)
 {
 }
 

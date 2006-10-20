@@ -33,10 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPythonEventObserver_h
 #define _pqPythonEventObserver_h
 
-#include <QObject>
+#include "pqEventObserver.h"
 #include <QHash>
 #include <QString>
-class QTextStream;
 
 /**
 Observes high-level ParaView events, and serializes them to a stream as Python
@@ -50,24 +49,23 @@ must ensure that it goes out of scope before trying to playback the stream.
 \sa pqEventTranslator, pqStdoutEventObserver, pqPythonEventSource.
 */
 
-class pqPythonEventObserver :
-  public QObject
+class pqPythonEventObserver : public pqEventObserver
 {
   Q_OBJECT
   
 public:
-  pqPythonEventObserver(QTextStream& Stream);
+  pqPythonEventObserver(QObject* p=0);
   ~pqPythonEventObserver();
 
-public slots:
   void onRecordEvent(
     const QString& Widget,
     const QString& Command,
     const QString& Arguments);
 
+  void setStream(QTextStream*);
+
 private:
   /// Stores a stream that will be used to store the Python output
-  QTextStream& Stream;
   QHash<QString, QString> Names;
 };
 

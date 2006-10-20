@@ -14,7 +14,7 @@
 #include "pqApplicationCore.h"
 #include "pqPipelineBuilder.h"
 #include "pqUndoStack.h"
-#include "pqTestUtility.h"
+#include "pqCoreTestUtility.h"
 
 
 // our main window
@@ -94,7 +94,7 @@ public:
       return false;
       }
 
-    bool ret = pqTestUtility::CompareImage(render_window, referenceImage, 
+    bool ret = pqCoreTestUtility::CompareImage(render_window, referenceImage, 
       threshold, output, tempDirectory);
     renModule->render();
     return ret;

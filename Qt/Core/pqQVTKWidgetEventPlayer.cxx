@@ -40,7 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "QVTKWidget.h"
-pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer()
+pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
+  : pqWidgetEventPlayer(p)
 {
 }
 

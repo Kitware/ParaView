@@ -31,14 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqFileDialogEventPlayer.h"
-#include "pqTestUtility.h"
+#include "pqCoreTestUtility.h"
 
 #include <pqFileDialog.h>
 
 #include <QApplication>
 #include <QtDebug>
 
-pqFileDialogEventPlayer::pqFileDialogEventPlayer()
+pqFileDialogEventPlayer::pqFileDialogEventPlayer(QObject* p)
+  : pqWidgetEventPlayer(p)
 {
 }
 
@@ -57,7 +58,7 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
 
   if(Command == "filesSelected")
     {
-    const QString data_directory = pqTestUtility::DataRoot();
+    const QString data_directory = pqCoreTestUtility::DataRoot();
     if(data_directory.isEmpty())
       {
       qCritical() << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";

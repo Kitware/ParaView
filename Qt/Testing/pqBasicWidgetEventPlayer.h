@@ -44,7 +44,7 @@ class pqBasicWidgetEventPlayer :
   public pqWidgetEventPlayer
 {
 public:
-  pqBasicWidgetEventPlayer();
+  pqBasicWidgetEventPlayer(QObject* p=0);
 
   bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error);
 

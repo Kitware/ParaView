@@ -127,19 +127,29 @@ void pqEventDispatcher::playNextEvent()
   // block signals as some event sources may interact with the event loop
   this->blockSignals(true);
 
-  bool result = this->Implementation->Source->getNextEvent(
+  int result = this->Implementation->Source->getNextEvent(
                               object, command, arguments);
   this->blockSignals(false);
 
-  if(!result)
+  if(result == pqEventSource::DONE)
     {
     this->stopPlayback();
     emit this->succeeded();
     return;
     }
+  else if(result == pqEventSource::FAILURE)
+    {
+    this->stopPlayback();
+    emit this->failed();
+    return;
+    }
     
   bool error = false;
+  // block signals as some event sources may interact with the event loop, as
+  // well as some players interact with the event loop
+  this->blockSignals(true);
   this->Implementation->Player->playEvent(object, command, arguments, error);
+  this->blockSignals(false);
   if(error)
     {
     this->stopPlayback();

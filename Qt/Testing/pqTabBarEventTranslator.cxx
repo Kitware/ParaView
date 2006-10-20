@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTabBar>
 #include <QEvent>
 
-pqTabBarEventTranslator::pqTabBarEventTranslator() :
+pqTabBarEventTranslator::pqTabBarEventTranslator(QObject* p) 
+  : pqWidgetEventTranslator(p),
   CurrentObject(0)
 {
 }

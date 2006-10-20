@@ -33,8 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqXMLEventObserver_h
 #define _pqXMLEventObserver_h
 
-#include <QObject>
-class QTextStream;
+#include "pqEventObserver.h"
 
 /**
 Observes high-level ParaView events, and serializes them to a stream as XML
@@ -48,14 +47,15 @@ must ensure that it goes out of scope before trying to playback the stream.
 \sa pqEventTranslator, pqStdoutEventObserver, pqXMLEventSource.
 */
 
-class pqXMLEventObserver :
-  public QObject
+class pqXMLEventObserver : public pqEventObserver
 {
   Q_OBJECT
   
 public:
-  pqXMLEventObserver(QTextStream& Stream);
+  pqXMLEventObserver(QObject* p);
   ~pqXMLEventObserver();
+
+  virtual void setStream(QTextStream* stream);
 
 public slots:
   void onRecordEvent(
@@ -64,8 +64,6 @@ public slots:
     const QString& Arguments);
 
 private:
-  /// Stores a stream that will be used to store the XML output
-  QTextStream& Stream;
 };
 
 #endif // !_pqXMLEventObserver_h

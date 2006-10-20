@@ -49,7 +49,7 @@ class pqMenuEventTranslator :
   Q_OBJECT
   
 public:
-  pqMenuEventTranslator();
+  pqMenuEventTranslator(QObject* p=0);
   ~pqMenuEventTranslator();
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);

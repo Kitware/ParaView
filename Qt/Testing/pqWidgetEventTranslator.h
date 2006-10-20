@@ -49,6 +49,7 @@ class QTTESTING_EXPORT pqWidgetEventTranslator :
   Q_OBJECT
   
 public:
+  pqWidgetEventTranslator(QObject* p=0) : QObject(p) {}
   virtual ~pqWidgetEventTranslator() {}
   
   /** Derivatives should implement this and translate events into commands,
@@ -61,7 +62,6 @@ signals:
   void recordEvent(QObject* Object, const QString& Command, const QString& Arguments);
 
 protected:
-  pqWidgetEventTranslator() {}
   pqWidgetEventTranslator(const pqWidgetEventTranslator&);
   pqWidgetEventTranslator& operator=(const pqWidgetEventTranslator&);
 };

@@ -47,7 +47,7 @@ class pqAbstractSliderEventTranslator :
   Q_OBJECT
   
 public:
-  pqAbstractSliderEventTranslator();
+  pqAbstractSliderEventTranslator(QObject* p=0);
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 

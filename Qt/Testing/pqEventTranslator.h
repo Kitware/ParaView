@@ -55,7 +55,7 @@ class QTTESTING_EXPORT pqEventTranslator :
   Q_OBJECT
 
 public:
-  pqEventTranslator();
+  pqEventTranslator(QObject* p=0);
   ~pqEventTranslator();
 
   /**
@@ -68,6 +68,12 @@ public:
 
   /// Adds a Qt object to a list of objects that should be ignored when translating events (useful to prevent recording UI events from being captured as part of the recording)
   void ignoreObject(QObject* Object);
+
+  /// start listening to the GUI and translating events
+  void start();
+  
+  /// stop listening to the GUI and translating events
+  void stop();
 
 signals:
   /// This signal will be emitted every time a translator generates a high-level ParaView event.  Observers should connect to this signal to serialize high-level events.

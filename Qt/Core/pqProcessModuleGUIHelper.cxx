@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqOutputWindowAdapter.h"
 #include "pqOutputWindow.h"
-#include "pqTestUtility.h"
+#include "pqCoreTestUtility.h"
 
 #include <pqObjectNaming.h>
 
@@ -111,7 +111,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.4");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.5");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -149,8 +149,8 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     this->Implementation->Window->show();
     
     // get the tester going when the application starts
-    pqTestUtility tester(*this);
-    QTimer::singleShot(0, &tester, SLOT(runTests()));
+    pqCoreTestUtility tester;
+    QTimer::singleShot(0, &tester, SLOT(playTests()));
     
     // Starts the event loop.
     QCoreApplication* app = QApplication::instance();

@@ -40,7 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
-pqAbstractButtonEventTranslator::pqAbstractButtonEventTranslator()
+pqAbstractButtonEventTranslator::pqAbstractButtonEventTranslator(QObject* p)
+  : pqWidgetEventTranslator(p)
 {
 }
 

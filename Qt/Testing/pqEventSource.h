@@ -42,15 +42,25 @@ class QTTESTING_EXPORT pqEventSource : public QObject
 {
   Q_OBJECT
 public:
+  pqEventSource(QObject* p) : QObject(p) {}
   virtual ~pqEventSource() {}
 
-  /** Retrieves the next available event.  Returns true if an event was
-  returned, false if there are no more events. */
-  virtual bool getNextEvent(
+  enum { SUCCESS, FAILURE, DONE };
+
+  /** Retrieves the next available event.  
+    Returns SUCCESS if an event was returned and can be processed,
+    FAILURE if there was a problem,
+    DONE, if there are no more events. */
+  virtual int getNextEvent(
     QString& object,
     QString& command,
     QString& arguments) = 0;
 
+  /** Set the filename for contents.
+      Returns true for valid file, false for invalid file */
+  virtual void setContent(const QString& filename) = 0;
+
 };
 
 #endif // !_pqEventSource_h
+

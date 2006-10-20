@@ -50,27 +50,43 @@ static const QString textToXML(const QString& string)
 ////////////////////////////////////////////////////////////////////////////////////
 // pqXMLEventObserver
 
-pqXMLEventObserver::pqXMLEventObserver(QTextStream& stream) :
-  Stream(stream)
+pqXMLEventObserver::pqXMLEventObserver(QObject* p) 
+  : pqEventObserver(p)
 {
-  this->Stream << "<?xml version=\"1.0\" ?>\n";
-  this->Stream << "<pqevents>\n";
 }
 
 pqXMLEventObserver::~pqXMLEventObserver()
 {
-  this->Stream << "</pqevents>\n";
 }
+
+void pqXMLEventObserver::setStream(QTextStream* stream)
+{
+  if(this->Stream)
+    {
+    *this->Stream << "</pqevents>\n";
+    }
+  pqEventObserver::setStream(stream);
+  if(this->Stream)
+    {
+    *this->Stream << "<?xml version=\"1.0\" ?>\n";
+    *this->Stream << "<pqevents>\n";
+    }
+}
+
 
 void pqXMLEventObserver::onRecordEvent(
   const QString& Widget,
   const QString& Command,
   const QString& Arguments)
 {
-  this->Stream
-    << "  <pqevent "
-    << "object=\"" << textToXML(Widget).toAscii().data() << "\" "
-    << "command=\"" << textToXML(Command).toAscii().data() << "\" "
-    << "arguments=\"" << textToXML(Arguments).toAscii().data() << "\" "
-    << "/>\n";
+  if(this->Stream)
+    {
+    *this->Stream
+      << "  <pqevent "
+      << "object=\"" << textToXML(Widget).toAscii().data() << "\" "
+      << "command=\"" << textToXML(Command).toAscii().data() << "\" "
+      << "arguments=\"" << textToXML(Arguments).toAscii().data() << "\" "
+      << "/>\n";
+    }
 }
+

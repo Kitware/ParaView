@@ -1,11 +1,13 @@
 
 PROJECT(QtTesting)
 
-#OPTION(QT_TESTING_WITH_PYTHON "Build Testing with Python" ON)
-SET(QT_TESTING_WITH_PYTHON OFF)
+OPTION(QT_TESTING_WITH_PYTHON "Build Testing with Python" ON)
 SET(QT_TESTING_WITH_XML ON)
 
 IF(QT_TESTING_WITH_PYTHON)
+  
+  INCLUDE(${CMAKE_ROOT}/Modules/FindPythonLibs.cmake)
+
   INCLUDE_DIRECTORIES(
     ${PYTHON_INCLUDE_PATH}
   )
@@ -40,6 +42,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqComboBoxEventTranslator.h
   pqDoubleSpinBoxEventTranslator.h
   pqEventDispatcher.h
+  pqEventObserver.h
   pqEventPlayer.h
   pqEventSource.h
   pqEventTranslator.h
@@ -48,6 +51,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.h
   pqStdoutEventObserver.h
+  pqTestUtility.h
   pqThreadedEventSource.h
   pqTabBarEventTranslator.h
   pqWidgetEventTranslator.h
@@ -91,6 +95,8 @@ ADD_LIBRARY(QtTesting
   pqDoubleSpinBoxEventTranslator.h
   pqEventDispatcher.cxx
   pqEventDispatcher.h
+  pqEventObserver.cxx
+  pqEventObserver.h
   pqEventPlayer.cxx
   pqEventPlayer.h
   pqEventTranslator.cxx
@@ -112,6 +118,8 @@ ADD_LIBRARY(QtTesting
   pqTabBarEventPlayer.h
   pqTabBarEventTranslator.cxx
   pqTabBarEventTranslator.h
+  pqTestUtility.cxx
+  pqTestUtility.h
   pqThreadedEventSource.cxx
   pqThreadedEventSource.h
   pqWidgetEventPlayer.h

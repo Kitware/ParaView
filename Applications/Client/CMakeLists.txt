@@ -131,9 +131,10 @@ ELSE(APPLE)
   SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
 ENDIF(APPLE)
   SET(TEST_XML ${pqClient_SOURCE_DIR}/Testing/XML)
+  SET(TEST_PYTHON ${pqClient_SOURCE_DIR}/Testing/Python)
   SET(TEST_IMAGE ${PARAVIEW_DATA_ROOT}/Baseline)
 
-  SET (TESTS_WITH_BASELINES
+  SET (XML_TESTS_WITH_BASELINES
     3DWidgetInCustomFilter
     Calculator
     Clip
@@ -171,15 +172,27 @@ ENDIF(APPLE)
     LoadStateHistogram
     )
 
+  IF(QT_TESTING_WITH_PYTHON)
+    SET(PYTHON_TESTS
+      HistogramChart
+      )
+  ENDIF(QT_TESTING_WITH_PYTHON)
+
   FOREACH(test ${TESTS_WITHOUT_BASELINES})
     ADD_TEST(pqClient${test}
       ${TEST_BINARY} -dr --run-test=${TEST_XML}/${test}.xml --exit)
   ENDFOREACH(test)
    
-  FOREACH(test ${TESTS_WITH_BASELINES})
+  FOREACH(test ${XML_TESTS_WITH_BASELINES})
     ADD_TEST(pqClient${test}
       ${TEST_BINARY} -dr --run-test=${TEST_XML}/${test}.xml
       --compare-view=${TEST_IMAGE}/${test}.png
+      --exit)
+  ENDFOREACH(test) 
+  
+  FOREACH(test ${PYTHON_TESTS})
+    ADD_TEST(pqClient${test}-Python
+      ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
       --exit)
   ENDFOREACH(test) 
   

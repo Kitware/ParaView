@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleSpinBox>
 #include <QtDebug>
 
-pqAbstractDoubleEventPlayer::pqAbstractDoubleEventPlayer()
+pqAbstractDoubleEventPlayer::pqAbstractDoubleEventPlayer(QObject* p)
+  : pqWidgetEventPlayer(p)
 {
 }
 

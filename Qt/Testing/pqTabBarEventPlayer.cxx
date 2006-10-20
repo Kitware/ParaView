@@ -36,7 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLineEdit>
 #include <QtDebug>
 
-pqTabBarEventPlayer::pqTabBarEventPlayer()
+pqTabBarEventPlayer::pqTabBarEventPlayer(QObject* p)
+  : pqWidgetEventPlayer(p)
 {
 }
 

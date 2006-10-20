@@ -47,7 +47,7 @@ class pqComboBoxEventTranslator :
   Q_OBJECT
   
 public:
-  pqComboBoxEventTranslator();
+  pqComboBoxEventTranslator(QObject* p=0);
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 

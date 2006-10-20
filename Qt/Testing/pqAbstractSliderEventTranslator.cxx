@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractSlider>
 #include <QEvent>
 
-pqAbstractSliderEventTranslator::pqAbstractSliderEventTranslator() :
+pqAbstractSliderEventTranslator::pqAbstractSliderEventTranslator(QObject* p)
+  : pqWidgetEventTranslator(p),
   CurrentObject(0)
 {
 }

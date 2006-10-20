@@ -50,7 +50,7 @@ class PQCORE_EXPORT pqFileDialogEventTranslator :
   Q_OBJECT
   
 public:
-  pqFileDialogEventTranslator();
+  pqFileDialogEventTranslator(QObject* p=0);
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 

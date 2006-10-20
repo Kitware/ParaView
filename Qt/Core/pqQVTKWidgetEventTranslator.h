@@ -47,7 +47,7 @@ class pqQVTKWidgetEventTranslator :
   Q_OBJECT
   
 public:
-  pqQVTKWidgetEventTranslator();
+  pqQVTKWidgetEventTranslator(QObject* p=0);
   ~pqQVTKWidgetEventTranslator();
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);

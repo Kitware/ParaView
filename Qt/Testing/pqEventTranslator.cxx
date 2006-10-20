@@ -55,8 +55,6 @@ struct pqEventTranslator::pqImplementation
 {
   ~pqImplementation()
   {
-  for(int i = 0; i != this->Translators.size(); ++i)
-    delete this->Translators[i];
   }
 
   /// Stores the working set of widget translators  
@@ -68,21 +66,31 @@ struct pqEventTranslator::pqImplementation
 ////////////////////////////////////////////////////////////////////////////////
 // pqEventTranslator
 
-pqEventTranslator::pqEventTranslator() :
+pqEventTranslator::pqEventTranslator(QObject* p)
+ : QObject(p),
   Implementation(new pqImplementation())
 {
-  QCoreApplication::instance()->installEventFilter(this);
 }
 
 pqEventTranslator::~pqEventTranslator()
 {
-  QCoreApplication::instance()->removeEventFilter(this);
-  
+  this->stop();
   delete Implementation;
+}
+
+void pqEventTranslator::start()
+{
+  QCoreApplication::instance()->installEventFilter(this);
+}
+
+void pqEventTranslator::stop()
+{
+  QCoreApplication::instance()->removeEventFilter(this);
 }
 
 void pqEventTranslator::addDefaultWidgetEventTranslators()
 {
+  addWidgetEventTranslator(new pqBasicWidgetEventTranslator());
   addWidgetEventTranslator(new pqAbstractButtonEventTranslator());
   addWidgetEventTranslator(new pqAbstractItemViewEventTranslator());
   addWidgetEventTranslator(new pqAbstractSliderEventTranslator());
@@ -92,14 +100,14 @@ void pqEventTranslator::addDefaultWidgetEventTranslators()
   addWidgetEventTranslator(new pqMenuEventTranslator());
   addWidgetEventTranslator(new pqSpinBoxEventTranslator());
   addWidgetEventTranslator(new pqTabBarEventTranslator());
-  addWidgetEventTranslator(new pqBasicWidgetEventTranslator());
 }
 
 void pqEventTranslator::addWidgetEventTranslator(pqWidgetEventTranslator* Translator)
 {
   if(Translator)
     {
-    this->Implementation->Translators.push_back(Translator);
+    this->Implementation->Translators.push_front(Translator);
+    Translator->setParent(this);
     
     QObject::connect(
       Translator,

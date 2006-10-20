@@ -37,16 +37,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////////
 // pqPythonEventObserver
 
-pqPythonEventObserver::pqPythonEventObserver(QTextStream& stream) :
-  Stream(stream)
+pqPythonEventObserver::pqPythonEventObserver(QObject* p) 
+  : pqEventObserver(p)
 {
-  this->Stream << "#/usr/bin/env python\n\n";
-  this->Stream << "import QtTesting\n\n";
 }
 
 pqPythonEventObserver::~pqPythonEventObserver()
 {
-  this->Stream.flush();
+}
+
+void pqPythonEventObserver::setStream(QTextStream* stream)
+{
+  pqEventObserver::setStream(stream);
+  if(this->Stream)
+    {
+    *this->Stream << "#/usr/bin/env python\n\n";
+    *this->Stream << "import QtTesting\n\n";
+    }
 }
 
 void pqPythonEventObserver::onRecordEvent(
@@ -54,23 +61,25 @@ void pqPythonEventObserver::onRecordEvent(
   const QString& Command,
   const QString& Arguments)
 {
-
-  QString varname = this->Names[Widget];
-  if(varname == QString::null)
+  if(this->Stream)
     {
-    varname = QString("object%1").arg(this->Names.count());
-    this->Names.insert(Widget, varname);
-    QString objname("%1 = '%2'");
-    objname = objname.arg(varname);
-    objname = objname.arg(Widget);
-    this->Stream << objname << "\n";
-    }
+    QString varname = this->Names[Widget];
+    if(varname == QString::null)
+      {
+      varname = QString("object%1").arg(this->Names.count());
+      this->Names.insert(Widget, varname);
+      QString objname("%1 = '%2'");
+      objname = objname.arg(varname);
+      objname = objname.arg(Widget);
+      *this->Stream << objname << "\n";
+      }
 
-  QString pycommand("QtTesting.playCommand(%1, '%2', '%3')");
-  pycommand = pycommand.arg(varname);
-  pycommand = pycommand.arg(Command);
-  pycommand = pycommand.arg(Arguments);
-  this->Stream << pycommand << "\n";
+    QString pycommand("QtTesting.playCommand(%1, '%2', '%3')");
+    pycommand = pycommand.arg(varname);
+    pycommand = pycommand.arg(Command);
+    pycommand = pycommand.arg(Arguments);
+    *this->Stream << pycommand << "\n";
+    }
 }
 
 

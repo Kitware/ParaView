@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QEvent>
 
-pqComboBoxEventTranslator::pqComboBoxEventTranslator() :
+pqComboBoxEventTranslator::pqComboBoxEventTranslator(QObject* p) 
+  : pqWidgetEventTranslator(p),
   CurrentObject(0)
 {
 }

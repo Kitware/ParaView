@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEvent>
 #include <QWidget>
 
-pqBasicWidgetEventTranslator::pqBasicWidgetEventTranslator()
+pqBasicWidgetEventTranslator::pqBasicWidgetEventTranslator(QObject* p)
+  : pqWidgetEventTranslator(p)
 {
 }
 

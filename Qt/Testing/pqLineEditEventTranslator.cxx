@@ -36,7 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLineEdit>
 #include <QSpinBox>
 
-pqLineEditEventTranslator::pqLineEditEventTranslator()
+pqLineEditEventTranslator::pqLineEditEventTranslator(QObject* p)
+  : pqWidgetEventTranslator(p)
 {
 }
 

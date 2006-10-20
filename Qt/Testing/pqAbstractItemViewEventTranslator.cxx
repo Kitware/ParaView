@@ -51,7 +51,8 @@ static const QString str(const QModelIndex& index)
   return result;
 }
 
-pqAbstractItemViewEventTranslator::pqAbstractItemViewEventTranslator() :
+pqAbstractItemViewEventTranslator::pqAbstractItemViewEventTranslator(QObject* p)
+  : pqWidgetEventTranslator(p),
   CurrentObject(0)
 {
 }

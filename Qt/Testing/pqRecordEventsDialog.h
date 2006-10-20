@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 
 class pqEventTranslator;
+class pqEventObserver;
 
 /// Provides a standard dialog that will record user input to an XML file as long as the dialog remains open
 class QTTESTING_EXPORT pqRecordEventsDialog :
@@ -47,11 +48,9 @@ class QTTESTING_EXPORT pqRecordEventsDialog :
 public:
   /**
   Creates the dialog and begins translating user input with the supplied translator.
-  pqRecordEventsDialog takes responsibility for the lifetime of the supplied translator object
-  
-  Output will be stored as XML using the supplied filesystem path.
   */
-  pqRecordEventsDialog(pqEventTranslator* Translator, const QString& Path, QWidget* Parent);
+  pqRecordEventsDialog(pqEventTranslator& Translator, pqEventObserver& observer,
+                       const QString& File, QWidget* Parent);
 
 private slots:
   void accept();

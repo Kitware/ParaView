@@ -68,7 +68,8 @@ public:
   QString CurrentArgument;
 };
 
-pqThreadedEventSource::pqThreadedEventSource()
+pqThreadedEventSource::pqThreadedEventSource(QObject* p)
+  : pqEventSource(p)
 {
   this->Internal = new pqInternal(*this);
 
@@ -86,7 +87,7 @@ pqThreadedEventSource::~pqThreadedEventSource()
 }
 
 
-bool pqThreadedEventSource::getNextEvent(
+int pqThreadedEventSource::getNextEvent(
     QString& object,
     QString& command,
     QString& arguments)
@@ -115,10 +116,14 @@ bool pqThreadedEventSource::getNextEvent(
 
   if(object == QString::null)
     {
-    return false;
+    if(arguments == "failure")
+      {
+      return FAILURE;
+      }
+    return DONE;
     }
 
-  return true;
+  return SUCCESS;
 }
 
 void pqThreadedEventSource::unlockTestingMutex()
@@ -150,12 +155,18 @@ void pqThreadedEventSource::postNextEvent(const QString& object,
 
 void pqThreadedEventSource::start()
 {
+  // don't start until the GUI thread is ready
   this->Internal->start();
 }
-  
-void pqThreadedEventSource::done()
+
+void pqThreadedEventSource::done(int success)
 {
-  this->postNextEvent(QString(), QString(), QString());
+  if(success == 0)
+    {
+    this->postNextEvent(QString(), QString(), QString());
+    return;
+    }
+  this->postNextEvent(QString(), QString(), "failure");
 }
 
 

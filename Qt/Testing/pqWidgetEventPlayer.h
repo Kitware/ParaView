@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqWidgetEventPlayer_h
 
 #include "QtTestingExport.h"
+#include <QObject>
 
-class QObject;
 class QString;
 
 /**
@@ -46,9 +46,10 @@ for test-cases, demos, tutorials, etc.
 \sa pqEventPlayer
 */
 
-class QTTESTING_EXPORT pqWidgetEventPlayer
+class QTTESTING_EXPORT pqWidgetEventPlayer : public QObject
 {
 public:
+  pqWidgetEventPlayer(QObject* p) : QObject(p)  {}
   virtual ~pqWidgetEventPlayer() {}
 
   /** Derivatives should implement this and play-back the given command,
@@ -60,10 +61,6 @@ public:
     const QString& Arguments,
     bool& Error) = 0;
 
-protected:
-  pqWidgetEventPlayer() {}
-  pqWidgetEventPlayer(const pqWidgetEventPlayer&) {}
-  pqWidgetEventPlayer& operator=(const pqWidgetEventPlayer&) { return *this; }
 };
 
 #endif // !_pqWidgetEventPlayer_h

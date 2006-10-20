@@ -47,7 +47,7 @@ class pqLineEditEventTranslator :
   Q_OBJECT
   
 public:
-  pqLineEditEventTranslator();
+  pqLineEditEventTranslator(QObject* p=0);
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 

@@ -41,7 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtTest>
 #include <QtDebug>
 
-pqAbstractActivateEventPlayer::pqAbstractActivateEventPlayer()
+pqAbstractActivateEventPlayer::pqAbstractActivateEventPlayer(QObject * p)
+  : pqWidgetEventPlayer(p)
 {
 }
 
