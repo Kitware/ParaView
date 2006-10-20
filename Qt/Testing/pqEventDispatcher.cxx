@@ -147,9 +147,7 @@ void pqEventDispatcher::playNextEvent()
   bool error = false;
   // block signals as some event sources may interact with the event loop, as
   // well as some players interact with the event loop
-  this->blockSignals(true);
   this->Implementation->Player->playEvent(object, command, arguments, error);
-  this->blockSignals(false);
   if(error)
     {
     this->stopPlayback();
