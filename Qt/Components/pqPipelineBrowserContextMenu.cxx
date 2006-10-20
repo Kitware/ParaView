@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineBrowserContextMenu.h"
 
 #include "pqApplicationCore.h"
-#include "pqDisplayProxyEditor.h"
 #include "pqFlatTreeView.h"
 #include "pqPipelineBrowser.h"
 #include "pqPipelineDisplay.h"
@@ -98,16 +97,6 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
     {
     QAction* action;
 
-    // Add the context menu items for a pipeline object.
-    action = menu.addAction("Display Settings...", this, SLOT(showDisplayEditor()));
-    action->setObjectName("Display Settings");
-    // here we check just the display count. If no display present at all,
-    // it implies mostly that the pending display is still pending.
-    if(source->getDisplayCount() == 0)
-      {
-      action->setEnabled(false);
-      }
-
     action = menu.addAction("Delete", this->Browser, SLOT(deleteSelected()));
     action->setObjectName("Delete");
     if (source->getNumberOfConsumers() > 0)
@@ -125,87 +114,6 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
     {
     menu.exec(tree->mapToGlobal(pos));
     }
-}
-
-void pqPipelineBrowserContextMenu::showDisplayEditor()
-{
-  if(!this->Browser)
-    {
-    return;
-    }
-
-  // Show the display proxy editor for the selected object.
-  pqFlatTreeView *tree = this->Browser->getTreeView();
-  QModelIndex current = tree->selectionModel()->currentIndex();
-  pqPipelineModel *model = this->Browser->getListModel();
-  pqPipelineSource *source = dynamic_cast<pqPipelineSource*>(
-      model->getItemFor(current));
-  if(!source)
-    {
-    return;
-    }
-
-  // Add the dialog to the main window.
-  QWidget* topParent = this->Browser;
-  while(topParent->parentWidget())
-    {
-    topParent = topParent->parentWidget();
-    }
-
-  QDialog dialog(topParent);
-  dialog.setObjectName("ObjectDisplayProperties");
-  dialog.setWindowTitle("Display Settings");
-  QVBoxLayout* l = new QVBoxLayout(&dialog);
-  l->setMargin(0);
-  l->setSpacing(6);
-  pqDisplay* display = source->getDisplay(this->Browser->getViewModule());
-  if (!display)
-    {
-    // If display doesn't exist, as far as the user is concerned, it simply
-    // means the source is not visible. Create a new hidden display 
-    // and show its properties.
-    display = this->Browser->createDisplay(source, false);
-    }
-  if (!display)
-    {
-    // no display properties to show.
-    return;
-    }
-
-  pqPipelineDisplay* pipelineDisplay = 
-    qobject_cast<pqPipelineDisplay*>(display);
-  if (pipelineDisplay)
-    {
-    pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(&dialog);
-    editor->setDisplay(pipelineDisplay);
-    l->addWidget(editor);
-    }
-  else 
-    {
-    pqXYPlotDisplayProxyEditor* editor = new pqXYPlotDisplayProxyEditor(&dialog);
-    editor->setDisplay(display);
-    l->addWidget(editor);
-    }
-
-  QHBoxLayout* hl = new QHBoxLayout;
-  hl->setMargin(6);
-  l->addLayout(hl);
-  hl->addStretch();
-
-  QPushButton* closeButton = new QPushButton(&dialog);
-  closeButton->setObjectName("DismissButton");
-  closeButton->setText(tr("Close"));
-  closeButton->setAutoDefault(true);
-  hl->addWidget(closeButton);
-
-  QObject::connect(closeButton, SIGNAL(clicked(bool)),
-    &dialog, SLOT(accept()));
-  
-  pqApplicationCore::instance()->getUndoStack()->
-    BeginUndoSet("Display Settings");
-  dialog.exec();
-  pqApplicationCore::instance()->getUndoStack()->
-    EndUndoSet();
 }
 
 void pqPipelineBrowserContextMenu::showRenderViewEditor()

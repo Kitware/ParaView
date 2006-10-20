@@ -54,7 +54,6 @@ public:
 
 public slots:
   void showContextMenu(const QPoint &pos);
-  void showDisplayEditor();
   void showRenderViewEditor();
 
 private:
