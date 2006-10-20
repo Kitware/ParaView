@@ -153,6 +153,7 @@ void pqImplicitPlaneWidget::createWidget(pqServer* server)
     get3DWidget("ImplicitPlaneWidgetDisplay", server);
   this->setWidgetProxy(widget);
   widget->UpdateVTKObjects();
+  widget->UpdatePropertyInformation();
   widget->AddObserver(vtkCommand::StartInteractionEvent,
     this->Implementation->StartDragObserver);
   widget->AddObserver(vtkCommand::EndInteractionEvent,
