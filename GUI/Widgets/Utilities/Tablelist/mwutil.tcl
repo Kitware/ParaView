@@ -16,7 +16,7 @@ package require Tk  8
 # ========================
 #
 
-namespace eval mwutil {
+namespace eval ::mwutil {
     #
     # Public variables:
     #

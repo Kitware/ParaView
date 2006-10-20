@@ -35,3 +35,10 @@ The changes are:
     variable library	[DIR]
   by:
 	variable library	[file dirname [info script]]
+
+- in mwutil.tcl
+  replace:
+    namespace eval mwutil {
+  by:    
+    namespace eval ::mwutil {
+  Otherwise the <Tab> key won't work (namespace problem?)
