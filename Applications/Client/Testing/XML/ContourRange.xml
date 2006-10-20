@@ -18,8 +18,6 @@
   <pqevent object="pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="10" />
   <pqevent object="pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
-  <pqevent object="PipelineObjectMenu" command="activate" arguments="Display Settings" />
-  <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="Momentum" />
-  <pqevent object="MainWindow/ObjectDisplayProperties/DismissButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0" command="set_tab" arguments="1" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="Momentum" />
 </pqevents>
