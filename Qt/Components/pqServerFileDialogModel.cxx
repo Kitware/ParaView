@@ -522,7 +522,20 @@ void pqServerFileDialogModel::setCurrentPath(const QString& Path)
 
 void pqServerFileDialogModel::setParentPath()
 {
-  this->setCurrentPath(this->Implementation->FileModel->CurrentPath + this->Implementation->Separator + "..");
+  /*int lastidx=this->Implementation->FileModel->CurrentPath.lastIndexOf(this->Implementation->Separator);
+  int len=this->Implementation->FileModel->CurrentPath.size();
+  QString path=this->Implementation->FileModel->CurrentPath;
+  path.remove(lastidx,len-lastidx);
+  if(!path.contains(this->Implementation->Separator))
+  {
+    path.append(this->Implementation->Separator);
+  }
+  */
+  QFileInfo info(this->Implementation->FileModel->CurrentPath);
+  this->setCurrentPath(info.path());
+
+
+  //this->setCurrentPath(this->Implementation->FileModel->CurrentPath + this->Implementation->Separator + "..");
 }
 
 QString pqServerFileDialogModel::getCurrentPath()
