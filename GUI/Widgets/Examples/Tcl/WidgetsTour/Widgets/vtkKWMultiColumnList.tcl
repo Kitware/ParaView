@@ -2,12 +2,14 @@ proc vtkKWMultiColumnListEntryPoint {parent win} {
 
   set app [$parent GetApplication] 
 
-  set projects {
-    {"KWWidgets" "1.0" "Sebastien Barre" 1 0 "1.0 0.5 1.0" 75}
-    {"ParaView" "2.3" "Ken Martin"       5 1 "1.0 0.0 0.0" 34}
-    {"VolView"   "3.0" "Rick Avila"      4 1 "0.0 1.0 0.0" 55}
-    {"CMake"     "3.0" "Bill Hoffman"    3 0 "0.0 0.0 1.0" 85}
-  }
+  set maintainers { "Sebastien Barre" "Ken Martin" "Rick Avila" "Bill Hoffman"}
+
+  set projects [list \
+    [list "KWWidgets" "1.0" [lindex $maintainers 0] 1 0 "1.0 0.5 1.0" 75] \
+    [list "ParaView"  "2.3" [lindex $maintainers 1] 5 1 "1.0 0.0 0.0" 34] \
+    [list "VolView"   "3.0" [lindex $maintainers 2] 4 1 "0.0 1.0 0.0" 55] \
+    [list "CMake"     "3.0" [lindex $maintainers 3] 3 0 "0.0 0.0 1.0" 85] \
+  ]
 
   # -----------------------------------------------------------------------
 
@@ -34,6 +36,7 @@ proc vtkKWMultiColumnListEntryPoint {parent win} {
   $mcl1 SetColumnAlignmentToCenter $col_index
 
   set col_index [$mcl1 AddColumn "Maintainer"] 
+  $mcl1 SetColumnFormatCommandToEmptyOutput $col_index
   $mcl1 ColumnEditableOn $col_index
   
   set col_index [$mcl1 AddColumn "Team Size"] 
@@ -73,7 +76,11 @@ proc vtkKWMultiColumnListEntryPoint {parent win} {
     set project [lindex $projects $i]
     $mcl1 InsertCellText $i 0 [lindex $project 0]
     $mcl1 InsertCellText $i 1 [lindex $project 1]
+
     $mcl1 InsertCellText $i 2 [lindex $project 2]
+    $mcl1 SetCellWindowCommandToComboBoxWithValuesAsSemiColonSeparated \
+        $i 2 [join $maintainers ";"]
+
     $mcl1 InsertCellTextAsInt $i 3 [lindex $project 3]
 
     $mcl1 InsertCellTextAsInt $i 4 [lindex $project 4]

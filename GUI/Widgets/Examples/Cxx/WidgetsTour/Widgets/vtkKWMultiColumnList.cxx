@@ -120,8 +120,8 @@ void vtkKWMultiColumnListItem::Create(vtkKWWidget *parent, vtkKWWindow *)
     mcl1->InsertCellText(i, 1, project.Version);
 
     mcl1->InsertCellText(i, 2, project.Maintainer);
-    mcl1->SetCellWindowCommandToComboBox(i, 2);
-    mcl1->SetCellWindowComboBoxValues(i, 2, nb_maintainers, maintainers);
+    mcl1->SetCellWindowCommandToComboBoxWithValues(
+      i, 2, nb_maintainers, maintainers);
 
     mcl1->InsertCellTextAsInt(i, 3, project.TeamSize);
 
