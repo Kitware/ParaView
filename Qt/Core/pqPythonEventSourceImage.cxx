@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 // python header first
-#include "Python.h"
+#include "vtkPython.h"
 
 // self include
 #include "pqPythonEventSourceImage.h"
