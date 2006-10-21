@@ -168,17 +168,11 @@ pqPythonEventSource::pqPythonEventSource(QObject* p)
   : pqThreadedEventSource(p)
 {
   this->Internal = new pqInternal;
-  
   // initialize python
   Py_Initialize();
-
+  
   // initialize the QtTesting module
   initQtTesting();
-
-  // initialize threading
-  PyEval_InitThreads();
-  this->Internal->MainThreadState = PyThreadState_Get();
-  PyEval_ReleaseLock();
 }
 
 pqPythonEventSource::~pqPythonEventSource()
@@ -215,6 +209,12 @@ bool pqPythonEventSource::event(QEvent* e)
 
 void pqPythonEventSource::run()
 {
+ 
+
+  // initialize threading
+  PyEval_InitThreads();
+  this->Internal->MainThreadState = PyThreadState_Get();
+  PyEval_ReleaseLock();
 
   QString filename = this->Internal->FileName;
   FILE* pythonScript = fopen(filename.toAscii().data(), "r");

@@ -34,11 +34,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqThreadedEventSource.h"
 
 #include <QMutex>
+#include <QWaitCondition>
 #include <QThread>
 #include <QString>
 #include <QEventLoop>
-#include <QTimer>
-#include <QAbstractEventDispatcher>
+#include <QEvent>
+#include <QApplication>
+
+namespace
+{
+  class pqPlayCommandEvent : public QEvent
+    {
+  public:
+    pqPlayCommandEvent(const QString& o, const QString& c, const QString& a)
+      : QEvent(QEvent::User),
+        Object(o),
+        Command(c),
+        Arguments(a)
+    {
+    }
+    QString Object;
+    QString Command;
+    QString Arguments;
+    };
+
+}
+
 
 class pqThreadedEventSource::pqInternal : public QThread
 {
@@ -46,7 +67,7 @@ class pqThreadedEventSource::pqInternal : public QThread
 public:
   pqInternal(pqThreadedEventSource& source)
     : Source(source), 
-      MainThread(*QThread::currentThread())
+      GotEvent(false)
     {
     }
   
@@ -57,12 +78,10 @@ public:
   
   pqThreadedEventSource& Source;
 
-  QMutex Mutex1;
-  QMutex Mutex2;
-  QMutex Mutex3;
-  QThread& MainThread;
+  QWaitCondition WaitCondition;
   QEventLoop Loop;
 
+  bool GotEvent;
   QString CurrentObject;
   QString CurrentCommand;
   QString CurrentArgument;
@@ -72,17 +91,10 @@ pqThreadedEventSource::pqThreadedEventSource(QObject* p)
   : pqEventSource(p)
 {
   this->Internal = new pqInternal(*this);
-
-
-  // lock the mutex
-  // only when we unlock it, does the other thread
-  // have a chance to interact with us
-  this->Internal->Mutex1.lock();
 }
 
 pqThreadedEventSource::~pqThreadedEventSource()
 {
-  this->Internal->Mutex1.unlock();
   delete this->Internal;
 }
 
@@ -92,27 +104,18 @@ int pqThreadedEventSource::getNextEvent(
     QString& command,
     QString& arguments)
 {
-  this->Internal->CurrentObject = QString::null;
-  this->Internal->CurrentCommand = QString::null;
-  this->Internal->CurrentArgument = QString::null;
-
-  // unlock the mutex
-  this->Internal->Mutex2.lock();
-
-  // unlock Mutex1 when this loop is running
-  QTimer::singleShot(0, this, SLOT(unlockTestingMutex()));
-
-  // wait for the other thread to interrupt us, while
-  // we keep the GUI alive.
-  this->Internal->Loop.exec();
-  
-  // lock the mutex again
-  this->Internal->Mutex1.lock();
-  this->Internal->Mutex2.unlock();
+  if(!this->Internal->GotEvent == true)
+  {
+    // wait for the other thread to post an event, while
+    // we keep the GUI alive.
+    this->Internal->Loop.exec();
+  }
 
   object = this->Internal->CurrentObject;
   command = this->Internal->CurrentCommand;
   arguments = this->Internal->CurrentArgument;
+  this->Internal->GotEvent = false;
+  this->Internal->WaitCondition.wakeAll();
 
   if(object == QString::null)
     {
@@ -126,9 +129,20 @@ int pqThreadedEventSource::getNextEvent(
   return SUCCESS;
 }
 
-void pqThreadedEventSource::unlockTestingMutex()
+bool pqThreadedEventSource::event(QEvent* e)
 {
-  this->Internal->Mutex1.unlock();
+  pqPlayCommandEvent* pe = dynamic_cast<pqPlayCommandEvent*>(e);
+  if(pe)
+  {
+    this->Internal->CurrentObject = pe->Object;
+    this->Internal->CurrentCommand = pe->Command;
+    this->Internal->CurrentArgument = pe->Arguments;
+    this->Internal->GotEvent = true;
+    this->Internal->Loop.quit();
+    return true;
+  }
+
+  return pqEventSource::event(e);
 }
 
 
@@ -136,26 +150,15 @@ void pqThreadedEventSource::postNextEvent(const QString& object,
                    const QString& command,
                    const QString& argument)
 {
-  this->Internal->Mutex1.lock();
-  
-  this->Internal->CurrentObject = object;
-  this->Internal->CurrentCommand = command;
-  this->Internal->CurrentArgument = argument;
-
-  // stop the event loop on the main thread
-  this->Internal->Loop.quit();
-
-  this->Internal->Mutex1.unlock();
-
-  // wait until the other thread has locked Mutex1, so we don't come around too
-  // quick and try to lock Mutex1 again.
-  this->Internal->Mutex2.lock();
-  this->Internal->Mutex2.unlock();
+  QApplication::postEvent(this, new pqPlayCommandEvent(object, command, argument));
+  // wait for the GUI thread to take the event and wake us up
+  QMutex mut;
+  mut.lock();
+  this->Internal->WaitCondition.wait(&mut);
 }
 
 void pqThreadedEventSource::start()
 {
-  // don't start until the GUI thread is ready
   this->Internal->start();
 }
 
@@ -168,5 +171,4 @@ void pqThreadedEventSource::done(int success)
     }
   this->postNextEvent(QString(), QString(), "failure");
 }
-
 

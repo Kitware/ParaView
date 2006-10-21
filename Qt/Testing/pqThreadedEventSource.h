@@ -66,6 +66,8 @@ public:
   
 protected:
 
+  bool event(QEvent* e);
+
   // start the thread
   void start();
 
@@ -76,12 +78,8 @@ protected:
   // run the thread, return 
   virtual void run() = 0;
 
-protected slots:
-  void unlockTestingMutex();
-
 private:
   class pqInternal;
-  friend class pqInternal;
   pqInternal* Internal;
 
 };
