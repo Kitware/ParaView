@@ -220,8 +220,12 @@ void pqPythonEventSourceImage::compareImage(QWidget* widget,
   // grab an image of the widget
   QSize oldSize = widget->size();
   widget->resize(SnapshotWidth, SnapshotHeight);
+  QFont oldFont = widget->font();
+  QFont newFont("Courier", 7, QFont::Normal, false);
+  widget->setFont(newFont);
   QImage img = QPixmap::grabWidget(widget).toImage();
   widget->resize(oldSize);
+  widget->setFont(oldFont);
   img = img.convertToFormat(QImage::Format_RGB32);
   img = img.mirrored();
   int width = img.width();
