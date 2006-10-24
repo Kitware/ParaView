@@ -11,7 +11,7 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.3");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.4");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -61,7 +61,7 @@ vtkSpyPlotUniReader::vtkSpyPlotUniReader()
   this->DumpOffset = 0;
 
   this->DataDumps = 0;
-
+  this->Blocks = 0;
 
   this->CellArraySelection = 0;
 
@@ -74,6 +74,8 @@ vtkSpyPlotUniReader::vtkSpyPlotUniReader()
   this->HaveInformation = 0;
   this->DownConvertVolumeFraction = 1;
   this->DataTypeChanged = 0;
+  this->GeomTimeStep = -1; // Indicate that geometry will have to be loaded
+  this->NeedToCheck = 1; // Indicates non-geometric data needs to be checked
   if ( !this->HaveInformation ) { vtkDebugMacro( << __LINE__ << " " << this << " Read: " << this->HaveInformation ); }
 }
 
@@ -94,6 +96,7 @@ vtkSpyPlotUniReader::~vtkSpyPlotUniReader()
     vtkSpyPlotUniReader::DataDump* dp = this->DataDumps+dump;
     delete [] dp->SavedVariables;
     delete [] dp->SavedVariableOffsets;
+    delete [] dp->SavedBlockAllocatedStates;
     int var;
     for ( var = 0; var < dp->NumVars; ++ var)
       {
@@ -114,9 +117,9 @@ vtkSpyPlotUniReader::~vtkSpyPlotUniReader()
         }
       }
     delete [] dp->Variables;
-    delete [] dp->Blocks;
     }
   delete [] this->DataDumps;
+  delete [] this->Blocks;
   this->SetFileName(0);
   this->SetCellArraySelection(0);
 }
@@ -177,6 +180,9 @@ int vtkSpyPlotUniReader::ReadInformation()
     vtkErrorMacro("Invalid Header");
     return 0;
     }
+
+  // Create the array of blocks we are going to use
+  this->Blocks = new vtkSpyPlotBlock[this->NumberOfBlocks];
 
   // Process all the Cell Material  Fields
 
@@ -254,140 +260,11 @@ int vtkSpyPlotUniReader::ReadInformation()
         }
       }
     }
-
-  // Read group headers. Groups are also time steps
-  const int MAX_DUMPS = 100;
-  struct GroupHeader
-  {
-    vtkTypeInt64 Offset;
-    int NumberOfDataDumps;
-    int DumpCycle[MAX_DUMPS];
-    double DumpTime[MAX_DUMPS];
-    double DumpDT[MAX_DUMPS]; // SPCTH 102 What is this anyway?
-    vtkTypeInt64 DumpOffset[MAX_DUMPS];
-  };
-
-  struct CummulativeGroupHeader
-  {
-    int NumberOfDataDumps;
-    int *DumpCycle;
-    double *DumpTime;
-    double *DumpDT; // SPCTH 102 What is this anyway?
-    vtkTypeInt64 *DumpOffset;
-  };
-
-  int dump;
-  while ( 1 )
+  
+  if (!this->ReadGroupHeaderInformation(&spis))
     {
-    GroupHeader gh;
-    if ( !spis.ReadInt64s(&(gh.Offset), 1) )
-      {
-      vtkErrorMacro( "Cannot get group header offset" );
-      return 0;
-      }
-    vtkTypeInt64 cpos = spis.Tell();
-    //vtkDebugMacro( "position: " << cpos );
-    //vtkDebugMacro( "offset:   " << gh.Offset );
-    if ( cpos > gh.Offset )
-      {
-      vtkErrorMacro("The offset is back in file: " << cpos 
-                    << " > " << gh.Offset);
-      return 0;
-      }
-    spis.Seek(gh.Offset);
-    if ( !spis.ReadInt32s(&(gh.NumberOfDataDumps), 1) )
-      {
-      vtkErrorMacro( "Problem reading the num dumps" );
-      return 0;
-      }
-    if ( !spis.ReadInt32s(gh.DumpCycle, MAX_DUMPS) )
-      {
-      vtkErrorMacro( "Problem reading the dump cycle" );
-      return 0;
-      }
-    if ( !spis.ReadDoubles(gh.DumpTime, MAX_DUMPS) )
-      {
-      vtkErrorMacro( "Problem reading the dump times" );
-      return 0;
-      }
-    if ( this->FileVersion >= 102 )
-      {
-      //cout << "This is SPCTH " << this->FileVersion
-      // << " so read DumpDT's" << endl;
-      if ( !spis.ReadDoubles(gh.DumpDT, MAX_DUMPS) )
-        {
-        vtkErrorMacro( "Problem reading the dump DT's" );
-        return 0;
-        }
-      }
-    if ( !spis.ReadInt64s(gh.DumpOffset, MAX_DUMPS) )
-      {
-      vtkErrorMacro( "Problem reading the dump offsets" );
-      return 0;
-      }
-    //vtkDebugMacro( "Number of dumps: " << gh.NumberOfDataDumps );
-    //for ( dump = 0; dump < gh.NumberOfDataDumps; ++ dump )
-    //  {
-    //  vtkDebugMacro( " Dump " << dump << " cycle: " << gh.DumpCycle[dump]
-    //                          << " time: " << gh.DumpTime[dump] 
-    //                          << " offset: " 
-    //                          << gh.DumpOffset[dump] );
-    //  }
-    CummulativeGroupHeader nch;
-    nch.NumberOfDataDumps = this->NumberOfDataDumps + gh.NumberOfDataDumps;
-    nch.DumpCycle  = new int[nch.NumberOfDataDumps];
-    nch.DumpTime   = new double[nch.NumberOfDataDumps];
-    if ( this->FileVersion >= 102 )
-      {
-      nch.DumpDT = new double[nch.NumberOfDataDumps];
-      }
-    nch.DumpOffset = new vtkTypeInt64[nch.NumberOfDataDumps];
-    if ( this->DumpCycle )
-      {
-      memcpy(nch.DumpCycle,  this->DumpCycle,  
-             this->NumberOfDataDumps * sizeof(int));
-      memcpy(nch.DumpTime,   this->DumpTime,   
-             this->NumberOfDataDumps * sizeof(double));
-      if ( this->FileVersion >= 102 )
-        {
-        memcpy(nch.DumpDT,   this->DumpDT,   
-               this->NumberOfDataDumps * sizeof(double));
-        }
-      memcpy(nch.DumpOffset, this->DumpOffset, 
-             this->NumberOfDataDumps * sizeof(vtkTypeInt64));
-      delete [] this->DumpCycle;
-      delete [] this->DumpTime;
-      if ( this->FileVersion >= 102 )
-        {
-        delete [] this->DumpDT;
-        }
-      delete [] this->DumpOffset;
-      }
-    memcpy(nch.DumpCycle  + this->NumberOfDataDumps, gh.DumpCycle,  
-           gh.NumberOfDataDumps * sizeof(int));
-    memcpy(nch.DumpTime   + this->NumberOfDataDumps, gh.DumpTime,   
-           gh.NumberOfDataDumps * sizeof(double));
-    if ( this->FileVersion >= 102 )
-      {
-      memcpy(nch.DumpDT   + this->NumberOfDataDumps, gh.DumpDT,     
-             gh.NumberOfDataDumps * sizeof(double));
-      }
-    memcpy(nch.DumpOffset + this->NumberOfDataDumps, gh.DumpOffset, 
-           gh.NumberOfDataDumps * sizeof(vtkTypeInt64));
-
-    this->NumberOfDataDumps   = nch.NumberOfDataDumps;
-    this->DumpCycle  = nch.DumpCycle;
-    this->DumpTime   = nch.DumpTime;
-    if ( this->FileVersion >= 102 )
-      {
-      this->DumpDT     = nch.DumpDT;
-      }
-    this->DumpOffset = nch.DumpOffset;
-    memset(&nch, 0, sizeof(nch));
-    if ( gh.NumberOfDataDumps != MAX_DUMPS )
-      {
-      break;
-      }
+    vtkErrorMacro("Problem reading group header information");
+    return 0;
     }
 
   this->TimeStepRange[1] = this->NumberOfDataDumps-1;
@@ -395,6 +272,8 @@ int vtkSpyPlotUniReader::ReadInformation()
   this->TimeRange[1] = this->DumpTime[this->NumberOfDataDumps-1];
 
   this->DataDumps = new vtkSpyPlotUniReader::DataDump[this->NumberOfDataDumps];
+  int dump;
+  // Read in the time step information 
   for ( dump = 0; dump < this->NumberOfDataDumps; ++dump )
     {
     vtkTypeInt64 cpos = spis.Tell();
@@ -552,7 +431,7 @@ int vtkSpyPlotUniReader::ReadInformation()
         }
       }
 
-    // Now read the data blocks information
+    // Now scan the data blocks information
     if ( !spis.ReadInt32s(&dh->NumberOfBlocks, 1) )
       {
       vtkErrorMacro( "Problem reading the num of blocks" );
@@ -562,34 +441,34 @@ int vtkSpyPlotUniReader::ReadInformation()
       {
       vtkErrorMacro( "Different number of blocks..." );
       }
-    dh->Blocks = new vtkSpyPlotBlock[dh->NumberOfBlocks];
+    dh->SavedBlockAllocatedStates = new unsigned char[dh->NumberOfBlocks];
     int block;
     int totalBlocks = 0;
+    // Record where the state of the block definition is for this
+    // time step
+    dh->BlocksOffset = spis.Tell();
     for ( block = 0; block < dh->NumberOfBlocks; ++ block )
       {
-      //long l = ifs.tellg();
-      vtkSpyPlotBlock *b = &(dh->Blocks[block]);
-      if ( !b->Read(&spis))
-        {
-        vtkErrorMacro( "Problem reading the block information" );
-        return 0;
-        }
-
-      //printf("Read data block header: n %d allocated %d pos %ld\n", 
-      // block, b->Allocated, l);
-      if ( b->IsAllocated() )
+      // Skip over the block but remember its allocated state
+      if (!vtkSpyPlotBlock::Scan(&spis, 
+                                 &(dh->SavedBlockAllocatedStates[block])))
+      {
+      vtkErrorMacro( "Problem scanning the block information" );
+      return 0;
+      }
+      if ( dh->SavedBlockAllocatedStates[block] )
         {
         totalBlocks ++;
         }
       }
-
+    
     dh->ActualNumberOfBlocks = totalBlocks;
-
+    dh->SavedBlocksGeometryOffset = spis.Tell();
+    
     vtkstd::vector<unsigned char> arrayBuffer;
     for ( block = 0; block < dh->NumberOfBlocks; ++ block )
       {
-      vtkSpyPlotBlock *b = dh->Blocks + block;
-      if ( b->IsAllocated() )
+      if (dh->SavedBlockAllocatedStates[block])
         {
         int numBytes;
         int component;
@@ -601,8 +480,6 @@ int vtkSpyPlotUniReader::ReadInformation()
             vtkErrorMacro( "Problem reading the number of bytes" );
             return 0;
             }
-          //vtkDebugMacro( "  Number of bytes for " << component << ": " 
-          // << numBytes );
           if ( static_cast<int>(arrayBuffer.size()) < numBytes )
             {
             arrayBuffer.resize(numBytes);
@@ -613,23 +490,6 @@ int vtkSpyPlotUniReader::ReadInformation()
             vtkErrorMacro( "Problem reading the bytes" );
             return 0;
             }
-          vtkFloatArray* currentArray = 0;
-          currentArray = b->GetVectors(component);
-          if ( !currentArray )
-            {
-            vtkErrorMacro( "Internal error" );
-            return 0;
-            }
-          float* array = currentArray->GetPointer(0);
-          int size = b->GetDimension(component);
-          if ( !this->RunLengthDeltaDecode(&*arrayBuffer.begin(), numBytes, 
-                                           array, size + 1) )
-            {
-            vtkErrorMacro( "Problem RLD decoding rectilinear grid array: "
-                           << component );
-            return 0;
-            }
-          vtkDebugMacro( " " << b << " vectors initialized" );
           }
         }
       }
@@ -654,8 +514,15 @@ int vtkSpyPlotUniReader::ReadInformation()
 
 
 //-----------------------------------------------------------------------------
-int vtkSpyPlotUniReader::ReadData()
+int vtkSpyPlotUniReader::MakeCurrent()
 {
+  if (!(this->NeedToCheck || (this->GeomTimeStep != this->CurrentTimeStep)))
+    {
+    // Nothing needs to be done
+    return 1;
+    }
+
+  
   if ( !this->HaveInformation ) 
     { 
     vtkDebugMacro( << __LINE__ << " " << this << " Read: " 
@@ -666,16 +533,91 @@ int vtkSpyPlotUniReader::ReadData()
       return 0;
       }
     }
+  
   vtkstd::vector<unsigned char> arrayBuffer;
   ifstream ifs(this->FileName, ios::binary|ios::in);
   vtkSpyPlotIStream spis;
   spis.SetStream(&ifs);
   int dump;
+  vtkSpyPlotUniReader::DataDump* dp;
+
+  // Do we have to update blocks
+  if (this->GeomTimeStep != this->CurrentTimeStep)
+    {
+    int block;
+    this->GeomTimeStep = this->CurrentTimeStep;
+    dump = this->CurrentTimeStep;
+    dp = this->DataDumps+dump;
+    //vtkDebugMacro( "Dump: " << dump << " / " 
+    // << this->NumberOfDataDumps << " at time: " << this->DumpTime[dump] );
+
+    // Load in the grid block information
+    // Advance the stream to where the block definitions are
+    spis.Seek(dp->BlocksOffset);
+    for ( block = 0; block < dp->NumberOfBlocks; ++ block )
+      {
+      //long l = ifs.tellg();
+      vtkSpyPlotBlock *b = &(this->Blocks[block]);
+      if ( !b->Read(this->IsAMR(), &spis))
+        {
+        vtkErrorMacro( "Problem reading the block information" );
+        return 0;
+        }
+      }
+  
+    // Advance the stream to where the block geometries are
+    spis.Seek(dp->SavedBlocksGeometryOffset);
+    for ( block = 0; block < dp->NumberOfBlocks; ++ block )
+      {
+      vtkSpyPlotBlock *b = &(this->Blocks[block]);
+      if ( b->IsAllocated() )
+        {
+        int numBytes;
+        int component;
+        //vtkDebugMacro( "Block: " << block );
+        for ( component = 0; component < 3; ++ component )
+          {
+          if ( !spis.ReadInt32s(&numBytes, 1) )
+            {
+            vtkErrorMacro( "Problem reading the number of bytes" );
+            return 0;
+            }
+          //vtkDebugMacro( "  Number of bytes for " << component << ": " 
+          // << numBytes );
+          if ( static_cast<int>(arrayBuffer.size()) < numBytes )
+            {
+            arrayBuffer.resize(numBytes);
+            }
+        
+          if ( !spis.ReadString(&*arrayBuffer.begin(), numBytes) )
+            {
+            vtkErrorMacro( "Problem reading the bytes" );
+            return 0;
+            }
+          if (!b->SetGeometry(component, &*arrayBuffer.begin(), numBytes))
+            {
+            vtkErrorMacro( "Problem RLD decoding rectilinear grid array: "
+                           << component );
+            return 0;
+            }
+          vtkDebugMacro( " " << b << " geometry initialized" );
+          }
+        }
+      }
+    }
+
+  if (!this->NeedToCheck)
+    {
+    return 1;
+    }
+
+  this->NeedToCheck = 0;
+
   for ( dump = 0; dump < this->NumberOfDataDumps; ++ dump )
     {
     if ( dump != this->CurrentTimeStep )
       {
-      vtkSpyPlotUniReader::DataDump* dp = this->DataDumps+dump;
+      dp = this->DataDumps+dump;
       int var;
       for ( var = 0; var < dp->NumVars; ++ var)
         {
@@ -702,8 +644,8 @@ int vtkSpyPlotUniReader::ReadData()
     }
 
   dump = this->CurrentTimeStep;
-  vtkSpyPlotUniReader::DataDump* dp = this->DataDumps+dump;
-  //vtkDebugMacro( "Dump: " << dump << " / " << this->NumberOfDataDumps << " at time: " << this->DumpTime[dump] );
+  dp = this->DataDumps+dump;
+  
   int fieldCnt;
   for ( fieldCnt = 0; fieldCnt < dp->NumVars; ++ fieldCnt )
     {
@@ -777,7 +719,7 @@ int vtkSpyPlotUniReader::ReadData()
     int actualBlockId = 0;
     for ( block = 0; block < dp->NumberOfBlocks; ++ block )
       {
-      vtkSpyPlotBlock* bk = dp->Blocks+block;
+      vtkSpyPlotBlock* bk = this->Blocks+block;
       if ( bk->IsAllocated() )
         {
         vtkFloatArray* floatArray = 0;
@@ -971,7 +913,7 @@ void vtkSpyPlotUniReader::PrintInformation()
     vtkDebugMacro( "Blocks: " );
     for ( block = 0; block < dp->NumberOfBlocks; ++ block )
       {
-      vtkSpyPlotBlock *b = dp->Blocks + block;
+      vtkSpyPlotBlock *b = this->Blocks + block;
       b->GetDimensions(bdims);
       vtkDebugMacro( "  " << block );
       vtkDebugMacro( "    Allocated: " << b->IsAllocated() );
@@ -980,6 +922,7 @@ void vtkSpyPlotUniReader::PrintInformation()
       vtkDebugMacro( "    Dims[0]: " << bdims[0] );
       vtkDebugMacro( "    Dims[1]: " << bdims[1] );
       vtkDebugMacro( "    Dims[2]: " << bdims[2] );
+      vtkDebugMacro( "    AMR: " << b->IsAMR() );
       if ( b->IsAllocated() )
         {
         int num;
@@ -999,9 +942,10 @@ void vtkSpyPlotUniReader::PrintInformation()
           {
           vtkDebugMacro( " " << bvecs[2]->GetValue(num));
           }
+        
         }
       }
-
+    
     for ( fieldCnt = 0; fieldCnt < dp->NumVars; ++ fieldCnt )
       {
       vtkSpyPlotUniReader::Variable* currentVar = dp->Variables + fieldCnt;
@@ -1055,80 +999,6 @@ void vtkSpyPlotUniReader::PrintInformation()
    to provide allocated space for *data which will be
    n bytes long. */
 
-int vtkSpyPlotUniReader::RunLengthDeltaDecode(const unsigned char* in, 
-                                              int inSize, float* out, 
-                                              int outSize)
-{
-  int outIndex = 0, inIndex = 0;
-
-  const unsigned char* ptmp = in;
-
-  /* Run-length decode */
-
-  // Get first value
-  float val;
-  memcpy(&val, ptmp, sizeof(float));
-  vtkByteSwap::SwapBE(&val);
-  ptmp += 4;
-
-  // Get delta
-  float delta;
-  memcpy(&delta, ptmp, sizeof(float));
-  vtkByteSwap::SwapBE(&delta);
-  ptmp += 4;
-
-  // Now loop around until I get to the end of
-  // the input array
-  inIndex += 8;
-  while ((outIndex<outSize) && (inIndex<inSize))
-    {
-    // Okay get the run length
-    unsigned char runLength = *ptmp;
-    ptmp ++;
-    if (runLength < 128)
-      {
-      ptmp += 4;
-      // Now populate the out data
-      int k;
-      for (k=0; k<runLength; ++k)
-        {
-        if ( outIndex >= outSize )
-          {
-          vtkErrorMacro( "Problem doing RLD decode. "
-                         << "Too much data generated. Excpected: " 
-                         << outSize );
-          return 0;
-          }
-        out[outIndex] = val + outIndex*delta;
-        outIndex++;
-        }
-      inIndex += 5;
-      }
-    else  // runLength >= 128
-      {
-      int k;
-      for (k=0; k<runLength-128; ++k)
-        {
-        if ( outIndex >= outSize )
-          {
-          vtkErrorMacro( "Problem doing RLD decode. "
-                         << "Too much data generated. Excpected: " 
-                         << outSize );
-          return 0;
-          }
-        float nval;
-        memcpy(&nval, ptmp, sizeof(float));
-        vtkByteSwap::SwapBE(&nval);
-        out[outIndex] = nval + outIndex*delta;
-        outIndex++;
-        ptmp += 4;
-        }
-      inIndex += 4*(runLength-128)+1;
-      }
-    } // while 
-
-  return 1;
-} 
 
 //-----------------------------------------------------------------------------
 template<class t>
@@ -1309,18 +1179,18 @@ vtkSpyPlotBlock* vtkSpyPlotUniReader::GetBlock(int block)
     { 
     vtkDebugMacro( << __LINE__ << " " << this << " Read: " 
                    << this->HaveInformation ); 
+    if (!this->ReadInformation())
+      return 0;
     }
-  this->ReadInformation();
-  vtkSpyPlotUniReader::DataDump* dp = this->DataDumps+this->CurrentTimeStep;
   int cb = 0;
   int blockId;
-  for ( blockId = 0; blockId < dp->NumberOfBlocks; ++ blockId )
+  for ( blockId = 0; blockId < this->NumberOfBlocks; ++ blockId )
     {
-    if ( dp->Blocks[blockId].IsAllocated() )
+    if ( this->Blocks[blockId].IsAllocated() )
       {
       if ( cb == block )
         {
-        return dp->Blocks+blockId;
+        return this->Blocks+blockId;
         }
       cb ++;
       }
@@ -1508,6 +1378,144 @@ int vtkSpyPlotUniReader::ReadHeader(vtkSpyPlotIStream *spis)
   return 1;
 }
 
+int vtkSpyPlotUniReader::ReadGroupHeaderInformation(vtkSpyPlotIStream *spis)
+{
+  // Read group headers. Groups are also time steps
+  const int MAX_DUMPS = 100;
+  struct GroupHeader
+  {
+    vtkTypeInt64 Offset;
+    int NumberOfDataDumps;
+    int DumpCycle[MAX_DUMPS];
+    double DumpTime[MAX_DUMPS];
+    double DumpDT[MAX_DUMPS]; // SPCTH 102 What is this anyway?
+    vtkTypeInt64 DumpOffset[MAX_DUMPS];
+  };
+
+  struct CummulativeGroupHeader
+  {
+    int NumberOfDataDumps;
+    int *DumpCycle;
+    double *DumpTime;
+    double *DumpDT; // SPCTH 102 What is this anyway?
+    vtkTypeInt64 *DumpOffset;
+  };
+
+  while ( 1 )
+    {
+    GroupHeader gh;
+    if ( !spis->ReadInt64s(&(gh.Offset), 1) )
+      {
+      vtkErrorMacro( "Cannot get group header offset" );
+      return 0;
+      }
+    vtkTypeInt64 cpos = spis->Tell();
+    //vtkDebugMacro( "position: " << cpos );
+    //vtkDebugMacro( "offset:   " << gh.Offset );
+    if ( cpos > gh.Offset )
+      {
+      vtkErrorMacro("The offset is back in file: " << cpos 
+                    << " > " << gh.Offset);
+      return 0;
+      }
+    spis->Seek(gh.Offset);
+    if ( !spis->ReadInt32s(&(gh.NumberOfDataDumps), 1) )
+      {
+      vtkErrorMacro( "Problem reading the num dumps" );
+      return 0;
+      }
+    if ( !spis->ReadInt32s(gh.DumpCycle, MAX_DUMPS) )
+      {
+      vtkErrorMacro( "Problem reading the dump cycle" );
+      return 0;
+      }
+    if ( !spis->ReadDoubles(gh.DumpTime, MAX_DUMPS) )
+      {
+      vtkErrorMacro( "Problem reading the dump times" );
+      return 0;
+      }
+    if ( this->FileVersion >= 102 )
+      {
+      //cout << "This is SPCTH " << this->FileVersion
+      // << " so read DumpDT's" << endl;
+      if ( !spis->ReadDoubles(gh.DumpDT, MAX_DUMPS) )
+        {
+        vtkErrorMacro( "Problem reading the dump DT's" );
+        return 0;
+        }
+      }
+    if ( !spis->ReadInt64s(gh.DumpOffset, MAX_DUMPS) )
+      {
+      vtkErrorMacro( "Problem reading the dump offsets" );
+      return 0;
+      }
+    //vtkDebugMacro( "Number of dumps: " << gh.NumberOfDataDumps );
+    //for ( dump = 0; dump < gh.NumberOfDataDumps; ++ dump )
+    //  {
+    //  vtkDebugMacro( " Dump " << dump << " cycle: " << gh.DumpCycle[dump]
+    //                          << " time: " << gh.DumpTime[dump] 
+    //                          << " offset: " 
+    //                          << gh.DumpOffset[dump] );
+    //  }
+    CummulativeGroupHeader nch;
+    nch.NumberOfDataDumps = this->NumberOfDataDumps + gh.NumberOfDataDumps;
+    nch.DumpCycle  = new int[nch.NumberOfDataDumps];
+    nch.DumpTime   = new double[nch.NumberOfDataDumps];
+    if ( this->FileVersion >= 102 )
+      {
+      nch.DumpDT = new double[nch.NumberOfDataDumps];
+      }
+    nch.DumpOffset = new vtkTypeInt64[nch.NumberOfDataDumps];
+    if ( this->DumpCycle )
+      {
+      memcpy(nch.DumpCycle,  this->DumpCycle,  
+             this->NumberOfDataDumps * sizeof(int));
+      memcpy(nch.DumpTime,   this->DumpTime,   
+             this->NumberOfDataDumps * sizeof(double));
+      if ( this->FileVersion >= 102 )
+        {
+        memcpy(nch.DumpDT,   this->DumpDT,   
+               this->NumberOfDataDumps * sizeof(double));
+        }
+      memcpy(nch.DumpOffset, this->DumpOffset, 
+             this->NumberOfDataDumps * sizeof(vtkTypeInt64));
+      delete [] this->DumpCycle;
+      delete [] this->DumpTime;
+      if ( this->FileVersion >= 102 )
+        {
+        delete [] this->DumpDT;
+        }
+      delete [] this->DumpOffset;
+      }
+    memcpy(nch.DumpCycle  + this->NumberOfDataDumps, gh.DumpCycle,  
+           gh.NumberOfDataDumps * sizeof(int));
+    memcpy(nch.DumpTime   + this->NumberOfDataDumps, gh.DumpTime,   
+           gh.NumberOfDataDumps * sizeof(double));
+    if ( this->FileVersion >= 102 )
+      {
+      memcpy(nch.DumpDT   + this->NumberOfDataDumps, gh.DumpDT,     
+             gh.NumberOfDataDumps * sizeof(double));
+      }
+    memcpy(nch.DumpOffset + this->NumberOfDataDumps, gh.DumpOffset, 
+           gh.NumberOfDataDumps * sizeof(vtkTypeInt64));
+
+    this->NumberOfDataDumps   = nch.NumberOfDataDumps;
+    this->DumpCycle  = nch.DumpCycle;
+    this->DumpTime   = nch.DumpTime;
+    if ( this->FileVersion >= 102 )
+      {
+      this->DumpDT     = nch.DumpDT;
+      }
+    this->DumpOffset = nch.DumpOffset;
+    memset(&nch, 0, sizeof(nch));
+    if ( gh.NumberOfDataDumps != MAX_DUMPS )
+      {
+      break;
+      }
+    }
+  return 1;
+}
+
 //-----------------------------------------------------------------------------
 void vtkSpyPlotUniReader::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -1523,6 +1531,7 @@ void vtkSpyPlotUniReader::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CurrentTime: " << this->CurrentTime << endl;
   os << indent << "DataTypeChanged: " << this->DataTypeChanged << endl;
   os << indent << "NumberOfCellFields: " << this->NumberOfCellFields << endl;
+  os << indent << "NeedToCheck: " << this->NeedToCheck << endl;
 }
 
 

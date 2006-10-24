@@ -49,6 +49,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <assert.h>
 #include <cctype>
 
+
 #define vtkMIN(x, y) \
   (\
    ((x)<(y))?(x):(y)\
@@ -57,7 +58,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.45");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.46");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -87,7 +88,6 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->TimeStep = 0;
   this->TimeStepRange[0] = 0;
   this->TimeStepRange[1] = 0;
-
   this->DownConvertVolumeFraction = 1;
 
   this->Controller = 0;
@@ -573,6 +573,10 @@ int vtkSpyPlotReader::RequestData(
   // Update the timestep.
   this->UpdateMetaData(request, outputVector);
   
+  // Tell all of the unireaders that they need to make to check to see
+  // if they are current
+  this->Map->TellReadersToCheck(this);
+  
   vtkSpyPlotBlock *block;
   vtkSpyPlotBlockIterator *blockIterator;
   if(this->DistributeFiles)
@@ -595,6 +599,8 @@ int vtkSpyPlotReader::RequestData(
   int progressInterval = total_num_of_blocks / 10 + 1;
   int rightHasBounds = 0;
   int leftHasBounds = 0;
+  // Note that in the process of getting the bounds 
+  // all of the readers will get updated appropriately  
   int boundsHaveBeenSet = this->SetGlobalBounds(blockIterator,
                                                 total_num_of_blocks,
                                                 progressInterval,
@@ -616,7 +622,7 @@ int vtkSpyPlotReader::RequestData(
   //vtkDebugMacro("there is (are) "<<numFiles<<" file(s)");
   // Read only the part of the file for this processNumber.
   int current_block_number;
-  for(blockIterator->Start(), current_block_number=1; 
+ for(blockIterator->Start(), current_block_number=1; 
       blockIterator->IsActive();
       blockIterator->Next(), current_block_number++)
     {
@@ -656,7 +662,6 @@ int vtkSpyPlotReader::RequestData(
       }
 
     vtkDebugMacro("Executing block: " << blockID);
-    uniReader->ReadData();
     // uniReader->PrintMemoryUsage();
 
     // Now we need to deal with the field data and mapout
@@ -700,7 +705,7 @@ int vtkSpyPlotReader::RequestData(
   // each block over the all dataset.
   
 
-  // Update the number of levels.
+  // Update the number of levels.  
   if(this->Controller)
     {
     this->SetGlobalLevels(hb, processNumber, numProcessors,
@@ -1322,8 +1327,10 @@ void vtkSpyPlotReader::GetLocalBounds(vtkSpyPlotBlockIterator *biter,
       this->UpdateProgress(
         static_cast<double>(1.2 + i) * progressFactor);
       }
+    // Make sure that the block is up to date
+    biter->GetUniReader()->MakeCurrent();
     block = biter->GetBlock();
-    block->GetRealBounds(bounds, this->IsAMR);
+    block->GetRealBounds(bounds);
     bbox->AddBounds(bounds);
     }
 }
@@ -1371,6 +1378,7 @@ int vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
       this->Controller->Receive(otherBounds, 6, left,
                                 VTK_MSG_SPY_READER_LOCAL_BOUNDS);
       bbox.AddBounds(otherBounds);
+      bbox.GetBounds(this->Bounds);
       }
     }
   if(right<numProcessors)
@@ -1383,6 +1391,7 @@ int vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
       this->Controller->Receive(otherBounds, 6, right,
                                 VTK_MSG_SPY_READER_LOCAL_BOUNDS);
       bbox.AddBounds(otherBounds);
+      bbox.GetBounds(this->Bounds);
       }
     }
   
@@ -1403,6 +1412,7 @@ int vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
       this->Controller->Receive(this->Bounds, 6, parent,
                                 VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
       bbox.AddBounds(this->Bounds);
+      bbox.GetBounds(this->Bounds);
       }
     }
   
@@ -1641,6 +1651,7 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
                                             ptDims, realPtDims));
           }
         uniReader->MarkCellFieldDataFixed(blockID, field);
+      
         }
       else
         {
@@ -1931,5 +1942,3 @@ void createSpyPlotLevelArray(vtkCellData *cd, int size, int level)
     }
 }
         
-
-                                  

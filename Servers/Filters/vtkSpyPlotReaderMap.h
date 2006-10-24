@@ -40,6 +40,7 @@ public:
   void Clean(vtkSpyPlotUniReader* save);
   vtkSpyPlotUniReader* GetReader(MapOfStringToSPCTH::iterator& it, 
                                  vtkSpyPlotReader* parent);
+  void TellReadersToCheck(vtkSpyPlotReader *parent);
 };
 
 
