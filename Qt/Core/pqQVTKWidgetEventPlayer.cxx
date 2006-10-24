@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QRegExp>
 
 #include <QtDebug>
-#include <stdio.h>
 
 #include "QVTKWidget.h"
 pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
@@ -58,8 +57,6 @@ bool pqQVTKWidgetEventPlayer::playEvent(QObject* Object,
       QRegExp mouseRegExp("\\(([^,]*),([^,]*),([^,]),([^,]),([^,]*)\\)");
       if (mouseRegExp.indexIn(Arguments)!= -1)
         {
-        printf("playing %s with widget size (%i,%i)\n", Command.toAscii().data(),
-          widget->width(), widget->height());
         QVariant v = mouseRegExp.cap(1);
         int x = static_cast<int>(v.toDouble() * widget->size().width());
         v = mouseRegExp.cap(2);
