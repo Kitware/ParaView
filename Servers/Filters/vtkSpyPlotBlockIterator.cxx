@@ -1,5 +1,6 @@
 #include "vtkSpyPlotBlockIterator.h"
 #include "vtkSpyPlotReader.h"
+#include <assert.h>
 
 vtkSpyPlotBlockIterator::vtkSpyPlotBlockIterator()
 {
