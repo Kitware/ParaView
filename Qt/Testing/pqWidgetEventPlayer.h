@@ -49,8 +49,8 @@ for test-cases, demos, tutorials, etc.
 class QTTESTING_EXPORT pqWidgetEventPlayer : public QObject
 {
 public:
-  pqWidgetEventPlayer(QObject* p) : QObject(p)  {}
-  virtual ~pqWidgetEventPlayer() {}
+  pqWidgetEventPlayer(QObject* p);
+  virtual ~pqWidgetEventPlayer();
 
   /** Derivatives should implement this and play-back the given command,
   returning "true" if they handled the command, and setting Error
@@ -60,6 +60,11 @@ public:
     const QString& Command,
     const QString& Arguments,
     bool& Error) = 0;
+
+protected:
+  /** Wait function provided for players that need to wait for the GUI
+      to perform a certain action */
+  void wait(int ms);
 
 };
 

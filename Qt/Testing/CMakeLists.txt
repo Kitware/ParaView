@@ -39,7 +39,6 @@ ENDIF(QT_TESTING_WITH_PYTHON)
 INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
   ${QtTesting_SOURCE_DIR}
-  ${QT_QTTEST_INCLUDE_DIR}
 )
 
 # Reduce the number of dirs that get included on moc command line
@@ -135,6 +134,7 @@ ADD_LIBRARY(QtTesting
   pqTestUtility.h
   pqThreadedEventSource.cxx
   pqThreadedEventSource.h
+  pqWidgetEventPlayer.cxx
   pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
   pqXMLEventObserver.cxx
@@ -153,7 +153,6 @@ SOURCE_GROUP("Generated" FILES
 
 TARGET_LINK_LIBRARIES(QtTesting
   ${QT_LIBRARIES} 
-  ${QT_QTTEST_LIBRARY}
 )
 
 IF(QT_TESTING_WITH_PYTHON)

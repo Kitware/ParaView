@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QMenuBar>
 #include <QPushButton>
-#include <QtTest>
 #include <QtDebug>
 
 pqAbstractActivateEventPlayer::pqAbstractActivateEventPlayer(QObject * p)
@@ -107,7 +106,9 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
         {
         menu_bar->setActiveAction(next->menuAction());
         while(!next->isVisible())
-          QTest::qWait(100);
+          {
+          this->wait(100);
+          }
         }
       else if(QMenu* menu = qobject_cast<QMenu*>(p))
         {
@@ -125,7 +126,9 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
         QApplication::sendEvent(menu, &button_release);
         
         while(!next->isVisible())
-          QTest::qWait(100);
+          {
+          this->wait(100);
+          }
         }
       }
 
