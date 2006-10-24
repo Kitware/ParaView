@@ -1,0 +1,2 @@
+SET(KIT_WRAP_DEPS Filtering Rendering)
+PV_WRAP_VTK_CS(Infovis INFOVIS "${KIT_WRAP_DEPS}")
