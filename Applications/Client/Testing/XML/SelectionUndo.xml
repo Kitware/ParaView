@@ -11,8 +11,8 @@
   <pqevent object="MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.604615,0.799427,1,0,0)" />
   <pqevent object="MainWindow/selectionToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.426154,0.315186,1,1,0)" />
-  <pqevent object="MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.62,0.383954,1,0,0)" />
-  <pqevent object="MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.62,0.383954,1,0,0)" />
+  <pqevent object="MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.62,0.5,1,0,0)" />
+  <pqevent object="MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.62,0.5,1,0,0)" />
   <pqevent object="MainWindow/selectionToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.401538,0.578797,1,1,0)" />
   <pqevent object="MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.401538,0.578797,1,0,0)" />
