@@ -3,6 +3,8 @@
 #include "vtkSpyPlotIStream.h"
 #include "vtkByteSwap.h"
 
+#include <assert.h>
+
 #define MinBlockBound(i) this->XYZArrays[i]->GetTuple1(0)
 #define MaxBlockBound(i)  \
 this->XYZArrays[i]->GetTuple1(this->XYZArrays[i]->GetNumberOfTuples()-1)
