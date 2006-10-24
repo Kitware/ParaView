@@ -281,6 +281,7 @@ protected:
                    vtkDataArray *a2,
                    vtkDataArray *a3);
   
+
   vtkSpyPlotReaderMap *Map;
   
   // Description:

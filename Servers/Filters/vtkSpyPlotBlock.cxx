@@ -10,21 +10,25 @@ this->XYZArrays[i]->GetTuple1(this->XYZArrays[i]->GetNumberOfTuples()-1)
 << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-
 //-----------------------------------------------------------------------------
 vtkSpyPlotBlock::vtkSpyPlotBlock() :
-  Allocated(0), Active(0), Level(0)
+  Level(0)
 {
+  this->Status.Active = 0;
+  this->Status.Allocated = 0;
+  this->Status.Fixed = 0;
+  this->Status.Debug = 0;
+  this->Status.AMR = 0;
   this->XYZArrays[0] = 0;
   this->XYZArrays[1] = 0;
   this->XYZArrays[2] = 0;
-  this->DebugMode = 0;
+  
 }
 
 //-----------------------------------------------------------------------------
 vtkSpyPlotBlock::~vtkSpyPlotBlock()
 {
-  if (!this->Allocated)
+  if (!this->IsAllocated()) 
     {
     return;
     }
@@ -37,13 +41,20 @@ vtkSpyPlotBlock::~vtkSpyPlotBlock()
 //-----------------------------------------------------------------------------
 void vtkSpyPlotBlock::SetDebug(unsigned char mode)
 {
-  this->DebugMode = mode;
+  if (mode)
+    {
+    this->Status.Debug = 1;
+    }
+  else 
+    {
+    this->Status.Debug = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------
 unsigned char vtkSpyPlotBlock::GetDebug() const
 {
-  return this->DebugMode;
+  return this->Status.Debug;
 }
 
 //-----------------------------------------------------------------------------
@@ -64,11 +75,10 @@ void vtkSpyPlotBlock::GetBounds(double bounds[6])const
 }
 
 //-----------------------------------------------------------------------------
-void vtkSpyPlotBlock::GetRealBounds(double rbounds[6],
-                                    int assumeAMR) const
+void vtkSpyPlotBlock::GetRealBounds(double rbounds[6]) const
 {
   int i, j = 0;
-  if (assumeAMR)
+  if (this->IsAMR())
     {
     double spacing, maxV, minV;
     for ( i = 0; i < 3; i++)
@@ -92,7 +102,7 @@ void vtkSpyPlotBlock::GetRealBounds(double rbounds[6],
   // (-2 represents the original endpoints being removed) - fixOffset is
   // used to correct for this
   int fixOffset = 0; 
-  if (!this->VectorsFixedForGhostCells) 
+  if (!this->IsFixed()) 
     {
     fixOffset = 1;
     }
@@ -102,7 +112,8 @@ void vtkSpyPlotBlock::GetRealBounds(double rbounds[6],
     if (this->Dimensions[i] > 1)
       {
       rbounds[j++] = this->XYZArrays[i]->GetTuple1(fixOffset);
-      rbounds[j++] = this->XYZArrays[i]->GetTuple1(this->Dimensions[i]+fixOffset-2);
+      rbounds[j++] = 
+        this->XYZArrays[i]->GetTuple1(this->Dimensions[i]+fixOffset-2);
       continue;
       }
     rbounds[j++] = 0;
@@ -113,6 +124,7 @@ void vtkSpyPlotBlock::GetRealBounds(double rbounds[6],
 //-----------------------------------------------------------------------------
 void vtkSpyPlotBlock::GetVectors(vtkDataArray *coordinates[3]) const
 {
+  assert("Check Block is not AMR" && (!this->IsAMR()));
   coordinates[0] = this->XYZArrays[0];
   coordinates[1] = this->XYZArrays[1];
   coordinates[2] = this->XYZArrays[2];
@@ -127,6 +139,7 @@ int vtkSpyPlotBlock::GetAMRInformation(double globalBounds[6],
                                        int realExtents[6], 
                                        int realDims[3]) const
 {
+  assert("Check Block is AMR" && this->IsAMR());
   *level = this->Level;
   this->GetExtents(extents);
   int i, j, hasBadCells = 0;
@@ -151,7 +164,7 @@ int vtkSpyPlotBlock::GetAMRInformation(double globalBounds[6],
       realExtents[j] = 1;
       origin[i] = minV + spacing[i];
       hasBadCells = 1;
-      if (!this->VectorsFixedForGhostCells)
+      if (!this->IsFixed())
         {
         --extents[j+1];
         }
@@ -166,7 +179,7 @@ int vtkSpyPlotBlock::GetAMRInformation(double globalBounds[6],
       {
       realExtents[j] = this->Dimensions[i] - 1;      
       hasBadCells = 1;
-      if (!this->VectorsFixedForGhostCells)
+      if (!this->IsFixed())
         {
         --extents[j];
         }
@@ -190,6 +203,9 @@ int vtkSpyPlotBlock::FixInformation(double globalBounds[6],
   )
 {
   
+  // This better not be a AMR block!
+  assert("Check Block is not AMR" && (!this->IsAMR()));
+
   this->GetExtents(extents);
 
   int i, j, hasBadGhostCells = 0;
@@ -202,10 +218,8 @@ int vtkSpyPlotBlock::FixInformation(double globalBounds[6],
   vtkDebugMacro( "  X: " << this->XYZArrays[0]->GetNumberOfTuples() );
   vtkDebugMacro( "  Y: " << this->XYZArrays[1]->GetNumberOfTuples() );
   vtkDebugMacro( "  Z: " << this->XYZArrays[2]->GetNumberOfTuples() );
-  vtkDebugMacro( << __LINE__ << " BadGhostCells:" 
-                 << coutVector6(this->RemovedBadGhostCells) );
   vtkDebugMacro( << __LINE__ << " Dims: " << coutVector3(this->Dimensions) );
-  vtkDebugMacro( << __LINE__ << " Bool: " << this->VectorsFixedForGhostCells );
+  vtkDebugMacro( << __LINE__ << " Bool: " << this->IsFixed() );
 
   double minV, maxV;
   for (i = 0, j = 0; i < 3; i++, j++)
@@ -224,14 +238,12 @@ int vtkSpyPlotBlock::FixInformation(double globalBounds[6],
     vtkDebugMacro( "Bounds[" << (j) << "] = " << minV 
                    <<" Bounds[" << (j+1) << "] = " << maxV);
     ca[i] = this->XYZArrays[i];
-    if(this->RemovedBadGhostCells[j] || 
-       (minV < globalBounds[j]) && !this->VectorsFixedForGhostCells)
+    if (minV < globalBounds[j])
       {
       realExtents[j]=1;
       --extents[j+1];
       hasBadGhostCells=1;
-      this->RemovedBadGhostCells[j] = 1;
-      if (!this->VectorsFixedForGhostCells)
+      if (!this->IsFixed())
         {
         this->XYZArrays[i]->RemoveFirstTuple();
         vectorsWereFixed = 1;
@@ -243,14 +255,12 @@ int vtkSpyPlotBlock::FixInformation(double globalBounds[6],
       }
     j++;
     
-    if(this->RemovedBadGhostCells[j] || 
-       (maxV >globalBounds[j]) && !this->VectorsFixedForGhostCells)
+    if (maxV >globalBounds[j])
       {
       realExtents[j] = this->Dimensions[i] - 1;      
       --extents[j];
       hasBadGhostCells=1;
-      this->RemovedBadGhostCells[j] = 1;
-      if (!this->VectorsFixedForGhostCells)
+      if (!this->IsFixed())
         {
         this->XYZArrays[i]->RemoveLastTuple();
         vectorsWereFixed = 1;
@@ -264,17 +274,25 @@ int vtkSpyPlotBlock::FixInformation(double globalBounds[6],
     }
   if (vectorsWereFixed)
     {
-    this->VectorsFixedForGhostCells = 1;
+    this->Status.Fixed = 1;
     }
-  vtkDebugMacro( << __LINE__ << " BadGhostCells:" 
-                 << coutVector6(this->RemovedBadGhostCells) );
   return hasBadGhostCells;
 }
 
 //-----------------------------------------------------------------------------
-int vtkSpyPlotBlock::Read(vtkSpyPlotIStream *stream)
+int vtkSpyPlotBlock::Read(int isAMR, vtkSpyPlotIStream *stream)
 {
 
+  if (isAMR)
+    {
+    this->Status.AMR = 1;
+    }
+  else 
+    {
+    this->Status.AMR = 0;
+    }
+
+  int temp;
   // Read in the dimensions of the block
   if (!stream->ReadInt32s(this->Dimensions, 3))
     {
@@ -282,17 +300,35 @@ int vtkSpyPlotBlock::Read(vtkSpyPlotIStream *stream)
     return 0;
     }
   // Read in the allocation state of the block
-  if (!stream->ReadInt32s(&(this->Allocated), 1))
+  if (!stream->ReadInt32s(&temp, 1))
     {
     vtkErrorMacro("Could not read in block's allocated state");
     return 0;
     }
+  if (temp)
+    {
+    this->Status.Allocated = 1;
+    }
+  else
+    {
+    this->Status.Allocated = 0;
+    }
+
   // Read in the active state of the block
-  if (!stream->ReadInt32s(&(this->Active), 1))
+  if (!stream->ReadInt32s(&temp, 1))
     {
     vtkErrorMacro("Could not read in block's active state");
     return 0;
     }
+  if (temp)
+    {
+    this->Status.Active = 1;
+    }
+  else
+    {
+    this->Status.Active = 0;
+    }
+
   // Read in the level of the block
   if (!stream->ReadInt32s(&(this->Level), 1))
     {
@@ -300,29 +336,75 @@ int vtkSpyPlotBlock::Read(vtkSpyPlotIStream *stream)
     return 0;
     }
 
-  if ( this->Allocated )
+  int i;
+  if ( this->IsAllocated() )
     {
-    this->XYZArrays[0] = vtkFloatArray::New();
-    this->XYZArrays[0]->SetNumberOfTuples(this->Dimensions[0]+1);
-    this->XYZArrays[1] = vtkFloatArray::New();
-    this->XYZArrays[1]->SetNumberOfTuples(this->Dimensions[1]+1);
-    this->XYZArrays[2] = vtkFloatArray::New();
-    this->XYZArrays[2]->SetNumberOfTuples(this->Dimensions[2]+1);
+    for (i = 0; i < 3; i++)
+      {
+      if (!this->XYZArrays[i])
+        {
+        this->XYZArrays[i] = vtkFloatArray::New();
+        }
+      this->XYZArrays[i]->SetNumberOfTuples(this->Dimensions[i]+1);
+      }
     }
-  else
+  else 
     {
-    this->XYZArrays[0] = 0;
-    this->XYZArrays[1] = 0;
-    this->XYZArrays[2] = 0;
+    for (i = 0; i < 3; i++)
+      {
+      if (this->XYZArrays[i])
+        {
+        this->XYZArrays[i]->Delete();
+        this->XYZArrays[i] = 0;
+        }
+      }
     }
-  // Clear the bad cell info
-  this->RemovedBadGhostCells[0] = 0;
-  this->RemovedBadGhostCells[1] = 0;
-  this->RemovedBadGhostCells[2] = 0;
-  this->RemovedBadGhostCells[3] = 0;
-  this->RemovedBadGhostCells[4] = 0;
-  this->RemovedBadGhostCells[5] = 0;
-  this->VectorsFixedForGhostCells = 0;
+  this->Status.Fixed = 0;
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSpyPlotBlock::Scan(vtkSpyPlotIStream *stream, 
+                          unsigned char *isAllocated)
+{
+
+  int temp[3];
+  // Read in the dimensions of the block
+  if (!stream->ReadInt32s(temp, 3))
+    {
+    vtkGenericWarningMacro("Could not read in block's dimensions");
+    return 0;
+    }
+  // Read in the allocation state of the block
+  if (!stream->ReadInt32s(temp, 1))
+    {
+    vtkGenericWarningMacro("Could not read in block's allocated state");
+    return 0;
+    }
+  if (temp[0])
+    {
+    *isAllocated = 1;
+    }
+  else 
+    {
+    *isAllocated = 0;
+    }
+
+
+  // Read in the active state of the block
+  if (!stream->ReadInt32s(temp, 1))
+    {
+    vtkGenericWarningMacro("Could not read in block's active state");
+    return 0;
+    }
+  
+  // Read in the level of the block
+  if (!stream->ReadInt32s(temp, 1))
+    {
+    vtkGenericWarningMacro("Could not read in block's level");
+    return 0;
+    }
+
   return 1;
 }
 
@@ -338,32 +420,25 @@ int vtkSpyPlotBlock::InvokeEvent(const char *, void *) const
 
  
 //-----------------------------------------------------------------------------
-/* Routine run-length-encodes the data pointed to by *data, placing
+/* SetGeometry - sets the geometric definition of the block's ith direction
+   encodeInfo is a runlength delta encoded string of size infoSize
+
+   DeltaRunLengthEncoded Description:
+   run-length-encodes the data pointed to by *data, placing
    the result in *out. n is the number of doubles to encode. n_out
    is the number of bytes used for the compression (and stored at
    *out). delta is the smallest change of adjacent values that will
    be accepted (changes smaller than delta will be ignored). 
 
-   Note: *out needs to be allocated by the calling application. 
-   Its worst-case size is 5*n bytes. */
+*/
 
-
-
-/* Routine run-length-decodes the data pointed to by *in and
-   returns a collection of doubles in *data. Performs the
-   inverse of rle above. Application should provide both
-   n (the expected number of doubles) and n_in the number
-   of bytes to decode from *in. Again, the application needs
-   to provide allocated space for *data which will be
-   n bytes long. */
-
-int vtkSpyPlotBlock::RunLengthDeltaDecode(const unsigned char* in, 
-                                          int inSize, float* out, 
-                                          int outSize)
+int vtkSpyPlotBlock::SetGeometry(int dir,
+                                 const unsigned char* encodedInfo, 
+                                 int infoSize)
 {
-  int outIndex = 0, inIndex = 0;
-
-  const unsigned char* ptmp = in;
+  int compIndex = 0, inIndex = 0;
+  int compSize = this->Dimensions[dir] + 1;
+  const unsigned char* ptmp = encodedInfo;
 
   /* Run-length decode */
 
@@ -379,10 +454,19 @@ int vtkSpyPlotBlock::RunLengthDeltaDecode(const unsigned char* in,
   vtkByteSwap::SwapBE(&delta);
   ptmp += 4;
 
+
+  if (!this->XYZArrays[dir])
+    {
+    vtkErrorMacro( "Coordinate Array has not been allocated" );
+    return 0;
+    }
+
+  float *comp = this->XYZArrays[dir]->GetPointer(0);
+
   // Now loop around until I get to the end of
   // the input array
   inIndex += 8;
-  while ((outIndex<outSize) && (inIndex<inSize))
+  while ((compIndex<compSize) && (inIndex<infoSize))
     {
     // Okay get the run length
     unsigned char runLength = *ptmp;
@@ -390,19 +474,19 @@ int vtkSpyPlotBlock::RunLengthDeltaDecode(const unsigned char* in,
     if (runLength < 128)
       {
       ptmp += 4;
-      // Now populate the out data
+      // Now populate the comp data
       int k;
       for (k=0; k<runLength; ++k)
         {
-        if ( outIndex >= outSize )
+        if ( compIndex >= compSize )
           {
           vtkErrorMacro( "Problem doing RLD decode. "
                          << "Too much data generated. Excpected: " 
-                         << outSize );
+                         << compSize );
           return 0;
           }
-        out[outIndex] = val + outIndex*delta;
-        outIndex++;
+        comp[compIndex] = val + compIndex*delta;
+        compIndex++;
         }
       inIndex += 5;
       }
@@ -411,18 +495,18 @@ int vtkSpyPlotBlock::RunLengthDeltaDecode(const unsigned char* in,
       int k;
       for (k=0; k<runLength-128; ++k)
         {
-        if ( outIndex >= outSize )
+        if ( compIndex >= compSize )
           {
           vtkErrorMacro( "Problem doing RLD decode. "
                          << "Too much data generated. Excpected: " 
-                         << outSize );
+                         << compSize );
           return 0;
           }
         float nval;
         memcpy(&nval, ptmp, sizeof(float));
         vtkByteSwap::SwapBE(&nval);
-        out[outIndex] = nval + outIndex*delta;
-        outIndex++;
+        comp[compIndex] = nval + compIndex*delta;
+        compIndex++;
         ptmp += 4;
         }
       inIndex += 4*(runLength-128)+1;

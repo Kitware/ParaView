@@ -46,10 +46,9 @@ public:
   int IsAllocated() const;
   int IsFixed() const;
   int IsActive() const;
+  int IsAMR() const;
   void MarkedAsFixed();
-  void GetRealBounds(double realBounds[6],
-                     int assumeAMR) const;
-  
+  void GetRealBounds(double realBounds[6]) const;
   int GetAMRInformation(double globalBounds[6],
                         int *level, 
                         double spacing[3],
@@ -58,7 +57,16 @@ public:
                         int realExtents[6], 
                         int realDimensions[3])const;
   int HadBadGhostCell(int i) const;
-  int Read(vtkSpyPlotIStream *stream);
+  // Read reads in the actual block's information
+  int Read(int isAMR, vtkSpyPlotIStream *stream);
+  // Advances the stream to be after the block, information w/r
+  // whether the block is allocated in the time step is returned
+  // as an arguement
+  static int Scan(vtkSpyPlotIStream *stream, unsigned char *isAllocated);
+
+  int SetGeometry(int dir,
+                  const unsigned char* encodedInfo, 
+                  int infoSize);
   int GetTotalSize() const;
   int FixInformation(double globalBounds[6],
                      int extents[6],
@@ -72,16 +80,18 @@ public:
   int HasObserver(const char *) const;
   int InvokeEvent(const char *, void *) const;
 protected:
-  int RunLengthDeltaDecode(const unsigned char* in, int inSize, float* out, 
-                           int outSize);
   int Dimensions[3];
-  int Allocated;
-  int Active;
+  struct BlockStatusType
+  {
+    unsigned Active: 1;
+    unsigned Allocated: 1;
+    unsigned AMR: 1;
+    unsigned Fixed :1;
+    unsigned Debug :1;
+  };
+  BlockStatusType Status;
   int Level;
-  unsigned char DebugMode;
   vtkFloatArray* XYZArrays[3];
-  int VectorsFixedForGhostCells;
-  int RemovedBadGhostCells[6];
 };
 
 inline int vtkSpyPlotBlock::GetLevel() const 
@@ -98,27 +108,27 @@ inline void vtkSpyPlotBlock::GetDimensions(int dims[3]) const
 
 inline int vtkSpyPlotBlock::IsActive() const
 {
-  return this->Active;
+  return this->Status.Active;
 }
 
 inline int vtkSpyPlotBlock::IsAllocated() const
 {
-  return this->Allocated;
+  return this->Status.Allocated;
+}
+
+inline int vtkSpyPlotBlock::IsAMR() const
+{
+  return this->Status.AMR;
 }
 
 inline int vtkSpyPlotBlock::IsFixed() const
 {
-  return this->VectorsFixedForGhostCells;
+  return this->Status.Fixed;
 }
 
 inline void vtkSpyPlotBlock::MarkedAsFixed()
 {
-  this->VectorsFixedForGhostCells = 1;
-}
-
-inline int vtkSpyPlotBlock::HadBadGhostCell(int i) const
-{
-  return (this->RemovedBadGhostCells[i]);
+  this->Status.Fixed = 1;
 }
 
 inline int vtkSpyPlotBlock::GetDimension(int i) const

@@ -58,8 +58,10 @@ public:
   int ReadInformation();
   
   // Description:
-  // Read in the atual data (including grid blocks)
-  int ReadData();
+  // Make sure that actual data (including grid blocks) is current
+  // else it will read in the required data from file
+  int MakeCurrent();
+
   void PrintInformation();
   void PrintMemoryUsage();
 
@@ -74,6 +76,9 @@ public:
   // Set and Get the time range for the simulation run
   vtkGetVector2Macro(TimeStepRange, int);
   vtkGetVector2Macro(TimeRange, double);
+
+  // Description:
+  vtkSetMacro(NeedToCheck, int);
 
   // Description:
   // Functions that map from time to time step and vice versa
@@ -132,10 +137,12 @@ public:
     int NumVars;
     int* SavedVariables;
     vtkTypeInt64* SavedVariableOffsets;
+    vtkTypeInt64 SavedBlocksGeometryOffset;
+    unsigned char* SavedBlockAllocatedStates;
+    vtkTypeInt64 BlocksOffset;
     Variable *Variables;
     int NumberOfBlocks;
     int ActualNumberOfBlocks;
-    vtkSpyPlotBlock* Blocks;
   };
 
   vtkSpyPlotBlock* GetDataBlock(int block);
@@ -146,16 +153,16 @@ public:
 protected:
   vtkSpyPlotUniReader();
   ~vtkSpyPlotUniReader();
+  vtkSpyPlotBlock* Blocks;
 
 private:
-  int RunLengthDeltaDecode(const unsigned char* in, int inSize, float* out, 
-                           int outSize);
   int RunLengthDataDecode(const unsigned char* in, int inSize, float* out, 
                           int outSize);
   int RunLengthDataDecode(const unsigned char* in, int inSize, 
                           unsigned char* out, int outSize);
 
   int ReadHeader(vtkSpyPlotIStream *spis);
+  int ReadGroupHeaderInformation(vtkSpyPlotIStream *spis);
 
   // Header information
   char FileDescription[128];
@@ -197,15 +204,23 @@ private:
 
   // Current time and time range information
   int CurrentTimeStep;
+  // Time step that the geometry represents
+  int GeomTimeStep;
   double CurrentTime;
   int TimeStepRange[2];
   double TimeRange[2];
+
+  // Indicates that the reader needs to check its data 
+  // (Not its geometry) - the reason is that ReadData
+  // wil be called alot and there needs to be a way to 
+  // optimize this
+  int NeedToCheck;
 
   int DataTypeChanged;
   int DownConvertVolumeFraction;
 
   int NumberOfCellFields;
-
+  
   vtkDataArraySelection* CellArraySelection;
 
   Variable* GetCellField(int field);
@@ -223,7 +238,8 @@ inline  double* vtkSpyPlotUniReader::GetTimeArray()
 
 inline int vtkSpyPlotUniReader::IsAMR() 
 { 
-  return this->GetNumberOfDataBlocks() > 1; 
+  return (this->NumberOfBlocks > 1); 
 }
+
 
 #endif

@@ -39,3 +39,13 @@ vtkSpyPlotReaderMap::GetReader(MapOfStringToSPCTH::iterator& it,
     }
   return it->second;
 }
+
+void vtkSpyPlotReaderMap::TellReadersToCheck(vtkSpyPlotReader *parent)
+{
+  MapOfStringToSPCTH::iterator it;
+  MapOfStringToSPCTH::iterator end=this->Files.end();
+  for (it=this->Files.begin();it!=end; ++it)
+    {
+    this->GetReader(it, parent)->SetNeedToCheck(1);
+    }
+}
