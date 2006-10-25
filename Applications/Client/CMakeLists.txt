@@ -174,7 +174,7 @@ ENDIF(APPLE)
 
   IF(QT_TESTING_WITH_PYTHON)
     SET(PYTHON_TESTS
-      #HistogramChart
+      HistogramChart
       )
   ENDIF(QT_TESTING_WITH_PYTHON)
 
