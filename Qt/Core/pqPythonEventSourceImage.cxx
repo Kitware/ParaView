@@ -213,7 +213,7 @@ void pqPythonEventSourceImage::compareImage(QWidget* widget,
 #elif defined(Q_WS_X11)
   QFont newFont("Courier", 8, QFont::Normal, false);
 #else
-  QFont newFont("Courier Regular", 8, QFont::Normal, false);
+  QFont newFont("Courier Regular", 10, QFont::Normal, false);
 #endif
   widget->setFont(newFont);
   QImage img = QPixmap::grabWidget(widget).toImage();
