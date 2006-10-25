@@ -108,6 +108,9 @@
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkX3DExporter.h"
+#include "vtkVRMLExporter.h"
+
 #include <vtkstd/map>
 
 #include "vtkPVLookmarkManager.h"
@@ -190,7 +193,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.795");
+vtkCxxRevisionMacro(vtkPVWindow, "1.796");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2679,6 +2682,34 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel,
   int numProcs = pvApp->GetProcessModule()->GetNumberOfPartitions();
   int parallel = (numProcs > 1);
   
+  const char *ext= this->ExtractFileExtension(filename);
+  
+  vtkProcessModule *pm = pvApp->GetProcessModule();
+  if ( !pm->GetClientMode() && pm->GetNumberOfPartitions() == 1 )
+    {
+    if (strcmp(ext,".x3d")==0)
+      {
+      vtkX3DExporter *x3dex= vtkX3DExporter::New();
+
+      x3dex->SetFileName(filename);
+      x3dex->SetInput(this->Interactor->GetRenderWindow());
+      x3dex->Update();
+      x3dex->Write();
+      x3dex->Delete();
+      return; 
+      }
+    if (strcmp(ext,".wrl")==0)
+      {
+      vtkVRMLExporter *vrmlExporter = vtkVRMLExporter::New();
+
+      vrmlExporter->SetFileName(filename);
+      vrmlExporter->SetInput(this->Interactor->GetRenderWindow());
+      vrmlExporter->Update();
+      vrmlExporter->Write();
+      vrmlExporter->Delete();
+      return; 
+      }
+    }
   // Find the writer that supports this file name and data type.
   vtkPVWriter* writer = this->FindPVWriter(filename, parallel, numParts);
   
@@ -2819,6 +2850,10 @@ void vtkPVWindow::WriteData()
     return;
     }
   
+  if ( !pm->GetClientMode() && pm->GetNumberOfPartitions() == 1 )
+    {
+    typesStr << " {{X3D Scene} {.x3d}} {{VRML Scene} {.wrl}}";
+    }
   typesStr << ends;
   char* types = typesStr.str();
 
