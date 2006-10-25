@@ -20,6 +20,10 @@ IF(QT_TESTING_WITH_PYTHON)
     pqPythonEventSourceImage.cxx
     pqPythonEventSourceImage.h
   )
+  SET(PYTHON_MOC_SRCS 
+    pqPythonEventSourceImage.h
+  )
+
 ENDIF(QT_TESTING_WITH_PYTHON)
 
 
@@ -64,6 +68,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCoreTestUtility.h
   pqUndoStack.h
   pqQVTKWidgetEventTranslator.h
+  ${PYTHON_MOC_SRCS}
   )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 

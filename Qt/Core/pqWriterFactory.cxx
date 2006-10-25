@@ -169,8 +169,8 @@ void pqWriterFactory::addFileType(const QString& description,
   writer = this->Internal->getPrototype(xmlgroup, xmlname);
   if (!writer)
     {
-    writer.TakeReference(pxm->NewProxy(xmlgroup.toStdString().c_str(), 
-      xmlname.toStdString().c_str()));
+    writer.TakeReference(pxm->NewProxy(xmlgroup.toAscii().data(), 
+      xmlname.toAscii().data()));
     if (!writer)
       {
       qDebug() << "Failed to create writer prototype : " << xmlgroup 
@@ -301,7 +301,7 @@ void pqWriterFactory::loadFileTypes(const QString& xmlfilename)
     QString desc = writer.attribute("file_description");
     QString group = writer.attribute("group", "writers");
     QStringList exts = extensions.split(" ", QString::SkipEmptyParts);
-    this->addFileType(desc, exts, group, name.toStdString().c_str());
+    this->addFileType(desc, exts, group, name.toAscii().data());
     }
 }
 

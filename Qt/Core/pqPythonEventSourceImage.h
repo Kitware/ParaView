@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PQCORE_EXPORT pqPythonEventSourceImage :
   public pqPythonEventSource
 {
+  Q_OBJECT
 public:
   pqPythonEventSourceImage(QObject* p=0);
   ~pqPythonEventSourceImage();
@@ -56,8 +57,9 @@ public slots:
                     double threshold,
                     const QString& tempDir);
 protected:
-  virtual bool event(QEvent* e);
   virtual void run();
+protected slots:
+  void doSnapshot();
 };
 
 #endif // !_pqPythonEventSourceImage_h

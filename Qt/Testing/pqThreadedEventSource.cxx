@@ -129,20 +129,16 @@ int pqThreadedEventSource::getNextEvent(
   return SUCCESS;
 }
 
-bool pqThreadedEventSource::event(QEvent* e)
+void pqThreadedEventSource::relayEvent(QString object, QString command, QString arguments)
 {
-  pqPlayCommandEvent* pe = dynamic_cast<pqPlayCommandEvent*>(e);
-  if(pe)
-  {
-    this->Internal->CurrentObject = pe->Object;
-    this->Internal->CurrentCommand = pe->Command;
-    this->Internal->CurrentArgument = pe->Arguments;
-    this->Internal->GotEvent = true;
+  this->Internal->CurrentObject = object;
+  this->Internal->CurrentCommand = command;
+  this->Internal->CurrentArgument = arguments;
+  this->Internal->GotEvent = true;
+  if(this->Internal->Loop.isRunning())
+    {
     this->Internal->Loop.quit();
-    return true;
-  }
-
-  return pqEventSource::event(e);
+    }
 }
 
 
@@ -150,10 +146,14 @@ void pqThreadedEventSource::postNextEvent(const QString& object,
                    const QString& command,
                    const QString& argument)
 {
-  QApplication::postEvent(this, new pqPlayCommandEvent(object, command, argument));
-  // wait for the GUI thread to take the event and wake us up
   QMutex mut;
   mut.lock();
+  QMetaObject::invokeMethod(this, "relayEvent", Qt::QueuedConnection, 
+                            Q_ARG(QString, object),
+                            Q_ARG(QString, command),
+                            Q_ARG(QString, argument));
+
+  // wait for the GUI thread to take the event and wake us up
   this->Internal->WaitCondition.wait(&mut);
 }
 

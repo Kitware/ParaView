@@ -64,10 +64,11 @@ public:
                      const QString& command,
                      const QString& argument);
   
+private slots:
+
+  void relayEvent(QString object, QString command, QString arguments);
+
 protected:
-
-  bool event(QEvent* e);
-
   // start the thread
   void start();
 

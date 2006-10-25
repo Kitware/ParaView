@@ -56,15 +56,6 @@ static QString PropertyObject;
 static QString PropertyResult;
 static QWaitCondition WaitResults;
 
-namespace
-{
-  class pqGetPropertyEvent : public QEvent
-    {
-  public:
-    pqGetPropertyEvent() : QEvent(QEvent::User) {}
-    };
-
-}
 
 static PyObject*
 QtTesting_playCommand(PyObject* /*self*/, PyObject* args)
@@ -115,12 +106,14 @@ QtTesting_getProperty(PyObject* /*self*/, PyObject* args)
     return NULL;
     }
 
-  PropertyResult = property;
   PropertyObject = object;
+  PropertyResult = property;
   
-  QCoreApplication::postEvent(Instance, new pqGetPropertyEvent());
   QMutex mut;
   mut.lock();
+
+  QMetaObject::invokeMethod(Instance, "getProperty", Qt::QueuedConnection);
+
   WaitResults.wait(&mut);
     
   if(PropertyObject == QString::null)
@@ -187,42 +180,35 @@ void pqPythonEventSource::setContent(const QString& path)
   this->start();
 }
   
-bool pqPythonEventSource::event(QEvent* e)
+void pqPythonEventSource::getProperty()
 {
-  if(dynamic_cast<pqGetPropertyEvent*>(e))
+  QObject* qobject = pqObjectNaming::GetObject(PropertyObject);
+  if(!qobject)
     {
-    QObject* qobject = pqObjectNaming::GetObject(PropertyObject);
-    if(!qobject)
-      {
-      PropertyObject = QString::null;
-      }
-    else
-      {
-      PropertyResult = qobject->property(
-        PropertyResult.toAscii().data()).toString();
-      }
-    WaitResults.wakeAll();
-    return true;
+    PropertyObject = QString::null;
     }
-  return pqThreadedEventSource::event(e);
+  else
+    {
+    PropertyResult = qobject->property(
+      PropertyResult.toAscii().data()).toString();
+    }
+  WaitResults.wakeAll();
 }
 
 void pqPythonEventSource::run()
 {
- 
+  QFile file(this->Internal->FileName);
+  if(!file.open(QFile::ReadOnly | QFile::Text))
+    {
+    printf("Unable to open python script\n");
+    return;
+    } 
 
   // initialize threading
   PyEval_InitThreads();
   this->Internal->MainThreadState = PyThreadState_Get();
   PyEval_ReleaseLock();
 
-  QString filename = this->Internal->FileName;
-  FILE* pythonScript = fopen(filename.toAscii().data(), "r");
-  if(!pythonScript)
-    {
-    printf("Unable to open python script\n");
-    return;
-    }
   
   PyEval_AcquireLock();
   PyInterpreterState* mainInterpreterState;
@@ -233,11 +219,8 @@ void pqPythonEventSource::run()
   Instance = this;
 
   // finally run the script
-  int result = PyRun_SimpleFile(pythonScript, filename.toAscii().data());
-  if( result == 2 )
-    {
-    printf("invalid python file\n");
-    }
+  QByteArray wholeFile = file.readAll();
+  int result = PyRun_SimpleString(wholeFile.data()) == 0 ? 0 : 1;
   
   PyThreadState_Swap(NULL);
 
@@ -246,8 +229,6 @@ void pqPythonEventSource::run()
   
   PyEval_ReleaseLock();
   
-  fclose(pythonScript);
-
   this->done(result);
 }
 

@@ -145,8 +145,6 @@ void pqEventDispatcher::playNextEvent()
     }
     
   bool error = false;
-  // block signals as some event sources may interact with the event loop, as
-  // well as some players interact with the event loop
   this->Implementation->Player->playEvent(object, command, arguments, error);
   if(error)
     {

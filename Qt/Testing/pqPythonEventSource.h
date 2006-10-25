@@ -42,6 +42,7 @@ by pqPythonEventObserver */
 class QTTESTING_EXPORT pqPythonEventSource :
   public pqThreadedEventSource
 {
+  Q_OBJECT
 public:
   pqPythonEventSource(QObject* p = 0);
   ~pqPythonEventSource();
@@ -50,8 +51,11 @@ public:
 
 protected:
   virtual void run();
-  virtual bool event(QEvent*);
 
+protected slots:
+  void getProperty();
+
+private:
   class pqInternal;
   pqInternal* Internal;
 

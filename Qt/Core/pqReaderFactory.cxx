@@ -186,8 +186,8 @@ void pqReaderFactory::addFileType(const QString& description,
   reader = this->Internal->getPrototype(xmlgroup, xmlname);
   if (!reader)
     {
-    reader.TakeReference(pxm->NewProxy(xmlgroup.toStdString().c_str(), 
-      xmlname.toStdString().c_str()));
+    reader.TakeReference(pxm->NewProxy(xmlgroup.toAscii().data(), 
+      xmlname.toAscii().data()));
     if (!reader)
       {
       qDebug() << "Failed to create reader prototype : " << xmlgroup 
@@ -394,7 +394,7 @@ void pqReaderFactory::loadFileTypes(const QString& xmlfilename)
     QString desc = reader.attribute("file_description");
     QString group = reader.attribute("group", "sources");
     QStringList exts = extensions.split(" ", QString::SkipEmptyParts);
-    this->addFileType(desc, exts, group, name.toStdString().c_str());
+    this->addFileType(desc, exts, group, name.toAscii().data());
     }
 }
 

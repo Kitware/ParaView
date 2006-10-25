@@ -26,6 +26,7 @@ IF(QT_TESTING_WITH_PYTHON)
   )
   SET(PYTHON_MOCS
     pqPythonEventObserver.h
+    pqPythonEventSource.h
   )
   SET(PYTHON_SRCS
     pqPythonEventObserver.cxx

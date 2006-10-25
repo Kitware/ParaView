@@ -72,15 +72,6 @@ QString SnapshotBaseline;
 int SnapshotWidth = 1;
 int SnapshotHeight = 1;
 
-namespace 
-{
-  class pqDoSnapshotEvent : public QEvent
-    {
-  public:
-    pqDoSnapshotEvent() : QEvent(QEvent::User) {}
-    };
-}
-
 static PyObject*
 QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
 {
@@ -106,12 +97,13 @@ QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
   SnapshotWidth = width;
   SnapshotHeight = height;
 
-  // get our routines on the GUI thread to do the image comparison
-  QCoreApplication::postEvent(Instance, new pqDoSnapshotEvent());
-
-  // wait for image comparison results
   QMutex mut;
   mut.lock();
+
+  // get our routines on the GUI thread to do the image comparison
+  QMetaObject::invokeMethod(Instance, "doSnapshot", Qt::QueuedConnection);
+
+  // wait for image comparison results
   WaitForSnapshot.wait(&mut);
 
   if(SnapshotWidget == QString::null)
@@ -164,43 +156,38 @@ void pqPythonEventSourceImage::run()
   pqPythonEventSource::run();
 }
 
-bool pqPythonEventSourceImage::event(QEvent* e)
+void pqPythonEventSourceImage::doSnapshot()
 {
-  if(dynamic_cast<pqDoSnapshotEvent*>(e))
+  QWidget* widget =
+    qobject_cast<QWidget*>(pqObjectNaming::GetObject(SnapshotWidget));
+  if(!widget)
     {
-    QWidget* widget =
-      qobject_cast<QWidget*>(pqObjectNaming::GetObject(SnapshotWidget));
-    if(!widget)
-      {
-      SnapshotWidget = QString::null;
-      }
-    else
-      {
-      // assume all images are in the dataroot/Baseline directory
-      QString fullpath = pqCoreTestUtility::DataRoot();
-      fullpath += QDir::separator();
-      fullpath += "Baseline";
-      fullpath += QDir::separator();
-      fullpath += SnapshotBaseline;
-
-
-      pqOptions* const options = pqOptions::SafeDownCast(
-            vtkProcessModule::GetProcessModule()->GetOptions());
-      int threshold = options->GetImageThreshold();
-      QString testdir = options->GetTestDirectory();
-      if(testdir == QString::null)
-        {
-        testdir = ".";
-        }
-
-      this->compareImage(widget,
-                         fullpath,
-                         threshold,
-                         testdir);
-      }
-    return true;
+    SnapshotWidget = QString::null;
     }
-  return pqPythonEventSource::event(e);
+  else
+    {
+    // assume all images are in the dataroot/Baseline directory
+    QString fullpath = pqCoreTestUtility::DataRoot();
+    fullpath += "/Baseline/";
+    fullpath += SnapshotBaseline;
+
+
+    pqOptions* const options = pqOptions::SafeDownCast(
+          vtkProcessModule::GetProcessModule()->GetOptions());
+    int threshold = options->GetImageThreshold();
+    QString testdir = options->GetTestDirectory();
+    if(testdir == QString::null)
+      {
+      testdir = ".";
+      }
+
+    this->compareImage(widget,
+                        fullpath,
+                        threshold,
+                        testdir);
+    }
+  // signal the testing thread
+  WaitForSnapshot.wakeAll();
 }
 
 void pqPythonEventSourceImage::compareImage(QWidget* widget,
@@ -221,7 +208,13 @@ void pqPythonEventSourceImage::compareImage(QWidget* widget,
   QSize oldSize = widget->size();
   widget->resize(SnapshotWidth, SnapshotHeight);
   QFont oldFont = widget->font();
-  QFont newFont("Courier", 7, QFont::Normal, false);
+#if defined(Q_WS_WIN)
+  QFont newFont("Arial", 8, QFont::Normal, false);
+#elif defined(Q_WS_X11)
+  QFont newFont("Courier", 8, QFont::Normal, false);
+#else
+  QFont newFont("Courier Regular", 8, QFont::Normal, false);
+#endif
   widget->setFont(newFont);
   QImage img = QPixmap::grabWidget(widget).toImage();
   widget->resize(oldSize);
@@ -257,8 +250,6 @@ void pqPythonEventSourceImage::compareImage(QWidget* widget,
   // compare the image
   SnapshotResult = testing->RegressionTest(vtkimage, threshold) == vtkTesting::PASSED;
 
-  // signal the testing thread
-  WaitForSnapshot.wakeAll();
 }
 
 
