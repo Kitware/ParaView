@@ -11,7 +11,7 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.4");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.5");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -1095,6 +1095,10 @@ int vtkSpyPlotUniReader::SetCurrentTime(double time)
   this->ReadInformation();
   if ( time < this->TimeRange[0] || time > this->TimeRange[1] )
     {
+      vtkWarningMacro("Requested time: " << time <<
+                      " is outside of reader's range [" <<
+                      this->TimeRange[0] << ", " <<
+                      this->TimeRange[1] << "]");
     return 0;
     }
   this->CurrentTime = time;
@@ -1113,7 +1117,11 @@ int vtkSpyPlotUniReader::SetCurrentTimeStep(int timeStep)
   this->ReadInformation();
   if ( timeStep < this->TimeStepRange[0] || timeStep > this->TimeStepRange[1] )
     {
-    return 0;
+      vtkWarningMacro("Requested time step: " << timeStep <<
+                      " is outside of reader's range [" <<
+                      this->TimeStepRange[0] << ", " <<
+                      this->TimeStepRange[1] << "]");
+   return 0;
     }
   this->CurrentTimeStep = timeStep;
   this->CurrentTime = this->GetTimeFromTimeStep(timeStep);
