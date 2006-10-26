@@ -197,6 +197,8 @@ public:
 pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   Implementation(new pqImplementation(parent_widget))
 {
+  Q_INIT_RESOURCE(pqComponents);
+
   this->setObjectName("MainWindowCore");
 
   QObject::connect(this, SIGNAL(activePlotModuleChanged(pqPlotViewModule*)),

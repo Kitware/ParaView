@@ -122,6 +122,10 @@ pqApplicationCore* pqApplicationCore::instance()
 pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   : QObject(p)
 {
+  // make sure core resources are available, necessary for static build,
+  // harmless for shared build
+  Q_INIT_RESOURCE(pqCore);
+
   this->Internal = new pqApplicationCoreInternal();
 
   this->Internal->ApplicationName = "ParaViewBasedApplication";

@@ -156,7 +156,7 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
 )
 
 SET(UI_RESOURCES
-  Resources/pqResources.qrc
+  Resources/pqComponents.qrc
 )
 
 QT4_ADD_RESOURCES(RCS_SOURCES
