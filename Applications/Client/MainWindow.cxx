@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIcon>
 #include <QLayout>
 #include <QMessageBox>
+#include <QShortcut>
 
 //////////////////////////////////////////////////////////////////////////////
 // MainWindow::pqImplementation
@@ -284,17 +285,24 @@ MainWindow::MainWindow() :
     
   connect(this->Implementation->UI.actionVCRLastFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onLastFrame()));
-
+  
   connect(this->Implementation->UI.actionMoveMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToInteraction()));
     
   connect(this->Implementation->UI.actionSelectionMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToSelection()));
 
-  // At end of each selection, we want to switch back to the normal interaction mode.
+  // Create Selection Shortcut.
+  QShortcut *s=new QShortcut(QKeySequence(tr("S")),&this->Implementation->Core.multiViewManager());
+  QObject::connect(
+    s, 
+    SIGNAL(activated()),
+    this, 
+    SLOT(onSelectionShortcut()));
+
   connect(&this->Implementation->Core.selectionManager(), 
     SIGNAL(selectionMarked()), 
-    this->Implementation->UI.actionMoveMode, SLOT(trigger()));
+    this, SLOT(onSelectionShortcutFinished()));
 
   connect(
     &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
@@ -379,7 +387,7 @@ MainWindow::MainWindow() :
     &this->Implementation->Core,
     SIGNAL(enableSelectionToolbar(bool)),
     this->Implementation->UI.selectionToolbar,
-    SLOT(setEnabled(bool)));
+    SLOT(setVisible(bool)));
 
   this->Implementation->Core.setupCustomFilterToolbar(
     this->Implementation->UI.customFilterToolbar);
@@ -738,3 +746,35 @@ void MainWindow::onPlotRemoved(pqPlotViewModule* view)
     this->Implementation->UI.menuPlots->setEnabled(false);
     }
 }
+
+void MainWindow::onSelectionShortcut()
+{
+
+  if(this->Implementation->UI.actionSelectionMode->isVisible())
+  {
+    this->Implementation->UI.actionSelectionMode->trigger();
+  }
+  else
+  {
+    this->Implementation->UI.actionSelectionMode->setChecked(true);
+    this->Implementation->Core.selectionManager().switchToSelection();
+  }
+
+
+}
+void MainWindow::onSelectionShortcutFinished()
+{
+  // At end of each selection, we want to switch back to the normal interaction mode. 
+ if(this->Implementation->UI.actionMoveMode->isVisible())
+  {
+    this->Implementation->UI.actionMoveMode->trigger();
+  }
+  else
+  {
+    this->Implementation->UI.actionMoveMode->setChecked(true);
+    this->Implementation->Core.selectionManager().switchToInteraction();
+  }
+
+}
+
+

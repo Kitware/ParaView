@@ -65,6 +65,9 @@ private slots:
   void onPlotAdded(pqPlotViewModule*);
   void onPlotRemoved(pqPlotViewModule*);
 
+  void onSelectionShortcut();
+  void onSelectionShortcutFinished();
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

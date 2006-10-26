@@ -564,7 +564,7 @@
     <string>Selection Mode (s)</string>
    </property>
    <property name="shortcut" >
-    <string>S</string>
+     <string/>
    </property>
   </action>
   <action name="actionEditUndo" >
