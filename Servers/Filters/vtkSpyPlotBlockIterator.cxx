@@ -67,7 +67,12 @@ int vtkSpyPlotBlockDistributionBlockIterator::GetNumberOfBlocksToProcess()
     vtkSpyPlotUniReader* reader = this->FileMap->GetReader(fileIterator, 
                                                            this->Parent);
     reader->ReadInformation();
-    reader->SetCurrentTimeStep(this->CurrentTimeStep);
+    if (!reader->SetCurrentTimeStep(this->CurrentTimeStep))
+      {
+        // This reader does not have that time step so skip it
+        continue;
+      }
+
     int numBlocks = reader->GetNumberOfDataBlocks();
     int numBlocksPerProcess = ( numBlocks / this->NumberOfProcessors);
     int leftOverBlocks = numBlocks - 
@@ -95,35 +100,38 @@ FindFirstBlockOfCurrentOrNextFile()
     this->UniReader=this->FileMap->GetReader(this->FileIterator, this->Parent);
     this->UniReader->SetFileName(fname);
     this->UniReader->ReadInformation();
-    this->UniReader->SetCurrentTimeStep(this->CurrentTimeStep);
     
-    this->NumberOfFields=this->UniReader->GetNumberOfCellFields();
-    
-    int numBlocks=this->UniReader->GetNumberOfDataBlocks();
-    
-    if (this->ProcessorId<numBlocks) // otherwise skip to the next file
+    // Does this reader contain the requested time step?
+    if (this->UniReader->SetCurrentTimeStep(this->CurrentTimeStep))
       {
-      int numBlocksPerProcess=numBlocks/this->NumberOfProcessors;
-      int leftOverBlocks=numBlocks-
-        (numBlocksPerProcess*this->NumberOfProcessors);
-      
-      int blockStart;
-      
-      if(this->ProcessorId<leftOverBlocks)
-        {
-        blockStart=(numBlocksPerProcess+1)*this->ProcessorId;
-        this->BlockEnd=blockStart+(numBlocksPerProcess+1)-1;
-        }
-      else
-        {
-        blockStart=numBlocksPerProcess*this->ProcessorId+leftOverBlocks;
-        this->BlockEnd=blockStart+numBlocksPerProcess-1;
-        }
-      this->Block=blockStart;
-      if (this->Block<=this->BlockEnd)
-        {
-        break; // Done
-        }
+        this->NumberOfFields=this->UniReader->GetNumberOfCellFields();
+        
+        int numBlocks=this->UniReader->GetNumberOfDataBlocks();
+        
+        if (this->ProcessorId<numBlocks) // otherwise skip to the next file
+          {
+            int numBlocksPerProcess=numBlocks/this->NumberOfProcessors;
+            int leftOverBlocks=numBlocks-
+              (numBlocksPerProcess*this->NumberOfProcessors);
+            
+            int blockStart;
+            
+            if(this->ProcessorId<leftOverBlocks)
+              {
+                blockStart=(numBlocksPerProcess+1)*this->ProcessorId;
+                this->BlockEnd=blockStart+(numBlocksPerProcess+1)-1;
+              }
+            else
+              {
+                blockStart=numBlocksPerProcess*this->ProcessorId+leftOverBlocks;
+                this->BlockEnd=blockStart+numBlocksPerProcess-1;
+              }
+            this->Block=blockStart;
+            if (this->Block<=this->BlockEnd)
+              {
+                break; // Done
+              }
+          }
       }
     ++this->FileIterator;
     ++this->FileIndex;
@@ -206,7 +214,8 @@ int vtkSpyPlotFileDistributionBlockIterator::GetNumberOfBlocksToProcess()
   int numFiles = this->FileEnd - this->FileStart + 1;
   int progressInterval = numFiles/ 20 + 1;
   for ( fileIterator = this->FileMap->Files.begin() ;
-        fileIterator != this->FileMap->Files.end() && file_index <= this->FileEnd;
+        fileIterator != this->FileMap->Files.end() && 
+          file_index <= this->FileEnd;
         fileIterator++, file_index++)
     {
     if (file_index < this->FileStart)
@@ -220,8 +229,11 @@ int vtkSpyPlotFileDistributionBlockIterator::GetNumberOfBlocksToProcess()
     vtkSpyPlotUniReader* reader = this->FileMap->GetReader(fileIterator, 
                                                            this->Parent);
     reader->ReadInformation();
-    reader->SetCurrentTimeStep(this->CurrentTimeStep);
-    total_num_blocks += reader->GetNumberOfDataBlocks();
+    // Does this reader contain the requested time step?
+    if (reader->SetCurrentTimeStep(this->CurrentTimeStep))
+      {
+        total_num_blocks += reader->GetNumberOfDataBlocks();
+      }
     }
   return total_num_blocks;
 }
@@ -237,18 +249,21 @@ void vtkSpyPlotFileDistributionBlockIterator::FindFirstBlockOfCurrentOrNextFile(
     
     this->UniReader->SetFileName(fname);
     this->UniReader->ReadInformation();
-    this->UniReader->SetCurrentTimeStep(this->CurrentTimeStep);
-    
-    this->NumberOfFields=this->UniReader->GetNumberOfCellFields();
-    
-    int numberOfBlocks;
-    numberOfBlocks=this->UniReader->GetNumberOfDataBlocks();
-    
-    this->BlockEnd=numberOfBlocks-1;
-    this->Block=0;
-    if (this->Block<=this->BlockEnd)
+    // Does this reader contain the requested time step?
+
+    if (this->UniReader->SetCurrentTimeStep(this->CurrentTimeStep))
       {
-      break;
+        this->NumberOfFields=this->UniReader->GetNumberOfCellFields();
+        
+        int numberOfBlocks;
+        numberOfBlocks=this->UniReader->GetNumberOfDataBlocks();
+        
+        this->BlockEnd=numberOfBlocks-1;
+        this->Block=0;
+        if (this->Block<=this->BlockEnd)
+          {
+            break;
+          }
       }
     ++this->FileIterator;
     ++this->FileIndex;
