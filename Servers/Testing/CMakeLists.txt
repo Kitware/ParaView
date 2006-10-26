@@ -14,7 +14,6 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkSpyPlotBlock.h
       vtkSpyPlotBlockIterator.h
       vtkSpyPlotUniReader.h
-      vtkSimpleBoundingBox.h
       vtkSpyPlotIStream.h
       vtkSpyPlotReaderMap.h
       )

@@ -62,7 +62,7 @@ class vtkSpyPlotBlock;
 class vtkSpyPlotUniReader;
 class vtkCellData;
 class vtkRectilinearGrid;
-class vtkSimpleBoundingBox;
+class vtkBoundingBox;
 
 class VTK_EXPORT vtkSpyPlotReader : public vtkHierarchicalDataSetAlgorithm
 {
@@ -158,7 +158,7 @@ protected:
 
   // Determine the bounds of just this reader
   void GetLocalBounds(vtkSpyPlotBlockIterator *biter,
-                      vtkSimpleBoundingBox *bbox,
+                      vtkBoundingBox *bbox,
                       int nBlocks, int progressInterval);
 
   // Set the global bounds of all readers
