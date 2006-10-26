@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notice for more information.
 class vtkDataArray;
 class vtkFloatArray;
 class vtkSpyPlotIStream;
+class vtkBoundingBox;
+
 class VTK_EXPORT vtkSpyPlotBlock {
 public:
   vtkSpyPlotBlock();
@@ -49,7 +51,7 @@ public:
   int IsAMR() const;
   void MarkedAsFixed();
   void GetRealBounds(double realBounds[6]) const;
-  int GetAMRInformation(double globalBounds[6],
+  int GetAMRInformation(const vtkBoundingBox &globalBounds,
                         int *level, 
                         double spacing[3],
                         double origin[3], 
@@ -68,7 +70,7 @@ public:
                   const unsigned char* encodedInfo, 
                   int infoSize);
   int GetTotalSize() const;
-  int FixInformation(double globalBounds[6],
+  int FixInformation(const vtkBoundingBox &globalBounds,
                      int extents[6],
                      int realExtents[6], 
                      int realDims[3],

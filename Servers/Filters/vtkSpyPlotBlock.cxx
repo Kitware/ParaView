@@ -2,7 +2,7 @@
 #include "vtkSpyPlotBlock.h"
 #include "vtkSpyPlotIStream.h"
 #include "vtkByteSwap.h"
-
+#include "vtkBoundingBox.h"
 #include <assert.h>
 
 #define MinBlockBound(i) this->XYZArrays[i]->GetTuple1(0)
@@ -133,7 +133,7 @@ void vtkSpyPlotBlock::GetVectors(vtkDataArray *coordinates[3]) const
 }
 
 //-----------------------------------------------------------------------------
-int vtkSpyPlotBlock::GetAMRInformation(double globalBounds[6],
+int vtkSpyPlotBlock::GetAMRInformation(const vtkBoundingBox  &globalBounds,
                                        int *level, 
                                        double spacing[3],
                                        double origin[3], 
@@ -145,7 +145,9 @@ int vtkSpyPlotBlock::GetAMRInformation(double globalBounds[6],
   *level = this->Level;
   this->GetExtents(extents);
   int i, j, hasBadCells = 0;
- 
+  const double *minP = globalBounds.GetMinPoint();
+  const double *maxP = globalBounds.GetMaxPoint();
+
   double minV, maxV;
   for (i = 0, j = 0; i < 3; i++, j++)
     {
@@ -161,7 +163,7 @@ int vtkSpyPlotBlock::GetAMRInformation(double globalBounds[6],
       continue;
       }
 
-    if (minV < globalBounds[j])
+    if (minV < minP[i])
       {
       realExtents[j] = 1;
       origin[i] = minV + spacing[i];
@@ -176,8 +178,8 @@ int vtkSpyPlotBlock::GetAMRInformation(double globalBounds[6],
       realExtents[j] = 0;
       origin[i] = minV;
       }
-    
-    if (maxV > globalBounds[++j])
+    ++j;
+    if (maxV > maxP[i])
       {
       realExtents[j] = this->Dimensions[i] - 1;      
       hasBadCells = 1;
@@ -197,7 +199,7 @@ int vtkSpyPlotBlock::GetAMRInformation(double globalBounds[6],
 }
 
 //-----------------------------------------------------------------------------
-int vtkSpyPlotBlock::FixInformation(double globalBounds[6],
+int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox &globalBounds,
                                     int extents[6],
                                     int realExtents[6], 
                                     int realDims[3],
@@ -207,6 +209,8 @@ int vtkSpyPlotBlock::FixInformation(double globalBounds[6],
   
   // This better not be a AMR block!
   assert("Check Block is not AMR" && (!this->IsAMR()));
+  const double *minP = globalBounds.GetMinPoint();
+  const double *maxP = globalBounds.GetMaxPoint();
 
   this->GetExtents(extents);
 
@@ -240,7 +244,7 @@ int vtkSpyPlotBlock::FixInformation(double globalBounds[6],
     vtkDebugMacro( "Bounds[" << (j) << "] = " << minV 
                    <<" Bounds[" << (j+1) << "] = " << maxV);
     ca[i] = this->XYZArrays[i];
-    if (minV < globalBounds[j])
+    if (minV < minP[i])
       {
       realExtents[j]=1;
       --extents[j+1];
@@ -257,7 +261,7 @@ int vtkSpyPlotBlock::FixInformation(double globalBounds[6],
       }
     j++;
     
-    if (maxV >globalBounds[j])
+    if (maxV > maxP[i])
       {
       realExtents[j] = this->Dimensions[i] - 1;      
       --extents[j];

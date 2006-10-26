@@ -158,11 +158,10 @@ protected:
 
   // Determine the bounds of just this reader
   void GetLocalBounds(vtkSpyPlotBlockIterator *biter,
-                      vtkBoundingBox *bbox,
                       int nBlocks, int progressInterval);
 
   // Set the global bounds of all readers
-  int SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
+  void SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
                       int total_num_of_block, 
                       int progressInterval,
                       int *rightHasBounds,
@@ -284,15 +283,9 @@ protected:
 
   vtkSpyPlotReaderMap *Map;
   
-  // Description:
-  // The processors are views as a heap tree. The root is the processor of
-  // id 0.
-  int GetParentProcessor(int proc);
-  int GetLeftChildProcessor(int proc);
-  
   int DistributeFiles;
   
-  double Bounds[6]; // bounds of the hierarchy without the bad ghostcells.
+  vtkBoundingBox *Bounds; //bounds of the hierarchy without the bad ghostcells.
   
   int GenerateLevelArray; // user flag
   int GenerateBlockIdArray; // user flag
