@@ -58,7 +58,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.47");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.48");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -74,6 +74,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->SetNumberOfInputPorts(0);
   
   this->Map = new vtkSpyPlotReaderMap;
+  this->Bounds = new vtkBoundingBox;
   this->FileName = 0;
   this->CurrentFileName = 0;
   this->CellDataArraySelection = vtkDataArraySelection::New();
@@ -109,6 +110,7 @@ vtkSpyPlotReader::~vtkSpyPlotReader()
   this->CellDataArraySelection->Delete();
   this->Map->Clean(0);
   delete this->Map;
+  delete this->Bounds;
   this->Map = 0;
   this->SetController(0);
 }
@@ -496,29 +498,20 @@ int vtkSpyPlotRemoveBadGhostCells(DataType* dataType, vtkDataArray* dataArray, i
   // skip some cell data.
   int xyz[3];
   int destXyz[3];
-  xyz[2]=realExtents[4];
-  destXyz[2]=0;
   DataType* dataPtr = static_cast<DataType*>(dataArray->GetVoidPointer(0));
-  while(xyz[2]<realExtents[5])
+  for (xyz[2] = realExtents[4], destXyz[2] = 0; 
+       xyz[2] < realExtents[5]; ++xyz[2], ++destXyz[2])
     {
-    destXyz[1]=0;
-    xyz[1]=realExtents[2];
-    while(xyz[1]<realExtents[3])
+    for (xyz[1] = realExtents[2], destXyz[1] = 0;
+         xyz[1] < realExtents[3]; ++xyz[1], ++destXyz[1])
       {
-      destXyz[0]=0;
-      xyz[0]=realExtents[0];
-      while(xyz[0]<realExtents[1])
+      for (xyz[0] = realExtents[0], destXyz[0] = 0;
+           xyz[0] < realExtents[1]; ++xyz[0], ++destXyz[0])
         {
         dataPtr[vtkStructuredData::ComputeCellId(realPtDims,destXyz)] =
           dataPtr[vtkStructuredData::ComputeCellId(ptDims,xyz)];
-        ++xyz[0];
-        ++destXyz[0];
         }
-      ++xyz[1];
-      ++destXyz[1];
       }
-    ++xyz[2];
-    ++destXyz[2];
     }
   dataArray->SetNumberOfTuples(realDims[0]*realDims[1]*realDims[2]);
   return 1;
@@ -601,14 +594,14 @@ int vtkSpyPlotReader::RequestData(
   int leftHasBounds = 0;
   // Note that in the process of getting the bounds 
   // all of the readers will get updated appropriately  
-  int boundsHaveBeenSet = this->SetGlobalBounds(blockIterator,
-                                                total_num_of_blocks,
-                                                progressInterval,
-                                                &rightHasBounds,
-                                                &leftHasBounds);
+  this->SetGlobalBounds(blockIterator, total_num_of_blocks,
+                        progressInterval, &rightHasBounds,
+                        &leftHasBounds);
   // Set the global bounds of the reader
-  info->Set(vtkExtractCTHPart::BOUNDS(),this->Bounds,6);
-  if (!boundsHaveBeenSet)
+  double b[6];
+  this->Bounds->GetBounds(b);
+  info->Set(vtkExtractCTHPart::BOUNDS(), b, 6);
+  if (!this->Bounds->IsValid())
     {
     // There were no bounds set - reader must have no blocks
     delete blockIterator;
@@ -693,7 +686,7 @@ int vtkSpyPlotReader::RequestData(
       }
 
     //this->MergeVectors(cd);
-    } // while
+    } // for
   delete blockIterator;
   
 #endif //  if 0 skip loading for valgrind test
@@ -1173,28 +1166,6 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
   return 1;
 }
 
-// The processors are views as a heap tree. The root is the processor of
-// id 0.
-//-----------------------------------------------------------------------------
-int vtkSpyPlotReader::GetParentProcessor(int proc)
-{
-  int result;
-  if(proc%2==1)
-    {
-    result=proc>>1; // /2
-    }
-  else
-    {
-    result=(proc-1)>>1; // /2
-    }
-  return result;
-}
-
-int vtkSpyPlotReader::GetLeftChildProcessor(int proc)
-{
-  return (proc<<1)+1; // *2+1
-}
-
 //-----------------------------------------------------------------------------
 int vtkSpyPlotReader::CanReadFile(const char* fname)
 {
@@ -1310,7 +1281,6 @@ void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
 
 // This functions return 1 if the bounds have been set
 void vtkSpyPlotReader::GetLocalBounds(vtkSpyPlotBlockIterator *biter,
-                                      vtkBoundingBox *bbox,
                                       int nBlocks, int progressInterval)
 {
   int i;
@@ -1331,114 +1301,45 @@ void vtkSpyPlotReader::GetLocalBounds(vtkSpyPlotBlockIterator *biter,
     biter->GetUniReader()->MakeCurrent();
     block = biter->GetBlock();
     block->GetRealBounds(bounds);
-    bbox->AddBounds(bounds);
+    this->Bounds->AddBounds(bounds);
     }
 }
     
 // Returns 1 if the bounds are valid else 0
-int vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
-                                      int total_num_of_blocks, 
-                                      int progressInterval,
-                                      int *rightHasBounds,
-                                      int *leftHasBounds)
+void vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
+                                       int total_num_of_blocks, 
+                                       int progressInterval,
+                                       int *rightHasBounds,
+                                       int *leftHasBounds)
 {
   // Get the local bounds of this reader
-  vtkBoundingBox bbox;
-  this->GetLocalBounds(biter, &bbox,
-                       total_num_of_blocks,
+  this->GetLocalBounds(biter, total_num_of_blocks,
                        progressInterval);
-  bbox.GetBounds(this->Bounds);
+ 
   // If we are not running in parallel then the local
   // bounds are the global bounds
   if (!this->Controller)
     {
-    return bbox.IsValid();
+    return;
+    }
+  vtkCommunicator *comm = this->Controller->GetCommunicator();
+  if (!comm)
+    {
+    return;
     }
 
   int processNumber = biter->GetProcessorId();
   int numProcessors = biter->GetNumberOfProcessors();
-  int parent = 0;
-  int left=GetLeftChildProcessor(processNumber);
-  int right=left+1;
-  if(processNumber>0) // not root (nothing to do if root)
+  if (!comm->ComputeGlobalBounds(processNumber, numProcessors,
+                                 this->Bounds, rightHasBounds,
+                                 leftHasBounds, 
+                                 VTK_MSG_SPY_READER_HAS_BOUNDS,
+                                 VTK_MSG_SPY_READER_LOCAL_BOUNDS,
+                                 VTK_MSG_SPY_READER_GLOBAL_BOUNDS))
     {
-    parent=this->GetParentProcessor(processNumber);
+    vtkErrorMacro("Problem occurred getting the global bounds");
     }
-  
-  double otherBounds[6];
-  if(left<numProcessors)
-    {
-    // TODO WARNING if the child is empty the bounds are not initialized!
-    // Grab the bounds from left child
-    this->Controller->Receive(leftHasBounds, 1, left,
-                              VTK_MSG_SPY_READER_HAS_BOUNDS);
-    
-    if(*leftHasBounds)
-      {
-      this->Controller->Receive(otherBounds, 6, left,
-                                VTK_MSG_SPY_READER_LOCAL_BOUNDS);
-      bbox.AddBounds(otherBounds);
-      bbox.GetBounds(this->Bounds);
-      }
-    }
-  if(right<numProcessors)
-    {
-    // Grab the bounds from right child
-    this->Controller->Receive(rightHasBounds, 1, right,
-                              VTK_MSG_SPY_READER_HAS_BOUNDS);
-    if(*rightHasBounds)
-      {
-      this->Controller->Receive(otherBounds, 6, right,
-                                VTK_MSG_SPY_READER_LOCAL_BOUNDS);
-      bbox.AddBounds(otherBounds);
-      bbox.GetBounds(this->Bounds);
-      }
-    }
-  
-  // If there are bounds to send do so
-  int boundsHaveBeenSet = bbox.IsValid();
-  // Send local to parent, Receive global from the parent.
-  if(processNumber>0) // not root (nothing to do if root)
-    {
-    this->Controller->Send(&boundsHaveBeenSet, 1, parent,
-                           VTK_MSG_SPY_READER_HAS_BOUNDS);
-    if(boundsHaveBeenSet)
-      {
-      // Copy the bbox's bounds into the reader's
-      bbox.GetBounds(this->Bounds);
-      this->Controller->Send(this->Bounds, 6, parent,
-                             VTK_MSG_SPY_READER_LOCAL_BOUNDS);
-      
-      this->Controller->Receive(this->Bounds, 6, parent,
-                                VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
-      bbox.AddBounds(this->Bounds);
-      bbox.GetBounds(this->Bounds);
-      }
-    }
-  
-  if(!boundsHaveBeenSet) // empty, no bounds, nothing to do
-    {
-    return 0;
-    }
-  
-  // Send it to children.
-  if(left<numProcessors)
-    {
-    if(*leftHasBounds)
-      {
-      this->Controller->Send(this->Bounds, 6, left,
-                             VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
-      }
-    if(right<numProcessors)
-      {
-      if(*rightHasBounds)
-        {
-        this->Controller->Send(this->Bounds, 6, right,
-                               VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
-        }
-      }
-    }
-  return 1;
+ return;
 }
   
 int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalDataSet *hb,
@@ -1453,7 +1354,7 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalDataSet *hb,
   double origin[3];
   int needsFixing;
 
-  needsFixing = block->GetAMRInformation(this->Bounds,
+  needsFixing = block->GetAMRInformation(*(this->Bounds),
                                          level, spacing,
                                          origin, extents, 
                                          realExtents,
@@ -1479,13 +1380,19 @@ int vtkSpyPlotReader::PrepareData(vtkHierarchicalDataSet *hb,
 
   int needsFixing;
   vtkDataArray *coordinates[3];
-  needsFixing = block->FixInformation(this->Bounds,
+  needsFixing = block->FixInformation(*(this->Bounds),
                                       extents, realExtents,
                                       realDims,coordinates);
-  vtkDebugMacro( << __LINE__ << " Real dims:    " << coutVector3(realDims) );
-  vtkDebugMacro( << __LINE__ << " Real Extents: " << coutVector6(realExtents) );
-  vtkDebugMacro( << __LINE__ << " Extents:      " << coutVector6(extents) );
-  vtkDebugMacro( << __LINE__ << " Global Bounds:" << coutVector6(this->Bounds) );
+  double bounds[6];
+  this->Bounds->GetBounds(bounds);
+  vtkDebugMacro( << __LINE__ << " Real dims:    " 
+                 << coutVector3(realDims) );
+  vtkDebugMacro( << __LINE__ << " Real Extents: " 
+                 << coutVector6(realExtents) );
+  vtkDebugMacro( << __LINE__ << " Extents:      " 
+                 << coutVector6(extents) );
+  vtkDebugMacro( << __LINE__ << " Global Bounds:" 
+                 << coutVector6(bounds) );
   vtkDebugMacro( << " Rectilinear grid pointer: " << rg );
   *rg=vtkRectilinearGrid::New();
   (*rg)->SetExtent(extents);
@@ -1728,11 +1635,11 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkHierarchicalDataSet *hb,
                                        int leftHasBounds)
 {
   int parent = 0;
-  int left=GetLeftChildProcessor(processNumber);
+  int left= vtkCommunicator::GetLeftChildProcessor(processNumber);
   int right=left+1;
   if(processNumber>0) // not root (nothing to do if root)
     {
-    parent=this->GetParentProcessor(processNumber);
+    parent= vtkCommunicator::GetParentProcessor(processNumber);
     }
   
   unsigned int numberOfLevels=hb->GetNumberOfLevels();
