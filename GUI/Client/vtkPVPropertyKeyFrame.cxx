@@ -21,6 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCutEntry.h"
 #include "vtkPVSelectionList.h"
+#include "vtkPVSinusoidKeyFrame.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkSMAnimationCueProxy.h"
 #include "vtkSMBooleanDomain.h"
@@ -65,7 +66,7 @@ inline static int IntVectPropertySetElement(vtkSMProxy *proxy,
 }
 
 
-vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.10");
+vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.11");
 //-----------------------------------------------------------------------------
 vtkPVPropertyKeyFrame::vtkPVPropertyKeyFrame()
 {
@@ -710,6 +711,12 @@ void vtkPVPropertyKeyFrame::Copy(vtkPVKeyFrame* fromKF)
       {
       this->SetKeyValue(i, from->GetKeyValue(i));
       }
+    vtkPVSinusoidKeyFrame *sinusoidKF = vtkPVSinusoidKeyFrame::SafeDownCast(from);
+    if (sinusoidKF)
+      {
+      // Set the key value from the Amplitude thumbwheel.
+      this->SetKeyValue(sinusoidKF->GetOffset());
+      }
     }
 }
 
@@ -733,6 +740,13 @@ void vtkPVPropertyKeyFrame::SaveState(ofstream* file)
       << this->GetKeyValue(i) << endl;
     }
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVPropertyKeyFrame::SetValueLabelText(const char* text)
+{
+  this->ValueLabel->SetText(text);
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVPropertyKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
 {

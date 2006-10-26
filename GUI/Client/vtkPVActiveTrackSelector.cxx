@@ -43,7 +43,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.16");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.17");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -274,6 +274,12 @@ void vtkPVActiveTrackSelector::CleanupSource()
 //-----------------------------------------------------------------------------
 void vtkPVActiveTrackSelector::SelectSourceCallback(const char* key)
 {
+  if (this->CurrentSourceCueTree &&
+      ! strcmp(key, this->CurrentSourceCueTree->GetLabelText()))
+    {
+    // Do nothing since we're reselecting the same source.
+    return;
+    }
   this->GetTraceHelper()->AddEntry("$kw(%s) SelectSourceCallback %s",
     this->GetTclName(), key);
   this->SelectSourceCallbackInternal(key);

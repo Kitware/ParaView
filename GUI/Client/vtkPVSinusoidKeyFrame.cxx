@@ -24,7 +24,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.14");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.15");
 
 //-----------------------------------------------------------------------------
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -68,13 +68,15 @@ void vtkPVSinusoidKeyFrame::ChildCreate()
 {
   this->Superclass::ChildCreate();
 
+  this->SetValueLabelText("Offset:");
+
   this->PhaseLabel->SetParent(this);
   this->PhaseLabel->Create();
   this->PhaseLabel->SetText("Phase:");
 
   this->PhaseThumbWheel->SetParent(this);
   this->PhaseThumbWheel->PopupModeOn();
-  this->PhaseThumbWheel->SetValue(0.0);
+  this->PhaseThumbWheel->SetValue(90.0);
   this->PhaseThumbWheel->SetResolution(0.01);
   this->PhaseThumbWheel->Create();
   this->PhaseThumbWheel->DisplayEntryOn();
@@ -253,6 +255,20 @@ void vtkPVSinusoidKeyFrame::UpdateEnableState()
   this->PropagateEnableState(this->PhaseThumbWheel);
   this->PropagateEnableState(this->FrequencyThumbWheel);
   this->PropagateEnableState(this->OffsetThumbWheel);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSinusoidKeyFrame::Copy(vtkPVKeyFrame* fromKF)
+{
+  this->Superclass::Copy(fromKF);
+  if (!this->KeyFrameProxy || fromKF->IsA("vtkPVSinusoidKeyFrame"))
+    {
+    return;
+    }
+
+  vtkPVPropertyKeyFrame *kf = vtkPVPropertyKeyFrame::SafeDownCast(fromKF);
+  this->SetOffset(kf->GetKeyValue());
+  this->SetKeyValue(0.0);
 }
 
 //-----------------------------------------------------------------------------

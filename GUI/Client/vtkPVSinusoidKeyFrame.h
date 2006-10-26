@@ -49,6 +49,9 @@ public:
 
   virtual void SaveState(ofstream* file);
   virtual void UpdateEnableState();
+
+  virtual void Copy(vtkPVKeyFrame* fromKF);
+
 protected:
   vtkPVSinusoidKeyFrame();
   ~vtkPVSinusoidKeyFrame();

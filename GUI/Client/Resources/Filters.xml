@@ -1497,6 +1497,34 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
                  type="float"
                  help="Displacement is vector times scale."/>
   </Module>
+  <Module name="AnimateWarp"
+          root_name="AnimateWarp"
+          menu_name="Animate Warp"
+          class="vtkPVAnimateWarp"
+          module_type="Filter">
+    <Filter class="vtkPVWarpVector">
+      <Input name="Input"
+             class="vtkPointSet">
+        <ArrayRequirement attribute="Point" components="3"/>
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <ArrayMenu property="SelectInputVectors"
+               trace_name="Vectors"
+               label="Vectors"
+               input_menu="im"
+               help="Select the input vectors to process."/>
+    <!-- ScaleFactor value chosen does not change processing speed of this filter or cause it to crash. -->
+    <VectorEntry label="Scale factor"
+                 trace_name="ScaleFactor"
+                 property="ScaleFactor"
+                 type="float"
+                 help="Displacement is vector times scale."/>
+  </Module>
   <Module name="Cut"
           root_name="Cut"
           replace_input="0"

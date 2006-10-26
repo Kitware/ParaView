@@ -123,6 +123,8 @@ protected:
 
   vtkKWLabel* ValueLabel;
   vtkKWWidget* ValueWidget; // the type of this widget will be decided at runtime.
+  void SetValueLabelText(const char* text);
+
   vtkKWPushButton* MinButton;
   vtkKWPushButton* MaxButton;
  
