@@ -21,7 +21,7 @@
 #include <vtksys/stl/vector>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.17");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.18");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetSetInternals
@@ -88,6 +88,8 @@ void vtkKWWidgetSet::DeleteAllWidgets()
     }
 
   this->Internals->Widgets.clear();
+
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
