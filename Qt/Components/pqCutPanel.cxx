@@ -94,21 +94,21 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
   Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
-  pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Implicit Plane"));
-  group1->setWidget(&this->Implementation->ImplicitPlaneWidget);
+  pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
+  group1->setTitle(tr("Implicit Plane"));
+  QVBoxLayout* l = new QVBoxLayout(group1);
+  l->addWidget(&this->Implementation->ImplicitPlaneWidget);
 
-  pqCollapsedGroup* const group2 = new pqCollapsedGroup(tr("Slices"));
-  group2->setWidget(&this->Implementation->SampleScalarWidget);
+  pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
+  group2->setTitle(tr("Slices"));
+  l = new QVBoxLayout(group2);
+  l->addWidget(&this->Implementation->SampleScalarWidget);
   
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
-  panel_layout->setMargin(0);
-  panel_layout->setSpacing(0);
   panel_layout->addWidget(group1);
   panel_layout->addWidget(group2);
   panel_layout->addStretch();
   
-  this->setLayout(panel_layout);
-
   QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)),
                    &this->Implementation->ImplicitPlaneWidget,
                    SLOT(setRenderModule(pqRenderModule*)));

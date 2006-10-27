@@ -98,13 +98,14 @@ public:
     delete this->LineSourceWidget;
     delete this->PointSourceWidget;
   }
+
+  /// Provides a container for Qt controls
+  QWidget UIContainer;
   
   /// Provides a UI for managing a vtkPointSource
   pqPointSourceWidget* const PointSourceWidget;
   /// Manages a 3D line widget, plus Qt controls  
   pqLineSourceWidget* const LineSourceWidget;
-  /// Provides a container for Qt controls
-  QWidget UIContainer;
   /// Provides the remaining Qt controls for the panel
   Ui::pqStreamTracerPanel UI;
 };
@@ -113,27 +114,29 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
-  this->Implementation->UI.setupUi(
-    &this->Implementation->UIContainer);
+  this->Implementation->UI.setupUi(&this->Implementation->UIContainer);
   
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
   panel_layout->setMargin(0);
   panel_layout->setSpacing(0);
   panel_layout->addWidget(&this->Implementation->UIContainer);
   panel_layout->addStretch();
-  this->setLayout(panel_layout);
+ 
+  QVBoxLayout* l = new QVBoxLayout(this->Implementation->UI.pointSource);
+  l->addWidget(this->Implementation->PointSourceWidget);
+  l->addStretch();
 
-  QVBoxLayout* const point_layout = new QVBoxLayout(this->Implementation->UI.pointSource);
-  point_layout->addWidget(this->Implementation->PointSourceWidget);
-  point_layout->addStretch();
-  this->Implementation->UI.pointSource->setLayout(point_layout);
+  l = new QVBoxLayout(this->Implementation->UI.lineSource);
+  l->addWidget(this->Implementation->LineSourceWidget);
+  l->addStretch();
+
+  this->Implementation->UI.stackedWidget->setCurrentWidget(
+          this->Implementation->UI.pointSource);
   
-  QVBoxLayout* const line_layout = new QVBoxLayout(this->Implementation->UI.lineSource);
-  line_layout->addWidget(this->Implementation->LineSourceWidget);
-  line_layout->addStretch();
-  this->Implementation->UI.lineSource->setLayout(line_layout);
-  
-  QObject::connect(this->Implementation->UI.seedType, SIGNAL(currentIndexChanged(int)), this, SLOT(onSeedTypeChanged(int)));
+  QObject::connect(this->Implementation->UI.seedType, 
+                   SIGNAL(currentIndexChanged(int)), 
+                   this, 
+                   SLOT(onSeedTypeChanged(int)));
   
   QObject::connect(
     this,
@@ -268,8 +271,8 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
       }
     }
 
-  pqNamedWidgets::link(
-    &this->Implementation->UIContainer, this->proxy()->getProxy(), this->propertyManager());
+  pqNamedWidgets::link(this, this->proxy()->getProxy(), 
+                       this->propertyManager());
 }
 
 pqStreamTracerPanel::~pqStreamTracerPanel()
@@ -356,6 +359,8 @@ void pqStreamTracerPanel::onUsePointSource()
       pqSMProxy source = sources[i];
       if(source->GetVTKClassName() == QString("vtkPointSource"))
         {
+        this->Implementation->UI.stackedWidget->setCurrentWidget(
+                        this->Implementation->UI.pointSource);
         this->Implementation->PointSourceWidget->setWidgetVisible(true);
         this->Implementation->LineSourceWidget->setWidgetVisible(false);
         pqSMAdaptor::setUncheckedProxyProperty(source_property, source);
@@ -377,6 +382,8 @@ void pqStreamTracerPanel::onUseLineSource()
       pqSMProxy source = sources[i];
       if(source->GetVTKClassName() == QString("vtkLineSource"))
         {
+        this->Implementation->UI.stackedWidget->setCurrentWidget(
+                        this->Implementation->UI.lineSource);
         this->Implementation->PointSourceWidget->setWidgetVisible(false);
         this->Implementation->LineSourceWidget->setWidgetVisible(true);
         pqSMAdaptor::setUncheckedProxyProperty(source_property, source);

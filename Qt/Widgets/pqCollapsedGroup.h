@@ -30,74 +30,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqCollapsedGroup_h
-#define _pqCollapsedGroup_h
+#ifndef _pqCollapsedGroup
+#define _pqCollapsedGroup
 
-#include "QtWidgetsExport.h"
+#include <QGroupBox>
 
-#include <QWidget>
-
-class QPushButton;
-
-/// Provides a container that can be collapsed or expanded to
-/// hide/show its children.
-class QTWIDGETS_EXPORT pqCollapsedGroup :
-  public QWidget
+class pqCollapsedGroup : public QGroupBox
 {
   Q_OBJECT
-  Q_PROPERTY(QString title READ title WRITE setTitle)
-  Q_PROPERTY(int indent READ indent WRITE setIndent)
-  
+  Q_PROPERTY(bool collapsed READ collapsed WRITE setCollapsed)
 public:
-  pqCollapsedGroup(QWidget* parent = 0);
-  pqCollapsedGroup(const QString& title, QWidget* parent = 0);
-  ~pqCollapsedGroup();
+  explicit pqCollapsedGroup(QWidget* p = 0);
 
-  /// Convenience function that sets a single child widget
-  void setWidget(QWidget* child);
+  bool collapsed() const;
+  void setCollapsed(bool);
 
-  /// Returns true if the container is expanded (children are visible)
-  const bool isExpanded();
+  QSize minimumSizeHint() const;
 
-  /// Get/Set the title for the group.
-  void setTitle(const QString& title);
-  QString title() const;
-
-  void setIndent(int indent);
-  int indent() const;
-
-signals:
-  /// Signal emitted whenever the container is expanded
-  void expanded();
-  /// Signal emitted whenever the container is collapsed
-  void collapsed();
-  /// Signal emitted whenever the container is expanded or collapsed
-  void toggled();
+protected:
+  virtual void paintEvent(QPaintEvent*);
+  virtual void mousePressEvent(QMouseEvent*);
+  virtual void mouseMoveEvent(QMouseEvent*);
+  virtual void mouseReleaseEvent(QMouseEvent*);
   
-public slots:
-  /// Sets the expanded/collapsed state of the container
-  void setExpanded(bool);
-  /// Expands the container so children are visible
-  void expand();
-  /// Collapses the container so children are hidden
-  void collapse();
-  /// Toggles the expanded / collapsed state of the container
-  void toggle();
+  bool Collapsed;
+  bool Pressed;
 
 private:
-  pqCollapsedGroup(const pqCollapsedGroup&);
-  pqCollapsedGroup& operator=(const pqCollapsedGroup&);
-
-  void resizeEvent(QResizeEvent* event);
-  void paintEvent(QPaintEvent* event);
-  bool eventFilter(QObject* target, QEvent* event);
-  void mousePressEvent(QMouseEvent* event);
-  void mouseReleaseEvent(QMouseEvent* event);
-  void leaveEvent(QEvent* event);
-  
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  QRect textRect();
+  QRect collapseRect();
 };
 
-#endif // !_pqCollapsedGroup_h
+#endif // _pqCollapsedGroup
+
 

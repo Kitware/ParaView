@@ -103,11 +103,15 @@ pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
   this->Implementation->Controls.setupUi(
     &this->Implementation->ControlsContainer);
 
-  pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Contour"));
-  group1->setWidget(&this->Implementation->ControlsContainer);
+  pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
+  group1->setTitle(tr("Contour"));
+  QVBoxLayout* l = new QVBoxLayout(group1);
+  l->addWidget(&this->Implementation->ControlsContainer);
 
-  pqCollapsedGroup* const group2 = new pqCollapsedGroup(tr("Isosurfaces"));
-  group2->setWidget(&this->Implementation->SampleScalarWidget);
+  pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
+  group2->setTitle(tr("Isosurfaces"));
+  l = new QVBoxLayout(group2);
+  l->addWidget(&this->Implementation->SampleScalarWidget);
   
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
   panel_layout->setMargin(0);
@@ -116,8 +120,6 @@ pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
   panel_layout->addWidget(group2);
   panel_layout->addStretch();
   
-  this->setLayout(panel_layout);
-
   connect(
     &this->Implementation->SampleScalarWidget,
     SIGNAL(samplesChanged()),

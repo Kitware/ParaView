@@ -32,254 +32,201 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCollapsedGroup.h"
 
-#include <QApplication>
-#include <QResizeEvent>
-#include <QStyleOptionButton>
+#include <QPainter>
+#include <QStyle>
+#include <QLayout>
 #include <QStylePainter>
-#include <QVBoxLayout>
-#include <QtDebug>
+#include <QStyleOptionGroupBox>
+#include <QMouseEvent>
 
-#include <iostream>
-
-///////////////////////////////////////////////////////////////////////////////
-// pqCollapsedGroup::pqImplementation
-
-class pqCollapsedGroup::pqImplementation
+static QStyleOptionGroupBox pqCollapseGroupGetStyleOption(const pqCollapsedGroup* p)
 {
-public:
-  pqImplementation(const QString& title) :
-    Expanded(true),
-    Title(title),
-    Indent(30),
-    Inside(false),
-    Pressed(false)
+  QStyleOptionGroupBox option;
+  option.init(p);
+  option.text = p->title();
+  option.lineWidth = 1;
+  option.midLineWidth = 0;
+  option.textAlignment = Qt::AlignLeft;
+  option.subControls = QStyle::SC_None;
+  if(!p->collapsed())
   {
+    option.subControls = QStyle::SC_GroupBoxFrame;
   }
-
-  bool Expanded;
-  QString Title;
-  int Indent;
-  QRect ButtonRect;
-  bool Inside;
-  bool Pressed;
-};
-
-pqCollapsedGroup::pqCollapsedGroup(QWidget* parent_widget) :
-  QWidget(parent_widget),
-  Implementation(new pqImplementation(""))
-{
-  QApplication::instance()->installEventFilter(this);
+  if(!p->title().isEmpty())
+  { 
+    option.subControls |= QStyle::SC_GroupBoxLabel;
+  }
+  return option;
 }
 
-pqCollapsedGroup::pqCollapsedGroup(const QString& group_title, QWidget* parent_widget) :
-  QWidget(parent_widget),
-  Implementation(new pqImplementation(group_title))
+pqCollapsedGroup::pqCollapsedGroup(QWidget* p) 
+    : QGroupBox(p), Collapsed(false), Pressed(false)
 {
-  QApplication::instance()->installEventFilter(this);
 }
 
-pqCollapsedGroup::~pqCollapsedGroup()
+QRect pqCollapsedGroup::textRect()
 {
-  QApplication::instance()->removeEventFilter(this);
-  delete this->Implementation;
+  QStyleOptionGroupBox option = pqCollapseGroupGetStyleOption(this);
+  option.subControls |= QStyle::SC_GroupBoxCheckBox;
+  return this->style()->subControlRect(QStyle::CC_GroupBox, &option,
+                                       QStyle::SC_GroupBoxLabel, this);
 }
 
-void pqCollapsedGroup::setWidget(QWidget* child)
+QRect pqCollapsedGroup::collapseRect()
 {
-  QVBoxLayout* const child_layout = new QVBoxLayout(this);
-  child_layout->setMargin(0);
-  child_layout->setSpacing(0);
-  child_layout->addWidget(child);
-  this->setLayout(child_layout);
-}
-
-const bool pqCollapsedGroup::isExpanded()
-{
-  return this->Implementation->Expanded;
-}
-
-void pqCollapsedGroup::setExpanded(bool expanded_state)
-{
-  if(this->Implementation->Expanded != expanded_state)
-    this->toggle();
-}
-
-void pqCollapsedGroup::expand()
-{
-  this->setExpanded(true);
-}
-
-void pqCollapsedGroup::collapse()
-{
-  this->setExpanded(false);
-}
-
-void pqCollapsedGroup::toggle()
-{
-  this->Implementation->Expanded = 
-    !this->Implementation->Expanded;
-   
-  const QObjectList& group_children = this->children();
-  for(int i = 0; i != group_children.size(); ++i)
-    {
-    if(QWidget* const widget = qobject_cast<QWidget*>(group_children[i]))
-      {
-      widget->setVisible(this->Implementation->Expanded);
-      }
-    }
-
-  this->update();
-  
-  emit this->toggled();
-  
-  if(this->Implementation->Expanded)
-    emit this->expanded();
-  else
-    emit this->collapsed();
-}
-
-void pqCollapsedGroup::setTitle(const QString& txt)
-{
-  this->Implementation->Title = txt;
-  this->update();
-}
-
-QString pqCollapsedGroup::title() const
-{
-  return this->Implementation->Title;
-}
-
-void pqCollapsedGroup::setIndent(int new_indent)
-{
-  this->Implementation->Indent = new_indent;
-  
-  // This hack forces a layout update so changes in
-  // Designer are shown immediately
-  const QSize old_size = this->size();
-  this->resize(old_size + QSize(1, 1));
-  this->resize(old_size);
-}
-
-int pqCollapsedGroup::indent() const
-{
-  return this->Implementation->Indent;
-}
-  
-void pqCollapsedGroup::resizeEvent(QResizeEvent* e)
-{
-  // Base the height of the button on the height of the font,
-  // and ensure that the result is an odd number (so the icon centers nicely)
-  const int button_height =
-    static_cast<int>(this->fontMetrics().height() * 1.3) | 0x01;
-
-  this->Implementation->ButtonRect =
-    QRect(0, 0, e->size().width(), button_height);
-  this->setContentsMargins(this->Implementation->Indent, this->Implementation->ButtonRect.height(), 0, 0);
-  this->update();
+  QStyleOptionGroupBox option = pqCollapseGroupGetStyleOption(this);
+  option.subControls |= QStyle::SC_GroupBoxCheckBox;
+  return this->style()->subControlRect(QStyle::CC_GroupBox, &option,
+                                       QStyle::SC_GroupBoxCheckBox, this);
+  QRect r = this->style()->subControlRect(QStyle::CC_GroupBox, &option,
+                                             QStyle::SC_GroupBoxCheckBox, this);
+  r.moveRight(this->width() - r.left());
+  return r;
 }
 
 void pqCollapsedGroup::paintEvent(QPaintEvent*)
 {
-  const QRect button_rect = this->Implementation->ButtonRect;
-
   QStylePainter painter(this);
-
-  QStyleOptionButton button_options;
-  button_options.initFrom(this);
-  button_options.features = QStyleOptionButton::None;
-  button_options.rect = button_rect;
-  button_options.state = QStyle::State_Enabled;
-
-  if(this->Implementation->Inside)
-    {
-    if(!this->Implementation->Pressed)
-      button_options.state |= QStyle::State_MouseOver;
-
-    if(this->Implementation->Pressed)
-      button_options.state |= QStyle::State_Sunken;
-    else
-      button_options.state |= QStyle::State_Raised;
-
-    painter.drawControl(QStyle::CE_PushButton, button_options);
-    }
-
-  const int icon_size = 9; // hardcoded in qcommonstyle.cpp
-
-  QStyleOption icon_options;
-  icon_options.rect = QRect(
-    button_rect.left() + icon_size / 2,
-    button_rect.top() + (button_rect.height() - icon_size) / 2,
-    icon_size,
-    icon_size);
-  icon_options.palette = button_options.palette;
-  icon_options.state = QStyle::State_Children;
-
-  if(this->Implementation->Expanded)
-    icon_options.state |= QStyle::State_Open;
-
-  painter.drawPrimitive(QStyle::PE_IndicatorBranch, icon_options);
+  QStyle* mystyle = this->style();
+  QStyleOptionGroupBox option = pqCollapseGroupGetStyleOption(this);
   
-  const QRect text_rect = QRect(
-    button_rect.left() + icon_size * 2,
-    button_rect.top(),
-    button_rect.width() - icon_size * 2,
-    button_rect.height());
-    
-  const QString text = this->Implementation->Title;
-  painter.drawItemText(text_rect, Qt::AlignLeft | Qt::AlignVCenter, button_options.palette, true, text);
+  QRect tRect = this->textRect();
+  QRect cRect = this->collapseRect();
+  
+  // Draw frame
+  if (option.subControls & QStyle::SC_GroupBoxFrame) 
+  {
+      QStyleOptionFrameV2 frame;
+      frame.QStyleOption::operator=(option);
+      frame.features = option.features;
+      frame.lineWidth = option.lineWidth;
+      frame.midLineWidth = option.midLineWidth;
+      frame.rect = mystyle->subControlRect(QStyle::CC_GroupBox, &option, QStyle::SC_GroupBoxFrame, this);
+      painter.save();
+      QRegion region(option.rect);
+      if (!option.text.isEmpty()) 
+      {
+          region -= tRect;
+      }
+      region -= cRect;
+      painter.setClipRegion(region);
+      mystyle->drawPrimitive(QStyle::PE_FrameGroupBox, &frame, &painter, this);
+      painter.restore();
+  }
+
+  // Draw title
+  if ((option.subControls & QStyle::SC_GroupBoxLabel) && !option.text.isEmpty()) {
+      if (!option.text.isEmpty()) {
+          QColor textColor = option.textColor;
+          if (textColor.isValid())
+              painter.setPen(textColor);
+          int align = int(option.textAlignment);
+          if (!mystyle->styleHint(QStyle::SH_UnderlineShortcut, &option, this))
+              align |= Qt::TextHideMnemonic;
+
+          mystyle->drawItemText(&painter, tRect,  Qt::TextShowMnemonic | Qt::AlignHCenter | align,
+                       option.palette, option.state & QStyle::State_Enabled, option.text,
+                       textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
+
+          if (option.state & QStyle::State_HasFocus) {
+              QStyleOptionFocusRect fropt;
+              fropt.QStyleOption::operator=(option);
+              fropt.rect = tRect;
+              mystyle->drawPrimitive(QStyle::PE_FrameFocusRect, &fropt, &painter, this);
+          }
+      }
+  }
+
+  // Draw indicator
+  QStyleOption indicatorOption;
+  indicatorOption.rect = cRect;
+  indicatorOption.state = QStyle::State_Children;
+  if(!this->collapsed())
+  {
+    indicatorOption.state |= QStyle::State_Open;
+  }
+  painter.drawPrimitive(QStyle::PE_IndicatorBranch, indicatorOption);
 }
 
-bool pqCollapsedGroup::eventFilter(QObject* target, QEvent* e)
+QSize pqCollapsedGroup::minimumSizeHint() const
 {
-  if(e->type() == QEvent::MouseMove)
-    {
-    for(QObject* ancestor = target; ancestor; ancestor = ancestor->parent())
-      {
-      if(ancestor == this)
-        {
-        const QPoint mouse = this->mapFromGlobal(qobject_cast<QWidget*>(target)->mapToGlobal(static_cast<QMouseEvent*>(e)->pos()));
-        const bool inside = this->Implementation->ButtonRect.contains(mouse);
-        if(inside != this->Implementation->Inside)
-          {
-          this->Implementation->Inside = inside;
-          this->update();
-          }
-        break;
-        }
-      }
-    }
-    
-  return QWidget::eventFilter(target, e);
+  QStyleOptionGroupBox option = pqCollapseGroupGetStyleOption(this);
+
+  int baseWidth = fontMetrics().width(this->title() + QLatin1Char(' '));
+  int baseHeight = fontMetrics().height();
+
+  baseWidth += this->style()->pixelMetric(QStyle::PM_IndicatorWidth);
+  baseHeight = qMax(baseHeight, 
+                    this->style()->pixelMetric(QStyle::PM_IndicatorHeight));
+
+  QSize sz(baseWidth, baseHeight);
+
+  if(this->Collapsed)
+  {
+    return sz;
+  }
+  sz = QWidget::minimumSizeHint().expandedTo(sz);
+  return this->style()->sizeFromContents(QStyle::CT_GroupBox, &option,
+                                         sz, this);
 }
 
 void pqCollapsedGroup::mousePressEvent(QMouseEvent* e)
 {
-  if(this->Implementation->ButtonRect.contains(e->pos()))
-    {
-    this->Implementation->Pressed = true;
-    this->update();
-    }
+  QRect cRect = this->collapseRect();
+  this->Pressed = cRect.contains(e->pos());
+}
+
+void pqCollapsedGroup::mouseMoveEvent(QMouseEvent* e)
+{
+  if(this->Pressed == true)
+  {
+    QRect cRect = this->collapseRect();
+    this->Pressed = cRect.contains(e->pos());
+  }
 }
 
 void pqCollapsedGroup::mouseReleaseEvent(QMouseEvent* e)
 {
-  if(this->Implementation->Pressed)
-    {
-    this->Implementation->Pressed = false;
-    this->update();
+  if(this->Pressed)
+  {
+    QRect cRect = this->collapseRect();
+    this->Pressed = cRect.contains(e->pos());
+  }
 
-    if(this->Implementation->ButtonRect.contains(e->pos()))
-      {
-      this->toggle();
-      }
-    }
+  if(this->Pressed)
+  {
+    this->setCollapsed(!this->collapsed());
+  }
 }
 
-void pqCollapsedGroup::leaveEvent(QEvent*)
+bool pqCollapsedGroup::collapsed() const
 {
-  if(this->Implementation->Inside)
-    {
-    this->Implementation->Inside = false;
-    this->update();
-    }
+  return this->Collapsed;
 }
+
+void pqCollapsedGroup::setCollapsed(bool v)
+{
+  if(v == this->Collapsed)
+  {
+    return;
+  }
+
+  this->Collapsed = v;
+  QSize sz = this->minimumSizeHint();
+
+  if(this->Collapsed)
+  {
+    this->layout()->setEnabled(false);
+    this->setMinimumHeight(sz.height());
+    this->setMaximumHeight(sz.height());
+  }
+  else
+  {
+    this->layout()->setEnabled(true);
+    this->setMinimumHeight(sz.height());
+    this->setMaximumHeight(QWIDGETSIZE_MAX);
+  }
+  this->updateGeometry();
+  this->update();
+}
+

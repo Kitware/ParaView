@@ -95,21 +95,21 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
   Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
-  pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Clip"));
-  group1->setWidget(&this->Implementation->InsideOutWidget);
+  pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
+  group1->setTitle(tr("Clip"));
+  QVBoxLayout* l = new QVBoxLayout(group1);
+  l->addWidget(&this->Implementation->InsideOutWidget);
 
-  pqCollapsedGroup* const group2 = new pqCollapsedGroup(tr("Implicit Plane"));
-  group2->setWidget(&this->Implementation->ImplicitPlaneWidget);
+  pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
+  group2->setTitle(tr("Implicit Plane"));
+  l = new QVBoxLayout(group2);
+  l->addWidget(&this->Implementation->ImplicitPlaneWidget);
   
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
-  panel_layout->setMargin(0);
-  panel_layout->setSpacing(0);
   panel_layout->addWidget(group1);
   panel_layout->addWidget(group2);
   panel_layout->addStretch();
   
-  this->setLayout(panel_layout);
-
   QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)),
                    &this->Implementation->ImplicitPlaneWidget,
                    SLOT(setRenderModule(pqRenderModule*)));
