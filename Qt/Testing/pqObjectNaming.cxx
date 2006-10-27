@@ -162,6 +162,7 @@ const QString pqObjectNaming::GetName(QObject& Object)
 QObject* pqObjectNaming::GetObject(const QString& Name)
 {
   QObject* result = 0;
+  QObject* lastObject = 0;
   const QStringList names = Name.split("/");
   if(names.empty())
     return 0;
@@ -175,6 +176,7 @@ QObject* pqObjectNaming::GetObject(const QString& Name)
     if(name == names[0])
       {
       result = object;
+      lastObject = object;
       break;
       }
     }
@@ -192,6 +194,7 @@ QObject* pqObjectNaming::GetObject(const QString& Name)
       if(name == names[j])
         {
         result = child;
+        lastObject = child;
         break;
         }
       }
@@ -201,6 +204,17 @@ QObject* pqObjectNaming::GetObject(const QString& Name)
     return result;
   
   qCritical() << "Couldn't find object " << Name;
+
+  if(lastObject)
+    {
+    QObjectList matches =
+      lastObject->findChildren<QObject*>(names[names.size()-1]);
+    foreach(QObject* o, matches)
+      {
+      qCritical() << "\tPossible match: " << pqObjectNaming::GetName(*o) << "\n";
+      }
+    }
+
   return 0;
 }
 
