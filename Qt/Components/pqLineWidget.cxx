@@ -214,6 +214,9 @@ void pqLineWidget::createWidget(pqServer* server)
       get3DWidget("LineSourceWidgetDisplay", server);
   this->setWidgetProxy(widget);
   
+  widget->UpdateVTKObjects();
+  widget->UpdatePropertyInformation();
+  
   this->Implementation->WidgetPoint1 = vtkSMDoubleVectorProperty::SafeDownCast(
     widget->GetProperty("Point1WorldPosition"));
   this->Implementation->WidgetPoint2 = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -261,7 +264,6 @@ void pqLineWidget::createWidget(pqServer* server)
     adaptor, "value", SIGNAL(valueChanged(const QString&)),
     widget, this->Implementation->WidgetPoint2, 2);
 
-  widget->UpdateVTKObjects();
  }
 
 void pqLineWidget::resetBounds()

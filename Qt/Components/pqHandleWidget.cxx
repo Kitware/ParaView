@@ -128,6 +128,9 @@ void pqHandleWidget::createWidget(pqServer* server)
     pqApplicationCore::instance()->get3DWidgetFactory()->
     get3DWidget("PointSourceWidgetDisplay", server);
   this->setWidgetProxy(widget);
+  
+  widget->UpdateVTKObjects();
+  widget->UpdatePropertyInformation();
 
   pqSignalAdaptorDouble* adaptor = new pqSignalAdaptorDouble(
     this->Implementation->UI->worldPositionX, "text",
@@ -149,8 +152,6 @@ void pqHandleWidget::createWidget(pqServer* server)
   this->Implementation->Links.addPropertyLink(
     adaptor, "value", SIGNAL(valueChanged(const QString&)),
     widget, widget->GetProperty("WorldPosition"), 2);
-
-  widget->UpdateVTKObjects();
 
   widget->AddObserver(vtkCommand::StartInteractionEvent,
     this->Implementation->StartDragObserver);
