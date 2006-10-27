@@ -33,9 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCollapsedGroup
 #define _pqCollapsedGroup
 
+#include "QtWidgetsExport.h"
 #include <QGroupBox>
 
-class pqCollapsedGroup : public QGroupBox
+class QTWIDGETS_EXPORT pqCollapsedGroup : public QGroupBox
 {
   Q_OBJECT
   Q_PROPERTY(bool collapsed READ collapsed WRITE setCollapsed)
