@@ -326,7 +326,7 @@ void pqCalculatorPanel::accept()
                  CalcProxy->GetProperty("AttributeMode"),
                  mode);
 
-  if(this->Internal->ResultArrayName->isEnabled())
+  if(!this->Internal->ResultArrayName->testAttribute(Qt::WA_ForceDisabled))
     {
     pqSMAdaptor::setElementProperty(
                    CalcProxy->GetProperty("ResultArrayName"),
