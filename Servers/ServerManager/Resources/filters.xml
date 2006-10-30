@@ -2240,15 +2240,6 @@ The Tetrahedralize filter converts the 3D cells of any type of data set to tetra
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
       </InputProperty>
-
-     <IntVectorProperty 
-        name="SetTetrahedraOnly" 
-        command="SetTetrahedraOnly" 
-        number_of_elements="1"
-        default_values="1" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
    <!-- End DataSetTriangleFilter -->
    </SourceProxy>
 
