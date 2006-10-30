@@ -1341,10 +1341,6 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <LabeledToggle label="TetrahedraOnly"
-                   trace_name="TetrahedraOnly"
-                   property="SetTetrahedraOnly"
-                   help="Culls vertices, lines and triangles from the output producing only tetrahedra."/>
   </Module>
   <Module name="TriangleFilter"
           menu_name="Triangulate"
