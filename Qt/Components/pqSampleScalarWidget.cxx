@@ -146,9 +146,10 @@ pqSampleScalarWidget::~pqSampleScalarWidget()
       this->Implementation->DomainObserver);
     }
 
-  if(this->Implementation->SampleProperty)
+  if(this->Implementation->SampleProperty &&
+     this->Implementation->SampleProperty->GetDomain("scalar_range"))
     {
-    this->Implementation->SampleProperty->RemoveObserver(
+    this->Implementation->SampleProperty->GetDomain("scalar_range")->RemoveObserver(
       this->Implementation->PropertyObserver);
     }
 
@@ -175,17 +176,18 @@ void pqSampleScalarWidget::setDataSources(
   this->Implementation->SampleProperty = sample_property;
   this->Implementation->RangeProperty = range_property;
 
-  if(this->Implementation->SampleProperty)
+  if(this->Implementation->SampleProperty &&
+     this->Implementation->SampleProperty->GetDomain("scalar_range"))
     {
-    this->Implementation->SampleProperty->AddObserver(
-      vtkCommand::ModifiedEvent,
+    this->Implementation->SampleProperty->GetDomain("scalar_range")->AddObserver(
+      vtkCommand::DomainModifiedEvent,
       this->Implementation->PropertyObserver);
     }
   
   if(this->Implementation->RangeProperty)
     {
     this->Implementation->RangeProperty->AddObserver(
-      vtkCommand::ModifiedEvent,
+      vtkCommand::DomainModifiedEvent,
       this->Implementation->DomainObserver);
     }
     
@@ -386,8 +388,6 @@ bool pqSampleScalarWidget::getRange(double& range_min, double& range_max)
   // Return the range of values in the input (if available)
   if(this->Implementation->SampleProperty)
     {
-    this->Implementation->SampleProperty->UpdateDependentDomains();
-    
     if(vtkSMDoubleRangeDomain* const domain =
       vtkSMDoubleRangeDomain::SafeDownCast(
         this->Implementation->SampleProperty->GetDomain("scalar_range")))
