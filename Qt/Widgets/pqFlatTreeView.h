@@ -38,18 +38,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "QtWidgetsExport.h"
-#include <QAbstractItemView>
+#include <QAbstractScrollArea>
+#include <QModelIndex>          // Needed for return type
+#include <QStyleOptionViewItem> // Needed for return type
 
 class pqFlatTreeViewItem;
 class pqFlatTreeViewItemRows;
 class pqFlatTreeViewInternal;
 
+class QAbstractItemModel;
 class QColor;
 class QFontMetrics;
 class QHeaderView;
 class QItemSelection;
+class QItemSelectionModel;
 class QPoint;
-class QStyleOptionViewItem;
 
 
 /// \class pqFlatTreeView
@@ -65,9 +68,24 @@ class QStyleOptionViewItem;
 /// those items are indented from the parent. Normal tree view
 /// branches are drawn between the parent and child items to show
 /// the relationship.
-class QTWIDGETS_EXPORT pqFlatTreeView : public QAbstractItemView
+class QTWIDGETS_EXPORT pqFlatTreeView : public QAbstractScrollArea
 {
   Q_OBJECT
+
+public:
+  enum SelectionBehavior
+    {
+    SelectItems,
+    SelectRows,
+    SelectColumns
+    };
+
+  enum SelectionMode
+    {
+    NoSelection,
+    SingleSelection,
+    ExtendedSelection
+    };
 
 public:
   /// \brief
@@ -76,21 +94,40 @@ public:
   pqFlatTreeView(QWidget *parent=0);
   virtual ~pqFlatTreeView();
 
-  virtual QModelIndex indexAt(const QPoint &point) const;
-  virtual QRect visualRect(const QModelIndex &index) const;
-  virtual void scrollTo(const QModelIndex &index,
-      QAbstractItemView::ScrollHint hint=QAbstractItemView::EnsureVisible);
-  virtual void keyboardSearch(const QString &search);
-
-  virtual void setModel(QAbstractItemModel *model);
-  virtual void setSelectionModel(QItemSelectionModel *itemSelectionModel);
-  virtual void reset();
-  virtual void setRootIndex(const QModelIndex &index);
+  /// \brief
+  ///   Used to monitor the header view.
+  ///
+  /// When the header view is shown or hidden, the layout needs to be
+  /// updated and repainted.
+  ///
+  /// \param object The object which will receive the event.
+  /// \param e The event to be sent.
   virtual bool eventFilter(QObject *object, QEvent *e);
+
+  /// \name Model Setup Methods
+  //@{
+  QAbstractItemModel *getModel() const {return this->Model;}
+  void setModel(QAbstractItemModel *model);
+
+  QModelIndex getRootIndex() const;
+  void setRootIndex(const QModelIndex &index);
+  //@}
+
+  /// \name Selection Setup Methods
+  //@{
+  QItemSelectionModel *getSelectionModel() const {return this->Selection;}
+  void setSelectionModel(QItemSelectionModel *selectionModel);
+
+  SelectionBehavior getSelectionBehavior() const {return this->Behavior;}
+  void setSelectionBehavior(SelectionBehavior behavior);
+
+  SelectionMode getSelectionMode() const {return this->Mode;}
+  void setSelectionMode(SelectionMode mode);
+  //@}
 
   /// \name Column Management Methods
   //@{
-  QHeaderView *header() const {return this->HeaderView;}
+  QHeaderView *getHeader() const {return this->HeaderView;}
   void setHeader(QHeaderView *headerView);
 
   /// \brief
@@ -112,37 +149,62 @@ public:
   void setColumnSizeManaged(bool managed);
   //@}
 
+  QModelIndex getIndexVisibleAt(const QPoint &point) const;
+  QModelIndex getIndexCellAt(const QPoint &point) const;
+
+  /// \name Editing Methods
+  //@{
+  bool startEditing(const QModelIndex &index);
+  void finishEditing();
+  void cancelEditing();
+  //@}
+
+signals:
+  void activated(const QModelIndex &index);
+  void clicked(const QModelIndex &index);
+
 public slots:
+  void reset();
+  void selectAll();
   void expand(const QModelIndex &index);
   void collapse(const QModelIndex &index);
+  void scrollTo(const QModelIndex &index);
 
 protected slots:
-  void rowsRemoved(const QModelIndex &parentIndex, int start, int end);
+  /// \name Model Change Handlers
+  //@{
+  void insertRows(const QModelIndex &parent, int start, int end);
+  void startRowRemoval(const QModelIndex &parent, int start, int end);
+  void finishRowRemoval(const QModelIndex &parent, int start, int end);
+  void insertColumns(const QModelIndex &parent, int start, int end);
+  void startColumnRemoval(const QModelIndex &parent, int start, int end);
+  void finishColumnRemoval(const QModelIndex &parent, int start, int end);
+  void updateData(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+  //@}
 
 protected:
-  virtual void rowsInserted(const QModelIndex &parentIndex,
-      int start, int end);
-  virtual void rowsAboutToBeRemoved(const QModelIndex &parentIndex,
-      int start, int end);
-  virtual void dataChanged(const QModelIndex &topLeft,
-      const QModelIndex &bottomRight);
+  /// \name Keyboard Event Handlers
+  //@{
+  virtual void keyPressEvent(QKeyEvent *e);
+  void keyboardSearch(const QString &search);
+  //@}
 
-  virtual void mouseDoubleClickEvent(QMouseEvent *e);
+  /// \name Mouse Event Handlers
+  //@{
   virtual void mousePressEvent(QMouseEvent *e);
-  virtual QModelIndex moveCursor(QAbstractItemView::CursorAction cursorAction,
-      Qt::KeyboardModifiers modifiers);
+  virtual void mouseMoveEvent(QMouseEvent *e);
+  virtual void mouseReleaseEvent(QMouseEvent *e);
+  virtual void mouseDoubleClickEvent(QMouseEvent *e);
+  virtual void wheelEvent(QWheelEvent *e);
+  //@}
 
-  virtual bool isIndexHidden(const QModelIndex &index) const;
-  virtual void setSelection(const QRect &rect,
-      QItemSelectionModel::SelectionFlags command);
-  virtual QRegion visualRegionForSelection(
-      const QItemSelection &selection) const;
+  int horizontalOffset() const;
+  int verticalOffset() const;
 
-  virtual int horizontalOffset() const;
-  virtual int verticalOffset() const;
   virtual void resizeEvent(QResizeEvent *e);
   virtual bool viewportEvent(QEvent *e);
   virtual void paintEvent(QPaintEvent *e);
+  QStyleOptionViewItem getViewOptions() const;
 
 private slots:
   void handleSectionResized(int index, int oldSize, int newSize);
@@ -157,11 +219,14 @@ private slots:
       const QItemSelection &deselected);
 
 private:
-  void resetInternal(int numberOfColumns);
+  void resetRoot();
+  void resetPreferredSizes();
+  void layoutEditor();
   void layoutItems();
   void layoutItem(pqFlatTreeViewItem *item, int &point,
       const QFontMetrics &fm);
   int getDataWidth(const QModelIndex &index, const QFontMetrics &fm) const;
+  int getWidthSum(pqFlatTreeViewItem *item, int column) const;
   bool updateContentsWidth();
   void updateScrollBars();
   void addChildItems(pqFlatTreeViewItem *item, int parentChildCount);
@@ -169,6 +234,7 @@ private:
       pqFlatTreeViewItemRows &rowList) const;
   pqFlatTreeViewItem *getItem(const pqFlatTreeViewItemRows &rowList) const;
   pqFlatTreeViewItem *getItem(const QModelIndex &index) const;
+  pqFlatTreeViewItem *getItemAt(int contentsY) const;
   pqFlatTreeViewItem *getNextVisibleItem(pqFlatTreeViewItem *item) const;
   pqFlatTreeViewItem *getPreviousVisibleItem(pqFlatTreeViewItem *item) const;
   pqFlatTreeViewItem *getLastVisibleItem() const;
@@ -178,6 +244,10 @@ private:
       QStyleOptionViewItem &options);
 
 private:
+  QAbstractItemModel *Model;
+  QItemSelectionModel *Selection;
+  SelectionBehavior Behavior;
+  SelectionMode Mode;
   QHeaderView *HeaderView;
   pqFlatTreeViewItem *Root;
   pqFlatTreeViewInternal *Internal;
@@ -188,6 +258,8 @@ private:
   bool FontChanged;
   bool ManageSizes;
   bool InUpdateWidth;
+  bool HeaderOwned;
+  bool SelectionOwned;
 
   static int TextMargin;
   static int DoubleTextMargin;

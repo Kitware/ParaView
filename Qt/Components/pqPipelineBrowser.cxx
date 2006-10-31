@@ -103,15 +103,15 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   if(this->TreeView)
     {
     this->TreeView->setObjectName("PipelineView");
-    this->TreeView->header()->hide();
+    this->TreeView->getHeader()->hide();
     this->TreeView->setModel(this->ListModel);
     this->TreeView->installEventFilter(this);
-    this->TreeView->header()->moveSection(1, 0);
-    //this->TreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    this->TreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    this->TreeView->getHeader()->moveSection(1, 0);
+    //this->TreeView->setSelectionBehavior(pqFlatTreeView::SelectRows);
+    this->TreeView->setSelectionMode(pqFlatTreeView::ExtendedSelection);
 
     // Listen to the selection change signals.
-    QItemSelectionModel *selection = this->TreeView->selectionModel();
+    QItemSelectionModel *selection = this->TreeView->getSelectionModel();
     if(selection)
       {
       connect(selection,
@@ -147,7 +147,7 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
     }
 
   // Create the adaptor.
-  new pqPipelineModelSelectionAdaptor(this->TreeView->selectionModel(),
+  new pqPipelineModelSelectionAdaptor(this->TreeView->getSelectionModel(),
     pqApplicationCore::instance()->getSelectionModel(), this);
 }
 
@@ -161,7 +161,8 @@ bool pqPipelineBrowser::eventFilter(QObject *object, QEvent *e)
   if(object == this->TreeView && e->type() == QEvent::KeyPress)
     {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
-    if(keyEvent->key() == Qt::Key_Delete)
+    if(keyEvent->key() == Qt::Key_Delete ||
+        keyEvent->key() == Qt::Key_Backspace)
       {
       this->deleteSelected();
       }
@@ -175,7 +176,7 @@ QItemSelectionModel *pqPipelineBrowser::getSelectionModel() const
 {
   if(this->TreeView)
     {
-    return this->TreeView->selectionModel();
+    return this->TreeView->getSelectionModel();
     }
 
   return 0;
@@ -248,7 +249,7 @@ void pqPipelineBrowser::select(pqServerManagerModelItem* item)
   QModelIndex index = this->ListModel->getIndexFor(item);
   // This not only changes the current selection, but also clears
   // any previous selection.
-  this->TreeView->selectionModel()->setCurrentIndex(index,
+  this->TreeView->getSelectionModel()->setCurrentIndex(index,
     QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 //  emit this->selectionChanged(item); 
 }
@@ -269,7 +270,7 @@ void pqPipelineBrowser::select(pqServer* server)
 void pqPipelineBrowser::deleteSelected()
 {
   // Get the selected item(s) from the selection model.
-  QModelIndex current = this->TreeView->selectionModel()->currentIndex();
+  QModelIndex current = this->TreeView->getSelectionModel()->currentIndex();
   pqServerManagerModelItem *item = this->ListModel->getItemFor(current);
   pqPipelineSource *source = qobject_cast<pqPipelineSource *>(item);
   pqServer *server = qobject_cast<pqServer *>(item);

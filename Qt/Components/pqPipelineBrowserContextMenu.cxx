@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXYPlotDisplayProxyEditor.h"
 
 #include <QDialog>
+#include <QItemSelectionModel>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -88,7 +89,7 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
   menu.setObjectName("PipelineObjectMenu");
   bool menuHasItems = false;
   pqFlatTreeView *tree = this->Browser->getTreeView();
-  QModelIndex current = tree->selectionModel()->currentIndex();
+  QModelIndex current = tree->getSelectionModel()->currentIndex();
   pqPipelineModel *model = this->Browser->getListModel();
   pqPipelineSource *source = dynamic_cast<pqPipelineSource*>(
     model->getItemFor(current));
