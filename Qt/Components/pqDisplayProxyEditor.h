@@ -54,6 +54,11 @@ public:
   /// get the proxy for which properties are displayed
   pqPipelineDisplay* getDisplay();
 
+public slots:
+  /// TODO: get rid of this function once the server manager can
+  /// inform us of display property changes
+  void reloadGUI();
+
 protected slots:
   /// internally used to update the graphics window when a property changes
   void updateView();

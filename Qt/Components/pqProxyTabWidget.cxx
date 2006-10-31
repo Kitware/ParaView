@@ -86,6 +86,10 @@ pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   QObject::connect(this->Inspector, SIGNAL(accepted()),
                    this->Information, SLOT(updateInformation()),
                    Qt::QueuedConnection);
+  // TODO: allow display page to work without help
+  QObject::connect(this->Inspector, SIGNAL(accepted()),
+                   this->Display, SLOT(reloadGUI()),
+                   Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------

@@ -486,3 +486,11 @@ void pqDisplayProxyEditor::zoomToData()
     }
 }
 
+// TODO:  get rid of me !!  as soon as vtkSMDisplayProxy can tell us when new
+// arrays are added.
+void pqDisplayProxyEditor::reloadGUI()
+{
+  this->Internal->ColorBy->setDisplay(this->Internal->Display);
+}
+
+
