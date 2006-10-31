@@ -720,7 +720,7 @@ void pqCustomFilterDefinitionWizard::removeOutput()
   if(item)
     {
     int row = this->Form->OutputPorts->indexOfTopLevelItem(item) - 1;
-    this->Form->ListNames.removeAll(item->text(2));
+    this->Form->ListNames.removeAll(item->text(1));
     delete item;
     if(row < 0)
       {
