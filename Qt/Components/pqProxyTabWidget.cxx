@@ -69,7 +69,6 @@ pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   this->addTab(scr, tr("Properties"));
 
   scr = new QScrollArea;
-  scr->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   scr->setWidgetResizable(true);
   scr->setFrameShape(QFrame::NoFrame);
   this->Display = new pqDisplayProxyEditor();
@@ -77,7 +76,6 @@ pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   this->addTab(scr, tr("Display"));
 
   scr = new QScrollArea;
-  scr->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   scr->setWidgetResizable(true);
   scr->setFrameShape(QFrame::NoFrame);
   this->Information = new pqProxyInformationWidget();
