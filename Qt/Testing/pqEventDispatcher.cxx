@@ -50,6 +50,8 @@ public:
     Player(0)
   {
 #if defined(Q_WS_MAC)
+  // for the Mac, work around a Qt bug by using a timer 
+  // (should be fixed in Qt 4.3.0)
     this->Timer.setInterval(1);
     this->Timer.setSingleShot(true);
 #endif
