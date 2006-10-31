@@ -65,7 +65,7 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   this->MaximizeButton->setIcon(
     QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarMaxButton)));
   this->RestoreButton->setIcon(
-    QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarMinButton)));
+    QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarNormalButton)));
 
   // set up actions
   QAction* a = new QAction(this->ActiveButton->icon(), tr("Active"), this->Menu);
