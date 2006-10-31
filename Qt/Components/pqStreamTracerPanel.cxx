@@ -133,6 +133,11 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   this->Implementation->UI.stackedWidget->setCurrentWidget(
           this->Implementation->UI.pointSource);
   
+  QObject::connect(this->Implementation->UI.IntegratorType, 
+                   SIGNAL(currentIndexChanged(int)), 
+                   this, 
+                   SLOT(onIntegratorTypeChanged(int)));
+  
   QObject::connect(this->Implementation->UI.seedType, 
                    SIGNAL(currentIndexChanged(int)), 
                    this, 
@@ -433,4 +438,20 @@ void pqStreamTracerPanel::accept()
     }
   pqObjectPanel::accept();
 }
+
+void pqStreamTracerPanel::onIntegratorTypeChanged(int index)
+{
+  bool enabled = false;
+  QString type = this->Implementation->UI.IntegratorType->itemText(index);
+  if(type == "Runge-Kutta 4-5")
+    {
+    enabled = true;
+    }
+  this->Implementation->UI.MinimumIntegrationStepUnit->setEnabled(enabled);
+  this->Implementation->UI.MinimumIntegrationStep->setEnabled(enabled);
+  this->Implementation->UI.MaximumIntegrationStepUnit->setEnabled(enabled);
+  this->Implementation->UI.MaximumIntegrationStep->setEnabled(enabled);
+  this->Implementation->UI.MaximumError->setEnabled(enabled);
+}
+
 

@@ -53,6 +53,7 @@ public:
 private slots:
   void onRenderModuleChanged(pqRenderModule*);
   void onSeedTypeChanged(int);
+  void onIntegratorTypeChanged(int);
 
 private:
   void onUsePointSource();
