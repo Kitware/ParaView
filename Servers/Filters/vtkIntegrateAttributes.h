@@ -79,6 +79,29 @@ protected:
                          vtkUnstructuredGrid* output,
                          vtkIdType cellId, vtkIdType pt1Id,
                          vtkIdType pt2Id, vtkIdType pt3Id);
+  void IntegrateTetrahedron(vtkDataSet* input, 
+                            vtkUnstructuredGrid* output,
+                            vtkIdType cellId, vtkIdType pt1Id,
+                            vtkIdType pt2Id, vtkIdType pt3Id,
+                            vtkIdType pt4Id);
+  void IntegratePixel(vtkDataSet* input, 
+                      vtkUnstructuredGrid* output,
+                      vtkIdType cellId, vtkIdList* cellPtIds);
+  void IntegrateVoxel(vtkDataSet* input, 
+                      vtkUnstructuredGrid* output,
+                      vtkIdType cellId, vtkIdList* cellPtIds);
+  void IntegrateGeneral1DCell(vtkDataSet* input, 
+                              vtkUnstructuredGrid* output,
+                              vtkIdType cellId, 
+                              vtkIdList* cellPtIds);
+  void IntegrateGeneral2DCell(vtkDataSet* input, 
+                              vtkUnstructuredGrid* output,
+                              vtkIdType cellId, 
+                              vtkIdList* cellPtIds);
+  void IntegrateGeneral3DCell(vtkDataSet* input, 
+                              vtkUnstructuredGrid* output,
+                              vtkIdType cellId, 
+                              vtkIdList* cellPtIds);
   void IntegrateSatelliteData(vtkDataSetAttributes* inda,
                               vtkDataSetAttributes* outda);                  
   void AllocateAttributes(vtkDataSetAttributes* inda, 
@@ -93,6 +116,10 @@ protected:
   void IntegrateData3(vtkDataSetAttributes* inda,
                       vtkDataSetAttributes* outda, vtkIdType pt1Id, 
                       vtkIdType pt2Id, vtkIdType pt3Id, double k);
+  void IntegrateData4(vtkDataSetAttributes* inda,
+                      vtkDataSetAttributes* outda, vtkIdType pt1Id, 
+                      vtkIdType pt2Id, vtkIdType pt3Id, vtkIdType pt4Id,
+                      double k);
 
 private:
   vtkIntegrateAttributes(const vtkIntegrateAttributes&);  // Not implemented.
