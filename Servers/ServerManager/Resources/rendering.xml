@@ -2774,6 +2774,13 @@
               <DataType value="vtkUnstructuredGrid" />
             </DataTypeDomain>
           </InputProperty>
+          <IntVectorProperty 
+            name="SetTetrahedraOnly" 
+            command="SetTetrahedraOnly" 
+            number_of_elements="1"
+            default_values="1" > 
+            <BooleanDomain name="bool"/>
+          </IntVectorProperty>
         </SourceProxy>
       </SubProxy>
 
