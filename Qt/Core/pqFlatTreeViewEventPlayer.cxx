@@ -55,7 +55,7 @@ static QModelIndex GetIndex(pqFlatTreeView& View, const QString& Name)
 
     if(rows.size() > 0)
       {
-      index = View.getModel()->index(rows[i].toInt(), column.toInt(), index);
+      index = View.getModel()->index(rows[rows.size() - 1].toInt(), column.toInt(), index);
       }
       
     return index;
