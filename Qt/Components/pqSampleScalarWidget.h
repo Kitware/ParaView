@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 #include <QWidget>
+#include <QModelIndex>
 
 class QItemSelection;
 
@@ -94,6 +95,8 @@ private:
   
   class pqImplementation;
   pqImplementation* const Implementation;
+
+  bool eventFilter(QObject *object, QEvent *e);
 };
 
 #endif // !_pqSampleScalarWidget_h

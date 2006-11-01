@@ -70,10 +70,13 @@ void pqScalarSetModel::clear()
   emit layoutChanged();
 }
 
-void pqScalarSetModel::insert(double value)
+QModelIndex pqScalarSetModel::insert(double value)
 {
-  this->Implementation->Values.insert(value);
+  vtkstd::pair<vtkstd::set<double>::iterator,bool> iter=this->Implementation->Values.insert(value);
+  int idx=vtkstd::distance(this->Implementation->Values.begin(),iter.first);
+  QModelIndex mindex=this->createIndex(idx,0);
   emit layoutChanged();
+  return mindex;
 }
 
 void pqScalarSetModel::erase(double value)
@@ -122,6 +125,7 @@ QVariant pqScalarSetModel::data(const QModelIndex& i, int role) const
   
   switch(role)
     {
+    case Qt::EditRole:
     case Qt::DisplayRole:
       {
       vtkstd::set<double>::iterator iterator = this->Implementation->Values.begin();

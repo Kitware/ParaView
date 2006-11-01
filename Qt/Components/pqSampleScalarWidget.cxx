@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkMemberFunctionCommand.h>
 #include <vtkSMDoubleRangeDomain.h>
 #include <vtkSMDoubleVectorProperty.h>
+#include <QKeyEvent>
 
 ///////////////////////////////////////////////////////////////////////////
 // pqSampleScalarWidget::pqImplementation
@@ -87,7 +88,8 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
   this->Implementation->UI->Values->setSelectionMode(QAbstractItemView::ExtendedSelection);
   
   this->Implementation->UI->Delete->setEnabled(false);
-  this->Implementation->UI->SelectAll->setEnabled(false);
+
+  this->Implementation->UI->Values->installEventFilter(this);
   
   connect(
     &this->Implementation->Model,
@@ -95,7 +97,7 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
     this,
     SIGNAL(samplesChanged()));
   
-  connect(
+    connect(
     &this->Implementation->Model,
     SIGNAL(layoutChanged()),
     this,
@@ -124,18 +126,16 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
     SIGNAL(clicked()),
     this,
     SLOT(onNewRange()));
-    
-  connect(
-    this->Implementation->UI->SelectAll,
-    SIGNAL(clicked()),
-    this,
-    SLOT(onSelectAll()));
+   
     
   connect(
     this->Implementation->UI->ScientificNotation,
     SIGNAL(toggled(bool)),
     this,
     SLOT(onScientificNotation(bool)));
+
+
+  
 }
 
 pqSampleScalarWidget::~pqSampleScalarWidget()
@@ -242,8 +242,7 @@ void pqSampleScalarWidget::reset()
 
 void pqSampleScalarWidget::onSamplesChanged()
 {
-  this->Implementation->UI->SelectAll->setEnabled(
-    this->Implementation->Model.rowCount());
+ 
 }
 
 void pqSampleScalarWidget::onSelectionChanged(const QItemSelection&, const QItemSelection&)
@@ -285,7 +284,11 @@ void pqSampleScalarWidget::onNewValue()
     new_value = values[values.size() - 1] + delta;
     }
     
-  this->Implementation->Model.insert(new_value);
+  QModelIndex idx=this->Implementation->Model.insert(new_value);
+  
+  this->Implementation->UI->Values->setCurrentIndex(idx);
+  this->Implementation->UI->Values->edit(idx);
+  
 }
 
 void pqSampleScalarWidget::onNewRange()
@@ -406,4 +409,19 @@ bool pqSampleScalarWidget::getRange(double& range_min, double& range_max)
     }
     
   return false;
+}
+
+
+bool pqSampleScalarWidget::eventFilter(QObject *object, QEvent *e)
+{
+  if(object == this->Implementation->UI->Values && e->type() == QEvent::KeyPress)
+    {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+    if(keyEvent->key() == Qt::Key_Delete || keyEvent->key() == Qt::Key_Backspace)
+      {
+       this->onDelete();
+      }
+    }
+
+  return QWidget::eventFilter(object, e);
 }

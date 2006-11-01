@@ -38,7 +38,11 @@
       <number>6</number>
      </property>
      <item>
-      <widget class="QListView" name="Values" />
+      <widget class="QListView" name="Values" >
+       <property name="editTriggers" >
+        <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers|QAbstractItemView::SelectedClicked</set>
+       </property>
+      </widget>
      </item>
      <item>
       <layout class="QVBoxLayout" >
@@ -84,19 +88,6 @@
          </property>
          <property name="text" >
           <string>New Range</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="SelectAll" >
-         <property name="toolTip" >
-          <string>Add a single value to the current set</string>
-         </property>
-         <property name="statusTip" >
-          <string>Add a single value to the current set.</string>
-         </property>
-         <property name="text" >
-          <string>Select All</string>
          </property>
         </widget>
        </item>

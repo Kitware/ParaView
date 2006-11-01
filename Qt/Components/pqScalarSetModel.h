@@ -52,7 +52,7 @@ public:
   /// Clears the model contents
   void clear();
   /// Inserts a floating-point number into the model
-  void insert(double value);
+  QModelIndex insert(double value);
   /// Erases a floating-point number from the model
   void erase(double value);
   /// Erases a zero-based row from the model
