@@ -204,6 +204,11 @@ QObject* pqObjectNaming::GetObject(const QString& Name)
     return result;
   
   qCritical() << "Couldn't find object " << Name;
+  if(lastObject)
+    {
+    qCritical() << "Found up to " << pqObjectNaming::GetName(*lastObject);
+    }
+
 
   if(lastObject)
     {
