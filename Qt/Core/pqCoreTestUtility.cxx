@@ -56,6 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFileDialogEventPlayer.h"
 #include "pqFileDialogEventTranslator.h"
+#include "pqFlatTreeViewEventPlayer.h"
+#include "pqFlatTreeViewEventTranslator.h"
 #include "pqOptions.h"
 #include "pqProcessModuleGUIHelper.h"
 #include "pqQVTKWidgetEventPlayer.h"
@@ -92,11 +94,15 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
        new pqQVTKWidgetEventTranslator(this));
   this->eventTranslator()->addWidgetEventTranslator(
        new pqFileDialogEventTranslator(this));
+  this->eventTranslator()->addWidgetEventTranslator(
+       new pqFlatTreeViewEventTranslator(this));
 
   this->eventPlayer()->addWidgetEventPlayer(
        new pqQVTKWidgetEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(
        new pqFileDialogEventPlayer(this));
+  this->eventPlayer()->addWidgetEventPlayer(
+       new pqFlatTreeViewEventPlayer(this));
 
 }
 

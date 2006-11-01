@@ -739,6 +739,23 @@ void pqFlatTreeView::selectAll()
   // TODO
 }
 
+void pqFlatTreeView::setCurrentIndex(const QModelIndex &index)
+{
+  if(this->Selection && this->Model)
+    {
+    if(this->Model->flags(index) & Qt::ItemIsSelectable)
+      {
+      this->Selection->setCurrentIndex(index,
+          QItemSelectionModel::ClearAndSelect);
+      }
+    else
+      {
+      this->Selection->setCurrentIndex(index,
+          QItemSelectionModel::Clear);
+      }
+    }
+}
+
 void pqFlatTreeView::expand(const QModelIndex &index)
 {
   pqFlatTreeViewItem *item = this->getItem(index);
@@ -1023,7 +1040,7 @@ void pqFlatTreeView::startRowRemoval(const QModelIndex &parentIndex, int start,
 }
 
 void pqFlatTreeView::finishRowRemoval(const QModelIndex &parentIndex,
-    int start, int end)
+    int, int)
 {
   // Get the view item for the parent index. If the view item
   // doesn't exist, it is not visible and no update is necessary.
@@ -1071,20 +1088,17 @@ void pqFlatTreeView::finishRowRemoval(const QModelIndex &parentIndex,
     }
 }
 
-void pqFlatTreeView::insertColumns(const QModelIndex &parent, int start,
-    int end)
+void pqFlatTreeView::insertColumns(const QModelIndex &, int, int)
 {
   // TODO
 }
 
-void pqFlatTreeView::startColumnRemoval(const QModelIndex &parent, int start,
-    int end)
+void pqFlatTreeView::startColumnRemoval(const QModelIndex &, int, int)
 {
   // TODO
 }
 
-void pqFlatTreeView::finishColumnRemoval(const QModelIndex &parent, int start,
-    int end)
+void pqFlatTreeView::finishColumnRemoval(const QModelIndex &, int, int)
 {
   // TODO
 }
@@ -2690,14 +2704,14 @@ void pqFlatTreeView::layoutEditor()
     int ex = this->HeaderView->sectionPosition(column);
     int columnWidth = this->HeaderView->sectionSize(column);
     int itemWidth = this->getWidthSum(item, column);
-    int width = itemWidth;
-    if(width < columnWidth)
+    int editWidth = itemWidth;
+    if(editWidth < columnWidth)
       {
       // Add some extra space to the editor.
-      width += pqFlatTreeView::DoubleTextMargin;
-      if(width > columnWidth)
+      editWidth += pqFlatTreeView::DoubleTextMargin;
+      if(editWidth > columnWidth)
         {
-        width = columnWidth;
+        editWidth = columnWidth;
         }
       }
 
@@ -2707,16 +2721,16 @@ void pqFlatTreeView::layoutEditor()
     if(indent > 0)
       {
       ex += indent;
-      width -= indent;
+      editWidth -= indent;
       }
 
     int ey = item->ContentsY + pqFlatTreeView::PipeLength;
-    int height = this->ItemHeight - pqFlatTreeView::PipeLength;
+    int editHeight = this->ItemHeight - pqFlatTreeView::PipeLength;
 
     // Adjust the location to viewport coordinates and set the size.
     ex -= this->horizontalOffset();
     ey -= this->verticalOffset();
-    this->Internal->Editor->setGeometry(ex, ey, width, height);
+    this->Internal->Editor->setGeometry(ex, ey, editWidth, editHeight);
     }
 }
 
@@ -2878,11 +2892,11 @@ int pqFlatTreeView::getDataWidth(const QModelIndex &index,
 
 int pqFlatTreeView::getWidthSum(pqFlatTreeViewItem *item, int column) const
 {
-  int width = item->Cells[column]->Width + pqFlatTreeView::TextMargin;
+  int total = item->Cells[column]->Width + pqFlatTreeView::TextMargin;
   QModelIndex index = item->Index;
   if(column == 0)
     {
-    width += item->Indent;
+    total += item->Indent;
     }
   else
     {
@@ -2892,10 +2906,10 @@ int pqFlatTreeView::getWidthSum(pqFlatTreeViewItem *item, int column) const
   QVariant icon = index.data(Qt::DecorationRole);
   if(icon.isValid())
     {
-    width += this->IndentWidth + pqFlatTreeView::TextMargin;
+    total += this->IndentWidth + pqFlatTreeView::TextMargin;
     }
 
-  return width;
+  return total;
 }
 
 bool pqFlatTreeView::updateContentsWidth()

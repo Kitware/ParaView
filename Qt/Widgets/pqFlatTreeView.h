@@ -166,6 +166,7 @@ signals:
 public slots:
   void reset();
   void selectAll();
+  void setCurrentIndex(const QModelIndex &index);
   void expand(const QModelIndex &index);
   void collapse(const QModelIndex &index);
   void scrollTo(const QModelIndex &index);
