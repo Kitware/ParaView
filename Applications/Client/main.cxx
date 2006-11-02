@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int main(int argc, char* argv[])
 {
   QApplication app(argc, argv);
+  Q_INIT_RESOURCE(pqCore);
+  Q_INIT_RESOURCE(pqComponents);
 
   QDir dir(QApplication::applicationDirPath());
   dir.cdUp();
