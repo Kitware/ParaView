@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWParameterValueFunctionEditor.h
+  Module:    vtkKWParameterValueFunctionEditor.h,v
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -441,7 +441,8 @@ public:
   vtkGetMacro(NumberOfParameterTicks, int);
 
   // Description:
-  // Set/Get the parameter ticks printf format.
+  // Set/Get the parameter ticks printf format. Set to NULL to actually
+  // hide the label.
   virtual void SetParameterTicksFormat(const char *);
   vtkGetStringMacro(ParameterTicksFormat);
 
@@ -523,15 +524,26 @@ public:
   vtkGetMacro(RescaleBetweenEndPoints, int);
 
   // Description:
-  // Set/Get the point radius (in pixels).
+  // Set/Get the point radius (in pixels) horizontally and vertically.
   virtual void SetPointRadius(int);
-  vtkGetMacro(PointRadius, int);
+  virtual void SetPointRadiusX(int);
+  vtkGetMacro(PointRadiusX, int);
+  virtual void SetPointRadiusY(int);
+  vtkGetMacro(PointRadiusY, int);
 
   // Description:
   // Set/Get the selected point radius as a fraction
-  // of the point radius (see PointRadius). 
+  // of the point radius (see PointRadiusX and PointRadiusY). 
   virtual void SetSelectedPointRadius(double);
   vtkGetMacro(SelectedPointRadius, double);
+
+  // Description:
+  // Set/Get the label to display in the selected point instead of its
+  // index (if PointIndexVisibility or SetPointIndexVisibility are set
+  // to ON). Set to NULL to go back to defaults.
+  virtual void SetSelectedPointText(const char *);
+  vtkGetStringMacro(SelectedPointText);
+  virtual void SetSelectedPointTextToInt(int);
 
   // Description:
   // Set/Get the point style for the function points, or specifically
@@ -649,11 +661,34 @@ public:
   virtual void SetPointColor(double rgb[3]);
   
   // Description:
-  // Set/Get the selected point color.
+  // Set/Get the selected point color, as well as its color when the user.
   // Overriden by ComputePointColorFromValue if supported.
   vtkGetVector3Macro(SelectedPointColor, double);
   virtual void SetSelectedPointColor(double r, double g, double b);
   virtual void SetSelectedPointColor(double rgb[3]);
+
+  // Description:
+  // Set/Get the selected point color when the user is actually interacting
+  // with it. Set any components to a negative value to use the default
+  // SelectedPointColor.
+  vtkGetVector3Macro(SelectedPointColorInInteraction, double);
+  virtual void SetSelectedPointColorInInteraction(
+    double r, double g, double b);
+  virtual void SetSelectedPointColorInInteraction(double rgb[3]);
+
+  // Description:
+  // Set the way the points are colored, either filled, or outlined.
+  //BTX
+  enum 
+  {
+    PointColorStyleFill = 0,
+    PointColorStyleOutline
+  };
+  //ETX
+  virtual void SetPointColorStyle(int);
+  vtkGetMacro(PointColorStyle, int);
+  virtual void SetPointColorStyleToFill();
+  virtual void SetPointColorStyleToOutline();
 
   // Description:
   // Set/Get the point text color.
@@ -802,6 +837,9 @@ public:
 
   // Description:
   // Specifies function-related commands to associate with the widget.
+  // 'FunctionStartChanging' is called when the function is starting to 
+  // changing (as the result of a user starting an interaction, like selecting
+  // a point to move it). 
   // 'FunctionChanging' is called when the function is changing (as the result
   // of a user interaction in progress, like moving a point). 
   // 'FunctionChanged' is called when the function has changed (as the result
@@ -821,6 +859,8 @@ public:
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still
   // evaluated as a simple command. 
+  virtual void SetFunctionStartChangingCommand(
+    vtkObject *object, const char *method);
   virtual void SetFunctionChangedCommand(
     vtkObject *object, const char *method);
   virtual void SetFunctionChangingCommand(
@@ -944,6 +984,7 @@ public:
   enum
   {
     FunctionChangedEvent = 10000,
+    FunctionStartChangingEvent,
     FunctionChangingEvent,
     PointAddedEvent,
     PointChangedEvent,
@@ -1143,6 +1184,7 @@ protected:
   int   ValueRangeVisibility;
   int   PointPositionInValueRange;
   int   ParameterRangePosition;
+  int   PointColorStyle;
   int   CurrentCanvasHeight;
   int   CurrentCanvasWidth;
   int   RequestedCanvasHeight;
@@ -1154,7 +1196,8 @@ protected:
   int   RescaleBetweenEndPoints;
   int   DisableAddAndRemove;
   int   DisableRedraw;
-  int   PointRadius;
+  int   PointRadiusX;
+  int   PointRadiusY;
   double SelectedPointRadius;
   int   FunctionLineWidth;
   int   FunctionLineStyle;
@@ -1196,11 +1239,13 @@ protected:
   char* ParameterTicksFormat;
   char* ParameterEntryFormat;
   double ParameterCursorPosition;
+  char* SelectedPointText;
 
   double FrameBackgroundColor[3];
   double ParameterCursorColor[3];
   double PointColor[3];
   double SelectedPointColor[3];
+  double SelectedPointColorInInteraction[3];
   double PointTextColor[3];
   double SelectedPointTextColor[3];
   int    ComputePointColorFromValue;
@@ -1215,6 +1260,7 @@ protected:
   char  *SelectionChangedCommand;
   char  *FunctionChangedCommand;
   char  *FunctionChangingCommand;
+  char  *FunctionStartChangingCommand;
   char  *VisibleRangeChangedCommand;
   char  *VisibleRangeChangingCommand;
   char  *ParameterCursorMovingCommand;
@@ -1234,6 +1280,7 @@ protected:
   virtual void InvokeSelectionChangedCommand();
   virtual void InvokeFunctionChangedCommand();
   virtual void InvokeFunctionChangingCommand();
+  virtual void InvokeFunctionStartChangingCommand();
   virtual void InvokeVisibleRangeChangedCommand();
   virtual void InvokeVisibleRangeChangingCommand();
   virtual void InvokeParameterCursorMovingCommand(double pos);

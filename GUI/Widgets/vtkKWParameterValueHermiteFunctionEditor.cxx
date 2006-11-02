@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWParameterValueHermiteFunctionEditor.cxx
+  Module:    vtkKWParameterValueHermiteFunctionEditor.cxx,v
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -919,7 +919,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
   // Is visible ? Is valid (not that there is no midpoint for the last point)
 
   double p, displayed_p;
-  int x, y, r = 0;
+  int x, y, rx = 0, ry = 0;
   int is_not_visible = 0, is_not_visible_h = 0;
   int is_not_valid = (id1 < 0 || id1 >= (this->GetFunctionSize() - 1));
 
@@ -938,10 +938,16 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
     {
     this->GetMidPointCanvasCoordinates(id1, &x, &y, &p);
 
-    r = (int)((double)this->PointRadius * VTK_KW_PVHFE_POINT_RADIUS_FACTOR);
+    rx = (int)((double)this->PointRadiusX * VTK_KW_PVHFE_POINT_RADIUS_FACTOR);
     if (id1 == this->GetSelectedMidPoint())
       {
-      r = (int)ceil((double)r * this->SelectedPointRadius);
+      rx = (int)ceil((double)rx * this->SelectedPointRadius);
+      }
+
+    ry = (int)((double)this->PointRadiusY * VTK_KW_PVHFE_POINT_RADIUS_FACTOR);
+    if (id1 == this->GetSelectedMidPoint())
+      {
+      ry = (int)ceil((double)ry * this->SelectedPointRadius);
       }
 
     // If the midpoint is not in the visible range, hide it
@@ -949,15 +955,16 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
     double c_x, c_y, c_x2, c_y2;
     this->GetCanvasScrollRegion(&c_x, &c_y, &c_x2, &c_y2);
 
-    int visible_margin = r + this->PointOutlineWidth + 5;
+    int visible_marginx = rx + this->PointOutlineWidth + 5;
+    int visible_marginy = ry + this->PointOutlineWidth + 5;
 
-    if (x + visible_margin < c_x || c_x2 < x - visible_margin)
+    if (x + visible_marginx < c_x || c_x2 < x - visible_marginx)
       {
       is_not_visible_h = 1;
       }
     
     if (is_not_visible_h || 
-        y + visible_margin < c_y || c_y2 < y - visible_margin)
+        y + visible_marginy < c_y || c_y2 < y - visible_marginy)
       {
       is_not_visible = 1;
       }
@@ -1004,8 +1011,8 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
                 << "}" << endl;
         }
       *tk_cmd << canv << " coords m_p" << id1 
-              << " " << x - r << " " << y - r 
-              << " " << x + r << " " << y + r
+              << " " << x - rx << " " << y - ry 
+              << " " << x + rx << " " << y + ry
               << endl;
       char color[10];
       double *rgb = (id1 == this->GetSelectedMidPoint()) 
