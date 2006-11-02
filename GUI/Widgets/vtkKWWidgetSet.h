@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWWidgetSet.h
+  Module:    vtkKWWidgetSet.h,v
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -138,6 +138,15 @@ public:
   vtkGetMacro(ExpandWidgets, int);
 
   // Description:
+  // Set/Get if the column/row layout should be uniform (enforce same size).
+  virtual void SetUniformColumns(int);
+  vtkBooleanMacro(UniformColumns, int);
+  vtkGetMacro(UniformColumns, int);
+  virtual void SetUniformRows(int);
+  vtkBooleanMacro(UniformRows, int);
+  vtkGetMacro(UniformRows, int);
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -161,6 +170,8 @@ protected:
   int WidgetsInternalPadX;
   int WidgetsInternalPadY;
   int ExpandWidgets;
+  int UniformColumns;
+  int UniformRows;
 
   // Description:
   // To be implemented by superclasses.

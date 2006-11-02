@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWWidgetSet.cxx
+  Module:    vtkKWWidgetSet.cxx,v
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -16,12 +16,13 @@
 
 #include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTkUtilities.h"
 
 #include <vtksys/stl/list>
 #include <vtksys/stl/vector>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.18");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.16");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetSetInternals
@@ -51,6 +52,8 @@ vtkKWWidgetSet::vtkKWWidgetSet()
   this->WidgetsInternalPadX = 0;
   this->WidgetsInternalPadY = 0;
   this->ExpandWidgets = 0;
+  this->UniformColumns = 0;
+  this->UniformRows = 0;
 
   // Internal structs
 
@@ -238,7 +241,7 @@ vtkKWWidget* vtkKWWidgetSet::InsertWidgetInternal(int id, int pos)
 // ----------------------------------------------------------------------------
 void vtkKWWidgetSet::Pack()
 {
-  if (!this->IsCreated())
+  if (!this->IsAlive())
     {
     return;
     }
@@ -255,8 +258,8 @@ void vtkKWWidgetSet::Pack()
 
   int nb_widgets = this->GetNumberOfWidgets();
 
-  int col = 0;
-  int row = 0;
+  int old_nb_cols = 10, old_nb_rows = 10;
+  vtkKWTkUtilities::GetGridSize(this, &old_nb_cols, &old_nb_rows);
 
   const char *sticky = 
     (this->ExpandWidgets ? "news" : (this->PackHorizontally ? "ews" : "nsw"));
@@ -266,6 +269,9 @@ void vtkKWWidgetSet::Pack()
 
   vtksys_stl::vector<int> row_used;
   row_used.assign(nb_widgets, 0);
+
+  int col = 0;
+  int row = 0;
 
   for (; it != end; ++it)
     {
@@ -303,28 +309,45 @@ void vtkKWWidgetSet::Pack()
 
   // Weights
   
-  int i;
-  int maxcol = 
+  int max_col = 
     (row > 0) ? this->MaximumNumberOfWidgetsInPackingDirection : col;
-  for (i = 0; i < maxcol; i++)
-    {
-    tk_cmd 
-      << "grid " << (this->PackHorizontally ? "column" : "row") 
-      << "configure " << this->GetWidgetName() << " " << i 
-      << " -weight " << (this->PackHorizontally ? col_used[i] : row_used[i])
-      << endl;
-    }
 
+  int nb_cols = this->PackHorizontally ? max_col : row;
+  int nb_rows = this->PackHorizontally ? row + 1 : max_col;
+
+  int i;
   if (nb_widgets)
     {
-    for (i = 0; i <= row; i++)
+    for (i = 0; i < nb_cols; i++)
       {
       tk_cmd 
-        << "grid " << (this->PackHorizontally ? "row" : "column") 
-        << "configure " << this->GetWidgetName() << " " << i 
-        << " -weight " << (this->PackHorizontally ? row_used[i] : col_used[i])
+        << "grid columnconfigure " << this->GetWidgetName() << " " << i 
+        << " -weight " << col_used[i]
+        << " -uniform " << (this->UniformColumns && col_used[i] ? "col" : "{}")
         << endl;
       }
+    }
+  for (i = nb_cols; i < old_nb_cols; i++)
+    {
+    tk_cmd << "grid columnconfigure " << this->GetWidgetName() << " " << i
+           << " -weight 0 -uniform {}" << endl;
+    }
+  
+  if (nb_widgets)
+    {
+    for (i = 0; i < nb_rows; i++)
+      {
+      tk_cmd 
+        << "grid rowconfigure " << this->GetWidgetName() << " " << i 
+        << " -weight " << row_used[i]
+        << " -uniform " << (this->UniformRows && row_used[i] ? "row" : "{}")
+        << endl;
+      }
+    }
+  for (i = nb_rows; i < old_nb_rows; i++)
+    {
+    tk_cmd << "grid rowconfigure " << this->GetWidgetName() << " " << i
+           << " -weight 0 -uniform {}" << endl;
     }
 
   tk_cmd << ends;
@@ -340,6 +363,32 @@ void vtkKWWidgetSet::SetPackHorizontally(int _arg)
     return;
     }
   this->PackHorizontally = _arg;
+  this->Modified();
+
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWWidgetSet::SetUniformColumns(int _arg)
+{
+  if (this->UniformColumns == _arg)
+    {
+    return;
+    }
+  this->UniformColumns = _arg;
+  this->Modified();
+
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWWidgetSet::SetUniformRows(int _arg)
+{
+  if (this->UniformRows == _arg)
+    {
+    return;
+    }
+  this->UniformRows = _arg;
   this->Modified();
 
   this->Pack();
@@ -473,6 +522,7 @@ void vtkKWWidgetSet::SetWidgetVisibility(int id, int flag)
         {
         it->Visibility = flag;
         this->Pack();
+        break;
         }
       }
     }
@@ -522,6 +572,12 @@ void vtkKWWidgetSet::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "PackHorizontally: " 
      << (this->PackHorizontally ? "On" : "Off") << endl;
+
+  os << indent << "UniformColumns: " 
+     << (this->UniformColumns ? "On" : "Off") << endl;
+
+  os << indent << "UniformRows: " 
+     << (this->UniformRows ? "On" : "Off") << endl;
 
   os << indent << "MaximumNumberOfWidgetsInPackingDirection: " 
      << (this->MaximumNumberOfWidgetsInPackingDirection ? "On" : "Off") << endl;
