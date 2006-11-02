@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.111");
+vtkCxxRevisionMacro(vtkKWMenu, "1.112");
 
 //----------------------------------------------------------------------------
 class vtkKWMenuInternals
@@ -973,7 +973,7 @@ int vtkKWMenu::GetIndexOfItem(const char *label)
   // interpreted differently. Detect that, and loop over all entries if
   // required
 
-  if (!label || !*label)
+  if (!label || !*label || !this->IsCreated())
     {
     return -1;
     }
