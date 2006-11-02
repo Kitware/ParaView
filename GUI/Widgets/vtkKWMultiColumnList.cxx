@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.70");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.71");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -3500,8 +3500,9 @@ int vtkKWMultiColumnList::FindCellAtRelativeCoordinates(
     }
 
   vtksys_stl::string nearest(
-    this->Script("%s nearestcell %d %d", this->GetWidgetName(), x, y));
-  return sscanf(nearest.c_str(), "%d,%d", row_index, col_index) == 2 ? 1 : 0;
+    this->Script("%s containingcell %d %d", this->GetWidgetName(), x, y));
+  return (sscanf(nearest.c_str(), "%d,%d", row_index, col_index) == 2 &&
+          col_index >= 0 && row_index >= 0) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
