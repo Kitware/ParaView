@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int main(int argc, char* argv[])
 {
   QApplication app(argc, argv);
+#if !defined(PARAVIEW_BUILD_SHARED_LIBS)
   Q_INIT_RESOURCE(pqCore);
   Q_INIT_RESOURCE(pqComponents);
+#endif
 
   QDir dir(QApplication::applicationDirPath());
   dir.cdUp();
