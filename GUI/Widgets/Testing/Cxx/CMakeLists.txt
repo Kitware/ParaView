@@ -3,6 +3,7 @@ INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsTestingMacros.cmake")
 SET(TESTS 
   Random
   Registry
+  StateMachine
   )
 
 FOREACH(TEST ${TESTS})

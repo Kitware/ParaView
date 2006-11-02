@@ -207,6 +207,13 @@ SET(KWWidgets_SRCS
   vtkKWSpinButtons.cxx
   vtkKWSplashScreen.cxx
   vtkKWSplitFrame.cxx
+  vtkKWStateMachine.cxx
+  vtkKWStateMachineCluster.cxx
+  vtkKWStateMachineInput.cxx
+  vtkKWStateMachineState.cxx
+  vtkKWStateMachineTransition.cxx
+  vtkKWStateMachineWriter.cxx
+  vtkKWStateMachineDOTWriter.cxx
   vtkKWTclInteractor.cxx
   vtkKWText.cxx
   vtkKWTheme.cxx
@@ -273,8 +280,9 @@ SET(KWWidgets_UTILS_SRCS
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWMaterialPropertyWidget.cxx
   vtkKWParameterValueFunctionEditor.cxx
-  vtkKWParameterValueHermiteFunctionEditor.cxx
   vtkKWParameterValueFunctionInterface.cxx
+  vtkKWParameterValueHermiteFunctionEditor.cxx
+  vtkKWStateMachineWriter.cxx
   vtkKWUserInterfaceManager.cxx
   vtkKWWidgetSet.cxx
   vtkKWWidgetWithScrollbars.cxx
