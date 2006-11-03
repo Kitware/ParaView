@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 
 #include "pqCoreInit.h"
+#include <QObject>
 
 void pqCoreInit()
 {
