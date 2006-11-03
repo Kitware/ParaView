@@ -30,6 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
+#define QT_STATICPLUGIN
+#include <QtPlugin>
+
 #include "pqComponentsInit.h"
 #include "pqCoreInit.h"
 
@@ -42,6 +45,8 @@ void pqComponentsInit()
   // init resources
   Q_INIT_RESOURCE(pqComponents);
 
+#endif
+
   // init static plugins
   Q_IMPORT_PLUGIN(pqCutPanelInterface)
   Q_IMPORT_PLUGIN(pqClipPanelInterface)
@@ -51,6 +56,5 @@ void pqComponentsInit()
   Q_IMPORT_PLUGIN(pqStreamTracerPanelInterface)
   Q_IMPORT_PLUGIN(pqThresholdPanelInterface)
 
-#endif
 }
 
