@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWMenu.h
+  Module:    vtkKWMenu.h,v
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -636,8 +636,10 @@ protected:
   const char* GetSuffixOutOfCreatedItemVariableName(const char *varname);
 
   // Description:
-  // Add accelerator binding to toplevel
-  virtual void SetItemAcceleratorBindingOnToplevel(int index);
+  // Install accelerator binding to toplevel
+  virtual void InstallItemAcceleratorBindingOnToplevel(int index);
+  virtual void ConvertItemAcceleratorToKeyBinding(
+    const char *accelerator, char **keybinding);
 
   // Description:
   // PIMPL Encapsulation for STL containers
@@ -649,8 +651,4 @@ private:
   void operator=(const vtkKWMenu&); // Not implemented
 };
 
-
 #endif
-
-
-

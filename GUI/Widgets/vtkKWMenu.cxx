@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWMenu.cxx
+  Module:    vtkKWMenu.cxx,v
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.112");
+vtkCxxRevisionMacro(vtkKWMenu, "1.109");
 
 //----------------------------------------------------------------------------
 class vtkKWMenuInternals
@@ -260,7 +260,7 @@ void vtkKWMenu::SetItemCommand(int index,
 
   delete [] command;
 
-  this->SetItemAcceleratorBindingOnToplevel(index);
+  this->InstallItemAcceleratorBindingOnToplevel(index);
 }
 
 //----------------------------------------------------------------------------
@@ -1413,62 +1413,107 @@ void vtkKWMenu::SetItemIndicatorVisibility(int index, int flag)
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetItemAccelerator(int index, const char *accelerator)
 {
-  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems() || 
-      !accelerator)
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
     return;
     }
-  this->Script("%s entryconfigure %d -accelerator {%s}", 
-               this->GetWidgetName(), index, accelerator);
 
-  this->SetItemAcceleratorBindingOnToplevel(index);
+  // Remove the old accelerator, if any
+
+  if (!accelerator || !*accelerator)
+    {
+    const char *old_accelerator = this->GetItemOption(index, "-accelerator");
+    if (old_accelerator && *old_accelerator)
+      {
+      char *keybinding = NULL;
+      this->ConvertItemAcceleratorToKeyBinding(old_accelerator, &keybinding);
+      if (keybinding && *keybinding)
+        {
+        vtkKWTopLevel *toplevel = this->GetParentTopLevel();
+        if (toplevel)
+          {
+          toplevel->SetBinding(keybinding, NULL);
+          }
+        }
+      delete [] keybinding;
+      }
+    }
+
+  // Install the new one
+
+  this->Script("%s entryconfigure %d -accelerator {%s}", 
+               this->GetWidgetName(), index, accelerator ? accelerator : "");
+
+  this->InstallItemAcceleratorBindingOnToplevel(index);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemAcceleratorBindingOnToplevel(int index)
+void vtkKWMenu::InstallItemAcceleratorBindingOnToplevel(int index)
 {
   const char *accelerator = this->GetItemOption(index, "-accelerator");
   if (accelerator && *accelerator)
     {
-    vtksys_stl::string accelerator_safe(accelerator);
-    const char *command = this->GetItemCommand(index);
-    if (command && *command)
+    char *keybinding = NULL;
+    this->ConvertItemAcceleratorToKeyBinding(accelerator, &keybinding);
+    if (keybinding && *keybinding)
       {
-      vtksys_stl::string command_safe(command);
-      vtkKWTopLevel *toplevel = this->GetParentTopLevel();
-      if (toplevel)
+      const char *command = this->GetItemCommand(index);
+      if (command && *command)
         {
-        // Let's try to transform it into a binding
-        vtksys::SystemTools::ReplaceString(
-          accelerator_safe, "+", "-");
-        vtksys::SystemTools::ReplaceString(
-          accelerator_safe, "Ctrl", "Control");
-
-        // Accelerator are usually specified as Ctrl-O, with the letter
-        // in uppercase. Switch it to lowercase
-
-        vtksys_stl::string::size_type accel_size = accelerator_safe.size();
-        vtksys_stl::string::size_type last_sep = accelerator_safe.rfind("-");
-        if((last_sep != vtksys_stl::string::npos &&
-            last_sep == accel_size - 2) ||
-           (last_sep == vtksys_stl::string::npos && accel_size == 1))
+        vtksys_stl::string command_safe(command);
+        vtkKWTopLevel *toplevel = this->GetParentTopLevel();
+        if (toplevel)
           {
-          accelerator_safe[accel_size - 1] =
-            static_cast<vtksys_stl::string::value_type>(
-              tolower(accelerator_safe[accel_size - 1]));
+          toplevel->SetBinding(keybinding, command_safe.c_str());
           }
-
-        vtksys_stl::string binding("<");
-        if(last_sep == vtksys_stl::string::npos)
-          {
-          binding += "Key-";
-          }
-        binding += accelerator_safe;
-        binding += ">";
-        toplevel->SetBinding(binding.c_str(), command_safe.c_str());
         }
       }
+    delete [] keybinding;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::ConvertItemAcceleratorToKeyBinding(
+  const char *accelerator, char **keybinding)
+{
+  vtksys_stl::string keybinding_str;
+  
+  if (accelerator && *accelerator)
+    {
+    vtksys_stl::string accelerator_safe(accelerator);
+
+    // Let's try to transform it into a binding
+
+    vtksys::SystemTools::ReplaceString(
+      accelerator_safe, "+", "-");
+    vtksys::SystemTools::ReplaceString(
+      accelerator_safe, "Ctrl", "Control");
+
+    // Accelerator are usually specified as Ctrl-O, with the letter
+    // in uppercase. Switch it to lowercase
+
+    vtksys_stl::string::size_type accel_size = accelerator_safe.size();
+    vtksys_stl::string::size_type last_sep = accelerator_safe.rfind("-");
+    if((last_sep != vtksys_stl::string::npos &&
+        last_sep == accel_size - 2) ||
+       (last_sep == vtksys_stl::string::npos && accel_size == 1))
+      {
+      accelerator_safe[accel_size - 1] =
+        static_cast<vtksys_stl::string::value_type>(
+          tolower(accelerator_safe[accel_size - 1]));
+      }
+
+    keybinding_str = "<";
+    if(last_sep == vtksys_stl::string::npos)
+      {
+      keybinding_str += "Key-";
+      }
+    keybinding_str += accelerator_safe;
+    keybinding_str += ">";
+    }
+
+  *keybinding = new char[keybinding_str.size() + 1];
+  strcpy(*keybinding, keybinding_str.c_str());
 }
 
 //----------------------------------------------------------------------------
