@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWStateMachine);
-vtkCxxRevisionMacro(vtkKWStateMachine, "1.1");
+vtkCxxRevisionMacro(vtkKWStateMachine, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkKWStateMachineInternals
@@ -175,8 +175,6 @@ void vtkKWStateMachine::RemoveState(vtkKWStateMachineState *state)
 
   // Remove state
 
-  vtkObject *obj;
-
   vtkKWStateMachineInternals::StatePoolIterator it = 
     this->Internals->StatePool.begin();
   vtkKWStateMachineInternals::StatePoolIterator end = 
@@ -185,7 +183,6 @@ void vtkKWStateMachine::RemoveState(vtkKWStateMachineState *state)
     {
     if ((*it) == state)
       {
-      obj = (vtkObject*)(*it);
       (*it)->UnRegister(this);
       this->Internals->StatePool.erase(it);
       break;
@@ -285,8 +282,6 @@ void vtkKWStateMachine::RemoveInput(vtkKWStateMachineInput *input)
 
   // Remove input
 
-  vtkObject *obj;
-
   vtkKWStateMachineInternals::InputPoolIterator it = 
     this->Internals->InputPool.begin();
   vtkKWStateMachineInternals::InputPoolIterator end = 
@@ -295,7 +290,6 @@ void vtkKWStateMachine::RemoveInput(vtkKWStateMachineInput *input)
     {
     if ((*it) == input)
       {
-      obj = (vtkObject*)(*it);
       (*it)->UnRegister(this);
       this->Internals->InputPool.erase(it);
       break;
@@ -429,8 +423,6 @@ void vtkKWStateMachine::RemoveTransition(vtkKWStateMachineTransition *transition
 
   // Remove transition
 
-  vtkObject *obj;
-
   vtkKWStateMachineInternals::TransitionPoolIterator it = 
     this->Internals->TransitionPool.begin();
   vtkKWStateMachineInternals::TransitionPoolIterator end = 
@@ -439,7 +431,6 @@ void vtkKWStateMachine::RemoveTransition(vtkKWStateMachineTransition *transition
     {
     if ((*it) == transition)
       {
-      obj = (vtkObject*)(*it);
       (*it)->UnRegister(this);
       this->Internals->TransitionPool.erase(it);
       break;
@@ -561,8 +552,6 @@ void vtkKWStateMachine::RemoveCluster(vtkKWStateMachineCluster *cluster)
 
   // Remove cluster
 
-  vtkObject *obj;
-
   vtkKWStateMachineInternals::ClusterPoolIterator it = 
     this->Internals->ClusterPool.begin();
   vtkKWStateMachineInternals::ClusterPoolIterator end = 
@@ -571,7 +560,6 @@ void vtkKWStateMachine::RemoveCluster(vtkKWStateMachineCluster *cluster)
     {
     if ((*it) == cluster)
       {
-      obj = (vtkObject*)(*it);
       (*it)->UnRegister(this);
       this->Internals->ClusterPool.erase(it);
       break;
