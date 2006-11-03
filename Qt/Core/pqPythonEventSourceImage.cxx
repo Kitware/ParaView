@@ -211,7 +211,7 @@ void pqPythonEventSourceImage::compareImage(QWidget* widget,
 #if defined(Q_WS_WIN)
   QFont newFont("Arial", 8, QFont::Normal, false);
 #elif defined(Q_WS_X11)
-  QFont newFont("Courier", 7, QFont::Normal, false);
+  QFont newFont("Courier 10 Pitch", 7, QFont::Normal, false);
 #else
   QFont newFont("Courier Regular", 10, QFont::Normal, false);
 #endif
