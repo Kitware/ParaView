@@ -71,7 +71,6 @@ bool pqClipPanelInterface::canCreatePanel(pqProxy* proxy) const
 }
 
 Q_EXPORT_PLUGIN(pqClipPanelInterface)
-Q_IMPORT_PLUGIN(pqClipPanelInterface)
 
 //////////////////////////////////////////////////////////////////////////////
 // pqClipPanel::pqImplementation

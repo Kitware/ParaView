@@ -72,7 +72,6 @@ bool pqThresholdPanelInterface::canCreatePanel(pqProxy* proxy) const
 }
 
 Q_EXPORT_PLUGIN(pqThresholdPanelInterface)
-Q_IMPORT_PLUGIN(pqThresholdPanelInterface)
 
 
 pqThresholdPanel::pqThresholdPanel(pqProxy* pxy, QWidget* p) :

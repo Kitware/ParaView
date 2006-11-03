@@ -107,9 +107,6 @@ public:
 int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
-#if !defined(PARAVIEW_BUILD_SHARED_LIBS)
-  Q_INIT_RESOURCE(pqCore);
-#endif
   return pqMain::Run(app, GUIHelper::New());
 }
 

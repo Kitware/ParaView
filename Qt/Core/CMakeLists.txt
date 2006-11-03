@@ -111,6 +111,8 @@ ADD_LIBRARY(pqCore
   pqConsumerDisplay.cxx
   pqConsumerDisplay.h
   pqCoreExport.h
+  pqCoreInit.cxx
+  pqCoreInit.h
   pqDisplay.cxx
   pqDisplay.h
   pqFileDialogEventPlayer.cxx

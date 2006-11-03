@@ -72,8 +72,8 @@ bool pqCalculatorPanelInterface::canCreatePanel(pqProxy* proxy) const
   return (proxy->getProxy()->GetXMLName() == QString("Calculator") 
     && proxy->getProxy()->GetXMLGroup() == QString("filters"));
 }
+
 Q_EXPORT_PLUGIN(pqCalculatorPanelInterface)
-Q_IMPORT_PLUGIN(pqCalculatorPanelInterface)
 
 class pqCalculatorPanel::pqInternal 
  : public QObject, public Ui::CalculatorPanel

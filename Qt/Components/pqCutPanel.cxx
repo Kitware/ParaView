@@ -70,7 +70,6 @@ bool pqCutPanelInterface::canCreatePanel(pqProxy* proxy) const
 }
 
 Q_EXPORT_PLUGIN(pqCutPanelInterface)
-Q_IMPORT_PLUGIN(pqCutPanelInterface)
 
 //////////////////////////////////////////////////////////////////////////////
 // pqCutPanel::pqImplementation

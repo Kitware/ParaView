@@ -30,18 +30,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "ProcessModuleGUIHelper.h"
-#include <pqMain.h>
 #include <QApplication>
 #include <QDir>
+#include "ProcessModuleGUIHelper.h"
+#include "pqMain.h"
+#include "pqComponentsInit.h"
 
 int main(int argc, char* argv[])
 {
   QApplication app(argc, argv);
-#if !defined(PARAVIEW_BUILD_SHARED_LIBS)
-  Q_INIT_RESOURCE(pqCore);
-  Q_INIT_RESOURCE(pqComponents);
-#endif
+  pqComponentsInit();
 
   QDir dir(QApplication::applicationDirPath());
   dir.cdUp();

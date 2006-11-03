@@ -193,6 +193,8 @@ ADD_LIBRARY(pqComponents
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
   pqComponentsExport.h
+  pqComponentsInit.cxx
+  pqComponentsInit.h
   pqContourPanel.cxx
   pqContourPanel.h
   pqCreateServerStartupDialog.cxx

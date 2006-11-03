@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSize>
 
 // ParaView includes.
+#include "pqCoreInit.h"
 #include "pq3DWidgetFactory.h"
 #include "pqLookupTableManager.h"
 #include "pqOptions.h"
@@ -122,6 +123,9 @@ pqApplicationCore* pqApplicationCore::instance()
 pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   : QObject(p)
 {
+  // initialize statics in case we're a static library
+  pqCoreInit();
+
   this->Internal = new pqApplicationCoreInternal();
 
   this->Internal->ApplicationName = "ParaViewBasedApplication";

@@ -74,7 +74,6 @@ bool pqContourPanelInterface::canCreatePanel(pqProxy* proxy) const
 }
 
 Q_EXPORT_PLUGIN(pqContourPanelInterface)
-Q_IMPORT_PLUGIN(pqContourPanelInterface)
 
 
 //////////////////////////////////////////////////////////////////////////////

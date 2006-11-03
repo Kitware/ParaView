@@ -76,7 +76,6 @@ bool pqExodusPanelInterface::canCreatePanel(pqProxy* proxy) const
 }
 
 Q_EXPORT_PLUGIN(pqExodusPanelInterface)
-Q_IMPORT_PLUGIN(pqExodusPanelInterface)
 
 
 pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :

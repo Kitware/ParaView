@@ -79,7 +79,6 @@ bool pqStreamTracerPanelInterface::canCreatePanel(pqProxy* proxy) const
 }
 
 Q_EXPORT_PLUGIN(pqStreamTracerPanelInterface)
-Q_IMPORT_PLUGIN(pqStreamTracerPanelInterface)
 
 //////////////////////////////////////////////////////////////////////////////
 // pqStreamTracerPanel::pqImplementation
