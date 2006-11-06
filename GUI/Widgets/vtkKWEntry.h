@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWEntry.h
+  Module:    vtkKWEntry.h,v
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -73,6 +73,22 @@ public:
   vtkBooleanMacro(PasswordMode, int);
   virtual void SetPasswordMode(int);
   virtual int GetPasswordMode();
+
+  // Description:
+  // Restrict the value to a given type (integer, double, or no restriction).
+  //BTX
+  enum
+  {
+    RestrictNone = 0,
+    RestrictInteger,
+    RestrictDouble
+  };
+  //ETX
+  vtkGetMacro(RestrictValue, int);
+  virtual void SetRestrictValue(int);
+  virtual void SetRestrictValueToInteger();
+  virtual void SetRestrictValueToDouble();
+  virtual void SetRestrictValueToNone();
 
   // Description:
   // Set/Get the background color of the widget.
@@ -208,11 +224,16 @@ protected:
 
   int Width;
   int ReadOnly;
+  int RestrictValue;
 
   char *Command;
   virtual void InvokeCommand(const char *value);
 
   virtual void Configure();
+
+  // Description:
+  // Update value restriction.
+  virtual void UpdateValueRestriction();
 
 private:
 

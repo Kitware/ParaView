@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWEntry.cxx
+  Module:    vtkKWEntry.cxx,v
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -16,6 +16,8 @@
 #include "vtkKWOptions.h"
 #include "vtkObjectFactory.h"
 
+#include <vtksys/stl/string>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
 vtkCxxRevisionMacro(vtkKWEntry, "1.82");
@@ -27,6 +29,7 @@ vtkKWEntry::vtkKWEntry()
   this->ReadOnly            = 0;
   this->InternalValueString = NULL;
   this->Command             = NULL;
+  this->RestrictValue       = vtkKWEntry::RestrictNone;
 }
 
 //----------------------------------------------------------------------------
@@ -65,6 +68,8 @@ void vtkKWEntry::Configure()
     {
     this->SetConfigurationOptionAsInt("-width", this->Width);
     }
+
+  this->UpdateValueRestriction();
 }
 
 //----------------------------------------------------------------------------
@@ -126,19 +131,45 @@ void vtkKWEntry::SetValue(const char *s)
     return;
     }
 
+  // Save the old -validate option, which seems to be reset to none
+  // whenever the entry was set to something invalid
+  vtksys_stl::string old_validate;
+  if (this->RestrictValue != vtkKWEntry::RestrictNone)
+    {
+    old_validate = this->GetConfigurationOption("-validate");
+    }
+  
   int old_state = this->GetState();
   this->SetStateToNormal();
-
+  
   this->Script("%s delete 0 end", this->GetWidgetName());
   if (s)
     {
     const char *val = this->ConvertInternalStringToTclString(
       s, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
-    this->Script("%s insert 0 \"%s\"", 
-                 this->GetWidgetName(), val ? val : "");
+    if (this->RestrictValue == vtkKWEntry::RestrictInteger)
+      {
+      this->Script("if {[string is integer \"%s\"]} {%s insert 0 \"%s\"}", 
+                   val ? val : "", this->GetWidgetName(), val ? val : "");
+      }
+    else if (this->RestrictValue == vtkKWEntry::RestrictDouble)
+      {
+      this->Script("if {[string is double \"%s\"]} {%s insert 0 \"%s\"}", 
+                   val ? val : "", this->GetWidgetName(), val ? val : "");
+      }
+    else
+      {
+      this->Script("%s insert 0 \"%s\"", 
+                   this->GetWidgetName(), val ? val : "");
+      }
     }
 
   this->SetState(old_state);
+
+  if (this->RestrictValue != vtkKWEntry::RestrictNone)
+    {
+    this->SetConfigurationOption("-validate", old_validate.c_str());
+    }
 
   this->InvokeEvent(vtkKWEntry::EntryValueChangedEvent, (void*)s);
 }
@@ -224,6 +255,59 @@ void vtkKWEntry::SetReadOnly(int arg)
   this->ReadOnly = arg;
   this->Modified();
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetRestrictValue(int arg)
+{
+  if (this->RestrictValue == arg)
+    {
+    return;
+    }
+
+  this->RestrictValue = arg;
+  this->Modified();
+
+  this->UpdateValueRestriction();
+}
+
+void vtkKWEntry::SetRestrictValueToInteger()
+{ 
+  this->SetRestrictValue(vtkKWEntry::RestrictInteger); 
+}
+
+void vtkKWEntry::SetRestrictValueToDouble()
+{ 
+  this->SetRestrictValue(vtkKWEntry::RestrictDouble); 
+}
+
+void vtkKWEntry::SetRestrictValueToNone()
+{ 
+  this->SetRestrictValue(vtkKWEntry::RestrictNone); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::UpdateValueRestriction()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  if (this->RestrictValue == vtkKWEntry::RestrictInteger)
+    {
+    this->SetConfigurationOption("-validate", "all");
+    this->SetConfigurationOption("-validatecommand", "string is integer %P");
+    }
+  else if (this->RestrictValue == vtkKWEntry::RestrictDouble)
+    {
+    this->SetConfigurationOption("-validate", "all");
+    this->SetConfigurationOption("-validatecommand", "string is double %P");
+    }
+  else
+    {
+    this->SetConfigurationOption("-validate", "none");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -476,5 +560,6 @@ void vtkKWEntry::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Width: " << this->GetWidth() << endl;
   os << indent << "Readonly: " << (this->ReadOnly ? "On" : "Off") << endl;
+  os << indent << "RestrictValue: " << this->RestrictValue << endl;
 }
 

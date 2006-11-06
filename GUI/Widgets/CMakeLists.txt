@@ -361,6 +361,7 @@ SET(list
 IF(KWWidgets_BUILD_VTK_WIDGETS)
   SET(list ${list}
     vtkKWColorTransferFunctionEditor
+    vtkKWPiecewiseFunctionEditor
     )
 ENDIF(KWWidgets_BUILD_VTK_WIDGETS)
 FOREACH(WidgetType ${list})

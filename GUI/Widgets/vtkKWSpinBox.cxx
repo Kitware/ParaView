@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWSpinBox.cxx
+  Module:    vtkKWSpinBox.cxx,v
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -15,6 +15,7 @@
 
 #include "vtkKWOptions.h"
 #include "vtkObjectFactory.h"
+
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
@@ -25,7 +26,7 @@ vtkCxxRevisionMacro(vtkKWSpinBox, "1.21");
 vtkKWSpinBox::vtkKWSpinBox() 
 {
   this->Command = NULL;
-  this->RestrictValuesToIntegers = 0;
+  this->RestrictValue = vtkKWSpinBox::RestrictNone;
 }
 
 //----------------------------------------------------------------------------
@@ -55,6 +56,8 @@ void vtkKWSpinBox::CreateWidget()
 
   this->SetBinding("<Return>", this, "CommandCallback");
   this->SetBinding("<FocusOut>", this, "CommandCallback");
+
+  this->UpdateValueRestriction();
 }
 
 //----------------------------------------------------------------------------
@@ -88,7 +91,12 @@ void vtkKWSpinBox::SetValue(double value)
     {
     // Save the old -validate option, which seems to be reset to none
     // whenever the entry was set to something invalid
-    vtksys_stl::string old_validate(this->GetConfigurationOption("-validate"));
+    vtksys_stl::string old_validate;
+    if (this->RestrictValue != vtkKWSpinBox::RestrictNone)
+      {
+      old_validate = this->GetConfigurationOption("-validate");
+      }
+
     const char *ptr = this->GetValueFormat(), *format;
     char user_format[256];
     if (ptr && *ptr)
@@ -99,13 +107,16 @@ void vtkKWSpinBox::SetValue(double value)
     else
       {
       format = "%s set %g";
-      if (this->RestrictValuesToIntegers)
+      if (this->RestrictValue == vtkKWSpinBox::RestrictInteger)
         {
         value = floor(value);
         }
       }
     this->Script(format, this->GetWidgetName(), value);
-    this->SetConfigurationOption("-validate", old_validate.c_str());
+    if (this->RestrictValue != vtkKWSpinBox::RestrictNone)
+      {
+      this->SetConfigurationOption("-validate", old_validate.c_str());
+      }
     this->InvokeCommand(this->GetValue());
     }
 }
@@ -141,20 +152,51 @@ int vtkKWSpinBox::GetWrap()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinBox::SetRestrictValuesToIntegers(int arg)
+void vtkKWSpinBox::SetRestrictValue(int arg)
 {
-  if (this->RestrictValuesToIntegers == arg)
+  if (this->RestrictValue == arg)
     {
     return;
     }
 
-  this->RestrictValuesToIntegers = arg;
+  this->RestrictValue = arg;
   this->Modified();
 
-  if (arg)
+  this->UpdateValueRestriction();
+}
+
+void vtkKWSpinBox::SetRestrictValueToInteger()
+{ 
+  this->SetRestrictValue(vtkKWSpinBox::RestrictInteger); 
+}
+
+void vtkKWSpinBox::SetRestrictValueToDouble()
+{ 
+  this->SetRestrictValue(vtkKWSpinBox::RestrictDouble); 
+}
+
+void vtkKWSpinBox::SetRestrictValueToNone()
+{ 
+  this->SetRestrictValue(vtkKWSpinBox::RestrictNone); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::UpdateValueRestriction()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  if (this->RestrictValue == vtkKWSpinBox::RestrictInteger)
     {
     this->SetConfigurationOption("-validate", "all");
     this->SetConfigurationOption("-validatecommand", "string is integer %P");
+    }
+  else if (this->RestrictValue == vtkKWSpinBox::RestrictDouble)
+    {
+    this->SetConfigurationOption("-validate", "all");
+    this->SetConfigurationOption("-validatecommand", "string is double %P");
     }
   else
     {
@@ -431,6 +473,5 @@ void vtkKWSpinBox::UpdateEnableState()
 void vtkKWSpinBox::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "RestrictValuesToIntegers: " 
-     << (this->RestrictValuesToIntegers ? "On" : "Off") << endl;
+  os << indent << "RestrictValue: " << this->RestrictValue << endl;
 }

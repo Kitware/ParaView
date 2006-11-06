@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWSpinBox.h
+  Module:    vtkKWSpinBox.h,v
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -65,12 +65,20 @@ public:
   vtkBooleanMacro(Wrap, int);
 
   // Description:
-  // Prevent the user from typing in non-integer values.
-  // This will also prevent SetValue from entering floating point values
-  // by truncating to an integer.
-  virtual void SetRestrictValuesToIntegers(int restrict);
-  vtkBooleanMacro(RestrictValuesToIntegers, int);
-  vtkGetMacro(RestrictValuesToIntegers, int);
+  // Restrict the value to a given type (integer, double, or no restriction).
+  //BTX
+  enum
+  {
+    RestrictNone = 0,
+    RestrictInteger,
+    RestrictDouble
+  };
+  //ETX
+  vtkGetMacro(RestrictValue, int);
+  virtual void SetRestrictValue(int);
+  virtual void SetRestrictValueToInteger();
+  virtual void SetRestrictValueToDouble();
+  virtual void SetRestrictValueToNone();
 
   // Description:
   // Set/Get the width of the spinbox in number of characters.
@@ -242,9 +250,14 @@ protected:
   // Create the widget.
   virtual void CreateWidget();
 
+  // Description:
+  // Update value restriction.
+  virtual void UpdateValueRestriction();
+
+  int RestrictValue;
+
   char *Command;
   virtual void InvokeCommand(double value);
-  int RestrictValuesToIntegers;
 
 private:
   vtkKWSpinBox(const vtkKWSpinBox&); // Not implemented

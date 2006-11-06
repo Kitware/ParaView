@@ -25,7 +25,7 @@ void vtkKWSpinBoxItem::Create(vtkKWWidget *parent, vtkKWWindow *)
   spinbox1->Create();
   spinbox1->SetRange(0, 10);
   spinbox1->SetIncrement(1);
-  spinbox1->RestrictValuesToIntegersOn();
+  spinbox1->SetRestrictValueToInteger();
   spinbox1->SetBalloonHelpString("A simple spinbox");
 
   app->Script(
