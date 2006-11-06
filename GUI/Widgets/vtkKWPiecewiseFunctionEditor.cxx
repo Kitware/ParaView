@@ -33,7 +33,8 @@
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
 vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.51");
 
-#define EPSILON 0.001
+#define EPSILON 0.0001
+#define EPSILON_MIN_WINDOW (EPSILON * 2.5)
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -1074,8 +1075,12 @@ void vtkKWPiecewiseFunctionEditor::UpdateWindowLevelFromPoints()
       double v1, v2;
       v1 = this->PiecewiseFunction->GetValue(p1);
       v2 = this->PiecewiseFunction->GetValue(p2);
-      this->Window = (v1 < v2 ? (p2 - p1) : p1 - p2);
-      this->Level = (p1 + p2) / 2.0;
+      this->Window = (v1 <= v2 ? (p2 - p1) : p1 - p2);
+      if (abs(this->Window) <= EPSILON_MIN_WINDOW * 1.1)
+        {
+        this->Window = 0;
+        }
+      this->Level = (p1 + p2) * 0.5;
       }
     }
 }
@@ -1139,24 +1144,8 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
     // Get the current value bounds (default to the whole range if no points)
 
     double start_v, end_v;
-    if (this->GetFunctionSize() > 0 && 
-        this->GetFunctionPointParameter(0, &parameter))
-      {
-      start_v = this->PiecewiseFunction->GetValue(parameter);
-      }
-    else
-      {
-      start_v = v_w_range[0];
-      }
-    if (this->GetFunctionSize() > 0 &&
-        this->GetFunctionPointParameter(this->GetFunctionSize()-1, &parameter))
-      {
-      end_v = this->PiecewiseFunction->GetValue(parameter);
-      }
-    else
-      {
-      end_v = v_w_range[1];
-      }
+    start_v = v_w_range[0];
+    end_v = v_w_range[1];
 
     // Make sure that if Window < 0 the ramp is going down (if > 0, going up)
 
@@ -1173,14 +1162,24 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
     double points[4];
     double window = this->Window > 0 ? this->Window : -this->Window;
 
-    points[1] = (this->Level - window / 2.0);
+    // We need to make sure window < EPSILON_MIN_WINDOW because each point
+    // is around the level at window * 0.5, then to avoid point 0,1 and
+    // point 2,3 to coincide we distance them by EPSILON, so we need
+    // at least the window > EPSILON * 2.0 to make sure things "work".
+
+    if (window < EPSILON_MIN_WINDOW)
+      {
+      window = EPSILON_MIN_WINDOW;
+      }
+
+    points[1] = (this->Level - window * 0.5);
     points[0] = (points[1] > p_w_range[0]) ? p_w_range[0] : points[1];
     if (points[1] == points[0])
       {
       // we have to cheat here sadly because we can't have 2 points the same
       points[1] += EPSILON; 
       }
-    points[2] = (this->Level + window / 2.0);
+    points[2] = (this->Level + window * 0.5);
     points[3] = (points[2] < p_w_range[1]) ? p_w_range[1] : points[2];
     if (points[2] == points[3])
       {
