@@ -53,6 +53,7 @@ class QHeaderView;
 class QItemSelection;
 class QItemSelectionModel;
 class QPoint;
+class QRect;
 
 
 /// \class pqFlatTreeView
@@ -149,8 +150,13 @@ public:
   void setColumnSizeManaged(bool managed);
   //@}
 
+  /// \name Index Location Methods
+  //@{
+  bool isIndexHidden(const QModelIndex &index) const;
   QModelIndex getIndexVisibleAt(const QPoint &point) const;
   QModelIndex getIndexCellAt(const QPoint &point) const;
+  void getSelectionIn(const QRect &rect, QItemSelection &items) const;
+  //@}
 
   /// \name Editing Methods
   //@{
@@ -208,9 +214,14 @@ protected:
   QStyleOptionViewItem getViewOptions() const;
 
 private slots:
+  /// \name Header Signal Handlers
+  //@{
   void handleSectionResized(int index, int oldSize, int newSize);
   void handleSectionMoved(int index, int oldVisual, int newVisual);
+  //@}
 
+  /// \name Selection Signal Handlers
+  //@{
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
   void changeCurrentRow(const QModelIndex &current,
       const QModelIndex &previous);
@@ -218,10 +229,14 @@ private slots:
       const QModelIndex &previous);
   void changeSelection(const QItemSelection &selected,
       const QItemSelection &deselected);
+  //@}
 
 private:
   void resetRoot();
   void resetPreferredSizes();
+
+  /// \name Layout Methods
+  //@{
   void layoutEditor();
   void layoutItems();
   void layoutItem(pqFlatTreeViewItem *item, int &point,
@@ -231,14 +246,23 @@ private:
   bool updateContentsWidth();
   void updateScrollBars();
   void addChildItems(pqFlatTreeViewItem *item, int parentChildCount);
+  //@}
+
+  /// \name Tree Navigation Methods
+  //@{
   bool getIndexRowList(const QModelIndex &index,
       pqFlatTreeViewItemRows &rowList) const;
   pqFlatTreeViewItem *getItem(const pqFlatTreeViewItemRows &rowList) const;
   pqFlatTreeViewItem *getItem(const QModelIndex &index) const;
   pqFlatTreeViewItem *getItemAt(int contentsY) const;
+  pqFlatTreeViewItem *getNextItem(pqFlatTreeViewItem *item) const;
   pqFlatTreeViewItem *getNextVisibleItem(pqFlatTreeViewItem *item) const;
   pqFlatTreeViewItem *getPreviousVisibleItem(pqFlatTreeViewItem *item) const;
   pqFlatTreeViewItem *getLastVisibleItem() const;
+  //@}
+
+  void getSelectionIn(const QModelIndex &topLeft,
+      const QModelIndex &bottomRight, QItemSelection &items) const;
 
   void drawBranches(QPainter &painter, pqFlatTreeViewItem *item,
       int halfIndent, const QColor &branchColor, const QColor &expandColor,
