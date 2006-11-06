@@ -151,6 +151,18 @@ void pqTestUtility::playTests(const QString& filename)
 
 void pqTestUtility::recordTests(const QString& filename)
 {
+#if defined(Q_WS_MAC)
+  // check for native or non-native menu bar.
+  // testing framework doesn't work with native menu bar, so let's warn if we
+  // get that.
+  if(!getenv("QT_MAC_NO_NATIVE_MENUBAR"))
+    {
+    qWarning("Recording menu events for native Mac menus doesn't work.\n"
+             "Set the QT_MAC_NO_NATIVE_MENUBAR environment variable to"
+             " correctly record menus");
+    }
+#endif
+
   QMap<QString, pqEventObserver*>::iterator iter;
 
   QFileInfo info(filename);
