@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.39");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.40");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -191,6 +191,7 @@ void vtkPVCompositeRenderModuleUI::CreateWidget()
     this->CompositeThresholdScale->Create();
     this->CompositeThresholdScale->SetRange(0.0, 100.0);
     this->CompositeThresholdScale->SetResolution(0.1);
+    this->CompositeThresholdScale->ValueVisibilityOff();
     this->CompositeThresholdScale->SetValue(this->CompositeThreshold);
     this->CompositeThresholdScale->SetEndCommand(this, 
                                                  "CompositeThresholdScaleCallback");
@@ -247,6 +248,7 @@ void vtkPVCompositeRenderModuleUI::CreateWidget()
     this->ReductionFactorScale->Create();
     this->ReductionFactorScale->SetRange(2, 20);
     this->ReductionFactorScale->SetResolution(1);
+    this->ReductionFactorScale->ValueVisibilityOff();
     this->ReductionFactorScale->SetValue(this->ReductionFactor);
     this->ReductionFactorScale->SetCommand(this, "ReductionFactorScaleCallback");
     this->ReductionFactorScale->SetBalloonHelpString(
@@ -293,6 +295,7 @@ void vtkPVCompositeRenderModuleUI::CreateWidget()
     this->SquirtLevelScale->Create();
     this->SquirtLevelScale->SetRange(1, 6);
     this->SquirtLevelScale->SetResolution(1);
+    this->SquirtLevelScale->ValueVisibilityOff();
     this->SquirtLevelScale->SetValue(this->SquirtLevel);
     this->SquirtLevelScale->SetEndCommand(this, 
                                           "SquirtLevelScaleCallback");

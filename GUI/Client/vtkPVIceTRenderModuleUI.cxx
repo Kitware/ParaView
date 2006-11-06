@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.17");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
@@ -119,6 +119,7 @@ void vtkPVIceTRenderModuleUI::CreateWidget()
   this->StillReductionFactorScale->Create();
   this->StillReductionFactorScale->SetRange(2, 20);
   this->StillReductionFactorScale->SetResolution(1);
+  this->StillReductionFactorScale->ValueVisibilityOff();
   this->StillReductionFactorScale->SetValue(2);
   this->StillReductionFactorScale->SetCommand(this, "StillReductionFactorScaleCallback");
   this->StillReductionFactorScale->SetBalloonHelpString(
@@ -163,6 +164,7 @@ void vtkPVIceTRenderModuleUI::CreateWidget()
   this->CollectThresholdScale->Create();
   this->CollectThresholdScale->SetRange(0.0, 1000.0);
   this->CollectThresholdScale->SetResolution(10.0);
+  this->CollectThresholdScale->ValueVisibilityOff();
   this->CollectThresholdScale->SetValue(this->CollectThreshold);
   this->CollectThresholdScale->SetEndCommand(this,
                                              "CollectThresholdScaleCallback");

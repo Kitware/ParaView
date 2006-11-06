@@ -61,7 +61,7 @@
 #define VTK_PV_DEFAULT_OUTLINE_THRESHOLD (5.0 * 1000000.0)
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.38");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
@@ -183,7 +183,7 @@ void vtkPVLODRenderModuleUI::CreateWidget()
   this->LODThresholdScale->SetResolution(0.1);
   this->LODThresholdScale->SetRange(0.0, 100.0);
   this->LODThresholdScale->SetResolution(0.1);
-
+  this->LODThresholdScale->ValueVisibilityOff();
 
   this->LODThresholdValue->SetParent(this->LODScalesFrame);
   this->LODThresholdValue->Create();
@@ -232,6 +232,7 @@ void vtkPVLODRenderModuleUI::CreateWidget()
   this->LODResolutionScale->Create();
   this->LODResolutionScale->SetRange(10, 160);
   this->LODResolutionScale->SetResolution(1.0);
+  this->LODResolutionScale->ValueVisibilityOff();
 
   this->LODResolutionValue->SetParent(this->LODScalesFrame);
   this->LODResolutionValue->Create();
@@ -275,6 +276,7 @@ void vtkPVLODRenderModuleUI::CreateWidget()
   this->OutlineThresholdScale->Create();
   this->OutlineThresholdScale->SetRange(0, 500);
   this->OutlineThresholdScale->SetResolution(0.1);
+  this->OutlineThresholdScale->ValueVisibilityOff();
 
   this->OutlineThresholdValue->SetParent(this->LODScalesFrame);
   this->OutlineThresholdValue->Create();
