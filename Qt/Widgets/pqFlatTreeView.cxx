@@ -680,16 +680,16 @@ QModelIndex pqFlatTreeView::getIndexCellAt(const QPoint &point) const
   return QModelIndex();
 }
 
-void pqFlatTreeView::getSelectionIn(const QRect &rect,
+void pqFlatTreeView::getSelectionIn(const QRect &area,
     QItemSelection &items) const
 {
-  if(!rect.isValid())
+  if(!area.isValid())
     {
     return;
     }
 
   // Translate the bounding rectangle to contents space.
-  QRect bounds = rect;
+  QRect bounds = area;
   bounds.translate(this->horizontalOffset(), this->verticalOffset());
   int top = 0;
   if(!this->HeaderView->isHidden())
@@ -2284,7 +2284,6 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
   int columns = this->Model->columnCount(this->Root->Index);
   int halfIndent = this->IndentWidth / 2;
   int trueHeight = this->ItemHeight - pqFlatTreeView::PipeLength;
-  int elideLength = options.fontMetrics.width("...");
   pqFlatTreeViewItem *item = this->getNextVisibleItem(this->Root);
   while(item)
     {
