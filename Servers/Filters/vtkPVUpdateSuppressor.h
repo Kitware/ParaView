@@ -52,11 +52,6 @@ public:
   vtkSetMacro(UpdateNumberOfPieces, int);
   vtkGetMacro(UpdateNumberOfPieces, int);
 
-  // Description:
-  // Set the output type. If not specified, the output type will be
-  // the same as the input.
-  vtkSetStringMacro(OutputType);
-
 protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();
@@ -75,11 +70,6 @@ protected:
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
 
-  virtual int RequestDataObject(vtkInformation*, 
-                                vtkInformationVector**, 
-                                vtkInformationVector*);
-  char* OutputType;
-  
   // This can be removed when streaming is removed.
   int PreviousUpdateWasBlockedByStreaming;  
 

@@ -28,7 +28,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.37");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.38");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -39,15 +39,12 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 
   this->CachedGeometry = NULL;
   this->CachedGeometryLength = 0;
-
-  this->OutputType = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 {
   this->RemoveAllCaches();
-  this->SetOutputType(0);
 }
 
 //----------------------------------------------------------------------------
@@ -58,17 +55,15 @@ void vtkPVUpdateSuppressor::ForceUpdate()
     return;
     }
 
+  // Make sure that output type matches input type
+  this->UpdateInformation();
+
   vtkDataSet *input = vtkDataSet::SafeDownCast(this->GetInput());
   if (input == 0)
     {
     vtkErrorMacro("No valid input.");
     return;
     }
-  input->UpdateInformation();
-  input =  vtkDataSet::SafeDownCast(this->GetInput());
-
-  // Make sure that output type matches input type
-  this->UpdateInformation();
   vtkDataSet *output = this->GetOutput();
 
   // int fixme; // I do not like this hack.  How can we get rid of it?
@@ -134,40 +129,6 @@ void vtkPVUpdateSuppressor::ForceUpdate()
     output->ShallowCopy(input);
     this->UpdateTime.Modified();
     }
-}
-
-//----------------------------------------------------------------------------
-int vtkPVUpdateSuppressor::RequestDataObject(
-  vtkInformation* request, 
-  vtkInformationVector** inputVector, 
-  vtkInformationVector* outputVector)
-{
-  if (!this->OutputType || this->OutputType[0] == '\0')
-    {
-    return this->Superclass::RequestDataObject(
-      request, inputVector, outputVector);
-    }
-
-  // for each output
-  for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
-    {
-    vtkInformation* info = outputVector->GetInformationObject(i);
-    vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
-    
-    if (!output || !output->IsA(this->OutputType)) 
-      {
-      output = vtkDemandDrivenPipeline::NewDataObject(this->OutputType);
-      if (!output)
-        {
-        return 0;
-        }
-      output->SetPipelineInformation(info);
-      output->Delete();
-      this->GetOutputPortInformation(0)->Set(
-        vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
-      }
-    }
-  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -278,8 +239,4 @@ void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "UpdatePiece: " << this->UpdatePiece << endl;
   os << indent << "UpdateNumberOfPieces: " << this->UpdateNumberOfPieces << endl;
-  os << indent << "OutputType: " 
-     << (this->OutputType?this->OutputType:"(none)")
-     << endl;
-         
 }
