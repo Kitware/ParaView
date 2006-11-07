@@ -20,6 +20,7 @@
 #include "vtkCharArray.h"
 #include "vtkDataSetReader.h"
 #include "vtkDataSetWriter.h"
+#include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMPIMToNSocketConnection.h"
@@ -39,7 +40,7 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.12");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.13");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -118,6 +119,14 @@ int vtkMPIMoveData::RequestDataObject(vtkInformation*,
       }
     outputCopy = vtkUnstructuredGrid::New();
     }
+  else if (this->OutputDataType == VTK_IMAGE_DATA)
+    {
+    if (output && output->IsA("vtkImageData"))
+      {
+      return 1;
+      }
+    outputCopy = vtkImageData::New();
+    }
   else
     {
     vtkErrorMacro("Unrecognized output type: " << this->OutputDataType
@@ -195,6 +204,18 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
     input = vtkDataSet::SafeDownCast(
       inputVector[0]->GetInformationObject(0)->Get(
         vtkDataObject::DATA_OBJECT()));
+    }
+
+  // We do not yet collect image data but we pretend to handle it.
+  // This is here to prevent errors on the client side during structured
+  // volume rendering.
+  if (this->OutputDataType == VTK_IMAGE_DATA)
+    {
+    if (input)
+      {
+      output->ShallowCopy(input);
+      }
+    return 1;
     }
 
   this->UpdatePiece = outInfo->Get(
