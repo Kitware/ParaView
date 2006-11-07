@@ -25,7 +25,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.13");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -94,7 +94,7 @@ vtkPVLODPartDisplayInformation* vtkSMLODDisplayProxy::GetLODInformation()
 //-----------------------------------------------------------------------------
 void vtkSMLODDisplayProxy::SetupVolumePipeline()
 {
-  if (!this->HasVolumePipeline)
+  if (this->VolumePipelineType == NONE)
     {
     return;
     }
@@ -147,8 +147,6 @@ void vtkSMLODDisplayProxy::SetupPipeline()
   ip->AddProxy(this->LODDecimatorProxy);
   this->LODUpdateSuppressorProxy->UpdateVTKObjects();
 
-  // LODUpdateSuppressorProxy shares OutputType property with UpdateSuppressorProxy,
-  // so it will get set accordingly.
   ip = vtkSMInputProperty::SafeDownCast(
     this->LODMapperProxy->GetProperty("Input"));
   if (!ip)

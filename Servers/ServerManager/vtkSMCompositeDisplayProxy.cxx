@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.23");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -115,10 +115,10 @@ void vtkSMCompositeDisplayProxy::CreateVTKObjects(int numObjects)
   this->DistributorProxy->SetServers(vtkProcessModule::RENDER_SERVER);
   this->LODDistributorProxy->SetServers(vtkProcessModule::RENDER_SERVER);
 
-  this->DistributorSuppressorProxy
-    = this->GetSubProxy("DistributorSuppressor");
-  this->LODDistributorSuppressorProxy
-    = this->GetSubProxy("LODDistributorSuppressor");
+  this->DistributorSuppressorProxy = 
+    this->GetSubProxy("DistributorSuppressor");
+  this->LODDistributorSuppressorProxy = 
+    this->GetSubProxy("LODDistributorSuppressor");
 
   if (!this->DistributorSuppressorProxy)
     {
@@ -136,43 +136,43 @@ void vtkSMCompositeDisplayProxy::CreateVTKObjects(int numObjects)
   this->LODDistributorSuppressorProxy->SetServers(
     vtkProcessModule::CLIENT_AND_SERVERS);
   
-  if (this->HasVolumePipeline)
+  if (this->VolumePipelineType != NONE)
     {
     this->VolumeCollectProxy = this->GetSubProxy("VolumeCollect");
-
     if (!this->VolumeCollectProxy)
       {
       vtkErrorMacro("Failed to find SubProxy VolumeCollect.");
       return;
       }
-
     this->VolumeCollectProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
+  else
+    {
+    this->RemoveSubProxy("VolumeCollect");
+    }
 
+  if (this->VolumePipelineType == UNSTRUCTURED_GRID)
+    {
     this->VolumeDistributorProxy = this->GetSubProxy("VolumeDistributor");
-
     if (!this->VolumeDistributorProxy)
       {
       vtkErrorMacro("Failed to find SubProxy VolumeDistributor.");
       return;
       }
-
     this->VolumeDistributorProxy->SetServers(vtkProcessModule::RENDER_SERVER);
 
-    this->VolumeDistributorSuppressorProxy
-      = this->GetSubProxy("VolumeDistributorSuppressor");
-
+    this->VolumeDistributorSuppressorProxy = 
+      this->GetSubProxy("VolumeDistributorSuppressor");
     if (!this->VolumeDistributorSuppressorProxy)
       {
       vtkErrorMacro("Failed to find SubProxy VolumeDistributorSuppressor.");
       return;
       }
-
     this->VolumeDistributorSuppressorProxy->SetServers(
       vtkProcessModule::CLIENT_AND_SERVERS);
     }
   else
     {
-    this->RemoveSubProxy("VolumeCollect");
     this->RemoveSubProxy("VolumeDistributor");
     this->RemoveSubProxy("VolumeDistributorSuppressor");
     }
@@ -430,8 +430,9 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-                                                     vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID,
+      vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
     }
 
   for (i = 0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
@@ -454,8 +455,9 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-                                                     vtkProcessModule::RENDER_SERVER, stream);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID,
+      vtkProcessModule::RENDER_SERVER, stream);
     }
 
   ip = vtkSMInputProperty::SafeDownCast(
@@ -480,21 +482,12 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
 
   this->DistributorProxy->UpdateVTKObjects();
   this->LODDistributorProxy->UpdateVTKObjects();
-
-  svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->DistributorSuppressorProxy->GetProperty("OutputType"));
-  svp->SetElement(0, "vtkPolyData");
-  svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->LODDistributorSuppressorProxy->GetProperty("OutputType"));
-  svp->SetElement(0, "vtkPolyData");
-  this->DistributorSuppressorProxy->UpdateVTKObjects();
-  this->LODDistributorSuppressorProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
 {
-  if (!this->HasVolumePipeline)
+  if (this->VolumePipelineType == NONE)
     {
     return;
     }
@@ -504,125 +497,172 @@ void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
   vtkSMInputProperty *ip;
   vtkSMStringVectorProperty *svp;
   vtkClientServerStream stream;
-
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->VolumeCollectProxy->GetProperty("Input"));
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->VolumeFilterProxy);
-
-  this->VolumeCollectProxy->UpdateVTKObjects();
-
-  unsigned int i;
-  for (i = 0; i < this->VolumeCollectProxy->GetNumberOfIDs(); i++)
+  if (this->VolumePipelineType == IMAGE_DATA)
     {
-    stream
-      << vtkClientServerStream::Invoke
-      << this->VolumeCollectProxy->GetID(i) 
-      << "SetOutputDataType"
-      << VTK_UNSTRUCTURED_GRID
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << this->VolumeCollectProxy->GetID(i) << "GetOutputPort"
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << this->VolumeUpdateSuppressorProxy->GetID(i) << "SetInputConnection"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
+    vtkSMInputProperty* usInput = vtkSMInputProperty::SafeDownCast(
+      this->VolumeUpdateSuppressorProxy->GetProperty("Input"));
+    
+    vtkSMInputProperty *ip = vtkSMInputProperty::SafeDownCast(
+      this->VolumeCollectProxy->GetProperty("Input"));
+    ip->RemoveAllProxies();
+    ip->AddProxy(usInput->GetProxy(0));
+    this->VolumeCollectProxy->UpdateVTKObjects();
+
+    unsigned int i;
+    for (i = 0; 
+         i < this->VolumeUpdateSuppressorProxy->GetNumberOfIDs(); 
+         i++)
+      {
+      stream
+        << vtkClientServerStream::Invoke
+        << this->VolumeCollectProxy->GetID(i) 
+        << "SetOutputDataType"
+        << VTK_IMAGE_DATA
+        << vtkClientServerStream::End;
+      stream
+        << vtkClientServerStream::Invoke
+        << this->VolumeCollectProxy->GetID(i) << "GetOutputPort"
+        << vtkClientServerStream::End;
+      stream
+        << vtkClientServerStream::Invoke
+        << this->VolumeUpdateSuppressorProxy->GetID(i) 
+        << "SetInputConnection"
+        << vtkClientServerStream::LastResult
+        << vtkClientServerStream::End;
+      }
+    if (stream.GetNumberOfMessages() > 0)
+      {
+      vtkProcessModule::GetProcessModule()->SendStream(
+        this->ConnectionID, 
+        this->VolumeUpdateSuppressorProxy->GetServers(), 
+        stream);
+      }
     }
-  if (stream.GetNumberOfMessages() > 0)
+  else if (this->VolumePipelineType == UNSTRUCTURED_GRID)
     {
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID, vtkProcessModule::CLIENT_AND_SERVERS, stream);
+    ip = vtkSMInputProperty::SafeDownCast(
+      this->VolumeCollectProxy->GetProperty("Input"));
+    ip->RemoveAllProxies();
+    ip->AddProxy(this->VolumeFilterProxy);
+    this->VolumeCollectProxy->UpdateVTKObjects();
+    
+    unsigned int i;
+    for (i = 0; i < this->VolumeCollectProxy->GetNumberOfIDs(); i++)
+      {
+      stream
+        << vtkClientServerStream::Invoke
+        << this->VolumeCollectProxy->GetID(i) 
+        << "SetOutputDataType"
+        << VTK_UNSTRUCTURED_GRID
+        << vtkClientServerStream::End;
+      stream
+        << vtkClientServerStream::Invoke
+        << this->VolumeCollectProxy->GetID(i) << "GetOutputPort"
+        << vtkClientServerStream::End;
+      stream
+        << vtkClientServerStream::Invoke
+        << this->VolumeUpdateSuppressorProxy->GetID(i) << "SetInputConnection"
+        << vtkClientServerStream::LastResult
+        << vtkClientServerStream::End;
+      }
+    if (stream.GetNumberOfMessages() > 0)
+      {
+      vtkProcessModule::GetProcessModule()->SendStream(
+        this->ConnectionID, vtkProcessModule::CLIENT_AND_SERVERS, stream);
+      }
+
+    // On the render server, insert a distributor.
+    ip = vtkSMInputProperty::SafeDownCast(
+      this->VolumeDistributorProxy->GetProperty("Input"));
+    ip->RemoveAllProxies();
+    ip->AddProxy(this->VolumeUpdateSuppressorProxy);
+    this->VolumeDistributorProxy->UpdateVTKObjects();
+
+    // On the render server, attach an update suppressor to the
+    // distributor.  On the client side (since the distributor is not
+    // there) attach it to the other update suppressor.  We cannot do this
+    // through the server manager interface.
+    for (i = 0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
+      {
+      stream 
+        << vtkClientServerStream::Invoke
+        << this->VolumeUpdateSuppressorProxy->GetID(i)<< "GetOutputPort" << 0
+        << vtkClientServerStream::End;
+      stream 
+        << vtkClientServerStream::Invoke
+        << this->VolumeDistributorSuppressorProxy->GetID(i)
+        << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
+        << vtkClientServerStream::End;
+      }
+    if (stream.GetNumberOfMessages() > 0)
+      {
+      vtkProcessModule::GetProcessModule()->SendStream(
+        this->ConnectionID,
+        vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
+      }
+
+    for (i = 0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
+      {
+      stream << vtkClientServerStream::Invoke
+             << this->VolumeDistributorProxy->GetID(i) << "GetOutputPort" << 0
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << this->VolumeDistributorSuppressorProxy->GetID(i)
+             << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
+             << vtkClientServerStream::End;
+      }
+    if (stream.GetNumberOfMessages() > 0)
+      {
+      vtkProcessModule::GetProcessModule()->SendStream(
+        this->ConnectionID,
+        vtkProcessModule::RENDER_SERVER, stream);
+      }
+
+    ip = vtkSMInputProperty::SafeDownCast(
+      this->VolumePTMapperProxy->GetProperty("Input"));
+    ip->RemoveAllProxies();
+    ip->AddProxy(this->VolumeDistributorSuppressorProxy);
+    this->VolumePTMapperProxy->UpdateVTKObjects();
+
+    ip = vtkSMInputProperty::SafeDownCast(
+      this->VolumeHAVSMapperProxy->GetProperty("Input"));
+    ip->RemoveAllProxies();
+    ip->AddProxy(this->VolumeDistributorSuppressorProxy);
+    this->VolumeHAVSMapperProxy->UpdateVTKObjects();
+
+    ip = vtkSMInputProperty::SafeDownCast(
+      this->VolumeBunykMapperProxy->GetProperty("Input"));
+    ip->RemoveAllProxies();
+    ip->AddProxy(this->VolumeDistributorSuppressorProxy);
+    this->VolumeBunykMapperProxy->UpdateVTKObjects();
+
+    ip = vtkSMInputProperty::SafeDownCast(
+      this->VolumeZSweepMapperProxy->GetProperty("Input"));
+    ip->RemoveAllProxies();
+    ip->AddProxy(this->VolumeDistributorSuppressorProxy);
+    this->VolumeZSweepMapperProxy->UpdateVTKObjects();
+
+    svp = vtkSMStringVectorProperty::SafeDownCast(
+      this->VolumeDistributorProxy->GetProperty("OutputType"));
+    svp->SetElement(0, "vtkUnstructuredGrid");
+
+    this->VolumeDistributorProxy->UpdateVTKObjects();
     }
-
-  // On the render server, insert a distributor.
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->VolumeDistributorProxy->GetProperty("Input"));
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->VolumeUpdateSuppressorProxy);
-  this->VolumeDistributorProxy->UpdateVTKObjects();
-
-  // On the render server, attach an update suppressor to the distributor.  On
-  // the client side (since the distributor is not there) attach it to the other
-  // update suppressor.  We cannot do this through the server manager interface.
-  for (i = 0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->VolumeUpdateSuppressorProxy->GetID(i)<< "GetOutputPort" << 0
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->VolumeDistributorSuppressorProxy->GetID(i)
-           << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-                                                     vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
-    }
-
-  for (i = 0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->VolumeDistributorProxy->GetID(i) << "GetOutputPort" << 0
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->VolumeDistributorSuppressorProxy->GetID(i)
-           << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-                                                     vtkProcessModule::RENDER_SERVER, stream);
-    }
-
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->VolumePTMapperProxy->GetProperty("Input"));
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->VolumeDistributorSuppressorProxy);
-  this->VolumePTMapperProxy->UpdateVTKObjects();
-
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->VolumeHAVSMapperProxy->GetProperty("Input"));
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->VolumeDistributorSuppressorProxy);
-  this->VolumeHAVSMapperProxy->UpdateVTKObjects();
-
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->VolumeBunykMapperProxy->GetProperty("Input"));
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->VolumeDistributorSuppressorProxy);
-  this->VolumeBunykMapperProxy->UpdateVTKObjects();
-
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->VolumeZSweepMapperProxy->GetProperty("Input"));
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->VolumeDistributorSuppressorProxy);
-  this->VolumeZSweepMapperProxy->UpdateVTKObjects();
-
-  svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->VolumeDistributorProxy->GetProperty("OutputType"));
-  svp->SetElement(0, "vtkUnstructuredGrid");
-
-  this->VolumeDistributorProxy->UpdateVTKObjects();
-
-  svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->VolumeDistributorSuppressorProxy->GetProperty("OutputType"));
-  svp->SetElement(0, "vtkUnstructuredGrid");
-  this->VolumeDistributorSuppressorProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMCompositeDisplayProxy::SetupVolumeDefaults()
 {
-  if (!this->HasVolumePipeline)
+  if (this->VolumePipelineType == NONE)
     {
     return;
     }
   this->Superclass::SetupVolumeDefaults();
+
+  if (this->VolumePipelineType == IMAGE_DATA)
+    {
+    return;
+    }
 
   this->SetupCollectionFilter(this->VolumeCollectProxy);
 
@@ -782,7 +822,7 @@ void vtkSMCompositeDisplayProxy::SetInputInternal(vtkSMSourceProxy *input)
 {
   this->Superclass::SetInputInternal(input);
 
-  if (this->HasVolumePipeline)
+  if (this->VolumePipelineType == UNSTRUCTURED_GRID)
     {
     // Find out how many processes are in the render server.  This should really
     // be done by the process module itself.
@@ -825,8 +865,8 @@ int vtkSMCompositeDisplayProxy::IsDistributedGeometryValid()
 {
   if (this->VolumeRenderMode)
     {
-    return (   this->DistributedVolumeGeometryIsValid
-               && this->VolumeGeometryIsValid );
+    return (this->DistributedVolumeGeometryIsValid && 
+            this->VolumeGeometryIsValid );
     }
   else
     {
@@ -1052,18 +1092,21 @@ void vtkSMCompositeDisplayProxy::AddGeometryToCompositingTree()
 
   if (this->Visibility)
     {
-    vtkSMInputProperty *ip;
+    vtkSMInputProperty *ip = 0;
     if (!this->VolumeRenderMode)
       {
       ip = vtkSMInputProperty::SafeDownCast(
         this->DistributorProxy->GetProperty("Input"));
       }
-    else
+    else if (this->VolumePipelineType == UNSTRUCTURED_GRID)
       {
       ip = vtkSMInputProperty::SafeDownCast(
         this->VolumeDistributorProxy->GetProperty("Input"));
       }
-    if (ip->GetNumberOfProxies() < 1) return;
+    if (!ip || ip->GetNumberOfProxies() < 1) 
+      {
+      return;
+      }
     vtkSMSourceProxy *input = vtkSMSourceProxy::SafeDownCast(ip->GetProxy(0));
 
     vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
@@ -1139,16 +1182,21 @@ void vtkSMCompositeDisplayProxy::UpdateDistributedGeometry()
 
   if (this->VolumeRenderMode)
     {
-    if (!this->DistributedVolumeGeometryIsValid && this->VolumeGeometryIsValid)
+    // The unstructured data is distributed only when rendering unstructured
+    // grids. Therefore, we don't have to update anything
+    if (this->VolumePipelineType == UNSTRUCTURED_GRID)
       {
-      vtkSMProperty *p
-        = this->VolumeDistributorSuppressorProxy->GetProperty("ForceUpdate");
-      p->Modified();
-      this->DistributedVolumeGeometryIsValid = 1;
-      // Make sure any ForceUpates are called in the correct order.  That is,
-      // the superclasses' suppressors should be called before ours.
-      this->VolumeUpdateSuppressorProxy->UpdateVTKObjects();
-      this->VolumeDistributorSuppressorProxy->UpdateVTKObjects();
+      if (!this->DistributedVolumeGeometryIsValid && this->VolumeGeometryIsValid)
+        {
+        vtkSMProperty *p
+          = this->VolumeDistributorSuppressorProxy->GetProperty("ForceUpdate");
+        p->Modified();
+        this->DistributedVolumeGeometryIsValid = 1;
+        // Make sure any ForceUpates are called in the correct order.  That is,
+        // the superclasses' suppressors should be called before ours.
+        this->VolumeUpdateSuppressorProxy->UpdateVTKObjects();
+        this->VolumeDistributorSuppressorProxy->UpdateVTKObjects();
+        }
       }
     }
   else

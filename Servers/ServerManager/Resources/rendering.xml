@@ -669,6 +669,39 @@
       </StringVectorProperty>
     </SourceProxy>
 
+    <Proxy name="DummyVolumeMapper">
+      <IntVectorProperty
+        name="ScalarMode"
+        command="SetScalarMode"
+        default_values="3"
+        number_of_elements="1"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Default"/>
+          <Entry value="1" text="PointData"/>
+          <Entry value="2" text="CellData"/>
+          <Entry value="3" text="PointFieldData"/>
+          <Entry value="4" text="CellFieldData"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty
+        name="SelectScalarArray"
+        command="SelectScalarArray"
+        number_of_elements="1"
+        animateable="0">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <ProxyProperty name="RayCastFunction" command="SetRayCastFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="ugrid_raycast_functions"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    </Proxy>
+
     <SourceProxy name="UnstructuredGridVolumeRayCastMapper" 
       class="vtkUnstructuredGridVolumeRayCastMapper">
       <InputProperty
@@ -756,6 +789,42 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
+    </SourceProxy>
+
+    <SourceProxy name="FixedPointVolumeRayCastMapper" 
+      class="vtkFixedPointVolumeRayCastMapper">
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <StringVectorProperty
+        name="SelectScalarArray"
+        command="SelectScalarArray"
+        number_of_elements="1"
+        animateable="0">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <IntVectorProperty
+        name="ScalarMode"
+        command="SetScalarMode"
+        default_values="3"
+        number_of_elements="1"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Default"/>
+          <Entry value="1" text="PointData"/>
+          <Entry value="2" text="CellData"/>
+          <Entry value="3" text="PointFieldData"/>
+          <Entry value="4" text="CellFieldData"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
     </SourceProxy>
   </ProxyGroup>
 
@@ -1769,8 +1838,8 @@
       </IntVectorProperty>
 
       <IntVectorProperty
-        name="OrderedCompositing"
-        command="SetOrderedCompositing"
+        name="DisableOrderedCompositing"
+        command="SetDisableOrderedCompositing"
         number_of_elements="1"
         default_values="0"
         update_self="1">
@@ -2796,6 +2865,16 @@
       </SubProxy>
 
       <SubProxy>
+        <Proxy name="VolumeDummyMapper"
+               proxygroup="mappers"
+               proxyname="DummyVolumeMapper">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="SelectScalarArray" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
         <Proxy name="VolumeBunykMapper" 
           proxygroup="mappers" 
           proxyname="UnstructuredGridVolumeRayCastMapper">
@@ -2803,9 +2882,7 @@
         <ShareProperties subproxy="Mapper">
           <Exception name="Input" />
         </ShareProperties>
-        <ExposedProperties>
-          <Property name="SelectScalarArray" />
-        </ExposedProperties>
+        <ShareProperties subproxy="VolumeDummyMapper"/>
       </SubProxy>
 
       <SubProxy>
@@ -2836,6 +2913,17 @@
         <ShareProperties subproxy="VolumeBunykMapper">
           <Exception name="Input" />
         </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeFixedPointRayCastMapper" 
+          proxygroup="mappers" 
+          proxyname="FixedPointVolumeRayCastMapper">
+        </Proxy>
+        <ShareProperties subproxy="Mapper">
+          <Exception name="Input" />
+        </ShareProperties>
+        <ShareProperties subproxy="VolumeDummyMapper"/>
       </SubProxy>
 
       <SubProxy>
@@ -2935,13 +3023,6 @@
         default_values="0"
         animateable="0"
         is_internal="1">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-      <IntVectorProperty name="OrderedCompositing"
-                         command="SetOrderedCompositing"
-                         number_of_elements="1"
-                         default_values="0"
-                         update_self="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <ProxyProperty name="OrderedCompositingTree"
