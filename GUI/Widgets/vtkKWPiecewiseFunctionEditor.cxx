@@ -1076,7 +1076,7 @@ void vtkKWPiecewiseFunctionEditor::UpdateWindowLevelFromPoints()
       v1 = this->PiecewiseFunction->GetValue(p1);
       v2 = this->PiecewiseFunction->GetValue(p2);
       this->Window = (v1 <= v2 ? (p2 - p1) : p1 - p2);
-      if (abs(this->Window) <= EPSILON_MIN_WINDOW * 1.1)
+      if (fabs(this->Window) <= EPSILON_MIN_WINDOW * 1.1)
         {
         this->Window = 0;
         }
