@@ -27,7 +27,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVColorSelectionWidget);
-vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.11");
 //-----------------------------------------------------------------------------
 vtkPVColorSelectionWidget::vtkPVColorSelectionWidget()
 {
@@ -227,5 +227,8 @@ void vtkPVColorSelectionWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Target: " << this->Target << endl;
-  os << indent << "ColorSelectionCommand: " << this->ColorSelectionCommand << endl;
+  os << indent << "ColorSelectionCommand: " << this->ColorSelectionCommand 
+     << endl;
+  os << indent << "UseGeometryInformation: " << this->UseGeometryInformation
+     << endl;
 }
