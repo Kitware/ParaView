@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODVolume);
-vtkCxxRevisionMacro(vtkPVLODVolume, "1.7");
+vtkCxxRevisionMacro(vtkPVLODVolume, "1.8");
 vtkCxxSetObjectMacro(vtkPVLODVolume, RenderModuleHelper, vtkPVRenderModuleHelper);
 
 //----------------------------------------------------------------------------
@@ -309,6 +309,12 @@ void vtkPVLODVolume::SetAllocatedRenderTime(double t, vtkViewport *v)
 //-----------------------------------------------------------------------------
 void vtkPVLODVolume::UpdateLODProperty()
 {
+  if (!this->Property)
+    {
+    vtkErrorMacro("No property is defined cannot update.");
+    return;
+    }
+
   if (this->HighLODId >= 0)
     {
     this->LODProp->SetLODProperty(this->HighLODId, this->Property);
