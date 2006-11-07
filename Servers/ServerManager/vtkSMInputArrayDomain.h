@@ -34,6 +34,11 @@
 
 #include "vtkSMDomain.h"
 
+// Needed to get around some header defining ANY as a macro
+#ifdef ANY
+# undef ANY
+#endif
+
 class vtkPVArrayInformation;
 class vtkPVDataSetAttributesInformation;
 class vtkSMSourceProxy;
