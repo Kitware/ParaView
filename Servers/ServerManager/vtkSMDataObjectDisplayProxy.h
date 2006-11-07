@@ -97,7 +97,7 @@ public:
   // Description:
   // Flag indicating if the display supports a volume rendering 
   // representation.
-  vtkGetMacro(HasVolumePipeline,    int);
+  vtkGetMacro(VolumePipelineType,    int);
   vtkGetMacro(SupportsHAVSMapper,   int);
   vtkGetMacro(SupportsBunykMapper,  int);
   vtkGetMacro(SupportsZSweepMapper, int);
@@ -148,6 +148,13 @@ public:
     ZSWEEP_VOLUME_MAPPER,
     BUNYK_RAY_CAST_VOLUME_MAPPER,
     UNKNOWN_VOLUME_MAPPER
+  };
+
+  enum VolumePipelines
+  {
+    NONE = 0,
+    UNSTRUCTURED_GRID,
+    IMAGE_DATA
   };
   //ETX
  
@@ -318,18 +325,25 @@ protected:
   vtkSMProxy *PropertyProxy;
   vtkSMProxy *ActorProxy; 
 
+  // Unstructured volume rendering classes
   vtkSMProxy* VolumeFilterProxy;
-  vtkSMProxy* VolumeUpdateSuppressorProxy;
   vtkSMProxy* VolumePTMapperProxy;
   vtkSMProxy* VolumeHAVSMapperProxy;
   vtkSMProxy* VolumeBunykMapperProxy;
   vtkSMProxy* VolumeZSweepMapperProxy;
+
+  // Structured grid volume rendering classes
+  vtkSMProxy* VolumeFixedPointRayCastMapperProxy;
+
+  // Common volume rendering classes
+  vtkSMProxy* VolumeUpdateSuppressorProxy;
   vtkSMProxy* VolumeActorProxy;
   vtkSMProxy* VolumePropertyProxy;
   vtkSMProxy* OpacityFunctionProxy;
   vtkSMProxy* ColorTransferFunctionProxy;
 
-  int HasVolumePipeline; 
+  int VolumePipelineType; 
+
   int SupportsHAVSMapper;
   int SupportsZSweepMapper;
   int SupportsBunykMapper;

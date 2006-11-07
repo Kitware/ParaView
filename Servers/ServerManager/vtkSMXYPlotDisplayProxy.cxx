@@ -60,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.21");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -178,7 +178,6 @@ void vtkSMXYPlotDisplayProxy::SetupWidget()
 void vtkSMXYPlotDisplayProxy::SetupPipeline()
 {
   vtkSMInputProperty* ipp;
-  vtkSMStringVectorProperty* svp;
 
   vtkClientServerStream stream;
   for (unsigned int i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
@@ -211,22 +210,6 @@ void vtkSMXYPlotDisplayProxy::SetupPipeline()
       this->UpdateSuppressorProxy->GetServers(), stream);
     }
 
-  svp  = vtkSMStringVectorProperty::SafeDownCast(
-    this->UpdateSuppressorProxy->GetProperty("OutputType"));
-  if (!svp)
-    {
-    vtkErrorMacro("Failed to find property OutputType on UpdateSuppressorProxy.");
-    return;
-    }
-  if (this->PolyOrUGrid)
-    {
-    svp->SetElement(0,"vtkUnstructuredGrid");
-    }
-  else
-    {
-    svp->SetElement(0,"vtkPolyData");
-    }
-  this->UpdateSuppressorProxy->UpdateVTKObjects();
 
   // We hook up the XY plot's input here itself.
   ipp = vtkSMInputProperty::SafeDownCast(

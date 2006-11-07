@@ -4070,11 +4070,6 @@ This filter uses colors to show levels of a hiearchical dataset.
         is_internal="1">
         <IntRangeDomain name="range" min="0 -1" />
       </IntVectorProperty>
-      <StringVectorProperty
-        name="OutputType"
-        command="SetOutputType"
-        number_of_elements="1">
-      </StringVectorProperty>
     </UpdateSuppressorProxy>
     
     <SourceProxy name="MPIMoveData" class="vtkMPIMoveData">

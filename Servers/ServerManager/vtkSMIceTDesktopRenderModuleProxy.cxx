@@ -23,13 +23,15 @@
 #include "vtkPVOptions.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMDisplayProxy.h"
+#include "vtkSMCompositeDisplayProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.19");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -51,6 +53,7 @@ vtkSMIceTDesktopRenderModuleProxy::vtkSMIceTDesktopRenderModuleProxy()
   this->TileDimensions[0] = this->TileDimensions[1] = 1;
   this->TileMullions[0] = this->TileMullions[1] = 1;
   this->RemoteDisplay = 1;
+  this->DisableOrderedCompositing = 0;
   this->OrderedCompositing = 0;
 
   this->DisplayManagerProxy = 0;
@@ -486,7 +489,10 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
 //-----------------------------------------------------------------------------
 void vtkSMIceTDesktopRenderModuleProxy::SetOrderedCompositing(int flag)
 {
-  if (this->OrderedCompositing == flag) return;
+  if (this->OrderedCompositing == flag) 
+    {
+    return;
+    }
 
   this->OrderedCompositing = flag;
 
@@ -496,13 +502,11 @@ void vtkSMIceTDesktopRenderModuleProxy::SetOrderedCompositing(int flag)
   for (obj = displays->GetNextItemAsObject(); obj != NULL;
        obj = displays->GetNextItemAsObject())
     {
-    vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
-    vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-                                       disp->GetProperty("OrderedCompositing"));
-    if (ivp)
+    vtkSMCompositeDisplayProxy *disp = 
+      vtkSMCompositeDisplayProxy::SafeDownCast(obj);
+    if (disp)
       {
-      ivp->SetElements1(this->OrderedCompositing);
-      disp->UpdateVTKObjects();
+      disp->SetOrderedCompositing(this->OrderedCompositing);
       }
     }
 
@@ -531,23 +535,17 @@ void vtkSMIceTDesktopRenderModuleProxy::SetOrderedCompositing(int flag)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderModuleProxy::AddDisplay(vtkSMAbstractDisplayProxy *disp)
+void vtkSMIceTDesktopRenderModuleProxy::AddDisplay(
+  vtkSMAbstractDisplayProxy *disp)
 {
   this->Superclass::AddDisplay(disp);
 
   vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-                                   disp->GetProperty("OrderedCompositingTree"));
+    disp->GetProperty("OrderedCompositingTree"));
   if (pp)
     {
     pp->RemoveAllProxies();
     pp->AddProxy(this->PKdTreeProxy);
-    }
-
-  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-                                       disp->GetProperty("OrderedCompositing"));
-  if (ivp)
-    {
-    ivp->SetElements1(this->OrderedCompositing);
     }
 
   disp->UpdateVTKObjects();
@@ -556,7 +554,9 @@ void vtkSMIceTDesktopRenderModuleProxy::AddDisplay(vtkSMAbstractDisplayProxy *di
 //-----------------------------------------------------------------------------
 void vtkSMIceTDesktopRenderModuleProxy::StillRender()
 {
-  if (this->OrderedCompositing)
+  int orderedCompositingNeeded = 0;
+
+  if (!this->DisableOrderedCompositing)
     {
     // Update the PKdTree, but only if there is something to divide that has
     // not been divided the last time or some geometry has become invalid.
@@ -564,18 +564,19 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
 
     // Check to see if there is anything new added to the k-d tree.
     vtkSMProxyProperty *toPartition = vtkSMProxyProperty::SafeDownCast(
-                                   this->PKdTreeProxy->GetProperty("DataSets"));
+      this->PKdTreeProxy->GetProperty("DataSets"));
     unsigned int i, numProxies;
     numProxies = toPartition->GetNumberOfProxies();
     for (i = 0; i < numProxies; i++)
       {
-      if (   this->PartitionedData->find(toPartition->GetProxy(i))
-          == this->PartitionedData->end() )
+      if (this->PartitionedData->find(toPartition->GetProxy(i)) == 
+          this->PartitionedData->end() )
         {
         doBuildLocator = 1;
         break;
         }
       }
+
 
     // Check to see if the geometry of any visible objects has changed.
     vtkObject *obj;
@@ -585,64 +586,83 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
     for (obj = displays->GetNextItemAsObject(cookie); obj != NULL;
          obj = displays->GetNextItemAsObject(cookie))
       {
-      vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
+      vtkSMCompositeDisplayProxy *disp = 
+        vtkSMCompositeDisplayProxy::SafeDownCast(obj);
       if (disp && disp->GetVisibilityCM())
         {
-        vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-                               disp->GetProperty("IsDistributedGeometryValid"));
-        if (ivp)
+        // If any of the displays is volume rendering, we need to
+        // turn on ordered compositing.
+        if (!orderedCompositingNeeded)
           {
-          disp->UpdatePropertyInformation(ivp);
-          if (!ivp->GetElement(0))
+          if (disp->GetVolumeRenderMode())
             {
-            doBuildLocator = 1;
-            break;
+            orderedCompositingNeeded = 1;
+            }
+          else
+            {
+            vtkSMDoubleVectorProperty* opacity = 
+              vtkSMDoubleVectorProperty::SafeDownCast(
+                disp->GetProperty("Opacity"));
+            if (opacity && opacity->GetElement(0) < 1.0)
+              {
+              orderedCompositingNeeded = 1;
+              }
             }
           }
+
+        if (!disp->IsDistributedGeometryValid())
+          {
+          doBuildLocator = 1;
+          }
+        }
+
+      if (doBuildLocator && orderedCompositingNeeded)
+        {
+        break;
         }
       }
 
-    if (doBuildLocator)
+    if (orderedCompositingNeeded)
       {
-      // Update PartitionedData ivar.
-      this->PartitionedData->erase(this->PartitionedData->begin(),
-                                   this->PartitionedData->end());
-      for (i = 0; i < numProxies; i++)
+      if (doBuildLocator)
         {
-        this->PartitionedData->insert(toPartition->GetProxy(i));
-        }
-
-      // For all visibile displays, make sure their geometry is up to date
-      // for the k-d tree and make sure the distribution gets updated after
-      // the tree is reformed.
-      displays = this->GetDisplays();
-      displays->InitTraversal(cookie);
-      for (obj = displays->GetNextItemAsObject(cookie); obj != NULL;
-           obj = displays->GetNextItemAsObject(cookie))
-        {
-        vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
-        if (disp && disp->GetVisibilityCM())
+        // Update PartitionedData ivar.
+        this->PartitionedData->erase(this->PartitionedData->begin(),
+                                     this->PartitionedData->end());
+        for (i = 0; i < numProxies; i++)
           {
-          vtkSMProperty *p = disp->GetProperty("Update");
-          if (p)
-            {
-            p->Modified();
-            }
-          p = disp->GetProperty("InvalidateDistributedGeometry");
-          if (p)
-            {
-            p->Modified();
-            }
-          disp->UpdateVTKObjects();
+          this->PartitionedData->insert(toPartition->GetProxy(i));
           }
+        
+        // For all visibile displays, make sure their geometry is up to date
+        // for the k-d tree and make sure the distribution gets updated after
+        // the tree is reformed.
+        displays = this->GetDisplays();
+        displays->InitTraversal(cookie);
+        for (obj = displays->GetNextItemAsObject(cookie); obj != NULL;
+             obj = displays->GetNextItemAsObject(cookie))
+          {
+          vtkSMCompositeDisplayProxy *disp = 
+            vtkSMCompositeDisplayProxy::SafeDownCast(obj);
+          if (disp && disp->GetVisibilityCM())
+            {
+            disp->SetOrderedCompositing(0);
+            disp->Update();
+            disp->InvalidateDistributedGeometry();
+            }
+          }
+        
+        // Build the global k-d tree.
+        vtkSMProperty *p = this->PKdTreeProxy->GetProperty("BuildLocator");
+        p->Modified();
+        this->PKdTreeProxy->UpdateVTKObjects();
         }
-
-      // Build the global k-d tree.
-      vtkSMProperty *p = this->PKdTreeProxy->GetProperty("BuildLocator");
-      p->Modified();
-      this->PKdTreeProxy->UpdateVTKObjects();
       }
     }
+
+  cout << "orderedCompositingNeeded: " << orderedCompositingNeeded 
+       << endl;
+  this->SetOrderedCompositing(orderedCompositingNeeded);
 
   this->Superclass::StillRender();
 }
@@ -655,7 +675,8 @@ void vtkSMIceTDesktopRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
     << ", " << this->TileDimensions[1] << endl;
   os << indent << "RemoteDisplay: " << this->RemoteDisplay 
     << endl;
-  os << indent << "OrderedCompositing: " << this->OrderedCompositing << endl;
+  os << indent << "DisableOrderedCompositing: " 
+     << this->DisableOrderedCompositing << endl;
 
   os << indent << "DisplayManagerProxy: ";
   if (this->DisplayManagerProxy)

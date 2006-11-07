@@ -40,9 +40,9 @@ public:
   // Description:
   // Set whether or not to order compositing.  If compositing is not ordered,
   // then the z buffer is used to composite.
-  vtkGetMacro(OrderedCompositing, int);
-  virtual void SetOrderedCompositing(int);
-  vtkBooleanMacro(OrderedCompositing, int);
+  vtkGetMacro(DisableOrderedCompositing, int);
+  vtkSetMacro(DisableOrderedCompositing, int);
+  vtkBooleanMacro(DisableOrderedCompositing, int);
 
   virtual void AddDisplay(vtkSMAbstractDisplayProxy* disp);
 
@@ -111,7 +111,9 @@ protected:
   // Control the RemoteDisplay property on vtkDesktopDeliveryServer.
   int RemoteDisplay;
  
+  int DisableOrderedCompositing;
   int OrderedCompositing;
+  void SetOrderedCompositing(int oc);
 
   vtkSMProxy* DisplayManagerProxy;
   vtkSMProxy* PKdTreeProxy;
