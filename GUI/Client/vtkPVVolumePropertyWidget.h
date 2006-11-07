@@ -59,6 +59,10 @@ protected:
   vtkPVVolumePropertyWidget();
   ~vtkPVVolumePropertyWidget();
   
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+
   vtkPVDataInformation *DataInformation;
 
   // This methods will be overriden in subclasses so that something

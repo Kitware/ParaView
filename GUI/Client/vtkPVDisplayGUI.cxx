@@ -105,7 +105,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.74");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.75");
 
 //----------------------------------------------------------------------------
 
@@ -223,6 +223,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
 
   this->VolumeScalarsMenuLabel = vtkKWLabel::New();
   this->VolumeScalarSelectionWidget = vtkPVColorSelectionWidget::New();
+  this->VolumeScalarSelectionWidget->SetUseGeometryInformation(0);
   
   this->VolumeRenderMethodMenuLabel = vtkKWLabel::New();
   this->VolumeRenderMethodMenu = vtkKWMenuButton::New();
@@ -1766,7 +1767,8 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
         VTK_PV_VOLUME_LABEL));
     }
   
-  if (!pDisp->GetHasVolumePipeline())
+  if (pDisp->GetVolumePipelineType() == 
+      vtkSMDataObjectDisplayProxy::NONE)
     {
     this->VolumeRenderMode = 0;
     return;
@@ -1794,44 +1796,54 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
   
   this->VolumeRenderMethodMenu->GetMenu()->DeleteAllItems();
   
-  if (pDisp->GetSupportsHAVSMapper() )
+  if (pDisp->GetVolumePipelineType() == 
+      vtkSMDataObjectDisplayProxy::UNSTRUCTURED_GRID)
     {
+    if (pDisp->GetSupportsHAVSMapper() )
+      {
+      this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
+        VTK_PV_VOLUME_HAVS_METHOD_LABEL, this, "DrawVolumeHAVS" );
+      }
+    
     this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
-      VTK_PV_VOLUME_HAVS_METHOD_LABEL, this, "DrawVolumeHAVS" );
-    }
-
-  this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
-    VTK_PV_VOLUME_PT_METHOD_LABEL, this, "DrawVolumePT" );
-
-  if (pDisp->GetSupportsZSweepMapper() )
-    {
-    this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
-      VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL, this, "DrawVolumeZSweep" );
-    }
-  if (pDisp->GetSupportsBunykMapper() )
-    {
-    this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
-      VTK_PV_VOLUME_BUNYK_METHOD_LABEL, this, "DrawVolumeBunyk" );
-    }
+      VTK_PV_VOLUME_PT_METHOD_LABEL, this, "DrawVolumePT" );
+    
+    if (pDisp->GetSupportsZSweepMapper() )
+      {
+      this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
+        VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL, this, "DrawVolumeZSweep" );
+      }
+    if (pDisp->GetSupportsBunykMapper() )
+      {
+      this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
+        VTK_PV_VOLUME_BUNYK_METHOD_LABEL, this, "DrawVolumeBunyk" );
+      }
   
-  switch (this->PVSource->GetDisplayProxy()->GetVolumeMapperTypeCM())
+    switch (this->PVSource->GetDisplayProxy()->GetVolumeMapperTypeCM())
+      {
+      case vtkSMDataObjectDisplayProxy::PROJECTED_TETRA_VOLUME_MAPPER:
+        this->VolumeRenderMethodMenu->SetValue
+          (VTK_PV_VOLUME_PT_METHOD_LABEL);
+        break;
+      case vtkSMDataObjectDisplayProxy::HAVS_VOLUME_MAPPER:
+        this->VolumeRenderMethodMenu->SetValue
+          (VTK_PV_VOLUME_HAVS_METHOD_LABEL);
+        break;
+      case vtkSMDataObjectDisplayProxy::ZSWEEP_VOLUME_MAPPER:
+        this->VolumeRenderMethodMenu->SetValue
+          (VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL);
+        break;
+      case vtkSMDataObjectDisplayProxy::BUNYK_RAY_CAST_VOLUME_MAPPER:
+        this->VolumeRenderMethodMenu->SetValue
+          (VTK_PV_VOLUME_BUNYK_METHOD_LABEL);
+        break;
+      }
+    }
+  else
     {
-    case vtkSMDataObjectDisplayProxy::PROJECTED_TETRA_VOLUME_MAPPER:
-      this->VolumeRenderMethodMenu->SetValue
-        (VTK_PV_VOLUME_PT_METHOD_LABEL);
-      break;
-    case vtkSMDataObjectDisplayProxy::HAVS_VOLUME_MAPPER:
-      this->VolumeRenderMethodMenu->SetValue
-        (VTK_PV_VOLUME_HAVS_METHOD_LABEL);
-      break;
-    case vtkSMDataObjectDisplayProxy::ZSWEEP_VOLUME_MAPPER:
-      this->VolumeRenderMethodMenu->SetValue
-        (VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL);
-      break;
-    case vtkSMDataObjectDisplayProxy::BUNYK_RAY_CAST_VOLUME_MAPPER:
-      this->VolumeRenderMethodMenu->SetValue
-        (VTK_PV_VOLUME_BUNYK_METHOD_LABEL);
-      break;
+    this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
+        "FixedPointRayCast", this, "DrawVolumeFixedPoint" );
+    this->VolumeRenderMethodMenu->SetValue("FixedPointRayCast");
     }
 }
 //----------------------------------------------------------------------------
@@ -1870,7 +1882,7 @@ void vtkPVDisplayGUI::ColorByArray(const char* array, int field)
 {
   this->GetTraceHelper()->AddEntry("$kw(%s) ColorByArray {%s} %d", 
                                    this->GetTclName(),
-    array, field);
+                                   array, field);
   
   this->PVSource->ColorByArray(array, field);
   this->ApplyTexture(0);
@@ -2268,6 +2280,15 @@ void vtkPVDisplayGUI::DrawVolumeBunykInternal()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDisplayGUI::DrawVolumeFixedPoint()
+{
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DrawSurface()
 {
   if (this->GetPVSource()->GetInitialized())
@@ -2378,6 +2399,41 @@ void vtkPVDisplayGUI::VolumeRenderModeOn()
       else
         {
         vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
+        }
+      }
+    else
+      {
+      // If there is no user selected color array, use point scalars. If there
+      // are no point scalars, use first point array with 1 component.
+      vtkPVDataInformation* dataInfo = this->PVSource->GetDataInformation();
+      vtkPVDataSetAttributesInformation* attrInfo =
+        dataInfo->GetPointDataInformation();
+      vtkPVArrayInformation* arrayInfo = 
+        attrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+      if (arrayInfo && arrayInfo->GetName())
+        {
+        this->VolumeRenderByArray(arrayInfo->GetName(), 
+                                  vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+        }
+      else
+        {
+        arrayInfo = 0;
+        int numArrays = attrInfo->GetNumberOfArrays();
+        for (int i=0; i<numArrays; i++)
+          {
+          arrayInfo = attrInfo->GetArrayInformation(i);
+          if (arrayInfo->GetNumberOfComponents() == 1)
+            {
+            break;
+            }
+          arrayInfo = 0;
+          }
+        if (arrayInfo)
+          {
+          this->VolumeRenderByArray(
+            arrayInfo->GetName(), 
+            vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+          }
         }
       }
     }

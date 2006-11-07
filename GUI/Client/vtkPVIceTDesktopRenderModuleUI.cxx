@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.12");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
@@ -44,7 +44,7 @@ vtkPVIceTDesktopRenderModuleUI::~vtkPVIceTDesktopRenderModuleUI()
   vtkPVApplication *pvapp = this->GetPVApplication();
   if (pvapp)
     {
-    pvapp->SetRegistryValue(2, "RunTime", "OrderedCompositing", "%d",
+    pvapp->SetRegistryValue(2, "RunTime", "DisableOrderedCompositing", "%d",
                             this->OrderedCompositingFlag);
     }
 
@@ -72,14 +72,15 @@ void vtkPVIceTDesktopRenderModuleUI::CreateWidget()
 
   this->OrderedCompositingCheck->SetParent(this->LODFrame->GetFrame());
   this->OrderedCompositingCheck->Create();
-  this->OrderedCompositingCheck->SetText("Enabled Ordered Compositing");
-  this->OrderedCompositingCheck->SetCommand(this,
-                                            "SetOrderedCompositingFlag");
-
-  if (pvapp && pvapp->GetRegistryValue(2, "RunTime", "OrderedCompositing", 0))
+  this->OrderedCompositingCheck->SetText("Disable Ordered Compositing");
+  this->OrderedCompositingCheck->SetCommand(
+    this, "SetOrderedCompositingFlag");
+  
+  if (pvapp && pvapp->GetRegistryValue(
+        2, "RunTime", "DisableOrderedCompositing", 0))
     {
     this->OrderedCompositingFlag
-      = pvapp->GetIntRegistryValue(2, "RunTime", "OrderedCompositing");
+      = pvapp->GetIntRegistryValue(2, "RunTime", "DisableOrderedCompositing");
     }
   this->OrderedCompositingCheck->SetSelectedState(this->OrderedCompositingFlag);
   // This call just forwards the value to the render module.
@@ -87,9 +88,9 @@ void vtkPVIceTDesktopRenderModuleUI::CreateWidget()
     this->OrderedCompositingCheck->GetSelectedState());
 
   this->OrderedCompositingCheck->SetBalloonHelpString(
-    "Toggle the use of ordered compositing.  Ordered compositing makes updates "
-    "and animations slower, but make volume rendering correct and may speed "
-    "up compositing in general.");
+    "Toggle the disable the use of ordered compositing.  Ordered compositing "
+    "makes updates and animations slower, but makes volume rendering correct "
+    "and may speed up compositing in general.");
 
   this->Script("pack %s -side top -anchor w",
                this->OrderedCompositingCheck->GetWidgetName());
@@ -113,7 +114,7 @@ void vtkPVIceTDesktopRenderModuleUI::SetOrderedCompositingFlag(int state)
   this->OrderedCompositingFlag = state;
 
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-                    this->RenderModuleProxy->GetProperty("OrderedCompositing"));
+    this->RenderModuleProxy->GetProperty("DisableOrderedCompositing"));
   if (!ivp)
     {
     vtkErrorMacro("Failed to find property OrderedCompositing on "

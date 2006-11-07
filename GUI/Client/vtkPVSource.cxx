@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.486");
+vtkCxxRevisionMacro(vtkPVSource, "1.487");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1627,22 +1627,23 @@ void vtkPVSource::ColorByArray(const char* arrayname, int field)
     return;
     }
   
-  vtkPVDataInformation* geomInfo = this->GetDisplayProxy()->GetGeometryInformation();
+  vtkPVDataInformation* geomInfo = 
+    this->GetDisplayProxy()->GetGeometryInformation();
   vtkPVDataSetAttributesInformation* attrInfo =
     (field == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA) ?
     geomInfo->GetPointDataInformation() :  geomInfo->GetCellDataInformation();
   vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(
     arrayname);
-  // Try geometry information
+  // Try data information
   if (!arrayInfo)
     {
-    vtkSMDisplayProxy* dproxy = this->GetDisplayProxy();
-    if (dproxy)
+    vtkSMSourceProxy* sproxy = this->GetProxy();
+    if (sproxy)
       {
-      geomInfo = dproxy->GetGeometryInformation();
+      vtkPVDataInformation* dataInfo = sproxy->GetDataInformation();
       attrInfo =
        (field == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA) ?
-       geomInfo->GetPointDataInformation() :  geomInfo->GetCellDataInformation();
+       dataInfo->GetPointDataInformation() :  dataInfo->GetCellDataInformation();
       arrayInfo = attrInfo->GetArrayInformation(arrayname);
       }
     }

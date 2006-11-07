@@ -64,6 +64,15 @@ public:
   void SetValue(const char* arrayname, int field);
   void SetValue(const char* label);
 
+  // Description:
+  // Determines whether the selection widget uses the geometry information
+  // or the data information to get the list of arrays to color
+  // by. Usually, geometry rendering should use geometry information,
+  // volume rendering should not. True by default
+  vtkSetMacro(UseGeometryInformation, int);
+  vtkGetMacro(UseGeometryInformation, int);
+  vtkBooleanMacro(UseGeometryInformation, int);
+
 protected:
   vtkPVColorSelectionWidget();
   ~vtkPVColorSelectionWidget();
@@ -71,6 +80,7 @@ protected:
   vtkPVSource* PVSource;
   vtkKWWidget* Target;
   char* ColorSelectionCommand;
+  int UseGeometryInformation;
 
   void AddArray(vtkPVDataSetAttributesInformation* attrInfo, int field_type);
 

@@ -24,14 +24,16 @@
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVSource.h"
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVColorSelectionWidget);
-vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.10");
 //-----------------------------------------------------------------------------
 vtkPVColorSelectionWidget::vtkPVColorSelectionWidget()
 {
   this->ColorSelectionCommand = 0;
   this->Target = 0;
+  this->UseGeometryInformation = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -65,22 +67,33 @@ void vtkPVColorSelectionWidget::Update(int remove_all /*=1*/)
     this->GetMenu()->DeleteAllItems();
     }
 
-  vtkPVDataSetAttributesInformation* attrInfo;
-  vtkSMDisplayProxy* dproxy = this->PVSource->GetDisplayProxy();
-  if (dproxy)
+  vtkPVDataInformation* dataInfo = 0;
+  if (this->UseGeometryInformation)
     {
-    vtkPVDataInformation* geomInfo = dproxy->GetGeometryInformation();
-    if (geomInfo)
+    vtkSMDisplayProxy* dproxy = this->PVSource->GetDisplayProxy();
+    if (dproxy)
       {
-
-      attrInfo = geomInfo->GetPointDataInformation();
-      this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
-
-      attrInfo = geomInfo->GetCellDataInformation();
-      this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+      dataInfo = dproxy->GetGeometryInformation();
+      }
+    }
+  else
+    {
+    vtkSMSourceProxy* proxy = this->PVSource->GetProxy();
+    if (proxy)
+      {
+      dataInfo = proxy->GetDataInformation();
       }
     }
 
+  if (dataInfo)
+    {
+    vtkPVDataSetAttributesInformation* attrInfo;
+    attrInfo = dataInfo->GetPointDataInformation();
+    this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+    
+    attrInfo = dataInfo->GetCellDataInformation();
+    this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+    }
 }
 
 //-----------------------------------------------------------------------------

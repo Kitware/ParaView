@@ -18,9 +18,11 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkKWPiecewiseFunctionEditor.h"
+#include "vtkKWColorTransferFunctionEditor.h"
 
 vtkStandardNewMacro(vtkPVVolumePropertyWidget);
-vtkCxxRevisionMacro(vtkPVVolumePropertyWidget, "1.6");
+vtkCxxRevisionMacro(vtkPVVolumePropertyWidget, "1.7");
 
 vtkCxxSetObjectMacro(vtkPVVolumePropertyWidget, DataInformation,
                      vtkPVDataInformation);
@@ -156,4 +158,13 @@ int vtkPVVolumePropertyWidget::GetDataSetScalarOpacityUnitDistanceRangeAndResolu
     }
 
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVVolumePropertyWidget::CreateWidget()
+{
+  this->Superclass::CreateWidget();
+
+  this->ScalarOpacityFunctionEditor->SetMidPointVisibility(0);
+  this->ScalarColorFunctionEditor->SetMidPointVisibility(0);
 }

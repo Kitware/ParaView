@@ -177,6 +177,7 @@ public:
   void DrawVolumeHAVS();
   void DrawVolumeBunyk();
   void DrawVolumeZSweep();
+  void DrawVolumeFixedPoint();
   
   // Description:
   // Methods called when item chosen from InterpolationMenu
