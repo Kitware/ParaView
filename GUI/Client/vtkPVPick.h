@@ -84,6 +84,8 @@ public:
   // Attempts to find the real time from the source.
   bool GetSourceTimeNow(double &TimeNow);
 
+  // Description:
+  // This causes the description page on the GUI to update.
   void UpdateGUI();
 
 protected:
