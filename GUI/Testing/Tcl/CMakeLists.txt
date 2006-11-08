@@ -493,6 +493,20 @@ IF (VTK_DATA_ROOT)
     )
 ENDIF (VTK_DATA_ROOT)
 
+IF (VTK_USE_CG_SHADERS)
+  ADD_TEST(CgShader-ParaView 
+    ${PARAVIEW_EXECUTABLE} 
+    ${TIMEOUT}
+    ${PARAVIEW_MPI_RUN_ONE} 
+    --disable-registry
+    ${PVClientTests_SOURCE_DIR}/Tcl/CgShader.pvs
+    -D ${VTK_DATA_ROOT}
+    -C ${PVCompareImages}
+    -T ${ParaView_BINARY_DIR}/Testing/Temporary
+    -V ${PVClientTestData}/Baseline/CgShader.png
+    )
+ENDIF (VTK_USE_CG_SHADERS)
+
 # Test timings for tiled display (Ice-T)
 IF (PARAVIEW_TEST_TILED_DISPLAY)
   ADD_TEST(TiledTiming

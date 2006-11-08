@@ -1,0 +1,49 @@
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp81) [$kw(vtkTemp1) GetMainView]
+
+set pv(vtkTemp1) [$Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+
+$pv(vtkTemp43) SetOrientationAxesVisibility 0
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $pv(vtkTemp43) $argv $argc
+
+set kw(vtkTemp1185) [$kw(vtkTemp1) CreatePVSource SphereSource]
+$kw(vtkTemp1) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp1) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp1185) AcceptCallback
+set kw(vtkTemp98) [$kw(vtkTemp1185) GetPVOutput]
+$kw(vtkTemp98) SetActorTranslate 1.000000 0.000000 0.000000
+$kw(vtkTemp81) SetCameraState 0.000 0.000 7.807  0.000 0.000 4.516  0.000 1.000 0.000
+$kw(vtkTemp98) DrawWireframe
+$kw(vtkTemp98) SetMaterial {CgTwisted} {CgTwisted}
+$kw(vtkTemp98) DrawSurface
+$kw(vtkTemp81) SetCameraState 0.988 -7.707 0.751  0.571 -4.459 0.434  0.038 0.102 0.994
+$kw(vtkTemp98) SetActorScale 1.500000 1.000000 1.000000
+$kw(vtkTemp98) SetActorScale 1.500000 3.100000 1.000000
+$kw(vtkTemp98) SetActorScale 1.500000 5.000000 1.000000
+$kw(vtkTemp81) SetCameraState 2.411 -6.340 3.865  1.395 -3.668 2.236  -0.104 0.488 0.866
+$kw(vtkTemp98) SetActorScale 1.500000 2.100000 1.000000
+$kw(vtkTemp81) SetCameraState 1.296 -7.696 0.196  0.750 -4.452 0.113  0.015 0.028 0.999
+$kw(vtkTemp98) SetActorScale 1.500000 2.100000 0.500000
+$kw(vtkTemp98) SetActorScale 1.500000 2.100000 5.500000
+$kw(vtkTemp98) SetActorScale 1.500000 2.100000 2.500000
+$kw(vtkTemp98) SetOpacity 0.200000
+$kw(vtkTemp98) SetOpacity 1.000000
+
+# Retrace
+#  update
+#  $Application StopRecordingScript
+#  [ $Application GetMainWindow ] DeleteAllSources
+#  # Source the trace to regenerate the sources.
+#  if {[catch {set channel [open test.tmp w]}] == 0 } {
+#     close $channel
+#     file delete -force test.tmp
+#     source "[$Application GetTraceFileName]"
+#  }
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit
