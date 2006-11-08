@@ -28,7 +28,7 @@ ENDIF(INSOURCE)
 #########################################################################
 SET(PARAVIEW_VERSION_MAJOR 2)
 SET(PARAVIEW_VERSION_MINOR 9)
-SET(PARAVIEW_VERSION_PATCH 4)
+SET(PARAVIEW_VERSION_PATCH 6)
 SET(PARAVIEW_VERSION "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
 SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}")
 
@@ -135,7 +135,7 @@ MARK_AS_ADVANCED(VTK_WRAP_HINTS)
 
 # If the cmake version includes cpack, use it
 INCLUDE(InstallRequiredSystemLibraries)
-SET(CPACK_INSTALL_CMAKE_PROJECTS "${ParaView_BINARY_DIR};ParaView;Runtime;/")
+SET(CPACK_INSTALL_CMAKE_PROJECTS "${ParaView_BINARY_DIR};ParaView;Runtime;/;${ParaView_BINARY_DIR};VTK Runtime Libs;RuntimeLibraries;/;${ParaView_BINARY_DIR};VTK Executables;RuntimeExecutables;/")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "ParaView is a scientific visualization tool")
 SET(CPACK_PACKAGE_VENDOR "Kitware Inc.")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/License_v1.1.txt")
