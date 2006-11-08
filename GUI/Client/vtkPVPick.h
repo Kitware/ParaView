@@ -84,6 +84,8 @@ public:
   // Attempts to find the real time from the source.
   bool GetSourceTimeNow(double &TimeNow);
 
+  void UpdateGUI();
+
 protected:
   vtkPVPick();
   ~vtkPVPick();
@@ -92,7 +94,6 @@ protected:
   vtkCollection* LabelCollection;
 
   virtual void Select();
-  void UpdateGUI();
   void ClearDataLabels();
   void InsertDataLabel(const char* label, vtkIdType idx,
                        vtkDataSetAttributes* attr, double* x=0);
