@@ -289,9 +289,6 @@ public slots:
   void createBarCharView();
   void createXYPlotView();
 
-  // Create a table view
-  void createTableView();
-
   // This option is used for testing. Sets the maximum size for
   // all render windows. When size.isEmpty() is true,
   // it resets the maximum bounds on the render windows.

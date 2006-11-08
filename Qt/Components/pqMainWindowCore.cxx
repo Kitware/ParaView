@@ -2163,9 +2163,3 @@ void pqMainWindowCore::createXYPlotView()
   pqApplicationCore::instance()->getPipelineBuilder()->createPlotWindow(
     pqPlotViewModule::XY_PLOT, this->getActiveServer());
 }
-
-void pqMainWindowCore::createTableView()
-{
-  pqApplicationCore::instance()->getPipelineBuilder()->createTableView(
-    this->getActiveServer());
-}

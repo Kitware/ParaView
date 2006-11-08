@@ -46,7 +46,6 @@ class pqRenderModule;
 class pqScalarBarDisplay;
 class pqScalarsToColors;
 class pqServer;
-class pqTableViewModule;
 class pqUndoStack;
 class vtkSMAbstractViewModuleProxy;
 class vtkSMProxy;
@@ -120,9 +119,6 @@ public:
   // Called to create a new plot view on the server. \c type is the enum
   // pqPlotViewModule::PlotType, which is the supported plot type.
   pqPlotViewModule* createPlotWindow(int type, pqServer* server);
-
-  // Called to create a new table view on the server
-  pqTableViewModule* createTableView(pqServer* server);
 
   // Create a connection between a source and a sink. This method ensures
   // that the UndoState is recoreded. Remember this "connection" is not a 
