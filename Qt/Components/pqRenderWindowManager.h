@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "pqMultiView.h"
 
+class pqGenericViewModule;
 class pqMultiView;
 class pqMultiViewFrame;
 class pqRenderModule;
@@ -89,8 +90,7 @@ private slots:
 
 public slots:
   void setActiveServer(pqServer* server);
-  void setActiveRenderModule(pqRenderModule* ren);
-  void setActiveRenderModuleSilently(pqRenderModule* ren);
+  void setActiveView(pqGenericViewModule* view);
   void allocateWindowsToRenderModules();
 
 protected:

@@ -44,8 +44,9 @@ class QHBoxLayout;
 
 class pqPipelineDisplay;
 class pqPipelineSource;
-class pqRenderModule;
+class pqGenericViewModule;
 class vtkEventQtSlotConnect;
+class pqRenderModule;
 
 /// Provides a standard user interface for selecting among a collection 
 /// of dataset variables (both cell and node variables).
@@ -79,10 +80,10 @@ public slots:
   /// Affects the \c SelectedSource
   void onVariableChanged(pqVariableType type, const QString& name);
 
-  /// Called to set the current render module. This widget
-  /// shows the source's display properties in this render module 
+  /// Called to set the current view. This widget
+  /// shows the source's display properties in this view 
   /// alone.
-  void setRenderModule(pqRenderModule* renModule);
+  void setView(pqGenericViewModule* view);
 
   /// When set, the source/renModule is not used to locate the
   /// display, instead this display is used.

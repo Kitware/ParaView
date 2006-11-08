@@ -133,10 +133,11 @@ void pqProxyTabWidget::setProxy(pqProxy* proxy)
   this->updateDisplayTab();
 }
 
-void pqProxyTabWidget::setRenderModule(pqRenderModule* rm) 
+void pqProxyTabWidget::setView(pqGenericViewModule* view) 
 {
+  pqRenderModule* rm = qobject_cast<pqRenderModule*>(view);
   this->RenderModule = rm;
-  this->Inspector->setRenderModule(rm);
+  this->Inspector->setView(view);
   
   this->updateDisplayTab();
 }

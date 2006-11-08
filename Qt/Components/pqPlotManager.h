@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqGraphWindowManager_h
-#define __pqGraphWindowManager_h
+#ifndef __pqPlotManager_h
+#define __pqPlotManager_h
 
 #include <QObject>
 #include "pqComponentsExport.h"
@@ -54,12 +54,7 @@ signals:
   // Fired just before the manager let's go of a plot view.
   void plotRemoved(pqPlotViewModule*);
 
-  // Fired when the activeView changes.
-  void activeViewChanged(pqPlotViewModule*);
-
 public slots:
-  void setActiveViewSilently(pqPlotViewModule*);
-  void setActiveView(pqPlotViewModule* view);
   void renderAllViews();
 
 protected:
@@ -81,6 +76,4 @@ private:
   pqPlotManagerInternal* Internal;
 };
 
-
 #endif
-

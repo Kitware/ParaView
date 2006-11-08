@@ -108,7 +108,7 @@ public slots:
   /// the server manager model selection
   void clearSelection();
   /// Used to keep track of active render module
-  void setActiveRenderModule(pqRenderModule*);
+  void setActiveView(pqGenericViewModule*);
   /// cleans all internal proxies.
   void cleanSelections();
 

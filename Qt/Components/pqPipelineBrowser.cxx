@@ -65,8 +65,6 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
 
   // Get the pipeline model from the pipeline data.
   this->ListModel = new pqPipelineModel(this);
-  QObject::connect(this, SIGNAL(viewModuleChanged(pqGenericViewModule*)),
-                   this->ListModel, SLOT(setViewModule(pqGenericViewModule*)));
 
   // Connect the model to the ServerManager model.
   pqServerManagerModel* smModel = 
@@ -353,7 +351,7 @@ pqConsumerDisplay* pqPipelineBrowser::createDisplay(pqPipelineSource* source,
 void pqPipelineBrowser::setViewModule(pqGenericViewModule* rm)
 {
   this->ViewModule = rm;
-  emit this->viewModuleChanged(rm);
+  this->ListModel->setViewModule(rm);
 }
 
 //-----------------------------------------------------------------------------

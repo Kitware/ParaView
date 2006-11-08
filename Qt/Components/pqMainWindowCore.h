@@ -135,10 +135,6 @@ public:
   /// returns the active server.
   pqServer* getActiveServer();
 
-  /// returns the active render module.
-  pqRenderModule* getActiveRenderModule();
-  pqGenericViewModule* getActiveView();
-  
   void removeActiveSource();
   void removeActiveServer();
   
@@ -203,14 +199,6 @@ signals:
   // Fired when the active server changes.
   void activeServerChanged(pqServer*);
 
-  // Fired when the active render module changes.
-  // All these are fired at the same time, expect
-  // that depending upon the type of the active view
-  // some signals may have null arguments.
-  void activeRenderModuleChanged(pqRenderModule*);
-  void activePlotModuleChanged(pqPlotViewModule*);
-  void activeViewChanged(pqGenericViewModule*);
-  
   // Fired when a source/filter/reader/compound proxy is
   // created without a display.
   void pendingDisplays(bool status);
@@ -271,13 +259,6 @@ public slots:
   // Call this slot to set the active server. 
   void setActiveServer(pqServer*);
 
-  // Call this slot to set the active render module.
-  // Internally calls setActiveView().
-  void setActiveRenderModule(pqRenderModule* ren);
-  
-  // Internally calls setActiveView().
-  void setActivePlotModule(pqPlotViewModule* plot);
-
   // Changes the active view. At one time either 1 render view
   // or 1 plot view can be active.
   void setActiveView(pqGenericViewModule* view);
@@ -308,6 +289,9 @@ public slots:
   void createBarCharView();
   void createXYPlotView();
 
+  // Create a table view
+  void createTableView();
+
   // This option is used for testing. Sets the maximum size for
   // all render windows. When size.isEmpty() is true,
   // it resets the maximum bounds on the render windows.
@@ -323,7 +307,6 @@ private slots:
   void onCompoundProxyRemoved(QString proxy);
   void onActiveSourceChanged(pqPipelineSource*);
   void onActiveServerChanged(pqServer*);
-  void onActiveRenderModuleChanged(pqRenderModule* rm);
   void onCoreActiveChanged();
 
   void onInitializeStates();

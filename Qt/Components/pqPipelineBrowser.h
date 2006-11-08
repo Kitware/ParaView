@@ -102,9 +102,6 @@ signals:
   // item.
   void selectionChanged(pqServerManagerModelItem* selectedItem);
   
-  /// Fired when the view module changes
-  void viewModuleChanged(pqGenericViewModule*);
-
 private slots:
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
   void handleIndexClicked(const QModelIndex &index);

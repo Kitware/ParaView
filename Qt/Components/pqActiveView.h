@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDisplayRepresentationWidget.h
+   Module:    pqActiveView.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,47 +29,46 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqDisplayRepresentationWidget_h
-#define __pqDisplayRepresentationWidget_h
+#ifndef __pqActiveView_h
+#define __pqActiveView_h
 
+#include <QObject>
 #include "pqComponentsExport.h"
-#include <QWidget>
 
-class pqDisplayRepresentationWidgetInternal;
-class pqPipelineSource;
 class pqGenericViewModule;
-class pqPipelineDisplay;
-/// A widget for representation of a display proxy.
-class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
+
+/// Provides a central location for managing an "active" view
+/// (note that a "view" could be a 3D render view, a plot, or
+/// any other type of view).
+///
+/// A slot is provided to set the currently-active view, and
+/// a signal notifies observers when the active view changes
+class PQCOMPONENTS_EXPORT pqActiveView :
+  public QObject
 {
   Q_OBJECT
-
+  
 public:
-  pqDisplayRepresentationWidget(QWidget* parent=0);
-  virtual ~pqDisplayRepresentationWidget();
-
+  static pqActiveView& instance();
+  
+  /// Returns the currently-active view (could return NULL)
+  pqGenericViewModule* current();
+  
 signals:
-  void currentTextChanged(const QString&);
+  /// Signal emitted whenever the currently-active view changes
+  void changed(pqGenericViewModule* view);
 
 public slots:
-  /// Call to show the representation for a display of the given source.
-  /// The display choosen if the first display for the source in the
-  /// set render module, if any.
-  void update(pqPipelineSource* source);
+  /// Called to set the currently-active view
+  void setCurrent(pqGenericViewModule* view);
 
-  /// Set the view. Typically called when the active view changes.
-  void setView(pqGenericViewModule* view);
-
-  void setDisplay(pqPipelineDisplay* display);
-  
-  void reloadGUI();
-
-private slots:
-  void onCurrentTextChanged(const QString&);
-
-  void updateLinks();
 private:
-  pqDisplayRepresentationWidgetInternal* Internal;
+  pqActiveView();
+  pqActiveView(const pqActiveView&); // Not implemented.
+  void operator=(const pqActiveView&); // Not implemented.
+  ~pqActiveView();
+  
+  pqGenericViewModule* ActiveView;
 };
-#endif
 
+#endif

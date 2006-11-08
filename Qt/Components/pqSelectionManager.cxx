@@ -424,8 +424,9 @@ vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderModule* rm,
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::setActiveRenderModule(pqRenderModule* rm)
+void pqSelectionManager::setActiveView(pqGenericViewModule* view)
 {
+  pqRenderModule* rm = qobject_cast<pqRenderModule*>(view);
   if (!rm)
     {
     return;

@@ -132,8 +132,9 @@ void pqScalarBarVisibilityAdaptor::setActiveSource(pqPipelineSource* source)
 
 
 //-----------------------------------------------------------------------------
-void pqScalarBarVisibilityAdaptor::setActiveRenderModule(pqRenderModule* rm)
+void pqScalarBarVisibilityAdaptor::setActiveView(pqGenericViewModule* view)
 {
+  pqRenderModule* const rm = qobject_cast<pqRenderModule*>(view);
   if (this->Internal->ActiveRenderModule == rm)
     {
     return;

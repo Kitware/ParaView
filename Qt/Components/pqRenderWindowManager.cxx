@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqActiveView.h"
 #include "pqRenderWindowManager.h"
 
 // VTK includes.
@@ -214,7 +215,7 @@ void pqRenderWindowManager::onFrameAdded(pqMultiViewFrame* frame)
 
   this->Internal->ActiveRenderModule =  rm;
   emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
-
+  pqActiveView::instance().setCurrent(this->Internal->ActiveRenderModule);
 }
 
 //-----------------------------------------------------------------------------
@@ -294,6 +295,7 @@ void pqRenderWindowManager::onRenderModuleRemoved(pqRenderModule* rm)
     {
     this->Internal->ActiveRenderModule = 0;
     emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
+    pqActiveView::instance().setCurrent(this->Internal->ActiveRenderModule);
     if (this->Internal->Frames.size() > 0)
       {
       // Activate some other view, so that atleast one view is active.
@@ -322,11 +324,14 @@ void pqRenderWindowManager::onActivate(QWidget* obj)
       }
     }
   emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
+  pqActiveView::instance().setCurrent(this->Internal->ActiveRenderModule);
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderWindowManager::setActiveRenderModule(pqRenderModule* ren)
+void pqRenderWindowManager::setActiveView(pqGenericViewModule* view)
 {
+  pqRenderModule* ren = qobject_cast<pqRenderModule*>(view);
+  
   if (this->Internal->ActiveRenderModule == ren)
     {
     return;
@@ -345,14 +350,6 @@ void pqRenderWindowManager::setActiveRenderModule(pqRenderModule* ren)
       qobject_cast<pqMultiViewFrame*>(ren->getWindowParent());
     frame->setActive(false);    
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderWindowManager::setActiveRenderModuleSilently(pqRenderModule* ren)
-{
-  this->blockSignals(true);
-  this->setActiveRenderModule(ren);
-  this->blockSignals(false);
 }
 
 //-----------------------------------------------------------------------------

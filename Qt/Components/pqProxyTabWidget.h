@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqProxy;
+class pqGenericViewModule;
 class pqRenderModule;
 class pqObjectInspectorWidget;
 class pqDisplayProxyEditor;
@@ -63,7 +64,7 @@ public slots:
   void setProxy(pqProxy* source);
   
   /// set the current render module that these panels work on
-  void setRenderModule(pqRenderModule* rm);
+  void setView(pqGenericViewModule* rm);
 
 protected slots:
   void updateDisplayTab();

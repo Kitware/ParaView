@@ -82,8 +82,10 @@ pqDisplayRepresentationWidget::~pqDisplayRepresentationWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayRepresentationWidget::setRenderModule(pqRenderModule* rm)
+void pqDisplayRepresentationWidget::setView(pqGenericViewModule* view)
 {
+  pqRenderModule* rm = qobject_cast<pqRenderModule*>(view);
+
   if (this->Internal->RenderModule)
     {
     QObject::disconnect(this->Internal->RenderModule, 0, this, 0);

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QMainWindow>
 
+#include "pqActiveView.h"
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
 #include "pqPlotViewModule.h"
@@ -46,7 +47,6 @@ class pqPlotManagerInternal
 {
 public:
   QMap<QObject*, pqPlotViewModule*> DockViewMap;
-  QPointer<pqPlotViewModule> ActiveView;
 };
 
 //-----------------------------------------------------------------------------
@@ -127,7 +127,7 @@ bool pqPlotManager::eventFilter(QObject* obj, QEvent* evt)
   QWidget* wdg = qobject_cast<QWidget*>(obj);
   if (wdg && evt ->type() == QEvent::FocusIn)
     {
-    this->setActiveView(this->getViewModule(wdg));
+    pqActiveView::instance().setCurrent(this->getViewModule(wdg));
     }
 
   return QObject::eventFilter(obj, evt);
@@ -144,22 +144,6 @@ pqPlotViewModule* pqPlotManager::getViewModule(QWidget* widget)
       }
     }
   return 0;
-}
-
-//-----------------------------------------------------------------------------
-void pqPlotManager::setActiveViewSilently(pqPlotViewModule* view)
-{
-  this->Internal->ActiveView = view;
-}
-
-//-----------------------------------------------------------------------------
-void pqPlotManager::setActiveView(pqPlotViewModule* view)
-{
-  if (this->Internal->ActiveView != view)
-    {
-    this->Internal->ActiveView = view;
-    emit this->activeViewChanged(view);
-    }
 }
 
 //-----------------------------------------------------------------------------

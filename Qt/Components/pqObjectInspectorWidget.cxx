@@ -137,8 +137,9 @@ void pqObjectInspectorWidget::canAccept(bool status)
   this->ResetButton->setEnabled(status);
 }
 
-void pqObjectInspectorWidget::setRenderModule(pqRenderModule* rm)
+void pqObjectInspectorWidget::setView(pqGenericViewModule* view)
 {
+  pqRenderModule* rm = qobject_cast<pqRenderModule*>(view);
   this->RenderModule = rm;
   emit this->renderModuleChanged(this->RenderModule);
 }

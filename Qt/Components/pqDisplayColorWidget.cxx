@@ -263,13 +263,13 @@ void pqDisplayColorWidget::updateGUI()
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayColorWidget::setRenderModule(pqRenderModule* renModule)
+void pqDisplayColorWidget::setView(pqGenericViewModule* view)
 {
   if (this->RenderModule)
     {
     QObject::disconnect(this->RenderModule, 0, this, 0);
     }
-  this->RenderModule = renModule;
+  this->RenderModule = qobject_cast<pqRenderModule*>(view);
   if (this->RenderModule)
     {
     QObject::connect(this->RenderModule, SIGNAL(displayAdded(pqDisplay*)), 

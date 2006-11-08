@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 
 class pqPipelineSource;
-class pqRenderModule;
+class pqGenericViewModule;
 class QAction;
 
 // pqScalarBarVisibilityAdaptor is an adptor that can be hooked on to
@@ -64,7 +64,7 @@ public slots:
   void setActiveSource(pqPipelineSource* source);
 
   // set the active view.
-  void setActiveRenderModule(pqRenderModule* rm);
+  void setActiveView(pqGenericViewModule* rm);
 
 protected slots:
   void updateEnableState();

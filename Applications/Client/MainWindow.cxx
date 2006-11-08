@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_MainWindow.h"
 
+#include <pqActiveView.h>
 #include <pqApplicationCore.h>
 #include <pqMainWindowCore.h>
 #include <pqObjectInspectorWidget.h>
@@ -588,8 +589,8 @@ MainWindow::MainWindow() :
     &this->Implementation->Core, SIGNAL(activeSourceChanged(pqPipelineSource*)),
     sbva, SLOT(setActiveSource(pqPipelineSource*)));
   QObject::connect(
-    &this->Implementation->Core, SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
-    sbva, SLOT(setActiveRenderModule(pqRenderModule*)));
+    &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
+    sbva, SLOT(setActiveView(pqGenericViewModule*)));
 
 
   // Restore the state of the window ...
