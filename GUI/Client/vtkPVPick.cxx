@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.38");
+vtkCxxRevisionMacro(vtkPVPick, "1.39");
 
 
 //*****************************************************************************
@@ -94,6 +94,7 @@ public:
             prop->Modified();
             }
           this->TemporalPickProxy->UpdateVTKObjects();
+          this->PVPick->UpdateGUI();
           break;
           }
         case vtkCommand::AnimationCueTickEvent:
@@ -115,6 +116,7 @@ public:
             }
 
           this->TemporalPickProxy->UpdateVTKObjects();
+          this->PVPick->UpdateGUI();
           break;
           }
         }
@@ -597,6 +599,7 @@ void vtkPVPick::UpdateGUI()
     return;
     }
 
+  this->PointLabelDisplayProxy->InvalidateGeometry();
   vtkUnstructuredGrid* d = this->PointLabelDisplayProxy->GetCollectedData();
   if (d == 0)
     {
