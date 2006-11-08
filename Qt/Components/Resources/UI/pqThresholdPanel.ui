@@ -41,7 +41,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="ThresholdBetween:Spin:1" />
+      <widget class="QDoubleSpinBox" name="ThresholdBetween_Spin_1" />
      </item>
     </layout>
    </item>
@@ -64,7 +64,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="ThresholdBetween:Spin:0" />
+      <widget class="QDoubleSpinBox" name="ThresholdBetween_Spin_0" />
      </item>
     </layout>
    </item>
@@ -126,10 +126,10 @@
     </widget>
    </item>
    <item row="0" column="1" colspan="2" >
-    <widget class="QComboBox" name="SelectInputScalars:mode" />
+    <widget class="QComboBox" name="SelectInputScalars_mode" />
    </item>
    <item row="1" column="1" colspan="2" >
-    <widget class="QComboBox" name="SelectInputScalars:scalars" />
+    <widget class="QComboBox" name="SelectInputScalars_scalars" />
    </item>
   </layout>
  </widget>

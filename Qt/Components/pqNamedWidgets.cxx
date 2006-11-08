@@ -91,7 +91,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
     // update domains that we might ask for
     SMProperty->UpdateDependentDomains();
 
-    const QString regex = QString("^%1$|^%1:.*$").arg(iter->GetKey());
+    const QString regex = QString("^%1$|^%1_.*$").arg(iter->GetKey());
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
     for(int i=0; i<foundObjects.size(); i++)
       {
@@ -104,9 +104,9 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
         if(propertyWidget)
           {
           int index = -1;
-          // get the index from the name
+          // get the index from the name, which should be at the end
           QString name = propertyWidget->objectName();
-          QStringList split = name.split(':');
+          QStringList split = name.split('_');
           if(split.size() > 1)
             {
             bool ok = false;
@@ -364,7 +364,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
         QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
         if(comboBox)
           {
-          if(comboBox->objectName().contains(QRegExp(":mode$")))
+          if(comboBox->objectName().contains(QRegExp("_mode$")))
             {
             pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty, 0);
             d0->setObjectName("FieldModeDomain");
@@ -376,7 +376,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
               adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
               proxy, SMProperty, 0);  // 0 means link mode for field selection
             }
-          if(comboBox->objectName().contains(QRegExp(":scalars$")))
+          if(comboBox->objectName().contains(QRegExp("_scalars$")))
             {
             pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty, 1);
             d0->setObjectName("FieldScalarsDomain");
@@ -412,7 +412,7 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
       continue;
       }
 
-    const QString regex = QString("^%1$|^%1:.*$").arg(iter->GetKey());
+    const QString regex = QString("^%1$|^%1_.*$").arg(iter->GetKey());
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
     for(int i=0; i<foundObjects.size(); i++)
       {
@@ -428,7 +428,7 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
           int index = -1;
           // get the index from the name
           QString name = propertyWidget->objectName();
-          QStringList split = name.split(':');
+          QStringList split = name.split('_');
           if(split.size() > 1)
             {
             bool ok = false;
@@ -659,7 +659,7 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
         QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
         if(comboBox)
           {
-          if(comboBox->objectName().contains(QRegExp(":mode$")))
+          if(comboBox->objectName().contains(QRegExp("_mode$")))
             {
             pqComboBoxDomain* d0 =
               comboBox->findChild<pqComboBoxDomain*>("FieldModeDomain");
@@ -679,7 +679,7 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
               delete adaptor;
               }
             }
-          if(comboBox->objectName().contains(QRegExp(":scalars$")))
+          if(comboBox->objectName().contains(QRegExp("_scalars$")))
             {
             pqComboBoxDomain* d0 =
               comboBox->findChild<pqComboBoxDomain*>("FieldScalarsDomain");

@@ -39,10 +39,10 @@
       <number>4</number>
      </property>
      <item row="2" column="1" colspan="2" >
-      <widget class="QSpinBox" name="FileRange:0" />
+      <widget class="QSpinBox" name="FileRange_0" />
      </item>
      <item rowspan="2" row="3" column="1" colspan="2" >
-      <widget class="QSpinBox" name="FileRange:1" />
+      <widget class="QSpinBox" name="FileRange_1" />
      </item>
      <item row="4" column="0" >
       <widget class="QLabel" name="label" >
