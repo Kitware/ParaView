@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.13");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
@@ -88,9 +88,11 @@ void vtkPVIceTDesktopRenderModuleUI::CreateWidget()
     this->OrderedCompositingCheck->GetSelectedState());
 
   this->OrderedCompositingCheck->SetBalloonHelpString(
-    "Toggle the disable the use of ordered compositing.  Ordered compositing "
+    "Toggle the use of ordered compositing.  Ordered compositing "
     "makes updates and animations slower, but makes volume rendering correct "
-    "and may speed up compositing in general.");
+    "and may speed up compositing in general. If on, ordered compositing "
+    "is always disabled. If off, ordered compositing is used when necessary "
+    "(when volume rendering and using transparency.");
 
   this->Script("pack %s -side top -anchor w",
                this->OrderedCompositingCheck->GetWidgetName());
@@ -117,7 +119,7 @@ void vtkPVIceTDesktopRenderModuleUI::SetOrderedCompositingFlag(int state)
     this->RenderModuleProxy->GetProperty("DisableOrderedCompositing"));
   if (!ivp)
     {
-    vtkErrorMacro("Failed to find property OrderedCompositing on "
+    vtkErrorMacro("Failed to find property DisableOrderedCompositing on "
                   "RenderModuleProxy.");
     return;
     }
