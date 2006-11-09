@@ -32,6 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // python header first
 #include "vtkPython.h"
+#ifndef PyMODINIT_FUNC
+#define PyMODINIT_FUNC extern "C" void
+#endif // PyMODINIT_FUNC
 
 // self include
 #include "pqPythonEventSourceImage.h"

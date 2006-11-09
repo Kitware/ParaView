@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // python header first
 // TODO:  Fix this so we don't depend on VTK
 #include "vtkPython.h"
+#ifndef PyMODINIT_FUNC
+#define PyMODINIT_FUNC extern "C" void
+#endif // PyMODINIT_FUNC
 
 // self include
 #include "pqPythonEventSource.h"
