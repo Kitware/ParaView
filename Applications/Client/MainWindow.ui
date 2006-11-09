@@ -16,7 +16,7 @@
    <string>MainWindow</string>
   </property>
   <property name="windowIcon" >
-   <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqAppIcon64.png</iconset>
+   <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqAppIcon64.png</iconset>
   </property>
   <property name="toolButtonStyle" >
    <enum>Qt::ToolButtonIconOnly</enum>
@@ -396,7 +396,7 @@
   </widget>
   <action name="actionFileOpen" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqOpen22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqOpen22.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Open</string>
@@ -426,7 +426,7 @@
   </action>
   <action name="actionHelpHelp" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqHelp22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqHelp22.png</iconset>
    </property>
    <property name="text" >
     <string>Help</string>
@@ -445,7 +445,7 @@
   </action>
   <action name="actionServerConnect" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqConnect22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqConnect22.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Connect</string>
@@ -453,7 +453,7 @@
   </action>
   <action name="actionServerDisconnect" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqDisconnect22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqDisconnect22.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Disconnect</string>
@@ -471,7 +471,7 @@
   </action>
   <action name="actionVCRPreviousFrame" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrBack22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrBack22.png</iconset>
    </property>
    <property name="text" >
     <string>Pre&amp;vious Frame</string>
@@ -479,7 +479,7 @@
   </action>
   <action name="actionVCRFirstFrame" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrFirst22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrFirst22.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;First Frame</string>
@@ -487,7 +487,7 @@
   </action>
   <action name="actionVCRNextFrame" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrForward22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrForward22.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Next Frame</string>
@@ -495,7 +495,7 @@
   </action>
   <action name="actionVCRLastFrame" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrLast22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrLast22.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Last Frame</string>
@@ -503,7 +503,7 @@
   </action>
   <action name="actionFileSaveData" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqFloppyDisk22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqFloppyDisk22.png</iconset>
    </property>
    <property name="text" >
     <string>Save Data</string>
@@ -544,7 +544,7 @@
     <bool>true</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqPointer22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqPointer22.png</iconset>
    </property>
    <property name="text" >
     <string>Move Mode</string>
@@ -558,7 +558,7 @@
     <bool>true</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqSelectPointer22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSelectPointer22.png</iconset>
    </property>
    <property name="text" >
     <string>Selection Mode (s)</string>
@@ -575,7 +575,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqUndo22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqUndo22.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Undo</string>
@@ -589,7 +589,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqRedo22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqRedo22.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Redo</string>
@@ -655,7 +655,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrPlay22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrPlay22.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Play</string>
@@ -666,7 +666,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrPause22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrPause22.png</iconset>
    </property>
    <property name="text" >
     <string>Pa&amp;use</string>
@@ -819,7 +819,7 @@
  </widget>
  <pixmapfunction></pixmapfunction>
  <resources>
-  <include location="../../Qt/Components/Resources/pqResources.qrc" />
+  <include location="../../Qt/Components/Resources/pqComponents.qrc" />
  </resources>
  <connections/>
 </ui>
