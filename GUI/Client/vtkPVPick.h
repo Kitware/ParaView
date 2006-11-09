@@ -21,8 +21,6 @@
 
 #include "vtkPVSource.h"
 
-class vtkSMPointLabelDisplayProxy;
-
 class vtkCollection;
 class vtkKWFrame;
 class vtkKWLabel;
