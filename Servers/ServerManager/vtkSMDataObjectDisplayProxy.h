@@ -15,7 +15,7 @@
 // .NAME vtkSMDataObjectDisplayProxy - a simple display proxy.
 // .SECTION Description
 // vtkSMDataObjectDisplayProxy is a sink for display objects. 
-// This is the superclass for objects that display PVParts.
+// This is the superclass for objects that display data objects.
 // Not meant to be used directly, although this implements the simplest
 // serial display with no LOD. This class has a bunch of 
 // "convenience methods" (method names appended with CM). These methods
