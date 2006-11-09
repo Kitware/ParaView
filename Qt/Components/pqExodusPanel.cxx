@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
+#include "ui_pqExodusPanel.h"
 
 // we include this for static plugins
 #define QT_STATICPLUGIN
@@ -78,9 +79,18 @@ bool pqExodusPanelInterface::canCreatePanel(pqProxy* proxy) const
 Q_EXPORT_PLUGIN(pqExodusPanelInterface)
 
 
-pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
-  pqLoadedFormObjectPanel(":/pqWidgets/UI/pqExodusPanel.ui", object_proxy, p)
+class pqExodusPanel::pqUI : public QObject, public Ui::ExodusPanel 
 {
+public:
+  pqUI(pqExodusPanel* p) : QObject(p) {}
+};
+
+pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
+  pqNamedObjectPanel(object_proxy, p)
+{
+  this->UI = new pqUI(this);
+  this->UI->setupUi(this);
+  
   this->DisplItem = 0;
   QObject::connect(this->propertyManager(), 
                    SIGNAL(canAcceptOrReject(bool)),
@@ -97,7 +107,7 @@ pqExodusPanel::~pqExodusPanel()
 void pqExodusPanel::linkServerManagerProperties()
 {
   // parent class hooks up some of our widgets in the ui
-  pqLoadedFormObjectPanel::linkServerManagerProperties();
+  pqNamedObjectPanel::linkServerManagerProperties();
   
   this->DisplItem = 0;
 
@@ -112,32 +122,27 @@ void pqExodusPanel::linkServerManagerProperties()
   range = pqSMAdaptor::getElementPropertyDomain(
        this->proxy()->getProxy()->GetProperty("TimeStep"));
 
-  QSlider* timeSlider = this->findChild<QSlider*>("TimeStep");
-  QSpinBox* timeSpin = this->findChild<QSpinBox*>("TimeStep:Spin");
-  QLabel* timeMin = this->findChild<QLabel*>("TimeStepMin");
-  QLabel* timeMax = this->findChild<QLabel*>("TimeStepMax");
-
   if((range.size() == 2) && (range[1] != -1))
     {
-    timeSlider->setEnabled(true);
-    timeSlider->setRange(range[0].toInt(), 
+    this->UI->TimeStep->setEnabled(true);
+    this->UI->TimeStep->setRange(range[0].toInt(), 
                          range[1].toInt());
-    timeSpin->setEnabled(true);
-    timeSpin->setRange(range[0].toInt(), 
+    this->UI->TimeStep_Spin->setEnabled(true);
+    this->UI->TimeStep_Spin->setRange(range[0].toInt(), 
                        range[1].toInt());
-    timeMin->setText(range[0].toString());
-    timeMax->setText(range[1].toString());
+    this->UI->TimeStepMin->setText(range[0].toString());
+    this->UI->TimeStepMax->setText(range[1].toString());
     }
   else
     {
-    timeMin->setText("0");
-    timeMax->setText("0");
-    timeSlider->setEnabled(false);
-    timeSpin->setEnabled(false);
+    this->UI->TimeStepMin->setText("0");
+    this->UI->TimeStepMax->setText("0");
+    this->UI->TimeStep->setEnabled(false);
+    this->UI->TimeStep_Spin->setEnabled(false);
     }
 
   // we hook up the node/element variables
-  QTreeWidget* VariablesTree = this->findChild<QTreeWidget*>("Variables");
+  QTreeWidget* VariablesTree = this->UI->Variables;
   pqTreeWidgetItemObject* item;
   QList<QString> strs;
   QString varName;
@@ -232,7 +237,7 @@ void pqExodusPanel::linkServerManagerProperties()
                      this, SLOT(displChanged(bool)));
 
     // connect the apply displacements check box with the "DISPL" node variable
-    QCheckBox* ApplyDisp = this->findChild<QCheckBox*>("ApplyDisplacements");
+    QCheckBox* ApplyDisp = this->UI->ApplyDisplacements;
     QObject::connect(ApplyDisp, SIGNAL(stateChanged(int)),
                      this, SLOT(applyDisplacements(int)));
     this->applyDisplacements(Qt::Checked);
@@ -240,13 +245,13 @@ void pqExodusPanel::linkServerManagerProperties()
     }
   else
     {
-    QCheckBox* ApplyDisp = this->findChild<QCheckBox*>("ApplyDisplacements");
+    QCheckBox* ApplyDisp = this->UI->ApplyDisplacements;
     this->applyDisplacements(Qt::Unchecked);
     ApplyDisp->setEnabled(false);
     }
 
   // we hook up the sideset/nodeset 
-  QTreeWidget* SetsTree = this->findChild<QTreeWidget*>("Sets");
+  QTreeWidget* SetsTree = this->UI->Sets;
   
   // do the sidesets
   vtkSMProperty* SideProperty = this->proxy()->getProxy()->GetProperty("SideSetArrayStatus");
@@ -287,7 +292,7 @@ void pqExodusPanel::linkServerManagerProperties()
   // update ranges to begin with
   this->updateDataRanges();
 
-  QTreeWidget* BlockTree = this->findChild<QTreeWidget*>("BlockArrayStatus");
+  QTreeWidget* BlockTree = this->UI->BlockArrayStatus;
 
   QAction* a;
   a = new QAction("All Blocks On", BlockTree);
@@ -328,16 +333,15 @@ void pqExodusPanel::applyDisplacements(int state)
     {
     this->DisplItem->setCheckState(0, Qt::Checked);
     }
-  QDoubleSpinBox* Mag;
-  Mag = this->findChild<QDoubleSpinBox*>("DisplacementMagnitude");
-  Mag->setEnabled(state == Qt::Checked ? true : false);
+  this->UI->DisplacementMagnitude->setEnabled(state == Qt::Checked ? 
+                                                  true : false);
 }
 
 void pqExodusPanel::displChanged(bool state)
 {
   if(!state)
     {
-    QCheckBox* ApplyDisp = this->findChild<QCheckBox*>("ApplyDisplacements");
+    QCheckBox* ApplyDisp = this->UI->ApplyDisplacements;
     ApplyDisp->setCheckState(Qt::Unchecked);
     }
 }
@@ -401,7 +405,7 @@ void pqExodusPanel::updateDataRanges()
     }
   vtkPVArrayInformation* ai;
   
-  QTreeWidget* VariablesTree = this->findChild<QTreeWidget*>("Variables");
+  QTreeWidget* VariablesTree = this->UI->Variables;
   pqTreeWidgetItemObject* item;
   QString dataString;
   
@@ -496,7 +500,7 @@ void pqExodusPanel::blocksOff()
 
 void pqExodusPanel::blocksToggle(Qt::CheckState c)
 {
-  QTreeWidget* Tree = this->findChild<QTreeWidget*>("BlockArrayStatus");
+  QTreeWidget* Tree = this->UI->BlockArrayStatus;
   this->toggle(Tree, c);
 }
 
@@ -513,7 +517,7 @@ void pqExodusPanel::variablesOff()
 
 void pqExodusPanel::variablesToggle(Qt::CheckState c)
 {
-  QTreeWidget* Tree = this->findChild<QTreeWidget*>("Variables");
+  QTreeWidget* Tree = this->UI->Variables;
   this->toggle(Tree, c);
 }
 
@@ -530,7 +534,7 @@ void pqExodusPanel::setsOff()
 
 void pqExodusPanel::setsToggle(Qt::CheckState c)
 {
-  QTreeWidget* Tree = this->findChild<QTreeWidget*>("Sets");
+  QTreeWidget* Tree = this->UI->Sets;
   this->toggle(Tree, c);
 }
 

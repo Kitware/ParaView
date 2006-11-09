@@ -33,14 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqExodusPanel_h
 #define _pqExodusPanel_h
 
-#include "pqLoadedFormObjectPanel.h"
+#include "pqNamedObjectPanel.h"
 #include "pqObjectPanelInterface.h"
 class pqTreeWidgetItemObject;
 class QTreeWidget;
 class vtkPVArrayInformation;
 
 class pqExodusPanel :
-  public pqLoadedFormObjectPanel
+  public pqNamedObjectPanel
 {
   Q_OBJECT
 public:
@@ -69,7 +69,7 @@ protected slots:
   void setsToggle(Qt::CheckState);
   
   void toggle(QTreeWidget*, Qt::CheckState);
-
+  
 protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
@@ -79,6 +79,9 @@ protected:
   pqTreeWidgetItemObject* DisplItem;
 
   bool DataUpdateInProgress;
+
+  class pqUI;
+  pqUI* UI;
 
 };
 

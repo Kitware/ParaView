@@ -2,8 +2,8 @@
  <author></author>
  <comment></comment>
  <exportmacro></exportmacro>
- <class>ExodusReader</class>
- <widget class="QWidget" name="ExodusReader" >
+ <class>ExodusPanel</class>
+ <widget class="QWidget" name="ExodusPanel" >
   <property name="geometry" >
    <rect>
     <x>0</x>

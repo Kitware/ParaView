@@ -71,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpinBoxDomain.h"
 #include "pqDoubleSpinBoxDomain.h"
 #include "pqSliderDomain.h"
+#include "pqFileChooserWidget.h"
 
 void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
 {
@@ -352,10 +353,18 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
       else if(pt == pqSMAdaptor::FILE_LIST)
         {
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
+        pqFileChooserWidget* chooser = 
+               qobject_cast<pqFileChooserWidget*>(foundObject);
         if(lineEdit)
           {
           property_manager->registerLink(
             lineEdit, "text", SIGNAL(textChanged(const QString&)),
+            proxy, SMProperty);
+          }
+        else if(chooser)
+          {
+          property_manager->registerLink(
+            chooser, "Filename", SIGNAL(filenameChanged(const QString&)),
             proxy, SMProperty);
           }
         }
@@ -647,10 +656,18 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
       else if(pt == pqSMAdaptor::FILE_LIST)
         {
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
+        pqFileChooserWidget* chooser = 
+               qobject_cast<pqFileChooserWidget*>(foundObject);
         if(lineEdit)
           {
           property_manager->unregisterLink(
             lineEdit, "text", SIGNAL(textChanged(const QString&)),
+            proxy, SMProperty);
+          }
+        else if(chooser)
+          {
+          property_manager->unregisterLink(
+            chooser, "Filename", SIGNAL(filenameChanged(const QString&)),
             proxy, SMProperty);
           }
         }

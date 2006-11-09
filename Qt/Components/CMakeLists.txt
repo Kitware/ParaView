@@ -64,6 +64,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqEditServerStartupDialog.h
   pqElementInspectorWidget.h
   pqExodusPanel.h
+  pqFileChooserWidget.h
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
@@ -134,6 +135,7 @@ SET(UI_FORMS
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqDisplayProxyEditor.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
+  Resources/UI/pqExodusPanel.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqLineWidget.ui
@@ -234,6 +236,8 @@ ADD_LIBRARY(pqComponents
   pqElementInspectorWidget.h
   pqExodusPanel.cxx
   pqExodusPanel.h
+  pqFileChooserWidget.cxx
+  pqFileChooserWidget.h
   pqHandleWidget.cxx
   pqHandleWidget.h
   pqImageTip.cxx
