@@ -676,14 +676,17 @@ void MainWindow::onHelpHelp()
   
 #if defined(Q_WS_WIN)
   const char* assistantName = "assistant.exe";
+  const char* binDir = "/";
 #elif defined(Q_WS_MAC)
-  const char* assistantName = "assistant.app/Contents/MacOS/assistant";
+  const char* assistantName = "assistant";
+  const char* binDir = "/../../../";
 #else
   const char* assistantName = "assistant";
+  const char* binDir = "/";
 #endif
   
-  QString helper = QCoreApplication::applicationDirPath() + QDir::separator()
-    + QString("pqClientDocFinder.txt");
+  QString helper = QCoreApplication::applicationDirPath() +
+    binDir + QString("pqClientDocFinder.txt");
   if(QFile::exists(helper))
     {
     QFile file(helper);
