@@ -673,20 +673,26 @@ void MainWindow::onHelpHelp()
 
   QString assistantExe;
   QString profileFile;
-  
+
+  const char* assistantName = "assistant";
 #if defined(Q_WS_WIN)
-  const char* assistantName = "assistant.exe";
-  const char* binDir = "/";
+  const char* binDir = "\\";
+  const char* binDir1 = "\\..\\";
 #elif defined(Q_WS_MAC)
-  const char* assistantName = "assistant";
-  const char* binDir = "/../../../";
-#else
-  const char* assistantName = "assistant";
   const char* binDir = "/";
+  const char* binDir1 = "/../../../";
+#else
+  const char* binDir = "/";
+  const char* binDir1 = "/";
 #endif
   
   QString helper = QCoreApplication::applicationDirPath() +
     binDir + QString("pqClientDocFinder.txt");
+  if(!QFile::exists(helper))
+    {
+    helper = QCoreApplication::applicationDirPath() +
+      binDir1 + QString("pqClientDocFinder.txt");
+    }
   if(QFile::exists(helper))
     {
     QFile file(helper);
@@ -702,10 +708,7 @@ void MainWindow::onHelpHelp()
     QString assistant = QCoreApplication::applicationDirPath();
     assistant += QDir::separator();
     assistant += assistantName;
-    if(QFile::exists(assistant))
-      {
-      assistantExe = assistant;
-      }
+    assistantExe = assistant;
     }
 
   this->Implementation->AssistantClient = 
