@@ -1420,7 +1420,8 @@
      <StringVectorProperty
         name="XMLFileName"
         command="SetXMLFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        information_property="XMLFileNameInfo" >
        <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
              <Property name="XMLFileNameInfo" function="XMLFileName"/>
@@ -1595,7 +1596,13 @@
         name="DisplayType"
         command="SetDisplayType"
         number_of_elements="1" 
-        default_values="1"/>
+        default_values="1">
+       <EnumerationDomain name="enum">
+         <Entry value="1" text="Blocks"/>
+         <Entry value="2" text="Hierarchy"/>
+         <Entry value="3" text="Materials"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
 
      <StringVectorProperty 
         name="BlockArrayInfo"
