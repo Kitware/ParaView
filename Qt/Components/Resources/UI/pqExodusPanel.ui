@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>253</width>
-    <height>535</height>
+    <height>528</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -36,61 +36,47 @@
       <number>0</number>
      </property>
      <property name="spacing" >
-      <number>4</number>
+      <number>6</number>
      </property>
-     <item row="2" column="1" colspan="2" >
-      <widget class="QSpinBox" name="FileRange_0" />
-     </item>
-     <item rowspan="2" row="3" column="1" colspan="2" >
+     <item rowspan="2" row="1" column="1" >
       <widget class="QSpinBox" name="FileRange_1" />
      </item>
-     <item row="4" column="0" >
+     <item row="0" column="1" >
+      <widget class="QSpinBox" name="FileRange_0" />
+     </item>
+     <item row="2" column="0" >
       <widget class="QLabel" name="label" >
        <property name="text" >
-        <string>Last index</string>
+        <string>Last file index</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0" >
-      <widget class="QLabel" name="label_6" >
-       <property name="text" >
-        <string>File pattern</string>
-       </property>
-      </widget>
-     </item>
-     <item rowspan="2" row="2" column="0" >
+     <item rowspan="2" row="0" column="0" >
       <widget class="QLabel" name="label_3" >
        <property name="text" >
-        <string>First index</string>
+        <string>First file index</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1" colspan="2" >
-      <widget class="QLineEdit" name="FilePattern" >
-       <property name="enabled" >
-        <bool>true</bool>
-       </property>
-       <property name="readOnly" >
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0" >
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
       <widget class="QLabel" name="label_4" >
        <property name="text" >
-        <string>File prefix</string>
+        <string>XML file</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1" colspan="2" >
-      <widget class="QLineEdit" name="FilePrefix" >
-       <property name="enabled" >
-        <bool>true</bool>
-       </property>
-       <property name="readOnly" >
-        <bool>true</bool>
-       </property>
-      </widget>
+     <item>
+      <widget class="pqFileChooserWidget" name="XMLFileName" />
      </item>
     </layout>
    </item>
@@ -128,9 +114,6 @@
        </property>
        <property name="wordWrap" >
         <bool>true</bool>
-       </property>
-       <property name="buddy" >
-        <cstring></cstring>
        </property>
       </widget>
      </item>
@@ -243,21 +226,65 @@
     </layout>
    </item>
    <item>
-    <widget class="QTreeWidget" name="BlockArrayStatus" >
-     <property name="minimumSize" >
-      <size>
-       <width>0</width>
-       <height>100</height>
-      </size>
+    <widget class="QTabWidget" name="DisplayType" >
+     <property name="currentIndex" >
+      <number>0</number>
      </property>
-     <property name="rootIsDecorated" >
-      <bool>false</bool>
-     </property>
-     <column>
-      <property name="text" >
+     <widget class="QWidget" name="tab_3" >
+      <attribute name="title" >
        <string>Blocks</string>
-      </property>
-     </column>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="QListWidget" name="BlockArrayStatus" >
+         <property name="minimumSize" >
+          <size>
+           <width>0</width>
+           <height>5</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab" >
+      <attribute name="title" >
+       <string>Hierarchy</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="QListWidget" name="HierarchyArrayStatus" />
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2" >
+      <attribute name="title" >
+       <string>Materials</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="QListWidget" name="MaterialArrayStatus" />
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -281,6 +308,15 @@
   </layout>
  </widget>
  <pixmapfunction></pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>pqFileChooserWidget</class>
+   <extends>QWidget</extends>
+   <header>pqFileChooserWidget.h</header>
+   <container>0</container>
+   <pixmap></pixmap>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

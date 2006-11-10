@@ -166,10 +166,18 @@ void pqSliderDomain::internalDomainChanged()
     range = pqSMAdaptor::getElementPropertyDomain(this->Internal->Property);
     if(range.size() == 2)
       {
-      double min = range[0].toDouble() * this->Internal->ScaleFactor;
-      double max = range[1].toDouble() * this->Internal->ScaleFactor;
-      slider->setMinimum(qRound(min));
-      slider->setMaximum(qRound(max));
+      int min = qRound(range[0].toDouble() * this->Internal->ScaleFactor);
+      int max = qRound(range[1].toDouble() * this->Internal->ScaleFactor);
+      if(min < max)
+        {
+        slider->setEnabled(true);
+        slider->setMinimum(min);
+        slider->setMaximum(max);
+        }
+      else
+        {
+        slider->setEnabled(false);
+        }
       }
     }
   else if(type == pqSMAdaptor::MULTIPLE_ELEMENTS)
@@ -179,10 +187,18 @@ void pqSliderDomain::internalDomainChanged()
                                                           this->Internal->Index);
     if(range.size() == 2)
       {
-      double min = range[0].toDouble() * this->Internal->ScaleFactor;
-      double max = range[1].toDouble() * this->Internal->ScaleFactor;
-      slider->setMinimum(qRound(min));
-      slider->setMaximum(qRound(max));
+      int min = qRound(range[0].toDouble() * this->Internal->ScaleFactor);
+      int max = qRound(range[1].toDouble() * this->Internal->ScaleFactor);
+      if(min < max)
+        {
+        slider->setEnabled(true);
+        slider->setMinimum(min);
+        slider->setMaximum(max);
+        }
+      else
+        {
+        slider->setEnabled(false);
+        }
       }
     }
   this->Internal->MarkedForUpdate = false;

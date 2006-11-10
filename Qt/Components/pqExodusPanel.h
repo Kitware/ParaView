@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectPanelInterface.h"
 class pqTreeWidgetItemObject;
 class QTreeWidget;
+class QListWidget;
 class vtkPVArrayInformation;
 
 class pqExodusPanel :
@@ -69,7 +70,8 @@ protected slots:
   void setsToggle(Qt::CheckState);
   
   void toggle(QTreeWidget*, Qt::CheckState);
-  
+  void toggle(QListWidget*, Qt::CheckState);
+
 protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QTreeWidget>
+#include <QListWidget>
 #include <QVariant>
 #include <QCheckBox>
 #include <QDoubleSpinBox>
@@ -95,6 +96,18 @@ pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
   QObject::connect(this->propertyManager(), 
                    SIGNAL(canAcceptOrReject(bool)),
                    this, SLOT(propertyChanged()));
+
+  this->UI->XMLFileName->setServer(this->proxy()->getServer());
+
+#if QT_VERSION < 0x040200
+  // workaround for Qt bug in plastique style, where painter state wasn't being
+  // restored after a save.
+  // we always want a height greater than 2 anyway
+  this->UI->BlockArrayStatus->setMinimumHeight(2);
+  this->UI->HierarchyArrayStatus->setMinimumHeight(2);
+  this->UI->MaterialArrayStatus->setMinimumHeight(2);
+#endif
+ 
   this->DataUpdateInProgress = false;
   
   this->linkServerManagerProperties();
@@ -109,6 +122,13 @@ void pqExodusPanel::linkServerManagerProperties()
   // parent class hooks up some of our widgets in the ui
   pqNamedObjectPanel::linkServerManagerProperties();
   
+  this->propertyManager()->registerLink(
+    this->UI->DisplayType, 
+    "currentIndex", 
+    SIGNAL(currentChanged(int)),
+    this->proxy()->getProxy(), 
+    this->proxy()->getProxy()->GetProperty("DisplayType"));
+
   this->DisplItem = 0;
 
   QPixmap cellPixmap(":/pqWidgets/Icons/pqCellData16.png");
@@ -291,10 +311,9 @@ void pqExodusPanel::linkServerManagerProperties()
 
   // update ranges to begin with
   this->updateDataRanges();
-
-  QTreeWidget* BlockTree = this->UI->BlockArrayStatus;
-
   QAction* a;
+  
+  QListWidget* BlockTree = this->UI->BlockArrayStatus;
   a = new QAction("All Blocks On", BlockTree);
   a->setObjectName("BlocksOn");
   QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(blocksOn()));
@@ -326,7 +345,7 @@ void pqExodusPanel::linkServerManagerProperties()
   VariablesTree->setContextMenuPolicy(Qt::ActionsContextMenu);
 
 }
-
+  
 void pqExodusPanel::applyDisplacements(int state)
 {
   if(state == Qt::Checked && this->DisplItem)
@@ -500,8 +519,8 @@ void pqExodusPanel::blocksOff()
 
 void pqExodusPanel::blocksToggle(Qt::CheckState c)
 {
-  QTreeWidget* Tree = this->UI->BlockArrayStatus;
-  this->toggle(Tree, c);
+  QListWidget* List = this->UI->BlockArrayStatus;
+  this->toggle(List, c);
 }
 
 
@@ -548,6 +567,20 @@ void pqExodusPanel::toggle(QTreeWidget* Tree, Qt::CheckState c)
       {
       item = Tree->topLevelItem(i);
       item->setCheckState(0, c);
+      }
+    }
+}
+
+void pqExodusPanel::toggle(QListWidget* List, Qt::CheckState c)
+{
+  if(List)
+    {
+    QListWidgetItem* item;
+    int i, end = List->count();
+    for(i=0; i<end; i++)
+      {
+      item = List->item(i);
+      item->setCheckState(c);
       }
     }
 }

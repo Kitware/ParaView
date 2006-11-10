@@ -87,7 +87,6 @@ pqObjectPanel::pqObjectPanel(pqProxy* object_proxy, QWidget* p) :
                    SIGNAL(canAcceptOrReject(bool)));
 
   this->Implementation->Proxy->getProxy()->UpdateVTKObjects();
-  this->Implementation->Proxy->getProxy()->UpdatePropertyInformation();
   vtkSMSourceProxy* sp;
   vtkSMCompoundProxy* cp;
   sp = vtkSMSourceProxy::SafeDownCast(this->Implementation->Proxy->getProxy());
@@ -112,6 +111,7 @@ pqObjectPanel::pqObjectPanel(pqProxy* object_proxy, QWidget* p) :
         }
       }
     }
+  this->Implementation->Proxy->getProxy()->UpdatePropertyInformation();
 }
 
 //-----------------------------------------------------------------------------
@@ -181,7 +181,7 @@ void pqObjectPanel::deselect()
 {
   emit this->ondeselect();
 }
-
+  
 void pqObjectPanel::setRenderModule(pqRenderModule* rm)
 {
   this->Implementation->RenderModule = rm;
