@@ -187,6 +187,7 @@ ENDIF(APPLE)
     SET(PYTHON_TESTS
       HistogramChart
       LoadStateMultiView
+      OpenHelp
       )
   ENDIF(QT_TESTING_WITH_PYTHON)
 
