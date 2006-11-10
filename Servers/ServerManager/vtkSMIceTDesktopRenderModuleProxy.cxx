@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.20");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -58,12 +58,14 @@ vtkSMIceTDesktopRenderModuleProxy::vtkSMIceTDesktopRenderModuleProxy()
 
   this->DisplayManagerProxy = 0;
   this->PKdTreeProxy = 0;
+  this->PKdTreeGeneratorProxy = 0;
 
   this->ServerRenderWindowProxy = 0;
   this->ServerCompositeManagerProxy = 0;
   this->ServerDisplayManagerProxy = 0;
 
   this->RenderModuleId = 0;
+  this->UsingCustomKdTree = 0;
 
   this->PartitionedData = new vtkSMIceTDesktopRenderModuleProxyProxySet;
 }
@@ -117,6 +119,7 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->RenderWindowProxy = this->GetSubProxy("RenderWindow");
   this->DisplayManagerProxy = this->GetSubProxy("DisplayManager");
   this->PKdTreeProxy = this->GetSubProxy("PKdTree");
+  this->PKdTreeGeneratorProxy = this->GetSubProxy("PKdTreeGenerator");
 
   if (!this->RenderWindowProxy)
     {
@@ -142,6 +145,12 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
     return;
     }
 
+  if (!this->PKdTreeGeneratorProxy)
+    {
+    vtkErrorMacro("PKdTreeGenerator subproxy must be defined.");
+    return;
+    }
+
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
@@ -163,6 +172,11 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->DisplayManagerProxy->UpdateVTKObjects();
 
   this->PKdTreeProxy->SetServers(vtkProcessModule::RENDER_SERVER);
+  this->PKdTreeGeneratorProxy->SetServers(vtkProcessModule::RENDER_SERVER);
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->PKdTreeGeneratorProxy->GetProperty("KdTree"));
+  pp->AddProxy(this->PKdTreeProxy);
+  this->PKdTreeGeneratorProxy->UpdateVTKObjects();
 
   // Allow a minimum number of cells in case we break up small data.
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -378,6 +392,20 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
     stream << vtkClientServerStream::Invoke
            << this->PKdTreeProxy->GetID(i) << "AddObserver"
            << "EndEvent" << cmd << vtkClientServerStream::End;
+    }
+
+  for (i=0; i < this->PKdTreeGeneratorProxy->GetNumberOfIDs(); i++)
+    {
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "GetController"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << vtkClientServerStream::LastResult << "GetNumberOfProcesses"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->PKdTreeGeneratorProxy->GetID(i) << "SetNumberOfPieces"
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
     }
   pm->SendStream(this->ConnectionID,
     vtkProcessModule::RENDER_SERVER, stream);
@@ -637,20 +665,51 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
         // For all visibile displays, make sure their geometry is up to date
         // for the k-d tree and make sure the distribution gets updated after
         // the tree is reformed.
+        // At the same time, we will also check if any display is
+        // volume rendering structured data. If so, we need to 
+        // generate the k-d tree using the structured data's distribution.
+        // Currently, at most one display can volume render structured
+        // data.
         displays = this->GetDisplays();
         displays->InitTraversal(cookie);
+        int self_generate_kdtree = 0;
         for (obj = displays->GetNextItemAsObject(cookie); obj != NULL;
-             obj = displays->GetNextItemAsObject(cookie))
+          obj = displays->GetNextItemAsObject(cookie))
           {
           vtkSMCompositeDisplayProxy *disp = 
             vtkSMCompositeDisplayProxy::SafeDownCast(obj);
           if (disp && disp->GetVisibilityCM())
             {
-            disp->SetOrderedCompositing(0);
             disp->Update();
             disp->InvalidateDistributedGeometry();
+
+            if (!self_generate_kdtree &&
+              disp->GetVolumeRenderMode() && disp->GetVolumePipelineType() 
+              == vtkSMDataObjectDisplayProxy::IMAGE_DATA)
+              {
+              // We are volume rendering structured data. We need to build 
+              // the k-d tree using the data distribution. 
+              self_generate_kdtree = 1;
+              disp->BuildKdTreeUsingDataPartitions(this->PKdTreeGeneratorProxy);
+              }
             }
           }
+
+        if (!self_generate_kdtree && this->UsingCustomKdTree)
+          {
+          // we need to ensure that the PKdTreeProxy no longer
+          // uses the user-defined cuts.
+          this->UsingCustomKdTree = 0;
+          vtkClientServerStream stream;
+          vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+          stream << vtkClientServerStream::Invoke
+            << this->PKdTreeProxy->GetID(0)
+            << "SetCuts" << 0
+            << vtkClientServerStream::End;
+          pm->SendStream(this->PKdTreeProxy->GetConnectionID(),
+            this->PKdTreeProxy->GetServers(), stream);
+          }
+        this->UsingCustomKdTree = self_generate_kdtree;
         
         // Build the global k-d tree.
         vtkSMProperty *p = this->PKdTreeProxy->GetProperty("BuildLocator");
@@ -660,8 +719,6 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
       }
     }
 
-  cout << "orderedCompositingNeeded: " << orderedCompositingNeeded 
-       << endl;
   this->SetOrderedCompositing(orderedCompositingNeeded);
 
   this->Superclass::StillRender();

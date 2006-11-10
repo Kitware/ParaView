@@ -1,0 +1,294 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkKdTreeGenerator.cxx
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#include "vtkKdTreeGenerator.h"
+
+#include "vtkBSPCuts.h"
+#include "vtkDataObject.h"
+#include "vtkExtentTranslator.h"
+#include "vtkInformation.h"
+#include "vtkKdNode.h"
+#include "vtkObjectFactory.h"
+#include "vtkPKdTree.h"
+#include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+
+#include <vtkstd/vector>
+
+class vtkKdTreeGeneratorVector : public vtkstd::vector<int> {};
+
+vtkStandardNewMacro(vtkKdTreeGenerator);
+vtkCxxRevisionMacro(vtkKdTreeGenerator, "1.1");
+vtkCxxSetObjectMacro(vtkKdTreeGenerator, ExtentTranslator, vtkExtentTranslator);
+vtkCxxSetObjectMacro(vtkKdTreeGenerator, KdTree, vtkPKdTree);
+//-----------------------------------------------------------------------------
+vtkKdTreeGenerator::vtkKdTreeGenerator()
+{
+  this->NumberOfPieces =1;
+  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
+  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = 1;
+  this->ExtentTranslator = 0;
+  this->Regions = 0;
+  this->KdTree = 0;
+}
+
+//-----------------------------------------------------------------------------
+vtkKdTreeGenerator::~vtkKdTreeGenerator()
+{
+  this->SetKdTree(0);
+  this->SetExtentTranslator(0);
+  delete []this->Regions;
+  this->Regions = 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkKdTreeGeneratorOrder(int* &ptr, vtkKdNode* node)
+{
+  if (node->GetLeft())
+    {
+    vtkKdTreeGeneratorOrder(ptr, node->GetLeft());
+    vtkKdTreeGeneratorOrder(ptr, node->GetRight());
+    }
+  else
+    {
+    *ptr = node->GetID();
+    ptr++;
+    }
+}
+
+//-----------------------------------------------------------------------------
+int vtkKdTreeGenerator::BuildTree(vtkDataObject* data)
+{
+  if (!data)
+    {
+    vtkErrorMacro("Cannot generate k-d tree without any data.");
+    return 0;
+    }
+  // We need the extent translator and the whole extents from the data.
+  vtkInformation* info = data->GetPipelineInformation();
+  vtkStreamingDemandDrivenPipeline* sddp = 
+    vtkStreamingDemandDrivenPipeline::SafeDownCast(
+      info->GetExecutive(vtkExecutive::PRODUCER()));
+  if (sddp)
+    {
+    this->SetExtentTranslator(sddp->GetExtentTranslator(info));
+    int wholeExtent[6];
+    sddp->GetWholeExtent(info, wholeExtent);
+    this->SetWholeExtent(wholeExtent);
+    }
+  else
+    {
+    vtkErrorMacro("Data must be obtained from pipeline so that "
+      " extent translator is available.");
+    return 0;
+    }
+
+  vtkSmartPointer<vtkKdNode> root = vtkSmartPointer<vtkKdNode>::New();
+  root->DeleteChildNodes();
+  root->SetBounds(this->WholeExtent[0], this->WholeExtent[1],
+    this->WholeExtent[2], this->WholeExtent[3],
+    this->WholeExtent[4], this->WholeExtent[5]);
+  root->SetDim(0);
+
+  this->FormRegions();
+  vtkKdTreeGeneratorVector regions_ids;
+  for (int cc=0; cc < this->NumberOfPieces; cc++)
+    {
+    regions_ids.push_back(cc);
+    }
+ if (!this->FormTree(root, regions_ids))
+   {
+   return 0;
+   }
+ vtkSmartPointer<vtkBSPCuts> cuts = vtkBSPCuts::New();
+ cuts->CreateCuts(root);
+ if (!this->KdTree)
+   {
+   vtkPKdTree* tree = vtkPKdTree::New();
+   this->SetKdTree(tree);
+   tree->Delete();
+   }
+ this->KdTree->SetCuts(cuts);
+ // cout  << endl << "Tree: " << endl;
+ // cuts->PrintTree();
+
+ // Now to determine assigments (not much different from inorder traversal printing 
+ // the leaf nodes alone).
+ int *assignments = new int[this->NumberOfPieces];
+ int *ptr = assignments;
+ vtkKdTreeGeneratorOrder(ptr, root);
+ this->KdTree->AssignRegions(assignments, this->NumberOfPieces);
+
+ this->SetExtentTranslator(0);
+ delete []assignments;
+ return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkKdTreeGenerator::FormTree(vtkKdNode* parent, 
+  vtkKdTreeGeneratorVector &regions_ids)
+{
+  if (regions_ids.size() == 1)
+    {
+    // We set the ID here so that it helps us figure out the
+    // region assignments, KdTree will replace these IDs
+    // when it reorders the regions.
+    parent->SetID(regions_ids[0]);
+    parent->SetDim(3);
+    int *extent = &this->Regions[6*regions_ids[0]];
+    parent->SetBounds(extent[0], extent[1], 
+      extent[2], extent[3], extent[4], extent[5]);
+    return 1;
+    }
+  if (regions_ids.size() == 0)
+    {
+    vtkErrorMacro("RegionIDs cannot be 0.");
+    return 0;
+    }
+
+  // Now we must determine how the given regions can be split into
+  // two non-interacting partitions.
+  int start_dim = parent->GetDim();
+  int current_dim = start_dim;
+  if (start_dim == 3)
+    {
+    vtkErrorMacro("Cannot partition leaf node!");
+    return 0;
+    }
+
+  vtkKdTreeGeneratorVector left;
+  vtkKdTreeGeneratorVector right;
+  int division_point = 0;
+  do
+    {
+    for (unsigned int cc=0; cc < regions_ids.size(); cc++)
+      {
+      int region_id = regions_ids[cc];
+      int *region_extents = &this->Regions[6*region_id];
+
+      division_point = region_extents[current_dim*2+1];
+      if (this->CanPartition(division_point, current_dim, 
+          regions_ids, left, right))
+        {
+
+        break;
+        }
+      }
+    if (left.size() > 0 || right.size()>0)
+      {
+      break;
+      }
+    current_dim = (current_dim+1) % 3;
+    } while (current_dim != start_dim);
+
+  parent->SetDim(current_dim);
+
+  vtkKdNode* leftNode = vtkKdNode::New();
+  leftNode->SetDim((current_dim+1) % 3);
+  double bounds[6];
+  parent->GetBounds(bounds);
+  bounds[2*current_dim+1] = division_point;
+  leftNode->SetBounds(bounds);
+
+  if (!this->FormTree(leftNode, left))
+    {
+    leftNode->Delete();
+    return 0;
+    }
+  parent->SetLeft(leftNode);
+  leftNode->Delete();
+
+  vtkKdNode* rightNode = vtkKdNode::New();
+  rightNode->SetDim((current_dim+1) % 3);
+  parent->GetBounds(bounds);
+  bounds[2*current_dim] = division_point;
+  rightNode->SetBounds(bounds);
+  if (!this->FormTree(rightNode, right))
+    {
+    rightNode->Delete();
+    return 0;
+    }
+  parent->SetRight(rightNode);
+  rightNode->Delete();
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkKdTreeGenerator::CanPartition(int division_point, int dimension,
+  vtkKdTreeGeneratorVector& ids,
+  vtkKdTreeGeneratorVector& left, vtkKdTreeGeneratorVector& right)
+{
+  // Iterate over all regions in the ids list and see if the given 
+  // division point is inside any region. If so, return false, 
+  // otherwise true.
+  // On success we update left, right to reflect the regions to the left
+  // and right of the division_point.
+
+  vtkKdTreeGeneratorVector work_left;
+  vtkKdTreeGeneratorVector work_right;
+
+  for (unsigned int cc=0; cc < ids.size(); cc++)
+    {
+    int region_id = ids[cc];
+    int *region_extents = &this->Regions[6*region_id];
+    int min = region_extents[2*dimension];
+    int max = region_extents[2*dimension+1];
+    if (division_point > min && division_point < max)
+      {
+      // division_point intersects some region.
+      // division is not valid.
+      return 0;
+      }
+    if (division_point <= min)
+      {
+      work_right.push_back(region_id);
+      }
+    else
+      {
+      work_left.push_back(region_id);
+      }
+    }
+  if (work_right.size() == 0 || work_left.size() == 0)
+    {
+    return 0;
+    }
+  left = work_left;
+  right = work_right;
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkKdTreeGenerator::FormRegions()
+{
+  delete [] this->Regions;
+  this->Regions = new int[this->NumberOfPieces*6];
+  this->ExtentTranslator->SetWholeExtent(this->WholeExtent);
+  this->ExtentTranslator->SetNumberOfPieces(this->NumberOfPieces);
+  this->ExtentTranslator->SetGhostLevel(0);
+  for (int cc=0; cc < this->NumberOfPieces; cc++)
+    {
+    this->ExtentTranslator->SetPiece(cc);
+    this->ExtentTranslator->PieceToExtent();
+    this->ExtentTranslator->GetExtent(&this->Regions[cc*6]);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkKdTreeGenerator::PrintSelf(ostream&os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "NumberOfPieces: " << this->NumberOfPieces << endl;
+  os << indent << "KdTree: " << this->KdTree << endl;
+}
+

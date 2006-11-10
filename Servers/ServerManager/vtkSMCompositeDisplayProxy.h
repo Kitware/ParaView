@@ -80,6 +80,7 @@ public:
 
   virtual void CacheUpdate(int idx, int total);
 
+  void BuildKdTreeUsingDataPartitions(vtkSMProxy* kdTreeGenerator);
 protected:
   vtkSMCompositeDisplayProxy();
   ~vtkSMCompositeDisplayProxy();

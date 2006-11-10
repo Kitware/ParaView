@@ -29,6 +29,7 @@ SET(Filters_SRCS
   vtkImageCompressor.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
+  vtkKdTreeGenerator.cxx
   vtkMergeArrays.cxx
   vtkMPICompositeManager.cxx
   vtkMPIDuplicatePolyData.cxx
