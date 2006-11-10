@@ -27,7 +27,6 @@ class vtkKWMenu;
 class vtkKWMostRecentFilesManager;
 class vtkKWProgressGauge;
 class vtkKWSeparator;
-class vtkKWTclInteractor;
 class vtkKWToolbar;
 class vtkKWToolbarSet;
 
@@ -246,11 +245,6 @@ public:
   virtual char* GetTitle();
 
   // Description:
-  // Get/display the tcl interactor.
-  virtual vtkKWTclInteractor* GetTclInteractor();
-  virtual void DisplayTclInteractor();
-  
-  // Description:
   // Update the UI. This will call:
   //   UpdateToolbarState
   //   UpdateEnableState 
@@ -386,8 +380,6 @@ protected:
   vtkKWMenu *WindowMenu;
   vtkKWMenu *HelpMenu;
   vtkKWMenu *ToolbarsVisibilityMenu;
-
-  vtkKWTclInteractor *TclInteractor;
 
   // Description:
   // Some constants

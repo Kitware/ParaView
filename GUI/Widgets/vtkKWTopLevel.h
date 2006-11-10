@@ -21,6 +21,7 @@
 #include "vtkKWCoreWidget.h"
 
 class vtkKWMenu;
+class vtkKWTclInteractor;
 
 class KWWidgets_EXPORT vtkKWTopLevel : public vtkKWCoreWidget
 {
@@ -264,6 +265,11 @@ public:
   virtual void SetResizable(int w, int h);
 
   // Description:
+  // Get/display the tcl interactor.
+  virtual vtkKWTclInteractor* GetTclInteractor();
+  virtual void DisplayTclInteractor();
+  
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -286,6 +292,7 @@ protected:
 
   vtkKWWidget *MasterWindow;
   vtkKWMenu   *Menu;
+  vtkKWTclInteractor *TclInteractor;
 
   char *Title;
   char *WindowClass;

@@ -26,14 +26,13 @@
 #include "vtkKWProgressGauge.h"
 #include "vtkKWSeparator.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkKWTkcon.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkObjectFactory.h"
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.52");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.53");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -78,8 +77,6 @@ vtkKWWindowBase::vtkKWWindowBase()
   this->TrayImageError        = vtkKWLabel::New();
   this->TrayFramePosition = 
     vtkKWWindowBase::TrayFramePositionStatusFrame;
-
-  this->TclInteractor         = NULL;
 
   this->SupportHelp           = 0;
   this->SupportPrint          = 0;
@@ -135,12 +132,6 @@ vtkKWWindowBase::vtkKWWindowBase()
 vtkKWWindowBase::~vtkKWWindowBase()
 {
   this->PrepareForDelete();
-
-  if (this->TclInteractor)
-    {
-    this->TclInteractor->Delete();
-    this->TclInteractor = NULL;
-    }
 
   if (this->FileMenu)
     {
@@ -282,13 +273,6 @@ void vtkKWWindowBase::PrepareForDelete()
   // this->MainFrame
   // this->StatusFrameSeparator
   // this->StatusFrame
-
-  if (this->TclInteractor )
-    {
-    this->TclInteractor->SetMasterWindow(NULL);
-    this->TclInteractor->Delete();
-    this->TclInteractor = NULL;
-    }
 
   if (this->MainToolbarSet)
     {
@@ -1187,42 +1171,6 @@ char* vtkKWWindowBase::GetTitle()
 }
 
 //----------------------------------------------------------------------------
-vtkKWTclInteractor* vtkKWWindowBase::GetTclInteractor()
-{
-  if (!this->TclInteractor)
-    {
-    this->TclInteractor = vtkKWTkcon::New();
-    }
-
-  if (!this->TclInteractor->IsCreated() && this->IsCreated())
-    {
-    this->TclInteractor->SetApplication(this->GetApplication());
-    this->TclInteractor->SetMasterWindow(this);
-    this->TclInteractor->Create();
-    }
-  
-  return this->TclInteractor;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindowBase::DisplayTclInteractor()
-{
-  vtkKWTclInteractor *tcl_interactor = this->GetTclInteractor();
-  if (tcl_interactor)
-    {
-    vtksys_stl::string title;
-    if (this->GetTitle())
-      {
-      title += this->GetTitle();
-      title += " : ";
-      }
-    title += ks_("Tcl Interactor Dialog|Title|Tcl Interactor");
-    tcl_interactor->SetTitle(title.c_str());
-    tcl_interactor->Display();
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWindowBase::SetProgressGaugePosition(int s)
 {
   if (s < vtkKWWindowBase::ProgressGaugePositionStatusFrame)
@@ -1331,10 +1279,6 @@ void vtkKWWindowBase::UpdateEnableState()
 
   this->UpdateToolbarState();
 
-  // Update the Tcl interactor
-
-  this->PropagateEnableState(this->TclInteractor);
-
   // Update the window element
 
   this->PropagateEnableState(this->MainFrame);
@@ -1416,7 +1360,6 @@ void vtkKWWindowBase::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SupportPrint: " << this->GetSupportPrint() << endl;
   os << indent << "StatusFrame: " << this->GetStatusFrame() << endl;
   os << indent << "WindowClass: " << this->GetWindowClass() << endl;  
-  os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
   os << indent << "MainToolbarSet: " << this->GetMainToolbarSet() << endl;
   os << indent << "StatusFrameVisibility: " << (this->StatusFrameVisibility ? "On" : "Off") << endl;
   os << indent << "TrayFramePosition: " << this->TrayFramePosition << endl;

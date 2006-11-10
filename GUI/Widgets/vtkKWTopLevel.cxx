@@ -18,12 +18,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWMenu.h"
+#include "vtkKWTkcon.h"
+#include "vtkKWInternationalization.h"
 
 #include <vtksys/stl/string>
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.28");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.29");
 
 //----------------------------------------------------------------------------
 vtkKWTopLevel::vtkKWTopLevel()
@@ -36,6 +38,8 @@ vtkKWTopLevel::vtkKWTopLevel()
   this->Modal           = 0;
   this->DisplayPosition = 
     vtkKWTopLevel::DisplayPositionMasterWindowCenterFirst;
+  this->TclInteractor   = NULL;
+
 }
 
 //----------------------------------------------------------------------------
@@ -49,6 +53,13 @@ vtkKWTopLevel::~vtkKWTopLevel()
     {
     this->Menu->Delete();
     this->Menu = NULL;
+    }
+
+  if (this->TclInteractor)
+    {
+    this->TclInteractor->SetMasterWindow(NULL);
+    this->TclInteractor->Delete();
+    this->TclInteractor = NULL;
     }
 }
 
@@ -97,6 +108,13 @@ void vtkKWTopLevel::CreateWidget()
     }
 
   this->PostCreate();
+
+  // Menu : Window : Tcl Interactor
+
+  if (!this->GetApplication()->GetReleaseMode())
+    {
+    this->SetBinding("<Control-t>", this, "DisplayTclInteractor");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -112,10 +130,14 @@ void vtkKWTopLevel::PostCreate()
   this->Script("wm protocol %s WM_DELETE_WINDOW {%s Withdraw}",
                this->GetWidgetName(), this->GetTclName());
   
-  if (this->GetTitle())
+  const char *title = this->GetTitle();
+  if (!title && this->GetApplication())
     {
-    this->Script("wm title %s \"%s\"", 
-                 this->GetWidgetName(), this->GetTitle());
+    title = this->GetApplication()->GetPrettyName();
+    }
+  if (title)
+    {
+    this->Script("wm title %s \"%s\"", this->GetWidgetName(), title);
     }
 
   if (this->GetMasterWindow() && this->GetMasterWindow()->IsCreated())
@@ -683,11 +705,48 @@ int vtkKWTopLevel::GetPadY()
 }
 
 //----------------------------------------------------------------------------
+vtkKWTclInteractor* vtkKWTopLevel::GetTclInteractor()
+{
+  if (!this->TclInteractor)
+    {
+    this->TclInteractor = vtkKWTkcon::New();
+    }
+
+  if (!this->TclInteractor->IsCreated() && this->IsCreated())
+    {
+    this->TclInteractor->SetApplication(this->GetApplication());
+    this->TclInteractor->SetMasterWindow(this);
+    this->TclInteractor->Create();
+    }
+  
+  return this->TclInteractor;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTopLevel::DisplayTclInteractor()
+{
+  vtkKWTclInteractor *tcl_interactor = this->GetTclInteractor();
+  if (tcl_interactor)
+    {
+    vtksys_stl::string title;
+    if (this->GetTitle())
+      {
+      title += this->GetTitle();
+      title += " : ";
+      }
+    title += ks_("Tcl Interactor Dialog|Title|Tcl Interactor");
+    tcl_interactor->SetTitle(title.c_str());
+    tcl_interactor->Display();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTopLevel::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
   this->PropagateEnableState(this->Menu);
+  this->PropagateEnableState(this->TclInteractor);
 }
 
 //----------------------------------------------------------------------------
@@ -717,5 +776,6 @@ void vtkKWTopLevel::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HideDecoration: " << (this->HideDecoration ? "On" : "Off" ) << endl;
   os << indent << "Modal: " << this->GetModal() << endl;
   os << indent << "DisplayPosition: " << this->GetDisplayPosition() << endl;
+  os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
 }
 
