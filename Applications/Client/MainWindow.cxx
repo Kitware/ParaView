@@ -671,7 +671,9 @@ void MainWindow::onHelpHelp()
       }
     }
 
-  // find the assistant
+  QString assistantExe;
+  QString profileFile;
+  
 #if defined(Q_WS_WIN)
   const char* assistantName = "assistant.exe";
 #elif defined(Q_WS_MAC)
@@ -680,39 +682,56 @@ void MainWindow::onHelpHelp()
   const char* assistantName = "assistant";
 #endif
   
-  // first look if assistant is bundled with application
-  QString assistant = QCoreApplication::applicationDirPath();
-  assistant += QDir::separator();
-  assistant += assistantName;
-  if(QFile::exists(assistant))
+  QString helper = QCoreApplication::applicationDirPath() + QDir::separator()
+    + QString("pqClientDocFinder.txt");
+  if(QFile::exists(helper))
     {
-    this->Implementation->AssistantClient = 
-      new QAssistantClient(assistant, this);
-    }
-  else
-    {
-    // not bundled, see if it can can be found in PATH
-    this->Implementation->AssistantClient = 
-      new QAssistantClient(QString(), this);
+    QFile file(helper);
+    if(file.open(QIODevice::ReadOnly))
+      {
+      assistantExe = file.readLine().trimmed() + assistantName;
+      profileFile = file.readLine().trimmed();
+      }
     }
 
+  if(assistantExe.isEmpty())
+    {
+    QString assistant = QCoreApplication::applicationDirPath();
+    assistant += QDir::separator();
+    assistant += assistantName;
+    if(QFile::exists(assistant))
+      {
+      assistantExe = assistant;
+      }
+    }
+
+  this->Implementation->AssistantClient = 
+    new QAssistantClient(assistantExe, this);
+  QObject::connect(this->Implementation->AssistantClient,
+                   SIGNAL(error(const QString&)),
+                   this,
+                   SLOT(assistantError(const QString&)));
+  
   QStringList args;
   args.append(QString("-profile"));
 
-  // see if help is bundled up with the application
-  QString profile = QCoreApplication::applicationDirPath() + QDir::separator()
-    + QString("pqClient.adp");
-
-  if(QFile::exists(profile))
+  if(profileFile.isEmpty())
     {
-    args.append(profile);
+    // see if help is bundled up with the application
+    QString profile = QCoreApplication::applicationDirPath() + QDir::separator()
+      + QString("pqClient.adp");
+    if(QFile::exists(profile))
+      {
+      profileFile = profile;
+      }
     }
-  else if(getenv("PARAVIEW_HELP"))
+
+  if(profileFile.isEmpty() && getenv("PARAVIEW_HELP"))
     {
     // not bundled, ask for help
     args.append(getenv("PARAVIEW_HELP"));
     }
-  else
+  else if(profileFile.isEmpty())
     {
     // no help, error out
     QMessageBox::critical(
@@ -725,8 +744,15 @@ void MainWindow::onHelpHelp()
     return;
     }
   
+  args.append(profileFile);
+  
   this->Implementation->AssistantClient->setArguments(args);
   this->Implementation->AssistantClient->openAssistant();
+}
+
+void MainWindow::assistantError(const QString& error)
+{
+  qCritical(error.toAscii().data());
 }
 
 void MainWindow::onPlotAdded(pqPlotViewModule* view)

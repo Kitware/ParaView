@@ -68,6 +68,8 @@ private slots:
   void onSelectionShortcut();
   void onSelectionShortcutFinished();
 
+  void assistantError(const QString& err);
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

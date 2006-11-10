@@ -123,6 +123,15 @@ IF(WIN32)
     optimized qtmain debug qtmaind
   )
 ENDIF(WIN32)
+
+SET(PV_CLIENT_DOC "${CMAKE_CURRENT_SOURCE_DIR}/pqClient.adp")
+STRING(REGEX REPLACE "[^/]+$" "" PV_ASSISTANT "${QT_QMAKE_EXECUTABLE}")
+IF(WIN32)
+  STRING(REGEX REPLACE "/" "\\\\" PV_ASSISTANT "${PV_ASSISTANT}")
+ENDIF(WIN32)
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqClientDocFinder.txt.in"
+               "${EXECUTABLE_OUTPUT_PATH}/pqClientDocFinder.txt"
+               @ONLY IMMEDIATE)
   
 IF(BUILD_TESTING)
 IF(APPLE)
