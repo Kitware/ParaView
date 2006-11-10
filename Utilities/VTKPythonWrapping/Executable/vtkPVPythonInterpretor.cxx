@@ -12,11 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
+#include "vtkPython.h"
 #include "vtkPVPythonInterpretor.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkPythonAppInitConfigure.h"
-#include "vtkPython.h"
 #include "vtkWindows.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -178,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.3");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
