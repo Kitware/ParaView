@@ -1863,6 +1863,15 @@
       <SubProxy>
         <Proxy name="PKdTree" proxygroup="locators" proxyname="PKdTree" />
       </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PKdTreeGenerator" class="vtkKdTreeGenerator">
+          <ProxyProperty name="KdTree"
+            command="SetKdTree">
+          </ProxyProperty>
+        </Proxy>
+      </SubProxy>
+
       <IntVectorProperty
         name="SetUseBackBuffer"
         command="SetUseBackBuffer"
@@ -3293,7 +3302,7 @@
     <New3DWidgetProxy name="SliderWidgetDisplay">
       <IntVectorProperty
         name="Enabled"
-        comamnd="SetEnabled"
+        command="SetEnabled"
         number_of_elements="1"
         default_values="0"
         update_self="1">

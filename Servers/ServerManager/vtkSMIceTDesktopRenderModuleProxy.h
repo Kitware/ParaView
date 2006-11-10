@@ -118,11 +118,18 @@ protected:
   vtkSMProxy* DisplayManagerProxy;
   vtkSMProxy* PKdTreeProxy;
 
+  // Generator is used only when volume rendering structured data.
+  vtkSMProxy* PKdTreeGeneratorProxy;
+
   vtkSMProxy* ServerRenderWindowProxy;
   vtkSMProxy* ServerCompositeManagerProxy;
   vtkSMProxy* ServerDisplayManagerProxy;
 
   int RenderModuleId;
+
+  // This flag is set when we generate the k-d tree ourselves 
+  // (in case of structured volume rendering). 
+  int UsingCustomKdTree;
 
   // Description:
   // The set of inputs (as proxies) to PKdTreeProxy that existed the last

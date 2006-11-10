@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.25");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -1103,6 +1103,11 @@ void vtkSMCompositeDisplayProxy::AddGeometryToCompositingTree()
       ip = vtkSMInputProperty::SafeDownCast(
         this->VolumeDistributorProxy->GetProperty("Input"));
       }
+    else if (this->VolumePipelineType == IMAGE_DATA)
+      {
+      ip = vtkSMInputProperty::SafeDownCast(
+        this->VolumeUpdateSuppressorProxy->GetProperty("Input"));
+      }
     if (!ip || ip->GetNumberOfProxies() < 1) 
       {
       return;
@@ -1122,7 +1127,25 @@ void vtkSMCompositeDisplayProxy::AddGeometryToCompositingTree()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMCompositeDisplayProxy::BuildKdTreeUsingDataPartitions(
+  vtkSMProxy* kdGenerator)
+{
+   vtkClientServerStream stream;
+   stream << vtkClientServerStream::Invoke
+     << this->VolumeUpdateSuppressorProxy->GetID(0)
+     << "GetInput"
+     << vtkClientServerStream::End;
+   stream << vtkClientServerStream::Invoke
+     << kdGenerator->GetID(0)
+     << "BuildTree"
+     << vtkClientServerStream::LastResult
+     << vtkClientServerStream::End;
+   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+   pm->SendStream(kdGenerator->GetConnectionID(),
+     kdGenerator->GetServers(), stream);
+}
 
+//-----------------------------------------------------------------------------
 void vtkSMCompositeDisplayProxy::SetVisibility(int visible)
 {
   this->Superclass::SetVisibility(visible);
@@ -1184,7 +1207,14 @@ void vtkSMCompositeDisplayProxy::UpdateDistributedGeometry()
     {
     // The unstructured data is distributed only when rendering unstructured
     // grids. Therefore, we don't have to update anything
-    if (this->VolumePipelineType == UNSTRUCTURED_GRID)
+    // However, we must update the flag, since otherwise the render module
+    // keeps on thinking that this distributed geometry is not valid
+    // resulting in unnecessary updated on every still render.
+    if (this->VolumePipelineType == IMAGE_DATA)
+      {
+      this->DistributedVolumeGeometryIsValid = 1;
+      }
+    else if (this->VolumePipelineType == UNSTRUCTURED_GRID)
       {
       if (!this->DistributedVolumeGeometryIsValid && this->VolumeGeometryIsValid)
         {
