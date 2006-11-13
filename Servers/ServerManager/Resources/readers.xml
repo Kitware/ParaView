@@ -1,6 +1,25 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
 
+   <SourceProxy name="DelimitedTextReader"
+                class="vtkDelimitedTextReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="1"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="DelimiterString"
+        command="SetDelimiterString"
+        animateable="1"
+        number_of_elements="1">
+     </StringVectorProperty>
+
+   </SourceProxy>
+
    <SourceProxy name="DEMReader" 
                 class="vtkDEMReader">
      <StringVectorProperty
