@@ -62,6 +62,7 @@ public:
   pqImplementation(pqProxy* proxy) :
     Proxy(proxy)
   {
+  this->RenderModule = NULL;
   }
   
   ~pqImplementation()
@@ -184,6 +185,11 @@ void pqObjectPanel::deselect()
   
 void pqObjectPanel::setRenderModule(pqRenderModule* rm)
 {
+  if(this->Implementation->RenderModule == rm)
+    {
+    return;
+    }
+
   this->Implementation->RenderModule = rm;
   emit this->renderModuleChanged(this->Implementation->RenderModule);
 }
