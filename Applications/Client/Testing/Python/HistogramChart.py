@@ -20,6 +20,6 @@ QtTesting.playCommand(object6, 'set_string', '16')
 object7 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept'
 QtTesting.playCommand(object7, 'activate', '')
 
-object8 = 'MainWindow/HistogramViewModule1/1pqHistogramWidget0/qt_scrollarea_viewport'
+object8 = 'MainWindow/HistogramViewModule1/1pqHistogramWidget0'
 QtTestingImage.compareImage(object8, 'HistogramChart.png', 400, 200)
 

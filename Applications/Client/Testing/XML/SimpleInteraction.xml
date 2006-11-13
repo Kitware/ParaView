@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
   <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Statistics View" />
   <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Cone" />
   <pqevent object="MainWindow/ServerStartupBrowser/startups" command="currentChanged" arguments="/0|0" />
