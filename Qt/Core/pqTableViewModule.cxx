@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPlotViewModule.cxx
+   Module:    pqTableViewModule.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,52 +29,41 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqPlotViewModule.h"
+#include "pqTableViewModule.h"
 
-#include "vtkDataSet.h"
 #include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMProxy.h"
 
 #include <QtDebug>
 #include <QPointer>
+#include <QTableView>
 
 #include "pqDisplay.h"
-#include "pqHistogramChart.h"
-#include "pqHistogramWidget.h"
-#include "pqLineChart.h"
-#include "pqLineChartModel.h"
-#include "pqLineChartWidget.h"
 #include "pqPipelineSource.h"
-#include "pqVTKHistogramModel.h"
-#include "pqVTKLineChartModel.h"
 
 //-----------------------------------------------------------------------------
-class pqPlotViewModuleInternal
+class pqTableViewModule::pqImplementation
 {
 public:
-  QPointer<QWidget> PlotWidget;
-  QPointer<QObject> VTKModel;
-  int MaxNumberOfVisibleDisplays;
-  pqPlotViewModuleInternal()
-    {
-    this->MaxNumberOfVisibleDisplays = -1;
-    }
-  ~pqPlotViewModuleInternal()
-    {
-    delete this->VTKModel;
-    delete this->PlotWidget;
-    }
+  pqImplementation() :
+    Table(new QTableView())
+  {
+  }
+
+  QPointer<QTableView> Table;
 };
 
 //-----------------------------------------------------------------------------
-pqPlotViewModule::pqPlotViewModule(int type,
-  const QString& group, const QString& name, 
-  vtkSMAbstractViewModuleProxy* renModule, pqServer* server, QObject* _parent)
-: pqGenericViewModule(group, name, renModule, server, _parent)
+pqTableViewModule::pqTableViewModule(
+    const QString& group,
+    const QString& name, 
+    vtkSMAbstractViewModuleProxy* renModule,
+    pqServer* server,
+    QObject* _parent) :
+  pqGenericViewModule(group, name, renModule, server, _parent),
+  Implementation(new pqImplementation())
 {
-  this->Type = type;
-  this->Internal = new pqPlotViewModuleInternal();
-
+/*
   switch (this->Type)
     {
   case BAR_CHART:
@@ -106,23 +95,25 @@ pqPlotViewModule::pqPlotViewModule(int type,
     this, SLOT(visibilityChanged(pqDisplay*)));
   QObject::connect(this, SIGNAL(displayAdded(pqDisplay*)),
     this, SLOT(visibilityChanged(pqDisplay*)));
+*/
 }
 
 //-----------------------------------------------------------------------------
-pqPlotViewModule::~pqPlotViewModule()
+pqTableViewModule::~pqTableViewModule()
 {
-  delete this->Internal;
+  delete this->Implementation;
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqPlotViewModule::getWidget()
+QWidget* pqTableViewModule::getWidget()
 {
-  return this->Internal->PlotWidget;
+  return this->Implementation->Table;
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::setWindowParent(QWidget* p)
+void pqTableViewModule::setWindowParent(QWidget* p)
 {
+/*
   if (this->Internal->PlotWidget)
     {
     this->Internal->PlotWidget->setParent(p);
@@ -131,21 +122,26 @@ void pqPlotViewModule::setWindowParent(QWidget* p)
     {
     qDebug() << "setWindowParent() failed since PlotWidget not yet created.";
     }
+*/
 }
 //-----------------------------------------------------------------------------
-QWidget* pqPlotViewModule::getWindowParent() const
+QWidget* pqTableViewModule::getWindowParent() const
 {
+  return 0;
+/*
   if (this->Internal->PlotWidget)
     {
     return this->Internal->PlotWidget->parentWidget();
     }
   qDebug() << "getWindowParent() failed since PlotWidget not yet created.";
   return 0;
+*/
 }
 
 //-----------------------------------------------------------------------------
-bool pqPlotViewModule::canDisplaySource(pqPipelineSource* source) const
+bool pqTableViewModule::canDisplaySource(pqPipelineSource* source) const
 {
+/*
   if (!this->Superclass::canDisplaySource(source))
     {
     return false;
@@ -158,13 +154,15 @@ bool pqPlotViewModule::canDisplaySource(pqPipelineSource* source) const
   case XY_PLOT:
     return (source->getProxy()->GetXMLName() == QString("Probe2"));
     }
+*/
 
   return false;
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::visibilityChanged(pqDisplay* disp)
+void pqTableViewModule::visibilityChanged(pqDisplay* disp)
 {
+/*
   if (disp->isVisible())
     {
     int max_visible = this->Internal->MaxNumberOfVisibleDisplays-1;
@@ -182,13 +180,15 @@ void pqPlotViewModule::visibilityChanged(pqDisplay* disp)
         }
       }
     }
+*/
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::forceRender()
+void pqTableViewModule::forceRender()
 {
   this->Superclass::forceRender();
 
+/*
   // Now update the GUI.
   switch (this->Type)
     {
@@ -200,10 +200,12 @@ void pqPlotViewModule::forceRender()
     this->renderXYPlot();
     break;
     }
+*/
 }
 
+/*
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::renderXYPlot()
+void pqTableViewModule::renderXYPlot()
 {
   pqVTKLineChartModel* model = 
     qobject_cast<pqVTKLineChartModel*>(this->Internal->VTKModel);
@@ -226,7 +228,7 @@ void pqPlotViewModule::renderXYPlot()
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::renderBarChar()
+void pqTableViewModule::renderBarChar()
 {
   pqVTKHistogramModel* model = 
     qobject_cast<pqVTKHistogramModel*>(this->Internal->VTKModel);
@@ -250,3 +252,4 @@ void pqPlotViewModule::renderBarChar()
   model->updateData((vtkDataObject*)0);
 }
 
+*/

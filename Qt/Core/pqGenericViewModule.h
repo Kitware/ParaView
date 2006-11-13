@@ -57,6 +57,9 @@ public:
   /// Returns the internal render Module proxy associated with this object.
   vtkSMAbstractViewModuleProxy* getViewModuleProxy() const;
 
+  /// Return a widget associated with this view
+  virtual QWidget* getWidget() = 0;
+
   /// Call this method to assign a Window in which this view module will
   /// be displayed.
   virtual void setWindowParent(QWidget* parent)=0;

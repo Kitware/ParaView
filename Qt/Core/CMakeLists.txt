@@ -37,6 +37,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqApplicationCore.h
   pqCommandServerStartup.h
   pqConsumerDisplay.h
+  pqCoreTestUtility.h
   pqDisplay.h
   pqFileDialogEventTranslator.h
   pqFlatTreeViewEventTranslator.h
@@ -53,6 +54,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPropertyLinks.h
   pqPropertyManager.h
   pqProxy.h
+  pqQVTKWidgetEventTranslator.h
   pqRenderModule.h
   pqScalarBarDisplay.h
   pqScalarBarVisibilityAdaptor.h
@@ -66,9 +68,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerStartupContext.h
   pqServerStartups.h
   pqSettings.h
-  pqCoreTestUtility.h
+  pqTableViewModule.h
   pqUndoStack.h
-  pqQVTKWidgetEventTranslator.h
   ${PYTHON_MOC_SRCS}
   )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -113,6 +114,8 @@ ADD_LIBRARY(pqCore
   pqCoreExport.h
   pqCoreInit.cxx
   pqCoreInit.h
+  pqCoreTestUtility.cxx
+  pqCoreTestUtility.h
   pqDisplay.cxx
   pqDisplay.h
   pqFileDialogEventPlayer.cxx
@@ -165,22 +168,26 @@ ADD_LIBRARY(pqCore
   pqPropertyManager.h
   pqProxy.cxx
   pqProxy.h
+  pqQVTKWidgetEventPlayer.cxx
+  pqQVTKWidgetEventPlayer.h
+  pqQVTKWidgetEventTranslator.cxx
+  pqQVTKWidgetEventTranslator.h
   pqReaderFactory.cxx
   pqReaderFactory.h
   pqRenderModule.cxx
   pqRenderModule.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
+  pqSMAdaptor.cxx
+  pqSMAdaptor.h
+  pqSMProxy.cxx
+  pqSMProxy.h
   pqScalarBarDisplay.cxx
   pqScalarBarDisplay.h
   pqScalarBarVisibilityAdaptor.cxx
   pqScalarBarVisibilityAdaptor.h
   pqScalarsToColors.cxx
   pqScalarsToColors.h
-  pqSMAdaptor.cxx
-  pqSMAdaptor.h
-  pqSMProxy.cxx
-  pqSMProxy.h
   pqServer.cxx
   pqServer.h
   pqServerManagerModel.cxx
@@ -202,26 +209,22 @@ ADD_LIBRARY(pqCore
   pqServerStartups.h
   pqSettings.cxx
   pqSettings.h
-  pqCoreTestUtility.cxx
-  pqCoreTestUtility.h
+  pqTableViewModule.cxx
+  pqTableViewModule.h
   pqUndoRedoStateLoader.cxx
   pqUndoRedoStateLoader.h
   pqUndoStack.cxx
   pqUndoStack.h
-  pqWriterFactory.cxx
-  pqWriterFactory.h
-  pqXMLUtil.cxx
-  pqXMLUtil.h
-  pqQVTKWidgetEventTranslator.cxx
-  pqQVTKWidgetEventTranslator.h
-  pqQVTKWidgetEventPlayer.cxx
-  pqQVTKWidgetEventPlayer.h
   pqVTKHistogramModel.cxx
   pqVTKHistogramModel.h
   pqVTKLineChartModel.cxx
   pqVTKLineChartModel.h
   pqVTKLineChartPlot.cxx
   pqVTKLineChartPlot.h
+  pqWriterFactory.cxx
+  pqWriterFactory.h
+  pqXMLUtil.cxx
+  pqXMLUtil.h
 
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}

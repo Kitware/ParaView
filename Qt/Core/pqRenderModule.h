@@ -56,7 +56,7 @@ public:
   vtkSMRenderModuleProxy* getRenderModuleProxy() const;
 
   /// Returns the QVTKWidget for this render Window.
-  QVTKWidget* getWidget() const;
+  QWidget* getWidget();
 
   /// Call this method to assign a Window in which this render module will
   /// render.  This will set the QVTKWidget's parent.

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPlotViewModule.h
+   Module:    pqTableViewModule.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,29 +29,22 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqPlotViewModule_h
-#define __pqPlotViewModule_h
+#ifndef __pqTableViewModule_h
+#define __pqTableViewModule_h
 
 #include "pqGenericViewModule.h"
 
-class pqPlotViewModuleInternal;
-
-class PQCORE_EXPORT pqPlotViewModule : public pqGenericViewModule
+class PQCORE_EXPORT pqTableViewModule :
+  public pqGenericViewModule
 {
-  Q_OBJECT
-public:
   typedef pqGenericViewModule Superclass;
 
-  pqPlotViewModule(int type, const QString& group, const QString& name, 
+  Q_OBJECT
+public:
+  pqTableViewModule(const QString& group, const QString& name, 
     vtkSMAbstractViewModuleProxy* renModule, 
     pqServer* server, QObject* parent=NULL);
-  virtual ~pqPlotViewModule();
-
-  enum PlotType
-    {
-    BAR_CHART = 0,
-    XY_PLOT =1
-    };
+  ~pqTableViewModule();
 
   QWidget* getWidget();
 
@@ -69,9 +62,6 @@ public:
     return false;
     };
 
-  int getType()
-    { return this->Type; }
-   
   /// This method returns is any pqPipelineSource can be dislayed in this
   /// view. Overridden to make sure that the source can be displayed
   /// in this type of plot.
@@ -86,15 +76,13 @@ private slots:
   void visibilityChanged(pqDisplay* disp);
 
 protected:
-  int Type;
-  void renderBarChar();
-  void renderXYPlot();
 
 private:
-  pqPlotViewModule(const pqPlotViewModule&); // Not implemented.
-  void operator=(const pqPlotViewModule&); // Not implemented.
+  pqTableViewModule(const pqTableViewModule&); // Not implemented.
+  void operator=(const pqTableViewModule&); // Not implemented.
 
-  pqPlotViewModuleInternal* Internal;
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 

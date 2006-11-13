@@ -185,7 +185,7 @@ vtkSMRenderModuleProxy* pqRenderModule::getRenderModuleProxy() const
 }
 
 //-----------------------------------------------------------------------------
-QVTKWidget* pqRenderModule::getWidget() const
+QWidget* pqRenderModule::getWidget()
 {
   return this->Internal->Viewport;
 }

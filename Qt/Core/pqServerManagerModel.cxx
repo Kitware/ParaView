@@ -61,6 +61,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
+#include "pqTableViewModule.h"
+
+#include <QVTKWidget.h>
 
 pqServerManagerModel* pqServerManagerModel::Instance = 0;
 pqServerManagerModel* pqServerManagerModel::instance()
@@ -605,6 +608,10 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
       pq_proxy = new pqPlotViewModule(type, group, name, ren, server, this);
       }
     }
+    else if(group == "views" && proxy->GetXMLName() == QString("TableView"))
+      {
+      pq_proxy = new pqTableViewModule(group, name, vtkSMAbstractViewModuleProxy::SafeDownCast(proxy), server, this);
+      }
 
   if (pq_proxy)
     {

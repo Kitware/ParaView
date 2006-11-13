@@ -67,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqTableViewModule.h"
 #include "pqUndoStack.h"
 
 #include <assert.h>
@@ -513,6 +514,28 @@ pqPlotViewModule* pqPipelineBuilder::createPlotWindow(int type, pqServer* server
     }
   return pqView;
 }
+
+pqTableViewModule* pqPipelineBuilder::createTableView(pqServer* server)
+{
+  if (!server)
+    {
+    qDebug() << "Cannot createPlotWindow on null server.";
+    return 0;
+    }
+
+  vtkSMProxy* const proxy = vtkSMProxyManager::GetProxyManager()->NewProxy("views", "TableView");
+  assert(proxy);
+  proxy->SetConnectionID(server->GetConnectionID());
+  proxy->UpdateVTKObjects();
+  
+  vtksys_ios::ostringstream name_stream;
+  name_stream << proxy->GetXMLName()
+    << this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName());
+  vtkSMProxyManager::GetProxyManager()->RegisterProxy("views", name_stream.str().c_str(), proxy);
+  proxy->Delete();
+  
+  return qobject_cast<pqTableViewModule*>(pqApplicationCore::instance()->getServerManagerModel()->getPQProxy(proxy));
+} 
 
 //-----------------------------------------------------------------------------
 pqRenderModule* pqPipelineBuilder::createWindow(pqServer* server)

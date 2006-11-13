@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPlotManager.h
+   Module:    pqGenericViewManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,51 +29,46 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqPlotManager_h
-#define __pqPlotManager_h
+#ifndef __pqGenericViewManager_h
+#define __pqGenericViewManager_h
 
 #include <QObject>
 #include "pqComponentsExport.h"
 
-class pqPlotManagerInternal;
+class pqGenericViewModule;
 class pqPlotViewModule;
 class pqProxy;
 class QWidget;
 
-class PQCOMPONENTS_EXPORT pqPlotManager : public QObject
+class PQCOMPONENTS_EXPORT pqGenericViewManager :
+  public QObject
 {
   Q_OBJECT
 public:
-  pqPlotManager(QObject* parent=0);
-  virtual ~pqPlotManager();
+  pqGenericViewManager(QObject* parent=0);
+  ~pqGenericViewManager();
 
 signals:
   // Fired after a new plot module is noticed by the manager.
   void plotAdded(pqPlotViewModule*);
-
   // Fired just before the manager let's go of a plot view.
   void plotRemoved(pqPlotViewModule*);
 
 public slots:
   void renderAllViews();
 
-protected:
-  void onPlotAdded(pqPlotViewModule*);
-  void onPlotRemoved(pqPlotViewModule*);
-
-  // event filter callback.
-  bool eventFilter(QObject* obj, QEvent* event);
-
-  pqPlotViewModule* getViewModule(QWidget* widget);
 private slots:
   void onProxyAdded(pqProxy* proxy);
   void onProxyRemoved(pqProxy* proxy);
   
 private:
-  pqPlotManager(const pqPlotManager&); // Not implemented.
-  void operator=(const pqPlotManager&); // Not implemented.
+  pqGenericViewManager(const pqGenericViewManager&); // Not implemented.
+  void operator=(const pqGenericViewManager&); // Not implemented.
 
-  pqPlotManagerInternal* Internal;
+  bool eventFilter(QObject* obj, QEvent* event);
+
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif

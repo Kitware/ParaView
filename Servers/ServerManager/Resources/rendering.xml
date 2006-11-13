@@ -1948,6 +1948,13 @@
     </ViewModuleProxy>
     <!-- End ProxyGroup plotmodules -->
   </ProxyGroup>
+
+  <ProxyGroup name="views">
+    <ViewModuleProxy name="TableView"
+      base_proxygroup="rendermodules" base_proxyname="ViewModule"
+      display_name="Table View">
+    </ViewModuleProxy>
+  </ProxyGroup>
   
   <ProxyGroup name="interactors">
     <Proxy name="GenericRenderWindowInteractor" class="vtkPVGenericRenderWindowInteractor">

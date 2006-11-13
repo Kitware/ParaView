@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 class QSize;
+class pqGenericViewManager;
 class pqGenericViewModule;
 class pqMultiView;
 class pqObjectInspectorWidget;
@@ -83,7 +84,8 @@ public:
 
   /// Returns a multi-view widget which can be embedded in the UI  
   pqRenderWindowManager& multiViewManager();
-
+  /// Returns the view manager, which keeps track of all views
+  pqGenericViewManager& viewManager();
   /// Returns the selection manager, which handles interactive selection
   pqSelectionManager& selectionManager();
   /// Returns the VCR controller, which can control animation playback
@@ -203,11 +205,6 @@ signals:
   // created without a display.
   void pendingDisplays(bool status);
 
-  // Fired when a new plot view is added.
-  void plotAdded(pqPlotViewModule*);
-  // Fired when a new plot view is removed.
-  void plotRemoved(pqPlotViewModule*);
-
 public slots:
   virtual void onFileOpen();
   virtual void onFileOpen(pqServer* Server);
@@ -288,6 +285,9 @@ public slots:
   // Create New Plot Views.
   void createBarCharView();
   void createXYPlotView();
+  
+  /// Create a table view
+  void createTableView();
 
   // This option is used for testing. Sets the maximum size for
   // all render windows. When size.isEmpty() is true,

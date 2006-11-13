@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineBuilder.h"
 #include "pqPipelineMenu.h"
 #include "pqPipelineSource.h"
-#include "pqPlotManager.h"
+#include "pqGenericViewManager.h"
 #include "pqPlotViewModule.h"
 #include "pqPQLookupTableManager.h"
 #include "pqProxyTabWidget.h"
@@ -120,6 +120,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
 
+#include "assert.h"
+
 ///////////////////////////////////////////////////////////////////////////
 // pqMainWindowCore::pqImplementation
 
@@ -133,7 +135,7 @@ public:
     CustomFilters(new pqCustomFilterManagerModel(parent)),
     CustomFilterManager(0),
     LookupTableManager(new pqPQLookupTableManager(parent)),
-    PlotManager(new pqPlotManager(parent)),
+    GenericViewManager(new pqGenericViewManager(parent)),
     RecentFilesMenu(0),
     FilterMenu(0),
     PipelineMenu(0),
@@ -156,7 +158,7 @@ public:
     delete this->CustomFilterManager;
     delete this->CustomFilters;
     delete this->LookupTableManager;
-    delete this->PlotManager;
+    delete this->GenericViewManager;
   }
 
   QWidget* const Parent;
@@ -167,7 +169,7 @@ public:
   pqCustomFilterManagerModel* const CustomFilters;
   pqCustomFilterManager* CustomFilterManager;
   pqPQLookupTableManager* LookupTableManager;
-  pqPlotManager* PlotManager;
+  pqGenericViewManager* const GenericViewManager;
  
   QMenu* RecentFilesMenu; 
   
@@ -201,12 +203,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   QObject::connect(&pqActiveView::instance(),
     SIGNAL(changed(pqGenericViewModule*)),
     this, SLOT(setActiveView(pqGenericViewModule*)));
-  QObject::connect(this->Implementation->PlotManager,
-    SIGNAL(plotAdded(pqPlotViewModule*)), 
-    this, SIGNAL(plotAdded(pqPlotViewModule*)));
-  QObject::connect(this->Implementation->PlotManager,
-    SIGNAL(plotRemoved(pqPlotViewModule*)), 
-    this, SIGNAL(plotRemoved(pqPlotViewModule*)));
 
   QObject::connect(this,
                    SIGNAL(activeServerChanged(pqServer*)),
@@ -310,6 +306,11 @@ pqMainWindowCore::~pqMainWindowCore()
 pqRenderWindowManager& pqMainWindowCore::multiViewManager()
 {
   return this->Implementation->MultiViewManager;
+}
+
+pqGenericViewManager& pqMainWindowCore::viewManager()
+{
+  return *this->Implementation->GenericViewManager;
 }
 
 pqSelectionManager& pqMainWindowCore::selectionManager()
@@ -1147,16 +1148,19 @@ void pqMainWindowCore::onFileSaveScreenshot()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveScreenshot(const QStringList& files)
 {
-  pqRenderModule* rm = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
+  pqRenderModule* const rm = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
   if(!rm)
     {
     qDebug() << "Cannnot save image. No active render module.";
     return;
     }
 
+  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(rm->getWidget());
+  assert(widget);
+
   for(int i = 0; i != files.size(); ++i)
     {
-    if(!pqCoreTestUtility::SaveScreenshot(rm->getWidget()->GetRenderWindow(), files[i]))
+    if(!pqCoreTestUtility::SaveScreenshot(widget->GetRenderWindow(), files[i]))
       {
       qCritical() << "Save Image failed.";
       }
@@ -1404,27 +1408,30 @@ void pqMainWindowCore::onToolsRecordTestScreenshot()
 
 void pqMainWindowCore::onToolsRecordTestScreenshot(const QStringList &fileNames)
 {
-  pqRenderModule* render_module = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
+  pqRenderModule* const render_module = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
   if(!render_module)
     {
     qCritical() << "Cannnot save image. No active render module.";
     return;
     }
 
-  QSize old_size = render_module->getWidget()->size();
-  render_module->getWidget()->resize(300,300);
+  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(render_module->getWidget());
+  assert(widget);
+
+  QSize old_size = widget->size();
+  widget->resize(300,300);
 
   QStringList::ConstIterator iter = fileNames.begin();
   for( ; iter != fileNames.end(); ++iter)
     {
     if(!pqCoreTestUtility::SaveScreenshot(
-        render_module->getWidget()->GetRenderWindow(), *iter))
+        widget->GetRenderWindow(), *iter))
       {
       qCritical() << "Save Image failed.";
       }
     }
 
-  render_module->getWidget()->resize(old_size);
+  widget->resize(old_size);
   render_module->render();
 }
 
@@ -1747,7 +1754,7 @@ void pqMainWindowCore::onInitializeInteractionStates()
 
 void pqMainWindowCore::onPostAccept()
 {
-  this->Implementation->PlotManager->renderAllViews();
+  this->Implementation->GenericViewManager->renderAllViews();
   this->updateFiltersMenu(this->getActiveSource());
 
   emit this->postAccept();
@@ -2154,7 +2161,6 @@ void pqMainWindowCore::setMaxRenderWindowSize(const QSize& size)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::createBarCharView()
 {
-  /* pqPlotViewModule* barCharView = */
     pqApplicationCore::instance()->getPipelineBuilder()->createPlotWindow(
       pqPlotViewModule::BAR_CHART, this->getActiveServer());
 }
@@ -2164,4 +2170,10 @@ void pqMainWindowCore::createXYPlotView()
 {
   pqApplicationCore::instance()->getPipelineBuilder()->createPlotWindow(
     pqPlotViewModule::XY_PLOT, this->getActiveServer());
+}
+
+void pqMainWindowCore::createTableView()
+{
+  pqApplicationCore::instance()->getPipelineBuilder()->createTableView(
+    this->getActiveServer());
 }

@@ -85,8 +85,15 @@ public:
       return false;
       }
 
+    QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renModule->getWidget());
+    if(!widget)
+      {
+      output << "ERROR: Not a QVTKWidget." << endl;
+      return false;
+      }
+
     vtkRenderWindow* const render_window =
-      renModule->getWidget()->GetRenderWindow();
+      widget->GetRenderWindow();
 
     if(!render_window)
       {

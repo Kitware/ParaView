@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pqActiveView.h>
 #include <pqApplicationCore.h>
+#include <pqGenericViewManager.h>
 #include <pqMainWindowCore.h>
 #include <pqObjectInspectorWidget.h>
 #include <pqPipelineBrowser.h>
@@ -357,10 +358,10 @@ MainWindow::MainWindow() :
     &this->Implementation->Core, SLOT(createXYPlotView()));
 
   connect(
-    &this->Implementation->Core, SIGNAL(plotAdded(pqPlotViewModule*)),
+    &this->Implementation->Core.viewManager(), SIGNAL(plotAdded(pqPlotViewModule*)),
     this, SLOT(onPlotAdded(pqPlotViewModule*)));
   connect(
-    &this->Implementation->Core, SIGNAL(plotRemoved(pqPlotViewModule*)),
+    &this->Implementation->Core.viewManager(), SIGNAL(plotRemoved(pqPlotViewModule*)),
     this, SLOT(onPlotRemoved(pqPlotViewModule*)));
 
   // Setup the 'modes' so that they are exclusively selected

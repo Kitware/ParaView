@@ -66,37 +66,38 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqElementInspectorWidget.h
   pqExodusPanel.h
   pqFileChooserWidget.h
+  pqGenericViewManager.h
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
-  pqLineWidget.h
   pqLineSourceWidget.h
+  pqLineWidget.h
   pqLoadedFormObjectPanel.h
   pqMainWindowCore.h
-  pqMultiViewFrame.h
   pqMultiView.h
+  pqMultiViewFrame.h
   pqNamedObjectPanel.h
   pqObjectInspectorWidget.h
   pqObjectPanel.h
   pqObjectPanelLoader.h
-  pqPipelineBrowserContextMenu.h
+  pqPQLookupTableManager.h
   pqPipelineBrowser.h
+  pqPipelineBrowserContextMenu.h
   pqPipelineMenu.h
   pqPipelineModelSelectionAdaptor.h
-  pqPlotManager.h
   pqPointSourceWidget.h
-  pqPQLookupTableManager.h
   pqProxyInformationWidget.h
   pqProxyTabWidget.h
   pqRecentFilesMenu.h
   pqRenderViewEditor.h
   pqRenderWindowManager.h
+  pqSMSignalAdaptors.h
   pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.h
   pqScalarSetModel.h
+  pqSelectReaderDialog.h
   pqSelectionAdaptor.h
   pqSelectionManager.h
-  pqSelectReaderDialog.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqServerStartupBrowser.h
@@ -106,7 +107,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSimpleAnimationManager.h
   pqSimpleServerStartup.h
   pqSliderDomain.h
-  pqSMSignalAdaptors.h
   pqSourceHistoryModel.h
   pqSourceInfoFilterModel.h
   pqSourceInfoGroupMap.h
@@ -241,16 +241,18 @@ ADD_LIBRARY(pqComponents
   pqExodusPanel.h
   pqFileChooserWidget.cxx
   pqFileChooserWidget.h
+  pqGenericViewManager.cxx
+  pqGenericViewManager.h
   pqHandleWidget.cxx
   pqHandleWidget.h
   pqImageTip.cxx
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
-  pqLineWidget.cxx
-  pqLineWidget.h
   pqLineSourceWidget.cxx
   pqLineSourceWidget.h
+  pqLineWidget.cxx
+  pqLineWidget.h
   pqLoadedFormObjectPanel.cxx
   pqLoadedFormObjectPanel.h
   pqMainWindowCore.cxx
@@ -269,6 +271,8 @@ ADD_LIBRARY(pqComponents
   pqObjectPanel.h
   pqObjectPanelLoader.cxx
   pqObjectPanelLoader.h
+  pqPQLookupTableManager.cxx
+  pqPQLookupTableManager.h
   pqPipelineBrowser.cxx
   pqPipelineBrowser.h
   pqPipelineBrowserContextMenu.cxx
@@ -277,12 +281,8 @@ ADD_LIBRARY(pqComponents
   pqPipelineMenu.h
   pqPipelineModelSelectionAdaptor.cxx
   pqPipelineModelSelectionAdaptor.h
-  pqPlotManager.cxx
-  pqPlotManager.h
   pqPointSourceWidget.cxx
   pqPointSourceWidget.h
-  pqPQLookupTableManager.cxx
-  pqPQLookupTableManager.h
   pqProxyInformationWidget.cxx
   pqProxyInformationWidget.h
   pqProxyTabWidget.cxx
@@ -301,6 +301,8 @@ ADD_LIBRARY(pqComponents
   pqSampleScalarWidget.h
   pqScalarSetModel.cxx
   pqScalarSetModel.h
+  pqSelectReaderDialog.cxx
+  pqSelectReaderDialog.h
   pqSelectionAdaptor.cxx
   pqSelectionAdaptor.h
   pqSelectionManager.cxx
@@ -313,16 +315,14 @@ ADD_LIBRARY(pqComponents
   pqServerStartupBrowser.h
   pqServerStartupDialog.cxx
   pqServerStartupDialog.h
+  pqSettingsDialog.cxx
+  pqSettingsDialog.h
   pqSignalAdaptorProxyList.cxx
   pqSignalAdaptorProxyList.h
   pqSimpleAnimationManager.cxx
   pqSimpleAnimationManager.h
   pqSimpleServerStartup.cxx
   pqSimpleServerStartup.h
-  pqSelectReaderDialog.cxx
-  pqSelectReaderDialog.h
-  pqSettingsDialog.cxx
-  pqSettingsDialog.h
   pqSliderDomain.cxx
   pqSliderDomain.h
   pqSourceHistoryModel.cxx
@@ -339,17 +339,17 @@ ADD_LIBRARY(pqComponents
   pqSourceProxyInfo.h
   pqSpinBoxDomain.cxx
   pqSpinBoxDomain.h
+  pqStateLoader.cxx
+  pqStateLoader.h
   pqStreamTracerPanel.cxx
   pqStreamTracerPanel.h
   pqThresholdPanel.cxx
   pqThresholdPanel.h
   pqToolTipTrapper.cxx
   pqToolTipTrapper.h
-  pqVariableType.h
   pqVCRController.cxx
   pqVCRController.h
-  pqStateLoader.cxx
-  pqStateLoader.h
+  pqVariableType.h
   pqXYPlotDisplayProxyEditor.cxx
   pqXYPlotDisplayProxyEditor.h
   ${MOC_BUILT_SOURCES}
