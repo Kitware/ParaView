@@ -1471,6 +1471,8 @@ void pqMainWindowCore::onToolsPythonShell()
   this->Implementation->PythonDialog->raise();
   this->Implementation->PythonDialog->activateWindow();
  
+#else // PARAVIEW_EMBED_PYTHON
+  QMessageBox::information(NULL, "ParaView", "Python Shell not available");
 #endif // PARAVIEW_EMBED_PYTHON
 }
 
