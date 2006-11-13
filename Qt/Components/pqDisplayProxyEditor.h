@@ -48,13 +48,14 @@ public:
   /// destructor
   ~pqDisplayProxyEditor();
 
-  /// Set the display whose properties we want to edit. 
-  void setDisplay(pqPipelineDisplay* display);
 
   /// get the proxy for which properties are displayed
   pqPipelineDisplay* getDisplay();
 
 public slots:
+  /// Set the display whose properties we want to edit. 
+  void setDisplay(pqPipelineDisplay* display);
+
   /// TODO: get rid of this function once the server manager can
   /// inform us of display property changes
   void reloadGUI();

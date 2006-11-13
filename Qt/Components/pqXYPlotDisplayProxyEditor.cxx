@@ -180,6 +180,26 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqDisplay* display)
     proxy, proxy->GetProperty("XArrayName"));
 
 
+
+  this->reloadGUI();
+}
+
+//-----------------------------------------------------------------------------
+void pqXYPlotDisplayProxyEditor::reloadGUI()
+{
+  if (!this->Internal->Display)
+    {
+    return;
+    }
+  vtkSMProxy* proxy = this->Internal->Display->getProxy();
+  if (!proxy)
+    {
+    return;
+    }
+  this->Internal->YAxisArrays->clear();
+
+  proxy->GetProperty("Input")->UpdateDependentDomains();
+
   // Now, build check boxes for y axis array selections. 
   QList<QString> input_scalars = pqSMAdaptor::getFieldSelectionScalarDomain(
     proxy->GetProperty("YArrayNames"));

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqProxyTabWidget.h
+   Module:    pqDisplayProxyEditorWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,53 +29,41 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqProxyTabWidget_h
-#define _pqProxyTabWidget_h
+#ifndef __pqDisplayProxyEditorWidget_h
+#define __pqDisplayProxyEditorWidget_h
 
-#include <QTabWidget>
-#include <QPointer>
+#include <QWidget>
 #include "pqComponentsExport.h"
 
-class pqProxy;
-class pqGenericViewModule;
-class pqObjectInspectorWidget;
-class pqDisplayProxyEditorWidget;
-class pqProxyInformationWidget;
+class pqDisplayProxyEditorWidgetInternal;
+class pqDisplay;
+class pqPipelineDisplay;
 
-/// Tabbed widget with 3 tabs (object inspector, display editor, information)
-class PQCOMPONENTS_EXPORT pqProxyTabWidget : public QTabWidget
+// This is a widget that can create different kinds of display
+// editors based on the type of the display.
+class PQCOMPONENTS_EXPORT pqDisplayProxyEditorWidget : public QWidget
 {
   Q_OBJECT
 public:
-  /// constructor
-  pqProxyTabWidget(QWidget* p);
-  /// destructor
-  ~pqProxyTabWidget();
+  pqDisplayProxyEditorWidget(QWidget* parent=NULL);
+  virtual ~pqDisplayProxyEditorWidget();
 
-  /// get the object inspector
-  pqObjectInspectorWidget* getObjectInspector();
-  
-  /// get the proxy for which properties are displayed
-  pqProxy* getProxy();
+  void setDisplay(pqDisplay*);
+  pqDisplay* getDisplay() const;
 
 public slots:
-  /// Set the display whose properties we want to edit. 
-  void setProxy(pqProxy* source);
-  
-  /// set the current render module that these panels work on
-  void setView(pqGenericViewModule* rm);
+  void reloadGUI();
 
-protected slots:
-  void updateDisplayTab();
+signals:
+  void requestReload();
+  void requestSetDisplay(pqDisplay*);
+  void requestSetDisplay(pqPipelineDisplay*);
 
 private:
-  pqObjectInspectorWidget* Inspector;
-  pqDisplayProxyEditorWidget* Display;
-  pqProxyInformationWidget* Information;
-  
-  QPointer<pqProxy> Proxy;
-  QPointer<pqGenericViewModule> ViewModule;
+  pqDisplayProxyEditorWidget(const pqDisplayProxyEditorWidget&); // Not implemented.
+  void operator=(const pqDisplayProxyEditorWidget&); // Not implemented.
 
+  pqDisplayProxyEditorWidgetInternal *Internal;
 };
 
 #endif

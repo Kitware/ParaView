@@ -44,11 +44,17 @@ public:
   pqXYPlotDisplayProxyEditor(QWidget* parent=0);
   virtual ~pqXYPlotDisplayProxyEditor();
 
-  // Get/Set the display whose properties this editor is editing.
+  // Get the display whose properties this editor is editing.
+  pqDisplay* getDisplay();
+
+public slots:
+
+  // Set the display whose properties this editor is editing.
   // This call will raise an error is the display is not
   // an XYPlotDisplay2 proxy.
   void setDisplay(pqDisplay* display);
-  pqDisplay* getDisplay();
+
+  void reloadGUI();
 
 protected slots:
   // Called to render all views in which this display is visible.

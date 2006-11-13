@@ -43,23 +43,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView widget includes
 
 // ParaView core includes
+#include "pqConsumerDisplay.h"
+#include "pqGenericViewModule.h"
 #include "pqPipelineSource.h"
-#include "pqPipelineDisplay.h"
-#include "pqRenderModule.h"
 
 // ParaView components includes
 #include "pqObjectInspectorWidget.h"
 #include "pqProxyInformationWidget.h"
-#include "pqDisplayProxyEditor.h"
+#include "pqDisplayProxyEditorWidget.h"
 
 
 //-----------------------------------------------------------------------------
 pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   : QTabWidget(p)
 {
-  this->Proxy = NULL;
-  this->RenderModule = NULL;
-
   QScrollArea* scr = new QScrollArea;
   scr->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   scr->setWidgetResizable(true);
@@ -71,7 +68,7 @@ pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   scr = new QScrollArea;
   scr->setWidgetResizable(true);
   scr->setFrameShape(QFrame::NoFrame);
-  this->Display = new pqDisplayProxyEditor();
+  this->Display = new pqDisplayProxyEditorWidget();
   scr->setWidget(this->Display);
   this->addTab(scr, tr("Display"));
 
@@ -135,23 +132,20 @@ void pqProxyTabWidget::setProxy(pqProxy* proxy)
 
 void pqProxyTabWidget::setView(pqGenericViewModule* view) 
 {
-  pqRenderModule* rm = qobject_cast<pqRenderModule*>(view);
-  this->RenderModule = rm;
   this->Inspector->setView(view);
+  this->ViewModule = view;
   
   this->updateDisplayTab();
 }
 
 void pqProxyTabWidget::updateDisplayTab()
 {
-  pqPipelineDisplay* display = NULL;
+  pqDisplay* display = NULL;
   pqPipelineSource* source = qobject_cast<pqPipelineSource*>(this->Proxy);
-  if(source && this->RenderModule)
+  if(source && this->ViewModule)
     {
-    display =
-      qobject_cast<pqPipelineDisplay*>(source->getDisplay(this->RenderModule));
+    display =  source->getDisplay(this->ViewModule);
     }
-
   this->Display->setDisplay(display);
 }
 
