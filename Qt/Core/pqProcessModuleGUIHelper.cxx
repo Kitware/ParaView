@@ -61,6 +61,7 @@ public:
     ApplicationCore(0),
     Window(0),
     EnableProgress(false),
+    ReadyEnableProgress(false),
     LastProgress(0)
   {
     // Redirect Qt debug output to VTK ...
@@ -105,13 +106,14 @@ public:
   pqApplicationCore* ApplicationCore;
   QWidget* Window;
   bool EnableProgress;
+  bool ReadyEnableProgress;
   double LastProgress;
 };
 
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.5");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.6");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -202,15 +204,21 @@ void pqProcessModuleGUIHelper::FinalizeApplication()
 //-----------------------------------------------------------------------------
 void pqProcessModuleGUIHelper::SendPrepareProgress()
 {
-  this->Implementation->EnableProgress = true;
-  this->Implementation->ApplicationCore->prepareProgress();
+  // set flag that we want a delayed progress 
+  // in other words, the progress will be enabled when a current
+  // process is taking long enough
+  this->Implementation->ReadyEnableProgress = true;
 }
 
 //-----------------------------------------------------------------------------
 void pqProcessModuleGUIHelper::SendCleanupPendingProgress()
 {
+  this->Implementation->ReadyEnableProgress = false;
+  if(this->Implementation->EnableProgress)
+    {
+    this->Implementation->ApplicationCore->cleanupPendingProgress();
+    }
   this->Implementation->EnableProgress = false;
-  this->Implementation->ApplicationCore->cleanupPendingProgress();
 }
 
 //-----------------------------------------------------------------------------
@@ -218,7 +226,7 @@ void pqProcessModuleGUIHelper::SetLocalProgress(const char* text,
   int progress)
 {
   double lastprog = vtkTimerLog::GetUniversalTime();
-  if (!this->Implementation->EnableProgress)
+  if (!this->Implementation->ReadyEnableProgress)
     {
     this->Implementation->LastProgress = lastprog;
     return;
@@ -227,6 +235,14 @@ void pqProcessModuleGUIHelper::SetLocalProgress(const char* text,
     {
     return;
     }
+
+  // delayed progress starting
+  if(this->Implementation->EnableProgress == false)
+    {
+    this->Implementation->EnableProgress = true;
+    this->Implementation->ApplicationCore->prepareProgress();
+    }
+
   this->Implementation->LastProgress = lastprog;
   if ( progress == 0 || progress > 100 )
     {
