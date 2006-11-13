@@ -29,7 +29,7 @@
 #include "vtkPointData.h"
 
 vtkStandardNewMacro(vtkDataAnalysisFilter);
-vtkCxxRevisionMacro(vtkDataAnalysisFilter, "1.4");
+vtkCxxRevisionMacro(vtkDataAnalysisFilter, "1.5");
 vtkCxxSetObjectMacro(vtkDataAnalysisFilter, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkDataAnalysisFilter::vtkDataAnalysisFilter()
@@ -148,8 +148,7 @@ int vtkDataAnalysisFilter::RequestData(vtkInformation *vtkNotUsed(request),
       return 1;
       }
 
-    if ((input->GetPointData() == NULL) || 
-        (input->GetPointData()->GetNumberOfTuples() < 1))
+    if (input->GetPointData() == NULL)
       {
       vtkErrorMacro("No point data to probe.");
       return 1;
