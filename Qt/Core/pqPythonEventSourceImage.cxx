@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCoreApplication>
 #include <QEvent>
 #include <QDir>
+#include <QCommonStyle>
 
 // Qt testing includes
 #include "pqObjectNaming.h"
@@ -214,14 +215,18 @@ void pqPythonEventSourceImage::compareImage(QWidget* widget,
 #if defined(Q_WS_WIN)
   QFont newFont("Arial", 8, QFont::Normal, false);
 #elif defined(Q_WS_X11)
-  QFont newFont("Courier 10 Pitch", 7, QFont::Normal, false);
+  QFont newFont("Fixed", 10, QFont::Normal, false);
 #else
   QFont newFont("Courier Regular", 10, QFont::Normal, false);
 #endif
+  QCommonStyle style;
+  QStyle* oldStyle = widget->style();
+  widget->setStyle(&style);
   widget->setFont(newFont);
   QImage img = QPixmap::grabWidget(widget).toImage();
   widget->resize(oldSize);
   widget->setFont(oldFont);
+  widget->setStyle(oldStyle);
   img = img.convertToFormat(QImage::Format_RGB32);
   img = img.mirrored();
   int width = img.width();
