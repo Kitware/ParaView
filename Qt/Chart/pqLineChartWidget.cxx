@@ -168,31 +168,6 @@ void pqLineChartWidget::setBackgroundColor(const QColor& color)
       this->ZoomPan->contentsHeight());
 }
 
-void pqLineChartWidget::setFont(const QFont &f)
-{
-  QAbstractScrollArea::setFont(f);
-
-  // Block the axis update signals until all the changes are
-  // made. This avoids laying out the chart for each individual
-  // change.
-  QFontMetrics fm(f);
-
-  this->XAxis->blockSignals(true);
-  this->XAxis->setTickLabelFont(f);
-  this->XAxis->blockSignals(false);
-
-  this->YAxis->blockSignals(true);
-  this->YAxis->setTickLabelFont(f);
-  this->YAxis->blockSignals(false);
-
-  this->RightYAxis->blockSignals(true);
-  this->RightYAxis->setTickLabelFont(f);
-  this->RightYAxis->blockSignals(false);
-
-  this->layoutChart(this->ZoomPan->contentsWidth(),
-      this->ZoomPan->contentsHeight());
-}
-
 void pqLineChartWidget::updateLayout()
 {
   // All of the chart members' layouts are interrelated. When one
@@ -248,7 +223,29 @@ bool pqLineChartWidget::event(QEvent *e)
     //this->LineChart->showTooltip(static_cast<QHelpEvent*>(e));
     }
   
-  return QAbstractScrollArea::event(e);
+  bool ret = QAbstractScrollArea::event(e);
+
+  if(e->type() == QEvent::FontChange)
+    {
+    // Block the axis update signals until all the changes are
+    // made. This avoids laying out the chart for each individual
+    // change.
+    this->XAxis->blockSignals(true);
+    this->XAxis->setTickLabelFont(this->font());
+    this->XAxis->blockSignals(false);
+
+    this->YAxis->blockSignals(true);
+    this->YAxis->setTickLabelFont(this->font());
+    this->YAxis->blockSignals(false);
+
+    this->RightYAxis->blockSignals(true);
+    this->RightYAxis->setTickLabelFont(this->font());
+    this->RightYAxis->blockSignals(false);
+
+    this->layoutChart(this->ZoomPan->contentsWidth(),
+        this->ZoomPan->contentsHeight());
+    }
+  return ret;
 }
     
 void pqLineChartWidget::keyPressEvent(QKeyEvent *e)

@@ -81,14 +81,6 @@ public:
   /// \param color The color to use for the background.
   void setBackgroundColor(const QColor &color);
 
-  /// \brief
-  ///   Sets the font for the widget.
-  ///
-  /// The font is used for the labels on the histogram axes.
-  ///
-  /// \param font The font to use.
-  virtual void setFont(const QFont &font);
-
   /// Returns the chart title object
   pqChartLabel& getTitle() {return *this->Title;}
 

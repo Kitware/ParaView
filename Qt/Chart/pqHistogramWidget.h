@@ -137,14 +137,6 @@ public:
   void setBackgroundColor(const QColor &color);
 
   /// \brief
-  ///   Sets the font for the widget.
-  ///
-  /// The font is used for the labels on the histogram axes.
-  ///
-  /// \param font The font to use.
-  virtual void setFont(const QFont &font);
-
-  /// \brief
   ///   Gets the current interaction mode.
   /// \return
   ///   The current interaction mode.
@@ -247,6 +239,12 @@ public:
   virtual QSize sizeHint() const;
 
 protected:
+  /// \brief
+  ///   Called to handle other events
+  ///
+  /// \param e Event specific data.
+  virtual bool event(QEvent *e);
+
   /// \brief
   ///   Called to handle user key press events.
   ///

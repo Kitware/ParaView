@@ -182,29 +182,31 @@ void pqHistogramWidget::setBackgroundColor(const QColor& color)
       this->ZoomPan->contentsHeight());
 }
 
-void pqHistogramWidget::setFont(const QFont &f)
+bool pqHistogramWidget::event(QEvent *e)
 {
-  QAbstractScrollArea::setFont(f);
+  bool ret = QAbstractScrollArea::event(e);
 
-  // Block the axis update signals until all the changes are
-  // made. This avoids laying out the chart for each individual
-  // change.
-  QFontMetrics fm(f);
+  if(e->type() == QEvent::FontChange)
+    {
+    // Block the axis update signals until all the changes are
+    // made. This avoids laying out the chart for each individual
+    // change.
+    this->XAxis->blockSignals(true);
+    this->XAxis->setTickLabelFont(this->font());
+    this->XAxis->blockSignals(false);
 
-  this->XAxis->blockSignals(true);
-  this->XAxis->setTickLabelFont(f);
-  this->XAxis->blockSignals(false);
+    this->YAxis->blockSignals(true);
+    this->YAxis->setTickLabelFont(this->font());
+    this->YAxis->blockSignals(false);
 
-  this->YAxis->blockSignals(true);
-  this->YAxis->setTickLabelFont(f);
-  this->YAxis->blockSignals(false);
+    this->FAxis->blockSignals(true);
+    this->FAxis->setTickLabelFont(this->font());
+    this->FAxis->blockSignals(false);
 
-  this->FAxis->blockSignals(true);
-  this->FAxis->setTickLabelFont(f);
-  this->FAxis->blockSignals(false);
-
-  this->layoutChart(this->ZoomPan->contentsWidth(),
-      this->ZoomPan->contentsHeight());
+    this->layoutChart(this->ZoomPan->contentsWidth(),
+        this->ZoomPan->contentsHeight());
+    }
+  return ret;
 }
 
 void pqHistogramWidget::setInteractMode(InteractMode mode)
