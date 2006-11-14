@@ -1178,7 +1178,8 @@ void vtkKWParameterValueHermiteFunctionEditor::SelectNextPoint()
     else
       {
       double pos;
-      if (this->GetFunctionPointMidPoint(this->GetSelectedPoint(), &pos))
+      if (this->GetMidPointVisibility() &&
+          this->GetFunctionPointMidPoint(this->GetSelectedPoint(), &pos))
         {
         this->SelectMidPoint(this->GetSelectedPoint());
         }
@@ -1206,7 +1207,8 @@ void vtkKWParameterValueHermiteFunctionEditor::SelectPreviousPoint()
     else
       {
       double pos;
-      if (this->GetFunctionPointMidPoint(this->GetSelectedPoint() - 1, &pos))
+      if (this->GetMidPointVisibility() &&
+          this->GetFunctionPointMidPoint(this->GetSelectedPoint() - 1, &pos))
         {
         this->SelectMidPoint(this->GetSelectedPoint() - 1);
         }
