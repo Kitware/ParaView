@@ -342,6 +342,14 @@ protected:
   vtkSMProxy* OpacityFunctionProxy;
   vtkSMProxy* ColorTransferFunctionProxy;
 
+  // These are pointers to update suppressor proxies
+  // that keep the cache for animation.
+  // By default these are 
+  // same as UpdateSuppressorProxy and VolumeUpdateSuppressorProxy,
+  // Subclasses may change these.
+  vtkSMProxy* CacherProxy;
+  vtkSMProxy* VolumeCacherProxy;
+
   int VolumePipelineType; 
 
   int SupportsHAVSMapper;

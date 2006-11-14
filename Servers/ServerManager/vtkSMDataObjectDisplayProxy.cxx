@@ -38,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.23");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.24");
 
 
 //-----------------------------------------------------------------------------
@@ -80,6 +80,8 @@ vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
   this->GeometryInformationIsValid = 0;
   this->GeometryInformation = vtkPVGeometryInformation::New();
 
+  this->CacherProxy = 0;
+  this->VolumeCacherProxy = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -119,6 +121,7 @@ void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
   this->MapperProxy = this->GetSubProxy("Mapper");
   this->PropertyProxy = this->GetSubProxy("Property");
   this->ActorProxy = this->GetSubProxy("Prop");
+
 
   this->GeometryFilterProxy->SetServers(vtkProcessModule::DATA_SERVER);
   this->UpdateSuppressorProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
@@ -203,6 +206,10 @@ void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
     {
     mlp->SetPropertyProxy(this->PropertyProxy);
     }
+
+  // Set the default cache keepers.
+  this->CacherProxy = this->UpdateSuppressorProxy;
+  this->VolumeCacherProxy = this->VolumeUpdateSuppressorProxy;
 }
 
 //-----------------------------------------------------------------------------
@@ -1336,22 +1343,24 @@ void vtkSMDataObjectDisplayProxy::CacheUpdate(int idx, int total)
     }
 
   
-  vtkSMIntVectorProperty* ivp;
+
+
   // Cache at the appropriate update suppressor depending
   // on if we are rendering volume or polygons.
-  if (this->VolumeRenderMode)
+  vtkSMProxy* cacheKeeper = (this->VolumeRenderMode)?
+    this->VolumeCacherProxy : this->CacherProxy;
+
+  if (!cacheKeeper)
     {
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->VolumeUpdateSuppressorProxy->GetProperty("CacheUpdate"));
+    vtkWarningMacro("Failed to locate the cache keeper proxy in the pipeline."
+      "Cannot update cache.");
+    return;
     }
-  else
-    {
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->UpdateSuppressorProxy->GetProperty("CacheUpdate"));
-    }
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    cacheKeeper->GetProperty("CacheUpdate"));
   ivp->SetElement(0, idx);
   ivp->SetElement(1, total);
-  this->UpdateVTKObjects();
+  cacheKeeper->UpdateVTKObjects();
   
   // I don't like calling Modified directly, but I need the scalars to be
   // remapped through the lookup table, and this causes that to happen.
@@ -1375,12 +1384,13 @@ void vtkSMDataObjectDisplayProxy::InvalidateGeometryInternal(int useCache)
   if (!useCache)
     {
     this->GeometryIsValid = 0;
-    if (this->UpdateSuppressorProxy)
+    if (this->CacherProxy)
       {
-      vtkSMProperty *p = 
-        this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
-      p->Modified();
-      this->UpdateSuppressorProxy->UpdateVTKObjects();
+      this->CacherProxy->InvokeCommand("RemoveAllCaches");
+      }
+    if (this->VolumeCacherProxy)
+      {
+      this->VolumeCacherProxy->InvokeCommand("RemoveAllCaches");
       }
     }
 }
