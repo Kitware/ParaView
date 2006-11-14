@@ -4,6 +4,7 @@ SUBDIRS(
   Theme
   WidgetsTour
   WindowWithPanels
+  WizardDialog
 )
 
 IF(KWWidgets_USE_INTERNATIONALIZATION)

@@ -237,6 +237,10 @@ SET(KWWidgets_SRCS
   vtkKWWindow.cxx
   vtkKWWindowBase.cxx
   vtkKWWindowLevelPresetSelector.cxx
+  vtkKWWizardDialog.cxx
+  vtkKWWizardStep.cxx
+  vtkKWWizardWidget.cxx
+  vtkKWWizardWorkflow.cxx
 # vtkKWColorPicker.cxx
 )
 
