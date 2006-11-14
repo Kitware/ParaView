@@ -391,9 +391,16 @@ bool pqSampleScalarWidget::getRange(double& range_min, double& range_max)
   // Return the range of values in the input (if available)
   if(this->Implementation->SampleProperty)
     {
-    if(vtkSMDoubleRangeDomain* const domain =
-      vtkSMDoubleRangeDomain::SafeDownCast(
-        this->Implementation->SampleProperty->GetDomain("scalar_range")))
+    vtkSMDoubleRangeDomain* domain;
+    domain = vtkSMDoubleRangeDomain::SafeDownCast(
+        this->Implementation->SampleProperty->GetDomain("scalar_range"));
+    if(!domain)
+      {
+      domain = vtkSMDoubleRangeDomain::SafeDownCast(
+        this->Implementation->SampleProperty->GetDomain("bounds"));
+      }
+
+    if(domain)
       {
       int min_exists = 0;
       range_min = domain->GetMinimum(0, min_exists);

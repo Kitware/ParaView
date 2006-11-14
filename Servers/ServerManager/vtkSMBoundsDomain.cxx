@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
-vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.7");
+vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.8");
 
 vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
 
@@ -161,6 +161,51 @@ void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
     {
     vtkSMSourceProxy* sp = 
       vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
+    if (sp)
+      {
+      vtkPVDataInformation *info = sp->GetDataInformation();
+      if (!info)
+        {
+        return;
+        }
+      double bounds[6];
+      info->GetBounds(bounds);
+      if (this->Mode == vtkSMBoundsDomain::NORMAL)
+        {
+        for (j = 0; j < 3; j++)
+          {
+          this->AddMinimum(j, bounds[2*j]);
+          this->AddMaximum(j, bounds[2*j+1]);
+          }
+        }
+      else if (this->Mode == vtkSMBoundsDomain::MAGNITUDE)
+        {
+        double magn = sqrt((bounds[1]-bounds[0]) * (bounds[1]-bounds[0]) +
+                           (bounds[3]-bounds[2]) * (bounds[3]-bounds[2]) +
+                           (bounds[5]-bounds[4]) * (bounds[5]-bounds[4]));
+        this->AddMinimum(0, -magn);
+        this->AddMaximum(0,  magn);
+        }
+      else if (this->Mode == vtkSMBoundsDomain::SCALED_EXTENT)
+        {
+        double maxbounds = bounds[1] - bounds[0];
+        maxbounds = (bounds[3] - bounds[2] > maxbounds) ? (bounds[3] - bounds[2]) : maxbounds;
+        maxbounds = (bounds[5] - bounds[4] > maxbounds) ? (bounds[5] - bounds[4]) : maxbounds;
+        maxbounds *= this->ScaleFactor;
+        this->AddMinimum(0, 0);
+        this->AddMaximum(0, maxbounds);
+        }
+      return;
+      }
+    }
+  
+  // In case there is no valid unchecked proxy, use the actual
+  // proxy values
+  numProxs = pp->GetNumberOfProxies();
+  for (i=0; i<numProxs; i++)
+    {
+    vtkSMSourceProxy* sp = 
+      vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
     if (sp)
       {
       vtkPVDataInformation *info = sp->GetDataInformation();
