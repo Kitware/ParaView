@@ -68,9 +68,9 @@ pqCommandServerStartupContextHelper::pqCommandServerStartupContextHelper(
 
   QObject::connect(
     this->Process,
-    SIGNAL(finished(int, QProcess::ExitStatus)),
+    SIGNAL(started()),
     this,
-    SLOT(onFinished(int, QProcess::ExitStatus)));
+    SLOT(onStarted()));
 }
 
 void pqCommandServerStartupContextHelper::onReadyReadStandardOutput()
@@ -83,21 +83,10 @@ void pqCommandServerStartupContextHelper::onReadyReadStandardError()
   qWarning() << this->Process->readAllStandardError().data();
 }
 
-void pqCommandServerStartupContextHelper::onFinished(int /*exitCode*/,
-  QProcess::ExitStatus exitStatus)
+void pqCommandServerStartupContextHelper::onStarted()
 {
-  switch(exitStatus)
-    {
-    case QProcess::NormalExit:
-      QTimer::singleShot(
-        static_cast<int>(this->Delay * 1000), this, SLOT(onDelayComplete()));
-      break;
-    case QProcess::CrashExit:
-      qWarning() << "The startup command crashed";
-      emit this->failed();
-      break;
-    }
-  
+  QTimer::singleShot(
+    static_cast<int>(this->Delay * 1000), this, SLOT(onDelayComplete()));
 }
 
 void pqCommandServerStartupContextHelper::onError(
@@ -122,6 +111,14 @@ void pqCommandServerStartupContextHelper::onError(
 
 void pqCommandServerStartupContextHelper::onDelayComplete()
 {
+  if(this->Process->state() == QProcess::NotRunning)
+    {
+    if(this->Process->exitStatus() == QProcess::CrashExit)
+      {
+      qWarning() << "The startup command crashed";
+      emit this->failed();
+      }
+    }
   emit this->succeeded();
 }
 
