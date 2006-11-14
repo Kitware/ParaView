@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.56");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.57");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -567,6 +567,11 @@ void vtkKWCheckButton::SetImageToIcon(vtkKWIcon* icon)
     this->SetImageToPixels(
       icon->GetData(), 
       icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
+    }
+  else
+    {
+    this->SetConfigurationOption("-image", "");
+    this->SetConfigurationOption("-selectimage", "");
     }
 }
 

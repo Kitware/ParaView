@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.40");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.41");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -481,6 +481,10 @@ void vtkKWMenuButton::SetImageToIcon(vtkKWIcon* icon)
     this->SetImageToPixels(
       icon->GetData(), 
       icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
+    }
+  else
+    {
+    this->SetConfigurationOption("-image", "");
     }
 }
 

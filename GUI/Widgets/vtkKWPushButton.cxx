@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.35");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.36");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -398,6 +398,10 @@ void vtkKWPushButton::SetImageToIcon(vtkKWIcon* icon)
     this->SetImageToPixels(
       icon->GetData(), 
       icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
+    }
+  else
+    {
+    this->SetConfigurationOption("-image", "");
     }
 }
 
