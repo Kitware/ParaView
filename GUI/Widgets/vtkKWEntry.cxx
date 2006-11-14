@@ -31,8 +31,8 @@ vtkKWEntry::vtkKWEntry()
   this->Command             = NULL;
   this->ValidationCommand   = NULL;
   this->RestrictValue       = vtkKWEntry::RestrictNone;
-  this->CommandTrigger      = 
-    vtkKWEntry::TriggerOnFocusOut | vtkKWEntry::TriggerOnReturnKey;
+  this->CommandTrigger      = (vtkKWEntry::TriggerOnFocusOut | 
+                               vtkKWEntry::TriggerOnReturnKey);
 }
 
 //----------------------------------------------------------------------------
@@ -331,7 +331,7 @@ void vtkKWEntry::ConfigureValidation()
     }
   else
     {
-    this->SetConfigurationOption("-validate", "key");
+    this->SetConfigurationOption("-validate", "all");
     vtksys_stl::string command(this->GetTclName());
     command += " ValidationCallback {%P}";
     this->SetConfigurationOption("-validatecommand", command.c_str());

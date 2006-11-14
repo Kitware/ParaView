@@ -25,8 +25,11 @@ vtkCxxRevisionMacro(vtkKWSpinBox, "1.21");
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox() 
 {
-  this->Command = NULL;
-  this->RestrictValue = vtkKWSpinBox::RestrictNone;
+  this->Command           = NULL;
+  this->ValidationCommand = NULL;
+  this->RestrictValue     = vtkKWSpinBox::RestrictNone;
+  this->CommandTrigger    = (vtkKWSpinBox::TriggerOnFocusOut | 
+                             vtkKWSpinBox::TriggerOnReturnKey);
 }
 
 //----------------------------------------------------------------------------
@@ -36,6 +39,12 @@ vtkKWSpinBox::~vtkKWSpinBox()
     {
     delete [] this->Command;
     this->Command = NULL;
+    }
+
+  if (this->ValidationCommand)
+    {
+    delete [] this->ValidationCommand;
+    this->ValidationCommand = NULL;
     }
 }
 
@@ -49,15 +58,41 @@ void vtkKWSpinBox::CreateWidget()
     return;
     }
 
+  this->Script("%s configure -textvariable %s_Value",
+               this->GetWidgetName(), this->GetTclName());
+  this->Script("trace variable %s_Value w {%s TracedVariableChangedCallback}",
+               this->GetTclName(), this->GetTclName());
+
   char *command = NULL;
-  this->SetObjectMethodCommand(&command, this, "CommandCallback");
+  this->SetObjectMethodCommand(&command, this, "ValueCallback");
   this->SetConfigurationOption("-command", command);
   delete [] command;
 
-  this->SetBinding("<Return>", this, "CommandCallback");
-  this->SetBinding("<FocusOut>", this, "CommandCallback");
+  this->Configure();
+}
 
-  this->UpdateValueRestriction();
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::Configure()
+{
+  if (this->CommandTrigger & vtkKWSpinBox::TriggerOnFocusOut)
+    {
+    this->SetBinding("<FocusOut>", this, "ValueCallback");
+    }
+  else
+    {
+    this->RemoveBinding("<FocusOut>", this, "ValueCallback");
+    }
+
+  if (this->CommandTrigger & vtkKWSpinBox::TriggerOnReturnKey)
+    {
+    this->SetBinding("<Return>", this, "ValueCallback");
+    }
+  else
+    {
+    this->RemoveBinding("<Return>", this, "ValueCallback");
+    }
+
+  this->ConfigureValidation();
 }
 
 //----------------------------------------------------------------------------
@@ -162,7 +197,7 @@ void vtkKWSpinBox::SetRestrictValue(int arg)
   this->RestrictValue = arg;
   this->Modified();
 
-  this->UpdateValueRestriction();
+  this->ConfigureValidation();
 }
 
 void vtkKWSpinBox::SetRestrictValueToInteger()
@@ -181,27 +216,48 @@ void vtkKWSpinBox::SetRestrictValueToNone()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinBox::UpdateValueRestriction()
+void vtkKWSpinBox::ConfigureValidation()
 {
   if (!this->IsCreated())
     {
     return;
     }
 
-  if (this->RestrictValue == vtkKWSpinBox::RestrictInteger)
-    {
-    this->SetConfigurationOption("-validate", "all");
-    this->SetConfigurationOption("-validatecommand", "string is integer %P");
-    }
-  else if (this->RestrictValue == vtkKWSpinBox::RestrictDouble)
-    {
-    this->SetConfigurationOption("-validate", "all");
-    this->SetConfigurationOption("-validatecommand", "string is double %P");
-    }
-  else
+  if (this->RestrictValue == vtkKWSpinBox::RestrictNone &&
+      (!this->ValidationCommand || !*this->ValidationCommand))
     {
     this->SetConfigurationOption("-validate", "none");
     }
+  else
+    {
+    this->SetConfigurationOption("-validate", "all");
+    vtksys_stl::string command(this->GetTclName());
+    command += " ValidationCallback {%P}";
+    this->SetConfigurationOption("-validatecommand", command.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSpinBox::ValidationCallback(const char *value)
+{
+  int res = 1;
+  if (this->RestrictValue == vtkKWSpinBox::RestrictInteger)
+    {
+    res &= atoi(this->Script("string is integer %s", value));
+    }
+  else if (this->RestrictValue == vtkKWSpinBox::RestrictDouble)
+    {
+    res &= atoi(this->Script("string is double %s", value));
+    }
+  if (!res)
+    {
+    return 0;
+    }
+  if (this->ValidationCommand && *this->ValidationCommand)
+    {
+    res &= this->InvokeValidationCommand(value);
+    }
+  return res;
 }
 
 //----------------------------------------------------------------------------
@@ -430,9 +486,44 @@ const char* vtkKWSpinBox::GetFont()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinBox::CommandCallback()
+void vtkKWSpinBox::ValueCallback()
 {
   this->InvokeCommand(this->GetValue());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::TracedVariableChangedCallback(
+  const char *, const char *, const char *)
+{
+  if (this->CommandTrigger & vtkKWSpinBox::TriggerOnAnyChange)
+    {
+    this->ValueCallback();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetCommandTrigger(int arg)
+{
+  if (this->CommandTrigger == arg)
+    {
+    return;
+    }
+
+  this->CommandTrigger = arg;
+  this->Modified();
+
+  this->Configure();
+}
+
+void vtkKWSpinBox::SetCommandTriggerToReturnKeyAndFocusOut()
+{ 
+  this->SetCommandTrigger(
+    vtkKWSpinBox::TriggerOnFocusOut | vtkKWSpinBox::TriggerOnReturnKey); 
+}
+
+void vtkKWSpinBox::SetCommandTriggerToAnyChange()
+{ 
+  this->SetCommandTrigger(vtkKWSpinBox::TriggerOnAnyChange); 
 }
 
 //----------------------------------------------------------------------------
@@ -459,6 +550,28 @@ void vtkKWSpinBox::InvokeCommand(double value)
       }
     }
   this->InvokeEvent(vtkKWSpinBox::SpinBoxValueChangedEvent, &value);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetValidationCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->ValidationCommand, object, method);
+  this->ConfigureValidation();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSpinBox::InvokeValidationCommand(const char *value)
+{
+  if (this->ValidationCommand && *this->ValidationCommand && 
+      this->GetApplication())
+    {
+    const char *val = this->ConvertInternalStringToTclString(
+      value, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
+    return atoi(
+      this->Script("%s \"%s\"", this->ValidationCommand, val ? val : ""));
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

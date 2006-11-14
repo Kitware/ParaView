@@ -76,7 +76,7 @@ public:
 
   // Description:
   // Restrict the value to a given type (integer, double, or no restriction).
-  // Note checks against RestrictValue are performed ValidationCommand.
+  // Note: checks against RestrictValue are performed before ValidationCommand.
   //BTX
   enum
   {
@@ -94,7 +94,7 @@ public:
   // Description:
   // Specifies a command to associate with this step. This command can
   // be used to validate the contents of the widget.
-  // Note checks against RestrictValue are performed ValidationCommand.
+  // Note: checks against RestrictValue are performed before ValidationCommand.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still
@@ -217,7 +217,6 @@ public:
   virtual void SetCommandTriggerToReturnKeyAndFocusOut();
   virtual void SetCommandTriggerToAnyChange();
 
-
   // Description:
   // Events. The EntryValueChangedEvent is triggered when the widget value
   // is changed. It is similar in concept to the 'Command' callback but can be
@@ -267,10 +266,9 @@ protected:
   char *Command;
   char *ValidationCommand;
 
-  virtual void Configure();
-
   // Description:
-  // Configure validation.
+  // Configure.
+  virtual void Configure();
   virtual void ConfigureValidation();
 
 private:

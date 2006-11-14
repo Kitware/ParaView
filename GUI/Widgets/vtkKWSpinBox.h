@@ -66,6 +66,7 @@ public:
 
   // Description:
   // Restrict the value to a given type (integer, double, or no restriction).
+  // Note: checks against RestrictValue are performed before ValidationCommand.
   //BTX
   enum
   {
@@ -79,6 +80,20 @@ public:
   virtual void SetRestrictValueToInteger();
   virtual void SetRestrictValueToDouble();
   virtual void SetRestrictValueToNone();
+
+  // Description:
+  // Specifies a command to associate with this step. This command can
+  // be used to validate the contents of the widget.
+  // Note: checks against RestrictValue are performed before ValidationCommand.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // This command should return 1 if the contents is valid, 0 otherwise.
+  // The following parameters are also passed to the command:
+  // - current value: const char*
+  virtual void SetValidationCommand(vtkObject *object, const char *method);
+  virtual int InvokeValidationCommand(const char *value);
 
   // Description:
   // Set/Get the width of the spinbox in number of characters.
@@ -199,7 +214,9 @@ public:
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
-  // typically invoked when the spinbutton value is changed.
+  // typically invoked when the return key is pressed, or the focus is lost,
+  // as specified by the CommandTrigger variable. It is also invoked when
+  // the spinbuttons are pressed.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still
@@ -210,6 +227,23 @@ public:
   //   be set to a callback accepting 'int'. In doubt, implement the callback
   //   using a 'double' signature that will accept both 'int' and 'double'.
   virtual void SetCommand(vtkObject *object, const char *method);
+  virtual void InvokeCommand(double value);
+
+  // Description:
+  // Specify when Command should be invoked. Default to losing focus and
+  // return key.
+  //BTX
+  enum
+  {
+    TriggerOnFocusOut  = 1,
+    TriggerOnReturnKey = 2,
+    TriggerOnAnyChange = 4
+  };
+  //ETX
+  vtkGetMacro(CommandTrigger, int);
+  virtual void SetCommandTrigger(int);
+  virtual void SetCommandTriggerToReturnKeyAndFocusOut();
+  virtual void SetCommandTriggerToAnyChange();
 
   // Description:
   // Events. The SpinBoxValueChangedEvent is triggered when the widget value
@@ -240,7 +274,10 @@ public:
 
   // Description:
   // Callbacks. Internal, do not use.
-  virtual void CommandCallback();
+  virtual void ValueCallback();
+  virtual int ValidationCallback(const char *value);
+  virtual void TracedVariableChangedCallback(
+    const char *, const char *, const char *);
 
 protected:
   vtkKWSpinBox();
@@ -250,14 +287,16 @@ protected:
   // Create the widget.
   virtual void CreateWidget();
 
-  // Description:
-  // Update value restriction.
-  virtual void UpdateValueRestriction();
-
   int RestrictValue;
+  int CommandTrigger;
 
   char *Command;
-  virtual void InvokeCommand(double value);
+  char *ValidationCommand;
+
+  // Description:
+  // Configure.
+  virtual void Configure();
+  virtual void ConfigureValidation();
 
 private:
   vtkKWSpinBox(const vtkKWSpinBox&); // Not implemented
