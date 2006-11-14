@@ -159,7 +159,11 @@ void vtkKWSpinBox::SetValue(double value)
 //----------------------------------------------------------------------------
 double vtkKWSpinBox::GetValue()
 {
-  return atof(this->Script("%s get", this->GetWidgetName()));
+  if (this->IsCreated())
+    {
+    return atof(this->Script("%s get", this->GetWidgetName()));
+    }
+  return 0.0;
 }
 
 //----------------------------------------------------------------------------
