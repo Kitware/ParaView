@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWStateMachineCluster);
-vtkCxxRevisionMacro(vtkKWStateMachineCluster, "1.1");
+vtkCxxRevisionMacro(vtkKWStateMachineCluster, "1.2");
 
 vtkIdType vtkKWStateMachineCluster::IdCounter = 1;
 
@@ -93,6 +93,11 @@ int vtkKWStateMachineCluster::AddState(vtkKWStateMachineState *state)
     return 0;
     }
   
+  if (!state->GetApplication())
+    {
+    state->SetApplication(this->GetApplication());
+    }
+
   this->Internals->StatePool.push_back(state);
   state->Register(this);
 

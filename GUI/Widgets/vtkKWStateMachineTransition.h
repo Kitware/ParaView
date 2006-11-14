@@ -67,33 +67,73 @@ public:
   virtual int IsComplete();
 
   // Description:
-  // Trigger the action associated to this transition. In the current
-  // implementation, this will call InvokeCommand().
-  virtual void TriggerAction();
+  // Start the transition. This method should be invoked when the transition
+  // is "started" by the state machine, as the state machine is about to 
+  // leave the OriginState but has not yet entered the DestinationState.
+  // This can prove useful to push bew inputs that rely on the fact that the
+  // state machine is still at the OriginState.
+  // It will take care of calling the corresponding callbacks (StartCommand)
+  // and events (StartEvent). Subclasses that override this method should
+  // make sure they call their superclass's Start() method.
+  virtual void Start();
 
   // Description:
-  // Specifies a command to associate with this transition. This command is 
-  // typically invoked when the transition is fired by the state machine. 
-  // Note that the state machine will not call InvokeCommand directly, 
-  // but will call TriggerAction() instead, which in turn will call
-  // InvokeCommand() and other form of events/actions/callbacks associated
-  // to this transition.
+  // End the transition. This command should be invoked when the transition
+  // is "ended" by the state machine, as the state machine has left the
+  // OriginState and already entered the DestinationState. 
+  // This can prove useful to push new inputs that rely on the fact that the
+  // state machine is now at the DestinationState.
+  // It will take care of calling the corresponding callbacks (EndCommand)
+  // and events (EndEvent). Subclasses that override this method should
+  // make sure they call their superclass's End() method.
+  virtual void End();
+
+  // Description:
+  // Specifies a command to associate with this transition. This command
+  // should be invoked when the transition is "started" by the state machine, 
+  // as the state machine is about to leave the OriginState but has not yet
+  // entered the DestinationState. State machine (sub)classes should call
+  // the Start() method most of the time, which will take care of triggering
+  // this callback and firing the StartEvent as well.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still
   // evaluated as a simple command. 
-  virtual void SetCommand(vtkObject *object, const char *method);
-  virtual void InvokeCommand();
+  virtual void SetStartCommand(vtkObject *object, const char *method);
+  virtual void InvokeStartCommand();
+  virtual int HasStartCommand();
 
   // Description:
-  // Specifies an event to associate with this transition. This event is 
-  // typically invoked when the transition is fired by the state machine. 
-  // Note that the state machine will not call InvokeEvent() directly, 
-  // but will call TriggerAction() instead, which in turn will call
-  // InvokeEvent() and other form of events/actions/callbacks associated
-  // to this transition. Defaults to vtkCommand::NoEvent.
-  vtkSetMacro(Event, unsigned long);
-  vtkGetMacro(Event, unsigned long);
+  // Specifies a command to associate with this transition. This command
+  // should be invoked when the transition is "ended" by the state machine, as
+  // the state machine has left the OriginState and already entered
+  // the DestinationState. State machine (sub)classes should call
+  // the End() method most of the time, which will take care of triggering this
+  // callback and firing the EndEvent as well.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  virtual void SetEndCommand(vtkObject *object, const char *method);
+  virtual void InvokeEndCommand();
+  virtual int HasEndCommand();
+
+  // Description:
+  // Events. The StartEvent should be fired when the transition is "started"
+  // by the state machine, as the state machine is about to leave the 
+  // OriginState but has not yet entered the DestinationState. The "EndEvent"
+  // should be fired when the transition is "ended" by the state machine, as
+  // the state machine has left the OriginState and already entered the 
+  // DestinationState. In both case, State machine (sub)classes should call
+  // the corresponding Start() end End() methods most of the time, which will
+  // take care of triggering both the callbacks and firing the events.
+  //BTX
+  enum
+  {
+    StartEvent = 10000,
+    EndEvent,
+  };
+  //ETX
 
 protected:
   vtkKWStateMachineTransition();
@@ -103,8 +143,9 @@ protected:
   vtkKWStateMachineState *OriginState;
   vtkKWStateMachineInput *Input;
   vtkKWStateMachineState *DestinationState;
-  unsigned long Event;
-  char *Command;
+
+  char *EndCommand;
+  char *StartCommand;
 
 private:
 

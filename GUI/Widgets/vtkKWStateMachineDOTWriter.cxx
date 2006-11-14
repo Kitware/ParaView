@@ -22,9 +22,11 @@
 #include "vtkKWStateMachineTransition.h"
 #include "vtkKWStateMachineCluster.h"
 
+#include <vtksys/stl/string>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWStateMachineDOTWriter);
-vtkCxxRevisionMacro(vtkKWStateMachineDOTWriter, "1.1");
+vtkCxxRevisionMacro(vtkKWStateMachineDOTWriter, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWStateMachineDOTWriter::vtkKWStateMachineDOTWriter()
@@ -33,7 +35,7 @@ vtkKWStateMachineDOTWriter::vtkKWStateMachineDOTWriter()
 
   this->GraphFontName = NULL;
   this->SetGraphFontName("Helvetica");
-  this->GraphFontSize = 14;
+  this->GraphFontSize = 12;
   this->GraphFontColor[0] = 0.0;
   this->GraphFontColor[1] = 0.0;
   this->GraphFontColor[2] = 0.0;
@@ -41,14 +43,14 @@ vtkKWStateMachineDOTWriter::vtkKWStateMachineDOTWriter()
 
   this->StateFontName = NULL;
   this->SetStateFontName("Helvetica");
-  this->StateFontSize = 12;
+  this->StateFontSize = 9;
   this->StateFontColor[0] = 0.0;
   this->StateFontColor[1] = 0.0;
   this->StateFontColor[2] = 0.0;
 
   this->InputFontName = NULL;
   this->SetInputFontName("Helvetica");
-  this->InputFontSize = 9;
+  this->InputFontSize = 8;
   this->InputFontColor[0] = 0.0;
   this->InputFontColor[1] = 0.0;
   this->InputFontColor[2] = 1.0;
@@ -59,6 +61,9 @@ vtkKWStateMachineDOTWriter::vtkKWStateMachineDOTWriter()
   this->ClusterFontColor[0] = 0.0;
   this->ClusterFontColor[1] = 0.0;
   this->ClusterFontColor[2] = 0.0;
+
+  this->PutStatesAtSameRank = 0;
+  this->CommandVisibility = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -146,6 +151,8 @@ int vtkKWStateMachineDOTWriter::WriteToStream(ostream& os)
 
   os << endl;
 
+  ostrstream all_states;
+
   int nb_states = this->Input->GetNumberOfStates();
   for (i = 0; i < nb_states; i++)
     {
@@ -160,12 +167,40 @@ int vtkKWStateMachineDOTWriter::WriteToStream(ostream& os)
       {
       os << state->GetId();
       }
+    if (this->CommandVisibility)
+      {
+      int has_enter = state->HasEnterCommand() || 
+        state->HasObserver(vtkKWStateMachineState::EnterEvent);
+      int has_leave = state->HasLeaveCommand() || 
+        state->HasObserver(vtkKWStateMachineState::LeaveEvent);
+      if (has_enter || has_leave)
+        {
+        os << "\\n[";
+        if (has_enter)
+          {
+          os << "e";
+          }
+        if (has_leave)
+          {
+          if (has_enter)
+            {
+            os << "/";
+            }
+          os << "l";
+          }
+        os << "]";
+        }
+      }
     os << "\"";
-    if (state == this->Input->GetInitialState())
+    if (state->GetAccepting())
       {
       os << ", peripheries=2";
       }
     os << "];" << endl;
+    if (this->PutStatesAtSameRank)
+      {
+      all_states << state->GetId() << "; ";
+      }
     }
 
   // Write all transitions
@@ -195,7 +230,31 @@ int vtkKWStateMachineDOTWriter::WriteToStream(ostream& os)
       {
       os << input->GetId();
       }
-    os << "\"];" << endl;
+    if (this->CommandVisibility)
+      {
+      int has_end = transition->HasEndCommand() || 
+        transition->HasObserver(vtkKWStateMachineTransition::EndEvent);
+      int has_start = transition->HasStartCommand() || 
+        transition->HasObserver(vtkKWStateMachineTransition::StartEvent);
+      if (has_end || has_start)
+        {
+        os << " [";
+        if (has_start)
+          {
+          os << "s";
+          }
+        if (has_end)
+          {
+          if (has_start)
+            {
+            os << "/";
+            }
+          os << "e";
+          }
+        os << "]";
+        }
+      }
+      os << "\"];" << endl;
     }
 
   // Write all clusters
@@ -213,20 +272,45 @@ int vtkKWStateMachineDOTWriter::WriteToStream(ostream& os)
     vtkKWStateMachineCluster *cluster = this->Input->GetNthCluster(i);
     os << indent << "subgraph cluster" << cluster->GetId() << " {" << endl;
     vtkIndent next_indent = indent.GetNextIndent();
-    os << next_indent << "fontcolor=\"" << cluster_color << "\";" << endl;
-    os << next_indent << "fontsize=" << this->ClusterFontSize << ";" << endl;
-    os << next_indent << "style=dashed;" << endl;
+    os << next_indent << "fontcolor=\"" << cluster_color << "\"; " 
+       << "fontsize=" << this->ClusterFontSize << "; ";
     if (this->ClusterFontName)
       {
-      os << next_indent << "fontname=\"" 
-         << this->ClusterFontName << "\";" << endl;
+      os << "fontname=\"" << this->ClusterFontName << "\"; ";
       }
+    os << endl;
+    os << next_indent << "style=dashed;" << endl;
+    os << next_indent << "label=\"";
+    if (cluster->GetName())
+      {
+      os << cluster->GetName();
+      }
+    else
+      {
+      os << cluster->GetId();
+      }
+    os << "\"" << endl;
     nb_states = cluster->GetNumberOfStates();
+    os << next_indent;
     for (j = 0; j < nb_states; j++)
       {
       vtkKWStateMachineState *state = cluster->GetNthState(j);
-      os << next_indent << state->GetId() << ";" << endl;
+      os << state->GetId() << "; ";
       }
+    os << endl;
+    os << indent << "}" << endl;
+    }
+
+  // Put all states at same rank?
+
+  if (this->PutStatesAtSameRank)
+    {
+    all_states << ends;
+    os << endl;
+    os << indent << "{" << endl;
+    vtkIndent next_indent = indent.GetNextIndent();
+    os << next_indent << "rank=same;" << endl;
+    os << next_indent << all_states.str() << endl;
     os << indent << "}" << endl;
     }
 
@@ -254,6 +338,21 @@ int vtkKWStateMachineDOTWriter::WriteToStream(ostream& os)
   os << "}" << endl;
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWStateMachineDOTWriter::WriteToFile(const char *filename)
+{
+  ofstream os(filename, ios::out);
+  int ret = this->WriteToStream(os);
+  
+  if (!ret)
+    {
+    os.close();
+    unlink(filename);
+    }
+  
+  return ret;
 }
 
 //----------------------------------------------------------------------------
@@ -296,4 +395,10 @@ void vtkKWStateMachineDOTWriter::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "GraphFontColor: (" << this->GraphFontColor[0] << ", " 
     << this->GraphFontColor[1] << ", " << this->GraphFontColor[2] << ")\n";
+
+  os << indent << "PutStatesAtSameRank: " 
+     << (this->PutStatesAtSameRank ? "On" : "Off") << endl;
+
+  os << indent << "CommandVisibility: " 
+     << (this->CommandVisibility ? "On" : "Off") << endl;
 }

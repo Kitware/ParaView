@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWStateMachine);
-vtkCxxRevisionMacro(vtkKWStateMachine, "1.2");
+vtkCxxRevisionMacro(vtkKWStateMachine, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkKWStateMachineInternals
@@ -53,6 +53,8 @@ public:
   typedef vtksys_stl::vector<vtkKWStateMachineTransition*>::iterator TransitionPoolIterator;
   TransitionPoolType TransitionPool;
 
+  TransitionPoolType TransitionHistoryPool;
+
   // Clusters
 
   typedef vtksys_stl::vector<vtkKWStateMachineCluster*> ClusterPoolType;
@@ -70,7 +72,7 @@ public:
   // => transition tables
 
   typedef vtksys_stl::map<vtkKWStateMachineInput*, vtkKWStateMachineTransition*> InputToTransitionMapType;
-  typedef vtksys_stl::map<vtkKWStateMachineInput*, vtkKWStateMachineTransition*>::iterator InputToTransitionMapInterator;
+  typedef vtksys_stl::map<vtkKWStateMachineInput*, vtkKWStateMachineTransition*>::iterator InputToTransitionMapIterator;
 
   typedef vtksys_stl::map<vtkKWStateMachineState*, InputToTransitionMapType> StateToInputMapType;
   typedef vtksys_stl::map<vtkKWStateMachineState*, InputToTransitionMapType>::iterator StateToInputMapIterator;
@@ -85,6 +87,8 @@ vtkKWStateMachine::vtkKWStateMachine()
 
   this->InitialState = NULL;
   this->CurrentState = NULL;
+
+  this->CurrentStateChangedCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -97,6 +101,12 @@ vtkKWStateMachine::~vtkKWStateMachine()
 
   delete this->Internals;
   this->Internals = NULL;
+
+  if (this->CurrentStateChangedCommand)
+    {
+    delete [] this->CurrentStateChangedCommand;
+    this->CurrentStateChangedCommand = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -136,6 +146,11 @@ int vtkKWStateMachine::AddState(vtkKWStateMachineState *state)
     return 0;
     }
   
+  if (!state->GetApplication())
+    {
+    state->SetApplication(this->GetApplication());
+    }
+
   this->Internals->StatePool.push_back(state);
   state->Register(this);
 
@@ -243,6 +258,11 @@ int vtkKWStateMachine::AddInput(vtkKWStateMachineInput *input)
     return 0;
     }
   
+  if (!input->GetApplication())
+    {
+    input->SetApplication(this->GetApplication());
+    }
+
   this->Internals->InputPool.push_back(input);
   input->Register(this);
 
@@ -378,6 +398,11 @@ int vtkKWStateMachine::AddTransition(vtkKWStateMachineTransition *transition)
     return 0;
     }
 
+  if (!transition->GetApplication())
+    {
+    transition->SetApplication(this->GetApplication());
+    }
+
   this->Internals->TransitionPool.push_back(transition);
   transition->Register(this);
 
@@ -456,24 +481,104 @@ void vtkKWStateMachine::RemoveAllTransitions()
 
 //----------------------------------------------------------------------------
 vtkKWStateMachineTransition* vtkKWStateMachine::CreateTransition(
-  vtkKWStateMachineState *state,
+  vtkKWStateMachineState *origin,
   vtkKWStateMachineInput *input,
-  vtkKWStateMachineState *new_state)
+  vtkKWStateMachineState *destination)
 {
-  if (!state || !input || !new_state)
+  if (!origin || !input || !destination)
     {
     vtkErrorMacro("Can not create transition with incomplete parameters!");
     return NULL;
     }
   
-  vtkKWStateMachineTransition *transition = vtkKWStateMachineTransition::New();
-  transition->SetOriginState(state);
+  vtkKWStateMachineTransition *transition =
+    this->FindTransition(origin, input, destination);
+  if (transition)
+    {
+    return transition;
+    }
+  
+  transition = vtkKWStateMachineTransition::New();
+  transition->SetOriginState(origin);
   transition->SetInput(input);
-  transition->SetDestinationState(new_state);
+  transition->SetDestinationState(destination);
 
   int res = this->AddTransition(transition);
   transition->Delete();
   return res ? transition : NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkKWStateMachineTransition* vtkKWStateMachine::FindTransition(
+  vtkKWStateMachineState *origin,
+  vtkKWStateMachineInput *input)
+{
+  // Find all transitions for the state
+
+  if (this->Internals->TransitionTable.find(origin) ==
+      this->Internals->TransitionTable.end())
+    {
+    return NULL;
+    }
+
+  vtkKWStateMachineInternals::InputToTransitionMapType &input_to_transition =
+    this->Internals->TransitionTable[origin];
+
+  // Find the specific transition for the state and the input
+
+  vtkKWStateMachineInternals::InputToTransitionMapIterator it = 
+    input_to_transition.find(input);
+  if (it == input_to_transition.end())
+    {
+    return NULL;
+    }
+  
+  return it->second;
+}
+
+//----------------------------------------------------------------------------
+vtkKWStateMachineTransition* vtkKWStateMachine::FindTransition(
+  vtkKWStateMachineState *origin,
+  vtkKWStateMachineInput *input,
+  vtkKWStateMachineState *destination)
+{
+  vtkKWStateMachineTransition *transition = 
+    this->FindTransition(origin, input);
+  if (transition && transition->GetDestinationState() == destination)
+    {
+    return transition;
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWStateMachine::PushTransitionToHistory(
+  vtkKWStateMachineTransition *transition)
+{
+  if (transition)
+    {
+    this->Internals->TransitionHistoryPool.push_back(transition);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWStateMachine::GetNumberOfTransitionsInHistory()
+{
+  return this->Internals->TransitionHistoryPool.size();
+}
+
+//----------------------------------------------------------------------------
+vtkKWStateMachineTransition* vtkKWStateMachine::GetNthTransitionInHistory(
+  int rank)
+{
+  if (rank < 0 || rank >= this->GetNumberOfTransitionsInHistory() || 
+      !this->Internals)
+    {
+    vtkErrorMacro("Index out of range");
+    return NULL;
+    }
+
+  return this->Internals->TransitionHistoryPool[rank];
 }
 
 //----------------------------------------------------------------------------
@@ -513,6 +618,11 @@ int vtkKWStateMachine::AddCluster(vtkKWStateMachineCluster *cluster)
     return 0;
     }
   
+  if (!cluster->GetApplication())
+    {
+    cluster->SetApplication(this->GetApplication());
+    }
+
   this->Internals->ClusterPool.push_back(cluster);
   cluster->Register(this);
 
@@ -584,22 +694,44 @@ void vtkKWStateMachine::RemoveAllClusters()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWStateMachine::SetInitialState(vtkKWStateMachineState *state)
+int vtkKWStateMachine::SetInitialState(vtkKWStateMachineState *state)
 {
   if (this->InitialState)
     {
     vtkErrorMacro("Not allowed to reset the initial state!");
-    return;
+    return 0;
     }
 
   if (!state)
     {
-    return;
+    return 0;
     }
 
   this->InitialState = state;
   this->CurrentState = state;
   this->Modified();
+
+  this->InvokeCurrentStateChangedCommand();
+  this->InvokeEvent(vtkKWStateMachine::CurrentStateChangedEvent);
+
+  this->CurrentState->Enter();
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkKWStateMachineState* vtkKWStateMachine::GetPreviousState()
+{
+  if (this->Internals && this->GetNumberOfTransitionsInHistory())
+    {
+    vtkKWStateMachineTransition *transition = this->GetNthTransitionInHistory(
+      this->GetNumberOfTransitionsInHistory() - 1);
+    if (transition)
+      {
+      return transition->GetOriginState();
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -634,36 +766,83 @@ void vtkKWStateMachine::ProcessInput(vtkKWStateMachineInput *input)
     return;
     }
 
-  if (!this->Internals)
-    {
-    return;
-    }
-
-  // Find all transitions for the current state
-
-  if (this->Internals->TransitionTable.find(this->CurrentState) ==
-      this->Internals->TransitionTable.end())
-    {
-    vtkWarningMacro("No transition has been defined for the current state!");
-    return;
-    }
-
-  vtkKWStateMachineInternals::InputToTransitionMapType &input_to_transition =
-    this->Internals->TransitionTable[this->CurrentState];
-
   // Find the specific transition for the current state and this input
 
-  if (input_to_transition.find(input) == input_to_transition.end())
+  vtkKWStateMachineTransition *transition = 
+    this->FindTransition(this->CurrentState, input);
+  if (!transition)
     {
-    vtkWarningMacro("No transition has been defined for the current state given this input!");
+    ostrstream err;
+    err << "No transition has been defined for the current state (";
+    if (this->CurrentState->GetName())
+      {
+      err << this->CurrentState->GetName();
+      }
+    else
+      {
+      err << this->CurrentState->GetId();
+      }
+    err << ") given this input (";
+    if (input->GetName())
+      {
+      err << input->GetName();
+      }
+    else
+      {
+      err << input->GetId();
+      }
+    err << ")!" << ends;
+    vtkWarningMacro(<< err.str());
     return;
     }
-  
-  // Go to new state
 
-  vtkKWStateMachineTransition *transition = input_to_transition[input];
+  // Leave the current state
+
+  transition->Start();
+
+  if (this->CurrentState)
+    {
+    this->CurrentState->Leave();
+    }
+
+  this->PushTransitionToHistory(transition);
+
+  // Go to the new state
+
   this->CurrentState = transition->GetDestinationState();
-  transition->TriggerAction();
+
+  this->InvokeCurrentStateChangedCommand();
+  this->InvokeEvent(vtkKWStateMachine::CurrentStateChangedEvent);
+
+  if (this->CurrentState)
+    {
+    this->CurrentState->Enter();
+    }
+    
+  transition->End();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWStateMachine::SetCurrentStateChangedCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(
+    &this->CurrentStateChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWStateMachine::InvokeCurrentStateChangedCommand()
+{
+  if (this->HasCurrentStateChangedCommand())
+    {
+    this->InvokeObjectMethodCommand(this->CurrentStateChangedCommand);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWStateMachine::HasCurrentStateChangedCommand()
+{
+  return this->CurrentStateChangedCommand && *this->CurrentStateChangedCommand;
 }
 
 //----------------------------------------------------------------------------

@@ -26,7 +26,7 @@ vtkCxxSetObjectMacro(vtkKWStateMachineTransition,DestinationState,vtkKWStateMach
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWStateMachineTransition);
-vtkCxxRevisionMacro(vtkKWStateMachineTransition, "1.1");
+vtkCxxRevisionMacro(vtkKWStateMachineTransition, "1.2");
 
 vtkIdType vtkKWStateMachineTransition::IdCounter = 1;
 
@@ -37,8 +37,9 @@ vtkKWStateMachineTransition::vtkKWStateMachineTransition()
   this->OriginState = NULL;
   this->Input = NULL;
   this->DestinationState = NULL;
-  this->Command = NULL;
-  this->Event = vtkCommand::NoEvent;
+
+  this->EndCommand = NULL;
+  this->StartCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -48,10 +49,15 @@ vtkKWStateMachineTransition::~vtkKWStateMachineTransition()
   this->SetInput(NULL);
   this->SetDestinationState(NULL);
 
-  if (this->Command)
+  if (this->EndCommand)
     {
-    delete [] this->Command;
-    this->Command = NULL;
+    delete [] this->EndCommand;
+    this->EndCommand = NULL;
+    }
+  if (this->StartCommand)
+    {
+    delete [] this->StartCommand;
+    this->StartCommand = NULL;
     }
 }
 
@@ -62,23 +68,61 @@ int vtkKWStateMachineTransition::IsComplete()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWStateMachineTransition::TriggerAction()
+void vtkKWStateMachineTransition::End()
 {
-  this->InvokeCommand();
-  this->InvokeEvent(this->Event);
+  this->InvokeEndCommand();
+  this->InvokeEvent(vtkKWStateMachineTransition::EndEvent);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWStateMachineTransition::SetCommand(
+void vtkKWStateMachineTransition::SetEndCommand(
   vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(&this->Command, object, method);
+  this->SetObjectMethodCommand(&this->EndCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWStateMachineTransition::InvokeCommand()
+void vtkKWStateMachineTransition::InvokeEndCommand()
 {
-  this->InvokeObjectMethodCommand(this->Command);
+  if (this->HasEndCommand())
+    {
+    this->InvokeObjectMethodCommand(this->EndCommand);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWStateMachineTransition::HasEndCommand()
+{
+  return this->EndCommand && *this->EndCommand;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWStateMachineTransition::Start()
+{
+  this->InvokeStartCommand();
+  this->InvokeEvent(vtkKWStateMachineTransition::StartEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWStateMachineTransition::SetStartCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->StartCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWStateMachineTransition::InvokeStartCommand()
+{
+  if (this->HasStartCommand())
+    {
+    this->InvokeObjectMethodCommand(this->StartCommand);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWStateMachineTransition::HasStartCommand()
+{
+  return this->StartCommand && *this->StartCommand;
 }
 
 //----------------------------------------------------------------------------
@@ -87,7 +131,6 @@ void vtkKWStateMachineTransition::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Id: " << this->Id << endl;
-  os << indent << "Event: " << this->Event << endl;
 
   os << indent << "OriginState: ";
   if (this->OriginState)

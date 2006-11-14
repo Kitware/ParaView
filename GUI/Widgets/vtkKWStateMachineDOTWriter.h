@@ -15,6 +15,10 @@
 // .SECTION Description
 // This class is a state machine writer for the DOT format, based on the
 // reference document: http://www.graphviz.org/Documentation/dotguide.pdf
+// The resulting file can be rendered using dot:
+//   dot -T png -o foo.png foo.txt
+// It can also be used directly from a Wiki page if your MediaWiki supports
+// the GraphViz extension (http://meta.wikimedia.org/wiki/GraphViz).
 // A state machine is defined by a set of states, a set of inputs and a
 // transition matrix that defines for each pair of (state,input) what is
 // the next state to assume.
@@ -40,9 +44,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Write state machine representation to stream. 
+  // Write state machine representation to stream or file. 
   // Returns 1 on success and 0 on failure.
   virtual int WriteToStream(ostream& os);
+  virtual int WriteToFile(const char *filename);
 
   // Description:
   // Set/Get the font name used for state labels. Defaults to Helvetica.
@@ -51,7 +56,7 @@ public:
   vtkSetStringMacro(StateFontName);
 
   // Description:
-  // Set/Get the font size used for state labels. Defaults to 12.
+  // Set/Get the font size used for state labels. Defaults to 9.
   vtkSetClampMacro(StateFontSize, int, 2, 200);
   vtkGetMacro(StateFontSize, int);
 
@@ -67,7 +72,7 @@ public:
   vtkSetStringMacro(InputFontName);
 
   // Description:
-  // Set/Get the font size used for input labels. Defaults to 9.
+  // Set/Get the font size used for input labels. Defaults to 8.
   vtkSetClampMacro(InputFontSize, int, 2, 200);
   vtkGetMacro(InputFontSize, int);
 
@@ -89,7 +94,7 @@ public:
   vtkSetStringMacro(GraphFontName);
 
   // Description:
-  // Set/Get the font size used for graph labels. Defaults to 14.
+  // Set/Get the font size used for graph labels. Defaults to 12.
   // Graph labels do not include state or input labels.
   vtkSetClampMacro(GraphFontSize, int, 2, 200);
   vtkGetMacro(GraphFontSize, int);
@@ -101,7 +106,7 @@ public:
   vtkGetVector3Macro(GraphFontColor,double);
 
   // Description:
-  // Set/Get the preferred graph direction. Defaults to left to right.
+  // Set/Get the preferred graph direction. Defaults to top to bottom.
   //BTX
   enum
   {
@@ -113,6 +118,24 @@ public:
   vtkGetMacro(GraphDirection, int);
   virtual void SetGraphDirectionToTopToBottom();
   virtual void SetGraphDirectionToLeftToRight();
+
+  // Description:
+  // Set/Get if the all states should be put at the same rank.
+  // If GraphDirection is TopToBottom, all nodes will share the same rank 
+  // horizontally, except the clusters which will still be set up in a 
+  // vertical fashion. If the GraphDirection is LeftToRight, all nodes
+  // will share the same rank vertically, except the clusters which will still
+  // be set up in a horizontal fashion. Experiment :)
+  vtkBooleanMacro(PutStatesAtSameRank, int);
+  vtkGetMacro(PutStatesAtSameRank, int);
+  vtkSetMacro(PutStatesAtSameRank, int);
+
+  // Description:
+  // Set/Get if the callbacks/commands associated to the state and 
+  // transitions should be shown (default) or hidden.
+  vtkBooleanMacro(CommandVisibility, int);
+  vtkGetMacro(CommandVisibility, int);
+  vtkSetMacro(CommandVisibility, int);
 
   // Description:
   // Set/Get the font name used for cluster labels. Defaults to Helvetica.
@@ -151,6 +174,9 @@ protected:
   char *ClusterFontName;
   int ClusterFontSize;
   double ClusterFontColor[3];
+
+  int PutStatesAtSameRank;
+  int CommandVisibility;
 
 private:
 

@@ -14,10 +14,10 @@
 // .NAME vtkKWStateMachineCluster - a state machine cluster.
 // .SECTION Description
 // This class is the basis for a state machine cluster, i.e. a means
-// to logicall group states together. 
-// A state machine is defined by a set of states, a set of inputs and a
-// transition matrix that defines for each pair of (state,input) what is
-// the next state to assume.
+// to logically group states together. Clusters are not used by the 
+// state machine per se, they are just a convenient way to group states
+// logically together, and can be used by state machine writers
+// (see vtkKWStateMachineDOTWriter) to display clusters as groups.
 // .SECTION Thanks
 // This work is part of the National Alliance for Medical Image
 // Computing (NAMIC), funded by the National Institutes of Health

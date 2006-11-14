@@ -71,6 +71,7 @@ int main()
   // Run the state machine
 
   state_machine->SetInitialState(state_1);
+  state_1->AcceptingOn();
   
   state_machine->PushInput(input_next);    // state_1 to state_2
   state_machine->PushInput(input_invalid); // state_2 to state_2
