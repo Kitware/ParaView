@@ -85,7 +85,6 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
     SLOT(onVariableChanged(pqVariableType, const QString&)));
 
   this->VTKConnect = vtkEventQtSlotConnect::New();
-  this->PendingDisplayPropertyConnections = true;
   this->BlockEmission = false;
 }
 
@@ -229,19 +228,19 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::updateVariableSelector(pqPipelineSource* source)
 {
-  this->VTKConnect->Disconnect();
-  this->PendingDisplayPropertyConnections = true;
   this->SelectedSource = source;
-
   this->reloadGUI();
 }
 
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::displayAdded()
 {
-  if (this->getDisplay())
+  if (this->RenderModule && this->SelectedSource)
     {
-    this->reloadGUI();
+    pqPipelineDisplay* disp;
+    disp = qobject_cast<pqPipelineDisplay*>(
+        this->SelectedSource->getDisplay(this->RenderModule));
+    this->setDisplay(disp);
     }
 }
 
@@ -283,7 +282,22 @@ void pqDisplayColorWidget::setDisplay(pqPipelineDisplay* disp)
 {
   this->VTKConnect->Disconnect();
   this->Display = disp;
-  this->PendingDisplayPropertyConnections = false;
+  if(this->Display)
+    {
+    vtkSMDataObjectDisplayProxy* displayProxy;
+    displayProxy = this->Display->getDisplayProxy();
+    this->VTKConnect->Connect(displayProxy->GetProperty("ScalarVisibility"),
+      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+    this->VTKConnect->Connect(displayProxy->GetProperty("ScalarMode"),
+      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+    this->VTKConnect->Connect(displayProxy->GetProperty("ColorArray"),
+      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+    this->VTKConnect->Connect(
+      displayProxy->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
+      this, SLOT(reloadGUI()),
+      NULL, 0.0,
+      Qt::QueuedConnection);
+    }
   this->reloadGUI();
 }
 
@@ -293,12 +307,6 @@ pqPipelineDisplay* pqDisplayColorWidget::getDisplay() const
   if (this->Display)
     {
     return this->Display;
-    }
-  if (this->RenderModule && this->SelectedSource)
-    {
-    return 
-      qobject_cast<pqPipelineDisplay*>(
-        this->SelectedSource->getDisplay(this->RenderModule));
     }
   return 0;
 }
@@ -318,8 +326,6 @@ void pqDisplayColorWidget::reloadGUI()
     return;
     }
   this->setEnabled(true);
-
-  vtkSMDataObjectDisplayProxy* displayProxy = display->getDisplayProxy();
 
   this->AvailableArrays = display->getColorFields();
   QRegExp regExpCell(" \\(cell\\)\\w*$");
@@ -342,21 +348,6 @@ void pqDisplayColorWidget::reloadGUI()
       }
     }
 
-  if (this->PendingDisplayPropertyConnections)
-    {
-    this->VTKConnect->Connect(displayProxy->GetProperty("ScalarVisibility"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-    this->VTKConnect->Connect(displayProxy->GetProperty("ScalarMode"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-    this->VTKConnect->Connect(displayProxy->GetProperty("ColorArray"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-    this->VTKConnect->Connect(
-      displayProxy->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
-      this, SLOT(reloadGUI()),
-      NULL, 0.0,
-      Qt::QueuedConnection);
-    this->PendingDisplayPropertyConnections = false;
-    }
   this->BlockEmission = false;
   this->updateGUI();
 }

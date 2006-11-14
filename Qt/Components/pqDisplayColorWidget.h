@@ -122,7 +122,6 @@ private:
   QHBoxLayout* Layout;
   QComboBox* Variables;
   bool BlockEmission;
-  bool PendingDisplayPropertyConnections;
   QPointer<pqPipelineSource> SelectedSource;
   vtkEventQtSlotConnect* VTKConnect;
   QPointer<pqRenderModule> RenderModule;
