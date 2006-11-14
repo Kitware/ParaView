@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.53");
+vtkCxxRevisionMacro(vtkKWLabel, "1.54");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -488,14 +488,18 @@ void vtkKWLabel::SetImageToIcon(vtkKWIcon* icon)
       icon->GetData(), 
       icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
     }
+  else
+    {
+    this->SetConfigurationOption("-image", "");
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWLabel::SetImageToPixels(const unsigned char* pixels, 
-                                   int width, 
-                                   int height,
-                                   int pixel_size,
-                                   unsigned long buffer_length)
+                                  int width, 
+                                  int height,
+                                  int pixel_size,
+                                  unsigned long buffer_length)
 {
   vtkKWTkUtilities::SetImageOptionToPixels(
     this, pixels, width, height, pixel_size, buffer_length);
