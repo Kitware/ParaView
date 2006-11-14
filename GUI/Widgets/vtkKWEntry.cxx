@@ -29,7 +29,10 @@ vtkKWEntry::vtkKWEntry()
   this->ReadOnly            = 0;
   this->InternalValueString = NULL;
   this->Command             = NULL;
+  this->ValidationCommand   = NULL;
   this->RestrictValue       = vtkKWEntry::RestrictNone;
+  this->CommandTrigger      = 
+    vtkKWEntry::TriggerOnFocusOut | vtkKWEntry::TriggerOnReturnKey;
 }
 
 //----------------------------------------------------------------------------
@@ -40,6 +43,13 @@ vtkKWEntry::~vtkKWEntry()
     delete [] this->Command;
     this->Command = NULL;
     }
+
+  if (this->ValidationCommand)
+    {
+    delete [] this->ValidationCommand;
+    this->ValidationCommand = NULL;
+    }
+
   this->SetInternalValueString(NULL);
 }
 
@@ -55,21 +65,41 @@ void vtkKWEntry::CreateWidget()
     return;
     }
 
+  this->Script("%s configure -textvariable %s_Value",
+               this->GetWidgetName(), this->GetTclName());
+  this->Script("trace variable %s_Value w {%s TracedVariableChangedCallback}",
+               this->GetTclName(), this->GetTclName());
+
   this->Configure();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWEntry::Configure()
 {
-  this->SetBinding("<Return>", this, "ValueCallback");
-  this->SetBinding("<FocusOut>", this, "ValueCallback");
+  if (this->CommandTrigger & vtkKWEntry::TriggerOnFocusOut)
+    {
+    this->SetBinding("<FocusOut>", this, "ValueCallback");
+    }
+  else
+    {
+    this->RemoveBinding("<FocusOut>", this, "ValueCallback");
+    }
+
+  if (this->CommandTrigger & vtkKWEntry::TriggerOnReturnKey)
+    {
+    this->SetBinding("<Return>", this, "ValueCallback");
+    }
+  else
+    {
+    this->RemoveBinding("<Return>", this, "ValueCallback");
+    }
 
   if (this->Width >= 0)
     {
     this->SetConfigurationOptionAsInt("-width", this->Width);
     }
 
-  this->UpdateValueRestriction();
+  this->ConfigureValidation();
 }
 
 //----------------------------------------------------------------------------
@@ -268,7 +298,7 @@ void vtkKWEntry::SetRestrictValue(int arg)
   this->RestrictValue = arg;
   this->Modified();
 
-  this->UpdateValueRestriction();
+  this->ConfigureValidation();
 }
 
 void vtkKWEntry::SetRestrictValueToInteger()
@@ -287,27 +317,48 @@ void vtkKWEntry::SetRestrictValueToNone()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::UpdateValueRestriction()
+void vtkKWEntry::ConfigureValidation()
 {
   if (!this->IsCreated())
     {
     return;
     }
 
-  if (this->RestrictValue == vtkKWEntry::RestrictInteger)
-    {
-    this->SetConfigurationOption("-validate", "all");
-    this->SetConfigurationOption("-validatecommand", "string is integer %P");
-    }
-  else if (this->RestrictValue == vtkKWEntry::RestrictDouble)
-    {
-    this->SetConfigurationOption("-validate", "all");
-    this->SetConfigurationOption("-validatecommand", "string is double %P");
-    }
-  else
+  if (this->RestrictValue == vtkKWEntry::RestrictNone &&
+      (!this->ValidationCommand || !*this->ValidationCommand))
     {
     this->SetConfigurationOption("-validate", "none");
     }
+  else
+    {
+    this->SetConfigurationOption("-validate", "key");
+    vtksys_stl::string command(this->GetTclName());
+    command += " ValidationCallback {%P}";
+    this->SetConfigurationOption("-validatecommand", command.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWEntry::ValidationCallback(const char *value)
+{
+  int res = 1;
+  if (this->RestrictValue == vtkKWEntry::RestrictInteger)
+    {
+    res &= atoi(this->Script("string is integer %s", value));
+    }
+  else if (this->RestrictValue == vtkKWEntry::RestrictDouble)
+    {
+    res &= atoi(this->Script("string is double %s", value));
+    }
+  if (!res)
+    {
+    return 0;
+    }
+  if (this->ValidationCommand && *this->ValidationCommand)
+    {
+    res &= this->InvokeValidationCommand(value);
+    }
+  return res;
 }
 
 //----------------------------------------------------------------------------
@@ -521,6 +572,41 @@ void vtkKWEntry::ValueCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWEntry::TracedVariableChangedCallback(
+  const char *, const char *, const char *)
+{
+  if (this->CommandTrigger & vtkKWEntry::TriggerOnAnyChange)
+    {
+    this->ValueCallback();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetCommandTrigger(int arg)
+{
+  if (this->CommandTrigger == arg)
+    {
+    return;
+    }
+
+  this->CommandTrigger = arg;
+  this->Modified();
+
+  this->Configure();
+}
+
+void vtkKWEntry::SetCommandTriggerToReturnKeyAndFocusOut()
+{ 
+  this->SetCommandTrigger(
+    vtkKWEntry::TriggerOnFocusOut | vtkKWEntry::TriggerOnReturnKey); 
+}
+
+void vtkKWEntry::SetCommandTriggerToAnyChange()
+{ 
+  this->SetCommandTrigger(vtkKWEntry::TriggerOnAnyChange); 
+}
+
+//----------------------------------------------------------------------------
 void vtkKWEntry::SetCommand(vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->Command, object, method);
@@ -536,6 +622,28 @@ void vtkKWEntry::InvokeCommand(const char *value)
     this->Script("%s \"%s\"", this->Command, val ? val : "");
     }
   this->InvokeEvent(vtkKWEntry::EntryValueChangedEvent, (void*)value);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetValidationCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->ValidationCommand, object, method);
+  this->ConfigureValidation();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWEntry::InvokeValidationCommand(const char *value)
+{
+  if (this->ValidationCommand && *this->ValidationCommand && 
+      this->GetApplication())
+    {
+    const char *val = this->ConvertInternalStringToTclString(
+      value, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
+    return atoi(
+      this->Script("%s \"%s\"", this->ValidationCommand, val ? val : ""));
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -561,5 +669,6 @@ void vtkKWEntry::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Width: " << this->GetWidth() << endl;
   os << indent << "Readonly: " << (this->ReadOnly ? "On" : "Off") << endl;
   os << indent << "RestrictValue: " << this->RestrictValue << endl;
+  os << indent << "CommandTrigger: " << this->CommandTrigger << endl;
 }
 
