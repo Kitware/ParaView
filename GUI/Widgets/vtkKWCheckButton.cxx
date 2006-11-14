@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.57");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.58");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -121,7 +121,8 @@ int vtkKWCheckButton::GetSelectedState()
 #else
     const char *varvalue = 
       Tcl_GetVar(
-        this->GetApplication()->GetMainInterp(), this->VariableName, TCL_GLOBAL_ONLY);
+        this->GetApplication()->GetMainInterp(), 
+        this->VariableName, TCL_GLOBAL_ONLY);
     const char *onvalue = this->GetConfigurationOption("-onvalue");
     return varvalue && onvalue && !strcmp(varvalue, onvalue);
 #endif
@@ -132,7 +133,7 @@ int vtkKWCheckButton::GetSelectedState()
 //----------------------------------------------------------------------------
 void vtkKWCheckButton::SetSelectedState(int s)
 {
-  if (this->IsCreated())
+  if (this->IsCreated() && this->GetSelectedState() != s)
     {
     int was_disabled = !this->GetEnabled();
     if (was_disabled)
@@ -142,7 +143,7 @@ void vtkKWCheckButton::SetSelectedState(int s)
 
     if (s)
       {
-      this->Script("%s select",this->GetWidgetName());
+      this->Script("%s select", this->GetWidgetName());
       }
     else
       {
@@ -152,6 +153,11 @@ void vtkKWCheckButton::SetSelectedState(int s)
     if (was_disabled)
       {
       this->SetEnabled(0);
+      }
+
+    if (this->GetSelectedState() == s)
+      {
+      this->CommandCallback();
       }
     }
 }
