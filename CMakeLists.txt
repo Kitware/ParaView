@@ -60,6 +60,12 @@ MARK_AS_ADVANCED(PYTHON_DEBUG_LIBRARY)
 
 
 #########################################################################
+# Force Infovis support on
+
+SET(VTK_USE_INFOVIS ON CACHE BOOL "Build VTK with Infovis Support" FORCE)
+MARK_AS_ADVANCED(VTK_USE_INFOVIS)
+
+#########################################################################
 # Configure Testing
 OPTION(BUILD_TESTING "Build ParaView Testing" ON)
 IF(BUILD_TESTING)
