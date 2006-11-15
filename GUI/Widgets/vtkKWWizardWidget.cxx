@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWizardWidget);
-vtkCxxRevisionMacro(vtkKWWizardWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWWizardWidget, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWWizardWidget::vtkKWWizardWidget()
@@ -233,7 +233,7 @@ void vtkKWWizardWidget::CreateWidget()
 
   vtkKWTkUtilities::ChangeFontWeightToBold(this->TitleLabel);
 
-  this->Script("grid %s -row 0 -column 0 -sticky news -padx 4 -pady 2",
+  this->Script("grid %s -row 0 -column 0 -sticky news -padx 4 -pady 1",
                this->TitleLabel->GetWidgetName());
 
   this->Script("grid rowconfigure %s 0 -weight 0",
@@ -251,9 +251,9 @@ void vtkKWWizardWidget::CreateWidget()
     }
   this->SubTitleLabel->SetParent(this->TitleFrame);
   this->SubTitleLabel->Create();
-  this->SubTitleLabel->SetAnchorToNorthWest();
   this->SubTitleLabel->SetPadX(15);
   this->SubTitleLabel->AdjustWrapLengthToWidthOn();
+  this->SubTitleLabel->SetAnchorToNorthWest();
 
   this->Script("grid %s -row 1 -column 0 -sticky news -padx 4 -pady 2",
                this->SubTitleLabel->GetWidgetName());

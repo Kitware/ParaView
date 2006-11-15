@@ -153,6 +153,8 @@ public:
   vtkGetObjectMacro(CancelButton, vtkKWPushButton);
   vtkGetObjectMacro(OKButton, vtkKWPushButton);
   vtkGetObjectMacro(SeparatorBeforeButtons, vtkKWSeparator);
+  vtkGetObjectMacro(SubTitleLabel, vtkKWLabel);
+  vtkGetObjectMacro(TitleLabel, vtkKWLabel);
 
   // Description:
   // Add all the default observers needed by that object, or remove
