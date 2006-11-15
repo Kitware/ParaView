@@ -26,7 +26,7 @@ QtTesting.playCommand(object10, 'currentChanged', '/0/2|0')
 QtTesting.playCommand(object10, 'currentChanged', '/0/2|1')
 object11 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0'
 QtTesting.playCommand(object11, 'set_tab', '1')
-object12 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/pqDisplayProxyEditor/ViewGroup/ViewZoomToData'
+object12 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ViewGroup/ViewZoomToData'
 QtTesting.playCommand(object12, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'actionFileSaveServerState')
 object13 = 'MainWindow/FileSaveServerStateDialog'

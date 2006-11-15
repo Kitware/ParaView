@@ -26,6 +26,6 @@
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/SelectInputVectors" command="set_string" arguments="Result" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0" command="set_tab" arguments="1" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="Result" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/pqDisplayProxyEditor/ViewGroup/ViewZoomToData" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="Result" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ViewGroup/ViewZoomToData" command="activate" arguments="" />
 </pqevents>

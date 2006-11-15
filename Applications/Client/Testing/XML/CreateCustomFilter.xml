@@ -7,7 +7,7 @@
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0" command="set_tab" arguments="1" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="false" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="false" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0/0|0" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0" command="set_tab" arguments="0" />
   <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionToolsCreateCustomFilter" />
