@@ -1103,7 +1103,7 @@ int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
 //----------------------------------------------------------------------------
 void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
 {
-  if (!this->HelpDialogStartingPage)
+  if (!this->HelpDialogStartingPage || !*this->HelpDialogStartingPage)
     {
     return;
     }
@@ -1120,8 +1120,25 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
     this->FindInstallationDirectory();
     if (this->InstallationDirectory)
       {
-      helplink += this->InstallationDirectory;
+      vtksys_stl::string try_file;
+      helplink = this->InstallationDirectory;
       helplink += "/";
+
+      try_file = helplink + this->HelpDialogStartingPage;
+      if (!vtksys::SystemTools::FileExists(try_file.c_str()))
+        {
+        helplink += "../";
+        try_file = helplink + this->HelpDialogStartingPage;
+        if (!vtksys::SystemTools::FileExists(try_file.c_str()))
+          {
+          helplink += "doc/";
+          try_file = helplink + this->HelpDialogStartingPage;
+          if (!vtksys::SystemTools::FileExists(try_file.c_str()))
+            {
+            helplink += "../Documentation/";
+            }
+          }
+        }
       }
     }
 
