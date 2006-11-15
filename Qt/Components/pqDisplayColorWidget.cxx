@@ -229,7 +229,13 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
 void pqDisplayColorWidget::updateVariableSelector(pqPipelineSource* source)
 {
   this->SelectedSource = source;
-  this->reloadGUI();
+  if (this->RenderModule && this->SelectedSource)
+    {
+    pqPipelineDisplay* disp;
+    disp = qobject_cast<pqPipelineDisplay*>(
+        this->SelectedSource->getDisplay(this->RenderModule));
+    this->setDisplay(disp);
+    }
 }
 
 //-----------------------------------------------------------------------------
