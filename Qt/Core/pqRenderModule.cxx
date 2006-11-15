@@ -163,7 +163,7 @@ pqRenderModule::pqRenderModule(const QString& name,
   this->Internal->Viewport = new QVTKWidget() 
     << pqSetName("Viewport");
   // do image caching for performance
-  //this->Internal->Viewport->setAutomaticImageCacheEnabled(true);
+  this->Internal->Viewport->setAutomaticImageCacheEnabled(true);
   RenderModules.insert(this);
 
   this->Internal->Viewport->installEventFilter(this);
@@ -273,6 +273,12 @@ void pqRenderModule::viewModuleInit()
   this->Internal->VTKConnect->Connect(
     this->Internal->RenderModuleProxy,
     vtkCommand::EndEvent,this, SLOT(onEndEvent()));  
+  
+  // help the QVTKWidget know when to clear the cache
+  this->Internal->VTKConnect->Connect(
+    this->Internal->RenderModuleProxy, vtkCommand::ModifiedEvent,
+    this->Internal->Viewport, SLOT(markCachedImageAsDirty()));  
+
   iren->Enable();
 
   this->Superclass::viewModuleInit();
