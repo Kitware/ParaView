@@ -293,11 +293,17 @@ void pqDisplayColorWidget::setDisplay(pqPipelineDisplay* disp)
     vtkSMDataObjectDisplayProxy* displayProxy;
     displayProxy = this->Display->getDisplayProxy();
     this->VTKConnect->Connect(displayProxy->GetProperty("ScalarVisibility"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()),
+      NULL, 0.0,
+      Qt::QueuedConnection);
     this->VTKConnect->Connect(displayProxy->GetProperty("ScalarMode"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()),
+      NULL, 0.0,
+      Qt::QueuedConnection);
     this->VTKConnect->Connect(displayProxy->GetProperty("ColorArray"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()),
+      NULL, 0.0,
+      Qt::QueuedConnection);
     this->VTKConnect->Connect(
       displayProxy->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
       this, SLOT(reloadGUI()),

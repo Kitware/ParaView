@@ -577,6 +577,7 @@ void pqMultiView::removeWidget(QWidget* w)
     pqMultiViewFrame* frame = new pqMultiViewFrame();
     this->replaceView(this->indexOf(w), frame);
     this->setup(frame);
+    emit this->frameAdded(frame);
     }
   else
     {
