@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWStateMachineCluster);
-vtkCxxRevisionMacro(vtkKWStateMachineCluster, "1.2");
+vtkCxxRevisionMacro(vtkKWStateMachineCluster, "1.3");
 
 vtkIdType vtkKWStateMachineCluster::IdCounter = 1;
 
@@ -137,8 +137,6 @@ void vtkKWStateMachineCluster::RemoveState(vtkKWStateMachineState *state)
 
   // Remove state
 
-  vtkObject *obj;
-
   vtkKWStateMachineClusterInternals::StatePoolIterator it = 
     this->Internals->StatePool.begin();
   vtkKWStateMachineClusterInternals::StatePoolIterator end = 
@@ -147,7 +145,6 @@ void vtkKWStateMachineCluster::RemoveState(vtkKWStateMachineState *state)
     {
     if ((*it) == state)
       {
-      obj = (vtkObject*)(*it);
       (*it)->UnRegister(this);
       this->Internals->StatePool.erase(it);
       break;

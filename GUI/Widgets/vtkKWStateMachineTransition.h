@@ -131,7 +131,7 @@ public:
   enum
   {
     StartEvent = 10000,
-    EndEvent,
+    EndEvent
   };
   //ETX
 

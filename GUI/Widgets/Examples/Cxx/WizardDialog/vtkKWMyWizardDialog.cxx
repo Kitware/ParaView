@@ -16,7 +16,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMyWizardDialog );
-vtkCxxRevisionMacro(vtkKWMyWizardDialog, "1.1");
+vtkCxxRevisionMacro(vtkKWMyWizardDialog, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWMyWizardDialog::vtkKWMyWizardDialog()
@@ -242,7 +242,7 @@ void vtkKWMyWizardDialog::CreateWidget()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMyWizardDialog::EntryChangedCallback(const char *value)
+int vtkKWMyWizardDialog::EntryChangedCallback(const char *)
 {
   this->GetWizardWidget()->Update();
   return 1;
@@ -496,7 +496,7 @@ void vtkKWMyWizardDialog::ShowResultUserInterfaceCallback()
  
   double operand1 = this->Operand1Entry->GetValueAsDouble();
   double operand2;
-  double result;
+  double result = 0.0;
 
   ostrstream str;
 

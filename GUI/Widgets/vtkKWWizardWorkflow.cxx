@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWizardWorkflow);
-vtkCxxRevisionMacro(vtkKWWizardWorkflow, "1.1");
+vtkCxxRevisionMacro(vtkKWWizardWorkflow, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkKWWizardWorkflowInternals
@@ -388,8 +388,6 @@ void vtkKWWizardWorkflow::RemoveStep(vtkKWWizardStep *step)
 
   // Remove step
 
-  vtkObject *obj;
-
   vtkKWWizardWorkflowInternals::StepPoolIterator it = 
     this->Internals->StepPool.begin();
   vtkKWWizardWorkflowInternals::StepPoolIterator end = 
@@ -398,7 +396,6 @@ void vtkKWWizardWorkflow::RemoveStep(vtkKWWizardStep *step)
     {
     if ((*it) == step)
       {
-      obj = (vtkObject*)(*it);
       (*it)->UnRegister(this);
       this->Internals->StepPool.erase(it);
       break;

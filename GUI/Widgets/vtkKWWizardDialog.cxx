@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWizardDialog);
-vtkCxxRevisionMacro(vtkKWWizardDialog, "1.1");
+vtkCxxRevisionMacro(vtkKWWizardDialog, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWWizardDialog::vtkKWWizardDialog()
@@ -55,8 +55,6 @@ void vtkKWWizardDialog::CreateWidget()
   // Call the superclass to create the whole widget
 
   this->Superclass::CreateWidget();
-
-  const char *wname = this->GetWidgetName();
 
   this->SetSize(500, 340);
 

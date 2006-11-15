@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWizardWidget);
-vtkCxxRevisionMacro(vtkKWWizardWidget, "1.2");
+vtkCxxRevisionMacro(vtkKWWizardWidget, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWWizardWidget::vtkKWWizardWidget()
@@ -192,8 +192,6 @@ void vtkKWWizardWidget::CreateWidget()
   // Call the superclass to create the whole widget
 
   this->Superclass::CreateWidget();
-
-  const char *wname = this->GetWidgetName();
 
   // -------------------------------------------------------------------
   // Workflow
