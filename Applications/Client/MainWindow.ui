@@ -28,7 +28,7 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>19</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPipeline" >
@@ -71,27 +71,6 @@
     <addaction name="actionServerDisconnect" />
     <addaction name="separator" />
     <addaction name="actionFileExit" />
-   </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <widget class="QMenu" name="menuAddPlot" >
-     <property name="title" >
-      <string>Add &amp;Plot</string>
-     </property>
-     <addaction name="actionHistogram" />
-     <addaction name="actionXY_Plot" />
-    </widget>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="menuAddPlot" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
    </widget>
    <widget class="QMenu" name="menuHelp" >
     <property name="title" >
@@ -159,6 +138,28 @@
     <addaction name="actionVCRNextFrame" />
     <addaction name="actionVCRLastFrame" />
    </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <widget class="QMenu" name="menuAddPlot" >
+     <property name="title" >
+      <string>Add &amp;Plot</string>
+     </property>
+     <addaction name="actionHistogram" />
+     <addaction name="actionXY_Plot" />
+     <addaction name="actionTable_View" />
+    </widget>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="menuAddPlot" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
+   </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
    <addaction name="menuView" />
@@ -168,22 +169,13 @@
    <addaction name="menuTools" />
    <addaction name="menuHelp" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>671</y>
-     <width>920</width>
-     <height>19</height>
-    </rect>
-   </property>
-  </widget>
+  <widget class="QStatusBar" name="statusbar" />
   <widget class="QDockWidget" name="pipelineBrowserDock" >
-   <property name="windowTitle" >
-    <string>Pipeline Browser</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Pipeline Browser</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -198,11 +190,11 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="objectInspectorDock" >
-   <property name="windowTitle" >
-    <string>Object Inspector</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Object Inspector</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -210,11 +202,11 @@
    <widget class="QWidget" name="dockWidgetContents_3" />
   </widget>
   <widget class="QDockWidget" name="statisticsViewDock" >
-   <property name="windowTitle" >
-    <string>Statistics View</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Statistics View</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -222,11 +214,11 @@
    <widget class="QWidget" name="dockWidgetContents_4" />
   </widget>
   <widget class="QDockWidget" name="elementInspectorDock" >
-   <property name="windowTitle" >
-    <string>Element Inspector</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Element Inspector</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -564,7 +556,7 @@
     <string>Selection Mode (s)</string>
    </property>
    <property name="shortcut" >
-     <string/>
+    <string/>
    </property>
   </action>
   <action name="actionEditUndo" >
@@ -814,6 +806,11 @@
    </property>
    <property name="text" >
     <string>Max Window Size: 300x300</string>
+   </property>
+  </action>
+  <action name="actionTable_View" >
+   <property name="text" >
+    <string>Table View</string>
    </property>
   </action>
  </widget>

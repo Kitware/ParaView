@@ -84,6 +84,7 @@ public:
 
 private slots:
   void visibilityChanged(pqDisplay* disp);
+  void objectDestroyed(QObject*);
 
 protected:
   int Type;

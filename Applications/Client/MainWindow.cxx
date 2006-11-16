@@ -364,6 +364,12 @@ MainWindow::MainWindow() :
     &this->Implementation->Core.viewManager(), SIGNAL(plotRemoved(pqPlotViewModule*)),
     this, SLOT(onPlotRemoved(pqPlotViewModule*)));
 
+  connect(
+    this->Implementation->UI.actionTable_View,
+    SIGNAL(triggered()),
+    &this->Implementation->Core,
+    SLOT(createTableView()));
+
   // Setup the 'modes' so that they are exclusively selected
   QActionGroup *modeGroup = new QActionGroup(this);
     modeGroup->addAction(this->Implementation->UI.actionMoveMode);

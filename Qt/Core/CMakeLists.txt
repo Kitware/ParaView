@@ -42,6 +42,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFileDialogEventTranslator.h
   pqFlatTreeViewEventTranslator.h
   pqGenericViewModule.h
+  pqHistogramTableModel.h
   pqLookupTableManager.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
@@ -128,6 +129,8 @@ ADD_LIBRARY(pqCore
   pqFlatTreeViewEventTranslator.h
   pqGenericViewModule.cxx
   pqGenericViewModule.h
+  pqHistogramTableModel.cxx
+  pqHistogramTableModel.h
   pqJoystickFly.cxx
   pqJoystickFly.h
   pqLookupTableManager.cxx

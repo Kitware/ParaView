@@ -74,8 +74,7 @@ public:
 
 private slots:
   void visibilityChanged(pqDisplay* disp);
-
-protected:
+  void objectDestroyed(QObject*);
 
 private:
   pqTableViewModule(const pqTableViewModule&); // Not implemented.

@@ -31,15 +31,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqTableViewModule.h"
 
-#include "vtkSMGenericViewDisplayProxy.h"
-#include "vtkSMProxy.h"
+#include "pqDisplay.h"
+#include "pqHistogramTableModel.h"
+#include "pqPipelineSource.h"
+
+#include <vtkCellData.h>
+#include <vtkDoubleArray.h>
+#include <vtkIntArray.h>
+#include <vtkRectilinearGrid.h>
+#include <vtkSMGenericViewDisplayProxy.h>
+#include <vtkSMProxy.h>
 
 #include <QtDebug>
 #include <QPointer>
+#include <QStandardItemModel>
 #include <QTableView>
-
-#include "pqDisplay.h"
-#include "pqPipelineSource.h"
 
 //-----------------------------------------------------------------------------
 class pqTableViewModule::pqImplementation
@@ -63,39 +69,7 @@ pqTableViewModule::pqTableViewModule(
   pqGenericViewModule(group, name, renModule, server, _parent),
   Implementation(new pqImplementation())
 {
-/*
-  switch (this->Type)
-    {
-  case BAR_CHART:
-      {
-      pqHistogramWidget* widget = new pqHistogramWidget();
-      pqVTKHistogramModel* model = new pqVTKHistogramModel(this);
-      widget->getHistogram().setModel(model);
-      this->Internal->PlotWidget = widget;
-      this->Internal->VTKModel = model;
-      this->Internal->MaxNumberOfVisibleDisplays = 1;
-      }
-    break;
-
-  case XY_PLOT:
-      {
-      pqLineChartWidget* widget = new pqLineChartWidget();
-      pqVTKLineChartModel* model = new pqVTKLineChartModel(this);
-      widget->getLineChart().setModel(model);
-      this->Internal->PlotWidget = widget; 
-      this->Internal->VTKModel = model;
-      this->Internal->MaxNumberOfVisibleDisplays = -1;
-      }
-    break;
-
-  default:
-    qDebug() << "PlotType: " << type << " not supported yet.";
-    }
-  QObject::connect(this, SIGNAL(displayVisibilityChanged(pqDisplay*, bool)),
-    this, SLOT(visibilityChanged(pqDisplay*)));
-  QObject::connect(this, SIGNAL(displayAdded(pqDisplay*)),
-    this, SLOT(visibilityChanged(pqDisplay*)));
-*/
+  QObject::connect(this->Implementation->Table, SIGNAL(destroyed(QObject*)), this, SLOT(objectDestroyed(QObject*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -111,76 +85,35 @@ QWidget* pqTableViewModule::getWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqTableViewModule::setWindowParent(QWidget* p)
+void pqTableViewModule::setWindowParent(QWidget* /*p*/)
 {
-/*
-  if (this->Internal->PlotWidget)
-    {
-    this->Internal->PlotWidget->setParent(p);
-    }
-  else
-    {
-    qDebug() << "setWindowParent() failed since PlotWidget not yet created.";
-    }
-*/
 }
 //-----------------------------------------------------------------------------
 QWidget* pqTableViewModule::getWindowParent() const
 {
   return 0;
-/*
-  if (this->Internal->PlotWidget)
-    {
-    return this->Internal->PlotWidget->parentWidget();
-    }
-  qDebug() << "getWindowParent() failed since PlotWidget not yet created.";
-  return 0;
-*/
 }
 
 //-----------------------------------------------------------------------------
 bool pqTableViewModule::canDisplaySource(pqPipelineSource* source) const
 {
-/*
   if (!this->Superclass::canDisplaySource(source))
     {
     return false;
     }
-  switch (this->Type)
-    {
-  case BAR_CHART:
-    return (source->getProxy()->GetXMLName() == QString("ExtractHistogram"));
 
-  case XY_PLOT:
-    return (source->getProxy()->GetXMLName() == QString("Probe2"));
-    }
-*/
+  /** \todo Filter based on the source output type (rectilinear grid or table) here */
 
-  return false;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
-void pqTableViewModule::visibilityChanged(pqDisplay* disp)
+void pqTableViewModule::visibilityChanged(pqDisplay* /*disp*/)
 {
-/*
-  if (disp->isVisible())
-    {
-    int max_visible = this->Internal->MaxNumberOfVisibleDisplays-1;
-    int cc=0;
-    QList<pqDisplay*> dislays = this->getDisplays();
-    foreach(pqDisplay* d, dislays)
-      {
-      if (d != disp && d->isVisible())
-        {
-        cc++;
-        if (cc > max_visible)
-          {
-          d->setVisible(false);
-          }
-        }
-      }
-    }
-*/
+}
+
+void pqTableViewModule::objectDestroyed(QObject*)
+{
 }
 
 //-----------------------------------------------------------------------------
@@ -188,68 +121,36 @@ void pqTableViewModule::forceRender()
 {
   this->Superclass::forceRender();
 
-/*
-  // Now update the GUI.
-  switch (this->Type)
+  const QList<pqDisplay*> pqdisplays = this->getDisplays();
+  foreach(pqDisplay* pqdisplay, pqdisplays)
     {
-  case BAR_CHART:
-    this->renderBarChar();
-    break;
+    if(!pqdisplay->isVisible())
+      continue;
+      
+    vtkSMGenericViewDisplayProxy* const display = 
+      vtkSMGenericViewDisplayProxy::SafeDownCast(pqdisplay->getProxy());
+      
+    vtkDataObject* const data = display->GetOutput();
 
-  case XY_PLOT:
-    this->renderXYPlot();
-    break;
-    }
-*/
-}
+    if(vtkRectilinearGrid* const grid = vtkRectilinearGrid::SafeDownCast(data))
+      {
+      if(vtkDoubleArray* const bin_extents = vtkDoubleArray::SafeDownCast(grid->GetXCoordinates()))
+        {
+        if(vtkIntArray* const bin_values = vtkIntArray::SafeDownCast(
+          grid->GetCellData()->GetArray("bin_values")))
+          {
+          if(bin_extents->GetNumberOfTuples() == bin_values->GetNumberOfTuples() + 1)
+            {
+            delete this->Implementation->Table->model();
+            this->Implementation->Table->setModel(new pqHistogramTableModel(bin_extents, bin_values, this->Implementation->Table));
+            }
+          }
+        }
+      }
 
-/*
-//-----------------------------------------------------------------------------
-void pqTableViewModule::renderXYPlot()
-{
-  pqVTKLineChartModel* model = 
-    qobject_cast<pqVTKLineChartModel*>(this->Internal->VTKModel);
-  if (!model)
-    {
-    qDebug() << "Cannot locate pqVTKLineChartModel.";
     return;
     }
-
-  QList<pqDisplay*> displays = this->getDisplays();
-  QList<pqDisplay*> visibleDisplays;
-  foreach (pqDisplay* display, displays)
-    {
-    if (display->isVisible())
-      {
-      visibleDisplays.push_back(display);
-      }
-    }
-  model->update(visibleDisplays);
+    
+  delete this->Implementation->Table->model();
+  this->Implementation->Table->setModel(new QStandardItemModel());
 }
-
-//-----------------------------------------------------------------------------
-void pqTableViewModule::renderBarChar()
-{
-  pqVTKHistogramModel* model = 
-    qobject_cast<pqVTKHistogramModel*>(this->Internal->VTKModel);
-  if (!model)
-    {
-    qDebug() << "Cannot locate pqVTKHistogramModel.";
-    return;
-    }
-
-  QList<pqDisplay*> displays = this->getDisplays();
-  foreach (pqDisplay* display, displays)
-    {
-    if (display->isVisible())
-      {
-      vtkSMGenericViewDisplayProxy* disp = 
-        vtkSMGenericViewDisplayProxy::SafeDownCast(display->getProxy());
-      model->updateData(disp->GetOutput());
-      return;
-      }
-    }
-  model->updateData((vtkDataObject*)0);
-}
-
-*/

@@ -1952,7 +1952,7 @@
   <ProxyGroup name="views">
     <ViewModuleProxy name="TableView"
       base_proxygroup="rendermodules" base_proxyname="ViewModule"
-      display_name="Table View">
+      display_name="TableDisplay">
     </ViewModuleProxy>
   </ProxyGroup>
   
@@ -3393,6 +3393,10 @@
     </GenericViewDisplayProxy>
 
     <GenericViewDisplayProxy name="HistogramDisplay"
+      base_proxygroup="displays" base_proxyname="GenericViewDisplay">
+    </GenericViewDisplayProxy>
+
+    <GenericViewDisplayProxy name="TableDisplay"
       base_proxygroup="displays" base_proxyname="GenericViewDisplay">
     </GenericViewDisplayProxy>
 
