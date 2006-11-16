@@ -28,9 +28,11 @@
 #include "vtkKWWizardStep.h"
 #include "vtkKWIcon.h"
 
+#include <vtksys/stl/string>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWizardWidget);
-vtkCxxRevisionMacro(vtkKWWizardWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWWizardWidget, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWWizardWidget::vtkKWWizardWidget()
@@ -418,7 +420,7 @@ void vtkKWWizardWidget::CreateWidget()
     this->BackButton = vtkKWPushButton::New();
     }
   this->BackButton->SetParent(this->ButtonFrame);
-  vtkstd::string back("< ");
+  vtksys_stl::string back("< ");
   back += ks_("Wizard|Button|Back");
   this->BackButton->SetText(back.c_str());
   this->BackButton->Create();
@@ -434,7 +436,7 @@ void vtkKWWizardWidget::CreateWidget()
     this->NextButton = vtkKWPushButton::New();
     }
   this->NextButton->SetParent(this->ButtonFrame);
-  vtkstd::string next(ks_("Wizard|Button|Next"));
+  vtksys_stl::string next(ks_("Wizard|Button|Next"));
   next += " >";
   this->NextButton->SetText(next.c_str());
   this->NextButton->Create();
