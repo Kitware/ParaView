@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMyWindow );
-vtkCxxRevisionMacro(vtkKWMyWindow, "1.2");
+vtkCxxRevisionMacro(vtkKWMyWindow, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWMyWindow::vtkKWMyWindow()
@@ -321,8 +321,9 @@ void vtkKWMyWindow::WindowLevelPresetApplyCallback(int id)
 //----------------------------------------------------------------------------
 void vtkKWMyWindow::WindowLevelPresetAddCallback()
 {
-  this->WindowLevelPresetUpdateCallback(
-    this->WindowLevelPresetSelector->AddPreset());
+  int id = this->WindowLevelPresetSelector->AddPreset();
+  this->WindowLevelPresetUpdateCallback(id);
+  this->WindowLevelPresetSelector->SelectPreset(id);
 }
 
 //----------------------------------------------------------------------------
