@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.105");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.106");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -820,8 +820,10 @@ int vtkKWNotebook::AddPage(const char *title,
   page->Frame->Create();
   if (this->UseFrameWithScrollbars)
     {
-    vtkKWFrameWithScrollbar::SafeDownCast(page->Frame)->SetBackgroundColor(
-      this->GetBackgroundColor());
+    vtkKWFrameWithScrollbar::SafeDownCast(
+      page->Frame)->SetBackgroundColor(this->GetBackgroundColor());
+    vtkKWFrameWithScrollbar::SafeDownCast(
+      page->Frame)->HorizontalScrollbarVisibilityOff();
     }
   else
     {

@@ -256,6 +256,8 @@ public:
   // make the page the parent of a vtkKWFrameWithScrollbar. For convenience,
   // this option can be turned on so that pages that are added from now on are
   // automatically put inside a vtkKWFrameWithScrollbar.
+  // Note that HorizontalScrollbarVisibility is set to Off by default on
+  // the vtkKWFrameWithScrollbar created by this class. 
   vtkSetMacro(UseFrameWithScrollbars, int);
   vtkGetMacro(UseFrameWithScrollbars, int);
   vtkBooleanMacro(UseFrameWithScrollbars, int);

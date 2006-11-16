@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.18");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.19");
 
 //----------------------------------------------------------------------------
 class vtkKWFrameWithScrollbarInternals
@@ -45,6 +45,9 @@ vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
 
   this->Frame   = NULL;
   this->ScrollableFrame = NULL;
+
+  this->VerticalScrollbarVisibility = 1;
+  this->HorizontalScrollbarVisibility = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -88,8 +91,27 @@ void vtkKWFrameWithScrollbar::CreateWidget()
 
   // Call the superclass to set the appropriate flags then create manually
 
+  vtksys_stl::string option("-relief flat -bd 2");
+  
+  if (this->VerticalScrollbarVisibility && this->HorizontalScrollbarVisibility)
+    {
+    option += " -auto both -scrollbar both";
+    }
+  else if (this->VerticalScrollbarVisibility)
+    {
+    option += " -auto vertical -scrollbar vertical";
+    }
+  else if (this->HorizontalScrollbarVisibility)
+    {
+    option += " -auto horizontal -scrollbar horizontal";
+    }
+  else
+    {
+    option += " -auto both -scrollbar both"; // Can't really hide them
+    }
+
   if (!vtkKWWidget::CreateSpecificTkWidget(this, 
-        "ScrolledWindow", "-relief flat -bd 2 -auto both"))
+                                           "ScrolledWindow", option.c_str()))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -101,8 +123,7 @@ void vtkKWFrameWithScrollbar::CreateWidget()
   this->ScrollableFrame = vtkKWCoreWidget::New();
   this->ScrollableFrame->SetParent(this);
   vtkKWWidget::CreateSpecificTkWidget(
-    this->ScrollableFrame,
-    "ScrollableFrame", "-height 1024 -constrainedwidth 0");
+    this->ScrollableFrame, "ScrollableFrame", "-height 1024");
 
   this->Script("%s setwidget %s", 
                this->GetWidgetName(), this->ScrollableFrame->GetWidgetName());
@@ -132,6 +153,24 @@ void vtkKWFrameWithScrollbar::CreateWidget()
   this->Internals->VerticalScrollbar->SetApplication(this->GetApplication());
   this->Internals->VerticalScrollbar->SetWidgetName(name.c_str());
   this->Internals->VerticalScrollbar->Create();
+
+  this->ConfigureWidget();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithScrollbar::ConfigureWidget()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  int constrained_width = this->HorizontalScrollbarVisibility ? 0 : 1;
+  int constrained_height = this->VerticalScrollbarVisibility ? 0 : 1;
+
+  this->Script("%s configure -constrainedwidth %d -constrainedheight %d",
+               this->ScrollableFrame->GetWidgetName(), 
+               constrained_width, constrained_height);
 }
 
 //----------------------------------------------------------------------------
@@ -247,6 +286,34 @@ int vtkKWFrameWithScrollbar::GetRelief()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWFrameWithScrollbar::SetVerticalScrollbarVisibility(int arg)
+{
+  if (this->VerticalScrollbarVisibility == arg)
+    {
+    return;
+    }
+
+  this->VerticalScrollbarVisibility = arg;
+  this->Modified();
+
+  this->ConfigureWidget();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithScrollbar::SetHorizontalScrollbarVisibility(int arg)
+{
+  if (this->HorizontalScrollbarVisibility == arg)
+    {
+    return;
+    }
+
+  this->HorizontalScrollbarVisibility = arg;
+  this->Modified();
+
+  this->ConfigureWidget();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWFrameWithScrollbar::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
@@ -259,6 +326,11 @@ void vtkKWFrameWithScrollbar::UpdateEnableState()
 void vtkKWFrameWithScrollbar::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "VerticalScrollbarVisibility: " 
+     << (this->VerticalScrollbarVisibility ? "On" : "Off") << endl;
+  os << indent << "HorizontalScrollbarVisibility: " 
+     << (this->HorizontalScrollbarVisibility ? "On" : "Off") << endl;
 
   os << indent << "Frame: ";
   if (this->Frame)

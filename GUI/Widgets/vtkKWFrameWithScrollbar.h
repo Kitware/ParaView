@@ -36,6 +36,20 @@ public:
   vtkGetObjectMacro(Frame, vtkKWFrame);
 
   // Description:
+  // Set/Get the vertical scrollbar visibility (default to On).
+  // No effect if called after Create().
+  virtual void SetVerticalScrollbarVisibility(int val);
+  vtkGetMacro(VerticalScrollbarVisibility, int);
+  vtkBooleanMacro(VerticalScrollbarVisibility, int);
+
+  // Description:
+  // Set/Get the horizontal scrollbar visibility (default to On).
+  // No effect if called after Create().
+  virtual void SetHorizontalScrollbarVisibility(int val);
+  vtkGetMacro(HorizontalScrollbarVisibility, int);
+  vtkBooleanMacro(HorizontalScrollbarVisibility, int);
+
+  // Description:
   // Set/Get the background color of the widget.
   virtual void GetBackgroundColor(double *r, double *g, double *b);
   virtual double* GetBackgroundColor();
@@ -87,6 +101,15 @@ protected:
   // Description:
   // Create the widget.
   virtual void CreateWidget();
+
+  // Description:
+  // Configure the widget.
+  virtual void ConfigureWidget();
+
+  // Description:
+  // Scrollbar visibility flags
+  int VerticalScrollbarVisibility;
+  int HorizontalScrollbarVisibility;
 
   vtkKWFrame *Frame;
   vtkKWCoreWidget *ScrollableFrame;
