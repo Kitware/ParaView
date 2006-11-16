@@ -1180,14 +1180,6 @@ int vtkKWSelectionFrameLayoutManager::AddWidgetWithTagAndGroup(
 
   this->ScheduleNumberOfWidgetsHasChanged();
 
-  // If we just added a widget, and there was nothing else before, let's
-  // select it for convenience purposes
-
-  if (this->GetNumberOfWidgets() == 1 && !this->GetSelectedWidget())
-    {
-    this->SelectWidget(this->GetNthWidget(0));
-    }
-
   return 1;
 }
 
