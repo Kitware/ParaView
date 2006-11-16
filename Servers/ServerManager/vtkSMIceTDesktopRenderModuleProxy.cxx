@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.21");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -574,9 +574,25 @@ void vtkSMIceTDesktopRenderModuleProxy::AddDisplay(
     {
     pp->RemoveAllProxies();
     pp->AddProxy(this->PKdTreeProxy);
+    disp->UpdateProperty("OrderedCompositingTree");
     }
 
-  disp->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderModuleProxy::RemoveDisplay(
+  vtkSMAbstractDisplayProxy* disp)
+{
+  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
+    disp->GetProperty("OrderedCompositingTree"));
+  if (pp)
+    {
+    pp->RemoveAllProxies();
+    pp->AddProxy(0);
+    disp->UpdateProperty("OrderedCompositingTree");
+    }
+
+  this->Superclass::RemoveDisplay(disp);
 }
 
 //-----------------------------------------------------------------------------
@@ -698,8 +714,8 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
         if (!self_generate_kdtree && this->UsingCustomKdTree)
           {
           // we need to ensure that the PKdTreeProxy no longer
-          // uses the user-defined cuts.
-          this->UsingCustomKdTree = 0;
+          // uses the user-defined cuts. Settings the cuts to NULL
+          // ensures that. 
           vtkClientServerStream stream;
           vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
           stream << vtkClientServerStream::Invoke
@@ -712,9 +728,7 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
         this->UsingCustomKdTree = self_generate_kdtree;
         
         // Build the global k-d tree.
-        vtkSMProperty *p = this->PKdTreeProxy->GetProperty("BuildLocator");
-        p->Modified();
-        this->PKdTreeProxy->UpdateVTKObjects();
+        this->PKdTreeProxy->InvokeCommand("BuildLocator");
         }
       }
     }

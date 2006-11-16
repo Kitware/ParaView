@@ -38,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.25");
 
 
 //-----------------------------------------------------------------------------
@@ -1424,9 +1424,7 @@ void vtkSMDataObjectDisplayProxy::Update()
       {
       return;
       }
-    vtkSMProperty *p
-      = this->VolumeUpdateSuppressorProxy->GetProperty("ForceUpdate");
-    p->Modified();
+    this->VolumeUpdateSuppressorProxy->InvokeCommand("ForceUpdate");
     this->VolumeGeometryIsValid = 1;
     }
   else
@@ -1435,12 +1433,10 @@ void vtkSMDataObjectDisplayProxy::Update()
       {
       return;
       }
-    vtkSMProperty* p = this->UpdateSuppressorProxy->GetProperty("ForceUpdate");
-    p->Modified();
+    this->UpdateSuppressorProxy->InvokeCommand("ForceUpdate");
     this->GeometryIsValid = 1;
     this->GeometryInformationIsValid = 0;
     }
-  this->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
