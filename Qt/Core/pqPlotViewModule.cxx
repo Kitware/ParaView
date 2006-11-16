@@ -106,8 +106,6 @@ pqPlotViewModule::pqPlotViewModule(int type,
     this, SLOT(visibilityChanged(pqDisplay*)));
   QObject::connect(this, SIGNAL(displayAdded(pqDisplay*)),
     this, SLOT(visibilityChanged(pqDisplay*)));
-    
-  QObject::connect(this->Internal->PlotWidget, SIGNAL(destroyed(QObject*)), this, SLOT(objectDestroyed(QObject*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -184,10 +182,6 @@ void pqPlotViewModule::visibilityChanged(pqDisplay* disp)
         }
       }
     }
-}
-
-void pqPlotViewModule::objectDestroyed(QObject*)
-{
 }
 
 //-----------------------------------------------------------------------------

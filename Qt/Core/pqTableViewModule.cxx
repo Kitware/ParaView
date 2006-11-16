@@ -69,7 +69,6 @@ pqTableViewModule::pqTableViewModule(
   pqGenericViewModule(group, name, renModule, server, _parent),
   Implementation(new pqImplementation())
 {
-  QObject::connect(this->Implementation->Table, SIGNAL(destroyed(QObject*)), this, SLOT(objectDestroyed(QObject*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -109,10 +108,6 @@ bool pqTableViewModule::canDisplaySource(pqPipelineSource* source) const
 
 //-----------------------------------------------------------------------------
 void pqTableViewModule::visibilityChanged(pqDisplay* /*disp*/)
-{
-}
-
-void pqTableViewModule::objectDestroyed(QObject*)
 {
 }
 
