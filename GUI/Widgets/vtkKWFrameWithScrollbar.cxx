@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.17");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.18");
 
 //----------------------------------------------------------------------------
 class vtkKWFrameWithScrollbarInternals
@@ -102,7 +102,7 @@ void vtkKWFrameWithScrollbar::CreateWidget()
   this->ScrollableFrame->SetParent(this);
   vtkKWWidget::CreateSpecificTkWidget(
     this->ScrollableFrame,
-    "ScrollableFrame", "-height 1024 -constrainedwidth 1");
+    "ScrollableFrame", "-height 1024 -constrainedwidth 0");
 
   this->Script("%s setwidget %s", 
                this->GetWidgetName(), this->ScrollableFrame->GetWidgetName());
