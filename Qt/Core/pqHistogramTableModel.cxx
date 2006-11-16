@@ -53,8 +53,8 @@ public:
   vtkSmartPointer<vtkIntArray> BinValues;
 };
 
-pqHistogramTableModel::pqHistogramTableModel(vtkDoubleArray* bin_extents, vtkIntArray* bin_values, QObject* parent) :
-  Superclass(parent),
+pqHistogramTableModel::pqHistogramTableModel(vtkDoubleArray* bin_extents, vtkIntArray* bin_values, QObject* parent_object) :
+  Superclass(parent_object),
   Implementation(new pqImplementation(bin_extents, bin_values))
 {
 }
@@ -64,28 +64,28 @@ pqHistogramTableModel::~pqHistogramTableModel()
   delete this->Implementation;
 }
 
-int pqHistogramTableModel::rowCount(const QModelIndex& parent) const
+int pqHistogramTableModel::rowCount(const QModelIndex& /*parent*/) const
 {
   return this->Implementation->BinValues->GetNumberOfTuples();
 }
 
-int pqHistogramTableModel::columnCount(const QModelIndex& parent) const
+int pqHistogramTableModel::columnCount(const QModelIndex& /*parent*/) const
 {
   return 3;
 }
 
-QVariant pqHistogramTableModel::data(const QModelIndex& index, int role) const
+QVariant pqHistogramTableModel::data(const QModelIndex& model_index, int role) const
 {
   if(role == Qt::DisplayRole)
     {
-    switch(index.column())
+    switch(model_index.column())
       {
       case 0:
-        return QString::number(this->Implementation->BinExtents->GetValue(index.row()));
+        return QString::number(this->Implementation->BinExtents->GetValue(model_index.row()));
       case 1:
-        return QString::number(this->Implementation->BinExtents->GetValue(index.row() + 1));
+        return QString::number(this->Implementation->BinExtents->GetValue(model_index.row() + 1));
       case 2:
-        return QString::number(this->Implementation->BinValues->GetValue(index.row()));
+        return QString::number(this->Implementation->BinValues->GetValue(model_index.row()));
       }
     }
     
