@@ -23,10 +23,11 @@
 #include "vtkKWStateMachineCluster.h"
 
 #include <vtksys/stl/string>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWStateMachineDOTWriter);
-vtkCxxRevisionMacro(vtkKWStateMachineDOTWriter, "1.2");
+vtkCxxRevisionMacro(vtkKWStateMachineDOTWriter, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWStateMachineDOTWriter::vtkKWStateMachineDOTWriter()
@@ -349,7 +350,7 @@ int vtkKWStateMachineDOTWriter::WriteToFile(const char *filename)
   if (!ret)
     {
     os.close();
-    unlink(filename);
+    vtksys::SystemTools::RemoveFile(filename);
     }
   
   return ret;
