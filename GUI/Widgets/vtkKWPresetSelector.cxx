@@ -58,7 +58,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.51");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.52");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -933,7 +933,15 @@ int vtkKWPresetSelector::AddPreset()
   this->Internals->PresetPool[id] = node;
 
   this->SetPresetCreationTime(id, vtksys::SystemTools::GetTime());
-  // this->ScheduleUpdatePresetRow(id); // called by SetPresetCreationTime
+
+  // Even though ScheduleUpdatePresetRow() is called by SetPresetCreationTime
+  // let's update the row *now* so that people can both add a preset *and*
+  // select it or see it right away programmatically. If we rely on 
+  // ScheduleUpdatePresetRow, the row will *not* be created on time once
+  // we hit SeeRow or SelectPreset, it will only be created the next time
+  // the event loop is idle enough to do so.
+
+  this->UpdatePresetRow(id); 
 
   if (this->PresetList && this->PresetList->IsMapped())
     {
