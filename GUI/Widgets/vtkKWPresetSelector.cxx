@@ -58,7 +58,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.52");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.53");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -1278,10 +1278,10 @@ vtkKWIcon* vtkKWPresetSelector::GetPresetScreenshot(int id)
 }
 
 //---------------------------------------------------------------------------
-#ifdef KWWidgets_BUILD_VTK_WIDGETS
 int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
   int id, vtkImageData *image)
 {
+#ifdef KWWidgets_BUILD_VTK_WIDGETS
   if (!this->Internals || !this->HasPreset(id))
     {
     return 0;
@@ -1412,16 +1412,15 @@ int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
   // Update the icon cell
 
   this->ScheduleUpdatePresetRow(id);
-
+#endif
   return 1;
 }
-#endif
 
 //---------------------------------------------------------------------------
-#ifdef KWWidgets_BUILD_VTK_WIDGETS
 int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromRenderWindow(
   int id, vtkRenderWindow *win)
 {
+#ifdef KWWidgets_BUILD_VTK_WIDGETS
   if (win)
     {
     vtkWindowToImageFilter *filter = vtkWindowToImageFilter::New();
@@ -1433,9 +1432,9 @@ int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromRenderWindow(
     filter->Delete();
     return res;
     }
+#endif
   return 0;
 }
-#endif
 
 //---------------------------------------------------------------------------
 int vtkKWPresetSelector::FlipPresetThumbnailAndScreenshotVertically(
