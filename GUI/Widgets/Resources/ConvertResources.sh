@@ -12,6 +12,7 @@ KWConvertImageToHeader --zlib --base64 \
     angle_tool.png \
     bidimensional_tool.png \
     bounding_box.png \
+    bug_mini.png \
     camera.png \
     calculator.png \
     color_bar_annotation.png \

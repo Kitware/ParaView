@@ -47,6 +47,7 @@ public:
     IconBrowserBack               = 71,
     IconBrowserForward            = 72,
     IconBrowserUp                 = 70,
+    IconBugMini                   = 200,
     IconCalculator                = 79,
     IconCamera                    = 19,
     IconCdRom                     = 75,

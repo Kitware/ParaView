@@ -46,6 +46,21 @@ static const unsigned char image_bounding_box[] =
 
 /* 
  * Resource generated for file:
+ *    bug_mini.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_bug_mini_width          = 16;
+static const unsigned int  image_bug_mini_height         = 16;
+static const unsigned int  image_bug_mini_pixel_size     = 4;
+static const unsigned long image_bug_mini_length         = 152;
+static const unsigned long image_bug_mini_decoded_length = 1024;
+
+static const unsigned char image_bug_mini[] = 
+  "eNqtklkKwDAIRHtzz5nTTJsPi0ynLpCAkASfjguAC4ftOcje3RhuE87MEFm3/d9hM76KEf"
+  "R+2KoW93HW87EepYF69d7XWrIWpUP5/PHVvKY89yjjQ59KDYrPZscamM9yq/2LfGf/OM7m"
+  "p9zUbnvlSyA=";
+
+/* 
+ * Resource generated for file:
  *    camera.png (zlib, base64) (image file)
  */
 static const unsigned int  image_camera_width          = 16;
