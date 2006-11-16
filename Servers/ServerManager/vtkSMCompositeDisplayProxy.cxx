@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.27");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.28");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -180,7 +180,12 @@ void vtkSMCompositeDisplayProxy::CreateVTKObjects(int numObjects)
   this->Superclass::CreateVTKObjects(numObjects);
   
   this->CacherProxy = this->DistributorSuppressorProxy;
-  this->VolumeCacherProxy = this->VolumeDistributorSuppressorProxy;
+  // The VolumeMapper for Image Data is directly connected to the 
+  // VolumeUpdateSuppressorProxy, and not to VolumeDistributorSuppressorProxy
+  // as is the case with UNSTRUCTURED_GRID volume rendering.
+  this->VolumeCacherProxy = (this->VolumePipelineType == IMAGE_DATA)?
+    this->VolumeUpdateSuppressorProxy :this->VolumeDistributorSuppressorProxy;
+
 }
 
 //-----------------------------------------------------------------------------
