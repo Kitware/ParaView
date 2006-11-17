@@ -1,4 +1,4 @@
-/*=========================================================================
+y/*=========================================================================
 
   Module:    vtkKWMenu.cxx,v
 
@@ -1120,6 +1120,7 @@ void vtkKWMenu::InvokeItem(int index)
 //----------------------------------------------------------------------------
 void vtkKWMenu::DeleteItem(int index)
 {
+  this->SetItemAccelerator(index, NULL);
   const char *wname = this->GetWidgetName();
   this->Script(
     "catch {%s delete %d} ; set {%sHelpArray([%s entrycget %d -label])} {}", 
@@ -1413,7 +1414,8 @@ void vtkKWMenu::SetItemIndicatorVisibility(int index, int flag)
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetItemAccelerator(int index, const char *accelerator)
 {
-  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems() ||
+      !this->HasItemOption(index, "-accelerator"))
     {
     return;
     }
