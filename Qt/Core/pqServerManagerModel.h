@@ -45,7 +45,7 @@ class pqGenericViewModule;
 class pqPipelineDisplay;
 class pqPipelineSource;
 class pqProxy;
-class pqRenderModule;
+class pqRenderViewModule;
 class pqServer;
 class pqServerManagerModelInternal;
 class pqServerManagerModelItem;
@@ -112,12 +112,12 @@ public:
   int getNumberOfRenderModules();
 
   /// Given an index, returns a render module.
-  pqRenderModule* getRenderModule(int idx);
+  pqRenderViewModule* getRenderModule(int idx);
 
-  /// Given a render module proxy get the pqRenderModule representation
+  /// Given a render module proxy get the pqRenderViewModule representation
   /// for it.
-  pqRenderModule* getRenderModule(vtkSMRenderModuleProxy*);
-  pqRenderModule* getRenderModule(QVTKWidget*);
+  pqRenderViewModule* getRenderModule(vtkSMRenderModuleProxy*);
+  pqRenderViewModule* getRenderModule(QVTKWidget*);
 
   /// Book end events for removing a server.
   void beginRemoveServer(pqServer *server);
@@ -139,7 +139,7 @@ public:
 
   // Returns a list of render modules on the particular server.
   // If server==NULL, returns all render modules.
-  QList<pqRenderModule*> getRenderModules(pqServer* server);
+  QList<pqRenderViewModule*> getRenderModules(pqServer* server);
 
   // Returns a list of views on the particular server.
   // If server==NULL, returns all view modules. This includes
@@ -214,14 +214,14 @@ signals:
   void preConnectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
 
   /// Fired when a render module becomes available. The handler of this
-  /// signal must set the pqRenderModule's parent QWidget at first 
+  /// signal must set the pqRenderViewModule's parent QWidget at first 
   /// opportunity.
-  void renderModuleAdded(pqRenderModule* rm);
-  void preRenderModuleAdded(pqRenderModule*);
+  void renderModuleAdded(pqRenderViewModule* rm);
+  void preRenderModuleAdded(pqRenderViewModule*);
 
   /// Fired when a render module is gone for ever.
-  void renderModuleRemoved(pqRenderModule* rm);
-  void preRenderModuleRemoved(pqRenderModule* rm);
+  void renderModuleRemoved(pqRenderViewModule* rm);
+  void preRenderModuleRemoved(pqRenderViewModule* rm);
 
   /// Fired when a pqProxy (or subclass) object is created for
   /// any registered proxy which is not a 

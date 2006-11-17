@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorTableDelegate.h"
 #include "pqColorTableModel.h"
 #include "pqPipelineDisplay.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
@@ -355,7 +355,7 @@ void pqColorMapEditor::resetGUI()
     return;
     }
 
-  pqRenderModule* rm = qobject_cast<pqRenderModule*>(
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
     this->Form->Display->getViewModule(0));
 
   // Update Scalar Bar GUI.
@@ -710,7 +710,7 @@ void pqColorMapEditor::setColorBarVisibility(bool visible)
     return;
     }
 
-  pqRenderModule* rm = qobject_cast<pqRenderModule*>(
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
     this->Form->Display->getViewModule(0));
   pqScalarBarDisplay* sb = stc->getScalarBar(rm);
   if (!sb && visible)
@@ -901,7 +901,7 @@ void pqColorMapEditor::setTitle(const QString& name, const QString& comp)
     return;
     }
 
-  pqRenderModule* rm = qobject_cast<pqRenderModule*>(
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
     this->Form->Display->getViewModule(0));
 
   // Update Scalar Bar GUI.

@@ -144,9 +144,9 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   
   QObject::connect(
     this,
-    SIGNAL(renderModuleChanged(pqRenderModule*)),
+    SIGNAL(renderModuleChanged(pqRenderViewModule*)),
     this,
-    SLOT(onRenderModuleChanged(pqRenderModule*)));
+    SLOT(onRenderModuleChanged(pqRenderViewModule*)));
 
   QObject::connect(
     this->Implementation->PointSourceWidget,
@@ -284,7 +284,7 @@ pqStreamTracerPanel::~pqStreamTracerPanel()
   delete this->Implementation;
 }
 
-void pqStreamTracerPanel::onRenderModuleChanged(pqRenderModule* render_module)
+void pqStreamTracerPanel::onRenderModuleChanged(pqRenderViewModule* render_module)
 {
   // Setup widgets for each available source ...
   if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(

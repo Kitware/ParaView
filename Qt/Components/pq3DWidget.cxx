@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 
 class pq3DWidgetInternal
 {
@@ -64,7 +64,7 @@ public:
   }
     
   QPointer<pqProxy> ReferenceProxy;
-  QPointer<pqRenderModule> RenderModule;
+  QPointer<pqRenderViewModule> RenderModule;
   pqSMProxy ControlledProxy;
   vtkSmartPointer<vtkSMNew3DWidgetProxy> WidgetProxy;
   vtkSmartPointer<vtkCommand> ControlledPropertiesObserver;
@@ -141,7 +141,7 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setRenderModule(pqRenderModule* renModule)
+void pq3DWidget::setRenderModule(pqRenderViewModule* renModule)
 {
   if (renModule == this->Internal->RenderModule)
     {
@@ -180,7 +180,7 @@ void pq3DWidget::setRenderModule(pqRenderModule* renModule)
 }
 
 //-----------------------------------------------------------------------------
-pqRenderModule* pq3DWidget::getRenderModule() const
+pqRenderViewModule* pq3DWidget::getRenderModule() const
 {
   return this->Internal->RenderModule;
 }

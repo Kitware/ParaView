@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectPanel.h"
 #include "pqObjectPanelInterface.h"
 
+class pqRenderViewModule;
+
 /// Custom panel for the StreamTracer filter that manages a combined Qt / 3D widget UI
 class pqStreamTracerPanel :
   public pqObjectPanel
@@ -51,7 +53,7 @@ public:
   virtual void accept();
   
 private slots:
-  void onRenderModuleChanged(pqRenderModule*);
+  void onRenderModuleChanged(pqRenderViewModule*);
   void onSeedTypeChanged(int);
   void onIntegratorTypeChanged(int);
 

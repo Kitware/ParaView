@@ -42,7 +42,7 @@ class pqNameCount;
 class pqPipelineDisplay;
 class pqPipelineSource;
 class pqPlotViewModule;
-class pqRenderModule;
+class pqRenderViewModule;
 class pqScalarBarDisplay;
 class pqScalarsToColors;
 class pqServer;
@@ -97,7 +97,7 @@ public:
   /// display wont be created. If xmlgroup is NULL, this method will
   /// try to instantiate a compound proxy with the given name.
   pqPipelineSource* createSource(const char* xmlgroup,
-    const char* xmlname, pqServer* server, pqRenderModule* renModule);
+    const char* xmlname, pqServer* server, pqRenderViewModule* renModule);
 
   // Create a display proxy for the given proxy(source/filter) and add 
   // it to the given render module. 
@@ -106,16 +106,16 @@ public:
 
   // Create a scalar bar for the lookuptable proxy in the given render window.
   pqScalarBarDisplay* createScalarBar(pqScalarsToColors *lut,
-    pqRenderModule* renModule);
+    pqRenderViewModule* renModule);
 
   /// Create new viewing "window" on the server. It uses the 
   /// MultiViewRenderModule on the given server to instantiate a new render 
   /// module.
-  pqRenderModule* createWindow(pqServer* server);
+  pqRenderViewModule* createWindow(pqServer* server);
 
   /// Remove a viewing "window". This also cleans up any displays that are
   /// visible only in this render window.
-  void removeWindow(pqRenderModule* rm);
+  void removeWindow(pqRenderViewModule* rm);
 
   // Called to create a new plot view on the server. \c type is the enum
   // pqPlotViewModule::PlotType, which is the supported plot type.
@@ -181,7 +181,7 @@ protected:
 
   // Internal create method.
   vtkSMProxy* createPipelineProxy(const char* xmlgroup,
-    const char* xmlname, pqServer* server, pqRenderModule* renModule);
+    const char* xmlname, pqServer* server, pqRenderViewModule* renModule);
 
   pqNameCount* NameGenerator;
   pqUndoStack* UndoStack;

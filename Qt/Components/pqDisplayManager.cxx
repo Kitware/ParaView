@@ -38,12 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPipelineBuilder.h"
 #include "pqServerManagerModel.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqApplicationCore.h"
 #include "pqPendingDisplayUndoElement.h"
 #include "pqUndoStack.h"
 
-typedef QMap< QPointer<pqPipelineSource>, QPointer<pqRenderModule> > DisplayMap;
+typedef QMap< QPointer<pqPipelineSource>, QPointer<pqRenderViewModule> > DisplayMap;
 
 class pqDisplayManager::pqInternal
 {
@@ -64,7 +64,7 @@ pqDisplayManager::~pqDisplayManager()
 }
 
 void pqDisplayManager::addDisplayForSource(pqPipelineSource* source,
-                                           pqRenderModule* rm)
+                                           pqRenderViewModule* rm)
 {
   pqApplicationCore::instance()->getPipelineBuilder()->createDisplayProxy(source,
     rm);
@@ -78,14 +78,14 @@ void pqDisplayManager::addDisplayForSource(pqPipelineSource* source,
 }
 
 void pqDisplayManager::addDeferredDisplayForSource(pqPipelineSource* source, 
-                                                   pqRenderModule* rm)
+                                                   pqRenderViewModule* rm)
 {
   this->Internal->SourcesSansDisplays.insert(source, rm);
 }
 
 void pqDisplayManager::createDeferredDisplays()
 {
-  QList<pqRenderModule*> renderModules;
+  QList<pqRenderViewModule*> renderModules;
 
   DisplayMap::iterator iter;
   for(iter = this->Internal->SourcesSansDisplays.begin();
@@ -93,7 +93,7 @@ void pqDisplayManager::createDeferredDisplays()
       ++iter)
     {
     pqPipelineSource* source = iter.key();
-    pqRenderModule* renderModule = iter.value();
+    pqRenderViewModule* renderModule = iter.value();
     
     if (!source || !renderModule)
       {

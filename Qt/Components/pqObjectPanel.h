@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QPointer>
 class pqProxy;
-class pqRenderModule;
+class pqRenderViewModule;
 
 class pqPropertyManager;
 
@@ -55,7 +55,7 @@ public:
   pqProxy* proxy();
   
   /// get the render module that this object panel works with
-  pqRenderModule* renderModule();
+  pqRenderViewModule* renderModule();
   
   /// size hint for this widget
   QSize sizeHint() const;
@@ -78,7 +78,7 @@ public slots:
   virtual void deselect();
 
   /// Set the render module that this panel works with
-  void setRenderModule(pqRenderModule*);
+  void setRenderModule(pqRenderViewModule*);
 
 signals:
   void canAcceptOrReject(bool);
@@ -86,7 +86,7 @@ signals:
   void onreset();
   void onselect();
   void ondeselect();
-  void renderModuleChanged(pqRenderModule*);
+  void renderModuleChanged(pqRenderViewModule*);
 
 protected:
   /// property manager belongs to this panel

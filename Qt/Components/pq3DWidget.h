@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkPVXMLElement;
 class vtkSMProperty;
 class pqProxy;
-class pqRenderModule;
+class pqRenderViewModule;
 class vtkSMNew3DWidgetProxy;
 class pq3DWidgetInternal;
 
@@ -89,7 +89,7 @@ public:
   bool widgetVisible() const;
   
   /// Get the render module that this widget works with
-  pqRenderModule* getRenderModule() const;
+  pqRenderViewModule* getRenderModule() const;
 
 signals:
   /// Notifies observers that widget visibility has changed
@@ -130,7 +130,7 @@ public slots:
   virtual void reset();
 
   /// Set the render module that this widget works with
-  virtual void setRenderModule(pqRenderModule* rm);
+  virtual void setRenderModule(pqRenderViewModule* rm);
 
 protected slots:
   /// Called to request a render.

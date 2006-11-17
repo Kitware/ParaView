@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRenderModule.cxx
+   Module:    pqRenderViewModule.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 
 // ParaView Server Manager includes.
 #include "QVTKWidget.h"
@@ -64,17 +64,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkPVAxesWidget.h"
 
-static QSet<pqRenderModule*> RenderModules;
+static QSet<pqRenderViewModule*> RenderModules;
 
 /// method to keep server side views in sync with client side views
 /// the client has multiple windows, whereas the server has just one window with
 /// multiple sub views.  We need to tell the server where to put the views.
-static void UpdateServerViews(pqRenderModule* renderModule)
+static void UpdateServerViews(pqRenderViewModule* renderModule)
 {
   // get all the render modules on the server
   pqServer* server = renderModule->getServer();
-  QList<pqRenderModule*> rms;
-  foreach(pqRenderModule* rm, RenderModules)
+  QList<pqRenderViewModule*> rms;
+  foreach(pqRenderViewModule* rm, RenderModules)
     {
     if(rm->getServer() == server)
       {
@@ -85,7 +85,7 @@ static void UpdateServerViews(pqRenderModule* renderModule)
   // find a rectangle that bounds all views
   QRect totalBounds;
   
-  foreach(pqRenderModule* rm, rms)
+  foreach(pqRenderViewModule* rm, rms)
     {
     QRect bounds = rm->getWidget()->rect();
     bounds.moveTo(rm->getWidget()->mapToGlobal(QPoint(0,0)));
@@ -93,7 +93,7 @@ static void UpdateServerViews(pqRenderModule* renderModule)
     }
 
   // now loop through all render modules and set the server size window size
-  foreach(pqRenderModule* rm, rms)
+  foreach(pqRenderViewModule* rm, rms)
     {
     vtkSMIntVectorProperty* prop = 0;
 
@@ -124,7 +124,7 @@ inline uint qHash(QPointer<T> p)
   return qHash(static_cast<T*>(p));
 }
 
-class pqRenderModuleInternal
+class pqRenderViewModuleInternal
 {
 public:
   QPointer<QVTKWidget> Viewport;
@@ -134,7 +134,7 @@ public:
   vtkSmartPointer<vtkPVAxesWidget> AxesWidget;
   pqUndoStack* UndoStack;
 
-  pqRenderModuleInternal()
+  pqRenderViewModuleInternal()
     {
     this->Viewport = 0;
     this->RenderViewProxy = vtkSmartPointer<pqRenderViewProxy>::New();
@@ -143,7 +143,7 @@ public:
     this->UndoStack = new pqUndoStack(true);
     }
 
-  ~pqRenderModuleInternal()
+  ~pqRenderViewModuleInternal()
     {
     this->RenderViewProxy->setRenderModule(0);
     delete this->UndoStack;
@@ -151,11 +151,11 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqRenderModule::pqRenderModule(const QString& name, 
+pqRenderViewModule::pqRenderViewModule(const QString& name, 
   vtkSMRenderModuleProxy* renModule, pqServer* server, QObject* _parent/*=null*/)
 : pqGenericViewModule("render_modules", name, renModule, server, _parent)
 {
-  this->Internal = new pqRenderModuleInternal();
+  this->Internal = new pqRenderViewModuleInternal();
   this->Internal->RenderViewProxy->setRenderModule(this);
   this->Internal->RenderModuleProxy = renModule;
   this->Internal->UndoStack->setActiveServer(this->getServer());
@@ -170,7 +170,7 @@ pqRenderModule::pqRenderModule(const QString& name,
 }
 
 //-----------------------------------------------------------------------------
-pqRenderModule::~pqRenderModule()
+pqRenderViewModule::~pqRenderViewModule()
 {
   RenderModules.remove(this);
 
@@ -179,38 +179,38 @@ pqRenderModule::~pqRenderModule()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMRenderModuleProxy* pqRenderModule::getRenderModuleProxy() const
+vtkSMRenderModuleProxy* pqRenderViewModule::getRenderModuleProxy() const
 {
   return this->Internal->RenderModuleProxy;
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqRenderModule::getWidget()
+QWidget* pqRenderViewModule::getWidget()
 {
   return this->Internal->Viewport;
 }
 
 //-----------------------------------------------------------------------------
-pqUndoStack* pqRenderModule::getInteractionUndoStack() const
+pqUndoStack* pqRenderViewModule::getInteractionUndoStack() const
 {
   return this->Internal->UndoStack;
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::setWindowParent(QWidget* _parent)
+void pqRenderViewModule::setWindowParent(QWidget* _parent)
 {
   this->Internal->Viewport->setParent(_parent);
   this->Internal->Viewport->update();
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqRenderModule::getWindowParent() const
+QWidget* pqRenderViewModule::getWindowParent() const
 {
   return this->Internal->Viewport->parentWidget();
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::viewModuleInit()
+void pqRenderViewModule::viewModuleInit()
 {
   if (!this->Internal->Viewport || !this->Internal->RenderViewProxy)
     {
@@ -285,7 +285,7 @@ void pqRenderModule::viewModuleInit()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::startInteraction()
+void pqRenderViewModule::startInteraction()
 {
   // It is essential to synchronize camera properties prior to starting the 
   // interaction since the current state of the camera might be different from 
@@ -307,7 +307,7 @@ void pqRenderModule::startInteraction()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::endInteraction()
+void pqRenderViewModule::endInteraction()
 {
   this->Internal->RenderModuleProxy->SynchronizeCameraProperties();
   this->Internal->UndoStack->EndUndoSet();
@@ -323,19 +323,19 @@ void pqRenderModule::endInteraction()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::onStartEvent()
+void pqRenderViewModule::onStartEvent()
 {
   emit this->beginRender();
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::onEndEvent()
+void pqRenderViewModule::onEndEvent()
 {
   emit this->endRender();
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::render()
+void pqRenderViewModule::render()
 {
   if (this->Internal->RenderModuleProxy && this->Internal->Viewport)
     {
@@ -344,7 +344,7 @@ void pqRenderModule::render()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::resetCamera()
+void pqRenderViewModule::resetCamera()
 {
   if (this->Internal->RenderModuleProxy)
     {
@@ -353,7 +353,7 @@ void pqRenderModule::resetCamera()
 }
 
 //-----------------------------------------------------------------------------
-bool pqRenderModule::saveImage(int width, int height, const QString& filename)
+bool pqRenderViewModule::saveImage(int width, int height, const QString& filename)
 {
   QSize cur_size = this->Internal->Viewport->size();
   if (width>0 && height>0)
@@ -403,7 +403,7 @@ bool pqRenderModule::saveImage(int width, int height, const QString& filename)
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::setDefaults()
+void pqRenderViewModule::setDefaults()
 {
   vtkSMProxy* proxy = this->getProxy();
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODResolution"), 50);
@@ -444,7 +444,7 @@ void pqRenderModule::setDefaults()
 }
 
 //-----------------------------------------------------------------------------
-bool pqRenderModule::eventFilter(QObject* caller, QEvent* e)
+bool pqRenderViewModule::eventFilter(QObject* caller, QEvent* e)
 {
   // TODO, apparently, this should watch for window position changes, not resizes
   

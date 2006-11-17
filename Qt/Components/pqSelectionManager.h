@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkType.h"
 
 class pqPipelineSource;
-class pqRenderModule;
+class pqRenderViewModule;
 class pqSelectionManagerImplementation;
 class vtkDataObject;
 class vtkObject;
@@ -116,7 +116,7 @@ private slots:
   void sourceRemoved(pqPipelineSource*);
   void proxyRegistered(QString, QString, vtkSMProxy*);
   void proxyUnRegistered(QString, QString, vtkSMProxy*);
-  void renderModuleRemoved(pqRenderModule* rm);
+  void renderModuleRemoved(pqRenderViewModule* rm);
   void onSelectionUpdateVTKObjects(vtkObject* sel);
   void updateSelections();
 
@@ -124,13 +124,13 @@ private:
   pqSelectionManagerImplementation* Implementation;
   int Mode;
 
-  int setInteractorStyleToSelect(pqRenderModule*);
-  int setInteractorStyleToInteract(pqRenderModule*);
+  int setInteractorStyleToSelect(pqRenderViewModule*);
+  int setInteractorStyleToInteract(pqRenderViewModule*);
   void processEvents(unsigned long event);
-  vtkSMDisplayProxy* getDisplayProxy(pqRenderModule*, vtkSMProxy*, bool create_new=true);
+  vtkSMDisplayProxy* getDisplayProxy(pqRenderViewModule*, vtkSMProxy*, bool create_new=true);
   void createDisplayProxies(vtkSMProxy*, bool show=true);
 
-  void updateSelection(int* eventpos, pqRenderModule* rm);
+  void updateSelection(int* eventpos, pqRenderViewModule* rm);
 
   void clearClientDisplays();
   void createNewClientDisplays(pqServerManagerSelection&);

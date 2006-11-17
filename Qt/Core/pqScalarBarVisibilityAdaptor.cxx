@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqScalarsToColors.h"
 #include "pqScalarBarDisplay.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarBarVisibilityAdaptor::pqInternal
@@ -49,7 +49,7 @@ class pqScalarBarVisibilityAdaptor::pqInternal
 public:
   QPointer<pqPipelineDisplay> ActiveDisplay;
   QPointer<pqPipelineSource> ActiveSource;
-  QPointer<pqRenderModule> ActiveRenderModule;
+  QPointer<pqRenderViewModule> ActiveRenderModule;
 };
 
 //-----------------------------------------------------------------------------
@@ -134,7 +134,7 @@ void pqScalarBarVisibilityAdaptor::setActiveSource(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqScalarBarVisibilityAdaptor::setActiveView(pqGenericViewModule* view)
 {
-  pqRenderModule* const rm = qobject_cast<pqRenderModule*>(view);
+  pqRenderViewModule* const rm = qobject_cast<pqRenderViewModule*>(view);
   if (this->Internal->ActiveRenderModule == rm)
     {
     return;

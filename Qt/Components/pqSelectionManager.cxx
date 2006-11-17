@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
@@ -150,8 +150,8 @@ public:
   // traverse selection and extract prop ids (unique)
   vtkInteractorStyleRubberBandPick* RubberBand;
   vtkInteractorObserver* SavedStyle;
-  pqRenderModule* RenderModule;
-  pqRenderModule* SelectionRenderModule;
+  pqRenderViewModule* RenderModule;
+  pqRenderViewModule* SelectionRenderModule;
   vtkPQSelectionObserver* SelectionObserver;
 
   int Xs, Ys, Xe, Ye;
@@ -208,8 +208,8 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
                    this, 
                    SLOT(sourceRemoved(pqPipelineSource*)));
   QObject::connect(
-    model, SIGNAL(renderModuleRemoved(pqRenderModule*)),
-    this, SLOT(renderModuleRemoved(pqRenderModule*)));
+    model, SIGNAL(renderModuleRemoved(pqRenderViewModule*)),
+    this, SLOT(renderModuleRemoved(pqRenderViewModule*)));
 
   // Cleanup when a selection helper is unregistered.
   pqServerManagerObserver* observer = core->getServerManagerObserver();
@@ -269,7 +269,7 @@ void pqSelectionManager::switchToInteraction()
 }
 
 //-----------------------------------------------------------------------------
-int pqSelectionManager::setInteractorStyleToSelect(pqRenderModule* rm)
+int pqSelectionManager::setInteractorStyleToSelect(pqRenderViewModule* rm)
 {
   vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
   if (!rmp)
@@ -301,7 +301,7 @@ int pqSelectionManager::setInteractorStyleToSelect(pqRenderModule* rm)
 }
 
 //-----------------------------------------------------------------------------
-int pqSelectionManager::setInteractorStyleToInteract(pqRenderModule* rm)
+int pqSelectionManager::setInteractorStyleToInteract(pqRenderViewModule* rm)
 {
   vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
   if (!rmp)
@@ -340,7 +340,7 @@ void pqSelectionManager::createDisplayProxies(vtkSMProxy* input, bool show/*=tru
   int numRenModules = model->getNumberOfRenderModules();
   for (int i=0; i<numRenModules; i++)
     {
-    pqRenderModule* rm = model->getRenderModule(i);
+    pqRenderViewModule* rm = model->getRenderModule(i);
     vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
     if (rmp->GetConnectionID() == input->GetConnectionID())
       {
@@ -357,7 +357,7 @@ void pqSelectionManager::createDisplayProxies(vtkSMProxy* input, bool show/*=tru
 }
 
 //-----------------------------------------------------------------------------
-vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderModule* rm,
+vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderViewModule* rm,
                                                        vtkSMProxy* input,
                                                        bool create_new/*=true*/)
 {
@@ -426,7 +426,7 @@ vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderModule* rm,
 //-----------------------------------------------------------------------------
 void pqSelectionManager::setActiveView(pqGenericViewModule* view)
 {
-  pqRenderModule* rm = qobject_cast<pqRenderModule*>(view);
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
   if (!rm)
     {
     return;
@@ -596,7 +596,7 @@ void pqSelectionManager::processEvents(unsigned long eventId)
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
+void pqSelectionManager::updateSelection(int* eventpos, pqRenderViewModule* rm)
 {
   // Set the selection rectangle
   this->Implementation->Xe = eventpos[0];
@@ -908,8 +908,8 @@ void pqSelectionManager::selectionChanged(vtkIdType cid)
   emit this->selectionChanged(this);
 
   // Since selection changed, we need to trigger render to show the selection.
-  QList<pqRenderModule*> rms = model->getRenderModules(model->getServer(cid));
-  foreach(pqRenderModule* rm, rms)
+  QList<pqRenderViewModule*> rms = model->getRenderModules(model->getServer(cid));
+  foreach(pqRenderViewModule* rm, rms)
     {
     rm->render();
     }
@@ -963,7 +963,7 @@ int pqSelectionManager::getSelectedObject(
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::renderModuleRemoved(pqRenderModule* rm)
+void pqSelectionManager::renderModuleRemoved(pqRenderViewModule* rm)
 {
   // locate displays in this render module, if any, are remove them.
   vtkSMProxy* rmp = rm->getProxy();

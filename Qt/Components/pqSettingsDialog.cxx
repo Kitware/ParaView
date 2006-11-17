@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 // ParaView Client includes.
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pq3DViewPropertiesWidget.h"
 
 //-----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ class pqSettingsDialogInternal : public Ui::pqSettingsDialog
 {
 public:
   pq3DViewPropertiesWidget* ViewProperties;
-  QPointer<pqRenderModule> RenderModule;
+  QPointer<pqRenderViewModule> RenderModule;
   pqSettingsDialogInternal()
     {
     this->ViewProperties = 0;
@@ -79,7 +79,7 @@ pqSettingsDialog::~pqSettingsDialog()
 }
 
 //-----------------------------------------------------------------------------
-void pqSettingsDialog::setRenderModule(pqRenderModule* ren)
+void pqSettingsDialog::setRenderModule(pqRenderViewModule* ren)
 {
   this->Internal->RenderModule = ren;
   this->setupGUI();

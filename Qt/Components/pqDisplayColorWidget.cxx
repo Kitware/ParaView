@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineDisplay.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 
@@ -274,7 +274,7 @@ void pqDisplayColorWidget::setView(pqGenericViewModule* view)
     {
     QObject::disconnect(this->RenderModule, 0, this, 0);
     }
-  this->RenderModule = qobject_cast<pqRenderModule*>(view);
+  this->RenderModule = qobject_cast<pqRenderViewModule*>(view);
   if (this->RenderModule)
     {
     QObject::connect(this->RenderModule, SIGNAL(displayAdded(pqDisplay*)), 

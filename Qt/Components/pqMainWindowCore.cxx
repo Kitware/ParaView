@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPQLookupTableManager.h"
 #include "pqProxyTabWidget.h"
 #include "pqReaderFactory.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqRenderWindowManager.h"
 #include "pqSelectionManager.h"
 #include "pqSelectReaderDialog.h"
@@ -811,7 +811,7 @@ bool pqMainWindowCore::compareView(
   ostream& output,
   const QString& tempDirectory)
 {
-  pqRenderModule* renModule = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* renModule = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
 
   if (!renModule)
     {
@@ -1120,7 +1120,7 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveScreenshot()
 {
-  pqRenderModule* rm = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
   if(!rm)
     {
     qDebug() << "Cannnot save image. No active render module.";
@@ -1148,7 +1148,7 @@ void pqMainWindowCore::onFileSaveScreenshot()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveScreenshot(const QStringList& files)
 {
-  pqRenderModule* const rm = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* const rm = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
   if(!rm)
     {
     qDebug() << "Cannnot save image. No active render module.";
@@ -1218,7 +1218,7 @@ void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
     }
   pqSimpleAnimationManager manager(this);
   manager.setServer(this->getActiveServer());
-  manager.setRenderModule(qobject_cast<pqRenderModule*>(pqActiveView::instance().current()));
+  manager.setRenderModule(qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current()));
   if (!manager.createTimestepAnimation(source, files[0]))
     {
     qDebug()<< "Animation not saved successfully.";
@@ -1228,7 +1228,7 @@ void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onEditCameraUndo()
 {
-  pqRenderModule* view = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* view = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
   if (!view)
     {
     qDebug() << "No active render module, cannot undo camera.";
@@ -1242,7 +1242,7 @@ void pqMainWindowCore::onEditCameraUndo()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onEditCameraRedo()
 {
-  pqRenderModule* view = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* view = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
   if (!view)
     {
     qDebug() << "No active render module, cannot redo camera.";
@@ -1381,7 +1381,7 @@ void pqMainWindowCore::onToolsRecordTest(const QStringList &fileNames)
 
 void pqMainWindowCore::onToolsRecordTestScreenshot()
 {
-  if(!qobject_cast<pqRenderModule*>(pqActiveView::instance().current()))
+  if(!qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current()))
     {
     qDebug() << "Cannnot save image. No active render module.";
     return;
@@ -1408,7 +1408,7 @@ void pqMainWindowCore::onToolsRecordTestScreenshot()
 
 void pqMainWindowCore::onToolsRecordTestScreenshot(const QStringList &fileNames)
 {
-  pqRenderModule* const render_module = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* const render_module = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
   if(!render_module)
     {
     qCritical() << "Cannnot save image. No active render module.";
@@ -1500,7 +1500,7 @@ void pqMainWindowCore::onHelpEnableTooltips(bool enabled)
 void pqMainWindowCore::onEditSettings()
 {
   pqSettingsDialog dialog(this->Implementation->Parent);
-  dialog.setRenderModule(qobject_cast<pqRenderModule*>(pqActiveView::instance().current()));
+  dialog.setRenderModule(qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current()));
   dialog.exec();
 }
 
@@ -1681,7 +1681,7 @@ void pqMainWindowCore::onInitializeStates()
 {
   pqServer* const server = this->getActiveServer();
   pqPipelineSource *source = this->getActiveSource();
-  pqRenderModule* rm = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
   
   const int num_servers = pqApplicationCore::instance()->
     getServerManagerModel()->getNumberOfServers();
@@ -1731,7 +1731,7 @@ void pqMainWindowCore::onInitializeInteractionStates()
   QString undo_camera_label = "";
   QString redo_camera_label = "";
 
-  if(pqRenderModule* const rm = qobject_cast<pqRenderModule*>(pqActiveView::instance().current()))
+  if(pqRenderViewModule* const rm = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current()))
     {
     pqUndoStack* const stack = rm->getInteractionUndoStack();
     if (stack && stack->CanUndo())
@@ -1911,7 +1911,7 @@ void pqMainWindowCore::setActiveView(pqGenericViewModule* view)
 {
   this->onInitializeStates();
 
-  pqRenderModule* rm = qobject_cast<pqRenderModule*>(view);
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
   if(rm)
     {
     QObject::connect(
@@ -2063,7 +2063,7 @@ void pqMainWindowCore::filtersActivated()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::resetCamera()
 {
-  pqRenderModule* ren = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
   if (ren)
     {
     ren->resetCamera();
@@ -2076,7 +2076,7 @@ void pqMainWindowCore::resetViewDirection(
     double look_x, double look_y, double look_z,
     double up_x, double up_y, double up_z)
 {
-  pqRenderModule* ren = qobject_cast<pqRenderModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
   if (ren)
     {
     vtkSMRenderModuleProxy* proxy = ren->getRenderModuleProxy();

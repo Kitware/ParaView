@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqPipelineSource;
-class pqRenderModule;
+class pqRenderViewModule;
 class pqServer;
 class pqSimpleAnimationManagerProxies;
 
@@ -67,7 +67,7 @@ public slots:
 
   // Set the render module. The view in this render module will be
   // saved in the animation.
-  void setRenderModule(pqRenderModule* ren)
+  void setRenderModule(pqRenderViewModule* ren)
     { this->RenderModule = ren; }
 private slots:
   void onAnimationTick();
@@ -75,7 +75,7 @@ private slots:
 private:
   pqPipelineSource* Source;
   pqServer* Server;
-  pqRenderModule* RenderModule;
+  pqRenderViewModule* RenderModule;
   pqSimpleAnimationManagerProxies* Proxies;
 };
 #endif

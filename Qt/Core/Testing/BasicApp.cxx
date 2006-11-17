@@ -10,7 +10,7 @@
 #include "pqMain.h"
 #include "pqProcessModuleGUIHelper.h"
 #include "pqServer.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqApplicationCore.h"
 #include "pqPipelineBuilder.h"
 #include "pqUndoStack.h"
@@ -56,7 +56,7 @@ public:
     this->RenderModule->render();
   }
   
-  QPointer<pqRenderModule> RenderModule;
+  QPointer<pqRenderViewModule> RenderModule;
 
 };
 
@@ -77,7 +77,7 @@ public:
   bool compareView(const QString& referenceImage, double threshold,
                    ostream& output, const QString& tempDirectory)
   {
-    pqRenderModule* renModule = Win->RenderModule;
+    pqRenderViewModule* renModule = Win->RenderModule;
 
     if (!renModule)
       {

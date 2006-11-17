@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqMultiViewFrame.h"
 #include "pqPipelineBuilder.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqXMLUtil.h"
@@ -78,17 +78,17 @@ class pqRenderWindowManagerInternal
 {
 public:
   QPointer<pqServer> ActiveServer;
-  QPointer<pqRenderModule> ActiveRenderModule;
+  QPointer<pqRenderViewModule> ActiveRenderModule;
   QPointer<pqMultiViewFrame> FrameBeingRemoved;
 
   QSet<QPointer<pqMultiViewFrame> > Frames;
 
-  QList<QPointer<pqRenderModule> > PendingRenderModules;
+  QList<QPointer<pqRenderViewModule> > PendingRenderModules;
   QSize MaxRenderWindowSize;
 
-  pqRenderModule* getRenderModuleToAllocate()
+  pqRenderViewModule* getRenderModuleToAllocate()
     {
-    foreach (pqRenderModule* ren, this->PendingRenderModules)
+    foreach (pqRenderViewModule* ren, this->PendingRenderModules)
       {
       if (ren)
         {
@@ -96,7 +96,7 @@ public:
         return ren;
         }
       }
-    pqRenderModule* ren  = pqPipelineBuilder::instance()->createWindow(
+    pqRenderViewModule* ren  = pqPipelineBuilder::instance()->createWindow(
       this->ActiveServer);
     this->PendingRenderModules.removeAll(ren);
     return ren;
@@ -119,10 +119,10 @@ pqRenderWindowManager::pqRenderWindowManager(QWidget* _parent/*=null*/)
     }
 
 
-  QObject::connect(smModel, SIGNAL(renderModuleAdded(pqRenderModule*)),
-    this, SLOT(onRenderModuleAdded(pqRenderModule*)));
-  QObject::connect(smModel, SIGNAL(renderModuleRemoved(pqRenderModule*)),
-    this, SLOT(onRenderModuleRemoved(pqRenderModule*)));
+  QObject::connect(smModel, SIGNAL(renderModuleAdded(pqRenderViewModule*)),
+    this, SLOT(onRenderModuleAdded(pqRenderViewModule*)));
+  QObject::connect(smModel, SIGNAL(renderModuleRemoved(pqRenderViewModule*)),
+    this, SLOT(onRenderModuleRemoved(pqRenderViewModule*)));
 
   QObject::connect(this, SIGNAL(frameAdded(pqMultiViewFrame*)), 
     this, SLOT(onFrameAdded(pqMultiViewFrame*)));
@@ -159,7 +159,7 @@ void pqRenderWindowManager::setActiveServer(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-pqRenderModule* pqRenderWindowManager::getActiveRenderModule()
+pqRenderViewModule* pqRenderWindowManager::getActiveRenderModule()
 {
   return this->Internal->ActiveRenderModule;
 }
@@ -173,7 +173,7 @@ void pqRenderWindowManager::onFrameAdded(pqMultiViewFrame* frame)
     }
 
   // Either use a previously unallocated render module, or create a new one.
-  pqRenderModule* rm = this->Internal->getRenderModuleToAllocate();
+  pqRenderViewModule* rm = this->Internal->getRenderModuleToAllocate();
 
   rm->setWindowParent(frame);
   frame->setMainWidget(rm->getWidget());
@@ -228,7 +228,7 @@ void pqRenderWindowManager::onFrameRemoved(pqMultiViewFrame* frame)
   if (w)
     {
     this->Internal->FrameBeingRemoved = frame;
-    pqRenderModule* rm = 
+    pqRenderViewModule* rm = 
       pqServerManagerModel::instance()->getRenderModule(w);
     QObject::disconnect(frame->BackButton, 0, rm->getInteractionUndoStack(), 0);
     QObject::disconnect(frame->ForwardButton, 0, rm->getInteractionUndoStack(), 0);
@@ -247,7 +247,7 @@ void pqRenderWindowManager::onFrameRemoved(pqMultiViewFrame* frame)
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderWindowManager::onRenderModuleAdded(pqRenderModule* rm)
+void pqRenderWindowManager::onRenderModuleAdded(pqRenderViewModule* rm)
 {
   this->Internal->PendingRenderModules.push_back(rm);
 }
@@ -271,7 +271,7 @@ QList<pqMultiViewFrame*> frames = this->SplitterFrame->findChildren<pqMultiViewF
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderWindowManager::onRenderModuleRemoved(pqRenderModule* rm)
+void pqRenderWindowManager::onRenderModuleRemoved(pqRenderViewModule* rm)
 {
   pqMultiViewFrame* frame = NULL;
   if (!this->Internal->FrameBeingRemoved)
@@ -313,7 +313,7 @@ void pqRenderWindowManager::onActivate(QWidget* obj)
     return;
     }
   QVTKWidget* w = qobject_cast<QVTKWidget*>(frame->mainWidget());
-  pqRenderModule* rm = 
+  pqRenderViewModule* rm = 
     pqServerManagerModel::instance()->getRenderModule(w);
   this->Internal->ActiveRenderModule = rm;
   foreach(pqMultiViewFrame* fr, this->Internal->Frames)
@@ -330,7 +330,7 @@ void pqRenderWindowManager::onActivate(QWidget* obj)
 //-----------------------------------------------------------------------------
 void pqRenderWindowManager::setActiveView(pqGenericViewModule* view)
 {
-  pqRenderModule* ren = qobject_cast<pqRenderModule*>(view);
+  pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(view);
   
   if (this->Internal->ActiveRenderModule == ren)
     {
@@ -403,7 +403,7 @@ void pqRenderWindowManager::saveState(vtkPVXMLElement* root)
     QVTKWidget* w = qobject_cast<QVTKWidget*>(frame->mainWidget());
     if (w)
       {
-      pqRenderModule* rm = 
+      pqRenderViewModule* rm = 
         pqServerManagerModel::instance()->getRenderModule(w);
       frameElem->AddAttribute("render_module", rm->getProxy()->GetSelfIDAsString());
       }
@@ -443,7 +443,7 @@ bool pqRenderWindowManager::loadState(vtkPVXMLElement* rwRoot,
       vtkSMRenderModuleProxy* renModuleProxy = 
         vtkSMRenderModuleProxy::SafeDownCast(loader->NewProxy(id));
       renModuleProxy->Delete();
-      pqRenderModule* rm =
+      pqRenderViewModule* rm =
         pqServerManagerModel::instance()->getRenderModule(renModuleProxy);
       pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
         this->widgetOfIndex(index));
@@ -463,7 +463,7 @@ bool pqRenderWindowManager::loadState(vtkPVXMLElement* rwRoot,
       QVTKWidget* _window = qobject_cast<QVTKWidget*>(frame->mainWidget());
       if (_window)
         {
-        pqRenderModule* ren = pqServerManagerModel::instance()->getRenderModule(_window);
+        pqRenderViewModule* ren = pqServerManagerModel::instance()->getRenderModule(_window);
         if (ren)
           {
           this->Internal->PendingRenderModules.push_back(ren);

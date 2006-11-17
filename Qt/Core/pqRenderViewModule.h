@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRenderModule.h
+   Module:    pqRenderViewModule.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,28 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqRenderModule_h
-#define __pqRenderModule_h
+#ifndef __pqRenderViewModule_h
+#define __pqRenderViewModule_h
 
 
 #include "pqGenericViewModule.h"
 
-class pqRenderModuleInternal;
+class pqRenderViewModuleInternal;
 class pqUndoStack;
 class QVTKWidget;
 class vtkSMRenderModuleProxy;
 
 
 // This is a PQ abstraction of a render module.
-class PQCORE_EXPORT pqRenderModule : public pqGenericViewModule
+class PQCORE_EXPORT pqRenderViewModule : public pqGenericViewModule
 {
   Q_OBJECT
 public:
   typedef pqGenericViewModule Superclass;
 
-  pqRenderModule(const QString& name, vtkSMRenderModuleProxy* renModule, 
+  pqRenderViewModule(const QString& name, vtkSMRenderModuleProxy* renModule, 
     pqServer* server, QObject* parent=NULL);
-  virtual ~pqRenderModule();
+  virtual ~pqRenderViewModule();
 
   /// Returns the internal render Module proxy associated with this object.
   vtkSMRenderModuleProxy* getRenderModuleProxy() const;
@@ -99,7 +99,7 @@ protected:
   bool eventFilter(QObject* caller, QEvent* e);
 
 private: 
-  pqRenderModuleInternal* Internal;
+  pqRenderViewModuleInternal* Internal;
 };
 
 #endif

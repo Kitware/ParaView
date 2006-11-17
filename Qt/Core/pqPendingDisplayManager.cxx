@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqUndoStack.h"
 
 
@@ -119,7 +119,7 @@ void pqPendingDisplayManager::createPendingDisplays(pqGenericViewModule* view)
     pb->createDisplay(source, view);
     view->render();
 
-    pqRenderModule* rm = qobject_cast<pqRenderModule*>(view);
+    pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
     if (rm && pqApplicationCore::instance()->getServerManagerModel()
       ->getNumberOfSources() == 1)
       {

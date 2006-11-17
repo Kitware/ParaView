@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqServer.h"
 #include "pqUndoStack.h"
 #include "pqXYPlotDisplayProxyEditor.h"

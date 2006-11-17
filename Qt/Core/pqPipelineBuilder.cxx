@@ -60,8 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqPlotViewModule.h"
-#include "pqRenderModule.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqScalarBarDisplay.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
@@ -104,7 +103,7 @@ pqPipelineBuilder::~pqPipelineBuilder()
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqPipelineBuilder::createSource(const char* xmlgroup,
-    const char* xmlname, pqServer* server, pqRenderModule* renModule)
+    const char* xmlname, pqServer* server, pqRenderViewModule* renModule)
 {
   vtkSMProxy* proxy = this->createPipelineProxy(xmlgroup, xmlname,
     server, renModule);
@@ -267,7 +266,7 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqPipelineBuilder::createPipelineProxy(const char* xmlgroup,
-    const char* xmlname, pqServer* server, pqRenderModule* renModule)
+    const char* xmlname, pqServer* server, pqRenderViewModule* renModule)
 {
   vtkSMProxy* proxy = this->createProxy(xmlgroup, xmlname, "sources",
     server, true);
@@ -538,7 +537,7 @@ pqTableViewModule* pqPipelineBuilder::createTableView(pqServer* server)
 } 
 
 //-----------------------------------------------------------------------------
-pqRenderModule* pqPipelineBuilder::createWindow(pqServer* server)
+pqRenderViewModule* pqPipelineBuilder::createWindow(pqServer* server)
 {
   if (!server)
     {
@@ -555,12 +554,12 @@ pqRenderModule* pqPipelineBuilder::createWindow(pqServer* server)
   renModule->Delete();
 
   // as a side effect of the registeration, pqServerManagerModel will
-  // have created a nice new pqRenderModule, obtain it.
+  // have created a nice new pqRenderViewModule, obtain it.
   pqServerManagerModel* smModel = pqServerManagerModel::instance();
-  pqRenderModule* pqRM = smModel->getRenderModule(renModule);
+  pqRenderViewModule* pqRM = smModel->getRenderModule(renModule);
   if (!pqRM)
     {
-    qDebug() << "Failed to create pqRenderModule.";
+    qDebug() << "Failed to create pqRenderViewModule.";
     }
   pqRM->setDefaults();
 
@@ -577,7 +576,7 @@ pqRenderModule* pqPipelineBuilder::createWindow(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineBuilder::removeWindow(pqRenderModule* rm)
+void pqPipelineBuilder::removeWindow(pqRenderViewModule* rm)
 {
   if (!rm)
     {
@@ -686,7 +685,7 @@ void pqPipelineBuilder::getSupportedProxies(const QString& xmlgroup,
 
 //-----------------------------------------------------------------------------
 pqScalarBarDisplay* pqPipelineBuilder::createScalarBar(pqScalarsToColors *lut,
-  pqRenderModule* renModule)
+  pqRenderViewModule* renModule)
 {
   if (!lut && !renModule)
     {

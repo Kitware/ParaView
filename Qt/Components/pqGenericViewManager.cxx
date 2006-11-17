@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
 #include "pqGenericViewModule.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqPlotViewModule.h"
 
@@ -81,7 +81,7 @@ void pqGenericViewManager::onProxyAdded(pqProxy* proxy)
 
   // For the short-term, ignore render views ...
   /** \todo Handle render modules here, too */
-  if(qobject_cast<pqRenderModule*>(view))
+  if(qobject_cast<pqRenderViewModule*>(view))
     return;
     
   QDockWidget* const dock_widget = new QDockWidget(
@@ -121,7 +121,7 @@ void pqGenericViewManager::onProxyRemoved(pqProxy* proxy)
 
   // For the short-term, ignore render views ...
   /** \todo Handle render modules here, too */
-  if(qobject_cast<pqRenderModule*>(view))
+  if(qobject_cast<pqRenderViewModule*>(view))
     return;
 
   if(pqPlotViewModule* const plot = qobject_cast<pqPlotViewModule*>(view))

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqLineSourceWidget.h"
 #include "pqPropertyLinks.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqSMSignalAdaptors.h"
 #include "pqServerManagerModel.h"
 

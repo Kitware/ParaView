@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pq3DWidget;
 class pqProxy;
-class pqRenderModule;
+class pqRenderViewModule;
 class pqSignalAdaptorProxyListInternal;
 class QComboBox;
 class QWidget;
@@ -78,7 +78,7 @@ public slots:
   void setProxy(const QVariant&);
 
   /// Set the render module.
-  void setRenderModule(pqRenderModule*);
+  void setRenderModule(pqRenderViewModule*);
 
   // These slots must be connected to the corresponding signals from the 
   // panel. Unlike most other signal adaptors that don't care about the

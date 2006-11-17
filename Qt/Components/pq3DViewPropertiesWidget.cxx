@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Client includes.
 #include "pqApplicationCore.h"
 #include "pqPropertyLinks.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqSettings.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"

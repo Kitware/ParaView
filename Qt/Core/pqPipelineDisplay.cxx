@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLookupTableManager.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineSource.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqSMAdaptor.h"
 #include "pqServerManagerModel.h"
 #include "pqScalarsToColors.h"

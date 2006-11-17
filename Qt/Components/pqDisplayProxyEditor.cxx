@@ -64,7 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
 {
@@ -473,7 +473,7 @@ void pqDisplayProxyEditor::zoomToData()
     numRenModules = this->Internal->Display->getNumberOfViewModules();
     for(unsigned int i=0; i<numRenModules; i++)
       {
-      pqRenderModule* renModule = qobject_cast<pqRenderModule*>(
+      pqRenderViewModule* renModule = qobject_cast<pqRenderViewModule*>(
         this->Internal->Display->getViewModule(i));
       if (renModule)
         {

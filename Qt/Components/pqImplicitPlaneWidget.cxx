@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
 #include "pqImplicitPlaneWidget.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"

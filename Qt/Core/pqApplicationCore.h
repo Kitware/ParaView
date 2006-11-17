@@ -42,7 +42,7 @@ class pqPendingDisplayManager;
 class pqPipelineBuilder;
 class pqPipelineSource;
 class pqReaderFactory;
-class pqRenderModule;
+class pqRenderViewModule;
 class pqServer;
 class pqServerManagerModel;
 class pqServerManagerObserver;

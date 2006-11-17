@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 
 //-----------------------------------------------------------------------------
 
@@ -72,7 +72,7 @@ public:
   
   pqProxy* Proxy;
   pqPropertyManager* PropertyManager;
-  QPointer<pqRenderModule> RenderModule;
+  QPointer<pqRenderViewModule> RenderModule;
 };
 
 //-----------------------------------------------------------------------------
@@ -132,7 +132,7 @@ pqPropertyManager* pqObjectPanel::propertyManager()
   return this->Implementation->PropertyManager;
 }
 
-pqRenderModule* pqObjectPanel::renderModule()
+pqRenderViewModule* pqObjectPanel::renderModule()
 {
   return this->Implementation->RenderModule;
 }
@@ -183,7 +183,7 @@ void pqObjectPanel::deselect()
   emit this->ondeselect();
 }
   
-void pqObjectPanel::setRenderModule(pqRenderModule* rm)
+void pqObjectPanel::setRenderModule(pqRenderViewModule* rm)
 {
   if(this->Implementation->RenderModule == rm)
     {

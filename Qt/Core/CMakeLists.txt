@@ -56,7 +56,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPropertyManager.h
   pqProxy.h
   pqQVTKWidgetEventTranslator.h
-  pqRenderModule.h
+  pqRenderViewModule.h
   pqScalarBarDisplay.h
   pqScalarBarVisibilityAdaptor.h
   pqScalarsToColors.h
@@ -177,8 +177,8 @@ ADD_LIBRARY(pqCore
   pqQVTKWidgetEventTranslator.h
   pqReaderFactory.cxx
   pqReaderFactory.h
-  pqRenderModule.cxx
-  pqRenderModule.h
+  pqRenderViewModule.cxx
+  pqRenderViewModule.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
   pqSMAdaptor.cxx

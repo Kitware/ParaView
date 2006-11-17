@@ -56,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqPlotViewModule.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqScalarBarDisplay.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
@@ -104,7 +104,7 @@ public:
   typedef QList<QPointer<pqServer> > ListOfServers;
   ListOfServers  Servers;
 
-  typedef QList<pqRenderModule*> ListOfRenderModules;
+  typedef QList<pqRenderViewModule*> ListOfRenderModules;
   ListOfRenderModules RenderModules;
 
   typedef QMap<vtkSMProxy*, pqConsumerDisplay*> MapOfDisplayProxyToDisplay;
@@ -206,14 +206,14 @@ QList<pqPipelineSource*> pqServerManagerModel::getSources(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-QList<pqRenderModule*> pqServerManagerModel::getRenderModules(pqServer* server)
+QList<pqRenderViewModule*> pqServerManagerModel::getRenderModules(pqServer* server)
 {
   if (!server)
     {
     return this->Internal->RenderModules;
     }
-  QList<pqRenderModule*> list;
-  foreach(pqRenderModule* rm, this->Internal->RenderModules)
+  QList<pqRenderViewModule*> list;
+  foreach(pqRenderViewModule* rm, this->Internal->RenderModules)
     {
     if (rm && (!server || rm->getServer() == server))
       {
@@ -227,8 +227,8 @@ QList<pqRenderModule*> pqServerManagerModel::getRenderModules(pqServer* server)
 QList<pqGenericViewModule*> pqServerManagerModel::getViewModules(pqServer* server)
 {
   QList<pqGenericViewModule*> list;
-  QList<pqRenderModule*> rmlist = this->getRenderModules(server);
-  foreach(pqRenderModule* rm, rmlist)
+  QList<pqRenderViewModule*> rmlist = this->getRenderModules(server);
+  foreach(pqRenderViewModule* rm, rmlist)
     {
     list.push_back(rm);
     }
@@ -521,11 +521,11 @@ void pqServerManagerModel::onAddRenderModule(QString name,
 
   if (this->getRenderModule(rm))
     {
-    // don't create a new pqRenderModule, one already exists.
+    // don't create a new pqRenderViewModule, one already exists.
     return;
     }
 
-  pqRenderModule* pqRM = new pqRenderModule(name, rm, server, this);
+  pqRenderViewModule* pqRM = new pqRenderViewModule(name, rm, server, this);
 
   emit this->preRenderModuleAdded(pqRM);
   this->Internal->RenderModules.push_back(pqRM);
@@ -536,12 +536,12 @@ void pqServerManagerModel::onAddRenderModule(QString name,
 //-----------------------------------------------------------------------------
 void pqServerManagerModel::onRemoveRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  pqRenderModule* toRemove = this->getRenderModule(rm);
+  pqRenderViewModule* toRemove = this->getRenderModule(rm);
   if (!toRemove)
     {
     // no need to raise an debug message, the render module being removed
     // is already not present.
-    // qDebug() << "Failed to locate the pqRenderModule for the proxy";
+    // qDebug() << "Failed to locate the pqRenderViewModule for the proxy";
     return;
     }
   emit this->preRenderModuleRemoved(toRemove);
@@ -654,9 +654,9 @@ void pqServerManagerModel::endRemoveServer()
 }
 
 //-----------------------------------------------------------------------------
-pqRenderModule* pqServerManagerModel::getRenderModule(vtkSMRenderModuleProxy* rm)
+pqRenderViewModule* pqServerManagerModel::getRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  foreach(pqRenderModule* pqRM, this->Internal->RenderModules)
+  foreach(pqRenderViewModule* pqRM, this->Internal->RenderModules)
     {
     if (pqRM->getProxy() == rm)
       {
@@ -667,9 +667,9 @@ pqRenderModule* pqServerManagerModel::getRenderModule(vtkSMRenderModuleProxy* rm
 }
 
 //-----------------------------------------------------------------------------
-pqRenderModule* pqServerManagerModel::getRenderModule(QVTKWidget* widget)
+pqRenderViewModule* pqServerManagerModel::getRenderModule(QVTKWidget* widget)
 {
-  foreach(pqRenderModule* pqRM, this->Internal->RenderModules)
+  foreach(pqRenderViewModule* pqRM, this->Internal->RenderModules)
     {
     if (pqRM->getWidget() == widget)
       {
@@ -833,7 +833,7 @@ int pqServerManagerModel::getNumberOfRenderModules()
 }
 
 //-----------------------------------------------------------------------------
-pqRenderModule* pqServerManagerModel::getRenderModule(int idx)
+pqRenderViewModule* pqServerManagerModel::getRenderModule(int idx)
 {
   if (idx >= this->Internal->RenderModules.size())
     {

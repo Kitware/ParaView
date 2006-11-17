@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqSettingsDialogInternal;
-class pqRenderModule;
+class pqRenderViewModule;
 
 class PQCOMPONENTS_EXPORT pqSettingsDialog : public QDialog
 {
@@ -46,7 +46,7 @@ public:
   virtual ~pqSettingsDialog();
 
 public slots:
-  void setRenderModule(pqRenderModule*);
+  void setRenderModule(pqRenderViewModule*);
 
 private slots:
   void onFinished(int);

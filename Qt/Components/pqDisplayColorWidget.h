@@ -46,7 +46,7 @@ class pqPipelineDisplay;
 class pqPipelineSource;
 class pqGenericViewModule;
 class vtkEventQtSlotConnect;
-class pqRenderModule;
+class pqRenderViewModule;
 
 /// Provides a standard user interface for selecting among a collection 
 /// of dataset variables (both cell and node variables).
@@ -124,7 +124,7 @@ private:
   bool BlockEmission;
   QPointer<pqPipelineSource> SelectedSource;
   vtkEventQtSlotConnect* VTKConnect;
-  QPointer<pqRenderModule> RenderModule;
+  QPointer<pqRenderViewModule> RenderModule;
   QPointer<pqPipelineDisplay> Display;
   QList<QString> AvailableArrays;
 };

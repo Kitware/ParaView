@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include<QPointer>
 
 #include "pqPipelineSource.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqPipelineDisplay.h"
 #include "pqPropertyLinks.h"
 #include "pqSignalAdaptors.h"
@@ -49,7 +49,7 @@ class pqDisplayRepresentationWidgetInternal :
   public Ui::displayRepresentationWidget
 {
 public:
-  QPointer<pqRenderModule> RenderModule;
+  QPointer<pqRenderViewModule> RenderModule;
   QPointer<pqPipelineSource> Source;
   QPointer<pqPipelineDisplay> Display;
   pqPropertyLinks Links;
@@ -84,7 +84,7 @@ pqDisplayRepresentationWidget::~pqDisplayRepresentationWidget()
 //-----------------------------------------------------------------------------
 void pqDisplayRepresentationWidget::setView(pqGenericViewModule* view)
 {
-  pqRenderModule* rm = qobject_cast<pqRenderModule*>(view);
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
 
   if (this->Internal->RenderModule)
     {

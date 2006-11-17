@@ -49,7 +49,7 @@ class pqPipelineSource;
 class pqPlotViewModule;
 class pqProxy;
 class pqProxyTabWidget;
-class pqRenderModule;
+class pqRenderViewModule;
 class pqRenderWindowManager;
 class pqRenderWindowManager;
 class pqSelectionManager;

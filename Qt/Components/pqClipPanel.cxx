@@ -109,9 +109,9 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
   panel_layout->addWidget(group2);
   panel_layout->addStretch();
   
-  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)),
+  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
                    &this->Implementation->ImplicitPlaneWidget,
-                   SLOT(setRenderModule(pqRenderModule*)));
+                   SLOT(setRenderModule(pqRenderViewModule*)));
 
   connect(&this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onWidgetChanged()));
   connect(this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));

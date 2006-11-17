@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqWidgetsExport.h"
 class pqPipelineSource;
-class pqRenderModule;
+class pqRenderViewModule;
 
 /// Object which provides help for managing display proxies
 class PQWIDGETS_EXPORT pqDisplayManager : public QObject
@@ -49,10 +49,10 @@ public:
 
 public slots:
 
-  void addDisplayForSource(pqPipelineSource*, pqRenderModule*);
+  void addDisplayForSource(pqPipelineSource*, pqRenderViewModule*);
 
-  void addDeferredDisplayForSource(pqPipelineSource*, pqRenderModule*);
-  void removeDeferredDisplayForSource(pqPipelineSource*, pqRenderModule*);
+  void addDeferredDisplayForSource(pqPipelineSource*, pqRenderViewModule*);
+  void removeDeferredDisplayForSource(pqPipelineSource*, pqRenderViewModule*);
   void createDeferredDisplays();
 
 private:

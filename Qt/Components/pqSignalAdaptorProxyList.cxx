@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqSMProxy.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 
 class pqSignalAdaptorProxyListInternal
 {
@@ -63,7 +63,7 @@ public:
   QPointer<pqProxy> ReferenceProxy;
   QPointer<QWidget> WidgetFrame;
   QPointer<QComboBox> ComboBox;
-  QPointer<pqRenderModule> RenderModule;
+  QPointer<pqRenderViewModule> RenderModule;
 
   typedef QMap<vtkSMProxy*, QPointer<pq3DWidget> > MapOf3DWidgets;
   MapOf3DWidgets Widgets;
@@ -187,7 +187,7 @@ void pqSignalAdaptorProxyList::setProxy(const QVariant& var)
 }
 
 //-----------------------------------------------------------------------------
-void pqSignalAdaptorProxyList::setRenderModule(pqRenderModule* renModule)
+void pqSignalAdaptorProxyList::setRenderModule(pqRenderViewModule* renModule)
 {
   this->Internal->RenderModule = renModule;
   if (this->Internal->ActiveWidget)

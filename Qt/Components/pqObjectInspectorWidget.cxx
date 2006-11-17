@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLoadedFormObjectPanel.h"
 #include "pqServerManagerObserver.h"
 #include "pqPropertyManager.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqPipelineSource.h"
 
@@ -139,12 +139,12 @@ void pqObjectInspectorWidget::canAccept(bool status)
 
 void pqObjectInspectorWidget::setView(pqGenericViewModule* view)
 {
-  pqRenderModule* rm = qobject_cast<pqRenderModule*>(view);
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
   this->RenderModule = rm;
   emit this->renderModuleChanged(this->RenderModule);
 }
 
-pqRenderModule* pqObjectInspectorWidget::getRenderModule()
+pqRenderViewModule* pqObjectInspectorWidget::getRenderModule()
 {
   return this->RenderModule;
 }
@@ -231,8 +231,8 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     QObject::connect(this->CurrentPanel, SIGNAL(canAcceptOrReject(bool)), 
                      this, SLOT(canAccept(bool)));
     
-    QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)), 
-                     this->CurrentPanel, SLOT(setRenderModule(pqRenderModule*)));
+    QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)), 
+                     this->CurrentPanel, SLOT(setRenderModule(pqRenderViewModule*)));
     }
     
   this->PanelArea->layout()->addWidget(this->CurrentPanel);

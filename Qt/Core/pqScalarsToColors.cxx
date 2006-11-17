@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarDisplay.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
-#include "pqRenderModule.h"
+#include "pqRenderViewModule.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarsToColorsInternal
@@ -83,7 +83,7 @@ void pqScalarsToColors::removeScalarBar(pqScalarBarDisplay* sb)
 }
 
 //-----------------------------------------------------------------------------
-pqScalarBarDisplay* pqScalarsToColors::getScalarBar(pqRenderModule* ren) const
+pqScalarBarDisplay* pqScalarsToColors::getScalarBar(pqRenderViewModule* ren) const
 {
   foreach(pqScalarBarDisplay* sb, this->Internal->ScalarBars)
     {

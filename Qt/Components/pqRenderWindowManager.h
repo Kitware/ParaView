@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqGenericViewModule;
 class pqMultiView;
 class pqMultiViewFrame;
-class pqRenderModule;
+class pqRenderViewModule;
 class pqRenderWindowManagerInternal;
 class pqServer;
 class vtkPVXMLElement;
@@ -56,7 +56,7 @@ public:
   virtual ~pqRenderWindowManager();
 
   // returns the active render module.
-  pqRenderModule* getActiveRenderModule();
+  pqRenderViewModule* getActiveRenderModule();
 
   // Save the state of the render window manager.
   void saveState(vtkPVXMLElement* root);
@@ -69,7 +69,7 @@ public:
   void setMaxRenderWindowSize(const QSize& size);
 signals:
   // Fired when the active render module changes.
-  void activeRenderModuleChanged(pqRenderModule*);
+  void activeRenderModuleChanged(pqRenderViewModule*);
 
 private slots:
   /// This will create a RenderWindow to fill the frame.
@@ -78,8 +78,8 @@ private slots:
   void onFrameAdded(pqMultiViewFrame* frame);
   void onFrameRemoved(pqMultiViewFrame* frame);
 
-  void onRenderModuleAdded(pqRenderModule* rm);
-  void onRenderModuleRemoved(pqRenderModule* rm);
+  void onRenderModuleAdded(pqRenderViewModule* rm);
+  void onRenderModuleRemoved(pqRenderViewModule* rm);
 
   void onActivate(QWidget* obj);
 
