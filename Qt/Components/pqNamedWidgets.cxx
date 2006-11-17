@@ -72,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleSpinBoxDomain.h"
 #include "pqSliderDomain.h"
 #include "pqFileChooserWidget.h"
+#include "pqFieldSelectionAdaptor.h"
 
 void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
 {
@@ -385,7 +386,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
               adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
               proxy, SMProperty, 0);  // 0 means link mode for field selection
             }
-          if(comboBox->objectName().contains(QRegExp("_scalars$")))
+          else if(comboBox->objectName().contains(QRegExp("_scalars$")))
             {
             pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty, 1);
             d0->setObjectName("FieldScalarsDomain");
@@ -396,6 +397,19 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
             property_manager->registerLink(
               adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
               proxy, SMProperty, 1);  // 1 means link scalar for field selection
+            }
+          else
+            {
+            // one combo for it all
+            pqFieldSelectionAdaptor* adaptor = new
+              pqFieldSelectionAdaptor(comboBox, SMProperty);
+            adaptor->setObjectName("FieldSelectionAdaptor");
+            property_manager->registerLink(
+              adaptor, "attributeMode", SIGNAL(selectionChanged()),
+              proxy, SMProperty, 0);
+            property_manager->registerLink(
+              adaptor, "scalar", SIGNAL(selectionChanged()),
+              proxy, SMProperty, 1);
             }
           }
         }
@@ -696,7 +710,7 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
               delete adaptor;
               }
             }
-          if(comboBox->objectName().contains(QRegExp("_scalars$")))
+          else if(comboBox->objectName().contains(QRegExp("_scalars$")))
             {
             pqComboBoxDomain* d0 =
               comboBox->findChild<pqComboBoxDomain*>("FieldScalarsDomain");
@@ -715,6 +729,20 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
               
               delete adaptor;
               }
+            }
+          else
+            {
+            pqFieldSelectionAdaptor* adaptor = 
+              comboBox->findChild<pqFieldSelectionAdaptor*>("FieldSelectionAdaptor");
+            // one combo for it all
+            property_manager->unregisterLink(
+              adaptor, "attributeMode", SIGNAL(selectionChanged()),
+              proxy, SMProperty, 0);
+            property_manager->unregisterLink(
+              adaptor, "scalar", SIGNAL(selectionChanged()),
+              proxy, SMProperty, 1);
+            
+            delete adaptor;
             }
           }
         }

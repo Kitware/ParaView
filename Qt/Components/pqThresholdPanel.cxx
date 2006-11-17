@@ -44,15 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // VTK includes
 
 // ParaView Server Manager includes
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMEnumerationDomain.h"
 
 // ParaView includes
 #include "pqProxy.h"
-#include "pqSMAdaptor.h"
 #include "pqPropertyManager.h"
-#include "pqDoubleSpinBoxDomain.h"
-#include "pqComboBoxDomain.h"
+#include "pqFieldSelectionAdaptor.h"
 
 
 QString pqThresholdPanelInterface::name() const
@@ -119,6 +115,24 @@ void pqThresholdPanel::linkServerManagerProperties()
 {
   // parent class hooks up some of our widgets in the ui
   pqLoadedFormObjectPanel::linkServerManagerProperties();
+  
+  QComboBox* combo = this->findChild<QComboBox*>("SelectInputScalars");
+  vtkSMProperty* prop = this->proxy()->getProxy()->
+          GetProperty("SelectInputScalars");
+  pqFieldSelectionAdaptor* adaptor = new pqFieldSelectionAdaptor(combo, prop);
+
+  this->propertyManager()->registerLink(adaptor, 
+                                        "attributeMode",
+                                        SIGNAL(selectionChanged()),
+                                        this->proxy()->getProxy(),
+                                        prop, 0);
+  
+  this->propertyManager()->registerLink(adaptor, 
+                                        "scalar",
+                                        SIGNAL(selectionChanged()),
+                                        this->proxy()->getProxy(),
+                                        prop, 1);
+
 }
 
 static bool IsSetting = false;
