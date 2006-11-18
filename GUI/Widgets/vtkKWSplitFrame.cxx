@@ -17,7 +17,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.42");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.43");
 
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::vtkKWSplitFrame()
@@ -50,6 +50,8 @@ vtkKWSplitFrame::vtkKWSplitFrame()
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::~vtkKWSplitFrame()
 {
+  this->RemoveBindings();
+
   if (this->Frame1)
     {
     this->Frame1->Delete();
@@ -126,6 +128,11 @@ void vtkKWSplitFrame::RemoveSeparatorBindings()
 //----------------------------------------------------------------------------
 void vtkKWSplitFrame::AddBindings()
 {
+  if (!this->IsAlive())
+    {
+    return;
+    }
+
   this->AddSeparatorBindings();
 
   this->SetBinding("<Configure>", this, "ConfigureCallback");
@@ -134,6 +141,11 @@ void vtkKWSplitFrame::AddBindings()
 //----------------------------------------------------------------------------
 void vtkKWSplitFrame::RemoveBindings()
 {
+  if (!this->IsAlive())
+    {
+    return;
+    }
+
   this->RemoveSeparatorBindings();
 
   this->RemoveBinding("<Configure>");
