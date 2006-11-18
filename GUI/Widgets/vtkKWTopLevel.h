@@ -278,6 +278,19 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Events. 
+  // WithdrawEvent is called when the toplevel has been withdrawn, as a result
+  // of calling the Withdraw() method. DisplayEvent is called when the 
+  // toplevel has been displayed by calling the Display() method.
+  //BTX
+  enum
+  {
+    DisplayEvent = 5500,
+    WithdrawEvent
+  };
+  //ETX
+
 protected:
   vtkKWTopLevel();
   ~vtkKWTopLevel();
