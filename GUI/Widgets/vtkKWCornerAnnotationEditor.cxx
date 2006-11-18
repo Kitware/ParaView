@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.21");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -114,7 +114,7 @@ vtkKWCornerAnnotationEditor::~vtkKWCornerAnnotationEditor()
   // - InternalCornerAnnotation in vtkKWView mode, or
   // - vtkKWRenderWidget::GetCornerAnnotation() in vtkKWRenderWidget mode.
 
-  this->SetRenderWidget(NULL);
+  this->RenderWidget = NULL;
 
   // If in vtkKWView mode, we createed and maintained the corner prop and
   // composite
