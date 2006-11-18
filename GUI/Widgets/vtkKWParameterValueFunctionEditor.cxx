@@ -347,10 +347,19 @@ vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
     this->ParameterCursorMovedCommand = NULL;
     }
 
+  if (this->IsAlive())
+    {
+    this->RemoveBinding("<Configure>");
+    }
+
   // GUI
 
   if (this->Canvas)
     {
+    if (this->Canvas->IsAlive())
+      {
+      this->Canvas->RemoveBinding("<Configure>");
+      }
     this->Canvas->Delete();
     this->Canvas = NULL;
     }
