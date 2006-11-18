@@ -55,7 +55,7 @@ class PQCOMPONENTS_EXPORT pqFieldSelectionAdaptor : public QObject
 
 public:
   /// constructor requires a QComboBox, 
-  pqFieldSelectionAdaptor(QComboBox* p, vtkSMProperty* p);
+  pqFieldSelectionAdaptor(QComboBox* p, vtkSMProperty* prop);
   ~pqFieldSelectionAdaptor();
   
   /// get the attribute mode
