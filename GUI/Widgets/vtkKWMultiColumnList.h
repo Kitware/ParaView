@@ -1406,6 +1406,10 @@ protected:
   double SortedColumnBackgroundColor[3];
   virtual void UpdateSortedColumnBackgroundColor();
 
+  // Description:
+  // Remove all the window destroy commands.
+  virtual void RemoveAllWindowDestroyCommandFromCells();
+
 private:
   vtkKWMultiColumnList(const vtkKWMultiColumnList&); // Not implemented
   void operator=(const vtkKWMultiColumnList&); // Not implemented

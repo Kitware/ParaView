@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.71");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.72");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -106,6 +106,8 @@ vtkKWMultiColumnList::vtkKWMultiColumnList()
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::~vtkKWMultiColumnList()
 {
+  this->RemoveAllWindowDestroyCommandFromCells();
+  
   if (this->EditStartCommand)
     {
     delete [] this->EditStartCommand;
@@ -2333,6 +2335,37 @@ void vtkKWMultiColumnList::CellWindowDestroyRemoveChildCallback(
     {
     child->SetParent(NULL);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RemoveAllWindowDestroyCommandFromCells()
+{
+  if (!this->IsAlive())
+    {
+    return;
+    }
+
+  int old_state = this->GetState();
+  if (this->GetState() != vtkKWOptions::StateNormal)
+    {
+    this->SetStateToNormal();
+    }
+  vtksys_stl::string command_str;
+  int nb_rows = this->GetNumberOfRows();
+  int nb_cols = this->GetNumberOfColumns();
+  for (int row = 0; row < nb_rows; row++)
+    {
+    for (int col = 0; col < nb_cols; col++)
+      {
+      const char *command = 
+        this->GetCellConfigurationOption(row, col, "-windowdestroy");
+      if (command && *command)
+        {
+        this->SetCellConfigurationOption(row, col, "-windowdestroy", "");
+        }
+      }
+    }
+  this->SetState(old_state);
 }
 
 //----------------------------------------------------------------------------
