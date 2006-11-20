@@ -415,7 +415,6 @@ void vtkKWApplication::InstallOutputWindow()
   this->Internals->LogOutputWindow = vtkKWOutputWindow::New();
   this->Internals->LogOutputWindow->SetApplication(this);
   vtkOutputWindow::SetInstance(this->Internals->LogOutputWindow);
-  this->Internals->LogOutputWindow->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -426,8 +425,9 @@ void vtkKWApplication::RestoreOutputWindow()
     if (vtkOutputWindow::GetInstance() == this->Internals->LogOutputWindow)
       {
       vtkOutputWindow::SetInstance(this->Internals->PreviousOutputWindow);
-      this->Internals->PreviousOutputWindow->Delete();
       }
+    this->Internals->PreviousOutputWindow->Delete();
+    this->Internals->LogOutputWindow->Delete();
     this->Internals->LogOutputWindow = NULL;
     }
 }
