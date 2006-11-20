@@ -37,6 +37,9 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWWindowBase.h"
+#include "vtkKWWindowBase.h"
+#include "vtkKWTclInteractor.h"
+#include "vtkKWTkcon.h"
 #include "vtkObjectFactory.h"
 #include "vtkTclUtil.h"
 
@@ -242,6 +245,7 @@ vtkKWApplication::vtkKWApplication()
   this->PrintTargetDPI            = 100.0;
   this->Theme                     = NULL;
   this->LogDialog                 = vtkKWLogDialog::New();
+  this->TclInteractor             = NULL;
 
   /* IMPORTANT:
      Do *NOT* call anything that retrieves the application's TclName.
@@ -381,6 +385,13 @@ void vtkKWApplication::PrepareForDelete()
     {
     this->SplashScreen->Delete();
     this->SplashScreen = NULL;
+    }
+
+  if (this->TclInteractor)
+    {
+    this->TclInteractor->SetMasterWindow(NULL);
+    this->TclInteractor->Delete();
+    this->TclInteractor = NULL;
     }
 
   // vtkKWOutputWindow is actually using the LogDialog, so before deleting
@@ -1174,7 +1185,7 @@ void vtkKWApplication::ProcessIdleTasks()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
+int vtkKWApplication::DisplayExitDialog(vtkKWTopLevel *master)
 {
   vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
   dialog->SetApplication(this);
@@ -1212,7 +1223,7 @@ int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
+void vtkKWApplication::DisplayHelpDialog(vtkKWTopLevel* master)
 {
   if (!this->HelpDialogStartingPage || !*this->HelpDialogStartingPage)
     {
@@ -1302,7 +1313,7 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::DisplayAboutDialog(vtkKWWindowBase* master)
+void vtkKWApplication::DisplayAboutDialog(vtkKWTopLevel* master)
 {
   if (this->InExit)
     {
@@ -2450,21 +2461,6 @@ int vtkKWApplication::PutEnv(const char* value)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::CreateLogDialog()
-{
-  if (!this->LogDialog)
-    {
-    this->LogDialog = vtkKWLogDialog::New();
-    }
-  if (!this->LogDialog->IsCreated())
-    {
-    this->LogDialog->SetApplication(this);
-    this->LogDialog->Create();
-    }
-  return this->LogDialog->IsCreated();
-}
-
-//----------------------------------------------------------------------------
 void vtkKWApplication::WarningMessage(const char* message)
 {
   this->InvokeEvent(vtkKWEvent::WarningMessageEvent, (void*)message);
@@ -2521,12 +2517,70 @@ void vtkKWApplication::DebugMessage(const char* message)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::DisplayLogDialog(vtkKWWindowBase* master)
+int vtkKWApplication::CreateLogDialog()
+{
+  if (!this->LogDialog)
+    {
+    this->LogDialog = vtkKWLogDialog::New();
+    }
+  if (!this->LogDialog->IsCreated())
+    {
+    this->LogDialog->SetApplication(this);
+    this->LogDialog->Create();
+    }
+  return this->LogDialog->IsCreated();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::DisplayLogDialog(vtkKWTopLevel* master)
 {
   if (this->CreateLogDialog())
     {
     this->LogDialog->SetMasterWindow(master ? master : this->GetNthWindow(0));
     this->LogDialog->Display();
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkKWTclInteractor* vtkKWApplication::GetTclInteractor()
+{
+  if (!this->TclInteractor)
+    {
+    this->TclInteractor = vtkKWTkcon::New();
+    }
+
+  if (!this->TclInteractor->IsCreated())
+    {
+    this->TclInteractor->SetApplication(this);
+    this->TclInteractor->Create();
+    }
+  
+  return this->TclInteractor;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::DisplayTclInteractor(vtkKWTopLevel *master)
+{
+  vtkKWTclInteractor *tcl_interactor = this->GetTclInteractor();
+  if (tcl_interactor)
+    {
+    if (!master)
+      {
+      master = this->GetNthWindow(0);
+      }
+    if (master)
+      {
+      vtksys_stl::string title;
+      if (master->GetTitle())
+        {
+        title += master->GetTitle();
+        title += " : ";
+        }
+      title += ks_("Tcl Interactor Dialog|Title|Tcl Interactor");
+      tcl_interactor->SetTitle(title.c_str());
+      tcl_interactor->SetMasterWindow(master);
+      }
+    tcl_interactor->Display();
     }
 }
 
@@ -2598,4 +2652,5 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ReleaseMode: " 
      << (this->ReleaseMode ? "On" : "Off") << endl;
   os << indent << "PrintTargetDPI: " << this->GetPrintTargetDPI() << endl;
+  os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
 }

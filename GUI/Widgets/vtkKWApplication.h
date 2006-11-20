@@ -37,8 +37,10 @@ class vtkKWText;
 class vtkKWTextWithScrollbars;
 class vtkKWTheme;
 class vtkKWWidget;
+class vtkKWTopLevel;
 class vtkKWWindowBase;
 class vtkKWLogDialog;
+class vtkKWTclInteractor;
 
 class KWWidgets_EXPORT vtkKWApplication : public vtkKWObject
 {
@@ -302,7 +304,6 @@ public:
   // for example).
   // This is more like a hint that many widgets can query to check if
   // they should save their own geometry (and restore it on startup). 
-  // See vtkKWWindowBase for example.
   vtkGetMacro(SaveUserInterfaceGeometry, int);
   vtkSetMacro(SaveUserInterfaceGeometry, int);
   vtkBooleanMacro(SaveUserInterfaceGeometry, int);
@@ -344,7 +345,7 @@ public:
   // Description:
   // Display the on-line help for this application.
   // Optionally provide a master window this dialog should be the slave of.
-  virtual void DisplayHelpDialog(vtkKWWindowBase *master);
+  virtual void DisplayHelpDialog(vtkKWTopLevel *master);
 
   // Description:
   // Set/Get the help starting page.
@@ -355,7 +356,7 @@ public:
   // Description:
   // Display the about dialog for this application.
   // Optionally provide a master window this dialog should be the slave of.
-  virtual void DisplayAboutDialog(vtkKWWindowBase *master);
+  virtual void DisplayAboutDialog(vtkKWTopLevel *master);
 
   // Description:
   // Return the Balloon Help helper object. 
@@ -446,9 +447,15 @@ public:
   // Description:
   // Display the warning/error/information/debug message log dialog.
   // Optionally provide a master window this dialog should be the slave of.
-  virtual void DisplayLogDialog(vtkKWWindowBase *master);
+  virtual void DisplayLogDialog(vtkKWTopLevel *master);
   vtkGetObjectMacro(LogDialog, vtkKWLogDialog);
 
+  // Description:
+  // Get/display the tcl interactor.
+  // Optionally provide a master window this dialog should be the slave of.
+  virtual void DisplayTclInteractor(vtkKWTopLevel *master);
+  virtual vtkKWTclInteractor* GetTclInteractor();
+  
   // Description:
   // Some constants
   //BTX
@@ -503,7 +510,7 @@ protected:
   // Display the exit dialog.
   // Optionally provide a master window this dialog should be the slave of.
   // Return 1 if the user wants to exit, 0 otherwise
-  virtual int DisplayExitDialog(vtkKWWindowBase *master);
+  virtual int DisplayExitDialog(vtkKWTopLevel *master);
 
   // Description:
   // Value that is set after exit (status), flag stating that 
@@ -603,6 +610,10 @@ protected:
   // Install/restore output window
   virtual void InstallOutputWindow();
   virtual void RestoreOutputWindow();
+
+  // Description:
+  // Tcl interactor.
+  vtkKWTclInteractor *TclInteractor;
 
 private:
 

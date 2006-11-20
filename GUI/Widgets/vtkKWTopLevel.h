@@ -266,6 +266,7 @@ public:
 
   // Description:
   // Get/display the tcl interactor.
+  // Kept for compatibility purposes, use vtkKWApplication instead.
   virtual vtkKWTclInteractor* GetTclInteractor();
   virtual void DisplayTclInteractor();
   
@@ -305,7 +306,6 @@ protected:
 
   vtkKWWidget *MasterWindow;
   vtkKWMenu   *Menu;
-  vtkKWTclInteractor *TclInteractor;
 
   char *Title;
   char *WindowClass;
