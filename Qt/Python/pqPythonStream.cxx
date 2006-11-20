@@ -30,10 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqPythonStream.h"
+#include <vtkPython.h>  // python first
 
-#undef slots
-#include <vtkPython.h>
+#include "pqPythonStream.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // pqPythonStream

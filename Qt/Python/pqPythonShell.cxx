@@ -30,6 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include <vtkPython.h> // python first
+
 #include "QtPythonConfig.h"
 
 #include "pqConsoleWidget.h"
@@ -37,9 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonStream.h"
 
 #include "vtkPVPythonInterpretor.h"
-
-#undef slots // Workaround for a conflict between Qt slots and the Python headers
-#include <vtkPython.h>
 
 #include <QCoreApplication>
 #include <QResizeEvent>
