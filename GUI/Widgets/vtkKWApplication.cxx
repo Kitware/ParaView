@@ -103,38 +103,6 @@ extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);
 #endif // KWWidgets_BUILD_VTK_WIDGETS
 
 //----------------------------------------------------------------------------
-class vtkKWApplicationInternals
-{
-public:
-  typedef vtksys_stl::vector<vtkKWWindowBase*> WindowsContainer;
-  typedef vtksys_stl::vector<vtkKWWindowBase*>::iterator WindowsContainerIterator;
-
-  WindowsContainer Windows;
-
-  // Some temporary storage var that do not need to be exposed in the .h
-
-  vtksys_stl::string VersionNameTemp;
-  vtksys_stl::string LimitedEditionModeNameTemp;
-
-  // For ::PutEnv
-
-  class DeletingCharVector : public vtksys_stl::vector<char*>
-  {
-  public:
-    ~DeletingCharVector()
-      {
-        for(vtksys_stl::vector<char*>::iterator i = this->begin();
-            i != this->end(); ++i)
-          {
-          delete []*i;
-          }
-      }
-  };
-
-  vtkOutputWindow *PreviousOutputWindow;
-};
-
-//----------------------------------------------------------------------------
 class KWWidgets_EXPORT vtkKWOutputWindow : public vtkOutputWindow
 {
 public:
@@ -193,6 +161,39 @@ protected:
 private:
   vtkKWOutputWindow(const vtkKWOutputWindow&);
   void operator=(const vtkKWOutputWindow&);
+};
+
+//----------------------------------------------------------------------------
+class vtkKWApplicationInternals
+{
+public:
+  typedef vtksys_stl::vector<vtkKWWindowBase*> WindowsContainer;
+  typedef vtksys_stl::vector<vtkKWWindowBase*>::iterator WindowsContainerIterator;
+
+  WindowsContainer Windows;
+
+  // Some temporary storage var that do not need to be exposed in the .h
+
+  vtksys_stl::string VersionNameTemp;
+  vtksys_stl::string LimitedEditionModeNameTemp;
+
+  // For ::PutEnv
+
+  class DeletingCharVector : public vtksys_stl::vector<char*>
+  {
+  public:
+    ~DeletingCharVector()
+      {
+        for(vtksys_stl::vector<char*>::iterator i = this->begin();
+            i != this->end(); ++i)
+          {
+          delete []*i;
+          }
+      }
+  };
+
+  vtkOutputWindow *PreviousOutputWindow;
+  vtkKWOutputWindow *LogOutputWindow;
 };
 
 vtkStandardNewMacro(vtkKWOutputWindow);
@@ -268,13 +269,7 @@ vtkKWApplication::vtkKWApplication()
 
   // Output win
 
-  this->Internals->PreviousOutputWindow = vtkOutputWindow::GetInstance();
-  this->Internals->PreviousOutputWindow->Register(this);
-
-  vtkKWOutputWindow *output_win = vtkKWOutputWindow::New();
-  output_win->SetApplication(this);
-  vtkOutputWindow::SetInstance(output_win);
-  output_win->Delete();
+  this->InstallOutputWindow();
 
   // Application name and version
 
@@ -391,11 +386,7 @@ void vtkKWApplication::PrepareForDelete()
   // vtkKWOutputWindow is actually using the LogDialog, so before deleting
   // it, just switch back to the previous output window
 
-  if (vtkOutputWindow::GetInstance() != this->Internals->PreviousOutputWindow)
-    {
-    vtkOutputWindow::SetInstance(this->Internals->PreviousOutputWindow);
-    this->Internals->PreviousOutputWindow->Delete();
-    }
+  this->RestoreOutputWindow();
 
   if (this->LogDialog)
     {
@@ -412,6 +403,32 @@ void vtkKWApplication::PrepareForDelete()
   if (this->MainInterp)
     {
     vtkKWTkUtilities::CancelAllTimerHandlers(this->MainInterp);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::InstallOutputWindow()
+{ 
+  this->Internals->PreviousOutputWindow = vtkOutputWindow::GetInstance();
+  this->Internals->PreviousOutputWindow->Register(this);
+
+  this->Internals->LogOutputWindow = vtkKWOutputWindow::New();
+  this->Internals->LogOutputWindow->SetApplication(this);
+  vtkOutputWindow::SetInstance(this->Internals->LogOutputWindow);
+  this->Internals->LogOutputWindow->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::RestoreOutputWindow()
+{ 
+  if (this->Internals->LogOutputWindow)
+    {
+    if (vtkOutputWindow::GetInstance() == this->Internals->LogOutputWindow)
+      {
+      vtkOutputWindow::SetInstance(this->Internals->PreviousOutputWindow);
+      this->Internals->PreviousOutputWindow->Delete();
+      }
+    this->Internals->LogOutputWindow = NULL;
     }
 }
 

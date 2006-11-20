@@ -114,7 +114,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.389");
+vtkCxxRevisionMacro(vtkPVApplication, "1.390");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -234,8 +234,9 @@ public:
 #endif
     if ( this->Application && this->Application->GetNumberOfWindows())
       {
-      vtkKWWindowBase *win = this->Application->GetNthWindow(
-        this->Application->GetNumberOfWindows() - 1);
+      vtkPVWindow *win = vtkPVWindow::SafeDownCast(
+        this->Application->GetNthWindow(
+          this->Application->GetNumberOfWindows() - 1));
 
       // Try to parse the message from standard VTK formats to
       // reformat it a bit.  The standard format of a VTK message
@@ -338,8 +339,9 @@ public:
       ostrstream str;
       this->FlushErrors(str);
       str << ends;
-      vtkKWWindowBase *win = this->Application->GetNthWindow(
-        this->Application->GetNumberOfWindows() - 1);
+      vtkPVWindow *win = vtkPVWindow::SafeDownCast(
+        this->Application->GetNthWindow(
+          this->Application->GetNumberOfWindows() - 1));
       if (win)
         {
         win->ErrorMessage(str.str());

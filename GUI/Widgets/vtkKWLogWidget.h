@@ -107,6 +107,17 @@ public:
   virtual void UpdateEnableState();
   virtual void Update();
 
+  // Description:
+  // Events. 
+  // RecordsClearedEvent is called when all records have been cleared using
+  // the "delete selected" or "delete all" button..
+  //BTX
+  enum
+  {
+    RecordsClearedEvent = 15000
+  };
+  //ETX
+
 protected:
   vtkKWLogWidget();
   ~vtkKWLogWidget();

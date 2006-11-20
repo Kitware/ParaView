@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLogWidget );
-vtkCxxRevisionMacro(vtkKWLogWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWLogWidget, "1.2");
 
 vtkIdType vtkKWLogWidget::IdCounter = 1;
 
@@ -366,6 +366,8 @@ int vtkKWLogWidget::GetNumberOfRecords()
 //----------------------------------------------------------------------------
 void vtkKWLogWidget::RemoveAllRecords()
 {
+  int nb_records = this->GetNumberOfRecords();
+
   if (this->Internals)
     {
     this->Internals->RecordContainer.clear();
@@ -381,6 +383,11 @@ void vtkKWLogWidget::RemoveAllRecords()
     this->DescriptionText->GetWidget()->SetText("");
     }
     
+  if (nb_records && !this->GetNumberOfRecords())
+    {
+    this->InvokeEvent(vtkKWLogWidget::RecordsClearedEvent, NULL);
+    }
+
   this->Update();   
 }
 
@@ -516,6 +523,10 @@ void vtkKWLogWidget::RemoveSelectedRecordsCallback()
       delete [] indices;
       this->Update();
       this->DescriptionText->GetWidget()->SetText("");
+      if (!this->GetNumberOfRecords())
+        {
+        this->InvokeEvent(vtkKWLogWidget::RecordsClearedEvent, NULL);
+        }
       }
     }
 }

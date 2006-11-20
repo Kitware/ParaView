@@ -193,7 +193,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.796");
+vtkCxxRevisionMacro(vtkPVWindow, "1.797");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -988,8 +988,9 @@ void vtkPVWindow::InitializeMenus()
     idx, "Show log of render events and timing");
               
   // Log stuff (not traced)
-  idx = this->GetWindowMenu()->InsertCommand(
-    5, "Error Log", this, "ShowErrorLog");
+  idx = this->GetWindowMenu()->GetIndexOfItem(
+    this->GetLogDialogMenuLabel());
+  this->GetWindowMenu()->SetItemCommand(idx, this, "ShowErrorLog");
   this->GetWindowMenu()->SetItemUnderline(idx, 2);
   this->GetWindowMenu()->SetItemHelpString(
     idx, "Show log of all errors and warnings");
@@ -4953,7 +4954,7 @@ void vtkPVWindow::ErrorMessage(const char* message)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ErrorIconCallback()
 {
-  this->Superclass::ErrorIconCallback();
+  this->SetErrorIconToBlack();
   this->ShowErrorLog();
 }
 

@@ -599,6 +599,11 @@ protected:
   vtkKWLogDialog *LogDialog;
   virtual int CreateLogDialog();
 
+  // Description:
+  // Install/restore output window
+  virtual void InstallOutputWindow();
+  virtual void RestoreOutputWindow();
+
 private:
 
   vtkKWRegistryHelper *RegistryHelper;

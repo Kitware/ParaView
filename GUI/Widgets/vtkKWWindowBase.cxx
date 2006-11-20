@@ -34,7 +34,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.54");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.55");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -1143,7 +1143,6 @@ void vtkKWWindowBase::ErrorIconCallback()
     {
     this->GetApplication()->DisplayLogDialog(this);
     }
-  this->SetErrorIconToBlack();
 }
 
 //----------------------------------------------------------------------------
@@ -1356,6 +1355,8 @@ void vtkKWWindowBase::AddCallbackCommandObservers()
         log_dlg, vtkKWTopLevel::DisplayEvent);
       this->AddCallbackCommandObserver(
         log_dlg, vtkKWTopLevel::WithdrawEvent);
+      this->AddCallbackCommandObserver(
+        log_dlg->GetLogWidget(), vtkKWLogWidget::RecordsClearedEvent);
       }
     }
 }
@@ -1382,6 +1383,8 @@ void vtkKWWindowBase::RemoveCallbackCommandObservers()
         log_dlg, vtkKWTopLevel::DisplayEvent);
       this->RemoveCallbackCommandObserver(
         log_dlg, vtkKWTopLevel::WithdrawEvent);
+      this->RemoveCallbackCommandObserver(
+        log_dlg->GetLogWidget(), vtkKWLogWidget::RecordsClearedEvent);
       }
     }
 }
