@@ -633,6 +633,7 @@ protected:
   // Update all rows in the list
   virtual void UpdatePresetRows();
   virtual void ScheduleUpdatePresetRows();
+  virtual void CancelScheduleUpdatePresetRows();
 
   char *PresetAddCommand;
   virtual void InvokePresetAddCommand();

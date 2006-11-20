@@ -58,7 +58,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.54");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.55");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -940,7 +940,10 @@ int vtkKWPresetSelector::AddPreset()
   // ScheduleUpdatePresetRow, the row will *not* be created on time once
   // we hit SeeRow or SelectPreset, it will only be created the next time
   // the event loop is idle enough to do so.
+  // Also, if some rows were schedules to be updated, do so now, otherwise
+  // some rows may popup after this one.
 
+  this->CancelScheduleUpdatePresetRows();
   this->UpdatePresetRow(id); 
 
   if (this->PresetList && this->PresetList->IsMapped())
@@ -2421,6 +2424,22 @@ void vtkKWPresetSelector::ScheduleUpdatePresetRows()
   this->Internals->ScheduleUpdatePresetRowsTimerId =
     this->Script(
       "after idle {catch {%s UpdatePresetRowsCallback}}", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::CancelScheduleUpdatePresetRows()
+{
+  // Not scheduled
+
+  if (!this->Internals->ScheduleUpdatePresetRowsTimerId.size())
+    {
+    return;
+    }
+
+  this->Script("after cancel %s", 
+               this->Internals->ScheduleUpdatePresetRowsTimerId.c_str());
+
+  this->UpdatePresetRowsCallback();
 }
 
 //----------------------------------------------------------------------------
