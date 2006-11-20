@@ -58,7 +58,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.53");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.54");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -995,7 +995,7 @@ int vtkKWPresetSelector::SetPresetGroup(int id, const char *group)
 {
   int res = this->SetPresetUserSlotAsString(
     id, this->GetPresetGroupSlotName(), group);
-  if (res && this->Internals && this->Internals->PresetFilter.size())
+  if (res && this->GetPresetFilterGroupConstraint())
     {
     // Changing the group of a preset may change the number of visible widgets
     // (for example, if the visibility of presets is filtered by groups), 
@@ -1572,7 +1572,14 @@ int vtkKWPresetSelector::SetPresetUserSlotAsDouble(
         node->UserSlotPool[slot_name];
       slot.DoubleValue = value;
       slot.Type = vtkKWPresetSelector::UserSlotDoubleType;
-      this->ScheduleUpdatePresetRow(id);
+      if (this->GetPresetFilterUserSlotConstraint(slot_name))
+        {
+        this->UpdatePresetRow(id);
+        }
+      else
+        {
+        this->ScheduleUpdatePresetRow(id);
+        }
       return 1;
       }
     }
@@ -1627,7 +1634,14 @@ int vtkKWPresetSelector::SetPresetUserSlotAsInt(
         node->UserSlotPool[slot_name];
       slot.IntValue = value;
       slot.Type = vtkKWPresetSelector::UserSlotIntType;
-      this->ScheduleUpdatePresetRow(id);
+      if (this->GetPresetFilterUserSlotConstraint(slot_name))
+        {
+        this->UpdatePresetRow(id);
+        }
+      else
+        {
+        this->ScheduleUpdatePresetRow(id);
+        }
       return 1;
       }
     }
@@ -1683,7 +1697,14 @@ int vtkKWPresetSelector::SetPresetUserSlotAsString(
         node->UserSlotPool[slot_name];
       slot.StringValue = fixed_value;
       slot.Type = vtkKWPresetSelector::UserSlotStringType;
-      this->ScheduleUpdatePresetRow(id);
+      if (this->GetPresetFilterUserSlotConstraint(slot_name))
+        {
+        this->UpdatePresetRow(id);
+        }
+      else
+        {
+        this->ScheduleUpdatePresetRow(id);
+        }
       return 1;
       }
     }
@@ -1738,7 +1759,14 @@ int vtkKWPresetSelector::SetPresetUserSlotAsPointer(
         node->UserSlotPool[slot_name];
       slot.PointerValue = value;
       slot.Type = vtkKWPresetSelector::UserSlotPointerType;
-      this->ScheduleUpdatePresetRow(id);
+      if (this->GetPresetFilterUserSlotConstraint(slot_name))
+        {
+        this->UpdatePresetRow(id);
+        }
+      else
+        {
+        this->ScheduleUpdatePresetRow(id);
+        }
       return 1;
       }
     }
@@ -1797,7 +1825,14 @@ int vtkKWPresetSelector::SetPresetUserSlotAsObject(
         {
         value->Register(this);
         }
-      this->ScheduleUpdatePresetRow(id);
+      if (this->GetPresetFilterUserSlotConstraint(slot_name))
+        {
+        this->UpdatePresetRow(id);
+        }
+      else
+        {
+        this->ScheduleUpdatePresetRow(id);
+        }
       return 1;
       }
     }
@@ -2990,3 +3025,4 @@ void vtkKWPresetSelector::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
+ 
