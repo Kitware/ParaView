@@ -34,7 +34,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.55");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.56");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -1355,8 +1355,11 @@ void vtkKWWindowBase::AddCallbackCommandObservers()
         log_dlg, vtkKWTopLevel::DisplayEvent);
       this->AddCallbackCommandObserver(
         log_dlg, vtkKWTopLevel::WithdrawEvent);
-      this->AddCallbackCommandObserver(
-        log_dlg->GetLogWidget(), vtkKWLogWidget::RecordsClearedEvent);
+      if (log_dlg->GetLogWidget())
+        {
+        this->AddCallbackCommandObserver(
+          log_dlg->GetLogWidget(), vtkKWLogWidget::RecordsClearedEvent);
+        }
       }
     }
 }
@@ -1383,8 +1386,11 @@ void vtkKWWindowBase::RemoveCallbackCommandObservers()
         log_dlg, vtkKWTopLevel::DisplayEvent);
       this->RemoveCallbackCommandObserver(
         log_dlg, vtkKWTopLevel::WithdrawEvent);
-      this->RemoveCallbackCommandObserver(
-        log_dlg->GetLogWidget(), vtkKWLogWidget::RecordsClearedEvent);
+      if (log_dlg->GetLogWidget())
+        {
+        this->RemoveCallbackCommandObserver(
+          log_dlg->GetLogWidget(), vtkKWLogWidget::RecordsClearedEvent);
+        }
       }
     }
 }
@@ -1396,8 +1402,6 @@ void vtkKWWindowBase::ProcessCallbackCommandEvents(vtkObject *caller,
 {
   if (this->GetApplication())
     {
-    vtkKWLogDialog *log_dlg = this->GetApplication()->GetLogDialog();
-
     // If the application sends an error/warning/debug/info, turn the
     // error icon to red to signal it to the user
 
@@ -1417,18 +1421,35 @@ void vtkKWWindowBase::ProcessCallbackCommandEvents(vtkObject *caller,
     // If the error log is displayed/withdrawn, turn the error icon to
     // black to signal that there were errors but they have been seen.
 
-    else if (log_dlg && caller == log_dlg)
+    else
       {
-      switch (event)
+      vtkKWLogDialog *log_dlg = this->GetApplication()->GetLogDialog();
+      if (log_dlg)
         {
-        case vtkKWTopLevel::DisplayEvent:
-        case vtkKWTopLevel::WithdrawEvent:
-          if (log_dlg->GetLogWidget() && 
-              log_dlg->GetLogWidget()->GetNumberOfRecords())
+        if (caller == log_dlg)
+          {
+          switch (event)
             {
-            this->SetErrorIconToBlack();
+            case vtkKWTopLevel::DisplayEvent:
+            case vtkKWTopLevel::WithdrawEvent:
+              if (log_dlg->GetLogWidget() && 
+                  log_dlg->GetLogWidget()->GetNumberOfRecords())
+                {
+                this->SetErrorIconToBlack();
+                }
+              break;
             }
-          break;
+          }
+        vtkKWLogWidget *log_w = log_dlg->GetLogWidget();
+        if (log_w && caller == log_w)
+          {
+          switch (event)
+            {
+            case vtkKWLogWidget::RecordsClearedEvent:
+              this->SetErrorIconToNone();
+              break;
+            }
+          }
         }
       }
     }

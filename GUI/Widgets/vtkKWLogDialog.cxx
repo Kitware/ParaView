@@ -22,12 +22,12 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLogDialog );
-vtkCxxRevisionMacro(vtkKWLogDialog, "1.1");
+vtkCxxRevisionMacro(vtkKWLogDialog, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWLogDialog::vtkKWLogDialog()
 {
-  this->LogWidget = NULL;
+  this->LogWidget = vtkKWLogWidget::New();
   this->CloseButton = NULL;
 }
 

@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLogWidget );
-vtkCxxRevisionMacro(vtkKWLogWidget, "1.2");
+vtkCxxRevisionMacro(vtkKWLogWidget, "1.3");
 
 vtkIdType vtkKWLogWidget::IdCounter = 1;
 
@@ -75,13 +75,14 @@ public:
 vtkKWLogWidget::vtkKWLogWidget()
 {  
   this->Internals              = new vtkKWLogWidgetInternals;
-  this->Toolbar                = vtkKWToolbar::New();
-  this->RecordList             = vtkKWMultiColumnListWithScrollbars::New();
-  this->SaveButton             = vtkKWLoadSaveButton::New();
-  this->RemoveSelectedButton   = vtkKWPushButton::New();
-  this->RemoveAllButton        = vtkKWPushButton::New();
-  this->DescriptionFrame       = vtkKWFrameWithLabel::New();
-  this->DescriptionText            = vtkKWTextWithScrollbars::New();
+
+  this->Toolbar                = NULL;
+  this->RecordList             = NULL;
+  this->SaveButton             = NULL;
+  this->RemoveSelectedButton   = NULL;
+  this->RemoveAllButton        = NULL;
+  this->DescriptionFrame       = NULL;
+  this->DescriptionText        = NULL;
   
   this->MaximumNumberOfRecords = 200;
 }
@@ -225,6 +226,10 @@ void vtkKWLogWidget::CreateRecordList()
 
   // Setup toolbar
 
+  if (!this->Toolbar)
+    {
+    this->Toolbar = vtkKWToolbar::New();
+    }
   this->Toolbar->SetParent(this);
   this->Toolbar->Create();
   this->Toolbar->SetToolbarAspectToFlat();
@@ -232,6 +237,10 @@ void vtkKWLogWidget::CreateRecordList()
 
   // Save Button
 
+  if (!this->SaveButton)
+    {
+    this->SaveButton = vtkKWLoadSaveButton::New();
+    }
   this->SaveButton->SetParent(this->Toolbar->GetFrame());
   this->SaveButton->Create();
   this->SaveButton->SetImageToPredefinedIcon(vtkKWIcon::IconFloppy);
@@ -245,6 +254,10 @@ void vtkKWLogWidget::CreateRecordList()
 
   // Remove Selected Button
 
+  if (!this->RemoveSelectedButton)
+    {
+    this->RemoveSelectedButton = vtkKWPushButton::New();
+    }
   this->RemoveSelectedButton->SetParent(this->Toolbar->GetFrame());
   this->RemoveSelectedButton->Create();
   this->RemoveSelectedButton->SetImageToPredefinedIcon(
@@ -256,6 +269,10 @@ void vtkKWLogWidget::CreateRecordList()
 
   // Remove All Button
 
+  if (!this->RemoveAllButton)
+    {
+    this->RemoveAllButton = vtkKWPushButton::New();
+    }
   this->RemoveAllButton->SetParent(this->Toolbar->GetFrame());
   this->RemoveAllButton->Create();
   this->RemoveAllButton->SetImageToPredefinedIcon(vtkKWIcon::IconTrashcan);
@@ -268,6 +285,10 @@ void vtkKWLogWidget::CreateRecordList()
   
   // Setup multicolumn list
 
+  if (!this->RecordList)
+    {
+    this->RecordList = vtkKWMultiColumnListWithScrollbars::New();
+    }
   this->RecordList->SetParent(this);
   this->RecordList->Create();
 
@@ -311,6 +332,10 @@ void vtkKWLogWidget::CreateRecordList()
   
   // Description Text Frame
 
+  if (!this->DescriptionFrame)
+    {
+    this->DescriptionFrame = vtkKWFrameWithLabel::New();
+    }
   this->DescriptionFrame->SetParent(this);
   this->DescriptionFrame->Create();
   this->DescriptionFrame->SetLabelText("Selected Record Description");
@@ -320,6 +345,10 @@ void vtkKWLogWidget::CreateRecordList()
   
   // Description Text Box
 
+  if (!this->DescriptionText)
+    {
+    this->DescriptionText = vtkKWTextWithScrollbars::New();
+    }
   this->DescriptionText->SetParent(this->DescriptionFrame->GetFrame());
   this->DescriptionText->Create();
   this->DescriptionText->GetWidget()->SetHeight(8);
