@@ -2472,10 +2472,10 @@ void vtkKWApplication::WarningMessage(const char* message)
     {
     this->LogDialog->GetLogWidget()->AddWarningRecord(message);
     }
-  else
-    {
-    cerr << ks_("Message Dialog|Title|Warning!") << message << endl;
-    }
+#ifdef _WIN32
+  ::OutputDebugString(message);
+#endif
+  cerr << message << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -2486,10 +2486,10 @@ void vtkKWApplication::ErrorMessage(const char* message)
     {
     this->LogDialog->GetLogWidget()->AddErrorRecord(message);
     }
-  else
-    {
-    cerr << ks_("Message Dialog|Title|Error!") << message << endl;
-    }
+#ifdef _WIN32
+  ::OutputDebugString(message);
+#endif
+  cerr << message << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -2500,10 +2500,10 @@ void vtkKWApplication::InformationMessage(const char* message)
     {
     this->LogDialog->GetLogWidget()->AddInformationRecord(message);
     }
-  else
-    {
-    cerr << ks_("Message Dialog|Title|Information!") << message << endl;
-    }
+#ifdef _WIN32
+  ::OutputDebugString(message);
+#endif
+  cerr << message << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -2514,10 +2514,10 @@ void vtkKWApplication::DebugMessage(const char* message)
     {
     this->LogDialog->GetLogWidget()->AddDebugRecord(message);
     }
-  else
-    {
-    cerr << ks_("Message Dialog|Title|Debug!") << message << endl;
-    }
+#ifdef _WIN32
+  ::OutputDebugString(message);
+#endif
+  cerr << message << endl;
 }
 
 //----------------------------------------------------------------------------
