@@ -34,7 +34,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.282");
+vtkCxxRevisionMacro(vtkKWWindow, "1.283");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -92,6 +92,9 @@ vtkKWWindow::vtkKWWindow()
   this->TclInteractorMenuLabel = 
     vtksys::SystemTools::DuplicateString(
       ks_("Menu|Window|&Tcl Interactor"));
+  this->LogDialogMenuLabel = 
+    vtksys::SystemTools::DuplicateString(
+      ks_("Menu|Window|&Error Log"));
 
   this->DefaultViewPanelName = 
     vtksys::SystemTools::DuplicateString("View");
@@ -195,6 +198,7 @@ vtkKWWindow::~vtkKWWindow()
   this->SetDefaultViewPanelName(NULL);
   this->SetTclInteractorMenuLabel(NULL);
   this->SetViewPanelPositionRegKey(NULL);
+  this->SetLogDialogMenuLabel(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -316,6 +320,17 @@ void vtkKWWindow::CreateWidget()
 
   if (!this->GetApplication()->GetReleaseMode())
     {
+    this->GetWindowMenu()->AddSeparator();
+    
+    cmd = "DisplayLogDialog {";
+    cmd += this->GetTclName();
+    cmd += "}";
+    idx = this->GetWindowMenu()->AddCommand(
+      this->GetLogDialogMenuLabel(), 
+      this->GetApplication(), cmd.c_str());
+    this->GetWindowMenu()->SetItemHelpString(
+      idx, k_("Display the error log dialog"));
+
     this->GetWindowMenu()->AddSeparator();
     
     idx = this->GetWindowMenu()->AddCommand(

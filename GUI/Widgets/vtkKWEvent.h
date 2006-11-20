@@ -229,6 +229,8 @@ public:
     InitializeTraceEvent,
     ManipulatorModifiedEvent,
     WarningMessageEvent,
+    InformationMessageEvent,
+    DebugMessageEvent,
     SourceDeletedEvent,
     //
     FinalBogusNotUsedEvent

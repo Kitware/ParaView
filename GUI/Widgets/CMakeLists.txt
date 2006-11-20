@@ -174,6 +174,8 @@ SET(KWWidgets_SRCS
   vtkKWListBoxToListBoxSelectionEditor.cxx
   vtkKWLoadSaveButton.cxx
   vtkKWLoadSaveDialog.cxx
+  vtkKWLogWidget.cxx
+  vtkKWLogDialog.cxx
   vtkKWMaterialPropertyWidget.cxx
   vtkKWMenu.cxx
   vtkKWMenuButton.cxx

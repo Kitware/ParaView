@@ -370,6 +370,7 @@ public:
   vtkGetStringMacro(DefaultViewPanelName);
   vtkGetStringMacro(TclInteractorMenuLabel);
   vtkGetStringMacro(ViewPanelPositionRegKey);
+  vtkGetStringMacro(LogDialogMenuLabel);
 
 protected:
   vtkKWWindow();
@@ -427,6 +428,7 @@ protected:
   vtkSetStringMacro(DefaultViewPanelName);
   vtkSetStringMacro(TclInteractorMenuLabel);
   vtkSetStringMacro(ViewPanelPositionRegKey);
+  vtkSetStringMacro(LogDialogMenuLabel);
 
 private:
 
@@ -460,6 +462,7 @@ private:
   char *DefaultViewPanelName;
   char *TclInteractorMenuLabel;
   char *ViewPanelPositionRegKey;
+  char *LogDialogMenuLabel;
 };
 
 #endif

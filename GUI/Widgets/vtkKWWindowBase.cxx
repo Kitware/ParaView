@@ -20,6 +20,8 @@
 #include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLoadSaveDialog.h"
+#include "vtkKWLogDialog.h"
+#include "vtkKWLogWidget.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWMostRecentFilesManager.h"
@@ -32,7 +34,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.53");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.54");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -280,6 +282,8 @@ void vtkKWWindowBase::PrepareForDelete()
     this->MainToolbarSet->SetNumberOfToolbarsChangedCommand(NULL, NULL);
     this->MainToolbarSet->RemoveAllToolbars();
     }
+
+  this->RemoveCallbackCommandObservers();
 }
 
 //----------------------------------------------------------------------------
@@ -439,6 +443,8 @@ void vtkKWWindowBase::CreateWidget()
   // Pack and restore geometry
 
   this->Pack();
+
+  this->AddCallbackCommandObservers();
 }
 
 //----------------------------------------------------------------------------
@@ -1097,28 +1103,6 @@ void vtkKWWindowBase::LoadScript(const char *filename)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindowBase::WarningMessage(const char* message)
-{
-  vtkKWMessageDialog::PopupMessage(
-    this->GetApplication(), this, 
-    ks_("Warning Dialog|Title|Warning!"),
-    message, vtkKWMessageDialog::WarningIcon);
-  this->SetErrorIconToRed();
-  this->InvokeEvent(vtkKWEvent::WarningMessageEvent, (void*)message);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindowBase::ErrorMessage(const char* message)
-{
-  vtkKWMessageDialog::PopupMessage(
-    this->GetApplication(), this, 
-    ks_("Error Dialog|Title|Error!"),
-    message, vtkKWMessageDialog::ErrorIcon);
-  this->SetErrorIconToRed();
-  this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, (void*)message);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWindowBase::SetErrorIcon(int s)
 {
   if (!this->TrayImageError || !this->TrayImageError->IsCreated())
@@ -1155,7 +1139,11 @@ void vtkKWWindowBase::SetErrorIcon(int s)
 //----------------------------------------------------------------------------
 void vtkKWWindowBase::ErrorIconCallback()
 {
-  this->SetErrorIcon(vtkKWWindowBase::ErrorIconBlack);
+  if (this->GetApplication())
+    {
+    this->GetApplication()->DisplayLogDialog(this);
+    }
+  this->SetErrorIconToBlack();
 }
 
 //----------------------------------------------------------------------------
@@ -1340,6 +1328,109 @@ void vtkKWWindowBase::UpdateMenuState()
       this->GetHelpMenu()->SetItemLabel(pos, buffer);
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowBase::AddCallbackCommandObservers()
+{
+  this->Superclass::AddCallbackCommandObservers();
+
+  if (this->GetApplication())
+    {
+    // If the application sends an error/warning/debug/info, turn the
+    // error icon to red to signal it to the user
+    this->AddCallbackCommandObserver(
+      this->GetApplication(), vtkKWEvent::WarningMessageEvent);
+    this->AddCallbackCommandObserver(
+      this->GetApplication(), vtkKWEvent::ErrorMessageEvent);
+    this->AddCallbackCommandObserver(
+      this->GetApplication(), vtkKWEvent::InformationMessageEvent);
+    this->AddCallbackCommandObserver(
+      this->GetApplication(), vtkKWEvent::DebugMessageEvent);
+    vtkKWLogDialog *log_dlg = this->GetApplication()->GetLogDialog();
+    if (log_dlg)
+      {
+      // If the error log is displayed/withdrawn, turn the error icon to
+      // black to signal that there were errors but they have been seen.
+      this->AddCallbackCommandObserver(
+        log_dlg, vtkKWTopLevel::DisplayEvent);
+      this->AddCallbackCommandObserver(
+        log_dlg, vtkKWTopLevel::WithdrawEvent);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowBase::RemoveCallbackCommandObservers()
+{
+  this->Superclass::RemoveCallbackCommandObservers();
+
+  if (this->GetApplication())
+    {
+    this->RemoveCallbackCommandObserver(
+      this->GetApplication(), vtkKWEvent::WarningMessageEvent);
+    this->RemoveCallbackCommandObserver(
+      this->GetApplication(), vtkKWEvent::ErrorMessageEvent);
+    this->RemoveCallbackCommandObserver(
+      this->GetApplication(), vtkKWEvent::InformationMessageEvent);
+    this->RemoveCallbackCommandObserver(
+      this->GetApplication(), vtkKWEvent::DebugMessageEvent);
+    vtkKWLogDialog *log_dlg = this->GetApplication()->GetLogDialog();
+    if (log_dlg)
+      {
+      this->RemoveCallbackCommandObserver(
+        log_dlg, vtkKWTopLevel::DisplayEvent);
+      this->RemoveCallbackCommandObserver(
+        log_dlg, vtkKWTopLevel::WithdrawEvent);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowBase::ProcessCallbackCommandEvents(vtkObject *caller,
+                                                     unsigned long event,
+                                                     void *calldata)
+{
+  if (this->GetApplication())
+    {
+    vtkKWLogDialog *log_dlg = this->GetApplication()->GetLogDialog();
+
+    // If the application sends an error/warning/debug/info, turn the
+    // error icon to red to signal it to the user
+
+    if (caller == this->GetApplication())
+      {
+      switch (event)
+        {
+        case vtkKWEvent::WarningMessageEvent:
+        case vtkKWEvent::ErrorMessageEvent:
+        case vtkKWEvent::InformationMessageEvent:
+        case vtkKWEvent::DebugMessageEvent:
+          this->SetErrorIconToRed();
+          break;
+        }
+      }
+
+    // If the error log is displayed/withdrawn, turn the error icon to
+    // black to signal that there were errors but they have been seen.
+
+    else if (log_dlg && caller == log_dlg)
+      {
+      switch (event)
+        {
+        case vtkKWTopLevel::DisplayEvent:
+        case vtkKWTopLevel::WithdrawEvent:
+          if (log_dlg->GetLogWidget() && 
+              log_dlg->GetLogWidget()->GetNumberOfRecords())
+            {
+            this->SetErrorIconToBlack();
+            }
+          break;
+        }
+      }
+    }
+
+  this->Superclass::ProcessCallbackCommandEvents(caller, event, calldata);
 }
 
 //----------------------------------------------------------------------------

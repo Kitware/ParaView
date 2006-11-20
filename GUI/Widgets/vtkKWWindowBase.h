@@ -76,14 +76,7 @@ public:
   virtual const char *GetStatusText();
   
   // Description:
-  // Popup a warning/error message.
-  // This can be overriden in a subclass to redirect errors and warnings
-  // to log files or more elaborate log windows.
-  virtual void WarningMessage(const char* message);
-  virtual void ErrorMessage(const char* message);
-
-  // Description:
-  // Set the error / warning icon in the tray.
+  // Set the error/warning icon in the tray.
   // Note that if StatusFrameVisibility is Off, you may want to move the
   // tray frame to a different position (say, in a toolbar), using
   // the SetTrayFramePosition() method.
@@ -302,6 +295,14 @@ public:
   //ETX
 
   // Description:
+  // Add all the default observers needed by that object, or remove
+  // all the observers that were added through AddCallbackCommandObserver.
+  // Subclasses can override these methods to add/remove their own default
+  // observers, but should call the superclass too.
+  virtual void AddCallbackCommandObservers();
+  virtual void RemoveCallbackCommandObservers();
+
+  // Description:
   // Callbacks. Internal, do not use.
   virtual void ErrorIconCallback();
   virtual void PrintSettingsCallback() {};
@@ -399,6 +400,13 @@ protected:
   vtkSetStringMacro(WindowGeometryRegKey);
   vtkSetStringMacro(DefaultGeometry);
 
+  // Description:
+  // Processes the events that are passed through CallbackCommand (or others).
+  // Subclasses can oberride this method to process their own events, but
+  // should call the superclass too.
+  virtual void ProcessCallbackCommandEvents(
+    vtkObject *caller, unsigned long event, void *calldata);
+  
 private:
 
   // Description:

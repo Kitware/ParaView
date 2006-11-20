@@ -14,12 +14,16 @@
 #include "vtkKWApplication.h"
 
 #include "vtkKWBalloonHelpManager.h"
+#include "vtkOutputWindow.h"
 #include "vtkKWEntry.h"
+#include "vtkKWEvent.h"
 #include "vtkKWEntryWithLabel.h"
 #include "vtkKWFrame.h"
 #include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLanguage.h"
+#include "vtkKWLogDialog.h"
+#include "vtkKWLogWidget.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
@@ -34,7 +38,6 @@
 #include "vtkKWToolbar.h"
 #include "vtkKWWindowBase.h"
 #include "vtkObjectFactory.h"
-#include "vtkOutputWindow.h"
 #include "vtkTclUtil.h"
 
 #include <stdarg.h>
@@ -127,7 +130,72 @@ public:
           }
       }
   };
+
+  vtkOutputWindow *PreviousOutputWindow;
 };
+
+//----------------------------------------------------------------------------
+class KWWidgets_EXPORT vtkKWOutputWindow : public vtkOutputWindow
+{
+public:
+  vtkTypeMacro(vtkKWOutputWindow,vtkOutputWindow);
+  static vtkKWOutputWindow* New();
+
+  void DisplayDebugText(const char* t)
+    { 
+      this->Application->DebugMessage(t); 
+      if (this->PromptUser || !this->Application->GetNumberOfWindowsMapped())
+        {
+        this->Application->DisplayLogDialog(NULL);
+        }
+    }
+  void DisplayWarningText(const char* t)
+    { 
+      this->Application->WarningMessage(t); 
+      if (this->PromptUser || !this->Application->GetNumberOfWindowsMapped())
+        {
+        this->Application->DisplayLogDialog(NULL);
+        }
+    }
+  void DisplayErrorText(const char* t)
+    { 
+      this->Application->ErrorMessage(t); 
+      if (this->PromptUser || !this->Application->GetNumberOfWindowsMapped())
+        {
+        this->Application->DisplayLogDialog(NULL);
+        }
+    }
+  void DisplayText(const char* t)
+    { 
+      this->Application->InformationMessage(t); 
+      if (this->PromptUser || !this->Application->GetNumberOfWindowsMapped())
+        {
+        this->Application->DisplayLogDialog(NULL);
+        }
+    }
+  void DisplayGenericWarningText(const char* t)
+    { 
+      this->DisplayWarningText(t); 
+    }
+  
+  void SetApplication(vtkKWApplication *app)
+    { 
+      this->Application = app; 
+    }
+
+protected:
+  vtkKWOutputWindow()
+    { 
+      this->Application = NULL; 
+    }
+  vtkKWApplication *Application;
+
+private:
+  vtkKWOutputWindow(const vtkKWOutputWindow&);
+  void operator=(const vtkKWOutputWindow&);
+};
+
+vtkStandardNewMacro(vtkKWOutputWindow);
 
 //----------------------------------------------------------------------------
 vtkKWApplication::vtkKWApplication()
@@ -172,6 +240,7 @@ vtkKWApplication::vtkKWApplication()
   this->SplashScreenVisibility    = 1;
   this->PrintTargetDPI            = 100.0;
   this->Theme                     = NULL;
+  this->LogDialog                 = vtkKWLogDialog::New();
 
   /* IMPORTANT:
      Do *NOT* call anything that retrieves the application's TclName.
@@ -196,6 +265,16 @@ vtkKWApplication::vtkKWApplication()
   // Instantiate the PIMPL Encapsulation for STL containers
 
   this->Internals = new vtkKWApplicationInternals;
+
+  // Output win
+
+  this->Internals->PreviousOutputWindow = vtkOutputWindow::GetInstance();
+  this->Internals->PreviousOutputWindow->Register(this);
+
+  vtkKWOutputWindow *output_win = vtkKWOutputWindow::New();
+  output_win->SetApplication(this);
+  vtkOutputWindow::SetInstance(output_win);
+  output_win->Delete();
 
   // Application name and version
 
@@ -307,6 +386,21 @@ void vtkKWApplication::PrepareForDelete()
     {
     this->SplashScreen->Delete();
     this->SplashScreen = NULL;
+    }
+
+  // vtkKWOutputWindow is actually using the LogDialog, so before deleting
+  // it, just switch back to the previous output window
+
+  if (vtkOutputWindow::GetInstance() != this->Internals->PreviousOutputWindow)
+    {
+    vtkOutputWindow::SetInstance(this->Internals->PreviousOutputWindow);
+    this->Internals->PreviousOutputWindow->Delete();
+    }
+
+  if (this->LogDialog)
+    {
+    this->LogDialog->Delete();
+    this->LogDialog = NULL;
     }
 
   if (this->BalloonHelpManager )
@@ -2336,6 +2430,87 @@ int vtkKWApplication::PutEnv(const char* value)
   // http://groups.google.com/group/comp.unix.wizards/msg/f0915a043bf259fa?dmode=source
   local_environment.push_back(env_var);
   return ret == 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::CreateLogDialog()
+{
+  if (!this->LogDialog)
+    {
+    this->LogDialog = vtkKWLogDialog::New();
+    }
+  if (!this->LogDialog->IsCreated())
+    {
+    this->LogDialog->SetApplication(this);
+    this->LogDialog->Create();
+    }
+  return this->LogDialog->IsCreated();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::WarningMessage(const char* message)
+{
+  this->InvokeEvent(vtkKWEvent::WarningMessageEvent, (void*)message);
+  if (this->CreateLogDialog())
+    {
+    this->LogDialog->GetLogWidget()->AddWarningRecord(message);
+    }
+  else
+    {
+    cerr << ks_("Message Dialog|Title|Warning!") << message << endl;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::ErrorMessage(const char* message)
+{
+  this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, (void*)message);
+  if (this->CreateLogDialog())
+    {
+    this->LogDialog->GetLogWidget()->AddErrorRecord(message);
+    }
+  else
+    {
+    cerr << ks_("Message Dialog|Title|Error!") << message << endl;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::InformationMessage(const char* message)
+{
+  this->InvokeEvent(vtkKWEvent::InformationMessageEvent, (void*)message);
+  if (this->CreateLogDialog())
+    {
+    this->LogDialog->GetLogWidget()->AddInformationRecord(message);
+    }
+  else
+    {
+    cerr << ks_("Message Dialog|Title|Information!") << message << endl;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::DebugMessage(const char* message)
+{
+  this->InvokeEvent(vtkKWEvent::DebugMessageEvent, (void*)message);
+  if (this->CreateLogDialog())
+    {
+    this->LogDialog->GetLogWidget()->AddDebugRecord(message);
+    }
+  else
+    {
+    cerr << ks_("Message Dialog|Title|Debug!") << message << endl;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::DisplayLogDialog(vtkKWWindowBase* master)
+{
+  if (this->CreateLogDialog())
+    {
+    this->LogDialog->SetMasterWindow(master ? master : this->GetNthWindow(0));
+    this->LogDialog->Display();
+    }
 }
 
 //----------------------------------------------------------------------------

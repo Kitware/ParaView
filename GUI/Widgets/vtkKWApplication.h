@@ -38,6 +38,7 @@ class vtkKWTextWithScrollbars;
 class vtkKWTheme;
 class vtkKWWidget;
 class vtkKWWindowBase;
+class vtkKWLogDialog;
 
 class KWWidgets_EXPORT vtkKWApplication : public vtkKWObject
 {
@@ -436,6 +437,19 @@ public:
   virtual void InstallTclBgErrorCallback();
 
   // Description:
+  // Popup a warning/error/information/debug message.
+  virtual void WarningMessage(const char* message);
+  virtual void ErrorMessage(const char* message);
+  virtual void DebugMessage(const char* message);
+  virtual void InformationMessage(const char* message);
+
+  // Description:
+  // Display the warning/error/information/debug message log dialog.
+  // Optionally provide a master window this dialog should be the slave of.
+  virtual void DisplayLogDialog(vtkKWWindowBase *master);
+  vtkGetObjectMacro(LogDialog, vtkKWLogDialog);
+
+  // Description:
   // Some constants
   //BTX
   static const char *ExitDialogName;
@@ -579,6 +593,11 @@ protected:
   //BTX
   static Tcl_Interp *InitializeVTK(Tcl_Interp *interp, ostream *err = 0);
   //ETX
+
+  // Description:
+  // Log dialog
+  vtkKWLogDialog *LogDialog;
+  virtual int CreateLogDialog();
 
 private:
 
