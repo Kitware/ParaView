@@ -24,25 +24,26 @@
 class vtkProcessModule;
 
 class vtkDataSet;
+class vtkKWLoadSaveDialog;
 class vtkKWMessageDialog;
+class vtkKWTopLevel;
 class vtkMapper;
 class vtkMultiProcessController;
-class vtkSocketController;
+class vtkPVApplicationObserver;
+class vtkPVCredits;
+class vtkPVGUIClientOptions;
+class vtkPVOptions;
 class vtkPVOutputWindow;
+class vtkPVProgressHandler;
+class vtkPVRenderView;
 class vtkPVSource;
 class vtkPVWindow;
-class vtkPVRenderView;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
 class vtkProcessObject;
-class vtkPVApplicationObserver;
-class vtkPVProgressHandler;
-class vtkKWLoadSaveDialog;
 class vtkSMApplication;
-class vtkPVGUIClientOptions;
-class vtkPVOptions;
 class vtkSMRenderModuleProxy;
-class vtkPVCredits;
+class vtkSocketController;
 
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
@@ -171,7 +172,7 @@ public:
   // Description:
   // Display the on-line help and about dialog for this application.
   // Over-writing vtkKWApplication defaults.
-  void DisplayHelpDialog(vtkKWWindowBase* master);
+  void DisplayHelpDialog(vtkKWTopLevel* master);
 
   // Description:
   // Tells the process modules whether to start the main
@@ -320,7 +321,7 @@ public:
   // Description:
   // Display the about dialog for this application.
   // Optionally provide a master window this dialog should be the slave of.
-  virtual void DisplayAboutDialog(vtkKWWindowBase *master);
+  virtual void DisplayAboutDialog(vtkKWTopLevel *master);
 
   // Description:
   // Internal method. Called by timer callback when a server connection drops.

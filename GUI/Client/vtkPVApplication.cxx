@@ -114,7 +114,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.390");
+vtkCxxRevisionMacro(vtkPVApplication, "1.391");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -1445,7 +1445,7 @@ vtkKWSplashScreen* vtkPVApplication::GetSplashScreen()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::DisplayAboutDialog(vtkKWWindowBase *master)
+void vtkPVApplication::DisplayAboutDialog(vtkKWTopLevel *master)
 {
   this->Credits->ShowAboutDialog(master);  
 }
@@ -1647,7 +1647,7 @@ void vtkPVApplication::StopRecordingScript()
 // Make instances of sources.
 //============================================================================
 
-void vtkPVApplication::DisplayHelpDialog(vtkKWWindowBase* master)
+void vtkPVApplication::DisplayHelpDialog(vtkKWTopLevel* master)
 {
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("ParaView Help");
