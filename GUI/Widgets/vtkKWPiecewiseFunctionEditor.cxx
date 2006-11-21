@@ -31,7 +31,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.51");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.55");
 
 #define EPSILON 0.0001
 #define EPSILON_MIN_WINDOW (EPSILON * 2.5)

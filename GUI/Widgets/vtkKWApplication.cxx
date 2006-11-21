@@ -76,7 +76,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.301");
+vtkCxxRevisionMacro(vtkKWApplication, "1.309");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 

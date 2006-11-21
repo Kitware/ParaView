@@ -22,7 +22,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.22");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.25");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";

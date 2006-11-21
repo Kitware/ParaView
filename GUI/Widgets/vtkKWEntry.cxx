@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.82");
+vtkCxxRevisionMacro(vtkKWEntry, "1.86");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()

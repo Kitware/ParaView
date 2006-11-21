@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.109");
+vtkCxxRevisionMacro(vtkKWMenu, "1.116");
 
 //----------------------------------------------------------------------------
 class vtkKWMenuInternals
