@@ -32,6 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSelectionManager.h"
 
+#include <QtDebug>
+#include <QWidget>
+#include <QCursor>
+
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqRenderViewModule.h"
@@ -41,8 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
-
-#include <QtDebug>
 
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
@@ -250,6 +252,8 @@ void pqSelectionManager::switchToSelection()
   if (this->setInteractorStyleToSelect(this->Implementation->RenderModule))
     {
     this->Mode = SELECT;
+    // set the selection cursor
+    this->Implementation->RenderModule->getWidget()->setCursor(Qt::CrossCursor);
     }
 }
 
@@ -265,6 +269,8 @@ void pqSelectionManager::switchToInteraction()
   if (this->setInteractorStyleToInteract(this->Implementation->RenderModule))
     {
     this->Mode = INTERACT;
+    // set the interaction cursor
+    this->Implementation->RenderModule->getWidget()->setCursor(QCursor());
     }
 }
 
