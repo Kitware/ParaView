@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.19");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.20");
 
 //----------------------------------------------------------------------------
 class vtkKWFrameWithScrollbarInternals
@@ -47,7 +47,7 @@ vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
   this->ScrollableFrame = NULL;
 
   this->VerticalScrollbarVisibility = 1;
-  this->HorizontalScrollbarVisibility = 1;
+  this->HorizontalScrollbarVisibility = 0;
 }
 
 //----------------------------------------------------------------------------

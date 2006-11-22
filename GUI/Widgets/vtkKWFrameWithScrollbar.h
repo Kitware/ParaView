@@ -43,7 +43,7 @@ public:
   vtkBooleanMacro(VerticalScrollbarVisibility, int);
 
   // Description:
-  // Set/Get the horizontal scrollbar visibility (default to On).
+  // Set/Get the horizontal scrollbar visibility (warning, default to Off).
   // No effect if called after Create().
   virtual void SetHorizontalScrollbarVisibility(int val);
   vtkGetMacro(HorizontalScrollbarVisibility, int);
