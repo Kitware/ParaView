@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pq3DViewPropertiesWidgetInternal;
-class vtkSMProxy;
+class pqGenericViewModule;
 
 class PQCOMPONENTS_EXPORT pq3DViewPropertiesWidget : public QWidget
 {
@@ -46,7 +46,7 @@ public:
   virtual ~pq3DViewPropertiesWidget();
 
   // Set the render module whose properties this widget is editing.
-  void setRenderModule(vtkSMProxy*);
+  void setRenderModule(pqGenericViewModule*);
 
 public slots:
   // call to accept the changes in the widget.

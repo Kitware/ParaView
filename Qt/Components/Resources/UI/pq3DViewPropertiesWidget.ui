@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>463</width>
-    <height>568</height>
+    <width>404</width>
+    <height>657</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -22,10 +22,698 @@
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item row="0" column="0" >
-    <widget class="QGroupBox" name="groupBox" >
+   <item row="4" column="0" >
+    <widget class="QGroupBox" name="UseLight" >
+     <property name="minimumSize" >
+      <size>
+       <width>16</width>
+       <height>200</height>
+      </size>
+     </property>
      <property name="title" >
-      <string>Colors</string>
+      <string>Key Light Parameters</string>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <property name="checked" >
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>4</number>
+      </property>
+      <property name="spacing" >
+       <number>3</number>
+      </property>
+      <item row="3" column="3" >
+       <widget class="QLabel" name="headRatioLabel" >
+        <property name="toolTip" >
+         <string>Key-to-Head Ratio</string>
+        </property>
+        <property name="whatsThis" >
+         <string>Set the Key-to-Head ratio. Similar to the Key-to-Fill ratio, this ratio controls how bright the headlight light is compared to the key light: larger values correspond to a dimmer headlight light. The headlight is special kind of fill light, lighting only the parts of the object that the camera can see. As such, a headlight tends to reduce the contrast of a scene. It can be used to fill in "shadows" of the object missed by the key and fill lights. The headlight should always be significantly dimmer than the key light: ratios of 2 to 15 are typical.</string>
+        </property>
+        <property name="text" >
+         <string>K:H</string>
+        </property>
+        <property name="buddy" >
+         <cstring>HeadLightK_H_Ratio</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4" >
+       <widget class="QDoubleSpinBox" name="BackLightK_B_Ratio" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Key-to-Back Ratio</string>
+        </property>
+        <property name="whatsThis" >
+         <string>Set the Key-to-Back Ratio. This ratio controls how bright the back lights are compared to the key light: larger values correspond to dimmer back lights. The back lights fill in the remaining high-contrast regions behind the object. Values between 2 and 10 are good.</string>
+        </property>
+        <property name="minimum" >
+         <double>1</double>
+        </property>
+        <property name="singleStep" >
+         <double>0.5</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5" >
+       <widget class="QLabel" name="fillElevationLabel" >
+        <property name="toolTip" >
+         <string>Fill Light Elevation</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Fill Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="text" >
+         <string>Ele</string>
+        </property>
+        <property name="buddy" >
+         <cstring>FillLightElevation</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="7" >
+       <widget class="QLabel" name="keyAzimuthLabel" >
+        <property name="toolTip" >
+         <string>Key Light Azimuth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Key Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="text" >
+         <string>Azi</string>
+        </property>
+        <property name="buddy" >
+         <cstring>KeyLightAzimuth</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="8" >
+       <widget class="QDoubleSpinBox" name="FillLightAzimuth" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Fill Light Azimuth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Fill Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="decimals" >
+         <number>0</number>
+        </property>
+        <property name="maximum" >
+         <double>180</double>
+        </property>
+        <property name="minimum" >
+         <double>-180</double>
+        </property>
+        <property name="singleStep" >
+         <double>10</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="keyLabel" >
+        <property name="toolTip" >
+         <string>Key Light Parameters</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Key Light is the main light.  It is usually positioned so that it appears like an overhead light (like the sun or a ceiling light).  It is generally positioned to shine down from about a 45 degree angle vertically and at least a little offset side to side.  The key light is usually at least about twice as bright as the total of all other lights in the scene to provide good modeling of object features.</string>
+        </property>
+        <property name="text" >
+         <string>Key</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="7" >
+       <widget class="QLabel" name="backAzimuthLabel" >
+        <property name="toolTip" >
+         <string>Back Light Azimuth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Back Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="text" >
+         <string>Azi</string>
+        </property>
+        <property name="buddy" >
+         <cstring>BackLightAzimuth</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5" >
+       <widget class="QLabel" name="backElevationLabel" >
+        <property name="toolTip" >
+         <string>Back Light Elevation</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Back Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="text" >
+         <string>Ele</string>
+        </property>
+        <property name="buddy" >
+         <cstring>BackLightElevation</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" >
+       <widget class="QLabel" name="fillRatioLabel" >
+        <property name="toolTip" >
+         <string>Key-to-Fill Ratio</string>
+        </property>
+        <property name="whatsThis" >
+         <string>Set the Key-to-Fill Ratio. This ratio controls how bright the fill light is compared to the key light: larger values correspond to a dimmer fill light. The purpose of the fill light is to light parts of the object not lit by the key light, while still maintaining constrast. This type of lighting may correspond to indirect illumination from the key light, bounced off a wall, floor, or other object. The fill light should never be brighter than the key light: a good range for the key-to-fill ratio is between 2 and 10.</string>
+        </property>
+        <property name="text" >
+         <string>K:F</string>
+        </property>
+        <property name="buddy" >
+         <cstring>FillLightK_F_Ratio</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" >
+       <widget class="QDoubleSpinBox" name="FillLightWarmth" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Fill Light Warmth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The "Warmth" of the Fill Light. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
+        </property>
+        <property name="maximum" >
+         <double>1</double>
+        </property>
+        <property name="singleStep" >
+         <double>0.1</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="6" >
+       <widget class="QDoubleSpinBox" name="FillLightElevation" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Fill Light Elevation</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Fill Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="decimals" >
+         <number>0</number>
+        </property>
+        <property name="maximum" >
+         <double>90</double>
+        </property>
+        <property name="minimum" >
+         <double>-90</double>
+        </property>
+        <property name="singleStep" >
+         <double>10</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="7" >
+       <widget class="QLabel" name="fillAzimuthLabel" >
+        <property name="toolTip" >
+         <string>Fill Light Azimuth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Fill Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="text" >
+         <string>Azi</string>
+        </property>
+        <property name="buddy" >
+         <cstring>FillLightAzimuth</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QLabel" name="keyWarmthLabel" >
+        <property name="toolTip" >
+         <string>Key Light Warmth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The "Warmth" of the Key Light. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
+        </property>
+        <property name="text" >
+         <string>Warm</string>
+        </property>
+        <property name="buddy" >
+         <cstring>KeyLightWarmth</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QLabel" name="backWarmthLabel" >
+        <property name="toolTip" >
+         <string>Back Light Warmth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The "Warmth" of the Back Light. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
+        </property>
+        <property name="text" >
+         <string>Warm</string>
+        </property>
+        <property name="buddy" >
+         <cstring>BackLightWarmth</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="8" >
+       <widget class="QDoubleSpinBox" name="KeyLightAzimuth" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Key Light Azimuth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Key Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="decimals" >
+         <number>0</number>
+        </property>
+        <property name="maximum" >
+         <double>180</double>
+        </property>
+        <property name="minimum" >
+         <double>-180</double>
+        </property>
+        <property name="singleStep" >
+         <double>10</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6" >
+       <widget class="QDoubleSpinBox" name="KeyLightElevation" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Key Light Elevation</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Key Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="decimals" >
+         <number>0</number>
+        </property>
+        <property name="maximum" >
+         <double>90</double>
+        </property>
+        <property name="minimum" >
+         <double>-90</double>
+        </property>
+        <property name="singleStep" >
+         <double>10</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" >
+       <widget class="QLabel" name="headWarmthLabel" >
+        <property name="toolTip" >
+         <string>Headlight Warmth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The "Warmth" of the Headlight. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
+        </property>
+        <property name="text" >
+         <string>Warm</string>
+        </property>
+        <property name="buddy" >
+         <cstring>HeadLightWarmth</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="headLabel" >
+        <property name="toolTip" >
+         <string>Headlight Parameters</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The headlight, always located at the position of the camera, reduces the contrast between areas lit by the key and fill light. </string>
+        </property>
+        <property name="text" >
+         <string>Head</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4" >
+       <widget class="QDoubleSpinBox" name="KeyLightIntensity" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Key Light Intensity</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Intensity of the Key Light.  0 = off and 1 = full intensity.</string>
+        </property>
+        <property name="maximum" >
+         <double>1</double>
+        </property>
+        <property name="singleStep" >
+         <double>0.1</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="6" >
+       <widget class="QDoubleSpinBox" name="BackLightElevation" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Back Light Elevation</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Back Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="decimals" >
+         <number>0</number>
+        </property>
+        <property name="maximum" >
+         <double>90</double>
+        </property>
+        <property name="minimum" >
+         <double>-90</double>
+        </property>
+        <property name="singleStep" >
+         <double>10</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QLabel" name="fillWarmthLabel" >
+        <property name="toolTip" >
+         <string>Fill Light Warmth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The "Warmth" of the Fill Light. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
+        </property>
+        <property name="text" >
+         <string>Warm</string>
+        </property>
+        <property name="buddy" >
+         <cstring>FillLightWarmth</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="backLabel" >
+        <property name="toolTip" >
+         <string>Back Light Parameters</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The two back lights, one on the left of the object as seen from the observer and one on the right, fill on the high-contrast areas behind the object. </string>
+        </property>
+        <property name="text" >
+         <string>Back</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QDoubleSpinBox" name="KeyLightWarmth" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Key Light Warmth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The "Warmth" of the Key Light. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
+        </property>
+        <property name="maximum" >
+         <double>1</double>
+        </property>
+        <property name="singleStep" >
+         <double>0.1</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5" >
+       <widget class="QLabel" name="keyElevationLabel" >
+        <property name="toolTip" >
+         <string>Key Light Elevation</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Key Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="text" >
+         <string>Ele</string>
+        </property>
+        <property name="buddy" >
+         <cstring>KeyLightElevation</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4" >
+       <widget class="QDoubleSpinBox" name="HeadLightK_H_Ratio" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Key-to-Head Ratio</string>
+        </property>
+        <property name="whatsThis" >
+         <string>Set the Key-to-Head ratio. Similar to the Key-to-Fill ratio, this ratio controls how bright the headlight light is compared to the key light: larger values correspond to a dimmer headlight light. The headlight is special kind of fill light, lighting only the parts of the object that the camera can see. As such, a headlight tends to reduce the contrast of a scene. It can be used to fill in "shadows" of the object missed by the key and fill lights. The headlight should always be significantly dimmer than the key light: ratios of 2 to 15 are typical.</string>
+        </property>
+        <property name="minimum" >
+         <double>1</double>
+        </property>
+        <property name="singleStep" >
+         <double>0.5</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3" >
+       <widget class="QLabel" name="backRatioLabel" >
+        <property name="toolTip" >
+         <string>Key-to-Back Ratio</string>
+        </property>
+        <property name="whatsThis" >
+         <string>Set the Key-to-Back Ratio. This ratio controls how bright the back lights are compared to the key light: larger values correspond to dimmer back lights. The back lights fill in the remaining high-contrast regions behind the object. Values between 2 and 10 are good.</string>
+        </property>
+        <property name="text" >
+         <string>K:B</string>
+        </property>
+        <property name="buddy" >
+         <cstring>BackLightK_B_Ratio</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3" >
+       <widget class="QLabel" name="keyIntensityLabel" >
+        <property name="toolTip" >
+         <string>Key Light Intensity</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Intensity of the Key Light.  0 = off and 1 = full intensity.</string>
+        </property>
+        <property name="text" >
+         <string>Int</string>
+        </property>
+        <property name="buddy" >
+         <cstring>KeyLightIntensity</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2" >
+       <widget class="QDoubleSpinBox" name="HeadLightWarmth" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Headlight Warmth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The "Warmth" of the Headlight. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
+        </property>
+        <property name="maximum" >
+         <double>1</double>
+        </property>
+        <property name="singleStep" >
+         <double>0.1</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="fillLabel" >
+        <property name="toolTip" >
+         <string>Fill Light Parameters</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The fill light is usually positioned across from or opposite from the key light (though still on the same side of the object as the camera) in order to simulate diffuse reflections from other objects in the scene.</string>
+        </property>
+        <property name="text" >
+         <string>Fill</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" >
+       <widget class="QDoubleSpinBox" name="BackLightWarmth" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Back Light Warmth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The "Warmth" of the Back Light. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
+        </property>
+        <property name="maximum" >
+         <double>1</double>
+        </property>
+        <property name="singleStep" >
+         <double>0.1</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4" >
+       <widget class="QDoubleSpinBox" name="FillLightK_F_Ratio" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Key-to-Fill Ratio</string>
+        </property>
+        <property name="whatsThis" >
+         <string>Set the Key-to-Fill Ratio. This ratio controls how bright the fill light is compared to the key light: larger values correspond to a dimmer fill light. The purpose of the fill light is to light parts of the object not lit by the key light, while still maintaining constrast. This type of lighting may correspond to indirect illumination from the key light, bounced off a wall, floor, or other object. The fill light should never be brighter than the key light: a good range for the key-to-fill ratio is between 2 and 10.</string>
+        </property>
+        <property name="minimum" >
+         <double>1</double>
+        </property>
+        <property name="singleStep" >
+         <double>0.5</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="5" colspan="4" >
+       <widget class="QCheckBox" name="MaintainLuminance" >
+        <property name="toolTip" >
+         <string>Toggle constant perceptual brightness.</string>
+        </property>
+        <property name="whatsThis" >
+         <string>If Maintain Luminance is set, the LightKit will attempt to maintain the apparent intensity of lights based on their perceptual brightnesses.</string>
+        </property>
+        <property name="text" >
+         <string>Maintain Luminance</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="8" >
+       <widget class="QDoubleSpinBox" name="BackLightAzimuth" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Back Light Azimuth</string>
+        </property>
+        <property name="whatsThis" >
+         <string>The Back Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
+        </property>
+        <property name="decimals" >
+         <number>0</number>
+        </property>
+        <property name="maximum" >
+         <double>180</double>
+        </property>
+        <property name="minimum" >
+         <double>-180</double>
+        </property>
+        <property name="singleStep" >
+         <double>10</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
+      <string>Advanced Render Parameters</string>
      </property>
      <layout class="QVBoxLayout" >
       <property name="margin" >
@@ -35,203 +723,46 @@
        <number>6</number>
       </property>
       <item>
-       <widget class="pqColorChooserButton" name="backgroundColor" >
+       <widget class="QCheckBox" name="parallelProjection" >
         <property name="toolTip" >
-         <string>Change the background color of the 3D View window</string>
-        </property>
-        <property name="text" >
-         <string>Set Background Color</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0" >
-    <widget class="QGroupBox" name="lodParameters" >
-     <property name="title" >
-      <string>LOD Parameters</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item row="1" column="0" colspan="2" >
-       <widget class="QCheckBox" name="renderingInterrupts" >
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of render interrupts (when using MPI, this uses asynchronous messaging). When off, renders can not be interrupted.&lt;/p>&lt;/body>&lt;/html></string>
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of parallel projection (if parallel projection is off, perspective projection is used)&lt;/p>&lt;/body>&lt;/html></string>
         </property>
         <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of render interrupts (when using MPI, this uses asynchronous messaging). When off, renders can not be interrupted.&lt;/p>&lt;/body>&lt;/html></string>
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of parallel projection (if parallel projection is off, perspective projection is used).&lt;/p>&lt;/body>&lt;/html></string>
         </property>
         <property name="text" >
-         <string>Allow Rendering Interrupts</string>
+         <string>Use Parallel Projection</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2" >
-       <layout class="QVBoxLayout" >
-        <property name="margin" >
-         <number>0</number>
+      <item>
+       <widget class="QCheckBox" name="triangleStrips" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If this option is choosen, all triangles are converted into triangle strips before rendering. This may improve the rendering performance.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
-        <property name="spacing" >
-         <number>6</number>
+        <property name="statusTip" >
+         <string/>
         </property>
-        <item>
-         <widget class="QLabel" name="lodThresholdLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="lodResolutionLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="outlineThresholdLabel" >
-          <property name="enabled" >
-           <bool>true</bool>
-          </property>
-          <property name="text" >
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+        <property name="whatsThis" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If this option is choosen, all triangles are converted into triangle strips before rendering. This may improve the rendering performance.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="text" >
+         <string>Use Triangle Strips</string>
+        </property>
+       </widget>
       </item>
-      <item row="0" column="1" >
-       <layout class="QVBoxLayout" >
-        <property name="margin" >
-         <number>0</number>
+      <item>
+       <widget class="QCheckBox" name="immediateModeRendering" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When this option is off, OpenGL display lists are used for rendering. Using display lists improves performance for small datasets but is not recommended for large datasets due to the excessive memory usage and long display list creation times.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
-        <property name="spacing" >
-         <number>6</number>
+        <property name="whatsThis" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When this option is off, OpenGL display lists are used for rendering. Using display lists improves performance for small datasets but is not recommended for large datasets due to the excessive memory usage and long display list creation times.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
-        <item>
-         <widget class="QSlider" name="lodThreshold" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="toolTip" >
-           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines whether to use decimated models during interaction. Threshold criteria is based on size of geometry in megabytes. &lt;b>Left:&lt;/b> Always use decimated models. &lt;b>Right:&lt;/b> Always use full resolution.&lt;/p>&lt;/body>&lt;/html></string>
-          </property>
-          <property name="whatsThis" >
-           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines whether to use decimated models during interaction. Threshold criteria is based on size of geometry in megabytes. &lt;b>Left:&lt;/b> Always use decimated models. &lt;b>Right:&lt;/b> Always use full resolution.&lt;/p>&lt;/body>&lt;/html></string>
-          </property>
-          <property name="maximum" >
-           <number>1000</number>
-          </property>
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSlider" name="lodResolution" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="toolTip" >
-           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the resolution of the decimated level-of-detail models. The value is the dimension for each axis in the quadric clustering algorithm. &lt;b>Left:&lt;/b> Use slow high-resolution models. &lt;b>Right:&lt;/b> Use fast simple models.&lt;/p>&lt;/body>&lt;/html></string>
-          </property>
-          <property name="whatsThis" >
-           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the resolution of the decimated level-of-detail models. The value is the dimension for each axis in the quadric clustering algorithm. &lt;b>Left:&lt;/b> Use slow high-resolution models. &lt;b>Right:&lt;/b> Use fast simple models.&lt;/p>&lt;/body>&lt;/html></string>
-          </property>
-          <property name="minimum" >
-           <number>10</number>
-          </property>
-          <property name="maximum" >
-           <number>160</number>
-          </property>
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSlider" name="outlineThreshold" >
-          <property name="toolTip" >
-           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the default representation to use for unstructured grid datasets. If the dataset has more cells than this threshold, then an outline is used. Otherwise, the surface is extracted. &lt;b>Left:&lt;/b> Use surface representation as default. &lt;b>Right:&lt;/b> Use outline representation as default.&lt;/p>&lt;/body>&lt;/html></string>
-          </property>
-          <property name="whatsThis" >
-           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the default representation to use for unstructured grid datasets. If the dataset has more cells than this threshold, then an outline is used. Otherwise, the surface is extracted. &lt;b>Left:&lt;/b> Use surface representation as default. &lt;b>Right:&lt;/b> Use outline representation as default.&lt;/p>&lt;/body>&lt;/html></string>
-          </property>
-          <property name="minimum" >
-           <number>0</number>
-          </property>
-          <property name="maximum" >
-           <number>5000</number>
-          </property>
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="0" column="0" >
-       <layout class="QVBoxLayout" >
-        <property name="margin" >
-         <number>0</number>
+        <property name="text" >
+         <string>Use Immediate Mode Rendering</string>
         </property>
-        <property name="spacing" >
-         <number>6</number>
-        </property>
-        <item>
-         <layout class="QHBoxLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="label" >
-            <property name="text" >
-             <string>LOD Threshold</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="enableLOD" >
-            <property name="toolTip" >
-             <string>Toggle use of LOD while interacting.</string>
-            </property>
-            <property name="text" >
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_2" >
-          <property name="text" >
-           <string>LOD Resolution</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_3" >
-          <property name="text" >
-           <string>Outline Threshold</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -457,10 +988,199 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QGroupBox" name="groupBox_2" >
+   <item row="2" column="0" >
+    <widget class="QGroupBox" name="lodParameters" >
      <property name="title" >
-      <string>Advanced Render Parameters</string>
+      <string>LOD Parameters</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QCheckBox" name="renderingInterrupts" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of render interrupts (when using MPI, this uses asynchronous messaging). When off, renders can not be interrupted.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="whatsThis" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of render interrupts (when using MPI, this uses asynchronous messaging). When off, renders can not be interrupted.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="text" >
+         <string>Allow Rendering Interrupts</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="lodThresholdLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lodResolutionLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="outlineThresholdLabel" >
+          <property name="enabled" >
+           <bool>true</bool>
+          </property>
+          <property name="text" >
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="1" >
+       <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QSlider" name="lodThreshold" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="toolTip" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines whether to use decimated models during interaction. Threshold criteria is based on size of geometry in megabytes. &lt;b>Left:&lt;/b> Always use decimated models. &lt;b>Right:&lt;/b> Always use full resolution.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="whatsThis" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines whether to use decimated models during interaction. Threshold criteria is based on size of geometry in megabytes. &lt;b>Left:&lt;/b> Always use decimated models. &lt;b>Right:&lt;/b> Always use full resolution.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="maximum" >
+           <number>1000</number>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="lodResolution" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="toolTip" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the resolution of the decimated level-of-detail models. The value is the dimension for each axis in the quadric clustering algorithm. &lt;b>Left:&lt;/b> Use slow high-resolution models. &lt;b>Right:&lt;/b> Use fast simple models.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="whatsThis" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the resolution of the decimated level-of-detail models. The value is the dimension for each axis in the quadric clustering algorithm. &lt;b>Left:&lt;/b> Use slow high-resolution models. &lt;b>Right:&lt;/b> Use fast simple models.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="minimum" >
+           <number>10</number>
+          </property>
+          <property name="maximum" >
+           <number>160</number>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="outlineThreshold" >
+          <property name="toolTip" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the default representation to use for unstructured grid datasets. If the dataset has more cells than this threshold, then an outline is used. Otherwise, the surface is extracted. &lt;b>Left:&lt;/b> Use surface representation as default. &lt;b>Right:&lt;/b> Use outline representation as default.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="whatsThis" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the default representation to use for unstructured grid datasets. If the dataset has more cells than this threshold, then an outline is used. Otherwise, the surface is extracted. &lt;b>Left:&lt;/b> Use surface representation as default. &lt;b>Right:&lt;/b> Use outline representation as default.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="minimum" >
+           <number>0</number>
+          </property>
+          <property name="maximum" >
+           <number>5000</number>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="0" >
+       <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" >
+          <property name="margin" >
+           <number>0</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label" >
+            <property name="text" >
+             <string>LOD Threshold</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="enableLOD" >
+            <property name="toolTip" >
+             <string>Toggle use of LOD while interacting.</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2" >
+          <property name="text" >
+           <string>LOD Resolution</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_3" >
+          <property name="text" >
+           <string>Outline Threshold</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0" >
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Colors</string>
      </property>
      <layout class="QVBoxLayout" >
       <property name="margin" >
@@ -470,44 +1190,12 @@
        <number>6</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="parallelProjection" >
+       <widget class="pqColorChooserButton" name="backgroundColor" >
         <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of parallel projection (if parallel projection is off, perspective projection is used)&lt;/p>&lt;/body>&lt;/html></string>
-        </property>
-        <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of parallel projection (if parallel projection is off, perspective projection is used).&lt;/p>&lt;/body>&lt;/html></string>
+         <string>Change the background color of the 3D View window</string>
         </property>
         <property name="text" >
-         <string>Use Parallel Projection</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="triangleStrips" >
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If this option is choosen, all triangles are converted into triangle strips before rendering. This may improve the rendering performance.&lt;/p>&lt;/body>&lt;/html></string>
-        </property>
-        <property name="statusTip" >
-         <string/>
-        </property>
-        <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If this option is choosen, all triangles are converted into triangle strips before rendering. This may improve the rendering performance.&lt;/p>&lt;/body>&lt;/html></string>
-        </property>
-        <property name="text" >
-         <string>Use Triangle Strips</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="immediateModeRendering" >
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When this option is off, OpenGL display lists are used for rendering. Using display lists improves performance for small datasets but is not recommended for large datasets due to the excessive memory usage and long display list creation times.&lt;/p>&lt;/body>&lt;/html></string>
-        </property>
-        <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When this option is off, OpenGL display lists are used for rendering. Using display lists improves performance for small datasets but is not recommended for large datasets due to the excessive memory usage and long display list creation times.&lt;/p>&lt;/body>&lt;/html></string>
-        </property>
-        <property name="text" >
-         <string>Use Immediate Mode Rendering</string>
+         <string>Set Background Color</string>
         </property>
        </widget>
       </item>

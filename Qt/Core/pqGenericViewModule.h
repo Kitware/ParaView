@@ -65,12 +65,15 @@ public:
   virtual void setWindowParent(QWidget* parent)=0;
   virtual QWidget* getWindowParent() const =0;
 
+public slots:
   /// Request a StillRender. Default implementation simply calls
   /// forceRender(). Subclasses can implement a delayed/buffered render.
   virtual void render() { this->forceRender(); }
 
   /// Forces an immediate render.
   virtual void forceRender();
+
+public:
 
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.

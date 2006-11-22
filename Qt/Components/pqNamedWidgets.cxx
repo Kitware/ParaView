@@ -93,7 +93,11 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
     // update domains that we might ask for
     SMProperty->UpdateDependentDomains();
 
-    const QString regex = QString("^%1$|^%1_.*$").arg(iter->GetKey());
+    // all property names with special characters are changed
+    QString key = iter->GetKey();
+    key.replace(':', '_');
+    key.replace(' ', '_');
+    const QString regex = QString("^%1$|^%1_.*$").arg(key);
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
     for(int i=0; i<foundObjects.size(); i++)
       {
@@ -435,7 +439,11 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
       continue;
       }
 
-    const QString regex = QString("^%1$|^%1_.*$").arg(iter->GetKey());
+    // all property names with special characters are changed
+    QString key = iter->GetKey();
+    key.replace(':', '_');
+    key.replace(' ', '_');
+    const QString regex = QString("^%1$|^%1_.*$").arg(key);
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
     for(int i=0; i<foundObjects.size(); i++)
       {

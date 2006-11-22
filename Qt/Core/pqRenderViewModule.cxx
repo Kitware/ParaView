@@ -118,12 +118,6 @@ static void UpdateServerViews(pqRenderViewModule* renderModule)
 
 }
 
-template<class T>
-inline uint qHash(QPointer<T> p)
-{
-  return qHash(static_cast<T*>(p));
-}
-
 class pqRenderViewModuleInternal
 {
 public:

@@ -43,24 +43,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Client includes.
 #include "pqApplicationCore.h"
-#include "pqPropertyLinks.h"
+#include "pqPropertyManager.h"
 #include "pqRenderViewModule.h"
 #include "pqSettings.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
+#include "pqNamedWidgets.h"
 
 //-----------------------------------------------------------------------------
 class pq3DViewPropertiesWidgetInternal : public Ui::pq3DViewProperties
 {
 public:
-  pqPropertyLinks Links;
+  pqPropertyManager Links;
   pqSignalAdaptorColor *ColorAdaptor;
-  vtkSmartPointer<vtkSMProxy> Proxy;
+  QPointer<pqGenericViewModule> ViewModule;
 
   pq3DViewPropertiesWidgetInternal() 
     {
     this->ColorAdaptor = 0;
-    this->Links.setUseUncheckedProperties(true);
     }
 
   ~pq3DViewPropertiesWidgetInternal()
@@ -107,7 +107,7 @@ public:
     }
 
 
-  void loadValues(vtkSMProxy* proxy);
+  void loadValues(pqGenericViewModule* proxy);
   void accept();
   // saves the user selections into pqSettings,
   // so that new render windows created will use the
@@ -116,32 +116,38 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-void pq3DViewPropertiesWidgetInternal::loadValues(vtkSMProxy* proxy)
+void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModule)
 {
   if (!this->ColorAdaptor)
     {
     this->ColorAdaptor = new pqSignalAdaptorColor(this->backgroundColor, 
       "chosenColor", SIGNAL(chosenColorChanged(const QColor&)), false);
     }
-  this->Proxy = (proxy);
+  
+  this->ViewModule = viewModule;
+  vtkSMProxy* proxy = viewModule->getProxy();
 
-  this->Links.addPropertyLink(this->ColorAdaptor, "color",
+  this->Links.registerLink(this->ColorAdaptor, "color",
     SIGNAL(colorChanged(const QVariant&)),
     proxy, proxy->GetProperty("Background"));
 
-  this->Links.addPropertyLink(this->parallelProjection, "checked",
+  this->Links.registerLink(this->parallelProjection, "checked",
     SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("CameraParallelProjection"));
 
-  this->Links.addPropertyLink(this->triangleStrips, "checked", 
+  this->Links.registerLink(this->triangleStrips, "checked", 
     SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("UseTriangleStrips"));
 
-  this->Links.addPropertyLink(this->immediateModeRendering, "checked", 
+  this->Links.registerLink(this->immediateModeRendering, "checked", 
     SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("UseImmediateMode"));
 
 
+  pqNamedWidgets::link(this->UseLight, proxy, &this->Links);
+  
+  this->Links.registerLink(this->UseLight, "checked", SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("UseLight"));
 
   if (vtkSMLODRenderModuleProxy::SafeDownCast(proxy))
     {
@@ -165,7 +171,7 @@ void pq3DViewPropertiesWidgetInternal::loadValues(vtkSMProxy* proxy)
     this->lodResolution->setValue(static_cast<int>(160-val + 10));
     this->updateLODResolutionLabel(this->lodResolution->value());
 
-    this->Links.addPropertyLink(this->renderingInterrupts, "checked",
+    this->Links.registerLink(this->renderingInterrupts, "checked",
       SIGNAL(stateChanged(int)),
       proxy, proxy->GetProperty("RenderInterruptsEnabled"));
     }
@@ -228,7 +234,7 @@ void pq3DViewPropertiesWidgetInternal::loadValues(vtkSMProxy* proxy)
     {
     // Only available for IceT.
     this->orderedCompositing->setVisible(true);
-    this->Links.addPropertyLink(this->orderedCompositing, "checked", 
+    this->Links.registerLink(this->orderedCompositing, "checked", 
       SIGNAL(stateChanged(int)),
       proxy, proxy->GetProperty("OrderedCompositing"));
     }
@@ -242,7 +248,7 @@ void pq3DViewPropertiesWidgetInternal::loadValues(vtkSMProxy* proxy)
 void pq3DViewPropertiesWidgetInternal::accept()
 {
 
-  if(!this->Proxy)
+  if(!this->ViewModule)
     {
     return;
     }
@@ -250,7 +256,7 @@ void pq3DViewPropertiesWidgetInternal::accept()
   // We need to accept user changes.
   this->Links.accept();
 
-  vtkSMProxy* renModule = this->Proxy;
+  vtkSMProxy* renModule = this->ViewModule->getProxy();
   if (vtkSMLODRenderModuleProxy::SafeDownCast(renModule))
     {
     // Push changes for LOD parameters.
@@ -320,7 +326,7 @@ void pq3DViewPropertiesWidgetInternal::writeSettings()
 
   settings->setValue("renderModule/Background",
     pqSMAdaptor::getMultipleElementProperty(
-      this->Proxy->GetProperty("Background")));
+      this->ViewModule->getProxy()->GetProperty("Background")));
 
   QList<QString> propertyNames;
   propertyNames.push_back("CameraParallelProjection");
@@ -335,11 +341,11 @@ void pq3DViewPropertiesWidgetInternal::writeSettings()
   propertyNames.push_back("OrderedCompositing");
   foreach (QString name, propertyNames)
     {
-    if (this->Proxy->GetProperty(name.toAscii().data()))
+    if (this->ViewModule->getProxy()->GetProperty(name.toAscii().data()))
       {
       settings->setValue("renderModule/" + name, 
         pqSMAdaptor::getElementProperty(
-          this->Proxy->GetProperty(name.toAscii().data())));
+          this->ViewModule->getProxy()->GetProperty(name.toAscii().data())));
       }
     }
 }
@@ -380,7 +386,7 @@ pq3DViewPropertiesWidget::~pq3DViewPropertiesWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pq3DViewPropertiesWidget::setRenderModule(vtkSMProxy* renderModule)
+void pq3DViewPropertiesWidget::setRenderModule(pqGenericViewModule* renderModule)
 {
   this->Internal->loadValues(renderModule);
 }
@@ -389,6 +395,10 @@ void pq3DViewPropertiesWidget::setRenderModule(vtkSMProxy* renderModule)
 void pq3DViewPropertiesWidget::accept()
 {
   this->Internal->accept();
+  if(this->Internal->ViewModule)
+    {
+    this->Internal->ViewModule->render();
+    }
 }
 
 //-----------------------------------------------------------------------------
