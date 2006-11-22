@@ -40,14 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // self include
 #include "pqPythonEventSource.h"
 
-// system includes
-#ifdef Q_OS_WIN
-#include <windows.h> // for Sleep
-#endif
-#ifdef Q_OS_UNIX
-#include <time.h>
-#endif
-
 // Qt include
 #include <QVariant>
 #include <QFile>
@@ -56,11 +48,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWaitCondition>
 #include <QCoreApplication>
 #include <QEvent>
-#include <QCoreApplication>
-#include <QTime>
 
 // Qt testing includes
 #include "pqObjectNaming.h"
+#include "pqWidgetEventPlayer.h"
 
 
 // TODO not have a global instance pointer?
@@ -151,17 +142,8 @@ QtTesting_wait(PyObject* /*self*/, PyObject* args)
     PyErr_SetString(PyExc_TypeError, "bad arguments to wait(msec)");
     return NULL;
     }
-  QTime timer;
-  timer.start();
-  do {
-    QCoreApplication::processEvents(QEventLoop::AllEvents, ms);
-#ifdef Q_OS_WIN
-    Sleep(uint(10));
-#else
-    struct timespec ts = { 10 / 1000, (10 % 1000) * 1000 * 1000 };
-    nanosleep(&ts, NULL);
-#endif
-  } while (timer.elapsed() < ms);
+
+  pqWidgetEventPlayer::wait(ms);
 
   return Py_BuildValue(const_cast<char*>(""));
 }

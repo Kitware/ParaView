@@ -61,10 +61,9 @@ public:
     const QString& Arguments,
     bool& Error) = 0;
 
-protected:
   /** Wait function provided for players that need to wait for the GUI
       to perform a certain action */
-  void wait(int ms);
+  static void wait(int ms);
 
 };
 
