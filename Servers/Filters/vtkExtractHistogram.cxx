@@ -28,7 +28,7 @@
 #include "vtkIntArray.h"
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.11");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.12");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -195,19 +195,16 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
 
   // Calculate the extents of each bin, based on the range of values in the
   // input ...  
-  // we offset the first and last values in the range by epsilon
-  // to ensure that extrema don't fall "outside" the first or last bins due
-  // to errors in floating-point precision.
   double range[2];
   data_array->GetRange(range, this->Component);
   const double bin_delta = (range[1] - range[0]) / this->BinCount;
   
-  bin_extents->SetValue(0, range[0] - VTK_DBL_EPSILON);
+  bin_extents->SetValue(0, range[0]);
   for(i = 1; i < this->BinCount; ++i)
     {
     bin_extents->SetValue(i, range[0] + (i * bin_delta));
     }
-  bin_extents->SetValue(this->BinCount, range[1] + VTK_DBL_EPSILON);
+  bin_extents->SetValue(this->BinCount, range[1]);
 
   int num_of_tuples = data_array->GetNumberOfTuples();
 
@@ -217,7 +214,15 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
     const double value = data_array->GetComponent(i, this->Component);
     for(int j = 0; j != this->BinCount; ++j)
       {
-      if(bin_extents->GetValue(j) <= value && value < bin_extents->GetValue(j+1))
+      // if we're at the last bin, and this value didn't go in any other bin,
+      // it goes in the last one
+      if(j == this->BinCount - 1)
+        {
+        bin_values->SetValue(j, bin_values->GetValue(j) + 1);
+        break;
+        }
+      // check that the value is less than the right hand value of the bin
+      else if(value < bin_extents->GetValue(j+1))
         {
         bin_values->SetValue(j, bin_values->GetValue(j) + 1);
         break;
