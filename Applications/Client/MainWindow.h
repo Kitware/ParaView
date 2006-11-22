@@ -50,6 +50,10 @@ public:
   bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
   
 private slots:
+  void onVCRPlay();
+  void onVCRPause();
+  void onVCRPlayDone();
+
   void onUndoLabel(const QString&);
   void onRedoLabel(const QString&);
 

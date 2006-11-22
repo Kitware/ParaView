@@ -188,6 +188,7 @@ ENDIF(APPLE)
       #HistogramChart
       LoadStateMultiView
       OpenHelp
+      VCRAnimation
       )
   ENDIF(QT_TESTING_WITH_PYTHON)
 

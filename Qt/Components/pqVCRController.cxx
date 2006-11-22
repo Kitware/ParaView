@@ -49,6 +49,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqVCRController::pqVCRController(QObject* _parent/*=null*/) : QObject(_parent)
 {
   this->Source = NULL;
+  QObject::connect(&this->Timer, SIGNAL(timeout()),
+                   this, SLOT(onTimerNextFrame()));
+  this->Timer.setInterval(100);
 }
 
 //-----------------------------------------------------------------------------
@@ -59,6 +62,32 @@ pqVCRController::~pqVCRController()
 void pqVCRController::setSource(pqPipelineSource* source)
 {
   this->Source = source;
+}
+
+void pqVCRController::onPlay()
+{
+  if(!this->Timer.isActive())
+    {
+    this->Timer.start();
+    }
+}
+
+void pqVCRController::onPause()
+{
+  if(this->Timer.isActive())
+    {
+    this->Timer.stop();
+    }
+}
+  
+void pqVCRController::onTimerNextFrame()
+{
+  bool didStep = this->updateSource(false, false, 1);
+  if(!didStep)
+    {
+    this->Timer.stop();
+    emit this->playCompleted();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -86,26 +115,19 @@ void pqVCRController::onLastFrame()
 }
 
 //-----------------------------------------------------------------------------
-void pqVCRController::updateSource(bool first, bool last, int offset)
+bool pqVCRController::updateSource(bool first, bool last, int offset)
 {
   if (!this->Source)
     {
-    return;
+    return false;
     }
   vtkSMProxy* activeProxy = this->Source->getProxy();
-  const QString source_class = activeProxy->GetVTKClassName();
-  if (source_class != "vtkExodusReader" && source_class != "vtkPExodusReader")
-    {
-    return;
-    }
-  
   vtkSMIntVectorProperty* const timestep = vtkSMIntVectorProperty::SafeDownCast(
     activeProxy->GetProperty("TimeStep"));
     
   if(!timestep)
     {
-    qDebug() << "Failed to locate property TimeStep on reader.";
-    return;
+    return false;
     }
 
   vtkSMIntRangeDomain* const timestep_range =
@@ -114,7 +136,7 @@ void pqVCRController::updateSource(bool first, bool last, int offset)
   if(!timestep_range)
     {
     qDebug() << "Failed to locate 'range' domain.";
-    return;
+    return false;
     }
 
   pqApplicationCore::instance()->getUndoStack()->BeginUndoSet("VCR");
@@ -123,6 +145,8 @@ void pqVCRController::updateSource(bool first, bool last, int offset)
   int max_exists = 0;
   int min_step = timestep_range->GetMinimum(0, min_exists);
   int max_step = timestep_range->GetMaximum(0, max_exists);
+  
+  int previousValue = timestep->GetElement(0);
 
   if (first)
     {
@@ -145,6 +169,9 @@ void pqVCRController::updateSource(bool first, bool last, int offset)
   emit this->timestepChanged();
   
   this->Source->renderAllViews();
+
+  return timestep->GetElement(0) != previousValue ? true : false;
+
 }
 
 

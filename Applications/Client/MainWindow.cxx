@@ -276,6 +276,15 @@ MainWindow::MainWindow() :
   this->Implementation->Core.onHelpEnableTooltips(
     this->Implementation->UI.actionHelpEnableTooltips->isChecked());
 
+  connect(this->Implementation->UI.actionVCRPlay,
+    SIGNAL(triggered()), this, SLOT(onVCRPlay()));
+  
+  connect(this->Implementation->UI.actionVCRPause,
+    SIGNAL(triggered()), this, SLOT(onVCRPause()));
+  
+  connect(&this->Implementation->Core.VCRController(), SIGNAL(playCompleted()), 
+          this, SLOT(onVCRPlayDone()));
+
   connect(this->Implementation->UI.actionVCRFirstFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onFirstFrame()));
     
@@ -815,6 +824,26 @@ void MainWindow::onSelectionShortcutFinished()
     this->Implementation->Core.selectionManager().switchToInteraction();
   }
 
+}
+
+void MainWindow::onVCRPlay()
+{
+  this->Implementation->UI.actionVCRPlay->setEnabled(false);
+  this->Implementation->UI.actionVCRPause->setEnabled(true);
+  this->Implementation->Core.VCRController().onPlay();
+}
+
+void MainWindow::onVCRPause()
+{
+  this->Implementation->UI.actionVCRPlay->setEnabled(true);
+  this->Implementation->UI.actionVCRPause->setEnabled(false);
+  this->Implementation->Core.VCRController().onPause();
+}
+
+void MainWindow::onVCRPlayDone()
+{
+  this->Implementation->UI.actionVCRPlay->setEnabled(true);
+  this->Implementation->UI.actionVCRPause->setEnabled(false);
 }
 
 

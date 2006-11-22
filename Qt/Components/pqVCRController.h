@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 #include <QObject>
+#include <QTimer>
 class pqPipelineSource;
 
 class PQCOMPONENTS_EXPORT pqVCRController : public QObject
@@ -47,6 +48,7 @@ public:
 
 signals:
   void timestepChanged();
+  void playCompleted();
 
 public slots:
   // Connect these signals to appropriate VCR buttons.
@@ -54,14 +56,20 @@ public slots:
   void onPreviousFrame();
   void onNextFrame();
   void onLastFrame();
+  void onPlay();
+  void onPause();
 
   void setSource(pqPipelineSource* source);
+
+private slots:
+  void onTimerNextFrame();
  
 private:
   // internal method.
-  void updateSource(bool first, bool last, int offset);
+  bool updateSource(bool first, bool last, int offset);
 
   pqPipelineSource* Source;
+  QTimer Timer;
 };
 
 #endif

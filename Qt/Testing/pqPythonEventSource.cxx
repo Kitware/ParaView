@@ -40,6 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // self include
 #include "pqPythonEventSource.h"
 
+// system includes
+#ifdef Q_OS_WIN
+#include <windows.h> // for Sleep
+#endif
+#ifdef Q_OS_UNIX
+#include <time.h>
+#endif
+
 // Qt include
 #include <QVariant>
 #include <QFile>
@@ -48,6 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWaitCondition>
 #include <QCoreApplication>
 #include <QEvent>
+#include <QCoreApplication>
+#include <QTime>
 
 // Qt testing includes
 #include "pqObjectNaming.h"
@@ -129,6 +139,42 @@ QtTesting_getProperty(PyObject* /*self*/, PyObject* args)
              PropertyResult.toAscii().data());
 }
 
+static PyObject*
+QtTesting_wait(PyObject* /*self*/, PyObject* args)
+{
+  // void QtTesting.wait(msec)
+  
+  int ms = 0;
+
+  if(!PyArg_ParseTuple(args, const_cast<char*>("i"), &ms))
+    {
+    PyErr_SetString(PyExc_TypeError, "bad arguments to wait(msec)");
+    return NULL;
+    }
+  QTime timer;
+  timer.start();
+  do {
+    QCoreApplication::processEvents(QEventLoop::AllEvents, ms);
+#ifdef Q_OS_WIN
+    Sleep(uint(10));
+#else
+    struct timespec ts = { 10 / 1000, (10 % 1000) * 1000 * 1000 };
+    nanosleep(&ts, NULL);
+#endif
+  } while (timer.elapsed() < ms);
+
+  return Py_BuildValue(const_cast<char*>(""));
+}
+
+static PyObject*
+QtTesting_getQtVersion(PyObject* /*self*/, PyObject* /*args*/)
+{
+  // string QtTesting.getQtVersion()
+  //    returns the Qt version as a string
+  
+  return Py_BuildValue(const_cast<char*>("s"), qVersion());
+}
+
 static PyMethodDef QtTestingMethods[] = {
   {
     const_cast<char*>("playCommand"), 
@@ -141,6 +187,19 @@ static PyMethodDef QtTestingMethods[] = {
     QtTesting_getProperty,
     METH_VARARGS,
     const_cast<char*>("Get a property of an object.")
+  },
+  {
+    const_cast<char*>("getQtVersion"),
+    QtTesting_getQtVersion,
+    METH_VARARGS,
+    const_cast<char*>("Get the version of Qt being used.")
+  },
+  {
+    const_cast<char*>("wait"),
+    QtTesting_wait,
+    METH_VARARGS,
+    const_cast<char*>("Have the python script wait for a specfied number"
+                      " of msecs, while the Qt app is alive.")
   },
 
   {NULL, NULL, 0, NULL} // Sentinal

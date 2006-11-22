@@ -28,7 +28,7 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>25</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPipeline" >
@@ -643,9 +643,6 @@
    </property>
   </action>
   <action name="actionVCRPlay" >
-   <property name="enabled" >
-    <bool>false</bool>
-   </property>
    <property name="icon" >
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrPlay22.png</iconset>
    </property>
