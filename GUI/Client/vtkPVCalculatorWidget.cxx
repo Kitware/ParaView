@@ -42,10 +42,11 @@
 #include "vtkSource.h"
 #include "vtkStringList.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkPVLabeledToggle.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.56");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.57");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -810,7 +811,7 @@ void vtkPVCalculatorWidget::Accept()
       this->GetSMVectorVariableProperty());
   vtkSMIntVectorProperty *attributeProp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMAttributeModeProperty());
-  
+
   const char *mode = this->AttributeModeMenu->GetValue();
 
   if (attributeProp)
@@ -838,7 +839,7 @@ void vtkPVCalculatorWidget::Accept()
       }
     scalarProp->SetNumberOfElements(this->NumberOfScalarVariables*3);
     }
-  
+
   if (vectorProp)
     {
     for (i = 0; i < this->NumberOfVectorVariables; i++)
@@ -852,38 +853,32 @@ void vtkPVCalculatorWidget::Accept()
     vectorProp->SetNumberOfElements(this->NumberOfVectorVariables*5);
     }
 
-  int isPointSet = this->PVSource->GetPVInput(0)
-    ->GetDataInformation()->DataSetTypeIsA("vtkPointSet");
-
-  if(isPointSet)
+  vtkSMStringVectorProperty *coordinateVectorProp =
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->GetPVSource()->GetProxy()->GetProperty(
+        "AddCoordinateVectorVariable"));
+  vtkSMStringVectorProperty *coordinateScalarProp =
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->GetPVSource()->GetProxy()->GetProperty(
+        "AddCoordinateScalarVariable"));
+  if ( coordinateVectorProp )
     {
-    vtkSMStringVectorProperty *coordinateVectorProp =
-      vtkSMStringVectorProperty::SafeDownCast(
-        this->GetPVSource()->GetProxy()->GetProperty(
-          "AddCoordinateVectorVariable"));
-    vtkSMStringVectorProperty *coordinateScalarProp =
-      vtkSMStringVectorProperty::SafeDownCast(
-        this->GetPVSource()->GetProxy()->GetProperty(
-          "AddCoordinateScalarVariable"));
-    if ( coordinateVectorProp )
-      {
-      coordinateVectorProp->SetElement(0, "coords");
-      coordinateVectorProp->SetElement(1, "0");
-      coordinateVectorProp->SetElement(2, "1");
-      coordinateVectorProp->SetElement(3, "2");
-      coordinateVectorProp->SetNumberOfElements(4);
-      }
+    coordinateVectorProp->SetElement(0, "coords");
+    coordinateVectorProp->SetElement(1, "0");
+    coordinateVectorProp->SetElement(2, "1");
+    coordinateVectorProp->SetElement(3, "2");
+    coordinateVectorProp->SetNumberOfElements(4);
+    }
 
-    if ( coordinateScalarProp )
-      {
-      coordinateScalarProp->SetElement(0, "coords_0");
-      coordinateScalarProp->SetElement(1, "0");
-      coordinateScalarProp->SetElement(2, "coords_1");
-      coordinateScalarProp->SetElement(3, "1");
-      coordinateScalarProp->SetElement(4, "coords_2");
-      coordinateScalarProp->SetElement(5, "2");
-      coordinateScalarProp->SetNumberOfElements(6);
-      }
+  if ( coordinateScalarProp )
+    {
+    coordinateScalarProp->SetElement(0, "coords_0");
+    coordinateScalarProp->SetElement(1, "0");
+    coordinateScalarProp->SetElement(2, "coords_1");
+    coordinateScalarProp->SetElement(3, "1");
+    coordinateScalarProp->SetElement(4, "coords_2");
+    coordinateScalarProp->SetElement(5, "2");
+    coordinateScalarProp->SetNumberOfElements(6);
     }
 
   if (functionProp)
@@ -1152,7 +1147,7 @@ void vtkPVCalculatorWidget::AddAllVariables(int populateMenus)
               {
               sprintf(menuCommand, "UpdateFunction {%s}", name);
               this->ScalarsMenu->GetMenu()->AddCommand(name, this,
-                                                       menuCommand);
+                menuCommand);
               }
             }
           else
@@ -1174,37 +1169,31 @@ void vtkPVCalculatorWidget::AddAllVariables(int populateMenus)
             {
             sprintf(menuCommand, "UpdateFunction {%s}", name);
             this->VectorsMenu->GetMenu()->AddCommand(name, this,
-                                                     menuCommand);
+              menuCommand);
             }
           }
         }
       }
     }
 
-  int isPointSet = this->PVSource->GetPVInput(0)
-    ->GetDataInformation()->DataSetTypeIsA("vtkPointSet");
- 
-  if(isPointSet)
+  name = "coords";
+  if (populateMenus)
     {
-    name = "coords";
+    sprintf(menuCommand, "UpdateFunction {%s}", name);
+    this->VectorsMenu->GetMenu()->AddCommand(name, this,
+      menuCommand);
+    }
+  for ( j = 0; j < 3; ++j )
+    {
+    sprintf(menuEntry, "%s_%d", name, j);
     if (populateMenus)
       {
-      sprintf(menuCommand, "UpdateFunction {%s}", name);
-      this->VectorsMenu->GetMenu()->AddCommand(name, this,
-        menuCommand);
-      }
-    for ( j = 0; j < 3; ++j )
-      {
-      sprintf(menuEntry, "%s_%d", name, j);
-      if (populateMenus)
-        {
-        sprintf(menuCommand, "UpdateFunction {%s}", menuEntry);
-        this->ScalarsMenu->GetMenu()->AddCommand(
-          menuEntry, this, menuCommand);
-        }
+      sprintf(menuCommand, "UpdateFunction {%s}", menuEntry);
+      this->ScalarsMenu->GetMenu()->AddCommand(
+        menuEntry, this, menuCommand);
       }
     }
-  }
+}
 
 //-----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::UpdateEnableState()
