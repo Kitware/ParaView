@@ -92,7 +92,7 @@ void pqSettingsDialog::setupGUI()
     {
     // Add settings tab.
     this->Internal->ViewProperties->setRenderModule(
-      this->Internal->RenderModule->getProxy());
+      this->Internal->RenderModule);
     this->Internal->tabWidget->addTab(
       this->Internal->ViewProperties, "Active View Properties");
     }
