@@ -4112,8 +4112,6 @@ This filter uses colors to show levels of a hiearchical dataset.
           <Entry value="4" text="Unstructured Grid" />
         </EnumerationDomain>
       </IntVectorProperty>
-      </Property>
-
     </SourceProxy>
 
     <SourceProxy name="ClientServerMoveData" class="vtkClientServerMoveData">
