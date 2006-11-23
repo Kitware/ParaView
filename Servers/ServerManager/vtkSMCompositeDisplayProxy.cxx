@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.28");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.29");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -178,13 +178,26 @@ void vtkSMCompositeDisplayProxy::CreateVTKObjects(int numObjects)
     }
 
   this->Superclass::CreateVTKObjects(numObjects);
+ 
   
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->UpdateSuppressorProxy->GetProperty("Enabled"));
+  ivp->SetElement(0, 0);
+  this->UpdateSuppressorProxy->UpdateProperty("Enabled");
   this->CacherProxy = this->DistributorSuppressorProxy;
+
   // The VolumeMapper for Image Data is directly connected to the 
   // VolumeUpdateSuppressorProxy, and not to VolumeDistributorSuppressorProxy
   // as is the case with UNSTRUCTURED_GRID volume rendering.
-  this->VolumeCacherProxy = (this->VolumePipelineType == IMAGE_DATA)?
-    this->VolumeUpdateSuppressorProxy :this->VolumeDistributorSuppressorProxy;
+  if (this->VolumePipelineType != IMAGE_DATA && this->VolumeDistributorSuppressorProxy)
+    {
+    this->VolumeCacherProxy = this->VolumeDistributorSuppressorProxy;
+
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->VolumeUpdateSuppressorProxy->GetProperty("Enabled"));
+    ivp->SetElement(0, 0);
+    this->VolumeUpdateSuppressorProxy->UpdateProperty("Enabled");
+    }
 
 }
 
@@ -1167,6 +1180,39 @@ void vtkSMCompositeDisplayProxy::SetVisibility(int visible)
 //-----------------------------------------------------------------------------
 void vtkSMCompositeDisplayProxy::CacheUpdate(int idx, int total)
 {
+  // Since cache is kept by the DistributorSuppressor,
+  // the UpdateSuppressor connected to the Collect filter doesn't
+  // get any chance to  mark the collect filter modified on the client
+  // side, hence we explicitly mark it modified.
+  vtkClientServerStream stream;
+  unsigned int cc;
+  if (this->VolumeCollectProxy && this->VolumeRenderMode)
+    {
+    for (cc=0; cc < this->VolumeCollectProxy->GetNumberOfIDs(); cc++)
+      {
+      stream << vtkClientServerStream::Invoke
+        << this->VolumeCollectProxy->GetID(cc)
+        << "Modified"
+        << vtkClientServerStream::End;
+      }
+    }
+  else if (this->CollectProxy)
+    {
+    for (cc=0; cc < this->CollectProxy->GetNumberOfIDs(); cc++)
+      {
+      stream << vtkClientServerStream::Invoke
+        << this->CollectProxy->GetID(cc)
+        << "Modified"
+        << vtkClientServerStream::End;    
+      }
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->GetConnectionID(), vtkProcessModule::CLIENT_AND_SERVERS,
+      stream);
+    }
+
   this->Superclass::CacheUpdate(idx, total);
 
   this->DistributedLODGeometryIsValid = 0;

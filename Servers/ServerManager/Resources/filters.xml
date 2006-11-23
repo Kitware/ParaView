@@ -4070,6 +4070,13 @@ This filter uses colors to show levels of a hiearchical dataset.
         is_internal="1">
         <IntRangeDomain name="range" min="0 -1" />
       </IntVectorProperty>
+      <IntVectorProperty
+        name="Enabled"
+        command="SetEnabled"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
     </UpdateSuppressorProxy>
     
     <SourceProxy name="MPIMoveData" class="vtkMPIMoveData">
@@ -4105,6 +4112,8 @@ This filter uses colors to show levels of a hiearchical dataset.
           <Entry value="4" text="Unstructured Grid" />
         </EnumerationDomain>
       </IntVectorProperty>
+      </Property>
+
     </SourceProxy>
 
     <SourceProxy name="ClientServerMoveData" class="vtkClientServerMoveData">

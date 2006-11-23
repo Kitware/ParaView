@@ -53,7 +53,7 @@
 #include "vtkSelection.h"
 #include "vtkSMMPIRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.52");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.53");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -598,7 +598,7 @@ void vtkSMRenderModuleProxy::CacheUpdate(int idx, int total)
       // Call CacheUpdate on those which support.
       ivp->SetElement(0, idx);
       ivp->SetElement(1, total);
-      disp->UpdateVTKObjects();
+      disp->UpdateProperty("CacheUpdate");
       }
     }
   iter->Delete();

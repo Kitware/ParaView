@@ -38,7 +38,7 @@
 #include "vtkWindowToImageFilter.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.18");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -234,7 +234,7 @@ void vtkSMCompositeRenderModuleProxy::StillRender()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendPrepareProgress(this->ConnectionID);
 
-  this->UpdateAllDisplays();
+  //this->UpdateAllDisplays();
 
   // Find out whether we are going to render localy.
   // Save this so we know where to get the z buffer (for picking?).

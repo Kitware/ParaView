@@ -52,15 +52,25 @@ public:
   vtkSetMacro(UpdateNumberOfPieces, int);
   vtkGetMacro(UpdateNumberOfPieces, int);
 
+  // Description:
+  // Get/Set if the update suppressor is enabled. If the update suppressor 
+  // is not enabled, it won't supress any updates. Enabled by default.
+  void SetEnabled(int);
+  vtkGetMacro(Enabled, int);
 protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();
 
   int RequestData(vtkInformation* request, vtkInformationVector **inputVector,
-                  vtkInformationVector *outputVector);
+    vtkInformationVector *outputVector);
+  virtual int RequestUpdateExtent(vtkInformation*,
+                                  vtkInformationVector**,
+                                  vtkInformationVector*);
 
   int UpdatePiece;
   int UpdateNumberOfPieces;
+
+  int Enabled;
 
   vtkTimeStamp UpdateTime;
 

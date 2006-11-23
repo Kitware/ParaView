@@ -38,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.25");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.26");
 
 
 //-----------------------------------------------------------------------------
@@ -1342,9 +1342,6 @@ void vtkSMDataObjectDisplayProxy::CacheUpdate(int idx, int total)
     return;
     }
 
-  
-
-
   // Cache at the appropriate update suppressor depending
   // on if we are rendering volume or polygons.
   vtkSMProxy* cacheKeeper = (this->VolumeRenderMode)?
@@ -1360,7 +1357,7 @@ void vtkSMDataObjectDisplayProxy::CacheUpdate(int idx, int total)
     cacheKeeper->GetProperty("CacheUpdate"));
   ivp->SetElement(0, idx);
   ivp->SetElement(1, total);
-  cacheKeeper->UpdateVTKObjects();
+  cacheKeeper->UpdateProperty("CacheUpdate");
   
   // I don't like calling Modified directly, but I need the scalars to be
   // remapped through the lookup table, and this causes that to happen.
