@@ -36,10 +36,16 @@ public:
                              vtkInformationVector** inInfo,
                              vtkInformationVector* outInfo);
 
+  // Description:
+  // Get/Set if the update suppressions are enabled.
+  // Enabled by default.
+  void SetEnabled(int e) {this->Enabled = e;}
+  vtkGetMacro(Enabled, int);
 protected:
   vtkUpdateSuppressorPipeline();
   ~vtkUpdateSuppressorPipeline();
 
+  int Enabled;
 private:
   vtkUpdateSuppressorPipeline(const vtkUpdateSuppressorPipeline&);  // Not implemented.
   void operator=(const vtkUpdateSuppressorPipeline&);  // Not implemented.

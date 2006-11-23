@@ -28,7 +28,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.38");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.39");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -39,12 +39,31 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 
   this->CachedGeometry = NULL;
   this->CachedGeometryLength = 0;
+
+  this->Enabled = 1;
 }
 
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 {
   this->RemoveAllCaches();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVUpdateSuppressor::SetEnabled(int enable)
+{
+  if (this->Enabled == enable)
+    {
+    return;
+    }
+  this->Enabled = enable;
+  this->Modified();
+  vtkUpdateSuppressorPipeline* executive = 
+    vtkUpdateSuppressorPipeline::SafeDownCast(this->GetExecutive());
+  if (executive)
+    {
+    executive->SetEnabled(enable);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -206,9 +225,33 @@ void vtkPVUpdateSuppressor::CacheUpdate(int idx, int num)
 //----------------------------------------------------------------------------
 vtkExecutive* vtkPVUpdateSuppressor::CreateDefaultExecutive()
 {
-  return vtkUpdateSuppressorPipeline::New();
+  vtkUpdateSuppressorPipeline* executive = vtkUpdateSuppressorPipeline::New();
+  executive->SetEnabled(this->Enabled);
+  return executive;
 }
 
+
+//----------------------------------------------------------------------------
+int vtkPVUpdateSuppressor::RequestUpdateExtent(vtkInformation* request,
+                                  vtkInformationVector** inputVector,
+                                  vtkInformationVector* outputVector)
+{
+  if (!this->Enabled)
+    {
+    vtkInformation* info = inputVector[0]->GetInformationObject(0);
+    vtkStreamingDemandDrivenPipeline* sddp = 
+      vtkStreamingDemandDrivenPipeline::SafeDownCast(
+        info->GetExecutive(vtkExecutive::PRODUCER()));
+    if (sddp)
+      {
+      sddp->SetUpdateExtent(info, this->UpdatePiece, 
+        this->UpdateNumberOfPieces, 0);
+      return 1;
+      }
+    return 0;
+    }
+  return 1;
+}
 
 //----------------------------------------------------------------------------
 int vtkPVUpdateSuppressor::RequestData(vtkInformation *request,
@@ -224,7 +267,8 @@ int vtkPVUpdateSuppressor::RequestData(vtkInformation *request,
   vtkDataSet *output = vtkDataSet::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  if (outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) > 1)
+  if (!this->Enabled 
+    || outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) > 1)
     {
     output->ShallowCopy(input);
     return 1;
@@ -239,4 +283,5 @@ void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "UpdatePiece: " << this->UpdatePiece << endl;
   os << indent << "UpdateNumberOfPieces: " << this->UpdateNumberOfPieces << endl;
+  os << indent << "Enabled: " << this->Enabled << endl;
 }
