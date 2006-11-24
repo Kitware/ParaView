@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.72");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.73");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -949,6 +949,9 @@ void vtkKWMultiColumnList::SetColumnSortMode(int col_index, int mode)
     case vtkKWMultiColumnList::SortModeReal:
       sortmode_opt = "real";
       break;
+    case vtkKWMultiColumnList::SortModeCommand:
+      sortmode_opt = "command";
+      break;
     default:
       sortmode_opt = "ascii";
       break;
@@ -1199,6 +1202,19 @@ void vtkKWMultiColumnList::SetColumnFormatCommand(int col_index,
     char *command = NULL;
     this->SetObjectMethodCommand(&command, object, method);
     this->SetColumnConfigurationOption(col_index, "-formatcommand", command);
+    delete [] command;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetColumnSortCommand(int col_index, 
+  vtkObject *object, const char *method)
+{
+  if (this->IsCreated())
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+    this->SetColumnConfigurationOption(col_index, "-sortcommand", command);
     delete [] command;
     }
 }

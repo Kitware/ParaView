@@ -290,7 +290,8 @@ public:
     SortModeDictionary,
     SortModeInteger,
     SortModeReal,
-    SortModeUnknown
+    SortModeUnknown,
+    SortModeCommand
   };
   //ETX
   virtual int GetColumnSortMode(int col_index);
@@ -454,6 +455,29 @@ public:
   // - the text to be displayed in the cell instead: const char*
   virtual void SetColumnFormatCommand(int col_index, 
                                       vtkObject *object, const char *method);
+                                      
+  // Description:
+  // Specifies a command to be used for the comparison of the items when
+  // invoking the sort subcommand of the Tcl command associated with the 
+  // specified column of the tablelist widget. 
+  // To compare two items (viewed as lists of cell contents
+  // within one row each) during the sort operation, the command is 
+  // automatically concatenated with the two items and the resulting script
+  // is evaluated. The script should return an integer less than, equal to, or
+  // greater than zero if the first item is to be considered less than, equal
+  // to, or greater than the second, respectively.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the contents of the first item/cell to compare: const char*
+  // - the contents of the second item/cell to compare: const char*
+  // The following output is expected from the command:
+  // - the result of the comparison: int
+   virtual void SetColumnSortCommand(int col_index, 
+     vtkObject *object, const char *method);
+                                      
   // Description:
   // Specifies the command to be invoked when displaying the contents of a
   // cell within a column col_index.
