@@ -24,7 +24,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.31");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWTopLevel::vtkKWTopLevel()
@@ -69,6 +69,7 @@ vtkKWApplication* vtkKWTopLevel::GetApplication()
 void vtkKWTopLevel::CreateWidget()
 {
   vtksys_stl::string opts;
+  vtksys_stl::string cmd;
 
   if (this->GetWindowClass())
     {
@@ -105,6 +106,11 @@ void vtkKWTopLevel::CreateWidget()
     {
     this->SetBinding("<Control-t>", this, "DisplayTclInteractor");
     }
+
+  cmd = "DisplayLogDialog {";
+  cmd += this->GetTclName();
+  cmd += "}";
+  this->SetBinding("<Control-Alt-e>", this->GetApplication(), cmd.c_str());
 }
 
 //----------------------------------------------------------------------------
@@ -318,9 +324,7 @@ void vtkKWTopLevel::DeIconify()
 //----------------------------------------------------------------------------
 void vtkKWTopLevel::SetMasterWindow(vtkKWWidget* win)
 {
-  // Ref count it ?
-
-  if (this->MasterWindow == win) 
+  if (this->MasterWindow == win || win == this) 
     {
     return;
     }

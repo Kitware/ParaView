@@ -34,7 +34,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.283");
+vtkCxxRevisionMacro(vtkKWWindow, "1.284");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -329,7 +329,8 @@ void vtkKWWindow::CreateWidget()
       this->GetLogDialogMenuLabel(), 
       this->GetApplication(), cmd.c_str());
     this->GetWindowMenu()->SetItemHelpString(
-      idx, k_("Display the error log dialog"));
+      idx, k_("Display the &error log dialog"));
+    this->GetWindowMenu()->SetItemAccelerator(idx, "Ctrl+Alt+E");
 
     this->GetWindowMenu()->AddSeparator();
     
