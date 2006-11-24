@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWizardWidget);
-vtkCxxRevisionMacro(vtkKWWizardWidget, "1.4");
+vtkCxxRevisionMacro(vtkKWWizardWidget, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWWizardWidget::vtkKWWizardWidget()
@@ -304,7 +304,7 @@ void vtkKWWizardWidget::CreateWidget()
   this->LayoutFrame->Create();
   this->LayoutFrame->SetBorderWidth(0);
 
-  this->Script("pack %s -side top -fill both -expand y", 
+  this->Script("pack %s -side top -fill both -expand y -padx 0 -pady 0", 
                this->LayoutFrame->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 1", 
@@ -323,7 +323,7 @@ void vtkKWWizardWidget::CreateWidget()
   this->PreTextLabel->SetJustificationToLeft();
   this->PreTextLabel->SetAnchorToNorthWest();
 
-  this->Script("grid %s -row 0 -sticky nsew -padx 6 -pady 4",
+  this->Script("grid %s -row 0 -sticky nsew -padx 2 -pady 4",
                this->PreTextLabel->GetWidgetName());
 
   this->Script("grid rowconfigure %s 0 -weight 0",
@@ -339,7 +339,7 @@ void vtkKWWizardWidget::CreateWidget()
   this->ClientArea->SetParent(this->LayoutFrame);
   this->ClientArea->Create();
 
-  this->Script("grid %s -row 1 -sticky nsew -padx 6 -pady 4",
+  this->Script("grid %s -row 1 -sticky nsew -padx 0 -pady 0",
                this->ClientArea->GetWidgetName());
 
   this->Script("grid rowconfigure %s 1 -weight 1",
@@ -358,7 +358,7 @@ void vtkKWWizardWidget::CreateWidget()
   this->PostTextLabel->SetJustificationToLeft();
   this->PostTextLabel->SetAnchorToNorthWest();
   
-  this->Script("grid %s -row 2 -sticky ew -padx 6 -pady 4",
+  this->Script("grid %s -row 2 -sticky ew -padx 2 -pady 4",
                this->PostTextLabel->GetWidgetName());
 
   this->Script("grid rowconfigure %s 2 -weight 0",
@@ -379,7 +379,7 @@ void vtkKWWizardWidget::CreateWidget()
   this->ErrorTextLabel->GetWidget()->SetAnchorToNorthWest();
   this->ErrorTextLabel->GetWidget()->AdjustWrapLengthToWidthOn();
   
-  this->Script("grid %s -row 3 -sticky ew -padx 6 -pady 2",
+  this->Script("grid %s -row 3 -sticky ew -padx 2 -pady 2",
                this->ErrorTextLabel->GetWidgetName());
 
   this->Script("grid rowconfigure %s 3 -weight 0",
@@ -409,7 +409,7 @@ void vtkKWWizardWidget::CreateWidget()
   this->ButtonFrame->Create();
   this->ButtonFrame->SetBorderWidth(0);
 
-  this->Script("pack %s -side top -fill x", 
+  this->Script("pack %s -side top -fill x -padx 0 -pady 0", 
                this->ButtonFrame->GetWidgetName());
 
   // -------------------------------------------------------------------
