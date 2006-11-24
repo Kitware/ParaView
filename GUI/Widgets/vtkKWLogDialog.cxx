@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLogDialog );
-vtkCxxRevisionMacro(vtkKWLogDialog, "1.2");
+vtkCxxRevisionMacro(vtkKWLogDialog, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWLogDialog::vtkKWLogDialog()
@@ -96,6 +96,9 @@ void vtkKWLogDialog::CreateWidget()
 
   this->Script("pack %s -anchor center -pady 2 -expand n",
                this->CloseButton->GetWidgetName());
+
+  this->AddBinding("<Return>", this, "Withdraw");
+  this->AddBinding("<Escape>", this, "Withdraw");
 }
 
 //----------------------------------------------------------------------------
