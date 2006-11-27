@@ -35,15 +35,19 @@ SET(EXE_SRCS "${EXE_NAME}.cxx")
 # On Win32 platforms, let's create a .rc resource file to setup a decent
 # application icon as well as some additional information in the "Version"
 # tab of the properties panel.
+# Update: Microsoft's rc.exe fails because of too many include paths, as VTK
+# and ITK keep growing.
+# fatal error RC1047: too many -I#
+# Let's not use the below code anymore, it was mainly cosmetic.
 
-IF(WIN32 AND NOT BORLAND AND NOT CYGWIN)
-  INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsResourceMacros.cmake")
-  SET(RC_FILENAME "${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.rc")
-  KWWidgets_CREATE_RC_FILE(
-    RC_FILENAME "${RC_FILENAME}"
-    RC_APPLICATION_NAME "${EXE_NAME}"
-    RC_COMPANY_NAME "Kitware, Inc.")
-ENDIF(WIN32 AND NOT BORLAND AND NOT CYGWIN)
+#IF(WIN32 AND NOT BORLAND AND NOT CYGWIN)
+#  INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsResourceMacros.cmake")
+#  SET(RC_FILENAME "${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.rc")
+#  KWWidgets_CREATE_RC_FILE(
+#    RC_FILENAME "${RC_FILENAME}"
+#    RC_APPLICATION_NAME "${EXE_NAME}"
+#    RC_COMPANY_NAME "Kitware, Inc.")
+#ENDIF(WIN32 AND NOT BORLAND AND NOT CYGWIN)
 
 # This example uses some files from the KWWidgets distribution tree.
 # Let's configure KWWidgets's vtkKWWidgetsPaths.h.in into our
