@@ -184,7 +184,8 @@ void pqReaderFactory::addFileType(const QString& description,
   vtkSmartPointer<vtkSMProxy> reader;
 
   reader = this->Internal->getPrototype(xmlgroup, xmlname);
-  if (!reader)
+  if (!reader && pxm->ProxyElementExists(xmlgroup.toAscii().data(),
+      xmlname.toAscii().data()))
     {
     reader.TakeReference(pxm->NewProxy(xmlgroup.toAscii().data(), 
       xmlname.toAscii().data()));
@@ -198,7 +199,10 @@ void pqReaderFactory::addFileType(const QString& description,
       vtkProcessModuleConnectionManager::GetSelfConnectionID());
     reader->SetServers(vtkProcessModule::CLIENT);
     }
-  this->addFileType(description, extensions, reader);
+  if (reader)
+    {
+    this->addFileType(description, extensions, reader);
+    }
 }
 
 //-----------------------------------------------------------------------------
