@@ -3007,6 +3007,7 @@
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
           <Exception name="RemoveAllCaches" />
+          <Exception name="CacheUpdate" />
         </ShareProperties>
       </SubProxy>
       <SubProxy>
@@ -3134,6 +3135,7 @@
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
           <Exception name="RemoveAllCaches" />
+          <Exception name="CacheUpdate" />
         </ShareProperties>
       </SubProxy>
       <SubProxy>
@@ -3143,6 +3145,7 @@
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
           <Exception name="OutputType" />
+          <Exception name="CacheUpdate" />
         </ShareProperties>
       </SubProxy>
 
@@ -3170,6 +3173,7 @@
         <ShareProperties subproxy="UpdateSuppressor">
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
         </ShareProperties>
       </SubProxy>
       <IntVectorProperty
