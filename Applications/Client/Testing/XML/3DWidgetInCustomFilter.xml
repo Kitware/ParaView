@@ -12,7 +12,7 @@
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyPipeline" command="currentChanged" arguments="/0|0" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip Function" />
+  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Clip_Function" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/AddPropertyButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/FinishButton" command="activate" arguments="" />
   <pqevent object="pqCustomFilterManager/CloseButton" command="activate" arguments="" />
