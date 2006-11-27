@@ -114,18 +114,6 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
 
   connect(
     &this->Implementation->ImplicitPlaneWidget,
-    SIGNAL(widgetStartInteraction()),
-    &this->Implementation->ImplicitPlaneWidget,
-    SLOT(showPlane()));
-  
-  connect(
-    &this->Implementation->ImplicitPlaneWidget,
-    SIGNAL(widgetEndInteraction()),
-    &this->Implementation->ImplicitPlaneWidget,
-    SLOT(hidePlane()));
-  
-  connect(
-    &this->Implementation->ImplicitPlaneWidget,
     SIGNAL(widgetChanged()),
     this->propertyManager(),
     SLOT(propertyChanged()));

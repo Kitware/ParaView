@@ -62,16 +62,23 @@ public:
   void setScaleFactor(double scale[3]);
   void setScaleOrigin(double origin[3]);
 
+public slots:
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   virtual void resetBounds();
-public slots:
+
+  /// accept the changes
+  void accept();
+  /// reset the changes
+  void reset();
+
+protected:
+  
   /// Makes the 3D widget plane visible (respects the overall visibility flag)
   virtual void showPlane();
 
   /// Hides the 3D widget plane
   virtual void hidePlane();
 
-protected:
   /// Subclasses can override this method to map properties to
   /// GUI. Default implementation updates the internal datastructures
   /// so that default implementations can be provided for 

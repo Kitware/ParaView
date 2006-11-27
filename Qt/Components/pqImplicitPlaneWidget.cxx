@@ -418,6 +418,19 @@ void pqImplicitPlaneWidget::resetBounds()
     }
 }
 
+void pqImplicitPlaneWidget::accept()
+{
+  Superclass::accept();
+  this->hidePlane();
+}
+
+void pqImplicitPlaneWidget::reset()
+{
+  Superclass::reset();
+  this->hidePlane();
+}
+
+
 void pqImplicitPlaneWidget::onUseCenterBounds()
 {
   vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
@@ -525,6 +538,7 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
 void pqImplicitPlaneWidget::on3DWidgetStartDrag()
 {
   emit widgetStartInteraction();
+  this->showPlane();
 }
 
 void pqImplicitPlaneWidget::on3DWidgetEndDrag()

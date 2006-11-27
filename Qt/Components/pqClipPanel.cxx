@@ -113,18 +113,6 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
                    &this->Implementation->ImplicitPlaneWidget,
                    SLOT(setRenderModule(pqRenderViewModule*)));
 
-  connect(
-    &this->Implementation->ImplicitPlaneWidget,
-    SIGNAL(widgetStartInteraction()),
-    &this->Implementation->ImplicitPlaneWidget,
-    SLOT(showPlane()));
-  
-  connect(
-    &this->Implementation->ImplicitPlaneWidget,
-    SIGNAL(widgetEndInteraction()),
-    &this->Implementation->ImplicitPlaneWidget,
-    SLOT(hidePlane()));
-  
   connect(&this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onWidgetChanged()));
   connect(this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
   connect(this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
