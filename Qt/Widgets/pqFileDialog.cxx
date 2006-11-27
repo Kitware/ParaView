@@ -396,6 +396,9 @@ void pqFileDialog::acceptManual()
 {
   // User entered text manually, so use that and ignore everything else
   QString manual_filename = this->Implementation->Ui.FileName->text();
+  
+  const QString dirfile =
+    this->Implementation->Model->getFilePath(manual_filename);
 
   // Add missing extension if necessary
   QFileInfo fi(manual_filename);
@@ -418,10 +421,10 @@ void pqFileDialog::acceptManual()
     this->Implementation->Model->getFilePath(manual_filename);
   
   // User chose an existing directory
-  if(this->Implementation->Model->dirExists(file))
+  if(this->Implementation->Model->dirExists(dirfile))
     {
     // Always enter directories, regardless of mode
-    this->onNavigate(file);
+    this->onNavigate(dirfile);
     this->Implementation->Ui.FileName->clear();
     return;
     }
