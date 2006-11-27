@@ -290,8 +290,8 @@ public:
     SortModeDictionary,
     SortModeInteger,
     SortModeReal,
-    SortModeUnknown,
-    SortModeCommand
+    SortModeCommand,
+    SortModeUnknown
   };
   //ETX
   virtual int GetColumnSortMode(int col_index);
