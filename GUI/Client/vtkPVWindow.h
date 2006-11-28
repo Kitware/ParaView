@@ -690,7 +690,7 @@ protected:
   vtkPVAnimationManager* AnimationManager;
 
   // Initialization methods called from create.
-  void InitializeMenus();
+  virtual void InitializeMenus();
   void InitializeInteractorInterfaces();
 
   vtkPVTimerLogDisplay *TimerLogDisplay;

@@ -26,6 +26,19 @@
                     property="CellArrayStatus"
                     trace_name="CellSelection"/>
   </Module>
+  <Module name="RTXMLPolyDataReader"
+			root_name="RTXMLPolyDataReader"
+			class="vtkPVAdvancedReaderModule"
+			module_type="Reader"
+			extensions=".vtpr"
+			file_description="Real Time VTK PolyData Files">
+		<Source class="vtkRTXMLPolyDataReader"/>
+    <StringEntry property="Location"
+                        label="Data Location"
+		        default_value="xyz" 
+		        trace_name="location"
+                        help="Set the data directory containing real time data files." />
+  </Module>
   <Module name="XMLUnstructuredGridReader"
           root_name="XMLUnstructuredGridReader"
           class="vtkPVAdvancedReaderModule"

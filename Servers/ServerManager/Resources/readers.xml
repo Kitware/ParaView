@@ -1,25 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
 
-   <SourceProxy name="DelimitedTextReader"
-                class="vtkDelimitedTextReader">
-     <StringVectorProperty
-        name="FileName"
-        command="SetFileName"
-        animateable="1"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="DelimiterString"
-        command="SetDelimiterString"
-        animateable="1"
-        number_of_elements="1">
-     </StringVectorProperty>
-
-   </SourceProxy>
-
    <SourceProxy name="DEMReader" 
                 class="vtkDEMReader">
      <StringVectorProperty
@@ -159,6 +140,52 @@
      </StringVectorProperty>
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
+
+   <SourceProxy name="RTXMLPolyDataReader"
+                class="vtkRTXMLPolyDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="Location"
+        command="SetLocation"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="NextFileName"
+        command="GetNextFileName"
+        number_of_elements="1"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="NewDataAvailable"
+        command="NewDataAvailable"
+        number_of_elements="1"
+		    default_values="2" 
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <Property
+        name="UpdateToNextFile"
+        command="UpdateToNextFile">
+     </Property>
+
+     <Property
+        name="ResetReader"
+        command="ResetReader">
+     </Property>
+     <!-- End of RTXMLPolyDataReader -->
+   </SourceProxy>
+
 
    <SourceProxy name="XMLUnstructuredGridReader" 
                 class="vtkXMLUnstructuredGridReader">
@@ -1439,8 +1466,7 @@
      <StringVectorProperty
         name="XMLFileName"
         command="SetXMLFileName"
-        number_of_elements="1"
-        information_property="XMLFileNameInfo" >
+        number_of_elements="1">
        <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
              <Property name="XMLFileNameInfo" function="XMLFileName"/>
@@ -1615,13 +1641,7 @@
         name="DisplayType"
         command="SetDisplayType"
         number_of_elements="1" 
-        default_values="1">
-       <EnumerationDomain name="enum">
-         <Entry value="1" text="Blocks"/>
-         <Entry value="2" text="Hierarchy"/>
-         <Entry value="3" text="Materials"/>
-       </EnumerationDomain>
-     </IntVectorProperty>
+        default_values="1"/>
 
      <StringVectorProperty 
         name="BlockArrayInfo"
