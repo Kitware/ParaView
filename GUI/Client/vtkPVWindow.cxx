@@ -109,6 +109,10 @@
 #include "vtkToolkits.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkX3DExporter.h"
+#include "vtkX3DExporterConfiguration.h"
+#ifdef VTK_X3D_USE_JAVA
+# include "vtkX3DExporterJavaHelper.h"
+#endif
 #include "vtkVRMLExporter.h"
 
 #include <vtkstd/map>
@@ -193,7 +197,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.797");
+vtkCxxRevisionMacro(vtkPVWindow, "1.798");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2688,10 +2692,37 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel,
   vtkProcessModule *pm = pvApp->GetProcessModule();
   if ( !pm->GetClientMode() && pm->GetNumberOfPartitions() == 1 )
     {
+#ifdef VTK_X3D_USE_JAVA
+    if (strcmp(ext,".x3db")==0)
+      {
+      const char* jarName = "FastInfoset.jar";
+      const char* jarPath = pm->GetPath("Jars", "Jars", jarName);
+      if ( !jarPath )
+        {
+        vtkKWMessageDialog::PopupMessage(
+        this->GetApplication(), this, "X3D Exporting Error",
+        "Error Finding JAR files, such as FastInfoset.jar",
+        vtkKWMessageDialog::ErrorIcon);
+        }
+      else
+        {
+        vtkstd::string jarLoc = jarPath;
+        jarLoc += "/Jars/FastInfoset.jar";
+        vtkX3DExporterJavaHelper::SetFastInfosetJarLocation(jarLoc.c_str());
+        vtkX3DExporter *x3dex= vtkX3DExporter::New();
+        x3dex->SetFileName(filename);
+        x3dex->SetInput(this->Interactor->GetRenderWindow());
+        x3dex->BinaryOn();
+        x3dex->Update();
+        x3dex->Write();
+        x3dex->Delete();
+        }
+      return; 
+      }
+#endif
     if (strcmp(ext,".x3d")==0)
       {
       vtkX3DExporter *x3dex= vtkX3DExporter::New();
-
       x3dex->SetFileName(filename);
       x3dex->SetInput(this->Interactor->GetRenderWindow());
       x3dex->Update();
@@ -2853,7 +2884,11 @@ void vtkPVWindow::WriteData()
   
   if ( !pm->GetClientMode() && pm->GetNumberOfPartitions() == 1 )
     {
-    typesStr << " {{X3D Scene} {.x3d}} {{VRML Scene} {.wrl}}";
+    typesStr << " {{X3D Scene} {.x3d"
+#ifdef VTK_X3D_USE_JAVA
+      " .x3db"
+#endif
+      "}} {{VRML Scene} {.wrl}}";
     }
   typesStr << ends;
   char* types = typesStr.str();

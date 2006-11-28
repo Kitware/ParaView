@@ -235,6 +235,13 @@ IF (PARAVIEW_USE_ICE_T)
   SET( ParaViewClient_SRCS ${ParaViewClient_SRCS})
 ENDIF (PARAVIEW_USE_ICE_T)
 
+IF (VTK_X3D_USE_JAVA)
+  CONFIGURE_FILE(
+    "${VTK_SOURCE_DIR}/Wrapping/Java/FastInfoset.jar"
+    "${ParaView_BINARY_DIR}/Jars/FastInfoset.jar"
+    COPYONLY IMMEDIATE)
+ENDIF (VTK_X3D_USE_JAVA)
+
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVApplicationResources
   WRAP_EXCLUDE
