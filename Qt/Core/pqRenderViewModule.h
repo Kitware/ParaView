@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqRenderViewModuleInternal;
 class pqUndoStack;
 class QVTKWidget;
+class vtkInteractorStyle;
 class vtkSMRenderModuleProxy;
 
 
@@ -82,6 +83,11 @@ public:
   /// Sets default values for the underlying proxy. This is typically called
   /// only on proxies created by the GUI itself.
   virtual void setDefaults();
+
+  /// Change the interactive style used by this render module. One is
+  /// encouraged to use this method to change the interactive style
+  /// rather than simply changing it on the render window interactor.
+  void setInteractorStyle(vtkInteractorStyle* style);
 private slots:
   // Called on start/end interaction.
   void startInteraction();

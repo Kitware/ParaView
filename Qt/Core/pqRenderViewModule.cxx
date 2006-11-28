@@ -279,6 +279,28 @@ void pqRenderViewModule::viewModuleInit()
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderViewModule::setInteractorStyle(vtkInteractorStyle* style)
+{
+  vtkPVGenericRenderWindowInteractor* iren =
+    vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      this->Internal->RenderModuleProxy->GetInteractor());
+  vtkInteractorObserver* old_style = iren->GetInteractorStyle();
+  if (old_style)
+    {
+    this->Internal->VTKConnect->Disconnect(old_style, 0, this, 0);
+    }
+
+  iren->SetInteractorStyle(style);
+
+  this->Internal->VTKConnect->Connect(style,
+    vtkCommand::StartInteractionEvent, 
+    this, SLOT(startInteraction()));
+  this->Internal->VTKConnect->Connect(style,
+    vtkCommand::EndInteractionEvent, 
+    this, SLOT(endInteraction()));
+}
+
+//-----------------------------------------------------------------------------
 void pqRenderViewModule::startInteraction()
 {
   // It is essential to synchronize camera properties prior to starting the 
