@@ -74,6 +74,16 @@ public:
   // evaluated as a simple command. 
   virtual void SetEllipsisCommand(vtkObject *obj, const char *method);
 
+
+  // Description:
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the values in the FinalList are changed.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  virtual void SetFinalListChangedCommand(vtkObject *obj, const char *method);
+
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -118,7 +128,9 @@ protected:
   virtual void AddElement(vtkKWListBox* l1, vtkKWListBox* l2, const char* element, int force);
 
   char* EllipsisCommand;
+  char* FinalListChangedCommand;
   virtual void InvokeEllipsisCommand();
+  virtual void InvokeFinalListChangedCommand();
 
   int EllipsisDisplayed;
 

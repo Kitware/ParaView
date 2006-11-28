@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.16");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -44,6 +44,7 @@ vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
   this->UpButton = vtkKWPushButton::New();
   this->DownButton = vtkKWPushButton::New();
   this->EllipsisCommand = 0;
+  this->FinalListChangedCommand = 0;
   this->EllipsisDisplayed = 0;
 }
 
@@ -64,6 +65,11 @@ vtkKWListBoxToListBoxSelectionEditor::~vtkKWListBoxToListBoxSelectionEditor()
     {
     delete [] this->EllipsisCommand;
     this->EllipsisCommand = NULL;
+    }
+  if(this->FinalListChangedCommand)
+    {
+    delete [] this->FinalListChangedCommand;
+    this->FinalListChangedCommand = NULL;
     }
 }
 
@@ -273,6 +279,7 @@ void vtkKWListBoxToListBoxSelectionEditor::ShiftItems(vtkKWListBox* l1, int down
     }
   delete [] selection;
   this->Modified();
+  this->InvokeFinalListChangedCommand();
   this->InvokeEvent(vtkCommand::WidgetModifiedEvent, 0);
 }
 
@@ -334,6 +341,7 @@ void vtkKWListBoxToListBoxSelectionEditor::MoveList(vtkKWListBox* l1, vtkKWListB
   delete [] selection;
   
   this->Modified();
+  this->InvokeFinalListChangedCommand();
   this->InvokeEvent(vtkCommand::WidgetModifiedEvent, 0);
 }
 
@@ -442,9 +450,26 @@ void vtkKWListBoxToListBoxSelectionEditor::SetEllipsisCommand(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWListBoxToListBoxSelectionEditor::SetFinalListChangedCommand(
+  vtkObject *obj, const char *method)
+{
+  this->SetObjectMethodCommand(&this->FinalListChangedCommand, obj, method);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::InvokeEllipsisCommand()
 {
   this->InvokeObjectMethodCommand(this->EllipsisCommand);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBoxToListBoxSelectionEditor::InvokeFinalListChangedCommand()
+{
+  if(this->FinalListChangedCommand &&
+    *this->FinalListChangedCommand)
+  {
+  this->InvokeObjectMethodCommand(this->FinalListChangedCommand);
+  }
 }
 
 //-----------------------------------------------------------------------------
