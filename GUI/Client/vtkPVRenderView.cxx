@@ -146,7 +146,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.424");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.425");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -319,6 +319,10 @@ void vtkPVRenderView::ShowNavigationWindowCallback(int registry)
     {
     return;
     }
+  if (this->ShowNavigationWindow)
+    {
+    return;
+    }
   
   this->GetTraceHelper()->AddEntry("$kw(%s) ShowNavigationWindowCallback %d",
                       this->GetTclName(), registry);
@@ -333,6 +337,7 @@ void vtkPVRenderView::ShowNavigationWindowCallback(int registry)
 
   this->NavigationWindowButton->SelectedStateOn();
   this->SelectionWindowButton->SelectedStateOff();
+
   if ( registry )
     {
     this->GetApplication()->SetRegistryValue(2, "RunTime","SourcesBrowser",
@@ -344,6 +349,10 @@ void vtkPVRenderView::ShowNavigationWindowCallback(int registry)
 void vtkPVRenderView::ShowSelectionWindowCallback(int registry)
 {
   if ( !this->GetApplication() )
+    {
+    return;
+    }
+  if (this->ShowSelectionWindow)
     {
     return;
     }
