@@ -531,6 +531,15 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
     ENDFOREACH(lib)
   ENDIF(vtkVolumeRendering_LIB_DEPENDS)
 
+  IF(KWWidgets_USE_INTERNATIONALIZATION)
+    IF(GETTEXT_INTL_LIBRARY)
+      GET_FILENAME_COMPONENT(path "${GETTEXT_INTL_LIBRARY}" PATH)
+      IF(path)
+        SET(extra_runtime_paths ${extra_runtime_paths} ${path})
+      ENDIF(path)
+    ENDIF(GETTEXT_INTL_LIBRARY)
+  ENDIF(KWWidgets_USE_INTERNATIONALIZATION)
+
   # For LD_LIBRARY_PATH or equivalent
   
   IF (WIN32)
