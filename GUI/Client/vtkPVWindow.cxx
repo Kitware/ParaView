@@ -108,12 +108,10 @@
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkUnstructuredGrid.h"
-#if 0
 #include "vtkX3DExporter.h"
 #include "vtkX3DExporterConfiguration.h"
 #ifdef VTK_X3D_USE_JAVA
 # include "vtkX3DExporterJavaHelper.h"
-#endif
 #endif
 #include "vtkVRMLExporter.h"
 
@@ -199,7 +197,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.799");
+vtkCxxRevisionMacro(vtkPVWindow, "1.800");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2694,7 +2692,6 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel,
   vtkProcessModule *pm = pvApp->GetProcessModule();
   if ( !pm->GetClientMode() && pm->GetNumberOfPartitions() == 1 )
     {
-#if 0
 #ifdef VTK_X3D_USE_JAVA
     if (strcmp(ext,".x3db")==0)
       {
@@ -2733,7 +2730,6 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel,
       x3dex->Delete();
       return; 
       }
-#endif
     if (strcmp(ext,".wrl")==0)
       {
       vtkVRMLExporter *vrmlExporter = vtkVRMLExporter::New();
@@ -2886,7 +2882,6 @@ void vtkPVWindow::WriteData()
     return;
     }
 
-#if 0  
   if ( !pm->GetClientMode() && pm->GetNumberOfPartitions() == 1 )
     {
     typesStr << " {{X3D Scene} {.x3d"
@@ -2895,7 +2890,6 @@ void vtkPVWindow::WriteData()
 #endif
       "}} {{VRML Scene} {.wrl}}";
     }
-#endif
   typesStr << ends;
   char* types = typesStr.str();
 
