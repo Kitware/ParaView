@@ -28,7 +28,7 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>29</height>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPipeline" >
@@ -431,8 +431,14 @@
    <property name="enabled" >
     <bool>false</bool>
    </property>
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqScalarBar22.png</iconset>
+   </property>
    <property name="text" >
-    <string>SbV</string>
+    <string/>
+   </property>
+   <property name="toolTip" >
+    <string>Toggle Scalar Bar Visibility</string>
    </property>
   </action>
   <action name="actionServerConnect" >
