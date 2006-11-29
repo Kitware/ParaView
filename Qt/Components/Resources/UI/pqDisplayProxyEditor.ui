@@ -182,6 +182,14 @@
       </item>
       <item row="0" column="1" >
        <widget class="pqDisplayRepresentationWidget" name="StyleRepresentation" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Choose what geometry should be used to represent the dataset.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -510,9 +518,9 @@
  <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
-   <class>pqColorChooserButton</class>
-   <extends>QPushButton</extends>
-   <header>pqColorChooserButton.h</header>
+   <class>pqDisplayRepresentationWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDisplayRepresentationWidget.h</header>
    <container>0</container>
    <pixmap></pixmap>
   </customwidget>
@@ -524,9 +532,9 @@
    <pixmap></pixmap>
   </customwidget>
   <customwidget>
-   <class>pqDisplayRepresentationWidget</class>
-   <extends>QWidget</extends>
-   <header>pqDisplayRepresentationWidget.h</header>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
    <container>0</container>
    <pixmap></pixmap>
   </customwidget>
