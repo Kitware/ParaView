@@ -34,16 +34,18 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Add a string element to the source list if it is not already there or on
+  // Add/Remove a string element to the source list if it is not already there or on
   // the final list. The optional argument force will make sure the item is
   // added to the source list and removed from final if it is already there.
   virtual void AddSourceElement(const char*, int force = 0);
+  virtual void RemoveSourceElement(int indx);
 
   // Description:
-  // Add a string element to the final list if it is not already there or on
+  // Add/remove a string element to the final list if it is not already there or on
   // the final list. The optional argument force will make sure the item is
   // added to the final list and removed from source if it is already there.
   virtual void AddFinalElement(const char*, int force = 0);
+  virtual void RemoveFinalElement(int index);
 
   // Description:
   // Get the number of elements on the final list.

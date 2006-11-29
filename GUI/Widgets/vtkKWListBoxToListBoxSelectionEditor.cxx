@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.17");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -197,13 +197,34 @@ void vtkKWListBoxToListBoxSelectionEditor::AddSourceElement(const char* element,
                    this->FinalList->GetWidget(), element, force);
   this->DisplayEllipsis();
 }
-
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::AddFinalElement(const char* element, int force /* = 0 */)
 {
   this->RemoveEllipsis();
   this->AddElement(this->FinalList->GetWidget(), 
                    this->SourceList->GetWidget(), element, force);
+  this->DisplayEllipsis();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBoxToListBoxSelectionEditor::RemoveSourceElement(int index)
+{
+  this->RemoveEllipsis();
+  if(index<this->SourceList->GetWidget()->GetNumberOfItems())
+    {
+    this->SourceList->GetWidget()->DeleteRange(index, index);
+    }
+  this->DisplayEllipsis();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBoxToListBoxSelectionEditor::RemoveFinalElement(int index)
+{
+  this->RemoveEllipsis();
+  if(index<this->FinalList->GetWidget()->GetNumberOfItems())
+    {
+    this->FinalList->GetWidget()->DeleteRange(index, index);
+    }
   this->DisplayEllipsis();
 }
 
