@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWizardWidget);
-vtkCxxRevisionMacro(vtkKWWizardWidget, "1.5");
+vtkCxxRevisionMacro(vtkKWWizardWidget, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWWizardWidget::vtkKWWizardWidget()
@@ -600,6 +600,16 @@ void vtkKWWizardWidget::PackButtons()
     {
     this->Script("pack %s -side right", 
                  this->BackButton->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWizardWidget::SetClientAreaMinimumHeight(int arg)
+{
+  if (this->LayoutFrame && this->LayoutFrame->IsCreated())
+    {
+    this->Script("grid rowconfigure %s 1 -minsize %d",
+                 this->LayoutFrame->GetWidgetName(), arg);
     }
 }
 

@@ -59,6 +59,10 @@ public:
   vtkGetObjectMacro(ClientArea, vtkKWFrame);
 
   // Description:
+  // Set the minimum client area height. No effect if called before Create(). 
+  virtual void SetClientAreaMinimumHeight(int);
+
+  // Description:
   // Refresh the interface.
   // This important method will refresh the state of the buttons, depending
   // on the current workflow navigation stack. If the workflow's FinishStep
