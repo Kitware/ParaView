@@ -39,6 +39,9 @@
         <property name="text" >
          <string>Max. Propagation</string>
         </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="1" column="1" >
@@ -48,6 +51,9 @@
        <widget class="QLabel" name="label_9" >
         <property name="text" >
          <string>Minimum Step Length</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -91,6 +97,9 @@
         <property name="text" >
          <string>Integrator Type</string>
         </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="8" column="2" >
@@ -110,6 +119,9 @@
         <property name="text" >
          <string>Initial Step Length</string>
         </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="6" column="1" >
@@ -127,12 +139,18 @@
         <property name="text" >
          <string>Maximum Step Length</string>
         </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="3" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
          <string>Integration Direction</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -143,6 +161,9 @@
        <widget class="QLabel" name="label_8" >
         <property name="text" >
          <string>Maximum Error</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
         </property>
        </widget>
       </item>

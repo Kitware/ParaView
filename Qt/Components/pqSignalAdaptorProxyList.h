@@ -57,7 +57,7 @@ class PQCOMPONENTS_EXPORT pqSignalAdaptorProxyList : public QObject
 public:
   /// constructor requires a QObject, the name of the QString proxy name, 
   /// and a signal for property changes.
-  pqSignalAdaptorProxyList(QComboBox* p, pqProxy* proxy, const char* smproperty_name);
+  pqSignalAdaptorProxyList(QComboBox* p, pqProxy* proxy, const QString& smproperty_name);
   ~pqSignalAdaptorProxyList();
 
   /// get the selected proxy.

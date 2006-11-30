@@ -85,7 +85,7 @@ public:
 
 //*****************************************************************************
 pqSignalAdaptorProxyList::pqSignalAdaptorProxyList(QComboBox* combobox, 
-              pqProxy* ref_proxy, const char* smproperty_name)
+              pqProxy* ref_proxy, const QString& smproperty_name)
   : QObject(combobox) 
 {
   this->Internal = new pqSignalAdaptorProxyListInternal();
@@ -94,7 +94,8 @@ pqSignalAdaptorProxyList::pqSignalAdaptorProxyList(QComboBox* combobox,
     this, SLOT(handleProxyChanged()));
 
   this->Internal->ReferenceProxy = ref_proxy;
-  vtkSMProperty* prop = ref_proxy->getProxy()->GetProperty(smproperty_name);
+  vtkSMProperty* prop;
+  prop = ref_proxy->getProxy()->GetProperty(smproperty_name.toAscii().data());
   if (prop)
     {
     this->Internal->Domain = vtkSMProxyListDomain::SafeDownCast(

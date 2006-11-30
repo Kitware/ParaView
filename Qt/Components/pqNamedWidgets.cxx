@@ -94,10 +94,12 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
     SMProperty->UpdateDependentDomains();
 
     // all property names with special characters are changed
-    QString key = iter->GetKey();
-    key.replace(':', '_');
-    key.replace(' ', '_');
-    const QString regex = QString("^%1$|^%1_.*$").arg(key);
+    QString propertyName = iter->GetKey();
+    propertyName.replace(':', '_');
+    propertyName.replace(' ', '_');
+    QString userPropertyName = iter->GetKey();
+
+    const QString regex = QString("^%1$|^%1_.*$").arg(propertyName);
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
     for(int i=0; i<foundObjects.size(); i++)
       {
@@ -267,14 +269,14 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
         {
         QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
         QWidget* widgetFrame = parent->findChild<QWidget*>(
-          QString("WidgetBox.%1").arg(iter->GetKey()));
+          QString("WidgetBox.%1").arg(propertyName));
         if (comboBox)
           {
           comboBox->clear();  //TODO: why is this here?  is a domain helper needed?
           pqProxy* pq_proxy =
             pqApplicationCore::instance()->getServerManagerModel()->getPQSource(proxy);
           pqSignalAdaptorProxyList* proxyAdaptor = 
-            new pqSignalAdaptorProxyList(comboBox, pq_proxy, iter->GetKey());
+            new pqSignalAdaptorProxyList(comboBox, pq_proxy, userPropertyName);
           proxyAdaptor->setWidgetFrame(widgetFrame);
           pqObjectPanel* object_panel = qobject_cast<pqObjectPanel*>(parent);
           if (object_panel)
@@ -440,10 +442,10 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
       }
 
     // all property names with special characters are changed
-    QString key = iter->GetKey();
-    key.replace(':', '_');
-    key.replace(' ', '_');
-    const QString regex = QString("^%1$|^%1_.*$").arg(key);
+    QString propertyName = iter->GetKey();
+    propertyName.replace(':', '_');
+    propertyName.replace(' ', '_');
+    const QString regex = QString("^%1$|^%1_.*$").arg(propertyName);
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
     for(int i=0; i<foundObjects.size(); i++)
       {
