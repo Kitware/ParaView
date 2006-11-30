@@ -7,6 +7,8 @@
 
 int main()
 {
+  // State machine
+
   vtkKWStateMachine *state_machine = vtkKWStateMachine::New();
 
   // States
@@ -41,7 +43,7 @@ int main()
   state_machine->AddInput(input_invalid);
   input_invalid->Delete();
 
-  // Transition: state_1 / next => state_2
+  // Transition: state_1 / input_next => state_2
 
   vtkKWStateMachineTransition *trans_a = vtkKWStateMachineTransition::New();
   trans_a->SetOriginState(state_1);
@@ -50,10 +52,10 @@ int main()
   state_machine->AddTransition(trans_a);
   trans_a->Delete();
 
-  // Transition: state_1 / skip => state_3
-  // Transition: state_2 / next => state_3
-  // Transition: state_3 / next => state_1
-  // Transition: state_2 / invalid => state_2
+  // Transition: state_1 / input_skip => state_3
+  // Transition: state_2 / input_next => state_3
+  // Transition: state_3 / input_next => state_1
+  // Transition: state_2 / input_invalid => state_2
 
   state_machine->CreateTransition(state_1, input_skip, state_3);
   state_machine->CreateTransition(state_2, input_next, state_3);
