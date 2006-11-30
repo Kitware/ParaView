@@ -23,7 +23,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgetsInit );
-vtkCxxRevisionMacro(vtkKWBWidgetsInit, "1.1");
+vtkCxxRevisionMacro(vtkKWBWidgetsInit, "1.2");
 
 int vtkKWBWidgetsInit::Initialized = 0;
 
@@ -57,7 +57,20 @@ void vtkKWBWidgetsInit::Initialize(Tcl_Interp* interp)
         "bwplus", 
         image_bwplus, 
         image_bwplus_width, image_bwplus_height, 
-        image_bwplus_pixel_size, image_bwplus_length))
+        image_bwplus_pixel_size, image_bwplus_length) ||
+      !vtkKWTkUtilities::UpdatePhoto(
+        interp, 
+        "bwdragfile", 
+        image_bwdragfile, 
+        image_bwdragfile_width, image_bwdragfile_height, 
+        image_bwdragfile_pixel_size, image_bwdragfile_length) ||
+      !vtkKWTkUtilities::UpdatePhoto(
+        interp, 
+        "bwdragicon", 
+        image_bwdragicon, 
+        image_bwdragicon_width, image_bwdragicon_height, 
+        image_bwdragicon_pixel_size, image_bwdragicon_length)
+    )
     {
     vtkGenericWarningMacro("Can not initialize BWidgets resources.");
     return;

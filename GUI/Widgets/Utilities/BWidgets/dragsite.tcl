@@ -157,9 +157,9 @@ proc DragSite::_init_drag { source state X Y } {
 
         if { [winfo children $_topw] == "" } {
             if { [string equal $type "BITMAP"] || [string equal $type "IMAGE"] } {
-                label $_topw.l -image [Bitmap::get dragicon] -relief flat -bd 0
+                label $_topw.l -image bwdragicon -relief flat -bd 0
             } else {
-                label $_topw.l -image [Bitmap::get dragfile] -relief flat -bd 0
+                label $_topw.l -image bwdragfile -relief flat -bd 0
             }
             pack  $_topw.l
         }

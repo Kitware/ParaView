@@ -2,6 +2,8 @@ KWConvertImageToHeader --zlib --base64 \
     vtkKWBWidgetsTclLibrary.h \
     bwminus.png \
     bwplus.png \
+    bwdragfile.png \
+    bwdragicon.png \
     arrow.tcl \
     combobox.tcl \
     dragsite.tcl \
