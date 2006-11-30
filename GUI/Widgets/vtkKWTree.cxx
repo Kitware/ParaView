@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.30");
+vtkCxxRevisionMacro(vtkKWTree, "1.31");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -681,6 +681,20 @@ void vtkKWTree::SetNodeUserData(const char *node, const char *data)
     this->Script("%s itemconfigure %s -data \"%s\"", 
                  this->GetWidgetName(), node, val);
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTree::GetNodeUserDataAsInt(const char *node)
+{
+  return atoi(this->GetNodeUserData(node));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeUserDataAsInt(const char *node, int data)
+{
+  char buffer[256];
+  sprintf(buffer, "%d", data);
+  this->SetNodeUserData(node, buffer);
 }
 
 //----------------------------------------------------------------------------

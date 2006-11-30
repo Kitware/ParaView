@@ -103,6 +103,8 @@ public:
   // to bury additional data in the node.
   virtual const char* GetNodeUserData(const char *node);
   virtual void SetNodeUserData(const char *node, const char *data);
+  virtual int GetNodeUserDataAsInt(const char *node);
+  virtual void SetNodeUserDataAsInt(const char *node, int);
 
   // Description:
   // Query if given node exists in the tree
