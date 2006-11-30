@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.29");
+vtkCxxRevisionMacro(vtkKWTree, "1.30");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -69,8 +69,11 @@ public:
 vtkKWTree::vtkKWTree()
 {
   this->SelectionMode = vtkKWOptions::SelectionModeSingle;
+  this->EnableReparenting = 0;
+
   this->SelectionChangedCommand = NULL;
   this->KeyPressDeleteCommand = NULL;
+  this->NodeParentChangedCommand = NULL;
   
   this->Internals = new vtkKWTreeInternals;
 }
@@ -83,10 +86,17 @@ vtkKWTree::~vtkKWTree()
     delete [] this->SelectionChangedCommand;
     this->SelectionChangedCommand = NULL;
     }
+
   if (this->KeyPressDeleteCommand)
     {
     delete [] this->KeyPressDeleteCommand;
     this->KeyPressDeleteCommand = NULL;
+    }
+
+  if (this->NodeParentChangedCommand)
+    {
+    delete [] this->NodeParentChangedCommand;
+    this->NodeParentChangedCommand = NULL;
     }
     
    delete this->Internals;
@@ -104,7 +114,7 @@ void vtkKWTree::CreateWidget()
   // Call the superclass to create the widget and set the appropriate flags
 
   if (!vtkKWWidget::CreateSpecificTkWidget(this, 
-        "Tree", "-relief flat -bd 0 -highlightthickness 0 -padx 2 -deltay 17"))
+        "Tree", "-relief flat -bd 0 -highlightthickness 0 -padx 2 -deltay 17 -dragenabled 0 -dropenabled 0 -dragevent 1 -dropovermode n"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -113,17 +123,50 @@ void vtkKWTree::CreateWidget()
   this->SetBinding("<<TreeSelect>>", this, "SelectionCallback");
   this->SetBindText("<ButtonPress-3>", this, "RightClickOnNodeCallback");
   
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, this, "DropOverNodeCallback");
+  this->SetConfigurationOption("-dropcmd", command);
+  delete [] command;
+
   // Bind some extra hotkeys 
-  this->Script("bind %s.c <KeyPress-Delete> [list %s KeyPressDeleteCallback]",
-               this->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s.c <KeyPress-Next> [list %s KeyNavigationCallback Next]",
-               this->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s.c <KeyPress-Prior> [list %s KeyNavigationCallback Prior]",
-               this->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s.c <KeyPress-Home> [list %s KeyNavigationCallback Home]",
-               this->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s.c <KeyPress-End> [list %s KeyNavigationCallback End]",
-               this->GetWidgetName(), this->GetTclName());
+
+  this->Script(
+    "bind %s.c <KeyPress-Delete> [list %s KeyPressDeleteCallback]",
+    this->GetWidgetName(), this->GetTclName());
+  this->Script(
+    "bind %s.c <KeyPress-Next> [list %s KeyNavigationCallback Next]",
+    this->GetWidgetName(), this->GetTclName());
+  this->Script(
+    "bind %s.c <KeyPress-Prior> [list %s KeyNavigationCallback Prior]",
+    this->GetWidgetName(), this->GetTclName());
+  this->Script(
+    "bind %s.c <KeyPress-Home> [list %s KeyNavigationCallback Home]",
+    this->GetWidgetName(), this->GetTclName());
+  this->Script(
+    "bind %s.c <KeyPress-End> [list %s KeyNavigationCallback End]",
+    this->GetWidgetName(), this->GetTclName());
+
+  this->UpdateDragAndDrop();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::UpdateDragAndDrop()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  if (this->EnableReparenting)
+    {
+    this->SetConfigurationOptionAsInt("-dragenabled", 1);
+    this->SetConfigurationOptionAsInt("-dropenabled", 1);
+    }
+  else
+    {
+    this->SetConfigurationOptionAsInt("-dragenabled", 0);
+    this->SetConfigurationOptionAsInt("-dropenabled", 0);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -305,13 +348,6 @@ void vtkKWTree::SetSelectionChangedCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::SetKeyPressDeleteCommand(
-  vtkObject *object, const char *method)
-{
-  this->SetObjectMethodCommand(&this->KeyPressDeleteCommand, object, method);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWTree::InvokeSelectionChangedCommand()
 {
   this->InvokeObjectMethodCommand(this->SelectionChangedCommand);
@@ -319,9 +355,42 @@ void vtkKWTree::InvokeSelectionChangedCommand()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWTree::SetKeyPressDeleteCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->KeyPressDeleteCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTree::InvokeKeyPressDeleteCommand()
 {
   this->InvokeObjectMethodCommand(this->KeyPressDeleteCommand);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeParentChangedCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->NodeParentChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::InvokeNodeParentChangedCommand(
+  const char *node, const char *new_parent, const char *previous_parent)
+{
+  if (this->NodeParentChangedCommand && *this->NodeParentChangedCommand && 
+      this->IsCreated())
+    {
+    this->Script("%s {%s} {%s} {%s}", 
+                 this->NodeParentChangedCommand, 
+                 node, new_parent, previous_parent);
+    }
+
+  const char *args[3];
+  args[0] = node;
+  args[1] = new_parent;
+  args[2] = previous_parent;
+  this->InvokeEvent(vtkKWTree::NodeParentChangedEvent, args);
 }
 
 //----------------------------------------------------------------------------
@@ -564,6 +633,31 @@ const char* vtkKWTree::GetNodeParent(const char *node)
     return this->Script("%s parent %s", this->GetWidgetName(), node);
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTree::IsNodeAncestor(const char *ancestor, const char *node)
+{
+  if (this->IsCreated() && ancestor && *ancestor && node && *node)
+    {
+    vtksys_stl::string parent(this->GetNodeParent(node));
+    if (!strcmp(parent.c_str(), ancestor))
+      {
+      return 1;
+      }
+    return this->IsNodeAncestor(ancestor, parent.c_str());
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::MoveNode(const char *node, const char *new_parent, int pos)
+{
+  if (this->IsCreated() && node && *node && new_parent && *new_parent)
+    {
+    this->Script("%s move %s %s %d", 
+                 this->GetWidgetName(), new_parent, node, pos);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -815,6 +909,19 @@ void vtkKWTree::SetHeight(int height)
 int vtkKWTree::GetHeight()
 {
   return this->GetConfigurationOptionAsInt("-height");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetEnableReparenting(int flag)
+{
+  if (this->EnableReparenting == flag)
+    {
+    return;
+    }
+
+  this->EnableReparenting = flag;
+  this->UpdateDragAndDrop();
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -1076,6 +1183,67 @@ void vtkKWTree::SetRightClickOnNodeCommand(vtkObject *object,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWTree::DropOverNodeCallback(
+  const char *treepath, 
+  const char *dragsourcepath, 
+  const char *where, 
+  const char *op, 
+  const char *datatype, 
+  const char *data)
+{
+  // Check that we are really dropping on our own widget
+
+  if (!treepath || strcmp(treepath, this->GetWidgetName()))
+    {
+    return;
+    }
+
+  // Check that we are really dragging from our own widget
+
+  vtksys_stl::string expect_dragsourcepath(this->GetWidgetName());
+  expect_dragsourcepath += ".c";
+  if (!dragsourcepath || strcmp(dragsourcepath, expect_dragsourcepath.c_str()))
+    {
+    return;
+    }
+
+  // Ignore the operation type (could be default, copy, move)
+
+  (void)op;
+
+  // Check that we are manipulating a tree node
+
+  if (!datatype || strcmp(datatype, "TREE_NODE"))
+    {
+    return;
+    }
+
+  // Check that the location of the drop is a node
+
+  vtksys_stl::vector<vtksys_stl::string> where_elems;
+  vtksys::SystemTools::Split(where, where_elems, ' ');
+
+  if (where_elems.size() != 2 || strcmp(where_elems[0].c_str(), "node"))
+    {
+    return;
+    }
+
+  vtksys_stl::string node(data);
+  vtksys_stl::string new_parent(where_elems[1]);
+  vtksys_stl::string previous_parent(this->GetNodeParent(node.c_str()));
+
+  if (this->EnableReparenting &&
+      !this->IsNodeAncestor(node.c_str(), new_parent.c_str()))
+    {
+    this->MoveNode(node.c_str(), new_parent.c_str(), 0);
+    this->OpenNode(new_parent.c_str());
+    this->SeeNode(node.c_str());
+    this->InvokeNodeParentChangedCommand(
+      node.c_str(), new_parent.c_str(), previous_parent.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTree::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
@@ -1086,5 +1254,8 @@ void vtkKWTree::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkKWTree::PrintSelf(ostream& os, vtkIndent indent)
 {
+  os << indent << "EnableReparenting: " 
+     << (this->EnableReparenting ? "On" : "Off") << endl;
+
   this->Superclass::PrintSelf(os,indent);
 }

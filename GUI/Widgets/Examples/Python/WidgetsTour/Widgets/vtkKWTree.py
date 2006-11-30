@@ -19,6 +19,7 @@ def vtkKWTreeEntryPoint(parent, win):
     tree1.SetBalloonHelpString("A simple tree")
     tree1.SetBorderWidth(2)
     tree1.SetReliefToGroove()
+    tree1.EnableReparentingOn()
     
     tree1.AddNode(None, "inbox_node", "Inbox")
     

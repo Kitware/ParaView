@@ -125,6 +125,15 @@ public:
   virtual const char* GetNodeParent(const char *node);
 
   // Description:
+  // Return if a node is the ancestor of another node.
+  virtual int IsNodeAncestor(const char *ancestor, const char *node);
+
+  // Description:
+  // Mode a node to the children list of parent at position index. Parent
+  // can not be a descendant of node.
+  virtual void MoveNode(const char *node, const char *new_parent, int pos);
+
+  // Description:
   // Set/Get the one of several styles for manipulating the selection. 
   // Valid constants can be found in vtkKWOptions::SelectionModeType.
   virtual void SetSelectionMode(int);
@@ -181,6 +190,15 @@ public:
   // Open/close a tree, i.e. a node and all its children.
   virtual void OpenTree(const char *node);
   virtual void CloseTree(const char *node);
+
+  // Description:
+  // Specifies wether or not a node can be reparented interactively using
+  // drag and drop.
+  // Check the NodeParentChangedCommand callback and NodeParentChangedEvent
+  // to be notified about the change.
+  vtkBooleanMacro(EnableReparenting, int);
+  vtkGetMacro(EnableReparenting, int);
+  virtual void SetEnableReparenting(int);
 
   // Description:
   // Set/Get the width/height.
@@ -331,7 +349,7 @@ public:
     const char *event, vtkObject *object, const char *method);
 
   // Description:
-  // Set the command for single click and double click on a node. This, 
+  // Set the command for single/double/right click on a node. This, 
   // in turn, just calls SetBindText.
   // WARNING: SetSingleClickOnNodeCommand will override the default behaviour
   // that selects a node when it is clicked on. It is therefore up to the
@@ -374,7 +392,21 @@ public:
     vtkObject *object, const char *method);
 
   // Description:
-  // Events. The TreeNodeSelectedEvent is triggered when the selection is
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when a node is reparented interactively.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - path to the node that was reparented: const char*
+  // - path to the node's new parent: const char*
+  // - path to the node's previous parent: const char*
+  virtual void SetNodeParentChangedCommand(
+    vtkObject *object, const char *method);
+  
+  // Description:
+  // Events. The SelectionChangedEvent is triggered when the selection is
   // changed (i.e. one or more node(s) are selected/deselected).
   // It is  similar in concept as the 'SelectionChangedCommand' but can be
   // used by multiple listeners/observers at a time.
@@ -382,12 +414,18 @@ public:
   // a specific node.
   // The following parameters are also passed as client data for 
   // RightClickOnNodeEvent:
-  // - the node ID: const char*
+  // - path to the node: const char*
+  // The following parameters are also passed as client data for 
+  // NodeParentChangedEvent:
+  // - path to the node that was reparented: const char*
+  // - path to the node's new parent: const char*
+  // - path to the node's previous parent: const char*
   //BTX
   enum
   {
     SelectionChangedEvent = 10000,
-    RightClickOnNodeEvent
+    RightClickOnNodeEvent,
+    NodeParentChangedEvent
   };
   //ETX
 
@@ -405,10 +443,8 @@ public:
   virtual void SelectionCallback();
   virtual void RightClickOnNodeCallback(const char *node);
   virtual void KeyPressDeleteCallback();
-  // This callback is used to add KeyPress-Home, End, Prior(PageUp),
-  // Next(PageDown) handling for the tree. These KeyPress envents will move
-  // the view area accordingly and also select the proper node.
   virtual void KeyNavigationCallback(const char* key);
+  virtual void DropOverNodeCallback(const char*, const char*, const char*, const char*, const char*, const char*);
 
 protected:
   vtkKWTree();
@@ -419,12 +455,19 @@ protected:
   virtual void CreateWidget();
   
   int SelectionMode;
+  int EnableReparenting;
 
   char *SelectionChangedCommand;
   virtual void InvokeSelectionChangedCommand();
   
   char *KeyPressDeleteCommand;
   virtual void InvokeKeyPressDeleteCommand();
+
+  char *NodeParentChangedCommand;
+  virtual void InvokeNodeParentChangedCommand(
+    const char *node, const char *new_parent, const char *previous_parent);
+
+  virtual void UpdateDragAndDrop();
 
   // PIMPL Encapsulation for STL containers
   //BTX
