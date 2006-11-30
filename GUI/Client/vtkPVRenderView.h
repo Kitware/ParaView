@@ -147,7 +147,13 @@ public:
   // is 1, then the value will be stored in the registry.
   void ShowNavigationWindowCallback(int registry);
   void ShowSelectionWindowCallback(int registry);
-  
+
+  // Description:
+  // Callbacks for the NavigationWindowButton and SelectionWindowButton.
+  // These two methods call the above two methods as appropriate.
+  void NavigationWindowButtonCallback();
+  void SelectionWindowButtonCallback();
+
   // Description:
   // Export the renderer and render window to a file.
   void SaveInBatchScript(ofstream *file);

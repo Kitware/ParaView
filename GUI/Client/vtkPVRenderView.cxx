@@ -146,7 +146,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.425");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.426");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -374,6 +374,40 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registry)
     {
     this->GetApplication()->SetRegistryValue(2, "RunTime","SourcesBrowser",
                                          "SelectionWindow");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::NavigationWindowButtonCallback()
+{
+  if (!this->NavigationWindowButton->IsCreated())
+    {
+    return;
+    }
+  if (this->NavigationWindowButton->GetSelectedState())
+    {
+    this->ShowNavigationWindowCallback(1);
+    }
+  else
+    {
+    this->ShowSelectionWindowCallback(1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SelectionWindowButtonCallback()
+{
+  if (!this->SelectionWindowButton->IsCreated())
+    {
+    return;
+    }
+  if (this->SelectionWindowButton->GetSelectedState())
+    {
+    this->ShowSelectionWindowCallback(1);
+    }
+  else
+    {
+    this->ShowNavigationWindowCallback(1);
     }
 }
 
@@ -839,7 +873,7 @@ void vtkPVRenderView::CreateWidget()
   this->SelectionWindowButton->SetBalloonHelpString(
     "Switch to selection window mode.");
   this->SelectionWindowButton->SetCommand(
-    this, "ShowSelectionWindowCallback 1");
+    this, "SelectionWindowButtonCallback");
   
   this->NavigationWindowButton->SetParent(
     this->NavigationFrame->GetLabelFrame());
@@ -854,7 +888,7 @@ void vtkPVRenderView::CreateWidget()
   this->NavigationWindowButton->SetBalloonHelpString(
     "Switch to navigation window mode.");
   this->NavigationWindowButton->SetCommand(
-    this, "ShowNavigationWindowCallback 1");
+    this, "NavigationWindowButtonCallback");
 
   this->Script("pack %s %s -side left -anchor w -before %s -padx 1",
                this->SelectionWindowButton->GetWidgetName(),
