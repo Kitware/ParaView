@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithLabel );
-vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.10");
+vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.11");
 
 int vtkKWFrameWithLabel::DefaultLabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
 int vtkKWFrameWithLabel::DefaultLabelFontWeight = vtkKWFrameWithLabel::LabelFontWeightBold;
@@ -173,11 +173,11 @@ void vtkKWFrameWithLabel::CreateWidget()
     ks_("Frame With Label|Shrink or expand the frame"));
   
   this->Script(
-    "pack %s -fill x -expand y -side top", this->ExternalMarginFrame->GetWidgetName());
+    "pack %s -fill x -expand n -anchor nw -side top", this->ExternalMarginFrame->GetWidgetName());
   this->Script(
-    "pack %s -fill both -expand y -side top", this->CollapsibleFrame->GetWidgetName());
+    "pack %s -fill both -expand y -anchor nw -side top", this->CollapsibleFrame->GetWidgetName());
   this->Script(
-    "pack %s -fill x -expand y -side top", this->InternalMarginFrame->GetWidgetName());
+    "pack %s -fill x -expand n -side top", this->InternalMarginFrame->GetWidgetName());
 
   this->Script(
     "pack %s -padx 2 -pady 2 -fill both -expand yes -side top",
