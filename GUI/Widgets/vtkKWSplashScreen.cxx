@@ -15,6 +15,7 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWCanvas.h"
+#include "vtkKWIcon.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWResourceUtilities.h"
 #include "vtkKWTkUtilities.h"
@@ -23,17 +24,15 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.39");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.40");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
 {
   this->Canvas = vtkKWCanvas::New();
-  this->Canvas->SetParent(this);
 
   this->ImageName = NULL;
   this->ProgressMessageVerticalOffset = -10;
-
   this->DisplayPosition = vtkKWTopLevel::DisplayPositionScreenCenter;
   this->HideDecoration  = 1;
 }
@@ -44,6 +43,7 @@ vtkKWSplashScreen::~vtkKWSplashScreen()
   if (this->Canvas)
     {
     this->Canvas->Delete();
+    this->Canvas = NULL;
     }
 
   this->SetImageName(NULL);
@@ -66,6 +66,7 @@ void vtkKWSplashScreen::CreateWidget()
 
   // Create and pack the canvas
 
+  this->Canvas->SetParent(this);
   this->Canvas->Create();
   this->Canvas->SetBorderWidth(0);
   this->Canvas->SetHighlightThickness(0);
@@ -85,13 +86,7 @@ void vtkKWSplashScreen::CreateWidget()
   this->Script("%s create text 0 0 -tags msg -anchor c", 
                this->Canvas->GetWidgetName());
 
-  if (this->ImageName)
-    {
-    this->Script("%s itemconfigure image -image %s", 
-                 this->Canvas->GetWidgetName(), this->ImageName);
-    this->UpdateCanvasSize();
-    }
-
+  this->UpdateImageInCanvas();
   this->UpdateProgressMessagePosition();
 }
 
@@ -118,7 +113,7 @@ void vtkKWSplashScreen::UpdateProgressMessagePosition()
     {
     int width = this->Canvas->GetWidth();
     int height = this->Canvas->GetHeight();
-
+    
     this->Script("%s coords msg %lf %d", 
                  this->Canvas->GetWidgetName(), 
                  (double)width * 0.5, 
@@ -129,7 +124,23 @@ void vtkKWSplashScreen::UpdateProgressMessagePosition()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSplashScreen::SetImageName (const char* _arg)
+void vtkKWSplashScreen::UpdateImageInCanvas()
+{
+  if (this->Canvas && this->Canvas->IsCreated())
+    {
+    const char *res = this->Canvas->Script(
+      "%s itemconfigure image -image {%s}", 
+      this->Canvas->GetWidgetName(), this->ImageName ? this->ImageName : "");
+    this->UpdateCanvasSize();
+    if (res && *res)
+      {
+      vtkErrorMacro("Error setting ImageName: " << res);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplashScreen::SetImageName(const char* _arg)
 {
   if (this->ImageName == NULL && _arg == NULL) 
     { 
@@ -158,17 +169,7 @@ void vtkKWSplashScreen::SetImageName (const char* _arg)
 
   this->Modified();
 
-  if (this->ImageName && this->Canvas && this->Canvas->IsCreated())
-    {
-    const char *res = this->Canvas->Script(
-      "%s itemconfigure image -image %s", 
-      this->Canvas->GetWidgetName(), this->ImageName);
-    this->UpdateCanvasSize();
-    if (res && *res)
-      {
-      vtkErrorMacro("Error setting ImageName: " << res);
-      }
-    }
+  this->UpdateImageInCanvas();
 } 
 
 //----------------------------------------------------------------------------
@@ -186,6 +187,49 @@ int vtkKWSplashScreen::ReadImage(const char *filename)
     return 0;
     }
 
+  this->SetImageToPixels(image_buffer, width, height, pixel_size);
+
+  delete [] image_buffer;
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplashScreen::SetImageToPredefinedIcon(int icon_index)
+{
+  vtkKWIcon *icon = vtkKWIcon::New();
+  icon->SetImage(icon_index);
+  this->SetImageToIcon(icon);
+  icon->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplashScreen::SetImageToIcon(vtkKWIcon* icon)
+{
+  if (icon)
+    {
+    this->SetImageToPixels(
+      icon->GetData(), 
+      icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
+    }
+  else
+    {
+    this->SetImageToPixels(NULL, 0, 0, 0);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplashScreen::SetImageToPixels(const unsigned char* pixels, 
+                                         int width, 
+                                         int height,
+                                         int pixel_size,
+                                         unsigned long buffer_length)
+{
+  if (!pixels || !width || !height || !pixel_size)
+    {
+    this->SetImageName(NULL);
+    return;
+    }
+
   // If no image name, make up one
 
   vtksys_stl::string new_image_name;
@@ -200,22 +244,25 @@ int vtkKWSplashScreen::ReadImage(const char *filename)
   // Update the Tk image (or create it if it did not exist)
 
   int res = vtkKWTkUtilities::UpdatePhoto(
-    this->GetApplication(), image_name, image_buffer,width,height,pixel_size);
+    this->GetApplication(), 
+    image_name, 
+    pixels, width, height, pixel_size, buffer_length);
   if (!res)
     {
     vtkErrorMacro("Error updating photo: " << image_name);
     }
 
   // Assign the new image name (now that it has been created)
+  // This will update the canvas as well
 
   if (new_image_name.size())
     {
     this->SetImageName(new_image_name.c_str());
     }
-  this->UpdateCanvasSize();
-
-  delete [] image_buffer;
-  return res;
+  else
+    {
+    this->UpdateImageInCanvas();
+    }
 }
 
 //----------------------------------------------------------------------------

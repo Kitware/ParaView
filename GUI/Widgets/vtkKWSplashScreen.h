@@ -21,6 +21,7 @@
 #include "vtkKWTopLevel.h"
 
 class vtkKWCanvas;
+class vtkKWIcon;
 
 class KWWidgets_EXPORT vtkKWSplashScreen : public vtkKWTopLevel
 {
@@ -40,19 +41,38 @@ public:
   vtkGetMacro(ProgressMessageVerticalOffset, int);
 
   // Description:
-  // Set/Get the name of the splash image (a Tk image name)
-  vtkGetStringMacro(ImageName);
-  virtual void SetImageName(const char*);
-  
+  // Specifies an image to display in the splashscreen.
+  // The SetImageToPredefinedIcon method accepts an index to one of the
+  // predefined icon listed in vtkKWIcon.
+  // The SetImageToPixels method sets the image using pixel data. It expects
+  // a pointer to the pixels and the structure of the image, i.e. its width, 
+  // height and the pixel_size (how many bytes per pixel, say 3 for RGB, or
+  // 1 for grayscale). If buffer_length = 0, it is computed automatically
+  // from the previous parameters. If it is not, it will most likely indicate
+  // that the buffer has been encoded using base64 and/or zlib.
+  // If pixel_size > 3 (i.e. RGBA), the image is blend the with background
+  // color of the widget.
+  // The SetImageName method can be used to specify a pre-existing Tk image.
+  virtual void SetImageToIcon(vtkKWIcon *icon);
+  virtual void SetImageToPredefinedIcon(int icon_index);
+  virtual void SetImageToPixels(
+    const unsigned char *pixels, int width, int height, int pixel_size,
+    unsigned long buffer_length = 0);
+
   // Description:
   // Read an image and use it as the splash image.
-  // If ImageName is set, this method will update the corresponding
-  // Tk image, otherwise it will create a new one and assign its name to
-  // ImageName.
   // Check vtkKWResourceUtilities::ReadImage for the list of supported
   // image format
   // Return 1 on success, 0 otherwise
   virtual int ReadImage(const char *filename);
+  
+  // Description:
+  // Set/Get the name of the splashscreen image, as a Tk image name. 
+  // This method is kept for backward compatibility only, as it exposes
+  // our dependency to Tk internal data structures. Use ReadImage, 
+  // SetImageToIcon or SetImageToPixels instead.
+  vtkGetStringMacro(ImageName);
+  virtual void SetImageName(const char*);
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -75,8 +95,9 @@ protected:
   char *ImageName;
   int ProgressMessageVerticalOffset;
 
-  void UpdateCanvasSize();
-  void UpdateProgressMessagePosition();
+  virtual void UpdateImageInCanvas();
+  virtual void UpdateCanvasSize();
+  virtual void UpdateProgressMessagePosition();
 
   // Description:
   // Get the width/height of the toplevel as requested
