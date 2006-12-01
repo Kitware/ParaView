@@ -184,6 +184,7 @@ public:
   
   QPointer<pqPipelineSource> ActiveSource;
   QPointer<pqServer> ActiveServer;
+  QPointer<pqProxyTabWidget> ProxyPanel;
 
 #ifdef PARAVIEW_EMBED_PYTHON
   QPointer<pqPythonDialog> PythonDialog;
@@ -545,6 +546,7 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
 {
   pqProxyTabWidget* const proxyPanel = 
     new pqProxyTabWidget(dock_widget);
+  this->Implementation->ProxyPanel = proxyPanel;
 
   pqObjectInspectorWidget* object_inspector = proxyPanel->getObjectInspector();
     
@@ -1971,6 +1973,13 @@ void pqMainWindowCore::onSourceCreated(pqPipelineSource* source)
 
   pqApplicationCore::instance()->getPendingDisplayManager()->
         addPendingDisplayForSource(source);
+
+  if (this->Implementation->ProxyPanel)
+    {
+    // Show the properties page.
+    this->Implementation->ProxyPanel->setCurrentIndex(0);
+    }
+  
 }
 
 //-----------------------------------------------------------------------------
