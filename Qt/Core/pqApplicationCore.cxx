@@ -71,7 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPendingDisplayUndoElement.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
-#include "pqPipelineSource.h"
+#include "pqPipelineFilter.h"
 #include "pqReaderFactory.h"
 #include "pqRenderViewModule.h"
 #include "pqServer.h"
@@ -299,6 +299,32 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
 
   QList<pqGenericViewModule*> viewModules = source->getViewModules();
 
+  // Make all inputs visible in views that the removed source
+  // is currently visible.
+  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
+  if (filter)
+    {
+    QList<pqPipelineSource*> inputs = filter->getInputs();
+    foreach(pqGenericViewModule* view, viewModules)
+      {
+      pqConsumerDisplay* src_disp = source->getDisplay(view);
+      if (!src_disp || !src_disp->isVisible())
+        {
+        continue;
+        }
+      // For each input, if it is not visibile in any of the views
+      // that the delete filter is visible, we make the input visible.
+      foreach(pqPipelineSource* input, inputs)
+        {
+        pqConsumerDisplay* input_disp = input->getDisplay(view);
+        if (input_disp && !input_disp->isVisible())
+          {
+          input_disp->setVisible(true);
+          }
+        }
+      }
+    }
+
   // HACK: This will make sure that the panel for the source being
   // removed goes away before the source is deleted. Probably the selection
   // should also go into the undo stack, that way on undo, the GUI selection
@@ -306,6 +332,7 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
   emit this->sourceRemoved(source);
  
   this->getPipelineBuilder()->remove(source);
+
 
   foreach (pqGenericViewModule* view, viewModules)
     {

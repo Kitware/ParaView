@@ -121,6 +121,20 @@ bool pqPipelineFilter::hasInput(pqPipelineSource *input) const
 }
 
 //-----------------------------------------------------------------------------
+QList<pqPipelineSource*> pqPipelineFilter::getInputs() const
+{
+  QList<pqPipelineSource*> inputs;
+  foreach(pqPipelineSource* src, this->Internal->Inputs)
+    {
+    if (src)
+      {
+      inputs.push_back(src);
+      }
+    }
+  return inputs;
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineFilter::inputChanged()
 {
   // We must determine what changed on the input property.

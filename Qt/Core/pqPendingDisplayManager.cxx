@@ -39,12 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Server Manager includes
 
 // pq includes
+#include "pqApplicationCore.h"
+#include "pqConsumerDisplay.h"
 #include "pqPendingDisplayUndoElement.h"
 #include "pqPipelineBuilder.h"
-#include "pqPipelineSource.h"
-#include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
+#include "pqPipelineFilter.h"
 #include "pqRenderViewModule.h"
+#include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 
 
@@ -117,6 +118,20 @@ void pqPendingDisplayManager::createPendingDisplays(pqGenericViewModule* view)
       continue;
       }
     pb->createDisplay(source, view);
+    pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
+    if (filter)
+      {
+      // hide input source.
+      QList<pqPipelineSource*> inputs = filter->getInputs();
+      foreach(pqPipelineSource* input_src, inputs)
+        {
+        pqConsumerDisplay* disp = input_src->getDisplay(view);
+        if (disp)
+          {
+          disp->setVisible(false);
+          }
+        }
+      }
     view->render();
 
     pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);

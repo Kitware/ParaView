@@ -44,6 +44,7 @@ class pqPipelineFilterInternal;
 
 class PQCORE_EXPORT pqPipelineFilter : public pqPipelineSource
 {
+  Q_OBJECT
 public:
   pqPipelineFilter(QString name, vtkSMProxy *proxy, pqServer* server, 
     QObject* parent=NULL);
@@ -51,6 +52,10 @@ public:
 
   // Get number of inputs.
   int getInputCount() const;
+
+
+  // Get a list of all inputs.
+  QList<pqPipelineSource*> getInputs() const;
 
   // Get input at given index.
   pqPipelineSource *getInput(int index) const;
