@@ -90,7 +90,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqProxyInformationWidget.h
   pqProxyTabWidget.h
   pqRecentFilesMenu.h
-  pqRenderViewEditor.h
   pqRenderWindowManager.h
   pqSMSignalAdaptors.h
   pqSampleScalarAddRangeDialog.h
@@ -145,7 +144,6 @@ SET(UI_FORMS
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
-  Resources/UI/pqRenderViewEditor.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui
   Resources/UI/pqSelectReaderDialog.ui
@@ -292,8 +290,6 @@ ADD_LIBRARY(pqComponents
   pqProxyTabWidget.h
   pqRecentFilesMenu.cxx
   pqRecentFilesMenu.h
-  pqRenderViewEditor.cxx
-  pqRenderViewEditor.h
   pqRenderWindowManager.cxx
   pqRenderWindowManager.h
   pqSMSignalAdaptors.cxx

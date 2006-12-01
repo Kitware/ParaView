@@ -143,11 +143,34 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
     SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("UseImmediateMode"));
 
+  // link default light params
+  this->Links.registerLink(this->DefaultLightSwitch, "checked", 
+                           SIGNAL(toggled(bool)),
+                           proxy, proxy->GetProperty("LightSwitch"));
+  pqSignalAdaptorSliderRange* sliderAdaptor;
+  sliderAdaptor = new pqSignalAdaptorSliderRange(this->LightIntensity);
+  this->Links.registerLink(sliderAdaptor, "value",
+                           SIGNAL(valueChanged(double)),
+                           proxy, proxy->GetProperty("LightIntensity"));
+  this->Links.registerLink(this->LightIntensity_Edit, "text",
+                           SIGNAL(textChanged(const QString&)),
+                           proxy, proxy->GetProperty("LightIntensity"));
+  pqSignalAdaptorColor* lightColorAdaptor;
+  lightColorAdaptor = new pqSignalAdaptorColor(this->SetLightColor,
+                                   "chosenColor",
+                                   SIGNAL(chosenColorChanged(const QColor&)),
+                                   false);
+  this->Links.registerLink(lightColorAdaptor, "color",
+                           SIGNAL(colorChanged(const QVariant&)),
+                           proxy, proxy->GetProperty("LightDiffuseColor"));
 
+
+  // link light kit params
   pqNamedWidgets::link(this->UseLight, proxy, &this->Links);
-  
   this->Links.registerLink(this->UseLight, "checked", SIGNAL(toggled(bool)),
     proxy, proxy->GetProperty("UseLight"));
+
+
 
   if (vtkSMLODRenderModuleProxy::SafeDownCast(proxy))
     {

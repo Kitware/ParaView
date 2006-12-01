@@ -54,7 +54,6 @@ public:
 
 public slots:
   void showContextMenu(const QPoint &pos);
-  void showRenderViewEditor();
 
 private:
   pqPipelineBrowser *Browser;

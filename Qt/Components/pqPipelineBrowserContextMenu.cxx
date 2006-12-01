@@ -117,28 +117,3 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
     }
 }
 
-void pqPipelineBrowserContextMenu::showRenderViewEditor()
-{
-  // TODO: Move this code to the correct location.
-  /*QWidget* widget = this->ListModel->getWidgetFor(selection);
-  vtkSMRenderModuleProxy* pw = pqServerManagerObserver::instance()->getRenderModule(qobject_cast<QVTKWidget*>(widget));
-  if(pw)
-    {
-    static const char* ViewSettingString = "View Settings...";
-    QMenu menu;
-    menu.addAction(ViewSettingString);
-    QAction* action = menu.exec(this->TreeView->mapToGlobal(position));
-    if(action && action->text() == ViewSettingString)
-      {
-      QDialog* dialog = new QDialog(topParent);
-      dialog->setWindowTitle("View Settings");
-      QHBoxLayout* l = new QHBoxLayout(dialog);
-      pqRenderViewEditor* editor = new pqRenderViewEditor(dialog);
-      editor->setRenderView(pw);
-      l->addWidget(editor);
-      dialog->show();
-      }
-    }*/
-}
-
-
