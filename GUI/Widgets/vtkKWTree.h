@@ -67,6 +67,8 @@ public:
 
   // Description:
   // Set/Get the label of the node.
+  // The return value of GetNodeText is a pointer to a temporary buffer
+  // which contents should be copied *right away*.
   virtual const char* GetNodeText(const char *node);
   virtual void SetNodeText(const char *node, const char *text);
 
@@ -87,6 +89,8 @@ public:
   // and will be matched to the corresponding (closest) font on your system.
   // If you are familiar with the X font names specification, you can also
   // describe the font that way (say, '*times-medium-r-*-*-12*').
+  // The return value of GetNodeFont is a pointer to a temporary buffer
+  // which contents should be copied *right away*.
   virtual const char* GetNodeFont(const char *node);
   virtual void SetNodeFont(const char *node, const char *font);
 
@@ -101,6 +105,8 @@ public:
   // Description:
   // Set/Get the user data associated to the node. This can be used
   // to bury additional data in the node.
+  // The return value of GetNodeUserData is a pointer to a temporary buffer
+  // which contents should be copied *right away*.
   virtual const char* GetNodeUserData(const char *node);
   virtual void SetNodeUserData(const char *node, const char *data);
   virtual int GetNodeUserDataAsInt(const char *node);
@@ -120,10 +126,14 @@ public:
   
   // Description:
   // Get node's children as a space separated list of nodes
+  // The return value of GetNodeChildren is a pointer to a temporary buffer
+  // which contents should be copied *right away*.
   virtual const char* GetNodeChildren(const char *node);
 
   // Description:
   // Get node's parent
+  // The return value of GetNodeParent is a pointer to a temporary buffer
+  // which contents should be copied *right away*.
   virtual const char* GetNodeParent(const char *node);
 
   // Description:
@@ -134,6 +144,18 @@ public:
   // Mode a node to the children list of parent at position index. Parent
   // can not be a descendant of node.
   virtual void MoveNode(const char *node, const char *new_parent, int pos);
+
+  // Description:
+  // Find a node with a specific user data associated, starting the
+  // search among the children of a specific node (set it to NULL or 'root'
+  // to search the whole tree).
+  // Return node name if found, NULL otherwise.
+  // The return value of both methods is a pointer to a temporary buffer
+  // which contents should be copied *right away*.
+  virtual const char* FindNodeWithUserData(
+    const char *parent, const char *data);
+  virtual const char* FindNodeWithUserDataAsInt(
+    const char *parent, int data);
 
   // Description:
   // Set/Get the one of several styles for manipulating the selection. 
@@ -160,6 +182,8 @@ public:
 
   // Description:
   // Return the selection as a list of space separated selected nodes
+  // The return value of GetSelection is a pointer to a temporary buffer
+  // which contents should be copied *right away*.
   virtual const char* GetSelection();
 
   // Description:

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.31");
+vtkCxxRevisionMacro(vtkKWTree, "1.32");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -695,6 +695,62 @@ void vtkKWTree::SetNodeUserDataAsInt(const char *node, int data)
   char buffer[256];
   sprintf(buffer, "%d", data);
   this->SetNodeUserData(node, buffer);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTree::FindNodeWithUserData(
+  const char *parent, const char *data)
+{
+  if (!data)
+    {
+    return NULL;
+    }
+
+  const char *children = 
+    this->GetNodeChildren(parent && *parent ? parent : "root");
+  if (!children || !*children)
+    {
+    return NULL;
+    }
+   
+  vtksys_stl::vector<vtksys_stl::string> children_list;
+  vtksys::SystemTools::Split(children, children_list, ' ');
+  vtksys_stl::vector<vtksys_stl::string>::iterator end = children_list.end();
+
+  vtksys_stl::vector<vtksys_stl::string>::iterator it = children_list.begin();
+  for (; it != end; it++)
+    {
+    const char *child_data = this->GetNodeUserData((*it).c_str());
+    if (child_data && !strcmp(child_data, data))
+      {
+      Tcl_SetResult(
+        this->GetApplication()->GetMainInterp(), 
+        (char*)(*it).c_str(), 
+        TCL_VOLATILE);
+      return Tcl_GetStringResult(this->GetApplication()->GetMainInterp());
+      }
+    }
+
+  it = children_list.begin();
+  for (; it != end; it++)
+    {
+    const char *found = this->FindNodeWithUserData((*it).c_str(), data);
+    if (found)
+      {
+      return found;
+      }
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTree::FindNodeWithUserDataAsInt(
+  const char *parent, int data)
+{
+  char buffer[256];
+  sprintf(buffer, "%d", data);
+  return this->FindNodeWithUserData(parent, buffer);
 }
 
 //----------------------------------------------------------------------------
