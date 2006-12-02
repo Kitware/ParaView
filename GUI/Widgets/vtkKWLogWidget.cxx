@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLogWidget );
-vtkCxxRevisionMacro(vtkKWLogWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWLogWidget, "1.4");
 
 vtkIdType vtkKWLogWidget::IdCounter = 1;
 
@@ -498,7 +498,9 @@ char* vtkKWLogWidget::GetFormatTimeStringCallback(const char* celltext)
     t = atol(celltext); //    sscanf(celltext, "%lu", &t);
     struct tm *new_time = localtime(&t);
     static char buffer[256];
-    strftime(buffer, 256, "%c", new_time); 
+    // avoid gcc-3.x warning about %c only printing 2-digit years
+    char tfmt[3] = "_c"; tfmt[0] = '%';
+    strftime(buffer, 256, tfmt, new_time); 
     return buffer;
     }
   return NULL;
