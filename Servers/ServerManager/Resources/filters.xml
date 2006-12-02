@@ -1527,7 +1527,6 @@ This filter creates a new cell array containing a geometric measure of each cell
          <Entry value="14" text="Shape and Size"/>
          <Entry value="24" text="Shear and Size"/>
          <Entry value="15" text="Distortion"/>
-         <Entry value="" text=""/>
        </EnumerationDomain>
      </IntVectorProperty>
    <!-- End MeshQuality -->
