@@ -801,92 +801,92 @@ This feature is nice for debugging output.)" />
                    trace_name="TriangleQualityMeasure"
                    label="Triangle Quality Measure"
                    help="Select the quality measure used to evaluate triangle quality. The radius ratio is the size of a circle circumscribed by a triangle's 3 vertices divided by the size of a circle tangent to a triangle's 3 edges. The edge ratio is the ratio of the longest edge length to the shortest edge length.">
-      <Item name="0" text="Edge Ratio"/>
-      <Item name="1" text="Aspect Ratio"/>
-      <Item name="2" text="Radius Ratio"/>
-      <Item name="3" text="Aspect Frobenius"/>
-      <Item name="6" text="Minimum Angle"/>
-      <Item name="8" text="Maximum Angle"/>
-      <Item name="9" text="Condition"/>
-      <Item name="10" text="Scaled Jacobian"/>
-      <Item name="12" text="Relative Size Squared"/>
-      <Item name="13" text="Shape"/>
-      <Item name="14" text="Shape and Size"/>
-      <Item name="15" text="Distortion"/>
+      <Item value="0"  name="Edge Ratio"/>
+      <Item value="1"  name="Aspect Ratio"/>
+      <Item value="2"  name="Radius Ratio"/>
+      <Item value="3"  name="Aspect Frobenius"/>
+      <Item value="6"  name="Minimum Angle"/>
+      <Item value="8"  name="Maximum Angle"/>
+      <Item value="9"  name="Condition"/>
+      <Item value="10" name="Scaled Jacobian"/>
+      <Item value="12" name="Relative Size Squared"/>
+      <Item value="13" name="Shape"/>
+      <Item value="14" name="Shape and Size"/>
+      <Item value="15" name="Distortion"/>
     </SelectionList>
     <SelectionList property="QuadQualityMeasure"
                    trace_name="QuadQualityMeasure"
                    label="Quad Quality Measure"
                    help="Select the quality measure used to evaluate quadrilateral quality">
-      <Item name="0" text="Edge Ratio"/>
-      <Item name="1" text="Aspect Ratio"/>
-      <Item name="2" text="Radius Ratio"/>
-      <Item name="4" text="Average Aspect Frobenius"/>
-      <Item name="5" text="Maximal Aspect Frobenius"/>
-      <Item name="6" text="Maximum Edge Ratio"/>
-      <Item name="17" text="Skew"/>
-      <Item name="18" text="Taper"/>
-      <Item name="26" text="Warpage"/>
-      <Item name="28" text="Area"/>
-      <Item name="20" text="Stretch"/>
-      <Item name="6" text="Minimum Angle"/>
-      <Item name="8" text="Maximum Angle"/>
-      <Item name="23" text="Oddy"/>
-      <Item name="9" text="Condition"/>
-      <Item name="25" text="Jacobian"/>
-      <Item name="10" text="Scaled Jacobian"/>
-      <Item name="11" text="Shear"/>
-      <Item name="12" text="Relative Size Squared"/>
-      <Item name="13" text="Shape"/>
-      <Item name="14" text="Shape and Size"/>
-      <Item name="24" text="Shear and Size"/>
-      <Item name="15" text="Distortion"/>
+      <Item value="0"  name="Edge Ratio"/>
+      <Item value="1"  name="Aspect Ratio"/>
+      <Item value="2"  name="Radius Ratio"/>
+      <Item value="4"  name="Average Aspect Frobenius"/>
+      <Item value="5"  name="Maximal Aspect Frobenius"/>
+      <Item value="6"  name="Maximum Edge Ratio"/>
+      <Item value="17" name="Skew"/>
+      <Item value="18" name="Taper"/>
+      <Item value="26" name="Warpage"/>
+      <Item value="28" name="Area"/>
+      <Item value="20" name="Stretch"/>
+      <Item value="6"  name="Minimum Angle"/>
+      <Item value="8"  name="Maximum Angle"/>
+      <Item value="23" name="Oddy"/>
+      <Item value="9"  name="Condition"/>
+      <Item value="25" name="Jacobian"/>
+      <Item value="10" name="Scaled Jacobian"/>
+      <Item value="11" name="Shear"/>
+      <Item value="12" name="Relative Size Squared"/>
+      <Item value="13" name="Shape"/>
+      <Item value="14" name="Shape and Size"/>
+      <Item value="24" name="Shear and Size"/>
+      <Item value="15" name="Distortion"/>
     </SelectionList>
     <SelectionList property="TetQualityMeasure"
                    trace_name="TetQualityMeasure"
                    label="Tet Quality Measure"
                    help="Select the quality measure used to evaluate tetrahedral quality. The radius ratio is the size of a sphere circumscribed by a tetrahedron's 4 vertices divided by the size of a circle tangent to a tetrahedron's 4 faces. The edge ratio is the ratio of the longest edge length to the shortest edge length. The collapse ratio is the minimum ratio of height of a vertex above the triangle opposite it divided by the longest edge of the opposing triangle across all vertex/triangle pairs.">
-      <Item name="0" text="Edge Ratio"/>
-      <Item name="1" text="Aspect Ratio"/>
-      <Item name="2" text="Radius Ratio"/>
-      <Item name="3" text="Aspect Frobenius"/>
-      <Item name="6" text="Minimal Dihedral Angle"/>
-      <Item name="7" text="Collapse Ratio"/>
-      <Item name="29" text="Aspect Beta"/>
-      <Item name="27" text="Aspect Gamma"/>
-      <Item name="19" text="Volume"/>
-      <Item name="9" text="Condition"/>
-      <Item name="25" text="Jacobian"/>
-      <Item name="10" text="Scaled Jacobian"/>
-      <Item name="12" text="Relative Size Squared"/>
-      <Item name="13" text="Shape"/>
-      <Item name="14" text="Shape and Size"/>
-      <Item name="15" text="Distortion"/>
+      <Item value="0"  name="Edge Ratio"/>
+      <Item value="1"  name="Aspect Ratio"/>
+      <Item value="2"  name="Radius Ratio"/>
+      <Item value="3"  name="Aspect Frobenius"/>
+      <Item value="6"  name="Minimal Dihedral Angle"/>
+      <Item value="7"  name="Collapse Ratio"/>
+      <Item value="29" name="Aspect Beta"/>
+      <Item value="27" name="Aspect Gamma"/>
+      <Item value="19" name="Volume"/>
+      <Item value="9"  name="Condition"/>
+      <Item value="25" name="Jacobian"/>
+      <Item value="10" name="Scaled Jacobian"/>
+      <Item value="12" name="Relative Size Squared"/>
+      <Item value="13" name="Shape"/>
+      <Item value="14" name="Shape and Size"/>
+      <Item value="15" name="Distortion"/>
     </SelectionList>
     <SelectionList property="HexQualityMeasure"
                    trace_name="HexQualityMeasure"
                    label="Hex Quality Measure"
                    help="Select the quality measure used to evaluate quadrilateral quality.">
-      <Item name="0" text="Edge Ratio"/>
-      <Item name="4" text="Average Aspect Frobenius"/>
-      <Item name="5" text="Maximal Aspect Frobenius"/>
-      <Item name="6" text="Maximum Edge Ratio"/>
-      <Item name="17" text="Skew"/>
-      <Item name="18" text="Taper"/>
-      <Item name="19" text="Volume"/>
-      <Item name="20" text="Stretch"/>
-      <Item name="21" text="Diagonal"/> 
-      <Item name="22" text="Dimension"/>
-      <Item name="23" text="Oddy"/>
-      <Item name="9" text="Condition"/>
-      <Item name="25" text="Jacobian"/>
-      <Item name="10" text="Scaled Jacobian"/>
-      <Item name="11" text="Shear"/>
-      <Item name="12" text="Relative Size Squared"/>
-      <Item name="13" text="Shape"/>
-      <Item name="14" text="Shape and Size"/>
-      <Item name="24" text="Shear and Size"/>
-      <Item name="15" text="Distortion"/>
+      <Item value="0"  name="Edge Ratio"/>
+      <Item value="4"  name="Average Aspect Frobenius"/>
+      <Item value="5"  name="Maximal Aspect Frobenius"/>
+      <Item value="6"  name="Maximum Edge Ratio"/>
+      <Item value="17" name="Skew"/>
+      <Item value="18" name="Taper"/>
+      <Item value="19" name="Volume"/>
+      <Item value="20" name="Stretch"/>
+      <Item value="21" name="Diagonal"/> 
+      <Item value="22" name="Dimension"/>
+      <Item value="23" name="Oddy"/>
+      <Item value="9"  name="Condition"/>
+      <Item value="25" name="Jacobian"/>
+      <Item value="10" name="Scaled Jacobian"/>
+      <Item value="11" name="Shear"/>
+      <Item value="12" name="Relative Size Squared"/>
+      <Item value="13" name="Shape"/>
+      <Item value="14" name="Shape and Size"/>
+      <Item value="24" name="Shear and Size"/>
+      <Item value="15" name="Distortion"/>
     </SelectionList>
     <Documentation>
 The mesh quality filter computes the quality of individual triangles, quadrilaterals, tetrahedra and hexahedra in a data set. Several quality measures exist for the different cell types. You may choose one for each type of cell. The filter then adds a new scalar array named "Quality" to the per-cell values of the data set containing these measures. Typically, a value of 1 is the optimal quality and the higher the value, the lower the cell quality.
