@@ -887,7 +887,6 @@ This feature is nice for debugging output.)" />
       <Item name="14" text="Shape and Size"/>
       <Item name="24" text="Shear and Size"/>
       <Item name="15" text="Distortion"/>
-      <Item name="" text=""/>
     </SelectionList>
     <Documentation>
 The mesh quality filter computes the quality of individual triangles, quadrilaterals, tetrahedra and hexahedra in a data set. Several quality measures exist for the different cell types. You may choose one for each type of cell. The filter then adds a new scalar array named "Quality" to the per-cell values of the data set containing these measures. Typically, a value of 1 is the optimal quality and the higher the value, the lower the cell quality.
