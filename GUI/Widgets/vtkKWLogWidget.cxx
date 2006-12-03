@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLogWidget );
-vtkCxxRevisionMacro(vtkKWLogWidget, "1.4");
+vtkCxxRevisionMacro(vtkKWLogWidget, "1.5");
 
 vtkIdType vtkKWLogWidget::IdCounter = 1;
 
@@ -488,6 +488,19 @@ int vtkKWLogWidget::WriteRecordsToFile(const char* filename)
     
   return 1;         
 }
+//----------------------------------------------------------------------------
+// Some  buggy versions of gcc complain about the use of %c: warning: `%c'
+// yields only last 2 digits of year in some locales.  Of course  program-
+// mers  are  encouraged  to  use %c, it gives the preferred date and time
+// representation. One meets all kinds of strange obfuscations to  circum-
+// vent this gcc problem. A relatively clean one is to add an intermediate
+// function. This is described as bug #3190 in gcc bugzilla:
+// [-Wformat-y2k doesn't belong to -Wall - it's hard to avoid]
+inline size_t
+my_strftime(char *s, size_t max, const char *fmt, const struct tm *tm)
+{
+  return strftime(s, max, fmt, tm);
+}
 
 //----------------------------------------------------------------------------
 char* vtkKWLogWidget::GetFormatTimeStringCallback(const char* celltext)
@@ -498,9 +511,7 @@ char* vtkKWLogWidget::GetFormatTimeStringCallback(const char* celltext)
     t = atol(celltext); //    sscanf(celltext, "%lu", &t);
     struct tm *new_time = localtime(&t);
     static char buffer[256];
-    // avoid gcc-3.x warning about %c only printing 2-digit years
-    char tfmt[3] = "_c"; tfmt[0] = '%';
-    strftime(buffer, 256, tfmt, new_time); 
+    my_strftime(buffer, 256, "%c", new_time); 
     return buffer;
     }
   return NULL;
