@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMCompoundProxy.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMGenericViewDisplayProxy.h"
@@ -680,7 +681,14 @@ void pqSelectionManager::createNewClientDisplays(
   for (; iter != selection.end(); iter++)
     {
     pqServerManagerModelItem* item = *iter;
-    vtkSMProxy* source = static_cast<pqPipelineSource*>(item)->getProxy();
+    vtkSMProxy* original_source = 
+      qobject_cast<pqPipelineSource*>(item)->getProxy();
+    vtkSMProxy* source = original_source;
+    if (vtkSMCompoundProxy* compound_proxy = 
+      vtkSMCompoundProxy::SafeDownCast(source))
+      {
+      source = compound_proxy->GetConsumableProxy();
+      }
 
     vtkIdType connId = source->GetConnectionID();
 
@@ -728,7 +736,7 @@ void pqSelectionManager::createNewClientDisplays(
 
     this->Implementation->ClientSideDisplays.push_back( 
       pqSelectionManagerImplementation::ClientSideDisplay(
-        source, extractor, display));
+        original_source, extractor, display));
     extractor->Delete();
     display->Delete();
     }

@@ -33,6 +33,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMCompoundProxy.h"
 
 #include <vtkstd/algorithm>
 #include <vtkstd/list>
@@ -69,7 +70,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.8");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -257,8 +258,17 @@ void vtkSMSelectionProxy::ConvertSelection(vtkSelection* sel,
 
   if (objProxy)
     {
-    properties->Set(vtkSelectionSerializer::ORIGINAL_SOURCE_ID(), 
-                    objProxy->GetID(0).ID);
+    if (vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(objProxy))
+      {
+      // For compound proxies, the selected proxy is the consumed proxy.
+      properties->Set(vtkSelectionSerializer::ORIGINAL_SOURCE_ID(), 
+        cp->GetConsumableProxy()->GetID(0).ID);
+      }
+    else
+      {
+      properties->Set(vtkSelectionSerializer::ORIGINAL_SOURCE_ID(), 
+        objProxy->GetID(0).ID);
+      }
     }
 }
 
