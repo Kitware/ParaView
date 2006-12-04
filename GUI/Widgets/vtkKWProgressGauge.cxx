@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.40");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.41");
 
 //----------------------------------------------------------------------------
 class vtkKWProgressGaugeInternals
@@ -43,6 +43,7 @@ vtkKWProgressGauge::vtkKWProgressGauge()
   this->MinimumHeight = this->Height;
   this->Canvas        = NULL;
   this->ExpandHeight  = 0;
+  this->PrimaryGaugePosition = vtkKWProgressGauge::GaugePositionTop;
 
   this->BarColor[0] = 0.0;
   this->BarColor[1] = 0.0;
@@ -342,7 +343,7 @@ void vtkKWProgressGauge::Redraw()
           (int)(this->BarColor[2] * 255.0));
   
   int bar_height = 
-    floor((height - nb_gauges_visible + 1) / (double)nb_gauges_visible);
+    (int)floor((height - nb_gauges_visible + 1) / (double)nb_gauges_visible);
 
   it = this->Internals->ValuePool.begin();
   for (; it != end; ++it)
@@ -360,12 +361,20 @@ void vtkKWProgressGauge::Redraw()
       }
     else
       {
-      double y = height - (rank + 1) * (bar_height + 1);
+      double y;
+      if (this->PrimaryGaugePosition == vtkKWProgressGauge::GaugePositionTop)
+        {
+        y = rank * (bar_height + 1);
+        }
+      else
+        {
+        y = height - (rank + 1) * (bar_height + 1) + 1;
+        }
       double w = 0.01 * value * this->Width;
       tk_cmd 
         << wname << " itemconfigure bar" << rank << " -fill " << color << endl
-        << wname << " coords bar" << rank << " 0 " << y + 1 << " " << w << " " 
-        << y + bar_height + 1 << endl;
+        << wname << " coords bar" << rank << " 0 " << y << " " << w << " " 
+        << y + bar_height << endl;
       }
     }
 
@@ -382,6 +391,44 @@ void vtkKWProgressGauge::Redraw()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWProgressGauge::SetPrimaryGaugePosition(int arg)
+{
+  if (arg < vtkKWProgressGauge::GaugePositionTop)
+    {
+    arg = vtkKWProgressGauge::GaugePositionTop;
+    }
+  else if (arg > vtkKWProgressGauge::GaugePositionBottom)
+    {
+    arg = vtkKWProgressGauge::GaugePositionBottom;
+    }
+
+  if (this->PrimaryGaugePosition == arg)
+    {
+    return;
+    }
+
+  this->PrimaryGaugePosition = arg;
+
+  this->Modified();
+
+  this->Redraw();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::SetPrimaryGaugePositionToTop()
+{ 
+  this->SetPrimaryGaugePosition(
+    vtkKWProgressGauge::GaugePositionTop); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::SetPrimaryGaugePositionToBottom()
+{ 
+  this->SetPrimaryGaugePosition(
+    vtkKWProgressGauge::GaugePositionBottom); 
+}
+
+//----------------------------------------------------------------------------
 void vtkKWProgressGauge::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -392,4 +439,5 @@ void vtkKWProgressGauge::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Width: " << this->GetWidth() << endl;
   os << indent << "ExpandHeight: "
      << (this->ExpandHeight ? "On" : "Off") << endl;
+  os << indent << "PrimaryGaugePosition: " << this->PrimaryGaugePosition << endl;
 }

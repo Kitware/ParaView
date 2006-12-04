@@ -43,9 +43,10 @@ public:
   // the same as calling the SetValue method.
   // This number is clamped between 0.0 and 100.0.
   // All progress gauges are stacked vertically on top of each other, with the
-  // lower rank at the bottom. Space for the primary gauge (ranked 0) is
-  // always allocated. It is not for secondary gauges which value is 0.0
-  // unless a higher rank gauge is != 0.0.
+  // lower rank at the top by default (this can be changed with 
+  // the SetPrimaryGaugePosition method). Space for the primary gauge
+  // (ranked 0) is always allocated. It is not for secondary gauges which
+  // value is 0.0 unless a higher rank gauge is != 0.0.
   virtual void SetNthValue(int rank, double value);
   virtual double GetNthValue(int rank);
   
@@ -81,6 +82,22 @@ public:
   vtkGetVectorMacro(BarColor,double,3);
 
   // Description:
+  // Set/Get the position of the primary gauge (rank 0). 
+  // If on top, higher rank are stacked below. If at the bottom, higher rank
+  // are stacked on top.
+  //BTX
+  enum 
+  {
+    GaugePositionTop = 0,
+    GaugePositionBottom
+  };
+  //ETX
+  virtual void SetPrimaryGaugePosition(int);
+  vtkGetMacro(PrimaryGaugePosition, int);
+  virtual void SetPrimaryGaugePositionToTop();
+  virtual void SetPrimaryGaugePositionToBottom();
+
+  // Description:
   // Callbacks. Internal, do not use.
   virtual void ConfigureCallback();
 
@@ -100,6 +117,7 @@ protected:
   double BarColor[3];
   double Value;
   int ExpandHeight;
+  int PrimaryGaugePosition;
 
   vtkKWCanvas *Canvas;
 
