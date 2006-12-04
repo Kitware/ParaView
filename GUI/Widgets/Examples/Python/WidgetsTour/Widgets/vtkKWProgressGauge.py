@@ -41,18 +41,36 @@ def vtkKWProgressGaugeEntryPoint(parent, win):
     progress1_pbs.SetPadX(1)
     progress1_pbs.SetPadY(1)
     progress1_pbs.ExpandWidgetsOn()
-    
-    for id in range(0,100,25):
-        buffer = "Set Progress to %d%%" % (id)
-        pushbutton = progress1_pbs.AddWidget(id)
+    progress1_pbs.PackHorizontallyOn()
+    progress1_pbs.SetMaximumNumberOfWidgetsInPackingDirection(3)
+
+    nb_buttons = 0
+    for id in range(0,101,25):
+        buffer = "Set primary to %d%%" % (id)
+        pushbutton = progress1_pbs.AddWidget(nb_buttons)
+        nb_buttons = nb_buttons + 1
         pushbutton.SetText(buffer)
         buffer = "SetValue %d" % (id)
         pushbutton.SetCommand(progress1, buffer)
-    
+
+        buffer = "Set secondary to %d%%" % (id)
+        pushbutton = progress1_pbs.AddWidget(nb_buttons)
+        nb_buttons = nb_buttons + 1
+        pushbutton.SetText(buffer)
+        buffer = "SetNthValue 1 %d" % (id)
+        pushbutton.SetCommand(progress1, buffer)
+
+        buffer = "Set tertiary to %d%%" % (id)
+        pushbutton = progress1_pbs.AddWidget(nb_buttons)
+        nb_buttons = nb_buttons + 1
+        pushbutton.SetText(buffer)
+        buffer = "SetNthValue 2 %d" % (id)
+        pushbutton.SetCommand(progress1, buffer)
+
     # Add a special button that will iterate from 0 to 100% in Tcl
     
     pushbutton = progress1_pbs.AddWidget(1000)
-    pushbutton.SetText("0% to 100%")
+    pushbutton.SetText("Set primary from 0% to 100%")
     
     buffer = "for {set i 0} {$i <= 100} {incr i} { %s SetValue $i ; after 20; update}" % (progress1.GetTclName())
     pushbutton.SetCommand(None, buffer)

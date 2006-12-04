@@ -49,21 +49,37 @@ void vtkKWProgressGaugeItem::Create(vtkKWWidget *parent, vtkKWWindow *)
   progress1_pbs->SetPadX(1);
   progress1_pbs->SetPadY(1);
   progress1_pbs->ExpandWidgetsOn();
+  progress1_pbs->PackHorizontallyOn();
+  progress1_pbs->SetMaximumNumberOfWidgetsInPackingDirection(3);
 
   char buffer[250];
+  int nb_buttons = 0;
+
   for (int id = 0; id <= 100; id += 25)
     {
-    sprintf(buffer, "Set Progress to %d%%", id);
-    vtkKWPushButton *pushbutton = progress1_pbs->AddWidget(id);
+    sprintf(buffer, "Set primary to %d%%", id);
+    vtkKWPushButton *pushbutton = progress1_pbs->AddWidget(nb_buttons++);
     pushbutton->SetText(buffer);
     sprintf(buffer, "SetValue %d", id);
+    pushbutton->SetCommand(progress1, buffer);
+
+    sprintf(buffer, "Set secondary to %d%%", id);
+    pushbutton = progress1_pbs->AddWidget(nb_buttons++);
+    pushbutton->SetText(buffer);
+    sprintf(buffer, "SetNthValue 1 %d", id);
+    pushbutton->SetCommand(progress1, buffer);
+
+    sprintf(buffer, "Set tertiary to %d%%", id);
+    pushbutton = progress1_pbs->AddWidget(nb_buttons++);
+    pushbutton->SetText(buffer);
+    sprintf(buffer, "SetNthValue 2 %d", id);
     pushbutton->SetCommand(progress1, buffer);
     }
 
   // Add a special button that will iterate from 0 to 100% in Tcl
 
   vtkKWPushButton *pushbutton = progress1_pbs->AddWidget(1000);
-  pushbutton->SetText("0% to 100%");
+  pushbutton->SetText("Set primary from 0% to 100%");
 
   sprintf(
     buffer, 

@@ -31,17 +31,31 @@ proc vtkKWProgressGaugeEntryPoint {parent win} {
   $progress1_pbs SetPadX 1
   $progress1_pbs SetPadY 1
   $progress1_pbs ExpandWidgetsOn
+  $progress1_pbs PackHorizontallyOn
+  $progress1_pbs SetMaximumNumberOfWidgetsInPackingDirection 3
 
+  set nb_buttons 0
   for {set id 0} {$id <= 100} {incr id 25} {
-    set pushbutton [$progress1_pbs AddWidget $id] 
-    $pushbutton SetText "Set Progress to $id%"
+    set pushbutton [$progress1_pbs AddWidget $nb_buttons] 
+    incr nb_buttons
+    $pushbutton SetText "Set primary to $id%"
     $pushbutton SetCommand $progress1 "SetValue $id"
+
+    set pushbutton [$progress1_pbs AddWidget $nb_buttons] 
+    incr nb_buttons
+    $pushbutton SetText "Set secondary to $id%"
+    $pushbutton SetCommand $progress1 "SetNthValue 1 $id"
+
+    set pushbutton [$progress1_pbs AddWidget $nb_buttons] 
+    incr nb_buttons
+    $pushbutton SetText "Set tertiary to $id%"
+    $pushbutton SetCommand $progress1 "SetNthValue 2 $id"
   }
 
   # Add a special button that will iterate from 0 to 100% in Tcl
 
   set pushbutton [$progress1_pbs AddWidget 1000] 
-  $pushbutton SetText "0% to 100%"
+  $pushbutton SetText "Set primary from 0% to 100%"
   $pushbutton SetCommand "" {
     for {set i 0} {$i <= 100} {incr i} {
       $progress1 SetValue $i; after 20; update

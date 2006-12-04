@@ -19,23 +19,36 @@
 #include "vtkKWApplication.h"
 
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/stl/map>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.39");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.40");
+
+//----------------------------------------------------------------------------
+class vtkKWProgressGaugeInternals
+{
+public:
+
+  typedef vtksys_stl::map<int, double> ValuePoolType;
+  typedef vtksys_stl::map<int, double>::iterator ValuePoolIterator;
+  ValuePoolType ValuePool;
+};
 
 //----------------------------------------------------------------------------
 vtkKWProgressGauge::vtkKWProgressGauge()
 { 
-  this->Width = 100;
-  this->Height = 14;
+  this->Width         = 100;
+  this->Height        = 15;
   this->MinimumHeight = this->Height;
-  this->Value = 0.0;
+  this->Canvas        = NULL;
+  this->ExpandHeight  = 0;
+
   this->BarColor[0] = 0.0;
   this->BarColor[1] = 0.0;
   this->BarColor[2] = 1.0;
-  this->Canvas = NULL;
-  this->ExpandHeight = 0;
+
+  this->Internals     = new vtkKWProgressGaugeInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -46,6 +59,9 @@ vtkKWProgressGauge::~vtkKWProgressGauge()
     this->Canvas->Delete();
     this->Canvas = NULL;
     }
+
+  delete this->Internals;
+  this->Internals = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -71,10 +87,7 @@ void vtkKWProgressGauge::CreateWidget()
   this->Canvas->SetWidth(0);
   this->Canvas->SetHeight(0);
 
-  // Create the progress bar and text
-
-  this->Script("%s create rectangle 0 0 0 0 -outline \"\" -tags bar", 
-               this->Canvas->GetWidgetName());
+  // Create the text
 
   this->Script("%s create text 0 0 -anchor c -text \"\" -tags value",
                this->Canvas->GetWidgetName());
@@ -88,25 +101,57 @@ void vtkKWProgressGauge::CreateWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWProgressGauge::SetValue(double value)
+double vtkKWProgressGauge::GetNthValue(int rank)
 {
-  if(value < 0.0)
+  if (rank >= 0)
     {
-    value = 0.0;
+    vtkKWProgressGaugeInternals::ValuePoolIterator it = 
+      this->Internals->ValuePool.find(rank);
+    if (it != this->Internals->ValuePool.end())
+      {
+      return it->second;
+      }
     }
-  if(value > 100.0)
-    {
-    value = 100.0;
-    }
-  if (this->Value == value)
+  return 0.0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::SetNthValue(int rank, double value)
+{
+  if (rank < 0)
     {
     return;
     }
 
-  this->Value = value;
+  if (value < 0.0)
+    {
+    value = 0.0;
+    }
+  if (value > 100.0)
+    {
+    value = 100.0;
+    }
+  if (this->GetNthValue(rank) == value)
+    {
+    return;
+    }
+
+  this->Internals->ValuePool[rank] = value;
   this->Modified();
 
   this->Redraw();
+}
+
+//----------------------------------------------------------------------------
+double vtkKWProgressGauge::GetValue()
+{
+  return this->GetNthValue(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::SetValue(double value)
+{
+  this->SetNthValue(0, value);
 }
 
 //----------------------------------------------------------------------------
@@ -230,49 +275,98 @@ void vtkKWProgressGauge::Redraw()
     this->Canvas->SetHeight(height);
     }
 
-  // If the Value is 0, set the text to nothing and the color
-  // of the bar to the background (0 0 0 0) rectangles show
-  // up as a pixel...
-  // Otherwise use the BarColor for the bar
+  vtkKWProgressGaugeInternals::ValuePoolIterator it;
+  vtkKWProgressGaugeInternals::ValuePoolIterator end
+    = this->Internals->ValuePool.end();
 
-  if (this->Value <= 0.0)
+  int rank;
+  double value;
+
+  // Compute the number of gauges to display
+  // Create a rectangle for each gauge if it does not exist
+
+  int nb_gauges_visible = 1;
+
+  it = this->Internals->ValuePool.begin();
+  for (; it != end; ++it)
     {
-    tk_cmd << wname << " itemconfigure value -text {}" << endl
-           << wname << " coords bar 0 0 0 0" << endl
-           << wname << " itemconfigure bar -fill {}" << endl;
+    rank = it->first;
+    value = it->second;
+    if (value > 0.0)
+      {
+      nb_gauges_visible = rank + 1;
+      if (!atoi(this->Canvas->Script("llength [%s find withtag bar%d]",
+                                     wname, rank)))
+        {
+        tk_cmd << wname << " create rectangle 0 0 0 0 -outline \"\" -tags bar"
+               << rank << endl
+               << wname << " lower bar" << rank << " all" << endl;
+        }
+      }
+    }
+
+  // If the Value is 0, set the text of the primary gauge to an empty string
+
+  value = this->GetValue();
+  if (value <= 0.0 || nb_gauges_visible > 1)
+    {
+    tk_cmd << wname << " itemconfigure value -text {}" << endl;
     }
   else
     {
     tk_cmd << wname << " coords value " 
            << this->Width * 0.5 << " " << height * 0.5 << endl;
 
-    char color[10];
-    sprintf(color, "#%02x%02x%02x", 
-            (int)(this->BarColor[0] * 255.0),
-            (int)(this->BarColor[1] * 255.0),
-            (int)(this->BarColor[2] * 255.0));
-
-    tk_cmd << wname << " itemconfigure bar -fill " << color << endl;
-
-    // Set the text to the percent done
+    // Set the text to the percent done for the primary gauge (rank 0)
 
     const char *textcolor = "-fill black";
-    if(this->Value > 50.0)
+    if(value > 50.0)
       {
       textcolor = "-fill white";
       }
     
     char buffer[5];
-    sprintf(buffer, "%3.0lf", this->Value);
+    sprintf(buffer, "%3.0lf", value);
 
     tk_cmd << wname << " itemconfigure value -text {" << buffer 
            << "%%} " << textcolor << endl;
+    }
 
-    // Draw the correct rectangle
+  // If the value is 0, set the color of the bar to the background, otherwise 
+  // the rectangle will still show up as a pixel...
 
-    tk_cmd << wname << " coords bar 0 0 [expr 0.01 * " << this->Value 
-           << " * [winfo width " << wname << "]] [winfo height "
-           << wname << "]" << endl;
+  char color[10];
+  sprintf(color, "#%02x%02x%02x", 
+          (int)(this->BarColor[0] * 255.0),
+          (int)(this->BarColor[1] * 255.0),
+          (int)(this->BarColor[2] * 255.0));
+  
+  int bar_height = 
+    floor((height - nb_gauges_visible + 1) / (double)nb_gauges_visible);
+
+  it = this->Internals->ValuePool.begin();
+  for (; it != end; ++it)
+    {
+    rank = it->first;
+    value = it->second;
+    if (value <= 0.0)
+      {
+      if (atoi(this->Canvas->Script("llength [%s find withtag bar%d]",
+                                    wname, rank)))
+        {
+        tk_cmd << wname << " coords bar" << rank << " 0 0 0 0" << endl
+               << wname << " itemconfigure bar" << rank << " -fill {}" << endl;
+        }
+      }
+    else
+      {
+      double y = height - (rank + 1) * (bar_height + 1);
+      double w = 0.01 * value * this->Width;
+      tk_cmd 
+        << wname << " itemconfigure bar" << rank << " -fill " << color << endl
+        << wname << " coords bar" << rank << " 0 " << y + 1 << " " << w << " " 
+        << y + bar_height + 1 << endl;
+      }
     }
 
   tk_cmd << ends;
