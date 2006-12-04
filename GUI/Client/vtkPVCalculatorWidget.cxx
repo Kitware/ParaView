@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.57");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.58");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -1176,16 +1176,16 @@ void vtkPVCalculatorWidget::AddAllVariables(int populateMenus)
       }
     }
 
-  name = "coords";
+#define vtkPVCalcWidgetCoords "coords"
   if (populateMenus)
     {
-    sprintf(menuCommand, "UpdateFunction {%s}", name);
-    this->VectorsMenu->GetMenu()->AddCommand(name, this,
+    sprintf(menuCommand, "UpdateFunction {%s}", vtkPVCalcWidgetCoords);
+    this->VectorsMenu->GetMenu()->AddCommand(vtkPVCalcWidgetCoords, this,
       menuCommand);
     }
   for ( j = 0; j < 3; ++j )
     {
-    sprintf(menuEntry, "%s_%d", name, j);
+    sprintf(menuEntry, "%s_%d", vtkPVCalcWidgetCoords, j);
     if (populateMenus)
       {
       sprintf(menuCommand, "UpdateFunction {%s}", menuEntry);
