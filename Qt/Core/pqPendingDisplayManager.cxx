@@ -123,8 +123,9 @@ void pqPendingDisplayManager::createPendingDisplays(pqGenericViewModule* view)
       {
       // hide input source.
       QList<pqPipelineSource*> inputs = filter->getInputs();
-      foreach(pqPipelineSource* input_src, inputs)
+      for(int cc=0; cc < inputs.size(); ++cc)
         {
+        pqPipelineSource* input_src = inputs[cc];
         pqConsumerDisplay* disp = input_src->getDisplay(view);
         if (disp)
           {

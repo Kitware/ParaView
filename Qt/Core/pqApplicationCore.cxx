@@ -314,8 +314,9 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
         }
       // For each input, if it is not visibile in any of the views
       // that the delete filter is visible, we make the input visible.
-      foreach(pqPipelineSource* input, inputs)
+      for(int cc=0; cc < inputs.size(); ++cc)
         {
+        pqPipelineSource* input = inputs[cc];
         pqConsumerDisplay* input_disp = input->getDisplay(view);
         if (input_disp && !input_disp->isVisible())
           {
