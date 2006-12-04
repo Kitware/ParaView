@@ -1977,7 +1977,8 @@ void pqMainWindowCore::onSourceCreated(pqPipelineSource* source)
   if (this->Implementation->ProxyPanel)
     {
     // Show the properties page.
-    this->Implementation->ProxyPanel->setCurrentIndex(0);
+    this->Implementation->ProxyPanel->setCurrentIndex(
+      pqProxyTabWidget::PROPERTIES);
     }
   
 }

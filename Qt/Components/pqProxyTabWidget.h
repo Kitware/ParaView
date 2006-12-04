@@ -58,6 +58,11 @@ public:
   /// get the proxy for which properties are displayed
   pqProxy* getProxy();
 
+  enum TabIndexes {
+    PROPERTIES =0,
+    DISPLAY=1,
+    INFORMATION=2
+  };
 public slots:
   /// Set the display whose properties we want to edit. 
   void setProxy(pqProxy* source);
