@@ -400,6 +400,9 @@ pq3DViewPropertiesWidget::pq3DViewPropertiesWidget(QWidget* _parent):
   QObject::connect(this->Internal->squirtLevel,
     SIGNAL(valueChanged(int)), this, SLOT(squirtLevelRateSliderChanged(int)));
   
+  QObject::connect(this->Internal->restoreDefault,
+    SIGNAL(clicked(bool)), this, SLOT(restoreDefaultBackground()));
+  
 }
 
 //-----------------------------------------------------------------------------
@@ -460,6 +463,17 @@ void pq3DViewPropertiesWidget::squirtLevelRateSliderChanged(int value)
 }
 
 //-----------------------------------------------------------------------------
+void pq3DViewPropertiesWidget::restoreDefaultBackground()
+{
+  pqRenderViewModule* rvm =
+    qobject_cast<pqRenderViewModule*>(this->Internal->ViewModule);
+  if(rvm)
+    {
+    int* col = rvm->defaultBackgroundColor();
+    this->Internal->backgroundColor->setChosenColor(
+               QColor(col[0], col[1], col[2]));
+    }
+}
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

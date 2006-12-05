@@ -127,6 +127,7 @@ public:
   vtkSmartPointer<vtkSMRenderModuleProxy> RenderModuleProxy;
   vtkSmartPointer<vtkPVAxesWidget> AxesWidget;
   pqUndoStack* UndoStack;
+  int DefaultBackground[3];
 
   pqRenderViewModuleInternal()
     {
@@ -135,6 +136,9 @@ public:
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->AxesWidget = vtkSmartPointer<vtkPVAxesWidget>::New();
     this->UndoStack = new pqUndoStack(true);
+    this->DefaultBackground[0] = 84;
+    this->DefaultBackground[1] = 89;
+    this->DefaultBackground[2] = 109;
     }
 
   ~pqRenderViewModuleInternal()
@@ -418,6 +422,11 @@ bool pqRenderViewModule::saveImage(int width, int height, const QString& filenam
   return (ret == vtkErrorCode::NoError);
 }
 
+int* pqRenderViewModule::defaultBackgroundColor()
+{
+  return this->Internal->DefaultBackground;
+}
+
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::setDefaults()
 {
@@ -426,6 +435,13 @@ void pqRenderViewModule::setDefaults()
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODThreshold"), 5);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("CompositeThreshold"), 3);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("SquirtLevel"), 3);
+
+  vtkSMProperty* backgroundProperty;
+  int* bg = this->defaultBackgroundColor();
+  backgroundProperty = proxy->GetProperty("Background");
+  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 0, bg[0]/255.0);
+  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 1, bg[1]/255.0);
+  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 2, bg[2]/255.0);
 
   // Now load default values from the QSettings, if available.
   pqSettings* settings = pqApplicationCore::instance()->settings();

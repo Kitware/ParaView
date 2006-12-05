@@ -59,6 +59,7 @@ private slots:
   void compositeThresholdSliderChanged(int);
   void subsamplingRateSliderChanged(int);
   void squirtLevelRateSliderChanged(int);
+  void restoreDefaultBackground();
 
 private:
   pq3DViewPropertiesWidgetInternal* Internal;

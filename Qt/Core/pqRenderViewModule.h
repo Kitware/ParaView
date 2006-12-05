@@ -84,6 +84,9 @@ public:
   /// only on proxies created by the GUI itself.
   virtual void setDefaults();
 
+  /// restore the default background color
+  int* defaultBackgroundColor();
+
   /// Change the interactive style used by this render module. One is
   /// encouraged to use this method to change the interactive style
   /// rather than simply changing it on the render window interactor.
