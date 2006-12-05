@@ -146,34 +146,6 @@ pqContourPanel::~pqContourPanel()
 void pqContourPanel::onAccepted()
 {
   this->Implementation->SampleScalarWidget.accept();
-  
-  // If this is the first time we've been accepted since our creation, hide the source
-  if(pqPipelineFilter* const pipeline_filter =
-    qobject_cast<pqPipelineFilter*>(this->proxy()))
-    {
-    if(0 == pipeline_filter->getDisplayCount())
-      {
-      for(int i = 0; i != pipeline_filter->getInputCount(); ++i)
-        {
-        if(pqPipelineSource* const pipeline_source = pipeline_filter->getInput(i))
-          {
-          for(int j = 0; j != pipeline_source->getDisplayCount(); ++j)
-            {
-            pqPipelineDisplay* const pipeline_display =
-              qobject_cast<pqPipelineDisplay*>(pipeline_source->getDisplay(j));
-            if (pipeline_display)
-              {
-
-              vtkSMDataObjectDisplayProxy* const display_proxy =
-                pipeline_display->getDisplayProxy();
-
-              display_proxy->SetVisibilityCM(false);
-              }
-            }
-          }
-        }
-      }
-    }
 }
 
 void pqContourPanel::onRejected()

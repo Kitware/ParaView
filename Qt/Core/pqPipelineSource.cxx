@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 
 // ParaView Server Manager.
+#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
@@ -335,4 +336,35 @@ void pqPipelineSource::renderAllViews(bool force /*=false*/)
       disp->renderAllViews(force);
       }
     }
+}
+//-----------------------------------------------------------------------------
+bool pqPipelineSource::replaceInput() const
+{
+  vtkSMProxy* proxy = this->getProxy();
+  if (!proxy)
+    {
+    return true;
+    }
+
+  vtkPVXMLElement* hints = proxy->GetHints();
+  if (!hints)
+    {
+    return true;
+    }
+  for (unsigned int cc=0; cc < hints->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* child = hints->GetNestedElement(cc);
+    if (!child || !child->GetName() || 
+      strcmp(child->GetName(), "Visibility") != 0)
+      {
+      continue;
+      }
+    int replace_input = 1;
+    if (!child->GetScalarAttribute("replace_input", &replace_input))
+      {
+      continue;
+      }
+    return (replace_input==1);
+    }
+  return true; // default value.
 }

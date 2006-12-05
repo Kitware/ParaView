@@ -99,6 +99,14 @@ public:
   /// Sets default values for the underlying proxy. This is typically called
   /// only on proxies created by the GUI itself.
   void setDefaultValues();
+
+
+  /// Returns if this proxy replaces input on creation.
+  /// This checks the "Hints" for the proxy, if any. If a <Visibility>
+  /// element is present with replace_input="0", then this method
+  /// returns false, otherwise true.
+  bool replaceInput() const;
+
 signals:
   /// fired when a connection is created between two pqPipelineSources.
   void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);

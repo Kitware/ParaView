@@ -119,7 +119,7 @@ void pqPendingDisplayManager::createPendingDisplays(pqGenericViewModule* view)
       }
     pb->createDisplay(source, view);
     pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
-    if (filter)
+    if (filter && filter->replaceInput())
       {
       // hide input source.
       QList<pqPipelineSource*> inputs = filter->getInputs();
