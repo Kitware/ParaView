@@ -55,6 +55,76 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 #include <QtDebug>
 
+/** Returns the name of an object as if it was unnamed.
+*/
+static const QString InternalGetNameAsUnnamed(QObject& Object)
+{
+  QString result;
+
+  QObjectList siblings;
+  if(Object.parent())
+    {
+    siblings = Object.parent()->children();
+    }
+  else
+    {
+    QWidgetList widgets = QApplication::topLevelWidgets();
+    for(int i = 0; i != widgets.size(); ++i)
+      {
+      siblings.push_back(widgets[i]);
+      }
+    }
+      
+  const QString type = Object.metaObject()->className();
+  
+  // order of top level widgets is not guarenteed
+  // we can someone counter that by checking visibility, 
+  // as we usually only test visible widgets, we would get the right one
+  int invisible_index = 0;
+  int visible_index = 0;
+  for(int i = 0; i != siblings.size(); ++i)
+    {
+    QObject* test = siblings[i];
+    if(test == &Object)
+      {
+      break;
+      }
+    else if(
+      type == test->metaObject()->className()
+      && test->objectName().isEmpty())
+      {
+      QWidget* widget = qobject_cast<QWidget*>(test);
+      if(widget && widget->isVisible())
+        {
+        ++visible_index;
+        }
+      else
+        {
+        ++invisible_index;
+        }
+      }
+    }
+    
+  int index = invisible_index;
+  if(QWidget* const widget = qobject_cast<QWidget*>(&Object))
+    {
+    if(widget->isVisible())
+      {
+      result += QString::number(1);
+      index = visible_index;
+      }
+    else
+      {
+      result += QString::number(0);
+      }
+    }
+  
+  result += type + QString::number(index);
+
+  result.replace("/", "|");
+  return result;
+}
+
 /** Returns the name of an object.  If the object doesn't have an explicit name,
 assigns a name as a convenience.  Also replaces problematic characters such as '/'.
 */
@@ -64,69 +134,13 @@ static const QString InternalGetName(QObject& Object)
 
   if(result.isEmpty())
     {
-    QObjectList siblings;
-    if(Object.parent())
-      {
-      siblings = Object.parent()->children();
-      }
-    else
-      {
-      QWidgetList widgets = QApplication::topLevelWidgets();
-      for(int i = 0; i != widgets.size(); ++i)
-        {
-        siblings.push_back(widgets[i]);
-        }
-      }
-      
-    const QString type = Object.metaObject()->className();
-    
-    // order of top level widgets is not guarenteed
-    // we can someone counter that by checking visibility, 
-    // as we usually only test visible widgets, we would get the right one
-    int invisible_index = 0;
-    int visible_index = 0;
-    for(int i = 0; i != siblings.size(); ++i)
-      {
-      QObject* test = siblings[i];
-      if(test == &Object)
-        {
-        break;
-        }
-      else if(
-        type == test->metaObject()->className()
-        && test->objectName().isEmpty())
-        {
-        QWidget* widget = qobject_cast<QWidget*>(test);
-        if(widget && widget->isVisible())
-          {
-          ++visible_index;
-          }
-        else
-          {
-          ++invisible_index;
-          }
-        }
-      }
-      
-    int index = invisible_index;
-    if(QWidget* const widget = qobject_cast<QWidget*>(&Object))
-      {
-      if(widget->isVisible())
-        {
-        result += QString::number(1);
-        index = visible_index;
-        }
-      else
-        {
-        result += QString::number(0);
-        }
-      }
-    result += type + QString::number(index);
+    result = InternalGetNameAsUnnamed(Object);
     }
 
   result.replace("/", "|");
   return result;
 }
+
 
 const QString pqObjectNaming::GetName(QObject& Object)
 {
@@ -172,8 +186,9 @@ QObject* pqObjectNaming::GetObject(const QString& Name)
     {
     QObject* object = top_level_widgets[i];
     const QString name = InternalGetName(*object);
+    const QString alt_name = InternalGetNameAsUnnamed(*object);
     
-    if(name == names[0])
+    if(name == names[0] || alt_name == names[0])
       {
       result = object;
       lastObject = object;
@@ -190,12 +205,23 @@ QObject* pqObjectNaming::GetObject(const QString& Name)
       {
       QObject* child = children[k];
       const QString name = InternalGetName(*child);
+      const QString alt_name = InternalGetNameAsUnnamed(*child);
       
-      if(name == names[j])
+      if(name == names[j] || alt_name == names[j])
         {
         result = child;
         lastObject = child;
         break;
+        }
+      }
+
+    // if there is a real name, also allow skipping generations
+    // in the hierarchy to find a child
+    if(result == 0)
+      {
+      if(!names[j].isEmpty() && names[j].at(0).isDigit())
+        {
+        result = result->findChild<QObject*>(names[j]);
         }
       }
     }
