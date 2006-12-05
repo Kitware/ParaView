@@ -74,6 +74,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   s->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   s->setWidgetResizable(true);
   s->setObjectName("ScrollArea");
+  s->setFrameShape(QFrame::NoFrame);
 
   this->PanelArea = new QWidget;
   this->PanelArea->setSizePolicy(QSizePolicy::MinimumExpanding,

@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>260</width>
-    <height>534</height>
+    <width>266</width>
+    <height>538</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -105,6 +105,14 @@
           <property name="enabled" >
            <bool>true</bool>
           </property>
+          <property name="sizePolicy" >
+           <sizepolicy>
+            <hsizetype>1</hsizetype>
+            <vsizetype>0</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="toolTip" >
            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Edit the constant color for the geometry.&lt;/p>&lt;/body>&lt;/html></string>
           </property>
@@ -119,6 +127,14 @@
        <widget class="pqDisplayColorWidget" name="ColorBy" >
         <property name="enabled" >
          <bool>true</bool>
+        </property>
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Select method for coloring dataset geometry.&lt;/p>&lt;/body>&lt;/html></string>
@@ -173,6 +189,19 @@
       <property name="spacing" >
        <number>6</number>
       </property>
+      <item row="2" column="1" >
+       <widget class="QDoubleSpinBox" name="StylePointSize" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="maximum" >
+         <double>100</double>
+        </property>
+        <property name="minimum" >
+         <double>1</double>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
@@ -195,13 +224,6 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="StyleInterpolation" >
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Choose the method used to shade the geometry and interpolate point attributes.&lt;/p>&lt;/body>&lt;/html></string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
@@ -209,13 +231,6 @@
         </property>
         <property name="alignment" >
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
-         <string>Point size</string>
         </property>
        </widget>
       </item>
@@ -239,26 +254,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="QDoubleSpinBox" name="StylePointSize" >
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p>&lt;/body>&lt;/html></string>
-        </property>
-        <property name="maximum" >
-         <double>100</double>
-        </property>
-        <property name="minimum" >
-         <double>1</double>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
-         <string>Opacity</string>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="1" >
        <widget class="QDoubleSpinBox" name="Opacity" >
         <property name="toolTip" >
@@ -269,6 +264,27 @@
         </property>
         <property name="singleStep" >
          <double>0.1</double>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>Opacity</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Point size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QComboBox" name="StyleInterpolation" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Choose the method used to shade the geometry and interpolate point attributes.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
        </widget>
       </item>
@@ -289,6 +305,14 @@
       </property>
       <item row="2" column="3" >
        <widget class="QDoubleSpinBox" name="OrientationZ" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Orient the geometry relative to the dataset origin.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -305,6 +329,14 @@
       </item>
       <item row="2" column="2" >
        <widget class="QDoubleSpinBox" name="OrientationY" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Orient the geometry relative to the dataset origin.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -342,6 +374,14 @@
       </item>
       <item row="3" column="3" >
        <widget class="QDoubleSpinBox" name="OriginZ" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Set the origin point about which rotations take place.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -358,6 +398,14 @@
       </item>
       <item row="0" column="1" >
        <widget class="QDoubleSpinBox" name="TranslateX" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Translate the geometry relative to the dataset location.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -381,6 +429,14 @@
       </item>
       <item row="1" column="3" >
        <widget class="QDoubleSpinBox" name="ScaleZ" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Scale the geometry relative to the size of the dataset.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -397,6 +453,14 @@
       </item>
       <item row="3" column="1" >
        <widget class="QDoubleSpinBox" name="OriginX" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Set the origin point about which rotations take place.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -413,6 +477,14 @@
       </item>
       <item row="0" column="3" >
        <widget class="QDoubleSpinBox" name="TranslateZ" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Translate the geometry relative to the dataset location.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -429,6 +501,14 @@
       </item>
       <item row="0" column="2" >
        <widget class="QDoubleSpinBox" name="TranslateY" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Translate the geometry relative to the dataset location.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -445,6 +525,14 @@
       </item>
       <item row="1" column="1" >
        <widget class="QDoubleSpinBox" name="ScaleX" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Scale the geometry relative to the size of the dataset.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -461,6 +549,14 @@
       </item>
       <item row="1" column="2" >
        <widget class="QDoubleSpinBox" name="ScaleY" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Scale the geometry relative to the size of the dataset.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -477,6 +573,14 @@
       </item>
       <item row="3" column="2" >
        <widget class="QDoubleSpinBox" name="OriginY" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Set the origin point about which rotations take place.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -493,6 +597,14 @@
       </item>
       <item row="2" column="1" >
        <widget class="QDoubleSpinBox" name="OrientationX" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Orient the geometry relative to the dataset origin.&lt;/p>&lt;/body>&lt;/html></string>
         </property>
@@ -525,16 +637,16 @@
    <pixmap></pixmap>
   </customwidget>
   <customwidget>
-   <class>pqDisplayColorWidget</class>
-   <extends>QWidget</extends>
-   <header>pqDisplayColorWidget.h</header>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
    <container>0</container>
    <pixmap></pixmap>
   </customwidget>
   <customwidget>
-   <class>pqColorChooserButton</class>
-   <extends>QPushButton</extends>
-   <header>pqColorChooserButton.h</header>
+   <class>pqDisplayColorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDisplayColorWidget.h</header>
    <container>0</container>
    <pixmap></pixmap>
   </customwidget>

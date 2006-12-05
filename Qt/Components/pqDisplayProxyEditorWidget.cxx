@@ -51,7 +51,8 @@ public:
 pqDisplayProxyEditorWidget::pqDisplayProxyEditorWidget(QWidget* p /*=0*/)
   : QWidget(p)
 {
-  new QVBoxLayout(this);
+  QVBoxLayout* l = new QVBoxLayout(this);
+  l->setMargin(0);
   this->Internal = new pqDisplayProxyEditorWidgetInternal;
 }
 
