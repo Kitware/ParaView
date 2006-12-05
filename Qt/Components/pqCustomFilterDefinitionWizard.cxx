@@ -297,7 +297,7 @@ void pqCustomFilterDefinitionWizard::addAutoIncludedProxies()
     {
     QString name = "auto_";
     name += proxy->GetSelfIDAsString();
-    this->Filter->AddProxy(name.toStdString().c_str(), proxy);
+    this->Filter->AddProxy(name.toAscii().data(), proxy);
     }
 }
 

@@ -116,7 +116,7 @@ QString pqSignalAdaptorDouble::value()
   bool convertible = false;
   double dValue = 
     QVariant(this->parent()->property(
-        this->PropertyName.toStdString().c_str())).toDouble(&convertible);
+        this->PropertyName.toAscii().data())).toDouble(&convertible);
   return convertible? QString::number(dValue, 'g', 3): "nan";
 }
 
@@ -126,7 +126,7 @@ void pqSignalAdaptorDouble::setValue(const QString &string)
   QVariant sValue(string);
   bool convertible = false;
   double dValue = sValue.toDouble(&convertible);
-  this->parent()->setProperty(this->PropertyName.toStdString().c_str(),
+  this->parent()->setProperty(this->PropertyName.toAscii().data(),
     (convertible)?QString::number(dValue, 'g', 3): "nan");
 }
 //-----------------------------------------------------------------------------

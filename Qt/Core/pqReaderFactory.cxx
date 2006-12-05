@@ -104,7 +104,7 @@ struct pqReaderInfo
            << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 0
            << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
-           << tmpID << "CanReadFile" << filename.toStdString().c_str()
+           << tmpID << "CanReadFile" << filename.toAscii().data()
            << vtkClientServerStream::End;
     pm->SendStream( cid, vtkProcessModule::DATA_SERVER_ROOT, stream);
     pm->GetLastResult(cid,
@@ -243,7 +243,7 @@ bool pqReaderFactory::checkIfFileIsReadable(const QString& filename,
 
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     proxy->GetProperty("ActiveFileName"));
-  svp->SetElement(0, filename.toStdString().c_str());
+  svp->SetElement(0, filename.toAscii().data());
   proxy->UpdateVTKObjects();
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(

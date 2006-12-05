@@ -94,7 +94,7 @@ vtkSMNew3DWidgetProxy* pq3DWidgetFactory::get3DWidget(const QString& name,
   // We register  the 3DWidget proxy under prototypes so that it
   // is never saved in state
   vtkSMNew3DWidgetProxy* proxy = vtkSMNew3DWidgetProxy::SafeDownCast(
-    builder->createProxy("displays", name.toStdString().c_str(), 
+    builder->createProxy("displays", name.toAscii().data(), 
       "3d_widgets_prototypes", server, false));
   if (!proxy)
     {

@@ -398,7 +398,7 @@ void pqRenderWindowManager::saveState(vtkPVXMLElement* root)
     pqMultiView::Index index = this->indexOf(frame);
     vtkPVXMLElement* frameElem = vtkPVXMLElement::New();
     frameElem->SetName("Frame");
-    frameElem->AddAttribute("index", index.getString().toStdString().c_str());
+    frameElem->AddAttribute("index", index.getString().toAscii().data());
 
     QVTKWidget* w = qobject_cast<QVTKWidget*>(frame->mainWidget());
     if (w)

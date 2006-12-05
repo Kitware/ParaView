@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkStringList.h"
 
-#include <vtksys/ios/sstream>
 
 // Qt includes.
 #include <QList>

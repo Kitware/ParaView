@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 
 // vtk includes
-#include <vtksys/ios/sstream>
 
 // Paraview Server Manager includes
 #include "vtkProcessModule.h"
@@ -244,17 +243,15 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
 
   if (this->UndoStack && is_undoable)
     {
-    vtksys_ios::ostringstream label;
-    label << "Create " << xmlname;
-    this->UndoStack->BeginUndoSet(QString(label.str().c_str()));
+    QString label = QString("Create %1").arg(xmlname);
+    this->UndoStack->BeginUndoSet(label);
     }
 
-  vtksys_ios::ostringstream name_stream;
-  name_stream << proxy->GetXMLName() <<
-    this->NameGenerator->GetCountAndIncrement(
-      proxy->GetXMLName());
+  QString name = QString("%1%2");
+  name = name.arg(proxy->GetXMLName());
+  name = name.arg(this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName()));
 
-  pxm->RegisterProxy(register_group, name_stream.str().c_str(), proxy);
+  pxm->RegisterProxy(register_group, name.toAscii().data(), proxy);
   proxy->Delete();
 
   if (this->UndoStack && is_undoable)
@@ -306,9 +303,9 @@ pqConsumerDisplay* pqPipelineBuilder::createDisplay(pqPipelineSource* src,
 
   if (this->UndoStack)
     {
-    vtksys_ios::ostringstream label;
-    label << "Display " << (proxy->GetXMLName()? proxy->GetXMLName() : "" );
-    this->UndoStack->BeginUndoSet(QString(label.str().c_str()));
+    QString label("Display %1");
+    label = label.arg(proxy->GetXMLName()?  proxy->GetXMLName() : "" );
+    this->UndoStack->BeginUndoSet(label);
     }
   pqConsumerDisplay* display = 
     this->createDisplayProxyInternal(proxy, renModule->getViewModuleProxy());
@@ -384,8 +381,8 @@ int pqPipelineBuilder::removeInternal(pqDisplay* display)
 
   // Unregister display.
   vtkSMProxyManager::GetProxyManager()->UnRegisterProxy(
-    display->getSMGroup().toStdString().c_str(), 
-    display->getSMName().toStdString().c_str(),
+    display->getSMGroup().toAscii().data(), 
+    display->getSMName().toAscii().data(),
     display->getProxy());
   return 1;
 }
@@ -452,8 +449,8 @@ void pqPipelineBuilder::remove(pqPipelineSource* source,
 
   // 3) Unregister proxy.
   vtkSMProxyManager::GetProxyManager()->UnRegisterProxy(
-    source->getSMGroup().toStdString().c_str(), 
-    source->getSMName().toStdString().c_str(),
+    source->getSMGroup().toAscii().data(), 
+    source->getSMName().toAscii().data(),
     source->getProxy());
 
   if (this->UndoStack && is_undoable)
@@ -496,10 +493,10 @@ pqPlotViewModule* pqPipelineBuilder::createPlotWindow(int type, pqServer* server
     }
   proxy->SetConnectionID(server->GetConnectionID());
   proxy->UpdateVTKObjects();
-  vtksys_ios::ostringstream name_stream;
-  name_stream << proxy->GetXMLName() 
-    << this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName());
-  pxm->RegisterProxy("plot_modules", name_stream.str().c_str(), proxy);
+  QString name("%1%2");
+  name = name.arg(proxy->GetXMLName());
+  name = name.arg(this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName()));
+  pxm->RegisterProxy("plot_modules", name.toAscii().data(), proxy);
   proxy->Delete();
 
   pqServerManagerModel* model = 
@@ -527,10 +524,10 @@ pqTableViewModule* pqPipelineBuilder::createTableView(pqServer* server)
   proxy->SetConnectionID(server->GetConnectionID());
   proxy->UpdateVTKObjects();
   
-  vtksys_ios::ostringstream name_stream;
-  name_stream << proxy->GetXMLName()
-    << this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName());
-  vtkSMProxyManager::GetProxyManager()->RegisterProxy("views", name_stream.str().c_str(), proxy);
+  QString name("%1%2");
+  name = name.arg(proxy->GetXMLName());
+  name = name.arg(this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName()));
+  vtkSMProxyManager::GetProxyManager()->RegisterProxy("views", name.toAscii().data(), proxy);
   proxy->Delete();
   
   return qobject_cast<pqTableViewModule*>(pqApplicationCore::instance()->getServerManagerModel()->getPQProxy(proxy));
@@ -608,7 +605,7 @@ void pqPipelineBuilder::removeWindow(pqRenderViewModule* rm)
     }
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->UnRegisterProxy("render_modules", name.toStdString().c_str(), rmProxy);
+  pxm->UnRegisterProxy("render_modules", name.toAscii().data(), rmProxy);
   // rm is invalid at this point.
  
   // Now clean up any orphan displays.
@@ -671,10 +668,10 @@ void pqPipelineBuilder::getSupportedProxies(const QString& xmlgroup,
   names.clear();
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   unsigned int numProxies = pxm->GetNumberOfXMLProxies(
-    xmlgroup.toStdString().c_str());
+    xmlgroup.toAscii().data());
   for (unsigned int cc=0; cc <numProxies; cc++)
     {
-    const char* name = pxm->GetXMLProxyName(xmlgroup.toStdString().c_str(),
+    const char* name = pxm->GetXMLProxyName(xmlgroup.toAscii().data(),
       cc);
     if (name)
       {

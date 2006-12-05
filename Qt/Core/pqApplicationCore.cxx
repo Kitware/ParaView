@@ -628,7 +628,7 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
   this->getUndoStack()->BeginUndoSet(QString("Create ") + xmlname);
 
   pqPipelineSource* filter = this->getPipelineBuilder()->createSource(
-    "filters", xmlname.toStdString().c_str(), 
+    "filters", xmlname.toAscii().data(), 
     input->getServer(), NULL);
 
   if(filter)
@@ -707,7 +707,7 @@ pqPipelineSource* pqApplicationCore::createSourceOnServer(const QString& xmlname
   this->getUndoStack()->BeginUndoSet(QString("Create ") + xmlname);
 
   pqPipelineSource* source = this->getPipelineBuilder()->createSource(
-    "sources", xmlname.toStdString().c_str(), 
+    "sources", xmlname.toAscii().data(), 
     server, NULL);
 
   emit this->sourceCreated(source);
@@ -725,7 +725,7 @@ pqPipelineSource* pqApplicationCore::createCompoundFilter(
   this->getUndoStack()->BeginUndoSet(QString("Create ") + name);
 
   pqPipelineSource* source = this->getPipelineBuilder()->createSource(
-    NULL, name.toStdString().c_str(), 
+    NULL, name.toAscii().data(), 
     server, NULL);
   
   vtkSMProperty* inputProperty = NULL;

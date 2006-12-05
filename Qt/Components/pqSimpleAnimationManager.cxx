@@ -374,7 +374,7 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
     cleaner->Delete();
 
     pqSMAdaptor::setElementProperty(cleaner->GetProperty("AnimationFileName"),
-      filename.toStdString().c_str());
+      filename.toAscii().data());
     pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 0,
       newSize.width());
     pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 1,
@@ -417,8 +417,8 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
   if (scene)
     {
     status = scene->SaveImages(
-      filePrefix.toStdString().c_str(),
-      extension.toStdString().c_str(), 
+      filePrefix.toAscii().data(),
+      extension.toAscii().data(), 
       newSize.width(),
       newSize.height(),
       dialogUI.spinBoxFrameRate->value(), 0);

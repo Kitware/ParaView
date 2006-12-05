@@ -155,7 +155,7 @@ void pqUndoStack::BeginUndoSet(QString label)
     {
     vtkIdType cid = this->Implementation->Server->GetConnectionID();
     this->Implementation->UndoStack->BeginOrContinueUndoSet(cid,
-      label.toStdString().c_str());
+      label.toAscii().data());
     }
 
   this->Implementation->NestedCount++;

@@ -165,7 +165,7 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
   // This will lead to the creation of pqScalarsToColors object
   // which this class will be intimated of (onAddLookupTable)
   // and our internal DS will be updated.
-  pxm->RegisterProxy("lookup_tables", name.toStdString().c_str(), lutProxy);
+  pxm->RegisterProxy("lookup_tables", name.toAscii().data(), lutProxy);
   lutProxy->Delete();
 
   // Setup default LUT to go from Blue to Red.

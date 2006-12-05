@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkSMCompoundProxy.h"
 #include "vtkSMSourceProxy.h"
-#include <vtksys/ios/sstream>
 
 // Qt includes.
 #include <QIcon>
@@ -114,28 +113,12 @@ struct pqSourceInfo
     {
     if (this->DataInformationValid)
       {
-      vtksys_ios::ostringstream stream;
-      for (int i=0; i<6; i++)
+      QString bounds("[ %1, %2 ] , [ %3, %4 ] , [ %5, %6 ]");
+      for(int i=0; i<6; i++)
         {
-        if (i %2 == 0)
-          {
-          stream << "[ ";
-          }
-        stream << setprecision(3) << this->Bounds[i];
-        if (i%2 == 0)
-          {
-          stream << ", ";
-          }
-        else
-          {
-          stream << " ]";
-          if (i != 5)
-            {
-            stream << " , ";
-            }
-          }
+        bounds = bounds.arg(this->Bounds[i], 0, 'g', 3);
         }
-      return QVariant(stream.str().c_str());
+      return QVariant(bounds);
       }
     return QVariant("Unavailable");
     }

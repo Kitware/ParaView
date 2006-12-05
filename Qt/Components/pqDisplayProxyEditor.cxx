@@ -417,7 +417,7 @@ void pqDisplayProxyEditor::updateEnableState()
       attrInfo = geomInfo->GetCellDataInformation();
       }
     vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(
-      this->Internal->Display->getColorField(true).toStdString().c_str());
+      this->Internal->Display->getColorField(true).toAscii().data());
 
     if (arrayInfo && arrayInfo->GetDataType() == VTK_UNSIGNED_CHAR)
       {

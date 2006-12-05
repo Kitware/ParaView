@@ -407,12 +407,12 @@ bool pqRenderViewModule::saveImage(int width, int height, const QString& filenam
   else
     {
     qCritical() << "Failed to determine file type for file:" 
-      << filename.toStdString().c_str();
+      << filename.toAscii().data();
     return false;
     }
 
   int ret = this->Internal->RenderModuleProxy->WriteImage(
-    filename.toStdString().c_str(), writername);
+    filename.toAscii().data(), writername);
   if (width>0 && height>0)
     {
     this->Internal->Viewport->resize(width, height);

@@ -1108,7 +1108,7 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
     }
 
   vtkSMStringVectorProperty::SafeDownCast(writer->GetProperty("FileName"))
-    ->SetElement(0, files[0].toStdString().c_str());
+    ->SetElement(0, files[0].toAscii().data());
 
   // TODO: We can popup a wizard or something for setting the properties
   // on the writer.
@@ -1847,7 +1847,7 @@ void pqMainWindowCore::updateFiltersMenu(pqPipelineSource* source)
       continue;
       }
     vtkSMProxy* output = pxm->GetProxy("filters_prototypes",
-      filterName.toStdString().c_str());
+      filterName.toAscii().data());
     if (!output)
       {
       action->setEnabled(false);
