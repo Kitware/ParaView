@@ -98,7 +98,9 @@ Integrates point and cell data over lines and surfaces.  It also computes length
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
       </InputProperty>
-
+   <Hints>
+     <Visibility replace_input="0" />
+   </Hints>
    <!-- End IntegrateAttributes -->
    </SourceProxy>
 
@@ -591,6 +593,9 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
          </RequiredProperties>
        </ExtentDomain>
      </IntVectorProperty>
+    <Hints>
+      <Visibility replace_input="0" />
+    </Hints>
    <!-- End ImageClip -->
    </SourceProxy>
 
@@ -1094,6 +1099,9 @@ This filter operates on polygonal data and produces polygonal output.
         default_values="30.0" >
        <DoubleRangeDomain name="range" min="0" max="180" />
      </DoubleVectorProperty>
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
    <!-- End FeatureEdges -->
    </SourceProxy>
 
@@ -1629,6 +1637,9 @@ The Outline filter generates an axis-aligned bounding box for the input data set
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+      </Hints>
    <!-- End  OutlineFilter -->
    </SourceProxy>
 
@@ -1657,6 +1668,9 @@ The Outline Corners filter generates the corners of a bounding box for the input
         default_values="0.2" >
        <DoubleRangeDomain name="range" min="0.001" max="0.5" />
      </DoubleVectorProperty>
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
    <!-- End  OutlineCornerFilter -->
    </SourceProxy>
 
@@ -2616,6 +2630,9 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
             </RequiredProperties>
           </BoundsDomain>
      </DoubleVectorProperty>
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
    <!-- End Cut -->
    </SourceProxy>
 
@@ -2841,6 +2858,9 @@ The Contour filter operates on any type of data set, but the input is required t
         animateable="0"> 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
    <!-- End Contour -->
    </SourceProxy>
 
@@ -2985,6 +3005,14 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
         default_values="1" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
+   <Hints>
+     <!-- Visibility Element can be used to suggest the GUI about
+          visibility of this filter (or its input) on creation.
+          replace_input="0" implies that the input visibility is not
+            changed on creation of this filter (defaults to "1")
+       -->
+     <Visibility replace_input="0" />
+   </Hints>
    <!-- End Glyph -->
    </SourceProxy>
 
@@ -3052,6 +3080,9 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
         default_values="0" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
    <!-- End ExtractGrid -->
    </SourceProxy>
 
@@ -3461,6 +3492,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         default_values="0.000000000001" >
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
    <!-- End StreamTracer -->
    </SourceProxy>
 
@@ -3669,7 +3703,9 @@ The Contour filter operates on any type of data set, but the input is required t
         animateable="0"> 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
-
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
    <!-- End GenericContour -->
    </SourceProxy>
 
@@ -3727,6 +3763,9 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
             </RequiredProperties>
           </BoundsDomain>
      </DoubleVectorProperty>
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
    <!-- End GenericCut -->
    </SourceProxy>
 
@@ -3769,6 +3808,9 @@ The Outline filter generates an axis-aligned bounding box for the input data set
              <DataType value="vtkGenericDataSet"/>
            </DataTypeDomain>
       </InputProperty>
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
    <!-- End  GenericOutlineFilter -->
    </SourceProxy>
 
@@ -3964,6 +4006,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         default_values="0.000000000001" >
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
    <!-- End GenericStreamTracer -->
    </SourceProxy>
 
@@ -4007,7 +4052,10 @@ Groups multiple datasets to create a multigroup dataset
              <DataType value="vtkDataObject"/>
            </DataTypeDomain>
      </InputProperty>
-   <!-- End BlockScalars -->
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
+   <!-- End GroupDataSets -->
    </SourceProxy>
 
    <SourceProxy name="GroupIdScalars" class="vtkMultiGroupDataGroupIdScalars">
@@ -4027,7 +4075,7 @@ This filter uses colors to show levels of a hiearchical dataset.
              <DataType value="vtkMultiGroupDataSet"/>
            </DataTypeDomain>
      </InputProperty>
-   <!-- End LevelScalars -->
+   <!-- End GroupIdScalars -->
    </SourceProxy>
 
     <SourceProxy name="GeometryFilter" class="vtkPVGeometryFilter">
@@ -4064,6 +4112,7 @@ This filter uses colors to show levels of a hiearchical dataset.
         animateable="0">
         <BooleanDomain name="bool"/> 
       </IntVectorProperty>
+    <!-- End GeometryFilter -->
     </SourceProxy>
 
     <SourceProxy name="OrderedCompositeDistributor"
@@ -4090,6 +4139,7 @@ This filter uses colors to show levels of a hiearchical dataset.
                             command="SetOutputType"
                             number_of_elements="1">
       </StringVectorProperty>
+    <!-- End OrderedCompositeDistributor -->
     </SourceProxy>
 
     <UpdateSuppressorProxy name="UpdateSuppressor" class="vtkPVUpdateSuppressor"
@@ -4128,6 +4178,7 @@ This filter uses colors to show levels of a hiearchical dataset.
         default_values="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+    <!-- End UpdateSuppressor -->
     </UpdateSuppressorProxy>
     
     <SourceProxy name="MPIMoveData" class="vtkMPIMoveData">
@@ -4163,6 +4214,7 @@ This filter uses colors to show levels of a hiearchical dataset.
           <Entry value="4" text="Unstructured Grid" />
         </EnumerationDomain>
       </IntVectorProperty>
+    <!-- End MPIMoveData -->
     </SourceProxy>
 
     <SourceProxy name="ClientServerMoveData" class="vtkClientServerMoveData">
@@ -4173,6 +4225,7 @@ This filter uses colors to show levels of a hiearchical dataset.
             <Group name="filters"/>
           </ProxyGroupDomain>
       </InputProperty>
+    <!-- End ClientServerMoveData -->
     </SourceProxy>
         
     <SourceProxy name="ReductionFilter" class="vtkReductionFilter">
@@ -4186,6 +4239,7 @@ This filter uses colors to show levels of a hiearchical dataset.
       <ProxyProperty name="ReductionHelper"
          command="SetReductionHelper">
       </ProxyProperty>
+    <!-- End ReductionFilter -->
     </SourceProxy>
 
    <SourceProxy name="ExtractLevel" class="vtkMultiGroupDataExtractGroup">
@@ -4258,6 +4312,7 @@ This filter extracts a list of datasets from multigroup datasets.
           <Property name="ShrinkFactor" />
         </ExposedProperties>
       </SubProxy>
+   <!-- End ShrunkContours -->
    </ShrunkContoursProxy>
 
    
@@ -4375,7 +4430,7 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
        </EnumerationDomain>
      </IntVectorProperty>
      
-   <!-- End AreaSelect -->
+   <!-- End CellSelect -->
    </SourceProxy>
 
    <SourceProxy name="TestCut" class="vtkCutter">
@@ -4411,7 +4466,10 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
        </BoundsDomain>
      </DoubleVectorProperty>
 
-   <!-- End Cut -->
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
+   <!-- End TestCut -->
    </SourceProxy>
 
    <SourceProxy name="ExtractHistogram" class="vtkExtractHistogram">
@@ -4487,6 +4545,7 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
          
    <!-- End RectilinearGridGeometryFilter -->
    </SourceProxy>
+
    <SourceProxy name="AttributeEditor" class="vtkAttributeEditor">
      <Documentation
           long_help="Select with a point or box widget the region to edit.  This output data type of this filter is always an unstructured grid."
@@ -4582,6 +4641,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
         default_values="0" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
+   <!-- End AttributeEditor -->
    </SourceProxy>
 
    <SourceProxy name="CellSelect2" class="vtkCellSelect">
@@ -4590,17 +4650,22 @@ This filter operates on all types of data sets, and it returns unstructured grid
         short_help="testing">
         Testing.
      </Documentation>
-    <InputProperty
-       name="Input"
-       command="SetInputConnection">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources"/>
-            <Group name="filters"/>
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkPolyData"/>
-          </DataTypeDomain>
-     </InputProperty>
+
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
+      </InputProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+      </Hints>
+   <!-- End CellSelect2 -->
    </SourceProxy>
 
    <SourceProxy name="TextureMapToPlane" class="vtkTextureMapToPlane">
@@ -4615,6 +4680,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
      </InputProperty>
+   <!-- End TextureMapToPlane -->
    </SourceProxy>
 
    <SourceProxy name="TextureMapToSphere" class="vtkTextureMapToSphere">
@@ -4629,6 +4695,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
      </InputProperty>
+   <!-- End TextureMapToSphere -->
    </SourceProxy>
 
    <SourceProxy name="TextureMapToCylinder" class="vtkTextureMapToCylinder">
@@ -4643,6 +4710,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
      </InputProperty>
+   <!-- End TextureMapToCylinder -->
    </SourceProxy>
 
    <SourceProxy name="PolyLineToRectilinearGrid" class="vtkPolyLineToRectilinearGridFilter">
