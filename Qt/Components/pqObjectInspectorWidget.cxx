@@ -87,15 +87,20 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   QBoxLayout* buttonlayout = new QHBoxLayout();
   this->AcceptButton = new QPushButton(this);
   this->AcceptButton->setObjectName("Accept");
-  this->AcceptButton->setText(tr("Accept"));
+  this->AcceptButton->setText(tr("Apply"));
   this->AcceptButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqUpdate16.png")));
   this->ResetButton = new QPushButton(this);
   this->ResetButton->setObjectName("Reset");
   this->ResetButton->setText(tr("Reset"));
   this->ResetButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqCancel16.png")));
+  this->DeleteButton = new QPushButton(this);
+  this->DeleteButton->setObjectName("Delete");
+  this->DeleteButton->setText(tr("Delete"));
+  this->DeleteButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqCancel16.png")));
   buttonlayout->addStretch();
   buttonlayout->addWidget(this->AcceptButton);
   buttonlayout->addWidget(this->ResetButton);
+  buttonlayout->addWidget(this->DeleteButton);
   buttonlayout->addStretch();
   
   mainLayout->addLayout(buttonlayout);
@@ -103,9 +108,11 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 
   this->connect(this->AcceptButton, SIGNAL(clicked()), SLOT(accept()));
   this->connect(this->ResetButton, SIGNAL(clicked()), SLOT(reset()));
+  this->connect(this->DeleteButton, SIGNAL(clicked()), SLOT(deleteProxy()));
 
   this->AcceptButton->setEnabled(false);
   this->ResetButton->setEnabled(false);
+  this->DeleteButton->setEnabled(false);
 
 
   this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
@@ -187,7 +194,10 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   bool reusedPanel = false;
 
   if(!proxy)
+    {
+    this->DeleteButton->setEnabled(false);
     return;
+    }
 
   // search for a custom form for this proxy with pending changes
   QMap<pqProxy*, pqObjectPanel*>::iterator iter;
@@ -240,6 +250,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   this->CurrentPanel->setRenderModule(this->getRenderModule());
   this->CurrentPanel->select();
   this->CurrentPanel->show();
+  this->DeleteButton->setEnabled(true);
 
   this->PanelStore[proxy] = this->CurrentPanel;
 }
@@ -333,6 +344,16 @@ void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
     {
     delete iter.value();
     this->PanelStore.erase(iter);
+    }
+}
+
+void pqObjectInspectorWidget::deleteProxy()
+{
+  if(this->CurrentPanel && this->CurrentPanel->proxy())
+    {
+    pqPipelineSource* source =
+      qobject_cast<pqPipelineSource*>(this->CurrentPanel->proxy());
+    pqApplicationCore::instance()->removeSource(source);
     }
 }
 

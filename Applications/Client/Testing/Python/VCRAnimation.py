@@ -9,7 +9,7 @@ object2 = 'MainWindow/ServerStartupBrowser/connect'
 QtTesting.playCommand(object2, 'activate', '')
 object3 = 'MainWindow/FileOpenDialog'
 QtTesting.playCommand(object3, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/dualSphereAnimation.pvd')
-object4 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept'
+object4 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept'
 QtTesting.playCommand(object4, 'activate', '')
 object5 = 'MainWindow/VCRToolbar/1QToolButton2'
 QtTesting.playCommand(object5, 'activate', '')

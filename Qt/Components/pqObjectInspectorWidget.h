@@ -115,6 +115,7 @@ protected slots:
 
   void removeProxy(pqPipelineSource* proxy);
 
+  void deleteProxy();
   
 private:
 
@@ -128,6 +129,7 @@ private:
   QWidget* PanelArea;
   QPushButton* AcceptButton;
   QPushButton* ResetButton;
+  QPushButton* DeleteButton;
   QPointer<pqRenderViewModule> RenderModule;
   
   pqObjectPanel* CurrentPanel;

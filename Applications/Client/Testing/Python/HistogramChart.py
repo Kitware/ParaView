@@ -14,10 +14,10 @@ QtTesting.playCommand(object4, 'currentChanged', '/0/0/0|0')
 object5 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0'
 QtTesting.playCommand(object5, 'set_tab', '1')
 QtTesting.playCommand(object5, 'set_tab', '0')
-object6 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BinCount'
+object6 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BinCount'
 QtTesting.playCommand(object6, 'set_string', '1')
 QtTesting.playCommand(object6, 'set_string', '16')
-object7 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/objectInspector/Accept'
+object7 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept'
 QtTesting.playCommand(object7, 'activate', '')
 
 object8 = 'MainWindow/HistogramViewModule1/1pqHistogramWidget0'

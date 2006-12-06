@@ -40,13 +40,12 @@ class vtkObject;
 class QWidget;
 
 #include "pqCoreExport.h"
-#include <QObject>
 #include <QVariant>
 #include <QList>
 #include "pqSMProxy.h"
 
 /// Translates server manager events into Qt-compatible slots and signals
-class PQCORE_EXPORT pqSMAdaptor : public QObject
+class PQCORE_EXPORT pqSMAdaptor
 {
 protected: 
   // class not instantiated
