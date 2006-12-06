@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.73");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.74");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -324,16 +324,19 @@ void vtkKWMultiColumnList::DeleteAllColumns()
   if (this->IsCreated())
     {
     int nb_columns = this->GetNumberOfColumns();
-    int old_state = this->GetState();
-    if (this->GetState() != vtkKWOptions::StateNormal)
+    if (nb_columns)
       {
-      this->SetStateToNormal();
-      }
-    this->Script("%s deletecolumns 0 end", this->GetWidgetName());
-    this->SetState(old_state);
-    if (this->GetNumberOfColumns() != nb_columns)
-      {
-      this->NumberOfColumnsChanged();
+      int old_state = this->GetState();
+      if (this->GetState() != vtkKWOptions::StateNormal)
+        {
+        this->SetStateToNormal();
+        }
+      this->Script("%s deletecolumns 0 end", this->GetWidgetName());
+      this->SetState(old_state);
+      if (this->GetNumberOfColumns() != nb_columns)
+        {
+        this->NumberOfColumnsChanged();
+        }
       }
     }
 }

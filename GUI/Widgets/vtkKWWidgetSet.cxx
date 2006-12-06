@@ -22,7 +22,7 @@
 #include <vtksys/stl/vector>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.20");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.21");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetSetInternals
@@ -270,11 +270,18 @@ void vtkKWWidgetSet::Pack()
   vtksys_stl::vector<int> row_used;
   row_used.assign(nb_widgets, 0);
 
-  int col = 0;
+  int col = -1;
   int row = 0;
 
   for (; it != end; ++it)
     {
+    col++;
+    if (this->MaximumNumberOfWidgetsInPackingDirection &&
+        col >= this->MaximumNumberOfWidgetsInPackingDirection)
+      {
+      col = 0;
+      row++;
+      }
     if (it->Visibility)
       {
       tk_cmd 
@@ -298,22 +305,15 @@ void vtkKWWidgetSet::Pack()
         row_used[col] = 1;
         }
       }
-    col++;
-    if (this->MaximumNumberOfWidgetsInPackingDirection &&
-        col >= this->MaximumNumberOfWidgetsInPackingDirection)
-      {
-      col = 0;
-      row++;
-      }
     }
 
   // Weights
   
   int max_col = 
-    (row > 0) ? this->MaximumNumberOfWidgetsInPackingDirection : col;
+    (row > 0) ? this->MaximumNumberOfWidgetsInPackingDirection - 1 : col;
 
-  int nb_cols = this->PackHorizontally ? max_col : row;
-  int nb_rows = this->PackHorizontally ? row + 1 : max_col;
+  int nb_cols = this->PackHorizontally ? max_col + 1 : row + 1;
+  int nb_rows = this->PackHorizontally ? row + 1 : max_col + 1;
 
   int i;
   if (nb_widgets)
@@ -328,7 +328,7 @@ void vtkKWWidgetSet::Pack()
       }
     }
   for (i = nb_cols; i < old_nb_cols; i++)
-    {
+    { 
     tk_cmd << "grid columnconfigure " << this->GetWidgetName() << " " << i
            << " -weight 0 -uniform {}" << endl;
     }
