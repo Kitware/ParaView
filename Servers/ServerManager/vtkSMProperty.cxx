@@ -33,14 +33,14 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.47");
+vtkCxxRevisionMacro(vtkSMProperty, "1.48");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkSMProperty, ControllerProxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, Documentation, vtkSMDocumentation);
-int vtkSMProperty::CheckDomains = 1;
+int vtkSMProperty::CheckDomains = 0;
 
 //---------------------------------------------------------------------------
 vtkSMProperty::vtkSMProperty()
