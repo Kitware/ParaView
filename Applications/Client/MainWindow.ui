@@ -512,12 +512,12 @@
   </action>
   <action name="actionFileLoadServerState" >
    <property name="text" >
-    <string>&amp;Load Server State</string>
+    <string>&amp;Load State</string>
    </property>
   </action>
   <action name="actionFileSaveServerState" >
    <property name="text" >
-    <string>&amp;Save Server State</string>
+    <string>&amp;Save State</string>
    </property>
   </action>
   <action name="actionHelpEnableTooltips" >
