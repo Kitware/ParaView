@@ -98,9 +98,6 @@ public:
   /// get whether UpdateVTKObjects is called automatically when needed
   bool autoUpdateVTKObjects();
 
-  /// TODO: domain change events
-  /// TODO: do domain changes possibly affect our links?
-
 protected:
   
   class pqInternal;
