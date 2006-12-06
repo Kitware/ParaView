@@ -177,6 +177,7 @@ SET(KWWidgets_SRCS
   vtkKWLogWidget.cxx
   vtkKWLogDialog.cxx
   vtkKWMaterialPropertyWidget.cxx
+  vtkKWMatrixWidget.cxx
   vtkKWMenu.cxx
   vtkKWMenuButton.cxx
   vtkKWMessage.cxx
@@ -391,9 +392,11 @@ SET(list
   vtkKWEntry
   vtkKWLabel
   vtkKWLoadSaveButton
+  vtkKWMatrixWidget
   vtkKWMenuButton
   vtkKWMenuButtonWithSpinButtons
   vtkKWMessage
+  vtkKWMultiColumnList
   vtkKWPopupButton
   vtkKWPushButton
   vtkKWPushButtonSet
