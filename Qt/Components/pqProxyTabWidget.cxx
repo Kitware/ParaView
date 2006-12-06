@@ -57,10 +57,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   : QTabWidget(p)
 {
-  this->Inspector = new pqObjectInspectorWidget();
-  this->addTab(this->Inspector, tr("Properties"));
-
+  // TODO: get rid of this first scroll area.  We don't need it.
   QScrollArea* scr = new QScrollArea;
+  scr->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  scr->setWidgetResizable(true);
+  scr->setFrameShape(QFrame::NoFrame);
+  this->Inspector = new pqObjectInspectorWidget();
+  scr->setWidget(this->Inspector);
+  this->addTab(scr, tr("Properties"));
+
+  scr = new QScrollArea;
   scr->setWidgetResizable(true);
   scr->setFrameShape(QFrame::NoFrame);
   this->Display = new pqDisplayProxyEditorWidget();
