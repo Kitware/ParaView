@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.25");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveButton::vtkKWLoadSaveButton()
@@ -76,16 +76,14 @@ void vtkKWLoadSaveButton::CreateWidget()
 
   this->LoadSaveDialog->SetParent(this);
   this->LoadSaveDialog->Create();
+
+  this->AddCallbackCommandObservers();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWLoadSaveButton::InvokeCommand()
 {
-  if (this->LoadSaveDialog->IsCreated() && this->LoadSaveDialog->Invoke())
-    {
-    this->UpdateFileName();
-    }
-
+  this->LoadSaveDialog->Invoke();
 
   this->Superclass::InvokeCommand();
 }
@@ -111,7 +109,7 @@ void vtkKWLoadSaveButton::SetMaximumFileNameLength(int arg)
   this->MaximumFileNameLength = arg;
   this->Modified();
 
-  this->UpdateFileName();
+  this->UpdateTextFromFileName();
 } 
 
 //----------------------------------------------------------------------------
@@ -125,11 +123,11 @@ void vtkKWLoadSaveButton::SetTrimPathFromFileName(int arg)
   this->TrimPathFromFileName = arg;
   this->Modified();
 
-  this->UpdateFileName();
+  this->UpdateTextFromFileName();
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWLoadSaveButton::UpdateFileName()
+void vtkKWLoadSaveButton::UpdateTextFromFileName()
 {
   const char *fname = this->GetFileName();
   if (!fname || !*fname)
@@ -165,6 +163,48 @@ void vtkKWLoadSaveButton::UpdateEnableState()
   this->Superclass::UpdateEnableState();
 
   this->PropagateEnableState(this->LoadSaveDialog);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLoadSaveButton::AddCallbackCommandObservers()
+{
+  this->Superclass::AddCallbackCommandObservers();
+
+  if (this->LoadSaveDialog)
+    {
+    this->AddCallbackCommandObserver(
+      this->LoadSaveDialog, vtkKWLoadSaveDialog::FileNameChangedEvent);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLoadSaveButton::RemoveCallbackCommandObservers()
+{
+  this->Superclass::RemoveCallbackCommandObservers();
+
+  if (this->LoadSaveDialog)
+    {
+    this->RemoveCallbackCommandObserver(
+      this->LoadSaveDialog, vtkKWLoadSaveDialog::FileNameChangedEvent);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLoadSaveButton::ProcessCallbackCommandEvents(vtkObject *caller,
+                                                       unsigned long event,
+                                                       void *calldata)
+{
+  if (caller == this->LoadSaveDialog)
+    {
+    switch (event)
+      {
+      case vtkKWLoadSaveDialog::FileNameChangedEvent:
+        this->UpdateTextFromFileName();
+        break;
+      }
+    }
+
+  this->Superclass::ProcessCallbackCommandEvents(caller, event, calldata);
 }
 
 //----------------------------------------------------------------------------

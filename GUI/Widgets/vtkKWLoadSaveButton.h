@@ -63,6 +63,14 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Add all the default observers needed by that object, or remove
+  // all the observers that were added through AddCallbackCommandObserver.
+  // Subclasses can override these methods to add/remove their own default
+  // observers, but should call the superclass too.
+  virtual void AddCallbackCommandObservers();
+  virtual void RemoveCallbackCommandObservers();
+
 protected:
   vtkKWLoadSaveButton();
   ~vtkKWLoadSaveButton();
@@ -75,10 +83,17 @@ protected:
 
   int TrimPathFromFileName;
   int MaximumFileNameLength;
-  virtual void UpdateFileName();
+  virtual void UpdateTextFromFileName();
 
   virtual void InvokeCommand();
 
+  // Description:
+  // Processes the events that are passed through CallbackCommand (or others).
+  // Subclasses can oberride this method to process their own events, but
+  // should call the superclass too.
+  virtual void ProcessCallbackCommandEvents(
+    vtkObject *caller, unsigned long event, void *calldata);
+  
 private:
   vtkKWLoadSaveButton(const vtkKWLoadSaveButton&); // Not implemented
   void operator=(const vtkKWLoadSaveButton&); // Not implemented
