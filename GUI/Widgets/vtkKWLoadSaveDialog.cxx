@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.56");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.57");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -40,6 +40,8 @@ vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 
   this->SetTitle("Open Text Document");
   this->SetFileTypes("{{Text Document} {.txt}}");
+
+  this->FileNameChangedCommand      = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -47,13 +49,25 @@ vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
 {
   this->SetFileTypes(NULL);
   this->SetInitialFileName(NULL);
-  this->SetFileName(NULL);
   this->SetDefaultExtension(NULL);
   this->SetLastPath(NULL);
+
+  if (this->FileName)
+    {
+    delete [] this->FileName;
+    this->FileName = NULL;
+    }
+
   if (this->FileNames)
     {
     this->FileNames->Delete();
     this->FileNames = 0;
+    }
+
+  if (this->FileNameChangedCommand)
+    {
+    delete [] this->FileNameChangedCommand;
+    this->FileNameChangedCommand = NULL;
     }
 }
 
@@ -265,6 +279,60 @@ void vtkKWLoadSaveDialog::RetrieveLastPathFromRegistry(const char* key)
       }  
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkKWLoadSaveDialog::SetFileNameChangedCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->FileNameChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLoadSaveDialog::InvokeFileNameChangedCommand(const char *filename)
+{
+  if (this->GetApplication() &&
+      this->FileNameChangedCommand && *this->FileNameChangedCommand)
+    {
+    this->Script("%s {%s}", 
+                 this->FileNameChangedCommand, filename ? filename : "");
+    }
+
+  this->InvokeEvent(
+    vtkKWLoadSaveDialog::FileNameChangedEvent, (void*)filename);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLoadSaveDialog::SetFileName(const char *arg)
+{
+  if (this->FileName == NULL && arg == NULL) 
+    { 
+    return;
+    }
+
+  if (this->FileName && arg && (!strcmp(this->FileName, arg))) 
+    { 
+    return;
+    }
+
+  if (this->FileName) 
+    { 
+    delete [] this->FileName; 
+    }
+
+  if (arg)
+    {
+    this->FileName = new char[strlen(arg)+1];
+    strcpy(this->FileName,arg);
+    }
+   else
+    {
+    this->FileName = NULL;
+    }
+
+  this->Modified();
+
+  this->InvokeFileNameChangedCommand(this->FileName);
+} 
 
 //----------------------------------------------------------------------------
 void vtkKWLoadSaveDialog::PrintSelf(ostream& os, vtkIndent indent)

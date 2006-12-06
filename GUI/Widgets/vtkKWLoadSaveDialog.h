@@ -52,7 +52,7 @@ public:
   // Description:
   // Set/Get the file path that the user selected
   vtkGetStringMacro(FileName);
-  vtkSetStringMacro(FileName);
+  virtual void SetFileName(const char*);
 
   // Description:
   // Set/Get default extension.
@@ -115,6 +115,30 @@ public:
   virtual void SaveLastPathToRegistry(const char *key);
   virtual void RetrieveLastPathFromRegistry(const char *key);
 
+  // Description:
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the FileName variable is changed.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - current filename: const char* (warning: NULL is passed as empty string)
+  virtual void SetFileNameChangedCommand(
+    vtkObject *object, const char *method);
+
+  // Description:
+  // Events. The FileNameChangedEvent is triggered when the FileName variable
+  // is changed.
+  // The following parameters are also passed as client data:
+  // - current filename: const char*
+  //BTX
+  enum
+  {
+    FileNameChangedEvent = 15000
+  };
+  //ETX
+
 protected:
   vtkKWLoadSaveDialog();
   ~vtkKWLoadSaveDialog();
@@ -132,6 +156,9 @@ protected:
   int ChooseDirectory;
   int MultipleSelection;
   vtkStringArray *FileNames;
+
+  char *FileNameChangedCommand;
+  virtual void InvokeFileNameChangedCommand(const char*);
 
 private:
   vtkKWLoadSaveDialog(const vtkKWLoadSaveDialog&); // Not implemented
