@@ -50,7 +50,9 @@ public:
   vtkGetStringMacro(FileTypes);
 
   // Description:
-  // Set/Get the file path that the user selected
+  // Set/Get the file path that the user selected. Note that if the dialog
+  // was cancelled, the FileName is set to NULL, reflecting that the user
+  // did not select anything (i.e., the previous selection is *not* kept).
   vtkGetStringMacro(FileName);
   virtual void SetFileName(const char*);
 

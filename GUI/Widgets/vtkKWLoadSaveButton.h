@@ -15,7 +15,9 @@
 // .SECTION Description
 // The vtkKWLoadSaveButton class creates a push button that
 // will popup a vtkKWLoadSaveDialog and display the chosen filename as
-// the button label.
+// the button label. Note that if the dialog is cancelled, the button
+// will not be reset to an empty string, therefore reflecting the
+// previously selected file, if any (which is the more logical behavior).
 // .SECTION See Also
 // vtkKWLoadSaveButtonWithLabel
 
@@ -38,7 +40,8 @@ public:
   vtkGetObjectMacro(LoadSaveDialog, vtkKWLoadSaveDialog);
 
   // Description:
-  // Retrieve the filename.
+  // Retrieve the filename. This method only query the GetFileName method
+  // on the LoadSaveDialog member.
   virtual char* GetFileName();
 
   // Description:

@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.26");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveButton::vtkKWLoadSaveButton()
@@ -30,6 +30,8 @@ vtkKWLoadSaveButton::vtkKWLoadSaveButton()
 
   this->MaximumFileNameLength = 30;
   this->TrimPathFromFileName  = 1;
+
+  this->AddCallbackCommandObservers();
 }
 
 //----------------------------------------------------------------------------
@@ -76,8 +78,6 @@ void vtkKWLoadSaveButton::CreateWidget()
 
   this->LoadSaveDialog->SetParent(this);
   this->LoadSaveDialog->Create();
-
-  this->AddCallbackCommandObservers();
 }
 
 //----------------------------------------------------------------------------
@@ -132,7 +132,6 @@ void vtkKWLoadSaveButton::UpdateTextFromFileName()
   const char *fname = this->GetFileName();
   if (!fname || !*fname)
     {
-    this->SetText(NULL);
     return;
     }
 
