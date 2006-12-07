@@ -109,10 +109,6 @@ public:
 
   void loadValues(pqGenericViewModule* proxy);
   void accept();
-  // saves the user selections into pqSettings,
-  // so that new render windows created will use the
-  // user selected properties as default.
-  void writeSettings();
 };
 
 //-----------------------------------------------------------------------------
@@ -339,37 +335,10 @@ void pq3DViewPropertiesWidgetInternal::accept()
       }
     }
   renModule->UpdateVTKObjects();
-  this->writeSettings();
-}
-
-//-----------------------------------------------------------------------------
-void pq3DViewPropertiesWidgetInternal::writeSettings()
-{
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-
-  settings->setValue("renderModule/Background",
-    pqSMAdaptor::getMultipleElementProperty(
-      this->ViewModule->getProxy()->GetProperty("Background")));
-
-  QList<QString> propertyNames;
-  propertyNames.push_back("CameraParallelProjection");
-  propertyNames.push_back("UseTriangleStrips");
-  propertyNames.push_back("UseImmediateMode");
-  propertyNames.push_back("LODThreshold");
-  propertyNames.push_back("LODResolution");
-  propertyNames.push_back("RenderInterruptsEnabled");
-  propertyNames.push_back("CompositeThreshold");
-  propertyNames.push_back("ReductionFactor");
-  propertyNames.push_back("SquirtLevel");
-  propertyNames.push_back("OrderedCompositing");
-  foreach (QString name, propertyNames)
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(this->ViewModule);
+  if(rm)
     {
-    if (this->ViewModule->getProxy()->GetProperty(name.toAscii().data()))
-      {
-      settings->setValue("renderModule/" + name, 
-        pqSMAdaptor::getElementProperty(
-          this->ViewModule->getProxy()->GetProperty(name.toAscii().data())));
-      }
+    rm->saveSettings();
     }
 }
 

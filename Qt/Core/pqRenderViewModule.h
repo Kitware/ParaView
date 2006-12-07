@@ -91,6 +91,12 @@ public:
   /// encouraged to use this method to change the interactive style
   /// rather than simply changing it on the render window interactor.
   void setInteractorStyle(vtkInteractorStyle* style);
+ 
+  /// Save the settings of this render module with QSettings
+  virtual void saveSettings();
+  /// Apply the settings from QSettings to this render module
+  virtual void restoreSettings();
+
 private slots:
   // Called on start/end interaction.
   void startInteraction();

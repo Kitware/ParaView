@@ -443,36 +443,104 @@ void pqRenderViewModule::setDefaults()
   pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 1, bg[1]/255.0);
   pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 2, bg[2]/255.0);
 
+  this->restoreSettings();
+  
+  proxy->UpdateVTKObjects();
+
+}
+
+static const char* pqRenderViewModuleSettings[] = {
+  "CameraParallelProjection",
+  "UseTriangleStrips",
+  "UseImmediateMode",
+  "LODThreshold",
+  "LODResolution",
+  "RenderInterruptsEnabled",
+  "CompositeThreshold",
+  "ReductionFactor",
+  "SquirtLevel",
+  "OrderedCompositing",
+  "LightSwitch",
+  "LightIntensity",
+  "UseLight",
+  "KeyLightWarmth",
+  "KeyLightIntensity",
+  "KeyLightElevation",
+  "KeyLightAzimuth",
+  "FillLightWarmth",
+  "FillLightK:F Ratio",
+  "FillLightElevation",
+  "FillLightAzimuth",
+  "BackLightWarmth",
+  "BackLightK:B Ratio",
+  "BackLightElevation",
+  "BackLightAzimuth",
+  "HeadLightWarmth",
+  "HeadLightK:H Ratio",
+  "MaintainLuminance",
+  NULL  // keep last
+};
+static const char* pqRenderViewModuleSettingsMulti[] = {
+  "Background",
+  "LightDiffuseColor",
+  NULL  // keep last
+};
+
+void pqRenderViewModule::restoreSettings()
+{
+  vtkSMProxy* proxy = this->getProxy();
+
   // Now load default values from the QSettings, if available.
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  QList<QString> propertyNames;
-  propertyNames.push_back("CameraParallelProjection");
-  propertyNames.push_back("UseTriangleStrips");
-  propertyNames.push_back("UseImmediateMode");
-  propertyNames.push_back("LODThreshold");
-  propertyNames.push_back("LODResolution");
-  propertyNames.push_back("RenderInterruptsEnabled");
-  propertyNames.push_back("CompositeThreshold");
-  propertyNames.push_back("ReductionFactor");
-  propertyNames.push_back("SquirtLevel");
-  propertyNames.push_back("OrderedCompositing");
-  foreach(QString property_name, propertyNames)
+
+  const char** str;
+
+  for(str=pqRenderViewModuleSettings; *str != NULL; str++)
     {
-    QString key = QString("renderModule/") + property_name;
-    if (proxy->GetProperty(property_name.toAscii().data()) && settings->contains(key))
+    QString key = QString("renderModule/") + *str;
+    vtkSMProperty* prop = proxy->GetProperty(*str);
+    if (prop && settings->contains(key))
       {
-      pqSMAdaptor::setElementProperty(
-        proxy->GetProperty(property_name.toAscii().data()),
-        settings->value("renderModule/" + property_name));
+      pqSMAdaptor::setElementProperty(prop, settings->value(key));
       }
     }
-  if (settings->contains("renderModule/Background"))
+  for(str=pqRenderViewModuleSettingsMulti; *str != NULL; str++)
     {
-    pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("Background"),
-      settings->value("renderModule/Background").value<QList<QVariant> >());
+    QString key = QString("renderModule/") + *str;
+    vtkSMProperty* prop = proxy->GetProperty(*str);
+    if (prop && settings->contains(key))
+      {
+      QList<QVariant> value = settings->value(key).value<QList<QVariant> >();
+      pqSMAdaptor::setMultipleElementProperty(prop, value);
+      }
     }
   proxy->UpdateVTKObjects();
+}
+
+void pqRenderViewModule::saveSettings()
+{
+  vtkSMProxy* proxy = this->getProxy();
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  const char** str;
+  
+  for(str=pqRenderViewModuleSettings; *str != NULL; str++)
+    {
+    QString key = QString("renderModule/") + *str;
+    vtkSMProperty* prop = proxy->GetProperty(*str);
+    if (prop)
+      {
+      settings->setValue(key, pqSMAdaptor::getElementProperty(prop));
+      }
+    }
+  for(str=pqRenderViewModuleSettingsMulti; *str != NULL; str++)
+    {
+    QString key = QString("renderModule/") + *str;
+    vtkSMProperty* prop = proxy->GetProperty(*str);
+    if (prop)
+      {
+      settings->setValue(key, pqSMAdaptor::getMultipleElementProperty(prop));
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
