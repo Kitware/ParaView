@@ -556,3 +556,8 @@ bool pqRenderViewModule::eventFilter(QObject* caller, QEvent* e)
   return QObject::eventFilter(caller, e);
 }
 
+void pqRenderViewModule::restoreDefaultLightSettings()
+{
+  // TODO:
+}
+

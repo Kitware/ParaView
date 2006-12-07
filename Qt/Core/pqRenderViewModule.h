@@ -86,6 +86,9 @@ public:
 
   /// restore the default background color
   int* defaultBackgroundColor();
+  
+  /// restore the default light parameters
+  void restoreDefaultLightSettings();
 
   /// Change the interactive style used by this render module. One is
   /// encouraged to use this method to change the interactive style

@@ -372,6 +372,9 @@ pq3DViewPropertiesWidget::pq3DViewPropertiesWidget(QWidget* _parent):
   QObject::connect(this->Internal->restoreDefault,
     SIGNAL(clicked(bool)), this, SLOT(restoreDefaultBackground()));
   
+  QObject::connect(this->Internal->ResetLight,
+    SIGNAL(clicked(bool)), this, SLOT(resetLights()));
+  
 }
 
 //-----------------------------------------------------------------------------
@@ -443,7 +446,18 @@ void pq3DViewPropertiesWidget::restoreDefaultBackground()
                QColor(col[0], col[1], col[2]));
     }
 }
+
 //-----------------------------------------------------------------------------
+void pq3DViewPropertiesWidget::resetLights()
+{
+  pqRenderViewModule* rvm =
+    qobject_cast<pqRenderViewModule*>(this->Internal->ViewModule);
+  if(rvm)
+    {
+    rvm->restoreDefaultLightSettings();
+    }
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

@@ -60,6 +60,7 @@ private slots:
   void subsamplingRateSliderChanged(int);
   void squirtLevelRateSliderChanged(int);
   void restoreDefaultBackground();
+  void resetLights();
 
 private:
   pq3DViewPropertiesWidgetInternal* Internal;
