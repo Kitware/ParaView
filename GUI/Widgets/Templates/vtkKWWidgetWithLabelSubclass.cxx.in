@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(@WidgetType@WithLabel);
-vtkCxxRevisionMacro(@WidgetType@WithLabel, "1.6");
+vtkCxxRevisionMacro(@WidgetType@WithLabel, "1.7");
 
 //----------------------------------------------------------------------------
 @WidgetType@WithLabel::@WidgetType@WithLabel()
@@ -129,8 +129,11 @@ void @WidgetType@WithLabel::Pack()
   if (this->Widget && this->Widget->IsCreated())
     {
     tk_cmd << "pack " << this->Widget->GetWidgetName() 
-           << " -anchor nw -fill x -side " << side << " -expand "
-           << (this->ExpandWidget ? "y" : "n") << endl;
+           << " -anchor nw "
+           << " -fill " << (this->ExpandWidget ? "x" : "none")
+           << " -side " << side 
+           << " -expand " << (this->ExpandWidget ? "y" : "n") 
+           << endl;
     }
   
   tk_cmd << ends;
