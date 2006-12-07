@@ -4,7 +4,7 @@ PROJECT(ParaView)
 #########################################################################
 # ParaView version number.  An even minor number corresponds to releases.    
 SET(PARAVIEW_VERSION_MAJOR 2)   
-SET(PARAVIEW_VERSION_MINOR 5)   
+SET(PARAVIEW_VERSION_MINOR 6)   
 SET(PARAVIEW_VERSION_PATCH 0)   
 SET(PARAVIEW_VERSION "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")   
 SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}")
