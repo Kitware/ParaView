@@ -19,6 +19,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWListBox.h"
 #include "vtkKWListBoxWithScrollbars.h"
+#include "vtkKWIcon.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWFrame.h"
@@ -29,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.18");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -97,33 +98,54 @@ void vtkKWListBoxToListBoxSelectionEditor::CreateWidget()
   vtkKWFrame* frame = vtkKWFrame::New();
   frame->SetParent(this);
   frame->Create();
+  int width = 32;
 
   this->AddButton->SetParent(frame);
   this->AddButton->Create();
   this->AddButton->SetText(ks_("List Box To List Box|Button|Add"));
+  this->AddButton->SetBalloonHelpString(this->AddButton->GetText());
+  this->AddButton->SetImageToPredefinedIcon(vtkKWIcon::IconTransportPlay);
+  this->AddButton->SetWidth(width);
   this->AddButton->SetCommand(this, "AddCallback");
 
   this->AddAllButton->SetParent(frame);
   this->AddAllButton->Create();
   this->AddAllButton->SetText(ks_("List Box To List Box|Button|Add All"));
+  this->AddAllButton->SetBalloonHelpString(this->AddAllButton->GetText());
+  this->AddAllButton->SetImageToPredefinedIcon(
+    vtkKWIcon::IconTransportFastForward);
+  this->AddAllButton->SetWidth(width);
   this->AddAllButton->SetCommand(this, "AddAllCallback");
 
   this->RemoveButton->SetParent(frame);
   this->RemoveButton->Create();
   this->RemoveButton->SetText(ks_("List Box To List Box|Button|Remove"));
+  this->RemoveButton->SetBalloonHelpString(this->RemoveButton->GetText());
+  this->RemoveButton->SetImageToPredefinedIcon(
+    vtkKWIcon::IconTransportPlayBackward);
+  this->RemoveButton->SetWidth(width);
   this->RemoveButton->SetCommand(this, "RemoveCallback");
 
   this->RemoveAllButton->SetParent(frame);
   this->RemoveAllButton->Create();
   this->RemoveAllButton->SetText(
     ks_("List Box To List Box|Button|Remove All"));
+  this->RemoveAllButton->SetBalloonHelpString(
+    this->RemoveAllButton->GetText());
+  this->RemoveAllButton->SetImageToPredefinedIcon(
+    vtkKWIcon::IconTransportRewind);
+  this->RemoveAllButton->SetWidth(width);
   this->RemoveAllButton->SetCommand(this, "RemoveAllCallback");
 
-  this->Script("pack %s %s %s %s -side top -fill x -padx 2 -pady 1",
-    this->AddButton->GetWidgetName(),
-    this->AddAllButton->GetWidgetName(),
-    this->RemoveButton->GetWidgetName(),
-    this->RemoveAllButton->GetWidgetName());
+  this->Script("pack %s %s %s %s -side top -fill x -padx 4 -pady 0",
+               this->AddButton->GetWidgetName(),
+               this->AddAllButton->GetWidgetName(),
+               this->RemoveButton->GetWidgetName(),
+               this->RemoveAllButton->GetWidgetName());
+
+  this->Script("pack %s %s -pady 2",
+               this->AddAllButton->GetWidgetName(),
+               this->RemoveAllButton->GetWidgetName());
 
   this->Script("pack %s -side left -expand false -fill y",
     frame->GetWidgetName());
@@ -147,12 +169,29 @@ void vtkKWListBoxToListBoxSelectionEditor::CreateWidget()
   this->UpButton->SetParent(btframe);
   this->UpButton->Create();
   this->UpButton->SetText(ks_("List Box To List Box|Button|Up"));
+  this->UpButton->SetBalloonHelpString(this->UpButton->GetText());
+  this->UpButton->SetImageToPredefinedIcon(vtkKWIcon::IconSpinUp);
+  this->UpButton->SetHeight(16);
   this->UpButton->SetCommand(this, "UpCallback");
 
   this->DownButton->SetParent(btframe);
   this->DownButton->Create();
   this->DownButton->SetText(ks_("List Box To List Box|Button|Down"));
+  this->DownButton->SetBalloonHelpString(this->DownButton->GetText());
+  this->DownButton->SetImageToPredefinedIcon(vtkKWIcon::IconSpinDown);
+  this->DownButton->SetHeight(16);
   this->DownButton->SetCommand(this, "DownCallback");
+
+  this->Script("grid %s -column 0 -row 0 -stick ew  -padx 1 -pady 2",
+    this->UpButton->GetWidgetName());
+
+  this->Script("grid %s -column 1 -row 0 -stick ew  -padx 1 -pady 2",
+    this->DownButton->GetWidgetName());
+
+  this->Script("grid columnconfigure %s 0 -weight 1 -uniform col",
+               btframe->GetWidgetName());
+  this->Script("grid columnconfigure %s 1 -weight 1 -uniform col",
+               btframe->GetWidgetName());
 
   this->Script("pack %s %s -side left -fill x -expand y -padx 1 -pady 2",
     this->UpButton->GetWidgetName(),
