@@ -27,8 +27,6 @@ void vtkKWMatrixWidgetItem::Create(vtkKWWidget *parent, vtkKWWindow *)
   matrix_widget1->SetPadX(2);
   matrix_widget1->SetPadY(2);
 
-  app->DebugMessage(matrix_widget1->GetTclName());
-
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     matrix_widget1->GetWidgetName());

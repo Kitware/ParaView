@@ -22,17 +22,18 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMatrixWidget );
-vtkCxxRevisionMacro(vtkKWMatrixWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWMatrixWidget, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWMatrixWidget::vtkKWMatrixWidget()
 {
-  this->NumberOfColumns = 4;
-  this->NumberOfRows    = 4;
-  this->EntrySet        = vtkKWEntrySet::New();
-  this->Width           = 6;
-  this->ReadOnly        = 0;
-  this->RestrictValue   = vtkKWMatrixWidget::RestrictDouble;
+  this->NumberOfColumns       = 4;
+  this->NumberOfRows          = 4;
+  this->EntrySet              = vtkKWEntrySet::New();
+  this->ElementWidth          = 4;
+  this->ReadOnly              = 0;
+  this->RestrictElementValue  = vtkKWMatrixWidget::RestrictDouble;
+  this->ElementChangedCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -42,6 +43,12 @@ vtkKWMatrixWidget::~vtkKWMatrixWidget()
     {
     this->EntrySet->SetParent(NULL);
     this->EntrySet->Delete();
+    }
+
+  if (this->ElementChangedCommand)
+    {
+    delete [] this->ElementChangedCommand;
+    this->ElementChangedCommand = NULL;
     }
 }
 
@@ -102,7 +109,7 @@ void vtkKWMatrixWidget::SetNumberOfRows(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMatrixWidget::SetValue(int row, int col, const char *val)
+void vtkKWMatrixWidget::SetElementValue(int row, int col, const char *val)
 {
   if (this->EntrySet && this->EntrySet->IsCreated() &&
       row >= 0 && row < this->NumberOfRows && 
@@ -114,7 +121,7 @@ void vtkKWMatrixWidget::SetValue(int row, int col, const char *val)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWMatrixWidget::GetValue(int row, int col)
+const char* vtkKWMatrixWidget::GetElementValue(int row, int col)
 {
   if (this->EntrySet && this->EntrySet->IsCreated() &&
       row >= 0 && row < this->NumberOfRows && 
@@ -127,7 +134,7 @@ const char* vtkKWMatrixWidget::GetValue(int row, int col)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMatrixWidget::SetValueAsInt(int row, int col, int val)
+void vtkKWMatrixWidget::SetElementValueAsInt(int row, int col, int val)
 {
   if (this->EntrySet && this->EntrySet->IsCreated() &&
       row >= 0 && row < this->NumberOfRows && 
@@ -139,7 +146,7 @@ void vtkKWMatrixWidget::SetValueAsInt(int row, int col, int val)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMatrixWidget::GetValueAsInt(int row, int col)
+int vtkKWMatrixWidget::GetElementValueAsInt(int row, int col)
 {
   if (this->EntrySet && this->EntrySet->IsCreated() &&
       row >= 0 && row < this->NumberOfRows && 
@@ -152,7 +159,7 @@ int vtkKWMatrixWidget::GetValueAsInt(int row, int col)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMatrixWidget::SetValueAsDouble(int row, int col, double val)
+void vtkKWMatrixWidget::SetElementValueAsDouble(int row, int col, double val)
 {
   if (this->EntrySet && this->EntrySet->IsCreated() &&
       row >= 0 && row < this->NumberOfRows && 
@@ -164,7 +171,7 @@ void vtkKWMatrixWidget::SetValueAsDouble(int row, int col, double val)
 }
 
 //----------------------------------------------------------------------------
-double vtkKWMatrixWidget::GetValueAsDouble(int row, int col)
+double vtkKWMatrixWidget::GetElementValueAsDouble(int row, int col)
 {
   if (this->EntrySet && this->EntrySet->IsCreated() &&
       row >= 0 && row < this->NumberOfRows && 
@@ -189,16 +196,21 @@ void vtkKWMatrixWidget::UpdateWidget()
   this->EntrySet->SetMaximumNumberOfWidgetsInPackingDirection(
     this->NumberOfColumns);
 
+  char command[256];
+
   int nb_requested_entries = this->NumberOfColumns * this->NumberOfRows;
   int nb_entries = this->EntrySet->GetNumberOfWidgets();
   while (nb_entries < nb_requested_entries)
     {
-    vtkKWEntry *entry = this->EntrySet->AddWidget(nb_entries++);
+    int id = nb_entries++;
+    vtkKWEntry *entry = this->EntrySet->AddWidget(id);
     if (entry)
       {
-      entry->SetWidth(this->Width);
+      entry->SetWidth(this->ElementWidth);
       entry->SetReadOnly(this->ReadOnly);
-      entry->SetRestrictValue(this->RestrictValue);
+      entry->SetRestrictValue(this->RestrictElementValue);
+      sprintf(command, "ElementChangedCallback %d", id);
+      entry->SetCommand(this, command);
       }
     }
 
@@ -213,14 +225,14 @@ void vtkKWMatrixWidget::UpdateWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMatrixWidget::SetRestrictValue(int arg)
+void vtkKWMatrixWidget::SetRestrictElementValue(int arg)
 {
-  if (this->RestrictValue == arg)
+  if (this->RestrictElementValue == arg)
     {
     return;
     }
 
-  this->RestrictValue = arg;
+  this->RestrictElementValue = arg;
   this->Modified();
 
   if (this->EntrySet->IsCreated())
@@ -230,36 +242,36 @@ void vtkKWMatrixWidget::SetRestrictValue(int arg)
       vtkKWEntry *entry = this->EntrySet->GetWidget(i);
       if (entry)
         {
-        entry->SetRestrictValue(this->RestrictValue);
+        entry->SetRestrictValue(this->RestrictElementValue);
         }
       }
     }
 }
 
-void vtkKWMatrixWidget::SetRestrictValueToInteger()
+void vtkKWMatrixWidget::SetRestrictElementValueToInteger()
 { 
-  this->SetRestrictValue(vtkKWMatrixWidget::RestrictInteger); 
+  this->SetRestrictElementValue(vtkKWMatrixWidget::RestrictInteger); 
 }
 
-void vtkKWMatrixWidget::SetRestrictValueToDouble()
+void vtkKWMatrixWidget::SetRestrictElementValueToDouble()
 { 
-  this->SetRestrictValue(vtkKWMatrixWidget::RestrictDouble); 
+  this->SetRestrictElementValue(vtkKWMatrixWidget::RestrictDouble); 
 }
 
-void vtkKWMatrixWidget::SetRestrictValueToNone()
+void vtkKWMatrixWidget::SetRestrictElementValueToNone()
 { 
-  this->SetRestrictValue(vtkKWMatrixWidget::RestrictNone); 
+  this->SetRestrictElementValue(vtkKWMatrixWidget::RestrictNone); 
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMatrixWidget::SetWidth(int width)
+void vtkKWMatrixWidget::SetElementWidth(int width)
 {
-  if (this->Width == width)
+  if (this->ElementWidth == width)
     {
     return;
     }
 
-  this->Width = width;
+  this->ElementWidth = width;
   this->Modified();
 
   if (this->EntrySet->IsCreated())
@@ -269,7 +281,7 @@ void vtkKWMatrixWidget::SetWidth(int width)
       vtkKWEntry *entry = this->EntrySet->GetWidget(i);
       if (entry)
         {
-        entry->SetWidth(this->Width);
+        entry->SetWidth(this->ElementWidth);
         }
       }
     }
@@ -300,6 +312,43 @@ void vtkKWMatrixWidget::SetReadOnly(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMatrixWidget::ElementChangedCallback(int id, const char *value)
+{
+  int rank = this->EntrySet->GetWidgetPosition(id);
+  int row = rank / this->NumberOfColumns;
+  int col = rank % this->NumberOfColumns;
+  this->InvokeElementChangedCommand(row, col, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMatrixWidget::SetElementChangedCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->ElementChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMatrixWidget::InvokeElementChangedCommand(
+  int row, int col, const char *value)
+{
+  if (this->ElementChangedCommand && *this->ElementChangedCommand && 
+      this->IsCreated())
+    {
+    const char *val = this->ConvertInternalStringToTclString(
+      value, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
+    this->Script("%s %d %d \"%s\"", 
+                 this->ElementChangedCommand, row, col, val ? val : "");
+    }
+
+  void *data[3];
+  data[0] = &row;
+  data[1] = &col;
+  data[2] = &value;
+  
+  this->InvokeEvent(vtkKWMatrixWidget::ElementChangedEvent, data);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMatrixWidget::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
@@ -317,6 +366,6 @@ void vtkKWMatrixWidget::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Width: " << this->GetWidth() << endl;
   os << indent << "Readonly: " << (this->ReadOnly ? "On" : "Off") << endl;
-  os << indent << "RestrictValue: " << this->RestrictValue << endl;
+  os << indent << "RestrictElementValue: " << this->RestrictElementValue << endl;
 }
 

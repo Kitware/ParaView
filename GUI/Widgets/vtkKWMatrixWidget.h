@@ -37,34 +37,35 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set/Get the matrix size
+  // Set/Get the matrix size.
   virtual void SetNumberOfColumns(int col);
   vtkGetMacro(NumberOfColumns, int);
   virtual void SetNumberOfRows(int col);
   vtkGetMacro(NumberOfRows, int);
 
   // Description:
-  // Set/Get the values
-  virtual void SetValue(int row, int col, const char *val);
-  virtual const char* GetValue(int row, int col);
-  virtual void SetValueAsInt(int row, int col, int val);
-  virtual int GetValueAsInt(int row, int col);
-  virtual void SetValueAsDouble(int row, int col, double val);
-  virtual double GetValueAsDouble(int row, int col);
+  // Set/Get the value of a given element.
+  virtual void SetElementValue(int row, int col, const char *val);
+  virtual const char* GetElementValue(int row, int col);
+  virtual void SetElementValueAsInt(int row, int col, int val);
+  virtual int GetElementValueAsInt(int row, int col);
+  virtual void SetElementValueAsDouble(int row, int col, double val);
+  virtual double GetElementValueAsDouble(int row, int col);
 
   // Description:
-  // The width is the number of charaters wide each entry box can fit.
-  virtual void SetWidth(int width);
-  vtkGetMacro(Width, int);
+  // The width is the number of charaters each element can fit.
+  virtual void SetElementWidth(int width);
+  vtkGetMacro(ElementWidth, int);
 
   // Description:
-  // Set/Get readonly flag. This flags makes each entry read only.
+  // Set/Get readonly flag. This flags makes each element read only.
   virtual void SetReadOnly(int);
   vtkBooleanMacro(ReadOnly, int);
   vtkGetMacro(ReadOnly, int);
 
   // Description:
-  // Restrict the value to a given type (integer, double, or no restriction).
+  // Restrict the value of an element to a given type
+  // (integer, double, or no restriction).
   //BTX
   enum
   {
@@ -73,11 +74,39 @@ public:
     RestrictDouble
   };
   //ETX
-  vtkGetMacro(RestrictValue, int);
-  virtual void SetRestrictValue(int);
-  virtual void SetRestrictValueToInteger();
-  virtual void SetRestrictValueToDouble();
-  virtual void SetRestrictValueToNone();
+  vtkGetMacro(RestrictElementValue, int);
+  virtual void SetRestrictElementValue(int);
+  virtual void SetRestrictElementValueToInteger();
+  virtual void SetRestrictElementValueToDouble();
+  virtual void SetRestrictElementValueToNone();
+
+  // Description:
+  // Specifies a command to be invoked when the value of an element in the
+  // matrix has changed.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the element location, i.e. its row and column indices: int, int
+  // - the element's new value: const char*
+  virtual void SetElementChangedCommand(vtkObject *object, const char *method);
+
+  // Description:
+  // Events. The ElementChangedEvent is triggered when the value of an
+  // element in the matrix has changed.
+  // The following parameters are also passed as client data:
+  // - the element location, i.e. its row and column indices: int, int
+  // - the element's new value: const char*
+  // Note that given the heterogeneous nature of types passed as client data,
+  // you should treat it as an array of void*[3], each one a pointer to
+  // the parameter (i.e., &int, &int, &const char*).
+  //BTX
+  enum
+  {
+    ElementChangedEvent = 10000
+  };
+  //ETX
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -88,6 +117,10 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks.
+  virtual void ElementChangedCallback(int id, const char *value);
+
 protected:
   vtkKWMatrixWidget();
   virtual ~vtkKWMatrixWidget();
@@ -95,9 +128,9 @@ protected:
   int NumberOfColumns;
   int NumberOfRows;
 
-  int Width;
+  int ElementWidth;
   int ReadOnly;
-  int RestrictValue;
+  int RestrictElementValue;
 
   // Description:
   // Create the widget.
@@ -105,6 +138,9 @@ protected:
   virtual void UpdateWidget();
 
   vtkKWEntrySet *EntrySet;
+
+  char *ElementChangedCommand;
+  void InvokeElementChangedCommand(int row, int col, const char *value);
 
 private:
   vtkKWMatrixWidget(const vtkKWMatrixWidget&); // Not implemented
