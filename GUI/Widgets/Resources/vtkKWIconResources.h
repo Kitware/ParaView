@@ -992,6 +992,20 @@ static const unsigned char image_transport_play[] =
 
 /* 
  * Resource generated for file:
+ *    transport_play_backward.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_transport_play_backward_width          = 16;
+static const unsigned int  image_transport_play_backward_height         = 16;
+static const unsigned int  image_transport_play_backward_pixel_size     = 4;
+static const unsigned long image_transport_play_backward_length         = 120;
+static const unsigned long image_transport_play_backward_decoded_length = 1024;
+
+static const unsigned char image_transport_play_backward[] = 
+  "eNrN0bEJAEEIRFF7slpbsAVrsQVbmI0W5G4TZzm4YML3EQQg+PmqCpkJ1qoqIgKsFZGx73"
+  "bqn3biT3bi3f1lp/eb2ZU/NZj/9Qbje4P1u3Hjv9wCUhnK6w==";
+
+/* 
+ * Resource generated for file:
  *    transport_play_to_key.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_play_to_key_width          = 16;

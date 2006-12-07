@@ -74,6 +74,7 @@ KWConvertImageToHeader --zlib --base64 \
     transport_loop.png \
     transport_pause.png \
     transport_play.png \
+    transport_play_backward.png \
     transport_play_to_key.png \
     transport_rewind.png \
     transport_rewind_to_key.png \
