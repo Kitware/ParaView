@@ -37,7 +37,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set/Get the matrix size.
+  // Set/Get the matrix size. Default to 1x1.
   virtual void SetNumberOfColumns(int col);
   vtkGetMacro(NumberOfColumns, int);
   virtual void SetNumberOfRows(int col);

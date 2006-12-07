@@ -22,13 +22,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMatrixWidget );
-vtkCxxRevisionMacro(vtkKWMatrixWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWMatrixWidget, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWMatrixWidget::vtkKWMatrixWidget()
 {
-  this->NumberOfColumns       = 4;
-  this->NumberOfRows          = 4;
+  this->NumberOfColumns       = 1;
+  this->NumberOfRows          = 1;
   this->EntrySet              = vtkKWEntrySet::New();
   this->ElementWidth          = 5;
   this->ReadOnly              = 0;
