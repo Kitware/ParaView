@@ -197,7 +197,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.800");
+vtkCxxRevisionMacro(vtkPVWindow, "1.801");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -4627,7 +4627,7 @@ int vtkPVWindow::LoadTexture()
 //-----------------------------------------------------------------------------
 int vtkPVWindow::LoadTexture(const char* filename)
 {
-  if ( !this->CheckIfFileIsReadable(filename) )
+  if (!filename)
     {
     return VTK_ERROR;
     }
@@ -4679,6 +4679,11 @@ int vtkPVWindow::LoadTexture(const char* filename)
     }
   
   imageReader->SetFileName(filename);
+  if (!imageReader->CanReadFile(filename))
+    {
+    imageReader->Delete();
+    return VTK_ERROR;
+    }
 
   // Read the texture image locally and write it out to a binary string.
   vtkStructuredPointsWriter *writer = vtkStructuredPointsWriter::New();
