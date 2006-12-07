@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMatrixWidget );
-vtkCxxRevisionMacro(vtkKWMatrixWidget, "1.2");
+vtkCxxRevisionMacro(vtkKWMatrixWidget, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWMatrixWidget::vtkKWMatrixWidget()
@@ -30,7 +30,7 @@ vtkKWMatrixWidget::vtkKWMatrixWidget()
   this->NumberOfColumns       = 4;
   this->NumberOfRows          = 4;
   this->EntrySet              = vtkKWEntrySet::New();
-  this->ElementWidth          = 4;
+  this->ElementWidth          = 5;
   this->ReadOnly              = 0;
   this->RestrictElementValue  = vtkKWMatrixWidget::RestrictDouble;
   this->ElementChangedCommand = NULL;
