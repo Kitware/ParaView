@@ -119,6 +119,7 @@ public:
     IconTransportLoop             = 124,
     IconTransportPause            = 125,
     IconTransportPlay             = 126,
+    IconTransportPlayBackward     = 201,
     IconTransportPlayToKey        = 127,
     IconTransportRewind           = 128,
     IconTransportRewindToKey      = 129,

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.39");
+vtkCxxRevisionMacro(vtkKWIcon, "1.40");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -674,6 +674,15 @@ void vtkKWIcon::SetImage(int image)
         image_transport_play_height,
         image_transport_play_pixel_size, 
         image_transport_play_length);
+      break;
+      
+    case vtkKWIcon::IconTransportPlayBackward:
+      this->SetImage(
+        image_transport_play_backward, 
+        image_transport_play_backward_width, 
+        image_transport_play_backward_height,
+        image_transport_play_backward_pixel_size, 
+        image_transport_play_backward_length);
       break;
       
     case vtkKWIcon::IconTransportPlayToKey:
