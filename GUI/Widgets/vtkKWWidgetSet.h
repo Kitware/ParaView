@@ -80,7 +80,7 @@ public:
   virtual int HasWidget(int id);
 
   // Description:
-  // Retrieve the position in the set the widget was insert at.
+  // Retrieve the position in the set the widget was inserted at.
   // Return pos if exists, -1 otherwise
   virtual int GetWidgetPosition(int id);
 
