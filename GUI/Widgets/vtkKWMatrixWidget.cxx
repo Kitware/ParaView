@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMatrixWidget );
-vtkCxxRevisionMacro(vtkKWMatrixWidget, "1.4");
+vtkCxxRevisionMacro(vtkKWMatrixWidget, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWMatrixWidget::vtkKWMatrixWidget()
@@ -83,7 +83,7 @@ void vtkKWMatrixWidget::CreateWidget()
 //----------------------------------------------------------------------------
 void vtkKWMatrixWidget::SetNumberOfColumns(int arg)
 {
-  if (this->NumberOfColumns == arg || arg <= 0)
+  if (this->NumberOfColumns == arg || arg < 0)
     {
     return;
     }
@@ -97,7 +97,7 @@ void vtkKWMatrixWidget::SetNumberOfColumns(int arg)
 //----------------------------------------------------------------------------
 void vtkKWMatrixWidget::SetNumberOfRows(int arg)
 {
-  if (this->NumberOfRows == arg || arg <= 0)
+  if (this->NumberOfRows == arg || arg < 0)
     {
     return;
     }
@@ -315,9 +315,12 @@ void vtkKWMatrixWidget::SetReadOnly(int arg)
 void vtkKWMatrixWidget::ElementChangedCallback(int id, const char *value)
 {
   int rank = this->EntrySet->GetWidgetPosition(id);
-  int row = rank / this->NumberOfColumns;
-  int col = rank % this->NumberOfColumns;
-  this->InvokeElementChangedCommand(row, col, value);
+  if (this->NumberOfColumns && this->NumberOfRows)
+    {
+    int row = rank / this->NumberOfColumns;
+    int col = rank % this->NumberOfColumns;
+    this->InvokeElementChangedCommand(row, col, value);
+    }
 }
 
 //----------------------------------------------------------------------------
