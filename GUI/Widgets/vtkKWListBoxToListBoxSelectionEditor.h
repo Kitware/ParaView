@@ -94,6 +94,7 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+  virtual void Update();
 
   // Description:
   // Callbacks. Internal, do not use.
@@ -138,7 +139,7 @@ protected:
 
   virtual void DisplayEllipsis();
   virtual void RemoveEllipsis();
-  
+
 private:
   vtkKWListBoxToListBoxSelectionEditor(const vtkKWListBoxToListBoxSelectionEditor&); // Not implemented
   void operator=(const vtkKWListBoxToListBoxSelectionEditor&); // Not Implemented

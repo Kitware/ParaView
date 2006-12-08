@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.19");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -468,11 +468,13 @@ void vtkKWListBoxToListBoxSelectionEditor::RemoveItemsFromFinalList()
   this->FinalList->GetWidget()->DeleteAll();
   this->Modified();
   this->InvokeEvent(vtkCommand::WidgetModifiedEvent, 0);
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::DisplayEllipsis()
 {
+  this->Update();
   if ( this->SourceList->GetWidget()->GetNumberOfItems() > 0 )
     {
     return;
@@ -546,6 +548,34 @@ void vtkKWListBoxToListBoxSelectionEditor::UpdateEnableState()
   this->PropagateEnableState(this->RemoveAllButton);
   this->PropagateEnableState(this->UpButton);
   this->PropagateEnableState(this->DownButton);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBoxToListBoxSelectionEditor::Update()
+{
+  this->UpdateEnableState();
+
+  //Add and AddAll buttons
+  if ( this->SourceList->GetWidget()->GetNumberOfItems() == 0 
+    || this->EllipsisDisplayed)
+    {
+    this->AddButton->SetEnabled(0);
+    this->AddAllButton->SetEnabled(0);
+    }
+
+  //Remove and RemoveAll buttons
+  if ( this->FinalList->GetWidget()->GetNumberOfItems() == 0)
+    {
+    this->RemoveButton->SetEnabled(0);
+    this->RemoveAllButton->SetEnabled(0);
+    }
+
+  //Up and Down buttons
+  if ( this->FinalList->GetWidget()->GetNumberOfItems() <= 1)
+    {
+    this->UpButton->SetEnabled(0);
+    this->DownButton->SetEnabled(0);
+    }
 }
 
 //----------------------------------------------------------------------------
