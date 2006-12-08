@@ -154,23 +154,36 @@ pqSimpleServerStartup::pqSimpleServerStartup(QObject* p) :
     SLOT(monitorReverseConnections()));
 }
 
+//-----------------------------------------------------------------------------
 pqSimpleServerStartup::~pqSimpleServerStartup()
 {
   delete this->Implementation;
 }
 
+//-----------------------------------------------------------------------------
 void pqSimpleServerStartup::startServer(pqServerStartup& startup)
 {
   // Get the named startup ...
   this->Implementation->Startup = &startup;
   this->Implementation->Server = startup.getServer();
-      
+
+  // If requested server is already running, nothing needs to be done.
+  if(pqServer* const existing_server =
+    pqApplicationCore::instance()->getServerManagerModel()->getServer(
+      this->Implementation->Server))
+    {
+    this->started(existing_server);
+    return;
+    }
+
   // Prompt the user for runtime server arguments ...
   if(!this->promptRuntimeArguments())
     {
     this->cancelled();
     return;
     }    
+
+  this->disconnectAllServers();
 
   // Branch based on the connection type - builtin, forward, or reverse ...
   if(startup.getServer().scheme() == "builtin")
@@ -192,6 +205,7 @@ void pqSimpleServerStartup::startServer(pqServerStartup& startup)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqSimpleServerStartup::startServer(
   pqServerStartups& server_startups,
   pqSettings& settings,
@@ -250,24 +264,28 @@ void pqSimpleServerStartup::startServer(
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqSimpleServerStartup::cancelled()
 {
   this->Implementation->reset();
   emit this->serverCancelled();
 }
 
+//-----------------------------------------------------------------------------
 void pqSimpleServerStartup::failed()
 {
   this->Implementation->reset();
   emit this->serverFailed();
 }
 
+//-----------------------------------------------------------------------------
 void pqSimpleServerStartup::started(pqServer* server)
 {
   this->Implementation->reset();
   emit this->serverStarted(server);
 }
 
+//-----------------------------------------------------------------------------
 bool pqSimpleServerStartup::promptRuntimeArguments()
 {
   // Never prompt for the builtin server
@@ -490,16 +508,9 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
   return true;
 }
 
+//-----------------------------------------------------------------------------
 void pqSimpleServerStartup::startBuiltinConnection()
 {
-  if(pqServer* const existing_server =
-    pqApplicationCore::instance()->getServerManagerModel()->getServer(
-      this->Implementation->Server))
-    {
-    this->started(existing_server);
-    return;
-    }
-
   this->Implementation->StartupDialog =
     new pqServerStartupDialog(this->Implementation->Server, false);
   this->Implementation->StartupDialog->show();
@@ -519,16 +530,9 @@ void pqSimpleServerStartup::startBuiltinConnection()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqSimpleServerStartup::startForwardConnection()
 {
-  if(pqServer* const existing_server =
-    pqApplicationCore::instance()->getServerManagerModel()->getServer(
-      this->Implementation->Server))
-    {
-    this->started(existing_server);
-    return;
-    }
-
   this->Implementation->StartupContext = new pqServerStartupContext();
   
   this->Implementation->StartupDialog =
@@ -581,6 +585,7 @@ void pqSimpleServerStartup::startForwardConnection()
     *this->Implementation->StartupContext);
 }
 
+//-----------------------------------------------------------------------------
 void pqSimpleServerStartup::forwardConnectServer()
 {
   if(pqServer* const server = pqApplicationCore::instance()->createServer(
@@ -594,16 +599,20 @@ void pqSimpleServerStartup::forwardConnectServer()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqSimpleServerStartup::disconnectAllServers()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smModel = core->getServerManagerModel();
+  while (smModel->getNumberOfServers() > 0)
+    {
+    core->removeServer(smModel->getServerByIndex(0));
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqSimpleServerStartup::startReverseConnection()
 {
-  if(pqServer* const existing_server =
-    pqApplicationCore::instance()->getServerManagerModel()->getServer(
-      this->Implementation->Server))
-    {
-    this->started(existing_server);
-    return;
-    }
-
   vtkProcessModule* const process_module = vtkProcessModule::GetProcessModule();
   
   QObject::connect(
@@ -684,6 +693,7 @@ void pqSimpleServerStartup::startReverseConnection()
     *this->Implementation->StartupContext);
 }
 
+//-----------------------------------------------------------------------------
 void pqSimpleServerStartup::monitorReverseConnections()
 {
   vtkProcessModule* const process_module = vtkProcessModule::GetProcessModule();
@@ -695,6 +705,7 @@ void pqSimpleServerStartup::monitorReverseConnections()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqSimpleServerStartup::finishReverseConnection(pqServer* server)
 {
   QObject::disconnect(

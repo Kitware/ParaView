@@ -103,6 +103,9 @@ private:
   void startBuiltinConnection();
   void startForwardConnection();
   void startReverseConnection();
+
+  // disconnects from any already existing servers.
+  void disconnectAllServers();
 };
 
 #endif
