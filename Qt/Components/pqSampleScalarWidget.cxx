@@ -88,7 +88,6 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
   this->Implementation->UI->Values->setSelectionMode(QAbstractItemView::ExtendedSelection);
   
   this->Implementation->UI->Delete->setEnabled(false);
-
   this->Implementation->UI->Values->installEventFilter(this);
   
   connect(
@@ -114,6 +113,11 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
     SIGNAL(clicked()),
     this,
     SLOT(onDelete()));
+   connect(
+    this->Implementation->UI->DeleteAll,
+    SIGNAL(clicked()),
+    this,
+    SLOT(onDeleteAll()));
     
   connect(
     this->Implementation->UI->NewValue,
@@ -135,6 +139,7 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
     SLOT(onScientificNotation(bool)));
 
 
+  this->onSamplesChanged();
   
 }
 
@@ -192,6 +197,7 @@ void pqSampleScalarWidget::setDataSources(
     }
     
   this->reset();
+  this->onSamplesChanged();
 }
 
 void pqSampleScalarWidget::accept()
@@ -215,6 +221,7 @@ void pqSampleScalarWidget::accept()
     }
     
   this->Implementation->IgnorePropertyChange = false;
+  this->onSamplesChanged();
 }
 
 void pqSampleScalarWidget::reset()
@@ -238,11 +245,14 @@ void pqSampleScalarWidget::reset()
     {
     this->Implementation->Model.insert(values[i]);
     }
+
 }
 
 void pqSampleScalarWidget::onSamplesChanged()
 {
- 
+   this->Implementation->UI->DeleteAll->setEnabled(
+    this->Implementation->Model.values().size());
+
 }
 
 void pqSampleScalarWidget::onSelectionChanged(const QItemSelection&, const QItemSelection&)
@@ -267,9 +277,18 @@ void pqSampleScalarWidget::onDelete()
 
   this->Implementation->UI->Values->selectionModel()->clear();
   
+  this->onSamplesChanged();
   emit samplesChanged();
 }
-
+void pqSampleScalarWidget::onDeleteAll()
+{
+  this->Implementation->Model.clear();
+ 
+  this->Implementation->UI->Values->selectionModel()->clear();
+  
+  this->onSamplesChanged();
+  emit samplesChanged();
+}
 void pqSampleScalarWidget::onNewValue()
 {
   double new_value = 0.0;
@@ -288,7 +307,7 @@ void pqSampleScalarWidget::onNewValue()
   
   this->Implementation->UI->Values->setCurrentIndex(idx);
   this->Implementation->UI->Values->edit(idx);
-  
+  this->onSamplesChanged();
 }
 
 void pqSampleScalarWidget::onNewRange()
@@ -335,6 +354,7 @@ void pqSampleScalarWidget::onNewRange()
       }
     }
   
+    this->onSamplesChanged();
   emit samplesChanged();
 }
 
@@ -368,6 +388,7 @@ void pqSampleScalarWidget::onControlledPropertyChanged()
     }
     
   this->reset();
+    this->onSamplesChanged();
 }
 
 void pqSampleScalarWidget::onControlledPropertyDomainChanged()
@@ -384,6 +405,7 @@ void pqSampleScalarWidget::onControlledPropertyDomainChanged()
     this->Implementation->UI->ScalarRange->setText(
       tr("Value Range: unlimited"));
     }
+      this->onSamplesChanged();
 }
 
 bool pqSampleScalarWidget::getRange(double& range_min, double& range_max)

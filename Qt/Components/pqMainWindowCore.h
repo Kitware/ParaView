@@ -335,7 +335,7 @@ private slots:
   // after first accept, set up undo stack so that the undo/redo
   // works correctly with pending displays etc etc.
   void onSourceCreated(pqPipelineSource*);
-  
+  void updateRecentFilterMenu(QAction* action);
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

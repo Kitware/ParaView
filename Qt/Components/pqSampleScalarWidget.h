@@ -79,6 +79,7 @@ private slots:
   void onSelectionChanged(const QItemSelection&, const QItemSelection&);
   
   void onDelete();
+  void onDeleteAll();
   void onNewValue();
   void onNewRange();
   void onSelectAll();

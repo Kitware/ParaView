@@ -102,6 +102,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStatusBar>
 #include <QToolBar>
 #include <QtDebug>
+#include <QList>
 
 #include <QVTKWidget.h>
 
@@ -172,8 +173,10 @@ public:
   pqGenericViewManager* const GenericViewManager;
  
   QMenu* RecentFilesMenu; 
-  
   QMenu* FilterMenu;
+  QMenu* AlphabeticalMenu;
+  QList<QString> RecentFilterList;
+
   pqPipelineMenu* PipelineMenu;
   QToolBar* VariableToolbar;
   QToolBar* CustomFilterToolbar;
@@ -372,6 +375,104 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     this->Implementation->FilterMenu << pqConnect(SIGNAL(triggered(QAction*)), 
       this, SLOT(onCreateFilter(QAction*)));
 
+    this->Implementation->FilterMenu << pqConnect(SIGNAL(triggered(QAction*)), 
+      this, SLOT(updateRecentFilterMenu(QAction*)));
+
+    this->Implementation->FilterMenu->clear();
+
+    // Update the menu items for the server and compound filters too.
+  
+    QStringList::Iterator iter;
+    pqSourceProxyInfo proxyInfo;
+
+
+
+    this->Implementation->RecentFilesMenu = this->Implementation->FilterMenu->addMenu("&Recent") 
+      << pqSetName("Recent");
+
+
+    //Common Filters
+    QStringList commonFilters;
+    commonFilters<<"Clip";
+    commonFilters<<"Cut";
+    commonFilters<<"Threshold";
+    commonFilters<<"Contour";
+    commonFilters<<"StreamTracer";
+
+    QMenu *commonMenu = this->Implementation->FilterMenu->addMenu("&Common") 
+      << pqSetName("Common");
+    for(iter = commonFilters.begin(); iter != commonFilters.end(); ++iter)
+      {
+      QAction* action = commonMenu->addAction(*iter) << pqSetName(*iter)
+        << pqSetData(*iter);
+      action->setEnabled(false);
+      }
+
+
+
+    // Load in the filter information.
+    QFile filterInfo(":/pqWidgets/XML/ParaViewFilters.xml");
+    if(filterInfo.open(QIODevice::ReadOnly))
+      {
+      vtkSmartPointer<vtkPVXMLParser> xmlParser = 
+        vtkSmartPointer<vtkPVXMLParser>::New();
+      xmlParser->InitializeParser();
+      QByteArray filter_data = filterInfo.read(1024);
+      while(!filter_data.isEmpty())
+        {
+        xmlParser->ParseChunk(filter_data.data(), filter_data.length());
+        filter_data = filterInfo.read(1024);
+        }
+
+      xmlParser->CleanupParser();
+      filterInfo.close();
+
+      proxyInfo.LoadFilterInfo(xmlParser->GetRootElement());
+      }
+  
+
+     this->Implementation->AlphabeticalMenu= this->Implementation->FilterMenu->addMenu("&Alphabetical") 
+          << pqSetName("Alphabetical");
+
+      vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
+      manager->InstantiateGroupPrototypes("filters");
+      int numFilters = manager->GetNumberOfProxies("filters_prototypes");
+      for(int i=0; i<numFilters; i++)
+      {
+
+        QStringList categoryList;
+        QString proxyName = manager->GetProxyName("filters_prototypes",i);
+
+        QAction* action = this->Implementation->AlphabeticalMenu->addAction(proxyName) << pqSetName(proxyName)
+          << pqSetData(proxyName);
+        action->setEnabled(false);
+      }
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+//Old Filter Menu
+  this->Implementation->FilterMenu = menu;
+  if(this->Implementation->FilterMenu)
+    {
+    this->Implementation->FilterMenu << pqConnect(SIGNAL(triggered(QAction*)), 
+      this, SLOT(onCreateFilter(QAction*)));
+
     this->Implementation->FilterMenu->clear();
 
     // Update the menu items for the server and compound filters too.
@@ -382,18 +483,18 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     pqSourceProxyInfo proxyInfo;
 
     //Released Filters
-    QStringList releasedFilters;
-    releasedFilters<<"Clip";
-    releasedFilters<<"Cut";
-    releasedFilters<<"Threshold";
-    releasedFilters<<"Contour";
-    releasedFilters<<"StreamTracer";
+    QStringList commonFilters;
+    commonFilters<<"Clip";
+    commonFilters<<"Cut";
+    commonFilters<<"Threshold";
+    commonFilters<<"Contour";
+    commonFilters<<"StreamTracer";
 
-    QMenu *releasedMenu = this->Implementation->FilterMenu->addMenu("Released") 
-      << pqSetName("Released");
-    for(iter = releasedFilters.begin(); iter != releasedFilters.end(); ++iter)
+    QMenu *commonMenu = this->Implementation->FilterMenu->addMenu("Common") 
+      << pqSetName("Common");
+    for(iter = commonFilters.begin(); iter != commonFilters.end(); ++iter)
       {
-      QAction* action = releasedMenu->addAction(*iter) << pqSetName(*iter)
+      QAction* action = commonMenu->addAction(*iter) << pqSetName(*iter)
         << pqSetData(*iter);
       action->setEnabled(false);
       }
@@ -478,6 +579,7 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
         }
       }
     }
+    */
 }
 
 pqPipelineMenu& pqMainWindowCore::pipelineMenu()
@@ -1550,7 +1652,40 @@ void pqMainWindowCore::onCreateFilter(QAction* action)
     qCritical() << "Filter could not be created.";
     } 
 }
+void pqMainWindowCore::updateRecentFilterMenu(QAction* action)
+{
+  if(!action)
+    {
+    return;
+    }
 
+  QString filterName = action->data().toString();
+  int idx=this->Implementation->RecentFilterList.indexOf(filterName);
+  if(idx!=-1)
+  {
+    this->Implementation->RecentFilterList.removeAt(idx);
+  }
+
+  this->Implementation->RecentFilterList.push_front(filterName);
+
+  this->Implementation->RecentFilesMenu->clear();
+
+
+  QList<QString>::iterator begin,end;
+  begin=this->Implementation->RecentFilterList.begin();
+  end=this->Implementation->RecentFilterList.end();
+  for(;begin!=end;++begin)
+  {
+    QAction* action = this->Implementation->RecentFilesMenu->addAction(*begin) << pqSetName(*begin)
+      << pqSetData(*begin);
+    action->setEnabled(false);
+  }
+
+
+
+
+
+}
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onCreateCompoundProxy(QAction* action)
 {
