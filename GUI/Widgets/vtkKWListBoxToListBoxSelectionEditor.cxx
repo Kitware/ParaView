@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.21");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -201,20 +201,25 @@ void vtkKWListBoxToListBoxSelectionEditor::CreateWidget()
   this->Script("pack %s %s -side left -fill x -expand y -padx 1 -pady 2",
     this->UpButton->GetWidgetName(),
     this->DownButton->GetWidgetName());
-  
+
   if(this->AllowReordering)
     {
-    this->Script("pack %s -side top -expand false -fill x",
-      this->ButtonFrame->GetWidgetName());
+    this->Pack();
     }
-  
+
   this->Script("pack %s -side left -expand true -fill both",
     frame->GetWidgetName());
   frame->Delete();
   this->DisplayEllipsis();
   this->Update();
 }
-
+  
+//----------------------------------------------------------------------------
+void vtkKWListBoxToListBoxSelectionEditor::Pack() 
+{
+  this->Script("pack %s -side top -expand false -fill x",
+    this->ButtonFrame->GetWidgetName());
+}  
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::AddElement(vtkKWListBox* l1, vtkKWListBox* l2, 
   const char* element, int force)
@@ -574,11 +579,8 @@ void vtkKWListBoxToListBoxSelectionEditor::UpdateEnableState()
   this->PropagateEnableState(this->AddAllButton);
   this->PropagateEnableState(this->RemoveButton);
   this->PropagateEnableState(this->RemoveAllButton);
-   if(this->AllowReordering)
-    {
-    this->PropagateEnableState(this->UpButton);
-    this->PropagateEnableState(this->DownButton);
-    }
+  this->PropagateEnableState(this->UpButton);
+  this->PropagateEnableState(this->DownButton);
 }
 
 //----------------------------------------------------------------------------
@@ -610,23 +612,20 @@ void vtkKWListBoxToListBoxSelectionEditor::Update()
     }
 
   //Up and Down buttons
-  if(this->AllowReordering)
+  if ( this->FinalList->GetWidget()->GetNumberOfItems() <= 1
+    || this->FinalList->GetWidget()->GetSelectionIndex()<0)
     {
-    if ( this->FinalList->GetWidget()->GetNumberOfItems() <= 1
-      || this->FinalList->GetWidget()->GetSelectionIndex()<0)
-      {
-      this->UpButton->SetEnabled(0);
-      this->DownButton->SetEnabled(0);
-      }
-    else if(this->FinalList->GetWidget()->GetSelectionIndex() ==0)
-      {
-      this->UpButton->SetEnabled(0);
-      }
-    else if(this->FinalList->GetWidget()->GetSelectionIndex() ==
-      (this->FinalList->GetWidget()->GetNumberOfItems()-1))
-      {
-      this->DownButton->SetEnabled(0);
-      }
+    this->UpButton->SetEnabled(0);
+    this->DownButton->SetEnabled(0);
+    }
+  else if(this->FinalList->GetWidget()->GetSelectionIndex() ==0)
+    {
+    this->UpButton->SetEnabled(0);
+    }
+  else if(this->FinalList->GetWidget()->GetSelectionIndex() ==
+    (this->FinalList->GetWidget()->GetNumberOfItems()-1))
+    {
+    this->DownButton->SetEnabled(0);
     }
 }
 
@@ -642,8 +641,7 @@ void vtkKWListBoxToListBoxSelectionEditor::SetAllowReordering(
 
   if(this->AllowReordering)
     {
-    this->Script("pack %s -side top -expand false -fill x",
-      this->ButtonFrame->GetWidgetName());
+    this->Pack();
     }
   else
     {

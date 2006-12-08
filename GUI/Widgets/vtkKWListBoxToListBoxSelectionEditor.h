@@ -126,6 +126,10 @@ protected:
   // Create the widget.
   virtual void CreateWidget();
 
+  // Description:
+  // Pack the Up/Down button Frame
+  virtual void Pack();
+
   vtkKWListBoxWithScrollbars* SourceList;
   vtkKWListBoxWithScrollbars* FinalList;
 
