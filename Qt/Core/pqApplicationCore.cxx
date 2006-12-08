@@ -527,6 +527,7 @@ QString pqApplicationCore::organizationName()
   return this->Internal->OrganizationName;
 }
 
+//-----------------------------------------------------------------------------
 pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
 {
   // Create a modified version of the resource that only contains server information
