@@ -226,6 +226,9 @@ void pqPythonEventSource::setContent(const QString& path)
   
 void pqPythonEventSource::getProperty()
 {
+  // ensure other tasks have been completed
+  QCoreApplication::processEvents();
+
   QObject* qobject = pqObjectNaming::GetObject(PropertyObject);
   if(!qobject)
     {

@@ -180,5 +180,8 @@ void pqEventDispatcher::stopPlayback()
     
   this->Implementation->Source = 0;
   this->Implementation->Player = 0;
+  
+  // ensure that everything is completed
+  QCoreApplication::processEvents();
 }
 
