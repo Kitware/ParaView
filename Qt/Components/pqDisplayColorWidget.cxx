@@ -85,7 +85,6 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
     SLOT(onVariableChanged(pqVariableType, const QString&)));
 
   this->VTKConnect = vtkEventQtSlotConnect::New();
-  this->BlockEmission = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -256,14 +255,12 @@ void pqDisplayColorWidget::updateGUI()
   pqPipelineDisplay* display = this->getDisplay();
   if (display)
     {
-    this->BlockEmission = true;
     int index = this->AvailableArrays.indexOf(display->getColorField());
     if (index < 0)
       {
       index = 0;
       }
     this->Variables->setCurrentIndex(index);
-    this->BlockEmission = false;
     }
 }
 

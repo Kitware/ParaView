@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 #include <QPointer>
+#include <QRegExp>
 
 #include "pqApplicationCore.h"
+#include "pqPipelineDisplay.h"
 #include "pqProxy.h"
 #include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
@@ -111,3 +113,66 @@ void pqScalarBarDisplay::onLookupTableModified()
     }
 }
 
+//-----------------------------------------------------------------------------
+QPair<QString, QString> pqScalarBarDisplay::getTitle() const
+{
+  QString title = pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("Title")).toString();
+  QRegExp reg("(.*)\\b(Magnitude|X|Y|Z|[0-9]+)\\b");
+  if (!reg.exactMatch(title))
+    {
+    return QPair<QString, QString>(title, "");
+    }
+  return QPair<QString, QString>(reg.cap(1), reg.cap(2));
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarBarDisplay::setTitle(const QString& name, const QString& comp)
+{
+  if (QPair<QString, QString>(name, comp) == this->getTitle())
+    {
+    return;
+    }
+
+  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("Title"),
+    (name + " " + comp).trimmed());
+  this->getProxy()->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarBarDisplay::makeTitle(pqPipelineDisplay* display)
+{
+  if (!this->Internal->LookupTable)
+    {
+    qDebug() << "Cannot setup title when not connected to any LUT.";
+    return;
+    }
+
+  QString arrayname = display->getColorField(true);
+  if (arrayname == "Solid Color" || arrayname == "")
+    {
+    // cannot decide title without array name.
+    return;
+    }
+
+  pqScalarsToColors::Mode mode = this->Internal->LookupTable->getVectorMode();
+  int component_no = this->Internal->LookupTable->getVectorComponent();
+  int num_components = display->getColorFieldNumberOfComponents(
+    display->getColorField(false));
+
+  QString component = (num_components > 1)? "Magnitude" : "";
+  if (num_components > 1 && 
+    mode == pqScalarsToColors::COMPONENT && component_no >= 0)
+    {
+    if (num_components <= 3 && component_no < 3)
+      {
+      const char* titles[] = { "X", "Y", "Z"};
+      component = titles[component_no];
+      }
+    else
+      {
+      component = QString::number(component_no);
+      }
+    }
+  this->setTitle(arrayname, component);
+}

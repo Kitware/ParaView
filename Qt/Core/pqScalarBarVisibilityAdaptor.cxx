@@ -94,6 +94,7 @@ void pqScalarBarVisibilityAdaptor::setScalarBarVisibility(bool visible)
     {
     pqPipelineBuilder* builder = pqApplicationCore::instance()->getPipelineBuilder();
     sb = builder->createScalarBar(lut, this->Internal->ActiveRenderModule);
+    sb->makeTitle(this->Internal->ActiveDisplay);
     }
   if (!sb)
     {

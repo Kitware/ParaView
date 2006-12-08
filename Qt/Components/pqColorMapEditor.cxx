@@ -363,6 +363,7 @@ void pqColorMapEditor::resetGUI()
   this->Form->ColorBarVisibility->setCheckState( 
     (sb && sb->isVisible()) ? Qt::Checked : Qt::Unchecked);
   this->setupScalarBarLinks(sb);
+  this->updateScalarBarTitle();
 
   this->Form->LockScalarRange->setCheckState(
     stc->getScalarRangeLock()? Qt::Checked : Qt::Unchecked);
@@ -718,14 +719,10 @@ void pqColorMapEditor::setColorBarVisibility(bool visible)
     pqPipelineBuilder* builder = 
       pqApplicationCore::instance()->getPipelineBuilder();
     sb = builder->createScalarBar(stc, rm);
-    this->setupScalarBarLinks(sb);
     // Set up scalar bar title only when the scalar bar is created.
-    this->setTitleName(this->Form->Display->getColorField(true));
-    if (this->Form->Component->count() > 1)
-      {
-      int index = this->getComponent() +1;
-      this->setTitleComponent(this->Form->Component->itemText(index));
-      }
+    sb->makeTitle(this->Form->Display);
+    this->setupScalarBarLinks(sb);
+    this->updateScalarBarTitle();
     }
 
   if (sb)
@@ -733,6 +730,25 @@ void pqColorMapEditor::setColorBarVisibility(bool visible)
     sb->setVisible(visible);
     sb->renderAllViews();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::updateScalarBarTitle()
+{
+  pqScalarsToColors* stc = this->Form->getScalarsToColors(this->LookupTable); 
+  if (stc)
+    {
+    pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
+      this->Form->Display->getViewModule(0));
+    pqScalarBarDisplay* sb = stc->getScalarBar(rm);
+    if (sb)
+      {
+      QPair<QString, QString> titlePair = sb->getTitle();
+      this->setTitle(titlePair.first, titlePair.second);
+      return;
+      }
+    }
+  this->setTitle("","");
 }
 
 //-----------------------------------------------------------------------------
@@ -834,13 +850,12 @@ void pqColorMapEditor::setScalarRangeMax(double max)
 void pqColorMapEditor::setComponent(int index)
 {
   int component_no = this->Form->Component->itemData(index).toInt();
-  pqSMAdaptor::setEnumerationProperty(this->LookupTable->GetProperty("VectorMode"),
-    (component_no == -1)? "Magnitude" : "Component");
-  pqSMAdaptor::setElementProperty(this->LookupTable->GetProperty("VectorComponent"),
-    (component_no == -1)? 0 : component_no);
+  pqScalarsToColors* stc = this->Form->getScalarsToColors(this->LookupTable);
+  stc->setVectorMode( 
+    (component_no==-1)? pqScalarsToColors::MAGNITUDE: pqScalarsToColors::COMPONENT,
+    component_no);
 
   this->setTitleComponent(this->Form->Component->itemText(index));
-  this->LookupTable->UpdateVTKObjects();
   this->Form->Display->renderAllViews();
 }
 
@@ -886,32 +901,19 @@ void pqColorMapEditor::setTitleComponent(const QString& comp)
 //-----------------------------------------------------------------------------
 void pqColorMapEditor::setTitle(const QString& name, const QString& comp)
 {
-  QString title ;
-  if (name != "" && comp != "")
-    {
-    title = name + " " + comp;
-    }
-  else
-    {
-    title = name + comp;
-    }
   pqScalarsToColors* stc = this->Form->getScalarsToColors(this->LookupTable);
-  if (!stc || !this->Form->Display)
+  if (stc && this->Form->Display)
     {
-    return;
-    }
+    pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
+      this->Form->Display->getViewModule(0));
 
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
-    this->Form->Display->getViewModule(0));
-
-  // Update Scalar Bar GUI.
-  pqScalarBarDisplay* sb = stc->getScalarBar(rm);
-  if (sb)
-    {
-    pqSMAdaptor::setElementProperty( 
-      sb->getProxy()->GetProperty("Title"), QVariant(title.toAscii().data()));
-    sb->getProxy()->UpdateVTKObjects();
-    sb->renderAllViews();
+    // Update Scalar Bar GUI.
+    pqScalarBarDisplay* sb = stc->getScalarBar(rm);
+    if (sb)
+      {
+      sb->setTitle(name, comp); 
+      sb->renderAllViews();
+      }
     }
 
   this->Form->TitleName->blockSignals(true);

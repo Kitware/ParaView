@@ -112,6 +112,9 @@ private:
   void resetFromLookupTable();
   int getComponent();
 
+  // Gets the current value of the Scalar bar's title and updates the GUI.
+  void updateScalarBarTitle();
+
   void setupScalarBarLinks(pqScalarBarDisplay* sb);
 };
 

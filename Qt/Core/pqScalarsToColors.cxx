@@ -190,3 +190,32 @@ void pqScalarsToColors::setWholeScalarRange(double min, double max)
 
   this->setScalarRange(min, max);
 }
+
+//-----------------------------------------------------------------------------
+void pqScalarsToColors::setVectorMode(Mode mode, int comp)
+{
+  vtkSMProxy* proxy = this->getProxy();
+  pqSMAdaptor::setEnumerationProperty(proxy->GetProperty("VectorMode"),
+    (mode == MAGNITUDE)? "Magnitude" : "Component");
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("VectorComponent"),
+    (mode == COMPONENT)? comp: 0);
+  proxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+pqScalarsToColors::Mode pqScalarsToColors::getVectorMode() const
+{
+  if (pqSMAdaptor::getEnumerationProperty(
+      this->getProxy()->GetProperty("VectorMode")) == "Magnitude")
+    {
+    return MAGNITUDE;
+    }
+  return COMPONENT;
+}
+
+//-----------------------------------------------------------------------------
+int pqScalarsToColors::getVectorComponent() const
+{
+  return pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("VectorComponent")).toInt();
+}

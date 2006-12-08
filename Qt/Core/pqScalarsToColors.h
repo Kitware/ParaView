@@ -64,6 +64,23 @@ public:
   void setScalarRange(double min, double max);
 
   QPair<double, double> getScalarRange() const;
+
+  enum Mode
+    {
+    MAGNITUDE = 0,
+    COMPONENT = 1
+    };
+
+  // Set the color mode (component/magnitude) and 
+  // component to color by. When mode is magnitude, component is ignored.
+  void setVectorMode(Mode mode, int component);
+
+  // Returns the vector mode and component used by the Lookup table. 
+  // When vector mode is MAGNITUDE, value returned by
+  // getVectorComponent() is indeterminate.
+  Mode getVectorMode() const;
+  int getVectorComponent() const;
+
 public slots:
   // This method checks if this LUT is used by any display,
   // if not, it hides all the scalars bar showing this LUT.

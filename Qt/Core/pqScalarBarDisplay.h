@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqScalarBarDisplay_h
 
 #include "pqDisplay.h"
+
+class pqPipelineDisplay;
 class pqScalarBarDisplayInternal;
 class pqScalarsToColors;
 
@@ -50,8 +52,22 @@ public:
   // Get the lookup table this scalar bar shows, if any.
   pqScalarsToColors* getLookupTable() const;
 
+  // Calls this method to set up a title for the scalar bar
+  // using the color by array name from the display.
+  // The component used to color with is obtained from the 
+  // LookupTable already stored by this object.
+  void makeTitle(pqPipelineDisplay* display);
+
+  // A scalar bar title is divided into two parts (any of which can be empty).
+  // Typically the first is the array name and the second is the component.
+  // This method returns the pair.
+  QPair<QString, QString> getTitle() const;
+  
+  // Set the title formed by combining two parts.
+  void setTitle(const QString& name, const QString& component);
 protected slots:
   void onLookupTableModified();
+
 private:
   pqScalarBarDisplayInternal* Internal;
 };
