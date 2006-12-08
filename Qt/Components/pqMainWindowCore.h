@@ -337,6 +337,8 @@ private slots:
   void onSourceCreated(pqPipelineSource*);
   void updateRecentFilterMenu(QAction* action);
 private:
+  void saveRecentFilterMenu();
+  void restoreRecentFilterMenu();
   class pqImplementation;
   pqImplementation* const Implementation;
 };

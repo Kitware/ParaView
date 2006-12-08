@@ -294,6 +294,7 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
 /*
   this->installEventFilter(this);
 */
+
   // set up state loader.
   pqStateLoader* loader = pqStateLoader::New();
   loader->SetMainWindowCore(this);
@@ -389,7 +390,7 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
 
     this->Implementation->RecentFilesMenu = this->Implementation->FilterMenu->addMenu("&Recent") 
       << pqSetName("Recent");
-
+    this->restoreRecentFilterMenu();
 
     //Common Filters
     QStringList commonFilters;
@@ -1667,6 +1668,12 @@ void pqMainWindowCore::updateRecentFilterMenu(QAction* action)
   }
 
   this->Implementation->RecentFilterList.push_front(filterName);
+  if(this->Implementation->RecentFilterList.size()>10)
+  {
+    this->Implementation->RecentFilterList.removeLast();
+  }
+
+
 
   this->Implementation->RecentFilesMenu->clear();
 
@@ -1681,11 +1688,68 @@ void pqMainWindowCore::updateRecentFilterMenu(QAction* action)
     action->setEnabled(false);
   }
 
-
-
-
-
+  this->saveRecentFilterMenu();
 }
+
+
+static const char* RecentFilterMenuSettings[] = {
+  "FilterOne",
+  "FilterTwo",
+  "FilterThree",
+  "FilterFour",
+  "FilterFive",
+  "FilterSix",
+  "FilterSeven",
+  "FilterEight",
+  "FilterNine",
+  "FilterTen",
+  NULL  // keep last
+};
+
+
+void pqMainWindowCore::saveRecentFilterMenu()
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  const char** str;
+
+  QList<QString>::iterator begin,end;
+  begin=this->Implementation->RecentFilterList.begin();
+  end=this->Implementation->RecentFilterList.end();
+
+  for(str=RecentFilterMenuSettings; *str != NULL; str++)
+  {
+    if(begin!=end)
+    {
+      QString key = QString("recentFilterMenu/") + *str;
+      settings->setValue(key, *begin);
+      begin++;    
+    }
+
+  }
+}
+void pqMainWindowCore::restoreRecentFilterMenu()
+{
+  this->Implementation->RecentFilesMenu->clear();
+
+  // Now load default values from the QSettings, if available.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+
+  const char** str;
+
+  for(str=RecentFilterMenuSettings; *str != NULL; str++)
+  {
+    QString key = QString("recentFilterMenu/") + *str;
+    if (settings->contains(key))
+    {
+      QString filterName=settings->value(key).toString();
+      QAction* action = this->Implementation->RecentFilesMenu->addAction(filterName) << pqSetName(filterName)
+        << pqSetData(filterName);
+      action->setEnabled(false);
+    }
+  }
+}
+
+
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onCreateCompoundProxy(QAction* action)
 {
