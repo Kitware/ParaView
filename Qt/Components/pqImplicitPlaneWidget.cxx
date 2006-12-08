@@ -415,7 +415,10 @@ void pqImplicitPlaneWidget::resetBounds()
       origin->SetElements(input_origin);
       }
     widget->UpdateProperty("Origin");
-    qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
+    if(this->getRenderModule())
+      {
+      this->getRenderModule()->render();
+      }
     }
 }
 
@@ -458,7 +461,10 @@ void pqImplicitPlaneWidget::onUseCenterBounds()
           {
           origin->SetElements(input_origin);
           widget->UpdateVTKObjects();
-          qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
+          if(this->getRenderModule())
+            {
+            this->getRenderModule()->render();
+            }
           }
         }
       }
@@ -476,7 +482,10 @@ void pqImplicitPlaneWidget::onUseXNormal()
       {
       normal->SetElements3(1, 0, 0);
       widget->UpdateVTKObjects();
-      qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
+      if(this->getRenderModule())
+        {
+        this->getRenderModule()->render();
+        }
       }
     }
 }
@@ -492,7 +501,10 @@ void pqImplicitPlaneWidget::onUseYNormal()
       {
       normal->SetElements3(0, 1, 0);
       widget->UpdateVTKObjects();
-      qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
+      if(this->getRenderModule())
+        {
+        this->getRenderModule()->render();
+        }
       }
     }
 }
@@ -508,7 +520,10 @@ void pqImplicitPlaneWidget::onUseZNormal()
       {
       normal->SetElements3(0, 0, 1);
       widget->UpdateVTKObjects();
-      qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
+      if(this->getRenderModule())
+        {
+        this->getRenderModule()->render();
+        }
       }
     }
 }
@@ -530,7 +545,10 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
           -camera_normal[0], -camera_normal[1], -camera_normal[2]);
         
         widget->UpdateVTKObjects();
-        qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
+        if(this->getRenderModule())
+          {
+          this->getRenderModule()->render();
+          }
         }
       }
     }
@@ -596,7 +614,10 @@ void pqImplicitPlaneWidget::set3DWidgetState(const double* origin, const double*
     
     widget->UpdateVTKObjects();
     
-    qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
+    if(this->getRenderModule())
+      {
+      this->getRenderModule()->render();
+      }
     }
     
   this->Ignore3DWidget = false;
