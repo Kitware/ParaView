@@ -25,7 +25,7 @@
    <item>
     <widget class="QCheckBox" name="show3DWidget" >
      <property name="text" >
-      <string>Visible</string>
+      <string>Show Plane</string>
      </property>
     </widget>
    </item>

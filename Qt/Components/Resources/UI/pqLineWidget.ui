@@ -25,7 +25,7 @@
    <item>
     <widget class="QCheckBox" name="visible" >
      <property name="text" >
-      <string>Visible</string>
+      <string>Show Line</string>
      </property>
     </widget>
    </item>
