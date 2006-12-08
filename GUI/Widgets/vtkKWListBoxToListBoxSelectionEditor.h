@@ -25,6 +25,7 @@
 class vtkKWListBoxWithScrollbars;
 class vtkKWPushButton;
 class vtkKWListBox;
+class vtkKWFrame;
 
 class KWWidgets_EXPORT vtkKWListBoxToListBoxSelectionEditor : public vtkKWCompositeWidget
 {
@@ -96,6 +97,15 @@ public:
   virtual void UpdateEnableState();
   virtual void Update();
 
+  // Descrition:
+  // Set/Get whether the widget should allow reordering
+  // or the final list with the Up/Down buttons.
+  //BTX 
+  virtual void SetAllowReordering(int);
+  vtkBooleanMacro(AllowReordering, int);
+  vtkGetMacro(AllowReordering, int);
+  //ETX
+
   // Description:
   // Callbacks. Internal, do not use.
   virtual void AddCallback();
@@ -105,6 +115,8 @@ public:
   virtual void UpCallback();
   virtual void DownCallback();
   virtual void EllipsisCallback();
+  virtual void SourceSelectionChangedCallback();
+  virtual void FinalSelectionChangedCallback();
 
 protected:
   vtkKWListBoxToListBoxSelectionEditor();
@@ -123,6 +135,7 @@ protected:
   vtkKWPushButton* RemoveAllButton;
   vtkKWPushButton* UpButton;
   vtkKWPushButton* DownButton;
+  vtkKWFrame* ButtonFrame;
 
   virtual void MoveWholeList(vtkKWListBox* l1, vtkKWListBox* l2);
   virtual void MoveSelectedList(vtkKWListBox* l1, vtkKWListBox* l2);
@@ -136,6 +149,7 @@ protected:
   virtual void InvokeFinalListChangedCommand();
 
   int EllipsisDisplayed;
+  int AllowReordering;
 
   virtual void DisplayEllipsis();
   virtual void RemoveEllipsis();
