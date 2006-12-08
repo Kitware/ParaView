@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // server manager includes
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMBooleanDomain.h"
-#include "vtkSMDomain.h"
+#include "vtkSMBoundsDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -1103,7 +1103,7 @@ QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(
   
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
-  while(!iter->IsAtEnd())
+  while(!iter->IsAtEnd() && !DoubleDomain && !IntDomain)
     {
     vtkSMDomain* d = iter->GetDomain();
     if(!DoubleDomain)
@@ -1184,21 +1184,10 @@ QVariant pqSMAdaptor::getMultipleElementProperty(vtkSMProperty* Property,
   vtkSMIdTypeVectorProperty* idvp = NULL;
   vtkSMStringVectorProperty* svp = NULL;
 
-  vtkSMProperty* info = Property->GetInformationProperty();
-  if(info)
-    {
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(info);
-    ivp = vtkSMIntVectorProperty::SafeDownCast(info);
-    idvp = vtkSMIdTypeVectorProperty::SafeDownCast(info);
-    svp = vtkSMStringVectorProperty::SafeDownCast(info);
-    }
-  else
-    {
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(Property);
-    ivp = vtkSMIntVectorProperty::SafeDownCast(Property);
-    idvp = vtkSMIdTypeVectorProperty::SafeDownCast(Property);
-    svp = vtkSMStringVectorProperty::SafeDownCast(Property);
-    }
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(Property);
+  ivp = vtkSMIntVectorProperty::SafeDownCast(Property);
+  idvp = vtkSMIdTypeVectorProperty::SafeDownCast(Property);
+  svp = vtkSMStringVectorProperty::SafeDownCast(Property);
 
   if(dvp && dvp->GetNumberOfElements() > Index)
     {
@@ -1590,4 +1579,23 @@ QList<QString> pqSMAdaptor::getFieldSelectionScalarDomain(vtkSMProperty*
   return types;
 }
 
-
+//-----------------------------------------------------------------------------
+QList<QString> pqSMAdaptor::getDomainTypes(vtkSMProperty* property)
+{
+  QList<QString> types;
+  if (property)
+    {
+    vtkSMDomainIterator* iter = property->NewDomainIterator();
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      vtkSMDomain* d = iter->GetDomain();
+      QString classname = d->GetClassName();
+      if (!types.contains(classname))
+        {
+        types.push_back(classname);
+        }
+      }
+    iter->Delete();
+    }
+  return types;
+}

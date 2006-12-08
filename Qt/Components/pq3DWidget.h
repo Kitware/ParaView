@@ -132,6 +132,14 @@ public slots:
   /// Set the render module that this widget works with
   virtual void setRenderModule(pqRenderViewModule* rm);
 
+  /// Resets the bounds of the 3D widget to the reference proxy bounds.
+  /// This typically calls PlaceWidget on the underlying 3D Widget 
+  /// with reference proxy bounds.
+  /// This should be explicitly called after the panel is created
+  /// and the widget is initialized i.e. the reference proxy, controlled proxy
+  /// and hints have been set.
+  virtual void resetBounds() =0;
+
 protected slots:
   /// Called to request a render.
   void render();
@@ -152,8 +160,10 @@ protected:
   /// Called when one of the controlled properties change (e.g: by undo/redo)
   virtual void onControlledPropertyChanged();
 
-  /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  virtual void resetBounds() =0;
+
+  /// Used to get the input bounds on for the reference proxy, if any.
+  /// returns 1 on success, 0 otherwise.
+  int getReferenceInputBounds(double bounds[6]) const;
 
 private:
   void updateWidgetVisibility();

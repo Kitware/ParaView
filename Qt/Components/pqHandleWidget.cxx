@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqHandleWidget.h"
 
+#include <QDoubleValidator>
+
 #include <vtkCamera.h>
 #include <vtkMemberFunctionCommand.h>
 #include <vtkHandleRepresentation.h>
@@ -97,6 +99,12 @@ pqHandleWidget::pqHandleWidget(QWidget* p) :
 
   this->Implementation->UI->setupUi(this);
   this->Implementation->UI->show3DWidget->setChecked(this->widgetVisible());
+
+  // Setup validators for all line edits.
+  QDoubleValidator* validator = new QDoubleValidator(this);
+  this->Implementation->UI->worldPositionX->setValidator(validator);
+  this->Implementation->UI->worldPositionY->setValidator(validator);
+  this->Implementation->UI->worldPositionZ->setValidator(validator);
 
   QObject::connect(this->Implementation->UI->show3DWidget,
     SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
@@ -201,37 +209,20 @@ void pqHandleWidget::onWidgetVisibilityChanged(bool visible)
 void pqHandleWidget::resetBounds()
 {
   vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
-  if(widget && this->getReferenceProxy())
+  double input_bounds[6];
+  if(widget && this->getReferenceInputBounds(input_bounds))
     {
-    if(vtkSMProxyProperty* const input_property =
-      vtkSMProxyProperty::SafeDownCast(
-        this->getReferenceProxy()->getProxy()->GetProperty("Input")))
+    double input_origin[3];
+    input_origin[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
+    input_origin[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
+    input_origin[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
+
+    if(vtkSMDoubleVectorProperty* const widget_position =
+      vtkSMDoubleVectorProperty::SafeDownCast(
+        widget->GetProperty("WorldPosition")))
       {
-      if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
-          input_property->GetProxy(0)))
-        {
-        double input_bounds[6];
-        input_proxy->GetDataInformation()->GetBounds(input_bounds);
-
-        double input_origin[3];
-        input_origin[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
-        input_origin[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
-        input_origin[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
-
-        if(widget)
-          {
-          if(vtkSMDoubleVectorProperty* const widget_position =
-            vtkSMDoubleVectorProperty::SafeDownCast(
-              widget->GetProperty("WorldPosition")))
-            {
-            widget_position->SetElements(input_origin);
-            }
-
-          widget->UpdateVTKObjects();
-
-          pqApplicationCore::instance()->render();
-          }
-        }
+      widget_position->SetElements(input_origin);
+      widget->UpdateVTKObjects();
       }
     }
 }

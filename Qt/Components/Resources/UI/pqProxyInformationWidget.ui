@@ -22,6 +22,37 @@
    <property name="spacing" >
     <number>2</number>
    </property>
+<!--sdsdsd -->
+   <item>
+    <widget class="QGroupBox" name="properties" >
+     <property name="title" >
+      <string>Properties</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>4</number>
+      </property>
+      <property name="spacing" >
+       <number>4</number>
+      </property>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="filenameLabel" >
+        <property name="text" >
+         <string>Filename:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QLabel" name="filename" >
+        <property name="text" >
+         <string>Filename:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+<!--dsdsds -->
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >

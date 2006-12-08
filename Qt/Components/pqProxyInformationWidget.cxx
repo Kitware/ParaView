@@ -37,17 +37,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes
 
 // VTK includes
+#include <vtksys/SystemTools.hxx>
 
 // ParaView Server Manager includes
 #include "vtkPVArrayInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMDomain.h"
+#include "vtkSMDomainIterator.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMSourceProxy.h"
 
 // ParaView widget includes
 
 // ParaView core includes
 #include "pqProxy.h"
+#include "pqSMAdaptor.h"
 
 // ParaView components includes
 
@@ -95,6 +102,11 @@ pqProxy* pqProxyInformationWidget::getProxy()
 //-----------------------------------------------------------------------------
 void pqProxyInformationWidget::updateInformation()
 {
+  this->Ui->properties->setVisible(false);
+  this->Ui->filename->setText(tr("NA"));
+  this->Ui->filename->setToolTip(tr("NA"));
+  this->Ui->filename->setStatusTip(tr("NA"));
+
   // out with the old
   this->Ui->type->setText(tr("NA"));
   this->Ui->numberOfCells->setText(tr("NA"));
@@ -201,6 +213,41 @@ void pqProxyInformationWidget::updateInformation()
     zrange = zrange.arg(bounds[5] - bounds[4], -1, 'f', 3);
     this->Ui->zRange->setText(zrange);
 
+    }
+
+  if (sourceProxy)
+    {
+    // Find the first property that has a vtkSMFileListDomain. Assume that
+    // it is the property used to set the filename.
+    vtkSmartPointer<vtkSMPropertyIterator> piter;
+    piter.TakeReference(sourceProxy->NewPropertyIterator());
+    for (piter->Begin(); !piter->IsAtEnd(); piter->Next())
+      {
+      vtkSMProperty* prop = piter->GetProperty();
+      if (prop->IsA("vtkSMStringVectorProperty"))
+        {
+        vtkSmartPointer<vtkSMDomainIterator> diter;
+        diter.TakeReference(prop->NewDomainIterator());
+        for(diter->Begin(); !diter->IsAtEnd(); diter->Next())
+          {
+          if (diter->GetDomain()->IsA("vtkSMFileListDomain"))
+            {
+            QString filename = 
+              pqSMAdaptor::getElementProperty(piter->GetProperty()).toString();
+            this->Ui->properties->show();
+            this->Ui->filename->setText(vtksys::SystemTools::GetFilenameName(
+                filename.toAscii().data()).c_str());
+            this->Ui->filename->setToolTip(filename);
+            this->Ui->filename->setStatusTip(filename);
+            break;
+            }
+          }
+        if (!diter->IsAtEnd())
+          {
+          break;
+          }
+        }
+      }
     }
 }
 

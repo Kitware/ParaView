@@ -53,8 +53,12 @@ public:
   /// 3D widget.
   virtual void setControlledProxy(vtkSMProxy*);
 
-protected:
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
+  /// This typically calls PlaceWidget on the underlying 3D Widget 
+  /// with reference proxy bounds.
+  /// This should be explicitly called after the panel is created
+  /// and the widget is initialized i.e. the reference proxy, controlled proxy
+  /// and hints have been set.
   virtual void resetBounds();
 
 private slots:

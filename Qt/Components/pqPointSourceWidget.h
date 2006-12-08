@@ -50,6 +50,14 @@ public:
   pqPointSourceWidget(QWidget* p = 0);
   ~pqPointSourceWidget();
 
+  /// Resets the bounds of the 3D widget to the reference proxy bounds.
+  /// This typically calls PlaceWidget on the underlying 3D Widget 
+  /// with reference proxy bounds.
+  /// This should be explicitly called after the panel is created
+  /// and the widget is initialized i.e. the reference proxy, controlled proxy
+  /// and hints have been set.
+  virtual void resetBounds();
+
 protected:
   /// Subclasses can override this method to map properties to
   /// GUI. Default implementation updates the internal datastructures
@@ -57,6 +65,7 @@ protected:
   /// accept/reset.
   virtual void setControlledProperty(const char* function,
     vtkSMProperty * controlled_property);
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

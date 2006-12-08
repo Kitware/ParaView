@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqLineWidget.h"
 
+#include <QDoubleValidator>
+
 #include <vtkMemberFunctionCommand.h>
 #include <vtkPVDataInformation.h>
 #include <vtkSMDoubleVectorProperty.h>
@@ -86,6 +88,15 @@ pqLineWidget::pqLineWidget(QWidget* p) :
 {
   this->Implementation->UI.setupUi(this);
   this->Implementation->UI.visible->setChecked(this->widgetVisible());
+
+  // Setup validators for all line widgets.
+  QDoubleValidator* validator = new QDoubleValidator(this);
+  this->Implementation->UI.point1X->setValidator(validator);
+  this->Implementation->UI.point1Y->setValidator(validator);
+  this->Implementation->UI.point1Z->setValidator(validator);
+  this->Implementation->UI.point2X->setValidator(validator);
+  this->Implementation->UI.point2Y->setValidator(validator);
+  this->Implementation->UI.point2Z->setValidator(validator);
 
   QObject::connect(this->Implementation->UI.visible,
     SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
@@ -134,6 +145,7 @@ void pqLineWidget::setControlledProxy(vtkSMProxy* proxy)
   this->Superclass::setControlledProxy(proxy);
 }
 
+//-----------------------------------------------------------------------------
 void pqLineWidget::setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2)
 {
   this->Implementation->WidgetPoint1->Copy(point1);
@@ -144,6 +156,7 @@ void pqLineWidget::setControlledProperties(vtkSMProperty* point1, vtkSMProperty*
   this->setControlledProperty(this->Implementation->WidgetPoint2, point2);
 }
 
+//-----------------------------------------------------------------------------
 void pqLineWidget::onXAxis()
 {
   double object_center[3];
@@ -165,6 +178,7 @@ void pqLineWidget::onXAxis()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineWidget::onYAxis()
 {
   double object_center[3];
@@ -207,16 +221,17 @@ void pqLineWidget::onZAxis()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineWidget::createWidget(pqServer* server)
 {
   vtkSMNew3DWidgetProxy* const widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-      get3DWidget("LineSourceWidgetDisplay", server);
+    get3DWidget("LineSourceWidgetDisplay", server);
   this->setWidgetProxy(widget);
-  
+
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();
-  
+
   this->Implementation->WidgetPoint1 = vtkSMDoubleVectorProperty::SafeDownCast(
     widget->GetProperty("Point1WorldPosition"));
   this->Implementation->WidgetPoint2 = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -264,38 +279,45 @@ void pqLineWidget::createWidget(pqServer* server)
     adaptor, "value", SIGNAL(valueChanged(const QString&)),
     widget, this->Implementation->WidgetPoint2, 2);
 
- }
-
-void pqLineWidget::resetBounds()
-{
 }
 
+//-----------------------------------------------------------------------------
+void pqLineWidget::resetBounds()
+{
+  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  double bounds[6];
+  if (!widget || !this->getReferenceInputBounds(bounds))
+    {
+    return;
+    }
+
+  if(vtkSMDoubleVectorProperty* const place_widget =
+    vtkSMDoubleVectorProperty::SafeDownCast(
+      widget->GetProperty("PlaceWidget")))
+    {
+    place_widget->SetElements(bounds);
+    widget->UpdateProperty("PlaceWidget", 1);
+    }
+  widget->UpdatePropertyInformation();
+}
+
+//-----------------------------------------------------------------------------
 void pqLineWidget::getReferenceBoundingBox(double center[3], double sz[3])
 {
-  if(this->getReferenceProxy())
+  double input_bounds[6];
+  if(this->getReferenceInputBounds(input_bounds))
     {
-    if(vtkSMProxyProperty* const input_property =
-      vtkSMProxyProperty::SafeDownCast(
-        this->getReferenceProxy()->getProxy()->GetProperty("Input")))
-      {
-      if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
-        input_property->GetProxy(0)))
-        {
-        double input_bounds[6];
-        input_proxy->GetDataInformation()->GetBounds(input_bounds);
+    center[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
+    center[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
+    center[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
 
-        center[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
-        center[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
-        center[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
-
-        sz[0] = fabs(input_bounds[1] - input_bounds[0]);
-        sz[1] = fabs(input_bounds[3] - input_bounds[2]);
-        sz[2] = fabs(input_bounds[5] - input_bounds[4]);
-        }
-      }
+    sz[0] = fabs(input_bounds[1] - input_bounds[0]);
+    sz[1] = fabs(input_bounds[3] - input_bounds[2]);
+    sz[2] = fabs(input_bounds[5] - input_bounds[4]);
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineWidget::onWidgetVisibilityChanged(bool visible)
 {
   this->Implementation->UI.visible->blockSignals(true);

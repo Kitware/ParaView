@@ -168,6 +168,7 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
         }
       }
     }
+  this->Implementation->ImplicitPlaneWidget.resetBounds();
 
   // Setup the sample scalar widget ...
   this->Implementation->SampleScalarWidget.setDataSources(

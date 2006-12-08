@@ -33,12 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes.
 #include "vtkMemberFunctionCommand.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNew3DWidgetProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
 
 // Qt includes.
 #include <QtDebug>
@@ -52,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
 #include "pqRenderViewModule.h"
+#include "pqSMAdaptor.h"
 
 class pq3DWidgetInternal
 {
@@ -247,7 +250,7 @@ vtkSMNew3DWidgetProxy* pq3DWidget::getWidgetProxy() const
 void pq3DWidget::setReferenceProxy(pqProxy* proxy)
 {
   this->Internal->ReferenceProxy = proxy;
-  this->resetBounds();
+  this->reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -270,7 +273,6 @@ void pq3DWidget::setControlledProxy(vtkSMProxy* proxy)
   if (proxy)
     {
     this->reset();
-    this->resetBounds();
     }
 }
 
@@ -307,7 +309,6 @@ void pq3DWidget::setHints(vtkPVXMLElement* hints)
       }
     }
   this->reset();
-  this->resetBounds();
 }
 
 //-----------------------------------------------------------------------------
@@ -377,6 +378,7 @@ void pq3DWidget::reset()
   if (this->Internal->WidgetProxy)
     {
     this->Internal->WidgetProxy->UpdateVTKObjects();
+    this->Internal->WidgetProxy->UpdatePropertyInformation();
     pqApplicationCore::instance()->render();
     }
   this->blockSignals(false);
@@ -430,6 +432,29 @@ void pq3DWidget::showWidget()
 void pq3DWidget::hideWidget()
 {
   this->setWidgetVisible(false);
+}
+
+//-----------------------------------------------------------------------------
+int pq3DWidget::getReferenceInputBounds(double bounds[6]) const
+{
+  if (!this->getReferenceProxy())
+    {
+    return 0;
+    }
+  vtkSMProxy* refProxy = this->getReferenceProxy()->getProxy();
+  vtkSMProperty* input_prop = refProxy->GetProperty("Input");
+  if (!input_prop)
+    {
+    return 0;
+    }
+  vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
+    pqSMAdaptor::getProxyProperty(input_prop));
+  if (!input)
+    {
+    return 0;
+    }
+  input->GetDataInformation()->GetBounds(bounds);
+  return 1;
 }
 
 //-----------------------------------------------------------------------------

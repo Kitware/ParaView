@@ -97,7 +97,8 @@ public:
   void renderAllViews(bool force=false);
 
   /// Sets default values for the underlying proxy. This is typically called
-  /// only on proxies created by the GUI itself.
+  /// only on proxies created by the GUI itself, and after the input 
+  /// (if applicable) has been set.
   void setDefaultValues();
 
 

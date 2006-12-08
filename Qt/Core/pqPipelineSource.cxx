@@ -163,27 +163,11 @@ void pqPipelineSource::createProxiesForProxyListDomains()
 //-----------------------------------------------------------------------------
 void pqPipelineSource::setDefaultValues()
 {
-  // Locate all properties with proxy list domains and set their default
-  // values.
   vtkSMProxy* proxy = this->getProxy();
   vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-    vtkSMProxyProperty* prop = vtkSMProxyProperty::SafeDownCast(
-      iter->GetProperty());
-    if (!prop)
-      {
-      continue;
-      }
-    vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-      prop->GetDomain("proxy_list"));
-    if (!pld || pld->GetNumberOfProxies() == 0)
-      {
-      continue;
-      }
-    vtkSMProxy* value = pld->GetProxy(0);
-    prop->RemoveAllProxies();
-    prop->AddProxy(value);
+    iter->GetProperty()->ResetToDefault();
     }
   iter->Delete();
 }

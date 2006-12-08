@@ -91,6 +91,30 @@ pqPointSourceWidget::~pqPointSourceWidget()
   delete this->Implementation;
 }
 
+#define vtkMin(a,b) ((a>b)? (b) : (a))
+
+//-----------------------------------------------------------------------------
+void pqPointSourceWidget::resetBounds()
+{
+  this->Superclass::resetBounds();
+
+  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  double input_bounds[6];
+  if(widget && this->getReferenceInputBounds(input_bounds))
+    {
+    double min_diameter = input_bounds[1]-input_bounds[0];
+    min_diameter = vtkMin(min_diameter, input_bounds[3]-input_bounds[2]);
+    min_diameter = vtkMin(min_diameter, input_bounds[5]-input_bounds[4]);
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      widget->GetProperty("Radius"));
+    if (dvp)
+      {
+      dvp->SetElement(0, min_diameter * 0.1);
+      }
+    widget->UpdateVTKObjects();
+    }
+}
+
 //-----------------------------------------------------------------------------
 void pqPointSourceWidget::setControlledProperty(const char* function,
   vtkSMProperty* _property)

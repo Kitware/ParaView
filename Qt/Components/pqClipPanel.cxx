@@ -154,6 +154,7 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
         }
       }
     }
+  this->Implementation->ImplicitPlaneWidget.resetBounds();
 
   this->propertyManager()->registerLink(
     &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),

@@ -54,6 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 
+#include <vtksys/SystemTools.hxx>
+
 // Qt includes.
 #include <QApplication>
 #include <QDomDocument>
@@ -633,12 +635,12 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
 
   if(filter)
     {
-    filter->setDefaultValues();
     this->getPipelineBuilder()->addConnection(input, filter);
     if (vtkSMProperty* const input_prop = filter->getProxy()->GetProperty("Input"))
       {
       input_prop->UpdateDependentDomains();
       }
+    filter->setDefaultValues();
 
     // As a special-case, set a default implicit function for new Cut filters
     if(xmlname == "Cut")
@@ -709,6 +711,7 @@ pqPipelineSource* pqApplicationCore::createSourceOnServer(const QString& xmlname
   pqPipelineSource* source = this->getPipelineBuilder()->createSource(
     "sources", xmlname.toAscii().data(), 
     server, NULL);
+  source->setDefaultValues();
 
   emit this->sourceCreated(source);
   this->getUndoStack()->EndUndoSet();
@@ -744,11 +747,12 @@ pqPipelineSource* pqApplicationCore::createCompoundFilter(
   else if(inputProperty && input)
     {
     this->getPipelineBuilder()->addConnection(input, source);
+    inputProperty->UpdateDependentDomains();
     }
 
   if(source)
     {
-    //source->getProxy()->UpdateVTKObjects();
+    source->setDefaultValues();
     emit this->sourceCreated(source);
     }
 
@@ -757,7 +761,7 @@ pqPipelineSource* pqApplicationCore::createCompoundFilter(
   return source;
 }
 
-
+//-----------------------------------------------------------------------------
 pqPipelineSource* pqApplicationCore::createReaderOnServer(
                const QString& filename,
                pqServer* server,
@@ -826,6 +830,16 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
                                     filename);
     proxy->UpdateVTKObjects();
     }
+
+  // Update pipeline information so that the reader
+  // readers file headers and obtains necessary information.
+  vtkSMSourceProxy::SafeDownCast(proxy)->UpdatePipelineInformation();
+  proxy->UpdatePropertyInformation();
+  reader->setDefaultValues();
+
+  // Set the proxy name to be the same as the filename.
+  reader->rename(
+    vtksys::SystemTools::GetFilenameName(filename.toAscii().data()).c_str());
 
   emit this->sourceCreated(reader);
   this->getUndoStack()->EndUndoSet();

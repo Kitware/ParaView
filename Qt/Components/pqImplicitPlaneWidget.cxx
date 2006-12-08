@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqImplicitPlaneWidget.h"
 
+#include <QDoubleValidator>
+
 #include <vtkCamera.h>
 #include <vtkMemberFunctionCommand.h>
 #include <vtkImplicitPlaneRepresentation.h>
@@ -110,6 +112,15 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
     
   this->Implementation->UI->setupUi(this);
   this->Implementation->UI->show3DWidget->setChecked(this->widgetVisible());
+
+  // Set validators for all line edit boxes.
+  QDoubleValidator* validator = new QDoubleValidator(this);
+  this->Implementation->UI->originX->setValidator(validator);
+  this->Implementation->UI->originY->setValidator(validator);
+  this->Implementation->UI->originZ->setValidator(validator);
+  this->Implementation->UI->normalX->setValidator(validator);
+  this->Implementation->UI->normalY->setValidator(validator);
+  this->Implementation->UI->normalZ->setValidator(validator);
 
   connect(this->Implementation->UI->show3DWidget,
     SIGNAL(toggled(bool)), this, SLOT(onShow3DWidget(bool)));
@@ -344,77 +355,67 @@ void pqImplicitPlaneWidget::onResetBounds()
 void pqImplicitPlaneWidget::resetBounds()
 {
   vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
-  if(widget && this->getReferenceProxy())
+  double input_bounds[6];
+  if(!widget || !this->getReferenceInputBounds(input_bounds))
     {
-    if(vtkSMProxyProperty* const input_property =
-      vtkSMProxyProperty::SafeDownCast(
-        this->getReferenceProxy()->getProxy()->GetProperty("Input")))
+    return;
+    }
+  
+  double input_origin[3];
+  input_origin[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
+  input_origin[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
+  input_origin[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
+
+  double input_size[3];
+  input_size[0] = fabs(input_bounds[1] - input_bounds[0]) * 1.2;
+  input_size[1] = fabs(input_bounds[3] - input_bounds[2]) * 1.2;
+  input_size[2] = fabs(input_bounds[5] - input_bounds[4]) * 1.2;
+
+  if(vtkSMDoubleVectorProperty* const place_widget =
+    vtkSMDoubleVectorProperty::SafeDownCast(
+      widget->GetProperty("PlaceWidget")))
+    {
+    double widget_bounds[6];
+    widget_bounds[0] = input_origin[0] - input_size[0];
+    widget_bounds[1] = input_origin[0] + input_size[0];
+    widget_bounds[2] = input_origin[1] - input_size[1];
+    widget_bounds[3] = input_origin[1] + input_size[1];
+    widget_bounds[4] = input_origin[2] - input_size[2];
+    widget_bounds[5] = input_origin[2] + input_size[2];
+
+    if (this->ScaleFactor[0] != 1 || this->ScaleFactor[1] != 1
+      || this->ScaleFactor[2] != 1)
       {
-      if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
-        input_property->GetProxy(0)))
-        {
-        double input_bounds[6];
-        input_proxy->GetDataInformation()->GetBounds(input_bounds);
-       
-        double input_origin[3];
-        input_origin[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
-        input_origin[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
-        input_origin[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
+      // We have some scale factor specified.
+      // widget bounds need to be scaled.
+      widget_bounds[0] = (widget_bounds[0] - this->ScaleOrigin[0])* 
+        this->ScaleFactor[0] + this->ScaleOrigin[0];
+      widget_bounds[1] = (widget_bounds[1] - this->ScaleOrigin[0])* 
+        this->ScaleFactor[0] + this->ScaleOrigin[0];
 
-        double input_size[3];
-        input_size[0] = fabs(input_bounds[1] - input_bounds[0]) * 1.2;
-        input_size[1] = fabs(input_bounds[3] - input_bounds[2]) * 1.2;
-        input_size[2] = fabs(input_bounds[5] - input_bounds[4]) * 1.2;
+      widget_bounds[2] = (widget_bounds[2] - this->ScaleOrigin[1])* 
+        this->ScaleFactor[1] + this->ScaleOrigin[1];
+      widget_bounds[3] = (widget_bounds[3] - this->ScaleOrigin[1])* 
+        this->ScaleFactor[1] + this->ScaleOrigin[1];
 
-       
-        if(vtkSMDoubleVectorProperty* const origin =
-          vtkSMDoubleVectorProperty::SafeDownCast(
-            widget->GetProperty("Origin")))
-          {
-          origin->SetElements(input_origin);
-          }
-        
-        if(vtkSMDoubleVectorProperty* const place_widget =
-          vtkSMDoubleVectorProperty::SafeDownCast(
-            widget->GetProperty("PlaceWidget")))
-          {
-          double widget_bounds[6];
-          widget_bounds[0] = input_origin[0] - input_size[0];
-          widget_bounds[1] = input_origin[0] + input_size[0];
-          widget_bounds[2] = input_origin[1] - input_size[1];
-          widget_bounds[3] = input_origin[1] + input_size[1];
-          widget_bounds[4] = input_origin[2] - input_size[2];
-          widget_bounds[5] = input_origin[2] + input_size[2];
-
-          if (this->ScaleFactor[0] != 1 || this->ScaleFactor[1] != 1
-            || this->ScaleFactor[2] != 1)
-            {
-            // We have some scale factor specified.
-            // widget bounds need to be scaled.
-            widget_bounds[0] = (widget_bounds[0] - this->ScaleOrigin[0])* 
-              this->ScaleFactor[0] + this->ScaleOrigin[0];
-            widget_bounds[1] = (widget_bounds[1] - this->ScaleOrigin[0])* 
-              this->ScaleFactor[0] + this->ScaleOrigin[0];
-
-            widget_bounds[2] = (widget_bounds[2] - this->ScaleOrigin[1])* 
-              this->ScaleFactor[1] + this->ScaleOrigin[1];
-            widget_bounds[3] = (widget_bounds[3] - this->ScaleOrigin[1])* 
-              this->ScaleFactor[1] + this->ScaleOrigin[1];
-
-            widget_bounds[4] = (widget_bounds[4] - this->ScaleOrigin[2])* 
-              this->ScaleFactor[2] + this->ScaleOrigin[2];
-            widget_bounds[5] = (widget_bounds[5] - this->ScaleOrigin[2])* 
-              this->ScaleFactor[2] + this->ScaleOrigin[2];
-            }
-
-          
-          place_widget->SetElements(widget_bounds);
-          
-          widget->UpdateVTKObjects();
-          qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
-          }
-        }
+      widget_bounds[4] = (widget_bounds[4] - this->ScaleOrigin[2])* 
+        this->ScaleFactor[2] + this->ScaleOrigin[2];
+      widget_bounds[5] = (widget_bounds[5] - this->ScaleOrigin[2])* 
+        this->ScaleFactor[2] + this->ScaleOrigin[2];
       }
+
+
+    place_widget->SetElements(widget_bounds);
+    widget->UpdateVTKObjects(); 
+    vtkSMDoubleVectorProperty* const origin = 
+      vtkSMDoubleVectorProperty::SafeDownCast(
+        widget->GetProperty("Origin"));
+    if(origin)
+      {
+      origin->SetElements(input_origin);
+      }
+    widget->UpdateProperty("Origin");
+    qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
     }
 }
 

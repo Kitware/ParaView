@@ -38,8 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServer;
 
 /// Provides a complete Qt UI for working with a 3D line widget
-class pqLineWidget :
-  public pq3DWidget
+class pqLineWidget : public pq3DWidget
 {
   typedef pq3DWidget Superclass;
   
@@ -48,6 +47,14 @@ class pqLineWidget :
 public:
   pqLineWidget(QWidget* p = 0);
   ~pqLineWidget();
+
+  /// Resets the bounds of the 3D widget to the reference proxy bounds.
+  /// This typically calls PlaceWidget on the underlying 3D Widget 
+  /// with reference proxy bounds.
+  /// This should be explicitly called after the panel is created
+  /// and the widget is initialized i.e. the reference proxy, controlled proxy
+  /// and hints have been set.
+  virtual void resetBounds();
 
   void setControlledProxy(vtkSMProxy* proxy);
   void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2);
@@ -62,7 +69,6 @@ private slots:
 
 private:
   void createWidget(pqServer* server);
-  void resetBounds();
   void getReferenceBoundingBox(double center[3], double size[3]);
 
   class pqImplementation;

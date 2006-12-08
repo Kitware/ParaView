@@ -69,8 +69,11 @@ public:
   MapOf3DWidgets Widgets;
   QPointer<pq3DWidget> ActiveWidget;
 
+  bool Selected;
+
   pqSignalAdaptorProxyListInternal()
     {
+    this->Selected = false;
     }
 
   ~pqSignalAdaptorProxyListInternal()
@@ -242,7 +245,6 @@ void pqSignalAdaptorProxyList::initialize3DWidget()
       }
     this->Internal->Widgets.insert(smProxy, widget3D);
     this->Internal->WidgetFrame->layout()->addWidget(widget3D);
-    widget3D->setReferenceProxy(this->Internal->ReferenceProxy);
     QObject::connect(widget3D, SIGNAL(widgetChanged()), 
       this, SIGNAL(modified()));
     }
@@ -266,6 +268,14 @@ void pqSignalAdaptorProxyList::initialize3DWidget()
     QString(smProxy->GetXMLName()) + " Widget");
   this->Internal->WidgetFrame->show();
   this->Internal->ActiveWidget->show();
+  if (this->Internal->Selected)
+    {
+    this->Internal->ActiveWidget->select();
+    }
+  else
+    {
+    this->Internal->ActiveWidget->deselect();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -286,13 +296,18 @@ pq3DWidget* pqSignalAdaptorProxyList::new3DWidget(vtkSMProxy* smProxy)
     {
     delete widgets[cc];
     }
+
   widgets[0]->setParent(this->Internal->WidgetFrame);
+  widgets[0]->setReferenceProxy(this->Internal->ReferenceProxy);
+  // We implicitly reset the widget bounds the first time the widget is shown.
+  widgets[0]->resetBounds();
   return widgets[0];
 }
 
 //-----------------------------------------------------------------------------
 void pqSignalAdaptorProxyList::select()
 {
+  this->Internal->Selected = true;
   if (this->Internal->ActiveWidget)
     {
     this->Internal->ActiveWidget->select();
@@ -302,6 +317,7 @@ void pqSignalAdaptorProxyList::select()
 //-----------------------------------------------------------------------------
 void pqSignalAdaptorProxyList::deselect()
 {
+  this->Internal->Selected = false;
   if (this->Internal->ActiveWidget)
     {
     this->Internal->ActiveWidget->deselect();

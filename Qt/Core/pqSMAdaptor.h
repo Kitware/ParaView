@@ -183,7 +183,12 @@ public:
   static void setFieldSelectionScalar(vtkSMProperty*, const QString&);
   static void setUncheckedFieldSelectionScalar(vtkSMProperty*, const QString&);
   static QList<QString> getFieldSelectionScalarDomain(vtkSMProperty*);
-  
+
+
+  /// Returns a list of domains types for the property. eg.
+  /// if a property has vtkSMBoundsDomain and vtkSMArrayListDomain then
+  /// this method will returns ["vtkSMBoundsDomain", "vtkSMArrayListDomain"].
+  static QList<QString> getDomainTypes(vtkSMProperty* property);
 };
 
 #endif // !_pqSMAdaptor_h
