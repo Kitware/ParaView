@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.22");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -202,10 +202,7 @@ void vtkKWListBoxToListBoxSelectionEditor::CreateWidget()
     this->UpButton->GetWidgetName(),
     this->DownButton->GetWidgetName());
 
-  if(this->AllowReordering)
-    {
-    this->Pack();
-    }
+  this->Pack();
 
   this->Script("pack %s -side left -expand true -fill both",
     frame->GetWidgetName());
@@ -217,8 +214,15 @@ void vtkKWListBoxToListBoxSelectionEditor::CreateWidget()
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::Pack() 
 {
-  this->Script("pack %s -side top -expand false -fill x",
-    this->ButtonFrame->GetWidgetName());
+  if(this->AllowReordering)
+    {
+    this->Script("pack %s -side top -expand false -fill x",
+      this->ButtonFrame->GetWidgetName());
+    }
+  else if(this->ButtonFrame->IsPacked())
+    {
+    this->ButtonFrame->Unpack();
+    }
 }  
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::AddElement(vtkKWListBox* l1, vtkKWListBox* l2, 
@@ -639,14 +643,7 @@ void vtkKWListBoxToListBoxSelectionEditor::SetAllowReordering(
     }
   this->AllowReordering = allowed;
 
-  if(this->AllowReordering)
-    {
-    this->Pack();
-    }
-  else
-    {
-    this->ButtonFrame->Unpack();
-    }
+  this->Pack();
   this->Modified();
 }
 
