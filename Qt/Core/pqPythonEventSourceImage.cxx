@@ -162,6 +162,10 @@ void pqPythonEventSourceImage::run()
 
 void pqPythonEventSourceImage::doSnapshot()
 {
+  
+  // make sure all other processing has been done before we take a snapshot
+  QCoreApplication::processEvents();
+
   QWidget* widget =
     qobject_cast<QWidget*>(pqObjectNaming::GetObject(SnapshotWidget));
   if(!widget)
