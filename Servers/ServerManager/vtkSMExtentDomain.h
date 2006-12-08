@@ -45,6 +45,15 @@ public:
   virtual void SetAnimationValue(vtkSMProperty *property, int idx,
                                  double value);
 
+  // Description:
+  // A vtkSMProperty is often defined with a default value in the
+  // XML itself. However, many times, the default value must be determined
+  // at run time. To facilitate this, domains can override this method
+  // to compute and set the default value for the property.
+  // Note that unlike the compile-time default values, the
+  // application must explicitly call this method to initialize the
+  // property.
+  virtual int SetDefaultValues(vtkSMProperty*);
 protected:
   vtkSMExtentDomain();
   ~vtkSMExtentDomain();

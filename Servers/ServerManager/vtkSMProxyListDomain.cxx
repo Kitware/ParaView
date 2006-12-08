@@ -45,7 +45,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMProxyListDomain);
-vtkCxxRevisionMacro(vtkSMProxyListDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMProxyListDomain, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMProxyListDomain::vtkSMProxyListDomain()
 {
@@ -101,6 +101,20 @@ const char* vtkSMProxyListDomain::GetProxyName(unsigned int cc)
     }
 
   return this->Internals->ProxyTypeList[cc].ProxyName.c_str();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMProxyListDomain::SetDefaultValues(vtkSMProperty* prop)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(prop);
+  if (pp && this->GetNumberOfProxies() > 0)
+    {
+    pp->RemoveAllProxies();
+    pp->AddProxy(this->GetProxy(0));
+    return 1;
+    }
+
+  return this->Superclass::SetDefaultValues(prop);
 }
 
 //-----------------------------------------------------------------------------
