@@ -377,12 +377,12 @@ void pqSampleScalarWidget::onControlledPropertyDomainChanged()
   if(this->getRange(range_min, range_max))
     {
     this->Implementation->UI->ScalarRange->setText(
-      tr("Scalar Range: [%1, %2]").arg(range_min).arg(range_max));
+      tr("Value Range: [%1, %2]").arg(range_min).arg(range_max));
     }
   else
     {
     this->Implementation->UI->ScalarRange->setText(
-      tr("Scalar Range: unlimited"));
+      tr("Value Range: unlimited"));
     }
 }
 
