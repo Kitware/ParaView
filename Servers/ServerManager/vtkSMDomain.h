@@ -57,6 +57,18 @@ public:
   virtual void SetAnimationValue(vtkSMProperty*, int, double) {}
 
   // Description:
+  // A vtkSMProperty is often defined with a default value in the
+  // XML itself. However, many times, the default value must be determined
+  // at run time. To facilitate this, domains can override this method
+  // to compute and set the default value for the property.
+  // Note that unlike the compile-time default values, the
+  // application must explicitly call this method to initialize the
+  // property.
+  // Returns 1 if the domain updated the property.
+  // Default implementation does nothing.
+  virtual int SetDefaultValues(vtkSMProperty*) {return 0; };
+
+  // Description:
   // Assigned by the XML parser. The name assigned in the XML
   // configuration. Can be used to figure out the origin of the
   // domain.
@@ -119,6 +131,9 @@ protected:
   // Invoked DomainModifiedEvent.
   void InvokeModified();
 
+  // Description:
+  // Gets the number of required properties added.
+  unsigned int GetNumberOfRequiredProperties();
 private:
   vtkSMDomain(const vtkSMDomain&); // Not implemented
   void operator=(const vtkSMDomain&); // Not implemented

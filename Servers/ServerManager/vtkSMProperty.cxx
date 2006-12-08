@@ -33,7 +33,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.48");
+vtkCxxRevisionMacro(vtkSMProperty, "1.49");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -508,6 +508,20 @@ int vtkSMProperty::GetCheckDomains()
 //---------------------------------------------------------------------------
 void vtkSMProperty::Copy(vtkSMProperty* )
 {
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::ResetToDefault()
+{
+  this->DomainIterator->Begin();
+  while(!this->DomainIterator->IsAtEnd())
+    {
+    if (this->DomainIterator->GetDomain()->SetDefaultValues(this))
+      {
+      break;
+      }
+    this->DomainIterator->Next();
+    }
 }
 
 //---------------------------------------------------------------------------

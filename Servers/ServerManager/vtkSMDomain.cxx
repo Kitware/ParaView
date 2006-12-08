@@ -22,7 +22,7 @@
 #include <vtkstd/map>
 #include "vtkStdString.h"
 
-vtkCxxRevisionMacro(vtkSMDomain, "1.11");
+vtkCxxRevisionMacro(vtkSMDomain, "1.12");
 
 struct vtkSMDomainInternals
 {
@@ -139,6 +139,12 @@ void vtkSMDomain::AddRequiredProperty(vtkSMProperty *prop,
   
   prop->AddDependent(this);
   this->Internals->RequiredProperties[function] = prop;
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMDomain::GetNumberOfRequiredProperties()
+{
+  return this->Internals->RequiredProperties.size();
 }
 
 //---------------------------------------------------------------------------

@@ -436,7 +436,7 @@
       <IntVectorProperty name="AlphaBitPlanes"
                          command="SetAlphaBitPlanes"
                          number_of_elements="1"
-                         default_values="0">
+                         default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -1202,19 +1202,15 @@
         <SimpleDoubleInformationHelper/>
      </DoubleVectorProperty>
 
-<!--
-     <Property
-       name="OnInteraction"
-       command="OnInteraction"
-       update_self="1">
-     </Property>
-
-     <Property
-       name="OnEndInteraction"
-       command="OnEndInteraction"
-       update_self="1">
-     </Property>
--->
+     <DoubleVectorProperty 
+        name="PlaceWidget"
+        is_internal="1"
+        command="PlaceWidget"
+        number_of_elements="6"
+        argument_is_array="1"
+        default_values="0 1 0 1 0 1">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
 
      <ProxyProperty name="Renderer" command="SetRenderer">
        <ProxyGroupDomain name="groups">
@@ -3256,6 +3252,7 @@
           <Property name="Point1WorldPosition" />
           <Property name="Point2WorldPositionInfo" />
           <Property name="Point2WorldPosition" />
+          <Property name="PlaceWidget" />
         </ExposedProperties>
       </SubProxy>
 

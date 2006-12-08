@@ -816,8 +816,10 @@ This filter only operates on unstructured data. It produces polygonal output.
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
+              <!--
               <Proxy group="implicit_functions" name="Box" />
               <Proxy group="implicit_functions" name="Sphere" />
+              -->
            </ProxyListDomain>
      </ProxyProperty>
 
@@ -2602,8 +2604,10 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
+              <!--
               <Proxy group="implicit_functions" name="Box" />
               <Proxy group="implicit_functions" name="Sphere" />
+              -->
            </ProxyListDomain>
      </ProxyProperty>
 
@@ -2664,8 +2668,10 @@ This filter operates on all types of data sets, and it returns unstructured grid
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
+              <!--
               <Proxy group="implicit_functions" name="Box" />
               <Proxy group="implicit_functions" name="Sphere" />
+              -->
            </ProxyListDomain>
      </ProxyProperty>
 
@@ -2962,7 +2968,6 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
         command="SetScaleFactor"
         number_of_elements="1"
         default_values="1.0" >
-       <DoubleRangeDomain name="range"/>
        <BoundsDomain name="bounds">
          <RequiredProperties>
             <Property name="Input" function="Input"/>
@@ -3226,6 +3231,9 @@ The Probe filter operates on any type of data and produces polygonal output (a p
              <Proxy group="sources" name="PointSource" />
            </ProxyListDomain>
       </InputProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+      </Hints>
    <!-- End Probe2 -->
    </SourceProxy>
 
@@ -3256,7 +3264,9 @@ The Probe filter operates on any type of data and produces polygonal output (a p
        default_values="0.0" >
           <DoubleRangeDomain name="range" min="0" max="1" />
     </DoubleVectorProperty>
-
+    <Hints>
+      <Visibility replace_input="0" />
+    </Hints>
    <!-- End TemporalProbe -->
    </SourceProxy>
 
@@ -3298,7 +3308,9 @@ The Probe filter operates on any type of data and produces polygonal output (a p
          <Entry value="1" text="Off"/>
        </EnumerationDomain>
     </IntVectorProperty>
-
+    <Hints>
+       <Visibility replace_input="0" />
+    </Hints>
    <!-- End TemporalPick -->
    </SourceProxy>
 
@@ -3601,8 +3613,10 @@ This filter operates on all types of data sets, and it returns unstructured grid
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
+              <!--
               <Proxy group="implicit_functions" name="Box" />
               <Proxy group="implicit_functions" name="Sphere" />
+              -->
            </ProxyListDomain>
      </ProxyProperty>
 
@@ -3735,8 +3749,10 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
+              <!--
               <Proxy group="implicit_functions" name="Box" />
               <Proxy group="implicit_functions" name="Sphere" />
+              -->
            </ProxyListDomain>
      </ProxyProperty>
 
@@ -4452,8 +4468,10 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
+              <!--
               <Proxy group="implicit_functions" name="Box" />
               <Proxy group="implicit_functions" name="Sphere" />
+              -->
            </ProxyListDomain>
      </ProxyProperty>
 

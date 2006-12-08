@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.17");
+vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.18");
 
 struct vtkSMIntRangeDomainInternals
 {
@@ -475,6 +475,41 @@ void vtkSMIntRangeDomain::SetAnimationValue(vtkSMProperty *property, int idx,
     {
     ivp->SetElement(idx, (int)(floor(value)));
     }
+}
+
+//---------------------------------------------------------------------------
+int vtkSMIntRangeDomain::SetDefaultValues(vtkSMProperty* prop)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
+  if (!ivp || this->GetNumberOfRequiredProperties() == 0)
+    {
+    // If number of required properties is 0, this this domain
+    // does not change based on values for some other property
+    // in that case, the property default does not depend on the domain.
+    return this->Superclass::SetDefaultValues(prop);
+    }
+  int updated = 0;
+  unsigned int numEls = ivp->GetNumberOfElements();
+  for (unsigned int i=0; i<numEls; i++)
+    {
+    if ( i % 2 == 0)
+      {
+      if (this->GetMinimumExists(i/2))
+        {
+        ivp->SetElement(i, this->GetMinimum(i/2));
+        updated = 1;
+        }
+      }
+    else
+      {
+      if (this->GetMaximumExists(i/2))
+        {
+        ivp->SetElement(i, this->GetMaximum(i/2));
+        updated = 1;
+        }
+      }
+    }
+  return updated;
 }
 
 //---------------------------------------------------------------------------

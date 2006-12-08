@@ -208,6 +208,16 @@ public:
   // may be NULL if no documentation is defined in the XML
   // for this property.
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
+
+  // Description:
+  // Iterates over all domains and calls SetDefaultValues() on each
+  // until one of then returns 1, implying that it updated
+  // the property value. This is used to reset the property
+  // to its default value. Currently default values that depend
+  // on domain are reset. Soon this will be extended to reset
+  // all properties.
+  void ResetToDefault();
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
