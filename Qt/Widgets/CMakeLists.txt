@@ -45,6 +45,10 @@ SET(QtWidgets_SRCS
   pqSetName.h
   pqSignalAdaptors.cxx
   pqSignalAdaptors.h
+  pqListWidgetCheckHelper.cxx
+  pqListWidgetCheckHelper.h
+  pqTreeWidgetCheckHelper.cxx
+  pqTreeWidgetCheckHelper.h
   pqTreeWidgetItemObject.cxx
   pqTreeWidgetItemObject.h
   pqViewMenu.cxx
@@ -73,6 +77,8 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqProgressBar.h
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
+  pqListWidgetCheckHelper.h
+  pqTreeWidgetCheckHelper.h
   pqTreeWidgetItemObject.h
   pqViewMenu.h
 )

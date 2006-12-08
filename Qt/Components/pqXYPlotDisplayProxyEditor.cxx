@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqXYPlotDisplayProxyEditor.h"
+#include "ui_pqXYPlotDisplayEditor.h"
 
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
@@ -38,13 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QPixmap>
 
+#include "pqComboBoxDomain.h"
 #include "pqDisplay.h"
 #include "pqPropertyLinks.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
+#include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
-#include "pqComboBoxDomain.h"
-#include "ui_pqXYPlotDisplayEditor.h"
 
 //-----------------------------------------------------------------------------
 class pqXYPlotDisplayProxyEditor::pqInternal : public Ui::Form
@@ -76,6 +77,10 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(QWidget* p)
 {
   this->Internal = new pqXYPlotDisplayProxyEditor::pqInternal();
   this->Internal->setupUi(this);
+
+  new pqTreeWidgetCheckHelper(this->Internal->YAxisArrays, 0,
+    this);
+
   this->Internal->XAxisModeAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->XAxisMode);
   this->Internal->XAxisArrayAdaptor = new pqSignalAdaptorComboBox(

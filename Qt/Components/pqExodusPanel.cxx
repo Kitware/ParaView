@@ -51,10 +51,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 
 // ParaView includes
-#include "pqTreeWidgetItemObject.h"
-#include "pqSMAdaptor.h"
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
+#include "pqSMAdaptor.h"
+#include "pqTreeWidgetCheckHelper.h"
+#include "pqTreeWidgetItemObject.h"
+#include "pqListWidgetCheckHelper.h"
 #include "ui_pqExodusPanel.h"
 
 // we include this for static plugins
@@ -163,6 +165,7 @@ void pqExodusPanel::linkServerManagerProperties()
 
   // we hook up the node/element variables
   QTreeWidget* VariablesTree = this->UI->Variables;
+  new pqTreeWidgetCheckHelper(VariablesTree, 0, this);
   pqTreeWidgetItemObject* item;
   QList<QString> strs;
   QString varName;
@@ -272,7 +275,8 @@ void pqExodusPanel::linkServerManagerProperties()
 
   // we hook up the sideset/nodeset 
   QTreeWidget* SetsTree = this->UI->Sets;
-  
+  new pqTreeWidgetCheckHelper(SetsTree, 0, this);
+
   // do the sidesets
   vtkSMProperty* SideProperty = this->proxy()->getProxy()->GetProperty("SideSetArrayStatus");
   QList<QVariant> SideDomain;
@@ -314,6 +318,7 @@ void pqExodusPanel::linkServerManagerProperties()
   QAction* a;
   
   QListWidget* BlockTree = this->UI->BlockArrayStatus;
+  new pqListWidgetCheckHelper(BlockTree, this);
   a = new QAction("All Blocks On", BlockTree);
   a->setObjectName("BlocksOn");
   QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(blocksOn()));
@@ -435,7 +440,7 @@ void pqExodusPanel::updateDataRanges()
     {
     ai = cdi->GetArrayInformation("BlockId");
     }
-  dataString = formatDataFor(ai);
+  dataString = this->formatDataFor(ai);
   item->setData(1, Qt::DisplayRole, dataString);
   item->setData(1, Qt::ToolTipRole, dataString);
 
@@ -447,7 +452,7 @@ void pqExodusPanel::updateDataRanges()
     {
     ai = cdi->GetArrayInformation("GlobalElementId");
     }
-  dataString = formatDataFor(ai);
+  dataString = this->formatDataFor(ai);
   item->setData(1, Qt::DisplayRole, dataString);
   item->setData(1, Qt::ToolTipRole, dataString);
 
@@ -467,7 +472,7 @@ void pqExodusPanel::updateDataRanges()
       {
       ai = cdi->GetArrayInformation(CellDomain[j].toString().toAscii().data());
       }
-    dataString = formatDataFor(ai);
+    dataString = this->formatDataFor(ai);
     item->setData(1, Qt::DisplayRole, dataString);
     item->setData(1, Qt::ToolTipRole, dataString);
     }
@@ -480,7 +485,7 @@ void pqExodusPanel::updateDataRanges()
     {
     ai = pdi->GetArrayInformation("GlobalNodeId");
     }
-  dataString = formatDataFor(ai);
+  dataString = this->formatDataFor(ai);
   item->setData(1, Qt::DisplayRole, dataString);
   item->setData(1, Qt::ToolTipRole, dataString);
 
@@ -500,7 +505,7 @@ void pqExodusPanel::updateDataRanges()
       {
       ai = pdi->GetArrayInformation(PointDomain[j].toString().toAscii().data());
       }
-    dataString = formatDataFor(ai);
+    dataString = this->formatDataFor(ai);
     item->setData(1, Qt::DisplayRole, dataString);
     item->setData(1, Qt::ToolTipRole, dataString);
     }
