@@ -110,6 +110,25 @@ public:
   FileMode Mode;
   Ui::pqFileDialog Ui;
   QStringList SelectedFiles;
+
+  // As the user keeps on changing the selection in the dialog box,
+  // we update the set. This does not keep full paths, only names
+  // relactive to current dir.
+  QStringList ActiveSet;
+
+  // Converts the ActiveSet to a ";" separated list
+  // suitable for showing in the file name entry.
+  QString getActiveSetAsString() const
+    {
+    return this->ActiveSet.join(";");
+    }
+
+  // Update the active set using a ";" separated string of
+  // file names.
+  void updateActiveSet( const QString& files)
+    {
+    this->ActiveSet = files.split(";", QString::SkipEmptyParts);
+    }
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -178,6 +197,12 @@ pqFileDialog::pqFileDialog(
                    this, 
                    SLOT(onClickedFile(const QModelIndex&)));
 
+  QObject::connect(this->Implementation->Ui.Files->selectionModel(),
+                  SIGNAL(
+                    selectionChanged(const QItemSelection&, const QItemSelection&)),
+                  this, 
+                  SLOT(fileSelectionChanged()));
+
   QObject::connect(this->Implementation->Ui.Favorites, 
                    SIGNAL(activated(const QModelIndex&)), 
                    this, 
@@ -212,11 +237,13 @@ pqFileDialog::pqFileDialog(
   this->Implementation->Model->setCurrentPath(startPath);
 }
 
+//-----------------------------------------------------------------------------
 pqFileDialog::~pqFileDialog()
 {
   delete this->Implementation;
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
 {
   this->Implementation->Mode = mode;
@@ -243,13 +270,15 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::emitFileSelected(const QString& file)
 {
   QStringList files;
   files << file;
-  emitFilesSelected(files);
+  this->emitFilesSelected(files);
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::emitFilesSelected(const QStringList& files)
 {
   // Ensure that we are hidden before broadcasting the selection,
@@ -260,24 +289,24 @@ void pqFileDialog::emitFilesSelected(const QStringList& files)
   this->done(QDialog::Accepted);
 }
   
+//-----------------------------------------------------------------------------
 QStringList pqFileDialog::getSelectedFiles()
 {
   return this->Implementation->SelectedFiles;
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::accept()
 {
-  const QString manual_filename = this->Implementation->Ui.FileName->text();
-  if(manual_filename.isEmpty())
+  QStringList fullPaths;
+  foreach (QString name, this->Implementation->ActiveSet)
     {
-    acceptFiles();
+    fullPaths << this->Implementation->Model->getFilePath(name);
     }
-  else
-    {
-    acceptManual();
-    }
+  this->acceptInternal(fullPaths);
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::onModelReset()
 {
   this->Implementation->Ui.Parents->clear();
@@ -291,16 +320,19 @@ void pqFileDialog::onModelReset()
   this->Implementation->Ui.Parents->setCurrentIndex(parents.size() - 1);
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::onNavigate(const QString& Path)
 {
   this->Implementation->Model->setCurrentPath(Path);
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateUp()
 {
   this->Implementation->Model->setParentPath();
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateDown(const QModelIndex& idx)
 {
   if(!this->Implementation->Model->isDir(idx))
@@ -314,6 +346,7 @@ void pqFileDialog::onNavigateDown(const QModelIndex& idx)
   this->Implementation->Model->setCurrentPath(paths[0]);
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::onFilterChange(const QString& filter)
 {
   QStringList fs = GetWildCardsFromFilter(filter);
@@ -325,16 +358,19 @@ void pqFileDialog::onFilterChange(const QString& filter)
   this->Implementation->FileFilter.clear();
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::onClickedFavorite(const QModelIndex&)
 {
   this->Implementation->Ui.Files->clearSelection();
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::onClickedFile(const QModelIndex&)
 {
   this->Implementation->Ui.Favorites->clearSelection();
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::onActivateFavorite(const QModelIndex& index)
 {
   QStringList selected_files;
@@ -350,6 +386,7 @@ void pqFileDialog::onActivateFavorite(const QModelIndex& index)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqFileDialog::onActivateFile(const QModelIndex& index)
 {
   QModelIndex actual_index = index;
@@ -386,120 +423,48 @@ void pqFileDialog::onActivateFile(const QModelIndex& index)
     }
 }
 
-void pqFileDialog::onTextEdited(const QString&)
+//-----------------------------------------------------------------------------
+void pqFileDialog::onTextEdited(const QString& user_input)
 {
   this->Implementation->Ui.Favorites->clearSelection();
   this->Implementation->Ui.Files->clearSelection();
+
+  this->Implementation->updateActiveSet(user_input);
 }
 
-void pqFileDialog::acceptManual()
+//-----------------------------------------------------------------------------
+QString pqFileDialog::fixFileExtension(
+  const QString& filename, const QString& filter)
 {
-  // User entered text manually, so use that and ignore everything else
-  QString manual_filename = this->Implementation->Ui.FileName->text();
-  
-  const QString dirfile =
-    this->Implementation->Model->getFilePath(manual_filename);
-
   // Add missing extension if necessary
-  QFileInfo fi(manual_filename);
-  QString ext = fi.completeSuffix();
-  QString extensionWildcard = GetWildCardsFromFilter(
-    this->Implementation->Ui.FileType->currentText()).first();
+  QFileInfo fileInfo(filename);
+  QString ext = fileInfo.completeSuffix();
+  QString extensionWildcard = ::GetWildCardsFromFilter(filter).first();
   QString wantedExtension =
     extensionWildcard.mid(extensionWildcard.indexOf('.')+1);
+
+  QString fixedFilename = filename;
   if(ext.isEmpty() && !wantedExtension.isEmpty() &&
-      wantedExtension != "*")
+    wantedExtension != "*")
     {
-    if(manual_filename.at(manual_filename.size() - 1) != '.')
+    if(fixedFilename.at(fixedFilename.size() - 1) != '.')
       {
-      manual_filename += ".";
+      fixedFilename += ".";
       }
-    manual_filename += wantedExtension;
+    fixedFilename += wantedExtension;
     }
-  
-  const QString file =
-    this->Implementation->Model->getFilePath(manual_filename);
-  
-  // User chose an existing directory
-  if(this->Implementation->Model->dirExists(dirfile))
-    {
-    // Always enter directories, regardless of mode
-    this->onNavigate(dirfile);
-    this->Implementation->Ui.FileName->clear();
-    return;
-    }
-  // User chose an existing file
-  else if(this->Implementation->Model->fileExists(file))
-    {
-    switch(this->Implementation->Mode)
-      {
-      case Directory:
-        // User chose a file in directory mode, do nothing
-        this->Implementation->Ui.FileName->clear();
-        return;
-      case ExistingFile:
-      case ExistingFiles:
-        // User chose an existing file, we're done
-        this->emitFileSelected(file);
-        return;
-      case AnyFile:
-        // User chose an existing file, prompt before overwrite
-        if(QMessageBox::No == QMessageBox::warning(
-          this,
-          this->windowTitle(),
-          QString(tr("%1 already exists.\nDo you want to replace it?")).arg(file),
-          QMessageBox::Yes,
-          QMessageBox::No))
-          {
-          return;
-          }
-        this->emitFileSelected(file);
-        return;
-      }
-    }
-  // User chose a nonexistent file
-  else
-    {
-    switch(this->Implementation->Mode)
-      {
-      case Directory:
-      case ExistingFile:
-      case ExistingFiles:
-        return;
-      case AnyFile:
-        this->emitFileSelected(file);
-        return;
-      }
-    }
+  return fixedFilename;
 }
 
-void pqFileDialog::acceptFiles()
+//-----------------------------------------------------------------------------
+void pqFileDialog::acceptInternal(QStringList& selected_files)
 {
-  // The user didn't enter any text manually, so we will process the file(s)
-  // selected in the file pane and ignore everything else.
-  QStringList selected_files;
-  
-  const QModelIndexList indices =
-    this->Implementation->Ui.Files->selectionModel()->selectedIndexes();
-  for(int i = 0; i != indices.size(); ++i)
-    {
-    QModelIndex index = indices[i];
-    if(index.column() != 0)
-      continue;
-      
-    if(index.model() == &this->Implementation->FileFilter)
-      {
-      index = this->Implementation->FileFilter.mapToSource(index);
-      }
-
-    selected_files << this->Implementation->Model->getFilePaths(index);
-    }
-
   if(selected_files.empty())
+    {
     return;
+    }
     
-  const QString file = selected_files[0];
-  
+  QString file = selected_files[0];
   // User chose an existing directory
   if(this->Implementation->Model->dirExists(file))
     {
@@ -507,17 +472,38 @@ void pqFileDialog::acceptFiles()
       {
       case Directory:
         this->emitFileSelected(file);
-        return;
+        break;
+
       case ExistingFile:
       case ExistingFiles:
       case AnyFile:
         this->onNavigate(file);
         this->Implementation->Ui.FileName->clear();
-        return;
+        break;
+      }
+    return;
+    }
+
+  // User choose and existing file or a brand new filename.
+  if (this->Implementation->Mode == pqFileDialog::AnyFile)
+    {
+    // If mode is a "save" dialog, we fix the extension first.
+    file = this->fixFileExtension(file,
+      this->Implementation->Ui.FileType->currentText());
+
+    // It is very possible that after fixing the extension,
+    // the new filename is an already present directory,
+    // hence we handle that case:
+    if (this->Implementation->Model->dirExists(file))
+      {
+      this->onNavigate(file);
+      this->Implementation->Ui.FileName->clear();
+      return;
       }
     }
+
   // User chose an existing file-or-files
-  else if(this->Implementation->Model->fileExists(file))
+  if (this->Implementation->Model->fileExists(file))
     {
     switch(this->Implementation->Mode)
       {
@@ -527,6 +513,8 @@ void pqFileDialog::acceptFiles()
         return;
       case ExistingFile:
       case ExistingFiles:
+        // TODO: we need to verify that all selected files are indeed
+        // "existing".
         // User chose an existing file-or-files, we're done
         this->emitFilesSelected(selected_files);
         return;
@@ -545,4 +533,46 @@ void pqFileDialog::acceptFiles()
         return;
       }
     }
+  else // User choose non-existent file.
+    {
+    switch (this->Implementation->Mode)
+      {
+    case Directory:
+    case ExistingFile:
+    case ExistingFiles:
+      this->Implementation->Ui.FileName->selectAll();
+      return;
+
+    case AnyFile:
+      this->emitFileSelected(file);
+      return;
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::fileSelectionChanged()
+{
+  // Selection changed, update the FileName entry box
+  // to reflect the current selection.
+  this->Implementation->ActiveSet.clear();
+
+  const QModelIndexList indices =
+    this->Implementation->Ui.Files->selectionModel()->selectedIndexes();
+  for(int i = 0; i != indices.size(); ++i)
+    {
+    QModelIndex index = indices[i];
+    if(index.column() != 0)
+      {
+      continue;
+      }
+      
+    if(index.model() == &this->Implementation->FileFilter)
+      {
+      this->Implementation->ActiveSet <<
+        this->Implementation->FileFilter.data(index).toString();
+      }
+    }
+  this->Implementation->Ui.FileName->setText(
+    this->Implementation->getActiveSetAsString());
 }

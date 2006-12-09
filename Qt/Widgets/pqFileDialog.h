@@ -142,8 +142,8 @@ private slots:
   
   void onTextEdited(const QString&);
   
-  void acceptManual();
-  void acceptFiles();
+  // Called when the user changes the file selection.
+  void fileSelectionChanged();
   
 private:
   pqFileDialog(const pqFileDialog&);
@@ -151,6 +151,9 @@ private:
   
   class pqImplementation;
   pqImplementation* const Implementation;
+
+  void acceptInternal(QStringList& selected_files);
+  QString fixFileExtension(const QString& filename, const QString& filter);
 };
 
 #endif // !_pqFileDialog_h
