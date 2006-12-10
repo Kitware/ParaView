@@ -397,6 +397,7 @@ SET(list
   vtkKWMenuButtonWithSpinButtons
   vtkKWMessage
   vtkKWMultiColumnList
+  vtkKWMultiColumnListWithScrollbars
   vtkKWPopupButton
   vtkKWPushButton
   vtkKWPushButtonSet
