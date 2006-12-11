@@ -53,6 +53,7 @@ public:
   // Get the source/filter of which this is a display.
   pqPipelineSource* getInput() const;
 
+  // Called after to creation to set default values.
   virtual void setDefaults();
 private slots:
   // called when input property on display changes. We must detect if

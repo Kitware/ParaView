@@ -54,11 +54,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqLookupTableManager.h"
 #include "pqPipelineBuilder.h"
+#include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqRenderViewModule.h"
-#include "pqSMAdaptor.h"
-#include "pqServerManagerModel.h"
 #include "pqScalarsToColors.h"
+#include "pqServerManagerModel.h"
+#include "pqSMAdaptor.h"
 
 
 //-----------------------------------------------------------------------------
@@ -142,21 +143,28 @@ void pqPipelineDisplay::setDefaults()
   vtkPVArrayInformation* arrayInfo;
 
   geomInfo = displayProxy->GetGeometryInformation();
-    
+
+  // Locate input display.
+  pqPipelineFilter* myInput = qobject_cast<pqPipelineFilter*>(this->getInput());
+  pqPipelineDisplay* upstreamDisplay = 0;
+  if (myInput && myInput->getInputCount() > 0)
+    {
+    pqPipelineSource* myInputsInput = myInput->getInput(0);
+    upstreamDisplay = qobject_cast<pqPipelineDisplay*>(
+      myInputsInput->getDisplay(this->getViewModule(0)));
+    if (upstreamDisplay)
+      {
+      inGeomInfo = upstreamDisplay->getDisplayProxy()->GetGeometryInformation();
+      }
+    }
+
   // Look for a new point array.
   // I do not think the logic is exactly as describerd in this methods
   // comment.  I believe this method only looks at "Scalars".
   if(geomInfo)
     {
     attrInfo = geomInfo->GetPointDataInformation();
-    if (inGeomInfo)
-      {
-      inAttrInfo = inGeomInfo->GetPointDataInformation();
-      }
-    else
-      {
-      inAttrInfo = 0;
-      }
+    inAttrInfo = inGeomInfo? inGeomInfo->GetPointDataInformation() : 0;
     pqPipelineDisplay::getColorArray(attrInfo, inAttrInfo, arrayInfo);
     if(arrayInfo)
       {
@@ -170,14 +178,7 @@ void pqPipelineDisplay::setDefaults()
   if(geomInfo)
     {
     attrInfo = geomInfo->GetCellDataInformation();
-    if (inGeomInfo)
-      {
-      inAttrInfo = inGeomInfo->GetCellDataInformation();
-      }
-    else
-      {
-      inAttrInfo = 0;
-      }
+    inAttrInfo = inGeomInfo? inGeomInfo->GetCellDataInformation() : 0;
     pqPipelineDisplay::getColorArray(attrInfo, inAttrInfo, arrayInfo);
     if(arrayInfo)
       {
@@ -186,7 +187,7 @@ void pqPipelineDisplay::setDefaults()
       return;
       }
     }
-    
+   
   if (geomInfo)
     {
     // Check for scalars in geometry
@@ -211,6 +212,18 @@ void pqPipelineDisplay::setDefaults()
                          vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
       return;
       }
+    }
+
+  // Try to inherit the same array selected by the input.
+  if (upstreamDisplay)
+    {
+    // propagate solid color.
+    double rgb[3];
+    upstreamDisplay->getDisplayProxy()->GetColorCM(rgb);
+    displayProxy->SetColorCM(rgb);
+
+    this->setColorField(upstreamDisplay->getColorField(false));
+    return;
     }
 
   // Color by property.
