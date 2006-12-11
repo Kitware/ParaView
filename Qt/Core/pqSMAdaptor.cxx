@@ -1380,16 +1380,7 @@ QString pqSMAdaptor::getFileListProperty(vtkSMProperty* Property)
   QString file;
 
   vtkSMStringVectorProperty* svp;
-
-  vtkSMProperty* info = Property->GetInformationProperty();
-  if(info)
-    {
-    svp = vtkSMStringVectorProperty::SafeDownCast(info);
-    }
-  else
-    {
-    svp = vtkSMStringVectorProperty::SafeDownCast(Property);
-    }
+  svp = vtkSMStringVectorProperty::SafeDownCast(Property);
 
   if(svp && svp->GetNumberOfElements() > 0)
     {
