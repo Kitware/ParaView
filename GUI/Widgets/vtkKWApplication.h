@@ -448,7 +448,7 @@ public:
   // Display the warning/error/information/debug message log dialog.
   // Optionally provide a master window this dialog should be the slave of.
   virtual void DisplayLogDialog(vtkKWTopLevel *master);
-  vtkGetObjectMacro(LogDialog, vtkKWLogDialog);
+  virtual vtkKWLogDialog* GetLogDialog();
 
   // Description:
   // Get/display the tcl interactor.

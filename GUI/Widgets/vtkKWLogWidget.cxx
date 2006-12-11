@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLogWidget );
-vtkCxxRevisionMacro(vtkKWLogWidget, "1.5");
+vtkCxxRevisionMacro(vtkKWLogWidget, "1.6");
 
 vtkIdType vtkKWLogWidget::IdCounter = 1;
 
@@ -617,6 +617,11 @@ void vtkKWLogWidget::RemoveInternalRecord(int record_id)
 int vtkKWLogWidget::AddRecord(
   const char* description, int type)
 {
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
   struct vtkKWLogWidgetInternals::Record record;
   record.Id = vtkKWLogWidget::IdCounter++;
   record.Description = description;

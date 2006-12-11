@@ -392,6 +392,7 @@ SET(list
   vtkKWEntry
   vtkKWLabel
   vtkKWLoadSaveButton
+  vtkKWListBoxWithScrollbars
   vtkKWMatrixWidget
   vtkKWMenuButton
   vtkKWMenuButtonWithSpinButtons

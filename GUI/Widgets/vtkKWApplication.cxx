@@ -76,7 +76,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.309");
+vtkCxxRevisionMacro(vtkKWApplication, "1.310");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -115,18 +115,10 @@ public:
   void DisplayDebugText(const char* t)
     { 
       this->Application->DebugMessage(t); 
-      if (this->PromptUser || !this->Application->GetNumberOfWindowsMapped())
-        {
-        this->Application->DisplayLogDialog(NULL);
-        }
     }
   void DisplayWarningText(const char* t)
     { 
       this->Application->WarningMessage(t); 
-      if (this->PromptUser || !this->Application->GetNumberOfWindowsMapped())
-        {
-        this->Application->DisplayLogDialog(NULL);
-        }
     }
   void DisplayErrorText(const char* t)
     { 
@@ -139,10 +131,6 @@ public:
   void DisplayText(const char* t)
     { 
       this->Application->InformationMessage(t); 
-      if (this->PromptUser || !this->Application->GetNumberOfWindowsMapped())
-        {
-        this->Application->DisplayLogDialog(NULL);
-        }
     }
   void DisplayGenericWarningText(const char* t)
     { 
@@ -2517,18 +2505,29 @@ void vtkKWApplication::DebugMessage(const char* message)
 }
 
 //----------------------------------------------------------------------------
+vtkKWLogDialog* vtkKWApplication::GetLogDialog()
+{
+  this->CreateLogDialog();
+  return this->LogDialog;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWApplication::CreateLogDialog()
 {
-  if (!this->LogDialog)
+  if (!this->InExit && !this->LogDialog)
     {
     this->LogDialog = vtkKWLogDialog::New();
     }
-  if (!this->LogDialog->IsCreated())
+  if (this->LogDialog)
     {
-    this->LogDialog->SetApplication(this);
-    this->LogDialog->Create();
+    if (!this->LogDialog->IsCreated())
+      {
+      this->LogDialog->SetApplication(this);
+      this->LogDialog->Create();
+      }
+    return this->LogDialog->IsCreated();
     }
-  return this->LogDialog->IsCreated();
+  return 0;
 }
 
 //----------------------------------------------------------------------------
