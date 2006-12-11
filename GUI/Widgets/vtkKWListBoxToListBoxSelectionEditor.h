@@ -22,7 +22,7 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWListBoxWithScrollbars;
+class vtkKWListBoxWithScrollbarsWithLabel;
 class vtkKWPushButton;
 class vtkKWListBox;
 class vtkKWFrame;
@@ -35,16 +35,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Add/Remove a string element to the source list if it is not already there or on
-  // the final list. The optional argument force will make sure the item is
-  // added to the source list and removed from final if it is already there.
+  // Add/Remove a string element to the source list if it is not already
+  // there or on the final list. The optional argument force will make sure
+  // the item is added to the source list and removed from final if it is
+  // already there.
   virtual void AddSourceElement(const char*, int force = 0);
   virtual void RemoveSourceElement(int indx);
 
   // Description:
-  // Add/remove a string element to the final list if it is not already there or on
-  // the final list. The optional argument force will make sure the item is
-  // added to the final list and removed from source if it is already there.
+  // Add/remove a string element to the final list if it is not already there
+  // or on the final list. The optional argument force will make sure the item
+  // is added to the final list and removed from source if it is already there.
   virtual void AddFinalElement(const char*, int force = 0);
   virtual void RemoveFinalElement(int index);
 
@@ -69,6 +70,11 @@ public:
   virtual void RemoveItemsFromFinalList();
 
   // Description:
+  // Get the listbox objects.
+  vtkGetObjectMacro(SourceList, vtkKWListBoxWithScrollbarsWithLabel);
+  vtkGetObjectMacro(FinalList, vtkKWListBoxWithScrollbarsWithLabel);
+
+  // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the ellipsis button is pressed.
   // The 'object' argument is the object that will have the method called on
@@ -76,7 +82,6 @@ public:
   // arguments in string form. If the object is NULL, the method is still
   // evaluated as a simple command. 
   virtual void SetEllipsisCommand(vtkObject *obj, const char *method);
-
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
@@ -130,8 +135,8 @@ protected:
   // Pack the widget
   virtual void Pack();
 
-  vtkKWListBoxWithScrollbars* SourceList;
-  vtkKWListBoxWithScrollbars* FinalList;
+  vtkKWListBoxWithScrollbarsWithLabel* SourceList;
+  vtkKWListBoxWithScrollbarsWithLabel* FinalList;
 
   vtkKWPushButton* AddButton;
   vtkKWPushButton* AddAllButton;
@@ -145,7 +150,8 @@ protected:
   virtual void MoveSelectedList(vtkKWListBox* l1, vtkKWListBox* l2);
   virtual void MoveList(vtkKWListBox* l1, vtkKWListBox* l2, const char* list);
   virtual void ShiftItems(vtkKWListBox* l1, int down);
-  virtual void AddElement(vtkKWListBox* l1, vtkKWListBox* l2, const char* element, int force);
+  virtual void AddElement(
+    vtkKWListBox* l1, vtkKWListBox* l2, const char* element, int force);
 
   char* EllipsisCommand;
   char* FinalListChangedCommand;

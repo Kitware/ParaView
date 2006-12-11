@@ -19,6 +19,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWListBox.h"
 #include "vtkKWListBoxWithScrollbars.h"
+#include "vtkKWListBoxWithScrollbarsWithLabel.h"
 #include "vtkKWIcon.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWPushButton.h"
@@ -30,13 +31,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.23");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.24");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
 {
-  this->SourceList = vtkKWListBoxWithScrollbars::New();
-  this->FinalList = vtkKWListBoxWithScrollbars::New();
+  this->SourceList = vtkKWListBoxWithScrollbarsWithLabel::New();
+  this->FinalList = vtkKWListBoxWithScrollbarsWithLabel::New();
 
   this->AddButton = vtkKWPushButton::New();
   this->AddAllButton = vtkKWPushButton::New();
@@ -93,12 +94,15 @@ void vtkKWListBoxToListBoxSelectionEditor::CreateWidget()
   this->Superclass::CreateWidget();
 
   this->SourceList->SetParent(this);
+  this->SourceList->SetLabelVisibility(0);
+  this->SourceList->SetLabelPositionToTop();
   this->SourceList->Create();
-  this->SourceList->GetWidget()->SetSelectionCommand(
-    this, "SourceSelectionChangedCallback");
-  this->SourceList->GetWidget()->SetSelectionModeToExtended();
   this->Script("pack %s -side left -expand true -fill both",
     this->SourceList->GetWidgetName());
+
+  vtkKWListBox *listbox = this->SourceList->GetWidget()->GetWidget();
+  listbox->SetSelectionCommand(this, "SourceSelectionChangedCallback");
+  listbox->SetSelectionModeToExtended();
 
   vtkKWFrame* frame = vtkKWFrame::New();
   frame->SetParent(this);
@@ -161,12 +165,15 @@ void vtkKWListBoxToListBoxSelectionEditor::CreateWidget()
   frame->Create();
 
   this->FinalList->SetParent(frame);
+  this->FinalList->SetLabelVisibility(0);
+  this->FinalList->SetLabelPositionToTop();
   this->FinalList->Create();
-  this->FinalList->GetWidget()->SetSelectionModeToExtended();
-  this->FinalList->GetWidget()->SetSelectionCommand(
-    this, "FinalSelectionChangedCallback");
   this->Script("pack %s -side top -expand true -fill both",
     this->FinalList->GetWidgetName());
+
+  listbox = this->FinalList->GetWidget()->GetWidget();
+  listbox->SetSelectionModeToExtended();
+  listbox->SetSelectionCommand(this, "FinalSelectionChangedCallback");
 
   this->ButtonFrame->SetParent(frame);
   this->ButtonFrame->Create();
@@ -249,8 +256,8 @@ void vtkKWListBoxToListBoxSelectionEditor::AddElement(vtkKWListBox* l1, vtkKWLis
 void vtkKWListBoxToListBoxSelectionEditor::AddSourceElement(const char* element, int force /* = 0 */)
 {
   this->RemoveEllipsis();
-  this->AddElement(this->SourceList->GetWidget(), 
-                   this->FinalList->GetWidget(), element, force);
+  this->AddElement(this->SourceList->GetWidget()->GetWidget(), 
+                   this->FinalList->GetWidget()->GetWidget(), element, force);
   this->DisplayEllipsis();
   this->Update();
 }
@@ -258,8 +265,8 @@ void vtkKWListBoxToListBoxSelectionEditor::AddSourceElement(const char* element,
 void vtkKWListBoxToListBoxSelectionEditor::AddFinalElement(const char* element, int force /* = 0 */)
 {
   this->RemoveEllipsis();
-  this->AddElement(this->FinalList->GetWidget(), 
-                   this->SourceList->GetWidget(), element, force);
+  this->AddElement(this->FinalList->GetWidget()->GetWidget(), 
+                   this->SourceList->GetWidget()->GetWidget(), element, force);
   this->DisplayEllipsis();
   this->Update();
 }
@@ -268,9 +275,9 @@ void vtkKWListBoxToListBoxSelectionEditor::AddFinalElement(const char* element, 
 void vtkKWListBoxToListBoxSelectionEditor::RemoveSourceElement(int index)
 {
   this->RemoveEllipsis();
-  if(index<this->SourceList->GetWidget()->GetNumberOfItems())
+  if(index<this->SourceList->GetWidget()->GetWidget()->GetNumberOfItems())
     {
-    this->SourceList->GetWidget()->DeleteRange(index, index);
+    this->SourceList->GetWidget()->GetWidget()->DeleteRange(index, index);
     }
   this->DisplayEllipsis();
   this->Update();
@@ -280,9 +287,9 @@ void vtkKWListBoxToListBoxSelectionEditor::RemoveSourceElement(int index)
 void vtkKWListBoxToListBoxSelectionEditor::RemoveFinalElement(int index)
 {
   this->RemoveEllipsis();
-  if(index<this->FinalList->GetWidget()->GetNumberOfItems())
+  if(index<this->FinalList->GetWidget()->GetWidget()->GetNumberOfItems())
     {
-    this->FinalList->GetWidget()->DeleteRange(index, index);
+    this->FinalList->GetWidget()->GetWidget()->DeleteRange(index, index);
     }
   this->DisplayEllipsis();
   this->Update();
@@ -292,8 +299,8 @@ void vtkKWListBoxToListBoxSelectionEditor::RemoveFinalElement(int index)
 void vtkKWListBoxToListBoxSelectionEditor::AddCallback()
 {
   this->RemoveEllipsis();
-  this->MoveSelectedList(this->SourceList->GetWidget(), 
-                         this->FinalList->GetWidget());
+  this->MoveSelectedList(this->SourceList->GetWidget()->GetWidget(), 
+                         this->FinalList->GetWidget()->GetWidget());
   this->DisplayEllipsis();
   this->Update();
 }
@@ -302,8 +309,8 @@ void vtkKWListBoxToListBoxSelectionEditor::AddCallback()
 void vtkKWListBoxToListBoxSelectionEditor::AddAllCallback()
 {
   this->RemoveEllipsis();
-  this->MoveWholeList(this->SourceList->GetWidget(), 
-                      this->FinalList->GetWidget());
+  this->MoveWholeList(this->SourceList->GetWidget()->GetWidget(), 
+                      this->FinalList->GetWidget()->GetWidget());
   this->DisplayEllipsis();
   this->Update();
 }
@@ -312,8 +319,8 @@ void vtkKWListBoxToListBoxSelectionEditor::AddAllCallback()
 void vtkKWListBoxToListBoxSelectionEditor::RemoveCallback() 
 {
   this->RemoveEllipsis();
-  this->MoveSelectedList(this->FinalList->GetWidget(), 
-                         this->SourceList->GetWidget());
+  this->MoveSelectedList(this->FinalList->GetWidget()->GetWidget(), 
+                         this->SourceList->GetWidget()->GetWidget());
   this->DisplayEllipsis();
   this->Update();
 }
@@ -322,8 +329,8 @@ void vtkKWListBoxToListBoxSelectionEditor::RemoveCallback()
 void vtkKWListBoxToListBoxSelectionEditor::RemoveAllCallback()
 {
   this->RemoveEllipsis();
-  this->MoveWholeList(this->FinalList->GetWidget(), 
-                      this->SourceList->GetWidget());
+  this->MoveWholeList(this->FinalList->GetWidget()->GetWidget(), 
+                      this->SourceList->GetWidget()->GetWidget());
   this->DisplayEllipsis();
   this->Update();
 }
@@ -371,13 +378,13 @@ void vtkKWListBoxToListBoxSelectionEditor::ShiftItems(vtkKWListBox* l1, int down
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::UpCallback()
 {
-  this->ShiftItems(this->FinalList->GetWidget(), 0);
+  this->ShiftItems(this->FinalList->GetWidget()->GetWidget(), 0);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::DownCallback()
 {
-  this->ShiftItems(this->FinalList->GetWidget(), 1);
+  this->ShiftItems(this->FinalList->GetWidget()->GetWidget(), 1);
 }
 
 //----------------------------------------------------------------------------
@@ -437,13 +444,13 @@ int vtkKWListBoxToListBoxSelectionEditor::GetNumberOfElementsOnSourceList()
     {
     return 0;
     }
-  return this->SourceList->GetWidget()->GetNumberOfItems();
+  return this->SourceList->GetWidget()->GetWidget()->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------
 int vtkKWListBoxToListBoxSelectionEditor::GetNumberOfElementsOnFinalList()
 {
-  return this->FinalList->GetWidget()->GetNumberOfItems();
+  return this->FinalList->GetWidget()->GetWidget()->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------
@@ -453,13 +460,13 @@ const char* vtkKWListBoxToListBoxSelectionEditor::GetElementFromSourceList(int i
     {
     return 0;
     }
-  return this->SourceList->GetWidget()->GetItem(idx);
+  return this->SourceList->GetWidget()->GetWidget()->GetItem(idx);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWListBoxToListBoxSelectionEditor::GetElementFromFinalList(int idx)
 {
-  return this->FinalList->GetWidget()->GetItem(idx);
+  return this->FinalList->GetWidget()->GetWidget()->GetItem(idx);
 }
 
 //----------------------------------------------------------------------------
@@ -469,19 +476,19 @@ int vtkKWListBoxToListBoxSelectionEditor::GetElementIndexFromSourceList(const ch
     {
     return -1;
     }
-  return this->SourceList->GetWidget()->GetItemIndex(element);
+  return this->SourceList->GetWidget()->GetWidget()->GetItemIndex(element);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWListBoxToListBoxSelectionEditor::GetElementIndexFromFinalList(const char* element)
 {
-  return this->FinalList->GetWidget()->GetItemIndex(element);
+  return this->FinalList->GetWidget()->GetWidget()->GetItemIndex(element);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::RemoveItemsFromSourceList()
 {
-  this->SourceList->GetWidget()->DeleteAll();
+  this->SourceList->GetWidget()->GetWidget()->DeleteAll();
   this->Modified();
   this->InvokeEvent(vtkCommand::WidgetModifiedEvent, 0);
   this->DisplayEllipsis();
@@ -491,7 +498,7 @@ void vtkKWListBoxToListBoxSelectionEditor::RemoveItemsFromSourceList()
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::RemoveItemsFromFinalList()
 {
-  this->FinalList->GetWidget()->DeleteAll();
+  this->FinalList->GetWidget()->GetWidget()->DeleteAll();
   this->Modified();
   this->InvokeEvent(vtkCommand::WidgetModifiedEvent, 0);
   this->Update();
@@ -500,13 +507,13 @@ void vtkKWListBoxToListBoxSelectionEditor::RemoveItemsFromFinalList()
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::DisplayEllipsis()
 {
-  if ( this->SourceList->GetWidget()->GetNumberOfItems() > 0 )
+  if ( this->SourceList->GetWidget()->GetWidget()->GetNumberOfItems() > 0 )
     {
     return;
     }
-  this->SourceList->GetWidget()->InsertEntry(
+  this->SourceList->GetWidget()->GetWidget()->InsertEntry(
     0, ks_("List Box To List Box|Ellipsis|..."));
-  this->SourceList->GetWidget()->SetBinding(
+  this->SourceList->GetWidget()->GetWidget()->SetBinding(
     "<Double-1>", this, "EllipsisCallback");
   this->EllipsisDisplayed = 1;
 }
@@ -518,8 +525,8 @@ void vtkKWListBoxToListBoxSelectionEditor::RemoveEllipsis()
     {
     return;
     }
-  this->SourceList->GetWidget()->DeleteAll();
-  this->SourceList->GetWidget()->RemoveBinding("<Double-1>");
+  this->SourceList->GetWidget()->GetWidget()->DeleteAll();
+  this->SourceList->GetWidget()->GetWidget()->RemoveBinding("<Double-1>");
   this->EllipsisDisplayed = 0;
 }
 
@@ -592,42 +599,45 @@ void vtkKWListBoxToListBoxSelectionEditor::Update()
 {
   this->UpdateEnableState();
 
-  //Add and AddAll buttons
-  if ( this->SourceList->GetWidget()->GetNumberOfItems() == 0 
+  // Add and AddAll buttons
+
+  if ( this->SourceList->GetWidget()->GetWidget()->GetNumberOfItems() == 0 
     || this->EllipsisDisplayed)
     {
     this->AddButton->SetEnabled(0);
     this->AddAllButton->SetEnabled(0);
     }
-  else if(this->SourceList->GetWidget()->GetSelectionIndex()<0)
+  else if(this->SourceList->GetWidget()->GetWidget()->GetSelectionIndex()<0)
     {
     this->AddButton->SetEnabled(0);
     }
 
-  //Remove and RemoveAll buttons
-  if ( this->FinalList->GetWidget()->GetNumberOfItems() == 0)
+  // Remove and RemoveAll buttons
+
+  if ( this->FinalList->GetWidget()->GetWidget()->GetNumberOfItems() == 0)
     {
     this->RemoveButton->SetEnabled(0);
     this->RemoveAllButton->SetEnabled(0);
     }
-  else if(this->FinalList->GetWidget()->GetSelectionIndex()<0)
+  else if(this->FinalList->GetWidget()->GetWidget()->GetSelectionIndex()<0)
     {
     this->RemoveButton->SetEnabled(0);
     }
 
-  //Up and Down buttons
-  if ( this->FinalList->GetWidget()->GetNumberOfItems() <= 1
-    || this->FinalList->GetWidget()->GetSelectionIndex()<0)
+  // Up and Down buttons
+
+  if ( this->FinalList->GetWidget()->GetWidget()->GetNumberOfItems() <= 1
+    || this->FinalList->GetWidget()->GetWidget()->GetSelectionIndex()<0)
     {
     this->UpButton->SetEnabled(0);
     this->DownButton->SetEnabled(0);
     }
-  else if(this->FinalList->GetWidget()->GetSelectionIndex() ==0)
+  else if(this->FinalList->GetWidget()->GetWidget()->GetSelectionIndex() ==0)
     {
     this->UpButton->SetEnabled(0);
     }
-  else if(this->FinalList->GetWidget()->GetSelectionIndex() ==
-    (this->FinalList->GetWidget()->GetNumberOfItems()-1))
+  else if(this->FinalList->GetWidget()->GetWidget()->GetSelectionIndex() ==
+    (this->FinalList->GetWidget()->GetWidget()->GetNumberOfItems()-1))
     {
     this->DownButton->SetEnabled(0);
     }
