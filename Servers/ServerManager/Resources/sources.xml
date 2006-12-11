@@ -697,7 +697,11 @@ The output of the Plane source is polygonal data.
          number_of_elements="1"
          animateable="1"
          default_values="1.0" >
-       <DoubleRangeDomain name="range" min="0"/>
+         <BoundsDomain name="range" mode="scaled_extent" scale_factor="0.1">
+           <RequiredProperties>
+             <Property name="DummyInput" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
       </DoubleVectorProperty>
 
       <InputProperty name="DummyInput" is_internal="1">
