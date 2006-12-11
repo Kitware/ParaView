@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
-vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.9");
+vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.10");
 
 vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
 
@@ -30,6 +30,7 @@ vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
 vtkSMBoundsDomain::vtkSMBoundsDomain()
 {
   this->Mode = vtkSMBoundsDomain::NORMAL;
+  this->DefaultMode = vtkSMBoundsDomain::MID;
   this->InputInformation = 0;
   this->ScaleFactor = 0.1;
 }
@@ -258,6 +259,34 @@ int vtkSMBoundsDomain::SetDefaultValues(vtkSMProperty* prop)
   int status = 0;
   switch (this->Mode)
     {
+  case vtkSMBoundsDomain::NORMAL:
+      {
+      for (unsigned int cc=0; cc < dvp->GetNumberOfElements(); cc++)
+        {
+        if (this->GetMaximumExists(cc) && this->GetMinimumExists(cc))
+          {
+          double value = 0.0;
+          switch (this->DefaultMode)
+            {
+           case vtkSMBoundsDomain::MIN:
+             value = this->GetMinimum(cc);
+             break;
+
+           case vtkSMBoundsDomain::MAX:
+             value = this->GetMaximum(cc);
+             break;
+
+           case vtkSMBoundsDomain::MID:
+           default:
+            value = (this->GetMaximum(cc) + this->GetMinimum(cc))/2.0;
+            break;
+            }
+          dvp->SetElement(cc, value);
+          status = 1; 
+          }
+        }
+      }
+    break;
   case vtkSMBoundsDomain::SCALED_EXTENT:
       {
       for (unsigned int cc=0; cc < dvp->GetNumberOfElements(); cc++)
@@ -310,6 +339,23 @@ int vtkSMBoundsDomain::ReadXMLAttributes(
       }
     }
 
+  const char* default_mode = element->GetAttribute("default_mode");
+  if (default_mode)
+    {
+    if (strcmp(default_mode, "min") == 0)
+      {
+      this->DefaultMode = vtkSMBoundsDomain::MIN;
+      }
+    else if (strcmp(default_mode, "max") == 0)
+      {
+      this->DefaultMode = vtkSMBoundsDomain::MAX;
+      }
+    if (strcmp(default_mode, "mid") == 0)
+      {
+      this->DefaultMode = vtkSMBoundsDomain::MID;
+      }
+    }
+
   const char* scalefactor = element->GetAttribute("scale_factor");
   if (scalefactor)
     {
@@ -326,4 +372,5 @@ void vtkSMBoundsDomain::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Mode: " << this->Mode << endl;
   os << indent << "ScaleFactor: " << this->ScaleFactor << endl;
+  os << indent << "DefaultMode: " << this->DefaultMode << endl;
 }

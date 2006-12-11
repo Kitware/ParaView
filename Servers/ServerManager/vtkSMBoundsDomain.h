@@ -68,11 +68,20 @@ public:
     ORIENTED_MAGNITUDE,
     SCALED_EXTENT
   };
+
+  enum DefaultModes
+    {
+    MIN,
+    MAX,
+    MID
+    };
 //ETX
 
   vtkSetMacro(ScaleFactor, double);
   vtkGetMacro(ScaleFactor, double);
 
+  vtkSetMacro(DefaultMode, int);
+  vtkGetMacro(DefaultMode, int);
 protected:
   vtkSMBoundsDomain();
   ~vtkSMBoundsDomain();
@@ -86,6 +95,7 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
   
   int Mode;
+  int DefaultMode; // Used only in Normal mode while settings the default value.
 
   vtkPVDataInformation* InputInformation;
 

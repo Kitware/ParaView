@@ -21,6 +21,7 @@
 
 #include "vtkObject.h"
 
+class vtkCollection;
 class vtkPVXMLParser;
 
 //BTX
@@ -139,6 +140,14 @@ public:
   // Serialize (as XML) in the given stream.
   void PrintXML(ostream& os, vtkIndent indent);
   void PrintXML();
+
+  // Description:
+  // Similar to DOM sepecific getElementsByTagName(). 
+  // Returns a list of vtkPVXMLElements with the given name in the order
+  // in which they will be encountered in a preorder traversal
+  // of the sub-tree under this node. The elements are populated
+  // in the vtkCollection passed as an argument.
+  void GetElementsByName(const char* name, vtkCollection* elements);
 
 protected:
   vtkPVXMLElement();
