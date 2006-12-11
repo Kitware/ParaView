@@ -16,6 +16,7 @@
 
 #include "vtkAppendPolyData.h"
 #include "vtkCompositeDataPipeline.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkGarbageCollector.h"
 #include "vtkHierarchicalBoxDataSet.h"
@@ -31,7 +32,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.26");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.27");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -287,8 +288,6 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
 
   vtkMultiGroupDataSet *hdInput = vtkMultiGroupDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkMultiGroupDataInformation* hdInfo = 
-    hdInput->GetMultiGroupDataInformation();
 
   vtkInformation* info = outputVector->GetInformationObject(0);
   vtkPolyData *output = vtkPolyData::SafeDownCast(
@@ -316,80 +315,76 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
   int retVal = 1;
   this->InputIsUniformGrid = 0;
 
-  unsigned int numGroups = hdInput->GetNumberOfGroups();
+  vtkCompositeDataIterator* iter = hdInput->NewIterator();
 
-  for (unsigned int level=0; level<numGroups; level++)
+  while(!iter->IsDoneWithTraversal())
     {
-    unsigned int numDataSets = hdInput->GetNumberOfDataSets(level);
-    for (unsigned int dataIdx=0; dataIdx<numDataSets; dataIdx++)
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+    if (ds)
       {
-      vtkDataSet* ds = vtkDataSet::SafeDownCast(
-        hdInput->GetDataSet(level, dataIdx));
-      if (ds)
+      vtkPolyData* tmpOut = vtkPolyData::New();
+      
+      if (ds->IsA("vtkUniformGrid"))
         {
-        vtkPolyData* tmpOut = vtkPolyData::New();
-        
-        if (ds->IsA("vtkUniformGrid"))
-          {
-          this->InputIsUniformGrid = 1;
-          }
-        else
-          {
-          this->InputIsUniformGrid = 0;
-          }
-
-        vtkIdType numBlankedPts = 0;
-        vtkInformation* blockInfo = hdInfo->GetInformation(level, dataIdx);
-        if (blockInfo)
-          {
-          if (blockInfo->Has(
-                vtkHierarchicalBoxDataSet::NUMBER_OF_BLANKED_POINTS()))
-            {
-            numBlankedPts = blockInfo->Get(
-              vtkHierarchicalBoxDataSet::NUMBER_OF_BLANKED_POINTS());
-            }
-          }
-        vtkIdType blockNumPts = ds->GetNumberOfPoints() - numBlankedPts;
-        // What fraction of the points will this processes get allocated?
-        vtkIdType blockMaxNumPts = (vtkIdType)(
-          (double)(maxNumPts)*(double)(blockNumPts)/(double)(totalNumPts));
-        this->BlockMaxNumPts = (blockMaxNumPts < 1) ? 1 : blockMaxNumPts;
-        if (this->UseMaskPoints)
-          {
-          this->BlockOnRatio = blockNumPts/this->BlockMaxNumPts;
-          }
-        this->BlockPointCounter = 0;
-        this->BlockNumPts = 0;
-        if (this->MaskPoints->GetRandomMode())
-          {
-          this->BlockNextPoint = static_cast<vtkIdType>(
-            1+vtkMath::Random()*this->BlockOnRatio);
-          }
-        else
-          {
-          this->BlockNextPoint = static_cast<vtkIdType>(1+this->BlockOnRatio);
-          }
-        
-        //retVal = this->MaskAndExecute(blockNumPts, blockMaxNumPts, ds,
-        //request, inputVs, outputVector);
-        newInInfo->Set(vtkDataObject::DATA_OBJECT(), ds);
-        retVal = 
-          this->Superclass::RequestData(request, inputVs, outputVector);
-
-        tmpOut->ShallowCopy(output);
-        
-        append->AddInput(tmpOut);
-        
-        // Call FastDelete() instead of Delete() to avoid garbage
-        // collection checks. This improves the preformance significantly
-        tmpOut->FastDelete();
-        if (!retVal)
-          {
-          break;
-          }
-        numInputs++;
+        this->InputIsUniformGrid = 1;
         }
+      else
+        {
+        this->InputIsUniformGrid = 0;
+        }
+      
+      vtkIdType numBlankedPts = 0;
+      vtkInformation* blockInfo = iter->GetCurrentInformationObject();
+      if (blockInfo)
+        {
+        if (blockInfo->Has(
+              vtkHierarchicalBoxDataSet::NUMBER_OF_BLANKED_POINTS()))
+          {
+          numBlankedPts = blockInfo->Get(
+            vtkHierarchicalBoxDataSet::NUMBER_OF_BLANKED_POINTS());
+          }
+        }
+      vtkIdType blockNumPts = ds->GetNumberOfPoints() - numBlankedPts;
+      // What fraction of the points will this processes get allocated?
+      vtkIdType blockMaxNumPts = (vtkIdType)(
+        (double)(maxNumPts)*(double)(blockNumPts)/(double)(totalNumPts));
+      this->BlockMaxNumPts = (blockMaxNumPts < 1) ? 1 : blockMaxNumPts;
+      if (this->UseMaskPoints)
+        {
+        this->BlockOnRatio = blockNumPts/this->BlockMaxNumPts;
+        }
+      this->BlockPointCounter = 0;
+      this->BlockNumPts = 0;
+      if (this->MaskPoints->GetRandomMode())
+        {
+        this->BlockNextPoint = static_cast<vtkIdType>(
+          1+vtkMath::Random()*this->BlockOnRatio);
+        }
+      else
+        {
+        this->BlockNextPoint = static_cast<vtkIdType>(1+this->BlockOnRatio);
+        }
+        
+      //retVal = this->MaskAndExecute(blockNumPts, blockMaxNumPts, ds,
+      //request, inputVs, outputVector);
+      newInInfo->Set(vtkDataObject::DATA_OBJECT(), ds);
+      retVal = 
+        this->Superclass::RequestData(request, inputVs, outputVector);
+      
+      tmpOut->ShallowCopy(output);
+      
+      append->AddInput(tmpOut);
+      
+      // Call FastDelete() instead of Delete() to avoid garbage
+      // collection checks. This improves the preformance significantly
+      tmpOut->FastDelete();
+      if (!retVal)
+        {
+        break;
+        }
+      numInputs++;
       }
+    iter->GoToNextItem();
     }
   inputVs[0]->Delete();
 
