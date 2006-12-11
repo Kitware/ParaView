@@ -94,12 +94,36 @@ pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
   this->UI = new pqUI(this);
   this->UI->setupUi(this);
   
+  QObject::connect(this->UI->DisplayType, SIGNAL(currentChanged(int)), 
+                   this, SIGNAL(displayTypeChanged()));
+  
   this->DisplItem = 0;
   QObject::connect(this->propertyManager(), 
                    SIGNAL(canAcceptOrReject(bool)),
                    this, SLOT(propertyChanged()));
 
   this->UI->XMLFileName->setServer(this->proxy()->getServer());
+  
+  QObject::connect(this->UI->BlocksAllOn, SIGNAL(clicked(bool)), 
+                   this, SLOT(blocksOn()));
+  QObject::connect(this->UI->BlocksAllOff, SIGNAL(clicked(bool)), 
+                   this, SLOT(blocksOff()));
+  QObject::connect(this->UI->VariablesAllOn, SIGNAL(clicked(bool)), 
+                   this, SLOT(variablesOn()));
+  QObject::connect(this->UI->VariablesAllOff, SIGNAL(clicked(bool)), 
+                   this, SLOT(variablesOff()));
+  QObject::connect(this->UI->SetsAllOn, SIGNAL(clicked(bool)), 
+                   this, SLOT(setsOn()));
+  QObject::connect(this->UI->SetsAllOff, SIGNAL(clicked(bool)), 
+                   this, SLOT(setsOff()));
+  QObject::connect(this->UI->MaterialsAllOn, SIGNAL(clicked(bool)), 
+                   this, SLOT(materialsOn()));
+  QObject::connect(this->UI->MaterialsAllOff, SIGNAL(clicked(bool)), 
+                   this, SLOT(materialsOff()));
+  QObject::connect(this->UI->HierarchyAllOn, SIGNAL(clicked(bool)), 
+                   this, SLOT(hierarchyOn()));
+  QObject::connect(this->UI->HierarchyAllOff, SIGNAL(clicked(bool)), 
+                   this, SLOT(hierarchyOff()));
 
 #if QT_VERSION < 0x040200
   // workaround for Qt bug in plastique style, where painter state wasn't being
@@ -119,15 +143,25 @@ pqExodusPanel::~pqExodusPanel()
 {
 }
 
+int pqExodusPanel::displayType() const
+{
+  return this->UI->DisplayType->currentIndex() + 1;
+}
+
+void pqExodusPanel::setDisplayType(int d)
+{
+  this->UI->DisplayType->setCurrentIndex(d-1);
+}
+
 void pqExodusPanel::linkServerManagerProperties()
 {
   // parent class hooks up some of our widgets in the ui
   pqNamedObjectPanel::linkServerManagerProperties();
   
   this->propertyManager()->registerLink(
-    this->UI->DisplayType, 
-    "currentIndex", 
-    SIGNAL(currentChanged(int)),
+    this,
+    "displayType", 
+    SIGNAL(displayTypeChanged()),
     this->proxy()->getProxy(), 
     this->proxy()->getProxy()->GetProperty("DisplayType"));
 
@@ -589,6 +623,40 @@ void pqExodusPanel::toggle(QListWidget* List, Qt::CheckState c)
       }
     }
 }
+
+void pqExodusPanel::materialsOn()
+{
+  this->materialsToggle(Qt::Checked);
+}
+
+void pqExodusPanel::materialsOff()
+{
+  this->materialsToggle(Qt::Unchecked);
+}
+
+void pqExodusPanel::materialsToggle(Qt::CheckState c)
+{
+  QListWidget* List = this->UI->MaterialArrayStatus;
+  this->toggle(List, c);
+}
+
+
+void pqExodusPanel::hierarchyOn()
+{
+  this->hierarchyToggle(Qt::Checked);
+}
+
+void pqExodusPanel::hierarchyOff()
+{
+  this->hierarchyToggle(Qt::Unchecked);
+}
+
+void pqExodusPanel::hierarchyToggle(Qt::CheckState c)
+{
+  QListWidget* List = this->UI->HierarchyArrayStatus;
+  this->toggle(List, c);
+}
+
 
 void pqExodusPanel::propertyChanged()
 {

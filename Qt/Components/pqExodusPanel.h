@@ -44,13 +44,18 @@ class pqExodusPanel :
   public pqNamedObjectPanel
 {
   Q_OBJECT
+  Q_PROPERTY(int displayType READ displayType WRITE setDisplayType)
 public:
   /// constructor
   pqExodusPanel(pqProxy* proxy, QWidget* p = NULL);
   /// destructor
   ~pqExodusPanel();
 
+signals:
+  void displayTypeChanged();
+
 protected slots:
+  void setDisplayType(int);
   void applyDisplacements(int);
   void displChanged(bool);
 
@@ -60,6 +65,14 @@ protected slots:
   void blocksOn();
   void blocksOff();
   void blocksToggle(Qt::CheckState);
+  
+  void materialsOn();
+  void materialsOff();
+  void materialsToggle(Qt::CheckState);
+  
+  void hierarchyOn();
+  void hierarchyOff();
+  void hierarchyToggle(Qt::CheckState);
   
   void variablesOn();
   void variablesOff();
@@ -73,6 +86,7 @@ protected slots:
   void toggle(QListWidget*, Qt::CheckState);
 
 protected:
+  int displayType() const;
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
 
