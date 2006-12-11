@@ -179,18 +179,20 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.4");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.5");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
 {
   this->Internal = new vtkPVPythonInterpretorInternal();
+  this->ExecutablePath = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::~vtkPVPythonInterpretor()
 {
   delete this->Internal;
+  this->SetExecutablePath(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -203,8 +205,13 @@ void vtkPVPythonInterpretor::InitializeInternal()
   // Compute the directory containing this executable.  The python
   // sys.executable variable contains the full path to the interpreter
   // executable.
-  PyObject* executable = PySys_GetObject(const_cast<char*>("executable"));
-  if(const char* exe_str = PyString_AsString(executable))
+  const char* exe_str =  this->ExecutablePath;
+  if (!exe_str)
+    {
+    PyObject* executable = PySys_GetObject(const_cast<char*>("executable"));
+    exe_str = PyString_AsString(executable);
+    }
+  if (exe_str);
     {
     // Use the executable location to try to set sys.path to include
     // the VTK python modules.
@@ -223,6 +230,7 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
     return 0;
     }
 
+  this->SetExecutablePath(argv[0]);
   if (!Py_IsInitialized())
     {
     // Set the program name, so that we can ask python to provide us
