@@ -76,7 +76,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.310");
+vtkCxxRevisionMacro(vtkKWApplication, "1.311");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -115,15 +115,23 @@ public:
   void DisplayDebugText(const char* t)
     { 
       this->Application->DebugMessage(t); 
+      if (this->PromptUser)
+        {
+        this->Application->DisplayLogDialog(NULL);
+        }
     }
   void DisplayWarningText(const char* t)
     { 
       this->Application->WarningMessage(t); 
+      if (this->PromptUser)
+        {
+        this->Application->DisplayLogDialog(NULL);
+        }
     }
   void DisplayErrorText(const char* t)
     { 
       this->Application->ErrorMessage(t); 
-      if (this->PromptUser || !this->Application->GetNumberOfWindowsMapped())
+      if (this->PromptUser)
         {
         this->Application->DisplayLogDialog(NULL);
         }
@@ -131,6 +139,10 @@ public:
   void DisplayText(const char* t)
     { 
       this->Application->InformationMessage(t); 
+      if (this->PromptUser)
+        {
+        this->Application->DisplayLogDialog(NULL);
+        }
     }
   void DisplayGenericWarningText(const char* t)
     { 
