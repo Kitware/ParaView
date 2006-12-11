@@ -301,6 +301,7 @@ pq3DWidget* pqSignalAdaptorProxyList::new3DWidget(vtkSMProxy* smProxy)
   widgets[0]->setReferenceProxy(this->Internal->ReferenceProxy);
   // We implicitly reset the widget bounds the first time the widget is shown.
   widgets[0]->resetBounds();
+  widgets[0]->reset();
   return widgets[0];
 }
 

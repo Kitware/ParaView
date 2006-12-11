@@ -429,7 +429,11 @@ The output of the Line source is polygonal data.
          number_of_elements="3"
          animateable="1"
          default_values="0.0 0.0 0.0" >
-         <DoubleRangeDomain name="range"/>
+         <BoundsDomain name="range" mode="normal" default_mode="min" >
+           <RequiredProperties>
+             <Property name="DummyInput" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -438,7 +442,11 @@ The output of the Line source is polygonal data.
          number_of_elements="3"
          animateable="1"
          default_values="0.0 0.0 0.0" >
-         <DoubleRangeDomain name="range"/>
+         <BoundsDomain name="range" mode="normal" default_mode="max" >
+           <RequiredProperties>
+             <Property name="DummyInput" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -448,12 +456,21 @@ The output of the Line source is polygonal data.
          default_values="6" >
         <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
+
+      <InputProperty name="DummyInput" is_internal="1">
+        <!-- Used when this source is added to a proxy list domain. -->
+      </InputProperty>
+
       <Hints>
         <PropertyGroup type="LineSource" >
           <Property function="Point1WorldPosition" name="Point1" />
           <Property function="Point2WorldPosition" name="Point2" />
           <Property function="Resolution"          name="Resolution" />
         </PropertyGroup>
+
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input" />
+        </ProxyList>
       </Hints>
    <!-- End Line -->
    </SourceProxy>
@@ -658,7 +675,11 @@ The output of the Plane source is polygonal data.
          number_of_elements="3"
          animateable="1"
          default_values="0.0 0.0 0.0" >
-         <DoubleRangeDomain name="range"/>
+         <BoundsDomain name="range" mode="normal" default_mode="mid" >
+           <RequiredProperties>
+             <Property name="DummyInput" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -679,12 +700,20 @@ The output of the Plane source is polygonal data.
        <DoubleRangeDomain name="range" min="0"/>
       </DoubleVectorProperty>
 
+      <InputProperty name="DummyInput" is_internal="1">
+        <!-- Used when this source is added to a proxy list domain. -->
+      </InputProperty>
+
       <Hints>
         <PropertyGroup type="PointSource" >
           <Property function="WorldPosition"  name="Center" />
           <Property function="Radius"         name="Radius" />
           <Property function="NumberOfPoints" name="NumberOfPoints" />
         </PropertyGroup>
+
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input" />
+        </ProxyList>
       </Hints>
    <!-- End PointSource -->
    </SourceProxy>

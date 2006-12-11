@@ -231,6 +231,8 @@ void pqHandleWidget::resetBounds()
 void pqHandleWidget::onResetBounds()
 {
   this->resetBounds();
+  this->render();
+
 }
 
 //-----------------------------------------------------------------------------

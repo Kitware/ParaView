@@ -250,7 +250,6 @@ vtkSMNew3DWidgetProxy* pq3DWidget::getWidgetProxy() const
 void pq3DWidget::setReferenceProxy(pqProxy* proxy)
 {
   this->Internal->ReferenceProxy = proxy;
-  this->reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -270,10 +269,6 @@ void pq3DWidget::setControlledProxy(vtkSMProxy* proxy)
   this->Internal->PropertyMap.clear();
 
   this->Internal->ControlledProxy = proxy;
-  if (proxy)
-    {
-    this->reset();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -308,7 +303,6 @@ void pq3DWidget::setHints(vtkPVXMLElement* hints)
         proxy->GetProperty(propElem->GetAttribute("name")));
       }
     }
-  this->reset();
 }
 
 //-----------------------------------------------------------------------------

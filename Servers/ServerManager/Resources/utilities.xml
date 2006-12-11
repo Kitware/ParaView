@@ -186,13 +186,22 @@
 
   <ProxyGroup name="implicit_functions">
     <ImplicitPlaneProxy name="Plane" class="vtkPlane">
+      <InputProperty
+        name="Input"
+        is_internal="1">
+      </InputProperty>
+
       <DoubleVectorProperty
          name="Origin"
          command="SetOrigin"
          update_self="1"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
-         <DoubleRangeDomain name="range" />
+         <BoundsDomain name="range" mode="normal" default_mode="mid">
+           <RequiredProperties>
+             <Property name="Input" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -210,7 +219,7 @@
          number_of_elements="1"
          animateable="1"
          default_values="0.0" >
-        <BoundsDomain name="range" mode="oriented_magnitude">
+        <BoundsDomain name="range" mode="oriented_magnitude" >
          <RequiredProperties>
             <Property name="Origin" function="Origin"/>
             <Property name="Normal" function="Normal"/>
@@ -229,7 +238,20 @@
           <Property name="Origin" function="Origin" />
           <Property name="Normal" function="Normal" />
         </PropertyGroup>
+
+        <ProxyList>
+          <!-- 
+            ProxyList hints are used when this proxy
+            is made a part of a proxy list domain. 
+            It provides a mechanism to link certain 
+            properties from this proxy with properties
+            from the proxy which has the property
+            with the proxy list domain.
+          -->
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
       </Hints>
+
     </ImplicitPlaneProxy>
 
     <Proxy name="Planes" class="vtkPlanes">

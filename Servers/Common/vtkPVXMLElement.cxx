@@ -13,10 +13,12 @@
 
 =========================================================================*/
 #include "vtkPVXMLElement.h"
+
+#include "vtkCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.11");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.12");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -451,6 +453,41 @@ int vtkPVXMLElement::GetCharacterDataAsVector(int length, float* data)
 int vtkPVXMLElement::GetCharacterDataAsVector(int length, double* data)
 {
   return vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXMLElement::GetElementsByName(const char* name, vtkCollection* elements)
+{
+  if (!elements)
+    {
+    vtkErrorMacro("elements cannot be NULL.");
+    return;
+    }
+  if (!name)
+    {
+    vtkErrorMacro("name cannot be NULL.");
+    return;
+    }
+
+  unsigned int numChildren = this->GetNumberOfNestedElements();
+  unsigned int cc;
+  for (cc=0; cc < numChildren; cc++)
+    {
+    vtkPVXMLElement* child = this->GetNestedElement(cc);
+    if (child && child->GetName() && strcmp(child->GetName(), name) == 0)
+      {
+      elements->AddItem(child);
+      }
+    }
+
+  for (cc=0; cc < numChildren; cc++)
+    {
+    vtkPVXMLElement* child = this->GetNestedElement(cc);
+    if (child)
+      {
+      child->GetElementsByName(name, elements);
+      }
+    }
 }
 
 #if defined(VTK_USE_64BIT_IDS)

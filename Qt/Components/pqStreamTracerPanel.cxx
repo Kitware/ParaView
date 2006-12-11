@@ -299,6 +299,8 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
 
   this->Implementation->LineSourceWidget->resetBounds();
   this->Implementation->PointSourceWidget->resetBounds();
+  this->Implementation->LineSourceWidget->reset();
+  this->Implementation->PointSourceWidget->reset();
 
 
   pqNamedWidgets::link(this, this->proxy()->getProxy(), 

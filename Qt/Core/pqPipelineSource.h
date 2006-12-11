@@ -148,6 +148,9 @@ protected:
   // called by pqConsumerDisplay when the connections change.
   void addDisplay(pqConsumerDisplay*);
   void removeDisplay(pqConsumerDisplay*);
+
+  void processProxyListHints(vtkSMProxy *proxy_list_proxy);
+
 private:
   pqPipelineSourceInternal *Internal; ///< Stores the output connections.
 };

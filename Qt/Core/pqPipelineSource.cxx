@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMPropertyLink.h"
 
 // Qt
 #include <QList>
@@ -53,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqGenericViewModule.h"
 #include "pqConsumerDisplay.h"
 #include "pqPipelineFilter.h"
+#include "pqXMLUtil.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineSourceInternal 
@@ -63,6 +65,8 @@ public:
   QString Name;
   QList<pqPipelineSource*> Consumers;
   QList<pqConsumerDisplay*> Displays;
+  QList<vtkSmartPointer<vtkSMPropertyLink> > Links;
+  QList<vtkSmartPointer<vtkSMProxy> > ProxyListDomainProxies;
 
   pqPipelineSourceInternal(QString name, vtkSMProxy* proxy)
     {
@@ -152,6 +156,8 @@ void pqPipelineSource::createProxiesForProxyListDomains()
         new_proxy->SetConnectionID(proxy->GetConnectionID());
         pld->AddProxy(new_proxy);
         domainProxies.push_back(new_proxy);
+        this->processProxyListHints(new_proxy);
+        this->Internal->ProxyListDomainProxies.push_back(new_proxy);
         }
       this->addInternalProxy(iter->GetKey(), new_proxy);
       }
@@ -159,6 +165,37 @@ void pqPipelineSource::createProxiesForProxyListDomains()
   iter->Delete();
 }
 
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::processProxyListHints(vtkSMProxy *proxy_list_proxy)
+{
+  vtkPVXMLElement* proxy_list_hint = pqXMLUtil::FindNestedElementByName(
+    proxy_list_proxy->GetHints(), "ProxyList");
+  if (proxy_list_hint)
+    {
+    for (unsigned int cc=0; 
+      cc < proxy_list_hint->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* child = proxy_list_hint->GetNestedElement(cc);
+      if (child && QString("Link") == child->GetName())
+        {
+        const char* name = child->GetAttribute("name");
+        const char* linked_with = child->GetAttribute("with_property");
+        if (name && linked_with)
+          {
+          vtkSMPropertyLink* link = vtkSMPropertyLink::New();
+          link->AddLinkedProperty(
+            this->getProxy(), linked_with,
+            vtkSMPropertyLink::INPUT);
+          link->AddLinkedProperty(
+            proxy_list_proxy, name, vtkSMPropertyLink::OUTPUT);
+          this->Internal->Links.push_back(link);
+          link->Delete();
+          }
+        }
+      }
+    }
+}
 
 //-----------------------------------------------------------------------------
 void pqPipelineSource::setDefaultValues()
@@ -170,6 +207,20 @@ void pqPipelineSource::setDefaultValues()
     iter->GetProperty()->ResetToDefault();
     }
   iter->Delete();
+
+  foreach(vtkSMProxy* dproxy, this->Internal->ProxyListDomainProxies)
+    {
+    vtkSMPropertyIterator* diter = dproxy->NewPropertyIterator();
+    for (diter->Begin(); !diter->IsAtEnd(); diter->Next())
+      {
+      diter->GetProperty()->UpdateDependentDomains();
+      }
+    for (diter->Begin(); !diter->IsAtEnd(); diter->Next())
+      {
+      diter->GetProperty()->ResetToDefault();
+      }
+    diter->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------
