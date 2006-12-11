@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notice for more information.
   Include AcuSolve related files
   =======================================================================*/
 
-vtkCxxRevisionMacro(vtkAcuSolveReaderProxy, "1.1");
+vtkCxxRevisionMacro(vtkAcuSolveReaderProxy, "1.2");
 vtkStandardNewMacro(vtkAcuSolveReaderProxy);
 
 //----------------------------------------------------------------------------
@@ -153,6 +153,16 @@ void vtkAcuSolveReaderProxy::PrintSelf( ostream&  os,
   os << indent 
      << "TimeStep: " 
      << this->TimeStep 
+     << endl;
+
+  os << indent
+     << "FileName: "
+     << (this->FileName?this->FileName:"(null)")
+     << endl;
+
+  os << indent
+     << "TimeStepRange: "
+     << this->TimeStepRange[0] << " " << this->TimeStepRange[1]
      << endl;
 }
 
