@@ -3,7 +3,7 @@
   <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Cone" />
   <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/Make Pretty" command="activate" arguments="FeatureEdges" />
+  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="FeatureEdges" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0" command="set_tab" arguments="1" />

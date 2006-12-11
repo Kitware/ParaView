@@ -8,7 +8,7 @@
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/qt_scrollarea_viewport" command="contextMenu" arguments="" />
   <pqevent object="1QMenu0" command="activate" arguments="VariablesOn" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/Released" command="activate" arguments="Threshold" />
+  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Threshold" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Form/SelectInputScalars" command="set_string" arguments="sigxx" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Form/LowerThresholdSlider" command="set_int" arguments="99" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Form/LowerThresholdSlider" command="set_int" arguments="97" />

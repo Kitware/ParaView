@@ -4,7 +4,7 @@
   <pqevent object="MainWindow/ServerStartupBrowser/startups" command="currentChanged" arguments="/0|0" />
   <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/Released" command="activate" arguments="Clip" />
+  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Clip" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuEdit" command="activate" arguments="actionEditSettings" />
   <pqevent object="MainWindow/pqSettingsDialog/tabWidget/1QStackedWidget0/pq3DViewProperties/tabWidget/1QStackedWidget0/tab/groupBox_2/parallelProjection" command="set_boolean" arguments="true" />

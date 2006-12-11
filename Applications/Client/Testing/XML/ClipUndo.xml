@@ -5,7 +5,7 @@
   <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/&amp;Favorites" command="activate" arguments="Clip" />
+  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Clip" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1pqCollapsedGroup1/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />

@@ -7,7 +7,7 @@
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ElevationFilter" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/Released" command="activate" arguments="Threshold" />
+  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Threshold" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Form/LowerThresholdSlider" command="set_int" arguments="1" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Form/LowerThresholdSlider" command="set_int" arguments="3" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Form/LowerThresholdSlider" command="set_int" arguments="4" />
