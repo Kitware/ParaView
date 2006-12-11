@@ -62,6 +62,8 @@ protected:
   // Initialize the interpretor.
   void InitializeInternal();
 
+  char* ExecutablePath;
+  vtkSetStringMacro(ExecutablePath);
 private:
   vtkPVPythonInterpretor(const vtkPVPythonInterpretor&); // Not implemented.
   void operator=(const vtkPVPythonInterpretor&); // Not implemented.
