@@ -3,6 +3,7 @@ INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 
 SET(Filters_SRCS
+  vtkAcuSolveReaderProxy.cxx
   vtkAttributeDataReductionFilter.cxx
   vtkAttributeEditor.cxx
   vtkCameraManipulator.cxx
