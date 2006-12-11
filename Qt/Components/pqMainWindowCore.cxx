@@ -1683,7 +1683,7 @@ void pqMainWindowCore::updateRecentFilterMenu(QAction* action)
   end=this->Implementation->RecentFilterList.end();
   for(;begin!=end;++begin)
   {
-    QAction* action = this->Implementation->RecentFilesMenu->addAction(*begin) << pqSetName(*begin)
+    QAction* recentA = this->Implementation->RecentFilesMenu->addAction(*begin) << pqSetName(*begin)
       << pqSetData(*begin);
     action->setEnabled(false);
   }
