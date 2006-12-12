@@ -272,6 +272,10 @@ protected:
   vtkGetStringMacro(XMLName);
 
   // Description:
+  // The label assigned by the xml parser.
+  vtkGetStringMacro(XMLLabel);
+
+  // Description:
   // Add a sub-property with the given name.
   void AddSubProperty(const char* name, vtkSMProperty* proxy);
 
@@ -324,6 +328,8 @@ protected:
   int IsInternal;
 
   char* XMLName;
+  char* XMLLabel;
+  vtkSetStringMacro(XMLLabel);
 
   vtkSMDomainIterator* DomainIterator;
 

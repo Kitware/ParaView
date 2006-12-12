@@ -33,7 +33,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.49");
+vtkCxxRevisionMacro(vtkSMProperty, "1.50");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -51,6 +51,7 @@ vtkSMProperty::vtkSMProperty()
   this->UpdateSelf = 0;
   this->PInternals = new vtkSMPropertyInternals;
   this->XMLName = 0;
+  this->XMLLabel = 0;
   this->DomainIterator = vtkSMDomainIterator::New();
   this->DomainIterator->SetProperty(this);
   this->Proxy = 0;
@@ -69,6 +70,7 @@ vtkSMProperty::~vtkSMProperty()
   this->SetCommand(0);
   delete this->PInternals;
   this->SetXMLName(0);
+  this->SetXMLLabel(0);
   this->DomainIterator->Delete();
   this->SetProxy(0);
   this->SetInformationHelper(0);
@@ -288,6 +290,12 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if(xmlname) 
     { 
     this->SetXMLName(xmlname); 
+    }
+
+  const char* xmllabel = element->GetAttribute("label");
+  if (xmllabel)
+    {
+    this->SetXMLLabel(xmllabel);
     }
 
   const char* command = element->GetAttribute("command");
@@ -536,6 +544,8 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InformationOnly:" << this->InformationOnly << endl;
   os << indent << "XMLName:" 
      <<  (this->XMLName ? this->XMLName : "(null)") << endl;
+  os << indent << "XMLLabel: " 
+    << (this->XMLLabel? this->XMLLabel : "(null)") << endl;
   os << indent << "InformationProperty: " << this->InformationProperty << endl;
   os << indent << "Animateable: " << this->Animateable << endl;
   os << indent << "Internal: " << this->IsInternal << endl;
