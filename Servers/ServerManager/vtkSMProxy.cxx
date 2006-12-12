@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.83");
+vtkCxxRevisionMacro(vtkSMProxy, "1.84");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -114,6 +114,7 @@ vtkSMProxy::vtkSMProxy()
   this->VTKClassName = 0;
   this->XMLGroup = 0;
   this->XMLName = 0;
+  this->XMLLabel = 0;
   this->ObjectsCreated = 0;
 
   vtkClientServerID nullID = { 0 };
@@ -162,6 +163,7 @@ vtkSMProxy::~vtkSMProxy()
   this->SetVTKClassName(0);
   this->SetXMLGroup(0);
   this->SetXMLName(0);
+  this->SetXMLLabel(0);
   this->SetXMLElement(0);
 
   if (this->SubProxyObserver)
@@ -1560,7 +1562,15 @@ int vtkSMProxy::ReadXMLAttributes(
   if(xmlname)
     {
     this->SetXMLName(xmlname);
+    this->SetXMLLabel(xmlname);
     }
+
+  const char* xmllabel = element->GetAttribute("label");
+  if (xmllabel)
+    {
+    this->SetXMLLabel(xmllabel);
+    }
+
   if (!this->CreateProxyHierarchy(pm, element))
     {
     return 0;
@@ -2108,6 +2118,9 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "XMLGroup: " 
     << (this->XMLGroup ? this->XMLGroup : "(null)")
+    << endl;
+  os << indent << "XMLLabel: " 
+    << (this->XMLLabel? this->XMLLabel : "(null)")
     << endl;
   os << indent << "Documentation: " << this->Documentation << endl;
   os << indent << "ObjectsCreated: " << this->ObjectsCreated << endl;

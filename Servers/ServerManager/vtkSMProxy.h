@@ -276,6 +276,13 @@ public:
   vtkGetStringMacro(XMLGroup);
 
   // Description:
+  // Assigned by the XML parser. The label assigned in the XML
+  // configuration. This is a more user-friendly name
+  // for the proxy, although it's cannot be used to locate the
+  // proxy.
+  vtkGetStringMacro(XMLLabel);
+
+  // Description:
   // Updates all property informations by calling UpdateInformation()
   // and populating the values. It also calls UpdateDependentDomains()
   // on all properties to make sure that domains that depend on the
@@ -424,6 +431,13 @@ protected:
   // this proxy belongs to. Can be used to figure out the origin of the
   // proxy.
   vtkSetStringMacro(XMLGroup);
+
+  // Description:
+  // Assigned by the XML parser. The label assigned in the XML
+  // configuration. This is a more user-friendly name
+  // for the proxy, although it's cannot be used to locate the
+  // proxy.
+  vtkSetStringMacro(XMLLabel);
 
   // Description:
   // It is possible to set the SelfID for a proxy. However then the setter
@@ -609,6 +623,7 @@ protected:
   char* VTKClassName;
   char* XMLGroup;
   char* XMLName;
+  char* XMLLabel;
   int ObjectsCreated;
   vtkTypeUInt32 Servers;
   int DoNotUpdateImmediately;
