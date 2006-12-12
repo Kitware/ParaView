@@ -35,6 +35,16 @@ public:
   vtkTypeRevisionMacro(vtkSMFileListDomain, vtkSMStringListDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // A vtkSMProperty is often defined with a default value in the
+  // XML itself. However, many times, the default value must be determined
+  // at run time. To facilitate this, domains can override this method
+  // to compute and set the default value for the property.
+  // Note that unlike the compile-time default values, the
+  // application must explicitly call this method to initialize the
+  // property.
+  // Returns 1 if the domain updated the property.
+  virtual int SetDefaultValues(vtkSMProperty*);
 protected:
   vtkSMFileListDomain();
   ~vtkSMFileListDomain();
