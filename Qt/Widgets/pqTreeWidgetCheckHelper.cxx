@@ -51,7 +51,7 @@ pqTreeWidgetCheckHelper::pqTreeWidgetCheckHelper(
 }
 
 //-----------------------------------------------------------------------------
-void pqTreeWidgetCheckHelper::onItemPressed(QTreeWidgetItem* item, int column)
+void pqTreeWidgetCheckHelper::onItemPressed(QTreeWidgetItem* item, int /*column*/)
 {
   this->PressState = item->checkState(this->CheckableColumn); 
 }

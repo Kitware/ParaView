@@ -37,11 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqListWidgetCheckHelper::pqListWidgetCheckHelper(
-  QListWidget* List, 
+  QListWidget* list, 
   QObject* p):
   QObject(p)
 {
-  this->List = List;
+  this->List = list;
   QObject::connect(this->List, SIGNAL(itemClicked(QListWidgetItem*)),
     this, SLOT(onItemClicked(QListWidgetItem*)));
   QObject::connect(this->List, SIGNAL(itemPressed(QListWidgetItem*)),
