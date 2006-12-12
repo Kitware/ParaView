@@ -873,7 +873,7 @@ The output of the Superquadric source is polygonal data with point normals and t
    <!-- End SuperQuadric -->
    </SourceProxy>
 
-   <SourceProxy name="RTAnalyticSource" class="vtkRTAnalyticSource">
+   <SourceProxy name="RTAnalyticSource" class="vtkRTAnalyticSource" label="Wavelet">
       <Documentation
          long_help="Regular rectilinear grid in up to three dimensions with values varying according to a periodic function."
          short_help="Create a Wavelet">
