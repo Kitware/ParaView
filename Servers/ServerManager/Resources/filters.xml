@@ -3227,8 +3227,8 @@ The Probe filter operates on any type of data and produces polygonal output (a p
              <Group name="sources"/>
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
-             <Proxy group="sources" name="LineSource" />
-             <Proxy group="sources" name="PointSource" />
+             <Proxy group="extended_sources" name="LineSource" />
+             <Proxy group="extended_sources" name="PointSource" />
            </ProxyListDomain>
       </InputProperty>
       <Hints>
@@ -3350,8 +3350,8 @@ This filter operates on any type of data set, provided it has point-centered vec
              <Group name="sources"/>
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
-              <Proxy group="sources" name="PointSource" />
-              <Proxy group="sources" name="LineSource" />
+              <Proxy group="extended_sources" name="PointSource" />
+              <Proxy group="extended_sources" name="LineSource" />
            </ProxyListDomain>
       </InputProperty>
 
