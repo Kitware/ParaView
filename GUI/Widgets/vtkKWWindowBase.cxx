@@ -34,7 +34,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.56");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.57");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -1336,8 +1336,8 @@ void vtkKWWindowBase::AddCallbackCommandObservers()
 
   if (this->GetApplication())
     {
-    // If the application sends an error/warning/debug/info, turn the
-    // error icon to red to signal it to the user
+    // If the application or log dialog sends an error/warning/debug/info, 
+    // turn the error icon to red to signal it to the user
     this->AddCallbackCommandObserver(
       this->GetApplication(), vtkKWEvent::WarningMessageEvent);
     this->AddCallbackCommandObserver(
@@ -1359,6 +1359,14 @@ void vtkKWWindowBase::AddCallbackCommandObservers()
         {
         this->AddCallbackCommandObserver(
           log_dlg->GetLogWidget(), vtkKWLogWidget::RecordsClearedEvent);
+        this->AddCallbackCommandObserver(
+          log_dlg->GetLogWidget(), vtkKWEvent::WarningMessageEvent);
+        this->AddCallbackCommandObserver(
+          log_dlg->GetLogWidget(), vtkKWEvent::ErrorMessageEvent);
+        this->AddCallbackCommandObserver(
+          log_dlg->GetLogWidget(), vtkKWEvent::InformationMessageEvent);
+        this->AddCallbackCommandObserver(
+          log_dlg->GetLogWidget(), vtkKWEvent::DebugMessageEvent);
         }
       }
     }
@@ -1390,6 +1398,14 @@ void vtkKWWindowBase::RemoveCallbackCommandObservers()
         {
         this->RemoveCallbackCommandObserver(
           log_dlg->GetLogWidget(), vtkKWLogWidget::RecordsClearedEvent);
+        this->RemoveCallbackCommandObserver(
+          log_dlg->GetLogWidget(), vtkKWEvent::WarningMessageEvent);
+        this->RemoveCallbackCommandObserver(
+          log_dlg->GetLogWidget(), vtkKWEvent::ErrorMessageEvent);
+        this->RemoveCallbackCommandObserver(
+          log_dlg->GetLogWidget(), vtkKWEvent::InformationMessageEvent);
+        this->RemoveCallbackCommandObserver(
+          log_dlg->GetLogWidget(), vtkKWEvent::DebugMessageEvent);
         }
       }
     }
@@ -1447,6 +1463,12 @@ void vtkKWWindowBase::ProcessCallbackCommandEvents(vtkObject *caller,
             {
             case vtkKWLogWidget::RecordsClearedEvent:
               this->SetErrorIconToNone();
+              break;
+            case vtkKWEvent::WarningMessageEvent:
+            case vtkKWEvent::ErrorMessageEvent:
+            case vtkKWEvent::InformationMessageEvent:
+            case vtkKWEvent::DebugMessageEvent:
+              this->SetErrorIconToRed();
               break;
             }
           }

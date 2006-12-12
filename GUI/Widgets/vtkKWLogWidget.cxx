@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLogWidget );
-vtkCxxRevisionMacro(vtkKWLogWidget, "1.6");
+vtkCxxRevisionMacro(vtkKWLogWidget, "1.7");
 
 vtkIdType vtkKWLogWidget::IdCounter = 1;
 
@@ -361,24 +361,28 @@ void vtkKWLogWidget::CreateRecordList()
 //----------------------------------------------------------------------------
 int vtkKWLogWidget::AddErrorRecord(const char* description)
 {
+  this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, (void*)description);
   return this->AddRecord(description, vtkKWLogWidget::ErrorType);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWLogWidget::AddWarningRecord(const char* description)
 {
+  this->InvokeEvent(vtkKWEvent::WarningMessageEvent, (void*)description);
   return this->AddRecord(description, vtkKWLogWidget::WarningType);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWLogWidget::AddInformationRecord(const char* description)
 {
+  this->InvokeEvent(vtkKWEvent::InformationMessageEvent, (void*)description);
   return this->AddRecord(description, vtkKWLogWidget::InformationType);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWLogWidget::AddDebugRecord(const char* description)
 {
+  this->InvokeEvent(vtkKWEvent::DebugMessageEvent, (void*)description);
   return this->AddRecord(description, vtkKWLogWidget::DebugType);   
 }
 
