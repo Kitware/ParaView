@@ -371,7 +371,7 @@ public:
   
   // Description:
   // Get the interpreter being used by this application
-  Tcl_Interp *GetMainInterp() {return this->MainInterp;};
+  static Tcl_Interp *GetMainInterp();
 
   // Description:
   // Initialize Tcl/Tk
@@ -477,8 +477,6 @@ public:
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
-
-  Tcl_Interp *MainInterp;
 
   // Description:
   // Do one tcl event and enter the event loop, allowing the application

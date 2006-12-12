@@ -76,7 +76,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.311");
+vtkCxxRevisionMacro(vtkKWApplication, "1.312");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -258,8 +258,7 @@ vtkKWApplication::vtkKWApplication()
 
   // Setup Tcl
 
-  this->MainInterp = Et_Interp;
-  if (!this->MainInterp)
+  if (!this->GetMainInterp())
     {
     vtkErrorMacro(
       "Interpreter not set. This probably means that Tcl was not "
@@ -283,7 +282,7 @@ vtkKWApplication::vtkKWApplication()
   vtksys_stl::string script =
     vtksys::SystemTools::GetFilenameWithoutExtension(
       vtksys::SystemTools::GetFilenameName(
-        vtkKWTkUtilities::GetCurrentScript(this->MainInterp)));
+        vtkKWTkUtilities::GetCurrentScript(this->GetMainInterp())));
   if (script.size())
     {
     this->Name = vtksys::SystemTools::DuplicateString(script.c_str());
@@ -334,7 +333,6 @@ vtkKWApplication::~vtkKWApplication()
   delete this->Internals;
   this->Internals = NULL;
 
-  this->MainInterp = NULL;
   vtkObjectFactory::UnRegisterAllFactories();
 
   this->SetLimitedEditionModeName(NULL);
@@ -411,9 +409,9 @@ void vtkKWApplication::PrepareForDelete()
     this->BalloonHelpManager = NULL;
     }
 
-  if (this->MainInterp)
+  if (this->GetMainInterp())
     {
-    vtkKWTkUtilities::CancelAllTimerHandlers(this->MainInterp);
+    vtkKWTkUtilities::CancelAllTimerHandlers(this->GetMainInterp());
     }
 }
 
@@ -558,7 +556,7 @@ int vtkKWApplication::Exit()
 
   if (this->IsDialogUp())
     {
-    vtkKWTkUtilities::Bell(this->MainInterp);
+    vtkKWTkUtilities::Bell(this->GetMainInterp());
     return 0;
     }
 
@@ -897,6 +895,12 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(Tcl_Interp *interp, ostream *err)
 }
 
 //----------------------------------------------------------------------------
+Tcl_Interp *vtkKWApplication::GetMainInterp()
+{
+  return Et_Interp;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWApplication::Start()
 { 
   int i;
@@ -954,7 +958,7 @@ void vtkKWApplication::Start(int argc, char **argv)
   if (i >= nb_windows && nb_windows)
     {
     this->GetNthWindow(0)->Display();
-    vtkKWTkUtilities::WithdrawTopLevel(this->MainInterp, ".");
+    vtkKWTkUtilities::WithdrawTopLevel(this->GetMainInterp(), ".");
     }
 
   // Set the KWWidgets icon by default
@@ -968,8 +972,10 @@ void vtkKWApplication::Start(int argc, char **argv)
   if (this->GetNumberOfWindows())
     {
     this->ProcessPendingEvents();
-    vtkKWSetApplicationIcon(this->MainInterp, NULL, IDI_KWWidgetsICO);
-    vtkKWSetApplicationSmallIcon(this->MainInterp, NULL, IDI_KWWidgetsICOSMALL);
+    vtkKWSetApplicationIcon(
+      this->GetMainInterp(), NULL, IDI_KWWidgetsICO);
+    vtkKWSetApplicationSmallIcon(
+      this->GetMainInterp(), NULL, IDI_KWWidgetsICOSMALL);
     }
 #endif
 
@@ -1362,8 +1368,8 @@ void vtkKWApplication::ConfigureAboutDialog()
       this->AboutDialogImage->SetConfigurationOption("-image", img_name);
       this->Script("pack %s -side top", 
                    this->AboutDialogImage->GetWidgetName());
-      int w = vtkKWTkUtilities::GetPhotoWidth(this->MainInterp, img_name);
-      int h = vtkKWTkUtilities::GetPhotoHeight(this->MainInterp, img_name);
+      int w = vtkKWTkUtilities::GetPhotoWidth(this->GetMainInterp(), img_name);
+      int h = vtkKWTkUtilities::GetPhotoHeight(this->GetMainInterp(), img_name);
       this->AboutDialog->GetTopFrame()->SetWidth(w);
       this->AboutDialog->GetTopFrame()->SetHeight(h);
       if (w > this->AboutDialog->GetTextWidth())
@@ -1693,12 +1699,12 @@ int vtkKWApplication::LoadScript(const char* filename)
 {
   int res = 1;
   vtksys_stl::string filename_copy(filename);
-  if (Tcl_EvalFile(Et_Interp, filename_copy.c_str()) != TCL_OK)
+  if (Tcl_EvalFile(this->GetMainInterp(), filename_copy.c_str()) != TCL_OK)
     {
     vtkErrorMacro("\n    Script: \n" << filename_copy.c_str()
                   << "\n    Returned Error on line "
-                  << this->MainInterp->errorLine << ": \n      "  
-                  << Tcl_GetStringResult(this->MainInterp) << endl);
+                  << this->GetMainInterp()->errorLine << ": \n      "  
+                  << Tcl_GetStringResult(this->GetMainInterp()) << endl);
     res = 0;
     if (this->ExitAfterLoadScript)
       {
