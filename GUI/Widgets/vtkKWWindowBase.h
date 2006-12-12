@@ -192,7 +192,8 @@ public:
   vtkKWMenu *GetWindowMenu();
   vtkKWMenu *GetHelpMenu();
   vtkKWMenu *GetToolbarsVisibilityMenu();
-  
+  vtkGetObjectMacro(MenuBarSeparator, vtkKWSeparator);
+
   // Description:
   // Convenience method that return the position where to safely insert 
   // entries in the corresponding menu without interferring with entries
