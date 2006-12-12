@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.24");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -156,7 +156,7 @@ void vtkKWListBoxToListBoxSelectionEditor::CreateWidget()
                this->AddAllButton->GetWidgetName(),
                this->RemoveAllButton->GetWidgetName());
 
-  this->Script("pack %s -side left -expand false -fill y",
+  this->Script("pack %s -side left -expand false -fill y -pady 40",
     frame->GetWidgetName());
   frame->Delete();
 
