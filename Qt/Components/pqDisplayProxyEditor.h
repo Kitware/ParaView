@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqDisplayProxyEditor_h
 
 #include <QWidget>
+#include <QList>
+#include <QVariant>
 #include "pqComponentsExport.h"
 
 class pqDisplayProxyEditorInternal;
@@ -42,6 +44,11 @@ class pqPipelineDisplay;
 class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public QWidget
 {
   Q_OBJECT
+  
+  // property adaptor for specular lighting
+  Q_PROPERTY(double specular READ specular WRITE setSpecular)
+  Q_PROPERTY(QVariant specularColor READ specularColor 
+                                    WRITE setSpecularColor)
 public:
   /// constructor
   pqDisplayProxyEditor(QWidget* p = NULL);
@@ -60,16 +67,27 @@ public slots:
   /// inform us of display property changes
   void reloadGUI();
 
+signals:
+  void specularChanged();
+  void specularColorChanged();
+
 protected slots:
   /// internally used to update the graphics window when a property changes
   void updateView();
   void openColorMapEditor();
   void zoomToData();
   void updateEnableState();
+  void onSpecularChanged();
   
 protected:
   pqDisplayProxyEditorInternal* Internal;
   void setupGUIConnections();
+  
+  double specular() const;
+  void setSpecular(double);
+  QVariant specularColor() const;
+  void setSpecularColor(QVariant);
+
 
 private:
   bool DisableSlots;

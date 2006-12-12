@@ -153,6 +153,33 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     "color", SIGNAL(colorChanged(const QVariant&)),
     displayProxy, displayProxy->GetProperty("Color"));
 
+  // setup for specular lighting
+  QObject::connect(this->Internal->SpecularLighting, SIGNAL(toggled(bool)),
+                   this, SIGNAL(specularChanged()));
+  QObject::connect(this, SIGNAL(specularChanged()),
+                   this, SLOT(onSpecularChanged()));
+  QObject::connect(this->Internal->SpecularWhite, SIGNAL(toggled(bool)),
+                   this, SIGNAL(specularColorChanged()));
+  this->Internal->Links->addPropertyLink(this,
+    "specular", SIGNAL(specularChanged()),
+    displayProxy, displayProxy->GetProperty("Specular"));
+  this->Internal->Links->addPropertyLink(this,
+    "specularColor", SIGNAL(specularColorChanged()),
+    displayProxy, displayProxy->GetProperty("SpecularColor"));
+  this->Internal->Links->addPropertyLink(this->Internal->SpecularPower,
+    "value", SIGNAL(valueChanged(int)),
+    displayProxy, displayProxy->GetProperty("SpecularPower"));
+  QObject::connect(this, SIGNAL(specularChanged()),
+                   this, SLOT(updateView()),
+                   Qt::QueuedConnection);
+  QObject::connect(this, SIGNAL(specularColorChanged()),
+                   this, SLOT(updateView()),
+                   Qt::QueuedConnection);
+  QObject::connect(this->Internal->SpecularPower, SIGNAL(valueChanged(int)),
+                   this, SLOT(updateView()),
+                   Qt::QueuedConnection);
+  // update state
+  this->onSpecularChanged();
 
   // setup for interpolation
   this->Internal->StyleInterpolation->clear();
@@ -494,3 +521,74 @@ void pqDisplayProxyEditor::reloadGUI()
 }
 
 
+double pqDisplayProxyEditor::specular() const
+{
+  if(this->Internal->SpecularLighting->isChecked())
+    {
+    return 1;
+    }
+  return 0;
+}
+
+void pqDisplayProxyEditor::setSpecular(double v)
+{
+  if(v == 0 && this->Internal->SpecularLighting->isChecked())
+    {
+    this->Internal->SpecularLighting->setChecked(true);
+    emit this->specularChanged();
+    }
+  else if(!this->Internal->SpecularLighting->isChecked())
+    {
+    this->Internal->SpecularLighting->setChecked(false);
+    emit this->specularChanged();
+    }
+}
+
+QVariant pqDisplayProxyEditor::specularColor() const
+{
+  if(this->Internal->SpecularWhite->isChecked())
+    {
+    QList<QVariant> ret;
+    ret.append(1.0);
+    ret.append(1.0);
+    ret.append(1.0);
+    return ret;
+    }
+  
+  vtkSMProxy* proxy = this->Internal->Display->getDisplayProxy();
+  return pqSMAdaptor::getMultipleElementProperty(
+       proxy->GetProperty("Color"));
+}
+
+void pqDisplayProxyEditor::setSpecularColor(QVariant specColor)
+{
+  QList<QVariant> whiteLight;
+  whiteLight.append(1.0);
+  whiteLight.append(1.0);
+  whiteLight.append(1.0);
+
+  if(specColor == whiteLight && !this->Internal->SpecularWhite->isChecked())
+    {
+    this->Internal->SpecularWhite->setChecked(true);
+    emit this->specularColorChanged();
+    }
+  else if(this->Internal->SpecularWhite->isChecked())
+    {
+    this->Internal->SpecularWhite->setChecked(false);
+    emit this->specularColorChanged();
+    }
+}
+
+void pqDisplayProxyEditor::onSpecularChanged()
+{
+  if(this->Internal->SpecularLighting->isChecked())
+    {
+    this->Internal->SpecularWhite->setEnabled(true);
+    this->Internal->SpecularPower->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->SpecularWhite->setEnabled(false);
+    this->Internal->SpecularPower->setEnabled(false);
+    }
+}
