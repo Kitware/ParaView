@@ -95,6 +95,9 @@ public slots:
   /// set the render module to work in
   void setView(pqGenericViewModule* view);
 
+  /// set the visibility of the delete button.
+  void setDeleteButtonVisibility(bool visible);
+
 signals:
   /// emitted before accept.
   void preaccept();

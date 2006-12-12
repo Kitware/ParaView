@@ -357,3 +357,10 @@ void pqObjectInspectorWidget::deleteProxy()
     }
 }
 
+void pqObjectInspectorWidget::setDeleteButtonVisibility(bool visible)
+{
+  this->DeleteButton->setVisible(visible);
+}
+
+
+
