@@ -376,9 +376,11 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     this->Implementation->FilterMenu << pqConnect(SIGNAL(triggered(QAction*)), 
       this, SLOT(onCreateFilter(QAction*)));
 
-    this->Implementation->FilterMenu << pqConnect(SIGNAL(triggered(QAction*)), 
-      this, SLOT(updateRecentFilterMenu(QAction*)));
-
+   QObject::connect(this->Implementation->FilterMenu,
+     SIGNAL(triggered(QAction*)),
+     this, SLOT(updateRecentFilterMenu(QAction*)),
+     Qt::QueuedConnection);
+    
     this->Implementation->FilterMenu->clear();
 
     // Update the menu items for the server and compound filters too.
@@ -1663,35 +1665,35 @@ void pqMainWindowCore::updateRecentFilterMenu(QAction* action)
     return;
     }
 
-  QString filterName = action->data().toString();
-  int idx=this->Implementation->RecentFilterList.indexOf(filterName);
-  if(idx!=-1)
-  {
-    this->Implementation->RecentFilterList.removeAt(idx);
-  }
+    QString filterName = action->data().toString();
+    int idx=this->Implementation->RecentFilterList.indexOf(filterName);
+    if(idx!=-1)
+      {
+      this->Implementation->RecentFilterList.removeAt(idx);
+      }
 
-  this->Implementation->RecentFilterList.push_front(filterName);
-  if(this->Implementation->RecentFilterList.size()>10)
-  {
-    this->Implementation->RecentFilterList.removeLast();
-  }
-
-
-
-  this->Implementation->RecentFilesMenu->clear();
+    this->Implementation->RecentFilterList.push_front(filterName);
+    if(this->Implementation->RecentFilterList.size()>10)
+      {
+      this->Implementation->RecentFilterList.removeLast();
+      }
 
 
-  QList<QString>::iterator begin,end;
-  begin=this->Implementation->RecentFilterList.begin();
-  end=this->Implementation->RecentFilterList.end();
-  for(;begin!=end;++begin)
-  {
-    QAction* recentA = this->Implementation->RecentFilesMenu->addAction(*begin) << pqSetName(*begin)
-      << pqSetData(*begin);
-    recentA->setEnabled(false);
-  }
 
-  this->saveRecentFilterMenu();
+    this->Implementation->RecentFilesMenu->clear();
+
+
+    QList<QString>::iterator begin,end;
+    begin=this->Implementation->RecentFilterList.begin();
+    end=this->Implementation->RecentFilterList.end();
+    for(;begin!=end;++begin)
+      {
+      QAction* recentA = this->Implementation->RecentFilesMenu->addAction(*begin) << pqSetName(*begin)
+        << pqSetData(*begin);
+      recentA->setEnabled(false);
+      }
+
+    this->saveRecentFilterMenu();
 }
 
 
