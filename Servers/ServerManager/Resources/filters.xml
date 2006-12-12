@@ -33,11 +33,12 @@
    <!-- End Stripper -->
    </SourceProxy>
 
-   <SourceProxy name="SurfaceVectors" class="vtkSurfaceVectors">
+   <SourceProxy name="SurfaceVectors" class="vtkSurfaceVectors" label="Surface Vectors">
      <Documentation
           long_help="This filter constrains vectors to lie on a surface."
           short_help="This filter constrains vectors o lie on a surface.">
-The surface vectors filter is used for 2D data sets.  It constrains vectors to lie in a surface by removing components of the vectors normal to the local surface.
+The surface vectors filter is used for 2D data sets.  It constrains vectors to lie in a
+surface by removing components of the vectors normal to the local surface.
      </Documentation>
      <InputProperty
         name="Input"
@@ -81,7 +82,8 @@ The surface vectors filter is used for 2D data sets.  It constrains vectors to l
    <!-- End SurfaceVectors -->
    </SourceProxy>
 
-   <SourceProxy name="IntegrateAttributes" class="vtkIntegrateAttributes">
+   <SourceProxy name="IntegrateAttributes" class="vtkIntegrateAttributes" 
+     label="Integrate Attributes">
      <Documentation 
         long_help="This filter integrates cell and point attributes.  Use selects whether the integration is over 1D lines, 2D surfaces or 3D volumes.  Cells not of the selected dimension are ignored."
         short_help="Integrates over lines, surfaces or vectors.">
@@ -104,7 +106,7 @@ Integrates point and cell data over lines and surfaces.  It also computes length
    <!-- End IntegrateAttributes -->
    </SourceProxy>
 
-   <SourceProxy name="IntegrateFlowThroughSurface" class="vtkIntegrateFlowThroughSurface">
+   <SourceProxy name="IntegrateFlowThroughSurface" class="vtkIntegrateFlowThroughSurface" label="Surface Flow">
      <Documentation
         long_help="This filter integrates flow through a surface."
         short_help="This filter integrates flow through a surface.">
@@ -139,7 +141,8 @@ The flow integration fitler  integrates the dot product of a point flow vector f
    <!-- End IntegrateFlowThroughSurface -->
    </SourceProxy>
 
-   <SourceProxy name="AllToN" class="vtkAllToNRedistributePolyData">
+   <SourceProxy name="AllToN" class="vtkAllToNRedistributePolyData"
+      label="All to N">
       <Documentation
          long_help="Redistribute data to a subset of available processes."
          short_help="Repartition data filter.">
@@ -186,7 +189,8 @@ The Balance filter is available when ParaView is run in parallel. It does load-b
    <!-- End Balance -->
    </SourceProxy>
 
-   <SourceProxy name="AppendAttributes" class="vtkMergeArrays">
+   <SourceProxy name="AppendAttributes" class="vtkMergeArrays"
+    label="Append Attributes">
       <Documentation
          long_help="Copies geometry from first input.  Puts all of the arrays into the output."
          short_help="Puts all input arrays into the single output.">
@@ -209,7 +213,8 @@ The Append Attributes filter takes multiple input data sets with the same geomet
    <!-- End AppendAttributes -->
    </SourceProxy>
 
-   <SourceProxy name="AppendPolyData" class="vtkAppendPolyData">
+   <SourceProxy name="AppendPolyData" class="vtkAppendPolyData"
+      label="Append Geometry">
       <Documentation
          long_help="Takes an input of multiple poly data parts and output has only one part."
          short_help="Append multiple parts into one.">
@@ -231,7 +236,7 @@ The Append Geometry filter operates on multiple polygonal data sets. The data se
    <!-- End AppendPolyData -->
    </SourceProxy>
 
-   <SourceProxy name="Append" class="vtkAppendFilter">
+   <SourceProxy name="Append" class="vtkAppendFilter" label="Append Datasets">
       <Documentation
          long_help="Takes an input of multiple datasets and output has only one unstructured grid."
          short_help="Append multiple datasets into one.">
@@ -253,7 +258,7 @@ The Append Datasets filter operates on multiple data sets of any type (polygonal
    <!-- End AppendDataSet -->
    </SourceProxy>
 
-   <SourceProxy name="CellCenters" class="vtkCellCenters">
+   <SourceProxy name="CellCenters" class="vtkCellCenters" label="Cell Centers">
      <Documentation
         long_help="Create a point (no geometry) at the center of each input cell."
         short_help="Convert cells to vertices.">
@@ -281,7 +286,8 @@ The Cell Centers filter places a point at the center of each cell in the input d
    <!-- End CellCenters -->
    </SourceProxy>
 
-   <SourceProxy name="CellDataToPointData" class="vtkPCellDataToPointData">
+   <SourceProxy name="CellDataToPointData" class="vtkPCellDataToPointData"
+     label="Cell Data to Point Data">
      <Documentation
         long_help="Create point attributes by averaging cell attributes."
         short_help="Convert cell data to point data.">
@@ -310,32 +316,8 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
    <!-- End CellDataToPointData -->
    </SourceProxy>
 
-   <SourceProxy name="PointDataToCellData" class="vtkPointDataToCellData">
-     <InputProperty
-        name="Input"
-        command="SetInputConnection">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
-             <DataType value="vtkDataSet"/>
-           </DataTypeDomain>
-           <InputArrayDomain name="input_array" attribute_type="point"/>
-           <FixedTypeDomain name="fixed_type"/>
-      </InputProperty>
-
-     <IntVectorProperty 
-        name="PassPointData" 
-        command="SetPassPointData" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-   <!-- End CellDataToPointData -->
-   </SourceProxy>
-
-   <SourceProxy name="CleanPolyData" class="vtkCleanPolyData">
+   <SourceProxy name="CleanPolyData" class="vtkCleanPolyData"
+     label="Clean">
      <Documentation
         long_help="Merge coincident points if they do not meet a feature edge critera."
         short_help="Merge coincident points.">
@@ -422,7 +404,8 @@ If the Piece invariant option is checked, the whole data set will be processed a
    <!-- End CleanPolyData -->
    </SourceProxy>
 
-   <SourceProxy name="CleanUnstructuredGrid" class="vtkCleanUnstructuredGrid">
+   <SourceProxy name="CleanUnstructuredGrid" class="vtkCleanUnstructuredGrid"
+      label="Clean to Grid">
       <Documentation
          long_help="This filter merges points and converts the data set to unstructured grid."
          short_help="Merge points.">
@@ -543,7 +526,8 @@ convex hull.
      </IntVectorProperty>
    </SourceProxy>
 
-   <SourceProxy name="PVConnectivityFilter" class="vtkPVConnectivityFilter">
+   <SourceProxy name="PVConnectivityFilter" class="vtkPVConnectivityFilter"
+      label="Connectivity">
       <Documentation
           long_help="Mark connected components with integer point attribute array."
           short_help="Find connected components.">
@@ -563,7 +547,7 @@ The Connectivity filter assigns a region id to connected components of the input
    <!-- End PVConnectivityFilter -->
    </SourceProxy>
 
-   <SourceProxy name="ImageClip" class="vtkImageClip">
+   <SourceProxy name="ImageClip" class="vtkImageClip" label="Crop">
     <Documentation
        long_help="Efficiently extract an area/volume of interest from a 2-d image or 3-d volume."
        short_help="Extract a volume of interest.">
@@ -599,7 +583,7 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
    <!-- End ImageClip -->
    </SourceProxy>
 
-   <SourceProxy name="Curvatures" class="vtkCurvatures">
+   <SourceProxy name="Curvatures" class="vtkCurvatures" label="Curvature">
     <Documentation
        long_help="This filter will compute the gaussian or mean curvature of the mesh at each point."
        short_help="Compute the curvature at each point.">
@@ -639,7 +623,7 @@ The Curvature filter computes the curvature at each point in a polygonal data se
    <!-- End Curvatures -->
    </SourceProxy>
 
-   <SourceProxy name="DecimatePro" class="vtkDecimatePro">
+   <SourceProxy name="DecimatePro" class="vtkDecimatePro" label="Decimate">
      <Documentation
         long_help="Simplify a polygonal model using an adaptive edge collapse algorithm.  This filter works with triangles only."
         short_help="Reduce the number of triangles in a model.">
@@ -692,7 +676,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
    <!-- End DecimatePro -->
    </SourceProxy>
 
-   <SourceProxy name="D3" class="vtkDistributedDataFilter">
+   <SourceProxy name="D3" class="vtkDistributedDataFilter" label="D3">
     <Documentation
        long_help="Repartition a data set into load-balanced spatially convex regions.  Create ghost cells if requested."
        short_help="Repartition a data set.">
@@ -732,7 +716,7 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
    <!-- End D3 -->
    </SourceProxy>
 
-   <SourceProxy name="ElevationFilter" class="vtkElevationFilter">
+   <SourceProxy name="ElevationFilter" class="vtkElevationFilter" label="Elevation">
      <Documentation
         long_help="Create point attribute array by projecting points onto an elevation vector."
         short_help="Create a point array representing elevation.">
@@ -787,7 +771,8 @@ The line can be specified interactively using the 3D line widget. See section 7.
    </SourceProxy>
 
 #if 1
-   <SourceProxy name="CTHPart" class="vtkExtractCTHPart">
+   <SourceProxy name="CTHPart" class="vtkExtractCTHPart"
+    label="Extract CTH Parts">
     <Documentation
        long_help="Create a surface from a CTH volume fraction."
        short_help="Extract a part from a CTH dataset.">
@@ -841,7 +826,8 @@ This filter only operates on unstructured data. It produces polygonal output.
    </SourceProxy>
 #endif
 
-   <SourceProxy name="ExtractEdges" class="vtkExtractEdges">
+   <SourceProxy name="ExtractEdges" class="vtkExtractEdges"
+      label="Extract Edges">
      <Documentation
         long_help="Extract edges of 2-d and 3-d cells as lines."
         short_help="Covert data to wireframe.">
@@ -861,7 +847,8 @@ The Extract Edges filter produces a wireframe version of the input data set by e
    <!-- End ExtractEdges -->
    </SourceProxy>
 
-   <SourceProxy name="DataSetSurfaceFilter" class="vtkDataSetSurfaceFilter">
+   <SourceProxy name="DataSetSurfaceFilter" class="vtkDataSetSurfaceFilter"
+      label="Extract Surface">
      <Documentation
         long_help="Extract a 2-d boundary surface using neighbor relations to eliminate internal faces."
         short_help="Extract 2-d boundary surface.">
@@ -1030,7 +1017,8 @@ The Calculator filter is available on the Toolbar.
    <!-- End Calculator -->
    </SourceProxy>
 
-   <SourceProxy name="FeatureEdges" class="vtkFeatureEdges">
+   <SourceProxy name="FeatureEdges" class="vtkFeatureEdges"
+    label="Feature Edges">
     <Documentation
        long_help="This filter will extract edges along sharp edges of surfaces or boundaries of surfaces."
        short_help="Extract edges that meet the feature critera.">
@@ -1107,7 +1095,7 @@ This filter operates on polygonal data and produces polygonal output.
    <!-- End FeatureEdges -->
    </SourceProxy>
 
-   <SourceProxy name="Gradient" class="vtkImageGradient">
+   <SourceProxy name="Gradient" class="vtkImageGradient" label="Gradient">
     <Documentation>
 The Gradient filter computes the gradient vector at each point in an image or volume. The Input menu allows the user to select the data set to which this filter will be applied. The Scalars menu determines from which scalar array the gradient will be computed. The Dimensionality menu selects whether the gradient will be calculated in 2 or 3 dimensions. If only 2 dimensions are used, gradients are only computed in X and Y. This filter uses central differences to compute the gradients. The Gradient filter operates on uniform rectilinear (image) data and produces image data output.
     </Documentation>
@@ -1149,7 +1137,8 @@ The Gradient filter computes the gradient vector at each point in an image or vo
    <!-- End Gradient -->
    </SourceProxy>
 
-   <SourceProxy name="UnstructuredGradient" class="vtkGradientFilter">
+   <SourceProxy name="UnstructuredGradient" class="vtkGradientFilter"
+     label="Gradient (Unstructured)">
      <Documentation>
 The Gradient filter estimates the gradient vector at each point or cell.  The Input menu allows the user to select the data set to which this filter will be applied.  The Field and Scalars menus allow the user to select the scalar array from which to compute gradients.  The Scalars menu determines from which scalar array the gradient will be computed.  The Result Array Name box allows the user to specify the name of the output array holding the computed gradients.
      </Documentation>
@@ -1190,7 +1179,8 @@ The Gradient filter estimates the gradient vector at each point or cell.  The In
    <!-- End UnstructuredGradient -->
    </SourceProxy>
 
-   <SourceProxy name="GradientMagnitude" class="vtkImageGradientMagnitude">
+   <SourceProxy name="GradientMagnitude" class="vtkImageGradientMagnitude"
+      label="Gradient Magnitude">
      <Documentation>
 The Gradient Magnitude filter computes the magnitude of the gradient vector at each point in an image or volume. The Input menu allows the user to select the data set to which this filter will be applied. The Scalars menu allows the user to select which scalar array will be used for gradient magnitude calculations. The Dimensionality menu determines whether the gradient magnitude will be computed in 2 or 3 dimensions. If 2 dimensions are used, the gradient magnitude will be computed from the gradients in X and Y. This filter operates on uniform rectilinear (image) data and produces image data output.
      </Documentation>
@@ -1233,7 +1223,8 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
    <!-- End Gradient -->
    </SourceProxy>
 
-   <SourceProxy name="LinearExtrusionFilter" class="vtkPVLinearExtrusionFilter">
+   <SourceProxy name="LinearExtrusionFilter" class="vtkPVLinearExtrusionFilter"
+    label="Linear Extrusion">
     <Documentation
        long_help="This filter creates a swept surface defined by translating the input along a vector."
        short_help="Generate a linear swept surface.">
@@ -1288,7 +1279,8 @@ The Piece invariant check box determines whether the output will be the same reg
    <!-- End LinearExtrusionFilter -->
    </SourceProxy>
 
-   <SourceProxy name="LoopSubdivisionFilter" class="vtkLoopSubdivisionFilter">
+   <SourceProxy name="LoopSubdivisionFilter" class="vtkLoopSubdivisionFilter"
+    label="Loop Subdivision">
     <Documentation
        long_help="This filter iteratively divides each triangle into four triangles.  New points are placed so the output surface is smooth."
        short_help="Create a higher resolution and smoother surface.">
@@ -1317,7 +1309,8 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
    <!-- End LoopSubdivisionFilter -->
    </SourceProxy>
 
-   <SourceProxy name="MaskPoints" class="vtkMaskPoints">
+   <SourceProxy name="MaskPoints" class="vtkMaskPoints"
+    label="Mask Points">
     <Documentation
           long_help="Reduce the number of points.  This filter is often used before glyphing.  Generating vertices is an option."
           short_help="Reduce the number of points.">
@@ -1419,7 +1412,8 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
    <!-- End Median -->
    </SourceProxy>
 
-   <SourceProxy name="MeshQuality" class="vtkMeshQuality">
+   <SourceProxy name="MeshQuality" class="vtkMeshQuality"
+    label="Mesh Quality">
     <Documentation
        long_help="This filter creates a new cell array containing a geometric measure of each cell's fitness. Different quality measures can be chosen for different cell shapes."
        short_help="Evaluate geometric mesh quality.">
@@ -1542,7 +1536,8 @@ This filter creates a new cell array containing a geometric measure of each cell
    <!-- End MeshQuality -->
    </SourceProxy>
 
-   <SourceProxy name="PolyDataNormals" class="vtkPPolyDataNormals">
+   <SourceProxy name="PolyDataNormals" class="vtkPPolyDataNormals"
+    label="Normals generation">
     <Documentation
        long_help="This filter will produce surface normals used for smooth shading.  Spltting is used to avoid smoothing across feature edges."
        short_help="Produce surface point normals.">
@@ -1622,7 +1617,8 @@ If this filter is run in parallel, the resulting data set will have seams along 
    <!-- End  PolyDataNormals -->
    </SourceProxy>
 
-   <SourceProxy name="OutlineFilter" class="vtkPOutlineFilter">
+   <SourceProxy name="OutlineFilter" class="vtkPOutlineFilter"
+     label="Outline">
      <Documentation
         long_help="This filter generates a bounding box representation of the input."
         short_help="Generates a bounding box.">
@@ -1645,7 +1641,8 @@ The Outline filter generates an axis-aligned bounding box for the input data set
    <!-- End  OutlineFilter -->
    </SourceProxy>
 
-   <SourceProxy name="OutlineCornerFilter" class="vtkPOutlineCornerFilter">
+   <SourceProxy name="OutlineCornerFilter" class="vtkPOutlineCornerFilter"
+    label="Outline Corners">
     <Documentation
        long_help="This filter generates a bounding box representation of the input.  It only displays the corners of the bounding box."
        short_help="Generates corners of a bounding box.">
@@ -1676,7 +1673,8 @@ The Outline Corners filter generates the corners of a bounding box for the input
    <!-- End  OutlineCornerFilter -->
    </SourceProxy>
 
-   <SourceProxy name="OctreeDepthScalars" class="vtkHyperOctreeDepth">
+   <SourceProxy name="OctreeDepthScalars" class="vtkHyperOctreeDepth"
+     label="Octree Depth Scalars">
      <Documentation
         long_help="This filter adds a scalar to each leaf of the octree that represents the leaf's depth within the tree."
         short_help="Computes cell depths within the octree.">
@@ -1697,7 +1695,8 @@ The vtkHyperOctreeDepth filter adds a scalar to each leaf of the octree that rep
    <!-- End  OctreeDepthScalars-->
    </SourceProxy>
 
-   <SourceProxy name="OctreeDepthLimit" class="vtkHyperOctreeLimiter">
+   <SourceProxy name="OctreeDepthLimit" class="vtkHyperOctreeLimiter"
+     label="Octree Depth Limit">
      <Documentation
         long_help="This filter takes in a octree and produces a new octree which is no deeper than the maximum specified depth level."
         short_help="Reduce an octree's resolution.">
@@ -1726,7 +1725,8 @@ The vtkHyperOctreeLimiter takes in a octree and produces a new octree in which i
    <!-- End  OctreeDepthLimit-->
    </SourceProxy>
 
-   <SourceProxy name="ProcessIdScalars" class="vtkProcessIdScalars">
+   <SourceProxy name="ProcessIdScalars" class="vtkProcessIdScalars"
+     label="Process Id Scalars">
      <Documentation
         long_help="This filter uses colors to show how data is partitioned across processes."
         short_help="Generate point scalars from process id.">
@@ -1754,7 +1754,8 @@ The Process Id Scalars filter assigns a unique scalar value to each piece of the
    <!-- End PieceScalars -->
    </SourceProxy>
 
-   <SourceProxy name="PointDataToCellData" class="vtkPointDataToCellData">
+   <SourceProxy name="PointDataToCellData" class="vtkPointDataToCellData"
+     label="Point Data to Cell Data">
      <Documentation
         long_help="Create cell attributes by averaging point attributes."
         short_help="Convert point data to cell data.">
@@ -1781,10 +1782,11 @@ The Point Data to Cell Data filter averages the values of the point attributes o
         default_values="0" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
-   <!-- End CellDataToPointData -->
+   <!-- End PointDataToCellData -->
    </SourceProxy>
 
-   <SourceProxy name="QuadricClustering" class="vtkQuadricClustering">
+   <SourceProxy name="QuadricClustering" class="vtkQuadricClustering"
+    label="Quadric Clustering">
     <Documentation
        long_help="This filter is the same filter used to generate level of detail for ParaView.  It uses a structured grid of bins and merges all points contained in each bin."
        short_help="Simplify polygonal models.">
@@ -1854,7 +1856,7 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
    <!-- End QuadricClustering -->
    </SourceProxy>
 
-   <SourceProxy name="BrownianPoints" class="vtkBrownianPoints">
+   <SourceProxy name="BrownianPoints" class="vtkBrownianPoints" label="Random Vectors">
     <Documentation
        long_help="This filter creates a new 3 component point data array and sets it as the default vectors.  It uses a random number generator to create values."
        short_help="Create a new random vector array.">
@@ -1890,7 +1892,8 @@ The Random Vectors filter generates a point-centered array of random vectors. It
    <!-- End BrownianPoints -->
    </SourceProxy>
 
-   <SourceProxy name="ReflectionFilter" class="vtkReflectionFilter">
+   <SourceProxy name="ReflectionFilter" class="vtkReflectionFilter" 
+    label="Reflect">
     <Documentation
        long_help="This filter takes the union of the input and its reflection over an axis-aligned plane."
        short_help="Reflect input over an axis aligned plane.">
@@ -1945,7 +1948,8 @@ The Reflection filter reflects the input data set across the specified plane. If
    <!-- End ReflectionFilter -->
    </SourceProxy>
 
-   <SourceProxy name="RibbonFilter" class="vtkRibbonFilter">
+   <SourceProxy name="RibbonFilter" class="vtkRibbonFilter"
+    label="Ribbon">
     <Documentation
        long_help="This filter generates ribbon surface from lines.  It is useful for displaying streamlines."
        short_help="Create ribbon surfaces from lines.">
@@ -2042,7 +2046,8 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
    </SourceProxy>
 
    <SourceProxy name="RotationalExtrusionFilter" 
-                class="vtkRotationalExtrusionFilter">
+                class="vtkRotationalExtrusionFilter"
+                label="Rotational Extrusion">
     <Documentation
        long_help="This filter generates a swept surface while translates the input along a circular path."
        short_help="Generates a swept surface using a rotational path.">
@@ -2105,7 +2110,8 @@ The Capping check box controls whether to close the open ends of the swept surfa
    <!-- End RotationalExtrusionFilter -->
    </SourceProxy>
 
-   <SourceProxy name="ShrinkFilter" class="vtkShrinkFilter">
+   <SourceProxy name="ShrinkFilter" class="vtkShrinkFilter"
+     label="Shrink">
      <Documentation
         long_help="This filter shrinks each input cell so they pull away from their neighbors."
         short_help="Shrink each input cell.">
@@ -2134,7 +2140,8 @@ The Shrink filter causes the individual cells of a data set to break apart from 
    <!-- End ShrinkFilter -->
    </SourceProxy>
 
-   <SourceProxy name="SmoothPolyDataFilter" class="vtkSmoothPolyDataFilter">
+   <SourceProxy name="SmoothPolyDataFilter" class="vtkSmoothPolyDataFilter"
+    label="Smooth">
     <Documentation
        long_help="This filter smooths a polygonal surface by iteratively moving points toward their neighbors."
        short_help="Smooth a polygonal surface without adding more points.">
@@ -2171,7 +2178,8 @@ The Smooth filter operates on a polygonal data set by iteratively adjusting the 
    <!-- End SmoothPolyDataFilter -->
    </SourceProxy>
 
-   <SourceProxy name="Stripper" class="vtkStripper">
+   <SourceProxy name="Stripper" class="vtkStripper"
+    label="Triangle Strips">
     <Documentation
        long_help="This filter uses a greedy algorithm to convert triangles into triangle strips"
        short_help="Convert triangles into triangle strips.">
@@ -2227,7 +2235,8 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
    <!-- End Subdivide -->
    </SourceProxy>
 
-   <SourceProxy name="TessellatorFilter" class="vtkTessellatorFilter">
+   <SourceProxy name="TessellatorFilter" class="vtkTessellatorFilter" 
+     label="Tessellate">
      <Documentation
         long_help="Tessellate nonlinear curves, surfaces, and volumes with lines, triangles, and tetrahedra."
         short_help="Polygonize a mesh.">
@@ -2290,7 +2299,8 @@ The Max Num Of Subdivisions setting specifies the maximum number of times an edg
    <!-- End TessellatorFilter -->
    </SourceProxy>
 
-   <SourceProxy name="DataSetTriangleFilter" class="vtkDataSetTriangleFilter">
+   <SourceProxy name="DataSetTriangleFilter" class="vtkDataSetTriangleFilter"
+     label="Tetrahedralize">
      <Documentation
         long_help="This filter converts 3-d cells to tetrahedrons and polygons to triangles.  The output is always of type unstructured grid."
         short_help="Convert to tetrahedrons and triangles.">
@@ -2310,7 +2320,8 @@ The Tetrahedralize filter converts the 3D cells of any type of data set to tetra
    <!-- End DataSetTriangleFilter -->
    </SourceProxy>
 
-   <SourceProxy name="TransformFilter" class="vtkTransformFilter">
+   <SourceProxy name="TransformFilter" class="vtkTransformFilter"
+    label="Transform">
     <Documentation
        long_help="This filter applies transformation to the polygons."
        short_help="Transform polygonal data.">
@@ -2336,7 +2347,8 @@ The Transform filter allows you to specify the position, size, and orientation o
    <!-- End TransformFilter -->
    </SourceProxy>
 
-   <SourceProxy name="TriangleFilter" class="vtkTriangleFilter">
+   <SourceProxy name="TriangleFilter" class="vtkTriangleFilter"
+     label="Triangulate">
      <Documentation
         long_help="This filter converts polygons and triangle strips to basic triangles."
         short_help="Convert polygonal data to triangles.">
@@ -2356,7 +2368,7 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
    <!-- End TriangleFilter -->
    </SourceProxy>
 
-   <SourceProxy name="TubeFilter" class="vtkTubeFilter">
+   <SourceProxy name="TubeFilter" class="vtkTubeFilter" label="Tube">
     <Documentation
        long_help="Convert lines into tubes.  Normals are used to avoid cracks between tube segments."
        short_help="Convert lines into tubes.">
@@ -2425,7 +2437,7 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
    <!-- End TubeFilter -->
    </SourceProxy>
 
-   <SourceProxy name="WarpScalar" class="vtkWarpScalar">
+   <SourceProxy name="WarpScalar" class="vtkWarpScalar" label="Warp (scalar)">
      <Documentation
         long_help="This filter moves point coordinates along a vector scaled by a point attribute.  It can be used to produce carpet plots."
         short_help="Warp point scalars into a spatial elevation plot.">
@@ -2494,7 +2506,7 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
    <!-- End WarpScalar -->
    </SourceProxy>
 
-   <SourceProxy name="WarpVector" class="vtkWarpVector">
+   <SourceProxy name="WarpVector" class="vtkWarpVector" label="Warp (vector)">
      <Documentation
         long_help="This filter displaces point coordinates along a vector attribute.  It is useful for showing mechanical deformation."
         short_help="Warp (displace) the geometry with a given vector field.">
@@ -2536,7 +2548,7 @@ The Warp (vector) filter translates the points of the input data set using a spe
    <!-- End WarpVector -->
    </SourceProxy>
 
-   <SourceProxy name="AnimateWarp" class="vtkWarpVector">
+   <SourceProxy name="AnimateWarp" class="vtkWarpVector" label="Animate Warp">
      <Documentation
         long_help="This filter displaces point coordinates along a vector attribute.  It is useful for showing mechanical deformation. This class also simplifies the animation process."
         short_help="Warp (displace) the geometry with a given vector field.">
@@ -3021,7 +3033,8 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
    <!-- End Glyph -->
    </SourceProxy>
 
-   <SourceProxy name="ExtractGrid" class="vtkPVExtractVOI">
+   <SourceProxy name="ExtractGrid" class="vtkPVExtractVOI"
+    label="Extract Grid">
     <Documentation
        long_help="Extract a subgrid from a structured grid with the option of setting subsample strides."
        short_help="Extract a subgrid or subsample.">
@@ -3091,7 +3104,8 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
    <!-- End ExtractGrid -->
    </SourceProxy>
 
-   <SourceProxy name="DataAnalysis" class="vtkDataAnalysisFilter">
+   <SourceProxy name="DataAnalysis" class="vtkDataAnalysisFilter"
+    label="Data Analysis (Pick/Probe)">
     <Documentation
        long_help="Sample point data at a point or along a line or by point id. Select cell at a point or by cell id. Data can be plotted on an XY plot."
        short_help="Pick a cell or point.">
@@ -3315,7 +3329,8 @@ The Probe filter operates on any type of data and produces polygonal output (a p
    </SourceProxy>
 
 
-   <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer">
+   <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer"
+    label="Stream Tracer">
     <Documentation
        long_help="Integrate streamlines in a vector field."
        short_help="Integrate streamlines in a vector field.">
@@ -3511,7 +3526,8 @@ This filter operates on any type of data set, provided it has point-centered vec
    </SourceProxy>
 
    <SourceProxy name="StructuredGridOutlineFilter" 
-                class="vtkStructuredGridOutlineFilter">
+                class="vtkStructuredGridOutlineFilter"
+                label="Outline (curvilinear)">
       <InputProperty
          name="Input"
          command="SetInputConnection">
@@ -3806,7 +3822,8 @@ Extract geometry from a higher-order dataset.
    <!-- End GenericGeometryFilter -->
    </SourceProxy>
 
- <SourceProxy name="GenericOutlineFilter" class="vtkGenericOutlineFilter">
+ <SourceProxy name="GenericOutlineFilter" class="vtkGenericOutlineFilter"
+     label="Generic Outline">
      <Documentation
        long_help="This filter generates a bounding box representation of the input."
        short_help="Generates a bounding box.">
@@ -3830,7 +3847,8 @@ The Outline filter generates an axis-aligned bounding box for the input data set
    <!-- End  GenericOutlineFilter -->
    </SourceProxy>
 
- <SourceProxy name="GenericStreamTracer" class="vtkGenericStreamTracer">
+ <SourceProxy name="GenericStreamTracer" class="vtkGenericStreamTracer"
+    label="Generic Stream Tracer">
     <Documentation
        long_help="Integrate streamlines in a vector field."
        short_help="Integrate streamlines in a vector field.">
@@ -4028,7 +4046,8 @@ This filter operates on any type of data set, provided it has point-centered vec
    <!-- End GenericStreamTracer -->
    </SourceProxy>
 
-  <SourceProxy name="GenericTessellator" class="vtkGenericDataSetTessellator">
+  <SourceProxy name="GenericTessellator" class="vtkGenericDataSetTessellator"
+      label="Generic Tessellator">
      <Documentation
          long_help="Tessellate a higher-order dataset"
          short_help="Tessellate a higher-order dataset">
@@ -4049,7 +4068,8 @@ Tessellate a higher-order dataset.
    <!-- End GenericTessellator -->
    </SourceProxy>
 
-   <SourceProxy name="GroupDataSets" class="vtkMultiGroupDataGroupFilter">
+   <SourceProxy name="GroupDataSets" class="vtkMultiGroupDataGroupFilter"
+    label="Group Datasets">
     <Documentation
         long_help="Group data sets."
         short_help="Group multiple inputs into one collection.">
@@ -4074,7 +4094,8 @@ Groups multiple datasets to create a multigroup dataset
    <!-- End GroupDataSets -->
    </SourceProxy>
 
-   <SourceProxy name="GroupIdScalars" class="vtkMultiGroupDataGroupIdScalars">
+   <SourceProxy name="GroupIdScalars" class="vtkMultiGroupDataGroupIdScalars"
+      label="Level Scalars">
      <Documentation
         long_help="This filter uses colors to show levels of a hiearchical dataset."
         short_help="Generate point scalars from level.">
@@ -4258,7 +4279,8 @@ This filter uses colors to show levels of a hiearchical dataset.
     <!-- End ReductionFilter -->
     </SourceProxy>
 
-   <SourceProxy name="ExtractLevel" class="vtkMultiGroupDataExtractGroup">
+   <SourceProxy name="ExtractLevel" class="vtkMultiGroupDataExtractGroup"
+     label="Extract Group">
      <Documentation
         long_help="This filter extracts a range of groups from a multigroup dataset."
         short_help="Extract level.">
@@ -4292,7 +4314,8 @@ This filter extracts a range of groups from a multigroup dataset
    </SourceProxy>
 
    <SourceProxy name="ExtractDataSets" 
-                class="vtkMultiGroupDataExtractDataSets">
+                class="vtkMultiGroupDataExtractDataSets"
+                label="Extract Datasets">
      <Documentation
         long_help="This filter extracts a list of datasets from multigroup datasets."
         short_help="Extract datasets.">
@@ -4686,7 +4709,8 @@ This filter operates on all types of data sets, and it returns unstructured grid
    <!-- End CellSelect2 -->
    </SourceProxy>
 
-   <SourceProxy name="TextureMapToPlane" class="vtkTextureMapToPlane">
+   <SourceProxy name="TextureMapToPlane" class="vtkTextureMapToPlane"
+     label="Texture Map to Plane">
      <InputProperty
        name="Input"
        command="SetInputConnection">
@@ -4701,7 +4725,8 @@ This filter operates on all types of data sets, and it returns unstructured grid
    <!-- End TextureMapToPlane -->
    </SourceProxy>
 
-   <SourceProxy name="TextureMapToSphere" class="vtkTextureMapToSphere">
+   <SourceProxy name="TextureMapToSphere" class="vtkTextureMapToSphere"
+     label="Texture Map to Sphere">
      <InputProperty
        name="Input"
        command="SetInputConnection">
@@ -4716,7 +4741,8 @@ This filter operates on all types of data sets, and it returns unstructured grid
    <!-- End TextureMapToSphere -->
    </SourceProxy>
 
-   <SourceProxy name="TextureMapToCylinder" class="vtkTextureMapToCylinder">
+   <SourceProxy name="TextureMapToCylinder" class="vtkTextureMapToCylinder"
+     label="Texture Map to Cylinder">
      <InputProperty
        name="Input"
        command="SetInputConnection">

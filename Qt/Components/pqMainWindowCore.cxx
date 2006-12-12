@@ -382,15 +382,17 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     this->Implementation->FilterMenu->clear();
 
     // Update the menu items for the server and compound filters too.
-  
+
     QStringList::Iterator iter;
     pqSourceProxyInfo proxyInfo;
 
-
-
-    this->Implementation->RecentFilesMenu = this->Implementation->FilterMenu->addMenu("&Recent") 
+    this->Implementation->RecentFilesMenu = 
+      this->Implementation->FilterMenu->addMenu("&Recent") 
       << pqSetName("Recent");
     this->restoreRecentFilterMenu();
+    
+    vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
+    manager->InstantiateGroupPrototypes("filters");
 
     //Common Filters
     QStringList commonFilters;
@@ -404,12 +406,18 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
       << pqSetName("Common");
     for(iter = commonFilters.begin(); iter != commonFilters.end(); ++iter)
       {
-      QAction* action = commonMenu->addAction(*iter) << pqSetName(*iter)
-        << pqSetData(*iter);
+      QString proxyName = (*iter);
+      vtkSMProxy* proxy = manager->GetProxy(
+        "filters_prototypes", proxyName.toAscii().data());
+      QString proxyLabel = proxyName;
+      if (proxy && proxy->GetXMLLabel())
+        {
+        proxyLabel = proxy->GetXMLLabel();
+        }
+      QAction* action = commonMenu->addAction(proxyLabel) << pqSetName(proxyName)
+        << pqSetData(proxyName);
       action->setEnabled(false);
       }
-
-
 
     // Load in the filter information.
     QFile filterInfo(":/pqWidgets/XML/ParaViewFilters.xml");
@@ -430,41 +438,36 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
 
       proxyInfo.LoadFilterInfo(xmlParser->GetRootElement());
       }
-  
 
-     this->Implementation->AlphabeticalMenu= this->Implementation->FilterMenu->addMenu("&Alphabetical") 
-          << pqSetName("Alphabetical");
+    this->Implementation->AlphabeticalMenu = 
+      this->Implementation->FilterMenu->addMenu("&Alphabetical") 
+      << pqSetName("Alphabetical");
 
-      vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
-      manager->InstantiateGroupPrototypes("filters");
-      int numFilters = manager->GetNumberOfProxies("filters_prototypes");
-      for(int i=0; i<numFilters; i++)
+
+    int numFilters = manager->GetNumberOfProxies("filters_prototypes");
+    QMap<QString, QString> sortingMap;
+    for(int i=0; i<numFilters; i++)
       {
-
-        QStringList categoryList;
-        QString proxyName = manager->GetProxyName("filters_prototypes",i);
-
-        QAction* action = this->Implementation->AlphabeticalMenu->addAction(proxyName) << pqSetName(proxyName)
-          << pqSetData(proxyName);
-        action->setEnabled(false);
+      QStringList categoryList;
+      QString proxyName = manager->GetProxyName("filters_prototypes",i);
+      vtkSMProxy* proxy = manager->GetProxy(
+        "filters_prototypes", proxyName.toAscii().data());
+      QString proxyLabel = proxyName;
+      if (proxy && proxy->GetXMLLabel())
+        {
+        proxyLabel = proxy->GetXMLLabel();
+        }
+      sortingMap[proxyLabel] = proxyName;
       }
-
-
-
-
+    for (QMap<QString, QString>::iterator iter = sortingMap.begin();
+      iter != sortingMap.end(); ++iter)
+      {
+      QAction* action = 
+        this->Implementation->AlphabeticalMenu->addAction(iter.key()) 
+        << pqSetName(iter.value()) << pqSetData(iter.value());
+      action->setEnabled(false);
+      }
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 //Old Filter Menu
