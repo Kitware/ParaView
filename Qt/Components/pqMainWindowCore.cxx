@@ -459,12 +459,12 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
         }
       sortingMap[proxyLabel] = proxyName;
       }
-    for (QMap<QString, QString>::iterator iter = sortingMap.begin();
-      iter != sortingMap.end(); ++iter)
+    for (QMap<QString, QString>::iterator iter2 = sortingMap.begin();
+      iter2 != sortingMap.end(); ++iter2)
       {
       QAction* action = 
-        this->Implementation->AlphabeticalMenu->addAction(iter.key()) 
-        << pqSetName(iter.value()) << pqSetData(iter.value());
+        this->Implementation->AlphabeticalMenu->addAction(iter2.key()) 
+        << pqSetName(iter2.value()) << pqSetData(iter2.value());
       action->setEnabled(false);
       }
     }
