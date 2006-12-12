@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.80");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.81");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -229,7 +229,7 @@ const char* vtkKWTkUtilities::EvaluateSimpleStringInternal(
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::CreateObjectMethodCommand(
-  vtkKWApplication *app,
+  Tcl_Interp *interp,
   char **command, 
   vtkObject *object, 
   const char *method)
@@ -250,15 +250,15 @@ void vtkKWTkUtilities::CreateObjectMethodCommand(
       }
     else
       {
-      if (!app)
+      if (!interp)
         {
         vtkErrorWithObjectMacro(
           object,
-          "Attempt to create a Tcl instance before the application was set!");
+          "Attempt to create a Tcl instance without a Tcl interpreter!");
         }
       else
         {
-        object_name = vtkKWTkUtilities::GetTclNameFromPointer(app, object);
+        object_name = vtkKWTkUtilities::GetTclNameFromPointer(interp, object);
         }
       }
     }
@@ -281,6 +281,17 @@ void vtkKWTkUtilities::CreateObjectMethodCommand(
     }
 
   (*command)[object_len + method_len] = '\0';
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::CreateObjectMethodCommand(
+  vtkKWApplication *app,
+  char **command, 
+  vtkObject *object, 
+  const char *method)
+{
+  vtkKWTkUtilities::CreateObjectMethodCommand(
+    app->GetMainInterp(), command, object, method);
 }
 
 //----------------------------------------------------------------------------
@@ -2751,19 +2762,54 @@ const char* vtkKWTkUtilities::GetCurrentScript(
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::CreateTimerHandler(
-  vtkKWApplication *app, unsigned long ms, 
+  Tcl_Interp *interp, 
+  unsigned long ms, 
   vtkObject *object, const char *method)
 {
-  if (!app || !app->GetMainInterp())
+  if (!interp)
     { 
     return NULL;
     }
 
-  Tcl_Interp *interp = app->GetMainInterp();
   char *command = NULL;
-  vtkKWTkUtilities::CreateObjectMethodCommand(app, &command, object, method);
+  vtkKWTkUtilities::CreateObjectMethodCommand(
+    interp, &command, object, method);
   char *after_command = new char[strlen(command) + 50];
   sprintf(after_command, "after %ld {%s}", ms, command);
+  if (Tcl_GlobalEval(interp, after_command) != TCL_OK)
+    {
+    vtkGenericWarningMacro(
+      << "Unable to create timer handler " << Tcl_GetStringResult(interp));
+    }
+  delete [] after_command;
+  delete [] command;
+  return Tcl_GetStringResult(interp);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::CreateTimerHandler(
+  vtkKWApplication *app, 
+  unsigned long ms, 
+  vtkObject *object, const char *method)
+{
+  return vtkKWTkUtilities::CreateTimerHandler(
+    app->GetMainInterp(), ms, object, method);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::CreateIdleTimerHandler(
+  Tcl_Interp *interp, 
+  vtkObject *object, const char *method)
+{
+  if (!interp)
+    { 
+    return NULL;
+    }
+
+  char *command = NULL;
+  vtkKWTkUtilities::CreateObjectMethodCommand(interp, &command, object, method);
+  char *after_command = new char[strlen(command) + 50];
+  sprintf(after_command, "after idle {%s}", command);
   if (Tcl_GlobalEval(interp, after_command) != TCL_OK)
     {
     vtkGenericWarningMacro(
@@ -2779,24 +2825,8 @@ const char* vtkKWTkUtilities::CreateIdleTimerHandler(
   vtkKWApplication *app, 
   vtkObject *object, const char *method)
 {
-  if (!app || !app->GetMainInterp())
-    { 
-    return NULL;
-    }
-
-  Tcl_Interp *interp = app->GetMainInterp();
-  char *command = NULL;
-  vtkKWTkUtilities::CreateObjectMethodCommand(app, &command, object, method);
-  char *after_command = new char[strlen(command) + 50];
-  sprintf(after_command, "after idle {%s}", command);
-  if (Tcl_GlobalEval(interp, after_command) != TCL_OK)
-    {
-    vtkGenericWarningMacro(
-      << "Unable to create timer handler " << Tcl_GetStringResult(interp));
-    }
-  delete [] after_command;
-  delete [] command;
-  return Tcl_GetStringResult(interp);
+  return vtkKWTkUtilities::CreateIdleTimerHandler(
+    app->GetMainInterp(), object, method);
 }
 
 //----------------------------------------------------------------------------

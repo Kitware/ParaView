@@ -90,6 +90,9 @@ public:
   static void CreateObjectMethodCommand(
     vtkKWApplication *app, 
     char **command, vtkObject *object, const char *method);
+  static void CreateObjectMethodCommand(
+    Tcl_Interp *interp, 
+    char **command, vtkObject *object, const char *method);
 
   // Description:
   // Get the RGB components that correspond to 'color' (say, #223344)
@@ -537,10 +540,19 @@ public:
   // evaluated as a simple command. 
   // Returns a string identifier that can be used to cancel the timer.
   static const char* CreateTimerHandler(
-    vtkKWApplication *app, unsigned long ms, 
+    Tcl_Interp *interp, 
+    unsigned long ms, 
+    vtkObject *object, const char *method);
+  static const char* CreateTimerHandler(
+    vtkKWApplication *app, 
+    unsigned long ms, 
     vtkObject *object, const char *method);
   static const char* CreateIdleTimerHandler(
-    vtkKWApplication *app, vtkObject *object, const char *method);
+    Tcl_Interp *interp, 
+    vtkObject *object, const char *method);
+  static const char* CreateIdleTimerHandler(
+    vtkKWApplication *app, 
+    vtkObject *object, const char *method);
 
   // Description:
   // Cancel one or all event handlers, i.e. cancel all delayed command that
