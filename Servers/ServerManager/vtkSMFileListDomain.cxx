@@ -15,9 +15,10 @@
 #include "vtkSMFileListDomain.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMFileListDomain);
-vtkCxxRevisionMacro(vtkSMFileListDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMFileListDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMFileListDomain::vtkSMFileListDomain()
@@ -27,6 +28,20 @@ vtkSMFileListDomain::vtkSMFileListDomain()
 //---------------------------------------------------------------------------
 vtkSMFileListDomain::~vtkSMFileListDomain()
 {
+}
+
+//---------------------------------------------------------------------------
+int vtkSMFileListDomain::SetDefaultValues(vtkSMProperty* property)
+{
+  vtkSMStringVectorProperty* svp = 
+    vtkSMStringVectorProperty::SafeDownCast(property);
+  if (svp && this->GetNumberOfStrings() > 0)
+    {
+    svp->SetElement(0, this->GetString(0));
+    return 1;
+    }
+
+  return this->Superclass::SetDefaultValues(property);
 }
 
 //---------------------------------------------------------------------------
