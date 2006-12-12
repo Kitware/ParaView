@@ -27,7 +27,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.46");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.47");
 
 //----------------------------------------------------------------------------
 vtkKWTclInteractor::vtkKWTclInteractor()
@@ -221,6 +221,29 @@ void vtkKWTclInteractor::UpCallback()
     this->Script("%s insert end $commandString",
                  this->CommandEntry->GetWidgetName());
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTclInteractor::SetFont(const char *font)
+{
+  if (this->CommandEntry)
+    {
+    this->CommandEntry->SetFont(font);
+    }
+  if (this->DisplayText)
+    {
+    this->DisplayText->GetWidget()->SetFont(font);
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTclInteractor::GetFont()
+{
+  if (this->CommandEntry)
+    {
+    return this->CommandEntry->GetFont();
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

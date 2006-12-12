@@ -24,7 +24,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTkcon );
-vtkCxxRevisionMacro(vtkKWTkcon, "1.7");
+vtkCxxRevisionMacro(vtkKWTkcon, "1.8");
 
 //----------------------------------------------------------------------------
 class vtkKWTkconInternals
@@ -204,6 +204,25 @@ void vtkKWTkcon::Focus()
     {
     this->Internals->Console->Focus();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkcon::SetFont(const char *font)
+{
+  if (this->IsCreated())
+    {
+    this->Script("tkcon font {%s}", font);
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkcon::GetFont()
+{
+  if (this->IsCreated())
+    {
+    return this->Script("tkcon font");
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
