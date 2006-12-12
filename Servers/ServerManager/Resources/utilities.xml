@@ -1989,4 +1989,113 @@
     </ConnectionCleanerProxy>
   </ProxyGroup>
 
+  <ProxyGroup name="extended_sources">
+    <SourceProxy name="LineSource" class="vtkLineSource">
+      <DoubleVectorProperty
+         name="Point1"
+         command="SetPoint1"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.0 0.0 0.0" >
+         <BoundsDomain name="range" mode="normal" default_mode="min" >
+           <RequiredProperties>
+             <Property name="DummyInput" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Point2"
+         command="SetPoint2"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.0 0.0 0.0" >
+         <BoundsDomain name="range" mode="normal" default_mode="max" >
+           <RequiredProperties>
+             <Property name="DummyInput" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="Resolution"
+         command="SetResolution"
+         number_of_elements="1"
+         default_values="6" >
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <InputProperty name="DummyInput" is_internal="1">
+        <!-- Used when this source is added to a proxy list domain. -->
+      </InputProperty>
+
+      <Hints>
+        <PropertyGroup type="LineSource" >
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+          <Property function="Resolution"          name="Resolution" />
+        </PropertyGroup>
+
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input" />
+        </ProxyList>
+      </Hints>
+    <!-- End LineSource -->
+    </SourceProxy>
+
+    <SourceProxy name="PointSource" class="vtkPointSource">
+       <DoubleVectorProperty
+          name="Center"
+          command="SetCenter"
+          number_of_elements="3"
+          animateable="1"
+          default_values="0.0 0.0 0.0" >
+          <BoundsDomain name="range" mode="normal" default_mode="mid" >
+            <RequiredProperties>
+              <Property name="DummyInput" function="Input" />
+            </RequiredProperties>
+          </BoundsDomain>
+       </DoubleVectorProperty>
+
+       <IntVectorProperty
+          name="NumberOfPoints"
+          command="SetNumberOfPoints"
+          number_of_elements="1"
+          animateable="1"
+          default_values="1" >
+          <IntRangeDomain name="range" min="1"/>
+       </IntVectorProperty>
+
+       <DoubleVectorProperty
+          name="Radius"
+          command="SetRadius"
+          number_of_elements="1"
+          animateable="1"
+          default_values="1.0" >
+          <BoundsDomain name="range" mode="scaled_extent" scale_factor="0.1">
+            <RequiredProperties>
+              <Property name="DummyInput" function="Input" />
+            </RequiredProperties>
+          </BoundsDomain>
+       </DoubleVectorProperty>
+
+       <InputProperty name="DummyInput" is_internal="1">
+         <!-- Used when this source is added to a proxy list domain. -->
+       </InputProperty>
+
+       <Hints>
+         <PropertyGroup type="PointSource" >
+           <Property function="WorldPosition"  name="Center" />
+           <Property function="Radius"         name="Radius" />
+           <Property function="NumberOfPoints" name="NumberOfPoints" />
+         </PropertyGroup>
+
+         <ProxyList>
+           <Link name="DummyInput" with_property="Input" />
+         </ProxyList>
+       </Hints>
+    <!-- End PointSource -->
+    </SourceProxy>
+  </ProxyGroup>
+
 </ServerManagerConfiguration>
