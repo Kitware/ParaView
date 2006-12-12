@@ -2820,6 +2820,8 @@
           <Property name="Opacity" />
           <Property name="Shading" />
           <Property name="Specular" />
+          <Property name="SpecularColor" />
+          <Property name="SpecularPower" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
