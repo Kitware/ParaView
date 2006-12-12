@@ -2955,6 +2955,7 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
       </InputProperty>
 
      <IntVectorProperty 
+        label="Orient"
         name="SetOrient" 
         command="SetOrient" 
         number_of_elements="1"
@@ -2963,6 +2964,7 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
      </IntVectorProperty>
 
      <IntVectorProperty 
+        label="Scale Mode"
         name="SetScaleMode" 
         command="SetScaleMode" 
         number_of_elements="1"
