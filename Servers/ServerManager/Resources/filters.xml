@@ -2982,7 +2982,7 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
         command="SetScaleFactor"
         number_of_elements="1"
         default_values="1.0" >
-       <BoundsDomain name="bounds">
+       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.1">
          <RequiredProperties>
             <Property name="Input" function="Input"/>
          </RequiredProperties>
