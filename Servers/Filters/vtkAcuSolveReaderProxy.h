@@ -168,11 +168,8 @@ protected:
                           vtkInformationVector *);
 
 private:
-  // Not implemented.
-  vtkAcuSolveReaderProxy(const vtkAcuSolveReaderProxy&);
-
-  // Not implemented.
-  void operator=(const vtkAcuSolveReaderProxy&);
+  vtkAcuSolveReaderProxy(const vtkAcuSolveReaderProxy&); // Not Implemented
+  void operator=(const vtkAcuSolveReaderProxy&); // Not Implemented
 };
 
 #endif

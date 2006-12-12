@@ -29,10 +29,15 @@ class vtkCellArray;
 
 typedef struct _Adb* AdbHd;
 
-class vtkAcuSolveReaderBase : public vtkObject
+class VTK_EXPORT vtkAcuSolveReaderBase : public vtkObject
 {
-
 public:
+
+  vtkTypeRevisionMacro(vtkAcuSolveReaderBase,vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent)
+    {
+      this->Superclass::PrintSelf(os, indent);
+    }
 
   //Description:
   //  Points or Nodes are the same. 
