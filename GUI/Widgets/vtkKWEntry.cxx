@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.86");
+vtkCxxRevisionMacro(vtkKWEntry, "1.87");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -344,11 +344,19 @@ int vtkKWEntry::ValidationCallback(const char *value)
   int res = 1;
   if (this->RestrictValue == vtkKWEntry::RestrictInteger)
     {
-    res &= atoi(this->Script("string is integer %s", value));
+    // Sadly we have to use the "append 0" trick to allow people to enter
+    // a negative sign
+    res &= atoi(this->Script(
+          "expr {[string is integer %s] || [string is integer \"%s0\"]}", 
+          value, value));
     }
   else if (this->RestrictValue == vtkKWEntry::RestrictDouble)
     {
-    res &= atoi(this->Script("string is double %s", value));
+    // Sadly we have to use the "append 0" trick to allow people to enter
+    // a negative sign or decimal point
+    res &= atoi(this->Script(
+          "expr {[string is double %s] || [string is double \"%s0\"]}", 
+          value, value));
     }
   if (!res)
     {
