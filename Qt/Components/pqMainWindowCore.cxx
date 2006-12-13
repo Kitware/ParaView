@@ -1747,11 +1747,34 @@ void pqMainWindowCore::restoreRecentFilterMenu()
     if (settings->contains(key))
     {
       QString filterName=settings->value(key).toString();
-      QAction* action = this->Implementation->RecentFilesMenu->addAction(filterName) << pqSetName(filterName)
-        << pqSetData(filterName);
-      action->setEnabled(false);
+
+      int idx=this->Implementation->RecentFilterList.indexOf(filterName);
+      if(idx!=-1)
+        {
+        this->Implementation->RecentFilterList.removeAt(idx);
+        }
+
+      this->Implementation->RecentFilterList.push_back(filterName);
+      if(this->Implementation->RecentFilterList.size()>10)
+        {
+        this->Implementation->RecentFilterList.removeLast();
+        }
     }
   }
+
+
+   this->Implementation->RecentFilesMenu->clear();
+
+
+   QList<QString>::iterator begin,end;
+   begin=this->Implementation->RecentFilterList.begin();
+   end=this->Implementation->RecentFilterList.end();
+   for(;begin!=end;++begin)
+     {
+     QAction* recentA = this->Implementation->RecentFilesMenu->addAction(*begin) << pqSetName(*begin)
+       << pqSetData(*begin);
+     recentA->setEnabled(false);
+     }
 }
 
 
