@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.81");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.82");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -285,13 +285,13 @@ void vtkKWTkUtilities::CreateObjectMethodCommand(
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::CreateObjectMethodCommand(
-  vtkKWApplication *app,
+  vtkKWApplication *,
   char **command, 
   vtkObject *object, 
   const char *method)
 {
   vtkKWTkUtilities::CreateObjectMethodCommand(
-    app->GetMainInterp(), command, object, method);
+    vtkKWApplication::GetMainInterp(), command, object, method);
 }
 
 //----------------------------------------------------------------------------
@@ -2788,12 +2788,12 @@ const char* vtkKWTkUtilities::CreateTimerHandler(
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::CreateTimerHandler(
-  vtkKWApplication *app, 
+  vtkKWApplication *, 
   unsigned long ms, 
   vtkObject *object, const char *method)
 {
   return vtkKWTkUtilities::CreateTimerHandler(
-    app->GetMainInterp(), ms, object, method);
+    vtkKWApplication::GetMainInterp(), ms, object, method);
 }
 
 //----------------------------------------------------------------------------
@@ -2822,11 +2822,11 @@ const char* vtkKWTkUtilities::CreateIdleTimerHandler(
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::CreateIdleTimerHandler(
-  vtkKWApplication *app, 
+  vtkKWApplication *, 
   vtkObject *object, const char *method)
 {
   return vtkKWTkUtilities::CreateIdleTimerHandler(
-    app->GetMainInterp(), object, method);
+    vtkKWApplication::GetMainInterp(), object, method);
 }
 
 //----------------------------------------------------------------------------

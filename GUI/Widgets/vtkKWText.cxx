@@ -36,7 +36,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.52");
+vtkCxxRevisionMacro(vtkKWText, "1.53");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -293,13 +293,11 @@ void vtkKWText::CreateWidget()
   const char *wname = this->GetWidgetName();
   vtksys_stl::string font(this->GetConfigurationOption("-font"));
 
-  vtkKWApplication *app = this->GetApplication();
-
   char bold_font[512], italic_font[512];
   vtkKWTkUtilities::ChangeFontWeightToBold(
-    app->GetMainInterp(), font.c_str(), bold_font);
+    vtkKWApplication::GetMainInterp(), font.c_str(), bold_font);
   vtkKWTkUtilities::ChangeFontSlantToItalic(
-    app->GetMainInterp(), font.c_str(), italic_font);
+    vtkKWApplication::GetMainInterp(), font.c_str(), italic_font);
 
   this->Script("%s tag config %s -font \"%s\"", 
                wname, vtkKWText::TagBold, bold_font);
