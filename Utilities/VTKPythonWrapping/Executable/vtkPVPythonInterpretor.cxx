@@ -179,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.5");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.6");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -211,7 +211,7 @@ void vtkPVPythonInterpretor::InitializeInternal()
     PyObject* executable = PySys_GetObject(const_cast<char*>("executable"));
     exe_str = PyString_AsString(executable);
     }
-  if (exe_str);
+  if (exe_str)
     {
     // Use the executable location to try to set sys.path to include
     // the VTK python modules.
