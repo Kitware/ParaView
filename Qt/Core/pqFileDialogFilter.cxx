@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* model, QObject* Parent)
   : QSortFilterProxyModel(Parent), Model(model)
 {
-  this->setSourceModel(model->fileModel());
+  this->setSourceModel(model);
 }
 
 pqFileDialogFilter::~pqFileDialogFilter()
@@ -59,7 +59,7 @@ void pqFileDialogFilter::setFilter(const QStringList& wildcards)
 
 bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& source_parent) const
 {
-  QModelIndex idx = this->Model->fileModel()->index(row_source, 0, source_parent);
+  QModelIndex idx = this->Model->index(row_source, 0, source_parent);
   if(this->Model->isDir(idx))
     {
     return true;

@@ -93,9 +93,9 @@ namespace {
 class pqFileDialog::pqImplementation
 {
 public:
-  pqImplementation(pqFileDialogModel* model) :
-    Model(model),
-    FileFilter(model),
+  pqImplementation(pqServer* server) :
+    Model(new pqFileDialogModel(server, NULL)),
+    FileFilter(this->Model),
     Mode(ExistingFile)
   {
   }
@@ -135,13 +135,13 @@ public:
 // pqFileDialog
 
 pqFileDialog::pqFileDialog(
-    pqFileDialogModel* model,
+    pqServer* server,
     QWidget* p, 
     const QString& title, 
     const QString& startDirectory, 
     const QString& nameFilter) :
   Superclass(p),
-  Implementation(new pqImplementation(model))
+  Implementation(new pqImplementation(server))
 {
   this->Implementation->Ui.setupUi(this);
 
@@ -167,7 +167,7 @@ pqFileDialog::pqFileDialog(
 
   this->setFileMode(ExistingFile);
 
-  QObject::connect(this->Implementation->Model->fileModel(),
+  QObject::connect(this->Implementation->Model,
                    SIGNAL(modelReset()), 
                    this, 
                    SLOT(onModelReset()));

@@ -39,7 +39,10 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqConsumerDisplay.h
   pqCoreTestUtility.h
   pqDisplay.h
+  pqFileDialog.h
   pqFileDialogEventTranslator.h
+  pqFileDialogFilter.h
+  pqFileDialogModel.h
   pqFlatTreeViewEventTranslator.h
   pqGenericViewModule.h
   pqHistogramTableModel.h
@@ -78,6 +81,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_FORMS
   Resources/UI/pqOutputWindow.ui
+  Resources/UI/pqFileDialog.ui
 )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
@@ -120,10 +124,16 @@ ADD_LIBRARY(pqCore
   pqCoreTestUtility.h
   pqDisplay.cxx
   pqDisplay.h
+  pqFileDialog.cxx
+  pqFileDialog.h
   pqFileDialogEventPlayer.cxx
   pqFileDialogEventPlayer.h
   pqFileDialogEventTranslator.cxx
   pqFileDialogEventTranslator.h
+  pqFileDialogFilter.cxx
+  pqFileDialogFilter.h
+  pqFileDialogModel.cxx
+  pqFileDialogModel.h
   pqFlatTreeViewEventPlayer.cxx
   pqFlatTreeViewEventPlayer.h
   pqFlatTreeViewEventTranslator.cxx

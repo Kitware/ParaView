@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pqApplicationCore.h>
 #include <pqFileDialog.h>
-#include <pqLocalFileDialogModel.h>
 #include <pqServerResources.h>
 #include <pqServerStartup.h>
 #include <pqServerStartups.h>
@@ -235,7 +234,7 @@ void pqServerBrowser::onSave()
   filters += "ParaView server configuration file (*.pvsc)";
   filters += ";;All files (*)";
 
-  pqFileDialog* const dialog  = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog* const dialog  = new pqFileDialog(NULL,
       this, tr("Save Server Configuration File:"), QString(), filters);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->setObjectName("SaveServerConfigurationDialog");
@@ -267,7 +266,7 @@ void pqServerBrowser::onLoad()
   filters += "ParaView server configuration file (*.pvsc)";
   filters += ";;All files (*)";
 
-  pqFileDialog* const dialog  = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog* const dialog  = new pqFileDialog(NULL,
       this, tr("Load Server Configuration File:"), QString(), filters);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->setObjectName("LoadServerConfigurationDialog");

@@ -32,14 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqChartContextMenu.h"
 
-#include "pqFileDialog.h"
-#include "pqLocalFileDialogModel.h"
-
 #include <QAction>
 #include <QMenu>
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QWidget>
+#include <QFileDialog>
 
 
 pqChartContextMenu::pqChartContextMenu(QObject *parentObject)
@@ -90,11 +88,11 @@ void pqChartContextMenu::savePDF()
     QWidget *chart = qvariant_cast<QWidget *>(action->data());
     if(chart)
       {
-      pqFileDialog *file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
-          chart, tr("Save .pdf File:"), QString(), "PDF files (*.pdf)");    
+      QFileDialog* file_dialog = new QFileDialog(chart, tr("Save .pdf File:"),
+                                       QString(), "PDF files (*.pdf)");
       file_dialog->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
       file_dialog->setObjectName("fileSavePDFDialog");
-      file_dialog->setFileMode(pqFileDialog::AnyFile);
+      file_dialog->setFileMode(QFileDialog::AnyFile);
       QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)),
           chart, SLOT(savePDF(const QStringList&)));
         
@@ -113,11 +111,11 @@ void pqChartContextMenu::savePNG()
     QWidget *chart = qvariant_cast<QWidget *>(action->data());
     if(chart)
       {
-      pqFileDialog *file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
-          chart, tr("Save .png File:"), QString(), "PNG files (*.png)");
+      QFileDialog* file_dialog = new QFileDialog(chart, tr("Save .png File:"),
+                                       QString(), "PNG files (*.png)");
       file_dialog->setAttribute(Qt::WA_DeleteOnClose);
       file_dialog->setObjectName("fileSavePNGDialog");
-      file_dialog->setFileMode(pqFileDialog::AnyFile);
+      file_dialog->setFileMode(QFileDialog::AnyFile);
       QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)),
           chart, SLOT(savePNG(const QStringList&)));
         

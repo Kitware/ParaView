@@ -59,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderWindowManager.h"
 #include "pqSelectionManager.h"
 #include "pqSelectReaderDialog.h"
-#include "pqServerFileDialogModel.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
@@ -79,7 +78,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pqConnect.h>
 #include <pqFileDialog.h>
-#include <pqLocalFileDialogModel.h>
 #include <pqObjectNaming.h>
 #include <pqProgressBar.h>
 #include <pqServerResources.h>
@@ -988,8 +986,7 @@ void pqMainWindowCore::onFileOpen(pqServer* server)
     filters += ";;";
     }
   filters += "All files (*)";
-  pqFileDialog* const file_dialog = new pqFileDialog(
-    new pqServerFileDialogModel(NULL, server), 
+  pqFileDialog* const file_dialog = new pqFileDialog(server, 
     this->Implementation->Parent, tr("Open File:"), QString(), filters);
     
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -1073,7 +1070,7 @@ void pqMainWindowCore::onFileLoadServerState(pqServer*)
   filters += "ParaView state file (*.pvsm)";
   filters += ";;All files (*)";
 
-  pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog *fileDialog = new pqFileDialog(NULL,
       this->Implementation->Parent, tr("Open Server State File:"), QString(), filters);
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("FileLoadServerStateDialog");
@@ -1125,7 +1122,7 @@ void pqMainWindowCore::onFileSaveServerState()
   filters += "ParaView state file (*.pvsm)";
   filters += ";;All files (*)";
 
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
+  pqFileDialog* const file_dialog = new pqFileDialog(NULL,
     this->Implementation->Parent, tr("Save Server State:"), QString(), filters);
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileSaveServerStateDialog");
@@ -1178,8 +1175,7 @@ void pqMainWindowCore::onFileSaveData()
     pqApplicationCore::instance()->getWriterFactory()->getSupportedFileTypes(
       source);
 
-  pqFileDialog file_dialog(
-    new pqServerFileDialogModel(NULL, source->getServer()), 
+  pqFileDialog file_dialog(source->getServer(),
     this->Implementation->Parent, tr("Save File:"), QString(), filters);
   file_dialog.setObjectName("FileSaveDialog");
   file_dialog.setFileMode(pqFileDialog::AnyFile);
@@ -1244,7 +1240,7 @@ void pqMainWindowCore::onFileSaveScreenshot()
   filters += ";;PPM image (*.ppm)";
   filters += ";;JPG image (*.jpg)";
   filters += ";;All files (*)";
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
+  pqFileDialog* const file_dialog = new pqFileDialog(NULL,
     this->Implementation->Parent, tr("Save Screenshot:"), QString(), filters);
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileSaveScreenshotDialog");
@@ -1306,7 +1302,7 @@ void pqMainWindowCore::onFileSaveAnimation()
 #endif
   filters +=";;JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png)";
   filters +=";;All files(*)";
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
+  pqFileDialog* const file_dialog = new pqFileDialog(NULL,
     this->Implementation->Parent, tr("Save Animation:"), QString(), filters);
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileSaveAnimationDialog");
@@ -1468,7 +1464,7 @@ void pqMainWindowCore::onToolsRecordTest()
   filters += "Python Files (*.py);;";
 #endif
   filters += "All Files (*)";
-  pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog *fileDialog = new pqFileDialog(NULL,
       QApplication::activeWindow(), tr("Record Test"), QString(), filters);
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("ToolsRecordTestDialog");
@@ -1504,7 +1500,7 @@ void pqMainWindowCore::onToolsRecordTestScreenshot()
   filters += ";;PPM Image (*.ppm)";
   filters += ";;JPG Image (*.jpg)";
   filters += ";;All Files (*)";
-  pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog *fileDialog = new pqFileDialog(NULL,
       QApplication::activeWindow(), tr("Save Test Screenshot"), QString(),
       filters);
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -1555,7 +1551,7 @@ void pqMainWindowCore::onToolsPlayTest()
   filters += "Python Files (*.py);;";
 #endif
   filters += "All Files (*)";
-  pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog *fileDialog = new pqFileDialog(NULL,
       QApplication::activeWindow(), tr("Play Test"), QString(), filters);
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("ToolsPlayTestDialog");

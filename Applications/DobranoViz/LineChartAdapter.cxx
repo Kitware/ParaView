@@ -13,7 +13,6 @@
 #include <pqChartCoordinate.h>
 #include <pqDelimitedTextParser.h>
 #include <pqFileDialog.h>
-#include <pqLocalFileDialogModel.h>
 #include <pqServer.h>
 #include <pqChartAxis.h>
 #include <pqChartLabel.h>

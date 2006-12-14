@@ -34,13 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqFileDialogFilter_h
 #define _pqFileDialogFilter_h
 
-#include "QtWidgetsExport.h"
+#include "pqCoreExport.h"
 #include <QSortFilterProxyModel>
 #include <QList>
 #include <QRegExp>
 class pqFileDialogModel;
 
-class QTWIDGETS_EXPORT pqFileDialogFilter :
+class PQCORE_EXPORT pqFileDialogFilter :
   public QSortFilterProxyModel
 {
   Q_OBJECT

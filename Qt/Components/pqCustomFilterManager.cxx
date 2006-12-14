@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCustomFilterManagerModel.h"
 #include "pqFileDialog.h"
-#include "pqLocalFileDialogModel.h"
 
 #include <QItemSelection>
 #include <QItemSelectionModel>
@@ -167,7 +166,7 @@ void pqCustomFilterManager::importFiles()
 {
   // Let the user select a file.
   pqFileDialog* fileDialog = new pqFileDialog(
-      new pqLocalFileDialogModel(), 
+      NULL,
       this,
       tr("Open Custom Filter File"),
       QString(),
@@ -187,7 +186,7 @@ void pqCustomFilterManager::exportSelected()
 {
   // Let the user select a file to save.
   pqFileDialog* fileDialog = new pqFileDialog(
-      new pqLocalFileDialogModel(), 
+      NULL,
       this,
       tr("Save Custom Filter File"),
       QString(),

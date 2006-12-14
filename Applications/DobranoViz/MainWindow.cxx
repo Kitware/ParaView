@@ -19,7 +19,6 @@
 #include <pqSetName.h>
 #include <pqFileDialog.h>
 #include <pqLineChartWidget.h>
-#include <pqLocalFileDialogModel.h>
 #include <pqMainWindowCore.h>
 #include <pqObjectInspectorWidget.h>
 #include <pqPipelineMenu.h>
@@ -479,7 +478,7 @@ void MainWindow::onHelpAbout()
 
 void MainWindow::onLoadSetup()
 {
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog* file_dialog = new pqFileDialog(NULL,
       this, tr("Open Setup:"))
     << pqSetName("fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(loadSetup(const QStringList&)));
@@ -491,7 +490,7 @@ void MainWindow::onLoadSetup()
 
 void MainWindow::onSavePDF()
 {
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
+  pqFileDialog* file_dialog = new pqFileDialog(NULL,
       this, tr("Save .pdf File:"))
     << pqSetName("fileSavePDFDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(savePDF(const QStringList&)));
@@ -503,7 +502,7 @@ void MainWindow::onSavePDF()
 
 void MainWindow::onSavePNG()
 {
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog* file_dialog = new pqFileDialog(NULL,
       this, tr("Save .png File:"))
     << pqSetName("fileSavePNGDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(saveImage(const QStringList&)));
@@ -515,7 +514,7 @@ void MainWindow::onSavePNG()
 
 void MainWindow::onLoadExperimentalData()
 {
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog* file_dialog = new pqFileDialog(NULL,
       this, tr("Open Experimental Data:"))
     << pqSetName("fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(loadExperimentalData(const QStringList&)));
@@ -527,7 +526,7 @@ void MainWindow::onLoadExperimentalData()
 
 void MainWindow::onLoadExperimentalUncertainty()
 {
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog* file_dialog = new pqFileDialog(NULL,
       this, tr("Open Experimental Uncertainty Data:"))
     << pqSetName("fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(loadExperimentalUncertainty(const QStringList&)));
@@ -539,7 +538,7 @@ void MainWindow::onLoadExperimentalUncertainty()
 
 void MainWindow::onLoadSimulationUncertainty()
 {
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog* file_dialog = new pqFileDialog(NULL,
       this, tr("Open Simulation Uncertainty Data:"))
     << pqSetName("fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(loadSimulationUncertainty(const QStringList&)));
@@ -551,7 +550,7 @@ void MainWindow::onLoadSimulationUncertainty()
 
 void MainWindow::onLoadExperimentSimulationMap()
 {
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
+  pqFileDialog* file_dialog = new pqFileDialog(NULL,
       this, tr("Open Experiment / Simulation Map:"))
     << pqSetName("fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->Implementation->LineChart, SLOT(loadExperimentSimulationMap(const QStringList&)));

@@ -40,8 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView
 #include "pqFileDialog.h"
-#include "pqServerFileDialogModel.h"
-#include "pqLocalFileDialogModel.h"
 
 pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
   : QWidget(p), Server(NULL)
@@ -108,17 +106,7 @@ void pqFileChooserWidget::chooseFile()
   QString filters = this->Extension;
   filters += ";;All files (*)";
 
-  pqFileDialogModel* model = NULL;
-  if(this->Server)
-    {
-    model = new pqServerFileDialogModel(NULL, this->Server);
-    }
-  else
-    {
-    model = new pqLocalFileDialogModel;
-    }
-
-  pqFileDialog* dialog = new pqFileDialog(model,
+  pqFileDialog* dialog = new pqFileDialog(this->Server,
     this, tr("Open File:"), QString(), filters);
   dialog->setFileMode(pqFileDialog::ExistingFile);
   if(QDialog::Accepted == dialog->exec())

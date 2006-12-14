@@ -99,7 +99,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSelectionAdaptor.h
   pqSelectionManager.h
   pqServerBrowser.h
-  pqServerFileDialogModel.h
   pqServerStartupBrowser.h
   pqServerStartupDialog.h
   pqSettingsDialog.h
@@ -308,8 +307,6 @@ ADD_LIBRARY(pqComponents
   pqSelectionManager.h
   pqServerBrowser.cxx
   pqServerBrowser.h
-  pqServerFileDialogModel.cxx
-  pqServerFileDialogModel.h
   pqServerStartupBrowser.cxx
   pqServerStartupBrowser.h
   pqServerStartupDialog.cxx

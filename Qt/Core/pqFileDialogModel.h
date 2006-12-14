@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqServerFileDialogModel.h
+   Module:    pqFileDialogModel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,45 +30,72 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqServerFileDialogModel_h
-#define _pqServerFileDialogModel_h
+#ifndef _pqFileDialogModel_h
+#define _pqFileDialogModel_h
 
-#include "pqComponentsExport.h"
-#include "pqFileDialogModel.h"
+#include "pqCoreExport.h"
+#include <QObject>
+#include <QAbstractItemModel>
 
 class vtkProcessModule;
 class pqServer;
+class QModelIndex;
 
 /**
-Implementation of pqFileDialogModel that allows remote browsing of a connected ParaView server's filesystem.
+pqFileDialogModel allows remote browsing of a connected ParaView server's
+filesystem, as well as browsing of the local file system.
 
 To use, pass a new instance of pqServerFileDialogModel to pqFileDialog object.
 
-\sa pqFileDialogModel, pqLocalFileDialogModel, pqFileDialog
+\sa pqFileDialog
 */
-class PQCOMPONENTS_EXPORT pqServerFileDialogModel :
-  public pqFileDialogModel
+class PQCORE_EXPORT pqFileDialogModel : public QAbstractItemModel
 {
-  typedef pqFileDialogModel base;
+  typedef QAbstractItemModel base;
   
   Q_OBJECT
 
 public:
   /// server is the server for which we need the listing.
-  pqServerFileDialogModel(QObject* Parent, pqServer* server);
-  ~pqServerFileDialogModel();
+  /// if the server is NULL, we get file listings locally
+  pqFileDialogModel(pqServer* server, QObject* Parent);
+  ~pqFileDialogModel();
 
+  /// Returns the path that will be automatically displayed when the file dialog is opened
   QString getStartPath();
+  /// Sets the path that the file dialog will display
   void setCurrentPath(const QString&);
+  /// Changes the current path to its immediate parent path (this is a no-op if
+  /// the current path is already at the root of the filesystem)
   void setParentPath();
+  /// Returns the path the the file dialog will display
   QString getCurrentPath();
+  /// Return true iff the given row is a directory
   bool isDir(const QModelIndex&);
+  /// Returns the set of file paths associated with the given row 
+  /// (a row may represent one-to-many paths if grouping is implemented)
   QStringList getFilePaths(const QModelIndex&);
+  /// Converts a file into an absolute path
   QString getFilePath(const QString&);
+  /// Returns all of the paths that are parents of the given path 
+  /// (this is handled by the back-end so it can deal with 
+  /// issues of delimiters, symlinks, multi-root filesystems, etc)
   QStringList getParentPaths(const QString&);
+  /// Returns whether the file exists
   bool fileExists(const QString&);
+  /// Returns whether a directory exists
   bool dirExists(const QString&);
-  QAbstractItemModel* fileModel();
+
+  // overloads for QAbstractItemModel
+  int columnCount(const QModelIndex&) const;
+  QVariant data(const QModelIndex & idx, int role) const;
+  QModelIndex index(int row, int column, const QModelIndex&) const;
+  QModelIndex parent(const QModelIndex&) const;
+  int rowCount(const QModelIndex&) const;
+  bool hasChildren(const QModelIndex& p) const;
+  QVariant headerData(int section, Qt::Orientation, int role) const;
+  
+  /// return the model for favorites
   QAbstractItemModel* favoriteModel();
   
 private:
@@ -76,5 +103,5 @@ private:
   pqImplementation* const Implementation;
 };
 
-#endif // !_pqServerFileDialogModel_h
+#endif // !_pqFileDialogModel_h
 

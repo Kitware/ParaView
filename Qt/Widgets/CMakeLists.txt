@@ -23,18 +23,10 @@ SET(QtWidgets_SRCS
   pqConsoleWidget.h
   pqDelimitedTextParser.cxx
   pqDelimitedTextParser.h
-  pqFileDialog.cxx
-  pqFileDialog.h
-  pqFileDialogFilter.cxx
-  pqFileDialogFilter.h
-  pqFileDialogModel.cxx
-  pqFileDialogModel.h
   pqFlatTreeView.cxx
   pqFlatTreeView.h
   pqListWidgetItemObject.cxx
   pqListWidgetItemObject.h
-  pqLocalFileDialogModel.cxx
-  pqLocalFileDialogModel.h
   pqProgressBar.cxx
   pqProgressBar.h
   pqSectionVisibilityContextMenu.cxx
@@ -68,12 +60,8 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqColorTableModel.h
   pqConsoleWidget.h
   pqDelimitedTextParser.h
-  pqFileDialog.h
-  pqFileDialogFilter.h
-  pqFileDialogModel.h
   pqFlatTreeView.h
   pqListWidgetItemObject.h
-  pqLocalFileDialogModel.h
   pqProgressBar.h
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
@@ -86,7 +74,6 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
 ##########################################################################
 ## Add *.ui files to be uic processed.
 SET(QtWidgets_UI_FORMS
-  pqFileDialog.ui
 )
 
 QT4_WRAP_UI(QtWidgets_UI_BUILT_SOURCES

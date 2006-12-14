@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqFileDialog_h
 #define _pqFileDialog_h
 
-#include "QtWidgetsExport.h"
+#include "pqCoreExport.h"
 #include <QDialog>
 
-class pqFileDialogModel;
 class QModelIndex;
+class pqServer;
 
 /**
   Provides a standard file dialog "front-end" for the pqFileDialogModel
@@ -51,10 +51,7 @@ class QModelIndex;
   the files the user selected:
 
   /code
-  pqFileDialog* dialog = new pqFileDialog(
-    new pqLocalFileDialogModel(),
-    this);
-    
+  pqFileDialog* dialog = new pqFileDialog(NULL, this);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
 
   QObject::connect(
@@ -71,19 +68,17 @@ class QModelIndex;
   getSelectedFiles() method:
   
   /code
-  pqFileDialog dialog(
-    new pqLocalFileDialogModel(),
-    this);
+  pqFileDialog dialog(NULL, this);
   if(Qt::Accepted == dialog.exec())
     {
     QStringList files = dialog.getSelectedFiles();
     }
   /endcode
   
-  \sa pqLocalFileDialogModel, pqServerFileDialogModel
+  \sa pqFileDialogModel
 */
 
-class QTWIDGETS_EXPORT pqFileDialog :
+class PQCORE_EXPORT pqFileDialog :
   public QDialog
 {
   typedef QDialog Superclass;
@@ -99,17 +94,18 @@ public:
   /// Directory: The name of a directory.
   enum FileMode { AnyFile, ExistingFile, ExistingFiles, Directory };
     
-  /// Creates a file dialog using the dialog model
+  /// Creates a file dialog with the specified server
+  /// if the server is NULL, files are browsed locally
   /// the title, and start directory may be specified
   /// the filter is a string of semi-colon separated filters
-  pqFileDialog(
-    pqFileDialogModel* Model,
+  pqFileDialog(pqServer*,
     QWidget* Parent, 
     const QString& Title = QString(), 
     const QString& Directory = QString(), 
     const QString& Filter = QString());
   ~pqFileDialog();
 
+  /// set the file mode
   void setFileMode(FileMode);
 
   /// Emits the filesSelected() signal and closes the dialog,
@@ -157,3 +153,4 @@ private:
 };
 
 #endif // !_pqFileDialog_h
+
