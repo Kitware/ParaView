@@ -41,9 +41,10 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/RegularExpression.hxx>
 #include <vtkstd/set>
+#include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.5");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -219,7 +220,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
   // Search for all files in the given directory.
   vtkstd::string prefix = this->FullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
-  vtkstd::string pattern = prefix
+  vtkstd::string pattern = prefix;
   pattern += "*";
   WIN32_FIND_DATA data;
   HANDLE handle = FindFirstFile(pattern.c_str(), &data);
@@ -246,7 +247,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
         {
         vtkPVFileInformation* infoD = vtkPVFileInformation::New();
         infoD->SetName(data.cFileName);
-        infoD->SetFullPath(prefix + data.cFileName);
+        infoD->SetFullPath((prefix + data.cFileName).c_str());
         infoD->Type = DIRECTORY;
         info_set.insert(infoD);
         infoD->Delete();
@@ -261,7 +262,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       files.insert(data.cFileName);
       vtkPVFileInformation* infoF = vtkPVFileInformation::New();
       infoF->SetName(data.cFileName);
-      infoF->SetFullPath(prefix + data.cFileName);
+      infoF->SetFullPath((prefix + data.cFileName).c_str());
       infoF->Type = SINGLE_FILE;
       info_set.insert(infoF);
       infoF->Delete();   
