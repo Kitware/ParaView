@@ -44,7 +44,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.5");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.6");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -254,12 +254,10 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
         }
       }
     else if((data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) ||
-      (!((data.dwFileAttributes & FILE_ATTRIBUTE_READONLY) && save) &&
-       !(data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
+      (!(data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
        !(data.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
        !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)))
       {
-      files.insert(data.cFileName);
       vtkPVFileInformation* infoF = vtkPVFileInformation::New();
       infoF->SetName(data.cFileName);
       infoF->SetFullPath((prefix + data.cFileName).c_str());
