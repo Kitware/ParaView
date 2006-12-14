@@ -43,7 +43,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.3");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -367,6 +367,7 @@ void vtkPVFileInformation::GetDirectoryListing()
         }
       }
     }
+  this->Print(cout);
 #endif
 }
 
@@ -424,39 +425,54 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
   vtkstd::string prefix = this->FullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
 
+  // sequence ending with numbers.
   vtksys::RegularExpression reg_ex("^(.*)\\.([0-9.]+)$");
+  // sequence ending with extension.
+  vtksys::RegularExpression reg_ex2("^(.*)(\\.|_)([0-9.]+)\\.(.*)$");
 
   for (vtkPVFileInformationSet::iterator iter = info_set.begin();
     iter != info_set.end(); )
     {
     vtkPVFileInformation* obj = *iter;
 
-    if (obj->Type != FILE_GROUP && obj->Type != DIRECTORY 
-      && reg_ex.find(obj->GetName()))
+    if (obj->Type != FILE_GROUP && obj->Type != DIRECTORY)
       {
-      vtkstd::string groupName = reg_ex.match(1);
-      vtkPVFileInformation* group = 0;
-      if (fileGroups.find(groupName) == fileGroups.end())
+      bool match = false;
+      vtkstd::string groupName;
+      if (reg_ex.find(obj->GetName()))
         {
-        group = vtkPVFileInformation::New();
-        group->SetName(groupName.c_str());
-        group->SetFullPath((prefix + groupName).c_str());
-        group->Type = FILE_GROUP;
-        fileGroups[groupName] = group;
-        group->Delete();
+        groupName = reg_ex.match(1);
+        match = true;
         }
-      else
+      else if (reg_ex2.find(obj->GetName()))
         {
-        group = fileGroups[groupName];
+        groupName = reg_ex2.match(1) + reg_ex2.match(2) + ".." + reg_ex2.match(4);
+        match = true;
         }
-      group->Contents->AddItem(obj);
-      vtkPVFileInformationSet::iterator prev_iter = iter++;
-      info_set.erase(prev_iter);
+
+      if (match)
+        {
+        vtkPVFileInformation* group = 0;
+        if (fileGroups.find(groupName) == fileGroups.end())
+          {
+          group = vtkPVFileInformation::New();
+          group->SetName(groupName.c_str());
+          group->SetFullPath((prefix + groupName).c_str());
+          group->Type = FILE_GROUP;
+          fileGroups[groupName] = group;
+          group->Delete();
+          }
+        else
+          {
+          group = fileGroups[groupName];
+          }
+        group->Contents->AddItem(obj);
+        vtkPVFileInformationSet::iterator prev_iter = iter++;
+        info_set.erase(prev_iter);
+        continue;
+        }
       }
-    else
-      {
-      ++iter;
-      }
+    ++iter;
     }
 
   // Now scan through all created groups and dissolve trivial groups
@@ -583,9 +599,11 @@ void vtkPVFileInformation::PrintSelf(ostream& os, vtkIndent indent)
   case FILE_GROUP:
     os << "FILE_GROUP" << endl;
     }
+  os << indent << "FastFileTypeDetection: " << this->FastFileTypeDetection << endl;
+
   for (int cc=0; cc < this->Contents->GetNumberOfItems(); cc++)
     {
+    os << endl;
     this->Contents->GetItemAsObject(cc)->PrintSelf(os, indent.GetNextIndent());
     }
-  os << indent << "FastFileTypeDetection: " << this->FastFileTypeDetection << endl;
 }
