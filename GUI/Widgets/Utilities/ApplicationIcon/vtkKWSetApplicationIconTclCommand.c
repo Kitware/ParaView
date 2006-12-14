@@ -166,7 +166,7 @@ int vtkKWSetApplicationIconCmd(ClientData clientdata,
   int icon_res_id;
   int set_small;
 
-  clientdata = 0; // To avoid warning: unreferenced formal parameter
+  (void)clientdata;
 
   // Check usage
 
