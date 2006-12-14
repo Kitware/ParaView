@@ -43,7 +43,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.3");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.4");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -367,7 +367,6 @@ void vtkPVFileInformation::GetDirectoryListing()
         }
       }
     }
-  this->Print(cout);
 #endif
 }
 
