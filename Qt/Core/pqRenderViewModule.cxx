@@ -515,6 +515,29 @@ void pqRenderViewModule::restoreSettings()
       }
     }
   proxy->UpdateVTKObjects();
+
+  // Orientation Axes settings.
+  QString key_prefix = "renderModule/OrientationAxes/";
+  if (settings->contains(key_prefix + "Visibility"))
+    {
+    this->setOrientationAxesVisibility(
+      settings->value(key_prefix + "Visibility").toBool());
+    }
+  if (settings->contains(key_prefix + "Interactivity"))
+    {
+    this->setOrientationAxesInteractivity(
+      settings->value(key_prefix + "Interactivity").toBool());
+    }
+  if (settings->contains(key_prefix + "OutlineColor"))
+    {
+    this->setOrientationAxesOutlineColor(
+      settings->value(key_prefix + "OutlineColor").value<QColor>());
+    }
+  if (settings->contains(key_prefix + "LabelColor"))
+    {
+    this->setOrientationAxesLabelColor(
+      settings->value(key_prefix + "LabelColor").value<QColor>());
+    }
 }
 
 void pqRenderViewModule::saveSettings()
@@ -541,6 +564,73 @@ void pqRenderViewModule::saveSettings()
       settings->setValue(key, pqSMAdaptor::getMultipleElementProperty(prop));
       }
     }
+
+  // Orientation Axes settings.
+  QString key_prefix = "renderModule/OrientationAxes/";
+  settings->setValue(key_prefix + "Visibility", 
+    this->getOrientationAxesVisibility());
+  settings->setValue(key_prefix + "Interactivity",
+    this->getOrientationAxesInteractivity());
+  settings->setValue(key_prefix + "OutlineColor",
+    this->getOrientationAxesOutlineColor());
+  settings->setValue(key_prefix + "LabelColor",
+    this->getOrientationAxesLabelColor());
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::setOrientationAxesVisibility(bool visible)
+{
+  this->Internal->AxesWidget->SetEnabled(visible? 1: 0);
+}
+
+//-----------------------------------------------------------------------------
+bool pqRenderViewModule::getOrientationAxesVisibility() const
+{
+  return this->Internal->AxesWidget->GetEnabled();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::setOrientationAxesInteractivity(bool interactive)
+{
+  this->Internal->AxesWidget->SetInteractive(interactive? 1: 0);
+}
+
+//-----------------------------------------------------------------------------
+bool pqRenderViewModule::getOrientationAxesInteractivity() const
+{
+  return this->Internal->AxesWidget->GetInteractive();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::setOrientationAxesOutlineColor(const QColor& color)
+{
+  this->Internal->AxesWidget->SetOutlineColor(
+    color.redF(), color.greenF(), color.blueF());
+}
+
+//-----------------------------------------------------------------------------
+QColor pqRenderViewModule::getOrientationAxesOutlineColor() const
+{
+  QColor color;
+  double* dcolor = this->Internal->AxesWidget->GetOutlineColor();
+  color.setRgbF(dcolor[0], dcolor[1], dcolor[2]);
+  return color;
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::setOrientationAxesLabelColor(const QColor& color)
+{
+  this->Internal->AxesWidget->SetAxisLabelColor(
+    color.redF(), color.greenF(), color.blueF());
+}
+
+//-----------------------------------------------------------------------------
+QColor pqRenderViewModule::getOrientationAxesLabelColor() const
+{
+  QColor color;
+  double* dcolor = this->Internal->AxesWidget->GetAxisLabelColor();
+  color.setRgbF(dcolor[0], dcolor[1], dcolor[2]);
+  return color;
 }
 
 //-----------------------------------------------------------------------------

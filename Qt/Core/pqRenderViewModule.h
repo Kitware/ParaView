@@ -97,8 +97,34 @@ public:
  
   /// Save the settings of this render module with QSettings
   virtual void saveSettings();
+
   /// Apply the settings from QSettings to this render module
   virtual void restoreSettings();
+
+  /// Get if the orientation axes is visible.
+  bool getOrientationAxesVisibility() const;
+
+  /// Get if the orientation axes is interactive.
+  bool getOrientationAxesInteractivity() const;
+
+  /// Get orientation axes label color.
+  QColor getOrientationAxesLabelColor() const;
+
+  /// Get orientation axes outline color.
+  QColor getOrientationAxesOutlineColor() const;
+
+public slots:
+  // Toggle is the orientation axes is visible.
+  void setOrientationAxesVisibility(bool visible);
+  
+  // Toggle orientation axes interactivity.
+  void setOrientationAxesInteractivity(bool interactive);
+
+  // Set orientation axes label color.
+  void setOrientationAxesLabelColor(const QColor&);
+
+  // Set orientation axes outline color.
+  void setOrientationAxesOutlineColor(const QColor&);
 
 private slots:
   // Called on start/end interaction.

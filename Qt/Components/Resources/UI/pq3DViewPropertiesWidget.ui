@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pq3DViewProperties</class>
  <widget class="QWidget" name="pq3DViewProperties" >
   <property name="geometry" >
@@ -496,13 +493,13 @@
              <number>0</number>
             </property>
             <property name="maximum" >
-             <double>180</double>
+             <double>180.000000000000000</double>
             </property>
             <property name="minimum" >
-             <double>-180</double>
+             <double>-180.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>10</double>
+             <double>10.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -536,10 +533,10 @@
              <string>Set the Key-to-Fill Ratio. This ratio controls how bright the fill light is compared to the key light: larger values correspond to a dimmer fill light. The purpose of the fill light is to light parts of the object not lit by the key light, while still maintaining constrast. This type of lighting may correspond to indirect illumination from the key light, bounced off a wall, floor, or other object. The fill light should never be brighter than the key light: a good range for the key-to-fill ratio is between 2 and 10.</string>
             </property>
             <property name="minimum" >
-             <double>1</double>
+             <double>1.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>0.5</double>
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -560,10 +557,10 @@
              <string>The "Warmth" of the Back Light. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
             </property>
             <property name="maximum" >
-             <double>1</double>
+             <double>1.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>0.1</double>
+             <double>0.100000000000000</double>
             </property>
            </widget>
           </item>
@@ -597,10 +594,10 @@
              <string>The "Warmth" of the Headlight. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
             </property>
             <property name="maximum" >
-             <double>1</double>
+             <double>1.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>0.1</double>
+             <double>0.100000000000000</double>
             </property>
            </widget>
           </item>
@@ -653,10 +650,10 @@
              <string>Set the Key-to-Head ratio. Similar to the Key-to-Fill ratio, this ratio controls how bright the headlight light is compared to the key light: larger values correspond to a dimmer headlight light. The headlight is special kind of fill light, lighting only the parts of the object that the camera can see. As such, a headlight tends to reduce the contrast of a scene. It can be used to fill in "shadows" of the object missed by the key and fill lights. The headlight should always be significantly dimmer than the key light: ratios of 2 to 15 are typical.</string>
             </property>
             <property name="minimum" >
-             <double>1</double>
+             <double>1.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>0.5</double>
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -693,10 +690,10 @@
              <string>The "Warmth" of the Key Light. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
             </property>
             <property name="maximum" >
-             <double>1</double>
+             <double>1.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>0.1</double>
+             <double>0.100000000000000</double>
             </property>
            </widget>
           </item>
@@ -749,13 +746,13 @@
              <number>0</number>
             </property>
             <property name="maximum" >
-             <double>90</double>
+             <double>90.000000000000000</double>
             </property>
             <property name="minimum" >
-             <double>-90</double>
+             <double>-90.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>10</double>
+             <double>10.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -776,10 +773,10 @@
              <string>The Intensity of the Key Light.  0 = off and 1 = full intensity.</string>
             </property>
             <property name="maximum" >
-             <double>1</double>
+             <double>1.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>0.1</double>
+             <double>0.100000000000000</double>
             </property>
            </widget>
           </item>
@@ -832,13 +829,13 @@
              <number>0</number>
             </property>
             <property name="maximum" >
-             <double>90</double>
+             <double>90.000000000000000</double>
             </property>
             <property name="minimum" >
-             <double>-90</double>
+             <double>-90.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>10</double>
+             <double>10.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -862,13 +859,13 @@
              <number>0</number>
             </property>
             <property name="maximum" >
-             <double>180</double>
+             <double>180.000000000000000</double>
             </property>
             <property name="minimum" >
-             <double>-180</double>
+             <double>-180.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>10</double>
+             <double>10.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -940,13 +937,13 @@
              <number>0</number>
             </property>
             <property name="maximum" >
-             <double>90</double>
+             <double>90.000000000000000</double>
             </property>
             <property name="minimum" >
-             <double>-90</double>
+             <double>-90.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>10</double>
+             <double>10.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -967,10 +964,10 @@
              <string>The "Warmth" of the Fill Light. Warmth is a parameter that varies from 0 to 1, where 0 is "cold" (looks icy or lit by a very blue sky), 1 is "warm" (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly "warmer" or "cooler," much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
             </property>
             <property name="maximum" >
-             <double>1</double>
+             <double>1.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>0.1</double>
+             <double>0.100000000000000</double>
             </property>
            </widget>
           </item>
@@ -1055,13 +1052,13 @@
              <number>0</number>
             </property>
             <property name="maximum" >
-             <double>180</double>
+             <double>180.000000000000000</double>
             </property>
             <property name="minimum" >
-             <double>-180</double>
+             <double>-180.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>10</double>
+             <double>10.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -1114,10 +1111,10 @@
              <string>Set the Key-to-Back Ratio. This ratio controls how bright the back lights are compared to the key light: larger values correspond to dimmer back lights. The back lights fill in the remaining high-contrast regions behind the object. Values between 2 and 10 are good.</string>
             </property>
             <property name="minimum" >
-             <double>1</double>
+             <double>1.000000000000000</double>
             </property>
             <property name="singleStep" >
-             <double>0.5</double>
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -1172,6 +1169,99 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_5" >
+      <attribute name="title" >
+       <string>Annotation</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="OrientationAxes" >
+         <property name="title" >
+          <string>Orientation Axes</string>
+         </property>
+         <property name="checkable" >
+          <bool>true</bool>
+         </property>
+         <layout class="QVBoxLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QCheckBox" name="OrientationAxesInteraction" >
+            <property name="toolTip" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle whether the position and size of the orientation axes can be controlled using mouse interaction in the 3D View window.&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
+            <property name="whatsThis" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle whether the position and size of the orientation axes can be controlled using mouse interaction in the 3D View window.&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
+            <property name="text" >
+             <string>Interactive</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" >
+            <property name="margin" >
+             <number>0</number>
+            </property>
+            <property name="spacing" >
+             <number>6</number>
+            </property>
+            <item>
+             <widget class="pqColorChooserButton" name="OrientationAxesOutlineColor" >
+              <property name="toolTip" >
+               <string>Change the color of the outline for resizing the orientation axes.</string>
+              </property>
+              <property name="whatsThis" >
+               <string>Change the color of the outline for resizing the orientation axes.</string>
+              </property>
+              <property name="text" >
+               <string>Outline Color</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="pqColorChooserButton" name="OrientationAxesLabelColor" >
+              <property name="toolTip" >
+               <string>Change the color of the labels of the orientation axes.</string>
+              </property>
+              <property name="whatsThis" >
+               <string>Change the color of the labels of the orientation axes.</string>
+              </property>
+              <property name="text" >
+               <string>Axis Label Color</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
        </item>
        <item>
         <spacer>
@@ -1439,14 +1529,11 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>pqColorChooserButton</class>
    <extends>QPushButton</extends>
    <header>pqColorChooserButton.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -261,6 +261,18 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
     {
     this->orderedCompositing->setVisible(false);
     }
+
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(this->ViewModule);
+  if(rm)
+    {
+    this->OrientationAxes->setChecked(rm->getOrientationAxesVisibility());
+    this->OrientationAxesInteraction->setCheckState(
+      rm->getOrientationAxesInteractivity()? Qt::Checked : Qt::Unchecked);
+    this->OrientationAxesOutlineColor->setChosenColor(
+      rm->getOrientationAxesOutlineColor());
+    this->OrientationAxesLabelColor->setChosenColor(
+      rm->getOrientationAxesLabelColor());
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -338,6 +350,15 @@ void pq3DViewPropertiesWidgetInternal::accept()
   pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(this->ViewModule);
   if(rm)
     {
+    rm->setOrientationAxesVisibility(this->OrientationAxes->isChecked());
+
+    rm->setOrientationAxesInteractivity(
+      this->OrientationAxesInteraction->checkState() == Qt::Checked);
+    rm->setOrientationAxesOutlineColor(
+      this->OrientationAxesOutlineColor->chosenColor());
+    rm->setOrientationAxesLabelColor(
+      this->OrientationAxesLabelColor->chosenColor());
+
     rm->saveSettings();
     }
 }
