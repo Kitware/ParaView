@@ -2098,4 +2098,37 @@
     </SourceProxy>
   </ProxyGroup>
 
+  <ProxyGroup name="misc">
+    <Proxy name="FileInformationHelper" class="vtkPVFileInformationHelper">
+
+      <StringVectorProperty name="Path" command="SetPath" />
+
+      <IntVectorProperty 
+        name="DirectoryListing" 
+        command="SetDirectoryListing"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="SpecialDirectories"
+        command="SetSpecialDirectories"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="PathSeparator"
+        command="GetPathSeparator"
+        information_only="1"
+        number_of_elements="1" >
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+
+    <!-- End of FileInformationHelper -->
+    </Proxy>
+  </ProxyGroup>
+
 </ServerManagerConfiguration>

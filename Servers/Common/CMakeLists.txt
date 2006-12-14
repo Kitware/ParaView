@@ -16,13 +16,20 @@ SET(Kit_SRCS
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkMPISelfConnection.cxx
+  vtkProcessModuleConnection.cxx
+  vtkProcessModuleConnectionManager.cxx
+  vtkProcessModule.cxx
+  vtkProcessModuleGUIHelper.cxx
   vtkPVArrayInformation.cxx
   vtkPVClassNameInformation.cxx
+  vtkPVClientServerIdCollectionInformation.cxx
   vtkPVCompositeDataInformation.cxx
   vtkPVCreateProcessModule.cxx
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDisplayInformation.cxx
+  vtkPVFileInformation.cxx
+  vtkPVFileInformationHelper.cxx
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
   vtkPVLODPartDisplayInformation.cxx
@@ -38,10 +45,6 @@ SET(Kit_SRCS
   vtkPVTimerInformation.cxx
   vtkPVXMLElement.cxx
   vtkPVXMLParser.cxx
-  vtkProcessModule.cxx
-  vtkProcessModuleConnection.cxx
-  vtkProcessModuleConnectionManager.cxx
-  vtkProcessModuleGUIHelper.cxx
   vtkRemoteConnection.cxx
   vtkSelectionConverter.cxx
   vtkSelectionSerializer.cxx
@@ -51,7 +54,6 @@ SET(Kit_SRCS
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx
-  vtkPVClientServerIdCollectionInformation.cxx
   )
 
 # Abstract and Wrap exclude
