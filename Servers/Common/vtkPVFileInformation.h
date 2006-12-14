@@ -25,7 +25,9 @@
 #define __vtkPVFileInformation_h
 
 #include "vtkPVInformation.h"
+
 class vtkCollection;
+class vtkPVFileInformationSet;
 
 class VTK_EXPORT vtkPVFileInformation : public vtkPVInformation
 {
@@ -98,7 +100,7 @@ protected:
 
   // Goes thru the collection of vtkPVFileInformation objects
   // are creates file groups, if possible. 
-  void OrganizeCollection(vtkCollection* collection);
+  void OrganizeCollection(vtkPVFileInformationSet& vector);
 
   bool DetectType();
   void GetSpecialDirectories();
