@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMatrixWidget );
-vtkCxxRevisionMacro(vtkKWMatrixWidget, "1.5");
+vtkCxxRevisionMacro(vtkKWMatrixWidget, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWMatrixWidget::vtkKWMatrixWidget()
@@ -34,6 +34,8 @@ vtkKWMatrixWidget::vtkKWMatrixWidget()
   this->ReadOnly              = 0;
   this->RestrictElementValue  = vtkKWMatrixWidget::RestrictDouble;
   this->ElementChangedCommand = NULL;
+  this->ElementChangedCommandTrigger      = (vtkKWMatrixWidget::TriggerOnFocusOut | 
+                               vtkKWMatrixWidget::TriggerOnReturnKey);
 }
 
 //----------------------------------------------------------------------------
@@ -196,6 +198,23 @@ void vtkKWMatrixWidget::UpdateWidget()
   this->EntrySet->SetMaximumNumberOfWidgetsInPackingDirection(
     this->NumberOfColumns);
 
+  int entry_trigger = 0;
+  if (this->ElementChangedCommandTrigger & 
+      vtkKWMatrixWidget::TriggerOnFocusOut)
+    {
+    entry_trigger |= vtkKWEntry::TriggerOnFocusOut;
+    }
+  if (this->ElementChangedCommandTrigger & 
+      vtkKWMatrixWidget::TriggerOnReturnKey)
+    {
+    entry_trigger |= vtkKWEntry::TriggerOnReturnKey;
+    }
+  if (this->ElementChangedCommandTrigger & 
+      vtkKWMatrixWidget::TriggerOnAnyChange)
+    {
+    entry_trigger |= vtkKWEntry::TriggerOnAnyChange;
+    }
+
   char command[256];
 
   int nb_requested_entries = this->NumberOfColumns * this->NumberOfRows;
@@ -211,6 +230,7 @@ void vtkKWMatrixWidget::UpdateWidget()
       entry->SetRestrictValue(this->RestrictElementValue);
       sprintf(command, "ElementChangedCallback %d", id);
       entry->SetCommand(this, command);
+      entry->SetCommandTrigger(entry_trigger);
       }
     }
 
@@ -309,6 +329,59 @@ void vtkKWMatrixWidget::SetReadOnly(int arg)
         }
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMatrixWidget::SetElementChangedCommandTrigger(int arg)
+{
+  if (this->ElementChangedCommandTrigger == arg)
+    {
+    return;
+    }
+
+  this->ElementChangedCommandTrigger = arg;
+  this->Modified();
+
+  int entry_trigger = 0;
+  if (this->ElementChangedCommandTrigger & 
+      vtkKWMatrixWidget::TriggerOnFocusOut)
+    {
+    entry_trigger |= vtkKWEntry::TriggerOnFocusOut;
+    }
+  if (this->ElementChangedCommandTrigger & 
+      vtkKWMatrixWidget::TriggerOnReturnKey)
+    {
+    entry_trigger |= vtkKWEntry::TriggerOnReturnKey;
+    }
+  if (this->ElementChangedCommandTrigger & 
+      vtkKWMatrixWidget::TriggerOnAnyChange)
+    {
+    entry_trigger |= vtkKWEntry::TriggerOnAnyChange;
+    }
+
+  if (this->EntrySet->IsCreated())
+    {
+    for (int i = 0; i < this->EntrySet->GetNumberOfWidgets(); i++)
+      {
+      vtkKWEntry *entry = this->EntrySet->GetWidget(i);
+      if (entry)
+        {
+        entry->SetCommandTrigger(entry_trigger);
+        }
+      }
+    }
+}
+
+void vtkKWMatrixWidget::SetElementChangedCommandTriggerToReturnKeyAndFocusOut()
+{ 
+  this->SetElementChangedCommandTrigger(
+    vtkKWMatrixWidget::TriggerOnFocusOut | 
+    vtkKWMatrixWidget::TriggerOnReturnKey); 
+}
+
+void vtkKWMatrixWidget::SetElementChangedCommandTriggerToAnyChange()
+{ 
+  this->SetElementChangedCommandTrigger(vtkKWMatrixWidget::TriggerOnAnyChange); 
 }
 
 //----------------------------------------------------------------------------

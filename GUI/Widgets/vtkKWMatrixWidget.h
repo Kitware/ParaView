@@ -109,6 +109,22 @@ public:
   //ETX
 
   // Description:
+  // Specify when ElementChangedCommand should be invoked. Default to losing
+  // focus and return key in the entry.
+  //BTX
+  enum
+  {
+    TriggerOnFocusOut  = 1,
+    TriggerOnReturnKey = 2,
+    TriggerOnAnyChange = 4
+  };
+  //ETX
+  vtkGetMacro(ElementChangedCommandTrigger, int);
+  virtual void SetElementChangedCommandTrigger(int);
+  virtual void SetElementChangedCommandTriggerToReturnKeyAndFocusOut();
+  virtual void SetElementChangedCommandTriggerToAnyChange();
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -131,6 +147,7 @@ protected:
   int ElementWidth;
   int ReadOnly;
   int RestrictElementValue;
+  int ElementChangedCommandTrigger;
 
   // Description:
   // Create the widget.
