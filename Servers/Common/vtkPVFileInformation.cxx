@@ -43,7 +43,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.2");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -56,6 +56,12 @@ inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
       }
     }
 }
+
+//-----------------------------------------------------------------------------
+class vtkPVFileInformationSet : 
+  public vtkstd::set<vtkSmartPointer<vtkPVFileInformation> >
+{
+};
 
 //-----------------------------------------------------------------------------
 vtkPVFileInformation::vtkPVFileInformation()
@@ -208,10 +214,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
 void vtkPVFileInformation::GetWindowsDirectoryListing()
 {
 #if defined(_WIN32)
-  typedef vtkstd::set< vtkstd::string > DirectoriesType;
-  typedef vtkstd::set< vtkstd::string > FilesType;
-  DirectoriesType directories;
-  FilesType files;
+  vtkPVFileInformationSet info_set;
 
   // Search for all files in the given directory.
   vtkstd::string prefix = this->FullPath;
@@ -241,7 +244,12 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       if(strcmp(data.cFileName, "..") != 0 &&
         strcmp(data.cFileName, ".") != 0)
         {
-        directories.insert(data.cFileName);
+        vtkPVFileInformation* infoD = vtkPVFileInformation::New();
+        infoD->SetName(data.cFileName);
+        infoD->SetFullPath(prefix + data.cFileName);
+        infoD->Type = DIRECTORY;
+        info_set.insert(infoD);
+        infoD->Delete();
         }
       }
     else if((data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) ||
@@ -251,6 +259,12 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
        !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)))
       {
       files.insert(data.cFileName);
+      vtkPVFileInformation* infoF = vtkPVFileInformation::New();
+      infoF->SetName(data.cFileName);
+      infoF->SetFullPath(prefix + data.cFileName);
+      infoF->Type = SINGLE_FILE;
+      info_set.insert(infoF);
+      infoF->Delete();   
       }
 
     // Find the next file.
@@ -274,35 +288,18 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
     vtkErrorMacro("Error calling FindClose.");
     }
 
-  for (DirectoriesType::iterator iterD = directories.begin();
-    iterD != directories.end(); ++iterD)
-    {
-    vtkPVFileInformation* infoD = vtkPVFileInformation::New();
-    infoD->SetName(iterD->c_str());
-    infoD->SetFullPath(prefix + iterD->c_str());
-    infoD->Type = DIRECTORY;
-    this->Contents->AddItem(infoD);
-    infoD->Delete();
-    }
+  this->OrganizeCollection(info_set);
 
-  for (FilesType::iterator iterF = files.begin();
-    iterF != files.end(); ++iterF)
+  for (vtkPVFileInformationSet::iterator iter = info_set.begin();
+    iter != info_set.end(); ++iter)
     {
-    vtkPVFileInformation* infoF = vtkPVFileInformation::New();
-    infoF->SetName(iterF->c_str());
-    infoF->SetFullPath(prefix + iterF->c_str());
-    infoF->Type = SINGLE_FILE;
-    this->Contents->AddItem(infoF);
-    infoF->Delete();   
+    this->Contents->AddItem(*iter);
     }
-
-  this->OrganizeCollection(this->Contents);
 
 #else
   vtkErrorMacro("GetWindowsDirectoryListing cannot be called on non-Windows systems.");
 #endif
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkPVFileInformation::GetDirectoryListing()
@@ -314,11 +311,7 @@ void vtkPVFileInformation::GetDirectoryListing()
 
 #else
 
-  typedef vtkstd::set<vtkstd::string> SetOfStrings;
-  SetOfStrings contents;
-  SetOfStrings directories;
-  SetOfStrings files;
-
+  vtkPVFileInformationSet info_set;
   vtkstd::string prefix = this->FullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
 
@@ -338,54 +331,41 @@ void vtkPVFileInformation::GetDirectoryListing()
       {
       continue;
       }
-    //contents.insert(d->d_name);
     vtkPVFileInformation* info = vtkPVFileInformation::New();
     info->SetName(d->d_name);
     info->SetFullPath((prefix + d->d_name).c_str());
     info->Type = INVALID;
-    this->Contents->AddItem(info);
+    info_set.insert(info);
     info->Delete();
     }
   closedir(dir);
 
-  this->OrganizeCollection(this->Contents);
+  this->OrganizeCollection(info_set);
 
   // Now we detect the file types for items.
   // We dissolve any groups that contain non-file items.
   
-  vtkSmartPointer<vtkCollectionIterator> iter;
-  iter.TakeReference(this->Contents->NewIterator());
- 
-
-  vtkstd::vector<vtkSmartPointer<vtkPVFileInformation> > result;
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  for (vtkPVFileInformationSet::iterator iter = info_set.begin();
+    iter != info_set.end(); ++iter)
     {
-    vtkPVFileInformation* obj = vtkPVFileInformation::SafeDownCast(
-      iter->GetCurrentObject());
+    vtkPVFileInformation* obj = (*iter);
     if (obj->DetectType())
       {
-      result.push_back(obj);
+      this->Contents->AddItem(obj);
       }
     else
       {
-      // Add children to result.
+      // Add children to contents.
       for (int cc=0; cc < obj->Contents->GetNumberOfItems(); cc++)
         {
         vtkPVFileInformation* child = vtkPVFileInformation::SafeDownCast(
           obj->Contents->GetItemAsObject(cc));
         if (child->DetectType())
           {
-          result.push_back(child);
+          this->Contents->AddItem(child);
           }
         }
       }
-    }
-
-  this->Contents->RemoveAllItems();
-  vtkstd::vector<vtkSmartPointer<vtkPVFileInformation> >::iterator iter2;
-  for (iter2 = result.begin(); iter2 != result.end(); ++iter2)
-    {
-    this->Contents->AddItem(*iter2);
     }
 #endif
 }
@@ -435,29 +415,21 @@ bool vtkPVFileInformation::DetectType()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVFileInformation::OrganizeCollection(vtkCollection* collection)
+void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
 {
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVFileInformation> > 
     MapOfStringToInfo;
   MapOfStringToInfo fileGroups;
-
+  
   vtkstd::string prefix = this->FullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
 
-  vtkSmartPointer<vtkCollection> result = vtkSmartPointer<vtkCollection>::New();
-  vtkSmartPointer<vtkCollectionIterator> iter;
-  iter.TakeReference(collection->NewIterator());
-
   vtksys::RegularExpression reg_ex("^(.*)\\.([0-9.]+)$");
 
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  for (vtkPVFileInformationSet::iterator iter = info_set.begin();
+    iter != info_set.end(); )
     {
-    vtkPVFileInformation* obj = vtkPVFileInformation::SafeDownCast(
-      iter->GetCurrentObject());
-    if (!obj || !obj->GetName())
-      {
-      continue;
-      }
+    vtkPVFileInformation* obj = *iter;
 
     if (obj->Type != FILE_GROUP && obj->Type != DIRECTORY 
       && reg_ex.find(obj->GetName()))
@@ -478,10 +450,12 @@ void vtkPVFileInformation::OrganizeCollection(vtkCollection* collection)
         group = fileGroups[groupName];
         }
       group->Contents->AddItem(obj);
+      vtkPVFileInformationSet::iterator prev_iter = iter++;
+      info_set.erase(prev_iter);
       }
     else
       {
-      result->AddItem(obj);
+      ++iter;
       }
     }
 
@@ -494,22 +468,16 @@ void vtkPVFileInformation::OrganizeCollection(vtkCollection* collection)
    vtkPVFileInformation* group = iter2->second;
    if (group->Contents->GetNumberOfItems() > 1)
      {
-     result->AddItem(group);
+     info_set.insert(group);
      }
    else
      {
      for (int cc=0; cc < group->Contents->GetNumberOfItems(); cc++)
        {
-       result->AddItem(group->Contents->GetItemAsObject(cc));
+       info_set.insert(vtkPVFileInformation::SafeDownCast(
+           group->Contents->GetItemAsObject(cc)));
        }
      }
-   }
- collection->RemoveAllItems();
-
- iter.TakeReference(result->NewIterator());
- for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-   {
-   collection->AddItem(iter->GetCurrentObject());
    }
 }
 
