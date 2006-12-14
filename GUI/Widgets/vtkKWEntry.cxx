@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.87");
+vtkCxxRevisionMacro(vtkKWEntry, "1.88");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -98,6 +98,18 @@ void vtkKWEntry::Configure()
     {
     this->SetConfigurationOptionAsInt("-width", this->Width);
     }
+
+  // When the entry is unmapped, trigger the callback as well. Here is
+  // the rationale: a user may have edited the value in the entry but
+  // neither did he press Enter or clicked on any other widget that
+  // made that entry lose its focus. When the user closes the window, or when
+  // the user switch to a different notebook tab than the one in which the 
+  // entry was packled, or when the user skip to a different wizard step
+  // than the one in which the entry was packed, then this entry should
+  // definitely be validated/acknowledged. This is what this event will
+  // take care of.
+
+  this->SetBinding("<Unmap>", this, "ValueCallback");
 
   this->ConfigureValidation();
 }
