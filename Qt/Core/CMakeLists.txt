@@ -41,6 +41,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDisplay.h
   pqFileDialog.h
   pqFileDialogEventTranslator.h
+  pqFileDialogFavoriteModel.h
   pqFileDialogFilter.h
   pqFileDialogModel.h
   pqFlatTreeViewEventTranslator.h
@@ -130,6 +131,8 @@ ADD_LIBRARY(pqCore
   pqFileDialogEventPlayer.h
   pqFileDialogEventTranslator.cxx
   pqFileDialogEventTranslator.h
+  pqFileDialogFavoriteModel.cxx
+  pqFileDialogFavoriteModel.h
   pqFileDialogFilter.cxx
   pqFileDialogFilter.h
   pqFileDialogModel.cxx

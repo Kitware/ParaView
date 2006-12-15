@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFileDialog.h"
 #include "pqFileDialogModel.h"
+#include "pqFileDialogFavoriteModel.h"
 #include "pqFileDialogFilter.h"
 
 #include "ui_pqFileDialog.h"
@@ -93,8 +94,17 @@ namespace {
 class pqFileDialog::pqImplementation
 {
 public:
+  pqFileDialogModel* const Model;
+  pqFileDialogFavoriteModel* const FavoriteModel;
+  pqFileDialogFilter FileFilter;
+  FileMode Mode;
+  Ui::pqFileDialog Ui;
+  QStringList SelectedFiles;
+
+
   pqImplementation(pqServer* server) :
     Model(new pqFileDialogModel(server, NULL)),
+    FavoriteModel(new pqFileDialogFavoriteModel(server, NULL)),
     FileFilter(this->Model),
     Mode(ExistingFile)
   {
@@ -103,32 +113,9 @@ public:
   ~pqImplementation()
   {
     delete this->Model;
+    delete this->FavoriteModel;
   }
-  
-  pqFileDialogModel* const Model;
-  pqFileDialogFilter FileFilter;
-  FileMode Mode;
-  Ui::pqFileDialog Ui;
-  QStringList SelectedFiles;
 
-  // As the user keeps on changing the selection in the dialog box,
-  // we update the set. This does not keep full paths, only names
-  // relactive to current dir.
-  QStringList ActiveSet;
-
-  // Converts the ActiveSet to a ";" separated list
-  // suitable for showing in the file name entry.
-  QString getActiveSetAsString() const
-    {
-    return this->ActiveSet.join(";");
-    }
-
-  // Update the active set using a ";" separated string of
-  // file names.
-  void updateActiveSet( const QString& files)
-    {
-    this->ActiveSet = files.split(";", QString::SkipEmptyParts);
-    }
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -162,7 +149,7 @@ pqFileDialog::pqFileDialog(
   this->Implementation->Ui.Files->setModel(&this->Implementation->FileFilter);
   this->Implementation->Ui.Files->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-  this->Implementation->Ui.Favorites->setModel(this->Implementation->Model->favoriteModel());
+  this->Implementation->Ui.Favorites->setModel(this->Implementation->FavoriteModel);
   this->Implementation->Ui.Favorites->setSelectionBehavior(QAbstractItemView::SelectRows);
 
   this->setFileMode(ExistingFile);
@@ -298,10 +285,12 @@ QStringList pqFileDialog::getSelectedFiles()
 //-----------------------------------------------------------------------------
 void pqFileDialog::accept()
 {
+  QStringList activeSet = this->Implementation->Ui.FileName->text().split(' ');
   QStringList fullPaths;
-  foreach (QString name, this->Implementation->ActiveSet)
+  
+  foreach (QString name, activeSet)
     {
-    fullPaths << this->Implementation->Model->getFilePath(name);
+    fullPaths.append(this->Implementation->Model->absoluteFilePath(name));
     }
   this->acceptInternal(fullPaths);
 }
@@ -311,10 +300,13 @@ void pqFileDialog::onModelReset()
 {
   this->Implementation->Ui.Parents->clear();
   
-  const QStringList parents = this->Implementation->Model->getParentPaths(this->Implementation->Model->getCurrentPath());
+  QString currentPath = this->Implementation->Model->getCurrentPath();
+  QChar separator = this->Implementation->Model->separator();
+  QStringList parents = currentPath.split(separator);
+
   for(int i = 0; i != parents.size(); ++i)
     {
-    this->Implementation->Ui.Parents->addItem(parents[i]);
+    this->Implementation->Ui.Parents->addItem(separator + parents[i]);
     }
     
   this->Implementation->Ui.Parents->setCurrentIndex(parents.size() - 1);
@@ -373,14 +365,9 @@ void pqFileDialog::onClickedFile(const QModelIndex&)
 //-----------------------------------------------------------------------------
 void pqFileDialog::onActivateFavorite(const QModelIndex& index)
 {
-  QStringList selected_files;
-  selected_files << this->Implementation->Model->getFilePaths(index);
-  if(selected_files.empty())
-    return;
-
-  QString file = selected_files.first();
-  if(this->Implementation->Model->dirExists(file))
+  if(this->Implementation->FavoriteModel->isDir(index))
     {
+    QString file = this->Implementation->FavoriteModel->filePath(index);
     this->onNavigate(file);
     this->Implementation->Ui.FileName->selectAll();
     }
@@ -424,12 +411,10 @@ void pqFileDialog::onActivateFile(const QModelIndex& index)
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::onTextEdited(const QString& user_input)
+void pqFileDialog::onTextEdited(const QString&)
 {
   this->Implementation->Ui.Favorites->clearSelection();
   this->Implementation->Ui.Files->clearSelection();
-
-  this->Implementation->updateActiveSet(user_input);
 }
 
 //-----------------------------------------------------------------------------
@@ -555,7 +540,7 @@ void pqFileDialog::fileSelectionChanged()
 {
   // Selection changed, update the FileName entry box
   // to reflect the current selection.
-  this->Implementation->ActiveSet.clear();
+  QString fileString;
 
   const QModelIndexList indices =
     this->Implementation->Ui.Files->selectionModel()->selectedIndexes();
@@ -569,10 +554,12 @@ void pqFileDialog::fileSelectionChanged()
       
     if(index.model() == &this->Implementation->FileFilter)
       {
-      this->Implementation->ActiveSet <<
-        this->Implementation->FileFilter.data(index).toString();
+      fileString += this->Implementation->FileFilter.data(index).toString() +
+                    " ";
       }
     }
-  this->Implementation->Ui.FileName->setText(
-    this->Implementation->getActiveSetAsString());
+
+
+  this->Implementation->Ui.FileName->setText(fileString);
 }
+

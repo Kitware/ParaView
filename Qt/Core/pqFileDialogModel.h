@@ -63,40 +63,54 @@ public:
 
   /// Returns the path that will be automatically displayed when the file dialog is opened
   QString getStartPath();
+  
   /// Sets the path that the file dialog will display
   void setCurrentPath(const QString&);
+  
+  /// Returns the path the the file dialog will display
+  QString getCurrentPath();
+  
   /// Changes the current path to its immediate parent path (this is a no-op if
   /// the current path is already at the root of the filesystem)
   void setParentPath();
-  /// Returns the path the the file dialog will display
-  QString getCurrentPath();
+
   /// Return true iff the given row is a directory
   bool isDir(const QModelIndex&);
-  /// Returns the set of file paths associated with the given row 
-  /// (a row may represent one-to-many paths if grouping is implemented)
-  QStringList getFilePaths(const QModelIndex&);
-  /// Converts a file into an absolute path
-  QString getFilePath(const QString&);
-  /// Returns all of the paths that are parents of the given path 
-  /// (this is handled by the back-end so it can deal with 
-  /// issues of delimiters, symlinks, multi-root filesystems, etc)
-  QStringList getParentPaths(const QString&);
+  
   /// Returns whether the file exists
   bool fileExists(const QString&);
+  
   /// Returns whether a directory exists
   bool dirExists(const QString&);
-
-  // overloads for QAbstractItemModel
-  int columnCount(const QModelIndex&) const;
-  QVariant data(const QModelIndex & idx, int role) const;
-  QModelIndex index(int row, int column, const QModelIndex&) const;
-  QModelIndex parent(const QModelIndex&) const;
-  int rowCount(const QModelIndex&) const;
-  bool hasChildren(const QModelIndex& p) const;
-  QVariant headerData(int section, Qt::Orientation, int role) const;
   
-  /// return the model for favorites
-  QAbstractItemModel* favoriteModel();
+  /// returns the path delimiter, could be \ or / depending on the platform
+  /// this model is browsing
+  QChar separator() const;
+
+  /// return the absolute path for this file
+  QString absoluteFilePath(const QString&);
+  
+  /// Returns the set of file paths associated with the given row 
+  /// (a row may represent one-to-many paths if grouping is implemented)
+  /// this also resolved symlinks if necessary
+  QStringList getFilePaths(const QModelIndex&);
+  
+  // overloads for QAbstractItemModel
+
+  /// return the number of columns in the model
+  int columnCount(const QModelIndex&) const;
+  /// return the data for an item
+  QVariant data(const QModelIndex & idx, int role) const;
+  /// return an index from another index
+  QModelIndex index(int row, int column, const QModelIndex&) const;
+  /// return the parent index of an index
+  QModelIndex parent(const QModelIndex&) const;
+  /// return the number of rows under a given index
+  int rowCount(const QModelIndex&) const;
+  /// return whether a given index has children
+  bool hasChildren(const QModelIndex& p) const;
+  /// returns header data
+  QVariant headerData(int section, Qt::Orientation, int role) const;
   
 private:
   class pqImplementation;

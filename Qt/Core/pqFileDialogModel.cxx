@@ -112,171 +112,6 @@ bool CaseInsensitiveSort(const QString& A, const QString& B)
   return A.toLower() < B.toLower();
 }
 
-//////////////////////////////////////////////////////////////////
-// FavoriteModel
-
-class pqFavoriteModel :
-  public QAbstractItemModel
-{
-public:
-  pqFavoriteModel(pqServer* server)
-  {
-  vtkPVFileInformation* information = vtkPVFileInformation::New();
-
-  if(server)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();  
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-
-    vtkSMProxy* helper = pxm->NewProxy("misc","FileInformationHelper");
-    helper->SetConnectionID(server->GetConnectionID());
-    helper->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
-    pqSMAdaptor::setElementProperty(helper->GetProperty("SpecialDirectories"),
-                                    true);
-    helper->UpdateVTKObjects();
-
-    pm->GatherInformation(server->GetConnectionID(),
-      vtkProcessModule::DATA_SERVER, information, helper->GetID(0));
-
-    helper->Delete();
-    }
-  else
-    {
-    vtkPVFileInformationHelper* helper = vtkPVFileInformationHelper::New();
-    helper->SetSpecialDirectories(1);
-    information->CopyFromObject(helper);
-    helper->Delete();
-    }
-  
-  vtkCollectionIterator* iter = information->GetContents()->NewIterator();
-  for (iter->InitTraversal(); 
-       !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-    vtkPVFileInformation* cur_info = vtkPVFileInformation::SafeDownCast(
-      iter->GetCurrentObject());
-    if (!cur_info)
-      {
-      continue;
-      }
-    int type = cur_info->GetType();
-    this->FavoriteList.push_back(FileInfo(
-        cur_info->GetName(), cur_info->GetFullPath(),
-        (type == vtkPVFileInformation::DIRECTORY || 
-          type == vtkPVFileInformation::DRIVE),
-        (type == vtkPVFileInformation::DRIVE)));
-    }
-
-  iter->Delete();
-  information->Delete();
-  }
-
-  QStringList getFilePaths(const QModelIndex& Index)
-  {
-    QStringList results;
-    
-    if(Index.row() < this->FavoriteList.size())
-      {
-      FileInfo& file = this->FavoriteList[Index.row()];
-      results.push_back(file.filePath());
-      }
-    
-    return results;
-  }
-
-  bool isDir(const QModelIndex& Index)
-  {
-    if(Index.row() >= this->FavoriteList.size())
-      return false;
-      
-    FileInfo& file = this->FavoriteList[Index.row()];
-    return file.isDir();
-  }
-
-  virtual int columnCount(const QModelIndex& /*parent*/) const
-  {
-    return 1;
-  }
-  
-  virtual QVariant data(const QModelIndex& idx, int role) const
-  {
-    if(!idx.isValid())
-      return QVariant();
-
-    if(idx.row() >= this->FavoriteList.size())
-      return QVariant();
-
-    const FileInfo& file = this->FavoriteList[idx.row()];
-    switch(role)
-      {
-      case Qt::DisplayRole:
-        switch(idx.column())
-          {
-          case 0:
-            return file.label();
-          }
-      case Qt::DecorationRole:
-        switch(idx.column())
-          {
-          case 0:
-            if(file.isRoot())
-              {
-              return Icons()->icon(QFileIconProvider::Drive);
-              }
-            if(file.isDir())
-              {
-              return Icons()->icon(QFileIconProvider::Folder);
-              }
-            return Icons()->icon(QFileIconProvider::File);
-          }
-      }
-      
-    return QVariant();
-  }
-  
-  virtual QModelIndex index(int row, int column, 
-                            const QModelIndex& /*parent*/) const
-  {
-    return createIndex(row, column);
-  }
-  
-  virtual QModelIndex parent(const QModelIndex& /*index*/) const
-  {
-    return QModelIndex();
-  }
-  
-  virtual int rowCount(const QModelIndex& /*parent*/) const
-  {
-    return this->FavoriteList.size();
-  }
-  
-  virtual bool hasChildren(const QModelIndex& p) const
-  {
-    if(!p.isValid())
-      return true;
-      
-    return false;
-  }
-  
-  virtual QVariant headerData(int section, 
-                              Qt::Orientation /*orientation*/, int role) const
-  {
-    switch(role)
-      {
-      case Qt::DisplayRole:
-        switch(section)
-          {
-          case 0:
-            return tr("Favorites");
-          }
-      }
-      
-    return QVariant();
-  }
- 
-  QList<FileInfo> FavoriteList;
-};
-
-
 } // namespace
 
 /////////////////////////////////////////////////////////////////////////
@@ -287,8 +122,7 @@ class pqFileDialogModel::pqImplementation
 public:
   pqImplementation(pqServer* server) :
     Separator(0),
-    Server(server),
-    FavoriteModel(new pqFavoriteModel(server))
+    Server(server)
   {
   
     // if we are doing remote browsing
@@ -320,7 +154,6 @@ public:
   
   ~pqImplementation()
   {
-    delete this->FavoriteModel;
   }
 
   /// Removes multiple-slashes, ".", and ".." from the given path string,
@@ -440,8 +273,6 @@ public:
   /// Caches information about the set of files within the current path.
   QList<FileInfo> FileList;
 
-  pqFavoriteModel* const FavoriteModel;
-  
   /// The last path accessed by this file dialog model
   /// used to remember paths across the session
   /// TODO:  this will not work if going between multiple servers
@@ -521,7 +352,6 @@ void pqFileDialogModel::setCurrentPath(const QString& Path)
                                     0);
     helper->UpdateVTKObjects();
     this->Implementation->UpdateInformation();
-    this->Implementation->Update(cPath, this->Implementation->FileInformation);
     }
   else
     {
@@ -532,8 +362,9 @@ void pqFileDialogModel::setCurrentPath(const QString& Path)
     helper->SetPath(Path.toAscii().data());
     helper->SetSpecialDirectories(0);
     this->Implementation->FileInformation->CopyFromObject(helper);
-    this->Implementation->Update(cPath, this->Implementation->FileInformation);
   }
+  
+  this->Implementation->Update(cPath, this->Implementation->FileInformation);
 
   this->reset();
 }
@@ -549,29 +380,30 @@ QString pqFileDialogModel::getCurrentPath()
   return this->Implementation->CurrentPath;
 }
 
+QString pqFileDialogModel::absoluteFilePath(const QString& path)
+{
+  if(path.isEmpty())
+    {
+    return QString();
+    }
+
+  if(path.at(0) == this->separator() ||
+     path.indexOf(QRegExp("[a-zA-Z]:")) == 0)
+    {
+    return path;
+    }
+
+  QString f = this->getCurrentPath() + this->separator() + path;
+  return this->Implementation->cleanPath(f);
+}
+
 QStringList pqFileDialogModel::getFilePaths(const QModelIndex& Index)
 {
   if(Index.model() == this)
     {
     return this->Implementation->getFilePaths(Index);
     }
-  
-  if(Index.model() == this->Implementation->FavoriteModel)
-    {
-    return this->Implementation->FavoriteModel->getFilePaths(Index);  
-    }
-
   return QStringList();
-}
-
-QString pqFileDialogModel::getFilePath(const QString& Path)
-{
-  /** \todo Use the server's definition of absolute */
-  if(QDir::isAbsolutePath(Path))
-    return Path;
-
-  return this->Implementation->CurrentPath + 
-         this->Implementation->Separator + Path;
 }
 
 bool pqFileDialogModel::isDir(const QModelIndex& Index)
@@ -579,21 +411,7 @@ bool pqFileDialogModel::isDir(const QModelIndex& Index)
   if(Index.model() == this)
     return this->Implementation->isDir(Index);
   
-  if(Index.model() == this->Implementation->FavoriteModel)
-    return this->Implementation->FavoriteModel->isDir(Index);  
-
   return false;    
-}
-
-QStringList pqFileDialogModel::getParentPaths(const QString& Path)
-{
-  QStringList paths = Path.split(this->Implementation->Separator);
-  for(int i = 1; i < paths.size(); ++i)
-    {
-    paths[i] = paths[i-1] + this->Implementation->Separator + paths[i];
-    }
-
-  return paths;
 }
 
 bool pqFileDialogModel::fileExists(const QString& FilePath)
@@ -608,12 +426,6 @@ bool pqFileDialogModel::fileExists(const QString& FilePath)
       helper->GetProperty("DirectoryListing"), 0);
     helper->UpdateVTKObjects();
     this->Implementation->UpdateInformation();
-
-    if (this->Implementation->FileInformation->GetType() ==
-      vtkPVFileInformation::SINGLE_FILE)
-      {
-      return true;
-      }
     }
   else
     {
@@ -623,12 +435,12 @@ bool pqFileDialogModel::fileExists(const QString& FilePath)
     helper->SetSpecialDirectories(0);
     helper->SetDirectoryListing(0);
     this->Implementation->FileInformation->CopyFromObject(helper);
-
-    if (this->Implementation->FileInformation->GetType() ==
-      vtkPVFileInformation::SINGLE_FILE)
-      {
-      return true;
-      }
+    }
+  
+  if (this->Implementation->FileInformation->GetType() ==
+    vtkPVFileInformation::SINGLE_FILE)
+    {
+    return true;
     }
 
   /*
@@ -661,13 +473,6 @@ bool pqFileDialogModel::dirExists(const QString& dir)
     helper->UpdateVTKObjects();
     this->Implementation->UpdateInformation();
 
-    if (this->Implementation->FileInformation->GetType() ==
-      vtkPVFileInformation::DIRECTORY || 
-      this->Implementation->FileInformation->GetType() == 
-      vtkPVFileInformation::DRIVE)
-      {
-      return true;
-      }
     }
   else
     {
@@ -677,14 +482,14 @@ bool pqFileDialogModel::dirExists(const QString& dir)
     helper->SetSpecialDirectories(0);
     helper->SetDirectoryListing(0);
     this->Implementation->FileInformation->CopyFromObject(helper);
-
-    if (this->Implementation->FileInformation->GetType() ==
-      vtkPVFileInformation::DIRECTORY || 
-      this->Implementation->FileInformation->GetType() == 
-      vtkPVFileInformation::DRIVE)
-      {
-      return true;
-      }
+    }
+  
+  if (this->Implementation->FileInformation->GetType() ==
+    vtkPVFileInformation::DIRECTORY || 
+    this->Implementation->FileInformation->GetType() == 
+    vtkPVFileInformation::DRIVE)
+    {
+    return true;
     }
 
   /*
@@ -704,9 +509,9 @@ bool pqFileDialogModel::dirExists(const QString& dir)
   return false;
 }
 
-QAbstractItemModel* pqFileDialogModel::favoriteModel()
+QChar pqFileDialogModel::separator() const
 {
-  return this->Implementation->FavoriteModel;
+  return this->Implementation->Separator;
 }
 
 int pqFileDialogModel::columnCount(const QModelIndex& /*idx*/) const
