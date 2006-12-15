@@ -25,7 +25,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.1");
+vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.2");
 vtkStandardNewMacro(vtkPVInteractorStyle);
 
 //-------------------------------------------------------------------------
@@ -34,6 +34,8 @@ vtkPVInteractorStyle::vtkPVInteractorStyle()
   this->UseTimers = 0;
   this->CameraManipulators = vtkCollection::New();
   this->Current = NULL;
+  this->CenterOfRotation[0] = this->CenterOfRotation[1]
+    = this->CenterOfRotation[2] = 0;
  }
 
 //-------------------------------------------------------------------------
@@ -70,22 +72,6 @@ void vtkPVInteractorStyle::OnRightButtonDown()
                      this->Interactor->GetControlKey());
 }
 
-//----------------------------------------------------------------------------
-void vtkPVInteractorStyle::SetCenterOfRotation(float x, float y, float z)
-{
-  vtkCameraManipulator *m;
-
-  vtkCollectionIterator *it = this->CameraManipulators->NewIterator();
-  it->InitTraversal();
-  while ( !it->IsDoneWithTraversal() )
-    {
-    m = static_cast<vtkCameraManipulator*>(it->GetCurrentObject());
-    m->SetCenter(x, y, z);
-    it->GoToNextItem();
-    }
-  it->Delete();
-}
-
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
 {
@@ -120,6 +106,7 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
       this->Current = manipulator;
       this->Current->Register(this);
       this->InvokeEvent(vtkCommand::StartInteractionEvent);
+      this->Current->SetCenter(this->CenterOfRotation);
       this->Current->StartInteraction();
       this->Current->OnButtonDown(this->Interactor->GetEventPosition()[0],
                                   this->Interactor->GetEventPosition()[1],
@@ -213,5 +200,10 @@ void vtkPVInteractorStyle::ResetLights()
 void vtkPVInteractorStyle::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "CenterOfRotation: "
+    << this->CenterOfRotation[0] << ", "
+    << this->CenterOfRotation[1] << ", "
+    << this->CenterOfRotation[2] << endl;
   os << indent << "CameraManipulators: " << this->CameraManipulators << endl;
+
 }
