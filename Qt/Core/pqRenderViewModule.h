@@ -144,7 +144,7 @@ public slots:
   // one should have approriate interaction style (vtkPVInteractorStyle subclass)
   // and camera manipulators that use the center of rotation. 
   // They are setup correctly by default.
-  void setCenterOfRotation(double x, double y, double x);
+  void setCenterOfRotation(double x, double y, double z);
   void setCenterOfRotation(double xyz[3])
     {
     this->setCenterOfRotation(xyz[0], xyz[1], xyz[2]);

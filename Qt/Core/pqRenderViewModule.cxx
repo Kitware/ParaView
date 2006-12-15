@@ -405,7 +405,6 @@ void pqRenderViewModule::resetCamera()
 void pqRenderViewModule::resetCenterOfRotation()
 {
   // Update center of rotation.
-//  this->Internal->RenderModuleProxy->SynchronizeCameraProperties();
   this->Internal->RenderModuleProxy->UpdatePropertyInformation();
   QList<QVariant> values = 
     pqSMAdaptor::getMultipleElementProperty(
