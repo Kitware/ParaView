@@ -64,6 +64,8 @@ public:
   const unsigned int getWarningCount();
   /// Returns the number of generic warning messages received
   const unsigned int getGenericWarningCount();
+  /// If active signals are emitted on messages.
+  void setActive(bool active);
 
 signals:
   /// Signal emitted by VTK messages
@@ -90,6 +92,8 @@ private:
   virtual void DisplayErrorText(const char*);
   virtual void DisplayWarningText(const char*);
   virtual void DisplayGenericWarningText(const char*);
+  
+  bool Active;
 };
 
 #endif // !_pqOutputWindowAdapter_h

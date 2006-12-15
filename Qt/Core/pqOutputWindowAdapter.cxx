@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkObjectFactory.h>
 
-vtkCxxRevisionMacro(pqOutputWindowAdapter, "1.1");
+vtkCxxRevisionMacro(pqOutputWindowAdapter, "1.2");
 vtkStandardNewMacro(pqOutputWindowAdapter);
 
 pqOutputWindowAdapter::pqOutputWindowAdapter() :
@@ -43,6 +43,7 @@ pqOutputWindowAdapter::pqOutputWindowAdapter() :
   WarningCount(0),
   GenericWarningCount(0)
 {
+  this->Active=true;
 }
 
 pqOutputWindowAdapter::~pqOutputWindowAdapter()
@@ -69,26 +70,43 @@ const unsigned int pqOutputWindowAdapter::getGenericWarningCount()
   return this->GenericWarningCount;
 }
 
+void pqOutputWindowAdapter::setActive(bool active)
+{
+  this->Active=active;
+}
+
 void pqOutputWindowAdapter::DisplayText(const char* text)
 {
   ++this->TextCount;
-  emit displayText(text);
+  if(this->Active)
+    {
+    emit displayText(text);
+    }
 }
 
 void pqOutputWindowAdapter::DisplayErrorText(const char* text)
 {
   ++this->ErrorCount;
-  emit displayErrorText(text);
+  if(this->Active)
+    {
+    emit displayErrorText(text);
+    }
 }
 
 void pqOutputWindowAdapter::DisplayWarningText(const char* text)
 {
   ++this->WarningCount;
-  emit displayWarningText(text);
+  if(this->Active)
+    {
+    emit displayWarningText(text);
+    }
 }
 
 void pqOutputWindowAdapter::DisplayGenericWarningText(const char* text)
 {
   ++this->GenericWarningCount;
-  emit displayGenericWarningText(text);
+  if(this->Active)
+    {
+    emit displayGenericWarningText(text);
+    }
 }
