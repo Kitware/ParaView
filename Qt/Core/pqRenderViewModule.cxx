@@ -238,6 +238,8 @@ void pqRenderViewModule::viewModuleInit()
 
   this->Internal->CenterAxesProxy.TakeReference(
     vtkSMObject::GetProxyManager()->NewProxy("axes","Axes"));
+  this->Internal->CenterAxesProxy->SetConnectionID(
+    this->Internal->RenderModuleProxy->GetConnectionID());
   QList<QVariant> scaleValues;
   scaleValues << .25 << .25 << .25;
   pqSMAdaptor::setMultipleElementProperty(
