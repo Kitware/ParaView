@@ -306,7 +306,16 @@ void pqFileDialog::onModelReset()
 
   for(int i = 0; i != parents.size(); ++i)
     {
-    this->Implementation->Ui.Parents->addItem(separator + parents[i]);
+    QString str;
+    for(int j=0; j<=i; j++)
+      {
+      str += parents[j];
+      if(separator != '/' && j == 0)
+        {
+        str += separator;
+        }
+      }
+    this->Implementation->Ui.Parents->addItem(str);
     }
     
   this->Implementation->Ui.Parents->setCurrentIndex(parents.size() - 1);
