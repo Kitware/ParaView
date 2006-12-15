@@ -309,11 +309,7 @@ void pqFileDialog::onModelReset()
     QString str;
     for(int j=0; j<=i; j++)
       {
-      str += parents[j];
-      if(separator != '/' && j == 0)
-        {
-        str += separator;
-        }
+      str += parents[j] + separator;
       }
     this->Implementation->Ui.Parents->addItem(str);
     }
