@@ -553,7 +553,7 @@ QStringList pqFileDialogModel::getFilePaths(const QModelIndex& Index)
 {
   if(Index.model() == this)
     {
-    return this->getFilePaths(Index);
+    return this->Implementation->getFilePaths(Index);
     }
   
   if(Index.model() == this->Implementation->FavoriteModel)
