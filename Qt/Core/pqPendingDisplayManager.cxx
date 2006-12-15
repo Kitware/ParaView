@@ -41,10 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // pq includes
 #include "pqApplicationCore.h"
 #include "pqConsumerDisplay.h"
+#include "pqGenericViewModule.h"
 #include "pqPendingDisplayUndoElement.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineFilter.h"
-#include "pqRenderViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 
@@ -135,13 +135,6 @@ void pqPendingDisplayManager::createPendingDisplays(pqGenericViewModule* view)
       }
     view->render();
 
-    pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
-    if (rm && pqApplicationCore::instance()->getServerManagerModel()
-      ->getNumberOfSources() == 1)
-      {
-      rm->resetCamera();
-      }
-    
     // For every pending display we create, we push an undoelement
     // nothing the creation of the pending display. 
     // This ensures that when this step is undone, the source for

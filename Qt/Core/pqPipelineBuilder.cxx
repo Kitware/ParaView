@@ -286,9 +286,9 @@ vtkSMProxy* pqPipelineBuilder::createPipelineProxy(const char* xmlgroup,
 
 //-----------------------------------------------------------------------------
 pqConsumerDisplay* pqPipelineBuilder::createDisplay(pqPipelineSource* src,
-  pqGenericViewModule* renModule)
+  pqGenericViewModule* viewModule)
 {
-  if (!src || !renModule )
+  if (!src || !viewModule )
     {
     qCritical() <<"Missing required attribute.";
     return NULL;
@@ -308,7 +308,16 @@ pqConsumerDisplay* pqPipelineBuilder::createDisplay(pqPipelineSource* src,
     this->UndoStack->BeginUndoSet(label);
     }
   pqConsumerDisplay* display = 
-    this->createDisplayProxyInternal(proxy, renModule->getViewModuleProxy());
+    this->createDisplayProxyInternal(proxy, viewModule->getViewModuleProxy());
+
+  pqRenderViewModule* renModule = 
+    qobject_cast<pqRenderViewModule*>(viewModule);
+  if (renModule && renModule->getDisplayCount() == 1)
+    {
+    renModule->resetCamera();
+    renModule->resetCenterOfRotation();
+    }
+
   if (this->UndoStack)
     {
     this->UndoStack->EndUndoSet();

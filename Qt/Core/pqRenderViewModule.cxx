@@ -42,10 +42,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkTrackballPan.h"
-#include "vtkSMIntVectorProperty.h"
 
 // Qt includes.
 #include <QFileInfo>
@@ -125,7 +126,8 @@ public:
   vtkSmartPointer<pqRenderViewProxy> RenderViewProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   vtkSmartPointer<vtkSMRenderModuleProxy> RenderModuleProxy;
-  vtkSmartPointer<vtkPVAxesWidget> AxesWidget;
+  vtkSmartPointer<vtkPVAxesWidget> OrientationAxesWidget;
+  vtkSmartPointer<vtkSMProxy> CenterAxesProxy;
   pqUndoStack* UndoStack;
   int DefaultBackground[3];
 
@@ -134,7 +136,7 @@ public:
     this->Viewport = 0;
     this->RenderViewProxy = vtkSmartPointer<pqRenderViewProxy>::New();
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-    this->AxesWidget = vtkSmartPointer<vtkPVAxesWidget>::New();
+    this->OrientationAxesWidget = vtkSmartPointer<vtkPVAxesWidget>::New();
     this->UndoStack = new pqUndoStack(true);
     this->DefaultBackground[0] = 84;
     this->DefaultBackground[1] = 89;
@@ -165,6 +167,8 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   RenderModules.insert(this);
 
   this->Internal->Viewport->installEventFilter(this);
+
+  this->ResetCenterWithCamera = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -225,12 +229,22 @@ void pqRenderViewModule::viewModuleInit()
   iren->SetPVRenderView(this->Internal->RenderViewProxy);
 
   // Init axes actor.
-  this->Internal->AxesWidget->SetParentRenderer(
+  this->Internal->OrientationAxesWidget->SetParentRenderer(
     this->Internal->RenderModuleProxy->GetRenderer());
-  this->Internal->AxesWidget->SetViewport(0, 0, 0.25, 0.25);
-  this->Internal->AxesWidget->SetInteractor(iren);
-  this->Internal->AxesWidget->SetEnabled(1);
-  this->Internal->AxesWidget->SetInteractive(0);
+  this->Internal->OrientationAxesWidget->SetViewport(0, 0, 0.25, 0.25);
+  this->Internal->OrientationAxesWidget->SetInteractor(iren);
+  this->Internal->OrientationAxesWidget->SetEnabled(1);
+  this->Internal->OrientationAxesWidget->SetInteractive(0);
+
+  this->Internal->CenterAxesProxy.TakeReference(
+    vtkSMObject::GetProxyManager()->NewProxy("axes","Axes"));
+  QList<QVariant> scaleValues;
+  scaleValues << .25 << .25 << .25;
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Internal->CenterAxesProxy->GetProperty("Scale"),
+    scaleValues);
+
+  this->Internal->RenderModuleProxy->ResetCamera();
 
   // Set up interactor styles.
   vtkPVInteractorStyle* style = vtkPVInteractorStyle::New();
@@ -276,6 +290,10 @@ void pqRenderViewModule::viewModuleInit()
   this->Internal->VTKConnect->Connect(
     this->Internal->RenderModuleProxy, vtkCommand::ModifiedEvent,
     this->Internal->Viewport, SLOT(markCachedImageAsDirty()));  
+
+  this->Internal->VTKConnect->Connect(
+    this->Internal->RenderModuleProxy, vtkCommand::ResetCameraEvent,
+    this, SLOT(onResetCameraEvent()));
 
   iren->Enable();
 
@@ -364,6 +382,15 @@ void pqRenderViewModule::render()
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderViewModule::onResetCameraEvent()
+{
+  if (this->ResetCenterWithCamera)
+    {
+    this->resetCenterOfRotation();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqRenderViewModule::resetCamera()
 {
   if (this->Internal->RenderModuleProxy)
@@ -371,6 +398,19 @@ void pqRenderViewModule::resetCamera()
     this->Internal->RenderModuleProxy->ResetCamera();
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::resetCenterOfRotation()
+{
+  // Update center of rotation.
+  this->Internal->RenderModuleProxy->SynchronizeCameraProperties();
+  QList<QVariant> values = 
+    pqSMAdaptor::getMultipleElementProperty(
+      this->Internal->RenderModuleProxy->GetProperty("CameraFocalPoint"));
+  this->setCenterOfRotation(
+    values[0].toDouble(), values[1].toDouble(), values[2].toDouble());
+}
+
 
 //-----------------------------------------------------------------------------
 bool pqRenderViewModule::saveImage(int width, int height, const QString& filename)
@@ -444,9 +484,11 @@ void pqRenderViewModule::setDefaults()
   pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 2, bg[2]/255.0);
 
   this->restoreSettings();
-  
-  proxy->UpdateVTKObjects();
+ 
+  pqSMAdaptor::addProxyProperty(proxy->GetProperty("Displays"),
+    this->Internal->CenterAxesProxy);
 
+  proxy->UpdateVTKObjects();
 }
 
 static const char* pqRenderViewModuleSettings[] = {
@@ -538,6 +580,19 @@ void pqRenderViewModule::restoreSettings()
     this->setOrientationAxesLabelColor(
       settings->value(key_prefix + "LabelColor").value<QColor>());
     }
+  
+  // Center Axes settings.
+  key_prefix = "renderModule/CenterAxes/";
+  if (settings->contains(key_prefix + "Visibility"))
+    {
+    this->setCenterAxesVisibility(
+      settings->value(key_prefix + "Visibility").toBool());
+    }
+  if (settings->contains(key_prefix + "ResetCenterWithCamera"))
+    {
+    this->ResetCenterWithCamera =
+      settings->value(key_prefix + "ResetCenterWithCamera").toBool();
+    }
 }
 
 void pqRenderViewModule::saveSettings()
@@ -575,36 +630,43 @@ void pqRenderViewModule::saveSettings()
     this->getOrientationAxesOutlineColor());
   settings->setValue(key_prefix + "LabelColor",
     this->getOrientationAxesLabelColor());
+
+  // Center Axes settings.
+  key_prefix = "renderModule/CenterAxes/";
+  settings->setValue(key_prefix + "Visibility",
+    this->getCenterAxesVisibility());
+  settings->setValue(key_prefix + "ResetCenterWithCamera",
+    this->ResetCenterWithCamera);
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::setOrientationAxesVisibility(bool visible)
 {
-  this->Internal->AxesWidget->SetEnabled(visible? 1: 0);
+  this->Internal->OrientationAxesWidget->SetEnabled(visible? 1: 0);
 }
 
 //-----------------------------------------------------------------------------
 bool pqRenderViewModule::getOrientationAxesVisibility() const
 {
-  return this->Internal->AxesWidget->GetEnabled();
+  return this->Internal->OrientationAxesWidget->GetEnabled();
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::setOrientationAxesInteractivity(bool interactive)
 {
-  this->Internal->AxesWidget->SetInteractive(interactive? 1: 0);
+  this->Internal->OrientationAxesWidget->SetInteractive(interactive? 1: 0);
 }
 
 //-----------------------------------------------------------------------------
 bool pqRenderViewModule::getOrientationAxesInteractivity() const
 {
-  return this->Internal->AxesWidget->GetInteractive();
+  return this->Internal->OrientationAxesWidget->GetInteractive();
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::setOrientationAxesOutlineColor(const QColor& color)
 {
-  this->Internal->AxesWidget->SetOutlineColor(
+  this->Internal->OrientationAxesWidget->SetOutlineColor(
     color.redF(), color.greenF(), color.blueF());
 }
 
@@ -612,7 +674,7 @@ void pqRenderViewModule::setOrientationAxesOutlineColor(const QColor& color)
 QColor pqRenderViewModule::getOrientationAxesOutlineColor() const
 {
   QColor color;
-  double* dcolor = this->Internal->AxesWidget->GetOutlineColor();
+  double* dcolor = this->Internal->OrientationAxesWidget->GetOutlineColor();
   color.setRgbF(dcolor[0], dcolor[1], dcolor[2]);
   return color;
 }
@@ -620,7 +682,7 @@ QColor pqRenderViewModule::getOrientationAxesOutlineColor() const
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::setOrientationAxesLabelColor(const QColor& color)
 {
-  this->Internal->AxesWidget->SetAxisLabelColor(
+  this->Internal->OrientationAxesWidget->SetAxisLabelColor(
     color.redF(), color.greenF(), color.blueF());
 }
 
@@ -628,9 +690,76 @@ void pqRenderViewModule::setOrientationAxesLabelColor(const QColor& color)
 QColor pqRenderViewModule::getOrientationAxesLabelColor() const
 {
   QColor color;
-  double* dcolor = this->Internal->AxesWidget->GetAxisLabelColor();
+  double* dcolor = this->Internal->OrientationAxesWidget->GetAxisLabelColor();
   color.setRgbF(dcolor[0], dcolor[1], dcolor[2]);
   return color;
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::setCenterOfRotation(double x, double y, double z)
+{
+  vtkPVGenericRenderWindowInteractor* iren =
+    vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      this->Internal->RenderModuleProxy->GetInteractor());
+  vtkPVInteractorStyle* style = vtkPVInteractorStyle::SafeDownCast(
+    iren->GetInteractorStyle());
+  if (!style)
+    {
+    qDebug() 
+      << "Cannot set center of rotation since interaction style has changed.";
+    return;
+    }
+
+  style->SetCenterOfRotation(x, y, z);
+
+  QList<QVariant> positionValues;
+  positionValues << x << y << z;
+
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Internal->CenterAxesProxy->GetProperty("Position"),
+    positionValues);
+
+  // Reset size of the axes.
+  double bounds[6];
+  this->Internal->RenderModuleProxy->ComputeVisiblePropBounds(bounds);
+
+  QList<QVariant> scaleValues;
+  scaleValues << (bounds[1]-bounds[0])*0.25
+    << (bounds[3]-bounds[2])*0.25 
+    << (bounds[5]-bounds[4])*0.25;
+
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Internal->CenterAxesProxy->GetProperty("Scale"),
+    scaleValues);
+
+  this->Internal->CenterAxesProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::getCenterOfRotation(double center[3]) const
+{
+  QList<QVariant> val =
+    pqSMAdaptor::getMultipleElementProperty(
+      this->Internal->CenterAxesProxy->GetProperty("Position"));
+  center[0] = val[0].toDouble();
+  center[1] = val[1].toDouble();
+  center[2] = val[2].toDouble();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::setCenterAxesVisibility(bool visible)
+{
+  pqSMAdaptor::setElementProperty(
+    this->Internal->CenterAxesProxy->GetProperty("Visibility"),
+    visible? 1 : 0);
+  this->Internal->CenterAxesProxy->UpdateProperty("Visibility");
+}
+
+//-----------------------------------------------------------------------------
+bool pqRenderViewModule::getCenterAxesVisibility() const
+{
+  return pqSMAdaptor::getElementProperty(
+    this->Internal->CenterAxesProxy->GetProperty("Visibility")).toBool();
 }
 
 //-----------------------------------------------------------------------------

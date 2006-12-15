@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 // Qt includes.
+#include <QDoubleValidator>
 
 // ParaView Client includes.
 #include "pqApplicationCore.h"
@@ -272,6 +273,17 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
       rm->getOrientationAxesOutlineColor());
     this->OrientationAxesLabelColor->setChosenColor(
       rm->getOrientationAxesLabelColor());
+
+    this->CustomCenter->setCheckState(Qt::Unchecked);
+    this->AutoResetCenterOfRotation->setCheckState(
+      rm->getResetCenterWithCamera()? Qt::Checked : Qt::Unchecked);
+    this->CenterAxesVisibility->setCheckState(
+      rm->getCenterAxesVisibility()? Qt::Checked : Qt::Unchecked);
+    double center[3];
+    rm->getCenterOfRotation(center);
+    this->CenterX->setText(QString::number(center[0],'g',3));
+    this->CenterY->setText(QString::number(center[1],'g',3));
+    this->CenterZ->setText(QString::number(center[2],'g',3));
     }
 }
 
@@ -358,7 +370,19 @@ void pq3DViewPropertiesWidgetInternal::accept()
       this->OrientationAxesOutlineColor->chosenColor());
     rm->setOrientationAxesLabelColor(
       this->OrientationAxesLabelColor->chosenColor());
-
+  
+    rm->setCenterAxesVisibility(
+      this->CenterAxesVisibility->checkState() == Qt::Checked);
+    rm->setResetCenterWithCamera(
+      this->AutoResetCenterOfRotation->checkState() == Qt::Checked);
+    if (this->CustomCenter->checkState() == Qt::Checked)
+      {
+      double center[3];
+      center[0] = this->CenterX->text().toDouble();
+      center[1] = this->CenterY->text().toDouble();
+      center[2] = this->CenterZ->text().toDouble();
+      rm->setCenterOfRotation(center);
+      }
     rm->saveSettings();
     }
 }
@@ -369,6 +393,12 @@ pq3DViewPropertiesWidget::pq3DViewPropertiesWidget(QWidget* _parent):
 {
   this->Internal = new pq3DViewPropertiesWidgetInternal;
   this->Internal->setupUi(this);
+
+  QDoubleValidator* dv = new QDoubleValidator(this);
+  this->Internal->CenterX->setValidator(dv);
+  this->Internal->CenterY->setValidator(dv);
+  this->Internal->CenterZ->setValidator(dv);
+
   this->Internal->label_3->hide();
   this->Internal->outlineThresholdLabel->hide();
   this->Internal->outlineThreshold->hide();

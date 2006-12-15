@@ -70,6 +70,9 @@ public:
   /// Resets the camera to include all visible data.
   void resetCamera();
 
+  /// Resets the center of rotation to the focal point.
+  void resetCenterOfRotation();
+
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.
   virtual bool saveImage(int width, int height, const QString& filename);
@@ -113,8 +116,19 @@ public:
   /// Get orientation axes outline color.
   QColor getOrientationAxesOutlineColor() const;
 
+  /// Get whether resetCamera() resets the
+  /// center of rotation as well.
+  bool getResetCenterWithCamera() const
+    { return this->ResetCenterWithCamera; }
+
+  /// Get center axes visibility.
+  bool getCenterAxesVisibility() const;
+
+  /// Get the current center of rotation.
+  void getCenterOfRotation(double center[3]) const;
+
 public slots:
-  // Toggle is the orientation axes is visible.
+  // Toggle the orientation axes visibility.
   void setOrientationAxesVisibility(bool visible);
   
   // Toggle orientation axes interactivity.
@@ -126,6 +140,24 @@ public slots:
   // Set orientation axes outline color.
   void setOrientationAxesOutlineColor(const QColor&);
 
+  // Set the center of rotation. For this to work,
+  // one should have approriate interaction style (vtkPVInteractorStyle subclass)
+  // and camera manipulators that use the center of rotation. 
+  // They are setup correctly by default.
+  void setCenterOfRotation(double x, double y, double x);
+  void setCenterOfRotation(double xyz[3])
+    {
+    this->setCenterOfRotation(xyz[0], xyz[1], xyz[2]);
+    }
+
+  // Toggle center axes visibility.
+  void setCenterAxesVisibility(bool visible);
+
+  /// Get/Set whether resetCamera() resets the
+  /// center of rotation as well.
+  void setResetCenterWithCamera(bool b)
+    { this->ResetCenterWithCamera = b;}
+
 private slots:
   // Called on start/end interaction.
   void startInteraction();
@@ -135,12 +167,19 @@ private slots:
   void onStartEvent();
   void onEndEvent();
 
+  // Called when vtkSMRenderModuleProxy fires
+  // ResetCameraEvent.
+  void onResetCameraEvent();
 
 protected:
   /// setups up RM and QVTKWidget binding.
   virtual void viewModuleInit();
 
   bool eventFilter(QObject* caller, QEvent* e);
+
+  // When true, the camera center of rotation will be reset when the
+  // user reset the camera.
+  bool ResetCenterWithCamera;
 
 private: 
   pqRenderViewModuleInternal* Internal;

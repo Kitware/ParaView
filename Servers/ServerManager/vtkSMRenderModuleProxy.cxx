@@ -53,7 +53,7 @@
 #include "vtkSelection.h"
 #include "vtkSMMPIRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.54");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.55");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -69,6 +69,7 @@ void vtkSMRenderModuleResetCameraClippingRange(
     self->ResetCameraClippingRange();
     }
 }
+
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxyAbortCheck(
   vtkObject*, unsigned long, void* arg, void*)
@@ -134,6 +135,7 @@ vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
     ren->RemoveObserver(this->ResetCameraClippingRangeTag);
     this->ResetCameraClippingRangeTag = 0;
     }
+
   if (this->AbortCheckTag)
     {
     this->GetRenderWindow()->RemoveObserver(this->AbortCheckTag);
@@ -418,7 +420,6 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->StartRenderEventTag =
     this->GetRenderer()->AddObserver(vtkCommand::StartEvent, src);
   src->Delete();
-
 }
 
 //-----------------------------------------------------------------------------
@@ -862,6 +863,7 @@ void vtkSMRenderModuleProxy::ResetCamera(double bds[6])
 {
   this->GetRenderer()->ResetCamera(bds);
   this->Modified();
+  this->InvokeEvent(vtkCommand::ResetCameraEvent);
 }
 
 //-----------------------------------------------------------------------------
