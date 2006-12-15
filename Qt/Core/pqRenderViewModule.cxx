@@ -405,10 +405,11 @@ void pqRenderViewModule::resetCamera()
 void pqRenderViewModule::resetCenterOfRotation()
 {
   // Update center of rotation.
-  this->Internal->RenderModuleProxy->SynchronizeCameraProperties();
+//  this->Internal->RenderModuleProxy->SynchronizeCameraProperties();
+  this->Internal->RenderModuleProxy->UpdatePropertyInformation();
   QList<QVariant> values = 
     pqSMAdaptor::getMultipleElementProperty(
-      this->Internal->RenderModuleProxy->GetProperty("CameraFocalPoint"));
+      this->Internal->RenderModuleProxy->GetProperty("CameraFocalPointInfo"));
   this->setCenterOfRotation(
     values[0].toDouble(), values[1].toDouble(), values[2].toDouble());
 }
