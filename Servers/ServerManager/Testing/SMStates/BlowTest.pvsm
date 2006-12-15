@@ -95,15 +95,6 @@
         <Min index="0" value="0"/>
       </Domain>
     </Property>
-    <Property name="OrderedCompositing" id="44.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="44.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="44.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="44.OrderedCompositingTree.groups">
-        <Group value="locators"/>
-      </Domain>
-    </Property>
     <Property name="Representation" id="44.Representation" number_of_elements="1">
       <Element index="0" value="2"/>
       <Domain name="enum" id="44.Representation.enum">
@@ -317,15 +308,6 @@
         <Min index="0" value="0"/>
       </Domain>
     </Property>
-    <Property name="OrderedCompositing" id="122.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="122.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="122.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="122.OrderedCompositingTree.groups">
-        <Group value="locators"/>
-      </Domain>
-    </Property>
     <Property name="Representation" id="122.Representation" number_of_elements="1">
       <Element index="0" value="2"/>
       <Domain name="enum" id="122.Representation.enum">
@@ -533,15 +515,6 @@
       <Element index="0" value="50"/>
       <Domain name="range" id="202.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="202.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="202.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="202.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="202.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="202.Representation" number_of_elements="1">
@@ -754,15 +727,6 @@
         <Min index="0" value="0"/>
       </Domain>
     </Property>
-    <Property name="OrderedCompositing" id="440.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="440.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="440.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="440.OrderedCompositingTree.groups">
-        <Group value="locators"/>
-      </Domain>
-    </Property>
     <Property name="Representation" id="440.Representation" number_of_elements="1">
       <Element index="0" value="2"/>
       <Domain name="enum" id="440.Representation.enum">
@@ -966,15 +930,6 @@
       <Element index="0" value="50"/>
       <Domain name="range" id="282.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="282.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="282.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="282.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="282.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="282.Representation" number_of_elements="1">
@@ -1216,15 +1171,6 @@
         <Min index="0" value="0"/>
       </Domain>
     </Property>
-    <Property name="OrderedCompositing" id="360.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="360.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="360.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="360.OrderedCompositingTree.groups">
-        <Group value="locators"/>
-      </Domain>
-    </Property>
     <Property name="Representation" id="360.Representation" number_of_elements="1">
       <Element index="0" value="2"/>
       <Domain name="enum" id="360.Representation.enum">
@@ -1414,15 +1360,6 @@
       <Element index="0" value="50"/>
       <Domain name="range" id="524.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="524.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="524.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="524.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="524.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="524.Representation" number_of_elements="1">
@@ -1644,15 +1581,6 @@
       <Element index="0" value="50"/>
       <Domain name="range" id="620.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="620.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="620.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="620.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="620.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="620.Representation" number_of_elements="1">
