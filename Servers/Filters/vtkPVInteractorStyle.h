@@ -59,7 +59,14 @@ public:
 
   // Description:
   // Propagates the center to the manipulators.
-  void SetCenterOfRotation(float x, float y, float z);
+  // This simply sets an interal ivar.
+  // It is propagated to a manipulator before the event
+  // is sent to it.
+  // Also changing the CenterOfRotation during interaction
+  // i.e. after a button press but before a button up
+  // has no effect until the next button press.
+  vtkSetVector3Macro(CenterOfRotation, float);
+  vtkGetVector3Macro(CenterOfRotation, float);
 
   // Description:
   // Do not let the superclass do anything with a char event.
@@ -70,6 +77,7 @@ protected:
   ~vtkPVInteractorStyle();
 
   vtkCameraManipulator *Current;
+  float CenterOfRotation[3];
 
   // The CameraInteractors also store there button and modifier.
   vtkCollection *CameraManipulators;
