@@ -1346,11 +1346,11 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
     }
   iter->Delete();
 
-  int which = Index;
+  int which = 0;
   vtkSMExtentDomain* extDomain = vtkSMExtentDomain::SafeDownCast(IntDomain);
   if(extDomain)
     {
-    which /= 2;
+    which = Index/2;
     }
 
   if(DoubleDomain)
