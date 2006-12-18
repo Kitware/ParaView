@@ -45,7 +45,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.8");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.9");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -58,6 +58,59 @@ inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
       }
     }
 }
+
+#if defined(_WIN32)
+static bool vtkPVFileInformationResolveLink(const vtkstd::string& fname,
+                                                      vtkstd::string& result,
+                                                      WIN32_FIND_DATA& wfd)
+{
+  IShellLink* shellLink;
+  HRESULT hr;
+  char Link[MAX_PATH];
+  bool coInit = false;
+  bool success = false;
+
+  hr = ::CoCreateInstance(CLSID_ShellLink, NULL, 
+                          CLSCTX_INPROC_SERVER, IID_IShellLink,
+                          (LPVOID*)&shellLink);
+  if(hr == CO_E_NOTINITIALIZED)
+    {
+    coInit = true;
+    ::CoInitialize(NULL);
+    hr = ::CoCreateInstance(CLSID_ShellLink, NULL, 
+                            CLSCTX_INPROC_SERVER, IID_IShellLink, 
+                            (LPVOID*)&shellLink);
+    }
+  if(SUCCEEDED(hr))
+    {
+    IPersistFile* ppf;
+    hr = shellLink->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
+    if(SUCCEEDED(hr))
+      {
+      vtkstd::wstring wfname(fname.begin(), fname.end());
+      hr = ppf->Load((LPOLESTR)wfname.c_str(), STGM_READ);
+      if(SUCCEEDED(hr))
+        {
+        if(shellLink->GetPath(Link, MAX_PATH, &wfd, SLGP_UNCPRIORITY) == NOERROR)
+          {
+          result = Link;
+          success = true;
+          }
+        ppf->Release();
+        }
+      }
+    shellLink->Release();
+    }
+  if(coInit)
+    {
+    CoUninitialize();
+    }
+
+  return success;
+
+}
+#endif
+
 
 //-----------------------------------------------------------------------------
 class vtkPVFileInformationSet : 
@@ -110,6 +163,21 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
     vtksys::SystemTools::GetCurrentWorkingDirectory().c_str());
   
   this->SetName(helper->GetPath());
+#if defined(_WIN32)
+  vtkstd::string::size_type idx;
+  for(idx = path.find('/', 0);
+      idx != vtkstd::string::npos;
+      idx = path.find('/', idx))
+    {
+    path.replace(idx, 1, 1, '\\');
+    }
+  size_t len = path.size();
+  WIN32_FIND_DATA data;
+  if(len > 4 && strncmp(path.c_str()+len-4, ".lnk", 4) == 0)
+  {
+  vtkPVFileInformationResolveLink(path, path, data);
+  }
+#endif
   this->SetFullPath(path.c_str());
 
   if (!vtksys::SystemTools::FileExists(this->FullPath))
@@ -131,7 +199,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
       {
       if(!*end)
         {
-        if (stricmp(start,this->Name) == 0)
+        if (stricmp(start,this->FullPath) == 0)
           {
           is_directory = true;
           this->Type = DRIVE;
@@ -263,31 +331,32 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
   int done = 0;
   while(!done)
     {
-    // Look at this file.
-    if(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+    vtkstd::string filename = data.cFileName;
+    vtkstd::string fullpath = prefix + filename;
+    size_t len = filename.size();
+    bool success = true;
+
+    if(len > 4 && strncmp(filename.c_str()+len-4, ".lnk", 4) == 0)
       {
-      if(strcmp(data.cFileName, "..") != 0 &&
-        strcmp(data.cFileName, ".") != 0)
-        {
-        vtkPVFileInformation* infoD = vtkPVFileInformation::New();
-        infoD->SetName(data.cFileName);
-        infoD->SetFullPath((prefix + data.cFileName).c_str());
-        infoD->Type = DIRECTORY;
-        info_set.insert(infoD);
-        infoD->Delete();
-        }
+      success = vtkPVFileInformationResolveLink(fullpath, fullpath, data);
       }
-    else if((data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) ||
-      (!(data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
-       !(data.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
-       !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)))
+
+    DWORD isdir = data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+    DWORD isfile = (data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) ||
+                  (!(data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
+                   !(data.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
+                   !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+
+    FileTypes type = isdir ? DIRECTORY : SINGLE_FILE;
+
+    if(success && (isdir || isfile))
       {
-      vtkPVFileInformation* infoF = vtkPVFileInformation::New();
-      infoF->SetName(data.cFileName);
-      infoF->SetFullPath((prefix + data.cFileName).c_str());
-      infoF->Type = SINGLE_FILE;
-      info_set.insert(infoF);
-      infoF->Delete();   
+      vtkPVFileInformation* infoD = vtkPVFileInformation::New();
+      infoD->SetName(filename.c_str());
+      infoD->SetFullPath(fullpath.c_str());
+      infoD->Type = type;
+      info_set.insert(infoD);
+      infoD->Delete();
       }
 
     // Find the next file.
