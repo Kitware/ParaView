@@ -120,9 +120,9 @@ public:
     this->FileLinkIcon = style->standardIcon(QStyle::SP_FileLinkIcon);
     }
 
-  QIcon icon(IconType type)
+  QIcon icon(IconType t) const
     {
-    switch(type)
+    switch(t)
       {
       case Drive:
         return QFileIconProvider::icon(QFileIconProvider::Drive);
@@ -138,11 +138,19 @@ public:
     return QIcon();
     }
 
-  QIcon icon(const FileInfo& info)
+  QIcon icon(const FileInfo& info) const
     {
     if(info.isDir())
       return icon(info.isLink() ? FolderLink : Folder);
     return icon(info.isLink() ? FileLink : File);
+    }
+  QIcon icon(const QFileInfo& info) const
+    {
+    return QFileIconProvider::icon(info);
+    }
+  QIcon icon(QFileIconProvider::IconType ico) const
+    {
+    return QFileIconProvider::icon(ico);
     }
 
 protected:
