@@ -1308,6 +1308,64 @@
        </ProxyGroupDomain>
      </ProxyProperty>
     </ImplicitPlaneRepresentationProxy>
+
+    <Proxy name="TextRepresentation" 
+           class="vtkTextRepresentation">
+
+      <IntVectorProperty
+         name="Visibility"
+         command="SetVisibility"
+         number_of_elements="1"
+         default_values="1"
+         animateable="1">
+         <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty 
+         name="Position"
+         command="SetPosition"
+         number_of_elements="2"
+         information_property="PositionInfo"
+         default_values="0.05 0.05">
+         <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty 
+         name="PositionInfo"
+         command="GetPosition"
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty 
+         name="Position2"
+         command="SetPosition2"
+         number_of_elements="2"
+         information_property="Position2Info"
+         default_values="0.1 0.1">
+         <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty 
+         name="Position2Info"
+         command="GetPosition2"
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty
+         name="Text"
+         command="SetText"
+         default_values="Some Default">
+      </StringVectorProperty>
+
+      <ProxyProperty name="Renderer" command="SetRenderer">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <!-- End of TextRepresentation -->
+    </Proxy>
   </ProxyGroup>
 
   <ProxyGroup name="properties">
@@ -3346,7 +3404,46 @@
           proxygroup="3d_widgets" proxyname="SliderWidget">
         </Proxy>
       </SubProxy>
+      <!--- End of SliderWidgetDisplay -->
     </New3DWidgetProxy>
+
+    <New3DWidgetProxy name="TextWidgetDisplay">
+      <ProxyProperty
+        name="Input">
+      </ProxyProperty>
+
+      <IntVectorProperty
+        name="Enabled"
+        command="SetEnabled"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Prop2D"
+          proxygroup="props" proxyname="TextRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="Text" />
+          <Property name="Position" />
+          <Property name="Position2" />
+          <Property name="PositionInfo" />
+          <Property name="Position2Info" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="TextWidget">
+        </Proxy>
+      </SubProxy>     
+
+      <!-- End of TextWidgetDisplay -->
+    </New3DWidgetProxy>
+
     <!-- End of displays group -->
   </ProxyGroup>
 
@@ -3562,4 +3659,5 @@
   </ProxyGroup>
 
 </ServerManagerConfiguration>
+
 
