@@ -44,7 +44,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.6");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.7");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -107,7 +107,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 
   vtkstd::string path = vtksys::SystemTools::CollapseFullPath(helper->GetPath(),
     vtksys::SystemTools::GetCurrentWorkingDirectory().c_str());
-
+  
   this->SetName(helper->GetPath());
   this->SetFullPath(path.c_str());
 
@@ -118,6 +118,30 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 
   bool is_directory = vtksys::SystemTools::FileIsDirectory(this->FullPath);
   this->Type = (is_directory)? DIRECTORY : SINGLE_FILE;
+#if defined(_WIN32)
+  if (!is_directory)
+    {
+    // Path may be drive letter.
+    char strings[1024];
+    DWORD n = GetLogicalDriveStrings(1024, strings);
+    char* start = strings;
+    char* end = start;
+    for(;end != strings+n; ++end)
+      {
+      if(!*end)
+        {
+        vtkstd::string drive_letter = start;
+        if (drive_letter == this->Name)
+          {
+          is_directory = true;
+          this->Type = DRIVE;
+          break;
+          }
+        start = end+1;
+        }
+      }
+    }
+#endif
 
   if (!helper->GetDirectoryListing() || !is_directory)
     {
