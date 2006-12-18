@@ -285,14 +285,12 @@ QStringList pqFileDialog::getSelectedFiles()
 //-----------------------------------------------------------------------------
 void pqFileDialog::accept()
 {
-  QStringList activeSet = this->Implementation->Ui.FileName->text().split(' ');
-  QStringList fullPaths;
-  
-  foreach (QString name, activeSet)
-    {
-    fullPaths.append(this->Implementation->Model->absoluteFilePath(name));
-    }
-  this->acceptInternal(fullPaths);
+  /* TODO:  handle pqFileDialog::ExistingFiles mode */
+  QString filename = this->Implementation->Ui.FileName->text();
+  filename = this->Implementation->Model->absoluteFilePath(filename);
+  QStringList files;
+  files.append(filename);
+  this->acceptInternal(files);
 }
 
 //-----------------------------------------------------------------------------
@@ -302,14 +300,22 @@ void pqFileDialog::onModelReset()
   
   QString currentPath = this->Implementation->Model->getCurrentPath();
   QChar separator = this->Implementation->Model->separator();
-  QStringList parents = currentPath.split(separator);
+  QStringList parents = currentPath.split(separator, QString::SkipEmptyParts);
+  if(parents.empty() && separator == '/')
+    {
+    parents.append("/");
+    }
 
   for(int i = 0; i != parents.size(); ++i)
     {
     QString str;
     for(int j=0; j<=i; j++)
       {
-      str += parents[j] + separator;
+      str += parents[j];
+      if(!str.endsWith(separator))
+        {
+        str += separator;
+        }
       }
     this->Implementation->Ui.Parents->addItem(str);
     }
@@ -387,32 +393,8 @@ void pqFileDialog::onActivateFile(const QModelIndex& index)
     
   QStringList selected_files;
   selected_files << this->Implementation->Model->getFilePaths(actual_index);
-  if(selected_files.empty())
-    return;
-    
-  QString file = selected_files.first();
-  if(this->Implementation->Model->dirExists(file))
-    {
-    this->onNavigate(file);
-    this->Implementation->Ui.FileName->selectAll();
-    }
-  else if(this->Implementation->Model->fileExists(file))
-    {
-    if(this->Implementation->Mode == AnyFile)
-      {
-      if(QMessageBox::No == QMessageBox::warning(
-        this,
-        this->windowTitle(),
-        QString(tr("%1 already exists.\nDo you want to replace it?")).arg(file),
-        QMessageBox::Yes,
-        QMessageBox::No))
-        {
-        return;
-        }
-      }
-      
-    this->emitFilesSelected(selected_files);
-    }
+
+  this->acceptInternal(selected_files);
 }
 
 //-----------------------------------------------------------------------------
@@ -456,7 +438,7 @@ void pqFileDialog::acceptInternal(QStringList& selected_files)
     
   QString file = selected_files[0];
   // User chose an existing directory
-  if(this->Implementation->Model->dirExists(file))
+  if(this->Implementation->Model->dirExists(file, file))
     {
     switch(this->Implementation->Mode)
       {
@@ -484,7 +466,7 @@ void pqFileDialog::acceptInternal(QStringList& selected_files)
     // It is very possible that after fixing the extension,
     // the new filename is an already present directory,
     // hence we handle that case:
-    if (this->Implementation->Model->dirExists(file))
+    if (this->Implementation->Model->dirExists(file, file))
       {
       this->onNavigate(file);
       this->Implementation->Ui.FileName->clear();
@@ -493,7 +475,7 @@ void pqFileDialog::acceptInternal(QStringList& selected_files)
     }
 
   // User chose an existing file-or-files
-  if (this->Implementation->Model->fileExists(file))
+  if (this->Implementation->Model->fileExists(file, file))
     {
     switch(this->Implementation->Mode)
       {
@@ -503,10 +485,14 @@ void pqFileDialog::acceptInternal(QStringList& selected_files)
         return;
       case ExistingFile:
       case ExistingFiles:
+        {
         // TODO: we need to verify that all selected files are indeed
         // "existing".
         // User chose an existing file-or-files, we're done
-        this->emitFilesSelected(selected_files);
+        QStringList files;
+        files.append(file);
+        this->emitFilesSelected(files);
+        }
         return;
       case AnyFile:
         // User chose an existing file, prompt before overwrite

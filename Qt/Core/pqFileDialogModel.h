@@ -78,10 +78,12 @@ public:
   bool isDir(const QModelIndex&);
   
   /// Returns whether the file exists
-  bool fileExists(const QString&);
+  /// also returns the full path, which could be a resolved shortcut
+  bool fileExists(const QString& file, QString& fullpath);
   
   /// Returns whether a directory exists
-  bool dirExists(const QString&);
+  /// also returns the full path, which could be a resolved shortcut
+  bool dirExists(const QString& dir, QString& fullpath);
   
   /// returns the path delimiter, could be \ or / depending on the platform
   /// this model is browsing
