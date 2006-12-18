@@ -26,6 +26,7 @@
 # include <direct.h>    // _getcwd
 # include <shlobj.h>    // SHGetFolderPath
 # include <sys/stat.h>  // stat
+# include <string.h>   // for strcasecmp
 # define vtkPVServerFileListingGetCWD _getcwd
 #else
 # include <sys/types.h> // DIR, struct dirent, struct stat
@@ -44,7 +45,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.7");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.8");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -130,8 +131,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
       {
       if(!*end)
         {
-        vtkstd::string drive_letter = start;
-        if (drive_letter == this->Name)
+        if (stricmp(start,this->Name) == 0)
           {
           is_directory = true;
           this->Type = DRIVE;
