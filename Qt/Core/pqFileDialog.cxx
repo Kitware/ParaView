@@ -301,9 +301,9 @@ void pqFileDialog::onModelReset()
   QString currentPath = this->Implementation->Model->getCurrentPath();
   QChar separator = this->Implementation->Model->separator();
   QStringList parents = currentPath.split(separator, QString::SkipEmptyParts);
-  if(parents.empty() && separator == '/')
+  if(separator == '/')
     {
-    parents.append("/");
+    parents.prepend("/");
     }
 
   for(int i = 0; i != parents.size(); ++i)
