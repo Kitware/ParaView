@@ -65,8 +65,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSize>
 
 // ParaView includes.
-#include "pqCoreInit.h"
 #include "pq3DWidgetFactory.h"
+#include "pqCoreInit.h"
+#include "pqDisplayPolicy.h"
 #include "pqLookupTableManager.h"
 #include "pqOptions.h"
 #include "pqPendingDisplayManager.h"
@@ -101,6 +102,7 @@ public:
   pqWriterFactory* WriterFactory;
   pqServerManagerSelectionModel* SelectionModel;
   pqPendingDisplayManager* PendingDisplayManager;
+  QPointer<pqDisplayPolicy> DisplayPolicy;
   vtkSmartPointer<vtkSMStateLoader> StateLoader;
   QPointer<pqLookupTableManager> LookupTableManager;
 
@@ -166,6 +168,8 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
     this->Internal->ServerManagerModel, this);
   
   this->Internal->PendingDisplayManager = new pqPendingDisplayManager(this);
+
+  this->Internal->DisplayPolicy = new pqDisplayPolicy(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -279,11 +283,23 @@ pqServerManagerSelectionModel* pqApplicationCore::getSelectionModel()
   return this->Internal->SelectionModel;
 }
 
+//-----------------------------------------------------------------------------
 pqPendingDisplayManager* pqApplicationCore::getPendingDisplayManager()
 {
   return this->Internal->PendingDisplayManager;
 }
 
+//-----------------------------------------------------------------------------
+void pqApplicationCore::setDisplayPolicy(pqDisplayPolicy* policy) 
+{
+  this->Internal->DisplayPolicy = policy;
+}
+
+//-----------------------------------------------------------------------------
+pqDisplayPolicy* pqApplicationCore::getDisplayPolicy() const
+{
+  return this->Internal->DisplayPolicy;
+}
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::removeSource(pqPipelineSource* source)
@@ -631,8 +647,7 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
   this->getUndoStack()->BeginUndoSet(QString("Create ") + xmlname);
 
   pqPipelineSource* filter = this->getPipelineBuilder()->createSource(
-    "filters", xmlname.toAscii().data(), 
-    input->getServer(), NULL);
+    "filters", xmlname.toAscii().data(), input->getServer());
 
   if(filter)
     {
@@ -710,8 +725,7 @@ pqPipelineSource* pqApplicationCore::createSourceOnServer(const QString& xmlname
   this->getUndoStack()->BeginUndoSet(QString("Create ") + xmlname);
 
   pqPipelineSource* source = this->getPipelineBuilder()->createSource(
-    "sources", xmlname.toAscii().data(), 
-    server, NULL);
+    "sources", xmlname.toAscii().data(), server);
   source->setDefaultValues();
 
   emit this->sourceCreated(source);
@@ -729,8 +743,7 @@ pqPipelineSource* pqApplicationCore::createCompoundFilter(
   this->getUndoStack()->BeginUndoSet(QString("Create ") + name);
 
   pqPipelineSource* source = this->getPipelineBuilder()->createSource(
-    NULL, name.toAscii().data(), 
-    server, NULL);
+    NULL, name.toAscii().data(), server);
   
   vtkSMProperty* inputProperty = NULL;
 

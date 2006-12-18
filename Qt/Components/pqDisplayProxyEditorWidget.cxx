@@ -37,8 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 #include "pqDisplayProxyEditor.h"
-#include "pqXYPlotDisplayProxyEditor.h"
 #include "pqPipelineDisplay.h"
+#include "pqTextDisplayPropertiesWidget.h"
+#include "pqTextWidgetDisplay.h"
+#include "pqXYPlotDisplayProxyEditor.h"
 
 class pqDisplayProxyEditorWidgetInternal
 {
@@ -111,6 +113,28 @@ void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
     if (!editor)
       {
       editor = new pqXYPlotDisplayProxyEditor(this);
+      this->layout()->addWidget(editor);
+      if (this->Internal->DisplayWidget)
+        {
+        this->layout()->removeWidget(this->Internal->DisplayWidget);
+        delete this->Internal->DisplayWidget;
+        }
+      this->Internal->DisplayWidget = editor;
+      QObject::connect(this, SIGNAL(requestSetDisplay(pqDisplay*)),
+        editor, SLOT(setDisplay(pqDisplay*)));
+      QObject::connect(this, SIGNAL(requestReload()),
+        editor, SLOT(reloadGUI()));
+      }
+    editor->setDisplay(display);
+    }
+  else if (qobject_cast<pqTextWidgetDisplay*>(display))
+    {
+    pqTextDisplayPropertiesWidget* editor = 
+      qobject_cast<pqTextDisplayPropertiesWidget*>(
+        this->Internal->DisplayWidget);
+    if (!editor)
+      {
+      editor = new pqTextDisplayPropertiesWidget(this);
       this->layout()->addWidget(editor);
       if (this->Internal->DisplayWidget)
         {

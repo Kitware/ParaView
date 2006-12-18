@@ -72,11 +72,6 @@ public:
   int getType()
     { return this->Type; }
    
-  /// This method returns is any pqPipelineSource can be dislayed in this
-  /// view. Overridden to make sure that the source can be displayed
-  /// in this type of plot.
-  virtual bool canDisplaySource(pqPipelineSource* source) const;
-
   /// Forces an immediate render. Overridden since for plots
   /// rendering actually happens on the GUI side, not merely
   /// in the ServerManager.
@@ -87,7 +82,7 @@ private slots:
 
 protected:
   int Type;
-  void renderBarChar();
+  void renderBarChart();
   void renderXYPlot();
 
 private:

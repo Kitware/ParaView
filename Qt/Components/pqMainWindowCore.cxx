@@ -339,6 +339,8 @@ void pqMainWindowCore::setSourceMenu(QMenu* menu)
       << pqSetName("2D Glyph") << pqSetData("GlyphSource2D");
     menu->addAction("3D Text") 
       << pqSetName("3D Text") << pqSetData("VectorText");
+    menu->addAction("Text")
+      <<pqSetData("Text") << pqSetData("TextSource");
     menu->addAction("Arrow")
       << pqSetName("Arrow") << pqSetData("ArrowSource");
     menu->addAction("Axes") 

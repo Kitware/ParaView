@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pq3DWidgetFactory;
 class pqApplicationCoreInternal;
+class pqDisplayPolicy;
 class pqLookupTableManager;
 class pqPendingDisplayManager;
 class pqPipelineBuilder;
@@ -87,6 +88,16 @@ public:
   pqReaderFactory* getReaderFactory();
   pqWriterFactory* getWriterFactory();
   pqPendingDisplayManager* getPendingDisplayManager();
+
+  // Returns the display policy instance used by the application.
+  // pqDisplayPolicy defines the policy for creating displays
+  // given a (source,view) pair.
+  pqDisplayPolicy* getDisplayPolicy() const;
+
+  // It is possible to change the display policy used by
+  // the application. Used to change the active display
+  // policy.
+  void setDisplayPolicy(pqDisplayPolicy*);
 
   // Returns the server manager selection model.
   pqServerManagerSelectionModel* getSelectionModel();

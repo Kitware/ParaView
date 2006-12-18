@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDisplayManager.h
+   Module:    pqTextWidgetDisplay.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,35 +29,39 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqDisplayManager_h
-#define _pqDisplayManager_h
+#ifndef __pqTextWidgetDisplay_h
+#define __pqTextWidgetDisplay_h
 
-#include <QObject>
-#include "pqWidgetsExport.h"
-class pqPipelineSource;
-class pqRenderViewModule;
+#include "pqConsumerDisplay.h"
 
-/// Object which provides help for managing display proxies
-class PQWIDGETS_EXPORT pqDisplayManager : public QObject
+class pqTextWidgetDisplayInternal;
+
+// This is a display representation for TextWidgetDisplay proxy.
+// TextWidgetDisplay is not really a consumer display i.e. it doesn't
+// have an input. However, we fake one my linking the Text property
+// from the dummy input with the property on the display. 
+// All this is managed by this display.
+class PQCORE_EXPORT pqTextWidgetDisplay : public pqConsumerDisplay
 {
   Q_OBJECT
+
+  typedef pqConsumerDisplay Superclass;
 public:
-  /// constructor
-  pqDisplayManager(QObject* p);
-  /// destructor
-  ~pqDisplayManager();
+  pqTextWidgetDisplay(const QString& group, const QString& name,
+    vtkSMProxy* display, pqServer* server,
+    QObject* parent=0);
+  virtual ~pqTextWidgetDisplay();
 
-public slots:
-
-  void addDisplayForSource(pqPipelineSource*, pqRenderViewModule*);
-
-  void addDeferredDisplayForSource(pqPipelineSource*, pqRenderViewModule*);
-  void removeDeferredDisplayForSource(pqPipelineSource*, pqRenderViewModule*);
-  void createDeferredDisplays();
+protected slots:
+  // called when input property on display changes. We must detect if
+  // (and when) the display is connected to a new proxy.
+  virtual void onInputChanged();
 
 private:
-  class pqInternal;
-  pqInternal* Internal;
+  pqTextWidgetDisplay(const pqTextWidgetDisplay&); // Not implemented.
+  void operator=(const pqTextWidgetDisplay&); // Not implemented.
+
+  pqTextWidgetDisplayInternal *Internal;
 };
 
 #endif

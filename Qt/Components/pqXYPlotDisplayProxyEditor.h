@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqDisplay;
 
+// Editor widget for XY plot displays.
 class PQCOMPONENTS_EXPORT pqXYPlotDisplayProxyEditor : public QWidget
 {
   Q_OBJECT

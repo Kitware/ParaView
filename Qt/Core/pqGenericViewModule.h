@@ -93,10 +93,10 @@ public:
   QList<pqDisplay*> getDisplays() const;
 
   /// This method returns is any pqPipelineSource can be dislayed in this
-  /// view. Default implementation simply checks if the 
-  /// source and the view module are on the same server, of so
-  /// returns true, otherwise false.
-  virtual bool canDisplaySource(pqPipelineSource* source) const;
+  /// view. This is a convenience method, it gets
+  /// the pqDisplayPolicy object from the pqApplicationCore
+  /// are queries it.
+  bool canDisplaySource(pqPipelineSource* source) const;
 
 signals:
   // Fired after a display has been added to this render module.

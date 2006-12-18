@@ -94,19 +94,6 @@ QWidget* pqTableViewModule::getWindowParent() const
 }
 
 //-----------------------------------------------------------------------------
-bool pqTableViewModule::canDisplaySource(pqPipelineSource* source) const
-{
-  if (!this->Superclass::canDisplaySource(source))
-    {
-    return false;
-    }
-
-  /** \todo Filter based on the source output type (rectilinear grid or table) here */
-
-  return true;
-}
-
-//-----------------------------------------------------------------------------
 void pqTableViewModule::visibilityChanged(pqDisplay* /*disp*/)
 {
 }

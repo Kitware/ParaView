@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes
 #include "pqApplicationCore.h"
+#include "pqDisplayPolicy.h"
 #include "pqNameCount.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
@@ -102,10 +103,9 @@ pqPipelineBuilder::~pqPipelineBuilder()
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqPipelineBuilder::createSource(const char* xmlgroup,
-    const char* xmlname, pqServer* server, pqRenderViewModule* renModule)
+    const char* xmlname, pqServer* server)
 {
-  vtkSMProxy* proxy = this->createPipelineProxy(xmlgroup, xmlname,
-    server, renModule);
+  vtkSMProxy* proxy = this->createPipelineProxy(xmlgroup, xmlname, server);
   if (proxy)
     {
     return pqServerManagerModel::instance()->getPQSource(proxy);
@@ -263,24 +263,10 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqPipelineBuilder::createPipelineProxy(const char* xmlgroup,
-    const char* xmlname, pqServer* server, pqRenderViewModule* renModule)
+    const char* xmlname, pqServer* server)
 {
   vtkSMProxy* proxy = this->createProxy(xmlgroup, xmlname, "sources",
     server, true);
-
-  if (proxy && renModule)
-    {
-    if (this->UndoStack)
-      {
-      this->UndoStack->BeginUndoSet("Connect display");
-      }
-
-    this->createDisplayProxyInternal(proxy, renModule->getRenderModuleProxy());
-    if (this->UndoStack)
-      {
-      this->UndoStack->EndUndoSet();
-      }
-    }
   return proxy;
 }
 
@@ -308,7 +294,7 @@ pqConsumerDisplay* pqPipelineBuilder::createDisplay(pqPipelineSource* src,
     this->UndoStack->BeginUndoSet(label);
     }
   pqConsumerDisplay* display = 
-    this->createDisplayProxyInternal(proxy, viewModule->getViewModuleProxy());
+    this->createDisplayProxyInternal(src , viewModule);
 
   pqRenderViewModule* renModule = 
     qobject_cast<pqRenderViewModule*>(viewModule);
@@ -328,19 +314,14 @@ pqConsumerDisplay* pqPipelineBuilder::createDisplay(pqPipelineSource* src,
 
 //-----------------------------------------------------------------------------
 pqConsumerDisplay* pqPipelineBuilder::createDisplayProxyInternal(
-  vtkSMProxy* proxy, vtkSMAbstractViewModuleProxy* renModule)
+  pqPipelineSource* src, pqGenericViewModule* view)
 {
-  if (!proxy)
-    {
-    qDebug() << "Cannot connect display to NULL source proxy.";
-    return NULL;
-    }
-  
-  vtkSMProxy* display = renModule->CreateDisplayProxy();
+  pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
+  vtkSMProxy* display = policy? policy->newDisplay(src, view) : 0; 
   if (!display)
     {
     qDebug() << "Cannot create display. "
-      << "View module does not support calling CreateDisplayProxy()";
+      <<"Make sure that your Display Policy is initialized properly.";
     return NULL;
     }
 
@@ -351,13 +332,16 @@ pqConsumerDisplay* pqPipelineBuilder::createDisplayProxyInternal(
   pxm->RegisterProxy("displays", display->GetSelfIDAsString(), display);
   display->Delete();
 
+  vtkSMProxy* proxy = src->getProxy();
+  vtkSMProxy* viewModuleProxy = view->getProxy();
+
   // Set the display proxy input.
   pqSMAdaptor::setProxyProperty(display->GetProperty("Input"), proxy);
   display->UpdateVTKObjects();
 
   // Add the display proxy to render module.
-  pqSMAdaptor::addProxyProperty(renModule->GetProperty("Displays"), display);
-  renModule->UpdateVTKObjects();
+  pqSMAdaptor::addProxyProperty(viewModuleProxy->GetProperty("Displays"), display);
+  viewModuleProxy->UpdateVTKObjects();
 
   pqConsumerDisplay* dispObject = 
     pqServerManagerModel::instance()->getPQDisplay(display);

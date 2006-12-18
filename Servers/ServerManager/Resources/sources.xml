@@ -1001,5 +1001,19 @@ The output of the Wavelet source is image (uniform rectilinear) data.
    <!-- End NetworkImageSource -->
    </SourceProxy>
 
+   <Proxy name="TextSource" class="">
+     <!-- 
+       "class" is deliberately empty, since this object has no server-side 
+       representation. 
+     -->
+     <StringVectorProperty
+       name="Text"
+       number_of_elements="1"
+       default_values="Text">
+     </StringVectorProperty>
+
+   <!-- End of TextSource -->
+   </Proxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -89,15 +89,10 @@ public:
   
   /// Creates a source/filter/reader proxy with the given xmlgroup,xmlname.
   /// The proxy is registered with a unique name under the group "sources".
-  /// If renModule is non-null, this also creates (and registers) a display 
-  /// proxy for the proxy, and adds it to the render module. All the work
-  /// done by a call to this method gets captured in a UndoSet, thus it
-  /// can be undone is a single step. It is essential that renModule is 
-  /// a render module on the server. renModule can be null, in which the 
-  /// display wont be created. If xmlgroup is NULL, this method will
+  /// If xmlgroup is NULL, this method will
   /// try to instantiate a compound proxy with the given name.
   pqPipelineSource* createSource(const char* xmlgroup,
-    const char* xmlname, pqServer* server, pqRenderViewModule* renModule);
+    const char* xmlname, pqServer* server);
 
   // Create a display proxy for the given proxy(source/filter) and add 
   // it to the given render module. 
@@ -177,11 +172,11 @@ protected:
   /// this method does what it says. Note that it does not worry about undo stack
   /// at all. The caller would have managed it.
   pqConsumerDisplay* createDisplayProxyInternal(
-    vtkSMProxy* proxy, vtkSMAbstractViewModuleProxy*);
+    pqPipelineSource* src, pqGenericViewModule* view);
 
   // Internal create method.
   vtkSMProxy* createPipelineProxy(const char* xmlgroup,
-    const char* xmlname, pqServer* server, pqRenderViewModule* renModule);
+    const char* xmlname, pqServer* server);
 
   pqNameCount* NameGenerator;
   pqUndoStack* UndoStack;

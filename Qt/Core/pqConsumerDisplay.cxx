@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSMProxy.h"
-#include "vtkSMInputProperty.h"
+#include "vtkSMProxyProperty.h"
 
 #include <QtDebug>
 #include <QPointer>
@@ -98,7 +98,7 @@ pqPipelineSource* pqConsumerDisplay::getInput() const
 //-----------------------------------------------------------------------------
 void pqConsumerDisplay::onInputChanged()
 {
-  vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
+  vtkSMProxyProperty* ivp = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("Input"));
   if (!ivp)
     {

@@ -40,7 +40,9 @@ class pqDisplay;
 class pqPipelineDisplay;
 
 // This is a widget that can create different kinds of display
-// editors based on the type of the display.
+// editors based on the type of the display. It encapsulates the code
+// to decide what GUI for display editing must be shown to the user
+// based on the type of the display.
 class PQCOMPONENTS_EXPORT pqDisplayProxyEditorWidget : public QWidget
 {
   Q_OBJECT

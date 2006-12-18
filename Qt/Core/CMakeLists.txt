@@ -39,6 +39,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqConsumerDisplay.h
   pqCoreTestUtility.h
   pqDisplay.h
+  pqDisplayPolicy.h
   pqFileDialog.h
   pqFileDialogEventTranslator.h
   pqFileDialogFavoriteModel.h
@@ -75,6 +76,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerStartups.h
   pqSettings.h
   pqTableViewModule.h
+  pqTextWidgetDisplay.h
   pqUndoStack.h
   ${PYTHON_MOC_SRCS}
   )
@@ -125,6 +127,8 @@ ADD_LIBRARY(pqCore
   pqCoreTestUtility.h
   pqDisplay.cxx
   pqDisplay.h
+  pqDisplayPolicy.cxx
+  pqDisplayPolicy.h
   pqFileDialog.cxx
   pqFileDialog.h
   pqFileDialogEventPlayer.cxx
@@ -228,6 +232,8 @@ ADD_LIBRARY(pqCore
   pqSettings.h
   pqTableViewModule.cxx
   pqTableViewModule.h
+  pqTextWidgetDisplay.cxx
+  pqTextWidgetDisplay.h
   pqUndoRedoStateLoader.cxx
   pqUndoRedoStateLoader.h
   pqUndoStack.cxx

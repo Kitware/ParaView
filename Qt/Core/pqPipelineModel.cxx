@@ -854,8 +854,15 @@ void pqPipelineModel::addSource(pqPipelineSource *source)
     }
   else
     {
-    qDebug() << "Unknown source proxy type added to the pipeline model.";
-    return;
+    // Now we determine type using some heuristics.
+    if (proxy->GetProperty("Input"))
+      {
+      item = new pqPipelineModelFilter(server, source);
+      }
+    else
+      {
+      item = new pqPipelineModelSource(server, source);
+      }
     }
 
   if(item)

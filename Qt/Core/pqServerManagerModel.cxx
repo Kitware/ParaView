@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerResource.h"
 #include "pqTableViewModule.h"
+#include "pqTextWidgetDisplay.h"
 
 #include <QVTKWidget.h>
 
@@ -405,6 +406,10 @@ void pqServerManagerModel::onAddDisplay(QString name,
     // 2) create a new pqConsumerDisplay;
     display = new pqPipelineDisplay(name, dProxy, server, this);
     }
+  else if (proxy->GetXMLName() == QString("TextWidgetDisplay"))
+    {
+    display = new pqTextWidgetDisplay("displays", name, proxy, server, this);
+    }
   else
     {
     display = new pqConsumerDisplay("displays", name, proxy, server, this);
@@ -609,7 +614,8 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
     }
     else if(group == "views" && proxy->GetXMLName() == QString("TableView"))
       {
-      pq_proxy = new pqTableViewModule(group, name, vtkSMAbstractViewModuleProxy::SafeDownCast(proxy), server, this);
+      pq_proxy = new pqTableViewModule(group, name, 
+        vtkSMAbstractViewModuleProxy::SafeDownCast(proxy), server, this);
       }
 
   if (pq_proxy)

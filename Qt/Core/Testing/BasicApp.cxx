@@ -38,8 +38,8 @@ public:
     // create source and elevation filter
     pqPipelineSource* source;
     pqPipelineSource* elevation;
-    source = pb->createSource("sources", "SphereSource", server, NULL);
-    elevation = pb->createSource("filters", "ElevationFilter", server, NULL);
+    source = pb->createSource("sources", "SphereSource", server);
+    elevation = pb->createSource("filters", "ElevationFilter", server);
     // passing render module in for the creation of the
     // ElevationFilter only leads to problems since the pipeline isn't connected
     // yet

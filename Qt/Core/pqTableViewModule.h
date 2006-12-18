@@ -62,11 +62,6 @@ public:
     return false;
     };
 
-  /// This method returns is any pqPipelineSource can be dislayed in this
-  /// view. Overridden to make sure that the source can be displayed
-  /// in this type of plot.
-  virtual bool canDisplaySource(pqPipelineSource* source) const;
-
   /// Forces an immediate render. Overridden since for plots
   /// rendering actually happens on the GUI side, not merely
   /// in the ServerManager.

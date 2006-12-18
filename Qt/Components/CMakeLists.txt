@@ -113,6 +113,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSourceInfoModel.h
   pqSpinBoxDomain.h
   pqStreamTracerPanel.h
+  pqTextDisplayPropertiesWidget.h
   pqThresholdPanel.h
   pqToolTipTrapper.h
   pqVCRController.h
@@ -150,6 +151,7 @@ SET(UI_FORMS
   Resources/UI/pqServerStartupDialog.ui
   Resources/UI/pqSettingsDialog.ui
   Resources/UI/pqStreamTracerPanel.ui
+  Resources/UI/pqTextDisplayPropertiesWidget.ui
   Resources/UI/pqXYPlotDisplayEditor.ui
 )
 
@@ -339,6 +341,8 @@ ADD_LIBRARY(pqComponents
   pqStateLoader.h
   pqStreamTracerPanel.cxx
   pqStreamTracerPanel.h
+  pqTextDisplayPropertiesWidget.cxx
+  pqTextDisplayPropertiesWidget.h
   pqThresholdPanel.cxx
   pqThresholdPanel.h
   pqToolTipTrapper.cxx

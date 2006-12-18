@@ -269,7 +269,7 @@ pqPipelineSource* pqReaderFactory::createReader(const QString& readerName,
         pqApplicationCore::instance()->getPipelineBuilder();
       pqPipelineSource* source = 
         builder->createSource("sources",      // TODO: support other groups
-                              info.PrototypeProxy->GetXMLName(), server, 0);
+                              info.PrototypeProxy->GetXMLName(), server);
       return source;
       }
     }

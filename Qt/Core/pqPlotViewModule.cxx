@@ -144,25 +144,6 @@ QWidget* pqPlotViewModule::getWindowParent() const
 }
 
 //-----------------------------------------------------------------------------
-bool pqPlotViewModule::canDisplaySource(pqPipelineSource* source) const
-{
-  if (!this->Superclass::canDisplaySource(source))
-    {
-    return false;
-    }
-  switch (this->Type)
-    {
-  case BAR_CHART:
-    return (source->getProxy()->GetXMLName() == QString("ExtractHistogram"));
-
-  case XY_PLOT:
-    return (source->getProxy()->GetXMLName() == QString("Probe2"));
-    }
-
-  return false;
-}
-
-//-----------------------------------------------------------------------------
 void pqPlotViewModule::visibilityChanged(pqDisplay* disp)
 {
   if (disp->isVisible())
@@ -193,7 +174,7 @@ void pqPlotViewModule::forceRender()
   switch (this->Type)
     {
   case BAR_CHART:
-    this->renderBarChar();
+    this->renderBarChart();
     break;
 
   case XY_PLOT:
@@ -226,7 +207,7 @@ void pqPlotViewModule::renderXYPlot()
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::renderBarChar()
+void pqPlotViewModule::renderBarChart()
 {
   pqVTKHistogramModel* model = 
     qobject_cast<pqVTKHistogramModel*>(this->Internal->VTKModel);
