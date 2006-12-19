@@ -48,6 +48,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWaitCondition>
 #include <QCoreApplication>
 #include <QEvent>
+#include <QStringList>
+#include <QThread>
+#include <QApplication>
 
 // Qt testing includes
 #include "pqObjectNaming.h"
@@ -59,6 +62,7 @@ static pqPythonEventSource* Instance = NULL;
 static QString PropertyObject;
 static QString PropertyResult;
 static QWaitCondition WaitResults;
+static QStringList ObjectList;
 
 
 static PyObject*
@@ -104,22 +108,26 @@ QtTesting_getProperty(PyObject* /*self*/, PyObject* args)
     return NULL;
     }
 
-  if(!Instance)
+  PropertyObject = object;
+  PropertyResult = property;
+
+  if(Instance && QThread::currentThread() != QApplication::instance()->thread())
+    {
+    QMutex mut;
+    mut.lock();
+    QMetaObject::invokeMethod(Instance, "threadGetProperty", Qt::QueuedConnection);
+    WaitResults.wait(&mut);
+    }
+  else if(QThread::currentThread() == QApplication::instance()->thread())
+    {
+    PropertyResult = pqPythonEventSource::getProperty(PropertyObject, PropertyResult);
+    }
+  else
     {
     PyErr_SetString(PyExc_AssertionError, "pqPythonEventSource not defined");
     return NULL;
     }
 
-  PropertyObject = object;
-  PropertyResult = property;
-  
-  QMutex mut;
-  mut.lock();
-
-  QMetaObject::invokeMethod(Instance, "getProperty", Qt::QueuedConnection);
-
-  WaitResults.wait(&mut);
-    
   if(PropertyObject == QString::null)
     {
     PyErr_SetString(PyExc_ValueError, "object not found");
@@ -157,6 +165,54 @@ QtTesting_getQtVersion(PyObject* /*self*/, PyObject* /*args*/)
   return Py_BuildValue(const_cast<char*>("s"), qVersion());
 }
 
+
+static PyObject*
+QtTesting_getChildren(PyObject* /*self*/, PyObject* args)
+{
+  // string QtTesting.getChildren('object')
+  //    returns the a list of strings with object names
+  
+  const char* object = 0;
+
+  if(!PyArg_ParseTuple(args, const_cast<char*>("s"), &object))
+    {
+    return NULL;
+    }
+
+  PropertyObject = object;
+  ObjectList.clear();
+
+  if(Instance && QThread::currentThread() != QApplication::instance()->thread())
+    {
+    QMutex mut;
+    mut.lock();
+    QMetaObject::invokeMethod(Instance, "threadGetChildren", Qt::QueuedConnection);
+    WaitResults.wait(&mut);
+    }
+  else if(QThread::currentThread() == QApplication::instance()->thread())
+    {
+    ObjectList = pqPythonEventSource::getChildren(PropertyObject);
+    }
+  else
+    {
+    PyErr_SetString(PyExc_AssertionError, "pqPythonEventSource not defined");
+    return NULL;
+    }
+
+  if(PropertyObject == QString::null)
+    {
+    PyErr_SetString(PyExc_ValueError, "object not found");
+    return NULL;
+    }
+
+  QString objs = ObjectList.join(", ");
+  QString ret = QString("[%1]").arg(objs);
+
+  return Py_BuildValue(const_cast<char*>("s"), 
+             ret.toAscii().data());
+}
+
+
 static PyMethodDef QtTestingMethods[] = {
   {
     const_cast<char*>("playCommand"), 
@@ -183,6 +239,12 @@ static PyMethodDef QtTestingMethods[] = {
     const_cast<char*>("Have the python script wait for a specfied number"
                       " of msecs, while the Qt app is alive.")
   },
+  {
+    const_cast<char*>("getChildren"),
+    QtTesting_getChildren,
+    METH_VARARGS,
+    const_cast<char*>("Return a list of child objects.")
+  },
 
   {NULL, NULL, 0, NULL} // Sentinal
 };
@@ -207,9 +269,11 @@ pqPythonEventSource::pqPythonEventSource(QObject* p)
   this->Internal = new pqInternal;
   // initialize python
   Py_Initialize();
-  
-  // initialize the QtTesting module
-  initQtTesting();
+  PyEval_InitThreads();
+
+  // add QtTesting to python's inittab, so it is
+  // available to all interpreters
+  PyImport_AppendInittab("QtTesting", initQtTesting);
 }
 
 pqPythonEventSource::~pqPythonEventSource()
@@ -224,21 +288,58 @@ void pqPythonEventSource::setContent(const QString& path)
   this->start();
 }
   
-void pqPythonEventSource::getProperty()
+QString pqPythonEventSource::getProperty(QString& object, const QString& prop)
 {
   // ensure other tasks have been completed
   QCoreApplication::processEvents();
+  QVariant ret;
 
-  QObject* qobject = pqObjectNaming::GetObject(PropertyObject);
+  QObject* qobject = pqObjectNaming::GetObject(object);
   if(!qobject)
     {
-    PropertyObject = QString::null;
+    object = QString::null;
     }
   else
     {
-    PropertyResult = qobject->property(
-      PropertyResult.toAscii().data()).toString();
+    ret = qobject->property(prop.toAscii().data()).toString();
     }
+
+  return ret.toString();
+
+}
+
+void pqPythonEventSource::threadGetProperty()
+{
+  PropertyResult = this->getProperty(PropertyObject, PropertyResult);
+  WaitResults.wakeAll();
+}
+
+QStringList pqPythonEventSource::getChildren(QString& object)
+{
+  // ensure other tasks have been completed
+  QCoreApplication::processEvents();
+  QStringList ret;
+
+  QObject* qobject = pqObjectNaming::GetObject(object);
+  if(!qobject)
+    {
+    object = QString::null;
+    }
+  else
+    {
+    const QObjectList& children = qobject->children();
+    foreach(QObject* child, children)
+      {
+      ret.append(pqObjectNaming::GetName(*child));
+      }
+    }
+  return ret;
+}
+
+
+void pqPythonEventSource::threadGetChildren()
+{
+  ObjectList = this->getChildren(PropertyObject);
   WaitResults.wakeAll();
 }
 
@@ -251,17 +352,7 @@ void pqPythonEventSource::run()
     return;
     } 
 
-  // initialize threading
-  PyEval_InitThreads();
-  this->Internal->MainThreadState = PyThreadState_Get();
-  PyEval_ReleaseLock();
-
-  
-  PyEval_AcquireLock();
-  PyInterpreterState* mainInterpreterState;
-  mainInterpreterState = this->Internal->MainThreadState->interp;
-  PyThreadState* myThreadState = PyThreadState_New(mainInterpreterState);
-  PyThreadState_Swap(myThreadState);
+  PyThreadState* threadState = Py_NewInterpreter();
   
   Instance = this;
 
@@ -269,12 +360,7 @@ void pqPythonEventSource::run()
   QByteArray wholeFile = file.readAll();
   int result = PyRun_SimpleString(wholeFile.data()) == 0 ? 0 : 1;
   
-  PyThreadState_Swap(NULL);
-
-  PyThreadState_Clear(myThreadState);
-  PyThreadState_Delete(myThreadState);
-  
-  PyEval_ReleaseLock();
+  Py_EndInterpreter(threadState);
   
   this->done(result);
 }

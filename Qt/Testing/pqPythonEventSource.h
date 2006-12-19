@@ -49,11 +49,15 @@ public:
 
   void setContent(const QString& path);
 
+  static QString getProperty(QString& object, const QString& prop);
+  static QStringList getChildren(QString& object);
+
 protected:
   virtual void run();
 
 protected slots:
-  void getProperty();
+  void threadGetProperty();
+  void threadGetChildren();
 
 private:
   class pqInternal;
