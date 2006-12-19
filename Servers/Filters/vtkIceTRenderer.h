@@ -183,6 +183,17 @@ protected:
 
   int PhysicalViewport[4];
 
+  // Used when rendering translucent geometry.
+  bool *PropVisibility;
+
+  // Description:
+  // Ask all props to update and draw any translucent
+  // geometry. This includes both vtkActors and vtkVolumes
+  // Return the number of rendered props.
+  // It is called once with alpha blending technique. It is called multiple
+  // times with depth peeling technique.
+  virtual int UpdateTranslucentGeometry();
+
   vtkIceTRenderer(const vtkIceTRenderer&); // Not implemented
   void operator=(const vtkIceTRenderer&); // Not implemented
 };

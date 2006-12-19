@@ -46,7 +46,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.21");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.21.10.1");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkCxxSetObjectMacro(vtkIceTRenderer, SortingKdTree, vtkPKdTree);
@@ -66,6 +66,7 @@ vtkIceTRenderer::vtkIceTRenderer()
 
   this->Context = vtkIceTContext::New();
   this->SetController(vtkMultiProcessController::GetGlobalController());
+  this->PropVisibility = 0;
 }
 
 vtkIceTRenderer::~vtkIceTRenderer()
@@ -500,6 +501,11 @@ int vtkIceTRenderer::UpdateGeometry()
         this->PropArray[i]->RenderOpaqueGeometry(this);
       }
     }
+  this->PropVisibility = visible;
+  this->DeviceRenderTranslucentGeometry();
+  this->PropVisibility = 0;
+
+  /*
   for (i = 0; i < this->PropArrayCount; i++)
     {
     if (visible[i])
@@ -508,6 +514,7 @@ int vtkIceTRenderer::UpdateGeometry()
         this->PropArray[i]->RenderTranslucentGeometry(this);
       }
     }
+    */
   for (i = 0; i < this->PropArrayCount; i++)
     {
     if (visible[i])
@@ -522,6 +529,24 @@ int vtkIceTRenderer::UpdateGeometry()
 
   delete[] visible;
   return this->NumberOfPropsRendered;
+}
+
+//-----------------------------------------------------------------------------
+int vtkIceTRenderer::UpdateTranslucentGeometry()
+{
+  int result=0;
+  // loop through props and give them a chance to
+  // render themselves as translucent geometry
+  for (int i = 0; i < this->PropArrayCount; i++ )
+    {
+    if (this->PropVisibility && this->PropVisibility[i])
+      {
+      int rendered=this->PropArray[i]->RenderTranslucentGeometry(this);
+      this->NumberOfPropsRendered += rendered;
+      result+=rendered;
+      }
+    }
+  return result;
 }
 
 //-----------------------------------------------------------------------------
