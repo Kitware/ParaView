@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
-vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.10");
+vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.11");
 
 vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
 
@@ -229,8 +229,8 @@ void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
         double magn = sqrt((bounds[1]-bounds[0]) * (bounds[1]-bounds[0]) +
                            (bounds[3]-bounds[2]) * (bounds[3]-bounds[2]) +
                            (bounds[5]-bounds[4]) * (bounds[5]-bounds[4]));
-        this->AddMinimum(0, -magn);
-        this->AddMaximum(0,  magn);
+        this->AddMinimum(0, -magn/2.0);
+        this->AddMaximum(0,  magn/2.0);
         }
       else if (this->Mode == vtkSMBoundsDomain::SCALED_EXTENT)
         {
