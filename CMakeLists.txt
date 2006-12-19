@@ -9,6 +9,18 @@ SET(PARAVIEW_VERSION_PATCH 0)
 SET(PARAVIEW_VERSION "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")   
 SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}")
 
+# Some good defaults for os X
+IF(APPLE)
+  SET(BUILD_SHARED_LIBS ON CACHE BOOL "")
+  SET(CMAKE_EXE_LINKER_FLAGS "-Wl,-search_paths_first" CACHE STRING "")
+  SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,-search_paths_first" CACHE STRING "")
+  SET(OPENGL_INCLUDE_DIR "/usr/X11R6/include" CACHE PATH "")
+  SET(VTK_USE_CARBON OFF CACHE INTERNAL "")
+  SET(VTK_USE_X ON CACHE INTERNAL "")
+ENDIF(APPLE)
+
+MARK_AS_ADVANCED(CLEAR VTK_USE_MPI)
+
 #########################################################################
 # Disallow in-source build
 STRING(COMPARE EQUAL "${ParaView_SOURCE_DIR}" 
@@ -16,7 +28,7 @@ STRING(COMPARE EQUAL "${ParaView_SOURCE_DIR}"
 IF(INSOURCE)
   MESSAGE(FATAL_ERROR "ParaView requires an out of source Build. Please create a separate binary directory and run CMake there.")
 ENDIF(INSOURCE)
-
+ 
 
 #########################################################################
 # Configure TclTk
@@ -42,15 +54,6 @@ FIND_FILE(VTK_WRAP_HINTS hints ${ParaView_SOURCE_DIR}/VTK/Wrapping)
 MARK_AS_ADVANCED(VTK_WRAP_HINTS)
 
 SET(VTK_GENERATE_TK_INTERNALS 1)
-
-#############################################################################
-# ParaView requires X on Apple.
-IF(APPLE)
-  SET(VTK_USE_CARBON OFF CACHE INTERNAL "ParaView needs X" FORCE)
-  SET(VTK_USE_COCOA OFF CACHE INTERNAL "ParaView needs X" FORCE)
-  SET(VTK_USE_X ON CACHE INTERNAL "ParaView needs X" FORCE)
-  MARK_AS_ADVANCED(VTK_USE_CARBON VTK_USE_COCOA VTK_USE_X)
-ENDIF(APPLE)
 
 #########################################################################
 # Include the file that most of the environment setup (except GUI).
@@ -226,4 +229,17 @@ IF(NOT PV_INSTALL_NO_DEVELOPMENT)
     ${ParaView_BINARY_DIR}/Utilities/ParaViewConfig.cmake
     )
 ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
+
+# Change the advanced flag of some options in a paraview-centric way
+IF(APPLE)
+  MARK_AS_ADVANCED(VTK_USE_CARBON)
+  MARK_AS_ADVANCED(VTK_USE_COCOA)
+  MARK_AS_ADVANCED(CMAKE_OSX_SYSROOT)
+  MARK_AS_ADVANCED(CMAKE_OSX_ARCHITECTURES)
+  MARK_AS_ADVANCED(VTK_USE_X)
+ENDIF(APPLE)
+
+MARK_AS_ADVANCED(TCL_LIBRARY_DEBUG)
+MARK_AS_ADVANCED(TK_LIBRARY_DEBUG)
+MARK_AS_ADVANCED(TK_WISH)
 
