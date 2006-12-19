@@ -76,7 +76,7 @@ public:
   // Description:
   // Set/Get corner text
   virtual void SetCornerText(const char *txt, int corner);
-  virtual char *GetCornerText(int i);
+  virtual const char *GetCornerText(int i);
 
   // Description:
   // Change the color of the annotation

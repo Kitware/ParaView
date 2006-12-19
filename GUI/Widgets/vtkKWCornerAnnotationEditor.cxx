@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.22");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -535,11 +535,11 @@ void vtkKWCornerAnnotationEditor::TextPropertyCallback()
 }
 
 //----------------------------------------------------------------------------
-char *vtkKWCornerAnnotationEditor::GetCornerText(int i)
+const char *vtkKWCornerAnnotationEditor::GetCornerText(int i)
 {
   if (this->CornerAnnotation)
     {
-    return this->CornerAnnotation->GetText(i);
+    return (const char*)this->CornerAnnotation->GetText(i);
     }
 
   return NULL;
