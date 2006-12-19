@@ -17,11 +17,11 @@
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPorts" command="currentChanged" arguments="/0|1" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="MyOutput" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/AddOutputButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPipeline" command="currentChanged" arguments="/0|0" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="MyOutput" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/AddOutputButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPorts" command="currentChanged" arguments="/0|1" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/OutputDownButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPorts" command="currentChanged" arguments="/1|1" />
