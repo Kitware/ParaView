@@ -95,6 +95,8 @@ pqThreadedEventSource::pqThreadedEventSource(QObject* p)
 
 pqThreadedEventSource::~pqThreadedEventSource()
 {
+  // wait a second for this thread to finish, if it hasn't yet
+  this->Internal->wait(1000);
   delete this->Internal;
 }
 
