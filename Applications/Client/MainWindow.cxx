@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqPlotViewModule.h>
 #include <pqProxyTabWidget.h>
 #include <pqRecentFilesMenu.h>
+#include <pqRenderViewModule.h>
 #include <pqRenderWindowManager.h>
 #include <pqScalarBarVisibilityAdaptor.h>
 #include <pqSelectionManager.h>
@@ -608,6 +609,21 @@ MainWindow::MainWindow() :
     &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
     sbva, SLOT(setActiveView(pqGenericViewModule*)));
 
+  // Set up Center Axes toolbar.
+  QObject::connect(
+    this->Implementation->UI.actionResetCenter, SIGNAL(triggered()),
+    &this->Implementation->Core, 
+    SLOT(resetCenterOfRotationToCenterOfCurrentData()));
+  QObject::connect(
+    this->Implementation->UI.actionShowCenterAxes, SIGNAL(toggled(bool)),
+    &this->Implementation->Core, SLOT(setCenterAxesVisibility(bool)));
+
+  QObject::connect(
+    &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
+    this, SLOT(setActiveView(pqGenericViewModule*)));
+  QObject::connect(
+    &this->Implementation->Core, SIGNAL(activeSourceChanged(pqPipelineSource*)),
+    this, SLOT(setActiveSource(pqPipelineSource*)));
 
   // Restore the state of the window ...
   pqApplicationCore::instance()->settings()->restoreState("MainWindow", *this);
@@ -621,6 +637,30 @@ MainWindow::~MainWindow()
   delete this->Implementation;
 }
 
+//-----------------------------------------------------------------------------
+void MainWindow::setActiveView(pqGenericViewModule* view)
+{
+  pqRenderViewModule* renView = qobject_cast<pqRenderViewModule*>(view);
+  bool is_ren = (renView != NULL);
+  this->Implementation->UI.actionShowCenterAxes->setEnabled(is_ren);
+  this->Implementation->UI.actionShowCenterAxes->blockSignals(true);
+  this->Implementation->UI.actionShowCenterAxes->setChecked(
+    (renView? renView->getCenterAxesVisibility(): false));
+  this->Implementation->UI.actionShowCenterAxes->blockSignals(false);
+  this->Implementation->UI.actionResetCenter->setEnabled(is_ren &&
+    this->Implementation->Core.getActiveSource());
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::setActiveSource(pqPipelineSource* src)
+{
+  bool is_ren = (qobject_cast<pqRenderViewModule*>(
+      pqActiveView::instance().current()) != NULL);
+  this->Implementation->UI.actionResetCenter->setEnabled(
+    src && is_ren);
+}
+
+//-----------------------------------------------------------------------------
 bool MainWindow::compareView(const QString& ReferenceImage, 
                              double Threshold, 
                              ostream& Output, 

@@ -108,6 +108,9 @@ public:
   /// field is a string of format "<arrayname> (cell|point)".
   int getColorFieldNumberOfComponents(const QString& field);
 
+  /// Get the data bounds for the input of this display.
+  /// Returns if the operation was successful.
+  bool getDataBounds(double bounds[6]);
 signals:
   // emitted when colorByArray()/setColorField() is called.
   void colorChanged();

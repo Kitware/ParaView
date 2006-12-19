@@ -648,3 +648,16 @@ QString pqPipelineDisplay::getColorField(bool raw)
   return QString();
 }
 
+//-----------------------------------------------------------------------------
+bool pqPipelineDisplay::getDataBounds(double bounds[6])
+{
+  vtkSMDataObjectDisplayProxy* display = 
+    this->getDisplayProxy();
+
+  if(!display || !display->GetGeometryInformation())
+    {
+    return false;
+    }
+  display->GetGeometryInformation()->GetBounds(bounds);
+  return true;
+}

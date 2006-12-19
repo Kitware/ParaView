@@ -295,6 +295,12 @@ public slots:
   void setMaxRenderWindowSize(const QSize& size);
   void enableTestingRenderWindowSize(bool enable);
 
+  // Resets the center of rotation to the center of the active 
+  // source in the active view.
+  void resetCenterOfRotationToCenterOfCurrentData();
+
+  // Set center axes visibility on active render view.
+  void setCenterAxesVisibility(bool visible);
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);

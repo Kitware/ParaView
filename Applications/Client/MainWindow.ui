@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow" >
   <property name="geometry" >
@@ -28,25 +25,13 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>28</height>
+     <height>25</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuPipeline" >
-    <property name="title" >
-     <string>&amp;Pipeline</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuFilters" >
     <property name="title" >
      <string>F&amp;ilters</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuServer" >
-    <property name="title" >
-     <string>&amp;Server</string>
-    </property>
-    <addaction name="actionServerConnect" />
-    <addaction name="actionServerDisconnect" />
    </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
@@ -172,7 +157,7 @@
   <widget class="QStatusBar" name="statusbar" />
   <widget class="QDockWidget" name="pipelineBrowserDock" >
    <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle" >
     <string>Pipeline Browser</string>
@@ -191,7 +176,7 @@
   </widget>
   <widget class="QDockWidget" name="objectInspectorDock" >
    <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle" >
     <string>Object Inspector</string>
@@ -203,7 +188,7 @@
   </widget>
   <widget class="QDockWidget" name="statisticsViewDock" >
    <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle" >
     <string>Statistics View</string>
@@ -215,7 +200,7 @@
   </widget>
   <widget class="QDockWidget" name="elementInspectorDock" >
    <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle" >
     <string>Element Inspector</string>
@@ -385,6 +370,19 @@
    <addaction name="actionNegativeY" />
    <addaction name="actionPositiveZ" />
    <addaction name="actionNegativeZ" />
+  </widget>
+  <widget class="QToolBar" name="axesToolbar" >
+   <property name="enabled" >
+    <bool>true</bool>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
+   <addaction name="actionShowCenterAxes" />
+   <addaction name="actionResetCenter" />
   </widget>
   <action name="actionFileOpen" >
    <property name="icon" >
@@ -678,6 +676,9 @@
    </property>
   </action>
   <action name="actionResetCamera" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="text" >
     <string>R</string>
    </property>
@@ -816,8 +817,32 @@
     <string>Table View</string>
    </property>
   </action>
+  <action name="actionShowCenterAxes" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqShowCenterAxes32.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Show Center</string>
+   </property>
+  </action>
+  <action name="actionResetCenter" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqResetCenter32.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Reset Center</string>
+   </property>
+  </action>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources>
   <include location="../../Qt/Components/Resources/pqComponents.qrc" />
  </resources>

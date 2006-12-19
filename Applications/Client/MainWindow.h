@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkIOStream.h>
 
 class pqPlotViewModule;
+class pqGenericViewModule;
+class pqPipelineSource;
+
 /// Provides the main window for the ParaView application
 class MainWindow :
   public QMainWindow
@@ -74,6 +77,8 @@ private slots:
 
   void assistantError(const QString& err);
 
+  void setActiveView(pqGenericViewModule*);
+  void setActiveSource(pqPipelineSource*);
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

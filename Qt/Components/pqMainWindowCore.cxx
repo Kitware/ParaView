@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPendingDisplayManager.h"
 #include "pqPipelineBrowser.h"
 #include "pqPipelineBuilder.h"
+#include "pqPipelineDisplay.h"
 #include "pqPipelineMenu.h"
 #include "pqPipelineSource.h"
 #include "pqPlotViewModule.h"
@@ -2408,8 +2409,58 @@ void pqMainWindowCore::createXYPlotView()
     pqPlotViewModule::XY_PLOT, this->getActiveServer());
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::createTableView()
 {
   pqApplicationCore::instance()->getPipelineBuilder()->createTableView(
     this->getActiveServer());
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::resetCenterOfRotationToCenterOfCurrentData()
+{
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
+    pqActiveView::instance().current());
+  if (!rm)
+    {
+    qDebug() << "No active render module. Cannot reset center of rotation.";
+    return;
+    }
+  pqPipelineSource* source = this->getActiveSource();
+  if (!source)
+    {
+    qDebug() << "No active source. Cannot reset center of rotation.";
+    return;
+    }
+  pqPipelineDisplay* display = qobject_cast<pqPipelineDisplay*>(
+    source->getDisplay(rm));
+  if (!display)
+    {
+    //qDebug() << "Active source not shown in active view. Cannot reset center.";
+    return;
+    }
+  double bounds[6];
+  if (display->getDataBounds(bounds))
+    {
+    double center[3];
+    center[0] = (bounds[1]+bounds[0])/2.0;
+    center[1] = (bounds[3]+bounds[2])/2.0;
+    center[2] = (bounds[5]+bounds[4])/2.0;
+    rm->setCenterOfRotation(center);
+    rm->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setCenterAxesVisibility(bool visible)
+{
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
+    pqActiveView::instance().current());
+  if (!rm)
+    {
+    qDebug() << "No active render module. setCenterAxesVisibility failed.";
+    return;
+    }
+  rm->setCenterAxesVisibility(visible);
+  rm->render();
 }
