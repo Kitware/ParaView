@@ -270,6 +270,7 @@ protected:
   // Configure.
   virtual void Configure();
   virtual void ConfigureValidation();
+  virtual void ConfigureTraceCallback(int state);
 
 private:
 

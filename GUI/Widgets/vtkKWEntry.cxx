@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.88");
+vtkCxxRevisionMacro(vtkKWEntry, "1.89");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -67,8 +67,6 @@ void vtkKWEntry::CreateWidget()
 
   this->Script("%s configure -textvariable %s_Value",
                this->GetWidgetName(), this->GetTclName());
-  this->Script("trace variable %s_Value w {%s TracedVariableChangedCallback}",
-               this->GetTclName(), this->GetTclName());
 
   this->Configure();
 }
@@ -112,6 +110,25 @@ void vtkKWEntry::Configure()
   this->SetBinding("<Unmap>", this, "ValueCallback");
 
   this->ConfigureValidation();
+
+  if (this->CommandTrigger & vtkKWEntry::TriggerOnAnyChange)
+    {
+    this->ConfigureTraceCallback(1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::ConfigureTraceCallback(int state)
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  this->Script(
+    "trace %s variable %s_Value write {%s TracedVariableChangedCallback}",
+    (state ? "add" : "remove"),
+    this->GetTclName(), this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -183,8 +200,21 @@ void vtkKWEntry::SetValue(const char *s)
   
   int old_state = this->GetState();
   this->SetStateToNormal();
-  
+
+  // We need to empty the entry first before inserting the value
+  // Let's make sure we are not triggering the trace callback while
+  // doing so.
+
+  if (this->CommandTrigger & vtkKWEntry::TriggerOnAnyChange)
+    {
+    this->ConfigureTraceCallback(0);
+    }
   this->Script("%s delete 0 end", this->GetWidgetName());
+  if (this->CommandTrigger & vtkKWEntry::TriggerOnAnyChange)
+    {
+    this->ConfigureTraceCallback(1);
+    }
+
   if (s)
     {
     const char *val = this->ConvertInternalStringToTclString(
