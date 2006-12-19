@@ -260,6 +260,48 @@
    <addaction name="actionMoveMode" />
    <addaction name="actionSelectionMode" />
   </widget>
+  <widget class="QToolBar" name="undoRedoToolbar" >
+   <property name="windowTitle" >
+    <string>Undo/Redo Controls</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>20</width>
+     <height>22</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
+   <addaction name="actionEditUndo" />
+   <addaction name="actionEditRedo" />
+  </widget>
+  <widget class="QToolBar" name="VCRToolbar" >
+   <property name="windowTitle" >
+    <string>VCR Controls</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>20</width>
+     <height>22</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
+   <addaction name="actionVCRFirstFrame" />
+   <addaction name="actionVCRPreviousFrame" />
+   <addaction name="actionVCRPlay" />
+   <addaction name="actionVCRPause" />
+   <addaction name="actionVCRNextFrame" />
+   <addaction name="actionVCRLastFrame" />
+  </widget>
   <widget class="QToolBar" name="variableToolbar" >
    <property name="windowTitle" >
     <string>Active Variable Controls</string>
@@ -311,48 +353,6 @@
    <attribute name="toolBarArea" >
     <number>4</number>
    </attribute>
-  </widget>
-  <widget class="QToolBar" name="undoRedoToolbar" >
-   <property name="windowTitle" >
-    <string>Undo/Redo Controls</string>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="iconSize" >
-    <size>
-     <width>20</width>
-     <height>22</height>
-    </size>
-   </property>
-   <attribute name="toolBarArea" >
-    <number>4</number>
-   </attribute>
-   <addaction name="actionEditUndo" />
-   <addaction name="actionEditRedo" />
-  </widget>
-  <widget class="QToolBar" name="VCRToolbar" >
-   <property name="windowTitle" >
-    <string>VCR Controls</string>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="iconSize" >
-    <size>
-     <width>20</width>
-     <height>22</height>
-    </size>
-   </property>
-   <attribute name="toolBarArea" >
-    <number>4</number>
-   </attribute>
-   <addaction name="actionVCRFirstFrame" />
-   <addaction name="actionVCRPreviousFrame" />
-   <addaction name="actionVCRPlay" />
-   <addaction name="actionVCRPause" />
-   <addaction name="actionVCRNextFrame" />
-   <addaction name="actionVCRLastFrame" />
   </widget>
   <widget class="QToolBar" name="cameraToolbar" >
    <property name="windowTitle" >
