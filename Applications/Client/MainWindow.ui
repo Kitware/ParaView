@@ -33,6 +33,13 @@
      <string>F&amp;ilters</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuServer" > 	 
+     <property name="title" > 	 
+      <string>&amp;Server</string> 	 
+     </property> 	 
+     <addaction name="actionServerConnect" /> 	 
+     <addaction name="actionServerDisconnect" /> 	 
+    </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
      <string>&amp;File</string>
