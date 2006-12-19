@@ -1160,9 +1160,6 @@
        </item>
        <item>
         <widget class="QPushButton" name="ResetLight" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
          <property name="text" >
           <string>Reset Light</string>
          </property>
