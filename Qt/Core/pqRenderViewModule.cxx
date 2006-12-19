@@ -495,17 +495,7 @@ void pqRenderViewModule::setDefaults()
   proxy->UpdateVTKObjects();
 }
 
-static const char* pqRenderViewModuleSettings[] = {
-  "CameraParallelProjection",
-  "UseTriangleStrips",
-  "UseImmediateMode",
-  "LODThreshold",
-  "LODResolution",
-  "RenderInterruptsEnabled",
-  "CompositeThreshold",
-  "ReductionFactor",
-  "SquirtLevel",
-  "OrderedCompositing",
+static const char* pqRenderViewModuleLightSettings [] = {
   "LightSwitch",
   "LightIntensity",
   "UseLight",
@@ -524,11 +514,43 @@ static const char* pqRenderViewModuleSettings[] = {
   "HeadLightWarmth",
   "HeadLightK:H Ratio",
   "MaintainLuminance",
-  NULL  // keep last
-};
-static const char* pqRenderViewModuleSettingsMulti[] = {
-  "Background",
+  NULL
+  };
+
+static const char* pqRenderViewModuleMiscSettings [] = {
+  "CameraParallelProjection",
+  "UseTriangleStrips",
+  "UseImmediateMode",
+  "LODThreshold",
+  "LODResolution",
+  "RenderInterruptsEnabled",
+  "CompositeThreshold",
+  "ReductionFactor",
+  "SquirtLevel",
+  "OrderedCompositing",
+  NULL
+  };
+
+
+static const char** pqRenderViewModuleSettings[] = {
+  pqRenderViewModuleLightSettings,
+  pqRenderViewModuleMiscSettings,
+  NULL
+  };
+
+static const char* pqRenderViewModuleLightSettingsMulti[] = {
   "LightDiffuseColor",
+  NULL  // keep last
+  };
+
+static const char* pqRenderViewModuleMiscSettingsMulti[] = {
+  "Background",
+  NULL  // keep last
+  };
+
+static const char** pqRenderViewModuleSettingsMulti[] = {
+  pqRenderViewModuleLightSettingsMulti,
+  pqRenderViewModuleMiscSettingsMulti,
   NULL  // keep last
 };
 
@@ -539,25 +561,33 @@ void pqRenderViewModule::restoreSettings()
   // Now load default values from the QSettings, if available.
   pqSettings* settings = pqApplicationCore::instance()->settings();
 
-  const char** str;
+  const char*** str;
 
   for(str=pqRenderViewModuleSettings; *str != NULL; str++)
     {
-    QString key = QString("renderModule/") + *str;
-    vtkSMProperty* prop = proxy->GetProperty(*str);
-    if (prop && settings->contains(key))
+    const char** substr;
+    for(substr = str[0]; *substr != NULL; substr++)
       {
-      pqSMAdaptor::setElementProperty(prop, settings->value(key));
+      QString key = QString("renderModule/") + *substr;
+      vtkSMProperty* prop = proxy->GetProperty(*substr);
+      if (prop && settings->contains(key))
+        {
+        pqSMAdaptor::setElementProperty(prop, settings->value(key));
+        }
       }
     }
   for(str=pqRenderViewModuleSettingsMulti; *str != NULL; str++)
     {
-    QString key = QString("renderModule/") + *str;
-    vtkSMProperty* prop = proxy->GetProperty(*str);
-    if (prop && settings->contains(key))
+    const char** substr;
+    for(substr = str[0]; *substr != NULL; substr++)
       {
-      QList<QVariant> value = settings->value(key).value<QList<QVariant> >();
-      pqSMAdaptor::setMultipleElementProperty(prop, value);
+      QString key = QString("renderModule/") + *substr;
+      vtkSMProperty* prop = proxy->GetProperty(*substr);
+      if (prop && settings->contains(key))
+        {
+        QList<QVariant> value = settings->value(key).value<QList<QVariant> >();
+        pqSMAdaptor::setMultipleElementProperty(prop, value);
+        }
       }
     }
   proxy->UpdateVTKObjects();
@@ -603,24 +633,32 @@ void pqRenderViewModule::saveSettings()
 {
   vtkSMProxy* proxy = this->getProxy();
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  const char** str;
+  const char*** str;
   
   for(str=pqRenderViewModuleSettings; *str != NULL; str++)
     {
-    QString key = QString("renderModule/") + *str;
-    vtkSMProperty* prop = proxy->GetProperty(*str);
-    if (prop)
+    const char** substr;
+    for(substr = str[0]; *substr != NULL; substr++)
       {
-      settings->setValue(key, pqSMAdaptor::getElementProperty(prop));
+      QString key = QString("renderModule/") + *substr;
+      vtkSMProperty* prop = proxy->GetProperty(*substr);
+      if (prop)
+        {
+        settings->setValue(key, pqSMAdaptor::getElementProperty(prop));
+        }
       }
     }
   for(str=pqRenderViewModuleSettingsMulti; *str != NULL; str++)
     {
-    QString key = QString("renderModule/") + *str;
-    vtkSMProperty* prop = proxy->GetProperty(*str);
-    if (prop)
+    const char** substr;
+    for(substr = str[0]; *substr != NULL; substr++)
       {
-      settings->setValue(key, pqSMAdaptor::getMultipleElementProperty(prop));
+      QString key = QString("renderModule/") + *substr;
+      vtkSMProperty* prop = proxy->GetProperty(*substr);
+      if (prop)
+        {
+        settings->setValue(key, pqSMAdaptor::getMultipleElementProperty(prop));
+        }
       }
     }
 
@@ -781,6 +819,23 @@ bool pqRenderViewModule::eventFilter(QObject* caller, QEvent* e)
 
 void pqRenderViewModule::restoreDefaultLightSettings()
 {
-  // TODO:
+  vtkSMProxy* proxy = this->getProxy();
+  const char** str;
+
+  for(str=pqRenderViewModuleLightSettings; *str != NULL; str++)
+    {
+    vtkSMProperty* prop = proxy->GetProperty(*str);
+    if(prop)
+      {
+      prop->ResetToDefault();
+      }
+    }
+  for(str=pqRenderViewModuleLightSettingsMulti; *str != NULL; str++)
+    {
+    vtkSMProperty* prop = proxy->GetProperty(*str);
+    prop->ResetToDefault();
+    }
+  proxy->UpdateVTKObjects();
+
 }
 
