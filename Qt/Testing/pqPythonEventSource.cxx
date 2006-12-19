@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static pqPythonEventSource* Instance = NULL;
 static QString PropertyObject;
 static QString PropertyResult;
+static QString PropertyValue;
 static QWaitCondition WaitResults;
 static QStringList ObjectList;
 
@@ -136,6 +137,60 @@ QtTesting_getProperty(PyObject* /*self*/, PyObject* args)
 
   return Py_BuildValue(const_cast<char*>("s"), 
              PropertyResult.toAscii().data());
+}
+
+static PyObject*
+QtTesting_setProperty(PyObject* /*self*/, PyObject* args)
+{
+  // string QtTesting.setProperty('object', 'property', 'value')
+  //    returns the string value of the property
+  
+  const char* object = 0;
+  const char* property = 0;
+  const char* value = 0;
+
+  if(!PyArg_ParseTuple(args, const_cast<char*>("ss"), &object, 
+                                                      &property, &value))
+    {
+    return NULL;
+    }
+
+  PropertyObject = object;
+  PropertyResult = property;
+  PropertyValue = value;
+
+  if(Instance && QThread::currentThread() != QApplication::instance()->thread())
+    {
+    QMutex mut;
+    mut.lock();
+    QMetaObject::invokeMethod(Instance, "threadSetProperty", Qt::QueuedConnection);
+    WaitResults.wait(&mut);
+    }
+  else if(QThread::currentThread() == QApplication::instance()->thread())
+    {
+    pqPythonEventSource::setProperty(PropertyObject, 
+                                     PropertyResult,
+                                     PropertyValue);
+    }
+  else
+    {
+    PyErr_SetString(PyExc_AssertionError, "pqPythonEventSource not defined");
+    return NULL;
+    }
+
+  if(PropertyObject == QString::null)
+    {
+    PyErr_SetString(PyExc_ValueError, "object not found");
+    return NULL;
+    }
+
+  if(PropertyResult == QString::null)
+    {
+    PyErr_SetString(PyExc_ValueError, "property not found");
+    return NULL;
+    }
+
+  return Py_BuildValue(const_cast<char*>("s"), "");
 }
 
 static PyObject*
@@ -227,6 +282,13 @@ static PyMethodDef QtTestingMethods[] = {
     const_cast<char*>("Get a property of an object.")
   },
   {
+    const_cast<char*>("setProperty"),
+    QtTesting_setProperty,
+    METH_VARARGS,
+    const_cast<char*>("Set a property of an object.")
+  },
+
+  {
     const_cast<char*>("getQtVersion"),
     QtTesting_getQtVersion,
     METH_VARARGS,
@@ -308,11 +370,41 @@ QString pqPythonEventSource::getProperty(QString& object, const QString& prop)
 
 }
 
+
 void pqPythonEventSource::threadGetProperty()
 {
   PropertyResult = this->getProperty(PropertyObject, PropertyResult);
   WaitResults.wakeAll();
 }
+
+
+void pqPythonEventSource::setProperty(QString& object, QString& prop, 
+                                      const QString& value)
+{
+  // ensure other tasks have been completed
+  QCoreApplication::processEvents();
+  QVariant ret;
+
+  QObject* qobject = pqObjectNaming::GetObject(object);
+  if(!qobject)
+    {
+    object = QString::null;
+    }
+  else
+    {
+    if(!qobject->setProperty(prop.toAscii().data(), value))
+      {
+      prop = QString::null;
+      }
+    }
+}
+
+void pqPythonEventSource::threadSetProperty()
+{
+  this->setProperty(PropertyObject, PropertyResult, PropertyValue);
+  WaitResults.wakeAll();
+}
+
 
 QStringList pqPythonEventSource::getChildren(QString& object)
 {

@@ -50,6 +50,7 @@ public:
   void setContent(const QString& path);
 
   static QString getProperty(QString& object, const QString& prop);
+  static void setProperty(QString& object, QString& prop, const QString& value);
   static QStringList getChildren(QString& object);
 
 protected:
@@ -57,6 +58,7 @@ protected:
 
 protected slots:
   void threadGetProperty();
+  void threadSetProperty();
   void threadGetChildren();
 
 private:
