@@ -277,7 +277,17 @@ void pqDisplayColorWidget::setView(pqGenericViewModule* view)
     QObject::connect(this->RenderModule, SIGNAL(displayAdded(pqDisplay*)), 
       this, SLOT(displayAdded()), Qt::QueuedConnection);
     }
-  this->reloadGUI();
+
+  if (this->SelectedSource)
+    {
+    this->setDisplay(
+      qobject_cast<pqPipelineDisplay*>(
+        this->SelectedSource->getDisplay(this->RenderModule)));
+    }
+  else
+    {
+    this->setDisplay(0);
+    }
 }
 
 //-----------------------------------------------------------------------------

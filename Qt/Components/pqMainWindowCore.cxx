@@ -39,7 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCustomFilterManagerModel.h"
 #include "pqDataInformationWidget.h"
 #include "pqDisplayColorWidget.h"
+#include "pqDisplayRepresentationWidget.h"
 #include "pqElementInspectorWidget.h"
+#include "pqGenericViewManager.h"
 #include "pqMainWindowCore.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
@@ -50,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineBuilder.h"
 #include "pqPipelineMenu.h"
 #include "pqPipelineSource.h"
-#include "pqGenericViewManager.h"
 #include "pqPlotViewModule.h"
 #include "pqPQLookupTableManager.h"
 #include "pqProxyTabWidget.h"
@@ -850,11 +851,11 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
     display_color,
     SLOT(reloadGUI()));
 
-  QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
+  QObject::connect(&pqActiveView::instance(), 
+    SIGNAL(changed(pqGenericViewModule*)),
     display_color, SLOT(setView(pqGenericViewModule*)));
 }
 
-#include "pqDisplayRepresentationWidget.h"
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setupRepresentationToolbar(QToolBar* toolbar)
 {
