@@ -146,8 +146,9 @@ initQtTestingImage(void)
 pqPythonEventSourceImage::pqPythonEventSourceImage(QObject* p)
   : pqPythonEventSource(p)
 {
-  // initialize the QtTestingImage module
-  initQtTestingImage();
+  // add QtTesting to python's inittab, so it is
+  // available to all interpreters
+  PyImport_AppendInittab("QtTestingImage", initQtTestingImage);
 }
 
 pqPythonEventSourceImage::~pqPythonEventSourceImage()
