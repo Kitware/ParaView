@@ -178,25 +178,16 @@ bool pqCoreTestUtility::CompareImage(vtkRenderWindow* RenderWindow,
   return false;
 }
   
-void pqCoreTestUtility::playTests()
-{
-  if(pqOptions* const options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions()))
-    {
-    if(options->GetTestFileName())
-      {
-      this->playTests(options->GetTestFileName());
-      return;
-      }
-    }
-  
-  // No tests to run, so declare success!
-  this->testSucceeded();
-}
-
 void pqCoreTestUtility::playTests(const QString& filename)
 {
-  pqTestUtility::playTests(filename);
+  if(!filename.isEmpty())
+    {
+    pqTestUtility::playTests(filename);
+    }
+  else
+    {
+    this->testSucceeded();
+    }
 }
 
 void pqCoreTestUtility::testSucceeded()

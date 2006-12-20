@@ -68,7 +68,6 @@ public:
                            const QString& TempDirectory);
 
 public slots:
-  void playTests();
   void playTests(const QString& filename);
 
 protected slots:

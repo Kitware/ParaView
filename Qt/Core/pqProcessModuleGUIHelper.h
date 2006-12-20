@@ -39,6 +39,8 @@ class QWidget;
 class vtkSMApplication;
 class QApplication;
 class QString;
+class pqTestUtility;
+
 /*! \brief This is the GUI helper for ParaView.
  * This class provides GUI elements to the process module without forcing
  * the process modules to link with the GUI. This class creates the main window
@@ -80,6 +82,9 @@ public:
   // Description:
   // Get the application singleton. 
   QApplication* GetApplication();
+
+  // return the test utility
+  virtual pqTestUtility* TestUtility();
 
   /// Dangerous option that disables the debug output window, intended for demo purposes only
   void disableOutputWindow();

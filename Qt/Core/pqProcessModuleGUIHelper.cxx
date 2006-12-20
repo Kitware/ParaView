@@ -35,8 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputWindowAdapter.h"
 #include "pqOutputWindow.h"
 #include "pqCoreTestUtility.h"
-
-#include <pqObjectNaming.h>
+#include "pqOptions.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkProcessModule.h>
@@ -108,12 +107,13 @@ public:
   bool EnableProgress;
   bool ReadyEnableProgress;
   double LastProgress;
+  pqCoreTestUtility TestUtility;
 };
 
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.7");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.8");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -150,9 +150,22 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     this->Implementation->Window->show();
     
     // get the tester going when the application starts
-    pqCoreTestUtility tester;
-    QTimer::singleShot(0, &tester, SLOT(playTests()));
-    
+    QString testFile;
+    if(this->TestUtility())
+      {
+      if(pqOptions* const options = pqOptions::SafeDownCast(
+             vtkProcessModule::GetProcessModule()->GetOptions()))
+        {
+        if(options->GetTestFileName())
+          {
+          testFile = options->GetTestFileName();
+          }
+        }
+        QMetaObject::invokeMethod(this->TestUtility(), "playTests",
+                              Qt::QueuedConnection,
+                              Q_ARG(QString, testFile));
+      }
+
     // Starts the event loop.
     QCoreApplication* app = QApplication::instance();
     status = app->exec();
@@ -294,4 +307,8 @@ QWidget* pqProcessModuleGUIHelper::GetMainWindow()
   return this->Implementation->Window;
 }
 
+pqTestUtility* pqProcessModuleGUIHelper::TestUtility()
+{
+  return &this->Implementation->TestUtility;
+}
 
