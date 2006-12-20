@@ -141,6 +141,7 @@ public:
     this->DefaultBackground[0] = 84;
     this->DefaultBackground[1] = 89;
     this->DefaultBackground[2] = 109;
+
     }
 
   ~pqRenderViewModuleInternal()
@@ -169,6 +170,18 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   this->Internal->Viewport->installEventFilter(this);
 
   this->ResetCenterWithCamera = true;
+
+  this->Internal->CenterAxesProxy.TakeReference(
+    vtkSMObject::GetProxyManager()->NewProxy("axes","Axes"));
+  this->Internal->CenterAxesProxy->SetConnectionID(
+    this->Internal->RenderModuleProxy->GetConnectionID());
+  this->Internal->CenterAxesProxy->SetServers(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  QList<QVariant> scaleValues;
+  scaleValues << .25 << .25 << .25;
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Internal->CenterAxesProxy->GetProperty("Scale"),
+    scaleValues);
 }
 
 //-----------------------------------------------------------------------------
@@ -235,18 +248,6 @@ void pqRenderViewModule::viewModuleInit()
   this->Internal->OrientationAxesWidget->SetInteractor(iren);
   this->Internal->OrientationAxesWidget->SetEnabled(1);
   this->Internal->OrientationAxesWidget->SetInteractive(0);
-
-  this->Internal->CenterAxesProxy.TakeReference(
-    vtkSMObject::GetProxyManager()->NewProxy("axes","Axes"));
-  this->Internal->CenterAxesProxy->SetConnectionID(
-    this->Internal->RenderModuleProxy->GetConnectionID());
-  this->Internal->CenterAxesProxy->SetServers(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  QList<QVariant> scaleValues;
-  scaleValues << .25 << .25 << .25;
-  pqSMAdaptor::setMultipleElementProperty(
-    this->Internal->CenterAxesProxy->GetProperty("Scale"),
-    scaleValues);
 
   this->Internal->RenderModuleProxy->ResetCamera();
 
