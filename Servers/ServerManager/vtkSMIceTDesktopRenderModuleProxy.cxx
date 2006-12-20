@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.22");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -711,13 +711,13 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
             }
           }
 
+        vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
         if (!self_generate_kdtree && this->UsingCustomKdTree)
           {
           // we need to ensure that the PKdTreeProxy no longer
           // uses the user-defined cuts. Settings the cuts to NULL
           // ensures that. 
           vtkClientServerStream stream;
-          vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
           stream << vtkClientServerStream::Invoke
             << this->PKdTreeProxy->GetID(0)
             << "SetCuts" << 0
@@ -728,7 +728,9 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
         this->UsingCustomKdTree = self_generate_kdtree;
         
         // Build the global k-d tree.
+        pm->SendPrepareProgress(this->GetConnectionID());
         this->PKdTreeProxy->InvokeCommand("BuildLocator");
+        pm->SendCleanupPendingProgress(this->GetConnectionID());
         }
       }
     }
