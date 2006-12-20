@@ -29,7 +29,7 @@
 class vtkKdTreeGeneratorVector : public vtkstd::vector<int> {};
 
 vtkStandardNewMacro(vtkKdTreeGenerator);
-vtkCxxRevisionMacro(vtkKdTreeGenerator, "1.1");
+vtkCxxRevisionMacro(vtkKdTreeGenerator, "1.1.2.1");
 vtkCxxSetObjectMacro(vtkKdTreeGenerator, ExtentTranslator, vtkExtentTranslator);
 vtkCxxSetObjectMacro(vtkKdTreeGenerator, KdTree, vtkPKdTree);
 //-----------------------------------------------------------------------------
@@ -111,7 +111,7 @@ int vtkKdTreeGenerator::BuildTree(vtkDataObject* data)
    {
    return 0;
    }
- vtkSmartPointer<vtkBSPCuts> cuts = vtkBSPCuts::New();
+ vtkSmartPointer<vtkBSPCuts> cuts = vtkSmartPointer<vtkBSPCuts>::New();
  cuts->CreateCuts(root);
  if (!this->KdTree)
    {
