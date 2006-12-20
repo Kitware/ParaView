@@ -18,7 +18,7 @@
 #include "vtkImageData.h"
 
 vtkStandardNewMacro(vtkSquirtCompressor);
-vtkCxxRevisionMacro(vtkSquirtCompressor, "1.4");
+vtkCxxRevisionMacro(vtkSquirtCompressor, "1.5");
 //-----------------------------------------------------------------------------
 vtkSquirtCompressor::vtkSquirtCompressor()
 {
@@ -85,8 +85,8 @@ int vtkSquirtCompressor::CompressData()
       index++;
 
       // Compute Run
-      while(((current_color&compress_mask) == (_rawColorBuffer[index]&compress_mask)) &&
-        (index<end_index) && (count<255))
+      while((index<end_index) && (count<255) && 
+        ((current_color&compress_mask) == (_rawColorBuffer[index]&compress_mask)))
         { 
         index++; count++;   
         }
