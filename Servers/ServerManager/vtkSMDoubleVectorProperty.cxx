@@ -22,19 +22,28 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.32");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.33");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
   vtkstd::vector<double> Values;
   vtkstd::vector<double> UncheckedValues;
   vtkstd::vector<double> LastPushedValues;
+  vtkstd::vector<double> DefaultValues;
+
   void UpdateLastPushedValues()
     {
     // Set the last pushed values.
     this->LastPushedValues.clear();
     this->LastPushedValues.insert(
       this->LastPushedValues.end(),
+      this->Values.begin(), this->Values.end());
+    }
+
+  void UpdateDefaultValues()
+    {
+    this->DefaultValues.clear();
+    this->DefaultValues.insert(this->DefaultValues.end(),
       this->Values.begin(), this->Values.end());
     }
 };
@@ -340,6 +349,7 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
         }
       this->SetElements(initVal);
       this->Internals->UpdateLastPushedValues();
+      this->Internals->UpdateDefaultValues();
       }
     else
       {
@@ -472,6 +482,19 @@ void vtkSMDoubleVectorProperty::Copy(vtkSMProperty* src)
            &dsrc->Internals->UncheckedValues[0], 
            this->GetNumberOfUncheckedElements()*sizeof(double));
     this->ImmediateUpdate = imUpdate;
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleVectorProperty::ResetToDefaultInternal()
+{
+  if (this->Internals->DefaultValues != this->Internals->Values)
+    {
+    this->Internals->Values.clear();
+    this->Internals->Values.insert(this->Internals->Values.end(),
+      this->Internals->DefaultValues.begin(),
+      this->Internals->DefaultValues.end());
+    this->Modified();
     }
 }
 

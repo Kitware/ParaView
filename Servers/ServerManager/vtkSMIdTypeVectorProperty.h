@@ -153,6 +153,9 @@ protected:
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
   //ETX
 
+  // Subclass may override this if ResetToDefault can reset to default
+  // value specified in the configuration file.
+  virtual void ResetToDefaultInternal();
 private:
   vtkSMIdTypeVectorProperty(const vtkSMIdTypeVectorProperty&); // Not implemented
   void operator=(const vtkSMIdTypeVectorProperty&); // Not implemented
