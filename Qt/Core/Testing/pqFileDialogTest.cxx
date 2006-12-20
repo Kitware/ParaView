@@ -108,6 +108,20 @@ void pqFileDialogTestUtility::cleanupFiles()
     QDir testDir(testDirName);
     if(testDir.exists())
       {
+      testDir.cd("FileDialogTest");
+      testDir.rmdir("SubDir1");
+      testDir.rmdir("SubDir2");
+      testDir.rmdir("SubDir3");
+      testDir.remove("File1.png");
+      testDir.remove("File2.png");
+      testDir.remove("File3.png");
+      testDir.remove("File1.bmp");
+      testDir.remove("File2.bmp");
+      testDir.remove("File3.bmp");
+      testDir.remove("File1.jpg");
+      testDir.remove("File2.jpg");
+      testDir.remove("File3.jpg");
+      testDir.cdUp();
       testDir.rmdir("FileDialogTest");
       }
     }
