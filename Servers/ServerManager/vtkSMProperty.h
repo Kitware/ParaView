@@ -214,8 +214,12 @@ public:
   // until one of then returns 1, implying that it updated
   // the property value. This is used to reset the property
   // to its default value. Currently default values that depend
-  // on domain are reset. Soon this will be extended to reset
-  // all properties.
+  // on domain are reset. This method can also be called
+  // to reset the property value to the default specified
+  // in the configuration XML. If none of the domains
+  // updates the property value, then some property subclassess
+  // (viz. IntVectorProperty, DoubleVectorProperty and IdTypeVectorProperty)
+  // update the current value to that specified in the configuration XML.
   void ResetToDefault();
 
 protected:
@@ -349,6 +353,10 @@ protected:
 
   vtkSMDocumentation* Documentation;
   void SetDocumentation(vtkSMDocumentation*);
+
+  // Subclass may override this if ResetToDefault can reset to default
+  // value specified in the configuration file.
+  virtual void ResetToDefaultInternal() {};
 //BTX
   // For PVEE.
   friend class vtkWSMApplication;

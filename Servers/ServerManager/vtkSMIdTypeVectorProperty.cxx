@@ -21,18 +21,27 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.11");
+vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.12");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {
   vtkstd::vector<vtkIdType> Values;
   vtkstd::vector<vtkIdType> UncheckedValues;
   vtkstd::vector<vtkIdType> LastPushedValues;
+  vtkstd::vector<vtkIdType> DefaultValues;
+
   void UpdateLastPushedValues()
     {
     // Save LastPushedValues.
     this->LastPushedValues.clear();
     this->LastPushedValues.insert(this->LastPushedValues.end(),
+      this->Values.begin(), this->Values.end());
+    }
+
+  void UpdateDefaultValues()
+    {
+    this->DefaultValues.clear();
+    this->DefaultValues.insert(this->DefaultValues.end(),
       this->Values.begin(), this->Values.end());
     }
 };
@@ -302,6 +311,7 @@ int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
         this->SetElement(i, initVal[i]);
         }
       this->Internals->UpdateLastPushedValues();
+      this->Internals->UpdateDefaultValues();
       }
     else
       {
@@ -434,6 +444,19 @@ void vtkSMIdTypeVectorProperty::Copy(vtkSMProperty* src)
            &dsrc->Internals->UncheckedValues[0], 
            this->GetNumberOfUncheckedElements()*sizeof(vtkIdType));
     this->ImmediateUpdate = imUpdate;
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIdTypeVectorProperty::ResetToDefaultInternal()
+{
+  if (this->Internals->DefaultValues != this->Internals->Values)
+    {
+    this->Internals->Values.clear();
+    this->Internals->Values.insert(this->Internals->Values.end(),
+      this->Internals->DefaultValues.begin(),
+      this->Internals->DefaultValues.end());
+    this->Modified();
     }
 }
 

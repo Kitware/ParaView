@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.27");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.28");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -31,11 +31,20 @@ struct vtkSMIntVectorPropertyInternals
   vtkstd::vector<int> LastPushedValues; // These are the values that
       // were last pushed onto the server. These are used to generate
       // the undo/redo state.
+  vtkstd::vector<int> DefaultValues; // Values set in the XML configuration.
+
   void UpdateLastPushedValues()
     {
     // Update LastPushedValues.
     this->LastPushedValues.clear();
     this->LastPushedValues.insert(this->LastPushedValues.end(),
+      this->Values.begin(), this->Values.end());
+    }
+
+  void UpdateDefaultValues()
+    {
+    this->DefaultValues.clear();
+    this->DefaultValues.insert(this->DefaultValues.end(),
       this->Values.begin(), this->Values.end());
     }
 };
@@ -313,6 +322,7 @@ int vtkSMIntVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
         this->SetElement(i, initVal[i]);
         }
       this->Internals->UpdateLastPushedValues();
+      this->Internals->UpdateDefaultValues();
       }
     else
       {
@@ -445,6 +455,19 @@ void vtkSMIntVectorProperty::Copy(vtkSMProperty* src)
            &dsrc->Internals->UncheckedValues[0], 
            this->GetNumberOfUncheckedElements()*sizeof(int));
     this->ImmediateUpdate = imUpdate;
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIntVectorProperty::ResetToDefaultInternal()
+{
+  if (this->Internals->DefaultValues != this->Internals->Values)
+    {
+    this->Internals->Values.clear();
+    this->Internals->Values.insert(this->Internals->Values.end(),
+      this->Internals->DefaultValues.begin(),
+      this->Internals->DefaultValues.end());
+    this->Modified();
     }
 }
 
