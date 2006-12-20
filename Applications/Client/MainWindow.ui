@@ -164,7 +164,7 @@
   <widget class="QStatusBar" name="statusbar" />
   <widget class="QDockWidget" name="pipelineBrowserDock" >
    <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle" >
     <string>Pipeline Browser</string>
@@ -183,7 +183,7 @@
   </widget>
   <widget class="QDockWidget" name="objectInspectorDock" >
    <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle" >
     <string>Object Inspector</string>
@@ -195,7 +195,7 @@
   </widget>
   <widget class="QDockWidget" name="statisticsViewDock" >
    <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle" >
     <string>Statistics View</string>
@@ -207,7 +207,7 @@
   </widget>
   <widget class="QDockWidget" name="elementInspectorDock" >
    <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle" >
     <string>Element Inspector</string>
