@@ -335,7 +335,7 @@ pqPythonEventSource::pqPythonEventSource(QObject* p)
 
   // add QtTesting to python's inittab, so it is
   // available to all interpreters
-  PyImport_AppendInittab("QtTesting", initQtTesting);
+  PyImport_AppendInittab(const_cast<char*>("QtTesting"), initQtTesting);
 }
 
 pqPythonEventSource::~pqPythonEventSource()

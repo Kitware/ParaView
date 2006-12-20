@@ -148,7 +148,8 @@ pqPythonEventSourceImage::pqPythonEventSourceImage(QObject* p)
 {
   // add QtTesting to python's inittab, so it is
   // available to all interpreters
-  PyImport_AppendInittab("QtTestingImage", initQtTestingImage);
+  PyImport_AppendInittab(const_cast<char*>("QtTestingImage"),
+                         initQtTestingImage);
 }
 
 pqPythonEventSourceImage::~pqPythonEventSourceImage()
