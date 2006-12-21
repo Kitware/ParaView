@@ -197,7 +197,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.800.2.1");
+vtkCxxRevisionMacro(vtkPVWindow, "1.800.2.2");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -4733,7 +4733,9 @@ int vtkPVWindow::LoadTexture(const char* filename)
   vtkSMProxyProperty *inputProp = vtkSMProxyProperty::SafeDownCast(
     textureProxy->GetProperty("Input"));
   inputProp->AddProxy(parser);
-
+  
+  imageReader->Delete();
+  writer->Delete();
   parser->Delete();
   textureProxy->Delete();
   

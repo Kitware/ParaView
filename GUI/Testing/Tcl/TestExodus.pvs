@@ -126,13 +126,6 @@ $kw(vtkTemp248) SetCurrentManipulator 2 1 {Pan}
 $kw(vtkTemp248) SetCurrentManipulator 2 0 {Zoom}
 $kw(vtkTemp4) SetCenterOfRotation 5 5 5
 
-# Lookmark Test
-set lookmarkManager [[ $Application GetMainWindow ] GetPVLookmarkManager]
-set lookmark [$lookmarkManager CreateLookmark "TestExodus" 0]
-[ $Application GetMainWindow ] DeleteAllSources
-$lookmark View
-$lookmarkManager Withdraw
-
 source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc
 
