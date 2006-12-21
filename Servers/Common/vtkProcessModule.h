@@ -404,6 +404,7 @@ public:
   vtkIdType GetConnectionID(vtkClientServerID id);
 //ETX
 
+
   // Description:
   // Given a vtkProcessModuleConnection, this method returns the connection
   // ID for it.
@@ -433,6 +434,12 @@ public:
   // assigned a ClientServerId.
   vtkSocketController* GetSocketController(vtkProcessModuleConnection* conn);
   vtkSocketController* GetRenderServerSocketController(vtkProcessModuleConnection* conn);
+
+  // Description:
+  // For the given connection, returns 1 if the connection is
+  // a remote server connection with separate socket connections
+  // for data server and render server.
+  int GetRenderClientMode(vtkIdType cid);
 
   // Description:
   // Get and Set the application installation directory

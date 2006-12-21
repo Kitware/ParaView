@@ -321,6 +321,12 @@ public:
   // Description:
   // Get the number of connections open.
   unsigned int GetNumberOfConnections();
+
+  // Description:
+  // For the given connection, returns 1 if the connection is
+  // a remote server connection with separate socket connections
+  // for data server and render server.
+  int GetRenderClientMode(vtkIdType cid);
 //ETX
 protected:
   vtkProcessModuleConnectionManager();

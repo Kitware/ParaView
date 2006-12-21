@@ -60,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.22");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -283,7 +283,7 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
       }
 
     // if running in render server mode
-    if (pm->GetOptions()->GetRenderServerMode())
+    if (pm->GetRenderClientMode(this->GetConnectionID()))
       {
       stream << vtkClientServerStream::Invoke
         << this->CollectProxy->GetID(i) << "SetServerToRenderServer"
