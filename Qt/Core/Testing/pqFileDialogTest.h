@@ -41,6 +41,7 @@ public slots:
 
 protected:
   QComboBox*   FileMode;
+  QComboBox*   ConnectionMode;
   QLineEdit*   FileFilter;
   QPushButton* OpenButton;
   QLabel*      EmitLabel;

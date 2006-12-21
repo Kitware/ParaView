@@ -155,6 +155,11 @@ pqFileDialogTestWidget::pqFileDialogTestWidget()
   QObject::connect(rec, SIGNAL(clicked(bool)), this, SLOT(record()));
   l->addWidget(rec);
 
+  this->ConnectionMode = new QComboBox(this);
+  this->ConnectionMode->setObjectName("ConnectionMode");
+  l->addWidget(this->ConnectionMode);
+  this->ConnectionMode->addItem("Local");
+  this->ConnectionMode->addItem("Remote");
 
   this->FileMode = new QComboBox(this);
   this->FileMode->setObjectName("FileMode");
@@ -196,7 +201,13 @@ void pqFileDialogTestWidget::openFileDialog()
     testDirName += "FileDialogTest";
     }
 
-  pqFileDialog diag(this->Server, this, this->FileMode->currentText(),
+  pqServer* server = this->Server;
+  if(this->ConnectionMode->currentText() == "Local")
+    {
+    server = NULL;
+    }
+
+  pqFileDialog diag(server, this, this->FileMode->currentText(),
                     testDirName, this->FileFilter->text());
   QVariant mode = this->FileMode->itemData(this->FileMode->currentIndex());
   diag.setFileMode(static_cast<pqFileDialog::FileMode>(mode.toInt()));
