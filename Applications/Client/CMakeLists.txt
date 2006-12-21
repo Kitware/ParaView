@@ -238,6 +238,14 @@ IF(BUILD_TESTING)
       --run-test=${TEST_XML}/${test}.xml
       --compare-view=${TEST_IMAGE}/${test}.png
       --exit)
+
+    ADD_TEST(pqClient${test}-ClientRenderServer
+      ${TEST_BINARY} --test-render-server
+      --test-directory=${PARAVIEW_TEST_DIR}
+      -dr
+      --run-test=${TEST_XML}/${test}.xml
+      --compare-view=${TEST_IMAGE}/${test}.png
+      --exit)
   ENDFOREACH(test)
 
   SUBDIRS(Testing/Cxx)
