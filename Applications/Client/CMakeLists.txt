@@ -152,6 +152,7 @@ IF(BUILD_TESTING)
     OpenFile
     OpenSaveData
     SimpleInteraction
+    SelectionUndo
     VariableSelector
     ViewSettingsDialog
     )
@@ -208,7 +209,6 @@ IF(BUILD_TESTING)
     ObjectInspectorSphere
     Plot3DReader
     RepresentationSelector
-    SelectionUndo
     SelectReader
     StreamTracer
     StreamTracerUpdates
