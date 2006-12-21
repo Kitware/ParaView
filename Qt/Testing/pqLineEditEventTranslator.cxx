@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEvent>
 #include <QLineEdit>
 #include <QSpinBox>
+#include <QTextDocument>
+#include <QTextEdit>
 
 pqLineEditEventTranslator::pqLineEditEventTranslator(QObject* p)
   : pqWidgetEventTranslator(p)
@@ -44,18 +46,30 @@ pqLineEditEventTranslator::pqLineEditEventTranslator(QObject* p)
 bool pqLineEditEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
 {
   QLineEdit* const object = qobject_cast<QLineEdit*>(Object);
-  if(!object)
+  QTextEdit* const teObject = qobject_cast<QTextEdit*>(Object);
+  if(!object && !teObject)
+    {
     return false;
+    }
   
   // If this line edit is part of a spinbox, don't translate events (the spinbox translator will receive the final value directly)
   if(qobject_cast<QSpinBox*>(Object->parent()))
+    {
     return false;
+    }
 
   switch(Event->type())
     {
     case QEvent::KeyRelease:
       {
-      emit recordEvent(Object, "set_string", object->text());
+      if (object)
+        {
+        emit recordEvent(Object, "set_string", object->text());
+        }
+      else if (teObject)
+        {
+        emit recordEvent(Object, "set_string", teObject->document()->toPlainText());
+        }
       }
       break;
     default:

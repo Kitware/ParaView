@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QLineEdit>
 #include <QtDebug>
+#include <QTextDocument>
+#include <QTextEdit>
 
 pqAbstractStringEventPlayer::pqAbstractStringEventPlayer(QObject* p)
   : pqWidgetEventPlayer(p)
@@ -72,6 +74,12 @@ bool pqAbstractStringEventPlayer::playEvent(QObject* Object, const QString& Comm
   if(QLineEdit* const object = qobject_cast<QLineEdit*>(Object))
     {
     object->setText(value);
+    return true;
+    }
+
+  if (QTextEdit* const object = qobject_cast<QTextEdit*>(Object))
+    {
+    object->document()->setPlainText(value);
     return true;
     }
 
