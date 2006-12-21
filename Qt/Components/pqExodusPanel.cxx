@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QTreeWidget>
-#include <QListWidget>
 #include <QVariant>
 #include <QCheckBox>
 #include <QDoubleSpinBox>
@@ -56,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
-#include "pqListWidgetCheckHelper.h"
 #include "ui_pqExodusPanel.h"
 
 // we include this for static plugins
@@ -104,27 +102,6 @@ pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
 
   this->UI->XMLFileName->setServer(this->proxy()->getServer());
   
-  QObject::connect(this->UI->BlocksAllOn, SIGNAL(clicked(bool)), 
-                   this, SLOT(blocksOn()));
-  QObject::connect(this->UI->BlocksAllOff, SIGNAL(clicked(bool)), 
-                   this, SLOT(blocksOff()));
-  QObject::connect(this->UI->VariablesAllOn, SIGNAL(clicked(bool)), 
-                   this, SLOT(variablesOn()));
-  QObject::connect(this->UI->VariablesAllOff, SIGNAL(clicked(bool)), 
-                   this, SLOT(variablesOff()));
-  QObject::connect(this->UI->SetsAllOn, SIGNAL(clicked(bool)), 
-                   this, SLOT(setsOn()));
-  QObject::connect(this->UI->SetsAllOff, SIGNAL(clicked(bool)), 
-                   this, SLOT(setsOff()));
-  QObject::connect(this->UI->MaterialsAllOn, SIGNAL(clicked(bool)), 
-                   this, SLOT(materialsOn()));
-  QObject::connect(this->UI->MaterialsAllOff, SIGNAL(clicked(bool)), 
-                   this, SLOT(materialsOff()));
-  QObject::connect(this->UI->HierarchyAllOn, SIGNAL(clicked(bool)), 
-                   this, SLOT(hierarchyOn()));
-  QObject::connect(this->UI->HierarchyAllOff, SIGNAL(clicked(bool)), 
-                   this, SLOT(hierarchyOff()));
-
 #if QT_VERSION < 0x040200
   // workaround for Qt bug in plastique style, where painter state wasn't being
   // restored after a save.
@@ -349,40 +326,40 @@ void pqExodusPanel::linkServerManagerProperties()
 
   // update ranges to begin with
   this->updateDataRanges();
+
   QAction* a;
   
-  QListWidget* BlockTree = this->UI->BlockArrayStatus;
-  new pqListWidgetCheckHelper(BlockTree, this);
+  QTreeWidget* BlockTree = this->UI->BlockArrayStatus;
+  new pqTreeWidgetCheckHelper(BlockTree, 0, this);
   a = new QAction("All Blocks On", BlockTree);
   a->setObjectName("BlocksOn");
-  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(blocksOn()));
+  QObject::connect(a, SIGNAL(triggered(bool)), BlockTree, SLOT(allOn()));
   BlockTree->addAction(a);
   a = new QAction("All Blocks Off", BlockTree);
   a->setObjectName("BlocksOff");
-  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(blocksOff()));
+  QObject::connect(a, SIGNAL(triggered(bool)), BlockTree, SLOT(allOff()));
   BlockTree->addAction(a);
   BlockTree->setContextMenuPolicy(Qt::ActionsContextMenu);
   
   a = new QAction("All Sets On", SetsTree);
   a->setObjectName("SetsOn");
-  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(setsOn()));
+  QObject::connect(a, SIGNAL(triggered(bool)), SetsTree, SLOT(allOn()));
   SetsTree->addAction(a);
   a = new QAction("All Sets Off", SetsTree);
   a->setObjectName("SetsOff");
-  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(setsOff()));
+  QObject::connect(a, SIGNAL(triggered(bool)), SetsTree, SLOT(allOff()));
   SetsTree->addAction(a);
   SetsTree->setContextMenuPolicy(Qt::ActionsContextMenu);
 
   a = new QAction("All Variables On", VariablesTree);
   a->setObjectName("VariablesOn");
-  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(variablesOn()));
+  QObject::connect(a, SIGNAL(triggered(bool)), VariablesTree, SLOT(allOn()));
   VariablesTree->addAction(a);
   a = new QAction("All Variables Off", VariablesTree);
   a->setObjectName("VariablesOff");
-  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(variablesOff()));
+  QObject::connect(a, SIGNAL(triggered(bool)), VariablesTree, SLOT(allOff()));
   VariablesTree->addAction(a);
   VariablesTree->setContextMenuPolicy(Qt::ActionsContextMenu);
-
 }
   
 void pqExodusPanel::applyDisplacements(int state)
@@ -543,118 +520,6 @@ void pqExodusPanel::updateDataRanges()
     item->setData(1, Qt::DisplayRole, dataString);
     item->setData(1, Qt::ToolTipRole, dataString);
     }
-}
-
-
-void pqExodusPanel::blocksOn()
-{
-  this->blocksToggle(Qt::Checked);
-}
-
-void pqExodusPanel::blocksOff()
-{
-  this->blocksToggle(Qt::Unchecked);
-}
-
-void pqExodusPanel::blocksToggle(Qt::CheckState c)
-{
-  QListWidget* List = this->UI->BlockArrayStatus;
-  this->toggle(List, c);
-}
-
-
-void pqExodusPanel::variablesOn()
-{
-  this->variablesToggle(Qt::Checked);
-}
-
-void pqExodusPanel::variablesOff()
-{
-  this->variablesToggle(Qt::Unchecked);
-}
-
-void pqExodusPanel::variablesToggle(Qt::CheckState c)
-{
-  QTreeWidget* Tree = this->UI->Variables;
-  this->toggle(Tree, c);
-}
-
-
-void pqExodusPanel::setsOn()
-{
-  this->setsToggle(Qt::Checked);
-}
-
-void pqExodusPanel::setsOff()
-{
-  this->setsToggle(Qt::Unchecked);
-}
-
-void pqExodusPanel::setsToggle(Qt::CheckState c)
-{
-  QTreeWidget* Tree = this->UI->Sets;
-  this->toggle(Tree, c);
-}
-
-void pqExodusPanel::toggle(QTreeWidget* Tree, Qt::CheckState c)
-{
-  if(Tree)
-    {
-    QTreeWidgetItem* item;
-    int i, end = Tree->topLevelItemCount();
-    for(i=0; i<end; i++)
-      {
-      item = Tree->topLevelItem(i);
-      item->setCheckState(0, c);
-      }
-    }
-}
-
-void pqExodusPanel::toggle(QListWidget* List, Qt::CheckState c)
-{
-  if(List)
-    {
-    QListWidgetItem* item;
-    int i, end = List->count();
-    for(i=0; i<end; i++)
-      {
-      item = List->item(i);
-      item->setCheckState(c);
-      }
-    }
-}
-
-void pqExodusPanel::materialsOn()
-{
-  this->materialsToggle(Qt::Checked);
-}
-
-void pqExodusPanel::materialsOff()
-{
-  this->materialsToggle(Qt::Unchecked);
-}
-
-void pqExodusPanel::materialsToggle(Qt::CheckState c)
-{
-  QListWidget* List = this->UI->MaterialArrayStatus;
-  this->toggle(List, c);
-}
-
-
-void pqExodusPanel::hierarchyOn()
-{
-  this->hierarchyToggle(Qt::Checked);
-}
-
-void pqExodusPanel::hierarchyOff()
-{
-  this->hierarchyToggle(Qt::Unchecked);
-}
-
-void pqExodusPanel::hierarchyToggle(Qt::CheckState c)
-{
-  QListWidget* List = this->UI->HierarchyArrayStatus;
-  this->toggle(List, c);
 }
 
 

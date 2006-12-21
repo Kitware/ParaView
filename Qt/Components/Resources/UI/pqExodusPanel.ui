@@ -1,15 +1,12 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>ExodusPanel</class>
  <widget class="QWidget" name="ExodusPanel" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>666</height>
+    <width>285</width>
+    <height>645</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -30,196 +27,61 @@
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item row="7" column="0" >
-    <widget class="QLabel" name="label_7" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text" >
-      <string>File Prefix</string>
-     </property>
-     <property name="wordWrap" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2" >
-    <widget class="QTabWidget" name="DisplayType" >
-     <property name="currentIndex" >
+   <item row="2" column="0" colspan="2" >
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab_3" >
-      <attribute name="title" >
-       <string>Blocks</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item row="1" column="0" >
-        <widget class="QListWidget" name="BlockArrayStatus" >
-         <property name="minimumSize" >
-          <size>
-           <width>0</width>
-           <height>5</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" >
-        <layout class="QHBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>6</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="BlocksAllOn" >
-           <property name="text" >
-            <string>All On</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="BlocksAllOff" >
-           <property name="text" >
-            <string>All Off</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab" >
-      <attribute name="title" >
-       <string>Hierarchy</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item row="0" column="0" >
-        <layout class="QHBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>6</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="HierarchyAllOn" >
-           <property name="text" >
-            <string>All On</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="HierarchyAllOff" >
-           <property name="text" >
-            <string>All Off</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QListWidget" name="HierarchyArrayStatus" />
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_2" >
-      <attribute name="title" >
-       <string>Materials</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item row="0" column="0" >
-        <layout class="QHBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>6</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="MaterialsAllOn" >
-           <property name="text" >
-            <string>All On</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="MaterialsAllOff" >
-           <property name="text" >
-            <string>All Off</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QListWidget" name="MaterialArrayStatus" />
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
-   <item row="12" column="1" >
-    <widget class="pqFileChooserWidget" name="XMLFileName" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+     <property name="spacing" >
+      <number>6</number>
      </property>
-    </widget>
+     <item>
+      <widget class="QCheckBox" name="ApplyDisplacements" >
+       <property name="layoutDirection" >
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text" >
+        <string>Apply Displacements</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="DisplacementMagnitude" />
+     </item>
+     <item>
+      <widget class="QLabel" name="label_5" >
+       <property name="text" >
+        <string>mag.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="7" column="1" >
-    <widget class="QLineEdit" name="FilePrefix" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item row="1" column="0" colspan="2" >
+    <widget class="pqSelectionTreeWidget" name="Variables" >
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
      </property>
-    </widget>
-   </item>
-   <item rowspan="2" row="10" column="1" >
-    <widget class="QSpinBox" name="FileRange_1" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+     <property name="rootIsDecorated" >
+      <bool>false</bool>
      </property>
+     <column>
+      <property name="text" >
+       <string>Variables</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Range(s)</string>
+      </property>
+     </column>
     </widget>
    </item>
-   <item row="12" column="0" >
-    <widget class="QLabel" name="label_4" >
+   <item row="6" column="0" >
+    <widget class="QLabel" name="label_6" >
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>5</hsizetype>
@@ -229,15 +91,15 @@
       </sizepolicy>
      </property>
      <property name="text" >
-      <string>XML file</string>
+      <string>File Pattern</string>
      </property>
      <property name="wordWrap" >
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="9" column="1" >
-    <widget class="QSpinBox" name="FileRange_0" >
+   <item row="6" column="1" >
+    <widget class="QLineEdit" name="FilePattern" >
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>7</hsizetype>
@@ -245,71 +107,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-    </widget>
-   </item>
-   <item rowspan="2" row="9" column="0" >
-    <widget class="QLabel" name="label_3" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text" >
-      <string>First file index</string>
-     </property>
-     <property name="wordWrap" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="11" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text" >
-      <string>Last file index</string>
-     </property>
-     <property name="wordWrap" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label_2" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font" >
-      <font>
-       <family>Sans Serif</family>
-       <pointsize>9</pointsize>
-       <weight>50</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-       <underline>false</underline>
-       <strikeout>false</strikeout>
-      </font>
-     </property>
-     <property name="text" >
-      <string>Time step</string>
-     </property>
-     <property name="wordWrap" >
-      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -366,61 +163,73 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="0" colspan="2" >
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
+   <item row="0" column="0" >
+    <widget class="QLabel" name="label_2" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>5</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="spacing" >
-      <number>6</number>
+     <property name="font" >
+      <font>
+       <family>Sans Serif</family>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+      </font>
      </property>
-     <item>
-      <widget class="QCheckBox" name="ApplyDisplacements" >
-       <property name="layoutDirection" >
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text" >
-        <string>Apply Displacements</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QDoubleSpinBox" name="DisplacementMagnitude" />
-     </item>
-     <item>
-      <widget class="QLabel" name="label_5" >
-       <property name="text" >
-        <string>mag.</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0" colspan="2" >
-    <widget class="QTreeWidget" name="Variables" >
-     <property name="minimumSize" >
-      <size>
-       <width>0</width>
-       <height>100</height>
-      </size>
+     <property name="text" >
+      <string>Time step</string>
      </property>
-     <property name="rootIsDecorated" >
-      <bool>false</bool>
+     <property name="wordWrap" >
+      <bool>true</bool>
      </property>
-     <column>
-      <property name="text" >
-       <string>Variables</string>
-      </property>
-     </column>
-     <column>
-      <property name="text" >
-       <string>Range(s)</string>
-      </property>
-     </column>
     </widget>
    </item>
-   <item row="8" column="1" >
-    <widget class="QLineEdit" name="FilePattern" >
+   <item row="9" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>5</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text" >
+      <string>Last file index</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item rowspan="2" row="7" column="0" >
+    <widget class="QLabel" name="label_3" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>5</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text" >
+      <string>First file index</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1" >
+    <widget class="QSpinBox" name="FileRange_0" >
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>7</hsizetype>
@@ -431,8 +240,8 @@
      </property>
     </widget>
    </item>
-   <item row="8" column="0" >
-    <widget class="QLabel" name="label_6" >
+   <item row="10" column="0" >
+    <widget class="QLabel" name="label_4" >
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>5</hsizetype>
@@ -442,39 +251,151 @@
       </sizepolicy>
      </property>
      <property name="text" >
-      <string>File Pattern</string>
+      <string>XML file</string>
      </property>
      <property name="wordWrap" >
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2" >
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
+   <item rowspan="2" row="8" column="1" >
+    <widget class="QSpinBox" name="FileRange_1" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1" >
+    <widget class="QLineEdit" name="FilePrefix" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1" >
+    <widget class="pqFileChooserWidget" native="1" name="XMLFileName" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" >
+    <widget class="QLabel" name="label_7" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>5</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text" >
+      <string>File Prefix</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2" >
+    <widget class="QTabWidget" name="DisplayType" >
+     <property name="currentIndex" >
       <number>0</number>
      </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="QPushButton" name="VariablesAllOn" >
-       <property name="text" >
-        <string>All On</string>
+     <widget class="QWidget" name="tab_3" >
+      <attribute name="title" >
+       <string>Blocks</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>9</number>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="VariablesAllOff" >
-       <property name="text" >
-        <string>All Off</string>
+       <property name="spacing" >
+        <number>6</number>
        </property>
-      </widget>
-     </item>
-    </layout>
+       <item row="0" column="0" >
+        <widget class="pqSelectionTreeWidget" name="BlockArrayStatus" >
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Blocks</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab" >
+      <attribute name="title" >
+       <string>Hierarchy</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="pqSelectionTreeWidget" name="HierarchyArrayStatus" >
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Hierarchy</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2" >
+      <attribute name="title" >
+       <string>Materials</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="pqSelectionTreeWidget" name="MaterialArrayStatus" >
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Materials</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
-   <item row="6" column="0" colspan="2" >
-    <widget class="QTreeWidget" name="Sets" >
+   <item row="4" column="0" colspan="2" >
+    <widget class="pqSelectionTreeWidget" name="Sets" >
      <property name="minimumSize" >
       <size>
        <width>0</width>
@@ -491,40 +412,18 @@
      </column>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2" >
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="QPushButton" name="SetsAllOn" >
-       <property name="text" >
-        <string>All On</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="SetsAllOff" >
-       <property name="text" >
-        <string>All Off</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>pqFileChooserWidget</class>
    <extends>QWidget</extends>
    <header>pqFileChooserWidget.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
+  </customwidget>
+  <customwidget>
+   <class>pqSelectionTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqSelectionTreeWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

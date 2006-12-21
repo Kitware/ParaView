@@ -62,29 +62,6 @@ protected slots:
   void updateDataRanges();
   void propertyChanged();
   
-  void blocksOn();
-  void blocksOff();
-  void blocksToggle(Qt::CheckState);
-  
-  void materialsOn();
-  void materialsOff();
-  void materialsToggle(Qt::CheckState);
-  
-  void hierarchyOn();
-  void hierarchyOff();
-  void hierarchyToggle(Qt::CheckState);
-  
-  void variablesOn();
-  void variablesOff();
-  void variablesToggle(Qt::CheckState);
-  
-  void setsOn();
-  void setsOff();
-  void setsToggle(Qt::CheckState);
-  
-  void toggle(QTreeWidget*, Qt::CheckState);
-  void toggle(QListWidget*, Qt::CheckState);
-
 protected:
   int displayType() const;
   /// populate widgets with properties from the server manager

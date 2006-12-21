@@ -39,6 +39,8 @@ SET(QtWidgets_SRCS
   pqSignalAdaptors.h
   pqListWidgetCheckHelper.cxx
   pqListWidgetCheckHelper.h
+  pqSelectionTreeWidget.cxx
+  pqSelectionTreeWidget.h
   pqTreeWidgetCheckHelper.cxx
   pqTreeWidgetCheckHelper.h
   pqTreeWidgetItemObject.cxx
@@ -66,6 +68,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
   pqListWidgetCheckHelper.h
+  pqSelectionTreeWidget.h
   pqTreeWidgetCheckHelper.h
   pqTreeWidgetItemObject.h
   pqViewMenu.h
