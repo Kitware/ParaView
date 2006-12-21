@@ -19,7 +19,6 @@ ADD_TEST(pqCoreBasicApp "${TEST_BINARY}" -dr "--test-directory=${PARAVIEW_TEST_D
 
 IF(QT_TESTING_WITH_PYTHON)
 
-  INCLUDE_DIRECTORIES(${QtPython_SOURCE_DIR})
   # Reduce the number of dirs that get included on moc command line
   # since it causes issues on Windows 2000.
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)

@@ -34,7 +34,6 @@ public:
   pqTestUtility* Tester() { return &this->TestUtility; }
 
 public slots:
-  void openPython();
   void record();
   void openFileDialog();
   void emittedFiles(const QStringList& files);

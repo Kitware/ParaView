@@ -23,8 +23,6 @@
 #include "pqTestUtility.h"
 #include "pqOptions.h"
 
-#include "pqPythonDialog.h"
-
 pqFileDialogTestUtility::pqFileDialogTestUtility()
 {
 }
@@ -143,12 +141,6 @@ pqFileDialogTestWidget::pqFileDialogTestWidget()
   this->Server = core->createServer(pqServerResource("builtin:"));
   QVBoxLayout* l = new QVBoxLayout(this);
 
-  QPushButton* python = new QPushButton(this);
-  python->setObjectName("python");
-  python->setText("Python Shell");
-  QObject::connect(python, SIGNAL(clicked(bool)), this, SLOT(openPython()));
-  l->addWidget(python);
-  
   QPushButton* rec = new QPushButton(this);
   rec->setObjectName("record");
   rec->setText("record...");
@@ -221,12 +213,6 @@ void pqFileDialogTestWidget::openFileDialog()
     {
     this->ReturnLabel->setText("cancelled");
     }
-}
-
-void pqFileDialogTestWidget::openPython()
-{
-  QDialog* d = new pqPythonDialog(NULL, QApplication::argc(), QApplication::argv());
-  d->show();
 }
 
 void pqFileDialogTestWidget::emittedFiles(const QStringList& files)
