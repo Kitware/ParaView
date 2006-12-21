@@ -581,7 +581,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     {
 #ifdef CONNECT_TO_RS_DS_SCRIPT
     vtkstd::string temp = CONNECT_TO_RS_DS_SCRIPT;
-    this->ClientPostFlags.push_back("--run-test=" + temp);
+    this->ClientPostFlags.push_back("--run-test-init=" + temp);
 #else
     cerr << "CONNECT_TO_RS_DS_SCRIPT must be specified." << endl;
     return 1;
@@ -591,7 +591,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     {
 #ifdef CONNECT_TO_SERVER_SCRIPT
     vtkstd::string temp = CONNECT_TO_SERVER_SCRIPT;
-    this->ClientPostFlags.push_back("--run-test=" + temp);
+    this->ClientPostFlags.push_back("--run-test-init=" + temp);
 #else
     cerr << "CONNECT_TO_SERVER_SCRIPT must be specified." << endl;
     return 1;
@@ -601,7 +601,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     {
 #ifdef CONNECT_TO_BUILTIN_SCRIPT
     vtkstd::string temp = CONNECT_TO_BUILTIN_SCRIPT;
-    this->ClientPostFlags.push_back("--run-test=" + temp);
+    this->ClientPostFlags.push_back("--run-test-init=" + temp);
 #else
     cerr << "CONNECT_TO_BUILTIN_SCRIPT must be specified." << endl;
     return 1;

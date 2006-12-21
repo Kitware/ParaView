@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.4");
+vtkCxxRevisionMacro(pqOptions, "1.5");
 
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
@@ -47,6 +47,8 @@ pqOptions::pqOptions()
   this->ImageThreshold = 12;
   this->ExitAppWhenTestsDone = 0;
   this->DisableRegistry = 0;
+  this->TestFileName = 0;
+  this->TestInitFileName = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -54,6 +56,8 @@ pqOptions::~pqOptions()
 {
   this->SetBaselineImage(0);
   this->SetTestDirectory(0);
+  this->SetTestFileName(0);
+  this->SetTestInitFileName(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -69,10 +73,11 @@ void pqOptions::Initialize()
     &this->TestDirectory,
     "Set the temporary directory where test-case output will be stored.");
  
-  /*
   this->AddArgument("--run-test", NULL,
     &this->TestFileName,  "Run a recorded test case.");
-    */
+
+  this->AddArgument("--run-test-init", NULL,
+    &this->TestInitFileName,  "Run a recorded test initialization case.");
   
   this->AddArgument("--image-threshold", NULL, &this->ImageThreshold,
     "Set the threshold beyond which viewport-image comparisons fail.");
@@ -87,6 +92,15 @@ void pqOptions::Initialize()
 //-----------------------------------------------------------------------------
 int pqOptions::PostProcess(int argc, const char * const *argv)
 {
+  this->TestFiles.clear();
+  if (this->TestInitFileName)
+    {
+    this->TestFiles << QString(this->TestInitFileName);
+    }
+  if (this->TestFileName)
+    {
+    this->TestFiles << QString(this->TestFileName);
+    }
   return this->Superclass::PostProcess(argc, argv);
 }
 

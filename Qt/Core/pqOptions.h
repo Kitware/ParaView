@@ -67,6 +67,8 @@ protected:
 
   char* TestDirectory;
   char* BaselineImage;
+  char* TestFileName;
+  char* TestInitFileName;
   int ImageThreshold;
   int ExitAppWhenTestsDone;
   int DisableRegistry;
@@ -75,6 +77,9 @@ protected:
     
   vtkSetStringMacro(TestDirectory);
   vtkSetStringMacro(BaselineImage);
+  vtkSetStringMacro(TestFileName);
+  vtkSetStringMacro(TestInitFileName);
+
  
   // Description:
   // This method is called when wrong argument is found. If it returns 0, then
