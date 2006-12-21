@@ -135,45 +135,23 @@ CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqClientDocFinder.txt.in"
                @ONLY IMMEDIATE)
   
 IF(BUILD_TESTING)
-IF(APPLE)
-  SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha.app/Contents/MacOS/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
-ELSE(APPLE)
-  SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
-ENDIF(APPLE)
+  IF(APPLE)
+    SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha.app/Contents/MacOS/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+  ELSE(APPLE)
+    SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+  ENDIF(APPLE)
+
   SET(TEST_XML ${pqClient_SOURCE_DIR}/Testing/XML)
   SET(TEST_PYTHON ${pqClient_SOURCE_DIR}/Testing/Python)
   SET(TEST_IMAGE ${PARAVIEW_DATA_ROOT}/Baseline)
 
   SET (XML_TESTS_WITH_BASELINES
-    3DWidgetInCustomFilter
-    Calculator
-    Clip
-    ClipHidden
-    ClipUndo
-    Contour
-    ContourRange
-    CreateCustomFilter
-    CreateSource
     CreateSourceWithoutConnect
-    CustomFilter
-    Cut
-    CutMulti
-    ExodusPanel
     ImageShrink
-    LoadState
     LoadStateSelection
-    ObjectInspectorSphere
     OpenFile
     OpenSaveData
-    Plot3DReader
-    RepresentationSelector
-    SelectionUndo
-    SelectReader
     SimpleInteraction
-    StreamTracer
-    StreamTracerUpdates
-    Threshold
-    UndoRedo
     VariableSelector
     ViewSettingsDialog
     )
@@ -210,7 +188,59 @@ ENDIF(APPLE)
       ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
       --exit)
   ENDFOREACH(test) 
-  
+
+# Now we add tests that use the pvTestDriver for running.
+  SET(XML_TESTS_WITH_BASELINES
+    3DWidgetInCustomFilter
+    Cut
+    Calculator
+    Clip
+    ClipHidden
+    ClipUndo
+    Contour
+    ContourRange
+    CreateCustomFilter
+    CreateSource
+    CustomFilter
+    CutMulti
+    ExodusPanel
+    LoadState
+    ObjectInspectorSphere
+    Plot3DReader
+    RepresentationSelector
+    SelectionUndo
+    SelectReader
+    StreamTracer
+    StreamTracerUpdates
+    Threshold
+    UndoRedo
+  )
+
+  IF(APPLE)
+    SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha.app/Contents/MacOS/pvTestDriver)
+  ELSE(APPLE)
+    SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver${PV_EXE_SUFFIX})
+  ENDIF(APPLE)
+
+  FOREACH(test ${XML_TESTS_WITH_BASELINES})
+    ADD_TEST(pqClient${test}-Builtin
+      ${TEST_BINARY}
+      --test-directory=${PARAVIEW_TEST_DIR}
+      -dr
+      --run-test=${TEST_XML}/${test}.xml
+      --compare-view=${TEST_IMAGE}/${test}.png
+      --exit)
+    
+    ADD_TEST(pqClient${test}-ClientServer
+      ${TEST_BINARY} --test-server
+      --test-directory=${PARAVIEW_TEST_DIR}
+      -dr
+      --run-test=${TEST_XML}/${test}.xml
+      --compare-view=${TEST_IMAGE}/${test}.png
+      --exit)
+  ENDFOREACH(test)
+
+  SUBDIRS(Testing/Cxx)
 ENDIF(BUILD_TESTING)
 
 # Add shared link forwarding executables if necessary.
