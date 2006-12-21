@@ -32,7 +32,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.26.10.1");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.26.10.2");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -386,6 +386,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
       }
     iter->GoToNextItem();
     }
+  iter->Delete();
   inputVs[0]->Delete();
 
   if (retVal)
