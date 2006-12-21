@@ -1,13 +1,21 @@
-CMAKE_MINIMUM_REQUIRED (VERSION 2.4)
 PROJECT(ParaView)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 #########################################################################
-# ParaView version number.  An even minor number corresponds to releases.    
-SET(PARAVIEW_VERSION_MAJOR 2)   
-SET(PARAVIEW_VERSION_MINOR 5)   
-SET(PARAVIEW_VERSION_PATCH 0)   
-SET(PARAVIEW_VERSION "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")   
-SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}")
+# Warn about ParaQ
+SET(PARAVIEW_WARN_ABOUT_PARAQ)
+IF(EXISTS "${ParaView_SOURCE_DIR}/CVS/Root")
+  FILE(READ "${ParaView_SOURCE_DIR}/CVS/Root" paraview_cvs_root)
+  IF("${paraview_cvs_root}" MATCHES ParaQ)
+    SET(PARAVIEW_WARN_ABOUT_PARAQ 1)
+  ENDIF("${paraview_cvs_root}" MATCHES ParaQ)
+ENDIF(EXISTS "${ParaView_SOURCE_DIR}/CVS/Root")
+IF("${ParaView_SOURCE_DIR}" MATCHES "ParaQ")
+  SET(PARAVIEW_WARN_ABOUT_PARAQ 1)
+ENDIF("${ParaView_SOURCE_DIR}" MATCHES "ParaQ")
+IF(PARAVIEW_WARN_ABOUT_PARAQ)
+  MESSAGE(SEND_ERROR "ParaView 3 should be checked out from ParaView3 repository. ParaQ repository is deprecated and will be removed")
+ENDIF(PARAVIEW_WARN_ABOUT_PARAQ)
 
 #########################################################################
 # Disallow in-source build
@@ -17,48 +25,12 @@ IF(INSOURCE)
   MESSAGE(FATAL_ERROR "ParaView requires an out of source Build. Please create a separate binary directory and run CMake there.")
 ENDIF(INSOURCE)
 
-
 #########################################################################
-# Configure TclTk
-OPTION(PARAVIEW_BUILD_GUI
-  "Build end user applications (ParaView, pvclient, pvbatch)" ON)
-MARK_AS_ADVANCED(PARAVIEW_BUILD_GUI)
-IF (PARAVIEW_BUILD_GUI)
-  SET(APPLICATION_BINARY_DIR "${CMAKE_BINARY_DIR}")
-  SET(VTK_TCL_TK_MACROS_MODULE 
-    "${ParaView_SOURCE_DIR}/VTK/CMake/vtkTclTkMacros.cmake")
-  SET(VTK_TCL_TK_INTERNALS_DIR 
-    "${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/internals")
-  SET(VTK_TCL_TK_WRAPPING_DIR "${ParaView_SOURCE_DIR}/VTK/Wrapping/Tcl")
-  SET(TclTk_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
-  SET(TclTk_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
-  SET(TclTk_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
-  INCLUDE(${VTK_TCL_TK_MACROS_MODULE})
-  SUBDIRS(Utilities/TclTk)
-ENDIF (PARAVIEW_BUILD_GUI)
-
-# Find hints file for the tcl wrapping
-FIND_FILE(VTK_WRAP_HINTS hints ${ParaView_SOURCE_DIR}/VTK/Wrapping)
-MARK_AS_ADVANCED(VTK_WRAP_HINTS)
-
-SET(VTK_GENERATE_TK_INTERNALS 1)
-
-#############################################################################
-# ParaView requires X on Apple.
-IF(APPLE)
-  SET(VTK_USE_CARBON OFF CACHE INTERNAL "ParaView needs X" FORCE)
-  SET(VTK_USE_COCOA OFF CACHE INTERNAL "ParaView needs X" FORCE)
-  SET(VTK_USE_X ON CACHE INTERNAL "ParaView needs X" FORCE)
-  MARK_AS_ADVANCED(VTK_USE_CARBON VTK_USE_COCOA VTK_USE_X)
-ENDIF(APPLE)
-
-#########################################################################
-# Include the file that most of the environment setup (except GUI).
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
-
-#########################################################################
-# Common settings
-#
+SET(PARAVIEW_VERSION_MAJOR 2)
+SET(PARAVIEW_VERSION_MINOR 9)
+SET(PARAVIEW_VERSION_PATCH 7)
+SET(PARAVIEW_VERSION "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
+SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}")
 
 # See VTK/CMakeLists.txt for an explanation of this default selection.
 IF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
@@ -69,161 +41,149 @@ ELSE(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
   SET(VTK_USE_RPATH_DEFAULT ON)
 ENDIF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
 
+#########################################################################
+# build VTK/Qt support
+OPTION(PARAVIEW_BUILD_QT_GUI "Build ParaView Qt Client. This requires Qt." ON)
+MARK_AS_ADVANCED(PARAVIEW_BUILD_QT_GUI)
+IF (PARAVIEW_BUILD_QT_GUI)
+  SET(VTK_USE_GUISUPPORT ON CACHE BOOL "Build VTK with GUI Support" FORCE)
+  SET(VTK_USE_QVTK ON CACHE BOOL "Build VTK with Qt Support" FORCE)
+  SET(DESIRED_QT_VERSION 4 CACHE STRING "Use Qt4" FORCE)
+  MARK_AS_ADVANCED(DESIRED_QT_VERSION VTK_USE_QVTK VTK_USE_GUISUPPORT)
+ENDIF (PARAVIEW_BUILD_QT_GUI)
 
-SET(KWWidgets_DISABLE_TESTING 1)
 
+# Work around CMake 2.2.x FindPythonLibs bug.
+# Do not find Python subdirectory as python debug library.
+SET(PYTHON_DEBUG_LIBRARY "" CACHE FILEPATH "Purposely empty: work around CMake FindPythonLibs bug")
+MARK_AS_ADVANCED(PYTHON_DEBUG_LIBRARY)
+
+
+#########################################################################
+# Force Infovis support on
+
+SET(VTK_USE_INFOVIS ON CACHE BOOL "Build VTK with Infovis Support" FORCE)
+MARK_AS_ADVANCED(VTK_USE_INFOVIS)
+
+#########################################################################
+# Configure Testing
+OPTION(BUILD_TESTING "Build ParaView Testing" ON)
+IF(BUILD_TESTING)
+  SET(PARAVIEW_TEST_DIR    ${ParaView_BINARY_DIR}/Testing/Temporary)
+  MAKE_DIRECTORY(${PARAVIEW_TEST_DIR})
+  ENABLE_TESTING()
+  INCLUDE (CTest)
+ENDIF(BUILD_TESTING)
+
+#########################################################################
+# Configure data directory
+IF(NOT PARAVIEW_DATA_ROOT AND PARAQ_DATA_ROOT)
+  SET(PARAVIEW_DATA_ROOT "${PARAQ_DATA_ROOT}")
+ENDIF(NOT PARAVIEW_DATA_ROOT AND PARAQ_DATA_ROOT)
+FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
+  ${ParaView_SOURCE_DIR}/ParaViewData
+  ${ParaView_SOURCE_DIR}/../ParaViewData
+  ${ParaView_SOURCE_DIR}/ParaQData
+  ${ParaView_SOURCE_DIR}/../ParaQData
+  $ENV{PARAVIEW_DATA_ROOT}
+  )
+
+#########################################################################
+# Configure Python
+OPTION(PARAVIEW_EMBED_PYTHON "Embedded Python Interpreter" ON)
+
+IF(PARAVIEW_EMBED_PYTHON)
+  SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build ParaView using shared libraries" FORCE)
+  SET(PARAVIEW_WRAP_PYTHON ON CACHE BOOL "Wrap ParaView server manager into Python" FORCE)
+ELSE(PARAVIEW_EMBED_PYTHON)
+  SET(PARAVIEW_WRAP_PYTHON OFF CACHE BOOL "Wrap ParaView server manager into Python" FORCE)
+ENDIF(PARAVIEW_EMBED_PYTHON)
+
+#########################################################################
+IF(BUILD_SHARED_LIBS)
+  ADD_DEFINITIONS(-DPARAVIEW_BUILD_SHARED_LIBS)
+ENDIF(BUILD_SHARED_LIBS)
+
+
+#########################################################################
 # Set the ServerManager test data dir,
-SET(PVServerManagerTestData ${ParaView_SOURCE_DIR}/Data)
-
-# KWWidgets should install only the components paraview does.
-
-SET(KWWidgets_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
-SET(KWWidgets_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
-SET(KWWidgets_INSTALL_DATA_DIR ${PV_INSTALL_DATA_DIR})
-SET(KWWidgets_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
-SET(KWWidgets_INSTALL_PACKAGE_DIR ${PV_INSTALL_LIB_DIR})
-SET(KWWidgets_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
-SET(KWWidgets_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
-SET(KWWidgets_INSTALL_NO_DOCUMENTATION 1)
-SET(KWWidgets_VTK_INSTALL_PACKAGE_DIR ${VTK_INSTALL_PACKAGE_DIR})
+SET(PVServerManagerTestData ${PARAVIEW_DATA_ROOT})
 
 #########################################################################
-# Setup release scripts.
-
-# Search for system runtime libraries based on the platform.  This is
-# not complete because it is used only for the release process by the
-# developers.
-IF(CMAKE_GENERATOR MATCHES "^Visual Studio 7 .NET 2003$")
-  STRING(REGEX REPLACE "\\\\" "/" SYSTEMROOT "$ENV{SYSTEMROOT}")
-  FOREACH(lib
-      "${SYSTEMROOT}/system32/msvcp71.dll"
-      "${SYSTEMROOT}/system32/msvcr71.dll"
-      )
-    IF(EXISTS ${lib})
-      SET(PV_INSTALL_SYSTEM_RUNTIME_LIBS
-        ${PV_INSTALL_SYSTEM_RUNTIME_LIBS} ${lib})
-    ENDIF(EXISTS ${lib})
-  ENDFOREACH(lib)
-ENDIF(CMAKE_GENERATOR MATCHES "^Visual Studio 7 .NET 2003$")
-
-# Include system runtime libraries in the installation if any are
-# specified by PV_INSTALL_SYSTEM_RUNTIME_LIBS.
-IF(PV_INSTALL_SYSTEM_RUNTIME_LIBS)
-  IF(WIN32)
-    INSTALL_PROGRAMS(${PV_INSTALL_BIN_DIR} ${PV_INSTALL_SYSTEM_RUNTIME_LIBS})
-  ELSE(WIN32)
-    INSTALL_PROGRAMS(${PV_INSTALL_LIB_DIR} ${PV_INSTALL_SYSTEM_RUNTIME_LIBS})
-  ENDIF(WIN32)
-ENDIF(PV_INSTALL_SYSTEM_RUNTIME_LIBS)
-
-IF(WIN32)
-  FIND_PROGRAM(NSIS_MAKENSIS NAMES makensis
-    PATHS [HKEY_LOCAL_MACHINE\\SOFTWARE\\NSIS]
-    DOC "Where is makensis.exe located"
-    )
-  MARK_AS_ADVANCED(NSIS_MAKENSIS)
-  FIND_PROGRAM(WINZIP_WZZIP NAMES wzzip
-    PATHS   "C:/Program Files/WinZip"
-    DOC "Where is makensis.exe located"
-    )
-  MARK_AS_ADVANCED(WINZIP_WZZIP)
-  STRING(REGEX REPLACE "/" "\\\\" PV_INSTALL_TOP "${CMAKE_INSTALL_PREFIX}")
-  SET(NSIS_EXTRA_COMMANDS ";Include system runtime libraries.\n  SetOutPath \"$INSTDIR\\bin\"\n")
-  FOREACH(lib ${PV_INSTALL_SYSTEM_RUNTIME_LIBS})
-    STRING(REGEX REPLACE "/" "\\\\" LIB "${lib}")
-    SET(NSIS_EXTRA_COMMANDS "${NSIS_EXTRA_COMMANDS}  File \"${LIB}\"\n")
-  ENDFOREACH(lib)
-  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/ParaView.nsi.in
-    ${ParaView_BINARY_DIR}/Utilities/Release/ParaView.nsi IMMEDIATE @ONLY)
-  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/Win32Release.sh.in
-    ${ParaView_BINARY_DIR}/Utilities/Release/Win32Release.sh IMMEDIATE @ONLY)
-  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/paraview_release.sh.in
-    ${ParaView_BINARY_DIR}/Utilities/Release/paraview_release.sh IMMEDIATE @ONLY)
-ENDIF(WIN32)
+# Include the file that most of the environment setup (except GUI).
+SET(ParaView_SOURCE_DIR ${ParaView_SOURCE_DIR})
+SET(ParaView_BINARY_DIR ${ParaView_BINARY_DIR})
+INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
 
 #########################################################################
-# Build Documentation
 IF(BUILD_DOCUMENTATION)
   SUBDIRS(Utilities/Doxygen)
 ENDIF(BUILD_DOCUMENTATION)
 
 #########################################################################
-# Configure GUI
-IF (PARAVIEW_BUILD_GUI)
-  SUBDIRS(GUI)
-ENDIF (PARAVIEW_BUILD_GUI)
+CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPQConfig.h.in
+  ${ParaView_BINARY_DIR}/vtkPQConfig.h
+  ESCAPE_QUOTES)
 
 #########################################################################
-# Configure ParaView Data
-SUBDIRS(Data)
+IF (PARAVIEW_BUILD_QT_GUI)
+  SUBDIRS(Qt)
+ENDIF (PARAVIEW_BUILD_QT_GUI)
 
-#-----------------------------------------------------------------------------
-# Help outside projects build ParaView plugin packages.
+#########################################################################
+IF (PARAVIEW_BUILD_QT_GUI)
+SUBDIRS(Applications)
+ENDIF (PARAVIEW_BUILD_QT_GUI)
 
-EXPORT_LIBRARY_DEPENDENCIES(${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake)
+# Find hints file for the client/server wrapping
+FIND_FILE(VTK_WRAP_HINTS hints ${ParaView_SOURCE_DIR}/VTK/Wrapping)
+MARK_AS_ADVANCED(VTK_WRAP_HINTS)
 
-# For ParaView from build tree:
-SET(PARAVIEW_VTK_DIR ${VTK_DIR})
-SET(VTK_WRAP_ClientServer_EXE_CONFIG ${VTK_WRAP_ClientServer_EXE})
-SET(VTKCS_SOURCE_DIR ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer)
-SET(PARAVIEW_CMAKE_EXTENSIONS
-  "${ParaView_SOURCE_DIR}/VTK/CMake")
-SET(PARAVIEW_CMAKE_CLIENT_SERVER_EXTENSION
-  ${VTKCS_SOURCE_DIR}/CMake/vtkWrapClientServer.cmake)
-SET(PARAVIEW_USE_FILE ${ParaView_SOURCE_DIR}/ParaViewUse.cmake)
-IF(PARAVIEW_BUILD_GUI)
-  SET(PARAVIEW_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS}
-    ${ParaView_SOURCE_DIR}/GUI/Widgets
-    ${ParaView_SOURCE_DIR}/GUI/Client
-    ${ParaView_BINARY_DIR}/GUI/Widgets
-    ${ParaView_BINARY_DIR}/GUI/Client
-    )
-ENDIF(PARAVIEW_BUILD_GUI)
-SET(PARAVIEW_GUI_INCLUDE_DIRS
-  ${TCL_INCLUDE_PATH}
-  ${TK_INCLUDE_PATH}
-  ${KWCommon_INCLUDE_PATH}
-  ${VTKZLIB_INCLUDE_DIR})
-SET(PARAVIEW_LIBRARY_DIRS ${LIBRARY_OUTPUT_PATH} ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
-SET(PARAVIEW_LIBRARY_DEPENDS_FILE ${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake)
-SET(PARAVIEW_GUI_CLIENT_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/paraview)
-SET(PARAVIEW_BATCH_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/pvbatch)
-SET(CFG_INIT "/${CMAKE_CFG_INTDIR}")
-IF(MAKE_SYSTEM OR UNIX)
-  SET(CFG_INIT "")
-ENDIF(MAKE_SYSTEM OR UNIX)
-SET(PARAVIEW_PROCESS_XML_EXECUTABLE "${EXECUTABLE_OUTPUT_PATH}${CFG_INIT}/kwProcessXML${EXE_EXT}")
-SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY ${ParaView_SOURCE_DIR}/Servers/ServerManager/Resources)
-SET(PARAVIEW_KWSYS_INCLUDE_DIRS ${ParaView_BINARY_DIR}/VTK/Utilities)
-CONFIGURE_FILE(${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
-               ${ParaView_BINARY_DIR}/ParaViewConfig.cmake @ONLY IMMEDIATE)
-
-# For installed ParaView:
-SET(PARAVIEW_VTK_DIR ${CMAKE_INSTALL_PREFIX}${VTK_INSTALL_LIB_DIR})
-SET(VTK_WRAP_ClientServer_EXE_CONFIG ${CMAKE_INSTALL_PREFIX}${PV_INSTALL_LIB_DIR}/vtkWrapClientServer)
-SET(PARAVIEW_CMAKE_EXTENSIONS
-  "${CMAKE_INSTALL_PREFIX}${PV_INSTALL_LIB_DIR}/CMake")
-SET(PARAVIEW_CMAKE_CLIENT_SERVER_EXTENSION ${CMAKE_INSTALL_PREFIX}${PV_INSTALL_LIB_DIR}/CMake/vtkWrapClientServer.cmake)
-SET(PARAVIEW_USE_FILE ${CMAKE_INSTALL_PREFIX}${PV_INSTALL_LIB_DIR}/ParaViewUse.cmake)
-SET(PARAVIEW_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include/paraview-${PARAVIEW_VERSION})
-SET(PARAVIEW_GUI_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS})
-SET(PARAVIEW_KWSYS_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS})
-SET(PARAVIEW_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}${PV_INSTALL_LIB_DIR})
-SET(PARAVIEW_LIBRARY_DEPENDS_FILE ${CMAKE_INSTALL_PREFIX}${PV_INSTALL_LIB_DIR}/ParaViewLibraryDepends.cmake)
-SET(PARAVIEW_GUI_CLIENT_EXECUTABLE ${CMAKE_INSTALL_PREFIX}${PV_INSTALL_BIN_DIR}/paraview)
-SET(PARAVIEW_BATCH_EXECUTABLE ${CMAKE_INSTALL_PREFIX}${PV_INSTALL_BIN_DIR}/pvbatch)
-SET(PARAVIEW_PROCESS_XML_EXECUTABLE "${CMAKE_INSTALL_PREFIX}${PV_INSTALL_BIN_DIR}/kwProcessXML")
-SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY ${CMAKE_INSTALL_PREFIX}${PV_INSTALL_LIB_DIR}/ServerManager/Resources)
-CONFIGURE_FILE(${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
-               ${ParaView_BINARY_DIR}/Utilities/ParaViewConfig.cmake @ONLY IMMEDIATE)
-
-IF(NOT PV_INSTALL_NO_DEVELOPMENT)
-  INSTALL_FILES(${PV_INSTALL_LIB_DIR}/CMake FILES
-    ${VTKCS_SOURCE_DIR}/CMake/vtkWrapClientServer.cmake)
-  INSTALL_FILES(${PV_INSTALL_LIB_DIR} FILES
-    ${ParaView_SOURCE_DIR}/ParaViewUse.cmake
-    ${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake
-    ${ParaView_BINARY_DIR}/Utilities/ParaViewConfig.cmake
-    )
-ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
-
+# If the cmake version includes cpack, use it
+INCLUDE(InstallRequiredSystemLibraries)
+SET(CPACK_INSTALL_CMAKE_PROJECTS "${ParaView_BINARY_DIR};ParaView;Runtime;/;${ParaView_BINARY_DIR};VTK Runtime Libs;RuntimeLibraries;/;${ParaView_BINARY_DIR};VTK Executables;RuntimeExecutables;/")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "ParaView is a scientific visualization tool")
+SET(CPACK_PACKAGE_VENDOR "Kitware Inc.")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/License_v1.1.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License_v1.1.txt")
+SET(CPACK_PACKAGE_VERSION_MAJOR "${PARAVIEW_VERSION_MAJOR}")
+SET(CPACK_PACKAGE_VERSION_MINOR "${PARAVIEW_VERSION_MINOR}")
+SET(CPACK_PACKAGE_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "ParaView ${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}.${PARAVIEW_VERSION_PATCH}")
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME
+  "paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}.${PARAVIEW_VERSION_PATCH}")
+IF (CMAKE_SYSTEM_PROCESSOR MATCHES "unknown")
+  SET (CMAKE_SYSTEM_PROCESSOR "x86")
+ENDIF (CMAKE_SYSTEM_PROCESSOR MATCHES "unknown")
+IF(NOT DEFINED CPACK_SYSTEM_NAME)
+  SET(CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR})
+ENDIF(NOT DEFINED CPACK_SYSTEM_NAME)
+IF(${CPACK_SYSTEM_NAME} MATCHES Windows)
+  IF(CMAKE_CL_64)
+    SET(CPACK_SYSTEM_NAME win64-${CMAKE_SYSTEM_PROCESSOR})
+  ELSE(CMAKE_CL_64)
+    SET(CPACK_SYSTEM_NAME win32-${CMAKE_SYSTEM_PROCESSOR})
+  ENDIF(CMAKE_CL_64)
+ENDIF(${CPACK_SYSTEM_NAME} MATCHES Windows)
+IF(NOT DEFINED CPACK_PACKAGE_FILE_NAME)
+  SET(CPACK_PACKAGE_FILE_NAME "${CPACK_SOURCE_PACKAGE_FILE_NAME}-${CPACK_SYSTEM_NAME}")
+ENDIF(NOT DEFINED CPACK_PACKAGE_FILE_NAME)
+SET(CPACK_PACKAGE_EXECUTABLES "paraview_alpha" "ParaView")
+IF(WIN32 AND NOT UNIX)
+  # There is a bug in NSI that does not handle full unix paths properly. Make
+  # sure there is at least one set of four (4) backlasshes.
+  SET(CPACK_PACKAGE_ICON "${ParaView_SOURCE_DIR}/Applications/Client\\\\ParaViewLogo.png")
+  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\paraview_alpha.exe")
+  SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} a cross-platform, open-source visualization system")
+  SET(CPACK_NSIS_HELP_LINK "http://www.paraview.org")
+  SET(CPACK_NSIS_URL_INFO_ABOUT "http://www.kitware.com")
+  SET(CPACK_NSIS_CONTACT "webmaster@paraview.org")
+  #    SET(CPACK_NSIS_MODIFY_PATH ON)
+ELSE(WIN32 AND NOT UNIX)
+  SET(CPACK_STRIP_FILES "")
+  SET(CPACK_SOURCE_STRIP_FILES "")
+  IF (NOT APPLE)
+    SET(CPACK_GENERATOR TGZ)
+  ENDIF (NOT APPLE)
+ENDIF(WIN32 AND NOT UNIX)
+INCLUDE(CPack)

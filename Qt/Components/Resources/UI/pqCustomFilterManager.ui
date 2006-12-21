@@ -1,0 +1,106 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>pqCustomFilterManager</class>
+ <widget class="QDialog" name="pqCustomFilterManager" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>418</width>
+    <height>235</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Custom Filter Manager</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item rowspan="5" row="0" column="0" >
+    <widget class="QListView" name="CustomFilterList" >
+     <property name="whatsThis" >
+      <string>Displays the list of registered custom filter definitions.</string>
+     </property>
+     <property name="selectionMode" >
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="isWrapping" stdset="0" >
+      <bool>true</bool>
+     </property>
+     <property name="resizeMode" >
+      <enum>QListView::Adjust</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="1" >
+    <widget class="QPushButton" name="CloseButton" >
+     <property name="text" >
+      <string>&amp;Close</string>
+     </property>
+     <property name="default" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QPushButton" name="RemoveButton" >
+     <property name="whatsThis" >
+      <string>Removes the selected custom filter definitions.</string>
+     </property>
+     <property name="text" >
+      <string>&amp;Remove</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QPushButton" name="ExportButton" >
+     <property name="whatsThis" >
+      <string>Exports the selected custom filter definitions to a file.</string>
+     </property>
+     <property name="text" >
+      <string>&amp;Export</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" >
+    <widget class="QPushButton" name="ImportButton" >
+     <property name="whatsThis" >
+      <string>Imports custom filter definitions from a file.</string>
+     </property>
+     <property name="text" >
+      <string>&amp;Import</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <pixmapfunction></pixmapfunction>
+ <tabstops>
+  <tabstop>CustomFilterList</tabstop>
+  <tabstop>ImportButton</tabstop>
+  <tabstop>ExportButton</tabstop>
+  <tabstop>RemoveButton</tabstop>
+  <tabstop>CloseButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

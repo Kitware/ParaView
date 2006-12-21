@@ -1,0 +1,45 @@
+
+INCLUDE_DIRECTORIES(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+SET(PV_TEST_CLEAN_COMMAND "" CACHE STRING
+  "Command to run after a failed test to cleanup processes.  Example: \"killall -9 rsh paraview\"")
+MARK_AS_ADVANCED(PV_TEST_CLEAN_COMMAND)
+
+
+SET(ConnectionXMLs
+  ManualConnectCS
+  ManualConnectBuiltin
+  ManualConnectCRSDS
+  )
+
+FOREACH(xml ${ConnectionXMLs})
+  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${xml}.xml.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${xml}.xml
+    @ONLY IMMEDIATE ESCAPE_QUOTES)
+ENDFOREACH(xml)
+
+SET(CONNECT_TO_SERVER_SCRIPT
+  ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectCS.xml)
+
+SET(CONNECT_TO_BUILTIN_SCRIPT
+  ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectBuiltin.xml)
+
+SET(CONNECT_TO_RS_DS_SCRIPT
+  ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectCRSDS.xml)
+
+
+SET (PARAVIEW_CLIENT paraview_alpha)
+SET (PARAVIEW_DATA_SERVER pvdataserver)
+SET (PARAVIEW_SERVER pvserver)
+SET (PARAVIEW_RENDER_SERVER pvrenderserver)
+
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/pvTestDriverConfig.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/pvTestDriverConfig.h @ONLY IMMEDIATE
+  ESCAPE_QUOTES)
+
+ADD_EXECUTABLE(pvTestDriver${PV_EXE_SUFFIX} pvTestDriver.cxx)
+ADD_DEPENDENCIES(pvTestDriver${PV_EXE_SUFFIX} paraview_alpha${PV_EXE_SUFFIX})
+TARGET_LINK_LIBRARIES(pvTestDriver${PV_EXE_SUFFIX} vtksys)

@@ -1,0 +1,922 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>pqCustomFilterDefinitionWizard</class>
+ <widget class="QDialog" name="pqCustomFilterDefinitionWizard" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>370</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Create Custom Filter</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>0</number>
+   </property>
+   <property name="spacing" >
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="TitleFrame" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="maximumSize" >
+      <size>
+       <width>16777215</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Plain</enum>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>0</number>
+      </property>
+      <property name="spacing" >
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="WizardImage" >
+        <property name="minimumSize" >
+         <size>
+          <width>178</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="pixmap" >
+         <pixmap resource="../pqResources.qrc" >:/pqWidgets/Icons/pqAppIcon64.png</pixmap>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QStackedWidget" name="TitleStack" >
+        <property name="currentIndex" >
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="TitleNamePage" >
+         <layout class="QHBoxLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label" >
+            <property name="text" >
+             <string>&lt;b>Choose a Name&lt;/b>&lt;br>&amp;nbsp;&amp;nbsp;&amp;nbsp;Enter a name for the custom filter.</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="TitleInputPage" >
+         <layout class="QHBoxLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_4" >
+            <property name="text" >
+             <string>&lt;b>Define the Inputs&lt;/b>&lt;br>&amp;nbsp;&amp;nbsp;&amp;nbsp;Select and name the input ports.</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="TitleOutputPage" >
+         <layout class="QHBoxLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_5" >
+            <property name="text" >
+             <string>&lt;b>Define the Outputs&lt;/b>&lt;br>&amp;nbsp;&amp;nbsp;&amp;nbsp;Select and name the output ports.</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="TitlePropertyPage" >
+         <layout class="QHBoxLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_6" >
+            <property name="text" >
+             <string>&lt;b>Define the Properties&lt;/b>&lt;br>&amp;nbsp;&amp;nbsp;&amp;nbsp;Select and name the exposed properties.</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_4" >
+     <property name="frameShape" >
+      <enum>QFrame::HLine</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Sunken</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="InputFrame" >
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Plain</enum>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="0" column="1" >
+       <widget class="QStackedWidget" name="PageStack" >
+        <property name="currentIndex" >
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="NamePage" >
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="2" column="1" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="0" colspan="2" >
+           <widget class="QLabel" name="label_3" >
+            <property name="text" >
+             <string>The name will be used to identify the custom filter. It should be unique. The name should also indicate what the custom filter will be used for.</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" >
+           <widget class="QLabel" name="label_2" >
+            <property name="text" >
+             <string>Custom Filter Name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" >
+           <widget class="QLineEdit" name="CustomFilterName" >
+            <property name="whatsThis" >
+             <string>Enter the custom filter name here.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="InputPage" >
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="0" column="0" colspan="3" >
+           <widget class="QLabel" name="label_9" >
+            <property name="text" >
+             <string>Select an object from the pipeline layout on the left. Then, select the input property from that object to expose. Give the input port a name and add it to the list.</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item rowspan="4" row="1" column="0" >
+           <widget class="QTreeView" name="InputPipeline" >
+            <property name="sizePolicy" >
+             <sizepolicy>
+              <hsizetype>0</hsizetype>
+              <vsizetype>7</vsizetype>
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>140</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>140</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" colspan="2" >
+           <widget class="QTreeWidget" name="InputPorts" >
+            <property name="alternatingRowColors" >
+             <bool>true</bool>
+            </property>
+            <property name="rootIsDecorated" >
+             <bool>false</bool>
+            </property>
+            <property name="uniformRowHeights" >
+             <bool>true</bool>
+            </property>
+            <column>
+             <property name="text" >
+              <string>Object</string>
+             </property>
+            </column>
+            <column>
+             <property name="text" >
+              <string>Property</string>
+             </property>
+            </column>
+            <column>
+             <property name="text" >
+              <string>Name</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item row="4" column="2" >
+           <widget class="QLineEdit" name="InputName" />
+          </item>
+          <item row="3" column="1" >
+           <widget class="QLabel" name="label_7" >
+            <property name="text" >
+             <string>Input Property</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" >
+           <widget class="QLabel" name="label_8" >
+            <property name="text" >
+             <string>Input Name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2" >
+           <widget class="QComboBox" name="InputCombo" />
+          </item>
+          <item row="2" column="1" colspan="2" >
+           <widget class="QFrame" name="frame" >
+            <property name="frameShape" >
+             <enum>QFrame::Box</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Sunken</enum>
+            </property>
+            <layout class="QHBoxLayout" >
+             <property name="margin" >
+              <number>2</number>
+             </property>
+             <property name="spacing" >
+              <number>2</number>
+             </property>
+             <item>
+              <spacer>
+               <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" >
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QToolButton" name="AddInputButton" >
+               <property name="toolTip" >
+                <string>Add Input</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqPlus16.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="RemoveInputButton" >
+               <property name="toolTip" >
+                <string>Remove Input</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqMinus16.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="InputUpButton" >
+               <property name="toolTip" >
+                <string>Move Up</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqArrowUp16.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="InputDownButton" >
+               <property name="toolTip" >
+                <string>Move Down</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqArrowDown16.png</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="OutputPage" >
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="3" column="2" >
+           <widget class="QLineEdit" name="OutputName" />
+          </item>
+          <item row="3" column="1" >
+           <widget class="QLabel" name="label_11" >
+            <property name="text" >
+             <string>Output Name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" colspan="2" >
+           <widget class="QFrame" name="frame_2" >
+            <property name="frameShape" >
+             <enum>QFrame::Box</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Sunken</enum>
+            </property>
+            <layout class="QHBoxLayout" >
+             <property name="margin" >
+              <number>2</number>
+             </property>
+             <property name="spacing" >
+              <number>2</number>
+             </property>
+             <item>
+              <spacer>
+               <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" >
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QToolButton" name="AddOutputButton" >
+               <property name="toolTip" >
+                <string>Add Output</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqPlus16.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="RemoveOutputButton" >
+               <property name="toolTip" >
+                <string>Remove Output</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqMinus16.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="OutputUpButton" >
+               <property name="toolTip" >
+                <string>Move Up</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqArrowUp16.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="OutputDownButton" >
+               <property name="toolTip" >
+                <string>Move Down</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqArrowDown16.png</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item rowspan="3" row="1" column="0" >
+           <widget class="QTreeView" name="OutputPipeline" >
+            <property name="sizePolicy" >
+             <sizepolicy>
+              <hsizetype>0</hsizetype>
+              <vsizetype>7</vsizetype>
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>140</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>140</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" colspan="2" >
+           <widget class="QTreeWidget" name="OutputPorts" >
+            <property name="alternatingRowColors" >
+             <bool>true</bool>
+            </property>
+            <property name="rootIsDecorated" >
+             <bool>false</bool>
+            </property>
+            <property name="uniformRowHeights" >
+             <bool>true</bool>
+            </property>
+            <column>
+             <property name="text" >
+              <string>Object</string>
+             </property>
+            </column>
+            <column>
+             <property name="text" >
+              <string>Name</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="3" >
+           <widget class="QLabel" name="label_10" >
+            <property name="text" >
+             <string>Select an object from the pipeline layout on the left. Give the output port a name and add it to the list.</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="PropertyPage" >
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="4" column="2" >
+           <widget class="QLineEdit" name="PropertyName" />
+          </item>
+          <item row="3" column="2" >
+           <widget class="QComboBox" name="PropertyCombo" />
+          </item>
+          <item row="3" column="1" >
+           <widget class="QLabel" name="label_13" >
+            <property name="text" >
+             <string>Property</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" >
+           <widget class="QLabel" name="label_14" >
+            <property name="text" >
+             <string>Property Name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" colspan="2" >
+           <widget class="QFrame" name="frame_3" >
+            <property name="frameShape" >
+             <enum>QFrame::Box</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Sunken</enum>
+            </property>
+            <layout class="QHBoxLayout" >
+             <property name="margin" >
+              <number>2</number>
+             </property>
+             <property name="spacing" >
+              <number>2</number>
+             </property>
+             <item>
+              <spacer>
+               <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" >
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QToolButton" name="AddPropertyButton" >
+               <property name="toolTip" >
+                <string>Add Property</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqPlus16.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="RemovePropertyButton" >
+               <property name="toolTip" >
+                <string>Remove Property</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqMinus16.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="PropertyUpButton" >
+               <property name="toolTip" >
+                <string>Move Up</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqArrowUp16.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="PropertyDownButton" >
+               <property name="toolTip" >
+                <string>Move Down</string>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+               <property name="icon" >
+                <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqArrowDown16.png</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="1" colspan="2" >
+           <widget class="QTreeWidget" name="PropertyList" >
+            <property name="alternatingRowColors" >
+             <bool>true</bool>
+            </property>
+            <property name="rootIsDecorated" >
+             <bool>false</bool>
+            </property>
+            <property name="uniformRowHeights" >
+             <bool>true</bool>
+            </property>
+            <column>
+             <property name="text" >
+              <string>Object</string>
+             </property>
+            </column>
+            <column>
+             <property name="text" >
+              <string>Property</string>
+             </property>
+            </column>
+            <column>
+             <property name="text" >
+              <string>Name</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item rowspan="4" row="1" column="0" >
+           <widget class="QTreeView" name="PropertyPipeline" >
+            <property name="sizePolicy" >
+             <sizepolicy>
+              <hsizetype>0</hsizetype>
+              <vsizetype>7</vsizetype>
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>140</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>140</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="3" >
+           <widget class="QLabel" name="label_12" >
+            <property name="text" >
+             <string>Select an object from the pipeline layout on the left. Then, select the property from that object to expose. Give the property a name and add it to the list.</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>16</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="0" colspan="3" >
+       <widget class="QFrame" name="frame_5" >
+        <property name="frameShape" >
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow" >
+         <enum>QFrame::Sunken</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>16</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="0" colspan="3" >
+       <layout class="QHBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>2</number>
+        </property>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>80</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="BackButton" >
+          <property name="text" >
+           <string>&lt; &amp;Back</string>
+          </property>
+          <property name="autoDefault" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="NextButton" >
+          <property name="text" >
+           <string>&amp;Next ></string>
+          </property>
+          <property name="autoDefault" >
+           <bool>false</bool>
+          </property>
+          <property name="default" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType" >
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>10</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="FinishButton" >
+          <property name="text" >
+           <string>&amp;Finish</string>
+          </property>
+          <property name="autoDefault" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="CancelButton" >
+          <property name="text" >
+           <string>Cancel</string>
+          </property>
+          <property name="autoDefault" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <pixmapfunction></pixmapfunction>
+ <tabstops>
+  <tabstop>CustomFilterName</tabstop>
+  <tabstop>InputPipeline</tabstop>
+  <tabstop>InputName</tabstop>
+  <tabstop>InputPorts</tabstop>
+  <tabstop>AddInputButton</tabstop>
+  <tabstop>RemoveInputButton</tabstop>
+  <tabstop>InputUpButton</tabstop>
+  <tabstop>InputDownButton</tabstop>
+  <tabstop>OutputPipeline</tabstop>
+  <tabstop>OutputName</tabstop>
+  <tabstop>OutputPorts</tabstop>
+  <tabstop>AddOutputButton</tabstop>
+  <tabstop>RemoveOutputButton</tabstop>
+  <tabstop>OutputUpButton</tabstop>
+  <tabstop>OutputDownButton</tabstop>
+  <tabstop>PropertyPipeline</tabstop>
+  <tabstop>PropertyCombo</tabstop>
+  <tabstop>PropertyName</tabstop>
+  <tabstop>PropertyList</tabstop>
+  <tabstop>AddPropertyButton</tabstop>
+  <tabstop>RemovePropertyButton</tabstop>
+  <tabstop>PropertyUpButton</tabstop>
+  <tabstop>PropertyDownButton</tabstop>
+  <tabstop>NextButton</tabstop>
+  <tabstop>BackButton</tabstop>
+  <tabstop>FinishButton</tabstop>
+  <tabstop>CancelButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../pqResources.qrc" />
+ </resources>
+ <connections/>
+</ui>

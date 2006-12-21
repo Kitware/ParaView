@@ -1,0 +1,79 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    pqClipPanel.h
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
+
+   See License_v1.1.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
+
+#ifndef _pqClipPanel_h
+#define _pqClipPanel_h
+
+#include "pqObjectPanel.h"
+#include "pqObjectPanelInterface.h"
+
+/// Custom panel for the Clip filter that manages a 3D widget for interactive clipping
+class pqClipPanel :
+  public pqObjectPanel
+{
+  typedef pqObjectPanel Superclass;
+
+  Q_OBJECT
+
+public:
+  pqClipPanel(pqProxy* proxy, QWidget* p);
+  ~pqClipPanel();
+  
+private slots:
+  /// Called when changes are made to the implicit plane widget
+  void onWidgetChanged();
+  /// Called if the user accepts pending modifications
+  void onAccepted();
+  /// Called if the user rejects pending modifications
+  void onRejected();
+
+private:
+  virtual void select();
+  virtual void deselect();
+
+  class pqImplementation;
+  pqImplementation* const Implementation;
+};
+
+// make this panel available to the object inspector
+class pqClipPanelInterface : public QObject, public pqObjectPanelInterface
+{
+  Q_OBJECT
+  Q_INTERFACES(pqObjectPanelInterface)
+public:
+  virtual QString name() const;
+  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
+  virtual bool canCreatePanel(pqProxy* proxy) const;
+};
+
+#endif
+

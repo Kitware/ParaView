@@ -1,0 +1,146 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>pqImplicitPlaneWidget</class>
+ <widget class="QWidget" name="pqImplicitPlaneWidget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>206</width>
+    <height>206</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>0</number>
+   </property>
+   <property name="spacing" >
+    <number>2</number>
+   </property>
+   <item>
+    <widget class="QCheckBox" name="show3DWidget" >
+     <property name="text" >
+      <string>Show Plane</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>2</number>
+     </property>
+     <item row="1" column="0" >
+      <widget class="QLabel" name="label" >
+       <property name="text" >
+        <string>Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" >
+      <widget class="QLineEdit" name="normalX" />
+     </item>
+     <item row="0" column="0" >
+      <widget class="QLabel" name="label_3" >
+       <property name="text" >
+        <string>Origin</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3" >
+      <widget class="QLineEdit" name="normalZ" />
+     </item>
+     <item row="0" column="3" >
+      <widget class="QLineEdit" name="originZ" />
+     </item>
+     <item row="0" column="2" >
+      <widget class="QLineEdit" name="originY" />
+     </item>
+     <item row="1" column="2" >
+      <widget class="QLineEdit" name="normalY" />
+     </item>
+     <item row="0" column="1" >
+      <widget class="QLineEdit" name="originX" />
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>0</number>
+     </property>
+     <item row="0" column="1" >
+      <widget class="QPushButton" name="resetBounds" >
+       <property name="text" >
+        <string>Reset Bounds</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" >
+      <widget class="QPushButton" name="useCameraNormal" >
+       <property name="text" >
+        <string>Camera Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" >
+      <widget class="QPushButton" name="useXNormal" >
+       <property name="text" >
+        <string>&amp;X Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0" >
+      <widget class="QPushButton" name="useZNormal" >
+       <property name="text" >
+        <string>&amp;Z Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" >
+      <widget class="QPushButton" name="useYNormal" >
+       <property name="text" >
+        <string>&amp;Y Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1" >
+      <widget class="QPushButton" name="useCenterBounds" >
+       <property name="text" >
+        <string>Center on Bounds</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <pixmapfunction></pixmapfunction>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>originX</tabstop>
+  <tabstop>originY</tabstop>
+  <tabstop>originZ</tabstop>
+  <tabstop>normalX</tabstop>
+  <tabstop>normalY</tabstop>
+  <tabstop>normalZ</tabstop>
+  <tabstop>useXNormal</tabstop>
+  <tabstop>resetBounds</tabstop>
+  <tabstop>useYNormal</tabstop>
+  <tabstop>useZNormal</tabstop>
+  <tabstop>useCameraNormal</tabstop>
+  <tabstop>useCenterBounds</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

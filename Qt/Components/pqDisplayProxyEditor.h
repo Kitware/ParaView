@@ -1,0 +1,97 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    pqDisplayProxyEditor.h
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
+
+   See License_v1.1.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
+#ifndef _pqDisplayProxyEditor_h
+#define _pqDisplayProxyEditor_h
+
+#include <QWidget>
+#include <QList>
+#include <QVariant>
+#include "pqComponentsExport.h"
+
+class pqDisplayProxyEditorInternal;
+class pqPipelineDisplay;
+
+/// Widget which provides an editor for the properties of a display.
+class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public QWidget
+{
+  Q_OBJECT
+  
+  // property adaptor for specular lighting
+  Q_PROPERTY(double specular READ specular WRITE setSpecular)
+  Q_PROPERTY(QVariant specularColor READ specularColor 
+                                    WRITE setSpecularColor)
+public:
+  /// constructor
+  pqDisplayProxyEditor(QWidget* p = NULL);
+  /// destructor
+  ~pqDisplayProxyEditor();
+
+
+  /// get the proxy for which properties are displayed
+  pqPipelineDisplay* getDisplay();
+
+public slots:
+  /// Set the display whose properties we want to edit. 
+  void setDisplay(pqPipelineDisplay* display);
+
+  /// TODO: get rid of this function once the server manager can
+  /// inform us of display property changes
+  void reloadGUI();
+
+signals:
+  void specularChanged();
+  void specularColorChanged();
+
+protected slots:
+  /// internally used to update the graphics window when a property changes
+  void updateView();
+  void openColorMapEditor();
+  void zoomToData();
+  void updateEnableState();
+  void onSpecularChanged();
+  
+protected:
+  pqDisplayProxyEditorInternal* Internal;
+  void setupGUIConnections();
+  
+  double specular() const;
+  void setSpecular(double);
+  QVariant specularColor() const;
+  void setSpecularColor(QVariant);
+
+
+private:
+  bool DisableSlots;
+};
+
+#endif
+

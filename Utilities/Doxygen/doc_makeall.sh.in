@@ -164,7 +164,7 @@ cd "${DOXTEMP}" || echoexit "Cannot find Doxygen output directory: ${DOXTEMP}"
 
 # ----------------------------------------------------------------------------
 # Convert the VTK headers to the Doxygen format.
-
+echo "Convert the VTK headers to the Doxygen format."
 if test "x$PERL_PROG" != "xNOTFOUND" ; then
     $PERL_PROG "$PATH_TO_VTK_DOX_SCRIPTS/doc_header2doxygen.pl" \
         --to "$INTERMEDIATE_DOX_DIR" \
@@ -177,10 +177,11 @@ if test "x$PERL_PROG" != "xNOTFOUND" ; then
         @DOXYGEN_BINARY_LOCATIONS@ || echoexit "Problem converting VTK headers"
     fi
 fi
+echo "Convert the VTK headers to the Doxygen format - done"
 
 # ----------------------------------------------------------------------------
 # Build the full-text index.
-
+echo "Build the full-text index."
 if test "x$PERL_PROG" != "xNOTFOUND" ; then
     $PERL_PROG "$PATH_TO_VTK_DOX_SCRIPTS/doc_index.pl" \
         --project "$PROJECT_NAME" \
@@ -190,6 +191,7 @@ if test "x$PERL_PROG" != "xNOTFOUND" ; then
         @DOXYGEN_SOURCE_LOCATIONS@ \
         @DOXYGEN_BINARY_LOCATIONS@ || echoexit "Problem building full-text index"
 fi
+echo "Build the full-text index - done"
 
 #  # ----------------------------------------------------------------------------
 #  # Generate the 'Class to Demos' page cross-linking each class to these
