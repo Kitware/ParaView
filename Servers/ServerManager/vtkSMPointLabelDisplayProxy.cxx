@@ -223,7 +223,7 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
         vtkProcessModule::DATA_SERVER, stream);
       }
     // if running in render server mode
-    if(pm->GetOptions()->GetRenderServerMode())
+    if(pm->GetRenderClientMode(this->GetConnectionID()))
       {
       stream << vtkClientServerStream::Invoke
         << this->CollectProxy->GetID(i) << "SetServerToRenderServer"

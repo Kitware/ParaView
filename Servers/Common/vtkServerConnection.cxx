@@ -35,7 +35,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.7");
+vtkCxxRevisionMacro(vtkServerConnection, "1.8");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -553,7 +553,7 @@ int vtkServerConnection::SetupDataServerRenderServerConnection()
   // if the data server is going to wait for the render server
   // then we have to tell the data server how many connections to make
   // if the render server is waiting, it already knows how many to make
-  if (options->GetRenderServerMode() == 2)
+  if (waitingServer == vtkProcessModule::DATA_SERVER)
     {
     // Get number of processes on the render server.
     this->GatherInformation(vtkProcessModule::RENDER_SERVER, info, id);
@@ -608,7 +608,7 @@ int vtkServerConnection::SetupDataServerRenderServerConnection()
 
   // Get the information about the connection after the call to
   // SetupWaitForConnection
-  if(options->GetRenderServerMode() == 1)
+  if(connectingServer == vtkProcessModule::DATA_SERVER)
     {
     this->GatherInformation(vtkProcessModule::RENDER_SERVER, info, id);
     numOfRenderServerNodes = info->GetNumberOfConnections();

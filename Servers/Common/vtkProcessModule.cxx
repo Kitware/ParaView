@@ -102,7 +102,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.63");
+vtkCxxRevisionMacro(vtkProcessModule, "1.64");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1593,6 +1593,12 @@ int vtkProcessModule::GetClientMode()
     return 0;
     }
   return this->Options->GetClientMode();
+}
+
+//----------------------------------------------------------------------------
+int vtkProcessModule::GetRenderClientMode(vtkIdType cid)
+{
+  return this->ConnectionManager->GetRenderClientMode(cid);
 }
 
 //----------------------------------------------------------------------------

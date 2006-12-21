@@ -72,7 +72,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.16");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.17");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -617,6 +617,19 @@ vtkClientServerID vtkProcessModuleConnectionManager::GetMPIMToNSocketConnectionI
     }
   vtkClientServerID nullid = {0 };
   return nullid;
+}
+
+//-----------------------------------------------------------------------------
+int vtkProcessModuleConnectionManager::GetRenderClientMode(vtkIdType id)
+{
+  vtkServerConnection* conn = vtkServerConnection::SafeDownCast(
+    this->GetConnectionFromID(id));
+  if (conn)
+    {
+    return (conn->GetRenderServerSocketController()? 1 : 0);
+    }
+
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
