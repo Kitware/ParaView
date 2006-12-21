@@ -186,6 +186,10 @@ void pqCoreTestUtility::playTests(const QStringList& filenames)
     this->TestFilenames.pop_front();
     this->pqTestUtility::playTests(filename);
     }
+  else
+    {
+    this->testSucceeded();
+    }
 }
 
 void pqCoreTestUtility::playTests(const QString& filename)

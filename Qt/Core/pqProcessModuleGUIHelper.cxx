@@ -114,7 +114,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.9");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.10");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -156,13 +156,9 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
       if(pqOptions* const options = pqOptions::SafeDownCast(
              vtkProcessModule::GetProcessModule()->GetOptions()))
         {
-        if(options->GetTestFiles().size() > 0)
-          {
-          QMetaObject::invokeMethod(this->TestUtility(), "playTests",
-            Qt::QueuedConnection,
-            Q_ARG(QStringList, 
-              options->GetTestFiles()));
-          }
+        QMetaObject::invokeMethod(this->TestUtility(), "playTests",
+          Qt::QueuedConnection,
+          Q_ARG(QStringList, options->GetTestFiles()));
         }
       }
 

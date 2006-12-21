@@ -16,6 +16,7 @@ public:
   pqFileDialogTestUtility();
   ~pqFileDialogTestUtility();
   void playTests(const QString& filename);
+  void playTests(const QStringList& filenames);
   void testSucceeded();
   void testFailed();
 protected:

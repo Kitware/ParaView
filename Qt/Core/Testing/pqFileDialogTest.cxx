@@ -34,6 +34,14 @@ pqFileDialogTestUtility::~pqFileDialogTestUtility()
   this->cleanupFiles();
 }
 
+void pqFileDialogTestUtility::playTests(const QStringList& filenames)
+{
+  if (filenames.size() > 0)
+    {
+    this->playTests(filenames[0]);
+    }
+}
+
 void pqFileDialogTestUtility::playTests(const QString& filename)
 {
   this->setupFiles();

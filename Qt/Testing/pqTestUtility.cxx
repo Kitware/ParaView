@@ -149,6 +149,14 @@ void pqTestUtility::playTests(const QString& filename)
     }
 }
 
+void pqTestUtility::playTests(const QStringList& filenames)
+{
+  foreach(QString filename, filenames)
+    {
+    this->playTests(filename);
+    }
+}
+
 void pqTestUtility::recordTests(const QString& filename)
 {
 #if defined(Q_WS_MAC)

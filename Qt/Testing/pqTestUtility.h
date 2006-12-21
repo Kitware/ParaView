@@ -80,6 +80,9 @@ public slots:
   /// start the playing of tests in a file
   virtual void playTests(const QString& filename);
 
+  /// start playing the tests in the collection of files.
+  virtual void playTests(const QStringList& filenames);
+
   /// start the recording of tests to a file
   virtual void recordTests(const QString& filename);
 
