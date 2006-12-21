@@ -45,7 +45,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.9");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.10");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -328,10 +328,12 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
     LocalFree(lpMsgBuf);
     return;
     }
-  int done = 0;
-  while(!done)
+
+  do
     {
     vtkstd::string filename = data.cFileName;
+    if(filename == "." || filename == "..")
+      continue;
     vtkstd::string fullpath = prefix + filename;
     size_t len = filename.size();
     bool success = true;
@@ -360,8 +362,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       }
 
     // Find the next file.
-    done = (FindNextFile(handle, &data) == 0)?1:0;
-    }
+    } while(FindNextFile(handle, &data) != 0);
 
   if(GetLastError() != ERROR_NO_MORE_FILES)
     {
