@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QWidget>
 #include <QTimer>
+#include <QStringList>
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper::pqImplementation
 
@@ -113,7 +114,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.8");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.9");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -150,20 +151,19 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     this->Implementation->Window->show();
     
     // get the tester going when the application starts
-    QString testFile;
     if(this->TestUtility())
       {
       if(pqOptions* const options = pqOptions::SafeDownCast(
              vtkProcessModule::GetProcessModule()->GetOptions()))
         {
-        if(options->GetTestFileName())
+        if(options->GetTestFiles().size() > 0)
           {
-          testFile = options->GetTestFileName();
+          QMetaObject::invokeMethod(this->TestUtility(), "playTests",
+            Qt::QueuedConnection,
+            Q_ARG(QStringList, 
+              options->GetTestFiles()));
           }
         }
-        QMetaObject::invokeMethod(this->TestUtility(), "playTests",
-                              Qt::QueuedConnection,
-                              Q_ARG(QString, testFile));
       }
 
     // Starts the event loop.

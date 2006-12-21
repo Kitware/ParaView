@@ -103,7 +103,6 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
        new pqFileDialogEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(
        new pqFlatTreeViewEventPlayer(this));
-
 }
 
 pqCoreTestUtility::~pqCoreTestUtility()
@@ -177,9 +176,21 @@ bool pqCoreTestUtility::CompareImage(vtkRenderWindow* RenderWindow,
     }
   return false;
 }
-  
+
+void pqCoreTestUtility::playTests(const QStringList& filenames)
+{
+  this->TestFilenames = filenames;
+  if (this->TestFilenames.size() > 0)
+    {
+    QString filename = this->TestFilenames[0];
+    this->TestFilenames.pop_front();
+    this->pqTestUtility::playTests(filename);
+    }
+}
+
 void pqCoreTestUtility::playTests(const QString& filename)
 {
+  this->TestFilenames.clear();
   if(!filename.isEmpty())
     {
     pqTestUtility::playTests(filename);
@@ -192,8 +203,16 @@ void pqCoreTestUtility::playTests(const QString& filename)
 
 void pqCoreTestUtility::testSucceeded()
 {
+  if (this->TestFilenames.size() > 0)
+    {
+    QString filename = this->TestFilenames[0];
+    this->TestFilenames.pop_front();
+    this->pqTestUtility::playTests(filename);
+    return;
+    }
   if(pqOptions* const options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions()))
+    vtkProcessModule::GetProcessModule()->GetOptions())
+    )
     {
     // TODO: image comparisons probably ought to be done the same
     //       way widget validation is done (when that gets implemented)

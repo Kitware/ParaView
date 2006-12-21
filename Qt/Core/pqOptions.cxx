@@ -34,16 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 
 #include <vtkObjectFactory.h>
+#include <vtkstd/string>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.3");
+vtkCxxRevisionMacro(pqOptions, "1.4");
 
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
 {
   this->BaselineImage = 0;
   this->TestDirectory = 0;
-  this->TestFileName = 0;
   this->ImageThreshold = 12;
   this->ExitAppWhenTestsDone = 0;
   this->DisableRegistry = 0;
@@ -54,7 +54,6 @@ pqOptions::~pqOptions()
 {
   this->SetBaselineImage(0);
   this->SetTestDirectory(0);
-  this->SetTestFileName(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -69,9 +68,11 @@ void pqOptions::Initialize()
   this->AddArgument("--test-directory", NULL,
     &this->TestDirectory,
     "Set the temporary directory where test-case output will be stored.");
-  
+ 
+  /*
   this->AddArgument("--run-test", NULL,
     &this->TestFileName,  "Run a recorded test case.");
+    */
   
   this->AddArgument("--image-threshold", NULL, &this->ImageThreshold,
     "Set the threshold beyond which viewport-image comparisons fail.");
@@ -90,6 +91,24 @@ int pqOptions::PostProcess(int argc, const char * const *argv)
 }
 
 //-----------------------------------------------------------------------------
+int pqOptions::WrongArgument(const char* arg)
+{
+  vtkstd::string argument = arg;
+  int index = argument.find('=');
+  if ( index != -1)
+    {
+    vtkstd::string key = argument.substr(0, index);
+    vtkstd::string value = argument.substr(index+1);
+    if (key == "--run-test")
+      {
+      this->TestFiles.push_back(value.c_str());
+      return 1;
+      }
+    }
+  return this->Superclass::WrongArgument(arg);
+}
+
+//-----------------------------------------------------------------------------
 void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -100,6 +119,4 @@ void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
     this->BaselineImage : "(none)") << endl;
   os << indent << "TestDirectory: " << (this->TestDirectory?
     this->TestDirectory : "(none)") << endl;
-  os << indent << "TestFileName: " << (this->TestFileName?
-    this->TestFileName : "(none)") << endl;
 }

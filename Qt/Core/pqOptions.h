@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreExport.h"
 #include <vtkPVOptions.h>
+#include <QStringList>
+
 /*! \brief Command line options for pqClient.
  *
  * pqOptions extends vtkPVOptions to handle pqClient specific command line 
@@ -47,12 +49,15 @@ public:
   vtkTypeRevisionMacro(pqOptions, vtkPVOptions);
   void PrintSelf(ostream &os, vtkIndent indent);
 
-  vtkGetStringMacro(TestFileName);
   vtkGetStringMacro(TestDirectory);
   vtkGetStringMacro(BaselineImage);
   vtkGetMacro(ImageThreshold, int);
   vtkGetMacro(ExitAppWhenTestsDone, int);
   vtkGetMacro(DisableRegistry, int);
+
+  const QStringList& GetTestFiles() 
+    { return this->TestFiles; }
+
 protected:
   pqOptions();
   virtual ~pqOptions();
@@ -60,17 +65,21 @@ protected:
   virtual void Initialize();
   virtual int PostProcess(int argc, const char * const *argv);
 
-  char* TestFileName;
   char* TestDirectory;
   char* BaselineImage;
   int ImageThreshold;
   int ExitAppWhenTestsDone;
   int DisableRegistry;
+
+  QStringList TestFiles;
     
-  vtkSetStringMacro(TestFileName);
   vtkSetStringMacro(TestDirectory);
   vtkSetStringMacro(BaselineImage);
-  
+ 
+  // Description:
+  // This method is called when wrong argument is found. If it returns 0, then
+  // the parsing will fail.
+  virtual int WrongArgument(const char* argument);
 private:
   pqOptions(const pqOptions &);
   void operator=(const pqOptions &);

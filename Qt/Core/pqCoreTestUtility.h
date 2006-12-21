@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include "pqTestUtility.h"
 #include <vtkIOStream.h>
+#include <QStringList>
 
 class QString;
 class pqEventPlayer;
@@ -69,11 +70,14 @@ public:
 
 public slots:
   void playTests(const QString& filename);
+  void playTests(const QStringList& filenames); 
 
 protected slots:
   void testSucceeded();
   void testFailed();
 
+private:
+  QStringList TestFilenames;
 };
 
 #endif // !_pqCoreTestUtility_h
