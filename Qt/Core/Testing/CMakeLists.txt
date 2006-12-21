@@ -29,7 +29,7 @@ IF(QT_TESTING_WITH_PYTHON)
                  pqFileDialogTest.cxx pqFileDialogTest.h 
                  pqFileDialogTest.py
                  ${MOC_SRCS})
-  TARGET_LINK_LIBRARIES(pqFileDialogTest pqCore QtPython QtTesting ${QT_LIBRARIES} )
+  TARGET_LINK_LIBRARIES(pqFileDialogTest pqCore QtTesting ${QT_LIBRARIES} )
   GET_TEST_BINARY(pqFileDialogTest TEST_BINARY)
   ADD_TEST(pqFileDialogTest "${TEST_BINARY}" -dr
            "--test-directory=${PARAVIEW_TEST_DIR}"
