@@ -1,4 +1,7 @@
 <ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow" >
   <property name="geometry" >
@@ -25,7 +28,7 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFilters" >
@@ -33,36 +36,53 @@
      <string>F&amp;ilters</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuServer" > 	 
-     <property name="title" > 	 
-      <string>&amp;Server</string> 	 
-     </property> 	 
-     <addaction name="actionServerConnect" /> 	 
-     <addaction name="actionServerDisconnect" /> 	 
-    </widget>
-   <widget class="QMenu" name="menuFile" >
+   <widget class="QMenu" name="menuServer" >
     <property name="title" >
-     <string>&amp;File</string>
+     <string>&amp;Server</string>
     </property>
-    <widget class="QMenu" name="menuRecentFiles" >
-     <property name="title" >
-      <string>Recent Files</string>
-     </property>
-    </widget>
-    <addaction name="actionFileOpen" />
-    <addaction name="menuRecentFiles" />
-    <addaction name="separator" />
-    <addaction name="actionFileLoadServerState" />
-    <addaction name="actionFileSaveServerState" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveData" />
-    <addaction name="actionFileSaveScreenshot" />
-    <addaction name="actionFileSaveAnimation" />
-    <addaction name="separator" />
     <addaction name="actionServerConnect" />
     <addaction name="actionServerDisconnect" />
+   </widget>
+   <widget class="QMenu" name="menuSources" >
+    <property name="title" >
+     <string>&amp;Sources</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuPipeline" >
+    <property name="title" >
+     <string>&amp;Pipeline</string>
+    </property>
+    <addaction name="actionAddSource" />
+    <addaction name="actionAddFilter" />
     <addaction name="separator" />
-    <addaction name="actionFileExit" />
+    <addaction name="actionChangeInput" />
+    <addaction name="actionDelete" />
+   </widget>
+   <widget class="QMenu" name="menuAnimation" >
+    <property name="title" >
+     <string>&amp;Animation</string>
+    </property>
+    <addaction name="actionVCRFirstFrame" />
+    <addaction name="actionVCRPreviousFrame" />
+    <addaction name="actionVCRPlay" />
+    <addaction name="actionVCRPause" />
+    <addaction name="actionVCRNextFrame" />
+    <addaction name="actionVCRLastFrame" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionToolsCreateCustomFilter" />
+    <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="separator" />
+    <addaction name="actionToolsDumpWidgetNames" />
+    <addaction name="actionToolsRecordTest" />
+    <addaction name="actionToolsRecordTestScreenshot" />
+    <addaction name="actionToolsPlayTest" />
+    <addaction name="actionTesting_Window_Size" />
+    <addaction name="separator" />
+    <addaction name="actionToolsPythonShell" />
    </widget>
    <widget class="QMenu" name="menuHelp" >
     <property name="title" >
@@ -72,11 +92,6 @@
     <addaction name="actionHelpHelp" />
     <addaction name="separator" />
     <addaction name="actionHelpEnableTooltips" />
-   </widget>
-   <widget class="QMenu" name="menuSources" >
-    <property name="title" >
-     <string>S&amp;ources</string>
-    </property>
    </widget>
    <widget class="QMenu" name="menuView" >
     <property name="title" >
@@ -104,32 +119,6 @@
     <addaction name="menuPlots" />
     <addaction name="separator" />
    </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>&amp;Tools</string>
-    </property>
-    <addaction name="actionToolsCreateCustomFilter" />
-    <addaction name="actionToolsManageCustomFilters" />
-    <addaction name="separator" />
-    <addaction name="actionToolsDumpWidgetNames" />
-    <addaction name="actionToolsRecordTest" />
-    <addaction name="actionToolsRecordTestScreenshot" />
-    <addaction name="actionToolsPlayTest" />
-    <addaction name="actionTesting_Window_Size" />
-    <addaction name="separator" />
-    <addaction name="actionToolsPythonShell" />
-   </widget>
-   <widget class="QMenu" name="menuAnimation" >
-    <property name="title" >
-     <string>&amp;Animation</string>
-    </property>
-    <addaction name="actionVCRFirstFrame" />
-    <addaction name="actionVCRPreviousFrame" />
-    <addaction name="actionVCRPlay" />
-    <addaction name="actionVCRPause" />
-    <addaction name="actionVCRNextFrame" />
-    <addaction name="actionVCRLastFrame" />
-   </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
      <string>&amp;Edit</string>
@@ -148,26 +137,63 @@
     <addaction name="actionEditCameraUndo" />
     <addaction name="actionEditCameraRedo" />
     <addaction name="separator" />
+    <addaction name="actionMoveMode" />
+    <addaction name="actionSelectionMode" />
+    <addaction name="separator" />
     <addaction name="menuAddPlot" />
     <addaction name="separator" />
     <addaction name="actionEditSettings" />
    </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuRecentFiles" >
+     <property name="title" >
+      <string>Recent Files</string>
+     </property>
+    </widget>
+    <addaction name="actionFileOpen" />
+    <addaction name="menuRecentFiles" />
+    <addaction name="separator" />
+    <addaction name="actionFileLoadServerState" />
+    <addaction name="actionFileSaveServerState" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveData" />
+    <addaction name="actionFileSaveScreenshot" />
+    <addaction name="actionFileSaveAnimation" />
+    <addaction name="separator" />
+    <addaction name="actionServerConnect" />
+    <addaction name="actionServerDisconnect" />
+    <addaction name="separator" />
+    <addaction name="actionFileExit" />
+   </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
    <addaction name="menuView" />
+   <addaction name="menuPipeline" />
    <addaction name="menuSources" />
    <addaction name="menuFilters" />
    <addaction name="menuAnimation" />
    <addaction name="menuTools" />
    <addaction name="menuHelp" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" />
-  <widget class="QDockWidget" name="pipelineBrowserDock" >
-   <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+  <widget class="QStatusBar" name="statusbar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>671</y>
+     <width>920</width>
+     <height>19</height>
+    </rect>
    </property>
+  </widget>
+  <widget class="QDockWidget" name="pipelineBrowserDock" >
    <property name="windowTitle" >
     <string>Pipeline Browser</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -182,11 +208,11 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="objectInspectorDock" >
-   <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
    <property name="windowTitle" >
     <string>Object Inspector</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -194,11 +220,11 @@
    <widget class="QWidget" name="dockWidgetContents_3" />
   </widget>
   <widget class="QDockWidget" name="statisticsViewDock" >
-   <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
    <property name="windowTitle" >
     <string>Statistics View</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -206,11 +232,11 @@
    <widget class="QWidget" name="dockWidgetContents_4" />
   </widget>
   <widget class="QDockWidget" name="elementInspectorDock" >
-   <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
    <property name="windowTitle" >
     <string>Element Inspector</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -379,11 +405,11 @@
    <addaction name="actionNegativeZ" />
   </widget>
   <widget class="QToolBar" name="axesToolbar" >
-   <property name="windowTitle" > 	 
-    <string>Center Axes Controls</string> 	 
-   </property> 	 
    <property name="enabled" >
     <bool>true</bool>
+   </property>
+   <property name="windowTitle" >
+    <string>Center Axes Controls</string>
    </property>
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
@@ -648,12 +674,12 @@
   </action>
   <action name="actionToolsCreateCustomFilter" >
    <property name="text" >
-    <string>&amp;Create Custom Filter ...</string>
+    <string>&amp;Create Custom Filter...</string>
    </property>
   </action>
   <action name="actionToolsManageCustomFilters" >
    <property name="text" >
-    <string>&amp;Manage Custom Filters ...</string>
+    <string>&amp;Manage Custom Filters...</string>
    </property>
   </action>
   <action name="actionVCRPlay" >
@@ -852,7 +878,64 @@
     <string>Reset Center</string>
    </property>
   </action>
+  <action name="actionAddSource" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Add &amp;Source...</string>
+   </property>
+   <property name="iconText" >
+    <string>Add Source...</string>
+   </property>
+   <property name="toolTip" >
+    <string>Add a Source to the Pipeline</string>
+   </property>
+   <property name="statusTip" >
+    <string>Add a Source to the Pipeline</string>
+   </property>
+  </action>
+  <action name="actionAddFilter" >
+   <property name="text" >
+    <string>Add &amp;Filter...</string>
+   </property>
+   <property name="iconText" >
+    <string>Add Filter...</string>
+   </property>
+   <property name="toolTip" >
+    <string>Add a Filter to the Pipeline</string>
+   </property>
+   <property name="statusTip" >
+    <string>Add a Filter to the Pipeline</string>
+   </property>
+  </action>
+  <action name="actionChangeInput" >
+   <property name="text" >
+    <string>Change &amp;Input...</string>
+   </property>
+   <property name="iconText" >
+    <string>Change Input...</string>
+   </property>
+   <property name="toolTip" >
+    <string>Change a Filter's Input</string>
+   </property>
+   <property name="statusTip" >
+    <string>Change a Filter's Input</string>
+   </property>
+  </action>
+  <action name="actionDelete" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqDelete16.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Delete</string>
+   </property>
+   <property name="statusTip" >
+    <string>Delete</string>
+   </property>
+  </action>
  </widget>
+ <pixmapfunction></pixmapfunction>
  <resources>
   <include location="../../Qt/Components/Resources/pqComponents.qrc" />
  </resources>

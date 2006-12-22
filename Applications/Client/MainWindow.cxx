@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqMainWindowCore.h>
 #include <pqObjectInspectorWidget.h>
 #include <pqPipelineBrowser.h>
+#include <pqPipelineBrowserContextMenu.h>
 #include <pqPipelineMenu.h>
 #include <pqPlotViewModule.h>
 #include <pqProxyTabWidget.h>
@@ -242,6 +243,15 @@ MainWindow::MainWindow() :
     this->Implementation->UI.menuFilters,
     SLOT(setEnabled(bool)));
 
+  this->Implementation->Core.pipelineMenu().setMenuAction(
+    pqPipelineMenu::AddSourceAction, this->Implementation->UI.actionAddSource);
+  this->Implementation->Core.pipelineMenu().setMenuAction(
+    pqPipelineMenu::AddFilterAction, this->Implementation->UI.actionAddFilter);
+  this->Implementation->Core.pipelineMenu().setMenuAction(
+    pqPipelineMenu::ChangeInputAction, this->Implementation->UI.actionChangeInput);
+  this->Implementation->Core.pipelineMenu().setMenuAction(
+    pqPipelineMenu::DeleteAction, this->Implementation->UI.actionDelete);
+
   connect(this->Implementation->UI.actionToolsCreateCustomFilter,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsCreateCustomFilter()));
 
@@ -262,9 +272,6 @@ MainWindow::MainWindow() :
 
   connect(this->Implementation->UI.actionToolsPythonShell,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsPythonShell()));
-
-  //this->Implementation->Core.pipelineMenu().addActionsToMenu(
-  //this->Implementation->UI.menuPipeline);
 
   connect(this->Implementation->UI.actionHelpAbout,
     SIGNAL(triggered()), this, SLOT(onHelpAbout()));
@@ -413,6 +420,25 @@ MainWindow::MainWindow() :
   // Setup dockable windows ...
   this->Implementation->Core.setupPipelineBrowser(
     this->Implementation->UI.pipelineBrowserDock);
+  pqPipelineBrowser *browser = this->Implementation->Core.pipelineBrowser();
+  this->Implementation->Core.pipelineMenu().setModels(browser->getListModel(),
+    browser->getSelectionModel());
+  connect(this->Implementation->UI.actionAddSource, SIGNAL(triggered()),
+    browser, SLOT(addSource()));
+  connect(this->Implementation->UI.actionAddFilter, SIGNAL(triggered()),
+    browser, SLOT(addFilter()));
+  connect(this->Implementation->UI.actionChangeInput, SIGNAL(triggered()),
+    browser, SLOT(changeInput()));
+  connect(this->Implementation->UI.actionDelete, SIGNAL(triggered()),
+    browser, SLOT(deleteSelected()));
+  pqPipelineBrowserContextMenu *browserMenu =
+    new pqPipelineBrowserContextMenu(browser);
+  browserMenu->setMenuAction(this->Implementation->UI.actionFileOpen);
+  //browserMenu->setMenuAction(this->Implementation->UI.actionAddSource);
+  browserMenu->setMenuAction(this->Implementation->UI.actionAddFilter);
+  browserMenu->setMenuAction(this->Implementation->UI.actionChangeInput);
+  browserMenu->setMenuAction(this->Implementation->UI.actionDelete);
+  browserMenu->setMenuAction(this->Implementation->UI.actionToolsCreateCustomFilter);
 
   pqProxyTabWidget* const proxyTab =
     this->Implementation->Core.setupProxyTabWidget(
