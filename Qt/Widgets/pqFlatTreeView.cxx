@@ -224,7 +224,8 @@ bool pqFlatTreeView::eventFilter(QObject *object, QEvent *e)
         this->viewport()->setFocus();
         return true;
         }
-      else if(key == Qt::Key_Escape)
+      else if(key == Qt::Key_Escape && this->Internal->Index.isValid() &&
+          this->Internal->Editor)
         {
         this->cancelEditing();
         this->viewport()->setFocus();
@@ -908,60 +909,26 @@ void pqFlatTreeView::setCurrentIndex(const QModelIndex &index)
     }
 }
 
+void pqFlatTreeView::expandAll()
+{
+  pqFlatTreeViewItem *item = this->getNextItem(this->Root);
+  while(item)
+    {
+    if(item->Expandable && !item->Expanded)
+      {
+      this->expandItem(item);
+      }
+
+    item = this->getNextItem(item);
+    }
+}
+
 void pqFlatTreeView::expand(const QModelIndex &index)
 {
   pqFlatTreeViewItem *item = this->getItem(index);
   if(item && item->Expandable && !item->Expanded)
     {
-    // An expandable item might not have the child items created
-    // yet. If the item ends up having no children, it should be
-    // marked as not expandable.
-    QRect area;
-    bool noChildren = item->Items.size() == 0;
-    if(noChildren)
-      {
-      this->addChildItems(item, item->Parent->Items.size());
-      if(item->Items.size() == 0)
-        {
-        // Repaint the item to remove the expandable button.
-        item->Expandable = false;
-        area.setRect(0, item->ContentsY, this->ContentsWidth,
-            this->ItemHeight);
-        area.translate(-this->horizontalOffset(), -this->verticalOffset());
-        this->viewport()->update(area);
-        return;
-        }
-      }
-
-    item->Expanded = true;
-
-    // Update the position of the items following the expanded item.
-    int point = item->ContentsY + this->ItemHeight;
-    QFontMetrics fm = this->fontMetrics();
-    pqFlatTreeViewItem *next = this->getNextVisibleItem(item);
-    while(next)
-      {
-      this->layoutItem(next, point, fm);
-      next = this->getNextVisibleItem(next);
-      }
-
-    // Update the contents size.
-    this->ContentsHeight = point;
-    bool widthChanged = this->updateContentsWidth();
-    this->updateScrollBars();
-
-    if(widthChanged)
-      {
-      this->viewport()->update();
-      }
-    else
-      {
-      // Repaint the area from the item to the end of the view.
-      area.setRect(0, item->ContentsY, this->ContentsWidth,
-          this->ContentsHeight - item->ContentsY);
-      area.translate(-this->horizontalOffset(), -this->verticalOffset());
-      this->viewport()->update(area);
-      }
+    this->expandItem(item);
     }
 }
 
@@ -1136,7 +1103,7 @@ void pqFlatTreeView::insertRows(const QModelIndex &parentIndex, int start,
     int count = item->Items.size() + end - start + 1;
     for( ; end >= start; end--)
       {
-      index = this->Model->index(start, 0, parentIndex);
+      index = this->Model->index(end, 0, parentIndex);
       if(index.isValid())
         {
         child = new pqFlatTreeViewItem();
@@ -1185,7 +1152,7 @@ void pqFlatTreeView::insertRows(const QModelIndex &parentIndex, int start,
           }
         else if(!this->HeaderView->isHidden())
           {
-          point = this->HeaderView->size().height();
+          point = this->HeaderView->height();
           }
 
         QFontMetrics fm = this->fontMetrics();
@@ -1272,7 +1239,16 @@ void pqFlatTreeView::finishRowRemoval(const QModelIndex &parentIndex,
 
     // Layout the following items now that the model has finished
     // removing the items.
-    int point = item->ContentsY + this->ItemHeight;
+    int point = 0;
+    if(item != this->Root)
+      {
+      point = item->ContentsY + this->ItemHeight;
+      }
+    else if(!this->HeaderView->isHidden())
+      {
+      point = this->HeaderView->height();
+      }
+
     QFontMetrics fm = this->fontMetrics();
     pqFlatTreeViewItem *next = this->getNextVisibleItem(item);
     while(next)
@@ -1411,9 +1387,8 @@ void pqFlatTreeView::updateData(const QModelIndex &topLeft,
 
 void pqFlatTreeView::keyPressEvent(QKeyEvent *e)
 {
-  if(!this->Model)
+  if(!this->Model || e->key() == Qt::Key_Escape)
     {
-    e->ignore();
     return;
     }
 
@@ -1921,10 +1896,6 @@ void pqFlatTreeView::keyPressEvent(QKeyEvent *e)
     {
     e->accept();
     }
-  else
-    {
-    e->ignore();
-    }
 }
 
 void pqFlatTreeView::keyboardSearch(const QString &)
@@ -2232,7 +2203,7 @@ bool pqFlatTreeView::viewportEvent(QEvent *e)
 
 void pqFlatTreeView::paintEvent(QPaintEvent *e)
 {
-  if(!e || !this->Root || !this->HeaderView)
+  if(!e || !this->Root || !this->HeaderView || !this->Model)
     {
     return;
     }
@@ -3406,6 +3377,60 @@ pqFlatTreeViewItem *pqFlatTreeView::getLastVisibleItem() const
     }
 
   return 0;
+}
+
+void pqFlatTreeView::expandItem(pqFlatTreeViewItem *item)
+{
+  item->Expanded = true;
+
+  // An expandable item might not have the child items created
+  // yet. If the item ends up having no children, it should be
+  // marked as not expandable.
+  QRect area;
+  bool noChildren = item->Items.size() == 0;
+  if(noChildren)
+    {
+    this->addChildItems(item, item->Parent->Items.size());
+    if(item->Items.size() == 0)
+      {
+      // Repaint the item to remove the expandable button.
+      item->Expandable = false;
+      item->Expanded = false;
+      area.setRect(0, item->ContentsY, this->ContentsWidth,
+          this->ItemHeight);
+      area.translate(-this->horizontalOffset(), -this->verticalOffset());
+      this->viewport()->update(area);
+      return;
+      }
+    }
+
+  // Update the position of the items following the expanded item.
+  int point = item->ContentsY + this->ItemHeight;
+  QFontMetrics fm = this->fontMetrics();
+  pqFlatTreeViewItem *next = this->getNextVisibleItem(item);
+  while(next)
+    {
+    this->layoutItem(next, point, fm);
+    next = this->getNextVisibleItem(next);
+    }
+
+  // Update the contents size.
+  this->ContentsHeight = point;
+  bool widthChanged = this->updateContentsWidth();
+  this->updateScrollBars();
+
+  if(widthChanged)
+    {
+    this->viewport()->update();
+    }
+  else
+    {
+    // Repaint the area from the item to the end of the view.
+    area.setRect(0, item->ContentsY, this->ContentsWidth,
+        this->ContentsHeight - item->ContentsY);
+    area.translate(-this->horizontalOffset(), -this->verticalOffset());
+    this->viewport()->update(area);
+    }
 }
 
 void pqFlatTreeView::getSelectionIn(const QModelIndex &topLeft,

@@ -173,6 +173,7 @@ public slots:
   void reset();
   void selectAll();
   void setCurrentIndex(const QModelIndex &index);
+  void expandAll();
   void expand(const QModelIndex &index);
   void collapse(const QModelIndex &index);
   void scrollTo(const QModelIndex &index);
@@ -260,6 +261,8 @@ private:
   pqFlatTreeViewItem *getPreviousVisibleItem(pqFlatTreeViewItem *item) const;
   pqFlatTreeViewItem *getLastVisibleItem() const;
   //@}
+
+  void expandItem(pqFlatTreeViewItem *item);
 
   void getSelectionIn(const QModelIndex &topLeft,
       const QModelIndex &bottomRight, QItemSelection &items) const;
