@@ -379,6 +379,9 @@
    <addaction name="actionNegativeZ" />
   </widget>
   <widget class="QToolBar" name="axesToolbar" >
+   <property name="windowTitle" > 	 
+    <string>Center Axes Controls</string> 	 
+   </property> 	 
    <property name="enabled" >
     <bool>true</bool>
    </property>
