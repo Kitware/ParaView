@@ -221,9 +221,6 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionToolsPythonShell,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsPythonShell()));
 
-  this->Implementation->Core.pipelineMenu().addActionsToMenu(
-    this->Implementation->UI.menuPipeline);
-
   connect(this->Implementation->UI.actionHelpAbout,
     SIGNAL(triggered()), this, SLOT(onHelpAbout()));
 
