@@ -35,13 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QStringList>
+#include "pqComponentsExport.h"
 class pqObjectPanelInterface;
 class pqObjectPanel;
 class pqProxy;
 
 /// loader class that creates panels from plugins
 /// for now, it only supports static plugins
-class pqObjectPanelLoader : public QObject
+class PQCOMPONENTS_EXPORT pqObjectPanelLoader : public QObject
 {
   Q_OBJECT
 public:

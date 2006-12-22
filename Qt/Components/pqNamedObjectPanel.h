@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// Base class for Widget which provides an editor for editing properties
 /// of a proxy where child widgets are named after the property they
 /// represent
-class pqNamedObjectPanel : public pqObjectPanel
+class PQCOMPONENTS_EXPORT pqNamedObjectPanel : public pqObjectPanel
 {
   typedef pqObjectPanel Superclass;
   

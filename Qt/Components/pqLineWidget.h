@@ -34,11 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqLineWidget_h
 
 #include "pq3DWidget.h"
+#include "pqComponentsExport.h"
 
 class pqServer;
 
 /// Provides a complete Qt UI for working with a 3D line widget
-class pqLineWidget : public pq3DWidget
+class PQCOMPONENTS_EXPORT pqLineWidget : public pq3DWidget
 {
   typedef pq3DWidget Superclass;
   

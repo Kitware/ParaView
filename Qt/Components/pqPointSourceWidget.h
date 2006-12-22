@@ -36,11 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMProxy.h"
 
 #include "pqHandleWidget.h" 
+#include "pqComponentsExport.h"
 
 class pqPropertyManager;
 
 /// Provides a complete Qt UI for working with a vtkPointSource filter
-class pqPointSourceWidget : public pqHandleWidget 
+class PQCOMPONENTS_EXPORT pqPointSourceWidget : public pqHandleWidget 
 {
   typedef pqHandleWidget Superclass;
   

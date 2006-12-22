@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectPanelInterface.h"
 
 /// Custom panel for the Clip filter that manages a 3D widget for interactive clipping
-class pqClipPanel :
+class PQCOMPONENTS_EXPORT pqClipPanel :
   public pqObjectPanel
 {
   typedef pqObjectPanel Superclass;

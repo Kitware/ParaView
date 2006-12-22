@@ -34,11 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqSelectReaderDialog_h
 
 #include <QDialog>
+#include "pqComponentsExport.h"
 
 class pqServer;
 
 /// a dialog that prompts for a reader type to open a file
-class pqSelectReaderDialog : public QDialog
+class PQCOMPONENTS_EXPORT pqSelectReaderDialog : public QDialog
 {
   Q_OBJECT
 public:

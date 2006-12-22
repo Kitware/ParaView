@@ -35,12 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqNamedObjectPanel.h"
 #include "pqObjectPanelInterface.h"
+#include "pqComponentsExport.h"
+
 class pqTreeWidgetItemObject;
 class QTreeWidget;
 class QListWidget;
 class vtkPVArrayInformation;
 
-class pqExodusPanel :
+class PQCOMPONENTS_EXPORT pqExodusPanel :
   public pqNamedObjectPanel
 {
   Q_OBJECT

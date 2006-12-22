@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqManualServerStartup_h
 
 #include "pqServerStartup.h"
+#include "pqCoreExport.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // pqManualServerStartup
@@ -41,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// Concrete implementation of pqServerStartup that does nothing -
 /// a "manual" startup.
 
-class pqManualServerStartup :
+class PQCORE_EXPORT pqManualServerStartup :
   public pqServerStartup
 {
 public:

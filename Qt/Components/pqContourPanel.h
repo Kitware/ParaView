@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectPanelInterface.h"
 
 /// Custom panel for the Contour filter
-class pqContourPanel :
+class PQCOMPONENTS_EXPORT pqContourPanel :
   public pqObjectPanel
 {
   typedef pqObjectPanel base;

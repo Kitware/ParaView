@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqServerStartup_h
 
 #include "pqServerResource.h"
+#include "pqCoreExport.h"
 
 #include <QDomDocument>
 #include <QMap>
@@ -44,7 +45,7 @@ class pqServerStartupContext;
 // pqServerStartup
 
 /// Abstract interface for an object that can start a remote server
-class pqServerStartup
+class PQCORE_EXPORT pqServerStartup
 {
 public:
   virtual ~pqServerStartup() {}

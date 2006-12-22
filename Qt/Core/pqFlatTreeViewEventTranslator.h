@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFlatTreeViewEventTranslator_h
 
 #include "pqWidgetEventTranslator.h"
+#include "pqCoreExport.h"
 
 class pqFlatTreeView;
 class QModelIndex;
@@ -44,7 +45,7 @@ Translates low-level Qt events into high-level ParaView events that can be recor
 \sa pqEventTranslator
 */
 
-class pqFlatTreeViewEventTranslator : public pqWidgetEventTranslator
+class PQCORE_EXPORT pqFlatTreeViewEventTranslator : public pqWidgetEventTranslator
 {
   Q_OBJECT
   

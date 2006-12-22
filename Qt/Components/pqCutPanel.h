@@ -33,13 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCutPanel_h
 #define _pqCutPanel_h
 
+#include "pqComponentsExport.h"
+
 #include "pqObjectPanel.h"
 #include "pqObjectPanelInterface.h"
 
 class pqImplicitPlaneWidget;
 
 /// Custom panel for the Cut filter that manages a 3D widget for interactive cutting
-class pqCutPanel :
+class PQCOMPONENTS_EXPORT pqCutPanel :
   public pqObjectPanel
 {
   typedef pqObjectPanel Superclass;

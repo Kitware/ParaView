@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqFileChooserWidget_h
 #define _pqFileChooserWidget_h
 
+#include "pqComponentsExport.h"
 #include <QWidget>
 #include <QString>
 class QLineEdit;
@@ -42,7 +43,7 @@ class pqServer;
 /// file chooser widget which consists of a tool button and a line edit
 /// hitting the tool button will bring up a file dialog, and the chosen
 /// file will be put in the line edit
-class pqFileChooserWidget : public QWidget
+class PQCOMPONENTS_EXPORT pqFileChooserWidget : public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(QString Filename READ filename WRITE setFilename)

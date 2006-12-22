@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqChartZoomHistory_h
 
 
+#include "QtChartExport.h"
+
 class pqChartZoomHistoryData;
 
 
@@ -57,7 +59,7 @@ class pqChartZoomHistoryData;
 /// content coordinates. These coordinates are used to set the
 /// content's position in the scroll view. The zoom factors are
 /// stored as percentages.
-class pqChartZoomItem
+class QTCHART_EXPORT pqChartZoomItem
 {
 public:
   pqChartZoomItem();
@@ -141,7 +143,7 @@ private:
 ///     pqChartZoomHistory::getNext(),
 ///     pqChartZoomHistory::getPrevious(),
 ///     pqChartZoomHistory::getCurrent()
-class pqChartZoomHistory
+class QTCHART_EXPORT pqChartZoomHistory
 {
 public:
   pqChartZoomHistory();

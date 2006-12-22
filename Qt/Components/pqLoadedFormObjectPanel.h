@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNamedObjectPanel.h"
 
 /// Widget which provides an editor for editing properties of a proxy
-class pqLoadedFormObjectPanel : public pqNamedObjectPanel
+class PQCOMPONENTS_EXPORT pqLoadedFormObjectPanel : public pqNamedObjectPanel
 {
   Q_OBJECT
 public:

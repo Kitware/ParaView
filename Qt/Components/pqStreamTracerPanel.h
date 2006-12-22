@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqRenderViewModule;
 
 /// Custom panel for the StreamTracer filter that manages a combined Qt / 3D widget UI
-class pqStreamTracerPanel :
+class PQCOMPONENTS_EXPORT pqStreamTracerPanel :
   public pqObjectPanel
 {
   typedef pqObjectPanel Superclass;

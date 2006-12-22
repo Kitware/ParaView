@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectPanelInterface.h"
 
 /// Panel for vtkArrayCalculator proxy
-class pqCalculatorPanel : public pqObjectPanel
+class PQCOMPONENTS_EXPORT pqCalculatorPanel : public pqObjectPanel
 {
   Q_OBJECT
 public:

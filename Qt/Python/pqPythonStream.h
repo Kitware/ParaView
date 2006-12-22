@@ -34,9 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPythonStream_h
 
 #include <QObject>
+#include "QtPythonExport.h"
 
 /// Helper-class that converts Python stream operations into Qt signals.
-class pqPythonStream :
+class QTPYTHON_EXPORT pqPythonStream :
   public QObject
 {
   Q_OBJECT

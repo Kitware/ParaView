@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMProxy.h"
 
+#include "pqComponentsExport.h"
 class QWidget;
 class pqPropertyManager;
 
@@ -68,7 +69,7 @@ sliders or spin boxes have a minimum or maximum value), their domains will be
 linked as well so if the domain changes, the possible values or
 minimums/maximums will automatically updated.
 */
-class pqNamedWidgets
+class PQCOMPONENTS_EXPORT pqNamedWidgets
 {
 public:
   /// Link a collection of Qt child widgets with server manager properties by name

@@ -34,13 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqObjectPanelInterface_h
 
 #include <QString>
+#include "pqComponentsExport.h"
 class pqObjectPanel;
 class pqProxy;
 class vtkSMProxy;
 class QWidget;
 
 /// interface class for plugins that create pqObjectPanels
-class pqObjectPanelInterface
+class PQCOMPONENTS_EXPORT pqObjectPanelInterface
 {
 public:
   /// destructor

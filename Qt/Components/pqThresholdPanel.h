@@ -35,10 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLoadedFormObjectPanel.h"
 #include "pqObjectPanelInterface.h"
+#include "pqComponentsExport.h"
 class QSlider;
 class QDoubleSpinBox;
 
-class pqThresholdPanel :
+class PQCOMPONENTS_EXPORT pqThresholdPanel :
   public pqLoadedFormObjectPanel
 {
   Q_OBJECT

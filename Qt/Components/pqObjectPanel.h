@@ -33,8 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqObjectPanel_h
 #define _pqObjectPanel_h
 
+#include "pqComponentsExport.h"
+
 #include <QWidget>
 #include <QPointer>
+#include "pqComponentsExport.h"
 class pqProxy;
 class pqRenderViewModule;
 
@@ -42,7 +45,7 @@ class pqPropertyManager;
 
 /// Base class for Widget which provides an editor for editing properties
 /// of a proxy
-class pqObjectPanel : public QWidget
+class PQCOMPONENTS_EXPORT pqObjectPanel : public QWidget
 {
   Q_OBJECT
 public:
