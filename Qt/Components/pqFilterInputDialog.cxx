@@ -209,24 +209,24 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
 
     // Add widgets for each of the filter inputs.
     vtkSMInputProperty *input = 0;
-    vtkSMPropertyIterator *iter =
+    vtkSMPropertyIterator *prop =
         this->Filter->getProxy()->NewPropertyIterator();
     int row = 0;
-    for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    for(prop->Begin(); !prop->IsAtEnd(); prop->Next())
       {
-      input = vtkSMInputProperty::SafeDownCast(iter->GetProperty());
+      input = vtkSMInputProperty::SafeDownCast(prop->GetProperty());
       if(input)
         {
         // TODO: Add support for other input properties such as the
         // 'source' input property of the glyph filter.
-        QString name = iter->GetKey();
+        QString name = prop->GetKey();
         if(name != "Input")
           {
           continue;
           }
 
         QRadioButton *button = new QRadioButton(name, frame);
-        button->setObjectName(iter->GetKey());
+        button->setObjectName(name);
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
         this->InputGroup->addButton(button, row);
         if(row == 0)
@@ -275,7 +275,7 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
         }
       }
 
-    iter->Delete();
+    prop->Delete();
     frameLayout->addItem(
         new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding),
         row, 0, 1, 2);

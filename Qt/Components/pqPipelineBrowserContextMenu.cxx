@@ -130,7 +130,6 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
 
   // Get the selected indexes from the browser.
   bool addSep = false;
-  QAction *action = 0;
   QModelIndexList indexes =
       this->Browser->getSelectionModel()->selectedIndexes();
 
