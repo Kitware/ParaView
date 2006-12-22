@@ -49,6 +49,7 @@ class pqPipelineModelSource;
 class pqPipelineSource;
 class pqGenericViewModule;
 class pqServer;
+class pqServerManagerModel;
 class pqServerManagerModelItem;
 class QPixmap;
 
@@ -86,7 +87,22 @@ public:
     };
 
 public:
+  /// \brief
+  ///   Creates an empty pipeline model.
+  /// \param parent The parent object.
   pqPipelineModel(QObject *parent=0);
+
+  /// \brief
+  ///   Makes a copy of a pipeline model.
+  /// \param other The pipeline model to copy.
+  /// \param parent The parent object.
+  pqPipelineModel(const pqPipelineModel &other, QObject *parent=0);
+
+  /// \brief
+  ///   Creates a pipeline model from a server manager model.
+  /// \param other Used to build a pipeline model.
+  /// \param parent The parent object.
+  pqPipelineModel(const pqServerManagerModel &other, QObject *parent=0);
   virtual ~pqPipelineModel();
 
   /// \name QAbstractItemModel Methods
@@ -176,6 +192,26 @@ public:
   ///   The model index for the given item. The index will be invalid
   ///   if the item is not in the model.
   QModelIndex getIndexFor(pqServerManagerModelItem *item) const;
+  //@}
+
+  /// \name Model Interaction
+  //@{
+  /// \brief
+  ///   Sets whether or not the model indexes are editable.
+  /// \param editable True if the model indexes can be edited.
+  void setEditable(bool editable) {this->Editable = editable;}
+
+  /// \brief
+  ///   Gets whether or not the model indexes are editable.
+  /// \return
+  ///   True if the model indexes can be edited.
+  bool isEditable() const {return this->Editable;}
+
+  /// \brief
+  ///   Sets whether of not an item subtree is selectable.
+  /// \param item The root of the subtree.
+  /// \param selectable True if the items can be selected.
+  void setSubtreeSelectable(pqServerManagerModelItem *item, bool selectable);
   //@}
 
 public slots:
@@ -372,14 +408,20 @@ private:
   /// \brief
   ///   Gets the next model item in the tree.
   /// \param item The current item.
+  /// \param root An alternate root for walking a subtree.
   /// \return
   ///   A pointer to the next item in the tree or null when the end
   ///   of the tree is reached.
-  pqPipelineModelItem *getNextModelItem(pqPipelineModelItem *item) const;
+  pqPipelineModelItem *getNextModelItem(pqPipelineModelItem *item,
+      pqPipelineModelItem *root=0) const;
+
+  /// Initializes the list of pixmaps.
+  void initializePixmaps();
 
 private:
   pqPipelineModelInternal *Internal; ///< Stores the pipeline representation.
   QPixmap *PixmapList;               ///< Stores the item icons.
+  bool Editable;                     ///< True if the model is editable.
 };
 
 #endif

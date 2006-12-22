@@ -142,7 +142,7 @@ pqServerManagerModel::~pqServerManagerModel()
 }
 
 //-----------------------------------------------------------------------------
-QList<pqServer*> pqServerManagerModel::getServers()
+QList<pqServer*> pqServerManagerModel::getServers() const
 {
   QList<pqServer*> list;
   foreach (pqServer* server, this->Internal->Servers)
@@ -190,7 +190,7 @@ QList<pqConsumerDisplay*> pqServerManagerModel::getDisplays(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-QList<pqPipelineSource*> pqServerManagerModel::getSources(pqServer* server)
+QList<pqPipelineSource*> pqServerManagerModel::getSources(pqServer* server) const
 {
   QList<pqPipelineSource*> list;
 
@@ -740,7 +740,7 @@ pqServer* pqServerManagerModel::getServerByIndex(unsigned int idx) const
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqServerManagerModel::getPQSource(vtkSMProxy* proxy)
+pqPipelineSource* pqServerManagerModel::getPQSource(vtkSMProxy* proxy) const
 {
   pqServerManagerModelInternal::Key key(proxy->GetConnectionID(),
     proxy->GetSelfID());
@@ -753,6 +753,19 @@ pqPipelineSource* pqServerManagerModel::getPQSource(vtkSMProxy* proxy)
     return it.value();
     }
   return NULL;
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineSource* pqServerManagerModel::getPQSource(const QString &name) const
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* proxy = pxm->GetProxy("sources", name.toAscii().data());
+  if(proxy)
+    {
+    return this->getPQSource(proxy);
+    }
+
+  return 0;
 }
 
 //-----------------------------------------------------------------------------

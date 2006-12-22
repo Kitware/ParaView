@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqGenericViewModule.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
 
 #include <QIcon>
@@ -72,6 +73,8 @@ public:
 
   virtual QString getName() const=0;
   virtual VisibleState getVisibleState(pqGenericViewModule *module) const=0;
+  virtual bool isSelectable() const {return true;}
+  virtual void setSelectable(bool selectable)=0;
   virtual pqPipelineModelItem *getParent() const=0;
   virtual pqServerManagerModelItem *getObject() const=0;
   virtual int getChildCount() const=0;
@@ -99,6 +102,8 @@ public:
   virtual QString getName() const;
   virtual pqPipelineModelItem::VisibleState getVisibleState(
       pqGenericViewModule *module) const;
+  virtual bool isSelectable() const {return this->Selectable;}
+  virtual void setSelectable(bool selectable) {this->Selectable = selectable;}
   virtual pqPipelineModelItem *getParent() const {return 0;}
   virtual pqServerManagerModelItem *getObject() const {return this->Server;}
   virtual int getChildCount() const {return this->Sources.size();}
@@ -114,6 +119,7 @@ public:
 private:
   pqServer *Server;
   QList<pqPipelineModelSource *> Sources;
+  bool Selectable;
 };
 
 
@@ -143,6 +149,8 @@ public:
   virtual QString getName() const;
   virtual pqPipelineModelItem::VisibleState getVisibleState(
       pqGenericViewModule *module) const;
+  virtual bool isSelectable() const {return this->Selectable;}
+  virtual void setSelectable(bool selectable) {this->Selectable = selectable;}
   virtual pqPipelineModelItem *getParent() const {return this->getServer();}
   virtual pqServerManagerModelItem *getObject() const {return this->Source;}
   virtual int getChildCount() const {return this->Outputs.size();}
@@ -158,6 +166,7 @@ public:
 private:
   pqPipelineSource *Source;
   QList<pqPipelineModelObject *> Outputs;
+  bool Selectable;
 };
 
 
@@ -190,6 +199,8 @@ public:
   virtual QString getName() const;
   virtual pqPipelineModelItem::VisibleState getVisibleState(
       pqGenericViewModule *module) const;
+  virtual bool isSelectable() const;
+  virtual void setSelectable(bool selectable);
   virtual pqPipelineModelItem *getParent() const {return this->Source;}
   virtual pqServerManagerModelItem *getObject() const;
   virtual int getChildCount() const {return 0;}
@@ -248,6 +259,7 @@ pqPipelineModelServer::pqPipelineModelServer(pqServer *server,
   : pqPipelineModelItem(parentObject), Sources()
 {
   this->Server = server;
+  this->Selectable = true;
 
   this->setType(pqPipelineModel::Server);
 }
@@ -321,6 +333,7 @@ pqPipelineModelSource::pqPipelineModelSource(pqPipelineModelServer *server,
   : pqPipelineModelObject(server, parentObject), Outputs()
 {
   this->Source = source;
+  this->Selectable = true;
 
   this->setType(pqPipelineModel::Source);
 }
@@ -472,6 +485,20 @@ pqPipelineModelItem::VisibleState pqPipelineModelLink::getVisibleState(
   return pqPipelineModelItem::NotAllowed;
 }
 
+bool pqPipelineModelLink::isSelectable() const
+{
+  if(this->Sink)
+    {
+    return this->Sink->isSelectable();
+    }
+
+  return false;
+}
+
+void pqPipelineModelLink::setSelectable(bool)
+{
+}
+
 pqServerManagerModelItem *pqPipelineModelLink::getObject() const
 {
   if(this->Sink)
@@ -493,29 +520,64 @@ pqPipelineModelInternal::pqPipelineModelInternal()
 
 
 //-----------------------------------------------------------------------------
-pqPipelineModel::pqPipelineModel(QObject *p)
-  : QAbstractItemModel(p)
+pqPipelineModel::pqPipelineModel(QObject *parentObject)
+  : QAbstractItemModel(parentObject)
 {
   this->Internal = new pqPipelineModelInternal();
+  this->PixmapList = 0;
 
   // Initialize the pixmap list.
-  this->PixmapList = new QPixmap[pqPipelineModelInternal::Total];
-  if(this->PixmapList)
+  this->initializePixmaps();
+}
+
+pqPipelineModel::pqPipelineModel(const pqPipelineModel &other,
+    QObject *parentObject)
+  : QAbstractItemModel(parentObject)
+{
+  this->Internal = new pqPipelineModelInternal();
+  this->PixmapList = 0;
+
+  // Initialize the pixmap list.
+  this->initializePixmaps();
+
+  // TODO: Copy the other pipeline model.
+}
+
+pqPipelineModel::pqPipelineModel(const pqServerManagerModel &other,
+    QObject *parentObject)
+  : QAbstractItemModel(parentObject)
+{
+  this->Internal = new pqPipelineModelInternal();
+  this->PixmapList = 0;
+
+  // Initialize the pixmap list.
+  this->initializePixmaps();
+
+  // Build a pipeline model from the current server manager model.
+  QList<pqPipelineSource *> sources;
+  QList<pqPipelineSource *>::Iterator source;
+  QList<pqServer *> servers = other.getServers();
+  QList<pqServer *>::Iterator server = servers.begin();
+  for( ; server != servers.end(); ++server)
     {
-    this->PixmapList[pqPipelineModel::Server].load(
-        ":/pqCore/Icons/pqServer16.png");
-    this->PixmapList[pqPipelineModel::Source].load(
-        ":/pqCore/Icons/pqSource16.png");
-    this->PixmapList[pqPipelineModel::Filter].load(
-        ":/pqCore/Icons/pqFilter16.png");
-    this->PixmapList[pqPipelineModel::CustomFilter].load(
-        ":/pqCore/Icons/pqBundle16.png");
-    this->PixmapList[pqPipelineModel::Link].load(
-        ":/pqCore/Icons/pqLinkBack16.png");
-    this->PixmapList[pqPipelineModelInternal::Eyeball].load(
-        ":/pqCore/Icons/pqEyeball16.png");
-    this->PixmapList[pqPipelineModelInternal::EyeballGray].load(
-        ":/pqCore/Icons/pqEyeballd16.png");
+    // Add the server to the model.
+    this->addServer(*server);
+
+    // Add the sources for the server.
+    sources = other.getSources(*server);
+    for(source = sources.begin(); source != sources.end(); ++source)
+      {
+      this->addSource(*source);
+      }
+
+    // Set up the pipeline connections.
+    for(source = sources.begin(); source != sources.end(); ++source)
+      {
+      for(int i = 0; i < (*source)->getNumberOfConsumers(); ++i)
+        {
+        this->addConnection(*source, (*source)->getConsumer(i));
+        }
+      }
     }
 }
 
@@ -672,9 +734,14 @@ Qt::ItemFlags pqPipelineModel::flags(const QModelIndex &idx) const
   Qt::ItemFlags indexFlags = Qt::ItemIsEnabled;
   if(idx.column() == 0)
     {
-    indexFlags |= Qt::ItemIsSelectable;
-    pqServerManagerModelItem* item = this->getItemFor(idx);
-    if (item && qobject_cast<pqPipelineSource*>(item))
+    pqPipelineModelItem *item = reinterpret_cast<pqPipelineModelItem*>(
+        idx.internalPointer());
+    if(item->isSelectable())
+      {
+      indexFlags |= Qt::ItemIsSelectable;
+      }
+
+    if(item->getType() != pqPipelineModel::Server && this->Editable)
       {
       indexFlags |= Qt::ItemIsEditable;
       }
@@ -683,18 +750,19 @@ Qt::ItemFlags pqPipelineModel::flags(const QModelIndex &idx) const
   return indexFlags;
 }
 
-bool pqPipelineModel::setData(const QModelIndex &idx, const QVariant& value,
-  int /*role =Qt::EditRole*/)
+bool pqPipelineModel::setData(const QModelIndex &idx, const QVariant &value,
+    int)
 {
-  if (value.toString().isEmpty())
+  if(value.toString().isEmpty())
     {
     return false;
     }
-  pqServerManagerModelItem* item = this->getItemFor(idx);
-  pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
-  if (src)
+
+  pqPipelineSource* source = qobject_cast<pqPipelineSource*>(
+      this->getItemFor(idx));
+  if(source)
     {
-    src->rename(value.toString());
+    source->rename(value.toString());
     }
   return true;
 }
@@ -724,6 +792,18 @@ QModelIndex pqPipelineModel::getIndexFor(pqServerManagerModelItem *item) const
     }
 
   return QModelIndex();
+}
+
+void pqPipelineModel::setSubtreeSelectable(pqServerManagerModelItem *item,
+    bool selectable)
+{
+  pqPipelineModelItem *root = this->getModelItemFor(item);
+  pqPipelineModelItem *modelItem = root;
+  while(modelItem)
+    {
+    modelItem->setSelectable(selectable);
+    modelItem = this->getNextModelItem(modelItem, root);
+    }
 }
 
 void pqPipelineModel::addServer(pqServer *server)
@@ -1169,9 +1249,9 @@ void pqPipelineModel::addConnection(pqPipelineModelSource *source,
       otherSource->getOutputs().removeAll(sink);
       this->endRemoveRows();
 
-      QModelIndex serverIndex = this->makeIndex(server);
       int serverRow = server->getChildCount();
-      this->beginInsertRows(serverIndex, serverRow, serverRow);
+      this->beginInsertRows(this->makeIndex(server), serverRow, serverRow);
+      sink->getInputs().append(source);
       server->getSources().append(sink);
       this->endInsertRows();
 
@@ -1184,6 +1264,10 @@ void pqPipelineModel::addConnection(pqPipelineModelSource *source,
         }
 
       emit this->indexRestored(this->makeIndex(sink));
+      }
+    else
+      {
+      sink->getInputs().append(source);
       }
 
     // A link item needs to be added to the source's output list.
@@ -1259,6 +1343,7 @@ void pqPipelineModel::removeConnection(pqPipelineModelSource *source,
       this->endRemoveRows();
 
       this->beginInsertRows(parentIndex, row, row);
+      sink->getInputs().removeAll(source);
       otherSource->getOutputs().insert(row, sink);
       this->endInsertRows();
       if(otherSource->getChildCount() == 1)
@@ -1268,13 +1353,16 @@ void pqPipelineModel::removeConnection(pqPipelineModelSource *source,
 
       emit this->indexRestored(this->makeIndex(sink));
       }
+    else
+      {
+      sink->getInputs().removeAll(source);
+      }
 
     // The link item in the source's output needs to be removed.
     parentIndex = this->makeIndex(source);
     row = source->getChildIndex(link);
     this->beginRemoveRows(parentIndex, row, row);
     source->getOutputs().removeAll(link);
-    sink->getInputs().removeAll(source);
     this->endRemoveRows();
     delete link;
     }
@@ -1351,7 +1439,7 @@ void pqPipelineModel::cleanPipelineMap()
 }
 
 pqPipelineModelItem *pqPipelineModel::getNextModelItem(
-    pqPipelineModelItem *item) const
+    pqPipelineModelItem *item, pqPipelineModelItem *root) const
 {
   if(item->getChildCount() > 0)
     {
@@ -1364,7 +1452,7 @@ pqPipelineModelItem *pqPipelineModel::getNextModelItem(
   int count = 0;
   pqPipelineModelItem *itemParent = 0;
   pqPipelineModelServer *server = 0;
-  while(true)
+  while(item != root)
     {
     itemParent = item->getParent();
     if(itemParent)
@@ -1405,46 +1493,26 @@ pqPipelineModelItem *pqPipelineModel::getNextModelItem(
   return 0;
 }
 
-/*
-void pqPipelineModel::saveState(vtkPVXMLElement *vtkNotUsed(root), 
-  pqMultiView *vtkNotUsed(multiView))
+void pqPipelineModel::initializePixmaps()
 {
-  if(!root)
+  if(this->PixmapList == 0)
     {
-    return;
+    this->PixmapList = new QPixmap[pqPipelineModelInternal::Total];
+    this->PixmapList[pqPipelineModel::Server].load(
+        ":/pqCore/Icons/pqServer16.png");
+    this->PixmapList[pqPipelineModel::Source].load(
+        ":/pqCore/Icons/pqSource16.png");
+    this->PixmapList[pqPipelineModel::Filter].load(
+        ":/pqCore/Icons/pqFilter16.png");
+    this->PixmapList[pqPipelineModel::CustomFilter].load(
+        ":/pqCore/Icons/pqBundle16.png");
+    this->PixmapList[pqPipelineModel::Link].load(
+        ":/pqCore/Icons/pqLinkBack16.png");
+    this->PixmapList[pqPipelineModelInternal::Eyeball].load(
+        ":/pqCore/Icons/pqEyeball16.png");
+    this->PixmapList[pqPipelineModelInternal::EyeballGray].load(
+        ":/pqCore/Icons/pqEyeballd16.png");
     }
-
-  // Create an element to hold the pipeline state.
-  vtkPVXMLElement *pipeline = vtkPVXMLElement::New();
-  pipeline->SetName("Pipeline");
-
-  // Save the state for each of the servers.
-  QString address;
-  pqServer *server = 0;
-  vtkPVXMLElement *element = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->ServerList.begin();
-  for( ; iter != this->Internal->ServerList.end(); ++iter)
-    {
-    element = vtkPVXMLElement::New();
-    element->SetName("Server");
-
-    // Save the connection information.
-    server = (*iter)->GetServer();
-    address = server->getAddress();
-    element->AddAttribute("address", address.toAscii().data());
-    if(address != server->getFriendlyName())
-      {
-      element->AddAttribute("name", server->getFriendlyName().toAscii().data());
-      }
-
-    (*iter)->SaveState(element, multiView);
-    pipeline->AddNestedElement(element);
-    element->Delete();
-    }
-
-  // Add the pipeline element to the xml.
-  root->AddNestedElement(pipeline);
-  pipeline->Delete();
 }
-*/
+
 

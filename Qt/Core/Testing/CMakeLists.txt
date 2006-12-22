@@ -27,7 +27,6 @@ IF(QT_TESTING_WITH_PYTHON)
   SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
   ADD_EXECUTABLE(pqFileDialogTest MACOSX_BUNDLE 
                  pqFileDialogTest.cxx pqFileDialogTest.h 
-                 pqFileDialogTest.py
                  ${MOC_SRCS})
   TARGET_LINK_LIBRARIES(pqFileDialogTest pqCore QtTesting ${QT_LIBRARIES} )
   GET_TEST_BINARY(pqFileDialogTest TEST_BINARY)

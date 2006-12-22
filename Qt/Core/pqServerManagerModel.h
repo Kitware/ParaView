@@ -99,7 +99,11 @@ public:
 
   /// Given a vtkSMProxy get the pqServer representation for that proxy,
   /// if one exists.
-  pqPipelineSource* getPQSource(vtkSMProxy*);
+  pqPipelineSource* getPQSource(vtkSMProxy*) const;
+
+  /// Given a name get the pqServer representation for that proxy,
+  /// if one exists.
+  pqPipelineSource* getPQSource(const QString &name) const;
 
   /// Given a vtkSMProxy for a display get the pqConsumerDisplay
   /// object for it, if one exists.
@@ -124,10 +128,10 @@ public:
   void endRemoveServer();
 
   /// Returns a list of servers.
-  QList<pqServer*> getServers();
+  QList<pqServer*> getServers() const;
 
   /// Returns a list of sources on the particular server.
-  QList<pqPipelineSource*> getSources(pqServer* server);
+  QList<pqPipelineSource*> getSources(pqServer* server) const;
 
   /// Returns a list of render displays on the server.
   QList<pqPipelineDisplay*> getPipelineDisplays(pqServer* server);
