@@ -66,6 +66,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqElementInspectorWidget.h
   pqExodusPanel.h
   pqFileChooserWidget.h
+  pqFilterInputDialog.h
   pqFieldSelectionAdaptor.h
   pqGenericViewManager.h
   pqHandleWidget.h
@@ -241,6 +242,8 @@ ADD_LIBRARY(pqComponents
   pqExodusPanel.h
   pqFileChooserWidget.cxx
   pqFileChooserWidget.h
+  pqFilterInputDialog.cxx
+  pqFilterInputDialog.h
   pqFieldSelectionAdaptor.cxx
   pqFieldSelectionAdaptor.h
   pqGenericViewManager.cxx

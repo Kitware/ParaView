@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include <QWidget>
-#include <QPointer>
 
+class pqPipelineBrowserInternal;
 class pqConsumerDisplay;
 class pqFlatTreeView;
 class pqGenericViewModule;
@@ -48,8 +48,15 @@ class pqPipelineModel;
 class pqPipelineSource;
 class pqServer;
 class pqServerManagerModelItem;
+class pqSourceHistoryModel;
+class pqSourceInfoGroupMap;
+class pqSourceInfoIcons;
+class pqSourceInfoModel;
 class QItemSelectionModel;
 class QModelIndex;
+class QStringList;
+class vtkPVXMLElement;
+class vtkSMProxy;
 
 // This is the pipeline browser widget. It creates the pqPipelineModel
 // and the pqFlatTreeView. pqPipelineModel observes events from the
@@ -62,44 +69,84 @@ class PQCOMPONENTS_EXPORT pqPipelineBrowser : public QWidget
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Creates a pipeline browser instance.
+  /// \param parent The parent widget.
   pqPipelineBrowser(QWidget *parent=0);
   virtual ~pqPipelineBrowser();
 
+  /// \brief
+  ///   Used to monitor the key press events in the tree view.
+  /// \param object The object receiving the event.
+  /// \param e The event information.
+  /// \return
+  ///   True if the event should not be sent to the object.
   virtual bool eventFilter(QObject *object, QEvent *e);
 
   pqPipelineModel *getListModel() const {return this->ListModel;}
   pqFlatTreeView *getTreeView() const {return this->TreeView;}
 
+  pqSourceInfoIcons *getIcons() const {return this->Icons;}
+
+  void loadFilterInfo(vtkPVXMLElement *root);
+
+  /// \name Selection Helper Methods
+  //@{
+  /// \brief
+  ///   Gets the selection model from the tree view.
+  /// \return
+  ///   A pointer to the selection model.
   QItemSelectionModel *getSelectionModel() const;
 
-  /// returns the currently select object, may be a 
-  /// server/source/filter.
-  pqServerManagerModelItem* getCurrentSelection() const;
+  /// \brief
+  ///   Gets the server manager model item for the current index.
+  /// \return
+  ///   A pointer to the current server manager model item, which can
+  ///   be a server, source, or filter.
+  pqServerManagerModelItem *getCurrentSelection() const;
 
-  /// returns the server for the currently selected branch.
-  /// This is a convienience method.
+  /// \brief
+  ///   Gets the server for the current index.
+  ///
+  /// If the current index is a server, this method is equivalent to
+  /// \c getCurrentSelection. If the current index is a source or
+  /// filter, the server for the item is returned.
+  ///
+  /// \return
+  ///   A pointer to the server for the current index.
   pqServer *getCurrentServer() const;
+  //@}
   
   /// get the view module this pipeline browser works with
-  pqGenericViewModule* getViewModule();
+  pqGenericViewModule *getViewModule() const;
 
   /// Helper method to create a display for the source
   /// on the current view module.
-  pqConsumerDisplay* createDisplay(pqPipelineSource* source, bool visible);
+  pqConsumerDisplay *createDisplay(pqPipelineSource *source, bool visible);
+
 public slots:
   // Call this to select the particular item.
   void select(pqServerManagerModelItem* item);
   void select(pqPipelineSource* src);
   void select(pqServer* server);
 
+  /// \name Model Modification Methods
+  //@{
+  void addSource();
+  void addFilter();
+  void changeInput();
   void deleteSelected();
+  //@}
 
-  /// set the current render module for the pipeline browser
+  /// \brief
+  ///   Sets the current render module.
+  /// \param rm The current render module.
   void setViewModule(pqGenericViewModule* rm);
 
 signals:
-  // Fired when the selection is changed. Argument is the newly selected
-  // item.
+  /// \brief
+  ///   Emitted when the selection changes.
+  /// \param selectedItem The newly selected item.
   void selectionChanged(pqServerManagerModelItem* selectedItem);
   
 private slots:
@@ -107,9 +154,18 @@ private slots:
   void handleIndexClicked(const QModelIndex &index);
 
 private:
-  pqPipelineModel *ListModel;
-  pqFlatTreeView *TreeView;
-  QPointer<pqGenericViewModule> ViewModule;
+  pqSourceInfoModel *getFilterModel();
+  void setupConnections(pqSourceInfoModel *model, pqSourceInfoGroupMap *map);
+  void getAllowedSources(pqSourceInfoModel *model, vtkSMProxy *input,
+      QStringList &list);
+
+private:
+  pqPipelineBrowserInternal *Internal; ///< Stores the class data.
+  pqPipelineModel *ListModel;          ///< Stores the pipeline model.
+  pqFlatTreeView *TreeView;            ///< Stores the tree view.
+  pqSourceInfoIcons *Icons;            ///< Stores the icons.
+  pqSourceInfoGroupMap *FilterGroups;  ///< Stores the filter grouping.
+  pqSourceHistoryModel *FilterHistory; ///< Stores the recent filters.
 };
 
 #endif

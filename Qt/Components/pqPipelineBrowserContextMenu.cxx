@@ -35,32 +35,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineBrowserContextMenu.h"
 
-#include "pqApplicationCore.h"
 #include "pqFlatTreeView.h"
 #include "pqPipelineBrowser.h"
-#include "pqPipelineDisplay.h"
-#include "pqPipelineModel.h"
-#include "pqPipelineSource.h"
-#include "pqRenderViewModule.h"
-#include "pqServer.h"
-#include "pqUndoStack.h"
-#include "pqXYPlotDisplayProxyEditor.h"
 
-#include <QDialog>
 #include <QItemSelectionModel>
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QMenu>
+#include <QPointer>
 
-#include "vtkSMProxy.h"
-#include "vtkSMDataObjectDisplayProxy.h"
+
+class pqPipelineBrowserContextMenuInternal
+{
+public:
+  pqPipelineBrowserContextMenuInternal();
+  ~pqPipelineBrowserContextMenuInternal() {}
+
+  QPointer<QAction> OpenFile;
+  QPointer<QAction> AddSource;
+  QPointer<QAction> AddFilter;
+  QPointer<QAction> CustomFilter;
+  QPointer<QAction> ChangeInput;
+  QPointer<QAction> Delete;
+};
+
+
+pqPipelineBrowserContextMenuInternal::pqPipelineBrowserContextMenuInternal()
+  : OpenFile(), AddSource(), AddFilter(), CustomFilter(), ChangeInput(),
+    Delete()
+{
+}
 
 
 pqPipelineBrowserContextMenu::pqPipelineBrowserContextMenu(
     pqPipelineBrowser *browser)
   : QObject(browser)
 {
+  this->Internal = new pqPipelineBrowserContextMenuInternal();
   this->Browser = browser;
 
   this->setObjectName("ContextMenu");
@@ -74,8 +83,39 @@ pqPipelineBrowserContextMenu::pqPipelineBrowserContextMenu(
     }
 }
 
-pqPipelineBrowserContextMenu::~pqPipelineBrowserContextMenu()
+void pqPipelineBrowserContextMenu::setMenuAction(QAction *action)
 {
+  if(!action)
+    {
+    return;
+    }
+
+  // Use the action's text to determine which one it is.
+  QString name = action->text();
+  if(name == "&Open")
+    {
+    this->Internal->OpenFile = action;
+    }
+  else if(name == "Add &Source...")
+    {
+    this->Internal->AddSource = action;
+    }
+  else if(name == "Add &Filter...")
+    {
+    this->Internal->AddFilter = action;
+    }
+  else if(name == "&Create Custom Filter...")
+    {
+    this->Internal->CustomFilter = action;
+    }
+  else if(name == "Change &Input...")
+    {
+    this->Internal->ChangeInput = action;
+    }
+  else if(name == "&Delete")
+    {
+    this->Internal->Delete = action;
+    }
 }
 
 void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
@@ -87,33 +127,66 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
 
   QMenu menu;
   menu.setObjectName("PipelineObjectMenu");
-  bool menuHasItems = false;
-  pqFlatTreeView *tree = this->Browser->getTreeView();
-  QModelIndex current = tree->getSelectionModel()->currentIndex();
-  pqPipelineModel *model = this->Browser->getListModel();
-  pqPipelineSource *source = dynamic_cast<pqPipelineSource*>(
-    model->getItemFor(current));
-  pqServer* server = dynamic_cast<pqServer*>(model->getItemFor(current));
-  if(source)
-    {
-    QAction* action;
 
-    action = menu.addAction("Delete", this->Browser, SLOT(deleteSelected()));
-    action->setObjectName("Delete");
-    if (source->getNumberOfConsumers() > 0)
+  // Get the selected indexes from the browser.
+  bool addSep = false;
+  QAction *action = 0;
+  QModelIndexList indexes =
+      this->Browser->getSelectionModel()->selectedIndexes();
+
+  // Add the 'open' item to the menu.
+  if(!this->Internal->OpenFile.isNull())
+    {
+    menu.addAction(this->Internal->OpenFile);
+    addSep = true;
+    }
+
+  // Add the 'add source' item to the menu.
+  if(!this->Internal->AddSource.isNull())
+    {
+    menu.addAction(this->Internal->AddSource);
+    addSep = true;
+    }
+
+  if(indexes.size() > 0)
+    {
+    // Add the 'add filter' item to the menu.
+    if(!this->Internal->AddFilter.isNull())
       {
-      action->setEnabled(false);
+      menu.addAction(this->Internal->AddFilter);
+      addSep = true;
       }
-    menuHasItems = true;
-    }
-  else if(server)
-    {
-    // Show the context menu for a server object.
+
+    // Add the 'create custom filter' item to the menu.
+    if(!this->Internal->CustomFilter.isNull())
+      {
+      menu.addAction(this->Internal->CustomFilter);
+      addSep = true;
+      }
+
+    if(addSep)
+      {
+      menu.addSeparator();
+      addSep = false;
+      }
+
+    // Add the 'change input' item to the menu.
+    if(!this->Internal->ChangeInput.isNull() &&
+        this->Internal->ChangeInput->isEnabled())
+      {
+      menu.addAction(this->Internal->ChangeInput);
+      }
+
+    // Add the 'delete' item to the menu.
+    if(!this->Internal->Delete.isNull())
+      {
+      menu.addAction(this->Internal->Delete);
+      }
     }
 
-  if(menuHasItems)
+  if(menu.actions().size() > 0)
     {
-    menu.exec(tree->mapToGlobal(pos));
+    menu.exec(this->Browser->getTreeView()->mapToGlobal(pos));
     }
 }
 

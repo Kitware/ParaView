@@ -140,6 +140,7 @@ public:
     RecentFilesMenu(0),
     FilterMenu(0),
     PipelineMenu(0),
+    PipelineBrowser(0),
     VariableToolbar(0),
     CustomFilterToolbar(0),
     ToolTipTrapper(0),
@@ -178,6 +179,7 @@ public:
   QList<QString> RecentFilterList;
 
   pqPipelineMenu* PipelineMenu;
+  pqPipelineBrowser *PipelineBrowser;
   QToolBar* VariableToolbar;
   QToolBar* CustomFilterToolbar;
   
@@ -596,45 +598,46 @@ pqPipelineMenu& pqMainWindowCore::pipelineMenu()
     {
     this->Implementation->PipelineMenu = new pqPipelineMenu(this);
     this->Implementation->PipelineMenu->setObjectName("PipelineMenu");
-
-    // Disable the add filter action to start with.
-    QAction *action = this->Implementation->PipelineMenu->getMenuAction(
-        pqPipelineMenu::AddFilterAction);
-    action->setEnabled(false);
-
-    // TEMP: Load in the filter information.
-    QFile filterInfo(":/pqWidgets/XML/ParaViewFilters.xml");
-    if(filterInfo.open(QIODevice::ReadOnly))
-      {
-      vtkSmartPointer<vtkPVXMLParser> xmlParser = 
-        vtkSmartPointer<vtkPVXMLParser>::New();
-      xmlParser->InitializeParser();
-      QByteArray filter_data = filterInfo.read(1024);
-      while(!filter_data.isEmpty())
-        {
-        xmlParser->ParseChunk(filter_data.data(), filter_data.length());
-        filter_data = filterInfo.read(1024);
-        }
-
-      xmlParser->CleanupParser();
-      filterInfo.close();
-
-      this->Implementation->PipelineMenu->loadFilterInfo(xmlParser->GetRootElement());
-      }
     }
-    
+
   return *this->Implementation->PipelineMenu;
+}
+
+pqPipelineBrowser* pqMainWindowCore::pipelineBrowser()
+{
+  return this->Implementation->PipelineBrowser;
 }
 
 void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
 {
-  pqPipelineBrowser* const pipeline_browser = new pqPipelineBrowser(dock_widget)
-    << pqSetName("pipelineBrowser");
+  this->Implementation->PipelineBrowser = new pqPipelineBrowser(dock_widget);
+  this->Implementation->PipelineBrowser->setObjectName("pipelineBrowser");
     
-  dock_widget->setWidget(pipeline_browser);
+  dock_widget->setWidget(this->Implementation->PipelineBrowser);
+
+  // TEMP: Load in the filter information.
+  QFile filterInfo(":/pqWidgets/XML/ParaViewFilters.xml");
+  if(filterInfo.open(QIODevice::ReadOnly))
+    {
+    vtkSmartPointer<vtkPVXMLParser> xmlParser = 
+      vtkSmartPointer<vtkPVXMLParser>::New();
+    xmlParser->InitializeParser();
+    QByteArray filter_data = filterInfo.read(1024);
+    while(!filter_data.isEmpty())
+      {
+      xmlParser->ParseChunk(filter_data.data(), filter_data.length());
+      filter_data = filterInfo.read(1024);
+      }
+
+    xmlParser->CleanupParser();
+    filterInfo.close();
+
+    this->Implementation->PipelineBrowser->loadFilterInfo(
+        xmlParser->GetRootElement());
+    }
 
   this->connect(
-    pipeline_browser,
+    this->Implementation->PipelineBrowser,
     SIGNAL(selectionChanged(pqServerManagerModelItem*)), 
     this,
     SLOT(onBrowserSelectionChanged(pqServerManagerModelItem*)));
@@ -642,13 +645,13 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
   QObject::connect(
     this,
     SIGNAL(select(pqServerManagerModelItem*)),
-    pipeline_browser,
+    this->Implementation->PipelineBrowser,
     SLOT(select(pqServerManagerModelItem*)));
   
   QObject::connect(
     &pqActiveView::instance(),
     SIGNAL(changed(pqGenericViewModule*)),
-    pipeline_browser,
+    this->Implementation->PipelineBrowser,
     SLOT(setViewModule(pqGenericViewModule*)));
 }
 
@@ -2020,16 +2023,6 @@ void pqMainWindowCore::onBrowserSelectionChanged(pqServerManagerModelItem* item)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::updateFiltersMenu(pqPipelineSource* source)
 {
-  if(this->Implementation->PipelineMenu)
-    {
-    QAction *addFilter = this->Implementation->PipelineMenu->getMenuAction(
-        pqPipelineMenu::AddFilterAction);
-    if(addFilter)
-      {
-      addFilter->setEnabled(source != 0);
-      }
-    }
-
   QMenu* const menu = this->Implementation->FilterMenu;
   if(!menu)
     {
@@ -2289,12 +2282,6 @@ void pqMainWindowCore::serverAdded(pqServer* server)
 
   // Make the newly created server is selected.
   //emit this->select(server);
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::filtersActivated()
-{
-  this->Implementation->PipelineMenu->addFilter(this->getActiveSource());
 }
 
 //-----------------------------------------------------------------------------

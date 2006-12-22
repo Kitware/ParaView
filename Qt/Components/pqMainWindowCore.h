@@ -44,6 +44,7 @@ class pqGenericViewManager;
 class pqGenericViewModule;
 class pqMultiView;
 class pqObjectInspectorWidget;
+class pqPipelineBrowser;
 class pqPipelineMenu;
 class pqPipelineSource;
 class pqPlotViewModule;
@@ -97,6 +98,7 @@ public:
   void setFilterMenu(QMenu* menu);
   
   pqPipelineMenu& pipelineMenu();
+  pqPipelineBrowser* pipelineBrowser();
   
   /// Setup a pipeline browser, attaching it to the given dock
   void setupPipelineBrowser(QDockWidget* parent);
@@ -263,8 +265,6 @@ public slots:
   // Call this slot when accept is called. This method will create
   // displays for any sources/filters that are pending.
   void createPendingDisplays();
-
-  void filtersActivated();
 
   // Called to show the settings dialog.
   void onEditSettings();

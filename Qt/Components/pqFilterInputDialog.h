@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPipelineBrowserContextMenu.h
+   Module:    pqFilterInputDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,38 +30,61 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineBrowserContextMenu.h
-/// \date 4/20/2006
+/// \file pqFilterInputDialog.h
+/// \date 12/5/2006
 
-#ifndef _pqPipelineBrowserContextMenu_h
-#define _pqPipelineBrowserContextMenu_h
+#ifndef _pqFilterInputDialog_h
+#define _pqFilterInputDialog_h
 
 
 #include "pqComponentsExport.h"
-#include <QObject>
+#include <QDialog>
 
-class pqPipelineBrowser;
-class pqPipelineBrowserContextMenuInternal;
-class QAction;
-class QPoint;
+class pqFilterInputDialogInternal;
+class pqFlatTreeView;
+class pqPipelineFilter;
+class pqPipelineModel;
+class QButtonGroup;
+class QGroupBox;
+class QItemSelection;
+class QPushButton;
+class QScrollArea;
+class QString;
+class QStringList;
 
 
-class PQCOMPONENTS_EXPORT pqPipelineBrowserContextMenu : public QObject
+class PQCOMPONENTS_EXPORT pqFilterInputDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  pqPipelineBrowserContextMenu(pqPipelineBrowser *browser);
-  virtual ~pqPipelineBrowserContextMenu() {}
+  pqFilterInputDialog(QWidget *parent=0);
+  virtual ~pqFilterInputDialog() {}
 
-  void setMenuAction(QAction *action);
+  pqPipelineModel *getModel() const {return this->Model;}
+  pqPipelineFilter *getFilter() const {return this->Filter;}
+  void setModelAndFilter(pqPipelineModel *model, pqPipelineFilter *filter);
 
-public slots:
-  void showContextMenu(const QPoint &pos);
+  void getFilterInputPorts(QStringList &ports) const;
+  void getFilterInputs(const QString &port, QStringList &inputs) const;
+  void getCurrentFilterInputs(const QString &port, QStringList &inputs) const;
+
+private slots:
+  void changeCurrentInput(int id);
+  void changeInput(const QItemSelection &selected,
+      const QItemSelection &deselected);
 
 private:
-  pqPipelineBrowserContextMenuInternal *Internal;
-  pqPipelineBrowser *Browser;
+  pqFilterInputDialogInternal *Internal;
+  pqPipelineModel *Model;
+  pqPipelineFilter *Filter;
+  pqFlatTreeView *TreeView;
+  QGroupBox *FilterBox;
+  QScrollArea *InputFrame;
+  QPushButton *OkButton;
+  QPushButton *CancelButton;
+  QButtonGroup *InputGroup;
+  bool InChangeInput;
 };
 
 #endif

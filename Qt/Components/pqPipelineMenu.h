@@ -40,19 +40,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QObject>
 
-class pqPipelineMenuInternal;
-class pqSourceInfoGroupMap;
-class pqSourceInfoIcons;
-class pqSourceInfoModel;
-class pqPipelineSource;
+class pqPipelineModel;
 class QAction;
-class QMenu;
-class QMenuBar;
-class QStringList;
-class vtkPVXMLElement;
-class vtkSMProxy;
+class QItemSelection;
+class QItemSelectionModel;
 
 
+/// \class pqPipelineMenu
+/// \brief
+///   The pqPipelineMenu class is used to update the enabled state of
+///   the pipeline menu.
 class PQCOMPONENTS_EXPORT pqPipelineMenu : public QObject
 {
   Q_OBJECT
@@ -63,38 +60,32 @@ public:
     InvalidAction = -1,
     AddSourceAction = 0,
     AddFilterAction,
-    LastAction = AddFilterAction
+    ChangeInputAction,
+    DeleteAction,
+    LastAction = DeleteAction
     };
 
 public:
   pqPipelineMenu(QObject *parent=0);
   virtual ~pqPipelineMenu();
 
-  pqSourceInfoIcons *getIcons() const;
+  void setModels(pqPipelineModel *model, QItemSelectionModel *selection);
 
-  void loadSourceInfo(vtkPVXMLElement *root);
-  void loadFilterInfo(vtkPVXMLElement *root);
-
-  pqSourceInfoModel *getFilterModel();
-
-  void addActionsToMenuBar(QMenuBar *menubar) const;
-  void addActionsToMenu(QMenu *menu) const;
+  void setMenuAction(ActionName name, QAction *action);
   QAction *getMenuAction(ActionName name) const;
 
-public slots:
-  void addSource();
-  void addFilter(pqPipelineSource*);
+  bool isActionEnabled(ActionName name) const;
 
-signals:
-  void filtersActivated();
+  void updateActions();
 
-private:
-  void setupConnections(pqSourceInfoModel *model, pqSourceInfoGroupMap *map);
-  void getAllowedSources(pqSourceInfoModel *model, vtkSMProxy *input,
-      QStringList &list);
+private slots:
+  void updateActions(const QItemSelection &selected,
+      const QItemSelection &deselected);
+  void handleDeletion();
 
 private:
-  pqPipelineMenuInternal *Internal;
+  pqPipelineModel *Model;
+  QItemSelectionModel *Selection;
   QAction **MenuList;
 };
 

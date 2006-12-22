@@ -35,158 +35,77 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineMenu.h"
 
-#include "pqAddSourceDialog.h"
-#include "pqApplicationCore.h"
+#include "pqPipelineModel.h"
+#include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
-#include "pqSourceHistoryModel.h"
-#include "pqSourceInfoFilterModel.h"
-#include "pqSourceInfoGroupMap.h"
-#include "pqSourceInfoIcons.h"
-#include "pqSourceInfoModel.h"
 
 #include <QAction>
-#include <QApplication>
-#include <QList>
-#include <QMenu>
-#include <QMenuBar>
-#include <QStringList>
+#include <QItemSelectionModel>
 #include <QtDebug>
-#include <QWidget>
-
-#include "vtkPVXMLElement.h"
-#include "vtkSMObject.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxyProperty.h"
 
 
-class pqPipelineMenuInternal
-{
-public:
-  pqPipelineMenuInternal();
-  ~pqPipelineMenuInternal() {}
 
-  pqSourceInfoIcons *Icons;
-
-  pqSourceInfoGroupMap *FilterGroups;
-  pqSourceHistoryModel *FilterHistory;
-
-  // TODO: Add support for multiple servers.
-  pqSourceInfoModel *FilterModel;
-
-  QString LastFilterGroup;
-};
-
-pqPipelineMenuInternal::pqPipelineMenuInternal()
-  : LastFilterGroup()
-{
-  this->Icons = 0;
-  this->FilterGroups = 0;
-  this->FilterHistory = 0;
-  this->FilterModel = 0;
-}
-
-
+//----------------------------------------------------------------------------
 pqPipelineMenu::pqPipelineMenu(QObject *parentObject)
   : QObject(parentObject)
 {
-  this->Internal = new pqPipelineMenuInternal();
-  this->Internal->Icons = new pqSourceInfoIcons(this);
-  this->Internal->FilterGroups = new pqSourceInfoGroupMap(this);
-  this->Internal->FilterHistory = new pqSourceHistoryModel(this);
-
-  // Set the icons for the history models.
-  this->Internal->FilterHistory->setIcons(this->Internal->Icons,
-      pqSourceInfoIcons::Filter);
-
-  // Initialize the pipeline menu actions.
-  QAction *action = 0;
+  this->Model = 0;
+  this->Selection = 0;
   this->MenuList = new QAction *[pqPipelineMenu::LastAction + 1];
-  this->MenuList[pqPipelineMenu::AddSourceAction] = 0;
-  action = new QAction(tr("Add &Filter..."), this);
-  action->setObjectName("AddFilter");
-  QObject::connect(action, SIGNAL(triggered()), this, SIGNAL(filtersActivated()));
-  this->MenuList[pqPipelineMenu::AddFilterAction] = action;
-
-  // TEMP: Set the add filter start path to the 'Released' group.
-  this->Internal->LastFilterGroup = "Released";
+  for(int i = 0; i <= pqPipelineMenu::LastAction; i++)
+    {
+    this->MenuList[i] = 0;
+    }
 }
 
 pqPipelineMenu::~pqPipelineMenu()
 {
-  // The icon map, group maps, and models will get cleaned up by Qt.
-  delete this->Internal;
   delete [] this->MenuList;
 }
 
-pqSourceInfoIcons *pqPipelineMenu::getIcons() const
+void pqPipelineMenu::setModels(pqPipelineModel *model,
+    QItemSelectionModel *selection)
 {
-  return this->Internal->Icons;
-}
-
-void pqPipelineMenu::loadSourceInfo(vtkPVXMLElement *)
-{
-  // TODO
-}
-
-void pqPipelineMenu::loadFilterInfo(vtkPVXMLElement *root)
-{
-  this->Internal->FilterGroups->loadSourceInfo(root);
-
-  // TEMP: Add in the list of released filters.
-  this->Internal->FilterGroups->addGroup("Released");
-  this->Internal->FilterGroups->addSource("Clip", "Released");
-  this->Internal->FilterGroups->addSource("Cut", "Released");
-  this->Internal->FilterGroups->addSource("Threshold", "Released");
-}
-
-pqSourceInfoModel *pqPipelineMenu::getFilterModel()
-{
-  // TODO: Add support for multiple servers.
-  if(!this->Internal->FilterModel)
-    {
-    // Get the list of available filters from the server manager.
-    QStringList filters;
-    vtkSMProxyManager *manager = vtkSMObject::GetProxyManager();
-    manager->InstantiateGroupPrototypes("filters");
-    unsigned int total = manager->GetNumberOfProxies("filters_prototypes");
-    for(unsigned int i = 0; i < total; i++)
-      {
-      filters.append(manager->GetProxyName("filters_prototypes", i));
-      }
-
-    // Create a new model for the filter groups.
-    this->Internal->FilterModel = new pqSourceInfoModel(filters, this);
-
-    // Initialize the new model.
-    this->setupConnections(this->Internal->FilterModel,
-        this->Internal->FilterGroups);
-    this->Internal->FilterModel->setIcons(this->Internal->Icons,
-        pqSourceInfoIcons::Filter);
-    }
-
-  return this->Internal->FilterModel;
-}
-
-void pqPipelineMenu::addActionsToMenuBar(QMenuBar *menubar) const
-{
-  if(menubar)
-    {
-    QMenu *menu = menubar->addMenu(tr("&Pipeline"));
-    menu->setObjectName("PipelineMenu");
-    this->addActionsToMenu(menu);
-    }
-}
-
-void pqPipelineMenu::addActionsToMenu(QMenu *menu) const
-{
-  if(!menu)
+  if(this->Model == model && this->Selection == selection)
     {
     return;
     }
 
-  // TODO: Finish this
-  menu->addAction(this->MenuList[pqPipelineMenu::AddFilterAction]);
+  if(this->Model)
+    {
+    this->disconnect(this->Model, 0, this, 0);
+    }
+
+  if(this->Selection)
+    {
+    // Disconnect from the previous selection model.
+    this->disconnect(this->Selection, 0, this, 0);
+    }
+
+  this->Model = selection ? model : 0;
+  this->Selection = this->Model ? selection : 0;
+  if(this->Selection)
+    {
+    // Listen to the new selection model's changes.
+    this->connect(this->Selection,
+        SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+        this,
+        SLOT(updateActions(const QItemSelection &, const QItemSelection &)));
+    this->connect(this->Selection, SIGNAL(destroyed()),
+        this, SLOT(handleDeletion()));
+    this->connect(this->Model, SIGNAL(destroyed()),
+        this, SLOT(handleDeletion()));
+    }
+
+  this->updateActions();
+}
+
+void pqPipelineMenu::setMenuAction(ActionName name, QAction *action)
+{
+  if(name != pqPipelineMenu::InvalidAction)
+    {
+    this->MenuList[name] = action;
+    }
 }
 
 QAction *pqPipelineMenu::getMenuAction(pqPipelineMenu::ActionName name) const
@@ -199,122 +118,84 @@ QAction *pqPipelineMenu::getMenuAction(pqPipelineMenu::ActionName name) const
   return 0;
 }
 
-void pqPipelineMenu::addSource()
+bool pqPipelineMenu::isActionEnabled(ActionName name) const
 {
-  // TODO
-}
-
-void pqPipelineMenu::addFilter(pqPipelineSource* input)
-{
-  if(!input)
+  QAction *action = this->getMenuAction(name);
+  if(action)
     {
-    return;
+    return action->isEnabled();
     }
 
-  // Get the filter info model for the current server.
-  pqSourceInfoModel *model = this->getFilterModel();
+  return true;
+}
 
-  // Use a proxy model to display only the allowed filters.
-  QStringList allowed;
-  pqSourceInfoFilterModel *filter = new pqSourceInfoFilterModel(this);
-  filter->setSourceModel(model);
-  this->getAllowedSources(model, input->getProxy(), allowed);
-  filter->setAllowedNames(allowed);
-
-  pqSourceInfoFilterModel *history = new pqSourceInfoFilterModel(this);
-  history->setSourceModel(this->Internal->FilterHistory);
-  history->setAllowedNames(allowed);
-
-  // Set up the add filter dialog.
-  pqAddSourceDialog dialog(QApplication::activeWindow());
-  dialog.setSourceMap(this->Internal->FilterGroups);
-  dialog.setSourceList(filter);
-  dialog.setHistoryList(history);
-  dialog.setSourceLabel("Filter");
-  dialog.setWindowTitle("Add Filter");
-
-  // Start the user in the previous group path.
-  dialog.setPath(this->Internal->LastFilterGroup);
-  if(dialog.exec() == QDialog::Accepted)
+void pqPipelineMenu::updateActions()
+{
+  // Get the current selection from the model.
+  QModelIndexList indexes;
+  if(this->Selection)
     {
-    // If the user selects a filter, save the starting path and add
-    // the selected filter to the history.
-    dialog.getPath(this->Internal->LastFilterGroup);
-    QString filterName;
-    dialog.getSource(filterName);
-    this->Internal->FilterHistory->addRecentSource(filterName);
+    indexes = this->Selection->selectedIndexes();
+    }
 
-    // Create the filter.
-    if(!pqApplicationCore::instance()->createFilterForSource(filterName, input))
+  bool enabled = true;
+  if(this->MenuList[pqPipelineMenu::AddFilterAction] != 0)
+    {
+    // TODO: Allow for multi-input filters.
+    enabled = indexes.size() == 1;
+    if(enabled)
       {
-      qCritical() << "Filter could not be created.";
-      } 
+      pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(
+          this->Model->getItemFor(indexes.first()));
+      enabled = source != 0;
+      }
+
+    this->MenuList[pqPipelineMenu::AddFilterAction]->setEnabled(enabled);
     }
 
-  delete filter;
-  delete history;
-}
-
-void pqPipelineMenu::setupConnections(pqSourceInfoModel *model,
-    pqSourceInfoGroupMap *map)
-{
-  // Connect the new model to the group map and add the initial
-  // items to the model.
-  QObject::connect(map, SIGNAL(clearingData()), model, SLOT(clearGroups()));
-  QObject::connect(map, SIGNAL(groupAdded(const QString &)),
-      model, SLOT(addGroup(const QString &)));
-  QObject::connect(map, SIGNAL(removingGroup(const QString &)),
-      model, SLOT(removeGroup(const QString &)));
-  QObject::connect(map, SIGNAL(sourceAdded(const QString &, const QString &)),
-      model, SLOT(addSource(const QString &, const QString &)));
-  QObject::connect(map,
-      SIGNAL(removingSource(const QString &, const QString &)),
-      model, SLOT(removeSource(const QString &, const QString &)));
-
-  map->initializeModel(model);
-}
-
-void pqPipelineMenu::getAllowedSources(pqSourceInfoModel *model,
-    vtkSMProxy *input, QStringList &list)
-{
-  if(!input || !model)
+  if(this->MenuList[pqPipelineMenu::ChangeInputAction] != 0)
     {
-    return;
-    }
-
-  // Get the list of available sources from the model.
-  QStringList available;
-  model->getAvailableSources(available);
-  if(available.isEmpty())
-    {
-    return;
-    }
-
-  // Loop through the list of filter prototypes to find the ones that
-  // are compatible with the input.
-  vtkSMProxy *prototype = 0;
-  vtkSMProxyProperty *prop = 0;
-  vtkSMProxyManager *manager = vtkSMObject::GetProxyManager();
-  QStringList::Iterator iter = available.begin();
-  for( ; iter != available.end(); ++iter)
-    {
-    prototype = manager->GetProxy("filters_prototypes",
-        (*iter).toAscii().data());
-    if(prototype)
+    enabled = indexes.size() == 1;
+    if(enabled)
       {
-      prop = vtkSMProxyProperty::SafeDownCast(
-          prototype->GetProperty("Input"));
-      if(prop)
+      pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter *>(
+          this->Model->getItemFor(indexes.first()));
+      enabled = filter != 0;
+      }
+
+    this->MenuList[pqPipelineMenu::ChangeInputAction]->setEnabled(enabled);
+    }
+
+  if(this->MenuList[pqPipelineMenu::DeleteAction] != 0)
+    {
+    // TODO: Allow for deleting multiple items at once.
+    enabled = indexes.size() == 1;
+    if(enabled)
+      {
+      // TODO: If the item is a link, it can always be removed.
+      pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(
+          this->Model->getItemFor(indexes.first()));
+      if(source)
         {
-        prop->RemoveAllUncheckedProxies();
-        prop->AddUncheckedProxy(input);
-        if(prop->IsInDomains())
-          {
-          list.append(*iter);
-          }
+        enabled = source->getNumberOfConsumers() == 0;
         }
       }
+
+    this->MenuList[pqPipelineMenu::DeleteAction]->setEnabled(enabled);
     }
+}
+
+void pqPipelineMenu::updateActions(const QItemSelection &,
+    const QItemSelection &)
+{
+  this->updateActions();
+}
+
+void pqPipelineMenu::handleDeletion()
+{
+  this->Model = 0;
+  this->Selection = 0;
+  this->updateActions();
 }
 
 
