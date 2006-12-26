@@ -56,7 +56,7 @@
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/FinishButton" command="activate" arguments="" />
   <pqevent object="pqCustomFilterManager/CloseButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
-  <pqevent object="PipelineObjectMenu" command="activate" arguments="Delete" />
+  <pqevent object="PipelineObjectMenu" command="activate" arguments="actionDelete" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
   <pqevent object="MainWindow/customFilterToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Guess3" command="set_boolean" arguments="true" />
