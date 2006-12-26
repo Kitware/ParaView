@@ -530,7 +530,7 @@ pqPipelineModel::pqPipelineModel(QObject *parentObject)
   this->initializePixmaps();
 }
 
-pqPipelineModel::pqPipelineModel(const pqPipelineModel &other,
+pqPipelineModel::pqPipelineModel(const pqPipelineModel& vtkNotUsed(other),
     QObject *parentObject)
   : QAbstractItemModel(parentObject)
 {
