@@ -752,6 +752,11 @@ The line can be specified interactively using the 3D line widget. See section 7.
          number_of_elements="3"
          animateable="1"
          default_values="0 0 0" >
+         <BoundsDomain name="range" mode="normal" default_mode="min" >
+           <RequiredProperties>
+             <Property name="Input" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
          <Documentation>
            Define one end of the line (small scalar values). Default is (0,0,0).
          </Documentation>
@@ -763,10 +768,22 @@ The line can be specified interactively using the 3D line widget. See section 7.
          number_of_elements="3"
          animateable="1"
          default_values="0 0 1" >
+         <BoundsDomain name="range" mode="normal" default_mode="max" >
+           <RequiredProperties>
+             <Property name="Input" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
          <Documentation>
            Define other end of the line (large scalar values). Default is (0,0,1).
          </Documentation>
       </DoubleVectorProperty>
+
+      <Hints>
+        <PropertyGroup type="Line" label="Elevation Widget">
+          <Property function="Point1WorldPosition" name="LowPoint" />
+          <Property function="Point2WorldPosition" name="HighPoint" />
+        </PropertyGroup>
+      </Hints>
    <!-- End ElevationFilter -->
    </SourceProxy>
 

@@ -71,6 +71,7 @@ public:
   pqSMProxy ControlledProxy;
   vtkSmartPointer<vtkSMNew3DWidgetProxy> WidgetProxy;
   vtkSmartPointer<vtkCommand> ControlledPropertiesObserver;
+  vtkSmartPointer<vtkPVXMLElement> Hints;
 
   QMap<vtkSmartPointer<vtkSMProperty>, vtkSmartPointer<vtkSMProperty> > PropertyMap;
 
@@ -130,6 +131,10 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* proxy)
       else if (widgetType == "LineSource")
         {
         widget = new pqLineSourceWidget(0);
+        }
+      else if (widgetType == "Line")
+        {
+        widget = new pqLineWidget(0);
         }
 
       if (widget)
@@ -272,8 +277,15 @@ void pq3DWidget::setControlledProxy(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
+vtkPVXMLElement* pq3DWidget::getHints() const
+{
+  return this->Internal->Hints;
+}
+
+//-----------------------------------------------------------------------------
 void pq3DWidget::setHints(vtkPVXMLElement* hints)
 {
+  this->Internal->Hints = hints;
   if (!hints)
     {
     return;

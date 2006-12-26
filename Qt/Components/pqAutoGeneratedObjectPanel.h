@@ -60,6 +60,8 @@ protected:
   /// sets up a QValidator for the line edit based on the type.
   void setupValidator(QLineEdit* lineEdit, QVariant::Type propertyType);
 
+  void processHints(QStringList& processedPropertyNames);
+
   QGridLayout* PanelLayout;
 };
 

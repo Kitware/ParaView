@@ -79,6 +79,7 @@ public:
   /// proxy has been set. The argument is the element
   /// <PropertyGroup /> which will be controlled by this widget.
   void setHints(vtkPVXMLElement* element);
+  vtkPVXMLElement* getHints() const;
 
   /// Return the 3D Widget proxy.
   vtkSMNew3DWidgetProxy* getWidgetProxy() const;

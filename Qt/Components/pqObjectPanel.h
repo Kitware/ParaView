@@ -82,7 +82,9 @@ public slots:
 
   /// Set the render module that this panel works with
   void setRenderModule(pqRenderViewModule*);
-
+protected slots:
+  // fires canAcceptOrReject(true).
+  void modified() { emit this->canAcceptOrReject(true); };
 signals:
   void canAcceptOrReject(bool);
   void onaccept();
