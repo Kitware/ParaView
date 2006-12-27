@@ -74,11 +74,12 @@ public:
   // objects are created.
   void SetReductionType(int type);
   //BTX
-  enum ReductionType
+  enum ReductionTypeEnum
     {
     ADD = 0,
     POLYDATA_APPEND = 1,
-    UNSTRUCTURED_APPEND = 2
+    UNSTRUCTURED_APPEND = 2,
+    FIRST_NODE_ONLY = 3 
     };
   //ETX
 
@@ -106,6 +107,7 @@ private:
   int CanCreateProxy;
   int CollectionDecision;
   int Visibility;
+  int ReductionType;
 
   vtkDataObject* Output;
 

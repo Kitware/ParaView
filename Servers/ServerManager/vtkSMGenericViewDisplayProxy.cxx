@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.10");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -43,6 +43,8 @@ vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
 
   this->Output = 0;
   this->UpdateRequiredFlag = 1;
+
+  this->ReductionType = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,6 +108,8 @@ void vtkSMGenericViewDisplayProxy::SetReductionType(int type)
     return;
     }
 
+  this->ReductionType = type;
+
   vtkClientServerStream stream;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   const char* classname = 0;
@@ -123,12 +127,20 @@ void vtkSMGenericViewDisplayProxy::SetReductionType(int type)
     classname = "vtkAppendFilter";
     break;
 
+  case FIRST_NODE_ONLY:
+    classname = 0;
+    break;
+
   default:
     vtkErrorMacro("Unknown reduction type: " << type);
     return;
     }
 
-  vtkClientServerID rfid = pm->NewStreamObject(classname, stream);
+  vtkClientServerID rfid = { 0 };
+  if ( classname )
+    {
+    rfid = pm->NewStreamObject(classname, stream);
+    }
   for (unsigned int i=0; i < this->ReduceProxy->GetNumberOfIDs(); i++)
     {
     stream
@@ -137,7 +149,11 @@ void vtkSMGenericViewDisplayProxy::SetReductionType(int type)
       << rfid
       << vtkClientServerStream::End;
     }
-  pm->DeleteStreamObject(rfid, stream);
+
+  if ( classname )
+    {
+    pm->DeleteStreamObject(rfid, stream);
+    }
 
   pm->SendStream(this->GetConnectionID(),
     this->ReduceProxy->GetServers(), stream);
@@ -304,15 +320,7 @@ void vtkSMGenericViewDisplayProxy::SetupCollectionFilter(
 //-----------------------------------------------------------------------------
 void vtkSMGenericViewDisplayProxy::Update()
 {
-  vtkSMProperty *p = this->UpdateSuppressorProxy->GetProperty("ForceUpdate");
-  if (!p)
-    {
-    vtkErrorMacro("Failed to find property ForceUpdate on "
-      "UpdateSuppressorProxy.");
-    return;
-    }
-  p->Modified();
-  this->UpdateVTKObjects();
+  this->UpdateSuppressorProxy->InvokeCommand("ForceUpdate");
   this->Superclass::Update();
   this->UpdateRequiredFlag = 0;
 
