@@ -42,7 +42,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.23");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.24");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -257,11 +257,40 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     this->SetName(str);
     }
 
+
+  switch ( this->DataSetType )
+    {
+    case VTK_IMAGE_DATA:
+      ext = static_cast<vtkImageData*>(data)->GetExtent();
+      break;
+    case VTK_STRUCTURED_GRID:
+      ext = static_cast<vtkStructuredGrid*>(data)->GetExtent();
+      break;
+    case VTK_RECTILINEAR_GRID:
+      ext = static_cast<vtkRectilinearGrid*>(data)->GetExtent();
+      break;
+    case VTK_UNIFORM_GRID:
+      ext = static_cast<vtkUniformGrid*>(data)->GetExtent();
+      break;
+    case VTK_UNSTRUCTURED_GRID:
+    case VTK_POLY_DATA:
+      this->PolygonCount = data->GetNumberOfCells();
+      break;
+    }
+  if (ext)
+    {
+    for (idx = 0; idx < 6; ++idx)
+      {
+      this->Extent[idx] = ext[idx];
+      }
+    }
+
   this->NumberOfPoints = data->GetNumberOfPoints();
   if (!this->NumberOfPoints)
     {
     return;
     }
+
   // We do not want to get the number of dual cells from an octree
   // because this triggers generation of connectivity arrays.
   if (data->GetDataObjectType() != VTK_HYPER_OCTREE)
@@ -293,33 +322,6 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     this->Bounds[idx] = bds[idx];
     }
   this->MemorySize = data->GetActualMemorySize();
-
-  switch ( this->DataSetType )
-    {
-    case VTK_IMAGE_DATA:
-      ext = static_cast<vtkImageData*>(data)->GetExtent();
-      break;
-    case VTK_STRUCTURED_GRID:
-      ext = static_cast<vtkStructuredGrid*>(data)->GetExtent();
-      break;
-    case VTK_RECTILINEAR_GRID:
-      ext = static_cast<vtkRectilinearGrid*>(data)->GetExtent();
-      break;
-    case VTK_UNIFORM_GRID:
-      ext = static_cast<vtkUniformGrid*>(data)->GetExtent();
-      break;
-    case VTK_UNSTRUCTURED_GRID:
-    case VTK_POLY_DATA:
-      this->PolygonCount = data->GetNumberOfCells();
-      break;
-    }
-  if (ext)
-    {
-    for (idx = 0; idx < 6; ++idx)
-      {
-      this->Extent[idx] = ext[idx];
-      }
-    }
 
   vtkPointSet* ps = vtkPointSet::SafeDownCast(data);
   if (ps && ps->GetPoints())
