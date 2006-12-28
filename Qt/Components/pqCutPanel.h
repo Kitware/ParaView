@@ -53,17 +53,24 @@ public:
   ~pqCutPanel();
 
   pqImplicitPlaneWidget* getImplicitPlaneWidget();
-  
+ 
+public slots:
+  /// Called when the panel becomes active. Default implemnetation does
+  /// nothing.
+  virtual void select();
+
+  /// Called when the panel becomes inactive. Default implemnetation does
+  /// nothing.
+  virtual void deselect();
+
 private slots:
   /// Called if the user accepts pending modifications
   void onAccepted();
   /// Called if the user rejects pending modifications
   void onRejected();
 
-private:
-  virtual void select();
-  virtual void deselect();
 
+private:
   class pqImplementation;
   pqImplementation* const Implementation;
 };
