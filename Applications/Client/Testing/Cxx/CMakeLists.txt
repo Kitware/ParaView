@@ -35,6 +35,9 @@ SET (PARAVIEW_CLIENT paraview_alpha)
 SET (PARAVIEW_DATA_SERVER pvdataserver)
 SET (PARAVIEW_SERVER pvserver)
 SET (PARAVIEW_RENDER_SERVER pvrenderserver)
+IF (APPLE)
+  SET (PARAVIEW_CLIENT paraview_alpha.app/Contents/MacOS/paraview_alpha)
+ENDIF (APPLE)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/pvTestDriverConfig.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/pvTestDriverConfig.h @ONLY IMMEDIATE
