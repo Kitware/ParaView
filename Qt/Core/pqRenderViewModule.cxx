@@ -487,13 +487,14 @@ void pqRenderViewModule::setDefaults()
   pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 0, bg[0]/255.0);
   pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 1, bg[1]/255.0);
   pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 2, bg[2]/255.0);
-
-  this->restoreSettings();
  
   pqSMAdaptor::addProxyProperty(proxy->GetProperty("Displays"),
     this->Internal->CenterAxesProxy);
 
   proxy->UpdateVTKObjects();
+
+
+  this->restoreSettings();
 }
 
 static const char* pqRenderViewModuleLightSettings [] = {
