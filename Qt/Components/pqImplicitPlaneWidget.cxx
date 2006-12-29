@@ -270,6 +270,11 @@ void pqImplicitPlaneWidget::setOriginProperty(vtkSMProperty* origin_property)
 {
   this->Implementation->OriginProperty = 
     vtkSMDoubleVectorProperty::SafeDownCast(origin_property);
+  if (origin_property->GetXMLLabel())
+    {
+    this->Implementation->UI->labelOrigin->setText(
+      origin_property->GetXMLLabel());
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -277,6 +282,11 @@ void pqImplicitPlaneWidget::setNormalProperty(vtkSMProperty* normal_property)
 {
   this->Implementation->NormalProperty = 
     vtkSMDoubleVectorProperty::SafeDownCast(normal_property);
+  if (normal_property->GetXMLLabel())
+    {
+    this->Implementation->UI->labelNormal->setText(
+      normal_property->GetXMLLabel());
+    }
 }
 
 

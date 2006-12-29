@@ -38,7 +38,7 @@
       <number>2</number>
      </property>
      <item row="1" column="0" >
-      <widget class="QLabel" name="label" >
+      <widget class="QLabel" name="labelNormal" >
        <property name="text" >
         <string>Normal</string>
        </property>
@@ -48,7 +48,7 @@
       <widget class="QLineEdit" name="normalX" />
      </item>
      <item row="0" column="0" >
-      <widget class="QLabel" name="label_3" >
+      <widget class="QLabel" name="labelOrigin" >
        <property name="text" >
         <string>Origin</string>
        </property>

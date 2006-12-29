@@ -65,6 +65,10 @@ public slots:
   void onYAxis();
   void onZAxis();
 
+protected:
+  virtual void setControlledProperty(const char* function,
+    vtkSMProperty * controlled_property);
+
 private slots:
   void onWidgetVisibilityChanged(bool visible);
 

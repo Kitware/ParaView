@@ -748,6 +748,7 @@ The line can be specified interactively using the 3D line widget. See section 7.
 
       <DoubleVectorProperty
          name="LowPoint"
+         label="Low Point"
          command="SetLowPoint"
          number_of_elements="3"
          animateable="1"
@@ -764,6 +765,7 @@ The line can be specified interactively using the 3D line widget. See section 7.
 
       <DoubleVectorProperty
          name="HighPoint"
+         label="High Point"
          command="SetHighPoint"
          number_of_elements="3"
          animateable="1"

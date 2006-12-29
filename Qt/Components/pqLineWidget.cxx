@@ -152,8 +152,31 @@ void pqLineWidget::setControlledProperties(vtkSMProperty* point1, vtkSMProperty*
   this->Implementation->WidgetPoint2->Copy(point2);
 
   // Map widget properties to controlled properties ...
-  this->setControlledProperty(this->Implementation->WidgetPoint1, point1);
-  this->setControlledProperty(this->Implementation->WidgetPoint2, point2);
+  this->setControlledProperty("Point1WorldPosition", point1);
+  this->setControlledProperty("Point2WorldPosition", point2);
+}
+
+//-----------------------------------------------------------------------------
+void pqLineWidget::setControlledProperty(const char* function,
+  vtkSMProperty* prop)
+{
+  this->Superclass::setControlledProperty(function, prop);
+  if (QString("Point1WorldPosition") == function)
+    {
+    if (prop->GetXMLLabel())
+      {
+      this->Implementation->UI.labelPoint1->setText(
+        prop->GetXMLLabel());
+      }
+    }
+  else if (QString("Point2WorldPosition") == function)
+    {
+    if (prop->GetXMLLabel())
+      {
+      this->Implementation->UI.labelPoint2->setText(
+        prop->GetXMLLabel());
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

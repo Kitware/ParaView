@@ -222,6 +222,9 @@ public:
   // update the current value to that specified in the configuration XML.
   void ResetToDefault();
 
+  // Description:
+  // The label assigned by the xml parser.
+  vtkGetStringMacro(XMLLabel);
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -274,10 +277,6 @@ protected:
   // that is on a subproxy may be different from the XMLName of the property,
   // see the note on ExposedProperties for vtkSMProxy.
   vtkGetStringMacro(XMLName);
-
-  // Description:
-  // The label assigned by the xml parser.
-  vtkGetStringMacro(XMLLabel);
 
   // Description:
   // Add a sub-property with the given name.
