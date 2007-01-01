@@ -1,0 +1,69 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+
+    <SourceProxy name="PythonScript" class="vtkPythonProgrammableFilter">
+      <Documentation
+         long_help="Executes a user supplied python script on its input dataset to produce an output dataset."
+         short_help="Executes a python script to produce data.">
+This filter will execute a python script to produce an output dataset.
+The filter keeps a copy of the python script in Script, and creates 
+Interpretor, a python interpretor to run the script in upon the first 
+ execution.
+      </Documentation>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+     <IntVectorProperty 
+        name="OutputDataSetType" 
+        command="SetOutputDataSetType" 
+        number_of_elements="1"
+        default_values="8"> 
+       <EnumerationDomain name="enum">
+         <!-- Values come from vtkType.h-->
+         <Entry value="8" text="Same as Input"/> <!-- text="vtkDataSet" -->
+         <Entry value="0" text="vtkPolyData"/>
+         <!-- <Entry value="1" text="vtkStructuredPoints"/> -->
+         <Entry value="2" text="vtkStructuredGrid"/>
+         <Entry value="3" text="vtkRectilinearGrid"/>
+         <Entry value="4" text="vtkUnstructuredGrid"/>
+         <!-- <Entry value="5" text="vtkPiecewiseFunction"/> -->
+         <Entry value="6" text="vtkImageData"/>
+         <!-- <Entry value="7" text="vtkDataObject"/> -->
+         <!-- <Entry value="9" text="vtkPointSet"/> -->
+         <!-- <Entry value="10" text="vtkUniformGrid"/> -->
+         <!-- <Entry value="11" text="vtkCompositeDataSet"/> -->
+         <!-- <Entry value="12" text="vtkMultigroupDataSet"/> -->
+         <!-- <Entry value="13" text="vtkMultiblockDataSet"/> -->
+         <!-- <Entry value="14" text="vtkHierarchicalDataSet"/> -->
+         <!-- <Entry value="15" text="vtkHierarchical_BoxDataSet"/> -->
+         <!-- <Entry value="16" text="vtkGenericDataSet"/> -->
+         <!-- <Entry value="17" text="vtkHyperOctree"/> -->
+         <!-- <Entry value="18" text="vtkTemporalDataSet"/> -->
+         <!-- <Entry value="19" text="vtkTable"/> -->
+         <!-- <Entry value="20" text="vtkGraph"/> -->
+         <!-- <Entry value="21" text="vtkTree"/> -->
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <StringVectorProperty 
+        name="Script" 
+        command="SetScript"
+        number_of_elements="1"
+        multiline="1">
+     </StringVectorProperty>
+
+    <!-- End PythonScript -->
+    </SourceProxy>
+
+  </ProxyGroup>
+
+</ServerManagerConfiguration>
