@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes
 #include <QComboBox>
 #include <QSlider>
-
+#include <QTextEdit>
 
 pqSignalAdaptorComboBox::pqSignalAdaptorComboBox(QComboBox* p)
   : QObject(p)
@@ -153,5 +153,24 @@ void pqSignalAdaptorSliderRange::setValue(double val)
 void pqSignalAdaptorSliderRange::handleValueChanged()
 {
   emit this->valueChanged(this->value());
+}
+
+//----------------------------------------------------------------------------
+pqSignalAdaptorTextEdit::pqSignalAdaptorTextEdit(QTextEdit* p)
+  : QObject(p)
+{
+  QObject::connect(p, SIGNAL(textChanged()), 
+                   this, SIGNAL(textChanged()));
+}
+
+QString pqSignalAdaptorTextEdit::text() const
+{
+  return static_cast<QTextEdit*>(this->parent())->toPlainText();
+}
+
+void pqSignalAdaptorTextEdit::setText(const QString& text)
+{
+  QTextEdit* combo = static_cast<QTextEdit*>(this->parent());
+  combo->setPlainText(text);
 }
 

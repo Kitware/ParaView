@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 class QComboBox;
 class QSlider;
+class QTextEdit;
+
 #include "QtWidgetsExport.h"
 
 
@@ -112,6 +114,25 @@ public slots:
   void setValue(double val);
 protected slots:
   void handleValueChanged();
+};
+
+/// signal adaptor that lets us get the text inside a QTextEdit
+class QTWIDGETS_EXPORT pqSignalAdaptorTextEdit : public QObject
+{
+  Q_OBJECT
+  Q_PROPERTY(QString text READ text WRITE setText)
+
+public:
+  /// constructor
+  pqSignalAdaptorTextEdit(QTextEdit* p);
+  /// get the current text
+  QString text() const;
+signals:
+  /// signal text changed
+  void textChanged();  
+public slots:
+  void setText(const QString&);
+protected:
 };
 
 #endif

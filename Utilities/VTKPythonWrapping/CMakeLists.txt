@@ -18,6 +18,7 @@
     ${VTK_SOURCE_DIR}/Common
     ${VTK_SOURCE_DIR}/IO
     ${VTK_SOURCE_DIR}/Filtering
+    ${VTK_SOURCE_DIR}/Graphics
     ${VTK_BINARY_DIR}/Rendering
     ${PYTHON_INCLUDE_PATH}
     )
@@ -99,6 +100,7 @@
     "${VTK_SOURCE_DIR}/Common/vtkUnsignedLongArray.cxx"
     "${VTK_SOURCE_DIR}/Common/vtkUnsignedLongLongArray.cxx"
     "${VTK_SOURCE_DIR}/Common/vtkUnsignedShortArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkPoints.cxx"
 
     "${VTK_SOURCE_DIR}/Filtering/vtkDataObject.cxx"
     "${VTK_SOURCE_DIR}/Filtering/vtkFieldData.cxx"
@@ -116,6 +118,11 @@
     "${VTK_SOURCE_DIR}/Filtering/vtkPolyData.cxx"
     "${VTK_SOURCE_DIR}/Filtering/vtkStructuredGrid.cxx"
     "${VTK_SOURCE_DIR}/Filtering/vtkUnstructuredGrid.cxx"
+
+    "${VTK_SOURCE_DIR}/Filtering/vtkAlgorithm.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkDataSetAlgorithm.cxx"
+
+    "${VTK_SOURCE_DIR}/Graphics/vtkProgrammableFilter.cxx"
 
     )
 
@@ -158,6 +165,7 @@ IF (PARAVIEW_WRAP_PYTHON AND NOT VTK_WRAP_PYTHON)
   SET(KIT_PYTHON_LIBS
     vtkIO
     vtkRendering
+    vtkGraphics
     )
 
   IF(UNIX)

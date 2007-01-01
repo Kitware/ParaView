@@ -100,6 +100,9 @@ public:
   // Copy all property values.
   virtual void Copy(vtkSMProperty* src);
 
+  // Description:
+  int GetMultiLine() { return this->MultiLine; }
+
 protected:
   vtkSMStringVectorProperty();
   ~vtkSMStringVectorProperty();
@@ -129,6 +132,9 @@ protected:
     int loadLastPushedValues=0);
 
   virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
+
+  // Description:
+  int MultiLine;
 
 private:
   vtkSMStringVectorProperty(const vtkSMStringVectorProperty&); // Not implemented

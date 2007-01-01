@@ -301,6 +301,12 @@ SET(resourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
   ${PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES}
   )
+IF(PARAVIEW_ENABLE_PYTHON_FILTER)
+  SET(resourceFiles
+      ${resourceFiles} 
+      ${CMAKE_CURRENT_SOURCE_DIR}/Resources/pythonfilter.xml
+      ) 
+ENDIF(PARAVIEW_ENABLE_PYTHON_FILTER) 
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h

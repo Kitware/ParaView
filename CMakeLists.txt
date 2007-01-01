@@ -91,13 +91,14 @@ FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
 #########################################################################
 # Configure Python
 OPTION(PARAVIEW_EMBED_PYTHON "Embedded Python Interpreter" ON)
+OPTION(PARAVIEW_ENABLE_PYTHON_FILTER "Enable python scriptable filter" OFF)
 
-IF(PARAVIEW_EMBED_PYTHON)
+IF(PARAVIEW_EMBED_PYTHON OR PARAVIEW_ENABLE_PYTHON_FILTER)
   SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build ParaView using shared libraries" FORCE)
   SET(PARAVIEW_WRAP_PYTHON ON CACHE BOOL "Wrap ParaView server manager into Python" FORCE)
-ELSE(PARAVIEW_EMBED_PYTHON)
+ELSE(PARAVIEW_EMBED_PYTHON OR PARAVIEW_ENABLE_PYTHON_FILTER)
   SET(PARAVIEW_WRAP_PYTHON OFF CACHE BOOL "Wrap ParaView server manager into Python" FORCE)
-ENDIF(PARAVIEW_EMBED_PYTHON)
+ENDIF(PARAVIEW_EMBED_PYTHON OR PARAVIEW_ENABLE_PYTHON_FILTER)
 
 #########################################################################
 IF(BUILD_SHARED_LIBS)

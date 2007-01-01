@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QCheckBox>
 #include <QLineEdit>
+#include <QTextEdit>
 #include <QPushButton>
 #include <QListWidget>
 #include <QTreeWidget>
@@ -305,6 +306,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
         {
         QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
+        QTextEdit* textEdit = qobject_cast<QTextEdit*>(foundObject);
         QSlider* slider = qobject_cast<QSlider*>(foundObject);
         QSpinBox* spinBox = qobject_cast<QSpinBox*>(foundObject);
         QDoubleSpinBox* doubleSpinBox = 
@@ -326,6 +328,15 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
           {
           property_manager->registerLink(
             lineEdit, "text", SIGNAL(textChanged(const QString&)),
+            proxy, SMProperty);
+          }
+        else if(textEdit)
+          {
+          pqSignalAdaptorTextEdit *adaptor = 
+            new pqSignalAdaptorTextEdit(textEdit);
+          adaptor->setObjectName("TextEditAdaptor");          
+          property_manager->registerLink(
+            adaptor, "text", SIGNAL(textChanged()),
             proxy, SMProperty);
           }
         else if(slider)

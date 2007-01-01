@@ -90,6 +90,7 @@
       <Filter name="MeshQuality" />
       <Filter name="ProcessIdScalars" />
       <Filter name="PVConnectivityFilter" />
+      <Filter name="PythonScript" />
     </Category>
     <Category name="Outline">
       <Filter name="OutlineCornerFilter" />
