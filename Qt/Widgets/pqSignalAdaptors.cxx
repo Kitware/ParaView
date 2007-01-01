@@ -168,9 +168,9 @@ QString pqSignalAdaptorTextEdit::text() const
   return static_cast<QTextEdit*>(this->parent())->toPlainText();
 }
 
-void pqSignalAdaptorTextEdit::setText(const QString& text)
+void pqSignalAdaptorTextEdit::setText(const QString& ptext)
 {
   QTextEdit* combo = static_cast<QTextEdit*>(this->parent());
-  combo->setPlainText(text);
+  combo->setPlainText(ptext);
 }
 
