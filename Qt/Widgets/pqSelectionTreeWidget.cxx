@@ -49,21 +49,21 @@ pqSelectionTreeWidget::pqSelectionTreeWidget(QWidget* p)
   this->CheckPixmap = new QPixmap(r.size());
   this->CheckPixmap->fill(QColor(0,0,0,0));
   QPainter painter1(this->CheckPixmap);
-  option.state = QStyle::State_On;
+  option.state = QStyle::State_On | QStyle::State_Enabled;
   this->style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, 
                        &painter1, this);
   
   this->PartialCheckPixmap = new QPixmap(r.size());
   this->PartialCheckPixmap->fill(QColor(0,0,0,0));
   QPainter painter2(this->PartialCheckPixmap);
-  option.state = QStyle::State_NoChange;
+  option.state = QStyle::State_NoChange | QStyle::State_Enabled;
   this->style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, 
                        &painter2, this);
 
   this->UnCheckPixmap = new QPixmap(r.size());
   this->UnCheckPixmap->fill(QColor(0,0,0,0));
   QPainter painter3(this->UnCheckPixmap);
-  option.state = QStyle::State_Off;
+  option.state = QStyle::State_Off | QStyle::State_Enabled;
   this->style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, 
                        &painter3, this);
   
