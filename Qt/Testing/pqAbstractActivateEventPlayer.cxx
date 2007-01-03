@@ -112,6 +112,7 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
         }
       else if(QMenu* menu = qobject_cast<QMenu*>(p))
         {
+#if QT_VERSION < 0x040103
         QRect geom = menu->actionGeometry(next->menuAction());
         QMouseEvent button_press(QEvent::MouseButtonPress, 
                                  geom.center(), 
@@ -124,6 +125,9 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
                                    geom.center(), 
                                    Qt::LeftButton, 0, 0);
         QApplication::sendEvent(menu, &button_release);
+#else
+        menu->setActiveAction(next->menuAction());
+#endif
         
         while(!next->isVisible())
           {
@@ -136,21 +140,13 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
     // to make action visible
     object->setActiveAction(action);
 
-    // simulate mouse click on menu item
-    QRect geom = object->actionGeometry(action);
-    QMouseEvent button_press(QEvent::MouseButtonPress, 
-                             geom.center(), 
-                             Qt::LeftButton, Qt::LeftButton, 0);
-    QApplication::sendEvent(object, &button_press);
-    
-    QMouseEvent button_release(QEvent::MouseButtonRelease, 
-                               geom.center(), 
-                               Qt::LeftButton, 0, 0);
-    QApplication::sendEvent(object, &button_release);
+    // activate the action item
+    QKeyEvent keyDown(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
+    QKeyEvent keyUp(QEvent::KeyRelease, Qt::Key_Enter, Qt::NoModifier);
 
-    // TODO:  If mouse happens to be over where a menu shows up
-    //        the mouse messes up the activation of the menu item
-    
+    QApplication::sendEvent(object, &keyDown);
+    QApplication::sendEvent(object, &keyUp);
+
     return true;
     }
 
