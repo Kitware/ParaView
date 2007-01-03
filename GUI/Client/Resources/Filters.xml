@@ -90,15 +90,6 @@
   </Module>
 <!-- #endif -->
 
-
-
-
-
-
-
-
-
-
   <Module name="Balance"
           root_name="Balance" module_type="Filter"
           multiprocess_support="multiple_processes">
@@ -2591,6 +2582,20 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
           root_name="LScalars"
           module_type="Filter">
     <Filter class="vtkMultiGroupDataGroupIdScalars">
+      <Input name="Input"
+             class="vtkMultiGroupDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+  </Module>
+
+  <Module name="ExtractOneDataSet"
+          menu_name="Convert to Simple Dataset"
+          root_name="ConvToSimple"
+          module_type="Filter">
+    <Filter class="vtkMultiGroupDataExtractOne">
       <Input name="Input"
              class="vtkMultiGroupDataSet"/>
     </Filter>
