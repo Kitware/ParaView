@@ -79,6 +79,9 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
 {
   this->ConnectionID = connectionID;
   this->Options = options;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SynchronizeServerClientOptions(this->ConnectionID);
+
   this->CreateRenderModule();
   this->setType(pqPipelineModel::Server);
 }
