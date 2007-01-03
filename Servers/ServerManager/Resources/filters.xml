@@ -4242,6 +4242,26 @@ This filter uses colors to show levels of a hiearchical dataset.
     <!-- End ReductionFilter -->
     </SourceProxy>
 
+   <SourceProxy name="ExtractOneDataSet" class="vtkMultiGroupDataExtractOne">
+     <Documentation
+        long_help="This filter extracts the first dataset from a composite dataset and produces a simple dataset as output. Use this filter before filters that do not work with composite datasets"
+        short_help="Convert to simple dataset.">
+This filter extracts a range of groups from a multigroup dataset    
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkMultiGroupDataSet"/>
+           </DataTypeDomain>
+     </InputProperty>
+   <!-- End ExtractOneDataSet -->
+   </SourceProxy>
+
    <SourceProxy name="ExtractLevel" class="vtkMultiGroupDataExtractGroup">
      <Documentation
         long_help="This filter extracts a range of groups from a multigroup dataset."

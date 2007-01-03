@@ -39,6 +39,7 @@ SET(Filters_SRCS
   vtkMultiActorHelper.cxx
   vtkMultiBlockExtractSelection.cxx
   vtkMultiDisplayManager.cxx
+  vtkMultiGroupDataExtractOne.cxx
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
   vtkPhastaReader.cxx
