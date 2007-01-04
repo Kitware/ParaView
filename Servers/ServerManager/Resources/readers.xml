@@ -2046,6 +2046,9 @@
                          information_only="1">
         <SimpleIntInformationHelper/>
       </IntVectorProperty>
+      <DoubleVectorProperty name="TimestepValues" information_only="1">
+       <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
       <IntVectorProperty name="TimeStep" 
                          command="SetTimeStep" 
                          number_of_elements="1" 
