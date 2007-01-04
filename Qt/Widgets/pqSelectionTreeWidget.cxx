@@ -38,6 +38,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include <QHeaderView>
 
+// enum for different pixmap types
+enum pqSelectionTreeWidgetPixmap
+{
+  pqCheck               = 0,
+  pqPartialCheck        = 1,
+  pqUnCheck             = 2,
+  
+  // All active states in lower half
+  pqCheck_Active        = 3,
+  pqPartialCheck_Active = 4,
+  pqUnCheck_Active      = 5,
+ 
+  pqMaxCheck            = 6
+};
+
+// array of style corresponding with the pqSelectionTreeWidgetPixmap enum
+static const QStyle::State pqSelectionTreeWidgetPixmapStyle[] =
+{
+  QStyle::State_On | QStyle::State_Enabled,
+  QStyle::State_NoChange | QStyle::State_Enabled,
+  QStyle::State_Off | QStyle::State_Enabled,
+  QStyle::State_On | QStyle::State_Enabled | QStyle::State_Active,
+  QStyle::State_NoChange | QStyle::State_Enabled | QStyle::State_Active,
+  QStyle::State_Off | QStyle::State_Enabled | QStyle::State_Active
+};
+
+QPixmap pqSelectionTreeWidget::pixmap(Qt::CheckState state, bool active)
+{
+  int offset = active ? pqMaxCheck/2 : 0;
+  switch(state)
+    {
+  case Qt::Checked:
+    return *this->CheckPixmaps[offset + pqCheck];
+  case Qt::Unchecked:
+    return *this->CheckPixmaps[offset + pqUnCheck];
+  case Qt::PartiallyChecked:
+    return *this->CheckPixmaps[offset + pqPartialCheck];
+    }
+  return QPixmap();
+}
+
 pqSelectionTreeWidget::pqSelectionTreeWidget(QWidget* p)
   : QTreeWidget(p)
 {
@@ -45,30 +86,22 @@ pqSelectionTreeWidget::pqSelectionTreeWidget(QWidget* p)
   QRect r = this->style()->subElementRect(QStyle::SE_CheckBoxIndicator, 
                                           &option, this);
   option.rect = QRect(QPoint(0,0), r.size());
-  
-  this->CheckPixmap = new QPixmap(r.size());
-  this->CheckPixmap->fill(QColor(0,0,0,0));
-  QPainter painter1(this->CheckPixmap);
-  option.state = QStyle::State_On | QStyle::State_Enabled;
-  this->style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, 
-                       &painter1, this);
-  
-  this->PartialCheckPixmap = new QPixmap(r.size());
-  this->PartialCheckPixmap->fill(QColor(0,0,0,0));
-  QPainter painter2(this->PartialCheckPixmap);
-  option.state = QStyle::State_NoChange | QStyle::State_Enabled;
-  this->style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, 
-                       &painter2, this);
 
-  this->UnCheckPixmap = new QPixmap(r.size());
-  this->UnCheckPixmap->fill(QColor(0,0,0,0));
-  QPainter painter3(this->UnCheckPixmap);
-  option.state = QStyle::State_Off | QStyle::State_Enabled;
-  this->style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, 
-                       &painter3, this);
+  this->CheckPixmaps = new QPixmap*[6];
+  for(int i=0; i<pqMaxCheck; i++)
+    {
+    this->CheckPixmaps[i] = new QPixmap(r.size());
+    this->CheckPixmaps[i]->fill(QColor(0,0,0,0));
+    QPainter painter(this->CheckPixmaps[i]);
+    option.state = pqSelectionTreeWidgetPixmapStyle[i];
+    
+    this->style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, 
+                         &painter, this);
+    }
   
   this->headerItem()->setCheckState(0, Qt::Checked);
-  this->headerItem()->setData(0, Qt::DecorationRole, *this->CheckPixmap);
+  this->headerItem()->setData(0, Qt::DecorationRole, 
+                              pixmap(Qt::Checked, this->hasFocus()));
 
   QObject::connect(this->header(), SIGNAL(sectionClicked(int)),
                    this, SLOT(doToggle(int)),
@@ -79,9 +112,25 @@ pqSelectionTreeWidget::pqSelectionTreeWidget(QWidget* p)
 
 pqSelectionTreeWidget::~pqSelectionTreeWidget()
 {
-  delete this->CheckPixmap;
-  delete this->UnCheckPixmap;
-  delete this->PartialCheckPixmap;
+  for(int i=0; i<pqMaxCheck; i++)
+    {
+    delete this->CheckPixmaps[i];
+    }
+  delete [] this->CheckPixmaps;
+}
+
+bool pqSelectionTreeWidget::event(QEvent* e)
+{
+  if(e->type() == QEvent::FocusIn ||
+     e->type() == QEvent::FocusOut)
+    {
+    Qt::CheckState state = this->checkState();
+    bool active = e->type() == QEvent::FocusIn;
+    this->headerItem()->setData(0, Qt::DecorationRole, 
+                              pixmap(state, active));
+    }
+
+  return Superclass::event(e);
 }
 
 void pqSelectionTreeWidget::dataChanged(const QModelIndex& topLeft,
@@ -115,18 +164,8 @@ void pqSelectionTreeWidget::updateCheckState()
   if(newState != oldState)
     {
     this->headerItem()->setCheckState(0, newState);
-    switch(newState)
-      {
-    case Qt::Checked:
-      this->headerItem()->setData(0, Qt::DecorationRole, *this->CheckPixmap);
-      break;
-    case Qt::Unchecked:
-      this->headerItem()->setData(0, Qt::DecorationRole, *this->UnCheckPixmap);
-      break;
-    case Qt::PartiallyChecked:
-      this->headerItem()->setData(0, Qt::DecorationRole, *this->PartialCheckPixmap);
-      break;
-      }
+    this->headerItem()->setData(0, Qt::DecorationRole, 
+                                pixmap(newState, this->hasFocus()));
     }
 }
 
@@ -168,6 +207,7 @@ void pqSelectionTreeWidget::doToggle(int column)
       }
     else
       {
+      // both unchecked and partial checked go here
       this->allOn();
       }
     }

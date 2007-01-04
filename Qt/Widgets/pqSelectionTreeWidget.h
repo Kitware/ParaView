@@ -36,8 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtWidgetsExport.h"
 #include <QTreeWidget>
 
-class QPixmap;
-
 /**
   Provides a QTreeWidget with a pre-defined column zero for checking items
 */
@@ -51,6 +49,8 @@ public:
   ~pqSelectionTreeWidget();
 
   Qt::CheckState checkState() const;
+
+  bool event(QEvent* e);
   
 public slots:
   void allOn();
@@ -62,9 +62,8 @@ protected slots:
   void updateCheckState();
 
 protected:
-  QPixmap* CheckPixmap;
-  QPixmap* PartialCheckPixmap;
-  QPixmap* UnCheckPixmap;
+  QPixmap** CheckPixmaps;
+  QPixmap pixmap(Qt::CheckState state, bool active);
 };
 
 #endif // !_pqSelectionTreeWidget_h
