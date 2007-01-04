@@ -1,4 +1,5 @@
 <ServerManagerConfiguration>
+
   <ProxyGroup name="sources">
 
    <SourceProxy name="DEMReader" 
@@ -169,7 +170,7 @@
         name="NewDataAvailable"
         command="NewDataAvailable"
         number_of_elements="1"
-		    default_values="2" 
+                    default_values="2" 
         information_only="1">
         <SimpleIntInformationHelper/>
      </IntVectorProperty>
