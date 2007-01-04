@@ -64,10 +64,10 @@ static const QStyle::State pqSelectionTreeWidgetPixmapStyle[] =
   QStyle::State_Off | QStyle::State_Enabled | QStyle::State_Active
 };
 
-QPixmap pqSelectionTreeWidget::pixmap(Qt::CheckState state, bool active)
+QPixmap pqSelectionTreeWidget::pixmap(Qt::CheckState cs, bool active)
 {
   int offset = active ? pqMaxCheck/2 : 0;
-  switch(state)
+  switch(cs)
     {
   case Qt::Checked:
     return *this->CheckPixmaps[offset + pqCheck];
@@ -124,10 +124,10 @@ bool pqSelectionTreeWidget::event(QEvent* e)
   if(e->type() == QEvent::FocusIn ||
      e->type() == QEvent::FocusOut)
     {
-    Qt::CheckState state = this->checkState();
+    Qt::CheckState cs = this->checkState();
     bool active = e->type() == QEvent::FocusIn;
     this->headerItem()->setData(0, Qt::DecorationRole, 
-                              pixmap(state, active));
+                              pixmap(cs, active));
     }
 
   return Superclass::event(e);
