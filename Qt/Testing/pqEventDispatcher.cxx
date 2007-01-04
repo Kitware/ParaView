@@ -30,12 +30,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqEventDispatcher.h"
+
+#ifdef Q_OS_WIN
+#include <windows.h> // for Sleep
+#endif
+#ifdef Q_OS_UNIX
+#include <time.h>
+#endif
+
 #include "pqEventPlayer.h"
 #include "pqEventSource.h"
-#include "pqEventDispatcher.h"
 
 #include <QAbstractEventDispatcher>
 #include <QtDebug>
+#include <QTime>
 #include <QTimer>
 #include <QApplication>
 
@@ -47,22 +56,27 @@ class pqEventDispatcher::pqImplementation
 public:
   pqImplementation() :
     Source(0),
-    Player(0)
+    Player(0),
+    EventState(FlushEvents)
   {
-#if defined(Q_WS_MAC)
-  // for the Mac, work around a Qt bug by using a timer 
-  // (should be fixed in Qt 4.3.0)
-    this->Timer.setInterval(1);
     this->Timer.setSingleShot(true);
-#endif
   }
   
   pqEventSource* Source;
   pqEventPlayer* Player;
-#if defined(Q_WS_MAC)
   QTimer Timer;
-#endif
+  enum EventStates
+    {
+    FlushEvents,
+    DoEvent,
+    Done
+    };
+  int EventState;
+
+  static int WaitTime;
 };
+
+int pqEventDispatcher::pqImplementation::WaitTime = 0;
 
 ////////////////////////////////////////////////////////////////////////////
 // pqEventDispatcher
@@ -72,6 +86,9 @@ pqEventDispatcher::pqEventDispatcher() :
 {
   QObject::connect(this, SIGNAL(readyPlayNextEvent()),
                    this, SLOT(playNextEvent()));
+
+  QObject::connect(&this->Implementation->Timer, SIGNAL(timeout()),
+                   this, SLOT(checkPlayNextEvent()));
 }
 
 pqEventDispatcher::~pqEventDispatcher()
@@ -92,27 +109,42 @@ void pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
     
   QApplication::setEffectEnabled(Qt::UI_General, false);
 
-#if defined(Q_WS_MAC)
-  QObject::connect(
-    QAbstractEventDispatcher::instance(),
-    SIGNAL(aboutToBlock()),
-    &this->Implementation->Timer,
-    SLOT(start()));
-  
-  QObject::connect(
-    &this->Implementation->Timer,
-    SIGNAL(timeout()),
-    this,
-    SIGNAL(readyPlayNextEvent()));
-#else
-  QObject::connect(
-    QAbstractEventDispatcher::instance(),
-    SIGNAL(aboutToBlock()),
-    this,
-    SIGNAL(readyPlayNextEvent()),
-    Qt::QueuedConnection);
-#endif
+  this->Implementation->Timer.setInterval(1);
+  this->Implementation->Timer.start();
+  this->Implementation->EventState = pqImplementation::FlushEvents;
+  this->Implementation->WaitTime = 0;
 }
+
+void pqEventDispatcher::checkPlayNextEvent()
+{
+  if(this->Implementation->EventState == pqImplementation::Done)
+    {
+    return;
+    }
+    
+  this->Implementation->Timer.setInterval(1);
+
+  // do an event every other time through here to be sure events are processed
+  if(this->Implementation->EventState == pqImplementation::DoEvent)
+    {
+    pqEventDispatcher::processEventsAndWait(1);
+    this->Implementation->EventState = pqImplementation::FlushEvents;
+    this->Implementation->Timer.start();
+    emit this->readyPlayNextEvent();
+    }
+  else if(!this->Implementation->WaitTime)
+    {
+    pqEventDispatcher::processEventsAndWait(1);
+    this->Implementation->EventState = pqImplementation::DoEvent;
+    this->Implementation->Timer.start();
+    }
+  else
+    {
+    this->Implementation->Timer.setInterval(this->Implementation->WaitTime);
+    this->Implementation->Timer.start();
+    }
+}
+
   
 void pqEventDispatcher::playNextEvent()
 {
@@ -158,25 +190,8 @@ void pqEventDispatcher::playNextEvent()
 
 void pqEventDispatcher::stopPlayback()
 {
-#if defined(Q_WS_MAC)
-  QObject::disconnect(
-    QAbstractEventDispatcher::instance(),
-    SIGNAL(aboutToBlock()),
-    &this->Implementation->Timer,
-    SLOT(start()));
-  
-  QObject::disconnect(
-    &this->Implementation->Timer,
-    SIGNAL(timeout()),
-    this,
-    SIGNAL(readyPlayNextEvent()));
-#else
-  QObject::disconnect(
-    QAbstractEventDispatcher::instance(),
-    SIGNAL(aboutToBlock()),
-    this,
-    SIGNAL(readyPlayNextEvent()));
-#endif
+  this->Implementation->Timer.stop();
+  this->Implementation->EventState = pqImplementation::Done;
   
   this->Implementation->Source->stop();
     
@@ -185,5 +200,25 @@ void pqEventDispatcher::stopPlayback()
   
   // ensure that everything is completed
   QCoreApplication::processEvents();
+}
+
+void pqEventDispatcher::processEventsAndWait(int ms)
+{
+  pqEventDispatcher::pqImplementation::WaitTime = ms <= 0 ? 1 : ms;
+  QTime timer;
+  timer.start();
+  do {
+    QCoreApplication::processEvents(QEventLoop::AllEvents, ms);
+#ifdef Q_OS_WIN
+    Sleep(uint(10));
+#else
+    struct timespec ts = { 10 / 1000, (10 % 1000) * 1000 * 1000 };
+    nanosleep(&ts, NULL);
+#endif
+
+  } while (timer.elapsed() < ms);
+  
+  pqEventDispatcher::pqImplementation::WaitTime = 0;
+
 }
 

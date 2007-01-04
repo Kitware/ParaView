@@ -32,15 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetEventPlayer.h"
 
-#ifdef Q_OS_WIN
-#include <windows.h> // for Sleep
-#endif
-#ifdef Q_OS_UNIX
-#include <time.h>
-#endif
-
 #include <QCoreApplication>
-#include <QTime>
   
 pqWidgetEventPlayer::pqWidgetEventPlayer(QObject* p) 
   : QObject(p)  
@@ -51,19 +43,4 @@ pqWidgetEventPlayer::~pqWidgetEventPlayer()
 {
 }
 
-void pqWidgetEventPlayer::wait(int ms)
-{
-  QTime timer;
-  timer.start();
-  do {
-    QCoreApplication::processEvents(QEventLoop::AllEvents, ms);
-#ifdef Q_OS_WIN
-    Sleep(uint(10));
-#else
-    struct timespec ts = { 10 / 1000, (10 % 1000) * 1000 * 1000 };
-    nanosleep(&ts, NULL);
-#endif
-
-  } while (timer.elapsed() < ms);
-}
 

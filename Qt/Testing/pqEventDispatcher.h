@@ -57,6 +57,10 @@ public:
   to indicate that playback has finished. */
   void playEvents(pqEventSource& source, pqEventPlayer& player);
 
+  /** Wait function provided for players that need to wait for the GUI
+      to perform a certain action */
+  static void processEventsAndWait(int ms);
+
 signals:
   void succeeded();
   void failed();
@@ -64,6 +68,7 @@ signals:
 
 private slots:
   void playNextEvent();
+  void checkPlayNextEvent();
 
 private:
   void stopPlayback();

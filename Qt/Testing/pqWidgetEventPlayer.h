@@ -61,10 +61,6 @@ public:
     const QString& Arguments,
     bool& Error) = 0;
 
-  /** Wait function provided for players that need to wait for the GUI
-      to perform a certain action */
-  static void wait(int ms);
-
 };
 
 #endif // !_pqWidgetEventPlayer_h

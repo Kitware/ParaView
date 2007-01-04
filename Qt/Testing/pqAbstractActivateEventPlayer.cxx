@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QtDebug>
 
+#include "pqEventDispatcher.h"
+
 pqAbstractActivateEventPlayer::pqAbstractActivateEventPlayer(QObject * p)
   : pqWidgetEventPlayer(p)
 {
@@ -107,7 +109,7 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
         menu_bar->setActiveAction(next->menuAction());
         while(!next->isVisible())
           {
-          this->wait(100);
+          pqEventDispatcher::processEventsAndWait(100);
           }
         }
       else if(QMenu* menu = qobject_cast<QMenu*>(p))
@@ -119,7 +121,7 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
                                  Qt::LeftButton, Qt::LeftButton, 0);
         QApplication::sendEvent(menu, &button_press);
         // process events before mouse up to help our sub menu show up
-        QCoreApplication::processEvents();  
+        pqEventDispatcher::processEventsAndWait(0);
         
         QMouseEvent button_release(QEvent::MouseButtonRelease, 
                                    geom.center(), 
@@ -131,7 +133,7 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
         
         while(!next->isVisible())
           {
-          this->wait(100);
+          pqEventDispatcher::processEventsAndWait(100);
           }
         }
       }

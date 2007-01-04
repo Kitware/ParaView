@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt testing includes
 #include "pqObjectNaming.h"
 #include "pqWidgetEventPlayer.h"
+#include "pqEventDispatcher.h"
 
 
 // TODO not have a global instance pointer?
@@ -216,7 +217,7 @@ QtTesting_wait(PyObject* /*self*/, PyObject* args)
     return NULL;
     }
 
-  pqWidgetEventPlayer::wait(ms);
+  pqEventDispatcher::processEventsAndWait(ms);
 
   return Py_BuildValue(const_cast<char*>(""));
 }
