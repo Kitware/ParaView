@@ -60,7 +60,7 @@ pqProxy::pqProxy(const QString& group, const QString& name,
   Proxy(proxy)
 {
   this->Internal = new pqProxyInternal;
-
+  this->Modified = false;
 }
 
 pqProxy::~pqProxy()
@@ -171,6 +171,16 @@ void pqProxy::rename(const QString& newname)
     pxm->UnRegisterProxy(this->getSMGroup().toAscii().data(),
       this->getSMName().toAscii().data(), this->getProxy());
     this->SMName = newname;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxy::setModified(bool modified)
+{
+  if(modified != this->Modified)
+    {
+    this->Modified = modified;
+    emit this->modifiedStateChanged(this);
     }
 }
 

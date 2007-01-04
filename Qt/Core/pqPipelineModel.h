@@ -51,6 +51,7 @@ class pqGenericViewModule;
 class pqServer;
 class pqServerManagerModel;
 class pqServerManagerModelItem;
+class QFont;
 class QPixmap;
 
 
@@ -212,6 +213,11 @@ public:
   /// \param item The root of the subtree.
   /// \param selectable True if the items can be selected.
   void setSubtreeSelectable(pqServerManagerModelItem *item, bool selectable);
+
+  /// \brief
+  ///   Sets the font hint for modified items.
+  /// \param font The font to use for modified items.
+  void setModifiedFont(const QFont &font);
   //@}
 
 public slots:
@@ -386,6 +392,11 @@ private:
   ///   render module.
   /// \param module The modified render module.
   void updateDisplays(pqGenericViewModule *module);
+
+  /// \brief
+  ///   Notifies the view that the input link items have changed.
+  /// \param sink The modified item.
+  void updateInputLinks(pqPipelineModelFilter *sink, int column=0);
 
   /// \brief
   ///   Gets the pipeline model item for the server manager model item.

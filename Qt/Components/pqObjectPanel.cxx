@@ -85,7 +85,7 @@ pqObjectPanel::pqObjectPanel(pqProxy* object_proxy, QWidget* p) :
   QObject::connect(this->Implementation->PropertyManager,
                    SIGNAL(canAcceptOrReject(bool)),
                    this,
-                   SIGNAL(canAcceptOrReject(bool)));
+                   SLOT(updateProxyModified(bool)));
 
   this->Implementation->Proxy->getProxy()->UpdateVTKObjects();
   vtkSMSourceProxy* sp;
@@ -193,3 +193,15 @@ void pqObjectPanel::setRenderModule(pqRenderViewModule* rm)
   this->Implementation->RenderModule = rm;
   emit this->renderModuleChanged(this->Implementation->RenderModule);
 }
+
+void pqObjectPanel::modified()
+{
+  this->updateProxyModified(true);
+}
+
+void pqObjectPanel::updateProxyModified(bool mod)
+{
+  this->Implementation->Proxy->setModified(mod);
+  emit this->canAcceptOrReject(true);
+}
+

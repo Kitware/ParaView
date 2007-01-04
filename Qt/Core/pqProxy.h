@@ -95,9 +95,23 @@ public:
   /// Returns a list of all the internal proxies added with a given key.
   QList<vtkSMProxy*> getInternalProxies(const QString& key) const;
 
+  /// \brief
+  ///   Gets whether or not the source has been modified.
+  /// \return
+  ///   True if the source has been modified.
+  bool isModified() const {return this->Modified;}
+
+  /// \brief
+  ///   Sets whether or not the source has been modified.
+  /// \param modified True if the source has been modified.
+  void setModified(bool modified);
+
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);
+
+  /// Fired when the modified status changes for the proxy.
+  void modifiedStateChanged(pqServerManagerModelItem*);
 
 protected:
   /// Concept of internal proxies:
@@ -121,6 +135,7 @@ private:
   QString SMGroup;
   vtkSmartPointer<vtkSMProxy> Proxy;
   pqProxyInternal* Internal;
+  bool Modified;
 };
 
 #endif

@@ -83,8 +83,14 @@ public slots:
   /// Set the render module that this panel works with
   void setRenderModule(pqRenderViewModule*);
 protected slots:
-  // fires canAcceptOrReject(true).
-  void modified() { emit this->canAcceptOrReject(true); };
+  /// Fires canAcceptOrReject(true).
+  void modified();
+
+  /// \brief
+  ///   Updates the proxy's modified status.
+  /// \param mod True if the proxy has been modified.
+  void updateProxyModified(bool mod);
+
 signals:
   void canAcceptOrReject(bool);
   void onaccept();

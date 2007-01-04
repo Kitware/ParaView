@@ -149,6 +149,12 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   this->TreeView->getHeader()->moveSection(1, 0);
   this->TreeView->setSelectionMode(pqFlatTreeView::ExtendedSelection);
 
+  // Use the tree view's font as the base for the model's modified
+  // font.
+  QFont modifiedFont = this->TreeView->font();
+  modifiedFont.setBold(true);
+  this->ListModel->setModifiedFont(modifiedFont);
+
   // Listen to the selection change signals.
   connect(this->TreeView->getSelectionModel(),
       SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),

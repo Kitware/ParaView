@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
 
+#include <QFont>
 #include <QIcon>
 #include <QList>
 #include <QMap>
@@ -75,6 +76,7 @@ public:
   virtual VisibleState getVisibleState(pqGenericViewModule *module) const=0;
   virtual bool isSelectable() const {return true;}
   virtual void setSelectable(bool selectable)=0;
+  virtual bool isModified() const=0;
   virtual pqPipelineModelItem *getParent() const=0;
   virtual pqServerManagerModelItem *getObject() const=0;
   virtual int getChildCount() const=0;
@@ -104,6 +106,7 @@ public:
       pqGenericViewModule *module) const;
   virtual bool isSelectable() const {return this->Selectable;}
   virtual void setSelectable(bool selectable) {this->Selectable = selectable;}
+  virtual bool isModified() const {return false;}
   virtual pqPipelineModelItem *getParent() const {return 0;}
   virtual pqServerManagerModelItem *getObject() const {return this->Server;}
   virtual int getChildCount() const {return this->Sources.size();}
@@ -151,6 +154,7 @@ public:
       pqGenericViewModule *module) const;
   virtual bool isSelectable() const {return this->Selectable;}
   virtual void setSelectable(bool selectable) {this->Selectable = selectable;}
+  virtual bool isModified() const;
   virtual pqPipelineModelItem *getParent() const {return this->getServer();}
   virtual pqServerManagerModelItem *getObject() const {return this->Source;}
   virtual int getChildCount() const {return this->Outputs.size();}
@@ -201,6 +205,7 @@ public:
       pqGenericViewModule *module) const;
   virtual bool isSelectable() const;
   virtual void setSelectable(bool selectable);
+  virtual bool isModified() const;
   virtual pqPipelineModelItem *getParent() const {return this->Source;}
   virtual pqServerManagerModelItem *getObject() const;
   virtual int getChildCount() const {return 0;}
@@ -242,6 +247,7 @@ public:
   QMap<pqServerManagerModelItem *, QPointer<pqPipelineModelItem> > ItemMap;
   pqGenericViewModule *RenderModule;
   pqServer *CleanupServer;
+  QFont Modified;
 };
 
 
@@ -384,6 +390,16 @@ pqPipelineModelItem::VisibleState pqPipelineModelSource::getVisibleState(
   return state;
 }
 
+bool pqPipelineModelSource::isModified() const
+{
+  if(this->Source)
+    {
+    return this->Source->isModified();
+    }
+
+  return false;
+}
+
 int pqPipelineModelSource::getChildIndex(pqPipelineModelItem *item) const
 {
   pqPipelineModelObject *object =
@@ -499,6 +515,16 @@ void pqPipelineModelLink::setSelectable(bool)
 {
 }
 
+bool pqPipelineModelLink::isModified() const
+{
+  if(this->Sink)
+    {
+    return this->Sink->isModified();
+    }
+
+  return false;
+}
+
 pqServerManagerModelItem *pqPipelineModelLink::getObject() const
 {
   if(this->Sink)
@@ -512,10 +538,12 @@ pqServerManagerModelItem *pqPipelineModelLink::getObject() const
 
 //-----------------------------------------------------------------------------
 pqPipelineModelInternal::pqPipelineModelInternal()
-  : Servers(), ItemMap()
+  : Servers(), ItemMap(), Modified()
 {
   this->RenderModule = 0;
   this->CleanupServer = 0;
+
+  this->Modified.setBold(true);
 }
 
 
@@ -722,6 +750,15 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
 
           break;
           }
+        case Qt::FontRole:
+          {
+          if(idx.column() == 0 && item->isModified())
+            {
+            return qVariantFromValue<QFont>(this->Internal->Modified);
+            }
+
+          break;
+          }
         }
       }
     }
@@ -804,6 +841,10 @@ void pqPipelineModel::setSubtreeSelectable(pqServerManagerModelItem *item,
     modelItem->setSelectable(selectable);
     modelItem = this->getNextModelItem(modelItem, root);
     }
+}
+
+void pqPipelineModel::setModifiedFont(const QFont &font)
+{
 }
 
 void pqPipelineModel::addServer(pqServer *server)
@@ -1111,12 +1152,15 @@ void pqPipelineModel::removeConnection(pqPipelineSource *source,
 
 void pqPipelineModel::updateItemName(pqServerManagerModelItem *item)
 {
-  // TODO: If the item is a fan in point, update the link items.
-  // The name is in column 0 so the getIndexFor method will work.
-  QModelIndex changed = this->getIndexFor(item);
-  if(changed.isValid())
+  pqPipelineModelItem *modelItem = this->getModelItemFor(item);
+  if(modelItem)
     {
+    // Update the name column.
+    QModelIndex changed = this->makeIndex(modelItem, 0);
     emit this->dataChanged(changed, changed);
+
+    // If the item is a fan in point, update the link items.
+    this->updateInputLinks(dynamic_cast<pqPipelineModelFilter *>(modelItem));
     }
 }
 
@@ -1131,7 +1175,8 @@ void pqPipelineModel::updateDisplays(pqPipelineSource *source,
     emit this->dataChanged(changed, changed);
 
     // TODO: Update the column with the display list.
-    // TODO: If the item is a fan in point, update the link items.
+    // If the item is a fan in point, update the link items.
+    this->updateInputLinks(dynamic_cast<pqPipelineModelFilter *>(source), 1);
     }
 }
 
@@ -1384,7 +1429,28 @@ void pqPipelineModel::updateDisplays(pqGenericViewModule *module)
         {
         changed = this->makeIndex(item, 1);
         emit this->dataChanged(changed, changed);
-        // TODO: If the item is a fan in point, update the link items.
+
+        // If the item is a fan in point, update the link items.
+        this->updateInputLinks(dynamic_cast<pqPipelineModelFilter *>(item), 1);
+        }
+      }
+    }
+}
+
+void pqPipelineModel::updateInputLinks(pqPipelineModelFilter *sink, int column)
+{
+  if(sink && sink->getInputs().size() > 1)
+    {
+    QList<pqPipelineModelSource *>::Iterator source =
+        sink->getInputs().begin();
+    for( ; source != sink->getInputs().end(); ++source)
+      {
+      pqPipelineModelLink *link = dynamic_cast<pqPipelineModelLink *>(
+          (*source)->getChild((*source)->getChildIndex(sink)));
+      if(link)
+        {
+        QModelIndex changed = this->makeIndex(link, column);
+        emit this->dataChanged(changed, changed);
         }
       }
     }

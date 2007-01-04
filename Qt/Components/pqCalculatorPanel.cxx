@@ -481,11 +481,6 @@ void pqCalculatorPanel::variableChosen(QAction* a)
     }
 }
 
-void pqCalculatorPanel::modified()
-{
-  emit this->canAcceptOrReject(true);
-}
-
 void pqCalculatorPanel::disableResults(bool e)
 {
   this->Internal->ResultArrayName->setEnabled(!e);

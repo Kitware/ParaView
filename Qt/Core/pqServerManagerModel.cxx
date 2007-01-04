@@ -282,6 +282,10 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
     {
     pqSource = new pqPipelineSource(name, source, server, this);
     }
+
+  // Mark the new object as modified since the user has to hit the
+  // accept button after creating the proxy.
+  pqSource->setModified(true);
   
   //// Set a nice label for the source, since registration names
   //// in ParaView are nothing but IDs which are merely numbers.
@@ -310,6 +314,9 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
     SIGNAL(displayRemoved(pqPipelineSource*, pqConsumerDisplay*)),
     this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqConsumerDisplay*)));
   this->connect(pqSource, SIGNAL(nameChanged(pqServerManagerModelItem*)), 
+    this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
+  this->connect(
+    pqSource, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
     this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
 
   emit this->preSourceAdded(pqSource);

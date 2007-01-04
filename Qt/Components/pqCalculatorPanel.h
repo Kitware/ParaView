@@ -62,8 +62,6 @@ protected slots:
   void variableChosen(QAction* a);
   void disableResults(bool);
 
-  void modified();
-
 protected:
   class pqInternal;
   pqInternal* Internal;
