@@ -27,16 +27,16 @@
                     trace_name="CellSelection"/>
   </Module>
   <Module name="RTXMLPolyDataReader"
-			root_name="RTXMLPolyDataReader"
-			class="vtkPVAdvancedReaderModule"
-			module_type="Reader"
-			extensions=".vtpr"
-			file_description="Real Time VTK PolyData Files">
-		<Source class="vtkRTXMLPolyDataReader"/>
+                        root_name="RTXMLPolyDataReader"
+                        class="vtkPVAdvancedReaderModule"
+                        module_type="Reader"
+                        extensions=".vtpr"
+                        file_description="Real Time VTK PolyData Files">
+                <Source class="vtkRTXMLPolyDataReader"/>
     <StringEntry property="Location"
                         label="Data Location"
-		        default_value="xyz" 
-		        trace_name="location"
+                        default_value="xyz" 
+                        trace_name="location"
                         help="Set the data directory containing real time data files." />
   </Module>
   <Module name="XMLUnstructuredGridReader"
@@ -357,6 +357,129 @@
                    help="Turn this ON if you plan to write Exodus or EnSight files"/>
     <BasicDSPFilterWidget trace_name="Apply basic time filtering"
                       help="Apply basic time filtering"/>
+  </Module>
+  <Module name="ExodusIIReader"
+          root_name="ExodusIIReader"
+          output="vtkUnstructuredGrid"
+          class="vtkPVAdvancedReaderModule"
+          module_type="Reader"
+          extensions=".exii"
+          file_description="ExodusII">
+    <Source class="vtkExodusIIReader"/>
+
+    <StringEntry property="XMLFileName"
+                 label="XML File"
+                 trace_name="xml_file"
+                 help="An XML file containing part and material descriptions and mapping to element blocks." />
+
+
+    <Scale property="TimeStep"
+           label="Time step" trace_name="TimeStep"
+           keeps_timesteps="1"
+           help="Set the current timestep."/>
+
+    <!--  Result variables defined over nodes and blocks -->
+    <ArraySelection trace_name="point_array_sel"
+                    property="PointResultArrayStatus"
+                    label_text="Node Variables" />
+    <ArraySelection trace_name="edge_array_sel"
+                    property="EdgeResultArrayStatus"
+                    label_text="Edge Variables" />
+    <ArraySelection trace_name="face_array_sel"
+                    property="FaceResultArrayStatus"
+                    label_text="Face Variables" />
+    <ArraySelection trace_name="cell_array_sel"
+                    property="ElementResultArrayStatus"
+                    label_text="Element Variables" />
+
+    <!--  Block status -->
+    <ArraySelection trace_name="block_sel"
+                    property="ElementBlockArrayStatus"
+                    label_text="ElementBlocks"/>
+    <ArraySelection trace_name="fblock_sel"
+                    property="FaceBlockArrayStatus"
+                    label_text="FaceBlocks"/>
+    <ArraySelection trace_name="eblock_sel"
+                    property="EdgeBlockArrayStatus"
+                    label_text="EdgeBlocks"/>
+
+    <!--  Set status and Result variables defined over sets -->
+    <ArraySelection trace_name="elem_set_sel"
+                    property="ElementSetArrayStatus"
+                    label_text="Element Sets" />
+    <ArraySelection trace_name="elem_set_res_sel"
+                    property="ElementSetResultArrayStatus"
+                    label_text="Element Set Results" />
+
+    <ArraySelection trace_name="side_set_sel"
+                    property="SideSetArrayStatus"
+                    label_text="Side Sets" />
+    <ArraySelection trace_name="side_set_res_sel"
+                    property="SideSetResultArrayStatus"
+                    label_text="Side Set Results" />
+
+    <ArraySelection trace_name="face_set_sel"
+                    property="FaceSetArrayStatus"
+                    label_text="Face Sets" />
+    <ArraySelection trace_name="face_set_res_sel"
+                    property="FaceSetResultArrayStatus"
+                    label_text="Face Set Results" />
+
+    <ArraySelection trace_name="edge_set_sel"
+                    property="EdgeSetArrayStatus"
+                    label_text="Edge Sets" />
+    <ArraySelection trace_name="edge_set_res_sel"
+                    property="EdgeSetResultArrayStatus"
+                    label_text="Edge Set Results" />
+
+    <ArraySelection trace_name="node_set_sel"
+                    property="NodeSetArrayStatus"
+                    label_text="Node Sets" />
+    <ArraySelection trace_name="node_set_res_sel"
+                    property="NodeSetResultArrayStatus"
+                    label_text="Node Set Results" />
+
+    <!-- Maps -->
+    <ArraySelection trace_name="node_map_sel"
+                    property="NodeMapArrayStatus"
+                    label_text="Node Maps" />
+    <ArraySelection trace_name="edge_map_sel"
+                    property="EdgeMapArrayStatus"
+                    label_text="Edge Maps" />
+    <ArraySelection trace_name="face_map_sel"
+                    property="FaceMapArrayStatus"
+                    label_text="Face Maps" />
+    <ArraySelection trace_name="elem_map_sel"
+                    property="ElementMapArrayStatus"
+                    label_text="Element Maps" />
+
+    <LabeledToggle label="Apply Displacements"
+                   property="ApplyDisplacements"
+                   trace_name="apply_displacements"
+                   help="Select whether the reader automatically applies displacements"/>
+    <VectorEntry label="Displacement Scale"
+                 trace_name="DisplacementMagnitude"
+                 property="DisplacementMagnitude"
+                 type="float"
+                 help="The magnitude of the applied displacement."/>
+
+    <LabeledToggle label="Object Ids"
+                   property="GenerateObjectIdCellArray"
+                   trace_name="object_ids"
+                   help="Select whether the reader generates object ids"/>
+
+    <LabeledToggle label="Global Node Ids"
+                   property="GenerateGlobalNodeIdArray"
+                   trace_name="global_node_ids"
+                   help="Select whether the reader generates global node ids"/>
+    <LabeledToggle label="Global Element Ids"
+                   property="GenerateGlobalElementIdArray"
+                   trace_name="global_element_ids"
+                   help="Select whether the reader generates global element ids"/>
+    <LabeledToggle label="Include metadata"
+                   property="ExodusModelMetadata"
+                   trace_name="metadata"
+                   help="Turn this ON if you plan to write Exodus or EnSight files"/>
   </Module>
     <Module name="byureader"
           class="vtkPVReaderModule" root_name="BYU"
@@ -853,3 +976,4 @@
   </Module>
 
 </ModuleInterfaces>
+
