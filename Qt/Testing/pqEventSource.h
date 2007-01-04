@@ -60,6 +60,9 @@ public:
       Returns true for valid file, false for invalid file */
   virtual void setContent(const QString& filename) = 0;
 
+  /** tell the source to stop feeding in events */
+  virtual void stop() {}
+
 };
 
 #endif // !_pqEventSource_h

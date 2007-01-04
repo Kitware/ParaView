@@ -41,32 +41,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEvent>
 #include <QApplication>
 
-namespace
-{
-  class pqPlayCommandEvent : public QEvent
-    {
-  public:
-    pqPlayCommandEvent(const QString& o, const QString& c, const QString& a)
-      : QEvent(QEvent::User),
-        Object(o),
-        Command(c),
-        Arguments(a)
-    {
-    }
-    QString Object;
-    QString Command;
-    QString Arguments;
-    };
-
-}
-
-
 class pqThreadedEventSource::pqInternal : public QThread
 {
   friend class pqThreadedEventSource;
 public:
   pqInternal(pqThreadedEventSource& source)
     : Source(source), 
+      ShouldStop(0),
       GotEvent(false)
     {
     }
@@ -81,6 +62,7 @@ public:
   QWaitCondition WaitCondition;
   QEventLoop Loop;
 
+  QAtomic ShouldStop;
   bool GotEvent;
   QString CurrentObject;
   QString CurrentCommand;
@@ -117,8 +99,8 @@ int pqThreadedEventSource::getNextEvent(
   command = this->Internal->CurrentCommand;
   arguments = this->Internal->CurrentArgument;
   this->Internal->GotEvent = false;
-  this->Internal->WaitCondition.wakeAll();
-
+  this->guiAcknowledge();
+  
   if(object == QString::null)
     {
     if(arguments == "failure")
@@ -144,7 +126,7 @@ void pqThreadedEventSource::relayEvent(QString object, QString command, QString 
 }
 
 
-void pqThreadedEventSource::postNextEvent(const QString& object,
+bool pqThreadedEventSource::postNextEvent(const QString& object,
                    const QString& command,
                    const QString& argument)
 {
@@ -155,13 +137,33 @@ void pqThreadedEventSource::postNextEvent(const QString& object,
                             Q_ARG(QString, command),
                             Q_ARG(QString, argument));
 
-  // wait for the GUI thread to take the event and wake us up
-  this->Internal->WaitCondition.wait(&mut);
+  return this->waitForGUI(mut);
 }
 
 void pqThreadedEventSource::start()
 {
   this->Internal->start();
+}
+
+void pqThreadedEventSource::stop()
+{
+  this->Internal->ShouldStop = 1;
+  this->guiAcknowledge();
+}
+
+bool pqThreadedEventSource::waitForGUI(QMutex& m)
+{
+  if(this->Internal->ShouldStop)
+    {
+    return false;
+    }
+  this->Internal->WaitCondition.wait(&m);
+  return !this->Internal->ShouldStop;
+}
+
+void pqThreadedEventSource::guiAcknowledge()
+{
+  this->Internal->WaitCondition.wakeAll();
 }
 
 void pqThreadedEventSource::done(int success)

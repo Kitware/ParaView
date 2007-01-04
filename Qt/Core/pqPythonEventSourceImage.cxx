@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QImage>
 #include <QWidget>
-#include <QWaitCondition>
 #include <QMutex>
 #include <QCoreApplication>
 #include <QEvent>
@@ -69,7 +68,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // since we have only one instance at a time
 static pqPythonEventSourceImage* Instance = 0;
-static QWaitCondition WaitForSnapshot;
 bool SnapshotResult = false;
 QString SnapshotWidget;
 QString SnapshotBaseline;
@@ -108,7 +106,11 @@ QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
   QMetaObject::invokeMethod(Instance, "doSnapshot", Qt::QueuedConnection);
 
   // wait for image comparison results
-  WaitForSnapshot.wait(&mut);
+  if(!Instance->waitForGUI(mut))
+    {
+    PyErr_SetString(PyExc_ValueError, "error during image comparison");
+    return NULL;
+    }
 
   if(SnapshotWidget == QString::null)
     {
@@ -197,7 +199,7 @@ void pqPythonEventSourceImage::doSnapshot()
                         testdir);
     }
   // signal the testing thread
-  WaitForSnapshot.wakeAll();
+  this->guiAcknowledge();
 }
 
 void pqPythonEventSourceImage::compareImage(QWidget* widget,

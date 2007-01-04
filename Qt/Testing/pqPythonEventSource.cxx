@@ -45,7 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QtDebug>
 #include <QMutex>
-#include <QWaitCondition>
 #include <QCoreApplication>
 #include <QEvent>
 #include <QStringList>
@@ -62,7 +61,6 @@ static pqPythonEventSource* Instance = NULL;
 static QString PropertyObject;
 static QString PropertyResult;
 static QString PropertyValue;
-static QWaitCondition WaitResults;
 static QStringList ObjectList;
 
 
@@ -84,7 +82,11 @@ QtTesting_playCommand(PyObject* /*self*/, PyObject* args)
 
   if(Instance)
     {
-    Instance->postNextEvent(object, command, arguments);
+    if(!Instance->postNextEvent(object, command, arguments))
+      {
+      PyErr_SetString(PyExc_AssertionError, "error processing event");
+      return NULL;
+      }
     }
   else
     {
@@ -117,7 +119,11 @@ QtTesting_getProperty(PyObject* /*self*/, PyObject* args)
     QMutex mut;
     mut.lock();
     QMetaObject::invokeMethod(Instance, "threadGetProperty", Qt::QueuedConnection);
-    WaitResults.wait(&mut);
+    if(!Instance->waitForGUI(mut))
+      {
+      PyErr_SetString(PyExc_ValueError, "error getting property");
+      return NULL;
+      }
     }
   else if(QThread::currentThread() == QApplication::instance()->thread())
     {
@@ -164,7 +170,11 @@ QtTesting_setProperty(PyObject* /*self*/, PyObject* args)
     QMutex mut;
     mut.lock();
     QMetaObject::invokeMethod(Instance, "threadSetProperty", Qt::QueuedConnection);
-    WaitResults.wait(&mut);
+    if(!Instance->waitForGUI(mut))
+      {
+      PyErr_SetString(PyExc_ValueError, "error setting property");
+      return NULL;
+      }
     }
   else if(QThread::currentThread() == QApplication::instance()->thread())
     {
@@ -242,7 +252,11 @@ QtTesting_getChildren(PyObject* /*self*/, PyObject* args)
     QMutex mut;
     mut.lock();
     QMetaObject::invokeMethod(Instance, "threadGetChildren", Qt::QueuedConnection);
-    WaitResults.wait(&mut);
+    if(!Instance->waitForGUI(mut))
+      {
+      PyErr_SetString(PyExc_ValueError, "error getting children");
+      return NULL;
+      }
     }
   else if(QThread::currentThread() == QApplication::instance()->thread())
     {
@@ -374,7 +388,7 @@ QString pqPythonEventSource::getProperty(QString& object, const QString& prop)
 void pqPythonEventSource::threadGetProperty()
 {
   PropertyResult = this->getProperty(PropertyObject, PropertyResult);
-  WaitResults.wakeAll();
+  this->guiAcknowledge();
 }
 
 
@@ -402,7 +416,7 @@ void pqPythonEventSource::setProperty(QString& object, QString& prop,
 void pqPythonEventSource::threadSetProperty()
 {
   this->setProperty(PropertyObject, PropertyResult, PropertyValue);
-  WaitResults.wakeAll();
+  this->guiAcknowledge();
 }
 
 
@@ -432,7 +446,7 @@ QStringList pqPythonEventSource::getChildren(QString& object)
 void pqPythonEventSource::threadGetChildren()
 {
   ObjectList = this->getChildren(PropertyObject);
-  WaitResults.wakeAll();
+  this->guiAcknowledge();
 }
 
 void pqPythonEventSource::run()

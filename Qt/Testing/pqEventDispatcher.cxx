@@ -177,6 +177,8 @@ void pqEventDispatcher::stopPlayback()
     this,
     SIGNAL(readyPlayNextEvent()));
 #endif
+  
+  this->Implementation->Source->stop();
     
   this->Implementation->Source = 0;
   this->Implementation->Player = 0;
