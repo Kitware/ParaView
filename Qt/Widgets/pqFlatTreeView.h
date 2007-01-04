@@ -279,7 +279,6 @@ private:
   QHeaderView *HeaderView;
   pqFlatTreeViewItem *Root;
   pqFlatTreeViewInternal *Internal;
-  int ItemHeight;
   int IndentWidth;
   int ContentsWidth;
   int ContentsHeight;
