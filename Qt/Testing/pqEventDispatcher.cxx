@@ -125,22 +125,22 @@ void pqEventDispatcher::checkPlayNextEvent()
   this->Implementation->Timer.setInterval(1);
 
   // do an event every other time through here to be sure events are processed
-  if(this->Implementation->EventState == pqImplementation::DoEvent)
+  if(this->Implementation->WaitTime)
+    {
+    this->Implementation->Timer.setInterval(this->Implementation->WaitTime);
+    this->Implementation->Timer.start();
+    }
+  else if(this->Implementation->EventState == pqImplementation::DoEvent)
     {
     pqEventDispatcher::processEventsAndWait(1);
     this->Implementation->EventState = pqImplementation::FlushEvents;
     this->Implementation->Timer.start();
     emit this->readyPlayNextEvent();
     }
-  else if(!this->Implementation->WaitTime)
+  else
     {
     pqEventDispatcher::processEventsAndWait(1);
     this->Implementation->EventState = pqImplementation::DoEvent;
-    this->Implementation->Timer.start();
-    }
-  else
-    {
-    this->Implementation->Timer.setInterval(this->Implementation->WaitTime);
     this->Implementation->Timer.start();
     }
 }
