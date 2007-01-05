@@ -91,7 +91,7 @@ int pqThreadedEventSource::getNextEvent(
     {
     // wait for the other thread to post an event, while
     // we keep the GUI alive.
-    pqEventDispatcher::processEventsAndWait(1000);
+    pqEventDispatcher::processEventsAndWait(100);
     }
 
   object = this->Internal->CurrentObject;

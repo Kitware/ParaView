@@ -32,13 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqEventDispatcher.h"
 
-#ifdef Q_OS_WIN
-#include <windows.h> // for Sleep
-#endif
-#ifdef Q_OS_UNIX
-#include <time.h>
-#endif
-
 #include "pqEventPlayer.h"
 #include "pqEventSource.h"
 
@@ -47,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTime>
 #include <QTimer>
 #include <QApplication>
+#include <QEventLoop>
 
 ////////////////////////////////////////////////////////////////////////////
 // pqEventDispatcher::pqImplementation
@@ -205,20 +199,9 @@ void pqEventDispatcher::stopPlayback()
 void pqEventDispatcher::processEventsAndWait(int ms)
 {
   pqEventDispatcher::pqImplementation::WaitTime = ms <= 0 ? 1 : ms;
-  QTime timer;
-  timer.start();
-  do {
-    QCoreApplication::processEvents(QEventLoop::AllEvents, ms);
-#ifdef Q_OS_WIN
-    Sleep(uint(10));
-#else
-    struct timespec ts = { 10 / 1000, (10 % 1000) * 1000 * 1000 };
-    nanosleep(&ts, NULL);
-#endif
-
-  } while (timer.elapsed() < ms);
-  
+  QEventLoop loop;
+  QTimer::singleShot(ms, &loop, SLOT(quit()));
+  loop.exec();
   pqEventDispatcher::pqImplementation::WaitTime = 0;
-
 }
 
