@@ -845,6 +845,7 @@ void pqPipelineModel::setSubtreeSelectable(pqServerManagerModelItem *item,
 
 void pqPipelineModel::setModifiedFont(const QFont &font)
 {
+  this->Internal->Modified = font;
 }
 
 void pqPipelineModel::addServer(pqServer *server)
