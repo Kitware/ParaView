@@ -553,17 +553,19 @@ pqPipelineModel::pqPipelineModel(QObject *parentObject)
 {
   this->Internal = new pqPipelineModelInternal();
   this->PixmapList = 0;
+  this->Editable = true;
 
   // Initialize the pixmap list.
   this->initializePixmaps();
 }
 
-pqPipelineModel::pqPipelineModel(const pqPipelineModel& vtkNotUsed(other),
+pqPipelineModel::pqPipelineModel(const pqPipelineModel &,
     QObject *parentObject)
   : QAbstractItemModel(parentObject)
 {
   this->Internal = new pqPipelineModelInternal();
   this->PixmapList = 0;
+  this->Editable = true;
 
   // Initialize the pixmap list.
   this->initializePixmaps();
@@ -577,6 +579,7 @@ pqPipelineModel::pqPipelineModel(const pqServerManagerModel &other,
 {
   this->Internal = new pqPipelineModelInternal();
   this->PixmapList = 0;
+  this->Editable = true;
 
   // Initialize the pixmap list.
   this->initializePixmaps();
