@@ -378,7 +378,7 @@ void pqPythonEventSource::setContent(const QString& path)
 QString pqPythonEventSource::getProperty(QString& object, const QString& prop)
 {
   // ensure other tasks have been completed
-  QCoreApplication::processEvents();
+  pqEventDispatcher::processEventsAndWait(1);
   QVariant ret;
 
   QObject* qobject = pqObjectNaming::GetObject(object);
@@ -407,7 +407,7 @@ void pqPythonEventSource::setProperty(QString& object, QString& prop,
                                       const QString& value)
 {
   // ensure other tasks have been completed
-  QCoreApplication::processEvents();
+  pqEventDispatcher::processEventsAndWait(1);
   QVariant ret;
 
   QObject* qobject = pqObjectNaming::GetObject(object);
@@ -434,7 +434,7 @@ void pqPythonEventSource::threadSetProperty()
 QStringList pqPythonEventSource::getChildren(QString& object)
 {
   // ensure other tasks have been completed
-  QCoreApplication::processEvents();
+  pqEventDispatcher::processEventsAndWait(1);
   QStringList ret;
 
   QObject* qobject = pqObjectNaming::GetObject(object);

@@ -37,9 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWaitCondition>
 #include <QThread>
 #include <QString>
-#include <QEventLoop>
-#include <QEvent>
-#include <QApplication>
+
+#include "pqEventDispatcher.h"
 
 class pqThreadedEventSource::pqInternal : public QThread
 {
@@ -48,7 +47,7 @@ public:
   pqInternal(pqThreadedEventSource& source)
     : Source(source), 
       ShouldStop(0),
-      GotEvent(false)
+      GotEvent(0)
     {
     }
   
@@ -60,10 +59,9 @@ public:
   pqThreadedEventSource& Source;
 
   QWaitCondition WaitCondition;
-  QEventLoop Loop;
 
   QAtomic ShouldStop;
-  bool GotEvent;
+  QAtomic GotEvent;
   QString CurrentObject;
   QString CurrentCommand;
   QString CurrentArgument;
@@ -88,12 +86,13 @@ int pqThreadedEventSource::getNextEvent(
     QString& command,
     QString& arguments)
 {
-  if(!this->Internal->GotEvent == true)
-  {
+
+  while(!this->Internal->GotEvent)
+    {
     // wait for the other thread to post an event, while
     // we keep the GUI alive.
-    this->Internal->Loop.exec();
-  }
+    pqEventDispatcher::processEventsAndWait(1000);
+    }
 
   object = this->Internal->CurrentObject;
   command = this->Internal->CurrentCommand;
@@ -119,10 +118,6 @@ void pqThreadedEventSource::relayEvent(QString object, QString command, QString 
   this->Internal->CurrentCommand = command;
   this->Internal->CurrentArgument = arguments;
   this->Internal->GotEvent = true;
-  if(this->Internal->Loop.isRunning())
-    {
-    this->Internal->Loop.quit();
-    }
 }
 
 
