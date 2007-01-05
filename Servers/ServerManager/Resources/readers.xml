@@ -1771,7 +1771,7 @@
    <!-- End ExodusReader -->
    </SourceProxy>
    <SourceProxy name="ExodusIIReader" 
-                class="vtkExodusIIReader">
+                class="vtkPExodusIIReader">
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -1780,22 +1780,62 @@
      </StringVectorProperty>
 
      <StringVectorProperty 
-        name="XMLFileNameInfo"
-        command="GetXMLFileName"
+        name="FilePrefixInfo"
+        command="GetFilePrefix"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
 
      <StringVectorProperty
-        name="XMLFileName"
-        command="SetXMLFileName"
-        number_of_elements="1">
+        name="FilePrefix"
+        command="SetFilePrefix"
+        number_of_elements="1"
+        information_property="FilePrefixInfo" >
        <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
-             <Property name="XMLFileNameInfo" function="XMLFileName"/>
+             <Property name="FilePrefixInfo" function="Prefix"/>
           </RequiredProperties>
        </FileListDomain>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="FilePatternInfo"
+        command="GetFilePattern"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FilePattern"
+        command="SetFilePattern"
+        number_of_elements="1"
+        information_property="FilePatternInfo" >
+       <FileListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="FilePatternInfo" function="Pattern"/>
+          </RequiredProperties>
+       </FileListDomain>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="FileRangeInfo"
+        command="GetFileRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="FileRange"
+        command="SetFileRange"
+        number_of_elements="2" 
+        default_values="-1 -1"
+        information_property="FileRangeInfo" >
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="FileRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="TimeStepRangeInfo"

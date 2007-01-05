@@ -365,12 +365,24 @@
           module_type="Reader"
           extensions=".exii"
           file_description="ExodusII">
-    <Source class="vtkExodusIIReader"/>
+    <Source class="vtkPExodusIIReader"/>
 
-    <StringEntry property="XMLFileName"
-                 label="XML File"
-                 trace_name="xml_file"
-                 help="An XML file containing part and material descriptions and mapping to element blocks." />
+    <StringEntry property="FilePrefix"
+                 label="File prefix"
+                 trace_name="file_prefix"
+                 help="Set the file root. Used with file pattern to format a file name." />
+    <StringEntry property="FilePattern"
+                 label="File Pattern"
+                 trace_name="file_pattern"
+                 help="Pattern used to load files. There are two parts to it prefix (%s) and the file number (%i)" />
+
+    
+    <MinMax trace_name="FileRange"
+            property="FileRange"
+            min_label="First Index"
+            max_label="Last Index"
+            min_help="Choose the index of the first file to be read"
+            max_help="Choose the index of the last file to be read"/>
 
 
     <Scale property="TimeStep"
