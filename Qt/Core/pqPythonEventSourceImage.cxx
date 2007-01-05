@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt testing includes
 #include "pqObjectNaming.h"
 #include "pqTestUtility.h"
+#include "pqEventDispatcher.h"
 
 // VTK includes
 #include "vtkSmartPointer.h"
@@ -168,7 +169,7 @@ void pqPythonEventSourceImage::doSnapshot()
 {
   
   // make sure all other processing has been done before we take a snapshot
-  QCoreApplication::processEvents();
+  pqEventDispatcher::processEventsAndWait(1);
 
   QWidget* widget =
     qobject_cast<QWidget*>(pqObjectNaming::GetObject(SnapshotWidget));
