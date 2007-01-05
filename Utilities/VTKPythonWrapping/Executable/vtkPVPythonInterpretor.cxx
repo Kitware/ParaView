@@ -25,6 +25,8 @@
 #include <vtkstd/algorithm>
 #include <vtkstd/string>
 
+#include <signal.h>  // for signal
+
 //-----------------------------------------------------------------------------
 #if defined(CMAKE_INTDIR)
 # define VTK_PYTHON_LIBRARY_DIR VTK_PYTHON_LIBRARY_DIR_BUILD "/" CMAKE_INTDIR
@@ -179,7 +181,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.6");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.7");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -237,6 +239,9 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
     // full path.
     Py_SetProgramName(argv[0]);
     Py_Initialize();
+#ifdef SIGINT
+    signal(SIGINT, SIG_DFL);
+#endif
     }
 
   this->Internal->Interpretor = Py_NewInterpreter();
