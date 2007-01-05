@@ -347,11 +347,15 @@ pqPythonEventSource::pqPythonEventSource(QObject* p)
   : pqThreadedEventSource(p)
 {
   this->Internal = new pqInternal;
-  // initialize python
-  Py_Initialize();
+  int initPy = Py_IsInitialized();
+  if(!initPy)
+    {
+    // initialize python
+    Py_Initialize();
 #ifdef SIGINT
-  signal(SIGINT, SIG_DFL);
+    signal(SIGINT, SIG_DFL);
 #endif
+    }
   PyEval_InitThreads();
 
   // add QtTesting to python's inittab, so it is
