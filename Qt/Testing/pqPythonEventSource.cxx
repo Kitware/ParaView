@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // self include
 #include "pqPythonEventSource.h"
 
+// system includes
+#include <signal.h>
+
 // Qt include
 #include <QVariant>
 #include <QFile>
@@ -346,6 +349,9 @@ pqPythonEventSource::pqPythonEventSource(QObject* p)
   this->Internal = new pqInternal;
   // initialize python
   Py_Initialize();
+#ifdef SIGINT
+  signal(SIGINT, SIG_DFL);
+#endif
   PyEval_InitThreads();
 
   // add QtTesting to python's inittab, so it is
