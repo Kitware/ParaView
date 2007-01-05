@@ -86,6 +86,11 @@ public:
     delete this->ViewMenu;
     delete this->ToolbarsMenu;
     delete this->PlotsMenu;
+    if(this->AssistantClient)
+      {
+      this->AssistantClient->closeAssistant();
+      delete this->AssistantClient;
+      }
   }
 
   QAssistantClient* AssistantClient;
