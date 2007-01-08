@@ -757,6 +757,146 @@ void pqFlatTreeView::getSelectionIn(const QRect &area,
   this->getSelectionIn(topLeft, bottomRight, items);
 }
 
+bool pqFlatTreeView::isIndexExpanded(const QModelIndex &index) const
+{
+  pqFlatTreeViewItem *item = this->getItem(index);
+  if(item)
+    {
+    return item->Expandable && item->Expanded;
+    }
+
+  return false;
+}
+
+QModelIndex pqFlatTreeView::getNextVisibleIndex(const QModelIndex &index,
+    const QModelIndex &root) const
+{
+  // Make sure the root index is valid.
+  pqFlatTreeViewItem *rootItem = this->getItem(root);
+  if(!rootItem)
+    {
+    return QModelIndex();
+    }
+
+  pqFlatTreeViewItem *item = this->getItem(index);
+  if(item)
+    {
+    if(item->Expandable)
+      {
+      if(item->Expanded)
+        {
+        return QModelIndex(item->Items[0]->Index);
+        }
+      }
+    else if(item->Items.size() > 0)
+      {
+      return QModelIndex(item->Items[0]->Index);
+      }
+
+    // Search up the ancestors for an item with multiple children.
+    // The next item will be the next child.
+    int row = 0;
+    int count = 0;
+    while(item != rootItem && item->Parent)
+      {
+      count = item->Parent->Items.size();
+      if(count > 1)
+        {
+        row = item->Parent->Items.indexOf(item) + 1;
+        if(row < count)
+          {
+          return QModelIndex(item->Parent->Items[row]->Index);
+          }
+        }
+
+      item = item->Parent;
+      }
+    }
+
+  return QModelIndex();
+}
+
+QModelIndex pqFlatTreeView::getRelativeIndex(const QString &id,
+    const QModelIndex &root) const
+{
+  // Make sure the root index is valid.
+  if(id.isEmpty() || (root.isValid() && root.model() != this->Model))
+    {
+    return QModelIndex();
+    }
+
+  // Separate the row list and the column.
+  QStringList list = id.split("|", QString::SkipEmptyParts);
+  if(list.size() == 2)
+    {
+    // Get the column from the last argument.
+    int column = list.last().toInt();
+
+    // Get the list of row hierarchy from the first argument.
+    list = list.first().split("/", QString::SkipEmptyParts);
+    if(list.size() > 0)
+      {
+      QModelIndex index = root;
+      QStringList::Iterator iter = list.begin();
+      for( ; iter != list.end(); ++iter)
+        {
+        index = this->Model->index(iter->toInt(), 0, index);
+        }
+
+      if(column != 0)
+        {
+        index = index.sibling(index.row(), column);
+        }
+
+      return index;
+      }
+    }
+
+  return QModelIndex();
+}
+
+void pqFlatTreeView::getRelativeIndexId(const QModelIndex &index, QString &id,
+    const QModelIndex &root) const
+{
+  // Make sure the root index is valid.
+  if(root.isValid() && root.model() != this->Model)
+    {
+    return;
+    }
+
+  if(!index.isValid() || index.model() != this->Model)
+    {
+    return;
+    }
+
+  // Get the row hierarchy from the index and its ancestors.
+  // Make sure the index is for column 0.
+  QStringList rowList;
+  QModelIndex tempIndex = index;
+  if(index.column() > 0)
+    {
+    tempIndex = index.sibling(index.row(), 0);
+    }
+
+  while(tempIndex.isValid() && tempIndex != root)
+    {
+    QString row;
+    row.setNum(tempIndex.row());
+    rowList.prepend(row);
+    tempIndex = tempIndex.parent();
+    }
+
+  if(tempIndex == root && rowList.size() > 0)
+    {
+    id = rowList.join("/");
+    id.prepend("/");
+    id.append("|");
+    QString column;
+    column.setNum(index.column());
+    id.append(column);
+    }
+}
+
 bool pqFlatTreeView::startEditing(const QModelIndex &index)
 {
   if(this->Model->flags(index) & Qt::ItemIsEditable)

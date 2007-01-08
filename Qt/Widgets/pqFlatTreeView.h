@@ -158,6 +158,17 @@ public:
   void getSelectionIn(const QRect &rect, QItemSelection &items) const;
   //@}
 
+  /// \name Index Navigation Methods
+  //@{
+  bool isIndexExpanded(const QModelIndex &index) const;
+  QModelIndex getNextVisibleIndex(const QModelIndex &index,
+      const QModelIndex &root=QModelIndex()) const;
+  QModelIndex getRelativeIndex(const QString &id,
+      const QModelIndex &root=QModelIndex()) const;
+  void getRelativeIndexId(const QModelIndex &index, QString &id,
+      const QModelIndex &root=QModelIndex()) const;
+  //@}
+
   /// \name Editing Methods
   //@{
   bool startEditing(const QModelIndex &index);
