@@ -61,14 +61,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHeaderView>
 #include <QItemSelectionModel>
 #include <QKeyEvent>
+#include <QMap>
 #include <QPointer>
+#include <QString>
 #include <QtDebug>
 #include <QVBoxLayout>
 
 #include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include <vtksys/ios/sstream>
 
 
 class pqPipelineBrowserInternal
@@ -80,13 +84,14 @@ public:
   // TODO: Add support for multiple servers.
   pqSourceInfoModel *FilterModel;
   QString LastFilterGroup;
+  QMap<QString, QString> MoveMap;
   QPointer<pqGenericViewModule> ViewModule;
 };
 
 
 //----------------------------------------------------------------------------
 pqPipelineBrowserInternal::pqPipelineBrowserInternal()
-  : LastFilterGroup()
+  : LastFilterGroup(), MoveMap()
 {
   this->FilterModel = 0;
   this->ViewModule = 0;
@@ -114,28 +119,28 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   pqServerManagerModel *smModel = 
       pqApplicationCore::instance()->getServerManagerModel();
   
-  QObject::connect(smModel, SIGNAL(serverAdded(pqServer*)),
+  this->connect(smModel, SIGNAL(serverAdded(pqServer*)),
       this->ListModel, SLOT(addServer(pqServer*)));
-  QObject::connect(smModel, SIGNAL(aboutToRemoveServer(pqServer *)),
+  this->connect(smModel, SIGNAL(aboutToRemoveServer(pqServer *)),
       this->ListModel, SLOT(startRemovingServer(pqServer *)));
-  QObject::connect(smModel, SIGNAL(serverRemoved(pqServer*)),
+  this->connect(smModel, SIGNAL(serverRemoved(pqServer*)),
       this->ListModel, SLOT(removeServer(pqServer*)));
-  QObject::connect(smModel, SIGNAL(sourceAdded(pqPipelineSource*)),
+  this->connect(smModel, SIGNAL(sourceAdded(pqPipelineSource*)),
       this->ListModel, SLOT(addSource(pqPipelineSource*)));
-  QObject::connect(smModel, SIGNAL(sourceRemoved(pqPipelineSource*)),
+  this->connect(smModel, SIGNAL(sourceRemoved(pqPipelineSource*)),
       this->ListModel, SLOT(removeSource(pqPipelineSource*)));
-  QObject::connect(smModel,
+  this->connect(smModel,
       SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
       this->ListModel,
       SLOT(addConnection(pqPipelineSource*, pqPipelineSource*)));
-  QObject::connect(smModel,
+  this->connect(smModel,
       SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
       this->ListModel,
       SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*)));
 
-  QObject::connect(smModel, SIGNAL(nameChanged(pqServerManagerModelItem *)),
+  this->connect(smModel, SIGNAL(nameChanged(pqServerManagerModelItem *)),
     this->ListModel, SLOT(updateItemName(pqServerManagerModelItem *)));
-  QObject::connect(smModel,
+  this->connect(smModel,
     SIGNAL(sourceDisplayChanged(pqPipelineSource *, pqConsumerDisplay*)),
     this->ListModel,
     SLOT(updateDisplays(pqPipelineSource *, pqConsumerDisplay*)));
@@ -156,18 +161,25 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   this->ListModel->setModifiedFont(modifiedFont);
 
   // Listen to the selection change signals.
-  connect(this->TreeView->getSelectionModel(),
+  this->connect(this->TreeView->getSelectionModel(),
       SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
       this, SLOT(changeCurrent(const QModelIndex &, const QModelIndex &)));
 
   // Listen for index clicked signals to change visibility.
-  QObject::connect(this->TreeView, SIGNAL(clicked(const QModelIndex &)),
+  this->connect(this->TreeView, SIGNAL(clicked(const QModelIndex &)),
       this, SLOT(handleIndexClicked(const QModelIndex &)));
 
   // Make sure the tree items get expanded when new descendents
   // are added.
-  connect(this->ListModel, SIGNAL(firstChildAdded(const QModelIndex &)),
+  this->connect(this->ListModel, SIGNAL(firstChildAdded(const QModelIndex &)),
       this->TreeView, SLOT(expand(const QModelIndex &)));
+
+  // Use the model's move and restore signals to keep track of
+  // selection and expanded indexes.
+  this->connect(this->ListModel, SIGNAL(movingIndex(const QModelIndex &)),
+      this, SLOT(saveState(const QModelIndex &)));
+  this->connect(this->ListModel, SIGNAL(indexRestored(const QModelIndex &)),
+      this, SLOT(restoreState(const QModelIndex &)));
 
   // The tree view should have a context menu based on the selected
   // items. The context menu policy should be set to custom for this
@@ -213,6 +225,16 @@ void pqPipelineBrowser::loadFilterInfo(vtkPVXMLElement *root)
   this->FilterGroups->addSource("Clip", "Released");
   this->FilterGroups->addSource("Cut", "Released");
   this->FilterGroups->addSource("Threshold", "Released");
+}
+
+void pqPipelineBrowser::saveState(vtkPVXMLElement *root) const
+{
+  this->saveState(this->TreeView->getRootIndex(), root);
+}
+
+void pqPipelineBrowser::restoreState(vtkPVXMLElement *root)
+{
+  this->restoreState(this->TreeView->getRootIndex(), root);
 }
 
 QItemSelectionModel *pqPipelineBrowser::getSelectionModel() const
@@ -494,6 +516,54 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
     }
 }
 
+void pqPipelineBrowser::saveState(const QModelIndex &index)
+{
+  if(index.isValid() && index.model() == this->ListModel)
+    {
+    // Get the name for the index, which will be used to look up the
+    // state.
+    QString name = this->ListModel->data(index).toString();
+    if(!name.isEmpty())
+      {
+      // Get the state for the index.
+      vtkPVXMLElement *root = vtkPVXMLElement::New();
+      root->SetName("MoveState");
+      this->saveState(index, root);
+
+      // Save the state in the map.
+      vtksys_ios::ostringstream xml_stream;
+      root->PrintXML(xml_stream, vtkIndent());
+      root->Delete();
+      QString state = xml_stream.str().c_str();
+      this->Internal->MoveMap.insert(name, state);
+      }
+    }
+}
+
+void pqPipelineBrowser::restoreState(const QModelIndex &index)
+{
+  if(index.isValid() && index.model() == this->ListModel)
+    {
+    QString name = this->ListModel->data(index).toString();
+    QMap<QString, QString>::Iterator iter = this->Internal->MoveMap.find(name);
+    if(iter != this->Internal->MoveMap.end())
+      {
+      // Use the map entry to restore the state.
+      vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
+      xmlParser->InitializeParser();
+      xmlParser->ParseChunk(iter->toAscii().data(), static_cast<unsigned int>(
+          iter->size()));
+      xmlParser->CleanupParser();
+
+      this->restoreState(index, xmlParser->GetRootElement());
+
+      // Remove the entry from the map.
+      xmlParser->Delete();
+      this->Internal->MoveMap.erase(iter);
+      }
+    }
+}
+
 pqSourceInfoModel *pqPipelineBrowser::getFilterModel()
 {
   // TODO: Add support for multiple servers.
@@ -577,6 +647,115 @@ void pqPipelineBrowser::getAllowedSources(pqSourceInfoModel *model,
         if(prop->IsInDomains())
           {
           list.append(*iter);
+          }
+        }
+      }
+    }
+}
+
+void pqPipelineBrowser::saveState(const QModelIndex &index,
+    vtkPVXMLElement *root) const
+{
+  // First, save the root index name and attributes.
+  QItemSelectionModel *selection = this->TreeView->getSelectionModel();
+  QModelIndex current = selection->currentIndex();
+  if(index.isValid())
+    {
+    if(this->TreeView->isIndexExpanded(index))
+      {
+      root->SetAttribute("expanded", "true");
+      }
+
+    if(selection->isSelected(index))
+      {
+      root->SetAttribute("selected", "true");
+      }
+
+    if(index == current)
+      {
+      root->SetAttribute("current", "true");
+      }
+    }
+
+  // Next, step through the indexes to save the expanded/selected
+  // state.
+  QModelIndex next = this->TreeView->getNextVisibleIndex(index, index);
+  while(next.isValid())
+    {
+    QString id;
+    vtkPVXMLElement *element = vtkPVXMLElement::New();
+    element->SetName("Index");
+    this->TreeView->getRelativeIndexId(next, id, index);
+    element->SetAttribute("id", id.toAscii().data());
+    if(this->TreeView->isIndexExpanded(next))
+      {
+      root->SetAttribute("expanded", "true");
+      }
+
+    if(selection->isSelected(next))
+      {
+      root->SetAttribute("selected", "true");
+      }
+
+    if(next == current)
+      {
+      root->SetAttribute("current", "true");
+      }
+
+    root->AddNestedElement(element);
+    element->Delete();
+    next = this->TreeView->getNextVisibleIndex(next, index);
+    }
+}
+
+void pqPipelineBrowser::restoreState(const QModelIndex &index,
+    vtkPVXMLElement *root)
+{
+  // First, restore the root index if it's valid.
+  QItemSelectionModel *selection = this->TreeView->getSelectionModel();
+  if(index.isValid())
+    {
+    if(root->GetAttribute("expanded") != 0)
+      {
+      this->TreeView->expand(index);
+      }
+
+    if(root->GetAttribute("selected") != 0)
+      {
+      selection->select(index, QItemSelectionModel::Select);
+      }
+
+    if(root->GetAttribute("current") != 0)
+      {
+      selection->setCurrentIndex(index, QItemSelectionModel::NoUpdate);
+      }
+    }
+
+  // Next, loop through the child elements.
+  QModelIndex next;
+  QString elemName = "Index";
+  for(unsigned int i = 0; i < root->GetNumberOfNestedElements(); i++)
+    {
+    vtkPVXMLElement *element = root->GetNestedElement(i);
+    if(elemName == element->GetName())
+      {
+      QString id = element->GetAttribute("id");
+      next = this->TreeView->getRelativeIndex(id, index);
+      if(next.isValid())
+        {
+        if(element->GetAttribute("expanded") != 0)
+          {
+          this->TreeView->expand(next);
+          }
+
+        if(element->GetAttribute("selected") != 0)
+          {
+          selection->select(next, QItemSelectionModel::Select);
+          }
+
+        if(element->GetAttribute("current") != 0)
+          {
+          selection->setCurrentIndex(next, QItemSelectionModel::NoUpdate);
           }
         }
       }

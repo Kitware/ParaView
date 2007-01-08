@@ -88,7 +88,14 @@ public:
 
   pqSourceInfoIcons *getIcons() const {return this->Icons;}
 
+  /// \name Session Continuity Methods
+  //@{
   void loadFilterInfo(vtkPVXMLElement *root);
+
+  void saveState(vtkPVXMLElement *root) const;
+
+  void restoreState(vtkPVXMLElement *root);
+  //@}
 
   /// \name Selection Helper Methods
   //@{
@@ -152,12 +159,16 @@ signals:
 private slots:
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
   void handleIndexClicked(const QModelIndex &index);
+  void saveState(const QModelIndex &index);
+  void restoreState(const QModelIndex &index);
 
 private:
   pqSourceInfoModel *getFilterModel();
   void setupConnections(pqSourceInfoModel *model, pqSourceInfoGroupMap *map);
   void getAllowedSources(pqSourceInfoModel *model, vtkSMProxy *input,
       QStringList &list);
+  void saveState(const QModelIndex &index, vtkPVXMLElement *root) const;
+  void restoreState(const QModelIndex &index, vtkPVXMLElement *root);
 
 private:
   pqPipelineBrowserInternal *Internal; ///< Stores the class data.
