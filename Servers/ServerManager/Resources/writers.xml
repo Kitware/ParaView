@@ -268,8 +268,7 @@
       </InputProperty>
     </WriterProxy>
 
-    <WriterProxy name="XdmfWriter" class="vtkXdmfWriter"
-      base_proxygroup="writers" base_proxyname="DataWriterBase">
+    <WriterProxy name="XdmfWriter" class="vtkXdmfWriter">
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -279,6 +278,12 @@
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
       </InputProperty>
+
+      <StringVectorProperty 
+        name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+      </StringVectorProperty>
     </WriterProxy>
 
     <PWriterProxy name="ExodusIIWriter" class="vtkExodusIIWriter"
