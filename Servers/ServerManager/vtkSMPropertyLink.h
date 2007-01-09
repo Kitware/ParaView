@@ -43,6 +43,13 @@ public:
                          const char* propertyname, 
                          int updateDir);
 
+  // Description:
+  // Another API to add a property link. In this case. we don't provide
+  // the link with the proxy to which the property belongs. Consequently
+  // we cannot propagate UpdateVTKObjects() calls irrespective
+  // of the PropagateUpdateVTKObjects flag. If one wants to propagate 
+  // UpdateVTKObjects, use the overload with vtkSMProxy as the argument.
+  void AddLinkedProperty(vtkSMProperty* property, int updateDir);
 protected:
   vtkSMPropertyLink();
   ~vtkSMPropertyLink();

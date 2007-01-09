@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.6");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.7");
 //-----------------------------------------------------------------------------
 struct vtkSMPropertyLinkInternals
 {
@@ -36,20 +36,36 @@ public:
   public:
     LinkedProperty(vtkSMProxy* proxy, const char* pname, int updateDir) :
       Proxy(proxy), PropertyName(pname), UpdateDirection(updateDir), 
+      Observer(0) 
+    {
+    }
+
+    LinkedProperty(vtkSMProperty* property, int updateDir) :
+      Property(property), UpdateDirection(updateDir), 
       Observer(0)
     {
     }
+
     ~LinkedProperty()
       {
       if (this->Observer && this->Proxy.GetPointer())
         {
-        this->Proxy.GetPointer()->RemoveObserver(Observer);
-        this->Observer = 0;
+        this->Proxy.GetPointer()->RemoveObserver(this->Observer);
         }
+
+      if (this->Observer && this->Property.GetPointer())
+        {
+        this->Property->RemoveObserver(this->Observer);
+        }
+      this->Observer = 0;
       }
 
+    // Either (Proxy, PropertyName) pair is valid or (Property) is valid,
+    // depending on the API used to add the link.
     vtkSmartPointer<vtkSMProxy> Proxy;
     vtkStdString PropertyName;
+    vtkSmartPointer<vtkSMProperty> Property;
+
     int UpdateDirection;
     vtkCommand* Observer;
     };
@@ -112,6 +128,56 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname,
     {
     this->ObserveProxyUpdates(proxy);
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMPropertyLink::AddLinkedProperty(vtkSMProperty* property, int updateDir)
+{
+  if (!property)
+    {
+    vtkErrorMacro("Cannot add link to a NULL property.");
+    return;
+    }
+  int addToList = 1;
+  int addObserver = updateDir & INPUT;
+
+  vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
+    this->Internals->LinkedProperties.begin();
+  for (; iter != this->Internals->LinkedProperties.end(); ++iter)
+    {
+    if (iter->Property == property)
+      {
+      if (iter->UpdateDirection != updateDir)
+        {
+        iter->UpdateDirection = updateDir;
+        if (addObserver)
+          {
+          iter->Observer = this->Observer;
+          }
+        }
+      else
+        {
+        addObserver = 0;
+        }
+      addToList = 0;
+      }
+    }
+
+  if (addToList)
+    {
+    vtkSMPropertyLinkInternals::LinkedProperty link(property, updateDir);
+    this->Internals->LinkedProperties.push_back(link);
+    if (addObserver)
+      {
+      this->Internals->LinkedProperties.back().Observer = this->Observer;
+      }
+    }
+
+  if (addObserver)
+    {
+    property->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
+    }
+
 }
 
 //-----------------------------------------------------------------------------
