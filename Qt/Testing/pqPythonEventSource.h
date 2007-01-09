@@ -34,8 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPythonEventSource_h
 
 #include "pqThreadedEventSource.h"
-
-class QString;
+#include <QString>
 
 /** Concrete implementation of pqEventSource that retrieves events recorded
 by pqPythonEventObserver */
@@ -52,6 +51,7 @@ public:
   static QString getProperty(QString& object, const QString& prop);
   static void setProperty(QString& object, QString& prop, const QString& value);
   static QStringList getChildren(QString& object);
+  static QString invokeMethod(QString& object, QString& method);
 
 protected:
   virtual void run();
@@ -60,6 +60,7 @@ protected slots:
   void threadGetProperty();
   void threadSetProperty();
   void threadGetChildren();
+  void threadInvokeMethod();
 
 private:
   class pqInternal;

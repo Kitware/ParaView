@@ -285,6 +285,60 @@ QtTesting_getChildren(PyObject* /*self*/, PyObject* args)
              ret.toAscii().data());
 }
 
+static PyObject*
+QtTesting_invokeMethod(PyObject* /*self*/, PyObject* args)
+{
+  // string QtTesting.invokeMethod('object', 'method')
+  //    calls a method and returns its value
+  
+  const char* object = 0;
+  const char* method = 0;
+
+  if(!PyArg_ParseTuple(args, const_cast<char*>("ss"), &object, &method))
+    {
+    return NULL;
+    }
+
+  PropertyObject = object;
+  PropertyValue = method;
+  PropertyResult = QString();
+
+  if(Instance && QThread::currentThread() != QApplication::instance()->thread())
+    {
+    QMutex mut;
+    mut.lock();
+    QMetaObject::invokeMethod(Instance, "threadInvokeMethod", Qt::QueuedConnection);
+    if(!Instance->waitForGUI(mut))
+      {
+      PyErr_SetString(PyExc_ValueError, "error invoking method");
+      return NULL;
+      }
+    }
+  else if(QThread::currentThread() == QApplication::instance()->thread())
+    {
+    PropertyResult = pqPythonEventSource::invokeMethod(PropertyObject,
+                                                       PropertyValue);
+    }
+  else
+    {
+    PyErr_SetString(PyExc_AssertionError, "pqPythonEventSource not defined");
+    return NULL;
+    }
+
+  if(PropertyObject == QString::null)
+    {
+    PyErr_SetString(PyExc_ValueError, "object not found");
+    return NULL;
+    }
+  else if(PropertyValue == QString::null)
+    {
+    PyErr_SetString(PyExc_ValueError, "method not found");
+    return NULL;
+    }
+
+  return Py_BuildValue(const_cast<char*>("s"), 
+             PropertyResult.toAscii().data());
+}
 
 static PyMethodDef QtTestingMethods[] = {
   {
@@ -324,6 +378,12 @@ static PyMethodDef QtTestingMethods[] = {
     QtTesting_getChildren,
     METH_VARARGS,
     const_cast<char*>("Return a list of child objects.")
+  },
+  {
+    const_cast<char*>("invokeMethod"),
+    QtTesting_invokeMethod,
+    METH_VARARGS,
+    const_cast<char*>("Invoke a Qt slot with the signature \"QVariant foo()\".")
   },
 
   {NULL, NULL, 0, NULL} // Sentinal
@@ -480,5 +540,33 @@ void pqPythonEventSource::run()
   Py_EndInterpreter(threadState);
   
   this->done(result);
+}
+
+void pqPythonEventSource::threadInvokeMethod()
+{
+  PropertyResult = this->invokeMethod(PropertyObject, PropertyValue);
+  this->guiAcknowledge();
+}
+
+QString pqPythonEventSource::invokeMethod(QString& object, QString& method)
+{
+  // ensure other tasks have been completed
+  pqEventDispatcher::processEventsAndWait(1);
+  QVariant ret;
+
+  QObject* qobject = pqObjectNaming::GetObject(object);
+  if(!qobject)
+    {
+    object = QString::null;
+    }
+  else
+    {
+    if(!QMetaObject::invokeMethod(qobject, method.toAscii().data(),
+                                  Q_RETURN_ARG(QVariant, ret)))
+      {
+      method = QString::null;
+      }
+    }
+  return ret.toString();
 }
 
