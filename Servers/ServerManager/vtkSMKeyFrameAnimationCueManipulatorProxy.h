@@ -25,7 +25,8 @@
 // affecting the property at the current time value.
 // \li \c vtkSMAnimationCueManipulatorProxy::StateModifiedEvent - 
 // This event is fired when the manipulator modifies the animated proxy.
-// \li \c vtkCommand::Modified - is fired when the keyframes are changed i.e. added/removed/modified.
+// \li \c vtkCommand::ModifiedEvent - 
+// is fired when the keyframes are changed i.e. added/removed/modified.
 // 
 // .SECTION See Also
 // vtkSMAnimationCueProxy vtkSMAnimationCueManipulatorProxy
@@ -104,6 +105,12 @@ public:
   // Keyframes are sorted according to increasing key frame time.
   vtkSMKeyFrameProxy* GetKeyFrameAtIndex(int index);
 
+  // Description:
+  // This method iterates over all added keyframe proxies and updates the
+  // domains for all keyframes, such that for every keyframe J, with keytime
+  // between keyframes I and K, the domain for keytime of J is
+  // (DomainJ)min = KeyTimeI and (DomainJ)max = KeyTimeK.
+  void UpdateKeyTimeDomains();
 protected:
   vtkSMKeyFrameAnimationCueManipulatorProxy();
   ~vtkSMKeyFrameAnimationCueManipulatorProxy();

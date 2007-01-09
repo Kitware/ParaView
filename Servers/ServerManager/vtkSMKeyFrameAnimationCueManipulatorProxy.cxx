@@ -14,13 +14,16 @@
 =========================================================================*/
 #include "vtkSMKeyFrameAnimationCueManipulatorProxy.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkSMKeyFrameProxy.h"
-#include "vtkCommand.h"
 #include "vtkClientServerID.h"
+#include "vtkCommand.h"
+#include "vtkObjectFactory.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMKeyFrameProxy.h"
+#include "vtkSMProperty.h"
 
 #include <vtkstd/vector>
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.13");
+
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.14");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -59,8 +62,8 @@ protected:
 class vtkSMKeyFrameAnimationCueManipulatorProxyInternals
 {
 public:
-  typedef vtkstd::vector<vtkSMKeyFrameProxy*> DoubleToKeyFrameVector;
-  DoubleToKeyFrameVector KeyFrames;
+  typedef vtkstd::vector<vtkSMKeyFrameProxy*> KeyFrameVector;
+  KeyFrameVector KeyFrames;
 };
 
 //****************************************************************************
@@ -105,6 +108,7 @@ int vtkSMKeyFrameAnimationCueManipulatorProxy::AddKeyFrame(vtkSMKeyFrameProxy* k
     {
     keyframe->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
     keyframe->Register(this);
+    this->UpdateKeyTimeDomains();
     }
   this->LastAddedKeyFrameIndex = index;
   this->Modified();
@@ -119,6 +123,7 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::RemoveKeyFrame(
     {
     keyframe->RemoveObservers(vtkCommand::ModifiedEvent, this->Observer);
     keyframe->UnRegister(this);
+    this->UpdateKeyTimeDomains();
     }
   this->Modified();
 }
@@ -126,7 +131,7 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::RemoveKeyFrame(
 //----------------------------------------------------------------------------
 void vtkSMKeyFrameAnimationCueManipulatorProxy::RemoveAllKeyFrames()
 {
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::
+  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::KeyFrameVector::
     iterator iter;
   for (iter = this->Internals->KeyFrames.begin();
     iter != this->Internals->KeyFrames.end();
@@ -149,7 +154,7 @@ unsigned int vtkSMKeyFrameAnimationCueManipulatorProxy::GetNumberOfKeyFrames()
 vtkSMKeyFrameProxy* vtkSMKeyFrameAnimationCueManipulatorProxy::GetKeyFrame(
   double time)
 {
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::
+  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::KeyFrameVector::
     iterator iter;
   for (iter = this->Internals->KeyFrames.begin();
     iter != this->Internals->KeyFrames.end();
@@ -170,7 +175,7 @@ vtkSMKeyFrameProxy* vtkSMKeyFrameAnimationCueManipulatorProxy::GetStartKeyFrame(
 {
   // we use the fact that we have maintained the vector in sorted order.
   vtkSMKeyFrameProxy* proxy = NULL;
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::
+  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::KeyFrameVector::
     iterator it = this->Internals->KeyFrames.begin();
   for (; it != this->Internals->KeyFrames.end(); it++)
     {
@@ -192,7 +197,7 @@ vtkSMKeyFrameProxy* vtkSMKeyFrameAnimationCueManipulatorProxy::GetStartKeyFrame(
 vtkSMKeyFrameProxy* vtkSMKeyFrameAnimationCueManipulatorProxy::
 GetEndKeyFrame(double time)
 {
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::
+  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::KeyFrameVector::
     iterator it = this->Internals->KeyFrames.begin();
   for (; it != this->Internals->KeyFrames.end(); it++)
     {
@@ -257,7 +262,7 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::UpdateValue(double currenttime,
 vtkSMKeyFrameProxy* vtkSMKeyFrameAnimationCueManipulatorProxy::GetNextKeyFrame(
   vtkSMKeyFrameProxy* keyFrame)
 {
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::
+  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::KeyFrameVector::
     iterator it = this->Internals->KeyFrames.begin();
   for (; it != this->Internals->KeyFrames.end(); it++)
     {
@@ -280,7 +285,7 @@ vtkSMKeyFrameProxy* vtkSMKeyFrameAnimationCueManipulatorProxy::GetPreviousKeyFra
 {
   vtkSMKeyFrameProxy* proxy = NULL;
   
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::
+  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::KeyFrameVector::
     iterator it = this->Internals->KeyFrames.begin();
   for (; it != this->Internals->KeyFrames.end(); it++)
     {
@@ -310,7 +315,7 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::SaveInBatchScript(ofstream* file
 {
   this->Superclass::SaveInBatchScript(file);
 
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::
+  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::KeyFrameVector::
     iterator it = this->Internals->KeyFrames.begin();
   for (; it != this->Internals->KeyFrames.end(); it++)
     {
@@ -332,10 +337,21 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::ExecuteEvent(
 
   if (keyframe && event == vtkCommand::ModifiedEvent)
     {
-    this->RemoveKeyFrameInternal(keyframe);
-    this->AddKeyFrameInternal(keyframe);
-    this->Modified();
+    // Check if the keyframe position has changed.
+    vtkSMKeyFrameProxy* prev = this->GetPreviousKeyFrame(keyframe);
+    vtkSMKeyFrameProxy* next = this->GetNextKeyFrame(keyframe);
+    double keytime = keyframe->GetKeyTime();
+    if ( (next && keytime > next->GetKeyTime()) || 
+      (prev && keytime < prev->GetKeyTime()))
+      {
+      cout << "Position Changed" << endl;
+      // Position of keyframe has changed.
+      this->RemoveKeyFrameInternal(keyframe);
+      this->AddKeyFrameInternal(keyframe);
+      }
     }
+  this->UpdateKeyTimeDomains();
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -344,7 +360,7 @@ int vtkSMKeyFrameAnimationCueManipulatorProxy::AddKeyFrameInternal(
 {
   double time = keyframe->GetKeyTime();
   int index = 0;
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::
+  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::KeyFrameVector::
     iterator iter;
   for (iter = this->Internals->KeyFrames.begin();
     iter != this->Internals->KeyFrames.end();
@@ -368,7 +384,7 @@ int vtkSMKeyFrameAnimationCueManipulatorProxy::AddKeyFrameInternal(
 int vtkSMKeyFrameAnimationCueManipulatorProxy::RemoveKeyFrameInternal(
   vtkSMKeyFrameProxy* keyframe)
 {
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::
+  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::KeyFrameVector::
     iterator iter;
   for (iter = this->Internals->KeyFrames.begin();
     iter != this->Internals->KeyFrames.end();
@@ -383,6 +399,42 @@ int vtkSMKeyFrameAnimationCueManipulatorProxy::RemoveKeyFrameInternal(
   return 0;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkSMKeyFrameAnimationCueManipulatorProxy::UpdateKeyTimeDomains()
+{
+  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::KeyFrameVector::
+    iterator iter;
+  unsigned int numFrames = this->Internals->KeyFrames.size();
+  for (unsigned int cc=0; cc < numFrames; ++cc)
+    {
+    vtkSMKeyFrameProxy* kf = this->Internals->KeyFrames[cc];
+    vtkSMKeyFrameProxy* prev = (cc>0)? this->Internals->KeyFrames[cc-1] : NULL;
+    vtkSMKeyFrameProxy* next = (cc+1<numFrames)? this->Internals->KeyFrames[cc+1]: NULL;
+    double min = (prev)? prev->GetKeyTime() : 0.0;
+    double max = (next)? next->GetKeyTime() : 1.0;
+    vtkSMProperty* keyTimeProp = kf->GetProperty("KeyTime");
+    if (!keyTimeProp)
+      {
+      vtkWarningMacro("KeyFrameProxy should have a KeyTime property.");
+      continue;
+      }
+    vtkSMDoubleRangeDomain* dr = vtkSMDoubleRangeDomain::SafeDownCast(
+      keyTimeProp->GetDomain("range"));
+    if (dr)
+      {
+      int exists;
+      if (dr->GetMinimum(0, exists) != min || !exists)
+        {
+        dr->AddMinimum(0, min);
+        }
+      if (dr->GetMaximum(0, exists) != max || !exists)
+        {
+        dr->AddMaximum(0, max);
+        }
+      }
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkSMKeyFrameAnimationCueManipulatorProxy::PrintSelf(ostream& os, 

@@ -32,6 +32,7 @@ SET(Kit_SRCS
   vtkSMCaveRenderModuleProxy.cxx
   vtkSMComparativeVisProxy.cxx
   vtkSMCompositeDisplayProxy.cxx
+  vtkSMCompositeKeyFrameProxy.cxx
   vtkSMCompositeRenderModuleProxy.cxx
   vtkSMCompoundProxy.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
