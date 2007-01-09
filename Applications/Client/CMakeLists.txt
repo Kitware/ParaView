@@ -168,6 +168,7 @@ IF(BUILD_TESTING)
       ExodusXML
       LoadStateMultiView
       OpenHelp
+      ToolBarAndMenus
       VCRAnimation
       )
   ENDIF(QT_TESTING_WITH_PYTHON)

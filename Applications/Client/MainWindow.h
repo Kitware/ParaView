@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _MainWindow_h
 
 #include <QMainWindow>
+#include <QVariant>
 #include <vtkIOStream.h>
 
 class pqPlotViewModule;
@@ -51,6 +52,9 @@ public:
   ~MainWindow();
 
   bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+
+public slots:
+  QVariant findToolBarActionsNotInMenus();
   
 private slots:
   void onVCRPlay();

@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqUndoStack.h>
 #include <pqVCRController.h>
 #include <pqViewMenu.h>
+#include <pqObjectNaming.h>
 
 #include <QAssistantClient>
 #include <QDir>
@@ -262,7 +263,7 @@ MainWindow::MainWindow() :
 
   connect(this->Implementation->UI.actionToolsManageCustomFilters,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsManageCustomFilters()));
-
+  
   connect(this->Implementation->UI.actionToolsDumpWidgetNames,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsDumpWidgetNames()));
 
@@ -917,4 +918,54 @@ void MainWindow::onVCRPlayDone()
   this->Implementation->UI.actionVCRPause->setEnabled(false);
 }
 
+QVariant MainWindow::findToolBarActionsNotInMenus()
+{
+  QStringList missingInActions;
+
+  // get all QActions on toolbars
+  QList<QToolBar*> toolBars = this->findChildren<QToolBar*>();
+  QList<QAction*> toolBarActions;
+  foreach(QToolBar* tb, toolBars)
+    {
+    toolBarActions += tb->actions();
+    }
+
+  // get all QActions on menus (recursively)
+  QList<QAction*> menuActions = this->menuBar()->actions();
+  for(int i = 0; i < menuActions.size();)
+    {
+    QAction* a = menuActions[i];
+    if(a->menu())
+      {
+      menuActions += a->menu()->actions();
+      menuActions.removeAt(i);
+      }
+    else
+      {
+      i++;
+      }
+    }
+
+  // sort actions
+  qSort(toolBarActions.begin(), toolBarActions.end());
+  qSort(menuActions.begin(), menuActions.end());
+
+  // make sure all toolbar icons are in the menu
+  QList<QAction*>::iterator iter = menuActions.begin();
+  foreach(QAction* a, toolBarActions)
+    {
+    QList<QAction*>::iterator newiter;
+    newiter = qBinaryFind(iter, menuActions.end(), a);
+    if(newiter == menuActions.end())
+      {
+      missingInActions.append(pqObjectNaming::GetName(*a));
+      }
+    else
+      {
+      iter = newiter;
+      }
+    }
+
+  return missingInActions.join(", ");
+}
 
