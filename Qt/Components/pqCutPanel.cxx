@@ -96,11 +96,13 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
   pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
   group1->setTitle(tr("Implicit Plane"));
   QVBoxLayout* l = new QVBoxLayout(group1);
+  this->Implementation->ImplicitPlaneWidget.layout()->setMargin(0);
   l->addWidget(&this->Implementation->ImplicitPlaneWidget);
 
   pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
   group2->setTitle(tr("Slices"));
   l = new QVBoxLayout(group2);
+  this->Implementation->SampleScalarWidget.layout()->setMargin(0);
   l->addWidget(&this->Implementation->SampleScalarWidget);
   
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);

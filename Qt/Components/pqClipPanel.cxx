@@ -102,6 +102,7 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
   pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
   group2->setTitle(tr("Implicit Plane"));
   l = new QVBoxLayout(group2);
+  this->Implementation->ImplicitPlaneWidget.layout()->setMargin(0);
   l->addWidget(&this->Implementation->ImplicitPlaneWidget);
   
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);

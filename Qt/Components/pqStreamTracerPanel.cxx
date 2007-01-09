@@ -123,10 +123,14 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   panel_layout->addStretch();
 
   QVBoxLayout* l = new QVBoxLayout(this->Implementation->UI.pointSource);
+  l->setMargin(0);
+  this->Implementation->PointSourceWidget->layout()->setMargin(0);
   l->addWidget(this->Implementation->PointSourceWidget);
   l->addStretch();
 
   l = new QVBoxLayout(this->Implementation->UI.lineSource);
+  l->setMargin(0);
+  this->Implementation->LineSourceWidget->layout()->setMargin(0);
   l->addWidget(this->Implementation->LineSourceWidget);
   l->addStretch();
 
