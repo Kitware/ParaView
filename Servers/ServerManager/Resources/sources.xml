@@ -450,7 +450,7 @@ The output of the Line source is polygonal data.
       </IntVectorProperty>
 
       <Hints>
-        <PropertyGroup type="LineSource" >
+        <PropertyGroup type="LineSource" label="Line">
           <Property function="Point1WorldPosition" name="Point1" />
           <Property function="Point2WorldPosition" name="Point2" />
           <Property function="Resolution"          name="Resolution" />
