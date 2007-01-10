@@ -1319,9 +1319,6 @@
     <SubProxy name="UpdateSuppressor" id="393"/>
   </Proxy>
   <Proxy group="animation" type="AnimationScene" id="32">
-    <Property name="AnimatedElement" id="32.AnimatedElement" number_of_elements="1">
-      <Element index="0" value="0"/>
-    </Property>
     <Property name="Caching" id="32.Caching" number_of_elements="1">
       <Element index="0" value="1"/>
       <Domain name="bool" id="32.Caching.bool"/>
