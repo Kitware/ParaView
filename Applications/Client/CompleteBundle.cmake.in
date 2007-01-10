@@ -28,9 +28,9 @@ __get_qt_library(qtgui      "@QT_QTGUI_LIBRARY@"      QtGui)
 __get_qt_library(qtnetwork  "@QT_QTNETWORK_LIBRARY@"  QtNetwork)
 __get_qt_library(qtxml      "@QT_QTXML_LIBRARY@"      QtXml)
 __get_qt_library(qttest     "@QT_QTTEST_LIBRARY@"     QtTest)
-__get_qt_library(qtdesigner "@QT_QTDESIGNER_LIBRARY@" QtDesigner)
+__get_qt_library(qtuitools  "@QT_QTUITOOLS_LIBRARY@"  QtUiTools)
 
-SET(qtlibraries ${qtcore} ${qtgui} ${qtnetwork} ${qtxml} ${qttest} ${qtdesigner})
+SET(qtlibraries ${qtcore} ${qtgui} ${qtnetwork} ${qtxml} ${qttest} ${qtuittools})
 
 MESSAGE("QT libs: ${qtlibraries}")
 

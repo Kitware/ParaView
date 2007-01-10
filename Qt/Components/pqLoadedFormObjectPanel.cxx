@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QVBoxLayout>
-#include <QFormBuilder>
+#include <QUiLoader>
 #include <QFile>
 
 // VTK includes
@@ -57,8 +57,8 @@ pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, pqProxy* obje
   
   if(file.open(QFile::ReadOnly))
     {
-    QFormBuilder builder;
-    QWidget* customForm = builder.load(&file, NULL);
+    QUiLoader loader;
+    QWidget* customForm = loader.load(&file, NULL);
     file.close();
     mainlayout->addWidget(customForm);
     }

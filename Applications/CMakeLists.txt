@@ -2,7 +2,6 @@
 # Setup Qt
 SET(QT_REQUIRED TRUE)
 FIND_PACKAGE(Qt4)
-SET(QT_USE_QTDESIGNER ON)
 SET(QT_USE_QTXML TRUE)
 # This ensures that the Qt includes dir etc are set properly.
 # We don't need to find the Qt4 package or include the use file
