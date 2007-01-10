@@ -1317,6 +1317,9 @@
           </property>
           <item>
            <widget class="pqColorChooserButton" name="OrientationAxesOutlineColor" >
+            <property name="enabled" >
+             <bool>false</bool>
+            </property>
             <property name="toolTip" >
              <string>Change the color of the outline for resizing the orientation axes.</string>
             </property>
@@ -1811,6 +1814,22 @@
     <hint type="destinationlabel" >
      <x>377</x>
      <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>OrientationAxesInteraction</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>OrientationAxesOutlineColor</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>237</x>
+     <y>82</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>133</x>
+     <y>114</y>
     </hint>
    </hints>
   </connection>
