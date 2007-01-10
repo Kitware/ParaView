@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QVBoxLayout>
-#include <QUiLoader>
+#include <QtUiTools/QUiLoader>   // CMake 2.4.3+ finds QtUiTools correctly
 #include <QFile>
 
 // VTK includes
