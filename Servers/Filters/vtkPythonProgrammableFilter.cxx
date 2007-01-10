@@ -27,7 +27,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.1");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.2");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ const char * vtkPythonProgrammableFilter::IntToDataSetTypeString(int i)
   switch (i)
     {
     case VTK_POLY_DATA: return "vtkPolyData";
-    case VTK_STRUCTURED_POINTS: "vtkStructuredPoints";
+    case VTK_STRUCTURED_POINTS: return "vtkStructuredPoints";
     case VTK_STRUCTURED_GRID: return "vtkStructuredGrid";
     case VTK_RECTILINEAR_GRID: return "vtkRectilinearGrid";
     case VTK_UNSTRUCTURED_GRID: return "vtkUnstructuredGrid";
