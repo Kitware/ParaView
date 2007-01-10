@@ -142,6 +142,7 @@ SET(UI_FORMS
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqLineWidget.ui
   Resources/UI/pqLineSourceControls.ui
+  Resources/UI/pqLinksEditor.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
@@ -360,11 +361,20 @@ ADD_LIBRARY(pqComponents
   ${UI_BUILT_SOURCES}
 )
 
+#TEMP  for Qt 4.2.2 and CMake < 2.4.3
+IF(WIN32)
+  SET(tmp_ui_lib debug QtUiToolsd4 release QtUiTools4)
+ELSE(WIN32)
+  SET(tmp_ui_lib QtUiTools )
+ENDIF(WIN32)
+
+
 TARGET_LINK_LIBRARIES(pqComponents
   pqCore
   QtChart
   QtTesting
   QtWidgets
+  ${tmp_ui_lib}
   vtkPVServerManager
   QVTK
   ${PYTHON_LINK_LIBRARIES}
