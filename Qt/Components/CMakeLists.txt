@@ -362,7 +362,7 @@ ADD_LIBRARY(pqComponents
 
 #TEMP  for Qt 4.2.2 and CMake < 2.4.3
 IF(WIN32)
-  SET(tmp_ui_lib debug QtUiToolsd release QtUiTools)
+  SET(tmp_ui_lib debug QtUiToolsd optimized QtUiTools)
 ELSE(WIN32)
   SET(tmp_ui_lib QtUiTools )
 ENDIF(WIN32)
