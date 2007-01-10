@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow" >
   <property name="geometry" >
@@ -28,7 +25,7 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>19</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFilters" >
@@ -36,27 +33,10 @@
      <string>F&amp;ilters</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuServer" >
-    <property name="title" >
-     <string>&amp;Server</string>
-    </property>
-    <addaction name="actionServerConnect" />
-    <addaction name="actionServerDisconnect" />
-   </widget>
    <widget class="QMenu" name="menuSources" >
     <property name="title" >
      <string>&amp;Sources</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuPipeline" >
-    <property name="title" >
-     <string>&amp;Pipeline</string>
-    </property>
-    <addaction name="actionAddSource" />
-    <addaction name="actionAddFilter" />
-    <addaction name="separator" />
-    <addaction name="actionChangeInput" />
-    <addaction name="actionDelete" />
    </widget>
    <widget class="QMenu" name="menuAnimation" >
     <property name="title" >
@@ -92,32 +72,6 @@
     <addaction name="actionHelpHelp" />
     <addaction name="separator" />
     <addaction name="actionHelpEnableTooltips" />
-   </widget>
-   <widget class="QMenu" name="menuView" >
-    <property name="title" >
-     <string>&amp;View</string>
-    </property>
-    <widget class="QMenu" name="menuToolbars" >
-     <property name="title" >
-      <string>Toolbars</string>
-     </property>
-    </widget>
-    <widget class="QMenu" name="menuPlots" >
-     <property name="title" >
-      <string>Plots</string>
-     </property>
-    </widget>
-    <addaction name="actionResetCamera" />
-    <addaction name="actionPositiveX" />
-    <addaction name="actionNegativeX" />
-    <addaction name="actionPositiveY" />
-    <addaction name="actionNegativeY" />
-    <addaction name="actionPositiveZ" />
-    <addaction name="actionNegativeZ" />
-    <addaction name="separator" />
-    <addaction name="menuToolbars" />
-    <addaction name="menuPlots" />
-    <addaction name="separator" />
    </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
@@ -168,6 +122,46 @@
     <addaction name="separator" />
     <addaction name="actionFileExit" />
    </widget>
+   <widget class="QMenu" name="menuPipeline" >
+    <property name="title" >
+     <string>&amp;Pipeline</string>
+    </property>
+    <addaction name="actionAddSource" />
+    <addaction name="actionAddFilter" />
+    <addaction name="separator" />
+    <addaction name="actionChangeInput" />
+    <addaction name="actionDelete" />
+   </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>&amp;View</string>
+    </property>
+    <widget class="QMenu" name="menuToolbars" >
+     <property name="title" >
+      <string>Toolbars</string>
+     </property>
+    </widget>
+    <widget class="QMenu" name="menuPlots" >
+     <property name="title" >
+      <string>Plots</string>
+     </property>
+    </widget>
+    <addaction name="actionResetCamera" />
+    <addaction name="actionPositiveX" />
+    <addaction name="actionNegativeX" />
+    <addaction name="actionPositiveY" />
+    <addaction name="actionNegativeY" />
+    <addaction name="actionPositiveZ" />
+    <addaction name="actionNegativeZ" />
+    <addaction name="separator" />
+    <addaction name="actionShowCenterAxes" />
+    <addaction name="actionResetCenter" />
+    <addaction name="actionScalarBarVisibility" />
+    <addaction name="separator" />
+    <addaction name="menuToolbars" />
+    <addaction name="menuPlots" />
+    <addaction name="separator" />
+   </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
    <addaction name="menuView" />
@@ -178,22 +172,13 @@
    <addaction name="menuTools" />
    <addaction name="menuHelp" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>671</y>
-     <width>920</width>
-     <height>19</height>
-    </rect>
-   </property>
-  </widget>
+  <widget class="QStatusBar" name="statusbar" />
   <widget class="QDockWidget" name="pipelineBrowserDock" >
+   <property name="allowedAreas" >
+    <set>Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle" >
     <string>Pipeline Browser</string>
-   </property>
-   <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -208,11 +193,11 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="objectInspectorDock" >
+   <property name="allowedAreas" >
+    <set>Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle" >
     <string>Object Inspector</string>
-   </property>
-   <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -220,11 +205,11 @@
    <widget class="QWidget" name="dockWidgetContents_3" />
   </widget>
   <widget class="QDockWidget" name="statisticsViewDock" >
+   <property name="allowedAreas" >
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle" >
     <string>Statistics View</string>
-   </property>
-   <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -232,11 +217,11 @@
    <widget class="QWidget" name="dockWidgetContents_4" />
   </widget>
   <widget class="QDockWidget" name="elementInspectorDock" >
+   <property name="allowedAreas" >
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle" >
     <string>Element Inspector</string>
-   </property>
-   <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -469,7 +454,7 @@
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqScalarBar22.png</iconset>
    </property>
    <property name="text" >
-    <string/>
+    <string>Show Color Bar</string>
    </property>
    <property name="toolTip" >
     <string>Toggle Scalar Bar Visibility</string>
@@ -935,7 +920,6 @@
    </property>
   </action>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources>
   <include location="../../Qt/Components/Resources/pqComponents.qrc" />
  </resources>

@@ -2,7 +2,9 @@
 import QtTesting
 
 exceptionsList = [ 'MainWindow/variableToolbar/QWidgetAction0',
-                   'MainWindow/representationToolbar/QWidgetAction0' ]
+                   'MainWindow/representationToolbar/QWidgetAction0',
+                   'MainWindow/mainToolBar/QAction1',
+                   'MainWindow/mainToolBar/QAction2' ]
 
 # test that all actions in the tool bars are in the menus
 missingActionsString = QtTesting.invokeMethod('MainWindow', 'findToolBarActionsNotInMenus')
