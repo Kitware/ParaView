@@ -369,4 +369,7 @@ void pqDisplayColorWidget::reloadGUI()
 
   this->BlockEmission = false;
   this->updateGUI();
+  // BlockEmissions blocked a signal that needs to be sent out
+  this->onVariableActivated(this->Variables->currentIndex());
 }
+
