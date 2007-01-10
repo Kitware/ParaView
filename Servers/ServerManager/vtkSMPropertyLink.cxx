@@ -26,7 +26,38 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.7");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.8");
+//-----------------------------------------------------------------------------
+class vtkSMPropertyLinkObserver : public vtkCommand
+{
+public:
+  static vtkSMPropertyLinkObserver* New() 
+    {
+    return new vtkSMPropertyLinkObserver;
+    }
+
+  void SetTarget(vtkSMPropertyLink* t) 
+    { 
+    this->Target = t;
+    }
+  virtual void Execute(vtkObject *c, unsigned long , void* )
+    {
+    vtkSMProperty* caller = vtkSMProperty::SafeDownCast(c);
+    if (this->Target && caller)
+      {
+      this->Target->UpdateProperties(caller);
+      }
+    }
+
+protected:
+  vtkSMPropertyLinkObserver() 
+    {
+    this->Target = 0;
+    }
+
+  vtkSMPropertyLink* Target;
+};
+
 //-----------------------------------------------------------------------------
 struct vtkSMPropertyLinkInternals
 {
@@ -58,6 +89,7 @@ public:
         this->Property->RemoveObserver(this->Observer);
         }
       this->Observer = 0;
+
       }
 
     // Either (Proxy, PropertyName) pair is valid or (Property) is valid,
@@ -69,19 +101,25 @@ public:
     int UpdateDirection;
     vtkCommand* Observer;
     };
+
   typedef vtkstd::list<LinkedProperty> LinkedPropertyType;
   LinkedPropertyType LinkedProperties;
+  vtkSMPropertyLinkObserver* PropertyObserver;
 };
 
 //-----------------------------------------------------------------------------
 vtkSMPropertyLink::vtkSMPropertyLink()
 {
   this->Internals = new vtkSMPropertyLinkInternals;
+  this->Internals->PropertyObserver = vtkSMPropertyLinkObserver::New();
+  this->Internals->PropertyObserver->SetTarget(this);
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPropertyLink::~vtkSMPropertyLink()
 {
+  this->Internals->PropertyObserver->SetTarget(0);
+  this->Internals->PropertyObserver->Delete();
   delete this->Internals;
 }
 
@@ -169,13 +207,15 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProperty* property, int updateDir
     this->Internals->LinkedProperties.push_back(link);
     if (addObserver)
       {
-      this->Internals->LinkedProperties.back().Observer = this->Observer;
+      this->Internals->LinkedProperties.back().Observer = 
+        this->Internals->PropertyObserver;
       }
     }
 
   if (addObserver)
     {
-    property->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
+    property->AddObserver(vtkCommand::ModifiedEvent, 
+      this->Internals->PropertyObserver);
     }
 
 }
@@ -220,8 +260,60 @@ void vtkSMPropertyLink::UpdateProperties(vtkSMProxy* fromProxy, const char* pnam
     {
     if (iter->UpdateDirection & OUTPUT)
       {
-      vtkSMProperty* toProp = iter->Proxy.GetPointer()->GetProperty(
-        iter->PropertyName);
+      vtkSMProperty* toProp = 0;
+      if (iter->Proxy.GetPointer())
+        {
+        toProp = iter->Proxy.GetPointer()->GetProperty(iter->PropertyName);
+        }
+      else if (iter->Property.GetPointer())
+        {
+        toProp = iter->Property;
+        }
+      if (toProp)
+        {
+        toProp->Copy(fromProp);
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMPropertyLink::UpdateProperties(vtkSMProperty* fromProp)
+{
+  // First verify that the property that triggerred this call is indeed
+  // an input property.
+  vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter;
+  int propagate = 0;
+  for (iter = this->Internals->LinkedProperties.begin(); 
+    iter != this->Internals->LinkedProperties.end(); ++iter)
+    {
+    if (iter->UpdateDirection & INPUT && iter->Property.GetPointer() == fromProp)
+      {
+      propagate = 1;
+      break;
+      }
+    }
+
+  if (!propagate)
+    {
+    return;
+    }
+ 
+  // Propagate the changes.
+  for (iter = this->Internals->LinkedProperties.begin(); 
+    iter != this->Internals->LinkedProperties.end(); ++iter)
+    {
+    if (iter->UpdateDirection & OUTPUT)
+      {
+      vtkSMProperty* toProp = 0;
+      if (iter->Proxy.GetPointer())
+        {
+        toProp = iter->Proxy.GetPointer()->GetProperty(iter->PropertyName);
+        }
+      else if (iter->Property.GetPointer())
+        {
+        toProp = iter->Property;
+        }
       if (toProp)
         {
         toProp->Copy(fromProp);

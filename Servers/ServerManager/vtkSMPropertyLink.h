@@ -24,6 +24,7 @@
 //BTX
 class vtkSMProperty;
 struct vtkSMPropertyLinkInternals;
+class vtkSMPropertyLinkObserver;
 //ETX
 
 class VTK_EXPORT vtkSMPropertyLink : public vtkSMLink
@@ -57,6 +58,7 @@ protected:
 
 //BTX
   friend struct vtkSMPropertyLinkInternals;
+  friend class vtkSMPropertyLinkObserver;
 //ETX
 
   // Description:
@@ -69,7 +71,7 @@ protected:
   
   virtual void UpdateVTKObjects(vtkSMProxy* caller);
   virtual void UpdateProperties(vtkSMProxy* caller, const char* pname);
-
+  void UpdateProperties(vtkSMProperty* property);
 private:
   vtkSMPropertyLinkInternals* Internals;
 
