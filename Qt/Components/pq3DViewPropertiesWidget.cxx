@@ -174,7 +174,7 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
     this->lodParameters->setVisible(true);
     double val = pqSMAdaptor::getElementProperty(
       proxy->GetProperty("LODThreshold")).toDouble();
-    if (val == VTK_LARGE_FLOAT)
+    if (val >= VTK_LARGE_FLOAT)
       {
       this->enableLOD->setCheckState(Qt::Unchecked);
       this->updateLODThresholdLabel(this->lodThreshold->value());
@@ -205,7 +205,7 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
     this->compositingParameters->setVisible(true);
     double val = pqSMAdaptor::getElementProperty(
       proxy->GetProperty("CompositeThreshold")).toDouble();
-    if (val == VTK_LARGE_FLOAT)
+    if (val >= VTK_LARGE_FLOAT)
       {
       this->enableCompositing->setCheckState(Qt::Unchecked);
       this->updateCompositeThresholdLabel(this->compositeThreshold->value());
@@ -316,7 +316,7 @@ void pq3DViewPropertiesWidgetInternal::accept()
     else
       {
       pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("LODThreshold"), VTK_LARGE_FLOAT);
+        renModule->GetProperty("LODThreshold"), VTK_DOUBLE_MAX);
       }
     }
 
@@ -331,7 +331,7 @@ void pq3DViewPropertiesWidgetInternal::accept()
     else
       {
       pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("CompositeThreshold"), VTK_LARGE_FLOAT);
+        renModule->GetProperty("CompositeThreshold"), VTK_DOUBLE_MAX);
       }
 
     if (this->enableSubsampling->checkState() == Qt::Checked)
