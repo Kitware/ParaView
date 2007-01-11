@@ -53,7 +53,7 @@
 #include "vtkSelection.h"
 #include "vtkSMMPIRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.54.2.1");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.54.2.2");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -323,7 +323,6 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     }
   ivp->SetElement(0, 2);
 
-#if 0
   // TODO: Enable this to enable depth peeling.
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->RendererProxy->GetProperty("DepthPeeling"));
@@ -333,7 +332,6 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     return;
     }
   ivp->SetElement(0, 1);
-#endif
    
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->RenderWindowProxy->GetProperty("NumberOfLayers"));

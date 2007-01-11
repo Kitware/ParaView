@@ -165,6 +165,7 @@
         default_values="0">
         <IntRangeDomain name="range" min="1" max="100"/>
       </IntVectorProperty>
+
       <IntVectorProperty
         name="DepthPeeling"
         command="SetUseDepthPeeling"
@@ -443,7 +444,7 @@
       <IntVectorProperty name="AlphaBitPlanes"
                          command="SetAlphaBitPlanes"
                          number_of_elements="1"
-                         default_values="0">
+                         default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
