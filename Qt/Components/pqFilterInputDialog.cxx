@@ -36,13 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFilterInputDialog.h"
 
 #include "pqFlatTreeView.h"
+#include "pqPipelineBrowserStateManager.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqServer.h"
 
 #include <QButtonGroup>
 #include <QGridLayout>
-#include <QGroupBox>
 #include <QHeaderView>
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -67,11 +67,15 @@ pqFilterInputDialog::pqFilterInputDialog(QWidget *widgetParent)
   : QDialog(widgetParent)
 {
   this->Internal = new pqFilterInputDialogInternal();
-  this->Model = 0;
+  this->Manager = new pqPipelineBrowserStateManager(this);
   this->Filter = 0;
-  this->TreeView = 0;
-  this->FilterBox = 0;
+  this->Model = 0;
+  this->Pipeline = 0;
+  this->Sources = 0;
+  this->Preview = 0;
   this->InputFrame = 0;
+  this->SourcesLabel = 0;
+  this->MultiHint = 0;
   this->OkButton = 0;
   this->CancelButton = 0;
   this->InputGroup = new QButtonGroup(this);
@@ -79,44 +83,63 @@ pqFilterInputDialog::pqFilterInputDialog(QWidget *widgetParent)
 
   // Set up the base gui elements.
   QGridLayout *baseLayout = new QGridLayout(this);
-  baseLayout->setMargin(9);
-  baseLayout->setSpacing(6);
 
-  // Create a flat tree view and put it on the left.
-  this->TreeView = new pqFlatTreeView(this);
-  this->TreeView->setObjectName("TreeView");
-  this->TreeView->getHeader()->hide();
-  this->TreeView->setMaximumWidth(150);
-  this->TreeView->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-  baseLayout->addWidget(this->TreeView, 0, 0);
-
-  // Add a group box for the filter input properties.
-  this->FilterBox = new QGroupBox(this);
-  this->FilterBox->setObjectName("FilterBox");
-  this->FilterBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  baseLayout->addWidget(this->FilterBox, 0, 1);
+  // Add labels for the dialog areas.
+  baseLayout->addWidget(new QLabel("Choose Input Port", this), 0, 0);
+  this->SourcesLabel = new QLabel("Select Source", this);
+  baseLayout->addWidget(this->SourcesLabel, 0, 1);
+  QFrame *divider = new QFrame(this);
+  divider->setFrameShadow(QFrame::Sunken);
+  divider->setFrameShape(QFrame::Shape::VLine);
+  baseLayout->addWidget(divider, 0, 2, 3, 1);
+  baseLayout->addWidget(new QLabel("Pipeline Preview", this), 0, 3);
 
   // Add a scroll area in case the input elements don't fit.
-  this->InputFrame = new QScrollArea(this->FilterBox);
+  this->InputFrame = new QScrollArea(this);
   this->InputFrame->setObjectName("InputFrame");
   this->InputFrame->setFrameShadow(QFrame::Plain);
   this->InputFrame->setFrameShape(QFrame::NoFrame);
   this->InputFrame->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   this->InputFrame->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   this->InputFrame->setWidgetResizable(true);
-  QHBoxLayout *inputLayout = new QHBoxLayout(this->FilterBox);
-  inputLayout->setMargin(2); // TODO: Check margin on mac.
-  inputLayout->setSpacing(6);
-  inputLayout->addWidget(this->InputFrame);
+  baseLayout->addWidget(this->InputFrame, 1, 0);
 
-  // Add the dialog buttons.
+  // Add the extended selection hint.
+  this->MultiHint = new QLabel(
+      "Note: To select multiple sources, use the shift or control key.",
+      this);
+  this->MultiHint->setWordWrap(true);
+  baseLayout->addWidget(this->MultiHint, 2, 0);
+
+  // Create a flat tree view and put it in the middle.
+  this->Sources = new pqFlatTreeView(this);
+  this->Sources->setObjectName("Sources");
+  this->Sources->getHeader()->hide();
+  this->Sources->setMaximumWidth(150);
+  this->Sources->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+  baseLayout->addWidget(this->Sources, 1, 1, 2, 1);
+
+  // Create the preview pane and add it to the right.
+  this->Preview = new pqFlatTreeView(this);
+  this->Preview->setObjectName("Preview");
+  this->Preview->getHeader()->hide();
+  this->Preview->setMaximumWidth(150);
+  this->Preview->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+  baseLayout->addWidget(this->Preview, 1, 3, 2, 1);
+
+  // Add the separator and the dialog buttons.
+  divider = new QFrame(this);
+  divider->setFrameShadow(QFrame::Sunken);
+  divider->setFrameShape(QFrame::Shape::HLine);
+  baseLayout->addWidget(divider, 3, 0, 1, 4);
+
   this->OkButton = new QPushButton("&OK", this);
   this->OkButton->setObjectName("OkButton");
   this->OkButton->setDefault(true);
   this->CancelButton = new QPushButton("&Cancel", this);
   this->CancelButton->setObjectName("CancelButton");
   QHBoxLayout *buttonLayout = new QHBoxLayout();
-  baseLayout->addLayout(buttonLayout, 1, 0, 1, 2);
+  baseLayout->addLayout(buttonLayout, 4, 0, 1, 4);
   buttonLayout->addStretch();
   buttonLayout->addWidget(this->OkButton);
   buttonLayout->addWidget(this->CancelButton);
@@ -130,7 +153,12 @@ pqFilterInputDialog::pqFilterInputDialog(QWidget *widgetParent)
       this, SLOT(changeCurrentInput(int)));
 
   this->setWindowTitle("Input Editor");
-  this->resize(470, 270);
+  this->resize(520, 270);
+}
+
+pqFilterInputDialog::~pqFilterInputDialog()
+{
+  delete this->Internal;
 }
 
 void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
@@ -139,6 +167,14 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
   if(this->Model == model && this->Filter == filter)
     {
     return;
+    }
+
+  // Clean up the selection pipeline.
+  if(this->Pipeline)
+    {
+    this->Sources->setModel(0);
+    delete this->Pipeline;
+    this->Pipeline = 0;
     }
 
   // Clean up the input property gui elements.
@@ -158,44 +194,57 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
   this->Filter = this->Model ? filter : 0;
 
   // Add the model to the tree view.
-  this->TreeView->setModel(this->Model);
+  this->Preview->setModel(this->Model);
+  this->Manager->setModelAndView(this->Model, this->Preview);
   if(this->Model)
     {
     // Hide all but the first column.
     int columns = this->Model->columnCount();
     for(int i = 1; i < columns; ++i)
       {
-      this->TreeView->getHeader()->hideSection(i);
+      this->Preview->getHeader()->hideSection(i);
       }
 
     this->Model->setEditable(false);
     this->connect(this->Model, SIGNAL(firstChildAdded(const QModelIndex &)),
-        this->TreeView, SLOT(expand(const QModelIndex &)));
+        this->Sources, SLOT(expand(const QModelIndex &)));
+
+    // Make a copy of the model for the user to select sources.
+    this->Pipeline = new pqPipelineModel(*this->Model, this);
+    this->Pipeline->setEditable(false);
+    this->Sources->setModel(this->Pipeline);
     }
 
+  this->setWindowTitle("Input Editor");
   if(this->Filter)
     {
     // Adjust the view's root index to hide the server and items from
     // any other servers.
     pqServer *server = this->Filter->getServer();
-    this->TreeView->setRootIndex(this->Model->getIndexFor(server));
-    this->TreeView->expandAll();
-    this->Model->setSubtreeSelectable(this->Filter, false);
+    this->Sources->setRootIndex(this->Pipeline->getIndexFor(server));
+    this->Sources->expandAll();
+    this->Preview->setRootIndex(this->Model->getIndexFor(server));
+    this->Preview->expandAll();
+    this->Pipeline->setSubtreeSelectable(this->Filter, false);
 
     // Listen to the new selection model.
-    this->connect(this->TreeView->getSelectionModel(),
+    this->connect(this->Sources->getSelectionModel(),
       SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
       this, SLOT(changeInput(const QItemSelection &, const QItemSelection &)));
 
+    // Select the filter in the preview window, so the user can keep
+    // track of it.
+    this->Preview->setCurrentIndex(this->Model->getIndexFor(this->Filter));
+
     // Set the filter title.
-    this->FilterBox->setTitle(this->Filter->getProxyName() + " Inputs");
+    this->setWindowTitle(this->windowTitle() + " - " +
+        this->Filter->getProxyName());
 
     // Create a widget to hold all the input properties.
     QWidget *frame = new QWidget();
     frame->setObjectName("InputContainer");
     QGridLayout *frameLayout = new QGridLayout(frame);
-    frameLayout->setMargin(4);
-    frameLayout->setSpacing(6);
+    frameLayout->setMargin(0);
 
     // Make a map of the sources.
     pqPipelineSource *source = 0;
@@ -377,7 +426,7 @@ void pqFilterInputDialog::changeCurrentInput(int id)
     {
     // Change the selection to match the new input(s).
     this->InChangeInput = true;
-    QItemSelectionModel *model = this->TreeView->getSelectionModel();
+    QItemSelectionModel *model = this->Sources->getSelectionModel();
     model->clear();
 
     // Make a map of the sources.
@@ -395,25 +444,29 @@ void pqFilterInputDialog::changeCurrentInput(int id)
     QListWidget *list = qobject_cast<QListWidget *>(widget);
     if(list)
       {
-      this->TreeView->setSelectionMode(pqFlatTreeView::ExtendedSelection);
+      this->Sources->setSelectionMode(pqFlatTreeView::ExtendedSelection);
+      this->SourcesLabel->setText("Select Source(s)");
+      this->MultiHint->show();
       for(int row = 0; row < list->count(); ++row)
         {
         QListWidgetItem *item = list->item(row);
         iter = sourceMap.find(item->text());
         if(iter != sourceMap.end())
           {
-          model->setCurrentIndex(this->Model->getIndexFor(iter.value()),
+          model->setCurrentIndex(this->Pipeline->getIndexFor(iter.value()),
               QItemSelectionModel::Select);
           }
         }
       }
     else if(label)
       {
-      this->TreeView->setSelectionMode(pqFlatTreeView::SingleSelection);
+      this->Sources->setSelectionMode(pqFlatTreeView::SingleSelection);
+      this->SourcesLabel->setText("Select Source");
+      this->MultiHint->hide();
       iter = sourceMap.find(label->text());
       if(iter != sourceMap.end())
         {
-        model->setCurrentIndex(this->Model->getIndexFor(iter.value()),
+        model->setCurrentIndex(this->Pipeline->getIndexFor(iter.value()),
             QItemSelectionModel::Select);
         }
       }
@@ -450,14 +503,15 @@ void pqFilterInputDialog::changeInput(const QItemSelection &selected,
   for( ; iter != indexes.end(); ++iter)
     {
     // Remove the connections for the deselected items.
-    source = dynamic_cast<pqPipelineSource *>(this->Model->getItemFor(*iter));
+    source = dynamic_cast<pqPipelineSource *>(
+        this->Pipeline->getItemFor(*iter));
     this->Model->removeConnection(source, this->Filter);
 
     // Since the label has only one item, only the list needs to clear
     // the deselected items.
     if(list)
       {
-      value = this->Model->data(*iter, Qt::DisplayRole);
+      value = this->Pipeline->data(*iter, Qt::DisplayRole);
       items = list->findItems(value.toString(), Qt::MatchExactly);
       for(item = items.begin(); item != items.end(); ++item)
         {
@@ -470,11 +524,12 @@ void pqFilterInputDialog::changeInput(const QItemSelection &selected,
   for(iter = indexes.begin(); iter != indexes.end(); ++iter)
     {
     // Add connections for the newly selected inputs.
-    source = dynamic_cast<pqPipelineSource *>(this->Model->getItemFor(*iter));
+    source = dynamic_cast<pqPipelineSource *>(
+        this->Pipeline->getItemFor(*iter));
     this->Model->addConnection(source, this->Filter);
 
     // Add the selected item to the input display widget.
-    value = this->Model->data(*iter, Qt::DisplayRole);
+    value = this->Pipeline->data(*iter, Qt::DisplayRole);
     if(list)
       {
       list->addItem(value.toString());

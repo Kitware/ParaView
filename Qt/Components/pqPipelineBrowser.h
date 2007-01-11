@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 class pqPipelineBrowserInternal;
+class pqPipelineBrowserStateManager;
 class pqConsumerDisplay;
 class pqFlatTreeView;
 class pqGenericViewModule;
@@ -83,7 +84,7 @@ public:
   ///   True if the event should not be sent to the object.
   virtual bool eventFilter(QObject *object, QEvent *e);
 
-  pqPipelineModel *getListModel() const {return this->ListModel;}
+  pqPipelineModel *getModel() const {return this->Model;}
   pqFlatTreeView *getTreeView() const {return this->TreeView;}
 
   pqSourceInfoIcons *getIcons() const {return this->Icons;}
@@ -159,24 +160,23 @@ signals:
 private slots:
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
   void handleIndexClicked(const QModelIndex &index);
-  void saveState(const QModelIndex &index);
-  void restoreState(const QModelIndex &index);
 
 private:
   pqSourceInfoModel *getFilterModel();
   void setupConnections(pqSourceInfoModel *model, pqSourceInfoGroupMap *map);
   void getAllowedSources(pqSourceInfoModel *model, vtkSMProxy *input,
       QStringList &list);
-  void saveState(const QModelIndex &index, vtkPVXMLElement *root) const;
-  void restoreState(const QModelIndex &index, vtkPVXMLElement *root);
 
 private:
   pqPipelineBrowserInternal *Internal; ///< Stores the class data.
-  pqPipelineModel *ListModel;          ///< Stores the pipeline model.
+  pqPipelineModel *Model;              ///< Stores the pipeline model.
   pqFlatTreeView *TreeView;            ///< Stores the tree view.
   pqSourceInfoIcons *Icons;            ///< Stores the icons.
   pqSourceInfoGroupMap *FilterGroups;  ///< Stores the filter grouping.
   pqSourceHistoryModel *FilterHistory; ///< Stores the recent filters.
+
+  /// Keeps track of tree state for moving indexes.
+  pqPipelineBrowserStateManager *Manager;
 };
 
 #endif

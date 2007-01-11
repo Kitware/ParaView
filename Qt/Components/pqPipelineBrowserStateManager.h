@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqFilterInputDialog.h
+   Module:    pqPipelineBrowserStateManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,67 +30,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqFilterInputDialog.h
-/// \date 12/5/2006
+/// \file pqPipelineBrowserStateManager.h
+/// \date 1/10/2007
 
-#ifndef _pqFilterInputDialog_h
-#define _pqFilterInputDialog_h
+#ifndef _pqPipelineBrowserStateManager_h
+#define _pqPipelineBrowserStateManager_h
 
 
 #include "pqComponentsExport.h"
-#include <QDialog>
+#include <QObject>
 
-class pqFilterInputDialogInternal;
 class pqFlatTreeView;
-class pqPipelineBrowserStateManager;
-class pqPipelineFilter;
+class pqPipelineBrowserStateManagerInternal;
 class pqPipelineModel;
-class QButtonGroup;
-class QGroupBox;
-class QItemSelection;
-class QLabel;
-class QPushButton;
-class QScrollArea;
-class QString;
-class QStringList;
+class QModelIndex;
+class vtkPVXMLElement;
 
 
-class PQCOMPONENTS_EXPORT pqFilterInputDialog : public QDialog
+/// \class pqPipelineBrowserStateManager
+/// \brief
+///   The pqPipelineBrowserStateManager class is used to save and
+///   restore the view state.
+class PQCOMPONENTS_EXPORT pqPipelineBrowserStateManager : public QObject
 {
   Q_OBJECT
 
 public:
-  pqFilterInputDialog(QWidget *parent=0);
-  virtual ~pqFilterInputDialog();
+  pqPipelineBrowserStateManager(QObject *parent=0);
+  virtual ~pqPipelineBrowserStateManager();
 
-  pqPipelineModel *getModel() const {return this->Model;}
-  pqPipelineFilter *getFilter() const {return this->Filter;}
-  void setModelAndFilter(pqPipelineModel *model, pqPipelineFilter *filter);
+  void setModelAndView(pqPipelineModel *model, pqFlatTreeView *view);
 
-  void getFilterInputPorts(QStringList &ports) const;
-  void getFilterInputs(const QString &port, QStringList &inputs) const;
-  void getCurrentFilterInputs(const QString &port, QStringList &inputs) const;
+  void saveState(vtkPVXMLElement *root) const;
+  void restoreState(vtkPVXMLElement *root);
 
-private slots:
-  void changeCurrentInput(int id);
-  void changeInput(const QItemSelection &selected,
-      const QItemSelection &deselected);
+public slots:
+  void saveState(const QModelIndex &index);
+  void restoreState(const QModelIndex &index);
 
 private:
-  pqFilterInputDialogInternal *Internal;
-  pqPipelineBrowserStateManager *Manager;
-  pqPipelineFilter *Filter;
+  void saveState(const QModelIndex &index, vtkPVXMLElement *root) const;
+  void restoreState(const QModelIndex &index, vtkPVXMLElement *root);
+
+private:
+  pqPipelineBrowserStateManagerInternal *Internal;
   pqPipelineModel *Model;
-  pqPipelineModel *Pipeline;
-  pqFlatTreeView *Sources;
-  pqFlatTreeView *Preview;
-  QScrollArea *InputFrame;
-  QLabel *SourcesLabel;
-  QLabel *MultiHint;
-  QPushButton *OkButton;
-  QPushButton *CancelButton;
-  QButtonGroup *InputGroup;
-  bool InChangeInput;
+  pqFlatTreeView *View;
 };
 
 #endif

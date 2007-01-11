@@ -85,6 +85,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPQLookupTableManager.h
   pqPipelineBrowser.h
   pqPipelineBrowserContextMenu.h
+  pqPipelineBrowserStateManager.h
   pqPipelineMenu.h
   pqPipelineModelSelectionAdaptor.h
   pqPointSourceWidget.h
@@ -282,6 +283,8 @@ ADD_LIBRARY(pqComponents
   pqPipelineBrowser.h
   pqPipelineBrowserContextMenu.cxx
   pqPipelineBrowserContextMenu.h
+  pqPipelineBrowserStateManager.cxx
+  pqPipelineBrowserStateManager.h
   pqPipelineMenu.cxx
   pqPipelineMenu.h
   pqPipelineModelSelectionAdaptor.cxx
