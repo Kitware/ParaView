@@ -36,7 +36,7 @@ echo "Copy QAssistant"
 (cd "${QT_BIN_DIR}" && tar cf - assistant.app) | (cd paraview_alpha.app/Contents/MacOS && tar xvf - )
 
 echo "Copy Qt frameworks"
-for a in QtCore QtGui QtNetwork QtXml; do
+for a in QtCore QtGui QtNetwork QtXml QtAssistant; do
   (cd "${QT_LIB_DIR}" &&  tar cf - $a.framework) | (cd paraview_alpha.app/Contents/Frameworks && tar xvf -) 
 done
 
@@ -44,90 +44,96 @@ EXECUTABLES="paraview_alpha.app/Contents/MacOS/paraview_alpha"
 EXECUTABLES="${EXECUTABLES} paraview_alpha.app/Contents/MacOS/pvserver"
 EXECUTABLES="${EXECUTABLES} paraview_alpha.app/Contents/MacOS/pvrenderserver"
 EXECUTABLES="${EXECUTABLES} paraview_alpha.app/Contents/MacOS/pvdataserver"
-EXECUTABLES="${EXECUTABLES} paraview_alpha.app/Contents/MacOS/pvpython"
+if [ -e paraview_alpha.app/Contents/MacOS/pvpython ]; then
+    EXECUTABLES="${EXECUTABLES} paraview_alpha.app/Contents/MacOS/pvpython"
+fi
 SUB_EXECUTABLES="${SUB_EXECUTABLES} paraview_alpha.app/Contents/MacOS/assistant.app/Contents/MacOS/assistant"
 
 echo "Stage 1 - fix all the Qt dylib's"
 for a in ${QT_LIB_DIR}/*.dylib; do
-  echo -n .
-  file=$(basename $a)
-  for executable in ${EXECUTABLES}; do
-    install_name_tool "${executable}" -change $a @executable_path/${file}
-  done
-  for executable in ${SUB_EXECUTABLES}; do
-    install_name_tool "${executable}" -change $a @executable_path/../../../${file}
-  done
-  install_name_tool paraview_alpha.app/Contents/MacOS/${file} -id @executable_path/${file}
-
-  if [ "x$DEBUG" = "x1" ]; then
-    echo "Stage 1.a.$a"
+  if [ -e $a  ]; then
+      echo -n .
+      file=$(basename $a)
+      for executable in ${EXECUTABLES}; do
+          install_name_tool "${executable}" -change $a @executable_path/${file}
+      done
+      for executable in ${SUB_EXECUTABLES}; do
+          install_name_tool "${executable}" -change $a @executable_path/../../../${file}
+      done
+      install_name_tool paraview_alpha.app/Contents/MacOS/${file} -id @executable_path/${file}
+      
+      if [ "x$DEBUG" = "x1" ]; then
+          echo "Stage 1.a.$a"
+      fi
+      for lib in @ParaView_BINARY_DIR@/bin/*.so @ParaView_BINARY_DIR@/bin/*.dylib; do
+          libfile=$(basename ${lib})
+          install_name_tool paraview_alpha.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
+      done
+      if [ "x$DEBUG" = "x1" ]; then
+          echo "Stage 1.b.$a"
+      fi
+      for lib in ${QT_LIB_DIR}/*.dylib; do
+          libfile=$(basename ${lib})
+          install_name_tool paraview_alpha.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
+      done
   fi
-  for lib in @ParaView_BINARY_DIR@/bin/*.so @ParaView_BINARY_DIR@/bin/*.dylib; do
-    libfile=$(basename ${lib})
-    install_name_tool paraview_alpha.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
-  done
-  if [ "x$DEBUG" = "x1" ]; then
-    echo "Stage 1.b.$a"
-  fi
-  for lib in ${QT_LIB_DIR}/*.dylib; do
-    libfile=$(basename ${lib})
-    install_name_tool paraview_alpha.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
-  done
 done
 
 echo ""
 echo "Stage 2 - Fix all the remaining dylib's"
 for a in @ParaView_BINARY_DIR@/bin/*.so @ParaView_BINARY_DIR@/bin/*.dylib; do
-  echo -n .
-  file=$(basename $a)
-  for executable in ${EXECUTABLES}; do
-    install_name_tool "${executable}" -change $a @executable_path/${file}
-  done
-  for executable in ${SUB_EXECUTABLES}; do
-    install_name_tool "${executable}" -change $a @executable_path/../../../${file}
-  done
-  install_name_tool paraview_alpha.app/Contents/MacOS/${file} -id @executable_path/${file}
-
-  if [ "x$DEBUG" = "x1" ]; then
-    echo "Stage 2.a.$a"
-  fi
-  for lib in @ParaView_BINARY_DIR@/bin/*.dylib; do
-    libfile=$(basename ${lib})
-    install_name_tool paraview_alpha.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
-  done
-  if [ "x$DEBUG" = "x1" ]; then
-    echo "Stage 2.b.$a"
-  fi
-  for lib in ${QT_LIB_DIR}/*.dylib; do
-    libfile=$(basename ${lib})
-    install_name_tool paraview_alpha.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
-  done
+    if [ -e $a ]; then
+        echo -n .
+        file=$(basename $a)
+        for executable in ${EXECUTABLES}; do
+            install_name_tool "${executable}" -change $a @executable_path/${file}
+        done
+        for executable in ${SUB_EXECUTABLES}; do
+            install_name_tool "${executable}" -change $a @executable_path/../../../${file}
+        done
+        install_name_tool paraview_alpha.app/Contents/MacOS/${file} -id @executable_path/${file}
+        
+        if [ "x$DEBUG" = "x1" ]; then
+            echo "Stage 2.a.$a"
+        fi
+        for lib in @ParaView_BINARY_DIR@/bin/*.dylib; do
+            libfile=$(basename ${lib})
+            install_name_tool paraview_alpha.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
+        done
+        if [ "x$DEBUG" = "x1" ]; then
+            echo "Stage 2.b.$a"
+        fi
+        for lib in ${QT_LIB_DIR}/*.dylib; do
+            libfile=$(basename ${lib})
+            install_name_tool paraview_alpha.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
+        done
+    fi
 done
 
 echo ""
 echo "Stage 3 - Fix all the Qt Frameworks"
-for a in QtCore QtGui QtNetwork QtXml; do
-  install_name_tool -id @executable_path/../Frameworks/$a.framework/Versions/4.0/$a paraview_alpha.app/Contents/Frameworks/$a.framework/Versions/4.0/$a
+for a in QtCore QtGui QtNetwork QtXml QtAssistant; do
+  install_name_tool -id @executable_path/../Frameworks/$a.framework/Versions/4/$a paraview_alpha.app/Contents/Frameworks/$a.framework/Versions/4/$a
   for executable in ${EXECUTABLES}; do
-    install_name_tool "${executable}" -change ${QT_LIB_DIR}/$a.framework/Versions/4.0/$a @executable_path/../Frameworks/$a.framework/Versions/4.0/$a
+    install_name_tool "${executable}" -change ${QT_LIB_DIR}/$a.framework/Versions/4/$a @executable_path/../Frameworks/$a.framework/Versions/4/$a
   done
   for executable in ${SUB_EXECUTABLES}; do
-    install_name_tool "${executable}" -change ${QT_LIB_DIR}/$a.framework/Versions/4.0/$a @executable_path/../../../../Frameworks/$a.framework/Versions/4.0/$a
+    install_name_tool "${executable}" -change ${QT_LIB_DIR}/$a.framework/Versions/4/$a @executable_path/../../../../Frameworks/$a.framework/Versions/4/$a
   done
 
   if [ "x$DEBUG" = "x1" ]; then
     echo "Stage 3.a.$a"
   fi
-  for b in QtCore QtGui QtNetwork QtXml; do
-    install_name_tool -change ${QT_LIB_DIR}/$b.framework/Versions/4.0/$b @executable_path/../Frameworks/$b.framework/Versions/4.0/$b paraview_alpha.app/Contents/Frameworks/$a.framework/Versions/4.0/$a
-    install_name_tool -change ${QT_LIB_DIR}/$b.framework/Versions/4.0/$b @executable_path/../Frameworks/$b.framework/Versions/4.0/$b paraview_alpha.app/Contents/Frameworks/$a.framework/Versions/Current/$a
-    install_name_tool -change ${QT_LIB_DIR}/$b.framework/Versions/4.0/$b @executable_path/../Frameworks/$b.framework/Versions/4.0/$b paraview_alpha.app/Contents/Frameworks/$a.framework/$a
+  for b in QtCore QtGui QtNetwork QtXml QtAssistant; do
+    install_name_tool -change ${QT_LIB_DIR}/$b.framework/Versions/4/$b @loader_path/../../../$b.framework/Versions/4/$b paraview_alpha.app/Contents/Frameworks/$a.framework/Versions/4/$a
+    install_name_tool -change ${QT_LIB_DIR}/$b.framework/Versions/4/$b @loader_path/../../../$b.framework/Versions/4/$b paraview_alpha.app/Contents/Frameworks/$a.framework/Versions/Current/$a
+    install_name_tool -change ${QT_LIB_DIR}/$b.framework/Versions/4/$b @loader_path/../$b.framework/Versions/4/$b paraview_alpha.app/Contents/Frameworks/$a.framework/$a
   done
   if [ "x$DEBUG" = "x1" ]; then
     echo "Stage 3.b.$a"
   fi
   for b in $(ls paraview_alpha.app/Contents/MacOS/*.dylib); do
-    install_name_tool -change ${QT_LIB_DIR}/$a.framework/Versions/4.0/$a @executable_path/../Frameworks/$a.framework/Versions/4.0/$a $b
+    install_name_tool -change ${QT_LIB_DIR}/$a.framework/Versions/4/$a @executable_path/../Frameworks/$a.framework/Versions/4/$a $b
   done
 done
 
