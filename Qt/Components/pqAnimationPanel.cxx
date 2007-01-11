@@ -137,6 +137,7 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
 
   this->Internal->TypeAdaptor = new pqSignalAdaptorKeyFrameType(
     this->Internal->interpolationType, 
+    this->Internal->valueLabel,
     this->Internal->typeFrame);
 
   this->Internal->TimeAdaptor = new pqSignalAdaptorKeyFrameTime(

@@ -21,7 +21,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkSMSinusoidKeyFrameProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMSinusoidKeyFrameProxy, "1.6");
 vtkStandardNewMacro(vtkSMSinusoidKeyFrameProxy);
 
 //----------------------------------------------------------------------------
@@ -77,15 +77,14 @@ void vtkSMSinusoidKeyFrameProxy::UpdateValue(double currenttime,
     return;
     }
 
-  // ( start + (end-start)*sin( 2*pi* (freq*t + phase/360) )/2 )
+  // ( start + (end-start)*sin( 2*pi* (freq*t + phase/360) ) )
   double t = sin ( 8.0 * atan(static_cast<double>(1.0)) *  
-    (this->Frequency* currenttime + this->Phase/360.0)) /  2.0;
+    (this->Frequency* currenttime + this->Phase/360.0));
 
   if (animated_element != -1)
     {
-    double vmin = this->GetKeyValue();
-    double vmax = vmin + this->Offset; 
-    double value = vmin + t * (vmax - vmin);
+    double amplitude = this->GetKeyValue();
+    double value = this->Offset + amplitude*t;
     domain->SetAnimationValue(property, animated_element, value);
     }
   else
@@ -98,9 +97,8 @@ void vtkSMSinusoidKeyFrameProxy::UpdateValue(double currenttime,
     // interpolate comman indices.
     for (i=0; i < min; i++)
       {
-      double vmax = next->GetKeyValue(i);
-      double vmin = this->GetKeyValue(i);
-      double value = vmin + t * (vmax - vmin);
+      double amplitude = this->GetKeyValue(i);
+      double value = this->Offset + amplitude*t;
       domain->SetAnimationValue(property, i, value);
       }
     // add any additional indices in start key frame.

@@ -14,7 +14,12 @@
 =========================================================================*/
 // .NAME vtkSMSinusoidKeyFrameProxy
 // .SECTION Description
-// Interplates a sinusoid. 
+// Interplates a sinusoid. At any given time \c t, the resultant
+// value obtained from this keyframe is given by :
+// value = this->Offset + (Key Value) * Sin (2*pi*theta);
+// where theta = this->Frequency*t + (this->Phase/360).
+// As is clear from  the equation, the amplitude of the wave
+// is obtained from the value of the keyframe.
 
 #ifndef __vtkSMSinusoidKeyFrameProxy_h
 #define __vtkSMSinusoidKeyFrameProxy_h

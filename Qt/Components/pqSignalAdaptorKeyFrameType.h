@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptors.h"
 
 class vtkSMProxy;
+class QLabel;
 
 // pqSignalAdaptorKeyFrameType is adaptor for the "Type" property of the 
 // vtkSMCompositeKeyFrameProxy. For certain types of keyframes, 
@@ -51,8 +52,10 @@ public:
   // Constructor. 
   // \c combo is the combo-box that chooses the type, while frame is
   // the frame in which this adaptor can put additional widgets, if needed.
+  // \c valueLabel is the label that is used for the keyframe value,
+  // since based on the type  the value label may change.
   // Note that this class will toggle the visibility of this frame as needed.
-  pqSignalAdaptorKeyFrameType(QComboBox* combo, QWidget* frame);
+  pqSignalAdaptorKeyFrameType(QComboBox* combo, QLabel* valueLabel, QWidget* frame);
   virtual ~pqSignalAdaptorKeyFrameType();
 
   // \c keyframe is the proxy for the key frame. It typically is

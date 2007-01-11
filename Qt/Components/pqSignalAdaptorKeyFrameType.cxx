@@ -35,11 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMCompositeKeyFrameProxy.h"
 #include "vtkSmartPointer.h"
 
-#include <QtDebug>
-#include <QPointer>
-#include <QWidget>
-#include <QDoubleValidator>
 #include <QComboBox>
+#include <QDoubleValidator>
+#include <QLabel>
+#include <QPointer>
+#include <QtDebug>
+#include <QWidget>
 
 #include "pqPropertyLinks.h"
 
@@ -49,16 +50,18 @@ public:
   Ui::pqSignalAdaptorKeyFrameType Ui;
   vtkSmartPointer<vtkSMProxy> KeyFrameProxy;
   QPointer<QWidget> Frame;
+  QPointer<QLabel> ValueLabel;
   pqPropertyLinks Links;
 };
 
 //-----------------------------------------------------------------------------
-pqSignalAdaptorKeyFrameType::pqSignalAdaptorKeyFrameType(QComboBox* combo, 
-  QWidget* frame)
+pqSignalAdaptorKeyFrameType::pqSignalAdaptorKeyFrameType(QComboBox* combo,
+  QLabel* label, QWidget* frame)
 : pqSignalAdaptorComboBox(combo)
 {
   this->Internals = new pqInternals;
   this->Internals->Frame = frame;
+  this->Internals->ValueLabel = label;
   this->Internals->Ui.setupUi(frame);
 
   this->Internals->Ui.exponentialGroup->hide();
@@ -144,6 +147,15 @@ void pqSignalAdaptorKeyFrameType::onTypeChanged()
     {
     this->Internals->Ui.sinusoidGroup->show();
     this->Internals->Frame->show();
+    }
+
+  if (type == vtkSMCompositeKeyFrameProxy::SINUSOID && this->Internals->ValueLabel)
+    {
+    this->Internals->ValueLabel->setText("Amplitude");
+    }
+  else if (this->Internals->ValueLabel)
+    {
+    this->Internals->ValueLabel->setText("Value");
     }
 }
 
