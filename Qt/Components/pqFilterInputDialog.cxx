@@ -207,7 +207,7 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
 
     this->Model->setEditable(false);
     this->connect(this->Model, SIGNAL(firstChildAdded(const QModelIndex &)),
-        this->Sources, SLOT(expand(const QModelIndex &)));
+        this->Preview, SLOT(expand(const QModelIndex &)));
 
     // Make a copy of the model for the user to select sources.
     this->Pipeline = new pqPipelineModel(*this->Model, this);
