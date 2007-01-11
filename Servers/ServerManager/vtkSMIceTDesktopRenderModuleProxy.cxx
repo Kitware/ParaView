@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.23");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -599,7 +599,7 @@ void vtkSMIceTDesktopRenderModuleProxy::RemoveDisplay(
 void vtkSMIceTDesktopRenderModuleProxy::StillRender()
 {
   int orderedCompositingNeeded = 0;
-
+  bool new_dataset = false;
   if (!this->DisableOrderedCompositing)
     {
     // Update the PKdTree, but only if there is something to divide that has
@@ -617,6 +617,7 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
           this->PartitionedData->end() )
         {
         doBuildLocator = 1;
+        new_dataset = true;
         break;
         }
       }
@@ -733,6 +734,16 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
         pm->SendCleanupPendingProgress(this->GetConnectionID());
         }
       }
+    }
+
+  if (new_dataset && this->OrderedCompositing && orderedCompositingNeeded)
+    {
+    // SetOrderedCompositing has no effect if OrderedCompositing is value
+    // is unchanged. However, a new display was added and it's 
+    // OrderedCompositing flag hasn;t been synchronized with that
+    // of the render module. Clearing the value will ensure
+    // that SetOrderedCompositing() will update all displays.
+    this->OrderedCompositing = 0;
     }
 
   this->SetOrderedCompositing(orderedCompositingNeeded);
