@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqAnimationManager_h
 #define __pqAnimationManager_h
 
-#include "pqCoreExport.h"
+#include "pqComponentsExport.h"
 #include <QObject>
 
 class pqAnimationCue;
@@ -46,7 +46,7 @@ class vtkSMProxy;
 // It encapsulates the initialization of animation scene per server
 // connection i.e. this class basically keeps track of the active 
 // animation scene.
-class PQCORE_EXPORT pqAnimationManager : public QObject
+class PQCOMPONENTS_EXPORT pqAnimationManager : public QObject
 {
   Q_OBJECT
 public:
