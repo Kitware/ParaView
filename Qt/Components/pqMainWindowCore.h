@@ -243,6 +243,8 @@ public slots:
 
   void onToolsCreateCustomFilter();
   void onToolsManageCustomFilters();
+  
+  void onToolsManageLinks();
 
   void onToolsDumpWidgetNames();
   

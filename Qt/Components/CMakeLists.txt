@@ -151,6 +151,7 @@ SET(UI_FORMS
   Resources/UI/pqLineSourceControls.ui
   Resources/UI/pqLineWidget.ui
   Resources/UI/pqLineSourceControls.ui
+  Resources/UI/pqLinksEditor.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui

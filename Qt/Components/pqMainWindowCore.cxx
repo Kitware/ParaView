@@ -79,8 +79,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqToolTipTrapper.h"
 #include "pqVCRController.h"
 #include "pqWriterFactory.h"
+#include "pqLinksModel.h"
+#include "ui_pqLinksEditor.h"
 
-#include <pqConnect.h>
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
 #include <pqProgressBar.h>
@@ -335,7 +336,7 @@ void pqMainWindowCore::setSourceMenu(QMenu* menu)
 {
   if(menu)
     {
-    menu << pqConnect(SIGNAL(triggered(QAction*)), 
+    QObject::connect(menu, SIGNAL(triggered(QAction*)), 
       this, SLOT(onCreateSource(QAction*)));
 
     menu->clear();
@@ -378,7 +379,8 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
   this->Implementation->FilterMenu = menu;
   if(this->Implementation->FilterMenu)
     {
-    this->Implementation->FilterMenu << pqConnect(SIGNAL(triggered(QAction*)), 
+    QObject::connect(this->Implementation->FilterMenu, 
+      SIGNAL(triggered(QAction*)), 
       this, SLOT(onCreateFilter(QAction*)));
 
    QObject::connect(this->Implementation->FilterMenu,
@@ -2493,5 +2495,15 @@ void pqMainWindowCore::setCenterAxesVisibility(bool visible)
     }
   rm->setCenterAxesVisibility(visible);
   rm->render();
+}
+
+void pqMainWindowCore::onToolsManageLinks()
+{
+  QDialog dialog;
+  Ui::pqLinksEditor ui;
+  ui.setupUi(&dialog);
+  pqLinksModel* model = new pqLinksModel(ui.tableView);
+  ui.tableView->setModel(model);
+  dialog.exec();
 }
 
