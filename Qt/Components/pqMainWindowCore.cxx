@@ -1393,12 +1393,12 @@ void pqMainWindowCore::onToolsCreateCustomFilter()
 {
   // Get the selected sources from the application core. Notify the user
   // if the selection is empty.
-  QWidget *activeWindow = QApplication::activeWindow();
+  QWidget *mainWin = this->Implementation->Parent;
   const pqServerManagerSelection *selections =
     pqApplicationCore::instance()->getSelectionModel()->selectedItems();
   if(selections->size() == 0)
     {
-    QMessageBox::warning(activeWindow, "Create Custom Filter Error",
+    QMessageBox::warning(mainWin, "Create Custom Filter Error",
         "No pipeline objects are selected.\n"
         "To create a new custom filter, select the sources and "
         "filters you want.\nThen, launch the creation wizard.",
@@ -1413,7 +1413,7 @@ void pqMainWindowCore::onToolsCreateCustomFilter()
   custom.setContents(selections);
   if(!custom.hasChildren(QModelIndex()))
     {
-    QMessageBox::warning(activeWindow, "Create Custom Filter Error",
+    QMessageBox::warning(mainWin, "Create Custom Filter Error",
         "The selected objects cannot be used to make a custom filter.\n"
         "To create a new custom filter, select the sources and "
         "filters you want.\nThen, launch the creation wizard.",
@@ -1421,7 +1421,7 @@ void pqMainWindowCore::onToolsCreateCustomFilter()
     return;
     }
 
-  pqCustomFilterDefinitionWizard wizard(&custom, activeWindow);
+  pqCustomFilterDefinitionWizard wizard(&custom, mainWin);
   wizard.setCustomFilterList(this->Implementation->CustomFilters);
   if(wizard.exec() == QDialog::Accepted)
     {
@@ -1443,7 +1443,7 @@ void pqMainWindowCore::onToolsManageCustomFilters()
     {
     this->Implementation->CustomFilterManager =
       new pqCustomFilterManager(this->Implementation->CustomFilters,
-        QApplication::activeWindow());
+        this->Implementation->Parent);
     }
 
   this->Implementation->CustomFilterManager->show();
@@ -1472,7 +1472,7 @@ void pqMainWindowCore::onToolsRecordTest()
 #endif
   filters += "All Files (*)";
   pqFileDialog *fileDialog = new pqFileDialog(NULL,
-      QApplication::activeWindow(), tr("Record Test"), QString(), filters);
+      this->Implementation->Parent, tr("Record Test"), QString(), filters);
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("ToolsRecordTestDialog");
   fileDialog->setFileMode(pqFileDialog::AnyFile);
@@ -1508,7 +1508,7 @@ void pqMainWindowCore::onToolsRecordTestScreenshot()
   filters += ";;JPG Image (*.jpg)";
   filters += ";;All Files (*)";
   pqFileDialog *fileDialog = new pqFileDialog(NULL,
-      QApplication::activeWindow(), tr("Save Test Screenshot"), QString(),
+      this->Implementation->Parent, tr("Save Test Screenshot"), QString(),
       filters);
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("RecordTestScreenshotDialog");
@@ -1559,7 +1559,7 @@ void pqMainWindowCore::onToolsPlayTest()
 #endif
   filters += "All Files (*)";
   pqFileDialog *fileDialog = new pqFileDialog(NULL,
-      QApplication::activeWindow(), tr("Play Test"), QString(), filters);
+      this->Implementation->Parent, tr("Play Test"), QString(), filters);
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("ToolsPlayTestDialog");
   fileDialog->setFileMode(pqFileDialog::ExistingFile);
@@ -2451,3 +2451,4 @@ void pqMainWindowCore::setCenterAxesVisibility(bool visible)
   rm->setCenterAxesVisibility(visible);
   rm->render();
 }
+
