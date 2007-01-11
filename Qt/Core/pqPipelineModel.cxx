@@ -559,7 +559,7 @@ pqPipelineModel::pqPipelineModel(QObject *parentObject)
   this->initializePixmaps();
 }
 
-pqPipelineModel::pqPipelineModel(const pqPipelineModel &,
+pqPipelineModel::pqPipelineModel(const pqPipelineModel &other,
     QObject *parentObject)
   : QAbstractItemModel(parentObject)
 {
@@ -570,7 +570,51 @@ pqPipelineModel::pqPipelineModel(const pqPipelineModel &,
   // Initialize the pixmap list.
   this->initializePixmaps();
 
-  // TODO: Copy the other pipeline model.
+  // Copy the other pipeline model. Start with the server objects.
+  pqPipelineSource *sink = 0;
+  pqPipelineModelItem *item = 0;
+  pqPipelineModelSource *source = 0;
+  QList<pqPipelineModelServer *>::ConstIterator server =
+      other.Internal->Servers.begin();
+  for( ; server != other.Internal->Servers.end(); ++server)
+    {
+    // Add the server to the model.
+    this->addServer((*server)->getServer());
+
+    // Add all the server's objects to the model.
+    item = other.getNextModelItem(*server, *server);
+    while(item)
+      {
+      source = dynamic_cast<pqPipelineModelSource *>(item);
+      if(source)
+        {
+        this->addSource(source->getSource());
+        }
+
+      item = other.getNextModelItem(item, *server);
+      }
+
+    // Set up all the connections.
+    item = other.getNextModelItem(*server, *server);
+    while(item)
+      {
+      source = dynamic_cast<pqPipelineModelSource *>(item);
+      if(source)
+        {
+        for(int i = 0; i < source->getChildCount(); i++)
+          {
+          sink = dynamic_cast<pqPipelineSource *>(
+              source->getChild(i)->getObject());
+          if(sink)
+            {
+            this->addConnection(source->getSource(), sink);
+            }
+          }
+        }
+
+      item = other.getNextModelItem(item, *server);
+      }
+    }
 }
 
 pqPipelineModel::pqPipelineModel(const pqServerManagerModel &other,
