@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDoubleSpinBoxDomain.h
+   Module:    pqKeyTimeDomain.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,42 +29,34 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef __pqKeyTimeDomain_h
+#define __pqKeyTimeDomain_h
 
-#ifndef pq_DoubleSpinBoxDomain_h
-#define pq_DoubleSpinBoxDomain_h
+#include "pqDoubleSpinBoxDomain.h"
+#include <QPointer>
 
-#include <QObject>
-#include "pqComponentsExport.h"
-
-class QDoubleSpinBox;
-class vtkSMProperty;
-
-/// combo box domain 
-/// observers the domain for a combo box and updates accordingly
-class PQCOMPONENTS_EXPORT pqDoubleSpinBoxDomain : public QObject
+class pqAnimationScene;
+// pqKeyTimeDomain is an specialization of pqDoubleSpinBoxDomain which
+// scales the bounds given by the domain using the start and end times
+// from the Animation Scene.
+class PQCOMPONENTS_EXPORT pqKeyTimeDomain : public pqDoubleSpinBoxDomain
 {
   Q_OBJECT
+  typedef pqDoubleSpinBoxDomain Superclass;
 public:
   /// constructor requires a QDoubleSpinBox, 
   /// and the property with the domain to observe
   /// the list of values in the combo box is automatically 
   /// updated when the domain changes
-  pqDoubleSpinBoxDomain(QDoubleSpinBox* p, vtkSMProperty* prop, int index=-1);
-  ~pqDoubleSpinBoxDomain();
+  pqKeyTimeDomain(QDoubleSpinBox* p, vtkSMProperty* prop, int index=-1);
+  ~pqKeyTimeDomain();
 
-public slots:
-  void domainChanged();
-protected slots:
-  void internalDomainChanged();
-
+  void setAnimationScene(pqAnimationScene* scene);
 protected:
-  virtual void setRange(double min, double max);
   virtual void setSingleStep(double step);
+  virtual void setRange(double min, double max);
 
-  QDoubleSpinBox* getSpinBox() const;
-private:
-  class pqInternal;
-  pqInternal* Internal;
+  QPointer<pqAnimationScene> Scene;
 };
 
 #endif

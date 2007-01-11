@@ -34,6 +34,8 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DWidgetFactory.h
+  pqAnimationCue.h
+  pqAnimationScene.h
   pqApplicationCore.h
   pqCommandServerStartup.h
   pqConsumerDisplay.h
@@ -114,6 +116,10 @@ SOURCE_GROUP("Generated" FILES
 ADD_LIBRARY(pqCore
   pq3DWidgetFactory.cxx
   pq3DWidgetFactory.h
+  pqAnimationCue.cxx
+  pqAnimationCue.h
+  pqAnimationScene.cxx
+  pqAnimationScene.h
   pqApplicationCore.cxx
   pqApplicationCore.h
   pqCommandServerStartup.cxx

@@ -59,6 +59,7 @@ class pqServerManagerModelItem;
 class pqToolsMenu;
 class pqVCRController;
 class pqViewMenu;
+class pqAnimationManager;
 
 class vtkUnstructuredGrid;
 
@@ -110,6 +111,9 @@ public:
   void setupStatisticsView(QDockWidget* parent);
   /// Setup an element inspector, attaching it to the given dock
   void setupElementInspector(QDockWidget* parent);
+
+  /// Setup the animation panel, attaching it to the given dock.
+  void setupAnimationPanel(QDockWidget* parent);
   
   /// Setup a variable-selection toolbar
   void setupVariableToolbar(QToolBar* parent);
@@ -173,7 +177,10 @@ public:
   pqMainWindowCore will attach a display.  Clients that wish to manage
   their own pipeline / displays should call this method once at startup. */
   void disableAutomaticDisplays();
-  
+ 
+  // Returns the animation manager. If none is already created,
+  // this call will create a new manager.
+  pqAnimationManager* getAnimationManager();
 signals:
   void enableFileOpen(bool);
   void enableFileLoadServerState(bool);

@@ -1,15 +1,12 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>Dialog</class>
  <widget class="QDialog" name="Dialog" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>362</width>
-    <height>250</height>
+    <width>400</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -22,193 +19,101 @@
    <property name="spacing" >
     <number>6</number>
    </property>
+   <item row="7" column="1" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="1" colspan="2" >
+    <widget class="QSpinBox" name="spinBoxAnimationDuration" >
+     <property name="toolTip" >
+      <string>Duration for the Animation (in seconds)</string>
+     </property>
+     <property name="statusTip" >
+      <string>Sets the duration for the animation in seconds.</string>
+     </property>
+     <property name="whatsThis" >
+      <string>Sets the duration for the animation in seconds.</string>
+     </property>
+     <property name="maximum" >
+      <number>2147483647</number>
+     </property>
+     <property name="minimum" >
+      <number>1</number>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0" >
-    <layout class="QVBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
+    <widget class="QLabel" name="labelAnimationDuration" >
+     <property name="text" >
+      <string>Animation Duration (sec)</string>
      </property>
-     <property name="spacing" >
-      <number>6</number>
+    </widget>
+   </item>
+   <item row="3" column="2" >
+    <widget class="QSpinBox" name="spinBoxHeight" >
+     <property name="toolTip" >
+      <string>View Height (in pixels)</string>
      </property>
-     <item>
-      <layout class="QHBoxLayout" >
-       <property name="margin" >
-        <number>0</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item>
-        <widget class="QLabel" name="labelAnimationDuration" >
-         <property name="text" >
-          <string>Animation Duration (sec)</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSpinBox" name="spinBoxAnimationDuration" >
-         <property name="toolTip" >
-          <string>Duration for the Animation (in seconds)</string>
-         </property>
-         <property name="statusTip" >
-          <string>Sets the duration for the animation in seconds.</string>
-         </property>
-         <property name="whatsThis" >
-          <string>Sets the duration for the animation in seconds.</string>
-         </property>
-         <property name="minimum" >
-          <number>1</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" >
-       <property name="margin" >
-        <number>0</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item>
-        <widget class="QLabel" name="labelFrameRate" >
-         <property name="text" >
-          <string>Frame Rate (fps)</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSpinBox" name="spinBoxFrameRate" >
-         <property name="toolTip" >
-          <string>Animation Frame Rate in frames-per-second.</string>
-         </property>
-         <property name="statusTip" >
-          <string>Sets the frame rate (fps) to use in the animation.</string>
-         </property>
-         <property name="whatsThis" >
-          <string>Sets the frame rate (fps) to use in the animation.</string>
-         </property>
-         <property name="maximum" >
-          <number>100</number>
-         </property>
-         <property name="minimum" >
-          <number>1</number>
-         </property>
-         <property name="value" >
-          <number>15</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" >
-       <property name="margin" >
-        <number>0</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item>
-        <widget class="QLabel" name="label_3" >
-         <property name="text" >
-          <string>Resolution (pixels)</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>6</number>
-         </property>
-         <item>
-          <widget class="QSpinBox" name="spinBoxWidth" >
-           <property name="toolTip" >
-            <string>View Width (in pixels) </string>
-           </property>
-           <property name="statusTip" >
-            <string>Sets the width (in pixles) to use while generating animation.</string>
-           </property>
-           <property name="whatsThis" >
-            <string>Sets the width (in pixles) to use while generating animation.</string>
-           </property>
-           <property name="minimum" >
-            <number>2</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="spinBoxHeight" >
-           <property name="toolTip" >
-            <string>View Height (in pixels)</string>
-           </property>
-           <property name="statusTip" >
-            <string>Sets the height (in pixles) to use while generating animation.</string>
-           </property>
-           <property name="whatsThis" >
-            <string>Sets the height (in pixles) to use while generating animation.</string>
-           </property>
-           <property name="minimum" >
-            <number>2</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" >
-       <property name="margin" >
-        <number>0</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item>
-        <widget class="QCheckBox" name="checkBoxUseDatasetTimesteps" >
-         <property name="toolTip" >
-          <string>Use Timestep Values from Dataset</string>
-         </property>
-         <property name="statusTip" >
-          <string>When checked, time step values from the dataset will be used, otherwise animation will linearly interpolate between all available timesteps.</string>
-         </property>
-         <property name="whatsThis" >
-          <string>When checked, time step values from the dataset will be used, otherwise animation will linearly interpolate between all available timesteps.</string>
-         </property>
-         <property name="text" >
-          <string>Scale with dataset's time values</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBoxDisconnect" >
-       <property name="enabled" >
-        <bool>false</bool>
-       </property>
-       <property name="toolTip" >
-        <string>Disconnect from the server before saving animation. The server will save the animation and then exit.</string>
-       </property>
-       <property name="statusTip" >
-        <string>Disconnect from the server before saving animation. The server will save the animation and then exit.</string>
-       </property>
-       <property name="whatsThis" >
-        <string>Disconnect from the server before saving animation. The server will save the animation and then exit.</string>
-       </property>
-       <property name="text" >
-        <string>Disconnect before saving animation</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+     <property name="statusTip" >
+      <string>Sets the height (in pixles) to use while generating animation.</string>
+     </property>
+     <property name="whatsThis" >
+      <string>Sets the height (in pixles) to use while generating animation.</string>
+     </property>
+     <property name="minimum" >
+      <number>2</number>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" >
+    <widget class="QSpinBox" name="spinBoxWidth" >
+     <property name="toolTip" >
+      <string>View Width (in pixels) </string>
+     </property>
+     <property name="statusTip" >
+      <string>Sets the width (in pixles) to use while generating animation.</string>
+     </property>
+     <property name="whatsThis" >
+      <string>Sets the width (in pixles) to use while generating animation.</string>
+     </property>
+     <property name="minimum" >
+      <number>2</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="2" >
+    <widget class="QSpinBox" name="spinBoxFrameRate" >
+     <property name="toolTip" >
+      <string>Animation Frame Rate in frames-per-second.</string>
+     </property>
+     <property name="statusTip" >
+      <string>Sets the frame rate (fps) to use in the animation.</string>
+     </property>
+     <property name="whatsThis" >
+      <string>Sets the frame rate (fps) to use in the animation.</string>
+     </property>
+     <property name="maximum" >
+      <number>100</number>
+     </property>
+     <property name="minimum" >
+      <number>1</number>
+     </property>
+     <property name="value" >
+      <number>15</number>
+     </property>
+    </widget>
    </item>
    <item row="1" column="0" >
+    <widget class="QLabel" name="labelFrameRate" >
+     <property name="text" >
+      <string>Frame Rate (fps)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="3" >
     <layout class="QHBoxLayout" >
      <property name="margin" >
       <number>0</number>
@@ -248,9 +153,67 @@
      </item>
     </layout>
    </item>
+   <item row="5" column="0" colspan="3" >
+    <widget class="QCheckBox" name="checkBoxDisconnect" >
+     <property name="enabled" >
+      <bool>false</bool>
+     </property>
+     <property name="toolTip" >
+      <string>Disconnect from the server before saving animation. The server will save the animation and then exit.</string>
+     </property>
+     <property name="statusTip" >
+      <string>Disconnect from the server before saving animation. The server will save the animation and then exit.</string>
+     </property>
+     <property name="whatsThis" >
+      <string>Disconnect from the server before saving animation. The server will save the animation and then exit.</string>
+     </property>
+     <property name="text" >
+      <string>Disconnect before saving animation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="3" >
+    <widget class="QCheckBox" name="checkBoxUseDatasetTimesteps" >
+     <property name="enabled" >
+      <bool>false</bool>
+     </property>
+     <property name="toolTip" >
+      <string>Use Timestep Values from Dataset</string>
+     </property>
+     <property name="statusTip" >
+      <string>When checked, time step values from the dataset will be used, otherwise animation will linearly interpolate between all available timesteps.</string>
+     </property>
+     <property name="whatsThis" >
+      <string>When checked, time step values from the dataset will be used, otherwise animation will linearly interpolate between all available timesteps.</string>
+     </property>
+     <property name="text" >
+      <string>Scale with dataset's time values</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" >
+    <widget class="QLabel" name="label_3" >
+     <property name="text" >
+      <string>Resolution (pixels)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>Number Of Frames</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="2" >
+    <widget class="QSpinBox" name="spinBoxNumberOfFrames" >
+     <property name="maximum" >
+      <number>2147483647</number>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections>
   <connection>

@@ -23,7 +23,7 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.15");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -221,7 +221,7 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::UpdateValue(double currenttime,
 
   if (this->GetNumberOfKeyFrames() < 2)
     {
-    vtkErrorMacro("Too few keyframe to animate.");
+    //vtkErrorMacro("Too few keyframe to animate.");
     return;
     }
   

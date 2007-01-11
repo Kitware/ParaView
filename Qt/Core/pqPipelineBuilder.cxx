@@ -453,6 +453,25 @@ void pqPipelineBuilder::remove(pqPipelineSource* source,
 }
 
 //-----------------------------------------------------------------------------
+void pqPipelineBuilder::remove(pqProxy* proxy, bool is_undoable)
+{
+  if (this->UndoStack && is_undoable)
+    {
+    this->UndoStack->BeginUndoSet(QString("Remove proxy"));
+    }
+
+  vtkSMProxyManager::GetProxyManager()->UnRegisterProxy(
+    proxy->getSMGroup().toAscii().data(), 
+    proxy->getSMName().toAscii().data(),
+    proxy->getProxy());
+
+  if (this->UndoStack && is_undoable)
+    {
+    this->UndoStack->EndUndoSet();
+    }
+}
+
+//-----------------------------------------------------------------------------
 pqPlotViewModule* pqPipelineBuilder::createPlotWindow(int type, pqServer* server)
 {
   if (!server)

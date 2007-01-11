@@ -49,6 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
+#include "pqAnimationCue.h"
+#include "pqAnimationScene.h"
 #include "pqNameCount.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
@@ -619,11 +621,23 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
       pq_proxy = new pqPlotViewModule(type, group, name, ren, server, this);
       }
     }
-    else if(group == "views" && proxy->GetXMLName() == QString("TableView"))
+  else if(group == "views" && proxy->GetXMLName() == QString("TableView"))
+    {
+    pq_proxy = new pqTableViewModule(group, name, 
+      vtkSMAbstractViewModuleProxy::SafeDownCast(proxy), server, this);
+    }
+  else if (group == "animation")
+    {
+    // Animation subsystem.
+    if (proxy->IsA("vtkSMAnimationSceneProxy"))
       {
-      pq_proxy = new pqTableViewModule(group, name, 
-        vtkSMAbstractViewModuleProxy::SafeDownCast(proxy), server, this);
+      pq_proxy = new pqAnimationScene(group, name, proxy, server, this);
       }
+    else if (proxy->IsA("vtkSMAnimationCueProxy"))
+      {
+      pq_proxy = new pqAnimationCue(group, name, proxy, server, this);
+      }
+    }
 
   if (pq_proxy)
     {

@@ -73,6 +73,30 @@
     <addaction name="separator" />
     <addaction name="actionHelpEnableTooltips" />
    </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuRecentFiles" >
+     <property name="title" >
+      <string>Recent Files</string>
+     </property>
+    </widget>
+    <addaction name="actionFileOpen" />
+    <addaction name="menuRecentFiles" />
+    <addaction name="separator" />
+    <addaction name="actionFileLoadServerState" />
+    <addaction name="actionFileSaveServerState" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveData" />
+    <addaction name="actionFileSaveScreenshot" />
+    <addaction name="actionFileSaveAnimation" />
+    <addaction name="separator" />
+    <addaction name="actionServerConnect" />
+    <addaction name="actionServerDisconnect" />
+    <addaction name="separator" />
+    <addaction name="actionFileExit" />
+   </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
      <string>&amp;Edit</string>
@@ -97,30 +121,6 @@
     <addaction name="menuAddPlot" />
     <addaction name="separator" />
     <addaction name="actionEditSettings" />
-   </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>&amp;File</string>
-    </property>
-    <widget class="QMenu" name="menuRecentFiles" >
-     <property name="title" >
-      <string>Recent Files</string>
-     </property>
-    </widget>
-    <addaction name="actionFileOpen" />
-    <addaction name="menuRecentFiles" />
-    <addaction name="separator" />
-    <addaction name="actionFileLoadServerState" />
-    <addaction name="actionFileSaveServerState" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveData" />
-    <addaction name="actionFileSaveScreenshot" />
-    <addaction name="actionFileSaveAnimation" />
-    <addaction name="separator" />
-    <addaction name="actionServerConnect" />
-    <addaction name="actionServerDisconnect" />
-    <addaction name="separator" />
-    <addaction name="actionFileExit" />
    </widget>
    <widget class="QMenu" name="menuPipeline" >
     <property name="title" >
@@ -405,6 +405,15 @@
    <addaction name="actionShowCenterAxes" />
    <addaction name="actionResetCenter" />
   </widget>
+  <widget class="QDockWidget" name="animationPanelDock" >
+   <property name="windowTitle" >
+    <string>Animation Panel</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents" />
+  </widget>
   <action name="actionFileOpen" >
    <property name="icon" >
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqOpen22.png</iconset>
@@ -487,6 +496,9 @@
    </property>
   </action>
   <action name="actionVCRPreviousFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="icon" >
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrBack22.png</iconset>
    </property>
@@ -495,6 +507,9 @@
    </property>
   </action>
   <action name="actionVCRFirstFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="icon" >
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrFirst22.png</iconset>
    </property>
@@ -503,6 +518,9 @@
    </property>
   </action>
   <action name="actionVCRNextFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="icon" >
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrForward22.png</iconset>
    </property>
@@ -511,6 +529,9 @@
    </property>
   </action>
   <action name="actionVCRLastFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="icon" >
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrLast22.png</iconset>
    </property>
@@ -668,6 +689,9 @@
    </property>
   </action>
   <action name="actionVCRPlay" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="icon" >
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrPlay22.png</iconset>
    </property>

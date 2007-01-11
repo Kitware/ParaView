@@ -34,11 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqVCRController_h
 
 #include "pqComponentsExport.h"
-
+#include <QPointer>
 #include <QObject>
 #include <QTimer>
 class pqPipelineSource;
+class pqAnimationScene;
 
+// pqVCRController is the QObject that encapsulates the
+// VCR control functionality. 
+// It provides a slot to set the scene that this object 
+// is using for animation. Typically, one would connect this
+// slot to a pqAnimationManager like object which keeps track
+// of the active animation scene.
 class PQCOMPONENTS_EXPORT pqVCRController : public QObject
 {
   Q_OBJECT
@@ -48,7 +55,21 @@ public:
 
 signals:
   void timestepChanged();
-  void playCompleted();
+
+  // emitted with playing(true) when play begins and
+  // playing(false) when play ends. 
+  void playing(bool);
+
+  // Fired when the enable state of the VCR control changes.
+  // fired each time setAnimationScene() is called. If
+  // called when a valid scene enabled(true) is fired,
+  // else enabled(false).
+  void enabled(bool);
+
+public slots:
+  // Set the animation scene. If null, the VCR control is disabled
+  // (emits enabled(false)).
+  void setAnimationScene(pqAnimationScene*);
 
 public slots:
   // Connect these signals to appropriate VCR buttons.
@@ -59,17 +80,17 @@ public slots:
   void onPlay();
   void onPause();
 
-  void setSource(pqPipelineSource* source);
+protected slots:
+  void onTick();
 
-private slots:
-  void onTimerNextFrame();
- 
 private:
-  // internal method.
-  bool updateSource(bool first, bool last, int offset);
+  pqVCRController(const pqVCRController&); // Not implemented.
+  void operator=(const pqVCRController&); // Not implemented.
 
-  pqPipelineSource* Source;
-  QTimer Timer;
+  QPointer<pqAnimationScene> Scene;
+
+  // internal method.
+  bool updateScene(bool first, bool last, int offset);
 };
 
 #endif

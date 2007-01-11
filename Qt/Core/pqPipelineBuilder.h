@@ -51,6 +51,7 @@ class pqUndoStack;
 class vtkSMAbstractViewModuleProxy;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
+class pqProxy;
 
 /// This is a class that can build pipelines. Use this class to create 
 /// sources/filters/readers etc etc. This class will ensure that all
@@ -157,6 +158,9 @@ public:
   // \li unregistering the display.
   // \c is_undoable flag can be used to indicate if the operation is undoable.
   void remove(pqPipelineDisplay* display, bool is_undoable=true);
+
+  // Removes the indicated proxy.
+  void remove(pqProxy* proxy, bool is_undoable=true);
 
   // Every server can potentially be compiled with different compile time options
   // while could lead to certain filters/sources/writers being non-instantiable

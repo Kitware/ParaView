@@ -32,26 +32,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVCRController.h"
 
 // ParaView Server Manager includes.
-#include "vtkSMProxy.h"
+#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMIntRangeDomain.h"
 
 // Qt includes.
 #include <QtDebug>
+#include <QCoreApplication>
 
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqRenderViewModule.h"
 #include "pqUndoStack.h"
-
+#include "pqAnimationScene.h"
+#include "pqSMAdaptor.h"
 //-----------------------------------------------------------------------------
 pqVCRController::pqVCRController(QObject* _parent/*=null*/) : QObject(_parent)
 {
-  this->Source = NULL;
-  QObject::connect(&this->Timer, SIGNAL(timeout()),
-                   this, SLOT(onTimerNextFrame()));
-  this->Timer.setInterval(100);
 }
 
 //-----------------------------------------------------------------------------
@@ -59,119 +57,133 @@ pqVCRController::~pqVCRController()
 {
 }
 
-void pqVCRController::setSource(pqPipelineSource* source)
+//-----------------------------------------------------------------------------
+void pqVCRController::setAnimationScene(pqAnimationScene* scene)
 {
-  this->Source = source;
-}
+  if (this->Scene == scene)
+    {
+    return;
+    }
+  if (this->Scene)
+    {
+    QObject::disconnect(this->Scene, 0, this, 0);
+    }
+  this->Scene = scene;
+  if (this->Scene)
+    {
+    QObject::connect(this->Scene, SIGNAL(tick()), this, SLOT(onTick()));
+    }
 
-void pqVCRController::onPlay()
-{
-  if(!this->Timer.isActive())
-    {
-    this->Timer.start();
-    }
-}
-
-void pqVCRController::onPause()
-{
-  if(this->Timer.isActive())
-    {
-    this->Timer.stop();
-    }
-}
-  
-void pqVCRController::onTimerNextFrame()
-{
-  bool didStep = this->updateSource(false, false, 1);
-  if(!didStep)
-    {
-    this->Timer.stop();
-    emit this->playCompleted();
-    }
+  emit this->enabled (this->Scene != NULL);
 }
 
 //-----------------------------------------------------------------------------
+void pqVCRController::onPlay()
+{
+  if (!this->Scene)
+    {
+    qDebug() << "No active scene. Cannot play.";
+    return;
+    }
+
+  emit this->playing(true);
+ 
+  vtkSMAnimationSceneProxy* scene = this->Scene->getAnimationSceneProxy();
+  scene->Play(); // NOTE: This is a blocking call, returns only after the
+                 // the animation has stopped.
+
+  emit this->playing(false);
+
+  pqApplicationCore::instance()->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqVCRController::onTick()
+{
+  // update all views.
+  pqApplicationCore::instance()->render();
+
+  // process the events so that the GUI remains responsive.
+  QCoreApplication::processEvents();
+
+  emit this->timestepChanged();
+}
+
+//-----------------------------------------------------------------------------
+void pqVCRController::onPause()
+{
+  if (!this->Scene)
+    {
+    qDebug() << "No active scene. Cannot play.";
+    return;
+    }
+  vtkSMAnimationSceneProxy* scene = this->Scene->getAnimationSceneProxy();
+  scene->Stop();
+}
+  
+//-----------------------------------------------------------------------------
 void pqVCRController::onFirstFrame()
 {
-  this->updateSource(true, false, 0);
+  this->updateScene(true, false, 0);
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onPreviousFrame()
 {
-  this->updateSource(false, false, -1);
+  this->updateScene(false, false, -1);
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onNextFrame()
 {
-  this->updateSource(false, false, 1);
+  this->updateScene(false, false, 1);
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onLastFrame()
 {
-  this->updateSource(false, true, 0);
+  this->updateScene(false, true, 0);
 }
 
 //-----------------------------------------------------------------------------
-bool pqVCRController::updateSource(bool first, bool last, int offset)
+bool pqVCRController::updateScene(bool first, bool last, int offset)
 {
-  if (!this->Source)
+  // TODO: We may want to move this "next" logic to vtkSMAnimationSceneProxy
+  // itself (or even vtkSMAnimationScene). This will need to take into consideration
+  // the new "ENUMERATED_TIMES" mode as well.
+  if (!this->Scene)
     {
-    return false;
-    }
-  vtkSMProxy* activeProxy = this->Source->getProxy();
-  vtkSMIntVectorProperty* const timestep = vtkSMIntVectorProperty::SafeDownCast(
-    activeProxy->GetProperty("TimeStep"));
-    
-  if(!timestep)
-    {
+    qDebug() << "No active scene. Cannot go to first frame.";
     return false;
     }
 
-  vtkSMIntRangeDomain* const timestep_range =
-    vtkSMIntRangeDomain::SafeDownCast(timestep->GetDomain("range"));
-    
-  if(!timestep_range)
-    {
-    qDebug() << "Failed to locate 'range' domain.";
-    return false;
-    }
-
-  pqApplicationCore::instance()->getUndoStack()->BeginUndoSet("VCR");
-
-  int min_exists = 0;
-  int max_exists = 0;
-  int min_step = timestep_range->GetMinimum(0, min_exists);
-  int max_step = timestep_range->GetMaximum(0, max_exists);
-  
-  int previousValue = timestep->GetElement(0);
+  vtkSMAnimationSceneProxy* scene = this->Scene->getAnimationSceneProxy();
+  double start_time = pqSMAdaptor::getElementProperty(
+    scene->GetProperty("StartTime")).toDouble();
+  double end_time = pqSMAdaptor::getElementProperty(
+    scene->GetProperty("EndTime")).toDouble();
+  double new_time = pqSMAdaptor::getElementProperty(
+    scene->GetProperty("CurrentTime")).toDouble();
 
   if (first)
     {
-    timestep->SetElement(0, min_step);
+    new_time = start_time;
     }
   else if (last)
     {
-    timestep->SetElement(0, max_step);
+    new_time = end_time;
     }
-  else
+  else 
     {
-    int new_time = timestep->GetElement(0) + offset;
-    new_time = (new_time >= min_step)? new_time : min_step;
-    new_time = (new_time <= max_step)? new_time : max_step;
-    timestep->SetElement(0, new_time);
+    new_time += offset;
+    new_time = (new_time < start_time)? start_time : new_time;
+    new_time = (new_time > end_time)? end_time : new_time;
     }
-  activeProxy->UpdateVTKObjects();
-  pqApplicationCore::instance()->getUndoStack()->EndUndoSet();
+  pqSMAdaptor::setElementProperty(scene->GetProperty("CurrentTime"), new_time);
+  scene->UpdateProperty("CurrentTime", 1);
 
-  emit this->timestepChanged();
-  
-  this->Source->renderAllViews();
-
-  return timestep->GetElement(0) != previousValue ? true : false;
-
+  this->onTick();
+  return true;
 }
 
 

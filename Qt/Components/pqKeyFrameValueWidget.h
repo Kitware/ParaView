@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDoubleSpinBoxDomain.h
+   Module:    pqKeyFrameValueWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,42 +29,22 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef __pqKeyFrameValueWidget_h
+#define __pqKeyFrameValueWidget_h
 
-#ifndef pq_DoubleSpinBoxDomain_h
-#define pq_DoubleSpinBoxDomain_h
-
-#include <QObject>
 #include "pqComponentsExport.h"
+#include <QWidget>
 
-class QDoubleSpinBox;
-class vtkSMProperty;
-
-/// combo box domain 
-/// observers the domain for a combo box and updates accordingly
-class PQCOMPONENTS_EXPORT pqDoubleSpinBoxDomain : public QObject
+class PQCOMPONENTS_EXPORT pqComponentsExport : public QWidget
 {
   Q_OBJECT
 public:
-  /// constructor requires a QDoubleSpinBox, 
-  /// and the property with the domain to observe
-  /// the list of values in the combo box is automatically 
-  /// updated when the domain changes
-  pqDoubleSpinBoxDomain(QDoubleSpinBox* p, vtkSMProperty* prop, int index=-1);
-  ~pqDoubleSpinBoxDomain();
+  pqComponentsExport(QWidget* parent=0);
+  virtual ~pqComponentsExport();
 
-public slots:
-  void domainChanged();
-protected slots:
-  void internalDomainChanged();
-
-protected:
-  virtual void setRange(double min, double max);
-  virtual void setSingleStep(double step);
-
-  QDoubleSpinBox* getSpinBox() const;
 private:
-  class pqInternal;
-  pqInternal* Internal;
+  pqComponentsExport(const pqComponentsExport&); // Not implemented.
+  void operator=(const pqComponentsExport&); // Not implemented.
 };
 
 #endif

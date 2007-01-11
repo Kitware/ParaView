@@ -82,7 +82,7 @@ public slots:
 
   // These slots must be connected to the corresponding signals from the 
   // panel. Unlike most other signal adaptors that don't care about the
-  // panel, this adaptor is relies on these signals from the panel,
+  // panel, this adaptor relies on these signals from the panel,
   // since the 3D widget visibility etc depends on it.
   void select();
   void deselect();

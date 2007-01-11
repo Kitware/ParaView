@@ -57,10 +57,6 @@ public slots:
   QVariant findToolBarActionsNotInMenus();
   
 private slots:
-  void onVCRPlay();
-  void onVCRPause();
-  void onVCRPlayDone();
-
   void onUndoLabel(const QString&);
   void onRedoLabel(const QString&);
 

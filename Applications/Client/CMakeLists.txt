@@ -169,7 +169,8 @@ IF(BUILD_TESTING)
       LoadStateMultiView
       OpenHelp
       ToolBarAndMenus
-      VCRAnimation
+      #VCRAnimation -- disabling until Time stuff goes in PV
+                    # readers will be animatable only after that.
       )
   ENDIF(QT_TESTING_WITH_PYTHON)
 

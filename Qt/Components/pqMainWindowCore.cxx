@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPQConfig.h>
 
 #include "pqActiveView.h"
+#include "pqAnimationManager.h"
+#include "pqAnimationPanel.h"
 #include "pqApplicationCore.h"
 #include "pqCustomFilterDefinitionModel.h"
 #include "pqCustomFilterDefinitionWizard.h"
@@ -190,6 +192,7 @@ public:
   QPointer<pqPipelineSource> ActiveSource;
   QPointer<pqServer> ActiveServer;
   QPointer<pqProxyTabWidget> ProxyPanel;
+  QPointer<pqAnimationManager> AnimationManager;
 
 #ifdef PARAVIEW_EMBED_PYTHON
   QPointer<pqPythonDialog> PythonDialog;
@@ -290,8 +293,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   QObject::connect(core, SIGNAL(postSourceCreated(pqPipelineSource*)),
                    this, SLOT(setActiveSource(pqPipelineSource*)));
   
-  QObject::connect(this, SIGNAL(activeSourceChanged(pqPipelineSource*)),
-                   &this->VCRController(), SLOT(setSource(pqPipelineSource*)));
   
 /*
   this->installEventFilter(this);
@@ -833,6 +834,38 @@ void pqMainWindowCore::setupElementInspector(QDockWidget* dock_widget)
 }
 
 //-----------------------------------------------------------------------------
+pqAnimationManager* pqMainWindowCore::getAnimationManager()
+{
+  if (!this->Implementation->AnimationManager)
+    {
+    this->Implementation->AnimationManager = new pqAnimationManager(this);
+    QObject::connect(this, SIGNAL(activeServerChanged(pqServer*)),
+      this->Implementation->AnimationManager, 
+      SLOT(onActiveServerChanged(pqServer*))); 
+    }
+  return this->Implementation->AnimationManager;
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setupAnimationPanel(QDockWidget* dock_widget)
+{
+  pqAnimationPanel* const panel = new pqAnimationPanel(dock_widget);
+  pqUndoStack* const undoStack = pqApplicationCore::instance()->getUndoStack();
+  
+  pqAnimationManager* mgr = this->getAnimationManager();
+  QObject::connect(mgr, SIGNAL(activeSceneChanged(pqAnimationScene*)),
+    &this->VCRController(), SLOT(setAnimationScene(pqAnimationScene*)));
+
+  QObject::connect(panel, SIGNAL(beginUndoSet(const QString&)),
+    undoStack, SLOT(BeginUndoSet(QString)));
+  QObject::connect(panel, SIGNAL(endUndoSet()),
+    undoStack, SLOT(EndUndoSet()));
+  
+  panel->setManager(mgr);
+  dock_widget->setWidget(panel);
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
 {
   this->Implementation->VariableToolbar = toolbar;
@@ -1283,21 +1316,12 @@ void pqMainWindowCore::onFileSaveScreenshot(const QStringList& files)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveAnimation()
 {
-  // Currently we only support saving animations in which reader's
-  // timestep value changes.
-  pqPipelineSource* source = this->getActiveSource();
-  if (!source)
+  pqAnimationManager* mgr = this->getAnimationManager();
+  if (!mgr || !mgr->getActiveScene())
     {
-    qDebug() << "Cannot save animation, no reader selected.";
+    qDebug() << "Cannot save animation since no active scene is present.";
     return;
     }
-
-  if (!pqSimpleAnimationManager::canAnimate(source))
-    {
-    qDebug() << "Cannot animate the selected source.";
-    return;
-    }
-
 
   QString filters = "MPEG files (*.mpg)";
 #ifdef _WIN32
@@ -1323,19 +1347,37 @@ void pqMainWindowCore::onFileSaveAnimation()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
 {
-  pqPipelineSource* source = this->getActiveSource();
-  if (!source)
+  pqAnimationManager* mgr = this->getAnimationManager();
+  if (!mgr || !mgr->getActiveScene())
     {
-    qDebug() << "Cannot save animation, no reader selected.";
+    qDebug() << "Cannot save animation since no active scene is present.";
     return;
     }
+
+  // TODO: for now, we only save the active view in the movie file.
+  pqRenderViewModule* activeView = 
+    qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
+  if (!activeView)
+    {
+    qDebug() << "Active View is not a render window. Currently we only support "
+      << "saving animations in a render view.";
+    return;
+    }
+
+  if (!mgr->saveAnimation(files[0], activeView))
+    {
+    qDebug() << "Animation save failed!";
+    }
+
+  /*
   pqSimpleAnimationManager manager(this);
   manager.setServer(this->getActiveServer());
-  manager.setRenderModule(qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current()));
+  manager.setRenderModule();
   if (!manager.createTimestepAnimation(source, files[0]))
     {
     qDebug()<< "Animation not saved successfully.";
     }
+    */
 }
 
 //-----------------------------------------------------------------------------
@@ -1934,8 +1976,9 @@ void pqMainWindowCore::onInitializeStates()
 
   emit this->enableFileSaveScreenshot(server != 0 && rm != 0);
 
+  // Can save animation if there exists an active scene.
   emit this->enableFileSaveAnimation(
-    pqSimpleAnimationManager::canAnimate(this->getActiveSource()));
+    this->getAnimationManager()->getActiveScene() != NULL);
 
   emit this->enableServerConnect(num_servers == 0);
     

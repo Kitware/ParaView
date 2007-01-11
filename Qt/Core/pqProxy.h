@@ -69,6 +69,8 @@ public:
   // with which the vtkSMProxy is registered with the proxy manager.
   // This does not affect the name with which the proxy is registered.
   // Emit nameChanged() signal when the name changes. 
+  // Don't call this method directly, pqServerManagerModel will update this
+  // as a side effect of rename().
   void setProxyName(const QString& name)
     {
     if (this->ProxyName != name)

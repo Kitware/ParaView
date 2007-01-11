@@ -121,16 +121,40 @@ void pqDoubleSpinBoxDomain::domainChanged()
   this->Internal->MarkedForUpdate = true;
   QTimer::singleShot(0, this, SLOT(internalDomainChanged()));
 }
-  
-void pqDoubleSpinBoxDomain::internalDomainChanged()
+
+//-----------------------------------------------------------------------------
+void pqDoubleSpinBoxDomain::setRange(double min, double max)
 {
-  QDoubleSpinBox* spinbox = qobject_cast<QDoubleSpinBox*>(this->parent());
-  Q_ASSERT(spinbox != NULL);
+  QDoubleSpinBox* spinbox = this->getSpinBox();
   if(!spinbox)
     {
     return;
     }
+  spinbox->setRange(min, max);
+}
 
+//-----------------------------------------------------------------------------
+void pqDoubleSpinBoxDomain::setSingleStep(double step)
+{
+  QDoubleSpinBox* spinbox = this->getSpinBox();
+  if(!spinbox)
+    {
+    return;
+    }
+  spinbox->setSingleStep(step);
+}
+
+//-----------------------------------------------------------------------------
+QDoubleSpinBox* pqDoubleSpinBoxDomain::getSpinBox() const
+{
+  QDoubleSpinBox* spinbox = qobject_cast<QDoubleSpinBox*>(this->parent());
+  Q_ASSERT(spinbox != NULL);
+  return spinbox;
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleSpinBoxDomain::internalDomainChanged()
+{
   pqSMAdaptor::PropertyType type;
   type = pqSMAdaptor::getPropertyType(this->Internal->Property);
   QList<QVariant> range;
@@ -143,13 +167,13 @@ void pqDoubleSpinBoxDomain::internalDomainChanged()
       double max = range[1].toDouble();
       if(range[0].type() == QVariant::Double)
         {
-        spinbox->setSingleStep( (max - min) / 50.0 );  // arbitrary
+        this->setSingleStep( (max - min) / 50.0 );  // arbitrary
         }
       else
         {
-        spinbox->setSingleStep(1.0);
+        this->setSingleStep(1.0);
         }
-      spinbox->setRange(min, max);
+      this->setRange(min, max);
       }
     }
   else if(type == pqSMAdaptor::MULTIPLE_ELEMENTS)
@@ -162,13 +186,13 @@ void pqDoubleSpinBoxDomain::internalDomainChanged()
       double max = range[1].toDouble();
       if(range[0].type() == QVariant::Double)
         {
-        spinbox->setSingleStep( (max - min) / 50.0 );  // arbitrary
+        this->setSingleStep( (max - min) / 50.0 );  // arbitrary
         }
       else
         {
-        spinbox->setSingleStep(1.0);
+        this->setSingleStep(1.0);
         }
-      spinbox->setRange(min, max);
+      this->setRange(min, max);
       }
     }
   this->Internal->MarkedForUpdate = false;

@@ -281,6 +281,11 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
   this->Internal->OutOfSync = true;
   SettingValue = true;
 
+  if (!this->Internal->UseUncheckedProperties)
+    {
+    emit this->beginUndoSet(this->Internal->QtProperty + " Changed");
+    }
+
   if(this->Internal->QtObject)
     {
     // get the property of the object
@@ -469,6 +474,10 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
     }
   SettingValue = false;
   emit this->qtWidgetChanged();
+  if (!this->Internal->UseUncheckedProperties)
+    {
+    emit this->endUndoSet();
+    }
 }
 
 bool pqPropertyLinksConnection::useUncheckedProperties() const
@@ -526,6 +535,10 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
     this, SIGNAL(qtWidgetChanged()));
   QObject::connect(conn, SIGNAL(smPropertyChanged()),
     this, SIGNAL(smPropertyChanged()));
+  QObject::connect(conn, SIGNAL(beginUndoSet(const QString&)),
+    this, SIGNAL(beginUndoSet(const QString&)));
+  QObject::connect(conn, SIGNAL(endUndoSet()),
+    this, SIGNAL(endUndoSet()));
     
   
   conn->setUseUncheckedProperties(this->Internal->UseUncheckedProperties);

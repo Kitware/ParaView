@@ -290,15 +290,12 @@ MainWindow::MainWindow() :
   this->Implementation->Core.onHelpEnableTooltips(
     this->Implementation->UI.actionHelpEnableTooltips->isChecked());
 
-  connect(this->Implementation->UI.actionVCRPlay,
-    SIGNAL(triggered()), this, SLOT(onVCRPlay()));
+  connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()), 
+    &this->Implementation->Core.VCRController(), SLOT(onPlay()));
   
-  connect(this->Implementation->UI.actionVCRPause,
-    SIGNAL(triggered()), this, SLOT(onVCRPause()));
+  connect(this->Implementation->UI.actionVCRPause, SIGNAL(triggered()), 
+    &this->Implementation->Core.VCRController(), SLOT(onPause()));
   
-  connect(&this->Implementation->Core.VCRController(), SIGNAL(playCompleted()), 
-          this, SLOT(onVCRPlayDone()));
-
   connect(this->Implementation->UI.actionVCRFirstFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onFirstFrame()));
     
@@ -310,6 +307,23 @@ MainWindow::MainWindow() :
     
   connect(this->Implementation->UI.actionVCRLastFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onLastFrame()));
+
+  pqVCRController* vcrcontroller = &this->Implementation->Core.VCRController();
+  connect(vcrcontroller, SIGNAL(enabled(bool)),
+    this->Implementation->UI.actionVCRPlay, SLOT(setEnabled(bool)));
+  connect(vcrcontroller, SIGNAL(enabled(bool)),
+    this->Implementation->UI.actionVCRFirstFrame, SLOT(setEnabled(bool)));
+  connect(vcrcontroller, SIGNAL(enabled(bool)),
+    this->Implementation->UI.actionVCRPreviousFrame, SLOT(setEnabled(bool)));
+  connect(vcrcontroller, SIGNAL(enabled(bool)),
+    this->Implementation->UI.actionVCRNextFrame, SLOT(setEnabled(bool)));
+  connect(vcrcontroller, SIGNAL(enabled(bool)),
+    this->Implementation->UI.actionVCRLastFrame, SLOT(setEnabled(bool)));
+
+  connect(vcrcontroller, SIGNAL(playing(bool)),
+    this->Implementation->UI.actionVCRPause, SLOT(setEnabled(bool)));
+  connect(vcrcontroller, SIGNAL(playing(bool)),
+    this->Implementation->UI.actionVCRPlay, SLOT(setDisabled(bool)));
   
   connect(this->Implementation->UI.actionMoveMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToInteraction()));
@@ -479,6 +493,9 @@ MainWindow::MainWindow() :
     
   this->Implementation->Core.setupElementInspector(
     this->Implementation->UI.elementInspectorDock);
+
+  this->Implementation->Core.setupAnimationPanel(
+    this->Implementation->UI.animationPanelDock);
   
   // Setup the view menu ...
   this->Implementation->ToolbarsMenu->addWidget(
@@ -528,6 +545,10 @@ MainWindow::MainWindow() :
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.elementInspectorDock,
     this->Implementation->UI.elementInspectorDock->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(
+    this->Implementation->UI.animationPanelDock,
+    this->Implementation->UI.animationPanelDock->windowTitle());
   
   // Setup the multiview render window ...
   this->setCentralWidget(&this->Implementation->Core.multiViewManager());
@@ -542,6 +563,7 @@ MainWindow::MainWindow() :
   // Setup the default dock configuration ...
   this->Implementation->UI.elementInspectorDock->hide();
   this->Implementation->UI.statisticsViewDock->hide();
+  this->Implementation->UI.animationPanelDock->hide();
 
   // Set up the action icons ...
   QIcon icon;
@@ -896,26 +918,6 @@ void MainWindow::onSelectionShortcutFinished()
     this->Implementation->Core.selectionManager().switchToInteraction();
   }
 
-}
-
-void MainWindow::onVCRPlay()
-{
-  this->Implementation->UI.actionVCRPlay->setEnabled(false);
-  this->Implementation->UI.actionVCRPause->setEnabled(true);
-  this->Implementation->Core.VCRController().onPlay();
-}
-
-void MainWindow::onVCRPause()
-{
-  this->Implementation->UI.actionVCRPlay->setEnabled(true);
-  this->Implementation->UI.actionVCRPause->setEnabled(false);
-  this->Implementation->Core.VCRController().onPause();
-}
-
-void MainWindow::onVCRPlayDone()
-{
-  this->Implementation->UI.actionVCRPlay->setEnabled(true);
-  this->Implementation->UI.actionVCRPause->setEnabled(false);
 }
 
 QVariant MainWindow::findToolBarActionsNotInMenus()
