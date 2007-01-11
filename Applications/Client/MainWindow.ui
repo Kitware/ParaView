@@ -55,6 +55,7 @@
     </property>
     <addaction name="actionToolsCreateCustomFilter" />
     <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="actionToolsManageLinks" />
     <addaction name="separator" />
     <addaction name="actionToolsDumpWidgetNames" />
     <addaction name="actionToolsRecordTest" />
@@ -941,6 +942,11 @@
    </property>
    <property name="statusTip" >
     <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionToolsManageLinks" >
+   <property name="text" >
+    <string>Manage Links...</string>
    </property>
   </action>
  </widget>

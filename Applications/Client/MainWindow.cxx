@@ -264,6 +264,9 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionToolsManageCustomFilters,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsManageCustomFilters()));
   
+  connect(this->Implementation->UI.actionToolsManageLinks,
+    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsManageLinks()));
+
   connect(this->Implementation->UI.actionToolsDumpWidgetNames,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsDumpWidgetNames()));
 
