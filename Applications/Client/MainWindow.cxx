@@ -427,7 +427,7 @@ MainWindow::MainWindow() :
   this->Implementation->Core.setupPipelineBrowser(
     this->Implementation->UI.pipelineBrowserDock);
   pqPipelineBrowser *browser = this->Implementation->Core.pipelineBrowser();
-  this->Implementation->Core.pipelineMenu().setModels(browser->getListModel(),
+  this->Implementation->Core.pipelineMenu().setModels(browser->getModel(),
     browser->getSelectionModel());
   connect(this->Implementation->UI.actionAddSource, SIGNAL(triggered()),
     browser, SLOT(addSource()));
