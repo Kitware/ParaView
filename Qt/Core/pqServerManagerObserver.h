@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkType.h" // needed for vtkIdType
 class pqMultiView;
 class pqServerManagerObserverInternal;
-class pqPipelineModel;
 
 class QVTKWidget;
 

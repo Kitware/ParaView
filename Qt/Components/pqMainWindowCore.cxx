@@ -1846,7 +1846,7 @@ void pqMainWindowCore::onCompoundProxyAdded(QString proxy)
   if(this->Implementation->CustomFilterToolbar)
     {
     this->Implementation->CustomFilterToolbar->addAction(
-      QIcon(":/pqCore/Icons/pqBundle32.png"), proxy) 
+      QIcon(":/pqWidgets/Icons/pqBundle32.png"), proxy) 
       << pqSetName(proxy) << pqSetData(proxy);
     }
 }

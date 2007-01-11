@@ -10,6 +10,9 @@
         <file>Icons/pqArrowDown16.png</file>
         <file>Icons/pqArrowUp16.png</file>
         <file>Icons/pqBack16.png</file>
+        <file>Icons/pqBundle16.png</file>
+        <file>Icons/pqBundle22.png</file>
+        <file>Icons/pqBundle32.png</file>
         <file>Icons/pqCamera16.png</file>
         <file>Icons/pqCamerad16.png</file>
         <file>Icons/pqCancel16.png</file>
@@ -26,8 +29,13 @@
         <file>Icons/pqDisconnect16.png</file>
         <file>Icons/pqDisconnect22.png</file>
         <file>Icons/pqDisconnect32.png</file>
+        <file>Icons/pqEyeball16.png</file>
+        <file>Icons/pqEyeballd16.png</file>
         <file>Icons/pqFavorites16.png</file>
         <file>Icons/pqFavorites32.png</file>
+        <file>Icons/pqFilter16.png</file>
+        <file>Icons/pqFilter22.png</file>
+        <file>Icons/pqFilter32.png</file>
         <file>Icons/pqFind22.png</file>
         <file>Icons/pqFloppyDisk16.png</file>
         <file>Icons/pqFloppyDisk22.png</file>
@@ -43,6 +51,8 @@
         <file>Icons/pqHierarchicalData16.png</file>
         <file>Icons/pqImageData16.png</file>
         <file>Icons/pqInspect22.png</file>
+        <file>Icons/pqLinkBack16.png</file>
+        <file>Icons/pqLinkIn16.png</file>
         <file>Icons/pqMinus16.png</file>
         <file>Icons/pqMouseMove15.png</file>
         <file>Icons/pqMousePick15.png</file>
@@ -78,9 +88,15 @@
         <file>Icons/pqScalarBar22.png</file>
         <file>Icons/pqScalarBar32.png</file>
         <file>Icons/pqSelectPointer22.png</file>
+        <file>Icons/pqServer16.png</file>
+        <file>Icons/pqServer22.png</file>
+        <file>Icons/pqServer32.png</file>
         <file>Icons/pqShowCenterAxes32.png</file>
         <file>Icons/pqSideSet16.png</file>
         <file>Icons/pqSolidColor16.png</file>
+        <file>Icons/pqSource16.png</file>
+        <file>Icons/pqSource22.png</file>
+        <file>Icons/pqSource32.png</file>
         <file>Icons/pqSplitViewH12.png</file>
         <file>Icons/pqSplitViewV12.png</file>
         <file>Icons/pqStructuredGrid16.png</file>

@@ -1613,19 +1613,19 @@ void pqPipelineModel::initializePixmaps()
     {
     this->PixmapList = new QPixmap[pqPipelineModelInternal::Total];
     this->PixmapList[pqPipelineModel::Server].load(
-        ":/pqCore/Icons/pqServer16.png");
+        ":/pqWidgets/Icons/pqServer16.png");
     this->PixmapList[pqPipelineModel::Source].load(
-        ":/pqCore/Icons/pqSource16.png");
+        ":/pqWidgets/Icons/pqSource16.png");
     this->PixmapList[pqPipelineModel::Filter].load(
-        ":/pqCore/Icons/pqFilter16.png");
+        ":/pqWidgets/Icons/pqFilter16.png");
     this->PixmapList[pqPipelineModel::CustomFilter].load(
-        ":/pqCore/Icons/pqBundle16.png");
+        ":/pqWidgets/Icons/pqBundle16.png");
     this->PixmapList[pqPipelineModel::Link].load(
-        ":/pqCore/Icons/pqLinkBack16.png");
+        ":/pqWidgets/Icons/pqLinkBack16.png");
     this->PixmapList[pqPipelineModelInternal::Eyeball].load(
-        ":/pqCore/Icons/pqEyeball16.png");
+        ":/pqWidgets/Icons/pqEyeball16.png");
     this->PixmapList[pqPipelineModelInternal::EyeballGray].load(
-        ":/pqCore/Icons/pqEyeballd16.png");
+        ":/pqWidgets/Icons/pqEyeballd16.png");
     }
 }
 

@@ -69,7 +69,6 @@ pqPipelineFilter::pqPipelineFilter(QString name, vtkSMProxy* proxy,
   pqPipelineSource(name, proxy, server, p)
 {
   this->Internal = new pqPipelineFilterInternal();
-  this->setType(pqPipelineModel::Filter);
   if (proxy)
     {
     // Listen to proxy events to get input changes.

@@ -90,6 +90,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineBrowserContextMenu.h
   pqPipelineBrowserStateManager.h
   pqPipelineMenu.h
+  pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h
   pqPointSourceWidget.h
   pqProxyInformationWidget.h
@@ -304,6 +305,8 @@ ADD_LIBRARY(pqComponents
   pqPipelineBrowserStateManager.h
   pqPipelineMenu.cxx
   pqPipelineMenu.h
+  pqPipelineModel.cxx
+  pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.cxx
   pqPipelineModelSelectionAdaptor.h
   pqPointSourceWidget.cxx

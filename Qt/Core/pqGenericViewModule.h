@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqDisplay;
 class pqGenericViewModuleInternal;
+class pqPipelineSource;
 class pqServer;
 class QWidget;
 class vtkSMAbstractViewModuleProxy;

@@ -83,7 +83,6 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
   pm->SynchronizeServerClientOptions(this->ConnectionID);
 
   this->CreateRenderModule();
-  this->setType(pqPipelineModel::Server);
 }
 
 //-----------------------------------------------------------------------------

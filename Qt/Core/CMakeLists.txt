@@ -57,7 +57,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPendingDisplayManager.h
   pqPipelineBuilder.h
   pqPipelineDisplay.h
-  pqPipelineModel.h
   pqPipelineSource.h
   pqPipelineFilter.h
   pqPlotViewModule.h
@@ -184,8 +183,6 @@ ADD_LIBRARY(pqCore
   pqPipelineDisplay.h
   pqPipelineFilter.cxx
   pqPipelineFilter.h
-  pqPipelineModel.cxx
-  pqPipelineModel.h
   pqPipelineSource.cxx
   pqPipelineSource.h
   pqPlotViewModule.cxx

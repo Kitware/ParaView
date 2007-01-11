@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqServerManagerObserver.h"
 
-#include "pqPipelineModel.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqXMLUtil.h"

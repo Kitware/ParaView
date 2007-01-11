@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "vtkType.h"
 
+class pqGenericViewModule;
 class pqPipelineSource;
 class pqRenderViewModule;
 class pqSelectionManagerImplementation;

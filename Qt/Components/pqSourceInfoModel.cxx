@@ -195,7 +195,7 @@ QVariant pqSourceInfoModel::data(const QModelIndex &idx, int role) const
         else
           {
           // Default to the source pixmap.
-          return QVariant(QPixmap(":/pqCore/Icons/pqSource16.png"));
+          return QVariant(QPixmap(":/pqWidgets/Icons/pqSource16.png"));
           }
         }
       case Qt::WhatsThisRole:

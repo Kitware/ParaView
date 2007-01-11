@@ -43,17 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqServerManagerModelItem::pqServerManagerModelItem(QObject* _parent /*=null*/)
   : QObject(_parent)
 {
-  this->ModelType = pqPipelineModel::Invalid;
-}
-//-----------------------------------------------------------------------------
-pqServerManagerModelItem::~pqServerManagerModelItem()
-{
-}
-
-//-----------------------------------------------------------------------------
-void pqServerManagerModelItem::setType(pqPipelineModel::ItemType type)
-{
-  this->ModelType = type;
 }
 
 

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineModel_h
 
 
-#include "pqCoreExport.h"
+#include "pqComponentsExport.h"
 #include <QAbstractItemModel>
 
 class pqConsumerDisplay;
@@ -71,7 +71,7 @@ class QPixmap;
 /// than one input, a link object is placed in the child list of the
 /// input objects. The link item represents a connection instead of a
 /// pipeline object.
-class PQCORE_EXPORT pqPipelineModel : public QAbstractItemModel
+class PQCOMPONENTS_EXPORT pqPipelineModel : public QAbstractItemModel
 {
   Q_OBJECT
 

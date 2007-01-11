@@ -83,8 +83,6 @@ pqPipelineSource::pqPipelineSource(const QString& name, vtkSMProxy* proxy,
 {
   this->Internal = new pqPipelineSourceInternal(name, proxy);
   
-  // Set the model item type.
-  this->setType(pqPipelineModel::Source);
   // Create any internal proxies needed by any property
   // that has a vtkSMProxyListDomain.
   this->createProxiesForProxyListDomains();

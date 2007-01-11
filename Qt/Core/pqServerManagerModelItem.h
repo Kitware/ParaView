@@ -40,8 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include <QObject>
 
-#include "pqPipelineModel.h" // Needed for ModelType member
-
 
 class PQCORE_EXPORT pqServerManagerModelItem : public QObject
 {
@@ -49,28 +47,12 @@ class PQCORE_EXPORT pqServerManagerModelItem : public QObject
 
 public:
   pqServerManagerModelItem(QObject* parent=NULL);
-  virtual ~pqServerManagerModelItem();
-
-  // Get the type for the model item. Type determines the way the 
-  // item is displayed.
-  // TODO: May be type must be only for pqPipelineSource, 
-  // everything is directly subclassed, hence we can use dynamic casts..
-  pqPipelineModel::ItemType getType() const {return this->ModelType;}
-
-signals:
-  // This signal is fired when data associated with the item,
-  // such as type/name is changed. 
-  void dataModified();
-
-protected:
-  void setType(pqPipelineModel::ItemType type); 
+  virtual ~pqServerManagerModelItem() {}
 
 protected slots:
   // called when input property on display changes. We must detect if
   // (and when) the display is connected to a new proxy.
   virtual void onInputChanged() { };
-private:
-  pqPipelineModel::ItemType ModelType;
 };
 
 #endif

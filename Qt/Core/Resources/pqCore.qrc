@@ -1,22 +1,6 @@
 <RCC>
     <qresource prefix="/pqCore" >
-        <file>Icons/pqBundle16.png</file>
-        <file>Icons/pqBundle22.png</file>
-        <file>Icons/pqBundle32.png</file>
-        <file>Icons/pqEyeball16.png</file>
-        <file>Icons/pqEyeballd16.png</file>
-        <file>Icons/pqFilter16.png</file>
-        <file>Icons/pqFilter22.png</file>
-        <file>Icons/pqFilter32.png</file>
-        <file>Icons/pqLinkBack16.png</file>
-        <file>Icons/pqLinkIn16.png</file>
         <file>Icons/pqLinkOut16.png</file>
-        <file>Icons/pqServer16.png</file>
-        <file>Icons/pqServer22.png</file>
-        <file>Icons/pqServer32.png</file>
-        <file>Icons/pqSource16.png</file>
-        <file>Icons/pqSource22.png</file>
-        <file>Icons/pqSource32.png</file>
     </qresource>
 </RCC>
 

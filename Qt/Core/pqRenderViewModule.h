@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqGenericViewModule.h"
+#include <QColor> // needed for return type.
 
 class pqRenderViewModuleInternal;
 class pqUndoStack;
