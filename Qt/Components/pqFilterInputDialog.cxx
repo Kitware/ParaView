@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 
 #include <QButtonGroup>
+#include <QFrame>
 #include <QGridLayout>
 #include <QHeaderView>
 #include <QHBoxLayout>
@@ -90,7 +91,7 @@ pqFilterInputDialog::pqFilterInputDialog(QWidget *widgetParent)
   baseLayout->addWidget(this->SourcesLabel, 0, 1);
   QFrame *divider = new QFrame(this);
   divider->setFrameShadow(QFrame::Sunken);
-  divider->setFrameShape(QFrame::Shape::VLine);
+  divider->setFrameShape(QFrame::VLine);
   baseLayout->addWidget(divider, 0, 2, 3, 1);
   baseLayout->addWidget(new QLabel("Pipeline Preview", this), 0, 3);
 
@@ -130,7 +131,7 @@ pqFilterInputDialog::pqFilterInputDialog(QWidget *widgetParent)
   // Add the separator and the dialog buttons.
   divider = new QFrame(this);
   divider->setFrameShadow(QFrame::Sunken);
-  divider->setFrameShape(QFrame::Shape::HLine);
+  divider->setFrameShape(QFrame::HLine);
   baseLayout->addWidget(divider, 3, 0, 1, 4);
 
   this->OkButton = new QPushButton("&OK", this);
