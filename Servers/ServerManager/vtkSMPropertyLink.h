@@ -51,6 +51,29 @@ public:
   // of the PropagateUpdateVTKObjects flag. If one wants to propagate 
   // UpdateVTKObjects, use the overload with vtkSMProxy as the argument.
   void AddLinkedProperty(vtkSMProperty* property, int updateDir);
+
+  // Description:
+  // Remove a linked property.
+  void RemoveLinkedProperty(vtkSMProperty* property);
+
+  // Description:
+  // Get the number of properties that are involved in this link.
+  unsigned int GetNumberOfLinkedProperties();
+
+  // Description:
+  // Get a property involved in this link.
+  vtkSMProperty* GetLinkedProperty(int index);
+
+  // Description:
+  // Get a proxy involved in this link.
+  vtkSMProxy* GetLinkedProxy(vtkSMProperty* property);
+  
+  // Description:
+  // Get the direction of a property involved in this link
+  // (see vtkSMLink::UpdateDirections)
+  int GetLinkedPropertyDirection(vtkSMProperty* property);
+  
+
 protected:
   vtkSMPropertyLink();
   ~vtkSMPropertyLink();

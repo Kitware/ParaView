@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.5");
+vtkCxxRevisionMacro(vtkSMProxyLink, "1.6");
 
 //---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals
@@ -133,6 +133,37 @@ void vtkSMProxyLink::RemoveLinkedProxy(vtkSMProxy* proxy)
 unsigned int vtkSMProxyLink::GetNumberOfLinkedProxies()
 {
   return static_cast<unsigned int>(this->Internals->LinkedProxies.size());
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyLink::GetLinkedProxy(int index)
+{
+  vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
+    this->Internals->LinkedProxies.begin();
+  for(int i=1;
+      i<index && iter != this->Internals->LinkedProxies.end();
+      i++)
+    { /* empty */ }
+  if(iter == this->Internals->LinkedProxies.end())
+    {
+    return NULL;
+    }
+  return iter->Proxy;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProxyLink::GetLinkedProxyDirection(vtkSMProxy* proxy)
+{
+  vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
+    this->Internals->LinkedProxies.begin();
+  for(; iter != this->Internals->LinkedProxies.end(); ++iter)
+    {
+    if(iter->Proxy == proxy)
+      {
+      return iter->UpdateDirection;
+      }
+    }
+  return NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -279,3 +310,5 @@ void vtkSMProxyLink::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+

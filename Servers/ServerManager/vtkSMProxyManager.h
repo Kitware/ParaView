@@ -189,6 +189,14 @@ public:
   // proxies as well if the flag is set.
   void UpdateRegisteredProxiesInOrder(int modified_only=1);
   void UpdateProxyInOrder(vtkSMProxy* proxy);
+  
+  // Description:
+  // Get the number of registered links with the server manager.
+  int GetNumberOfLinks();
+
+  // Description:
+  // Get the name of a link.
+  const char* GetLinkName(int index);
 
   // Description:
   // Register proxy/property links with the server manager. The linknames

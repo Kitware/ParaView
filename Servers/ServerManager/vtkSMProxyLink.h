@@ -53,6 +53,15 @@ public:
   unsigned int GetNumberOfLinkedProxies();
 
   // Description:
+  // Get a proxy involved in this link.
+  vtkSMProxy* GetLinkedProxy(int index);
+  
+  // Description:
+  // Get the direction of a proxy involved in this link
+  // (see vtkSMLink::UpdateDirections)
+  int GetLinkedProxyDirection(vtkSMProxy* proxy);
+  
+  // Description:
   // It is possible to exclude certain properties from being synchronized
   // by this link. This method can be used to add/remove the names for such
   // exception properties.
