@@ -449,6 +449,7 @@ QString pqFileDialogModel::absoluteFilePath(const QString& path)
     }
 
   if(path.at(0) == this->separator() ||
+     ('/' == this->separator() && path.at(0) == '~') ||
      path.indexOf(QRegExp("[a-zA-Z]:")) == 0)
     {
     return path;
