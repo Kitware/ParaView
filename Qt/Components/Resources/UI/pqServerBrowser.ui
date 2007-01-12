@@ -1,15 +1,12 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pqServerBrowser</class>
  <widget class="QDialog" name="pqServerBrowser" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>277</width>
-    <height>344</height>
+    <width>384</width>
+    <height>345</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -26,8 +23,8 @@
     <widget class="QLabel" name="message" >
      <property name="font" >
       <font>
-       <family>MS Shell Dlg 2</family>
-       <pointsize>8</pointsize>
+       <family>Lucida Grande</family>
+       <pointsize>13</pointsize>
        <weight>50</weight>
        <italic>false</italic>
        <bold>false</bold>
@@ -141,7 +138,6 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <tabstops>
   <tabstop>startups</tabstop>
   <tabstop>addServer</tabstop>

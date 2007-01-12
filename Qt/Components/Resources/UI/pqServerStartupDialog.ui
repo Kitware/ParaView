@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pqServerStartupDialog</class>
  <widget class="QDialog" name="pqServerStartupDialog" >
   <property name="geometry" >
@@ -26,8 +23,8 @@
     <widget class="QLabel" name="message" >
      <property name="font" >
       <font>
-       <family>MS Shell Dlg 2</family>
-       <pointsize>10</pointsize>
+       <family>Lucida Grande</family>
+       <pointsize>11</pointsize>
        <weight>75</weight>
        <italic>false</italic>
        <bold>true</bold>
@@ -75,7 +72,6 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections>
   <connection>
