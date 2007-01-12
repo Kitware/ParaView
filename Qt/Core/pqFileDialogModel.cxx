@@ -66,11 +66,12 @@ public:
   }
 
   FileInfo(const QString& l, const QString& filepath, 
-           const bool isdir) :
+           const bool isdir, const QList<FileInfo>& g = QList<FileInfo>()) :
     Label(l),
     FilePath(filepath),
     IsDir(isdir),
-    IsLink(false)
+    IsLink(false),
+    Group(g)
   {
   if(this->Label.endsWith(".lnk"))
     {
@@ -99,11 +100,22 @@ public:
     return this->IsLink;
   }
 
+  bool isGroup() const
+  {
+    return !this->Group.empty();
+  }
+
+  const QList<FileInfo>& group() const
+  {
+    return this->Group;
+  }
+
 private:
   QString Label;
   QString FilePath;
   bool IsDir;
   bool IsLink;
+  QList<FileInfo> Group;
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -222,21 +234,43 @@ public:
     return result.trimmed();
   }
 
-  void UpdateInformation()
+  /// query the file system for information
+  vtkPVFileInformation* GetData(bool dirListing, 
+                                const QString& path,
+                                bool specialDirs)
     {
-    if(!this->FileInformationHelperProxy)
+    if(this->FileInformationHelperProxy)
       {
-      return;
+      // send data to server
+      vtkSMProxy* helper = this->FileInformationHelperProxy;
+      pqSMAdaptor::setElementProperty(
+        helper->GetProperty("DirectoryListing"), dirListing);
+      pqSMAdaptor::setElementProperty(helper->GetProperty("Path"),
+         path.toAscii().data());
+      pqSMAdaptor::setElementProperty(
+        helper->GetProperty("SpecialDirectories"), specialDirs);
+      helper->UpdateVTKObjects();
+      
+      // get data from server
+      this->FileInformation->Initialize();
+      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+      pm->GatherInformation(this->FileInformationHelperProxy->GetConnectionID(),
+        vtkProcessModule::DATA_SERVER, 
+        this->FileInformation, 
+        this->FileInformationHelperProxy->GetID(0));
       }
-
-    this->FileInformation->Initialize();
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->GatherInformation(this->FileInformationHelperProxy->GetConnectionID(),
-      vtkProcessModule::DATA_SERVER, 
-      this->FileInformation, 
-      this->FileInformationHelperProxy->GetID(0));
+    else
+      {
+      vtkPVFileInformationHelper* helper = this->FileInformationHelper;
+      helper->SetDirectoryListing(dirListing);
+      helper->SetPath(path.toAscii().data());
+      helper->SetSpecialDirectories(specialDirs);
+      this->FileInformation->CopyFromObject(helper);
+      }
+    return this->FileInformation;
     }
 
+  /// put queried information into our model
   void Update(const QString& path, vtkPVFileInformation* dir)
     {
     this->CurrentPath = path;
@@ -268,8 +302,7 @@ public:
         }
       else if (info->GetType() == vtkPVFileInformation::FILE_GROUP)
         {
-        // TODO: For now simply expanding the groups and putting them
-        // the client may use this grouping information.
+        QList<FileInfo> groupFiles;
         vtkSmartPointer<vtkCollectionIterator> childIter;
         childIter.TakeReference(info->GetContents()->NewIterator());
         for (childIter->InitTraversal(); !childIter->IsDoneWithTraversal();
@@ -277,9 +310,14 @@ public:
           {
           vtkPVFileInformation* child = vtkPVFileInformation::SafeDownCast(
             childIter->GetCurrentObject());
-          files.push_back(FileInfo(child->GetName(), child->GetFullPath(),
+          //printf("got child full path %s\n", child->GetFullPath());
+          groupFiles.push_back(FileInfo(child->GetName(), child->GetFullPath(),
                                    false));
           }
+        qSort(groupFiles.begin(), groupFiles.end(), CaseInsensitiveSort);
+        //printf("group full path %s\n", info->GetFullPath());
+        files.push_back(FileInfo(info->GetName(), groupFiles[0].filePath(), false,
+            groupFiles));
         }
       }
 
@@ -318,15 +356,18 @@ public:
     return file.isDir();
     }
 
+  bool isRemote()
+    {
+    return !!this->Server;
+    }
+
   /// Path separator for the connected server's filesystem. 
   char Separator;
 
-  /// Connection from which the dir listing is to be fetched.
-  pqServer* Server;
   /// Current path being displayed (server's filesystem).
   QString CurrentPath;
   /// Caches information about the set of files within the current path.
-  QList<FileInfo> FileList;
+  QVector<FileInfo> FileList;  // adjacent memory occupation for QModelIndex
 
   /// The last path accessed by this file dialog model
   /// used to remember paths across the session
@@ -334,6 +375,10 @@ public:
   static QString gLastLocalPath;
   static QString gLastServerPath;
 
+private:   
+  // server vs. local implementation private
+  pqServer* Server;
+  
   vtkSmartPointer<vtkPVFileInformationHelper> FileInformationHelper;
   vtkSmartPointer<vtkSMProxy> FileInformationHelperProxy;
   vtkSmartPointer<vtkPVFileInformation> FileInformation;
@@ -357,70 +402,31 @@ pqFileDialogModel::~pqFileDialogModel()
 
 QString pqFileDialogModel::getStartPath()
 {
-  QString ret;
-  if(this->Implementation->FileInformationHelperProxy)
+  QString* path = NULL;
+  if(this->Implementation->isRemote())
     {
-    if (this->Implementation->gLastServerPath.isEmpty())
-      {
-      vtkSMProxy* helper = this->Implementation->FileInformationHelperProxy;
-      pqSMAdaptor::setElementProperty(
-        helper->GetProperty("DirectoryListing"), 0);
-      pqSMAdaptor::setElementProperty(helper->GetProperty("Path"), ".");
-      pqSMAdaptor::setElementProperty(
-        helper->GetProperty("SpecialDirectories"), 0);
-      helper->UpdateVTKObjects();
-      this->Implementation->UpdateInformation();
-      this->Implementation->gLastServerPath = 
-            this->Implementation->FileInformation->GetFullPath();
-      }
-    ret = this->Implementation->gLastServerPath;
+    path = &this->Implementation->gLastServerPath;
     }
   else
     {
-    if (this->Implementation->gLastLocalPath.isEmpty())
-      {
-      vtkPVFileInformationHelper* helper = 
-                     this->Implementation->FileInformationHelper;
-      helper->SetDirectoryListing(0);
-      helper->SetPath(".");
-      helper->SetSpecialDirectories(0);
-      this->Implementation->FileInformation->CopyFromObject(helper);
-      this->Implementation->gLastLocalPath = 
-             this->Implementation->FileInformation->GetFullPath();
-      }
-    ret = this->Implementation->gLastLocalPath;
+    path = &this->Implementation->gLastLocalPath;
     }
-  return ret;
+
+  if (path->isEmpty())
+    {
+    vtkPVFileInformation* info =
+      this->Implementation->GetData(false, ".", false);
+    *path = info->GetFullPath();
+    }
+  return *path;
 }
 
 void pqFileDialogModel::setCurrentPath(const QString& Path)
 {
   QString cPath = this->Implementation->cleanPath(Path);
-  if(this->Implementation->FileInformationHelperProxy)
-    {
-    this->Implementation->gLastServerPath = cPath;
-    vtkSMProxy* helper = this->Implementation->FileInformationHelperProxy;
-    pqSMAdaptor::setElementProperty(helper->GetProperty("DirectoryListing"),
-                                    1);
-    pqSMAdaptor::setElementProperty(helper->GetProperty("Path"), cPath);
-    pqSMAdaptor::setElementProperty(helper->GetProperty("SpecialDirectories"), 
-                                    0);
-    helper->UpdateVTKObjects();
-    this->Implementation->UpdateInformation();
-    }
-  else
-    {
-    this->Implementation->gLastLocalPath = cPath;
-    vtkPVFileInformationHelper* helper = 
-               this->Implementation->FileInformationHelper;
-    helper->SetDirectoryListing(1);
-    helper->SetPath(cPath.toAscii().data());
-    helper->SetSpecialDirectories(0);
-    this->Implementation->FileInformation->CopyFromObject(helper);
-  }
-  
-  this->Implementation->Update(cPath, this->Implementation->FileInformation);
-
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(true, cPath, false);
+  this->Implementation->Update(cPath, info);
   this->reset();
 }
 
@@ -472,124 +478,42 @@ bool pqFileDialogModel::isDir(const QModelIndex& Index)
 bool pqFileDialogModel::fileExists(const QString& file, QString& fullpath)
 {
   QString FilePath = this->Implementation->cleanPath(file);
-  if(this->Implementation->FileInformationHelperProxy)
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(false, FilePath, false);
+  
+  // try again for shortcut
+  if(info->GetType() != vtkPVFileInformation::SINGLE_FILE)
     {
-    vtkSMProxy* helper = this->Implementation->FileInformationHelperProxy;
-    pqSMAdaptor::setElementProperty(helper->GetProperty("Path"), FilePath);
-    pqSMAdaptor::setElementProperty(
-      helper->GetProperty("SpecialDirectories"), 0);
-    pqSMAdaptor::setElementProperty(
-      helper->GetProperty("DirectoryListing"), 0);
-    helper->UpdateVTKObjects();
-    this->Implementation->UpdateInformation();
-    // try again for shortcuts
-    if(this->Implementation->FileInformation->GetType() != 
-      vtkPVFileInformation::SINGLE_FILE)
-      {
-      pqSMAdaptor::setElementProperty(helper->GetProperty("Path"), FilePath + ".lnk");
-      helper->UpdateVTKObjects();
-      this->Implementation->UpdateInformation();
-      }
-    if(this->Implementation->FileInformation->GetType() == 
-      vtkPVFileInformation::SINGLE_FILE)
-      {
-      fullpath = this->Implementation->FileInformation->GetFullPath();
-      return true;
-      }
-    }
-  else
-    {
-    vtkPVFileInformationHelper* helper = 
-             this->Implementation->FileInformationHelper;
-    helper->SetPath(FilePath.toAscii().data());
-    helper->SetSpecialDirectories(0);
-    helper->SetDirectoryListing(0);
-    this->Implementation->FileInformation->CopyFromObject(helper);
-    
-    // try again for shortcuts
-    if(this->Implementation->FileInformation->GetType() != 
-      vtkPVFileInformation::SINGLE_FILE)
-      {
-      helper->SetPath((FilePath + ".lnk").toAscii().data());
-      this->Implementation->FileInformation->CopyFromObject(helper);
-      }
-    if(this->Implementation->FileInformation->GetType() == 
-      vtkPVFileInformation::SINGLE_FILE)
-      {
-      fullpath = this->Implementation->FileInformation->GetFullPath();
-      return true;
-      }
-
+    info = this->Implementation->GetData(false, FilePath + ".lnk", false);
     }
 
+  if(info->GetType() == vtkPVFileInformation::SINGLE_FILE)
+    {
+    fullpath = info->GetFullPath();
+    return true;
+    }
   return false;
-
 }
 
 bool pqFileDialogModel::dirExists(const QString& path, QString& fullpath)
 {
   QString dir = this->Implementation->cleanPath(path);
-  if(this->Implementation->FileInformationHelperProxy)
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(false, dir, false);
+  
+  // try again for shortcuts
+  if(info->GetType() != vtkPVFileInformation::DIRECTORY &&
+     info->GetType() != vtkPVFileInformation::DRIVE)
     {
-    vtkSMProxy* helper = this->Implementation->FileInformationHelperProxy;
-    pqSMAdaptor::setElementProperty(helper->GetProperty("Path"), dir);
-    pqSMAdaptor::setElementProperty(
-      helper->GetProperty("SpecialDirectories"), 0);
-    pqSMAdaptor::setElementProperty(
-      helper->GetProperty("DirectoryListing"), 0);
-    helper->UpdateVTKObjects();
-    this->Implementation->UpdateInformation();
-
-    // try again for shortcuts
-    if(this->Implementation->FileInformation->GetType() != 
-      vtkPVFileInformation::DIRECTORY &&
-      this->Implementation->FileInformation->GetType() != 
-      vtkPVFileInformation::DRIVE)
-      {
-      pqSMAdaptor::setElementProperty(helper->GetProperty("Path"), dir + ".lnk");
-      helper->UpdateVTKObjects();
-      this->Implementation->UpdateInformation();
-      }
-
-    if(this->Implementation->FileInformation->GetType() == 
-      vtkPVFileInformation::DIRECTORY ||
-      this->Implementation->FileInformation->GetType() == 
-      vtkPVFileInformation::DRIVE)
-      {
-      fullpath = this->Implementation->FileInformation->GetFullPath();
-      return true;
-      }
-    }
-  else
-    {
-    vtkPVFileInformationHelper* helper = 
-         this->Implementation->FileInformationHelper;
-    helper->SetPath(dir.toAscii().data());
-    helper->SetSpecialDirectories(0);
-    helper->SetDirectoryListing(0);
-    this->Implementation->FileInformation->CopyFromObject(helper);
-
-    // try again for a shortcut
-    if (this->Implementation->FileInformation->GetType() !=
-      vtkPVFileInformation::DIRECTORY && 
-      this->Implementation->FileInformation->GetType() != 
-      vtkPVFileInformation::DRIVE)
-      {
-      helper->SetPath((dir + ".lnk").toAscii().data());
-      this->Implementation->FileInformation->CopyFromObject(helper);
-      }
-
-
-    if (this->Implementation->FileInformation->GetType() ==
-      vtkPVFileInformation::DIRECTORY || 
-      this->Implementation->FileInformation->GetType() == 
-      vtkPVFileInformation::DRIVE)
-      {
-      fullpath = this->Implementation->FileInformation->GetFullPath();
-      return true;
-      }
+    info = this->Implementation->GetData(false, dir + ".lnk", false);
     }
 
+  if(info->GetType() == vtkPVFileInformation::DIRECTORY ||
+     info->GetType() == vtkPVFileInformation::DRIVE)
+    {
+    fullpath = info->GetFullPath();
+    return true;
+    }
   return false;
 }
 
@@ -605,53 +529,101 @@ int pqFileDialogModel::columnCount(const QModelIndex& /*idx*/) const
 
 QVariant pqFileDialogModel::data(const QModelIndex & idx, int role) const
 {
-  if(!idx.isValid())
-    return QVariant();
+  const FileInfo* file = NULL;
 
-  if(idx.row() >= this->Implementation->FileList.size())
-    return QVariant();
-
-  const FileInfo& file = this->Implementation->FileList[idx.row()];
-
-  switch(role)
+  if(idx.isValid() && 
+     NULL == idx.internalPointer() &&
+     idx.row() >= 0 && 
+     idx.row() < this->Implementation->FileList.size())
     {
-  case Qt::DisplayRole:
-    switch(idx.column())
+    file = &this->Implementation->FileList[idx.row()];
+    }
+  else if(idx.isValid() && idx.internalPointer())
+    {
+    FileInfo* ptr = reinterpret_cast<FileInfo*>(idx.internalPointer());
+    const QList<FileInfo>& grp = ptr->group();
+    if(idx.row() >= 0 && idx.row() < grp.size())
       {
-    case 0:
-      return file.label();
+      file = &grp[idx.row()];
       }
-  case Qt::DecorationRole:
-    switch(idx.column())
-      {
-    case 0:
-      return Icons()->icon(file);
-      }
+    }
+
+  if(!file)
+    {
+    // should never get here anyway
+    return QVariant();
+    }
+
+  if(role == Qt::DisplayRole && idx.column() == 0)
+    {
+    return file->label();
+    }
+  else if(role == Qt::DecorationRole && idx.column() == 0)
+    {
+    return Icons()->icon(*file);
     }
 
   return QVariant();
 }
 
 QModelIndex pqFileDialogModel::index(int row, int column, 
-                const QModelIndex& /*p*/) const
+                                     const QModelIndex& p) const
 {
-  return this->createIndex(row, column);
-}
+  if(!p.isValid())
+    {
+    return this->createIndex(row, column);
+    }
+  if(p.row() >= 0 && 
+     p.row() < this->Implementation->FileList.size() &&
+     NULL == p.internalPointer())
+    {
+    FileInfo* fi = &this->Implementation->FileList[p.row()];
+    return this->createIndex(row, column, fi);
+    }
 
-QModelIndex pqFileDialogModel::parent(const QModelIndex& /*idx*/) const
-{
   return QModelIndex();
 }
 
-int pqFileDialogModel::rowCount(const QModelIndex& /*idx*/) const
+QModelIndex pqFileDialogModel::parent(const QModelIndex& idx) const
 {
-  return this->Implementation->FileList.size();
+  if(!idx.isValid() || !idx.internalPointer())
+    {
+    return QModelIndex();
+    }
+  
+  const FileInfo* ptr = reinterpret_cast<FileInfo*>(idx.internalPointer());
+  int row = ptr - &this->Implementation->FileList.first();
+  return this->createIndex(row, idx.column());
+}
+
+int pqFileDialogModel::rowCount(const QModelIndex& idx) const
+{
+  if(!idx.isValid())
+    {
+    return this->Implementation->FileList.size();
+    }
+  
+  if(NULL == idx.internalPointer() &&
+     idx.row() >= 0 && 
+     idx.row() < this->Implementation->FileList.size())
+    {
+    return this->Implementation->FileList[idx.row()].group().size();
+    }
+
+  return 0;
 }
 
 bool pqFileDialogModel::hasChildren(const QModelIndex& idx) const
 {
   if(!idx.isValid())
     return true;
+
+  if(NULL == idx.internalPointer() && 
+     idx.row() >= 0 && 
+     idx.row() < this->Implementation->FileList.size())
+    {
+    return this->Implementation->FileList[idx.row()].isGroup();
+    }
 
   return false;
 }

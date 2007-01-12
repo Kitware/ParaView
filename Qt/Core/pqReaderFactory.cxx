@@ -83,9 +83,20 @@ struct pqReaderInfo
       return false;
       }
 
+    // include check for ".ext.00"
     QFileInfo info(filename);
-    QString extension = info.suffix();
-    if (!this->Extensions.contains(extension))
+    QString extension = info.completeSuffix();
+    QStringList exts = extension.split('.');
+    bool found = false;
+    foreach(QString ext, exts)
+      {
+      if (this->Extensions.contains(ext))
+        {
+        found = true;
+        break;
+        }
+      }
+    if(!found)
       {
       return false;
       }

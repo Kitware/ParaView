@@ -84,7 +84,14 @@ namespace {
 
     // separated by spaces or semi-colons
     QStringList fs = f.split(QRegExp("[\\s+;]"));
-    return fs;
+
+    // add a *.ext.* for every *.ext we get to support file groups
+    QStringList ret = fs;
+    foreach(QString ext, fs)
+      {
+      ret.append(ext + ".*");
+      }
+    return ret;
     }
 }
 
@@ -287,7 +294,29 @@ void pqFileDialog::accept()
 {
   /* TODO:  handle pqFileDialog::ExistingFiles mode */
   QString filename = this->Implementation->Ui.FileName->text();
-  filename = this->Implementation->Model->absoluteFilePath(filename);
+  filename = filename.trimmed();
+  
+  // TODO: if it is a group, we're getting the first file instead
+  QAbstractProxyModel* m = &this->Implementation->FileFilter;
+  int numrows = m->rowCount(QModelIndex());
+  bool found = false;
+  for(int i=0; i<numrows; i++)
+    {
+    QModelIndex idx = m->index(i, 0, QModelIndex());
+    if(filename == m->data(idx, Qt::DisplayRole))
+      {
+      QModelIndex sidx = m->mapToSource(idx);
+      filename = this->Implementation->Model->getFilePaths(sidx)[0];
+      found = true;
+      break;
+      }
+    }
+
+  if(!found)
+    {
+    filename = this->Implementation->Model->absoluteFilePath(filename);
+    }
+
   QStringList files;
   files.append(filename);
   this->acceptInternal(files);
@@ -411,7 +440,7 @@ QString pqFileDialog::fixFileExtension(
   // Add missing extension if necessary
   QFileInfo fileInfo(filename);
   QString ext = fileInfo.completeSuffix();
-  QString extensionWildcard = ::GetWildCardsFromFilter(filter).first();
+  QString extensionWildcard = GetWildCardsFromFilter(filter).first();
   QString wantedExtension =
     extensionWildcard.mid(extensionWildcard.indexOf('.')+1);
 

@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pqFileDialog</class>
  <widget class="QDialog" name="pqFileDialog" >
   <property name="geometry" >
@@ -216,16 +213,12 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="itemsExpandable" >
-        <bool>false</bool>
-       </property>
       </widget>
      </item>
     </layout>
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <tabstops>
   <tabstop>FileName</tabstop>
   <tabstop>FileType</tabstop>
