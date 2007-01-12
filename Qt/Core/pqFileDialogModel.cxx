@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFileDialogModel.h"
 
+#include <vtkstd/algorithm>
+
 #include <QFileIconProvider>
 #include <QStyle>
 #include <QApplication>
@@ -181,6 +183,26 @@ bool CaseInsensitiveSort(const FileInfo& A, const FileInfo& B)
   return A.label().toLower() < B.label().toLower();
 }
 
+class CaseInsensitiveSortGroup 
+  : public vtkstd::binary_function<FileInfo, FileInfo, bool>
+{
+public:
+  CaseInsensitiveSortGroup(const QString& groupName)
+    {
+    this->numPrefix = groupName.length();
+    }
+  bool operator()(const FileInfo& A, const FileInfo& B) const
+    {
+    QString aLabel = A.label();
+    QString bLabel = B.label();
+    aLabel = aLabel.right(aLabel.length() - numPrefix);
+    bLabel = bLabel.right(bLabel.length() - numPrefix);
+    return aLabel < bLabel;
+    }
+private:
+  int numPrefix;
+};
+
 } // namespace
 
 /////////////////////////////////////////////////////////////////////////
@@ -310,12 +332,11 @@ public:
           {
           vtkPVFileInformation* child = vtkPVFileInformation::SafeDownCast(
             childIter->GetCurrentObject());
-          //printf("got child full path %s\n", child->GetFullPath());
           groupFiles.push_back(FileInfo(child->GetName(), child->GetFullPath(),
                                    false));
           }
-        qSort(groupFiles.begin(), groupFiles.end(), CaseInsensitiveSort);
-        //printf("group full path %s\n", info->GetFullPath());
+        vtkstd::sort(groupFiles.begin(), groupFiles.end(),
+                     CaseInsensitiveSortGroup(info->GetName()));
         files.push_back(FileInfo(info->GetName(), groupFiles[0].filePath(), false,
             groupFiles));
         }
