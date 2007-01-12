@@ -63,7 +63,6 @@ private:
   QPointer<pqProxy> Source;
   class pqUi;
   pqUi* Ui;
-  
 };
 
 #endif

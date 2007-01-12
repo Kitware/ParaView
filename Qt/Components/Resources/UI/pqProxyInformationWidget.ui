@@ -1,28 +1,32 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pqProxyInformationWidget</class>
  <widget class="QWidget" name="pqProxyInformationWidget" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>261</width>
-    <height>489</height>
+    <width>276</width>
+    <height>900</height>
    </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy>
+    <hsizetype>7</hsizetype>
+    <vsizetype>7</vsizetype>
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
-    <number>2</number>
+    <number>9</number>
    </property>
    <property name="spacing" >
-    <number>2</number>
+    <number>6</number>
    </property>
-<!--sdsdsd -->
    <item>
     <widget class="QGroupBox" name="properties" >
      <property name="title" >
@@ -52,7 +56,6 @@
      </layout>
     </widget>
    </item>
-<!--dsdsds -->
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
@@ -267,21 +270,52 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox_4" >
+     <property name="title" >
+      <string>Time</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QTreeWidget" name="timeValues" >
+        <property name="columnCount" >
+         <number>2</number>
+        </property>
+        <column>
+         <property name="text" >
+          <string>Index</string>
+         </property>
+        </column>
+        <column>
+         <property name="text" >
+          <string>Value</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" >
       <size>
-       <width>257</width>
-       <height>16</height>
+       <width>20</width>
+       <height>40</height>
       </size>
      </property>
     </spacer>
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections/>
 </ui>

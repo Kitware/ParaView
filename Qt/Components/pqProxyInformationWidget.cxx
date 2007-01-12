@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqProxyInformationWidget.h"
 
 // Qt includes
+#include <QHeaderView>
 
 // VTK includes
 #include <vtksys/SystemTools.hxx>
@@ -46,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMSourceProxy.h"
@@ -188,9 +190,12 @@ void pqProxyInformationWidget::updateInformation()
             dataRange.append(componentRange);
             }
           item->setData(2, Qt::DisplayRole, dataRange);
+          item->setData(2, Qt::ToolTipRole, dataRange);
           }
         }
       }
+    this->Ui->dataArrays->header()->resizeSections(
+      QHeaderView::ResizeToContents);
 
     double bounds[6];
     dataInformation->GetBounds(bounds);
@@ -246,6 +251,22 @@ void pqProxyInformationWidget::updateInformation()
           {
           break;
           }
+        }
+      }
+
+    // Check if there are timestep values. If yes, display them.
+    vtkSMDoubleVectorProperty* tsv = vtkSMDoubleVectorProperty::SafeDownCast(
+      sourceProxy->GetProperty("TimestepValues"));
+    this->Ui->timeValues->clear();
+    if (tsv)
+      {
+      unsigned int numElems = tsv->GetNumberOfElements();
+      for (unsigned int i=0; i<numElems; i++)
+        {
+        QTreeWidgetItem * item = new QTreeWidgetItem(this->Ui->timeValues);
+        item->setData(0, Qt::DisplayRole, i);
+        item->setData(1, Qt::DisplayRole, tsv->GetElement(i));
+        item->setData(1, Qt::ToolTipRole, tsv->GetElement(i));
         }
       }
     }
