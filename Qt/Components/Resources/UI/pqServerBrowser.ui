@@ -21,17 +21,6 @@
    </property>
    <item>
     <widget class="QLabel" name="message" >
-     <property name="font" >
-      <font>
-       <family>Lucida Grande</family>
-       <pointsize>13</pointsize>
-       <weight>50</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-       <underline>false</underline>
-       <strikeout>false</strikeout>
-      </font>
-     </property>
      <property name="text" >
       <string>Choose a server:</string>
      </property>
