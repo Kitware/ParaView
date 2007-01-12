@@ -3507,7 +3507,13 @@
       <SubProxy>
         <Proxy name="Reduce" proxygroup="filters" proxyname="ReductionFilter">
         </Proxy>
+        <ExposedProperties>
+          <Property name="PreReductionHelper" />
+          <Property name="ReductionHelper" />
+          <Property name="PassThrough" />
+        </ExposedProperties>
       </SubProxy>
+
     </GenericViewDisplayProxy>
 
     <GenericViewDisplayProxy name="HistogramDisplay"

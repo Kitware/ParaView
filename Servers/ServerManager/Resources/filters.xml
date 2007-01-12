@@ -4294,9 +4294,20 @@ This filter uses colors to show levels of a hiearchical dataset.
             <Group name="filters"/>
           </ProxyGroupDomain>
       </InputProperty>
+      <ProxyProperty name="PreReductionHelper"
+         command="SetPreReductionHelper">
+      </ProxyProperty>
       <ProxyProperty name="ReductionHelper"
          command="SetReductionHelper">
       </ProxyProperty>
+      <IntVectorProperty 
+         name="PassThrough" 
+         command="SetPassThrough" 
+         number_of_elements="1"
+         default_values="-1"> 
+        <IntRangeDomain name="range" min="-1"/>
+     </IntVectorProperty>
+
     <!-- End ReductionFilter -->
     </SourceProxy>
 
@@ -4790,6 +4801,29 @@ This filter operates on all types of data sets, and it returns unstructured grid
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
      </InputProperty>     
+   </SourceProxy>
+
+   <SourceProxy name="MinMax" class="vtkMinMax">
+      <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkPolyData"/>
+          </DataTypeDomain>
+     </InputProperty>     
+
+     <IntVectorProperty 
+        name="Operation" 
+        command="SetOperation" 
+        number_of_elements="1"
+        default_values="0"> 
+        <IntRangeDomain name="range" min="0" max="1"/>
+     </IntVectorProperty>
+     
    </SourceProxy>
    
    </ProxyGroup>

@@ -34,20 +34,25 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.4");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.5");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
+vtkCxxSetObjectMacro(vtkReductionFilter, PreReductionHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, ReductionHelper, vtkAlgorithm);
+
 //-----------------------------------------------------------------------------
 vtkReductionFilter::vtkReductionFilter()
 {
   this->Controller= 0;
   this->RawData = 0;
+  this->PreReductionHelper = 0;
   this->ReductionHelper = 0;
+  this->PassThrough = -1;
 }
 
 //-----------------------------------------------------------------------------
 vtkReductionFilter::~vtkReductionFilter()
 {
+  this->SetPreReductionHelper(0);
   this->SetReductionHelper(0);
   this->SetController(0);
   delete []this->RawData;
@@ -76,7 +81,7 @@ int vtkReductionFilter::RequestData(vtkInformation*,
       inputVector[0]->GetInformationObject(0)->Get(
         vtkDataObject::DATA_OBJECT()));
     }
-
+  
   this->Reduce(input, output);
   return 1;
 }
@@ -84,12 +89,57 @@ int vtkReductionFilter::RequestData(vtkInformation*,
 //-----------------------------------------------------------------------------
 void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
 {
+  //run the PreReduction filter on our input
+  //result goes into preOutput
+  vtkDataSet *preOutput = NULL;
+  if (this->PreReductionHelper == NULL)
+    {
+    //allow a passthrough
+    preOutput = input->NewInstance();
+    preOutput->ShallowCopy(input);
+    }
+  else
+    {
+    this->PreReductionHelper->RemoveAllInputs();
+    this->PreReductionHelper->AddInputConnection(input->GetProducerPort());
+    this->PreReductionHelper->Update();
+    vtkDataSet* reduced_output = 
+      vtkDataSet::SafeDownCast(this->PreReductionHelper->GetOutputDataObject(0));
+    if (this->ReductionHelper != NULL)
+      {
+      vtkInformation* info = this->ReductionHelper->GetInputPortInformation(0);
+      if (info) 
+        {
+        const char* expectedType =
+          info->Get(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE());
+        if (reduced_output->IsA(expectedType))
+          {
+          preOutput = reduced_output->NewInstance();
+          preOutput->ShallowCopy(reduced_output);
+          }
+        else 
+          {
+          vtkWarningMacro("Prereduction filter's output type is not same as the reduction filter's input type.");
+          preOutput = input->NewInstance();
+          preOutput->ShallowCopy(input);
+          }
+        }
+      }
+    else
+      {
+      preOutput = reduced_output->NewInstance();
+      preOutput->ShallowCopy(reduced_output);
+      }
+    }
+
   vtkMultiProcessController* controller = this->Controller;
   if (!controller || controller->GetNumberOfProcesses() <= 1)
     {
-    output->ShallowCopy(input);
+    output->ShallowCopy(preOutput);
+    preOutput->Delete();
     return;
     }
+
 #ifdef VTK_USE_MPI
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
     controller->GetCommunicator());
@@ -101,7 +151,7 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
   int myId = controller->GetLocalProcessId();
   int numProcs = controller->GetNumberOfProcesses();
 
-  this->MarshallData(input);
+  this->MarshallData(preOutput);
   if (myId == 0)
     {
     int *data_lengths = new int[numProcs];
@@ -122,33 +172,53 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
     com->GatherV(this->RawData, gathered_data, this->DataLength,
       data_lengths, offsets, 0);
 
-    // Form vtkDataSets from all collected data.
+    // Form vtkDataSets from collected data.
+    // Meanwhile if the user wants to see only one node's data
+    // then pass only that through
     vtkstd::vector<vtkSmartPointer<vtkDataSet> > data_sets;
     for (cc=0; cc < numProcs; ++cc)
       {
-      vtkDataSet* ds = this->Reconstruct(
-        gathered_data + offsets[cc], data_lengths[cc]);
-      data_sets.push_back(ds);
-      ds->Delete();
+      if (this->PassThrough<0 || this->PassThrough==cc)
+        {        
+        vtkDataSet* ds = this->Reconstruct(
+          gathered_data + offsets[cc], data_lengths[cc]);
+        data_sets.push_back(ds);
+        ds->Delete();
+        }
       }
 
-    // Now we need to reduce the collected data_sets.
+    // Now run the ReductionHelper on the collected results from each node
+    // result goes into output
     if (!this->ReductionHelper)
       {
-      vtkErrorMacro("ReductionHelper not set, cannot reduce.");
+      //allow a passthrough
+      //in this case just send the data from one node
       output->ShallowCopy(data_sets[0]);
       }
     else
       {
       this->ReductionHelper->RemoveAllInputs();
-      for (cc=0; cc<numProcs; ++cc)
+      //connect all (or just the selected selected) datasets to the reduction
+      //algorithm
+      if (this->PassThrough == -1)
+        {
+        for (cc=0; cc<numProcs; ++cc)
+          {
+          this->ReductionHelper->AddInputConnection(
+            data_sets[cc]->GetProducerPort());
+          }
+        } 
+      else
         {
         this->ReductionHelper->AddInputConnection(
-          data_sets[cc]->GetProducerPort());
+          data_sets[0]->GetProducerPort());
         }
+       
       this->ReductionHelper->Update();
       vtkDataSet* reduced_output = 
-        vtkDataSet::SafeDownCast(this->ReductionHelper->GetOutputDataObject(0));
+        vtkDataSet::SafeDownCast(
+          this->ReductionHelper->GetOutputDataObject(0));
+
       if (output->IsA(reduced_output->GetClassName()))
         {
         output->ShallowCopy(reduced_output);
@@ -169,8 +239,10 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
     com->Gather(&this->DataLength, 0, 1, 0);
     // Send the data to be gathered on the root.
     com->GatherV(this->RawData, 0, this->DataLength, 0, 0, 0);
-    output->ShallowCopy(input);
+    output->ShallowCopy(preOutput);
     }
+
+  preOutput->Delete();
   delete []this->RawData;
   this->RawData = 0;
   this->DataLength = 0;
@@ -218,6 +290,7 @@ vtkDataSet* vtkReductionFilter::Reconstruct(char* raw_data, int data_length)
 void vtkReductionFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "PreReductionHelper: " << this->PreReductionHelper << endl;
   os << indent << "ReductionHelper: " << this->ReductionHelper << endl;
   os << indent << "Controller: " << this->Controller << endl;
 }

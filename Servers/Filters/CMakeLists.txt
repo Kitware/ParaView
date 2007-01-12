@@ -39,6 +39,7 @@ SET(Filters_SRCS
   vtkIntegrateFlowThroughSurface.cxx
   vtkKdTreeGenerator.cxx
   vtkMergeArrays.cxx
+  vtkMinMax.cxx
   vtkMPICompositeManager.cxx
   vtkMPIDuplicatePolyData.cxx
   vtkMPIDuplicateUnstructuredGrid.cxx

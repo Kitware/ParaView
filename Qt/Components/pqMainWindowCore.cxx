@@ -471,10 +471,16 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     for (QMap<QString, QString>::iterator iter2 = sortingMap.begin();
       iter2 != sortingMap.end(); ++iter2)
       {
+      //I am hiding the min max filter because it is intended for python 
+      //scripts and its output is not 'correct' on parallel runs when it
+      //uses the standard paraview display pipeline.
+      if (QString::compare(iter2.key(), "MinMax") != 0)
+        {
       QAction* action = 
         this->Implementation->AlphabeticalMenu->addAction(iter2.key()) 
         << pqSetName(iter2.value()) << pqSetData(iter2.value());
       action->setEnabled(false);
+        }
       }
     }
 
