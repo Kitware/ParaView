@@ -29,7 +29,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkMinMax);
-vtkCxxRevisionMacro(vtkMinMax, "1.1");
+vtkCxxRevisionMacro(vtkMinMax, "1.2");
 
 template <class T>
 void vtkMinMaxExecute(
@@ -74,8 +74,8 @@ int vtkMinMax::FillInputPortInformation(int port, vtkInformation *info)
   return 1;
 }
 
-//-----------------------------------------------------------------------------
-int vtkMinMax::RequestData(vtkInformation* reqInfo,
+//----------------------------------------------------------------------------
+int vtkMinMax::RequestData(vtkInformation* vtkNotUsed(reqInfo),
                              vtkInformationVector** inputVector,
                              vtkInformationVector* outputVector)
 {
