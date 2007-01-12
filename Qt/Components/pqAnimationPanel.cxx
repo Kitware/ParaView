@@ -433,11 +433,11 @@ void pqAnimationPanel::buildPropertyList()
     this->Internal->CurrentSource->getProxy()->NewPropertyIterator());
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-    vtkSMVectorProperty* property = 
+    vtkSMVectorProperty* smproperty = 
       vtkSMVectorProperty::SafeDownCast(iter->GetProperty());
-    if (property && property->GetAnimateable() > 0)
+    if (smproperty && smproperty->GetAnimateable() > 0)
       {
-      unsigned int num_elems = property->GetNumberOfElements();
+      unsigned int num_elems = smproperty->GetNumberOfElements();
       for (unsigned int cc=0; cc < num_elems; cc++)
         {
         pqAnimationPanel::pqInternals::PropertyInfo info;

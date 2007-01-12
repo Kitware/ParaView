@@ -329,17 +329,17 @@ QString pqSignalAdaptorKeyFrameValue::value() const
 }
 
 //-----------------------------------------------------------------------------
-void pqSignalAdaptorKeyFrameValue::setValue(const QString& value)
+void pqSignalAdaptorKeyFrameValue::setValue(const QString& new_value)
 {
   switch (this->Internals->ActiveWidgetType)
     {
   case pqInternals::LINEEDIT:
-    this->Internals->lineEdit->setText(value);
+    this->Internals->lineEdit->setText(new_value);
     break;
 
   case pqInternals::CHECKBOX:
       {
-      QVariant v(value);
+      QVariant v(new_value);
       if (v.canConvert(QVariant::Int) && v.toInt() > 0)
         {
         this->Internals->checkBox->setCheckState(Qt::Checked);
@@ -354,7 +354,7 @@ void pqSignalAdaptorKeyFrameValue::setValue(const QString& value)
   case pqInternals::COMBOBOX:
       {
       QComboBox* combo = this->Internals->comboBox;
-      int idx = combo->findText(value);
+      int idx = combo->findText(new_value);
       combo->setCurrentIndex(idx);
       if(idx == -1 && combo->count() > 0)
         {
