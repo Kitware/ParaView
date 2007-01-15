@@ -75,6 +75,7 @@ protected slots:
   void openColorMapEditor();
   void zoomToData();
   void updateEnableState();
+  void updateMaterial(int idx);
   
 protected:
   pqDisplayProxyEditorInternal* Internal;

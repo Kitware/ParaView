@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QtDebug>
 #include <QIcon>
+#include <QFileInfo>
 
 // VTK includes
 #include "QVTKWidget.h"
@@ -53,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkMaterialLibrary.h"
 
 // ParaView widget includes
 #include "pqSignalAdaptors.h"
@@ -65,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqRenderViewModule.h"
+#include "pqFileDialog.h"
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
 {
@@ -88,8 +91,13 @@ public:
   QPointer<pqPipelineDisplay> Display;
   pqSignalAdaptorComboBox* InterpolationAdaptor;
   pqSignalAdaptorColor*    ColorAdaptor;
+
+  // map of <material labels, material files>
+  static QMap<QString, QString> MaterialMap;
   
 };
+
+QMap<QString, QString> pqDisplayProxyEditorInternal::MaterialMap;
 
 //-----------------------------------------------------------------------------
 /// constructor
@@ -275,6 +283,39 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
   QObject::connect(this->Internal->StyleRepresentation,
     SIGNAL(currentTextChanged(const QString&)),
     this->Internal->ColorBy, SLOT(reloadGUI()));
+  
+  // material
+  this->Internal->StyleMaterial->blockSignals(true);
+  this->Internal->StyleMaterial->clear();
+  if(vtkMaterialLibrary::GetNumberOfMaterials() > 0)
+    {
+    this->Internal->StyleMaterial->addItem("None");
+    this->Internal->StyleMaterial->addItem("Browse...");
+    this->Internal->StyleMaterial->addItems(this->Internal->MaterialMap.keys());
+    const char* mat = this->Internal->Display->getDisplayProxy()->GetMaterialCM();
+    if(mat)
+      {
+      QString filename = mat;
+      QMap<QString, QString>::iterator iter;
+      for(iter = this->Internal->MaterialMap.begin();
+          iter != this->Internal->MaterialMap.end();
+          ++iter)
+        {
+        if(filename == iter.value())
+          {
+          int foundidx = this->Internal->StyleMaterial->findText(iter.key());
+          this->Internal->StyleMaterial->setCurrentIndex(foundidx);
+          return;
+          }
+        }
+      }
+    }
+  else
+    {
+    this->Internal->StyleMaterial->addItem("Unavailable");
+    this->Internal->StyleMaterial->setEnabled(false);
+    }
+  this->Internal->StyleMaterial->blockSignals(false);
 
   this->DisableSlots = 0;
 
@@ -402,6 +443,10 @@ void pqDisplayProxyEditor::setupGUIConnections()
   QObject::connect(
     this->Internal->ColorActorColor, SIGNAL(chosenColorChanged(const QColor&)),
     this, SLOT(updateView()));
+  
+  QObject::connect(this->Internal->StyleMaterial, SIGNAL(currentIndexChanged(int)),
+                   this, SLOT(updateMaterial(int)));
+
 }
 
 //-----------------------------------------------------------------------------
@@ -547,6 +592,49 @@ void pqDisplayProxyEditor::setSpecularColor(QVariant specColor)
     {
     this->Internal->SpecularWhite->setChecked(false);
     emit this->specularColorChanged();
+    }
+}
+
+void pqDisplayProxyEditor::updateMaterial(int idx)
+{
+  if(idx == 0)
+    {
+    this->Internal->Display->getDisplayProxy()->SetMaterialCM(0);
+    this->updateView();
+    }
+  else if(idx == 1)
+    {
+    pqFileDialog diag(NULL, this, "Open Material File", QString(), 
+                      "Material Files (*.xml)");
+    diag.setFileMode(pqFileDialog::ExistingFile);
+    if(diag.exec() == QDialog::Accepted)
+      {
+      QString filename = diag.getSelectedFiles()[0];
+      QMap<QString, QString>::iterator iter;
+      for(iter = this->Internal->MaterialMap.begin();
+          iter != this->Internal->MaterialMap.end();
+          ++iter)
+        {
+        if(filename == iter.value())
+          {
+          int foundidx = this->Internal->StyleMaterial->findText(iter.key());
+          this->Internal->StyleMaterial->setCurrentIndex(foundidx);
+          return;
+          }
+        }
+      QFileInfo fi(filename);
+      this->Internal->MaterialMap.insert(fi.fileName(), filename);
+      this->Internal->StyleMaterial->addItem(fi.fileName());
+      this->Internal->StyleMaterial->setCurrentIndex(
+        this->Internal->StyleMaterial->count() - 1);
+      }
+    }
+  else
+    {
+    QString label = this->Internal->StyleMaterial->itemText(idx);
+    this->Internal->Display->getDisplayProxy()->SetMaterialCM(
+      this->Internal->MaterialMap[label].toAscii().data());
+    this->updateView();
     }
 }
 
