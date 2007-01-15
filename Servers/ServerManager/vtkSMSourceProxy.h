@@ -84,11 +84,6 @@ public:
   virtual void UpdateSelfAndAllInputs();
 
   // Description:
-  // Updates data information if necessary and copies information to 
-  // the DataInformation property.
-  void UpdateDataInformation();
-
-  // Description:
   // Return the number of parts (output proxies).
   unsigned int GetNumberOfParts();
 
@@ -116,14 +111,6 @@ public:
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
   // Description:
-  // Return a property (see superclass documentation). Overwritten
-  // to allow DataInformation property specially.
-  vtkSMProperty* GetProperty(const char* name) 
-    {
-      return this->Superclass::GetProperty(name);
-    }
-
-  // Description:
   // Mark the data information as invalid. If invalidateConsumers
   // is true, all consumers' data information is also marked as
   // invalid.
@@ -147,17 +134,6 @@ protected:
   friend class vtkSMInputProperty;
 //ETX
 
-  // Description:
-  // Internal helper methods used to populate the information property
-  // using the information object.
-  void ConvertDataInformationToProperty(
-    vtkPVDataInformation* info, vtkSMProperty* prop);
-  void ConvertFieldDataInformationToProperty(
-    vtkPVDataSetAttributesInformation* info, vtkSMProperty* prop);
-  void ConvertArrayInformationToProperty(
-    vtkPVArrayInformation* info, vtkSMProperty* prop);
-
-
   int PartsCreated;
 
 
@@ -169,11 +145,6 @@ protected:
   // Description:
   // Mark the data information as invalid.
   void InvalidateDataInformation();
-
-  // Description:
-  // Return a property (see superclass documentation). Overwritten
-  // to allow DataInformation property specially.
-  virtual vtkSMProperty* GetProperty(const char* name, int selfOnly);
 
   vtkPVDataInformation *DataInformation;
   int DataInformationValid;
