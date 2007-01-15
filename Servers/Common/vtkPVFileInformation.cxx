@@ -45,7 +45,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.10");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.11");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -357,6 +357,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       infoD->SetName(filename.c_str());
       infoD->SetFullPath(fullpath.c_str());
       infoD->Type = type;
+      infoD->FastFileTypeDetection = this->FastFileTypeDetection;
       info_set.insert(infoD);
       infoD->Delete();
       }
@@ -428,6 +429,7 @@ void vtkPVFileInformation::GetDirectoryListing()
     info->SetName(d->d_name);
     info->SetFullPath((prefix + d->d_name).c_str());
     info->Type = INVALID;
+    info->FastFileTypeDetection = this->FastFileTypeDetection;
     info_set.insert(info);
     info->Delete();
     }
@@ -551,6 +553,7 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
           group->SetName(groupName.c_str());
           group->SetFullPath((prefix + groupName).c_str());
           group->Type = FILE_GROUP;
+          group->FastFileTypeDetection = this->FastFileTypeDetection;
           fileGroups[groupName] = group;
           group->Delete();
           }
