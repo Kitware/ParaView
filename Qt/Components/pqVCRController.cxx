@@ -100,8 +100,8 @@ void pqVCRController::onPlay()
 //-----------------------------------------------------------------------------
 void pqVCRController::onTick()
 {
-  // update all views.
-  pqApplicationCore::instance()->render();
+  // No need to explicitly update all views,
+  // the animation scene proxy does it.
 
   // process the events so that the GUI remains responsive.
   QCoreApplication::processEvents();

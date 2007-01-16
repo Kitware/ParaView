@@ -25,6 +25,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
 #include "vtkSMAnimationSceneProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkTIFFWriter.h"
@@ -42,7 +43,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.2");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.3");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -59,6 +60,9 @@ vtkSMAnimationSceneImageWriter::vtkSMAnimationSceneImageWriter()
   this->ImageWriter = 0;
   this->FileCount = 0;
 
+  this->Prefix = 0;
+  this->Suffix = 0;
+
   this->BackgroundColor[0] = this->BackgroundColor[1] = 
     this->BackgroundColor[2] = 0.0;
 }
@@ -68,6 +72,9 @@ vtkSMAnimationSceneImageWriter::~vtkSMAnimationSceneImageWriter()
 {
   this->SetMovieWriter(0);
   this->SetImageWriter(0);
+
+  this->SetPrefix(0);
+  this->SetSuffix(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -91,7 +98,10 @@ bool vtkSMAnimationSceneImageWriter::SaveInitialize()
     this->MovieWriter->Start();
     }
 
+  this->AnimationScene->SetOverrideStillRender(1);
+
   this->FileCount = 0;
+
   return true;
 }
 
@@ -145,11 +155,11 @@ void vtkSMAnimationSceneImageWriter::Merge(vtkImageData* dest, vtkImageData* src
     unsigned char* spanIn = inIt.BeginSpan();
     unsigned char* outSpanEnd = outIt.EndSpan();
     unsigned char* inSpanEnd = inIt.EndSpan();
-    while (outSpanEnd != spanOut && inSpanEnd != spanIn)
+    if (outSpanEnd != spanOut && inSpanEnd != spanIn)
       {
-      *spanOut = *spanIn;
-      ++spanIn;
-      ++spanOut;
+      size_t minO = outSpanEnd - spanOut;
+      size_t minI = inSpanEnd - spanIn;
+      memcpy(spanOut, spanIn, (minO < minI)? minO : minI);
       }
     inIt.NextSpan();
     outIt.NextSpan();
@@ -159,20 +169,35 @@ void vtkSMAnimationSceneImageWriter::Merge(vtkImageData* dest, vtkImageData* src
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
 {
-  vtkImageData* combinedImage = this->NewFrame();
-
-  for (unsigned int cc=0; 
-    cc < this->AnimationScene->GetNumberOfViewModules(); cc++)
+  vtkSmartPointer<vtkImageData> combinedImage;
+  unsigned int num_modules = this->AnimationScene->GetNumberOfViewModules();
+  if (num_modules > 1)
     {
-    vtkSMAbstractViewModuleProxy* view = this->AnimationScene->GetViewModule(cc);
+    combinedImage.TakeReference(this->NewFrame());
+    for (unsigned int cc=0; cc < num_modules; cc++)
+      {
+      vtkSMAbstractViewModuleProxy* view = this->AnimationScene->GetViewModule(cc);
+      vtkSMRenderModuleProxy* rmview = vtkSMRenderModuleProxy::SafeDownCast(view);
+      if (!rmview)
+        {
+        continue;
+        }
+      vtkImageData* capture = rmview->CaptureWindow(this->Magnification);
+      this->Merge(combinedImage, capture);
+      capture->Delete();
+      }
+    }
+  else if (num_modules == 1)
+    {
+    // If only one view, we speed things up slightly by using the 
+    // captured image directly.
+    vtkSMAbstractViewModuleProxy* view = this->AnimationScene->GetViewModule(0);
     vtkSMRenderModuleProxy* rmview = vtkSMRenderModuleProxy::SafeDownCast(view);
     if (!rmview)
       {
-      continue;
+      return false;
       }
-    vtkImageData* capture = rmview->CaptureWindow(this->Magnification);
-    this->Merge(combinedImage, capture);
-    capture->Delete();
+    combinedImage.TakeReference(rmview->CaptureWindow(this->Magnification));
     }
 
   int errcode = 0;
@@ -180,22 +205,19 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     {
     char number[1024];
     sprintf(number, ".%04d", this->FileCount);
-    vtkstd::string filename = this->FileName;
-    vtkstd::string::size_type dot_pos = filename.rfind(".");
-    if(dot_pos != vtkstd::string::npos)
-      {
-      filename = filename.substr(0, dot_pos);
-      }
-    filename =  filename + number 
-      + vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
+    vtkstd::string filename = this->Prefix;
+    filename = filename + number + this->Suffix;
     this->ImageWriter->SetInput(combinedImage);
     this->ImageWriter->SetFileName(filename.c_str());
     this->ImageWriter->Write();
+
     errcode = this->ImageWriter->GetErrorCode(); 
     this->FileCount = (!errcode)? this->FileCount + 1 : this->FileCount; 
+
     }
   else if (this->MovieWriter)
     {
+    abort();
     this->MovieWriter->SetInput(combinedImage);
     this->MovieWriter->Write();
 
@@ -222,7 +244,7 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
       errcode = alg_error;
       }
     }
-  combinedImage->Delete();
+
   if (errcode)
     {
     this->ErrorCode = errcode;
@@ -234,6 +256,8 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneImageWriter::SaveFinalize()
 {
+  this->AnimationScene->SetOverrideStillRender(0);
+
   // TODO: If save failed, we must remove the partially
   // written files.
   if (this->MovieWriter)
@@ -303,6 +327,19 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     {
     this->SetImageWriter(iwriter);
     iwriter->Delete();
+
+    vtkstd::string filename = this->FileName;
+    vtkstd::string::size_type dot_pos = filename.rfind(".");
+    if(dot_pos != vtkstd::string::npos)
+      {
+      this->SetPrefix(filename.substr(0, dot_pos).c_str());
+      this->SetSuffix(filename.substr(dot_pos).c_str()); 
+      }
+    else
+      {
+      this->SetPrefix(this->FileName);
+      this->SetSuffix("");
+      }
     }
   if (mwriter)
     {

@@ -96,7 +96,12 @@ protected:
   int Magnification;
   int FileCount;
   int ErrorCode;
-  
+
+  char* Prefix;
+  char* Suffix;
+  vtkSetStringMacro(Prefix);
+  vtkSetStringMacro(Suffix);
+
   double BackgroundColor[3];
 
   vtkImageWriter* ImageWriter;

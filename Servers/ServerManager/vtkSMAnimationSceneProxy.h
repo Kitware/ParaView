@@ -132,6 +132,11 @@ protected:
   vtkCollection* AnimationCueProxies;
   vtkCollectionIterator* AnimationCueProxiesIterator;
 
+  //BTX
+  friend class vtkSMAnimationSceneImageWriter;
+  int OverrideStillRender;
+  vtkSetMacro(OverrideStillRender, int);
+  //ETX
 private:
   vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&); // Not implemented.
   void operator=(const vtkSMAnimationSceneProxy&); // Not implemented.

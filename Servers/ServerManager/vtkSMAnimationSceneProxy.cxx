@@ -111,7 +111,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.33");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.34");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -119,7 +119,7 @@ vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
   this->AnimationCueProxies = vtkCollection::New();
   this->AnimationCueProxiesIterator = this->AnimationCueProxies->NewIterator();
   this->GeometryCached = 0;
-  
+  this->OverrideStillRender = 0;
   this->Internals = new vtkSMAnimationSceneProxyInternals();
 }
 
@@ -359,7 +359,10 @@ int vtkSMAnimationSceneProxy::GetPlayMode()
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::StartCueInternal(void* info)
 {
-  this->Internals->StillRenderAllViews();
+  if (!this->OverrideStillRender)
+    {
+    this->Internals->StillRenderAllViews();
+    }
   this->Superclass::StartCueInternal(info);
 }
 
@@ -368,8 +371,11 @@ void vtkSMAnimationSceneProxy::TickInternal(void* info)
 {
   this->CacheUpdate(info);
 
-  // Render All Views.
-  this->Internals->StillRenderAllViews();
+  if (!this->OverrideStillRender)
+    {
+    // Render All Views.
+    this->Internals->StillRenderAllViews();
+    }
 
   this->Superclass::TickInternal(info);
 }
@@ -378,7 +384,10 @@ void vtkSMAnimationSceneProxy::TickInternal(void* info)
 void vtkSMAnimationSceneProxy::EndCueInternal(void* info)
 {
   this->CacheUpdate(info);
-  this->Internals->StillRenderAllViews();
+  if (!this->OverrideStillRender)
+    {
+    this->Internals->StillRenderAllViews();
+    }
   this->Superclass::EndCueInternal(info);
 }
 
