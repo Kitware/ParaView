@@ -476,10 +476,10 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
       //uses the standard paraview display pipeline.
       if (QString::compare(iter2.key(), "MinMax") != 0)
         {
-      QAction* action = 
-        this->Implementation->AlphabeticalMenu->addAction(iter2.key()) 
-        << pqSetName(iter2.value()) << pqSetData(iter2.value());
-      action->setEnabled(false);
+        QAction* action = 
+          this->Implementation->AlphabeticalMenu->addAction(iter2.key()) 
+            << pqSetName(iter2.value()) << pqSetData(iter2.value());
+        action->setEnabled(false);
         }
       }
     }
