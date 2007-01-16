@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
 
-    <SourceProxy name="PythonScript" class="vtkPythonProgrammableFilter">
+    <SourceProxy name="Programmable Filter" class="vtkPythonProgrammableFilter">
       <Documentation
          long_help="Executes a user supplied python script on its input dataset to produce an output dataset."
          short_help="Executes a python script to produce data.">
