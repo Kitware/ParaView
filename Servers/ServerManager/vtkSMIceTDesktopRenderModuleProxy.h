@@ -53,12 +53,14 @@ public:
 
   // Description:
   // Sets the size of the server render window.
-  void SetGUISize(int x, int y);
+  // Overridden to send the value to the composite manager.
+  virtual void SetGUISize(int x, int y);
 
   // Description:
   // Sets the position of the view associated with this module inside
   // the server render window. (0,0) corresponds to upper left corner.
-  void SetWindowPosition(int x, int y);
+  // Overridden to send the value to the composite manager.
+  virtual void SetWindowPosition(int x, int y);
 
   // Description:
   // Set the proxy of the server render window. This should be set

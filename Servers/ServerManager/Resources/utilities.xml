@@ -914,8 +914,9 @@
     <AnimationSceneProxy name="AnimationScene" class="notused">
       <!-- No server side objects created. All properties are updateself -->
       <ProxyProperty
-        name="RenderModule"
-        command="SetRenderModuleProxy"
+        name="ViewModules"
+        command="AddViewModule"
+        clean_command="RemoveAllViewModules"
         update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="rendermodules" />

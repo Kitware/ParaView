@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqAnimationCue;
 class vtkSMAnimationSceneProxy;
+class QSize;
 
 // pqAnimationScene is a representation for a vtkSMAnimationScene
 // proxy. It provides API to access AnimationCues in the scene.
@@ -68,6 +69,10 @@ public:
 
   // returns true is the cue is present in this scene.
   bool contains(pqAnimationCue*) const;
+
+  // Combines the sizes of all the view modules
+  // animated by the scene and returns the total view size.
+  QSize getViewSize() const;
 signals:
   // Fired before a new cue is added to the scene.
   void preAddedCue(pqAnimationCue*);

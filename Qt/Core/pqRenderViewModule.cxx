@@ -141,7 +141,6 @@ public:
     this->DefaultBackground[0] = 84;
     this->DefaultBackground[1] = 89;
     this->DefaultBackground[2] = 109;
-
     }
 
   ~pqRenderViewModuleInternal()

@@ -33,8 +33,6 @@ class vtkSMAbstractDisplayProxy;
 class vtkPVClientServerIdCollectionInformation;
 class vtkTimerLog;
 
-// TODO: have to change the PVCameraManipulators to do ResetCamera on
-// the RenderModule rather than renderer.
 class VTK_EXPORT vtkSMAbstractViewModuleProxy : public vtkSMProxy
 {
 public:
@@ -88,6 +86,21 @@ public:
   // Update all visible displays (therefore sources)
   virtual void UpdateAllDisplays();  
 
+  // Description:
+  // Multi-view methods:
+  // This is useful when using multiple views. Set the dimensions
+  // of the GUI with all the multiple views take together.
+  vtkSetVector2Macro(GUISize, int);
+  vtkGetVector2Macro(GUISize, int);
+
+  // Description:
+  // Multi-view methods:
+  // This is useful when using multiple views. 
+  // Sets the position of the view associated with this module inside
+  // the server render window. (0,0) corresponds to upper left corner.
+  vtkSetVector2Macro(WindowPosition, int);
+  vtkGetVector2Macro(WindowPosition, int);
+
 protected:
   vtkSMAbstractViewModuleProxy();
   ~vtkSMAbstractViewModuleProxy();
@@ -125,6 +138,9 @@ protected:
   // Description:
   // Read attributes from an XML element.
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
+  int GUISize[2];
+  int WindowPosition[2];
 private:
   // Description:
   // Overridden since Interactor properties must be cleared.

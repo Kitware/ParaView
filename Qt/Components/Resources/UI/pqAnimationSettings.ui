@@ -24,6 +24,12 @@
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
     </spacer>
    </item>
    <item row="0" column="1" colspan="2" >
@@ -214,6 +220,17 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>spinBoxAnimationDuration</tabstop>
+  <tabstop>spinBoxFrameRate</tabstop>
+  <tabstop>spinBoxNumberOfFrames</tabstop>
+  <tabstop>spinBoxWidth</tabstop>
+  <tabstop>spinBoxHeight</tabstop>
+  <tabstop>checkBoxUseDatasetTimesteps</tabstop>
+  <tabstop>checkBoxDisconnect</tabstop>
+  <tabstop>okButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -360,3 +360,17 @@ bool pqMultiViewFrame::eventFilter(QObject* caller, QEvent* e)
 
   return caller->event(e);
 }
+
+//-----------------------------------------------------------------------------
+void pqMultiViewFrame::hideDecorations()
+{
+//  this->hideMenu(true);
+  this->Menu->hide();
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewFrame::showDecorations()
+{
+//  this->hideMenu(false);
+  this->Menu->show();
+}

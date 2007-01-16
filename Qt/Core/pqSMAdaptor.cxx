@@ -236,9 +236,9 @@ QList<pqSMProxy> pqSMAdaptor::getProxyListProperty(vtkSMProperty* Property)
 void pqSMAdaptor::setProxyListProperty(vtkSMProperty* Property, 
                                        QList<pqSMProxy> Value)
 {
-  if(pqSMAdaptor::getPropertyType(Property) == pqSMAdaptor::PROXYLIST)
+  vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
+  if (proxyProp)
     {
-    vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
     proxyProp->RemoveAllProxies();
     foreach(pqSMProxy p, Value)
       {

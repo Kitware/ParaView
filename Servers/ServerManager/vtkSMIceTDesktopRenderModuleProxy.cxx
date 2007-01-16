@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.23");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.24");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -91,6 +91,7 @@ void vtkSMIceTDesktopRenderModuleProxy::SetGUISize(int x, int y)
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
     }
+  this->Superclass::SetGUISize(x, y);
 }
 
 //-----------------------------------------------------------------------------
@@ -106,6 +107,7 @@ void vtkSMIceTDesktopRenderModuleProxy::SetWindowPosition(int x, int y)
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
     }
+  this->Superclass::SetWindowPosition(x, y);
 }
 
 //-----------------------------------------------------------------------------

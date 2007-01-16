@@ -41,6 +41,7 @@ class pqProxy;
 class pqRenderViewModule;
 class pqServer;
 class vtkSMProxy;
+class QSize;
 
 // pqAnimationManager manages the Animation sub-system.
 // It encapsulates the initialization of animation scene per server
@@ -75,11 +76,12 @@ public:
   pqAnimationCue* createCue(pqAnimationScene* scene, 
     vtkSMProxy* proxy, const char* propertyname, int index);
 
-  // Saves the animation from the active scene.
-  // Currently, only 1 view is saved in the generated movie.
+  // Saves the animation from the active scene. The active scene
+  // is determined using the active server.
   // Returns true if the save was successful.
-  bool saveAnimation(const QString& filename, pqRenderViewModule* view);
+  bool saveAnimation(const QString& filename);
 
+  void setViewWidget(QWidget*);
 signals:
   // emitted when the active scene changes (\c scene may be NULL).
   void activeSceneChanged(pqAnimationScene* scene);
@@ -96,9 +98,15 @@ protected slots:
   void frameRateChanged();
   void numberOfFramesChanged();
 
+  // Update the ViewModules property in the active scene.
+  void updateViewModules();
+
 private:
   pqAnimationManager(const pqAnimationManager&); // Not implemented.
   void operator=(const pqAnimationManager&); // Not implemented.
+
+  int updateViewSizes(QSize requested_size, QSize current_size, bool is_Mpeg);
+  void restoreViewSizes();
 
   class pqInternals;
   pqInternals* Internals;

@@ -53,7 +53,7 @@
 #include "vtkSelection.h"
 #include "vtkSMMPIRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.57");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.58");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1137,6 +1137,15 @@ vtkImageData* vtkSMRenderModuleProxy::CaptureWindow(int magnification)
   this->GetRenderWindow()->SwapBuffersOn();
   this->GetRenderWindow()->Frame();
   this->GetRenderWindow()->SetOffScreenRendering(0);
+
+  // Update image extents based on WindowPosition.
+  int extents[6];
+  capture->GetExtent(extents);
+  for (int cc=0; cc < 4; cc++)
+    {
+    extents[cc] += this->WindowPosition[cc/2]*magnification;
+    }
+  capture->SetExtent(extents);
 
   return capture;
 }

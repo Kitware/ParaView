@@ -19,14 +19,10 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkErrorCode.h"
-#include "vtkGenericMovieWriter.h"
-#include "vtkImageData.h"
-#include "vtkJPEGWriter.h"
-#include "vtkMPEG2Writer.h"
 #include "vtkObjectFactory.h"
-#include "vtkPNGWriter.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -35,21 +31,43 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMXMLPVAnimationWriterProxy.h"
-#include "vtkTIFFWriter.h"
 #include "vtkToolkits.h"
 
 #include <vtksys/SystemTools.hxx>
-#ifdef _WIN32
-  #include "vtkAVIWriter.h"
-#else
-#ifdef VTK_USE_FFMPEG_ENCODER
-  #include "vtkFFMPEGWriter.h"
-#endif
-#endif
+#include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.31");
+//----------------------------------------------------------------------------
+class vtkSMAnimationSceneProxyInternals
+{
+public:
+  typedef vtkstd::vector<vtkSmartPointer<vtkSMAbstractViewModuleProxy> > 
+    VectorOfViewModules;
+  VectorOfViewModules ViewModules;
+  void StillRenderAllViews()
+    {
+    VectorOfViewModules::iterator iter = this->ViewModules.begin();
+    for (; iter != this->ViewModules.end(); ++iter)
+      {
+      iter->GetPointer()->StillRender();
+      }
+    }
+  void CacheUpdateAllViews(int index, int max)
+    {
+    VectorOfViewModules::iterator iter = this->ViewModules.begin();
+    for (; iter != this->ViewModules.end(); ++iter)
+      {
+      vtkSMRenderModuleProxy* ren = vtkSMRenderModuleProxy::SafeDownCast(*iter);
+      if (ren)
+        {
+        ren->CacheUpdate(index, max);
+        }
+      }
+    }
+};
+
+
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.32");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
-
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {
@@ -58,17 +76,9 @@ vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
   this->RenderModuleProxy = 0;
   this->GeometryCached = 0;
   
-  this->MovieWriter = NULL;
-  this->ImageWriter = NULL;
-  this->FileRoot = NULL;
-  this->FileExtension = NULL;
-
   this->GeometryWriter = 0;
 
-  // Used to store the magnification of the saved image
-  this->Magnification = 1;
-
-  this->InSaveAnimation = 0;
+  this->Internals = new vtkSMAnimationSceneProxyInternals();
 }
 
 //----------------------------------------------------------------------------
@@ -76,26 +86,14 @@ vtkSMAnimationSceneProxy::~vtkSMAnimationSceneProxy()
 {
   this->AnimationCueProxies->Delete();
   this->AnimationCueProxiesIterator->Delete();
-  this->SetRenderModuleProxy(0);
-
-  if (this->ImageWriter)
-    {
-    this->ImageWriter->Delete();
-    this->ImageWriter = NULL;
-    }
-  if (this->MovieWriter)
-    {
-    this->MovieWriter->Delete();
-    this->MovieWriter = NULL;
-    }
-  this->SetFileRoot(0);
-  this->SetFileExtension(0);
 
   if (this->GeometryWriter)
     {
     this->GeometryWriter->Delete();
     this->GeometryWriter = 0;
     }
+
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -113,6 +111,44 @@ void vtkSMAnimationSceneProxy::CreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::AddViewModule(vtkSMAbstractViewModuleProxy* view)
+{
+  vtkSMAnimationSceneProxyInternals::VectorOfViewModules::iterator iter = 
+    this->Internals->ViewModules.begin();
+  for (; iter != this->Internals->ViewModules.end(); ++iter)
+    {
+    if (iter->GetPointer() == view)
+      {
+      // already added.
+      return;
+      }
+    }
+  this->Internals->ViewModules.push_back(view);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::RemoveViewModule(
+  vtkSMAbstractViewModuleProxy* view)
+{
+  vtkSMAnimationSceneProxyInternals::VectorOfViewModules::iterator iter = 
+    this->Internals->ViewModules.begin();
+  for (; iter != this->Internals->ViewModules.end(); ++iter)
+    {
+    if (iter->GetPointer() == view)
+      {
+      this->Internals->ViewModules.erase(iter);
+      break;
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::RemoveAllViewModules()
+{
+  this->Internals->ViewModules.clear();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::SetCaching(int enable)
 {
   this->Superclass::SetCaching(enable);
@@ -126,230 +162,6 @@ void vtkSMAnimationSceneProxy::SetCaching(int enable)
     cue->SetCaching(enable);
     }
   iter->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::SaveImages()
-{
-  if (!this->RenderModuleProxy)
-    {
-    return;
-    }
-  int errcode = 0;
-
-  vtkImageData* capture = 
-    this->RenderModuleProxy->CaptureWindow(this->Magnification);
-  if (this->ImageWriter)
-    {
-    char* fileName = 
-      new char[strlen(this->FileRoot) + strlen(this->FileExtension) + 25];
-    sprintf(fileName, 
-            "%s%04d.%s", this->FileRoot, this->FileCount, this->FileExtension);
-    this->ImageWriter->SetInput(capture);
-    this->ImageWriter->SetFileName(fileName);
-    this->ImageWriter->Write();
-    errcode = this->ImageWriter->GetErrorCode(); 
-    this->FileCount = (!errcode)? this->FileCount + 1 : this->FileCount; 
-    delete [] fileName;
-    }
-  else if (this->MovieWriter)
-    {
-    this->MovieWriter->SetInput(capture);
-    this->MovieWriter->Write();
-
-    int alg_error = this->MovieWriter->GetErrorCode();
-    int movie_error = this->MovieWriter->GetError();
-
-    if (movie_error && !alg_error)
-      {
-      //An error that the moviewriter caught, without setting any error code.
-      //vtkGenericMovieWriter::GetStringFromErrorCode will result in
-      //Unassigned Error. If this happens the Writer should be changed to set
-      //a meaningful error code.
-
-      errcode = vtkErrorCode::UserError;      
-      }
-    else
-      {
-      //if 0, then everything went well
-
-      //< userError, means a vtkAlgorithm error (see vtkErrorCode.h)
-      //= userError, means an unknown Error (Unassigned error)
-      //> userError, means a vtkGenericMovieWriter error
-
-      errcode = alg_error;
-      }
-    }
-  if (errcode)
-    {
-    this->Stop();
-    this->SaveFailed = errcode;
-    }
-  capture->Delete();
-}
-
-//----------------------------------------------------------------------------
-int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot, 
-                                         const char* ext, 
-                                         int width, 
-                                         int height, 
-                                         double framerate,
-                                         int quality,
-                                         bool dont_update_write_framerate/*=false*/)
-{
-
-  if (!this->RenderModuleProxy)
-    {
-    vtkErrorMacro("Render Module is not set.");
-    return 1;
-    }
-  if (this->InSaveAnimation || 
-      this->ImageWriter || this->MovieWriter || !this->RenderModuleProxy)
-    {
-    vtkErrorMacro("Incosistent state. Save aborted.");
-    return 1;
-    }
-  this->InSaveAnimation = 1;
-  this->SetAnimationTime(0);
-
-  this->RenderModuleProxy->UpdatePropertyInformation();
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->RenderModuleProxy->GetProperty("RenderWindowSizeInfo"));
-  int *size = ivp->GetElements();
-
-  this->Magnification = 1;
-  // determine magnification.
-  if (size[0] < width || size[1] < height)
-    {
-    int xMag = width / size[0] + 1;
-    int yMag = height / size[1] + 1;
-    this->Magnification = (xMag > yMag) ? xMag : yMag;
-    width /= this->Magnification;
-    height /= this->Magnification;
-    }
-
-  vtkSMIntVectorProperty* ivpSize = vtkSMIntVectorProperty::SafeDownCast(
-    this->RenderModuleProxy->GetProperty("RenderWindowSize"));
-  ivpSize->SetElement(0, width);
-  ivpSize->SetElement(1, height);
-  this->RenderModuleProxy->UpdateVTKObjects();
-
-  if (strcmp(ext,"jpg") == 0)
-    {
-    this->ImageWriter = vtkJPEGWriter::New();
-    }
-  else if (strcmp(ext,"tif") == 0)
-    {
-    this->ImageWriter = vtkTIFFWriter::New();
-    }
-  else if (strcmp(ext,"png") == 0)
-    {
-    this->ImageWriter = vtkPNGWriter::New();
-    }
-  else if (strcmp(ext, "mpg") == 0)
-    {
-    this->MovieWriter = vtkMPEG2Writer::New();
-    }
-#ifdef _WIN32
-  else if (strcmp(ext, "avi") == 0)
-    {
-    vtkAVIWriter *aviwriter = vtkAVIWriter::New();
-    aviwriter->SetQuality(quality);
-    if (!dont_update_write_framerate)
-      {
-      aviwriter->SetRate(static_cast<int>(framerate));
-      }
-    this->MovieWriter = aviwriter;
-    }
-#else
-#ifdef VTK_USE_FFMPEG_ENCODER
-  else if (strcmp(ext, "avi") == 0)
-    {
-    vtkFFMPEGWriter *aviwriter = vtkFFMPEGWriter::New();
-    aviwriter->SetQuality(quality);
-    if (!dont_update_write_framerate)
-      {
-      aviwriter->SetRate(static_cast<int>(framerate));
-      }
-    this->MovieWriter = aviwriter;
-    
-    }
-#endif
-#endif
-  else
-    {
-    vtkErrorMacro("Unknown extension " << ext << ", try: jpg, tif or png.");
-    this->InSaveAnimation = 0;
-    return 1;
-    }
-
-#ifndef VTK_USE_FFMPEG_ENCODER
-  quality = quality + 1; //prevent unused parameter warning when no AVI
-#endif
-  // to avoid warnings.
-  (void)dont_update_write_framerate;
-
-  this->SetFileRoot(fileRoot);
-  this->SetFileExtension(ext);
-  this->FileCount = 0;
-  this->SaveFailed = 0;
-  if (this->MovieWriter)
-    {
-    vtkImageData* capture = 
-      this->RenderModuleProxy->CaptureWindow(this->Magnification);
-    ostrstream str;
-    str << fileRoot << "." << ext << ends;
-    this->MovieWriter->SetFileName(str.str());
-    str.rdbuf()->freeze(0);
-    this->MovieWriter->SetInput(capture);
-    this->MovieWriter->Start();
-    capture->Delete();
-    }
-
-  // Play the animation.
-  int oldMode = this->GetPlayMode();
-  double old_framerate = this->GetFrameRate();
-  int old_loop = this->GetLoop();
-  this->SetPlayMode(vtkAnimationScene::PLAYMODE_SEQUENCE);
-  this->SetFrameRate(framerate);
-  this->SetLoop(0);
-  this->Play();
-  this->SetPlayMode(oldMode);
-  this->SetFrameRate(old_framerate);
-  this->SetLoop(old_loop);
-
-  if (this->ImageWriter)
-    {
-    if (this->SaveFailed)
-      {
-      char* fileName = new char[strlen(this->FileRoot) + strlen(this->FileExtension) + 25];
-      for (int i=0; i < this->FileCount; i++)
-        {
-        sprintf(fileName, "%s%04d.%s", this->FileRoot, i, this->FileExtension);
-        vtksys::SystemTools::RemoveFile(fileName);
-        }
-      delete [] fileName;
-      }
-    
-    this->ImageWriter->Delete();
-    this->ImageWriter = NULL;
-    }
-  else if (this->MovieWriter)
-    {
-    this->MovieWriter->End();
-
-    if (this->SaveFailed)
-      {
-      char *fileName = this->MovieWriter->GetFileName();
-      vtksys::SystemTools::RemoveFile(fileName);
-      }
-
-    this->MovieWriter->SetInput(0);
-    this->MovieWriter->Delete();
-    this->MovieWriter = NULL;
-    }
-  this->InSaveAnimation = 0;
-  return this->SaveFailed;
 }
 
 //----------------------------------------------------------------------------
@@ -650,6 +462,7 @@ void vtkSMAnimationSceneProxy::StartCueInternal(void* info)
     {
     this->RenderModuleProxy->StillRender();
     }
+  this->Internals->StillRenderAllViews();
   this->Superclass::StartCueInternal(info);
 }
 
@@ -657,15 +470,11 @@ void vtkSMAnimationSceneProxy::StartCueInternal(void* info)
 void vtkSMAnimationSceneProxy::TickInternal(void* info)
 {
   this->CacheUpdate(info);
-  if (this->RenderModuleProxy)
-    {
-    this->RenderModuleProxy->StillRender();
-    }
+
+  // Render All Views.
+  this->Internals->StillRenderAllViews();
+
   this->Superclass::TickInternal(info);
-  if (this->InSaveAnimation)
-    {
-    this->SaveImages();
-    }
   vtkAnimationCue::AnimationCueInfo *cueInfo = reinterpret_cast<
     vtkAnimationCue::AnimationCueInfo*>(info);
   this->SaveGeometry(cueInfo->AnimationTime);
@@ -675,6 +484,7 @@ void vtkSMAnimationSceneProxy::TickInternal(void* info)
 void vtkSMAnimationSceneProxy::EndCueInternal(void* info)
 {
   this->CacheUpdate(info);
+  this->Internals->StillRenderAllViews();
   if (this->RenderModuleProxy)
     {
     this->RenderModuleProxy->StillRender();
@@ -702,11 +512,8 @@ void vtkSMAnimationSceneProxy::CacheUpdate(void* info)
   int maxindex = 
     static_cast<int>((etime - stime) * this->GetFrameRate()) + 1; 
 
-  if (this->RenderModuleProxy)
-    {
-    this->RenderModuleProxy->CacheUpdate(index, maxindex);
-    this->GeometryCached = 1;
-    }
+  this->Internals->CacheUpdateAllViews(index, maxindex);
+  this->GeometryCached = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -726,6 +533,23 @@ void vtkSMAnimationSceneProxy::SetAnimationTime(double time)
     this->AnimationCue->Initialize();
     this->AnimationCue->Tick(time,0);
     }
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMAnimationSceneProxy::GetNumberOfViewModules()
+{
+  return this->Internals->ViewModules.size();
+}
+
+//----------------------------------------------------------------------------
+vtkSMAbstractViewModuleProxy* vtkSMAnimationSceneProxy::GetViewModule(
+  unsigned int cc)
+{
+  if (cc < this->Internals->ViewModules.size())
+    {
+    return this->Internals->ViewModules[cc];
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

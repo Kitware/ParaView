@@ -58,7 +58,7 @@ protected:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMServerSideAnimationPlayer);
-vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.3");
+vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMServerSideAnimationPlayer::vtkSMServerSideAnimationPlayer()
 {
@@ -150,11 +150,12 @@ void vtkSMServerSideAnimationPlayer::PerformActions()
           ext = name.substr(dot_pos+1);
           name = name.substr(0, dot_pos);
           }
-
+      /* FIXME
         scene->SaveImages(name.c_str(), ext.c_str(),
           this->Size[0], this->Size[1],
           this->FrameRate,
           this->Quality);
+          */
         }
       }
     }

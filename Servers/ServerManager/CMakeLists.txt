@@ -16,6 +16,8 @@ SET(Kit_SRCS
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationCueProxy.cxx
   vtkSMAnimationSceneProxy.cxx
+  vtkSMAnimationSceneWriter.cxx
+  vtkSMAnimationSceneImageWriter.cxx
   vtkSMApplication.cxx
   vtkSMArrayListDomain.cxx
   vtkSMArrayRangeDomain.cxx
@@ -177,6 +179,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMAbstractDisplayProxy.cxx
   vtkSMAbstractViewModuleProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
+  vtkSMAnimationSceneWriter.cxx
   vtkSMConsumerDisplayProxy.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx

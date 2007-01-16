@@ -93,14 +93,26 @@ signals:
   /// signal for frame removed
   void frameRemoved(pqMultiViewFrame*);
 
+  // Fired to hide all frame decorations.
+  void hideFrameDecorations();
+  
+  // Fired to show all frame decorations.
+  void showFrameDecorations();
 public slots:
   void removeWidget(QWidget *widget);
   pqMultiViewFrame* splitWidgetHorizontal(QWidget *widget);
   pqMultiViewFrame* splitWidgetVertical(QWidget *widget);
 
+  /// hides the frame decorations.
+  void hideDecorations();
+
+  /// shows the frame decorations.
+  void showDecorations();
+
 protected slots:
   void maximizeWidget(QWidget*);
   void restoreWidget(QWidget*);
+
 
 protected:
 

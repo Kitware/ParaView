@@ -416,12 +416,14 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
   int status = 0;
   if (scene)
     {
+    /*
     status = scene->SaveImages(
       filePrefix.toAscii().data(),
       extension.toAscii().data(), 
       newSize.width(),
       newSize.height(),
       dialogUI.spinBoxFrameRate->value(), 0);
+      */
     }
  
   activeView->getWidget()->setMaximumSize(oldMaxSize);

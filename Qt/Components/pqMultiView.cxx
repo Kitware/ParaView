@@ -533,6 +533,7 @@ void pqMultiView::saveState(vtkPVXMLElement *root)
   multiView->Delete();
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiView::loadState(vtkPVXMLElement *root)
 {
   if(!root)
@@ -567,6 +568,7 @@ void pqMultiView::loadState(vtkPVXMLElement *root)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiView::removeWidget(QWidget* w)
 {
   // If this is the only widget in the multi-view, replace it
@@ -588,6 +590,7 @@ void pqMultiView::removeWidget(QWidget* w)
   delete w;
 }
 
+//-----------------------------------------------------------------------------
 pqMultiViewFrame* pqMultiView::splitWidget(QWidget* w, Qt::Orientation o)
 {
   pqMultiView::Index index = this->indexOf(w);
@@ -598,6 +601,8 @@ pqMultiViewFrame* pqMultiView::splitWidget(QWidget* w, Qt::Orientation o)
   emit this->frameAdded(frame);
   return frame;
 }
+
+//-----------------------------------------------------------------------------
 pqMultiViewFrame* pqMultiView::splitWidget(QWidget* w, Qt::Orientation o,float percent)
 {
   pqMultiView::Index index = this->indexOf(w);
@@ -608,17 +613,21 @@ pqMultiViewFrame* pqMultiView::splitWidget(QWidget* w, Qt::Orientation o,float p
   emit this->frameAdded(frame);
   return frame;
 }
+
+//-----------------------------------------------------------------------------
 pqMultiViewFrame* pqMultiView::splitWidgetHorizontal(QWidget* w)
 {
   return this->splitWidget(w, Qt::Horizontal);
 
 }
 
+//-----------------------------------------------------------------------------
 pqMultiViewFrame* pqMultiView::splitWidgetVertical(QWidget* w)
 {
   return this->splitWidget(w, Qt::Vertical);
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiView::maximizeWidget(QWidget* maxWidget)
 {
 
@@ -653,6 +662,7 @@ void pqMultiView::maximizeWidget(QWidget* maxWidget)
 
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiView::restoreWidget(QWidget*)
 {
 
@@ -687,6 +697,8 @@ void pqMultiView::restoreWidget(QWidget*)
   }
 
 }
+
+//-----------------------------------------------------------------------------
 /*
 bool pqMultiView::eventFilter(QObject*, QEvent* e)
 {
@@ -701,6 +713,7 @@ bool pqMultiView::eventFilter(QObject*, QEvent* e)
 }
 */
 
+//-----------------------------------------------------------------------------
 void pqMultiView::cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed)
 {
   QWidget *w = 0;
@@ -720,6 +733,8 @@ void pqMultiView::cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed)
       }
     }
 }
+
+//-----------------------------------------------------------------------------
 void pqMultiView::setup(pqMultiViewFrame* frame)
 {
   Q_ASSERT(frame != NULL);
@@ -774,7 +789,14 @@ void pqMultiView::setup(pqMultiViewFrame* frame)
   QObject::connect(RestoreSignalMapper, SIGNAL(mapped(QWidget*)), 
                    this, SLOT(restoreWidget(QWidget*)));
 
+  // Connect decorations signals.
+  QObject::connect(this, SIGNAL(hideFrameDecorations()),
+    frame, SLOT(hideDecorations()));
+  QObject::connect(this, SIGNAL(showFrameDecorations()),
+    frame, SLOT(showDecorations()));
 }
+
+//-----------------------------------------------------------------------------
 void pqMultiView::saveSplitter(vtkPVXMLElement *element,
     QSplitter *splitter, int index)
 {
@@ -876,3 +898,26 @@ void pqMultiView::restoreSplitter(QWidget *w,
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqMultiView::hideDecorations()
+{
+  QList<QSplitter*> splitters = this->findChildren<QSplitter*>();
+  foreach (QSplitter* splitter, splitters)
+    {
+    splitter->setHandleWidth(1);
+    }
+  emit this->hideFrameDecorations();
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiView::showDecorations()
+{
+  QSplitter* temp = new QSplitter();
+  QList<QSplitter*> splitters = this->findChildren<QSplitter*>();
+  foreach (QSplitter* splitter, splitters)
+    {
+    splitter->setHandleWidth(temp->handleWidth());
+    }
+  delete temp;
+  emit this->showFrameDecorations();
+}

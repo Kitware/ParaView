@@ -850,6 +850,11 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
     QObject::connect(this, SIGNAL(activeServerChanged(pqServer*)),
       this->Implementation->AnimationManager, 
       SLOT(onActiveServerChanged(pqServer*))); 
+    QObject::connect(this->Implementation->AnimationManager,
+      SIGNAL(activeSceneChanged(pqAnimationScene*)),
+      this, SLOT(onInitializeStates()));
+    this->Implementation->AnimationManager->setViewWidget(
+      &this->multiViewManager());
     }
   return this->Implementation->AnimationManager;
 }
@@ -1330,6 +1335,7 @@ void pqMainWindowCore::onFileSaveAnimation()
     qDebug() << "Cannot save animation since no active scene is present.";
     return;
     }
+  this->multiViewManager().hideDecorations();
 
   QString filters = "MPEG files (*.mpg)";
 #ifdef _WIN32
@@ -1362,30 +1368,14 @@ void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
     return;
     }
 
-  // TODO: for now, we only save the active view in the movie file.
-  pqRenderViewModule* activeView = 
-    qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
-  if (!activeView)
-    {
-    qDebug() << "Active View is not a render window. Currently we only support "
-      << "saving animations in a render view.";
-    return;
-    }
-
-  if (!mgr->saveAnimation(files[0], activeView))
+  // This is essential since we don't want the view frame
+  // decorations to apper in out animation.
+  this->multiViewManager().hideDecorations();
+  if (!mgr->saveAnimation(files[0]))
     {
     qDebug() << "Animation save failed!";
     }
-
-  /*
-  pqSimpleAnimationManager manager(this);
-  manager.setServer(this->getActiveServer());
-  manager.setRenderModule();
-  if (!manager.createTimestepAnimation(source, files[0]))
-    {
-    qDebug()<< "Animation not saved successfully.";
-    }
-    */
+  this->multiViewManager().showDecorations();
 }
 
 //-----------------------------------------------------------------------------

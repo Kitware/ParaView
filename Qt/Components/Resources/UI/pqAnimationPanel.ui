@@ -263,6 +263,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>sourceName</tabstop>
+  <tabstop>propertyName</tabstop>
+  <tabstop>keyFrameIndex</tabstop>
+  <tabstop>keyFrameTime</tabstop>
+  <tabstop>interpolationType</tabstop>
+  <tabstop>addKeyFrame</tabstop>
+  <tabstop>deleteKeyFrame</tabstop>
+  <tabstop>currentFrame</tabstop>
+  <tabstop>numberOfFrames</tabstop>
+  <tabstop>playMode</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

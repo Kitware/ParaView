@@ -36,10 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMAbstractViewModuleProxy.h"
 
 #include <QPointer>
 #include <QSet>
 #include <QtDebug>
+#include <QSize>
 
 #include "pqAnimationCue.h"
 #include "pqApplicationCore.h"
@@ -253,4 +255,20 @@ void pqAnimationScene::removeCues(vtkSMProxy* animated_proxy)
       builder->remove(cue);
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+QSize pqAnimationScene::getViewSize() const
+{
+  QSize size;
+  // Simply get the first view module and get it's GUISize.
+  vtkSMAnimationSceneProxy* sceneProxy = this->getAnimationSceneProxy();
+  if (sceneProxy->GetNumberOfViewModules() > 0)
+    {
+    vtkSMAbstractViewModuleProxy* view = sceneProxy->GetViewModule(0);
+    size.setWidth(view->GetGUISize()[0]);
+    size.setHeight(view->GetGUISize()[1]);
+
+    }
+  return size;
 }

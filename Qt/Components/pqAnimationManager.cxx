@@ -33,32 +33,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqAbortAnimation.h"
 #include "ui_pqAnimationSettings.h"
 
+#include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMServerProxyManagerReviver.h"
 
-#include <QPointer>
-#include <QMap>
-#include <QtDebug>
+#include <QCoreApplication>
 #include <QFileInfo>
+#include <QMap>
+#include <QMessageBox>
+#include <QPointer>
+#include <QSize>
+#include <QtDebug>
 
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqPipelineBuilder.h"
+#include "pqProxy.h"
 #include "pqRenderViewModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
+static inline int pqCeil(double val)
+{
+  if (val == static_cast<int>(val))
+    {
+    return static_cast<int>(val);
+    }
+  return static_cast<int>(val+1.0);
+}
 //-----------------------------------------------------------------------------
 class pqAnimationManager::pqInternals
 {
 public:
   QPointer<pqServer> ActiveServer;
+  QPointer<QWidget> ViewWidget;
   typedef QMap<pqServer*, QPointer<pqAnimationScene> > SceneMap;
   SceneMap Scenes;
   Ui::Dialog* AnimationSettingsDialog;
+
+  QSize OldMaxSize;
+  QSize OldSize;
 };
 
 //-----------------------------------------------------------------------------
@@ -72,12 +90,46 @@ pqAnimationManager::pqAnimationManager(QObject* _parent/*=0*/)
     this, SLOT(onProxyAdded(pqProxy*)));
   QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)),
     this, SLOT(onProxyRemoved(pqProxy*)));
+
+  QObject::connect(smmodel, SIGNAL(renderModuleAdded(pqRenderViewModule*)),
+    this, SLOT(updateViewModules()));
+  QObject::connect(smmodel, SIGNAL(renderModuleRemoved(pqRenderViewModule*)),
+    this, SLOT(updateViewModules()));
 }
 
 //-----------------------------------------------------------------------------
 pqAnimationManager::~pqAnimationManager()
 {
   delete this->Internals;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::setViewWidget(QWidget* w)
+{
+  this->Internals->ViewWidget = w;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::updateViewModules()
+{
+  pqAnimationScene* scene = this->getActiveScene();
+  if (!scene)
+    {
+    return;
+    }
+  QList<pqGenericViewModule*> viewModules = 
+    pqApplicationCore::instance()->getServerManagerModel()->getViewModules(
+      this->Internals->ActiveServer);
+  
+  QList<pqSMProxy> viewList;
+  foreach(pqGenericViewModule* view, viewModules)
+    {
+    viewList.push_back(pqSMProxy(view->getProxy()));
+    } 
+
+  vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
+  pqSMAdaptor::setProxyListProperty(sceneProxy->GetProperty("ViewModules"),
+    viewList);
 }
 
 //-----------------------------------------------------------------------------
@@ -89,6 +141,7 @@ void pqAnimationManager::onProxyAdded(pqProxy* proxy)
     this->Internals->Scenes[scene->getServer()] = scene;
     if (this->Internals->ActiveServer == scene->getServer())
       {
+      this->updateViewModules();
       emit this->activeSceneChanged(this->getActiveScene());
       }
     }
@@ -145,7 +198,7 @@ pqAnimationScene* pqAnimationManager::createActiveScene()
       {
       qDebug() << "Failed to create scene proxy.";
       }
-    
+   
     return this->getActiveScene();
     }
   return 0;
@@ -216,8 +269,7 @@ void pqAnimationManager::numberOfFramesChanged()
 }
 
 //-----------------------------------------------------------------------------
-bool pqAnimationManager::saveAnimation(const QString& filename, 
-  pqRenderViewModule* activeView)
+bool pqAnimationManager::saveAnimation(const QString& filename)
 {
   pqAnimationScene* scene = this->getActiveScene();
   if (!scene)
@@ -260,7 +312,7 @@ bool pqAnimationManager::saveAnimation(const QString& filename,
     }
 
   // Set current size of the window.
-  QSize viewSize = activeView->getWidget()->size();
+  QSize viewSize = scene->getViewSize();
   dialogUI.spinBoxHeight->setValue(viewSize.height());
   dialogUI.spinBoxWidth->setValue(viewSize.width());
 
@@ -294,18 +346,66 @@ bool pqAnimationManager::saveAnimation(const QString& filename,
   this->Internals->AnimationSettingsDialog = 0;
 
   // Update Scene properties based on user options.
-  pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("StartTime"), 0);
   pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("EndTime"),
-    dialogUI.spinBoxAnimationDuration->value());
-  pqSMAdaptor::setProxyProperty(sceneProxy->GetProperty("RenderModule"),
-    activeView->getProxy());
+    dialogUI.spinBoxAnimationDuration->value() + start_time);
   sceneProxy->UpdateVTKObjects();
 
-  QSize oldMaxSize = activeView->getWidget()->maximumSize();
   QSize newSize(dialogUI.spinBoxWidth->value(),
     dialogUI.spinBoxHeight->value());
 
   // Enfore the multiple of 4 criteria.
+  int magnification = this->updateViewSizes(newSize, viewSize, isMPEG);
+ 
+#if 0
+  // TODO: FIXME
+  if (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked)
+    {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    // We save the animation offline.
+    vtkSMProxy* cleaner = 
+      pxm->NewProxy("connection_cleaners", "AnimationPlayer");
+    cleaner->SetConnectionID(this->Internals->ActiveServer->GetConnectionID());
+    pxm->RegisterProxy("animation","cleaner",cleaner);
+    cleaner->Delete();
+
+    pqSMAdaptor::setElementProperty(cleaner->GetProperty("AnimationFileName"),
+      filename.toAscii().data());
+    pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 0,
+      newSize.width());
+    pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 1,
+      newSize.height());
+    pqSMAdaptor::setElementProperty(cleaner->GetProperty("FrameRate"),
+      dialogUI.spinBoxFrameRate->value());
+    cleaner->UpdateVTKObjects();
+
+    vtkSMServerProxyManagerReviver* reviver = 
+      vtkSMServerProxyManagerReviver::New();
+    int status = reviver->ReviveRemoteServerManager(
+        this->Internals->ActiveServer->GetConnectionID());
+    reviver->Delete();
+    pqApplicationCore::instance()->removeServer(this->Internals->ActiveServer);
+    return status;
+    }
+#endif
+
+  vtkSMAnimationSceneImageWriter* writer = vtkSMAnimationSceneImageWriter::New();
+  writer->SetFileName(filename.toAscii().data());
+  writer->SetMagnification(magnification);
+  writer->SetAnimationScene(sceneProxy);
+  writer->SetFrameRate(dialogUI.spinBoxFrameRate->value());
+  int status = writer->Save();
+  writer->Delete();
+
+  this->restoreViewSizes();
+  return (status == 0);
+}
+
+//-----------------------------------------------------------------------------
+int pqAnimationManager::updateViewSizes(QSize newSize, QSize currentSize, bool isMPEG)
+{
+  QSize requested_newSize = newSize;
+  // Enforce requested size restrictions based on the choosen
+  // format.
   if (isMPEG)
     {
     int &width = newSize.rwidth();
@@ -341,44 +441,48 @@ bool pqAnimationManager::saveAnimation(const QString& filename,
       }
     }
 
-  activeView->getWidget()->setMaximumSize(newSize);
-  activeView->getWidget()->resize(newSize);
- 
-
-  if (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked)
+  if (requested_newSize != newSize)
     {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    // We save the animation offline.
-    vtkSMProxy* cleaner = 
-      pxm->NewProxy("connection_cleaners", "AnimationPlayer");
-    cleaner->SetConnectionID(this->Internals->ActiveServer->GetConnectionID());
-    pxm->RegisterProxy("animation","cleaner",cleaner);
-    cleaner->Delete();
-
-    pqSMAdaptor::setElementProperty(cleaner->GetProperty("AnimationFileName"),
-      filename.toAscii().data());
-    pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 0,
-      newSize.width());
-    pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 1,
-      newSize.height());
-    pqSMAdaptor::setElementProperty(cleaner->GetProperty("FrameRate"),
-      dialogUI.spinBoxFrameRate->value());
-    cleaner->UpdateVTKObjects();
-
-    vtkSMServerProxyManagerReviver* reviver = 
-      vtkSMServerProxyManagerReviver::New();
-    int status = reviver->ReviveRemoteServerManager(
-        this->Internals->ActiveServer->GetConnectionID());
-    reviver->Delete();
-    pqApplicationCore::instance()->removeServer(this->Internals->ActiveServer);
-    return status;
+    QMessageBox::warning(NULL, "Resolution Changed",
+      QString("The requested resolution has been changed from (%1, %2)\n").arg(
+        requested_newSize.width()).arg(requested_newSize.height()) + 
+      QString("to (%1, %2) to match format specifications.").arg(
+        newSize.width()).arg(newSize.height()));
     }
- 
-  int status = sceneProxy->SaveImages(filePrefix.toAscii().data(),
-    extension.toAscii().data(), newSize.width(), newSize.height(),
-    dialogUI.spinBoxFrameRate->value(), 0);
 
-  activeView->getWidget()->setMaximumSize(oldMaxSize);
-  activeView->getWidget()->resize(viewSize);   
-  return (status == 0);
+  int magnification = 1;
+
+  // If newSize > currentSize, then magnification is involved.
+  int temp = pqCeil(newSize.width()/static_cast<double>(currentSize.width()));
+  magnification = (temp> magnification)? temp: magnification;
+
+  temp = pqCeil(newSize.height()/static_cast<double>(currentSize.height()));
+  magnification = (temp > magnification)? temp : magnification;
+
+  newSize = newSize/magnification;
+
+  if (!this->Internals->ViewWidget)
+    {
+    qDebug() << "ViewWidget must be set to the parent of all views.";
+    }
+  else
+    {
+    this->Internals->OldSize = this->Internals->ViewWidget->size();
+    this->Internals->OldMaxSize = this->Internals->ViewWidget->maximumSize();
+    this->Internals->ViewWidget->setMaximumSize(newSize);
+    this->Internals->ViewWidget->resize(newSize);
+    QCoreApplication::processEvents();
+    }
+
+  return magnification;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::restoreViewSizes()
+{
+  if (this->Internals->ViewWidget)
+    {
+    this->Internals->ViewWidget->setMaximumSize(this->Internals->OldMaxSize);
+    this->Internals->ViewWidget->resize(this->Internals->OldSize);
+    }
 }

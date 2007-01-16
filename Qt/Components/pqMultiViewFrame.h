@@ -88,6 +88,11 @@ public slots:
   /// sets whether this frame is active.  if active, a border is drawn
   void setActive(bool);
 
+  /// hides the frame decorations.
+  void hideDecorations();
+
+  /// shows the frame decorations.
+  void showDecorations();
 signals:
   /// signal active state changed
   void activeChanged(bool);

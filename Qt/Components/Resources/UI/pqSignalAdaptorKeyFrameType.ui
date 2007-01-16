@@ -139,6 +139,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>Base</tabstop>
+  <tabstop>StartPower</tabstop>
+  <tabstop>EndPower</tabstop>
+  <tabstop>Phase</tabstop>
+  <tabstop>Frequency</tabstop>
+  <tabstop>Offset</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

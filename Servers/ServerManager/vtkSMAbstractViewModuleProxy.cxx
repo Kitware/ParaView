@@ -49,7 +49,7 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.5");
 
 //-----------------------------------------------------------------------------
 vtkSMAbstractViewModuleProxy::vtkSMAbstractViewModuleProxy()
@@ -57,6 +57,10 @@ vtkSMAbstractViewModuleProxy::vtkSMAbstractViewModuleProxy()
   // All the subproxies are created on Client and Render Server.
   this->Displays = vtkCollection::New();
   this->DisplayXMLName = 0;
+
+  this->GUISize[0] = this->GUISize[1] = 300;
+  this->WindowPosition[0] = this->WindowPosition[1] = 0;
+
 }
 
 //-----------------------------------------------------------------------------
@@ -372,6 +376,10 @@ int vtkSMAbstractViewModuleProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
 void vtkSMAbstractViewModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "GUISize: " 
+    << this->GUISize[0] << ", " << this->GUISize[1] << endl;
+  os << indent << "WindowPosition: " 
+    << this->WindowPosition[0] << ", " << this->WindowPosition[1] << endl;
   os << indent << "Displays: " << this->Displays << endl;
 }
 

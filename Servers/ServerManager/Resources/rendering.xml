@@ -1643,9 +1643,31 @@
         command="StillRender" 
         update_self="1">
       </Property>
+
       <Property name="InteractiveRender" 
         command="InteractiveRender" update_self="1">
       </Property>
+
+      <IntVectorProperty
+         name="WindowPosition"
+         command="SetWindowPosition"
+         number_of_elements="2"
+         default_values="0 0"
+         update_self="1"
+         immediate_update="1">
+         <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="GUISize"
+         command="SetGUISize"
+         number_of_elements="2"
+         default_values="300 300"
+         update_self="1"
+         immediate_update="1">
+         <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
+
       <ProxyProperty
         name="Displays"
         command="AddDisplay"
@@ -1657,6 +1679,7 @@
           <Group name="3d_widgets" />
         </ProxyGroupDomain>
       </ProxyProperty>
+
       <IntVectorProperty
         name="CacheUpdate"
         command="CacheUpdate"
@@ -1666,10 +1689,12 @@
         is_internal="1">
         <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
+
       <Property
         name="InvalidateGeometry"
         command="InvalidateGeometry">
       </Property>
+
       <IntVectorProperty
         name="UseTriangleStrips"
         command="SetUseTriangleStrips"
@@ -1678,6 +1703,7 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
       <IntVectorProperty
         name="UseImmediateMode"
         command="SetUseImmediateMode"
@@ -1686,6 +1712,7 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
       <IntVectorProperty
         name="RenderInterruptsEnabled"
         command="SetRenderInterruptsEnabled"
@@ -1694,6 +1721,7 @@
         default_values="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
       <IntVectorProperty
         name="UseLight"
         command="SetUseLight"
@@ -1885,28 +1913,6 @@
 
     <IceTDesktopRenderModuleProxy name="IceTDesktopRenderModule" 
       base_proxygroup="rendermodules" base_proxyname="CompositeRenderModule">
-
-      <IntVectorProperty
-         name="WindowPosition"
-         command="SetWindowPosition"
-         number_of_elements="2"
-         default_values="0 0"
-         update_self="1"
-         is_internal="1"
-         immediate_update="1">
-         <IntRangeDomain name="range" min="0 0" />
-      </IntVectorProperty>
-
-      <IntVectorProperty
-         name="GUISize"
-         command="SetGUISize"
-         number_of_elements="2"
-         default_values="300 300"
-         update_self="1"
-         immediate_update="1"
-         is_internal="1">
-         <IntRangeDomain name="range" min="0 0" />
-      </IntVectorProperty>
 
       <IntVectorProperty
         name="DisableOrderedCompositing"
