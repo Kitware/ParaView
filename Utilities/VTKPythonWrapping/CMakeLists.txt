@@ -74,7 +74,6 @@
   ADD_EXECUTABLE(vtkWrapPythonInit 
     ${VTK_SOURCE_DIR}/Wrapping/vtkWrapPythonInit.c)
 
-  EXEC_PROGRAM(/home/demarle/bin/echoer.sh ARGS PYWRAPSOURCES ${VTK_COMMON_SOURCES})
 
   SET(VTK_COMMON_SOURCES
 ${VTK_SOURCE_DIR}/Common/vtkAbstractArray.cxx
