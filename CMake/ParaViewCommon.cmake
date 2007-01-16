@@ -464,6 +464,7 @@ LINK_DIRECTORIES(${PARAVIEW_EXTRA_LINK_DIRECTORIES})
 # This ones need to be fixed, so that first are not wrapped. This will be fixed
 # once the server changes are merged.
 #
+SET(ExtraParaViewCSWrapped_SRCS)
 SET(ExtraParaViewServerNonWrapped_SRCS)
 SET(ExtraParaViewServerManagerNonWrapped_SRCS)
 SET(ExtraParaViewClient_SRCS)
@@ -472,6 +473,10 @@ SET(ExtraParaViewServer_SRCS)
 SET(ExtraParaViewServerFiltersIncludes)
 SET(ExtraParaViewGUIIncludes)
 
+MACRO(PARAVIEW_INCLUDE_CS_WRAPPED_SOURCES SRCS)
+  SET(ExtraParaViewCSWrapped_SRCS
+    ${ExtraParaViewCSWrapped_SRCS} ${SRCS})
+ENDMACRO(PARAVIEW_INCLUDE_CS_WRAPPED_SOURCES)
 MACRO(PARAVIEW_INCLUDE_SERVERMANAGER_SOURCES SRCS)
   SET(ExtraParaViewServerManagerNonWrapped_SRCS
     ${ExtraParaViewServerManagerNonWrapped_SRCS} ${SRCS})
