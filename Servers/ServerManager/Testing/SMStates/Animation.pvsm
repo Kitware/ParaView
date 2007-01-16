@@ -2011,7 +2011,7 @@
         <Entry value="1" text="Realtime"/>
       </Domain>
     </Property>
-    <Property name="RenderModule" id="32.RenderModule" number_of_elements="1">
+    <Property name="ViewModules" id="32.ViewModules" number_of_elements="1">
       <Proxy value="4"/>
       <Domain name="groups" id="32.RenderModule.groups">
         <Group value="rendermodules"/>
