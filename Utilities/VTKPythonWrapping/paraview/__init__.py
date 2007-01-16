@@ -548,6 +548,7 @@ class pyConnection:
             return True
         return False
 
+
 # Users can set the active connection which will be used by API
 # to create proxies etc when no connection argument is passed.
 ActiveConnection = None
@@ -707,3 +708,31 @@ def CreateDisplay(proxy, renModule):
     renModule.UpdateVTKObjects()
     return display
 
+def fetch(input, operator, node=-1):
+   """ 
+   A convenience method that instantiates a pipeline that applies the 
+   given operator to input and returns the result to the client. The 
+   optional node argument when set to -1 applies to operation to all 
+   server nodes, or when set to a number returns the results from that
+   node.
+   """
+   
+   #create the reduction pipeline
+   gvd = CreateProxy("displays", "GenericViewDisplay")
+   #connect gvd to the desired input
+   gvd.SetInput(input)
+   
+   #tell gvd that its vtkReductionFilter should apply the given operator   
+   gvd.SetPreReductionHelper(operator)
+   gvd.SetReductionHelper(operator)
+   
+   #tell gvd to select either one, or all nodes to gather
+   gvd.SetPassThrough(node)
+   #results are always gathered to the root before sending to client
+   gvd.SetReductionType(3)   
+   
+   #go!
+   gvd.UpdateVTKObjects()
+   gvd.Update()
+   
+   return gvd.GetOutput()
