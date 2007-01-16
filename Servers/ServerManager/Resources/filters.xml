@@ -4812,7 +4812,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
             <Group name="filters"/>
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
-            <DataType value="vtkPolyData"/>
+            <DataType value="vtkDataSet"/>
           </DataTypeDomain>
      </InputProperty>     
 

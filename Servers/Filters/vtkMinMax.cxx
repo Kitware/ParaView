@@ -29,7 +29,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkMinMax);
-vtkCxxRevisionMacro(vtkMinMax, "1.3");
+vtkCxxRevisionMacro(vtkMinMax, "1.4");
 
 template <class T>
 void vtkMinMaxExecute(
@@ -316,6 +316,7 @@ void vtkMinMaxExecute(vtkMinMax *self,
       {
       FirstPasses[compIdx+jdx] = 0;
       *ovalue = *ivalue;
+      continue;
       }
     
     switch (self->GetOperation()) 
