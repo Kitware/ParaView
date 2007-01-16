@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMinMax - Performs a user specified operation on its input data
+// .NAME vtkMinMax - Finds the min, max, or sum of all of its input data
 // attributes.
 //
 // .SECTION Description
@@ -46,11 +46,13 @@ public:
   enum Operations
     {
       MIN = 0,
-      MAX = 1
+      MAX = 1,
+      SUM = 2
     };
   //ETX
-  vtkSetClampMacro(Operation, int, MIN, MAX);
+  vtkSetClampMacro(Operation, int, MIN, SUM);
   vtkGetMacro(Operation, int);
+  void SetOperation(const char *op);
 
   //Description:
   //A diagnostic that should be zero.

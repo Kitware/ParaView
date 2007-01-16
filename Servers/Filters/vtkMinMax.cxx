@@ -29,7 +29,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkMinMax);
-vtkCxxRevisionMacro(vtkMinMax, "1.2");
+vtkCxxRevisionMacro(vtkMinMax, "1.3");
 
 template <class T>
 void vtkMinMaxExecute(
@@ -56,6 +56,28 @@ vtkMinMax::~vtkMinMax()
   if (this->PFirstPass)
     {
     delete[] this->PFirstPass;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkMinMax::SetOperation(const char *str)
+{
+  if (strncmp(str, "MIN", 3) == 0)
+    {
+    this->SetOperation(vtkMinMax::MIN);
+    }
+  else if (strncmp(str, "MAX", 3) == 0)
+    {
+    this->SetOperation(vtkMinMax::MAX);
+    }
+  else if (strncmp(str, "SUM", 3) == 0)
+    {
+    this->SetOperation(vtkMinMax::SUM);
+    }
+  else
+    {
+    vtkErrorMacro("Unrecognized operation type defaulting to MIN");
+    this->SetOperation(0);
     }
 }
 
@@ -306,6 +328,11 @@ void vtkMinMaxExecute(vtkMinMax *self,
       case vtkMinMax::MAX:
       {
       if (*ivalue > *ovalue) *ovalue = *ivalue;
+      break;
+      }
+      case vtkMinMax::SUM:
+      {
+      *ovalue += *ivalue;
       break;
       }
       default:

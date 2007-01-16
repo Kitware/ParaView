@@ -4816,13 +4816,17 @@ This filter operates on all types of data sets, and it returns unstructured grid
           </DataTypeDomain>
      </InputProperty>     
 
-     <IntVectorProperty 
+     <StringVectorProperty 
         name="Operation" 
         command="SetOperation" 
         number_of_elements="1"
-        default_values="0"> 
-        <IntRangeDomain name="range" min="0" max="1"/>
-     </IntVectorProperty>
+        default_values="MIN"> 
+        <StringListDomain name="operation">
+          <String value="MIN"/>
+          <String value="MAX"/>
+          <String value="SUM"/>
+        </StringListDomain>
+     </StringVectorProperty>
      
    </SourceProxy>
    
