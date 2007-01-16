@@ -27,7 +27,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.2");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.3");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -176,7 +176,7 @@ void vtkPythonProgrammableFilter::Exec()
     this->Interpretor->InitializeSubInterpretor(1, (char**)&argv0);
 
     char addrofthis[1024];
-    sprintf(addrofthis, "'%X'", this);
+    sprintf(addrofthis, "'%X'", (unsigned int)this);
     
     vtkstd::string initscript;
     initscript  = "";
