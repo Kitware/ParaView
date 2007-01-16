@@ -1966,12 +1966,6 @@
         <Entry value="1" text="Realtime"/>
       </Domain>
     </Property>
-    <Property name="RenderModule" id="32.RenderModule" number_of_elements="1">
-      <Proxy value="4"/>
-      <Domain name="groups" id="32.RenderModule.groups">
-        <Group value="rendermodules"/>
-      </Domain>
-    </Property>
     <Property name="StartTime" id="32.StartTime" number_of_elements="1">
       <Element index="0" value="0"/>
     </Property>
