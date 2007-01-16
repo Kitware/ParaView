@@ -449,7 +449,6 @@ void pqFilterInputDialog::changeCurrentInput(int id)
     QItemSelectionModel *model = this->Sources->getSelectionModel();
     model->clear();
 
-    pqPipelineSource *source = 0;
     QMap<QString, pqPipelineSource *>::ConstIterator iter;
     QWidget *widget = this->Internal->Widgets[id];
     QLabel *label = qobject_cast<QLabel *>(widget);
