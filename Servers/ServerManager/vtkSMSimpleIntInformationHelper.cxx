@@ -20,7 +20,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleIntInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleIntInformationHelper, "1.6");
+vtkCxxRevisionMacro(vtkSMSimpleIntInformationHelper, "1.7");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleIntInformationHelper::vtkSMSimpleIntInformationHelper()
@@ -80,7 +80,8 @@ void vtkSMSimpleIntInformationHelper::UpdateProperty(
   // If single value, all int types
   if (argType == vtkClientServerStream::int32_value ||
       argType == vtkClientServerStream::int16_value ||
-      argType == vtkClientServerStream::int8_value)
+      argType == vtkClientServerStream::int8_value ||
+      argType == vtkClientServerStream::bool_value)
     {
     int ires;
     int retVal = res.GetArgument(0, 0, &ires);
