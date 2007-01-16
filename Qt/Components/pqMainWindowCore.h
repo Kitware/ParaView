@@ -188,6 +188,7 @@ signals:
   void enableFileSaveData(bool);
   void enableFileSaveScreenshot(bool);
   void enableFileSaveAnimation(bool);
+  void enableFileSaveGeometry(bool);
   void enableCameraUndo(bool);
   void enableCameraRedo(bool);
   void cameraUndoLabel(const QString&);
@@ -234,6 +235,9 @@ public slots:
 
   void onFileSaveAnimation();
   void onFileSaveAnimation(const QStringList& files);
+
+  void onSaveGeometry();
+  void onSaveGeometry(const QStringList& files);
   
   void onEditCameraUndo();
   void onEditCameraRedo();

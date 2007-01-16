@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqAbortAnimation.h"
 #include "ui_pqAnimationSettings.h"
 
+#include "vtkSMAnimationSceneGeometryWriter.h"
 #include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMProxyManager.h"
@@ -393,11 +394,11 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   writer->SetMagnification(magnification);
   writer->SetAnimationScene(sceneProxy);
   writer->SetFrameRate(dialogUI.spinBoxFrameRate->value());
-  int status = writer->Save();
+  bool status = writer->Save();
   writer->Delete();
 
   this->restoreViewSizes();
-  return (status == 0);
+  return status;
 }
 
 //-----------------------------------------------------------------------------
@@ -485,4 +486,29 @@ void pqAnimationManager::restoreViewSizes()
     this->Internals->ViewWidget->setMaximumSize(this->Internals->OldMaxSize);
     this->Internals->ViewWidget->resize(this->Internals->OldSize);
     }
+}
+
+//-----------------------------------------------------------------------------
+bool pqAnimationManager::saveGeometry(const QString& filename, 
+  pqGenericViewModule* view)
+{
+  if (!view)
+    {
+    return false;
+    }
+
+  pqAnimationScene* scene = this->getActiveScene();
+  if (!scene)
+    {
+    return false;
+    }
+  vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
+
+  vtkSMAnimationSceneGeometryWriter* writer = vtkSMAnimationSceneGeometryWriter::New();
+  writer->SetFileName(filename.toAscii().data());
+  writer->SetAnimationScene(sceneProxy);
+  writer->SetViewModule(view->getProxy());
+  bool status = writer->Save();
+  writer->Delete();
+  return status;
 }

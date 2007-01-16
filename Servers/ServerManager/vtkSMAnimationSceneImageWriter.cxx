@@ -42,7 +42,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.1");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.2");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -234,6 +234,8 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneImageWriter::SaveFinalize()
 {
+  // TODO: If save failed, we must remove the partially
+  // written files.
   if (this->MovieWriter)
     {
     this->MovieWriter->End();

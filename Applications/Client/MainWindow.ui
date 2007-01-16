@@ -74,55 +74,6 @@
     <addaction name="separator" />
     <addaction name="actionHelpEnableTooltips" />
    </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>&amp;File</string>
-    </property>
-    <widget class="QMenu" name="menuRecentFiles" >
-     <property name="title" >
-      <string>Recent Files</string>
-     </property>
-    </widget>
-    <addaction name="actionFileOpen" />
-    <addaction name="menuRecentFiles" />
-    <addaction name="separator" />
-    <addaction name="actionFileLoadServerState" />
-    <addaction name="actionFileSaveServerState" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveData" />
-    <addaction name="actionFileSaveScreenshot" />
-    <addaction name="actionFileSaveAnimation" />
-    <addaction name="separator" />
-    <addaction name="actionServerConnect" />
-    <addaction name="actionServerDisconnect" />
-    <addaction name="separator" />
-    <addaction name="actionFileExit" />
-   </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <widget class="QMenu" name="menuAddPlot" >
-     <property name="title" >
-      <string>Add &amp;Plot</string>
-     </property>
-     <addaction name="actionHistogram" />
-     <addaction name="actionXY_Plot" />
-     <addaction name="actionTable_View" />
-    </widget>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="actionMoveMode" />
-    <addaction name="actionSelectionMode" />
-    <addaction name="separator" />
-    <addaction name="menuAddPlot" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
-   </widget>
    <widget class="QMenu" name="menuPipeline" >
     <property name="title" >
      <string>&amp;Pipeline</string>
@@ -162,6 +113,57 @@
     <addaction name="menuToolbars" />
     <addaction name="menuPlots" />
     <addaction name="separator" />
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <widget class="QMenu" name="menuAddPlot" >
+     <property name="title" >
+      <string>Add &amp;Plot</string>
+     </property>
+     <addaction name="actionHistogram" />
+     <addaction name="actionXY_Plot" />
+     <addaction name="actionTable_View" />
+    </widget>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="actionMoveMode" />
+    <addaction name="actionSelectionMode" />
+    <addaction name="separator" />
+    <addaction name="menuAddPlot" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
+   </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuRecentFiles" >
+     <property name="title" >
+      <string>Recent Files</string>
+     </property>
+    </widget>
+    <addaction name="actionFileOpen" />
+    <addaction name="menuRecentFiles" />
+    <addaction name="separator" />
+    <addaction name="actionFileLoadServerState" />
+    <addaction name="actionFileSaveServerState" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveData" />
+    <addaction name="actionFileSaveScreenshot" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveAnimation" />
+    <addaction name="actionFileSaveGeometry" />
+    <addaction name="separator" />
+    <addaction name="actionServerConnect" />
+    <addaction name="actionServerDisconnect" />
+    <addaction name="separator" />
+    <addaction name="actionFileExit" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -493,7 +495,7 @@
   </action>
   <action name="actionFileSaveAnimation" >
    <property name="text" >
-    <string>Save Animation</string>
+    <string>Save &amp;Animation</string>
    </property>
   </action>
   <action name="actionVCRPreviousFrame" >
@@ -947,6 +949,11 @@
   <action name="actionToolsManageLinks" >
    <property name="text" >
     <string>Manage Links...</string>
+   </property>
+  </action>
+  <action name="actionFileSaveGeometry" >
+   <property name="text" >
+    <string>Save &amp;Geometry</string>
    </property>
   </action>
  </widget>

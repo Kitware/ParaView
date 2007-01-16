@@ -15,9 +15,10 @@ SET(Kit_SRCS
   vtkSMAbstractViewModuleProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationCueProxy.cxx
+  vtkSMAnimationSceneGeometryWriter.cxx
+  vtkSMAnimationSceneImageWriter.cxx
   vtkSMAnimationSceneProxy.cxx
   vtkSMAnimationSceneWriter.cxx
-  vtkSMAnimationSceneImageWriter.cxx
   vtkSMApplication.cxx
   vtkSMArrayListDomain.cxx
   vtkSMArrayRangeDomain.cxx

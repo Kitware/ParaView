@@ -175,6 +175,13 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionFileSaveAnimation,
     SLOT(setEnabled(bool)));
 
+  connect(this->Implementation->UI.actionFileSaveGeometry, SIGNAL(triggered()), 
+    &this->Implementation->Core, SLOT(onSaveGeometry()));
+  connect(&this->Implementation->Core,
+    SIGNAL(enableFileSaveGeometry(bool)),
+    this->Implementation->UI.actionFileSaveGeometry,
+    SLOT(setEnabled(bool)));
+
   connect(this->Implementation->UI.actionFileExit,
     SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));  
 

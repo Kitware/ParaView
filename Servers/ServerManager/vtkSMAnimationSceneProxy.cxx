@@ -43,6 +43,7 @@ public:
   typedef vtkstd::vector<vtkSmartPointer<vtkSMAbstractViewModuleProxy> > 
     VectorOfViewModules;
   VectorOfViewModules ViewModules;
+
   void StillRenderAllViews()
     {
     VectorOfViewModules::iterator iter = this->ViewModules.begin();
@@ -51,6 +52,7 @@ public:
       iter->GetPointer()->StillRender();
       }
     }
+
   void CacheUpdateAllViews(int index, int max)
     {
     VectorOfViewModules::iterator iter = this->ViewModules.begin();
@@ -63,21 +65,61 @@ public:
         }
       }
     }
+
+  void CleanCacheAllViews()
+    {
+    VectorOfViewModules::iterator iter = this->ViewModules.begin();
+    for (; iter != this->ViewModules.end(); ++iter)
+      {
+      vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(
+        iter->GetPointer());
+      if (rm)
+        {
+        rm->InvalidateAllGeometries();
+        }
+      }
+    }
+
+  void DisableInteractionAllViews()
+    {
+    VectorOfViewModules::iterator iter = this->ViewModules.begin();
+    for (; iter != this->ViewModules.end(); ++iter)
+      {
+      vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(
+        iter->GetPointer());
+      if (rm)
+        {
+        rm->GetInteractor()->Disable();
+        }
+      }
+    }
+
+  void EnableInteractionAllViews()
+    {
+    VectorOfViewModules::iterator iter = this->ViewModules.begin();
+    for (; iter != this->ViewModules.end(); ++iter)
+      {
+      vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(
+        iter->GetPointer());
+      if (rm)
+        {
+        rm->GetInteractor()->Enable();
+        }
+      }
+    }
+
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.32");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.33");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {
   this->AnimationCueProxies = vtkCollection::New();
   this->AnimationCueProxiesIterator = this->AnimationCueProxies->NewIterator();
-  this->RenderModuleProxy = 0;
   this->GeometryCached = 0;
   
-  this->GeometryWriter = 0;
-
   this->Internals = new vtkSMAnimationSceneProxyInternals();
 }
 
@@ -86,13 +128,6 @@ vtkSMAnimationSceneProxy::~vtkSMAnimationSceneProxy()
 {
   this->AnimationCueProxies->Delete();
   this->AnimationCueProxiesIterator->Delete();
-
-  if (this->GeometryWriter)
-    {
-    this->GeometryWriter->Delete();
-    this->GeometryWriter = 0;
-    }
-
   delete this->Internals;
 }
 
@@ -165,149 +200,15 @@ void vtkSMAnimationSceneProxy::SetCaching(int enable)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::SaveGeometry(double time)
-{
-  if (!this->GeometryWriter)
-    {
-    return;
-    }
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GeometryWriter->GetProperty("WriteTime"));
-  dvp->SetElement(0, time);
-  this->GeometryWriter->UpdateVTKObjects();
-}
-
-//----------------------------------------------------------------------------
-int vtkSMAnimationSceneProxy::SaveGeometry(const char* filename)
-{
-  if (this->GeometryWriter || !this->RenderModuleProxy)
-    {
-    vtkErrorMacro("Inconsistent state! Cannot SaveGeometry");
-    return 1;
-    }
-  vtkSMXMLPVAnimationWriterProxy* animWriter = 
-    vtkSMXMLPVAnimationWriterProxy::SafeDownCast(vtkSMObject::GetProxyManager()
-      ->NewProxy("writers","XMLPVAnimationWriter"));
-  if (!animWriter)
-    {
-    vtkErrorMacro("Failed to create XMLPVAnimationWriter proxy.");
-    return 1;
-    }
-  animWriter->SetConnectionID(this->ConnectionID);
-
-  this->SaveFailed = 0;
-  this->SetAnimationTime(0);
-  this->GeometryWriter = animWriter;
-
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-    animWriter->GetProperty("FileName"));
-  svp->SetElement(0,filename);
-  animWriter->UpdateVTKObjects();
-
-  vtkSMProxyIterator* proxyIter = vtkSMProxyIterator::New();
-  proxyIter->SetMode(vtkSMProxyIterator::ONE_GROUP);
-  proxyIter->Begin("displays");
-  for (; !proxyIter->IsAtEnd(); proxyIter->Next())
-    {
-    vtkSMDataObjectDisplayProxy* sDisp = vtkSMDataObjectDisplayProxy::SafeDownCast(
-      proxyIter->GetProxy());
-    // only the data object displays are saved.
-    if (sDisp && sDisp->GetVisibilityCM())
-      {
-      sDisp->SetInputAsGeometryFilter(animWriter);
-      }
-    }
-  proxyIter->Delete();
-
-  vtkSMProperty* p = animWriter->GetProperty("Start");
-  p->Modified();
-  animWriter->UpdateVTKObjects();
-
-  // Play the animation.
-  int oldMode = this->GetPlayMode();
-  int old_loop = this->GetLoop();
-  this->SetLoop(0);
-  this->SetPlayMode(vtkAnimationScene::PLAYMODE_SEQUENCE);
-  this->Play();
-  this->SetPlayMode(oldMode);
-  this->SetLoop(old_loop);
- 
-  p = animWriter->GetProperty("Finish");
-  p->Modified();
-  animWriter->UpdateVTKObjects();
-
-  
-  if (animWriter->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
-    {
-    this->SaveFailed = vtkErrorCode::OutOfDiskSpaceError;
-    }
-  animWriter->Delete();
-  this->GeometryWriter = NULL;
-  return this->SaveFailed;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::SaveInBatchScript(ofstream* file)
-{
-  this->Superclass::SaveInBatchScript(file);
-
-  ostrstream batchNameStr;
-  batchNameStr << "pvTemp" << this->GetSelfIDAsString()
-               << ends;
-  char* batchName = batchNameStr.str();;
-
-  *file << "  [$" << batchName << " GetProperty Loop]"
-    << " SetElements1 " << this->GetLoop() << endl;
-  *file << "  [$" << batchName << " GetProperty FrameRate]"
-    << " SetElements1 " << this->GetFrameRate() << endl;
-  *file << "  [$" << batchName << " GetProperty PlayMode]"
-    << " SetElements1 " << this->GetPlayMode() << endl;
-  
-  *file << "  $" << batchName << " SetRenderModuleProxy $pvTemp" 
-        << this->RenderModuleProxy->GetSelfIDAsString()
-        << endl;
-  *file << "  $" << batchName << " UpdateVTKObjects" << endl;
-  *file << endl;
-  vtkCollectionIterator* iter = this->AnimationCueProxiesIterator;
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-    iter->GoToNextItem())
-    {
-    vtkSMAnimationCueProxy* cue = 
-      vtkSMAnimationCueProxy::SafeDownCast(iter->GetCurrentObject());
-    if (cue)
-      {
-      cue->SaveInBatchScript(file);
-      *file << "  [$" << batchName << " GetProperty Cues]"
-        " AddProxy $pvTemp" << cue->GetSelfIDAsString() << endl;
-      *file << "  $" << batchName << " UpdateVTKObjects" << endl;
-      *file << endl;
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::Play()
 {
   vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
     this->AnimationCue);
   if (scene)
     {
-    int old_enable = 0;
-    vtkRenderWindowInteractor *iren=0;
-    if (this->RenderModuleProxy)
-      {
-      iren = this->RenderModuleProxy->GetInteractor();
-      old_enable = iren?iren->GetEnabled():0;
-      if (old_enable)
-        {
-        iren->Disable();
-        }
-      }
+    this->Internals->DisableInteractionAllViews();
     scene->Play();
-    if (old_enable && iren)
-      {
-      iren->Enable();
-      }
+    this->Internals->EnableInteractionAllViews();
     }
 }
 
@@ -458,10 +359,6 @@ int vtkSMAnimationSceneProxy::GetPlayMode()
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::StartCueInternal(void* info)
 {
-  if (this->RenderModuleProxy)
-    {
-    this->RenderModuleProxy->StillRender();
-    }
   this->Internals->StillRenderAllViews();
   this->Superclass::StartCueInternal(info);
 }
@@ -475,9 +372,6 @@ void vtkSMAnimationSceneProxy::TickInternal(void* info)
   this->Internals->StillRenderAllViews();
 
   this->Superclass::TickInternal(info);
-  vtkAnimationCue::AnimationCueInfo *cueInfo = reinterpret_cast<
-    vtkAnimationCue::AnimationCueInfo*>(info);
-  this->SaveGeometry(cueInfo->AnimationTime);
 }
 
 //----------------------------------------------------------------------------
@@ -485,10 +379,6 @@ void vtkSMAnimationSceneProxy::EndCueInternal(void* info)
 {
   this->CacheUpdate(info);
   this->Internals->StillRenderAllViews();
-  if (this->RenderModuleProxy)
-    {
-    this->RenderModuleProxy->StillRender();
-    }
   this->Superclass::EndCueInternal(info);
 }
 
@@ -519,9 +409,10 @@ void vtkSMAnimationSceneProxy::CacheUpdate(void* info)
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::CleanCache()
 {
-  if (this->GeometryCached && this->RenderModuleProxy)
+  if (this->GeometryCached)
     {    
-    this->RenderModuleProxy->InvalidateAllGeometries();
+    this->Internals->CleanCacheAllViews();
+    this->GeometryCached = 0;
     }
 }
 

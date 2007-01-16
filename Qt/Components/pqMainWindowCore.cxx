@@ -1335,9 +1335,8 @@ void pqMainWindowCore::onFileSaveAnimation()
     qDebug() << "Cannot save animation since no active scene is present.";
     return;
     }
-  this->multiViewManager().hideDecorations();
-
   QString filters = "MPEG files (*.mpg)";
+
 #ifdef _WIN32
   filters += ";;AVI files (*.avi)";
 #else
@@ -1379,9 +1378,60 @@ void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindowCore::onSaveGeometry()
+{
+  pqAnimationManager* mgr = this->getAnimationManager();
+  if (!mgr || !mgr->getActiveScene())
+    {
+    qDebug() << "Cannot save animation geometry since no active scene is present.";
+    return;
+    }
+  pqGenericViewModule* view = pqActiveView::instance().current();
+  if (!view)
+    {
+    qDebug() << "Cannot save animation geometry since no active view.";
+    return;
+    }
+
+  QString filters = "ParaView Data files (*.pvd);;All files (*)";
+  pqFileDialog* const file_dialog = new pqFileDialog(NULL,
+    this->Implementation->Parent, tr("Save Animation Geometry"), QString(), filters);
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
+  file_dialog->setObjectName("FileSaveAnimationDialog");
+  file_dialog->setFileMode(pqFileDialog::AnyFile);
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
+    this, SLOT(onSaveGeometry(const QStringList&)));
+  file_dialog->setModal(true);
+  file_dialog->show();  
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onSaveGeometry(const QStringList& files)
+{
+  pqAnimationManager* mgr = this->getAnimationManager();
+  if (!mgr || !mgr->getActiveScene())
+    {
+    qDebug() << "Cannot save animation since no active scene is present.";
+    return;
+    }
+  pqGenericViewModule* view = pqActiveView::instance().current();
+  if (!view)
+    {
+    qDebug() << "Cannot save animation geometry since no active view.";
+    return;
+    }
+
+  if (!mgr->saveGeometry(files[0], view))
+    {
+    qDebug() << "Animation save geometry failed!";
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onEditCameraUndo()
 {
-  pqRenderViewModule* view = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* view = qobject_cast<pqRenderViewModule*>(
+    pqActiveView::instance().current());
   if (!view)
     {
     qDebug() << "No active render module, cannot undo camera.";
@@ -1395,7 +1445,8 @@ void pqMainWindowCore::onEditCameraUndo()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onEditCameraRedo()
 {
-  pqRenderViewModule* view = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* view = qobject_cast<pqRenderViewModule*>(
+    pqActiveView::instance().current());
   if (!view)
     {
     qDebug() << "No active render module, cannot redo camera.";
@@ -1561,7 +1612,8 @@ void pqMainWindowCore::onToolsRecordTestScreenshot()
 
 void pqMainWindowCore::onToolsRecordTestScreenshot(const QStringList &fileNames)
 {
-  pqRenderViewModule* const render_module = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* const render_module = qobject_cast<pqRenderViewModule*>(
+    pqActiveView::instance().current());
   if(!render_module)
     {
     qCritical() << "Cannnot save image. No active render module.";
@@ -1653,7 +1705,8 @@ void pqMainWindowCore::onHelpEnableTooltips(bool enabled)
 void pqMainWindowCore::onEditSettings()
 {
   pqSettingsDialog dialog(this->Implementation->Parent);
-  dialog.setRenderModule(qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current()));
+  dialog.setRenderModule(qobject_cast<pqRenderViewModule*>(
+      pqActiveView::instance().current()));
   dialog.exec();
 }
 
@@ -1953,7 +2006,8 @@ void pqMainWindowCore::onInitializeStates()
 {
   pqServer* const server = this->getActiveServer();
   pqPipelineSource *source = this->getActiveSource();
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
+    pqActiveView::instance().current());
   
   const int num_servers = pqApplicationCore::instance()->
     getServerManagerModel()->getNumberOfServers();
@@ -1977,6 +2031,9 @@ void pqMainWindowCore::onInitializeStates()
   // Can save animation if there exists an active scene.
   emit this->enableFileSaveAnimation(
     this->getAnimationManager()->getActiveScene() != NULL);
+
+  emit this->enableFileSaveGeometry(
+    (this->getAnimationManager()->getActiveScene() != NULL) && rm);
 
   emit this->enableServerConnect(num_servers == 0);
     
@@ -2004,7 +2061,8 @@ void pqMainWindowCore::onInitializeInteractionStates()
   QString undo_camera_label = "";
   QString redo_camera_label = "";
 
-  if(pqRenderViewModule* const rm = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current()))
+  if(pqRenderViewModule* const rm = qobject_cast<pqRenderViewModule*>(
+      pqActiveView::instance().current()))
     {
     pqUndoStack* const stack = rm->getInteractionUndoStack();
     if (stack && stack->CanUndo())

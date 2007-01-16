@@ -35,13 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QObject>
 
+class QSize;
+
 class pqAnimationCue;
 class pqAnimationScene;
+class pqGenericViewModule;
 class pqProxy;
-class pqRenderViewModule;
 class pqServer;
 class vtkSMProxy;
-class QSize;
 
 // pqAnimationManager manages the Animation sub-system.
 // It encapsulates the initialization of animation scene per server
@@ -81,7 +82,14 @@ public:
   // Returns true if the save was successful.
   bool saveAnimation(const QString& filename);
 
+  // The the Widget that contains all the views.
+  // This is required since the manager may need to change the view size
+  // depending upon the users requested animation size.
   void setViewWidget(QWidget*);
+
+  // Saves the animation geometry from the active scene
+  // as visible in the given view.
+  bool saveGeometry(const QString& filename, pqGenericViewModule* view);
 signals:
   // emitted when the active scene changes (\c scene may be NULL).
   void activeSceneChanged(pqAnimationScene* scene);

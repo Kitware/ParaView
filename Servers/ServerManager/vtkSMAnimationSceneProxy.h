@@ -43,10 +43,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Save the state of this proxy in the batch file.
-  virtual void SaveInBatchScript(ofstream*);
-
-  // Description:
   // Start playing the animation. On every \c Tick, 
   // \c vtkCommand::AnimationCueTickEvent is fired. One can call \c Stop()
   // in the event handler for this event to abort playing of the animation.
@@ -106,8 +102,6 @@ public:
   void RemoveViewModule(vtkSMAbstractViewModuleProxy*);
   void RemoveAllViewModules();
 
-  void SetRenderModuleProxy(vtkSMRenderModuleProxy* rm)
-    { this->RenderModuleProxy = rm; }
   // Description:
   // API to get the view modules.
   unsigned int GetNumberOfViewModules();
@@ -118,23 +112,14 @@ public:
   // at the indicated time.
   void SetAnimationTime(double time);
 
-  // Description:
-  // Save the geometry of the animation.
-  // Note that this method is not accessible using property interface.
-  // Returns 0 on success.
-  int SaveGeometry(const char* filename);
-
 protected:
   vtkSMAnimationSceneProxy();
   ~vtkSMAnimationSceneProxy();
 
-  // Called on every tick to save geometry.
-  void SaveGeometry(double time);
-
   virtual void CreateVTKObjects(int numObjects);
 
-  int GeometryCached; // flag indicating if this call asked RenderModuleProxy
-    // to CacheUpdate.
+  // Set when CacheUpdate() is called on any view.
+  int GeometryCached; 
 
   // Description:
   // Callbacks for corresponding Cue events. The argument must be 
@@ -146,14 +131,6 @@ protected:
   
   vtkCollection* AnimationCueProxies;
   vtkCollectionIterator* AnimationCueProxiesIterator;
-
-  vtkSMRenderModuleProxy* RenderModuleProxy;
-
-  // Stuff for saving Animation Images.
-  int SaveFailed;
-
-  // Stuff for saving Geometry.
-  vtkSMProxy *GeometryWriter;
 
 private:
   vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&); // Not implemented.
