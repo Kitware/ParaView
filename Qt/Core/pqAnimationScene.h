@@ -98,6 +98,10 @@ signals:
   // Emitted when the play mode changes.
   void playModeChanged();
 
+  // Emitted when the looping state changes on the
+  // underlying proxy.
+  void loopChanged();
+
   // Emitted when playing animation.
   void tick();
 private slots:

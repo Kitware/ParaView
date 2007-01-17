@@ -66,6 +66,10 @@ signals:
   // else enabled(false).
   void enabled(bool);
 
+  // Emitted to update the check state
+  // of the loop.
+  void loop(bool);
+
 public slots:
   // Set the animation scene. If null, the VCR control is disabled
   // (emits enabled(false)).
@@ -79,9 +83,11 @@ public slots:
   void onLastFrame();
   void onPlay();
   void onPause();
+  void onLoop(bool checked);
 
 protected slots:
   void onTick();
+  void onLoopPropertyChanged();
 
 private:
   pqVCRController(const pqVCRController&); // Not implemented.
@@ -91,6 +97,7 @@ private:
 
   // internal method.
   bool updateScene(bool first, bool last, int offset);
+
 };
 
 #endif

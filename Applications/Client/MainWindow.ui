@@ -28,26 +28,10 @@
      <height>25</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFilters" >
-    <property name="title" >
-     <string>F&amp;ilters</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuSources" >
     <property name="title" >
      <string>&amp;Sources</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuAnimation" >
-    <property name="title" >
-     <string>&amp;Animation</string>
-    </property>
-    <addaction name="actionVCRFirstFrame" />
-    <addaction name="actionVCRPreviousFrame" />
-    <addaction name="actionVCRPlay" />
-    <addaction name="actionVCRPause" />
-    <addaction name="actionVCRNextFrame" />
-    <addaction name="actionVCRLastFrame" />
    </widget>
    <widget class="QMenu" name="menuTools" >
     <property name="title" >
@@ -164,6 +148,23 @@
     <addaction name="actionServerDisconnect" />
     <addaction name="separator" />
     <addaction name="actionFileExit" />
+   </widget>
+   <widget class="QMenu" name="menuFilters" >
+    <property name="title" >
+     <string>F&amp;ilters</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuAnimation" >
+    <property name="title" >
+     <string>&amp;Animation</string>
+    </property>
+    <addaction name="actionVCRFirstFrame" />
+    <addaction name="actionVCRPreviousFrame" />
+    <addaction name="actionVCRPlay" />
+    <addaction name="actionVCRPause" />
+    <addaction name="actionVCRNextFrame" />
+    <addaction name="actionVCRLastFrame" />
+    <addaction name="actionVCRLoop" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -315,6 +316,7 @@
    <addaction name="actionVCRPause" />
    <addaction name="actionVCRNextFrame" />
    <addaction name="actionVCRLastFrame" />
+   <addaction name="actionVCRLoop" />
   </widget>
   <widget class="QToolBar" name="variableToolbar" >
    <property name="windowTitle" >
@@ -954,6 +956,23 @@
   <action name="actionFileSaveGeometry" >
    <property name="text" >
     <string>Save &amp;Geometry</string>
+   </property>
+  </action>
+  <action name="actionVCRLoop" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>&amp;Loop</string>
+   </property>
+   <property name="iconText" >
+    <string>Loop</string>
+   </property>
+   <property name="toolTip" >
+    <string>Loop</string>
    </property>
   </action>
  </widget>

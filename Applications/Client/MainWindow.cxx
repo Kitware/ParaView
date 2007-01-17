@@ -317,6 +317,9 @@ MainWindow::MainWindow() :
     
   connect(this->Implementation->UI.actionVCRLastFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onLastFrame()));
+ 
+  connect(this->Implementation->UI.actionVCRLoop, SIGNAL(toggled(bool)), 
+    &this->Implementation->Core.VCRController(), SLOT(onLoop(bool)));
 
   pqVCRController* vcrcontroller = &this->Implementation->Core.VCRController();
   connect(vcrcontroller, SIGNAL(enabled(bool)),
@@ -329,11 +332,17 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionVCRNextFrame, SLOT(setEnabled(bool)));
   connect(vcrcontroller, SIGNAL(enabled(bool)),
     this->Implementation->UI.actionVCRLastFrame, SLOT(setEnabled(bool)));
+  connect(vcrcontroller, SIGNAL(enabled(bool)),
+    this->Implementation->UI.actionVCRLoop, SLOT(setEnabled(bool)));
+
+  connect(vcrcontroller, SIGNAL(loop(bool)),
+    this->Implementation->UI.actionVCRLoop, SLOT(setChecked(bool)));
 
   connect(vcrcontroller, SIGNAL(playing(bool)),
     this->Implementation->UI.actionVCRPause, SLOT(setEnabled(bool)));
   connect(vcrcontroller, SIGNAL(playing(bool)),
     this->Implementation->UI.actionVCRPlay, SLOT(setDisabled(bool)));
+
   
   connect(this->Implementation->UI.actionMoveMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToInteraction()));
