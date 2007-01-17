@@ -2292,7 +2292,7 @@ H5D_create_chunk_map(const H5D_t *dataset, const H5T_t *mem_type, const H5S_t *f
      * speed up hyperslab calculations by removing the extra checks and/or
      * additions involving the offset and the hyperslab selection -QAK)
      */
-    if(H5S_hyper_normalize_offset(file_space, old_offset)<0)
+    if(H5S_hyper_normalize_offset((H5S_t *)file_space, old_offset)<0)
         HGOTO_ERROR (H5E_DATASET, H5E_BADSELECT, FAIL, "unable to normalize dataspace by offset")
     file_space_normalized = TRUE;
 
@@ -2457,7 +2457,7 @@ done:
             HDONE_ERROR (H5E_DATASET, H5E_CANTFREE, FAIL, "Can't decrement temporary datatype ID")
     } /* end if */
     if(file_space_normalized) {
-        if(H5S_hyper_denormalize_offset(file_space, old_offset)<0)
+        if(H5S_hyper_denormalize_offset((H5S_t *)file_space, old_offset)<0)
             HGOTO_ERROR (H5E_DATASET, H5E_BADSELECT, FAIL, "unable to normalize dataspace by offset")
     } /* end if */
 

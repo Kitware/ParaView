@@ -85,8 +85,6 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "warning: argument .+ might be clobbered by .longjmp. or .vfork."
   "Microsoft Visual Studio/VC98/include"
   ".include.qtcore"
-  "hdf5\H5Dio.c(2295) : warning C4090: 'function' : different 'const' qualifiers"
-  "hdf5\H5Dio.c(2460) : warning C4090: 'function' : different 'const' qualifiers"
   )
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
