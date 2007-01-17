@@ -99,7 +99,13 @@ public:
 
   // Description:
   // Find a nested element with the given id.
+  // Not that this searches only the immediate children of this
+  // vtkPVXMLElement.
   vtkPVXMLElement* FindNestedElement(const char* id);
+
+  // Description:
+  // Locate a nested element with the given tag name.
+  vtkPVXMLElement* FindNestedElementByName(const char* name);
 
   // Description:
   // Removes all nested elements.

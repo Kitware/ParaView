@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.12");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.13");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -28,7 +28,8 @@ struct vtkPVXMLElementInternals
 {
   vtkstd::vector<vtkstd::string> AttributeNames;
   vtkstd::vector<vtkstd::string> AttributeValues;
-  vtkstd::vector<vtkSmartPointer<vtkPVXMLElement> > NestedElements;
+  typedef vtkstd::vector<vtkSmartPointer<vtkPVXMLElement> > VectorOfElements;
+  VectorOfElements NestedElements;
   vtkstd::string CharacterData;
 };
 
@@ -309,6 +310,22 @@ vtkPVXMLElement* vtkPVXMLElement::FindNestedElement(const char* id)
     if(nid && strcmp(nid, id) == 0)
       {
       return this->Internal->NestedElements[i];
+      }
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkPVXMLElement* vtkPVXMLElement::FindNestedElementByName(const char* name)
+{
+  vtkPVXMLElementInternals::VectorOfElements::iterator iter =
+    this->Internal->NestedElements.begin();
+  for(; iter != this->Internal->NestedElements.end(); ++iter)
+    {
+    const char* cur_name = (*iter)->GetName();
+    if(name && cur_name && strcmp(cur_name, name) == 0)
+      {
+      return (*iter);
       }
     }
   return 0;
