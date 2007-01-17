@@ -131,6 +131,7 @@ void pqAnimationManager::updateViewModules()
   vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
   pqSMAdaptor::setProxyListProperty(sceneProxy->GetProperty("ViewModules"),
     viewList);
+  sceneProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
