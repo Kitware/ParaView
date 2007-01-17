@@ -28,6 +28,7 @@
 #include "vtkSMObject.h"
 
 class vtkSMServerSideAnimationPlayerObserver;
+class vtkSMAnimationSceneImageWriter;
 
 class VTK_EXPORT vtkSMServerSideAnimationPlayer : public vtkSMObject
 {
@@ -43,26 +44,10 @@ public:
   vtkGetMacro(ConnectionID, vtkIdType);
 
   // Description:
-  // These are properties that are needed to save an animation.
-  // If AnimationFileName is set, then only this object will
-  // attempt to save the animation.
-  vtkSetStringMacro(AnimationFileName);
-  vtkGetStringMacro(AnimationFileName);
-
-  // Description:
-  // These are properties that are needed to save an animation.
-  vtkSetVector2Macro(Size, int);
-  vtkGetVector2Macro(Size, int);
-
-  // Description:
-  // These are properties that are needed to save an animation.
-  vtkSetMacro(FrameRate, double);
-  vtkGetMacro(FrameRate, double);
-
-  // Description:
-  // These are properties that are needed to save an animation.
-  vtkSetMacro(Quality, int);
-  vtkGetMacro(Quality, int);
+  // This is the writer which we are going to tell to write
+  // the animation out once the client disconnects.
+  void SetWriter(vtkSMAnimationSceneImageWriter* writer);
+  vtkGetObjectMacro(Writer, vtkSMAnimationSceneImageWriter);
 //BTX
 protected:
   vtkSMServerSideAnimationPlayer();
@@ -77,11 +62,8 @@ protected:
   virtual void PerformActions();
 
   vtkIdType ConnectionID;
+  vtkSMAnimationSceneImageWriter* Writer;
 
-  char* AnimationFileName;
-  int Size[2];
-  double FrameRate;
-  int Quality;
 private:
   vtkSMServerSideAnimationPlayer(const vtkSMServerSideAnimationPlayer&); // Not implemented.
   void operator=(const vtkSMServerSideAnimationPlayer&); // Not implemented.

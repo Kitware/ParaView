@@ -293,8 +293,12 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   Ui::Dialog dialogUI;
   this->Internals->AnimationSettingsDialog = &dialogUI;
   dialogUI.setupUi(&dialog);
+
+  // TODO: Until we fix IceT rendermodule to work without client
+  // one cannot disconnect if there is more than 1 view.
   dialogUI.checkBoxDisconnect->setEnabled(
-    this->Internals->ActiveServer->isRemote());
+    this->Internals->ActiveServer->isRemote() 
+    && (sceneProxy->GetNumberOfViewModules()==1));
   bool isMPEG = (extension == "mpg");
   if (isMPEG)
     {
@@ -358,37 +362,41 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   // Enfore the multiple of 4 criteria.
   int magnification = this->updateViewSizes(newSize, viewSize, isMPEG);
  
-#if 0
-  // TODO: FIXME
   if (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked)
     {
+    pqServer* server = this->Internals->ActiveServer;
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+    vtkSMProxy* writer = pxm->NewProxy("writers", "AnimationSceneImageWriter");
+    writer->SetConnectionID(server->GetConnectionID());
+    pxm->RegisterProxy("animation", "writer", writer);
+    writer->Delete();
+
+    pqSMAdaptor::setElementProperty(writer->GetProperty("FileName"),
+      filename.toAscii().data());
+    pqSMAdaptor::setElementProperty(writer->GetProperty("Magnification"), 
+      magnification); 
+    pqSMAdaptor::setElementProperty(writer->GetProperty("FrameRate"),
+      dialogUI.spinBoxFrameRate->value());
+    writer->UpdateVTKObjects();
+
     // We save the animation offline.
     vtkSMProxy* cleaner = 
       pxm->NewProxy("connection_cleaners", "AnimationPlayer");
-    cleaner->SetConnectionID(this->Internals->ActiveServer->GetConnectionID());
+    cleaner->SetConnectionID(server->GetConnectionID());
     pxm->RegisterProxy("animation","cleaner",cleaner);
     cleaner->Delete();
 
-    pqSMAdaptor::setElementProperty(cleaner->GetProperty("AnimationFileName"),
-      filename.toAscii().data());
-    pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 0,
-      newSize.width());
-    pqSMAdaptor::setMultipleElementProperty(cleaner->GetProperty("Size"), 1,
-      newSize.height());
-    pqSMAdaptor::setElementProperty(cleaner->GetProperty("FrameRate"),
-      dialogUI.spinBoxFrameRate->value());
+    pqSMAdaptor::setProxyProperty(cleaner->GetProperty("Writer"), writer);
     cleaner->UpdateVTKObjects();
 
     vtkSMServerProxyManagerReviver* reviver = 
       vtkSMServerProxyManagerReviver::New();
-    int status = reviver->ReviveRemoteServerManager(
-        this->Internals->ActiveServer->GetConnectionID());
+    int status = reviver->ReviveRemoteServerManager(server->GetConnectionID());
     reviver->Delete();
-    pqApplicationCore::instance()->removeServer(this->Internals->ActiveServer);
+    pqApplicationCore::instance()->removeServer(server);
     return status;
     }
-#endif
 
   vtkSMAnimationSceneImageWriter* writer = vtkSMAnimationSceneImageWriter::New();
   writer->SetFileName(filename.toAscii().data());

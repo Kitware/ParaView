@@ -1900,6 +1900,17 @@
         update_self="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
+      <IntVectorProperty
+        name="DisableOrderedCompositing">
+        <!-- blank property added to match IceTDesktopRenderModuleProxy API -->
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="SetUseBackBuffer">
+        <!-- blank property added to match IceTDesktopRenderModuleProxy API -->
+      </IntVectorProperty>
+
     </MPIRenderModuleProxy>
 
     <MultiDisplayRenderModuleProxy name="MultiDisplayRenderModule"

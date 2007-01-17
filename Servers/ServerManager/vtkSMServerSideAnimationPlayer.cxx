@@ -22,6 +22,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMProxyIterator.h"
+#include "vtkSMAnimationSceneImageWriter.h"
 
 #include <vtkstd/string>
 
@@ -58,7 +59,9 @@ protected:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMServerSideAnimationPlayer);
-vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.4");
+vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.5");
+vtkCxxSetObjectMacro(vtkSMServerSideAnimationPlayer, Writer, 
+  vtkSMAnimationSceneImageWriter);
 //-----------------------------------------------------------------------------
 vtkSMServerSideAnimationPlayer::vtkSMServerSideAnimationPlayer()
 {
@@ -68,11 +71,7 @@ vtkSMServerSideAnimationPlayer::vtkSMServerSideAnimationPlayer()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->AddObserver(vtkCommand::ConnectionClosedEvent, this->Observer);
 
-  this->AnimationFileName =0;
-  this->Size[0] = 400;
-  this->Size[1] = 400;
-  this->FrameRate = 1;
-  this->Quality = 1;
+  this->Writer = 0; 
 }
 
 //-----------------------------------------------------------------------------
@@ -85,7 +84,8 @@ vtkSMServerSideAnimationPlayer::~vtkSMServerSideAnimationPlayer()
     }
   this->Observer->SetTarget(0);
   this->Observer->Delete();
-  this->SetAnimationFileName(0);
+  
+  this->SetWriter(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -129,33 +129,25 @@ void vtkSMServerSideAnimationPlayer::PerformActions()
       }
     }
 
-  // Play any animations.
+  // Write any animations.
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMAnimationSceneProxy* scene = 
       vtkSMAnimationSceneProxy::SafeDownCast(iter->GetProxy());
     if (scene)
       {
-      if (!this->AnimationFileName)
+      if (!this->Writer)
         {
         scene->Play();
         }
       else
         {
-        vtkstd::string name = this->AnimationFileName; 
-        vtkstd::string ext;
-        vtkstd::string::size_type dot_pos = name.rfind(".");
-        if(dot_pos != vtkstd::string::npos)
+        this->Writer->SetAnimationScene(scene);
+        if (!this->Writer->Save())
           {
-          ext = name.substr(dot_pos+1);
-          name = name.substr(0, dot_pos);
+          vtkErrorMacro("Failed to save animation.");
           }
-      /* FIXME
-        scene->SaveImages(name.c_str(), ext.c_str(),
-          this->Size[0], this->Size[1],
-          this->FrameRate,
-          this->Quality);
-          */
+        break;
         }
       }
     }
@@ -170,14 +162,9 @@ void vtkSMServerSideAnimationPlayer::PerformActions()
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 void vtkSMServerSideAnimationPlayer::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ConnectionID: " << this->ConnectionID << endl;
-  os << indent << "FrameRate: " << this->FrameRate << endl;
-  os << indent << "AnimationFileName: " << 
-    (this->AnimationFileName? this->AnimationFileName : "(none)") << endl;
-  os << indent << "Size: " << this->Size[0] << ", " << this->Size[1] << endl;
-  os << indent << "Quality: " << this->Quality << endl;
+  os << indent << "Writer: " << this->Writer << endl;
 }

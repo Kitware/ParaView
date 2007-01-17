@@ -312,6 +312,31 @@
       </InputProperty>
     </PWriterProxy>
 
+    <Proxy name="AnimationSceneImageWriter" class="vtkSMAnimationSceneImageWriter">
+      <ProxyProperty name="AnimationScene"
+        command="SetAnimationScene">
+      </ProxyProperty>
+
+      <IntVectorProperty name="Magnification"
+        command="SetMagnification"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <StringVectorProperty name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="FrameRate"
+        command="SetFrameRate"
+        number_of_elements="1"
+        default_values="0">
+      </DoubleVectorProperty>
+    <!-- End of AnimationSceneImageWriter -->
+    </Proxy>
+
     <XMLPVAnimationWriterProxy name="XMLPVAnimationWriter" class ="vtkXMLPVAnimationWriter">
       <InputProperty
         name="Input" 

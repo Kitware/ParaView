@@ -2049,35 +2049,11 @@
 
   <ProxyGroup name="connection_cleaners">
     <ConnectionCleanerProxy name="AnimationPlayer" class="vtkSMServerSideAnimationPlayer">
-      <StringVectorProperty
-        name="AnimationFileName"
-        command="SetAnimationFileName"
-        number_of_elements="1">
-      </StringVectorProperty>
 
-      <IntVectorProperty
-        name="Size"
-        command="SetSize"
-        number_of_elements="2"
-        default_values="400 400">
-        <IntRangeDomain name="range" min="1 1" />
-      </IntVectorProperty>
-
-      <DoubleVectorProperty 
-        name="FrameRate"
-        command="SetFrameRate"
-        number_of_elements="1"
-        default_values="10">
-        <DoubleRangeDomain name="range" min="1" />
-      </DoubleVectorProperty>
-
-      <IntVectorProperty
-        name="Quality"
-        command="SetQuality"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
-      </IntVectorProperty>
+      <ProxyProperty name="Writer"
+        command="SetWriter">
+      </ProxyProperty>
+    <!-- End of AnimationPlayer -->
     </ConnectionCleanerProxy>
   </ProxyGroup>
 
