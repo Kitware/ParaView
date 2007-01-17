@@ -25,7 +25,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.16");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -101,10 +101,6 @@ void vtkSMAnimationCueProxy::RemoveAnimatedProxy()
 void vtkSMAnimationCueProxy::SetCaching(int enable)
 {
   this->Caching = enable;
-  if (!this->Caching && this->AnimatedProxy)
-    {
-    this->AnimatedProxy->MarkModified(this);
-    }
 }
   
 
@@ -214,10 +210,15 @@ void vtkSMAnimationCueProxy::ExecuteEvent(vtkObject* obj, unsigned long event,
     switch (event)
       {
     case vtkSMAnimationCueManipulatorProxy::StateModifiedEvent:
+      /* No longer needed, since if the property changes, 
+       * MarkModified is indeed called on the proxy when the property 
+       * is pushed.
       if (!this->Caching && this->AnimatedProxy)
         {
         this->AnimatedProxy->MarkModified(this);
         }
+        */ 
+      break;
       }
     }
 }

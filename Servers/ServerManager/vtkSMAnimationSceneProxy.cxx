@@ -111,7 +111,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.34");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.35");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -337,9 +337,15 @@ void vtkSMAnimationSceneProxy::SetPlayMode(int mode)
   // Caching is disabled when play mode is real time.
   if (mode == vtkAnimationScene::PLAYMODE_REALTIME && this->Caching)
     {
+    /*
     vtkWarningMacro("Disabling caching. "
       "Caching not available in Real Time mode.");
     this->SetCaching(0);
+    */
+    // We clean cache and hence forth, we dont call CacheUpdate()
+    // this will make sure that cache is not used when playing in 
+    // real time.
+    this->CleanCache();
     }
 }
 

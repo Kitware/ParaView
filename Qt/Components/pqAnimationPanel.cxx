@@ -270,6 +270,9 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
     this->Internal->playMode, "currentText", 
     SIGNAL(currentIndexChanged(const QString&)),
     sceneProxy, sceneProxy->GetProperty("PlayMode"));
+  this->Internal->SceneLinks.addPropertyLink(
+    this->Internal->caching, "checked", SIGNAL(toggled(bool)),
+    sceneProxy, sceneProxy->GetProperty("Caching"));
 
   QObject::connect(scene, SIGNAL(startTimeChanged()), 
     this, SLOT(onSceneTimeChanged()));
@@ -319,12 +322,14 @@ void pqAnimationPanel::onSceneTimeChanged()
     this->Internal->currentFrame->setDecimals(0);
     this->Internal->labelNumberOfFrames->setText("Number Of Frames");
     this->Internal->numberOfFrames->setValidator(new QIntValidator(this));
+    this->Internal->caching->setEnabled(true);
     }
   else
     {
     this->Internal->currentFrame->setDecimals(2);
     this->Internal->labelNumberOfFrames->setText("Duration (secs)");
     this->Internal->numberOfFrames->setValidator(new QDoubleValidator(this));
+    this->Internal->caching->setEnabled(false);
     }
 }
 
