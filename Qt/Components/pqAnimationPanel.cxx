@@ -39,11 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMVectorProperty.h"
 
-#include <QMetaType>
-#include <QPointer>
-#include <QtDebug>
 #include <QDoubleValidator>
 #include <QIntValidator>
+#include <QMetaType>
+#include <QPointer>
+#include <QScrollArea>
+#include <QtDebug>
 
 #include "pqAnimationCue.h"
 #include "pqAnimationManager.h"
@@ -89,7 +90,27 @@ Q_DECLARE_METATYPE(pqAnimationPanel::pqInternals::PropertyInfo);
 pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
 {
   this->Internal = new pqAnimationPanel::pqInternals();
-  this->Internal->setupUi(this);
+  QVBoxLayout* vboxlayout = new QVBoxLayout(this);
+  vboxlayout->setSpacing(0);
+  vboxlayout->setMargin(0);
+  vboxlayout->setObjectName("vboxLayout");
+
+  QWidget* container = new QWidget(this);
+  container->setObjectName("scrollWidget");
+  container->setSizePolicy(QSizePolicy::MinimumExpanding,
+    QSizePolicy::MinimumExpanding);
+
+  QScrollArea* s = new QScrollArea(this);
+  s->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  s->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  s->setWidgetResizable(true);
+  s->setObjectName("scrollArea");
+  s->setFrameShape(QFrame::NoFrame);
+  s->setWidget(container);
+  vboxlayout->addWidget(s);
+
+  this->Internal->setupUi(container);
+
 
   QObject::connect(&this->Internal->Links, SIGNAL(beginUndoSet(const QString&)),
     this, SIGNAL(beginUndoSet(const QString&)));
