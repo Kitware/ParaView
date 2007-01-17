@@ -65,6 +65,7 @@ extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkGenericFilteringCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkInfovisCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
@@ -86,6 +87,7 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkFilteringCS_Initialize(pm->GetInterpreter());
   vtkGenericFilteringCS_Initialize(pm->GetInterpreter());
   vtkImagingCS_Initialize(pm->GetInterpreter());
+  vtkInfovisCS_Initialize(pm->GetInterpreter());
   vtkGraphicsCS_Initialize(pm->GetInterpreter());
   vtkIOCS_Initialize(pm->GetInterpreter());
   vtkRenderingCS_Initialize(pm->GetInterpreter());
