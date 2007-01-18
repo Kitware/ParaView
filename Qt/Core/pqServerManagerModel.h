@@ -88,10 +88,14 @@ public:
   // Get the number of server connections available.
   unsigned int getNumberOfServers();
 
-  // Get the number of sources. Eventually, we may want this 
-  // to take a server argument and returns the number of sources
-  // on the server.
+
+  /// Get the number of sources. Eventually, we may want this 
+  /// to take a server argument and returns the number of sources
+  /// on the server.
   unsigned int getNumberOfSources();
+
+  /// Get the source at an index
+  pqPipelineSource* getPQSource(int index);
 
   /// Given the name for a Source, get the pqServer on which the
   //// source exists.
@@ -105,6 +109,7 @@ public:
   /// if one exists.
   pqPipelineSource* getPQSource(const QString &name) const;
 
+  
   /// Given a vtkSMProxy for a display get the pqConsumerDisplay
   /// object for it, if one exists.
   pqConsumerDisplay* getPQDisplay(vtkSMProxy*);

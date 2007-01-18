@@ -839,6 +839,23 @@ unsigned int pqServerManagerModel::getNumberOfSources()
 }
 
 //-----------------------------------------------------------------------------
+pqPipelineSource* pqServerManagerModel::getPQSource(int idx)
+{
+  pqServerManagerModelInternal::MapOfSources::iterator iter;
+  int i;
+  for(i=0, iter = this->Internal->Sources.begin();
+      iter != this->Internal->Sources.end();
+      ++iter, ++i)
+    {
+    if(i == idx)
+      {
+      return iter.value();
+      }
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
 void pqServerManagerModel::updateServerName()
 {
   // Get the server object from the sender.
