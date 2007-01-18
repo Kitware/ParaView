@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>567</width>
-    <height>313</height>
+    <width>496</width>
+    <height>389</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -19,8 +19,53 @@
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item row="0" column="1" >
-    <layout class="QVBoxLayout" >
+   <item row="1" column="0" >
+    <widget class="QStackedWidget" name="stackedWidget" >
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="page" >
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="1" >
+        <widget class="QTreeView" name="ObjectTreeProxy2" />
+       </item>
+       <item row="0" column="0" >
+        <widget class="QTreeView" name="ObjectTreeProxy1" />
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_2" >
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item row="1" column="0" >
+        <widget class="QListWidget" name="Property1List" />
+       </item>
+       <item row="0" column="0" >
+        <widget class="QTreeView" name="ObjectTreeProperty1" />
+       </item>
+       <item row="1" column="1" >
+        <widget class="QListWidget" name="Property2List" />
+       </item>
+       <item row="0" column="1" >
+        <widget class="QTreeView" name="ObjectTreeProperty2" />
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="0" column="0" >
+    <layout class="QHBoxLayout" >
      <property name="margin" >
       <number>0</number>
      </property>
@@ -28,66 +73,63 @@
       <number>6</number>
      </property>
      <item>
-      <widget class="QPushButton" name="addButton" >
+      <widget class="QLabel" name="label" >
        <property name="text" >
-        <string>Add...</string>
+        <string>Name:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="editButton" >
+      <widget class="QLineEdit" name="lineEdit" />
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2" >
        <property name="text" >
-        <string>Edit...</string>
+        <string>Mode:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="removeButton" >
-       <property name="text" >
-        <string>Remove...</string>
-       </property>
+      <widget class="QComboBox" name="comboBox" >
+       <item>
+        <property name="text" >
+         <string>Object Link</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Property Link</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>
       <spacer>
        <property name="orientation" >
-        <enum>Qt::Vertical</enum>
+        <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" >
         <size>
-         <width>20</width>
-         <height>40</height>
+         <width>40</width>
+         <height>20</height>
         </size>
        </property>
       </spacer>
      </item>
     </layout>
    </item>
-   <item row="1" column="0" colspan="2" >
+   <item row="2" column="0" >
     <widget class="QDialogButtonBox" name="buttonBox" >
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons" >
-      <set>QDialogButtonBox::Close</set>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" >
-    <widget class="QTableView" name="tableView" >
-     <property name="selectionBehavior" >
-      <enum>QAbstractItemView::SelectRows</enum>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>addButton</tabstop>
-  <tabstop>editButton</tabstop>
-  <tabstop>removeButton</tabstop>
-  <tabstop>buttonBox</tabstop>
- </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -97,8 +139,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>248</x>
-     <y>254</y>
+     <x>227</x>
+     <y>367</y>
     </hint>
     <hint type="destinationlabel" >
      <x>157</x>
@@ -113,12 +155,28 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>316</x>
-     <y>260</y>
+     <x>295</x>
+     <y>373</y>
     </hint>
     <hint type="destinationlabel" >
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>stackedWidget</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>304</x>
+     <y>22</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>481</x>
+     <y>45</y>
     </hint>
    </hints>
   </connection>

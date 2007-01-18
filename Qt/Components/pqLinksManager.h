@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqLinksEditor.h
+   Module:    pqLinksManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,58 +30,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqLinksEditor_h
-#define _pqLinksEditor_h
+#ifndef _pqLinksManager_h
+#define _pqLinksManager_h
 
 #include <QDialog>
 #include "pqComponentsExport.h"
-#include "ui_pqLinksEditor.h"
-#include "pqLinksModel.h"
+#include "ui_pqLinksManager.h"
 
-class pqLinksEditorProxyModel;
+class pqLinksModel;
 
-class PQCOMPONENTS_EXPORT pqLinksEditor :
-  public QDialog, private Ui::pqLinksEditor
+class PQCOMPONENTS_EXPORT pqLinksManager :
+  public QDialog, private Ui::pqLinksManager
 {
   Q_OBJECT
   typedef QDialog base;
 public:
+  pqLinksManager(QWidget* p=0);
+  ~pqLinksManager();
 
-  /// create a link editor to create/edit a link
-  /// initial values are retrieved from the provided vtkSMLink
-  pqLinksEditor(vtkSMLink* link, QWidget* p=0);
-  ~pqLinksEditor();
-
-  QString linkName();
-
-  pqLinksModel::ItemType linkMode();
-
-  pqProxy* selectedInputProxy();
-  pqProxy* selectedOutputProxy();
-  
-  QString selectedInputProperty();
-  QString selectedOutputProperty();
-
-  void accept();
+public slots:
+  /// add a link
+  void addLink();
+  /// edit the currently selected link
+  void editLink();
+  /// edit the currently selected link
+  void removeLink();
 
 private slots:
-  void currentInputProxyChanged(const QModelIndex& cur, const QModelIndex&);
-  void currentOutputProxyChanged(const QModelIndex& cur, const QModelIndex&);
-  
-  void currentInputPropertyChanged(const QString& item);
-  void currentOutputPropertyChanged(const QString& item);
+  void selectionChanged(const QModelIndex& idx);
 
 private:
-
-  void updatePropertyList(QListWidget* tw, pqProxy* proxy);
-
-  pqLinksEditorProxyModel* InputProxyModel;
-  pqLinksEditorProxyModel* OutputProxyModel;
-  
-  pqProxy* SelectedInputProxy;
-  pqProxy* SelectedOutputProxy;
-  QString SelectedInputProperty;
-  QString SelectedOutputProperty;
+  pqLinksModel* Model;
 
 };
 

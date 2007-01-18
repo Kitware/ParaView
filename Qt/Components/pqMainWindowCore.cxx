@@ -79,7 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqToolTipTrapper.h"
 #include "pqVCRController.h"
 #include "pqWriterFactory.h"
-#include "pqLinksEditor.h"
+#include "pqLinksManager.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -2552,7 +2552,7 @@ void pqMainWindowCore::setCenterAxesVisibility(bool visible)
 
 void pqMainWindowCore::onToolsManageLinks()
 {
-  pqLinksEditor editor;
+  pqLinksManager editor;
   editor.exec();
 }
 

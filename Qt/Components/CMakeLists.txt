@@ -78,6 +78,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLineSourceWidget.h
   pqLineWidget.h
   pqLinksEditor.h
+  pqLinksManager.h
   pqLoadedFormObjectPanel.h
   pqMainWindowCore.h
   pqMultiView.h
@@ -154,11 +155,10 @@ SET(UI_FORMS
   Resources/UI/pqLineWidget.ui
   Resources/UI/pqLineSourceControls.ui
   Resources/UI/pqLinksEditor.ui
+  Resources/UI/pqLinksManager.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqPointSourceControls.ui
-  Resources/UI/pqPropertyLink.ui
   Resources/UI/pqProxyInformationWidget.ui
-  Resources/UI/pqProxyLink.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui
   Resources/UI/pqSelectReaderDialog.ui
@@ -282,6 +282,8 @@ ADD_LIBRARY(pqComponents
   pqLineWidget.h
   pqLinksEditor.cxx
   pqLinksEditor.h
+  pqLinksManager.cxx
+  pqLinksManager.h
   pqLoadedFormObjectPanel.cxx
   pqLoadedFormObjectPanel.h
   pqMainWindowCore.cxx

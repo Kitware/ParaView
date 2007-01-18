@@ -65,6 +65,103 @@ pqLinksModel::~pqLinksModel()
 {
 }
 
+static vtkSMProxy* getProxyFromLink(vtkSMProxyLink* link, int desiredDir)
+{
+  int numLinks = link->GetNumberOfLinkedProxies();
+  for(int i=0; i<numLinks; i++)
+    {
+    vtkSMProxy* proxy = link->GetLinkedProxy(i);
+    int dir = link->GetLinkedProxyDirection(proxy);
+    if(dir == desiredDir)
+      {
+      return proxy;
+      }
+    }
+  return NULL;
+}
+
+static vtkSMProxy* getProxyFromLink(vtkSMPropertyLink* link, int desiredDir)
+{
+  int numLinks = link->GetNumberOfLinkedProperties();
+  for(int i=0; i<numLinks; i++)
+    {
+    vtkSMProxy* proxy = link->GetLinkedProxy(i);
+    int dir = link->GetLinkedPropertyDirection(i);
+    if(dir == desiredDir)
+      {
+      return proxy;
+      }
+    }
+  return NULL;
+}
+  
+QString pqLinksModel::getPropertyFromIndex(const QModelIndex& idx,
+                                           int desiredDir) const
+{
+  QString name = this->getLinkName(idx);
+  vtkSMLink* link = this->getLink(name);
+  vtkSMPropertyLink* propertyLink = vtkSMPropertyLink::SafeDownCast(link);
+
+  if(propertyLink)
+    {
+    int numLinks = propertyLink->GetNumberOfLinkedProperties();
+    for(int i=0; i<numLinks; i++)
+      {
+      int dir = propertyLink->GetLinkedPropertyDirection(i);
+      if(dir == desiredDir)
+        {
+        return propertyLink->GetLinkedPropertyName(i);
+        }
+      }
+    }
+  return QString();
+}
+
+pqProxy* pqLinksModel::getProxyFromIndex(const QModelIndex& idx, int dir) const
+{
+  QString name = this->getLinkName(idx);
+  vtkSMLink* link = this->getLink(name);
+  vtkSMPropertyLink* propertyLink = vtkSMPropertyLink::SafeDownCast(link);
+  vtkSMProxyLink* proxyLink = vtkSMProxyLink::SafeDownCast(link);
+    
+  vtkSMProxy* masterProxy = NULL;
+
+  if(proxyLink)
+    {
+    masterProxy = getProxyFromLink(proxyLink, dir);
+    }
+  else if(propertyLink)
+    {
+    masterProxy = getProxyFromLink(propertyLink, dir);
+    }
+  
+  pqServerManagerModel* smModel =
+    pqApplicationCore::instance()->getServerManagerModel();
+
+  return smModel->getPQProxy(masterProxy);
+}
+
+pqProxy* pqLinksModel::getInputProxy(const QModelIndex& idx) const
+{
+  return this->getProxyFromIndex(idx, vtkSMLink::INPUT);
+}
+
+pqProxy* pqLinksModel::getOutputProxy(const QModelIndex& idx) const
+{
+  return this->getProxyFromIndex(idx, vtkSMLink::OUTPUT);
+}
+  
+QString pqLinksModel::getInputProperty(const QModelIndex& idx) const
+{
+  return this->getPropertyFromIndex(idx, vtkSMLink::INPUT);
+}
+
+QString pqLinksModel::getOutputProperty(const QModelIndex& idx) const
+{
+  return this->getPropertyFromIndex(idx, vtkSMLink::OUTPUT);
+}
+
+
 // implementation to satisfy api
 int pqLinksModel::rowCount(const QModelIndex&) const
 {
@@ -83,88 +180,39 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
     {
     QString name = this->getLinkName(idx);
     vtkSMLink* link = this->getLink(name);
-    vtkSMPropertyLink* propertyLink = vtkSMPropertyLink::SafeDownCast(link);
-    vtkSMProxyLink* proxyLink = vtkSMProxyLink::SafeDownCast(link);
-    
-    vtkSMProxy* masterProxy = NULL;
-    vtkSMProxy* slaveProxy = NULL;
-    QString masterProperty;
-    QString slaveProperty;
+    ItemType type = this->getLinkType(link);
     
     if(idx.column() == 0)
       {
       return name == QString::null ? "Unknown" : name;
       }
-    else
+    else if(idx.column() == 1)
       {
-      if(proxyLink)
-        {
-        int numLinks = proxyLink->GetNumberOfLinkedProxies();
-        for(int i=0; i<numLinks; i++)
-          {
-          vtkSMProxy* proxy = proxyLink->GetLinkedProxy(i);
-          int dir = proxyLink->GetLinkedProxyDirection(proxy);
-          if(!masterProxy && dir == vtkSMLink::INPUT)
-            {
-            masterProxy = proxy;
-            }
-          else if(!slaveProxy && dir == vtkSMLink::OUTPUT)
-            {
-            slaveProxy = proxy;
-            }
-          }
-        }
-      else if(propertyLink)
-        {
-        int numLinks = propertyLink->GetNumberOfLinkedProperties();
-        for(int i=0; i<numLinks; i++)
-          {
-          vtkSMProxy* proxy = propertyLink->GetLinkedProxy(i);
-          const char* prop = propertyLink->GetLinkedPropertyName(i);
-          int dir = propertyLink->GetLinkedPropertyDirection(i);
-          if(!masterProxy && dir == vtkSMLink::INPUT)
-            {
-            masterProxy = proxy;
-            masterProperty = prop;
-            }
-          else if(!slaveProxy && dir == vtkSMLink::OUTPUT)
-            {
-            slaveProxy = proxy;
-            slaveProperty = prop;
-            }
-          }
-        }
-      }
-    
-    pqServerManagerModel* smModel =
-      pqApplicationCore::instance()->getServerManagerModel();
-    
-    pqProxy* masterpqProxy = smModel->getPQProxy(masterProxy);
-    pqProxy* slavepqProxy = smModel->getPQProxy(slaveProxy);
-    
-    if(idx.column() == 1)
-      {
-      return masterpqProxy ? masterpqProxy->getProxyName() : "Unknown";
+      pqProxy* pxy = this->getInputProxy(idx);
+      return pxy ? pxy->getProxyName() : "Unknown";
       }
     else if(idx.column() == 2)
       {
-      if(proxyLink)
+      if(type == pqLinksModel::Proxy)
         {
         return "All";
         }
-      return masterProperty != QString::null ? masterProperty : "Unknown"; 
+      QString prop = this->getInputProperty(idx);
+      return prop.isEmpty() ? "Unknown" : prop; 
       }
     else if(idx.column() == 3)
       {
-      return slavepqProxy ? slavepqProxy->getProxyName() : "Unknown";
+      pqProxy* pxy = this->getOutputProxy(idx);
+      return pxy ? pxy->getProxyName() : "Unknown";
       }
     else if(idx.column() == 4)
       {
-      if(proxyLink)
+      if(type == pqLinksModel::Proxy)
         {
         return "All";
         }
-      return slaveProperty != QString::null ? slaveProperty : "Unknown"; 
+      QString prop = this->getOutputProperty(idx);
+      return prop.isEmpty() ? "Unknown" : prop; 
       }
     }
   return QVariant();
@@ -197,11 +245,30 @@ QString pqLinksModel::getLinkName(const QModelIndex& idx) const
   return linkName;
 }
 
+QModelIndex pqLinksModel::findLink(vtkSMLink* link) const
+{
+  int numRows = this->rowCount();
+  for(int i=0; i<numRows; i++)
+    {
+    QModelIndex idx = this->index(i, 0, QModelIndex());
+    if(this->getLink(idx) == link)
+      {
+      return idx;
+      }
+    }
+  return QModelIndex();
+}
+
 vtkSMLink* pqLinksModel::getLink(const QString& name) const
 {
   vtkSMProxyManager* pxm = vtkSMProxy::GetProxyManager();
   vtkSMLink* link = pxm->GetRegisteredLink(name.toAscii().data());
   return link;
+}
+
+vtkSMLink* pqLinksModel::getLink(const QModelIndex& idx) const
+{
+  return this->getLink(this->getLinkName(idx));
 }
 
 pqLinksModel::ItemType pqLinksModel::getLinkType(vtkSMLink* link) const
@@ -219,8 +286,7 @@ pqLinksModel::ItemType pqLinksModel::getLinkType(vtkSMLink* link) const
 
 pqLinksModel::ItemType pqLinksModel::getLinkType(const QModelIndex& idx) const
 {
-  QString name = this->getLinkName(idx);
-  vtkSMLink* link = this->getLink(name);
+  vtkSMLink* link = this->getLink(idx);
   return this->getLinkType(link);
 }
 

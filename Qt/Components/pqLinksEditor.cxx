@@ -34,14 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksEditor.h"
 
 // Qt
-#include <QLineEdit>
-#include <QComboBox>
+#include <QMessageBox>
 
 // SM
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMOrderedPropertyIterator.h"
 
 // pqCore
 #include "pqServerManagerModel.h"
@@ -52,9 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // pqComponents
 #include "pqLinksModel.h"
 #include "ui_pqLinksEditor.h"
-#include "ui_pqProxyLink.h"
-#include "ui_pqPropertyLink.h"
-
 
 
 class pqLinksEditorProxyModel : public QAbstractItemModel
@@ -145,6 +142,33 @@ public:
     return QVariant();
     }
 
+  QModelIndex findProxy(pqProxy* pxy)
+    {
+    QModelIndex parentIdx;
+    if(qobject_cast<pqRenderViewModule*>(pxy))
+      {
+      parentIdx = this->index(0, 0, QModelIndex());
+      }
+    else if(qobject_cast<pqPipelineSource*>(pxy))
+      {
+      parentIdx = this->index(1, 0, QModelIndex());
+      }
+    
+    if(parentIdx.isValid())
+      {
+      int numRows = this->rowCount(parentIdx);
+      for(int i=0; i<numRows; i++)
+        {
+        QModelIndex idx = this->index(i, 0, parentIdx);
+        if(this->getProxy(idx) == pxy)
+          {
+          return idx;
+          }
+        }
+      }
+
+    return QModelIndex();
+    }
 
   pqProxy* getProxy(const QModelIndex& idx) const
     {
@@ -172,91 +196,211 @@ public:
     }
 };
 
-pqLinksEditor::pqLinksEditor(QWidget* p)
+pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
   : QDialog(p)
 {
   this->setupUi(this);
-  this->Model = new pqLinksModel(this);
-  this->tableView->setModel(this->Model);
-  QObject::connect(this->tableView, SIGNAL(clicked(const QModelIndex&)),
-                   this, SLOT(selectionChanged(const QModelIndex&)));
-  QObject::connect(this->addButton, SIGNAL(clicked(bool)),
-                   this, SLOT(addLink()));
-  QObject::connect(this->editButton, SIGNAL(clicked(bool)),
-                   this, SLOT(editLink()));
-  QObject::connect(this->removeButton, SIGNAL(clicked(bool)),
-                   this, SLOT(removeLink()));
-  this->editButton->setEnabled(false);
-  this->removeButton->setEnabled(false);
+
+  this->SelectedInputProxy = NULL;
+  this->SelectedOutputProxy = NULL;
+  
+  this->InputProxyModel = new pqLinksEditorProxyModel(this);
+  this->OutputProxyModel = new pqLinksEditorProxyModel(this);
+  this->ObjectTreeProxy1->setModel(this->InputProxyModel);
+  this->ObjectTreeProxy2->setModel(this->OutputProxyModel);
+  this->ObjectTreeProperty1->setModel(this->InputProxyModel);
+  this->ObjectTreeProperty2->setModel(this->OutputProxyModel);
+
+  QObject::connect(this->ObjectTreeProxy1->selectionModel(),
+     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+     this,
+     SLOT(currentInputProxyChanged(const QModelIndex&, const QModelIndex&)));
+  
+  QObject::connect(this->ObjectTreeProperty1->selectionModel(),
+     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+     this,
+     SLOT(currentInputProxyChanged(const QModelIndex&, const QModelIndex&)));
+
+  QObject::connect(this->ObjectTreeProxy2->selectionModel(),
+     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+     this,
+     SLOT(currentOutputProxyChanged(const QModelIndex&, const QModelIndex&)));
+  
+  QObject::connect(this->ObjectTreeProperty2->selectionModel(),
+     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+     this,
+     SLOT(currentOutputProxyChanged(const QModelIndex&, const QModelIndex&)));
+  
+  QObject::connect(this->Property1List,
+     SIGNAL(currentTextChanged(const QString&)),
+     this,
+     SLOT(currentInputPropertyChanged(const QString&)));
+  
+  QObject::connect(this->Property2List,
+     SIGNAL(currentTextChanged(const QString&)),
+     this,
+     SLOT(currentOutputPropertyChanged(const QString&)));
+
+  if(link)
+    {
+    pqLinksModel model;
+    QModelIndex idx = model.findLink(link);
+    QItemSelectionModel::SelectionFlags selFlags =
+      QItemSelectionModel::ClearAndSelect;
+    
+    // set the input/output proxies
+    if(idx.isValid())
+      {
+      this->lineEdit->setText(model.getLinkName(idx));
+
+      if(model.getLinkType(idx) == pqLinksModel::Property)
+        {
+        this->comboBox->setCurrentIndex(1);
+        }
+      else
+        {
+        this->comboBox->setCurrentIndex(0);
+        }
+      
+      pqProxy* inputProxy = model.getInputProxy(idx);
+      QModelIndex viewIdx = this->InputProxyModel->findProxy(inputProxy);
+      if(viewIdx.isValid())
+        {
+        this->ObjectTreeProxy1->selectionModel()->
+          setCurrentIndex(viewIdx, selFlags);
+        this->ObjectTreeProperty1->selectionModel()->
+          setCurrentIndex(viewIdx, selFlags);
+        }
+      
+      pqProxy* outputProxy = model.getOutputProxy(idx);
+      viewIdx = this->OutputProxyModel->findProxy(outputProxy);
+      if(viewIdx.isValid())
+        {
+        this->ObjectTreeProxy2->selectionModel()->
+          setCurrentIndex(viewIdx, selFlags);
+        this->ObjectTreeProperty2->selectionModel()->
+          setCurrentIndex(viewIdx, selFlags);
+        }
+
+      }
+    }
+
 }
 
 pqLinksEditor::~pqLinksEditor()
 {
 }
 
-void pqLinksEditor::addLink()
+void pqLinksEditor::accept()
 {
-  QDialog dialog;
-  QVBoxLayout* dlayout = new QVBoxLayout(&dialog);
-  QHBoxLayout* hlayout = new QHBoxLayout;
-  QLineEdit* nameEdit = new QLineEdit(&dialog);
-  hlayout->addWidget(nameEdit);
-  QComboBox* mode = new QComboBox(&dialog);
-  hlayout->addWidget(mode);
-  dlayout->addLayout(hlayout);
-  QWidget* cont = new QWidget(&dialog);
-  dlayout->addWidget(cont);
-  QDialogButtonBox* dbuttons = new QDialogButtonBox(QDialogButtonBox::Ok |
-                                                    QDialogButtonBox::Cancel,
-                                                    Qt::Horizontal,
-                                                    &dialog);
-  dlayout->addWidget(dbuttons);
-
-  Ui::pqProxyLink proxyui;
-  proxyui.setupUi(cont);
-  pqLinksEditorProxyModel* m1 = new pqLinksEditorProxyModel(&dialog);
-  pqLinksEditorProxyModel* m2 = new pqLinksEditorProxyModel(&dialog);
-  proxyui.Proxy1Tree->setModel(m1);
-  proxyui.Proxy2Tree->setModel(m2);
-  QObject::connect(dbuttons, SIGNAL(accepted()), &dialog, SLOT(accept()));
-  QObject::connect(dbuttons, SIGNAL(rejected()), &dialog, SLOT(reject()));
-
-  if(dialog.exec() == QDialog::Accepted)
+  // validate complete information before accepting
+  if(this->linkName().isEmpty())
     {
-    QModelIndex idx1 = proxyui.Proxy1Tree->selectionModel()->currentIndex();
-    QModelIndex idx2 = proxyui.Proxy2Tree->selectionModel()->currentIndex();
-    pqProxy* p1 = m1->getProxy(idx1);
-    pqProxy* p2 = m2->getProxy(idx2);
-
-    this->Model->addProxyLink("camLink", p1, p2);
+    QMessageBox::information(this, "Missing information", 
+      "The link name is missing");
+    return;
     }
-}
-
-void pqLinksEditor::editLink()
-{
-}
-
-void pqLinksEditor::removeLink()
-{
-  QModelIndex idx = this->tableView->selectionModel()->currentIndex();
-  if(idx.isValid())
+  if(this->linkMode() == pqLinksModel::Proxy)
     {
-    this->Model->removeLink(idx);
-    }
-}
-
-void pqLinksEditor::selectionChanged(const QModelIndex& idx)
-{
-  if(!idx.isValid())
-    {
-    this->editButton->setEnabled(false);
-    this->removeButton->setEnabled(false);
+    if(!this->selectedInputProxy() || !this->selectedOutputProxy())
+      {
+      QMessageBox::information(this, "Missing information", 
+        "The object selections are incompelete");
+      return;
+      }
     }
   else
     {
-    this->editButton->setEnabled(true);
-    this->removeButton->setEnabled(true);
+    if(!this->selectedInputProxy() || !this->selectedOutputProxy() ||
+       this->selectedInputProperty().isEmpty() ||
+       this->selectedOutputProperty().isEmpty())
+      {
+      QMessageBox::information(this, "Missing information", 
+        "The object/property selections are incompelete");
+      return;
+      }
+    }
+
+  // allow the dialog to close
+  QDialog::accept();
+}
+
+QString pqLinksEditor::linkName()
+{
+  return this->lineEdit->text();
+}
+
+pqLinksModel::ItemType pqLinksEditor::linkMode()
+{
+  return this->comboBox->currentIndex() == 0 ? 
+    pqLinksModel::Proxy : pqLinksModel::Property ;
+}
+
+pqProxy* pqLinksEditor::selectedInputProxy()
+{
+  return this->SelectedInputProxy;
+}
+
+pqProxy* pqLinksEditor::selectedOutputProxy()
+{
+  return this->SelectedOutputProxy;
+}
+
+
+QString pqLinksEditor::selectedInputProperty()
+{
+  return this->SelectedInputProperty;
+}
+
+QString pqLinksEditor::selectedOutputProperty()
+{
+  return this->SelectedOutputProperty;
+}
+
+
+void pqLinksEditor::currentInputProxyChanged(const QModelIndex& cur,
+                                         const QModelIndex&)
+{
+  this->SelectedInputProxy = this->InputProxyModel->getProxy(cur);
+  if(this->linkMode() == pqLinksModel::Property)
+    {
+    this->updatePropertyList(this->Property1List, this->SelectedInputProxy);
     }
 }
 
+void pqLinksEditor::currentOutputProxyChanged(const QModelIndex& cur,
+                                         const QModelIndex&)
+{
+  this->SelectedOutputProxy = this->OutputProxyModel->getProxy(cur);
+  if(this->linkMode() == pqLinksModel::Property)
+    {
+    this->updatePropertyList(this->Property2List, this->SelectedOutputProxy);
+    }
+}
+
+void pqLinksEditor::updatePropertyList(QListWidget* tw, pqProxy* proxy)
+{
+  tw->clear();
+  if(!proxy)
+    {
+    return;
+    }
+  vtkSMOrderedPropertyIterator *iter = vtkSMOrderedPropertyIterator::New();
+  iter->SetProxy(proxy->getProxy());
+  for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    tw->addItem(iter->GetKey());
+    }
+  iter->Delete();
+}
+
+void pqLinksEditor::currentInputPropertyChanged(const QString& item)
+{
+  this->SelectedInputProperty = item;
+}
+
+void pqLinksEditor::currentOutputPropertyChanged(const QString& item)
+{
+  this->SelectedOutputProperty = item;
+}
 

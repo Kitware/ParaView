@@ -70,6 +70,16 @@ public:
 
   // subclass specific implementation
   ItemType getLinkType(const QModelIndex& idx) const;
+  vtkSMLink* getLink(const QModelIndex& idx) const;
+  QModelIndex findLink(vtkSMLink* link) const;
+
+  pqProxy* getInputProxy(const QModelIndex& idx) const;
+  pqProxy* getOutputProxy(const QModelIndex& idx) const;
+  
+  QString getInputProperty(const QModelIndex& idx) const;
+  QString getOutputProperty(const QModelIndex& idx) const;
+  
+  QString getLinkName(const QModelIndex& idx) const;
 
   void addProxyLink(const QString& name, 
                     pqProxy* inputProxy, pqProxy* outputProxy);
@@ -81,9 +91,10 @@ public:
   void removeLink(const QModelIndex& idx);
 
 private:
-  QString getLinkName(const QModelIndex& idx) const;
   vtkSMLink* getLink(const QString& name) const;
   ItemType getLinkType(vtkSMLink* link) const;
+  pqProxy* getProxyFromIndex(const QModelIndex& idx, int dir) const;
+  QString getPropertyFromIndex(const QModelIndex& idx, int dir) const;
 };
 
 #endif
