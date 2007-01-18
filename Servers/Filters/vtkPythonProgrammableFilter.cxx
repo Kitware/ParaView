@@ -27,7 +27,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.3");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.4");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -176,14 +176,13 @@ void vtkPythonProgrammableFilter::Exec()
     this->Interpretor->InitializeSubInterpretor(1, (char**)&argv0);
 
     char addrofthis[1024];
-    sprintf(addrofthis, "'%X'", (unsigned int)this);
-    
+    char *aplus = addrofthis+2; //skip over "0x"
     vtkstd::string initscript;
     initscript  = "";
     initscript += "import paraview;\n";
-    initscript += "self = paraview.vtkProgrammableFilter(";
-    initscript += addrofthis;
-    initscript +=  ");\n";
+    initscript += "self = paraview.vtkProgrammableFilter('";
+    initscript += aplus;
+    initscript +=  "');\n";
     this->Interpretor->MakeCurrent();
     this->Interpretor->RunSimpleString(initscript.c_str());
     }
