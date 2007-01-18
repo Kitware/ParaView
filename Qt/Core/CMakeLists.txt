@@ -81,6 +81,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTableViewModule.h
   pqTextWidgetDisplay.h
   pqUndoStack.h
+  pqWriterFactory.h
   ${PYTHON_MOC_SRCS}
   )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")

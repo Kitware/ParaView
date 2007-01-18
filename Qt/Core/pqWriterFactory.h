@@ -46,6 +46,7 @@ class pqPipelineSource;
 // to a given file.
 class  PQCORE_EXPORT pqWriterFactory : public QObject
 {
+  Q_OBJECT
 public:
   pqWriterFactory(QObject* parent=NULL);
   virtual ~pqWriterFactory();
