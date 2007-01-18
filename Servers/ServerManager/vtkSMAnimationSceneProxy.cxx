@@ -52,7 +52,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.30");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.30.6.1");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -214,30 +214,27 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot,
     vtkErrorMacro("Incosistent state. Save aborted.");
     return 1;
     }
-  this->InSaveAnimation = 1;
-  this->SetAnimationTime(0);
+
 
   this->RenderModuleProxy->UpdatePropertyInformation();
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->RenderModuleProxy->GetProperty("RenderWindowSizeInfo"));
-  int *size = ivp->GetElements();
+  const int *current_size = ivp->GetElements();
 
   this->Magnification = 1;
   // determine magnification.
-  if (size[0] < width || size[1] < height)
+  if (current_size[0] < width || current_size[1] < height)
     {
-    int xMag = width / size[0] + 1;
-    int yMag = height / size[1] + 1;
+    int xMag = width / current_size[0] + 1;
+    int yMag = height / current_size[1] + 1;
     this->Magnification = (xMag > yMag) ? xMag : yMag;
     width /= this->Magnification;
     height /= this->Magnification;
     }
+  this->RenderModuleProxy->GetRenderWindow()->SetSize(width, height);
 
-  vtkSMIntVectorProperty* ivpSize = vtkSMIntVectorProperty::SafeDownCast(
-    this->RenderModuleProxy->GetProperty("RenderWindowSize"));
-  ivpSize->SetElement(0, width);
-  ivpSize->SetElement(1, height);
-  this->RenderModuleProxy->UpdateVTKObjects();
+  this->InSaveAnimation = 1;
+  this->SetAnimationTime(0);
 
   if (strcmp(ext,"jpg") == 0)
     {
@@ -354,6 +351,8 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot,
     this->MovieWriter = NULL;
     }
   this->InSaveAnimation = 0;
+  this->RenderModuleProxy->GetRenderWindow()->SetSize(
+    current_size[0], current_size[1]);
   return this->SaveFailed;
 }
 

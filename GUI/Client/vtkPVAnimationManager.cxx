@@ -67,7 +67,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.69");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.69.2.1");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1249,7 +1249,6 @@ void vtkPVAnimationManager::SaveAnimation()
     dlg->Delete();
 
     this->AnimationScene->SaveImages(fileRoot.c_str(), ext, width, height, framerate, quality);
-    view->SetRenderWindowSize(origWidth, origHeight);
     }
 
   saveDialog->Delete();
