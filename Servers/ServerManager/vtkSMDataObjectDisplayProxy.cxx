@@ -38,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.26");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.26.2.1");
 
 
 //-----------------------------------------------------------------------------
@@ -745,11 +745,14 @@ void vtkSMDataObjectDisplayProxy::SetupVolumePipeline()
       return;
       }
     pp->RemoveAllProxies();
-    if (this->SupportsHAVSMapper)
-      {
-      pp->AddProxy(this->VolumeHAVSMapperProxy);
-      }
-    else
+    // Due to problems with the HAVS mapper and the current state of graphics
+    // hardware/drivers, we are no longer making the HAVS mapper the default in
+    // any circumstance.
+//     if (this->SupportsHAVSMapper)
+//       {
+//       pp->AddProxy(this->VolumeHAVSMapperProxy);
+//       }
+//     else
       {
       pp->AddProxy(this->VolumePTMapperProxy);
       }

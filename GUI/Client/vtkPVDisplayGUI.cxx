@@ -105,7 +105,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.75");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.75.2.1");
 
 //----------------------------------------------------------------------------
 
@@ -130,10 +130,18 @@ public:
         }
       if ( this->DisplayGUI->GetPVRenderView()->GetRenderWindow()->GetDesiredUpdateRate() >= 1 )
         {
-        if ( this->DisplayGUI->VolumeRenderMethodMenu->GetMenu()->HasItem(
-               VTK_PV_VOLUME_HAVS_METHOD_LABEL) &&
-             strncmp(this->DisplayGUI->VolumeScalarSelectionWidget->GetValue(),
-                     "Cell", 4) != 0 )
+        // The default rendering method has changed back to PT due to problems
+        // we are having with HAVS and the current generation of graphics
+        // hardware.  Thus, this logic has changed a bit.  If we change back,
+        // renable this logic.
+//         if (   this->DisplayGUI->VolumeRenderMethodMenu->GetMenu()
+//                                       ->HasItem(VTK_PV_VOLUME_HAVS_METHOD_LABEL)
+//             && (strncmp(this->DisplayGUI->VolumeScalarSelectionWidget
+//                         ->GetValue(), "Cell", 4) != 0)
+//             && (strcmp(this->DisplayGUI->VolumeRenderMethodMenu->GetValue(),
+//                        VTK_PV_VOLUME_PT_METHOD_LABEL) != 0) )
+        if ( !strcmp( this->DisplayGUI->VolumeRenderMethodMenu->GetValue(),
+                      VTK_PV_VOLUME_HAVS_METHOD_LABEL ) )
           {
           this->DisplayGUI->DrawVolumeHAVSInternal();
           }
