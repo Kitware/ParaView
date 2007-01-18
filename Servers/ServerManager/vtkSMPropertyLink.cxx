@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.9");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.10");
 //-----------------------------------------------------------------------------
 class vtkSMPropertyLinkObserver : public vtkCommand
 {
@@ -247,10 +247,12 @@ vtkSMProperty* vtkSMPropertyLink::GetLinkedProperty(int index)
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
-  for(int i=1;
+  for(int i=0;
       i<index && iter != this->Internals->LinkedProperties.end();
       i++)
-    { /* empty */ }
+    { 
+    iter++;
+    }
   if(iter == this->Internals->LinkedProperties.end())
     {
     return NULL;
@@ -259,33 +261,57 @@ vtkSMProperty* vtkSMPropertyLink::GetLinkedProperty(int index)
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* vtkSMPropertyLink::GetLinkedProxy(vtkSMProperty* property)
+const char* vtkSMPropertyLink::GetLinkedPropertyName(int index)
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
-  for(; iter != this->Internals->LinkedProperties.end(); iter++)
-    {
-    if(iter->Property == property)
-      {
-      return iter->Proxy;
-      }
+  for(int i=0;
+      i<index && iter != this->Internals->LinkedProperties.end();
+      i++)
+    { 
+    iter++;
     }
-  return NULL;
+  if(iter == this->Internals->LinkedProperties.end())
+    {
+    return NULL;
+    }
+  return iter->PropertyName;
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMPropertyLink::GetLinkedPropertyDirection(vtkSMProperty* property)
+vtkSMProxy* vtkSMPropertyLink::GetLinkedProxy(int index)
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
-  for(; iter != this->Internals->LinkedProperties.end(); iter++)
-    {
-    if(iter->Property == property)
-      {
-      return iter->UpdateDirection;
-      }
+  for(int i=0;
+      i<index && iter != this->Internals->LinkedProperties.end();
+      i++)
+    { 
+    iter++;
     }
-  return NONE;
+  if(iter == this->Internals->LinkedProperties.end())
+    {
+    return NULL;
+    }
+  return iter->Proxy;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMPropertyLink::GetLinkedPropertyDirection(int index)
+{
+  vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
+    this->Internals->LinkedProperties.begin();
+  for(int i=0;
+      i<index && iter != this->Internals->LinkedProperties.end();
+      i++)
+    { 
+    iter++;
+    }
+  if(iter == this->Internals->LinkedProperties.end())
+    {
+    return NONE;
+    }
+  return iter->UpdateDirection;
 }
 
 //-----------------------------------------------------------------------------

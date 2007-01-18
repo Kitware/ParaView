@@ -88,7 +88,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.56");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.57");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -881,7 +881,7 @@ const char* vtkSMProxyManager::GetLinkName(int idx)
     }
   vtkSMProxyManagerInternals::LinkType::iterator it =
     this->Internals->RegisteredLinkMap.begin();
-  for(int i=1; i<idx; i++)
+  for(int i=0; i<idx; i++)
     {
     it++;
     }

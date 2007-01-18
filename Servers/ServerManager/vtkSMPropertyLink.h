@@ -66,12 +66,16 @@ public:
 
   // Description:
   // Get a proxy involved in this link.
-  vtkSMProxy* GetLinkedProxy(vtkSMProperty* property);
+  vtkSMProxy* GetLinkedProxy(int index);
+  
+  // Description:
+  // Get a property involved in this link.
+  const char* GetLinkedPropertyName(int index);
   
   // Description:
   // Get the direction of a property involved in this link
   // (see vtkSMLink::UpdateDirections)
-  int GetLinkedPropertyDirection(vtkSMProperty* property);
+  int GetLinkedPropertyDirection(int index);
   
 
 protected:

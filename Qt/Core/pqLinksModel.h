@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractItemModel>
 
 class vtkSMLink;
+class pqProxy;
 
 class PQCORE_EXPORT pqLinksModel : public QAbstractTableModel
 {
@@ -69,6 +70,15 @@ public:
 
   // subclass specific implementation
   ItemType getLinkType(const QModelIndex& idx) const;
+
+  void addProxyLink(const QString& name, 
+                    pqProxy* inputProxy, pqProxy* outputProxy);
+
+  void addPropertyLink(const QString& name,
+                       pqProxy* inputProxy, const QString& inputProp,
+                       pqProxy* outputProxy, const QString& outputProp);
+
+  void removeLink(const QModelIndex& idx);
 
 private:
   QString getLinkName(const QModelIndex& idx) const;

@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // pqCore includes
 #include "pqServerManagerModel.h"
+#include "pqRenderViewModule.h"
 #include "pqApplicationCore.h"
 #include "pqProxy.h"
 
@@ -87,8 +88,8 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
     
     vtkSMProxy* masterProxy = NULL;
     vtkSMProxy* slaveProxy = NULL;
-    vtkSMProperty* masterProperty = NULL;
-    vtkSMProperty* slaveProperty = NULL;
+    QString masterProperty;
+    QString slaveProperty;
     
     if(idx.column() == 0)
       {
@@ -99,17 +100,15 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
       if(proxyLink)
         {
         int numLinks = proxyLink->GetNumberOfLinkedProxies();
-        for(int i=0; 
-            i<numLinks && masterProxy == NULL && slaveProxy == NULL; 
-            i++)
+        for(int i=0; i<numLinks; i++)
           {
           vtkSMProxy* proxy = proxyLink->GetLinkedProxy(i);
           int dir = proxyLink->GetLinkedProxyDirection(proxy);
-          if(dir == vtkSMLink::INPUT)
+          if(!masterProxy && dir == vtkSMLink::INPUT)
             {
             masterProxy = proxy;
             }
-          else if(dir == vtkSMLink::OUTPUT)
+          else if(!slaveProxy && dir == vtkSMLink::OUTPUT)
             {
             slaveProxy = proxy;
             }
@@ -118,19 +117,17 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
       else if(propertyLink)
         {
         int numLinks = propertyLink->GetNumberOfLinkedProperties();
-        for(int i=0; 
-            i<numLinks && masterProxy == NULL && slaveProxy == NULL; 
-            i++)
+        for(int i=0; i<numLinks; i++)
           {
-          vtkSMProperty* prop = propertyLink->GetLinkedProperty(i);
-          vtkSMProxy* proxy = propertyLink->GetLinkedProxy(prop);
-          int dir = propertyLink->GetLinkedPropertyDirection(prop);
-          if(dir == vtkSMLink::INPUT)
+          vtkSMProxy* proxy = propertyLink->GetLinkedProxy(i);
+          const char* prop = propertyLink->GetLinkedPropertyName(i);
+          int dir = propertyLink->GetLinkedPropertyDirection(i);
+          if(!masterProxy && dir == vtkSMLink::INPUT)
             {
             masterProxy = proxy;
             masterProperty = prop;
             }
-          else if(dir == vtkSMLink::OUTPUT)
+          else if(!slaveProxy && dir == vtkSMLink::OUTPUT)
             {
             slaveProxy = proxy;
             slaveProperty = prop;
@@ -155,7 +152,7 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
         {
         return "All";
         }
-      return masterProperty ? masterProperty->GetXMLLabel() : "Unknown"; 
+      return masterProperty != QString::null ? masterProperty : "Unknown"; 
       }
     else if(idx.column() == 3)
       {
@@ -167,7 +164,7 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
         {
         return "All";
         }
-      return slaveProperty ? slaveProperty->GetXMLLabel() : "Unknown"; 
+      return slaveProperty != QString::null ? slaveProperty : "Unknown"; 
       }
     }
   return QVariant();
@@ -227,4 +224,76 @@ pqLinksModel::ItemType pqLinksModel::getLinkType(const QModelIndex& idx) const
   return this->getLinkType(link);
 }
 
+
+void pqLinksModel::addProxyLink(const QString& name,
+                                   pqProxy* inputProxy,
+                                   pqProxy* outputProxy)
+{
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  if(qobject_cast<pqRenderViewModule*>(inputProxy) &&
+     qobject_cast<pqRenderViewModule*>(outputProxy))
+     {
+     // TODO: make a vtkSMCameraLink class for linking cameras
+     this->addPropertyLink(name + "Position",
+                           inputProxy, "CameraPositionInfo",
+                           outputProxy, "CameraPosition");
+     this->addPropertyLink(name + "FocalPoint",
+                           inputProxy, "CameraFocalPointInfo",
+                           outputProxy, "CameraFocalPoint");
+     this->addPropertyLink(name + "ViewUp",
+                           inputProxy, "CameraViewUpInfo",
+                           outputProxy, "CameraViewUp");
+     }
+  else
+    {
+    vtkSMProxyLink* link = vtkSMProxyLink::New();
+    link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::INPUT);
+    link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::OUTPUT);
+    pxm->RegisterLink(name.toAscii().data(), link);
+    link->Delete();
+    }
+  
+  this->reset();
+}
+
+void pqLinksModel::addPropertyLink(const QString& name,
+                                      pqProxy* inputProxy,
+                                      const QString& inputProp,
+                                      pqProxy* outputProxy,
+                                      const QString& outputProp)
+{
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMPropertyLink* link = vtkSMPropertyLink::New();
+  
+  link->AddLinkedProperty(inputProxy->getProxy(),
+                          inputProp.toAscii().data(),
+                          vtkSMLink::INPUT);
+  link->AddLinkedProperty(outputProxy->getProxy(),
+                          outputProp.toAscii().data(),
+                          vtkSMLink::OUTPUT);
+  pxm->RegisterLink(name.toAscii().data(), link);
+  link->Delete();
+  
+  this->reset();
+}
+
+void pqLinksModel::removeLink(const QModelIndex& idx)
+{
+  if(!idx.isValid())
+    {
+    return;
+    }
+  
+  // we want an index for the first column
+  QModelIndex removeIdx = this->index(idx.row(), 0, idx.parent());
+  // get the name from the first column
+  QString name = this->data(removeIdx, Qt::DisplayRole).toString();
+
+  if(name != QString::null)
+    {
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    pxm->UnRegisterLink(name.toAscii().data());
+    this->reset();
+    }
+}
 

@@ -79,8 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqToolTipTrapper.h"
 #include "pqVCRController.h"
 #include "pqWriterFactory.h"
-#include "pqLinksModel.h"
-#include "ui_pqLinksEditor.h"
+#include "pqLinksEditor.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -2553,11 +2552,7 @@ void pqMainWindowCore::setCenterAxesVisibility(bool visible)
 
 void pqMainWindowCore::onToolsManageLinks()
 {
-  QDialog dialog;
-  Ui::pqLinksEditor ui;
-  ui.setupUi(&dialog);
-  pqLinksModel* model = new pqLinksModel(ui.tableView);
-  ui.tableView->setModel(model);
-  dialog.exec();
+  pqLinksEditor editor;
+  editor.exec();
 }
 
