@@ -159,32 +159,43 @@ IF(BUILD_TESTING)
 
   SET (TESTS_WITHOUT_BASELINES
     AboutDialog
-    LoadStateHistogram
     )
+  IF(PARAVIEW_DATA_ROOT)
+    SET (TESTS_WITHOUT_BASELINES
+      ${TESTS_WITHOUT_BASELINES}
+      LoadStateHistogram
+      )
+  ENDIF(PARAVIEW_DATA_ROOT)
 
   IF(QT_TESTING_WITH_PYTHON)
     SET(PYTHON_TESTS
-      #HistogramChart
-      ExodusXML
-      LoadStateMultiView
       OpenHelp
       ToolBarAndMenus
-      #VCRAnimation -- disabling until Time stuff goes in PV
-                    # readers will be animatable only after that.
       )
+    IF(PARAVIEW_DATA_ROOT)
+      SET(PYTHON_TESTS ${PYTHON_TESTS}
+        #HistogramChart
+        ExodusXML
+        LoadStateMultiView
+        #VCRAnimation -- disabling until Time stuff goes in PV
+                      # readers will be animatable only after that.
+        )
+    ENDIF(PARAVIEW_DATA_ROOT)
   ENDIF(QT_TESTING_WITH_PYTHON)
 
   FOREACH(test ${TESTS_WITHOUT_BASELINES})
     ADD_TEST(pqClient${test}
       ${TEST_BINARY} -dr --run-test=${TEST_XML}/${test}.xml --exit)
   ENDFOREACH(test)
-   
-  FOREACH(test ${XML_TESTS_WITH_BASELINES})
-    ADD_TEST(pqClient${test}
-      ${TEST_BINARY} -dr --run-test=${TEST_XML}/${test}.xml
-      --compare-view=${TEST_IMAGE}/${test}.png
-      --exit)
-  ENDFOREACH(test) 
+  
+  IF(PARAVIEW_DATA_ROOT)
+    FOREACH(test ${XML_TESTS_WITH_BASELINES})
+      ADD_TEST(pqClient${test}
+        ${TEST_BINARY} -dr --run-test=${TEST_XML}/${test}.xml
+        --compare-view=${TEST_IMAGE}/${test}.png
+        --exit)
+    ENDFOREACH(test) 
+  ENDIF(PARAVIEW_DATA_ROOT)
   
   FOREACH(test ${PYTHON_TESTS})
     ADD_TEST(pqClient${test}-Python
@@ -220,31 +231,33 @@ IF(BUILD_TESTING)
 
   SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver${PV_EXE_SUFFIX})
 
-  FOREACH(test ${XML_TESTS_WITH_BASELINES})
-    ADD_TEST(pqClient${test}-Builtin
-      ${TEST_BINARY}
-      --test-directory=${PARAVIEW_TEST_DIR}
-      -dr
-      --run-test=${TEST_XML}/${test}.xml
-      --compare-view=${TEST_IMAGE}/${test}.png
-      --exit)
-    
-    ADD_TEST(pqClient${test}-ClientServer
-      ${TEST_BINARY} --test-server
-      --test-directory=${PARAVIEW_TEST_DIR}
-      -dr
-      --run-test=${TEST_XML}/${test}.xml
-      --compare-view=${TEST_IMAGE}/${test}.png
-      --exit)
+  IF(PARAVIEW_DATA_ROOT)
+    FOREACH(test ${XML_TESTS_WITH_BASELINES})
+      ADD_TEST(pqClient${test}-Builtin
+        ${TEST_BINARY}
+        --test-directory=${PARAVIEW_TEST_DIR}
+        -dr
+        --run-test=${TEST_XML}/${test}.xml
+        --compare-view=${TEST_IMAGE}/${test}.png
+        --exit)
+      
+      ADD_TEST(pqClient${test}-ClientServer
+        ${TEST_BINARY} --test-server
+        --test-directory=${PARAVIEW_TEST_DIR}
+        -dr
+        --run-test=${TEST_XML}/${test}.xml
+        --compare-view=${TEST_IMAGE}/${test}.png
+        --exit)
 
-    ADD_TEST(pqClient${test}-ClientRenderServer
-      ${TEST_BINARY} --test-render-server
-      --test-directory=${PARAVIEW_TEST_DIR}
-      -dr
-      --run-test=${TEST_XML}/${test}.xml
-      --compare-view=${TEST_IMAGE}/${test}.png
-      --exit)
-  ENDFOREACH(test)
+      ADD_TEST(pqClient${test}-ClientRenderServer
+        ${TEST_BINARY} --test-render-server
+        --test-directory=${PARAVIEW_TEST_DIR}
+        -dr
+        --run-test=${TEST_XML}/${test}.xml
+        --compare-view=${TEST_IMAGE}/${test}.png
+        --exit)
+    ENDFOREACH(test)
+  ENDIF(PARAVIEW_DATA_ROOT)
 
   SUBDIRS(Testing/Cxx)
 ENDIF(BUILD_TESTING)
