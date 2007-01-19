@@ -132,7 +132,7 @@
         <string/>
        </property>
        <property name="icon" >
-        <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqBack16.png</iconset>
+        <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqBack16.png</iconset>
        </property>
        <property name="autoRaise" >
         <bool>true</bool>
@@ -148,7 +148,7 @@
         <string/>
        </property>
        <property name="icon" >
-        <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqFolderUp16.png</iconset>
+        <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqFolderUp16.png</iconset>
        </property>
        <property name="autoRaise" >
         <bool>true</bool>
@@ -164,7 +164,7 @@
         <string/>
        </property>
        <property name="icon" >
-        <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqFolderNew16.png</iconset>
+        <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqFolderNew16.png</iconset>
        </property>
        <property name="autoRaise" >
         <bool>true</bool>
@@ -180,7 +180,7 @@
         <string/>
        </property>
        <property name="icon" >
-        <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqAddFavorites16.png</iconset>
+        <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqAddFavorites16.png</iconset>
        </property>
        <property name="autoRaise" >
         <bool>true</bool>
@@ -249,7 +249,7 @@
   <tabstop>SourceHistory</tabstop>
  </tabstops>
  <resources>
-  <include location="../pqResources.qrc" />
+  <include location="../pqComponents.qrc" />
  </resources>
  <connections/>
 </ui>
