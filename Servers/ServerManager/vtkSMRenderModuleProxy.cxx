@@ -54,7 +54,7 @@
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMMPIRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.59");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.60");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -190,6 +190,7 @@ vtkSMRenderModuleProxy::GetOpenGLExtensionsInformation()
     }
 
   this->OpenGLExtensionsInformation = vtkPVOpenGLExtensionsInformation::New();
+  /*
   // FIXME:
   // When in client-server mode, if the client has not created the
   // server-side windows, then asking for extentions on the server side
@@ -199,6 +200,7 @@ vtkSMRenderModuleProxy::GetOpenGLExtensionsInformation()
   pm->GatherInformation(this->ConnectionID, vtkProcessModule::CLIENT,
     this->OpenGLExtensionsInformation, 
     this->RenderWindowProxy->GetID(0));
+    */
   return this->OpenGLExtensionsInformation;
 }
 
