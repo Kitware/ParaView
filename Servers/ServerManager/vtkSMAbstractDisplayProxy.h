@@ -33,6 +33,7 @@
 
 #include "vtkSMProxy.h"
 class vtkPVGeometryInformation;
+class vtkSMAbstractViewModuleProxy;
 
 class VTK_EXPORT vtkSMAbstractDisplayProxy : public vtkSMProxy
 {
@@ -47,14 +48,22 @@ public:
   
   // Description:
   // Called to update the Display. Default implementation does nothing.
-  virtual void Update() { }
+  // Argument is the view requesting the update. Can be null in the
+  // case when something other than a view is requesting the update.
+  virtual void Update() { this->Update(0); };
+  virtual void Update(vtkSMAbstractViewModuleProxy*) { };
 
   // Description:
   // When doing an ordered composite, some displays will need to run extra
   // filters that redistribute or clip their data before a render occurs.
   // This method makes sure that the distributed data is up to date.  The
   // default implementation just calls Update().
-  virtual void UpdateDistributedGeometry() { this->Update(); }
+  // Argument is the view requesting the update. Can be null in the
+  // case when something other than a view is requesting the update.
+  virtual void UpdateDistributedGeometry(vtkSMAbstractViewModuleProxy* view) 
+    { this->Update(view); };
+  void UpdateDistributedGeometry()
+    { this->UpdateDistributedGeometry(0); };
 
   // Description:
   // This method returns if the Update() or UpdateDistributedGeometry()

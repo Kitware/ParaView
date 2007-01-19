@@ -33,7 +33,6 @@ class vtkCommand;
 class vtkMultiProcessController;
 class vtkProcessModuleConnectionObserver;
 class vtkPVInformation;
-class vtkPVOpenGLExtensionsInformation;
 class vtkPVXMLElement;
 
 class VTK_EXPORT vtkProcessModuleConnection : public vtkObject
@@ -132,10 +131,6 @@ public:
   // \returns NULL on failure, otherwise the XML element is returned.
   virtual vtkPVXMLElement* NewNextRedo()=0;
 
-  // Description:
-  // Returns the rendering extensions information for the given
-  // connection.
-  vtkPVOpenGLExtensionsInformation* GetOpenGLExtensionsInformation();
 protected:
   vtkProcessModuleConnection();
   ~vtkProcessModuleConnection();
@@ -176,7 +171,6 @@ protected:
   // Every connection is assigned a vtkClientServerID.
   vtkClientServerID SelfID;
 
-  vtkPVOpenGLExtensionsInformation* OpenGLExtensionsInformation;
 private:
   vtkProcessModuleConnection(const vtkProcessModuleConnection&); // Not implemented.
   void operator=(const vtkProcessModuleConnection&); // Not implemented.

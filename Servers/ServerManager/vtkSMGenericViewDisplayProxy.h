@@ -61,7 +61,8 @@ public:
 
   // Description:
   // Update the output
-  void Update();
+  virtual void Update(vtkSMAbstractViewModuleProxy*);
+  virtual void Update() { this->Superclass::Update(); }
 
   // Description:
   // This method returns if the Update() or UpdateDistributedGeometry()

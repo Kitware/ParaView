@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.11");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -318,10 +318,10 @@ void vtkSMGenericViewDisplayProxy::SetupCollectionFilter(
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMGenericViewDisplayProxy::Update()
+void vtkSMGenericViewDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
 {
   this->UpdateSuppressorProxy->InvokeCommand("ForceUpdate");
-  this->Superclass::Update();
+  this->Superclass::Update(view);
   this->UpdateRequiredFlag = 0;
 
   if (this->PostProcessorProxy)

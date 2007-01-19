@@ -50,7 +50,7 @@ protected:
   vtkSMAnimationSceneWriter* Target;
 };
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneWriter, "1.2");
+vtkCxxRevisionMacro(vtkSMAnimationSceneWriter, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMAnimationSceneWriter::vtkSMAnimationSceneWriter()
 {
@@ -116,6 +116,7 @@ void vtkSMAnimationSceneWriter::ExecuteEvent(vtkObject* vtkNotUsed(caller),
     }
 }
 
+#include "vtkTimerLog.h"
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneWriter::Save()
 {
@@ -168,10 +169,16 @@ bool vtkSMAnimationSceneWriter::Save()
 
   if (status)
     {
+    vtkTimerLog* timer = vtkTimerLog::New();
+    timer->StartTimer();
     this->Saving = true;
     this->SaveFailed = false;
     this->AnimationScene->Play();
     this->Saving = false;
+    timer->StopTimer();
+
+    cout << "Play Time: " << timer->GetElapsedTime() << " seconds" << endl;
+    timer->Delete();
     }
 
   status = this->SaveFinalize() && status;

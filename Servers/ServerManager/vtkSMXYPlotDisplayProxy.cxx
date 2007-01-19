@@ -60,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.23");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -465,7 +465,7 @@ void vtkSMXYPlotDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMXYPlotDisplayProxy::Update()
+void vtkSMXYPlotDisplayProxy::Update(vtkSMAbstractViewModuleProxy*)
 {
   if (this->GeometryIsValid || !this->UpdateSuppressorProxy || 
     !this->RenderModuleProxy)

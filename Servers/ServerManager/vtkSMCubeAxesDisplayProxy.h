@@ -63,7 +63,8 @@ public:
 
   // Description:
   // This method updates the piece that has been assigned to this process.
-  virtual void Update();
+  virtual void Update(vtkSMAbstractViewModuleProxy*);
+  virtual void Update() { this->Superclass::Update(); }
 
   // Description:
   // For flip books.

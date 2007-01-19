@@ -39,7 +39,8 @@ public:
   // Description:
   // Update like normal, but make sure the LOD is collected.
   // I encountered a bug. First render was missing the LOD on the client.
-  void Update();
+  virtual void Update(vtkSMAbstractViewModuleProxy*);
+  virtual void Update() { this->Superclass::Update(); }
 
 protected:
   vtkSMMultiDisplayProxy();

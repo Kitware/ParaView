@@ -296,7 +296,7 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPointLabelDisplayProxy::Update()
+void vtkSMPointLabelDisplayProxy::Update(vtkSMAbstractViewModuleProxy*)
 {
   if (this->GeometryIsValid || !this->UpdateSuppressorProxy)
     {

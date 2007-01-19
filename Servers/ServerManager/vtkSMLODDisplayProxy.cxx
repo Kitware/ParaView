@@ -25,7 +25,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.15");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -122,43 +122,12 @@ void vtkSMLODDisplayProxy::SetupVolumePipeline()
 void vtkSMLODDisplayProxy::SetupPipeline()
 {
   this->Superclass::SetupPipeline();
-  vtkSMInputProperty* ip;
-  vtkSMProxyProperty* pp;
   
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->LODDecimatorProxy->GetProperty("Input"));
-  if (!ip)
-    {
-    vtkErrorMacro("Failed to find property Input on LODDecimatorProxy.");
-    return;
-    }
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->GeometryFilterProxy);
-  this->LODDecimatorProxy->UpdateVTKObjects();
-
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->LODUpdateSuppressorProxy->GetProperty("Input"));
-  if (!ip)
-    {
-    vtkErrorMacro("Failed to find property Input on LODUpdateSuppressorProxy.");
-    return;
-    }
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->LODDecimatorProxy);
-  this->LODUpdateSuppressorProxy->UpdateVTKObjects();
-
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->LODMapperProxy->GetProperty("Input"));
-  if (!ip)
-    {
-    vtkErrorMacro("Failed to find property Input on LODMapperProxy.");
-    return;
-    }
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->LODUpdateSuppressorProxy);
-  this->LODMapperProxy->UpdateVTKObjects();
+  this->Connect(this->LODDecimatorProxy, this->GeometryFilterProxy);
+  this->Connect(this->LODUpdateSuppressorProxy, this->LODDecimatorProxy);
+  this->Connect(this->LODMapperProxy, this->LODUpdateSuppressorProxy);
   
-  pp = vtkSMProxyProperty::SafeDownCast(
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->ActorProxy->GetProperty("LODMapper"));
   if (!pp)
     {
@@ -333,9 +302,9 @@ int vtkSMLODDisplayProxy::UpdateRequired()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMLODDisplayProxy::Update()
+void vtkSMLODDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
 {
-  this->Superclass::Update();
+  this->Superclass::Update(view);
 
   if (!this->LODGeometryIsValid && this->GetLODFlag() && 
     this->LODUpdateSuppressorProxy)

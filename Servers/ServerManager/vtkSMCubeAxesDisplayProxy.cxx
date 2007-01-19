@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.10");
 
 
 //----------------------------------------------------------------------------
@@ -211,7 +211,7 @@ void vtkSMCubeAxesDisplayProxy::InvalidateGeometryInternal(int /*useCache*/)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCubeAxesDisplayProxy::Update()
+void vtkSMCubeAxesDisplayProxy::Update(vtkSMAbstractViewModuleProxy*)
 {
   if (this->GeometryIsValid || !this->RenderModuleProxy)
     {

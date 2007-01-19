@@ -17,11 +17,7 @@
 // .SECTION Description
 // Information object that can be used to obtain OpenGL extension
 // information. The object from which the information is obtained
-// should be the process module.
-// One can directly instantiate this class and gather information,
-// however, to avoid repeated extension queries, vtkProcessModule
-// also provides API to access the vtkPVOpenGLExtensionsInformation object
-// for every connection.
+// should be a render window.
 #ifndef __vtkPVOpenGLExtensionsInformation_h
 #define __vtkPVOpenGLExtensionsInformation_h
 
@@ -40,6 +36,8 @@ public:
   // Transfer information about a single object into this object.
   virtual void CopyFromObject(vtkObject*);
 
+  // Description:
+  // Returns if the given extension is supported.
   bool ExtensionSupported(const char* ext);
 
   // Description:

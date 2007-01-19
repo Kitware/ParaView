@@ -67,7 +67,8 @@ public:
   // Description:
   // This method calls a ForceUpdate on the UpdateSuppressor
   // if the Geometry is not valid. 
-  virtual void Update();
+  virtual void Update(vtkSMAbstractViewModuleProxy*);
+  virtual void Update() { this->Superclass::Update(); }
 
   // Description:
   // This method returns if the Update() or UpdateDistributedGeometry()
@@ -152,7 +153,9 @@ public:
 
   enum VolumePipelines
   {
-    NONE = 0,
+    INVALID=13, /* Set when the display hasn;t yet determined if Volume 
+                   is supported at all. */
+    NONE = 0,   /* Display is certain that we cannot volume render */
     UNSTRUCTURED_GRID,
     IMAGE_DATA
   };
@@ -367,6 +370,10 @@ protected:
   virtual void VolumeRenderModeOn();
   virtual void VolumeRenderModeOff();
 
+  // Description:
+  // Get information about extensions from the view module.
+  void UpdateRenderModuleExtensions(vtkSMAbstractViewModuleProxy*);
+
   // IVars to avoid unnecessary setting of values.
   int Visibility;
   int Representation;
@@ -375,6 +382,8 @@ protected:
   int VolumeGeometryIsValid;
   int CanCreateProxy;
 
+  int RenderModuleExtensionsTested;
+
   int GeometryInformationIsValid;
   vtkPVGeometryInformation* GeometryInformation;
 
@@ -382,6 +391,13 @@ protected:
   // cached geometry
   virtual void InvalidateGeometryInternal(int useCache);
 
+  // Called to check if the display can support volume rendering.
+  // Note that will will excute the input pipeline
+  // if not already up-to-date.
+  void DetermineVolumeSupport();
+
+  // convenience method to connect to proxies.
+  bool Connect(vtkSMProxy* consumer, vtkSMProxy* producer);
 private:
   vtkSMDataObjectDisplayProxy(const vtkSMDataObjectDisplayProxy&); // Not implemented.
   void operator=(const vtkSMDataObjectDisplayProxy&); // Not implemented.

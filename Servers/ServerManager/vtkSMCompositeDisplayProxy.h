@@ -69,8 +69,11 @@ public:
   // geometry.
   virtual void MarkModified(vtkSMProxy* modifiedProxy); 
 
-  virtual void Update();
-  virtual void UpdateDistributedGeometry();
+  virtual void Update(vtkSMAbstractViewModuleProxy*);
+  virtual void Update() {this->Superclass::Update(); }
+  virtual void UpdateDistributedGeometry(vtkSMAbstractViewModuleProxy*);
+  virtual void UpdateDistributedGeometry() 
+    { this->Superclass::UpdateDistributedGeometry(); }
 
   // Description:
   // This method returns if the Update() or UpdateDistributedGeometry()

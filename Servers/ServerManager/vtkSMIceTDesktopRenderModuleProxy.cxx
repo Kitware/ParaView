@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.25");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -699,7 +699,7 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
             vtkSMCompositeDisplayProxy::SafeDownCast(obj);
           if (disp && disp->GetVisibilityCM())
             {
-            disp->Update();
+            disp->Update(this);
             disp->InvalidateDistributedGeometry();
 
             if (!self_generate_kdtree &&

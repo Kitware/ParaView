@@ -20,7 +20,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMMultiDisplayProxy);
-vtkCxxRevisionMacro(vtkSMMultiDisplayProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMMultiDisplayProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMMultiDisplayProxy::vtkSMMultiDisplayProxy()
 {
@@ -32,10 +32,10 @@ vtkSMMultiDisplayProxy::~vtkSMMultiDisplayProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMMultiDisplayProxy::Update()
+void vtkSMMultiDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
 {
   this->SetLODCollectionDecision(1);
-  this->Superclass::Update();
+  this->Superclass::Update(view);
   this->UpdateLODPipeline(); // Since for Multi Display Render modules, 
   // the client always renders using LOD. Hence we keep the LOD pipeline
   // in sync also.

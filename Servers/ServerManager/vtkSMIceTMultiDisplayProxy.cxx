@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.7");
 vtkStandardNewMacro(vtkSMIceTMultiDisplayProxy);
 
 //-----------------------------------------------------------------------------
@@ -355,10 +355,9 @@ int vtkSMIceTMultiDisplayProxy::UpdateRequired()
 }
 
 //-----------------------------------------------------------------------------
-
-void vtkSMIceTMultiDisplayProxy::Update()
+void vtkSMIceTMultiDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
 {
-  this->Superclass::Update();
+  this->Superclass::Update(view);
 
   if (this->SuppressGeometryCollection && !this->OutlineGeometryIsValid)
     {

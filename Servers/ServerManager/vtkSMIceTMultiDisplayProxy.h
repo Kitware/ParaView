@@ -56,7 +56,8 @@ protected:
 
   virtual void InvalidateGeometryInternal(int useCache);
   virtual int UpdateRequired();
-  virtual void Update();
+  virtual void Update(vtkSMAbstractViewModuleProxy*);
+  virtual void Update() { this->Superclass::Update(); }
 
   vtkSMProxy *OutlineFilterProxy;
   vtkSMProxy *OutlineCollectProxy;

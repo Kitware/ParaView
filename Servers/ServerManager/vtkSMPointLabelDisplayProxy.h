@@ -49,7 +49,8 @@ public:
   // This method updates the piece that has been assigned to this process.
   // Leads to a call to ForceUpdate on UpdateSuppressorProxy iff
   // GeometryIsValid==0;
-  virtual void Update();
+  virtual void Update(vtkSMAbstractViewModuleProxy*);
+  virtual void Update() { this->Superclass::Update(); }
 
   //BTX
   // Description:

@@ -32,18 +32,19 @@
 class vtkPVOpenGLExtensionsInformationInternal
 {
 public:
-  typedef vtkstd::vector<vtkstd::string> VectorOfStrings;
-  VectorOfStrings Extensions;
+  typedef vtkstd::set<vtkstd::string> SetOfStrings;
+  SetOfStrings Extensions;
 };
 
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkPVOpenGLExtensionsInformation);
-vtkCxxRevisionMacro(vtkPVOpenGLExtensionsInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVOpenGLExtensionsInformation, "1.2");
 //-----------------------------------------------------------------------------
 vtkPVOpenGLExtensionsInformation::vtkPVOpenGLExtensionsInformation()
 {
   this->Internal = new vtkPVOpenGLExtensionsInformationInternal;
+  this->RootOnly = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,10 +58,11 @@ void vtkPVOpenGLExtensionsInformation::CopyFromObject(vtkObject* obj)
 {
   this->Internal->Extensions.clear();
 
-  vtkProcessModule* pm = vtkProcessModule::SafeDownCast(obj);
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
-    vtkErrorMacro("Cannot downcast to vtkProcessModule.");
+    vtkErrorMacro("No vtkProcessModule!");
     return;
     }
   vtkSmartPointer<vtkPVDisplayInformation> di = 
@@ -71,20 +73,27 @@ void vtkPVOpenGLExtensionsInformation::CopyFromObject(vtkObject* obj)
     return;
     }
 
-  vtkRenderWindow* renWin = vtkRenderWindow::New();
+  vtkRenderWindow* renWin = vtkRenderWindow::SafeDownCast(obj);
   if (!renWin)
     {
-    vtkErrorMacro("Cannot create render window.");
+    vtkErrorMacro("Cannot downcast to render window.");
     return;
     }
-  renWin->SetSize(1,1);
   vtkOpenGLExtensionManager* mgr = vtkOpenGLExtensionManager::New();
   mgr->SetRenderWindow(renWin);
   mgr->Update();
+
+  vtkstd::vector<vtkstd::string> extensions;
   vtksys::SystemTools::Split(mgr->GetExtensionsString(), 
-    this->Internal->Extensions, ' ');
+    extensions, ' ');
+
+  this->Internal->Extensions.clear();
+  vtkstd::vector<vtkstd::string>::iterator iter;
+  for (iter =  extensions.begin(); iter != extensions.end(); iter++)
+    {
+    this->Internal->Extensions.insert(*iter);
+    }
   mgr->Delete();
-  renWin->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -102,26 +111,10 @@ void vtkPVOpenGLExtensionsInformation::AddInformation(vtkPVInformation* pvinfo)
     vtkErrorMacro("Could not downcast to vtkPVOpenGLExtensionsInformation.");
     return;
     }
-  vtkstd::set<vtkstd::string> setSelf;
-  vtkstd::set<vtkstd::string> setOther;
-
-  vtkPVOpenGLExtensionsInformationInternal::VectorOfStrings::iterator iter;
-  for (iter = this->Internal->Extensions.begin(); 
-    iter != this->Internal->Extensions.end();
-    ++iter)
-    {
-    setSelf.insert(*iter);
-    }
-
-  for (iter = info->Internal->Extensions.begin(); 
-    iter != info->Internal->Extensions.end();
-    ++iter)
-    {
-    setOther.insert(*iter);
-    }
+  vtkstd::set<vtkstd::string> setSelf = this->Internal->Extensions;
+  vtkstd::set<vtkstd::string> &setOther = info->Internal->Extensions;
 
   this->Internal->Extensions.clear();
-
   vtkstd::set_intersection(setSelf.begin(), setSelf.end(),
     setOther.begin(), setOther.end(),
     vtkstd::inserter(this->Internal->Extensions, this->Internal->Extensions.begin()));
@@ -134,7 +127,7 @@ void vtkPVOpenGLExtensionsInformation::CopyToStream(vtkClientServerStream* css)
   *css << vtkClientServerStream::Reply;
 
   vtkstd::string data;
-  vtkPVOpenGLExtensionsInformationInternal::VectorOfStrings::iterator iter;
+  vtkPVOpenGLExtensionsInformationInternal::SetOfStrings::iterator iter;
   for (iter = this->Internal->Extensions.begin(); 
     iter != this->Internal->Extensions.end();
     ++iter)
@@ -157,23 +150,22 @@ void vtkPVOpenGLExtensionsInformation::CopyFromStream(
     vtkErrorMacro("Error parsing extensions string from message.");
     return;
     }
-  vtksys::SystemTools::Split(ext, this->Internal->Extensions, ' ');
+
+  vtkstd::vector<vtkstd::string> extensions;
+  vtksys::SystemTools::Split(ext, extensions, ' ');
+  vtkstd::vector<vtkstd::string>::iterator iter;
+  for (iter =  extensions.begin(); iter != extensions.end(); ++iter)
+    {
+    this->Internal->Extensions.insert(*iter);
+    }
 }
 
 //-----------------------------------------------------------------------------
 bool vtkPVOpenGLExtensionsInformation::ExtensionSupported(const char* ext)
 {
-  vtkPVOpenGLExtensionsInformationInternal::VectorOfStrings::iterator iter;
-  for (iter = this->Internal->Extensions.begin(); 
-    iter != this->Internal->Extensions.end();
-    ++iter)
-    {
-    if (*iter == ext)
-      {
-      return true;
-      }
-    }
-  return false;
+  vtkPVOpenGLExtensionsInformationInternal::SetOfStrings::iterator iter
+    = this->Internal->Extensions.find(ext);
+  return (iter != this->Internal->Extensions.end());
 }
 
 //-----------------------------------------------------------------------------
@@ -181,7 +173,7 @@ void vtkPVOpenGLExtensionsInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Supported Extensions: " << endl;
-  vtkPVOpenGLExtensionsInformationInternal::VectorOfStrings::iterator iter;
+  vtkPVOpenGLExtensionsInformationInternal::SetOfStrings::iterator iter;
   for (iter = this->Internal->Extensions.begin(); 
     iter != this->Internal->Extensions.end();
     ++iter)

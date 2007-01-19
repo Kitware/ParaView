@@ -24,14 +24,15 @@
 class vtkCamera;
 class vtkCollection;
 class vtkImageData;
+class vtkPVClientServerIdCollectionInformation;
+class vtkPVOpenGLExtensionsInformation;
+class vtkPVRenderModuleHelper;
+class vtkRenderer;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
-class vtkRenderer;
-class vtkPVRenderModuleHelper;
+class vtkSelection;
 class vtkSMDisplay;
 class vtkSMDisplayProxy;
-class vtkPVClientServerIdCollectionInformation;
-class vtkSelection;
 class vtkTimerLog;
 
 // TODO: have to change the PVCameraManipulators to do ResetCamera on
@@ -190,6 +191,10 @@ public:
   // Return a list of visible cells within the provided screen area.
   vtkSelection *SelectVisibleCells(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1);
 
+  // Description:
+  // Returns the information object for this render module can can provide information
+  // about server-side extensions supported.
+  vtkPVOpenGLExtensionsInformation* GetOpenGLExtensionsInformation();
 protected:
   vtkSMRenderModuleProxy();
   ~vtkSMRenderModuleProxy();
@@ -288,6 +293,7 @@ protected:
   // Get the number of polygons this render module is rendering
   vtkIdType GetTotalNumberOfPolygons();
 
+  vtkPVOpenGLExtensionsInformation* OpenGLExtensionsInformation;
 private:
   vtkSMRenderModuleProxy(const vtkSMRenderModuleProxy&); // Not implemented.
   void operator=(const vtkSMRenderModuleProxy&); // Not implemented.

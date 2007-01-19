@@ -38,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.26");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.27");
 
 
 //-----------------------------------------------------------------------------
@@ -67,8 +67,10 @@ vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
   this->OpacityFunctionProxy = 0;
   this->ColorTransferFunctionProxy = 0;
 
-  this->VolumePipelineType    = NONE; // By Default, don't bother about the
-                                      // Volume Pipeline.
+  // We haven't determined if this display can support volume rendering
+  // hence we mark it INVALID.
+  this->VolumePipelineType    = INVALID;
+
   this->SupportsBunykMapper  = 0;
   this->SupportsZSweepMapper = 0;
   this->SupportsHAVSMapper   = 0;
@@ -82,6 +84,8 @@ vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
 
   this->CacherProxy = 0;
   this->VolumeCacherProxy = 0;
+
+  this->RenderModuleExtensionsTested = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,6 +114,26 @@ vtkSMDataObjectDisplayProxy::~vtkSMDataObjectDisplayProxy()
 }
 
 //-----------------------------------------------------------------------------
+bool vtkSMDataObjectDisplayProxy::Connect(vtkSMProxy* consumer, vtkSMProxy* producer)
+{
+  if (!consumer)
+    {
+    return false;
+    }
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    consumer->GetProperty("Input"));
+  if (pp)
+    {
+    pp->RemoveAllProxies();
+    pp->AddProxy(producer);
+    consumer->UpdateProperty("Input");
+    return true;
+    }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
 {
   if (this->ObjectsCreated || !this->CanCreateProxy)
@@ -133,70 +157,44 @@ void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
   // Volume Stuff.
- 
-  if (this->VolumePipelineType == UNSTRUCTURED_GRID)
-    {
-    this->VolumeFilterProxy = this->GetSubProxy("VolumeFilter");
-    this->VolumePTMapperProxy = this->GetSubProxy("VolumePTMapper");
-    this->VolumeHAVSMapperProxy = this->GetSubProxy("VolumeHAVSMapper");
-    this->VolumeBunykMapperProxy = this->GetSubProxy("VolumeBunykMapper");
-    this->VolumeZSweepMapperProxy = this->GetSubProxy("VolumeZSweepMapper");
+  this->VolumeFilterProxy = this->GetSubProxy("VolumeFilter");
+  this->VolumePTMapperProxy = this->GetSubProxy("VolumePTMapper");
+  this->VolumeHAVSMapperProxy = this->GetSubProxy("VolumeHAVSMapper");
+  this->VolumeBunykMapperProxy = this->GetSubProxy("VolumeBunykMapper");
+  this->VolumeZSweepMapperProxy = this->GetSubProxy("VolumeZSweepMapper");
 
-    this->VolumeFilterProxy->SetServers(vtkProcessModule::DATA_SERVER);
-    this->VolumePTMapperProxy->SetServers(
-      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-    this->VolumeHAVSMapperProxy->SetServers(
-      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);    
-    this->VolumeBunykMapperProxy->SetServers(
-      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-    this->VolumeZSweepMapperProxy->SetServers(
-      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-    }
-  else
-    {
-    this->RemoveSubProxy("VolumeFilter");
-    this->RemoveSubProxy("VolumePTMapper");
-    this->RemoveSubProxy("VolumeHAVSMapper");
-    this->RemoveSubProxy("VolumeBunykMapper");
-    this->RemoveSubProxy("VolumeZSweepMapper");
-    }
+  this->VolumeFilterProxy->SetServers(vtkProcessModule::DATA_SERVER);
+  this->VolumePTMapperProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->VolumeHAVSMapperProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);    
+  this->VolumeBunykMapperProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->VolumeZSweepMapperProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
-  if (this->VolumePipelineType == IMAGE_DATA)
-    {
-    this->VolumeFixedPointRayCastMapperProxy =
-      this->GetSubProxy("VolumeFixedPointRayCastMapper");
-    this->VolumeFixedPointRayCastMapperProxy->SetServers(
-      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-    }
+  this->VolumeFixedPointRayCastMapperProxy =
+    this->GetSubProxy("VolumeFixedPointRayCastMapper");
+  this->VolumeFixedPointRayCastMapperProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
-  if (this->VolumePipelineType != NONE)
-    {
-    this->VolumeUpdateSuppressorProxy = 
-      this->GetSubProxy("VolumeUpdateSuppressor");
-    this->VolumeUpdateSuppressorProxy->SetServers(
-      vtkProcessModule::CLIENT_AND_SERVERS);
-    this->VolumeActorProxy = this->GetSubProxy("VolumeActor");
-    this->VolumeActorProxy->SetServers(
-      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-    this->VolumePropertyProxy = this->GetSubProxy("VolumeProperty");
-    this->VolumePropertyProxy->SetServers(
-      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-    this->OpacityFunctionProxy = this->GetSubProxy("OpacityFunction");
-    this->OpacityFunctionProxy->SetServers(
-      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-    this->ColorTransferFunctionProxy = 
-      this->GetSubProxy("ColorTransferFunction");
-    this->ColorTransferFunctionProxy->SetServers(
-      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-    }
-  else
-    {
-    this->RemoveSubProxy("OpacityFunction");
-    this->RemoveSubProxy("ColorTransferFunction");
-    this->RemoveSubProxy("VolumeProperty");
-    this->RemoveSubProxy("VolumeActor");
-    this->RemoveSubProxy("VolumeUpdateSuppressor");
-    }
+  this->VolumeUpdateSuppressorProxy = 
+    this->GetSubProxy("VolumeUpdateSuppressor");
+  this->VolumeUpdateSuppressorProxy->SetServers(
+    vtkProcessModule::CLIENT_AND_SERVERS);
+  this->VolumeActorProxy = this->GetSubProxy("VolumeActor");
+  this->VolumeActorProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->VolumePropertyProxy = this->GetSubProxy("VolumeProperty");
+  this->VolumePropertyProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->OpacityFunctionProxy = this->GetSubProxy("OpacityFunction");
+  this->OpacityFunctionProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->ColorTransferFunctionProxy = 
+    this->GetSubProxy("ColorTransferFunction");
+  this->ColorTransferFunctionProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
   this->Superclass::CreateVTKObjects(numObjects);
 
@@ -248,154 +246,37 @@ vtkSMProxy * vtkSMDataObjectDisplayProxy::GetInput(int i)
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
 {
-  int num = 0;
-  if (input)
+  if (!input)
     {
-    num = input->GetNumberOfParts();
-    if (!num)
-      {
-      input->CreateParts();
-      num = input->GetNumberOfParts();
-      }
+    return;
     }
-  if (num == 0)
+
+  input->CreateParts();
+  int numInputs = input->GetNumberOfParts();
+  if (numInputs == 0)
     {
     vtkErrorMacro("Input proxy has no output! Cannot create the display");
     return;
     }
   
   // This will create all the subproxies with correct number of parts.
-  if (input)
-    {
-    this->CanCreateProxy = 1;
-    }
+  this->CanCreateProxy = 1;
 
-  // Should we enable unstructured grid volume rendering pipeline?
-  vtkSMProxy* p = this->GetSubProxy("VolumeFilter");
-  this->VolumePipelineType = NONE;
-  if (p)
-    {
-    vtkSMDataTypeDomain* domain = vtkSMDataTypeDomain::SafeDownCast(
-      p->GetProperty("Input")->GetDomain("input_type"));
-    if (domain->IsInDomain(input))
-      {
-      this->VolumePipelineType = UNSTRUCTURED_GRID;
-      }
-    this->SupportsBunykMapper = 0;
-    this->SupportsZSweepMapper = 0;
-    this->SupportsHAVSMapper = 0;
-    }
-  
-  if ( this->VolumePipelineType == UNSTRUCTURED_GRID)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkPVOpenGLExtensionsInformation* glinfo =
-    pm->GetOpenGLExtensionsInformation(this->GetConnectionID());
-    if (glinfo)
-      {
-      // These are extensions needed for HAVS. It would be nice
-      // if these was some way of asking the HAVS mapper the extensions
-      // it needs rather than hardcoding it here.
-      int supports_GL_EXT_texture3D =
-        glinfo->ExtensionSupported( "GL_EXT_texture3D");
-      int supports_GL_EXT_framebuffer_object =
-        glinfo->ExtensionSupported( "GL_EXT_framebuffer_object");
-      int supports_GL_ARB_fragment_program =
-        glinfo->ExtensionSupported( "GL_ARB_fragment_program" );
-      int supports_GL_ARB_vertex_program =
-        glinfo->ExtensionSupported( "GL_ARB_vertex_program" );
-      int supports_GL_ARB_texture_float =
-        glinfo->ExtensionSupported( "GL_ARB_texture_float" );
-      int supports_GL_ATI_texture_float =
-        glinfo->ExtensionSupported( "GL_ATI_texture_float" );
+  // We haven't determined yet if volume rendering is supported.
+  this->VolumePipelineType = INVALID;
 
-      if ( !supports_GL_EXT_texture3D ||
-        !supports_GL_EXT_framebuffer_object ||
-        !supports_GL_ARB_fragment_program ||
-        !supports_GL_ARB_vertex_program ||
-        !(supports_GL_ARB_texture_float || supports_GL_ATI_texture_float))
-        {
-        this->SupportsHAVSMapper = 0;
-        }
-      else
-        {
-        this->SupportsHAVSMapper = 1;
-        }
-      }
+  this->CreateVTKObjects(numInputs);
 
-    if (input->GetDataInformation()->GetNumberOfCells() < 1000000)
-      {
-      this->SupportsZSweepMapper = 1;
-      }
-    if (input->GetDataInformation()->GetNumberOfCells() < 500000)
-      {
-      this->SupportsBunykMapper = 1;
-      }
-    }
+  // We only set up the geometry pipeline.
+  this->Connect(this->GeometryFilterProxy, input);
+  // First, setup the pipeline.
+  this->SetupPipeline();
+  // Second, set default property values.
+  this->SetupDefaults();
 
-  // Should we enable image volume rendering pipeline?
-  p = this->GetSubProxy("VolumeFixedPointRayCastMapper");
-  if (p)
-    {
-    vtkSMDataTypeDomain* domain = vtkSMDataTypeDomain::SafeDownCast(
-      p->GetProperty("Input")->GetDomain("input_type"));
-    if (domain->IsInDomain(input))
-      {
-      this->VolumePipelineType = IMAGE_DATA;
-      }
-    }
-    
-  this->CreateVTKObjects(num);
-
-  vtkSMInputProperty* ip;
- 
-  input->UpdateVTKObjects();
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->GeometryFilterProxy->GetProperty("Input"));
-  ip->RemoveAllProxies();
-  ip->AddProxy(input);
-  if (!ip->GetImmediateUpdate())
-    {
-    this->GeometryFilterProxy->UpdateVTKObjects();
-    }
-
-  if (this->VolumePipelineType == UNSTRUCTURED_GRID)
-    {
-    ip = vtkSMInputProperty::SafeDownCast(
-      this->VolumeFilterProxy->GetProperty("Input"));
-    ip->RemoveAllProxies();
-    ip->AddProxy(input);
-    if (!ip->GetImmediateUpdate())
-      {
-      this->VolumeFilterProxy->UpdateVTKObjects();
-      }
-    }
-  else if (this->VolumePipelineType == IMAGE_DATA)
-    {
-    ip = vtkSMInputProperty::SafeDownCast(
-      this->VolumeUpdateSuppressorProxy->GetProperty("Input"));
-    ip->RemoveAllProxies();
-    ip->AddProxy(input);
-    if (!ip->GetImmediateUpdate())
-      {
-      this->VolumeUpdateSuppressorProxy->UpdateVTKObjects();
-      }
-    }
- 
-  if (input)
-    {
-    // First, setup the pipeline.
-    this->SetupPipeline();
-    // Second, set default property values.
-    this->SetupDefaults();
-    }
-
-  if (this->VolumePipelineType != NONE)
-    {
-    // Set up the Volume Pipeline if needed.
-    this->SetupVolumePipeline();
-    this->SetupVolumeDefaults();
-    }
+  // We leave the volume pipeline uninitialized.
+  // It will be setup once we know more about the input data
+  // type.
 }
 
 //-----------------------------------------------------------------------------
@@ -442,31 +323,10 @@ vtkSMProxy* vtkSMDataObjectDisplayProxy::GetTexture()
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetupPipeline()
 {
-  vtkSMInputProperty* ipp = 0;
+  this->Connect(this->UpdateSuppressorProxy, this->GeometryFilterProxy);
+  this->Connect(this->MapperProxy, this->UpdateSuppressorProxy);
+
   vtkSMProxyProperty* pp = 0;
-  
-  ipp = vtkSMInputProperty::SafeDownCast(
-    this->UpdateSuppressorProxy->GetProperty("Input"));
-  if (!ipp)
-    {
-    vtkErrorMacro("Failed to find property Input on UpdateSuppressor.");
-    return;
-    }
-  ipp->RemoveAllProxies();
-  ipp->AddProxy(this->GeometryFilterProxy);
-  this->UpdateSuppressorProxy->UpdateVTKObjects();
-
-  ipp = vtkSMInputProperty::SafeDownCast(
-    this->MapperProxy->GetProperty("Input"));
-  if (!ipp)
-    {
-    vtkErrorMacro("Failed to find property Input on MapperProxy.");
-    return;
-    }
-  ipp->RemoveAllProxies();
-  ipp->AddProxy(this->UpdateSuppressorProxy);
-  this->MapperProxy->UpdateVTKObjects();
-
   pp = vtkSMProxyProperty::SafeDownCast(
     this->ActorProxy->GetProperty("Mapper"));
   if (!pp)
@@ -489,7 +349,6 @@ void vtkSMDataObjectDisplayProxy::SetupPipeline()
   pp->AddProxy(this->PropertyProxy);
 
   this->ActorProxy->UpdateVTKObjects();
-
 }
 
 //-----------------------------------------------------------------------------
@@ -668,8 +527,6 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
     pm->SendStream(this->ConnectionID,
                    vtkProcessModule::RENDER_SERVER, stream2);  
     }
-  
-  //  this->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -680,62 +537,17 @@ void vtkSMDataObjectDisplayProxy::SetupVolumePipeline()
     return;
     }
 
-  vtkSMInputProperty* ip;
   vtkSMProxyProperty* pp;
- 
+
+  vtkSMProxy* input = this->GetInput(0);
   if (this->VolumePipelineType == UNSTRUCTURED_GRID)
     {
-    ip = vtkSMInputProperty::SafeDownCast(
-      this->VolumeUpdateSuppressorProxy->GetProperty("Input"));
-    if (!ip)
-      {
-      vtkErrorMacro("Failed to find property Input on VolumeUpdateSuppressor.");
-      return;
-      }
-    ip->RemoveAllProxies();
-    ip->AddProxy(this->VolumeFilterProxy);
-    this->VolumeUpdateSuppressorProxy->UpdateVTKObjects();
-
-    ip = vtkSMInputProperty::SafeDownCast(
-      this->VolumePTMapperProxy->GetProperty("Input"));
-    if (!ip)
-      {
-      vtkErrorMacro("Failed to find property Input on VolumePTMapperProxy.");
-      return;
-      }
-    ip->RemoveAllProxies();
-    ip->AddProxy(this->VolumeUpdateSuppressorProxy);
-
-    ip = vtkSMInputProperty::SafeDownCast(
-      this->VolumeHAVSMapperProxy->GetProperty("Input"));
-    if (!ip)
-      {
-      vtkErrorMacro("Failed to find property Input on VolumeHAVSMapperProxy.");
-      return;
-      }
-    ip->RemoveAllProxies();
-    ip->AddProxy(this->VolumeUpdateSuppressorProxy);
-
-    ip = vtkSMInputProperty::SafeDownCast(
-      this->VolumeBunykMapperProxy->GetProperty("Input"));
-    if (!ip)
-      {
-      vtkErrorMacro("Failed to find property Input on VolumeBunykMapperProxy.");
-      return;
-      }
-    ip->RemoveAllProxies();
-    ip->AddProxy(this->VolumeUpdateSuppressorProxy);
-
-
-    ip = vtkSMInputProperty::SafeDownCast(
-      this->VolumeZSweepMapperProxy->GetProperty("Input"));
-    if (!ip)
-      {
-      vtkErrorMacro("Failed to find property Input on VolumeZSweepMapperProxy.");
-      return;
-      }
-    ip->RemoveAllProxies();
-    ip->AddProxy(this->VolumeUpdateSuppressorProxy);
+    this->Connect(this->VolumeFilterProxy, input);
+    this->Connect(this->VolumeUpdateSuppressorProxy, this->VolumeFilterProxy);
+    this->Connect(this->VolumePTMapperProxy, this->VolumeUpdateSuppressorProxy);
+    this->Connect(this->VolumeHAVSMapperProxy, this->VolumeUpdateSuppressorProxy);
+    this->Connect(this->VolumeBunykMapperProxy, this->VolumeUpdateSuppressorProxy);
+    this->Connect(this->VolumeZSweepMapperProxy, this->VolumeUpdateSuppressorProxy);
 
     pp = vtkSMProxyProperty::SafeDownCast(
       this->VolumeActorProxy->GetProperty("Mapper"));
@@ -757,17 +569,9 @@ void vtkSMDataObjectDisplayProxy::SetupVolumePipeline()
     }
   else if (this->VolumePipelineType == IMAGE_DATA)
     {
-    ip = vtkSMInputProperty::SafeDownCast(
-      this->VolumeFixedPointRayCastMapperProxy->GetProperty("Input"));
-    if (!ip)
-      {
-      vtkErrorMacro("Failed to find property Input on "
-                    "VolumeFixedPointRayCastMapperProxy.");
-      return;
-      }
-    ip->RemoveAllProxies();
-    ip->AddProxy(this->VolumeUpdateSuppressorProxy);
-    this->VolumeFixedPointRayCastMapperProxy->UpdateVTKObjects();
+    this->Connect(this->VolumeUpdateSuppressorProxy, input);
+    this->Connect(this->VolumeFixedPointRayCastMapperProxy, 
+      this->VolumeUpdateSuppressorProxy);
 
     pp = vtkSMProxyProperty::SafeDownCast(
       this->VolumeActorProxy->GetProperty("Mapper"));
@@ -829,16 +633,6 @@ void vtkSMDataObjectDisplayProxy::SetupVolumeDefaults()
 
   // VolumePTMapperProxy defaults.
   // No defaults to set.
-
-  // VolumeActorProxy defaults.
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->VolumeActorProxy->GetProperty("Visibility"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property Visibility on VolumeActorProxy.");
-    return;
-    }
-  ivp->SetElement(0, 0);
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   if (!pm)
@@ -911,6 +705,14 @@ void vtkSMDataObjectDisplayProxy::SetRepresentation(int representation)
       vtkErrorMacro("Display does not have Volume Rendering support.");
       return;
       }
+
+    // Notice that we allow the representation to be volume
+    // if we haven't determined if the display can render volumes.
+    // If we later realize that the data is not suitable for
+    // volume rendering, we flash an error and switch representation
+    // to Surface. This makes it possible to load state for displays
+    // with volume rendering enabled and still deferring the 
+    // volume check till Update().
     this->VolumeRenderModeOn();
     }
   else
@@ -995,6 +797,13 @@ void vtkSMDataObjectDisplayProxy::VolumeRenderModeOff()
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::ResetTransferFunctions()
 {
+  if (this->VolumePipelineType == INVALID)
+    {
+    vtkErrorMacro(
+      "Please Update the display before calling ResetTransferFunctions().");
+    return;
+    }
+
   if (this->VolumePipelineType == NONE)
     {
     vtkErrorMacro("This display does not support Volume Rendering.");
@@ -1255,7 +1064,8 @@ void vtkSMDataObjectDisplayProxy::SetVolumeMapperToZSweepCM()
 //-----------------------------------------------------------------------------
 int vtkSMDataObjectDisplayProxy::GetVolumeMapperTypeCM()
 {
-  if ( this->VolumePipelineType == NONE )
+  if ( this->VolumePipelineType == NONE  || 
+    this->VolumePipelineType == INVALID)
     {
     return vtkSMDataObjectDisplayProxy::UNKNOWN_VOLUME_MAPPER;
     }
@@ -1395,6 +1205,11 @@ void vtkSMDataObjectDisplayProxy::InvalidateGeometryInternal(int useCache)
 //-----------------------------------------------------------------------------
 int vtkSMDataObjectDisplayProxy::UpdateRequired()
 {
+  if (this->VolumePipelineType == INVALID || !this->RenderModuleExtensionsTested)
+    {
+    return 1;
+    }
+
   if (this->VolumeRenderMode)
     {
     if (this->VolumeGeometryIsValid || !this->VolumeUpdateSuppressorProxy)
@@ -1413,8 +1228,119 @@ int vtkSMDataObjectDisplayProxy::UpdateRequired()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDataObjectDisplayProxy::Update()
+void vtkSMDataObjectDisplayProxy::DetermineVolumeSupport()
 {
+  if (this->VolumePipelineType != INVALID)
+    {
+    // Already determined support.
+    return;
+    }
+
+  this->VolumePipelineType = NONE;
+
+  vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(this->GetInput(0));
+  vtkSMDataTypeDomain* domain = vtkSMDataTypeDomain::SafeDownCast(
+    this->VolumeFilterProxy->GetProperty("Input")->GetDomain("input_type"));
+  if (domain && domain->IsInDomain(input))
+    {
+    this->VolumePipelineType = UNSTRUCTURED_GRID;
+
+    vtkPVDataInformation* datainfo = input->GetDataInformation();
+    if (datainfo->GetNumberOfCells() < 1000000)
+      {
+      this->SupportsZSweepMapper = 1;
+      }
+    if (datainfo->GetNumberOfCells() < 500000)
+      {
+      this->SupportsBunykMapper = 1;
+      }
+    // HAVS support is determined when the display is added to a render 
+    // module.
+    }
+  else 
+    {
+    domain = vtkSMDataTypeDomain::SafeDownCast(
+      this->VolumeFixedPointRayCastMapperProxy->GetProperty("Input")->
+      GetDomain("input_type"));
+    if (domain && domain->IsInDomain(input))
+      {
+      this->VolumePipelineType = IMAGE_DATA;
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::UpdateRenderModuleExtensions(
+  vtkSMAbstractViewModuleProxy* view)
+{
+  vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(view);
+  if (!rm)
+    {
+    return;
+    }
+  vtkPVOpenGLExtensionsInformation* glinfo =
+    rm->GetOpenGLExtensionsInformation();
+  if (glinfo)
+    {
+    // These are extensions needed for HAVS. It would be nice
+    // if these was some way of asking the HAVS mapper the extensions
+    // it needs rather than hardcoding it here.
+    int supports_GL_EXT_texture3D =
+      glinfo->ExtensionSupported( "GL_EXT_texture3D");
+    int supports_GL_EXT_framebuffer_object =
+      glinfo->ExtensionSupported( "GL_EXT_framebuffer_object");
+    int supports_GL_ARB_fragment_program =
+      glinfo->ExtensionSupported( "GL_ARB_fragment_program" );
+    int supports_GL_ARB_vertex_program =
+      glinfo->ExtensionSupported( "GL_ARB_vertex_program" );
+    int supports_GL_ARB_texture_float =
+      glinfo->ExtensionSupported( "GL_ARB_texture_float" );
+    int supports_GL_ATI_texture_float =
+      glinfo->ExtensionSupported( "GL_ATI_texture_float" );
+
+    if ( !supports_GL_EXT_texture3D ||
+      !supports_GL_EXT_framebuffer_object ||
+      !supports_GL_ARB_fragment_program ||
+      !supports_GL_ARB_vertex_program ||
+      !(supports_GL_ARB_texture_float || supports_GL_ATI_texture_float))
+      {
+      this->SupportsHAVSMapper = 0;
+      }
+    else
+      {
+      this->SupportsHAVSMapper = 1;
+      }
+    }
+  this->RenderModuleExtensionsTested = 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
+{
+  if (!this->RenderModuleExtensionsTested)
+    {
+    this->UpdateRenderModuleExtensions(view);
+    }
+
+  if (this->VolumePipelineType == INVALID)
+    {
+    this->DetermineVolumeSupport();
+
+    // We haven't determined if the pipeline can support volume
+    // rendering. Determine that and accordingly update the
+    // display pipeline.
+    this->SetupVolumePipeline();
+
+    this->SetupVolumeDefaults();
+    }
+
+  if (this->VolumeRenderMode && this->VolumePipelineType == NONE)
+    {
+    vtkErrorMacro("The display's input cannot be rendered as a volume."
+      << " Switching to surface rendering.");
+    this->SetRepresentation(vtkSMDataObjectDisplayProxy::SURFACE);
+    }
+
   if (this->VolumeRenderMode)
     {
     if (this->VolumeGeometryIsValid || !this->VolumeUpdateSuppressorProxy)
@@ -1446,10 +1372,19 @@ void vtkSMDataObjectDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     }
   // add this->ActorProxy to the render module.
   this->Superclass::AddToRenderModule(rm);
-  if (this->VolumePipelineType != NONE)
-    {
-    this->AddPropToRenderer(this->VolumeActorProxy, rm);
-    }
+  
+  // We cannnot rely on this->VolumePipelineType being set
+  // when this gets called since the display can be added to a render module
+  // before it is updated. Hence, we assume that volume rendering is supported
+  // and always add the volume rendering actor.
+  this->AddPropToRenderer(this->VolumeActorProxy, rm);
+
+  // This will ensure that on update we'll check if the
+  // view supports certain extensions.
+  this->RenderModuleExtensionsTested = 0;
+
+  // We don't support HAVS unless we've verified that we do.
+  this->SupportsHAVSMapper = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1460,12 +1395,10 @@ void vtkSMDataObjectDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy*
     vtkErrorMacro("Display proxy not created!");
     return;
     }
+  this->SupportsHAVSMapper = 0;
   // removes this->ActorProxy from the render module.
   this->Superclass::RemoveFromRenderModule(rm);
-  if (this->VolumePipelineType != NONE)
-    {
-    this->RemovePropFromRenderer(this->VolumeActorProxy, rm);
-    }
+  this->RemovePropFromRenderer(this->VolumeActorProxy, rm);
 }
 
 //-----------------------------------------------------------------------------
@@ -1511,7 +1444,7 @@ void vtkSMDataObjectDisplayProxy::SetInputAsGeometryFilter(vtkSMProxy *onProxy)
     onProxy->GetProperty("Input"));
   if (!ip)
     {
-    vtkErrorMacro("Failed to find proeprty Input.");
+    vtkErrorMacro("Failed to find property Input.");
     return;
     }
   ip->AddProxy(this->GeometryFilterProxy);

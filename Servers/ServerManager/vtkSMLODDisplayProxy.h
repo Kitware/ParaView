@@ -39,7 +39,8 @@ public:
   // Description:
   // This method calls a ForceUpdate on the UpdateSuppressor
   // if the Geometry is not valid. 
-  virtual void Update();
+  virtual void Update(vtkSMAbstractViewModuleProxy*);
+  virtual void Update() { this->Superclass::Update(); }
 
   // Description:
   // This method returns if the Update() or UpdateDistributedGeometry()

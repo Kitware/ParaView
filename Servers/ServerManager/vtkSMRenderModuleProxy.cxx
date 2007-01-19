@@ -45,15 +45,16 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkWindowToImageFilter.h"
 
-#include "vtkPVClientServerIdCollectionInformation.h"
-#include "vtkProcessModuleConnectionManager.h"
-#include "vtkSMDataObjectDisplayProxy.h"
-#include "vtkPVVisibleCellSelector.h"
 #include "vtkIdTypeArray.h"
+#include "vtkProcessModuleConnectionManager.h"
+#include "vtkPVClientServerIdCollectionInformation.h"
+#include "vtkPVOpenGLExtensionsInformation.h"
+#include "vtkPVVisibleCellSelector.h"
 #include "vtkSelection.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMMPIRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.58");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.59");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -124,6 +125,8 @@ vtkSMRenderModuleProxy::vtkSMRenderModuleProxy()
   this->RenderTimer = vtkTimerLog::New();
   this->ResetPolygonsPerSecondResults();
   this->MeasurePolygonsPerSecond = 0;
+
+  this->OpenGLExtensionsInformation = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -165,6 +168,38 @@ vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
   this->Helper = 0;
   this->RenderTimer->Delete();
   this->RenderTimer = 0;
+  if (this->OpenGLExtensionsInformation)
+    {
+    this->OpenGLExtensionsInformation->Delete();
+    this->OpenGLExtensionsInformation = 0;
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVOpenGLExtensionsInformation* 
+vtkSMRenderModuleProxy::GetOpenGLExtensionsInformation()
+{
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Objects not created yet. Cannot get OpenGL extensions information");
+    return 0;
+    }
+  if (this->OpenGLExtensionsInformation)
+    {
+    return this->OpenGLExtensionsInformation;
+    }
+
+  this->OpenGLExtensionsInformation = vtkPVOpenGLExtensionsInformation::New();
+  // FIXME:
+  // When in client-server mode, if the client has not created the
+  // server-side windows, then asking for extentions on the server side
+  // triggers a render on the server-side render window which hangs.
+  // Hence for now, using only the client side information.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->GatherInformation(this->ConnectionID, vtkProcessModule::CLIENT,
+    this->OpenGLExtensionsInformation, 
+    this->RenderWindowProxy->GetID(0));
+  return this->OpenGLExtensionsInformation;
 }
 
 //-----------------------------------------------------------------------------
@@ -1296,6 +1331,16 @@ void vtkSMRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
     << this->MaximumPolygonsPerSecond << endl;
   os << indent << "LastPolygonsPerSecond: " 
     << this->LastPolygonsPerSecond << endl;
+  os << indent << "OpenGLExtensionsInformation: ";
+  if (this->OpenGLExtensionsInformation)
+    {
+    os << endl;
+    this->OpenGLExtensionsInformation->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
 
 //-----------------------------------------------------------------------------
