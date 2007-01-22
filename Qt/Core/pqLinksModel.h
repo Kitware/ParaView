@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMLink;
 class pqProxy;
+class pqRenderViewModule;
 
 class PQCORE_EXPORT pqLinksModel : public QAbstractTableModel
 {
@@ -46,11 +47,12 @@ class PQCORE_EXPORT pqLinksModel : public QAbstractTableModel
   typedef QAbstractTableModel Superclass;
 
 public:
-    /// type of link (proxy or property)
+    /// type of link (camera, proxy or property)
   enum ItemType
     {
     Unknown,
     Proxy,
+    Camera,
     Property
     };
 
@@ -83,6 +85,10 @@ public:
 
   void addProxyLink(const QString& name, 
                     pqProxy* inputProxy, pqProxy* outputProxy);
+  
+  void addCameraLink(const QString& name, 
+                    pqRenderViewModule* inputProxy,
+                    pqRenderViewModule* outputProxy);
 
   void addPropertyLink(const QString& name,
                        pqProxy* inputProxy, const QString& inputProp,

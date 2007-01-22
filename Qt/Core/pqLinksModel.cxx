@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyLink.h"
+#include "vtkSMCameraLink.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProperty.h"
 
@@ -277,6 +278,10 @@ pqLinksModel::ItemType pqLinksModel::getLinkType(vtkSMLink* link) const
     {
     return Property;
     }
+  else if(vtkSMCameraLink::SafeDownCast(link))
+    {
+    return Camera;
+    }
   else if(vtkSMProxyLink::SafeDownCast(link))
     {
     return Proxy;
@@ -296,29 +301,24 @@ void pqLinksModel::addProxyLink(const QString& name,
                                    pqProxy* outputProxy)
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  if(qobject_cast<pqRenderViewModule*>(inputProxy) &&
-     qobject_cast<pqRenderViewModule*>(outputProxy))
-     {
-     // TODO: make a vtkSMCameraLink class for linking cameras
-     this->addPropertyLink(name + "Position",
-                           inputProxy, "CameraPositionInfo",
-                           outputProxy, "CameraPosition");
-     this->addPropertyLink(name + "FocalPoint",
-                           inputProxy, "CameraFocalPointInfo",
-                           outputProxy, "CameraFocalPoint");
-     this->addPropertyLink(name + "ViewUp",
-                           inputProxy, "CameraViewUpInfo",
-                           outputProxy, "CameraViewUp");
-     }
-  else
-    {
-    vtkSMProxyLink* link = vtkSMProxyLink::New();
-    link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::INPUT);
-    link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::OUTPUT);
-    pxm->RegisterLink(name.toAscii().data(), link);
-    link->Delete();
-    }
-  
+  vtkSMProxyLink* link = vtkSMProxyLink::New();
+  link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::INPUT);
+  link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::OUTPUT);
+  pxm->RegisterLink(name.toAscii().data(), link);
+  link->Delete();
+  this->reset();
+}
+
+void pqLinksModel::addCameraLink(const QString& name,
+                                 pqRenderViewModule* inputProxy,
+                                 pqRenderViewModule* outputProxy)
+{
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMCameraLink* link = vtkSMCameraLink::New();
+  link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::INPUT);
+  link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::OUTPUT);
+  pxm->RegisterLink(name.toAscii().data(), link);
+  link->Delete();
   this->reset();
 }
 

@@ -83,9 +83,19 @@ void pqLinksManager::addLink()
     {
     if(editor.linkMode() == pqLinksModel::Proxy)
       {
-      this->Model->addProxyLink(editor.linkName(), 
-                                editor.selectedInputProxy(),
-                                editor.selectedOutputProxy());
+      pqProxy* inP = editor.selectedInputProxy();
+      pqProxy* outP = editor.selectedOutputProxy();
+      pqRenderViewModule* inR= qobject_cast<pqRenderViewModule*>(inP);
+      pqRenderViewModule* outR= qobject_cast<pqRenderViewModule*>(outP);
+
+      if(inR && outR)
+        {
+        this->Model->addCameraLink(editor.linkName(), inR, outR);
+        }
+      else
+        {
+        this->Model->addProxyLink(editor.linkName(), inP, outP);
+        }
       }
     else if(editor.linkMode() == pqLinksModel::Property)
       {
@@ -109,9 +119,19 @@ void pqLinksManager::editLink()
     
     if(editor.linkMode() == pqLinksModel::Proxy)
       {
-      this->Model->addProxyLink(editor.linkName(), 
-                                editor.selectedInputProxy(),
-                                editor.selectedOutputProxy());
+      pqProxy* inP = editor.selectedInputProxy();
+      pqProxy* outP = editor.selectedOutputProxy();
+      pqRenderViewModule* inR= qobject_cast<pqRenderViewModule*>(inP);
+      pqRenderViewModule* outR= qobject_cast<pqRenderViewModule*>(outP);
+
+      if(inR && outR)
+        {
+        this->Model->addCameraLink(editor.linkName(), inR, outR);
+        }
+      else
+        {
+        this->Model->addProxyLink(editor.linkName(), inP, outP);
+        }
       }
     else if(editor.linkMode() == pqLinksModel::Property)
       {
