@@ -57,6 +57,12 @@ public:
   // is not enabled, it won't supress any updates. Enabled by default.
   void SetEnabled(int);
   vtkGetMacro(Enabled, int);
+
+  // Description:
+  // Get/Set the update time that is sent up the pipeline.
+  void SetUpdateTime(double utime);
+  vtkGetMacro(UpdateTime, double);
+
 protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();
@@ -69,10 +75,13 @@ protected:
 
   int UpdatePiece;
   int UpdateNumberOfPieces;
+  double UpdateTime;
+
+  bool UpdateTimeInitialized;
 
   int Enabled;
 
-  vtkTimeStamp UpdateTime;
+  vtkTimeStamp PipelineUpdateTime;
 
   vtkDataSet** CachedGeometry;
   int CachedGeometryLength;
