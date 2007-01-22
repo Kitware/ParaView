@@ -21,6 +21,7 @@
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLink.h"
+#include "vtkSMCameraLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSmartPointer.h"
 
@@ -29,7 +30,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.16");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.17");
 
 struct vtkSMStateLoaderRegistrationInfo
 {
@@ -334,6 +335,16 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
         if (!link)
           {
           link = vtkSMProxyLink::New();
+          pxm->RegisterLink(linkname, link);
+          link->Delete();
+          }       
+        }
+      else if (strcmp(name, "CameraLink") == 0)
+        {
+        link = pxm->GetRegisteredLink(linkname);
+        if (!link)
+          {
+          link = vtkSMCameraLink::New();
           pxm->RegisterLink(linkname, link);
           link->Delete();
           }       

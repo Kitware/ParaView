@@ -42,11 +42,11 @@ public:
   // changes, it's value is pushed to all other output proxies in the link.
   // A proxy can be set to be both input and output by setting updateDir
   // to INPUT | OUTPUT
-  void AddLinkedProxy(vtkSMProxy* proxy, int updateDir);
+  virtual void AddLinkedProxy(vtkSMProxy* proxy, int updateDir);
 
   // Description:
   // Remove a linked proxy.
-  void RemoveLinkedProxy(vtkSMProxy* proxy);
+  virtual void RemoveLinkedProxy(vtkSMProxy* proxy);
 
   // Description:
   // Get the number of proxies that are involved in this link.
