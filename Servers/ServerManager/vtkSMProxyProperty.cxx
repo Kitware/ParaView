@@ -32,7 +32,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.40");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.41");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -331,6 +331,21 @@ void vtkSMProxyProperty::RemoveAllUncheckedProxies()
   this->PPInternals->UncheckedProxies.erase(
     this->PPInternals->UncheckedProxies.begin(),
     this->PPInternals->UncheckedProxies.end());
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMProxyProperty::IsProxyAdded(vtkSMProxy* proxy)
+{
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> >::iterator iter =   
+    this->PPInternals->Proxies.begin();
+  for ( ; iter != this->PPInternals->Proxies.end() ; ++iter)
+    {
+    if (*iter == proxy)
+      {
+      return true;
+      }
+    }
+  return false;
 }
 
 //---------------------------------------------------------------------------

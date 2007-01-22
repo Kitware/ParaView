@@ -66,6 +66,10 @@ public:
   int SetProxy(unsigned int idx, vtkSMProxy* proxy);
 
   // Description:
+  // Returns if the given proxy is already added to the property.
+  bool IsProxyAdded(vtkSMProxy* proxy);
+
+  // Description:
   // Add a proxy to the list of proxies without calling Modified
   // (if modify is false). This is commonly used when ImmediateUpdate
   // is true but it is more efficient to avoid calling Update until
