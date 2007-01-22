@@ -2,9 +2,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 1.8)
 PROJECT(VTKHDF5 C)
 INCLUDE_REGULAR_EXPRESSION("^.*\\.[ch]$")
 
-SET(LIBRARY_OUTPUT_PATH ${VTKHDF5_BINARY_DIR}/bin CACHE PATH 
+SET(LIBRARY_OUTPUT_PATH ${VTKHDF5_BINARY_DIR}/bin CACHE PATH
   "Single output directory for building all libraries.")
-SET(EXECUTABLE_OUTPUT_PATH ${VTKHDF5_BINARY_DIR}/bin CACHE PATH 
+SET(EXECUTABLE_OUTPUT_PATH ${VTKHDF5_BINARY_DIR}/bin CACHE PATH
   "Single output directory for building all executables.")
 MARK_AS_ADVANCED(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)
 
@@ -38,15 +38,15 @@ IF(CMAKE_C_FLAGS MATCHES "/W4")
   STRING(REGEX REPLACE "/W4" "/W3" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
 ENDIF(CMAKE_C_FLAGS MATCHES "/W4")
 
-SET(PACKAGE_VERSION "\"1.6.2\"")
+SET(PACKAGE_VERSION "\"1.6.5\"")
 SET(PACKAGE_TARNAME "\"hdf5\"")
 SET(PACKAGE_NAME "\"HDF5\"")
-SET(PACKAGE_STRING "\"HDF5 1.6.2\"")
+SET(PACKAGE_STRING "\"HDF5 1.6.5\"")
 SET(PACKAGE_BUGREPORT "\"hdfhelp@ncsa.uiuc.edu\"")
 
 SET(LINUX_LFS 0)
 IF(CMAKE_SYSTEM MATCHES "Linux-([3-9]\\.[0-9]|2\\.[4-9])\\.")
-  OPTION(HDF5_ENABLE_LINUX_LFS 
+  OPTION(HDF5_ENABLE_LINUX_LFS
     "Enable support for large (64-bit) files on Linux." ON)
   IF(HDF5_ENABLE_LINUX_LFS)
     SET(LINUX_LFS 1)
@@ -54,7 +54,10 @@ IF(CMAKE_SYSTEM MATCHES "Linux-([3-9]\\.[0-9]|2\\.[4-9])\\.")
 ENDIF(CMAKE_SYSTEM MATCHES "Linux-([3-9]\\.[0-9]|2\\.[4-9])\\.")
 SET(HDF5_EXTRA_FLAGS)
 IF(LINUX_LFS)
-  SET(HDF5_EXTRA_FLAGS -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
+  SET(HDF5_EXTRA_FLAGS
+    -D_FILE_OFFSET_BITS=64
+    -D_LARGEFILE64_SOURCE
+    -D_LARGEFILE_SOURCE)
 ENDIF(LINUX_LFS)
 ADD_DEFINITIONS(${HDF5_EXTRA_FLAGS})
 
@@ -88,7 +91,7 @@ INCLUDE (${VTKHDF5_SOURCE_DIR}/CMake/CheckTypeSize.cmake)
 # does, it appends library to the list.
 SET(LINK_LIBS "")
 MACRO(CHECK_LIBRARY_EXISTS_CONCAT LIBRARY SYMBOL VARIABLE)
-  CHECK_LIBRARY_EXISTS("${LIBRARY};${LINK_LIBS}" ${SYMBOL} "" 
+  CHECK_LIBRARY_EXISTS("${LIBRARY};${LINK_LIBS}" ${SYMBOL} ""
     ${VARIABLE})
   IF(${VARIABLE})
     SET(LINK_LIBS ${LINK_LIBS} ${LIBRARY})
@@ -165,7 +168,7 @@ ENDIF(WINDOWS)
 
 # if the c compiler found stdint, check the C++ as well. On some systems this
 # file will be found by C but not C++, only do this test if the C++ compiler
-# has been initialized (e.g. the project also includes some c++) 
+# has been initialized (e.g. the project also includes some c++)
 IF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
   CHECK_INCLUDE_FILE_CXX("stdint.h" HAVE_STDINT_H_CXX)
   IF (NOT HAVE_STDINT_H_CXX)
@@ -286,7 +289,7 @@ ENDIF(HDF5_STREAM_VFD)
 # For other other specific tests, use this macro.
 MACRO(OTHER_INTERNAL_TEST OTHER_TEST)
   IF("${OTHER_TEST}" MATCHES "^${OTHER_TEST}$")
-    SET(MACRO_CHECK_FUNCTION_DEFINITIONS 
+    SET(MACRO_CHECK_FUNCTION_DEFINITIONS
       "-D${OTHER_TEST} ${CMAKE_REQUIRED_FLAGS}")
     SET(OTHER_TEST_ADD_LIBRARIES)
     IF(CMAKE_REQUIRED_LIBRARIES)
@@ -294,7 +297,7 @@ MACRO(OTHER_INTERNAL_TEST OTHER_TEST)
         "-DLINK_LIBRARIES:STRING=${CMAKE_REQUIRED_LIBRARIES}")
     ENDIF(CMAKE_REQUIRED_LIBRARIES)
     FOREACH(def ${HDF5_EXTRA_TEST_DEFINITIONS})
-      SET(MACRO_CHECK_FUNCTION_DEFINITIONS 
+      SET(MACRO_CHECK_FUNCTION_DEFINITIONS
         "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D${def}=${${def}}")
     ENDFOREACH(def)
 
@@ -304,13 +307,16 @@ MACRO(OTHER_INTERNAL_TEST OTHER_TEST)
         HAVE_SYS_TYPES_H
         HAVE_SYS_SOCKET_H)
       IF("${def}")
-        SET(MACRO_CHECK_FUNCTION_DEFINITIONS 
+        SET(MACRO_CHECK_FUNCTION_DEFINITIONS
           "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D${def}")
       ENDIF("${def}")
     ENDFOREACH(def)
     IF(LINUX_LFS)
       SET(MACRO_CHECK_FUNCTION_DEFINITIONS
-        "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE")
+        "${MACRO_CHECK_FUNCTION_DEFINITIONS}
+        -D_FILE_OFFSET_BITS=64
+        -D_LARGEFILE64_SOURCE
+        -D_LARGEFILE_SOURCE")
     ENDIF(LINUX_LFS)
 
     MESSAGE(STATUS "Performing Other Test ${OTHER_TEST}")
@@ -326,19 +332,19 @@ MACRO(OTHER_INTERNAL_TEST OTHER_TEST)
     ELSE(${OTHER_TEST})
       MESSAGE(STATUS "Performing Other Test ${OTHER_TEST} - Failed")
       SET(${OTHER_TEST} "" CACHE INTERNAL "Other test ${FUNCTION}")
-      WRITE_FILE(${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log 
-        "Performing Other Test ${OTHER_TEST} failed with the following output:\n"
-        "${OUTPUT}\n" APPEND)
+      WRITE_FILE(${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
+        "Performing Other Test ${OTHER_TEST} failed with the following "
+        "output:\n${OUTPUT}\n" APPEND)
     ENDIF(${OTHER_TEST})
   ENDIF("${OTHER_TEST}" MATCHES "^${OTHER_TEST}$")
-ENDMACRO(OTHER_INTERNAL_TEST) 
+ENDMACRO(OTHER_INTERNAL_TEST)
 
 # Do curl specific tests
 IF(WINDOWS)
   SET(HAVE_TIMEZONE 1)
   SET(HAVE_FUNCTION 1)
 ELSE(WINDOWS)
-  FOREACH(CURL_TEST 
+  FOREACH(CURL_TEST
       TIME_WITH_SYS_TIME
       STDC_HEADERS
       HAVE_TM_ZONE
@@ -392,7 +398,8 @@ ELSE(WINDOWS)
     FOREACH(HDF5_PRINTF_LL l64 l L q ll)
       SET(CURRENT_TEST_DEFINITIONS "-DPRINTF_LL_WIDTH=${HDF5_PRINTF_LL}")
       IF(SIZEOF_LONG_LONG)
-        SET(CURRENT_TEST_DEFINITIONS "${CURRENT_TEST_DEFINITIONS} -DHAVE_LONG_LONG")
+        SET(CURRENT_TEST_DEFINITIONS "${CURRENT_TEST_DEFINITIONS}
+        -DHAVE_LONG_LONG")
       ENDIF(SIZEOF_LONG_LONG)
       TRY_RUN(HDF5_PRINTF_LL_TEST_RUN HDF5_PRINTF_LL_TEST_COMPILE
         ${VTKHDF5_BINARY_DIR}/CMake
@@ -405,18 +412,21 @@ ELSE(WINDOWS)
             "Width for printf for type `long long' or `__int64', us. `ll")
           SET(PRINT_LL_FOUND 1)
         ELSE(HDF5_PRINTF_LL_TEST_RUN MATCHES 0)
-          #MESSAGE("Width with ${HDF5_PRINTF_LL} failed with result: ${HDF5_PRINTF_LL_TEST_RUN}")
+          #MESSAGE("Width with ${HDF5_PRINTF_LL} failed with result: "
+          #"${HDF5_PRINTF_LL_TEST_RUN}")
         ENDIF(HDF5_PRINTF_LL_TEST_RUN MATCHES 0)
       ELSE(HDF5_PRINTF_LL_TEST_COMPILE)
         WRITE_FILE(${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
-          "Test PRINTF_LL_WIDTH for ${HDF5_PRINTF_LL} failed with the following output:\n"
-          "${OUTPUT}\n" APPEND)
+          "Test PRINTF_LL_WIDTH for ${HDF5_PRINTF_LL} failed with the "
+          "following output:\n${OUTPUT}\n" APPEND)
       ENDIF(HDF5_PRINTF_LL_TEST_COMPILE)
     ENDFOREACH(HDF5_PRINTF_LL)
     IF(PRINT_LL_FOUND)
-      MESSAGE(STATUS "Checking for apropriate format for 64 bit long: found ${PRINTF_LL_WIDTH}")
+      MESSAGE(STATUS "Checking for apropriate format for 64 bit long: found"
+       " ${PRINTF_LL_WIDTH}")
     ELSE(PRINT_LL_FOUND)
-      MESSAGE(STATUS "Checking for apropriate format for 64 bit long: not found")
+      MESSAGE(STATUS "Checking for apropriate format for 64 bit long: not "
+        "found")
       SET(PRINTF_LL_WIDTH "\"unknown\"" CACHE INTERNAL
         "Width for printf for type `long long' or `__int64', us. `ll")
     ENDIF(PRINT_LL_FOUND)
