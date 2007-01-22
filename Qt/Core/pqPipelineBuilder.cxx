@@ -556,10 +556,13 @@ pqRenderViewModule* pqPipelineBuilder::createWindow(pqServer* server)
 
   // This is not an undo-able operation (atleast for now).
   vtkSMRenderModuleProxy* renModule = server->newRenderModule();
+  
+  QString name = QString("%1%2");
+  name = name.arg(renModule->GetXMLName());
+  name = name.arg(this->NameGenerator->GetCountAndIncrement(renModule->GetXMLName()));
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->RegisterProxy("render_modules", renModule->GetSelfIDAsString(),
-    renModule);
+  pxm->RegisterProxy("render_modules", name.toAscii().data(), renModule);
   renModule->Delete();
 
   // as a side effect of the registeration, pqServerManagerModel will
