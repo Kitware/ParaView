@@ -38,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.27");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.28");
 
 
 //-----------------------------------------------------------------------------
@@ -1322,18 +1322,6 @@ void vtkSMDataObjectDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
     this->UpdateRenderModuleExtensions(view);
     }
 
-  if (this->VolumePipelineType == INVALID)
-    {
-    this->DetermineVolumeSupport();
-
-    // We haven't determined if the pipeline can support volume
-    // rendering. Determine that and accordingly update the
-    // display pipeline.
-    this->SetupVolumePipeline();
-
-    this->SetupVolumeDefaults();
-    }
-
   if (this->VolumeRenderMode && this->VolumePipelineType == NONE)
     {
     vtkErrorMacro("The display's input cannot be rendered as a volume."
@@ -1359,6 +1347,21 @@ void vtkSMDataObjectDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
     this->UpdateSuppressorProxy->InvokeCommand("ForceUpdate");
     this->GeometryIsValid = 1;
     this->GeometryInformationIsValid = 0;
+    }
+
+  // Do this after the update so that the first update is not caused by 
+  // getting the data information. This assumes that the default 
+  // representation is never volume rendering.
+  if (this->VolumePipelineType == INVALID)
+    {
+    this->DetermineVolumeSupport();
+
+    // We haven't determined if the pipeline can support volume
+    // rendering. Determine that and accordingly update the
+    // display pipeline.
+    this->SetupVolumePipeline();
+
+    this->SetupVolumeDefaults();
     }
 }
 
