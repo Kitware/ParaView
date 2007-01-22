@@ -298,17 +298,7 @@ QList<QList<QVariant> > pqSMAdaptor::getSelectionProperty(vtkSMProperty* Propert
   if(StringProperty)
     {
     int numSelections = 0;
-    vtkSMStringVectorProperty* infoProp = NULL;
-    infoProp = vtkSMStringVectorProperty::SafeDownCast(
-                           StringProperty->GetInformationProperty());
-    if(infoProp)
-      {
-      numSelections = infoProp->GetNumberOfElements() / 2;
-      }
-    else
-      {
-      numSelections = StringProperty->GetNumberOfElements() / 2;
-      }
+    numSelections = StringProperty->GetNumberOfElements() / 2;
 
     for(int i=0; i<numSelections; i++)
       {
@@ -361,21 +351,11 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
             break;
             }
           }
-        // check the information property for a default value
-        if(!value.isValid())
-          {
-          vtkSMStringVectorProperty* infoProp = NULL;
-          infoProp = vtkSMStringVectorProperty::SafeDownCast(
-                                StringProperty->GetInformationProperty());
-          if(infoProp)
-            {
-            value = infoProp->GetElement(Index*2 + 1);
-            }
-          }
         }
       // make up a zero
       if(!value.isValid())
         {
+        qWarning("had to make up a value for selection\n");
         value = "0";
         }
       if(StringDomain->GetIntDomainMode() ==
