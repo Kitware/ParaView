@@ -286,6 +286,9 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionToolsPlayTest,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsPlayTest()));
 
+  connect(this->Implementation->UI.actionToolsOutputWindow, SIGNAL(triggered()),
+          &this->Implementation->Core, SLOT(onToolsOutputWindow()));
+
   connect(this->Implementation->UI.actionToolsPythonShell,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsPythonShell()));
 

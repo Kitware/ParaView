@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayRepresentationWidget.h"
 #include "pqElementInspectorWidget.h"
 #include "pqGenericViewManager.h"
+#include "pqProcessModuleGUIHelper.h"
 #include "pqMainWindowCore.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
@@ -1667,6 +1668,22 @@ void pqMainWindowCore::onToolsPlayTest(const QStringList &fileNames)
   if(1 == fileNames.size())
     {
     this->Implementation->TestUtility.playTests(fileNames[0]);
+    }
+}
+
+void pqMainWindowCore::onToolsOutputWindow()
+{
+  vtkProcessModuleGUIHelper *helper
+    = vtkProcessModule::GetProcessModule()->GetGUIHelper();
+  pqProcessModuleGUIHelper *pqHelper
+    = pqProcessModuleGUIHelper::SafeDownCast(helper);
+  if (!pqHelper)
+    {
+    qWarning("Could not get the pqProcessModuleGUIHelper");
+    }
+  else
+    {
+    pqHelper->showOutputWindow();
     }
 }
 

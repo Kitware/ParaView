@@ -89,6 +89,9 @@ public:
   /// Dangerous option that disables the debug output window, intended for demo purposes only
   void disableOutputWindow();
 
+  /// Show the output window.
+  virtual void showOutputWindow();
+
 protected:
   pqProcessModuleGUIHelper(); 
   ~pqProcessModuleGUIHelper(); 

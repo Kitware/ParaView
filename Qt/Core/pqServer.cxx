@@ -141,16 +141,9 @@ void pqServer::CreateRenderModule()
       } 
     else if(server_info) // && !server_info->GetUseIceT().
       {
-      // \todo These render modules don't support multi view,
-      // so, what to do if the server says it does not support IceT?
-      if (this->Options->GetTileDimensions()[0] )
-        {
-        renderModuleName = "MultiDisplayRenderModule";
-        }
-      else if(this->Options->GetClientMode())
-        {
-        renderModuleName = "MPIRenderModule";
-        }
+      // This fallback render module does not handle parallel rendering or tile
+      // display, but it will handle remote serial rendering and multiple views.
+      renderModuleName = "ClientServerRenderModule";
       }
     }
   if (!renderModuleName)

@@ -25,29 +25,13 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSources" >
     <property name="title" >
      <string>&amp;Sources</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>&amp;Tools</string>
-    </property>
-    <addaction name="actionToolsCreateCustomFilter" />
-    <addaction name="actionToolsManageCustomFilters" />
-    <addaction name="actionToolsManageLinks" />
-    <addaction name="separator" />
-    <addaction name="actionToolsDumpWidgetNames" />
-    <addaction name="actionToolsRecordTest" />
-    <addaction name="actionToolsRecordTestScreenshot" />
-    <addaction name="actionToolsPlayTest" />
-    <addaction name="actionTesting_Window_Size" />
-    <addaction name="separator" />
-    <addaction name="actionToolsPythonShell" />
    </widget>
    <widget class="QMenu" name="menuHelp" >
     <property name="title" >
@@ -165,6 +149,24 @@
     <addaction name="actionVCRNextFrame" />
     <addaction name="actionVCRLastFrame" />
     <addaction name="actionVCRLoop" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionToolsCreateCustomFilter" />
+    <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="actionToolsManageLinks" />
+    <addaction name="separator" />
+    <addaction name="actionToolsDumpWidgetNames" />
+    <addaction name="actionToolsRecordTest" />
+    <addaction name="actionToolsRecordTestScreenshot" />
+    <addaction name="actionToolsPlayTest" />
+    <addaction name="actionTesting_Window_Size" />
+    <addaction name="separator" />
+    <addaction name="actionToolsOutputWindow" />
+    <addaction name="separator" />
+    <addaction name="actionToolsPythonShell" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -973,6 +975,11 @@
    </property>
    <property name="toolTip" >
     <string>Loop</string>
+   </property>
+  </action>
+  <action name="actionToolsOutputWindow" >
+   <property name="text" >
+    <string>&amp;Output Window</string>
    </property>
   </action>
  </widget>
