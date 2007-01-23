@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.12");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -77,6 +77,7 @@ void vtkSMGenericViewDisplayProxy::CreateVTKObjects(int numObjects)
   this->UpdateSuppressorProxy = this->GetSubProxy("UpdateSuppressor");
   this->UpdateSuppressorProxy->SetServers(
     this->Servers | vtkProcessModule::CLIENT);
+    
   this->CollectProxy = this->GetSubProxy("Collect");
   this->CollectProxy->SetServers(
     this->Servers | vtkProcessModule::CLIENT);
@@ -276,6 +277,31 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
     ip->AddProxy(this->CollectProxy);
     this->PostProcessorProxy->UpdateVTKObjects();
     }
+
+  // Init UpdateSuppressor properties.
+  // Seems like we can't use properties for this 
+  // to work properly.
+  for(unsigned int i = 0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); ++i)
+    {
+    stream
+      << vtkClientServerStream::Invoke
+      << vtkProcessModule::GetProcessModule()->GetProcessModuleID() << "GetNumberOfPartitions"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorProxy->GetID(i) << "SetUpdateNumberOfPieces"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << vtkProcessModule::GetProcessModule()->GetProcessModuleID() << "GetPartitionId"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    }
+  vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
+    this->UpdateSuppressorProxy->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------
