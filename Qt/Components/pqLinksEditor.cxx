@@ -251,9 +251,10 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
      this,
      SLOT(updateEnabledState()), Qt::QueuedConnection);
 
+  pqLinksModel model;
+  
   if(link)
     {
-    pqLinksModel model;
     QModelIndex idx = model.findLink(link);
     QItemSelectionModel::SelectionFlags selFlags =
       QItemSelectionModel::ClearAndSelect;
@@ -293,6 +294,21 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
         }
 
       }
+    }
+  else
+    {
+    // make a name
+    QString newLinkName;
+    int index = 0;
+    while(newLinkName.isEmpty())
+      {
+      QString tryName = QString("Link%1").arg(index++);
+      if(!model.getLink(tryName))
+        {
+        newLinkName = tryName;
+        }
+      }
+    this->lineEdit->setText(newLinkName);
     }
 
   this->updateEnabledState();
