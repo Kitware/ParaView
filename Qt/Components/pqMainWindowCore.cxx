@@ -2563,6 +2563,7 @@ void pqMainWindowCore::onToolsManageLinks()
     {
     this->Implementation->LinksManager = new
       pqLinksManager(this->Implementation->Parent);
+    this->Implementation->LinksManager->setWindowTitle("Link Manager");
     this->Implementation->LinksManager->setAttribute(Qt::WA_DeleteOnClose);
     this->Implementation->LinksManager->show();
     }

@@ -354,7 +354,12 @@ void pqLinksModel::removeLink(const QModelIndex& idx)
   QModelIndex removeIdx = this->index(idx.row(), 0, idx.parent());
   // get the name from the first column
   QString name = this->data(removeIdx, Qt::DisplayRole).toString();
-
+  
+  this->removeLink(name);
+}
+  
+void pqLinksModel::removeLink(const QString& name)
+{
   if(name != QString::null)
     {
     vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();

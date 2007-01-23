@@ -82,6 +82,7 @@ public:
   QString getOutputProperty(const QModelIndex& idx) const;
   
   QString getLinkName(const QModelIndex& idx) const;
+  vtkSMLink* getLink(const QString& name) const;
 
   void addProxyLink(const QString& name, 
                     pqProxy* inputProxy, pqProxy* outputProxy);
@@ -95,9 +96,9 @@ public:
                        pqProxy* outputProxy, const QString& outputProp);
 
   void removeLink(const QModelIndex& idx);
+  void removeLink(const QString& name);
 
 private:
-  vtkSMLink* getLink(const QString& name) const;
   ItemType getLinkType(vtkSMLink* link) const;
   pqProxy* getProxyFromIndex(const QModelIndex& idx, int dir) const;
   QString getPropertyFromIndex(const QModelIndex& idx, int dir) const;

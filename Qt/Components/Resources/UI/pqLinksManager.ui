@@ -74,9 +74,18 @@
     </widget>
    </item>
    <item row="0" column="0" >
-    <widget class="QTableView" name="tableView" >
-     <property name="selectionBehavior" >
-      <enum>QAbstractItemView::SelectRows</enum>
+    <widget class="QTreeView" name="treeView" >
+     <property name="alternatingRowColors" >
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode" >
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="rootIsDecorated" >
+      <bool>false</bool>
+     </property>
+     <property name="itemsExpandable" >
+      <bool>false</bool>
      </property>
     </widget>
    </item>

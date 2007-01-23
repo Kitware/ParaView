@@ -59,9 +59,11 @@ pqLinksManager::pqLinksManager(QWidget* p)
 {
   this->setupUi(this);
   this->Model = new pqLinksModel(this);
-  this->tableView->setModel(this->Model);
-  QObject::connect(this->tableView, SIGNAL(clicked(const QModelIndex&)),
+  this->treeView->setModel(this->Model);
+  QObject::connect(this->treeView, SIGNAL(clicked(const QModelIndex&)),
                    this, SLOT(selectionChanged(const QModelIndex&)));
+  QObject::connect(this->treeView, SIGNAL(activated(const QModelIndex&)),
+                   this, SLOT(editLink()));
   QObject::connect(this->addButton, SIGNAL(clicked(bool)),
                    this, SLOT(addLink()));
   QObject::connect(this->editButton, SIGNAL(clicked(bool)),
@@ -79,6 +81,7 @@ pqLinksManager::~pqLinksManager()
 void pqLinksManager::addLink()
 {
   pqLinksEditor editor(NULL, this);
+  editor.setWindowTitle("Add Link");
   if(editor.exec() == QDialog::Accepted)
     {
     if(editor.linkMode() == pqLinksModel::Proxy)
@@ -110,9 +113,10 @@ void pqLinksManager::addLink()
 
 void pqLinksManager::editLink()
 {
-  QModelIndex idx = this->tableView->selectionModel()->currentIndex();
+  QModelIndex idx = this->treeView->selectionModel()->currentIndex();
   vtkSMLink* link = this->Model->getLink(idx);
   pqLinksEditor editor(link, this);
+  editor.setWindowTitle("Edit Link");
   if(editor.exec() == QDialog::Accepted)
     {
     this->Model->removeLink(idx);
@@ -146,10 +150,17 @@ void pqLinksManager::editLink()
 
 void pqLinksManager::removeLink()
 {
-  QModelIndex idx = this->tableView->selectionModel()->currentIndex();
-  if(idx.isValid())
+  QModelIndexList idxs = this->treeView->selectionModel()->selectedIndexes();
+  QStringList names;
+  // convert indexes to names so our indexes don't become invalid during removal
+  foreach(QModelIndex idx, idxs)
     {
-    this->Model->removeLink(idx);
+    names.append(this->Model->getLinkName(idx));
+    }
+
+  foreach(QString name, names)
+    {
+    this->Model->removeLink(name);
     }
 }
 
