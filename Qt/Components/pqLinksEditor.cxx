@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksEditor.h"
 
 // Qt
-#include <QMessageBox>
+#include <QPushButton>
 
 // SM
 #include "vtkSMRenderModuleProxy.h"
@@ -240,6 +240,16 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
      SIGNAL(currentTextChanged(const QString&)),
      this,
      SLOT(currentOutputPropertyChanged(const QString&)));
+  
+  QObject::connect(this->lineEdit,
+     SIGNAL(textChanged(const QString&)),
+     this,
+     SLOT(updateEnabledState()), Qt::QueuedConnection);
+  
+  QObject::connect(this->comboBox,
+     SIGNAL(currentIndexChanged(const QString&)),
+     this,
+     SLOT(updateEnabledState()), Qt::QueuedConnection);
 
   if(link)
     {
@@ -285,44 +295,12 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
       }
     }
 
+  this->updateEnabledState();
+
 }
 
 pqLinksEditor::~pqLinksEditor()
 {
-}
-
-void pqLinksEditor::accept()
-{
-  // validate complete information before accepting
-  if(this->linkName().isEmpty())
-    {
-    QMessageBox::information(this, "Missing information", 
-      "The link name is missing");
-    return;
-    }
-  if(this->linkMode() == pqLinksModel::Proxy)
-    {
-    if(!this->selectedInputProxy() || !this->selectedOutputProxy())
-      {
-      QMessageBox::information(this, "Missing information", 
-        "The object selections are incompelete");
-      return;
-      }
-    }
-  else
-    {
-    if(!this->selectedInputProxy() || !this->selectedOutputProxy() ||
-       this->selectedInputProperty().isEmpty() ||
-       this->selectedOutputProperty().isEmpty())
-      {
-      QMessageBox::information(this, "Missing information", 
-        "The object/property selections are incompelete");
-      return;
-      }
-    }
-
-  // allow the dialog to close
-  QDialog::accept();
 }
 
 QString pqLinksEditor::linkName()
@@ -366,6 +344,7 @@ void pqLinksEditor::currentInputProxyChanged(const QModelIndex& cur,
     {
     this->updatePropertyList(this->Property1List, this->SelectedInputProxy);
     }
+  this->updateEnabledState();
 }
 
 void pqLinksEditor::currentOutputProxyChanged(const QModelIndex& cur,
@@ -376,6 +355,7 @@ void pqLinksEditor::currentOutputProxyChanged(const QModelIndex& cur,
     {
     this->updatePropertyList(this->Property2List, this->SelectedOutputProxy);
     }
+  this->updateEnabledState();
 }
 
 void pqLinksEditor::updatePropertyList(QListWidget* tw, pqProxy* proxy)
@@ -397,10 +377,31 @@ void pqLinksEditor::updatePropertyList(QListWidget* tw, pqProxy* proxy)
 void pqLinksEditor::currentInputPropertyChanged(const QString& item)
 {
   this->SelectedInputProperty = item;
+  this->updateEnabledState();
 }
 
 void pqLinksEditor::currentOutputPropertyChanged(const QString& item)
 {
   this->SelectedOutputProperty = item;
+  this->updateEnabledState();
+}
+
+void pqLinksEditor::updateEnabledState()
+{
+  bool enabled = true;
+  if(!this->SelectedInputProxy || !this->SelectedInputProxy ||
+     this->linkName().isEmpty())
+    {
+    enabled = false;
+    }
+  if(this->linkMode() == pqLinksModel::Property)
+    {
+    if(this->SelectedInputProperty.isEmpty() ||
+       this->SelectedOutputProperty.isEmpty())
+      {
+      enabled = false;
+      }
+    }
+  this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
 }
 

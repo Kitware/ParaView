@@ -62,14 +62,14 @@ public:
   QString selectedInputProperty();
   QString selectedOutputProperty();
 
-  void accept();
-
 private slots:
   void currentInputProxyChanged(const QModelIndex& cur, const QModelIndex&);
   void currentOutputProxyChanged(const QModelIndex& cur, const QModelIndex&);
   
   void currentInputPropertyChanged(const QString& item);
   void currentOutputPropertyChanged(const QString& item);
+  
+  void updateEnabledState();
 
 private:
 
