@@ -51,8 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 
 
-static bool SettingValue = false;
-
 class pqPropertyLinksConnection::pqInternal
 {
 public:
@@ -75,7 +73,12 @@ public:
 
   // This flag indicates if the QObject and the vtkSMProperty are out of synch. 
   bool OutOfSync;
+
+  // the current property being worked with (global)
+  static vtkSMProperty* SettingProperty;
 };
+
+vtkSMProperty* pqPropertyLinksConnection::pqInternal::SettingProperty = NULL;
 
 class pqPropertyLinks::pqInternal
 {
@@ -144,12 +147,12 @@ void pqPropertyLinksConnection::clearOutOfSync() const
 
 void pqPropertyLinksConnection::smLinkedPropertyChanged() 
 {
-  if(SettingValue)
+  if(this->Internal->SettingProperty == this->Internal->Property)
     {
     return;
     }
   this->Internal->OutOfSync = true;
-  SettingValue = true;
+  this->Internal->SettingProperty = this->Internal->Property;
 
   if(this->Internal->QtObject)
     {
@@ -268,18 +271,18 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
       break;
       }
     }
-  SettingValue = false;
+  this->Internal->SettingProperty = NULL;
   emit this->smPropertyChanged();
 }
 
 void pqPropertyLinksConnection::qtLinkedPropertyChanged() 
 {
-  if(SettingValue)
+  if(this->Internal->SettingProperty == this->Internal->Property)
     {
     return;
     }
   this->Internal->OutOfSync = true;
-  SettingValue = true;
+  this->Internal->SettingProperty = this->Internal->Property;
 
   if (!this->Internal->UseUncheckedProperties)
     {
@@ -472,7 +475,7 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
       break;
       }
     }
-  SettingValue = false;
+  this->Internal->SettingProperty = NULL;
   emit this->qtWidgetChanged();
   if (!this->Internal->UseUncheckedProperties)
     {
