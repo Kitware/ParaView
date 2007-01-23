@@ -148,7 +148,8 @@ public:
     ToolTipTrapper(0),
     IgnoreBrowserSelectionChanges(false),
     ActiveSource(NULL),
-    ActiveServer(NULL)
+    ActiveServer(NULL),
+    LinksManager(NULL)
   {
 #ifdef PARAVIEW_EMBED_PYTHON
   this->PythonDialog = 0;
@@ -193,6 +194,7 @@ public:
   QPointer<pqServer> ActiveServer;
   QPointer<pqProxyTabWidget> ProxyPanel;
   QPointer<pqAnimationManager> AnimationManager;
+  QPointer<pqLinksManager> LinksManager;
 
 #ifdef PARAVIEW_EMBED_PYTHON
   QPointer<pqPythonDialog> PythonDialog;
@@ -2552,7 +2554,17 @@ void pqMainWindowCore::setCenterAxesVisibility(bool visible)
 
 void pqMainWindowCore::onToolsManageLinks()
 {
-  pqLinksManager editor;
-  editor.exec();
+  if(this->Implementation->LinksManager)
+    {
+    this->Implementation->LinksManager->raise();
+    this->Implementation->LinksManager->activateWindow();
+    }
+  else
+    {
+    this->Implementation->LinksManager = new
+      pqLinksManager(this->Implementation->Parent);
+    this->Implementation->LinksManager->setAttribute(Qt::WA_DeleteOnClose);
+    this->Implementation->LinksManager->show();
+    }
 }
 
