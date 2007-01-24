@@ -42,9 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqChartPlugin_h
 #define _pqChartPlugin_h
 
-#include <QtDesigner/QDesignerCustomWidgetInterface>
-#include <QtDesigner/QDesignerCustomWidgetCollectionInterface>
-#include <QtCore/qplugin.h>
+#include <QDesignerCustomWidgetInterface>
+#include <QDesignerCustomWidgetCollectionInterface>
+#include <qplugin.h>
 #include <QObject>
 
 class pqColorMapWidgetPlugin;

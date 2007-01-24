@@ -131,6 +131,8 @@ TARGET_LINK_LIBRARIES(ChartTest
 
 SET(BUILD_PARAVIEW_CHART_PLUGIN ON)
 
+INCLUDE_DIRECTORIES(${QT_QTDESIGNER_INCLUDE_DIR})
+
 # don't build plugin on systems that require dependents to be shared (PIC actually)
 IF(NOT BUILD_SHARED_LIBS)
   IF(CMAKE_SYSTEM MATCHES "HP-UX.*")
