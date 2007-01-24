@@ -129,6 +129,8 @@ INSTALL(TARGETS QtWidgets
 # plugin
 # -----------------------------------------------------------------------------
 
+INCLUDE_DIRECTORIES(${QT_QTDESIGNER_INCLUDE_DIR})
+
 SET(QtWidgetsPlugin_SRCS
   QtWidgetsPlugin.cxx
   QtWidgetsPlugin.h

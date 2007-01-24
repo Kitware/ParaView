@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _QtWidgetsPlugin_h
 #define _QtWidgetsPlugin_h
 
-#include <QtDesigner/QDesignerCustomWidgetInterface>
-#include <QtDesigner/QDesignerCustomWidgetCollectionInterface>
-#include <QtCore/qplugin.h>
+#include <QDesignerCustomWidgetInterface>
+#include <QDesignerCustomWidgetCollectionInterface>
+#include <qplugin.h>
 #include <QObject>
 
 class pqCollapsedGroupPlugin :
