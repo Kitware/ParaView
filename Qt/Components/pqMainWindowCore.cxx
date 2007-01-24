@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayRepresentationWidget.h"
 #include "pqElementInspectorWidget.h"
 #include "pqGenericViewManager.h"
-#include "pqProcessModuleGUIHelper.h"
+#include "pqLinksManager.h"
 #include "pqMainWindowCore.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPlotViewModule.h"
 #include "pqPQLookupTableManager.h"
+#include "pqProcessModuleGUIHelper.h"
 #include "pqProxyTabWidget.h"
 #include "pqReaderFactory.h"
 #include "pqRenderViewModule.h"
@@ -77,10 +78,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqSourceProxyInfo.h"
 #include "pqStateLoader.h"
+#include "pqTimerLogDisplay.h"
 #include "pqToolTipTrapper.h"
 #include "pqVCRController.h"
 #include "pqWriterFactory.h"
-#include "pqLinksManager.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -152,7 +153,8 @@ public:
     IgnoreBrowserSelectionChanges(false),
     ActiveSource(NULL),
     ActiveServer(NULL),
-    LinksManager(NULL)
+    LinksManager(NULL),
+    TimerLog(NULL)
   {
 #ifdef PARAVIEW_EMBED_PYTHON
   this->PythonDialog = 0;
@@ -198,6 +200,7 @@ public:
   QPointer<pqProxyTabWidget> ProxyPanel;
   QPointer<pqAnimationManager> AnimationManager;
   QPointer<pqLinksManager> LinksManager;
+  QPointer<pqTimerLogDisplay> TimerLog;
 
 #ifdef PARAVIEW_EMBED_PYTHON
   QPointer<pqPythonDialog> PythonDialog;
@@ -1674,6 +1677,19 @@ void pqMainWindowCore::onToolsPlayTest(const QStringList &fileNames)
     {
     this->Implementation->TestUtility.playTests(fileNames[0]);
     }
+}
+
+void pqMainWindowCore::onToolsTimerLog()
+{
+  if(!this->Implementation->TimerLog)
+    {
+    this->Implementation->TimerLog
+      = new pqTimerLogDisplay(this->Implementation->Parent);
+    }
+  this->Implementation->TimerLog->show();
+  this->Implementation->TimerLog->raise();
+  this->Implementation->TimerLog->activateWindow();
+  this->Implementation->TimerLog->Refresh();
 }
 
 void pqMainWindowCore::onToolsOutputWindow()

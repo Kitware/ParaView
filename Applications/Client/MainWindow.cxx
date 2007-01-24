@@ -286,6 +286,9 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionToolsPlayTest,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsPlayTest()));
 
+  connect(this->Implementation->UI.actionToolsTimerLog, SIGNAL(triggered()),
+          &this->Implementation->Core, SLOT(onToolsTimerLog()));
+
   connect(this->Implementation->UI.actionToolsOutputWindow, SIGNAL(triggered()),
           &this->Implementation->Core, SLOT(onToolsOutputWindow()));
 

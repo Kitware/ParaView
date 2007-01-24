@@ -261,6 +261,7 @@ public slots:
   void onToolsPlayTest();
   void onToolsPlayTest(const QStringList &fileNames);
 
+  void onToolsTimerLog();
   void onToolsOutputWindow();
   
   void onToolsPythonShell();

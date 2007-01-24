@@ -164,6 +164,7 @@
     <addaction name="actionToolsPlayTest" />
     <addaction name="actionTesting_Window_Size" />
     <addaction name="separator" />
+    <addaction name="actionToolsTimerLog" />
     <addaction name="actionToolsOutputWindow" />
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
@@ -980,6 +981,11 @@
   <action name="actionToolsOutputWindow" >
    <property name="text" >
     <string>&amp;Output Window</string>
+   </property>
+  </action>
+  <action name="actionToolsTimerLog" >
+   <property name="text" >
+    <string>Timer &amp;Log</string>
    </property>
   </action>
  </widget>
