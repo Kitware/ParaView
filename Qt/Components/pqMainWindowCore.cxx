@@ -1689,7 +1689,7 @@ void pqMainWindowCore::onToolsTimerLog()
   this->Implementation->TimerLog->show();
   this->Implementation->TimerLog->raise();
   this->Implementation->TimerLog->activateWindow();
-  this->Implementation->TimerLog->Refresh();
+  this->Implementation->TimerLog->refresh();
 }
 
 void pqMainWindowCore::onToolsOutputWindow()
