@@ -22,7 +22,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkSMLink, "1.4");
+vtkCxxRevisionMacro(vtkSMLink, "1.5");
 //-----------------------------------------------------------------------------
 class vtkSMLinkObserver : public vtkCommand
 {
@@ -35,6 +35,7 @@ public:
   vtkSMLinkObserver()
     {
       this->Link = 0;
+      this->InProgress = false;
     }
   ~vtkSMLinkObserver()
     {
@@ -43,6 +44,11 @@ public:
   
   virtual void Execute(vtkObject *c, unsigned long event, void* pname)
     {
+    if(this->InProgress)
+      {
+      return;
+      }
+    this->InProgress = true;
     vtkSMProxy* caller = vtkSMProxy::SafeDownCast(c);
     if (this->Link && caller)
       {
@@ -56,9 +62,11 @@ public:
         this->Link->UpdateProperties(caller, (const char*)pname);
         }
       }
+    this->InProgress = false;
     }
 
   vtkSMLink* Link;
+  bool InProgress;
 };
 
 //-----------------------------------------------------------------------------
