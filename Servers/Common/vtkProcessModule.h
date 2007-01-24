@@ -27,6 +27,7 @@
 #include "vtkObject.h"
 #include "vtkClientServerID.h" // needed for UniqueID.
 
+class vtkCacheSizeKeeper;
 class vtkCallbackCommand;
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
@@ -576,6 +577,13 @@ public:
   vtkGetMacro(SendStreamToClientOnly, int);
   vtkBooleanMacro(SendStreamToClientOnly, int);
 //BTX
+
+  // Description:
+  // Get/Set the vtkCacheSizeKeeper objects that can
+  // be used to keep track of the cache size for this process.
+  // To gather information about caches on all processes,
+  // use vtkPVCacheSizeInformation.
+  vtkGetObjectMacro(CacheSizeKeeper, vtkCacheSizeKeeper);
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -695,6 +703,8 @@ protected:
   static int StreamBlockFlag;
 
   int UseMPI;
+
+  vtkCacheSizeKeeper* CacheSizeKeeper;
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented.
   void operator=(const vtkProcessModule&); // Not implemented.

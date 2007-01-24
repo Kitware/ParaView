@@ -16,6 +16,7 @@
 #include "vtkProcessModule.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkCacheSizeKeeper.h"
 #include "vtkCallbackCommand.h"
 #include "vtkClientServerID.h"
 #include "vtkClientServerInterpreter.h"
@@ -102,7 +103,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.65");
+vtkCxxRevisionMacro(vtkProcessModule, "1.66");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -143,6 +144,8 @@ vtkProcessModule::vtkProcessModule()
 
   this->UseMPI = 1;
   this->SendStreamToClientOnly = 0;
+
+  this->CacheSizeKeeper = vtkCacheSizeKeeper::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -180,6 +183,8 @@ vtkProcessModule::~vtkProcessModule()
   this->Timer->Delete();
   this->MemoryInformation->Delete();
   this->ServerInformation->Delete();
+
+  this->CacheSizeKeeper->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -1822,6 +1827,16 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
   if (this->GUIHelper)
     {
     this->GUIHelper->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "CacheSizeKeeper: ";
+  if (this->CacheSizeKeeper)
+    {
+    this->CacheSizeKeeper->PrintSelf(os, indent.GetNextIndent());
     }
   else
     {

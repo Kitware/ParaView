@@ -1695,6 +1695,16 @@
         <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="CacheLimit"
+        command="SetCacheLimit"
+        number_of_elements="1"
+        update_self="1"
+        default_values="102400">
+        <!-- Default is 100 MBs -->
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+
       <Property
         name="InvalidateGeometry"
         command="InvalidateGeometry">
@@ -2479,6 +2489,7 @@
         </Proxy>
         <ExposedProperties>
           <Property name="CacheUpdate" />
+          <Property name="SaveCacheOnCacheUpdate" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>

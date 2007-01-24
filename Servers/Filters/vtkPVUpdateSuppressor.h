@@ -21,6 +21,8 @@
 
 #include "vtkDataSetAlgorithm.h"
 
+class vtkCacheSizeKeeper;
+
 class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataSetAlgorithm
 {
 public:
@@ -63,6 +65,17 @@ public:
   void SetUpdateTime(double utime);
   vtkGetMacro(UpdateTime, double);
 
+  // Description:
+  // Get/Set the cache size keeper. The update suppressor
+  // reports its cache size to this keeper, if any.
+  void SetCacheSizeKeeper(vtkCacheSizeKeeper*);
+  vtkGetObjectMacro(CacheSizeKeeper, vtkCacheSizeKeeper);
+
+  // Description:
+  // If not set, CacheUpdate() will use cache if available,
+  // but will not cache newly generated data.
+  vtkSetMacro(SaveCacheOnCacheUpdate, int);
+  vtkGetMacro(SaveCacheOnCacheUpdate, int);
 protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();
@@ -81,10 +94,13 @@ protected:
 
   int Enabled;
 
+  vtkCacheSizeKeeper* CacheSizeKeeper;
   vtkTimeStamp PipelineUpdateTime;
 
   vtkDataSet** CachedGeometry;
   int CachedGeometryLength;
+
+  int SaveCacheOnCacheUpdate;
 
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();

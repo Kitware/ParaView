@@ -16,13 +16,14 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkAlgorithmOutput.h"
+#include "vtkCacheSizeKeeper.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
-#include "vtkInformation.h"
 #include "vtkInformationDoubleVectorKey.h"
+#include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
@@ -30,9 +31,9 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.41");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.42");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
-
+vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 {
@@ -46,12 +47,20 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
   this->CachedGeometryLength = 0;
 
   this->Enabled = 1;
+
+  this->SaveCacheOnCacheUpdate = 1;
+  this->CacheSizeKeeper = 0;
+  this->SetCacheSizeKeeper(
+    vtkProcessModule::GetProcessModule()->GetCacheSizeKeeper());
 }
 
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 {
   this->RemoveAllCaches();
+
+  // Unset cache keeper only after having cleared the cache.
+  this->SetCacheSizeKeeper(0);
 }
 
 //----------------------------------------------------------------------------
@@ -175,10 +184,12 @@ void vtkPVUpdateSuppressor::RemoveAllCaches()
 {
   int idx;
 
+  unsigned long freed_size = 0;
   for (idx = 0; idx < this->CachedGeometryLength; ++idx)
     {
     if (this->CachedGeometry[idx])
       {
+      freed_size += this->CachedGeometry[idx]->GetActualMemorySize();
       this->CachedGeometry[idx]->Delete();
       this->CachedGeometry[idx] = NULL;
       }
@@ -190,6 +201,11 @@ void vtkPVUpdateSuppressor::RemoveAllCaches()
     this->CachedGeometry = NULL;
     }
   this->CachedGeometryLength = 0;
+
+  if (freed_size > 0 && this->CacheSizeKeeper)
+    {
+    this->CacheSizeKeeper->FreeCacheSize(freed_size);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -231,8 +247,15 @@ void vtkPVUpdateSuppressor::CacheUpdate(int idx, int num)
     //  Compositing seems to update the input properly.
     //  But this update is needed when doing animation without compositing.
     pd->Update(); 
-    this->CachedGeometry[idx] = pd;
-    pd->Register(this);
+    if (this->SaveCacheOnCacheUpdate)
+      {
+      this->CachedGeometry[idx] = pd;
+      if (this->CacheSizeKeeper)
+        {
+        this->CacheSizeKeeper->AddCacheSize(pd->GetActualMemorySize());
+        }
+      pd->Register(this);
+      }
     pd->Delete();
     }
   else
@@ -304,4 +327,6 @@ void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UpdatePiece: " << this->UpdatePiece << endl;
   os << indent << "UpdateNumberOfPieces: " << this->UpdateNumberOfPieces << endl;
   os << indent << "Enabled: " << this->Enabled << endl;
+  os << indent << "CacheSizeKeeper: " << this->CacheSizeKeeper << endl;
+  os << indent << "SaveCacheOnCacheUpdate: " << this->SaveCacheOnCacheUpdate << endl;
 }

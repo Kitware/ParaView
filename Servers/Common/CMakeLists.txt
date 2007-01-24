@@ -9,6 +9,7 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 SET(Kit_SRCS
+  vtkCacheSizeKeeper.cxx
   vtkClientConnection.cxx
   vtkCommandOptions.cxx
   vtkCommandOptionsXMLParser.cxx
@@ -21,6 +22,7 @@ SET(Kit_SRCS
   vtkProcessModule.cxx
   vtkProcessModuleGUIHelper.cxx
   vtkPVArrayInformation.cxx
+  vtkPVCacheSizeInformation.cxx
   vtkPVClassNameInformation.cxx
   vtkPVClientServerIdCollectionInformation.cxx
   vtkPVCompositeDataInformation.cxx

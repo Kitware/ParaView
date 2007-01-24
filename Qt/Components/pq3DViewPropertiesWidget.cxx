@@ -128,6 +128,8 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
     SIGNAL(colorChanged(const QVariant&)),
     proxy, proxy->GetProperty("Background"));
 
+  this->Links.registerLink(this->cacheLimit, "value", SIGNAL(valueChanged(int)),
+    proxy, proxy->GetProperty("CacheLimit"));
   this->Links.registerLink(this->parallelProjection, "checked",
     SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("CameraParallelProjection"));

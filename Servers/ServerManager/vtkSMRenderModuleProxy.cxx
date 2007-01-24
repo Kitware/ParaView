@@ -24,37 +24,38 @@
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
 #include "vtkFloatArray.h"
+#include "vtkIdTypeArray.h"
 #include "vtkImageWriter.h"
 #include "vtkInstantiator.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
+#include "vtkPVCacheSizeInformation.h"
+#include "vtkPVClientServerIdCollectionInformation.h"
 #include "vtkPVGeometryInformation.h"
+#include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVRenderModuleHelper.h"
+#include "vtkPVVisibleCellSelector.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkSelection.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMMPIRenderModuleProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
 #include "vtkWindowToImageFilter.h"
 
-#include "vtkIdTypeArray.h"
-#include "vtkProcessModuleConnectionManager.h"
-#include "vtkPVClientServerIdCollectionInformation.h"
-#include "vtkPVOpenGLExtensionsInformation.h"
-#include "vtkPVVisibleCellSelector.h"
-#include "vtkSelection.h"
-#include "vtkSMDataObjectDisplayProxy.h"
-#include "vtkSMMPIRenderModuleProxy.h"
-
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.60");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.61");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -127,6 +128,8 @@ vtkSMRenderModuleProxy::vtkSMRenderModuleProxy()
   this->MeasurePolygonsPerSecond = 0;
 
   this->OpenGLExtensionsInformation = 0;
+
+  this->CacheLimit = 100*1024; // 100 MBs.
 }
 
 //-----------------------------------------------------------------------------
@@ -627,8 +630,33 @@ void vtkSMRenderModuleProxy::RemoveDisplay(vtkSMAbstractDisplayProxy* adisp)
 }
 
 //-----------------------------------------------------------------------------
+bool vtkSMRenderModuleProxy::CheckCacheSizeWithinLimit()
+{
+  vtkSmartPointer<vtkPVCacheSizeInformation> info = 
+    vtkSmartPointer<vtkPVCacheSizeInformation>::New();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->GatherInformation(this->ConnectionID,
+    vtkProcessModule::RENDER_SERVER, info, pm->GetProcessModuleID());
+
+  vtkSmartPointer<vtkPVCacheSizeInformation> clientinfo = 
+    vtkSmartPointer<vtkPVCacheSizeInformation>::New();
+  clientinfo->CopyFromObject(pm);
+
+  clientinfo->AddInformation(info);
+
+  if (clientinfo->GetCacheSize() >= 
+    static_cast<unsigned long>(this->CacheLimit))
+    {
+    return false;
+    }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::CacheUpdate(int idx, int total)
 {
+  int save_cache = (!this->CheckCacheSizeWithinLimit())? 1: 0;
+
   vtkCollectionIterator* iter = this->GetDisplays()->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
@@ -638,7 +666,15 @@ void vtkSMRenderModuleProxy::CacheUpdate(int idx, int total)
       {
       continue;
       }
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    vtkSMIntVectorProperty* ivp;
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      disp->GetProperty("SaveCacheOnCacheUpdate"));
+    if (ivp)
+      {
+      ivp->SetElement(0, save_cache);
+      disp->UpdateProperty("SaveCacheOnCacheUpdate");
+      }
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
       disp->GetProperty("CacheUpdate"));
     if (ivp)
       {
@@ -646,6 +682,7 @@ void vtkSMRenderModuleProxy::CacheUpdate(int idx, int total)
       // Call CacheUpdate on those which support.
       ivp->SetElement(0, idx);
       ivp->SetElement(1, total);
+      ivp->SetElement(2, save_cache);
       disp->UpdateProperty("CacheUpdate");
       }
     }
@@ -1333,6 +1370,7 @@ void vtkSMRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
     << this->MaximumPolygonsPerSecond << endl;
   os << indent << "LastPolygonsPerSecond: " 
     << this->LastPolygonsPerSecond << endl;
+  os << indent << "CacheLimit: " << this->CacheLimit << endl;
   os << indent << "OpenGLExtensionsInformation: ";
   if (this->OpenGLExtensionsInformation)
     {

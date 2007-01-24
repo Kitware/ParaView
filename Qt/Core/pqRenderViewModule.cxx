@@ -519,6 +519,7 @@ static const char* pqRenderViewModuleLightSettings [] = {
   };
 
 static const char* pqRenderViewModuleMiscSettings [] = {
+  "CacheLimit",
   "CameraParallelProjection",
   "UseTriangleStrips",
   "UseImmediateMode",

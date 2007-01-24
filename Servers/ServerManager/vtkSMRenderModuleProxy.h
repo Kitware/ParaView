@@ -195,6 +195,12 @@ public:
   // Returns the information object for this render module can can provide information
   // about server-side extensions supported.
   vtkPVOpenGLExtensionsInformation* GetOpenGLExtensionsInformation();
+
+  // Description:
+  // Get/Set the cache limit (in kilobytes) for each process. If cache size
+  // grows beyond the limit, no caching is done on any of the processes.
+  vtkGetMacro(CacheLimit, int);
+  vtkSetMacro(CacheLimit, int);
 protected:
   vtkSMRenderModuleProxy();
   ~vtkSMRenderModuleProxy();
@@ -212,6 +218,10 @@ protected:
   // Description:
   // Set the LOD decision.
   void SetLODFlag(int val);
+
+  // Description:
+  // Check is cache size is within limit.
+  bool CheckCacheSizeWithinLimit();
 
   // Collection of props added to the renderer.
   vtkCollection* RendererProps; 
@@ -288,6 +298,7 @@ protected:
   vtkIdType AveragePolygonsPerSecondCount;
   void CalculatePolygonsPerSecond(double time);
   int MeasurePolygonsPerSecond;
+  int CacheLimit; // in KiloBytes.
 
   // Description:
   // Get the number of polygons this render module is rendering
