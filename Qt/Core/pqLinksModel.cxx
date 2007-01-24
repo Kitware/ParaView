@@ -49,9 +49,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static const char* columnHeaders[] = 
 {
   "Name",
-  "Master",
+  "Object 1",
   "Property",
-  "Slave",
+  "Object 2",
   "Property"
 };
 
@@ -302,8 +302,11 @@ void pqLinksModel::addProxyLink(const QString& name,
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMProxyLink* link = vtkSMProxyLink::New();
+  // bi-directional link
   link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::INPUT);
   link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::OUTPUT);
+  link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::INPUT);
+  link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::OUTPUT);
   pxm->RegisterLink(name.toAscii().data(), link);
   link->Delete();
   this->reset();
@@ -315,8 +318,11 @@ void pqLinksModel::addCameraLink(const QString& name,
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMCameraLink* link = vtkSMCameraLink::New();
+  // bi-directional link
   link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::INPUT);
   link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::OUTPUT);
+  link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::INPUT);
+  link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::OUTPUT);
   pxm->RegisterLink(name.toAscii().data(), link);
   link->Delete();
   this->reset();
@@ -331,9 +337,16 @@ void pqLinksModel::addPropertyLink(const QString& name,
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMPropertyLink* link = vtkSMPropertyLink::New();
   
+  // bi-directional link
   link->AddLinkedProperty(inputProxy->getProxy(),
                           inputProp.toAscii().data(),
                           vtkSMLink::INPUT);
+  link->AddLinkedProperty(outputProxy->getProxy(),
+                          outputProp.toAscii().data(),
+                          vtkSMLink::INPUT);
+  link->AddLinkedProperty(inputProxy->getProxy(),
+                          inputProp.toAscii().data(),
+                          vtkSMLink::OUTPUT);
   link->AddLinkedProperty(outputProxy->getProxy(),
                           outputProp.toAscii().data(),
                           vtkSMLink::OUTPUT);
