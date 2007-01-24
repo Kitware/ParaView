@@ -124,6 +124,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
 
+#include <vtkToolkits.h>
+
 #include "assert.h"
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1337,17 +1339,20 @@ void pqMainWindowCore::onFileSaveAnimation()
     qDebug() << "Cannot save animation since no active scene is present.";
     return;
     }
-  QString filters = "MPEG files (*.mpg)";
+  QString filters = "";
 
+#ifdef VTK_USE_MPEG2_ENCODER
+  filter += "MPEG files (*.mpg);;";
+#endif
 #ifdef _WIN32
-  filters += ";;AVI files (*.avi)";
+  filters += "AVI files (*.avi);;";
 #else
 # ifdef VTK_USE_FFMPEG_ENCODER
-  filters += ";;AVI files (*.avi)";
+  filters += "AVI files (*.avi);;";
 # endif
 #endif
-  filters +=";;JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png)";
-  filters +=";;All files(*)";
+  filters +="JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png);;";
+  filters +="All files(*)";
   pqFileDialog* const file_dialog = new pqFileDialog(NULL,
     this->Implementation->Parent, tr("Save Animation:"), QString(), filters);
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);

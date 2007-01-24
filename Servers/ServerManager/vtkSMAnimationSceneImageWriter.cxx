@@ -20,7 +20,6 @@
 #include "vtkImageIterator.h"
 #include "vtkImageWriter.h"
 #include "vtkJPEGWriter.h"
-#include "vtkMPEG2Writer.h"
 #include "vtkObjectFactory.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
@@ -30,6 +29,10 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkTIFFWriter.h"
 #include "vtkToolkits.h"
+
+#ifdef VTK_USE_MPEG2_ENCODER
+# include "vtkMPEG2Writer.h"
+#endif
 
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
@@ -43,7 +46,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.3");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.4");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -292,10 +295,12 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     {
     iwriter = vtkPNGWriter::New();
     }
+#ifdef VTK_USE_MPEG2_ENCODER
   else if (extension == ".mpeg" || extension == ".mpg")
     {
     mwriter = vtkMPEG2Writer::New();
     }
+#endif
 #ifdef _WIN32
   else if (extension == ".avi")
     {
