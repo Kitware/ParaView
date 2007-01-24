@@ -68,7 +68,7 @@ static pqTimerLogDisplayFloatChoices ThresholdChoices[] = {
   { "0.01", 0.01f },
   { "0.1", 0.1f }
 };
-static const NumThresholdChoices
+static const int NumThresholdChoices
   = sizeof(ThresholdChoices)/sizeof(pqTimerLogDisplayFloatChoices);
 
 static pqTimerLogDisplayIntChoices LengthChoices[] = {
@@ -77,7 +77,7 @@ static pqTimerLogDisplayIntChoices LengthChoices[] = {
   { "1000", 1000 },
   { "5000", 5000 }
 };
-static const NumLengthChoices
+static const int NumLengthChoices
   = sizeof(LengthChoices)/sizeof(pqTimerLogDisplayIntChoices);
 
 //-----------------------------------------------------------------------------
@@ -239,7 +239,7 @@ void pqTimerLogDisplay::setTimeThresholdById(int id)
 //-----------------------------------------------------------------------------
 int pqTimerLogDisplay::bufferLength() const
 {
-  return LengthChoices[this->ui->bufferLength->currentIndex()].value;
+  return qRound(LengthChoices[this->ui->bufferLength->currentIndex()].value);
 }
 
 void pqTimerLogDisplay::setBufferLength(int value)
