@@ -46,7 +46,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.4");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.5");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -220,7 +220,6 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     }
   else if (this->MovieWriter)
     {
-    abort();
     this->MovieWriter->SetInput(combinedImage);
     this->MovieWriter->Write();
 
