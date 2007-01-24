@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.7");
+vtkCxxRevisionMacro(vtkSMProxyLink, "1.8");
 
 //---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals
@@ -80,20 +80,9 @@ void vtkSMProxyLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
     this->Internals->LinkedProxies.begin();
   for(; iter != this->Internals->LinkedProxies.end(); iter++)
     {
-    if (iter->Proxy == proxy)
+    if (iter->Proxy == proxy && iter->UpdateDirection == updateDir)
       {
-      if (iter->UpdateDirection != updateDir)
-        {
-        iter->UpdateDirection = updateDir;
-        if (addObserver)
-          {
-          iter->Observer = this->Observer;
-          }
-        }
-      else
-        {
-        addObserver = 0;
-        }
+      addObserver = 0;
       addToList = 0;
       }
     }
