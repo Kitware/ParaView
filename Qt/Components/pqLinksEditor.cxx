@@ -113,6 +113,11 @@ public:
     return 1;
     }
   
+  QVariant headerData(int, Qt::Orientation, int) const
+    {
+    return QVariant();
+    }
+  
   QVariant data(const QModelIndex& idx, int role) const
     {
     if(!idx.isValid())
