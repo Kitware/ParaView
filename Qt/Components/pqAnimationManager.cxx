@@ -131,7 +131,7 @@ void pqAnimationManager::updateViewModules()
   vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
   pqSMAdaptor::setProxyListProperty(sceneProxy->GetProperty("ViewModules"),
     viewList);
-  sceneProxy->UpdateVTKObjects();
+  sceneProxy->UpdateProperty("ViewModules");
 }
 
 //-----------------------------------------------------------------------------
@@ -143,7 +143,6 @@ void pqAnimationManager::onProxyAdded(pqProxy* proxy)
     this->Internals->Scenes[scene->getServer()] = scene;
     if (this->Internals->ActiveServer == scene->getServer())
       {
-      this->updateViewModules();
       emit this->activeSceneChanged(this->getActiveScene());
       }
     }
@@ -201,6 +200,7 @@ pqAnimationScene* pqAnimationManager::createActiveScene()
       qDebug() << "Failed to create scene proxy.";
       }
    
+    this->updateViewModules();
     return this->getActiveScene();
     }
   return 0;

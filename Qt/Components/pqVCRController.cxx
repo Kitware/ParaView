@@ -128,7 +128,7 @@ void pqVCRController::onLoop(bool checked)
 {
   vtkSMAnimationSceneProxy* scene = this->Scene->getAnimationSceneProxy();
   pqSMAdaptor::setElementProperty(scene->GetProperty("Loop"),checked);
-  scene->UpdateVTKObjects();
+  scene->UpdateProperty("Loop");
 }
 
 //-----------------------------------------------------------------------------
