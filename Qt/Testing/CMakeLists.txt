@@ -36,6 +36,20 @@ IF(QT_TESTING_WITH_PYTHON)
   )
 ENDIF(QT_TESTING_WITH_PYTHON)
 
+IF(QT_TESTING_WITH_XML)
+  SET(XML_MOCS
+    pqXMLEventObserver.h
+  )
+  SET(XML_SRCS
+    pqXMLEventObserver.cxx
+    pqXMLEventObserver.h
+    pqXMLEventSource.cxx
+    pqXMLEventSource.h
+  )
+ENDIF(QT_TESTING_WITH_XML)
+
+
+
 
 INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
@@ -68,8 +82,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqThreadedEventSource.h
   pqTabBarEventTranslator.h
   pqWidgetEventTranslator.h
-  pqXMLEventObserver.h
   ${PYTHON_MOCS}
+  ${XML_MOCS}
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -138,13 +152,10 @@ ADD_LIBRARY(QtTesting
   pqWidgetEventPlayer.cxx
   pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
-  pqXMLEventObserver.cxx
-  pqXMLEventObserver.h
-  pqXMLEventSource.cxx
-  pqXMLEventSource.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
   ${PYTHON_SRCS}
+  ${XML_SRCS}
 )
 
 SOURCE_GROUP("Generated" FILES
