@@ -58,8 +58,8 @@ pqLinksManager::pqLinksManager(QWidget* p)
   : QDialog(p)
 {
   this->setupUi(this);
-  this->Model = new pqLinksModel(this);
-  this->treeView->setModel(this->Model);
+  pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
+  this->treeView->setModel(model);
   QObject::connect(this->treeView, SIGNAL(clicked(const QModelIndex&)),
                    this, SLOT(selectionChanged(const QModelIndex&)));
   QObject::connect(this->treeView, SIGNAL(activated(const QModelIndex&)),
@@ -80,6 +80,7 @@ pqLinksManager::~pqLinksManager()
 
 void pqLinksManager::addLink()
 {
+  pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
   pqLinksEditor editor(NULL, this);
   editor.setWindowTitle("Add Link");
   if(editor.exec() == QDialog::Accepted)
@@ -93,16 +94,16 @@ void pqLinksManager::addLink()
 
       if(inR && outR)
         {
-        this->Model->addCameraLink(editor.linkName(), inR, outR);
+        model->addCameraLink(editor.linkName(), inR, outR);
         }
       else
         {
-        this->Model->addProxyLink(editor.linkName(), inP, outP);
+        model->addProxyLink(editor.linkName(), inP, outP);
         }
       }
     else if(editor.linkMode() == pqLinksModel::Property)
       {
-      this->Model->addPropertyLink(editor.linkName(),
+      model->addPropertyLink(editor.linkName(),
                                 editor.selectedInputProxy(),
                                 editor.selectedInputProperty(),
                                 editor.selectedOutputProxy(),
@@ -113,13 +114,14 @@ void pqLinksManager::addLink()
 
 void pqLinksManager::editLink()
 {
+  pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
   QModelIndex idx = this->treeView->selectionModel()->currentIndex();
-  vtkSMLink* link = this->Model->getLink(idx);
+  vtkSMLink* link = model->getLink(idx);
   pqLinksEditor editor(link, this);
   editor.setWindowTitle("Edit Link");
   if(editor.exec() == QDialog::Accepted)
     {
-    this->Model->removeLink(idx);
+    model->removeLink(idx);
     
     if(editor.linkMode() == pqLinksModel::Proxy)
       {
@@ -130,16 +132,16 @@ void pqLinksManager::editLink()
 
       if(inR && outR)
         {
-        this->Model->addCameraLink(editor.linkName(), inR, outR);
+        model->addCameraLink(editor.linkName(), inR, outR);
         }
       else
         {
-        this->Model->addProxyLink(editor.linkName(), inP, outP);
+        model->addProxyLink(editor.linkName(), inP, outP);
         }
       }
     else if(editor.linkMode() == pqLinksModel::Property)
       {
-      this->Model->addPropertyLink(editor.linkName(),
+      model->addPropertyLink(editor.linkName(),
                                 editor.selectedInputProxy(),
                                 editor.selectedInputProperty(),
                                 editor.selectedOutputProxy(),
@@ -150,17 +152,18 @@ void pqLinksManager::editLink()
 
 void pqLinksManager::removeLink()
 {
+  pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
   QModelIndexList idxs = this->treeView->selectionModel()->selectedIndexes();
   QStringList names;
   // convert indexes to names so our indexes don't become invalid during removal
   foreach(QModelIndex idx, idxs)
     {
-    names.append(this->Model->getLinkName(idx));
+    names.append(model->getLinkName(idx));
     }
 
   foreach(QString name, names)
     {
-    this->Model->removeLink(name);
+    model->removeLink(name);
     }
 }
 

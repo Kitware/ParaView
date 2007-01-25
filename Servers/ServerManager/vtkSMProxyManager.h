@@ -320,6 +320,7 @@ public:
     // Set when the register/unregister event if fired for registration of 
     // a compound proxy definition.
     int IsCompoundProxyDefinition;
+    int IsLink;
   };
 
   struct ModifiedPropertyInformation

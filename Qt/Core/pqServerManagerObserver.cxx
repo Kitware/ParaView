@@ -115,15 +115,15 @@ void pqServerManagerObserver::proxyRegistered(vtkObject*, unsigned long, void*,
     {
     emit this->compoundProxyDefinitionRegistered(info->ProxyName);
     }
-  else if(strcmp(info->GroupName, "sources") == 0)
+  else if(info->GroupName && strcmp(info->GroupName, "sources") == 0)
     {
     emit this->sourceRegistered(info->ProxyName, info->Proxy);
     }
-  else if(strcmp(info->GroupName, "displays") == 0)
+  else if(info->GroupName && strcmp(info->GroupName, "displays") == 0)
     {
     emit this->displayRegistered(info->ProxyName, info->Proxy);
     }
-  else if (strcmp(info->GroupName, "render_modules")==0)
+  else if (info->GroupName && strcmp(info->GroupName, "render_modules")==0)
     {
     // A render module is registered. proxies in this group
     // are vtkSMRenderModuleProxies which are "alive" with a window and all,
@@ -156,15 +156,15 @@ void pqServerManagerObserver::proxyUnRegistered(vtkObject*, unsigned long, void*
     {
     emit this->compoundProxyDefinitionUnRegistered(info->ProxyName);
     }
-  else if(strcmp(info->GroupName, "sources") == 0 )
+  else if(info->GroupName && strcmp(info->GroupName, "sources") == 0 )
     {
     emit this->sourceUnRegistered(info->ProxyName, info->Proxy);
     }
-  else if (strcmp(info->GroupName, "displays") == 0)
+  else if (info->GroupName && strcmp(info->GroupName, "displays") == 0)
     {
     emit this->displayUnRegistered(info->Proxy);
     }
-  else if (strcmp(info->GroupName, "render_modules") == 0)
+  else if (info->GroupName && strcmp(info->GroupName, "render_modules") == 0)
     {
     emit this->renderModuleUnRegistered(
       vtkSMRenderModuleProxy::SafeDownCast(info->Proxy));

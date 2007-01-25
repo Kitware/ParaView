@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "ui_pqLinksManager.h"
 
-class pqLinksModel;
-
 class PQCOMPONENTS_EXPORT pqLinksManager :
   public QDialog, private Ui::pqLinksManager
 {
@@ -58,9 +56,6 @@ public slots:
 
 private slots:
   void selectionChanged(const QModelIndex& idx);
-
-private:
-  pqLinksModel* Model;
 
 };
 

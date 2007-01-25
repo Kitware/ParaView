@@ -59,7 +59,7 @@ public:
   // Description:
   // Get the direction of a proxy involved in this link
   // (see vtkSMLink::UpdateDirections)
-  int GetLinkedProxyDirection(vtkSMProxy* proxy);
+  int GetLinkedProxyDirection(int index);
   
   // Description:
   // It is possible to exclude certain properties from being synchronized

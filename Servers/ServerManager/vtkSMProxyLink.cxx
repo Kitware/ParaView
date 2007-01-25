@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.8");
+vtkCxxRevisionMacro(vtkSMProxyLink, "1.9");
 
 //---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals
@@ -101,6 +101,8 @@ void vtkSMProxyLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
     {
     this->ObserveProxyUpdates(proxy);
     }
+
+  this->Modified();
 }
 
 //---------------------------------------------------------------------------
@@ -113,6 +115,7 @@ void vtkSMProxyLink::RemoveLinkedProxy(vtkSMProxy* proxy)
     if (iter->Proxy == proxy)
       {
       this->Internals->LinkedProxies.erase(iter);
+      this->Modified();
       break;
       }
     }
@@ -143,18 +146,21 @@ vtkSMProxy* vtkSMProxyLink::GetLinkedProxy(int index)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxyLink::GetLinkedProxyDirection(vtkSMProxy* proxy)
+int vtkSMProxyLink::GetLinkedProxyDirection(int index)
 {
   vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
     this->Internals->LinkedProxies.begin();
-  for(; iter != this->Internals->LinkedProxies.end(); ++iter)
+  for(int i=0;
+      i<index && iter != this->Internals->LinkedProxies.end();
+      i++)
     {
-    if(iter->Proxy == proxy)
-      {
-      return iter->UpdateDirection;
-      }
+    iter++;
     }
-  return NONE;
+  if(iter == this->Internals->LinkedProxies.end())
+    {
+    return NONE;
+    }
+  return iter->UpdateDirection;
 }
 
 //---------------------------------------------------------------------------

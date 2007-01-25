@@ -88,7 +88,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.57");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.58");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -626,6 +626,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name,
         info.GroupName = it->first.c_str();
         info.ProxyName = it2->first.c_str();
         info.IsCompoundProxyDefinition = 0;
+        info.IsLink = 0;
 
         this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
         this->UnMarkProxyAsModified(info.Proxy);
@@ -661,6 +662,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
         info.GroupName = it->first.c_str();
         info.ProxyName = it2->first.c_str();
         info.IsCompoundProxyDefinition = 0;
+        info.IsLink = 0;
       
         this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
         this->UnMarkProxyAsModified(info.Proxy);
@@ -785,6 +787,7 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
   info.GroupName = groupname;
   info.ProxyName = name;
   info.IsCompoundProxyDefinition = 0;
+  info.IsLink = 0;
 
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
@@ -898,6 +901,14 @@ void vtkSMProxyManager::RegisterLink(const char* name, vtkSMLink* link)
     vtkWarningMacro("Replacing previously registered link with name " << name);
     }
   this->Internals->RegisteredLinkMap[name] = link;
+  
+  RegisteredProxyInformation info;
+  info.Proxy = 0;
+  info.GroupName = 0;
+  info.ProxyName = name;
+  info.IsCompoundProxyDefinition = 0;
+  info.IsLink = 1;
+  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
 
 //---------------------------------------------------------------------------
@@ -919,6 +930,14 @@ void vtkSMProxyManager::UnRegisterLink(const char* name)
     this->Internals->RegisteredLinkMap.find(name);
   if (it != this->Internals->RegisteredLinkMap.end())
     {
+    RegisteredProxyInformation info;
+    info.Proxy = 0;
+    info.GroupName = 0;
+    info.ProxyName = name;
+    info.IsCompoundProxyDefinition = 0;
+    info.IsLink = 1;
+    this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+
     this->Internals->RegisteredLinkMap.erase(it);
     }
 }
@@ -1221,6 +1240,7 @@ void vtkSMProxyManager::UnRegisterCompoundProxyDefinition(const char* name)
     info.GroupName = 0;
     info.ProxyName = name;
     info.IsCompoundProxyDefinition = 1;
+    info.IsLink = 0;
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
 
     this->Internals->CompoundProxyDefinitions.erase(it);
@@ -1242,6 +1262,7 @@ void vtkSMProxyManager::RegisterCompoundProxyDefinition(
   info.GroupName = 0;
   info.ProxyName = name;
   info.IsCompoundProxyDefinition = 1;
+  info.IsLink = 0;
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
 

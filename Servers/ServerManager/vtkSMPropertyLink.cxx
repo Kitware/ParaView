@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.11");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.12");
 //-----------------------------------------------------------------------------
 class vtkSMPropertyLinkObserver : public vtkCommand
 {
@@ -156,6 +156,8 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname,
     {
     this->ObserveProxyUpdates(proxy);
     }
+
+  this->Modified();
 }
 
 //-----------------------------------------------------------------------------
@@ -196,6 +198,8 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProperty* property, int updateDir
     property->AddObserver(vtkCommand::ModifiedEvent, 
       this->Internals->PropertyObserver);
     }
+  
+  this->Modified();
 
 }
 
@@ -210,6 +214,7 @@ void vtkSMPropertyLink::RemoveLinkedProperty(vtkSMProperty* property)
     if (iter->Property == property)
       {
       this->Internals->LinkedProperties.erase(iter);
+      this->Modified();
       break;
       }
     }

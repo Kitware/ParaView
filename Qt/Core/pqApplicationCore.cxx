@@ -88,6 +88,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqWriterFactory.h"
 #include "pqXMLUtil.h"
+#include "pqLinksModel.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -105,6 +106,7 @@ public:
   QPointer<pqDisplayPolicy> DisplayPolicy;
   vtkSmartPointer<vtkSMStateLoader> StateLoader;
   QPointer<pqLookupTableManager> LookupTableManager;
+  pqLinksModel LinksModel;
 
   QString OrganizationName;
   QString ApplicationName;
@@ -287,6 +289,12 @@ pqServerManagerSelectionModel* pqApplicationCore::getSelectionModel()
 pqPendingDisplayManager* pqApplicationCore::getPendingDisplayManager()
 {
   return this->Internal->PendingDisplayManager;
+}
+
+//-----------------------------------------------------------------------------
+pqLinksModel* pqApplicationCore::getLinksModel()
+{
+  return &this->Internal->LinksModel;
 }
 
 //-----------------------------------------------------------------------------

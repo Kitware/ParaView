@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMLink;
 class pqProxy;
 class pqRenderViewModule;
+class pqServerManagerModelItem;
 
 class PQCORE_EXPORT pqLinksModel : public QAbstractTableModel
 {
@@ -102,6 +103,30 @@ private:
   ItemType getLinkType(vtkSMLink* link) const;
   pqProxy* getProxyFromIndex(const QModelIndex& idx, int dir) const;
   QString getPropertyFromIndex(const QModelIndex& idx, int dir) const;
+
+  class pqInternal;
+  pqInternal* Internal;
+};
+
+
+// internal class, here for moc'ing purposes
+class pqLinksModelObject : public QObject
+{
+  Q_OBJECT
+public:
+  pqLinksModelObject(QString name, pqLinksModel* p);
+  ~pqLinksModelObject();
+
+  QString name() const;
+  vtkSMLink* link() const;
+
+public slots:
+  void proxyModified(pqServerManagerModelItem*);
+  void refresh();
+
+private:
+  class pqInternal;
+  pqInternal* Internal;
 };
 
 #endif

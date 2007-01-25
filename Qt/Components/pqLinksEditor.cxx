@@ -256,20 +256,20 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
      this,
      SLOT(updateEnabledState()), Qt::QueuedConnection);
 
-  pqLinksModel model;
+  pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
   
   if(link)
     {
-    QModelIndex idx = model.findLink(link);
+    QModelIndex idx = model->findLink(link);
     QItemSelectionModel::SelectionFlags selFlags =
       QItemSelectionModel::ClearAndSelect;
     
     // set the input/output proxies
     if(idx.isValid())
       {
-      this->lineEdit->setText(model.getLinkName(idx));
+      this->lineEdit->setText(model->getLinkName(idx));
 
-      if(model.getLinkType(idx) == pqLinksModel::Property)
+      if(model->getLinkType(idx) == pqLinksModel::Property)
         {
         this->comboBox->setCurrentIndex(1);
         }
@@ -278,7 +278,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
         this->comboBox->setCurrentIndex(0);
         }
       
-      pqProxy* inputProxy = model.getInputProxy(idx);
+      pqProxy* inputProxy = model->getInputProxy(idx);
       QModelIndex viewIdx = this->InputProxyModel->findProxy(inputProxy);
       if(viewIdx.isValid())
         {
@@ -288,7 +288,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
           setCurrentIndex(viewIdx, selFlags);
         }
       
-      pqProxy* outputProxy = model.getOutputProxy(idx);
+      pqProxy* outputProxy = model->getOutputProxy(idx);
       viewIdx = this->OutputProxyModel->findProxy(outputProxy);
       if(viewIdx.isValid())
         {
@@ -308,7 +308,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
     while(newLinkName.isEmpty())
       {
       QString tryName = QString("Link%1").arg(index++);
-      if(!model.getLink(tryName))
+      if(!model->getLink(tryName))
         {
         newLinkName = tryName;
         }
