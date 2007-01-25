@@ -180,18 +180,10 @@ signals:
   // Fired when a state file is loaded successfully.
   void stateLoaded();
 
-  // HACK
-  void sourceRemoved(pqPipelineSource*);
-  
-  void sourceCreated(pqPipelineSource*);
-
-  // sourceCreated is fired while the source creation undo 
-  // element is still active. On the contrary, this signal
-  // is fired after the undo stack is closed. This is
-  // signal to listen to for updated object panels etc which
-  // are usually consequence on non-undoable action such
-  // as selecting a source in the panel etc etc.
-  void postSourceCreated(pqPipelineSource*);
+  void finishedAddingServer(pqServer *server);
+  void finishSourceCreation(pqPipelineSource *source);
+  void finishedAddingSource(pqPipelineSource *source);
+  void aboutToRemoveSource(pqPipelineSource *source);
 
 protected:
   /// create signal/slot connections between pdata and smModel.

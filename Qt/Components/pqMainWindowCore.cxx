@@ -48,12 +48,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMainWindowCore.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
+#include "pqObjectInspectorDriver.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqPendingDisplayManager.h"
 #include "pqPendingDisplayManager.h"
 #include "pqPipelineBrowser.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
+#include "pqPipelineFilter.h"
 #include "pqPipelineMenu.h"
 #include "pqPipelineSource.h"
 #include "pqPlotViewModule.h"
@@ -150,17 +152,15 @@ public:
     VariableToolbar(0),
     CustomFilterToolbar(0),
     ToolTipTrapper(0),
-    IgnoreBrowserSelectionChanges(false),
-    ActiveSource(NULL),
-    ActiveServer(NULL),
-    LinksManager(NULL),
-    TimerLog(NULL)
+    InCreateSource(false),
+    LinksManager(0),
+    TimerLog(0)
   {
 #ifdef PARAVIEW_EMBED_PYTHON
   this->PythonDialog = 0;
 #endif // PARAVIEW_EMBED_PYTHON
   }
-  
+
   ~pqImplementation()
   {
     delete this->ToolTipTrapper;
@@ -193,10 +193,8 @@ public:
   
   pqToolTipTrapper* ToolTipTrapper;
 
-  bool IgnoreBrowserSelectionChanges;
+  bool InCreateSource;
   
-  QPointer<pqPipelineSource> ActiveSource;
-  QPointer<pqServer> ActiveServer;
   QPointer<pqProxyTabWidget> ProxyPanel;
   QPointer<pqAnimationManager> AnimationManager;
   QPointer<pqLinksManager> LinksManager;
@@ -216,28 +214,8 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   Implementation(new pqImplementation(parent_widget))
 {
   this->setObjectName("MainWindowCore");
-
-  QObject::connect(&pqActiveView::instance(),
-    SIGNAL(changed(pqGenericViewModule*)),
-    this, SLOT(setActiveView(pqGenericViewModule*)));
-
-  QObject::connect(this,
-                   SIGNAL(activeServerChanged(pqServer*)),
-                   &this->Implementation->MultiViewManager,
-                   SLOT(setActiveServer(pqServer*)));
-  
-  QObject::connect(this,
-                   SIGNAL(activeServerChanged(pqServer*)),
-                   pqApplicationCore::instance()->getUndoStack(),
-                   SLOT(setActiveServer(pqServer*)));
-  
-  QObject::connect(&pqActiveView::instance(),
-                   SIGNAL(changed(pqGenericViewModule*)),
-                   &this->selectionManager(),
-                   SLOT(setActiveView(pqGenericViewModule*)));
   
   pqApplicationCore* const core = pqApplicationCore::instance();
-
   core->setLookupTableManager(this->Implementation->LookupTableManager);
   QObject::connect(this, SIGNAL(postAccept()),
     this->Implementation->LookupTableManager, 
@@ -249,8 +227,13 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
  
   // Listen to the active render module changed signals.
   QObject::connect(
-    &pqActiveView::instance(),
-    SIGNAL(changed(pqGenericViewModule*)),
+    &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
+    this, SLOT(onActiveViewChanged(pqGenericViewModule*)));
+  QObject::connect(
+    &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
+    &this->selectionManager(), SLOT(setActiveView(pqGenericViewModule*)));
+  QObject::connect(
+    &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
     &this->Implementation->MultiViewManager,
     SLOT(setActiveView(pqGenericViewModule*)));
     
@@ -262,46 +245,48 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
       this->Implementation->CustomFilters, SLOT(removeCustomFilter(QString)));
 
-  // Connect selection changed events.
-  QObject::connect(this, SIGNAL(activeSourceChanged(pqPipelineSource*)),
-                   this, SLOT(onActiveSourceChanged(pqPipelineSource*)));
-
-  QObject::connect(this, SIGNAL(activeServerChanged(pqServer*)),
-                   this, SLOT(onActiveServerChanged(pqServer*)));
-
-  QObject::connect(this, SIGNAL(activeSourceChanged(pqPipelineSource*)),
-                   this, SLOT(onCoreActiveChanged()));
-  QObject::connect(this, SIGNAL(activeServerChanged(pqServer*)),
-                   this, SLOT(onCoreActiveChanged()));
+  // Listen to selection changed events.
+  pqServerManagerSelectionModel *selection =
+      pqApplicationCore::instance()->getSelectionModel();
+  this->connect(selection, SIGNAL(currentChanged(pqServerManagerModelItem*)),
+      this, SLOT(onSelectionChanged()));
+  this->connect(selection,
+      SIGNAL(selectionChanged(const pqServerManagerSelection&, const pqServerManagerSelection&)),
+      this, SLOT(onSelectionChanged()));
 
   // Update enable state when pending displays state changes.
-  QObject::connect(core->getPendingDisplayManager(), 
-                   SIGNAL(pendingDisplays(bool)),
-                   this, SLOT(onInitializeStates()));
+  this->connect(core->getPendingDisplayManager(), SIGNAL(pendingDisplays(bool)),
+      this, SLOT(onPendingDisplayChanged(bool)));
 
-  // HACK: This will make sure that the panel for the source being
-  // removed goes away before the source is deleted. Probably the selection
-  // should also go into the undo stack, that way on undo, the GUI selection
-  // can also be restored.
-  QObject::connect(core, SIGNAL(sourceRemoved(pqPipelineSource*)),
-                   this, SLOT(sourceRemoved(pqPipelineSource*)));
-  
-  QObject::connect(core->getServerManagerModel(),
-                   SIGNAL(aboutToRemoveServer(pqServer*)),
-                   this, 
-                   SLOT(serverRemoved(pqServer*)));
-  
-  QObject::connect(core->getServerManagerModel(), SIGNAL(serverAdded(pqServer*)),
-                   this, SLOT(serverAdded(pqServer*)));
-  
-  QObject::connect(core,
-                   SIGNAL(sourceCreated(pqPipelineSource*)),
-                   this, 
-                   SLOT(onSourceCreated(pqPipelineSource*)));
-  QObject::connect(core, SIGNAL(postSourceCreated(pqPipelineSource*)),
-                   this, SLOT(setActiveSource(pqPipelineSource*)));
-  
-  
+  // Create a render module and associate it with a window when a new
+  // server is added.
+  this->connect(core->getServerManagerModel(),
+      SIGNAL(serverAdded(pqServer*)),
+      this, SLOT(onServerCreation(pqServer*)));
+
+  this->connect(core, SIGNAL(finishedAddingServer(pqServer*)),
+      this, SLOT(onServerCreationFinished(pqServer*)));
+  this->connect(core->getServerManagerModel(),
+      SIGNAL(aboutToRemoveServer(pqServer*)),
+      this, SLOT(onRemovingServer(pqServer*)));
+  this->connect(core->getServerManagerModel(),
+      SIGNAL(finishedRemovingServer()),
+      this, SLOT(onSelectionChanged()));
+
+  // Add a source to the pending display list when a new one is created.
+  // The pending display should be created inside the undo set.
+  this->connect(core, SIGNAL(finishSourceCreation(pqPipelineSource*)),
+      this, SLOT(onSourceCreation(pqPipelineSource*)));
+  this->connect(core->getServerManagerModel(),
+      SIGNAL(preSourceRemoved(pqPipelineSource*)),
+      core->getPendingDisplayManager(), 
+      SLOT(removePendingDisplayForSource(pqPipelineSource*)));
+
+  this->connect(core, SIGNAL(finishedAddingSource(pqPipelineSource*)),
+      this, SLOT(onSourceCreationFinished(pqPipelineSource*)));
+  this->connect(core, SIGNAL(aboutToRemoveSource(pqPipelineSource*)),
+      this, SLOT(onRemovingSource(pqPipelineSource*)));
+
 /*
   this->installEventFilter(this);
 */
@@ -651,18 +636,6 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
     this->Implementation->PipelineBrowser->loadFilterInfo(
         xmlParser->GetRootElement());
     }
-
-  this->connect(
-    this->Implementation->PipelineBrowser,
-    SIGNAL(selectionChanged(pqServerManagerModelItem*)), 
-    this,
-    SLOT(onBrowserSelectionChanged(pqServerManagerModelItem*)));
-
-  QObject::connect(
-    this,
-    SIGNAL(select(pqServerManagerModelItem*)),
-    this->Implementation->PipelineBrowser,
-    SLOT(select(pqServerManagerModelItem*)));
   
   QObject::connect(
     &pqActiveView::instance(),
@@ -720,11 +693,15 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
     object_inspector,
     SLOT(forceModified(bool)));
 
+  // Use the server manager selection model to determine which page
+  // should be shown.
+  pqObjectInspectorDriver *driver = new pqObjectInspectorDriver(proxyPanel);
+  driver->setSelectionModel(pqApplicationCore::instance()->getSelectionModel());
   QObject::connect(
-    this,
-    SIGNAL(activeSourceChanged(pqProxy*)),
+    driver,
+    SIGNAL(objectChanged(pqProxy *)),
     proxyPanel,
-    SLOT(setProxy(pqProxy*)));
+    SLOT(setProxy(pqProxy *)));
   
   QObject::connect(
     &pqActiveView::instance(),
@@ -781,11 +758,15 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
     object_inspector,
     SLOT(forceModified(bool)));
 
+  // Use the server manager selection model to determine which page
+  // should be shown.
+  pqObjectInspectorDriver *driver = new pqObjectInspectorDriver(object_inspector);
+  driver->setSelectionModel(pqApplicationCore::instance()->getSelectionModel());
   QObject::connect(
-    this,
-    SIGNAL(activeSourceChanged(pqProxy*)),
+    driver,
+    SIGNAL(objectChanged(pqProxy *)),
     object_inspector,
-    SLOT(setProxy(pqProxy*)));
+    SLOT(setProxy(pqProxy *)));
   
   QObject::connect(
     &pqActiveView::instance(),
@@ -854,12 +835,9 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
   if (!this->Implementation->AnimationManager)
     {
     this->Implementation->AnimationManager = new pqAnimationManager(this);
-    QObject::connect(this, SIGNAL(activeServerChanged(pqServer*)),
-      this->Implementation->AnimationManager, 
-      SLOT(onActiveServerChanged(pqServer*))); 
     QObject::connect(this->Implementation->AnimationManager,
       SIGNAL(activeSceneChanged(pqAnimationScene*)),
-      this, SLOT(onInitializeStates()));
+      this, SLOT(onActiveSceneChanged(pqAnimationScene*)));
     this->Implementation->AnimationManager->setViewWidget(
       &this->multiViewManager());
     }
@@ -1007,7 +985,30 @@ bool pqMainWindowCore::compareView(
 
 void pqMainWindowCore::initializeStates()
 {
-  this->onInitializeStates();
+  emit this->enableFileOpen(true);
+
+  emit this->enableFileLoadServerState(true);
+  
+  emit this->enableFileSaveServerState(false);
+  emit this->enableFileSaveData(false);
+  emit this->enableFileSaveScreenshot(false);
+
+  emit this->enableFileSaveAnimation(false);
+  emit this->enableFileSaveGeometry(false);
+
+  emit this->enableServerConnect(true);
+  emit this->enableServerDisconnect(false);
+
+  emit this->enableSourceCreate(true);
+  emit this->enableFilterCreate(false);
+
+  emit this->enableVariableToolbar(false);
+  emit this->enableSelectionToolbar(false);
+
+  emit this->enableCameraUndo(false);
+  emit this->enableCameraRedo(false);
+  emit this->cameraUndoLabel("");
+  emit this->cameraRedoLabel("");
 }
 
 //-----------------------------------------------------------------------------
@@ -1026,13 +1027,17 @@ void pqMainWindowCore::onFileOpen()
     server_browser->setModal(true);
     server_browser->show();
     }
-  else if(!this->getActiveServer())
-    {
-    qDebug() << "No active server selected.";
-    }
   else
     {
-    this->onFileOpen(this->getActiveServer());
+    pqServer *server = this->getActiveServer();
+    if(server)
+      {
+      this->onFileOpen(server);
+      }
+    else
+      {
+      qDebug() << "No active server selected.";
+      }
     }
 }
 
@@ -1062,19 +1067,18 @@ void pqMainWindowCore::onFileOpen(pqServer* server)
 void pqMainWindowCore::onFileOpen(const QStringList& files)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
+  pqServer *server = this->getActiveServer();
   for(int i = 0; i != files.size(); ++i)
     {
     pqPipelineSource* reader = this->createReaderOnActiveServer(files[i]);
     if (!reader)
       {
-      pqSelectReaderDialog prompt(files[i], this->getActiveServer(),
+      pqSelectReaderDialog prompt(files[i], server,
                                   qobject_cast<QWidget*>(this->parent()));
       if(prompt.exec() == QDialog::Accepted)
         {
         QString whichReader = prompt.getReader();
-        reader = core->createReaderOnServer(files[i],
-                                            this->getActiveServer(),
-                                            whichReader);
+        reader = core->createReaderOnServer(files[i], server, whichReader);
         }
       else
         {
@@ -1085,7 +1089,7 @@ void pqMainWindowCore::onFileOpen(const QStringList& files)
     // Add this to the list of recent server resources ...
     if(reader)
       {
-      pqServerResource resource = this->getActiveServer()->getResource();
+      pqServerResource resource = server->getResource();
       resource.setPath(files[i]);
       core->serverResources().add(resource);
       core->serverResources().save(*core->settings());
@@ -1100,13 +1104,13 @@ void pqMainWindowCore::onFileLoadServerState()
   int num_servers = core->getServerManagerModel()->getNumberOfServers();
   if (num_servers > 0)
     {
-    if (!this->getActiveServer())
+    pqServer* server = this->getActiveServer();
+    if (!server)
       {
       qDebug() << "No active server. Cannot load state.";
       return;
       }
-    pqServer* server = this->getActiveServer();
-    this->setActiveSource(NULL);
+
     this->onFileLoadServerState(server);
     }
   else
@@ -1144,6 +1148,7 @@ void pqMainWindowCore::onFileLoadServerState(pqServer*)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileLoadServerState(const QStringList& files)
 {
+  pqServer *server = this->getActiveServer();
   for(int i = 0; i != files.size(); ++i)
     {
     // Read in the xml file to restore.
@@ -1155,14 +1160,13 @@ void pqMainWindowCore::onFileLoadServerState(const QStringList& files)
     vtkPVXMLElement *root = xmlParser->GetRootElement();
     if (root)
       {
-      pqApplicationCore::instance()->loadState(
-        root, this->getActiveServer());
+      pqApplicationCore::instance()->loadState(root, server);
                                               
       // Add this to the list of recent server resources ...
       pqServerResource resource;
       resource.setScheme("session");
       resource.setPath(files[i]);
-      resource.setSessionServer(this->getActiveServer()->getResource());
+      resource.setSessionServer(server->getResource());
       pqApplicationCore::instance()->serverResources().add(resource);
       pqApplicationCore::instance()->serverResources().save(*pqApplicationCore::instance()->settings());
       }
@@ -1203,6 +1207,7 @@ void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
 
 
   // Print the xml to the requested file(s).
+  pqServer *server = this->getActiveServer();
   for(int i = 0; i != files.size(); ++i)
     {
     ofstream os(files[i].toAscii().data(), ios::out);
@@ -1212,7 +1217,7 @@ void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
     pqServerResource resource;
     resource.setScheme("session");
     resource.setPath(files[i]);
-    resource.setSessionServer(this->getActiveServer()->getResource());
+    resource.setSessionServer(server->getResource());
     pqApplicationCore::instance()->serverResources().add(resource);
     pqApplicationCore::instance()->serverResources().save(*pqApplicationCore::instance()->settings());
     }
@@ -1277,7 +1282,7 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
   // TODO: We can popup a wizard or something for setting the properties
   // on the writer.
   vtkSMProxyProperty::SafeDownCast(writer->GetProperty("Input"))->AddProxy(
-    this->getActiveSource()->getProxy());
+    source->getProxy());
   writer->UpdateVTKObjects();
 
   writer->UpdatePipeline();
@@ -1487,7 +1492,6 @@ void pqMainWindowCore::onServerDisconnect()
     {
     pqApplicationCore::instance()->removeServer(server);
     }
-  this->onInitializeStates();
 }
 
 void pqMainWindowCore::onToolsCreateCustomFilter()
@@ -1956,154 +1960,196 @@ void pqMainWindowCore::onCompoundProxyRemoved(QString proxy)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onActiveSourceChanged(pqPipelineSource* src)
+void pqMainWindowCore::onSelectionChanged()
 {
-  // Update the filters menu if there are no sources waiting for displays.
-  // Updating the filters menu will cause the execution of a filter because
-  // it's output is needed to check filter matches. We do not want the
-  // filter to execute prematurely.
-  if (pqApplicationCore::instance()->getPendingDisplayManager()
-      ->getNumberOfPendingDisplays() == 0)
+  pqServerManagerModelItem *item = this->getActiveObject();
+  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
+  pqServer *server = dynamic_cast<pqServer *>(item);
+  if(!server && source)
     {
-    this->updateFiltersMenu(src);
+    server = source->getServer();
     }
 
-  this->onInitializeStates();
+  pqApplicationCore *core = pqApplicationCore::instance();
+  int numServers = core->getServerManagerModel()->getNumberOfServers();
+  pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(
+      pqActiveView::instance().current());
+  bool pendingDisplays = 
+      core->getPendingDisplayManager()->getNumberOfPendingDisplays() > 0;
+
+  // Update the filters menu.
+  if(!pendingDisplays)
+    {
+    this->updateFiltersMenu(source);
+    }
+
+  // Update the multi-view and undo stack.
+  this->Implementation->MultiViewManager.setActiveServer(server);
+  pqApplicationCore::instance()->getUndoStack()->setActiveServer(server);
+
+  // Update the server connect/disconnect actions.
+  emit this->enableServerConnect(numServers == 0);
+  emit this->enableServerDisconnect(server != 0);
+
+  // Update various actions that depend on pending displays.
+  this->updatePendingActions(server, source, numServers, pendingDisplays);
+
+  // Update the reset center action.
+  emit this->enableResetCenter(source != 0 && renderModule != 0);
+
+  // Update the save screenshot action.
+  emit this->enableFileSaveScreenshot(server != 0 && renderModule != 0);
+
+  // Update the animation manager if it exists.
+  if(this->Implementation->AnimationManager)
+    {
+    // Update the animation manager. Setting the active server will
+    // change the active scene.
+    this->Implementation->AnimationManager->onActiveServerChanged(server);
+    }
+
+  // TEMP
+  emit this->activeServerChanged(server);
+  emit this->activeSourceChanged(source);
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onActiveServerChanged(pqServer* )
+void pqMainWindowCore::onPendingDisplayChanged(bool pendingDisplays)
 {
-  this->onInitializeStates();
+  pqServerManagerModelItem *item = this->getActiveObject();
+  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
+  pqServer *server = dynamic_cast<pqServer *>(item);
+  if(!server && source)
+    {
+    server = source->getServer();
+    }
+
+  emit this->enableFileOpen(!pendingDisplays);
+
+  pqApplicationCore *core = pqApplicationCore::instance();
+  int numServers = core->getServerManagerModel()->getNumberOfServers();
+  this->updatePendingActions(server, source, numServers, pendingDisplays);
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onCoreActiveChanged()
+void pqMainWindowCore::onActiveViewChanged(pqGenericViewModule *view)
 {
-  if(this->Implementation->IgnoreBrowserSelectionChanges)
+  pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(view);
+
+  // Update the selection toolbar.
+  emit this->enableSelectionToolbar(renderModule != 0);
+
+  // Get the active source and server.
+  pqServerManagerModelItem *item = this->getActiveObject();
+  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
+  pqServer *server = dynamic_cast<pqServer *>(item);
+  if(!server && source)
     {
-    return;
+    server = source->getServer();
     }
 
-  this->Implementation->IgnoreBrowserSelectionChanges = true;
-    
-  pqServer* const activeServer = this->getActiveServer();
-  pqPipelineSource* const activeSource = 
-    this->getActiveSource();
- 
-  pqServerManagerModelItem* item = activeSource;
-  if(!item)
+  // Update the reset center action.
+  emit this->enableResetCenter(source != 0 && renderModule != 0);
+
+  // Update the show center axis action.
+  emit this->enableShowCenterAxis(renderModule != 0);
+
+  // Update the save screenshot action.
+  emit this->enableFileSaveScreenshot(server != 0 && renderModule != 0);
+
+  // Update the animation manager if it exists.
+  if(this->Implementation->AnimationManager)
     {
-    item = activeServer;
+    pqAnimationScene *scene =
+        this->Implementation->AnimationManager->getActiveScene();
+    emit this->enableFileSaveGeometry(scene != 0 && renderModule != 0);
     }
 
-  emit this->select(item);
-  
-  this->Implementation->IgnoreBrowserSelectionChanges = false;
+  // Update the view undo/redo state.
+  this->updateViewUndoRedo(renderModule);
+  if(renderModule)
+    {
+    // Make sure the render module undo stack is connected.
+    this->connect(renderModule->getInteractionUndoStack(),
+        SIGNAL(StackChanged(bool, QString, bool, QString)),
+        this, SLOT(onActiveViewUndoChanged()));
+    }
 }
 
-/*
-bool pqMainWindowCore::eventFilter(QObject* watched, QEvent* e)
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onActiveViewUndoChanged()
 {
-  if (e->type() == QEvent::KeyPress)
+  pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(
+      pqActiveView::instance().current());
+  if(renderModule && renderModule == this->sender())
     {
-    QKeyEvent* kEvent = static_cast<QKeyEvent*>(e);
-    
-    if (kEvent->key() == Qt::Key_S)
+    this->updateViewUndoRedo(renderModule);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onActiveSceneChanged(pqAnimationScene *scene)
+{
+  pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(
+      pqActiveView::instance().current());
+  emit this->enableFileSaveAnimation(scene != 0);
+  emit this->enableFileSaveGeometry(scene != 0 && renderModule != 0);
+}
+
+//-----------------------------------------------------------------------------
+pqServerManagerModelItem *pqMainWindowCore::getActiveObject() const
+{
+  pqServerManagerModelItem *item = 0;
+  pqServerManagerSelectionModel *selection =
+      pqApplicationCore::instance()->getSelectionModel();
+  const pqServerManagerSelection *selected = selection->selectedItems();
+  if(selected->size() == 1)
+    {
+    item = selected->first();
+    }
+  else if(selected->size() > 1)
+    {
+    item = selection->currentItem();
+    if(item && !selection->isSelected(item))
       {
-      if (this->Implementation->SelectionManager->getMode() ==
-          pqSelectionManager::SELECT)
-        {
-        QAction*  interact = 
-          this->Implementation->SelectionToolBar->findChild<QAction*>(
-            "InteractButton");
-        if (this->Implementation->SelectionToolBar->isEnabled())
-          {
-          interact->trigger();
-          }
-        }
-      else
-        {
-        QAction*  selectAction = 
-          this->Implementation->SelectionToolBar->findChild<QAction*>(
-            "SelectButton");
-        if (this->Implementation->SelectionToolBar->isEnabled())
-          {
-          selectAction->trigger();
-          }
-        }
-      return true;
+      item = 0;
       }
     }
 
-  return QMainWindow::eventFilter(watched, e);
+  return item;
 }
-*/
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onInitializeStates()
+void pqMainWindowCore::updatePendingActions(pqServer *server,
+    pqPipelineSource *source, int numServers, bool pendingDisplays)
 {
-  pqServer* const server = this->getActiveServer();
-  pqPipelineSource *source = this->getActiveSource();
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
-    pqActiveView::instance().current());
-  
-  const int num_servers = pqApplicationCore::instance()->
-    getServerManagerModel()->getNumberOfServers();
+  // Update the file menu actions.
+  emit this->enableFileLoadServerState(!pendingDisplays &&
+      (!numServers || server != 0));
+  emit this->enableFileSaveServerState(!pendingDisplays && server !=0);
+  emit this->enableFileSaveData(!pendingDisplays && source);
 
-  const bool pending_displays = 
-    (pqApplicationCore::instance()->getPendingDisplayManager()->
-     getNumberOfPendingDisplays() > 0);
+  // Update the source and filter menus.
+  emit this->enableSourceCreate(!pendingDisplays &&
+      (numServers == 0 || server != 0));
+  emit this->enableFilterCreate(!pendingDisplays &&
+      source != 0 && server != 0);
 
-  emit this->enableFileOpen(!pending_displays);
-
-  emit this->enableFileLoadServerState(
-    !pending_displays && (!num_servers || server !=0));
-  
-  emit this->enableFileSaveServerState(
-    !pending_displays && server !=0);
-  
-  emit this->enableFileSaveData(!pending_displays && source);
-
-  emit this->enableFileSaveScreenshot(server != 0 && rm != 0);
-
-  // Can save animation if there exists an active scene.
-  emit this->enableFileSaveAnimation(
-    this->getAnimationManager()->getActiveScene() != NULL);
-
-  emit this->enableFileSaveGeometry(
-    (this->getAnimationManager()->getActiveScene() != NULL) && rm);
-
-  emit this->enableServerConnect(num_servers == 0);
-    
-  emit this->enableServerDisconnect(server != 0);
-
-  emit this->enableSourceCreate(
-    (num_servers == 0 || server != 0) && !pending_displays);
-
-  emit this->enableFilterCreate(
-    source != 0 && server != 0 && !pending_displays);
-
-  emit this->enableVariableToolbar(
-    source != 0 && !pending_displays);
-
-  emit this->enableSelectionToolbar(rm ? true : false);
-
-  this->onInitializeInteractionStates();
+  // Update the variable toolbar.
+  emit this->enableVariableToolbar(source != 0 && !pendingDisplays);
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onInitializeInteractionStates()
+void pqMainWindowCore::updateViewUndoRedo(pqRenderViewModule *renderModule)
 {
   bool can_undo_camera = false;
   bool can_redo_camera = false;
-  QString undo_camera_label = "";
-  QString redo_camera_label = "";
+  QString undo_camera_label;
+  QString redo_camera_label;
 
-  if(pqRenderViewModule* const rm = qobject_cast<pqRenderViewModule*>(
-      pqActiveView::instance().current()))
+  if(renderModule)
     {
-    pqUndoStack* const stack = rm->getInteractionUndoStack();
+    pqUndoStack* const stack = renderModule->getInteractionUndoStack();
     if (stack && stack->CanUndo())
       {
       can_undo_camera = true;
@@ -2122,40 +2168,126 @@ void pqMainWindowCore::onInitializeInteractionStates()
   emit this->cameraRedoLabel(redo_camera_label);
 }
 
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onServerCreationFinished(pqServer *server)
+{
+  // Select the newly created server.
+  pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(server,
+      pqServerManagerSelectionModel::ClearAndSelect);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onRemovingServer(pqServer *server)
+{
+  // Make sure the server and its sources are not selected.
+  pqServerManagerSelection toDeselect;
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqServerManagerSelectionModel *selection = core->getSelectionModel();
+  toDeselect.append(server);
+  QList<pqPipelineSource*> sources =
+      core->getServerManagerModel()->getSources(server);
+  QList<pqPipelineSource*>::Iterator iter = sources.begin();
+  for( ; iter != sources.end(); ++iter)
+    {
+    toDeselect.append(*iter);
+    }
+
+  selection->select(toDeselect, pqServerManagerSelectionModel::Deselect);
+  if(selection->currentItem() == server)
+    {
+    if(selection->selectedItems()->size() > 0)
+      {
+      selection->setCurrentItem(selection->selectedItems()->last(),
+            pqServerManagerSelectionModel::NoUpdate);
+      }
+    else
+      {
+      selection->setCurrentItem(0, pqServerManagerSelectionModel::NoUpdate);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onSourceCreationFinished(pqPipelineSource *source)
+{
+  if(this->Implementation->ProxyPanel)
+    {
+    // Make sure the property tab is showing since the accept/reset
+    // buttons are on that panel.
+    this->Implementation->ProxyPanel->setCurrentIndex(
+        pqProxyTabWidget::PROPERTIES);
+    }
+
+  // Set the new source as the current selection.
+  pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(source,
+      pqServerManagerSelectionModel::ClearAndSelect);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
+{
+  // If the source is selected, remove it from the selection.
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqServerManagerSelectionModel *selection = core->getSelectionModel();
+  if(selection->isSelected(source))
+    {
+    if(selection->selectedItems()->size() > 1)
+      {
+      // Deselect the source.
+      selection->select(source, pqServerManagerSelectionModel::Deselect);
+
+      // If the source is the current item, change the current item.
+      if(selection->currentItem() == source)
+        {
+        selection->setCurrentItem(selection->selectedItems()->last(),
+            pqServerManagerSelectionModel::NoUpdate);
+        }
+      }
+    else
+      {
+      // If the item is a filter and has only one input, set the
+      // input as the current item. Otherwise, select the server.
+      pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter *>(source);
+      if(filter && filter->getInputCount() == 1)
+        {
+        selection->setCurrentItem(filter->getInput(0),
+            pqServerManagerSelectionModel::ClearAndSelect);
+        }
+      else
+        {
+        selection->setCurrentItem(source->getServer(),
+            pqServerManagerSelectionModel::ClearAndSelect);
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onServerCreation(pqServer *server)
+{
+  // Create a render module.
+  pqPipelineBuilder::instance()->createWindow(server);
+
+  // Tell the multiview manager to associate a window
+  // for the newly created render module.
+  this->Implementation->MultiViewManager.setActiveServer(server);
+  this->Implementation->MultiViewManager.allocateWindowsToRenderModules();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onSourceCreation(pqPipelineSource *source)
+{
+  pqApplicationCore *core = pqApplicationCore::instance();
+  core->getPendingDisplayManager()->addPendingDisplayForSource(source);
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onPostAccept()
 {
   this->Implementation->GenericViewManager->renderAllViews();
   this->updateFiltersMenu(this->getActiveSource());
 
   emit this->postAccept();
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::onBrowserSelectionChanged(pqServerManagerModelItem* item)
-{
-  if (this->Implementation->IgnoreBrowserSelectionChanges)
-    {
-    return;
-    }
-  this->Implementation->IgnoreBrowserSelectionChanges = true;
-  
-  // Update the internal iVars that denote the active selections.
-  pqServer* server = 0;
-  pqPipelineSource* source = dynamic_cast<pqPipelineSource*>(item);
-  if (source)
-    {
-    server = source->getServer();
-    this->setActiveServer(server);
-    this->setActiveSource(source);
-    }
-  else
-    {
-    server = dynamic_cast<pqServer*>(item);
-    this->setActiveSource(0);
-    this->setActiveServer(server);
-
-    }
-  this->Implementation->IgnoreBrowserSelectionChanges = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -2233,53 +2365,24 @@ void pqMainWindowCore::updateFiltersMenu(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqMainWindowCore::getActiveSource()
 {
-  return this->Implementation->ActiveSource;
+  return dynamic_cast<pqPipelineSource *>(this->getActiveObject());
 }
 
 //-----------------------------------------------------------------------------
 pqServer* pqMainWindowCore::getActiveServer()
 {
-  return this->Implementation->ActiveServer;
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::setActiveSource(pqPipelineSource* src)
-{
-  if (this->Implementation->ActiveSource == src)
+  pqServerManagerModelItem *item = this->getActiveObject();
+  pqServer *server = dynamic_cast<pqServer *>(item);
+  if(!server)
     {
-    return;
+    pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
+    if(source)
+      {
+      server = source->getServer();
+      }
     }
 
-  this->Implementation->ActiveSource = src;
-  emit this->activeSourceChanged(static_cast<pqProxy*>(src));
-  emit this->activeSourceChanged(src);
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::setActiveServer(pqServer* server)
-{
-  if (this->Implementation->ActiveServer == server)
-    {
-    return;
-    }
-  this->Implementation->ActiveServer = server;
-  emit this->activeServerChanged(server);
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::setActiveView(pqGenericViewModule* view)
-{
-  this->onInitializeStates();
-
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
-  if(rm)
-    {
-    QObject::connect(
-      rm->getInteractionUndoStack(),
-      SIGNAL(StackChanged(bool, QString, bool, QString)),
-      this,
-      SLOT(onInitializeInteractionStates()));
-    }
+  return server;
 }
 
 //-----------------------------------------------------------------------------
@@ -2307,41 +2410,6 @@ void pqMainWindowCore::removeActiveServer()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::sourceRemoved(pqPipelineSource* source)
-{
-  if (source == this->getActiveSource())
-    {
-    pqServer* server =this->getActiveServer();
-    this->setActiveSource(NULL);
-    this->Implementation->ActiveServer = 0;
-    this->setActiveServer(server);
-    }
-
-  pqApplicationCore::instance()->getPendingDisplayManager()->
-    removePendingDisplayForSource(source);
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::onSourceCreated(pqPipelineSource* source)
-{
-  if (!source)
-    {
-    return;
-    }
-
-  pqApplicationCore::instance()->getPendingDisplayManager()->
-        addPendingDisplayForSource(source);
-
-  if (this->Implementation->ProxyPanel)
-    {
-    // Show the properties page.
-    this->Implementation->ProxyPanel->setCurrentIndex(
-      pqProxyTabWidget::PROPERTIES);
-    }
-  
-}
-
-//-----------------------------------------------------------------------------
 pqPipelineSource* pqMainWindowCore::createSourceOnActiveServer(
   const QString& xmlname)
 {
@@ -2362,8 +2430,16 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
 pqPipelineSource* pqMainWindowCore::createCompoundSource(
   const QString& name)
 {
-  pqPipelineSource* cp = pqApplicationCore::instance()->createCompoundFilter(name,
-      this->getActiveServer(), this->getActiveSource());
+  pqServerManagerModelItem *item = this->getActiveObject();
+  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
+  pqServer *server = dynamic_cast<pqServer *>(item);
+  if(!server && source)
+    {
+    server = source->getServer();
+    }
+
+  pqPipelineSource* cp = pqApplicationCore::instance()->createCompoundFilter(
+      name, server, source);
 
   cp->getProxy()->UpdateVTKObjects();
   
@@ -2380,10 +2456,10 @@ pqPipelineSource* pqMainWindowCore::createReaderOnActiveServer(
 
 void pqMainWindowCore::disableAutomaticDisplays()
 {
-  QObject::disconnect(pqApplicationCore::instance(),
-    SIGNAL(sourceCreated(pqPipelineSource*)),
-    this, 
-    SLOT(onSourceCreated(pqPipelineSource*)));
+  QObject::disconnect(pqApplicationCore::instance()->getServerManagerModel(),
+    SIGNAL(sourceAdded(pqPipelineSource*)),
+    pqApplicationCore::instance()->getPendingDisplayManager(), 
+    SLOT(addPendingDisplayForSource(pqPipelineSource*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -2395,31 +2471,6 @@ void pqMainWindowCore::createPendingDisplays()
     pqApplicationCore::instance()->getPendingDisplayManager()->
       createPendingDisplays(view);
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::serverRemoved(pqServer* server)
-{
-  if(server == this->Implementation->ActiveServer)
-    {
-    this->setActiveSource(NULL);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::serverAdded(pqServer* server)
-{
-  this->setActiveServer(server);
-
-  // Create a render module.
-  pqPipelineBuilder::instance()->createWindow(this->getActiveServer());
-
-  // Tell the multiview manager to associate a window
-  // for the newly created render module.
-  this->Implementation->MultiViewManager.allocateWindowsToRenderModules();
-
-  // Make the newly created server is selected.
-  //emit this->select(server);
 }
 
 //-----------------------------------------------------------------------------

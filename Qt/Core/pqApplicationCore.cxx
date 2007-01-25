@@ -352,11 +352,7 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
       }
     }
 
-  // HACK: This will make sure that the panel for the source being
-  // removed goes away before the source is deleted. Probably the selection
-  // should also go into the undo stack, that way on undo, the GUI selection
-  // can also be restored.
-  emit this->sourceRemoved(source);
+  emit this->aboutToRemoveSource(source);
  
   this->getPipelineBuilder()->remove(source);
 
@@ -615,7 +611,7 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
 
       server = smModel->getServer(id);
       server->setResource(server_resource);
-//      emit this->serverCreated(server);
+      emit this->finishedAddingServer(server);
       }
     }
 
@@ -711,12 +707,11 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
       {
       ::SetDefaultInputArray(filter->getProxy(), "SelectInputVectors");
       }
-
-    emit this->sourceCreated(filter);
     }
-    
+
+  emit this->finishSourceCreation(filter);
   this->getUndoStack()->EndUndoSet();
-  emit this->postSourceCreated(filter);
+  emit this->finishedAddingSource(filter);
   return filter;
 }
 
@@ -736,10 +731,10 @@ pqPipelineSource* pqApplicationCore::createSourceOnServer(const QString& xmlname
     "sources", xmlname.toAscii().data(), server);
   source->setDefaultValues();
 
-  emit this->sourceCreated(source);
+  emit this->finishSourceCreation(source);
   this->getUndoStack()->EndUndoSet();
   
-  emit this->postSourceCreated(source);
+  emit this->finishedAddingSource(source);
   return source;
 }
 
@@ -775,11 +770,11 @@ pqPipelineSource* pqApplicationCore::createCompoundFilter(
   if(source)
     {
     source->setDefaultValues();
-    emit this->sourceCreated(source);
     }
 
+  emit this->finishSourceCreation(source);
   this->getUndoStack()->EndUndoSet();
-  emit this->postSourceCreated(source);
+  emit this->finishedAddingSource(source);
   return source;
 }
 
@@ -863,9 +858,9 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
   reader->rename(
     vtksys::SystemTools::GetFilenameName(filename.toAscii().data()).c_str());
 
-  emit this->sourceCreated(reader);
+  emit this->finishSourceCreation(reader);
   this->getUndoStack()->EndUndoSet();
-  emit this->postSourceCreated(reader);
+  emit this->finishedAddingSource(reader);
   return reader;
 }
 

@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 class QSize;
+class pqAnimationScene;
 class pqGenericViewManager;
 class pqGenericViewModule;
 class pqMultiView;
@@ -199,21 +200,15 @@ signals:
   void enableFilterCreate(bool);
   void enableVariableToolbar(bool);
   void enableSelectionToolbar(bool);
+  void enableResetCenter(bool);
+  void enableShowCenterAxis(bool);
   
   /** \todo Hide these private implementation details */
   void postAccept();
-  void select(pqServerManagerModelItem*);
   
-  // Fired when the active source changes.
+  // TEMP
   void activeSourceChanged(pqPipelineSource*);
-  void activeSourceChanged(pqProxy*);
-
-  // Fired when the active server changes.
   void activeServerChanged(pqServer*);
-
-  // Fired when a source/filter/reader/compound proxy is
-  // created without a display.
-  void pendingDisplays(bool status);
 
 public slots:
   virtual void onFileOpen();
@@ -267,16 +262,6 @@ public slots:
   void onToolsPythonShell();
   
   void onHelpEnableTooltips(bool enabled = true);
-  
-  // Call this slot to set the active source. 
-  void setActiveSource(pqPipelineSource*);
-
-  // Call this slot to set the active server. 
-  void setActiveServer(pqServer*);
-
-  // Changes the active view. At one time either 1 render view
-  // or 1 plot view can be active.
-  void setActiveView(pqGenericViewModule* view);
 
   // Call this slot when accept is called. This method will create
   // displays for any sources/filters that are pending.
@@ -324,41 +309,32 @@ private slots:
   void onCreateCompoundProxy(QAction*);
   void onCompoundProxyAdded(QString proxy);
   void onCompoundProxyRemoved(QString proxy);
-  void onActiveSourceChanged(pqPipelineSource*);
-  void onActiveServerChanged(pqServer*);
-  void onCoreActiveChanged();
 
-  void onInitializeStates();
-  void onInitializeInteractionStates();
+  void onSelectionChanged();
+  void onPendingDisplayChanged(bool pendingDisplays);
+  void onActiveViewChanged(pqGenericViewModule *view);
+  void onActiveViewUndoChanged();
+  void onActiveSceneChanged(pqAnimationScene *scene);
+
+  void onServerCreationFinished(pqServer *server);
+  void onRemovingServer(pqServer *server);
+  void onSourceCreationFinished(pqPipelineSource *source);
+  void onRemovingSource(pqPipelineSource *source);
+
+  void onServerCreation(pqServer *server);
+  void onSourceCreation(pqPipelineSource *source);
 
   void onPostAccept();
 
-  // Called when selection on the pqPipelineBrowser changes.
-  // Use this slot to communicate the pipeline browser selection to the
-  // ApplicationCore. Any work that needs to be done on selection
-  // change should actually be done by monitoring selection events
-  // from the ApplicationCore.
-  void onBrowserSelectionChanged(pqServerManagerModelItem*);
-
   // enable/disable filters as per the source.
   void updateFiltersMenu(pqPipelineSource* source);
-
-  // called when a source is removed by the pqServerManagerModel. If
-  // the removed source is the active source, we must change it.
-  void sourceRemoved(pqPipelineSource*);
-  void serverRemoved(pqServer* server);
-
-  // Called when a new server is added to the pqServerManagerModel.
-  void serverAdded(pqServer* server);
   
-  // Performs the set of actions need to be performed after a new 
-  // source/reader/filter/customfilter is created. This includes
-  // seting up handler to create a default display proxy for the source
-  // after first accept, set up undo stack so that the undo/redo
-  // works correctly with pending displays etc etc.
-  void onSourceCreated(pqPipelineSource*);
   void updateRecentFilterMenu(QAction* action);
 private:
+  pqServerManagerModelItem *getActiveObject() const;
+  void updatePendingActions(pqServer *server, pqPipelineSource *source,
+      int numServers, bool pendingDisplays);
+  void updateViewUndoRedo(pqRenderViewModule *renderModule);
   void saveRecentFilterMenu();
   void restoreRecentFilterMenu();
   class pqImplementation;

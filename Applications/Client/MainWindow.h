@@ -77,8 +77,7 @@ private slots:
 
   void assistantError(const QString& err);
 
-  void setActiveView(pqGenericViewModule*);
-  void setActiveSource(pqPipelineSource*);
+  void onShowCenterAxisChanged(bool);
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

@@ -69,6 +69,11 @@ pqPendingDisplayManager::~pqPendingDisplayManager()
 
 void pqPendingDisplayManager::addPendingDisplayForSource(pqPipelineSource* s)
 {
+  if(!s)
+    {
+    return;
+    }
+
   this->internalAddPendingDisplayForSource(s);
 
   pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();

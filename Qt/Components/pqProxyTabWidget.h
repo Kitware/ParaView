@@ -54,6 +54,9 @@ public:
 
   /// get the object inspector
   pqObjectInspectorWidget* getObjectInspector();
+
+  /// get the display editor
+  pqDisplayProxyEditorWidget* getDisplayEditor() const {return this->Display;}
   
   /// get the proxy for which properties are displayed
   pqProxy* getProxy();

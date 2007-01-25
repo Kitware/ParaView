@@ -698,11 +698,11 @@ MainWindow::MainWindow() :
     &this->Implementation->Core, SLOT(setCenterAxesVisibility(bool)));
 
   QObject::connect(
-    &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
-    this, SLOT(setActiveView(pqGenericViewModule*)));
+    &this->Implementation->Core, SIGNAL(enableShowCenterAxis(bool)),
+    this, SLOT(onShowCenterAxisChanged(bool)));
   QObject::connect(
-    &this->Implementation->Core, SIGNAL(activeSourceChanged(pqPipelineSource*)),
-    this, SLOT(setActiveSource(pqPipelineSource*)));
+    &this->Implementation->Core, SIGNAL(enableResetCenter(bool)),
+    this->Implementation->UI.actionShowCenterAxes, SLOT(setEnabled(bool)));
 
   // Restore the state of the window ...
   pqApplicationCore::instance()->settings()->restoreState("MainWindow", *this);
@@ -717,26 +717,15 @@ MainWindow::~MainWindow()
 }
 
 //-----------------------------------------------------------------------------
-void MainWindow::setActiveView(pqGenericViewModule* view)
+void MainWindow::onShowCenterAxisChanged(bool enabled)
 {
-  pqRenderViewModule* renView = qobject_cast<pqRenderViewModule*>(view);
-  bool is_ren = (renView != NULL);
-  this->Implementation->UI.actionShowCenterAxes->setEnabled(is_ren);
+  this->Implementation->UI.actionShowCenterAxes->setEnabled(enabled);
   this->Implementation->UI.actionShowCenterAxes->blockSignals(true);
+  pqRenderViewModule* renView = qobject_cast<pqRenderViewModule*>(
+    pqActiveView::instance().current());
   this->Implementation->UI.actionShowCenterAxes->setChecked(
-    (renView? renView->getCenterAxesVisibility(): false));
+    renView ? renView->getCenterAxesVisibility() : false);
   this->Implementation->UI.actionShowCenterAxes->blockSignals(false);
-  this->Implementation->UI.actionResetCenter->setEnabled(is_ren &&
-    this->Implementation->Core.getActiveSource());
-}
-
-//-----------------------------------------------------------------------------
-void MainWindow::setActiveSource(pqPipelineSource* src)
-{
-  bool is_ren = (qobject_cast<pqRenderViewModule*>(
-      pqActiveView::instance().current()) != NULL);
-  this->Implementation->UI.actionResetCenter->setEnabled(
-    src && is_ren);
 }
 
 //-----------------------------------------------------------------------------

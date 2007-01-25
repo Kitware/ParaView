@@ -23,7 +23,7 @@ object9 = 'MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/1/
 QtTesting.playCommand(object9, 'activate', '')
 object10 = 'MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView'
 QtTesting.playCommand(object10, 'currentChanged', '/0/2|0')
-QtTesting.playCommand(object10, 'currentChanged', '/0/2|1')
+#QtTesting.playCommand(object10, 'currentChanged', '/0/2|1')
 object11 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0'
 QtTesting.playCommand(object11, 'set_tab', '1')
 QtTesting.playCommand(object1, 'activate', 'actionFileSaveServerState')

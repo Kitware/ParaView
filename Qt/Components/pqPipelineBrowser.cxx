@@ -158,11 +158,6 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   modifiedFont.setBold(true);
   this->Model->setModifiedFont(modifiedFont);
 
-  // Listen to the selection change signals.
-  this->connect(this->TreeView->getSelectionModel(),
-      SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-      this, SLOT(changeCurrent(const QModelIndex &, const QModelIndex &)));
-
   // Listen for index clicked signals to change visibility.
   this->connect(this->TreeView, SIGNAL(clicked(const QModelIndex &)),
       this, SLOT(handleIndexClicked(const QModelIndex &)));
@@ -237,24 +232,6 @@ QItemSelectionModel *pqPipelineBrowser::getSelectionModel() const
   return this->TreeView->getSelectionModel();
 }
 
-pqServer *pqPipelineBrowser::getCurrentServer() const
-{
-  pqServerManagerModelItem *item = this->getCurrentSelection();
-  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
-  if(source)
-    {
-    return source->getServer();
-    }
-
-  return dynamic_cast<pqServer *>(item);
-}
-
-pqServerManagerModelItem *pqPipelineBrowser::getCurrentSelection() const
-{
-  QModelIndex index = this->getSelectionModel()->currentIndex();
-  return this->Model->getItemFor(index);
-}
-
 pqGenericViewModule *pqPipelineBrowser::getViewModule() const
 {
   return this->Internal->ViewModule;
@@ -274,27 +251,6 @@ pqConsumerDisplay *pqPipelineBrowser::createDisplay(pqPipelineSource *source,
       source, this->Internal->ViewModule);
   display->setVisible(visible);
   return display;
-}
-
-void pqPipelineBrowser::select(pqServerManagerModelItem *item)
-{
-  QModelIndex index = this->Model->getIndexFor(item);
-
-  // This not only changes the current selection, but also clears
-  // any previous selection.
-  this->getSelectionModel()->setCurrentIndex(index,
-      QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
-//  emit this->selectionChanged(item); 
-}
-
-void pqPipelineBrowser::select(pqPipelineSource *source)
-{
-  this->select((pqServerManagerModelItem *)source);
-}
-
-void pqPipelineBrowser::select(pqServer *server)
-{
-  this->select((pqServerManagerModelItem *)server);
 }
 
 void pqPipelineBrowser::addSource()
@@ -357,7 +313,7 @@ void pqPipelineBrowser::addFilter()
         source))
       {
       qCritical() << "Filter could not be created.";
-      } 
+      }
     }
 
   delete filter;
@@ -461,17 +417,6 @@ void pqPipelineBrowser::setViewModule(pqGenericViewModule *rm)
 {
   this->Internal->ViewModule = rm;
   this->Model->setViewModule(rm);
-}
-
-void pqPipelineBrowser::changeCurrent(const QModelIndex &current,
-    const QModelIndex &)
-{
-  if(this->Model)
-    {
-    // Get the current item from the model.
-    pqServerManagerModelItem *item = this->Model->getItemFor(current);
-    emit this->selectionChanged(item);
-    }
 }
 
 void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)

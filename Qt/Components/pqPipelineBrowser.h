@@ -105,24 +105,6 @@ public:
   /// \return
   ///   A pointer to the selection model.
   QItemSelectionModel *getSelectionModel() const;
-
-  /// \brief
-  ///   Gets the server manager model item for the current index.
-  /// \return
-  ///   A pointer to the current server manager model item, which can
-  ///   be a server, source, or filter.
-  pqServerManagerModelItem *getCurrentSelection() const;
-
-  /// \brief
-  ///   Gets the server for the current index.
-  ///
-  /// If the current index is a server, this method is equivalent to
-  /// \c getCurrentSelection. If the current index is a source or
-  /// filter, the server for the item is returned.
-  ///
-  /// \return
-  ///   A pointer to the server for the current index.
-  pqServer *getCurrentServer() const;
   //@}
   
   /// get the view module this pipeline browser works with
@@ -133,11 +115,6 @@ public:
   pqConsumerDisplay *createDisplay(pqPipelineSource *source, bool visible);
 
 public slots:
-  // Call this to select the particular item.
-  void select(pqServerManagerModelItem* item);
-  void select(pqPipelineSource* src);
-  void select(pqServer* server);
-
   /// \name Model Modification Methods
   //@{
   void addSource();
@@ -150,15 +127,8 @@ public slots:
   ///   Sets the current render module.
   /// \param rm The current render module.
   void setViewModule(pqGenericViewModule* rm);
-
-signals:
-  /// \brief
-  ///   Emitted when the selection changes.
-  /// \param selectedItem The newly selected item.
-  void selectionChanged(pqServerManagerModelItem* selectedItem);
   
 private slots:
-  void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
   void handleIndexClicked(const QModelIndex &index);
 
 private:

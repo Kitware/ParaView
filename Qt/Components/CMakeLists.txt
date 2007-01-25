@@ -84,6 +84,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiView.h
   pqMultiViewFrame.h
   pqNamedObjectPanel.h
+  pqObjectInspectorDriver.h
   pqObjectInspectorWidget.h
   pqObjectPanel.h
   pqObjectPanelLoader.h
@@ -300,6 +301,8 @@ ADD_LIBRARY(pqComponents
   pqNamedObjectPanel.h
   pqNamedWidgets.cxx
   pqNamedWidgets.h
+  pqObjectInspectorDriver.cxx
+  pqObjectInspectorDriver.h
   pqObjectInspectorWidget.cxx
   pqObjectInspectorWidget.h
   pqObjectPanel.cxx
