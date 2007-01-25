@@ -448,6 +448,14 @@ void pqFileDialogModel::setCurrentPath(const QString& Path)
   vtkPVFileInformation* info;
   info = this->Implementation->GetData(true, cPath, false);
   this->Implementation->Update(cPath, info);
+  if(this->Implementation->isRemote())
+    {
+    this->Implementation->gLastServerPath = cPath;
+    }
+  else
+    {
+    this->Implementation->gLastLocalPath = cPath;
+    }
   this->reset();
 }
 
