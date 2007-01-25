@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 
 #include "pqPipelineSource.h"
 

@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 
 #include "vtkSmartPointer.h"
+#include "vtkEventQtSlotConnect.h"
+
+#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 
 
@@ -45,8 +48,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqProxyInternal
 {
 public:
+  pqProxyInternal()
+    {
+    this->Connection = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    }
   typedef QMap<QString, QList<vtkSmartPointer<vtkSMProxy> > > ProxyListsType;
   ProxyListsType ProxyLists;
+  vtkSmartPointer<vtkSMProxy> Proxy;
+  vtkSmartPointer<vtkEventQtSlotConnect> Connection;
 };
 
 //-----------------------------------------------------------------------------
@@ -56,11 +65,14 @@ pqProxy::pqProxy(const QString& group, const QString& name,
   Server(server),
   ProxyName(name),
   SMName(name),
-  SMGroup(group),
-  Proxy(proxy)
+  SMGroup(group)
 {
   this->Internal = new pqProxyInternal;
+  this->Internal->Proxy = proxy;
   this->Modified = false;
+
+  this->Internal->Connection->Connect(proxy, vtkCommand::UpdateEvent,
+    this, SLOT(onUpdateVTKObjects()));
 }
 
 pqProxy::~pqProxy()
@@ -173,6 +185,40 @@ void pqProxy::rename(const QString& newname)
     this->SMName = newname;
     }
 }
+  
+//-----------------------------------------------------------------------------
+void pqProxy::setProxyName(const QString& name)
+{
+  if (this->ProxyName != name)
+    {
+    this->ProxyName = name; 
+    emit this->nameChanged(this);
+    }
+}
+
+//-----------------------------------------------------------------------------
+const QString& pqProxy::getProxyName()
+{
+  return this->ProxyName;
+}
+
+//-----------------------------------------------------------------------------
+const QString& pqProxy::getSMName()
+{ 
+  return this->SMName;
+}
+
+//-----------------------------------------------------------------------------
+const QString& pqProxy::getSMGroup()
+{
+  return this->SMGroup;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqProxy::getProxy() const
+{
+  return this->Internal->Proxy;
+}
 
 //-----------------------------------------------------------------------------
 void pqProxy::setModified(bool modified)
@@ -185,6 +231,11 @@ void pqProxy::setModified(bool modified)
 }
 
 //-----------------------------------------------------------------------------
+void pqProxy::onUpdateVTKObjects()
+{
+  this->setModified(false);
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

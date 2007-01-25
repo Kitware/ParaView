@@ -201,7 +201,11 @@ void pqObjectPanel::modified()
 
 void pqObjectPanel::updateProxyModified(bool mod)
 {
-  this->Implementation->Proxy->setModified(mod);
-  emit this->canAcceptOrReject(true);
+  if(mod)
+    {
+    // only mark proxy as modified, never unmodified
+    this->Implementation->Proxy->setModified(mod);
+    }
+  emit this->canAcceptOrReject(mod);
 }
 

@@ -38,8 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineObject_h
 
 #include "pqServerManagerModelItem.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMProxy.h"
 class pqServer;
 class vtkSMProxy;
 class pqProxyInternal;
@@ -71,29 +69,19 @@ public:
   // Emit nameChanged() signal when the name changes. 
   // Don't call this method directly, pqServerManagerModel will update this
   // as a side effect of rename().
-  void setProxyName(const QString& name)
-    {
-    if (this->ProxyName != name)
-      {
-      this->ProxyName = name; 
-      emit this->nameChanged(this);
-      }
-    }
-  const QString& getProxyName()
-    { return this->ProxyName; }
+  void setProxyName(const QString& name);
+  const QString& getProxyName();
   
   /// Get the name with which this proxy is registered on the
   /// server manager. A proxy can be registered with more than
   /// one name on the Server Manager. This is the name/group which
   /// this pqProxy stands for. 
-  const QString& getSMName()
-    { return this->SMName; }
-  const QString& getSMGroup()
-    { return this->SMGroup; }
+  const QString& getSMName();
+  const QString& getSMGroup();
 
   /// Get the vtkSMProxy this object stands for.
-  vtkSMProxy* getProxy() const
-    {return this->Proxy; }
+  vtkSMProxy* getProxy() const;
+  
   /// Returns a list of all the internal proxies added with a given key.
   QList<vtkSMProxy*> getInternalProxies(const QString& key) const;
 
@@ -130,12 +118,14 @@ protected:
   // Unregisters all internal proxies.
   void clearInternalProxies();
 
+private slots:
+  void onUpdateVTKObjects();
+
 private:
   pqServer *Server;           ///< Stores the parent server.
   QString ProxyName;
   QString SMName;
   QString SMGroup;
-  vtkSmartPointer<vtkSMProxy> Proxy;
   pqProxyInternal* Internal;
   bool Modified;
 };

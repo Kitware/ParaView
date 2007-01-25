@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // VTK includes
 
 // ParaView Server Manager includes
+#include "vtkSMProxy.h"
 
 // ParaView includes
 #include "pqProxy.h"
