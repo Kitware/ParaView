@@ -12,12 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMXDMFInformationHelper - populates vtkSMStringVectorProperty using a vtkPVServerXDMFParameters
+// .NAME vtkSMXDMFInformationHelper - populates vtkSMStringVectorProperty with information from a vtkXdmfReader.
 // .SECTION Description
 // vtkSMXDMFInformationHelper only works with vtkSMStringVectorProperties. It
-// populates the property using the server side helper object. Each
+// populates the property using the server side helper object. 
 // XDMF parameters are stored as 5 component tuples: name, current value, 
 // first index, stride, count
+// Domains and grids are returned in a simple list.
 // .SECTION See Also
 // vtkSMInformationHelper vtkPVServerXDMFParameters vtkSMStringVectorProperty
 
@@ -28,6 +29,7 @@
 #include "vtkClientServerID.h" // needed for vtkClientServerID
 
 class vtkSMProperty;
+class vtkPVXMLElement;
 
 class VTK_EXPORT vtkSMXDMFInformationHelper : public vtkSMInformationHelper
 {
@@ -52,6 +54,11 @@ protected:
   vtkSMXDMFInformationHelper();
   ~vtkSMXDMFInformationHelper();
 
+  //will look for the info_type attribute and if set to domains or grids
+  //will act to gather them. otherwise it will gather parameters.
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
+
+  int InfoType;
 private:
   vtkSMXDMFInformationHelper(const vtkSMXDMFInformationHelper&); // Not implemented
   void operator=(const vtkSMXDMFInformationHelper&); // Not implemented

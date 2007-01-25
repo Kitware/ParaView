@@ -55,6 +55,7 @@ void pqComponentsInit()
   Q_IMPORT_PLUGIN(pqExodusPanelInterface)
   Q_IMPORT_PLUGIN(pqStreamTracerPanelInterface)
   Q_IMPORT_PLUGIN(pqThresholdPanelInterface)
+  Q_IMPORT_PLUGIN(pqXDMFPanelInterface)
 
 }
 

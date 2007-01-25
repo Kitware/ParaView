@@ -1360,6 +1360,57 @@
         <FileListDomain name="files"/>
      </StringVectorProperty>
 
+
+     <StringVectorProperty
+        name="GetDomainName"
+        command="GetDomainName"
+        number_of_elements="1"
+        information_only="1">
+        <XDMFInformationHelper info_type="domains"/>
+     </StringVectorProperty> 
+
+     <StringVectorProperty
+        name="SetDomainName"
+        command="SetDomainName"
+        number_of_elements="1">
+        <StringListDomain name="AvailableDomains"/>
+     </StringVectorProperty>
+
+
+     <StringVectorProperty
+        name="GetGridName"
+        command="GetGridName"
+        number_of_elements="1"
+        information_only="1">
+        <XDMFInformationHelper info_type="grids"/>
+     </StringVectorProperty> 
+
+     <StringVectorProperty
+        name="SetGridName"
+        command="SetGridName"
+        number_of_elements="1">
+        <StringListDomain name="AvailableGrids"/>
+     </StringVectorProperty>
+
+     <Property
+       name="DisableAllGrids"
+       command="DisableAllGrids"
+       is_internal="1">
+     </Property>
+
+     <Property
+       name="RemoveAllGrids"
+       command="RemoveAllGrids"
+       is_internal="1">
+     </Property>
+                  
+     <StringVectorProperty
+        name="EnableGrid"
+        command="EnableGrid"
+        number_of_elements="1" 
+        repeat_command="1"/> 
+
+
      <StringVectorProperty 
         name="CellArrayInfo"
         information_only="1">
@@ -1381,6 +1432,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
+
 
      <StringVectorProperty 
         name="PointArrayInfo"
@@ -1404,6 +1456,7 @@
        </ArraySelectionDomain>
      </StringVectorProperty>
 
+
       <IntVectorProperty
          name="Stride"
          command="SetStride"
@@ -1413,21 +1466,11 @@
         <IntRangeDomain name="range" min="1 1 1" />
       </IntVectorProperty>
 
-     <StringVectorProperty
-        name="DomainName"
-        command="SetDomainName"
-        number_of_elements="1"/> 
-
-     <StringVectorProperty
-        name="EnableGrid"
-        command="EnableGrid"
-        number_of_elements="0" 
-        repeat_command="1"/> 
 
      <StringVectorProperty 
         name="ParametersInfo"
         information_only="1">
-        <XDMFInformationHelper/>
+        <XDMFInformationHelper info_type="parameters"/>
      </StringVectorProperty>
 
      <StringVectorProperty
@@ -1444,6 +1487,7 @@
           </RequiredProperties>
        </XDMFPropertyDomain>
      </StringVectorProperty>
+
    <!-- End XdmfReader -->
    </SourceProxy>
 

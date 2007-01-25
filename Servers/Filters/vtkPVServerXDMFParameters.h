@@ -14,6 +14,9 @@
 =========================================================================*/
 // .NAME vtkPVServerXDMFParameters - Server-side helper for vtkPVXDMFParameters.
 // .SECTION Description
+// This is a helper class that gets either the list of domains, grids or 
+// parameters from a vtkXdmfReader on the server.
+// .SECTION See Also vtkSMXDMFInformationHelper.h
 
 #ifndef __vtkPVServerXDMFParameters_h
 #define __vtkPVServerXDMFParameters_h
@@ -30,6 +33,16 @@ public:
   static vtkPVServerXDMFParameters* New();
   vtkTypeRevisionMacro(vtkPVServerXDMFParameters, vtkPVServerObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Get the set of parameters that may be specified for the given
+  // XDMF reader.
+  const vtkClientServerStream& GetDomains(vtkXdmfReader*);
+
+  // Description:
+  // Get the set of parameters that may be specified for the given
+  // XDMF reader.
+  const vtkClientServerStream& GetGrids(vtkXdmfReader*);
 
   // Description:
   // Get the set of parameters that may be specified for the given

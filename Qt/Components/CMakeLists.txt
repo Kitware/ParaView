@@ -129,6 +129,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTimerLogDisplay.h
   pqToolTipTrapper.h
   pqVCRController.h
+  pqXDMFPanel.h
   pqXYPlotDisplayProxyEditor.h
 )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -171,6 +172,7 @@ SET(UI_FORMS
   Resources/UI/pqStreamTracerPanel.ui
   Resources/UI/pqTextDisplayPropertiesWidget.ui
   Resources/UI/pqTimerLogDisplay.ui
+  Resources/UI/pqXDMFPanel.ui
   Resources/UI/pqXYPlotDisplayEditor.ui
 )
 
@@ -393,6 +395,8 @@ ADD_LIBRARY(pqComponents
   pqVCRController.cxx
   pqVCRController.h
   pqVariableType.h
+  pqXDMFPanel.cxx
+  pqXDMFPanel.h
   pqXYPlotDisplayProxyEditor.cxx
   pqXYPlotDisplayProxyEditor.h
   ${MOC_BUILT_SOURCES}

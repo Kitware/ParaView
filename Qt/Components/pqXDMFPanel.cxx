@@ -1,0 +1,335 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    pqXDMFPanel.cxx
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
+
+   See License_v1.1.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
+
+#include "pqXDMFPanel.h"
+
+// Qt includes
+#include <QTreeWidget>
+#include <QVariant>
+#include <QCheckBox>
+#include <QDoubleSpinBox>
+#include <QAction>
+#include <QTimer>
+#include <QLabel>
+#include <QComboBox>
+#include <QListWidget>
+
+// VTK includes
+
+// ParaView Server Manager includes
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMStringListDomain.h"
+
+// ParaView includes
+#include "pqPropertyManager.h"
+#include "pqProxy.h"
+#include "pqSMAdaptor.h"
+#include "pqTreeWidgetCheckHelper.h"
+#include "pqTreeWidgetItemObject.h"
+#include "ui_pqXDMFPanel.h"
+
+// we include this for static plugins
+#define QT_STATICPLUGIN
+#include <QtPlugin>
+
+//----------------------------------------------------------------------------
+QString pqXDMFPanelInterface::name() const
+{
+  return "XDMFReader";
+}
+
+//----------------------------------------------------------------------------
+pqObjectPanel* pqXDMFPanelInterface::createPanel(pqProxy* proxy, QWidget* p)
+{
+  return new pqXDMFPanel(proxy, p);
+}
+
+//----------------------------------------------------------------------------
+bool pqXDMFPanelInterface::canCreatePanel(pqProxy* proxy) const
+{
+  return (QString("sources") == proxy->getProxy()->GetXMLGroup()
+    && QString("XdmfReader") == proxy->getProxy()->GetXMLName());
+}
+
+Q_EXPORT_PLUGIN(pqXDMFPanelInterface)
+
+class pqXDMFPanel::pqUI : public QObject, public Ui::XDMFPanel 
+{
+public:
+  pqUI(pqXDMFPanel* p) : QObject(p) {}
+};
+
+//----------------------------------------------------------------------------
+pqXDMFPanel::pqXDMFPanel(pqProxy* object_proxy, QWidget* p) :
+  pqNamedObjectPanel(object_proxy, p)
+{
+  this->UI = new pqUI(this);
+  this->UI->setupUi(this);
+      
+  this->linkServerManagerProperties();
+
+}
+
+//----------------------------------------------------------------------------
+pqXDMFPanel::~pqXDMFPanel()
+{
+}
+
+//----------------------------------------------------------------------------
+void pqXDMFPanel::PopulateDomainWidget()
+{
+  //empty the selection widget on the UI (and don't call the changed slot)
+  QComboBox* selectionWidget = this->UI->DomainNames;
+  QObject::disconnect(selectionWidget, SIGNAL(currentIndexChanged(QString)), 
+                   this, SLOT(SetSelectedDomain(QString)));
+  selectionWidget->clear();
+
+  //get access to the paraview-"Domain" that restricts what names we can choose
+  vtkSMStringVectorProperty* SetNameProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("SetDomainName"));
+  vtkSMStringListDomain* canChooseFrom = 
+    vtkSMStringListDomain::SafeDownCast(
+      SetNameProperty->GetDomain("AvailableDomains"));
+  //empty it
+  canChooseFrom->RemoveAllStrings();
+
+  //ask the reader for the list of available Xdmf-"domain" names
+  this->proxy()->getProxy()->UpdatePropertyInformation();
+  vtkSMStringVectorProperty* GetNamesProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("GetDomainName"));
+
+  //add each xdmf-domain name to the widget and to the paraview-Domain
+  int numNames = GetNamesProperty->GetNumberOfElements();
+  for (int i = 0; i < numNames; i++)
+    {
+    const char* name = GetNamesProperty->GetElement(i);
+    selectionWidget->addItem(name);
+    canChooseFrom->AddString(name);
+    }
+
+  //watch for changes in the widget so that we can tell the proxy
+  QObject::connect(selectionWidget, SIGNAL(currentIndexChanged(QString)), 
+                   this, SLOT(SetSelectedDomain(QString)));
+
+}
+
+//----------------------------------------------------------------------------
+void pqXDMFPanel::PopulateGridWidget()
+{
+  //force the XdmfReader that ignore what it thinks it knows 
+  //about the available grids, because it is wrong when domain changes
+  vtkSMProperty* RemoveProperty = 
+    vtkSMProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("RemoveAllGrids"));
+  RemoveProperty->Modified();
+  this->proxy()->getProxy()->UpdateVTKObjects();
+
+  //empty the selection widget on the UI (and don't call the changed slot)
+  QListWidget* selectionWidget = this->UI->GridNames;
+  QObject::disconnect(selectionWidget, SIGNAL(itemSelectionChanged()), 
+                      this, SLOT(SetSelectedGrids()));
+  selectionWidget->clear();
+
+  //get access to the paraview Domain that restricts what names we can choose
+  vtkSMStringVectorProperty* SetNameProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("SetGridName"));
+  vtkSMStringListDomain* canChooseFrom = 
+    vtkSMStringListDomain::SafeDownCast(
+      SetNameProperty->GetDomain("AvailableGrids"));
+  //empty it
+  canChooseFrom->RemoveAllStrings();
+
+  //get access to the property that turns on/off each grid
+  vtkSMStringVectorProperty* EnableProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("EnableGrid"));
+
+  //ask the reader for the list of available Xdmf grid names
+  this->proxy()->getProxy()->UpdatePropertyInformation();
+  vtkSMStringVectorProperty* GetNamesProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("GetGridName"));
+
+  //add each name to the widget and the Domain, and enable each one
+  int numNames = GetNamesProperty->GetNumberOfElements();
+  for (int i = 0; i < numNames; i++)
+    {
+    const char* name = GetNamesProperty->GetElement(i);
+    QListWidgetItem *anitem = new QListWidgetItem(name, selectionWidget);
+    selectionWidget->setItemSelected(anitem, true); //enable in gui
+
+    canChooseFrom->AddString(name);
+
+    EnableProperty->SetElement(0, name); //enable on proxy
+    EnableProperty->Modified();
+    this->proxy()->getProxy()->UpdateVTKObjects();
+    }
+
+  this->PopulateArrayWidget();
+  //watch for changes in the widget so that we can tell the proxy
+  QObject::connect(selectionWidget, SIGNAL(itemSelectionChanged()), 
+                   this, SLOT(SetSelectedGrids()));
+
+}
+
+//----------------------------------------------------------------------------
+void pqXDMFPanel::PopulateArrayWidget()
+{
+  QPixmap cellPixmap(":/pqWidgets/Icons/pqCellData16.png");
+  QPixmap pointPixmap(":/pqWidgets/Icons/pqPointData16.png");
+
+  QTreeWidget* VariablesTree = this->UI->Variables;
+  VariablesTree->clear();
+
+  new pqTreeWidgetCheckHelper(VariablesTree, 0, this);
+  pqTreeWidgetItemObject* item;
+  QList<QString> strs;
+  QString varName;
+
+  this->proxy()->getProxy()->UpdatePropertyInformation();
+
+  // do the cell variables
+  vtkSMProperty* CellProperty = this->proxy()->getProxy()->GetProperty("CellArrayStatus");
+  QList<QVariant> CellDomain;
+  CellDomain = pqSMAdaptor::getSelectionPropertyDomain(CellProperty);
+  int j;
+  for(j=0; j<CellDomain.size(); j++)
+    {
+    varName = CellDomain[j].toString();
+    strs.clear();
+    strs.append(varName);
+    item = new pqTreeWidgetItemObject(VariablesTree, strs);
+    item->setData(0, Qt::ToolTipRole, varName);
+    item->setData(0, Qt::DecorationRole, cellPixmap);
+    this->propertyManager()->registerLink(item, 
+                                      "checked", 
+                                      SIGNAL(checkedStateChanged(bool)),
+                                      this->proxy()->getProxy(), CellProperty, j);
+    }
+
+  // do the node variables
+  vtkSMProperty* NodeProperty = this->proxy()->getProxy()->GetProperty("PointArrayStatus");
+  QList<QVariant> PointDomain;
+  PointDomain = pqSMAdaptor::getSelectionPropertyDomain(NodeProperty);
+
+  for(j=0; j<PointDomain.size(); j++)
+    {
+    varName = PointDomain[j].toString();
+    strs.clear();
+    strs.append(varName);
+    item = new pqTreeWidgetItemObject(VariablesTree, strs);
+    item->setData(0, Qt::ToolTipRole, varName);
+    item->setData(0, Qt::DecorationRole, pointPixmap);
+    this->propertyManager()->registerLink(item, 
+                                      "checked", 
+                                      SIGNAL(checkedStateChanged(bool)),
+                                      this->proxy()->getProxy(), NodeProperty, j);
+
+    }
+}
+
+//----------------------------------------------------------------------------
+void pqXDMFPanel::linkServerManagerProperties()
+{
+  // parent class hooks up some of our widgets in the ui
+  pqNamedObjectPanel::linkServerManagerProperties();
+
+  this->PopulateDomainWidget();
+  this->PopulateGridWidget();
+  this->PopulateArrayWidget();
+}
+
+//-----------------------------------------------------------------------------
+void pqXDMFPanel::SetSelectedDomain(QString newDomain)
+{
+  //get access to the property that lets us pick the domain
+  vtkSMStringVectorProperty* SetNameProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("SetDomainName"));
+  SetNameProperty->SetElement(0, newDomain.toAscii());
+  this->proxy()->getProxy()->UpdateVTKObjects();
+
+  //when domain changes, update the available grids
+  this->PopulateGridWidget();
+
+  //turn on apply/reset button
+  this->modified();
+}
+
+//-----------------------------------------------------------------------------
+void pqXDMFPanel::SetSelectedGrids()
+{
+  //go through the selections from the gui and turn them on in the server
+  QList<QListWidgetItem *> selections = this->UI->GridNames->selectedItems();
+  if (selections.size() == 0)
+    {
+    qWarning("Must select at least one grid.");
+    QListWidgetItem *citem = this->UI->GridNames->currentItem();
+    this->UI->GridNames->setItemSelected(citem, true);    
+    return;
+    }
+
+  //turn off all grids so we can enable only those selected in the gui
+  vtkSMProperty* DisableProperty = 
+    vtkSMProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("DisableAllGrids"));
+  DisableProperty->Modified();
+  this->proxy()->getProxy()->UpdateVTKObjects();
+  
+  //get access to the property that lets us turn on grids
+  vtkSMStringVectorProperty* EnableProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("EnableGrid"));
+
+  for (int i = 0; i < selections.size(); i++)
+    {
+    const char *namestr = ((selections.at(i))->text()).toAscii();
+    EnableProperty->SetElement(0, namestr);
+    EnableProperty->Modified();
+    this->proxy()->getProxy()->UpdateVTKObjects();
+    }
+  
+  //when grid changes, update the available arrays
+  this->PopulateArrayWidget();
+
+  //turn on apply/reset button
+  this->modified();
+}
+  
