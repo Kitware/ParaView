@@ -197,7 +197,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.800.2.2");
+vtkCxxRevisionMacro(vtkPVWindow, "1.800.2.3");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2300,8 +2300,8 @@ void vtkPVWindow::OpenCallback()
       << this->FileDescriptions << " {{All Files} {*}}" << ends;
 
   vtkKWLoadSaveDialog* loadDialog = this->GetPVApplication()->NewLoadSaveDialog();
-  loadDialog->RetrieveLastPathFromRegistry("OpenPath");
   loadDialog->Create();
+  loadDialog->RetrieveLastPathFromRegistry("OpenPath");
   loadDialog->SetParent(this);
   loadDialog->SetTitle("Open ParaView File");
 
