@@ -25,7 +25,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.2");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.3");
 
 //---------------------------------------------------------------------------
 struct vtkSMCameraLinkInternals
@@ -158,7 +158,8 @@ void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller)
     for(int i=0; i<numObjects; i++)
       {
       vtkSMProxy* p = this->GetLinkedProxy(i);
-      if(this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT)
+      if(p != caller &&
+         this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT)
         {
         vtkSMProperty* toProp = p->GetProperty(props[1]);
         toProp->Copy(fromProp);
