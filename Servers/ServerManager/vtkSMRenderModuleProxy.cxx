@@ -55,7 +55,7 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.61");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.62");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -682,7 +682,6 @@ void vtkSMRenderModuleProxy::CacheUpdate(int idx, int total)
       // Call CacheUpdate on those which support.
       ivp->SetElement(0, idx);
       ivp->SetElement(1, total);
-      ivp->SetElement(2, save_cache);
       disp->UpdateProperty("CacheUpdate");
       }
     }
