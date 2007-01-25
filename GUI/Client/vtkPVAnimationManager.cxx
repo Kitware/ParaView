@@ -67,7 +67,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.69.2.1");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.69.2.2");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1050,7 +1050,9 @@ void vtkPVAnimationManager::SaveAnimation()
   saveDialog->SetTitle("Save Animation Images");
   ostrstream ostr;
   ostr << "{{JPEG Images} {.jpg}} {{TIFF Images} {.tif}} {{PNG Images} {.png}}";
+#ifdef VTK_USE_MPEG2_ENCODER
   ostr << " {{MPEG2 movie file} {.mpg}}";
+#endif
 
 #ifdef _WIN32
   ostr << " {{AVI movie file} {.avi}}";

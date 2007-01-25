@@ -31,7 +31,6 @@
 #include "vtkRenderer.h"
 #include "vtkKWScaleWithEntry.h"
 #include "vtkKWScaleWithEntrySet.h"
-#include "vtkMPEG2Writer.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkKWRenderWidget.h"
@@ -42,6 +41,7 @@
 #include "vtkJPEGWriter.h"
 #include "vtkTIFFWriter.h"
 #include "vtkKWWidgetsBuildConfigure.h" // VTK_USE_VIDEO_FOR_WINDOWS
+#include "vtkGenericMovieWriter.h"
 
 #ifdef VTK_USE_VIDEO_FOR_WINDOWS 
 #include "vtkAVIWriter.h"
@@ -49,6 +49,10 @@
 #ifdef VTK_USE_FFMPEG_ENCODER
 #include "vtkFFMPEGWriter.h"
 #endif
+#endif
+
+#ifdef VTK_USE_MPEG2_ENCODER
+#include "vtkMPEG2Writer.h"
 #endif
 
 #include <vtksys/SystemTools.hxx>
@@ -72,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.29");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.29.2.1");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -548,6 +552,8 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
 
   int res;
   vtksys_stl::string filename;
+  vtksys_stl::string filetypes("{{JPEG} {.jpg}} {{TIFF} {.tif}}");
+  vtksys_stl::string defaultExtension(".jpg");
 
   vtkKWLoadSaveDialog *save_dialog = vtkKWLoadSaveDialog::New();
   save_dialog->SetParent(this->GetParentTopLevel());
@@ -556,13 +562,18 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   save_dialog->SetTitle(
     ks_("Animation|Save Animation Dialog|Title|Save Animation"));
   save_dialog->SaveDialogOn();
-#if defined(VTK_USE_VIDEO_FOR_WINDOWS) || defined(VTK_USE_FFMPEG_ENCODER)
-  save_dialog->SetFileTypes("{{AVI} {.avi}} {{MPEG2} {.mpg}} {{JPEG} {.jpg}} {{TIFF} {.tif}}");
-  save_dialog->SetDefaultExtension(".avi");
-#else
-  save_dialog->SetFileTypes("{{MPEG2} {.mpg}} {{JPEG} {.jpg}} {{TIFF} {.tif}}");
-  save_dialog->SetDefaultExtension(".mpg");
+
+#if defined(VTK_USE_MPEG2_ENCODER)
+  filetypes = vtksys_stl::string("{{MPEG2} {.mpg}} ") + filetypes;
+  defaultExtension = ".mpg";
 #endif
+#if defined(VTK_USE_VIDEO_FOR_WINDOWS) || defined(VTK_USE_FFMPEG_ENCODER)
+  filetypes = vtksys_stl::string("{{AVI} {.avi}} ") + filetypes;
+  defaultExtension = ".avi";
+#endif
+
+  save_dialog->SetFileTypes(filetypes.c_str());
+  save_dialog->SetDefaultExtension(defaultExtension.c_str());
 
   res = save_dialog->Invoke();
   if (res)
@@ -830,11 +841,17 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
     {
     if (ext)
       {
-      if (!strcmp(ext, ".mpg"))
+      if (!strcmp(ext, ".jpg"))
+        {
+        image_writer = vtkJPEGWriter::New();
+        }
+#ifdef VTK_USE_MPEG2_ENCODER
+      else if (!strcmp(ext, ".mpg"))
         {
         movie_writer = vtkMPEG2Writer::New();
         }
-#ifdef VTK_USE_VIDEO_FOR_WINDOWS 
+#endif
+#ifdef VTK_USE_VIDEO_FOR_WINDOWS
       else if (!strcmp(ext, ".avi"))
         {
         movie_writer = vtkAVIWriter::New();
@@ -847,10 +864,6 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
         }
 #endif
 #endif
-      else if (!strcmp(ext, ".jpg"))
-        {
-        image_writer = vtkJPEGWriter::New();
-        }
       else if (!strcmp(ext, ".tif"))
         {
         image_writer = vtkTIFFWriter::New();
@@ -1071,10 +1084,16 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
     {
     if (ext)
       {
-      if (!strcmp(ext, ".mpg"))
+      if (!strcmp(ext, ".jpg"))
+        {
+        image_writer = vtkJPEGWriter::New();
+        }
+#ifdef VTK_USE_MPEG2_ENCODER
+      else if (!strcmp(ext, ".mpg"))
         {
         movie_writer = vtkMPEG2Writer::New();
         }
+#endif
 #ifdef VTK_USE_VIDEO_FOR_WINDOWS 
       else if (!strcmp(ext, ".avi"))
         {
@@ -1088,10 +1107,6 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
         }
 #endif
 #endif
-      else if (!strcmp(ext, ".jpg"))
-        {
-        image_writer = vtkJPEGWriter::New();
-        }
       else if (!strcmp(ext, ".tif"))
         {
         image_writer = vtkTIFFWriter::New();

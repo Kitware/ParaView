@@ -22,7 +22,6 @@
 #include "vtkGenericMovieWriter.h"
 #include "vtkImageData.h"
 #include "vtkJPEGWriter.h"
-#include "vtkMPEG2Writer.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
 #include "vtkRenderWindow.h"
@@ -39,11 +38,15 @@
 #include "vtkToolkits.h"
 
 #ifdef _WIN32
-  #include "vtkAVIWriter.h"
+# include "vtkAVIWriter.h"
 #else
 #ifdef VTK_USE_FFMPEG_ENCODER
-  #include "vtkFFMPEGWriter.h"
+# include "vtkFFMPEGWriter.h"
 #endif
+#endif
+
+#ifdef VTK_USE_MPEG2_ENCODER
+# include "vtkMPEG2Writer.h"
 #endif
 
 #if !defined(_WIN32) || defined(__CYGWIN__)
@@ -52,7 +55,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.30.6.1");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.30.6.2");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -248,10 +251,12 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot,
     {
     this->ImageWriter = vtkPNGWriter::New();
     }
+#ifdef VTK_USE_MPEG2_ENCODER
   else if (strcmp(ext, "mpg") == 0)
     {
     this->MovieWriter = vtkMPEG2Writer::New();
     }
+#endif
 #ifdef _WIN32
   else if (strcmp(ext, "avi") == 0)
     {
