@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.15.16.1");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -133,7 +133,12 @@ void vtkSMImplicitPlaneWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long e
     }
   if (!widget->GetDrawPlane() && event == vtkCommand::InteractionEvent)
     { 
-    this->SetDrawPlane(1);
+    vtkSMIntVectorProperty *dp = vtkSMIntVectorProperty::SafeDownCast(
+      this->GetProperty("DrawPlane"));
+    if (dp)
+      {
+      dp->SetElements1(1);
+      }
     }
   this->Superclass::ExecuteEvent(wdg,event,p);
 }
