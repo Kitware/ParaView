@@ -592,12 +592,12 @@ void pqLinksModelObject::refresh()
       SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
       this, SLOT(proxyModified(pqServerManagerModelItem*)));
     QObject::connect(p, SIGNAL(destroyed(QObject*)),
-                        this, SLOT(remove()), Qt::QueuedConnection);
+                        this, SLOT(remove()));
     }
   foreach(pqProxy* p, this->Internal->OutputProxies)
     {
     QObject::connect(p, SIGNAL(destroyed(QObject*)),
-                        this, SLOT(remove()), Qt::QueuedConnection);
+                        this, SLOT(remove()));
     }
   
 }
