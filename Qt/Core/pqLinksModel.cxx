@@ -75,6 +75,7 @@ public:
     if(eid == vtkCommand::RegisterEvent)
       {
       LinkObjects.append(new pqLinksModelObject(linkName, this->Model));
+      this->Model->reset();
       }
     else if(eid == vtkCommand::UnRegisterEvent)
       {
@@ -87,12 +88,12 @@ public:
           {
           delete *iter;
           this->LinkObjects.erase(iter);
+          this->Model->reset();
           break;
           }
         }
       }
     }
-
 
 protected:
   pqInternal() {}
@@ -379,7 +380,6 @@ void pqLinksModel::addProxyLink(const QString& name,
 
   pxm->RegisterLink(name.toAscii().data(), link);
   link->Delete();
-  this->reset();
 }
 
 void pqLinksModel::addCameraLink(const QString& name,
@@ -395,7 +395,6 @@ void pqLinksModel::addCameraLink(const QString& name,
   link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::OUTPUT);
   pxm->RegisterLink(name.toAscii().data(), link);
   link->Delete();
-  this->reset();
 }
 
 void pqLinksModel::addPropertyLink(const QString& name,
@@ -423,7 +422,6 @@ void pqLinksModel::addPropertyLink(const QString& name,
   pxm->RegisterLink(name.toAscii().data(), link);
   link->Delete();
   
-  this->reset();
 }
 
 void pqLinksModel::removeLink(const QModelIndex& idx)
@@ -447,7 +445,6 @@ void pqLinksModel::removeLink(const QString& name)
     {
     vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
     pxm->UnRegisterLink(name.toAscii().data());
-    this->reset();
     }
 }
 
@@ -518,6 +515,12 @@ void pqLinksModelObject::proxyModified(pqServerManagerModelItem* item)
   this->Internal->Setting = false;
 }
 
+void pqLinksModelObject::remove()
+{
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  pxm->UnRegisterLink(this->name().toAscii().data());
+}
+
 void pqLinksModelObject::refresh()
 {
   foreach(pqProxy* p, this->Internal->InputProxies)
@@ -525,6 +528,13 @@ void pqLinksModelObject::refresh()
     QObject::disconnect(p,
       SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
       this, SLOT(proxyModified(pqServerManagerModelItem*)));
+    QObject::disconnect(p, SIGNAL(destroyed(QObject*)),
+                        this, SLOT(remove()));
+    }
+  foreach(pqProxy* p, this->Internal->OutputProxies)
+    {
+    QObject::disconnect(p, SIGNAL(destroyed(QObject*)),
+                        this, SLOT(remove()));
     }
 
   this->Internal->InputProxies.clear();
@@ -581,6 +591,13 @@ void pqLinksModelObject::refresh()
     QObject::connect(p,
       SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
       this, SLOT(proxyModified(pqServerManagerModelItem*)));
+    QObject::connect(p, SIGNAL(destroyed(QObject*)),
+                        this, SLOT(remove()), Qt::QueuedConnection);
+    }
+  foreach(pqProxy* p, this->Internal->OutputProxies)
+    {
+    QObject::connect(p, SIGNAL(destroyed(QObject*)),
+                        this, SLOT(remove()), Qt::QueuedConnection);
     }
   
 }

@@ -109,7 +109,6 @@ private:
 };
 
 
-// internal class, here for moc'ing purposes
 class pqLinksModelObject : public QObject
 {
   Q_OBJECT
@@ -120,9 +119,10 @@ public:
   QString name() const;
   vtkSMLink* link() const;
 
-public slots:
+private slots:
   void proxyModified(pqServerManagerModelItem*);
   void refresh();
+  void remove();
 
 private:
   class pqInternal;
