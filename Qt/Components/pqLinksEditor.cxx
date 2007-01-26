@@ -42,6 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMOrderedPropertyIterator.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyListDomain.h"
+#include "vtkSMProxyProperty.h"
 
 // pqCore
 #include "pqServerManagerModel.h"
@@ -59,9 +62,32 @@ class pqLinksEditorProxyModel : public QAbstractItemModel
 public:
   pqLinksEditorProxyModel(QObject* p) : QAbstractItemModel(p)
     {
+    Q_ASSERT(sizeof(RowIndex) == sizeof(void*));
     }
   ~pqLinksEditorProxyModel()
     {
+    }
+
+  struct RowIndex
+    {
+    RowIndex(int t, bool hi, int i) : type(t), hasIndex(hi), index(i) {}
+    size_t type : 7;
+    size_t hasIndex : 1;
+    size_t index : 8 * (sizeof(size_t) - sizeof(char));
+    };
+    
+  void* encodeIndex(const RowIndex& row) const
+    {
+    RowIndex ri = row;
+    ri.type++;
+    return *reinterpret_cast<void**>(&ri);
+    }
+  
+  RowIndex decodeIndex(void* p) const
+    {
+    RowIndex ri = *reinterpret_cast<RowIndex*>(&p);
+    ri.type--;
+    return ri;
     }
 
   QModelIndex index(int row, int column, const QModelIndex& pidx) const
@@ -72,17 +98,57 @@ public:
       {
       return this->createIndex(row, column);
       }
-    return this->createIndex(row, column, reinterpret_cast<void*>(pidx.row()+1));
+    RowIndex ri(pidx.row(), false, 0);
+
+    if(pidx.internalPointer() != NULL)
+      {
+      ri = this->decodeIndex(pidx.internalPointer());
+      ri.hasIndex = true;
+      ri.index = pidx.row();
+      }
+    return this->createIndex(row, column, this->encodeIndex(ri));
     }
   
-  QModelIndex parent(const QModelIndex& pidx) const
+  QModelIndex parent(const QModelIndex& idx) const
     {
-    if(!pidx.isValid() || pidx.internalPointer() == NULL)
+    if(!idx.isValid() || idx.internalPointer() == NULL)
       {
       return QModelIndex();
       }
-    int row = reinterpret_cast<size_t>(pidx.internalPointer()) - 1;
-    return this->createIndex(row, pidx.column());
+    RowIndex ri = this->decodeIndex(idx.internalPointer());
+    int row = ri.type;
+    void* p = NULL;
+    if(ri.hasIndex)
+      {
+      row = ri.index;
+      RowIndex ri2(ri.type, false, 0);
+      p = this->encodeIndex(ri2);
+      }
+
+    return this->createIndex(row, idx.column(), p);
+    }
+
+  vtkSMProxyListDomain* proxyListDomain(const QModelIndex& idx) const
+    {
+    pqProxy* pxy = this->getProxy(idx);
+    vtkSMProxyListDomain* pxyDomain = NULL;
+    
+    vtkSMPropertyIterator* iter = vtkSMPropertyIterator::New();
+    iter->SetProxy(pxy->getProxy());
+    for(iter->Begin(); 
+        pxyDomain == NULL && !iter->IsAtEnd(); 
+        iter->Next())
+      {
+      vtkSMProxyProperty* pxyProperty =
+        vtkSMProxyProperty::SafeDownCast(iter->GetProperty());
+      if(pxyProperty)
+        {
+        pxyDomain = vtkSMProxyListDomain::SafeDownCast(
+          pxyProperty->GetDomain("proxy_list"));
+        }
+      }
+    iter->Delete();
+    return pxyDomain;
     }
   
   int rowCount(const QModelIndex& idx) const
@@ -92,17 +158,26 @@ public:
       return 2;
       }
     QModelIndex pidx = this->parent(idx);
+    pqServerManagerModel* smModel;
+    smModel = pqApplicationCore::instance()->getServerManagerModel();
+
     if(!pidx.isValid())
       {
-      pqServerManagerModel* m;
-      m = pqApplicationCore::instance()->getServerManagerModel();
       if(idx.row() == 0)
         {
-        return m->getNumberOfRenderModules();
+        return smModel->getNumberOfRenderModules();
         }
       else if(idx.row() == 1)
         {
-        return m->getNumberOfSources();
+        return smModel->getNumberOfSources();
+        }
+      }
+    if(pidx.isValid() && pidx.row() == 1)
+      {
+      vtkSMProxyListDomain* pxyDomain = this->proxyListDomain(idx);
+      if(pxyDomain)
+        {
+        return pxyDomain->GetNumberOfProxies();
         }
       }
     return 0;
@@ -124,24 +199,37 @@ public:
       {
       return QVariant();
       }
-    QModelIndex pidx = this->parent(idx);
-    if(!pidx.isValid() && role == Qt::DisplayRole)
+    if(role == Qt::DisplayRole)
       {
-      if(idx.row() == 0)
+      if(idx.internalPointer() == NULL)
         {
-        return "Views";
+        if(idx.row() == 0)
+          {
+          return "Views";
+          }
+        else if(idx.row() == 1)
+          {
+          return "Objects";
+          }
         }
-      else if(idx.row() == 1)
+      
+      RowIndex ri = this->decodeIndex(idx.internalPointer());
+      if(!ri.hasIndex)
         {
-        return "Objects";
+        pqProxy* pxy = this->getProxy(idx);
+        if(pxy)
+          {
+          return pxy->getProxyName();
+          }
         }
-      }
-    else if(role == Qt::DisplayRole)
-      {
-      pqProxy* pxy = this->getProxy(idx);
-      if(pxy)
+      else
         {
-        return pxy->getProxyName();
+        QModelIndex pidx = this->parent(idx);
+        vtkSMProxyListDomain* domain = this->proxyListDomain(pidx);
+        if(domain && (int)domain->GetNumberOfProxies() > idx.row())
+          {
+          return domain->GetProxyName(idx.row());
+          }
         }
       }
     return QVariant();
@@ -149,6 +237,7 @@ public:
 
   QModelIndex findProxy(pqProxy* pxy)
     {
+    // TODO internal proxies
     QModelIndex parentIdx;
     if(qobject_cast<pqRenderViewModule*>(pxy))
       {
@@ -185,6 +274,7 @@ public:
     QModelIndex pidx = this->parent(idx);
     if(pidx.isValid())
       {
+      RowIndex ri = this->decodeIndex(idx.internalPointer());
       pqServerManagerModel* m;
       m = pqApplicationCore::instance()->getServerManagerModel();
       if(pidx.row() == 0)
@@ -193,7 +283,14 @@ public:
         }
       else if(pidx.row() == 1)
         {
-        return m->getPQSource(idx.row());
+        if(!ri.hasIndex)
+          {
+          return m->getPQSource(idx.row());
+          }
+        else
+          {
+          // TODO internal proxies
+          }
         }
       }
     return NULL;
@@ -296,6 +393,11 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
           setCurrentIndex(viewIdx, selFlags);
         this->ObjectTreeProperty2->selectionModel()->
           setCurrentIndex(viewIdx, selFlags);
+        }
+      
+      if(model->getLinkType(idx) == pqLinksModel::Property)
+        {
+        // TODO init the properties
         }
 
       }
