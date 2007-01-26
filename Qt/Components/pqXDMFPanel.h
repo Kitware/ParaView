@@ -37,10 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectPanelInterface.h"
 #include "pqComponentsExport.h"
 
-class pqTreeWidgetItemObject;
 class QTreeWidget;
 class QListWidget;
-class vtkPVArrayInformation;
+class pqXDMFPanelArrayRecord;
 
 // a panel for XDMF readers
 // allows user to choose a domain name and select from the available groups
@@ -71,6 +70,9 @@ protected:
 
   // fill the array selection part of the GUI
   void PopulateArrayWidget();
+
+  // ask the server what the selection state of the arrays is
+  void ResetArrays();
  
   class pqUI;
   pqUI* UI;
@@ -78,6 +80,9 @@ protected:
 protected slots:
   void SetSelectedDomain(QString newDomain);
   void SetSelectedGrids();
+
+private:
+  QList<pqXDMFPanelArrayRecord> ArrayList;
 
 };
 

@@ -1606,11 +1606,12 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0" 
-        information_property="CellArrayInfo"> 
+        information_property="CellArrayInfo"
+        animateable="0"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -1627,11 +1628,12 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="PointArrayInfo"> 
+        information_property="PointArrayInfo"
+        animateable="0"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>

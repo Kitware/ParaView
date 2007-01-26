@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMStringListDomain.h"
+#include "vtkSMArraySelectionDomain.h"
 
 // ParaView includes
 #include "pqPropertyManager.h"
@@ -65,6 +66,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // we include this for static plugins
 #define QT_STATICPLUGIN
 #include <QtPlugin>
+
+// the purpose of this helper class is to remember what array selection
+// widgets are linked to what server properties so that we can control the call
+// backs when we need to rebuild
+class pqXDMFPanelArrayRecord
+{
+public:
+  pqXDMFPanelArrayRecord(pqTreeWidgetItemObject *widget, 
+                         int CorP, 
+                         int location) :
+    widget(widget), CorP(CorP), location(location) 
+    {
+    };
+
+  pqTreeWidgetItemObject *widget;
+  int CorP; //cell or point
+  int location; //index in property
+};
 
 //----------------------------------------------------------------------------
 QString pqXDMFPanelInterface::name() const
@@ -101,12 +120,12 @@ pqXDMFPanel::pqXDMFPanel(pqProxy* object_proxy, QWidget* p) :
   this->UI->setupUi(this);
       
   this->linkServerManagerProperties();
-
 }
 
 //----------------------------------------------------------------------------
 pqXDMFPanel::~pqXDMFPanel()
 {
+  this->ArrayList.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -202,10 +221,72 @@ void pqXDMFPanel::PopulateGridWidget()
     this->proxy()->getProxy()->UpdateVTKObjects();
     }
 
+  //whenever grid changes, update the available arrays
+  this->ResetArrays();
   this->PopulateArrayWidget();
+
   //watch for changes in the widget so that we can tell the proxy
   QObject::connect(selectionWidget, SIGNAL(itemSelectionChanged()), 
                    this, SLOT(SetSelectedGrids()));
+
+}
+
+
+//----------------------------------------------------------------------------
+void pqXDMFPanel::ResetArrays()
+{
+  //First, unregister all of the call backs so that we can set the property
+  //values in peace.
+  pqTreeWidgetItemObject* item;
+  vtkSMProperty* registeredProperty;
+  QList<pqXDMFPanelArrayRecord>::iterator it;
+  for (it = this->ArrayList.begin(); it != this->ArrayList.end(); it++)
+    {
+    pqXDMFPanelArrayRecord mem = this->ArrayList.takeFirst();
+    item = mem.widget;
+    if (mem.CorP == 0)
+      {
+      registeredProperty =
+        this->proxy()->getProxy()->GetProperty("CellArrayStatus");
+      }
+    else
+      {
+      registeredProperty =
+        this->proxy()->getProxy()->GetProperty("PointArrayStatus");
+      }
+    this->propertyManager()->unregisterLink(item, 
+                                            "checked", 
+                                            SIGNAL(checkedStateChanged(bool)),
+                                            this->proxy()->getProxy(), 
+                                            registeredProperty, 
+                                            mem.location);
+    }
+
+  //tell the servermanager to read what arrays the server has now
+  this->proxy()->getProxy()->UpdatePropertyInformation();
+
+  //now copy the names and enabled status for the arrays
+  //from the input property to the output property
+  vtkSMStringVectorProperty* IProperty;
+  vtkSMStringVectorProperty* OProperty;
+  vtkSMArraySelectionDomain* ODomain;
+  
+  IProperty = vtkSMStringVectorProperty::SafeDownCast(
+    this->proxy()->getProxy()->GetProperty("PointArrayInfo")
+    );
+  OProperty = vtkSMStringVectorProperty::SafeDownCast(
+    this->proxy()->getProxy()->GetProperty("PointArrayStatus")
+    );
+  ODomain = vtkSMArraySelectionDomain::SafeDownCast(
+    OProperty->GetDomain("array_list")
+    );
+
+  OProperty->Copy(IProperty);
+  ODomain->Update(IProperty);
+
+  //clean out the UI to be safe
+  QTreeWidget* VariablesTree = this->UI->Variables;
+  VariablesTree->clear();
 
 }
 
@@ -226,7 +307,10 @@ void pqXDMFPanel::PopulateArrayWidget()
   this->proxy()->getProxy()->UpdatePropertyInformation();
 
   // do the cell variables
-  vtkSMProperty* CellProperty = this->proxy()->getProxy()->GetProperty("CellArrayStatus");
+  // uses the input domain and output status to create widgets for each cell
+  // array
+  vtkSMProperty* CellProperty = 
+    this->proxy()->getProxy()->GetProperty("CellArrayStatus");
   QList<QVariant> CellDomain;
   CellDomain = pqSMAdaptor::getSelectionPropertyDomain(CellProperty);
   int j;
@@ -236,6 +320,7 @@ void pqXDMFPanel::PopulateArrayWidget()
     strs.clear();
     strs.append(varName);
     item = new pqTreeWidgetItemObject(VariablesTree, strs);
+    this->ArrayList.append(pqXDMFPanelArrayRecord(item,0,j));
     item->setData(0, Qt::ToolTipRole, varName);
     item->setData(0, Qt::DecorationRole, cellPixmap);
     this->propertyManager()->registerLink(item, 
@@ -249,12 +334,15 @@ void pqXDMFPanel::PopulateArrayWidget()
   QList<QVariant> PointDomain;
   PointDomain = pqSMAdaptor::getSelectionPropertyDomain(NodeProperty);
 
+  vtkSMStringVectorProperty *StringProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(NodeProperty);
   for(j=0; j<PointDomain.size(); j++)
     {
     varName = PointDomain[j].toString();
     strs.clear();
     strs.append(varName);
     item = new pqTreeWidgetItemObject(VariablesTree, strs);
+    this->ArrayList.append(pqXDMFPanelArrayRecord(item,1,j));
     item->setData(0, Qt::ToolTipRole, varName);
     item->setData(0, Qt::DecorationRole, pointPixmap);
     this->propertyManager()->registerLink(item, 
@@ -272,8 +360,8 @@ void pqXDMFPanel::linkServerManagerProperties()
   pqNamedObjectPanel::linkServerManagerProperties();
 
   this->PopulateDomainWidget();
+
   this->PopulateGridWidget();
-  this->PopulateArrayWidget();
 }
 
 //-----------------------------------------------------------------------------
@@ -326,7 +414,8 @@ void pqXDMFPanel::SetSelectedGrids()
     this->proxy()->getProxy()->UpdateVTKObjects();
     }
   
-  //when grid changes, update the available arrays
+  //whenever grid changes, update the available arrays
+  this->ResetArrays();
   this->PopulateArrayWidget();
 
   //turn on apply/reset button
