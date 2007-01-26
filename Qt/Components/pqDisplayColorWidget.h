@@ -42,11 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QComboBox;
 class QHBoxLayout;
 
+class pqConsumerDisplay;
 class pqPipelineDisplay;
-class pqPipelineSource;
-class pqGenericViewModule;
 class vtkEventQtSlotConnect;
-class pqRenderViewModule;
 
 /// Provides a standard user interface for selecting among a collection 
 /// of dataset variables (both cell and node variables).
@@ -71,23 +69,15 @@ public:
   pqPipelineDisplay* getDisplay() const;
 
   QString getCurrentText() const;
+
 public slots:
-  /// Call to update the variable selector to show the variables
-  /// provided by the \c source. \c source can be NULL.
-  void updateVariableSelector(pqPipelineSource* source);
-
   /// Called when the variable selection changes. 
-  /// Affects the \c SelectedSource
   void onVariableChanged(pqVariableType type, const QString& name);
-
-  /// Called to set the current view. This widget
-  /// shows the source's display properties in this view 
-  /// alone.
-  void setView(pqGenericViewModule* view);
 
   /// When set, the source/renModule is not used to locate the
   /// display, instead this display is used.
-  void setDisplay(pqPipelineDisplay* display);
+  void setDisplay(pqConsumerDisplay* display);
+
 signals:
   /// Signal emitted whenever the user chooses a variable, 
   /// or chooseVariable() is called.
@@ -105,11 +95,6 @@ private slots:
   /// Called when the GUI must reload the arrays shown in the widget.
   void reloadGUI();
 
-  /// Called when a display gets added to the selected render module.
-  /// Since a source may not have any display in a particular render module
-  /// when the rendermodule becomes active, we listen to this signal to 
-  /// update the GUI when a display gets added.
-  void displayAdded();
 private:
   /// Converts a variable type and name into a packed string representation 
   /// that can be used with a combo box.
@@ -122,9 +107,7 @@ private:
   QHBoxLayout* Layout;
   QComboBox* Variables;
   bool BlockEmission;
-  QPointer<pqPipelineSource> SelectedSource;
   vtkEventQtSlotConnect* VTKConnect;
-  QPointer<pqRenderViewModule> RenderModule;
   QPointer<pqPipelineDisplay> Display;
   QList<QString> AvailableArrays;
 };

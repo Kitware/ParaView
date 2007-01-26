@@ -49,8 +49,8 @@ public:
   ~MainWindow();
   
 private slots:
-  virtual void onActiveServerChanged(pqServer*);
-  virtual void onActiveRenderModuleChanged(pqRenderModule*);
+  virtual void onServerCreationFinished(pqServer*);
+  virtual void onPendingDisplaysChanged(bool);
 
 private:
   class pqImplementation;

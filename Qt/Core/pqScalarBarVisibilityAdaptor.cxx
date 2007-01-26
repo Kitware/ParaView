@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
-#include "pqPipelineSource.h"
 #include "pqScalarsToColors.h"
 #include "pqScalarBarDisplay.h"
 #include "pqRenderViewModule.h"
@@ -48,7 +47,6 @@ class pqScalarBarVisibilityAdaptor::pqInternal
 {
 public:
   QPointer<pqPipelineDisplay> ActiveDisplay;
-  QPointer<pqPipelineSource> ActiveSource;
   QPointer<pqRenderViewModule> ActiveRenderModule;
 };
 
@@ -72,9 +70,35 @@ pqScalarBarVisibilityAdaptor::~pqScalarBarVisibilityAdaptor()
 }
 
 //-----------------------------------------------------------------------------
+void pqScalarBarVisibilityAdaptor::setActiveDisplay(pqConsumerDisplay *display,
+    pqGenericViewModule *view)
+{
+  if(display != this->Internal->ActiveDisplay)
+    {
+    if(this->Internal->ActiveDisplay)
+      {
+      this->disconnect(this->Internal->ActiveDisplay, 0, this, 0);
+      }
+
+    this->Internal->ActiveDisplay = dynamic_cast<pqPipelineDisplay *>(display);
+    this->Internal->ActiveRenderModule =
+        dynamic_cast<pqRenderViewModule *>(view);
+    if(this->Internal->ActiveDisplay)
+      {
+      this->connect(this->Internal->ActiveDisplay,
+          SIGNAL(visibilityChanged(bool)), 
+          this, SLOT(updateEnableState()), Qt::QueuedConnection);
+      this->connect(this->Internal->ActiveDisplay, SIGNAL(colorChanged()),
+          this, SLOT(updateEnableState()), Qt::QueuedConnection);
+      }
+
+    this->updateEnableState();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqScalarBarVisibilityAdaptor::setScalarBarVisibility(bool visible)
 {
-  this->updateDisplay();
   if (!this->Internal->ActiveDisplay)
     {
     qDebug() << "No active display found, cannot change scalar bar visibility.";
@@ -108,48 +132,8 @@ void pqScalarBarVisibilityAdaptor::setScalarBarVisibility(bool visible)
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarBarVisibilityAdaptor::setActiveSource(pqPipelineSource* source)
-{
-  if (this->Internal->ActiveSource == source)
-    {
-    return;
-    }
-  if (this->Internal->ActiveSource)
-    {
-    QObject::disconnect(this->Internal->ActiveSource, 0, this, 0);
-    }
-  this->Internal->ActiveSource = source;
-  if (source)
-    {
-    QObject::connect(
-      source, SIGNAL(displayAdded(pqPipelineSource*, pqConsumerDisplay*)),
-      this, SLOT(updateEnableState()), Qt::QueuedConnection);
-    QObject::connect(
-      source, SIGNAL(displayRemoved(pqPipelineSource*, pqConsumerDisplay*)),
-      this, SLOT(updateEnableState()), Qt::QueuedConnection);
-    }
-  this->updateEnableState();
-}
-
-
-//-----------------------------------------------------------------------------
-void pqScalarBarVisibilityAdaptor::setActiveView(pqGenericViewModule* view)
-{
-  pqRenderViewModule* const rm = qobject_cast<pqRenderViewModule*>(view);
-  if (this->Internal->ActiveRenderModule == rm)
-    {
-    return;
-    }
-  this->Internal->ActiveRenderModule = rm;
-  this->updateEnableState();
-}
-
-//-----------------------------------------------------------------------------
 void pqScalarBarVisibilityAdaptor::updateEnableState()
 {
-  // First determine the active display.
-  this->updateDisplay();
-
   // No display, no scalar bar.
   if (!this->Internal->ActiveDisplay)
     {
@@ -188,31 +172,3 @@ void pqScalarBarVisibilityAdaptor::updateEnableState()
     }
 }
 
-
-//-----------------------------------------------------------------------------
-void pqScalarBarVisibilityAdaptor::updateDisplay()
-{
-  pqPipelineDisplay* disp  = 0;
-  if (this->Internal->ActiveSource && this->Internal->ActiveRenderModule)
-    {
-    disp = qobject_cast<pqPipelineDisplay*>(
-      this->Internal->ActiveSource->getDisplay(
-        this->Internal->ActiveRenderModule));
-    }
-  if (this->Internal->ActiveDisplay == disp)
-    {
-    return;
-    }
-  if (this->Internal->ActiveDisplay)
-    {
-    QObject::disconnect(this->Internal->ActiveDisplay, 0, this, 0);
-    }
-  this->Internal->ActiveDisplay = disp;
-  if (disp)
-    {
-    QObject::connect(disp, SIGNAL(visibilityChanged(bool)), 
-      this, SLOT(updateEnableState()), Qt::QueuedConnection);
-    QObject::connect(disp, SIGNAL(colorChanged()),
-      this, SLOT(updateEnableState()), Qt::QueuedConnection);
-    }
-}

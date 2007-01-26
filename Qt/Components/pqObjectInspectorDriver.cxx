@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectInspectorDriver.h"
 
+#include "pqGenericViewModule.h"
+#include "pqConsumerDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqProxy.h"
 #include "pqServerManagerModel.h"
@@ -46,6 +48,9 @@ pqObjectInspectorDriver::pqObjectInspectorDriver(QObject *parentObject)
   : QObject(parentObject)
 {
   this->Selection = 0;
+  this->Source = 0;
+  this->Display = 0;
+  this->View = 0;
   this->ShowCurrent = true;
 }
 
@@ -68,31 +73,88 @@ void pqObjectInspectorDriver::setSelectionModel(
     {
     this->connect(this->Selection,
         SIGNAL(currentChanged(pqServerManagerModelItem *)),
-        this, SLOT(updateObject()));
+        this, SLOT(updateSource()));
     this->connect(this->Selection,
         SIGNAL(selectionChanged(const pqServerManagerSelection &, const pqServerManagerSelection &)),
-        this, SLOT(updateObject()));
+        this, SLOT(updateSource()));
     this->connect(this->Selection->model(),
         SIGNAL(preSourceRemoved(pqPipelineSource *)),
-        this, SLOT(checkObject(pqPipelineSource *)));
+        this, SLOT(checkSource(pqPipelineSource *)));
     }
 }
 
-void pqObjectInspectorDriver::updateObject()
+void pqObjectInspectorDriver::setActiveView(pqGenericViewModule *view)
 {
-  emit this->objectChanged(this->getObject());
-}
-
-void pqObjectInspectorDriver::checkObject(pqPipelineSource *source)
-{
-  pqProxy *current = this->getObject();
-  if(current && current == source)
+  if(view != this->View)
     {
-    emit this->objectChanged(0);
+    this->View = view;
+    this->checkForDisplay();
     }
 }
 
-pqProxy *pqObjectInspectorDriver::getObject() const
+void pqObjectInspectorDriver::updateSource()
+{
+  this->setActiveSource(this->findSource());
+}
+
+void pqObjectInspectorDriver::checkSource(pqPipelineSource *source)
+{
+  if(source && source == this->Source)
+    {
+    this->setActiveSource(source);
+    }
+}
+
+void pqObjectInspectorDriver::checkForDisplay()
+{
+  pqConsumerDisplay *display = this->findDisplay();
+  if(display != this->Display)
+    {
+    this->Display = display;
+    emit this->displayChanged(this->Display, this->View);
+    }
+}
+
+void pqObjectInspectorDriver::checkDisplay(pqPipelineSource *,
+    pqConsumerDisplay *display)
+{
+  if(display && display == this->Display)
+    {
+    this->Display = 0;
+    emit this->displayChanged(this->Display, this->View);
+    }
+}
+
+void pqObjectInspectorDriver::setActiveSource(pqPipelineSource *source)
+{
+  if(source == this->Source)
+    {
+    return;
+    }
+
+  if(this->Source)
+    {
+    this->disconnect(this->Source, 0, this, 0);
+    }
+
+  this->Source = source;
+  if(this->Source)
+    {
+    this->connect(this->Source,
+        SIGNAL(displayAdded(pqPipelineSource *, pqConsumerDisplay *)),
+        this, SLOT(checkForDisplay()), Qt::QueuedConnection);
+    this->connect(this->Source,
+        SIGNAL(displayRemoved(pqPipelineSource *, pqConsumerDisplay *)),
+        this, SLOT(checkDisplay(pqPipelineSource *, pqConsumerDisplay *)));
+    }
+
+  emit this->sourceChanged(this->Source);
+
+  // Update the active display.
+  this->checkForDisplay();
+}
+
+pqPipelineSource *pqObjectInspectorDriver::findSource() const
 {
   pqServerManagerModelItem *item = 0;
   const pqServerManagerSelection *selected = this->Selection->selectedItems();
@@ -109,7 +171,17 @@ pqProxy *pqObjectInspectorDriver::getObject() const
       }
     }
 
-  return dynamic_cast<pqProxy *>(item);
+  return dynamic_cast<pqPipelineSource *>(item);
+}
+
+pqConsumerDisplay *pqObjectInspectorDriver::findDisplay() const
+{
+  if(this->Source && this->View)
+    {
+    return this->Source->getDisplay(this->View);
+    }
+
+  return 0;
 }
 
 

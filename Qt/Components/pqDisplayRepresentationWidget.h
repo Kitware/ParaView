@@ -36,9 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 class pqDisplayRepresentationWidgetInternal;
-class pqPipelineSource;
-class pqGenericViewModule;
-class pqPipelineDisplay;
+class pqConsumerDisplay;
+
 /// A widget for representation of a display proxy.
 class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
 {
@@ -52,15 +51,7 @@ signals:
   void currentTextChanged(const QString&);
 
 public slots:
-  /// Call to show the representation for a display of the given source.
-  /// The display choosen if the first display for the source in the
-  /// set render module, if any.
-  void update(pqPipelineSource* source);
-
-  /// Set the view. Typically called when the active view changes.
-  void setView(pqGenericViewModule* view);
-
-  void setDisplay(pqPipelineDisplay* display);
+  void setDisplay(pqConsumerDisplay* display);
   
   void reloadGUI();
 

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqCoreExport.h"
 
-class pqPipelineSource;
+class pqConsumerDisplay;
 class pqGenericViewModule;
 class QAction;
 
@@ -59,12 +59,7 @@ signals:
   void scalarBarVisible(bool);
 
 public slots:
-   
-  // set the active source.
-  void setActiveSource(pqPipelineSource* source);
-
-  // set the active view.
-  void setActiveView(pqGenericViewModule* rm);
+  void setActiveDisplay(pqConsumerDisplay *display, pqGenericViewModule *view);
 
 protected slots:
   void updateEnableState();
@@ -76,7 +71,6 @@ private:
 
   class pqInternal;
   pqInternal* Internal;
-  void updateDisplay();
 };
 
 

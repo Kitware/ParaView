@@ -48,10 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIcon>
 
 #include "pqApplicationCore.h"
-#include "pqPipelineSource.h"
-#include "pqPipelineFilter.h"
 #include "pqPipelineDisplay.h"
-#include "pqRenderViewModule.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 
@@ -225,31 +222,6 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayColorWidget::updateVariableSelector(pqPipelineSource* source)
-{
-  this->SelectedSource = source;
-  if (this->RenderModule && this->SelectedSource)
-    {
-    pqPipelineDisplay* disp;
-    disp = qobject_cast<pqPipelineDisplay*>(
-        this->SelectedSource->getDisplay(this->RenderModule));
-    this->setDisplay(disp);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayColorWidget::displayAdded()
-{
-  if (this->RenderModule && this->SelectedSource)
-    {
-    pqPipelineDisplay* disp;
-    disp = qobject_cast<pqPipelineDisplay*>(
-        this->SelectedSource->getDisplay(this->RenderModule));
-    this->setDisplay(disp);
-    }
-}
-
-//-----------------------------------------------------------------------------
 void pqDisplayColorWidget::updateGUI()
 {
   pqPipelineDisplay* display = this->getDisplay();
@@ -265,36 +237,15 @@ void pqDisplayColorWidget::updateGUI()
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayColorWidget::setView(pqGenericViewModule* view)
+void pqDisplayColorWidget::setDisplay(pqConsumerDisplay* display) 
 {
-  if (this->RenderModule)
+  if(display == this->Display)
     {
-    QObject::disconnect(this->RenderModule, 0, this, 0);
-    }
-  this->RenderModule = qobject_cast<pqRenderViewModule*>(view);
-  if (this->RenderModule)
-    {
-    QObject::connect(this->RenderModule, SIGNAL(displayAdded(pqDisplay*)), 
-      this, SLOT(displayAdded()), Qt::QueuedConnection);
+    return;
     }
 
-  if (this->SelectedSource)
-    {
-    this->setDisplay(
-      qobject_cast<pqPipelineDisplay*>(
-        this->SelectedSource->getDisplay(this->RenderModule)));
-    }
-  else
-    {
-    this->setDisplay(0);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayColorWidget::setDisplay(pqPipelineDisplay* disp) 
-{
   this->VTKConnect->Disconnect();
-  this->Display = disp;
+  this->Display = dynamic_cast<pqPipelineDisplay*>(display);
   if(this->Display)
     {
     vtkSMDataObjectDisplayProxy* displayProxy;
@@ -323,11 +274,7 @@ void pqDisplayColorWidget::setDisplay(pqPipelineDisplay* disp)
 //-----------------------------------------------------------------------------
 pqPipelineDisplay* pqDisplayColorWidget::getDisplay() const
 {
-  if (this->Display)
-    {
-    return this->Display;
-    }
-  return 0;
+  return this->Display;
 }
 
 //-----------------------------------------------------------------------------

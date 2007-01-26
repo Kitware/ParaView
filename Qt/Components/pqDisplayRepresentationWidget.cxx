@@ -49,8 +49,6 @@ class pqDisplayRepresentationWidgetInternal :
   public Ui::displayRepresentationWidget
 {
 public:
-  QPointer<pqRenderViewModule> RenderModule;
-  QPointer<pqPipelineSource> Source;
   QPointer<pqPipelineDisplay> Display;
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* Adaptor;
@@ -82,36 +80,13 @@ pqDisplayRepresentationWidget::~pqDisplayRepresentationWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayRepresentationWidget::setView(pqGenericViewModule* view)
+void pqDisplayRepresentationWidget::setDisplay(pqConsumerDisplay* display)
 {
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
-
-  if (this->Internal->RenderModule)
+  if(display != this->Internal->Display)
     {
-    QObject::disconnect(this->Internal->RenderModule, 0, this, 0);
+    this->Internal->Display = dynamic_cast<pqPipelineDisplay*>(display);
+    this->updateLinks();
     }
-  this->Internal->RenderModule = rm;
-  if (this->Internal->RenderModule)
-    {
-    QObject::connect(this->Internal->RenderModule, 
-      SIGNAL(displayAdded(pqDisplay*)), 
-      this, SLOT(reloadGUI()), Qt::QueuedConnection);
-    }  
-  this->updateLinks();
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayRepresentationWidget::setDisplay(pqPipelineDisplay* disp)
-{
-  this->Internal->Display = disp;
-  this->updateLinks();
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayRepresentationWidget::update(pqPipelineSource* source)
-{
-  this->Internal->Source = source;
-  this->updateLinks();
 }
 
 //-----------------------------------------------------------------------------
@@ -120,32 +95,25 @@ void pqDisplayRepresentationWidget::updateLinks()
   // break old links.
   this->Internal->Links.removeAllPropertyLinks();
 
-  pqPipelineDisplay* display = this->Internal->Display;
-
-  if (!display && this->Internal->Source && this->Internal->RenderModule)
-    {
-    // this widget cannot work on other consumer displays like plot displays.
-    display = 
-      qobject_cast<pqPipelineDisplay*>(
-        this->Internal->Source->getDisplay(this->Internal->RenderModule));
-    }
-
-  this->Internal->comboBox->setEnabled(display!=0);
+  this->Internal->comboBox->setEnabled(this->Internal->Display != 0);
   this->Internal->comboBox->clear();
-  if (!display)
+  if (!this->Internal->Display)
     {
     this->Internal->comboBox->addItem("Representation");
     return;
     }
 
-  vtkSMDataObjectDisplayProxy* displayProxy = display->getDisplayProxy();
-  vtkSMProperty* repProperty = display->getProxy()->GetProperty("Representation");
+  vtkSMDataObjectDisplayProxy* displayProxy =
+      this->Internal->Display->getDisplayProxy();
+  vtkSMProperty* repProperty =
+      this->Internal->Display->getProxy()->GetProperty("Representation");
   repProperty->UpdateDependentDomains();
   QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(repProperty);
   foreach(QVariant item, items)
     {
     // Disable volume rendering support for now
-    if (item == "Volume" && 1 /*!display->getDisplayProxy()->GetHasVolumePipeline()*/)
+    if (item == "Volume" && 1
+        /*!this->Internal->Display->getDisplayProxy()->GetHasVolumePipeline()*/)
       {
       continue; // add volume only if volume representation is supported.
       }
@@ -170,9 +138,5 @@ void pqDisplayRepresentationWidget::onCurrentTextChanged(const QString&)
   if (this->Internal->Display)
     {
     this->Internal->Display->renderAllViews();
-    }
-  if (this->Internal->RenderModule)
-    {
-    this->Internal->RenderModule->render();
     }
 }

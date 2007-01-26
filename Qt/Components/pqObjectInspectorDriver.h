@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QObject>
 
+class pqConsumerDisplay;
+class pqGenericViewModule;
 class pqPipelineSource;
 class pqProxy;
 class pqServerManagerSelectionModel;
@@ -77,36 +79,79 @@ public:
   /// \param model The selection model.
   void setSelectionModel(pqServerManagerSelectionModel *model);
 
+public slots:
+  /// \brief
+  ///   Sets the active view.
+  ///
+  /// The active view and the active source are used to determine the
+  /// active display.
+  ///
+  /// \param view The new active view.
+  void setActiveView(pqGenericViewModule *view);
+
 signals:
   /// \brief
   ///   Emitted when the object panel to be shown changes.
-  /// \param proxy The object to show in the object inspector.
-  void objectChanged(pqProxy *proxy);
-
-private slots:
-  /// Determines the object to show and emits the signal.
-  void updateObject();
+  /// \param proxy The source to show in the object inspector.
+  void sourceChanged(pqProxy *proxy);
 
   /// \brief
-  ///   Checks if the object being removed is the shown object.
+  ///   Emitted when the display to be shown changes.
+  /// \param display The display to show.
+  /// \param view The view the display is in.
+  void displayChanged(pqConsumerDisplay *display, pqGenericViewModule *view);
+
+private slots:
+  /// Determines the source to show and emits the signal.
+  void updateSource();
+
+  /// \brief
+  ///   Checks if the source being removed is the active source.
   ///
-  /// If the object being shown is being removed, the \c objectChanged
+  /// If the source being shown is being removed, the \c sourceChanged
   /// signal is emitted.
   ///
-  /// \param source The object being removed.
-  void checkObject(pqPipelineSource *source);
+  /// \param source The source being removed.
+  void checkSource(pqPipelineSource *source);
+
+  /// Checks for a new display on the current source.
+  void checkForDisplay();
+
+  /// \brief
+  ///   Checks whether or not the current display is being removed.
+  /// \param source The source owning the display.
+  /// \param display The display being removed.
+  void checkDisplay(pqPipelineSource *source, pqConsumerDisplay *display);
 
 private:
   /// \brief
-  ///   Gets the object that should be shown in the object inspector.
+  ///   Sets the current source.
+  ///
+  /// The current source is used to determine the active display. The
+  /// source needs to be monitored for display changes.
+  ///
+  /// \param source The new active source.
+  void setActiveSource(pqPipelineSource *source);
+
+  /// \brief
+  ///   Gets the source that should be shown in the object inspector.
   /// \return
-  ///   A pointer to the object to show.
-  pqProxy *getObject() const;
+  ///   A pointer to the active source.
+  pqPipelineSource *findSource() const;
+
+  /// \brief
+  ///   Gets the display that should be shown in the display panel.
+  /// \return
+  ///   A pointer to the active display.
+  pqConsumerDisplay *findDisplay() const;
 
 private:
   /// Used to find the selected item(s).
   pqServerManagerSelectionModel *Selection;
-  bool ShowCurrent; ///< True if the current is shown for multiple.
+  pqPipelineSource *Source;   ///< Stores the active source.
+  pqConsumerDisplay *Display; ///< Stores the active display.
+  pqGenericViewModule *View;  ///< Stores the active view.
+  bool ShowCurrent;           ///< True if the current is shown for multiple.
 };
 
 #endif

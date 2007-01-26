@@ -34,8 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_MainWindow.h"
 
+#include <pqApplicationCore.h>
 #include <pqMainWindowCore.h>
 #include <pqMultiView.h>
+#include <pqPendingDisplayManager.h>
 #include <pqRenderWindowManager.h>
 
 #include <vtkSmartPointer.h>
@@ -109,16 +111,13 @@ MainWindow::MainWindow() :
     this->Implementation->UI.pipelineBrowserDock);
 
   this->connect(
-    &this->Implementation->Core,
-    SIGNAL(activeServerChanged(pqServer*)), 
-    this,
-    SLOT(onActiveServerChanged(pqServer*)));
+    pqApplicationCore::instance(), SIGNAL(finishedAddingServer(pqServer*)),
+    this, SLOT(onServerCreationFinished(pqServer*)));
     
   this->connect(
-    &this->Implementation->Core.multiViewManager(),
-    SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
-    this,
-    SLOT(onActiveRenderModuleChanged(pqRenderModule*)));
+    pqApplicationCore::instance()->getPendingDisplayManager(),
+    SIGNAL(pendingDisplays(bool)),
+    this, SLOT(onPendingDisplaysChanged(bool)), Qt::QueuedConnection);
 
   // Setup the multiview render window ...
   this->setCentralWidget(&this->Implementation->Core.multiViewManager());
@@ -139,7 +138,7 @@ MainWindow::~MainWindow()
 }
 
 //-----------------------------------------------------------------------------
-void MainWindow::onActiveServerChanged(pqServer* server)
+void MainWindow::onServerCreationFinished(pqServer* server)
 {
   if(!server)
     {
@@ -151,11 +150,14 @@ void MainWindow::onActiveServerChanged(pqServer* server)
   parser->Parse(custom_filters);
   parser->ProcessConfiguration(vtkSMProxyManager::GetProxyManager());
 
-  this->Implementation->Core.createSourceOnActiveServer("CustomSource");
+  pqApplicationCore::instance()->createSourceOnServer("CustomSource", server);
 }
 
-void MainWindow::onActiveRenderModuleChanged(pqRenderModule*)
+void MainWindow::onPendingDisplaysChanged(bool hasDisplays)
 {
-  this->Implementation->Core.createPendingDisplays();
+  if(hasDisplays)
+    {
+    this->Implementation->Core.createPendingDisplays();
+    }
 }
 

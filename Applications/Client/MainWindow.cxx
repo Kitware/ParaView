@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqApplicationCore.h>
 #include <pqGenericViewManager.h>
 #include <pqMainWindowCore.h>
+#include <pqObjectInspectorDriver.h>
 #include <pqObjectInspectorWidget.h>
 #include <pqPipelineBrowser.h>
 #include <pqPipelineBrowserContextMenu.h>
@@ -681,12 +682,9 @@ MainWindow::MainWindow() :
   // Set up scalar bar visibility tool bar item.
   pqScalarBarVisibilityAdaptor* sbva = new pqScalarBarVisibilityAdaptor(
       this->Implementation->UI.actionScalarBarVisibility);
-  QObject::connect(
-    &this->Implementation->Core, SIGNAL(activeSourceChanged(pqPipelineSource*)),
-    sbva, SLOT(setActiveSource(pqPipelineSource*)));
-  QObject::connect(
-    &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
-    sbva, SLOT(setActiveView(pqGenericViewModule*)));
+  QObject::connect(this->Implementation->Core.getObjectInspectorDriver(),
+    SIGNAL(displayChanged(pqConsumerDisplay *, pqGenericViewModule *)),
+    sbva, SLOT(setActiveDisplay(pqConsumerDisplay *, pqGenericViewModule *)));
 
   // Set up Center Axes toolbar.
   QObject::connect(

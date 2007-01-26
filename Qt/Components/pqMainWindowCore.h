@@ -44,6 +44,7 @@ class pqAnimationScene;
 class pqGenericViewManager;
 class pqGenericViewModule;
 class pqMultiView;
+class pqObjectInspectorDriver;
 class pqObjectInspectorWidget;
 class pqPipelineBrowser;
 class pqPipelineMenu;
@@ -182,6 +183,11 @@ public:
   // Returns the animation manager. If none is already created,
   // this call will create a new manager.
   pqAnimationManager* getAnimationManager();
+
+  // Returns the object inspector driver. If the driver is not
+  // created, a new one will be created and returned.
+  pqObjectInspectorDriver* getObjectInspectorDriver();
+
 signals:
   void enableFileOpen(bool);
   void enableFileLoadServerState(bool);
@@ -205,10 +211,6 @@ signals:
   
   /** \todo Hide these private implementation details */
   void postAccept();
-  
-  // TEMP
-  void activeSourceChanged(pqPipelineSource*);
-  void activeServerChanged(pqServer*);
 
 public slots:
   virtual void onFileOpen();

@@ -145,6 +145,7 @@ public:
     CustomFilterManager(0),
     LookupTableManager(new pqPQLookupTableManager(parent)),
     GenericViewManager(new pqGenericViewManager(parent)),
+    ObjectInspectorDriver(0),
     RecentFilesMenu(0),
     FilterMenu(0),
     PipelineMenu(0),
@@ -180,6 +181,7 @@ public:
   pqCustomFilterManager* CustomFilterManager;
   pqPQLookupTableManager* LookupTableManager;
   pqGenericViewManager* const GenericViewManager;
+  pqObjectInspectorDriver* ObjectInspectorDriver;
  
   QMenu* RecentFilesMenu; 
   QMenu* FilterMenu;
@@ -695,11 +697,10 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
 
   // Use the server manager selection model to determine which page
   // should be shown.
-  pqObjectInspectorDriver *driver = new pqObjectInspectorDriver(proxyPanel);
-  driver->setSelectionModel(pqApplicationCore::instance()->getSelectionModel());
+  pqObjectInspectorDriver *driver = this->getObjectInspectorDriver();
   QObject::connect(
     driver,
-    SIGNAL(objectChanged(pqProxy *)),
+    SIGNAL(sourceChanged(pqProxy *)),
     proxyPanel,
     SLOT(setProxy(pqProxy *)));
   
@@ -760,11 +761,10 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
 
   // Use the server manager selection model to determine which page
   // should be shown.
-  pqObjectInspectorDriver *driver = new pqObjectInspectorDriver(object_inspector);
-  driver->setSelectionModel(pqApplicationCore::instance()->getSelectionModel());
+  pqObjectInspectorDriver *driver = this->getObjectInspectorDriver();
   QObject::connect(
     driver,
-    SIGNAL(objectChanged(pqProxy *)),
+    SIGNAL(sourceChanged(pqProxy *)),
     object_inspector,
     SLOT(setProxy(pqProxy *)));
   
@@ -874,21 +874,33 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
     
   toolbar->addWidget(display_color);
 
-  QObject::connect(
-    this,
-    SIGNAL(activeSourceChanged(pqPipelineSource*)),
-    display_color,
-    SLOT(updateVariableSelector(pqPipelineSource*)));
+  QObject::connect(this->getObjectInspectorDriver(),
+    SIGNAL(displayChanged(pqConsumerDisplay *, pqGenericViewModule *)),
+    display_color, SLOT(setDisplay(pqConsumerDisplay *)));
   
   QObject::connect(
     this,
     SIGNAL(postAccept()),
     display_color,
     SLOT(reloadGUI()));
+}
 
-  QObject::connect(&pqActiveView::instance(), 
-    SIGNAL(changed(pqGenericViewModule*)),
-    display_color, SLOT(setView(pqGenericViewModule*)));
+//-----------------------------------------------------------------------------
+pqObjectInspectorDriver* pqMainWindowCore::getObjectInspectorDriver()
+{
+  if(!this->Implementation->ObjectInspectorDriver)
+    {
+    this->Implementation->ObjectInspectorDriver =
+        new pqObjectInspectorDriver(this);
+    this->Implementation->ObjectInspectorDriver->setSelectionModel(
+        pqApplicationCore::instance()->getSelectionModel());
+    this->connect(&pqActiveView::instance(),
+        SIGNAL(changed(pqGenericViewModule *)),
+        this->Implementation->ObjectInspectorDriver,
+        SLOT(setActiveView(pqGenericViewModule *)));
+    }
+
+  return this->Implementation->ObjectInspectorDriver;
 }
 
 //-----------------------------------------------------------------------------
@@ -900,14 +912,12 @@ void pqMainWindowCore::setupRepresentationToolbar(QToolBar* toolbar)
 
   toolbar->addWidget(display_representation);
 
-  QObject::connect(this, SIGNAL(activeSourceChanged(pqPipelineSource*)),
-    display_representation, SLOT(update(pqPipelineSource*)));
+  QObject::connect(this->getObjectInspectorDriver(),
+    SIGNAL(displayChanged(pqConsumerDisplay *, pqGenericViewModule *)),
+    display_representation, SLOT(setDisplay(pqConsumerDisplay *)));
 
   QObject::connect(this, SIGNAL(postAccept()),
     display_representation, SLOT(reloadGUI()));
-
-  QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
-    display_representation, SLOT(setView(pqGenericViewModule*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -2007,10 +2017,6 @@ void pqMainWindowCore::onSelectionChanged()
     // change the active scene.
     this->Implementation->AnimationManager->onActiveServerChanged(server);
     }
-
-  // TEMP
-  emit this->activeServerChanged(server);
-  emit this->activeSourceChanged(source);
 }
 
 //-----------------------------------------------------------------------------
@@ -2456,10 +2462,9 @@ pqPipelineSource* pqMainWindowCore::createReaderOnActiveServer(
 
 void pqMainWindowCore::disableAutomaticDisplays()
 {
-  QObject::disconnect(pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(sourceAdded(pqPipelineSource*)),
-    pqApplicationCore::instance()->getPendingDisplayManager(), 
-    SLOT(addPendingDisplayForSource(pqPipelineSource*)));
+  QObject::disconnect(pqApplicationCore::instance(),
+    SIGNAL(finishSourceCreation(pqPipelineSource*)),
+    this, SLOT(onSourceCreation(pqPipelineSource*)));
 }
 
 //-----------------------------------------------------------------------------
