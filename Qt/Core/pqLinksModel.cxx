@@ -46,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMCameraLink.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyProperty.h"
 
 // pqCore includes
 #include "pqServerManagerModel.h"
@@ -375,8 +377,19 @@ void pqLinksModel::addProxyLink(const QString& name,
   link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::OUTPUT);
   link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::INPUT);
   link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::OUTPUT);
+  
   // any proxy property doesn't participate in the link
   // instead, these proxies are linkable themselves
+  vtkSMPropertyIterator *iter = vtkSMPropertyIterator::New();
+  iter->SetProxy(inputProxy->getProxy());
+  for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    if(vtkSMProxyProperty::SafeDownCast(iter->GetProperty()))
+      {
+      link->AddException(iter->GetKey());
+      }
+    }
+  iter->Delete();
 
   pxm->RegisterLink(name.toAscii().data(), link);
   link->Delete();
@@ -476,6 +489,7 @@ pqLinksModelObject::pqLinksModelObject(QString linkName, pqLinksModel* p)
   this->Internal->Connection->Connect(this->Internal->Link, 
                             vtkCommand::ModifiedEvent,
                             this, SLOT(refresh()));
+  this->refresh();
 }
 
 pqLinksModelObject::~pqLinksModelObject()
