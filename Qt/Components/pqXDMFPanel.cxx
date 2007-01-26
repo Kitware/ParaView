@@ -118,6 +118,8 @@ pqXDMFPanel::pqXDMFPanel(pqProxy* object_proxy, QWidget* p) :
 {
   this->UI = new pqUI(this);
   this->UI->setupUi(this);
+  this->LastGridDeselected = NULL;
+  this->NeedsResetGrid = 0;
       
   this->linkServerManagerProperties();
 }
@@ -224,6 +226,11 @@ void pqXDMFPanel::PopulateGridWidget()
   //whenever grid changes, update the available arrays
   this->ResetArrays();
   this->PopulateArrayWidget();
+
+  //remeber what is pressed so we can prevent deselection of all grids
+  QObject::connect(selectionWidget, 
+                   SIGNAL(itemClicked(QListWidgetItem *)),
+                   this, SLOT(RecordLastSelectedGrid(QListWidgetItem *)));
 
   //watch for changes in the widget so that we can tell the proxy
   QObject::connect(selectionWidget, SIGNAL(itemSelectionChanged()), 
@@ -382,15 +389,30 @@ void pqXDMFPanel::SetSelectedDomain(QString newDomain)
 }
 
 //-----------------------------------------------------------------------------
+void pqXDMFPanel::RecordLastSelectedGrid(QListWidgetItem *grid)
+{
+  //this little dance makes sure that when the last grid is unselected
+  //we can select it to make sure that are least one grid is selected
+  this->LastGridDeselected = grid;
+  if (this->NeedsResetGrid)
+    {
+    this->UI->GridNames->setItemSelected(grid, true);    
+    this->NeedsResetGrid = 0;
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqXDMFPanel::SetSelectedGrids()
 {
   //go through the selections from the gui and turn them on in the server
   QList<QListWidgetItem *> selections = this->UI->GridNames->selectedItems();
   if (selections.size() == 0)
     {
-    qWarning("Must select at least one grid.");
-    QListWidgetItem *citem = this->UI->GridNames->currentItem();
-    this->UI->GridNames->setItemSelected(citem, true);    
+    if (this->LastGridDeselected != NULL)
+      {
+      this->NeedsResetGrid = 1;
+      }
+    qWarning("At least one grid must be enabled.");
     return;
     }
 

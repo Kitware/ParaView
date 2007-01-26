@@ -37,8 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectPanelInterface.h"
 #include "pqComponentsExport.h"
 
-class QTreeWidget;
-class QListWidget;
+class QListWidgetItem;
 class pqXDMFPanelArrayRecord;
 
 // a panel for XDMF readers
@@ -80,10 +79,12 @@ protected:
 protected slots:
   void SetSelectedDomain(QString newDomain);
   void SetSelectedGrids();
+  void RecordLastSelectedGrid(QListWidgetItem *);
 
 private:
   QList<pqXDMFPanelArrayRecord> ArrayList;
-
+  QListWidgetItem *LastGridDeselected;
+  int NeedsResetGrid;
 };
 
 // make this panel available to the object inspector
