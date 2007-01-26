@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.13");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -281,14 +281,14 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
   // Init UpdateSuppressor properties.
   // Seems like we can't use properties for this 
   // to work properly.
-  for(unsigned int i = 0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); ++i)
+  for(unsigned int j = 0; j < this->UpdateSuppressorProxy->GetNumberOfIDs(); ++j)
     {
     stream
       << vtkClientServerStream::Invoke
       << vtkProcessModule::GetProcessModule()->GetProcessModuleID() << "GetNumberOfPartitions"
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
-      << this->UpdateSuppressorProxy->GetID(i) << "SetUpdateNumberOfPieces"
+      << this->UpdateSuppressorProxy->GetID(j) << "SetUpdateNumberOfPieces"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     stream
@@ -296,7 +296,7 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
       << vtkProcessModule::GetProcessModule()->GetProcessModuleID() << "GetPartitionId"
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
-      << this->UpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
+      << this->UpdateSuppressorProxy->GetID(j) << "SetUpdatePiece"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     }
