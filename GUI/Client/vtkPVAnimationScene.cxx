@@ -73,7 +73,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.69");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.69.2.1");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -719,6 +719,11 @@ void vtkPVAnimationScene::Play()
   this->OnBeginPlay();
   this->AnimationSceneProxy->Play();
   this->OnEndPlay();
+  if (this->Window && this->Window->GetCurrentPVSource())
+    {
+    this->Window->GetCurrentPVSource()->ResetCallback();
+    }
+
   this->GetTraceHelper()->AddEntry("$kw(%s) Play", this->GetTclName());
 }
 
