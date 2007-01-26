@@ -113,6 +113,8 @@ pqTimerLogDisplay::pqTimerLogDisplay(QWidget *p)
   this->setTimeThreshold(0.01f);
   this->setBufferLength(500);
   this->setEnable(true);
+
+  this->restoreState();
 }
 
 pqTimerLogDisplay::~pqTimerLogDisplay()
@@ -174,12 +176,12 @@ void pqTimerLogDisplay::addToLog(const QString &source,
     {
     if (numLogs > 1)
       {
-      this->ui->log->insertHtml(QString("<p><h1>%1, Process %2</h1><br>")
+      this->ui->log->insertHtml(QString("<br><p><h1>%1, Process %2</h1><p>")
                                 .arg(source).arg(id));
       }
     else
       {
-      this->ui->log->insertHtml(QString("<p><h1>%1</h1><br>").arg(source));
+      this->ui->log->insertHtml(QString("<br><p><h1>%1</h1><p>").arg(source));
       }
     this->ui->log->insertHtml(QString("<pre>%1</pre>").arg(timerInfo->GetLog(id)));
     }
@@ -339,7 +341,23 @@ void pqTimerLogDisplay::save(const QString &filename)
 }
 
 //-----------------------------------------------------------------------------
-void pqTimerLogDisplay::showEvent(QShowEvent *e)
+void pqTimerLogDisplay::saveState()
+{
+  pqApplicationCore *core = pqApplicationCore::instance();
+  if (core)
+    {
+    pqSettings *settings = core->settings();
+    settings->saveState(*this, "TimerLog");
+    settings->beginGroup("TimerLog");
+    settings->setValue("TimeThreshold", this->timeThreshold());
+    settings->setValue("BufferLength", this->bufferLength());
+    settings->setValue("Enable", this->isEnabled());
+    settings->endGroup();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqTimerLogDisplay::restoreState()
 {
   pqApplicationCore *core = pqApplicationCore::instance();
   if (core)
@@ -357,24 +375,18 @@ void pqTimerLogDisplay::showEvent(QShowEvent *e)
                                     this->isEnabled()).toBool());
     settings->endGroup();
     }
+}
 
+//-----------------------------------------------------------------------------
+void pqTimerLogDisplay::showEvent(QShowEvent *e)
+{
+  this->restoreState();
   this->Superclass::showEvent(e);
 }
 
 //-----------------------------------------------------------------------------
 void pqTimerLogDisplay::hideEvent(QHideEvent *e)
 {
-  pqApplicationCore *core = pqApplicationCore::instance();
-  if (core)
-    {
-    pqSettings *settings = core->settings();
-    settings->saveState(*this, "TimerLog");
-    settings->beginGroup("TimerLog");
-    settings->setValue("TimeThreshold", this->timeThreshold());
-    settings->setValue("BufferLength", this->bufferLength());
-    settings->setValue("Enable", this->isEnabled());
-    settings->endGroup();
-    }
-
+  this->saveState();
   this->Superclass::hideEvent(e);
 }

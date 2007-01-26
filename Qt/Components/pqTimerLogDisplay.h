@@ -64,6 +64,9 @@ public slots:
   void save(const QString &filename);
   void save(const QStringList &files);
 
+  void saveState();
+  void restoreState();
+
 protected:
   virtual void addToLog(const QString &source,
                         vtkPVTimerInformation *timerInfo);
