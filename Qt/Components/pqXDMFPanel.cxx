@@ -291,6 +291,20 @@ void pqXDMFPanel::ResetArrays()
   OProperty->Copy(IProperty);
   ODomain->Update(IProperty);
 
+
+  IProperty = vtkSMStringVectorProperty::SafeDownCast(
+    this->proxy()->getProxy()->GetProperty("CellArrayInfo")
+    );
+  OProperty = vtkSMStringVectorProperty::SafeDownCast(
+    this->proxy()->getProxy()->GetProperty("CellArrayStatus")
+    );
+  ODomain = vtkSMArraySelectionDomain::SafeDownCast(
+    OProperty->GetDomain("array_list")
+    );
+
+  OProperty->Copy(IProperty);
+  ODomain->Update(IProperty);
+
   //clean out the UI to be safe
   QTreeWidget* VariablesTree = this->UI->Variables;
   VariablesTree->clear();
