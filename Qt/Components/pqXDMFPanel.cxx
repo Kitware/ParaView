@@ -73,10 +73,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqXDMFPanelArrayRecord
 {
 public:
-  pqXDMFPanelArrayRecord(pqTreeWidgetItemObject *widget, 
-                         int CorP, 
-                         int location) :
-    widget(widget), CorP(CorP), location(location) 
+  pqXDMFPanelArrayRecord(pqTreeWidgetItemObject *_widget, 
+                         int _CorP, 
+                         int _location) :
+    widget(_widget), CorP(_CorP), location(_location) 
     {
     };
 
@@ -128,6 +128,19 @@ pqXDMFPanel::pqXDMFPanel(pqProxy* object_proxy, QWidget* p) :
 pqXDMFPanel::~pqXDMFPanel()
 {
   this->ArrayList.clear();
+}
+
+//----------------------------------------------------------------------------
+void pqXDMFPanel::linkServerManagerProperties()
+{
+  // parent class hooks up some of our widgets in the ui
+  pqNamedObjectPanel::linkServerManagerProperties();
+
+  this->PopulateDomainWidget();
+
+  this->PopulateGridWidget();
+
+  this->PopulateParameterWidget();
 }
 
 //----------------------------------------------------------------------------
@@ -354,9 +367,6 @@ void pqXDMFPanel::PopulateArrayWidget()
   vtkSMProperty* NodeProperty = this->proxy()->getProxy()->GetProperty("PointArrayStatus");
   QList<QVariant> PointDomain;
   PointDomain = pqSMAdaptor::getSelectionPropertyDomain(NodeProperty);
-
-  vtkSMStringVectorProperty *StringProperty = 
-    vtkSMStringVectorProperty::SafeDownCast(NodeProperty);
   for(j=0; j<PointDomain.size(); j++)
     {
     varName = PointDomain[j].toString();
@@ -375,15 +385,24 @@ void pqXDMFPanel::PopulateArrayWidget()
 }
 
 //----------------------------------------------------------------------------
-void pqXDMFPanel::linkServerManagerProperties()
+void pqXDMFPanel::PopulateParameterWidget()
 {
-  // parent class hooks up some of our widgets in the ui
-  pqNamedObjectPanel::linkServerManagerProperties();
+  //ask the reader for the list of available Xdmf paramaters
+  this->proxy()->getProxy()->UpdatePropertyInformation();
+  vtkSMStringVectorProperty* GetNamesProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("ParametersInfo"));
 
-  this->PopulateDomainWidget();
-
-  this->PopulateGridWidget();
+  //add a control for each paramter to the panel
+  int numNames = GetNamesProperty->GetNumberOfElements();
+  //cerr << numNames << endl;
+  for (int i = 0; i < numNames; i++)
+    {
+    //const char* name = GetNamesProperty->GetElement(i);
+    //cerr << i << " = " << name << endl;
+    }
 }
+
 
 //-----------------------------------------------------------------------------
 void pqXDMFPanel::SetSelectedDomain(QString newDomain)

@@ -67,11 +67,14 @@ protected:
   // fill the grid selection part of the GUI
   void PopulateGridWidget();
 
+  // ask the server what the selection state of the arrays is
+  void ResetArrays();
+
   // fill the array selection part of the GUI
   void PopulateArrayWidget();
 
-  // ask the server what the selection state of the arrays is
-  void ResetArrays();
+  // fill the parameters part of the GUI
+  void PopulateParameterWidget();
  
   class pqUI;
   pqUI* UI;
