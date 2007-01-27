@@ -172,6 +172,8 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   this->Internal->PendingDisplayManager = new pqPendingDisplayManager(this);
 
   this->Internal->DisplayPolicy = new pqDisplayPolicy(this);
+
+  this->LoadingState = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -436,8 +438,10 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
   if (rootElement)
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    this->LoadingState = true;
     pxm->LoadState(rootElement, server->GetConnectionID(), loader);
     pxm->UpdateRegisteredProxiesInOrder(0);
+    this->LoadingState = false;
     }
 
   // Clear undo stack.
@@ -450,6 +454,7 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     pqLoader->SetMultiViewRenderModuleProxy(0);
     }
   this->render();
+
   emit this->stateLoaded();
 }
 

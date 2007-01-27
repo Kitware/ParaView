@@ -128,6 +128,7 @@ public:
   vtkSmartPointer<vtkSMRenderModuleProxy> RenderModuleProxy;
   vtkSmartPointer<vtkPVAxesWidget> OrientationAxesWidget;
   vtkSmartPointer<vtkSMProxy> CenterAxesProxy;
+  vtkSmartPointer<vtkSMProxy> InteractorStyleProxy;
   pqUndoStack* UndoStack;
   int DefaultBackground[3];
 
@@ -137,6 +138,7 @@ public:
     this->RenderViewProxy = vtkSmartPointer<pqRenderViewProxy>::New();
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->OrientationAxesWidget = vtkSmartPointer<vtkPVAxesWidget>::New();
+    this->InteractorStyleProxy = 0;
     this->UndoStack = new pqUndoStack(true);
     this->DefaultBackground[0] = 84;
     this->DefaultBackground[1] = 89;
@@ -175,12 +177,17 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   this->Internal->CenterAxesProxy->SetConnectionID(
     this->Internal->RenderModuleProxy->GetConnectionID());
   this->Internal->CenterAxesProxy->SetServers(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    vtkProcessModule::CLIENT); //|vtkProcessModule::RENDER_SERVER);
   QList<QVariant> scaleValues;
   scaleValues << .25 << .25 << .25;
   pqSMAdaptor::setMultipleElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Scale"),
     scaleValues);
+
+  /// When a state is loaded, if this render module is reused, its interactor style will change
+  QObject::connect(pqApplicationCore::instance(), SIGNAL(stateLoaded()), this,
+    SLOT(updateInteractorStyleFromState()));
+
 }
 
 //-----------------------------------------------------------------------------
@@ -250,33 +257,104 @@ void pqRenderViewModule::viewModuleInit()
 
   this->Internal->RenderModuleProxy->ResetCamera();
 
-  // Set up interactor styles.
-  vtkPVInteractorStyle* style = vtkPVInteractorStyle::New();
-  vtkCameraManipulator* manip = vtkPVTrackballRotate::New();
-  style->AddManipulator(manip);
-  manip->Delete();
-  manip = vtkTrackballPan::New();
-  manip->SetButton(2);
-  style->AddManipulator(manip);
-  manip->Delete();
-  manip = vtkPVTrackballZoom::New();
-  manip->SetButton(3);
-  style->AddManipulator(manip);
-  manip->Delete();
-  manip = vtkTrackballPan::New();
-  manip->SetButton(1);
-  manip->SetControl(1);
-  style->AddManipulator(manip);
-  manip->Delete();
-  manip = vtkPVTrackballZoom::New();
-  manip->SetButton(1);
-  manip->SetShift(1);
-  style->AddManipulator(manip);
-  manip->Delete();
-   
-  iren->SetInteractorStyle(style);
-  style->Delete();
+  // Set up interactor styles and their manipulators.
 
+  // If viewModuleInit() is called while state is being loaded, 
+  // then everything inside this conditional will be taken care of by the state and we don't want to override it.
+  if(!pqApplicationCore::instance()->isLoadingState())
+    {
+    // Create the interactor style proxy:
+    this->Internal->InteractorStyleProxy.TakeReference(
+      vtkSMObject::GetProxyManager()->NewProxy("interactorstyles","InteractorStyle"));
+    this->Internal->InteractorStyleProxy->SetConnectionID(
+      this->Internal->RenderModuleProxy->GetConnectionID());
+    this->Internal->InteractorStyleProxy->SetServers(
+      vtkProcessModule::CLIENT);
+    this->addInternalProxy("InteractorStyles",this->Internal->InteractorStyleProxy);
+    vtkSMProperty *styleManips = this->Internal->InteractorStyleProxy->GetProperty("CameraManipulators");
+  
+    // It is possible that the interactor style is setup via python in which case it may be something 
+    // other than PVInteractorStyle which may not accept manipulators, hence this conditional
+    if(styleManips)
+      {
+      // Create and register manipulators, then add to interactor style
+
+      vtkSMProxy *manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballRotate");
+      manip->SetConnectionID(
+        this->Internal->RenderModuleProxy->GetConnectionID());
+      manip->SetServers(vtkProcessModule::CLIENT);
+      this->addInternalProxy("CameraManipulators",manip);
+      pqSMAdaptor::addProxyProperty(styleManips, manip);
+      manip->Delete();
+
+      manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballPan1");
+      manip->SetConnectionID(
+        this->Internal->RenderModuleProxy->GetConnectionID());
+      manip->SetServers(vtkProcessModule::CLIENT);
+      vtkSMIntVectorProperty *button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
+      button->SetElement(0,2);
+      this->addInternalProxy("CameraManipulators",manip);
+      pqSMAdaptor::addProxyProperty(styleManips, manip);
+      manip->UpdateVTKObjects();
+      manip->Delete();
+
+      manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballPan1");
+      manip->SetConnectionID(
+        this->Internal->RenderModuleProxy->GetConnectionID());
+      manip->SetServers(vtkProcessModule::CLIENT);
+      button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
+      button->SetElement(0,1);
+      button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Control"));
+      button->SetElement(0,1);
+      this->addInternalProxy("CameraManipulators",manip);
+      pqSMAdaptor::addProxyProperty(styleManips, manip);
+      manip->UpdateVTKObjects();
+      manip->Delete();
+
+      manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballZoom");
+      manip->SetConnectionID(
+        this->Internal->RenderModuleProxy->GetConnectionID());
+      manip->SetServers(vtkProcessModule::CLIENT);
+      button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
+      button->SetElement(0,3);
+      this->addInternalProxy("CameraManipulators",manip);
+      pqSMAdaptor::addProxyProperty(styleManips, manip);
+      manip->UpdateVTKObjects();
+      manip->Delete();
+
+      manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballZoom");
+      manip->SetConnectionID(
+        this->Internal->RenderModuleProxy->GetConnectionID());
+      manip->SetServers(vtkProcessModule::CLIENT);
+      button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
+      button->SetElement(0,1);
+      button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Shift"));
+      button->SetElement(0,1);
+      this->addInternalProxy("CameraManipulators",manip);
+      pqSMAdaptor::addProxyProperty(styleManips, manip);
+      manip->UpdateVTKObjects();
+      manip->Delete();
+      }
+
+    // Is this needed?
+    this->Internal->InteractorStyleProxy->UpdateVTKObjects();
+
+    // Set interactor style as a proxy property of the render module so it will get saved in the state
+    vtkSMProxyProperty *iStyle = vtkSMProxyProperty::SafeDownCast(this->Internal->RenderModuleProxy->GetProperty("InteractorStyle"));
+    iStyle->RemoveAllProxies();
+    iStyle->AddProxy(this->Internal->InteractorStyleProxy);
+
+    }
+  else
+    {
+    // If we got here, this render module was created and initialized from state, so just grab its interactor style and use it as our own
+    vtkSMProxyProperty *iStyle = vtkSMProxyProperty::SafeDownCast(this->Internal->RenderModuleProxy->GetProperty("InteractorStyle"));
+    this->Internal->InteractorStyleProxy = iStyle->GetProxy(0);
+    }
+
+
+  vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
+  vtkInteractorStyle *style = vtkInteractorStyle::SafeDownCast(pvm->GetObjectFromID(this->Internal->InteractorStyleProxy->GetID(0)));
   this->Internal->VTKConnect->Connect(style,
     vtkCommand::StartInteractionEvent, 
     this, SLOT(startInteraction()));
@@ -305,6 +383,29 @@ void pqRenderViewModule::viewModuleInit()
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderViewModule::updateInteractorStyleFromState()
+{
+  vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
+  vtkInteractorStyle *currentStyle = vtkInteractorStyle::SafeDownCast(pvm->GetObjectFromID(this->Internal->InteractorStyleProxy->GetID(0)));
+  vtkInteractorStyle *newStyle = vtkInteractorStyle::SafeDownCast(this->Internal->RenderModuleProxy->GetInteractor()->GetInteractorStyle());
+
+  if(currentStyle != newStyle)
+    {
+    this->setInteractorStyle(newStyle);
+    }
+
+  // This is a temporary fix to make sure the center axes gets displayed after the state is loaded
+  pqSMAdaptor::removeProxyProperty(this->Internal->RenderModuleProxy->GetProperty("Displays"),
+    this->Internal->CenterAxesProxy);
+  pqSMAdaptor::addProxyProperty(this->Internal->RenderModuleProxy->GetProperty("Displays"),
+    this->Internal->CenterAxesProxy);
+  this->Internal->RenderModuleProxy->UpdateVTKObjects();
+
+  this->updateCenterAxes();
+}
+
+
+//-----------------------------------------------------------------------------
 void pqRenderViewModule::setInteractorStyle(vtkInteractorStyle* style)
 {
   vtkPVGenericRenderWindowInteractor* iren =
@@ -317,6 +418,12 @@ void pqRenderViewModule::setInteractorStyle(vtkInteractorStyle* style)
     }
 
   iren->SetInteractorStyle(style);
+
+  // Grab the new interactor style's proxy and  register it:
+  this->removeInternalProxy("InteractorStyles",this->Internal->InteractorStyleProxy);
+  vtkSMProxyProperty *iStyle = vtkSMProxyProperty::SafeDownCast(this->Internal->RenderModuleProxy->GetProperty("InteractorStyle"));
+  this->Internal->InteractorStyleProxy = iStyle->GetProxy(0);
+  this->addInternalProxy("InteractorStyles",this->Internal->InteractorStyleProxy);
 
   this->Internal->VTKConnect->Connect(style,
     vtkCommand::StartInteractionEvent, 
@@ -739,25 +846,20 @@ QColor pqRenderViewModule::getOrientationAxesLabelColor() const
   return color;
 }
 
-//-----------------------------------------------------------------------------
-void pqRenderViewModule::setCenterOfRotation(double x, double y, double z)
-{
-  vtkPVGenericRenderWindowInteractor* iren =
-    vtkPVGenericRenderWindowInteractor::SafeDownCast(
-      this->Internal->RenderModuleProxy->GetInteractor());
-  vtkPVInteractorStyle* style = vtkPVInteractorStyle::SafeDownCast(
-    iren->GetInteractorStyle());
-  if (!style)
-    {
-    qDebug() 
-      << "Cannot set center of rotation since interaction style has changed.";
-    return;
-    }
 
-  style->SetCenterOfRotation(x, y, z);
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::updateCenterAxes()
+{
+  double center[3];
+  QList<QVariant> val =
+    pqSMAdaptor::getMultipleElementProperty(
+      this->Internal->InteractorStyleProxy->GetProperty("CenterOfRotation"));
+  center[0] = val[0].toDouble();
+  center[1] = val[1].toDouble();
+  center[2] = val[2].toDouble();
 
   QList<QVariant> positionValues;
-  positionValues << x << y << z;
+  positionValues << center[0] << center[1] << center[2];
 
   pqSMAdaptor::setMultipleElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Position"),
@@ -780,11 +882,38 @@ void pqRenderViewModule::setCenterOfRotation(double x, double y, double z)
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderViewModule::setCenterOfRotation(double x, double y, double z)
+{
+  vtkPVGenericRenderWindowInteractor* iren =
+    vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      this->Internal->RenderModuleProxy->GetInteractor());
+  vtkPVInteractorStyle* style = vtkPVInteractorStyle::SafeDownCast(
+    iren->GetInteractorStyle());
+  if (!style)
+    {
+    qDebug() 
+      << "Cannot set center of rotation since interaction style has changed.";
+    return;
+    }
+
+  QList<QVariant> positionValues;
+  positionValues << x << y << z;
+
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Internal->InteractorStyleProxy->GetProperty("CenterOfRotation"),
+    positionValues);
+
+  this->Internal->InteractorStyleProxy->UpdateVTKObjects();
+
+  this->updateCenterAxes();
+}
+
+//-----------------------------------------------------------------------------
 void pqRenderViewModule::getCenterOfRotation(double center[3]) const
 {
   QList<QVariant> val =
     pqSMAdaptor::getMultipleElementProperty(
-      this->Internal->CenterAxesProxy->GetProperty("Position"));
+      this->Internal->InteractorStyleProxy->GetProperty("CenterOfRotation"));
   center[0] = val[0].toDouble();
   center[1] = val[1].toDouble();
   center[2] = val[2].toDouble();

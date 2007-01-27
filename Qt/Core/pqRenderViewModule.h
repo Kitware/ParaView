@@ -41,7 +41,7 @@ class pqUndoStack;
 class QVTKWidget;
 class vtkInteractorStyle;
 class vtkSMRenderModuleProxy;
-
+class vtkObject;
 
 // This is a PQ abstraction of a render module.
 class PQCORE_EXPORT pqRenderViewModule : public pqGenericViewModule
@@ -150,6 +150,13 @@ public slots:
     {
     this->setCenterOfRotation(xyz[0], xyz[1], xyz[2]);
     }
+
+  // Sets the position and scale of the axes when the center of rotation has been modified
+  void updateCenterAxes();
+
+  // Initializes the interactor style and center axes using server state.
+  // This is called after a state file is finished loading.
+  void updateInteractorStyleFromState();
 
   // Toggle center axes visibility.
   void setCenterAxesVisibility(bool visible);

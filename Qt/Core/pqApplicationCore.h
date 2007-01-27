@@ -170,6 +170,10 @@ public:
   /// while loading states, if any. This is used
   /// only when loadState is called with loader=NULL.
   void setStateLoader(vtkSMStateLoader* loader);
+
+  // Check to see if its in the process of loading a state
+  bool isLoadingState(){return this->LoadingState;};
+
 signals:
   // Fired to enable or disable progress bar.
   void enableProgress(bool enable);
@@ -204,6 +208,7 @@ protected:
     emit this->progress(QString(name), value);
     }
 
+  bool LoadingState;
 
 private:
   pqApplicationCoreInternal* Internal;

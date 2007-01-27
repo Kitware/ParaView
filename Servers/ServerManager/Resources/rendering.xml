@@ -1851,6 +1851,9 @@
         <Proxy name="Interactor" proxyname="GenericRenderWindowInteractor" 
           proxygroup="interactors">
         </Proxy>
+        <ExposedProperties>
+          <Property name="InteractorStyle" />
+        </ExposedProperties>
         <!-- TODO: we may expose the InteractorRender property and 
         GUI call call that property instead on iren->Render() -->
       </SubProxy>
@@ -2075,9 +2078,119 @@
           <Group  name="renderers" />
         </ProxyGroupDomain>
       </ProxyProperty>
+      <ProxyProperty 
+        name="InteractorStyle" 
+        command="SetInteractorStyle">
+        <ProxyGroupDomain name="groups">
+          <Group  name="interactorstyles" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
     </Proxy>
   </ProxyGroup>
-  
+
+  <ProxyGroup name="interactorstyles">
+    <Proxy name="InteractorStyle" class="vtkPVInteractorStyle">
+      <DoubleVectorProperty
+        name="CenterOfRotation"
+        command="SetCenterOfRotation"
+        number_of_elements="3"
+        default_values="0 0 0">
+      </DoubleVectorProperty>
+      <ProxyProperty
+        name="CameraManipulators"
+        command="AddManipulator">
+        <ProxyGroupDomain name="groups">
+          <Group name="cameramanipulators" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="cameramanipulators">
+    <Proxy name="CameraManipulator" class="vtkCameraManipulator">
+      <IntVectorProperty
+        name="Button"
+        command="SetButton"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain>
+          <Entry value="1" text="Left Button"/>
+          <Entry value="2" text="Center Button"/>
+          <Entry value="3" text="Right Button"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="Shift"
+        command="SetShift"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="IsShiftPressed"/>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="Control"
+        command="SetControl"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="IsControlPressed"/>
+      </IntVectorProperty>
+      <StringVectorProperty
+        name="ManipulatorName"
+        command="SetManipulatorName"
+        number_of_elements="1">
+      </StringVectorProperty>
+    </Proxy>
+
+    <Proxy name="JoystickFly1" class="vtkPVJoystickFly" base_proxygroup="cameramanipulators"
+      base_proxyname="CameraManipulator">
+      <DoubleVectorProperty
+        name="FlySpeed"
+        command="SetFlySpeed"
+        number_of_elements="1"
+        default_values="15">
+        <DoubleRangeDomain name="range" min="1" max="30"/>
+      </DoubleVectorProperty>
+    </Proxy>
+
+    <Proxy name="JoystickFly2" class="pqJoystickFly" base_proxygroup="cameramanipulators"
+      base_proxyname="CameraManipulator">
+      <DoubleVectorProperty
+        name="FlySpeed"
+        command="SetFlySpeed"
+        number_of_elements="1"
+        default_values="15">
+        <DoubleRangeDomain name="range" min="1" max="30"/>
+      </DoubleVectorProperty>
+      <IntVectorProperty
+        name="In"
+        command="SetIn"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain>
+          <Entry value="0" text="Fly In"/>
+          <Entry value="1" text="Fly Out"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+    </Proxy>
+
+    <Proxy name="TrackballMoveActor" class="vtkPVTrackballMoveActor" base_proxygroup="cameramanipulators"
+      base_proxyname="CameraManipulator"/>
+
+    <Proxy name="TrackballPan1" class="vtkTrackballPan" base_proxygroup="cameramanipulators"
+      base_proxyname="CameraManipulator"/>
+
+    <Proxy name="TrackballPan2" class="vtkPVTrackballPan" base_proxygroup="cameramanipulators"
+      base_proxyname="CameraManipulator"/>
+
+    <Proxy name="TrackballRoll" class="vtkPVTrackballRoll" base_proxygroup="cameramanipulators"
+      base_proxyname="CameraManipulator"/>
+
+    <Proxy name="TrackballRotate" class="vtkPVTrackballRotate" base_proxygroup="cameramanipulators"
+      base_proxyname="CameraManipulator"/>
+
+    <Proxy name="TrackballZoom" class="vtkPVTrackballZoom" base_proxygroup="cameramanipulators"
+      base_proxyname="CameraManipulator"/>
+  </ProxyGroup>
+
   <ProxyGroup name="compositers">
     <Proxy name="CompressCompositer" class="vtkCompressCompositer">
     </Proxy>
