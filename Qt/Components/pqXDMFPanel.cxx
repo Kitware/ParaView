@@ -552,10 +552,10 @@ void pqXDMFPanel::SetCellValue(int newval)
   int row = paramsContainer->currentRow();
   if (row < 0) 
     {
-    cerr << "warning" << endl;
+    cerr << "warning assuming first parameter" << endl;
     row = 0;
     }
-  int loc = row*2;
+
   vtkSMStringVectorProperty* SetParameterProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
       this->proxy()->getProxy()->GetProperty("ParameterIndex"));
@@ -566,7 +566,8 @@ void pqXDMFPanel::SetCellValue(int newval)
 
   char valS[20];
   sprintf(valS, "%d", newval);
-  for (int i = 0; i < GetParameterProperty->GetNumberOfElements()/5; i++)
+  int numRows = ((int)GetParameterProperty->GetNumberOfElements())/5;
+  for (int i = 0; i < numRows; i++)
     {
     const char *name = GetParameterProperty->GetElement(i*5+0);
     SetParameterProperty->SetElement(i*2+0, name);
