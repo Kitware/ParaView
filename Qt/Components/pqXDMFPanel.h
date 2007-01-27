@@ -83,6 +83,7 @@ protected slots:
   void SetSelectedDomain(QString newDomain);
   void SetSelectedGrids();
   void RecordLastSelectedGrid(QListWidgetItem *);
+  void SetCellValue(int r);
 
 private:
   QList<pqXDMFPanelArrayRecord> ArrayList;

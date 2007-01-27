@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QComboBox>
 #include <QListWidget>
+#include <QTableWidget>
 
 // VTK includes
 
@@ -380,27 +381,94 @@ void pqXDMFPanel::PopulateArrayWidget()
                                       "checked", 
                                       SIGNAL(checkedStateChanged(bool)),
                                       this->proxy()->getProxy(), NodeProperty, j);
-
     }
 }
 
 //----------------------------------------------------------------------------
 void pqXDMFPanel::PopulateParameterWidget()
 {
-  //ask the reader for the list of available Xdmf paramaters
+  QTableWidget* paramsContainer = this->UI->Parameters;
+
+  //ask the reader for the list of available Xdmf parameters
   this->proxy()->getProxy()->UpdatePropertyInformation();
-  vtkSMStringVectorProperty* GetNamesProperty = 
+  vtkSMStringVectorProperty* GetParameterProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
       this->proxy()->getProxy()->GetProperty("ParametersInfo"));
 
-  //add a control for each paramter to the panel
-  int numNames = GetNamesProperty->GetNumberOfElements();
-  //cerr << numNames << endl;
-  for (int i = 0; i < numNames; i++)
+  int numParameter = GetParameterProperty->GetNumberOfElements();
+  paramsContainer->setRowCount(numParameter/5);
+  if (numParameter == 0)
     {
-    //const char* name = GetNamesProperty->GetElement(i);
-    //cerr << i << " = " << name << endl;
+    QLabel* paramsLabel = this->UI->Parameters_label;
+    paramsLabel->setText("No Parameters");
+    paramsContainer->hide();
+    return;
     }
+  //add a control for each paramter to the panel
+  QTableWidgetItem *item;
+  item = new QTableWidgetItem("Min");
+  paramsContainer->setHorizontalHeaderItem(0,item);
+  item = new QTableWidgetItem("Value");
+  paramsContainer->setHorizontalHeaderItem(1,item);
+  item = new QTableWidgetItem("Max");
+  paramsContainer->setHorizontalHeaderItem(2,item);
+  for (int i = 0; i < numParameter; i+=5)
+    {
+    int row = i/5;
+    const char* name = GetParameterProperty->GetElement(i+0);
+    item = new QTableWidgetItem(name);
+    item->setFlags(0);
+    paramsContainer->setVerticalHeaderItem(row,item);
+
+    const char* firstIdxS = GetParameterProperty->GetElement(i+2);
+    item = new QTableWidgetItem(firstIdxS);
+    item->setFlags(0);
+    paramsContainer->setItem(row,0,item);
+    int min = atoi(firstIdxS);
+
+    const char *strideS = GetParameterProperty->GetElement(i+3);
+    int stride = atoi(strideS);
+
+    const char *countS = GetParameterProperty->GetElement(i+4);
+    int count = atoi(countS);    
+    int max = min + stride*count;
+    char maxS[20];
+    sprintf(maxS, "%d", max);
+    item = new QTableWidgetItem(maxS);
+    item->setFlags(0);
+    paramsContainer->setItem(row,2,item);
+
+    QSpinBox *valBox = new QSpinBox(paramsContainer);
+    valBox->setMinimum(min);
+    valBox->setMaximum(max);
+    valBox->setSingleStep(stride);
+    const char* currentValS = GetParameterProperty->GetElement(i+1);
+    int val = atoi(currentValS);
+    valBox->setValue(val);
+    paramsContainer->setCellWidget(row,1,valBox);    
+
+    //how to pass the calling object and the name/value pair to the slot?
+    //when this is changed slot has to get name, value and the row number
+    //then it has to set in the SetParameterProperty element 2*row to be name
+    //and 2*row+1 to be value
+    //if i just get the row and the value in the callback I can set it
+
+    QObject::connect(valBox, SIGNAL(valueChanged(int)), 
+                     this, SLOT(SetCellValue(int)));
+
+    
+    //QObject::connect(paramsContainer, SIGNAL(cellClicked(int, int)), 
+    //                 this, SLOT(SetCellValue(int, int)));
+    /*
+    this->propertyManager()->registerLink(valBox, 
+                                          "changed", 
+                                          SIGNAL(valueChanged(int)),
+                                          this->proxy()->getProxy(), 
+                                          SetParameterProperty, row);
+    */
+    }
+
+  paramsContainer->resizeColumnsToContents();
 }
 
 
@@ -434,7 +502,7 @@ void pqXDMFPanel::RecordLastSelectedGrid(QListWidgetItem *grid)
     }
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 void pqXDMFPanel::SetSelectedGrids()
 {
   //go through the selections from the gui and turn them on in the server
@@ -477,3 +545,42 @@ void pqXDMFPanel::SetSelectedGrids()
   this->modified();
 }
   
+//---------------------------------------------------------------------------
+void pqXDMFPanel::SetCellValue(int newval)
+{
+  QTableWidget* paramsContainer = this->UI->Parameters;
+  int row = paramsContainer->currentRow();
+  if (row < 0) 
+    {
+    cerr << "warning" << endl;
+    row = 0;
+    }
+  int loc = row*2;
+  vtkSMStringVectorProperty* SetParameterProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("ParameterIndex"));
+
+  vtkSMStringVectorProperty* GetParameterProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("ParametersInfo"));
+
+  char valS[20];
+  sprintf(valS, "%d", newval);
+  for (int i = 0; i < GetParameterProperty->GetNumberOfElements()/5; i++)
+    {
+    const char *name = GetParameterProperty->GetElement(i*5+0);
+    SetParameterProperty->SetElement(i*2+0, name);
+    if (i == row)
+      {
+      SetParameterProperty->SetElement(i*2+1, valS);
+      }
+    else
+      {
+      const char *oval = GetParameterProperty->GetElement(i*5+1);
+      SetParameterProperty->SetElement(i*2+1, oval);
+      }
+
+    }
+  this->proxy()->getProxy()->UpdateVTKObjects();
+  this->modified();
+}
