@@ -484,22 +484,23 @@ void pqAnimationPanel::buildPropertyList()
     {
     vtkSMVectorProperty* smproperty = 
       vtkSMVectorProperty::SafeDownCast(iter->GetProperty());
-    if (smproperty && smproperty->GetAnimateable() > 0 && 
-      smproperty->GetInformationProperty()==0)
+    if (!smproperty || !smproperty->GetAnimateable() || 
+      smproperty->GetInformationOnly())
       {
-      unsigned int num_elems = smproperty->GetNumberOfElements();
-      for (unsigned int cc=0; cc < num_elems; cc++)
-        {
-        pqAnimationPanel::pqInternals::PropertyInfo info;
-        info.Name = iter->GetKey();
-        info.Index = cc;
+      continue;
+      }
+    unsigned int num_elems = smproperty->GetNumberOfElements();
+    for (unsigned int cc=0; cc < num_elems; cc++)
+      {
+      pqAnimationPanel::pqInternals::PropertyInfo info;
+      info.Name = iter->GetKey();
+      info.Index = cc;
 
-        QString label = iter->GetKey();
-        label = (num_elems>1) ? label + " (" + QString::number(cc) + ")" 
-          : label;
-        this->Internal->propertyName->addItem(label, 
-          QVariant::fromValue(info));
-        }
+      QString label = iter->GetKey();
+      label = (num_elems>1) ? label + " (" + QString::number(cc) + ")" 
+        : label;
+      this->Internal->propertyName->addItem(label, 
+        QVariant::fromValue(info));
       }
     }
 }

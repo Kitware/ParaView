@@ -78,6 +78,8 @@ private slots:
   void assistantError(const QString& err);
 
   void onShowCenterAxisChanged(bool);
+
+  void setTimeRanges(double, double);
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

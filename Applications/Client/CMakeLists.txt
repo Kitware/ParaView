@@ -217,6 +217,7 @@ IF(BUILD_TESTING)
     CreateSource
     CustomFilter
     CutMulti
+    DualSphereAnimation
     ExodusPanel
     LoadState
     ObjectInspectorSphere

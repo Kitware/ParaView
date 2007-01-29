@@ -341,7 +341,8 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionVCRLastFrame, SLOT(setEnabled(bool)));
   connect(vcrcontroller, SIGNAL(enabled(bool)),
     this->Implementation->UI.actionVCRLoop, SLOT(setEnabled(bool)));
-
+  connect(vcrcontroller, SIGNAL(timeRanges(double, double)),
+    this, SLOT(setTimeRanges(double, double)));
   connect(vcrcontroller, SIGNAL(loop(bool)),
     this->Implementation->UI.actionVCRLoop, SLOT(setChecked(bool)));
 
@@ -915,3 +916,11 @@ QVariant MainWindow::findToolBarActionsNotInMenus()
   return missingInActions.join(", ");
 }
 
+//-----------------------------------------------------------------------------
+void MainWindow::setTimeRanges(double start, double end)
+{
+  this->Implementation->UI.actionVCRFirstFrame->setToolTip(
+    QString("First Frame (%1)").arg(start, 0, 'g'));
+  this->Implementation->UI.actionVCRLastFrame->setToolTip(
+    QString("Last Frame (%1)").arg(end, 0, 'g'));
+}
