@@ -56,8 +56,8 @@ public:
 
   pqLinksModel::ItemType linkMode();
 
-  pqProxy* selectedInputProxy();
-  pqProxy* selectedOutputProxy();
+  vtkSMProxy* selectedInputProxy();
+  vtkSMProxy* selectedOutputProxy();
   
   QString selectedInputProperty();
   QString selectedOutputProperty();
@@ -73,13 +73,13 @@ private slots:
 
 private:
 
-  void updatePropertyList(QListWidget* tw, pqProxy* proxy);
+  void updatePropertyList(QListWidget* tw, vtkSMProxy* proxy);
 
   pqLinksEditorProxyModel* InputProxyModel;
   pqLinksEditorProxyModel* OutputProxyModel;
   
-  pqProxy* SelectedInputProxy;
-  pqProxy* SelectedOutputProxy;
+  vtkSMProxy* SelectedInputProxy;
+  vtkSMProxy* SelectedOutputProxy;
   QString SelectedInputProperty;
   QString SelectedOutputProperty;
 

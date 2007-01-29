@@ -87,10 +87,12 @@ void pqLinksManager::addLink()
     {
     if(editor.linkMode() == pqLinksModel::Proxy)
       {
-      pqProxy* inP = editor.selectedInputProxy();
-      pqProxy* outP = editor.selectedOutputProxy();
-      pqRenderViewModule* inR= qobject_cast<pqRenderViewModule*>(inP);
-      pqRenderViewModule* outR= qobject_cast<pqRenderViewModule*>(outP);
+      vtkSMProxy* inP = editor.selectedInputProxy();
+      vtkSMProxy* outP = editor.selectedOutputProxy();
+      vtkSMRenderModuleProxy* inR;
+      inR = vtkSMRenderModuleProxy::SafeDownCast(inP);
+      vtkSMRenderModuleProxy* outR;
+      outR = vtkSMRenderModuleProxy::SafeDownCast(outP);
 
       if(inR && outR)
         {
@@ -125,10 +127,12 @@ void pqLinksManager::editLink()
     
     if(editor.linkMode() == pqLinksModel::Proxy)
       {
-      pqProxy* inP = editor.selectedInputProxy();
-      pqProxy* outP = editor.selectedOutputProxy();
-      pqRenderViewModule* inR= qobject_cast<pqRenderViewModule*>(inP);
-      pqRenderViewModule* outR= qobject_cast<pqRenderViewModule*>(outP);
+      vtkSMProxy* inP = editor.selectedInputProxy();
+      vtkSMProxy* outP = editor.selectedOutputProxy();
+      vtkSMRenderModuleProxy* inR;
+      inR = vtkSMRenderModuleProxy::SafeDownCast(inP);
+      vtkSMRenderModuleProxy* outR;
+      outR = vtkSMRenderModuleProxy::SafeDownCast(outP);
 
       if(inR && outR)
         {

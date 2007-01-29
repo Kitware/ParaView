@@ -38,9 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractItemModel>
 
 class vtkSMLink;
-class pqProxy;
-class pqRenderViewModule;
+class vtkSMProxy;
+class vtkSMRenderModuleProxy;
 class pqServerManagerModelItem;
+class pqProxy;
+class vtkSMProxyListDomain;
+
 
 class PQCORE_EXPORT pqLinksModel : public QAbstractTableModel
 {
@@ -76,8 +79,8 @@ public:
   vtkSMLink* getLink(const QModelIndex& idx) const;
   QModelIndex findLink(vtkSMLink* link) const;
 
-  pqProxy* getInputProxy(const QModelIndex& idx) const;
-  pqProxy* getOutputProxy(const QModelIndex& idx) const;
+  vtkSMProxy* getInputProxy(const QModelIndex& idx) const;
+  vtkSMProxy* getOutputProxy(const QModelIndex& idx) const;
   
   QString getInputProperty(const QModelIndex& idx) const;
   QString getOutputProperty(const QModelIndex& idx) const;
@@ -86,22 +89,31 @@ public:
   vtkSMLink* getLink(const QString& name) const;
 
   void addProxyLink(const QString& name, 
-                    pqProxy* inputProxy, pqProxy* outputProxy);
+                    vtkSMProxy* inputProxy, vtkSMProxy* outputProxy);
   
   void addCameraLink(const QString& name, 
-                    pqRenderViewModule* inputProxy,
-                    pqRenderViewModule* outputProxy);
+                    vtkSMRenderModuleProxy* inputProxy,
+                    vtkSMRenderModuleProxy* outputProxy);
 
   void addPropertyLink(const QString& name,
-                       pqProxy* inputProxy, const QString& inputProp,
-                       pqProxy* outputProxy, const QString& outputProp);
+                       vtkSMProxy* inputProxy, const QString& inputProp,
+                       vtkSMProxy* outputProxy, const QString& outputProp);
 
   void removeLink(const QModelIndex& idx);
   void removeLink(const QString& name);
 
+  /// Return a representative proxy.
+  /// It could be itself, or in the case of internal proxies, the owning
+  /// pqProxy.
+  static pqProxy* representativeProxy(vtkSMProxy* proxy);
+  
+  /// return the proxy list domain for a proxy
+  /// this domain is used to get internal linkable proxies
+  static vtkSMProxyListDomain* proxyListDomain(vtkSMProxy* proxy);
+
 private:
   ItemType getLinkType(vtkSMLink* link) const;
-  pqProxy* getProxyFromIndex(const QModelIndex& idx, int dir) const;
+  vtkSMProxy* getProxyFromIndex(const QModelIndex& idx, int dir) const;
   QString getPropertyFromIndex(const QModelIndex& idx, int dir) const;
 
   class pqInternal;

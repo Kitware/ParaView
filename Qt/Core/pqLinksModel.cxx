@@ -48,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMProxyListDomain.h"
 
 // pqCore includes
 #include "pqServerManagerModel.h"
@@ -188,36 +190,31 @@ QString pqLinksModel::getPropertyFromIndex(const QModelIndex& idx,
   return QString();
 }
 
-pqProxy* pqLinksModel::getProxyFromIndex(const QModelIndex& idx, int dir) const
+vtkSMProxy* pqLinksModel::getProxyFromIndex(const QModelIndex& idx, int dir) const
 {
   QString name = this->getLinkName(idx);
   vtkSMLink* link = this->getLink(name);
   vtkSMPropertyLink* propertyLink = vtkSMPropertyLink::SafeDownCast(link);
   vtkSMProxyLink* proxyLink = vtkSMProxyLink::SafeDownCast(link);
     
-  vtkSMProxy* masterProxy = NULL;
-
   if(proxyLink)
     {
-    masterProxy = getProxyFromLink(proxyLink, dir);
+    return getProxyFromLink(proxyLink, dir);
     }
   else if(propertyLink)
     {
-    masterProxy = getProxyFromLink(propertyLink, dir);
+    return getProxyFromLink(propertyLink, dir);
     }
-  
-  pqServerManagerModel* smModel =
-    pqApplicationCore::instance()->getServerManagerModel();
 
-  return smModel->getPQProxy(masterProxy);
+  return NULL;
 }
 
-pqProxy* pqLinksModel::getInputProxy(const QModelIndex& idx) const
+vtkSMProxy* pqLinksModel::getInputProxy(const QModelIndex& idx) const
 {
   return this->getProxyFromIndex(idx, vtkSMLink::INPUT);
 }
 
-pqProxy* pqLinksModel::getOutputProxy(const QModelIndex& idx) const
+vtkSMProxy* pqLinksModel::getOutputProxy(const QModelIndex& idx) const
 {
   return this->getProxyFromIndex(idx, vtkSMLink::OUTPUT);
 }
@@ -252,35 +249,71 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
     QString name = this->getLinkName(idx);
     vtkSMLink* link = this->getLink(name);
     ItemType type = this->getLinkType(link);
-    
+
     if(idx.column() == 0)
       {
       return name == QString::null ? "Unknown" : name;
       }
     else if(idx.column() == 1)
       {
-      pqProxy* pxy = this->getInputProxy(idx);
-      return pxy ? pxy->getProxyName() : "Unknown";
+      vtkSMProxy* pxy = this->getInputProxy(idx);
+      pqProxy* qpxy = this->representativeProxy(pxy);
+      return qpxy ? qpxy->getProxyName() : "Unknown";
       }
     else if(idx.column() == 2)
       {
-      if(type == pqLinksModel::Proxy)
+      vtkSMProxy* pxy = this->getInputProxy(idx);
+      pqProxy* qpxy = this->representativeProxy(pxy);
+      if(type == pqLinksModel::Proxy && qpxy->getProxy() == pxy)
         {
         return "All";
+        }
+      else if(type == pqLinksModel::Proxy && qpxy)
+        {
+        vtkSMProxyListDomain* d = this->proxyListDomain(qpxy->getProxy());
+        if(d)
+          {
+          int numProxies = d->GetNumberOfProxies();
+          for(int i=0; i<numProxies; i++)
+            {
+            if(pxy == d->GetProxy(i))
+              {
+              return d->GetProxyName(i);
+              }
+            }
+          }
         }
       QString prop = this->getInputProperty(idx);
       return prop.isEmpty() ? "Unknown" : prop; 
       }
     else if(idx.column() == 3)
       {
-      pqProxy* pxy = this->getOutputProxy(idx);
-      return pxy ? pxy->getProxyName() : "Unknown";
+      vtkSMProxy* pxy = this->getOutputProxy(idx);
+      pqProxy* qpxy = this->representativeProxy(pxy);
+      return qpxy ? qpxy->getProxyName() : "Unknown";
       }
     else if(idx.column() == 4)
       {
-      if(type == pqLinksModel::Proxy)
+      vtkSMProxy* pxy = this->getOutputProxy(idx);
+      pqProxy* qpxy = this->representativeProxy(pxy);
+      if(type == pqLinksModel::Proxy && qpxy->getProxy() == pxy)
         {
         return "All";
+        }
+      else if(type == pqLinksModel::Proxy && qpxy)
+        {
+        vtkSMProxyListDomain* d = this->proxyListDomain(qpxy->getProxy());
+        if(d)
+          {
+          int numProxies = d->GetNumberOfProxies();
+          for(int i=0; i<numProxies; i++)
+            {
+            if(pxy == d->GetProxy(i))
+              {
+              return d->GetProxyName(i);
+              }
+            }
+          }
         }
       QString prop = this->getOutputProperty(idx);
       return prop.isEmpty() ? "Unknown" : prop; 
@@ -367,21 +400,21 @@ pqLinksModel::ItemType pqLinksModel::getLinkType(const QModelIndex& idx) const
 
 
 void pqLinksModel::addProxyLink(const QString& name,
-                                   pqProxy* inputProxy,
-                                   pqProxy* outputProxy)
+                                   vtkSMProxy* inputProxy,
+                                   vtkSMProxy* outputProxy)
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMProxyLink* link = vtkSMProxyLink::New();
   // bi-directional link
-  link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::INPUT);
-  link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::OUTPUT);
-  link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::INPUT);
-  link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::OUTPUT);
+  link->AddLinkedProxy(inputProxy, vtkSMLink::INPUT);
+  link->AddLinkedProxy(outputProxy, vtkSMLink::OUTPUT);
+  link->AddLinkedProxy(outputProxy, vtkSMLink::INPUT);
+  link->AddLinkedProxy(inputProxy, vtkSMLink::OUTPUT);
   
   // any proxy property doesn't participate in the link
   // instead, these proxies are linkable themselves
   vtkSMPropertyIterator *iter = vtkSMPropertyIterator::New();
-  iter->SetProxy(inputProxy->getProxy());
+  iter->SetProxy(inputProxy);
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     if(vtkSMProxyProperty::SafeDownCast(iter->GetProperty()))
@@ -396,40 +429,40 @@ void pqLinksModel::addProxyLink(const QString& name,
 }
 
 void pqLinksModel::addCameraLink(const QString& name,
-                                 pqRenderViewModule* inputProxy,
-                                 pqRenderViewModule* outputProxy)
+                                 vtkSMRenderModuleProxy* inputProxy,
+                                 vtkSMRenderModuleProxy* outputProxy)
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMCameraLink* link = vtkSMCameraLink::New();
   // bi-directional link
-  link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::INPUT);
-  link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::OUTPUT);
-  link->AddLinkedProxy(outputProxy->getProxy(), vtkSMLink::INPUT);
-  link->AddLinkedProxy(inputProxy->getProxy(), vtkSMLink::OUTPUT);
+  link->AddLinkedProxy(inputProxy, vtkSMLink::INPUT);
+  link->AddLinkedProxy(outputProxy, vtkSMLink::OUTPUT);
+  link->AddLinkedProxy(outputProxy, vtkSMLink::INPUT);
+  link->AddLinkedProxy(inputProxy, vtkSMLink::OUTPUT);
   pxm->RegisterLink(name.toAscii().data(), link);
   link->Delete();
 }
 
 void pqLinksModel::addPropertyLink(const QString& name,
-                                      pqProxy* inputProxy,
+                                      vtkSMProxy* inputProxy,
                                       const QString& inputProp,
-                                      pqProxy* outputProxy,
+                                      vtkSMProxy* outputProxy,
                                       const QString& outputProp)
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMPropertyLink* link = vtkSMPropertyLink::New();
   
   // bi-directional link
-  link->AddLinkedProperty(inputProxy->getProxy(),
+  link->AddLinkedProperty(inputProxy,
                           inputProp.toAscii().data(),
                           vtkSMLink::INPUT);
-  link->AddLinkedProperty(outputProxy->getProxy(),
+  link->AddLinkedProperty(outputProxy,
                           outputProp.toAscii().data(),
                           vtkSMLink::INPUT);
-  link->AddLinkedProperty(inputProxy->getProxy(),
+  link->AddLinkedProperty(inputProxy,
                           inputProp.toAscii().data(),
                           vtkSMLink::OUTPUT);
-  link->AddLinkedProperty(outputProxy->getProxy(),
+  link->AddLinkedProperty(outputProxy,
                           outputProp.toAscii().data(),
                           vtkSMLink::OUTPUT);
   pxm->RegisterLink(name.toAscii().data(), link);
@@ -461,6 +494,53 @@ void pqLinksModel::removeLink(const QString& name)
     }
 }
 
+pqProxy* pqLinksModel::representativeProxy(vtkSMProxy* pxy)
+{
+  // assume internal proxies don't have pqProxy counterparts
+  pqServerManagerModel* smModel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqProxy* rep = smModel->getPQProxy(pxy);
+  
+  if(!rep)
+    {
+    // get the owner of this internal proxy
+    int numConsumers = pxy->GetNumberOfConsumers();
+    for(int i=0; rep == NULL && i<numConsumers; i++)
+      {
+      vtkSMProxy* consumer = pxy->GetConsumerProxy(i);
+      rep = smModel->getPQProxy(consumer);
+      }
+    }
+  return rep;
+}
+  
+vtkSMProxyListDomain* pqLinksModel::proxyListDomain(
+  vtkSMProxy* pxy)
+{
+  vtkSMProxyListDomain* pxyDomain = NULL;
+
+  if(pxy == NULL)
+    {
+    return NULL;
+    }
+  
+  vtkSMPropertyIterator* iter = vtkSMPropertyIterator::New();
+  iter->SetProxy(pxy);
+  for(iter->Begin(); 
+      pxyDomain == NULL && !iter->IsAtEnd(); 
+      iter->Next())
+    {
+    vtkSMProxyProperty* pxyProperty =
+      vtkSMProxyProperty::SafeDownCast(iter->GetProperty());
+    if(pxyProperty)
+      {
+      pxyDomain = vtkSMProxyListDomain::SafeDownCast(
+        pxyProperty->GetDomain("proxy_list"));
+      }
+    }
+  iter->Delete();
+  return pxyDomain;
+}
 
 
 class pqLinksModelObject::pqInternal
@@ -535,6 +615,8 @@ void pqLinksModelObject::remove()
   pxm->UnRegisterLink(this->name().toAscii().data());
 }
 
+
+
 void pqLinksModelObject::refresh()
 {
   foreach(pqProxy* p, this->Internal->InputProxies)
@@ -542,22 +624,15 @@ void pqLinksModelObject::refresh()
     QObject::disconnect(p,
       SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
       this, SLOT(proxyModified(pqServerManagerModelItem*)));
-    QObject::disconnect(p, SIGNAL(destroyed(QObject*)),
-                        this, SLOT(remove()));
-    }
-  foreach(pqProxy* p, this->Internal->OutputProxies)
-    {
-    QObject::disconnect(p, SIGNAL(destroyed(QObject*)),
-                        this, SLOT(remove()));
     }
 
   this->Internal->InputProxies.clear();
   this->Internal->OutputProxies.clear();
 
-  pqServerManagerModel* smModel =
-    pqApplicationCore::instance()->getServerManagerModel();
   vtkSMProxyLink* proxyLink = vtkSMProxyLink::SafeDownCast(this->link());
   vtkSMPropertyLink* propertyLink = vtkSMPropertyLink::SafeDownCast(this->link());
+
+  QList<vtkSMProxy*> tmpInputs, tmpOutputs;
 
   if(proxyLink)
     {
@@ -566,14 +641,13 @@ void pqLinksModelObject::refresh()
       {
       vtkSMProxy* pxy = proxyLink->GetLinkedProxy(i);
       int dir = proxyLink->GetLinkedProxyDirection(i);
-      pqProxy* pxy1 = smModel->getPQProxy(pxy);
-      if(pxy1 && dir == vtkSMLink::INPUT)
+      if(dir == vtkSMLink::INPUT)
         {
-        this->Internal->InputProxies.append(pxy1);
+        tmpInputs.append(pxy);
         }
-      else if(pxy1 && dir == vtkSMLink::OUTPUT)
+      else if(dir == vtkSMLink::OUTPUT)
         {
-        this->Internal->OutputProxies.append(pxy1);
+        tmpOutputs.append(pxy);
         }
       }
     }
@@ -584,14 +658,13 @@ void pqLinksModelObject::refresh()
       {
       vtkSMProxy* pxy = propertyLink->GetLinkedProxy(i);
       int dir = propertyLink->GetLinkedPropertyDirection(i);
-      pqProxy* pxy1 = smModel->getPQProxy(pxy);
-      if(pxy1 && dir == vtkSMLink::INPUT)
+      if(dir == vtkSMLink::INPUT)
         {
-        this->Internal->InputProxies.append(pxy1);
+        tmpInputs.append(pxy);
         }
-      else if(pxy1 && dir == vtkSMLink::OUTPUT)
+      else if(dir == vtkSMLink::OUTPUT)
         {
-        this->Internal->OutputProxies.append(pxy1);
+        tmpOutputs.append(pxy);
         }
       }
     }
@@ -600,21 +673,30 @@ void pqLinksModelObject::refresh()
     qWarning("Unhandled proxy type\n");
     }
 
-  foreach(pqProxy* p, this->Internal->InputProxies)
+  foreach(vtkSMProxy* p, tmpInputs)
     {
-    QObject::connect(p,
-      SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
-      this, SLOT(proxyModified(pqServerManagerModelItem*)));
-    QObject::connect(p, SIGNAL(destroyed(QObject*)),
-                        this, SLOT(remove()));
-    }
-  foreach(pqProxy* p, this->Internal->OutputProxies)
-    {
-    QObject::connect(p, SIGNAL(destroyed(QObject*)),
-                        this, SLOT(remove()));
+    pqProxy* pxy = pqLinksModel::representativeProxy(p);
+    if(pxy)
+      {
+      this->Internal->InputProxies.append(pxy);
+      QObject::connect(pxy,
+        SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+        this, SLOT(proxyModified(pqServerManagerModelItem*)));
+      QObject::connect(pxy, SIGNAL(destroyed(QObject*)),
+        this, SLOT(remove()));
+      }
     }
   
+  foreach(vtkSMProxy* p, tmpOutputs)
+    {
+    pqProxy* pxy = pqLinksModel::representativeProxy(p);
+    if(pxy)
+      {
+      this->Internal->OutputProxies.append(pxy);
+      QObject::connect(pxy, SIGNAL(destroyed(QObject*)),
+        this, SLOT(remove()));
+      }
+    }
 }
-
 
 

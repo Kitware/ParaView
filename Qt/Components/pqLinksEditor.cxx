@@ -92,8 +92,11 @@ public:
 
   QModelIndex index(int row, int column, const QModelIndex& pidx) const
     {
-    pqServerManagerModel* m;
-    m = pqApplicationCore::instance()->getServerManagerModel();
+    if(this->rowCount(pidx) <= row)
+      {
+      return QModelIndex();
+      }
+    
     if(!pidx.isValid())
       {
       return this->createIndex(row, column);
@@ -130,25 +133,8 @@ public:
 
   vtkSMProxyListDomain* proxyListDomain(const QModelIndex& idx) const
     {
-    pqProxy* pxy = this->getProxy(idx);
-    vtkSMProxyListDomain* pxyDomain = NULL;
-    
-    vtkSMPropertyIterator* iter = vtkSMPropertyIterator::New();
-    iter->SetProxy(pxy->getProxy());
-    for(iter->Begin(); 
-        pxyDomain == NULL && !iter->IsAtEnd(); 
-        iter->Next())
-      {
-      vtkSMProxyProperty* pxyProperty =
-        vtkSMProxyProperty::SafeDownCast(iter->GetProperty());
-      if(pxyProperty)
-        {
-        pxyDomain = vtkSMProxyListDomain::SafeDownCast(
-          pxyProperty->GetDomain("proxy_list"));
-        }
-      }
-    iter->Delete();
-    return pxyDomain;
+    vtkSMProxy* pxy = this->getProxy(idx);
+    return pqLinksModel::proxyListDomain(pxy);
     }
   
   int rowCount(const QModelIndex& idx) const
@@ -216,10 +202,12 @@ public:
       RowIndex ri = this->decodeIndex(idx.internalPointer());
       if(!ri.hasIndex)
         {
-        pqProxy* pxy = this->getProxy(idx);
+        vtkSMProxy* pxy = this->getProxy(idx);
+        pqServerManagerModel* m;
+        m = pqApplicationCore::instance()->getServerManagerModel();
         if(pxy)
           {
-          return pxy->getProxyName();
+          return m->getPQProxy(pxy)->getProxyName();
           }
         }
       else
@@ -235,36 +223,65 @@ public:
     return QVariant();
     }
 
-  QModelIndex findProxy(pqProxy* pxy)
+  QModelIndex findProxy(vtkSMProxy* pxy)
     {
-    // TODO internal proxies
-    QModelIndex parentIdx;
-    if(qobject_cast<pqRenderViewModule*>(pxy))
+    QModelIndexList indexes;
+    QModelIndex start = this->index(0, 0, QModelIndex());
+    if(start.isValid())
       {
-      parentIdx = this->index(0, 0, QModelIndex());
+      indexes.append(start);
       }
-    else if(qobject_cast<pqPipelineSource*>(pxy))
+
+    while(!indexes.isEmpty())
       {
-      parentIdx = this->index(1, 0, QModelIndex());
-      }
-    
-    if(parentIdx.isValid())
-      {
-      int numRows = this->rowCount(parentIdx);
-      for(int i=0; i<numRows; i++)
+      QModelIndex idx = indexes.back();
+      if(pxy == this->getProxy(idx))
         {
-        QModelIndex idx = this->index(i, 0, parentIdx);
-        if(this->getProxy(idx) == pxy)
+        return idx;
+        }
+
+      if(this->rowCount(idx))
+        {
+        // go to first child
+        indexes.append(this->index(0, 0, idx));
+        }
+      else
+        {
+        // can this be compacted ?
+
+        QModelIndex sib = idx.sibling(idx.row() + 1, 0);
+        // got to next sibling
+        if(sib.isValid())
           {
-          return idx;
+          indexes.removeLast();
+          indexes.append(sib);
+          }
+        // go to parents sibling
+        else
+          {
+          while(!indexes.isEmpty() && !sib.isValid())
+            {
+            indexes.removeLast();
+            if(!indexes.isEmpty())
+              {
+              QModelIndex pidx = indexes.back();
+              sib = pidx.sibling(pidx.row() + 1, 0);
+              if(sib.isValid())
+                {
+                indexes.removeLast();
+                indexes.append(sib);
+                }
+              }
+            }
           }
         }
       }
-
+    
+    // never found it
     return QModelIndex();
     }
 
-  pqProxy* getProxy(const QModelIndex& idx) const
+  vtkSMProxy* getProxy(const QModelIndex& idx) const
     {
     if(!idx.isValid())
       {
@@ -277,19 +294,23 @@ public:
       RowIndex ri = this->decodeIndex(idx.internalPointer());
       pqServerManagerModel* m;
       m = pqApplicationCore::instance()->getServerManagerModel();
-      if(pidx.row() == 0)
+      if(ri.type == 0)
         {
-        return m->getRenderModule(idx.row());
+        return m->getRenderModule(idx.row())->getProxy();
         }
-      else if(pidx.row() == 1)
+      else if(ri.type == 1)
         {
         if(!ri.hasIndex)
           {
-          return m->getPQSource(idx.row());
+          return m->getPQSource(idx.row())->getProxy();
           }
         else
           {
-          // TODO internal proxies
+          vtkSMProxyListDomain* domain = this->proxyListDomain(pidx);
+          if(domain && idx.row() < (int)domain->GetNumberOfProxies())
+            {
+            return domain->GetProxy(idx.row());
+            }
           }
         }
       }
@@ -375,7 +396,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
         this->comboBox->setCurrentIndex(0);
         }
       
-      pqProxy* inputProxy = model->getInputProxy(idx);
+      vtkSMProxy* inputProxy = model->getInputProxy(idx);
       QModelIndex viewIdx = this->InputProxyModel->findProxy(inputProxy);
       if(viewIdx.isValid())
         {
@@ -385,7 +406,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
           setCurrentIndex(viewIdx, selFlags);
         }
       
-      pqProxy* outputProxy = model->getOutputProxy(idx);
+      vtkSMProxy* outputProxy = model->getOutputProxy(idx);
       viewIdx = this->OutputProxyModel->findProxy(outputProxy);
       if(viewIdx.isValid())
         {
@@ -437,12 +458,12 @@ pqLinksModel::ItemType pqLinksEditor::linkMode()
     pqLinksModel::Proxy : pqLinksModel::Property ;
 }
 
-pqProxy* pqLinksEditor::selectedInputProxy()
+vtkSMProxy* pqLinksEditor::selectedInputProxy()
 {
   return this->SelectedInputProxy;
 }
 
-pqProxy* pqLinksEditor::selectedOutputProxy()
+vtkSMProxy* pqLinksEditor::selectedOutputProxy()
 {
   return this->SelectedOutputProxy;
 }
@@ -481,7 +502,7 @@ void pqLinksEditor::currentOutputProxyChanged(const QModelIndex& cur,
   this->updateEnabledState();
 }
 
-void pqLinksEditor::updatePropertyList(QListWidget* tw, pqProxy* proxy)
+void pqLinksEditor::updatePropertyList(QListWidget* tw, vtkSMProxy* proxy)
 {
   tw->clear();
   if(!proxy)
@@ -489,7 +510,7 @@ void pqLinksEditor::updatePropertyList(QListWidget* tw, pqProxy* proxy)
     return;
     }
   vtkSMOrderedPropertyIterator *iter = vtkSMOrderedPropertyIterator::New();
-  iter->SetProxy(proxy->getProxy());
+  iter->SetProxy(proxy);
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     tw->addItem(iter->GetKey());
