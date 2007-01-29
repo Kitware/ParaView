@@ -15,6 +15,7 @@
 #include "vtkSMDataObjectDisplayProxy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCommand.h"
 #include "vtkHAVSVolumeMapper.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
@@ -38,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.28");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.29");
 
 
 //-----------------------------------------------------------------------------
@@ -1363,6 +1364,7 @@ void vtkSMDataObjectDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
 
     this->SetupVolumeDefaults();
     }
+  this->InvokeEvent(vtkCommand::UserEvent);
 }
 
 //-----------------------------------------------------------------------------
