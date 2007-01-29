@@ -3,7 +3,7 @@ CC="/opt/i686-gcc-335/bin/gcc"
 CXX="/opt/i686-gcc-335/bin/g++"
 CFLAGS=""
 CXXFLAGS="-Wno-deprecated"
-CMAKE="/usr/local/bin/cmake"
+CMAKE="/home/amy/cmake-2.4.6-Linux-i386/bin/cmake"
 MAKE="make -j 2"
 DISPLAY=:0.0
 
