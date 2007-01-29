@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.34");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.35");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -477,10 +477,16 @@ void vtkSMDoubleVectorProperty::Copy(vtkSMProperty* src)
     this->ImmediateUpdate = 0;
     this->SetNumberOfElements(dsrc->GetNumberOfElements());
     this->SetNumberOfUncheckedElements(dsrc->GetNumberOfUncheckedElements());
-    this->SetElements(&dsrc->Internals->Values[0]);
-    memcpy(&this->Internals->UncheckedValues[0], 
+    if (this->GetNumberOfElements() > 0)
+      {
+      this->SetElements(&dsrc->Internals->Values[0]);
+      }
+    if (this->GetNumberOfUncheckedElements() > 0)
+      {
+      memcpy(&this->Internals->UncheckedValues[0], 
            &dsrc->Internals->UncheckedValues[0], 
            this->GetNumberOfUncheckedElements()*sizeof(double));
+      }
     this->ImmediateUpdate = imUpdate;
     this->Modified();
     }
