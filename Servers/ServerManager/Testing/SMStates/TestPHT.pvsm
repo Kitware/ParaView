@@ -1551,43 +1551,6 @@
     <SubProxy name="VolumeUpdateSuppressor" id="582"/>
     <SubProxy name="VolumeZSweepMapper" id="585"/>
   </Proxy>
-  <Proxy group="animation" type="AnimationScene" id="32">
-    <Property name="Caching" id="32.Caching" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="bool" id="32.Caching.bool"/>
-    </Property>
-    <Property name="Cues" id="32.Cues" number_of_elements="0">
-      <Domain name="groups" id="32.Cues.groups">
-        <Group value="animation"/>
-      </Domain>
-    </Property>
-    <Property name="EndTime" id="32.EndTime" number_of_elements="1">
-      <Element index="0" value="9"/>
-    </Property>
-    <Property name="FrameRate" id="32.FrameRate" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
-    <Property name="Loop" id="32.Loop" number_of_elements="1">
-      <Element index="0" value="0"/>
-    </Property>
-    <Property name="PlayMode" id="32.PlayMode" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="enum" id="32.PlayMode.enum">
-        <Entry value="0" text="Sequence"/>
-        <Entry value="1" text="Realtime"/>
-      </Domain>
-    </Property>
-    <Property name="StartTime" id="32.StartTime" number_of_elements="1">
-      <Element index="0" value="0"/>
-    </Property>
-    <Property name="TimeMode" id="32.TimeMode" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="enum" id="32.TimeMode.enum">
-        <Entry value="0" text="Normalized"/>
-        <Entry value="1" text="Relative"/>
-      </Domain>
-    </Property>
-  </Proxy>
   <Proxy group="axes" type="Axes" id="25">
     <Property name="Origin" id="25.Origin" number_of_elements="3">
       <Element index="0" value="0"/>
@@ -2843,9 +2806,6 @@
     <Item id="354" name="GlyphSources.Sphere0.Display"/>
     <Item id="505" name="Sources.Phasta0"/>
     <Item id="514" name="Sources.Phasta0.Display"/>
-  </ProxyCollection>
-  <ProxyCollection name="animation_scene">
-    <Item id="32" name="vtkPVAnimationScene_AnimationScene0"/>
   </ProxyCollection>
   <ProxyCollection name="axes">
     <Item id="25" name="CenterAxes"/>

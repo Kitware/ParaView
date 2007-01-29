@@ -4249,7 +4249,8 @@ This filter uses colors to show levels of a hiearchical dataset.
         command="SetUpdateTime"
         number_of_elements="1"
         default_values="0"
-        immediate_update="1">
+        immediate_update="1"
+        is_internal="1">
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
     <!-- End UpdateSuppressor -->

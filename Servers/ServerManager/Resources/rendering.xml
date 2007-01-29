@@ -2965,6 +2965,8 @@
         command="SetUpdateTime"
         update_self="1"
         immediate_update="1"
+        number_of_elements="1"
+        default_values="0"
         is_internal="1">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
