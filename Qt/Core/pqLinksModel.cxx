@@ -167,7 +167,8 @@ static vtkSMProxy* getProxyFromLink(vtkSMPropertyLink* link, int desiredDir)
     }
   return NULL;
 }
-  
+ 
+// TODO: fix this so it isn't dependent on the order of links
 QString pqLinksModel::getPropertyFromIndex(const QModelIndex& idx,
                                            int desiredDir) const
 {
@@ -190,6 +191,7 @@ QString pqLinksModel::getPropertyFromIndex(const QModelIndex& idx,
   return QString();
 }
 
+// TODO: fix this so it isn't dependent on the order of links
 vtkSMProxy* pqLinksModel::getProxyFromIndex(const QModelIndex& idx, int dir) const
 {
   QString name = this->getLinkName(idx);
@@ -458,12 +460,12 @@ void pqLinksModel::addPropertyLink(const QString& name,
                           vtkSMLink::INPUT);
   link->AddLinkedProperty(outputProxy,
                           outputProp.toAscii().data(),
-                          vtkSMLink::INPUT);
-  link->AddLinkedProperty(inputProxy,
-                          inputProp.toAscii().data(),
                           vtkSMLink::OUTPUT);
   link->AddLinkedProperty(outputProxy,
                           outputProp.toAscii().data(),
+                          vtkSMLink::INPUT);
+  link->AddLinkedProperty(inputProxy,
+                          inputProp.toAscii().data(),
                           vtkSMLink::OUTPUT);
   pxm->RegisterLink(name.toAscii().data(), link);
   link->Delete();

@@ -416,9 +416,24 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
           setCurrentIndex(viewIdx, selFlags);
         }
       
+      // if this is a property link, make the properties current
       if(model->getLinkType(idx) == pqLinksModel::Property)
         {
-        // TODO init the properties
+        QString inputProperty = model->getInputProperty(idx);
+        QList<QListWidgetItem*> items =
+          this->Property1List->findItems(inputProperty, Qt::MatchExactly);
+        if(!items.isEmpty())
+          {
+          this->Property1List->setCurrentItem(items[0]);
+          }
+
+        QString outputProperty = model->getOutputProperty(idx);
+        items = this->Property2List->findItems(outputProperty, 
+          Qt::MatchExactly);
+        if(!items.isEmpty())
+          {
+          this->Property2List->setCurrentItem(items[0]);
+          }
         }
 
       }
@@ -540,6 +555,7 @@ void pqLinksEditor::updateEnabledState()
     }
   if(this->linkMode() == pqLinksModel::Property)
     {
+    // TODO check property types compatible (maybe label properties w/ types?)
     if(this->SelectedInputProperty.isEmpty() ||
        this->SelectedOutputProperty.isEmpty())
       {
