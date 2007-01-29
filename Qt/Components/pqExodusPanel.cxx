@@ -149,31 +149,6 @@ void pqExodusPanel::linkServerManagerProperties()
   QPixmap sideSetPixmap(":/pqWidgets/Icons/pqSideSet16.png");
   QPixmap nodeSetPixmap(":/pqWidgets/Icons/pqNodeSet16.png");
 
-  // set the range for the slider 
-  // (should probably be moved down to pqNamedObjectPanel)
-  QList<QVariant> range;
-  range = pqSMAdaptor::getElementPropertyDomain(
-       this->proxy()->getProxy()->GetProperty("TimeStep"));
-
-  if((range.size() == 2) && (range[1] != -1))
-    {
-    this->UI->TimeStep->setEnabled(true);
-    this->UI->TimeStep->setRange(range[0].toInt(), 
-                         range[1].toInt());
-    this->UI->TimeStep_Spin->setEnabled(true);
-    this->UI->TimeStep_Spin->setRange(range[0].toInt(), 
-                       range[1].toInt());
-    this->UI->TimeStepMin->setText(range[0].toString());
-    this->UI->TimeStepMax->setText(range[1].toString());
-    }
-  else
-    {
-    this->UI->TimeStepMin->setText("0");
-    this->UI->TimeStepMax->setText("0");
-    this->UI->TimeStep->setEnabled(false);
-    this->UI->TimeStep_Spin->setEnabled(false);
-    }
-
   // we hook up the node/element variables
   QTreeWidget* VariablesTree = this->UI->Variables;
   new pqTreeWidgetCheckHelper(VariablesTree, 0, this);
