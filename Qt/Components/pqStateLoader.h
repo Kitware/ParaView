@@ -59,6 +59,14 @@ protected:
   ~pqStateLoader();
 
   // Description:
+  // Overridden so that animation scene proxy is not recreated types.
+  virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
+
+  // Overridden to avoid registering the reused animation scene twice.
+  virtual void RegisterProxyInternal(const char* group, 
+    const char* name, vtkSMProxy* proxy);
+
+  // Description:
   // This method is called to load a proxy state. Overloaded to make sure that 
   // when states are loaded for existsing render modules, the displays already present
   // in those render modules are not affected.

@@ -14,24 +14,13 @@
 =========================================================================*/
 #include "vtkSMAnimationSceneProxy.h"
 
-#include "vtkAnimationCue.h"
 #include "vtkAnimationScene.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
-#include "vtkErrorCode.h"
 #include "vtkObjectFactory.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMDataObjectDisplayProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxyIterator.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMRenderModuleProxy.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMXMLPVAnimationWriterProxy.h"
-#include "vtkToolkits.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/vector>
@@ -111,7 +100,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.35");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.36");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -121,6 +110,7 @@ vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
   this->GeometryCached = 0;
   this->OverrideStillRender = 0;
   this->Internals = new vtkSMAnimationSceneProxyInternals();
+  this->PlayMode = SEQUENCE;
 }
 
 //----------------------------------------------------------------------------
@@ -330,6 +320,8 @@ void vtkSMAnimationSceneProxy::SetPlayMode(int mode)
 {
   vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
     this->AnimationCue);
+
+  this->PlayMode = mode;
   if (scene)
     {
     scene->SetPlayMode(mode);
@@ -352,14 +344,7 @@ void vtkSMAnimationSceneProxy::SetPlayMode(int mode)
 //----------------------------------------------------------------------------
 int vtkSMAnimationSceneProxy::GetPlayMode()
 {
-  vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
-    this->AnimationCue);
-  if (scene)
-    {
-    return scene->GetPlayMode();
-    }
-  vtkErrorMacro("VTK object was not created");
-  return 0;
+  return this->PlayMode;
 }
 
 //----------------------------------------------------------------------------
@@ -462,4 +447,6 @@ vtkSMAbstractViewModuleProxy* vtkSMAnimationSceneProxy::GetViewModule(
 void vtkSMAnimationSceneProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "PlayMode: "<< this->PlayMode << endl;
+  os << indent << "OverrideStillRender: " << this->OverrideStillRender << endl;
 }

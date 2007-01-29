@@ -114,8 +114,8 @@ protected slots:
   // Called when the active scene changes.
   void onActiveSceneChanged(pqAnimationScene* scene);
 
-  // Called when animation scene end times change.
-  void onSceneTimeChanged();
+  // Called when animation scene's play mode changes.
+  void onScenePlayModeChanged();
 
   // The cues in the scene have changed, so we make sure
   // that we are not displaying a removed or added cue, if so

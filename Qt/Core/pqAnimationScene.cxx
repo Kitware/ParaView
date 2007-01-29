@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMAbstractViewModuleProxy.h"
+#include "vtkSMPropertyLink.h"
 
 #include <QPointer>
 #include <QSet>
@@ -46,9 +47,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationCue.h"
 #include "pqApplicationCore.h"
 #include "pqPipelineBuilder.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
+#include "pqTimeKeeper.h"
 
 template<class T>
 static uint qHash(QPointer<T> p)
@@ -61,10 +64,15 @@ class pqAnimationScene::pqInternals
 {
 public:
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  vtkSmartPointer<vtkSMPropertyLink> TimestepValuesLink;
+  vtkSmartPointer<vtkSMPropertyLink> TimeLink;
   QSet<QPointer<pqAnimationCue> > Cues;
+  QPointer<pqAnimationCue> GlobalTimeCue;
   pqInternals()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    this->TimestepValuesLink = vtkSmartPointer<vtkSMPropertyLink>::New();
+    this->TimeLink = vtkSmartPointer<vtkSMPropertyLink>::New();
     }
 };
 
@@ -81,19 +89,20 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
     this, SIGNAL(tick()));
 
   this->Internals->VTKConnect->Connect(
-    proxy->GetProperty("StartTime"), vtkCommand::ModifiedEvent,
-    this, SIGNAL(startTimeChanged()));
-  this->Internals->VTKConnect->Connect(
-    proxy->GetProperty("EndTime"), vtkCommand::ModifiedEvent,
-    this, SIGNAL(endTimeChanged()));
-  this->Internals->VTKConnect->Connect(
     proxy->GetProperty("PlayMode"), vtkCommand::ModifiedEvent,
     this, SIGNAL(playModeChanged()));
   this->Internals->VTKConnect->Connect(
     proxy->GetProperty("Loop"), vtkCommand::ModifiedEvent,
     this, SIGNAL(loopChanged()));
 
+  this->Internals->VTKConnect->Connect(
+    proxy->GetProperty("ClockTimeRange"), vtkCommand::ModifiedEvent,
+    this, SIGNAL(clockTimeRangesChanged()));
   this->onCuesChanged();
+
+
+  // Initialize the time keeper.
+  this->setupTimeTrack();
 }
 
 //-----------------------------------------------------------------------------
@@ -106,6 +115,73 @@ pqAnimationScene::~pqAnimationScene()
 vtkSMAnimationSceneProxy* pqAnimationScene::getAnimationSceneProxy() const
 {
   return vtkSMAnimationSceneProxy::SafeDownCast(this->getProxy());
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationScene::setupTimeTrack()
+{
+  pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
+
+  QObject::connect(timekeeper, SIGNAL(timeStepsChanged()),
+    this, SLOT(updateTimeRanges()));
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->getProxy()->GetProperty("TimeKeeper"));
+  if (pp && pp->GetNumberOfProxies() == 0)
+    {
+    pp->AddProxy(timekeeper->getProxy());
+    this->getProxy()->UpdateVTKObjects();
+    }
+
+  // Link timekeeper properties.
+  this->Internals->TimestepValuesLink->AddLinkedProperty(
+    timekeeper->getProxy(), "TimestepValues", vtkSMLink::INPUT);
+  this->Internals->TimestepValuesLink->AddLinkedProperty(
+    this->getProxy(), "TimeSteps", vtkSMLink::OUTPUT);
+  timekeeper->getProxy()->GetProperty("TimestepValues")->Modified();
+
+  this->Internals->TimeLink->AddLinkedProperty(
+    timekeeper->getProxy(), "Time", vtkSMLink::INPUT);
+  this->Internals->TimeLink->AddLinkedProperty(
+    this->getProxy(), "ClockTime", vtkSMLink::OUTPUT);
+  timekeeper->getProxy()->GetProperty("Time")->Modified();
+
+  this->updateTimeRanges();
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationScene::updateTimeRanges()
+{
+  pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
+  if (timekeeper->getNumberOfTimeStepValues() == 0)
+    {
+    return;
+    }
+
+  QPair<double, double> range = timekeeper->getTimeRange();
+  vtkSMProxy* sceneProxy = this->getProxy();
+
+  QList<QVariant> locks = pqSMAdaptor::getMultipleElementProperty(
+    sceneProxy->GetProperty("ClockTimeRangeLocks"));
+  if (!locks[0].toBool())
+    {
+    pqSMAdaptor::setMultipleElementProperty(
+      sceneProxy->GetProperty("ClockTimeRange"), 0, range.first);
+    }
+  if (!locks[1].toBool())
+    {
+    pqSMAdaptor::setMultipleElementProperty(
+      sceneProxy->GetProperty("ClockTimeRange"), 1, range.second);
+    }
+  sceneProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+QPair<double, double> pqAnimationScene::getClockTimeRange() const
+{
+  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
+    this->getProxy()->GetProperty("ClockTimeRange"));
+  return QPair<double,double>(values[0].toDouble(), values[1].toDouble());
 }
 
 //-----------------------------------------------------------------------------
@@ -184,6 +260,14 @@ pqAnimationCue* pqAnimationScene::getCue(vtkSMProxy* proxy,
 pqAnimationCue* pqAnimationScene::createCue(vtkSMProxy* proxy, 
   const char* propertyname, int index) 
 {
+  return this->createCueInternal("KeyFrameAnimationCueManipulator",
+    proxy, propertyname, index);
+}
+
+//-----------------------------------------------------------------------------
+pqAnimationCue* pqAnimationScene::createCueInternal(const QString& mtype,
+  vtkSMProxy* proxy, const char* propertyname, int index) 
+{
   pqServerManagerModel* smmodel = 
     pqApplicationCore::instance()->getServerManagerModel();
   pqPipelineBuilder* builder = pqApplicationCore::instance()->getPipelineBuilder();
@@ -196,6 +280,7 @@ pqAnimationCue* pqAnimationScene::createCue(vtkSMProxy* proxy,
     qDebug() << "Failed to create AnimationCue.";
     return 0;
     }
+  cue->setManipulatorType(mtype);
   cue->setDefaults();
 
   pqSMAdaptor::setProxyProperty(cueProxy->GetProperty("AnimatedProxy"), proxy);

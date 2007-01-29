@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTrackballZoom.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -59,9 +60,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqRenderViewProxy.h"
+#include "pqServer.h"
 #include "pqSetName.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
+#include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 #include "vtkPVAxesWidget.h"
 
@@ -128,6 +131,7 @@ public:
   vtkSmartPointer<vtkSMRenderModuleProxy> RenderModuleProxy;
   vtkSmartPointer<vtkPVAxesWidget> OrientationAxesWidget;
   vtkSmartPointer<vtkSMProxy> CenterAxesProxy;
+  vtkSmartPointer<vtkSMPropertyLink> ViewTimeLink;
   vtkSmartPointer<vtkSMProxy> InteractorStyleProxy;
   pqUndoStack* UndoStack;
   int DefaultBackground[3];
@@ -183,6 +187,7 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   pqSMAdaptor::setMultipleElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Scale"),
     scaleValues);
+  this->Internal->CenterAxesProxy->UpdateVTKObjects();
 
   /// When a state is loaded, if this render module is reused, its interactor style will change
   QObject::connect(pqApplicationCore::instance(), SIGNAL(stateLoaded()), this,
@@ -599,6 +604,15 @@ void pqRenderViewModule::setDefaults()
 
   proxy->UpdateVTKObjects();
 
+  // Link ViewTime with global time.
+  vtkSMProxy* timekeeper = this->getServer()->getTimeKeeper()->getProxy();
+
+  vtkSMPropertyLink* link = vtkSMPropertyLink::New();
+  link->AddLinkedProperty(timekeeper->GetProperty("Time"), vtkSMLink::INPUT);
+  link->AddLinkedProperty(proxy->GetProperty("ViewTime"), vtkSMLink::OUTPUT);
+  this->Internal->ViewTimeLink = link;
+  link->Delete();
+  timekeeper->GetProperty("Time")->Modified();
 
   this->restoreSettings();
 }

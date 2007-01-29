@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSignalAdaptorKeyFrameTime::pqInternals
 {
 public:
-  QPointer<pqAnimationScene> Scene;
+  QPointer<pqAnimationScene> AnimationScene;
   QPointer<pqAnimationCue> Cue;
   QString PropertyName;
   vtkEventQtSlotConnect* VTKConnect;
@@ -83,19 +83,16 @@ pqSignalAdaptorKeyFrameTime::~pqSignalAdaptorKeyFrameTime()
 void pqSignalAdaptorKeyFrameTime::setNormalizedTime(double ntime)
 {
   double scaled_time = ntime;
-  if (this->Internals->Scene && this->Internals->Cue)
+  if (this->Internals->AnimationScene && this->Internals->Cue)
     {
-    vtkSMProxy* scene = this->Internals->Scene->getProxy();
     vtkSMProxy* cue = this->Internals->Cue->getProxy();
 
     if (pqSMAdaptor::getEnumerationProperty(
         cue->GetProperty("TimeMode")) == "Normalized")
       {
-      double start = pqSMAdaptor::getElementProperty(
-        scene->GetProperty("StartTime")).toDouble();
-      double end = pqSMAdaptor::getElementProperty(
-        scene->GetProperty("EndTime")).toDouble();
-      scaled_time = start + ntime*(end-start);
+      QPair<double, double> range = 
+        this->Internals->AnimationScene->getClockTimeRange();
+      scaled_time = range.first + ntime*(range.second-range.first);
       }
     }
   if (this->parent()->property(
@@ -112,21 +109,18 @@ double pqSignalAdaptorKeyFrameTime::normalizedTime() const
 {
   double time = this->parent()->property(
       this->Internals->PropertyName.toAscii().data()).toDouble();
-  if (this->Internals->Scene  && this->Internals->Cue)
+  if (this->Internals->AnimationScene && this->Internals->Cue)
     {
-    vtkSMProxy* scene = this->Internals->Scene->getProxy();
     vtkSMProxy* cue = this->Internals->Cue->getProxy();
 
     if (pqSMAdaptor::getEnumerationProperty(
         cue->GetProperty("TimeMode")) == "Normalized")
       {
-      double start = pqSMAdaptor::getElementProperty(
-        scene->GetProperty("StartTime")).toDouble();
-      double end = pqSMAdaptor::getElementProperty(
-        scene->GetProperty("EndTime")).toDouble();
-      if (start != end)
+      QPair<double, double> range = 
+        this->Internals->AnimationScene->getClockTimeRange();
+      if (range.first != range.second)
         {
-        time = (time - start)/(end-start);
+        time = (time - range.first)/(range.second - range.first);
         }
       }
     }
@@ -140,23 +134,21 @@ void pqSignalAdaptorKeyFrameTime::setAnimationCue(pqAnimationCue* cue)
 }
 
 //-----------------------------------------------------------------------------
-void pqSignalAdaptorKeyFrameTime::setAnimationScene(pqAnimationScene* scene)
+void pqSignalAdaptorKeyFrameTime::setAnimationScene(pqAnimationScene* keeper)
 {
-  if (this->Internals->Scene)
+  if (this->Internals->AnimationScene)
     {
-    QObject::disconnect(this->Internals->Scene, 0, this, 0);
+    QObject::disconnect(this->Internals->AnimationScene, 0, this, 0);
     }
-  this->Internals->Scene = scene;
-  if (this->Internals->Scene)
+  this->Internals->AnimationScene = keeper;
+  if (keeper)
     {
-    QObject::connect(scene, SIGNAL(startTimeChanged()),
-      this, SLOT(sceneChanged()));
-    QObject::connect(scene, SIGNAL(endTimeChanged()),
-      this, SLOT(sceneChanged()));
+    QObject::connect(keeper, SIGNAL(clockTimeRangesChanged()),
+      this, SLOT(timeRangesChanged()));
     }
 }
 //-----------------------------------------------------------------------------
-void pqSignalAdaptorKeyFrameTime::sceneChanged()
+void pqSignalAdaptorKeyFrameTime::timeRangesChanged()
 {
   this->setNormalizedTime(this->Internals->LastTime);
 }

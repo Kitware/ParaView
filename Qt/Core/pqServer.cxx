@@ -55,7 +55,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
+#include "pqTimeKeeper.h"
 
+class pqServer::pqInternals
+{
+public:
+  QPointer<pqTimeKeeper> TimeKeeper;
+
+};
 /////////////////////////////////////////////////////////////////////////////////////////////
 // pqServer
 
@@ -77,12 +84,12 @@ void pqServer::disconnect(pqServer* server)
 pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _parent) :
   pqServerManagerModelItem(_parent)
 {
+  this->Internals = new pqInternals;
+
   this->ConnectionID = connectionID;
   this->Options = options;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SynchronizeServerClientOptions(this->ConnectionID);
-
-  this->CreateRenderModule();
 }
 
 //-----------------------------------------------------------------------------
@@ -102,10 +109,47 @@ pqServer::~pqServer()
     }
     */
   this->ConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
+
+  delete this->Internals;
 }
 
 //-----------------------------------------------------------------------------
-void pqServer::CreateRenderModule()
+void pqServer::initialize()
+{
+  // Setup the Connection TimeKeeper.
+  // Currently, we are keeping seperate times per connection. Once we start
+  // supporting multiple connections, we may want to the link the
+  // connection times together.
+  this->createTimeKeeper();
+
+  this->createRenderModule();
+}
+
+//-----------------------------------------------------------------------------
+pqTimeKeeper* pqServer::getTimeKeeper() const
+{
+  return this->Internals->TimeKeeper;
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::createTimeKeeper()
+{
+  // Set Global Time keeper.
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* proxy = pxm->NewProxy("misc","TimeKeeper");
+  proxy->SetConnectionID(this->ConnectionID);
+  proxy->SetServers(vtkProcessModule::CLIENT);
+  proxy->UpdateVTKObjects();
+  pxm->RegisterProxy("timekeeper", "TimeKeeper", proxy);
+  proxy->Delete();
+
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  this->Internals->TimeKeeper = qobject_cast<pqTimeKeeper*>(smmodel->getPQProxy(proxy));
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::createRenderModule()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMProxyManager* proxy_manager = vtkSMObject::GetProxyManager();

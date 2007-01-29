@@ -41,7 +41,8 @@ class pqAnimationScene;
 // pqSignalAdaptorKeyFrameTime is adaptor for key frame's time.
 // We use the adptor to scale the actual SMProperty value since
 // the SMProperty is usually normalized while the GUI should show
-// it in human readable form i.e. scaled with respect to the scene.
+// it in human readable form i.e. scaled with respect to the scene's
+// clock time range.
 class PQCOMPONENTS_EXPORT pqSignalAdaptorKeyFrameTime : public QObject
 {
   Q_OBJECT;
@@ -54,9 +55,9 @@ public:
     const QString& propertyname, const QString& signal);
   virtual ~pqSignalAdaptorKeyFrameTime();
 
-  // Set the AnimationScene. It is needed to know the current scene time
-  // and if/when it changes etc etc.
-  void setAnimationScene(pqAnimationScene* scene);
+  // Set the time keeper. Time keeper provides us
+  // with the range for the time values.
+  void setAnimationScene(pqAnimationScene* keeper);
 
   // Set the AnimationCue. It is needed to know the time mode of the key frame
   // itself. The user may explicitly change the time to relative, in which
@@ -75,7 +76,7 @@ public slots:
   void setNormalizedTime(double time);
 
 protected slots:
-  void sceneChanged();
+  void timeRangesChanged();
 
 private:
   pqSignalAdaptorKeyFrameTime(const pqSignalAdaptorKeyFrameTime&); // Not implemented.

@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.29");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.30");
 
 
 //-----------------------------------------------------------------------------
@@ -1313,6 +1313,30 @@ void vtkSMDataObjectDisplayProxy::UpdateRenderModuleExtensions(
       }
     }
   this->RenderModuleExtensionsTested = 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetUpdateTime(double time)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->UpdateSuppressorProxy->GetProperty("UpdateTime"));
+  dvp->SetElement(0, time);
+  // UpdateTime is immediate update, so no need to update.
+
+  // Go upstream to the reader and mark it modified.
+  vtkSMProxy* current = this;
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    current->GetProperty("Input"));
+  while (current && pp && pp->GetNumberOfProxies() > 0)
+    {
+    current = pp->GetProxy(0);
+    pp = vtkSMProxyProperty::SafeDownCast(current->GetProperty("Input"));
+    }
+
+  if (current)
+    {
+    current->MarkModified(current);
+    }
 }
 
 //-----------------------------------------------------------------------------

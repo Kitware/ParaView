@@ -33,6 +33,7 @@ class vtkRenderWindowInteractor;
 class vtkSelection;
 class vtkSMDisplay;
 class vtkSMDisplayProxy;
+class vtkSMPropertyLink;
 class vtkTimerLog;
 
 // TODO: have to change the PVCameraManipulators to do ResetCamera on
@@ -305,6 +306,8 @@ protected:
   vtkIdType GetTotalNumberOfPolygons();
 
   vtkPVOpenGLExtensionsInformation* OpenGLExtensionsInformation;
+
+  vtkSMPropertyLink* ViewTimeLinks;
 private:
   vtkSMRenderModuleProxy(const vtkSMRenderModuleProxy&); // Not implemented.
   void operator=(const vtkSMRenderModuleProxy&); // Not implemented.

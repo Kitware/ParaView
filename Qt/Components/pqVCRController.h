@@ -70,10 +70,14 @@ signals:
   // of the loop.
   void loop(bool);
 
+  void timeRanges(double, double);
 public slots:
   // Set the animation scene. If null, the VCR control is disabled
   // (emits enabled(false)).
   void setAnimationScene(pqAnimationScene*);
+
+  // Called when timeranges change.
+  void onTimeRangesChanged();
 
 public slots:
   // Connect these signals to appropriate VCR buttons.
@@ -94,10 +98,6 @@ private:
   void operator=(const pqVCRController&); // Not implemented.
 
   QPointer<pqAnimationScene> Scene;
-
-  // internal method.
-  bool updateScene(bool first, bool last, int offset);
-
 };
 
 #endif

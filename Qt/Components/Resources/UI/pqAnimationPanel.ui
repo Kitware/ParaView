@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>269</width>
-    <height>353</height>
+    <width>329</width>
+    <height>387</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -35,6 +35,77 @@
        <property name="spacing" >
         <number>6</number>
        </property>
+       <item row="2" column="0" colspan="2" >
+        <widget class="QGroupBox" name="editorFrame" >
+         <property name="title" >
+          <string>Key Frame Editor</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="4" column="0" colspan="2" >
+           <widget class="QFrame" name="typeFrame" />
+          </item>
+          <item row="2" column="1" >
+           <widget class="QFrame" name="valueFrame" >
+            <property name="frameShape" >
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Raised</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QSpinBox" name="keyFrameIndex" />
+          </item>
+          <item row="3" column="1" >
+           <widget class="QComboBox" name="interpolationType" />
+          </item>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="label_5" >
+            <property name="text" >
+             <string>Key Frame Time</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_4" >
+            <property name="text" >
+             <string>Key Frame Index</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" >
+           <widget class="QLabel" name="label_2" >
+            <property name="text" >
+             <string>Interpolation</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" >
+           <widget class="QLabel" name="valueLabel" >
+            <property name="text" >
+             <string>Key Frame Value</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QLineEdit" name="keyFrameTime" />
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item row="1" column="0" colspan="2" >
         <layout class="QHBoxLayout" >
          <property name="margin" >
@@ -85,75 +156,11 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="0" colspan="2" >
-        <widget class="QGroupBox" name="editorFrame" >
-         <property name="title" >
-          <string>Key Frame Editor</string>
+       <item row="3" column="1" >
+        <widget class="QPushButton" name="deleteKeyFrame" >
+         <property name="text" >
+          <string>Delete Key Frame</string>
          </property>
-         <layout class="QGridLayout" >
-          <property name="margin" >
-           <number>9</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
-          <item row="3" column="1" >
-           <widget class="QComboBox" name="interpolationType" />
-          </item>
-          <item row="0" column="1" >
-           <widget class="QSpinBox" name="keyFrameIndex" />
-          </item>
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_4" >
-            <property name="text" >
-             <string>Key Frame Index</string>
-            </property>
-            <property name="wordWrap" >
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" >
-           <widget class="QLabel" name="label_2" >
-            <property name="text" >
-             <string>Interpolation</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" colspan="2" >
-           <widget class="QFrame" name="typeFrame" />
-          </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="label_5" >
-            <property name="text" >
-             <string>Key Frame Time</string>
-            </property>
-            <property name="wordWrap" >
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" >
-           <widget class="QLabel" name="valueLabel" >
-            <property name="text" >
-             <string>Key Frame Value</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1" >
-           <widget class="QFrame" name="valueFrame" >
-            <property name="frameShape" >
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow" >
-             <enum>QFrame::Raised</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" >
-           <widget class="QDoubleSpinBox" name="keyFrameTime" />
-          </item>
-         </layout>
         </widget>
        </item>
        <item row="3" column="0" >
@@ -163,30 +170,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1" >
-        <widget class="QPushButton" name="deleteKeyFrame" >
-         <property name="text" >
-          <string>Delete Key Frame</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tabScene" >
-      <property name="enabled" >
-       <bool>false</bool>
-      </property>
-      <attribute name="title" >
-       <string>Scene Properties</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item row="4" column="0" colspan="2" >
+       <item row="4" column="1" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -199,66 +183,167 @@
          </property>
         </spacer>
        </item>
-       <item row="3" column="0" colspan="2" >
-        <widget class="QCheckBox" name="caching" >
-         <property name="toolTip" >
-          <string>Cache geometry during playback.</string>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabScene" >
+      <property name="enabled" >
+       <bool>false</bool>
+      </property>
+      <attribute name="title" >
+       <string>Scene Properties</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="groupBox" >
+         <property name="title" >
+          <string>Time Controls</string>
          </property>
-         <property name="text" >
-          <string>Cache Geometry</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" >
-        <widget class="QLabel" name="labelCurrentFrame" >
-         <property name="text" >
-          <string>Current Frame</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="label_7" >
-         <property name="text" >
-          <string>Play Mode</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" >
-        <widget class="QLineEdit" name="numberOfFrames" />
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="labelNumberOfFrames" >
-         <property name="text" >
-          <string>No. Of Frames</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" >
-        <widget class="QDoubleSpinBox" name="currentFrame" >
-         <property name="decimals" >
-          <number>2</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" >
-        <widget class="QComboBox" name="playMode" >
-         <item>
-          <property name="text" >
-           <string>Sequence</string>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
           </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Real Time</string>
+          <property name="spacing" >
+           <number>6</number>
           </property>
-         </item>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_6" >
+            <property name="text" >
+             <string>Current Time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="label_8" >
+            <property name="text" >
+             <string>Start Time:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" >
+           <widget class="QLabel" name="label_9" >
+            <property name="text" >
+             <string>End Time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QLineEdit" name="currentTime" />
+          </item>
+          <item row="1" column="1" >
+           <widget class="QLineEdit" name="startTime" />
+          </item>
+          <item row="2" column="1" >
+           <widget class="QLineEdit" name="endTime" />
+          </item>
+          <item row="1" column="2" >
+           <widget class="QCheckBox" name="startTimeLock" >
+            <property name="text" >
+             <string>lock</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2" >
+           <widget class="QCheckBox" name="endTimeLock" >
+            <property name="text" >
+             <string>lock</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2" >
+         <property name="title" >
+          <string>Playback Controls</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="labelNumberOfFrames" >
+            <property name="text" >
+             <string>No. Of Frames</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" >
+           <widget class="QSpinBox" name="duration" />
+          </item>
+          <item row="2" column="0" >
+           <widget class="QLabel" name="labelDuration" >
+            <property name="text" >
+             <string>Duration (secs)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2" >
+           <widget class="QCheckBox" name="caching" >
+            <property name="toolTip" >
+             <string>Cache geometry during playback.</string>
+            </property>
+            <property name="text" >
+             <string>Cache Geometry</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QSpinBox" name="numberOfFrames" />
+          </item>
+          <item row="0" column="1" >
+           <widget class="QComboBox" name="playMode" >
+            <item>
+             <property name="text" >
+              <string>Sequence</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Real Time</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Snap To TimeSteps</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_7" >
+            <property name="text" >
+             <string>Play Mode</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -271,8 +356,8 @@
      </property>
      <property name="sizeHint" >
       <size>
-       <width>246</width>
-       <height>16</height>
+       <width>311</width>
+       <height>41</height>
       </size>
      </property>
     </spacer>
@@ -284,14 +369,13 @@
   <tabstop>sourceName</tabstop>
   <tabstop>propertyName</tabstop>
   <tabstop>keyFrameIndex</tabstop>
-  <tabstop>keyFrameTime</tabstop>
   <tabstop>interpolationType</tabstop>
   <tabstop>addKeyFrame</tabstop>
   <tabstop>deleteKeyFrame</tabstop>
-  <tabstop>currentFrame</tabstop>
-  <tabstop>numberOfFrames</tabstop>
   <tabstop>playMode</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../pqComponents.qrc" />
+ </resources>
  <connections/>
 </ui>

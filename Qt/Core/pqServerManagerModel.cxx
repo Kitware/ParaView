@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerResource.h"
 #include "pqTableViewModule.h"
+#include "pqTimeKeeper.h"
 #include "pqTextWidgetDisplay.h"
 
 #include <QVTKWidget.h>
@@ -463,6 +464,7 @@ void pqServerManagerModel::onAddServer(vtkIdType id)
   // origniation internal to the GUI?
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pqServer* server = new pqServer(id, pm->GetOptions(), this);
+
   this->onAddServer(server);
 }
 
@@ -482,6 +484,8 @@ void pqServerManagerModel::onAddServer(pqServer* server)
 
   this->Internal->Servers.push_back(server);
   this->connect(server, SIGNAL(nameChanged()), this, SLOT(updateServerName()));
+
+  server->initialize();
 
   emit this->serverAdded(server);
 }
@@ -629,7 +633,7 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
   else if (group == "animation")
     {
     // Animation subsystem.
-    if (proxy->IsA("vtkSMAnimationSceneProxy"))
+    if (proxy->IsA("vtkSMPVAnimationSceneProxy"))
       {
       pq_proxy = new pqAnimationScene(group, name, proxy, server, this);
       }
@@ -637,6 +641,10 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
       {
       pq_proxy = new pqAnimationCue(group, name, proxy, server, this);
       }
+    }
+  else if (group == "timekeeper")
+    {
+    pq_proxy = new pqTimeKeeper(group, name, proxy, server, this);
     }
 
   if (pq_proxy)

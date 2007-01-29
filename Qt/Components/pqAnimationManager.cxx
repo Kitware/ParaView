@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMAnimationSceneGeometryWriter.h"
 #include "vtkSMAnimationSceneImageWriter.h"
-#include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMPVAnimationSceneProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMServerProxyManagerReviver.h"
@@ -166,6 +166,10 @@ void pqAnimationManager::onProxyRemoved(pqProxy* proxy)
 void pqAnimationManager::onActiveServerChanged(pqServer* server)
 {
   this->Internals->ActiveServer = server;
+  if (server && !this->getActiveScene())
+    {
+    this->createActiveScene();
+    }
   emit this->activeSceneChanged(this->getActiveScene());
 }
 
@@ -191,8 +195,8 @@ pqAnimationScene* pqAnimationManager::createActiveScene()
   if (this->Internals->ActiveServer)
     {
     pqPipelineBuilder* builder = pqApplicationCore::instance()->getPipelineBuilder();
-    vtkSMProxy *scene = builder->createProxy("animation", "AnimationScene", "animation",
-      this->Internals->ActiveServer);
+    vtkSMProxy *scene = builder->createProxy("animation", "PVAnimationScene", "animation",
+      this->Internals->ActiveServer, false);
     // this will result in a call to onProxyAdded() and proper
     // signals will be emitted.
     if (!scene)
@@ -232,36 +236,41 @@ pqAnimationCue* pqAnimationManager::createCue(pqAnimationScene* scene,
 //-----------------------------------------------------------------------------
 void pqAnimationManager::durationChanged()
 {
-  double duration = 
-    this->Internals->AnimationSettingsDialog->spinBoxAnimationDuration->value();
-  double framerate =
-    this->Internals->AnimationSettingsDialog->spinBoxFrameRate->value();
-
-  double num_frames = duration*framerate;
-  this->Internals->AnimationSettingsDialog->
-    spinBoxNumberOfFrames->blockSignals(true);
-  this->Internals->AnimationSettingsDialog->
-    spinBoxNumberOfFrames->setValue(static_cast<int>(num_frames));
-  this->Internals->AnimationSettingsDialog->
-    spinBoxNumberOfFrames->blockSignals(false);
+  this->frameRateChanged();
 }
 
 //-----------------------------------------------------------------------------
 void pqAnimationManager::frameRateChanged()
 {
   double framerate =
-    this->Internals->AnimationSettingsDialog->spinBoxFrameRate->value();
+    this->Internals->AnimationSettingsDialog->frameRate->value();
   double num_frames = 
     this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->value();
 
-  double duration =  num_frames/framerate;
+  double duration =  
+    this->Internals->AnimationSettingsDialog->animationDuration->value();
 
-  this->Internals->AnimationSettingsDialog->
-    spinBoxAnimationDuration->blockSignals(true);
-  this->Internals->AnimationSettingsDialog->
-    spinBoxAnimationDuration->setValue(static_cast<int>(duration));
-  this->Internals->AnimationSettingsDialog->
-    spinBoxAnimationDuration->blockSignals(false);
+  switch (this->getActiveScene()->getAnimationSceneProxy()->GetPlayMode())
+    {
+  case vtkSMPVAnimationSceneProxy::SEQUENCE:
+  case vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS:
+    this->Internals->AnimationSettingsDialog->animationDuration->
+      blockSignals(true);
+    this->Internals->AnimationSettingsDialog->animationDuration->setValue(
+      num_frames/framerate);
+    this->Internals->AnimationSettingsDialog->animationDuration->
+      blockSignals(false);
+    break;
+
+  case vtkSMPVAnimationSceneProxy::REALTIME:
+    this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
+      blockSignals(true);
+    this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->setValue(
+      static_cast<int>(duration*framerate));
+    this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
+      blockSignals(false);
+    break;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -278,7 +287,8 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
     {
     return false;
     }
-  vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
+  vtkSMPVAnimationSceneProxy* sceneProxy = 
+    vtkSMPVAnimationSceneProxy::SafeDownCast(scene->getAnimationSceneProxy());
 
   QFileInfo fileinfo(filename);
   QString filePrefix = filename;
@@ -307,8 +317,8 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
     dialogUI.spinBoxHeight->setMaximum(1080);
 
     // Frame rate is fixed when using vtkMPIWriter.
-    dialogUI.spinBoxFrameRate->setValue(30);
-    dialogUI.spinBoxFrameRate->setEnabled(false);
+    dialogUI.frameRate->setValue(30);
+    dialogUI.frameRate->setEnabled(false);
     }
   else
     {
@@ -323,22 +333,39 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   dialogUI.spinBoxWidth->setValue(viewSize.width());
 
   // Set current duration/frame rate/no. of. frames.
-  double start_time = pqSMAdaptor::getElementProperty(
-    sceneProxy->GetProperty("StartTime")).toDouble();
-  double end_time = pqSMAdaptor::getElementProperty(
-    sceneProxy->GetProperty("EndTime")).toDouble();
-  double duration = (end_time - start_time);
-  double frame_rate = dialogUI.spinBoxFrameRate->value();
-  double numFrames = duration*frame_rate;
+  double frame_rate = dialogUI.frameRate->value();
+  switch (sceneProxy->GetPlayMode())
+    {
+  case vtkSMPVAnimationSceneProxy::SEQUENCE:
+    dialogUI.spinBoxNumberOfFrames->setValue(
+      sceneProxy->GetNumberOfFrames());
+    dialogUI.animationDuration->setEnabled(false);
+    dialogUI.animationDuration->setValue(
+      sceneProxy->GetNumberOfFrames()/frame_rate);
+    break;
 
-  dialogUI.spinBoxNumberOfFrames->setValue(static_cast<int>(numFrames));
-  dialogUI.spinBoxAnimationDuration->setValue(static_cast<int>(duration));
+  case vtkSMPVAnimationSceneProxy::REALTIME:
+    dialogUI.animationDuration->setValue(sceneProxy->GetDuration());
+    dialogUI.spinBoxNumberOfFrames->setValue(
+      static_cast<int>(sceneProxy->GetDuration()*frame_rate));
+    dialogUI.spinBoxNumberOfFrames->setEnabled(false);
+    break;
+
+  case vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS:
+    dialogUI.spinBoxNumberOfFrames->setValue(
+      sceneProxy->GetNumberOfTimeSteps());
+    dialogUI.animationDuration->setValue(
+      sceneProxy->GetNumberOfTimeSteps()*frame_rate);
+    dialogUI.spinBoxNumberOfFrames->setEnabled(false);
+    dialogUI.animationDuration->setEnabled(false);
+    break;
+    }
 
   QObject::connect(
-    dialogUI.spinBoxAnimationDuration, SIGNAL(valueChanged(int)),
+    dialogUI.animationDuration, SIGNAL(valueChanged(double)),
     this, SLOT(durationChanged()));
   QObject::connect(
-    dialogUI.spinBoxFrameRate, SIGNAL(valueChanged(int)),
+    dialogUI.frameRate, SIGNAL(valueChanged(double)),
     this, SLOT(frameRateChanged()));
   QObject::connect(
     dialogUI.spinBoxNumberOfFrames, SIGNAL(valueChanged(int)),
@@ -351,9 +378,21 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
     }
   this->Internals->AnimationSettingsDialog = 0;
 
-  // Update Scene properties based on user options.
-  pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("EndTime"),
-    dialogUI.spinBoxAnimationDuration->value() + start_time);
+  // Update Scene properties based on user options. 
+  double num_frames = sceneProxy->GetNumberOfFrames();
+  double duration = sceneProxy->GetDuration();
+  switch (sceneProxy->GetPlayMode())
+    {
+  case vtkSMPVAnimationSceneProxy::SEQUENCE:
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"), 
+      dialogUI.spinBoxNumberOfFrames->value());
+    break;
+
+  case vtkSMPVAnimationSceneProxy::REALTIME:
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("Duration"),
+      dialogUI.animationDuration->value());
+    break;
+    }
   sceneProxy->UpdateVTKObjects();
 
   QSize newSize(dialogUI.spinBoxWidth->value(),
@@ -377,7 +416,7 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
     pqSMAdaptor::setElementProperty(writer->GetProperty("Magnification"), 
       magnification); 
     pqSMAdaptor::setElementProperty(writer->GetProperty("FrameRate"),
-      dialogUI.spinBoxFrameRate->value());
+      dialogUI.frameRate->value());
     writer->UpdateVTKObjects();
 
     // We save the animation offline.
@@ -402,9 +441,24 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   writer->SetFileName(filename.toAscii().data());
   writer->SetMagnification(magnification);
   writer->SetAnimationScene(sceneProxy);
-  writer->SetFrameRate(dialogUI.spinBoxFrameRate->value());
+  writer->SetFrameRate(dialogUI.frameRate->value());
   bool status = writer->Save();
   writer->Delete();
+
+  // Restore, duration and number of frames.
+  switch (sceneProxy->GetPlayMode())
+    {
+  case vtkSMPVAnimationSceneProxy::SEQUENCE:
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"), 
+      num_frames);
+    break;
+
+  case vtkSMPVAnimationSceneProxy::REALTIME:
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("Duration"),
+      duration);
+    break;
+    }
+  sceneProxy->UpdateVTKObjects();
 
   this->restoreViewSizes();
   return status;

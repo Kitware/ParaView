@@ -75,7 +75,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettingsDialog.h"
 #include "pqSettingsDialog.h"
 #include "pqSettings.h"
-#include "pqSimpleAnimationManager.h"
 #include "pqSMAdaptor.h"
 #include "pqSMAdaptor.h"
 #include "pqSourceProxyInfo.h"

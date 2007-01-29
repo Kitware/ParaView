@@ -32,25 +32,6 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="1" colspan="2" >
-    <widget class="QSpinBox" name="spinBoxAnimationDuration" >
-     <property name="toolTip" >
-      <string>Duration for the Animation (in seconds)</string>
-     </property>
-     <property name="statusTip" >
-      <string>Sets the duration for the animation in seconds.</string>
-     </property>
-     <property name="whatsThis" >
-      <string>Sets the duration for the animation in seconds.</string>
-     </property>
-     <property name="maximum" >
-      <number>2147483647</number>
-     </property>
-     <property name="minimum" >
-      <number>1</number>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0" >
     <widget class="QLabel" name="labelAnimationDuration" >
      <property name="text" >
@@ -87,28 +68,6 @@
      </property>
      <property name="minimum" >
       <number>2</number>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1" colspan="2" >
-    <widget class="QSpinBox" name="spinBoxFrameRate" >
-     <property name="toolTip" >
-      <string>Animation Frame Rate in frames-per-second.</string>
-     </property>
-     <property name="statusTip" >
-      <string>Sets the frame rate (fps) to use in the animation.</string>
-     </property>
-     <property name="whatsThis" >
-      <string>Sets the frame rate (fps) to use in the animation.</string>
-     </property>
-     <property name="maximum" >
-      <number>100</number>
-     </property>
-     <property name="minimum" >
-      <number>1</number>
-     </property>
-     <property name="value" >
-      <number>15</number>
      </property>
     </widget>
    </item>
@@ -218,11 +177,23 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="1" colspan="2" >
+    <widget class="QDoubleSpinBox" name="animationDuration" >
+     <property name="maximum" >
+      <double>999999999999999967336168804116691273849533185806555472917961779471295845921727862608739868455469056.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="2" >
+    <widget class="QDoubleSpinBox" name="frameRate" >
+     <property name="minimum" >
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>spinBoxAnimationDuration</tabstop>
-  <tabstop>spinBoxFrameRate</tabstop>
   <tabstop>spinBoxNumberOfFrames</tabstop>
   <tabstop>spinBoxWidth</tabstop>
   <tabstop>spinBoxHeight</tabstop>

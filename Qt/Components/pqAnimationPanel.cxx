@@ -50,9 +50,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationManager.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
-#include "pqKeyTimeDomain.h"
+#include "pqDoubleSpinBoxDomain.h"
+#include "pqKeyFrameTimeValidator.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqSignalAdaptorKeyFrameTime.h"
@@ -60,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptorKeyFrameValue.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
+#include "pqTimeKeeper.h"
 
 //-----------------------------------------------------------------------------
 class pqAnimationPanel::pqInternals : public Ui::AnimationPanel
@@ -72,7 +75,7 @@ public:
   QPointer<pqSignalAdaptorKeyFrameValue> ValueAdaptor;
   QPointer<pqSignalAdaptorKeyFrameType> TypeAdaptor;
   QPointer<pqSignalAdaptorKeyFrameTime> TimeAdaptor;
-  QPointer<pqKeyTimeDomain> TimeDomain;
+  QPointer<pqKeyFrameTimeValidator> KeyFrameTimeValidator;
   QPointer<pqDoubleSpinBoxDomain> SceneCurrentTimeDomain;
   QPointer<pqAnimationScene> ActiveScene;
   pqPropertyLinks Links;
@@ -111,6 +114,9 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
 
   this->Internal->setupUi(container);
 
+  this->Internal->KeyFrameTimeValidator = new pqKeyFrameTimeValidator(this);
+  this->Internal->keyFrameTime->setValidator(
+    this->Internal->KeyFrameTimeValidator);
 
   QObject::connect(&this->Internal->Links, SIGNAL(beginUndoSet(const QString&)),
     this, SIGNAL(beginUndoSet(const QString&)));
@@ -162,8 +168,8 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
     this->Internal->typeFrame);
 
   this->Internal->TimeAdaptor = new pqSignalAdaptorKeyFrameTime(
-    this->Internal->keyFrameTime, "value",
-    SIGNAL(valueChanged(double)));
+    this->Internal->keyFrameTime, "text",
+    SIGNAL(textChanged(const QString&)));
 
 
   this->updateEnableState();
@@ -259,27 +265,43 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
   sceneProxy->UpdatePropertyInformation();
 
   // update domain to currentFrame before creating the link.
-  this->onSceneTimeChanged();
+  this->onScenePlayModeChanged();
+
+  //pqTimeKeeper* timekeeper = scene->getServer()->getTimeKeeper();
+
   this->Internal->SceneLinks.addPropertyLink(
-    this->Internal->currentFrame, "value", SIGNAL(valueChanged(double)),
-    sceneProxy, sceneProxy->GetProperty("CurrentTime"));
+    this->Internal->currentTime, "text", SIGNAL(textChanged(const QString&)),
+    sceneProxy, sceneProxy->GetProperty("ClockTime"));
   this->Internal->SceneLinks.addPropertyLink(
-    this->Internal->numberOfFrames, "text", SIGNAL(textChanged(const QString&)),
-    sceneProxy, sceneProxy->GetProperty("EndTime"));
+    this->Internal->startTime, "text", SIGNAL(textChanged(const QString&)),
+    sceneProxy, sceneProxy->GetProperty("ClockTimeRange"), 0);
+  this->Internal->SceneLinks.addPropertyLink(
+    this->Internal->endTime, "text", SIGNAL(textChanged(const QString&)),
+    sceneProxy, sceneProxy->GetProperty("ClockTimeRange"), 1);
+  this->Internal->SceneLinks.addPropertyLink(
+    this->Internal->startTimeLock, "checked", SIGNAL(toggled(bool)),
+    sceneProxy, sceneProxy->GetProperty("ClockTimeRangeLocks"), 0);
+  this->Internal->SceneLinks.addPropertyLink(
+    this->Internal->endTimeLock, "checked", SIGNAL(toggled(bool)),
+    sceneProxy, sceneProxy->GetProperty("ClockTimeRangeLocks"), 1);
+
   this->Internal->SceneLinks.addPropertyLink(
     this->Internal->playMode, "currentText", 
     SIGNAL(currentIndexChanged(const QString&)),
     sceneProxy, sceneProxy->GetProperty("PlayMode"));
+
+  this->Internal->SceneLinks.addPropertyLink(
+    this->Internal->numberOfFrames, "value", SIGNAL(valueChanged(int)),
+    sceneProxy, sceneProxy->GetProperty("NumberOfFrames"));
+  this->Internal->SceneLinks.addPropertyLink(
+    this->Internal->duration, "value", SIGNAL(valueChanged(int)),
+    sceneProxy, sceneProxy->GetProperty("Duration"));
   this->Internal->SceneLinks.addPropertyLink(
     this->Internal->caching, "checked", SIGNAL(toggled(bool)),
     sceneProxy, sceneProxy->GetProperty("Caching"));
 
-  QObject::connect(scene, SIGNAL(startTimeChanged()), 
-    this, SLOT(onSceneTimeChanged()));
-  QObject::connect(scene, SIGNAL(endTimeChanged()), 
-    this, SLOT(onSceneTimeChanged()));
   QObject::connect(scene, SIGNAL(playModeChanged()),
-    this, SLOT(onSceneTimeChanged()));
+    this, SLOT(onScenePlayModeChanged()));
   QObject::connect(scene, SIGNAL(cuesChanged()), 
     this, SLOT(onSceneCuesChanged()));
 }
@@ -305,31 +327,32 @@ void pqAnimationPanel::onSceneCuesChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationPanel::onSceneTimeChanged()
+void pqAnimationPanel::onScenePlayModeChanged()
 {
   vtkSMProxy* proxy = this->Internal->ActiveScene->getProxy();
-  double start = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("StartTime")).toDouble();
-  double end = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("EndTime")).toDouble();
-  this->Internal->currentFrame->setMinimum(0);
-  this->Internal->currentFrame->setMaximum(end-start);
+  QString playmode = 
+    pqSMAdaptor::getEnumerationProperty(proxy->GetProperty("PlayMode")).toString();
 
-  delete this->Internal->numberOfFrames->validator();
-  if (pqSMAdaptor::getEnumerationProperty(proxy->GetProperty("PlayMode")) ==
-    "Sequence")
+  if (playmode == "Sequence")
     {
-    this->Internal->currentFrame->setDecimals(0);
-    this->Internal->labelNumberOfFrames->setText("Number Of Frames");
-    this->Internal->numberOfFrames->setValidator(new QIntValidator(this));
-    this->Internal->caching->setEnabled(true);
+    this->Internal->numberOfFrames->show();
+    this->Internal->labelNumberOfFrames->show();
+    this->Internal->labelDuration->hide();
+    this->Internal->duration->hide();
+    }
+  else if (playmode == "Real Time")
+    {
+    this->Internal->numberOfFrames->hide();
+    this->Internal->labelNumberOfFrames->hide();
+    this->Internal->labelDuration->show();
+    this->Internal->duration->show();
     }
   else
     {
-    this->Internal->currentFrame->setDecimals(2);
-    this->Internal->labelNumberOfFrames->setText("Duration (secs)");
-    this->Internal->numberOfFrames->setValidator(new QDoubleValidator(this));
-    this->Internal->caching->setEnabled(false);
+    this->Internal->numberOfFrames->hide();
+    this->Internal->labelNumberOfFrames->hide();
+    this->Internal->labelDuration->hide();
+    this->Internal->duration->hide();
     }
 }
 
@@ -461,7 +484,8 @@ void pqAnimationPanel::buildPropertyList()
     {
     vtkSMVectorProperty* smproperty = 
       vtkSMVectorProperty::SafeDownCast(iter->GetProperty());
-    if (smproperty && smproperty->GetAnimateable() > 0)
+    if (smproperty && smproperty->GetAnimateable() > 0 && 
+      smproperty->GetInformationProperty()==0)
       {
       unsigned int num_elems = smproperty->GetNumberOfElements();
       for (unsigned int cc=0; cc < num_elems; cc++)
@@ -653,7 +677,7 @@ void pqAnimationPanel::showKeyFrame(int index)
   this->Internal->TimeAdaptor->setAnimationCue(0);
   this->Internal->TimeAdaptor->setAnimationScene(0);
   this->Internal->TypeAdaptor->setKeyFrameProxy(0);
-  delete this->Internal->TimeDomain;
+  this->Internal->KeyFrameTimeValidator->setAnimationScene(0);
   if (!toShowKf)
     {
     // No keyframe to show.
@@ -670,22 +694,20 @@ void pqAnimationPanel::showKeyFrame(int index)
   this->Internal->interpolationType->setCurrentIndex(-1);
   this->Internal->interpolationType->blockSignals(false);
 
-  // Update domain for key time.
-  this->Internal->keyFrameTime->setMinimum(0);
-
   this->Internal->ValueAdaptor->setAnimationCue(this->Internal->ActiveCue);
-  this->Internal->TimeAdaptor->setAnimationScene(this->Internal->ActiveScene);
   this->Internal->TimeAdaptor->setAnimationCue(this->Internal->ActiveCue);
 
-  // pqKeyTimeDomain ensures that the the keyframes order
+  // pqKeyFrameTimeValidator ensures that the the keyframes order
   // cannot be changed. This works because when the keyframes
   // or their time changes, the domain for the KeyTime property
   // for all the keyframes is updated by the 
   // vtkSMKeyFrameAnimationCueManipulatorProxy.
-  this->Internal->TimeDomain = new pqKeyTimeDomain(
-    this->Internal->keyFrameTime, 
-    toShowKf->GetProperty("KeyTime"), 0);
-  this->Internal->TimeDomain->setAnimationScene(
+  this->Internal->KeyFrameTimeValidator->setAnimationScene(
+    this->Internal->ActiveScene);
+  this->Internal->KeyFrameTimeValidator->setDomain(
+    toShowKf->GetProperty("KeyTime")->GetDomain("range"));
+
+  this->Internal->TimeAdaptor->setAnimationScene(
     this->Internal->ActiveScene);
 
   // Update and connect the type adaptor

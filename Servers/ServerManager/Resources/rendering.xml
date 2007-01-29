@@ -1705,6 +1705,13 @@
         <IntRangeDomain name="range" min="0"/>
       </IntVectorProperty>
 
+      <DoubleVectorProperty
+        name="ViewTime"
+        number_of_elements="1"
+        default_values="0">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
       <Property
         name="InvalidateGeometry"
         command="InvalidateGeometry">
@@ -2602,7 +2609,6 @@
         </Proxy>
         <ExposedProperties>
           <Property name="CacheUpdate" />
-          <Property name="SaveCacheOnCacheUpdate" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -2954,6 +2960,14 @@
         command="InvalidateGeometry"
         update_self="1">
       </Property>
+      <DoubleVectorProperty
+        name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        immediate_update="1"
+        is_internal="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
       <IntVectorProperty
         name="CacheUpdate"
         command="CacheUpdate"
@@ -3003,6 +3017,9 @@
       <SubProxy>
         <Proxy name="UpdateSuppressor" 
           proxygroup="filters" proxyname="UpdateSuppressor" />
+        <ExposedProperties>
+          <Property name="SaveCacheOnCacheUpdate" />
+        </ExposedProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />

@@ -936,14 +936,6 @@
       </IntVectorProperty>
     
       <DoubleVectorProperty
-        name="StartTime"
-        command="SetStartTime"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
         name="EndTime"
         command="SetEndTime"
         number_of_elements="1"
@@ -1007,6 +999,136 @@
       </IntVectorProperty>
 
     </AnimationSceneProxy>
+
+    <PVAnimationSceneProxy name="PVAnimationScene" class="notused">
+      <!-- No server side objects created. All properties are updateself -->
+      <ProxyProperty
+        name="ViewModules"
+        command="AddViewModule"
+        clean_command="RemoveAllViewModules"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="rendermodules" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <IntVectorProperty
+        name="Loop"
+        command="SetLoop"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="CurrentTime"
+        command="SetAnimationTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0"
+        is_internal="1">
+      </DoubleVectorProperty>
+
+      <ProxyProperty name="Cues"
+        command="AddCue"
+        update_self="1"
+        remove_command="RemoveCue">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <IntVectorProperty
+        name="PlayMode"
+        command="SetPlayMode"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Sequence" />
+          <Entry value="1" text="Real Time" />
+          <Entry value="2" text="Snap To TimeSteps" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="NumberOfFrames"
+        command="SetNumberOfFrame"
+        number_of_elements="1"
+        default_values="10">
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Duration"
+        command="SetDuration"
+        number_of_elements="1"
+        default_values="10">
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Caching"
+        command="SetCaching"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <ProxyProperty
+        name="TimeKeeper"
+        command="SetTimeKeeper"
+        update_self="1">
+      </ProxyProperty>
+
+      <DoubleVectorProperty
+        name="TimeSteps"
+        command="AddTimeStep"
+        update_self="1"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        clean_command="RemoveAllTimeSteps">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="ClockTimeRange"
+        command="SetClockTimeRange"
+        number_of_elements="2"
+        default_values="0 1"
+        update_self="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ClockTimeRangeLocks"
+        number_of_elements="2"
+        default_values="0 0">
+        <!-- This is a "no-command" property. Has not effect 
+        on the proxy, but used by the GUI to keep the range lock state.
+        -->
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="ClockTime"
+        command="SetClockTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0"
+        immediate_update="1"
+        is_internal="1">
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <Proxy name="TimeCue" proxygroup="animation" proxyname="AnimationCue" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="TimeCueManipulator" 
+          proxygroup="animation_manipulators"
+          proxyname="LinearAnimationCueManipulator" />
+      </SubProxy>
+
+    </PVAnimationSceneProxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="animation_manipulators">
@@ -2197,6 +2319,22 @@
 
     <!-- End of FileInformationHelper -->
     </Proxy>
+
+    <Proxy name="TimeKeeper" class="">
+      <DoubleVectorProperty
+        name="Time"
+        number_of_elements="1"
+        default_values="0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="TimestepValues">
+      </DoubleVectorProperty>
+
+      <!-- End of TimeKeeper -->
+    </Proxy>
+
   </ProxyGroup>
 
 </ServerManagerConfiguration>

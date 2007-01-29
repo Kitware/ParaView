@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVCRController.h"
 
 // ParaView Server Manager includes.
-#include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMPVAnimationSceneProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMIntRangeDomain.h"
 
@@ -74,12 +74,25 @@ void pqVCRController::setAnimationScene(pqAnimationScene* scene)
     QObject::connect(this->Scene, SIGNAL(tick()), this, SLOT(onTick()));
     QObject::connect(this->Scene, SIGNAL(loopChanged()),
       this, SLOT(onLoopPropertyChanged()));
+    QObject::connect(this->Scene, SIGNAL(clockTimeRangesChanged()),
+        this, SLOT(onTimeRangesChanged()));
     bool loop_checked = pqSMAdaptor::getElementProperty(
         scene->getProxy()->GetProperty("Loop")).toBool();
     emit this->loop(loop_checked);
     }
 
+  this->onTimeRangesChanged();
   emit this->enabled (this->Scene != NULL);
+}
+
+//-----------------------------------------------------------------------------
+void pqVCRController::onTimeRangesChanged()
+{
+  if (this->Scene)
+    {
+    QPair<double, double> range = this->Scene->getClockTimeRange();
+    emit this->timeRanges(range.first, range.second);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -146,66 +159,44 @@ void pqVCRController::onPause()
 //-----------------------------------------------------------------------------
 void pqVCRController::onFirstFrame()
 {
-  this->updateScene(true, false, 0);
+  vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
+    this->Scene->getProxy());
+  if (scene)
+    {
+    scene->GoToFirst();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onPreviousFrame()
 {
-  this->updateScene(false, false, -1);
+  vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
+    this->Scene->getProxy());
+  if (scene)
+    {
+    scene->GoToPrevious();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onNextFrame()
 {
-  this->updateScene(false, false, 1);
+  vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
+    this->Scene->getProxy());
+  if (scene)
+    {
+    scene->GoToNext();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onLastFrame()
 {
-  this->updateScene(false, true, 0);
+  vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
+    this->Scene->getProxy());
+  if (scene)
+    {
+    scene->GoToLast();
+    }
 }
-
-//-----------------------------------------------------------------------------
-bool pqVCRController::updateScene(bool first, bool last, int offset)
-{
-  // TODO: We may want to move this "next" logic to vtkSMAnimationSceneProxy
-  // itself (or even vtkSMAnimationScene). This will need to take into consideration
-  // the new "ENUMERATED_TIMES" mode as well.
-  if (!this->Scene)
-    {
-    qDebug() << "No active scene. Cannot go to first frame.";
-    return false;
-    }
-
-  vtkSMAnimationSceneProxy* scene = this->Scene->getAnimationSceneProxy();
-  double start_time = pqSMAdaptor::getElementProperty(
-    scene->GetProperty("StartTime")).toDouble();
-  double end_time = pqSMAdaptor::getElementProperty(
-    scene->GetProperty("EndTime")).toDouble();
-  double new_time = pqSMAdaptor::getElementProperty(
-    scene->GetProperty("CurrentTime")).toDouble();
-
-  if (first)
-    {
-    new_time = start_time;
-    }
-  else if (last)
-    {
-    new_time = end_time;
-    }
-  else 
-    {
-    new_time += offset;
-    new_time = (new_time < start_time)? start_time : new_time;
-    new_time = (new_time > end_time)? end_time : new_time;
-    }
-  pqSMAdaptor::setElementProperty(scene->GetProperty("CurrentTime"), new_time);
-  scene->UpdateProperty("CurrentTime", 1);
-
-  this->onTick();
-  return true;
-}
-
 

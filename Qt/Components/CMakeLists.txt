@@ -74,7 +74,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
-  pqKeyTimeDomain.h
+  pqKeyFrameTimeValidator.h
   pqLineSourceWidget.h
   pqLineWidget.h
   pqLinksEditor.h
@@ -115,7 +115,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSignalAdaptorKeyFrameValue.h
   pqSignalAdaptorKeyFrameTime.h
   pqSignalAdaptorKeyFrameType.h
-  pqSimpleAnimationManager.h
   pqSimpleServerStartup.h
   pqSliderDomain.h
   pqSourceHistoryModel.h
@@ -279,8 +278,8 @@ ADD_LIBRARY(pqComponents
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
-  pqKeyTimeDomain.cxx
-  pqKeyTimeDomain.h
+  pqKeyFrameTimeValidator.cxx
+  pqKeyFrameTimeValidator.h
   pqLineSourceWidget.cxx
   pqLineSourceWidget.h
   pqLineWidget.cxx
@@ -363,8 +362,6 @@ ADD_LIBRARY(pqComponents
   pqSignalAdaptorKeyFrameTime.h
   pqSignalAdaptorKeyFrameType.cxx
   pqSignalAdaptorKeyFrameType.h
-  pqSimpleAnimationManager.cxx
-  pqSimpleAnimationManager.h
   pqSimpleServerStartup.cxx
   pqSimpleServerStartup.h
   pqSliderDomain.cxx

@@ -34,9 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 
 #include <QPointer>
 
+#include "pqAnimationManager.h"
+#include "pqAnimationScene.h"
 #include "pqMainWindowCore.h"
 #include "pqRenderWindowManager.h"
 
@@ -50,7 +53,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.4");
+vtkCxxRevisionMacro(pqStateLoader, "1.5");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -103,6 +106,43 @@ int pqStateLoader::LoadState(vtkPVXMLElement* root, int keep_proxies/*=0*/)
     this->ClearCreatedProxies();
     }
   return 1;
+}
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqStateLoader::NewProxyInternal(
+  const char* xml_group, const char* xml_name)
+{
+  if (xml_group && xml_name && strcmp(xml_group, "animation")==0
+    && strcmp(xml_name, "PVAnimationScene")==0)
+    {
+    // If an animation scene already exists, we use that.
+    pqAnimationScene* scene = 
+      this->Internal->MainWindowCore->getAnimationManager()->getActiveScene();
+    if (scene)
+      {
+      vtkSMProxy* proxy = scene->getProxy();
+      proxy->Register(this);
+      return proxy;
+      }
+    }
+  return this->Superclass::NewProxyInternal(xml_group, xml_name);
+}
+
+//---------------------------------------------------------------------------
+void pqStateLoader::RegisterProxyInternal(const char* group,
+  const char* name, vtkSMProxy* proxy)
+{
+  if (proxy->GetXMLGroup() 
+    && strcmp(proxy->GetXMLGroup(), "animation")==0
+    && proxy->IsA("vtkSMPVAnimationScene"))
+    {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    if (pxm->GetProxyName(group, proxy))
+      {
+      // scene is registered, don't re-register it.
+      return;
+      }
+    }
+  this->Superclass::RegisterProxyInternal(group, name, proxy);
 }
 
 //-----------------------------------------------------------------------------

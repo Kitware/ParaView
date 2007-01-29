@@ -71,6 +71,10 @@ public:
   virtual void Update() { this->Superclass::Update(); }
 
   // Description:
+  // Set the update time passed on to the update suppressor.
+  virtual void SetUpdateTime(double time);
+
+  // Description:
   // This method returns if the Update() or UpdateDistributedGeometry()
   // calls will actually lead to an Update. This is used by the render module
   // to decide if it can expect any pipeline updates.

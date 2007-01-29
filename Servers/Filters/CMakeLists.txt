@@ -53,6 +53,7 @@ SET(Filters_SRCS
   vtkPolyLineToRectilinearGridFilter.cxx
   vtkPPhastaReader.cxx
   vtkPPickFilter.cxx
+  vtkPVAnimationScene.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
   vtkPVCompositeBuffer.cxx

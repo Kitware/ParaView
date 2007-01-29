@@ -71,6 +71,14 @@ public:
 
   // Returns the index of the property being animated.
   int getAnimatedPropertyIndex() const;
+
+  // Set the type of manipulator to create by default.
+  void setManipulatorType(const QString& type)
+    { this->ManipulatorType = type; }
+
+  // returns the manipulator proxy.
+  vtkSMProxy* getManipulatorProxy() const;
+
 public slots:
   void setDefaults();
     
@@ -90,6 +98,7 @@ private:
   pqAnimationCue(const pqAnimationCue&); // Not implemented.
   void operator=(const pqAnimationCue&); // Not implemented.
 
+  QString ManipulatorType;
   class pqInternals;
   pqInternals* Internal;
 };

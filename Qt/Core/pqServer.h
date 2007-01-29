@@ -33,22 +33,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqServer_h
 #define _pqServer_h
 
+class pqTimeKeeper;
 class vtkProcessModule;
 class vtkPVOptions;
 class vtkSMApplication;
-class vtkSMProxyManager;
 class vtkSMMultiViewRenderModuleProxy;
+class vtkSMProxyManager;
 class vtkSMRenderModuleProxy;
 
 #include "pqCoreExport.h"
 #include "pqServerManagerModelItem.h"
 #include "pqServerResource.h"
 #include "vtkSmartPointer.h"
+#include <QPointer>
 
 /// Abstracts the concept of a "server connection" so that ParaView clients may: 
 /// have more than one connect at a time / open and close connections at-will
-class PQCORE_EXPORT pqServer :
-  public pqServerManagerModelItem 
+class PQCORE_EXPORT pqServer : public pqServerManagerModelItem 
 {
   Q_OBJECT
 
@@ -81,6 +82,13 @@ public:
   // Returns is this connection is a connection to a remote
   // server or a built-in server.
   bool isRemote() const;
+
+  // Returns the time keeper for this connection.
+  pqTimeKeeper* getTimeKeeper() const;
+
+  // Initializes the pqServer, must be called as soon as pqServer 
+  // is created.
+  void initialize();
 signals:
   void nameChanged();
 
@@ -88,7 +96,10 @@ protected:
   /// Creates vtkSMMultiViewRenderModuleProxy for this connection and 
   /// initializes it to create render modules of correct type 
   /// depending upon the connection.
-  void CreateRenderModule();
+  void createRenderModule();
+
+  // Creates the TimeKeeper proxy for this connection.
+  void createTimeKeeper();
   
 private:
   pqServer(const pqServer&);  // Not implemented.
@@ -101,6 +112,9 @@ private:
   // Each connection will eventually have a PVOptions object. 
   // For now, this is same as the vtkProcessModule::Options.
   vtkSmartPointer<vtkPVOptions> Options;
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif // !_pqServer_h

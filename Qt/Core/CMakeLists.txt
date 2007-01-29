@@ -79,6 +79,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerStartups.h
   pqSettings.h
   pqTableViewModule.h
+  pqTimeKeeper.h
   pqTextWidgetDisplay.h
   pqUndoStack.h
   pqWriterFactory.h
@@ -240,6 +241,8 @@ ADD_LIBRARY(pqCore
   pqSettings.h
   pqTableViewModule.cxx
   pqTableViewModule.h
+  pqTimeKeeper.cxx
+  pqTimeKeeper.h
   pqTextWidgetDisplay.cxx
   pqTextWidgetDisplay.h
   pqUndoRedoStateLoader.cxx

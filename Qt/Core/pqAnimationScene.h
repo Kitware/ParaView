@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqAnimationScene_h
 
 #include "pqProxy.h"
-
+#include <QPair>
 class pqAnimationCue;
 class vtkSMAnimationSceneProxy;
 class QSize;
@@ -73,6 +73,9 @@ public:
   // Combines the sizes of all the view modules
   // animated by the scene and returns the total view size.
   QSize getViewSize() const;
+
+  // Get the clock time range set on the animation scene proxy.
+  QPair<double, double> getClockTimeRange() const;
 signals:
   // Fired before a new cue is added to the scene.
   void preAddedCue(pqAnimationCue*);
@@ -89,12 +92,6 @@ signals:
   // Fired after cues have been added/removed.
   void cuesChanged();
 
-  // Fired when the proxy's StartTime changes.
-  void startTimeChanged();
-
-  // Fired when the proxy's EndTime changes.
-  void endTimeChanged();
-
   // Emitted when the play mode changes.
   void playModeChanged();
 
@@ -104,11 +101,18 @@ signals:
 
   // Emitted when playing animation.
   void tick();
+
+  // Emitted when the clock time ranges change.
+  void clockTimeRangesChanged();
 private slots:
   // Called when the "Cues" property on the AnimationScene proxy
   // is changed. Updates the internal datastructure to reflect the current
   // state of the scene.
   void onCuesChanged();
+
+  // Called when timekeeper's timesteps change,
+  // we synchronize the ClockTimeRange on the scene proxy.
+  void updateTimeRanges();  
 
 private:
   pqAnimationScene(const pqAnimationScene&); // Not implemented.
@@ -116,6 +120,10 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
+
+  void setupTimeTrack();
+  pqAnimationCue* createCueInternal(const QString& mtype,
+    vtkSMProxy* proxy, const char* propertyname, int index);
 };
 
 #endif

@@ -59,6 +59,8 @@ pqAnimationCue::pqAnimationCue(const QString& group, const QString& name,
     vtkSMProxy* proxy, pqServer* server, QObject* _parent/*=NULL*/)
 : pqProxy(group, name, proxy, server, _parent)
 {
+  this->ManipulatorType = "KeyFrameAnimationCueManipulator";
+
   this->Internal = new pqAnimationCue::pqInternals();
 
   this->Internal->VTKConnect->Connect(
@@ -82,6 +84,12 @@ pqAnimationCue::pqAnimationCue(const QString& group, const QString& name,
 pqAnimationCue::~pqAnimationCue()
 {
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqAnimationCue::getManipulatorProxy() const
+{
+  return this->Internal->Manipulator;
 }
 
 //-----------------------------------------------------------------------------
@@ -116,7 +124,8 @@ void pqAnimationCue::setDefaults()
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMProxy* manip = 
-      pxm->NewProxy("animation_manipulators", "KeyFrameAnimationCueManipulator");
+      pxm->NewProxy("animation_manipulators", 
+        this->ManipulatorType.toAscii().data());
     manip->SetConnectionID(this->getServer()->GetConnectionID());
     this->addInternalProxy("Manipulator", manip);
     manip->Delete();

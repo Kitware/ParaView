@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqKeyTimeDomain.h
+   Module:    pqKeyFrameTimeValidator.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,34 +29,38 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqKeyTimeDomain_h
-#define __pqKeyTimeDomain_h
+#ifndef __pqKeyFrameTimeValidator_h
+#define __pqKeyFrameTimeValidator_h
 
-#include "pqDoubleSpinBoxDomain.h"
-#include <QPointer>
+#include <QDoubleValidator>
+#include "pqComponentsExport.h"
 
 class pqAnimationScene;
-// pqKeyTimeDomain is an specialization of pqDoubleSpinBoxDomain which
-// scales the bounds given by the domain using the start and end times
-// from the Animation Scene.
-class PQCOMPONENTS_EXPORT pqKeyTimeDomain : public pqDoubleSpinBoxDomain
+class vtkSMDomain;
+
+class PQCOMPONENTS_EXPORT pqKeyFrameTimeValidator : public QDoubleValidator
 {
   Q_OBJECT
-  typedef pqDoubleSpinBoxDomain Superclass;
+  typedef QDoubleValidator Superclass;
 public:
-  /// constructor requires a QDoubleSpinBox, 
-  /// and the property with the domain to observe
-  /// the list of values in the combo box is automatically 
-  /// updated when the domain changes
-  pqKeyTimeDomain(QDoubleSpinBox* p, vtkSMProperty* prop, int index=-1);
-  ~pqKeyTimeDomain();
+  pqKeyFrameTimeValidator(QObject* parent);
+  virtual ~pqKeyFrameTimeValidator();
 
-  void setAnimationScene(pqAnimationScene* scene);
-protected:
-  virtual void setSingleStep(double step);
-  virtual void setRange(double min, double max);
+  // Set the AnimationScene. The ClockTimeRange from the time
+  // keeper is used to determine the scale factor for the 
+  // range for this validator.
+  void setAnimationScene(pqAnimationScene* timekeeper);
 
-  QPointer<pqAnimationScene> Scene;
+  // Set the domain which for this key time. Domain provides
+  // the normalized range for this validator.
+  void setDomain(vtkSMDomain* domain);
+
+protected slots:
+  void onDomainModified();
+
+private:
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif

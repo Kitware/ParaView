@@ -71,10 +71,17 @@ public:
   void SetFrameRate(double framerate);
   double GetFrameRate();
 
+  //BTX
+  enum 
+    {
+    SEQUENCE=0,
+    REALTIME=1
+    };
+  //ETX
   // Description:
   // Note that when the play mode is set to Real Time, cacheing is
   // disabled.
-  void SetPlayMode(int mode);
+  virtual void SetPlayMode(int mode);
   int GetPlayMode();
 
   void AddCue(vtkSMProxy* cue);
@@ -131,6 +138,8 @@ protected:
   
   vtkCollection* AnimationCueProxies;
   vtkCollectionIterator* AnimationCueProxiesIterator;
+
+  int PlayMode;
 
   //BTX
   friend class vtkSMAnimationSceneImageWriter;
