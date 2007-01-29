@@ -162,7 +162,11 @@ void pqLinksManager::removeLink()
   // convert indexes to names so our indexes don't become invalid during removal
   foreach(QModelIndex idx, idxs)
     {
-    names.append(model->getLinkName(idx));
+    QString name = model->getLinkName(idx);
+    if(!names.contains(name))
+      {
+      names.append(name);
+      }
     }
 
   foreach(QString name, names)
