@@ -77,7 +77,9 @@ public:
   // (see vtkSMLink::UpdateDirections)
   int GetLinkedPropertyDirection(int index);
   
-
+  // Description:
+  // Remove all links.
+  virtual void RemoveAllLinks();
 protected:
   vtkSMPropertyLink();
   ~vtkSMPropertyLink();

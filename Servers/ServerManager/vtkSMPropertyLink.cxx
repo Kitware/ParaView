@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.12");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.13");
 //-----------------------------------------------------------------------------
 class vtkSMPropertyLinkObserver : public vtkCommand
 {
@@ -203,6 +203,13 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProperty* property, int updateDir
 
 }
 
+
+//-----------------------------------------------------------------------------
+void vtkSMPropertyLink::RemoveAllLinks()
+{
+  this->Internals->LinkedProperties.clear();
+  this->Modified();
+}
 
 //-----------------------------------------------------------------------------
 void vtkSMPropertyLink::RemoveLinkedProperty(vtkSMProperty* property)

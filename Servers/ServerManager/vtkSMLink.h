@@ -50,6 +50,10 @@ public:
   vtkSetMacro(PropagateUpdateVTKObjects, int);
   vtkGetMacro(PropagateUpdateVTKObjects, int);
   vtkBooleanMacro(PropagateUpdateVTKObjects, int);
+
+  // Description:
+  // Remove all links.
+  virtual void RemoveAllLinks() = 0;
 protected:
   vtkSMLink();
   ~vtkSMLink();

@@ -67,7 +67,10 @@ public:
   // exception properties.
   void AddException(const char* propertyname);
   void RemoveException(const char* propertyname);
- 
+
+  // Description:
+  // Remove all links.
+  virtual void RemoveAllLinks();
 protected:
   vtkSMProxyLink();
   ~vtkSMProxyLink();

@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.9");
+vtkCxxRevisionMacro(vtkSMProxyLink, "1.10");
 
 //---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals
@@ -102,6 +102,13 @@ void vtkSMProxyLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
     this->ObserveProxyUpdates(proxy);
     }
 
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMProxyLink::RemoveAllLinks()
+{
+  this->Internals->LinkedProxies.clear();
   this->Modified();
 }
 
