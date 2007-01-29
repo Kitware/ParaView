@@ -48,11 +48,24 @@
     </item>
    </layout>
   </widget>
-  <widget class="QLabel" name="label_2" >
+  <widget class="QListWidget" name="GridNames" >
    <property name="geometry" >
     <rect>
      <x>9</x>
-     <y>43</y>
+     <y>66</y>
+     <width>247</width>
+     <height>75</height>
+    </rect>
+   </property>
+   <property name="selectionMode" >
+    <enum>QAbstractItemView::MultiSelection</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>50</y>
      <width>247</width>
      <height>17</height>
     </rect>
@@ -61,11 +74,48 @@
     <string>Grids</string>
    </property>
   </widget>
+  <widget class="pqSelectionTreeWidget" name="Variables" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>150</y>
+     <width>247</width>
+     <height>198</height>
+    </rect>
+   </property>
+   <property name="sizePolicy" >
+    <sizepolicy>
+     <hsizetype>13</hsizetype>
+     <vsizetype>3</vsizetype>
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize" >
+    <size>
+     <width>0</width>
+     <height>10</height>
+    </size>
+   </property>
+   <property name="rootIsDecorated" >
+    <bool>false</bool>
+   </property>
+   <column>
+    <property name="text" >
+     <string>Variables</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Range(s)</string>
+    </property>
+   </column>
+  </widget>
   <widget class="QWidget" name="layoutWidget" >
    <property name="geometry" >
     <rect>
      <x>10</x>
-     <y>380</y>
+     <y>360</y>
      <width>247</width>
      <height>31</height>
     </rect>
@@ -95,66 +145,11 @@
     </item>
    </layout>
   </widget>
-  <widget class="QListWidget" name="GridNames" >
-   <property name="geometry" >
-    <rect>
-     <x>9</x>
-     <y>66</y>
-     <width>247</width>
-     <height>100</height>
-    </rect>
-   </property>
-   <property name="selectionMode" >
-    <enum>QAbstractItemView::MultiSelection</enum>
-   </property>
-  </widget>
-  <widget class="pqSelectionTreeWidget" name="Variables" >
-   <property name="geometry" >
-    <rect>
-     <x>9</x>
-     <y>175</y>
-     <width>247</width>
-     <height>198</height>
-    </rect>
-   </property>
-   <property name="minimumSize" >
-    <size>
-     <width>0</width>
-     <height>100</height>
-    </size>
-   </property>
-   <property name="rootIsDecorated" >
-    <bool>false</bool>
-   </property>
-   <column>
-    <property name="text" >
-     <string>Variables</string>
-    </property>
-   </column>
-   <column>
-    <property name="text" >
-     <string>Range(s)</string>
-    </property>
-   </column>
-  </widget>
-  <widget class="QLabel" name="Parameters_label" >
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>420</y>
-     <width>247</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text" >
-    <string>Parameters</string>
-   </property>
-  </widget>
   <widget class="QTableWidget" name="Parameters" >
    <property name="geometry" >
     <rect>
      <x>10</x>
-     <y>440</y>
+     <y>420</y>
      <width>251</width>
      <height>151</height>
     </rect>
@@ -168,6 +163,19 @@
    <column/>
    <column/>
    <column/>
+  </widget>
+  <widget class="QLabel" name="Parameters_label" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>403</y>
+     <width>247</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Parameters</string>
+   </property>
   </widget>
  </widget>
  <customwidgets>

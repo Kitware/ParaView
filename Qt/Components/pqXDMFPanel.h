@@ -75,7 +75,10 @@ protected:
 
   // fill the parameters part of the GUI
   void PopulateParameterWidget();
- 
+
+  // overridden to make domain and grid choices const after 1st selection
+  virtual void accept();
+
   class pqUI;
   pqUI* UI;
 
@@ -88,7 +91,8 @@ protected slots:
 private:
   QList<pqXDMFPanelArrayRecord> ArrayList;
   QListWidgetItem *LastGridDeselected;
-  int NeedsResetGrid;
+  bool NeedsResetGrid;
+  bool FirstAcceptHappened;
 };
 
 // make this panel available to the object inspector

@@ -120,8 +120,8 @@ pqXDMFPanel::pqXDMFPanel(pqProxy* object_proxy, QWidget* p) :
   this->UI = new pqUI(this);
   this->UI->setupUi(this);
   this->LastGridDeselected = NULL;
-  this->NeedsResetGrid = 0;
-      
+  this->NeedsResetGrid = false;
+  this->FirstAcceptHappened = false;
   this->linkServerManagerProperties();
 }
 
@@ -131,6 +131,23 @@ pqXDMFPanel::~pqXDMFPanel()
   this->ArrayList.clear();
 }
 
+//----------------------------------------------------------------------------
+void pqXDMFPanel::accept()
+{
+  pqNamedObjectPanel::accept();
+  if (!this->FirstAcceptHappened)
+    {
+    //when the change later on the number of output ports of the server side
+    //object changes. If we can make paraview OK with that, then we should
+    //take this out and let the user change it dynamically.
+    QComboBox* domainWidget = this->UI->DomainNames;
+    domainWidget->setEnabled(false);
+    QListWidget* gridsWidget = this->UI->GridNames;
+    gridsWidget->setEnabled(false);
+    gridsWidget->adjustSize();
+    }
+  this->FirstAcceptHappened = true;
+}
 //----------------------------------------------------------------------------
 void pqXDMFPanel::linkServerManagerProperties()
 {
@@ -498,7 +515,7 @@ void pqXDMFPanel::RecordLastSelectedGrid(QListWidgetItem *grid)
   if (this->NeedsResetGrid)
     {
     this->UI->GridNames->setItemSelected(grid, true);    
-    this->NeedsResetGrid = 0;
+    this->NeedsResetGrid = false;
     }
 }
 
@@ -511,7 +528,7 @@ void pqXDMFPanel::SetSelectedGrids()
     {
     if (this->LastGridDeselected != NULL)
       {
-      this->NeedsResetGrid = 1;
+      this->NeedsResetGrid = true;
       }
     qWarning("At least one grid must be enabled.");
     return;
