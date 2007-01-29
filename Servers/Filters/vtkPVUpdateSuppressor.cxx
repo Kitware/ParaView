@@ -31,7 +31,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.43");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.44");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -50,8 +50,13 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 
   this->SaveCacheOnCacheUpdate = 1;
   this->CacheSizeKeeper = 0;
-  this->SetCacheSizeKeeper(
-    vtkProcessModule::GetProcessModule()->GetCacheSizeKeeper());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  if (pm)
+    {
+    this->SetCacheSizeKeeper(
+      vtkProcessModule::GetProcessModule()->GetCacheSizeKeeper());
+    }
 }
 
 //----------------------------------------------------------------------------
