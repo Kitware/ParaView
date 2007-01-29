@@ -55,7 +55,7 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.64");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.65");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -294,7 +294,7 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->RenderWindowProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->InteractorProxy->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+    vtkProcessModule::CLIENT); // | vtkProcessModule::RENDER_SERVER);
   this->LightKitProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->LightProxy->SetServers(
