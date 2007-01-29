@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QListWidget>
 #include <QTableWidget>
+#include <QSignalMapper>
 
 // VTK includes
 
@@ -421,7 +422,9 @@ void pqXDMFPanel::PopulateParameterWidget()
     paramsContainer->hide();
     return;
     }
+
   //add a control for each paramter to the panel
+  QSignalMapper* sm = new QSignalMapper(paramsContainer);
   QTableWidgetItem *item;
   item = new QTableWidgetItem("Min");
   paramsContainer->setHorizontalHeaderItem(0,item);
@@ -464,26 +467,13 @@ void pqXDMFPanel::PopulateParameterWidget()
     valBox->setValue(val);
     paramsContainer->setCellWidget(row,1,valBox);    
 
-    //how to pass the calling object and the name/value pair to the slot?
-    //when this is changed slot has to get name, value and the row number
-    //then it has to set in the SetParameterProperty element 2*row to be name
-    //and 2*row+1 to be value
-    //if i just get the row and the value in the callback I can set it
-
     QObject::connect(valBox, SIGNAL(valueChanged(int)), 
-                     this, SLOT(SetCellValue(int)));
-
-    
-    //QObject::connect(paramsContainer, SIGNAL(cellClicked(int, int)), 
-    //                 this, SLOT(SetCellValue(int, int)));
-    /*
-    this->propertyManager()->registerLink(valBox, 
-                                          "changed", 
-                                          SIGNAL(valueChanged(int)),
-                                          this->proxy()->getProxy(), 
-                                          SetParameterProperty, row);
-    */
+                     sm, SLOT(map()));
+    sm->setMapping(valBox, i);
     }
+
+  QObject::connect(sm, SIGNAL(mapped(int)),
+                   this, SLOT(SetCellValue(int)));
 
   paramsContainer->resizeColumnsToContents();
 }
@@ -563,15 +553,11 @@ void pqXDMFPanel::SetSelectedGrids()
 }
   
 //---------------------------------------------------------------------------
-void pqXDMFPanel::SetCellValue(int newval)
+void pqXDMFPanel::SetCellValue(int row)
 {
   QTableWidget* paramsContainer = this->UI->Parameters;
-  int row = paramsContainer->currentRow();
-  if (row < 0) 
-    {
-    cerr << "warning assuming first parameter" << endl;
-    row = 0;
-    }
+  QSpinBox *widget = (QSpinBox*)paramsContainer->cellWidget(row,1);
+  int value = widget->value();
 
   vtkSMStringVectorProperty* SetParameterProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
@@ -582,7 +568,7 @@ void pqXDMFPanel::SetCellValue(int newval)
       this->proxy()->getProxy()->GetProperty("ParametersInfo"));
 
   char valS[20];
-  sprintf(valS, "%d", newval);
+  sprintf(valS, "%d", value);
   int numRows = ((int)GetParameterProperty->GetNumberOfElements())/5;
   for (int i = 0; i < numRows; i++)
     {
