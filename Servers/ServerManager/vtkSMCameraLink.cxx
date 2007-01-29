@@ -25,7 +25,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.3");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.4");
 
 //---------------------------------------------------------------------------
 struct vtkSMCameraLinkInternals
@@ -41,19 +41,26 @@ struct vtkSMCameraLinkInternals
     }
   struct LinkedCamera
   {
-    LinkedCamera(vtkSMProxy* proxy) : 
+    LinkedCamera(vtkSMProxy* proxy, vtkSMCameraLink* camLink) : 
       Proxy(proxy)
       {
       this->Observer = vtkSmartPointer<vtkCallbackCommand>::New();
+      this->Observer->SetClientData(camLink);
+      this->Observer->SetCallback(vtkSMCameraLinkInternals::UpdateViewCallback);
+      proxy->AddObserver(vtkCommand::EndEvent, this->Observer);
       };
     ~LinkedCamera()
       {
+      this->Proxy->RemoveObserver(this->Observer);
       }
     vtkSmartPointer<vtkSMProxy> Proxy;
     vtkSmartPointer<vtkCallbackCommand> Observer;
+
+    LinkedCamera(const LinkedCamera&);
+    LinkedCamera& operator=(const LinkedCamera&);
   };
 
-  typedef vtkstd::list<LinkedCamera> LinkedProxiesType;
+  typedef vtkstd::list<LinkedCamera*> LinkedProxiesType;
   LinkedProxiesType LinkedProxies;
 
   bool Updating;
@@ -63,6 +70,14 @@ struct vtkSMCameraLinkInternals
   vtkSMCameraLinkInternals()
     {
     this->Updating = false;
+    }
+  ~vtkSMCameraLinkInternals()
+    {
+    LinkedProxiesType::iterator iter;
+    for(iter = this->LinkedProxies.begin(); iter != LinkedProxies.end(); ++iter)
+      {
+      delete *iter;
+      }
     }
 };
 
@@ -97,12 +112,7 @@ void vtkSMCameraLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
     if(updateDir == vtkSMLink::INPUT)
       {
       this->Internals->LinkedProxies.push_back(
-        vtkSMCameraLinkInternals::LinkedCamera(proxy));
-      vtkCallbackCommand* callback = 
-        this->Internals->LinkedProxies.back().Observer;
-      callback->SetClientData(this);
-      callback->SetCallback(vtkSMCameraLinkInternals::UpdateViewCallback);
-      proxy->AddObserver(vtkCommand::EndEvent, callback);
+        new vtkSMCameraLinkInternals::LinkedCamera(proxy, this));
       }
     }
 }
@@ -117,8 +127,9 @@ void vtkSMCameraLink::RemoveLinkedProxy(vtkSMProxy* proxy)
       iter != this->Internals->LinkedProxies.end();
       ++iter)
     {
-    if(iter->Proxy == proxy)
+    if((*iter)->Proxy == proxy)
       {
+      delete *iter;
       this->Internals->LinkedProxies.erase(iter);
       break;
       }
