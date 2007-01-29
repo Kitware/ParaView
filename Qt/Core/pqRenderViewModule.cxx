@@ -55,13 +55,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QtDebug>
 #include <QEvent>
+#include <QMouseEvent>
+#include <QMenu>
 #include <QSet>
 
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqRenderViewProxy.h"
 #include "pqServer.h"
-#include "pqSetName.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqTimeKeeper.h"
@@ -126,6 +127,7 @@ class pqRenderViewModuleInternal
 {
 public:
   QPointer<QVTKWidget> Viewport;
+  QPoint MouseOrigin;
   vtkSmartPointer<pqRenderViewProxy> RenderViewProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   vtkSmartPointer<vtkSMRenderModuleProxy> RenderModuleProxy;
@@ -166,8 +168,12 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   this->Internal->RenderModuleProxy = renModule;
   this->Internal->UndoStack->setActiveServer(this->getServer());
 
-  this->Internal->Viewport = new QVTKWidget() 
-    << pqSetName("Viewport");
+  this->Internal->Viewport = new QVTKWidget();
+  this->Internal->Viewport->setObjectName("Viewport");
+  // we manage the context menu ourself, so it doesn't interfere with
+  // render window interactions
+  this->Internal->Viewport->setContextMenuPolicy(Qt::NoContextMenu);
+
   // do image caching for performance
   //this->Internal->Viewport->setAutomaticImageCacheEnabled(true);
   RenderModules.insert(this);
@@ -989,8 +995,47 @@ bool pqRenderViewModule::eventFilter(QObject* caller, QEvent* e)
     {
     UpdateServerViews(this);
     }
+
+  if(e->type() == QEvent::MouseButtonPress)
+    {
+    QMouseEvent* me = static_cast<QMouseEvent*>(e);
+    if(me->button() & Qt::RightButton)
+      {
+      this->Internal->MouseOrigin = me->pos();
+      }
+    }
+  else if(e->type() == QEvent::MouseButtonRelease)
+    {
+    QMouseEvent* me = static_cast<QMouseEvent*>(e);
+    if(me->button() & Qt::RightButton)
+      {
+      QPoint newPos = static_cast<QMouseEvent*>(e)->pos();
+      QPoint delta = newPos - this->Internal->MouseOrigin;
+      if(delta.manhattanLength() < 3)
+        {
+        QList<QAction*> actions = this->Internal->Viewport->actions();
+        if(!actions.isEmpty())
+          {
+          QMenu* menu = new QMenu(this->Internal->Viewport);
+          menu->setAttribute(Qt::WA_DeleteOnClose);
+          menu->addActions(actions);
+          menu->popup(this->Internal->Viewport->mapToGlobal(newPos));
+          }
+        }
+      }
+    }
   
   return QObject::eventFilter(caller, e);
+}
+
+void pqRenderViewModule::addMenuAction(QAction* a)
+{
+  this->Internal->Viewport->addAction(a);
+}
+
+void pqRenderViewModule::removeMenuAction(QAction* a)
+{
+  this->Internal->Viewport->removeAction(a);
 }
 
 void pqRenderViewModule::restoreDefaultLightSettings()

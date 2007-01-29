@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqRenderViewModuleInternal;
 class pqUndoStack;
 class QVTKWidget;
+class QAction;
 class vtkInteractorStyle;
 class vtkSMRenderModuleProxy;
 class vtkObject;
@@ -127,6 +128,11 @@ public:
 
   /// Get the current center of rotation.
   void getCenterOfRotation(double center[3]) const;
+
+  /// add an action for a context menu
+  void addMenuAction(QAction* a);
+  /// remove an action for a context menu
+  void removeMenuAction(QAction* a);
 
 public slots:
   // Toggle the orientation axes visibility.
