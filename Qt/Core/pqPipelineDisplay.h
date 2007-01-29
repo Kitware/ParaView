@@ -127,6 +127,9 @@ public slots:
   // "lock" on scalar range.
   void updateLookupTableScalarRange();
 
+protected slots:
+  void deferredSetDefaults();
+
 private:
   pqPipelineDisplayInternal *Internal; 
   static void getColorArray(

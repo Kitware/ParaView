@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
+#include "pqRenderViewModule.h"
 
 
 class pqPendingDisplayManager::MyInternal
@@ -115,6 +116,8 @@ void pqPendingDisplayManager::createPendingDisplays(pqGenericViewModule* view)
     {
     return;
     }
+
+  pqRenderViewModule* renModule = qobject_cast<pqRenderViewModule*>(view);
   pqPipelineBuilder* pb = pqApplicationCore::instance()->getPipelineBuilder();
   foreach (pqPipelineSource* source, this->Internal->SourcesSansDisplays)
     {
@@ -123,6 +126,12 @@ void pqPendingDisplayManager::createPendingDisplays(pqGenericViewModule* view)
       continue;
       }
     pb->createDisplay(source, view);
+    if (renModule && renModule->getDisplayCount() == 1)
+      {
+      renModule->resetCamera();
+      renModule->resetCenterOfRotation();
+      }
+
     pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
     if (filter && filter->replaceInput())
       {

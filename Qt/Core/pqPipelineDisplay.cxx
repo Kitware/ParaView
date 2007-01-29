@@ -37,12 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // ParaView Server Manager includes.
+#include "vtkEventQtSlotConnect.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkSmartPointer.h" 
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkCommand.h"
 
 // Qt includes.
 #include <QList>
@@ -67,7 +69,14 @@ class pqPipelineDisplayInternal
 {
 public:
   vtkSmartPointer<vtkSMDataObjectDisplayProxy> DisplayProxy;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  bool DefaultsInitialized;
 
+  pqPipelineDisplayInternal()
+    {
+    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    this->DefaultsInitialized = false;
+    }
   // Convenience method to get array information.
   vtkPVArrayInformation* getArrayInformation(
     const char* arrayname, int fieldType)
@@ -130,7 +139,24 @@ void pqPipelineDisplay::setDefaults()
     {
     return;
     }
+  this->Internal->VTKConnect->Connect(displayProxy,
+    vtkCommand::UserEvent, this, SLOT(deferredSetDefaults()));
+}
 
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::deferredSetDefaults()
+{
+  if (this->Internal->DefaultsInitialized)
+    {
+    return;
+    }
+
+  vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
+  if (!displayProxy)
+    {
+    return;
+    }
+  this->Internal->DefaultsInitialized = true;
   // if the source created a new point scalar, use it
   // else if the source created a new cell scalar, use it
   // else if the input color by array exists in this source, use it

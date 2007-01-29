@@ -296,14 +296,6 @@ pqConsumerDisplay* pqPipelineBuilder::createDisplay(pqPipelineSource* src,
   pqConsumerDisplay* display = 
     this->createDisplayProxyInternal(src , viewModule);
 
-  pqRenderViewModule* renModule = 
-    qobject_cast<pqRenderViewModule*>(viewModule);
-  if (renModule && renModule->getDisplayCount() == 1)
-    {
-    renModule->resetCamera();
-    renModule->resetCenterOfRotation();
-    }
-
   if (this->UndoStack)
     {
     this->UndoStack->EndUndoSet();
