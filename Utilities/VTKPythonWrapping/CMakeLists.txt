@@ -142,7 +142,6 @@ ${VTK_SOURCE_DIR}/Common/vtkMath.cxx
 ${VTK_SOURCE_DIR}/Common/vtkMatrix4x4.cxx
 ${VTK_SOURCE_DIR}/Common/vtkMatrixToHomogeneousTransform.cxx
 ${VTK_SOURCE_DIR}/Common/vtkMatrixToLinearTransform.cxx
-${VTK_SOURCE_DIR}/Common/vtkMultiPartExtentTranslator.cxx
 ${VTK_SOURCE_DIR}/Common/vtkMultiThreader.cxx
 ${VTK_SOURCE_DIR}/Common/vtkMutexLock.cxx
 ${VTK_SOURCE_DIR}/Common/vtkOStrStreamWrapper.cxx

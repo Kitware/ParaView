@@ -29,7 +29,6 @@ SET(Filters_SRCS
   vtkDesktopDeliveryServer.cxx
   vtkExtractBlockFromSelection.cxx
   vtkExtractHistogram.cxx
-  vtkExtractHistogramExtentTranslator.cxx
   vtkExtractScatterPlot.cxx
 #  vtkGroup.cxx
   vtkHDF5RawImageReader.cxx
