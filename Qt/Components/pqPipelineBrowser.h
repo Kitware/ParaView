@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include <QWidget>
+#include <QModelIndex> // Needed for typedef
 
 class pqPipelineBrowserInternal;
 class pqPipelineBrowserStateManager;
@@ -54,10 +55,8 @@ class pqSourceInfoGroupMap;
 class pqSourceInfoIcons;
 class pqSourceInfoModel;
 class QItemSelectionModel;
-class QModelIndex;
 class QStringList;
 class vtkPVXMLElement;
-class vtkSMProxy;
 
 // This is the pipeline browser widget. It creates the pqPipelineModel
 // and the pqFlatTreeView. pqPipelineModel observes events from the
@@ -134,8 +133,8 @@ private slots:
 private:
   pqSourceInfoModel *getFilterModel();
   void setupConnections(pqSourceInfoModel *model, pqSourceInfoGroupMap *map);
-  void getAllowedSources(pqSourceInfoModel *model, vtkSMProxy *input,
-      QStringList &list);
+  void getAllowedSources(pqSourceInfoModel *model,
+      const QModelIndexList &indexes, QStringList &list);
 
 private:
   pqPipelineBrowserInternal *Internal; ///< Stores the class data.

@@ -141,13 +141,22 @@ void pqPipelineMenu::updateActions()
   bool enabled = true;
   if(this->MenuList[pqPipelineMenu::AddFilterAction] != 0)
     {
-    // TODO: Allow for multi-input filters.
-    enabled = indexes.size() == 1;
+    // Allow for multi-input filters.
+    enabled = indexes.size() >= 1;
     if(enabled)
       {
-      pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(
-          this->Model->getItemFor(indexes.first()));
-      enabled = source != 0;
+      pqPipelineSource *source = 0;
+      QModelIndexList::Iterator index = indexes.begin();
+      for( ; index != indexes.end(); ++index)
+        {
+        source = dynamic_cast<pqPipelineSource *>(
+            this->Model->getItemFor(*index));
+        if(!source)
+          {
+          enabled = false;
+          break;
+          }
+        }
       }
 
     this->MenuList[pqPipelineMenu::AddFilterAction]->setEnabled(enabled);

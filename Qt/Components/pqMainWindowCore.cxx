@@ -119,6 +119,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSmartPointer.h>
 #include <vtkSMDoubleRangeDomain.h>
 #include <vtkSMDoubleVectorProperty.h>
+#include <vtkSMInputProperty.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMProxyProperty.h>
@@ -1989,7 +1990,7 @@ void pqMainWindowCore::onSelectionChanged()
   // Update the filters menu.
   if(!pendingDisplays)
     {
-    this->updateFiltersMenu(source);
+    this->updateFiltersMenu();
     }
 
   // Update the multi-view and undo stack.
@@ -2290,78 +2291,112 @@ void pqMainWindowCore::onSourceCreation(pqPipelineSource *source)
 void pqMainWindowCore::onPostAccept()
 {
   this->Implementation->GenericViewManager->renderAllViews();
-  this->updateFiltersMenu(this->getActiveSource());
+  this->updateFiltersMenu();
 
   emit this->postAccept();
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::updateFiltersMenu(pqPipelineSource* source)
+void pqMainWindowCore::updateFiltersMenu()
 {
   QMenu* const menu = this->Implementation->FilterMenu;
   if(!menu)
     {
     return;
     }
- 
-  // Iterate over all filters in the menu and see if they are
-  // applicable to the current source.
-  vtkSMProxy* input = (source)? source->getProxy() : NULL;
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
-  if (!input)
+  // Get the list of selected sources. Make sure the list contains
+  // only valid sources.
+  const pqServerManagerSelection *selected =
+      pqApplicationCore::instance()->getSelectionModel()->selectedItems();
+  if(selected->size() == 0)
     {
+    // Filters need an input to be created.
     menu->setEnabled(false);
     return;
     }
 
-  QList<QString> supportedFilters;
+  pqPipelineSource *source = 0;
+  pqServerManagerModelItem *item = 0;
+  pqServerManagerSelection::ConstIterator iter = selected->begin();
+  for( ; iter != selected->end(); ++iter)
+    {
+    item = *iter;
+    pqServer *server = dynamic_cast<pqServer *>(item);
+    if(server)
+      {
+      // A server is not a valid input.
+      menu->setEnabled(false);
+      return;
+      }
 
+    source = dynamic_cast<pqPipelineSource *>(item);
+    if(!source || !source->getProxy())
+      {
+      // Unsupported/unknown input type or missing proxy.
+      menu->setEnabled(false);
+      return;
+      }
+    }
+ 
+  vtkSMProxy* input = (source)? source->getProxy() : NULL;
+
+  // Get the list of available filters.
+  QList<QString> supportedFilters;
   pqApplicationCore::instance()->getPipelineBuilder()->
     getSupportedProxies("filters", source->getServer(), supportedFilters);
 
-
-  QList<QAction*> menu_actions = menu->findChildren<QAction*>();
+  // Iterate over all filters in the menu and see if they can be
+  // applied to the current source(s).
   bool some_enabled = false;
-  foreach(QAction* action, menu_actions)
+  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  QList<QAction *> menu_actions = menu->findChildren<QAction *>();
+  QList<QAction *>::Iterator action = menu_actions.begin();
+  for( ; action != menu_actions.end(); ++action)
     {
-    if (!input)
-      {
-      action->setEnabled(false);
-      continue;
-      }
-    QString filterName = action->data().toString();
+    QString filterName = (*action)->data().toString();
     if (filterName.isEmpty())
       {
       continue;
       }
+
+    (*action)->setEnabled(false);
     if (!supportedFilters.contains(filterName))
       {
       // skip filters not supported by the server.
-      action->setEnabled(false);
       continue;
       }
-    vtkSMProxy* output = pxm->GetProxy("filters_prototypes",
+
+    vtkSMProxy* output = proxyManager->GetProxy("filters_prototypes",
       filterName.toAscii().data());
     if (!output)
       {
-      action->setEnabled(false);
       continue;
       }
-    vtkSMProxyProperty* smproperty = vtkSMProxyProperty::SafeDownCast(
+
+    vtkSMInputProperty *input = vtkSMInputProperty::SafeDownCast(
       output->GetProperty("Input"));
-    if (smproperty)
+    if(input)
       {
-      smproperty->RemoveAllUncheckedProxies();
-      smproperty->AddUncheckedProxy(input);
-      if (smproperty->IsInDomains())
+      if(!input->GetMultipleInput() && selected->size() > 1)
         {
-        action->setEnabled(true);
-        some_enabled = true;
         continue;
         }
+
+      input->RemoveAllUncheckedProxies();
+      for(iter = selected->begin(); iter != selected->end(); ++iter)
+        {
+        item = *iter;
+        source = dynamic_cast<pqPipelineSource *>(item);
+        input->AddUncheckedProxy(source->getProxy());
+        }
+
+      if(input->IsInDomains())
+        {
+        (*action)->setEnabled(true);
+        some_enabled = true;
+        }
       }
-    action->setEnabled(false);
     }
 
   menu->setEnabled(some_enabled);
@@ -2427,8 +2462,31 @@ pqPipelineSource* pqMainWindowCore::createSourceOnActiveServer(
 pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
   const QString& xmlname)
 {
+  // Get the list of selected sources.
   pqApplicationCore* core = pqApplicationCore::instance();
-  return core->createFilterForSource(xmlname, this->getActiveSource());
+  pqServerManagerSelection selected =
+      *core->getSelectionModel()->selectedItems();
+  pqPipelineSource* source = 0;
+  pqPipelineSource* filter = 0;
+  pqServerManagerModelItem* item = 0;
+  pqServerManagerSelection::ConstIterator iter = selected.begin();
+  if(iter != selected.end())
+    {
+    item = *iter;
+    source = dynamic_cast<pqPipelineSource*>(item);
+    filter = core->createFilterForSource(xmlname, source);
+    ++iter;
+    }
+
+  pqPipelineBuilder* builder = core->getPipelineBuilder();
+  for( ; filter && iter != selected.end(); ++iter)
+    {
+    item = *iter;
+    source = dynamic_cast<pqPipelineSource*>(item);
+    builder->addConnection(source, filter);
+    }
+
+  return filter;
 }
 
 //-----------------------------------------------------------------------------

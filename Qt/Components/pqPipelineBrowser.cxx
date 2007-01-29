@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
 
 
 class pqPipelineBrowserInternal
@@ -260,17 +260,9 @@ void pqPipelineBrowser::addSource()
 
 void pqPipelineBrowser::addFilter()
 {
-  // Get the source input from the browser's selection model.
+  // Get the source input(s) from the browser's selection model.
   QModelIndexList indexes = this->getSelectionModel()->selectedIndexes();
-  if(indexes.size() != 1)
-    {
-    // TODO: Add support for multi-input filters like append.
-    return;
-    }
-
-  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(
-      this->Model->getItemFor(indexes.first()));
-  if(!source)
+  if(indexes.size() < 1)
     {
     return;
     }
@@ -280,9 +272,9 @@ void pqPipelineBrowser::addFilter()
 
   // Use a proxy model to display only the allowed filters.
   QStringList allowed;
+  this->getAllowedSources(model, indexes, allowed);
   pqSourceInfoFilterModel *filter = new pqSourceInfoFilterModel(this);
   filter->setSourceModel(model);
-  this->getAllowedSources(model, source->getProxy(), allowed);
   filter->setAllowedNames(allowed);
 
   pqSourceInfoFilterModel *history = new pqSourceInfoFilterModel(this);
@@ -309,8 +301,27 @@ void pqPipelineBrowser::addFilter()
     this->FilterHistory->addRecentSource(filterName);
 
     // Create the filter.
-    if(!pqApplicationCore::instance()->createFilterForSource(filterName,
-        source))
+    pqPipelineSource *source = 0;
+    pqPipelineSource *filter = 0;
+    QModelIndexList::Iterator index = indexes.begin();
+    pqApplicationCore *core = pqApplicationCore::instance();
+    if(index != indexes.end())
+      {
+      source = dynamic_cast<pqPipelineSource *>(
+          this->Model->getItemFor(*index));
+      filter = core->createFilterForSource(filterName, source);
+      ++index;
+      }
+
+    pqPipelineBuilder* builder = core->getPipelineBuilder();
+    for( ; filter && index != indexes.end(); ++index)
+      {
+      source = dynamic_cast<pqPipelineSource *>(
+          this->Model->getItemFor(*index));
+      builder->addConnection(source, filter);
+      }
+
+    if(!filter)
       {
       qCritical() << "Filter could not be created.";
       }
@@ -504,9 +515,9 @@ void pqPipelineBrowser::setupConnections(pqSourceInfoModel *model,
 }
 
 void pqPipelineBrowser::getAllowedSources(pqSourceInfoModel *model,
-    vtkSMProxy *input, QStringList &list)
+    const QModelIndexList &indexes, QStringList &list)
 {
-  if(!input || !model)
+  if(!model || indexes.size() == 0)
     {
     return;
     }
@@ -519,10 +530,28 @@ void pqPipelineBrowser::getAllowedSources(pqSourceInfoModel *model,
     return;
     }
 
+  // Convert the list of indexes to a list of sources.
+  QList<pqPipelineSource *> sources;
+  QModelIndexList::ConstIterator index = indexes.begin();
+  for( ; index != indexes.end(); ++index)
+    {
+    pqPipelineSource *item = dynamic_cast<pqPipelineSource *>(
+        this->Model->getItemFor(*index));
+    if(item)
+      {
+      sources.append(item);
+      }
+    }
+
+  if(sources.size() == 0)
+    {
+    return;
+    }
+
   // Loop through the list of filter prototypes to find the ones that
   // are compatible with the input.
   vtkSMProxy *prototype = 0;
-  vtkSMProxyProperty *prop = 0;
+  vtkSMInputProperty *prop = 0;
   vtkSMProxyManager *manager = vtkSMProxyManager::GetProxyManager();
   QStringList::Iterator iter = available.begin();
   for( ; iter != available.end(); ++iter)
@@ -531,12 +560,21 @@ void pqPipelineBrowser::getAllowedSources(pqSourceInfoModel *model,
         (*iter).toAscii().data());
     if(prototype)
       {
-      prop = vtkSMProxyProperty::SafeDownCast(
-          prototype->GetProperty("Input"));
+      prop = vtkSMInputProperty::SafeDownCast(prototype->GetProperty("Input"));
       if(prop)
         {
+        if(sources.size() > 1 && !prop->GetMultipleInput())
+          {
+          continue;
+          }
+
         prop->RemoveAllUncheckedProxies();
-        prop->AddUncheckedProxy(input);
+        QList<pqPipelineSource *>::Iterator source = sources.begin();
+        for( ; source != sources.end(); ++source)
+          {
+          prop->AddUncheckedProxy((*source)->getProxy());
+          }
+
         if(prop->IsInDomains())
           {
           list.append(*iter);

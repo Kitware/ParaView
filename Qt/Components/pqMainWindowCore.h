@@ -328,8 +328,7 @@ private slots:
 
   void onPostAccept();
 
-  // enable/disable filters as per the source.
-  void updateFiltersMenu(pqPipelineSource* source);
+  void updateFiltersMenu();
   
   void updateRecentFilterMenu(QAction* action);
 private:
