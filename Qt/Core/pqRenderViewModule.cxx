@@ -352,20 +352,31 @@ void pqRenderViewModule::viewModuleInit()
     }
   else
     {
-    // If we got here, this render module was created and initialized from state, so just grab its interactor style and use it as our own
+    // If we got here, this render module was created and initialized from state
+
     vtkSMProxyProperty *iStyle = vtkSMProxyProperty::SafeDownCast(this->Internal->RenderModuleProxy->GetProperty("InteractorStyle"));
-    this->Internal->InteractorStyleProxy = iStyle->GetProxy(0);
+
+    // if the state is an older version, then it may not support interactor style proxies, thus the following conditional 
+    //     (and all subsequent conditionals in this class that make sure the interactor style proxy objct is valid)
+    if(iStyle->GetNumberOfProxies() > 0)
+      {
+      // Just grab its interactor style and use it as our own
+      this->Internal->InteractorStyleProxy = iStyle->GetProxy(0);
+      }
     }
 
+  if(this->Internal->InteractorStyleProxy)
+    {
+    vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
+    vtkInteractorStyle *style = vtkInteractorStyle::SafeDownCast(pvm->GetObjectFromID(this->Internal->InteractorStyleProxy->GetID(0)));
+    this->Internal->VTKConnect->Connect(style,
+      vtkCommand::StartInteractionEvent, 
+      this, SLOT(startInteraction()));
+    this->Internal->VTKConnect->Connect(style,
+      vtkCommand::EndInteractionEvent, 
+      this, SLOT(endInteraction()));
+    }
 
-  vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
-  vtkInteractorStyle *style = vtkInteractorStyle::SafeDownCast(pvm->GetObjectFromID(this->Internal->InteractorStyleProxy->GetID(0)));
-  this->Internal->VTKConnect->Connect(style,
-    vtkCommand::StartInteractionEvent, 
-    this, SLOT(startInteraction()));
-  this->Internal->VTKConnect->Connect(style,
-    vtkCommand::EndInteractionEvent, 
-    this, SLOT(endInteraction()));
   this->Internal->VTKConnect->Connect(
     this->Internal->RenderModuleProxy,
     vtkCommand::StartEvent, this, SLOT(onStartEvent()));
@@ -390,6 +401,11 @@ void pqRenderViewModule::viewModuleInit()
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::updateInteractorStyleFromState()
 {
+  if(!this->Internal->InteractorStyleProxy)
+    {
+    return;
+    }
+
   vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
   vtkInteractorStyle *currentStyle = vtkInteractorStyle::SafeDownCast(pvm->GetObjectFromID(this->Internal->InteractorStyleProxy->GetID(0)));
   vtkInteractorStyle *newStyle = vtkInteractorStyle::SafeDownCast(this->Internal->RenderModuleProxy->GetInteractor()->GetInteractorStyle());
@@ -864,6 +880,11 @@ QColor pqRenderViewModule::getOrientationAxesLabelColor() const
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::updateCenterAxes()
 {
+  if(!this->Internal->InteractorStyleProxy)
+    {
+    return;
+    }
+
   double center[3];
   QList<QVariant> val =
     pqSMAdaptor::getMultipleElementProperty(
@@ -898,6 +919,11 @@ void pqRenderViewModule::updateCenterAxes()
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::setCenterOfRotation(double x, double y, double z)
 {
+  if(!this->Internal->InteractorStyleProxy)
+    {
+    return;
+    }
+
   vtkPVGenericRenderWindowInteractor* iren =
     vtkPVGenericRenderWindowInteractor::SafeDownCast(
       this->Internal->RenderModuleProxy->GetInteractor());
@@ -925,6 +951,11 @@ void pqRenderViewModule::setCenterOfRotation(double x, double y, double z)
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::getCenterOfRotation(double center[3]) const
 {
+  if(!this->Internal->InteractorStyleProxy)
+    {
+    return;
+    }
+
   QList<QVariant> val =
     pqSMAdaptor::getMultipleElementProperty(
       this->Internal->InteractorStyleProxy->GetProperty("CenterOfRotation"));
