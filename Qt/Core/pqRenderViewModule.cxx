@@ -177,7 +177,7 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   this->Internal->CenterAxesProxy->SetConnectionID(
     this->Internal->RenderModuleProxy->GetConnectionID());
   this->Internal->CenterAxesProxy->SetServers(
-    vtkProcessModule::CLIENT); //|vtkProcessModule::RENDER_SERVER);
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   QList<QVariant> scaleValues;
   scaleValues << .25 << .25 << .25;
   pqSMAdaptor::setMultipleElementProperty(
@@ -269,7 +269,7 @@ void pqRenderViewModule::viewModuleInit()
     this->Internal->InteractorStyleProxy->SetConnectionID(
       this->Internal->RenderModuleProxy->GetConnectionID());
     this->Internal->InteractorStyleProxy->SetServers(
-      vtkProcessModule::CLIENT);
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     this->addInternalProxy("InteractorStyles",this->Internal->InteractorStyleProxy);
     vtkSMProperty *styleManips = this->Internal->InteractorStyleProxy->GetProperty("CameraManipulators");
   
@@ -282,7 +282,7 @@ void pqRenderViewModule::viewModuleInit()
       vtkSMProxy *manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballRotate");
       manip->SetConnectionID(
         this->Internal->RenderModuleProxy->GetConnectionID());
-      manip->SetServers(vtkProcessModule::CLIENT);
+      manip->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       this->addInternalProxy("CameraManipulators",manip);
       pqSMAdaptor::addProxyProperty(styleManips, manip);
       manip->Delete();
@@ -290,7 +290,7 @@ void pqRenderViewModule::viewModuleInit()
       manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballPan1");
       manip->SetConnectionID(
         this->Internal->RenderModuleProxy->GetConnectionID());
-      manip->SetServers(vtkProcessModule::CLIENT);
+      manip->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       vtkSMIntVectorProperty *button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
       button->SetElement(0,2);
       this->addInternalProxy("CameraManipulators",manip);
@@ -301,7 +301,7 @@ void pqRenderViewModule::viewModuleInit()
       manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballPan1");
       manip->SetConnectionID(
         this->Internal->RenderModuleProxy->GetConnectionID());
-      manip->SetServers(vtkProcessModule::CLIENT);
+      manip->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
       button->SetElement(0,1);
       button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Control"));
@@ -314,7 +314,7 @@ void pqRenderViewModule::viewModuleInit()
       manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballZoom");
       manip->SetConnectionID(
         this->Internal->RenderModuleProxy->GetConnectionID());
-      manip->SetServers(vtkProcessModule::CLIENT);
+      manip->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
       button->SetElement(0,3);
       this->addInternalProxy("CameraManipulators",manip);
@@ -325,7 +325,7 @@ void pqRenderViewModule::viewModuleInit()
       manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballZoom");
       manip->SetConnectionID(
         this->Internal->RenderModuleProxy->GetConnectionID());
-      manip->SetServers(vtkProcessModule::CLIENT);
+      manip->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
       button->SetElement(0,1);
       button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Shift"));
