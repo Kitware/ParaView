@@ -135,6 +135,32 @@
         <file>Icons/pqWindowd22.png</file>
         <file>Icons/pqWindowd32.png</file>
         <file>Icons/pqWindowh16.png</file>
+        <file>Icons/pvApply.png</file>
+        <file>Icons/pvBegin.png</file>
+        <file>Icons/pvCancel.png</file>
+        <file>Icons/pvConnect.png</file>
+        <file>Icons/pvDelete.png</file>
+        <file>Icons/pvDisconnect.png</file>
+        <file>Icons/pvEnd.png</file>
+        <file>Icons/pvHelp.png</file>
+        <file>Icons/pvNext.png</file>
+        <file>Icons/pvOpen.png</file>
+        <file>Icons/pvPause.png</file>
+        <file>Icons/pvPlay.png</file>
+        <file>Icons/pvPrevious.png</file>
+        <file>Icons/pvRedo.png</file>
+        <file>Icons/pvResetCamera.png</file>
+        <file>Icons/pvRotate.png</file>
+        <file>Icons/pvSave.png</file>
+        <file>Icons/pvScalarBar.png</file>
+        <file>Icons/pvSelect.png</file>
+        <file>Icons/pvUndo.png</file>
+        <file>Icons/pvXminus.png</file>15
+        <file>Icons/pvXplus.png</file>
+        <file>Icons/pvYminus.png</file>
+        <file>Icons/pvYplus.png</file>
+        <file>Icons/pvZminus.png</file>
+        <file>Icons/pvZplus.png</file>
         <file>UI/pqThresholdPanel.ui</file>
         <file>XML/ParaViewFilters.xml</file>
         <file>XML/ParaViewReaders.xml</file>

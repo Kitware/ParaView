@@ -424,7 +424,7 @@
   </widget>
   <action name="actionFileOpen" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqOpen22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvOpen.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Open</string>
@@ -454,7 +454,7 @@
   </action>
   <action name="actionHelpHelp" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqHelp22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvHelp.png</iconset>
    </property>
    <property name="text" >
     <string>Help</string>
@@ -468,7 +468,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqScalarBar22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvScalarBar.png</iconset>
    </property>
    <property name="text" >
     <string>Show Color Bar</string>
@@ -479,7 +479,7 @@
   </action>
   <action name="actionServerConnect" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqConnect22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvConnect.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Connect</string>
@@ -487,7 +487,7 @@
   </action>
   <action name="actionServerDisconnect" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqDisconnect22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvDisconnect.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Disconnect</string>
@@ -508,7 +508,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrBack22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvPrevious.png</iconset>
    </property>
    <property name="text" >
     <string>Pre&amp;vious Frame</string>
@@ -519,7 +519,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrFirst22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvBegin.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;First Frame</string>
@@ -530,7 +530,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrForward22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvNext.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Next Frame</string>
@@ -541,7 +541,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrLast22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvEnd.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Last Frame</string>
@@ -549,7 +549,7 @@
   </action>
   <action name="actionFileSaveData" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqFloppyDisk22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvSave.png</iconset>
    </property>
    <property name="text" >
     <string>Save Data</string>
@@ -590,7 +590,7 @@
     <bool>true</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqPointer22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvRotate.png</iconset>
    </property>
    <property name="text" >
     <string>Move Mode</string>
@@ -604,7 +604,7 @@
     <bool>true</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSelectPointer22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvSelect.png</iconset>
    </property>
    <property name="text" >
     <string>Selection Mode (s)</string>
@@ -621,7 +621,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqUndo22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvUndo.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Undo</string>
@@ -635,7 +635,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqRedo22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvRedo.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Redo</string>
@@ -701,7 +701,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrPlay22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvPlay.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Play</string>
@@ -712,7 +712,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrPause22.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvPause.png</iconset>
    </property>
    <property name="text" >
     <string>Pa&amp;use</string>
@@ -729,11 +729,11 @@
    </property>
   </action>
   <action name="actionResetCamera" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvResetCamera.png</iconset>
+   </property>
    <property name="enabled" >
     <bool>false</bool>
-   </property>
-   <property name="text" >
-    <string>R</string>
    </property>
    <property name="statusTip" >
     <string>Reset Camera</string>
@@ -743,6 +743,9 @@
    </property>
   </action>
   <action name="actionPositiveX" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvXplus.png</iconset>
+   </property>
    <property name="enabled" >
     <bool>false</bool>
    </property>
@@ -760,6 +763,9 @@
    </property>
   </action>
   <action name="actionNegativeX" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvXminus.png</iconset>
+   </property>
    <property name="enabled" >
     <bool>false</bool>
    </property>
@@ -777,6 +783,9 @@
    </property>
   </action>
   <action name="actionPositiveY" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvYplus.png</iconset>
+   </property>
    <property name="enabled" >
     <bool>false</bool>
    </property>
@@ -794,6 +803,9 @@
    </property>
   </action>
   <action name="actionNegativeY" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvYminus.png</iconset>
+   </property>
    <property name="enabled" >
     <bool>false</bool>
    </property>
@@ -811,6 +823,9 @@
    </property>
   </action>
   <action name="actionPositiveZ" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvZplus.png</iconset>
+   </property>
    <property name="enabled" >
     <bool>false</bool>
    </property>
@@ -828,6 +843,9 @@
    </property>
   </action>
   <action name="actionNegativeZ" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvZminus.png</iconset>
+   </property>
    <property name="enabled" >
     <bool>false</bool>
    </property>
@@ -942,7 +960,7 @@
   </action>
   <action name="actionDelete" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqDelete16.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pvDelete.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Delete</string>
