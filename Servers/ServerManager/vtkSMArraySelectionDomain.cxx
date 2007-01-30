@@ -18,7 +18,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArraySelectionDomain);
-vtkCxxRevisionMacro(vtkSMArraySelectionDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMArraySelectionDomain, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMArraySelectionDomain::vtkSMArraySelectionDomain()
@@ -57,13 +57,13 @@ void vtkSMArraySelectionDomain::Update(vtkSMProperty* prop)
 int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop)
 {
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
-  if(!svp || this->GetNumberOfRequiredProperties() == 0 ||
-     this->GetNumberOfStrings() == 0)
+  if(!svp || this->GetNumberOfRequiredProperties() == 0)
     {
     return this->Superclass::SetDefaultValues(prop);
     }
 
   // info property has default values
+  int numStrings = this->GetNumberOfStrings();
   vtkSMStringVectorProperty* isvp;
   isvp = vtkSMStringVectorProperty::SafeDownCast(prop->GetInformationProperty());
   if(isvp)
@@ -73,7 +73,10 @@ int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop)
       {
       svp->SetElement(i, isvp->GetElement(i));
       }
+    svp->SetNumberOfElements(numEls);
     }
+  
+  svp->SetNumberOfElements(numStrings * 2);
 
   return 1;
 }
