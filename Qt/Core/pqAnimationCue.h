@@ -66,6 +66,9 @@ public:
   // NULL otherwise.
   vtkSMProxy* getKeyFrame(int index) const;
 
+  // Returns the animated proxy, if any.
+  vtkSMProxy* getAnimatedProxy() const;
+
   // Returns the property that is animated by this cue, if any.
   vtkSMProperty* getAnimatedProperty() const;
 

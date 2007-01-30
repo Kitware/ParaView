@@ -32,7 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqScalarSetModel.h"
 
-#include <vtkstd/set>
+#include <QList>
+
 
 ////////////////////////////////////////////////////////////////////////////
 // pqScalarSetModel::pqImplementation
@@ -41,12 +42,14 @@ class pqScalarSetModel::pqImplementation
 {
 public:
   pqImplementation() :
+    PreserveOrder(false),
     Format('g'),
     Precision(3)
   {
   }
   
-  vtkstd::set<double> Values;
+  QList<double> Values;
+  bool PreserveOrder;
   char Format;
   int Precision;
 };
@@ -59,62 +62,97 @@ pqScalarSetModel::pqScalarSetModel() :
 {
 }
 
+//-----------------------------------------------------------------------------
 pqScalarSetModel::~pqScalarSetModel()
 {
   delete this->Implementation;
 }
 
+//-----------------------------------------------------------------------------
 void pqScalarSetModel::clear()
 {
   this->Implementation->Values.clear();
   emit layoutChanged();
 }
 
+//-----------------------------------------------------------------------------
 QModelIndex pqScalarSetModel::insert(double value)
 {
+  QModelIndex mindex;
+  if (this->Implementation->PreserveOrder)
+    {
+    this->Implementation->Values.append(value);
+    mindex = this->createIndex(this->Implementation->Values.size()-1, 0);
+    }
+  else
+    {
+    // if value is already contained, we don't add it.
+    int index = this->Implementation->Values.indexOf(value);
+    if (index == -1)
+      {
+      // insert at correct place.
+      for (int cc=0; cc < this->Implementation->Values.size(); cc++)
+        {
+        if (this->Implementation->Values[cc] > value)
+          {
+          index = cc;
+          this->Implementation->Values.insert(index, value);
+          break;
+          }
+        }
+      if (index == -1)
+        {
+        index = this->Implementation->Values.size();
+        this->Implementation->Values.append(value);
+        }
+      }
+    mindex = this->createIndex(index, 0);
+    }
+
+  /*
   vtkstd::pair<vtkstd::set<double>::iterator,bool> iter=this->Implementation->Values.insert(value);
   int idx=vtkstd::distance(this->Implementation->Values.begin(),iter.first);
   QModelIndex mindex=this->createIndex(idx,0);
+  */
   emit layoutChanged();
   return mindex;
 }
 
+//-----------------------------------------------------------------------------
 void pqScalarSetModel::erase(double value)
 {
-  this->Implementation->Values.erase(value);
+  this->Implementation->Values.removeAll(value);
   emit layoutChanged();
 }
 
+//-----------------------------------------------------------------------------
 void pqScalarSetModel::erase(int row)
 {
   if(row < 0 || row >= static_cast<int>(this->Implementation->Values.size()))
+    {
     return;
+    }
     
-  vtkstd::set<double>::iterator iterator = this->Implementation->Values.begin();
-  vtkstd::advance(iterator, row);
-  this->Implementation->Values.erase(iterator);
+  this->Implementation->Values.removeAt(row);
   emit layoutChanged();
 }
 
+//-----------------------------------------------------------------------------
 const QList<double> pqScalarSetModel::values()
 {
-  QList<double> results;
-  
-  vtkstd::copy(
-    this->Implementation->Values.begin(),
-    this->Implementation->Values.end(),
-    vtkstd::back_inserter(results));
-  
-  return results;
+  return this->Implementation->Values;
 }
 
+//-----------------------------------------------------------------------------
 void pqScalarSetModel::setFormat(char f, int precision)
 {
   this->Implementation->Format = f;
   this->Implementation->Precision = precision;
-  emit dataChanged(this->index(0), this->index(this->Implementation->Values.size() - 1));
+  emit dataChanged(this->index(0), 
+    this->index(this->Implementation->Values.size() - 1));
 }
 
+//-----------------------------------------------------------------------------
 QVariant pqScalarSetModel::data(const QModelIndex& i, int role) const
 {
   if(!i.isValid())
@@ -128,8 +166,8 @@ QVariant pqScalarSetModel::data(const QModelIndex& i, int role) const
     case Qt::EditRole:
     case Qt::DisplayRole:
       {
-      vtkstd::set<double>::iterator iterator = this->Implementation->Values.begin();
-      vtkstd::advance(iterator, i.row());
+      QList<double>::iterator iterator = this->Implementation->Values.begin();
+      iterator += i.row();
       return QString::number(
         *iterator, this->Implementation->Format, this->Implementation->Precision);
       }
@@ -138,16 +176,19 @@ QVariant pqScalarSetModel::data(const QModelIndex& i, int role) const
   return QVariant();
 }
 
+//-----------------------------------------------------------------------------
 Qt::ItemFlags pqScalarSetModel::flags(const QModelIndex& /*i*/) const
 {
   return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
+//-----------------------------------------------------------------------------
 int pqScalarSetModel::rowCount(const QModelIndex& /*parent*/) const
 {
   return Implementation->Values.size();
 }
 
+//-----------------------------------------------------------------------------
 bool pqScalarSetModel::setData(const QModelIndex& i, const QVariant& value, int role)
 {
   if(!i.isValid())
@@ -160,14 +201,30 @@ bool pqScalarSetModel::setData(const QModelIndex& i, const QVariant& value, int 
     {
     case Qt::EditRole:
       {
+      /*
       vtkstd::set<double>::iterator iterator = this->Implementation->Values.begin();
       vtkstd::advance(iterator, i.row());
       this->Implementation->Values.erase(iterator);
       this->Implementation->Values.insert(value.toDouble());
+      */
+      this->erase(i.row());
+      this->insert(value.toDouble());
       emit dataChanged(this->index(0), this->index(this->Implementation->Values.size() - 1));
       emit layoutChanged();
       }
     }
     
   return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarSetModel::setPreserveOrder(bool preserve)
+{
+  this->Implementation->PreserveOrder = preserve;
+}
+
+//-----------------------------------------------------------------------------
+bool pqScalarSetModel::preserveOrder() const
+{
+  return this->Implementation->PreserveOrder;
 }

@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pqSampleScalarWidget</class>
  <widget class="QWidget" name="pqSampleScalarWidget" >
   <property name="geometry" >
@@ -9,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>209</width>
-    <height>282</height>
+    <height>202</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -110,7 +107,6 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections/>
 </ui>

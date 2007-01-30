@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include <QObject>
+#include <QList>
+#include <QVariant>
 
 class vtkSMProxy;
 class pqAnimationCue;
@@ -48,10 +50,14 @@ class pqAnimationCue;
 class PQCOMPONENTS_EXPORT pqSignalAdaptorKeyFrameValue : public QObject
 {
   Q_OBJECT;
-  Q_PROPERTY(QString value READ value WRITE setValue);
+  Q_PROPERTY(QList<QVariant> values READ values WRITE setValue);
+  Q_PROPERTY(QVariant value READ value WRITE setValue);
 public:
   // Constructor. 
-  pqSignalAdaptorKeyFrameValue(QWidget* parent);
+  // \c lparent is the frame which can be used to pack large widgets
+  // such as Contour Values editor widgets, while \c parent 
+  // is the frame in which small widgets such as check box etc are packed.
+  pqSignalAdaptorKeyFrameValue(QWidget* lparent, QWidget* parent);
   virtual ~pqSignalAdaptorKeyFrameValue();
 
   // Get/Set the animation cue on which we've added the key frame
@@ -63,7 +69,9 @@ public:
 
   // Get the value as string. This is the value for the 
   // "KeyValue" property of the KeyFrame proxy.
-  QString value() const;
+  QList<QVariant> values() const;
+
+  QVariant value() const;
 
   // Attempts to set the value to the minimum specified by the domain.
   void setValueToMin() { this->onMin(); }
@@ -81,8 +89,9 @@ signals:
 public slots:
   // Set the value as string. This is the value for the 
   // "KeyValue" property of the KeyFrame proxy.
-  void setValue(const QString&);
-
+  void setValue(const QList<QVariant>&);
+  void setValue(QVariant v);
+    
 private slots:
   // Called when animation cue is modified.
   void onCueModified();

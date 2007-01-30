@@ -36,18 +36,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkCommand.h"
-#include "vtkSMProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyAdaptor.h"
 
 #include <QtDebug>
 #include <QPointer>
 #include <QDoubleValidator>
 #include <QIntValidator>
+#include <QGridLayout>
 
-#include "pqSMAdaptor.h"
-#include "pqPropertyLinks.h"
 #include "pqAnimationCue.h"
 #include "pqComboBoxDomain.h"
+#include "pqPropertyLinks.h"
+#include "pqSampleScalarWidget.h"
+#include "pqSMAdaptor.h"
 
 class pqSignalAdaptorKeyFrameValue::pqInternals : 
   public Ui::SignalAdaptorKeyFrameValue
@@ -58,7 +60,8 @@ public:
     NONE,
     LINEEDIT,
     COMBOBOX,
-    CHECKBOX
+    CHECKBOX,
+    SAMPLESCALARS
     };
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   pqPropertyLinks Links;
@@ -67,7 +70,8 @@ public:
   WidgetType ActiveWidgetType;
   QPointer<QWidget> Parent;
   QPointer<pqComboBoxDomain> ComboBoxDomain;
-
+  QPointer<QWidget> LargeParent;
+  QPointer<pqSampleScalarWidget> SampleScalarWidget;
   QVariant MinValue;
   QVariant MaxValue;
 
@@ -79,7 +83,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqSignalAdaptorKeyFrameValue::pqSignalAdaptorKeyFrameValue(QWidget* _parent)
+pqSignalAdaptorKeyFrameValue::pqSignalAdaptorKeyFrameValue(QWidget* lparent, 
+  QWidget* _parent)
 : QObject(_parent)
 {
   this->Internals = new pqInternals;
@@ -89,6 +94,14 @@ pqSignalAdaptorKeyFrameValue::pqSignalAdaptorKeyFrameValue(QWidget* _parent)
   this->Internals->minButton->hide();
   this->Internals->maxButton->hide();
   this->Internals->Parent = _parent;
+  this->Internals->LargeParent = lparent;
+
+  lparent->hide();
+  this->Internals->SampleScalarWidget = new pqSampleScalarWidget(true, lparent);
+  QGridLayout* llayout = new QGridLayout(lparent);
+  llayout->addWidget(this->Internals->SampleScalarWidget, 0, 0);
+  llayout->setSpacing(0);
+  this->Internals->SampleScalarWidget->layout()->setMargin(0);
 
   QObject::connect(this->Internals->minButton, SIGNAL(clicked(bool)),
     this, SLOT(onMin()));
@@ -99,6 +112,7 @@ pqSignalAdaptorKeyFrameValue::pqSignalAdaptorKeyFrameValue(QWidget* _parent)
 //-----------------------------------------------------------------------------
 pqSignalAdaptorKeyFrameValue::~pqSignalAdaptorKeyFrameValue()
 {
+  delete this->Internals->SampleScalarWidget;
   delete this->Internals;
 }
 
@@ -148,7 +162,7 @@ void pqSignalAdaptorKeyFrameValue::onCueModified()
     }
 
 
-  QString currentValue = this->value();
+  QList<QVariant> currentValue = this->values();
   vtkSmartPointer<vtkSMPropertyAdaptor> adaptor = 
     vtkSmartPointer<vtkSMPropertyAdaptor>::New();
   adaptor->SetProperty(prop);
@@ -165,44 +179,62 @@ void pqSignalAdaptorKeyFrameValue::onCueModified()
     this->Internals->ActiveWidget = 0;
     }
 
-  if (prop_type == vtkSMPropertyAdaptor::ENUMERATION && 
-    elem_type == vtkSMPropertyAdaptor::INT)
+  if (index == -1)
     {
-    activeWidget = this->Internals->comboBox;
-    this->Internals->ComboBoxDomain = new pqComboBoxDomain(
-      this->Internals->comboBox, prop, index);
-    this->Internals->ActiveWidgetType = pqInternals::COMBOBOX;
-    QObject::connect(this->Internals->comboBox,
-      SIGNAL(currentIndexChanged(int)), 
-      this, SIGNAL(valueChanged()));
+    if (elem_type == vtkSMPropertyAdaptor::DOUBLE)
+      {
+      this->Internals->LargeParent->show();
+      this->Internals->SampleScalarWidget->setDataSources(
+       cue->getAnimatedProxy(),vtkSMDoubleVectorProperty::SafeDownCast(prop));
+      QObject::connect(this->Internals->SampleScalarWidget,
+        SIGNAL(samplesChanged()), this, SIGNAL(valueChanged()));
+      activeWidget = this->Internals->SampleScalarWidget;
+      this->Internals->ActiveWidgetType = pqInternals::SAMPLESCALARS;
+      }
     }
-  else if (prop_type == vtkSMPropertyAdaptor::ENUMERATION &&
-    elem_type == vtkSMPropertyAdaptor::BOOLEAN)
+  else
     {
-    activeWidget = this->Internals->checkBox;
-    this->Internals->ActiveWidgetType = pqInternals::CHECKBOX;
-    QObject::connect(this->Internals->checkBox, SIGNAL(stateChanged(int)),
-      this, SIGNAL(valueChanged()));
-    }
-  else if (elem_type == vtkSMPropertyAdaptor::INT)
-    {
-    activeWidget = this->Internals->lineEdit;
-    delete this->Internals->lineEdit->validator();
-    this->Internals->lineEdit->setValidator(
-      new QIntValidator(this));
-    this->Internals->ActiveWidgetType = pqInternals::LINEEDIT;
-    QObject::connect(this->Internals->lineEdit, SIGNAL(textChanged(const QString&)),
-      this, SIGNAL(valueChanged()));
-    }
-  else if (elem_type == vtkSMPropertyAdaptor::DOUBLE)
-    {
-    activeWidget = this->Internals->lineEdit;
-    delete this->Internals->lineEdit->validator();
-    this->Internals->lineEdit->setValidator(
-      new QDoubleValidator(this));
-    this->Internals->ActiveWidgetType = pqInternals::LINEEDIT;
-    QObject::connect(this->Internals->lineEdit, SIGNAL(textChanged(const QString&)),
-      this, SIGNAL(valueChanged()));
+    this->Internals->LargeParent->hide();
+
+    if (prop_type == vtkSMPropertyAdaptor::ENUMERATION && 
+      elem_type == vtkSMPropertyAdaptor::INT)
+      {
+      activeWidget = this->Internals->comboBox;
+      this->Internals->ComboBoxDomain = new pqComboBoxDomain(
+        this->Internals->comboBox, prop, index);
+      this->Internals->ActiveWidgetType = pqInternals::COMBOBOX;
+      QObject::connect(this->Internals->comboBox,
+        SIGNAL(currentIndexChanged(int)), 
+        this, SIGNAL(valueChanged()));
+      }
+    else if (prop_type == vtkSMPropertyAdaptor::ENUMERATION &&
+      elem_type == vtkSMPropertyAdaptor::BOOLEAN)
+      {
+      activeWidget = this->Internals->checkBox;
+      this->Internals->ActiveWidgetType = pqInternals::CHECKBOX;
+      QObject::connect(this->Internals->checkBox, SIGNAL(stateChanged(int)),
+        this, SIGNAL(valueChanged()));
+      }
+    else if (elem_type == vtkSMPropertyAdaptor::INT)
+      {
+      activeWidget = this->Internals->lineEdit;
+      delete this->Internals->lineEdit->validator();
+      this->Internals->lineEdit->setValidator(
+        new QIntValidator(this));
+      this->Internals->ActiveWidgetType = pqInternals::LINEEDIT;
+      QObject::connect(this->Internals->lineEdit, SIGNAL(textChanged(const QString&)),
+        this, SIGNAL(valueChanged()));
+      }
+    else if (elem_type == vtkSMPropertyAdaptor::DOUBLE)
+      {
+      activeWidget = this->Internals->lineEdit;
+      delete this->Internals->lineEdit->validator();
+      this->Internals->lineEdit->setValidator(
+        new QDoubleValidator(this));
+      this->Internals->ActiveWidgetType = pqInternals::LINEEDIT;
+      QObject::connect(this->Internals->lineEdit, SIGNAL(textChanged(const QString&)),
+        this, SIGNAL(valueChanged()));
+      }
     }
 
   this->Internals->lineEdit->hide();
@@ -214,7 +246,7 @@ void pqSignalAdaptorKeyFrameValue::onCueModified()
     activeWidget->show();
     }
   this->Internals->Parent->setEnabled(true);
-  if (currentValue != QString("-empty-"))
+  if (currentValue.size() > 0)
     {
     this->setValue(currentValue);
     }
@@ -266,6 +298,10 @@ void pqSignalAdaptorKeyFrameValue::onDomainChanged()
     {
     // Nothing to do, the pqComboBoxDomain already manages it.
     }
+  else if (this->Internals->ActiveWidgetType == pqInternals::SAMPLESCALARS)
+    {
+    // pqSampleScalarWidget automatically updates the domain.
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -274,7 +310,7 @@ void pqSignalAdaptorKeyFrameValue::onMin()
   if (this->Internals->ActiveWidgetType == pqInternals::LINEEDIT
     && this->Internals->MinValue.isValid())
     {
-    this->setValue(this->Internals->MinValue.toString());
+    this->setValue(this->Internals->MinValue);
     }
 }
 
@@ -284,7 +320,7 @@ void pqSignalAdaptorKeyFrameValue::onMax()
   if (this->Internals->ActiveWidgetType == pqInternals::LINEEDIT
     && this->Internals->MaxValue.isValid())
     {
-    this->setValue(this->Internals->MaxValue.toString());
+    this->setValue(this->Internals->MaxValue);
     }
 }
 
@@ -300,46 +336,82 @@ void pqSignalAdaptorKeyFrameValue::setValueToCurrent()
     }
   if (index != -1)
     {
-    QVariant curValue = pqSMAdaptor::getMultipleElementProperty(prop, index).toString();
+    QVariant curValue = pqSMAdaptor::getMultipleElementProperty(prop, index);
     if (curValue.isValid())
       {
-      this->setValue(curValue.toString());
+      this->setValue(curValue);
       }
+    }
+  else
+    {
+    QList<QVariant> curValues = pqSMAdaptor::getMultipleElementProperty(prop);
+    this->setValue(curValues);
     }
 }
 
 //-----------------------------------------------------------------------------
-QString pqSignalAdaptorKeyFrameValue::value() const
+QVariant pqSignalAdaptorKeyFrameValue::value() const
 {
+  QList<QVariant> list = this->values();
+  if (list.size()> 0)
+    {
+    return list[0];
+    }
+  return QVariant();
+}
+
+//-----------------------------------------------------------------------------
+QList<QVariant> pqSignalAdaptorKeyFrameValue::values() const
+{
+  QList<QVariant> values;
   switch (this->Internals->ActiveWidgetType)
     {
   case pqInternals::LINEEDIT:
-    return this->Internals->lineEdit->text();
+    values << this->Internals->lineEdit->text();
+    break;
 
   case pqInternals::CHECKBOX:
-    return (this->Internals->checkBox->checkState() == Qt::Checked)? "1.0" : "0.0";
+    values << (this->Internals->checkBox->checkState() == Qt::Checked);
+    break;
 
   case pqInternals::COMBOBOX:
-    return this->Internals->comboBox->currentText();
+    values << this->Internals->comboBox->currentText();
+    break;
+
+  case pqInternals::SAMPLESCALARS:
+    values = this->Internals->SampleScalarWidget->samples();
+    break;
+
   default:
     break;
     }
 
-  return QString("-empty-");
+  return values;
 }
 
 //-----------------------------------------------------------------------------
-void pqSignalAdaptorKeyFrameValue::setValue(const QString& new_value)
+void pqSignalAdaptorKeyFrameValue::setValue(QVariant value)
+{
+  QList<QVariant> list;
+  list.push_back(value);
+  this->setValue(list);
+}
+
+//-----------------------------------------------------------------------------
+void pqSignalAdaptorKeyFrameValue::setValue(const QList<QVariant>& new_value)
 {
   switch (this->Internals->ActiveWidgetType)
     {
   case pqInternals::LINEEDIT:
-    this->Internals->lineEdit->setText(new_value);
+    if (new_value.size() > 0)
+      {
+      this->Internals->lineEdit->setText(new_value[0].toString());
+      }
     break;
 
   case pqInternals::CHECKBOX:
       {
-      QVariant v(new_value);
+      QVariant v = new_value[0];
       if (v.canConvert(QVariant::Int) && v.toInt() > 0)
         {
         this->Internals->checkBox->setCheckState(Qt::Checked);
@@ -354,13 +426,17 @@ void pqSignalAdaptorKeyFrameValue::setValue(const QString& new_value)
   case pqInternals::COMBOBOX:
       {
       QComboBox* combo = this->Internals->comboBox;
-      int idx = combo->findText(new_value);
+      int idx = combo->findText(new_value[0].toString());
       combo->setCurrentIndex(idx);
       if(idx == -1 && combo->count() > 0)
         {
         combo->setCurrentIndex(0);
         }
       }
+    break;
+
+  case pqInternals::SAMPLESCALARS:
+    this->Internals->SampleScalarWidget->setSamples(new_value);
     break;
 
   default:

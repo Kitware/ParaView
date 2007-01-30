@@ -93,6 +93,14 @@ vtkSMProxy* pqAnimationCue::getManipulatorProxy() const
 }
 
 //-----------------------------------------------------------------------------
+vtkSMProxy* pqAnimationCue::getAnimatedProxy() const
+{
+  vtkSMProxy* proxy = pqSMAdaptor::getProxyProperty(
+    this->getProxy()->GetProperty("AnimatedProxy"));
+  return proxy;
+}
+
+//-----------------------------------------------------------------------------
 vtkSMProperty* pqAnimationCue::getAnimatedProperty() const
 {
   vtkSMProxy* proxy = pqSMAdaptor::getProxyProperty(

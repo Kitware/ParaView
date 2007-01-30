@@ -79,7 +79,7 @@ class pqCutPanel::pqImplementation
 public:
   pqImplementation() :
     ImplicitPlaneWidget(),
-    SampleScalarWidget()
+    SampleScalarWidget(false)
   {
   }
   

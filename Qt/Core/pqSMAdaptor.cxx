@@ -128,7 +128,8 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       VectorProperty = vtkSMVectorProperty::SafeDownCast(Property);
 
       Q_ASSERT(VectorProperty != NULL);
-      if(VectorProperty && VectorProperty->GetNumberOfElements() > 1)
+      if(VectorProperty && 
+        (VectorProperty->GetNumberOfElements() > 1 || VectorProperty->GetRepeatCommand()))
         {
         type = pqSMAdaptor::MULTIPLE_ELEMENTS;
         }

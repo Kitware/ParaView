@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include <QModelIndex>
+#include <QList>
+#include <QVariant>
 
 class QItemSelection;
 
@@ -56,7 +58,9 @@ class PQCOMPONENTS_EXPORT pqSampleScalarWidget :
   Q_OBJECT
 
 public:
-  pqSampleScalarWidget(QWidget* Parent = 0);
+  // If preserve_order == true, then the widget will preserve value orders
+  // and allow for duplicates, otherwise the values are unique and sorted.
+  pqSampleScalarWidget(bool preserve_order, QWidget* Parent = 0);
   ~pqSampleScalarWidget();
 
   /// Sets the server manager objects that will be controlled by the widget
@@ -70,6 +74,12 @@ public:
   /// Reset pending changes
   void reset();
 
+  // Returns the samples currently selected in the widget
+  // (these may differ from the accepted values).
+  QList<QVariant> samples();
+
+  // Set the current value of the widget.
+  void setSamples(QList<QVariant> samples);
 signals:
   /// Signal emitted whenever the set of samples changes.
   void samplesChanged();

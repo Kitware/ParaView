@@ -160,7 +160,7 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
     this, SLOT(onNameChanged(pqServerManagerModelItem*)));
 
   this->Internal->ValueAdaptor = new pqSignalAdaptorKeyFrameValue(
-    this->Internal->valueFrame);
+    this->Internal->valueFrameLarge, this->Internal->valueFrame);
 
   this->Internal->TypeAdaptor = new pqSignalAdaptorKeyFrameType(
     this->Internal->interpolationType, 
@@ -490,11 +490,15 @@ void pqAnimationPanel::buildPropertyList()
       continue;
       }
     unsigned int num_elems = smproperty->GetNumberOfElements();
+    if (smproperty->GetRepeatCommand())
+      {
+      num_elems = 1;
+      }
     for (unsigned int cc=0; cc < num_elems; cc++)
       {
       pqAnimationPanel::pqInternals::PropertyInfo info;
       info.Name = iter->GetKey();
-      info.Index = cc;
+      info.Index = smproperty->GetRepeatCommand()? -1 : cc;
 
       QString label = iter->GetKey();
       label = (num_elems>1) ? label + " (" + QString::number(cc) + ")" 
@@ -717,10 +721,22 @@ void pqAnimationPanel::showKeyFrame(int index)
     this->Internal->TypeAdaptor, "currentText",
     SIGNAL(currentTextChanged(const QString&)),
     toShowKf, toShowKf->GetProperty("Type"));
-  this->Internal->Links.addPropertyLink(
-    this->Internal->ValueAdaptor, "value",
-    SIGNAL(valueChanged()),
-    toShowKf, toShowKf->GetProperty("KeyValues"));
+  int animated_index = this->Internal->ActiveCue->getAnimatedPropertyIndex();
+  if (animated_index == -1)
+    {
+    this->Internal->Links.addPropertyLink(
+      this->Internal->ValueAdaptor, "values",
+      SIGNAL(valueChanged()),
+      toShowKf, toShowKf->GetProperty("KeyValues"));
+    }
+  else
+    {
+    this->Internal->Links.addPropertyLink(
+      this->Internal->ValueAdaptor, "value",
+      SIGNAL(valueChanged()),
+      toShowKf, toShowKf->GetProperty("KeyValues"),
+      animated_index);
+    }
   this->Internal->Links.addPropertyLink(
     this->Internal->TimeAdaptor, "normalizedTime",
     SIGNAL(timeChanged()),

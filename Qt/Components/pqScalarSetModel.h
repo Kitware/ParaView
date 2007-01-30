@@ -68,7 +68,12 @@ public:
   virtual Qt::ItemFlags flags(const QModelIndex& index ) const;
   virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
   virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
-    
+
+  /// Get/Set if the order in which the values are inserted must be preserved. 
+  /// Off by default i.e. values will be sorted. If set after inserting a few values,
+  /// the order of values inserted until the flag was set is lost.
+  void setPreserveOrder(bool);
+  bool preserveOrder() const;
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

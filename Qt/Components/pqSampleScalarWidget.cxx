@@ -71,7 +71,7 @@ public:
   bool IgnorePropertyChange;
 };
 
-pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
+pqSampleScalarWidget::pqSampleScalarWidget(bool preserveOrder, QWidget* Parent) :
   Superclass(Parent),
   Implementation(new pqImplementation())
 {
@@ -83,6 +83,7 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
 
   this->Implementation->UI->setupUi(this);
 
+  this->Implementation->Model.setPreserveOrder(preserveOrder);
   this->Implementation->UI->Values->setModel(&this->Implementation->Model);
   this->Implementation->UI->Values->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->Implementation->UI->Values->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -200,6 +201,35 @@ void pqSampleScalarWidget::setDataSources(
   this->onSamplesChanged();
 }
 
+//-----------------------------------------------------------------------------
+QList<QVariant> pqSampleScalarWidget::samples()
+{
+  QList<QVariant> list;
+  if(this->Implementation->SampleProperty)
+    {
+    const QList<double> samples = this->Implementation->Model.values();
+    foreach (double v, samples)
+      {
+      list.push_back(QVariant(v));
+      }
+    }
+  return list;
+}
+
+//-----------------------------------------------------------------------------
+void pqSampleScalarWidget::setSamples(QList<QVariant> list)
+{
+  this->Implementation->Model.clear();
+  foreach (QVariant v, list)
+    {
+    if (v.canConvert(QVariant::Double))
+      {
+      this->Implementation->Model.insert(v.toDouble());
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqSampleScalarWidget::accept()
 {
   this->Implementation->IgnorePropertyChange = true;

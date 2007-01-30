@@ -83,7 +83,7 @@ class pqContourPanel::pqImplementation
 {
 public:
   pqImplementation() :
-    SampleScalarWidget()
+    SampleScalarWidget(false)
   {
   }
 
