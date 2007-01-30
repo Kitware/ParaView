@@ -2338,8 +2338,6 @@ void pqMainWindowCore::updateFiltersMenu()
       return;
       }
     }
- 
-  vtkSMProxy* input = (source)? source->getProxy() : NULL;
 
   // Get the list of available filters.
   QList<QString> supportedFilters;

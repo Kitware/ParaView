@@ -273,9 +273,9 @@ void pqPipelineBrowser::addFilter()
   // Use a proxy model to display only the allowed filters.
   QStringList allowed;
   this->getAllowedSources(model, indexes, allowed);
-  pqSourceInfoFilterModel *filter = new pqSourceInfoFilterModel(this);
-  filter->setSourceModel(model);
-  filter->setAllowedNames(allowed);
+  pqSourceInfoFilterModel *modelFilter = new pqSourceInfoFilterModel(this);
+  modelFilter->setSourceModel(model);
+  modelFilter->setAllowedNames(allowed);
 
   pqSourceInfoFilterModel *history = new pqSourceInfoFilterModel(this);
   history->setSourceModel(this->FilterHistory);
@@ -284,7 +284,7 @@ void pqPipelineBrowser::addFilter()
   // Set up the add filter dialog.
   pqAddSourceDialog dialog(QApplication::activeWindow());
   dialog.setSourceMap(this->FilterGroups);
-  dialog.setSourceList(filter);
+  dialog.setSourceList(modelFilter);
   dialog.setHistoryList(history);
   dialog.setSourceLabel("Filter");
   dialog.setWindowTitle("Add Filter");
@@ -327,7 +327,7 @@ void pqPipelineBrowser::addFilter()
       }
     }
 
-  delete filter;
+  delete modelFilter;
   delete history;
 }
 
