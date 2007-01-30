@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 #include "vtkPVAxesWidget.h"
+#include "pqLinkViewWidget.h"
 
 static QSet<pqRenderViewModule*> RenderModules;
 
@@ -173,6 +174,12 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   // we manage the context menu ourself, so it doesn't interfere with
   // render window interactions
   this->Internal->Viewport->setContextMenuPolicy(Qt::NoContextMenu);
+  
+  // add a link view menu
+  QAction* act = new QAction("Link View...", this);
+  this->addMenuAction(act);
+  QObject::connect(act, SIGNAL(triggered(bool)),
+                   this, SLOT(linkToOtherView()));
 
   // do image caching for performance
   //this->Internal->Viewport->setAutomaticImageCacheEnabled(true);
@@ -1058,5 +1065,14 @@ void pqRenderViewModule::restoreDefaultLightSettings()
     }
   proxy->UpdateVTKObjects();
 
+}
+  
+void pqRenderViewModule::linkToOtherView()
+{
+  pqLinkViewWidget* linkWidget = new pqLinkViewWidget(this);
+  linkWidget->setAttribute(Qt::WA_DeleteOnClose);
+  QPoint pos = this->getWidget()->mapToGlobal(QPoint(2,2));
+  linkWidget->move(pos);
+  linkWidget->show();
 }
 

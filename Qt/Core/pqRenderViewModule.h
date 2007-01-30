@@ -172,6 +172,9 @@ public slots:
   void setResetCenterWithCamera(bool b)
     { this->ResetCenterWithCamera = b;}
 
+  /// start the link to other view process
+  void linkToOtherView();
+
 private slots:
   // Called on start/end interaction.
   void startInteraction();

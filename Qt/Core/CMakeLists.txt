@@ -52,6 +52,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqGenericViewModule.h
   pqHistogramTableModel.h
   pqLinksModel.h
+  pqLinkViewWidget.h
   pqLookupTableManager.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
@@ -162,6 +163,8 @@ ADD_LIBRARY(pqCore
   pqJoystickFly.h
   pqLinksModel.cxx
   pqLinksModel.h
+  pqLinkViewWidget.cxx
+  pqLinkViewWidget.h
   pqLookupTableManager.cxx
   pqLookupTableManager.h
   pqMain.cxx
