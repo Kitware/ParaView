@@ -65,10 +65,19 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
       Error = true;
       return true;
       }
+
+    const QString test_directory = pqCoreTestUtility::TestDirectory();
+    if (test_directory.isEmpty())
+      {
+      qCritical() << "You must specify --test-directory in the command line options.";
+      Error = true;
+      return true;
+      }
     
     /** \todo Handle multiple files */
     QString file = Arguments;
     file.replace("$PARAVIEW_DATA_ROOT", data_directory);
+    file.replace("$PARAVIEW_TEST_ROOT", test_directory);
 
     QStringList files;
     files.append(file);

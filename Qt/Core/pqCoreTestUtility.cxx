@@ -205,6 +205,16 @@ void pqCoreTestUtility::playTests(const QString& filename)
     }
 }
 
+QString pqCoreTestUtility::TestDirectory()
+{
+  if (pqOptions* const options = pqOptions::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetOptions()))
+    {
+    return options->GetTestDirectory();
+    }
+  return QString();
+}
+
 void pqCoreTestUtility::testSucceeded()
 {
   if (this->TestFilenames.size() > 0)

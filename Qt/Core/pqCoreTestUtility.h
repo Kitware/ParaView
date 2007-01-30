@@ -57,6 +57,11 @@ public:
   /// Returns the absolute path to the PARAVIEW_DATA_ROOT in canonical form
   /// (slashes forward), or empty string
   static QString DataRoot();
+
+  /// Returns the temporary test directory in which tests can write
+  /// temporary outputs, difference images etc.
+  static QString TestDirectory();
+
   /// Saves the contents of a render window to a file for later use as a
   /// reference image
   static bool SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File);
