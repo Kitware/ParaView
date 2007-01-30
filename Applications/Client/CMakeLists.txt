@@ -151,6 +151,8 @@ IF(BUILD_TESTING)
     LoadStateSelection
     OpenFile
     OpenSaveData
+    PropertyLink
+    # PropertyLink doesn't work in client/server mode
     SimpleInteraction
     SelectionUndo
     VariableSelector
