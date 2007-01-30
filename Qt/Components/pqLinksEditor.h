@@ -40,6 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqLinksEditorProxyModel;
 
+
+/// a Qt dialog for editing a property/proxy/camera link
+/// two proxies can be selected, and if property type is
+/// selected, then two properties can be selected as well.
 class PQCOMPONENTS_EXPORT pqLinksEditor :
   public QDialog, private Ui::pqLinksEditor
 {
@@ -50,24 +54,31 @@ public:
   /// create a link editor to create/edit a link
   /// initial values are retrieved from the provided vtkSMLink
   pqLinksEditor(vtkSMLink* link, QWidget* p=0);
+  /// destroy this dialog
   ~pqLinksEditor();
 
+  /// get the name of the link
   QString linkName();
 
-  pqLinksModel::ItemType linkMode();
+  /// get the type of link
+  pqLinksModel::ItemType linkType();
 
-  vtkSMProxy* selectedInputProxy();
-  vtkSMProxy* selectedOutputProxy();
+  /// get the first selected proxy
+  vtkSMProxy* selectedProxy1();
+  /// get the second selected proxy;
+  vtkSMProxy* selectedProxy2();
   
-  QString selectedInputProperty();
-  QString selectedOutputProperty();
+  /// get the first selected property
+  QString selectedProperty1();
+  /// get the second selected property
+  QString selectedProperty2();
 
 private slots:
-  void currentInputProxyChanged(const QModelIndex& cur, const QModelIndex&);
-  void currentOutputProxyChanged(const QModelIndex& cur, const QModelIndex&);
+  void currentProxy1Changed(const QModelIndex& cur, const QModelIndex&);
+  void currentProxy2Changed(const QModelIndex& cur, const QModelIndex&);
   
-  void currentInputPropertyChanged(QListWidgetItem* item);
-  void currentOutputPropertyChanged(QListWidgetItem* item);
+  void currentProperty1Changed(QListWidgetItem* item);
+  void currentProperty2Changed(QListWidgetItem* item);
   
   void updateEnabledState();
 
@@ -75,13 +86,13 @@ private:
 
   void updatePropertyList(QListWidget* tw, vtkSMProxy* proxy);
 
-  pqLinksEditorProxyModel* InputProxyModel;
-  pqLinksEditorProxyModel* OutputProxyModel;
+  pqLinksEditorProxyModel* Proxy1Model;
+  pqLinksEditorProxyModel* Proxy2Model;
   
-  vtkSMProxy* SelectedInputProxy;
-  vtkSMProxy* SelectedOutputProxy;
-  QString SelectedInputProperty;
-  QString SelectedOutputProperty;
+  vtkSMProxy* SelectedProxy1;
+  vtkSMProxy* SelectedProxy2;
+  QString SelectedProperty1;
+  QString SelectedProperty2;
 
 };
 

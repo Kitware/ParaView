@@ -44,7 +44,9 @@ class pqServerManagerModelItem;
 class pqProxy;
 class vtkSMProxyListDomain;
 
-
+/// A Qt based model to represent the vtkSMLinks in the
+/// server manager.
+/// All links are bi-directional between two proxies.
 class PQCORE_EXPORT pqLinksModel : public QAbstractTableModel
 {
   Q_OBJECT
@@ -68,38 +70,56 @@ public:
   ~pqLinksModel();
 
   // implementation to satisfy api
+  /// the number of rows (number of links)
   int rowCount(const QModelIndex &parent=QModelIndex()) const;
+  /// the number of columns
   int columnCount(const QModelIndex &parent=QModelIndex()) const;
+  /// data for an index
   QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
+  /// header data
   QVariant headerData(int section, Qt::Orientation orient, 
                       int role=Qt::DisplayRole) const;
 
   // subclass specific implementation
+  /// get the type of link from model index
   ItemType getLinkType(const QModelIndex& idx) const;
+  /// get the link from model index
   vtkSMLink* getLink(const QModelIndex& idx) const;
+  /// search for a link and return model index
   QModelIndex findLink(vtkSMLink* link) const;
 
-  vtkSMProxy* getInputProxy(const QModelIndex& idx) const;
-  vtkSMProxy* getOutputProxy(const QModelIndex& idx) const;
+  /// get the first proxy for a link
+  vtkSMProxy* getProxy1(const QModelIndex& idx) const;
+  /// get the second proxy for a link
+  vtkSMProxy* getProxy2(const QModelIndex& idx) const;
   
-  QString getInputProperty(const QModelIndex& idx) const;
-  QString getOutputProperty(const QModelIndex& idx) const;
+  /// get the first property for a link
+  QString getProperty1(const QModelIndex& idx) const;
+  /// get the second property for a link
+  QString getProperty2(const QModelIndex& idx) const;
   
+  /// get the name of a link
   QString getLinkName(const QModelIndex& idx) const;
+  /// get the link from a name
   vtkSMLink* getLink(const QString& name) const;
 
+  /// add a proxy based link
   void addProxyLink(const QString& name, 
-                    vtkSMProxy* inputProxy, vtkSMProxy* outputProxy);
+                    vtkSMProxy* proxy1, vtkSMProxy* proxy2);
   
+  /// add a camera based link
   void addCameraLink(const QString& name, 
-                    vtkSMRenderModuleProxy* inputProxy,
-                    vtkSMRenderModuleProxy* outputProxy);
+                    vtkSMRenderModuleProxy* proxy1,
+                    vtkSMRenderModuleProxy* proxy2);
 
+  /// add a property based link
   void addPropertyLink(const QString& name,
-                       vtkSMProxy* inputProxy, const QString& inputProp,
-                       vtkSMProxy* outputProxy, const QString& outputProp);
+                       vtkSMProxy* proxy1, const QString& prop1,
+                       vtkSMProxy* proxy2, const QString& prop2);
 
+  /// remove a link by index
   void removeLink(const QModelIndex& idx);
+  /// remove a link by name
   void removeLink(const QString& name);
 
   /// Return a representative proxy.
@@ -120,7 +140,7 @@ private:
   pqInternal* Internal;
 };
 
-
+// internal class here for moc'ing reasons
 class pqLinksModelObject : public QObject
 {
   Q_OBJECT

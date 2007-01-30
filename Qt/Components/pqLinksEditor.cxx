@@ -358,45 +358,45 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
 {
   this->setupUi(this);
 
-  this->SelectedInputProxy = NULL;
-  this->SelectedOutputProxy = NULL;
+  this->SelectedProxy1 = NULL;
+  this->SelectedProxy2 = NULL;
   
-  this->InputProxyModel = new pqLinksEditorProxyModel(this);
-  this->OutputProxyModel = new pqLinksEditorProxyModel(this);
-  this->ObjectTreeProxy1->setModel(this->InputProxyModel);
-  this->ObjectTreeProxy2->setModel(this->OutputProxyModel);
-  this->ObjectTreeProperty1->setModel(this->InputProxyModel);
-  this->ObjectTreeProperty2->setModel(this->OutputProxyModel);
+  this->Proxy1Model = new pqLinksEditorProxyModel(this);
+  this->Proxy2Model = new pqLinksEditorProxyModel(this);
+  this->ObjectTreeProxy1->setModel(this->Proxy1Model);
+  this->ObjectTreeProxy2->setModel(this->Proxy2Model);
+  this->ObjectTreeProperty1->setModel(this->Proxy1Model);
+  this->ObjectTreeProperty2->setModel(this->Proxy2Model);
 
   QObject::connect(this->ObjectTreeProxy1->selectionModel(),
      SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
      this,
-     SLOT(currentInputProxyChanged(const QModelIndex&, const QModelIndex&)));
+     SLOT(currentProxy1Changed(const QModelIndex&, const QModelIndex&)));
   
   QObject::connect(this->ObjectTreeProperty1->selectionModel(),
      SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
      this,
-     SLOT(currentInputProxyChanged(const QModelIndex&, const QModelIndex&)));
+     SLOT(currentProxy1Changed(const QModelIndex&, const QModelIndex&)));
 
   QObject::connect(this->ObjectTreeProxy2->selectionModel(),
      SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
      this,
-     SLOT(currentOutputProxyChanged(const QModelIndex&, const QModelIndex&)));
+     SLOT(currentProxy2Changed(const QModelIndex&, const QModelIndex&)));
   
   QObject::connect(this->ObjectTreeProperty2->selectionModel(),
      SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
      this,
-     SLOT(currentOutputProxyChanged(const QModelIndex&, const QModelIndex&)));
+     SLOT(currentProxy2Changed(const QModelIndex&, const QModelIndex&)));
   
   QObject::connect(this->Property1List,
      SIGNAL(itemPressed(QListWidgetItem* )),
      this,
-     SLOT(currentInputPropertyChanged(QListWidgetItem* )));
+     SLOT(currentProperty1Changed(QListWidgetItem* )));
   
   QObject::connect(this->Property2List,
      SIGNAL(itemPressed(QListWidgetItem* )),
      this,
-     SLOT(currentOutputPropertyChanged(QListWidgetItem* )));
+     SLOT(currentProperty2Changed(QListWidgetItem* )));
   
   QObject::connect(this->lineEdit,
      SIGNAL(textChanged(const QString&)),
@@ -430,8 +430,8 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
         this->comboBox->setCurrentIndex(0);
         }
       
-      vtkSMProxy* inputProxy = model->getInputProxy(idx);
-      QModelIndex viewIdx = this->InputProxyModel->findProxy(inputProxy);
+      vtkSMProxy* inputProxy = model->getProxy1(idx);
+      QModelIndex viewIdx = this->Proxy1Model->findProxy(inputProxy);
       if(viewIdx.isValid())
         {
         this->ObjectTreeProxy1->selectionModel()->
@@ -440,8 +440,8 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
           setCurrentIndex(viewIdx, selFlags);
         }
       
-      vtkSMProxy* outputProxy = model->getOutputProxy(idx);
-      viewIdx = this->OutputProxyModel->findProxy(outputProxy);
+      vtkSMProxy* outputProxy = model->getProxy2(idx);
+      viewIdx = this->Proxy2Model->findProxy(outputProxy);
       if(viewIdx.isValid())
         {
         this->ObjectTreeProxy2->selectionModel()->
@@ -453,7 +453,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
       // if this is a property link, make the properties current
       if(model->getLinkType(idx) == pqLinksModel::Property)
         {
-        QString inputProperty = model->getInputProperty(idx);
+        QString inputProperty = model->getProperty1(idx);
         QList<QListWidgetItem*> items =
           this->Property1List->findItems(inputProperty, Qt::MatchExactly);
         if(!items.isEmpty())
@@ -461,7 +461,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
           this->Property1List->setCurrentItem(items[0]);
           }
 
-        QString outputProperty = model->getOutputProperty(idx);
+        QString outputProperty = model->getProperty2(idx);
         items = this->Property2List->findItems(outputProperty, 
           Qt::MatchExactly);
         if(!items.isEmpty())
@@ -501,52 +501,52 @@ QString pqLinksEditor::linkName()
   return this->lineEdit->text();
 }
 
-pqLinksModel::ItemType pqLinksEditor::linkMode()
+pqLinksModel::ItemType pqLinksEditor::linkType()
 {
   return this->comboBox->currentIndex() == 0 ? 
     pqLinksModel::Proxy : pqLinksModel::Property ;
 }
 
-vtkSMProxy* pqLinksEditor::selectedInputProxy()
+vtkSMProxy* pqLinksEditor::selectedProxy1()
 {
-  return this->SelectedInputProxy;
+  return this->SelectedProxy1;
 }
 
-vtkSMProxy* pqLinksEditor::selectedOutputProxy()
+vtkSMProxy* pqLinksEditor::selectedProxy2()
 {
-  return this->SelectedOutputProxy;
-}
-
-
-QString pqLinksEditor::selectedInputProperty()
-{
-  return this->SelectedInputProperty;
-}
-
-QString pqLinksEditor::selectedOutputProperty()
-{
-  return this->SelectedOutputProperty;
+  return this->SelectedProxy2;
 }
 
 
-void pqLinksEditor::currentInputProxyChanged(const QModelIndex& cur,
+QString pqLinksEditor::selectedProperty1()
+{
+  return this->SelectedProperty1;
+}
+
+QString pqLinksEditor::selectedProperty2()
+{
+  return this->SelectedProperty2;
+}
+
+
+void pqLinksEditor::currentProxy1Changed(const QModelIndex& cur,
                                          const QModelIndex&)
 {
-  this->SelectedInputProxy = this->InputProxyModel->getProxy(cur);
-  if(this->linkMode() == pqLinksModel::Property)
+  this->SelectedProxy1 = this->Proxy1Model->getProxy(cur);
+  if(this->linkType() == pqLinksModel::Property)
     {
-    this->updatePropertyList(this->Property1List, this->SelectedInputProxy);
+    this->updatePropertyList(this->Property1List, this->SelectedProxy1);
     }
   this->updateEnabledState();
 }
 
-void pqLinksEditor::currentOutputProxyChanged(const QModelIndex& cur,
+void pqLinksEditor::currentProxy2Changed(const QModelIndex& cur,
                                          const QModelIndex&)
 {
-  this->SelectedOutputProxy = this->OutputProxyModel->getProxy(cur);
-  if(this->linkMode() == pqLinksModel::Property)
+  this->SelectedProxy2 = this->Proxy2Model->getProxy(cur);
+  if(this->linkType() == pqLinksModel::Property)
     {
-    this->updatePropertyList(this->Property2List, this->SelectedOutputProxy);
+    this->updatePropertyList(this->Property2List, this->SelectedProxy2);
     }
   this->updateEnabledState();
 }
@@ -571,42 +571,42 @@ void pqLinksEditor::updatePropertyList(QListWidget* tw, vtkSMProxy* proxy)
   iter->Delete();
 }
 
-void pqLinksEditor::currentInputPropertyChanged(QListWidgetItem*  item)
+void pqLinksEditor::currentProperty1Changed(QListWidgetItem*  item)
 {
-  this->SelectedInputProperty = item->data(Qt::UserRole).toString();
+  this->SelectedProperty1 = item->data(Qt::UserRole).toString();
   this->updateEnabledState();
 }
 
-void pqLinksEditor::currentOutputPropertyChanged(QListWidgetItem*  item)
+void pqLinksEditor::currentProperty2Changed(QListWidgetItem*  item)
 {
-  this->SelectedOutputProperty = item->data(Qt::UserRole).toString();
+  this->SelectedProperty2 = item->data(Qt::UserRole).toString();
   this->updateEnabledState();
 }
 
 void pqLinksEditor::updateEnabledState()
 {
   bool enabled = true;
-  if(!this->SelectedInputProxy || !this->SelectedOutputProxy ||
+  if(!this->SelectedProxy1 || !this->SelectedProxy2 ||
      this->linkName().isEmpty())
     {
     enabled = false;
     }
-  if(this->linkMode() == pqLinksModel::Property)
+  if(this->linkType() == pqLinksModel::Property)
     {
-    if(this->SelectedInputProperty.isEmpty() ||
-       this->SelectedOutputProperty.isEmpty())
+    if(this->SelectedProperty1.isEmpty() ||
+       this->SelectedProperty2.isEmpty())
       {
       enabled = false;
       }
     // check property types compatible
-    if(this->SelectedInputProxy && this->SelectedOutputProxy)
+    if(this->SelectedProxy1 && this->SelectedProxy2)
       {
       vtkSMProperty* p1 =
-        this->SelectedInputProxy->GetProperty(
-          this->SelectedInputProperty.toAscii().data());
+        this->SelectedProxy1->GetProperty(
+          this->SelectedProperty1.toAscii().data());
       vtkSMProperty* p2 =
-        this->SelectedOutputProxy->GetProperty(
-          this->SelectedOutputProperty.toAscii().data());
+        this->SelectedProxy2->GetProperty(
+          this->SelectedProperty2.toAscii().data());
       if(!p1 || !p2 || propertyType(p1) != propertyType(p2))
         {
         enabled = false;

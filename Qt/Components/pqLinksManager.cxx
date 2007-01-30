@@ -85,10 +85,10 @@ void pqLinksManager::addLink()
   editor.setWindowTitle("Add Link");
   if(editor.exec() == QDialog::Accepted)
     {
-    if(editor.linkMode() == pqLinksModel::Proxy)
+    if(editor.linkType() == pqLinksModel::Proxy)
       {
-      vtkSMProxy* inP = editor.selectedInputProxy();
-      vtkSMProxy* outP = editor.selectedOutputProxy();
+      vtkSMProxy* inP = editor.selectedProxy1();
+      vtkSMProxy* outP = editor.selectedProxy2();
       vtkSMRenderModuleProxy* inR;
       inR = vtkSMRenderModuleProxy::SafeDownCast(inP);
       vtkSMRenderModuleProxy* outR;
@@ -103,13 +103,13 @@ void pqLinksManager::addLink()
         model->addProxyLink(editor.linkName(), inP, outP);
         }
       }
-    else if(editor.linkMode() == pqLinksModel::Property)
+    else if(editor.linkType() == pqLinksModel::Property)
       {
       model->addPropertyLink(editor.linkName(),
-                                editor.selectedInputProxy(),
-                                editor.selectedInputProperty(),
-                                editor.selectedOutputProxy(),
-                                editor.selectedOutputProperty());
+                                editor.selectedProxy1(),
+                                editor.selectedProperty1(),
+                                editor.selectedProxy2(),
+                                editor.selectedProperty2());
       }
     }
 }
@@ -125,10 +125,10 @@ void pqLinksManager::editLink()
     {
     model->removeLink(idx);
     
-    if(editor.linkMode() == pqLinksModel::Proxy)
+    if(editor.linkType() == pqLinksModel::Proxy)
       {
-      vtkSMProxy* inP = editor.selectedInputProxy();
-      vtkSMProxy* outP = editor.selectedOutputProxy();
+      vtkSMProxy* inP = editor.selectedProxy1();
+      vtkSMProxy* outP = editor.selectedProxy2();
       vtkSMRenderModuleProxy* inR;
       inR = vtkSMRenderModuleProxy::SafeDownCast(inP);
       vtkSMRenderModuleProxy* outR;
@@ -143,13 +143,13 @@ void pqLinksManager::editLink()
         model->addProxyLink(editor.linkName(), inP, outP);
         }
       }
-    else if(editor.linkMode() == pqLinksModel::Property)
+    else if(editor.linkType() == pqLinksModel::Property)
       {
       model->addPropertyLink(editor.linkName(),
-                                editor.selectedInputProxy(),
-                                editor.selectedInputProperty(),
-                                editor.selectedOutputProxy(),
-                                editor.selectedOutputProperty());
+                                editor.selectedProxy1(),
+                                editor.selectedProperty1(),
+                                editor.selectedProxy2(),
+                                editor.selectedProperty2());
       }
     }
 }

@@ -211,22 +211,22 @@ vtkSMProxy* pqLinksModel::getProxyFromIndex(const QModelIndex& idx, int dir) con
   return NULL;
 }
 
-vtkSMProxy* pqLinksModel::getInputProxy(const QModelIndex& idx) const
+vtkSMProxy* pqLinksModel::getProxy1(const QModelIndex& idx) const
 {
   return this->getProxyFromIndex(idx, vtkSMLink::INPUT);
 }
 
-vtkSMProxy* pqLinksModel::getOutputProxy(const QModelIndex& idx) const
+vtkSMProxy* pqLinksModel::getProxy2(const QModelIndex& idx) const
 {
   return this->getProxyFromIndex(idx, vtkSMLink::OUTPUT);
 }
   
-QString pqLinksModel::getInputProperty(const QModelIndex& idx) const
+QString pqLinksModel::getProperty1(const QModelIndex& idx) const
 {
   return this->getPropertyFromIndex(idx, vtkSMLink::INPUT);
 }
 
-QString pqLinksModel::getOutputProperty(const QModelIndex& idx) const
+QString pqLinksModel::getProperty2(const QModelIndex& idx) const
 {
   return this->getPropertyFromIndex(idx, vtkSMLink::OUTPUT);
 }
@@ -258,13 +258,13 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
       }
     else if(idx.column() == 1)
       {
-      vtkSMProxy* pxy = this->getInputProxy(idx);
+      vtkSMProxy* pxy = this->getProxy1(idx);
       pqProxy* qpxy = this->representativeProxy(pxy);
       return qpxy ? qpxy->getProxyName() : "Unknown";
       }
     else if(idx.column() == 2)
       {
-      vtkSMProxy* pxy = this->getInputProxy(idx);
+      vtkSMProxy* pxy = this->getProxy1(idx);
       pqProxy* qpxy = this->representativeProxy(pxy);
       if(type == pqLinksModel::Proxy && qpxy->getProxy() == pxy)
         {
@@ -285,18 +285,18 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
             }
           }
         }
-      QString prop = this->getInputProperty(idx);
+      QString prop = this->getProperty1(idx);
       return prop.isEmpty() ? "Unknown" : prop; 
       }
     else if(idx.column() == 3)
       {
-      vtkSMProxy* pxy = this->getOutputProxy(idx);
+      vtkSMProxy* pxy = this->getProxy2(idx);
       pqProxy* qpxy = this->representativeProxy(pxy);
       return qpxy ? qpxy->getProxyName() : "Unknown";
       }
     else if(idx.column() == 4)
       {
-      vtkSMProxy* pxy = this->getOutputProxy(idx);
+      vtkSMProxy* pxy = this->getProxy2(idx);
       pqProxy* qpxy = this->representativeProxy(pxy);
       if(type == pqLinksModel::Proxy && qpxy->getProxy() == pxy)
         {
@@ -317,7 +317,7 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
             }
           }
         }
-      QString prop = this->getOutputProperty(idx);
+      QString prop = this->getProperty2(idx);
       return prop.isEmpty() ? "Unknown" : prop; 
       }
     }

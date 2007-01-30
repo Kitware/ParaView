@@ -37,13 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "ui_pqLinksManager.h"
 
+/// dialog for viewing, creating, editing, removing proxy/property/camera links
 class PQCOMPONENTS_EXPORT pqLinksManager :
   public QDialog, private Ui::pqLinksManager
 {
   Q_OBJECT
   typedef QDialog base;
 public:
+  /// create this dialog with a parent
   pqLinksManager(QWidget* p=0);
+  /// destroy this dialog
   ~pqLinksManager();
 
 public slots:
