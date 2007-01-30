@@ -508,7 +508,7 @@ ENDMACRO(PARAVIEW_GUI_INCLUDE_DIRECTORIES SRCS)
 SET(PARAVIEW_EXTRA_EXTERNAL_MODULES
   "" CACHE STRING "Extra modules that ParaView will try to import. The modules have to provide ParaViewImport.cmake file.")
 MARK_AS_ADVANCED(PARAVIEW_EXTRA_EXTERNAL_MODULES)
-FOREACH(external SAF SSLIB_SAF ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
+FOREACH(external ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
   OPTION(PARAVIEW_USE_${external} "Build using ${external} library. Requires access to ${external} libraries" OFF)
   MARK_AS_ADVANCED(PARAVIEW_USE_${external})
   IF(PARAVIEW_USE_${external})
