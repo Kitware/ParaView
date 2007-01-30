@@ -453,20 +453,31 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
       // if this is a property link, make the properties current
       if(model->getLinkType(idx) == pqLinksModel::Property)
         {
-        QString inputProperty = model->getProperty1(idx);
-        QList<QListWidgetItem*> items =
-          this->Property1List->findItems(inputProperty, Qt::MatchExactly);
-        if(!items.isEmpty())
+        QString prop1 = model->getProperty1(idx);
+        int count = this->Property1List->count();
+        int i;
+        for(i=0; i<count; i++)
           {
-          this->Property1List->setCurrentItem(items[0]);
+          QListWidgetItem* item = this->Property1List->item(i);
+          QString d = item->data(Qt::UserRole).toString();
+          if(d == prop1)
+            {
+            this->Property1List->setCurrentItem(item);
+            break;
+            }
           }
 
-        QString outputProperty = model->getProperty2(idx);
-        items = this->Property2List->findItems(outputProperty, 
-          Qt::MatchExactly);
-        if(!items.isEmpty())
+        QString prop2 = model->getProperty2(idx);
+        count = this->Property2List->count();
+        for(i=0; i<count; i++)
           {
-          this->Property2List->setCurrentItem(items[0]);
+          QListWidgetItem* item = this->Property2List->item(i);
+          QString d = item->data(Qt::UserRole).toString();
+          if(d == prop2)
+            {
+            this->Property2List->setCurrentItem(item);
+            break;
+            }
           }
         }
 
