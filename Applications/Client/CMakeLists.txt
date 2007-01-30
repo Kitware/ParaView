@@ -146,6 +146,7 @@ IF(BUILD_TESTING)
   SET(TEST_IMAGE ${PARAVIEW_DATA_ROOT}/Baseline)
 
   SET (XML_TESTS_WITH_BASELINES
+    CameraLink
     CreateSourceWithoutConnect
     ImageShrink
     LoadStateSelection
