@@ -100,7 +100,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.37");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.38");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -209,7 +209,7 @@ int vtkSMAnimationSceneProxy::IsInPlay()
     this->AnimationCue);
   if (scene)
     {
-    scene->IsInPlay();
+    return scene->IsInPlay();
     }
   return 0;
 }
