@@ -147,6 +147,7 @@ IF(BUILD_TESTING)
 
   SET (XML_TESTS_WITH_BASELINES
     CameraLink
+    ClipPlaneLink
     CreateSourceWithoutConnect
     ImageShrink
     LoadStateSelection
