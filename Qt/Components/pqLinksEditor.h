@@ -66,8 +66,8 @@ private slots:
   void currentInputProxyChanged(const QModelIndex& cur, const QModelIndex&);
   void currentOutputProxyChanged(const QModelIndex& cur, const QModelIndex&);
   
-  void currentInputPropertyChanged(const QString& item);
-  void currentOutputPropertyChanged(const QString& item);
+  void currentInputPropertyChanged(QListWidgetItem* item);
+  void currentOutputPropertyChanged(QListWidgetItem* item);
   
   void updateEnabledState();
 

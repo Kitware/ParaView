@@ -45,6 +45,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
 
 // pqCore
 #include "pqServerManagerModel.h"
@@ -56,6 +60,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksModel.h"
 #include "ui_pqLinksEditor.h"
 
+static QString propertyType(vtkSMProperty* p)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(p);
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(p);
+  vtkSMIdTypeVectorProperty* idvp = vtkSMIdTypeVectorProperty::SafeDownCast(p);
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(p);
+
+  if(ivp)
+    {
+    return QString("Integer %1").arg(ivp->GetNumberOfElements());
+    }
+  else if(dvp)
+    {
+    return QString("Real %1").arg(dvp->GetNumberOfElements());
+    }
+  else if(svp)
+    {
+    return QString("String %i").arg(svp->GetNumberOfElements());
+    }
+  else if(idvp)
+    {
+    return QString("Id %i").arg(idvp->GetNumberOfElements());
+    }
+  else if(pp)
+    {
+    return QString("Proxy %i").arg(pp->GetNumberOfProxies());
+    }
+  return "Unknown";
+}
 
 class pqLinksEditorProxyModel : public QAbstractItemModel
 {
@@ -355,14 +389,14 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
      SLOT(currentOutputProxyChanged(const QModelIndex&, const QModelIndex&)));
   
   QObject::connect(this->Property1List,
-     SIGNAL(currentTextChanged(const QString&)),
+     SIGNAL(itemPressed(QListWidgetItem* )),
      this,
-     SLOT(currentInputPropertyChanged(const QString&)));
+     SLOT(currentInputPropertyChanged(QListWidgetItem* )));
   
   QObject::connect(this->Property2List,
-     SIGNAL(currentTextChanged(const QString&)),
+     SIGNAL(itemPressed(QListWidgetItem* )),
      this,
-     SLOT(currentOutputPropertyChanged(const QString&)));
+     SLOT(currentOutputPropertyChanged(QListWidgetItem* )));
   
   QObject::connect(this->lineEdit,
      SIGNAL(textChanged(const QString&)),
@@ -528,38 +562,55 @@ void pqLinksEditor::updatePropertyList(QListWidget* tw, vtkSMProxy* proxy)
   iter->SetProxy(proxy);
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-    tw->addItem(iter->GetKey());
+    QString name = iter->GetKey();
+    QString type = propertyType(iter->GetProperty());
+    QString propertyLabel = QString("%1 (%2)").arg(name).arg(type);
+    QListWidgetItem* item = new QListWidgetItem(propertyLabel, tw);
+    item->setData(Qt::UserRole, name);
     }
   iter->Delete();
 }
 
-void pqLinksEditor::currentInputPropertyChanged(const QString& item)
+void pqLinksEditor::currentInputPropertyChanged(QListWidgetItem*  item)
 {
-  this->SelectedInputProperty = item;
+  this->SelectedInputProperty = item->data(Qt::UserRole).toString();
   this->updateEnabledState();
 }
 
-void pqLinksEditor::currentOutputPropertyChanged(const QString& item)
+void pqLinksEditor::currentOutputPropertyChanged(QListWidgetItem*  item)
 {
-  this->SelectedOutputProperty = item;
+  this->SelectedOutputProperty = item->data(Qt::UserRole).toString();
   this->updateEnabledState();
 }
 
 void pqLinksEditor::updateEnabledState()
 {
   bool enabled = true;
-  if(!this->SelectedInputProxy || !this->SelectedInputProxy ||
+  if(!this->SelectedInputProxy || !this->SelectedOutputProxy ||
      this->linkName().isEmpty())
     {
     enabled = false;
     }
   if(this->linkMode() == pqLinksModel::Property)
     {
-    // TODO check property types compatible (maybe label properties w/ types?)
     if(this->SelectedInputProperty.isEmpty() ||
        this->SelectedOutputProperty.isEmpty())
       {
       enabled = false;
+      }
+    // check property types compatible
+    if(this->SelectedInputProxy && this->SelectedOutputProxy)
+      {
+      vtkSMProperty* p1 =
+        this->SelectedInputProxy->GetProperty(
+          this->SelectedInputProperty.toAscii().data());
+      vtkSMProperty* p2 =
+        this->SelectedOutputProxy->GetProperty(
+          this->SelectedOutputProperty.toAscii().data());
+      if(!p1 || !p2 || propertyType(p1) != propertyType(p2))
+        {
+        enabled = false;
+        }
       }
     }
   this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
