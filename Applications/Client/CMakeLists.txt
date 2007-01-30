@@ -185,13 +185,16 @@ IF(BUILD_TESTING)
 
   FOREACH(test ${TESTS_WITHOUT_BASELINES})
     ADD_TEST(pqClient${test}
-      ${TEST_BINARY} -dr --run-test=${TEST_XML}/${test}.xml --exit)
+      ${TEST_BINARY} -dr 
+        --test-directory=${PARAVIEW_TEST_DIR}
+        --run-test=${TEST_XML}/${test}.xml --exit)
   ENDFOREACH(test)
   
   IF(PARAVIEW_DATA_ROOT)
     FOREACH(test ${XML_TESTS_WITH_BASELINES})
       ADD_TEST(pqClient${test}
         ${TEST_BINARY} -dr --run-test=${TEST_XML}/${test}.xml
+        --test-directory=${PARAVIEW_TEST_DIR}
         --compare-view=${TEST_IMAGE}/${test}.png
         --exit)
     ENDFOREACH(test) 
@@ -200,6 +203,7 @@ IF(BUILD_TESTING)
   FOREACH(test ${PYTHON_TESTS})
     ADD_TEST(pqClient${test}-Python
       ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
+      --test-directory=${PARAVIEW_TEST_DIR}
       --exit)
   ENDFOREACH(test) 
 
@@ -220,6 +224,7 @@ IF(BUILD_TESTING)
     DualSphereAnimation
     ExodusPanel
     LoadState
+#LoadSaveStateAnimation
     ObjectInspectorSphere
     Plot3DReader
     RepresentationSelector
