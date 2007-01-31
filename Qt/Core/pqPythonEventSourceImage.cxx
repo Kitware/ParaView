@@ -55,9 +55,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventDispatcher.h"
 
 // VTK includes
+#include "vtkImageData.h"
+#include "vtkPNGReader.h"
 #include "vtkSmartPointer.h"
 #include "vtkTesting.h"
-#include "vtkImageData.h"
 
 // SM includes
 #include "vtkProcessModule.h"
@@ -72,26 +73,38 @@ static pqPythonEventSourceImage* Instance = 0;
 bool SnapshotResult = false;
 QString SnapshotWidget;
 QString SnapshotBaseline;
+QString SnapshotTestImage;
 int SnapshotWidth = 1;
 int SnapshotHeight = 1;
 
 static PyObject*
 QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
 {
+  // void QtTestingImage.compareImage('png file', 'baselineFile')   or
   // void QtTestingImage.compareImage('object', 'baselineFile', width, height)
   //   an exception is thrown in this fails
   
   const char* object = 0;
   const char* baseline = 0;
+  const char* pngfile = 0;
   int width = 0;
   int height = 0;
+  bool image_image_compare = false;
 
   if(!PyArg_ParseTuple(args, 
                        const_cast<char*>("ssii"), 
                        &object, &baseline, &width, &height))
     {
-    PyErr_SetString(PyExc_TypeError, "bad arguments to compareImage()");
-    return NULL;
+    if(PyArg_ParseTuple(args, 
+        const_cast<char*>("ss"), &pngfile, &baseline))
+      {
+      image_image_compare = true;
+      }
+    else
+      {
+      PyErr_SetString(PyExc_TypeError, "bad arguments to compareImage()");
+      return NULL;
+      }
     }
 
   SnapshotResult = false;
@@ -99,12 +112,13 @@ QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
   SnapshotBaseline = baseline;
   SnapshotWidth = width;
   SnapshotHeight = height;
+  SnapshotTestImage = pngfile;
 
   QMutex mut;
   mut.lock();
 
   // get our routines on the GUI thread to do the image comparison
-  QMetaObject::invokeMethod(Instance, "doSnapshot", Qt::QueuedConnection);
+  QMetaObject::invokeMethod(Instance, "doComparison", Qt::QueuedConnection);
 
   // wait for image comparison results
   if(!Instance->waitForGUI(mut))
@@ -113,7 +127,7 @@ QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
     return NULL;
     }
 
-  if(SnapshotWidget == QString::null)
+  if(!image_image_compare && SnapshotWidget == QString::null)
     {
     PyErr_SetString(PyExc_ValueError, "object not found");
     return NULL;
@@ -133,7 +147,7 @@ static PyMethodDef QtTestingImageMethods[] = {
     const_cast<char*>("compareImage"), 
     QtTestingImage_compareImage,
     METH_VARARGS,
-    const_cast<char*>("compare the snapshot of a widget with a baseline")
+    const_cast<char*>("compare the snapshot of a widget/image with a baseline")
   },
 
   {NULL, NULL, 0, NULL} // Sentinal
@@ -165,44 +179,52 @@ void pqPythonEventSourceImage::run()
   pqPythonEventSource::run();
 }
 
-void pqPythonEventSourceImage::doSnapshot()
+//-----------------------------------------------------------------------------
+void pqPythonEventSourceImage::doComparison()
 {
-  
   // make sure all other processing has been done before we take a snapshot
   pqEventDispatcher::processEventsAndWait(1);
 
-  QWidget* widget =
-    qobject_cast<QWidget*>(pqObjectNaming::GetObject(SnapshotWidget));
-  if(!widget)
+  // assume all images are in the dataroot/Baseline directory
+  QString fullpath = pqCoreTestUtility::DataRoot();
+  fullpath += "/Baseline/";
+  fullpath += SnapshotBaseline;
+
+  pqOptions* const options = pqOptions::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetOptions());
+  int threshold = options->GetImageThreshold();
+  QString testdir = options->GetTestDirectory();
+  if(testdir == QString::null)
     {
-    SnapshotWidget = QString::null;
+    testdir = ".";
     }
-  else
+
+  if (SnapshotWidget != QString::null)
     {
-    // assume all images are in the dataroot/Baseline directory
-    QString fullpath = pqCoreTestUtility::DataRoot();
-    fullpath += "/Baseline/";
-    fullpath += SnapshotBaseline;
-
-
-    pqOptions* const options = pqOptions::SafeDownCast(
-          vtkProcessModule::GetProcessModule()->GetOptions());
-    int threshold = options->GetImageThreshold();
-    QString testdir = options->GetTestDirectory();
-    if(testdir == QString::null)
+    QWidget* widget =
+      qobject_cast<QWidget*>(pqObjectNaming::GetObject(SnapshotWidget));
+    if(widget)
       {
-      testdir = ".";
+      this->compareImage(widget,
+                          fullpath,
+                          threshold,
+                          testdir);
       }
-
-    this->compareImage(widget,
-                        fullpath,
-                        threshold,
-                        testdir);
     }
+  else if (SnapshotTestImage != QString::null)
+    {
+    SnapshotTestImage = SnapshotTestImage.replace("$PARAVIEW_TEST_ROOT",
+      pqCoreTestUtility::TestDirectory());
+    SnapshotTestImage = SnapshotTestImage.replace("$PARAVIEW_DATA_ROOT",
+      pqCoreTestUtility::DataRoot());
+    this->compareImage(SnapshotTestImage, fullpath, threshold, testdir);
+    }
+
   // signal the testing thread
   this->guiAcknowledge();
 }
 
+//-----------------------------------------------------------------------------
 void pqPythonEventSourceImage::compareImage(QWidget* widget,
                     const QString& baseline,
                     double threshold,
@@ -211,11 +233,6 @@ void pqPythonEventSourceImage::compareImage(QWidget* widget,
   
   // for generic QWidget's, let's paint the widget into our QPixmap,
   // put it in a vtkImageData and compare the image with a baseline
-  vtkSmartPointer<vtkTesting> testing = vtkSmartPointer<vtkTesting>::New();
-  testing->AddArgument("-T");
-  testing->AddArgument(tempDir.toAscii().data());
-  testing->AddArgument("-V");
-  testing->AddArgument(baseline.toAscii().data());
 
   // grab an image of the widget
   QSize oldSize = widget->size();
@@ -264,9 +281,35 @@ void pqPythonEventSourceImage::compareImage(QWidget* widget,
       }
     }
 
-  // compare the image
-  SnapshotResult = testing->RegressionTest(vtkimage, threshold) == vtkTesting::PASSED;
-
+  this->compareImageInternal(vtkimage, baseline, threshold, tempDir);
 }
 
+//-----------------------------------------------------------------------------
+void pqPythonEventSourceImage::compareImageInternal(vtkImageData* vtkimage,
+  const QString& baseline, double threshold, const QString& tempDir)
+{
+  vtkSmartPointer<vtkTesting> testing = vtkSmartPointer<vtkTesting>::New();
+  testing->AddArgument("-T");
+  testing->AddArgument(tempDir.toAscii().data());
+  testing->AddArgument("-V");
+  testing->AddArgument(baseline.toAscii().data());
 
+  // compare the image
+  SnapshotResult = 
+    (testing->RegressionTest(vtkimage, threshold) == vtkTesting::PASSED);
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonEventSourceImage::compareImage(const QString& image,
+  const QString& baseline, double threshold, const QString& tempDir)
+{
+  vtkSmartPointer<vtkPNGReader> reader = vtkSmartPointer<vtkPNGReader>::New();
+  if (!reader->CanReadFile(image.toAscii().data()))
+    {
+    SnapshotResult = false;
+    return;
+    }
+  reader->SetFileName(image.toAscii().data());
+  reader->Update();
+  this->compareImageInternal(reader->GetOutput(), baseline, threshold, tempDir);
+}
