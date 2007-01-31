@@ -146,8 +146,6 @@ IF(BUILD_TESTING)
   SET(TEST_IMAGE ${PARAVIEW_DATA_ROOT}/Baseline)
 
   SET (XML_TESTS_WITH_BASELINES
-    CameraLink
-    ClipPlaneLink
     CreateSourceWithoutConnect
     ImageShrink
     LoadStateSelection
@@ -214,6 +212,8 @@ IF(BUILD_TESTING)
 # Now we add tests that use the pvTestDriver for running.
   SET(XML_TESTS_WITH_BASELINES
     3DWidgetInCustomFilter
+    CameraLink
+    ClipPlaneLink
     Cut
     Calculator
     Clip
