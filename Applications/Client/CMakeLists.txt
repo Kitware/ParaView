@@ -181,8 +181,8 @@ IF(BUILD_TESTING)
         #HistogramChart
         ExodusXML
         LoadStateMultiView
-        #VCRAnimation -- disabling until Time stuff goes in PV
-                      # readers will be animatable only after that.
+        SaveAnimationMultiView
+        VCRAnimation 
         )
     ENDIF(PARAVIEW_DATA_ROOT)
   ENDIF(QT_TESTING_WITH_PYTHON)
@@ -228,7 +228,7 @@ IF(BUILD_TESTING)
     DualSphereAnimation
     ExodusPanel
     LoadState
-#LoadSaveStateAnimation
+    LoadSaveStateAnimation
     ObjectInspectorSphere
     Plot3DReader
     RepresentationSelector
