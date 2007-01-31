@@ -182,7 +182,7 @@ IF(BUILD_TESTING)
         ExodusXML
         LoadStateMultiView
         SaveAnimationMultiView
-        VCRAnimation 
+# VCRAnimation -- enable after PVD reader supports time.
         )
     ENDIF(PARAVIEW_DATA_ROOT)
   ENDIF(QT_TESTING_WITH_PYTHON)
