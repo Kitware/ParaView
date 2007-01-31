@@ -87,26 +87,26 @@ QModelIndex pqScalarSetModel::insert(double value)
   else
     {
     // if value is already contained, we don't add it.
-    int index = this->Implementation->Values.indexOf(value);
-    if (index == -1)
+    int curindex = this->Implementation->Values.indexOf(value);
+    if (curindex == -1)
       {
       // insert at correct place.
       for (int cc=0; cc < this->Implementation->Values.size(); cc++)
         {
         if (this->Implementation->Values[cc] > value)
           {
-          index = cc;
-          this->Implementation->Values.insert(index, value);
+          curindex = cc;
+          this->Implementation->Values.insert(curindex, value);
           break;
           }
         }
-      if (index == -1)
+      if (curindex == -1)
         {
-        index = this->Implementation->Values.size();
+        curindex = this->Implementation->Values.size();
         this->Implementation->Values.append(value);
         }
       }
-    mindex = this->createIndex(index, 0);
+    mindex = this->createIndex(curindex, 0);
     }
 
   /*

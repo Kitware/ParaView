@@ -83,7 +83,7 @@ public:
   struct PropertyInfo
     {
     QString Name;
-    unsigned int Index;
+    int Index;
     };
 };
 

@@ -363,37 +363,37 @@ QVariant pqSignalAdaptorKeyFrameValue::value() const
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSignalAdaptorKeyFrameValue::values() const
 {
-  QList<QVariant> values;
+  QList<QVariant> value_list;
   switch (this->Internals->ActiveWidgetType)
     {
   case pqInternals::LINEEDIT:
-    values << this->Internals->lineEdit->text();
+    value_list << this->Internals->lineEdit->text();
     break;
 
   case pqInternals::CHECKBOX:
-    values << (this->Internals->checkBox->checkState() == Qt::Checked);
+    value_list << (this->Internals->checkBox->checkState() == Qt::Checked);
     break;
 
   case pqInternals::COMBOBOX:
-    values << this->Internals->comboBox->currentText();
+    value_list << this->Internals->comboBox->currentText();
     break;
 
   case pqInternals::SAMPLESCALARS:
-    values = this->Internals->SampleScalarWidget->samples();
+    value_list = this->Internals->SampleScalarWidget->samples();
     break;
 
   default:
     break;
     }
 
-  return values;
+  return value_list;
 }
 
 //-----------------------------------------------------------------------------
-void pqSignalAdaptorKeyFrameValue::setValue(QVariant value)
+void pqSignalAdaptorKeyFrameValue::setValue(QVariant newvalue)
 {
   QList<QVariant> list;
-  list.push_back(value);
+  list.push_back(newvalue);
   this->setValue(list);
 }
 

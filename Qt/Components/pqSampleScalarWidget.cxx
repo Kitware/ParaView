@@ -207,8 +207,8 @@ QList<QVariant> pqSampleScalarWidget::samples()
   QList<QVariant> list;
   if(this->Implementation->SampleProperty)
     {
-    const QList<double> samples = this->Implementation->Model.values();
-    foreach (double v, samples)
+    const QList<double> sample_list = this->Implementation->Model.values();
+    foreach (double v, sample_list)
       {
       list.push_back(QVariant(v));
       }
