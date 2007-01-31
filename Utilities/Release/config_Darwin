@@ -10,5 +10,6 @@ write_cache()
   cat >> CMakeCache.txt <<EOF
 VTK_USE_CARBON:BOOL=OFF
 VTK_USE_X:BOOL=ON
+VTK_USE_INFOVIS:BOOL=OFF
 EOF
 }

@@ -13,5 +13,6 @@ write_cache()
     write_standard_cache
     cat >> CMakeCache.txt <<EOF
 PV_INSTALL_SYSTEM_RUNTIME_LIBS:STRING=/opt/i686-gcc-335/lib/libstdc++.so.5;/opt/i686-gcc-335/lib/libgcc_s.so.1
+VTK_USE_INFOVIS:BOOL=OFF
 EOF
 }
