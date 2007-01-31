@@ -3,7 +3,7 @@
   <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
   <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/dualSphereAnimation.pvd" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Animation Panel" />
+  <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Animation Inspector" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_stackedwidget/tabKeyFrame/propertyName" command="set_string" arguments="TimeStep" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="5" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="7" />
