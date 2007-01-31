@@ -181,7 +181,7 @@ IF(BUILD_TESTING)
         #HistogramChart
         ExodusXML
         LoadStateMultiView
-        SaveAnimationMultiView
+#        SaveAnimationMultiView
 # VCRAnimation -- enable after PVD reader supports time.
         )
     ENDIF(PARAVIEW_DATA_ROOT)
