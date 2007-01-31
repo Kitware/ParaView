@@ -387,7 +387,7 @@ QtTesting.playCommand(object22, 'set_int', '800')
 object22 = 'Dialog/okButton'
 QtTesting.playCommand(object22, 'activate', '')
 
-QtTesting.wait(50);
+QtTesting.wait(1000);
 objectPlayButton = 'MainWindow/VCRToolbar/1QToolButton2'
 while QtTesting.getProperty(objectPlayButton, "enabled") != 'true' :
   QtTesting.wait(50)
