@@ -76,6 +76,10 @@ void pqVCRController::setAnimationScene(pqAnimationScene* scene)
       this, SLOT(onLoopPropertyChanged()));
     QObject::connect(this->Scene, SIGNAL(clockTimeRangesChanged()),
         this, SLOT(onTimeRangesChanged()));
+    QObject::connect(this->Scene, SIGNAL(beginPlay()),
+      this, SLOT(onBeginPlay()));
+    QObject::connect(this->Scene, SIGNAL(endPlay()),
+      this, SLOT(onEndPlay()));
     bool loop_checked = pqSMAdaptor::getElementProperty(
         scene->getProxy()->GetProperty("Loop")).toBool();
     emit this->loop(loop_checked);
@@ -104,13 +108,9 @@ void pqVCRController::onPlay()
     return;
     }
 
-  emit this->playing(true);
- 
   vtkSMAnimationSceneProxy* scene = this->Scene->getAnimationSceneProxy();
   scene->Play(); // NOTE: This is a blocking call, returns only after the
                  // the animation has stopped.
-
-  emit this->playing(false);
 
   pqApplicationCore::instance()->render();
 }
@@ -125,6 +125,18 @@ void pqVCRController::onTick()
   QCoreApplication::processEvents();
 
   emit this->timestepChanged();
+}
+
+//-----------------------------------------------------------------------------
+void pqVCRController::onBeginPlay()
+{
+  emit this->playing(true);
+}
+
+//-----------------------------------------------------------------------------
+void pqVCRController::onEndPlay()
+{
+  emit this->playing(false);
 }
 
 //-----------------------------------------------------------------------------

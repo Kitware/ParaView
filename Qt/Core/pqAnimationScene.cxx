@@ -87,6 +87,10 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
   this->Internals->VTKConnect->Connect(proxy,
     vtkCommand::AnimationCueTickEvent, 
     this, SIGNAL(tick()));
+  this->Internals->VTKConnect->Connect(proxy, vtkCommand::StartEvent,
+    this, SIGNAL(beginPlay()));
+  this->Internals->VTKConnect->Connect(proxy, vtkCommand::EndEvent,
+    this, SIGNAL(endPlay()));
 
   this->Internals->VTKConnect->Connect(
     proxy->GetProperty("PlayMode"), vtkCommand::ModifiedEvent,

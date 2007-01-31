@@ -104,6 +104,12 @@ signals:
 
   // Emitted when the clock time ranges change.
   void clockTimeRangesChanged();
+
+  // Emitted when animation starts playing.
+  void beginPlay();
+
+  // Emitted when animation ends playing.
+  void endPlay();
 private slots:
   // Called when the "Cues" property on the AnimationScene proxy
   // is changed. Updates the internal datastructure to reflect the current

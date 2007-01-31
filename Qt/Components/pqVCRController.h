@@ -92,6 +92,8 @@ public slots:
 protected slots:
   void onTick();
   void onLoopPropertyChanged();
+  void onBeginPlay();
+  void onEndPlay();
 
 private:
   pqVCRController(const pqVCRController&); // Not implemented.
