@@ -415,7 +415,7 @@
   </widget>
   <widget class="QDockWidget" name="animationPanelDock" >
    <property name="windowTitle" >
-    <string>Animation Panel</string>
+    <string>Animation Inspector</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
