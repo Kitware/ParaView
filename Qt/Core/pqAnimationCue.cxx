@@ -31,11 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqAnimationCue.h"
 
-#include "vtkSMProxy.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSmartPointer.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 
 #include <QList>
 #include <QtDebug>
@@ -135,6 +136,7 @@ void pqAnimationCue::setDefaults()
       pxm->NewProxy("animation_manipulators", 
         this->ManipulatorType.toAscii().data());
     manip->SetConnectionID(this->getServer()->GetConnectionID());
+    manip->SetServers(vtkProcessModule::CLIENT);
     this->addInternalProxy("Manipulator", manip);
     manip->Delete();
     pqSMAdaptor::setProxyProperty(proxy->GetProperty("Manipulator"),
@@ -273,6 +275,7 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
     return 0;
     }
   kf->SetConnectionID(this->getServer()->GetConnectionID());
+  kf->SetServers(vtkProcessModule::CLIENT);
 
   keyframes.insert(index, kf);
   double keyTime;

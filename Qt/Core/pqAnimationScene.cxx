@@ -33,11 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkProcessModule.h"
+#include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSMPropertyLink.h"
+#include "vtkSMProxyProperty.h"
 
 #include <QPointer>
 #include <QSet>
@@ -278,6 +279,7 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& mtype,
 
   vtkSMProxy* cueProxy = builder->createProxy("animation", "AnimationCue", "animation",
     this->getServer());
+  cueProxy->SetServers(vtkProcessModule::CLIENT);
   pqAnimationCue* cue = qobject_cast<pqAnimationCue*>(smmodel->getPQProxy(cueProxy));
   if (!cue)
     {

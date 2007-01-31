@@ -33,10 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqAbortAnimation.h"
 #include "ui_pqAnimationSettings.h"
 
+#include "vtkProcessModule.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
 #include "vtkSMAnimationSceneImageWriter.h"
-#include "vtkSMPVAnimationSceneProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMPVAnimationSceneProxy.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMServerProxyManagerReviver.h"
 
@@ -197,6 +198,7 @@ pqAnimationScene* pqAnimationManager::createActiveScene()
     pqPipelineBuilder* builder = pqApplicationCore::instance()->getPipelineBuilder();
     vtkSMProxy *scene = builder->createProxy("animation", "PVAnimationScene", "animation",
       this->Internals->ActiveServer, false);
+    scene->SetServers(vtkProcessModule::CLIENT);
     // this will result in a call to onProxyAdded() and proper
     // signals will be emitted.
     if (!scene)
