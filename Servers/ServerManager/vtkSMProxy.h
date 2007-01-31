@@ -567,8 +567,15 @@ protected:
   unsigned int GetNumberOfSubProxies();
 
   // Description:
-  // Save the ids for the subproxies.
-  void SaveSubProxyIds(vtkPVXMLElement* root);
+  // Save relevant information about subproxies. Note that we don't need
+  // to save subproxy property information since only 
+  // exposed properties are saved.
+  void SaveSubProxyState(vtkPVXMLElement* root);
+
+  // Description:
+  // Load the subproxy state.
+  void LoadSubProxyState(vtkPVXMLElement* subproxyElement, 
+    vtkSMStateLoader* loader);
 
   // Description:
   // Called by a proxy property, this adds the property,proxy

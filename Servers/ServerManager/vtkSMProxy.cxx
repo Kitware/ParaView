@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.84");
+vtkCxxRevisionMacro(vtkSMProxy, "1.85");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1780,6 +1780,12 @@ int vtkSMProxy::LoadState(vtkPVXMLElement* proxyElement,
                           vtkSMStateLoader* loader)
 {
   unsigned int numElems = proxyElement->GetNumberOfNestedElements();
+  int servers =0;
+  if (proxyElement->GetScalarAttribute("servers", &servers))
+    {
+    this->SetServersSelf(servers);
+    }
+
   for (unsigned int i=0; i<numElems; i++)
     {
     vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
@@ -1806,6 +1812,10 @@ int vtkSMProxy::LoadState(vtkPVXMLElement* proxyElement,
         {
         return 0;
         }
+      }
+    else if (strcmp(name, "SubProxy") == 0)
+      {
+      this->LoadSubProxyState(currentElement, loader);
       }
     else if (strcmp(name, "RevivalState") == 0 && loader->GetReviveProxies())
       {
@@ -1905,7 +1915,8 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
   proxyElement->AddAttribute("group", this->XMLGroup);
   proxyElement->AddAttribute("type", this->XMLName);
   proxyElement->AddAttribute("id", this->GetSelfIDAsString());
-
+  proxyElement->AddAttribute("servers", 
+    static_cast<unsigned int>(this->Servers));
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
 
   while (!iter->IsAtEnd())
@@ -1928,10 +1939,7 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
     proxyElement->Delete();
     }
 
-
-  // SubProxyIds are never really needed.
-  //this->SaveSubProxyIds(proxyElement);
-
+  this->SaveSubProxyState(proxyElement);
   return proxyElement;
 }
 
@@ -1976,7 +1984,7 @@ vtkPVXMLElement* vtkSMProxy::SaveRevivalState(vtkPVXMLElement* root)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::SaveSubProxyIds(vtkPVXMLElement* root)
+void vtkSMProxy::SaveSubProxyState(vtkPVXMLElement* root)
 {
   vtkSMProxyInternals::ProxyMap::iterator iter =
     this->Internals->SubProxies.begin();
@@ -1985,10 +1993,36 @@ void vtkSMProxy::SaveSubProxyIds(vtkPVXMLElement* root)
     vtkPVXMLElement* subproxyElement = vtkPVXMLElement::New();
     subproxyElement->SetName("SubProxy");
     subproxyElement->AddAttribute("name", iter->first.c_str());
-    subproxyElement->AddAttribute("id", iter->second.GetPointer()->GetSelfIDAsString());
-    iter->second.GetPointer()->SaveSubProxyIds(subproxyElement);
+    subproxyElement->AddAttribute("servers", 
+      static_cast<unsigned int>(iter->second->GetServers()));
+    iter->second.GetPointer()->SaveSubProxyState(subproxyElement);
     root->AddNestedElement(subproxyElement);
     subproxyElement->Delete();
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::LoadSubProxyState(vtkPVXMLElement* subproxyElement, 
+  vtkSMStateLoader* loader)
+{
+  const char* name = subproxyElement->GetAttribute("name");
+  if (name)
+    {
+    int servers=0;
+    vtkSMProxy* proxy = this->GetSubProxy(name);
+    if (proxy && subproxyElement->GetScalarAttribute("servers", &servers))
+      {
+      proxy->SetServersSelf(servers);
+      for (unsigned int cc=0; cc < subproxyElement->GetNumberOfNestedElements();
+        cc++)
+        {
+        vtkPVXMLElement* nested = subproxyElement->GetNestedElement(cc);
+        if (nested->GetName() && strcmp(nested->GetName(), "SubProxy")==0)
+          {
+          proxy->LoadSubProxyState(nested, loader);
+          }
+        }
+      }
     }
 }
 
