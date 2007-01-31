@@ -27,11 +27,12 @@
 
 #include "vtkSMProxy.h"
 
-class vtkSMAnimationCueProxyObserver;
 class vtkAnimationCue;
-class vtkSMProperty;
-class vtkSMDomain;
+class vtkCommand;
 class vtkSMAnimationCueManipulatorProxy;
+class vtkSMAnimationCueProxyObserver;
+class vtkSMDomain;
+class vtkSMProperty;
 
 class VTK_EXPORT vtkSMAnimationCueProxy : public vtkSMProxy
 {
@@ -164,7 +165,7 @@ protected:
     { this->CreateVTKObjects(1); }
   
 //BTX
-  vtkSMAnimationCueProxyObserver* Observer;
+  vtkCommand* Observer;
   friend class vtkSMAnimationCueProxyObserver;
   friend class vtkSMTemporalXYPlotDisplayProxy;
 //ETX

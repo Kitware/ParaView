@@ -124,6 +124,8 @@ protected:
   ~vtkSMAnimationSceneProxy();
 
   virtual void CreateVTKObjects(int numObjects);
+  virtual void ExecuteEvent(vtkObject* wdg, unsigned long event, void* calldata);
+  virtual void InitializeObservers(vtkAnimationCue* cue); 
 
   // Set when CacheUpdate() is called on any view.
   int GeometryCached; 

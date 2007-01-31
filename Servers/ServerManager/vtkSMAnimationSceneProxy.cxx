@@ -17,6 +17,7 @@
 #include "vtkAnimationScene.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
@@ -100,7 +101,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.38");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.39");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -133,6 +134,17 @@ void vtkSMAnimationSceneProxy::CreateVTKObjects(int numObjects)
   this->ObjectsCreated = 1;
 
   this->Superclass::CreateVTKObjects(numObjects);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::InitializeObservers(vtkAnimationCue* cue)
+{
+  this->Superclass::InitializeObservers(cue);
+  if (cue)
+    {
+    cue->AddObserver(vtkCommand::StartEvent, this->Observer);
+    cue->AddObserver(vtkCommand::EndEvent, this->Observer);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -446,6 +458,18 @@ vtkSMAbstractViewModuleProxy* vtkSMAnimationSceneProxy::GetViewModule(
     return this->Internals->ViewModules[cc];
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::ExecuteEvent(
+  vtkObject* wdg, unsigned long event, void* calldata)
+{
+  if (event == vtkCommand::StartEvent || event == vtkCommand::EndEvent)
+    {
+    this->InvokeEvent(event);
+    return;
+    }
+  this->Superclass::ExecuteEvent(wdg, event, calldata);
 }
 
 //----------------------------------------------------------------------------

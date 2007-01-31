@@ -25,7 +25,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.17");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -63,8 +63,9 @@ public:
 //----------------------------------------------------------------------------
 vtkSMAnimationCueProxy::vtkSMAnimationCueProxy()
 {
-  this->Observer = vtkSMAnimationCueProxyObserver::New();
-  this->Observer->SetAnimationCueProxy(this);
+  vtkSMAnimationCueProxyObserver* obs = vtkSMAnimationCueProxyObserver::New();
+  obs->SetAnimationCueProxy(this);
+  this->Observer = obs; 
 
   this->AnimatedProxy = 0;
   this->AnimatedElement= 0;
