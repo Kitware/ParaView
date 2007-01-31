@@ -29,7 +29,21 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+
+#include "pqMainWindowCore.h"
 #include <vtkPQConfig.h>
+
+#include <QApplication>
+#include <QDockWidget>
+#include <QFile>
+#include <QMenu>
+#include <QMessageBox>
+#include <QProgressBar>
+#include <QStatusBar>
+#include <QToolBar>
+#include <QtDebug>
+#include <QList>
+#include <QDir>
 
 #include "pqActiveView.h"
 #include "pqAnimationManager.h"
@@ -45,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqElementInspectorWidget.h"
 #include "pqGenericViewManager.h"
 #include "pqLinksManager.h"
-#include "pqMainWindowCore.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
 #include "pqObjectInspectorDriver.h"
@@ -97,17 +110,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef PARAVIEW_EMBED_PYTHON
 #include <pqPythonDialog.h>
 #endif // PARAVIEW_EMBED_PYTHON
-
-#include <QApplication>
-#include <QDockWidget>
-#include <QFile>
-#include <QMenu>
-#include <QMessageBox>
-#include <QProgressBar>
-#include <QStatusBar>
-#include <QToolBar>
-#include <QtDebug>
-#include <QList>
 
 #include <QVTKWidget.h>
 
@@ -224,8 +226,23 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     SLOT(updateLookupTableScalarRanges()));
 
   // Initialize supported file types.
-  core->getReaderFactory()->loadFileTypes(":/pqWidgets/XML/ParaViewReaders.xml");
-  core->getWriterFactory()->loadFileTypes(":/pqWidgets/XML/ParaViewWriters.xml");
+  QString readersDirName = ":/ParaViewReaders";
+  QDir readersDir(readersDirName);
+  QStringList resources = readersDir.entryList(QDir::Files);
+  foreach(QString resource, resources)
+    {
+    core->getReaderFactory()->loadFileTypes(
+      readersDirName + QString("/") + resource);
+    }
+  
+  QString writersDirName = ":/ParaViewWriters";
+  QDir writersDir(writersDirName);
+  resources = writersDir.entryList(QDir::Files);
+  foreach(QString resource, resources)
+    {
+    core->getWriterFactory()->loadFileTypes(
+      writersDirName + QString("/") + resource);
+    }
  
   // Listen to the active render module changed signals.
   QObject::connect(
@@ -423,9 +440,15 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
       }
 
     // Load in the filter information.
-    QFile filterInfo(":/pqWidgets/XML/ParaViewFilters.xml");
-    if(filterInfo.open(QIODevice::ReadOnly))
+    QString filtersDirName = ":/ParaViewReaders";
+    QDir filtersDir(filtersDirName);
+    QStringList resources = filtersDir.entryList(QDir::Files);
+    foreach(QString resource, resources)
       {
+      QString resourceName = filtersDirName + QString("/") + resource;
+      QFile filterInfo(resourceName);
+      filterInfo.open(QFile::ReadOnly);
+      
       vtkSmartPointer<vtkPVXMLParser> xmlParser = 
         vtkSmartPointer<vtkPVXMLParser>::New();
       xmlParser->InitializeParser();
@@ -478,121 +501,6 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
       }
     }
 
-/*
-//Old Filter Menu
-  this->Implementation->FilterMenu = menu;
-  if(this->Implementation->FilterMenu)
-    {
-    this->Implementation->FilterMenu << pqConnect(SIGNAL(triggered(QAction*)), 
-      this, SLOT(onCreateFilter(QAction*)));
-
-    this->Implementation->FilterMenu->clear();
-
-    // Update the menu items for the server and compound filters too.
-    QMenu *alphabetical = this->Implementation->FilterMenu;
-    QMap<QString, QMenu *> categories;
-
-    QStringList::Iterator iter;
-    pqSourceProxyInfo proxyInfo;
-
-    //Released Filters
-    QStringList commonFilters;
-    commonFilters<<"Clip";
-    commonFilters<<"Cut";
-    commonFilters<<"Threshold";
-    commonFilters<<"Contour";
-    commonFilters<<"StreamTracer";
-
-    QMenu *commonMenu = this->Implementation->FilterMenu->addMenu("Common") 
-      << pqSetName("Common");
-    for(iter = commonFilters.begin(); iter != commonFilters.end(); ++iter)
-      {
-      QAction* action = commonMenu->addAction(*iter) << pqSetName(*iter)
-        << pqSetData(*iter);
-      action->setEnabled(false);
-      }
-
-    // Load in the filter information.
-    QFile filterInfo(":/pqWidgets/XML/ParaViewFilters.xml");
-    if(filterInfo.open(QIODevice::ReadOnly))
-      {
-      vtkSmartPointer<vtkPVXMLParser> xmlParser = 
-        vtkSmartPointer<vtkPVXMLParser>::New();
-      xmlParser->InitializeParser();
-      QByteArray filter_data = filterInfo.read(1024);
-      while(!filter_data.isEmpty())
-        {
-        xmlParser->ParseChunk(filter_data.data(), filter_data.length());
-        filter_data = filterInfo.read(1024);
-        }
-
-      xmlParser->CleanupParser();
-      filterInfo.close();
-
-      proxyInfo.LoadFilterInfo(xmlParser->GetRootElement());
-      }
-
-    // Set up the filters menu based on the filter information.
-    QStringList menuNames;
-    proxyInfo.GetFilterMenu(menuNames);
-    if(menuNames.size() > 0)
-      {
-      // Only use an alphabetical menu if requested.
-      alphabetical = 0;
-      }
-
-    for(iter = menuNames.begin(); iter != menuNames.end(); ++iter)
-      {
-      if((*iter).isEmpty())
-        {
-        this->Implementation->FilterMenu->addSeparator();
-        }
-      else
-        {
-        QMenu *_menu = this->Implementation->FilterMenu->addMenu(*iter) 
-          << pqSetName(*iter);
-        categories.insert(*iter, _menu);
-        if((*iter) == "&Alphabetical" || (*iter) == "Alphabetical")
-          {
-          alphabetical = _menu;
-          }
-        }
-      }
-
-    vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
-    manager->InstantiateGroupPrototypes("filters");
-    int numFilters = manager->GetNumberOfProxies("filters_prototypes");
-    for(int i=0; i<numFilters; i++)
-      {
-      int addToAlphabetical = 0;
-
-      QStringList categoryList;
-      QString proxyName = manager->GetProxyName("filters_prototypes",i);
-      proxyInfo.GetFilterMenuCategories(proxyName, categoryList);
-
-      for(iter = categoryList.begin(); iter != categoryList.end(); ++iter)
-        {
-        QMap<QString, QMenu *>::Iterator jter = categories.find(*iter);
-        if(jter != categories.end())
-          {
-          QAction* action = (*jter)->addAction(proxyName) << pqSetName(proxyName)
-            << pqSetData(proxyName);
-          action->setEnabled(false);
-          
-          // Add to the alphabetical list only if in one of the other menus.
-          addToAlphabetical = 1;
-          }
-        }
-
-      if(alphabetical && addToAlphabetical)
-        {
-        QAction* action = alphabetical->addAction(proxyName) << pqSetName(proxyName)
-          << pqSetData(proxyName);
-        action->setEnabled(false);
-        }
-      }
-    }
-    */
 }
 
 pqPipelineMenu& pqMainWindowCore::pipelineMenu()
@@ -618,6 +526,7 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
     
   dock_widget->setWidget(this->Implementation->PipelineBrowser);
 
+#if 0
   // TEMP: Load in the filter information.
   QFile filterInfo(":/pqWidgets/XML/ParaViewFilters.xml");
   if(filterInfo.open(QIODevice::ReadOnly))
@@ -638,6 +547,7 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
     this->Implementation->PipelineBrowser->loadFilterInfo(
         xmlParser->GetRootElement());
     }
+#endif
   
   QObject::connect(
     &pqActiveView::instance(),
