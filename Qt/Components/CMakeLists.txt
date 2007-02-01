@@ -197,11 +197,11 @@ FOREACH(RESOURCE ${ALL_GUI_RESOURCES})
       "${QT_COMPONENTS_GUI_RESOURCES_CONTENTS}  <file alias=\"${ALIAS}\">${RESOURCE}</file>\n")
 ENDFOREACH(RESOURCE)
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqExtraResources.qrc.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResource.qrc" @ONLY)
+               "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc" @ONLY)
 
 SET(UI_RESOURCES
   Resources/pqComponents.qrc
-  "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResource.qrc"
+  "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc"
 )
 
 QT4_ADD_RESOURCES(RCS_SOURCES
