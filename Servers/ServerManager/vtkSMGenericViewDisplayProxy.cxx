@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.14");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -146,7 +146,7 @@ void vtkSMGenericViewDisplayProxy::SetReductionType(int type)
     {
     stream
       << vtkClientServerStream::Invoke
-      << this->ReduceProxy->GetID(i) << "SetReductionHelper"
+      << this->ReduceProxy->GetID(i) << "SetPostGatherHelper"
       << rfid
       << vtkClientServerStream::End;
     }

@@ -4311,11 +4311,11 @@ This filter uses colors to show levels of a hiearchical dataset.
             <Group name="filters"/>
           </ProxyGroupDomain>
       </InputProperty>
-      <ProxyProperty name="PreReductionHelper"
-         command="SetPreReductionHelper">
+      <ProxyProperty name="PreGatherHelper"
+         command="SetPreGatherHelper">
       </ProxyProperty>
-      <ProxyProperty name="ReductionHelper"
-         command="SetReductionHelper">
+      <ProxyProperty name="PostGatherHelper"
+         command="SetPostGatherHelper">
       </ProxyProperty>
       <IntVectorProperty 
          name="PassThrough" 

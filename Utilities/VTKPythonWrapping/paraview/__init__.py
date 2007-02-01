@@ -708,31 +708,60 @@ def CreateDisplay(proxy, renModule):
     renModule.UpdateVTKObjects()
     return display
 
-def fetch(input, operator, node=-1):
+def fetch(input, arg=None):
    """ 
-   A convenience method that instantiates a pipeline that applies the 
-   given operator to input and returns the result to the client. The 
-   optional node argument when set to -1 applies to operation to all 
-   server nodes, or when set to a number returns the results from that
-   node.
+   A convenience method that moves data from the server to the client, 
+   optionally performing some operation on the data as it moves.
+   The input argument is the name of the (proxy for a) source or filter
+   whose output is needed on the client.
+
+   You can use fetch to do three things.
+   If arg is None (the default) then the output is brought to the client 
+   unmodified. In parallel runs the Append or AppenPolyData filters merges the
+   data on each processor into one dataset.
+
+   If arg is an integer then one particular processor's output is brought to
+   the client. In serial runs the arg is ignored. If you have a filter that
+   computes results in parallel and brings them to the root node, then set 
+   arg to be 0.
+
+   If arg is an algorithm, for example vtkMinMax, the algorithm will be applied
+   to the data to obtain some result. In parallel runs the algorithm will be
+   run on each processor to make intermediate results and then again on the 
+   root processor over all of the intermediate results to create a 
+   global result.
    """
-   
-   #create the reduction pipeline
+
+   import types
+
+   #create the pipeline that reduces and transmits the data
    gvd = CreateProxy("displays", "GenericViewDisplay")
-   #connect gvd to the desired input
-   gvd.SetInput(input)
-   
-   #tell gvd that its vtkReductionFilter should apply the given operator   
-   gvd.SetPreReductionHelper(operator)
-   gvd.SetReductionHelper(operator)
-   
-   #tell gvd to select either one, or all nodes to gather
-   gvd.SetPassThrough(node)
-   #results are always gathered to the root before sending to client
-   gvd.SetReductionType(3)   
-   
+   gvd.SetInput(input) 
+  
+   if arg == None:
+     print "getting appended"
+     if input.GetDataInformation().GetDataClassName() == "vtkPolyData":
+       print "use append poly data filter"
+       gvd.SetReductionType(1)
+     else:
+       print "use append filter"
+       gvd.SetReductionType(2)
+
+   elif type(arg) is types.IntType:          
+     print "getting node %d" % arg
+     gvd.SetReductionType(3)   
+     gvd.SetPreGatherHelper(None)
+     gvd.SetPostGatherHelper(None)
+     gvd.SetPassThrough(arg)
+
+   else:
+     print "applying operation"
+     gvd.SetReductionType(3)   
+     gvd.SetPreGatherHelper(arg)
+     gvd.SetPostGatherHelper(arg)
+     gvd.SetPassThrough(-1)
+
    #go!
    gvd.UpdateVTKObjects()
-   gvd.Update()
-   
+   gvd.Update()   
    return gvd.GetOutput()

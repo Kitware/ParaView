@@ -26,6 +26,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
 #include "vtkToolkits.h"
+#include "vtkInstantiator.h"
 
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
@@ -34,26 +35,26 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.5");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.6");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
-vtkCxxSetObjectMacro(vtkReductionFilter, PreReductionHelper, vtkAlgorithm);
-vtkCxxSetObjectMacro(vtkReductionFilter, ReductionHelper, vtkAlgorithm);
+vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
+vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
 
 //-----------------------------------------------------------------------------
 vtkReductionFilter::vtkReductionFilter()
 {
   this->Controller= 0;
   this->RawData = 0;
-  this->PreReductionHelper = 0;
-  this->ReductionHelper = 0;
+  this->PreGatherHelper = 0;
+  this->PostGatherHelper = 0;
   this->PassThrough = -1;
 }
 
 //-----------------------------------------------------------------------------
 vtkReductionFilter::~vtkReductionFilter()
 {
-  this->SetPreReductionHelper(0);
-  this->SetReductionHelper(0);
+  this->SetPreGatherHelper(0);
+  this->SetPostGatherHelper(0);
   this->SetController(0);
   delete []this->RawData;
 }
@@ -65,12 +66,62 @@ int vtkReductionFilter::FillInputPortInformation(int idx, vtkInformation *info)
   return this->Superclass::FillInputPortInformation(idx, info);
 }
 
+/*
+//-----------------------------------------------------------------------------
+int vtkReductionFilter::RequestDataObject(
+  vtkInformation* reqInfo,
+  vtkInformationVector** inputVector, 
+  vtkInformationVector* outputVector)
+{
+  if (this->PostGatherHelper != NULL)
+    {
+    cerr << "ALIGNING OUTPUT TYPES" << endl;
+
+    vtkInformation* helpersInfo = 
+      this->PostGatherHelper->GetOutputPortInformation(0);
+
+    if (helpersInfo)
+      cerr << "GOT HELPERS OUT INFO" << endl;
+    else
+      cerr << "NO INFO" << endl;
+
+    const char *helpersOutType = helpersInfo->Get(vtkDataObject::DATA_TYPE_NAME());
+    if (helpersOutType)
+      cerr << "HELPERS OUT IS A " << helpersOutType << endl;
+    else
+      cerr << "NO OUT TYPE" << endl;
+
+    vtkInformation* info = outputVector->GetInformationObject(0);
+    vtkDataSet *output = vtkDataSet::SafeDownCast(
+      reqInfo->Get(vtkDataObject::DATA_OBJECT()));
+    if (!output || !output->IsA(helpersOutType)) 
+      {
+      vtkObject* anObj = vtkInstantiator::CreateInstance(helpersOutType);
+      if (!anObj || !anObj->IsA(helpersOutType))
+        {
+        vtkErrorMacro("Could not create chosen output data type.");
+        return 0;
+        }
+      cerr << "CHANGING OUTPUT TYPE" << endl;
+      vtkDataSet* newOutput = vtkDataSet::SafeDownCast(anObj);
+      newOutput->SetPipelineInformation(info);
+      newOutput->Delete();
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+      }
+    }
+  else
+    {
+    return this->Superclass::RequestDataObject(reqInfo, inputVector, outputVector);
+    }
+}
+*/
+
 //-----------------------------------------------------------------------------
 int vtkReductionFilter::RequestData(vtkInformation*,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-
   vtkDataSet* input = 0;
   vtkDataSet* output = vtkDataSet::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -92,22 +143,28 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
   //run the PreReduction filter on our input
   //result goes into preOutput
   vtkDataSet *preOutput = NULL;
-  if (this->PreReductionHelper == NULL)
+  if (this->PreGatherHelper == NULL)
     {
     //allow a passthrough
     preOutput = input->NewInstance();
     preOutput->ShallowCopy(input);
     }
   else
-    {
-    this->PreReductionHelper->RemoveAllInputs();
-    this->PreReductionHelper->AddInputConnection(input->GetProducerPort());
-    this->PreReductionHelper->Update();
+    {        
+    //don't just use the input directly, in that case the pipeline info gets
+    //messed up and PreGatherHelper won't have piece or time info.
+    this->PreGatherHelper->RemoveAllInputs();
+    vtkDataSet *incopy = input->NewInstance();
+    incopy->ShallowCopy(input);
+    this->PreGatherHelper->AddInputConnection(0, incopy->GetProducerPort());
+    this->PreGatherHelper->Update();
     vtkDataSet* reduced_output = 
-      vtkDataSet::SafeDownCast(this->PreReductionHelper->GetOutputDataObject(0));
-    if (this->ReductionHelper != NULL)
+      vtkDataSet::SafeDownCast(this->PreGatherHelper->GetOutputDataObject(0));
+    incopy->Delete();
+
+    if (this->PostGatherHelper != NULL)
       {
-      vtkInformation* info = this->ReductionHelper->GetInputPortInformation(0);
+      vtkInformation* info = this->PostGatherHelper->GetInputPortInformation(0);
       if (info) 
         {
         const char* expectedType =
@@ -119,7 +176,7 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
           }
         else 
           {
-          vtkWarningMacro("Prereduction filter's output type is not same as the reduction filter's input type.");
+          vtkWarningMacro("PreGatherHelper's output type is not compatible with the PostGatherHelper's input type.");
           preOutput = input->NewInstance();
           preOutput->ShallowCopy(input);
           }
@@ -150,6 +207,10 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
     }
   int myId = controller->GetLocalProcessId();
   int numProcs = controller->GetNumberOfProcesses();
+  if (this->PassThrough > numProcs)
+    {
+    this->PassThrough = -1;
+    }
 
   this->MarshallData(preOutput);
   if (myId == 0)
@@ -187,9 +248,9 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
         }
       }
 
-    // Now run the ReductionHelper on the collected results from each node
+    // Now run the PostGatherHelper on the collected results from each node
     // result goes into output
-    if (!this->ReductionHelper)
+    if (!this->PostGatherHelper)
       {
       //allow a passthrough
       //in this case just send the data from one node
@@ -197,27 +258,27 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
       }
     else
       {
-      this->ReductionHelper->RemoveAllInputs();
+      this->PostGatherHelper->RemoveAllInputs();
       //connect all (or just the selected selected) datasets to the reduction
       //algorithm
       if (this->PassThrough == -1)
         {
         for (cc=0; cc<numProcs; ++cc)
           {
-          this->ReductionHelper->AddInputConnection(
+          this->PostGatherHelper->AddInputConnection(
             data_sets[cc]->GetProducerPort());
           }
         } 
       else
         {
-        this->ReductionHelper->AddInputConnection(
+        this->PostGatherHelper->AddInputConnection(
           data_sets[0]->GetProducerPort());
         }
        
-      this->ReductionHelper->Update();
+      this->PostGatherHelper->Update();
       vtkDataSet* reduced_output = 
         vtkDataSet::SafeDownCast(
-          this->ReductionHelper->GetOutputDataObject(0));
+          this->PostGatherHelper->GetOutputDataObject(0));
 
       if (output->IsA(reduced_output->GetClassName()))
         {
@@ -225,7 +286,9 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
         }
       else
         {
-        vtkErrorMacro("Reduction output type is not same as the reduction filter's output type.");
+        cerr << "POST OUT = " << reduced_output->GetClassName() << endl;
+        cerr << "REDX OUT = " << output->GetClassName() << endl;
+        vtkErrorMacro("PostGatherHelper's output type is not same as the ReductionFilters's output type.");
         }
       }
 
@@ -290,7 +353,7 @@ vtkDataSet* vtkReductionFilter::Reconstruct(char* raw_data, int data_length)
 void vtkReductionFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "PreReductionHelper: " << this->PreReductionHelper << endl;
-  os << indent << "ReductionHelper: " << this->ReductionHelper << endl;
+  os << indent << "PreGatherHelper: " << this->PreGatherHelper << endl;
+  os << indent << "PostGatherHelper: " << this->PostGatherHelper << endl;
   os << indent << "Controller: " << this->Controller << endl;
 }

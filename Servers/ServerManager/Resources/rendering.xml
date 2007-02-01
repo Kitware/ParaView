@@ -3673,8 +3673,8 @@
         <Proxy name="Reduce" proxygroup="filters" proxyname="ReductionFilter">
         </Proxy>
         <ExposedProperties>
-          <Property name="PreReductionHelper" />
-          <Property name="ReductionHelper" />
+          <Property name="PreGatherHelper" />
+          <Property name="PostGatherHelper" />
           <Property name="PassThrough" />
         </ExposedProperties>
       </SubProxy>

@@ -16,12 +16,12 @@
 // dataset using any reduction algorithm.
 // .SECTION Description
 // A generic filter that can reduce any type of dataset using any reduction 
-// algorithm. Actual reduction is performed by running the PreReductionHelper
-// and ReductionHelper algorithms. The PreReductionHelper runs on each node
+// algorithm. Actual reduction is performed by running the PreGatherHelper
+// and PostGatherHelper algorithms. The PreGatherHelper runs on each node
 // in parallel. Next the intermediate results are gathered to the root node.
-// The root node then runs the ReductionHelper algorithm to produce a single 
-// result. The ReductionHelper must be an algorithm that takes multiple 
-// input connections and produces a single reduced output. 
+// Then the root node then runs the PostGatherHelper algorithm to produce a
+// single result. The PostGatherHelper must be an algorithm that takes 
+// multiple input connections and produces a single reduced output. 
 //
 // In addition to doing reduction the PassThrough variable lets you choose
 // to pass through the results of any one node instead of aggregating all of
@@ -44,16 +44,16 @@ public:
   // Description:
   // Get/Set the pre-reduction helper. Pre-Reduction helper is an algorithm 
   // that runs on each node's data before it is sent to the root.
-  void SetPreReductionHelper(vtkAlgorithm*);
-  vtkGetObjectMacro(PreReductionHelper, vtkAlgorithm);
+  void SetPreGatherHelper(vtkAlgorithm*);
+  vtkGetObjectMacro(PreGatherHelper, vtkAlgorithm);
 
   // Description:
   // Get/Set the reduction helper. Reduction helper is an algorithm with
   // multiple input connections, that produces a single output as
   // the reduced output. This is run on the root node to produce a result
   // from the gathered results of each node.
-  void SetReductionHelper(vtkAlgorithm*);
-  vtkGetObjectMacro(ReductionHelper, vtkAlgorithm);
+  void SetPostGatherHelper(vtkAlgorithm*);
+  vtkGetObjectMacro(PostGatherHelper, vtkAlgorithm);
 
   // Description:
   // Get/Set the MPI controller used for gathering.
@@ -63,7 +63,7 @@ public:
   //Get/Set the PassThrough flag which (when set to a nonnegative number N) 
   //tells the filter to produce results that come from node N only. The 
   //data from that node still runs through the PreReduction and 
-  //ReductionHelper algorithms.
+  //PostGatherHelper algorithms.
   vtkSetMacro(PassThrough, int);
   vtkGetMacro(PassThrough, int);
 
@@ -74,7 +74,11 @@ protected:
   // Overridden to mark input as optional, since input data may
   // not be available on all processes that this filter is instantiated.
   virtual int FillInputPortInformation(int port, vtkInformation *info);
-
+  /*
+  virtual int RequestDataObject(vtkInformation* request,
+                                vtkInformationVector** inputVector,
+                                vtkInformationVector* outputVector);
+  */
   virtual int RequestData(vtkInformation* request,
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
@@ -85,8 +89,8 @@ protected:
 
   char* RawData;
   int DataLength;
-  vtkAlgorithm* PreReductionHelper;
-  vtkAlgorithm* ReductionHelper;
+  vtkAlgorithm* PreGatherHelper;
+  vtkAlgorithm* PostGatherHelper;
   vtkMultiProcessController* Controller;
   int PassThrough;
 

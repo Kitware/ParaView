@@ -16,15 +16,15 @@
 // attributes.
 //
 // .SECTION Description
-// This filter lets the user choose from a list of operations and then runs
+// This filter lets the user choose from a set of operations and then runs
 // that operation on all of the attribute data of its input(s). For example
 // if MIN is requested, it finds the minimum values in all of its input data
 // arrays. If this filter has multiple input data sets attached to its
-// first input port, it will run the operation on all each input data set in
-// turn, producing for example a global minimum value. This filter ignores 
-// attribute values that are marked as being ghosts. The output of this 
-// filter will always be a single vtkPolyData that contains exactly one point 
-// and one cell (a VTK_VERTEX).
+// first input port, it will run the operation on each input data set in
+// turn, producing a global minimum value over all the inputs. In parallel 
+// runs this filter REQUIRES vtkGhostLevel arrays to skip redundant 
+// information. The output of this filter will always be a single vtkPolyData 
+// that contains exactly one point and one cell (a VTK_VERTEX).
 
 #include "vtkPolyDataAlgorithm.h"
 
