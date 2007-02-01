@@ -236,12 +236,12 @@ void pqSampleScalarWidget::accept()
   
   if(this->Implementation->SampleProperty)
     {
-    const QList<double> samples = this->Implementation->Model.values();
+    const QList<double> sample_list = this->Implementation->Model.values();
     
-    this->Implementation->SampleProperty->SetNumberOfElements(samples.size());
-    for(int i = 0; i != samples.size(); ++i)
+    this->Implementation->SampleProperty->SetNumberOfElements(sample_list.size());
+    for(int i = 0; i != sample_list.size(); ++i)
       {
-      this->Implementation->SampleProperty->SetElement(i, samples[i]);
+      this->Implementation->SampleProperty->SetElement(i, sample_list[i]);
       }
     }
 

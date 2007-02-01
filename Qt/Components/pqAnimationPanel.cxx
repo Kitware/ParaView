@@ -498,7 +498,7 @@ void pqAnimationPanel::buildPropertyList()
       {
       pqAnimationPanel::pqInternals::PropertyInfo info;
       info.Name = iter->GetKey();
-      info.Index = smproperty->GetRepeatCommand()? -1 : cc;
+      info.Index = smproperty->GetRepeatCommand()? -1 : static_cast<int>(cc);
 
       QString label = iter->GetKey();
       label = (num_elems>1) ? label + " (" + QString::number(cc) + ")" 
