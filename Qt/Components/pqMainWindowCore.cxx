@@ -226,7 +226,7 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     SLOT(updateLookupTableScalarRanges()));
 
   // Initialize supported file types.
-  QString readersDirName = ":/ParaViewReaders";
+  QString readersDirName = ":/ParaViewResources";
   QDir readersDir(readersDirName);
   QStringList resources = readersDir.entryList(QDir::Files);
   foreach(QString resource, resources)
@@ -235,7 +235,7 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
       readersDirName + QString("/") + resource);
     }
   
-  QString writersDirName = ":/ParaViewWriters";
+  QString writersDirName = ":/ParaViewResources";
   QDir writersDir(writersDirName);
   resources = writersDir.entryList(QDir::Files);
   foreach(QString resource, resources)
@@ -440,7 +440,7 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
       }
 
     // Load in the filter information.
-    QString filtersDirName = ":/ParaViewReaders";
+    QString filtersDirName = ":/ParaViewResources";
     QDir filtersDir(filtersDirName);
     QStringList resources = filtersDir.entryList(QDir::Files);
     foreach(QString resource, resources)

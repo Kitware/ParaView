@@ -163,13 +163,9 @@
         <file>Icons/pvZplus.png</file>
         <file>UI/pqThresholdPanel.ui</file>
     </qresource>
-    <qresource prefix="/ParaViewReaders" >
+    <qresource prefix="/ParaViewResources" >
         <file alias="ParaViewReaders.xml">XML/ParaViewReaders.xml</file>
-    </qresource>
-    <qresource prefix="/ParaViewFilters" >
         <file alias="ParaViewFilters.xml">XML/ParaViewFilters.xml</file>
-    </qresource>
-    <qresource prefix="/ParaViewWriters" >
         <file alias="ParaViewWriters.xml">XML/ParaViewWriters.xml</file>
     </qresource>
 </RCC>
