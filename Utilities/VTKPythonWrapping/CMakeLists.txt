@@ -340,7 +340,6 @@ ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataInformation.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataIterator.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataSet.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataSetAlgorithm.cxx
-${VTK_SOURCE_DIR}/Filtering/vtkNodeLinks.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkNonLinearCell.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkOrderedTriangulator.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkParametricSpline.cxx
@@ -423,6 +422,7 @@ ${VTK_SOURCE_DIR}/Filtering/vtkUnstructuredGridSource.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkUnstructuredGridToPolyDataFilter.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkUnstructuredGridToUnstructuredGridFilter.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkVertex.cxx
+${VTK_SOURCE_DIR}/Filtering/vtkVertexLinks.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkViewDependentErrorMetric.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkVoxel.cxx
 ${VTK_SOURCE_DIR}/Filtering/vtkWedge.cxx
