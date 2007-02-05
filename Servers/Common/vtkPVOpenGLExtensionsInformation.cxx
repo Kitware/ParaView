@@ -19,8 +19,10 @@
 #include "vtkOpenGLExtensionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDisplayInformation.h"
+#include "vtkPVOptions.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
+#include "vtkToolkits.h"
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
@@ -39,7 +41,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkPVOpenGLExtensionsInformation);
-vtkCxxRevisionMacro(vtkPVOpenGLExtensionsInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVOpenGLExtensionsInformation, "1.1.8.1");
 //-----------------------------------------------------------------------------
 vtkPVOpenGLExtensionsInformation::vtkPVOpenGLExtensionsInformation()
 {
@@ -66,6 +68,18 @@ void vtkPVOpenGLExtensionsInformation::CopyFromObject(vtkObject* obj)
   vtkSmartPointer<vtkPVDisplayInformation> di = 
     vtkSmartPointer<vtkPVDisplayInformation>::New();
   di->CopyFromObject(pm);
+
+  // If we are using Mesa and offscreen rendering, pretend no
+  // extensions are supported. Although this is not necessarily true,
+  // it is acceptable to disable extensions when using software rendering.
+  vtkPVOptions* options = pm->GetOptions();
+#ifdef VTK_OPEN_HAS_OSMESA
+  if (options->GetUseOffscreenRendering())
+    {
+    return;
+    }
+#endif
+
   if (!di->GetCanOpenDisplay())
     {
     return;
