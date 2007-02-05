@@ -145,7 +145,6 @@ void pqXDMFPanel::accept()
     domainWidget->setEnabled(false);
     QListWidget* gridsWidget = this->UI->GridNames;
     gridsWidget->setEnabled(false);
-    gridsWidget->adjustSize();
     }
   this->FirstAcceptHappened = true;
 }
