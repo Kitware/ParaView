@@ -35,7 +35,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.6");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.7");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -356,4 +356,5 @@ void vtkReductionFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PreGatherHelper: " << this->PreGatherHelper << endl;
   os << indent << "PostGatherHelper: " << this->PostGatherHelper << endl;
   os << indent << "Controller: " << this->Controller << endl;
+  os << indent << "PassThrough: " << this->PassThrough << endl;
 }

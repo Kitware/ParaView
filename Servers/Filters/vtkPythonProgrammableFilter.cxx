@@ -27,7 +27,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.5");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.6");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -198,4 +198,5 @@ void vtkPythonProgrammableFilter::Exec()
 void vtkPythonProgrammableFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "OutputDataSetType: " << this->OutputDataSetType << endl;
 }
