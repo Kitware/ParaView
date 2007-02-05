@@ -545,8 +545,11 @@ void pqServerManagerModel::onAddRenderModule(QString name,
   pqRenderViewModule* pqRM = new pqRenderViewModule(name, rm, server, this);
 
   emit this->preRenderModuleAdded(pqRM);
+  emit this->preViewModuleAdded(pqRM);
+
   this->Internal->RenderModules.push_back(pqRM);
 
+  emit this->viewModuleAdded(pqRM);
   emit this->renderModuleAdded(pqRM);
 }
 
@@ -562,7 +565,9 @@ void pqServerManagerModel::onRemoveRenderModule(vtkSMRenderModuleProxy* rm)
     return;
     }
   emit this->preRenderModuleRemoved(toRemove);
+  emit this->preViewModuleRemoved(toRemove);
   this->Internal->RenderModules.removeAll(toRemove);
+  emit this->viewModuleRemoved(toRemove);
   emit this->renderModuleRemoved(toRemove);
 
   delete toRemove;
@@ -591,6 +596,7 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
     return;
     }
 
+  bool is_viewmodule = false;
   pqProxy *pq_proxy = NULL;
   if (group == "lookup_tables")
     {
@@ -624,11 +630,13 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
       {
       pq_proxy = new pqPlotViewModule(type, group, name, ren, server, this);
       }
+    is_viewmodule = true;
     }
   else if(group == "views" && proxy->GetXMLName() == QString("TableView"))
     {
     pq_proxy = new pqTableViewModule(group, name, 
       vtkSMAbstractViewModuleProxy::SafeDownCast(proxy), server, this);
+    is_viewmodule = true;
     }
   else if (group == "animation")
     {
@@ -650,7 +658,16 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
   if (pq_proxy)
     {
     emit this->preProxyAdded(pq_proxy);
+    if (is_viewmodule)
+      {
+      emit this->preViewModuleAdded(
+        qobject_cast<pqGenericViewModule*>(pq_proxy));
+      }
     this->Internal->Proxies.insert(proxy, pq_proxy);
+    if (is_viewmodule)
+      {
+      emit this->viewModuleAdded(qobject_cast<pqGenericViewModule*>(pq_proxy));
+      }
     emit this->proxyAdded(pq_proxy);
     }
 }
@@ -668,7 +685,17 @@ void pqServerManagerModel::onProxyUnRegistered(QString group,
   if (pq_proxy->getSMName() == name && pq_proxy->getSMGroup() == group)
     {
     emit this->preProxyRemoved(pq_proxy);
+    pqGenericViewModule* viewmodule = 
+      qobject_cast<pqGenericViewModule*>(pq_proxy);
+    if (viewmodule)
+      {
+      emit this->preViewModuleRemoved(viewmodule);
+      }
     this->Internal->Proxies.remove(proxy);
+    if (viewmodule)
+      {
+      emit this->viewModuleRemoved(viewmodule);
+      }
     emit this->proxyRemoved(pq_proxy);
 
     delete pq_proxy;

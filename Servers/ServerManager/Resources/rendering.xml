@@ -2028,9 +2028,11 @@
         command="StillRender" 
         update_self="1">
       </Property>
+
       <Property name="InteractiveRender" 
         command="InteractiveRender" update_self="1">
       </Property>
+
       <ProxyProperty
         name="Displays"
         command="AddDisplay"
@@ -2040,6 +2042,26 @@
           <Group name="displays" />
         </ProxyGroupDomain>
       </ProxyProperty>
+
+      <IntVectorProperty
+         name="WindowPosition"
+         command="SetWindowPosition"
+         number_of_elements="2"
+         default_values="0 0"
+         update_self="1"
+         immediate_update="1">
+         <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="GUISize"
+         command="SetGUISize"
+         number_of_elements="2"
+         default_values="300 300"
+         update_self="1"
+         immediate_update="1">
+         <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
     </ViewModuleProxy>
     <!-- End ProxyGroup rendermodules -->
   </ProxyGroup>

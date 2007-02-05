@@ -12,13 +12,13 @@ object1 = 'MainWindow/menubar/menuSources'
 QtTesting.playCommand(object1, 'activate', 'Wavelet')
 object2 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
 QtTesting.playCommand(object2, 'activate', '')
-object3 = 'MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton'
+object3 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton'
 QtTesting.playCommand(object3, 'activate', '')
-object4 = 'MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalButton'
+object4 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalButton'
 QtTesting.playCommand(object4, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'Sphere')
 QtTesting.playCommand(object2, 'activate', '')
-object5 = 'MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/Viewport'
+object5 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/Viewport'
 QtTesting.playCommand(object5, 'mousePress', '(0.533784,0.680147,1,1,0)')
 QtTesting.playCommand(object5, 'mouseMove', '(0.533784,0.680147,1,0,0)')
 QtTesting.playCommand(object5, 'mouseRelease', '(0.533784,0.680147,1,0,0)')

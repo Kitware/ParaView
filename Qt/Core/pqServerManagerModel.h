@@ -232,6 +232,15 @@ signals:
   void renderModuleRemoved(pqRenderViewModule* rm);
   void preRenderModuleRemoved(pqRenderViewModule* rm);
 
+  /// Fired when a view module becomes available (also fired for 
+  /// pqRenderViewModule).
+  void viewModuleAdded(pqGenericViewModule*);
+  void preViewModuleAdded(pqGenericViewModule*);
+
+  /// Fired when a view module (including pqRenderViewModule) is to be removed.
+  void viewModuleRemoved(pqGenericViewModule*);
+  void preViewModuleRemoved(pqGenericViewModule*);
+
   /// Fired when a pqProxy (or subclass) object is created for
   /// any registered proxy which is not a 
   /// source/filter/display/render module.

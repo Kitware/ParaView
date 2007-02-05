@@ -23,7 +23,7 @@ xmlFilename = QtTesting.getProperty(object7, "text")
 if(xmlFilename == ''):
   raise ValueError('XML file not read in')
 
-snapshotWidget = 'MainWindow/1pqRenderWindowManager0/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'ExodusXML.png', 300, 300);
 
 

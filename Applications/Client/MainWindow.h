@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 #include <vtkIOStream.h>
 
-class pqPlotViewModule;
 class pqGenericViewModule;
 class pqPipelineSource;
 
@@ -68,9 +67,6 @@ private slots:
 
   void onHelpAbout();
   void onHelpHelp();
-
-  void onPlotAdded(pqPlotViewModule*);
-  void onPlotRemoved(pqPlotViewModule*);
 
   void onSelectionShortcut();
   void onSelectionShortcutFinished();

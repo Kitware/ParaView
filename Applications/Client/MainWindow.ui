@@ -61,11 +61,6 @@
       <string>Toolbars</string>
      </property>
     </widget>
-    <widget class="QMenu" name="menuPlots" >
-     <property name="title" >
-      <string>Plots</string>
-     </property>
-    </widget>
     <addaction name="actionResetCamera" />
     <addaction name="actionPositiveX" />
     <addaction name="actionNegativeX" />
@@ -79,7 +74,6 @@
     <addaction name="actionScalarBarVisibility" />
     <addaction name="separator" />
     <addaction name="menuToolbars" />
-    <addaction name="menuPlots" />
     <addaction name="separator" />
    </widget>
    <widget class="QMenu" name="menuEdit" >

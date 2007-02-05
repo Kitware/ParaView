@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 class QSize;
+class pqAnimationManager;
 class pqAnimationScene;
-class pqGenericViewManager;
 class pqGenericViewModule;
 class pqMultiView;
 class pqObjectInspectorDriver;
@@ -53,15 +53,13 @@ class pqPlotViewModule;
 class pqProxy;
 class pqProxyTabWidget;
 class pqRenderViewModule;
-class pqRenderWindowManager;
-class pqRenderWindowManager;
 class pqSelectionManager;
 class pqServer;
 class pqServerManagerModelItem;
 class pqToolsMenu;
 class pqVCRController;
+class pqViewManager;
 class pqViewMenu;
-class pqAnimationManager;
 
 class vtkUnstructuredGrid;
 
@@ -87,9 +85,7 @@ public:
   ~pqMainWindowCore();
 
   /// Returns a multi-view widget which can be embedded in the UI  
-  pqRenderWindowManager& multiViewManager();
-  /// Returns the view manager, which keeps track of all views
-  pqGenericViewManager& viewManager();
+  pqViewManager& multiViewManager();
   /// Returns the selection manager, which handles interactive selection
   pqSelectionManager& selectionManager();
   /// Returns the VCR controller, which can control animation playback

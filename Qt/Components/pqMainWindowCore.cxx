@@ -57,7 +57,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayColorWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqElementInspectorWidget.h"
-#include "pqGenericViewManager.h"
 #include "pqLinksManager.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
@@ -77,7 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyTabWidget.h"
 #include "pqReaderFactory.h"
 #include "pqRenderViewModule.h"
-#include "pqRenderWindowManager.h"
+#include "pqViewManager.h"
 #include "pqSelectionManager.h"
 #include "pqSelectReaderDialog.h"
 #include "pqServer.h"
@@ -146,7 +145,6 @@ public:
     CustomFilters(new pqCustomFilterManagerModel(parent)),
     CustomFilterManager(0),
     LookupTableManager(new pqPQLookupTableManager(parent)),
-    GenericViewManager(new pqGenericViewManager(parent)),
     ObjectInspectorDriver(0),
     RecentFilesMenu(0),
     FilterMenu(0),
@@ -162,6 +160,7 @@ public:
 #ifdef PARAVIEW_EMBED_PYTHON
   this->PythonDialog = 0;
 #endif // PARAVIEW_EMBED_PYTHON
+  this->MultiViewManager.setObjectName("MultiViewManager");
   }
 
   ~pqImplementation()
@@ -171,18 +170,16 @@ public:
     delete this->CustomFilterManager;
     delete this->CustomFilters;
     delete this->LookupTableManager;
-    delete this->GenericViewManager;
   }
 
   QWidget* const Parent;
-  pqRenderWindowManager MultiViewManager;
+  pqViewManager MultiViewManager;
   pqVCRController VCRController;
   pqSelectionManager SelectionManager;
   pqElementInspectorWidget* ElementInspector;
   pqCustomFilterManagerModel* const CustomFilters;
   pqCustomFilterManager* CustomFilterManager;
   pqPQLookupTableManager* LookupTableManager;
-  pqGenericViewManager* const GenericViewManager;
   pqObjectInspectorDriver* ObjectInspectorDriver;
  
   QMenu* RecentFilesMenu; 
@@ -243,7 +240,12 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     core->getWriterFactory()->loadFileTypes(
       writersDirName + QString("/") + resource);
     }
- 
+
+  // Connect the view manager to the pqActiveView.
+  QObject::connect(&this->Implementation->MultiViewManager,
+    SIGNAL(activeViewModuleChanged(pqGenericViewModule*)),
+    &pqActiveView::instance(), SLOT(setCurrent(pqGenericViewModule*)));
+
   // Listen to the active render module changed signals.
   QObject::connect(
     &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
@@ -251,10 +253,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   QObject::connect(
     &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
     &this->selectionManager(), SLOT(setActiveView(pqGenericViewModule*)));
-  QObject::connect(
-    &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
-    &this->Implementation->MultiViewManager,
-    SLOT(setActiveView(pqGenericViewModule*)));
     
   // Listen for compound proxy register events.
   pqServerManagerObserver *observer =
@@ -323,14 +321,9 @@ pqMainWindowCore::~pqMainWindowCore()
   delete Implementation;
 }
 
-pqRenderWindowManager& pqMainWindowCore::multiViewManager()
+pqViewManager& pqMainWindowCore::multiViewManager()
 {
   return this->Implementation->MultiViewManager;
-}
-
-pqGenericViewManager& pqMainWindowCore::viewManager()
-{
-  return *this->Implementation->GenericViewManager;
 }
 
 pqSelectionManager& pqMainWindowCore::selectionManager()
@@ -1211,8 +1204,8 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveScreenshot()
 {
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
-  if(!rm)
+  pqGenericViewModule* view = pqActiveView::instance().current();
+  if(!view)
     {
     qDebug() << "Cannnot save image. No active render module.";
     return;
@@ -1239,19 +1232,15 @@ void pqMainWindowCore::onFileSaveScreenshot()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveScreenshot(const QStringList& files)
 {
-  pqRenderViewModule* const rm = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
-  if(!rm)
+  pqGenericViewModule* view = pqActiveView::instance().current();
+  if(!view)
     {
-    qDebug() << "Cannnot save image. No active render module.";
+    qDebug() << "Cannnot save image. No active view module.";
     return;
     }
-
-  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(rm->getWidget());
-  assert(widget);
-
   for(int i = 0; i != files.size(); ++i)
     {
-    if(!pqCoreTestUtility::SaveScreenshot(widget->GetRenderWindow(), files[i]))
+    if(!view->saveImage(0, 0, files[i]))
       {
       qCritical() << "Save Image failed.";
       }
@@ -1892,8 +1881,8 @@ void pqMainWindowCore::onSelectionChanged()
 
   pqApplicationCore *core = pqApplicationCore::instance();
   int numServers = core->getServerManagerModel()->getNumberOfServers();
-  pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(
-      pqActiveView::instance().current());
+  pqGenericViewModule* view = pqActiveView::instance().current();
+  pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(view);
   bool pendingDisplays = 
       core->getPendingDisplayManager()->getNumberOfPendingDisplays() > 0;
 
@@ -1918,7 +1907,7 @@ void pqMainWindowCore::onSelectionChanged()
   emit this->enableResetCenter(source != 0 && renderModule != 0);
 
   // Update the save screenshot action.
-  emit this->enableFileSaveScreenshot(server != 0 && renderModule != 0);
+  emit this->enableFileSaveScreenshot(server != 0 && view != 0);
 
   // Update the animation manager if it exists.
   if(this->Implementation->AnimationManager)
@@ -1971,7 +1960,7 @@ void pqMainWindowCore::onActiveViewChanged(pqGenericViewModule *view)
   emit this->enableShowCenterAxis(renderModule != 0);
 
   // Update the save screenshot action.
-  emit this->enableFileSaveScreenshot(server != 0 && renderModule != 0);
+  emit this->enableFileSaveScreenshot(server != 0 && view != 0);
 
   // Update the animation manager if it exists.
   if(this->Implementation->AnimationManager)
@@ -2181,13 +2170,14 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onServerCreation(pqServer *server)
 {
-  // Create a render module.
-  pqPipelineBuilder::instance()->createWindow(server);
 
   // Tell the multiview manager to associate a window
   // for the newly created render module.
   this->Implementation->MultiViewManager.setActiveServer(server);
-  this->Implementation->MultiViewManager.allocateWindowsToRenderModules();
+
+  // Create a render module.
+  pqPipelineBuilder::instance()->createWindow(server);
+  //this->Implementation->MultiViewManager.allocateWindowsToRenderModules();
 }
 
 //-----------------------------------------------------------------------------
@@ -2200,7 +2190,6 @@ void pqMainWindowCore::onSourceCreation(pqPipelineSource *source)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onPostAccept()
 {
-  this->Implementation->GenericViewManager->renderAllViews();
   this->updateFiltersMenu();
 
   emit this->postAccept();
@@ -2538,7 +2527,7 @@ void pqMainWindowCore::enableTestingRenderWindowSize(bool enable)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setMaxRenderWindowSize(const QSize& size)
 {
-  this->Implementation->MultiViewManager.setMaxRenderWindowSize(size);
+  this->Implementation->MultiViewManager.setMaxViewWindowSize(size);
 }
 
 //-----------------------------------------------------------------------------

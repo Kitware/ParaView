@@ -63,11 +63,11 @@ public:
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.
   virtual bool saveImage(int /*width*/, int /*height*/, 
-    const QString& /*filename*/) 
-    {
-    // Not supported yet.
-    return false;
-    };
+    const QString& /*filename*/);
+
+  /// Capture the view image into a new vtkImageData with the given magnification
+  /// and returns it.
+  virtual vtkImageData* captureImage(int magnification);
 
   int getType()
     { return this->Type; }
@@ -79,6 +79,11 @@ public:
 
 private slots:
   void visibilityChanged(pqDisplay* disp);
+
+  // Called when render is called on the undelying proxy.
+  // Since ServerManager does not really "render" for plots,
+  // we catch the signal and render in the client.
+  void renderInternal();
 
 protected:
   int Type;

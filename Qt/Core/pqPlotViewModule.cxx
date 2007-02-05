@@ -32,11 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPlotViewModule.h"
 
 #include "vtkDataSet.h"
+#include "vtkImageData.h"
+#include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMProxy.h"
 
-#include <QtDebug>
+#include <QPixmap>
+#include <QImage>
 #include <QPointer>
+#include <QtDebug>
 
 #include "pqDisplay.h"
 #include "pqHistogramChart.h"
@@ -106,6 +110,8 @@ pqPlotViewModule::pqPlotViewModule(int type,
     this, SLOT(visibilityChanged(pqDisplay*)));
   QObject::connect(this, SIGNAL(displayAdded(pqDisplay*)),
     this, SLOT(visibilityChanged(pqDisplay*)));
+
+  QObject::connect(this, SIGNAL(endRender()), this, SLOT(renderInternal()));
 }
 
 //-----------------------------------------------------------------------------
@@ -169,7 +175,11 @@ void pqPlotViewModule::visibilityChanged(pqDisplay* disp)
 void pqPlotViewModule::forceRender()
 {
   this->Superclass::forceRender();
+}
 
+//-----------------------------------------------------------------------------
+void pqPlotViewModule::renderInternal()
+{
   // Now update the GUI.
   switch (this->Type)
     {
@@ -231,3 +241,60 @@ void pqPlotViewModule::renderBarChart()
   model->updateData((vtkDataObject*)0);
 }
 
+
+//-----------------------------------------------------------------------------
+vtkImageData* pqPlotViewModule::captureImage(int magnification)
+{
+  QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
+  grabbedPixMap = grabbedPixMap.scaled(grabbedPixMap.size().width()*magnification,
+    grabbedPixMap.size().height()*magnification);
+
+  // Now we need to convert this pixmap to vtkImageData.
+  QImage image = grabbedPixMap.toImage();
+
+  vtkImageData* vtkimage = vtkImageData::New();
+  vtkimage->SetScalarTypeToUnsignedChar();
+  vtkimage->SetNumberOfScalarComponents(3);
+  vtkimage->SetDimensions(image.size().width(), image.size().height(), 1);
+  vtkimage->AllocateScalars();
+
+  QSize imgSize = image.size();
+
+  unsigned char* data = static_cast<unsigned char*>(vtkimage->GetScalarPointer());
+  for (int y=0; y < imgSize.height(); y++)
+    {
+    int index=(imgSize.height()-y-1) * imgSize.width()*3;
+    for (int x=0; x< imgSize.width(); x++)
+      {
+      QRgb color = image.pixel(x, y);
+      data[index++] = qRed(color);
+      data[index++] = qGreen(color);
+      data[index++] = qBlue(color);
+      }
+    }
+
+  // Update image extents based on window position.
+  int *position = this->getViewModuleProxy()->GetWindowPosition();
+  int extents[6];
+  vtkimage->GetExtent(extents);
+  for (int cc=0; cc < 4; cc++)
+    {
+    extents[cc] += position[cc/2]*magnification;
+    }
+  vtkimage->SetExtent(extents);
+
+  return vtkimage;
+}
+
+//-----------------------------------------------------------------------------
+bool pqPlotViewModule::saveImage(int width, int height, 
+    const QString& filename)
+{
+  if (width != 0 && height != 0)
+    {
+    this->getWidget()->resize(width, height);
+    }
+
+  QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
+  return grabbedPixMap.save(filename);
+}

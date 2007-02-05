@@ -62,6 +62,10 @@ public:
     return false;
     };
 
+  /// Save image to vtkImageData. Not supported.
+  vtkImageData* captureImage(int /*magnification*/)
+    { return NULL; }
+
   /// Forces an immediate render. Overridden since for plots
   /// rendering actually happens on the GUI side, not merely
   /// in the ServerManager.

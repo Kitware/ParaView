@@ -22,7 +22,7 @@
 #include <pqMainWindowCore.h>
 #include <pqObjectInspectorWidget.h>
 #include <pqPipelineMenu.h>
-#include <pqRenderWindowManager.h>
+#include <pqViewManager.h>
 #include <pqSelectionManager.h>
 #include <pqSetName.h>
 #include <pqUndoStack.h>

@@ -32,32 +32,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqMultiView.h"
 
-#include <QSignalMapper>
-#include <QSplitter>
-#include <QString>
+#include "vtkPVXMLElement.h"
+
 #include <QBuffer>
 #include <QDataStream>
 #include <QLayout>
+#include <QSignalMapper>
+#include <QSplitter>
+#include <QString>
+#include <QStringList>
+
 #include "pqMultiViewFrame.h"
 #include "pqXMLUtil.h"
 
-#include "vtkPVXMLElement.h"
 
 
 //-----------------------------------------------------------------------------
 QString pqMultiView::Index::getString() const
 {
-  QByteArray index_string;
+/*  QByteArray index_string;
   QDataStream stream(&index_string, QIODevice::WriteOnly);
   stream << *this;
   return QString(index_string.toBase64());
+  */
+  QString string;
+  foreach(int index, *this)
+    {
+    if (string != QString::null)
+      {
+      string += ".";
+      }
+    string += QString::number(index);
+    }
+  return string;
 }
 
 void pqMultiView::Index::setFromString(const QString& str) 
 {
+  /*
   QByteArray data = QByteArray::fromBase64(str.toAscii());
   QDataStream stream(data);
   stream >> *this;
+  */
+  this->clear();
+  QStringList indexes = str.split(".", QString::SkipEmptyParts);
+  foreach (QString index, indexes)
+    {
+    QVariant v(index);
+    if (v.canConvert(QVariant::Int))
+      {
+      this->push_back(v.toInt());
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -145,6 +171,7 @@ void pqMultiView::reset(QList<QWidget*> &removed)
     splitter->addWidget(frame);
     }
   this->setup(frame);
+  emit this->frameAdded(frame);
 }
 
 //-----------------------------------------------------------------------------
@@ -219,6 +246,20 @@ void pqMultiView::removeView(QWidget* w)
       // restore sizes
       parentSplitter->setSizes(sizes);
       delete splitter;
+      }
+    else if (splitter->count() == 1 && splitter->parentWidget() == this->SplitterFrame)
+      {
+      // If the "other" widget is a splitter, then that subtree
+      // must become the root.
+      QWidget* otherWidget = splitter->widget(0);
+      QSplitter* otherSplitter = qobject_cast<QSplitter*>(otherWidget);
+      if (otherSplitter)
+        {
+        otherSplitter->setParent(this->SplitterFrame);
+        delete splitter;
+        otherSplitter->setObjectName("MultiViewSplitter");
+        this->SplitterFrame->layout()->addWidget(otherSplitter);
+        }
       }
     else
       {

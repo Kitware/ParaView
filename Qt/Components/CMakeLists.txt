@@ -70,7 +70,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFileChooserWidget.h
   pqFilterInputDialog.h
   pqFieldSelectionAdaptor.h
-  pqGenericViewManager.h
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
@@ -99,7 +98,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqProxyInformationWidget.h
   pqProxyTabWidget.h
   pqRecentFilesMenu.h
-  pqRenderWindowManager.h
   pqSMSignalAdaptors.h
   pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.h
@@ -129,6 +127,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTimerLogDisplay.h
   pqToolTipTrapper.h
   pqVCRController.h
+  pqViewManager.h
   pqXDMFPanel.h
   pqXYPlotDisplayProxyEditor.h
 )
@@ -290,8 +289,6 @@ ADD_LIBRARY(pqComponents
   pqFilterInputDialog.h
   pqFieldSelectionAdaptor.cxx
   pqFieldSelectionAdaptor.h
-  pqGenericViewManager.cxx
-  pqGenericViewManager.h
   pqHandleWidget.cxx
   pqHandleWidget.h
   pqImageTip.cxx
@@ -350,8 +347,6 @@ ADD_LIBRARY(pqComponents
   pqProxyTabWidget.h
   pqRecentFilesMenu.cxx
   pqRecentFilesMenu.h
-  pqRenderWindowManager.cxx
-  pqRenderWindowManager.h
   pqSMSignalAdaptors.cxx
   pqSMSignalAdaptors.h
   pqSampleScalarAddRangeDialog.cxx
@@ -412,9 +407,11 @@ ADD_LIBRARY(pqComponents
   pqTimerLogDisplay.h
   pqToolTipTrapper.cxx
   pqToolTipTrapper.h
+  pqVariableType.h
   pqVCRController.cxx
   pqVCRController.h
-  pqVariableType.h
+  pqViewManager.cxx
+  pqViewManager.h
   pqXDMFPanel.cxx
   pqXDMFPanel.h
   pqXYPlotDisplayProxyEditor.cxx

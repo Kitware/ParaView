@@ -82,6 +82,10 @@ pqGenericViewModule::pqGenericViewModule(const QString& group, const QString& na
   // Listen to updates on the displays property.
   this->Internal->VTKConnect->Connect(renModule->GetProperty("Displays"),
     vtkCommand::ModifiedEvent, this, SLOT(displaysChanged()));
+  this->Internal->VTKConnect->Connect(renModule,
+    vtkCommand::StartEvent, this, SIGNAL(beginRender()));
+  this->Internal->VTKConnect->Connect(renModule,
+    vtkCommand::EndEvent, this, SIGNAL(endRender()));
 
   if (renModule->GetObjectsCreated())
     {

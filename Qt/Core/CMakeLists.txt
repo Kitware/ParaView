@@ -124,6 +124,8 @@ ADD_LIBRARY(pqCore
   pqAnimationCue.h
   pqAnimationScene.cxx
   pqAnimationScene.h
+  pqAnimationSceneImageWriter.cxx
+  pqAnimationSceneImageWriter.h
   pqApplicationCore.cxx
   pqApplicationCore.h
   pqCommandServerStartup.cxx

@@ -39,13 +39,15 @@ class pqDisplay;
 class pqGenericViewModuleInternal;
 class pqPipelineSource;
 class pqServer;
+class pqUndoStack;
 class QWidget;
+class vtkImageData;
 class vtkSMAbstractViewModuleProxy;
 
 
-// This is a PQ abstraction of a generic view module. Subclasses can be
-// specific for different types of view such as render view, histogram view
-// etc.
+/// This is a PQ abstraction of a generic view module. Subclasses can be
+/// specific for different types of view such as render view, histogram view
+/// etc.
 class PQCORE_EXPORT pqGenericViewModule : public pqProxy
 {
   Q_OBJECT
@@ -66,6 +68,15 @@ public:
   virtual void setWindowParent(QWidget* parent)=0;
   virtual QWidget* getWindowParent() const =0;
 
+  /// Returns if this view module can support 
+  /// undo/redo. Returns false by default. Subclassess must override
+  /// if that's not the case.
+  virtual bool supportsUndo() const { return false; }
+
+  /// View modules that support undo must override this method
+  /// to return the undo stack for the view module.
+  virtual pqUndoStack* getInteractionUndoStack() const { return 0;} 
+
 public slots:
   /// Request a StillRender. Default implementation simply calls
   /// forceRender(). Subclasses can implement a delayed/buffered render.
@@ -79,6 +90,10 @@ public:
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.
   virtual bool saveImage(int width, int height, const QString& filename) =0;
+
+  /// Capture the view image into a new vtkImageData with the given magnification
+  /// and returns it.
+  virtual vtkImageData* captureImage(int magnification) =0;
 
   /// This method checks if the display is one of the displays
   /// rendered by this render module.
@@ -100,23 +115,23 @@ public:
   bool canDisplaySource(pqPipelineSource* source) const;
 
 signals:
-  // Fired after a display has been added to this render module.
+  /// Fired after a display has been added to this render module.
   void displayAdded(pqDisplay*);
 
-  // Fired after a display has been removed from this render module.
+  /// Fired after a display has been removed from this render module.
   void displayRemoved(pqDisplay*);
 
-  // Fired when the render module fires a vtkCommand::StartEvent
-  // signalling the beginning of rendering. Subclasses must fire
-  // these signals at appropriate times.
+  /// Fired when the render module fires a vtkCommand::StartEvent
+  /// signalling the beginning of rendering. Subclasses must fire
+  /// these signals at appropriate times.
   void beginRender();
 
-  // Fired when the render module fires a vtkCommand::EndEvent
-  // signalling the end of rendering.
-  // Subclasses must fire these signals at appropriate times.
+  /// Fired when the render module fires a vtkCommand::EndEvent
+  /// signalling the end of rendering.
+  /// Subclasses must fire these signals at appropriate times.
   void endRender();
 
-  // Fired when any displays visibility changes.
+  /// Fired when any displays visibility changes.
   void displayVisibilityChanged(pqDisplay* display, bool visible);
 
 private slots:
@@ -131,8 +146,8 @@ private slots:
   void onDisplayVisibilityChanged(bool);
 
 protected:
-  // Called to initialize the view module either when this object is created
-  // on when the proxy is created.
+  /// Called to initialize the view module either when this object is created
+  /// on when the proxy is created.
   virtual void viewModuleInit();
 
 private:

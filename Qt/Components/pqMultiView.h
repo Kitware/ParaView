@@ -48,9 +48,9 @@ class PQCOMPONENTS_EXPORT pqMultiView : public QStackedWidget
 public:
   class Index: public QList<int>
   {
-public:
-  QString getString() const;
-  void setFromString(const QString& string);
+  public:
+    QString getString() const;
+    void setFromString(const QString& string);
   };
   
   pqMultiView(QWidget* parent = NULL);
@@ -72,7 +72,7 @@ public:
   virtual Index splitView(Index index, Qt::Orientation orientation);
 
   virtual Index splitView(pqMultiView::Index index, 
-  Qt::Orientation orientation, float percent);
+    Qt::Orientation orientation, float percent);
 
   pqMultiViewFrame* splitWidget(QWidget* widget, Qt::Orientation o,float percent);
 

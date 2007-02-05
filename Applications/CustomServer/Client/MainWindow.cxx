@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqMainWindowCore.h>
 #include <pqMultiView.h>
 #include <pqPendingDisplayManager.h>
-#include <pqRenderWindowManager.h>
+#include <pqViewManager.h>
 
 #include <vtkSmartPointer.h>
 #include <vtkSMProxyManager.h>

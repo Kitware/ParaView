@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationManager.h"
 #include "pqAnimationScene.h"
 #include "pqMainWindowCore.h"
-#include "pqRenderWindowManager.h"
+#include "pqViewManager.h"
 
 //-----------------------------------------------------------------------------
 class pqStateLoaderInternal
@@ -53,7 +53,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.5");
+vtkCxxRevisionMacro(pqStateLoader, "1.6");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -91,7 +91,7 @@ int pqStateLoader::LoadState(vtkPVXMLElement* root, int keep_proxies/*=0*/)
         return 0;
         }
       }
-    else if (strcmp(name, "RenderViewManager") == 0)
+    else if (strcmp(name, "ViewManager") == 0)
       {
       if (!this->Internal->MainWindowCore->multiViewManager().loadState(
           curElement, this))

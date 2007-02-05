@@ -39,26 +39,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pqActiveView.h>
 #include <pqApplicationCore.h>
-#include <pqGenericViewManager.h>
 #include <pqMainWindowCore.h>
 #include <pqObjectInspectorDriver.h>
 #include <pqObjectInspectorWidget.h>
-#include <pqPipelineBrowser.h>
+#include <pqObjectNaming.h>
 #include <pqPipelineBrowserContextMenu.h>
+#include <pqPipelineBrowser.h>
 #include <pqPipelineMenu.h>
 #include <pqPlotViewModule.h>
 #include <pqProxyTabWidget.h>
 #include <pqRecentFilesMenu.h>
 #include <pqRenderViewModule.h>
-#include <pqRenderWindowManager.h>
 #include <pqScalarBarVisibilityAdaptor.h>
 #include <pqSelectionManager.h>
 #include <pqSetName.h>
 #include <pqSettings.h>
 #include <pqUndoStack.h>
 #include <pqVCRController.h>
+#include <pqViewManager.h>
 #include <pqViewMenu.h>
-#include <pqObjectNaming.h>
 
 #include <QAssistantClient>
 #include <QDir>
@@ -78,8 +77,7 @@ public:
     Core(parent),
     RecentFilesMenu(0),
     ViewMenu(0),
-    ToolbarsMenu(0),
-    PlotsMenu(0)
+    ToolbarsMenu(0)
   {
   }
   
@@ -87,7 +85,6 @@ public:
   {
     delete this->ViewMenu;
     delete this->ToolbarsMenu;
-    delete this->PlotsMenu;
     if(this->AssistantClient)
       {
       this->AssistantClient->closeAssistant();
@@ -101,7 +98,6 @@ public:
   pqRecentFilesMenu* RecentFilesMenu;
   pqViewMenu* ViewMenu;
   pqViewMenu* ToolbarsMenu;
-  pqViewMenu* PlotsMenu;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -119,10 +115,6 @@ MainWindow::MainWindow() :
     pqViewMenu(*this->Implementation->UI.menuView, this);
   this->Implementation->ToolbarsMenu = 
     new pqViewMenu(*this->Implementation->UI.menuToolbars);
-  this->Implementation->PlotsMenu = new
-    pqViewMenu(*this->Implementation->UI.menuPlots, this);
-
-  this->Implementation->UI.menuPlots->setEnabled(false);
 
   this->setWindowTitle(
     QString("ParaView %1 (alpha)").arg(PARAVIEW_VERSION_FULL));
@@ -421,12 +413,6 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionXY_Plot, SIGNAL(triggered()),
     &this->Implementation->Core, SLOT(createXYPlotView()));
 
-  connect(
-    &this->Implementation->Core.viewManager(), SIGNAL(plotAdded(pqPlotViewModule*)),
-    this, SLOT(onPlotAdded(pqPlotViewModule*)));
-  connect(
-    &this->Implementation->Core.viewManager(), SIGNAL(plotRemoved(pqPlotViewModule*)),
-    this, SLOT(onPlotRemoved(pqPlotViewModule*)));
 
   connect(
     this->Implementation->UI.actionTable_View,
@@ -660,51 +646,58 @@ void MainWindow::onShowCenterAxisChanged(bool enabled)
 }
 
 //-----------------------------------------------------------------------------
-bool MainWindow::compareView(const QString& ReferenceImage, 
-                             double Threshold, 
-                             ostream& Output, 
-                             const QString& TempDirectory)
+bool MainWindow::compareView(const QString& ReferenceImage,
+  double Threshold,
+  ostream& Output,
+  const QString& TempDirectory)
 {
   return this->Implementation->Core.compareView(
     ReferenceImage, Threshold, Output, TempDirectory);
 }
-
+  
+//-----------------------------------------------------------------------------
 void MainWindow::onUndoLabel(const QString& label)
 {
   this->Implementation->UI.actionEditUndo->setText(
     label.isEmpty() ? tr("Can't Undo") : QString(tr("&Undo %1")).arg(label));
 }
 
+//-----------------------------------------------------------------------------
 void MainWindow::onRedoLabel(const QString& label)
 {
   this->Implementation->UI.actionEditRedo->setText(
     label.isEmpty() ? tr("Can't Redo") : QString(tr("&Redo %1")).arg(label));
 }
 
+//-----------------------------------------------------------------------------
 void MainWindow::onCameraUndoLabel(const QString& label)
 {
   this->Implementation->UI.actionEditCameraUndo->setText(
     label.isEmpty() ? tr("Can't Undo Camera") : QString(tr("U&ndo %1")).arg(label));
 }
 
+//-----------------------------------------------------------------------------
 void MainWindow::onCameraRedoLabel(const QString& label)
 {
   this->Implementation->UI.actionEditCameraRedo->setText(
     label.isEmpty() ? tr("Can't Redo Camera") : QString(tr("R&edo %1")).arg(label));
 }
 
+//-----------------------------------------------------------------------------
 void MainWindow::onPreAccept()
 {
   this->setEnabled(false);
   this->statusBar()->showMessage(tr("Updating..."));
 }
 
+//-----------------------------------------------------------------------------
 void MainWindow::onPostAccept()
 {
   this->setEnabled(true);
   this->statusBar()->showMessage(tr("Ready"), 2000);
 }
 
+//-----------------------------------------------------------------------------
 void MainWindow::onHelpAbout()
 {
   AboutDialog* const dialog = new AboutDialog(this);
@@ -712,6 +705,7 @@ void MainWindow::onHelpAbout()
   dialog->show();
 }
 
+//-----------------------------------------------------------------------------
 void MainWindow::onHelpHelp()
 {
   if(this->Implementation->AssistantClient)
@@ -811,30 +805,13 @@ void MainWindow::onHelpHelp()
   this->Implementation->AssistantClient->openAssistant();
 }
 
+//-----------------------------------------------------------------------------
 void MainWindow::assistantError(const QString& error)
 {
   qCritical(error.toAscii().data());
 }
 
-void MainWindow::onPlotAdded(pqPlotViewModule* view)
-{
-  this->Implementation->PlotsMenu->addWidget(view->getWindowParent(),
-    view->getSMName());
-  if (this->Implementation->PlotsMenu->getNumberOfWidgets() > 0)
-    {
-    this->Implementation->UI.menuPlots->setEnabled(true);
-    }
-}
-
-void MainWindow::onPlotRemoved(pqPlotViewModule* view)
-{
-  this->Implementation->PlotsMenu->removeWidget(view->getWindowParent());
-  if (this->Implementation->PlotsMenu->getNumberOfWidgets() == 0)
-    {
-    this->Implementation->UI.menuPlots->setEnabled(false);
-    }
-}
-
+//-----------------------------------------------------------------------------
 void MainWindow::onSelectionShortcut()
 {
 
@@ -850,6 +827,8 @@ void MainWindow::onSelectionShortcut()
 
 
 }
+
+//-----------------------------------------------------------------------------
 void MainWindow::onSelectionShortcutFinished()
 {
   // At end of each selection, we want to switch back to the normal interaction mode. 
@@ -865,6 +844,7 @@ void MainWindow::onSelectionShortcutFinished()
 
 }
 
+//-----------------------------------------------------------------------------
 QVariant MainWindow::findToolBarActionsNotInMenus()
 {
   QStringList missingInActions;

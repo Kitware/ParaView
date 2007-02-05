@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkProcessModule.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
-#include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPVAnimationSceneProxy.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -51,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
+#include "pqAnimationSceneImageWriter.h"
 #include "pqApplicationCore.h"
 #include "pqPipelineBuilder.h"
 #include "pqProxy.h"
@@ -93,9 +93,9 @@ pqAnimationManager::pqAnimationManager(QObject* _parent/*=0*/)
   QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)),
     this, SLOT(onProxyRemoved(pqProxy*)));
 
-  QObject::connect(smmodel, SIGNAL(renderModuleAdded(pqRenderViewModule*)),
+  QObject::connect(smmodel, SIGNAL(viewModuleAdded(pqGenericViewModule*)),
     this, SLOT(updateViewModules()));
-  QObject::connect(smmodel, SIGNAL(renderModuleRemoved(pqRenderViewModule*)),
+  QObject::connect(smmodel, SIGNAL(viewModuleRemoved(pqGenericViewModule*)),
     this, SLOT(updateViewModules()));
 }
 
@@ -439,7 +439,7 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
     return status;
     }
 
-  vtkSMAnimationSceneImageWriter* writer = vtkSMAnimationSceneImageWriter::New();
+  vtkSMAnimationSceneImageWriter* writer = pqAnimationSceneImageWriter::New();
   writer->SetFileName(filename.toAscii().data());
   writer->SetMagnification(magnification);
   writer->SetAnimationScene(sceneProxy);

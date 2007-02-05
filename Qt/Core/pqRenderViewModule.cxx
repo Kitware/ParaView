@@ -70,60 +70,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVAxesWidget.h"
 #include "pqLinkViewWidget.h"
 
-static QSet<pqRenderViewModule*> RenderModules;
-
-/// method to keep server side views in sync with client side views
-/// the client has multiple windows, whereas the server has just one window with
-/// multiple sub views.  We need to tell the server where to put the views.
-static void UpdateServerViews(pqRenderViewModule* renderModule)
-{
-  // get all the render modules on the server
-  pqServer* server = renderModule->getServer();
-  QList<pqRenderViewModule*> rms;
-  foreach(pqRenderViewModule* rm, RenderModules)
-    {
-    if(rm->getServer() == server)
-      {
-      rms.append(rm);
-      }
-    }
-
-  // find a rectangle that bounds all views
-  QRect totalBounds;
-  
-  foreach(pqRenderViewModule* rm, rms)
-    {
-    QRect bounds = rm->getWidget()->rect();
-    bounds.moveTo(rm->getWidget()->mapToGlobal(QPoint(0,0)));
-    totalBounds |= bounds;
-    }
-
-  // now loop through all render modules and set the server size window size
-  foreach(pqRenderViewModule* rm, rms)
-    {
-    vtkSMIntVectorProperty* prop = 0;
-
-    // set size containing all views
-    prop = vtkSMIntVectorProperty::SafeDownCast(
-      rm->getRenderModuleProxy()->GetProperty("GUISize"));
-    if(prop)
-      {
-      prop->SetElements2(totalBounds.width(), totalBounds.height());
-      }
-
-    // position relative to the bounds of all views
-    prop = vtkSMIntVectorProperty::SafeDownCast(
-      rm->getRenderModuleProxy()->GetProperty("WindowPosition"));
-    if(prop)
-      {
-      QPoint pos = rm->getWidget()->mapToGlobal(QPoint(0,0));
-      pos -= totalBounds.topLeft();
-      prop->SetElements2(pos.x(), pos.y());
-      }
-    }
-
-}
-
 class pqRenderViewModuleInternal
 {
 public:
@@ -183,7 +129,6 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
 
   // do image caching for performance
   //this->Internal->Viewport->setAutomaticImageCacheEnabled(true);
-  RenderModules.insert(this);
 
   this->Internal->Viewport->installEventFilter(this);
 
@@ -211,7 +156,6 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
 //-----------------------------------------------------------------------------
 pqRenderViewModule::~pqRenderViewModule()
 {
-  RenderModules.remove(this);
 
   delete this->Internal->Viewport;
   delete this->Internal;
@@ -390,13 +334,6 @@ void pqRenderViewModule::viewModuleInit()
       this, SLOT(endInteraction()));
     }
 
-  this->Internal->VTKConnect->Connect(
-    this->Internal->RenderModuleProxy,
-    vtkCommand::StartEvent, this, SLOT(onStartEvent()));
-  this->Internal->VTKConnect->Connect(
-    this->Internal->RenderModuleProxy,
-    vtkCommand::EndEvent,this, SLOT(onEndEvent()));  
-  
   // help the QVTKWidget know when to clear the cache
   this->Internal->VTKConnect->Connect(
     this->Internal->RenderModuleProxy, vtkCommand::ModifiedEvent,
@@ -506,18 +443,6 @@ void pqRenderViewModule::endInteraction()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::onStartEvent()
-{
-  emit this->beginRender();
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderViewModule::onEndEvent()
-{
-  emit this->endRender();
-}
-
-//-----------------------------------------------------------------------------
 void pqRenderViewModule::render()
 {
   if (this->Internal->RenderModuleProxy && this->Internal->Viewport)
@@ -556,6 +481,11 @@ void pqRenderViewModule::resetCenterOfRotation()
     values[0].toDouble(), values[1].toDouble(), values[2].toDouble());
 }
 
+//-----------------------------------------------------------------------------
+vtkImageData* pqRenderViewModule::captureImage(int magnification)
+{
+  return this->Internal->RenderModuleProxy->CaptureWindow(magnification);
+}
 
 //-----------------------------------------------------------------------------
 bool pqRenderViewModule::saveImage(int width, int height, const QString& filename)
@@ -998,11 +928,6 @@ bool pqRenderViewModule::eventFilter(QObject* caller, QEvent* e)
 {
   // TODO, apparently, this should watch for window position changes, not resizes
   
-  if(e->type() == QEvent::Resize)
-    {
-    UpdateServerViews(this);
-    }
-
   if(e->type() == QEvent::MouseButtonPress)
     {
     QMouseEvent* me = static_cast<QMouseEvent*>(e);

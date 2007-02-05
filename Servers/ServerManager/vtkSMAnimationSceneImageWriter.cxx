@@ -46,7 +46,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.5");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.6");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -138,6 +138,18 @@ vtkImageData* vtkSMAnimationSceneImageWriter::NewFrame()
 }
 
 //-----------------------------------------------------------------------------
+vtkImageData* vtkSMAnimationSceneImageWriter::CaptureViewImage(
+  vtkSMAbstractViewModuleProxy* view, int magnification)
+{
+  vtkSMRenderModuleProxy* rmview = vtkSMRenderModuleProxy::SafeDownCast(view);
+  if (rmview)
+    {
+    return rmview->CaptureWindow(magnification);
+    } 
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMAnimationSceneImageWriter::Merge(vtkImageData* dest, vtkImageData* src)
 {
   vtkImageIterator<unsigned char> inIt(src, src->GetExtent());
@@ -180,14 +192,12 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     for (unsigned int cc=0; cc < num_modules; cc++)
       {
       vtkSMAbstractViewModuleProxy* view = this->AnimationScene->GetViewModule(cc);
-      vtkSMRenderModuleProxy* rmview = vtkSMRenderModuleProxy::SafeDownCast(view);
-      if (!rmview)
+      vtkImageData* capture = this->CaptureViewImage(view, this->Magnification);
+      if (capture)
         {
-        continue;
+        this->Merge(combinedImage, capture);
+        capture->Delete();
         }
-      vtkImageData* capture = rmview->CaptureWindow(this->Magnification);
-      this->Merge(combinedImage, capture);
-      capture->Delete();
       }
     }
   else if (num_modules == 1)
@@ -195,12 +205,12 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     // If only one view, we speed things up slightly by using the 
     // captured image directly.
     vtkSMAbstractViewModuleProxy* view = this->AnimationScene->GetViewModule(0);
-    vtkSMRenderModuleProxy* rmview = vtkSMRenderModuleProxy::SafeDownCast(view);
-    if (!rmview)
+    vtkImageData* capture = this->CaptureViewImage(view, this->Magnification);
+    if (!capture)
       {
       return false;
       }
-    combinedImage.TakeReference(rmview->CaptureWindow(this->Magnification));
+    combinedImage.TakeReference(capture);
     }
 
   int errcode = 0;
@@ -378,4 +388,8 @@ void vtkSMAnimationSceneImageWriter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Quality: " << this->Quality << endl;
   os << indent << "Magnification: " << this->Magnification << endl;
+  os << indent << "ErrorCode: " << this->ErrorCode << endl;
+  os << indent << "BackgroundColor: " << this->BackgroundColor[0]
+    << ", " << this->BackgroundColor[1] << ", " << this->BackgroundColor[2] 
+    << endl;
 }

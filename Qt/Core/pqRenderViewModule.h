@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColor> // needed for return type.
 
 class pqRenderViewModuleInternal;
-class pqUndoStack;
 class QVTKWidget;
 class QAction;
 class vtkInteractorStyle;
@@ -59,7 +58,7 @@ public:
   vtkSMRenderModuleProxy* getRenderModuleProxy() const;
 
   /// Returns the QVTKWidget for this render Window.
-  QWidget* getWidget();
+  virtual QWidget* getWidget();
 
   /// Call this method to assign a Window in which this render module will
   /// render.  This will set the QVTKWidget's parent.
@@ -79,11 +78,15 @@ public:
   /// the current window size is used.
   virtual bool saveImage(int width, int height, const QString& filename);
 
+  /// Capture the view image into a new vtkImageData with the given magnification
+  /// and returns it.
+  virtual vtkImageData* captureImage(int magnification);
+
   /// Each render module keeps a undo stack for interaction.
   /// This method returns that undo stack. External world
   /// typically uses it to Undo/Redo; pushing of elements on this stack
   /// on interaction is managed by this class.
-  pqUndoStack* getInteractionUndoStack() const;
+  virtual pqUndoStack* getInteractionUndoStack() const;
 
   /// Sets default values for the underlying proxy. This is typically called
   /// only on proxies created by the GUI itself.
@@ -134,6 +137,10 @@ public:
   /// remove an action for a context menu
   void removeMenuAction(QAction* a);
 
+  /// Returns if this view module can support 
+  /// undo/redo. Returns false by default. Subclassess must override
+  /// if that's not the case.
+  virtual bool supportsUndo() const { return true; }
 public slots:
   // Toggle the orientation axes visibility.
   void setOrientationAxesVisibility(bool visible);
@@ -179,10 +186,6 @@ private slots:
   // Called on start/end interaction.
   void startInteraction();
   void endInteraction();
-
-  // Called on start/end rendering.
-  void onStartEvent();
-  void onEndEvent();
 
   // Called when vtkSMRenderModuleProxy fires
   // ResetCameraEvent.

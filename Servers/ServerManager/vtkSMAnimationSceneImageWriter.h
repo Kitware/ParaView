@@ -30,9 +30,10 @@
 
 #include "vtkSMAnimationSceneWriter.h"
 
-class vtkImageWriter;
 class vtkGenericMovieWriter;
 class vtkImageData;
+class vtkImageWriter;
+class vtkSMAbstractViewModuleProxy;
 
 class VTK_EXPORT vtkSMAnimationSceneImageWriter : public vtkSMAnimationSceneWriter
 {
@@ -86,6 +87,14 @@ protected:
   // Updates the ActualSize which is the 
   // resolution of the generated animation frame.
   void UpdateImageSize();
+
+  // Description:
+  // Captures the view from the given module and
+  // returns a new Image data object. May return NULL.
+  // Default implementation can only handle vtkSMRenderModuleProxy subclasses.
+  // Subclassess must override to handle other types of view modules.
+  virtual vtkImageData* CaptureViewImage(
+    vtkSMAbstractViewModuleProxy*, int magnification);
 
   vtkImageData* NewFrame();
   void Merge(vtkImageData* dest, vtkImageData* src);

@@ -55,7 +55,7 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.65");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.66");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -572,10 +572,7 @@ void vtkSMRenderModuleProxy::PerformRender()
     }
 
   vtkRenderWindow *renWindow = this->GetRenderWindow(); 
-
-  this->InvokeEvent(vtkCommand::StartEvent);
   renWindow->Render();
-  this->InvokeEvent(vtkCommand::EndEvent);
 
   if ( this->MeasurePolygonsPerSecond )
     {

@@ -50,24 +50,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewModule.h"
 
 
+//-----------------------------------------------------------------------------
 class pqPendingDisplayManager::MyInternal
 {
 public:
   QList<QPointer< pqPipelineSource> > SourcesSansDisplays;
 };
 
+//-----------------------------------------------------------------------------
 pqPendingDisplayManager::pqPendingDisplayManager(QObject* p)
   : QObject(p)
 {
   this->Internal = new MyInternal;
 }
 
+//-----------------------------------------------------------------------------
 pqPendingDisplayManager::~pqPendingDisplayManager()
 {
   delete this->Internal;
 }
 
 
+//-----------------------------------------------------------------------------
 void pqPendingDisplayManager::addPendingDisplayForSource(pqPipelineSource* s)
 {
   if(!s)
@@ -83,6 +87,7 @@ void pqPendingDisplayManager::addPendingDisplayForSource(pqPipelineSource* s)
   elem->Delete();
 }
 
+//-----------------------------------------------------------------------------
 void pqPendingDisplayManager::internalAddPendingDisplayForSource(pqPipelineSource* s)
 {
   if (!this->Internal->SourcesSansDisplays.contains(s))
@@ -96,6 +101,7 @@ void pqPendingDisplayManager::internalAddPendingDisplayForSource(pqPipelineSourc
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqPendingDisplayManager::removePendingDisplayForSource(pqPipelineSource* s)
 {
   if (this->Internal->SourcesSansDisplays.contains(s))
@@ -110,6 +116,7 @@ void pqPendingDisplayManager::removePendingDisplayForSource(pqPipelineSource* s)
 }
 
 
+//-----------------------------------------------------------------------------
 void pqPendingDisplayManager::createPendingDisplays(pqGenericViewModule* view)
 {
   if (!view)
@@ -164,6 +171,7 @@ void pqPendingDisplayManager::createPendingDisplays(pqGenericViewModule* view)
   emit this->pendingDisplays(false);
 }
 
+//-----------------------------------------------------------------------------
 int pqPendingDisplayManager::getNumberOfPendingDisplays()
 {
   return this->Internal->SourcesSansDisplays.size();

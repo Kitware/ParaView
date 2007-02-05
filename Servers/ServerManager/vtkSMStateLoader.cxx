@@ -30,7 +30,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.18");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.19");
 
 struct vtkSMStateLoaderRegistrationInfo
 {
@@ -177,7 +177,7 @@ vtkSMProxy* vtkSMStateLoader::NewProxy(vtkPVXMLElement* root,
 
   if (!root)
     {
-    vtkErrorMacro("No root is defined. Cannot create proxy");
+    vtkErrorMacro("No root is defined. Cannot create proxy with id " << id);
     return 0;
     }
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqGenericViewManager.h
+   Module:    pqAnimationSceneImageWriter.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,46 +29,38 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqGenericViewManager_h
-#define __pqGenericViewManager_h
+#ifndef __pqAnimationSceneImageWriter_h
+#define __pqAnimationSceneImageWriter_h
 
-#include <QObject>
-#include "pqComponentsExport.h"
+#include "vtkSMAnimationSceneImageWriter.h"
+#include "pqCoreExport.h"
 
-class pqGenericViewModule;
-class pqPlotViewModule;
-class pqProxy;
-class QWidget;
-
-class PQCOMPONENTS_EXPORT pqGenericViewManager :
-  public QObject
+/// pqAnimationSceneImageWriter is a subclass of vtkSMAnimationSceneImageWriter
+/// which knows how to generate images from a plot view modules.
+class PQCORE_EXPORT pqAnimationSceneImageWriter : public vtkSMAnimationSceneImageWriter
 {
-  Q_OBJECT
 public:
-  pqGenericViewManager(QObject* parent=0);
-  ~pqGenericViewManager();
+  static pqAnimationSceneImageWriter* New();
+  vtkTypeRevisionMacro(pqAnimationSceneImageWriter, vtkSMAnimationSceneImageWriter);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
-signals:
-  // Fired after a new plot module is noticed by the manager.
-  void plotAdded(pqPlotViewModule*);
-  // Fired just before the manager let's go of a plot view.
-  void plotRemoved(pqPlotViewModule*);
+protected:
+  pqAnimationSceneImageWriter();
+  ~pqAnimationSceneImageWriter();
 
-public slots:
-  void renderAllViews();
+  // Description:
+  // Captures the view from the given module and
+  // returns a new Image data object. May return NULL.
+  // Default implementation can only handle vtkSMRenderModuleProxy subclasses.
+  // Subclassess must override to handle other types of view modules.
+  virtual vtkImageData* CaptureViewImage(
+    vtkSMAbstractViewModuleProxy*, int magnification);
 
-private slots:
-  void onProxyAdded(pqProxy* proxy);
-  void onProxyRemoved(pqProxy* proxy);
-  
 private:
-  pqGenericViewManager(const pqGenericViewManager&); // Not implemented.
-  void operator=(const pqGenericViewManager&); // Not implemented.
-
-  bool eventFilter(QObject* obj, QEvent* event);
-
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  pqAnimationSceneImageWriter(const pqAnimationSceneImageWriter&); // Not implemented.
+  void operator=(const pqAnimationSceneImageWriter&); // Not implemented.
 };
 
+
 #endif
+

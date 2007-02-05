@@ -49,7 +49,7 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.7");
 
 //-----------------------------------------------------------------------------
 vtkSMAbstractViewModuleProxy::vtkSMAbstractViewModuleProxy()
@@ -100,6 +100,7 @@ void vtkSMAbstractViewModuleProxy::InteractiveRender()
 //-----------------------------------------------------------------------------
 void vtkSMAbstractViewModuleProxy::BeginInteractiveRender()
 {
+  this->InvokeEvent(vtkCommand::StartEvent);
   vtkTimerLog::MarkStartEvent("Interactive Render");
 }
 
@@ -107,6 +108,7 @@ void vtkSMAbstractViewModuleProxy::BeginInteractiveRender()
 void vtkSMAbstractViewModuleProxy::EndInteractiveRender()
 {
   vtkTimerLog::MarkEndEvent("Interactive Render");
+  this->InvokeEvent(vtkCommand::EndEvent);
 }
 
 //-----------------------------------------------------------------------------
@@ -122,6 +124,7 @@ void vtkSMAbstractViewModuleProxy::StillRender()
 //-----------------------------------------------------------------------------
 void vtkSMAbstractViewModuleProxy::BeginStillRender()
 {
+  this->InvokeEvent(vtkCommand::StartEvent);
   vtkTimerLog::MarkStartEvent("Still Render");
 }
 
@@ -129,6 +132,7 @@ void vtkSMAbstractViewModuleProxy::BeginStillRender()
 void vtkSMAbstractViewModuleProxy::EndStillRender()
 {
   vtkTimerLog::MarkEndEvent("Still Render");
+  this->InvokeEvent(vtkCommand::EndEvent);
 }
 
 //-----------------------------------------------------------------------------
