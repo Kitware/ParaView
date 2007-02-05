@@ -172,6 +172,8 @@ int main(int argc, char* argv[])
     << "//" << endl
     << "#ifndef __" << ot.Prefix.c_str() << "_h" << endl
     << "#define __" << ot.Prefix.c_str() << "_h" << endl
+    << endl
+    << "#include <string.h>" << endl
     << endl;
 
   vtkstd::string output = argv[1];
