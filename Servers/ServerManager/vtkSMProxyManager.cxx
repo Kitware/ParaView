@@ -26,9 +26,10 @@
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMCompoundProxy.h"
 #include "vtkSMDocumentation.h"
-#include "vtkSMProperty.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMUndoStack.h"
 #include "vtkStdString.h"
@@ -57,6 +58,8 @@ public:
     }
 };
 #endif
+
+class vtkSMProxyManagerProxySet : public vtkstd::set<vtkSMProxy*> {};
 
 //*****************************************************************************
 class vtkSMProxyManagerObserver : public vtkCommand
@@ -88,7 +91,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.59");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.60");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -1075,19 +1078,65 @@ void vtkSMProxyManager::SaveState(const char* filename, int revival/*=0*/)
 void vtkSMProxyManager::SaveState(vtkPVXMLElement* root, int revival/*=0*/)
 {
   this->SaveStateInternal(
-    vtkProcessModuleConnectionManager::GetNullConnectionID(), root, revival);
+    vtkProcessModuleConnectionManager::GetNullConnectionID(), root, 0, revival);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::SaveState(vtkIdType connectionID,
   vtkPVXMLElement* root, int revival/*=0*/)
 {
-  this->SaveStateInternal(connectionID, root, revival);
+  this->SaveStateInternal(connectionID, root, 0, revival);
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyManager::SaveState(vtkPVXMLElement* root, 
+  vtkCollection* proxies, int save_referred_proxies)
+{
+  
+  vtkSMProxyManagerProxySet setOfProxies;
+  for (int cc=0; cc < proxies->GetNumberOfItems(); ++cc)
+    {
+    vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(proxies->GetItemAsObject(cc));
+    if (proxy)
+      {
+      setOfProxies.insert(proxy);
+      if (save_referred_proxies)
+        {
+        this->CollectReferredProxies(setOfProxies, proxy);
+        }
+      }
+    }
+  this->SaveStateInternal(
+    vtkProcessModuleConnectionManager::GetNullConnectionID(),
+    root, &setOfProxies, 0);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::CollectReferredProxies(
+  vtkSMProxyManagerProxySet& setOfProxies, vtkSMProxy* proxy)
+{
+  vtkSmartPointer<vtkSMPropertyIterator> iter;
+  iter.TakeReference(proxy->NewPropertyIterator());
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      iter->GetProperty());
+    for (unsigned int cc=0; pp && (pp->GetNumberOfProxies() > cc); cc++)
+      {
+      vtkSMProxy* referredProxy = pp->GetProxy(cc);
+      if (referredProxy)
+        {
+        setOfProxies.insert(referredProxy);
+        this->CollectReferredProxies(setOfProxies, referredProxy);
+        }
+      }
+    }
+}
+
+
+//---------------------------------------------------------------------------
 void vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
-  vtkPVXMLElement* rootElement, int revival)
+  vtkPVXMLElement* rootElement, vtkSMProxyManagerProxySet* proxySet, int revival)
 {
   if (!rootElement)
     {
@@ -1127,30 +1176,40 @@ void vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
       {
       do_group = 0;
       }
-    if (do_group)
+    if (!do_group)
       {
-      // save the states of all proxies in this group.
-      for (; it2 != it->second.end(); it2++)
+      continue;
+      }
+
+    // save the states of all proxies in this group.
+    for (; it2 != it->second.end(); it2++)
+      {
+      vtkSMProxyManagerProxyListType::iterator it3
+        = it2->second.begin();
+      for (; it3 != it2->second.end(); ++it3)
         {
-        vtkSMProxyManagerProxyListType::iterator it3
-          = it2->second.begin();
-        for (; it3 != it2->second.end(); ++it3)
+        if (visited_proxies.find(it3->Proxy.GetPointer()) 
+          != visited_proxies.end())
           {
-          if (visited_proxies.find(it3->Proxy.GetPointer()) 
-            == visited_proxies.end())
+          // proxy has been saved.
+          continue;
+          }
+        if (proxySet && proxySet->find(it3->Proxy.GetPointer()) == proxySet->end())
+          {
+          // proxy set was specified, and the indicated proxy
+          // does not belong to that set.
+          continue;
+          }
+        if (connectionID == vtkProcessModuleConnectionManager::GetNullConnectionID() || 
+          it3->Proxy.GetPointer()->GetConnectionID() == connectionID)
+          {
+          vtkPVXMLElement* proxyElement = 
+            it3->Proxy.GetPointer()->SaveState(rootElement);
+          if (revival && proxyElement)
             {
-            if (connectionID == vtkProcessModuleConnectionManager::GetNullConnectionID() || 
-              it3->Proxy.GetPointer()->GetConnectionID() == connectionID)
-              {
-              vtkPVXMLElement* proxyElement = 
-                it3->Proxy.GetPointer()->SaveState(rootElement);
-              if (revival && proxyElement)
-                {
-                it3->Proxy.GetPointer()->SaveRevivalState(proxyElement);
-                }
-              visited_proxies.insert(it3->Proxy.GetPointer());
-              }
+            it3->Proxy.GetPointer()->SaveRevivalState(proxyElement);
             }
+          visited_proxies.insert(it3->Proxy.GetPointer());
           }
         }
       }
@@ -1180,6 +1239,7 @@ void vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
       collectionElement->AddAttribute("name", it->first.c_str());
       vtkSMProxyManagerProxyMapType::iterator it2 =
         it->second.begin();
+      bool some_proxy_added = false;
       for (; it2 != it->second.end(); it2++)
         {
         vtkSMProxyManagerProxyListType::iterator it3 =
@@ -1195,14 +1255,21 @@ void vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
             itemElement->AddAttribute("name", it2->first.c_str());
             collectionElement->AddNestedElement(itemElement);
             itemElement->Delete();
+            some_proxy_added = true;
             }
           }
         }
-      rootElement->AddNestedElement(collectionElement);
+      // Avoid addition of empty groups.
+      if (some_proxy_added)
+        {
+        rootElement->AddNestedElement(collectionElement);
+        }
       collectionElement->Delete();
       }
     }
 
+  // TODO: Save definitions for only referred compound proxy definitions
+  // when saving state for subset of proxies.
   vtkPVXMLElement* defs = vtkPVXMLElement::New();
   defs->SetName("CompoundProxyDefinitions");
   this->SaveCompoundProxyDefinitions(defs);
@@ -1210,11 +1277,16 @@ void vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
   defs->Delete();
 
   // TODO: Save links as per connection ID
-  vtkPVXMLElement* links = vtkPVXMLElement::New();
-  links->SetName("Links");
-  this->SaveRegisteredLinks(links);
-  rootElement->AddNestedElement(links);
-  links->Delete();
+  // TODO: What to do with links when saving state for a
+  // subset of proxies?
+  if (!proxySet)
+    {
+    vtkPVXMLElement* links = vtkPVXMLElement::New();
+    links->SetName("Links");
+    this->SaveRegisteredLinks(links);
+    rootElement->AddNestedElement(links);
+    links->Delete();
+    }
 
   rootElement->Delete();
 }

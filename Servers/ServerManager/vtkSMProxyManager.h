@@ -42,6 +42,7 @@ class vtkSMProxy;
 class vtkSMProxyManagerObserver;
 class vtkSMStateLoader;
 class vtkStringList;
+class vtkSMProxyManagerProxySet;
 
 //BTX
 struct vtkSMProxyManagerInternals;
@@ -277,6 +278,15 @@ public:
   void SaveState(vtkIdType connectionID, vtkPVXMLElement* root, int revival=0);
 
   // Description:
+  // Saves the server manager state for the collection of proxies
+  // mentioned. If \c save_referred_proxies is true, state for
+  // proxies on any proxy property of the proxies in the collection 
+  // will also be saved. Note that for the state of any proxy
+  // to be saved, it has to be registered with the proxy manager.
+  void SaveState(vtkPVXMLElement* rootElement, vtkCollection* proxies,
+    int save_referred_proxies);
+
+  // Description:
   // Given a group name, create prototypes and store them
   // in a instance group called groupName_prototypes.
   // Prototypes have their ConnectionID set to the SelfConnection.
@@ -394,7 +404,11 @@ protected:
   void SaveRegisteredLinks(vtkPVXMLElement* root);
 
   void SaveStateInternal(vtkIdType connectionID, vtkPVXMLElement* root, 
-    int revival);
+    vtkSMProxyManagerProxySet* setOfProxies, int revival);
+
+  // Recursively collects all proxies referred by the proxy in the set.
+  void CollectReferredProxies(vtkSMProxyManagerProxySet& setOfProxies, 
+    vtkSMProxy* proxy);
 
   int UpdateInputProxies;
 private:
