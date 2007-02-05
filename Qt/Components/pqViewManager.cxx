@@ -535,9 +535,9 @@ void pqViewManager::updateViewModulePositions()
       view->getProxy()->GetProperty("WindowPosition"));
     if(prop)
       {
-      QPoint pos = view->getWidget()->mapToGlobal(QPoint(0,0));
-      pos -= totalBounds.topLeft();
-      prop->SetElements2(pos.x(), pos.y());
+      QPoint view_pos = view->getWidget()->mapToGlobal(QPoint(0,0));
+      view_pos -= totalBounds.topLeft();
+      prop->SetElements2(view_pos.x(), view_pos.y());
       }
     }
 }
