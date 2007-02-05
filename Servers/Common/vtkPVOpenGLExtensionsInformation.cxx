@@ -41,7 +41,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkPVOpenGLExtensionsInformation);
-vtkCxxRevisionMacro(vtkPVOpenGLExtensionsInformation, "1.1.8.1");
+vtkCxxRevisionMacro(vtkPVOpenGLExtensionsInformation, "1.1.8.2");
 //-----------------------------------------------------------------------------
 vtkPVOpenGLExtensionsInformation::vtkPVOpenGLExtensionsInformation()
 {
@@ -73,7 +73,7 @@ void vtkPVOpenGLExtensionsInformation::CopyFromObject(vtkObject* obj)
   // extensions are supported. Although this is not necessarily true,
   // it is acceptable to disable extensions when using software rendering.
   vtkPVOptions* options = pm->GetOptions();
-#ifdef VTK_OPEN_HAS_OSMESA
+#ifdef VTK_OPENGL_HAS_OSMESA
   if (options->GetUseOffscreenRendering())
     {
     return;
