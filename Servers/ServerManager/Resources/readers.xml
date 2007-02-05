@@ -1496,7 +1496,8 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        animateable="0" >
         <FileListDomain name="files"/>
      </StringVectorProperty>
 
@@ -1510,7 +1511,8 @@
      <StringVectorProperty
         name="XMLFileName"
         command="SetXMLFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        animateable="0" >
        <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
              <Property name="XMLFileNameInfo" function="XMLFileName"/>
@@ -1529,6 +1531,7 @@
         name="FilePrefix"
         command="SetFilePrefix"
         number_of_elements="1"
+        animateable="0"
         information_property="FilePrefixInfo" >
        <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
@@ -1548,6 +1551,7 @@
         name="FilePattern"
         command="SetFilePattern"
         number_of_elements="1"
+        animateable="0"
         information_property="FilePatternInfo" >
        <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
@@ -1568,6 +1572,7 @@
         command="SetFileRange"
         number_of_elements="2" 
         default_values="-1 -1"
+        animateable="0"
         information_property="FileRangeInfo" >
        <IntRangeDomain name="range">
           <RequiredProperties>
@@ -1587,8 +1592,8 @@
         name="TimeStep"
         command="SetTimeStep"
         number_of_elements="1"
-        animateable="1"
         default_values="0"
+        animateable="0"
         information_property="TimestepValues">
        <IntRangeDomain name="range">
           <RequiredProperties>
@@ -1654,6 +1659,7 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
+        animateable="0"
         information_property="SideSetInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
@@ -1674,6 +1680,7 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
+        animateable="0"
         element_types="2 0"
         information_property="NodeSetInfo"> 
        <ArraySelectionDomain name="array_list">
@@ -1702,6 +1709,7 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0" 
+        animateable="0"
         information_property="BlockArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
@@ -1723,6 +1731,7 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0" 
+        animateable="0"
         information_property="MaterialArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
@@ -1744,6 +1753,7 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0" 
+        animateable="0"
         information_property="HierarchyArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
