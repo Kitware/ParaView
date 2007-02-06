@@ -89,15 +89,15 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->AcceptButton = new QPushButton(this);
   this->AcceptButton->setObjectName("Accept");
   this->AcceptButton->setText(tr("Apply"));
-  this->AcceptButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pvApply.png")));
+  this->AcceptButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqUpdate16.png")));
   this->ResetButton = new QPushButton(this);
   this->ResetButton->setObjectName("Reset");
   this->ResetButton->setText(tr("Reset"));
-  this->ResetButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pvCancel.png")));
+  this->ResetButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqCancel16.png")));
   this->DeleteButton = new QPushButton(this);
   this->DeleteButton->setObjectName("Delete");
   this->DeleteButton->setText(tr("Delete"));
-  this->DeleteButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pvDelete.png")));
+  this->DeleteButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqDelete16.png")));
   buttonlayout->addStretch();
   buttonlayout->addWidget(this->AcceptButton);
   buttonlayout->addWidget(this->ResetButton);
