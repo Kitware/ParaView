@@ -1061,16 +1061,18 @@
 
       <IntVectorProperty
         name="NumberOfFrames"
-        command="SetNumberOfFrame"
+        command="SetNumberOfFrames"
         number_of_elements="1"
-        default_values="10">
+        default_values="10"
+        update_self="1">
       </IntVectorProperty>
 
       <IntVectorProperty
         name="Duration"
         command="SetDuration"
         number_of_elements="1"
-        default_values="10">
+        default_values="10"
+        update_self="1">
       </IntVectorProperty>
 
       <IntVectorProperty
