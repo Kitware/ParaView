@@ -2068,18 +2068,18 @@
 
   <ProxyGroup name="plotmodules">
 
-    <ViewModuleProxy name="HistogramViewModule"
+    <ViewModuleProxy name="BarChartViewModule"
       base_proxygroup="rendermodules" base_proxyname="ViewModule"
-      display_name="HistogramDisplay">
+      display_name="BarChartDisplay">
       <!-- Add non-command properties that will help
-          keep client-only Histogram properties in SM such as colors etc etc -->
+          keep client-only BarChart properties in SM such as colors etc etc -->
     </ViewModuleProxy>
 
     <ViewModuleProxy name="XYPlotViewModule"
       base_proxygroup="rendermodules" base_proxyname="ViewModule"
       display_name="XYPlotDisplay2">
       <!-- Add non-command properties that will help
-          keep client-only Histogram properties in SM such as colors etc etc -->
+          keep client-only BarChart properties in SM such as colors etc etc -->
     </ViewModuleProxy>
     <!-- End ProxyGroup plotmodules -->
   </ProxyGroup>
@@ -3703,7 +3703,7 @@
 
     </GenericViewDisplayProxy>
 
-    <GenericViewDisplayProxy name="HistogramDisplay"
+    <GenericViewDisplayProxy name="BarChartDisplay"
       base_proxygroup="displays" base_proxyname="GenericViewDisplay">
     </GenericViewDisplayProxy>
 

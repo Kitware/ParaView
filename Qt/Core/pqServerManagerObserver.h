@@ -45,7 +45,7 @@ class vtkCommand;
 class vtkObject;
 class vtkPVXMLElement;
 class vtkSMProxy;
-class vtkSMRenderModuleProxy;
+class vtkSMAbstractViewModuleProxy;
 
 // This is a vtkSMProxyManager observer. This class should simply listen to events
 // fired by proxy manager and respond. It does not support any creation method. 
@@ -72,12 +72,12 @@ signals:
   // Fired when a proxy registered under group "displays" is unregistered.
   void displayUnRegistered(vtkSMProxy* display);
 
-  /// Fired when a render module proxy is registered under the "render_modules"
+  /// Fired when a view module proxy is registered under the "view_modules"
   /// group.
-  void renderModuleRegistered(QString name, vtkSMRenderModuleProxy* rm);
+  void viewModuleRegistered(QString name, vtkSMAbstractViewModuleProxy* rm);
 
-  /// Fired when a render module proxy is unregistred.
-  void renderModuleUnRegistered(vtkSMRenderModuleProxy* rm);
+  /// Fired when a view module proxy is unregistred.
+  void viewModuleUnRegistered(vtkSMAbstractViewModuleProxy* rm);
 
   /// Fired when a compound proxy definition is registered.
   void compoundProxyDefinitionRegistered(QString name);
@@ -86,11 +86,11 @@ signals:
   void compoundProxyDefinitionUnRegistered(QString name);
   
   // Fired when a proxy is registered, and not in the "sources" or
-  // "render_modules" groups.
+  // "view_modules" groups.
   void proxyRegistered(QString group, QString name, vtkSMProxy* proxy);
   
   // Fired when a proxy is unregistered, and does not belong to
-  // the "sources" or "render_modules" group.
+  // the "sources" or "view_modules" group.
   void proxyUnRegistered(QString group, QString name, vtkSMProxy* proxy);
 
   /// Fired when a server connection is created by the vtkProcessModule.

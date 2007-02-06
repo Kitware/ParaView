@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkType.h" // needed for vtkIdType.
 
 class vtkSMProxy;
-class vtkSMRenderModuleProxy;
+class vtkSMAbstractViewModuleProxy;
 class QVTKWidget;
 
 class pqConsumerDisplay;
@@ -117,15 +117,21 @@ public:
   /// Given a vtkSMProxy gets the pqProxy for it.
   pqProxy* getPQProxy(vtkSMProxy*);
 
-  /// Returns the number of render modules
-  int getNumberOfRenderModules();
+  /// Returns the number of view modules
+  int getNumberOfViewModules() const;
 
-  /// Given an index, returns a render module.
-  pqRenderViewModule* getRenderModule(int idx);
+  /// Returns the number of render modules (<= this->getNumberOfViewModules()).
+  int getNumberOfRenderModules() const;
 
-  /// Given a render module proxy get the pqRenderViewModule representation
+  /// Returns the render module at the given index.
+  pqRenderViewModule* getRenderModule(int index) const;
+
+  /// Given an index, returns a view module.
+  pqGenericViewModule* getViewModule(int idx);
+
+  /// Given a view module proxy get the pqGenericViewModule representation
   /// for it.
-  pqRenderViewModule* getRenderModule(vtkSMRenderModuleProxy*);
+  pqGenericViewModule* getViewModule(vtkSMProxy*);
   pqRenderViewModule* getRenderModule(QVTKWidget*);
 
   /// Book end events for removing a server.
@@ -145,10 +151,6 @@ public:
   /// render displays as well as other consumer displays such as 
   /// plot displays.
   QList<pqConsumerDisplay*> getDisplays(pqServer* server);
-
-  // Returns a list of render modules on the particular server.
-  // If server==NULL, returns all render modules.
-  QList<pqRenderViewModule*> getRenderModules(pqServer* server);
 
   // Returns a list of views on the particular server.
   // If server==NULL, returns all view modules. This includes
@@ -177,8 +179,8 @@ public slots:
   void onRemoveServer(vtkIdType cid);
 
   /// Call when a new render module is registered/unrgistered.
-  void onAddRenderModule(QString name, vtkSMRenderModuleProxy* rm);
-  void onRemoveRenderModule(vtkSMRenderModuleProxy* rm);
+  void onAddViewModule(QString name, vtkSMAbstractViewModuleProxy* rm);
+  void onRemoveViewModule(vtkSMAbstractViewModuleProxy* rm);
 
   /// Call when a display proxy is registered/unregistered.
   void onAddDisplay(QString name, vtkSMProxy* display);
@@ -188,6 +190,7 @@ public slots:
  /// (other than sources/displays/render modules).
  void onProxyRegistered(QString group, QString name, vtkSMProxy* proxy);
  void onProxyUnRegistered(QString group, QString name, vtkSMProxy* proxy);
+
 signals:
   // Fired when a new connection is created on the vtkProcessModule.
   // a new pqServer encapsulator is created for it (thanks to
@@ -222,22 +225,11 @@ signals:
   void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
   void preConnectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
 
-  /// Fired when a render module becomes available. The handler of this
-  /// signal must set the pqRenderViewModule's parent QWidget at first 
-  /// opportunity.
-  void renderModuleAdded(pqRenderViewModule* rm);
-  void preRenderModuleAdded(pqRenderViewModule*);
-
-  /// Fired when a render module is gone for ever.
-  void renderModuleRemoved(pqRenderViewModule* rm);
-  void preRenderModuleRemoved(pqRenderViewModule* rm);
-
-  /// Fired when a view module becomes available (also fired for 
-  /// pqRenderViewModule).
+  /// Fired when a view module becomes available.
   void viewModuleAdded(pqGenericViewModule*);
   void preViewModuleAdded(pqGenericViewModule*);
 
-  /// Fired when a view module (including pqRenderViewModule) is to be removed.
+  /// Fired when a view module is to be removed.
   void viewModuleRemoved(pqGenericViewModule*);
   void preViewModuleRemoved(pqGenericViewModule*);
 

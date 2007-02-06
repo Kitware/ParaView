@@ -211,8 +211,8 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
                    this, 
                    SLOT(sourceRemoved(pqPipelineSource*)));
   QObject::connect(
-    model, SIGNAL(renderModuleRemoved(pqRenderViewModule*)),
-    this, SLOT(renderModuleRemoved(pqRenderViewModule*)));
+    model, SIGNAL(viewModuleRemoved(pqGenericViewModule*)),
+    this, SLOT(viewModuleRemoved(pqGenericViewModule*)));
 
   // Cleanup when a selection helper is unregistered.
   pqServerManagerObserver* observer = core->getServerManagerObserver();
@@ -922,10 +922,14 @@ void pqSelectionManager::selectionChanged(vtkIdType cid)
   emit this->selectionChanged(this);
 
   // Since selection changed, we need to trigger render to show the selection.
-  QList<pqRenderViewModule*> rms = model->getRenderModules(model->getServer(cid));
-  foreach(pqRenderViewModule* rm, rms)
+  QList<pqGenericViewModule*> rms = model->getViewModules(model->getServer(cid));
+  foreach(pqGenericViewModule* view, rms)
     {
-    rm->render();
+    pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
+    if (rm)
+      {
+      rm->render();
+      }
     }
 
 }
@@ -977,8 +981,13 @@ int pqSelectionManager::getSelectedObject(
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::renderModuleRemoved(pqRenderViewModule* rm)
+void pqSelectionManager::viewModuleRemoved(pqGenericViewModule* vm)
 {
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(vm);
+  if (!rm)
+    {
+    return;
+    }
   // locate displays in this render module, if any, are remove them.
   vtkSMProxy* rmp = rm->getProxy();
   if (!rmp)

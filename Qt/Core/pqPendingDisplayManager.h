@@ -60,9 +60,8 @@ public slots:
   /// remove a source for which a display will eventually be made
   void removePendingDisplayForSource(pqPipelineSource* s);
   
-  /// create deferred displays for the sources on a particular
-  /// render module
-  void createPendingDisplays(pqGenericViewModule* rm);
+  /// create deferred displays. 
+  void createPendingDisplays(pqGenericViewModule* view);
 
   /// get the number of deferred displays
   int getNumberOfPendingDisplays();
@@ -74,6 +73,10 @@ signals:
 protected:
   friend class pqPendingDisplayUndoElement;
   void internalAddPendingDisplayForSource(pqPipelineSource* s);
+
+
+  pqGenericViewModule* getViewForSource(pqPipelineSource* source,
+    pqGenericViewModule* currentView);
 
 private:
   class MyInternal;

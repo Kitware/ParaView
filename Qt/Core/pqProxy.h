@@ -38,9 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineObject_h
 
 #include "pqServerManagerModelItem.h"
-class pqServer;
-class vtkSMProxy;
 class pqProxyInternal;
+class pqServer;
+class vtkPVXMLElement;
+class vtkSMProxy;
 
 // This class represents any registered Server Manager proxy.
 // It keeps essential information to locate the proxy as well as
@@ -96,6 +97,9 @@ public:
   /// \param modified True if the source has been modified.
   void setModified(bool modified);
 
+  /// Returns the hints for this proxy, if any. May returns NULL
+  /// if no hints are defined.
+  vtkPVXMLElement* getHints() const;
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);

@@ -117,7 +117,7 @@ private slots:
   void sourceRemoved(pqPipelineSource*);
   void proxyRegistered(QString, QString, vtkSMProxy*);
   void proxyUnRegistered(QString, QString, vtkSMProxy*);
-  void renderModuleRemoved(pqRenderViewModule* rm);
+  void viewModuleRemoved(pqGenericViewModule* rm);
   void onSelectionUpdateVTKObjects(vtkObject* sel);
   void updateSelections();
 

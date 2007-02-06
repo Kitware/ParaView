@@ -73,7 +73,7 @@ bool pqDisplayPolicy::canDisplay(const pqPipelineSource* source,
   QString viewProxyName = view->getProxy()->GetXMLName();
   QString srcProxyName = source->getProxy()->GetXMLName();
 
-  if (viewProxyName == "HistogramViewModule")
+  if (viewProxyName == "BarChartViewModule")
     {
     return (srcProxyName == "ExtractHistogram");
     }

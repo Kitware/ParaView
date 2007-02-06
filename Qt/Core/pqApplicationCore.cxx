@@ -198,11 +198,11 @@ void pqApplicationCore::connect(pqServerManagerObserver* pdata,
     smModel, SLOT(onAddServer(vtkIdType)));
   QObject::connect(pdata, SIGNAL(connectionClosed(vtkIdType)),
     smModel, SLOT(onRemoveServer(vtkIdType)));
-  QObject::connect(pdata, SIGNAL(renderModuleRegistered(QString, 
-        vtkSMRenderModuleProxy*)),
-    smModel, SLOT(onAddRenderModule(QString, vtkSMRenderModuleProxy*)));
-  QObject::connect(pdata, SIGNAL(renderModuleUnRegistered(vtkSMRenderModuleProxy*)),
-    smModel, SLOT(onRemoveRenderModule(vtkSMRenderModuleProxy*)));
+  QObject::connect(pdata, SIGNAL(viewModuleRegistered(QString, 
+        vtkSMAbstractViewModuleProxy*)),
+    smModel, SLOT(onAddViewModule(QString, vtkSMAbstractViewModuleProxy*)));
+  QObject::connect(pdata, SIGNAL(viewModuleUnRegistered(vtkSMAbstractViewModuleProxy*)),
+    smModel, SLOT(onRemoveViewModule(vtkSMAbstractViewModuleProxy*)));
   QObject::connect(pdata, 
     SIGNAL(displayRegistered(QString, vtkSMProxy*)),
     smModel, SLOT(onAddDisplay(QString, vtkSMProxy*)));

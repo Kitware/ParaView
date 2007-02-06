@@ -72,11 +72,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqGenericViewModule::pqGenericViewModule(const QString& group, const QString& name, 
+pqGenericViewModule::pqGenericViewModule(
+  ViewModuleTypes type,
+  const QString& group, const QString& name, 
   vtkSMAbstractViewModuleProxy* renModule, pqServer* server, 
   QObject* _parent/*=null*/)
 : pqProxy(group, name, renModule, server, _parent)
 {
+  this->ViewType = type;
   this->Internal = new pqGenericViewModuleInternal();
 
   // Listen to updates on the displays property.

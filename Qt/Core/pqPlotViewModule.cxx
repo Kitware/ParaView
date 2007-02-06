@@ -71,15 +71,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqPlotViewModule::pqPlotViewModule(int type,
+pqPlotViewModule::pqPlotViewModule(ViewModuleTypes type,
   const QString& group, const QString& name, 
   vtkSMAbstractViewModuleProxy* renModule, pqServer* server, QObject* _parent)
-: pqGenericViewModule(group, name, renModule, server, _parent)
+: pqGenericViewModule(type, group, name, renModule, server, _parent)
 {
-  this->Type = type;
   this->Internal = new pqPlotViewModuleInternal();
 
-  switch (this->Type)
+  switch (this->getViewType())
     {
   case BAR_CHART:
       {
@@ -181,7 +180,7 @@ void pqPlotViewModule::forceRender()
 void pqPlotViewModule::renderInternal()
 {
   // Now update the GUI.
-  switch (this->Type)
+  switch (this->getViewType())
     {
   case BAR_CHART:
     this->renderBarChart();
@@ -190,6 +189,9 @@ void pqPlotViewModule::renderInternal()
   case XY_PLOT:
     this->renderXYPlot();
     break;
+
+  default:
+    qDebug() << "Incorrect plot type: " << this->getViewType();
     }
 }
 

@@ -108,7 +108,8 @@ public:
 //-----------------------------------------------------------------------------
 pqRenderViewModule::pqRenderViewModule(const QString& name, 
   vtkSMRenderModuleProxy* renModule, pqServer* server, QObject* _parent/*=null*/)
-: pqGenericViewModule("render_modules", name, renModule, server, _parent)
+: pqGenericViewModule(
+  pqGenericViewModule::RENDER_VIEW, "view_modules", name, renModule, server, _parent)
 {
   this->Internal = new pqRenderViewModuleInternal();
   this->Internal->RenderViewProxy->setRenderModule(this);

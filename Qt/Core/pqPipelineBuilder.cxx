@@ -464,125 +464,71 @@ void pqPipelineBuilder::remove(pqProxy* proxy, bool is_undoable)
 }
 
 //-----------------------------------------------------------------------------
-pqPlotViewModule* pqPipelineBuilder::createPlotWindow(int type, pqServer* server)
+pqGenericViewModule* pqPipelineBuilder::createView(int type, pqServer* server)
 {
   if (!server)
     {
-    qDebug() << "Cannot createPlotWindow on null server.";
-    return 0;
+    qDebug() << "Cannot create view without server.";
+    return NULL;
     }
-
-  const char* proxyname;
-  switch (type)
-    {
-  case pqPlotViewModule::BAR_CHART:
-    proxyname = "HistogramViewModule";
-    break;
-  case pqPlotViewModule::XY_PLOT:
-    proxyname = "XYPlotViewModule";
-    break;
-  default:
-    qDebug() << "Cannot determine proxy to create for type: " << type;
-    return 0;
-    }
-
-  // This is not an undo-able operation (atleast for now)
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxy* proxy = pxm->NewProxy("plotmodules", proxyname);
+  vtkSMProxy* proxy= 0;
+  switch (type)
+    {
+  case pqGenericViewModule::RENDER_VIEW:
+    proxy = server->newRenderModule();
+    break;
+
+  case pqGenericViewModule::XY_PLOT:
+    proxy = pxm->NewProxy("plotmodules", "XYPlotViewModule");
+    break;
+
+  case pqGenericViewModule::BAR_CHART:
+    proxy = pxm->NewProxy("plotmodules","BarChartViewModule");
+    break;
+
+  case pqGenericViewModule::TABLE_VIEW:
+    proxy = pxm->NewProxy("views", "TableView");
+    break;
+
+  default:
+    qDebug() << "Unknown view type : " << type;
+    }
+
   if (!proxy)
     {
-    qDebug() << "Cannot create proxy: rendermodules:" << proxyname;
-    return 0;
+    qDebug() << "Failed to create a proxy for the requested view type.";
+    return NULL;
     }
   proxy->SetConnectionID(server->GetConnectionID());
-  proxy->UpdateVTKObjects();
-  QString name("%1%2");
-  name = name.arg(proxy->GetXMLName());
-  name = name.arg(this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName()));
-  pxm->RegisterProxy("plot_modules", name.toAscii().data(), proxy);
+
+  QString name = QString("%1%2").arg(proxy->GetXMLName()).arg(
+    this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName()));
+  pxm->RegisterProxy("view_modules", name.toAscii().data(), proxy);
   proxy->Delete();
 
   pqServerManagerModel* model = 
     pqApplicationCore::instance()->getServerManagerModel();
-  pqPlotViewModule* pqView = qobject_cast<pqPlotViewModule*>(
+  pqGenericViewModule* view = qobject_cast<pqGenericViewModule*>(
     model->getPQProxy(proxy));
-  if (!pqView)
+  if (view)
     {
-    qDebug() << "Cannot locate the pqPlotViewModule for the " 
+    view->setDefaults();
+    }
+  else
+    {
+    qDebug() << "Cannot locate the pqGenericViewModule for the " 
       << "view module proxy.";
     }
-  return pqView;
-}
-
-pqTableViewModule* pqPipelineBuilder::createTableView(pqServer* server)
-{
-  if (!server)
-    {
-    qDebug() << "Cannot createPlotWindow on null server.";
-    return 0;
-    }
-
-  vtkSMProxy* const proxy = vtkSMProxyManager::GetProxyManager()->NewProxy("views", "TableView");
-  assert(proxy);
-  proxy->SetConnectionID(server->GetConnectionID());
-  proxy->UpdateVTKObjects();
   
-  QString name("%1%2");
-  name = name.arg(proxy->GetXMLName());
-  name = name.arg(this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName()));
-  vtkSMProxyManager::GetProxyManager()->RegisterProxy("views", name.toAscii().data(), proxy);
-  proxy->Delete();
-  
-  return qobject_cast<pqTableViewModule*>(pqApplicationCore::instance()->getServerManagerModel()->getPQProxy(proxy));
-} 
-
-//-----------------------------------------------------------------------------
-pqRenderViewModule* pqPipelineBuilder::createWindow(pqServer* server)
-{
-  if (!server)
-    {
-    qDebug() << "Cannot createWindow on null server.";
-    return NULL;
-    }
-
-  // This is not an undo-able operation (atleast for now).
-  vtkSMRenderModuleProxy* renModule = server->newRenderModule();
-  
-  QString name = QString("%1%2");
-  name = name.arg(renModule->GetXMLName());
-  name = name.arg(this->NameGenerator->GetCountAndIncrement(renModule->GetXMLName()));
-
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->RegisterProxy("render_modules", name.toAscii().data(), renModule);
-  renModule->Delete();
-
-  // as a side effect of the registeration, pqServerManagerModel will
-  // have created a nice new pqRenderViewModule, obtain it.
-  pqServerManagerModel* smModel = pqServerManagerModel::instance();
-  pqRenderViewModule* pqRM = smModel->getRenderModule(renModule);
-  if (!pqRM)
-    {
-    qDebug() << "Failed to create pqRenderViewModule.";
-    }
-  pqRM->setDefaults();
-
-#if 0
-  // turn on vtk light kit
-  renModule->SetUseLight(1);
-  // turn off main light
-  pqSMAdaptor::setElementProperty(renModule->GetProperty("LightSwitch"), 0);
-#endif
-
-  renModule->UpdateVTKObjects();
-  return pqRM;
-
+  return view;
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineBuilder::removeWindow(pqRenderViewModule* rm)
+void pqPipelineBuilder::removeView(pqGenericViewModule* view)
 {
-  if (!rm)
+  if (!view)
     {
     qDebug() << "Nothing to remove.";
     return;
@@ -590,30 +536,34 @@ void pqPipelineBuilder::removeWindow(pqRenderViewModule* rm)
 
   // Get a list of all displays belonging to this render module. We delete
   // all the displays that belong only to this render module.
-  QList<pqDisplay*> displays = rm->getDisplays();
+  QList<pqDisplay*> displays = view->getDisplays();
 
   // Unregister the proxy....the rest of the GUI will(rather should) manage itself!
-  QString name = rm->getProxyName();
-  vtkSMMultiViewRenderModuleProxy* multiRM = rm->getServer()->GetRenderModule();
-  vtkSMRenderModuleProxy* rmProxy = rm->getRenderModuleProxy();
+  QString name = view->getSMName();
+  vtkSMProxy* proxy = view->getProxy();
 
-  // This need to be done since multiRM adds all created rendermodules to itself.
-  // This may need revisiting once we fully support multi-view.
-  // This removal is necessary,as otherwise the vtkSMRenderModuleProxy lingers
-  // after this call -- which is not good, since the vtkSMRenderModuleProxy 
-  // is as such not useful.
-  for (unsigned int cc=0; cc < multiRM->GetNumberOfProxies(); cc++)
+  if (qobject_cast<pqRenderViewModule*>(view))
     {
-    if (multiRM->GetProxy(cc) == rmProxy)
+    vtkSMMultiViewRenderModuleProxy* multiRM = view->getServer()->GetRenderModule();  
+
+    // This need to be done since multiRM adds all created rendermodules to itself.
+    // This may need revisiting once we fully support multi-view.
+    // This removal is necessary,as otherwise the vtkSMRenderModuleProxy lingers
+    // after this call -- which is not good, since the vtkSMRenderModuleProxy
+    // is as such not useful.
+    for (unsigned int cc=0; cc < multiRM->GetNumberOfProxies(); cc++)
       {
-      multiRM->RemoveProxy(multiRM->GetProxyName(cc));
-      break;
+      if (multiRM->GetProxy(cc) == proxy)
+        {
+        multiRM->RemoveProxy(multiRM->GetProxyName(cc));
+        break;
+        }
       }
     }
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->UnRegisterProxy("render_modules", name.toAscii().data(), rmProxy);
-  // rm is invalid at this point.
+  pxm->UnRegisterProxy(view->getSMGroup().toAscii().data(), name.toAscii().data(), proxy);
+  // view is invalid at this point.
  
   // Now clean up any orphan displays.
   foreach (pqDisplay* disp, displays)

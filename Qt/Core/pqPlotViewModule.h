@@ -42,16 +42,10 @@ class PQCORE_EXPORT pqPlotViewModule : public pqGenericViewModule
 public:
   typedef pqGenericViewModule Superclass;
 
-  pqPlotViewModule(int type, const QString& group, const QString& name, 
+  pqPlotViewModule(ViewModuleTypes type, const QString& group, const QString& name, 
     vtkSMAbstractViewModuleProxy* renModule, 
     pqServer* server, QObject* parent=NULL);
   virtual ~pqPlotViewModule();
-
-  enum PlotType
-    {
-    BAR_CHART = 0,
-    XY_PLOT =1
-    };
 
   QWidget* getWidget();
 
@@ -69,9 +63,6 @@ public:
   /// and returns it.
   virtual vtkImageData* captureImage(int magnification);
 
-  int getType()
-    { return this->Type; }
-   
   /// Forces an immediate render. Overridden since for plots
   /// rendering actually happens on the GUI side, not merely
   /// in the ServerManager.
@@ -86,7 +77,6 @@ private slots:
   void renderInternal();
 
 protected:
-  int Type;
   void renderBarChart();
   void renderXYPlot();
 

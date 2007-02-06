@@ -41,7 +41,8 @@ class pqVTKHistogramModelInternal;
 class vtkRectilinearGrid;
 class vtkDataObject;
 
-
+/// Concrete implementation for the pqHistogramModel for 
+/// vtkRectilinearGrid.
 class PQCORE_EXPORT pqVTKHistogramModel : public pqHistogramModel
 {
 public:

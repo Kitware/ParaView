@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 // Server Manager includes
+#include "vtkPVXMLElement.h"
+#include "vtkSMProxy.h"
 
 // pq includes
 #include "pqApplicationCore.h"
@@ -45,9 +47,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPendingDisplayUndoElement.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineFilter.h"
+#include "pqPlotViewModule.h"
+#include "pqRenderViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
-#include "pqRenderViewModule.h"
 
 
 //-----------------------------------------------------------------------------
@@ -115,24 +118,82 @@ void pqPendingDisplayManager::removePendingDisplayForSource(pqPipelineSource* s)
     }
 }
 
-
 //-----------------------------------------------------------------------------
-void pqPendingDisplayManager::createPendingDisplays(pqGenericViewModule* view)
+pqGenericViewModule* pqPendingDisplayManager::getViewForSource(
+  pqPipelineSource* source, pqGenericViewModule* currentView)
 {
-  if (!view)
+  vtkPVXMLElement* hints = source->getHints();
+  vtkPVXMLElement* viewElement = hints? 
+    hints->FindNestedElementByName("View") : 0;
+  const char* view_type = viewElement? viewElement->GetAttribute("type") : 0;
+  if (view_type)
     {
-    return;
+    QString proxy_name = view_type;
+    proxy_name += "ViewModule";
+    if (currentView->getProxy()->GetXMLName() == proxy_name)
+      {
+      // nothing to do, active view is preferred view.
+      }
+    else
+      {
+      // Create the preferred view only if one doesn't exist already.
+      pqGenericViewModule *preferredView = 0;
+      QList<pqGenericViewModule*> views = 
+        pqApplicationCore::instance()->getServerManagerModel()->getViewModules(
+          source->getServer());
+      foreach (pqGenericViewModule* view, views)
+        {
+        if (proxy_name == view->getProxy()->GetXMLName())
+          {
+          preferredView = view;
+          break;
+          }
+        }
+      if (!preferredView)
+        {
+        // Preferred view does not exit, create a new view.
+        pqPipelineBuilder* builder = 
+          pqApplicationCore::instance()->getPipelineBuilder();
+        if (strcmp(view_type, "XYPlot")==0 )
+          {
+          currentView = builder->createView(
+            pqGenericViewModule::XY_PLOT, source->getServer());
+          }
+        else if (strcmp(view_type,"BarChart") ==0 )
+          {
+          currentView = builder->createView(
+            pqGenericViewModule::BAR_CHART, source->getServer());
+          }
+        }
+      }
     }
 
-  pqRenderViewModule* renModule = qobject_cast<pqRenderViewModule*>(view);
+  // No hints. We don't know what type of view is suitable
+  // for this proxy. Just check if it can be shown in current view.
+  return (currentView && currentView->canDisplaySource(source)) ?  
+    currentView : 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqPendingDisplayManager::createPendingDisplays(
+  pqGenericViewModule* activeview)
+{
+
   pqPipelineBuilder* pb = pqApplicationCore::instance()->getPipelineBuilder();
   foreach (pqPipelineSource* source, this->Internal->SourcesSansDisplays)
     {
-    if (!source || !view->canDisplaySource(source))
+    if (!source)
+      {
+      continue;
+      }
+    pqGenericViewModule* view = this->getViewForSource(source, activeview);
+    if (!view)
       {
       continue;
       }
     pb->createDisplay(source, view);
+
+    pqRenderViewModule* renModule = qobject_cast<pqRenderViewModule*>(view);
     if (renModule && renModule->getDisplayCount() == 1)
       {
       renModule->resetCamera();

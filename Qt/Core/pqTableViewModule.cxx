@@ -66,7 +66,8 @@ pqTableViewModule::pqTableViewModule(
     vtkSMAbstractViewModuleProxy* renModule,
     pqServer* server,
     QObject* _parent) :
-  pqGenericViewModule(group, name, renModule, server, _parent),
+  pqGenericViewModule(
+    pqGenericViewModule::TABLE_VIEW, group, name, renModule, server, _parent),
   Implementation(new pqImplementation())
 {
 }

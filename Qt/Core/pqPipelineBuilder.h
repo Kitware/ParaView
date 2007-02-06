@@ -41,17 +41,15 @@ class pqGenericViewModule;
 class pqNameCount;
 class pqPipelineDisplay;
 class pqPipelineSource;
-class pqPlotViewModule;
+class pqProxy;
 class pqRenderViewModule;
 class pqScalarBarDisplay;
 class pqScalarsToColors;
 class pqServer;
-class pqTableViewModule;
 class pqUndoStack;
 class vtkSMAbstractViewModuleProxy;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
-class pqProxy;
 
 /// This is a class that can build pipelines. Use this class to create 
 /// sources/filters/readers etc etc. This class will ensure that all
@@ -104,21 +102,15 @@ public:
   pqScalarBarDisplay* createScalarBar(pqScalarsToColors *lut,
     pqRenderViewModule* renModule);
 
-  /// Create new viewing "window" on the server. It uses the 
-  /// MultiViewRenderModule on the given server to instantiate a new render 
-  /// module.
-  pqRenderViewModule* createWindow(pqServer* server);
+  // Creates a new view module of the given type (pqGenericViewModule::ViewModuleTypes)
+  // on the given server. If requested type if a RENDER_VIEW module, it uses
+  // the MultiViewRenderModule on the given server to instantiate the new view.
+  pqGenericViewModule* createView(int type, pqServer* server);
 
-  /// Remove a viewing "window". This also cleans up any displays that are
-  /// visible only in this render window.
-  void removeWindow(pqRenderViewModule* rm);
-
-  // Called to create a new plot view on the server. \c type is the enum
-  // pqPlotViewModule::PlotType, which is the supported plot type.
-  pqPlotViewModule* createPlotWindow(int type, pqServer* server);
-
-  /// Creates a new table view on the server
-  pqTableViewModule* createTableView(pqServer* server);
+  /// Remove a view. This also cleans up any displays that are
+  /// visible in this view. Generally displays are visible in only one view, if
+  /// not then the display is not cleaned up.
+  void removeView(pqGenericViewModule* view);
 
   // Create a connection between a source and a sink. This method ensures
   // that the UndoState is recoreded. Remember this "connection" is not a 

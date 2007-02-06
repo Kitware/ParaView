@@ -2176,7 +2176,8 @@ void pqMainWindowCore::onServerCreation(pqServer *server)
   this->Implementation->MultiViewManager.setActiveServer(server);
 
   // Create a render module.
-  pqPipelineBuilder::instance()->createWindow(server);
+  pqPipelineBuilder::instance()->createView(
+    pqGenericViewModule::RENDER_VIEW, server);
   //this->Implementation->MultiViewManager.allocateWindowsToRenderModules();
 }
 
@@ -2533,22 +2534,22 @@ void pqMainWindowCore::setMaxRenderWindowSize(const QSize& size)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::createBarCharView()
 {
-    pqApplicationCore::instance()->getPipelineBuilder()->createPlotWindow(
-      pqPlotViewModule::BAR_CHART, this->getActiveServer());
+    pqApplicationCore::instance()->getPipelineBuilder()->createView(
+      pqGenericViewModule::BAR_CHART, this->getActiveServer());
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::createXYPlotView()
 {
-  pqApplicationCore::instance()->getPipelineBuilder()->createPlotWindow(
-    pqPlotViewModule::XY_PLOT, this->getActiveServer());
+  pqApplicationCore::instance()->getPipelineBuilder()->createView(
+    pqGenericViewModule::XY_PLOT, this->getActiveServer());
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::createTableView()
 {
-  pqApplicationCore::instance()->getPipelineBuilder()->createTableView(
-    this->getActiveServer());
+  pqApplicationCore::instance()->getPipelineBuilder()->createView(
+    pqGenericViewModule::TABLE_VIEW, this->getActiveServer());
 }
 
 //-----------------------------------------------------------------------------

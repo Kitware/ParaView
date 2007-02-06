@@ -261,8 +261,6 @@ public slots:
   
   void onHelpEnableTooltips(bool enabled = true);
 
-  // Call this slot when accept is called. This method will create
-  // displays for any sources/filters that are pending.
   void createPendingDisplays();
 
   // Called to show the settings dialog.

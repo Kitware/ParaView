@@ -29,7 +29,8 @@ public:
     pqServer* server = core->createServer(pqServerResource("builtin:"));
     
     // create a graphics window and put it in our main window
-    this->RenderModule = pb->createWindow(server);
+    this->RenderModule = qobject_cast<pqRenderViewModule*>(
+      pb->createView(pqGenericViewModule::RENDER_VIEW, server));
     this->setCentralWidget(this->RenderModule->getWidget());
     
     // hmm... (we get problems if we don't do this)

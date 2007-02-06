@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSMSourceProxy.h"
 
 #include <QList>
@@ -123,14 +123,14 @@ void pqServerManagerObserver::proxyRegistered(vtkObject*, unsigned long, void*,
     {
     emit this->displayRegistered(info->ProxyName, info->Proxy);
     }
-  else if (info->GroupName && strcmp(info->GroupName, "render_modules")==0)
+  else if (info->GroupName && strcmp(info->GroupName, "view_modules")==0)
     {
-    // A render module is registered. proxies in this group
-    // are vtkSMRenderModuleProxies which are "alive" with a window and all,
+    // A view module is registered. proxies in this group
+    // are vtkSMAbstractViewModuleProxy which are "alive" with a window and all,
     // and not the vtkSMMultiViewRenderModuleProxy.
-    vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(
+    vtkSMAbstractViewModuleProxy* rm = vtkSMAbstractViewModuleProxy::SafeDownCast(
       info->Proxy);
-    emit this->renderModuleRegistered(info->ProxyName, rm);
+    emit this->viewModuleRegistered(info->ProxyName, rm);
     }
   else
     {
@@ -164,10 +164,10 @@ void pqServerManagerObserver::proxyUnRegistered(vtkObject*, unsigned long, void*
     {
     emit this->displayUnRegistered(info->Proxy);
     }
-  else if (info->GroupName && strcmp(info->GroupName, "render_modules") == 0)
+  else if (info->GroupName && strcmp(info->GroupName, "view_modules") == 0)
     {
-    emit this->renderModuleUnRegistered(
-      vtkSMRenderModuleProxy::SafeDownCast(info->Proxy));
+    emit this->viewModuleUnRegistered(
+      vtkSMAbstractViewModuleProxy::SafeDownCast(info->Proxy));
     }
   else
     {

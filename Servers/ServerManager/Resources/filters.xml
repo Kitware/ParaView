@@ -3268,6 +3268,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       </InputProperty>
       <Hints>
         <Visibility replace_input="0" />
+        <View type="XYPlot" />
       </Hints>
    <!-- End Probe2 -->
    </SourceProxy>
@@ -4611,6 +4612,10 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
         <IntRangeDomain name="range" min="0" max="15"/>
      </IntVectorProperty>
 
+     <Hints>
+       <!-- View can be used to specify the preferred view for the proxy -->
+       <View type="BarChart" />
+     </Hints>
    <!-- End ExtractHistogram -->
    </SourceProxy>
 

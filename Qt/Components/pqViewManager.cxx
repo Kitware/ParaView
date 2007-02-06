@@ -98,8 +98,8 @@ public:
       }
 
     // Create a new module (for now we'll create a render module always.
-    pqGenericViewModule* ren  = pqPipelineBuilder::instance()->createWindow(
-      this->ActiveServer);
+    pqGenericViewModule* ren  = pqPipelineBuilder::instance()->createView(
+      pqGenericViewModule::RENDER_VIEW, this->ActiveServer);
     return ren;
     }
 };
@@ -245,10 +245,9 @@ void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
     }
 
   // When a frame is removed, the contained view is also destroyed.
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
-  if (rm)
+  if (view)
     {
-    pqPipelineBuilder::instance()->removeWindow(rm);
+    pqPipelineBuilder::instance()->removeView(view);
     }
 }
 

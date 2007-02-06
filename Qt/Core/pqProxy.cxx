@@ -221,6 +221,12 @@ vtkSMProxy* pqProxy::getProxy() const
 }
 
 //-----------------------------------------------------------------------------
+vtkPVXMLElement* pqProxy::getHints() const
+{
+  return this->Internal->Proxy->GetHints();
+}
+
+//-----------------------------------------------------------------------------
 void pqProxy::setModified(bool modified)
 {
   if(modified != this->Modified)

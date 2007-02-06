@@ -107,8 +107,8 @@ public:
   typedef QList<QPointer<pqServer> > ListOfServers;
   ListOfServers  Servers;
 
-  typedef QList<pqRenderViewModule*> ListOfRenderModules;
-  ListOfRenderModules RenderModules;
+  typedef QList<pqGenericViewModule*> ListOfViewModules;
+  ListOfViewModules ViewModules;
 
   typedef QMap<vtkSMProxy*, pqConsumerDisplay*> MapOfDisplayProxyToDisplay;
   MapOfDisplayProxyToDisplay Displays;
@@ -209,37 +209,17 @@ QList<pqPipelineSource*> pqServerManagerModel::getSources(pqServer* server) cons
 }
 
 //-----------------------------------------------------------------------------
-QList<pqRenderViewModule*> pqServerManagerModel::getRenderModules(pqServer* server)
+QList<pqGenericViewModule*> pqServerManagerModel::getViewModules(pqServer* server)
 {
   if (!server)
     {
-    return this->Internal->RenderModules;
+    return this->Internal->ViewModules;
     }
-  QList<pqRenderViewModule*> list;
-  foreach(pqRenderViewModule* rm, this->Internal->RenderModules)
-    {
-    if (rm && (!server || rm->getServer() == server))
-      {
-      list.push_back(rm);
-      }
-    }
-  return list;
-}
 
-//-----------------------------------------------------------------------------
-QList<pqGenericViewModule*> pqServerManagerModel::getViewModules(pqServer* server)
-{
   QList<pqGenericViewModule*> list;
-  QList<pqRenderViewModule*> rmlist = this->getRenderModules(server);
-  foreach(pqRenderViewModule* rm, rmlist)
+  foreach(pqGenericViewModule* view, this->Internal->ViewModules)
     {
-    list.push_back(rm);
-    }
-
-  foreach(pqProxy* proxy, this->Internal->Proxies)
-    {
-    pqGenericViewModule* view = qobject_cast<pqGenericViewModule*>(proxy);
-    if (view && (!server || view->getServer() == server))
+    if (view && view->getServer() == server)
       {
       list.push_back(view);
       }
@@ -519,56 +499,73 @@ void pqServerManagerModel::onRemoveServer(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel::onAddRenderModule(QString name, 
-  vtkSMRenderModuleProxy* rm)
+void pqServerManagerModel::onAddViewModule(QString name, 
+  vtkSMAbstractViewModuleProxy* view)
 {
-  if (!rm)
+  if (!view)
     {
-    qDebug() << "onAddRenderModule cannot be called with null render module.";
+    qDebug() << "onAddViewModule cannot be called with null view module.";
     return;
     }
 
 
-  pqServer* server =this->getServerForSource(rm);
+  pqServer* server =this->getServerForSource(view);
   if (!server)
     {
-    qDebug() << "Failed to locate server for render module.";
+    qDebug() << "Failed to locate server for view module.";
     return;
     }
 
-  if (this->getRenderModule(rm))
+  if (this->getViewModule(view))
     {
-    // don't create a new pqRenderViewModule, one already exists.
+    // don't create a new pqGenericViewModule if one already exists.
     return;
     }
 
-  pqRenderViewModule* pqRM = new pqRenderViewModule(name, rm, server, this);
+  pqGenericViewModule* pqview = 0;
+  vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(view);
+  const char* xml_type = view->GetXMLName();
+  if (rm)
+    {
+    pqview = new pqRenderViewModule(name, rm, server, this);
+    }
+  else if (strcmp(xml_type, "BarChartViewModule") == 0)
+    {
+    pqview = new pqPlotViewModule(pqGenericViewModule::BAR_CHART,
+      "view_modules", name, view, server, this);
+    }
+  else if (strcmp(xml_type, "XYPlotViewModule") == 0)
+    {
+    pqview = new pqPlotViewModule(pqGenericViewModule::XY_PLOT,
+      "view_modules", name, view, server, this);
+    }
+  else if (strcmp(xml_type, "TableView") == 0)
+    {
+    pqview = new pqTableViewModule("view_modules", name, view, server, this);
+    }
 
-  emit this->preRenderModuleAdded(pqRM);
-  emit this->preViewModuleAdded(pqRM);
-
-  this->Internal->RenderModules.push_back(pqRM);
-
-  emit this->viewModuleAdded(pqRM);
-  emit this->renderModuleAdded(pqRM);
+  if (pqview)
+    {
+    emit this->preViewModuleAdded(pqview);
+    this->Internal->ViewModules.push_back(pqview);
+    emit this->viewModuleAdded(pqview);
+    }
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel::onRemoveRenderModule(vtkSMRenderModuleProxy* rm)
+void pqServerManagerModel::onRemoveViewModule(vtkSMAbstractViewModuleProxy* rm)
 {
-  pqRenderViewModule* toRemove = this->getRenderModule(rm);
+  pqGenericViewModule* toRemove = this->getViewModule(rm);
   if (!toRemove)
     {
-    // no need to raise an debug message, the render module being removed
+    // no need to raise an debug message, the view module being removed
     // is already not present.
-    // qDebug() << "Failed to locate the pqRenderViewModule for the proxy";
     return;
     }
-  emit this->preRenderModuleRemoved(toRemove);
+
   emit this->preViewModuleRemoved(toRemove);
-  this->Internal->RenderModules.removeAll(toRemove);
+  this->Internal->ViewModules.removeAll(toRemove);
   emit this->viewModuleRemoved(toRemove);
-  emit this->renderModuleRemoved(toRemove);
 
   delete toRemove;
 }
@@ -596,7 +593,6 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
     return;
     }
 
-  bool is_viewmodule = false;
   pqProxy *pq_proxy = NULL;
   if (group == "lookup_tables")
     {
@@ -606,37 +602,6 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
   else if (group == "scalar_bars")
     {
     pq_proxy = new pqScalarBarDisplay(group, name, proxy, server, this);
-    }
-  else if (group == "plot_modules")
-    {
-    int type;
-    QString xmlType = proxy->GetXMLName();
-    if (xmlType == "HistogramViewModule")
-      {
-      type = pqPlotViewModule::BAR_CHART;
-      }
-    else if (xmlType == "XYPlotViewModule")
-      {
-      type = pqPlotViewModule::XY_PLOT;
-      }
-    else
-      {
-      qDebug() << "Don't know what kind of plot is a " << xmlType;
-      return;
-      }
-    vtkSMAbstractViewModuleProxy* ren = 
-      vtkSMAbstractViewModuleProxy::SafeDownCast(proxy);
-    if (ren)
-      {
-      pq_proxy = new pqPlotViewModule(type, group, name, ren, server, this);
-      }
-    is_viewmodule = true;
-    }
-  else if(group == "views" && proxy->GetXMLName() == QString("TableView"))
-    {
-    pq_proxy = new pqTableViewModule(group, name, 
-      vtkSMAbstractViewModuleProxy::SafeDownCast(proxy), server, this);
-    is_viewmodule = true;
     }
   else if (group == "animation")
     {
@@ -658,16 +623,7 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
   if (pq_proxy)
     {
     emit this->preProxyAdded(pq_proxy);
-    if (is_viewmodule)
-      {
-      emit this->preViewModuleAdded(
-        qobject_cast<pqGenericViewModule*>(pq_proxy));
-      }
     this->Internal->Proxies.insert(proxy, pq_proxy);
-    if (is_viewmodule)
-      {
-      emit this->viewModuleAdded(qobject_cast<pqGenericViewModule*>(pq_proxy));
-      }
     emit this->proxyAdded(pq_proxy);
     }
 }
@@ -715,9 +671,9 @@ void pqServerManagerModel::endRemoveServer()
 }
 
 //-----------------------------------------------------------------------------
-pqRenderViewModule* pqServerManagerModel::getRenderModule(vtkSMRenderModuleProxy* rm)
+pqGenericViewModule* pqServerManagerModel::getViewModule(vtkSMProxy* rm)
 {
-  foreach(pqRenderViewModule* pqRM, this->Internal->RenderModules)
+  foreach(pqGenericViewModule* pqRM, this->Internal->ViewModules)
     {
     if (pqRM->getProxy() == rm)
       {
@@ -730,11 +686,11 @@ pqRenderViewModule* pqServerManagerModel::getRenderModule(vtkSMRenderModuleProxy
 //-----------------------------------------------------------------------------
 pqRenderViewModule* pqServerManagerModel::getRenderModule(QVTKWidget* widget)
 {
-  foreach(pqRenderViewModule* pqRM, this->Internal->RenderModules)
+  foreach(pqGenericViewModule* pqRM, this->Internal->ViewModules)
     {
     if (pqRM->getWidget() == widget)
       {
-      return pqRM;
+      return qobject_cast<pqRenderViewModule*>(pqRM);
       }
     }
   return NULL;
@@ -854,8 +810,7 @@ pqProxy* pqServerManagerModel::getPQProxy(vtkSMProxy* proxy)
       }
     if (!pqproxy)
       {
-      pqproxy = this->getRenderModule(
-        vtkSMRenderModuleProxy::SafeDownCast(proxy));
+      pqproxy = this->getViewModule(proxy);
       }
     }
   return pqproxy;
@@ -918,18 +873,56 @@ void pqServerManagerModel::updateDisplayVisibility(bool)
 
 
 //-----------------------------------------------------------------------------
-int pqServerManagerModel::getNumberOfRenderModules()
+int pqServerManagerModel::getNumberOfRenderModules() const
 {
-  return this->Internal->RenderModules.size();
+  int num = 0;
+  foreach (pqGenericViewModule* view, this->Internal->ViewModules)
+    {
+    if (qobject_cast<pqRenderViewModule*>(view))
+      {
+      num++;
+      }
+    }
+  return num;
 }
 
 //-----------------------------------------------------------------------------
-pqRenderViewModule* pqServerManagerModel::getRenderModule(int idx)
+pqRenderViewModule* pqServerManagerModel::getRenderModule(int index) const
 {
-  if (idx >= this->Internal->RenderModules.size())
+  if (index <0 || index > this->Internal->ViewModules.size())
+    {
+    return NULL;
+    }
+
+  int num = 0;
+  foreach (pqGenericViewModule* view, this->Internal->ViewModules)
+    {
+    pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
+    if (rm)
+      {
+      if (num == index)
+        {
+        return rm;
+        }
+      num++;
+      }
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+int pqServerManagerModel::getNumberOfViewModules() const
+{
+  return this->Internal->ViewModules.size();
+}
+
+//-----------------------------------------------------------------------------
+pqGenericViewModule* pqServerManagerModel::getViewModule(int idx)
+{
+  if (idx < 0 || idx >= this->Internal->ViewModules.size())
     {
     return 0;
     }
-  return this->Internal->RenderModules.value(idx);
+  return this->Internal->ViewModules.value(idx);
 }
 

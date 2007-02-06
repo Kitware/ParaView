@@ -51,10 +51,8 @@ class vtkSMAbstractViewModuleProxy;
 class PQCORE_EXPORT pqGenericViewModule : public pqProxy
 {
   Q_OBJECT
+
 public:
-  pqGenericViewModule(const QString& group, const QString& name, 
-    vtkSMAbstractViewModuleProxy* renModule, 
-    pqServer* server, QObject* parent=NULL);
   virtual ~pqGenericViewModule();
 
   /// Returns the internal render Module proxy associated with this object.
@@ -77,6 +75,19 @@ public:
   /// to return the undo stack for the view module.
   virtual pqUndoStack* getInteractionUndoStack() const { return 0;} 
 
+  /// Enumeration defines the different types of view modules
+  /// supported.
+  enum ViewModuleTypes
+    {
+    RENDER_VIEW=1,
+    XY_PLOT,
+    BAR_CHART,
+    TABLE_VIEW
+    };
+
+  /// Returns the type of this view module.
+  ViewModuleTypes getViewType() const
+    { return this->ViewType; }
 public slots:
   /// Request a StillRender. Default implementation simply calls
   /// forceRender(). Subclasses can implement a delayed/buffered render.
@@ -114,6 +125,9 @@ public:
   /// are queries it.
   bool canDisplaySource(pqPipelineSource* source) const;
 
+  /// Sets default values for the underlying proxy. This is typically called
+  /// only on proxies created by the GUI itself.
+  virtual void setDefaults() { };
 signals:
   /// Fired after a display has been added to this render module.
   void displayAdded(pqDisplay*);
@@ -150,11 +164,18 @@ protected:
   /// on when the proxy is created.
   virtual void viewModuleInit();
 
+protected:
+  pqGenericViewModule(pqGenericViewModule::ViewModuleTypes type,
+    const QString& group, const QString& name, 
+    vtkSMAbstractViewModuleProxy* renModule, 
+    pqServer* server, QObject* parent=NULL);
+
 private:
   pqGenericViewModule(const pqGenericViewModule&); // Not implemented.
   void operator=(const pqGenericViewModule&); // Not implemented.
 
   pqGenericViewModuleInternal* Internal;
+  ViewModuleTypes ViewType;
 };
 
 #endif
