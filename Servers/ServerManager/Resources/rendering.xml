@@ -2966,6 +2966,7 @@
           <Exception name="LODMapper" />
           <Exception name="Property" />
           <Exception name="Visibility" />
+          <Exception name="Texture" />
         </ShareProperties>
       </SubProxy>
 
