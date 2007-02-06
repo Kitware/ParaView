@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.487");
+vtkCxxRevisionMacro(vtkPVSource, "1.487.2.1");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1452,7 +1452,8 @@ int vtkPVSource::ColorByScalars(
 // The rules are:
 // If the source created a NEW point scalar array, use it.
 // Else if the source created a NEW cell scalar array, use it.
-// Else if the input clolor by array exists in this source, use it.
+// Else if the input color by array exists in this source, use it.
+// Else color by texture if the input did.
 // Else color by property.
 void vtkPVSource::SetDefaultColorParameters()
 {
@@ -1599,6 +1600,10 @@ void vtkPVSource::SetDefaultColorParameters()
           return;
         }
 
+      }
+    else
+      {
+      this->DisplayProxy->SetTexture(input->GetDisplayProxy()->GetTexture());
       }
     }
 
