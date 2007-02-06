@@ -24,6 +24,7 @@ SET(Filters_SRCS
   vtkCompleteArrays.cxx
   vtkCVGeometryCache.cxx
   vtkDataAnalysisFilter.cxx
+  vtkDataSetHistogramFilter.cxx
   vtkDataSetSubdivisionAlgorithm.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
@@ -36,6 +37,7 @@ SET(Filters_SRCS
   vtkImageCompressor.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
+  vtkInteractorStyleTransferFunctionEditor.cxx
   vtkKdTreeGenerator.cxx
   vtkMergeArrays.cxx
   vtkMinMax.cxx
@@ -115,6 +117,16 @@ SET(Filters_SRCS
   vtkTessellatorFilter.cxx
   vtkTiledDisplaySchedule.cxx
   vtkTrackballPan.cxx
+  vtkTransferFunctionEditorRepresentation.cxx
+  vtkTransferFunctionEditorRepresentation1D.cxx
+  vtkTransferFunctionEditorRepresentationShapes1D.cxx
+  vtkTransferFunctionEditorRepresentationShapes2D.cxx
+  vtkTransferFunctionEditorRepresentationSimple1D.cxx
+  vtkTransferFunctionEditorWidget.cxx
+  vtkTransferFunctionEditorWidget1D.cxx
+  vtkTransferFunctionEditorWidgetShapes1D.cxx
+  vtkTransferFunctionEditorWidgetShapes2D.cxx
+  vtkTransferFunctionEditorWidgetSimple1D.cxx
   vtkUpdateSuppressorPipeline.cxx
   vtkVolumeSelector.cxx
   vtkVRMLSource.cxx
@@ -138,6 +150,10 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVRenderViewProxy.cxx
   vtkPVJoystickFly.cxx
   vtkSubdivisionAlgorithm.cxx 
+  vtkTransferFunctionEditorRepresentation.cxx
+  vtkTransferFunctionEditorRepresentation1D.cxx
+  vtkTransferFunctionEditorWidget.cxx
+  vtkTransferFunctionEditorWidget1D.cxx
   ABSTRACT)
 
 IF(PARAVIEW_ENABLE_PYTHON_FILTER)
@@ -233,6 +249,8 @@ ENDIF(PARAVIEW_BUILD_WITH_ADAPTOR)
 CONFIGURE_FILE(${PVFilters_SOURCE_DIR}/vtkPVFiltersConfig.h.in
   ${PVFilters_BINARY_DIR}/vtkPVFiltersConfig.h
   ESCAPE_QUOTES)
+
+SET(VTK_WRAP_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/hints)
 
 # Setup vtkInstantiator registration for this library's classes.
 INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
