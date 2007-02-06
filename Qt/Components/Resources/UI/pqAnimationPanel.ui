@@ -68,7 +68,11 @@
            </widget>
           </item>
           <item row="0" column="1" >
-           <widget class="QSpinBox" name="keyFrameIndex" />
+           <widget class="QSpinBox" name="keyFrameIndex" >
+            <property name="maximum" >
+             <number>2147483647</number>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0" >
            <widget class="QLabel" name="label_5" >
@@ -305,7 +309,14 @@
            </widget>
           </item>
           <item row="2" column="1" >
-           <widget class="QSpinBox" name="duration" />
+           <widget class="QSpinBox" name="duration" >
+            <property name="maximum" >
+             <number>2147483647</number>
+            </property>
+            <property name="minimum" >
+             <number>1</number>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0" >
            <widget class="QLabel" name="labelDuration" >
@@ -325,7 +336,14 @@
            </widget>
           </item>
           <item row="1" column="1" >
-           <widget class="QSpinBox" name="numberOfFrames" />
+           <widget class="QSpinBox" name="numberOfFrames" >
+            <property name="maximum" >
+             <number>2147483647</number>
+            </property>
+            <property name="minimum" >
+             <number>1</number>
+            </property>
+           </widget>
           </item>
           <item row="0" column="1" >
            <widget class="QComboBox" name="playMode" >
