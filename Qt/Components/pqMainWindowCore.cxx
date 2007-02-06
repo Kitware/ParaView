@@ -1296,7 +1296,7 @@ void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
   this->multiViewManager().hideDecorations();
   if (!mgr->saveAnimation(files[0]))
     {
-    qDebug() << "Animation save failed!";
+    // qDebug() << "Animation save failed!";
     }
   this->multiViewManager().showDecorations();
 }
