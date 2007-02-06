@@ -48,10 +48,6 @@ public:
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
 
-  // Get/Set the frame rate to use for saving the animation.
-  // If 0, which is the default, the frame rate from the scene will be used.
-  vtkSetMacro(FrameRate, double);
-  vtkGetMacro(FrameRate, double);
 protected:
   vtkSMAnimationSceneWriter();
   ~vtkSMAnimationSceneWriter();
@@ -85,7 +81,6 @@ protected:
   bool Saving;
   bool SaveFailed;
   char* FileName;
-  double FrameRate;
 private:
   vtkSMAnimationSceneWriter(const vtkSMAnimationSceneWriter&); // Not implemented.
   void operator=(const vtkSMAnimationSceneWriter&); // Not implemented.

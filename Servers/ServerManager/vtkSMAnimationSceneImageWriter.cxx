@@ -46,7 +46,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.6");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.7");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -65,6 +65,7 @@ vtkSMAnimationSceneImageWriter::vtkSMAnimationSceneImageWriter()
 
   this->Prefix = 0;
   this->Suffix = 0;
+  this->FrameRate = 1.0;
 
   this->BackgroundColor[0] = this->BackgroundColor[1] = 
     this->BackgroundColor[2] = 0.0;
@@ -316,7 +317,7 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     vtkAVIWriter* avi = vtkAVIWriter::New();
     avi->SetQuality(this->Quality);
     avi->SetRate(
-      static_cast<int>(this->AnimationScene->GetFrameRate()));
+      static_cast<int>(this->GetFrameRate()));
     mwriter = avi;
     }
 #else
@@ -326,7 +327,7 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     vtkFFMPEGWriter *aviwriter = vtkFFMPEGWriter::New();
     aviwriter->SetQuality(this->Quality);
     aviwriter->SetRate(
-      static_cast<int>(this->AnimationScene->GetFrameRate()));
+      static_cast<int>(this->GetFrameRate()));
     mwriter = aviwriter;
     }
 # endif
@@ -389,6 +390,7 @@ void vtkSMAnimationSceneImageWriter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Quality: " << this->Quality << endl;
   os << indent << "Magnification: " << this->Magnification << endl;
   os << indent << "ErrorCode: " << this->ErrorCode << endl;
+  os << indent << "FrameRate: " << this->FrameRate << endl;
   os << indent << "BackgroundColor: " << this->BackgroundColor[0]
     << ", " << this->BackgroundColor[1] << ", " << this->BackgroundColor[2] 
     << endl;

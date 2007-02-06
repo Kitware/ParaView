@@ -102,9 +102,7 @@ protected slots:
   void onProxyAdded(pqProxy*);
   void onProxyRemoved(pqProxy*);
 
-  void durationChanged();
-  void frameRateChanged();
-  void numberOfFramesChanged();
+  void updateGUI();
 
   // Update the ViewModules property in the active scene.
   void updateViewModules();

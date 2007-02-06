@@ -16,7 +16,10 @@
 // that adds a new play mode to play through available timesteps.
 // .SECTION Description
 // vtkAnimationScene subclass
-// that adds a new play mode to play through available timesteps.
+// that adds a new play mode to play through available timesteps. 
+// Note that when playing in PLAYMODE_TIMESTEPS mode, the frame-rate
+// is not used at all, instead FramesPerTimestep is
+// used to imply number of frames per timestep.
 
 #ifndef __vtkPVAnimationScene_h
 #define __vtkPVAnimationScene_h
@@ -62,10 +65,18 @@ public:
     PLAYMODE_TIMESTEPS = PLAYMODE_REALTIME+1
     };
   //ETX
+
+  // Description:
+  // Get/Set the number of frames per timstep. Used only when 
+  // play mode is PLAYMODE_TIMESTEPS. Note that this replaces
+  // the FrameRate when playing in PLAYMODE_TIMESTEPS mode.
+  vtkSetMacro(FramesPerTimestep, int);
+  vtkGetMacro(FramesPerTimestep, int);
 protected:
   vtkPVAnimationScene();
   ~vtkPVAnimationScene();
 
+  int FramesPerTimestep;
 private:
   vtkPVAnimationScene(const vtkPVAnimationScene&); // Not implemented.
   void operator=(const vtkPVAnimationScene&); // Not implemented.

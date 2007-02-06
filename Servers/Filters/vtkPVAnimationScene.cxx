@@ -22,11 +22,12 @@
 class vtkPVAnimationSceneSetOfDouble : public vtkstd::set<double> {};
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.2");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.3");
 //-----------------------------------------------------------------------------
 vtkPVAnimationScene::vtkPVAnimationScene()
 {
   this->TimeSteps = new vtkPVAnimationSceneSetOfDouble;
+  this->FramesPerTimestep = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -95,7 +96,7 @@ void vtkPVAnimationScene::Play()
   this->InPlay = 1;
   this->StopPlay = 0;
 
-  double frame_rate = this->FrameRate? this->FrameRate : 1.0;
+  double frame_count = this->FramesPerTimestep>1? this->FramesPerTimestep: 1.0;
 
   do
     {
@@ -120,11 +121,11 @@ void vtkPVAnimationScene::Play()
         break;
         }
 
-      if (frame_rate > 1)
+      if (frame_count> 1)
         {
-        double increment = ((*iter)-previous_tick_time)/frame_rate;
+        double increment = ((*iter)-previous_tick_time)/frame_count;
         double itime = previous_tick_time+increment;
-        for (int cc=0; cc < frame_rate-1; cc++)
+        for (int cc=0; cc < frame_count-1; cc++)
           {
           this->Tick(itime, increment);
           previous_tick_time = itime;
@@ -178,4 +179,5 @@ double vtkPVAnimationScene::GetPreviousTimeStep(double timestep)
 void vtkPVAnimationScene::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "FramesPerTimestep: " << this->FramesPerTimestep << endl;
 }

@@ -23,7 +23,7 @@
 #include "vtkPVAnimationScene.h"
 
 vtkStandardNewMacro(vtkSMPVAnimationSceneProxy);
-vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMPVAnimationSceneProxy::vtkSMPVAnimationSceneProxy()
 {
@@ -291,6 +291,20 @@ void vtkSMPVAnimationSceneProxy::SetClockTime(double time)
     animation_start + normalized_time * (animation_end - animation_start);
   this->SetAnimationTime(animation_time);
   this->InSetClockTime = false;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMPVAnimationSceneProxy::SetFramesPerTimestep(int fpt)
+{
+  vtkPVAnimationScene::SafeDownCast(
+    this->AnimationCue)->SetFramesPerTimestep(fpt);
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMPVAnimationSceneProxy::GetFramesPerTimestep()
+{
+  return vtkPVAnimationScene::SafeDownCast(
+      this->AnimationCue)->GetFramesPerTimestep();
 }
 
 //-----------------------------------------------------------------------------

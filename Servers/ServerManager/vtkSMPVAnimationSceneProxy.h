@@ -98,6 +98,13 @@ public:
   // The conversion from clock time to animation time depends on 
   // ClockTimeRange and PlayMode.
   void SetClockTime(double time);
+
+  // Description:
+  // Get/Set the number of frames per timstep. Used only when 
+  // play mode is PLAYMODE_TIMESTEPS. Note that this replaces
+  // the FrameRate when playing in PLAYMODE_TIMESTEPS mode.
+  void SetFramesPerTimestep(int);
+  int GetFramesPerTimestep();
 protected:
   vtkSMPVAnimationSceneProxy();
   ~vtkSMPVAnimationSceneProxy();

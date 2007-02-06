@@ -1076,6 +1076,15 @@
       </IntVectorProperty>
 
       <IntVectorProperty
+        name="FramesPerTimestep"
+        command="SetFramesPerTimestep"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
         name="Caching"
         command="SetCaching"
         number_of_elements="1"

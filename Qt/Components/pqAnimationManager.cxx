@@ -236,26 +236,38 @@ pqAnimationCue* pqAnimationManager::createCue(pqAnimationScene* scene,
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationManager::durationChanged()
-{
-  this->frameRateChanged();
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationManager::frameRateChanged()
+void pqAnimationManager::updateGUI()
 {
   double framerate =
     this->Internals->AnimationSettingsDialog->frameRate->value();
-  double num_frames = 
+  int num_frames = 
     this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->value();
-
   double duration =  
     this->Internals->AnimationSettingsDialog->animationDuration->value();
+  int frames_per_timestep =
+    this->Internals->AnimationSettingsDialog->spinBoxFramesPerTimestep->value();
 
   switch (this->getActiveScene()->getAnimationSceneProxy()->GetPlayMode())
     {
-  case vtkSMPVAnimationSceneProxy::SEQUENCE:
   case vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS:
+      {
+      // get original number of frames.
+      pqAnimationScene* scene = this->getActiveScene();
+      vtkSMPVAnimationSceneProxy* sceneProxy = 
+        vtkSMPVAnimationSceneProxy::SafeDownCast(
+          scene->getAnimationSceneProxy());
+      num_frames = sceneProxy->GetNumberOfTimeSteps();
+        num_frames = frames_per_timestep*num_frames;
+      this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
+        blockSignals(true);
+      this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
+        setValue(num_frames);
+      this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
+        blockSignals(false);
+      }
+    // Don't break. let it fall thru to sequence.
+
+  case vtkSMPVAnimationSceneProxy::SEQUENCE:
     this->Internals->AnimationSettingsDialog->animationDuration->
       blockSignals(true);
     this->Internals->AnimationSettingsDialog->animationDuration->setValue(
@@ -273,12 +285,6 @@ void pqAnimationManager::frameRateChanged()
       blockSignals(false);
     break;
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationManager::numberOfFramesChanged()
-{
-  this->frameRateChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -334,6 +340,11 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   dialogUI.spinBoxHeight->setValue(viewSize.height());
   dialogUI.spinBoxWidth->setValue(viewSize.width());
 
+  // Frames per timestep is only shown
+  // when saving in SNAP_TO_TIMESTEPS mode.
+  dialogUI.spinBoxFramesPerTimestep->hide();
+  dialogUI.labelFramesPerTimestep->hide();
+
   // Set current duration/frame rate/no. of. frames.
   double frame_rate = dialogUI.frameRate->value();
   switch (sceneProxy->GetPlayMode())
@@ -360,18 +371,23 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
       sceneProxy->GetNumberOfTimeSteps()*frame_rate);
     dialogUI.spinBoxNumberOfFrames->setEnabled(false);
     dialogUI.animationDuration->setEnabled(false);
+    dialogUI.spinBoxFramesPerTimestep->show();
+    dialogUI.labelFramesPerTimestep->show();
     break;
     }
 
   QObject::connect(
     dialogUI.animationDuration, SIGNAL(valueChanged(double)),
-    this, SLOT(durationChanged()));
+    this, SLOT(updateGUI()));
   QObject::connect(
     dialogUI.frameRate, SIGNAL(valueChanged(double)),
-    this, SLOT(frameRateChanged()));
+    this, SLOT(updateGUI()));
   QObject::connect(
     dialogUI.spinBoxNumberOfFrames, SIGNAL(valueChanged(int)),
-    this, SLOT(numberOfFramesChanged()));
+    this, SLOT(updateGUI()));
+  QObject::connect(
+    dialogUI.spinBoxFramesPerTimestep, SIGNAL(valueChanged(int)),
+    this, SLOT(updateGUI()));
 
   if (!dialog.exec())
     {
@@ -383,6 +399,8 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   // Update Scene properties based on user options. 
   double num_frames = sceneProxy->GetNumberOfFrames();
   double duration = sceneProxy->GetDuration();
+  double frames_per_timestep = sceneProxy->GetFramesPerTimestep();
+
   switch (sceneProxy->GetPlayMode())
     {
   case vtkSMPVAnimationSceneProxy::SEQUENCE:
@@ -393,6 +411,11 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   case vtkSMPVAnimationSceneProxy::REALTIME:
     pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("Duration"),
       dialogUI.animationDuration->value());
+    break;
+
+  case vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS:
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("FramesPerTimestep"),
+      dialogUI.spinBoxFramesPerTimestep->value());
     break;
     }
   sceneProxy->UpdateVTKObjects();
@@ -458,6 +481,11 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   case vtkSMPVAnimationSceneProxy::REALTIME:
     pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("Duration"),
       duration);
+    break;
+
+  case vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS:
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("FramesPerTimestep"),
+      frames_per_timestep);
     break;
     }
   sceneProxy->UpdateVTKObjects();

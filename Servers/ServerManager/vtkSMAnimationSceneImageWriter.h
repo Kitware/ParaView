@@ -65,6 +65,14 @@ public:
   vtkSetVector3Macro(BackgroundColor, double);
   vtkGetVector3Macro(BackgroundColor, double);
 
+  // Get/Set the frame rate to use for saving the animation.
+  // This frame rate is the frame rate that gets saved in the movie 
+  // file generated, if applicable. If does not affect the FrameRate
+  // set on the animation scene at all. In other words, this is the 
+  // playback frame rate and not the animation generation frame rate.
+  // Default value is 1.
+  vtkSetMacro(FrameRate, double);
+  vtkGetMacro(FrameRate, double);
 protected:
   vtkSMAnimationSceneImageWriter();
   ~vtkSMAnimationSceneImageWriter();
@@ -112,6 +120,7 @@ protected:
   vtkSetStringMacro(Suffix);
 
   double BackgroundColor[3];
+  double FrameRate;
 
   vtkImageWriter* ImageWriter;
   vtkGenericMovieWriter* MovieWriter;

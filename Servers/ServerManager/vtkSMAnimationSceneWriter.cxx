@@ -50,7 +50,7 @@ protected:
   vtkSMAnimationSceneWriter* Target;
 };
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneWriter, "1.4");
+vtkCxxRevisionMacro(vtkSMAnimationSceneWriter, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMAnimationSceneWriter::vtkSMAnimationSceneWriter()
 {
@@ -60,7 +60,6 @@ vtkSMAnimationSceneWriter::vtkSMAnimationSceneWriter()
   this->Observer->SetTarget(this);
   this->FileName = 0;
   this->SaveFailed = false;
-  this->FrameRate = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -116,7 +115,6 @@ void vtkSMAnimationSceneWriter::ExecuteEvent(vtkObject* vtkNotUsed(caller),
     }
 }
 
-#include "vtkTimerLog.h"
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneWriter::Save()
 {
@@ -158,27 +156,15 @@ bool vtkSMAnimationSceneWriter::Save()
   this->AnimationScene->SetLoop(0);
 
   bool status = this->SaveInitialize();
-  double frame_rate = this->AnimationScene->GetFrameRate();
-  if (this->FrameRate > 0)
-    {
-    this->AnimationScene->SetFrameRate(this->FrameRate);
-    }
-
   int caching = this->AnimationScene->GetCaching();
   this->AnimationScene->SetCaching(0);
 
   if (status)
     {
-    vtkTimerLog* timer = vtkTimerLog::New();
-    timer->StartTimer();
     this->Saving = true;
     this->SaveFailed = false;
     this->AnimationScene->Play();
     this->Saving = false;
-    timer->StopTimer();
-
-    cout << "Play Time: " << timer->GetElapsedTime() << " seconds" << endl;
-    timer->Delete();
     }
 
   status = this->SaveFinalize() && status;
@@ -189,7 +175,6 @@ bool vtkSMAnimationSceneWriter::Save()
     this->AnimationScene->SetPlayMode(play_mode);
     }
   this->AnimationScene->SetLoop(loop);
-  this->AnimationScene->SetFrameRate(frame_rate);
   this->AnimationScene->SetCaching(caching);
 
   return status && (!this->SaveFailed);
@@ -202,5 +187,4 @@ void vtkSMAnimationSceneWriter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnimationScene: " << this->AnimationScene << endl;
   os << indent << "FileName: " << 
     (this->FileName? this->FileName : "(null)") << endl;
-  os << indent << "FrameRate: " << this->FrameRate << endl;
 }
