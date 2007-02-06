@@ -337,12 +337,11 @@ MainWindow::MainWindow() :
     this, SLOT(setTimeRanges(double, double)));
   connect(vcrcontroller, SIGNAL(loop(bool)),
     this->Implementation->UI.actionVCRLoop, SLOT(setChecked(bool)));
-
+  connect(vcrcontroller, SIGNAL(playing(bool)),
+    this, SLOT(onPlaying(bool)));
   connect(vcrcontroller, SIGNAL(playing(bool)),
     this->Implementation->UI.actionVCRPause, SLOT(setEnabled(bool)));
-  connect(vcrcontroller, SIGNAL(playing(bool)),
-    this->Implementation->UI.actionVCRPlay, SLOT(setDisabled(bool)));
-
+  this->Implementation->UI.actionVCRPause->setVisible(false);
   
   connect(this->Implementation->UI.actionMoveMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToInteraction()));
@@ -894,6 +893,13 @@ QVariant MainWindow::findToolBarActionsNotInMenus()
     }
 
   return missingInActions.join(", ");
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::onPlaying(bool playing)
+{
+  this->Implementation->UI.actionVCRPlay->setVisible(!playing);
+  this->Implementation->UI.actionVCRPause->setVisible(playing);
 }
 
 //-----------------------------------------------------------------------------

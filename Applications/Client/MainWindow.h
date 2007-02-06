@@ -76,6 +76,8 @@ private slots:
   void onShowCenterAxisChanged(bool);
 
   void setTimeRanges(double, double);
+
+  void onPlaying(bool);
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
