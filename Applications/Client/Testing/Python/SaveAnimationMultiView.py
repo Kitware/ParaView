@@ -60,7 +60,7 @@ QtTesting.playCommand(object16, 'set_int', '1')
 QtTesting.playCommand(object16, 'set_int', '0')
 object17 = 'MainWindow/VCRToolbar/1QToolButton0'
 QtTesting.playCommand(object17, 'activate', '')
-object18 = 'MainWindow/VCRToolbar/1QToolButton4'
+object18 = 'MainWindow/VCRToolbar/1QToolButton3'
 QtTesting.playCommand(object18, 'activate', '')
 QtTesting.playCommand(object18, 'activate', '')
 QtTesting.playCommand(object18, 'activate', '')
@@ -113,7 +113,7 @@ QtTesting.playCommand(object22, 'activate', '')
 
 QtTesting.wait(1000);
 objectPlayButton = 'MainWindow/VCRToolbar/1QToolButton2'
-while QtTesting.getProperty(objectPlayButton, "enabled") != 'true' :
+while QtTesting.getProperty(objectPlayButton, "text") == 'Pause' :
   QtTesting.wait(50)
 
 QtTestingImage.compareImage('$PARAVIEW_TEST_ROOT/movie_test.0005.png', 'SaveAnimationMultiView.png');
