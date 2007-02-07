@@ -83,7 +83,7 @@ namespace {
       }
 
     // separated by spaces or semi-colons
-    QStringList fs = f.split(QRegExp("[\\s+;]"));
+    QStringList fs = f.split(QRegExp("[\\s+;]"), QString::SkipEmptyParts);
 
     // add a *.ext.* for every *.ext we get to support file groups
     QStringList ret = fs;
