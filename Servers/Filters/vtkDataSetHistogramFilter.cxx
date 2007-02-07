@@ -22,7 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkDataSetHistogramFilter, "1.1");
+vtkCxxRevisionMacro(vtkDataSetHistogramFilter, "1.2");
 vtkStandardNewMacro(vtkDataSetHistogramFilter);
 
 //----------------------------------------------------------------------------
@@ -46,8 +46,7 @@ vtkDataSetHistogramFilter::~vtkDataSetHistogramFilter()
 
 //----------------------------------------------------------------------------
 template <class T>
-void vtkDataSetHistogramFilterExecute(vtkDataSetHistogramFilter *self,
-                                      T *inPtr, int numComponents,
+void vtkDataSetHistogramFilterExecute(T *inPtr, int numComponents,
                                       int numTuples,
                                       vtkImageData *outData, int *outPtr)
 {
@@ -85,10 +84,6 @@ int vtkDataSetHistogramFilter::RequestData(
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkDataSet *inData = vtkDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
-
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkImageData *outData = vtkImageData::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -114,7 +109,7 @@ int vtkDataSetHistogramFilter::RequestData(
   switch (inArray->GetDataType())
     {
     vtkTemplateMacro(vtkDataSetHistogramFilterExecute(
-                       this, (VTK_TT *)(inPtr),
+                       (VTK_TT *)(inPtr),
                        inArray->GetNumberOfComponents(),
                        inArray->GetNumberOfTuples(),
                        outData, (int *)(outPtr)));
@@ -129,12 +124,11 @@ int vtkDataSetHistogramFilter::RequestData(
 //----------------------------------------------------------------------------
 int vtkDataSetHistogramFilter::RequestInformation (
   vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector,
+  vtkInformationVector** vtkNotUsed(inputVector),
   vtkInformationVector* outputVector)
 {
   // get the info objects
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
   int ext[6];
   ext[0] = this->OutputExtent[0];
@@ -173,7 +167,7 @@ int vtkDataSetHistogramFilter::RequestUpdateExtent (
 }
 
 //----------------------------------------------------------------------------
-int vtkDataSetHistogramFilter::FillInputPortInformation(int port,
+int vtkDataSetHistogramFilter::FillInputPortInformation(int vtkNotUsed(port),
                                                         vtkInformation *info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");

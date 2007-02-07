@@ -25,7 +25,7 @@
 #include "vtkViewport.h"
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.1");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.2");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -320,7 +320,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::SetHandleDisplayPosition(
 void vtkTransferFunctionEditorRepresentationSimple1D::RemoveHandle(
   unsigned int id)
 {
-  if (id < 0 || id > this->Handles->size()-1)
+  if (id > this->Handles->size()-1)
     {
     return;
     }

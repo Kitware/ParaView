@@ -47,6 +47,8 @@ public:
   // Description:
   // Set the scalar range of the underlying data to display with this widget.
   virtual void SetScalarRange(double min, double max);
+  virtual void SetScalarRange(double range[2]) 
+    { this->SetScalarRange(range[0], range[1]); }
 
   // Description:
   // Update the size of the rendering window containing this widget, and
@@ -85,7 +87,7 @@ protected:
   static vtkHandleWidget* CreateHandleWidget(
     vtkTransferFunctionEditorWidgetSimple1D *self,
     vtkTransferFunctionEditorRepresentationSimple1D *rep,
-    int currentHandleNumber);
+    unsigned int currentHandleNumber);
 
   void RecomputeNodePositions(double oldRange[2], double newRange[2]);
   void RecomputeNodePositions(int oldSize[2], int newSize[2]);

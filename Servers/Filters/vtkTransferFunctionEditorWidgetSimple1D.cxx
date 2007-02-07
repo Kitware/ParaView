@@ -25,7 +25,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.1");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.2");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -127,7 +127,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNodeAction(
     vtkTransferFunctionEditorRepresentationSimple1D *rep =
       reinterpret_cast<vtkTransferFunctionEditorRepresentationSimple1D*>
       (self->WidgetRep);
-    int currentHandleNumber = rep->CreateHandle(e);
+    unsigned int currentHandleNumber = rep->CreateHandle(e);
     vtkHandleWidget *currentHandle = self->CreateHandleWidget(
       self,rep,currentHandleNumber);
     rep->SetHandleDisplayPosition(currentHandleNumber,e);
@@ -215,7 +215,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::OnChar()
 //-------------------------------------------------------------------------
 void vtkTransferFunctionEditorWidgetSimple1D::RemoveNode(unsigned int id)
 {
-  if (id < 0 || id > this->Nodes->size()-1)
+  if (id > this->Nodes->size()-1)
     {
     return;
     }
@@ -244,7 +244,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::RemoveNode(unsigned int id)
 vtkHandleWidget* vtkTransferFunctionEditorWidgetSimple1D::CreateHandleWidget(
   vtkTransferFunctionEditorWidgetSimple1D *self, 
   vtkTransferFunctionEditorRepresentationSimple1D *rep,
-  int currentHandleNumber)
+  unsigned int currentHandleNumber)
 {
   vtkHandleRepresentation *handleRep =
     rep->GetHandleRepresentation(currentHandleNumber);
