@@ -35,9 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include "pqComponentsExport.h"
 
-class pqDisplayProxyEditorWidgetInternal;
 class pqDisplay;
+class pqDisplayProxyEditorWidgetInternal;
+class pqGenericViewModule;
 class pqPipelineDisplay;
+class pqPipelineSource;
 
 // This is a widget that can create different kinds of display
 // editors based on the type of the display. It encapsulates the code
@@ -50,6 +52,15 @@ public:
   pqDisplayProxyEditorWidget(QWidget* parent=NULL);
   virtual ~pqDisplayProxyEditorWidget();
 
+  /// Set the source and view. Source and view are used by this class
+  /// only if display is NULL. It is used to decide if a new display 
+  /// can be created for the source at all.
+  void setSource(pqPipelineSource* source);
+  void setView(pqGenericViewModule* view);
+
+  /// Set the display to edit. If NULL, source and view must be set so
+  /// that the widget can show a default GUI which allows the user to
+  /// turn visibility on which entails creating a new display.
   void setDisplay(pqDisplay*);
   pqDisplay* getDisplay() const;
 
@@ -61,11 +72,15 @@ signals:
   void requestSetDisplay(pqDisplay*);
   void requestSetDisplay(pqPipelineDisplay*);
 
+protected slots:
+  void onVisibilityChanged(int);
+
 private:
   pqDisplayProxyEditorWidget(const pqDisplayProxyEditorWidget&); // Not implemented.
   void operator=(const pqDisplayProxyEditorWidget&); // Not implemented.
 
   pqDisplayProxyEditorWidgetInternal *Internal;
+  void showDefaultWidget();
 };
 
 #endif

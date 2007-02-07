@@ -96,6 +96,13 @@ private slots:
   /// inactivate all other frames and trigger activeViewModuleChanged().
   void onActivate(QWidget* obj);
 
+  /// Called when user requests conversion of view type.
+  void onConvertToTriggered(QAction* action);
+
+  /// Called before context menu is shown for the frame.
+  /// We update menu enable state depending on view type.
+  void onFrameContextMenuRequested(QWidget*);
+
   /// Slots to manage drag/drop of frames.
   void frameDragStart(pqMultiViewFrame*);
   void frameDragEnter(pqMultiViewFrame*,QDragEnterEvent*);
@@ -137,9 +144,12 @@ protected:
   /// on all view modules.
   void updateViewModulePositions();
 
+  /// Updates the context menu.
+  void updateConversionActions(pqMultiViewFrame* frame);
 private:
   pqViewManager(pqViewManager&); // Not implemented.
   void operator=(const pqViewManager&); // Not implemented.
+
 
   class pqInternals;
   pqInternals* Internal;

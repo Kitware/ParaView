@@ -257,6 +257,8 @@ ADD_LIBRARY(pqCore
   pqUndoRedoStateLoader.h
   pqUndoStack.cxx
   pqUndoStack.h
+  pqVTKHistogramColor.cxx
+  pqVTKHistogramColor.h
   pqVTKHistogramModel.cxx
   pqVTKHistogramModel.h
   pqVTKLineChartModel.cxx

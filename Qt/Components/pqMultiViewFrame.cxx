@@ -117,12 +117,21 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
                 SLOT(splitHorizontal()));
   
   // setup the context menu
-  this->Menu->setContextMenuPolicy(Qt::ActionsContextMenu);
-  this->Menu->addAction(this->SplitHorizontalButton->defaultAction());
-  this->Menu->addAction(this->SplitVerticalButton->defaultAction());
-  this->Menu->addAction(this->CloseButton->defaultAction());
+  this->Menu->setContextMenuPolicy(Qt::CustomContextMenu);
+  //this->Menu->addAction(this->SplitHorizontalButton->defaultAction());
+  //this->Menu->addAction(this->SplitVerticalButton->defaultAction());
+  //this->Menu->addAction(this->CloseButton->defaultAction());
   this->Menu->setAcceptDrops(true);
-  
+  QObject::connect(this->Menu,  
+    SIGNAL(customContextMenuRequested(const QPoint&)),
+    this, SLOT(onCustomContextMenuRequested(const QPoint&)));
+
+  this->ContextMenu = new QMenu(this->Menu);
+  this->ContextMenu->setObjectName("FrameContextMenu");
+  this->ContextMenu->addAction(this->SplitHorizontalButton->defaultAction());
+  this->ContextMenu->addAction(this->SplitVerticalButton->defaultAction());
+  this->ContextMenu->addAction(this->CloseButton->defaultAction());
+
   this->MenuHidden=false;
   // TODO: temporary until they can be implemented or wanted
   this->RestoreButton->hide();
@@ -141,6 +150,13 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
 pqMultiViewFrame::~pqMultiViewFrame()
 {
 }
+
+void pqMultiViewFrame::onCustomContextMenuRequested(const QPoint& point)
+{
+  emit this->contextMenuRequested();
+  this->ContextMenu->exec(this->Menu->mapToGlobal(point));
+}
+
 
 void pqMultiViewFrame::setTitle(const QString& title)
 {

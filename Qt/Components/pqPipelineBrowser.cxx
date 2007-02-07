@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAddSourceDialog.h"
 #include "pqApplicationCore.h"
+#include "pqDisplayPolicy.h"
 #include "pqFilterInputDialog.h"
 #include "pqFlatTreeView.h"
 #include "pqPipelineBrowserStateManager.h"
@@ -186,11 +187,13 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
       pqApplicationCore::instance()->getSelectionModel(), this);
 }
 
+//----------------------------------------------------------------------------
 pqPipelineBrowser::~pqPipelineBrowser()
 {
   delete this->Internal;
 }
 
+//----------------------------------------------------------------------------
 bool pqPipelineBrowser::eventFilter(QObject *object, QEvent *e)
 {
   if(object == this->TreeView && e->type() == QEvent::KeyPress)
@@ -206,6 +209,7 @@ bool pqPipelineBrowser::eventFilter(QObject *object, QEvent *e)
   return QWidget::eventFilter(object, e);
 }
 
+//----------------------------------------------------------------------------
 void pqPipelineBrowser::loadFilterInfo(vtkPVXMLElement *root)
 {
   this->FilterGroups->loadSourceInfo(root);
@@ -217,47 +221,37 @@ void pqPipelineBrowser::loadFilterInfo(vtkPVXMLElement *root)
   this->FilterGroups->addSource("Threshold", "Released");
 }
 
+//----------------------------------------------------------------------------
 void pqPipelineBrowser::saveState(vtkPVXMLElement *root) const
 {
   this->Manager->saveState(root);
 }
 
+//----------------------------------------------------------------------------
 void pqPipelineBrowser::restoreState(vtkPVXMLElement *root)
 {
   this->Manager->restoreState(root);
 }
 
+//----------------------------------------------------------------------------
 QItemSelectionModel *pqPipelineBrowser::getSelectionModel() const
 {
   return this->TreeView->getSelectionModel();
 }
 
+//----------------------------------------------------------------------------
 pqGenericViewModule *pqPipelineBrowser::getViewModule() const
 {
   return this->Internal->ViewModule;
 }
 
-pqConsumerDisplay *pqPipelineBrowser::createDisplay(pqPipelineSource *source, 
-    bool visible)
-{
-  if(!this->Internal->ViewModule ||
-      !this->Internal->ViewModule->canDisplaySource(source))
-    {
-    return 0;
-    }
-
-  pqConsumerDisplay *display = 
-      pqApplicationCore::instance()->getPipelineBuilder()->createDisplay(
-      source, this->Internal->ViewModule);
-  display->setVisible(visible);
-  return display;
-}
-
+//----------------------------------------------------------------------------
 void pqPipelineBrowser::addSource()
 {
   // TODO
 }
 
+//----------------------------------------------------------------------------
 void pqPipelineBrowser::addFilter()
 {
   // Get the source input(s) from the browser's selection model.
@@ -331,6 +325,7 @@ void pqPipelineBrowser::addFilter()
   delete history;
 }
 
+//----------------------------------------------------------------------------
 void pqPipelineBrowser::changeInput()
 {
   // The change input dialog only supports one filter at a time.
@@ -398,6 +393,7 @@ void pqPipelineBrowser::changeInput()
     }
 }
 
+//----------------------------------------------------------------------------
 void pqPipelineBrowser::deleteSelected()
 {
   QModelIndexList indexes = this->getSelectionModel()->selectedIndexes();
@@ -424,12 +420,14 @@ void pqPipelineBrowser::deleteSelected()
     }
 }
 
+//----------------------------------------------------------------------------
 void pqPipelineBrowser::setViewModule(pqGenericViewModule *rm)
 {
   this->Internal->ViewModule = rm;
   this->Model->setViewModule(rm);
 }
 
+//----------------------------------------------------------------------------
 void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
 {
   // See if the index is associated with a source.
@@ -444,16 +442,20 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
       pqConsumerDisplay *display = source->getDisplay(
           this->Internal->ViewModule);
 
+      bool visible = true;
       // If the display exists, toggle the display. Otherwise, create a
       // display for the source in the current window.
-      if(!display)
+      if(display)
         {
-        display = this->createDisplay(source, true);
+        visible = !display->isVisible();
         }
-      else
-        {
-        display->setVisible(!display->isVisible());
-        }
+
+      pqDisplayPolicy* dpolicy = 
+        pqApplicationCore::instance()->getDisplayPolicy();
+      // Will create new display if needed. May also create new view 
+      // as defined by the policy.
+      display = dpolicy->setDisplayVisibility(
+        source, this->Internal->ViewModule, visible);
 
       if(display)
         {
@@ -468,6 +470,7 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
     }
 }
 
+//----------------------------------------------------------------------------
 pqSourceInfoModel *pqPipelineBrowser::getFilterModel()
 {
   // TODO: Add support for multiple servers.
@@ -495,6 +498,7 @@ pqSourceInfoModel *pqPipelineBrowser::getFilterModel()
   return this->Internal->FilterModel;
 }
 
+//----------------------------------------------------------------------------
 void pqPipelineBrowser::setupConnections(pqSourceInfoModel *model,
     pqSourceInfoGroupMap *map)
 {
@@ -514,6 +518,7 @@ void pqPipelineBrowser::setupConnections(pqSourceInfoModel *model,
   map->initializeModel(model);
 }
 
+//----------------------------------------------------------------------------
 void pqPipelineBrowser::getAllowedSources(pqSourceInfoModel *model,
     const QModelIndexList &indexes, QStringList &list)
 {

@@ -14,6 +14,12 @@ object2 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stacke
 QtTesting.playCommand(object2, 'activate', '')
 object3 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton'
 QtTesting.playCommand(object3, 'activate', '')
+
+QtTesting.playCommand(object1, 'activate', 'Arrow')
+QtTesting.playCommand(object2, 'activate', '')
+object4 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Delete'
+QtTesting.playCommand(object4, 'activate', '')
+
 object4 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalButton'
 QtTesting.playCommand(object4, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'Sphere')

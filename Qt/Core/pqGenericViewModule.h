@@ -79,7 +79,8 @@ public:
   /// supported.
   enum ViewModuleTypes
     {
-    RENDER_VIEW=1,
+    INVALID,
+    RENDER_VIEW,
     XY_PLOT,
     BAR_CHART,
     TABLE_VIEW

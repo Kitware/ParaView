@@ -2405,11 +2405,8 @@ void pqMainWindowCore::disableAutomaticDisplays()
 void pqMainWindowCore::createPendingDisplays()
 {
   pqGenericViewModule* view = pqActiveView::instance().current();
-  if (view)
-    {
-    pqApplicationCore::instance()->getPendingDisplayManager()->
-      createPendingDisplays(view);
-    }
+  pqApplicationCore::instance()->getPendingDisplayManager()->
+    createPendingDisplays(view);
 }
 
 //-----------------------------------------------------------------------------

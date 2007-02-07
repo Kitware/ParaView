@@ -57,6 +57,7 @@ public:
   }
 
   QPointer<QTableView> Table;
+  QPointer<QWidget> WindowParent;
 };
 
 //-----------------------------------------------------------------------------
@@ -85,13 +86,15 @@ QWidget* pqTableViewModule::getWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqTableViewModule::setWindowParent(QWidget* /*p*/)
+void pqTableViewModule::setWindowParent(QWidget* p)
 {
+  this->Implementation->WindowParent = p;
 }
+
 //-----------------------------------------------------------------------------
 QWidget* pqTableViewModule::getWindowParent() const
 {
-  return 0;
+  return this->Implementation->WindowParent;
 }
 
 //-----------------------------------------------------------------------------

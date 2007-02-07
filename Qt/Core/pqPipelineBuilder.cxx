@@ -309,7 +309,7 @@ pqConsumerDisplay* pqPipelineBuilder::createDisplayProxyInternal(
   pqPipelineSource* src, pqGenericViewModule* view)
 {
   pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
-  vtkSMProxy* display = policy? policy->newDisplay(src, view) : 0; 
+  vtkSMProxy* display = policy? policy->newDisplayProxy(src, view) : 0; 
   if (!display)
     {
     qDebug() << "Cannot create display. "

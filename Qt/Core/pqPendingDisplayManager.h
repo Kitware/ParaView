@@ -74,10 +74,6 @@ protected:
   friend class pqPendingDisplayUndoElement;
   void internalAddPendingDisplayForSource(pqPipelineSource* s);
 
-
-  pqGenericViewModule* getViewForSource(pqPipelineSource* source,
-    pqGenericViewModule* currentView);
-
 private:
   class MyInternal;
   MyInternal* Internal;

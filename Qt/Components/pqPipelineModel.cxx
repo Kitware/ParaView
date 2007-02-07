@@ -369,7 +369,9 @@ QString pqPipelineModelSource::getName() const
 pqPipelineModelItem::VisibleState pqPipelineModelSource::getVisibleState(
     pqGenericViewModule *module) const
 {
-  pqPipelineModelItem::VisibleState state = pqPipelineModelItem::NotAllowed;
+  // If no view module is preset, it implies that a suitable type
+  // of view module will be created.
+  pqPipelineModelItem::VisibleState state = pqPipelineModelItem::NotVisible;
   if(module && module->getServer() == this->Source->getServer())
     {
     pqConsumerDisplay*display = this->Source->getDisplay(module);
@@ -1236,13 +1238,14 @@ void pqPipelineModel::setViewModule(pqGenericViewModule *module)
     }
 
   // Update the current view column for the previous render module.
-  // If the render modules are from different servers, the whole
-  // column needs to be updated. Otherwise, use the previous and
+  // If the render modules are from different servers (or either one of them is NULL), 
+  // the whole column needs to be updated. Otherwise, use the previous and
   // current render module to look up the affected sources.
   QModelIndex changed;
   pqPipelineModelItem *item = 0;
-  if(this->Internal->RenderModule && module &&
-      this->Internal->RenderModule->getServer() != module->getServer())
+  if ( (this->Internal->RenderModule && module &&
+      this->Internal->RenderModule->getServer() != module->getServer()) ||
+    !this->Internal->RenderModule || !module)
     {
     this->Internal->RenderModule = module;
     if(this->Internal->Servers.size() > 0)

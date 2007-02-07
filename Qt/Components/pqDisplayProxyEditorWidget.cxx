@@ -30,23 +30,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqDisplayProxyEditorWidget.h"
+#include "ui_pqDisplayProxyEditorWidget.h"
 
 #include "vtkSMProxy.h"
 
 #include <QPointer>
 #include <QVBoxLayout>
 
+#include "pqApplicationCore.h"
+#include "pqDisplayPolicy.h"
 #include "pqDisplayProxyEditor.h"
+#include "pqGenericViewModule.h"
 #include "pqPipelineDisplay.h"
+#include "pqPipelineSource.h"
 #include "pqTextDisplayPropertiesWidget.h"
 #include "pqTextWidgetDisplay.h"
 #include "pqXYPlotDisplayProxyEditor.h"
+#include "pqPropertyLinks.h"
 
-class pqDisplayProxyEditorWidgetInternal
+class pqDisplayProxyEditorWidgetInternal : public Ui::DisplayProxyEditorWidget
 {
 public:
+  QPointer<pqPipelineSource> Source;
+  QPointer<pqGenericViewModule> View;
   QPointer<pqDisplay> Display;
   QPointer<QWidget> DisplayWidget;
+  QWidget* DefaultWidget;
+  pqPropertyLinks Links;
 };
 
 //-----------------------------------------------------------------------------
@@ -56,12 +66,29 @@ pqDisplayProxyEditorWidget::pqDisplayProxyEditorWidget(QWidget* p /*=0*/)
   QVBoxLayout* l = new QVBoxLayout(this);
   l->setMargin(0);
   this->Internal = new pqDisplayProxyEditorWidgetInternal;
+
+  this->Internal->DefaultWidget = new QWidget(this);
+  this->Internal->setupUi(this->Internal->DefaultWidget);
+  l->addWidget(this->Internal->DefaultWidget);
 }
 
 //-----------------------------------------------------------------------------
 pqDisplayProxyEditorWidget::~pqDisplayProxyEditorWidget()
 {
+  delete this->Internal->DefaultWidget;
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditorWidget::setView(pqGenericViewModule* view)
+{
+  this->Internal->View = view;
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditorWidget::setSource(pqPipelineSource* source)
+{
+  this->Internal->Source = source;
 }
 
 //-----------------------------------------------------------------------------
@@ -71,11 +98,69 @@ pqDisplay* pqDisplayProxyEditorWidget::getDisplay() const
 }
 
 //-----------------------------------------------------------------------------
+void pqDisplayProxyEditorWidget::showDefaultWidget()
+{
+  if (this->Internal->DisplayWidget)
+    {
+    this->Internal->DisplayWidget->hide();
+    }
+  this->Internal->DefaultWidget->show();
+  pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
+  if (this->Internal->Display || 
+      !this->Internal->View || 
+      (policy && policy->canDisplay(this->Internal->Source, 
+                                    this->Internal->View)))
+    {
+    this->Internal->DefaultWidget->setEnabled(true);
+    if (this->Internal->Display)
+      {
+      vtkSMProxy* display = this->Internal->Display->getProxy();
+      this->Internal->Links.addPropertyLink(
+        this->Internal->ViewData, "checked", SIGNAL(stateChanged(int)),
+        display, display->GetProperty("Visibility"));
+      }
+    else
+      {
+      this->Internal->ViewData->setCheckState(Qt::Unchecked);
+      }
+    QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)),
+      this, SLOT(onVisibilityChanged(int)), Qt::QueuedConnection);
+    }
+  else
+    {
+    this->Internal->DefaultWidget->setEnabled(false);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditorWidget::onVisibilityChanged(int state)
+{
+  if (this->Internal->Display)
+    {
+    this->Internal->Display->renderAllViews();
+    }
+  else
+    {
+    pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
+    pqDisplay* disp = policy->setDisplayVisibility(this->Internal->Source, 
+      this->Internal->View, (state == Qt::Checked));
+    if (disp)
+      {
+      disp->renderAllViews();
+      }
+    this->setDisplay(disp);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
 {
+  QObject::disconnect(this->Internal->ViewData, 0, this, 0);
+  this->Internal->Links.removeAllPropertyLinks();
   this->Internal->Display = display;
   if (!display)
     {
+    this->showDefaultWidget();
     emit this->requestSetDisplay((pqDisplay*)0);
     emit this->requestSetDisplay((pqPipelineDisplay*)0);
     return;
@@ -151,8 +236,22 @@ void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
     }
   else
     {
+    this->showDefaultWidget(); 
     emit this->requestSetDisplay((pqDisplay*)0);
     emit this->requestSetDisplay((pqPipelineDisplay*)0);
+    return;
+    }
+
+  if (this->Internal->DisplayWidget)
+    {
+    this->Internal->DisplayWidget->show();
+
+    // NOTE: We make is disabled before we hide it. If the DefaultWidget children
+    // had the focus, then hiding the widget before disabling it leads to the
+    // focus getting transferred to one of the view modules which may lead to 
+    // unnecessary active-view change. 
+    this->Internal->DefaultWidget->setEnabled(false);
+    this->Internal->DefaultWidget->hide();
     }
 }
 

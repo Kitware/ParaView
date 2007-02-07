@@ -145,6 +145,7 @@ SET(UI_FORMS
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqDisplayProxyEditor.ui
+  Resources/UI/pqDisplayProxyEditorWidget.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqEditServerStartupDialog.ui
   Resources/UI/pqElementInspectorWidget.ui

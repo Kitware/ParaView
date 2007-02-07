@@ -34,13 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkPVXMLElement.h"
 
 #include <QtDebug>
 #include <QString>
 
-#include "pqPipelineSource.h"
+#include "pqApplicationCore.h"
+#include "pqConsumerDisplay.h"
 #include "pqGenericViewModule.h"
+#include "pqPipelineBuilder.h"
+#include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 
 //-----------------------------------------------------------------------------
 pqDisplayPolicy::pqDisplayPolicy(QObject* _parent) :QObject(_parent)
@@ -87,14 +92,13 @@ bool pqDisplayPolicy::canDisplay(const pqPipelineSource* source,
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqDisplayPolicy::newDisplay(
-  const pqPipelineSource* source, const pqGenericViewModule* view) const
+vtkSMProxy* pqDisplayPolicy::newDisplayProxy(
+  pqPipelineSource* source, pqGenericViewModule* view) const
 {
   if (!this->canDisplay(source, view))
     {
     return NULL;
     }
-
   QString srcProxyName = source->getProxy()->GetXMLName();
   if (srcProxyName == "TextSource")
     {
@@ -105,6 +109,138 @@ vtkSMProxy* pqDisplayPolicy::newDisplay(
     }
 
   return view->getViewModuleProxy()->CreateDisplayProxy(); 
+}
+
+//-----------------------------------------------------------------------------
+pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
+  pqGenericViewModule* currentView) const
+{
+  pqPipelineBuilder* builder = 
+    pqApplicationCore::instance()->getPipelineBuilder();
+  vtkPVXMLElement* hints = source->getHints();
+  vtkPVXMLElement* viewElement = hints? 
+    hints->FindNestedElementByName("View") : 0;
+  const char* view_type = viewElement? viewElement->GetAttribute("type") : 0;
+  if (view_type)
+    {
+    QString proxy_name = view_type;
+    proxy_name += "ViewModule";
+    if (currentView && currentView->getProxy()->GetXMLName() == proxy_name)
+      {
+      // nothing to do, active view is preferred view.
+      }
+    else
+      {
+      // Create the preferred view only if one doesn't exist already.
+      pqGenericViewModule *preferredView = 0;
+      if (currentView)
+        {
+        // If currentView is empty, then we must always create a new view of the preferred type.
+        QList<pqGenericViewModule*> views = 
+          pqApplicationCore::instance()->getServerManagerModel()->getViewModules(
+            source->getServer());
+        foreach (pqGenericViewModule* view, views)
+          {
+          if (proxy_name == view->getProxy()->GetXMLName())
+            {
+            preferredView = view;
+            break;
+            }
+          }
+        }
+      if (!preferredView)
+        {
+        // Preferred view does not exist (or we insist on creating a new one) create a new view.
+        if (strcmp(view_type, "XYPlot")==0 )
+          {
+          currentView = builder->createView(
+            pqGenericViewModule::XY_PLOT, source->getServer());
+          }
+        else if (strcmp(view_type,"BarChart") ==0 )
+          {
+          currentView = builder->createView(
+            pqGenericViewModule::BAR_CHART, source->getServer());
+          }
+        }
+      }
+    }
+
+  if (!currentView)
+    {
+    // The user has selected a frame that is empty or the source does not
+    // recommend any view type. Hence we create a render view.
+    currentView = builder->createView(
+      pqGenericViewModule::RENDER_VIEW, source->getServer());
+    }
+
+  // No hints. We don't know what type of view is suitable
+  // for this proxy. Just check if it can be shown in current view.
+  return  currentView;
+}
+
+//-----------------------------------------------------------------------------
+pqConsumerDisplay* pqDisplayPolicy::createPreferredDisplay(
+  pqPipelineSource* source, pqGenericViewModule* view,
+  bool dont_create_view) const
+{
+  if (!view && dont_create_view)
+    {
+    return NULL;
+    }
+
+  if (dont_create_view && !this->canDisplay(source, view))
+    {
+    return NULL;
+    }
+
+  if (!dont_create_view) 
+    {
+    view = this->getPreferredView(source, view); 
+    if (!view)
+      {
+      // Could not create a view suitable for this source.
+      // Creation of the display can no longer proceed.
+      return NULL;
+      }
+    }
+
+  // Simply create a display for the view set up the connections and
+  // return.
+  pqConsumerDisplay* display = pqApplicationCore::instance()->getPipelineBuilder()->
+    createDisplay(source, view);
+  return display;
+}
+
+//-----------------------------------------------------------------------------
+pqConsumerDisplay* pqDisplayPolicy::setDisplayVisibility(
+  pqPipelineSource* source, pqGenericViewModule* view, bool visible) const
+{
+  if (!source)
+    {
+    // Cannot really display a NULL source.
+    return 0;
+    }
+
+  pqConsumerDisplay* display = source->getDisplay(view);
+  if (display)
+    {
+    // set the visibility.
+    display->setVisible(visible);
+    return display;
+    }
+
+  // No display exists for this view.
+  // First check if the view exists. If not, we will create a "suitable" view.
+  if (!view)
+    {
+    view = this->getPreferredView(source, view);
+    }
+  if (view)
+    {
+    display = pqApplicationCore::instance()->getPipelineBuilder()->createDisplay(source, view);
+    display->setVisible(visible);
+    }
+  return display;
 }
 
 

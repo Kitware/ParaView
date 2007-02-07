@@ -141,6 +141,8 @@ void pqProxyTabWidget::updateDisplayTab()
     {
     display =  source->getDisplay(this->ViewModule);
     }
+  this->Display->setSource(source);
+  this->Display->setView(this->ViewModule);
   this->Display->setDisplay(display);
 }
 

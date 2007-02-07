@@ -31,9 +31,6 @@ object13 = 'MainWindow/FileSaveServerStateDialog'
 QtTesting.playCommand(object13, 'filesSelected', '$PARAVIEW_TEST_ROOT/TestMultiView.pvsm')
 object14 = 'MainWindow/mainToolBar/1QToolButton3'
 QtTesting.playCommand(object14, 'activate', '')
-object15 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseButton'
-QtTesting.playCommand(object15, 'activate', '')
-QtTesting.playCommand(object15, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'actionFileLoadServerState')
 QtTesting.playCommand(object2, 'activate', '')
 QtTesting.playCommand(object3, 'filesSelected', '$PARAVIEW_TEST_ROOT/TestMultiView.pvsm')

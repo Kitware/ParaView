@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QPointer>
+#include <QtDebug>
 
 // Server Manager includes
 #include "vtkPVXMLElement.h"
@@ -51,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
-
+#include "pqDisplayPolicy.h"
 
 //-----------------------------------------------------------------------------
 class pqPendingDisplayManager::MyInternal
@@ -119,80 +120,32 @@ void pqPendingDisplayManager::removePendingDisplayForSource(pqPipelineSource* s)
 }
 
 //-----------------------------------------------------------------------------
-pqGenericViewModule* pqPendingDisplayManager::getViewForSource(
-  pqPipelineSource* source, pqGenericViewModule* currentView)
-{
-  vtkPVXMLElement* hints = source->getHints();
-  vtkPVXMLElement* viewElement = hints? 
-    hints->FindNestedElementByName("View") : 0;
-  const char* view_type = viewElement? viewElement->GetAttribute("type") : 0;
-  if (view_type)
-    {
-    QString proxy_name = view_type;
-    proxy_name += "ViewModule";
-    if (currentView->getProxy()->GetXMLName() == proxy_name)
-      {
-      // nothing to do, active view is preferred view.
-      }
-    else
-      {
-      // Create the preferred view only if one doesn't exist already.
-      pqGenericViewModule *preferredView = 0;
-      QList<pqGenericViewModule*> views = 
-        pqApplicationCore::instance()->getServerManagerModel()->getViewModules(
-          source->getServer());
-      foreach (pqGenericViewModule* view, views)
-        {
-        if (proxy_name == view->getProxy()->GetXMLName())
-          {
-          preferredView = view;
-          break;
-          }
-        }
-      if (!preferredView)
-        {
-        // Preferred view does not exit, create a new view.
-        pqPipelineBuilder* builder = 
-          pqApplicationCore::instance()->getPipelineBuilder();
-        if (strcmp(view_type, "XYPlot")==0 )
-          {
-          currentView = builder->createView(
-            pqGenericViewModule::XY_PLOT, source->getServer());
-          }
-        else if (strcmp(view_type,"BarChart") ==0 )
-          {
-          currentView = builder->createView(
-            pqGenericViewModule::BAR_CHART, source->getServer());
-          }
-        }
-      }
-    }
-
-  // No hints. We don't know what type of view is suitable
-  // for this proxy. Just check if it can be shown in current view.
-  return (currentView && currentView->canDisplaySource(source)) ?  
-    currentView : 0;
-}
-
-//-----------------------------------------------------------------------------
 void pqPendingDisplayManager::createPendingDisplays(
   pqGenericViewModule* activeview)
 {
+  pqDisplayPolicy* displayPolicy = 
+    pqApplicationCore::instance()->getDisplayPolicy();
+  if (!displayPolicy)
+    {
+    qCritical() << "No display policy defined. Cannot create pending displays.";
+    return;
+    }
 
-  pqPipelineBuilder* pb = pqApplicationCore::instance()->getPipelineBuilder();
   foreach (pqPipelineSource* source, this->Internal->SourcesSansDisplays)
     {
     if (!source)
       {
       continue;
       }
-    pqGenericViewModule* view = this->getViewForSource(source, activeview);
-    if (!view)
+
+    pqDisplay* display = displayPolicy->createPreferredDisplay(
+      source, activeview, false);
+    if (!display || display->getNumberOfViewModules() != 1)
       {
       continue;
       }
-    pb->createDisplay(source, view);
 
+    pqGenericViewModule* view = display->getViewModule(0); 
     pqRenderViewModule* renModule = qobject_cast<pqRenderViewModule*>(view);
     if (renModule && renModule->getDisplayCount() == 1)
       {

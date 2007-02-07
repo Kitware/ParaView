@@ -3705,6 +3705,30 @@
 
     <GenericViewDisplayProxy name="BarChartDisplay"
       base_proxygroup="displays" base_proxyname="GenericViewDisplay">
+      <!-- All properties here are non-command properties, since
+        we don't have any special proxy for BarChartDisplay. 
+        We have properties which aid the GUI is "drawing" this display.
+      -->
+      <ProxyProperty
+        name="LookupTable">
+        <!--
+        The lookup table proxy used to color the bar chart.
+        -->
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <IntVectorProperty
+        name="MapScalars"
+        number_of_elements="1"
+        default_values="1">
+        <!-- 
+        If true, the LookupTable, if any is used to color the bar chart.
+        Otherwise, random colors will be generated.
+        -->
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
     </GenericViewDisplayProxy>
 
     <GenericViewDisplayProxy name="TableDisplay"

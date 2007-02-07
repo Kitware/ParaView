@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqMultiViewFrameMenu.h"
 #include <QUuid>
 
+class QMenu;
+
 /// a holder for a widget in a multiview
 class PQCOMPONENTS_EXPORT pqMultiViewFrame : public QWidget, public Ui::MultiViewFrameMenu
 {
@@ -70,6 +72,9 @@ public:
   void hideMenu(bool hide);
 
   QUuid uniqueID() const;
+
+  QMenu* getContextMenu() const
+    { return this->ContextMenu; }
 
 public slots:
 
@@ -114,8 +119,11 @@ signals:
   void dragMove(pqMultiViewFrame*,QDragMoveEvent*);
   /// drop event
   void drop(pqMultiViewFrame*,QDropEvent*);
-
-  
+  /// fired before the context menu is shown for this frame.
+  void contextMenuRequested();
+protected slots:
+  /// called when a context menu is requested.
+  void onCustomContextMenuRequested(const QPoint& point);
 
 protected:
   void paintEvent(QPaintEvent* e);
@@ -123,6 +131,7 @@ protected:
 
 private:
   QWidget* MainWidget;
+  QMenu* ContextMenu;
   bool AutoHide;
   bool Active;
   bool MenuHidden;

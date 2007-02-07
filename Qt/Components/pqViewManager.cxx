@@ -40,11 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntVectorProperty.h"
 
 // Qt includes.
+#include <QAction>
 #include <QDrag>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QList>
 #include <QMap>
+#include <QMenu>
 #include <QMimeData>
 #include <QPointer>
 #include <QSet>
@@ -81,6 +83,7 @@ public:
   QPointer<pqServer> ActiveServer;
   QPointer<pqGenericViewModule> ActiveViewModule;
   QPointer<pqMultiViewFrame> FrameBeingRemoved;
+  QMenu ConvertMenu;
 
   typedef QMap<pqMultiViewFrame*, QPointer<pqGenericViewModule> > FrameMapType;
   FrameMapType Frames;
@@ -90,6 +93,7 @@ public:
   QSize MaxWindowSize;
 
   bool DontCreateDeleteViewsModules;
+  bool DontCloseFrameWhenRenderModuleIsRemoved;
   pqGenericViewModule* getViewModuleToAllocate()
     {
     if (!this->ActiveServer || this->DontCreateDeleteViewsModules)
@@ -110,6 +114,7 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
 {
   this->Internal = new pqInternals();
   this->Internal->DontCreateDeleteViewsModules = false;
+  this->Internal->DontCloseFrameWhenRenderModuleIsRemoved = false;
   this->Internal->MaxWindowSize = QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   pqServerManagerModel* smModel = pqServerManagerModel::instance();
   if (!smModel)
@@ -130,6 +135,26 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
     this, SLOT(onFrameAdded(pqMultiViewFrame*)));
   QObject::connect(this, SIGNAL(frameRemoved(pqMultiViewFrame*)), 
     this, SLOT(onFrameRemoved(pqMultiViewFrame*)));
+
+  // Create actions for converting view types.
+  QAction* view_action = new QAction("3D View", this);
+  view_action->setData(QVariant(pqGenericViewModule::RENDER_VIEW));
+  this->Internal->ConvertMenu.addAction(view_action);
+
+  view_action = new QAction("Bar Chart", this);
+  view_action->setData(QVariant(pqGenericViewModule::BAR_CHART));
+  this->Internal->ConvertMenu.addAction(view_action);
+
+  view_action = new QAction("XY Plot", this);
+  view_action->setData(QVariant(pqGenericViewModule::XY_PLOT));
+  this->Internal->ConvertMenu.addAction(view_action);
+
+  view_action = new QAction("Table", this);
+  view_action->setData(QVariant(pqGenericViewModule::TABLE_VIEW));
+  this->Internal->ConvertMenu.addAction(view_action);
+
+  QObject::connect(&this->Internal->ConvertMenu, SIGNAL(triggered(QAction*)),
+    this, SLOT(onConvertToTriggered(QAction*)));
 
   // Creates the default empty frame.
   this->init();
@@ -167,6 +192,23 @@ pqGenericViewModule* pqViewManager::getActiveViewModule() const
 }
 
 //-----------------------------------------------------------------------------
+void pqViewManager::updateConversionActions(pqMultiViewFrame* frame)
+{
+  int to_exclude = -1;
+  if (this->Internal->Frames.contains(frame))
+    {
+    to_exclude = this->Internal->Frames[frame]->getViewType();
+    }
+
+  bool server_exists = (pqApplicationCore::instance()->getServerManagerModel()->
+    getNumberOfServers() >= 1);
+  foreach (QAction* action, this->Internal->ConvertMenu.actions())
+    {
+    action->setEnabled(server_exists && (to_exclude != action->data().toInt()));
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
 {
   // We connect drag-drop signals event for empty frames.
@@ -179,14 +221,16 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
   QObject::connect(frame, SIGNAL(drop(pqMultiViewFrame*,QDropEvent*)),
     this, SLOT(frameDrop(pqMultiViewFrame*,QDropEvent*)));
 
+  frame->installEventFilter(this);
   frame->MaximizeButton->show();
   frame->CloseButton->show();
   frame->SplitVerticalButton->show();
   frame->SplitHorizontalButton->show();
 
-  frame->MaximizeButton->setEnabled(false);
-  frame->SplitVerticalButton->setEnabled(false);
-  frame->SplitHorizontalButton->setEnabled(false);
+  frame->getContextMenu()->addSeparator();
+  QAction* subAction = frame->getContextMenu()->addMenu(
+    &this->Internal->ConvertMenu);
+  subAction->setText("Convert To");
 
   QSignalMapper* sm = new QSignalMapper(frame);
   sm->setMapping(frame, frame);
@@ -194,22 +238,18 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
   QObject::connect(sm, SIGNAL(mapped(QWidget*)), 
     this, SLOT(onActivate(QWidget*)));
 
+  sm = new QSignalMapper(frame);
+  sm->setMapping(frame, frame);
+  QObject::connect(frame, SIGNAL(contextMenuRequested()), sm, SLOT(map()));
+  QObject::connect(sm, SIGNAL(mapped(QWidget*)), 
+    this, SLOT(onFrameContextMenuRequested(QWidget*)));
+
+  // A newly added frames gets collected as an empty frame.
+  // It will be used next time a view module is created.
   this->Internal->PendingFrames.removeAll(frame);
-  this->Internal->PendingFrames.push_front(frame);
+  this->Internal->PendingFrames.push_back(frame);
 
-  if (this->Internal->DontCreateDeleteViewsModules)
-    {
-    return;
-    }
-
-  // We push this new frame at the head of pending frames and
-  // ask for a suitable view. If a new view module is created,
-  // it will automatically be added to  the first frame in the
-  // PendingFrames.
-
-  // Either use a previously unallocated render module, or create a new one.
-  pqGenericViewModule* view = this->Internal->getViewModuleToAllocate();
-  (void)view;
+  frame->setActive(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -224,6 +264,7 @@ void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
   QObject::disconnect(frame, SIGNAL(drop(pqMultiViewFrame*,QDropEvent*)),
     this, SLOT(frameDrop(pqMultiViewFrame*,QDropEvent*)));
 
+  frame->removeEventFilter(this);
   this->Internal->PendingFrames.removeAll(frame);
   if (!this->Internal->Frames.contains(frame))
     {
@@ -287,9 +328,6 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
     frame->BackButton->hide();
     frame->ForwardButton->hide();
     }
-  frame->MaximizeButton->setEnabled(true);
-  frame->SplitVerticalButton->setEnabled(true);
-  frame->SplitHorizontalButton->setEnabled(true);
 
   this->Internal->Frames.insert(frame, view);
 }
@@ -318,9 +356,6 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* vie
     }
   frame->BackButton->hide();
   frame->ForwardButton->hide();
-  frame->MaximizeButton->setEnabled(false);
-  frame->SplitVerticalButton->setEnabled(false);
-  frame->SplitHorizontalButton->setEnabled(false);
 
   this->Internal->PendingFrames.push_back(frame);
 }
@@ -373,15 +408,34 @@ void pqViewManager::assignFrame(pqGenericViewModule* view)
     }
   else
     {
-    // Use existing available frame.
-    frame = this->Internal->PendingFrames.first();
-    this->Internal->PendingFrames.pop_front();
+    // It is possible that the active frame is empty, if so,
+    // we use it.
+    foreach (pqMultiViewFrame* curframe, this->Internal->PendingFrames)
+      {
+      if (curframe->active())
+        {
+        frame = curframe;
+        break;
+        }
+      }
+    if (!frame)
+      {
+      frame = this->Internal->PendingFrames.first();
+      }
+    this->Internal->PendingFrames.removeAll(frame);
     }
 
   if (frame)
     {
     this->connect(frame, view);
-    frame->setActive(true);
+    if (frame->active())
+      {
+      this->onActivate(frame);
+      }
+    else
+      {
+      frame->setActive(true);
+      }
     }
 }
 
@@ -398,8 +452,17 @@ void pqViewManager::onViewModuleRemoved(pqGenericViewModule* view)
   if (frame)
     {
     this->disconnect(frame, view);
-    // close the frame for this view as well.
-    this->removeWidget(frame);
+    if (!this->Internal->DontCloseFrameWhenRenderModuleIsRemoved)
+      {
+      // close the frame for this view as well.
+      this->removeWidget(frame);
+      }
+    }
+
+  if (this->Internal->DontCloseFrameWhenRenderModuleIsRemoved)
+    {
+    this->onActivate(frame);
+    return;
     }
 
   if (this->Internal->ActiveViewModule == view)
@@ -413,6 +476,42 @@ void pqViewManager::onViewModuleRemoved(pqGenericViewModule* view)
       {
       this->onActivate(NULL);
       }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::onConvertToTriggered(QAction* action)
+{
+  int new_type = action->data().toInt();
+
+  // FIXME: We may want to fix this to use the active server instead.
+  pqServer* server= pqApplicationCore::instance()->
+    getServerManagerModel()->getServerByIndex(0);
+  if (!server)
+    {
+    qDebug() << "No server present cannot convert view.";
+    return;
+    }
+
+  pqPipelineBuilder* builder = pqApplicationCore::instance()->
+    getPipelineBuilder();
+  if (this->Internal->ActiveViewModule)
+    {
+    this->Internal->DontCloseFrameWhenRenderModuleIsRemoved = true;
+    builder->removeView(this->Internal->ActiveViewModule);
+    this->Internal->DontCloseFrameWhenRenderModuleIsRemoved = false;
+    }
+
+  builder->createView(new_type, server);
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::onFrameContextMenuRequested(QWidget* widget)
+{
+  pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(widget);
+  if (frame)
+    {
+    this->updateConversionActions(frame);
     }
 }
 
@@ -431,6 +530,7 @@ void pqViewManager::onActivate(QWidget* obj)
     {
     return;
     }
+
 
   pqGenericViewModule* view = this->Internal->Frames.value(frame);
   // If the frame does not have a view, view==NULL.
@@ -469,6 +569,11 @@ bool pqViewManager::eventFilter(QObject* caller, QEvent* e)
         {
         frame->setActive(true);
         }
+      }
+    pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(caller);
+    if (frame)
+      {
+      frame->setActive(true);
       }
     }
   else if (e->type() == QEvent::FocusIn)
@@ -624,7 +729,14 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
       if (frame && view)
         {
         this->connect(frame, view);
-        frame->setActive(true);
+        if (frame->active())
+          {
+          frame->setActive(true);
+          }
+        else
+          {
+          this->onActivate(frame);
+          }
         }
       }
     }

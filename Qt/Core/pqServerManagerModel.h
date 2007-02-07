@@ -69,25 +69,24 @@ public:
   pqServerManagerModel(QObject* parent=NULL);
   virtual ~pqServerManagerModel();
 
-  // Avoid using this, this will be take out soon.
+  /// Avoid using this, this will be take out soon.
   static pqServerManagerModel* instance();
 
   /// Given a vtkSMProxy get the pqServer on which the proxy exists.
   pqServer* getServerForSource(vtkSMProxy*);
   pqServer* getServerForSource(pqPipelineSource*);
 
-  // Given a process module ConnectionID, get pqServer for it.
+  /// Given a process module ConnectionID, get pqServer for it.
   pqServer* getServer(vtkIdType connectionId);
 
-  // Given the server resource, find the pqServer.
+  /// Given the server resource, find the pqServer.
   pqServer* getServer(const pqServerResource& resource) const;
 
-  // Given the server index, get the pqServer.
+  /// Given the server index, get the pqServer.
   pqServer* getServerByIndex(unsigned int index) const;
 
-  // Get the number of server connections available.
+  /// Get the number of server connections available.
   unsigned int getNumberOfServers();
-
 
   /// Get the number of sources. Eventually, we may want this 
   /// to take a server argument and returns the number of sources
@@ -187,9 +186,9 @@ public slots:
   void onRemoveDisplay(vtkSMProxy* display);
 
   /// Call when a proxy is registered/unregistered. 
- /// (other than sources/displays/render modules).
- void onProxyRegistered(QString group, QString name, vtkSMProxy* proxy);
- void onProxyUnRegistered(QString group, QString name, vtkSMProxy* proxy);
+  /// (other than sources/displays/render modules).
+  void onProxyRegistered(QString group, QString name, vtkSMProxy* proxy);
+  void onProxyUnRegistered(QString group, QString name, vtkSMProxy* proxy);
 
 signals:
   // Fired when a new connection is created on the vtkProcessModule.

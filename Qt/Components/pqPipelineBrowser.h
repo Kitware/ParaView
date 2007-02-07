@@ -109,10 +109,6 @@ public:
   /// get the view module this pipeline browser works with
   pqGenericViewModule *getViewModule() const;
 
-  /// Helper method to create a display for the source
-  /// on the current view module.
-  pqConsumerDisplay *createDisplay(pqPipelineSource *source, bool visible);
-
 public slots:
   /// \name Model Modification Methods
   //@{
