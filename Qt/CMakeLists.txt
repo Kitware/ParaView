@@ -3,7 +3,7 @@ PROJECT (PQGUI)
 #########################################################################
 # Setup Qt
 SET(QT_REQUIRED TRUE)
-SET(QT_MIN_VERSION "4.2.0")
+SET(QT_MIN_VERSION "4.2.2")
 FIND_PACKAGE(Qt4)
 SET(QT_USE_QTUITOOLS ON)
 SET(QT_USE_QTNETWORK TRUE)
