@@ -15,4 +15,6 @@ IF(ParaView_FOUND)
     FIND_PACKAGE(Qt4)
   ENDIF(PARAVIEW_BUILD_QT_GUI)
 
+  INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewPlugins.cmake)
+
 ENDIF(ParaView_FOUND)
