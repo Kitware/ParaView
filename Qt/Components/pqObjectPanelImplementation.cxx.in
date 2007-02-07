@@ -1,0 +1,30 @@
+
+#include "@PANEL_NAME@.h"
+#include "@PANEL_NAME@Implementation.h"
+
+#include <QtPlugin>
+
+#include "vtkSMProxy.h"
+#include "pqProxy.h"
+
+@PANEL_NAME@Implementation::@PANEL_NAME@Implementation(QObject* p)
+  : QObject(p)
+{
+}
+
+QString @PANEL_NAME@Implementation::name() const
+{
+  return "@PANEL_NAME@";
+}
+
+pqObjectPanel* @PANEL_NAME@Implementation::createPanel(pqProxy* object_proxy, QWidget* p)
+{
+  return new @PANEL_NAME@(object_proxy, p);
+}
+
+bool @PANEL_NAME@Implementation::canCreatePanel(pqProxy* proxy) const
+{
+  return (QString("@PANEL_XML_NAME@") == proxy->getProxy()->GetXMLName()
+     && QString("@PANEL_XML_GROUP@") == proxy->getProxy()->GetXMLGroup());
+}
+

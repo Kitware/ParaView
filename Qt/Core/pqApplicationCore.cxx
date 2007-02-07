@@ -89,6 +89,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWriterFactory.h"
 #include "pqXMLUtil.h"
 #include "pqLinksModel.h"
+#include "pqPluginManager.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -107,6 +108,7 @@ public:
   vtkSmartPointer<vtkSMStateLoader> StateLoader;
   QPointer<pqLookupTableManager> LookupTableManager;
   pqLinksModel LinksModel;
+  pqPluginManager PluginManager;
 
   QString OrganizationName;
   QString ApplicationName;
@@ -297,6 +299,12 @@ pqPendingDisplayManager* pqApplicationCore::getPendingDisplayManager()
 pqLinksModel* pqApplicationCore::getLinksModel()
 {
   return &this->Internal->LinksModel;
+}
+
+//-----------------------------------------------------------------------------
+pqPluginManager* pqApplicationCore::getPluginManager()
+{
+  return &this->Internal->PluginManager;
 }
 
 //-----------------------------------------------------------------------------

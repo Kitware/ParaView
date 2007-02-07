@@ -57,6 +57,7 @@ class pqWriterFactory;
 class vtkPVXMLElement;
 class vtkSMStateLoader;
 class pqLinksModel;
+class pqPluginManager;
 
 /// This class is the crux of the ParaView application. It creates
 /// and manages various managers which are necessary for the PQClient
@@ -90,6 +91,7 @@ public:
   pqWriterFactory* getWriterFactory();
   pqPendingDisplayManager* getPendingDisplayManager();
   pqLinksModel* getLinksModel();
+  pqPluginManager* getPluginManager();
 
   // Returns the display policy instance used by the application.
   // pqDisplayPolicy defines the policy for creating displays

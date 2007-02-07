@@ -58,28 +58,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 
-// we include this for static plugins
-#define QT_STATICPLUGIN
-#include <QtPlugin>
-
-QString pqStreamTracerPanelInterface::name() const
-{
-  return "StreamTracer";
-}
-
-pqObjectPanel* pqStreamTracerPanelInterface::createPanel(pqProxy* proxy, QWidget* p)
-{
-  return new pqStreamTracerPanel(proxy, p);
-}
-
-bool pqStreamTracerPanelInterface::canCreatePanel(pqProxy* proxy) const
-{
-  return (QString("filters") == proxy->getProxy()->GetXMLGroup() &&
-    QString("StreamTracer") == proxy->getProxy()->GetXMLName());
-}
-
-Q_EXPORT_PLUGIN(pqStreamTracerPanelInterface)
-
 //////////////////////////////////////////////////////////////////////////////
 // pqStreamTracerPanel::pqImplementation
 

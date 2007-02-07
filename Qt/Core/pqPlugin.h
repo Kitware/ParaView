@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqObjectPanelLoader.cxx
+   Module:    pqPlugin.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,59 +30,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-// this include
-#include "pqObjectPanelLoader.h"
+#ifndef _pqPlugin_h
+#define _pqPlugin_h
 
-// Qt includes
-#include <QPluginLoader>
+#include <QObjectList>
 
-// ParaView includes
-#include "pqObjectPanelInterface.h"
-
-//-----------------------------------------------------------------------------
-/// constructor
-pqObjectPanelLoader::pqObjectPanelLoader(QObject* p)
-  : QObject(p)
+/// the main plugin interface for GUI extensions
+/// one instance of this resides in the plugin
+class pqPlugin
 {
-  // for now, we only support static plugins 
-  // (plugins built into the application)
-  QObjectList plugins = QPluginLoader::staticInstances();
-  foreach(QObject* o, plugins)
-    {
-    pqObjectPanelInterface* i = qobject_cast<pqObjectPanelInterface*>(o);
-    if(i)
-      {
-      this->PanelPlugins.append(i);
-      }
-    }
-}
+public:
+  /// destructor
+  virtual ~pqPlugin() {}
 
-//-----------------------------------------------------------------------------
-/// destructor
-pqObjectPanelLoader::~pqObjectPanelLoader()
-{
-}
-  
-pqObjectPanel* pqObjectPanelLoader::createPanel(pqProxy* proxy, QWidget* p)
-{
-  foreach(pqObjectPanelInterface* i, this->PanelPlugins)
-    {
-    if (i->canCreatePanel(proxy))
-      {
-      return i->createPanel(proxy, p);
-      }
-    }
-  return NULL;
-}
+  virtual QObjectList interfaces() = 0;
+};
 
-QStringList pqObjectPanelLoader::availableWidgets() const
-{
-  QStringList names;
-  foreach(pqObjectPanelInterface* i, this->PanelPlugins)
-    {
-    names.append(i->name());
-    }
-  return names;
-}
+Q_DECLARE_INTERFACE(pqPlugin, "com.kitware/paraview/plugin")
 
+#endif
 

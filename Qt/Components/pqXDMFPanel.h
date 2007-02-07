@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqXDMFPanel_h
 
 #include "pqNamedObjectPanel.h"
-#include "pqObjectPanelInterface.h"
 #include "pqComponentsExport.h"
 
 class QListWidgetItem;
@@ -93,17 +92,6 @@ private:
   QListWidgetItem *LastGridDeselected;
   bool NeedsResetGrid;
   bool FirstAcceptHappened;
-};
-
-// make this panel available to the object inspector
-class pqXDMFPanelInterface : public QObject, public pqObjectPanelInterface
-{
-  Q_OBJECT
-  Q_INTERFACES(pqObjectPanelInterface)
-public:
-  virtual QString name() const;
-  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
-  virtual bool canCreatePanel(pqProxy* proxy) const;
 };
 
 #endif

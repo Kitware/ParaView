@@ -86,7 +86,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqObjectInspectorDriver.h
   pqObjectInspectorWidget.h
   pqObjectPanel.h
-  pqObjectPanelLoader.h
   pqPQLookupTableManager.h
   pqPipelineBrowser.h
   pqPipelineBrowserContextMenu.h
@@ -324,8 +323,6 @@ ADD_LIBRARY(pqComponents
   pqObjectInspectorWidget.h
   pqObjectPanel.cxx
   pqObjectPanel.h
-  pqObjectPanelLoader.cxx
-  pqObjectPanelLoader.h
   pqPQLookupTableManager.cxx
   pqPQLookupTableManager.h
   pqPipelineBrowser.cxx

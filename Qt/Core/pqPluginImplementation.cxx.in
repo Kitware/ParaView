@@ -1,0 +1,22 @@
+
+#include "@PLUGIN_NAME@PluginImplementation.h"
+#include <QtPlugin>
+
+@INTERFACE_INCLUDES@
+
+@PLUGIN_NAME@Plugin::@PLUGIN_NAME@Plugin()
+{
+  @INTERFACE_INSTANCES@
+}
+
+@PLUGIN_NAME@Plugin::~@PLUGIN_NAME@Plugin()
+{
+}
+
+QObjectList @PLUGIN_NAME@Plugin::interfaces()
+{
+  return this->Interfaces;
+}
+
+Q_EXPORT_PLUGIN2(@PLUGIN_NAME@Plugin, @PLUGIN_NAME@Plugin)
+

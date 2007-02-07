@@ -1,0 +1,22 @@
+
+#ifndef _@PLUGIN_NAME@Plugin_h
+#define _@PLUGIN_NAME@Plugin_h
+
+#include "pqPlugin.h"
+#include <QObject>
+
+// implementation of pqPlugin
+class @PLUGIN_NAME@Plugin : public QObject, public pqPlugin
+{
+  Q_OBJECT
+  Q_INTERFACES(pqPlugin)
+public:
+  @PLUGIN_NAME@Plugin();
+  ~@PLUGIN_NAME@Plugin();
+  virtual QObjectList interfaces();
+private:
+  QObjectList Interfaces;
+};
+
+#endif
+

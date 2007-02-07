@@ -266,6 +266,9 @@ public slots:
   // Called to show the settings dialog.
   void onEditSettings();
 
+  // invoke the dialog to manage plugins
+  void onManagePlugins();
+
   // Camera slots.
   void resetCamera();
   void resetViewDirectionPosX();
@@ -323,6 +326,7 @@ private slots:
   void onPostAccept();
 
   void updateFiltersMenu();
+  void refreshFiltersMenu();
   
   void updateRecentFilterMenu(QAction* action);
 private:

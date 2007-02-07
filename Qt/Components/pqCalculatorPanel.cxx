@@ -52,29 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "ui_pqCalculatorPanel.h"
 
-
-// we include this for static plugins
-#define QT_STATICPLUGIN
-#include <QtPlugin>
-
-QString pqCalculatorPanelInterface::name() const
-{
-  return "Calculator";
-}
-
-pqObjectPanel* pqCalculatorPanelInterface::createPanel(pqProxy* object_proxy, QWidget* p)
-{
-  return new pqCalculatorPanel(object_proxy, p);
-}
-
-bool pqCalculatorPanelInterface::canCreatePanel(pqProxy* proxy) const
-{
-  return (proxy->getProxy()->GetXMLName() == QString("Calculator") 
-    && proxy->getProxy()->GetXMLGroup() == QString("filters"));
-}
-
-Q_EXPORT_PLUGIN(pqCalculatorPanelInterface)
-
 class pqCalculatorPanel::pqInternal 
  : public QObject, public Ui::CalculatorPanel
 {

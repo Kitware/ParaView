@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqThresholdPanel_h
 
 #include "pqLoadedFormObjectPanel.h"
-#include "pqObjectPanelInterface.h"
 #include "pqComponentsExport.h"
 class QSlider;
 class QDoubleSpinBox;
@@ -67,18 +66,6 @@ protected:
   QDoubleSpinBox* LowerSpin;
   QDoubleSpinBox* UpperSpin;
 
-};
-
-
-// make this panel available to the object inspector
-class pqThresholdPanelInterface : public QObject, public pqObjectPanelInterface
-{
-  Q_OBJECT
-  Q_INTERFACES(pqObjectPanelInterface)
-public:
-  virtual QString name() const;
-  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
-  virtual bool canCreatePanel(pqProxy* proxy) const; 
 };
 
 #endif

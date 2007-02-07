@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqClipPanel_h
 
 #include "pqObjectPanel.h"
-#include "pqObjectPanelInterface.h"
 
 /// Custom panel for the Clip filter that manages a 3D widget for interactive clipping
 class PQCOMPONENTS_EXPORT pqClipPanel :
@@ -62,17 +61,6 @@ private:
 
   class pqImplementation;
   pqImplementation* const Implementation;
-};
-
-// make this panel available to the object inspector
-class pqClipPanelInterface : public QObject, public pqObjectPanelInterface
-{
-  Q_OBJECT
-  Q_INTERFACES(pqObjectPanelInterface)
-public:
-  virtual QString name() const;
-  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
-  virtual bool canCreatePanel(pqProxy* proxy) const;
 };
 
 #endif

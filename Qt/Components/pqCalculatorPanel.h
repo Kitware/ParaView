@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqCalculatorPanel_h
 
 #include "pqObjectPanel.h"
-#include "pqObjectPanelInterface.h"
 
 /// Panel for vtkArrayCalculator proxy
 class PQCOMPONENTS_EXPORT pqCalculatorPanel : public pqObjectPanel
@@ -65,17 +64,6 @@ protected slots:
 protected:
   class pqInternal;
   pqInternal* Internal;
-};
-
-// make this panel available to the object inspector
-class pqCalculatorPanelInterface : public QObject, public pqObjectPanelInterface
-{
-  Q_OBJECT
-  Q_INTERFACES(pqObjectPanelInterface)
-public:
-  virtual QString name() const;
-  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
-  virtual bool canCreatePanel(pqProxy* proxy) const;
 };
 
 #endif

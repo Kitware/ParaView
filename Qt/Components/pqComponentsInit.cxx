@@ -48,15 +48,5 @@ void pqComponentsInit()
 
 #endif
 
-  // init static plugins
-  Q_IMPORT_PLUGIN(pqCutPanelInterface)
-  Q_IMPORT_PLUGIN(pqClipPanelInterface)
-  Q_IMPORT_PLUGIN(pqCalculatorPanelInterface)
-  Q_IMPORT_PLUGIN(pqContourPanelInterface)
-  Q_IMPORT_PLUGIN(pqExodusPanelInterface)
-  Q_IMPORT_PLUGIN(pqStreamTracerPanelInterface)
-  Q_IMPORT_PLUGIN(pqThresholdPanelInterface)
-  Q_IMPORT_PLUGIN(pqXDMFPanelInterface)
-
 }
 

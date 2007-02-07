@@ -95,6 +95,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqToolTipTrapper.h"
 #include "pqVCRController.h"
 #include "pqWriterFactory.h"
+#include "pqPluginManager.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -304,6 +305,11 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   this->connect(core, SIGNAL(aboutToRemoveSource(pqPipelineSource*)),
       this, SLOT(onRemovingSource(pqPipelineSource*)));
 
+  this->connect(pqApplicationCore::instance()->getPluginManager(),
+                SIGNAL(serverManagerExtensionLoaded()),
+                this,
+                SLOT(refreshFiltersMenu()));
+
 /*
   this->installEventFilter(this);
 */
@@ -378,26 +384,15 @@ void pqMainWindowCore::setSourceMenu(QMenu* menu)
     }
 }
 
-void pqMainWindowCore::setFilterMenu(QMenu* menu)
+void pqMainWindowCore::refreshFiltersMenu()
 {
-  this->Implementation->FilterMenu = menu;
   if(this->Implementation->FilterMenu)
     {
-    QObject::connect(this->Implementation->FilterMenu, 
-      SIGNAL(triggered(QAction*)), 
-      this, SLOT(onCreateFilter(QAction*)));
-
-   QObject::connect(this->Implementation->FilterMenu,
-     SIGNAL(triggered(QAction*)),
-     this, SLOT(updateRecentFilterMenu(QAction*)),
-     Qt::QueuedConnection);
-    
     this->Implementation->FilterMenu->clear();
 
     // Update the menu items for the server and compound filters too.
 
     QStringList::Iterator iter;
-    pqSourceProxyInfo proxyInfo;
 
     this->Implementation->RecentFilesMenu = 
       this->Implementation->FilterMenu->addMenu("&Recent") 
@@ -430,32 +425,6 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
       QAction* action = commonMenu->addAction(proxyLabel) << pqSetName(proxyName)
         << pqSetData(proxyName);
       action->setEnabled(false);
-      }
-
-    // Load in the filter information.
-    QString filtersDirName = ":/ParaViewResources";
-    QDir filtersDir(filtersDirName);
-    QStringList resources = filtersDir.entryList(QDir::Files);
-    foreach(QString resource, resources)
-      {
-      QString resourceName = filtersDirName + QString("/") + resource;
-      QFile filterInfo(resourceName);
-      filterInfo.open(QFile::ReadOnly);
-      
-      vtkSmartPointer<vtkPVXMLParser> xmlParser = 
-        vtkSmartPointer<vtkPVXMLParser>::New();
-      xmlParser->InitializeParser();
-      QByteArray filter_data = filterInfo.read(1024);
-      while(!filter_data.isEmpty())
-        {
-        xmlParser->ParseChunk(filter_data.data(), filter_data.length());
-        filter_data = filterInfo.read(1024);
-        }
-
-      xmlParser->CleanupParser();
-      filterInfo.close();
-
-      proxyInfo.LoadFilterInfo(xmlParser->GetRootElement());
       }
 
     this->Implementation->AlphabeticalMenu = 
@@ -494,6 +463,39 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
       }
     }
 
+  this->updateFiltersMenu();
+}
+
+void pqMainWindowCore::setFilterMenu(QMenu* menu)
+{
+  if(this->Implementation->FilterMenu)
+    {
+    QObject::disconnect(this->Implementation->FilterMenu, 
+      SIGNAL(triggered(QAction*)), 
+      this, SLOT(onCreateFilter(QAction*)));
+
+    QObject::disconnect(this->Implementation->FilterMenu,
+      SIGNAL(triggered(QAction*)),
+      this, SLOT(updateRecentFilterMenu(QAction*)));
+
+    this->Implementation->FilterMenu->clear();
+    }
+
+  this->Implementation->FilterMenu = menu;
+
+  if(this->Implementation->FilterMenu)
+    {
+    QObject::connect(this->Implementation->FilterMenu, 
+      SIGNAL(triggered(QAction*)), 
+      this, SLOT(onCreateFilter(QAction*)));
+
+    QObject::connect(this->Implementation->FilterMenu,
+      SIGNAL(triggered(QAction*)),
+      this, SLOT(updateRecentFilterMenu(QAction*)),
+      Qt::QueuedConnection);
+
+    this->refreshFiltersMenu();
+    }
 }
 
 pqPipelineMenu& pqMainWindowCore::pipelineMenu()
@@ -519,29 +521,6 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
     
   dock_widget->setWidget(this->Implementation->PipelineBrowser);
 
-#if 0
-  // TEMP: Load in the filter information.
-  QFile filterInfo(":/pqWidgets/XML/ParaViewFilters.xml");
-  if(filterInfo.open(QIODevice::ReadOnly))
-    {
-    vtkSmartPointer<vtkPVXMLParser> xmlParser = 
-      vtkSmartPointer<vtkPVXMLParser>::New();
-    xmlParser->InitializeParser();
-    QByteArray filter_data = filterInfo.read(1024);
-    while(!filter_data.isEmpty())
-      {
-      xmlParser->ParseChunk(filter_data.data(), filter_data.length());
-      filter_data = filterInfo.read(1024);
-      }
-
-    xmlParser->CleanupParser();
-    filterInfo.close();
-
-    this->Implementation->PipelineBrowser->loadFilterInfo(
-        xmlParser->GetRootElement());
-    }
-#endif
-  
   QObject::connect(
     &pqActiveView::instance(),
     SIGNAL(changed(pqGenericViewModule*)),
@@ -2615,6 +2594,18 @@ void pqMainWindowCore::onToolsManageLinks()
     this->Implementation->LinksManager->setWindowTitle("Link Manager");
     this->Implementation->LinksManager->setAttribute(Qt::WA_DeleteOnClose);
     this->Implementation->LinksManager->show();
+    }
+}
+
+void pqMainWindowCore::onManagePlugins()
+{
+  pqFileDialog fd(NULL, this->Implementation->Parent, "Load Plugin", QString(), 
+                  "Plugins (*.so;*.dll;*.sl)");
+  if(fd.exec() == QDialog::Accepted)
+    {
+    QString plugin = fd.getSelectedFiles()[0];
+    pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
+    pm->loadPlugin(NULL, plugin);
     }
 }
 

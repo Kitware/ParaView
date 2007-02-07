@@ -50,28 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFrame>
 #include <QVBoxLayout>
 
-// we include this for static plugins
-#define QT_STATICPLUGIN
-#include <QtPlugin>
-
-QString pqClipPanelInterface::name() const
-{
-  return "Clip";
-}
-
-pqObjectPanel* pqClipPanelInterface::createPanel(pqProxy* proxy, QWidget* p)
-{
-  return new pqClipPanel(proxy, p);
-}
- 
-bool pqClipPanelInterface::canCreatePanel(pqProxy* proxy) const
-{
-  return (QString("filters") == proxy->getProxy()->GetXMLGroup() &&
-    QString("Clip") == proxy->getProxy()->GetXMLName());
-}
-
-Q_EXPORT_PLUGIN(pqClipPanelInterface)
-
 //////////////////////////////////////////////////////////////////////////////
 // pqClipPanel::pqImplementation
 

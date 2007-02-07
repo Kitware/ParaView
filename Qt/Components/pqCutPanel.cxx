@@ -49,28 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 
-// we include this for static plugins
-#define QT_STATICPLUGIN
-#include <QtPlugin>
-
-QString pqCutPanelInterface::name() const
-{
-  return "Cut";
-}
-
-pqObjectPanel* pqCutPanelInterface::createPanel(pqProxy* proxy, QWidget* p)
-{
-  return new pqCutPanel(proxy, p);
-}
-
-bool pqCutPanelInterface::canCreatePanel(pqProxy* proxy) const
-{
-  return (proxy->getProxy()->GetXMLName() == QString("Cut") 
-    && proxy->getProxy()->GetXMLGroup() == QString("filters"));
-}
-
-Q_EXPORT_PLUGIN(pqCutPanelInterface)
-
 //////////////////////////////////////////////////////////////////////////////
 // pqCutPanel::pqImplementation
 

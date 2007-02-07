@@ -57,29 +57,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetItemObject.h"
 #include "ui_pqExodusPanel.h"
 
-// we include this for static plugins
-#define QT_STATICPLUGIN
-#include <QtPlugin>
-
-QString pqExodusPanelInterface::name() const
-{
-  return "ExodusReader";
-}
-
-pqObjectPanel* pqExodusPanelInterface::createPanel(pqProxy* proxy, QWidget* p)
-{
-  return new pqExodusPanel(proxy, p);
-}
-
-bool pqExodusPanelInterface::canCreatePanel(pqProxy* proxy) const
-{
-  return (QString("sources") == proxy->getProxy()->GetXMLGroup()
-    && QString("ExodusReader") == proxy->getProxy()->GetXMLName());
-}
-
-Q_EXPORT_PLUGIN(pqExodusPanelInterface)
-
-
 class pqExodusPanel::pqUI : public QObject, public Ui::ExodusPanel 
 {
 public:

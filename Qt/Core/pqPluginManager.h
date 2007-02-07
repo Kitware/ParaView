@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqObjectPanelLoader.h
+   Module:    pqPluginManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,38 +30,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqObjectPanelLoader_h
-#define _pqObjectPanelLoader_h
+#ifndef _pqPluginManager_h
+#define _pqPluginManager_h
 
 #include <QObject>
-#include <QStringList>
-#include "pqComponentsExport.h"
-class pqObjectPanelInterface;
-class pqObjectPanel;
-class pqProxy;
+#include "pqCoreExport.h"
 
-/// loader class that creates panels from plugins
-/// for now, it only supports static plugins
-class PQCOMPONENTS_EXPORT pqObjectPanelLoader : public QObject
+class pqServer;
+
+/// plugin loader takes care of loading plugins
+/// containing GUI extensions and server manager extensions
+class PQCORE_EXPORT pqPluginManager : public QObject
 {
   Q_OBJECT
 public:
-  /// constructor
-  pqObjectPanelLoader(QObject* p=0);
-  /// destructor
-  ~pqObjectPanelLoader();
+  pqPluginManager(QObject* p = 0);
+  ~pqPluginManager();
 
-  /// create a widget from a plugin
-  pqObjectPanel* createPanel(pqProxy* proxy,
-                              QWidget* parent = 0);
+  /// attempt to load a plugin
+  /// return true on success
+  bool loadPlugin(pqServer* server, const QString& lib);
 
-  QStringList availableWidgets() const;
+  /// return all interfaces that have been loaded
+  QObjectList interfaces();
+  
+signals:
+  /// signal for when an interface is loaded
+  void guiInterfaceLoaded(QObject* iface);
+  
+  /// signal for when some GUI XML is loaded
+  /// which can be used to add new readers/writers to the file dialog, etc..
+  void guiXMLLoaded(const QString& xml);
+
+  /// notification that new extensions were added to the server manager
+  void serverManagerExtensionLoaded();
 
 private:
-  QList<pqObjectPanelInterface*> PanelPlugins;
 
+  QObjectList Interfaces;
 };
 
 #endif
-
 

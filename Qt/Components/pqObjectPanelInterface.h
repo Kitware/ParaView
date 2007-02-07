@@ -55,7 +55,7 @@ public:
   virtual QString name() const = 0;
 };
 
-Q_DECLARE_INTERFACE(pqObjectPanelInterface, "com.kitware.paraview.objectpanel")
+Q_DECLARE_INTERFACE(pqObjectPanelInterface, "com.kitware/paraview/objectpanel")
 
 #endif
 

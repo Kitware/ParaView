@@ -37,37 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSlider>
 #include <QComboBox>
 
-// we include this for static plugins
-#define QT_STATICPLUGIN
-#include <QtPlugin>
-
-// VTK includes
-
-// ParaView Server Manager includes
-#include "vtkSMProxy.h"
-
-// ParaView includes
-#include "pqProxy.h"
-
-QString pqThresholdPanelInterface::name() const
-{
-  return "Threshold";
-}
-
-pqObjectPanel* pqThresholdPanelInterface::createPanel(pqProxy* object_proxy, QWidget* p)
-{
-  return new pqThresholdPanel(object_proxy, p);
-}
-
-bool pqThresholdPanelInterface::canCreatePanel(pqProxy* proxy) const
-{
-  return (QString("Threshold") == proxy->getProxy()->GetXMLName()
-     && QString("filters") == proxy->getProxy()->GetXMLGroup());
-}
-
-Q_EXPORT_PLUGIN(pqThresholdPanelInterface)
-
-
 pqThresholdPanel::pqThresholdPanel(pqProxy* pxy, QWidget* p) :
   pqLoadedFormObjectPanel(":/pqWidgets/UI/pqThresholdPanel.ui", pxy, p)
 {

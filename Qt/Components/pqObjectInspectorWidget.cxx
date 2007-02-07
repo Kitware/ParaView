@@ -56,6 +56,94 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqPipelineSource.h"
+#include "pqObjectPanelInterface.h"
+#include "pqCutPanel.h"
+#include "pqClipPanel.h"
+#include "pqCalculatorPanel.h"
+#include "pqStreamTracerPanel.h"
+#include "pqThresholdPanel.h"
+#include "pqContourPanel.h"
+#include "pqExodusPanel.h"
+#include "pqXDMFPanel.h"
+#include "pqPluginManager.h"
+
+
+class pqStandardCustomPanels : public QObject, public pqObjectPanelInterface
+{
+public:
+  pqStandardCustomPanels(QObject* p) : QObject(p) {}
+
+  QString name() const
+    {
+    return "StandardPanels";
+    }
+  pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p)
+    {
+    if(QString("filters") == proxy->getProxy()->GetXMLGroup())
+      {
+      if(QString("Cut") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqCutPanel(proxy, p);
+        }
+      if(QString("Clip") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqClipPanel(proxy, p);
+        }
+      if(QString("Calculator") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqCalculatorPanel(proxy, p);
+        }
+      if(QString("StreamTracer") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqStreamTracerPanel(proxy, p);
+        }
+      if(QString("Threshold") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqThresholdPanel(proxy, p);
+        }
+      if(QString("Contour") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqContourPanel(proxy, p);
+        }
+      }
+    if(QString("sources") == proxy->getProxy()->GetXMLGroup())
+      {
+      if(QString("ExodusReader") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqExodusPanel(proxy, p);
+        }
+      if(QString("XdmfReader") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqXDMFPanel(proxy, p);
+        }
+      }
+    return NULL;
+    }
+  bool canCreatePanel(pqProxy* proxy) const
+    {
+    if(QString("filters") == proxy->getProxy()->GetXMLGroup())
+      {
+      if(QString("Cut") == proxy->getProxy()->GetXMLName() ||
+         QString("Clip") == proxy->getProxy()->GetXMLName() ||
+         QString("Calculator") == proxy->getProxy()->GetXMLName() ||
+         QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||
+         QString("Threshold") == proxy->getProxy()->GetXMLName() ||
+         QString("Contour") == proxy->getProxy()->GetXMLName())
+        {
+        return true;
+        }
+      }
+    if(QString("sources") == proxy->getProxy()->GetXMLGroup())
+      {
+      if(QString("ExodusReader") == proxy->getProxy()->GetXMLName() ||
+         QString("XdmfReader") == proxy->getProxy()->GetXMLName())
+        {
+        return true;
+        }
+      }
+    return false;
+    }
+};
 
 //-----------------------------------------------------------------------------
 pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
@@ -65,6 +153,18 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 
   this->ForceModified = false;
   this->CurrentPanel = 0;
+
+  // get custom panels
+  this->StandardCustomPanels = new pqStandardCustomPanels(this);
+  QObjectList ifaces = 
+    pqApplicationCore::instance()->getPluginManager()->interfaces();
+  foreach(QObject* iface, ifaces)
+    {
+    this->addCustomPanel(iface);
+    }
+  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
+                   SIGNAL(guiInterfaceLoaded(QObject*)),
+                   this, SLOT(addCustomPanel(QObject*)));
   
   // main layout
   QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -213,8 +313,25 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     {
     const QString xml_name = proxy->getProxy()->GetXMLName();
       
-    // search static plugins for a panel
-    this->CurrentPanel = this->Loader.createPanel(proxy);
+    // search custom panels
+    foreach(pqObjectPanelInterface* iface, this->CustomPanels)
+      {
+      if (iface->canCreatePanel(proxy))
+        {
+        this->CurrentPanel = iface->createPanel(proxy, NULL);
+        break;
+        }
+      }
+    
+    // search standard custom panels
+    if(!this->CurrentPanel)
+      {
+      if (this->StandardCustomPanels->canCreatePanel(proxy))
+        {
+        this->CurrentPanel = 
+          this->StandardCustomPanels->createPanel(proxy, NULL);
+        }
+      }
 
     // if there's no panel from a plugin, check the ui resources
     if(!this->CurrentPanel)
@@ -364,4 +481,16 @@ void pqObjectInspectorWidget::setDeleteButtonVisibility(bool visible)
 }
 
 
+void pqObjectInspectorWidget::addCustomPanel(pqObjectPanelInterface* iface)
+{
+  if(iface)
+    {
+    this->CustomPanels.append(iface);
+    }
+}
+
+void pqObjectInspectorWidget::addCustomPanel(QObject* iface)
+{
+  this->addCustomPanel(qobject_cast<pqObjectPanelInterface*>(iface));
+}
 

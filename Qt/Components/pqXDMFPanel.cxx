@@ -65,10 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetItemObject.h"
 #include "ui_pqXDMFPanel.h"
 
-// we include this for static plugins
-#define QT_STATICPLUGIN
-#include <QtPlugin>
-
 // the purpose of this helper class is to remember what array selection
 // widgets are linked to what server properties so that we can control the call
 // backs when we need to rebuild
@@ -86,27 +82,6 @@ public:
   int CorP; //cell or point
   int location; //index in property
 };
-
-//----------------------------------------------------------------------------
-QString pqXDMFPanelInterface::name() const
-{
-  return "XDMFReader";
-}
-
-//----------------------------------------------------------------------------
-pqObjectPanel* pqXDMFPanelInterface::createPanel(pqProxy* proxy, QWidget* p)
-{
-  return new pqXDMFPanel(proxy, p);
-}
-
-//----------------------------------------------------------------------------
-bool pqXDMFPanelInterface::canCreatePanel(pqProxy* proxy) const
-{
-  return (QString("sources") == proxy->getProxy()->GetXMLGroup()
-    && QString("XdmfReader") == proxy->getProxy()->GetXMLName());
-}
-
-Q_EXPORT_PLUGIN(pqXDMFPanelInterface)
 
 class pqXDMFPanel::pqUI : public QObject, public Ui::XDMFPanel 
 {
