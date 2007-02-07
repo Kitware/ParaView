@@ -702,7 +702,6 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
   this->Internal->DontCreateDeleteViewsModules = false; 
   
   this->Internal->Frames.clear();
-  this->Internal->PendingFrames.clear();
   for(unsigned int cc=0; cc < rwRoot->GetNumberOfNestedElements(); cc++)
     {
     vtkPVXMLElement* elem = rwRoot->GetNestedElement(cc);
@@ -729,18 +728,31 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
       if (frame && view)
         {
         this->connect(frame, view);
-        if (frame->active())
-          {
-          frame->setActive(true);
-          }
-        else
-          {
-          this->onActivate(frame);
-          }
         }
       }
     }
+  pqMultiViewFrame* frame = 0;
+  if (this->Internal->Frames.size() > 0)
+    {
+    // Make the first frame active.
+    frame = this->Internal->Frames.begin().key();
+    }
+  else if (this->Internal->PendingFrames.size() > 0)
+    {
+    frame = this->Internal->PendingFrames[0];
+    }
 
+  if (frame)
+    {
+    if (frame->active())
+      {
+      this->onActivate(frame);
+      }
+    else
+      {
+      frame->setActive(true);
+      }
+    }
   return true;
 }
 

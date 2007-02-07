@@ -854,6 +854,7 @@ bool pqMainWindowCore::compareView(
   if (!renModule)
     {
     output << "ERROR: Could not locate the render module." << endl;
+    return false;
     }
 
   vtkRenderWindow* const render_window = 
