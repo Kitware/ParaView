@@ -72,7 +72,7 @@ public:
   void updateLODThresholdLabel(int value)
     {
     this->lodThresholdLabel->setText(
-      QVariant(value/10.0).toString() + " MBytes");
+      QString("%1").arg(value/10.0, 0, 'f', 2) + " MBytes");
     }
 
   void updateLODResolutionLabel(int value)
