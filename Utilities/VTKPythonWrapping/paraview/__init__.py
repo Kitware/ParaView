@@ -23,7 +23,7 @@ A simple example:
   paraview.ActiveConnection = paraview.Connect()
 
   # Creates a new render module on the active connection.
-  renModule = paraview.createRenderWindow()
+  renModule = paraview.CreateRenderWindow()
 
   # Create a new sphere proxy on the active connection.
   sphere = paraview.CreateProxy("sources", "SphereSource")
