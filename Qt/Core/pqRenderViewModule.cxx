@@ -123,7 +123,7 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   this->Internal->Viewport->setContextMenuPolicy(Qt::NoContextMenu);
   
   // add a link view menu
-  QAction* act = new QAction("Link View...", this);
+  QAction* act = new QAction("Link Camera...", this);
   this->addMenuAction(act);
   QObject::connect(act, SIGNAL(triggered(bool)),
                    this, SLOT(linkToOtherView()));
