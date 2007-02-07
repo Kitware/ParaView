@@ -25,7 +25,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.2");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.3");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -265,7 +265,7 @@ vtkHandleWidget* vtkTransferFunctionEditorWidgetSimple1D::CreateHandleWidget(
 
   // Now place the widget into the list of handle widgets.
   vtkNodeListIterator niter;
-  int i = 0;
+  unsigned int i = 0;
   for (niter = self->Nodes->begin(); niter != self->Nodes->end();
        niter++, i++)
     {

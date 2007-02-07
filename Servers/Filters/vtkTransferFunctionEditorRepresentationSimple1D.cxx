@@ -25,7 +25,7 @@
 #include "vtkViewport.h"
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.2");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.3");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -326,7 +326,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::RemoveHandle(
     }
 
   vtkHandleListIterator iter;
-  int i = 0;
+  unsigned int i = 0;
   for (iter = this->Handles->begin(); iter != this->Handles->end();
        iter++, i++)
     {
