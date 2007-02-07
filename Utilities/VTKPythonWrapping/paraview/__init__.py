@@ -708,7 +708,7 @@ def CreateDisplay(proxy, renModule):
     renModule.UpdateVTKObjects()
     return display
 
-def fetch(input, arg=None):
+def Fetch(input, arg=None):
    """ 
    A convenience method that moves data from the server to the client, 
    optionally performing some operation on the data as it moves.
