@@ -506,9 +506,9 @@ void pqViewManager::onConvertToTriggered(QAction* action)
 }
 
 //-----------------------------------------------------------------------------
-void pqViewManager::onFrameContextMenuRequested(QWidget* widget)
+void pqViewManager::onFrameContextMenuRequested(QWidget* wid)
 {
-  pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(widget);
+  pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(wid);
   if (frame)
     {
     this->updateConversionActions(frame);
