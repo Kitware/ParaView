@@ -30,9 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#define QT_STATICPLUGIN
-#include <QtPlugin>
-
 #include "pqComponentsInit.h"
 #include "pqCoreInit.h"
 
