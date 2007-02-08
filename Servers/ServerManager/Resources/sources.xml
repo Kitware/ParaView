@@ -26,6 +26,9 @@ The output of the 2D Glyph source is polygonal data.
          <Entry value="9" text="Arrow"/>
          <Entry value="10" text="ThickArrow"/>
        </EnumerationDomain>
+       <Documentation>
+         Select the glyph type.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -34,6 +37,9 @@ The output of the 2D Glyph source is polygonal data.
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Specify whether the glyph is filled (a polygon) or not (a closed polygon defined by line segments). This only applies to 2D closed glyphs.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -42,6 +48,9 @@ The output of the 2D Glyph source is polygonal data.
         number_of_elements="3"
         default_values="0.0 0.0 0.0" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Set the x, y, z coordinates of the origin of the 2D glyph.
+       </Documentation>
      </DoubleVectorProperty>
    <!-- End 2DGlyph -->
    </SourceProxy>
@@ -59,6 +68,9 @@ The output of the 3D Text source is polygonal data.
         command="SetText"
         number_of_elements="1"
         default_values="3D Text">
+        <Documentation>
+          Enter the text to display.
+        </Documentation>
      </StringVectorProperty>
    <!-- End 3DText -->
    </SourceProxy>
@@ -81,15 +93,22 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
          number_of_elements="1"
          default_values="6" >
         <IntRangeDomain name="range" min="1" max="128" />
+        <Documentation>
+          Set the number of faces on the tip.
+        </Documentation>
       </IntVectorProperty>
 
 <!-- TODO Why the arbitrary ranges? Check the arrow sources-->
+<!-- These arbitrary ranges come from the header file for vtkArrowSource.-->
       <DoubleVectorProperty
          name="TipRadius"
          command="SetTipRadius"
          number_of_elements="1"
          default_values="0.1" >
         <DoubleRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          Set the radius of the widest part of the tip.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -98,6 +117,9 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
          number_of_elements="1"
          default_values="0.35" >
         <DoubleRangeDomain name="range" min="0" max="1" />
+        <Documentation>
+          Set the length of the tip (the whole arrow is length 1).
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -106,6 +128,9 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
          number_of_elements="1"
          default_values="6" >
         <IntRangeDomain name="range" min="0" max="128" />
+        <Documentation>
+          Set the number of faces on the shaft.
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -114,6 +139,9 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
          number_of_elements="1"
          default_values="0.03" >
         <DoubleRangeDomain name="range" min="0" max="5" />
+        <Documentation>
+          Set the radius of the shaft.
+        </Documentation>
       </DoubleVectorProperty>
    <!-- End Arrow -->
    </SourceProxy>
@@ -134,6 +162,9 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
          number_of_elements="1"
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the size of the axes.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -142,6 +173,9 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the x, y, z coordinates of the origin of the axes.
+        </Documentation>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -150,6 +184,9 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to display the negative axes.
+       </Documentation>
      </IntVectorProperty>
    <!-- End Axes -->
    </SourceProxy>
@@ -164,9 +201,13 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
          command="SetBounds"
          number_of_elements="6"
          default_values="0 1 0 1 0 1" >
+         <Documentation>
+           Set the minimum and maximum X, Y, and Z coordinates (X min, X max, Y min, Y max, Z min, Z max) for drawing the outline.
+         </Documentation>
       </DoubleVectorProperty>
    <!-- End OutlineSource -->
    </SourceProxy>
+
    <SourceProxy name="CubeSource" class="vtkCubeSource">
       <Documentation
          long_help="3D box with specified X, Y, and Z lengths." 
@@ -185,6 +226,9 @@ The output of the Box source is polygonal data containing both normals and textu
          animateable="1"
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the length of the cube in the x direction.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -194,6 +238,9 @@ The output of the Box source is polygonal data containing both normals and textu
          animateable="1"
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the length of the cube in the y direction.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -203,6 +250,9 @@ The output of the Box source is polygonal data containing both normals and textu
          animateable="1"
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the length of the cube in the z direction.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -212,6 +262,9 @@ The output of the Box source is polygonal data containing both normals and textu
          animateable="1"
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the center of the cube.
+        </Documentation>
       </DoubleVectorProperty>
    <!-- End Box -->
    </SourceProxy>
@@ -234,6 +287,9 @@ The output of the Cone source is polygonal data.
          animateable="1"
          default_values="6" >
         <IntRangeDomain name="range" min="0" max="512" />
+        <Documentation>
+          Set the number of faces on the cone.
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -243,6 +299,9 @@ The output of the Cone source is polygonal data.
          animateable="1"
          default_values="0.5" >
         <DoubleRangeDomain name="range" min="0"/>
+        <Documentation>
+          Set the radius of the base of the cone.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -252,6 +311,9 @@ The output of the Cone source is polygonal data.
          animateable="1"
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the height of the cone.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -260,6 +322,9 @@ The output of the Cone source is polygonal data.
          number_of_elements="3"
          animateable="1"
          default_values="0.0 0.0 0.0" >
+         <Documentation>
+           Set the center of the cone.
+         </Documentation>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -269,6 +334,9 @@ The output of the Cone source is polygonal data.
         animateable="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Set whether to draw the base of the cone.
+       </Documentation>
      </IntVectorProperty>
    <!-- End Cone -->
    </SourceProxy>
@@ -284,6 +352,9 @@ The output of the Cone source is polygonal data.
          number_of_elements="1"
          default_values="10" >
         <IntRangeDomain name="range" min="2" max="64" />
+        <Documentation>
+          XYZ cell dimensions of a block
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -292,6 +363,9 @@ The output of the Cone source is polygonal data.
          number_of_elements="1"
          default_values="9.5" >
         <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Map this value to 0.5 for use as a volume fraction.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -300,6 +374,9 @@ The output of the Cone source is polygonal data.
          number_of_elements="1"
          default_values="5" >
         <IntRangeDomain name="range" min="1" max="10" />
+        <Documentation>
+          Determines how deep to refine the grid.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -308,6 +385,9 @@ The output of the Cone source is polygonal data.
          number_of_elements="1"
          default_values="1">
         <BooleanDomain name="bool"/>
+        <Documentation>
+          Set whether to generate overlapping ghost levels.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -316,6 +396,9 @@ The output of the Cone source is polygonal data.
          number_of_elements="1"
          default_values="1">
         <BooleanDomain name="bool"/>
+        <Documentation>
+          Generate a 2D AMR fractal.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -324,6 +407,9 @@ The output of the Cone source is polygonal data.
          number_of_elements="1"
          default_values="0">
         <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify whether all the blocks should be the same size. If the dataset is asymetric, some blocks will have an X dimension that is larger by 2.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -332,6 +418,9 @@ The output of the Cone source is polygonal data.
          number_of_elements="1"
          default_values="0">
         <BooleanDomain name="bool"/>
+        <Documentation>
+          Set whether to generate rectilinear grids or uniform grids.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty 
@@ -351,6 +440,9 @@ The output of the Cone source is polygonal data.
               <Property name="TimeStepRangeInfo" function="Range"/>
            </RequiredProperties>
         </IntRangeDomain>
+        <Documentation>
+          Set the current timestep.
+        </Documentation>
       </IntVectorProperty>
 
    <!-- End HierarchicalFractal -->
@@ -374,6 +466,9 @@ The output of the Cylinder source is polygonal data containing both normals and 
          number_of_elements="1"
          default_values="6" >
         <IntRangeDomain name="range" min="2" max="512" />
+        <Documentation>
+          Set the number of facets used to define the cylinder.
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -383,6 +478,9 @@ The output of the Cylinder source is polygonal data containing both normals and 
          animateable="1"
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the height of the cylinder (along the y axis).
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -391,6 +489,9 @@ The output of the Cylinder source is polygonal data containing both normals and 
          number_of_elements="1"
          default_values="0.5" >
         <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the radius of the cylinder.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -400,6 +501,9 @@ The output of the Cylinder source is polygonal data containing both normals and 
          animateable="1"
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the center of the cylinder.
+        </Documentation>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -408,6 +512,9 @@ The output of the Cylinder source is polygonal data containing both normals and 
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Set whether to draw the ends of the cylinder.
+       </Documentation>
      </IntVectorProperty>
    <!-- End Cylinder -->
    </SourceProxy>
@@ -430,6 +537,9 @@ The output of the Line source is polygonal data.
          animateable="1"
          default_values="0.0 0.0 0.0" >
          <DoubleRangeDomain name="range" />
+         <Documentation>
+           Set the coordinates of the first endpoint of the line.
+         </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -439,6 +549,9 @@ The output of the Line source is polygonal data.
          animateable="1"
          default_values="0.0 0.0 0.0" >
          <DoubleRangeDomain name="range" />
+         <Documentation>
+           Set the coordinates of the second endpoint of the line.
+         </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -447,6 +560,9 @@ The output of the Line source is polygonal data.
          number_of_elements="1"
          default_values="6" >
         <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Set the number of pieces to divide the line into.
+        </Documentation>
       </IntVectorProperty>
 
       <Hints>
@@ -477,6 +593,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="6"
          default_values="0 250 0 250 0 0" >
         <IntRangeDomain name="range"/>
+        <Documentation>
+          Set the minimum and maximum values of the dataset in each dimension.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -485,6 +604,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="3"
          default_values="0 1 2" >
         <IntRangeDomain name="range"/>
+        <Documentation>
+          Choose which axes of the data set to display.
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -493,6 +615,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="4"
          default_values="-1.75 -1.25 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the imaginary and real values for C (constant) and X (initial value).
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -501,6 +626,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="4"
          default_values="2.5 2.5 2.0 1.5" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the imaginary and real values for the size of the volume for C (constant) and X (initial value).
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -510,6 +638,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          animateable="1"
          default_values="100" >
         <IntRangeDomain name="range" min="1" max="5000" />
+        <Documentation>
+          Set the limit on computational iterations. Values less than 2.0 after the specified number of iterations are considered in the fractal set.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -518,6 +649,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="1" >
         <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Set the rate at which to subsample the volume. The extent of the dataset in each dimension will be divided by this value.
+        </Documentation>
       </IntVectorProperty>
    <!-- End Mandelbrot -->
    </SourceProxy>
@@ -533,6 +667,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="2" >
         <IntRangeDomain name="range" min="1" max="3" />
+        <Documentation>
+          Set the dimensionality of the fractal: 1D - Binary tree line, 2D - Quadtree plane, 3D - Octree volume.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -541,6 +678,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="5" >
         <IntRangeDomain name="range" min="2" max="11" />
+        <Documentation>
+          Specify the maximum refinement level for the grid.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -549,6 +689,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="3" >
         <IntRangeDomain name="range" min="1" max="10" />
+        <Documentation>
+          Specify the minimum refinement level for the grid.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -557,6 +700,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="3"
          default_values="0 1 2" >
         <IntRangeDomain name="range"/>
+        <Documentation>
+          Choose which axes of the data set to display.
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -565,6 +711,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="4"
          default_values="-1.75 -1.25 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the imaginary and real values for C (constant) and X (initial value).
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -573,6 +722,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="4"
          default_values="2.5 2.5 2.0 1.5" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the imaginary and real values for the size of the volume for C (constant) and X (initial value).
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -582,6 +734,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          animateable="1"
          default_values="100" >
         <IntRangeDomain name="range" min="1" max="5000" />
+        <Documentation>
+          Specify the limit on computational iterations. Values less than 2.0 after the specified number of iterations are considered in the fractal set.
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -590,6 +745,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="2.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The threshold value determine when to subdivide a leaf node.
+        </Documentation>
       </DoubleVectorProperty>      
 
    <!-- End OctreeFractal -->
@@ -614,6 +772,9 @@ The output of the Plane source is polygonal data.
          animateable="1"
          default_values="-0.5 -0.5 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the position of the origin of the plane.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -623,6 +784,9 @@ The output of the Plane source is polygonal data.
          animateable="1"
          default_values="0.5 -0.5 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the position of the point defining the first axis of the plane.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -632,6 +796,9 @@ The output of the Plane source is polygonal data.
          animateable="1"
          default_values="-0.5 0.5 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the position of the point defining the second axis of the plane.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -640,6 +807,9 @@ The output of the Plane source is polygonal data.
          number_of_elements="1"
          default_values="1" >
         <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Set the number of divisions along the X axis.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -648,11 +818,18 @@ The output of the Plane source is polygonal data.
          number_of_elements="1"
          default_values="1" >
         <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Set the number of divisions along the Y axis.
+        </Documentation>
       </IntVectorProperty>
    <!-- End Plane -->
    </SourceProxy>
 
    <SourceProxy name="PointSource" class="vtkPointSource">
+      <Documentation long_help="Create a point cloud of a certain size, radius, and center."
+                     short_help="Create a point cloud.">
+The point source creates a specified number of points within a given radius about a specified center point. 
+      </Documentation>
       <DoubleVectorProperty
          name="Center"
          command="SetCenter"
@@ -660,6 +837,9 @@ The output of the Plane source is polygonal data.
          animateable="1"
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the center of the point cloud.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -669,6 +849,9 @@ The output of the Plane source is polygonal data.
          animateable="1"
          default_values="1" >
          <IntRangeDomain name="range" min="1"/>
+         <Documentation>
+           Set the number of points in the point cloud.
+         </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -678,6 +861,9 @@ The output of the Plane source is polygonal data.
          animateable="1"
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0"/>
+        <Documentation>
+          Set the radius of the point cloud, measured from the specified center point.
+        </Documentation>
       </DoubleVectorProperty>
 
       <Hints>
@@ -713,6 +899,9 @@ The output of the Sphere source is polygonal data with point normals defined.
          animateable="1"
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the coordinates for the center of the sphere.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -722,6 +911,9 @@ The output of the Sphere source is polygonal data with point normals defined.
          animateable="1"
          default_values="0.5" >
         <DoubleRangeDomain name="range" min="0"/>
+        <Documentation>
+          Set the radius of the sphere.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -730,6 +922,9 @@ The output of the Sphere source is polygonal data with point normals defined.
          number_of_elements="1"
          default_values="8" >
         <IntRangeDomain name="range" min="3" max="1024" />
+        <Documentation>
+          Set the number of points in the longitudinal direction (ranging from StartTheta to EndTheta).
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -739,6 +934,9 @@ The output of the Sphere source is polygonal data with point normals defined.
          animateable="1"
          default_values="0" >
         <DoubleRangeDomain name="range" min="0" max="360" />
+        <Documentation>
+          Set the starting angle (in degrees) in the longitudinal direction.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -748,6 +946,9 @@ The output of the Sphere source is polygonal data with point normals defined.
          animateable="1"
          default_values="360" >
         <DoubleRangeDomain name="range" min="0" max="360" />
+        <Documentation>
+          Set the ending angle (in degrees) in the longitudinal direction.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -756,6 +957,9 @@ The output of the Sphere source is polygonal data with point normals defined.
          number_of_elements="1"
          default_values="8" >
         <IntRangeDomain name="range" min="3" max="1024" />
+        <Documentation>
+          Set the number of points in the latitudinal direction (ranging from StartPhi to EndPhi).
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -765,6 +969,9 @@ The output of the Sphere source is polygonal data with point normals defined.
          animateable="1"
          default_values="0" >
         <DoubleRangeDomain name="range" min="0" max="180" />
+        <Documentation>
+          Set the starting angle (in degrees) in the latitudinal direction.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -774,6 +981,9 @@ The output of the Sphere source is polygonal data with point normals defined.
          animateable="1"
          default_values="180" >
         <DoubleRangeDomain name="range" min="0" max="180" />
+        <Documentation>
+          Set the ending angle (in degrees) in the latitudinal direction.
+        </Documentation>
       </DoubleVectorProperty>
    <!-- End Sphere -->
    </SourceProxy>
@@ -802,6 +1012,9 @@ The output of the Superquadric source is polygonal data with point normals and t
          animateable="1"
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the coordinates of the center of the superquadric.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -810,6 +1023,9 @@ The output of the Superquadric source is polygonal data with point normals and t
          number_of_elements="3"
          default_values="1.0 1.0 1.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the scale of the superquadric along the X, Y, and Z axes.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -818,6 +1034,9 @@ The output of the Superquadric source is polygonal data with point normals and t
          number_of_elements="1"
          default_values="16" >
         <IntRangeDomain name="range" min="8" max="1024" />
+        <Documentation>
+          Set the number of points in the longitudinal direction.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -826,6 +1045,9 @@ The output of the Superquadric source is polygonal data with point normals and t
          number_of_elements="1"
          default_values="16" >
         <IntRangeDomain name="range" min="4" max="1024" />
+        <Documentation>
+          Set the number of points in the latitudinal direction.
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -834,6 +1056,9 @@ The output of the Superquadric source is polygonal data with point normals and t
          number_of_elements="1"
          default_values="0.3333" >
         <DoubleRangeDomain name="range" min="0.0001" max="1" />
+        <Documentation>
+          When the superquadric is toroidal, specify the distance between the inner and outer radii of the superquadric. Changing the thickness does not change the outer radius of the superquadric.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -842,7 +1067,10 @@ The output of the Superquadric source is polygonal data with point normals and t
          number_of_elements="1"
          animateable="1"
          default_values="1" >
-        <DoubleRangeDomain name="range" min="0.01" max="1" />
+        <DoubleRangeDomain name="range" min="0.01" />
+        <Documentation>
+          Specify how round the superquadric will be in the longitudinal direction. Values range from 0 (rectangular) to 1 (circular) to higher order.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -851,7 +1079,10 @@ The output of the Superquadric source is polygonal data with point normals and t
          number_of_elements="1"
          animateable="1"
          default_values="1" >
-        <DoubleRangeDomain name="range" min="0.01" max="1" />
+        <DoubleRangeDomain name="range" min="0.01" />
+        <Documentation>
+          Specify how round the superquadric will be in the latitudinal direction. Values range from 0 (rectangular) to 1 (circular) to higher order.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -860,6 +1091,9 @@ The output of the Superquadric source is polygonal data with point normals and t
          number_of_elements="1"
          default_values="0.5" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Specify the isotropic size of the superquadric.
+        </Documentation>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -869,6 +1103,9 @@ The output of the Superquadric source is polygonal data with point normals and t
         animateable="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Determine whether the superquadric is toroidal or ellipsoidal.
+       </Documentation>
      </IntVectorProperty>
    <!-- End SuperQuadric -->
    </SourceProxy>
@@ -898,6 +1135,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          number_of_elements="6"
          default_values="-10 10 -10 10 -10 10" >
         <IntRangeDomain name="range"/>
+        <Documentation>
+          Set the range (dimensions) of the function along the X, Y, and Z axes.
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -907,6 +1147,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          animateable="1"
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the center of the dataset.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -915,6 +1158,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="255.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the maximum value of the function.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -924,6 +1170,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          animateable="1"
          default_values="60.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the natural frequency in X.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -933,6 +1182,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          animateable="1"
          default_values="30.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the natural frequency in Y.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -942,6 +1194,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          animateable="1"
          default_values="40.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the natural frequency in Y.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -950,6 +1205,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="10.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the wave amplitude in X.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -958,6 +1216,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="18.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the wave amplitude in Y.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -966,6 +1227,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="5.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the wave amplitude in Z.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -974,6 +1238,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="0.5" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the standard deviation of the gaussian used in computing this function.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -982,6 +1249,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="1" >
         <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Set the rate at which to subsample the volume. The extent of the dataset in each dimension will be divided by this value.
+        </Documentation>
       </IntVectorProperty>
    <!-- End Wavelet -->
    </SourceProxy>
@@ -993,6 +1263,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          number_of_elements="1"
          default_values="6" >
         <IntRangeDomain name="range" min="1" max="128" />
+        <Documentation>
+          Set the number of faces used to generate the cone.
+        </Documentation>
       </IntVectorProperty>
    <!-- End Test3DWidget -->
    </SourceProxy>
