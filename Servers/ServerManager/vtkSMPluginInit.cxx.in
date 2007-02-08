@@ -1,0 +1,37 @@
+
+#include "@XML_HEADER@"
+
+class vtkClientServerInterpreter;
+
+extern "C" void @MODULE_NAME@_Initialize(vtkClientServerInterpreter *arlu);
+
+namespace {
+  class StaticInit
+  {
+    public:
+    StaticInit()
+    {
+      XMLString = @XML_GET_INTERFACE@();
+    }
+    ~StaticInit()
+    {
+      delete [] XMLString;
+    }
+    char* XMLString;
+  };
+}
+
+// entry point to get XML as a string
+extern "C" const char* ModuleXML()
+{
+  static StaticInit staticinit;
+  return staticinit.XMLString;
+}
+
+// entry point to initialize this module with the client/server interpreter
+extern "C" const char* ModuleInit(vtkClientServerInterpreter *arlu)
+{
+  @MODULE_NAME@_Initialize(arlu);
+}
+
+

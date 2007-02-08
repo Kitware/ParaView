@@ -2353,6 +2353,34 @@
 
       <!-- End of TimeKeeper -->
     </Proxy>
+    
+    <Proxy name="PluginLoader" class="vtkSMPluginLoader">
+      <StringVectorProperty
+        name="Plugin"
+        command="LoadPlugin"
+        number_of_elements="1"
+        default_values="0">
+      </StringVectorProperty>
+      
+      <IntVectorProperty
+        name="Loaded"
+        command="GetLoaded"
+        number_of_elements="1"
+        information_only="1"
+        default_values="0">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      
+      <StringVectorProperty
+        name="ServerManagerXML"
+        command="GetServerManagerXML"
+        number_of_elements="1"
+        information_only="1">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+
+      <!-- End of PluginLoader -->
+    </Proxy>
 
   </ProxyGroup>
 

@@ -93,6 +93,7 @@ SET(Kit_SRCS
   vtkSMPart.cxx
   vtkSMPickLineWidgetProxy.cxx
   vtkSMPickPointWidgetProxy.cxx
+  vtkSMPluginLoader.cxx
   vtkSMPointWidgetProxy.cxx 
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
