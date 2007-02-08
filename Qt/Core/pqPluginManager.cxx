@@ -38,8 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMXMLParser.h"
 #include "vtkProcessModule.h"
 #include "vtkSMObject.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxy.h"
 
 #include "pqPlugin.h"
+#include "pqServer.h"
+#include "pqSMAdaptor.h"
 
 pqPluginManager::pqPluginManager(QObject* p)
   : QObject(p)
@@ -55,56 +59,60 @@ QObjectList pqPluginManager::interfaces()
   return this->Interfaces;
 }
 
-bool pqPluginManager::loadPlugin(pqServer* /*server*/, const QString& lib)
+bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
 {
   bool success = false;
 
   // look for SM stuff in the plugin
-  QLibrary plugin(lib);
-  if(plugin.load())
+  if(server)
     {
-    // TODO  support server side loading
-    typedef const char* (*ModuleXML)();
-    typedef void (*ModuleInit)(vtkClientServerInterpreter*);
-    ModuleXML modxml = (ModuleXML)plugin.resolve("ModuleXML");
-    ModuleInit modinit = (ModuleInit)plugin.resolve("ModuleInit");
-
-    // module consists of either xml&init or just xml
-    if(modxml && modinit)
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMProxy* pxy = pxm->NewProxy("misc", "PluginLoader");
+    if(pxy && !lib.isEmpty())
       {
-      (*modinit)(vtkProcessModule::GetProcessModule()->GetInterpreter());
-      }
-    
-    if(modxml)
-      {
-      success = true;
-      const char* xml = (*modxml)();
-      vtkSMXMLParser* parser = vtkSMXMLParser::New();
-      parser->Parse(xml);
-      parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
-      parser->Delete();
-      emit this->serverManagerExtensionLoaded();
-      }
-
-    QPluginLoader qplugin(lib);
-    qplugin.load();
-    pqPlugin* pqplugin = qobject_cast<pqPlugin*>(qplugin.instance());
-    if(pqplugin)
-      {
-      success = true;
-      QObjectList ifaces = pqplugin->interfaces();
-      foreach(QObject* iface, ifaces)
+      vtkSMProperty* prop = pxy->GetProperty("Plugin");
+      pqSMAdaptor::setElementProperty(prop, lib);
+      pxy->SetConnectionID(server->GetConnectionID());
+      pxy->UpdateVTKObjects();
+      pxy->UpdatePropertyInformation();
+      prop = pxy->GetProperty("Loaded");
+      success = pqSMAdaptor::getElementProperty(prop).toInt();
+      if(success)
         {
-        this->Interfaces.append(iface);
-        emit this->guiInterfaceLoaded(iface);
+        prop = pxy->GetProperty("ServerManagerXML");
+        QString xml = pqSMAdaptor::getElementProperty(prop).toString();
+        if(!xml.isEmpty())
+          {
+          vtkSMXMLParser* parser = vtkSMXMLParser::New();
+          parser->Parse(xml.toAscii().data());
+          parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
+          parser->Delete();
+          emit this->serverManagerExtensionLoaded();
+          }
+        pxy->UnRegister(NULL);
         }
       }
     }
 
-  // this is not a paraview plugin, unload it
-  if(success == false && plugin.isLoaded())
+  // check if this plugin has gui stuff in it
+  QPluginLoader qplugin(lib);
+  qplugin.load();
+  pqPlugin* pqplugin = qobject_cast<pqPlugin*>(qplugin.instance());
+  if(pqplugin)
     {
-    plugin.unload();
+    success = true;
+    QObjectList ifaces = pqplugin->interfaces();
+    foreach(QObject* iface, ifaces)
+      {
+      this->Interfaces.append(iface);
+      emit this->guiInterfaceLoaded(iface);
+      }
+    }
+
+  // this is not a paraview plugin, unload it
+  if(success == false && qplugin.isLoaded())
+    {
+    qplugin.unload();
     }
 
   return success;
