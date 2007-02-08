@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.15");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -302,45 +302,6 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
     }
   vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
     this->UpdateSuppressorProxy->GetServers(), stream);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMGenericViewDisplayProxy::SetupCollectionFilter(
-  vtkSMProxy* collectProxy)
-{ 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  int i, num;
-
-  vtkClientServerStream stream;
-
-  num = collectProxy->GetNumberOfIDs();
-  for (i = 0; i < num; ++i)
-    {
-    stream
-      << vtkClientServerStream::Invoke
-      << collectProxy->GetID(i) << "SetMoveModeToCollect"
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << collectProxy->GetID(i) << "SetServerToDataServer"
-      << vtkClientServerStream::End;
-    int mask = ~vtkProcessModule::CLIENT;
-    pm->SendStream(this->ConnectionID,
-                   collectProxy->GetServers() & mask,
-                   stream);
-    stream
-      << vtkClientServerStream::Invoke
-      << collectProxy->GetID(i) << "SetMoveModeToCollect"
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << collectProxy->GetID(i) << "SetServerToClient"
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::CLIENT,
-                   stream);
-    }
 }
 
 //-----------------------------------------------------------------------------

@@ -93,10 +93,8 @@ protected:
 
   virtual void CreateVTKObjects(int numObjects);
 
-  // Description:
-  // Connect the VTK data object to display pipeline.
   void SetInput(vtkSMProxy* input);
-  void SetupCollectionFilter(vtkSMProxy* collectProxy);
+
   int UpdateRequiredFlag;
 
 private:
