@@ -1283,6 +1283,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
        name="Text"
        number_of_elements="1"
        default_values="Text">
+        <Documentation>
+          Enter the text to display.
+        </Documentation>
      </StringVectorProperty>
 
    <!-- End of TextSource -->
