@@ -79,7 +79,11 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
 #if defined(CMAKE_INTDIR)
   package_dir += "/..";
 #endif
+#if defined (__APPLE__)
+  package_dir += "/../../../../Utilities/VTKPythonWrapping";
+#else
   package_dir += "/../Utilities/VTKPythonWrapping";
+#endif
   package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
   if(vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
     {
@@ -181,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.7");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.8");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
