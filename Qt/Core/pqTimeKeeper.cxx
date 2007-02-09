@@ -138,6 +138,13 @@ QPair<double, double> pqTimeKeeper::getTimeRange() const
 }
 
 //-----------------------------------------------------------------------------
+double pqTimeKeeper::getTime() const
+{
+  return pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("Time")).toDouble();  
+}
+
+//-----------------------------------------------------------------------------
 void pqTimeKeeper::sourceAdded(pqPipelineSource* source)
 {
   vtkSMProxy* proxy = source->getProxy();

@@ -40,10 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 
 class pqConsumerDisplay;
+class pqGenericViewModule;
 class pqPipelineSourceInternal;
 class vtkObject;
-class pqGenericViewModule;
-
+class vtkPVDataInformation;
 
 /// PQ representation for a vtkSMProxy that can be involved in a pipeline.
 /// i.e that can have input and/or output. The public API is to observe
@@ -101,12 +101,19 @@ public:
   /// (if applicable) has been set.
   void setDefaultValues();
 
-
   /// Returns if this proxy replaces input on creation.
   /// This checks the "Hints" for the proxy, if any. If a <Visibility>
   /// element is present with replace_input="0", then this method
   /// returns false, otherwise true.
   bool replaceInput() const;
+
+  /// Before a source's output datainformation can be examined, we have
+  /// to make sure that the first update is called through a display
+  /// with correctly set UpdateTime. If not, the source will
+  /// be updated with incorrect time. Using this method,
+  /// (instead of directly calling vtkSMSourceProxy::GetDataInformation())
+  /// ensures this.
+  vtkPVDataInformation* getDataInformation() const;
 
 signals:
   /// fired when a connection is created between two pqPipelineSources.

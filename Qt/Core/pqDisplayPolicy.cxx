@@ -31,10 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqDisplayPolicy.h"
 
+#include "vtkPVDataInformation.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkPVXMLElement.h"
+#include "vtkSMSourceProxy.h"
 
 #include <QtDebug>
 #include <QString>
@@ -73,16 +75,28 @@ bool pqDisplayPolicy::canDisplay(const pqPipelineSource* source,
     return false;
     }
 
-  // FIXME: Alternatively, we may want to check the source output
-  // data type to decide whether the output can be plotted.
+  // Based on type of view, we check is the source's output 
+  // is of the expected type.
   QString viewProxyName = view->getProxy()->GetXMLName();
   QString srcProxyName = source->getProxy()->GetXMLName();
 
   if (viewProxyName == "BarChartViewModule")
     {
-    return (srcProxyName == "ExtractHistogram");
-    }
+    vtkPVDataInformation* dataInfo = source->getDataInformation();
+    if (dataInfo)
+      {
+      int extent[6];
+      dataInfo->GetExtent(extent);
+      int non_zero_dims = 0;
+      for (int cc=0; cc < 3; cc++)
+        {
+        non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
+        }
 
+      return (dataInfo->GetDataClassName() == QString("vtkRectilinearGrid")) &&
+        (non_zero_dims == 1);
+      }
+    }
   if (viewProxyName == "XYPlotViewModule")
     {
     return (srcProxyName == "Probe2");
@@ -183,6 +197,12 @@ pqConsumerDisplay* pqDisplayPolicy::createPreferredDisplay(
   pqPipelineSource* source, pqGenericViewModule* view,
   bool dont_create_view) const
 {
+  if (source)
+    {
+    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(source->getProxy());
+    // ensure parts are created.
+    sp->CreateParts();
+    }
   if (!view && dont_create_view)
     {
     return NULL;

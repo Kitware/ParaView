@@ -39,10 +39,10 @@ class vtkSMProxy;
 class pqPipelineSource;
 class vtkObject;
 
-// pqTimeKeeper is pqProxy for "TimeKeeper" proxy. A timekeeper is
-// created by default per connection. pqServer keeps a pointer to the 
-// connection's time keeper. A time keeper keeps track of the
-// global time and timesteps available currently.
+/// pqTimeKeeper is pqProxy for "TimeKeeper" proxy. A timekeeper is
+/// created by default per connection. pqServer keeps a pointer to the 
+/// connection's time keeper. A time keeper keeps track of the
+/// global time and timesteps available currently.
 class PQCORE_EXPORT pqTimeKeeper : public pqProxy 
 {
   Q_OBJECT;
@@ -51,18 +51,21 @@ public:
     vtkSMProxy* timekeeper, pqServer* server, QObject* parent=0);
   virtual ~pqTimeKeeper();
 
-  // Returns the number of timestep values
-  // known to this time keeper.
+  /// Returns the number of timestep values
+  /// known to this time keeper.
   int getNumberOfTimeStepValues() const;
 
-  // Returns the time range. 
-  // Return (0,0) is getNumberOfTimeStepValues() == 0.
+  /// Returns the time range. 
+  /// Return (0,0) is getNumberOfTimeStepValues() == 0.
   QPair<double, double> getTimeRange() const;
+
+  /// Returns the current time.
+  double getTime() const;
 signals:
-  // Fired when the keeper updates the times.
+  /// Fired when the keeper updates the times.
   void timeStepsChanged();
 
-  // Internal signal.
+  /// Internal signal.
   void triggerInitialization();
 public slots:
   void sourceAdded(pqPipelineSource*);

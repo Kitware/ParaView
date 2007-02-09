@@ -105,6 +105,10 @@ public:
   vtkPVDataInformation* GetDataInformation();
 
   // Description:
+  // Returns if the data information is currently valid.
+  vtkGetMacro(DataInformationValid, int);
+
+  // Description:
   // Chains to superclass as well as mark the data information as
   // invalid (next time data information is requested, it will be
   // re-created).

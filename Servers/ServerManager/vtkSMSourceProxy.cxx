@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.43");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.44");
 
 struct vtkSMSourceProxyInternals
 {
@@ -531,4 +531,5 @@ int vtkSMSourceProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
 void vtkSMSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "DataInformationValid: " << this->DataInformationValid << endl;
 }

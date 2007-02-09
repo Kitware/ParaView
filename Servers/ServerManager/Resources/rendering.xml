@@ -3644,28 +3644,7 @@
   </ProxyGroup>
 
   <ProxyGroup name="displays">
-    <GenericViewDisplayProxy name="GenericViewDisplay">
-       <InputProperty
-        name="Input"
-        command="SetInput-not-used"
-        update_self="1">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-          <Group name="glyph_sources" />
-        </ProxyGroupDomain>
-        <InputArrayDomain 
-          name="input_array_any" 
-          attribute_type="any" />
-        <InputArrayDomain 
-          name="input_array_cell" 
-          attribute_type="cell"
-          number_of_components="1"/>
-        <InputArrayDomain 
-          name="input_array_point" 
-          attribute_type="point"
-          number_of_components="1"/>
-      </InputProperty>
+    <Proxy name="GenericViewDisplayBase">
       <Property
         name="Update"
         command="Update"
@@ -3711,15 +3690,60 @@
           <Property name="PassThrough" />
         </ExposedProperties>
       </SubProxy>
+    </Proxy>
 
+    <GenericViewDisplayProxy name="GenericViewDisplay"
+      base_proxygroup="displays" base_proxyname="GenericViewDisplayBase">
+       <InputProperty
+        name="Input"
+        command="SetInput-not-used"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+          <Group name="glyph_sources" />
+        </ProxyGroupDomain>
+        <InputArrayDomain 
+          name="input_array_any" 
+          attribute_type="any" />
+        <InputArrayDomain 
+          name="input_array_cell" 
+          attribute_type="cell"
+          number_of_components="1"/>
+        <InputArrayDomain 
+          name="input_array_point" 
+          attribute_type="point"
+          number_of_components="1"/>
+      </InputProperty>
     </GenericViewDisplayProxy>
 
     <GenericViewDisplayProxy name="BarChartDisplay"
-      base_proxygroup="displays" base_proxyname="GenericViewDisplay">
+      base_proxygroup="displays" base_proxyname="GenericViewDisplayBase">
       <!-- All properties here are non-command properties, since
         we don't have any special proxy for BarChartDisplay. 
         We have properties which aid the GUI is "drawing" this display.
       -->
+       <InputProperty
+        name="Input"
+        command="SetInput-not-used"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+          <Group name="glyph_sources" />
+        </ProxyGroupDomain>
+        <InputArrayDomain 
+          name="input_array_cell" 
+          attribute_type="cell"
+          number_of_components="1"/>
+        <InputArrayDomain 
+          name="input_array_point" 
+          attribute_type="point"
+          number_of_components="1"/>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkRectilinearGrid"/>
+        </DataTypeDomain>
+      </InputProperty>
       <ProxyProperty
         name="LookupTable">
         <!--
@@ -3772,7 +3796,7 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
+      <!-- End of BarChartDisplay -->
     </GenericViewDisplayProxy>
 
     <GenericViewDisplayProxy name="TableDisplay"

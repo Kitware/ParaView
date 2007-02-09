@@ -36,14 +36,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 
 // ParaView Server Manager.
+#include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxy.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMPropertyLink.h"
+#include "vtkSMSourceProxy.h"
 
 // Qt
 #include <QList>
@@ -51,9 +53,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView
-#include "pqGenericViewModule.h"
 #include "pqConsumerDisplay.h"
+#include "pqGenericViewModule.h"
 #include "pqPipelineFilter.h"
+#include "pqServer.h"
+#include "pqSMAdaptor.h"
+#include "pqTimeKeeper.h"
 #include "pqXMLUtil.h"
 
 //-----------------------------------------------------------------------------
@@ -370,6 +375,7 @@ void pqPipelineSource::renderAllViews(bool force /*=false*/)
       }
     }
 }
+
 //-----------------------------------------------------------------------------
 bool pqPipelineSource::replaceInput() const
 {
@@ -400,4 +406,40 @@ bool pqPipelineSource::replaceInput() const
     return (replace_input==1);
     }
   return true; // default value.
+}
+
+//-----------------------------------------------------------------------------
+vtkPVDataInformation* pqPipelineSource::getDataInformation() const
+{
+  vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
+    this->getProxy());
+  // If parts haven't been created, it implies that the
+  // source has never been accepted. In that case
+  // forcing a pipeline update can raise errors, hence we dont 
+  // try to get any data information.
+  if (!proxy || proxy->GetNumberOfParts() == 0)
+    {
+    return 0;
+    }
+
+  if (this->getDisplayCount() > 0 || proxy->GetDataInformationValid())
+    {
+    return proxy->GetDataInformation();
+    }
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMAbstractDisplayProxy* display = vtkSMAbstractDisplayProxy::SafeDownCast(
+      pxm->NewProxy("displays", "GenericViewDisplay"));
+  display->SetConnectionID(this->getServer()->GetConnectionID());
+  pqSMAdaptor::setProxyProperty(display->GetProperty("Input"), proxy);
+  display->UpdateVTKObjects();
+
+  // Set display update time.
+  pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
+  double time = timekeeper->getTime();
+  pqSMAdaptor::setElementProperty(display->GetProperty("UpdateTime"), time);
+  display->UpdateVTKObjects();
+  display->Update();
+  display->Delete();
+  return proxy->GetDataInformation();
 }
