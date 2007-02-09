@@ -76,7 +76,9 @@ QColor pqVTKHistogramColor::getColor(int index, int total) const
       {
       pqChartValue cvmin, cvmax;
       this->Internals->Model->getRangeX(cvmin, cvmax);
-      double value = cvmin + index*(cvmax-cvmin)/total;
+      double min = cvmin.getDoubleValue();
+      double max = cvmax.getDoubleValue();
+      double value = min + index*(max-min)/total;
       unsigned char* ucolor = 
         this->Internals->ScalarToColors->MapValue(value);
       color.setRgb(ucolor[0], ucolor[1], ucolor[2], ucolor[3]);
