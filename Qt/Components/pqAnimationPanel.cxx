@@ -500,7 +500,7 @@ void pqAnimationPanel::buildPropertyList()
       info.Name = iter->GetKey();
       info.Index = smproperty->GetRepeatCommand()? -1 : static_cast<int>(cc);
 
-      QString label = iter->GetKey();
+      QString label = iter->GetProperty()->GetXMLLabel();
       label = (num_elems>1) ? label + " (" + QString::number(cc) + ")" 
         : label;
       this->Internal->propertyName->addItem(label, 
