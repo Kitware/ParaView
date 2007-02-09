@@ -58,10 +58,10 @@ int main(int, char*[])
     }
 
   vtkIntArray* const bin_values = vtkIntArray::SafeDownCast(
-    histogram->GetCellData()->GetArray("bin_values"));
+    histogram->GetCellData()->GetArray((int)0));
   if(!bin_values)
     {
-    vtkGenericWarningMacro("bin_values missing.");
+    vtkGenericWarningMacro("cell data missing.");
     return 1;
     }
 
