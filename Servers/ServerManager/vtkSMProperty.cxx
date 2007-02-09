@@ -33,7 +33,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.51");
+vtkCxxRevisionMacro(vtkSMProperty, "1.52");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -279,6 +279,46 @@ vtkSMProperty* vtkSMProperty::NewProperty(const char* name)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
+{
+  // Add space before every capital letter not preceeded by a capital letter
+  // or space hence:
+  // "MySpace" ==> "My Space"
+  // "MySPACE" ==> "My SPACE"
+  // "My Space" ==> "My Space"
+
+  int max = strlen(xmlname);
+  char* label = new char[2*max+10];
+  char* ptr = label;
+
+  bool previous_capital = false;
+  *ptr = xmlname[0];
+  ptr++;
+
+  for (int cc=1; cc < max; ++cc)
+    {
+    if (xmlname[cc] >= 'A' && xmlname[cc] <= 'Z')
+      {
+      if (!previous_capital && *(ptr-1) != ' ')
+        {
+        *ptr = ' ';
+        ptr++;
+        }
+      previous_capital = true;
+      }
+    else
+      {
+      previous_capital = false;
+      }
+    *ptr = xmlname[cc];
+    ptr++;
+    }
+  *ptr = 0;
+  this->SetXMLLabel(label);
+  delete [] label;
+}
+
+//---------------------------------------------------------------------------
 int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
                                      vtkPVXMLElement* element)
 {
@@ -296,6 +336,10 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if (xmllabel)
     {
     this->SetXMLLabel(xmllabel);
+    }
+  else
+    {
+    this->CreatePrettyLabel(xmlname);
     }
 
   const char* command = element->GetAttribute("command");

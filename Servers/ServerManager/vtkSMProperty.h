@@ -379,6 +379,11 @@ private:
   void SetControllerProxy(vtkSMProxy* );
   char* ControllerPropertyName;
   vtkSetStringMacro(ControllerPropertyName);
+
+  // Description:
+  // Given the string, this method will create and set a well-formated
+  // string as XMLLabel.
+  void CreatePrettyLabel(const char* name);
 };
 
 #endif
