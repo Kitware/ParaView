@@ -200,8 +200,11 @@ pqConsumerDisplay* pqDisplayPolicy::createPreferredDisplay(
   if (source)
     {
     vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(source->getProxy());
-    // ensure parts are created.
-    sp->CreateParts();
+    if (sp)
+      {
+      // ensure parts are created.
+      sp->CreateParts();
+      }
     }
   if (!view && dont_create_view)
     {
