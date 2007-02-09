@@ -226,6 +226,7 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
   frame->CloseButton->show();
   frame->SplitVerticalButton->show();
   frame->SplitHorizontalButton->show();
+  frame->LookmarkButton->show();
 
   frame->getContextMenu()->addSeparator();
   QAction* subAction = frame->getContextMenu()->addMenu(
@@ -329,6 +330,11 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
     frame->ForwardButton->hide();
     }
 
+  frame->LookmarkButton->show();
+  QObject::connect(frame->LookmarkButton, SIGNAL(pressed()),
+    this, SLOT(onLookmarkButtonPressed()));
+  frame->LookmarkButton->setEnabled(true);
+
   this->Internal->Frames.insert(frame, view);
 }
 
@@ -354,8 +360,11 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* vie
     QObject::disconnect(stack, 0,frame->BackButton, 0);
     QObject::disconnect(stack, 0,frame->ForwardButton, 0);
     }
+  QObject::disconnect(frame->LookmarkButton, 0, this, 0);
+
   frame->BackButton->hide();
   frame->ForwardButton->hide();
+  frame->LookmarkButton->setEnabled(false);
 
   this->Internal->PendingFrames.push_back(frame);
 }
@@ -870,3 +879,9 @@ void pqViewManager::frameDrop(pqMultiViewFrame* acceptingFrame,
     }
 }
 
+
+//-----------------------------------------------------------------------------
+void pqViewManager::onLookmarkButtonPressed()
+{
+  emit this->createLookmark(this->Internal->ActiveViewModule);
+}

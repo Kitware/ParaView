@@ -76,6 +76,9 @@ signals:
   /// Fired when the active view module changes.
   void activeViewModuleChanged(pqGenericViewModule*);
 
+  // Fired when the user pressed the lookmark button for one of the views
+  void createLookmark(pqGenericViewModule*);
+
 private slots:
   /// This will create a view module to fill the frame.
   /// the render window is created on the active server
@@ -115,6 +118,10 @@ public slots:
   /// determine the server on whcih to create new view modules
   /// when a frame a split.
   void setActiveServer(pqServer* server);
+
+  // Emits a signal to let listeners know that a lookmark 
+  // needs to be created of the active view
+  void onLookmarkButtonPressed();
 
 protected:
   /// Event filter callback.

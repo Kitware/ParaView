@@ -258,6 +258,9 @@ MainWindow::MainWindow() :
   this->Implementation->Core.pipelineMenu().setMenuAction(
     pqPipelineMenu::DeleteAction, this->Implementation->UI.actionDelete);
 
+  connect(this->Implementation->UI.actionToolsCreateLookmark,
+    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsCreateLookmark()));
+
   connect(this->Implementation->UI.actionToolsCreateCustomFilter,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsCreateCustomFilter()));
 
@@ -506,6 +509,9 @@ MainWindow::MainWindow() :
   this->Implementation->Core.setupElementInspector(
     this->Implementation->UI.elementInspectorDock);
 
+  this->Implementation->Core.setupLookmarkBrowser(
+    this->Implementation->UI.lookmarkBrowserDock);
+
   this->Implementation->Core.setupAnimationPanel(
     this->Implementation->UI.animationPanelDock);
   
@@ -559,6 +565,10 @@ MainWindow::MainWindow() :
     this->Implementation->UI.elementInspectorDock->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(
+    this->Implementation->UI.lookmarkBrowserDock,
+    this->Implementation->UI.lookmarkBrowserDock->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.animationPanelDock,
     this->Implementation->UI.animationPanelDock->windowTitle());
   
@@ -574,6 +584,7 @@ MainWindow::MainWindow() :
 
   // Setup the default dock configuration ...
   this->Implementation->UI.elementInspectorDock->hide();
+  this->Implementation->UI.lookmarkBrowserDock->hide();
   this->Implementation->UI.statisticsViewDock->hide();
   this->Implementation->UI.animationPanelDock->hide();
 

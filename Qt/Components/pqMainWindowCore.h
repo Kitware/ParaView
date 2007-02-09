@@ -109,6 +109,8 @@ public:
   void setupStatisticsView(QDockWidget* parent);
   /// Setup an element inspector, attaching it to the given dock
   void setupElementInspector(QDockWidget* parent);
+  /// Setup lookmark browser, attaching it to the given dock
+  void setupLookmarkBrowser(QDockWidget* parent);
 
   /// Setup the animation panel, attaching it to the given dock.
   void setupAnimationPanel(QDockWidget* parent);
@@ -241,6 +243,9 @@ public slots:
   void onToolsCreateCustomFilter();
   void onToolsManageCustomFilters();
   
+  void onToolsCreateLookmark();
+  void onToolsCreateLookmark(pqGenericViewModule*);
+
   void onToolsManageLinks();
 
   void onToolsDumpWidgetNames();

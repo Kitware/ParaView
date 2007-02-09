@@ -1,14 +1,11 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>MultiViewFrameMenu</class>
  <widget class="QWidget" name="MultiViewFrameMenu" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>786</width>
+    <width>773</width>
     <height>18</height>
    </rect>
   </property>
@@ -48,82 +45,7 @@
    <property name="spacing" >
     <number>0</number>
    </property>
-   <item row="0" column="8" >
-    <widget class="QToolButton" name="RestoreButton" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>0</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize" >
-      <size>
-       <width>16</width>
-       <height>16</height>
-      </size>
-     </property>
-     <property name="text" >
-      <string>Restore</string>
-     </property>
-     <property name="autoRaise" >
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="7" >
-    <widget class="QToolButton" name="MaximizeButton" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>0</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize" >
-      <size>
-       <width>16</width>
-       <height>16</height>
-      </size>
-     </property>
-     <property name="text" >
-      <string>Maximize</string>
-     </property>
-     <property name="autoRaise" >
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="6" >
-    <widget class="QToolButton" name="SplitVerticalButton" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>0</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize" >
-      <size>
-       <width>16</width>
-       <height>16</height>
-      </size>
-     </property>
-     <property name="text" >
-      <string>Split Vertical</string>
-     </property>
-     <property name="icon" >
-      <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqSplitViewV12.png</iconset>
-     </property>
-     <property name="autoRaise" >
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="5" >
     <widget class="QToolButton" name="SplitHorizontalButton" >
      <property name="sizePolicy" >
       <sizepolicy>
@@ -150,38 +72,6 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="4" >
-    <widget class="QToolButton" name="ActiveButton" >
-     <property name="minimumSize" >
-      <size>
-       <width>16</width>
-       <height>16</height>
-      </size>
-     </property>
-     <property name="text" >
-      <string>A</string>
-     </property>
-     <property name="checkable" >
-      <bool>true</bool>
-     </property>
-     <property name="autoRaise" >
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="3" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>311</width>
-       <height>16</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="0" column="0" >
     <widget class="QToolButton" name="BackButton" >
      <property name="enabled" >
@@ -198,6 +88,45 @@
      </property>
      <property name="checkable" >
       <bool>false</bool>
+     </property>
+     <property name="autoRaise" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" >
+    <widget class="QLabel" name="WindowCaption" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>5</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text" >
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="8" >
+    <widget class="QToolButton" name="MaximizeButton" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>0</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize" >
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="text" >
+      <string>Maximize</string>
      </property>
      <property name="autoRaise" >
       <bool>false</bool>
@@ -226,7 +155,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="9" >
+   <item row="0" column="10" >
     <widget class="QToolButton" name="CloseButton" >
      <property name="sizePolicy" >
       <sizepolicy>
@@ -250,24 +179,101 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="2" >
-    <widget class="QLabel" name="WindowCaption" >
+   <item row="0" column="7" >
+    <widget class="QToolButton" name="SplitVerticalButton" >
      <property name="sizePolicy" >
       <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>5</vsizetype>
+       <hsizetype>0</hsizetype>
+       <vsizetype>0</vsizetype>
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="minimumSize" >
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
      <property name="text" >
-      <string/>
+      <string>Split Vertical</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqSplitViewV12.png</iconset>
+     </property>
+     <property name="autoRaise" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4" >
+    <widget class="QToolButton" name="ActiveButton" >
+     <property name="minimumSize" >
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="text" >
+      <string>A</string>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <property name="autoRaise" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="9" >
+    <widget class="QToolButton" name="RestoreButton" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>0</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize" >
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="text" >
+      <string>Restore</string>
+     </property>
+     <property name="autoRaise" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>311</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="5" >
+    <widget class="QToolButton" name="LookmarkButton" >
+     <property name="text" >
+      <string>Lookmark</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqLookmark.png</iconset>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources>
   <include location="../pqComponents.qrc" />
  </resources>

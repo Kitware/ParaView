@@ -119,6 +119,8 @@ signals:
   void dragMove(pqMultiViewFrame*,QDragMoveEvent*);
   /// drop event
   void drop(pqMultiViewFrame*,QDropEvent*);
+  /// signal create lookmark pressed
+  void createLookmarkPressed();
   /// fired before the context menu is shown for this frame.
   void contextMenuRequested();
 protected slots:

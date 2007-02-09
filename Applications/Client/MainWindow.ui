@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>940</width>
+    <width>909</width>
     <height>700</height>
    </rect>
   </property>
@@ -24,8 +24,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>940</width>
-     <height>19</height>
+     <width>909</width>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSources" >
@@ -51,30 +51,6 @@
     <addaction name="separator" />
     <addaction name="actionChangeInput" />
     <addaction name="actionDelete" />
-   </widget>
-   <widget class="QMenu" name="menuView" >
-    <property name="title" >
-     <string>&amp;View</string>
-    </property>
-    <widget class="QMenu" name="menuToolbars" >
-     <property name="title" >
-      <string>Toolbars</string>
-     </property>
-    </widget>
-    <addaction name="actionResetCamera" />
-    <addaction name="actionPositiveX" />
-    <addaction name="actionNegativeX" />
-    <addaction name="actionPositiveY" />
-    <addaction name="actionNegativeY" />
-    <addaction name="actionPositiveZ" />
-    <addaction name="actionNegativeZ" />
-    <addaction name="separator" />
-    <addaction name="actionShowCenterAxes" />
-    <addaction name="actionResetCenter" />
-    <addaction name="actionScalarBarVisibility" />
-    <addaction name="separator" />
-    <addaction name="menuToolbars" />
-    <addaction name="separator" />
    </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
@@ -150,6 +126,7 @@
     </property>
     <addaction name="actionToolsCreateCustomFilter" />
     <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="actionToolsCreateLookmark" />
     <addaction name="actionToolsManageLinks" />
     <addaction name="separator" />
     <addaction name="actionToolsDumpWidgetNames" />
@@ -162,6 +139,30 @@
     <addaction name="actionToolsOutputWindow" />
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
+   </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>&amp;View</string>
+    </property>
+    <widget class="QMenu" name="menuToolbars" >
+     <property name="title" >
+      <string>Toolbars</string>
+     </property>
+    </widget>
+    <addaction name="actionResetCamera" />
+    <addaction name="actionPositiveX" />
+    <addaction name="actionNegativeX" />
+    <addaction name="actionPositiveY" />
+    <addaction name="actionNegativeY" />
+    <addaction name="actionPositiveZ" />
+    <addaction name="actionNegativeZ" />
+    <addaction name="separator" />
+    <addaction name="actionShowCenterAxes" />
+    <addaction name="actionResetCenter" />
+    <addaction name="actionScalarBarVisibility" />
+    <addaction name="separator" />
+    <addaction name="menuToolbars" />
+    <addaction name="separator" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -415,6 +416,29 @@
     <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents" />
+  </widget>
+  <widget class="QDockWidget" name="lookmarkBrowserDock" >
+   <property name="sizePolicy" >
+    <sizepolicy>
+     <hsizetype>5</hsizetype>
+     <vsizetype>5</vsizetype>
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="floating" >
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Lookmark Browser</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_6" />
   </widget>
   <action name="actionFileOpen" >
    <property name="icon" >
@@ -1001,6 +1025,11 @@
   <action name="actionToolsTimerLog" >
    <property name="text" >
     <string>Timer &amp;Log</string>
+   </property>
+  </action>
+  <action name="actionToolsCreateLookmark" >
+   <property name="text" >
+    <string>Create Lookmark</string>
    </property>
   </action>
  </widget>

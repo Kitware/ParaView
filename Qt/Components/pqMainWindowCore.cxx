@@ -58,6 +58,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayRepresentationWidget.h"
 #include "pqElementInspectorWidget.h"
 #include "pqLinksManager.h"
+#include "pqLookmarkBrowser.h"
+#include "pqLookmarkBrowserModel.h"
+#include "pqLookmarkDefinitionWizard.h"
+#include "pqMainWindowCore.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
 #include "pqObjectInspectorDriver.h"
@@ -145,6 +149,7 @@ public:
     MultiViewManager(parent),
     CustomFilters(new pqCustomFilterManagerModel(parent)),
     CustomFilterManager(0),
+    Lookmarks(new pqLookmarkBrowserModel(parent)),
     LookupTableManager(new pqPQLookupTableManager(parent)),
     ObjectInspectorDriver(0),
     RecentFilesMenu(0),
@@ -170,6 +175,7 @@ public:
     delete this->PipelineMenu;
     delete this->CustomFilterManager;
     delete this->CustomFilters;
+    delete this->Lookmarks;
     delete this->LookupTableManager;
   }
 
@@ -178,8 +184,10 @@ public:
   pqVCRController VCRController;
   pqSelectionManager SelectionManager;
   pqElementInspectorWidget* ElementInspector;
+  pqLookmarkBrowser* LookmarkBrowser;
   pqCustomFilterManagerModel* const CustomFilters;
   pqCustomFilterManager* CustomFilterManager;
+  pqLookmarkBrowserModel* const Lookmarks;
   pqPQLookupTableManager* LookupTableManager;
   pqObjectInspectorDriver* ObjectInspectorDriver;
  
@@ -304,6 +312,12 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
       this, SLOT(onSourceCreationFinished(pqPipelineSource*)));
   this->connect(core, SIGNAL(aboutToRemoveSource(pqPipelineSource*)),
       this, SLOT(onRemovingSource(pqPipelineSource*)));
+
+  // Listen for the signal that the lookmark button for a given view was pressed
+  QObject::connect(
+    &this->Implementation->MultiViewManager, SIGNAL(createLookmark(pqGenericViewModule*)),
+    this,
+    SLOT(onToolsCreateLookmark(pqGenericViewModule*)));
 
   this->connect(pqApplicationCore::instance()->getPluginManager(),
                 SIGNAL(serverManagerExtensionLoaded()),
@@ -709,6 +723,13 @@ void pqMainWindowCore::setupElementInspector(QDockWidget* dock_widget)
                    SLOT(onSelectionChanged(pqSelectionManager*)));
     
   dock_widget->setWidget(element_inspector);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setupLookmarkBrowser(QDockWidget* dock_widget)
+{
+  this->Implementation->LookmarkBrowser = new pqLookmarkBrowser(this->Implementation->Lookmarks, dock_widget);
+  dock_widget->setWidget(this->Implementation->LookmarkBrowser);
 }
 
 //-----------------------------------------------------------------------------
@@ -1443,6 +1464,35 @@ void pqMainWindowCore::onToolsManageCustomFilters()
   this->Implementation->CustomFilterManager->show();
 }
 
+void pqMainWindowCore::onToolsCreateLookmark()
+{
+  // Create a lookmark of the currently active view
+  this->onToolsCreateLookmark(pqActiveView::instance().current());
+}
+
+void pqMainWindowCore::onToolsCreateLookmark(pqGenericViewModule *view)
+{
+  // right now we only support Lookmarks of render modules
+  pqRenderViewModule* const render_module = qobject_cast<pqRenderViewModule*>(view);
+  if(!render_module)
+    {
+    qCritical() << "Cannnot create Lookmark. No active render module.";
+    return;
+    }
+
+  QWidget *mainWin = this->Implementation->Parent;
+
+  pqLookmarkDefinitionWizard wizard(render_module, this->Implementation->Lookmarks, mainWin);
+  if(wizard.exec() == QDialog::Accepted)
+    {
+    wizard.createLookmark();
+    QString lookmarkName = wizard.getLookmarkName();
+    this->Implementation->LookmarkBrowser->selectLookmark(lookmarkName);
+    this->Implementation->LookmarkBrowser->parentWidget()->show();
+    }
+}
+
+
 void pqMainWindowCore::onToolsDumpWidgetNames()
 {
   QStringList names;
@@ -1896,6 +1946,9 @@ void pqMainWindowCore::onSelectionChanged()
     // change the active scene.
     this->Implementation->AnimationManager->onActiveServerChanged(server);
     }
+
+  // Update the lookmark browser so it knows about the (possible) change in servers
+  this->Implementation->LookmarkBrowser->setActiveServer(server);
 }
 
 //-----------------------------------------------------------------------------

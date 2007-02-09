@@ -98,7 +98,6 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   a->setObjectName("CloseAction");
   this->CloseButton->setDefaultAction(a);
 
-
   this->connect(this->ActiveButton->defaultAction(), SIGNAL(triggered(bool)), 
                 SLOT(setActive(bool)));
   this->connect(this->CloseButton->defaultAction(), SIGNAL(triggered(bool)), 
@@ -142,6 +141,7 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   this->CloseButton->hide();
   this->SplitVerticalButton->hide();
   this->SplitHorizontalButton->hide();
+  this->LookmarkButton->hide();
 
 
   this->UniqueID=QUuid::createUuid();
