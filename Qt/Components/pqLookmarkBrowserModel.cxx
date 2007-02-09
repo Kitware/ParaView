@@ -419,15 +419,14 @@ void pqLookmarkBrowserModel::addLookmarks(vtkPVXMLElement *root)
 }
 
 
-void pqLookmarkBrowserModel::loadLookmark(const QModelIndex &index, pqServer *server)
+void pqLookmarkBrowserModel::loadLookmark(const QModelIndex &idx, pqServer *server)
 {
-  if(!index.isValid() || !server)
+  if(!idx.isValid() || !server)
     {
     return;
     }
 
-  QString state = this->getLookmarkState(index);
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  QString state = this->getLookmarkState(idx);
   vtkPVXMLParser *parser = vtkPVXMLParser::New();
 
   // This is a hack for converting the QString to a char*. None of qstring's conversion methods were working.
