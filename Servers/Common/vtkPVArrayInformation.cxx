@@ -19,7 +19,7 @@ cxx     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.6");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -305,34 +305,38 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
     this->Initialize();
     }
 
-  vtkDataArray* array = vtkDataArray::SafeDownCast(obj);
+  vtkAbstractArray* const array = vtkAbstractArray::SafeDownCast(obj);
   if(!array)
     {
-    vtkErrorMacro("Cannot downcast to array.");
+    vtkErrorMacro("Cannot downcast to abstract array.");
     this->Initialize();
     return;
     }
 
-  double range[2];
-  double *ptr;
-  int idx;
-
   this->SetName(array->GetName());
   this->DataType = array->GetDataType();
   this->SetNumberOfComponents(array->GetNumberOfComponents());
-  ptr = this->Ranges;
-  if (this->NumberOfComponents > 1)
+  
+  if(vtkDataArray* const data_array = vtkDataArray::SafeDownCast(obj))
     {
-    // First store range of vector magnitude.
-    array->GetRange(range, -1);
-    *ptr++ = range[0];
-    *ptr++ = range[1];
-    }
-  for (idx = 0; idx < this->NumberOfComponents; ++idx)
-    {
-    array->GetRange(range, idx);
-    *ptr++ = range[0];
-    *ptr++ = range[1];
+    double range[2];
+    double *ptr;
+    int idx;
+
+    ptr = this->Ranges;
+    if (this->NumberOfComponents > 1)
+      {
+      // First store range of vector magnitude.
+      data_array->GetRange(range, -1);
+      *ptr++ = range[0];
+      *ptr++ = range[1];
+      }
+    for (idx = 0; idx < this->NumberOfComponents; ++idx)
+      {
+      data_array->GetRange(range, idx);
+      *ptr++ = range[0];
+      *ptr++ = range[1];
+      }
     }
 }
 
