@@ -112,7 +112,15 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
       "/site-packages/paraview", "/paraview", // Windows
       0
     };
-    vtkstd::string prefix = vtksys::SystemTools::GetFilenamePath(self_dir);
+    vtkstd::string prefix;
+    if (strlen(self_dir) == 1 && self_dir[0] == '.')
+      {
+      prefix = self_dir;
+      }
+    else
+      {
+      prefix = vtksys::SystemTools::GetFilenamePath(self_dir);
+      }
     for(const char** dir = inst_dirs; *dir; ++dir)
       {
       package_dir = prefix;
@@ -185,7 +193,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.8");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.9");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
