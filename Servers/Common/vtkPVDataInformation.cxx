@@ -42,7 +42,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.24");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -693,61 +693,52 @@ const char* vtkPVDataInformation::GetName()
 //----------------------------------------------------------------------------
 const char* vtkPVDataInformation::GetDataSetTypeAsString()
 {
-  if (this->DataSetType == VTK_IMAGE_DATA)
+  switch(this->DataSetType)
     {
-    return "vtkImageData";
-    }
-  if (this->DataSetType == VTK_RECTILINEAR_GRID)
-    {
-    return "vtkRectilinearGrid";
-    }
-  if (this->DataSetType == VTK_STRUCTURED_GRID)
-    {
-    return "vtkStructuredGrid";
-    }
-  if (this->DataSetType == VTK_POLY_DATA)
-    {
-    return "vtkPolyData";
-    }
-  if (this->DataSetType == VTK_UNSTRUCTURED_GRID)
-    {
-    return "vtkUnstructuredGrid";
-    }
-  if (this->DataSetType == VTK_DATA_SET)
-    {
-    return "vtkDataSet";
-    }
-  if (this->DataSetType == VTK_POINT_SET)
-    {
-    return "vtkPointSet";
-    }
-  if (this->DataSetType == VTK_COMPOSITE_DATA_SET)
-    {
-    return "vtkCompositeDataSet";
-    }
-  if (this->DataSetType == VTK_MULTIGROUP_DATA_SET)
-    {
-    return "vtkMultiGroupDataSet";
-    }
-  if (this->DataSetType == VTK_MULTIBLOCK_DATA_SET)
-    {
-    return "vtkMultiBlockDataSet";
-    }
-  if (this->DataSetType == VTK_HIERARCHICAL_DATA_SET)
-    {
-    return "vtkHierarchicalDataSet";
-    }
-  if (this->DataSetType == VTK_UNIFORM_GRID)
-    {
-    return "vtkUniformGrid";
-    }
-  if (this->DataSetType == VTK_HIERARCHICAL_BOX_DATA_SET)
-    {
-    return "vtkHierarchicalBoxDataSet";
-    }
-  if (this->DataSetType == VTK_GENERIC_DATA_SET)
-    {
-    return "vtkGenericDataSet";
+    case VTK_POLY_DATA:
+      return "vtkPolyData";
+    case VTK_STRUCTURED_POINTS:
+      return "vtkStructuredPoints";
+    case VTK_STRUCTURED_GRID:
+      return "vtkStructuredGrid";
+    case VTK_RECTILINEAR_GRID:
+      return "vtkRectilinearGrid";
+    case VTK_UNSTRUCTURED_GRID:
+      return "vtkUnstructuredGrid";
+    case VTK_PIECEWISE_FUNCTION:
+      return "vtkPiecewiseFunction";
+    case VTK_IMAGE_DATA:
+      return "vtkImageData";
+    case VTK_DATA_OBJECT:
+      return "vtkDataObject";
+    case VTK_DATA_SET:
+      return "vtkDataSet";
+    case VTK_POINT_SET:
+      return "vtkPointSet";
+    case VTK_UNIFORM_GRID:
+      return "vtkUniformGrid";
+    case VTK_COMPOSITE_DATA_SET:
+      return "vtkCompositeDataSet";
+    case VTK_MULTIGROUP_DATA_SET:
+      return "vtkMultigroupDataSet";
+    case VTK_MULTIBLOCK_DATA_SET:
+      return "vtkMultiblockDataSet";
+    case VTK_HIERARCHICAL_DATA_SET:
+      return "vtkHierarchicalDataSet";
+    case VTK_HIERARCHICAL_BOX_DATA_SET:
+      return "vtkHierarchicalBoxDataSet";
+    case VTK_GENERIC_DATA_SET:
+      return "vtkGenericDataSet";
+    case VTK_HYPER_OCTREE:
+      return "vtkHyperOctree";
+    case VTK_TEMPORAL_DATA_SET:
+      return "vtkTemporalDataSet";
+    case VTK_TABLE:
+      return "vtkTable";
+    case VTK_GRAPH:
+      return "vtkGraph";
+    case VTK_TREE:
+      return "vtkTree";
     }
   
   return "UnknownType";
