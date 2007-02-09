@@ -85,6 +85,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTimeKeeper.h
   pqTextWidgetDisplay.h
   pqUndoStack.h
+  pqVTKLineChartModel.h
+  pqVTKHistogramModel.h
   pqWriterFactory.h
   ${PYTHON_MOC_SRCS}
   )

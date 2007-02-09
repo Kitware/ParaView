@@ -47,6 +47,7 @@ class vtkDataArray;
 /// vtkRectilinearGrid.
 class PQCORE_EXPORT pqVTKHistogramModel : public pqHistogramModel
 {
+  Q_OBJECT
 public:
   pqVTKHistogramModel(QObject *parent=0);
   virtual ~pqVTKHistogramModel();
@@ -61,10 +62,18 @@ public:
   virtual void getRangeY(pqChartValue &min, pqChartValue &max) const;
   //@}
 
-  
-  /// Add/Remove displays.
+  /// Returns the color scheme to be used by the chart.
+  pqHistogramColor* getColorScheme() const;
+
+public slots:
+  /// Add display to the view. Although this model supports adding
+  /// more than 1 display, it shows only 1 plot at a time.
   void addDisplay(pqDisplay*);
+
+  /// Remove a display.
   void removeDisplay(pqDisplay*);
+
+  /// Remove all displays.
   void removeAllDisplays();
 
   /// Equivalent to "render". Leads to the updating of the widget.
@@ -74,9 +83,6 @@ public:
 
   /// Forces update of the widget.
   void forceUpdate();
-
-  /// Returns the color scheme to be used by the chart.
-  pqHistogramColor* getColorScheme() const;
 
 protected:
   /// Called by forceUpdate when the data is empty.

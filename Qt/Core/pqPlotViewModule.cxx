@@ -114,6 +114,12 @@ pqPlotViewModule::pqPlotViewModule(ViewModuleTypes type,
     this, SLOT(visibilityChanged(pqDisplay*)));
 
   QObject::connect(this, SIGNAL(endRender()), this, SLOT(renderInternal()));
+  QObject::connect(this, SIGNAL(modelUpdate()), 
+    this->Internal->VTKModel, SLOT(update()));
+  QObject::connect(this, SIGNAL(displayAdded(pqDisplay*)), 
+    this->Internal->VTKModel, SLOT(addDisplay(pqDisplay*)));
+  QObject::connect(this, SIGNAL(displayRemoved(pqDisplay*)), 
+    this->Internal->VTKModel, SLOT(removeDisplay(pqDisplay*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -164,7 +170,7 @@ void pqPlotViewModule::visibilityChanged(pqDisplay* disp)
       if (d != disp && d->isVisible())
         {
         cc++;
-        if (cc > max_visible)
+        if (max_visible >= 0 && cc > max_visible)
           {
           d->setVisible(false);
           }
@@ -202,66 +208,8 @@ void pqPlotViewModule::forceRender()
 void pqPlotViewModule::renderInternal()
 {
   this->Internal->RenderRequestPending = false;
-  // Now update the GUI.
-  switch (this->getViewType())
-    {
-  case BAR_CHART:
-    this->renderBarChart();
-    break;
-
-  case XY_PLOT:
-    this->renderXYPlot();
-    break;
-
-  default:
-    qDebug() << "Incorrect plot type: " << this->getViewType();
-    }
+  emit this->modelUpdate();
 }
-
-//-----------------------------------------------------------------------------
-void pqPlotViewModule::renderXYPlot()
-{
-  pqVTKLineChartModel* model = 
-    qobject_cast<pqVTKLineChartModel*>(this->Internal->VTKModel);
-  if (!model)
-    {
-    qDebug() << "Cannot locate pqVTKLineChartModel.";
-    return;
-    }
-
-  QList<pqDisplay*> displays = this->getDisplays();
-  QList<pqDisplay*> visibleDisplays;
-  foreach (pqDisplay* display, displays)
-    {
-    if (display->isVisible())
-      {
-      visibleDisplays.push_back(display);
-      }
-    }
-  model->update(visibleDisplays);
-}
-
-//-----------------------------------------------------------------------------
-void pqPlotViewModule::renderBarChart()
-{
-  pqVTKHistogramModel* model = 
-    qobject_cast<pqVTKHistogramModel*>(this->Internal->VTKModel);
-  if (!model)
-    {
-    qDebug() << "Cannot locate pqVTKHistogramModel.";
-    return;
-    }
-
-  model->removeAllDisplays();
-  QList<pqDisplay*> displays = this->getDisplays();
-  foreach (pqDisplay* display, displays)
-    {
-    model->addDisplay(display);
-    }
-
-  model->update();
-}
-
 
 //-----------------------------------------------------------------------------
 vtkImageData* pqPlotViewModule::captureImage(int magnification)

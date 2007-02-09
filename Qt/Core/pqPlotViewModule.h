@@ -70,6 +70,11 @@ public:
 
   /// Request a delayed forceRender().
   virtual void render();
+
+signals:
+  /// Fired to update the internal VTK model.
+  void modelUpdate();
+
 private slots:
   void visibilityChanged(pqDisplay* disp);
 

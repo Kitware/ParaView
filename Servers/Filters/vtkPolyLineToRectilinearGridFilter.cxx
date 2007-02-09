@@ -26,7 +26,7 @@
 #include "vtkDoubleArray.h"
 
 vtkStandardNewMacro(vtkPolyLineToRectilinearGridFilter);
-vtkCxxRevisionMacro(vtkPolyLineToRectilinearGridFilter, "1.1");
+vtkCxxRevisionMacro(vtkPolyLineToRectilinearGridFilter, "1.2");
 //-----------------------------------------------------------------------------
 vtkPolyLineToRectilinearGridFilter::vtkPolyLineToRectilinearGridFilter()
 {
@@ -42,7 +42,7 @@ int vtkPolyLineToRectilinearGridFilter::FillInputPortInformation(int port,
   vtkInformation* info)
 {
   this->Superclass::FillInputPortInformation(port, info);
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;
 }
 
@@ -65,11 +65,23 @@ int vtkPolyLineToRectilinearGridFilter::RequestData(
   vtkInformation* const output_info = outputVector->GetInformationObject(0);
   vtkRectilinearGrid* const output_data = vtkRectilinearGrid::SafeDownCast(
     output_info->Get(vtkDataObject::DATA_OBJECT()));
-  output_data->Initialize();
 
   vtkInformation* const input_info = inputVector[0]->GetInformationObject(0);
-  vtkPolyData* const input = vtkPolyData::SafeDownCast(
-    input_info->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataObject* inputDO = input_info->Get(vtkDataObject::DATA_OBJECT());
+  vtkRectilinearGrid* inputRG = vtkRectilinearGrid::SafeDownCast(inputDO);
+  if (inputRG)
+    {
+    // input is already a rectilinear grid. do nothing.
+    output_data->ShallowCopy(inputRG);
+    return 1;
+    }
+  
+  vtkPolyData* const input = vtkPolyData::SafeDownCast(inputDO);
+  if (!input)
+    {
+    vtkErrorMacro("Input must be either a vtkPolyData or vtkRectilinearGrid.");
+    return 0;
+    }
 
   vtkPointData* outPD = output_data->GetPointData();
   vtkCellData* outCD = output_data->GetCellData();

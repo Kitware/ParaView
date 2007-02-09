@@ -36,30 +36,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 
 class pqDisplay;
-
 class pqVTKLineChartModelInternal;
 
+/// pqVTKLineChartModelInternal is a concrete implementation for
+/// pqLineChartModel that plots XYPlotDisplay2 proxies.
 class PQCORE_EXPORT pqVTKLineChartModel : public pqLineChartModel
 {
+  Q_OBJECT
 public:
   typedef pqLineChartModel Superclass;
 
   pqVTKLineChartModel(QObject* parent=0);
   virtual ~pqVTKLineChartModel();
 
-  void update(QList<pqDisplay*>& visibleDisplays);
+public slots:
+  /// Add a display to the view.
+  void addDisplay(pqDisplay*);
 
+  /// Remove a display from the view.
+  void removeDisplay(pqDisplay*);
+
+  /// Remove all displays.
+  void removeAllDisplays();
+
+  /// Equivalent to render on render views. It checks is
+  /// the plot data/displays have modified since last update.
+  /// If so, it will rebuilt the plots.
   void update();
 
+protected:
   /// Removes all the plots from the model.
   virtual void clearPlots();
+
+  /// Creates pqVTKLineChartPlot objects for each display. A pqVTKLineChartPlot
+  /// is create for each YAxis array for every display visible.
+  void createPlotsForDisplay(pqDisplay*);
+
+protected slots:
+  void markModified();
+
 private:
   pqVTKLineChartModel(const pqVTKLineChartModel&); // Not implemented.
   void operator=(const pqVTKLineChartModel&); // Not implemented.
 
   pqVTKLineChartModelInternal* Internal;
 
-  void createPlotsForDisplay(pqDisplay*);
 };
 
 #endif
