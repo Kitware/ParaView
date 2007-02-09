@@ -38,6 +38,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAnimationCue.h
   pqAnimationScene.h
   pqApplicationCore.h
+  pqBarChartDisplay.h
   pqCommandServerStartup.h
   pqConsumerDisplay.h
   pqCoreTestUtility.h
@@ -129,6 +130,8 @@ ADD_LIBRARY(pqCore
   pqAnimationSceneImageWriter.h
   pqApplicationCore.cxx
   pqApplicationCore.h
+  pqBarChartDisplay.cxx
+  pqBarChartDisplay.h
   pqCommandServerStartup.cxx
   pqCommandServerStartup.h
   pqConsumerDisplay.cxx
@@ -257,6 +260,8 @@ ADD_LIBRARY(pqCore
   pqUndoRedoStateLoader.h
   pqUndoStack.cxx
   pqUndoStack.h
+  pqVTKHistogramColor.cxx
+  pqVTKHistogramColor.h
   pqVTKHistogramModel.cxx
   pqVTKHistogramModel.h
   pqVTKLineChartModel.cxx

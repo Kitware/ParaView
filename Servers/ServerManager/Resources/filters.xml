@@ -4604,11 +4604,19 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
           </FieldDataDomain>
      </StringVectorProperty>
 
-     <IntVectorProperty name="BinCount" command="SetBinCount" number_of_elements="1" default_values="10" animateable="0"> 
+     <IntVectorProperty name="BinCount" 
+        command="SetBinCount" 
+        number_of_elements="1" 
+        default_values="10">
         <IntRangeDomain name="range" min="1" max="256"/>
      </IntVectorProperty>
 
-     <IntVectorProperty name="Component" command="SetComponent" number_of_elements="1" default_values="0" animateable="0"> 
+     <IntVectorProperty 
+        name="Component" 
+        command="SetComponent" 
+        number_of_elements="1" 
+        default_values="0" 
+        animateable="0"> 
         <IntRangeDomain name="range" min="0" max="15"/>
      </IntVectorProperty>
 

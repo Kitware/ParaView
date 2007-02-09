@@ -51,6 +51,7 @@ class QTimer;
 class vtkSMProxy;
 class pqScalarBarDisplay;
 
+/// pqColorMapEditor is the color map editor widget.
 class PQCOMPONENTS_EXPORT pqColorMapEditor : public QDialog
 {
   Q_OBJECT

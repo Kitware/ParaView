@@ -388,21 +388,15 @@ void pqObjectInspectorWidget::accept()
     this->CurrentPanel->accept();
     }
  
-  foreach(pqObjectPanel* p, this->QueuedPanels)
-    {
-    pqPipelineSource *source = qobject_cast<pqPipelineSource*>(p->proxy());
-    if(source)
-      {
-      source->renderAllViews();
-      }
-    }
-  
   emit this->accepted();
   
   this->QueuedPanels.clear();
   
   this->ForceModified = false;
   emit this->postaccept();
+
+  // Essential to render all views.
+  pqApplicationCore::instance()->render();
 }
 
 void pqObjectInspectorWidget::reset()

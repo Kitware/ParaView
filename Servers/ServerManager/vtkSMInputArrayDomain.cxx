@@ -25,7 +25,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.11");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.12");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
@@ -256,6 +256,11 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(
       {
       this->SetAttributeType(
         static_cast<unsigned char>(vtkSMInputArrayDomain::POINT));
+      }
+    else if (strcmp(attribute_type, "any") == 0)
+      {
+      this->SetAttributeType(
+        static_cast<unsigned char>(vtkSMInputArrayDomain::ANY));
       }
     else
       {

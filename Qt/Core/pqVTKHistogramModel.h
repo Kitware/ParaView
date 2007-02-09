@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHistogramModel.h"
 #include "pqCoreExport.h"
 
+class pqBarChartDisplay;
+class pqDisplay;
+class pqHistogramColor;
 class pqVTKHistogramModelInternal;
-class vtkRectilinearGrid;
-class vtkDataObject;
+class vtkDataArray;
 
 /// Concrete implementation for the pqHistogramModel for 
 /// vtkRectilinearGrid.
@@ -59,15 +61,41 @@ public:
   virtual void getRangeY(pqChartValue &min, pqChartValue &max) const;
   //@}
 
-  /// Fetches the histogram data from the pipeline.
-  void updateData(vtkRectilinearGrid *data);
-  void updateData(vtkDataObject* data);
+  
+  /// Add/Remove displays.
+  void addDisplay(pqDisplay*);
+  void removeDisplay(pqDisplay*);
+  void removeAllDisplays();
 
+  /// Equivalent to "render". Leads to the updating of the widget.
+  /// update leads to a call to forceUpdate only it anything
+  /// has been modified since last update.
   void update();
+
+  /// Forces update of the widget.
   void forceUpdate();
+
+  /// Returns the color scheme to be used by the chart.
+  pqHistogramColor* getColorScheme() const;
+
+protected:
+  /// Called by forceUpdate when the data is empty.
+  void forceUpdateEmptyData();
+
+  /// Set the display that is being currently displayed.
+  void setCurrentDisplay(pqBarChartDisplay* display);
+
+  /// Returns the array to be plotted on x axis.
+  vtkDataArray* getXArray(pqBarChartDisplay* display) const;
+
+  /// Returns the array to be plotted on y axis.
+  vtkDataArray* getYArray(pqBarChartDisplay* display) const;
+
+  /// updates the color scheme.
+  void updateColorScheme();
+
 private:
   pqVTKHistogramModelInternal *Internal; ///< Stores the data bounds.
-  vtkRectilinearGrid *Data;              ///< A pointer to the data.
 };
 
 #endif

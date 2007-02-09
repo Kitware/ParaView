@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QImage>
 #include <QPointer>
 #include <QtDebug>
+#include <QTimer>
 
 #include "pqDisplay.h"
 #include "pqHistogramChart.h"
@@ -68,6 +69,7 @@ public:
     delete this->VTKModel;
     delete this->PlotWidget;
     }
+  bool RenderRequestPending;
 };
 
 //-----------------------------------------------------------------------------
@@ -77,7 +79,7 @@ pqPlotViewModule::pqPlotViewModule(ViewModuleTypes type,
 : pqGenericViewModule(type, group, name, renModule, server, _parent)
 {
   this->Internal = new pqPlotViewModuleInternal();
-
+  this->Internal->RenderRequestPending = false;
   switch (this->getViewType())
     {
   case BAR_CHART:
@@ -85,6 +87,7 @@ pqPlotViewModule::pqPlotViewModule(ViewModuleTypes type,
       pqHistogramWidget* widget = new pqHistogramWidget();
       pqVTKHistogramModel* model = new pqVTKHistogramModel(this);
       widget->getHistogram().setModel(model);
+      widget->getHistogram().setBinColorScheme(model->getColorScheme());
       this->Internal->PlotWidget = widget;
       this->Internal->VTKModel = model;
       this->Internal->MaxNumberOfVisibleDisplays = 1;
@@ -171,6 +174,25 @@ void pqPlotViewModule::visibilityChanged(pqDisplay* disp)
 }
 
 //-----------------------------------------------------------------------------
+void pqPlotViewModule::render()
+{
+  if (!this->Internal->RenderRequestPending)
+    {
+    this->Internal->RenderRequestPending = true;
+    QTimer::singleShot(0, this, SLOT(delayedRender()));
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPlotViewModule::delayedRender()
+{
+  if (this->Internal->RenderRequestPending)
+    {
+    this->forceRender();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqPlotViewModule::forceRender()
 {
   this->Superclass::forceRender();
@@ -179,6 +201,7 @@ void pqPlotViewModule::forceRender()
 //-----------------------------------------------------------------------------
 void pqPlotViewModule::renderInternal()
 {
+  this->Internal->RenderRequestPending = false;
   // Now update the GUI.
   switch (this->getViewType())
     {
@@ -229,18 +252,14 @@ void pqPlotViewModule::renderBarChart()
     return;
     }
 
+  model->removeAllDisplays();
   QList<pqDisplay*> displays = this->getDisplays();
   foreach (pqDisplay* display, displays)
     {
-    if (display->isVisible())
-      {
-      vtkSMGenericViewDisplayProxy* disp = 
-        vtkSMGenericViewDisplayProxy::SafeDownCast(display->getProxy());
-      model->updateData(disp->GetOutput());
-      return;
-      }
+    model->addDisplay(display);
     }
-  model->updateData((vtkDataObject*)0);
+
+  model->update();
 }
 
 

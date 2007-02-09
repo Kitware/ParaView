@@ -3654,6 +3654,17 @@
           <Group name="filters"/>
           <Group name="glyph_sources" />
         </ProxyGroupDomain>
+        <InputArrayDomain 
+          name="input_array_any" 
+          attribute_type="any" />
+        <InputArrayDomain 
+          name="input_array_cell" 
+          attribute_type="cell"
+          number_of_components="1"/>
+        <InputArrayDomain 
+          name="input_array_point" 
+          attribute_type="point"
+          number_of_components="1"/>
       </InputProperty>
       <Property
         name="Update"
@@ -3719,16 +3730,49 @@
         </ProxyGroupDomain>
       </ProxyProperty>
       
-      <IntVectorProperty
-        name="MapScalars"
+      <StringVectorProperty name="XArrayName"
+         number_of_elements="1">
+         <!-- Set the array to use on X axis. This is used only if
+          XAxisUsePoints is 0. -->
+          <ArrayListDomain name="array_list" 
+            attribute_type="Scalars"
+            input_domain_name="input_array_point">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="YArrayName"
+         number_of_elements="1">
+         <!-- Set the array to use on X axis. -->
+          <ArrayListDomain name="array_list" 
+            attribute_type="Scalars"
+            input_domain_name="input_array_cell">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="XAxisPointComponent"
         number_of_elements="1"
-        default_values="1">
-        <!-- 
-        If true, the LookupTable, if any is used to color the bar chart.
-        Otherwise, random colors will be generated.
-        -->
+        default_values="0">
+        <!-- Choose the point component for X axis.
+        Used only when XAxisUsePoints is 1 -->
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="X" />
+          <Entry value="1" text="Y" />
+          <Entry value="2" text="Z" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="XAxisUsePoints"
+        number_of_elements="1"
+        default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
     </GenericViewDisplayProxy>
 
     <GenericViewDisplayProxy name="TableDisplay"

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 #include "pqApplicationCore.h"
+#include "pqBarChartDisplayProxyEditor.h"
 #include "pqDisplayPolicy.h"
 #include "pqDisplayProxyEditor.h"
 #include "pqGenericViewModule.h"
@@ -198,6 +199,29 @@ void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
     if (!editor)
       {
       editor = new pqXYPlotDisplayProxyEditor(this);
+      this->layout()->addWidget(editor);
+      if (this->Internal->DisplayWidget)
+        {
+        this->layout()->removeWidget(this->Internal->DisplayWidget);
+        delete this->Internal->DisplayWidget;
+        }
+      this->Internal->DisplayWidget = editor;
+      QObject::connect(this, SIGNAL(requestSetDisplay(pqDisplay*)),
+        editor, SLOT(setDisplay(pqDisplay*)));
+      QObject::connect(this, SIGNAL(requestReload()),
+        editor, SLOT(reloadGUI()));
+      }
+    editor->setDisplay(display);
+    }
+  else if (display->getProxy() && 
+    display->getProxy()->GetXMLName() == QString("BarChartDisplay"))
+    {
+    pqBarChartDisplayProxyEditor* editor =
+      qobject_cast<pqBarChartDisplayProxyEditor*>(
+        this->Internal->DisplayWidget);
+    if (!editor)
+      {
+      editor = new pqBarChartDisplayProxyEditor(this);
       this->layout()->addWidget(editor);
       if (this->Internal->DisplayWidget)
         {

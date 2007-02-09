@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqXYPlotDisplayProxyEditor.h
+   Module:    pqBarChartDisplayProxyEditor.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,47 +29,52 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqXYPlotDisplayProxyEditor_h
-#define __pqXYPlotDisplayProxyEditor_h
+#ifndef __pqBarChartDisplayProxyEditor_h
+#define __pqBarChartDisplayProxyEditor_h
 
 #include <QWidget>
 #include "pqComponentsExport.h"
 
 class pqDisplay;
 
-/// Editor widget for XY plot displays.
-class PQCOMPONENTS_EXPORT pqXYPlotDisplayProxyEditor : public QWidget
+/// pqBarChartDisplayProxyEditor is the editor widget for
+/// a Bar Chart display.
+class PQCOMPONENTS_EXPORT pqBarChartDisplayProxyEditor : public QWidget
 {
   Q_OBJECT
 public:
-  pqXYPlotDisplayProxyEditor(QWidget* parent=0);
-  virtual ~pqXYPlotDisplayProxyEditor();
+  pqBarChartDisplayProxyEditor(QWidget* parent=0);
+  virtual ~pqBarChartDisplayProxyEditor();
 
-  /// Get the display whose properties this editor is editing.
-  pqDisplay* getDisplay();
+  /// Returns the display proxy that is currently being edited
+  /// by the editor.
+  pqDisplay* getDisplay() const;
 
 public slots:
-
   /// Set the display whose properties this editor is editing.
   /// This call will raise an error is the display is not
-  /// a XYPlotDisplay2 proxy.
+  /// a BarChartPlotDisplay proxy.
   void setDisplay(pqDisplay* display);
 
   /// Forces a reload of the GUI elements that depend on
   /// the display proxy.
   void reloadGUI();
 
-protected slots:
-  /// Called to render all views in which this display is visible.
+  /// If display is valid, requests update on all views the
+  /// display is visible in.
   void updateAllViews();
 
-  void updateXArrayNameEnableState();
+protected slots:
+  /// Opens the color map editor.
+  void openColorMapEditor();
 
-  void yArraySelectionChanged();
+protected:
+  /// Cleans up internal data structures.
+  void cleanup();
 
 private:
-  pqXYPlotDisplayProxyEditor(const pqXYPlotDisplayProxyEditor&); // Not implemented.
-  void operator=(const pqXYPlotDisplayProxyEditor&); // Not implemented.
+  pqBarChartDisplayProxyEditor(const pqBarChartDisplayProxyEditor&); // Not implemented.
+  void operator=(const pqBarChartDisplayProxyEditor&); // Not implemented.
 
   class pqInternal;
   pqInternal* Internal;

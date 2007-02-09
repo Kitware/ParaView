@@ -31,33 +31,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqVTKHistogramModel.h"
 
-#include "pqChartCoordinate.h"
-#include <QtDebug>
-
 #include "vtkCellData.h"
 #include "vtkDoubleArray.h"
-#include "vtkRectilinearGrid.h"
 #include "vtkIntArray.h"
+#include "vtkPointData.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMGenericViewDisplayProxy.h"
 
+#include <QtDebug>
+#include <QList>
+#include <QPointer>
+
+#include "pqBarChartDisplay.h"
+#include "pqChartCoordinate.h"
+#include "pqSMAdaptor.h"
+#include "pqVTKHistogramColor.h"
 
 class pqVTKHistogramModelInternal
 {
 public:
-  pqVTKHistogramModelInternal();
-  ~pqVTKHistogramModelInternal() {}
-
   pqChartCoordinate Minimum;
   pqChartCoordinate Maximum;
   vtkTimeStamp LastUpdateTime;
   vtkTimeStamp MTime;
+  pqVTKHistogramColor ColorScheme;
+
+  QPointer<pqBarChartDisplay> LastUsedDisplay;
+  QList<QPointer<pqBarChartDisplay> > Displays;
+
+  /// returns the display that can be viewed by this
+  /// model given the current state of the displays' visibility.
+  pqBarChartDisplay* getCurrentDisplay() const
+    {
+    foreach (pqBarChartDisplay* display, this->Displays)
+      {
+      if (display && display->isVisible())
+        {
+        return display;
+        }
+      }
+    return NULL;
+    }
 };
-
-
-//----------------------------------------------------------------------------
-pqVTKHistogramModelInternal::pqVTKHistogramModelInternal()
-  : Minimum(), Maximum()
-{
-}
 
 
 //----------------------------------------------------------------------------
@@ -65,170 +81,217 @@ pqVTKHistogramModel::pqVTKHistogramModel(QObject *parentObject)
   : pqHistogramModel(parentObject)
 {
   this->Internal = new pqVTKHistogramModelInternal();
-  this->Data = 0;
+  this->Internal->ColorScheme.setModel(this);
 }
 
+//----------------------------------------------------------------------------
 pqVTKHistogramModel::~pqVTKHistogramModel()
 {
   delete this->Internal;
-  if(this->Data)
+}
+
+//----------------------------------------------------------------------------
+pqHistogramColor* pqVTKHistogramModel::getColorScheme() const
+{
+  return &this->Internal->ColorScheme;
+}
+
+//----------------------------------------------------------------------------
+void pqVTKHistogramModel::addDisplay(pqDisplay* display)
+{
+  pqBarChartDisplay* cdisplay = qobject_cast<pqBarChartDisplay*>(display);
+  if (cdisplay && !this->Internal->Displays.contains(cdisplay))
     {
-    this->Data->Delete();
+    this->Internal->Displays.push_back(cdisplay);
     }
 }
 
-int pqVTKHistogramModel::getNumberOfBins() const
+//----------------------------------------------------------------------------
+void pqVTKHistogramModel::removeDisplay(pqDisplay* display)
 {
-  if (this->Data)
+  pqBarChartDisplay* cdisplay = qobject_cast<pqBarChartDisplay*>(display);
+  if (cdisplay)
     {
-    vtkIntArray *const values = vtkIntArray::SafeDownCast(
-      this->Data->GetCellData()->GetArray("bin_values"));
-    if(values && values->GetNumberOfComponents() == 1)
+    this->Internal->Displays.removeAll(cdisplay);
+    if (cdisplay == this->Internal->LastUsedDisplay)
       {
-      return values->GetNumberOfTuples();
+      this->setCurrentDisplay(0);
       }
     }
+}
 
+//----------------------------------------------------------------------------
+void pqVTKHistogramModel::removeAllDisplays()
+{
+  this->Internal->Displays.clear();
+  this->Internal->MTime.Modified();
+}
+
+//----------------------------------------------------------------------------
+int pqVTKHistogramModel::getNumberOfBins() const
+{
+  vtkDataArray* yarray = this->getYArray(this->Internal->LastUsedDisplay);
+  if (yarray)
+    {
+    return yarray->GetNumberOfTuples();
+    }
   return 0;
 }
 
+//----------------------------------------------------------------------------
 void pqVTKHistogramModel::getBinValue(int index, pqChartValue &bin) const
 {
-  if (this->Data)
+  vtkDataArray* yarray = this->getYArray(this->Internal->LastUsedDisplay);
+  if(yarray && yarray->GetNumberOfComponents() == 1 && index >= 0 &&
+    index < yarray->GetNumberOfTuples())
     {
-    vtkIntArray *const values = vtkIntArray::SafeDownCast(
-      this->Data->GetCellData()->GetArray("bin_values"));
-    if(values && values->GetNumberOfComponents() == 1 && index >= 0 &&
-      index < values->GetNumberOfTuples())
-      {
-      bin = static_cast<double>(values->GetValue(index));
-      }
+    bin = yarray->GetTuple1(index);
     }
 }
 
+//----------------------------------------------------------------------------
 void pqVTKHistogramModel::getRangeX(pqChartValue &min, pqChartValue &max) const
 {
   min = this->Internal->Minimum.X;
   max = this->Internal->Maximum.X;
 }
 
+//----------------------------------------------------------------------------
 void pqVTKHistogramModel::getRangeY(pqChartValue &min, pqChartValue &max) const
 {
   min = this->Internal->Minimum.Y;
   max = this->Internal->Maximum.Y;
 }
 
-void pqVTKHistogramModel::updateData(vtkDataObject* d)
+//----------------------------------------------------------------------------
+void pqVTKHistogramModel::setCurrentDisplay(pqBarChartDisplay* display)
 {
-  this->updateData(vtkRectilinearGrid::SafeDownCast(d));
-}
-
-void pqVTKHistogramModel::updateData(vtkRectilinearGrid *data)
-{
-  if (this->Data == data)
+  // Update the lookup table.
+  vtkSMProxy* lut = 0;
+  if (display)
     {
-    this->update();
+    lut = pqSMAdaptor::getProxyProperty(
+      display->getProxy()->GetProperty("LookupTable"));
+    }
+
+  this->Internal->ColorScheme.setMapIndexToColor(true);
+  this->Internal->ColorScheme.setScalarsToColors(lut);
+
+  if (this->Internal->LastUsedDisplay == display)
+    {
     return;
     }
 
-
-  // Release the reference to the old data if there is any.
-  if(this->Data)
-    {
-    this->Data->Delete();
-    this->Data = 0;
-    this->Internal->Minimum.X = (int)0;
-    this->Internal->Maximum.X = (int)0;
-    this->Internal->Minimum.Y = (int)0;
-    this->Internal->Maximum.Y = (int)0;
-    }
-
-  // Keep a reference to the new data.
-  this->Data = data;
-  if (this->Data)
-    {
-    this->Data->Register(0);
-    }
-
+  this->Internal->LastUsedDisplay = display;
   this->Internal->MTime.Modified();
-  this->update();
 }
 
+//----------------------------------------------------------------------------
 void pqVTKHistogramModel::update()
 {
-  if ( (this->Internal->MTime > this->Internal->LastUpdateTime) ||
-    (this->Data && this->Data->GetMTime() > this->Internal->LastUpdateTime))
+  this->setCurrentDisplay(this->Internal->getCurrentDisplay());
+
+  bool force = true; //FIXME: until we fix thses conditions to include LUT.
+ 
+  /*
+  // We try to determine if we really need to update the GUI.
+
+  // If the model has been modified since last update.
+  force |= this->Internal->MTime > this->Internal->LastUpdateTime;
+
+  // if the display has been modified since last update.
+  force |= (this->Internal->LastUsedDisplay) && 
+    (this->Internal->LastUsedDisplay->getProxy()->GetMTime() > 
+     this->Internal->LastUpdateTime); 
+
+  // if the data object obtained from the display has been modified 
+  // since last update.
+  vtkRectilinearGrid* data = this->Internal->LastUsedDisplay?
+    this->Internal->LastUsedDisplay->getClientSideData() : 0; 
+  force |= (data) && (data->GetMTime() > this->Internal->LastUpdateTime);
+  */
+  if (force)
     {
     this->forceUpdate();
     }
 }
 
+//----------------------------------------------------------------------------
+void pqVTKHistogramModel::forceUpdateEmptyData()
+{
+  // No data, just show empty chart.
+  this->Internal->Minimum.Y = 0;
+  this->Internal->Maximum.Y = 0;
+  this->Internal->Minimum.X = 0;
+  this->Internal->Maximum.X = 0;
+  this->Internal->LastUpdateTime.Modified();
+  emit this->resetBinValues();
+}
+
+//----------------------------------------------------------------------------
+vtkDataArray* pqVTKHistogramModel::getYArray(pqBarChartDisplay* display) const
+{
+  if (!display)
+    {
+    return 0;
+    }
+  return display->getYArray();
+}
+
+//----------------------------------------------------------------------------
+vtkDataArray* pqVTKHistogramModel::getXArray(pqBarChartDisplay* display) const
+{
+  if (!display)
+    {
+    return 0;
+    }
+  return display->getXArray();
+}
+
+//----------------------------------------------------------------------------
 void pqVTKHistogramModel::forceUpdate()
 {
-  if (this->Data)
-    {
-    // Get the overall range for the histogram. The bin ranges are
-    // stored in the x coordinate array.
-    vtkDoubleArray *const extents = vtkDoubleArray::SafeDownCast(
-      this->Data->GetXCoordinates());
-    if(!extents || extents->GetNumberOfComponents() != 1)
-      {
-      qWarning("Unrecognized histogram extent data. The histogram model expects "
-        "a double array of tuples with one component.");
-      }
-    else if(extents->GetNumberOfTuples() < 2)
-      {
-      qWarning("The histogram range must have at least two values.");
-      }
-    else
-      {
-      this->Internal->Minimum.X = extents->GetValue(0);
-      this->Internal->Maximum.X = extents->GetValue(
-        extents->GetNumberOfTuples() - 1);
+  // ensure that the display to show hasn't changed.
+  this->setCurrentDisplay(this->Internal->getCurrentDisplay());
 
-      // Search through the bin values to find the y-axis range.
-      vtkIntArray *const values = vtkIntArray::SafeDownCast(
-        this->Data->GetCellData()->GetArray("bin_values"));
-      if(!values || values->GetNumberOfComponents() != 1)
-        {
-        qWarning("Unrecognized histogram data. The histogram model expects "
-          "an unsigned long array of tuples with one component.");
-        }
-      else
-        {
-        unsigned long min = 0;
-        unsigned long max = 0;
-        unsigned long value = 0;
-        for(int i = 0; i != values->GetNumberOfTuples(); ++i)
-          {
-          value = values->GetValue(i);
-          if(i == 0)
-            {
-            min = value;
-            max = value;
-            }
-          else if(value < min)
-            {
-            min = value;
-            }
-          else if(value > max)
-            {
-            max = value;
-            }
-          }
-
-        this->Internal->Minimum.Y = static_cast<double>(min);
-        this->Internal->Maximum.Y = static_cast<double>(max);
-        }
-      }
-    }
-  else
+  if (!this->Internal->LastUsedDisplay)
     {
-    this->Internal->Minimum.Y = 0;
-    this->Internal->Maximum.Y = 0;
-    this->Internal->Minimum.X = 0;
-    this->Internal->Maximum.X = 0;
+    this->forceUpdateEmptyData();
+    return;
     }
+
+  pqBarChartDisplay* display = this->Internal->LastUsedDisplay;
+  vtkRectilinearGrid* data = display? display->getClientSideData() : 0;
+  if (!data)
+    {
+    this->forceUpdateEmptyData();
+    return;
+    }
+  
+  vtkDataArray* const xarray = this->getXArray(display);
+  vtkDataArray* const yarray = this->getYArray(display);
+  if (!xarray || !yarray)
+    {
+    qCritical() << "Failed to locate the data to plot on either axes.";
+    this->forceUpdateEmptyData();
+    return;
+    }
+
+  // Get the overall range for the histogram. The bin ranges are
+  // stored in the x coordinate array.
+  if(xarray->GetNumberOfTuples() < 2)
+    {
+    qWarning("The histogram range must have at least two values.");
+    }
+
+  double range[2];
+  xarray->GetRange(range);
+  this->Internal->Minimum.X = range[0];
+  this->Internal->Maximum.X = range[1];
+
+  yarray->GetRange(range);
+  this->Internal->Minimum.Y = range[0];
+  this->Internal->Maximum.Y = range[1];
 
   this->Internal->LastUpdateTime.Modified();
   emit this->resetBinValues();

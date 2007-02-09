@@ -68,6 +68,8 @@ public:
   /// in the ServerManager.
   virtual void forceRender();
 
+  /// Request a delayed forceRender().
+  virtual void render();
 private slots:
   void visibilityChanged(pqDisplay* disp);
 
@@ -76,6 +78,8 @@ private slots:
   // we catch the signal and render in the client.
   void renderInternal();
 
+  /// Internal slot.
+  void delayedRender();
 protected:
   void renderBarChart();
   void renderXYPlot();

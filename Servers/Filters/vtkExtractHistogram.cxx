@@ -28,7 +28,7 @@
 #include "vtkIntArray.h"
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.13");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.14");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -146,6 +146,7 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   bin_extents->SetNumberOfTuples(this->BinCount + 1);
   bin_extents->SetName("bin_extents");
   output_data->SetXCoordinates(bin_extents);
+  output_data->GetPointData()->AddArray(bin_extents);
   bin_extents->Delete();
 
   // Insert values into bins ...
@@ -181,6 +182,20 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
     {
     vtkErrorMacro("Cannot locate array to process.");
     return 0;
+    }
+  bin_extents->SetName(data_array->GetName());
+
+  vtkDataSet *inputDS = vtkDataSet::SafeDownCast(this->GetInput(0));
+  if (inputDS)
+    {
+    if (inputDS->GetPointData()->GetArray(data_array->GetName()) == data_array)
+      {
+      bin_values->SetName("point_values");
+      }
+    else if (inputDS->GetCellData()->GetArray(data_array->GetName()) == data_array)
+      {
+      bin_values->SetName("cell_values");
+      }
     }
 
   // If the requested component is out-of-range for the input, we return an

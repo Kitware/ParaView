@@ -48,9 +48,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QRegExp>
 
 // ParaView includes.
-#include "pqApplicationCore.h"
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
+#include "pqApplicationCore.h"
+#include "pqBarChartDisplay.h"
 #include "pqNameCount.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
@@ -63,8 +64,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerResource.h"
 #include "pqTableViewModule.h"
-#include "pqTimeKeeper.h"
 #include "pqTextWidgetDisplay.h"
+#include "pqTimeKeeper.h"
 
 #include <QVTKWidget.h>
 
@@ -399,6 +400,10 @@ void pqServerManagerModel::onAddDisplay(QString name,
   else if (proxy->GetXMLName() == QString("TextWidgetDisplay"))
     {
     display = new pqTextWidgetDisplay("displays", name, proxy, server, this);
+    }
+  else if (proxy->GetXMLName() == QString("BarChartDisplay"))
+    {
+    display = new pqBarChartDisplay("displays", name, proxy, server, this);
     }
   else
     {
