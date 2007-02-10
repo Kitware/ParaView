@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.14");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.15");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -271,12 +271,12 @@ const char* vtkPVXMLElement::GetAttribute(const char* name)
 char* vtkPVXMLElement::GetSanitizedAttribute(const char* name)
 {
   unsigned int numAttributes = this->Internal->AttributeNames.size();
-  unsigned int i;
-  for(i=0; i < numAttributes; ++i)
+  unsigned int a;
+  for(a=0; a < numAttributes; ++a)
     {
-    if(strcmp(this->Internal->AttributeNames[i].c_str(), name) == 0)
+    if(strcmp(this->Internal->AttributeNames[a].c_str(), name) == 0)
       {
-      const char *value = this->Internal->AttributeValues[i].c_str();
+      const char *value = this->Internal->AttributeValues[a].c_str();
       if (value)
         {
         //un-escape any characters that are not allowed in XML
