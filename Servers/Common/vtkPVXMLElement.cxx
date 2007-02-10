@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.13");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.14");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -121,6 +121,50 @@ void vtkPVXMLElement::AddAttribute(const char* attrName,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXMLElement::AddSanitizedAttribute(const char* attrName,
+                                            const char* attrValue)
+{
+  if (!attrName || !attrValue)
+    {
+    return;
+    }
+  
+  this->Internal->AttributeNames.push_back(attrName);
+
+  //escape any characters that are not allowed in XML
+  vtkstd::string sanitized = "";
+  const int numtok = 8;
+  const char escapees[numtok][3] = 
+    {{"&"},{"\'"},{">"},{"<"},{"\""},{"\r\n"},{"\r"},{"\n"}};
+  const char replacees[numtok][8] = 
+    {{"&amp;"},{"&apos;"},{"&gt;"},{"&lt;"},{"&quot;"},{";PVEOL;"},{";PVEOL;"},{";PVEOL;"}};
+  int len = strlen(attrValue);
+  const char *ptr = attrValue;
+  for (int i = 0; i < len; i++)
+    {
+    bool replaced = false;
+    for (int j = 0; j < numtok; j++)
+      {
+      int szof = strlen(escapees[j]);
+      if (!strncmp(ptr, escapees[j], szof))
+        {
+        sanitized += replacees[j];
+        ptr += szof;
+        replaced = true;
+        break;
+        }
+      }
+    if (!replaced)
+      {
+      char c = *ptr;
+      sanitized += c;
+      ptr++;
+      }    
+    }
+  this->Internal->AttributeValues.push_back(sanitized.c_str());
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXMLElement::SetAttribute(const char* attrName,
   const char* attrValue)
 {
@@ -218,6 +262,58 @@ const char* vtkPVXMLElement::GetAttribute(const char* name)
     if(strcmp(this->Internal->AttributeNames[i].c_str(), name) == 0)
       {
       return this->Internal->AttributeValues[i].c_str();
+      }
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+char* vtkPVXMLElement::GetSanitizedAttribute(const char* name)
+{
+  unsigned int numAttributes = this->Internal->AttributeNames.size();
+  unsigned int i;
+  for(i=0; i < numAttributes; ++i)
+    {
+    if(strcmp(this->Internal->AttributeNames[i].c_str(), name) == 0)
+      {
+      const char *value = this->Internal->AttributeValues[i].c_str();
+      if (value)
+        {
+        //un-escape any characters that are not allowed in XML
+        vtkstd::string sanitized = "";
+        const int numtok = 8;
+        const char escapees[numtok][3] = 
+          {{"&"},{"\'"},{">"},{"<"},{"\""},{"\r\n"},{"\r"},{"\n"}};
+        const char replacees[numtok][8] = 
+          {{"&amp;"},{"&apos;"},{"&gt;"},{"&lt;"},{"&quot;"},{";PVEOL;"},{";PVEOL;"},{";PVEOL;"}};
+        int len = strlen(value);
+        const char *ptr = value;
+        for (int i = 0; i < len; i++)
+          {
+          bool replaced = false;
+          for (int j = 0; j < numtok; j++)
+            {
+            int szof = strlen(replacees[j]);
+            if (!strncmp(ptr, replacees[j], szof))
+              {
+              sanitized += escapees[j];
+              ptr += szof;
+              replaced = true;
+              break;
+              }
+            }
+          if (!replaced)
+            {
+            char c = *ptr;
+            sanitized += c;
+            ptr++;
+            }    
+          }       
+        char *retval = new char[strlen(sanitized.c_str())];
+        strcpy(retval, sanitized.c_str());
+        return retval;
+        }
+      return 0;
       }
     }
   return 0;

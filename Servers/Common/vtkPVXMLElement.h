@@ -48,8 +48,16 @@ public:
 
   // Description:
   // Get the attribute with the given name.  If it doesn't exist,
-  // returns 0.
+  // returns 0. 
   const char* GetAttribute(const char* name);
+
+  // Description:
+  // Like GetAttribute(const char*), but this method does XML
+  // escape DE-coding.
+  // &quot; to "  &gt; to > &lt; to < &apos; to ` and ;PVEOL; to \n
+  // WARNING: The caller is responsible for delete[]'ing the memory that
+  //this method news and returns.
+  char* GetSanitizedAttribute(const char* name);
 
   // Description:
   // Get the character data for the element.
@@ -130,9 +138,17 @@ public:
 #endif
 
   // Description:
+  // Like the AddAttribute(const char*, const char*), but this method
+  // does XML escape encoding.
+  // " to &quot; > to &gt; < to &lt; ' to &apos; and \n|\r|\r\n to ;PVEOL;
+  void AddSanitizedAttribute(const char* attrName, const char* attrValue);
+
+  // Description:
   // Given it's name and value, set an attribute.
   // If an attribute with the given name already exists,
   // it replaces the old attribute.
+  // chars that need to be XML escaped will be done so internally
+  // for example " will be converted to &quot;
   void SetAttribute(const char* attrName, const char* attrValue);
 
   // Description:
