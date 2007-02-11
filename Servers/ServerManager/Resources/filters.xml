@@ -4451,7 +4451,7 @@ This filter extracts a list of datasets from multigroup datasets.
    <!-- End TemporalCache -->
    </SourceProxy>
    
-   <SourceProxy name="CellSelect" class="vtkFrustumExtractor">
+   <SourceProxy name="CellSelect" class="vtkExtractSelectedFrustum">
       <Documentation
         long_help="Draw a rectangle on the screen and obtain the section of data inside it." 
         short_help="Rubber band selection inside a DataSet">

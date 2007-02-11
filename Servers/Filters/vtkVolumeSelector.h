@@ -15,13 +15,13 @@
 // .NAME vtkVolumeSelector - Given a frustrum and a list of datasets, creates a selection
 // .SECTION Description
 // vtkVolumeSelector selects cells that are in the given frustrum from a
-// list of datasets. Internally, it uses vtkFrustumExtractor to select
+// list of datasets. Internally, it uses vtkExtractSelectedFrustum to select
 // cells. The output is a vtkSelection tree. Each node in the tree contains
 // a SOURCE_ID (the proxy id of the producer of the dataset), a PROP_ID (if
 // assigned with AddProp), the PROCESS_ID and the selection list array.
 //
 // .SECTION See Also
-// vtkFrustumExtractor
+// vtkExtractSelectedFrustum
 
 #ifndef __vtkVolumeSelector_h
 #define __vtkVolumeSelector_h
@@ -30,7 +30,7 @@
 
 //BTX
 class vtkAlgorithm;
-class vtkFrustumExtractor;
+class vtkExtractSelectedFrustum;
 class vtkProp;
 class vtkSelection;
 struct vtkVolumeSelectorInternals;
@@ -110,7 +110,7 @@ protected:
   vtkVolumeSelector();
   ~vtkVolumeSelector();
 
-  vtkFrustumExtractor *AtomExtractor;
+  vtkExtractSelectedFrustum *AtomExtractor;
   vtkVolumeSelectorInternals* Internal;
   vtkSelection* Selection;
 

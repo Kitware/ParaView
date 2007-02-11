@@ -26,7 +26,6 @@
 
 class vtkDataSet;
 class vtkExtractSelection;
-class vtkPolyDataExtractSelection;
 class vtkSelection;
 
 class VTK_EXPORT vtkMultiBlockExtractSelection : public vtkMultiBlockDataSetAlgorithm 

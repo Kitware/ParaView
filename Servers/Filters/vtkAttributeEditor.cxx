@@ -40,7 +40,6 @@
 #include "vtkIntArray.h"
 #include "vtkToolkits.h"
 #include "vtkAppendFilter.h"
-#include "vtkExtractCells.h"
 #include "vtkFieldData.h"
 #include "vtkInformationVector.h"
 #ifdef VTK_USE_MPI
@@ -49,7 +48,7 @@
 #include "vtkPickFilter.h"
 
 
-vtkCxxRevisionMacro(vtkAttributeEditor, "1.10");
+vtkCxxRevisionMacro(vtkAttributeEditor, "1.11");
 vtkStandardNewMacro(vtkAttributeEditor);
 vtkCxxSetObjectMacro(vtkAttributeEditor,ClipFunction,vtkImplicitFunction);
 vtkCxxSetObjectMacro(vtkAttributeEditor,Controller,vtkMultiProcessController);
