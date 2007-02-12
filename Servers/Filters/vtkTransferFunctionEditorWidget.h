@@ -52,10 +52,17 @@ public:
 
   // Description:
   // Set the scalar range to show in the transfer function editor.
-  virtual void SetScalarRange(double range[2])
-    { this->SetScalarRange(range[0], range[1]); }
-  virtual void SetScalarRange(double min, double max);
-  vtkGetVector2Macro(ScalarRange, double);
+  virtual void SetVisibleScalarRange(double range[2])
+    { this->SetVisibleScalarRange(range[0], range[1]); }
+  virtual void SetVisibleScalarRange(double min, double max);
+  vtkGetVector2Macro(VisibleScalarRange, double);
+
+  // Description:
+  // Set the whole range of possible scalar values to show in the transfer
+  // function editor. This is used for showing the whole scalar range when
+  // the input is not set.
+  vtkSetVector2Macro(WholeScalarRange, double);
+  vtkGetVector2Macro(WholeScalarRange, double);
 
   // Description:
   // Reset the widget so that it shows the whole scalar range of the input
@@ -85,7 +92,8 @@ protected:
   vtkDataSet *Input;
   char *ArrayName;
   int FieldAssociation;
-  double ScalarRange[2];
+  double VisibleScalarRange[2];
+  double WholeScalarRange[2];
   int NumberOfScalarBins; // used for float and double input images
 
 private:

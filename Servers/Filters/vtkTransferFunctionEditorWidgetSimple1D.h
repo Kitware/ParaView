@@ -46,9 +46,9 @@ public:
 
   // Description:
   // Set the scalar range of the underlying data to display with this widget.
-  virtual void SetScalarRange(double min, double max);
-  virtual void SetScalarRange(double range[2]) 
-    { this->SetScalarRange(range[0], range[1]); }
+  virtual void SetVisibleScalarRange(double min, double max);
+  virtual void SetVisibleScalarRange(double range[2]) 
+    { this->SetVisibleScalarRange(range[0], range[1]); }
 
   // Description:
   // Update the size of the rendering window containing this widget, and

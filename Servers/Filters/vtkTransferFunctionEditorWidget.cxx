@@ -20,7 +20,7 @@
 #include "vtkDataArray.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.3");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.4");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
@@ -29,8 +29,8 @@ vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
   this->ArrayName = NULL;
   this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
   this->NumberOfScalarBins = 10000;
-  this->ScalarRange[0] = 1;
-  this->ScalarRange[1] = 0;
+  this->WholeScalarRange[0] = this->VisibleScalarRange[0] = 1;
+  this->WholeScalarRange[1] = this->VisibleScalarRange[1] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -41,15 +41,21 @@ vtkTransferFunctionEditorWidget::~vtkTransferFunctionEditorWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkTransferFunctionEditorWidget::SetScalarRange(double min, double max)
+void vtkTransferFunctionEditorWidget::SetVisibleScalarRange(double min,
+                                                            double max)
 {
-  if (min == this->ScalarRange[0] && max == this->ScalarRange[1])
+  if (min == this->VisibleScalarRange[0] && max == this->VisibleScalarRange[1])
     {
     return;
     }
 
-  this->ScalarRange[0] = min;
-  this->ScalarRange[1] = max;
+  if (this->WholeScalarRange[0] > this->WholeScalarRange[1])
+    {
+    this->SetWholeScalarRange(min, max);
+    }
+
+  this->VisibleScalarRange[0] = min;
+  this->VisibleScalarRange[1] = max;
   this->Modified();
 
   vtkTransferFunctionEditorRepresentation *rep =
@@ -101,33 +107,36 @@ void vtkTransferFunctionEditorWidget::SetScalarRange(double min, double max)
 //----------------------------------------------------------------------------
 void vtkTransferFunctionEditorWidget::ShowWholeScalarRange()
 {
-  if (!this->Input)
+  if (this->Input)
     {
-    return;
-    }
-  double range[2];
-  vtkDataSetAttributes *dsa;
-  vtkDataArray *dataArray;
-  if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-    {
-    dsa = this->Input->GetPointData();
+    double range[2];
+    vtkDataSetAttributes *dsa;
+    vtkDataArray *dataArray;
+    if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+      {
+      dsa = this->Input->GetPointData();
+      }
+    else
+      {
+      dsa = this->Input->GetCellData();
+      }
+    if (this->ArrayName)
+      {
+      dataArray = dsa->GetArray(this->ArrayName);
+      }
+    else
+      {
+      dataArray = dsa->GetScalars();
+      }
+    if (dataArray)
+      {
+      dataArray->GetRange(range);
+      this->SetVisibleScalarRange(range);
+      }
     }
   else
     {
-    dsa = this->Input->GetCellData();
-    }
-  if (this->ArrayName)
-    {
-    dataArray = dsa->GetArray(this->ArrayName);
-    }
-  else
-    {
-    dataArray = dsa->GetScalars();
-    }
-  if (dataArray)
-    {
-    dataArray->GetRange(range);
-    this->SetScalarRange(range);
+    this->SetVisibleScalarRange(this->WholeScalarRange);
     }
 }
 
@@ -141,7 +150,7 @@ void vtkTransferFunctionEditorWidget::SetInput(vtkDataSet *input)
     if (this->Input != NULL)
       {
       this->Input->Register(this);
-      if (this->ScalarRange[0] > this->ScalarRange[1])
+      if (this->VisibleScalarRange[0] > this->VisibleScalarRange[1])
         {
         double range[2];
         vtkDataSetAttributes *dsa;
@@ -165,7 +174,7 @@ void vtkTransferFunctionEditorWidget::SetInput(vtkDataSet *input)
         if (array)
           {
           array->GetRange(range);
-          this->SetScalarRange(range);
+          this->SetVisibleScalarRange(range);
           }
         }
       this->ComputeHistogram();
@@ -264,6 +273,8 @@ void vtkTransferFunctionEditorWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "ScalarRange: " << this->ScalarRange[0] << " "
-     << this->ScalarRange[1] << endl;
+  os << indent << "VisibleScalarRange: " << this->VisibleScalarRange[0] << " "
+     << this->VisibleScalarRange[1] << endl;
+  os << indent << "WholeScalarRange: " << this->WholeScalarRange[0] << " "
+     << this->WholeScalarRange[1] << endl;
 }

@@ -80,7 +80,8 @@ public:
 
   // Description:
   // Set the input data set containing the scalar array used in the
-  // transfer function.
+  // transfer function. If the input is not set, the histogram will not be
+  // visible, regardless of how HistogramVisibility is set.
   void SetInput(vtkDataSet *input);
 
   // Description:
@@ -97,12 +98,23 @@ public:
   // Set the range of scalar values that will be shown in the rendering
   // window. Set the type of transfer function editor to use before setting
   // or getting the scalar range.
-  void SetScalarRange(double range[2]) 
-    { this->SetScalarRange(range[0], range[1]); }
-  void SetScalarRange(double min, double max);
-  void GetScalarRange(double range[2]);
-  double* GetScalarRange();
+  void SetVisibleScalarRange(double range[2]) 
+    { this->SetVisibleScalarRange(range[0], range[1]); }
+  void SetVisibleScalarRange(double min, double max);
+  void GetVisibleScalarRange(double range[2]);
+  double* GetVisibleScalarRange();
 
+  // Description:
+  // Set the whole range of possible scalar values. This will be used for
+  // resetting the viewer to show the whole scalar range when the input is
+  // not set. Set the type of transfer function editor to use before setting
+  // or getting the scalar range.
+  void SetWholeScalarRange(double range[2])
+    { this->SetWholeScalarRange(range[0], range[1]); }
+  void SetWholeScalarRange(double min, double max);
+  void GetWholeScalarRange(double range[2]);
+  double* GetWholeScalarRange();
+  
   // Description:
   // Provide access to some of the underlying VTK objects.
   vtkGetObjectMacro(Renderer, vtkRenderer);

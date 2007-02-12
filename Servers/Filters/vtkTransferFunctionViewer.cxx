@@ -27,7 +27,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.3");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.4");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -407,11 +407,11 @@ void vtkTransferFunctionViewer::UnInstallPipeline()
 }
 
 //----------------------------------------------------------------------------
-void vtkTransferFunctionViewer::SetScalarRange(double min, double max)
+void vtkTransferFunctionViewer::SetVisibleScalarRange(double min, double max)
 {
   if (this->EditorWidget)
     {
-    this->EditorWidget->SetScalarRange(min, max);
+    this->EditorWidget->SetVisibleScalarRange(min, max);
     }
 
   vtkTransferFunctionEditorRepresentation *rep =
@@ -424,22 +424,50 @@ void vtkTransferFunctionViewer::SetScalarRange(double min, double max)
 }
 
 //----------------------------------------------------------------------------
-void vtkTransferFunctionViewer::GetScalarRange(double range[2])
+void vtkTransferFunctionViewer::GetVisibleScalarRange(double range[2])
 {
   if (this->EditorWidget)
     {
-    this->EditorWidget->GetScalarRange(range);
+    this->EditorWidget->GetVisibleScalarRange(range);
     }
 }
 
 //----------------------------------------------------------------------------
-double* vtkTransferFunctionViewer::GetScalarRange()
+double* vtkTransferFunctionViewer::GetVisibleScalarRange()
 {
   if (!this->EditorWidget)
     {
     return NULL;
     }
-  return this->EditorWidget->GetScalarRange();
+  return this->EditorWidget->GetVisibleScalarRange();
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetWholeScalarRange(double min, double max)
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->SetWholeScalarRange(min, max);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::GetWholeScalarRange(double range[2])
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->GetWholeScalarRange(range);
+    }
+}
+
+//----------------------------------------------------------------------------
+double* vtkTransferFunctionViewer::GetWholeScalarRange()
+{
+  if (!this->EditorWidget)
+    {
+    return NULL;
+    }
+  return this->EditorWidget->GetWholeScalarRange();
 }
 
 //----------------------------------------------------------------------------

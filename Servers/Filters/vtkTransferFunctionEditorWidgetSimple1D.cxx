@@ -25,7 +25,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.3");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.4");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -286,20 +286,20 @@ vtkHandleWidget* vtkTransferFunctionEditorWidgetSimple1D::CreateHandleWidget(
 }
 
 //----------------------------------------------------------------------------
-void vtkTransferFunctionEditorWidgetSimple1D::SetScalarRange(
+void vtkTransferFunctionEditorWidgetSimple1D::SetVisibleScalarRange(
   double min, double max)
 {
-  if (this->ScalarRange[0] == min && this->ScalarRange[1] == max)
+  if (this->VisibleScalarRange[0] == min && this->VisibleScalarRange[1] == max)
     {
     return;
     }
 
   double oldRange[2];
-  this->GetScalarRange(oldRange);
+  this->GetVisibleScalarRange(oldRange);
 
-  this->Superclass::SetScalarRange(min, max);
+  this->Superclass::SetVisibleScalarRange(min, max);
 
-  this->RecomputeNodePositions(oldRange, this->ScalarRange);
+  this->RecomputeNodePositions(oldRange, this->VisibleScalarRange);
 }
 
 //----------------------------------------------------------------------------

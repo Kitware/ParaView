@@ -1,1 +1,2 @@
-vtkTransferFunctionViewer GetScalarRange             307 2
+vtkTransferFunctionViewer GetWholeScalarRange             307 2
+vtkTransferFunctionViewer GetVisibleScalarRange           307 2

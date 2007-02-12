@@ -21,7 +21,7 @@
 #include "vtkTransferFunctionEditorRepresentation.h"
 #include "vtkTransferFunctionEditorWidget.h"
 
-vtkCxxRevisionMacro(vtkInteractorStyleTransferFunctionEditor, "1.1");
+vtkCxxRevisionMacro(vtkInteractorStyleTransferFunctionEditor, "1.2");
 vtkStandardNewMacro(vtkInteractorStyleTransferFunctionEditor);
 
 vtkCxxSetObjectMacro(vtkInteractorStyleTransferFunctionEditor, Widget,
@@ -195,13 +195,13 @@ void vtkInteractorStyleTransferFunctionEditor::Pan()
   double pctX = dx / (double)(size[0]);
 
   double range[2];
-  this->Widget->GetScalarRange(range);
+  this->Widget->GetVisibleScalarRange(range);
 
   double newRange[2];
   double rangeShift = (range[1] - range[0]) * pctX;
   newRange[0] = range[0] + rangeShift;
   newRange[1] = range[1] + rangeShift;
-  this->Widget->SetScalarRange(newRange);
+  this->Widget->SetVisibleScalarRange(newRange);
 
   vtkTransferFunctionEditorRepresentation *rep =
     vtkTransferFunctionEditorRepresentation::SafeDownCast(
@@ -229,13 +229,13 @@ void vtkInteractorStyleTransferFunctionEditor::Zoom()
   double scaleFactor = pow((double)1.1, dyf);
 
   double range[2];
-  this->Widget->GetScalarRange(range);
+  this->Widget->GetVisibleScalarRange(range);
 
   double newRange[2];
   double newRangeWidth = (range[1] - range[0]) / scaleFactor;
   newRange[0] = (range[0] + range[1] - newRangeWidth) * 0.5;
   newRange[1] = newRange[0] + newRangeWidth;
-  this->Widget->SetScalarRange(newRange);
+  this->Widget->SetVisibleScalarRange(newRange);
 
   vtkTransferFunctionEditorRepresentation *rep =
     vtkTransferFunctionEditorRepresentation::SafeDownCast(
