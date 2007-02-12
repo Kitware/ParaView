@@ -681,6 +681,12 @@ void pqMultiView::maximizeWidget(QWidget* maxWidget)
     // Already maximized, nothing to do.
     return;
     }
+  if (this->CurrentMaximizedFrame)
+    {
+    this->CurrentMaximizedFrame->restore();
+    this->CurrentMaximizedFrame = 0;
+    }
+
 
   QWidget *w = this->SplitterFrame->layout()->itemAt(0)->widget();
   QSplitter *splitter = qobject_cast<QSplitter *>(w);
