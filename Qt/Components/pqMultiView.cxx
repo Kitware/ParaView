@@ -671,10 +671,16 @@ pqMultiViewFrame* pqMultiView::splitWidgetVertical(QWidget* w)
 //-----------------------------------------------------------------------------
 void pqMultiView::maximizeWidget(QWidget* maxWidget)
 {
-
   pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(maxWidget);
   if(!frame)
+    {
     return;
+    }
+  if (this->CurrentMaximizedFrame == frame)
+    {
+    // Already maximized, nothing to do.
+    return;
+    }
 
   QWidget *w = this->SplitterFrame->layout()->itemAt(0)->widget();
   QSplitter *splitter = qobject_cast<QSplitter *>(w);
