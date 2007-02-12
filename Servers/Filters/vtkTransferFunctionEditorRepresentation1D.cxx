@@ -21,7 +21,7 @@
 #include "vtkPointData.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.2");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.3");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation1D, Histogram,
                      vtkIntArray);
@@ -55,6 +55,15 @@ void vtkTransferFunctionEditorRepresentation1D::SetDisplaySize(int x, int y)
                                         this->DisplaySize[1], 1);
     this->HistogramImage->SetNumberOfScalarComponents(4);
     this->HistogramImage->AllocateScalars();
+    vtkUnsignedCharArray *array = vtkUnsignedCharArray::SafeDownCast(
+      this->HistogramImage->GetPointData()->GetScalars());
+    if (array)
+      {
+      array->FillComponent(0, 0);
+      array->FillComponent(1, 0);
+      array->FillComponent(2, 0);
+      array->FillComponent(3, 0);
+      }
     }
 }
 
