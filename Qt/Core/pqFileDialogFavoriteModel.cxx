@@ -49,9 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMAdaptor.h"
 
-namespace
-{
-
 /////////////////////////////////////////////////////////////////////
 // Icons
 
@@ -60,14 +57,14 @@ Q_GLOBAL_STATIC(QFileIconProvider, Icons);
 //////////////////////////////////////////////////////////////////////
 // FileInfo
 
-class FileInfo
+class pqFileDialogFavoriteModelFileInfo
 {
 public:
-  FileInfo()
+  pqFileDialogFavoriteModelFileInfo()
   {
   }
 
-  FileInfo(const QString& l, const QString& filepath, 
+  pqFileDialogFavoriteModelFileInfo(const QString& l, const QString& filepath, 
            const bool isdir, const bool isroot) :
     Label(l),
     FilePath(filepath),
@@ -103,15 +100,13 @@ private:
   bool IsRoot;
 };
 
-} // end namspace
-
 //////////////////////////////////////////////////////////////////
 // FavoriteModel
 
 class pqFileDialogFavoriteModel::pqImplementation
 {
 public:
-  QList<FileInfo> FavoriteList;
+  QList<pqFileDialogFavoriteModelFileInfo> FavoriteList;
 
 
   pqImplementation(pqServer* server)
@@ -154,7 +149,7 @@ public:
       continue;
       }
     int type = cur_info->GetType();
-    this->FavoriteList.push_back(FileInfo(
+    this->FavoriteList.push_back(pqFileDialogFavoriteModelFileInfo(
         cur_info->GetName(), cur_info->GetFullPath(),
         (type == vtkPVFileInformation::DIRECTORY || 
           type == vtkPVFileInformation::DRIVE),
@@ -183,7 +178,7 @@ QString pqFileDialogFavoriteModel::filePath(const QModelIndex& Index) const
 {
   if(Index.row() < this->Implementation->FavoriteList.size())
     {
-    FileInfo& file = this->Implementation->FavoriteList[Index.row()];
+    pqFileDialogFavoriteModelFileInfo& file = this->Implementation->FavoriteList[Index.row()];
     return file.filePath();
     }
   return QString();
@@ -194,7 +189,7 @@ bool pqFileDialogFavoriteModel::isDir(const QModelIndex& Index) const
   if(Index.row() >= this->Implementation->FavoriteList.size())
     return false;
     
-  FileInfo& file = this->Implementation->FavoriteList[Index.row()];
+  pqFileDialogFavoriteModelFileInfo& file = this->Implementation->FavoriteList[Index.row()];
   return file.isDir();
 }
 
@@ -206,7 +201,7 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
   if(idx.row() >= this->Implementation->FavoriteList.size())
     return QVariant();
 
-  const FileInfo& file = this->Implementation->FavoriteList[idx.row()];
+  const pqFileDialogFavoriteModelFileInfo& file = this->Implementation->FavoriteList[idx.row()];
   switch(role)
     {
     case Qt::DisplayRole:

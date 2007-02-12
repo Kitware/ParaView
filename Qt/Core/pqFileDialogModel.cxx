@@ -53,22 +53,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkStringList.h>
 
 #include "pqSMAdaptor.h"
-namespace
-{
-  
 
 //////////////////////////////////////////////////////////////////////
-// FileInfo
+// pqFileDialogModelFileInfo
 
-class FileInfo
+class pqFileDialogModelFileInfo
 {
 public:
-  FileInfo()
+  pqFileDialogModelFileInfo()
   {
   }
 
-  FileInfo(const QString& l, const QString& filepath, 
-           const bool isdir, const QList<FileInfo>& g = QList<FileInfo>()) :
+  pqFileDialogModelFileInfo(const QString& l, const QString& filepath, 
+           const bool isdir, const QList<pqFileDialogModelFileInfo>& g =
+           QList<pqFileDialogModelFileInfo>()) :
     Label(l),
     FilePath(filepath),
     IsDir(isdir),
@@ -107,7 +105,7 @@ public:
     return !this->Group.empty();
   }
 
-  const QList<FileInfo>& group() const
+  const QList<pqFileDialogModelFileInfo>& group() const
   {
     return this->Group;
   }
@@ -117,7 +115,7 @@ private:
   QString FilePath;
   bool IsDir;
   bool IsLink;
-  QList<FileInfo> Group;
+  QList<pqFileDialogModelFileInfo> Group;
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -152,7 +150,7 @@ public:
     return QIcon();
     }
 
-  QIcon icon(const FileInfo& info) const
+  QIcon icon(const pqFileDialogModelFileInfo& info) const
     {
     if(info.isDir())
       return icon(info.isLink() ? FolderLink : Folder);
@@ -174,24 +172,27 @@ protected:
 
 Q_GLOBAL_STATIC(pqFileDialogModelIconProvider, Icons);
 
+namespace {
+
 ///////////////////////////////////////////////////////////////////////
 // CaseInsensitiveSort
 
-bool CaseInsensitiveSort(const FileInfo& A, const FileInfo& B)
+bool CaseInsensitiveSort(const pqFileDialogModelFileInfo& A, const
+  pqFileDialogModelFileInfo& B)
 {
   // Sort alphabetically (but case-insensitively)
   return A.label().toLower() < B.label().toLower();
 }
 
 class CaseInsensitiveSortGroup 
-  : public vtkstd::binary_function<FileInfo, FileInfo, bool>
+  : public vtkstd::binary_function<pqFileDialogModelFileInfo, pqFileDialogModelFileInfo, bool>
 {
 public:
   CaseInsensitiveSortGroup(const QString& groupName)
     {
     this->numPrefix = groupName.length();
     }
-  bool operator()(const FileInfo& A, const FileInfo& B) const
+  bool operator()(const pqFileDialogModelFileInfo& A, const pqFileDialogModelFileInfo& B) const
     {
     QString aLabel = A.label();
     QString bLabel = B.label();
@@ -298,8 +299,8 @@ public:
     this->CurrentPath = path;
     this->FileList.clear();
 
-    QList<FileInfo> dirs;
-    QList<FileInfo> files;
+    QList<pqFileDialogModelFileInfo> dirs;
+    QList<pqFileDialogModelFileInfo> files;
 
     vtkSmartPointer<vtkCollectionIterator> iter;
     iter.TakeReference(dir->GetContents()->NewIterator());
@@ -316,15 +317,15 @@ public:
         }
       if (info->GetType() == vtkPVFileInformation::DIRECTORY)
         {
-        dirs.push_back(FileInfo(info->GetName(), info->GetFullPath(), true));
+        dirs.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(), true));
         }
       else if (info->GetType() == vtkPVFileInformation::SINGLE_FILE)
         {
-        files.push_back(FileInfo(info->GetName(), info->GetFullPath(), false));
+        files.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(), false));
         }
       else if (info->GetType() == vtkPVFileInformation::FILE_GROUP)
         {
-        QList<FileInfo> groupFiles;
+        QList<pqFileDialogModelFileInfo> groupFiles;
         vtkSmartPointer<vtkCollectionIterator> childIter;
         childIter.TakeReference(info->GetContents()->NewIterator());
         for (childIter->InitTraversal(); !childIter->IsDoneWithTraversal();
@@ -332,12 +333,12 @@ public:
           {
           vtkPVFileInformation* child = vtkPVFileInformation::SafeDownCast(
             childIter->GetCurrentObject());
-          groupFiles.push_back(FileInfo(child->GetName(), child->GetFullPath(),
+          groupFiles.push_back(pqFileDialogModelFileInfo(child->GetName(), child->GetFullPath(),
                                    false));
           }
         vtkstd::sort(groupFiles.begin(), groupFiles.end(),
                      CaseInsensitiveSortGroup(info->GetName()));
-        files.push_back(FileInfo(info->GetName(), groupFiles[0].filePath(), false,
+        files.push_back(pqFileDialogModelFileInfo(info->GetName(), groupFiles[0].filePath(), false,
             groupFiles));
         }
       }
@@ -361,7 +362,7 @@ public:
 
     if(Index.row() < this->FileList.size())
       { 
-      FileInfo& file = this->FileList[Index.row()];
+      pqFileDialogModelFileInfo& file = this->FileList[Index.row()];
       results.push_back(file.filePath());
       }
 
@@ -373,7 +374,7 @@ public:
     if(Index.row() >= this->FileList.size())
       return false;
 
-    FileInfo& file = this->FileList[Index.row()];
+    pqFileDialogModelFileInfo& file = this->FileList[Index.row()];
     return file.isDir();
     }
 
@@ -388,7 +389,7 @@ public:
   /// Current path being displayed (server's filesystem).
   QString CurrentPath;
   /// Caches information about the set of files within the current path.
-  QVector<FileInfo> FileList;  // adjacent memory occupation for QModelIndex
+  QVector<pqFileDialogModelFileInfo> FileList;  // adjacent memory occupation for QModelIndex
 
   /// The last path accessed by this file dialog model
   /// used to remember paths across the session
@@ -559,7 +560,7 @@ int pqFileDialogModel::columnCount(const QModelIndex& /*idx*/) const
 
 QVariant pqFileDialogModel::data(const QModelIndex & idx, int role) const
 {
-  const FileInfo* file = NULL;
+  const pqFileDialogModelFileInfo* file = NULL;
 
   if(idx.isValid() && 
      NULL == idx.internalPointer() &&
@@ -570,8 +571,8 @@ QVariant pqFileDialogModel::data(const QModelIndex & idx, int role) const
     }
   else if(idx.isValid() && idx.internalPointer())
     {
-    FileInfo* ptr = reinterpret_cast<FileInfo*>(idx.internalPointer());
-    const QList<FileInfo>& grp = ptr->group();
+    pqFileDialogModelFileInfo* ptr = reinterpret_cast<pqFileDialogModelFileInfo*>(idx.internalPointer());
+    const QList<pqFileDialogModelFileInfo>& grp = ptr->group();
     if(idx.row() >= 0 && idx.row() < grp.size())
       {
       file = &grp[idx.row()];
@@ -607,7 +608,7 @@ QModelIndex pqFileDialogModel::index(int row, int column,
      p.row() < this->Implementation->FileList.size() &&
      NULL == p.internalPointer())
     {
-    FileInfo* fi = &this->Implementation->FileList[p.row()];
+    pqFileDialogModelFileInfo* fi = &this->Implementation->FileList[p.row()];
     return this->createIndex(row, column, fi);
     }
 
@@ -621,7 +622,7 @@ QModelIndex pqFileDialogModel::parent(const QModelIndex& idx) const
     return QModelIndex();
     }
   
-  const FileInfo* ptr = reinterpret_cast<FileInfo*>(idx.internalPointer());
+  const pqFileDialogModelFileInfo* ptr = reinterpret_cast<pqFileDialogModelFileInfo*>(idx.internalPointer());
   int row = ptr - &this->Implementation->FileList.first();
   return this->createIndex(row, idx.column());
 }
