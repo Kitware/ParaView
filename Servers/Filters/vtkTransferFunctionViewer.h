@@ -141,6 +141,7 @@ protected:
   char *ArrayName;
   int FieldAssociation;
   vtkEventForwarderCommand *EventForwarder;
+  unsigned long InputMTime;
 
 private:
   vtkTransferFunctionViewer(const vtkTransferFunctionViewer&); // Not implemented.

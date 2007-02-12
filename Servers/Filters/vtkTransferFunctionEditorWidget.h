@@ -66,6 +66,11 @@ public:
   // Reconfigure the widget based on the size of the renderer containing it.
   virtual void Configure(int size[2]);
 
+  // Description:
+  // Notify the widget that the input has been modified so the histogram
+  // needs to be recomputed.
+  virtual void InputModified();
+
 protected:
   vtkTransferFunctionEditorWidget();
   ~vtkTransferFunctionEditorWidget();

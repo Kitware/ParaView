@@ -26,26 +26,17 @@
 
 #include "vtkTransferFunctionEditorWidget.h"
 
-class vtkDoubleArray;
-
 class VTK_EXPORT vtkTransferFunctionEditorWidget1D : public vtkTransferFunctionEditorWidget
 {
 public:
   vtkTypeRevisionMacro(vtkTransferFunctionEditorWidget1D, vtkTransferFunctionEditorWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Method for activating this widget. Note that the widget representation
-  // must be specified or the widget will not appear.
-  virtual void SetEnabled(int enabled);
-
 protected:
   vtkTransferFunctionEditorWidget1D();
   ~vtkTransferFunctionEditorWidget1D();
 
   virtual void ComputeHistogram();
-
-  vtkDoubleArray *Histogram;
 
 private:
   vtkTransferFunctionEditorWidget1D(const vtkTransferFunctionEditorWidget1D&); // Not implemented.

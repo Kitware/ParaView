@@ -27,7 +27,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.2");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.3");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -42,6 +42,7 @@ vtkTransferFunctionViewer::vtkTransferFunctionViewer()
   this->ArrayName = NULL;
   this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
   this->EventForwarder = vtkEventForwarderCommand::New();
+  this->InputMTime = 0;
 
   this->EventForwarder->SetTarget(this);
 
@@ -149,6 +150,7 @@ void vtkTransferFunctionViewer::SetInput(vtkDataSet *input)
     if (this->Input != NULL)
       {
       this->Input->Register(this);
+      this->InputMTime = this->Input->GetMTime();
       }
     if (tmpInput != NULL)
       {
@@ -326,9 +328,17 @@ void vtkTransferFunctionViewer::SetSize(int x, int y)
 //----------------------------------------------------------------------------
 void vtkTransferFunctionViewer::Render()
 {
-  if (this->EditorWidget && this->EditorWidget->GetRepresentation())
+  if (this->EditorWidget)
     {
-    this->EditorWidget->GetRepresentation()->BuildRepresentation();
+    if (this->Input && this->Input->GetMTime() > this->InputMTime)
+      {
+      this->InputMTime = this->Input->GetMTime();
+      this->EditorWidget->InputModified();
+      }
+    if (this->EditorWidget->GetRepresentation())
+      {
+      this->EditorWidget->GetRepresentation()->BuildRepresentation();
+      }
     }
 
   this->RenderWindow->Render();

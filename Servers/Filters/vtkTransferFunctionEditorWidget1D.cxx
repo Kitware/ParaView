@@ -17,26 +17,23 @@
 #include "vtkCellData.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetHistogramFilter.h"
-#include "vtkDoubleArray.h"
 #include "vtkImageAccumulate.h"
 #include "vtkImageData.h"
+#include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkPointData.h"
 #include "vtkTransferFunctionEditorRepresentation1D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget1D, "1.2");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget1D, "1.3");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget1D::vtkTransferFunctionEditorWidget1D()
 {
-  this->Histogram = vtkDoubleArray::New();
-  this->Histogram->SetNumberOfComponents(1);
 }
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget1D::~vtkTransferFunctionEditorWidget1D()
 {
-  this->Histogram->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -72,6 +69,9 @@ void vtkTransferFunctionEditorWidget1D::ComputeHistogram()
   double range[2];
   array->GetRange(range);
 
+  vtkTransferFunctionEditorRepresentation1D *rep =
+    vtkTransferFunctionEditorRepresentation1D::SafeDownCast(this->WidgetRep);
+
   if (this->Input->IsA("vtkImageData"))
     {
     vtkImageAccumulate *accum = vtkImageAccumulate::New();
@@ -90,8 +90,11 @@ void vtkTransferFunctionEditorWidget1D::ComputeHistogram()
       }
     accum->SetComponentOrigin(range[0], 0, 0);
     accum->Update();
-    this->Histogram->DeepCopy(
-      accum->GetOutput()->GetPointData()->GetScalars());
+    if (rep)
+      {
+      rep->SetHistogram(static_cast<vtkIntArray*>(
+                          accum->GetOutput()->GetPointData()->GetScalars()));
+      }
     accum->Delete();
     }
   else
@@ -111,23 +114,14 @@ void vtkTransferFunctionEditorWidget1D::ComputeHistogram()
       }
     hist->SetOutputOrigin(range[0]);
     hist->Update();
-    this->Histogram->DeepCopy(
-      hist->GetOutput()->GetPointData()->GetScalars());
+    if (rep)
+      {
+      rep->SetHistogram(static_cast<vtkIntArray*>(
+                          hist->GetOutput()->GetPointData()->GetScalars()));
+      }
     hist->Delete();
     }
-}
 
-//----------------------------------------------------------------------------
-void vtkTransferFunctionEditorWidget1D::SetEnabled(int enabled)
-{
-  this->Superclass::SetEnabled(enabled);
-
-  vtkTransferFunctionEditorRepresentation1D *rep =
-    vtkTransferFunctionEditorRepresentation1D::SafeDownCast(this->WidgetRep);
-  if (enabled && rep)
-    {
-    rep->SetHistogram(this->Histogram);
-    }
 }
 
 //----------------------------------------------------------------------------
