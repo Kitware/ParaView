@@ -30,7 +30,7 @@
 #include "vtkTransferFunctionEditorRepresentation.h"
 
 class vtkImageData;
-class vtkDoubleArray;
+class vtkIntArray;
 
 class VTK_EXPORT vtkTransferFunctionEditorRepresentation1D : public vtkTransferFunctionEditorRepresentation
 {
@@ -39,9 +39,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the double array containing the histogram (computed by the
+  // Set the int array containing the histogram (computed by the
   // associated vtkTransferFunctionEditorWidget1D).
-  void SetHistogram(vtkDoubleArray* histogram);
+  void SetHistogram(vtkIntArray* histogram);
 
   // Description:
   // Put together the necessary parts to display this 3D widget
@@ -57,7 +57,7 @@ protected:
 
   void UpdateHistogramImage();
 
-  vtkDoubleArray *Histogram;
+  vtkIntArray *Histogram;
   vtkImageData *HistogramImage;
 
 private:
