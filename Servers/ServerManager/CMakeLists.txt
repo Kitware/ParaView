@@ -34,6 +34,7 @@ SET(Kit_SRCS
   vtkSMCameraManipulatorProxy.cxx
   vtkSMCameraLink.cxx
   vtkSMCaveRenderModuleProxy.cxx
+  vtkSMClientServerRenderModuleProxy.cxx
   vtkSMComparativeVisProxy.cxx
   vtkSMCompositeDisplayProxy.cxx
   vtkSMCompositeKeyFrameProxy.cxx
@@ -82,7 +83,6 @@ SET(Kit_SRCS
   vtkSMLODRenderModuleProxy.cxx
   vtkSMMaterialLoaderProxy.cxx
   vtkSMMultiDisplayProxy.cxx
-  vtkSMMultiDisplayRenderModuleProxy.cxx
   vtkSMMultiViewRenderModuleProxy.cxx
   vtkSMNew3DWidgetProxy.cxx
   vtkSMNumberOfGroupsDomain.cxx
@@ -129,7 +129,6 @@ SET(Kit_SRCS
   vtkSMSimpleDoubleInformationHelper.cxx
   vtkSMSimpleRenderModuleProxy.cxx
   vtkSMSimpleStringInformationHelper.cxx
-  vtkSMMPIRenderModuleProxy.cxx
   vtkSMSourceProxy.cxx
   vtkSMSphereWidgetProxy.cxx
   vtkSMStateLoader.cxx
@@ -184,6 +183,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMAbstractViewModuleProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationSceneWriter.cxx
+  vtkSMCompositeRenderModuleProxy.cxx
   vtkSMConsumerDisplayProxy.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx

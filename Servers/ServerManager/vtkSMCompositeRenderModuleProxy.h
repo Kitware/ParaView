@@ -23,117 +23,32 @@
 #ifndef __vtkSMCompositeRenderModuleProxy_h
 #define __vtkSMCompositeRenderModuleProxy_h
 
-#include "vtkSMLODRenderModuleProxy.h"
-// We could have very well derrived this from vtkSMRenderModuleProxy, but hey!
+#include "vtkSMClientServerRenderModuleProxy.h"
 
-class vtkSMCompositeDisplayProxy;
 class vtkSMDisplayProxy;
 
-class VTK_EXPORT vtkSMCompositeRenderModuleProxy : public vtkSMLODRenderModuleProxy
+class VTK_EXPORT vtkSMCompositeRenderModuleProxy : public vtkSMClientServerRenderModuleProxy
 {
 public:
-  static vtkSMCompositeRenderModuleProxy* New();
-  vtkTypeRevisionMacro(vtkSMCompositeRenderModuleProxy, vtkSMLODRenderModuleProxy);
+  vtkTypeRevisionMacro(vtkSMCompositeRenderModuleProxy, vtkSMClientServerRenderModuleProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  vtkSetMacro(CompositeThreshold, double);
-  vtkGetMacro(CompositeThreshold, double);
-
-  // Description:
-  // Set this flag to indicate whether to calculate the reduction factor for
-  // use in tree composite (or client server).
-  vtkSetMacro(ReductionFactor, int);
-  vtkGetMacro(ReductionFactor, int);
-
-  // Description:
-  // Squirt is a hybrid run length encoding and bit reduction compression
-  // algorithm that is used to compress images for transmition from the
-  // server to client.  Value of 0 disabled all compression.  Level zero is just
-  // run length compression with no bit compression (lossless).
-  vtkSetMacro(SquirtLevel, int);
-  vtkGetMacro(SquirtLevel, int);
-
-  // Description:
-  // Render based on the interactive render parameters. This usually means
-  // LOD size, LOD geometry.
-  virtual void InteractiveRender();
-
-  // Description:
-  // Render based on the still render parameters. This usually means
-  // full size, full geometry.
-  virtual void StillRender();
-
-  // Description:
-  // Get the value of the z buffer at a position. 
-  // This is necessary for picking the center of rotation.
-  virtual double GetZBufferValue(int x, int y);
-
-  // Description:
-  // Indicates if we should locally render.
-  virtual int IsRenderLocal();
+  // This is an alias for RemoteRenderThreshold (here for backward
+  // compatibility).
+  void SetCompositeThreshold(double val) {this->SetRemoteRenderThreshold(val);}
+  double GetCompositeThreshold() {return this->GetRemoteRenderThreshold();}
 
 protected:
   vtkSMCompositeRenderModuleProxy();
   ~vtkSMCompositeRenderModuleProxy();
 
   virtual void CreateVTKObjects(int numObjects);
-  // Computes the reduction factor to use in compositing.
-  virtual void ComputeReductionFactor(int inReductionFactor);
-  int ReductionFactor;
-  int SquirtLevel;
-
-  int LocalRender;
-
-  int CollectionDecision;
-  int LODCollectionDecision;
-
-  double CompositeThreshold;
-  
-  vtkSMProxy* CompositeManagerProxy;
 
   // Description:
-  // Subclasses must decide what type of CompositeManagerProxy they need.
-  // This method is called to make that decision. Subclasses are expected to
-  // add the CompositeManagerProxy as a SubProxy named "CompositeManager".
-  virtual void CreateCompositeManager() { }; //TODO: pure virtual.
-
-  // Description:
-  // Subclasses should override this method to intialize the Composite Manager.
-  // This is called after CreateVTKObjects();
-  virtual void InitializeCompositingPipeline();
-
-  // Indicates if we should locally render.
-  // Flag stillRender is set when this decision is to be made during StillRender
-  // else it's 0 (for InteractiveRender);
-  virtual int GetLocalRenderDecision(unsigned long totalMemory, int stillRender);
-
-  // Convenience method to set CollectionDecition on DisplayProxy.
-  void SetCollectionDecision(vtkSMCompositeDisplayProxy* pDisp, int decision);
-  
-  // Convenience method to set LODCollectionDecision on DisplayProxy.
-  void SetLODCollectionDecision(vtkSMCompositeDisplayProxy* pDisp, int decision);
-  
-  // Convenience method to set ImageReductionFactor on Composity Proxy.
-  // Note that this message is sent only to the client.
-  void SetImageReductionFactor(vtkSMProxy* compositor, int factor);
-
-  // Convenience method to set Squirt Level on Composite Proxy.
-  // Note that this message is sent only to the client.
-  void SetSquirtLevel(vtkSMProxy* compositor, int level);
-  
-  // Convenience method to set Use Compositing on COmposite Proxy.
-  // Note that this message is sent only to the client.
-  void SetUseCompositing(vtkSMProxy* p, int flag);
-
-  // Return the servers  where the PrepareProgress request
-  // must be sent when rendering. By default,
-  // it is RENDER_SERVER|CLIENT, however in CompositeRenderModule,
-  // when rendering locally, the progress messages need not 
-  // be sent to the servers.
-  virtual vtkTypeUInt32 GetRenderingProgressServers();
+  // Subclasses should override this method to setup any compositing classes.
+  // This is called during CreateVTKObjects();
+  virtual void InitializeCompositingPipeline() { }
 private:
   vtkSMCompositeRenderModuleProxy(const vtkSMCompositeRenderModuleProxy&); // Not implemented.
   void operator=(const vtkSMCompositeRenderModuleProxy&); // Not implemented.

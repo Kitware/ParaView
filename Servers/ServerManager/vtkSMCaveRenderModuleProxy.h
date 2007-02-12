@@ -37,10 +37,10 @@ protected:
   ~vtkSMCaveRenderModuleProxy();
   
   // Description:
-  // Subclasses must decide what type of CompositeManagerProxy they need.
+  // Subclasses must decide what type of RenderSyncManagerProxy they need.
   // This method is called to make that decision. Subclasses are expected to
-  // add the CompositeManagerProxy as a SubProxy named "CompositeManager".
-  virtual void CreateCompositeManager();
+  // add the RenderSyncManagerProxy as a SubProxy named "RenderSyncManager".
+  virtual void CreateRenderSyncManager();
 
   // Description:
   // Subclasses should override this method to intialize the Composite Manager.

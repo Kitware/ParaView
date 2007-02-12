@@ -47,7 +47,6 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMMPIRenderModuleProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
@@ -55,7 +54,7 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.67");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.68");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1455,33 +1454,19 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
   vcsProxy->SetConnectionID(this->ConnectionID);
   vcsProxy->SetServers(this->Servers);
 
-  //don't let the CompositeManager control back/front buffer swapping so that
+  //don't let the RenderSyncManager control back/front buffer swapping so that
   //we can do it here instead.
-  vtkSMProxy *CM = this->GetSubProxy("CompositeManager");
+  vtkSMProxy *renderSyncManager = this->GetSubProxy("RenderSyncManager");
   vtkSMIntVectorProperty *setAllowBuffSwap = NULL;
-  if (CM)
+  if (renderSyncManager)
     {
     setAllowBuffSwap = vtkSMIntVectorProperty::SafeDownCast(
-      CM->GetProperty("SetUseBackBuffer"));
+      renderSyncManager->GetProperty("SetUseBackBuffer"));
     }
   if (setAllowBuffSwap != NULL)
     {
     setAllowBuffSwap->SetElements1(0);
-    CM->UpdateVTKObjects();
-    }
-
-  //MPIRenderServer mode uses an imageactor on the client 
-  //(see vtkClientCompositeManager) internally to do compositing, 
-  //which doesnt jive with selection mode rendering. This looks for that 
-  //particular case and deals with it by only doing selection on the 
-  //renderserver nodes.
-  vtkSMMPIRenderModuleProxy *meAsMPI_RMP = vtkSMMPIRenderModuleProxy::SafeDownCast(this);
-  if (!this->IsRenderLocal() && meAsMPI_RMP != NULL && CM != NULL)
-    {
-    if (!strcmp(CM->GetVTKClassName(), "vtkClientCompositeManager"))
-      {
-      vcsProxy->SetServers(vtkProcessModule::RENDER_SERVER);
-      }      
+    renderSyncManager->UpdateVTKObjects();
     }
 
   //how we get access to the renderers
@@ -1564,9 +1549,9 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
 
   if (setAllowBuffSwap != NULL)
     {
-    //let the CompositeManager control back/front buffer swapping
+    //let the RenderSyncManager control back/front buffer swapping
     setAllowBuffSwap->SetElements1(1);
-    CM->UpdateVTKObjects();
+    renderSyncManager->UpdateVTKObjects();
     }
   
   //convert the intermediate results into  the selection data structure 

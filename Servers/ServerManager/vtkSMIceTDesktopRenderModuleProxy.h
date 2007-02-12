@@ -52,42 +52,11 @@ public:
   // Multi-view methods:
 
   // Description:
-  // Sets the size of the server render window.
-  // Overridden to send the value to the composite manager.
-  virtual void SetGUISize(int x, int y);
-
-  // Description:
-  // Sets the position of the view associated with this module inside
-  // the server render window. (0,0) corresponds to upper left corner.
-  // Overridden to send the value to the composite manager.
-  virtual void SetWindowPosition(int x, int y);
-
-  // Description:
-  // Set the proxy of the server render window. This should be set
-  // immediately after the render module is created. Setting this
-  // after CreateVTKObjects() has been called has no effect.
-  void SetServerRenderWindowProxy(vtkSMProxy*);
-  vtkGetObjectMacro(ServerRenderWindowProxy, vtkSMProxy);
-
-  // Description:
-  // Set the proxy of the server composite manager. This should be set
-  // immediately after the render module is created. Setting this after
-  // CreateVTKObjects() has been called has no effect.
-  void SetServerCompositeManagerProxy(vtkSMProxy*);
-  vtkGetObjectMacro(ServerCompositeManagerProxy, vtkSMProxy);
-
-  // Description:
   // Set the proxy of the server display manager. This should be set
   // immediately after the render module is created. Setting this after
   // CreateVTKObjects() has been called has no effect.
   void SetServerDisplayManagerProxy(vtkSMProxy*);
   vtkGetObjectMacro(ServerDisplayManagerProxy, vtkSMProxy);
-
-  // Description:
-  // Set the Id of the render module. This is only needed for multi view
-  // and has to be unique. It is used to match client/server render RMIs
-  vtkSetMacro(RenderModuleId, int);
-  vtkGetMacro(RenderModuleId, int);
 
 protected:
   vtkSMIceTDesktopRenderModuleProxy();
@@ -96,12 +65,6 @@ protected:
   // This method is the wierdest CreateVTKObjects I have known.
   // Basically we are trying to create the Renderer in a non-standard way.
   virtual void CreateVTKObjects(int numObjects);
- 
-  // Description:
-  // Subclasses must decide what type of CompositeManagerProxy they need.
-  // This method is called to make that decision. Subclasses are expected to
-  // add the CompositeManagerProxy as a SubProxy named "CompositeManager".
-  virtual void CreateCompositeManager();
 
   // Description:
   // Subclasses should override this method to intialize the Composite Manager.
@@ -124,11 +87,7 @@ protected:
   // Generator is used only when volume rendering structured data.
   vtkSMProxy* PKdTreeGeneratorProxy;
 
-  vtkSMProxy* ServerRenderWindowProxy;
-  vtkSMProxy* ServerCompositeManagerProxy;
   vtkSMProxy* ServerDisplayManagerProxy;
-
-  int RenderModuleId;
 
   // This flag is set when we generate the k-d tree ourselves 
   // (in case of structured volume rendering). 

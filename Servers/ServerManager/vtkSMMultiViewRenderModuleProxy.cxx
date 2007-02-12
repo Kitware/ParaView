@@ -16,12 +16,13 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkSMClientServerRenderModuleProxy.h"
 #include "vtkSMIceTDesktopRenderModuleProxy.h"
 #include "vtkSMProxyManager.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMultiViewRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.6");
 
 //----------------------------------------------------------------------------
 vtkSMMultiViewRenderModuleProxy::vtkSMMultiViewRenderModuleProxy()
@@ -51,14 +52,22 @@ vtkSMProxy* vtkSMMultiViewRenderModuleProxy::NewRenderModule()
     "rendermodules", this->RenderModuleName);
   renderModule->SetConnectionID(this->ConnectionID);
 
+  vtkSMClientServerRenderModuleProxy *clientServerModule =
+    vtkSMClientServerRenderModuleProxy::SafeDownCast(renderModule);
+  if (clientServerModule)
+    {
+    clientServerModule->SetServerRenderWindowProxy(
+                                             this->GetSubProxy("RenderWindow"));
+    clientServerModule->SetServerRenderSyncManagerProxy(
+                                        this->GetSubProxy("RenderSyncManager"));
+    clientServerModule->SetRenderModuleId(this->RenderModuleId);
+    }
+
   vtkSMIceTDesktopRenderModuleProxy* iceT = 
     vtkSMIceTDesktopRenderModuleProxy::SafeDownCast(renderModule);
   if (iceT)
     {
-    iceT->SetServerRenderWindowProxy(this->GetSubProxy("RenderWindow"));
-    iceT->SetServerCompositeManagerProxy(this->GetSubProxy("CompositeManager"));
     iceT->SetServerDisplayManagerProxy(this->GetSubProxy("DisplayManager"));
-    iceT->SetRenderModuleId(this->RenderModuleId);
     }
 
   ostrstream name;
@@ -85,8 +94,9 @@ void vtkSMMultiViewRenderModuleProxy::CreateVTKObjects(int numObjects)
                   "vtk objects");
     return;
     }
-  if (strcmp(this->RenderModuleName, "IceTDesktopRenderModule") == 0||
-      strcmp(this->RenderModuleName, "IceTRenderModule") == 0)
+  if (   (strcmp(this->RenderModuleName, "IceTDesktopRenderModule") == 0)
+      || (strcmp(this->RenderModuleName, "IceTRenderModule") == 0)
+      || (strcmp(this->RenderModuleName, "ClientServerRenderModule") == 0) )
     {
     vtkSMProxy* renWin = this->GetProxyManager()->NewProxy(
       "renderwindow", "RenderWindow");
@@ -95,13 +105,17 @@ void vtkSMMultiViewRenderModuleProxy::CreateVTKObjects(int numObjects)
     this->AddSubProxy("RenderWindow", renWin);
     renWin->Delete();
 
-    vtkSMProxy* comMan = this->GetProxyManager()->NewProxy(
+    vtkSMProxy* renSyncMan = this->GetProxyManager()->NewProxy(
       "composite_managers", "DesktopDeliveryServer");
-    comMan->SetConnectionID(this->ConnectionID);
-    comMan->SetServers(vtkProcessModule::RENDER_SERVER);
-    this->AddSubProxy("CompositeManager", comMan);
-    comMan->Delete();
+    renSyncMan->SetConnectionID(this->ConnectionID);
+    renSyncMan->SetServers(vtkProcessModule::RENDER_SERVER);
+    this->AddSubProxy("RenderSyncManager", renSyncMan);
+    renSyncMan->Delete();
+    }
 
+  if (   (strcmp(this->RenderModuleName, "IceTDesktopRenderModule") == 0)
+      || (strcmp(this->RenderModuleName, "IceTRenderModule") == 0) )
+    {
     vtkSMProxy* displayMan = this->GetProxyManager()->NewProxy(
       "composite_managers", "IceTRenderManager");
     displayMan->SetConnectionID(this->ConnectionID);

@@ -1667,7 +1667,7 @@
          name="GUISize"
          command="SetGUISize"
          number_of_elements="2"
-         default_values="300 300"
+         default_values="0 0"
          update_self="1"
          immediate_update="1">
          <IntRangeDomain name="range" min="0 0" />
@@ -1886,11 +1886,12 @@
       </DoubleVectorProperty>
     </LODRenderModuleProxy>
 
-    <CompositeRenderModuleProxy name="CompositeRenderModule" base_proxygroup="rendermodules"
-      base_proxyname="LODRenderModule">
+    <ClientServerRenderModuleProxy name="ClientServerRenderModule"
+                                   base_proxygroup="rendermodules"
+                                   base_proxyname="LODRenderModule">
       <DoubleVectorProperty
-        name="CompositeThreshold"
-        command="SetCompositeThreshold"
+        name="RemoteRenderThreshold"
+        command="SetRemoteRenderThreshold"
         number_of_elements="1"
         default_values="20.0"
         update_self="1">
@@ -1913,39 +1914,29 @@
         <IntRangeDomain name="range" min="0"/>
       </IntVectorProperty>
 
-    </CompositeRenderModuleProxy>
-
-    <MPIRenderModuleProxy name="MPIRenderModule" base_proxygroup="rendermodules"
-      base_proxyname="CompositeRenderModule">
-      <IntVectorProperty
-        name="UseCompositeCompression"
-        command="SetUseCompositeCompression"
-        number_of_elements="1"
-        default_values="1"
-        update_self="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="DisableOrderedCompositing">
-        <!-- blank property added to match IceTDesktopRenderModuleProxy API -->
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="SetUseBackBuffer">
-        <!-- blank property added to match IceTDesktopRenderModuleProxy API -->
-      </IntVectorProperty>
-
-    </MPIRenderModuleProxy>
-
-    <MultiDisplayRenderModuleProxy name="MultiDisplayRenderModule"
-      base_proxygroup="rendermodules" base_proxyname="CompositeRenderModule">
       <SubProxy>
-        <Proxy name="CompositeManager" proxygroup="composite_managers"
-          proxyname="MultiDisplayManager">
+        <Proxy name="RenderSyncManager" proxygroup="composite_managers"
+          proxyname="DesktopDeliveryClient">
         </Proxy>
       </SubProxy>
-    </MultiDisplayRenderModuleProxy>
+    </ClientServerRenderModuleProxy>
+
+    <CompositeRenderModuleProxy name="CompositeRenderModule" base_proxygroup="rendermodules"
+      base_proxyname="ClientServerRenderModule">
+
+      <!-- This is really an alias for RemoteRenderThreshold.  I have kept
+           it for backwards compatiability.  This can cause an issue with
+           the property becoming out-of-sync with the actual object if both
+           are used. -->
+      <DoubleVectorProperty
+        name="CompositeThreshold"
+        command="SetCompositeThreshold"
+        number_of_elements="1"
+        default_values="20.0"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+    </CompositeRenderModuleProxy>
 
     <IceTDesktopRenderModuleProxy name="IceTDesktopRenderModule" 
       base_proxygroup="rendermodules" base_proxyname="CompositeRenderModule">
@@ -1966,11 +1957,6 @@
         <ExposedProperties>
           <Property name="InitializeOffScreen" />
         </ExposedProperties>
-      </SubProxy>
-      <SubProxy>
-        <Proxy name="CompositeManager" proxygroup="composite_managers"
-          proxyname="DesktopDeliveryClient">
-        </Proxy>
       </SubProxy>
 
       <SubProxy>

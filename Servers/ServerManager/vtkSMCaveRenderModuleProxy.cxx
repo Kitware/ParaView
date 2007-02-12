@@ -28,7 +28,7 @@
 #include "vtkPVServerInformation.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.10");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {
@@ -41,28 +41,28 @@ vtkSMCaveRenderModuleProxy::~vtkSMCaveRenderModuleProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMCaveRenderModuleProxy::CreateCompositeManager()
+void vtkSMCaveRenderModuleProxy::CreateRenderSyncManager()
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
   vtkSMProxy* cm = pxm->NewProxy("composite_managers", "CaveRenderManager" );
   if (!cm)
     {
-    vtkErrorMacro("Failed to create CompositeManagerProxy.");
+    vtkErrorMacro("Failed to create RenderSyncManagerProxy.");
     return;
     }
   cm->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   cm->SetConnectionID(this->ConnectionID);
-  this->AddSubProxy("CompositeManager", cm);
+  this->AddSubProxy("RenderSyncManager", cm);
   cm->Delete();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
 {
-  if (!this->CompositeManagerProxy)
+  if (!this->RenderSyncManagerProxy)
     {
-    vtkErrorMacro("CompositeManagerProxy not set.");
+    vtkErrorMacro("RenderSyncManagerProxy not set.");
     return;
     }
   
@@ -88,8 +88,8 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
 
   if (pm->GetOptions()->GetClientMode())
     {
-    // using vtkClientCompositeManager. 
-    for (i=0; i < this->CompositeManagerProxy->GetNumberOfIDs(); i++)
+    // using vtkClientRenderSyncManager. 
+    for (i=0; i < this->RenderSyncManagerProxy->GetNumberOfIDs(); i++)
       {
       // Clean up this mess !!!!!!!!!!!!!
       // Even a cast to vtkPVClientServerModule would be better than this.
@@ -97,7 +97,7 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
       stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
         << "GetClientMode" << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke 
-        << this->CompositeManagerProxy->GetID(i) 
+        << this->RenderSyncManagerProxy->GetID(i) 
         << "SetClientFlag"
         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
 
@@ -106,12 +106,12 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
         << pm->GetConnectionClientServerID(this->ConnectionID)
         << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke 
-        << this->CompositeManagerProxy->GetID(i)
+        << this->RenderSyncManagerProxy->GetID(i)
         << "SetSocketController" << vtkClientServerStream::LastResult
         << vtkClientServerStream::End;
       }
-    pm->SendStream(this->CompositeManagerProxy->GetConnectionID(),
-      this->CompositeManagerProxy->GetServers(), stream);
+    pm->SendStream(this->RenderSyncManagerProxy->GetConnectionID(),
+      this->RenderSyncManagerProxy->GetServers(), stream);
     }
 
   this->Superclass::InitializeCompositingPipeline();
@@ -183,7 +183,7 @@ void vtkSMCaveRenderModuleProxy::LoadConfigurationFile(int numDisplays)
 
   vtkCaveRenderManager* crm = 
     vtkCaveRenderManager::SafeDownCast(pm->GetObjectFromID(
-        this->CompositeManagerProxy->GetID(0)));
+        this->RenderSyncManagerProxy->GetID(0)));
 
   for (idx = 0; idx < numDisplays; ++idx)
     { // Just a test case.  Configuration file later.
@@ -236,7 +236,7 @@ void vtkSMCaveRenderModuleProxy::ConfigureFromServerInformation()
     this->ConnectionID);
   vtkCaveRenderManager* crm = 
     vtkCaveRenderManager::SafeDownCast(pm->GetObjectFromID(
-        this->CompositeManagerProxy->GetID(0)));
+        this->RenderSyncManagerProxy->GetID(0)));
 
   unsigned int idx;
   unsigned int numMachines = serverInfo->GetNumberOfMachines();

@@ -27,7 +27,7 @@
 #include "vtkRenderWindow.h"
 
 vtkStandardNewMacro(vtkSMIceTRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.9");
 
 //-----------------------------------------------------------------------------
 vtkSMIceTRenderModuleProxy::vtkSMIceTRenderModuleProxy()
@@ -78,14 +78,14 @@ void vtkSMIceTRenderModuleProxy::InitializeCompositingPipeline()
   this->Superclass::InitializeCompositingPipeline();
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->CompositeManagerProxy->GetProperty("UseCompositing"));
+    this->RenderSyncManagerProxy->GetProperty("UseCompositing"));
   if (ivp)
     {
     // In multi display mode, the server windows must be shown immediately.
     ivp->SetElement(0, 1); 
     }
 
-  this->CompositeManagerProxy->UpdateVTKObjects();
+  this->RenderSyncManagerProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

@@ -82,7 +82,7 @@
 #include "vtkSMCompositeRenderModuleProxy.h"
 #include "vtkSMCaveRenderModuleProxy.h"
 #include "vtkSMLODRenderModuleProxy.h"
-#include "vtkSMMultiDisplayRenderModuleProxy.h"
+#include "vtkSMClientServerRenderModuleProxy.h"
 
 #ifdef PARAVIEW_USE_ICE_T
 #include "vtkSMProcessModule.h"
@@ -166,7 +166,7 @@ int main(int , char *[])
   c = vtkSMCompositeRenderModuleProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMCaveRenderModuleProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMLODRenderModuleProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMMultiDisplayRenderModuleProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMClientServerRenderModuleProxy::New(); c->Print( cout ); c->Delete();
 
 #ifdef PARAVIEW_USE_ICE_T
   c = vtkSMProcessModule::New(); c->Print( cout ); c->Delete();
