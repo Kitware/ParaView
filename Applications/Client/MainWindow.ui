@@ -128,6 +128,7 @@
     <addaction name="actionToolsManageCustomFilters" />
     <addaction name="actionToolsCreateLookmark" />
     <addaction name="actionToolsManageLinks" />
+    <addaction name="actionManage_Plugins" />
     <addaction name="separator" />
     <addaction name="actionToolsDumpWidgetNames" />
     <addaction name="actionToolsRecordTest" />
@@ -1025,6 +1026,11 @@
   <action name="actionToolsTimerLog" >
    <property name="text" >
     <string>Timer &amp;Log</string>
+   </property>
+  </action>
+  <action name="actionManage_Plugins" >
+   <property name="text" >
+    <string>Manage Plugins...</string>
    </property>
   </action>
   <action name="actionToolsCreateLookmark" >

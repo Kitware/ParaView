@@ -630,6 +630,9 @@ MainWindow::MainWindow() :
   QObject::connect(
     &this->Implementation->Core, SIGNAL(enableResetCenter(bool)),
     this->Implementation->UI.actionShowCenterAxes, SLOT(setEnabled(bool)));
+  
+  connect(this->Implementation->UI.actionManage_Plugins,
+    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onManagePlugins()));
 
   // Restore the state of the window ...
   pqApplicationCore::instance()->settings()->restoreState("MainWindow", *this);
@@ -921,3 +924,4 @@ void MainWindow::setTimeRanges(double start, double end)
   this->Implementation->UI.actionVCRLastFrame->setToolTip(
     QString("Last Frame (%1)").arg(end, 0, 'g'));
 }
+
