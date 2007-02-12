@@ -20,12 +20,13 @@
 #include "vtkDynamicLoader.h"
 
 vtkStandardNewMacro(vtkSMPluginLoader);
-vtkCxxRevisionMacro(vtkSMPluginLoader, "1.1");
+vtkCxxRevisionMacro(vtkSMPluginLoader, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkSMPluginLoader::vtkSMPluginLoader()
 {
   this->Loaded = 0;
+  this->FileName = 0;
   this->ServerManagerXML = NULL;
 }
 
@@ -39,30 +40,47 @@ vtkSMPluginLoader::~vtkSMPluginLoader()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPluginLoader::LoadPlugin(const char* FileName)
+void vtkSMPluginLoader::SetFileName(const char* file)
 {
-  typedef const char* (*ModuleXML)();
-  typedef void (*ModuleInit)(vtkClientServerInterpreter*);
+  if(this->Loaded)
+    {
+    return;
+    }
+  
+  typedef const char* (*PluginXML)();
+  typedef void (*PluginInit)(vtkClientServerInterpreter*);
+
+  if(this->FileName)
+    {
+    delete [] this->FileName;
+    this->FileName = NULL;
+    }
+  if(file && file[0] != '\0')
+    {
+    size_t len = strlen(file);
+    this->FileName = new char[len+1];
+    strcpy(this->FileName, file);
+    }
 
   if(!this->Loaded && FileName && FileName[0] != '\0')
     {
     vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(FileName);
     if(lib)
       {
-      ModuleXML modxml = 
-        (ModuleXML)vtkDynamicLoader::GetSymbolAddress(lib, "ModuleXML");
-      ModuleInit modinit = 
-        (ModuleInit)vtkDynamicLoader::GetSymbolAddress(lib, "ModuleInit");
-      if(modxml && modinit)
+      PluginXML xml = 
+        (PluginXML)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginXML");
+      PluginInit init = 
+        (PluginInit)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginInit");
+      if(xml && init)
         {
         this->Loaded = 1;
-        (*modinit)(vtkProcessModule::GetProcessModule()->GetInterpreter());
-        const char* xml = (*modxml)();
-        if(xml)
+        (*init)(vtkProcessModule::GetProcessModule()->GetInterpreter());
+        const char* xmlString = (*xml)();
+        if(xmlString)
           {
-          size_t len = strlen(xml);
+          size_t len = strlen(xmlString);
           this->ServerManagerXML = new char[len+1];
-          strcpy(this->ServerManagerXML, xml);
+          strcpy(this->ServerManagerXML, xmlString);
           }
         this->Modified();
         }

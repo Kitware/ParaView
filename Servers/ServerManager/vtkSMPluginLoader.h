@@ -30,8 +30,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // attempt to load a plugin
-  void LoadPlugin(const char* FileName);
+  // set the filename and load the plugin
+  void SetFileName(const char* file);
+  vtkGetStringMacro(FileName);
   
   // Description:
   // Get the Server Manager XML from a loaded plugin
@@ -45,8 +46,9 @@ protected:
   vtkSMPluginLoader();
   ~vtkSMPluginLoader();
 
-  char* ServerManagerXML;
+  char* FileName;
   int Loaded;
+  char* ServerManagerXML;
 
 private:
   vtkSMPluginLoader(const vtkSMPluginLoader&); // Not implemented.

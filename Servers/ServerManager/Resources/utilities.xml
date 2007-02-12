@@ -2356,10 +2356,10 @@
     
     <Proxy name="PluginLoader" class="vtkSMPluginLoader">
       <StringVectorProperty
-        name="Plugin"
-        command="LoadPlugin"
-        number_of_elements="1"
-        default_values="0">
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
       </StringVectorProperty>
       
       <IntVectorProperty

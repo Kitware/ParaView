@@ -22,14 +22,14 @@ namespace {
 }
 
 // entry point to get XML as a string
-extern "C" const char* ModuleXML()
+extern "C" const char* ParaViewPluginXML()
 {
   static StaticInit staticinit;
   return staticinit.XMLString;
 }
 
-// entry point to initialize this module with the client/server interpreter
-extern "C" const char* ModuleInit(vtkClientServerInterpreter *arlu)
+// entry point to initialize this plugin with the client/server interpreter
+extern "C" const char* ParaViewPluginInit(vtkClientServerInterpreter *arlu)
 {
   @MODULE_NAME@_Initialize(arlu);
 }
