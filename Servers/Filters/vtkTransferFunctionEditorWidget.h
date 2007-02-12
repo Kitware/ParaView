@@ -71,6 +71,11 @@ public:
   // needs to be recomputed.
   virtual void InputModified();
 
+  // Description:
+  // Methods for activating this widget. Note that the widget representation
+  // must be specified or the widget will not appear.
+  virtual void SetEnabled(int enable);
+
 protected:
   vtkTransferFunctionEditorWidget();
   ~vtkTransferFunctionEditorWidget();

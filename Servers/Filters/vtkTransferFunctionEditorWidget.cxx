@@ -20,7 +20,7 @@
 #include "vtkDataArray.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.2");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.3");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
@@ -246,6 +246,17 @@ void vtkTransferFunctionEditorWidget::Configure(int size[2])
 void vtkTransferFunctionEditorWidget::InputModified()
 {
   this->ComputeHistogram();
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidget::SetEnabled(int enable)
+{
+  this->Superclass::SetEnabled(enable);
+
+  if (enable)
+    {
+    this->ComputeHistogram();
+    }
 }
 
 //----------------------------------------------------------------------------
