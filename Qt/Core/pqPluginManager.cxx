@@ -70,7 +70,7 @@ bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
     vtkSMProxy* pxy = pxm->NewProxy("misc", "PluginLoader");
     if(pxy && !lib.isEmpty())
       {
-      vtkSMProperty* prop = pxy->GetProperty("Plugin");
+      vtkSMProperty* prop = pxy->GetProperty("FileName");
       pqSMAdaptor::setElementProperty(prop, lib);
       pxy->SetConnectionID(server->GetConnectionID());
       pxy->UpdateVTKObjects();
@@ -79,6 +79,7 @@ bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
       success = pqSMAdaptor::getElementProperty(prop).toInt();
       if(success)
         {
+        this->Plugins.insert(server, lib);
         prop = pxy->GetProperty("ServerManagerXML");
         QString xml = pqSMAdaptor::getElementProperty(prop).toString();
         if(!xml.isEmpty())
@@ -101,6 +102,7 @@ bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
   if(pqplugin)
     {
     success = true;
+    this->Plugins.insert(NULL, lib);
     QObjectList ifaces = pqplugin->interfaces();
     foreach(QObject* iface, ifaces)
       {
@@ -118,4 +120,8 @@ bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
   return success;
 }
 
+QStringList pqPluginManager::loadedPlugins(pqServer* server)
+{
+  return this->Plugins.values(server);
+}
 

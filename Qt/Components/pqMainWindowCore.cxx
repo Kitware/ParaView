@@ -99,6 +99,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqToolTipTrapper.h"
 #include "pqVCRController.h"
 #include "pqWriterFactory.h"
+#include "pqPluginDialog.h"
 #include "pqPluginManager.h"
 
 #include <pqFileDialog.h>
@@ -2650,13 +2651,7 @@ void pqMainWindowCore::onToolsManageLinks()
 
 void pqMainWindowCore::onManagePlugins()
 {
-  pqFileDialog fd(NULL, this->Implementation->Parent, "Load Plugin", QString(), 
-                  "Plugins (*.so;*.dll;*.sl)");
-  if(fd.exec() == QDialog::Accepted)
-    {
-    QString plugin = fd.getSelectedFiles()[0];
-    pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-    pm->loadPlugin(NULL, plugin);
-    }
+  pqPluginDialog diag(this->getActiveServer(), this->Implementation->Parent);
+  diag.exec();
 }
 

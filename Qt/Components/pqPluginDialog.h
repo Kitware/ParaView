@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPluginManager.h
+   Module:    pqPluginDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,50 +30,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPluginManager_h
-#define _pqPluginManager_h
+#ifndef _pqPluginDialog_h
+#define _pqPluginDialog_h
 
-#include <QObject>
-#include <QMultiMap>
-#include <QStringList>
-#include "pqCoreExport.h"
-
+#include <QDialog>
+#include "pqComponentsExport.h"
+#include "ui_pqPluginDialog.h"
 class pqServer;
 
-/// plugin loader takes care of loading plugins
-/// containing GUI extensions and server manager extensions
-class PQCORE_EXPORT pqPluginManager : public QObject
+class PQCOMPONENTS_EXPORT pqPluginDialog :
+  public QDialog, private Ui::pqPluginDialog
 {
   Q_OBJECT
+  typedef QDialog base;
 public:
-  pqPluginManager(QObject* p = 0);
-  ~pqPluginManager();
+  /// create this dialog with a parent
+  pqPluginDialog(pqServer* server, QWidget* p=0);
+  /// destroy this dialog
+  ~pqPluginDialog();
 
-  /// attempt to load a plugin
-  /// return true on success
-  bool loadPlugin(pqServer* server, const QString& lib);
+public slots:
+  void loadServerPlugin();
+  void loadClientPlugin();
 
-  /// return all GUI interfaces that have been loaded
-  QObjectList interfaces();
+protected:
+  void refresh();
+  void refreshClient();
+  void refreshServer();
+  void loadPlugin(pqServer* server);
 
-  /// return all the plugins loaded on a server
-  QStringList loadedPlugins(pqServer*);
+  pqServer* Server;
 
-signals:
-  /// signal for when an interface is loaded
-  void guiInterfaceLoaded(QObject* iface);
-  
-  /// signal for when some GUI XML is loaded
-  /// which can be used to add new readers/writers to the file dialog, etc..
-  void guiXMLLoaded(const QString& xml);
-
-  /// notification that new extensions were added to the server manager
-  void serverManagerExtensionLoaded();
-
-private:
-
-  QObjectList Interfaces;
-  QMultiMap<pqServer*, QString> Plugins;
 };
 
 #endif

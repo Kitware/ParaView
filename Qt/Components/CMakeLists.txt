@@ -97,6 +97,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineMenu.h
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h
+  pqPluginDialog.h
   pqPointSourceWidget.h
   pqProxyInformationWidget.h
   pqProxyTabWidget.h
@@ -165,6 +166,7 @@ SET(UI_FORMS
   Resources/UI/pqLookmarkDefinitionWizard.ui
   Resources/UI/pqLookmarkBrowser.ui
   Resources/UI/pqMultiViewFrameMenu.ui
+  Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
@@ -353,6 +355,8 @@ ADD_LIBRARY(pqComponents
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.cxx
   pqPipelineModelSelectionAdaptor.h
+  pqPluginDialog.cxx
+  pqPluginDialog.h
   pqPointSourceWidget.cxx
   pqPointSourceWidget.h
   pqProxyInformationWidget.cxx
