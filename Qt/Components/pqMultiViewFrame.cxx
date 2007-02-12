@@ -248,6 +248,8 @@ void pqMultiViewFrame::setMainWidget(QWidget* w)
     {
     static_cast<QBoxLayout*>(l)->addStretch();
     }
+    
+  this->mainWidgetChanged(this);
 }
 
 QWidget* pqMultiViewFrame::mainWidget()

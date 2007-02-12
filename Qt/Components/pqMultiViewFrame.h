@@ -123,6 +123,9 @@ signals:
   void createLookmarkPressed();
   /// fired before the context menu is shown for this frame.
   void contextMenuRequested();
+  /// Signal emitted after the main widget has changed for this frame
+  void mainWidgetChanged(pqMultiViewFrame*);
+  
 protected slots:
   /// called when a context menu is requested.
   void onCustomContextMenuRequested(const QPoint& point);
