@@ -148,6 +148,7 @@ public:
   pqImplementation(QWidget* parent) :
     Parent(parent),
     MultiViewManager(parent),
+    LookmarkBrowser(0),
     CustomFilters(new pqCustomFilterManagerModel(parent)),
     CustomFilterManager(0),
     Lookmarks(new pqLookmarkBrowserModel(parent)),
@@ -1953,8 +1954,11 @@ void pqMainWindowCore::onSelectionChanged()
     this->Implementation->AnimationManager->onActiveServerChanged(server);
     }
 
-  // Update the lookmark browser so it knows about the (possible) change in servers
-  this->Implementation->LookmarkBrowser->setActiveServer(server);
+  if ( this->Implementation->LookmarkBrowser )
+    {
+    // Update the lookmark browser so it knows about the (possible) change in servers
+    this->Implementation->LookmarkBrowser->setActiveServer(server);
+    }
 }
 
 //-----------------------------------------------------------------------------
