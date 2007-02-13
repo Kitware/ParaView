@@ -31,6 +31,7 @@
 class vtkDataSet;
 class vtkEventForwarderCommand;
 class vtkInteractorStyleTransferFunctionEditor;
+class vtkPiecewiseFunction;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
@@ -77,6 +78,14 @@ public:
     SHAPES_2D
   };
 //ETX
+
+  // Description:
+  // Set the type of function to modify (color, opacity, or both).
+  // Set the editor type before setting the modification type.
+  void SetModificationType(int type);
+  void SetModificationTypeToColor();
+  void SetModificationTypeToOpacity();
+  void SetModificationTypeToColorAndOpacity();
 
   // Description:
   // Set the input data set containing the scalar array used in the
@@ -136,6 +145,10 @@ public:
   // Determine whether a histogram will be displayed behind the transfer
   // function editor.
   void SetHistogramVisibility(int visibility);
+
+  //Description:
+  // Get the opacity function.
+  vtkPiecewiseFunction* GetOpacityFunction();
 
 protected:
   vtkTransferFunctionViewer();

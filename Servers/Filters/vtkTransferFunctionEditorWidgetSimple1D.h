@@ -83,6 +83,9 @@ protected:
   static void EndSelectAction(vtkAbstractWidget*);
   static void MoveNodeAction(vtkAbstractWidget*);
 
+  void AddOpacityPoint(int x, int y);
+  void RemoveOpacityPoint(unsigned int id);
+  
   // Helper method for creating widgets
   static vtkHandleWidget* CreateHandleWidget(
     vtkTransferFunctionEditorWidgetSimple1D *self,

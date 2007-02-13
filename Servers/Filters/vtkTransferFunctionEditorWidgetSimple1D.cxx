@@ -18,6 +18,7 @@
 #include "vtkHandleRepresentation.h"
 #include "vtkHandleWidget.h"
 #include "vtkObjectFactory.h"
+#include "vtkPiecewiseFunction.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkTransferFunctionEditorRepresentationSimple1D.h"
 #include "vtkWidgetCallbackMapper.h"
@@ -25,7 +26,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.4");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.5");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -127,9 +128,19 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNodeAction(
     vtkTransferFunctionEditorRepresentationSimple1D *rep =
       reinterpret_cast<vtkTransferFunctionEditorRepresentationSimple1D*>
       (self->WidgetRep);
+    if (self->ModificationType == COLOR)
+      {
+      int size[2];
+      rep->GetDisplaySize(size);
+      e[1] = size[1] / 2;
+      }
     unsigned int currentHandleNumber = rep->CreateHandle(e);
     vtkHandleWidget *currentHandle = self->CreateHandleWidget(
       self,rep,currentHandleNumber);
+    if (self->ModificationType == OPACITY)
+      {
+      self->AddOpacityPoint(x, y);
+      }
     rep->SetHandleDisplayPosition(currentHandleNumber,e);
     currentHandle->SetEnabled(1);
     self->InvokeEvent(vtkCommand::PlacePointEvent,(void*)&(currentHandleNumber));
@@ -186,7 +197,19 @@ void vtkTransferFunctionEditorWidgetSimple1D::MoveNodeAction(
   pos[0] = static_cast<double>(x);
   pos[1] = static_cast<double>(y);
   pos[2] = 0.0;
+  if (self->ModificationType == COLOR)
+    {
+    int size[2];
+    rep->GetDisplaySize(size);
+    pos[1] = size[1]/2;
+    }
   rep->SetHandleDisplayPosition(nodeId, pos);
+
+  if (self->ModificationType == OPACITY)
+    {
+    self->RemoveOpacityPoint(nodeId);
+    self->AddOpacityPoint(x, y);
+    }
 
   self->EventCallbackCommand->SetAbortFlag(1);
   self->InvokeEvent(vtkCommand::InteractionEvent, NULL);
@@ -218,6 +241,11 @@ void vtkTransferFunctionEditorWidgetSimple1D::RemoveNode(unsigned int id)
   if (id > this->Nodes->size()-1)
     {
     return;
+    }
+
+  if (this->ModificationType == OPACITY)
+    {
+    this->RemoveOpacityPoint(id);
     }
 
   vtkTransferFunctionEditorRepresentationSimple1D *rep =
@@ -391,6 +419,39 @@ void vtkTransferFunctionEditorWidgetSimple1D::Configure(int size[2])
   this->Superclass::Configure(size);
 
   this->RecomputeNodePositions(oldSize, size);
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidgetSimple1D::AddOpacityPoint(int x, int y)
+{
+  vtkTransferFunctionEditorRepresentationSimple1D *rep =
+    reinterpret_cast<vtkTransferFunctionEditorRepresentationSimple1D*>
+    (this->WidgetRep);
+
+  if (!rep)
+    {
+    return;
+    }
+
+  int windowSize[2];
+  double percent[2], newScalar;
+
+  rep->GetDisplaySize(windowSize);
+  percent[0] = x / (double)(windowSize[0]);
+  percent[1] = y / (double)(windowSize[1]);
+  newScalar = this->VisibleScalarRange[0] +
+    percent[0] * (this->VisibleScalarRange[1]-this->VisibleScalarRange[0]);
+
+  this->OpacityFunction->AddPoint(newScalar, percent[1]);
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidgetSimple1D::RemoveOpacityPoint(
+  unsigned int id)
+{
+  double value[4];
+  this->OpacityFunction->GetNodeValue(id, value);
+  this->OpacityFunction->RemovePoint(value[0]);
 }
 
 //----------------------------------------------------------------------------

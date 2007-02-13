@@ -30,6 +30,7 @@
 #include "vtkAbstractWidget.h"
 
 class vtkDataSet;
+class vtkPiecewiseFunction;
 
 class VTK_EXPORT vtkTransferFunctionEditorWidget : public vtkAbstractWidget
 {
@@ -83,6 +84,21 @@ public:
   // must be specified or the widget will not appear.
   virtual void SetEnabled(int enable);
 
+  // Description:
+  // Set the type of function to modify.
+  vtkSetClampMacro(ModificationType, int, 0, 2);
+  
+//BTX
+  enum ModificationTypes
+  {
+    COLOR = 0,
+    OPACITY,
+    COLOR_AND_OPACITY
+  };
+//ETX
+
+  vtkGetObjectMacro(OpacityFunction, vtkPiecewiseFunction);
+
 protected:
   vtkTransferFunctionEditorWidget();
   ~vtkTransferFunctionEditorWidget();
@@ -95,6 +111,8 @@ protected:
   double VisibleScalarRange[2];
   double WholeScalarRange[2];
   int NumberOfScalarBins; // used for float and double input images
+  int ModificationType;
+  vtkPiecewiseFunction *OpacityFunction;
 
 private:
   vtkTransferFunctionEditorWidget(const vtkTransferFunctionEditorWidget&); // Not implemented.

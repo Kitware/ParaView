@@ -16,11 +16,12 @@
 
 #include "vtkCellData.h"
 #include "vtkDataSet.h"
+#include "vtkPiecewiseFunction.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.4");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.5");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
@@ -31,6 +32,8 @@ vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
   this->NumberOfScalarBins = 10000;
   this->WholeScalarRange[0] = this->VisibleScalarRange[0] = 1;
   this->WholeScalarRange[1] = this->VisibleScalarRange[1] = 0;
+  this->ModificationType = OPACITY;
+  this->OpacityFunction = vtkPiecewiseFunction::New();
 }
 
 //----------------------------------------------------------------------------
@@ -38,6 +41,7 @@ vtkTransferFunctionEditorWidget::~vtkTransferFunctionEditorWidget()
 {
   this->SetInput(NULL);
   this->SetArrayName(NULL);
+  this->OpacityFunction->Delete();
 }
 
 //----------------------------------------------------------------------------
