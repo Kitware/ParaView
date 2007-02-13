@@ -875,8 +875,6 @@ void pqRenderViewModule::setCenterOfRotation(double x, double y, double z)
     iren->GetInteractorStyle());
   if (!style)
     {
-    qDebug() 
-      << "Cannot set center of rotation since interaction style has changed.";
     return;
     }
 
