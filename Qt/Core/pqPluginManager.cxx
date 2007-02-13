@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QLibrary>
 #include <QPluginLoader>
+#include <QMessageBox>
 
 #include "vtkSMXMLParser.h"
 #include "vtkProcessModule.h"
@@ -97,18 +98,24 @@ bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
 
   // check if this plugin has gui stuff in it
   QPluginLoader qplugin(lib);
-  qplugin.load();
-  pqPlugin* pqplugin = qobject_cast<pqPlugin*>(qplugin.instance());
-  if(pqplugin)
+  if(qplugin.load())
     {
-    success = true;
-    this->Plugins.insert(NULL, lib);
-    QObjectList ifaces = pqplugin->interfaces();
-    foreach(QObject* iface, ifaces)
+    pqPlugin* pqplugin = qobject_cast<pqPlugin*>(qplugin.instance());
+    if(pqplugin)
       {
-      this->Interfaces.append(iface);
-      emit this->guiInterfaceLoaded(iface);
+      success = true;
+      this->Plugins.insert(NULL, lib);
+      QObjectList ifaces = pqplugin->interfaces();
+      foreach(QObject* iface, ifaces)
+        {
+        this->Interfaces.append(iface);
+        emit this->guiInterfaceLoaded(iface);
+        }
       }
+    }
+  else
+    {
+    QMessageBox::information(NULL, "Plugin Load Failed", qplugin.errorString());
     }
 
   // this is not a paraview plugin, unload it
