@@ -1219,6 +1219,11 @@ void pqMainWindowCore::onFileSaveScreenshot()
   filters += ";;TIFF image (*.tif)";
   filters += ";;PPM image (*.ppm)";
   filters += ";;JPG image (*.jpg)";
+
+  if (view->getViewType() != pqGenericViewModule::RENDER_VIEW)
+    {
+    filters += ";;PDF file (*.pdf)";
+    }
   filters += ";;All files (*)";
   pqFileDialog* const file_dialog = new pqFileDialog(NULL,
     this->Implementation->Parent, tr("Save Screenshot:"), QString(), filters);

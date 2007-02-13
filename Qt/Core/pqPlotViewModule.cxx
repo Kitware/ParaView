@@ -37,8 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMProxy.h"
 
-#include <QPixmap>
+#include <QFileInfo>
 #include <QImage>
+#include <QPixmap>
 #include <QPointer>
 #include <QtDebug>
 #include <QTimer>
@@ -262,6 +263,34 @@ bool pqPlotViewModule::saveImage(int width, int height,
   if (width != 0 && height != 0)
     {
     this->getWidget()->resize(width, height);
+    }
+
+  if (QFileInfo(filename).suffix().toLower() == "pdf")
+    {
+    QStringList list;
+    list.push_back(filename);
+    switch (this->getViewType())
+      {
+    case pqGenericViewModule::BAR_CHART:
+        {
+        pqHistogramWidget* widget = qobject_cast<pqHistogramWidget*>(
+          this->Internal->PlotWidget);
+        widget->savePDF(list);
+        }
+      break;
+
+    case pqGenericViewModule::XY_PLOT:
+        {
+        pqLineChartWidget* widget = qobject_cast<pqLineChartWidget*>(
+          this->Internal->PlotWidget);
+        widget->savePDF(list);
+        }
+      break;
+
+    default:
+      return false;
+      }
+    return true;
     }
 
   QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
