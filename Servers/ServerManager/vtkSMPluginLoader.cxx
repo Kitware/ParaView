@@ -20,7 +20,7 @@
 #include "vtkDynamicLoader.h"
 
 vtkStandardNewMacro(vtkSMPluginLoader);
-vtkCxxRevisionMacro(vtkSMPluginLoader, "1.3");
+vtkCxxRevisionMacro(vtkSMPluginLoader, "1.4");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -29,8 +29,8 @@ vtkCxxRevisionMacro(vtkSMPluginLoader, "1.3");
 #define C_DECL
 #endif
 
-typedef const char* C_DECL (*PluginXML)();
-typedef void C_DECL (*PluginInit)(vtkClientServerInterpreter*);
+typedef const char* (C_DECL *PluginXML)();
+typedef void (C_DECL *PluginInit)(vtkClientServerInterpreter*);
 
 
 //-----------------------------------------------------------------------------
