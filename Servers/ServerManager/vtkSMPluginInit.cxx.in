@@ -2,6 +2,7 @@
 #include "@XML_HEADER@"
 
 #ifdef _WIN32
+// __cdecl gives an unmangled name
 #define C_DECL __cdecl
 #define C_EXPORT extern "C" __declspec(dllexport)
 #else
