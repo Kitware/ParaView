@@ -98,12 +98,6 @@ public slots:
   /// set the visibility of the delete button.
   void setDeleteButtonVisibility(bool visible);
   
-  /// add a custom panel
-  void addCustomPanel(pqObjectPanelInterface* iface);
-  /// add a custom panel (helper which casts the QObject to
-  /// pqObjectPanelInterface)
-  void addCustomPanel(QObject* iface);
-
 signals:
   /// emitted before accept.
   void preaccept();
@@ -128,7 +122,6 @@ protected slots:
   
 private:
 
-  QList<pqObjectPanelInterface*> CustomPanels;
   pqObjectPanelInterface* StandardCustomPanels;
 
   // When in forceModified(), reset, should not disable accept button,

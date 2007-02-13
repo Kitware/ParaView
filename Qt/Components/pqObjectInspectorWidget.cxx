@@ -156,15 +156,6 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 
   // get custom panels
   this->StandardCustomPanels = new pqStandardCustomPanels(this);
-  QObjectList ifaces = 
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
-  foreach(QObject* iface, ifaces)
-    {
-    this->addCustomPanel(iface);
-    }
-  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
-                   SIGNAL(guiInterfaceLoaded(QObject*)),
-                   this, SLOT(addCustomPanel(QObject*)));
   
   // main layout
   QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -314,11 +305,15 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     const QString xml_name = proxy->getProxy()->GetXMLName();
       
     // search custom panels
-    foreach(pqObjectPanelInterface* iface, this->CustomPanels)
+    pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
+    QObjectList ifaces = pm->interfaces();
+    foreach(QObject* iface, ifaces)
       {
-      if (iface->canCreatePanel(proxy))
+      pqObjectPanelInterface* piface =
+        qobject_cast<pqObjectPanelInterface*>(iface);
+      if (piface && piface->canCreatePanel(proxy))
         {
-        this->CurrentPanel = iface->createPanel(proxy, NULL);
+        this->CurrentPanel = piface->createPanel(proxy, NULL);
         break;
         }
       }
@@ -474,17 +469,4 @@ void pqObjectInspectorWidget::setDeleteButtonVisibility(bool visible)
   this->DeleteButton->setVisible(visible);
 }
 
-
-void pqObjectInspectorWidget::addCustomPanel(pqObjectPanelInterface* iface)
-{
-  if(iface)
-    {
-    this->CustomPanels.append(iface);
-    }
-}
-
-void pqObjectInspectorWidget::addCustomPanel(QObject* iface)
-{
-  this->addCustomPanel(qobject_cast<pqObjectPanelInterface*>(iface));
-}
 
