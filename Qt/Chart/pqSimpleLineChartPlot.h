@@ -149,6 +149,18 @@ public:
   void setErrorWidth(int series, const pqChartValue &width);
   //@}
 
+  /// \brief
+  ///   Get the drawing color for a series.
+  /// \param series The index of the series.
+  /// \return
+  ///   The drawing color for a series.
+  virtual QColor getColor(int series) const;
+
+  /// \brief
+  ///   Set the drawing color for a series.
+  /// \param series The index of the series.
+  /// \param color The color for the series.
+  void setColor(int series, const QColor& color);
 private:
   /// Compiles the overall plot range from the points.
   void updatePlotRanges();

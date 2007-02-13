@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqLineChartItemData
 {
 public:
+  QColor Color;
   pqLineChartItemData() {}
   virtual ~pqLineChartItemData() {}
 
@@ -362,6 +363,7 @@ void pqLineChart::layoutChart()
         pqLineChartItemError *error = dynamic_cast<pqLineChartItemError *>(
             *series);
 
+        (*series)->Color = (*iter)->Plot->getColor(i);
         QPolygon *polygon = 0;
         int total = (*iter)->Plot->getNumberOfPoints(i);
         for(int j = 0; j < total; j++)
@@ -476,7 +478,7 @@ void pqLineChart::drawChart(QPainter& painter, const QRect& area)
         {
         options->setupPainter(painter, j);
         }
-
+      painter.setPen((*series)->Color);
       pqLineChartItemPoints *points = dynamic_cast<pqLineChartItemPoints *>(
           *series);
       pqLineChartItemLine *line = dynamic_cast<pqLineChartItemLine *>(

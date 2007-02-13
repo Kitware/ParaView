@@ -32,11 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqConsumerDisplay.h"
 
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSMProxy.h"
+#include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMPropertyIterator.h"
 
 #include <QtDebug>
 #include <QPointer>
+#include <QColor>
 
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
@@ -145,30 +147,53 @@ void pqConsumerDisplay::onInputChanged()
 //-----------------------------------------------------------------------------
 void pqConsumerDisplay::setDefaults()
 {
-  // Setup default display parameters.
-  // This is more of a catch-all method. All different displays that
-  // don;t have special classes setup their defaults here.
-  vtkSMProxy* proxy = this->getProxy();
+  if (!this->isVisible())
+    {
+    // For any non-visible display, we don't set its defaults.
+    return;
+    }
 
-  // defaults for XY Plot displays.
+  // Set default arrays and lookup table.
+  vtkSMAbstractDisplayProxy* proxy = vtkSMAbstractDisplayProxy::SafeDownCast(
+    this->getProxy());
+  
+  // setDefaults() can always call Update on the display. 
+  // This is safe since setDefaults() will typically be called only after having
+  // added the display to the render module, which ensures that the
+  // update time has been set correctly on the display.
+  proxy->Update();
+
+  proxy->GetProperty("Input")->UpdateDependentDomains();
+
+  // This will setup default array names. Just reset-to-default all properties,
+  // the vtkSMArrayListDomain will do the rest.
+  vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    iter->GetProperty()->ResetToDefault();
+    }
+  iter->Delete();
+
   if (proxy->GetXMLName() == QString("XYPlotDisplay2"))
     {
-    proxy->GetProperty("Input")->UpdateDependentDomains();
-    vtkSMProperty* prop = proxy->GetProperty("XArrayName");
+    // Intialize array colors.
+    QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("SelectYArrays"));
+    QList<QString> input_scalars = pqSMAdaptor::getFieldSelectionScalarDomain(
+      proxy->GetProperty("SelectYArrays"));
 
-    QList<QString> input_scalars = 
-      pqSMAdaptor::getFieldSelectionScalarDomain(prop);
-    if (input_scalars.size() > 0)
+    double hue_step = (input_scalars.size() > 1)?  1.0 / (input_scalars.size()) : 1.0;
+    for (int cc=0; cc < input_scalars.size(); cc++)
       {
-      pqSMAdaptor::setElementProperty(prop, input_scalars[0]);
+      QColor qcolor;
+      qcolor.setHsvF(cc*hue_step, 1.0, 1.0);
+      values.push_back(QVariant(qcolor.redF()));
+      values.push_back(QVariant(qcolor.greenF()));
+      values.push_back(QVariant(qcolor.blueF()));
+      values.push_back(QVariant(1));
+      values.push_back(input_scalars[cc]);
       }
-    QList<QVariant> vscalars;
-    foreach(QString val, input_scalars)
-      {
-      vscalars.push_back(val);
-      }
-    pqSMAdaptor::setMultipleElementProperty(
-        proxy->GetProperty("YArrayNames"), vscalars);
+    pqSMAdaptor::setMultipleElementProperty(proxy->GetProperty("SelectYArrays"), values);
     proxy->UpdateVTKObjects();
     }
 }

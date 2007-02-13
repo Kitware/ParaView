@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QToolTip>
 #include <QVector>
+#include <QColor>
 
 
 class pqSimpleLineChartPlotErrorBounds
@@ -75,6 +76,7 @@ public:
   QVector<pqChartCoordinate> Points;
   pqLineChartPlot::SeriesType Type;
   pqSimpleLineChartPlotErrorData *Error;
+  QColor Color;
 };
 
 
@@ -107,7 +109,7 @@ pqSimpleLineChartPlotErrorData::pqSimpleLineChartPlotErrorData()
 //----------------------------------------------------------------------------
 pqSimpleLineChartPlotSeries::pqSimpleLineChartPlotSeries(
     pqLineChartPlot::SeriesType type)
-  : Points()
+  : Points(), Color(0, 0, 0)
 {
   this->Type = type;
   this->Error = 0;
@@ -554,6 +556,26 @@ void pqSimpleLineChartPlot::updatePlotRanges(const pqChartCoordinate &coord)
       this->Internal->Maximum.Y = coord.Y;
       }
     }
+}
+
+void pqSimpleLineChartPlot::setColor(int series, const QColor& c)
+{
+  if (series >=0 && series < this->getNumberOfSeries())
+    {
+    pqSimpleLineChartPlotSeries *plotSeries = this->Internal->Series[series];
+    plotSeries->Color = c; 
+    this->resetPlot();
+    }
+}
+
+QColor pqSimpleLineChartPlot::getColor(int series) const
+{
+  if (series >=0 && series < this->getNumberOfSeries())
+    {
+    pqSimpleLineChartPlotSeries *plotSeries = this->Internal->Series[series];
+    return plotSeries->Color;
+    }
+  return QColor(0, 0, 0);
 }
 
 /*const double pqLinePlot::getDistance(const QPoint& coords) const

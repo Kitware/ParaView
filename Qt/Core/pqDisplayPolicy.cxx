@@ -99,7 +99,23 @@ bool pqDisplayPolicy::canDisplay(const pqPipelineSource* source,
     }
   if (viewProxyName == "XYPlotViewModule")
     {
-    return (srcProxyName == "Probe2");
+    if (srcProxyName == "Probe2")
+      {
+      return true;
+      }
+    vtkPVDataInformation* dataInfo = source->getDataInformation();
+    if (dataInfo)
+      {
+      int extent[6];
+      dataInfo->GetExtent(extent);
+      int non_zero_dims = 0;
+      for (int cc=0; cc < 3; cc++)
+        {
+        non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
+        }
+      return (dataInfo->GetDataClassName() == QString("vtkRectilinearGrid")) &&
+        (non_zero_dims == 1);
+      }
     }
 
   return true;

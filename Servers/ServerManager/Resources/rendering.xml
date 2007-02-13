@@ -3830,11 +3830,16 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <StringVectorProperty name="YArrayNames"
+      <StringVectorProperty name="SelectYArrays"
          repeat_command="1"
-         number_of_elements="0">
+         number_of_elements="0"
+         number_of_elements_per_command="5"
+         element_types="1 1 1 0 2">
          <!-- This state property will save the list of selected arrays
-              that are plotted. -->
+              that are plotted. 
+              Components are:
+                <array name> <selected> <red> <green> <blue>
+         -->
           <ArrayListDomain name="array_list" attribute_type="Scalars">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
@@ -3940,5 +3945,6 @@
   </ProxyGroup>
 
 </ServerManagerConfiguration>
+
 
 

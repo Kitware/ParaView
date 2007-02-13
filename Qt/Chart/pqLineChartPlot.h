@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqChartCoordinate;
 class pqChartValue;
+class QColor;
 
 
 /// \class pqLineChartPlot
@@ -105,6 +106,13 @@ public:
   /// \return
   ///   The drawing type for a series.
   virtual SeriesType getSeriesType(int series) const=0;
+
+  /// \brief
+  ///   Get the drawing color for a series.
+  /// \param series The index of the series.
+  /// \return
+  ///   The drawing color for a series.
+  virtual QColor getColor(int series) const=0;
 
   /// \brief
   ///   Get the number of points in a series.
@@ -172,7 +180,7 @@ public:
   /// \sa pqLineChartPlot::getRangeX(pqChartValue &, pqChartValue &)
   virtual void getRangeY(pqChartValue &min, pqChartValue &max) const=0;
   //@}
-
+ 
 signals:
   /// Emitted when the plot data has changed drastically.
   void plotReset();

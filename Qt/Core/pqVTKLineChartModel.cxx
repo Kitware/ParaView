@@ -36,10 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRectilinearGrid.h"
 #include "vtkSMGenericViewDisplayProxy.h"
 
-#include <QtDebug>
+#include <QColor>
 #include <QList>
 #include <QMap>
 #include <QPointer>
+#include <QtDebug>
 
 #include "pqVTKLineChartPlot.h"
 #include "pqSMAdaptor.h"
@@ -193,16 +194,28 @@ void pqVTKLineChartModel::createPlotsForDisplay(pqDisplay* display)
     proxy->GetProperty("XAxisMode")).toInt();
 
   QList<QVariant> arraynames  = pqSMAdaptor::getMultipleElementProperty(
-    proxy->GetProperty("YArrayNames"));
+    proxy->GetProperty("SelectYArrays"));
 
-  foreach(QVariant vname, arraynames)
+  for (int cc=0; cc+4 < arraynames.size(); cc+= 5)
     {
-    if (vname.toString() != "")
+    if (!arraynames[cc+3].toBool())
+      {
+      continue;
+      }
+    QString vname = arraynames[cc+4].toString();
+    if (vname != "")
       {
       pqVTKLineChartPlot* plot = new pqVTKLineChartPlot(dataset, this);
-      plot->setYArray(vname.toString());
+      plot->setYArray(vname);
       plot->setXArray(xaxisarray);
       plot->setXAxisMode(xaxismode);
+
+      QColor color;
+      color.setRedF(arraynames[cc+0].toDouble());
+      color.setGreenF(arraynames[cc+1].toDouble());
+      color.setBlueF(arraynames[cc+2].toDouble());
+      plot->setColor(color);
+
       this->Internal->Plots.push_back(plot);
       this->appendPlot(plot);
       }

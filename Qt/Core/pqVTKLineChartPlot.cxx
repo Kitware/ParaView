@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
+#include <QColor>
 #include <QtDebug>
 
 #include "pqChartCoordinate.h"
@@ -51,6 +52,7 @@ public:
   pqVTKLineChartPlot::XAxisModes XAxisMode;
   QString XAxisArray;
   QString YAxisArray;
+  QColor Color;
 };
 
 //-----------------------------------------------------------------------------
@@ -268,3 +270,13 @@ QString pqVTKLineChartPlot::getXArrayNameToUse() const
 }
 
 //-----------------------------------------------------------------------------
+void pqVTKLineChartPlot::setColor(const QColor& c) 
+{
+  this->Internal->Color = c;
+}
+
+//-----------------------------------------------------------------------------
+QColor pqVTKLineChartPlot::getColor(int) const
+{
+  return this->Internal->Color;
+}

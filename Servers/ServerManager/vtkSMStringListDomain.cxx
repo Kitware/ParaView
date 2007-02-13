@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.17");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.18");
 
 struct vtkSMStringListDomainInternals
 {
@@ -252,12 +252,25 @@ int vtkSMStringListDomain::SetDefaultValues(vtkSMProperty* prop)
 {
   vtkSMStringVectorProperty* svp = 
     vtkSMStringVectorProperty::SafeDownCast(prop);
-  if (svp && svp->GetNumberOfElements() == 1 && 
-      this->GetNumberOfStrings()> 0)
+  unsigned int num_string = this->GetNumberOfStrings();
+  if (svp && num_string > 0)
     {
-    svp->SetElement(0, this->GetString(0));
-    return 1;
+    if (svp->GetNumberOfElements() == 1 && !svp->GetRepeatCommand())
+      {
+      svp->SetElement(0, this->GetString(0));
+      return 1;
+      }
+    if (svp->GetRepeatCommand() && svp->GetNumberOfElementsPerCommand()==1)
+      {
+      svp->SetNumberOfElements(num_string);
+      for (unsigned int cc=0; cc < num_string; cc++)
+        {
+        svp->SetElement(cc, this->GetString(cc));
+        }
+      return 1;
+      }
     }
+
 
   return this->Superclass::SetDefaultValues(prop);
 }

@@ -89,25 +89,8 @@ void pqBarChartDisplay::setDefaults()
     }
 
   // Set default arrays and lookup table.
-  vtkSMGenericViewDisplayProxy* proxy = 
-    vtkSMGenericViewDisplayProxy::SafeDownCast(this->getProxy());
-  proxy->GetProperty("Input")->UpdateDependentDomains();
-
-  // setDefaults() can always call Update on the display. 
-  // This is safe since setDefaults() will typically be called only after having
-  // added the display to the render module, which ensures that the
-  // update time has been set correctly on the display.
-  proxy->Update();
-
-  // This will setup default array names. Just reset-to-default all properties,
-  // the vtkSMArrayListDomain will do the rest.
-  vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    iter->GetProperty()->ResetToDefault();
-    }
-  iter->Delete();
-
+  vtkSMProxy* proxy = this->getProxy();
+  
   // By default, we use the 1st point array as the X axis. If no point data
   // is present we use the X coordinate of the points themselves.
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(

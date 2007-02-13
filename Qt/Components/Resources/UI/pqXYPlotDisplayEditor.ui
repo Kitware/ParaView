@@ -1,15 +1,12 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>Form</class>
  <widget class="QWidget" name="Form" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>377</width>
-    <height>462</height>
+    <width>237</width>
+    <height>307</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -77,12 +74,20 @@
           <height>100</height>
          </size>
         </property>
+        <property name="selectionMode" >
+         <enum>QAbstractItemView::NoSelection</enum>
+        </property>
         <property name="rootIsDecorated" >
          <bool>false</bool>
         </property>
         <column>
          <property name="text" >
           <string>Variables</string>
+         </property>
+        </column>
+        <column>
+         <property name="text" >
+          <string>Color</string>
          </property>
         </column>
        </widget>
@@ -117,7 +122,6 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections/>
 </ui>

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqDisplay;
+class QTreeWidgetItem;
 
 /// Editor widget for XY plot displays.
 class PQCOMPONENTS_EXPORT pqXYPlotDisplayProxyEditor : public QWidget
@@ -67,9 +68,14 @@ protected slots:
 
   void yArraySelectionChanged();
 
+  /// Slot to listen to clicks for changing color.
+  void onItemClicked(QTreeWidgetItem* item, int column);
 private:
   pqXYPlotDisplayProxyEditor(const pqXYPlotDisplayProxyEditor&); // Not implemented.
   void operator=(const pqXYPlotDisplayProxyEditor&); // Not implemented.
+
+  // pushes the item's state to the SM property.
+  void updateSMState(QTreeWidgetItem* item);
 
   class pqInternal;
   pqInternal* Internal;

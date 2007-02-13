@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLineChartPlot.h"
 #include "pqCoreExport.h"
-
 class vtkRectilinearGrid;
 class pqVTKLineChartPlotInternal;
 
@@ -71,6 +70,9 @@ public:
     ARC_LENGTH=2
     };
   void setXAxisMode(int mode);
+
+  QColor getColor(int) const; 
+  void setColor(const QColor& c);
 private:
   pqVTKLineChartPlot(const pqVTKLineChartPlot&); // Not implemented.
   void operator=(const pqVTKLineChartPlot&); // Not implemented.
