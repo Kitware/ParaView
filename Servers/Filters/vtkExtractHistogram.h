@@ -43,12 +43,10 @@ public:
   // Controls the number of bins N in the output histogram data
   vtkSetClampMacro(BinCount, int, 1, VTK_LARGE_INTEGER);
   vtkGetMacro(BinCount, int);
-  
-private:
+protected: 
   vtkExtractHistogram();
-  vtkExtractHistogram(const vtkExtractHistogram&); // Not implemented
-  void operator=(const vtkExtractHistogram&); // Not implemented
   ~vtkExtractHistogram();
+
 
   virtual int FillInputPortInformation (int port, vtkInformation *info);
 
@@ -68,6 +66,10 @@ private:
 
   int Component;
   int BinCount;
+
+private:
+  void operator=(const vtkExtractHistogram&); // Not implemented
+  vtkExtractHistogram(const vtkExtractHistogram&); // Not implemented
 };
 
 #endif

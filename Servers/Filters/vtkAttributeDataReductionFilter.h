@@ -18,7 +18,9 @@
 // Filter that takes data with same structure on multiple input connections to
 // produce a reduced dataset with cell/point data summed/maxed/minned for 
 // all cells/points. Data arrays not available in all inputs
-// are discarded.
+// are discarded. The attribute to reduce can be set to point or cell or field
+// or all. Only selected attributes will be reduced according to the 
+// type choosen, all other attributes are those at the first input.
 
 #ifndef __vtkAttributeDataReductionFilter_h
 #define __vtkAttributeDataReductionFilter_h
@@ -38,7 +40,22 @@ public:
     MAX = 2,
     MIN = 3
     };
+
+  enum AttributeTypes // These can be 'or'-ed together.
+    {
+    POINT_DATA = 0x01,
+    CELL_DATA  = 0x02,
+    FIELD_DATA = 0x04 // FIXME: Field data not supported yet.
+    };
 //ETX
+
+  // Set the attributes to reduce. Only the choosen type of attributes will be 
+  // reduced by this filter. The not-choosen attributes are passed through
+  // from the first input unchanged. Default is (POINT_DATA|CELL_DATA) 
+  // i.e. point data and cell data will be reduced.
+  // FIXME: Field data not supported yet.
+  vtkSetMacro(AttributeType, int);
+  vtkGetMacro(AttributeType, int);
 
   // Set the reduction type. Reduction type dictates how overlapping cell/point
   // data is combined. Default is ADD.
@@ -73,6 +90,7 @@ protected:
   
   virtual int FillInputPortInformation(int port, vtkInformation *info);
   int ReductionType;
+  int AttributeType;
 private:
   vtkAttributeDataReductionFilter(const vtkAttributeDataReductionFilter&); // Not implemented.
   void operator=(const vtkAttributeDataReductionFilter&); // Not implemented.

@@ -4573,7 +4573,7 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
    <!-- End TestCut -->
    </SourceProxy>
 
-   <SourceProxy name="ExtractHistogram" class="vtkExtractHistogram">
+   <SourceProxy name="ExtractHistogram" class="vtkPExtractHistogram">
      <Documentation
         long_help="Extract a histogram from field data."
         short_help="Extract a histogram from field data.">

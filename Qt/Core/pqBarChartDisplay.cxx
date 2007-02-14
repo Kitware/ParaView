@@ -98,6 +98,8 @@ void pqBarChartDisplay::setDefaults()
   bool use_points = (svp->GetElement(0) == 0);
   pqSMAdaptor::setElementProperty(
     proxy->GetProperty("XAxisUsePoints"), use_points);
+  pqSMAdaptor::setEnumerationProperty(
+    proxy->GetProperty("ReductionType"), "FIRST_NODE_ONLY");
   proxy->UpdateVTKObjects();
 
   // Now initialize the lookup table.

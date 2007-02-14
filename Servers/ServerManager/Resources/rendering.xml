@@ -3631,12 +3631,14 @@
 
   <ProxyGroup name="displays">
     <Proxy name="GenericViewDisplayBase">
+
       <Property
         name="Update"
         command="Update"
         is_internal="1"
         update_self="1">
       </Property>
+
       <IntVectorProperty
         name="Visibility"
         command="SetVisibility"
@@ -3646,10 +3648,11 @@
         animateable="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
       <IntVectorProperty
         name="ReductionType"
         command="SetReductionType"
-        default_values="0"
+        default_values="3"
         number_of_elements="1"
         update_self="1">
         <EnumerationDomain name="enum">
@@ -3659,14 +3662,17 @@
           <Entry value="3" text="FIRST_NODE_ONLY" />
         </EnumerationDomain>
       </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="UpdateSuppressor" 
           proxygroup="filters" proxyname="UpdateSuppressor" />
       </SubProxy>
+
       <SubProxy>
         <Proxy name="Collect" proxygroup="filters" proxyname="ClientServerMoveData">
         </Proxy>
       </SubProxy>
+
       <SubProxy>
         <Proxy name="Reduce" proxygroup="filters" proxyname="ReductionFilter">
         </Proxy>
@@ -3676,6 +3682,7 @@
           <Property name="PassThrough" />
         </ExposedProperties>
       </SubProxy>
+      <!-- End of GenericViewDisplayBase -->
     </Proxy>
 
     <GenericViewDisplayProxy name="GenericViewDisplay"

@@ -24,11 +24,13 @@
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkAttributeDataReductionFilter);
-vtkCxxRevisionMacro(vtkAttributeDataReductionFilter, "1.5");
+vtkCxxRevisionMacro(vtkAttributeDataReductionFilter, "1.6");
 //-----------------------------------------------------------------------------
 vtkAttributeDataReductionFilter::vtkAttributeDataReductionFilter()
 {
   this->ReductionType = vtkAttributeDataReductionFilter::ADD;
+  this->AttributeType = vtkAttributeDataReductionFilter::POINT_DATA |
+    vtkAttributeDataReductionFilter::CELL_DATA;
 }
 
 //-----------------------------------------------------------------------------
@@ -158,25 +160,40 @@ int vtkAttributeDataReductionFilter::RequestData(
       }
     }
 
-  vtkPointData *outputPD = output->GetPointData();
-  vtkCellData *outputCD = output->GetCellData();
-  outputPD->CopyGlobalIdsOn();
-  outputPD->CopyAllocate(ptList,numPoints0);
-  outputCD->CopyGlobalIdsOn();
-  outputCD->CopyAllocate(cellList,numCells0);
+  vtkIdType idx;
   vtkPointData* input0PD = input0->GetPointData();
-  vtkCellData* input0CD = input0->GetCellData();
+  vtkPointData *outputPD = output->GetPointData();
 
- vtkIdType idx;
-  for (idx=0; idx < numPoints0; idx++)
+  if ( (this->AttributeType & vtkAttributeDataReductionFilter::POINT_DATA) == 0)
     {
-    // Copy 0th point data first.
-    outputPD->CopyData(ptList, input0PD, 0, idx, idx);
+    outputPD->ShallowCopy(input0PD);
+    }
+  else
+    {
+    outputPD->CopyGlobalIdsOn();
+    outputPD->CopyAllocate(ptList,numPoints0);
+    for (idx=0; idx < numPoints0; idx++)
+      {
+      // Copy 0th point data first.
+      outputPD->CopyData(ptList, input0PD, 0, idx, idx);
+      }
     }
 
-  for (idx=0; idx< numCells0; ++idx)
+  vtkCellData* input0CD = input0->GetCellData();
+  vtkCellData *outputCD = output->GetCellData();
+  if ((this->AttributeType & vtkAttributeDataReductionFilter::CELL_DATA) == 0)
     {
-    outputCD->CopyData(cellList, input0CD, 0, idx, idx);
+    outputCD->ShallowCopy(input0CD);
+    }
+  else
+    {
+    outputCD->CopyGlobalIdsOn();
+    outputCD->CopyAllocate(cellList,numCells0);
+
+    for (idx=0; idx< numCells0; ++idx)
+      {
+      outputCD->CopyData(cellList, input0CD, 0, idx, idx);
+      }
     }
 
   this->UpdateProgress(0.1);
@@ -201,31 +218,34 @@ int vtkAttributeDataReductionFilter::RequestData(
     int i;
 
     // Now combine this inPD with the outPD using the reduction indicated.
-    for (i=0; i < ptList.GetNumberOfFields(); ++i)
+    if ((this->AttributeType & POINT_DATA) != 0)
       {
-      if (ptList.GetFieldIndex(i) >=0)
+      for (i=0; i < ptList.GetNumberOfFields(); ++i)
         {
-        vtkDataArray* toDA = outputPD->GetArray(ptList.GetFieldIndex(i));
-        vtkDataArray* fromDA = inPD->GetArray(ptList.GetDSAIndex(cc, i));
-        if (!toDA || !fromDA)
+        if (ptList.GetFieldIndex(i) >=0)
           {
-          continue;
-          }
-        vtkSmartPointer<vtkArrayIterator> toIter;
-        toIter.TakeReference(toDA->NewIterator());
-        vtkSmartPointer<vtkArrayIterator> fromIter;
-        fromIter.TakeReference(fromDA->NewIterator());
+          vtkDataArray* toDA = outputPD->GetArray(ptList.GetFieldIndex(i));
+          vtkDataArray* fromDA = inPD->GetArray(ptList.GetDSAIndex(cc, i));
+          if (!toDA || !fromDA)
+            {
+            continue;
+            }
+          vtkSmartPointer<vtkArrayIterator> toIter;
+          toIter.TakeReference(toDA->NewIterator());
+          vtkSmartPointer<vtkArrayIterator> fromIter;
+          fromIter.TakeReference(fromDA->NewIterator());
 
-        switch (toDA->GetDataType())
-          {
-          vtkArrayIteratorTemplateMacro(
-            vtkAttributeDataReductionFilterReduce(this,
-              static_cast<VTK_TT*>(toIter.GetPointer()), 
-              static_cast<VTK_TT*>(fromIter.GetPointer()), 
-              progress_offset, progress_factor));
-        default:
-          vtkWarningMacro("Cannot reduce arrays of type: " <<
-            toDA->GetDataTypeAsString());
+          switch (toDA->GetDataType())
+            {
+            vtkArrayIteratorTemplateMacro(
+              vtkAttributeDataReductionFilterReduce(this,
+                static_cast<VTK_TT*>(toIter.GetPointer()), 
+                static_cast<VTK_TT*>(fromIter.GetPointer()), 
+                progress_offset, progress_factor));
+          default:
+            vtkWarningMacro("Cannot reduce arrays of type: " <<
+              toDA->GetDataTypeAsString());
+            }
           }
         }
       }
@@ -234,37 +254,41 @@ int vtkAttributeDataReductionFilter::RequestData(
     vtkCellData* inCD = inputCC->GetCellData();
     progress_offset += progress_factor;
 
-    // Now combine this inCD with the outCD using the reduction indicated.
-    for (i=0; i < cellList.GetNumberOfFields(); ++i)
+    if ((this->AttributeType & CELL_DATA) != 0)
       {
-      if (cellList.GetFieldIndex(i) >=0)
+      // Now combine this inCD with the outCD using the reduction indicated.
+      for (i=0; i < cellList.GetNumberOfFields(); ++i)
         {
-        vtkDataArray* toDA = outputCD->GetArray(cellList.GetFieldIndex(i));
-        vtkDataArray* fromDA = inCD->GetArray(cellList.GetDSAIndex(cc, i));
-        if (!toDA || !fromDA)
+        if (cellList.GetFieldIndex(i) >=0)
           {
-          continue;
-          }
-        vtkSmartPointer<vtkArrayIterator> toIter;
-        toIter.TakeReference(toDA->NewIterator());
-        vtkSmartPointer<vtkArrayIterator> fromIter;
-        fromIter.TakeReference(fromDA->NewIterator());
+          vtkDataArray* toDA = outputCD->GetArray(cellList.GetFieldIndex(i));
+          vtkDataArray* fromDA = inCD->GetArray(cellList.GetDSAIndex(cc, i));
+          if (!toDA || !fromDA)
+            {
+            continue;
+            }
+          vtkSmartPointer<vtkArrayIterator> toIter;
+          toIter.TakeReference(toDA->NewIterator());
+          vtkSmartPointer<vtkArrayIterator> fromIter;
+          fromIter.TakeReference(fromDA->NewIterator());
 
-        switch (toDA->GetDataType())
-          {
-          vtkArrayIteratorTemplateMacro(
-            vtkAttributeDataReductionFilterReduce(this,
-              static_cast<VTK_TT*>(toIter.GetPointer()), 
-              static_cast<VTK_TT*>(fromIter.GetPointer()),
-              progress_offset, progress_factor));
-        default:
-          vtkWarningMacro("Cannot reduce arrays of type: " <<
-            toDA->GetDataTypeAsString());
+          switch (toDA->GetDataType())
+            {
+            vtkArrayIteratorTemplateMacro(
+              vtkAttributeDataReductionFilterReduce(this,
+                static_cast<VTK_TT*>(toIter.GetPointer()), 
+                static_cast<VTK_TT*>(fromIter.GetPointer()),
+                progress_offset, progress_factor));
+          default:
+            vtkWarningMacro("Cannot reduce arrays of type: " <<
+              toDA->GetDataTypeAsString());
+            }
           }
         }
       }
     progress_offset += progress_factor;
     }
+
   return 1; 
 }
 
@@ -274,4 +298,5 @@ void vtkAttributeDataReductionFilter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ReductionType: " << this->GetReductionTypeAsString() 
     << endl;
+  os << indent << "AttributeType: " << this->AttributeType << endl;
 }
