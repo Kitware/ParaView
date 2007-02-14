@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.16");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -83,7 +83,10 @@ void vtkSMGenericViewDisplayProxy::CreateVTKObjects(int numObjects)
     this->Servers | vtkProcessModule::CLIENT);
 
   this->ReduceProxy =  this->GetSubProxy("Reduce");
-  this->ReduceProxy->SetServers(this->Servers);
+  if (this->ReduceProxy)
+    {
+    this->ReduceProxy->SetServers(this->Servers);
+    }
 
   this->PostProcessorProxy = this->GetSubProxy("PostProcessor");
   if (this->PostProcessorProxy)
@@ -103,13 +106,12 @@ void vtkSMGenericViewDisplayProxy::SetReductionType(int type)
     return;
     }
 
+  this->ReductionType = type;
+
   if (!this->ReduceProxy)
     {
-    vtkErrorMacro("Could not locate the Reduction proxy.");
     return;
     }
-
-  this->ReductionType = type;
 
   vtkClientServerStream stream;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -156,6 +158,12 @@ void vtkSMGenericViewDisplayProxy::SetReductionType(int type)
     pm->DeleteStreamObject(rfid, stream);
     }
 
+  if (type == FIRST_NODE_ONLY && this->ReduceProxy)
+    {
+    // We re-arrange the pipeline to remove the ReduceProxy
+    // from the pipeline.
+    }
+
   pm->SendStream(this->GetConnectionID(),
     this->ReduceProxy->GetServers(), stream);
 }
@@ -192,36 +200,46 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMInputProperty* ip = 0;
 
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->ReduceProxy->GetProperty("Input"));
-  ip->RemoveAllProxies();
-  ip->AddProxy(input);
-  this->ReduceProxy->UpdateVTKObjects();
+  if (this->ReduceProxy)
+    {
+    ip = vtkSMInputProperty::SafeDownCast(
+      this->ReduceProxy->GetProperty("Input"));
+    ip->RemoveAllProxies();
+    ip->AddProxy(input);
+    this->ReduceProxy->UpdateVTKObjects();
 
-  for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
-    {
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetController"
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << this->ReduceProxy->GetID(i) << "SetController"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, 
-      this->ReduceProxy->GetServers(), stream);
+    for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
+      {
+      stream
+        << vtkClientServerStream::Invoke
+        << pm->GetProcessModuleID() << "GetController"
+        << vtkClientServerStream::End;
+      stream
+        << vtkClientServerStream::Invoke
+        << this->ReduceProxy->GetID(i) << "SetController"
+        << vtkClientServerStream::LastResult
+        << vtkClientServerStream::End;
+      }
+    if (stream.GetNumberOfMessages() > 0)
+      {
+      pm->SendStream(this->ConnectionID, 
+        this->ReduceProxy->GetServers(), stream);
+      }
     }
 
   ip = vtkSMInputProperty::SafeDownCast(
     this->CollectProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
-  ip->AddProxy(this->ReduceProxy);
-  this->CollectProxy->UpdateVTKObjects();
+  if (this->ReduceProxy)
+    {
+    ip->AddProxy(this->ReduceProxy);
+    }
+  else
+    {
+    ip->AddProxy(input);
+    }
 
+  this->CollectProxy->UpdateVTKObjects();
 
   for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
     {
