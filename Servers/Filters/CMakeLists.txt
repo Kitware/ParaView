@@ -128,6 +128,7 @@ SET(Filters_SRCS
   vtkTransferFunctionEditorWidgetShapes1D.cxx
   vtkTransferFunctionEditorWidgetShapes2D.cxx
   vtkTransferFunctionEditorWidgetSimple1D.cxx
+  vtkTransferFunctionViewer.cxx
   vtkUpdateSuppressorPipeline.cxx
   vtkVolumeSelector.cxx
   vtkVRMLSource.cxx
