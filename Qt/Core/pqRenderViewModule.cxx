@@ -58,6 +58,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 #include <QMenu>
 #include <QSet>
+#include <QPrinter>
+#include <QPainter>
 
 // ParaView includes.
 #include "pqApplicationCore.h"
@@ -519,6 +521,25 @@ bool pqRenderViewModule::saveImage(int width, int height, const QString& filenam
   else if(file.completeSuffix() == "jpg")
     {
     writername = "vtkJPEGWriter";
+    }
+  else if(file.completeSuffix() == "pdf")
+    {
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(filename);
+    
+    QPixmap pix = QPixmap::grabWidget(this->Internal->Viewport);
+    QPainter painter;
+    painter.begin(&printer);
+    QSize viewport_size(pix.rect().size());
+    viewport_size.scale(printer.pageRect().size(), Qt::KeepAspectRatio);
+    painter.setWindow(pix.rect());
+    painter.setViewport(QRect(0,0, viewport_size.width(),
+        viewport_size.height()));
+    painter.drawPixmap(QPointF(0.0, 0.0), pix);
+    painter.end();
+
+    return true;
     }
   else
     {
