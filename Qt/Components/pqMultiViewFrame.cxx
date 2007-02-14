@@ -101,19 +101,19 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   this->connect(this->ActiveButton->defaultAction(), SIGNAL(triggered(bool)), 
                 SLOT(setActive(bool)));
   this->connect(this->CloseButton->defaultAction(), SIGNAL(triggered(bool)), 
-                SLOT(close()));
+                SLOT(close()), Qt::QueuedConnection);
   this->connect(this->MaximizeButton->defaultAction(), 
                 SIGNAL(triggered(bool)), 
-                SLOT(maximize()));
+                SLOT(maximize()), Qt::QueuedConnection);
   this->connect(this->RestoreButton->defaultAction(), 
                 SIGNAL(triggered(bool)), 
-                SLOT(restore()));
+                SLOT(restore()), Qt::QueuedConnection);
   this->connect(this->SplitVerticalButton->defaultAction(), 
                 SIGNAL(triggered(bool)), 
-                SLOT(splitVertical()));
+                SLOT(splitVertical()), Qt::QueuedConnection);
   this->connect(this->SplitHorizontalButton->defaultAction(), 
                 SIGNAL(triggered(bool)), 
-                SLOT(splitHorizontal()));
+                SLOT(splitHorizontal()), Qt::QueuedConnection);
   
   // setup the context menu
   this->Menu->setContextMenuPolicy(Qt::CustomContextMenu);
