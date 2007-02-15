@@ -52,19 +52,19 @@
           file_description="VTK RectilinearGrid Files (partitioned)">
   </Reader>
   <Reader name="XMLMultiBlockDataReader"
-          extensions="vtm"
+          extensions="vtm vtmb"
           file_description="VTK MultiBlock Data Files">
   </Reader>
   <Reader name="XMLMultiGroupDataReader"
-          extensions="vtm"
+          extensions="vtm vtmg"
           file_description="VTK MultiGroup Data Files">
   </Reader>
   <Reader name="XMLHierarchicalDataReader"
-          extensions="vtm"
+          extensions="vtm vthd"
           file_description="VTK Hierarchical Data Files">
   </Reader>
   <Reader name="XMLHierarchicalBoxDataReader"
-          extensions="vtm"
+          extensions="vtm vthb"
           file_description="VTK Hierarchical Box Data Files">
   </Reader>
   <Reader name="legacyreader"
