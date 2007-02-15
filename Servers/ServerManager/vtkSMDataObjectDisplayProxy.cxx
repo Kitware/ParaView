@@ -38,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.26.2.1");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.26.2.2");
 
 
 //-----------------------------------------------------------------------------
@@ -418,6 +418,22 @@ void vtkSMDataObjectDisplayProxy::SetTexture(vtkSMProxy *texture)
   if (texture)
     {
     pp->AddProxy(texture);
+    }
+  else
+    {
+    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+    if (!pm)
+      {
+      return;
+      }
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->ActorProxy->GetID(0)
+           << "SetTexture"
+           << (vtkObjectBase*)0
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID,
+                   vtkProcessModule::RENDER_SERVER, stream);
     }
 
   this->UpdateVTKObjects();
