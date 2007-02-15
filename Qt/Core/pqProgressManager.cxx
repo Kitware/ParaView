@@ -51,11 +51,11 @@ pqProgressManager::~pqProgressManager()
 
 
 //-----------------------------------------------------------------------------
-bool pqProgressManager::eventFilter(QObject* obj, QEvent* event)
+bool pqProgressManager::eventFilter(QObject* obj, QEvent* evt)
 {
   if (this->ProgressCount != 0)
     {
-    if (dynamic_cast<QKeyEvent*>(event) || dynamic_cast<QMouseEvent*>(event))
+    if (dynamic_cast<QKeyEvent*>(evt) || dynamic_cast<QMouseEvent*>(evt))
       {
       if (!this->NonBlockableObjects.contains(obj))
         {
@@ -64,7 +64,7 @@ bool pqProgressManager::eventFilter(QObject* obj, QEvent* event)
       }
     }
 
-  return QObject::eventFilter(obj, event);
+  return QObject::eventFilter(obj, evt);
 }
 
 //-----------------------------------------------------------------------------
