@@ -15,33 +15,31 @@
 #include "vtkTransferFunctionEditorWidget.h"
 
 #include "vtkCellData.h"
+#include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPointData.h"
-#include "vtkDataArray.h"
+#include "vtkRectilinearGrid.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.5");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.6");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
 {
-  this->Input = NULL;
-  this->ArrayName = NULL;
-  this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
   this->NumberOfScalarBins = 10000;
   this->WholeScalarRange[0] = this->VisibleScalarRange[0] = 1;
   this->WholeScalarRange[1] = this->VisibleScalarRange[1] = 0;
   this->ModificationType = OPACITY;
   this->OpacityFunction = vtkPiecewiseFunction::New();
+  this->Histogram = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::~vtkTransferFunctionEditorWidget()
 {
-  this->SetInput(NULL);
-  this->SetArrayName(NULL);
   this->OpacityFunction->Delete();
+  this->SetHistogram(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -64,45 +62,23 @@ void vtkTransferFunctionEditorWidget::SetVisibleScalarRange(double min,
 
   vtkTransferFunctionEditorRepresentation *rep =
     vtkTransferFunctionEditorRepresentation::SafeDownCast(this->WidgetRep);
-  if (rep)
+  if (this->Histogram)
     {
-    if (this->Input)
+    double histogramRange[2];
+    int numBins;
+    vtkDataArray *dataArray = this->Histogram->GetXCoordinates();
+    if (dataArray)
       {
-      double inputScalarRange[2];
-      vtkDataSetAttributes *dsa;
-      if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-        {
-        dsa = this->Input->GetPointData();
-        }
-      else
-        {
-        dsa = this->Input->GetCellData();
-        }
-      vtkDataArray *dataArray;
-      if (this->ArrayName)
-        {
-        dataArray = dsa->GetArray(this->ArrayName);
-        }
-      else
-        {
-        dataArray = dsa->GetScalars();
-        }
-      dataArray->GetRange(inputScalarRange);
-      int scalarType = dataArray->GetDataType();
-      if (scalarType != VTK_FLOAT && scalarType != VTK_DOUBLE)
-        {
-        rep->SetScalarBinRange(static_cast<int>(min - inputScalarRange[0]),
-                               static_cast<int>(max - inputScalarRange[0]));
-        }
-      else
+      dataArray->GetRange(histogramRange);
+      numBins = dataArray->GetNumberOfTuples() - 1;
+
+      if (rep)
         {
         rep->SetScalarBinRange(
-          static_cast<int>(
-            (min - inputScalarRange[0]) * this->NumberOfScalarBins /
-            (inputScalarRange[1] - inputScalarRange[0])),
-          static_cast<int>(
-            (max - inputScalarRange[0]) * this->NumberOfScalarBins /
-            (inputScalarRange[1] - inputScalarRange[0])));
+          static_cast<int>((min - histogramRange[0]) * numBins /
+                           (histogramRange[1] - histogramRange[0])),
+          static_cast<int>((max - histogramRange[0]) * numBins /
+                           (histogramRange[1] - histogramRange[0])));
         }
       }
     }
@@ -111,27 +87,10 @@ void vtkTransferFunctionEditorWidget::SetVisibleScalarRange(double min,
 //----------------------------------------------------------------------------
 void vtkTransferFunctionEditorWidget::ShowWholeScalarRange()
 {
-  if (this->Input)
+  if (this->Histogram)
     {
     double range[2];
-    vtkDataSetAttributes *dsa;
-    vtkDataArray *dataArray;
-    if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-      {
-      dsa = this->Input->GetPointData();
-      }
-    else
-      {
-      dsa = this->Input->GetCellData();
-      }
-    if (this->ArrayName)
-      {
-      dataArray = dsa->GetArray(this->ArrayName);
-      }
-    else
-      {
-      dataArray = dsa->GetScalars();
-      }
+    vtkDataArray *dataArray = this->Histogram->GetXCoordinates();
     if (dataArray)
       {
       dataArray->GetRange(range);
@@ -141,106 +100,6 @@ void vtkTransferFunctionEditorWidget::ShowWholeScalarRange()
   else
     {
     this->SetVisibleScalarRange(this->WholeScalarRange);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkTransferFunctionEditorWidget::SetInput(vtkDataSet *input)
-{
-  if (input != this->Input)
-    {
-    vtkDataSet *tmpInput = this->Input;
-    this->Input = input;
-    if (this->Input != NULL)
-      {
-      this->Input->Register(this);
-      if (this->VisibleScalarRange[0] > this->VisibleScalarRange[1])
-        {
-        double range[2];
-        vtkDataSetAttributes *dsa;
-        vtkDataArray *array;
-        if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-          {
-          dsa = this->Input->GetPointData();
-          }
-        else
-          {
-          dsa = this->Input->GetCellData();
-          }
-        if (this->ArrayName)
-          {
-          array = dsa->GetArray(this->ArrayName);
-          }
-        else
-          {
-          array = dsa->GetScalars();
-          }
-        if (array)
-          {
-          array->GetRange(range);
-          this->SetVisibleScalarRange(range);
-          }
-        }
-      this->ComputeHistogram();
-      }
-    if (tmpInput != NULL)
-      {
-      tmpInput->UnRegister(this);
-      }
-    this->Modified();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkTransferFunctionEditorWidget::SetArrayName(const char *name)
-{
-  if (this->ArrayName == NULL && name == NULL)
-    {
-    return;
-    }
-  if (this->ArrayName && name && !strcmp(this->ArrayName, name))
-    {
-    return;
-    }
-  if (this->ArrayName)
-    {
-    delete [] this->ArrayName;
-    }
-  if (name)
-    {
-    size_t len = strlen(name) + 1;
-    char *str1 = new char[len];
-    const char *str2 = name;
-    this->ArrayName = str1;
-    do
-      {
-      *str1++ = *str2++;
-      }
-    while (--len);
-    this->ComputeHistogram();
-    }
-  else
-    {
-    this->ArrayName = NULL;
-    }
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkTransferFunctionEditorWidget::SetFieldAssociation(int assoc)
-{
-  int clampedVal =
-    (assoc < vtkDataObject::FIELD_ASSOCIATION_POINTS) ? 
-    vtkDataObject::FIELD_ASSOCIATION_POINTS : assoc;
-  clampedVal =
-    (assoc > vtkDataObject::FIELD_ASSOCIATION_CELLS) ? 
-    vtkDataObject::FIELD_ASSOCIATION_CELLS : assoc;
-  
-  if (this->FieldAssociation != clampedVal)
-    {
-    this->FieldAssociation = clampedVal;
-    this->ComputeHistogram();
-    this->Modified();
     }
 }
 
@@ -256,19 +115,30 @@ void vtkTransferFunctionEditorWidget::Configure(int size[2])
 }
 
 //----------------------------------------------------------------------------
-void vtkTransferFunctionEditorWidget::InputModified()
+void vtkTransferFunctionEditorWidget::SetHistogram(
+  vtkRectilinearGrid *histogram)
 {
-  this->ComputeHistogram();
-}
-
-//----------------------------------------------------------------------------
-void vtkTransferFunctionEditorWidget::SetEnabled(int enable)
-{
-  this->Superclass::SetEnabled(enable);
-
-  if (enable)
+  if (this->Histogram != histogram)
     {
-    this->ComputeHistogram();
+    vtkRectilinearGrid *tempHist = this->Histogram;
+    this->Histogram = histogram;
+    if (this->Histogram != NULL)
+      {
+      this->Histogram->Register(this);
+      vtkDataArray *hist = this->Histogram->GetXCoordinates();
+      if (hist &&
+          this->VisibleScalarRange[0] == 1 && this->VisibleScalarRange[1] == 0)
+        {
+        double range[2];
+        hist->GetRange(range);
+        this->SetVisibleScalarRange(range);
+        }
+      }
+    if (tempHist != NULL)
+      {
+      tempHist->UnRegister(this);
+      }
+    this->Modified();
     }
 }
 

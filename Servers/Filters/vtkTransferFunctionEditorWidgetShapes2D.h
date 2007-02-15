@@ -38,8 +38,6 @@ protected:
   vtkTransferFunctionEditorWidgetShapes2D() {}
   ~vtkTransferFunctionEditorWidgetShapes2D() {}
 
-  virtual void ComputeHistogram() {}
-
 private:
   vtkTransferFunctionEditorWidgetShapes2D(const vtkTransferFunctionEditorWidgetShapes2D&); // Not implemented.
   void operator=(const vtkTransferFunctionEditorWidgetShapes2D&); // Not implemented.

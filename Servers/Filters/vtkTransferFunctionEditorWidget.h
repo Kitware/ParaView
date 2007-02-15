@@ -31,25 +31,13 @@
 
 class vtkDataSet;
 class vtkPiecewiseFunction;
+class vtkRectilinearGrid;
 
 class VTK_EXPORT vtkTransferFunctionEditorWidget : public vtkAbstractWidget
 {
 public:
   vtkTypeRevisionMacro(vtkTransferFunctionEditorWidget, vtkAbstractWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Set the input data set containing the array used for computing the
-  // histogram and the scalar range.
-  void SetInput(vtkDataSet *input);
-
-  // Description:
-  // Set the name of the array in the input data set to be processed.
-  void SetArrayName(const char *name);
-
-  // Description:
-  // Set the field association (points = 0, cells = 1) of the array to process.
-  void SetFieldAssociation(int assoc);
 
   // Description:
   // Set the scalar range to show in the transfer function editor.
@@ -75,16 +63,6 @@ public:
   virtual void Configure(int size[2]);
 
   // Description:
-  // Notify the widget that the input has been modified so the histogram
-  // needs to be recomputed.
-  virtual void InputModified();
-
-  // Description:
-  // Methods for activating this widget. Note that the widget representation
-  // must be specified or the widget will not appear.
-  virtual void SetEnabled(int enable);
-
-  // Description:
   // Set the type of function to modify.
   vtkSetClampMacro(ModificationType, int, 0, 2);
   
@@ -97,22 +75,24 @@ public:
   };
 //ETX
 
+  // Description:
+  // Get the opacity transfer function.
   vtkGetObjectMacro(OpacityFunction, vtkPiecewiseFunction);
 
+  // Description:
+  // Set the rectilinear grid containing the histogram.
+  virtual void SetHistogram(vtkRectilinearGrid *histogram);
+  
 protected:
   vtkTransferFunctionEditorWidget();
   ~vtkTransferFunctionEditorWidget();
 
-  virtual void ComputeHistogram() = 0;
-
-  vtkDataSet *Input;
-  char *ArrayName;
-  int FieldAssociation;
   double VisibleScalarRange[2];
   double WholeScalarRange[2];
   int NumberOfScalarBins; // used for float and double input images
   int ModificationType;
   vtkPiecewiseFunction *OpacityFunction;
+  vtkRectilinearGrid *Histogram;
 
 private:
   vtkTransferFunctionEditorWidget(const vtkTransferFunctionEditorWidget&); // Not implemented.

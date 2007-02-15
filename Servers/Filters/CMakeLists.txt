@@ -24,7 +24,6 @@ SET(Filters_SRCS
   vtkCompleteArrays.cxx
   vtkCVGeometryCache.cxx
   vtkDataAnalysisFilter.cxx
-  vtkDataSetHistogramFilter.cxx
   vtkDataSetSubdivisionAlgorithm.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx

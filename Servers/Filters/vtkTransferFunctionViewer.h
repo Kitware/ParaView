@@ -32,6 +32,7 @@ class vtkDataSet;
 class vtkEventForwarderCommand;
 class vtkInteractorStyleTransferFunctionEditor;
 class vtkPiecewiseFunction;
+class vtkRectilinearGrid;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
@@ -88,20 +89,12 @@ public:
   void SetModificationTypeToColorAndOpacity();
 
   // Description:
-  // Set the input data set containing the scalar array used in the
-  // transfer function. If the input is not set, the histogram will not be
-  // visible, regardless of how HistogramVisibility is set.
-  void SetInput(vtkDataSet *input);
-
-  // Description:
-  // Set the name of the data array in the input data set to process.
-  void SetArrayName(const char* name);
-
-  // Description:
-  // Set whether the array to process is point-centered or cell-centered.
-  void SetFieldAssociation(int assoc);
-  void SetFieldAssociationToPoints();
-  void SetFieldAssociationToCells();
+  // Set the histogram to display behind the transfer function editor.
+  // The X coordinates of this vtkRectilinearGrid give the scalar range for
+  // each bin of the histogram.
+  // There is a cell array containing the number of scalar values per bin.
+  // Set the editor type before setting the histogram.
+  void SetHistogram(vtkRectilinearGrid *histogram);
 
   // Description:
   // Set the range of scalar values that will be shown in the rendering
@@ -162,11 +155,7 @@ protected:
   vtkRenderWindowInteractor *Interactor;
   vtkInteractorStyleTransferFunctionEditor *InteractorStyle;
   vtkTransferFunctionEditorWidget *EditorWidget;
-  vtkDataSet *Input;
-  char *ArrayName;
-  int FieldAssociation;
   vtkEventForwarderCommand *EventForwarder;
-  unsigned long InputMTime;
 
 private:
   vtkTransferFunctionViewer(const vtkTransferFunctionViewer&); // Not implemented.

@@ -21,7 +21,7 @@
 #include "vtkPointData.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.3");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.4");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation1D, Histogram,
                      vtkIntArray);
@@ -88,7 +88,7 @@ void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
     }
   else
     {
-    numBins = this->ScalarBinRange[1] - this->ScalarBinRange[0] + 1;
+    numBins = this->ScalarBinRange[1] - this->ScalarBinRange[0];
     minBinIdx = this->ScalarBinRange[0];
     }
 

@@ -20,6 +20,7 @@
 #include "vtkInteractorStyleTransferFunctionEditor.h"
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkRectilinearGrid.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -28,7 +29,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.5");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.6");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -39,11 +40,7 @@ vtkTransferFunctionViewer::vtkTransferFunctionViewer()
   this->Interactor = NULL;
   this->InteractorStyle = vtkInteractorStyleTransferFunctionEditor::New();
   this->EditorWidget = NULL;
-  this->Input = NULL;
-  this->ArrayName = NULL;
-  this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
   this->EventForwarder = vtkEventForwarderCommand::New();
-  this->InputMTime = 0;
 
   this->EventForwarder->SetTarget(this);
 
@@ -73,8 +70,6 @@ vtkTransferFunctionViewer::~vtkTransferFunctionViewer()
     this->EditorWidget->Delete();
     this->EditorWidget = NULL;
     }
-  this->SetInput(NULL);
-  this->SetArrayName(NULL);
   this->EventForwarder->Delete();
 }
 
@@ -142,102 +137,6 @@ void vtkTransferFunctionViewer::SetHistogramVisibility(int visibility)
 }
 
 //----------------------------------------------------------------------------
-void vtkTransferFunctionViewer::SetInput(vtkDataSet *input)
-{
-  if (this->Input != input)
-    {
-    vtkDataSet *tmpInput = this->Input;
-    this->Input = input;
-    if (this->Input != NULL)
-      {
-      this->Input->Register(this);
-      this->InputMTime = this->Input->GetMTime();
-      }
-    if (tmpInput != NULL)
-      {
-      tmpInput->UnRegister(this);
-      }
-    this->Modified();
-    }
-
-  if (this->EditorWidget)
-    {
-    this->EditorWidget->SetInput(input);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkTransferFunctionViewer::SetArrayName(const char* name)
-{
-  if (this->ArrayName == NULL && name == NULL)
-    {
-    return;
-    }
-  if (this->ArrayName && name && !strcmp(this->ArrayName, name))
-    {
-    return;
-    }
-  if (this->ArrayName)
-    {
-    delete [] this->ArrayName;
-    }
-  if (name)
-    {
-    size_t len = strlen(name) + 1;
-    char *str1 = new char[len];
-    const char *str2 = name;
-    this->ArrayName = str1;
-    do
-      {
-      *str1++ = *str2++;
-      }
-    while (--len);
-    }
-  else
-    {
-    this->ArrayName = NULL;
-    }
-  if (this->EditorWidget)
-    {
-    this->EditorWidget->SetArrayName(this->ArrayName);
-    }
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkTransferFunctionViewer::SetFieldAssociation(int assoc)
-{
-  int clampedVal =
-    (assoc < vtkDataObject::FIELD_ASSOCIATION_POINTS) ?
-    vtkDataObject::FIELD_ASSOCIATION_POINTS : assoc;
-  clampedVal =
-    (assoc > vtkDataObject::FIELD_ASSOCIATION_CELLS) ?
-    vtkDataObject::FIELD_ASSOCIATION_CELLS : assoc;
-  
-  if (this->FieldAssociation != clampedVal)
-    {
-    this->FieldAssociation = clampedVal;
-    this->Modified();
-    if (this->EditorWidget)
-      {
-      this->EditorWidget->SetFieldAssociation(clampedVal);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkTransferFunctionViewer::SetFieldAssociationToPoints()
-{
-  this->SetFieldAssociation(vtkDataObject::FIELD_ASSOCIATION_POINTS);
-}
-
-//----------------------------------------------------------------------------
-void vtkTransferFunctionViewer::SetFieldAssociationToCells()
-{
-  this->SetFieldAssociation(vtkDataObject::FIELD_ASSOCIATION_CELLS);
-}
-
-//----------------------------------------------------------------------------
 void vtkTransferFunctionViewer::SetTransferFunctionEditorType(int type)
 {
   switch (type)
@@ -283,9 +182,6 @@ void vtkTransferFunctionViewer::SetTransferFunctionEditorType(int type)
     {
     this->EditorWidget->SetInteractor(this->Interactor);
     this->EditorWidget->SetDefaultRenderer(this->Renderer);
-    this->EditorWidget->SetInput(this->Input);
-    this->EditorWidget->SetFieldAssociation(this->FieldAssociation);
-    this->EditorWidget->SetArrayName(this->ArrayName);
     this->EditorWidget->SetEnabled(1);
     vtkTransferFunctionEditorRepresentation *rep =
       vtkTransferFunctionEditorRepresentation::SafeDownCast(
@@ -357,17 +253,9 @@ void vtkTransferFunctionViewer::SetSize(int x, int y)
 //----------------------------------------------------------------------------
 void vtkTransferFunctionViewer::Render()
 {
-  if (this->EditorWidget)
+  if (this->EditorWidget && this->EditorWidget->GetRepresentation())
     {
-    if (this->Input && this->Input->GetMTime() > this->InputMTime)
-      {
-      this->InputMTime = this->Input->GetMTime();
-      this->EditorWidget->InputModified();
-      }
-    if (this->EditorWidget->GetRepresentation())
-      {
-      this->EditorWidget->GetRepresentation()->BuildRepresentation();
-      }
+    this->EditorWidget->GetRepresentation()->BuildRepresentation();
     }
 
   this->RenderWindow->Render();
@@ -507,6 +395,18 @@ vtkPiecewiseFunction* vtkTransferFunctionViewer::GetOpacityFunction()
     return this->EditorWidget->GetOpacityFunction();
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetHistogram(vtkRectilinearGrid *histogram)
+{
+  if (!this->EditorWidget)
+    {
+    vtkErrorMacro("Set the transfer function editor type before setting the histogram.");
+    return;
+    }
+
+  this->EditorWidget->SetHistogram(histogram);
 }
 
 //----------------------------------------------------------------------------

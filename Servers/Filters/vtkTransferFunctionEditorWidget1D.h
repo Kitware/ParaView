@@ -32,11 +32,13 @@ public:
   vtkTypeRevisionMacro(vtkTransferFunctionEditorWidget1D, vtkTransferFunctionEditorWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Set the histogram.
+  virtual void SetHistogram(vtkRectilinearGrid *histogram);
+
 protected:
   vtkTransferFunctionEditorWidget1D();
   ~vtkTransferFunctionEditorWidget1D();
-
-  virtual void ComputeHistogram();
 
 private:
   vtkTransferFunctionEditorWidget1D(const vtkTransferFunctionEditorWidget1D&); // Not implemented.
