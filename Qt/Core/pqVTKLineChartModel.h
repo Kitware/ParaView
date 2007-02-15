@@ -64,10 +64,9 @@ public slots:
   /// If so, it will rebuilt the plots.
   void update();
 
-protected:
   /// Removes all the plots from the model.
   virtual void clearPlots();
-
+protected:
   /// Creates pqVTKLineChartPlot objects for each display. A pqVTKLineChartPlot
   /// is create for each YAxis array for every display visible.
   void createPlotsForDisplay(pqDisplay*);
