@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextDocument>
 #include <QTextEdit>
 
+#include "pqObjectNaming.h"
+
 pqAbstractStringEventPlayer::pqAbstractStringEventPlayer(QObject* p)
   : pqWidgetEventPlayer(p)
 {
@@ -64,8 +66,9 @@ bool pqAbstractStringEventPlayer::playEvent(QObject* Object, const QString& Comm
         {
         possibles += QString("\t") + object->itemText(i) + QString("\n");
         }
-      qCritical() << "Unable to find " << value << " in combo box\n"
-                  << "Possible values are:\n" << possibles;
+      qCritical() << "Unable to find " << value << " in combo box: "
+                  << pqObjectNaming::GetName(*Object)
+                  << "\nPossible values are:\n" << possibles;
       Error = true;
       }
     return true;
