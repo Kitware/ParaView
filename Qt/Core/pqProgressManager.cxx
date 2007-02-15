@@ -104,14 +104,14 @@ bool pqProgressManager::isLocked() const
 }
 
 //-----------------------------------------------------------------------------
-void pqProgressManager::setProgress(const QString& message, int progress)
+void pqProgressManager::setProgress(const QString& message, int progress_val)
 {
   if (this->Lock && this->Lock != this->sender())
     {
     // When locked, ignore all other senders.
     return;
     }
-  emit this->progress(message, progress);
+  emit this->progress(message, progress_val);
 }
 
 //-----------------------------------------------------------------------------
