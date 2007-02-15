@@ -30,7 +30,7 @@ QtTesting.playCommand(object5, 'mouseMove', '(0.533784,0.680147,1,0,0)')
 QtTesting.playCommand(object5, 'mouseRelease', '(0.533784,0.680147,1,0,0)')
 object6 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_tabbar'
 QtTesting.playCommand(object6, 'set_tab', '1')
-object8 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ViewGroup/ViewData'
+object8 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/Form/ViewGroup/ViewData'
 QtTesting.playCommand(object8, 'set_boolean', 'false')
 QtTesting.playCommand(object8, 'set_boolean', 'false')
 QtTesting.playCommand(object8, 'set_boolean', 'false')
