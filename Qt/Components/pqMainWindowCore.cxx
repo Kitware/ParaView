@@ -868,6 +868,9 @@ void pqMainWindowCore::setupProgressBar(QStatusBar* toolbar)
 
   QObject::connect(progress_bar, SIGNAL(abortPressed()),
     progress_manager, SLOT(triggerAbort()));
+
+  progress_manager->addNonBlockableObject(progress_bar);
+  progress_manager->addNonBlockableObject(progress_bar->getAbortButton());
 }
 
 //-----------------------------------------------------------------------------

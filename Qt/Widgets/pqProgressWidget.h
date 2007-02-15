@@ -46,6 +46,10 @@ public:
   pqProgressWidget(QWidget* parent=0);
   virtual ~pqProgressWidget();
 
+  QToolButton* getAbortButton() const
+    {
+    return this->AbortButton;
+    }
 public slots:
   /// Set the progress.
   void setProgress(const QString& message, int value);
