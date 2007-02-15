@@ -75,6 +75,11 @@ pqDefaultDisplayPanel::pqDefaultDisplayPanel(pqDisplay* display, QWidget* p)
                    this, SLOT(onStateChanged(int)));
 }
 
+pqDefaultDisplayPanel::~pqDefaultDisplayPanel()
+{
+  delete this->Internal;
+}
+
 void pqDefaultDisplayPanel::onStateChanged(int s)
 {
   this->updateAllViews();

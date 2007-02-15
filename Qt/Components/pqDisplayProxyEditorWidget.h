@@ -86,6 +86,7 @@ class pqDefaultDisplayPanel : public pqDisplayPanel
   Q_OBJECT
 public:
   pqDefaultDisplayPanel(pqDisplay* display, QWidget* p);
+  ~pqDefaultDisplayPanel();
 
 signals:
   void visibilityChanged(bool);
