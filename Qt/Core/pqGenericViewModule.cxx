@@ -73,7 +73,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqGenericViewModule::pqGenericViewModule(
-  ViewModuleTypes type,
+  const QString& type,
   const QString& group, const QString& name, 
   vtkSMAbstractViewModuleProxy* renModule, pqServer* server, 
   QObject* _parent/*=null*/)

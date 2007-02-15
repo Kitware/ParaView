@@ -180,17 +180,7 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
         }
       if (!preferredView)
         {
-        // Preferred view does not exist (or we insist on creating a new one) create a new view.
-        if (strcmp(view_type, "XYPlot")==0 )
-          {
-          currentView = builder->createView(
-            pqGenericViewModule::XY_PLOT, source->getServer());
-          }
-        else if (strcmp(view_type,"BarChart") ==0 )
-          {
-          currentView = builder->createView(
-            pqGenericViewModule::BAR_CHART, source->getServer());
-          }
+        currentView = builder->createView(source->getServer(), view_type);
         }
       }
     }
@@ -199,8 +189,7 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
     {
     // The user has selected a frame that is empty or the source does not
     // recommend any view type. Hence we create a render view.
-    currentView = builder->createView(
-      pqGenericViewModule::RENDER_VIEW, source->getServer());
+    currentView = builder->createView(source->getServer());
     }
 
   // No hints. We don't know what type of view is suitable

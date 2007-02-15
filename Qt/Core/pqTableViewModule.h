@@ -46,12 +46,10 @@ public:
     pqServer* server, QObject* parent=NULL);
   ~pqTableViewModule();
 
-  QWidget* getWidget();
+  static QString tableType() { return "TableView"; }
+  static QString tableTypeName() { return "Table"; }
 
-  /// Call this method to assign a Window in which this view module will
-  /// be displayed.
-  virtual void setWindowParent(QWidget* parent);
-  virtual QWidget* getWindowParent() const;
+  QWidget* getWidget();
 
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.

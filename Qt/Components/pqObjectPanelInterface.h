@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqObjectPanelInterface_h
 
 #include <QString>
+#include <QtPlugin>
 #include "pqComponentsExport.h"
 class pqObjectPanel;
 class pqProxy;

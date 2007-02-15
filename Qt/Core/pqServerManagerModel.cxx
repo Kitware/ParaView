@@ -51,21 +51,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
-#include "pqBarChartDisplay.h"
 #include "pqNameCount.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
-#include "pqPlotViewModule.h"
 #include "pqRenderViewModule.h"
 #include "pqScalarBarDisplay.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
-#include "pqTableViewModule.h"
 #include "pqTextWidgetDisplay.h"
 #include "pqTimeKeeper.h"
+#include "pqPluginManager.h"
+#include "pqViewModuleInterface.h"
 
 #include <QVTKWidget.h>
 
@@ -392,20 +391,32 @@ void pqServerManagerModel::onAddDisplay(QString name,
 
   vtkSMDataObjectDisplayProxy* dProxy =
     vtkSMDataObjectDisplayProxy::SafeDownCast(proxy);
+  const char* xml_name = proxy->GetXMLName();
   if (dProxy)
     {
     // 2) create a new pqConsumerDisplay;
     display = new pqPipelineDisplay(name, dProxy, server, this);
     }
-  else if (proxy->GetXMLName() == QString("TextWidgetDisplay"))
+  else if (xml_name == QString("TextWidgetDisplay"))
     {
     display = new pqTextWidgetDisplay("displays", name, proxy, server, this);
     }
-  else if (proxy->GetXMLName() == QString("BarChartDisplay"))
-    {
-    display = new pqBarChartDisplay("displays", name, proxy, server, this);
-    }
   else
+    {
+    QObjectList ifaces =
+      pqApplicationCore::instance()->getPluginManager()->interfaces();
+    foreach(QObject* iface, ifaces)
+      {
+      pqViewModuleInterface* vmi = qobject_cast<pqViewModuleInterface*>(iface);
+      if(vmi && vmi->displayTypes().contains(xml_name))
+        {
+        display = vmi->createDisplay(xml_name, "displays", name, proxy, server,this);
+        break;
+        }
+      }
+    }
+  
+  if(!display)
     {
     display = new pqConsumerDisplay("displays", name, proxy, server, this);
     }
@@ -534,19 +545,19 @@ void pqServerManagerModel::onAddViewModule(QString name,
     {
     pqview = new pqRenderViewModule(name, rm, server, this);
     }
-  else if (strcmp(xml_type, "BarChartViewModule") == 0)
+  else
     {
-    pqview = new pqPlotViewModule(pqGenericViewModule::BAR_CHART,
-      "view_modules", name, view, server, this);
-    }
-  else if (strcmp(xml_type, "XYPlotViewModule") == 0)
-    {
-    pqview = new pqPlotViewModule(pqGenericViewModule::XY_PLOT,
-      "view_modules", name, view, server, this);
-    }
-  else if (strcmp(xml_type, "TableView") == 0)
-    {
-    pqview = new pqTableViewModule("view_modules", name, view, server, this);
+    QObjectList ifaces =
+      pqApplicationCore::instance()->getPluginManager()->interfaces();
+    foreach(QObject* iface, ifaces)
+      {
+      pqViewModuleInterface* vmi = qobject_cast<pqViewModuleInterface*>(iface);
+      if(vmi && vmi->viewModuleTypes().contains(xml_type))
+        {
+        pqview = vmi->createView(xml_type, "view_modules", name, view, server,this);
+        break;
+        }
+      }
     }
 
   if (pqview)

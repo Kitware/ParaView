@@ -30,7 +30,7 @@ public:
     
     // create a graphics window and put it in our main window
     this->RenderModule = qobject_cast<pqRenderViewModule*>(
-      pb->createView(pqGenericViewModule::RENDER_VIEW, server));
+      pb->createView(server));
     this->setCentralWidget(this->RenderModule->getWidget());
     
     // hmm... (we get problems if we don't do this)

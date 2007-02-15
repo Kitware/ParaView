@@ -74,41 +74,37 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqPlotViewModule::pqPlotViewModule(ViewModuleTypes type,
+pqPlotViewModule::pqPlotViewModule(const QString& type,
   const QString& group, const QString& name, 
   vtkSMAbstractViewModuleProxy* renModule, pqServer* server, QObject* _parent)
 : pqGenericViewModule(type, group, name, renModule, server, _parent)
 {
   this->Internal = new pqPlotViewModuleInternal();
   this->Internal->RenderRequestPending = false;
-  switch (this->getViewType())
+  if(type == this->barChartType())
     {
-  case BAR_CHART:
-      {
-      pqHistogramWidget* widget = new pqHistogramWidget();
-      pqVTKHistogramModel* model = new pqVTKHistogramModel(this);
-      widget->getHistogram().setModel(model);
-      widget->getHistogram().setBinColorScheme(model->getColorScheme());
-      this->Internal->PlotWidget = widget;
-      this->Internal->VTKModel = model;
-      this->Internal->MaxNumberOfVisibleDisplays = 1;
-      }
-    break;
-
-  case XY_PLOT:
-      {
-      pqLineChartWidget* widget = new pqLineChartWidget();
-      pqVTKLineChartModel* model = new pqVTKLineChartModel(this);
-      widget->getLineChart().setModel(model);
-      this->Internal->PlotWidget = widget; 
-      this->Internal->VTKModel = model;
-      this->Internal->MaxNumberOfVisibleDisplays = -1;
-      }
-    break;
-
-  default:
+    pqHistogramWidget* widget = new pqHistogramWidget();
+    pqVTKHistogramModel* model = new pqVTKHistogramModel(this);
+    widget->getHistogram().setModel(model);
+    widget->getHistogram().setBinColorScheme(model->getColorScheme());
+    this->Internal->PlotWidget = widget;
+    this->Internal->VTKModel = model;
+    this->Internal->MaxNumberOfVisibleDisplays = 1;
+    }
+  else if(type == this->XYPlotType())
+    {
+    pqLineChartWidget* widget = new pqLineChartWidget();
+    pqVTKLineChartModel* model = new pqVTKLineChartModel(this);
+    widget->getLineChart().setModel(model);
+    this->Internal->PlotWidget = widget; 
+    this->Internal->VTKModel = model;
+    this->Internal->MaxNumberOfVisibleDisplays = -1;
+    }
+  else
+    {
     qDebug() << "PlotType: " << type << " not supported yet.";
     }
+  
   QObject::connect(this, SIGNAL(displayVisibilityChanged(pqDisplay*, bool)),
     this, SLOT(visibilityChanged(pqDisplay*)));
   QObject::connect(this, SIGNAL(displayAdded(pqDisplay*)),
@@ -133,29 +129,6 @@ pqPlotViewModule::~pqPlotViewModule()
 QWidget* pqPlotViewModule::getWidget()
 {
   return this->Internal->PlotWidget;
-}
-
-//-----------------------------------------------------------------------------
-void pqPlotViewModule::setWindowParent(QWidget* p)
-{
-  if (this->Internal->PlotWidget)
-    {
-    this->Internal->PlotWidget->setParent(p);
-    }
-  else
-    {
-    qDebug() << "setWindowParent() failed since PlotWidget not yet created.";
-    }
-}
-//-----------------------------------------------------------------------------
-QWidget* pqPlotViewModule::getWindowParent() const
-{
-  if (this->Internal->PlotWidget)
-    {
-    return this->Internal->PlotWidget->parentWidget();
-    }
-  qDebug() << "getWindowParent() failed since PlotWidget not yet created.";
-  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -269,25 +242,20 @@ bool pqPlotViewModule::saveImage(int width, int height,
     {
     QStringList list;
     list.push_back(filename);
-    switch (this->getViewType())
+    if(this->getViewType() == this->barChartType())
       {
-    case pqGenericViewModule::BAR_CHART:
-        {
-        pqHistogramWidget* widget = qobject_cast<pqHistogramWidget*>(
-          this->Internal->PlotWidget);
-        widget->savePDF(list);
-        }
-      break;
-
-    case pqGenericViewModule::XY_PLOT:
-        {
-        pqLineChartWidget* widget = qobject_cast<pqLineChartWidget*>(
-          this->Internal->PlotWidget);
-        widget->savePDF(list);
-        }
-      break;
-
-    default:
+      pqHistogramWidget* widget = qobject_cast<pqHistogramWidget*>(
+        this->Internal->PlotWidget);
+      widget->savePDF(list);
+      }
+    else if(this->getViewType() == this->XYPlotType())
+      {
+      pqLineChartWidget* widget = qobject_cast<pqLineChartWidget*>(
+        this->Internal->PlotWidget);
+      widget->savePDF(list);
+      }
+    else
+      {
       return false;
       }
     return true;
@@ -296,3 +264,4 @@ bool pqPlotViewModule::saveImage(int width, int height,
   QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
   return grabbedPixMap.save(filename);
 }
+

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPluginManager.h
+   Module:    pqStandardViewModules.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,58 +30,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPluginManager_h
-#define _pqPluginManager_h
+#ifndef _pqStandardViewModules_h
+#define _pqStandardViewModules_h
 
-#include <QObject>
-#include <QMultiMap>
-#include <QStringList>
 #include "pqCoreExport.h"
+#include "pqViewModuleInterface.h"
+#include <QObject>
 
-class pqServer;
-
-/// plugin loader takes care of loading plugins
-/// containing GUI extensions and server manager extensions
-class PQCORE_EXPORT pqPluginManager : public QObject
+/// interface class for plugins that create view modules
+class PQCORE_EXPORT pqStandardViewModules : public QObject, 
+                                                 public pqViewModuleInterface
 {
   Q_OBJECT
+  Q_INTERFACES(pqViewModuleInterface)
 public:
-  pqPluginManager(QObject* p = 0);
-  ~pqPluginManager();
-
-  /// attempt to load a plugin
-  /// return true on success
-  bool loadPlugin(pqServer* server, const QString& lib);
-
-  /// return all GUI interfaces that have been loaded
-  QObjectList interfaces();
-
-  /// return all the plugins loaded on a server
-  QStringList loadedPlugins(pqServer*);
-
-  /// add an extra interface.
-  /// these interfaces are appended to the ones loaded from plugins
-  void addInterface(QObject* iface);
   
-  /// remove an extra interface
-  void removeInterface(QObject* iface);
+  pqStandardViewModules(QObject* o);
+  ~pqStandardViewModules();
 
-signals:
-  /// signal for when an interface is loaded
-  void guiInterfaceLoaded(QObject* iface);
+  QStringList viewTypes() const;
+  QStringList viewModuleTypes() const;
+  QStringList displayTypes() const;
+  QString viewTypeName(const QString&) const;
+
+  bool canCreateView(const QString& viewtype) const;
   
-  /// signal for when some GUI XML is loaded
-  /// which can be used to add new readers/writers to the file dialog, etc..
-  void guiXMLLoaded(const QString& xml);
+  vtkSMProxy* createViewProxy(const QString& viewtype);
 
-  /// notification that new extensions were added to the server manager
-  void serverManagerExtensionLoaded();
+  pqGenericViewModule* createView(const QString& viewtype,
+    const QString& group,
+    const QString& name,
+    vtkSMAbstractViewModuleProxy* viewmodule,
+    pqServer* server,
+    QObject* parent);
+  
+  pqConsumerDisplay* createDisplay(const QString& display_type, 
+    const QString& group,
+    const QString& name,
+    vtkSMProxy* proxy,
+    pqServer* server,
+    QObject* parent);
 
-private:
-
-  QObjectList Interfaces;
-  QMultiMap<pqServer*, QString> Plugins;
-  QObjectList ExtraInterfaces;
+  QString name() const;
 };
 
 #endif

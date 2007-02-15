@@ -48,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPendingDisplayUndoElement.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineFilter.h"
-#include "pqPlotViewModule.h"
 #include "pqRenderViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"

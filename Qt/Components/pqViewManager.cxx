@@ -63,6 +63,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqXMLUtil.h"
+#include "pqViewModuleInterface.h"
+#include "pqPluginManager.h"
 
 #if WIN32
 #include "process.h"
@@ -103,7 +105,7 @@ public:
 
     // Create a new module (for now we'll create a render module always.
     pqGenericViewModule* ren  = pqPipelineBuilder::instance()->createView(
-      pqGenericViewModule::RENDER_VIEW, this->ActiveServer);
+      this->ActiveServer);
     return ren;
     }
 };
@@ -136,22 +138,28 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
   QObject::connect(this, SIGNAL(frameRemoved(pqMultiViewFrame*)), 
     this, SLOT(onFrameRemoved(pqMultiViewFrame*)));
 
-  // Create actions for converting view types.
+  
   QAction* view_action = new QAction("3D View", this);
-  view_action->setData(QVariant(pqGenericViewModule::RENDER_VIEW));
+  view_action->setData(pqRenderViewModule::renderViewType());
   this->Internal->ConvertMenu.addAction(view_action);
 
-  view_action = new QAction("Bar Chart", this);
-  view_action->setData(QVariant(pqGenericViewModule::BAR_CHART));
-  this->Internal->ConvertMenu.addAction(view_action);
-
-  view_action = new QAction("XY Plot", this);
-  view_action->setData(QVariant(pqGenericViewModule::XY_PLOT));
-  this->Internal->ConvertMenu.addAction(view_action);
-
-  view_action = new QAction("Table", this);
-  view_action->setData(QVariant(pqGenericViewModule::TABLE_VIEW));
-  this->Internal->ConvertMenu.addAction(view_action);
+  // Create actions for converting view types.
+  QObjectList ifaces =
+    pqApplicationCore::instance()->getPluginManager()->interfaces();
+  foreach(QObject* iface, ifaces)
+    {
+    pqViewModuleInterface* vi = qobject_cast<pqViewModuleInterface*>(iface);
+    if(vi)
+      {
+      QStringList viewtypes = vi->viewTypes();
+      foreach(QString viewtype, viewtypes)
+        {
+        view_action = new QAction(vi->viewTypeName(viewtype), this);
+        view_action->setData(viewtype);
+        this->Internal->ConvertMenu.addAction(view_action);
+        }
+      }
+    }
 
   QObject::connect(&this->Internal->ConvertMenu, SIGNAL(triggered(QAction*)),
     this, SLOT(onConvertToTriggered(QAction*)));
@@ -194,7 +202,7 @@ pqGenericViewModule* pqViewManager::getActiveViewModule() const
 //-----------------------------------------------------------------------------
 void pqViewManager::updateConversionActions(pqMultiViewFrame* frame)
 {
-  int to_exclude = -1;
+  QString to_exclude;
   if (this->Internal->Frames.contains(frame))
     {
     to_exclude = this->Internal->Frames[frame]->getViewType();
@@ -204,7 +212,7 @@ void pqViewManager::updateConversionActions(pqMultiViewFrame* frame)
     getNumberOfServers() >= 1);
   foreach (QAction* action, this->Internal->ConvertMenu.actions())
     {
-    action->setEnabled(server_exists && (to_exclude != action->data().toInt()));
+    action->setEnabled(server_exists && (to_exclude != action->data().toString()));
     }
 }
 
@@ -302,10 +310,18 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
     }
   this->Internal->PendingFrames.removeAll(frame);
 
-  view->setWindowParent(frame);
-  frame->setMainWidget(view->getWidget());
-  view->getWidget()->installEventFilter(this);
-  view->getWidget()->setMaximumSize(this->Internal->MaxWindowSize);
+  QWidget* viewWidget = view->getWidget();
+  if(viewWidget)
+    {
+    viewWidget->setParent(frame);
+    frame->setMainWidget(viewWidget);
+    viewWidget->installEventFilter(this);
+    viewWidget->setMaximumSize(this->Internal->MaxWindowSize);
+    }
+  else
+    {
+    frame->setMainWidget(NULL);
+    }
 
   if (view->supportsUndo())
     {
@@ -348,9 +364,13 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* vie
 
   this->Internal->Frames.remove(frame);
 
-  view->setWindowParent(NULL);
+  QWidget* viewWidget = view->getWidget();
+  if(viewWidget)
+    {
+    viewWidget->setParent(NULL);
+    viewWidget->removeEventFilter(this);
+    }
   frame->setMainWidget(NULL);
-  view->getWidget()->removeEventFilter(this);
 
   pqUndoStack* stack = view->getInteractionUndoStack();
   if (view->supportsUndo() && stack)
@@ -451,7 +471,7 @@ void pqViewManager::assignFrame(pqGenericViewModule* view)
 //-----------------------------------------------------------------------------
 pqMultiViewFrame* pqViewManager::getFrame(pqGenericViewModule* view) const
 {
-  return qobject_cast<pqMultiViewFrame*>(view->getWindowParent());
+  return qobject_cast<pqMultiViewFrame*>(view->getWidget()->parentWidget());
 }
 
 //-----------------------------------------------------------------------------
@@ -491,7 +511,7 @@ void pqViewManager::onViewModuleRemoved(pqGenericViewModule* view)
 //-----------------------------------------------------------------------------
 void pqViewManager::onConvertToTriggered(QAction* action)
 {
-  int new_type = action->data().toInt();
+  QString type = action->data().toString();
 
   // FIXME: We may want to fix this to use the active server instead.
   pqServer* server= pqApplicationCore::instance()->
@@ -511,7 +531,7 @@ void pqViewManager::onConvertToTriggered(QAction* action)
     this->Internal->DontCloseFrameWhenRenderModuleIsRemoved = false;
     }
 
-  builder->createView(new_type, server);
+  builder->createView(server, type);
 }
 
 //-----------------------------------------------------------------------------

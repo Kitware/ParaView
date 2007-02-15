@@ -57,7 +57,7 @@ pqPluginManager::~pqPluginManager()
 
 QObjectList pqPluginManager::interfaces()
 {
-  return this->Interfaces;
+  return this->Interfaces + this->ExtraInterfaces;
 }
 
 bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
@@ -130,5 +130,22 @@ bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
 QStringList pqPluginManager::loadedPlugins(pqServer* server)
 {
   return this->Plugins.values(server);
+}
+
+void pqPluginManager::addInterface(QObject* iface)
+{
+  if(!this->ExtraInterfaces.contains(iface))
+    {
+    this->ExtraInterfaces.append(iface);
+    }
+}
+
+void pqPluginManager::removeInterface(QObject* iface)
+{
+  int idx = this->ExtraInterfaces.indexOf(iface);
+  if(idx != -1)
+    {
+    this->ExtraInterfaces.removeAt(idx);
+    }
 }
 

@@ -1,0 +1,107 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    pqViewModuleImplementation.cxx.in
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
+
+   See License_v1.1.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
+
+#include "@VIEW_TYPE@Implementation.h"
+#include "@VIEW_TYPE@.h"
+
+#include "vtkSMProxyManager.h"
+#include "pqConsumerDisplay.h"
+
+// configured with CMake
+// requires: VIEW_TYPE, VIEW_TYPE_NAME, DISPLAY_TYPE, VIEW_XML_TYPE, VIEW_XML_GROUP, VIEW_XML_NAME
+
+@VIEW_TYPE@Implementation::@VIEW_TYPE@Implementation(QObject* o)
+  : QObject(o)
+{
+}
+
+QStringList @VIEW_TYPE@Implementation::viewTypes() const
+{
+  return QStringList() << "@VIEW_TYPE@";
+}
+
+QStringList @VIEW_TYPE@Implementation::viewModuleTypes() const
+{
+  return QStringList() << "@VIEW_XML_TYPE@";
+}
+
+QStringList @VIEW_TYPE@Implementation::displayTypes() const
+{
+  return QStringList() << "@DISPLAY_TYPE@";
+}
+
+QString @VIEW_TYPE@Implementation::viewTypeName(const QString& type) const
+{
+  return "@VIEW_TYPE_NAME@";
+}
+
+bool @VIEW_TYPE@Implementation::canCreateView(const QString& viewtype) const
+{
+  return viewtype == "@VIEW_TYPE@";
+}
+
+vtkSMProxy* @VIEW_TYPE@Implementation::createViewProxy(const QString& viewtype)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  if(viewtype == "@VIEW_TYPE@")
+    {
+    return pxm->NewProxy("@VIEW_XML_GROUP@", "@VIEW_XML_NAME@");
+    }
+
+  return NULL;
+}
+
+pqGenericViewModule* @VIEW_TYPE@Implementation::createView(const QString& viewtype,
+                                                const QString& group,
+                                                const QString& viewname,
+                                                vtkSMAbstractViewModuleProxy* viewmodule,
+                                                pqServer* server,
+                                                QObject* p)
+{
+  return new @VIEW_TYPE@("@VIEW_TYPE@", group, viewname, viewmodule, server, p);
+}
+
+pqConsumerDisplay* @VIEW_TYPE@Implementation::createDisplay(const QString& display_type, 
+  const QString& group,
+  const QString& n,
+  vtkSMProxy* proxy,
+  pqServer* server,
+  QObject* p)
+{
+  return new @DISPLAY_TYPE@(group, n, proxy, server, p);
+}
+
+QString @VIEW_TYPE@Implementation::name() const
+{
+  return "@VIEW_TYPE@";
+}
+

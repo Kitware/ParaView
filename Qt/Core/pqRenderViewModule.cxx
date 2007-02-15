@@ -111,7 +111,7 @@ public:
 pqRenderViewModule::pqRenderViewModule(const QString& name, 
   vtkSMRenderModuleProxy* renModule, pqServer* server, QObject* _parent/*=null*/)
 : pqGenericViewModule(
-  pqGenericViewModule::RENDER_VIEW, "view_modules", name, renModule, server, _parent)
+  renderViewType(), "view_modules", name, renModule, server, _parent)
 {
   this->Internal = new pqRenderViewModuleInternal();
   this->Internal->RenderViewProxy->setRenderModule(this);
@@ -180,19 +180,6 @@ QWidget* pqRenderViewModule::getWidget()
 pqUndoStack* pqRenderViewModule::getInteractionUndoStack() const
 {
   return this->Internal->UndoStack;
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderViewModule::setWindowParent(QWidget* _parent)
-{
-  this->Internal->Viewport->setParent(_parent);
-  this->Internal->Viewport->update();
-}
-
-//-----------------------------------------------------------------------------
-QWidget* pqRenderViewModule::getWindowParent() const
-{
-  return this->Internal->Viewport->parentWidget();
 }
 
 //-----------------------------------------------------------------------------

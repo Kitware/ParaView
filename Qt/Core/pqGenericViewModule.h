@@ -61,11 +61,6 @@ public:
   /// Return a widget associated with this view
   virtual QWidget* getWidget() = 0;
 
-  /// Call this method to assign a Window in which this view module will
-  /// be displayed.
-  virtual void setWindowParent(QWidget* parent)=0;
-  virtual QWidget* getWindowParent() const =0;
-
   /// Returns if this view module can support 
   /// undo/redo. Returns false by default. Subclassess must override
   /// if that's not the case.
@@ -75,19 +70,8 @@ public:
   /// to return the undo stack for the view module.
   virtual pqUndoStack* getInteractionUndoStack() const { return 0;} 
 
-  /// Enumeration defines the different types of view modules
-  /// supported.
-  enum ViewModuleTypes
-    {
-    INVALID,
-    RENDER_VIEW,
-    XY_PLOT,
-    BAR_CHART,
-    TABLE_VIEW
-    };
-
   /// Returns the type of this view module.
-  ViewModuleTypes getViewType() const
+  QString getViewType() const
     { return this->ViewType; }
 public slots:
   /// Request a StillRender. Default implementation simply calls
@@ -101,6 +85,7 @@ public:
 
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.
+  /// TODO:  pqGenericViewModule should probably report file types is supports
   virtual bool saveImage(int width, int height, const QString& filename) =0;
 
   /// Capture the view image into a new vtkImageData with the given magnification
@@ -166,7 +151,7 @@ protected:
   virtual void viewModuleInit();
 
 protected:
-  pqGenericViewModule(pqGenericViewModule::ViewModuleTypes type,
+  pqGenericViewModule(const QString& type,
     const QString& group, const QString& name, 
     vtkSMAbstractViewModuleProxy* renModule, 
     pqServer* server, QObject* parent=NULL);
@@ -176,7 +161,7 @@ private:
   void operator=(const pqGenericViewModule&); // Not implemented.
 
   pqGenericViewModuleInternal* Internal;
-  ViewModuleTypes ViewType;
+  QString ViewType;
 };
 
 #endif

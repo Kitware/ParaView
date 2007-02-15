@@ -68,6 +68,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqTableViewModule.h"
 #include "pqUndoStack.h"
+#include "pqPluginManager.h"
+#include "pqViewModuleInterface.h"
 
 #include <assert.h>
 
@@ -462,7 +464,7 @@ void pqPipelineBuilder::remove(pqProxy* proxy, bool is_undoable)
 }
 
 //-----------------------------------------------------------------------------
-pqGenericViewModule* pqPipelineBuilder::createView(int type, pqServer* server)
+pqGenericViewModule* pqPipelineBuilder::createView(pqServer* server, const QString& type)
 {
   if (!server)
     {
@@ -472,26 +474,23 @@ pqGenericViewModule* pqPipelineBuilder::createView(int type, pqServer* server)
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* proxy= 0;
-  switch (type)
+  if(type.isEmpty() || type == pqRenderViewModule::renderViewType())
     {
-  case pqGenericViewModule::RENDER_VIEW:
     proxy = server->newRenderModule();
-    break;
-
-  case pqGenericViewModule::XY_PLOT:
-    proxy = pxm->NewProxy("plotmodules", "XYPlotViewModule");
-    break;
-
-  case pqGenericViewModule::BAR_CHART:
-    proxy = pxm->NewProxy("plotmodules","BarChartViewModule");
-    break;
-
-  case pqGenericViewModule::TABLE_VIEW:
-    proxy = pxm->NewProxy("views", "TableView");
-    break;
-
-  default:
-    qDebug() << "Unknown view type : " << type;
+    }
+  else
+    {
+    QObjectList ifaces =
+      pqApplicationCore::instance()->getPluginManager()->interfaces();
+    foreach(QObject* iface, ifaces)
+      {
+      pqViewModuleInterface* vmi = qobject_cast<pqViewModuleInterface*>(iface);
+      if(vmi && vmi->viewTypes().contains(type))
+        {
+        proxy = vmi->createViewProxy(type);
+        break;
+        }
+      }
     }
 
   if (!proxy)

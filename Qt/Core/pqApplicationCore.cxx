@@ -90,6 +90,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXMLUtil.h"
 #include "pqLinksModel.h"
 #include "pqPluginManager.h"
+#include "pqStandardViewModules.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -174,6 +175,10 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   this->Internal->PendingDisplayManager = new pqPendingDisplayManager(this);
 
   this->Internal->DisplayPolicy = new pqDisplayPolicy(this);
+
+  // add standard views
+  this->Internal->PluginManager.addInterface(
+    new pqStandardViewModules(&this->Internal->PluginManager));
 
   this->LoadingState = false;
 }

@@ -42,17 +42,17 @@ class PQCORE_EXPORT pqPlotViewModule : public pqGenericViewModule
 public:
   typedef pqGenericViewModule Superclass;
 
-  pqPlotViewModule(ViewModuleTypes type, const QString& group, const QString& name, 
+  static QString barChartType() { return "BarChart"; }
+  static QString barChartTypeName() { return "Bar Chart"; }
+  static QString XYPlotType() { return "XYPlot"; }
+  static QString XYPlotTypeName() { return "XY Plot"; }
+
+  pqPlotViewModule(const QString& type, const QString& group, const QString& name, 
     vtkSMAbstractViewModuleProxy* renModule, 
     pqServer* server, QObject* parent=NULL);
   virtual ~pqPlotViewModule();
 
   QWidget* getWidget();
-
-  /// Call this method to assign a Window in which this view module will
-  /// be displayed.
-  virtual void setWindowParent(QWidget* parent);
-  virtual QWidget* getWindowParent() const;
 
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.

@@ -68,7 +68,7 @@ pqTableViewModule::pqTableViewModule(
     pqServer* server,
     QObject* _parent) :
   pqGenericViewModule(
-    pqGenericViewModule::TABLE_VIEW, group, name, renModule, server, _parent),
+    tableType(), group, name, renModule, server, _parent),
   Implementation(new pqImplementation())
 {
 }
@@ -83,18 +83,6 @@ pqTableViewModule::~pqTableViewModule()
 QWidget* pqTableViewModule::getWidget()
 {
   return this->Implementation->Table;
-}
-
-//-----------------------------------------------------------------------------
-void pqTableViewModule::setWindowParent(QWidget* p)
-{
-  this->Implementation->WindowParent = p;
-}
-
-//-----------------------------------------------------------------------------
-QWidget* pqTableViewModule::getWindowParent() const
-{
-  return this->Implementation->WindowParent;
 }
 
 //-----------------------------------------------------------------------------

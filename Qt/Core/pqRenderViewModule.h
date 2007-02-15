@@ -50,6 +50,8 @@ class PQCORE_EXPORT pqRenderViewModule : public pqGenericViewModule
 public:
   typedef pqGenericViewModule Superclass;
 
+  static QString renderViewType() { return "RenderView"; }
+
   pqRenderViewModule(const QString& name, vtkSMRenderModuleProxy* renModule, 
     pqServer* server, QObject* parent=NULL);
   virtual ~pqRenderViewModule();
@@ -59,11 +61,6 @@ public:
 
   /// Returns the QVTKWidget for this render Window.
   virtual QWidget* getWidget();
-
-  /// Call this method to assign a Window in which this render module will
-  /// render.  This will set the QVTKWidget's parent.
-  virtual void setWindowParent(QWidget* parent);
-  virtual QWidget* getWindowParent() const;
 
   /// Request a StillRender. 
   virtual void render();

@@ -81,6 +81,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerStartupContext.h
   pqServerStartups.h
   pqSettings.h
+  pqStandardViewModules.h
   pqTableViewModule.h
   pqTimeKeeper.h
   pqTextWidgetDisplay.h
@@ -252,6 +253,8 @@ ADD_LIBRARY(pqCore
   pqServerStartups.h
   pqSettings.cxx
   pqSettings.h
+  pqStandardViewModules.cxx
+  pqStandardViewModules.h
   pqTableViewModule.cxx
   pqTableViewModule.h
   pqTimeKeeper.cxx

@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
-#include "pqPlotViewModule.h"
+#include "pqGenericViewModule.h"
 
 vtkStandardNewMacro(pqAnimationSceneImageWriter);
-vtkCxxRevisionMacro(pqAnimationSceneImageWriter, "1.1");
+vtkCxxRevisionMacro(pqAnimationSceneImageWriter, "1.2");
 //-----------------------------------------------------------------------------
 pqAnimationSceneImageWriter::pqAnimationSceneImageWriter()
 {
@@ -57,15 +57,10 @@ vtkImageData* pqAnimationSceneImageWriter::CaptureViewImage(
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
 
-  pqPlotViewModule* plot = qobject_cast<pqPlotViewModule*>(
+  pqGenericViewModule* pq_view = qobject_cast<pqGenericViewModule*>(
     smmodel->getPQProxy(view));
-  if (!plot)
-    {
-    return this->Superclass::CaptureViewImage(view, magnification);
-    }
-  
-  plot->forceRender();
-  return plot->captureImage(magnification);
+
+  return pq_view->captureImage(magnification);
 }
 
 //-----------------------------------------------------------------------------

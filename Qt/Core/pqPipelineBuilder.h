@@ -102,10 +102,10 @@ public:
   pqScalarBarDisplay* createScalarBar(pqScalarsToColors *lut,
     pqRenderViewModule* renModule);
 
-  // Creates a new view module of the given type (pqGenericViewModule::ViewModuleTypes)
-  // on the given server. If requested type if a RENDER_VIEW module, it uses
+  // Creates a new view module of the given type
+  // on the given server. If requested type is not supplied, it uses
   // the MultiViewRenderModule on the given server to instantiate the new view.
-  pqGenericViewModule* createView(int type, pqServer* server);
+  pqGenericViewModule* createView(pqServer* server, const QString& type = QString());
 
   /// Remove a view. This also cleans up any displays that are
   /// visible in this view. Generally displays are visible in only one view, if
