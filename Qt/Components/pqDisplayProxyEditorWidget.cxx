@@ -127,43 +127,6 @@ pqDisplay* pqDisplayProxyEditorWidget::getDisplay() const
   return this->Internal->Display;
 }
 
-#if 0
-//-----------------------------------------------------------------------------
-void pqDisplayProxyEditorWidget::showDefaultWidget()
-{
-  if (this->Internal->DisplayPanel)
-    {
-    this->Internal->DisplayPanel->hide();
-    }
-  this->Internal->DefaultWidget->show();
-  pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
-  if (this->Internal->Display || 
-      !this->Internal->View || 
-      (policy && policy->canDisplay(this->Internal->Source, 
-                                    this->Internal->View)))
-    {
-    this->Internal->DefaultWidget->setEnabled(true);
-    if (this->Internal->Display)
-      {
-      vtkSMProxy* display = this->Internal->Display->getProxy();
-      this->Internal->Links.addPropertyLink(
-        this->Internal->ViewData, "checked", SIGNAL(stateChanged(int)),
-        display, display->GetProperty("Visibility"));
-      }
-    else
-      {
-      this->Internal->ViewData->setCheckState(Qt::Unchecked);
-      }
-    QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)),
-      this, SLOT(onVisibilityChanged(int)), Qt::QueuedConnection);
-    }
-  else
-    {
-    this->Internal->DefaultWidget->setEnabled(false);
-    }
-}
-#endif
-
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditorWidget::onVisibilityChanged(bool state)
 {

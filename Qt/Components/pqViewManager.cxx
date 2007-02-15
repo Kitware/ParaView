@@ -152,10 +152,11 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
     if(vi)
       {
       QStringList viewtypes = vi->viewTypes();
-      foreach(QString viewtype, viewtypes)
+      QStringList::iterator iter;
+      for(iter = viewtypes.begin(); iter != viewtypes.end(); ++iter)
         {
-        view_action = new QAction(vi->viewTypeName(viewtype), this);
-        view_action->setData(viewtype);
+        view_action = new QAction(vi->viewTypeName(*iter), this);
+        view_action->setData(*iter);
         this->Internal->ConvertMenu.addAction(view_action);
         }
       }
