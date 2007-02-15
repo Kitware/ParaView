@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqAnimationScene.h"
 
+#include "vtkAnimationCue.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkProcessModule.h"
@@ -87,7 +88,7 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
     vtkCommand::ModifiedEvent, this, SLOT(onCuesChanged()));
   this->Internals->VTKConnect->Connect(proxy,
     vtkCommand::AnimationCueTickEvent, 
-    this, SIGNAL(tick()));
+    this, SLOT(onTick(vtkObject*, unsigned long, void*, void*)));
   this->Internals->VTKConnect->Connect(proxy, vtkCommand::StartEvent,
     this, SIGNAL(beginPlay()));
   this->Internals->VTKConnect->Connect(proxy, vtkCommand::EndEvent,
@@ -365,4 +366,32 @@ QSize pqAnimationScene::getViewSize() const
 
     }
   return size;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationScene::play()
+{
+  this->getAnimationSceneProxy()->Play();
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationScene::pause()
+{
+  this->getAnimationSceneProxy()->Stop();
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
+{
+  vtkAnimationCue::AnimationCueInfo *cueInfo = 
+    reinterpret_cast<vtkAnimationCue::AnimationCueInfo*>(info);
+  if (!cueInfo)
+    {
+    return;
+    }
+  int progress = static_cast<int>(
+    (cueInfo->AnimationTime - cueInfo->StartTime)*100/
+    (cueInfo->EndTime - cueInfo->StartTime));
+
+  emit this->tick(progress);
 }

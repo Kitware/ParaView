@@ -93,7 +93,9 @@ public:
 signals:
   // emitted when the active scene changes (\c scene may be NULL).
   void activeSceneChanged(pqAnimationScene* scene);
- 
+
+  /// emitted with the current save progress.
+  void saveProgress(const QString&, int);
 public slots:
   // Called when the active server changes.
   void onActiveServerChanged(pqServer*);
@@ -107,6 +109,8 @@ protected slots:
   // Update the ViewModules property in the active scene.
   void updateViewModules();
 
+  /// Called on every tick while saving animation.
+  void onTick(int);
 private:
   pqAnimationManager(const pqAnimationManager&); // Not implemented.
   void operator=(const pqAnimationManager&); // Not implemented.

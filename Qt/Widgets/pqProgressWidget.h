@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqProgressBar.cxx
+   Module:    pqProgressWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,42 +29,46 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqProgressBar.h"
+#ifndef __pqProgressWidget_h
+#define __pqProgressWidget_h
 
-//-----------------------------------------------------------------------------
-pqProgressBar::pqProgressBar(QWidget* _p) : QProgressBar(_p)
+
+#include <QWidget>
+#include "QtWidgetsExport.h"
+
+class pqProgressBar;
+class QToolButton;
+
+class QTWIDGETS_EXPORT pqProgressWidget : public QWidget
 {
-  this->Message = "";
-}
+  Q_OBJECT
+public:
+  pqProgressWidget(QWidget* parent=0);
+  virtual ~pqProgressWidget();
 
+public slots:
+  /// Set the progress.
+  void setProgress(const QString& message, int value);
 
-//-----------------------------------------------------------------------------
-pqProgressBar::~pqProgressBar()
-{
-  
-}
+  /// Enabled/Disable the progress. This is different from 
+  /// enabling/disabling the widget itself. This shows/hides
+  /// the progress part of the widget.
+  void enableProgress(bool enabled);
 
-//-----------------------------------------------------------------------------
-QString pqProgressBar::text() const
-{
-  return this->Message + QProgressBar::text();
-}
+  /// Enable/Disable the abort button.
+  void enableAbort(bool enabled);
 
-//-----------------------------------------------------------------------------
-void pqProgressBar::setProgress(const QString& message, int _value)
-{
-  this->Message = message + ": ";
-  this->setValue(_value);
-}
+signals:
+  void abortPressed();
 
-//-----------------------------------------------------------------------------
-void pqProgressBar::enableProgress(bool e)
-{
-  this->setEnabled(e);
-  this->setTextVisible(e);
-  if(!e)
-    {
-    this->reset();
-    }
-}
+protected:
+  pqProgressBar* ProgressBar;
+  QToolButton* AbortButton;
+
+private:
+  pqProgressWidget(const pqProgressWidget&); // Not implemented.
+  void operator=(const pqProgressWidget&); // Not implemented.
+};
+
+#endif
 

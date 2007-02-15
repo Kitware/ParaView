@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationSceneImageWriter.h"
 #include "pqApplicationCore.h"
 #include "pqPipelineBuilder.h"
+#include "pqProgressManager.h"
 #include "pqProxy.h"
 #include "pqRenderViewModule.h"
 #include "pqServer.h"
@@ -467,7 +468,24 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   writer->SetMagnification(magnification);
   writer->SetAnimationScene(sceneProxy);
   writer->SetFrameRate(dialogUI.frameRate->value());
+
+  pqProgressManager* progress_manager = 
+    pqApplicationCore::instance()->getProgressManager();
+
+  progress_manager->setEnableAbort(true);
+  progress_manager->setEnableProgress(true);
+  QObject::connect(progress_manager, SIGNAL(abort()), scene, SLOT(pause()));
+  QObject::connect(scene, SIGNAL(tick(int)), this, SLOT(onTick(int)));
+  QObject::connect(this, SIGNAL(saveProgress(const QString&, int)),
+    progress_manager, SLOT(setProgress(const QString&, int)));
+  progress_manager->lockProgress(this);
   bool status = writer->Save();
+  progress_manager->unlockProgress(this);
+  QObject::disconnect(progress_manager, 0, scene, 0);
+  QObject::disconnect(scene, 0, this, 0);
+  QObject::disconnect(this, 0, progress_manager, 0);
+  progress_manager->setEnableProgress(false);
+  progress_manager->setEnableAbort(false);
   writer->Delete();
 
   // Restore, duration and number of frames.
@@ -604,4 +622,10 @@ bool pqAnimationManager::saveGeometry(const QString& filename,
   bool status = writer->Save();
   writer->Delete();
   return status;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::onTick(int progress)
+{
+  emit this->saveProgress("Saving Animation", progress);
 }

@@ -77,6 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPlotViewModule.h"
 #include "pqPQLookupTableManager.h"
 #include "pqProcessModuleGUIHelper.h"
+#include "pqProgressManager.h"
 #include "pqProxyTabWidget.h"
 #include "pqReaderFactory.h"
 #include "pqRenderViewModule.h"
@@ -104,7 +105,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
-#include <pqProgressBar.h>
+#include <pqProgressWidget.h>
 #include <pqServerResources.h>
 #include <pqSetData.h>
 #include <pqSetName.h>
@@ -846,23 +847,27 @@ void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* toolbar)
 */
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::setupProgressBar(QStatusBar* toolbar)
 {
-  pqProgressBar* const progress_bar = new pqProgressBar(toolbar);
+  pqProgressWidget* const progress_bar = new pqProgressWidget(toolbar);
   toolbar->addPermanentWidget(progress_bar);
   progress_bar->enableProgress(false);
 
-  QObject::connect(
-    pqApplicationCore::instance(),
-    SIGNAL(enableProgress(bool)),
-    progress_bar,
-    SLOT(enableProgress(bool)));
+  pqProgressManager* progress_manager = 
+    pqApplicationCore::instance()->getProgressManager();
+
+  QObject::connect(progress_manager, SIGNAL(enableProgress(bool)),
+    progress_bar, SLOT(enableProgress(bool)));
     
-  QObject::connect(
-    pqApplicationCore::instance(), 
-    SIGNAL(progress(const QString&, int)),
-    progress_bar, 
-    SLOT(setProgress(const QString&, int)));
+  QObject::connect(progress_manager, SIGNAL(progress(const QString&, int)),
+    progress_bar, SLOT(setProgress(const QString&, int)));
+
+  QObject::connect(progress_manager, SIGNAL(enableAbort(bool)),
+    progress_bar, SLOT(enableAbort(bool)));
+
+  QObject::connect(progress_bar, SIGNAL(abortPressed()),
+    progress_manager, SLOT(triggerAbort()));
 }
 
 //-----------------------------------------------------------------------------

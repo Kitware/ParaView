@@ -64,6 +64,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineFilter.h
   pqPlotViewModule.h
   pqPluginManager.h
+  pqProgressManager.h
   pqPropertyLinks.h
   pqPropertyManager.h
   pqProxy.h
@@ -206,6 +207,8 @@ ADD_LIBRARY(pqCore
   pqPluginManager.h
   pqProcessModuleGUIHelper.cxx
   pqProcessModuleGUIHelper.h
+  pqProgressManager.cxx
+  pqProgressManager.h
   pqPropertyLinks.cxx
   pqPropertyLinks.h
   pqPropertyManager.cxx

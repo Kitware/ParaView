@@ -71,7 +71,7 @@ void pqVCRController::setAnimationScene(pqAnimationScene* scene)
   this->Scene = scene;
   if (this->Scene)
     {
-    QObject::connect(this->Scene, SIGNAL(tick()), this, SLOT(onTick()));
+    QObject::connect(this->Scene, SIGNAL(tick(int)), this, SLOT(onTick()));
     QObject::connect(this->Scene, SIGNAL(loopChanged()),
       this, SLOT(onLoopPropertyChanged()));
     QObject::connect(this->Scene, SIGNAL(clockTimeRangesChanged()),

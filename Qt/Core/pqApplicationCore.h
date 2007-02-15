@@ -38,10 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pq3DWidgetFactory;
 class pqApplicationCoreInternal;
 class pqDisplayPolicy;
+class pqLinksModel;
 class pqLookupTableManager;
 class pqPendingDisplayManager;
 class pqPipelineBuilder;
 class pqPipelineSource;
+class pqPluginManager;
+class pqProgressManager;
 class pqReaderFactory;
 class pqRenderViewModule;
 class pqServer;
@@ -56,8 +59,6 @@ class pqUndoStack;
 class pqWriterFactory;
 class vtkPVXMLElement;
 class vtkSMStateLoader;
-class pqLinksModel;
-class pqPluginManager;
 
 /// This class is the crux of the ParaView application. It creates
 /// and manages various managers which are necessary for the PQClient
@@ -92,6 +93,9 @@ public:
   pqPendingDisplayManager* getPendingDisplayManager();
   pqLinksModel* getLinksModel();
   pqPluginManager* getPluginManager();
+
+  /// ProgressManager is the manager that streamlines progress.
+  pqProgressManager* getProgressManager() const;
 
   // Returns the display policy instance used by the application.
   // pqDisplayPolicy defines the policy for creating displays
@@ -177,12 +181,6 @@ public:
   bool isLoadingState(){return this->LoadingState;};
 
 signals:
-  // Fired to enable or disable progress bar.
-  void enableProgress(bool enable);
-
-  // Fired with the actual progress value.
-  void progress(const QString&, int);
-
   // Fired when a state file is loaded successfully.
   void stateLoaded();
 
@@ -199,16 +197,14 @@ protected:
 
   friend class pqProcessModuleGUIHelper;
 
-  void prepareProgress()
-    { emit this->enableProgress(true); }
+  /// called to start accepting progress.
+  void prepareProgress();
 
-  void cleanupPendingProgress()
-    { emit this->enableProgress(false); }
+  /// called to stop accepting progress.
+  void cleanupPendingProgress();
 
-  void sendProgress(const char* name, int value)
-    {
-    emit this->progress(QString(name), value);
-    }
+  /// called to udpate progress.
+  void sendProgress(const char* name, int value);
 
   bool LoadingState;
 

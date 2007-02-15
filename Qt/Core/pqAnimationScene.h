@@ -34,12 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 #include <QPair>
-class pqAnimationCue;
-class vtkSMAnimationSceneProxy;
-class QSize;
 
-// pqAnimationScene is a representation for a vtkSMAnimationScene
-// proxy. It provides API to access AnimationCues in the scene.
+class pqAnimationCue;
+class QSize;
+class vtkObject;
+class vtkSMAnimationSceneProxy;
+
+/// pqAnimationScene is a representation for a vtkSMAnimationScene
+/// proxy. It provides API to access AnimationCues in the scene.
 class PQCORE_EXPORT pqAnimationScene : public pqProxy
 {
   Q_OBJECT;
@@ -48,78 +50,89 @@ public:
     vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
   virtual ~pqAnimationScene();
 
-  // returns the vtkSMAnimationSceneProxy.
+  /// returns the vtkSMAnimationSceneProxy.
   vtkSMAnimationSceneProxy* getAnimationSceneProxy() const;
 
-  // Returns the cue that animates the given 
-  // \c index of the given \c property on the given \c proxy, in this scene,
-  // if any.
+  /// Returns the cue that animates the given 
+  /// \c index of the given \c property on the given \c proxy, in this scene,
+  /// if any.
   pqAnimationCue* getCue(vtkSMProxy* proxy, const char* propertyname, 
     int index) const;
 
-  // Creates and initializes a new cue that can animate
-  // the \c index of the \c property on the given \c proxy
-  // in this scene. This method does not check is such a cue already
-  // exists, use getCue() before calling this to avoid duplicates.
+  /// Creates and initializes a new cue that can animate
+  /// the \c index of the \c property on the given \c proxy
+  /// in this scene. This method does not check is such a cue already
+  /// exists, use getCue() before calling this to avoid duplicates.
   pqAnimationCue* createCue(vtkSMProxy* proxy, const char* propertyname,
     int index);
 
-  // Removes all cues which animate the indicated proxy, if any.
+  /// Removes all cues which animate the indicated proxy, if any.
   void removeCues(vtkSMProxy* proxy);
 
-  // returns true is the cue is present in this scene.
+  /// returns true is the cue is present in this scene.
   bool contains(pqAnimationCue*) const;
 
-  // Combines the sizes of all the view modules
-  // animated by the scene and returns the total view size.
+  /// Combines the sizes of all the view modules
+  /// animated by the scene and returns the total view size.
   QSize getViewSize() const;
 
-  // Get the clock time range set on the animation scene proxy.
+  /// Get the clock time range set on the animation scene proxy.
   QPair<double, double> getClockTimeRange() const;
 signals:
-  // Fired before a new cue is added to the scene.
+  /// Fired before a new cue is added to the scene.
   void preAddedCue(pqAnimationCue*);
 
-  // Fired after a new cue has been added to the scene.
+  /// Fired after a new cue has been added to the scene.
   void addedCue(pqAnimationCue*);
 
-  // Fired before a cue is removed from the scene.
+  /// Fired before a cue is removed from the scene.
   void preRemovedCue(pqAnimationCue*);
 
-  // Fired after a cue has been removed from the scene.
+  /// Fired after a cue has been removed from the scene.
   void removedCue(pqAnimationCue*);
 
-  // Fired after cues have been added/removed.
+  /// Fired after cues have been added/removed.
   void cuesChanged();
 
-  // Emitted when the play mode changes.
+  /// Emitted when the play mode changes.
   void playModeChanged();
 
-  // Emitted when the looping state changes on the
-  // underlying proxy.
+  /// Emitted when the looping state changes on the
+  /// underlying proxy.
   void loopChanged();
 
-  // Emitted when playing animation.
-  void tick();
-
-  // Emitted when the clock time ranges change.
+  /// Emitted when the clock time ranges change.
   void clockTimeRangesChanged();
 
-  // Emitted when animation starts playing.
+  /// Emitted when animation starts playing.
   void beginPlay();
 
-  // Emitted when animation ends playing.
+  /// Emitted when animation ends playing.
   void endPlay();
+
+  /// Emitted when playing animation. 
+  /// Argument is the percent of play completed.
+  void tick(int percentCompleted);
+
+public slots:
+  /// Play animation.
+  void play();
+  
+  /// Pause animation.
+  void pause();
+
 private slots:
-  // Called when the "Cues" property on the AnimationScene proxy
-  // is changed. Updates the internal datastructure to reflect the current
-  // state of the scene.
+  /// Called when the "Cues" property on the AnimationScene proxy
+  /// is changed. Updates the internal datastructure to reflect the current
+  /// state of the scene.
   void onCuesChanged();
 
-  // Called when timekeeper's timesteps change,
-  // we synchronize the ClockTimeRange on the scene proxy.
+  /// Called when timekeeper's timesteps change,
+  /// we synchronize the ClockTimeRange on the scene proxy.
   void updateTimeRanges();  
 
+  /// Called on animation tick.
+  void onTick(vtkObject* caller, unsigned long, void*, void* info);
 private:
   pqAnimationScene(const pqAnimationScene&); // Not implemented.
   void operator=(const pqAnimationScene&); // Not implemented.

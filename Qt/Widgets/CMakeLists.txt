@@ -29,6 +29,8 @@ SET(QtWidgets_SRCS
   pqListWidgetItemObject.h
   pqProgressBar.cxx
   pqProgressBar.h
+  pqProgressWidget.cxx
+  pqProgressWidget.h
   pqSectionVisibilityContextMenu.cxx
   pqSectionVisibilityContextMenu.h
   pqSetData.cxx
@@ -65,6 +67,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqFlatTreeView.h
   pqListWidgetItemObject.h
   pqProgressBar.h
+  pqProgressWidget.h
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
   pqListWidgetCheckHelper.h

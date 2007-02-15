@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidgetFactory.h"
 #include "pqCoreInit.h"
 #include "pqDisplayPolicy.h"
+#include "pqLinksModel.h"
 #include "pqLookupTableManager.h"
 #include "pqOptions.h"
 #include "pqPendingDisplayManager.h"
@@ -75,6 +76,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
+#include "pqPluginManager.h"
+#include "pqProgressManager.h"
 #include "pqReaderFactory.h"
 #include "pqRenderViewModule.h"
 #include "pqServer.h"
@@ -85,12 +88,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerStartups.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
+#include "pqStandardViewModules.h"
 #include "pqUndoStack.h"
 #include "pqWriterFactory.h"
 #include "pqXMLUtil.h"
-#include "pqLinksModel.h"
-#include "pqPluginManager.h"
-#include "pqStandardViewModules.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -110,6 +111,7 @@ public:
   QPointer<pqLookupTableManager> LookupTableManager;
   pqLinksModel LinksModel;
   pqPluginManager PluginManager;
+  pqProgressManager* ProgressManager;
 
   QString OrganizationName;
   QString ApplicationName;
@@ -175,6 +177,8 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   this->Internal->PendingDisplayManager = new pqPendingDisplayManager(this);
 
   this->Internal->DisplayPolicy = new pqDisplayPolicy(this);
+
+  this->Internal->ProgressManager = new pqProgressManager(this);
 
   // add standard views
   this->Internal->PluginManager.addInterface(
@@ -310,6 +314,12 @@ pqLinksModel* pqApplicationCore::getLinksModel()
 pqPluginManager* pqApplicationCore::getPluginManager()
 {
   return &this->Internal->PluginManager;
+}
+
+//-----------------------------------------------------------------------------
+pqProgressManager* pqApplicationCore::getProgressManager() const
+{
+  return this->Internal->ProgressManager;
 }
 
 //-----------------------------------------------------------------------------
@@ -883,6 +893,7 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
   return reader;
 }
 
+//-----------------------------------------------------------------------------
 void pqApplicationCore::render()
 {
   QList<pqGenericViewModule*> list = 
@@ -890,6 +901,34 @@ void pqApplicationCore::render()
   foreach(pqGenericViewModule* view, list)
     {
     view->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::prepareProgress()
+{
+  if (this->Internal->ProgressManager)
+    {
+    this->Internal->ProgressManager->setEnableProgress(true);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::cleanupPendingProgress()
+{
+  if (this->Internal->ProgressManager)
+    {
+    this->Internal->ProgressManager->setEnableProgress(false);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::sendProgress(const char* name, int value)
+{
+  QString message = name;
+  if (this->Internal->ProgressManager)
+    {
+    this->Internal->ProgressManager->setProgress(message, value);
     }
 }
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqProgressBar.cxx
+   Module:    pqProgressWidget.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,42 +29,67 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "pqProgressWidget.h"
+
 #include "pqProgressBar.h"
 
+#include <QApplication>
+#include <QGridLayout>
+#include <QProgressBar>
+#include <QToolButton>
+
+
 //-----------------------------------------------------------------------------
-pqProgressBar::pqProgressBar(QWidget* _p) : QProgressBar(_p)
+pqProgressWidget::pqProgressWidget(QWidget* _parent/*=0*/)
+  : QWidget(_parent)
 {
-  this->Message = "";
+  QGridLayout *gridLayout = new QGridLayout(this);
+  gridLayout->setSpacing(4);
+  gridLayout->setMargin(0);
+  gridLayout->setObjectName("gridLayout");
+
+  this->ProgressBar = new pqProgressBar(this);
+  this->ProgressBar->setObjectName("ProgressBar");
+  this->ProgressBar->setOrientation(Qt::Horizontal);
+  gridLayout->addWidget(this->ProgressBar, 0, 1, 1, 1);
+
+  this->AbortButton = new QToolButton(this);
+  this->AbortButton->setObjectName("AbortButton");
+  this->AbortButton->setIcon(
+    QIcon(QString::fromUtf8(":/QtWidgets/Icons/pqDelete16.png")));
+  this->AbortButton->setIconSize(QSize(12, 12));
+  this->AbortButton->setToolTip(
+    QApplication::translate("Form", "Abort", 0, QApplication::UnicodeUTF8));
+
+  this->AbortButton->setEnabled(false);
+  QObject::connect(this->AbortButton, SIGNAL(pressed()),
+    this, SIGNAL(abortPressed()));
+
+  gridLayout->addWidget(this->AbortButton, 0, 0, 1, 1);
 }
 
 
 //-----------------------------------------------------------------------------
-pqProgressBar::~pqProgressBar()
+pqProgressWidget::~pqProgressWidget()
 {
-  
+  delete this->ProgressBar;
+  delete this->AbortButton;
 }
 
 //-----------------------------------------------------------------------------
-QString pqProgressBar::text() const
+void pqProgressWidget::setProgress(const QString& message, int value)
 {
-  return this->Message + QProgressBar::text();
+  this->ProgressBar->setProgress(message, value);
 }
 
 //-----------------------------------------------------------------------------
-void pqProgressBar::setProgress(const QString& message, int _value)
+void pqProgressWidget::enableProgress(bool enabled)
 {
-  this->Message = message + ": ";
-  this->setValue(_value);
+  this->ProgressBar->enableProgress(enabled);
 }
 
 //-----------------------------------------------------------------------------
-void pqProgressBar::enableProgress(bool e)
+void pqProgressWidget::enableAbort(bool enabled)
 {
-  this->setEnabled(e);
-  this->setTextVisible(e);
-  if(!e)
-    {
-    this->reset();
-    }
+  this->AbortButton->setEnabled(enabled);
 }
-
