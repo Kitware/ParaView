@@ -65,8 +65,6 @@ signals:
   /// Fired when the keeper updates the times.
   void timeStepsChanged();
 
-  /// Internal signal.
-  void triggerInitialization();
 public slots:
   void sourceAdded(pqPipelineSource*);
   void sourceRemoved(pqPipelineSource*);

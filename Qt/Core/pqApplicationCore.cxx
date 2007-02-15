@@ -458,13 +458,13 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     pqLoader->SetMultiViewRenderModuleProxy(server->GetRenderModule());
     }
 
+  this->LoadingState = true;
+
   if (rootElement)
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    this->LoadingState = true;
     pxm->LoadState(rootElement, server->GetConnectionID(), loader);
     pxm->UpdateRegisteredProxiesInOrder(0);
-    this->LoadingState = false;
     }
 
   // Clear undo stack.
@@ -476,9 +476,11 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     // enabling the proxy to be cleaned up before server disconnect.
     pqLoader->SetMultiViewRenderModuleProxy(0);
     }
+
   QApplication::processEvents();
   this->render();
 
+  this->LoadingState = false;
   emit this->stateLoaded();
 }
 

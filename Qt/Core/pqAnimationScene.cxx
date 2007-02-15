@@ -159,8 +159,12 @@ void pqAnimationScene::setupTimeTrack()
 void pqAnimationScene::updateTimeRanges()
 {
   pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
-  if (timekeeper->getNumberOfTimeStepValues() == 0)
+  if (timekeeper->getNumberOfTimeStepValues() == 0 || 
+    pqApplicationCore::instance()->isLoadingState())
     {
+    // If timekeeper has no timesteps at all
+    // or if we are currently loading state then we don't want to change
+    // the currently set start/end times.
     return;
     }
 

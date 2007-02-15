@@ -36,10 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
 
-#include <QtDebug>
-#include <QPointer>
-#include <QMap>
 #include <QList>
+#include <QMap>
+#include <QPointer>
+#include <QtDebug>
+#include <QTimer>
 
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
@@ -64,11 +65,7 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
   this->Internals = new pqInternals();
   this->Internals->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
-
-  QObject::connect(this, SIGNAL(triggerInitialization()),
-    this, SLOT(delayedInitialization()), Qt::QueuedConnection);
-
-  emit this->triggerInitialization();
+  QTimer::singleShot(0, this, SLOT(delayedInitialization()));
 }
 
 //-----------------------------------------------------------------------------
