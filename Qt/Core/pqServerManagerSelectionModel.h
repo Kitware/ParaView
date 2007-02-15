@@ -70,7 +70,7 @@ public:
     QObject* parent=NULL);
   virtual ~pqServerManagerSelectionModel();
 
-  // Returns the tiem that is current, on NULL if
+  // Returns the item that is current, on NULL if
   // there is no current.
   pqServerManagerModelItem* currentItem() const;
 
@@ -80,7 +80,7 @@ public:
   void setCurrentItem(pqServerManagerModelItem* item, 
     pqServerManagerSelectionModel::SelectionFlags command);
 
-  // Returns if the \c item is selected.
+  // Returns true if the item is selected.
   bool isSelected(pqServerManagerModelItem* item) const;
 
   // Returns the pqServerManagerModel operated on by the selection model.
