@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqXYPlotDisplayProxyEditor.h
+   Module:    pqDisplayPanel.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,52 +29,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqXYPlotDisplayProxyEditor_h
-#define __pqXYPlotDisplayProxyEditor_h
 
 #include "pqDisplayPanel.h"
 
-class pqDisplay;
-class QTreeWidgetItem;
-
-/// Editor widget for XY plot displays.
-class PQCOMPONENTS_EXPORT pqXYPlotDisplayProxyEditor : public pqDisplayPanel
+pqDisplayPanel::pqDisplayPanel(pqDisplay* display, QWidget* p)
+  : QWidget(p), Display(display)
 {
-  Q_OBJECT
-public:
-  pqXYPlotDisplayProxyEditor(pqDisplay* display, QWidget* parent=0);
-  virtual ~pqXYPlotDisplayProxyEditor();
+}
 
-public slots:
-
-  /// Forces a reload of the GUI elements that depend on
-  /// the display proxy.
-  void reloadGUI();
-
-protected slots:
-  void updateXArrayNameEnableState();
-
-  void yArraySelectionChanged();
-
-  /// Slot to listen to clicks for changing color.
-  void onItemClicked(QTreeWidgetItem* item, int column);
-private:
+pqDisplayPanel::~pqDisplayPanel()
+{
+}
   
-  /// Set the display whose properties this editor is editing.
-  /// This call will raise an error is the display is not
-  /// a XYPlotDisplay2 proxy.
-  void setDisplay(pqDisplay* display);
+pqDisplay* pqDisplayPanel::getDisplay()
+{
+  return this->Display;
+}
 
+void pqDisplayPanel::reloadGUI()
+{
+}
 
-  pqXYPlotDisplayProxyEditor(const pqXYPlotDisplayProxyEditor&); // Not implemented.
-  void operator=(const pqXYPlotDisplayProxyEditor&); // Not implemented.
-
-  // pushes the item's state to the SM property.
-  void updateSMState(QTreeWidgetItem* item);
-
-  class pqInternal;
-  pqInternal* Internal;
-};
-
-#endif
+void pqDisplayPanel::updateAllViews()
+{
+  if (this->Display)
+    {
+    this->Display->renderAllViews();
+    }
+}
 

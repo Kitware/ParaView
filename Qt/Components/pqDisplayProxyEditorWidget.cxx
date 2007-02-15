@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqDisplayProxyEditorWidget.h"
-#include "ui_pqDisplayProxyEditorWidget.h"
 
 #include "vtkSMProxy.h"
 
@@ -48,16 +47,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTextWidgetDisplay.h"
 #include "pqXYPlotDisplayProxyEditor.h"
 #include "pqPropertyLinks.h"
+#include "ui_pqDisplayProxyEditorWidget.h"
 
-class pqDisplayProxyEditorWidgetInternal : public Ui::DisplayProxyEditorWidget
+class pqDefaultDisplayPanel::pqInternal 
+ : public Ui::DisplayProxyEditorWidget
+{
+public:
+  pqPropertyLinks Links;
+};
+
+pqDefaultDisplayPanel::pqDefaultDisplayPanel(pqDisplay* display, QWidget* p)
+  : pqDisplayPanel(display, p)
+{
+  this->Internal = new pqInternal;
+  this->Internal->setupUi(this);
+  if(display)
+    {
+    this->Internal->Links.addPropertyLink(
+      this->Internal->ViewData, "checked", SIGNAL(stateChanged(int)),
+      display->getProxy(), display->getProxy()->GetProperty("Visibility"));
+    }
+  else
+    {
+    this->Internal->ViewData->setCheckState(Qt::Unchecked);
+    }
+  QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)), 
+                   this, SLOT(onStateChanged(int)));
+}
+
+void pqDefaultDisplayPanel::onStateChanged(int s)
+{
+  this->updateAllViews();
+  emit this->visibilityChanged(s == Qt::Checked);
+}
+
+
+class pqDisplayProxyEditorWidgetInternal
 {
 public:
   QPointer<pqPipelineSource> Source;
   QPointer<pqGenericViewModule> View;
   QPointer<pqDisplay> Display;
-  QPointer<QWidget> DisplayWidget;
-  QWidget* DefaultWidget;
-  pqPropertyLinks Links;
+  QPointer<pqDisplayPanel> DisplayPanel;
 };
 
 //-----------------------------------------------------------------------------
@@ -68,15 +99,13 @@ pqDisplayProxyEditorWidget::pqDisplayProxyEditorWidget(QWidget* p /*=0*/)
   l->setMargin(0);
   this->Internal = new pqDisplayProxyEditorWidgetInternal;
 
-  this->Internal->DefaultWidget = new QWidget(this);
-  this->Internal->setupUi(this->Internal->DefaultWidget);
-  l->addWidget(this->Internal->DefaultWidget);
+  this->Internal->DisplayPanel = new pqDefaultDisplayPanel(NULL, this);
+  l->addWidget(this->Internal->DisplayPanel);
 }
 
 //-----------------------------------------------------------------------------
 pqDisplayProxyEditorWidget::~pqDisplayProxyEditorWidget()
 {
-  delete this->Internal->DefaultWidget;
   delete this->Internal;
 }
 
@@ -98,12 +127,13 @@ pqDisplay* pqDisplayProxyEditorWidget::getDisplay() const
   return this->Internal->Display;
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditorWidget::showDefaultWidget()
 {
-  if (this->Internal->DisplayWidget)
+  if (this->Internal->DisplayPanel)
     {
-    this->Internal->DisplayWidget->hide();
+    this->Internal->DisplayPanel->hide();
     }
   this->Internal->DefaultWidget->show();
   pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
@@ -132,155 +162,87 @@ void pqDisplayProxyEditorWidget::showDefaultWidget()
     this->Internal->DefaultWidget->setEnabled(false);
     }
 }
+#endif
 
 //-----------------------------------------------------------------------------
-void pqDisplayProxyEditorWidget::onVisibilityChanged(int state)
+void pqDisplayProxyEditorWidget::onVisibilityChanged(bool state)
 {
-  if (this->Internal->Display)
+  pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
+  pqDisplay* disp = policy->setDisplayVisibility(this->Internal->Source, 
+    this->Internal->View, state);
+  
+  if (disp)
     {
-    this->Internal->Display->renderAllViews();
+    disp->renderAllViews();
     }
-  else
-    {
-    pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
-    pqDisplay* disp = policy->setDisplayVisibility(this->Internal->Source, 
-      this->Internal->View, (state == Qt::Checked));
-    if (disp)
-      {
-      disp->renderAllViews();
-      }
-    this->setDisplay(disp);
-    }
+  this->setDisplay(disp);
 }
 
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
 {
-  QObject::disconnect(this->Internal->ViewData, 0, this, 0);
-  this->Internal->Links.removeAllPropertyLinks();
-  this->Internal->Display = display;
-  if (!display)
+  if(display && this->Internal->Display == display)
     {
-    this->showDefaultWidget();
-    emit this->requestSetDisplay((pqDisplay*)0);
-    emit this->requestSetDisplay((pqPipelineDisplay*)0);
     return;
     }
+
+  if(this->Internal->DisplayPanel)
+    {
+    delete this->Internal->DisplayPanel;
+    }
+  
+  this->Internal->Display = display;
 
   pqPipelineDisplay* pd = qobject_cast<pqPipelineDisplay*>(display);
   if (pd)
     {
-    pqDisplayProxyEditor* editor = qobject_cast<pqDisplayProxyEditor*>(
-      this->Internal->DisplayWidget);
-
-    if (!editor)
-      {
-      editor = new pqDisplayProxyEditor(this);
-      this->layout()->addWidget(editor);
-      if (this->Internal->DisplayWidget)
-        {
-        this->layout()->removeWidget(this->Internal->DisplayWidget);
-        delete this->Internal->DisplayWidget;
-        }      
-      this->Internal->DisplayWidget = editor;
-      QObject::connect(this, SIGNAL(requestReload()),
-        editor, SLOT(reloadGUI()));
-      QObject::connect(this, SIGNAL(requestSetDisplay(pqPipelineDisplay*)),
-        editor, SLOT(setDisplay(pqPipelineDisplay*)));
-      }
-    editor->setDisplay(pd);
+    this->Internal->DisplayPanel = new pqDisplayProxyEditor(pd, this);
     }
-  else if (display->getProxy() && 
+  else if (display && display->getProxy() && 
     display->getProxy()->GetXMLName() == QString("XYPlotDisplay2"))
     {
-    pqXYPlotDisplayProxyEditor* editor = 
-      qobject_cast<pqXYPlotDisplayProxyEditor*>(
-        this->Internal->DisplayWidget);
-    if (!editor)
-      {
-      editor = new pqXYPlotDisplayProxyEditor(this);
-      this->layout()->addWidget(editor);
-      if (this->Internal->DisplayWidget)
-        {
-        this->layout()->removeWidget(this->Internal->DisplayWidget);
-        delete this->Internal->DisplayWidget;
-        }
-      this->Internal->DisplayWidget = editor;
-      QObject::connect(this, SIGNAL(requestSetDisplay(pqDisplay*)),
-        editor, SLOT(setDisplay(pqDisplay*)));
-      QObject::connect(this, SIGNAL(requestReload()),
-        editor, SLOT(reloadGUI()));
-      }
-    editor->setDisplay(display);
+    this->Internal->DisplayPanel = new pqXYPlotDisplayProxyEditor(display, this);
     }
-  else if (display->getProxy() && 
+  else if (display && display->getProxy() && 
     display->getProxy()->GetXMLName() == QString("BarChartDisplay"))
     {
-    pqBarChartDisplayProxyEditor* editor =
-      qobject_cast<pqBarChartDisplayProxyEditor*>(
-        this->Internal->DisplayWidget);
-    if (!editor)
-      {
-      editor = new pqBarChartDisplayProxyEditor(this);
-      this->layout()->addWidget(editor);
-      if (this->Internal->DisplayWidget)
-        {
-        this->layout()->removeWidget(this->Internal->DisplayWidget);
-        delete this->Internal->DisplayWidget;
-        }
-      this->Internal->DisplayWidget = editor;
-      QObject::connect(this, SIGNAL(requestSetDisplay(pqDisplay*)),
-        editor, SLOT(setDisplay(pqDisplay*)));
-      QObject::connect(this, SIGNAL(requestReload()),
-        editor, SLOT(reloadGUI()));
-      }
-    editor->setDisplay(display);
+    this->Internal->DisplayPanel = new pqBarChartDisplayProxyEditor(display, this);
     }
   else if (qobject_cast<pqTextWidgetDisplay*>(display))
     {
-    pqTextDisplayPropertiesWidget* editor = 
-      qobject_cast<pqTextDisplayPropertiesWidget*>(
-        this->Internal->DisplayWidget);
-    if (!editor)
-      {
-      editor = new pqTextDisplayPropertiesWidget(this);
-      this->layout()->addWidget(editor);
-      if (this->Internal->DisplayWidget)
-        {
-        this->layout()->removeWidget(this->Internal->DisplayWidget);
-        delete this->Internal->DisplayWidget;
-        }
-      this->Internal->DisplayWidget = editor;
-      QObject::connect(this, SIGNAL(requestSetDisplay(pqDisplay*)),
-        editor, SLOT(setDisplay(pqDisplay*)));
-      QObject::connect(this, SIGNAL(requestReload()),
-        editor, SLOT(reloadGUI()));
-      }
-    editor->setDisplay(display);
+    this->Internal->DisplayPanel = new pqTextDisplayPropertiesWidget(display, this);
     }
   else
     {
-    this->showDefaultWidget(); 
-    emit this->requestSetDisplay((pqDisplay*)0);
-    emit this->requestSetDisplay((pqPipelineDisplay*)0);
-    return;
+    this->Internal->DisplayPanel = new pqDefaultDisplayPanel(display, this);
+    
+    pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
+    if(this->Internal->Display || !this->Internal->View ||
+       (policy && policy->canDisplay(this->Internal->Source,
+                                     this->Internal->View)))
+      {
+      // connect to visibility so we can create a view for it
+      QObject::connect(this->Internal->DisplayPanel,
+                       SIGNAL(visibilityChanged(bool)),
+                       this, 
+                       SLOT(onVisibilityChanged(bool)), Qt::QueuedConnection);
+      }
+    else
+      {
+      this->Internal->DisplayPanel->setEnabled(false);
+      }
     }
-
-  if (this->Internal->DisplayWidget)
-    {
-    this->Internal->DisplayWidget->show();
-
-    // NOTE: We make is disabled before we hide it. If the DefaultWidget children
-    // had the focus, then hiding the widget before disabling it leads to the
-    // focus getting transferred to one of the view modules which may lead to 
-    // unnecessary active-view change. 
-    this->Internal->DefaultWidget->setEnabled(false);
-    this->Internal->DefaultWidget->hide();
-    }
+  
+  this->layout()->addWidget(this->Internal->DisplayPanel);
+  
+  this->Internal->DisplayPanel->show();
 }
 
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditorWidget::reloadGUI()
 {
-  emit this->requestReload();
+  if(this->Internal->DisplayPanel)
+    {
+    this->Internal->DisplayPanel->reloadGUI();
+    }
 }

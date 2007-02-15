@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include "pqComponentsExport.h"
+#include "pqDisplayPanel.h"
 
 class pqDisplay;
 class pqDisplayProxyEditorWidgetInternal;
@@ -67,13 +68,8 @@ public:
 public slots:
   void reloadGUI();
 
-signals:
-  void requestReload();
-  void requestSetDisplay(pqDisplay*);
-  void requestSetDisplay(pqPipelineDisplay*);
-
 protected slots:
-  void onVisibilityChanged(int);
+  void onVisibilityChanged(bool);
 
 private:
   pqDisplayProxyEditorWidget(const pqDisplayProxyEditorWidget&); // Not implemented.
@@ -81,6 +77,25 @@ private:
 
   pqDisplayProxyEditorWidgetInternal *Internal;
   void showDefaultWidget();
+};
+
+
+/// default display panel with only a visibility checkbox
+class pqDefaultDisplayPanel : public pqDisplayPanel
+{
+  Q_OBJECT
+public:
+  pqDefaultDisplayPanel(pqDisplay* display, QWidget* p);
+
+signals:
+  void visibilityChanged(bool);
+
+protected slots:
+  void onStateChanged(int);
+
+protected:
+  class pqInternal;
+  pqInternal* Internal;
 };
 
 #endif

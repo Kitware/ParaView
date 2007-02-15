@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqXYPlotDisplayProxyEditor.h
+   Module:    pqDisplayPanel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,51 +29,39 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqXYPlotDisplayProxyEditor_h
-#define __pqXYPlotDisplayProxyEditor_h
+#ifndef _pqDisplayPanel_h
+#define _pqDisplayPanel_h
 
-#include "pqDisplayPanel.h"
+#include <QWidget>
+#include <QPointer>
+#include "pqComponentsExport.h"
+#include "pqDisplay.h"
 
-class pqDisplay;
-class QTreeWidgetItem;
 
-/// Editor widget for XY plot displays.
-class PQCOMPONENTS_EXPORT pqXYPlotDisplayProxyEditor : public pqDisplayPanel
+/// Widget which provides an editor for the properties of a display.
+class PQCOMPONENTS_EXPORT pqDisplayPanel : public QWidget
 {
   Q_OBJECT
 public:
-  pqXYPlotDisplayProxyEditor(pqDisplay* display, QWidget* parent=0);
-  virtual ~pqXYPlotDisplayProxyEditor();
+  /// constructor
+  pqDisplayPanel(pqDisplay* display, QWidget* p = NULL);
+  /// destructor
+  ~pqDisplayPanel();
+
+  /// get the proxy for which properties are displayed
+  pqDisplay* getDisplay();
 
 public slots:
-
-  /// Forces a reload of the GUI elements that depend on
-  /// the display proxy.
-  void reloadGUI();
-
-protected slots:
-  void updateXArrayNameEnableState();
-
-  void yArraySelectionChanged();
-
-  /// Slot to listen to clicks for changing color.
-  void onItemClicked(QTreeWidgetItem* item, int column);
-private:
+  /// TODO: get rid of this function once the server manager can
+  /// inform us of display property changes
+  virtual void reloadGUI();
   
-  /// Set the display whose properties this editor is editing.
-  /// This call will raise an error is the display is not
-  /// a XYPlotDisplay2 proxy.
-  void setDisplay(pqDisplay* display);
+  /// Requests update on all views the
+  /// display is visible in.
+  virtual void updateAllViews();
 
-
-  pqXYPlotDisplayProxyEditor(const pqXYPlotDisplayProxyEditor&); // Not implemented.
-  void operator=(const pqXYPlotDisplayProxyEditor&); // Not implemented.
-
-  // pushes the item's state to the SM property.
-  void updateSMState(QTreeWidgetItem* item);
-
-  class pqInternal;
-  pqInternal* Internal;
+protected:
+  QPointer<pqDisplay> Display;
 };
 
 #endif

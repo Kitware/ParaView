@@ -50,25 +50,20 @@ public:
 
 
 //-----------------------------------------------------------------------------
-pqTextDisplayPropertiesWidget::pqTextDisplayPropertiesWidget(QWidget* p)
-  : QWidget(p)
+pqTextDisplayPropertiesWidget::pqTextDisplayPropertiesWidget(pqDisplay* display, QWidget* p)
+  : pqDisplayPanel(display, p)
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(renderAllViews()));
+  this->setDisplay(display);
 }
 
 //-----------------------------------------------------------------------------
 pqTextDisplayPropertiesWidget::~pqTextDisplayPropertiesWidget()
 {
   delete this->Internal;
-}
-
-//-----------------------------------------------------------------------------
-pqDisplay* pqTextDisplayPropertiesWidget::getDisplay() const
-{
-  return this->Internal->Display;
 }
 
 //-----------------------------------------------------------------------------
@@ -124,15 +119,6 @@ void pqTextDisplayPropertiesWidget::onVisibilityChanged(int state)
   if (state == Qt::Unchecked)
     {
     this->Internal->Interactivity->setCheckState(Qt::Unchecked);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqTextDisplayPropertiesWidget::renderAllViews()
-{
-  if (this->Internal->Display)
-    {
-    this->Internal->Display->renderAllViews();
     }
 }
 

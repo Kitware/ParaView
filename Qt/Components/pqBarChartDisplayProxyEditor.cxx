@@ -56,8 +56,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqBarChartDisplayProxyEditor::pqBarChartDisplayProxyEditor(QWidget* _parent)
-  : QWidget(_parent)
+pqBarChartDisplayProxyEditor::pqBarChartDisplayProxyEditor(pqDisplay* display, QWidget* _parent)
+  : pqDisplayPanel(display, _parent)
 {
   this->Internal = new pqInternal;
   this->Internal->VTKConnect = vtkEventQtSlotConnect::New();
@@ -70,6 +70,8 @@ pqBarChartDisplayProxyEditor::pqBarChartDisplayProxyEditor(QWidget* _parent)
     this, SLOT(updateAllViews()), Qt::QueuedConnection);
 
   this->Internal->UsePoints->setCheckState(Qt::Checked);
+
+  this->setDisplay(display);
 }
 
 //-----------------------------------------------------------------------------
@@ -79,21 +81,6 @@ pqBarChartDisplayProxyEditor::~pqBarChartDisplayProxyEditor()
 
   this->Internal->VTKConnect->Delete();
   delete this->Internal;
-}
-
-//-----------------------------------------------------------------------------
-void pqBarChartDisplayProxyEditor::updateAllViews()
-{
-  if (this->Internal->Display)
-    {
-    this->Internal->Display->renderAllViews();
-    }
-}
-
-//-----------------------------------------------------------------------------
-pqDisplay* pqBarChartDisplayProxyEditor::getDisplay() const
-{
-  return this->Internal->Display;
 }
 
 //-----------------------------------------------------------------------------

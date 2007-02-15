@@ -101,8 +101,8 @@ QMap<QString, QString> pqDisplayProxyEditorInternal::MaterialMap;
 
 //-----------------------------------------------------------------------------
 /// constructor
-pqDisplayProxyEditor::pqDisplayProxyEditor(QWidget* p)
-  : QWidget(p), DisableSlots(0)
+pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineDisplay* display, QWidget* p)
+  : pqDisplayPanel(display, p), DisableSlots(0)
 {
   this->Internal = new pqDisplayProxyEditorInternal;
   this->Internal->setupUi(this);
@@ -110,6 +110,8 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(QWidget* p)
 
   // setting a display proxy will enable this
   this->setEnabled(false);
+
+  this->setDisplay(display);
 }
 
 //-----------------------------------------------------------------------------
@@ -320,13 +322,6 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
   this->DisableSlots = 0;
 
   this->updateEnableState();
-}
-
-//-----------------------------------------------------------------------------
-/// get the proxy for which properties are displayed
-pqPipelineDisplay* pqDisplayProxyEditor::getDisplay()
-{
-  return this->Internal->Display;
 }
 
 //-----------------------------------------------------------------------------

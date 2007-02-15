@@ -32,37 +32,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqBarChartDisplayProxyEditor_h
 #define __pqBarChartDisplayProxyEditor_h
 
-#include <QWidget>
-#include "pqComponentsExport.h"
+#include "pqDisplayPanel.h"
 
 class pqDisplay;
 
 /// pqBarChartDisplayProxyEditor is the editor widget for
 /// a Bar Chart display.
-class PQCOMPONENTS_EXPORT pqBarChartDisplayProxyEditor : public QWidget
+class PQCOMPONENTS_EXPORT pqBarChartDisplayProxyEditor : public pqDisplayPanel
 {
   Q_OBJECT
 public:
-  pqBarChartDisplayProxyEditor(QWidget* parent=0);
+  pqBarChartDisplayProxyEditor(pqDisplay* display, QWidget* parent=0);
   virtual ~pqBarChartDisplayProxyEditor();
 
-  /// Returns the display proxy that is currently being edited
-  /// by the editor.
-  pqDisplay* getDisplay() const;
-
 public slots:
-  /// Set the display whose properties this editor is editing.
-  /// This call will raise an error is the display is not
-  /// a BarChartPlotDisplay proxy.
-  void setDisplay(pqDisplay* display);
-
   /// Forces a reload of the GUI elements that depend on
   /// the display proxy.
   void reloadGUI();
-
-  /// If display is valid, requests update on all views the
-  /// display is visible in.
-  void updateAllViews();
 
 protected slots:
   /// Opens the color map editor.
@@ -73,6 +59,12 @@ protected:
   void cleanup();
 
 private:
+  
+  /// Set the display whose properties this editor is editing.
+  /// This call will raise an error is the display is not
+  /// a BarChartPlotDisplay proxy.
+  void setDisplay(pqDisplay* display);
+
   pqBarChartDisplayProxyEditor(const pqBarChartDisplayProxyEditor&); // Not implemented.
   void operator=(const pqBarChartDisplayProxyEditor&); // Not implemented.
 

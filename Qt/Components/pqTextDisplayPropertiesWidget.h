@@ -32,34 +32,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqTextDisplayPropertiesWidget_h
 #define __pqTextDisplayPropertiesWidget_h
 
-#include <QWidget>
-#include "pqComponentsExport.h"
+#include "pqDisplayPanel.h"
 
-// This is a display editor widget for Text displays. 
-class pqDisplay;
-
-class PQCOMPONENTS_EXPORT pqTextDisplayPropertiesWidget : public QWidget
+/// This is a display editor widget for Text displays. 
+class PQCOMPONENTS_EXPORT pqTextDisplayPropertiesWidget : public pqDisplayPanel
 {
   Q_OBJECT
 public:
-  pqTextDisplayPropertiesWidget(QWidget* parent=0);
+  pqTextDisplayPropertiesWidget(pqDisplay* display, QWidget* parent=0);
   virtual ~pqTextDisplayPropertiesWidget();
 
-  // Get the display whose properties this editor is editing.
-  pqDisplay* getDisplay() const;
-
-public slots:
-  /// Set the display whose properties this editor will edit.
-  void setDisplay(pqDisplay* display);
-
-  void reloadGUI() {};
-
 protected slots:
-  void renderAllViews();
-
   void onVisibilityChanged(int);
 
 private:
+  /// Set the display whose properties this editor will edit.
+  void setDisplay(pqDisplay* display);
+
   class pqInternal;
   pqInternal* Internal;
 

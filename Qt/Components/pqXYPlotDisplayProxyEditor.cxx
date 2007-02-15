@@ -73,8 +73,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(QWidget* p)
-  : QWidget(p)
+pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqDisplay* display, QWidget* p)
+  : pqDisplayPanel(display, p)
 {
   this->Internal = new pqXYPlotDisplayProxyEditor::pqInternal();
   this->Internal->setupUi(this);
@@ -109,18 +109,13 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(QWidget* p)
   QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)),
     this, SLOT(updateAllViews()), Qt::QueuedConnection);
 
+  this->setDisplay(display);
 }
 
 //-----------------------------------------------------------------------------
 pqXYPlotDisplayProxyEditor::~pqXYPlotDisplayProxyEditor()
 {
   delete this->Internal;
-}
-
-//-----------------------------------------------------------------------------
-pqDisplay* pqXYPlotDisplayProxyEditor::getDisplay()
-{
-  return this->Internal->Display;
 }
 
 //-----------------------------------------------------------------------------
@@ -302,15 +297,6 @@ void pqXYPlotDisplayProxyEditor::onItemClicked(QTreeWidgetItem* item, int col)
     item->setData(1, Qt::DecorationRole, colorPixmap);
     item->setData(1, Qt::UserRole, QVariant(color));
     this->updateSMState(item);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqXYPlotDisplayProxyEditor::updateAllViews()
-{
-  if (this->Internal->Display)
-    {
-    this->Internal->Display->renderAllViews();
     }
 }
 

@@ -35,13 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QList>
 #include <QVariant>
-#include "pqComponentsExport.h"
+#include "pqDisplayPanel.h"
 
 class pqDisplayProxyEditorInternal;
 class pqPipelineDisplay;
 
 /// Widget which provides an editor for the properties of a display.
-class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public QWidget
+class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public pqDisplayPanel
 {
   Q_OBJECT
   
@@ -50,17 +50,9 @@ class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public QWidget
                                     WRITE setSpecularColor)
 public:
   /// constructor
-  pqDisplayProxyEditor(QWidget* p = NULL);
+  pqDisplayProxyEditor(pqPipelineDisplay* display, QWidget* p = NULL);
   /// destructor
   ~pqDisplayProxyEditor();
-
-
-  /// get the proxy for which properties are displayed
-  pqPipelineDisplay* getDisplay();
-
-public slots:
-  /// Set the display whose properties we want to edit. 
-  void setDisplay(pqPipelineDisplay* display);
 
   /// TODO: get rid of this function once the server manager can
   /// inform us of display property changes
@@ -78,12 +70,15 @@ protected slots:
   void updateMaterial(int idx);
   
 protected:
+
+  /// Set the display whose properties we want to edit.
+  void setDisplay(pqPipelineDisplay* display);
+
   pqDisplayProxyEditorInternal* Internal;
   void setupGUIConnections();
   
   QVariant specularColor() const;
   void setSpecularColor(QVariant);
-
 
 private:
   bool DisableSlots;
