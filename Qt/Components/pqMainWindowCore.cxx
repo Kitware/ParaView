@@ -155,7 +155,7 @@ public:
     Lookmarks(new pqLookmarkBrowserModel(parent)),
     LookupTableManager(new pqPQLookupTableManager(parent)),
     ObjectInspectorDriver(0),
-    RecentFilesMenu(0),
+    RecentFiltersMenu(0),
     FilterMenu(0),
     PipelineMenu(0),
     PipelineBrowser(0),
@@ -194,7 +194,7 @@ public:
   pqPQLookupTableManager* LookupTableManager;
   pqObjectInspectorDriver* ObjectInspectorDriver;
  
-  QMenu* RecentFilesMenu; 
+  QMenu* RecentFiltersMenu; 
   QMenu* FilterMenu;
   QMenu* AlphabeticalMenu;
   QList<QString> RecentFilterList;
@@ -403,6 +403,8 @@ void pqMainWindowCore::setSourceMenu(QMenu* menu)
 
 void pqMainWindowCore::refreshFiltersMenu()
 {
+  vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
+  manager->InstantiateGroupPrototypes("filters");
   if(this->Implementation->FilterMenu)
     {
     this->Implementation->FilterMenu->clear();
@@ -411,13 +413,12 @@ void pqMainWindowCore::refreshFiltersMenu()
 
     QStringList::Iterator iter;
 
-    this->Implementation->RecentFilesMenu = 
+    this->Implementation->RecentFiltersMenu = 
       this->Implementation->FilterMenu->addMenu("&Recent") 
       << pqSetName("Recent");
     this->restoreRecentFilterMenu();
     
-    vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
-    manager->InstantiateGroupPrototypes("filters");
+
 
     //Common Filters
     QStringList commonFilters;
@@ -1747,6 +1748,8 @@ void pqMainWindowCore::onCreateFilter(QAction* action)
     qCritical() << "Filter could not be created.";
     } 
 }
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::updateRecentFilterMenu(QAction* action)
 {
   if(!action)
@@ -1754,35 +1757,44 @@ void pqMainWindowCore::updateRecentFilterMenu(QAction* action)
     return;
     }
 
-    QString filterName = action->data().toString();
-    int idx=this->Implementation->RecentFilterList.indexOf(filterName);
-    if(idx!=-1)
+  QString filterName = action->data().toString();
+  int idx=this->Implementation->RecentFilterList.indexOf(filterName);
+  if(idx!=-1)
+    {
+    this->Implementation->RecentFilterList.removeAt(idx);
+    }
+
+  this->Implementation->RecentFilterList.push_front(filterName);
+  if(this->Implementation->RecentFilterList.size()>10)
+    {
+    this->Implementation->RecentFilterList.removeLast();
+    }
+
+
+
+  this->Implementation->RecentFiltersMenu->clear();
+
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  QList<QString>::iterator begin,end;
+  begin=this->Implementation->RecentFilterList.begin();
+  end=this->Implementation->RecentFilterList.end();
+  for(;begin!=end;++begin)
+    {
+    QString proxyLabel = (*begin);
+    vtkSMProxy* proxy = pxm->GetProxy(
+      "filters_prototypes", (*begin).toAscii().data());
+    if (proxy && proxy->GetXMLLabel())
       {
-      this->Implementation->RecentFilterList.removeAt(idx);
+      proxyLabel = proxy->GetXMLLabel();
       }
+    QAction* recentA = 
+      this->Implementation->RecentFiltersMenu->addAction(proxyLabel) 
+      << pqSetName(*begin) << pqSetData(*begin);
+    recentA->setEnabled(false);
+    }
 
-    this->Implementation->RecentFilterList.push_front(filterName);
-    if(this->Implementation->RecentFilterList.size()>10)
-      {
-      this->Implementation->RecentFilterList.removeLast();
-      }
-
-
-
-    this->Implementation->RecentFilesMenu->clear();
-
-
-    QList<QString>::iterator begin,end;
-    begin=this->Implementation->RecentFilterList.begin();
-    end=this->Implementation->RecentFilterList.end();
-    for(;begin!=end;++begin)
-      {
-      QAction* recentA = this->Implementation->RecentFilesMenu->addAction(*begin) << pqSetName(*begin)
-        << pqSetData(*begin);
-      recentA->setEnabled(false);
-      }
-
-    this->saveRecentFilterMenu();
+  this->saveRecentFilterMenu();
 }
 
 
@@ -1823,7 +1835,7 @@ void pqMainWindowCore::saveRecentFilterMenu()
 }
 void pqMainWindowCore::restoreRecentFilterMenu()
 {
-  this->Implementation->RecentFilesMenu->clear();
+  this->Implementation->RecentFiltersMenu->clear();
 
   // Now load default values from the QSettings, if available.
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -1852,16 +1864,25 @@ void pqMainWindowCore::restoreRecentFilterMenu()
   }
 
 
-   this->Implementation->RecentFilesMenu->clear();
+   this->Implementation->RecentFiltersMenu->clear();
 
 
+   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
    QList<QString>::iterator begin,end;
    begin=this->Implementation->RecentFilterList.begin();
    end=this->Implementation->RecentFilterList.end();
    for(;begin!=end;++begin)
      {
-     QAction* recentA = this->Implementation->RecentFilesMenu->addAction(*begin) << pqSetName(*begin)
-       << pqSetData(*begin);
+      QString proxyLabel = (*begin);
+      vtkSMProxy* proxy = pxm->GetProxy(
+        "filters_prototypes", (*begin).toAscii().data());
+      if (proxy && proxy->GetXMLLabel())
+        {
+        proxyLabel = proxy->GetXMLLabel();
+        }
+     QAction* recentA = 
+       this->Implementation->RecentFiltersMenu->addAction(proxyLabel) 
+       << pqSetName(*begin) << pqSetData(*begin);
      recentA->setEnabled(false);
      }
 }
