@@ -4,100 +4,60 @@
   <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/dualSphereAnimation.pvd" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Animation Inspector" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_stackedwidget/tabKeyFrame/propertyName" command="set_string" arguments="Time Step" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="5" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="7" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="10" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="12" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="15" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="17" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="20" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="22" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="25" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="27" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="30" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="35" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="37" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="42" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="47" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="50" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="52" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="57" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="62" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="67" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="70" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="75" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="80" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="82" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="85" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="90" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="92" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="95" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="97" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="100" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="102" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="105" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="107" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="110" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="112" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="115" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="117" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="120" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="122" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="124" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="127" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="129" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="134" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="137" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="139" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="142" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="144" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="147" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="149" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="152" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_stackedwidget/tabKeyFrame/addKeyFrame" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton5" command="activate" arguments="" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/propertyName" command="set_string" arguments="Time Step" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/addKeyFrame" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
   <pqevent object="MainWindow/VCRToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="149" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="147" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="144" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="142" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="137" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="134" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="132" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="129" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="127" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="124" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="136" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="133" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="130" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="128" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="125" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="122" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="120" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="115" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="112" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="107" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="119" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="114" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="111" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="105" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="103" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="97" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="92" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="85" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="94" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="89" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="86" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="80" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="77" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="78" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="75" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="72" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="70" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="69" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="67" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="65" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="62" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="60" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="64" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="61" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="58" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="55" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="52" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="53" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="50" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="47" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="44" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="42" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="39" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="33" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="31" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="28" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="25" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="22" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="19" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="17" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="14" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="11" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="8" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="6" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="3" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="0" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/1QWidget1/1QScrollBar0" command="set_int" arguments="0" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_stackedwidget/tabScene/groupBox/currentTime" command="set_string" arguments="0." />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_stackedwidget/tabScene/groupBox/currentTime" command="set_string" arguments="0." />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_stackedwidget/tabScene/groupBox/currentTime" command="set_string" arguments="0.2" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_stackedwidget/tabScene/groupBox/currentTime" command="set_string" arguments="0.25" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/currentTime" command="set_string" arguments="0." />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/currentTime" command="set_string" arguments="0." />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/currentTime" command="set_string" arguments="0.2" />
+  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/currentTime" command="set_string" arguments="0.25" />
 </pqevents>

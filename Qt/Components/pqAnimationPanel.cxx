@@ -254,13 +254,13 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
   this->Internal->ActiveScene = scene;
   if (!scene)
     {
-    this->Internal->tabScene->setEnabled(false);
+    this->Internal->playbackGroup->setEnabled(false);
     this->setActiveCue(0);
     this->updateEnableState();
     return;
     }
 
-  this->Internal->tabScene->setEnabled(true);
+  this->Internal->playbackGroup->setEnabled(true);
   vtkSMProxy* sceneProxy = scene->getProxy();
   sceneProxy->UpdatePropertyInformation();
 
