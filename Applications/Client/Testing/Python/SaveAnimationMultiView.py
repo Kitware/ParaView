@@ -43,15 +43,15 @@ QtTesting.playCommand(object10, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/dualS
 QtTesting.playCommand(object2, 'activate', '')
 object11 = 'MainWindow/menubar/menuView'
 QtTesting.playCommand(object11, 'activate', 'Animation Inspector')
-object12 = 'MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_stackedwidget/tabKeyFrame/propertyName'
-QtTesting.playCommand(object12, 'set_string', 'TimeStep')
-object14 = 'MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_stackedwidget/tabKeyFrame/addKeyFrame'
+object12 = 'MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/propertyName'
+QtTesting.playCommand(object12, 'set_string', 'Time Step')
+object14 = 'MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/addKeyFrame'
 QtTesting.playCommand(object14, 'activate', '')
 object15 = 'MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView'
 QtTesting.playCommand(object15, 'currentChanged', '/0/1|0')
-QtTesting.playCommand(object12, 'set_string', 'EndTheta')
+QtTesting.playCommand(object12, 'set_string', 'End Theta')
 QtTesting.playCommand(object14, 'activate', '')
-object16 = 'MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_stackedwidget/tabKeyFrame/editorFrame/keyFrameIndex'
+object16 = 'MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/editorFrame/keyFrameIndex'
 QtTesting.playCommand(object16, 'set_int', '1')
 QtTesting.playCommand(object16, 'set_int', '0')
 QtTesting.playCommand(object15, 'currentChanged', '/0/0|0')
@@ -75,7 +75,7 @@ QtTesting.playCommand(object16, 'set_int', '0')
 QtTesting.playCommand(object16, 'set_int', '1')
 QtTesting.playCommand(object16, 'set_int', '0')
 QtTesting.playCommand(object16, 'set_int', '1')
-object19 = 'MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tabWidget/qt_tabwidget_stackedwidget/tabKeyFrame/editorFrame/SignalAdaptorKeyFrameValue/lineEdit'
+object19 = 'MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/editorFrame/SignalAdaptorKeyFrameValue/lineEdit'
 QtTesting.playCommand(object19, 'set_string', '10')
 QtTesting.playCommand(object19, 'set_string', '10')
 QtTesting.playCommand(object17, 'activate', '')
