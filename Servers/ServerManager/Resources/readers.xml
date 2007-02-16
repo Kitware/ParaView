@@ -66,24 +66,11 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
      </StringVectorProperty>
-     <IntVectorProperty 
-        name="TimeStepRangeInfo"
-        command="GetTimeStepRange"
+     <DoubleVectorProperty 
+        name="TimestepValues"
         information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
-     <IntVectorProperty 
-        name="TimeStep"
-        command="SetTimeStep"
-        number_of_elements="1"
-        animateable="1"
-        default_values="0">
-       <IntRangeDomain name="range">
-          <RequiredProperties>
-             <Property name="TimeStepRangeInfo" function="Range"/>
-          </RequiredProperties>
-       </IntRangeDomain>
-     </IntVectorProperty>
+        <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
    <!-- End PVDReader -->
    </SourceProxy>
 

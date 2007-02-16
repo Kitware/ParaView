@@ -46,6 +46,12 @@ protected:
   vtkPVDReader();
   ~vtkPVDReader();
 
+  void ReadXMLData();
+
+  virtual int RequestDataObject(vtkInformation* request, 
+                                vtkInformationVector** inputVector, 
+                                vtkInformationVector* outputVector);
+
   // Set TimeStepRange
   virtual void SetupOutputInformation(vtkInformation *outInfo);
 

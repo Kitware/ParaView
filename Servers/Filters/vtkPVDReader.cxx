@@ -14,9 +14,13 @@
 =========================================================================*/
 #include "vtkPVDReader.h"
 
+#include "vtkDataObject.h"
+#include "vtkExecutive.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVDReader, "1.3");
+vtkCxxRevisionMacro(vtkPVDReader, "1.4");
 vtkStandardNewMacro(vtkPVDReader);
 
 
@@ -54,17 +58,129 @@ int vtkPVDReader::GetTimeStep()
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVDReader::ReadXMLData()
+{
+  // need to Parse the file first
+  if (!this->ReadXMLInformation())
+    {
+    return;
+    }
+
+  vtkInformation* outInfo = this->GetExecutive()->GetOutputInformation(0);
+
+  int tsLength = 0;
+  double* steps = 0;
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+    {
+    tsLength = 
+      outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    steps = 
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    }
+
+  // Check if a particular time was requested.
+  if(steps &&
+     outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+    {
+    // Get the requested time step. We only supprt requests of a single time
+    // step in this reader right now
+    double *requestedTimeSteps = 
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+    int numReqTimeSteps = 
+      outInfo->Length(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+
+    if (numReqTimeSteps > 0)
+      {
+      // find the first time value larger than requested time value
+      // this logic could be improved
+      int cnt = 0;
+      while (cnt < tsLength-1 && steps[cnt] < requestedTimeSteps[0])
+        {
+        cnt++;
+        }
+      this->SetRestrictionImpl("timestep", 
+                               this->GetAttributeValue("timestep", cnt),
+                               false);
+      // This is what we will read.
+      vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
+      output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
+                                    steps+cnt,1);
+      }
+    }
+
+  this->ReadXMLDataImpl();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVDReader::RequestDataObject(
+  vtkInformation* request, 
+  vtkInformationVector** inputVector, 
+  vtkInformationVector* outputVector)
+{
+  // need to Parse the file first
+  if (!this->ReadXMLInformation())
+    {
+    vtkErrorMacro("Could not read file information");
+    return 0;
+    }
+
+  // If the file has timesteps and no restriction was set, set the
+  // restriction for the first timestep. This is to avoid reading all
+  // the timesteps at once.
+  if (this->GetAttributeIndex("timestep") != -1)
+    {
+    if (!this->GetRestriction("timestep"))
+      {
+      int index = this->GetAttributeIndex("timestep");
+      int numTimeSteps = this->GetNumberOfAttributeValues(index);
+      if (numTimeSteps > 0)
+        {
+        this->SetRestrictionImpl("timestep", 
+                                 this->GetAttributeValue("timestep", 0),
+                                 false);
+        }
+      }
+    }
+
+  return 
+    this->Superclass::RequestDataObject(request, inputVector, outputVector);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDReader::SetupOutputInformation(vtkInformation *outInfo)
 {
   this->Superclass::SetupOutputInformation(outInfo);
 
   int index = this->GetAttributeIndex("timestep");
+  int numTimeSteps = this->GetNumberOfAttributeValues(index);
   this->TimeStepRange[0] = 0;
-  this->TimeStepRange[1] = this->GetNumberOfAttributeValues(index)-1;
+  this->TimeStepRange[1] = numTimeSteps-1;
   if (this->TimeStepRange[1] == -1)
     {
     this->TimeStepRange[1] = 0;
     }
+  double* timeSteps = new double[numTimeSteps];
+  for(int i=0; i<numTimeSteps; i++)
+    {
+    const char* attr = this->GetAttributeValue(index, i);
+    char* res = 0;
+    double val = strtod(attr, &res);
+    if (res == attr)
+      {
+      vtkErrorMacro("Could not parse timestep string: " << attr
+                    << " Setting time value to 0");
+      timeSteps[i] = 0.0;
+      }
+    else
+      {
+      timeSteps[i] = val;
+      }
+    }
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
+               timeSteps,
+               numTimeSteps);
+  delete[] timeSteps;
 }
 
 
