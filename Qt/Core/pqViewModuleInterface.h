@@ -51,9 +51,6 @@ public:
   /// Return a list of view types supported by this interface
   virtual QStringList viewTypes() const = 0;
   
-  /// Return a list of server manager view types supported by this interface
-  virtual QStringList viewModuleTypes() const = 0;
-  
   /// Return a list of display types supported by this interface
   /// overload this if you have custom pqConsuerDisplay's
   virtual QStringList displayTypes() const { return QStringList(); }
@@ -68,7 +65,7 @@ public:
   /// <SourceProxy name="MyCustomFilter" class="vtkMyCustomFilter">
   ///  ...
   ///  <Hints>
-  ///   <View type="MyCustomView" />
+  ///   <View type="MyCustom" />
   ///  </Hints>
   /// </SourceProxy>
   virtual bool canCreateView(const QString& viewtype) const = 0;

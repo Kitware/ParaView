@@ -55,11 +55,6 @@ QStringList pqStandardViewModules::viewTypes() const
     pqTableViewModule::tableType();
 }
 
-QStringList pqStandardViewModules::viewModuleTypes() const
-{
-  return QStringList() << "BarChartViewModule" << "XYPlotViewModule" << "TableView";
-}
-
 QStringList pqStandardViewModules::displayTypes() const
 {
   return QStringList() << "BarChartDisplay";
@@ -109,12 +104,12 @@ pqGenericViewModule* pqStandardViewModules::createView(const QString& viewtype,
                                                 pqServer* server,
                                                 QObject* p)
 {
-  if(viewtype == "BarChartViewModule")
+  if(viewtype == "BarChart")
     {
     return new pqPlotViewModule(pqPlotViewModule::barChartType(),
                               group, viewname, viewmodule, server, p);
     }
-  else if(viewtype == "XYPlotViewModule")
+  else if(viewtype == "XYPlot")
     {
     return new pqPlotViewModule(pqPlotViewModule::XYPlotType(),
                               group, viewname, viewmodule, server, p);
@@ -140,11 +135,6 @@ pqConsumerDisplay* pqStandardViewModules::createDisplay(const QString& display_t
     }
 
   return NULL;
-}
-
-QString pqStandardViewModules::name() const
-{
-  return "StandardViewModules";
 }
 
 

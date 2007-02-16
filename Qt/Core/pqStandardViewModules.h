@@ -49,7 +49,6 @@ public:
   ~pqStandardViewModules();
 
   QStringList viewTypes() const;
-  QStringList viewModuleTypes() const;
   QStringList displayTypes() const;
   QString viewTypeName(const QString&) const;
 
@@ -71,7 +70,6 @@ public:
     pqServer* server,
     QObject* parent);
 
-  QString name() const;
 };
 
 #endif

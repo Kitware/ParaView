@@ -121,18 +121,15 @@ MACRO(ADD_GUI_PANEL_INTERFACE OUTSRCS ClassName XMLName XMLGroup)
 ENDMACRO(ADD_GUI_PANEL_INTERFACE)
 
 # create implementation for a custom panel interface
-MACRO(ADD_VIEW_MODULE_INTERFACE OUTSRCS ClassName ViewName DisplayType
-    ViewXMLType ViewXMLGroup ViewXMLName)
-  SET(VIEW_TYPE ${ClassName})
+MACRO(ADD_VIEW_MODULE_INTERFACE OUTSRCS ViewType ViewName DisplayType ViewXMLGroup)
+  SET(VIEW_TYPE ${ViewType})
   SET(VIEW_TYPE_NAME ${ViewName})
   IF(${DisplayType})
     SET(DISPLAY_TYPE ${ViewName})
   ELSE(${DisplayType})
     SET(DISPLAY_TYPE "pqConsumerDisplay")
   ENDIF(${DisplayType})
-  SET(VIEW_XML_TYPE ${ViewXMLType})
   SET(VIEW_XML_GROUP ${ViewXMLGroup})
-  SET(VIEW_XML_NAME ${ViewXMLName})
 
   CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Core/pqViewModuleImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${VIEW_TYPE}Implementation.h @ONLY)

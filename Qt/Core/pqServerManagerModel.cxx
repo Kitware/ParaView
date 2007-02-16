@@ -540,7 +540,13 @@ void pqServerManagerModel::onAddViewModule(QString name,
 
   pqGenericViewModule* pqview = 0;
   vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(view);
-  const char* xml_type = view->GetXMLName();
+  QString xml_type = view->GetXMLName();
+  QString ending = "ViewModule";
+  if(xml_type.endsWith(ending))
+    {
+    xml_type.chop(ending.size());
+    }
+
   if (rm)
     {
     pqview = new pqRenderViewModule(name, rm, server, this);
@@ -552,7 +558,7 @@ void pqServerManagerModel::onAddViewModule(QString name,
     foreach(QObject* iface, ifaces)
       {
       pqViewModuleInterface* vmi = qobject_cast<pqViewModuleInterface*>(iface);
-      if(vmi && vmi->viewModuleTypes().contains(xml_type))
+      if(vmi && vmi->viewTypes().contains(xml_type))
         {
         pqview = vmi->createView(xml_type, "view_modules", name, view, server,this);
         break;
