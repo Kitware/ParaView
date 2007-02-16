@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
 
-   <SourceProxy name="ImageShrink" class="vtkImageShrink3D">
+   <SourceProxy name="ImageShrink" class="vtkImageShrink3D" label="Image Shrink">
     <InputProperty
        name="Input"
        command="SetInputConnection">
@@ -12,6 +12,9 @@
           <DataTypeDomain name="input_type">
             <DataType value="vtkImageData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Image Shrink filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -21,6 +24,9 @@
         animateable="1"
         default_values="1 1 1" > 
        <IntRangeDomain name="range" min="1" max="100"/>
+       <Documentation>
+         Set the amount by which to shrink along each axis.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -29,16 +35,18 @@
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to use an average of neighborhood scalar values as the output scalar value. If off, only subsampling will be performed.
+       </Documentation>
      </IntVectorProperty>
-   <!-- End Stripper -->
+   <!-- End ImageShrink -->
    </SourceProxy>
 
    <SourceProxy name="SurfaceVectors" class="vtkSurfaceVectors" label="Surface Vectors">
      <Documentation
           long_help="This filter constrains vectors to lie on a surface."
           short_help="This filter constrains vectors o lie on a surface.">
-The surface vectors filter is used for 2D data sets.  It constrains vectors to lie in a
-surface by removing components of the vectors normal to the local surface.
+The surface vectors filter is used for 2D data sets.  It constrains vectors to lie in a surface by removing components of the vectors normal to the local surface.
      </Documentation>
      <InputProperty
         name="Input"
@@ -52,9 +60,12 @@ surface by removing components of the vectors normal to the local surface.
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="point"
                              number_of_components="3"/>
-      </InputProperty>
+           <Documentation>
+             Set the input to the Surface Vectors filter.
+           </Documentation>
+     </InputProperty>
 
-      <StringVectorProperty 
+     <StringVectorProperty 
          name="SelectInputVectors" 
          command="SetInputArrayToProcess"
          number_of_elements="5"
@@ -65,7 +76,10 @@ surface by removing components of the vectors normal to the local surface.
                  <Property name="Input" function="Input"/>
               </RequiredProperties>
             </ArrayListDomain>
-      </StringVectorProperty> 
+            <Documentation>
+              Select the input vector array to process.
+            </Documentation>
+     </StringVectorProperty> 
 
      <IntVectorProperty 
         name="ConstraintMode" 
@@ -77,6 +91,9 @@ surface by removing components of the vectors normal to the local surface.
          <Entry value="1" text="Perpendicular"/>
          <Entry value="2" text="PerpendicularScale"/>
        </EnumerationDomain>
+       <Documentation>
+         Specify whether the vectors will be parallel or perpendicular to the surface.
+       </Documentation>
      </IntVectorProperty>
 
    <!-- End SurfaceVectors -->
@@ -99,6 +116,9 @@ Integrates point and cell data over lines and surfaces.  It also computes length
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Integrate Attributes filter.
+           </Documentation>
       </InputProperty>
    <Hints>
      <Visibility replace_input="0" />
@@ -124,6 +144,9 @@ The flow integration fitler  integrates the dot product of a point flow vector f
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="point"
                              number_of_components="3"/>
+           <Documentation>
+             Set the input to the Surface Flow filter.
+           </Documentation>
       </InputProperty>
 
       <StringVectorProperty 
@@ -136,6 +159,9 @@ The flow integration fitler  integrates the dot product of a point flow vector f
                  <Property name="Input" function="Input"/>
               </RequiredProperties>
             </ArrayListDomain>
+            <Documentation>
+              Select the input vectors to process.
+            </Documentation>
       </StringVectorProperty> 
 
    <!-- End IntegrateFlowThroughSurface -->
@@ -158,13 +184,20 @@ The All to N filter is available when ParaView is run in parallel. It redistribu
            <DataTypeDomain name="input_type">
              <DataType value="vtkPolyData"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the All to N filter.
+           </Documentation>
       </InputProperty>
 
       <IntVectorProperty 
          name="NumberOfProcesses" 
          command="SetNumberOfProcesses" 
          number_of_elements="1"
-         default_values="1" > 
+         default_values="1"
+         label="Number of Processes"> 
+         <Documentation>
+           Set the number of processes across which to split the input data.
+         </Documentation>
       </IntVectorProperty>         
    <!-- End AllToN -->
    </SourceProxy>
@@ -185,6 +218,9 @@ The Balance filter is available when ParaView is run in parallel. It does load-b
            <DataTypeDomain name="input_type">
              <DataType value="vtkPolyData"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Balance filter.
+           </Documentation>
       </InputProperty>
    <!-- End Balance -->
    </SourceProxy>
@@ -208,6 +244,9 @@ The Append Attributes filter takes multiple input data sets with the same geomet
            <DataTypeDomain name="input_type" composite_data_supported="0">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Append Attributes filter.
+           </Documentation>
       </InputProperty>
          
    <!-- End AppendAttributes -->
@@ -232,6 +271,9 @@ The Append Geometry filter operates on multiple polygonal data sets. The data se
            <DataTypeDomain name="input_type">
              <DataType value="vtkPolyData"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Append Geometry filter.
+           </Documentation>
       </InputProperty>
    <!-- End AppendPolyData -->
    </SourceProxy>
@@ -254,6 +296,9 @@ The Append Datasets filter operates on multiple data sets of any type (polygonal
            <DataTypeDomain name="input_type" composite_data_supported="0">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Append Datasets filter.
+           </Documentation>
       </InputProperty>
    <!-- End AppendDataSet -->
    </SourceProxy>
@@ -274,6 +319,9 @@ The Cell Centers filter places a point at the center of each cell in the input d
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Cell Centers filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -282,6 +330,9 @@ The Cell Centers filter places a point at the center of each cell in the input d
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Specify whether to generate vertex cells as the topography of the output.
+       </Documentation>
      </IntVectorProperty>
    <!-- End CellCenters -->
    </SourceProxy>
@@ -304,6 +355,9 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="cell"/>
+          <Documentation>
+            Set the input to the Cell Data to Point Data filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -312,6 +366,9 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Control whether the input cell data will be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output.
+       </Documentation>
      </IntVectorProperty>
    <!-- End CellDataToPointData -->
    </SourceProxy>
@@ -335,6 +392,9 @@ If the Piece invariant option is checked, the whole data set will be processed a
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Clean filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -343,6 +403,9 @@ If the Piece invariant option is checked, the whole data set will be processed a
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Specify whether the results must be the same regardless of whether ParaView is run in parallel or in a single process. Turn this option on to remove seams when running in parallel.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -352,6 +415,9 @@ If the Piece invariant option is checked, the whole data set will be processed a
         animateable="1"
         default_values="0.0" >
        <DoubleRangeDomain name="range" min="0" max="1" />
+       <Documentation>
+         Set the tolerance (for whether to combine nearby points) in terms of fraction of bounding box length.
+       </Documentation>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -360,6 +426,9 @@ If the Piece invariant option is checked, the whole data set will be processed a
         number_of_elements="1"
         default_values="1.0" >
        <DoubleRangeDomain name="range" min="0"/>
+       <Documentation>
+         Set the tolerance (for whether to combine nearby points) in absolute terms.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -368,6 +437,9 @@ If the Piece invariant option is checked, the whole data set will be processed a
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Determine whether to use absolute or relative (a percentage of the bounding box) tolerance.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -376,6 +448,9 @@ If the Piece invariant option is checked, the whole data set will be processed a
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Turn on/off conversion of degenerate lines to points.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -384,6 +459,9 @@ If the Piece invariant option is checked, the whole data set will be processed a
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Turn on/off conversion of degenerate polys to lines.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -392,6 +470,9 @@ If the Piece invariant option is checked, the whole data set will be processed a
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Turn on/off conversion of degenerate strips to polys.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -400,6 +481,9 @@ If the Piece invariant option is checked, the whole data set will be processed a
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to perform point-merging.
+       </Documentation>
      </IntVectorProperty>
    <!-- End CleanPolyData -->
    </SourceProxy>
@@ -421,11 +505,14 @@ The Clean to Grid filter merges points that are within a tolerance of 1/100,000 
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Clean to Grid filter.
+           </Documentation>
       </InputProperty>
    <!-- End CleanUnstructuredGrid -->
    </SourceProxy>
 
-   <SourceProxy name="Delaunay2D" class="vtkDelaunay2D">
+   <SourceProxy name="Delaunay2D" class="vtkDelaunay2D" label="Delaunay 2D">
       <Documentation
          long_help="Create 2D Delaunay triangulation of input points. 
 It expects a vtkPointSet as input and produces vtkPolyData as output. 
@@ -488,13 +575,23 @@ convex hull.
            <DataTypeDomain name="input_type">
              <DataType value="vtkPointSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Delaunay 2D filter.
+           </Documentation>
       </InputProperty>
       <IntVectorProperty 
         name="ProjectionPlaneMode" 
         command="SetProjectionPlaneMode" 
         number_of_elements="1"
         default_values="0"> 
-       <IntRangeDomain name="range" min="0" max="2"/>
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="XY Plane"/>
+<!--         <Entry value="1" text="Perpendicular"/> -->
+         <Entry value="2" text="Best-Fitting Plane"/>
+       </EnumerationDomain>
+       <Documentation>
+         Set what type of projection plane to use in performing the triangulation.
+       </Documentation>
      </IntVectorProperty>
      <DoubleVectorProperty name="Alpha"
        command="SetAlpha"
@@ -502,6 +599,9 @@ convex hull.
        animateable="1"
        default_values="0.0">
        <DoubleRangeDomain name="range" min="0"/>
+       <Documentation>
+         Specify alpha (or distance) value to control the output of this filter. For a non-zero alpha value, only edges or triangles contained within a sphere centered at mesh vertices will be output. Otherwise, only triangles will be output.
+       </Documentation>
      </DoubleVectorProperty>
      <DoubleVectorProperty name="Tolerance"
        command="SetTolerance"
@@ -509,6 +609,9 @@ convex hull.
        animateable="1"
        default_values="0.00001">
        <DoubleRangeDomain name="range" min="0" max="1.0" />
+       <Documentation>
+         Specify a tolerance to control discarding of closely spaced points. This tolerance is specified as a fraction of the diagonal length of the bounding box of the points.
+       </Documentation>
      </DoubleVectorProperty>
      <DoubleVectorProperty name="Offset"
        command="SetOffset"
@@ -516,6 +619,9 @@ convex hull.
        animateable="1"
        default_values="1.0">
        <DoubleRangeDomain name="range" min="0.75"/>
+       <Documentation>
+         Specify a multiplier to control the size of the initial, bounding Delaunay triangulation.
+       </Documentation>
      </DoubleVectorProperty>
      <IntVectorProperty name="BoundingTriangulation"
        command="SetBoundingTriangulation"
@@ -523,6 +629,9 @@ convex hull.
        animateable="1"
        default_values="0">
        <BooleanDomain name="bool"/>
+       <Documentation>
+         If checked, bounding triangulation points (and associated triangles) are included in the output. (These are introduced as an initial triangulation to begin the triangulation process. This feature is nice for debugging output.)
+       </Documentation>
      </IntVectorProperty>
    </SourceProxy>
 
@@ -543,6 +652,9 @@ The Connectivity filter assigns a region id to connected components of the input
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Connectivity filter.
+           </Documentation>
       </InputProperty>
    <!-- End PVConnectivityFilter -->
    </SourceProxy>
@@ -564,6 +676,9 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
           <DataTypeDomain name="input_type">
             <DataType value="vtkImageData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Crop filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -576,6 +691,9 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
             <Property name="Input" function="Input"/>
          </RequiredProperties>
        </ExtentDomain>
+       <Documentation>
+         Set the minimum and maximum extents in each dimension of the output.
+       </Documentation>
      </IntVectorProperty>
     <Hints>
       <Visibility replace_input="0" />
@@ -600,6 +718,9 @@ The Curvature filter computes the curvature at each point in a polygonal data se
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Curvature filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -608,6 +729,9 @@ The Curvature filter computes the curvature at each point in a polygonal data se
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Turn on this option to invert the mean curvature calculation for meshes with inward pointing normals.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -619,6 +743,9 @@ The Curvature filter computes the curvature at each point in a polygonal data se
          <Entry value="0" text="Gaussian"/>
          <Entry value="1" text="Mean"/>
        </EnumerationDomain>
+       <Documentation>
+         Select the type of curvature to compute.
+       </Documentation>
      </IntVectorProperty>
    <!-- End Curvatures -->
    </SourceProxy>
@@ -639,6 +766,9 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
            <DataTypeDomain name="input_type">
              <DataType value="vtkPolyData"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Decimate filter.
+           </Documentation>
       </InputProperty>
 
       <DoubleVectorProperty
@@ -648,6 +778,9 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
          animateable="1"
          default_values="0.9" >
         <DoubleRangeDomain name="range" min="0" max="1" />
+        <Documentation>
+          Set the desired reduction as a percentage of the total number of triangles.
+        </Documentation>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -656,6 +789,9 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         If off, better reduction can occur, but model may break up. If on, mesh splitting and hole elimination will not occur.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -664,6 +800,9 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
         number_of_elements="1"
         default_values="15.0" >
        <DoubleRangeDomain name="range" min="0" max="180" />
+       <Documentation>
+         This angle is used to define a feature edge, an edge along which the topology can be split. If the surface normal between two adjacent triangles is as least as large as this Feature Angle, a feature edge exists.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -673,6 +812,9 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
         default_values="1" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
+     <Documentation>
+       If off, the Decimate filter will not remove points on the boundary of the dataset.
+     </Documentation>
    <!-- End DecimatePro -->
    </SourceProxy>
 
@@ -692,6 +834,9 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the D3 filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -704,14 +849,21 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
          <Entry value="1" text="Duplicate cells"/>
          <Entry value="2" text="Divide cells"/>
        </EnumerationDomain>
+       <Documentation>
+         Select how to handle boundary cells. Isosurfacing works well when cells are uniquely assigned to processes. Dividing cells along processor boundaries is useful for volume rendering.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
         name="UseMinimalMemory" 
         command="SetUseMinimalMemory" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0"
+        label="Minimal Memory"> 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Force communication routines to use minimal memory, which is slower.
+       </Documentation>
      </IntVectorProperty>
    <!-- End D3 -->
    </SourceProxy>
@@ -733,6 +885,9 @@ The line can be specified interactively using the 3D line widget. See section 7.
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Elevation filter.
+           </Documentation>
       </InputProperty>
 
       <DoubleVectorProperty
@@ -812,7 +967,12 @@ This filter only operates on unstructured data. It produces polygonal output.
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="cell" 
                             number_of_components="1"/>
+          <Documentation>
+            Set the input to the Extract CTH Parts filter.
+          </Documentation>
      </InputProperty>
+
+<!-- For the below property, you also need a way to say, "Don't clip. -->
 
      <ProxyProperty name="ClipPlane" command="SetClipPlane">
            <ProxyGroupDomain name="groups">
@@ -825,21 +985,36 @@ This filter only operates on unstructured data. It produces polygonal output.
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>
+           <Documentation>
+             Adjust the parameters of the plane to clip with.
+           </Documentation>
      </ProxyProperty>
 
+<!-- The GUI for the property below needs a way to select multiple arrays,
+     not just a text box for entering an array name. -->
+
      <StringVectorProperty 
-        name="AddVolumeArrayName" 
+        name="AddVolumeArrayName"
         command="AddVolumeArrayName" 
         repeat_command="1"
         number_of_elements_per_command="1"
-        number_of_elements="1" /> 
+        number_of_elements="1"
+        label="Volume Arrays">
+        <Documentation>
+          Select the volume fraction arrays for generating parts.
+        </Documentation>
+     </StringVectorProperty> 
 
      <DoubleVectorProperty
         name="VolumeFractionSurfaceValue"
         command="SetVolumeFractionSurfaceValue"
         number_of_elements="1"
-        default_values="0.1" >
+        default_values="0.1"
+        label="Volume Fraction Value">
        <DoubleRangeDomain name="range" min="0" max="1" />
+       <Documentation>
+         Set the volume fraction value for the surface. Should be between 0 and 1.
+       </Documentation>
      </DoubleVectorProperty>
    <!-- End CTHPart -->
    </SourceProxy>
@@ -862,6 +1037,9 @@ The Extract Edges filter produces a wireframe version of the input data set by e
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Extract Edges filter.
+           </Documentation>
       </InputProperty>
    <!-- End ExtractEdges -->
    </SourceProxy>
@@ -883,6 +1061,9 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Extract Surface filter.
+           </Documentation>
       </InputProperty>
 
      <IntVectorProperty 
@@ -891,6 +1072,9 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Turn this option on to remove internal surface between processes. NOTE: Enabling this option might cause multiple executions of the data source because more information is needed to remove internal surfaces.
+       </Documentation>
      </IntVectorProperty>
    <!-- End DataSetSurfaceFilter -->
    </SourceProxy>
@@ -944,24 +1128,39 @@ The Calculator filter is available on the Toolbar.
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
           <InputArrayDomain name="input_array"/>
+          <Documentation>
+            Set the input to the Calculator filter.
+          </Documentation>
      </InputProperty>
 
      <Property
         name="RemoveAllVariables"
         command="RemoveAllVariables"
-        immediate_update="1">
+        immediate_update="1"
+        label="Clear">
+        <Documentation>
+          Erase the current function from the calulator's function entry box.
+        </Documentation>
      </Property>
 
      <StringVectorProperty 
         name="ResultArrayName" 
         command="SetResultArrayName" 
         number_of_elements="1"
-        default_values="Result" /> 
+        default_values="Result">
+        <Documentation>
+          Provide a name for the output array containing the result of this computation.
+        </Documentation>
+     </StringVectorProperty> 
      
      <StringVectorProperty 
         name="Function" 
         command="SetFunction" 
-        number_of_elements="1" /> 
+        number_of_elements="1">
+        <Documentation>
+          Enter the equation for the new array.
+        </Documentation>
+     </StringVectorProperty>
    
      <StringVectorProperty 
         name="AddScalarVariable" 
@@ -970,7 +1169,12 @@ The Calculator filter is available on the Toolbar.
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="3"
-        element_types="2 2 0" />
+        element_types="2 2 0"
+        label="Scalar Variable">
+        <Documentation>
+          Add a new scalar variable to the current function for computing a new array.
+        </Documentation>
+     </StringVectorProperty>
 
      <StringVectorProperty 
         name="AddVectorVariable" 
@@ -979,16 +1183,26 @@ The Calculator filter is available on the Toolbar.
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="5"
-        element_types="2 2 0 0 0" />
+        element_types="2 2 0 0 0"
+        label="Vector Variable">
+        <Documentation>
+          Add a new vector variable to the current function for computing a new array.
+        </Documentation>
+     </StringVectorProperty>
      
-        <StringVectorProperty 
+     <StringVectorProperty 
         name="AddCoordinateScalarVariable" 
         command="AddCoordinateScalarVariable" 
         clean_command="RemoveCoordinateScalarVariables"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" />
+        element_types="2 0"
+        label="Coordinate Scalar Variable">
+        <Documentation>
+          Add a new scalar variable to the current function for computing new point coordinates.
+        </Documentation>
+     </StringVectorProperty>
 
      <StringVectorProperty 
         name="AddCoordinateVectorVariable" 
@@ -997,7 +1211,12 @@ The Calculator filter is available on the Toolbar.
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="4"
-        element_types="2 0 0 0" />
+        element_types="2 0 0 0"
+        label="Coordinate Vector Variable">
+        <Documentation>
+          Add a new vector variable to the current function for computing new point coordinates.
+        </Documentation>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="CoordinateResults" 
@@ -1005,6 +1224,9 @@ The Calculator filter is available on the Toolbar.
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to compute point coordinates or a new array.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1016,6 +1238,9 @@ The Calculator filter is available on the Toolbar.
          <Entry value="1" text="point_data"/>
          <Entry value="2" text="cell_data"/>
        </EnumerationDomain>
+       <Documentation>
+         Select whether to perform the computation on point-centered or cell-centered data.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1024,6 +1249,9 @@ The Calculator filter is available on the Toolbar.
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to replace invalid values in the computation with a specific value.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -1032,6 +1260,9 @@ The Calculator filter is available on the Toolbar.
         number_of_elements="1"
         default_values="0.0" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Set the value with which to replace invalid values in the computation.
+       </Documentation>
      </DoubleVectorProperty>
    <!-- End Calculator -->
    </SourceProxy>
@@ -1059,6 +1290,9 @@ This filter operates on polygonal data and produces polygonal output.
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Feature Edges filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -1067,6 +1301,9 @@ This filter operates on polygonal data and produces polygonal output.
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to extract boundary edges.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1075,14 +1312,21 @@ This filter operates on polygonal data and produces polygonal output.
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to extract feature edges.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
         name="NonManifoldEdges" 
         command="SetNonManifoldEdges" 
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1"
+        label="Non-Manifold Edges"> 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to extract non-manifold edges.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1091,6 +1335,9 @@ This filter operates on polygonal data and produces polygonal output.
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to extract manifold edges.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1099,6 +1346,9 @@ This filter operates on polygonal data and produces polygonal output.
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to create a "coloring" array to label the edges by type.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -1107,6 +1357,9 @@ This filter operates on polygonal data and produces polygonal output.
         number_of_elements="1"
         default_values="30.0" >
        <DoubleRangeDomain name="range" min="0" max="180" />
+       <Documentation>
+         This angle is used to define a feature edge. If the surface normal between two adjacent triangles is at least as large as this Feature Angle, a feature edge exists.
+       </Documentation>
      </DoubleVectorProperty>
      <Hints>
        <Visibility replace_input="0" />
@@ -1130,6 +1383,9 @@ The Gradient filter computes the gradient vector at each point in an image or vo
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="point" 
                             number_of_components="1"/>
+          <Documentation>
+            Set the input to the Gradient filter.
+          </Documentation>
      </InputProperty>
 
      <StringVectorProperty 
@@ -1142,6 +1398,9 @@ The Gradient filter computes the gradient vector at each point in an image or vo
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <Documentation>
+             Select the array from which to compute the gradient.
+           </Documentation>
      </StringVectorProperty>
      <IntVectorProperty 
         name="Dimensionality" 
@@ -1152,6 +1411,9 @@ The Gradient filter computes the gradient vector at each point in an image or vo
          <Entry value="2" text="Two"/>
          <Entry value="3" text="Three"/>
        </EnumerationDomain>
+       <Documentation>
+         Select whether to compute the gradient in two dimensions or in three.
+       </Documentation>
      </IntVectorProperty>
    <!-- End Gradient -->
    </SourceProxy>
@@ -1174,12 +1436,16 @@ The Gradient filter estimates the gradient vector at each point or cell.  The In
            <Property name="SelectInputScalars" function="FieldDataSelection"/>
          </RequiredProperties>
        </InputArrayDomain>
+       <Documentation>
+         Set the input to the Gradient (Unstructured) filter.
+       </Documentation>
      </InputProperty>
 
      <StringVectorProperty name="SelectInputScalars"
                            command="SetInputArrayToProcess"
                            number_of_elements="5"
-                           element_types="0 0 0 0 2">
+                           element_types="0 0 0 0 2"
+                           label="Scalar Array">
        <ArrayListDomain name="array_list" attribute_type="Scalars">
          <RequiredProperties>
            <Property name="Input" function="Input"/>
@@ -1190,11 +1456,18 @@ The Gradient filter estimates the gradient vector at each point or cell.  The In
            <Property name="Input" function="Input"/>
          </RequiredProperties>
        </FieldDataDomain>
+       <Documentation>
+         Select the scalar array from which to compute the gradient.
+       </Documentation>
      </StringVectorProperty>
      <StringVectorProperty name="ResultArrayName"
                            command="SetResultArrayName"
                            number_of_elements="1"
-                           default_values="Gradients"/>
+                           default_values="Gradients">
+       <Documentation>
+         Provide a name for the output array containing the gradient vectors.
+       </Documentation>
+     </StringVectorProperty>
    <!-- End UnstructuredGradient -->
    </SourceProxy>
 
@@ -1215,6 +1488,9 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="point" 
                              number_of_components="1"/>
+           <Documentation>
+             Set the input to the Gradient Magnitude filter.
+           </Documentation>
       </InputProperty>
 
      <StringVectorProperty 
@@ -1227,6 +1503,9 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <Documentation>
+             Select the scalar array to use in computing the gradient magnitude.
+           </Documentation>
      </StringVectorProperty>
 
      <IntVectorProperty 
@@ -1238,6 +1517,9 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
          <Entry value="2" text="Two"/>
          <Entry value="3" text="Three"/>
        </EnumerationDomain>
+       <Documentation>
+         Select whether to compute the gradient magnitude in two or three dimensions.
+       </Documentation>
      </IntVectorProperty>
    <!-- End Gradient -->
    </SourceProxy>
@@ -1261,6 +1543,9 @@ The Piece invariant check box determines whether the output will be the same reg
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Linear Extrusion filter.
+          </Documentation>
      </InputProperty>
 
      <DoubleVectorProperty
@@ -1270,6 +1555,9 @@ The Piece invariant check box determines whether the output will be the same reg
         animateable="1"
         default_values="1.0" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Specify the amount of extrusion this filter should perform.
+       </Documentation>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -1278,6 +1566,9 @@ The Piece invariant check box determines whether the output will be the same reg
         number_of_elements="3"
         default_values="0 0 1" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Set the direction for the extrusion.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -1286,6 +1577,9 @@ The Piece invariant check box determines whether the output will be the same reg
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to draw endcaps.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1294,6 +1588,9 @@ The Piece invariant check box determines whether the output will be the same reg
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Turn this option to to produce the same results regardless of the number of processors used. Turn this off if you do want to process ghost levels and do not mind seams.
+       </Documentation>
      </IntVectorProperty>
    <!-- End LinearExtrusionFilter -->
    </SourceProxy>
@@ -1315,6 +1612,9 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Loop Subdivision filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -1322,8 +1622,12 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
         command="SetNumberOfSubdivisions" 
         number_of_elements="1"
         animateable="1"
-        default_values="1" > 
+        default_values="1"
+        label="Number of Subdivisions"> 
        <IntRangeDomain name="range" min="1" max="4"/>
+       <Documentation>
+         Set the number of subdivision iterations to perform. Each subdivision divides single triangles into four new triangles.
+       </Documentation>
      </IntVectorProperty>
    <!-- End LoopSubdivisionFilter -->
    </SourceProxy>
@@ -1346,6 +1650,9 @@ The Input menu allows the user to select the data set to which this filter will 
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Mask Points filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -1354,14 +1661,21 @@ The Input menu allows the user to select the data set to which this filter will 
         number_of_elements="1"
         default_values="2" > 
        <IntRangeDomain name="range" min="1"/>
+       <Documentation>
+         Retain 1 / (On Ratio) points in the output dataset.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
         name="MaximumNumberOfPoints" 
         command="SetMaximumNumberOfPoints" 
         number_of_elements="1"
-        default_values="5000" > 
+        default_values="5000"
+        label="Maximum Number of Points"> 
        <IntRangeDomain name="range" min="0"/>
+       <Documentation>
+         Set the maximum number of points in the output dataset.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1371,14 +1685,21 @@ The Input menu allows the user to select the data set to which this filter will 
         animateable="1"
         default_values="0" > 
        <IntRangeDomain name="range" min="0"/>
+       <Documentation>
+         Begin masking from this point id.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
         name="RandomMode" 
         command="SetRandomMode" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0"
+        label="Random"> 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to randomly select points or to subsample regularly.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1387,6 +1708,9 @@ The Input menu allows the user to select the data set to which this filter will 
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Specify whether to generate vertex cells as the topography of the output. If on, the geometry (vertices) will be displayed in the rendering window; otherwise no geometry will be displayed.
+       </Documentation>
      </IntVectorProperty>
    <!-- End MaskPoints -->
    </SourceProxy>
@@ -1407,6 +1731,9 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="point" 
                             number_of_components="1"/>
+          <Documentation>
+            Set the input to the Median filter.
+          </Documentation>
      </InputProperty>
 
      <StringVectorProperty 
@@ -1419,6 +1746,9 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <Documentation>
+             Select the scalar array to use in computing the median.
+           </Documentation>
      </StringVectorProperty>
 
      <IntVectorProperty 
@@ -1427,6 +1757,9 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
         number_of_elements="3"
         default_values="1 1 1" > 
        <IntRangeDomain name="range"/>
+       <Documentation>
+         Specify the size in each dimension of the kernel (neighborhood) in which to compute the median.
+       </Documentation>
      </IntVectorProperty>
    <!-- End Median -->
    </SourceProxy>
@@ -1448,6 +1781,9 @@ This filter creates a new cell array containing a geometric measure of each cell
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Mesh Quality filter.
+          </Documentation>
      </InputProperty>
      <IntVectorProperty
         name="TriangleQualityMeasure"
@@ -1468,6 +1804,9 @@ This filter creates a new cell array containing a geometric measure of each cell
          <Entry value="14" text="Shape and Size"/>
          <Entry value="15" text="Distortion"/>
        </EnumerationDomain>
+       <Documentation>
+         Select the quality measure used to evaluate triangle quality. The radius ratio is the size of a circle circumscribed by a triangle's 3 vertices divided by the size of a circle tangent to a triangle's 3 edges. The edge ratio is the ratio of the longest edge length to the shortest edge length.
+       </Documentation>
      </IntVectorProperty>
      <IntVectorProperty
         name="QuadQualityMeasure"
@@ -1499,6 +1838,9 @@ This filter creates a new cell array containing a geometric measure of each cell
          <Entry value="24" text="Shear and Size"/>
          <Entry value="15" text="Distortion"/>
        </EnumerationDomain>
+       <Documentation>
+         Select the quality measure used to evaluate quadrilateral quality.
+       </Documentation>
      </IntVectorProperty>
      <IntVectorProperty
         name="TetQualityMeasure"
@@ -1523,6 +1865,9 @@ This filter creates a new cell array containing a geometric measure of each cell
          <Entry value="14" text="Shape and Size"/>
          <Entry value="15" text="Distortion"/>
        </EnumerationDomain>
+       <Documentation>
+         Select the quality measure used to evaluate tetrahedral quality. The radius ratio is the size of a sphere circumscribed by a tetrahedron's 4 vertices divided by the size of a circle tangent to a tetrahedron's 4 faces. The edge ratio is the ratio of the longest edge length to the shortest edge length. The collapse ratio is the minimum ratio of height of a vertex above the triangle opposite it divided by the longest edge of the opposing triangle across all vertex/triangle pairs.
+       </Documentation>
      </IntVectorProperty>
      <IntVectorProperty
         name="HexQualityMeasure"
@@ -1551,12 +1896,15 @@ This filter creates a new cell array containing a geometric measure of each cell
          <Entry value="24" text="Shear and Size"/>
          <Entry value="15" text="Distortion"/>
        </EnumerationDomain>
+       <Documentation>
+         Select the quality measure used to evaluate hexahedral quality.
+       </Documentation>
      </IntVectorProperty>
    <!-- End MeshQuality -->
    </SourceProxy>
 
    <SourceProxy name="PolyDataNormals" class="vtkPPolyDataNormals"
-    label="Normals generation">
+    label="Normals Generation">
     <Documentation
        long_help="This filter will produce surface normals used for smooth shading.  Spltting is used to avoid smoothing across feature edges."
        short_help="Produce surface point normals.">
@@ -1576,6 +1924,9 @@ If this filter is run in parallel, the resulting data set will have seams along 
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Normals Generation filter.
+          </Documentation>
      </InputProperty>
 
      <DoubleVectorProperty 
@@ -1584,6 +1935,9 @@ If this filter is run in parallel, the resulting data set will have seams along 
         number_of_elements="1"
         default_values="30" > 
        <DoubleRangeDomain name="range" min="0" max="180"/>
+       <Documentation>
+         This angle is used to define a feature edge. If the surface normal between two adjacent triangles is at least as large as this Feature Angle, a feature edge exists. Points are duplicated along these feature edges.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -1592,6 +1946,9 @@ If this filter is run in parallel, the resulting data set will have seams along 
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Turn on/off the splitting of sharp edges. If sharp edges are split, then points are duplicated along these edges, and separate normals are computed for both sets of points to give crisp (rendered) surface definition.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1600,6 +1957,9 @@ If this filter is run in parallel, the resulting data set will have seams along 
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Turn on/off the enforcement of consistent polygon ordering.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1608,14 +1968,21 @@ If this filter is run in parallel, the resulting data set will have seams along 
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to reverse the direction of all the normals, changing the meaning of front and back.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
         name="NonManifoldTraversal" 
         command="SetNonManifoldTraversal" 
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1"
+        label="Non-Manifold Traversal"> 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Turn on/off traversal across non-manifold edges. Not traversing non-manifold edges will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1624,6 +1991,9 @@ If this filter is run in parallel, the resulting data set will have seams along 
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Turn on/off the computation of cell normals (in addition to point normals typically computed by this filter).
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1632,6 +2002,9 @@ If this filter is run in parallel, the resulting data set will have seams along 
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Turn this option to to produce the same results regardless of the number of processors used. Turn this off if you do want to process ghost levels and do not mind seams.
+       </Documentation>
      </IntVectorProperty>
    <!-- End  PolyDataNormals -->
    </SourceProxy>
@@ -1653,6 +2026,9 @@ The Outline filter generates an axis-aligned bounding box for the input data set
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Outline filter.
+           </Documentation>
       </InputProperty>
       <Hints>
         <Visibility replace_input="0" />
@@ -1677,6 +2053,9 @@ The Outline Corners filter generates the corners of a bounding box for the input
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Outline Corners filter.
+          </Documentation>
      </InputProperty>
 
      <DoubleVectorProperty
@@ -1685,6 +2064,9 @@ The Outline Corners filter generates the corners of a bounding box for the input
         number_of_elements="1"
         default_values="0.2" >
        <DoubleRangeDomain name="range" min="0.001" max="0.5" />
+       <Documentation>
+         Set the size of the corners as a percentage of the length of the corresponding bounding box.
+       </Documentation>
      </DoubleVectorProperty>
      <Hints>
        <Visibility replace_input="0" />
@@ -1710,6 +2092,9 @@ The vtkHyperOctreeDepth filter adds a scalar to each leaf of the octree that rep
            <DataTypeDomain name="input_type">
              <DataType value="vtkHyperOctree"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Octree Depth Scalars filter.
+           </Documentation>
       </InputProperty>
    <!-- End  OctreeDepthScalars-->
    </SourceProxy>
@@ -1719,7 +2104,7 @@ The vtkHyperOctreeDepth filter adds a scalar to each leaf of the octree that rep
      <Documentation
         long_help="This filter takes in a octree and produces a new octree which is no deeper than the maximum specified depth level."
         short_help="Reduce an octree's resolution.">
-The vtkHyperOctreeLimiter takes in a octree and produces a new octree in which is nowhere deeper than the maximum specified depth level. The attribute data of pruned leaf cells is integrated in to their ancestors at the cut level.
+The Octree Depth Limit filter takes in an octree and produces a new octree that is nowhere deeper than the maximum specified depth level. The attribute data of pruned leaf cells are integrated in to their ancestors at the cut level.
      </Documentation>
      <InputProperty
         name="Input"
@@ -1732,6 +2117,9 @@ The vtkHyperOctreeLimiter takes in a octree and produces a new octree in which i
            <DataTypeDomain name="input_type">
              <DataType value="vtkHyperOctree"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Octree Depth Limit filter.
+           </Documentation>
       </InputProperty>
 
      <IntVectorProperty 
@@ -1740,6 +2128,9 @@ The vtkHyperOctreeLimiter takes in a octree and produces a new octree in which i
         number_of_elements="1"
         default_values="4" > 
        <IntRangeDomain name="range" min="3" max="255"/>
+       <Documentation>
+         Set the maximum depth of the output octree.
+       </Documentation>
      </IntVectorProperty>
    <!-- End  OctreeDepthLimit-->
    </SourceProxy>
@@ -1761,6 +2152,9 @@ The Process Id Scalars filter assigns a unique scalar value to each piece of the
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Process Id Scalars filter.
+           </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -1769,6 +2163,9 @@ The Process Id Scalars filter assigns a unique scalar value to each piece of the
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to use random id values for the various pieces.
+       </Documentation>
      </IntVectorProperty>
    <!-- End PieceScalars -->
    </SourceProxy>
@@ -1792,6 +2189,9 @@ The Point Data to Cell Data filter averages the values of the point attributes o
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="point"/>
            <FixedTypeDomain name="fixed_type"/>
+           <Documentation>
+             Set the input to the Point Data to Cell Data filter.
+           </Documentation>
       </InputProperty>
 
      <IntVectorProperty 
@@ -1800,6 +2200,9 @@ The Point Data to Cell Data filter averages the values of the point attributes o
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Control whether the input point data will be passed to the output. If on, then the input point data is passed through to the output; otherwise, only generated cell data is placed into the output.
+       </Documentation>
      </IntVectorProperty>
    <!-- End PointDataToCellData -->
    </SourceProxy>
@@ -1823,14 +2226,21 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Quadric Clustering filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
         name="NumberOfDivisions" 
         command="SetNumberOfDivisions" 
         number_of_elements="3"
-        default_values="50 50 50" > 
+        default_values="50 50 50"
+        label="Number of Dimensions" > 
        <IntRangeDomain name="range"/>
+       <Documentation>
+         Set the number of spatial bins in each dimension.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1839,6 +2249,9 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to use points from the input as the representative points or to calculate optimum representative points for each bin.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1847,6 +2260,9 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to use feature edge quadrics to match up the boundaries between pieces.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1855,6 +2271,9 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to use feature point quadrics to align piece boundaries.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1863,6 +2282,9 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether the cell data should be copied from input to output.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty
@@ -1871,6 +2293,9 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
         number_of_elements="1"
         default_values="0">
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to include triangles completely contained in a spatial bin in the computation of the bin's quadrics. When this option is off, the filters operates faster, but the resulting surface may not be as well-behaved.
+       </Documentation>
      </IntVectorProperty>
    <!-- End QuadricClustering -->
    </SourceProxy>
@@ -1891,6 +2316,9 @@ The Random Vectors filter generates a point-centered array of random vectors. It
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Random Vectors filter.
+          </Documentation>
      </InputProperty>
 
      <DoubleVectorProperty 
@@ -1899,6 +2327,9 @@ The Random Vectors filter generates a point-centered array of random vectors. It
         number_of_elements="1"
         default_values="0" > 
        <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+         Set the minimum length of the random point vectors generated.
+       </Documentation>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty 
@@ -1907,6 +2338,9 @@ The Random Vectors filter generates a point-centered array of random vectors. It
         number_of_elements="1"
         default_values="1" > 
        <DoubleRangeDomain name="range" min="0"/>
+       <Documentation>
+         Set the maximum length of the random point vectors generated.
+       </Documentation>
      </DoubleVectorProperty>
    <!-- End BrownianPoints -->
    </SourceProxy>
@@ -1916,7 +2350,7 @@ The Random Vectors filter generates a point-centered array of random vectors. It
     <Documentation
        long_help="This filter takes the union of the input and its reflection over an axis-aligned plane."
        short_help="Reflect input over an axis aligned plane.">
-The Reflection filter reflects the input data set across the specified plane. If the Copy Input check box is marked, the output is the union of the input data set and its reflection. Otherwise the output will contain only the reflection of the input data. If the value chosen from the Plane menu is X, Y, or Z, the value of the Center entry determines where the plane is placed along the specified axis. The other six entries, X Min, X Max, etc., place the reflection plane at the specified face of the bounding box of the input data set. This filter operates on any type of data set and produces an unstructured grid output.
+The Reflect filter reflects the input data set across the specified plane. If the Copy Input check box is marked, the output is the union of the input data set and its reflection. Otherwise the output will contain only the reflection of the input data. If the value chosen from the Plane menu is X, Y, or Z, the value of the Center entry determines where the plane is placed along the specified axis. The other six entries, X Min, X Max, etc., place the reflection plane at the specified face of the bounding box of the input data set. This filter operates on any type of data set and produces an unstructured grid output.
     </Documentation>
     <InputProperty
        name="Input"
@@ -1928,6 +2362,9 @@ The Reflection filter reflects the input data set across the specified plane. If
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Reflect filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -1946,6 +2383,9 @@ The Reflection filter reflects the input data set across the specified plane. If
          <Entry value="7" text="Y"/>
          <Entry value="8" text="Z"/>
        </EnumerationDomain>
+       <Documentation>
+         Select which plane to reflect across.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -1955,6 +2395,9 @@ The Reflection filter reflects the input data set across the specified plane. If
         animateable="1"
         default_values="0.0" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         If the selected Plane is X, Y, or Z, then this value specifies the center of the reflection plane.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty
@@ -1963,6 +2406,9 @@ The Reflection filter reflects the input data set across the specified plane. If
         number_of_elements="1"
         default_values="1">
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to include both the input and its reflection in the output.
+       </Documentation>
      </IntVectorProperty>
    <!-- End ReflectionFilter -->
    </SourceProxy>
@@ -1990,32 +2436,43 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
                             number_of_components="3" optional="1"/>
           <InputArrayDomain name="input_array2" attribute_type="point"
                             number_of_components="1" optional="1"/>
+          <Documentation>
+            Set the input to the Ribbon filter.
+          </Documentation>
      </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SetInputArrayToProcess"
         number_of_elements="5"
-        element_types="0 0 0 0 2">
+        element_types="0 0 0 0 2"
+        label="Scalars">
            <ArrayListDomain name="array_list" attribute_type="Scalars"
                             input_domain_name="input_array2">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <Documentation>
+             Select the input scalars by which to vary the width of the ribbons.
+           </Documentation>
      </StringVectorProperty> 
 
      <StringVectorProperty 
         name="SelectInputVectors" 
         command="SetInputArrayToProcess"
         number_of_elements="5"
-        element_types="0 0 0 0 2">
+        element_types="0 0 0 0 2"
+        label="Vectors">
            <ArrayListDomain name="array_list" attribute_type="Vectors"
                             input_domain_name="input_array1">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <Documentation>
+             Select the input vectors for calculating the normals of the ribbons.
+           </Documentation>
      </StringVectorProperty>
 
      <DoubleVectorProperty
@@ -2028,6 +2485,9 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
             <Property name="Input" function="Input"/>
          </RequiredProperties>
        </BoundsDomain>
+       <Documentation>
+         If varying the ribbon's width, this value is the minimum ribbon width. If not varying the width, this value is half the width of the ribbon.
+       </Documentation>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -2036,6 +2496,9 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
         number_of_elements="1"
         default_values="0" >
        <DoubleRangeDomain name="range" min="0" max="360" />
+       <Documentation>
+         Set the offset angle (in degrees) of the ribbon from the line normal.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -2044,6 +2507,9 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         When this option is off, default normals will be generated if the input contains no normals. If on, the default normal will be used.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -2052,6 +2518,9 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
         number_of_elements="3"
         default_values="0 0 1" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Specify the normal to use if Use Default Normal is on.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -2060,6 +2529,9 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle the variation of ribbon width with scalar value.
+       </Documentation>
      </IntVectorProperty>
    <!-- End RibbonFilter -->
    </SourceProxy>
@@ -2083,6 +2555,9 @@ The Capping check box controls whether to close the open ends of the swept surfa
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Rotational Extrusion filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -2091,6 +2566,9 @@ The Capping check box controls whether to close the open ends of the swept surfa
         number_of_elements="1"
         default_values="12" > 
        <IntRangeDomain name="range" min="1"/>
+       <Documentation>
+         Control the number of intermediate node points used in performing the sweep.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -2099,6 +2577,9 @@ The Capping check box controls whether to close the open ends of the swept surfa
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to draw endcaps.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -2108,6 +2589,9 @@ The Capping check box controls whether to close the open ends of the swept surfa
         animateable="1"
         default_values="360" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Specify the angle of rotation in degrees.
+       </Documentation>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -2117,6 +2601,9 @@ The Capping check box controls whether to close the open ends of the swept surfa
         animateable="1"
         default_values="0" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Set the total amount of translation along the Z axis during the sweep process.
+       </Documentation>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -2125,6 +2612,9 @@ The Capping check box controls whether to close the open ends of the swept surfa
         number_of_elements="1"
         default_values="0" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Set the change in radius during the sweep process.
+       </Documentation>
      </DoubleVectorProperty>
    <!-- End RotationalExtrusionFilter -->
    </SourceProxy>
@@ -2146,6 +2636,9 @@ The Shrink filter causes the individual cells of a data set to break apart from 
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Shrink filter.
+           </Documentation>
       </InputProperty>
 
       <DoubleVectorProperty
@@ -2155,6 +2648,9 @@ The Shrink filter causes the individual cells of a data set to break apart from 
          animateable="1"
          default_values="0.5" >
         <DoubleRangeDomain name="range" min="0" max="1" />
+        <Documentation>
+          Set the percentage by which to shrink the input cells.
+        </Documentation>
       </DoubleVectorProperty>
    <!-- End ShrinkFilter -->
    </SourceProxy>
@@ -2176,6 +2672,9 @@ The Smooth filter operates on a polygonal data set by iteratively adjusting the 
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Smooth filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -2183,8 +2682,12 @@ The Smooth filter operates on a polygonal data set by iteratively adjusting the 
         command="SetNumberOfIterations" 
         number_of_elements="1"
         animateable="1"
-        default_values="20" > 
+        default_values="20"
+        label="Number of Iterations"> 
        <IntRangeDomain name="range" min="0"/>
+       <Documentation>
+         Set the number of smoothing iterations to perform. More iterations produces better smoothing.
+       </Documentation>
      </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -2193,6 +2696,9 @@ The Smooth filter operates on a polygonal data set by iteratively adjusting the 
          number_of_elements="1"
          default_values="0.0" >
         <DoubleRangeDomain name="range" min="0" max="1" />
+        <Documentation>
+          Set the convergence criterion for the iteration process. Smaller numbers result in more smoothing iterations.
+        </Documentation>
       </DoubleVectorProperty>
    <!-- End SmoothPolyDataFilter -->
    </SourceProxy>
@@ -2214,6 +2720,9 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Triangle Strips filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -2222,6 +2731,9 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
         number_of_elements="1"
         default_values="1000" > 
        <IntRangeDomain name="range" min="4" max="100000"/>
+       <Documentation>
+         Set the maximum number of triangles / lines to include in a triangle strip or polyline.
+       </Documentation>
      </IntVectorProperty>
    <!-- End Stripper -->
    </SourceProxy>
@@ -2242,14 +2754,21 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Subdivide filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
         name="NumberOfSubdivisions" 
         command="SetNumberOfSubdivisions" 
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1"
+        label="Number of Subdivisions"> 
        <IntRangeDomain name="range" min="1" max="4"/>
+       <Documentation>
+         Set the number of subdivision iterations  to perform.
+       </Documentation>
      </IntVectorProperty>
    <!-- End Subdivide -->
    </SourceProxy>
@@ -2277,6 +2796,9 @@ The Max Num Of Subdivisions setting specifies the maximum number of times an edg
              <DataType value="vtkDataSet"/>
              <DataType value="vtkUnstructuredGrid"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Tessellate filter.
+           </Documentation>
      </InputProperty>
 
      <IntVectorProperty
@@ -2285,6 +2807,9 @@ The Max Num Of Subdivisions setting specifies the maximum number of times an edg
         number_of_elements="1"
         default_values="3">
        <IntRangeDomain name="range" min="1" max="3"/>
+       <Documentation>
+         Set the maximum dimensionality of the output tessellation. Cells of higher dimension will be reduced to their boundaries.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -2293,6 +2818,9 @@ The Max Num Of Subdivisions setting specifies the maximum number of times an edg
         number_of_elements="1"
         default_values="1e-3">
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Set the maximum chord error allowed at any edge midpoint in the output tessellation.
+       </Documentation>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -2300,14 +2828,23 @@ The Max Num Of Subdivisions setting specifies the maximum number of times an edg
         command="SetFieldCriterion"
         repeat_command="1"
         number_of_elements_per_command="1"
-        use_index="1"/>
+        use_index="1"
+        label="Field Error">
+        <Documentation>
+          Set the maximum field error allowed at any edge midpoint in the output tessellation.
+        </Documentation>
+     </DoubleVectorProperty>
 
      <IntVectorProperty
         name="MaximumNumberOfSubdivisions"
         command="SetMaximumNumberOfSubdivisions"
         number_of_elements="1"
-        default_values="3">
+        default_values="3"
+        label="Maximum Number of Subdivisions">
        <IntRangeDomain name="range" min="0" max="8"/>
+       <Documentation>
+         Set the maximum number of subdivision iterations to perform.
+       </Documentation>
      </IntVectorProperty>
 
      <Property
@@ -2335,6 +2872,9 @@ The Tetrahedralize filter converts the 3D cells of any type of data set to tetra
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Tetrahedralize filter.
+           </Documentation>
       </InputProperty>
    <!-- End DataSetTriangleFilter -->
    </SourceProxy>
@@ -2356,12 +2896,18 @@ The Transform filter allows you to specify the position, size, and orientation o
           <DataTypeDomain name="input_type">
             <DataType value="vtkPointSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Transform filter.
+          </Documentation>
      </InputProperty>
 
      <ProxyProperty name="Transform" command="SetTransform">
            <ProxyGroupDomain name="groups">
               <Group name="transforms"/>
            </ProxyGroupDomain>
+           <Documentation>
+             Set the transform to apply to the input dataset.
+           </Documentation>
      </ProxyProperty>
    <!-- End TransformFilter -->
    </SourceProxy>
@@ -2383,6 +2929,9 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
            <DataTypeDomain name="input_type">
              <DataType value="vtkPolyData"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Triangulate filter.
+           </Documentation>
       </InputProperty>
    <!-- End TriangleFilter -->
    </SourceProxy>
@@ -2403,6 +2952,9 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Tube filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -2410,8 +2962,12 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
         command="SetNumberOfSides" 
         number_of_elements="1"
         animateable="1"
-        default_values="6" > 
+        default_values="6"
+        label="Number of Sides"> 
        <IntRangeDomain name="range" min="3"/>
+       <Documentation>
+         Set the number of sides for the tube.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -2420,6 +2976,9 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to draw endcaps on the tube.
+       </Documentation>
      </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -2431,7 +2990,10 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
           <RequiredProperties>
              <Property name="Input" function="Input"/>
           </RequiredProperties>
-`       </BoundsDomain>
+        </BoundsDomain>
+        <Documentation>
+          Set the radius of the tube. If the radius is varying, then this value is the minimum radius.
+        </Documentation>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -2444,6 +3006,9 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
          <Entry value="1" text="By Scalar"/>
          <Entry value="2" text="By Vector"/>
        </EnumerationDomain>
+       <Documentation>
+         Select whether/how to vary the radius of the tube.
+       </Documentation>
      </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -2452,6 +3017,9 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
          number_of_elements="1"
          default_values="10" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Set the maximum tube radius in terms of a multiple of the minimum radius. If not varying the radius, this value has no effect.
+        </Documentation>
       </DoubleVectorProperty>
    <!-- End TubeFilter -->
    </SourceProxy>
@@ -2476,18 +3044,25 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="point"
                              number_of_components="1"/>
+           <Documentation>
+             Set the input to the Warp (scalar) filter.
+           </Documentation>
      </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SetInputArrayToProcess"
-          number_of_elements="5"
-          element_types="0 0 0 0 2">
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        label="Scalars">
            <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <Documentation>
+             Select the input scalars by which to warp the dataset.
+           </Documentation>
      </StringVectorProperty>
 
      <DoubleVectorProperty
@@ -2497,6 +3072,9 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
         animateable="1"
         default_values="1.0" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Multiply the scalar at a given point by this value to determine the magnitude of the change vector for that point.
+       </Documentation>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -2505,6 +3083,9 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
         number_of_elements="3"
         default_values="0 0 1" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Specify the direction along which to warp the dataset.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -2513,14 +3094,21 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         If point normals are present in the dataset, toggle whether to use a single Normal value (On) or the normals from the dataset (Off).
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
         name="XYPlane" 
         command="SetXYPlane" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0"
+        label="XY Plane">
        <BooleanDomain name="bool"/>
+       <Documentation>
+         If this option is on, then the Z-coordinates from the input are considered to be the scalar values, and the displacement is along the Z axis.
+       </Documentation>
      </IntVectorProperty>
    <!-- End WarpScalar -->
    </SourceProxy>
@@ -2543,18 +3131,25 @@ The Warp (vector) filter translates the points of the input data set using a spe
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="point"
                              number_of_components="3"/>
+           <Documentation>
+             Set the input to the Warp (vector) filter.
+           </Documentation>
       </InputProperty>
 
       <StringVectorProperty 
          name="SelectInputVectors" 
          command="SetInputArrayToProcess"
          number_of_elements="5"
-         element_types="0 0 0 0 2">
+         element_types="0 0 0 0 2"
+         label="Vectors">
             <ArrayListDomain name="array_list" attribute_type="Vectors">
               <RequiredProperties>
                  <Property name="Input" function="Input"/>
               </RequiredProperties>
             </ArrayListDomain>
+            <Documentation>
+              Select the vector array by which to warp the dataset's point coordinates.
+            </Documentation>
       </StringVectorProperty> 
 
       <DoubleVectorProperty
@@ -2563,6 +3158,9 @@ The Warp (vector) filter translates the points of the input data set using a spe
          number_of_elements="1"
          default_values="1.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Each component of the selected vector array will be multiplied by this value before being used to compute new point coordinates.
+        </Documentation>
       </DoubleVectorProperty>
    <!-- End WarpVector -->
    </SourceProxy>
@@ -2585,18 +3183,25 @@ The Warp (vector) filter translates the points of the input data set using a spe
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="point"
                              number_of_components="3"/>
+           <Documentation>
+             Set the input to the Animate Warp filter.
+           </Documentation>
       </InputProperty>
 
       <StringVectorProperty 
          name="SelectInputVectors" 
          command="SetInputArrayToProcess"
          number_of_elements="5"
-         element_types="0 0 0 0 2">
+         element_types="0 0 0 0 2"
+         label="Vectors">
             <ArrayListDomain name="array_list" attribute_type="Vectors">
               <RequiredProperties>
                  <Property name="Input" function="Input"/>
               </RequiredProperties>
             </ArrayListDomain>
+            <Documentation>
+              Select the vector array by which to warp the dataset's point coordinates.
+            </Documentation>
       </StringVectorProperty> 
 
       <DoubleVectorProperty
@@ -2605,6 +3210,9 @@ The Warp (vector) filter translates the points of the input data set using a spe
          number_of_elements="1"
          default_values="1.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Each component of the selected vector array will be multiplied by this value before being used to compute new point coordinates.
+        </Documentation>
       </DoubleVectorProperty>
    <!-- End AnimateWarp -->
    </SourceProxy>
@@ -2627,6 +3235,9 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Cut filter.
+          </Documentation>
      </InputProperty>
 
      <ProxyProperty name="CutFunction" command="SetCutFunction">
@@ -2640,6 +3251,9 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>
+           <Documentation>
+             Set the parameters of the cut function.
+           </Documentation>
      </ProxyProperty>
 
      <DoubleVectorProperty
@@ -2658,12 +3272,16 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
         set_number_command="SetNumberOfContours"
         number_of_elements_per_command="1"
         use_index="1"
-        animateable="1">
+        animateable="1"
+        label="Cut Offset Values">
           <BoundsDomain name="bounds" mode="magnitude">
             <RequiredProperties>
               <Property name="Input" function="Input"/>
             </RequiredProperties>
           </BoundsDomain>
+          <Documentation>
+            Specify a list of current offset values. This can be used to create multiple cuts with different centers. Each entry represents a new cut with center shifted by the offset value.
+          </Documentation>
      </DoubleVectorProperty>
      <Hints>
        <Visibility replace_input="0" />
@@ -2691,6 +3309,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="point"
                             optional="1"/>
+          <Documentation>
+            Set the input to the Clip filter.
+          </Documentation>
      </InputProperty>
 
      <ProxyProperty name="ClipFunction" command="SetClipFunction">
@@ -2704,6 +3325,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>
+           <Documentation>
+             Set the parameters of the clip function.
+           </Documentation>
      </ProxyProperty>
 
      <DoubleVectorProperty
@@ -2721,18 +3345,25 @@ This filter operates on all types of data sets, and it returns unstructured grid
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle which portion of the dataset should be clipped away.
+       </Documentation>
      </IntVectorProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SetInputArrayToProcess"
         number_of_elements="5"
-        element_types="0 0 0 0 2">
+        element_types="0 0 0 0 2"
+        label="Scalars">
            <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <Documentation>
+             Choose the clipping scalar array.
+           </Documentation>
      </StringVectorProperty> 
 
      <DoubleVectorProperty
@@ -2747,6 +3378,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
             </RequiredProperties>
           </ArrayRangeDomain>         
           <DoubleRangeDomain name="range"/>
+          <Documentation>
+            Choose the scalar value with which to clip.
+          </Documentation>
      </DoubleVectorProperty>
    <!-- End Clip -->
    </SourceProxy>
@@ -2773,13 +3407,17 @@ The Threshold filter extracts the portions of the input data set whose scalars l
                           function="FieldDataSelection"/>
              </RequiredProperties>
           </InputArrayDomain>
+          <Documentation>
+            Set the input to the Threshold filter.
+          </Documentation>
      </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SetInputArrayToProcess"
         number_of_elements="5"
-        element_types="0 0 0 0 2">
+        element_types="0 0 0 0 2"
+        label="Scalars">
            <ArrayListDomain name="array_list" 
                             attribute_type="Scalars">
              <RequiredProperties>
@@ -2791,19 +3429,26 @@ The Threshold filter extracts the portions of the input data set whose scalars l
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </FieldDataDomain>
+           <Documentation>
+             Choose the scalar array from which to perform thresholding.
+           </Documentation>
      </StringVectorProperty> 
 
      <DoubleVectorProperty 
         name="ThresholdBetween" 
         command="ThresholdBetween"
         number_of_elements="2"
-        default_values="0 0">
+        default_values="0 0"
+        label="Threshold Range">
           <ArrayRangeDomain name="range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
             </RequiredProperties>
           </ArrayRangeDomain>         
+          <Documentation>
+            Specify the upper and lower bounds of the threshold.
+          </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -2812,6 +3457,9 @@ The Threshold filter extracts the portions of the input data set whose scalars l
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         If All Scalars is checked, then a cell is only included in the output if all its points are within the threshold. This is only relevant when thresholding by a point-centered array.
+       </Documentation>
      </IntVectorProperty>
    <!-- End Threshold -->
    </SourceProxy>
@@ -2837,6 +3485,9 @@ The Contour filter operates on any type of data set, but the input is required t
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="point"
                             number_of_components="1"/>
+          <Documentation>
+            Set the input to the Contour filter.
+          </Documentation>
      </InputProperty>
 
      <StringVectorProperty 
@@ -2844,12 +3495,16 @@ The Contour filter operates on any type of data set, but the input is required t
         command="SetInputArrayToProcess"
         number_of_elements="5"
         element_types="0 0 0 0 2"
-        animateable="0"> 
+        animateable="0"
+        label="Scalars">
           <ArrayListDomain name="array_list" attribute_type="Scalars">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
             </RequiredProperties>
           </ArrayListDomain>
+          <Documentation>
+            Choose which scalar array you want to contour.
+          </Documentation>
      </StringVectorProperty>
 
      <DoubleVectorProperty
@@ -2866,7 +3521,10 @@ The Contour filter operates on any type of data set, but the input is required t
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
             </RequiredProperties>
-          </ArrayRangeDomain>         
+          </ArrayRangeDomain>
+          <Documentation>
+            Specify the current contour values.
+          </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -2876,6 +3534,9 @@ The Contour filter operates on any type of data set, but the input is required t
         default_values="1" 
         animateable="0"> 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to compute normals.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -2885,6 +3546,9 @@ The Contour filter operates on any type of data set, but the input is required t
         default_values="0" 
         animateable="0"> 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to compute gradients.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -2894,6 +3558,9 @@ The Contour filter operates on any type of data set, but the input is required t
         default_values="0" 
         animateable="0"> 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to compute scalars.
+       </Documentation>
      </IntVectorProperty>
      <Hints>
        <Visibility replace_input="0" />
@@ -2928,32 +3595,43 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
                             number_of_components="1" optional="1"/>
           <InputArrayDomain name="input_array2" attribute_type="point"
                             number_of_components="3" optional="1"/>
+          <Documentation>
+            Set the input to the Glyph filter.
+          </Documentation>
      </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SetInputArrayToProcess"
         number_of_elements="5"
-        element_types="0 0 0 0 2"> 
+        element_types="0 0 0 0 2"
+        label="Scalars">
           <ArrayListDomain name="array_list" attribute_type="Scalars" 
                input_domain_name="input_array1">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
             </RequiredProperties>
           </ArrayListDomain>
+          <Documentation>
+            Select the scalar array on which to operate.
+          </Documentation>
      </StringVectorProperty>
 
      <StringVectorProperty 
         name="SelectInputVectors" 
         command="SetInputArrayToProcess"
         number_of_elements="5"
-        element_types="0 0 0 0 2"> 
+        element_types="0 0 0 0 2"
+        label="Vectors">
           <ArrayListDomain name="array_list" attribute_type="Vectors"
                input_domain_name="input_array2">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
             </RequiredProperties>
           </ArrayListDomain>
+          <Documentation>
+            Select the vector array on which to operate.
+          </Documentation>
      </StringVectorProperty>
 
      <InputProperty
@@ -2971,6 +3649,9 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
               <Proxy group="sources" name="ConeSource" />
               <Proxy group="sources" name="CylinderSource" />
            </ProxyListDomain>
+           <Documentation>
+             Select the type of glyph to use.
+           </Documentation>
       </InputProperty>
 
      <IntVectorProperty 
@@ -2980,6 +3661,9 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Choose whether to orient the glyphs based on the selected vector array.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -2994,6 +3678,9 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
          <Entry value="2" text="vector_components"/>
          <Entry value="3" text="off"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose whether/how to scale the glyphs.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -3018,22 +3705,33 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
             <Property name="SelectInputVectors" function="ArraySelection"/>
          </RequiredProperties>
        </ArrayRangeDomain>
+       <Documentation>
+         This multiplier will be used to scale the glyphs before adding them to the output.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
         name="MaximumNumberOfPoints" 
         command="SetMaximumNumberOfPoints" 
         number_of_elements="1"
-        default_values="5000" >
+        default_values="5000"
+        label="Maximum Number of Points">
        <IntRangeDomain name="range" min="0"/>
+       <Documentation>
+         Set the maximum number of glyphs to produce.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
         name="UseMaskPoints" 
         command="SetUseMaskPoints" 
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1"
+        label="Mask Points"> 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to limit the maximum number of glyphs.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -3042,6 +3740,9 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to choose randomly which points to glyph.
+       </Documentation>
      </IntVectorProperty>
    <Hints>
      <!-- Visibility Element can be used to suggest the GUI about
@@ -3074,6 +3775,9 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
             <DataType value="vtkStructuredPoints"/>
             <DataType value="vtkStructuredGrid"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Extract Grid filter.
+          </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -3086,6 +3790,9 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
             <Property name="Input" function="Input"/>
          </RequiredProperties>
        </ExtentDomain>
+       <Documentation>
+       Set the minimum/maximum values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -3094,6 +3801,9 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
         animateable="1"
         number_of_elements="1" default_values="1">
        <IntRangeDomain name="range" min="1"/>
+       <Documentation>
+         Set the sampling rate in the I dimension.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -3102,6 +3812,9 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
         animateable="1"
         number_of_elements="1" default_values="1">
        <IntRangeDomain name="range" min="1"/>
+       <Documentation>
+         Set the sampling rate in the J dimension.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -3110,6 +3823,9 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
         command="SetSampleRateK"
         number_of_elements="1" default_values="1">
        <IntRangeDomain name="range" min="1"/>
+       <Documentation>
+         Set the sampling rate in the K dimension.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -3118,6 +3834,9 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to always include the boundary of the grid in the output.
+       </Documentation>
      </IntVectorProperty>
      <Hints>
        <Visibility replace_input="0" />
@@ -3145,6 +3864,9 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
           </DataTypeDomain>
           <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
           <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
+          <Documentation>
+            Set the input to the Data Analysis (Pick/Probe) filter.
+          </Documentation>
      </InputProperty>
 
      <InputProperty
@@ -3153,6 +3875,9 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
+           <Documentation>
+             Choose the dataset to probe with.
+           </Documentation>
      </InputProperty>
 
      <IntVectorProperty name="Mode"
@@ -3163,30 +3888,47 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
           <Entry text="Probe" value="0" />
           <Entry text="Pick" value="1" />
         </EnumerationDomain>
+        <Documentation>
+          Choose whether to perform a pick or probe.
+        </Documentation>
      </IntVectorProperty>
      <IntVectorProperty name="Id"
         command="SetId"
         number_of_elements="1"
         default_values="0">
         <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the Id of the point or cell to pick.
+        </Documentation>
      </IntVectorProperty>
      <IntVectorProperty name="UseIdToPick"
         command="SetUseIdToPick"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        label="Use Id to Pick">
         <BooleanDomain name="bool" />
+        <Documentation>
+          Select whether to pick based on a point or cell Id.
+        </Documentation>
      </IntVectorProperty>
      <IntVectorProperty name="PickCell"
         command="SetPickCell"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        label="Pick Cells">
         <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle whether to pick cells or points.
+        </Documentation>
      </IntVectorProperty>
      <DoubleVectorProperty
          name="WorldPoint"
          command="SetWorldPoint"
          number_of_elements="3"
          default_values="0 0 0" >
+         <Documentation>
+           Pick the cell or point closest to this world point.  The 'p' key can be used to select a point under the cursor.
+         </Documentation>
       </DoubleVectorProperty>
    <!-- End PickProbe -->
    </SourceProxy>
@@ -3214,6 +3956,9 @@ The Probe filter operates on any type of data and produces polygonal output (a p
           <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
           <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
           <InputArrayDomain name="input_array" attribute_type="point"/>
+          <Documentation>
+            Select the dataset from which to obtain probe values.
+          </Documentation>
      </InputProperty>
 
      <InputProperty
@@ -3222,6 +3967,9 @@ The Probe filter operates on any type of data and produces polygonal output (a p
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
+           <Documentation>
+             Select the dataset whose geometry will be used in determining positions to probe.
+           </Documentation>
       </InputProperty>
    <!-- End Probe -->
    </SourceProxy>
@@ -3253,6 +4001,9 @@ The Probe filter operates on any type of data and produces polygonal output (a p
           <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
           <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
           <InputArrayDomain name="input_array" attribute_type="point"/>
+          <Documentation>
+            Select the dataset from which to obtain probe values.
+          </Documentation>
      </InputProperty>
 
      <InputProperty
@@ -3265,6 +4016,9 @@ The Probe filter operates on any type of data and produces polygonal output (a p
              <Proxy group="extended_sources" name="LineSource" />
              <Proxy group="extended_sources" name="PointSource" />
            </ProxyListDomain>
+           <Documentation>
+             Select the dataset whose geometry will be used in determining positions to probe.
+           </Documentation>
       </InputProperty>
       <Hints>
         <Visibility replace_input="0" />
@@ -3284,6 +4038,9 @@ The Probe filter operates on any type of data and produces polygonal output (a p
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the temporal probe filter.
+          </Documentation>
     </InputProperty>
  
     <Property
@@ -3299,6 +4056,9 @@ The Probe filter operates on any type of data and produces polygonal output (a p
        number_of_elements="1"
        default_values="0.0" >
           <DoubleRangeDomain name="range" min="0" max="1" />
+          <Documentation>
+            Specify the time value at which to probe.
+          </Documentation>
     </DoubleVectorProperty>
     <Hints>
       <Visibility replace_input="0" />
@@ -3317,6 +4077,9 @@ The Probe filter operates on any type of data and produces polygonal output (a p
           <DataTypeDomain name="input_type">
             <DataType value="vtkUnstructuredGrid"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Temporal Pick filter.
+          </Documentation>
     </InputProperty>
  
     <Property
@@ -3332,17 +4095,24 @@ The Probe filter operates on any type of data and produces polygonal output (a p
        number_of_elements="1"
        default_values="0.0" >
           <DoubleRangeDomain name="range" min="0" max="1" />
+          <Documentation>
+            Specify the time value at which to perform a pick.
+          </Documentation>          
     </DoubleVectorProperty>
 
     <IntVectorProperty 
        name="PointOrCell" 
        command="SetPointOrCell" 
        number_of_elements="1"
-       default_values="0" >
+       default_values="0"
+       label="Point or Cell">
        <EnumerationDomain name="enum">
          <Entry value="0" text="On"/>
          <Entry value="1" text="Off"/>
        </EnumerationDomain>
+       <Documentation>
+         Select whether to pick a point (0) or cell (1).
+       </Documentation>
     </IntVectorProperty>
     <Hints>
        <Visibility replace_input="0" />
@@ -3378,6 +4148,9 @@ This filter operates on any type of data set, provided it has point-centered vec
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="point"
                             number_of_components="3"/>
+          <Documentation>
+            Set the input to the Stream Tracer filter.
+          </Documentation>
      </InputProperty>
 
      <InputProperty
@@ -3390,6 +4163,9 @@ This filter operates on any type of data set, provided it has point-centered vec
               <Proxy group="extended_sources" name="PointSource" />
               <Proxy group="extended_sources" name="LineSource" />
            </ProxyListDomain>
+           <Documentation>
+             Specify the seed points for generating the streamlines.
+           </Documentation>
       </InputProperty>
 
      <StringVectorProperty 
@@ -3397,12 +4173,16 @@ This filter operates on any type of data set, provided it has point-centered vec
         command="SetInputArrayToProcess"
         number_of_elements="5"
         element_types="0 0 0 0 2"
-        animateable="0"> 
+        animateable="0"
+        label="Vectors">
            <ArrayListDomain name="array_list" attribute_type="Vectors">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <Documentation>
+             Choose the vector array from which to generate streamlines.
+           </Documentation>
      </StringVectorProperty>
 
      <IntVectorProperty
@@ -3421,6 +4201,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="0" text="Time"/>
          <Entry value="1" text="Length"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the unit for specifying the maximum streamline length.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -3434,6 +4217,9 @@ This filter operates on any type of data set, provided it has point-centered vec
             <Property name="Input" function="Input"/>
          </RequiredProperties>
        </BoundsDomain>
+       <Documentation>
+         Specify the maximum streamline length.
+       </Documentation>       
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -3447,6 +4233,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the unit for specifying the initial integration step.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -3456,6 +4245,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="0.5" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Specify the initial integration step.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -3468,6 +4260,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="1" text="BACKWARD"/>
          <Entry value="2" text="BOTH"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the integration direction.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -3480,6 +4275,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="1" text="Runge-Kutta 4"/>
          <Entry value="2" text="Runge-Kutta 4-5"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the type of integrator to use.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -3488,6 +4286,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="0.000001" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Set the maximum error allowed in the integration. The meaning of this value depends on the integrator chosen.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -3501,6 +4302,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the unit to use for specifying the minimum integration step.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -3510,6 +4314,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="0.01" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Specify the minimum integration step.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -3523,6 +4330,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the unit to use for specifying the maximum integration step.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -3532,6 +4342,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="0.01" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Specify the maximum integration step.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -3541,6 +4354,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="2000" >
        <IntRangeDomain name="range"/>
+       <Documentation>
+         Specify the maximum number of steps used in the integration.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -3550,6 +4366,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="0.000000000001" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         If at any point the speed is below this value, the integration is terminated.
+       </Documentation>
      </DoubleVectorProperty>
      <Hints>
        <Visibility replace_input="0" />
@@ -3560,6 +4379,11 @@ This filter operates on any type of data set, provided it has point-centered vec
    <SourceProxy name="StructuredGridOutlineFilter" 
                 class="vtkStructuredGridOutlineFilter"
                 label="Outline (curvilinear)">
+      <Documentation
+         long_help="This filter generates an outline representation of the input."
+         short_help="Generates an outline.">
+The Outline filter generates an outline of the outside edges of the input data set. The Input menu specifies the data set for which to create an outline. This filter operates structured grid data sets and produces polygonal output.
+      </Documentation>
       <InputProperty
          name="Input"
          command="SetInputConnection">
@@ -3570,8 +4394,11 @@ This filter operates on any type of data set, provided it has point-centered vec
            <DataTypeDomain name="input_type">
              <DataType value="vtkStructuredGrid"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the outline (curvilinear) filter.
+           </Documentation>
       </InputProperty>
-   <!-- End Balance -->
+   <!-- End StructuredGridOutlineFilter -->
    </SourceProxy>
 
    <SourceProxy name="Pick" class="vtkPickFilter">
@@ -3593,6 +4420,9 @@ The Pick filter operates on any type of data and produces unstructured grid outp
            <DataTypeDomain name="input_type" composite_data_supported="0">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Pick filter.
+           </Documentation>
       </InputProperty>
 
       <DoubleVectorProperty
@@ -3600,28 +4430,39 @@ The Pick filter operates on any type of data and produces unstructured grid outp
          command="SetWorldPoint"
          number_of_elements="3"
          default_values="0 0 0" >
+         <Documentation>
+           Pick the cell or point closest to this world point.  The 'p' key can be used to select the point under the cursor.
+         </Documentation>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
         name="PickCell" 
         command="SetPickCell" 
         number_of_elements="1"
-        default_values="1" >
+        default_values="1"
+        label="Pick Type">
        <EnumerationDomain name="enum">
          <Entry value="0" text="Point"/>
          <Entry value="1" text="Cell"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose whether to pick a point or a cell.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
         name="UseIdToPick" 
         command="SetUseIdToPick" 
         number_of_elements="1"
-        default_values="0" >
+        default_values="0"
+        label="Use Id to Pick">
        <EnumerationDomain name="enum">
          <Entry value="0" text="Off"/>
          <Entry value="1" text="On"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose whether to pick a point/cell by Id.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -3629,6 +4470,9 @@ The Pick filter operates on any type of data and produces unstructured grid outp
         command="SetId" 
         number_of_elements="1"
         default_values="0" >
+        <Documentation>
+          If picking by Id, specify the point or cell Id.
+        </Documentation>
      </IntVectorProperty>
 
    </SourceProxy>
@@ -3637,9 +4481,9 @@ The Pick filter operates on any type of data and produces unstructured grid outp
     <Documentation
        long_help="Clip with an implicit plane, sphere or with scalars. Clipping does not reduce the dimensionality of the data set.  This output data type of this filter is always an unstructured grid."
        short_help="Clip with an implicit plane, sphere or with scalars.">
-The Clip filter cuts away a portion of the input data set using a plane, a sphere, a box, or a scalar value. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget (plane, sphere, or box) is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 7.4.
+The Generic Clip filter cuts away a portion of the input data set using a plane, a sphere, a box, or a scalar value. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget (plane, sphere, or box) is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 7.4.
 If an implicit function is selected, the clip filter returns that portion of the input data set that lies inside the function. If Scalars is selected, then the user must specify a scalar array to clip according to. The clip filter will return the portions of the data set whose value in the selected Scalars array is larger than the Clip value. Regardless of the selection from the Clip Function menu, if the Inside Out option is checked, the opposite portions of the data set will be returned.
-This filter operates on all types of data sets, and it returns unstructured grid data on output. This filter is available on the toolbar.
+This filter operates on all types of data sets, and it returns unstructured grid data on output.
     </Documentation>
     <InputProperty
        name="Input"
@@ -3653,6 +4497,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="point"
                             optional="1"/>
+          <Documentation>
+            Set the input to the Generic Clip filter.
+          </Documentation>
      </InputProperty>
 
      <ProxyProperty name="ClipFunction" command="SetClipFunction">
@@ -3666,6 +4513,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>
+           <Documentation>
+             Set the parameters of the clip function.
+           </Documentation>
      </ProxyProperty>
 
      <DoubleVectorProperty
@@ -3683,6 +4533,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Choose which portion of the dataset should be clipped away.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -3696,6 +4549,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
             </RequiredProperties>
           </ArrayRangeDomain>         
           <DoubleRangeDomain name="range"/>
+          <Documentation>
+            If clipping with a scalar array, choose the clipping value.
+          </Documentation>
      </DoubleVectorProperty>
    <!-- End GenericClip -->
    </SourceProxy>
@@ -3704,10 +4560,10 @@ This filter operates on all types of data sets, and it returns unstructured grid
     <Documentation
        long_help="Generate isolines or isosurfaces using point scalars."
        short_help="Generate isolines or isosurfaces.">
-The Contour filter computes isolines or isosurfaces using a selected point-centered scalar array. The available scalar arrays are listed in the Scalars menu. The scalar range of the selected array will be displayed.
+The Generic Contour filter computes isolines or isosurfaces using a selected point-centered scalar array. The available scalar arrays are listed in the Scalars menu. The scalar range of the selected array will be displayed.
 The interface for adding contour values is very similar to the one for selecting cut offsets (in the Cut filter). To add a single contour value, select the value from the New Value slider in the Add value portion of the interface and click the Add button, or press Enter. To instead add several evenly spaced contours, use the controls in the Generate range of values section. Select the number of contour values to generate using the Number of Values slider. The Range slider controls the interval in which to generate the contour values. Once the number of values and range have been selected, click the Generate button. The new values will be added to the Contour Values list. To delete a value from the Contour Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list. If no values are in the Contour Values list when Accept is pressed, the current value of the New Value slider will be used.
 In addition to selecting contour values, you can also select additional computations to perform. If any of Compute Normals, Compute Gradients, or Compute Scalars is selected, the appropriate computation will be performed, and a corresponding point-centered array will be added to the output.
-The Contour filter operates on any type of data set, but the input is required to have at least one point-centered scalar (single-component) array. The output of this filter is polygonal. This filter is available on the Toolbar.
+The Generic Contour filter operates on a generic data set, but the input is required to have at least one point-centered scalar (single-component) array. The output of this filter is polygonal.
     </Documentation>
     <InputProperty
        name="Input"
@@ -3721,6 +4577,9 @@ The Contour filter operates on any type of data set, but the input is required t
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="point"
                             number_of_components="1" optional="1"/>
+          <Documentation>
+            Set the input to the Generic Contour filter.
+          </Documentation>
      </InputProperty>
 
      <DoubleVectorProperty
@@ -3736,7 +4595,10 @@ The Contour filter operates on any type of data set, but the input is required t
             <RequiredProperties>
                <Property name="Input" function="Input"/>
             </RequiredProperties>
-          </ArrayRangeDomain>         
+          </ArrayRangeDomain>
+          <Documentation>
+            Specify the current contour values.
+          </Documentation>          
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -3746,6 +4608,9 @@ The Contour filter operates on any type of data set, but the input is required t
         default_values="1" 
         animateable="0"> 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to compute normals.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -3755,6 +4620,9 @@ The Contour filter operates on any type of data set, but the input is required t
         default_values="0" 
         animateable="0"> 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to compute gradients.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -3764,6 +4632,9 @@ The Contour filter operates on any type of data set, but the input is required t
         default_values="0" 
         animateable="0"> 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to compute scalars.
+       </Documentation>
      </IntVectorProperty>
      <Hints>
        <Visibility replace_input="0" />
@@ -3775,9 +4646,9 @@ The Contour filter operates on any type of data set, but the input is required t
     <Documentation
        long_help="This filter cuts a data set with a plane or sphere.  Cutting is similar to a contour.  It creates surfaces from volumes and lines from surfaces."
        short_help="Cut datasets with planes or spheres.">
-The Cut filter extracts the portion of the input data set that lies along the specified plane or sphere. From the Cut Function menu, you can select whether cutting will be performed with a plane or a sphere. The appropriate 3D widget (plane widget or sphere widget) will be displayed. The parameters of the cut function can be specified interactively using the 3D widget or manually using the traditional user interface controls. Instructions for using these 3D widgets and their corresponding user interfaces are found in section 7.4.
+The Generic Cut filter extracts the portion of the input data set that lies along the specified plane or sphere. From the Cut Function menu, you can select whether cutting will be performed with a plane or a sphere. The appropriate 3D widget (plane widget or sphere widget) will be displayed. The parameters of the cut function can be specified interactively using the 3D widget or manually using the traditional user interface controls. Instructions for using these 3D widgets and their corresponding user interfaces are found in section 7.4.
 By default, the cut lies on the specified plane or sphere. Using the Cut Offset Values portion of the interface, it is also possible to cut the data set at some offset from the original cut function. The Cut Offset Values are in the spatial units of the data set. To add a single offset, select the value from the New Value slider in the Add value portion of the interface and click the Add button, or press Enter. To instead add several evenly spaced offsets, use the controls in the Generate range of values section. Select the number of offsets to generate using the Number of Values slider. The Range slider controls the interval in which to generate the offsets. Once the number of values and range have been selected, click the Generate button. The new offsets will be added to the Offset Values list. To delete a value from the Cut Offset Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list.
-The Cut filter takes any type of data set as input. Use the Input menu to choose a data set to cut. The output of this filter is polygonal data. This filter is available on the Toolbar.
+The Generic Cut filter takes a generic dataset as input. Use the Input menu to choose a data set to cut. The output of this filter is polygonal data.
     </Documentation>
     <InputProperty
        name="Input"
@@ -3789,6 +4660,9 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
           <DataTypeDomain name="input_type">
             <DataType value="vtkGenericDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Generic Cut filter.
+          </Documentation>
      </InputProperty>
 
      <ProxyProperty name="CutFunction" command="SetCutFunction">
@@ -3802,6 +4676,9 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>
+           <Documentation>
+             Set the parameters to the implicit function used for cutting.
+           </Documentation>
      </ProxyProperty>
 
      <DoubleVectorProperty
@@ -3826,6 +4703,9 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
               <Property name="Input" function="Input"/>
             </RequiredProperties>
           </BoundsDomain>
+          <Documentation>
+            Specify a list of current offset values. This can be used to create multiple cuts with different centers. Each entry represents a new cut with center shifted by the offset value.
+          </Documentation>
      </DoubleVectorProperty>
      <Hints>
        <Visibility replace_input="0" />
@@ -3849,6 +4729,9 @@ Extract geometry from a higher-order dataset.
            <DataTypeDomain name="input_type">
              <DataType value="vtkGenericDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Generic Geometry Filter.
+           </Documentation>
       </InputProperty>
 
    <!-- End GenericGeometryFilter -->
@@ -3859,7 +4742,7 @@ Extract geometry from a higher-order dataset.
      <Documentation
        long_help="This filter generates a bounding box representation of the input."
        short_help="Generates a bounding box.">
-The Outline filter generates an axis-aligned bounding box for the input data set. The Input menu specifies the data set for which to create a bounding box. This filter operates on any type of data set and produces polygonal output.
+The Generic Outline filter generates an axis-aligned bounding box for the input data set. The Input menu specifies the data set for which to create a bounding box. This filter operates on generic data sets and produces polygonal output.
      </Documentation>
       
      <InputProperty
@@ -3872,6 +4755,9 @@ The Outline filter generates an axis-aligned bounding box for the input data set
            <DataTypeDomain name="input_type">
              <DataType value="vtkGenericDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Generic Outline filter.
+           </Documentation>
       </InputProperty>
      <Hints>
        <Visibility replace_input="0" />
@@ -3884,13 +4770,13 @@ The Outline filter generates an axis-aligned bounding box for the input data set
     <Documentation
        long_help="Integrate streamlines in a vector field."
        short_help="Integrate streamlines in a vector field.">
-The Stream Tracer filter generates streamlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 7.4.
+The Generic Stream Tracer filter generates streamlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 7.4.
 The Max. Propagation entry box allows you to specify the maximum length of the streamlines. From the Max. Propagation menu, you can select the units to be either Time (the time a particle would travel with steady flow) or Length (in the data set's spatial coordinates).
 The Init. Step Len. menu and entry specify the initial step size for integration. (For non-adaptive integrators, Runge-Kutta 2 and 4, the initial step size is used throughout the integration.) The menu allows you to specify the units. Time and Length have the same meaning as for Max. Propagation. Cell Length specifies the step length as a number of cells.
 The Integration Direction menu determines in which direction(s) the stream trace will be generated: FORWARD, BACKWARD, or BOTH.
 The Integrator Type section of the interface determines which calculation to use for integration: Runge-Kutta 2, Runge-Kutta 4, or Runge-Kutta 4-5. If Runge-Kutta 4-5 is selected, controls are displayed for specifying the minimum and maximum step length and the maximum error. The controls for specifying Min. Step Len. and Max. Step Len. are the same as those for Init. Step Len. The Runge-Kutta 4-5 integrator tries to choose the step size so that the estimated error is less than the value of the Maximum Error entry.
 If the integration takes more than Max. Steps to complete, if the speed goes below Term. Speed, if Max. Propagation is reached, or if a boundary of the input data set is crossed, integration terminates.
-This filter operates on any type of data set, provided it has point-centered vectors. The output is polygonal data containing polylines. This filter is available on the Toolbar.
+This filter operates on any type of data set, provided it has point-centered vectors. The output is polygonal data containing polylines.
     </Documentation>
        
     <InputProperty
@@ -3907,6 +4793,9 @@ This filter operates on any type of data set, provided it has point-centered vec
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="point"
                             number_of_components="3"/>
+          <Documentation>
+            Set the input to the Generic Stream Tracer filter.
+          </Documentation>
      </InputProperty>
 
      <InputProperty
@@ -3915,9 +4804,12 @@ This filter operates on any type of data set, provided it has point-centered vec
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
-         <DataTypeDomain name="input_type">
-            <DataType value="vtkDataSet"/>
-          </DataTypeDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <Documentation>
+             Specify the seed points for generating the streamlines.
+           </Documentation>
       </InputProperty>
 
      <!-- This is a hack used to bypass the fact that ParaView
@@ -3934,6 +4826,9 @@ This filter operates on any type of data set, provided it has point-centered vec
              <Property name="Input" function="Input"/>
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the radius of the point cloud for setting seed points.
+        </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty
@@ -3951,6 +4846,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="0" text="Time"/>
          <Entry value="1" text="Length"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the unit for specifying the maximum streamline length.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -3963,6 +4861,9 @@ This filter operates on any type of data set, provided it has point-centered vec
             <Property name="Input" function="Input"/>
          </RequiredProperties>
        </BoundsDomain>
+       <Documentation>
+         Specify the maximum streamline length.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -3975,6 +4876,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the unit for specifying the initial integration step.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -3983,6 +4887,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="0.5" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Specify the initial integration step.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -3995,6 +4902,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="1" text="BACKWARD"/>
          <Entry value="2" text="BOTH"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the integration direction.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -4007,6 +4917,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="1" text="Runge-Kutta 4"/>
          <Entry value="2" text="Runge-Kutta 4-5"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the type of integrator to use.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -4015,6 +4928,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="0.000001" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Set the maximum error allowed in the integration. The meaning of this value depends on the integrator chosen.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -4027,6 +4943,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the unit to use for specifying the minimum integration step.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -4035,6 +4954,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="0.01" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Specify the minimum integration step.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -4047,6 +4969,9 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose the unit to use for specifying the maximum integration step.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -4055,6 +4980,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="0.01" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Specify the maximum integration step.
+       </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -4063,6 +4991,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="2000" >
        <IntRangeDomain name="range"/>
+       <Documentation>
+         Specify the maximum number of steps used in the integration.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -4071,6 +5002,9 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="0.000000000001" >
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         If at any point the speed is below this value, the integration is terminated.
+       </Documentation>
      </DoubleVectorProperty>
      <Hints>
        <Visibility replace_input="0" />
@@ -4095,6 +5029,9 @@ Tessellate a higher-order dataset.
            <DataTypeDomain name="input_type">
              <DataType value="vtkGenericDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Generic Tessellator filter.
+           </Documentation>
       </InputProperty>
 
    <!-- End GenericTessellator -->
@@ -4119,6 +5056,9 @@ Groups multiple datasets to create a multigroup dataset
            <DataTypeDomain name="input_type" composite_data_supported="1">
              <DataType value="vtkDataObject"/>
            </DataTypeDomain>
+           <Documentation>
+             Select the inputs to the Group Datasets filter.
+           </Documentation>
      </InputProperty>
      <Hints>
        <Visibility replace_input="0" />
@@ -4143,6 +5083,9 @@ This filter uses colors to show levels of a hiearchical dataset.
            <DataTypeDomain name="input_type">
              <DataType value="vtkMultiGroupDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Level Scalars filter.
+           </Documentation>
      </InputProperty>
    <!-- End GroupIdScalars -->
    </SourceProxy>
@@ -4156,6 +5099,9 @@ This filter uses colors to show levels of a hiearchical dataset.
             <Group name="filters"/>
           </ProxyGroupDomain>
           <!-- Does this have any data type domain? -->
+          <Documentation>
+            Set the input to the Geoemtry Filter.
+          </Documentation>
       </InputProperty>
       <IntVectorProperty
         name="UseStrips"
@@ -4164,6 +5110,9 @@ This filter uses colors to show levels of a hiearchical dataset.
         default_values="0"
         animateable="0">
         <BooleanDomain name="bool"/> 
+        <Documentation>
+          Toggle whether to generate faces containing triangle strips. This should render faster and use less memory, but no cell data is copied.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty
         name="UseOutline"
@@ -4172,6 +5121,9 @@ This filter uses colors to show levels of a hiearchical dataset.
         default_values="0"
         animateable="0">
         <BooleanDomain name="bool"/>
+        <Documentation>
+          Toggle whether to generate an outline or a surface.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty
         name="PassThroughIds"
@@ -4180,6 +5132,9 @@ This filter uses colors to show levels of a hiearchical dataset.
         default_values="1"
         animateable="0">
         <BooleanDomain name="bool"/> 
+        <Documentation>
+          If on, the output polygonal dataset will have a celldata array that holds the cell index of the original 3D cell that produced each output cell. This is useful for cell picking.
+        </Documentation>
       </IntVectorProperty>
     <!-- End GeometryFilter -->
     </SourceProxy>
@@ -4191,6 +5146,9 @@ This filter uses colors to show levels of a hiearchical dataset.
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
+        <Documentation>
+          Set the input to the Ordered Composite Distributor filter.
+        </Documentation>
       </InputProperty>
       <IntVectorProperty name="PassThrough"
                          command="SetPassThrough"
@@ -4198,15 +5156,24 @@ This filter uses colors to show levels of a hiearchical dataset.
                          default_values="0"
                          animateable="0">
         <BooleanDomain name="bool"/>
+        <Documentation>
+          Toggle whether to pass the data through without compositing.
+        </Documentation>
       </IntVectorProperty>
       <ProxyProperty name="PKdTree" command="SetPKdTree">
         <ProxyGroupDomain name="groups">
           <Group name="locators"/>
         </ProxyGroupDomain>
+        <Documentation>
+          Set the vtkPKdTree to distribute with.
+        </Documentation>
       </ProxyProperty>
       <StringVectorProperty name="OutputType"
                             command="SetOutputType"
                             number_of_elements="1">
+        <Documentation>
+          When not empty, the output will be converted to the given type.
+        </Documentation>
       </StringVectorProperty>
     <!-- End OrderedCompositeDistributor -->
     </SourceProxy>
@@ -4221,6 +5188,9 @@ This filter uses colors to show levels of a hiearchical dataset.
             <Group name="filters"/>
           </ProxyGroupDomain>
           <!-- Does this have any data type domain? -->
+          <Documentation>
+            Set the input to the Update Suppressor filter.
+          </Documentation>
       </InputProperty>
       <Property
         name="ForceUpdate"
@@ -4254,6 +5224,9 @@ This filter uses colors to show levels of a hiearchical dataset.
         number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle whether the update suppressor is enabled.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty
         name="UpdateTime"
@@ -4276,6 +5249,9 @@ This filter uses colors to show levels of a hiearchical dataset.
             <Group name="filters"/>
           </ProxyGroupDomain>
           <!-- Does this have any data type domain? -->
+          <Documentation>
+            Set the input to the MPI Move Data filter.
+          </Documentation>
       </InputProperty>
       <IntVectorProperty
         name="MoveMode"
@@ -4288,6 +5264,9 @@ This filter uses colors to show levels of a hiearchical dataset.
           <Entry value="1" text="Collect" />
           <Entry value="2" text="Clone" />
         </EnumerationDomain>
+        <Documentation>
+          Specify how the data is to be redistributed.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty
         name="OutputDataType"
@@ -4299,6 +5278,9 @@ This filter uses colors to show levels of a hiearchical dataset.
           <Entry value="0" text="PolyData" />
           <Entry value="4" text="Unstructured Grid" />
         </EnumerationDomain>
+        <Documentation>
+          Specify the type of the dataset.
+        </Documentation>
       </IntVectorProperty>
     <!-- End MPIMoveData -->
     </SourceProxy>
@@ -4310,6 +5292,9 @@ This filter uses colors to show levels of a hiearchical dataset.
             <Group name="sources"/>
             <Group name="filters"/>
           </ProxyGroupDomain>
+          <Documentation>
+            Set the input to the Client Server Move Data filter.
+          </Documentation>
       </InputProperty>
     <!-- End ClientServerMoveData -->
     </SourceProxy>
@@ -4321,12 +5306,21 @@ This filter uses colors to show levels of a hiearchical dataset.
             <Group name="sources"/>
             <Group name="filters"/>
           </ProxyGroupDomain>
+          <Documentation>
+            Set the input to the Reduction filter.
+          </Documentation>
       </InputProperty>
       <ProxyProperty name="PreGatherHelper"
          command="SetPreGatherHelper">
+         <Documentation>
+           Set the algorithm that runs on each node in parallel.
+         </Documentation>
       </ProxyProperty>
       <ProxyProperty name="PostGatherHelper"
          command="SetPostGatherHelper">
+         <Documentation>
+           Set the algorithm that takes multiple inputs and produces a single reduced output.
+         </Documentation>
       </ProxyProperty>
       <IntVectorProperty 
          name="PassThrough" 
@@ -4334,6 +5328,9 @@ This filter uses colors to show levels of a hiearchical dataset.
          number_of_elements="1"
          default_values="-1"> 
         <IntRangeDomain name="range" min="-1"/>
+        <Documentation>
+          If set to a non-negative value, then produce results using only the node Id specified.
+        </Documentation>
      </IntVectorProperty>
 
     <!-- End ReductionFilter -->
@@ -4357,6 +5354,9 @@ This filter extracts a range of groups from a multigroup dataset
              <DataType value="vtkMultiGroupDataSet"/>
            </DataTypeDomain>
            <NumberOfGroupsDomain name="multi_group" multiplicity="multiple"/>
+           <Documentation>
+             Set the input to the Extract Group filter.
+           </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -4369,6 +5369,9 @@ This filter extracts a range of groups from a multigroup dataset
              <Property name="Input" function="Input"/>
           </RequiredProperties>
        </NumberOfGroupsDomain>
+       <Documentation>
+         Set the Ids of the minimum and maximum group to extract.
+       </Documentation>
      </IntVectorProperty>
    <!-- End ExtractLevel -->
    </SourceProxy>
@@ -4391,6 +5394,9 @@ This filter extracts a list of datasets from multigroup datasets.
            <DataTypeDomain name="input_type">
              <DataType value="vtkMultiGroupDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Extract Datasets filter.
+           </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -4398,7 +5404,11 @@ This filter extracts a list of datasets from multigroup datasets.
         command="AddDataSet"
         clean_command="ClearDataSetList"
         repeat_command="1"
-        number_of_elements_per_command="2"/>
+        number_of_elements_per_command="2">
+        <Documentation>
+          Choose the datasets to extract.
+        </Documentation>
+     </IntVectorProperty>
    <!-- End ExtractDataSets -->
    </SourceProxy>
 
@@ -4424,6 +5434,9 @@ This filter extracts a list of datasets from multigroup datasets.
        <DataTypeDomain name="input_type">
          <DataType value="vtkPointSet"/>
        </DataTypeDomain>
+       <Documentation>
+         Set the input to the Temporal Cache filter.
+       </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -4432,6 +5445,9 @@ This filter extracts a list of datasets from multigroup datasets.
         number_of_elements="1"
         default_values="0" > 
         <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle whether this filter will use the collected cache or simply behave as a pass-through filter.
+        </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -4444,6 +5460,9 @@ This filter extracts a list of datasets from multigroup datasets.
           <Entry value="1" text="CellData" />
           <Entry value="2" text="FieldData" />
         </EnumerationDomain>
+        <Documentation>
+          Choose whether point, cell, or field data is collected.
+        </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -4451,6 +5470,9 @@ This filter extracts a list of datasets from multigroup datasets.
         command="CollectAttributeData"
         number_of_elements="1"
         default_values="0">
+        <Documentation>
+          Set the time to collect the data attribute.
+        </Documentation>
      </DoubleVectorProperty>
 
      <Property
@@ -4476,6 +5498,9 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
        <DataTypeDomain name="input_type">
          <DataType value="vtkDataSet"/>
        </DataTypeDomain>
+       <Documentation>
+         Set the input to the Cell Select filter.
+       </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
@@ -4487,6 +5512,9 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
          <Entry value="0" text="Off"/>
          <Entry value="1" text="On"/>
        </EnumerationDomain>
+       <Documentation>
+         Choose how to determine if a cell is selected. If off, a cell is selected only if all of its points are inside the selected region. If on, only a portion of a cell must be inside for it to be selected.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -4498,6 +5526,9 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
          <Entry value="0" text="Off"/>
          <Entry value="1" text="On"/>
        </EnumerationDomain>
+       <Documentation>
+         Toggle whether new arrays are generated indicating whether a cell is selected (On) or whether a new dataset is created containing only the selected cells (Off).
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -4543,6 +5574,9 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Test Cut filter.
+          </Documentation>
      </InputProperty>
 
      <ProxyProperty name="CutFunction" command="SetCutFunction">
@@ -4556,6 +5590,9 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>
+           <Documentation>
+             Set the parameters of the cut function.
+           </Documentation>
      </ProxyProperty>
 
      <DoubleVectorProperty
@@ -4594,6 +5631,9 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
                           function="FieldDataSelection"/>
              </RequiredProperties>
           </InputArrayDomain>
+          <Documentation>
+            Set the input to the Histogram filter.
+          </Documentation>
      </InputProperty>
 
      <StringVectorProperty
@@ -4613,6 +5653,9 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
                <Property name="Input" function="Input"/>
             </RequiredProperties>
           </FieldDataDomain>
+          <Documentation>
+            Choose the array from which to compute the histogram.
+          </Documentation>
      </StringVectorProperty>
 
      <IntVectorProperty name="BinCount" 
@@ -4620,6 +5663,9 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
         number_of_elements="1" 
         default_values="10">
         <IntRangeDomain name="range" min="1" max="256"/>
+        <Documentation>
+          Set the number of bins for the histogram.
+        </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -4629,6 +5675,9 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
         default_values="0" 
         animateable="0"> 
         <IntRangeDomain name="range" min="0" max="15"/>
+        <Documentation>
+          Choose from which array component the histogram should be computed.
+        </Documentation>
      </IntVectorProperty>
 
      <Hints>
@@ -4655,6 +5704,9 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Rectilinear Grid Geometry filter.
+           </Documentation>
       </InputProperty>
          
    <!-- End RectilinearGridGeometryFilter -->
@@ -4680,6 +5732,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
            </DataTypeDomain>
           <InputArrayDomain name="input_array" number_of_components="1">
           </InputArrayDomain>
+          <Documentation>
+            Set the input to the Attribute Editor filter.
+          </Documentation>
       </InputProperty>
 
      <InputProperty
@@ -4691,6 +5746,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
+           <Documentation>
+             Specify the source object used when writing out data.
+           </Documentation>
       </InputProperty>
 
      <StringVectorProperty 
@@ -4703,6 +5761,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <Documentation>
+             Choose the scalar array.
+           </Documentation>
      </StringVectorProperty> 
 
      <ProxyProperty name="PickFunction" command="SetPickFunction">
@@ -4710,19 +5771,26 @@ This filter operates on all types of data sets, and it returns unstructured grid
                <Group name="implicit_functions"/>
                <Group name="3d_widgets"/>
            </ProxyGroupDomain>
+           <Documentation>
+             Adjust the parameters of the function used for picking.
+`          </Documentation>
      </ProxyProperty>
 
      <DoubleVectorProperty
         name="Value"
         command="SetAttributeValue"
         number_of_elements="1"
-        default_values="0.0" >
+        default_values="0.0"
+        label="Attribute Value">
           <ArrayRangeDomain name="scalar_range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
             </RequiredProperties>
-          </ArrayRangeDomain>         
+          </ArrayRangeDomain>
+          <Documentation>
+            Choose the scalar value to select with.
+          </Documentation>       
      </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -4730,6 +5798,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
          command="SetWorldPoint"
          number_of_elements="3"
          default_values="0 0 0" >
+         <Documentation>
+           Pick the node closest to this world point. The 'p' key can be used to select a node under the cursor.
+         </Documentation>
       </DoubleVectorProperty>  
    
      <IntVectorProperty 
@@ -4738,6 +5809,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle whether to perform editing.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -4746,6 +5820,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         When this flag is set, the next time the filter is executed, the arrays of edits will be deleted. This is meant to be used when a timestep change is about to occur.
+       </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -4754,6 +5831,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Toggle between a source view and a filter view.
+       </Documentation>
      </IntVectorProperty>
    <!-- End AttributeEditor -->
    </SourceProxy>
@@ -4775,6 +5855,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
            <DataTypeDomain name="input_type">
              <DataType value="vtkPolyData"/>
            </DataTypeDomain>
+           <Documentation>
+             Set the input to the Cell Select 2 filter.
+           </Documentation>
       </InputProperty>
       <Hints>
         <Visibility replace_input="0" />
@@ -4794,6 +5877,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Texture Map to Plane filter.
+          </Documentation>
      </InputProperty>
    <!-- End TextureMapToPlane -->
    </SourceProxy>
@@ -4810,6 +5896,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Texture Map to Sphere filter.
+          </Documentation>
      </InputProperty>
    <!-- End TextureMapToSphere -->
    </SourceProxy>
@@ -4826,11 +5915,16 @@ This filter operates on all types of data sets, and it returns unstructured grid
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Texture Map to Cylinder filter.
+          </Documentation>
      </InputProperty>
    <!-- End TextureMapToCylinder -->
    </SourceProxy>
 
-   <SourceProxy name="PolyLineToRectilinearGrid" class="vtkPolyLineToRectilinearGridFilter">
+   <SourceProxy name="PolyLineToRectilinearGrid"
+                class="vtkPolyLineToRectilinearGridFilter"
+                label="Polyline to Rectilinear Grid">
       <InputProperty
        name="Input"
        command="SetInputConnection">
@@ -4841,6 +5935,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <Documentation>
+            Set the input to the Polyline to Rectilinear Grid filter.
+          </Documentation>
      </InputProperty>     
    </SourceProxy>
 
@@ -4855,7 +5952,10 @@ This filter operates on all types of data sets, and it returns unstructured grid
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
-     </InputProperty>     
+          <Documentation>
+            Set the input to the Min Max filter.
+          </Documentation>
+     </InputProperty>
 
      <StringVectorProperty 
         name="Operation" 
@@ -4867,6 +5967,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
           <String value="MAX"/>
           <String value="SUM"/>
         </StringListDomain>
+        <Documentation>
+          Select whether to perform a min, max, or sum operation on the data.
+        </Documentation>
      </StringVectorProperty>
      
    </SourceProxy>
