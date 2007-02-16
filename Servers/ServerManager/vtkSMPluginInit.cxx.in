@@ -1,5 +1,7 @@
 
+#if @HAVE_XML@
 #include "@XML_HEADER@"
+#endif // HAVE_XML
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -10,10 +12,7 @@
 #define C_EXPORT extern "C"
 #endif
 
-class vtkClientServerInterpreter;
-
-extern "C" void @MODULE_NAME@_Initialize(vtkClientServerInterpreter *arlu);
-
+#if @HAVE_XML@
 namespace {
   class StaticInit
   {
@@ -36,6 +35,11 @@ C_EXPORT const char* C_DECL ParaViewPluginXML()
   static StaticInit staticinit;
   return staticinit.XMLString;
 }
+#endif // HAVE_XML
+
+#if @HAVE_SRCS@
+class vtkClientServerInterpreter;
+extern "C" void @MODULE_NAME@_Initialize(vtkClientServerInterpreter *arlu);
 
 // entry point to initialize this plugin with the client/server interpreter
 C_EXPORT void C_DECL ParaViewPluginInit(vtkClientServerInterpreter *arlu)
@@ -43,4 +47,5 @@ C_EXPORT void C_DECL ParaViewPluginInit(vtkClientServerInterpreter *arlu)
   @MODULE_NAME@_Initialize(arlu);
 }
 
+#endif // HAVE_SRCS
 
