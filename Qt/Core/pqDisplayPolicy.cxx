@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqDisplayPolicy.h"
 
-#include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSMAbstractViewModuleProxy.h"
@@ -61,71 +60,10 @@ pqDisplayPolicy::~pqDisplayPolicy()
 }
 
 //-----------------------------------------------------------------------------
-bool pqDisplayPolicy::canDisplay(const pqPipelineSource* source,
-  const pqGenericViewModule* view) const
-{
-  if (!source || !view)
-    {
-    return false;
-    }
-
-  if (source->getServer()->GetConnectionID() != 
-    view->getServer()->GetConnectionID())
-    {
-    return false;
-    }
-
-  // Based on type of view, we check is the source's output 
-  // is of the expected type.
-  QString viewProxyName = view->getProxy()->GetXMLName();
-  QString srcProxyName = source->getProxy()->GetXMLName();
-
-  if (viewProxyName == "BarChartViewModule")
-    {
-    vtkPVDataInformation* dataInfo = source->getDataInformation();
-    if (dataInfo)
-      {
-      int extent[6];
-      dataInfo->GetExtent(extent);
-      int non_zero_dims = 0;
-      for (int cc=0; cc < 3; cc++)
-        {
-        non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
-        }
-
-      return (dataInfo->GetDataClassName() == QString("vtkRectilinearGrid")) &&
-        (non_zero_dims == 1);
-      }
-    }
-  if (viewProxyName == "XYPlotViewModule")
-    {
-    if (srcProxyName == "Probe2")
-      {
-      return true;
-      }
-    vtkPVDataInformation* dataInfo = source->getDataInformation();
-    if (dataInfo)
-      {
-      int extent[6];
-      dataInfo->GetExtent(extent);
-      int non_zero_dims = 0;
-      for (int cc=0; cc < 3; cc++)
-        {
-        non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
-        }
-      return (dataInfo->GetDataClassName() == QString("vtkRectilinearGrid")) &&
-        (non_zero_dims == 1);
-      }
-    }
-
-  return true;
-}
-
-//-----------------------------------------------------------------------------
 vtkSMProxy* pqDisplayPolicy::newDisplayProxy(
   pqPipelineSource* source, pqGenericViewModule* view) const
 {
-  if (!this->canDisplay(source, view))
+  if(view && !view->canDisplaySource(source))
     {
     return NULL;
     }
@@ -216,7 +154,7 @@ pqConsumerDisplay* pqDisplayPolicy::createPreferredDisplay(
     return NULL;
     }
 
-  if (dont_create_view && !this->canDisplay(source, view))
+  if (dont_create_view && (view && !view->canDisplaySource(source)))
     {
     return NULL;
     }

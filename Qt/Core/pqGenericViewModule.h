@@ -109,7 +109,7 @@ public:
   /// view. This is a convenience method, it gets
   /// the pqDisplayPolicy object from the pqApplicationCore
   /// are queries it.
-  bool canDisplaySource(pqPipelineSource* source) const;
+  virtual bool canDisplaySource(pqPipelineSource* source) const = 0;
 
   /// Sets default values for the underlying proxy. This is typically called
   /// only on proxies created by the GUI itself.

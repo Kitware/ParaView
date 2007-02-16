@@ -184,10 +184,8 @@ void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
     {
     this->Internal->DisplayPanel = new pqDefaultDisplayPanel(display, this);
     
-    pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
     if(this->Internal->Display || !this->Internal->View ||
-       (policy && policy->canDisplay(this->Internal->Source,
-                                     this->Internal->View)))
+       this->Internal->View->canDisplaySource(this->Internal->Source))
       {
       // connect to visibility so we can create a view for it
       QObject::connect(this->Internal->DisplayPanel,
@@ -200,10 +198,7 @@ void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
       this->Internal->DisplayPanel->setEnabled(false);
       }
     }
-  
   this->layout()->addWidget(this->Internal->DisplayPanel);
-  
-  this->Internal->DisplayPanel->show();
 }
 
 //-----------------------------------------------------------------------------

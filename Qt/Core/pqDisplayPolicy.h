@@ -55,11 +55,6 @@ public:
   pqDisplayPolicy(QObject* p);
   virtual ~pqDisplayPolicy();
 
-  /// Returns if the given source can be displayed in the given view.
-  /// Current implementation returns true when view is NULL.
-  virtual bool canDisplay(
-    const pqPipelineSource* source, const pqGenericViewModule* view) const;
-
   /// Creates a new display proxy for the (source, view) pair and returns it.
   /// The caller must release the reference when it's done with the returned proxy.
   /// Both view and source must be non-null. If source cannot be displayed in the

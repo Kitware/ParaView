@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPlotViewModule.h"
 
+#include "vtkPVDataInformation.h"
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "vtkSMAbstractViewModuleProxy.h"
@@ -44,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QTimer>
 
+#include "pqServer.h"
 #include "pqDisplay.h"
 #include "pqHistogramChart.h"
 #include "pqHistogramWidget.h"
@@ -263,5 +265,56 @@ bool pqPlotViewModule::saveImage(int width, int height,
 
   QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
   return grabbedPixMap.save(filename);
+}
+
+bool pqPlotViewModule::canDisplaySource(pqPipelineSource* source) const
+{
+  if(!source || 
+     source->getServer()->GetConnectionID() !=
+     this->getServer()->GetConnectionID())
+    {
+    return false;
+    }
+
+  QString srcProxyName = source->getProxy()->GetXMLName();
+
+  if(this->getViewType() == this->barChartType())
+    {
+    vtkPVDataInformation* dataInfo = source->getDataInformation();
+    if (dataInfo)
+      {
+      int extent[6];
+      dataInfo->GetExtent(extent);
+      int non_zero_dims = 0;
+      for (int cc=0; cc < 3; cc++)
+        {
+        non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
+        }
+
+      return (dataInfo->GetDataClassName() == QString("vtkRectilinearGrid")) &&
+        (non_zero_dims == 1);
+      }
+    }
+  else if(this->getViewType() == this->XYPlotType())
+    {
+    if (srcProxyName == "Probe2")
+      {
+      return true;
+      }
+    vtkPVDataInformation* dataInfo = source->getDataInformation();
+    if (dataInfo)
+      {
+      int extent[6];
+      dataInfo->GetExtent(extent);
+      int non_zero_dims = 0;
+      for (int cc=0; cc < 3; cc++)
+        {
+        non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
+        }
+      return (dataInfo->GetDataClassName() == QString("vtkRectilinearGrid")) &&
+        (non_zero_dims == 1);
+      }
+    }
+  return false;
 }
 

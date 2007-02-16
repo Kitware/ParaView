@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplay.h"
 #include "pqHistogramTableModel.h"
 #include "pqPipelineSource.h"
+#include "pqServer.h"
 
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
@@ -128,3 +129,17 @@ void pqTableViewModule::forceRender()
   delete this->Implementation->Table->model();
   this->Implementation->Table->setModel(new QStandardItemModel());
 }
+  
+
+bool pqTableViewModule::canDisplaySource(pqPipelineSource* source) const
+{
+  if(!source ||
+     this->getServer()->GetConnectionID() !=
+     source->getServer()->GetConnectionID())
+    {
+    return false;
+    }
+  return true;
+}
+
+

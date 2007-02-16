@@ -138,6 +138,10 @@ public:
   /// undo/redo. Returns false by default. Subclassess must override
   /// if that's not the case.
   virtual bool supportsUndo() const { return true; }
+ 
+  // returns whether a source can be displayed in this view module 
+  virtual bool canDisplaySource(pqPipelineSource* source) const;
+
 public slots:
   // Toggle the orientation axes visibility.
   void setOrientationAxesVisibility(bool visible);

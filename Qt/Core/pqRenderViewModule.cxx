@@ -65,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqRenderViewProxy.h"
 #include "pqServer.h"
+#include "pqPipelineSource.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqTimeKeeper.h"
@@ -1007,4 +1008,16 @@ void pqRenderViewModule::linkToOtherView()
   linkWidget->move(pos);
   linkWidget->show();
 }
+  
+bool pqRenderViewModule::canDisplaySource(pqPipelineSource* source) const
+{
+  if(!source ||
+     this->getServer()->GetConnectionID() !=
+     source->getServer()->GetConnectionID())
+    {
+    return false;
+    }
+  return true;
+}
+
 

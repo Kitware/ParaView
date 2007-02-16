@@ -46,8 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqDisplay.h"
-#include "pqDisplayPolicy.h"
-#include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 
@@ -249,18 +247,6 @@ void pqGenericViewModule::onUpdateVTKObjects()
   this->Internal->VTKConnect->Disconnect(
     this->getProxy(), vtkCommand::UpdateEvent,
     this, SLOT(onUpdateVTKObjects()));
-}
-
-//-----------------------------------------------------------------------------
-bool pqGenericViewModule::canDisplaySource(pqPipelineSource* source) const
-{
-  pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
-  if (policy)
-    {
-    return policy->canDisplay(source, this);
-    }
-  qDebug() << "Application display policy has not been set.";
-  return false;
 }
 
 //-----------------------------------------------------------------------------

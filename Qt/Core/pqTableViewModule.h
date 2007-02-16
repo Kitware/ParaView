@@ -69,6 +69,8 @@ public:
   /// in the ServerManager.
   virtual void forceRender();
 
+  virtual bool canDisplaySource(pqPipelineSource* source) const;
+
 private slots:
   void visibilityChanged(pqDisplay* disp);
 

@@ -71,6 +71,8 @@ public:
   /// Request a delayed forceRender().
   virtual void render();
 
+  virtual bool canDisplaySource(pqPipelineSource* source) const;
+
 signals:
   /// Fired to update the internal VTK model.
   void modelUpdate();
