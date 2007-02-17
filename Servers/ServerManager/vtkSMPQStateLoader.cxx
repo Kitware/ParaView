@@ -25,7 +25,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.11");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.12");
 vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewRenderModuleProxy, 
   vtkSMMultiViewRenderModuleProxy);
 
@@ -84,7 +84,8 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
         if (!this->PQInternal->PreferredRenderModules.empty())
           {
           vtkSMRenderModuleProxy *renMod = this->PQInternal->PreferredRenderModules.front();
-          for(unsigned int i=0; i<this->MultiViewRenderModuleProxy->GetNumberOfProxies(); i++)
+          unsigned int i=0;
+          for(i=0; i<this->MultiViewRenderModuleProxy->GetNumberOfProxies(); i++)
             {
             if(this->MultiViewRenderModuleProxy->GetProxy(i) == renMod)
               {
