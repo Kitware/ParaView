@@ -348,8 +348,8 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
     }
 
   frame->LookmarkButton->show();
-  QObject::connect(frame->LookmarkButton, SIGNAL(pressed()),
-    this, SLOT(onLookmarkButtonPressed()));
+  QObject::connect(frame, SIGNAL(createLookmark()),
+    this, SLOT(onCreateLookmarkRequest()));
   frame->LookmarkButton->setEnabled(true);
 
   this->Internal->Frames.insert(frame, view);
@@ -900,9 +900,8 @@ void pqViewManager::frameDrop(pqMultiViewFrame* acceptingFrame,
     }
 }
 
-
 //-----------------------------------------------------------------------------
-void pqViewManager::onLookmarkButtonPressed()
+void pqViewManager::onCreateLookmarkRequest()
 {
   emit this->createLookmark(this->Internal->ActiveViewModule);
 }

@@ -120,8 +120,8 @@ public slots:
   void setActiveServer(pqServer* server);
 
   // Emits a signal to let listeners know that a lookmark 
-  // needs to be created of the active view
-  void onLookmarkButtonPressed();
+  // needs to be created for the active view
+  void onCreateLookmarkRequest();
 
 protected:
   /// Event filter callback.

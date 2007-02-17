@@ -100,6 +100,8 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
 
   this->connect(this->ActiveButton->defaultAction(), SIGNAL(triggered(bool)), 
                 SLOT(setActive(bool)));
+  QObject::connect(this->LookmarkButton, SIGNAL(pressed()),
+    this, SLOT(onLookmarkButtonPressed()));
   this->connect(this->CloseButton->defaultAction(), SIGNAL(triggered(bool)), 
                 SLOT(close()), Qt::QueuedConnection);
   this->connect(this->MaximizeButton->defaultAction(), 
@@ -391,4 +393,16 @@ void pqMultiViewFrame::showDecorations()
 {
 //  this->hideMenu(false);
   this->Menu->show();
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewFrame::onLookmarkButtonPressed()
+{
+  // make sure this frame's view is set as the active one
+  // FIXME: Is there a cleaner way to do this? 
+  // I thought of using the "pressed()" button signal to set the active view (since it needs to be done before anything else) 
+  // and the "clicked()" signal to emit 
+  // pqViewManager::createLookmark(pqGenericViewModule*) but would this cause a race condition?
+  this->setActive(true);
+  emit this->createLookmark();
 }
