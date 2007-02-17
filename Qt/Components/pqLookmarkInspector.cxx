@@ -251,8 +251,17 @@ void pqLookmarkInspector::onLookmarkSelectionChanged(const QItemSelection &selec
     this->Form->LookmarkName->setText(this->BrowserModel->getLookmarkName(this->CurrentSelection.at(0)));
     this->Form->LookmarkData->setText(this->BrowserModel->getLookmarkDataName(this->CurrentSelection.at(0)));
     this->Form->LookmarkComments->setText(this->BrowserModel->getLookmarkComments(this->CurrentSelection.at(0)));
-    this->Form->LookmarkIcon->setPixmap(QPixmap::fromImage(this->BrowserModel->getLargeLookmarkIcon(this->CurrentSelection.at(0))));
-    this->Form->LookmarkPipeline->setPixmap(QPixmap::fromImage(this->BrowserModel->getLookmarkPipeline(this->CurrentSelection.at(0))));
+    QImage img;
+    img = this->BrowserModel->getLargeLookmarkIcon(this->CurrentSelection.at(0));
+    if(!img.isNull())
+      {
+      this->Form->LookmarkIcon->setPixmap(QPixmap::fromImage(img));
+      }
+    img = this->BrowserModel->getLookmarkPipeline(this->CurrentSelection.at(0));
+    if(!img.isNull())
+      {
+      this->Form->LookmarkPipeline->setPixmap(QPixmap::fromImage(img));
+      }
     this->Form->RestoreData->setChecked(this->BrowserModel->getLookmarkRestoreDataFlag(this->CurrentSelection.at(0)));
     this->Form->RestoreCamera->setChecked(this->BrowserModel->getLookmarkRestoreCameraFlag(this->CurrentSelection.at(0)));
 
