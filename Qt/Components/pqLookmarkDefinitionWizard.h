@@ -43,6 +43,8 @@ class QModelIndex;
 class pqRenderViewModule;
 class vtkCollection;
 class pqConsumerDisplay;
+class pqFlatTreeView;
+class pqPipelineModel;
 
 /*! \class pqLookmarkDefinitionWizard
  *  \brief
@@ -107,6 +109,12 @@ private:
   bool validateLookmarkName();
 
   /// \brief
+  ///   Generates a "trimmed" view of the current pipeline that reflects the pipeline that will be restored when this lookmark is invoked.
+  /// \return
+  ///   The view of the pipeline.
+  pqFlatTreeView* createPipelinePreview();
+
+  /// \brief
   ///   A recursive helper function for adding to the proxy collection the given display, its input source, 
   ///   and all displays and sources "upstream" in the pipeline from it.
   ///
@@ -129,6 +137,8 @@ private:
   pqRenderViewModule *RenderModule;
   pqLookmarkBrowserModel *Lookmarks;
   pqLookmarkDefinitionWizardForm *Form;
+  pqFlatTreeView *PipelineView;
+  pqPipelineModel *PipelineModel;
 };
 
 #endif
