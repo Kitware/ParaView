@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqObjectPanelInterface.h
+   Module:    pqDisplayPanelInterface.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,28 +30,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqObjectPanelInterface_h
-#define _pqObjectPanelInterface_h
+#ifndef _pqDisplayPanelInterface_h
+#define _pqDisplayPanelInterface_h
 
 #include <QtPlugin>
-class pqObjectPanel;
-class pqProxy;
+#include "pqComponentsExport.h"
+class pqDisplayPanel;
+class pqDisplay;
 class QWidget;
 
-/// interface class for plugins that create pqObjectPanels
-class pqObjectPanelInterface
+/// interface class for plugins that create pqDisplayPanels
+class pqDisplayPanelInterface
 {
 public:
   /// destructor
-  virtual ~pqObjectPanelInterface() {}
+  virtual ~pqDisplayPanelInterface() {}
 
   /// Returns true if this panel can be created for the given the proxy.
-  virtual bool canCreatePanel(pqProxy* proxy) const = 0;
+  virtual bool canCreatePanel(pqDisplay* display) const = 0;
   /// Creates a panel for the given proxy
-  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p) = 0;
+  virtual pqDisplayPanel* createPanel(pqDisplay* display, QWidget* parent) = 0;
 };
 
-Q_DECLARE_INTERFACE(pqObjectPanelInterface, "com.kitware/paraview/objectpanel")
+Q_DECLARE_INTERFACE(pqDisplayPanelInterface, "com.kitware/paraview/displaypanel")
 
 #endif
 

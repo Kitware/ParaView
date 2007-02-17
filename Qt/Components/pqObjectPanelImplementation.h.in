@@ -12,7 +12,6 @@ class @PANEL_NAME@Implementation : public QObject, public pqObjectPanelInterface
   Q_INTERFACES(pqObjectPanelInterface)
 public:
   @PANEL_NAME@Implementation(QObject* p);
-  virtual QString name() const;
   virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p);
   virtual bool canCreatePanel(pqProxy* proxy) const; 
 };

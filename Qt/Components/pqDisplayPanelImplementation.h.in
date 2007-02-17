@@ -1,0 +1,20 @@
+
+#ifndef _@PANEL_NAME@Implementation_h
+#define _@PANEL_NAME@Implementation_h
+
+#include <QObject>
+#include "pqDisplayPanelInterface.h"
+
+// make this panel available to the object inspector
+class @PANEL_NAME@Implementation : public QObject, public pqDisplayPanelInterface
+{
+  Q_OBJECT
+  Q_INTERFACES(pqDisplayPanelInterface)
+public:
+  @PANEL_NAME@Implementation(QObject* p);
+  virtual pqDisplayPanel* createPanel(pqDisplay* display, QWidget* p);
+  virtual bool canCreatePanel(pqDisplay* display) const; 
+};
+
+#endif
+

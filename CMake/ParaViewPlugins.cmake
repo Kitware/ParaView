@@ -96,8 +96,8 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name XMLFile)
   
 ENDMACRO(ADD_SERVER_MANAGER_EXTENSION)
 
-# create implementation for a custom panel interface
-MACRO(ADD_GUI_PANEL_INTERFACE OUTSRCS ClassName XMLName XMLGroup)
+# create implementation for a custom object panel interface
+MACRO(ADD_OBJECT_PANEL_INTERFACE OUTSRCS ClassName XMLName XMLGroup)
   SET(PANEL_NAME ${ClassName})
   SET(PANEL_XML_NAME ${XMLName})
   SET(PANEL_XML_GROUP ${XMLGroup})
@@ -118,7 +118,29 @@ MACRO(ADD_GUI_PANEL_INTERFACE OUTSRCS ClassName XMLName XMLGroup)
       ${IFACE_MOC_SRCS}
       )
 
-ENDMACRO(ADD_GUI_PANEL_INTERFACE)
+ENDMACRO(ADD_OBJECT_PANEL_INTERFACE)
+
+# create implementation for a custom display panel interface
+MACRO(ADD_DISPLAY_PANEL_INTERFACE OUTSRCS ClassName XMLName)
+  SET(PANEL_NAME ${ClassName})
+  SET(PANEL_XML_NAME ${XMLName})
+
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelImplementation.h.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelImplementation.cxx.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx @ONLY)
+
+  GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${QT_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS}")
+  QT4_WRAP_CPP(IFACE_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
+
+  SET(${OUTSRCS} 
+      ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx
+      ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h
+      ${IFACE_MOC_SRCS}
+      )
+ENDMACRO(ADD_DISPLAY_PANEL_INTERFACE)
 
 # create implementation for a custom panel interface
 MACRO(ADD_VIEW_MODULE_INTERFACE OUTSRCS ViewType ViewName DisplayType ViewXMLGroup)

@@ -1,0 +1,32 @@
+
+#include "@PANEL_NAME@.h"
+#include "@PANEL_NAME@Implementation.h"
+
+#include "vtkSMProxy.h"
+#include "pqDisplay.h"
+
+@PANEL_NAME@Implementation::@PANEL_NAME@Implementation(QObject* p)
+  : QObject(p)
+{
+}
+
+pqDisplayPanel* @PANEL_NAME@Implementation::createPanel(pqDisplay* display, QWidget* p)
+{
+  if(!display || !display->getProxy())
+    {
+    return NULL;
+    }
+  
+  return new @PANEL_NAME@(display, p);
+}
+
+bool @PANEL_NAME@Implementation::canCreatePanel(pqDisplay* display) const
+{
+  if(!display || !display->getProxy())
+    {
+    return false;
+    }
+
+  return QString("@PANEL_XML_NAME@") == display->getProxy()->GetXMLName();
+}
+

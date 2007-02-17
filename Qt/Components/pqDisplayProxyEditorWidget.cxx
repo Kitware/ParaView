@@ -48,12 +48,73 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXYPlotDisplayProxyEditor.h"
 #include "pqPropertyLinks.h"
 #include "ui_pqDisplayProxyEditorWidget.h"
+#include "pqDisplayPanelInterface.h"
+#include "pqPluginManager.h"
+
+
+/// standard display panels
+class pqStandardDisplayPanels : public QObject,
+                                public pqDisplayPanelInterface
+{
+public:
+  /// constructor
+  pqStandardDisplayPanels(){}
+  /// destructor
+  virtual ~pqStandardDisplayPanels(){}
+
+  /// Returns true if this panel can be created for the given the proxy.
+  virtual bool canCreatePanel(pqDisplay* proxy) const
+    {
+    if(!proxy || !proxy->getProxy())
+      {
+      return false;
+      }
+
+    QString type = proxy->getProxy()->GetXMLName();
+
+    if(type == "BarChartDisplay" ||
+       type == "XYPlotDisplay2" ||
+       qobject_cast<pqTextWidgetDisplay*>(proxy))
+      {
+      return true;
+      }
+
+    return false;
+    }
+  /// Creates a panel for the given proxy
+  virtual pqDisplayPanel* createPanel(pqDisplay* proxy, QWidget* p)
+    {
+    if(!proxy || !proxy->getProxy())
+      {
+      return NULL;
+      }
+
+    QString type = proxy->getProxy()->GetXMLName();
+    if(type == QString("XYPlotDisplay2"))
+      {
+      return new pqXYPlotDisplayProxyEditor(proxy, p);
+      }
+    
+    if(type == QString("BarChartDisplay"))
+      {
+      return new pqBarChartDisplayProxyEditor(proxy, p);
+      }
+    
+    if (qobject_cast<pqTextWidgetDisplay*>(proxy))
+      {
+      return new pqTextDisplayPropertiesWidget(proxy, p);
+      }
+    return NULL;
+    }
+};
+
 
 class pqDefaultDisplayPanel::pqInternal 
  : public Ui::DisplayProxyEditorWidget
 {
 public:
   pqPropertyLinks Links;
+  pqStandardDisplayPanels StandardPanels;
 };
 
 pqDefaultDisplayPanel::pqDefaultDisplayPanel(pqDisplay* display, QWidget* p)
@@ -160,27 +221,27 @@ void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
     }
   
   this->Internal->Display = display;
+  
+  // search for a custom panels
+  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
+  QObjectList ifaces = pm->interfaces();
+  foreach(QObject* iface, ifaces)
+    {
+    pqDisplayPanelInterface* piface =
+      qobject_cast<pqDisplayPanelInterface*>(iface);
+    if (piface && piface->canCreatePanel(display))
+      {
+      this->Internal->DisplayPanel = piface->createPanel(display, this);
+      break;
+      }
+    }
 
   pqPipelineDisplay* pd = qobject_cast<pqPipelineDisplay*>(display);
-  if (pd)
+  if (!this->Internal->DisplayPanel && pd)
     {
     this->Internal->DisplayPanel = new pqDisplayProxyEditor(pd, this);
     }
-  else if (display && display->getProxy() && 
-    display->getProxy()->GetXMLName() == QString("XYPlotDisplay2"))
-    {
-    this->Internal->DisplayPanel = new pqXYPlotDisplayProxyEditor(display, this);
-    }
-  else if (display && display->getProxy() && 
-    display->getProxy()->GetXMLName() == QString("BarChartDisplay"))
-    {
-    this->Internal->DisplayPanel = new pqBarChartDisplayProxyEditor(display, this);
-    }
-  else if (qobject_cast<pqTextWidgetDisplay*>(display))
-    {
-    this->Internal->DisplayPanel = new pqTextDisplayPropertiesWidget(display, this);
-    }
-  else
+  else if(!this->Internal->DisplayPanel)
     {
     this->Internal->DisplayPanel = new pqDefaultDisplayPanel(display, this);
     
