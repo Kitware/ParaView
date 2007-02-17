@@ -191,13 +191,13 @@ void pqLookmarkInspector::save()
 }
 
 //-----------------------------------------------------------------------------
-void pqLookmarkInspector::onRestoreCameraModified(int state)
+void pqLookmarkInspector::onRestoreCameraModified()
 {
   emit this->modified();
 }
 
 //-----------------------------------------------------------------------------
-void pqLookmarkInspector::onRestoreDataModified(int state)
+void pqLookmarkInspector::onRestoreDataModified()
 {
   emit this->modified();
 }
@@ -211,7 +211,7 @@ void pqLookmarkInspector::onLookmarkCommentsModified()
 
 
 //-----------------------------------------------------------------------------
-void pqLookmarkInspector::onLookmarkNameModified(const QString &newname)
+void pqLookmarkInspector::onLookmarkNameModified()
 {
   emit this->modified();
 }

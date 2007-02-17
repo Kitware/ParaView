@@ -95,9 +95,9 @@ public slots:
   void setActiveServer(pqServer *server){this->ActiveServer = server;};
 
   // Listen for modifications to the widgets so we know when the current lookmark is save-able
-  void onRestoreCameraModified(int);
-  void onRestoreDataModified(int);
-  void onLookmarkNameModified(const QString&);
+  void onRestoreCameraModified();
+  void onRestoreDataModified();
+  void onLookmarkNameModified();
   void onLookmarkCommentsModified();
   void onModified();
 
