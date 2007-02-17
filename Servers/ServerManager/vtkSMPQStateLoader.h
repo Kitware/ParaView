@@ -30,6 +30,10 @@
 #include "vtkSMStateLoader.h"
 
 class vtkSMMultiViewRenderModuleProxy;
+class vtkSMRenderModuleProxy;
+//BTX
+struct vtkSMPQStateLoaderInternals;
+//ETX
 
 class VTK_EXPORT vtkSMPQStateLoader : public vtkSMStateLoader
 {
@@ -51,8 +55,12 @@ public:
   // Description:
   // If this flag is set, for every request to create a render module, an available
   // render module will be used. Off by default.
-  vtkSetMacro(UseExistingRenderModules, int);
-  vtkGetMacro(UseExistingRenderModules, int);
+  //vtkSetMacro(UseExistingRenderModules, int);
+  //vtkGetMacro(UseExistingRenderModules, int);
+  void AddPreferredRenderModule(vtkSMRenderModuleProxy*);
+  void RemovePreferredRenderModule(vtkSMRenderModuleProxy*);
+  void ClearPreferredRenderModules();
+
 protected:
   vtkSMPQStateLoader();
   ~vtkSMPQStateLoader();
@@ -67,8 +75,8 @@ protected:
     const char* name, vtkSMProxy* proxy);
 
   vtkSMMultiViewRenderModuleProxy* MultiViewRenderModuleProxy;
-  int UseExistingRenderModules;
-  int UsedExistingRenderModules;
+
+  vtkSMPQStateLoaderInternals *PQInternal;
 private:
   vtkSMPQStateLoader(const vtkSMPQStateLoader&); // Not implemented.
   void operator=(const vtkSMPQStateLoader&); // Not implemented.

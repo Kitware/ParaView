@@ -20,17 +20,29 @@
 #include "vtkSMMultiViewRenderModuleProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkSmartPointer.h"
+#include <vtkstd/list>
+#include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.10");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.11");
 vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewRenderModuleProxy, 
   vtkSMMultiViewRenderModuleProxy);
+
+
+struct vtkSMPQStateLoaderInternals
+{
+  vtkstd::list<vtkSmartPointer<vtkSMRenderModuleProxy> > PreferredRenderModules;
+};
+
+
 //-----------------------------------------------------------------------------
 vtkSMPQStateLoader::vtkSMPQStateLoader()
 {
+  this->PQInternal = new vtkSMPQStateLoaderInternals;
   this->MultiViewRenderModuleProxy = 0;
-  this->UseExistingRenderModules = 0;
-  this->UsedExistingRenderModules = 0;
+  //this->UseExistingRenderModules = 0;
+  //this->UsedExistingRenderModules = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -43,7 +55,7 @@ vtkSMPQStateLoader::~vtkSMPQStateLoader()
 int vtkSMPQStateLoader::LoadState(vtkPVXMLElement* rootElement, 
   int keep_proxies)
 {
-  this->UsedExistingRenderModules= 0;
+  //this->UsedExistingRenderModules= 0;
   return this->Superclass::LoadState(rootElement, keep_proxies);
 }
 
@@ -69,16 +81,23 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
       // Create a rendermodule.
       if (this->MultiViewRenderModuleProxy)
         {
-        if (this->UseExistingRenderModules)
+        if (!this->PQInternal->PreferredRenderModules.empty())
           {
-          vtkSMProxy* p = this->MultiViewRenderModuleProxy->GetProxy(
-            static_cast<unsigned int>(this->UsedExistingRenderModules));
-          this->UsedExistingRenderModules++;
-          if (p)
+          vtkSMRenderModuleProxy *renMod = this->PQInternal->PreferredRenderModules.front();
+          for(unsigned int i=0; i<this->MultiViewRenderModuleProxy->GetNumberOfProxies(); i++)
             {
-            p->Register(this);
-            return p;
+            if(this->MultiViewRenderModuleProxy->GetProxy(i) == renMod)
+              {
+              break;
+              }
             }
+          if(i<this->MultiViewRenderModuleProxy->GetNumberOfProxies())
+            {
+            renMod->Register(this);
+            this->PQInternal->PreferredRenderModules.pop_front();
+            return renMod;
+            }
+          this->PQInternal->PreferredRenderModules.pop_front();
           }
         // Can't use exiting module (none present, or all present are have
         // already been used, hence we allocate a new one.
@@ -118,6 +137,36 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
 }
 
 //---------------------------------------------------------------------------
+void vtkSMPQStateLoader::AddPreferredRenderModule(vtkSMRenderModuleProxy *renderModule)
+{
+  if(!renderModule)
+    { 
+    vtkWarningMacro("Could not add preffered render module.");
+    return;
+    }
+  // Make sure it is not part of the list yet
+  vtkstd::list<vtkSmartPointer<vtkSMRenderModuleProxy> >::iterator begin = this->PQInternal->PreferredRenderModules.begin();
+  vtkstd::list<vtkSmartPointer<vtkSMRenderModuleProxy> >::iterator end = this->PQInternal->PreferredRenderModules.end();
+  if(find(begin,end,renderModule) == end)
+    {
+    this->PQInternal->PreferredRenderModules.push_back(renderModule);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMPQStateLoader::RemovePreferredRenderModule(vtkSMRenderModuleProxy *renderModule)
+{
+  this->PQInternal->PreferredRenderModules.remove(renderModule);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMPQStateLoader::ClearPreferredRenderModules()
+{
+  this->PQInternal->PreferredRenderModules.clear();
+}
+
+
+//---------------------------------------------------------------------------
 void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
   const char* name, vtkSMProxy* proxy)
 {
@@ -140,6 +189,4 @@ void vtkSMPQStateLoader::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "MultiViewRenderModuleProxy: " 
      << this->MultiViewRenderModuleProxy << endl;
-  os << indent << "UseExistingRenderModules: "
-     << this->UseExistingRenderModules << endl;
 }

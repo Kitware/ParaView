@@ -53,6 +53,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMMultiViewRenderModuleProxy.h"
+#include "vtkSMRenderModuleProxy.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -454,7 +456,15 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
   vtkSMPQStateLoader* pqLoader = vtkSMPQStateLoader::SafeDownCast(loader);
   if (pqLoader)
     {
-    pqLoader->SetUseExistingRenderModules(1);
+    // tell the state loader to use the existing render modules before creating new ones
+    vtkSMRenderModuleProxy *smRen;
+    for(unsigned int i=0; i<server->GetRenderModule()->GetNumberOfProxies(); i++)
+      {
+      if( (smRen = dynamic_cast<vtkSMRenderModuleProxy*>(server->GetRenderModule()->GetProxy(i))) )
+        {
+        pqLoader->AddPreferredRenderModule(smRen);
+        }
+      }
     pqLoader->SetMultiViewRenderModuleProxy(server->GetRenderModule());
     }
 
@@ -475,6 +485,8 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     // this is necessary to avoid unnecesary references to the render module,
     // enabling the proxy to be cleaned up before server disconnect.
     pqLoader->SetMultiViewRenderModuleProxy(0);
+    // delete any unused rendermodules from state loader
+    pqLoader->ClearPreferredRenderModules();
     }
 
   QApplication::processEvents();
