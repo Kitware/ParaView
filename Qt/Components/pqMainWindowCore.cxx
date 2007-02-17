@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqElementInspectorWidget.h"
 #include "pqLinksManager.h"
 #include "pqLookmarkBrowser.h"
+#include "pqLookmarkInspector.h"
 #include "pqLookmarkBrowserModel.h"
 #include "pqLookmarkDefinitionWizard.h"
 #include "pqMainWindowCore.h"
@@ -149,14 +150,13 @@ public:
   pqImplementation(QWidget* parent) :
     Parent(parent),
     MultiViewManager(parent),
-    LookmarkBrowser(0),
     CustomFilters(new pqCustomFilterManagerModel(parent)),
     CustomFilterManager(0),
-    Lookmarks(new pqLookmarkBrowserModel(parent)),
     LookupTableManager(new pqPQLookupTableManager(parent)),
     ObjectInspectorDriver(0),
     RecentFiltersMenu(0),
     FilterMenu(0),
+    Lookmarks(0),
     PipelineMenu(0),
     PipelineBrowser(0),
     VariableToolbar(0),
@@ -188,9 +188,10 @@ public:
   pqSelectionManager SelectionManager;
   pqElementInspectorWidget* ElementInspector;
   pqLookmarkBrowser* LookmarkBrowser;
+  pqLookmarkInspector* LookmarkInspector;
+  pqLookmarkBrowserModel* Lookmarks;
   pqCustomFilterManagerModel* const CustomFilters;
   pqCustomFilterManager* CustomFilterManager;
-  pqLookmarkBrowserModel* const Lookmarks;
   pqPQLookupTableManager* LookupTableManager;
   pqObjectInspectorDriver* ObjectInspectorDriver;
  
@@ -732,8 +733,34 @@ void pqMainWindowCore::setupElementInspector(QDockWidget* dock_widget)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setupLookmarkBrowser(QDockWidget* dock_widget)
 {
+  if(!this->Implementation->Lookmarks)
+    {
+    this->Implementation->Lookmarks = new pqLookmarkBrowserModel(this);
+    }
   this->Implementation->LookmarkBrowser = new pqLookmarkBrowser(this->Implementation->Lookmarks, dock_widget);
   dock_widget->setWidget(this->Implementation->LookmarkBrowser);
+}
+
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setupLookmarkInspector(QDockWidget* dock_widget)
+{
+  if(!this->Implementation->Lookmarks)
+    {
+    this->Implementation->Lookmarks = new pqLookmarkBrowserModel(this);
+    }
+
+  this->Implementation->LookmarkInspector = new pqLookmarkInspector(this->Implementation->Lookmarks, dock_widget);
+
+  if(this->Implementation->LookmarkBrowser)
+    {
+    QObject::connect(
+      this->Implementation->LookmarkBrowser->getSelectionModel(),
+      SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection & )),
+      this->Implementation->LookmarkInspector,
+      SLOT(onLookmarkSelectionChanged(const QItemSelection &, const QItemSelection & )));
+    }
+  dock_widget->setWidget(this->Implementation->LookmarkInspector);
 }
 
 //-----------------------------------------------------------------------------
@@ -1492,15 +1519,14 @@ void pqMainWindowCore::onToolsCreateLookmark(pqGenericViewModule *view)
     return;
     }
 
-  QWidget *mainWin = this->Implementation->Parent;
-
-  pqLookmarkDefinitionWizard wizard(render_module, this->Implementation->Lookmarks, mainWin);
+  pqLookmarkDefinitionWizard wizard(render_module, this->Implementation->Lookmarks, this->Implementation->Parent);
   if(wizard.exec() == QDialog::Accepted)
     {
     wizard.createLookmark();
     QString lookmarkName = wizard.getLookmarkName();
     this->Implementation->LookmarkBrowser->selectLookmark(lookmarkName);
     this->Implementation->LookmarkBrowser->parentWidget()->show();
+    this->Implementation->LookmarkInspector->parentWidget()->show();
     }
 }
 
@@ -1984,6 +2010,11 @@ void pqMainWindowCore::onSelectionChanged()
     // Update the lookmark browser so it knows about the (possible) change in servers
     this->Implementation->LookmarkBrowser->setActiveServer(server);
     }
+  if ( this->Implementation->LookmarkInspector )
+    {
+    // Update the lookmark inspector so it knows about the (possible) change in servers
+    this->Implementation->LookmarkInspector->setActiveServer(server);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -2372,6 +2403,22 @@ pqPipelineSource* pqMainWindowCore::getActiveSource()
 {
   return dynamic_cast<pqPipelineSource *>(this->getActiveObject());
 }
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::getRootSources(QList<pqPipelineSource*> *sources, pqPipelineSource *src)
+{
+  pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter*>(src);
+  if(!filter || filter->getInputCount()==0)
+    {
+    sources->push_back(src);
+    return;
+    }
+  for(int i=0; i<filter->getInputCount(); i++)
+    {
+    this->getRootSources(sources, filter->getInput(i));
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 pqServer* pqMainWindowCore::getActiveServer()

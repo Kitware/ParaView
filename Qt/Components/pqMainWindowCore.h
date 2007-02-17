@@ -70,6 +70,7 @@ class QMenu;
 class QStatusBar;
 class QToolBar;
 class QWidget;
+class QList;
 
 /** \brief Provides a standardized main window for ParaView applications -
 application authors can derive from pqMainWindowCore and call its member functions
@@ -111,6 +112,8 @@ public:
   void setupElementInspector(QDockWidget* parent);
   /// Setup lookmark browser, attaching it to the given dock
   void setupLookmarkBrowser(QDockWidget* parent);
+  /// Setup lookmark inspector, attaching it to the given dock
+  void setupLookmarkInspector(QDockWidget* parent);
 
   /// Setup the animation panel, attaching it to the given dock.
   void setupAnimationPanel(QDockWidget* parent);
@@ -139,6 +142,9 @@ public:
 
   /// returns the active source.
   pqPipelineSource* getActiveSource();
+
+  /// populate list with the non-server, non-filter objects that are in the same pipeline as "src"
+  void getRootSources(QList<pqPipelineSource*> *sources, pqPipelineSource *src);
 
   /// returns the active server.
   pqServer* getActiveServer();
@@ -243,6 +249,8 @@ public slots:
   void onToolsCreateCustomFilter();
   void onToolsManageCustomFilters();
   
+  // TO DO: Support lookmark of multiple views and different view types (plots, etc).
+  // Right now this creates one for a single render view only.
   void onToolsCreateLookmark();
   void onToolsCreateLookmark(pqGenericViewModule*);
 

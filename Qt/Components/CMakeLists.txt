@@ -84,6 +84,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLookmarkDefinitionWizard.h
   pqLookmarkBrowser.h
   pqLookmarkBrowserModel.h
+  pqLookmarkInspector.h
+  pqLookmarkStateLoader.h
   pqMainWindowCore.h
   pqMultiView.h
   pqMultiViewFrame.h
@@ -166,6 +168,7 @@ SET(UI_FORMS
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLookmarkDefinitionWizard.ui
   Resources/UI/pqLookmarkBrowser.ui
+  Resources/UI/pqLookmarkInspector.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
@@ -328,6 +331,10 @@ ADD_LIBRARY(pqComponents
   pqLookmarkBrowserModel.h
   pqLookmarkDefinitionWizard.cxx
   pqLookmarkDefinitionWizard.h
+  pqLookmarkInspector.cxx
+  pqLookmarkInspector.h
+  pqLookmarkStateLoader.cxx
+  pqLookmarkStateLoader.h
   pqMainWindowCore.cxx
   pqMainWindowCore.h
   pqMultiView.cxx

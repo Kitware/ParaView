@@ -512,6 +512,9 @@ MainWindow::MainWindow() :
   this->Implementation->Core.setupLookmarkBrowser(
     this->Implementation->UI.lookmarkBrowserDock);
 
+  this->Implementation->Core.setupLookmarkInspector(
+    this->Implementation->UI.lookmarkInspectorDock);
+
   this->Implementation->Core.setupAnimationPanel(
     this->Implementation->UI.animationPanelDock);
   
@@ -569,6 +572,10 @@ MainWindow::MainWindow() :
     this->Implementation->UI.lookmarkBrowserDock->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(
+    this->Implementation->UI.lookmarkInspectorDock,
+    this->Implementation->UI.lookmarkInspectorDock->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.animationPanelDock,
     this->Implementation->UI.animationPanelDock->windowTitle());
   
@@ -585,6 +592,7 @@ MainWindow::MainWindow() :
   // Setup the default dock configuration ...
   this->Implementation->UI.elementInspectorDock->hide();
   this->Implementation->UI.lookmarkBrowserDock->hide();
+  this->Implementation->UI.lookmarkInspectorDock->hide();
   this->Implementation->UI.statisticsViewDock->hide();
   this->Implementation->UI.animationPanelDock->hide();
 

@@ -441,6 +441,18 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_6" />
   </widget>
+  <widget class="QDockWidget" name="lookmarkInspectorDock" >
+   <property name="allowedAreas" >
+    <set>Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Lookmark Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_7" />
+  </widget>
   <action name="actionFileOpen" >
    <property name="icon" >
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqOpen24.png</iconset>
