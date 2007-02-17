@@ -403,7 +403,7 @@
   <customwidget>
    <class>pqCollapsedGroup</class>
    <extends>QWidget</extends>
-   <header>pqcollapsedgroup.h</header>
+   <header>pqCollapsedGroup.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
