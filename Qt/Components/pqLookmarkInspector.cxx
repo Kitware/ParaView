@@ -98,15 +98,15 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkBrowserModel *model, QWidget 
 
   this->connect(this->Form->RestoreData, 
                 SIGNAL(stateChanged(int)),
-                SLOT(onRestoreDataModified(int)));
+                SLOT(onRestoreDataModified()));
 
   this->connect(this->Form->RestoreCamera, 
                 SIGNAL(stateChanged(int)),
-                SLOT(onRestoreCameraModified(int)));
+                SLOT(onRestoreCameraModified()));
 
   this->connect(this->Form->LookmarkName, 
                 SIGNAL(textChanged(const QString &)),
-                SLOT(onLookmarkNameModified(const QString &)));
+                SLOT(onLookmarkNameModified()));
 
   this->connect(this->Form->LookmarkComments, 
                 SIGNAL(textChanged()),
@@ -224,7 +224,7 @@ void pqLookmarkInspector::onModified()
 
 
 //-----------------------------------------------------------------------------
-void pqLookmarkInspector::onLookmarkSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+void pqLookmarkInspector::onLookmarkSelectionChanged(const QItemSelection &selected) //, const QItemSelection &deselected)
 {
   this->CurrentSelection = selected.indexes();
 

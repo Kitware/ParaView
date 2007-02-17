@@ -78,7 +78,7 @@ public slots:
   // Called when the selection has changed in the lookmark browser
   // Which widgets are displayed is based on whether there are 0, 1, or more lookmarks currently selected
   // It uses the pqLookmarkBrowserModel to initialize the widget values.
-  void onLookmarkSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected );
+  void onLookmarkSelectionChanged(const QItemSelection &selected); //, const QItemSelection &deselected );
 
   // This modifies/deletes the the data at the selected indices of the pqLookmarkBrowserModel
   void save();

@@ -758,7 +758,8 @@ void pqMainWindowCore::setupLookmarkInspector(QDockWidget* dock_widget)
       this->Implementation->LookmarkBrowser->getSelectionModel(),
       SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection & )),
       this->Implementation->LookmarkInspector,
-      SLOT(onLookmarkSelectionChanged(const QItemSelection &, const QItemSelection & )));
+      SLOT(onLookmarkSelectionChanged(const QItemSelection &)));
+      //SLOT(onLookmarkSelectionChanged(const QItemSelection &, const QItemSelection & )));
     }
   dock_widget->setWidget(this->Implementation->LookmarkInspector);
 }
