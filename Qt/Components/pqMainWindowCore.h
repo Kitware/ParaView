@@ -70,7 +70,6 @@ class QMenu;
 class QStatusBar;
 class QToolBar;
 class QWidget;
-class QList;
 
 /** \brief Provides a standardized main window for ParaView applications -
 application authors can derive from pqMainWindowCore and call its member functions
@@ -143,7 +142,7 @@ public:
   /// returns the active source.
   pqPipelineSource* getActiveSource();
 
-  /// populate list with the non-server, non-filter objects that are in the same pipeline as "src"
+  /// populate list of the non-server, non-filter objects that are in the same pipeline as "src"
   void getRootSources(QList<pqPipelineSource*> *sources, pqPipelineSource *src);
 
   /// returns the active server.

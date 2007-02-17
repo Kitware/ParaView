@@ -58,7 +58,6 @@ class pqLookmarkBrowserModel;
 class QModelIndex;
 class QItemSelection;
 class pqLookmarkInspectorForm;
-class QList;
 
 /// \class pqLookmarkInspector
 /// \brief
