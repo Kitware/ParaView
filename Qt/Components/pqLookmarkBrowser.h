@@ -43,6 +43,7 @@ class QItemSelection;
 class QStringList;
 class QModelIndex;
 class pqServer;
+class QItemSelectionModel;
 
 /// \class pqLookmarkBrowser
 /// \brief
@@ -53,7 +54,6 @@ class pqServer;
 /// It provides an interface for loading and removing lookmarks.
 ///
 /// Still to do: 
-///  - hook up importing and exporting lookmarks
 ///  - convert to a tree view
 ///  - should we allow user to create a lookmark from the browser?
 
@@ -69,6 +69,8 @@ public:
   /// \param parent The parent widget for the dialog.
   pqLookmarkBrowser(pqLookmarkBrowserModel *model, QWidget *parent=0);
   virtual ~pqLookmarkBrowser();
+
+  QItemSelectionModel* getSelectionModel();
 
 public slots:
   /// \brief

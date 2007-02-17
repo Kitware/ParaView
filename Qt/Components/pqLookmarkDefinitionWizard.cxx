@@ -42,6 +42,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqConsumerDisplay.h"
 #include "pqDisplay.h"
+#include "pqPipelineModel.h"
+#include "pqFlatTreeView.h"
+#include "pqApplicationCore.h"
+#include "pqPipelineBrowser.h"
+#include "pqServerManagerModel.h"
 
 #include <QMessageBox>
 #include <QModelIndex>
@@ -49,6 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QLineEdit>
 #include <QImage>
+#include <QVBoxLayout>
+#include <QHeaderView>
 
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -59,8 +66,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
 #include "QVTKWidget.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVDataInformation.h"
+#include "vtkSMSourceProxy.h"
 
 #include "assert.h"
 
@@ -79,8 +89,11 @@ pqLookmarkDefinitionWizard::pqLookmarkDefinitionWizard(
   this->OverwriteOK = false;
   this->RenderModule = renderModule;
   this->Lookmarks = model;
+  this->PipelineView = 0;
   this->Form = new pqLookmarkDefinitionWizardForm();
   this->Form->setupUi(this);
+
+  this->createPipelinePreview();
 
   // Listen to the button click events.
   QObject::connect(this->Form->CancelButton, SIGNAL(clicked()),
@@ -102,7 +115,90 @@ pqLookmarkDefinitionWizard::~pqLookmarkDefinitionWizard()
     {
     delete this->Form;
     }
+  if(this->PipelineView)
+    {
+    delete this->PipelineView;
+    }
+  if(this->PipelineModel)
+    {
+    delete this->PipelineModel;
+    }
+
 }
+
+
+
+pqFlatTreeView* pqLookmarkDefinitionWizard::createPipelinePreview()
+{
+  // Set up the base gui elements.
+  QVBoxLayout *baseLayout = new QVBoxLayout(this->Form->PipelinePreviewFrame);
+  baseLayout->setMargin(0);
+  baseLayout->setSpacing(6);
+
+  // Create the preview pane and add it to the right.
+  this->PipelineView = new pqFlatTreeView(this);
+  this->PipelineView->setObjectName("PipelinePreview");
+  this->PipelineView->getHeader()->hide();
+  this->PipelineView->setSelectionMode(pqFlatTreeView::NoSelection);
+  this->PipelineView->setMaximumWidth(300);
+  this->PipelineView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  baseLayout->addWidget(this->PipelineView);
+
+  // Make a copy of the model for the user to select sources.
+  pqServerManagerModel *smModel =
+      pqApplicationCore::instance()->getServerManagerModel();
+  this->PipelineModel = new pqPipelineModel(*smModel);
+  this->PipelineModel->setEditable(false);
+  this->PipelineView->setModel(this->PipelineModel);
+
+  // Hide all but the first column.
+  int columns = this->PipelineModel->columnCount();
+  for(int i = 1; i < columns; ++i)
+    {
+    this->PipelineView->getHeader()->hideSection(i);
+    }
+
+  // Save visible displays and their sources, also any display/source pair upstream from a visible one in the pipeline:
+  QList<pqDisplay*> displays = this->RenderModule->getDisplays();
+  QList<pqDisplay *>::Iterator iter;
+  pqConsumerDisplay *consDisp;
+  vtkCollection *proxies = vtkCollection::New();
+  for(iter = displays.begin(); iter != displays.end(); ++iter)
+    {
+    // if a display is visible, add it, its pipeline source, and all its upstream inputs to the collection of proxies
+    if( (consDisp = dynamic_cast<pqConsumerDisplay*>(*iter)))
+      {
+      if(consDisp->isVisible() )
+        {
+        this->addToProxyCollection(consDisp,proxies);
+        }
+      }
+    }
+
+  pqPipelineSource *src;
+  for(int i=smModel->getNumberOfSources()-1; i>=0; i--)
+    {
+    src = smModel->getPQSource(i);
+
+    // if a display is visible, add it, its pipeline source, and all its upstream inputs to the collection of proxies
+    if( src )
+      {
+      if(!proxies->IsItemPresent(src->getProxy()))
+        {
+        this->PipelineModel->removeSource(src);
+        }
+      }
+    }
+
+  this->PipelineView->expandAll();
+
+  proxies->Delete();
+
+  return this->PipelineView;
+}
+
+
+
 
 void pqLookmarkDefinitionWizard::createLookmark()
 {
@@ -120,27 +216,62 @@ void pqLookmarkDefinitionWizard::createLookmark()
   assert(widget);
   this->hide();
   widget->GetRenderWindow()->Render();
-  this->RenderModule->saveImage(48,48,"tempLookmarkImage.png");
+  this->RenderModule->saveImage(150,150,"tempLookmarkImage.png");
   QImage image("tempLookmarkImage.png","PNG");
   remove("tempLookmarkImage.png");
+
+  // Save an image of the pipeline view
+  QImage pipeline = QPixmap::grabWidget(this->PipelineView).toImage();
+  if(pipeline.width()>250)
+    {
+    pipeline.scaled(250,pipeline.height());
+    }
 
   vtkCollection *proxies = vtkCollection::New();
   vtkPVXMLElement *stateElement = vtkPVXMLElement::New();
   stateElement->SetName("ServerManagerState");
 
   // Save visible displays and their sources, also any display/source pair upstream from a visible one in the pipeline:
-
   QList<pqDisplay*> displays = this->RenderModule->getDisplays();
   QList<pqDisplay *>::Iterator iter;
   pqConsumerDisplay *consDisp;
   for(iter = displays.begin(); iter != displays.end(); ++iter)
     {
     // if a display is visible, add it, its pipeline source, and all its upstream inputs to the collection of proxies
-    if( (consDisp = dynamic_cast<pqConsumerDisplay*>(*iter)) && (*iter)->isVisible() )
+    if( (consDisp = dynamic_cast<pqConsumerDisplay*>(*iter)))
       {
-      this->addToProxyCollection(consDisp,proxies);
+      if(consDisp->isVisible() )
+        {
+        this->addToProxyCollection(consDisp,proxies);
+        }
       }
     }
+
+  // Get the data name
+  QString dataName;
+  bool dataFound = false;
+  vtkSMSourceProxy *srcProxy;
+  vtkCollectionIterator *proxyIter = vtkCollectionIterator::New();
+  proxyIter->SetCollection(proxies);
+  proxyIter->GoToFirstItem();
+  while(proxyIter->GetCurrentObject())
+    {
+    srcProxy = vtkSMSourceProxy::SafeDownCast(proxyIter->GetCurrentObject());
+    if( srcProxy && strcmp(srcProxy->GetXMLGroup(),"sources")==0 )
+      { 
+      if(dataFound)
+        {
+       // qDebug() << "Cannot create lookmarks of multiple sources at this time.";
+        }
+      else
+        {
+        dataName = proxyManager->GetProxyName("sources",srcProxy);
+        dataFound = true;
+        }
+      }
+    proxyIter->GoToNextItem();
+    }
+  proxyIter->Delete();
 
   // Get the XML representation of the contents of "proxies", as well as their referred proxies
   proxyManager->SaveState(stateElement, proxies, 1);
@@ -182,7 +313,7 @@ void pqLookmarkDefinitionWizard::createLookmark()
   state.remove('\t');
 
   // Create a lookmark with the given name, image, and state
-  this->Lookmarks->addLookmark(this->Form->LookmarkName->text(),image,state);
+  this->Lookmarks->addLookmark(this->Form->LookmarkName->text(), dataName, this->Form->LookmarkComments->toPlainText(), image, pipeline, state);
 
   proxies->Delete();
   stateElement->Delete();

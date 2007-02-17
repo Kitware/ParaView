@@ -226,16 +226,26 @@ void pqLookmarkBrowser::exportSelected(const QStringList &files)
 void pqLookmarkBrowser::removeSelected()
 {
   // Get the selected lookmarks from the list.
-  QString lookmark;
-
-  QModelIndexList selection =
-      this->Form->LookmarkList->selectionModel()->selectedIndexes();
+  QModelIndexList selection =this->Form->LookmarkList->selectionModel()->selectedIndexes();
+  QList<QModelIndex>::iterator iter;
+  QList<QString> names;
+  for(iter=selection.begin(); iter!=selection.end(); iter++)
+    {
+    names.push_back(this->Model->getLookmarkName(*iter));
+    }
+  QList<QString>::iterator iter2;
+  for(iter2=names.begin(); iter2!=names.end(); iter2++)
+    {
+    this->Model->removeLookmark(*iter2);
+    }
+/*
   while(selection.count()>0)
     {
     this->Model->removeLookmark(selection.back());  
     // by removing a lookmark, the list of selected indices changed
     selection = this->Form->LookmarkList->selectionModel()->selectedIndexes();
     }
+*/
 }
 
 
@@ -249,6 +259,12 @@ void pqLookmarkBrowser::updateButtons(const QItemSelection &,
   this->Form->RemoveButton->setEnabled(hasSelected);
   this->Form->ExportButton->setEnabled(hasSelected);
 
+}
+
+
+QItemSelectionModel* pqLookmarkBrowser::getSelectionModel()
+{ 
+  return this->Form->LookmarkList->selectionModel();
 }
 
 

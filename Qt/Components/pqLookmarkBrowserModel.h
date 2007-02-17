@@ -126,8 +126,18 @@ public:
   /// \return
   ///   The lookmark definition name or an empty string.
   QString getLookmarkName(const QModelIndex &index) const;
+  QString getLookmarkDataName(const QModelIndex &index) const;
   QString getLookmarkState(const QModelIndex &index) const;
-  QImage getLookmarkIcon(const QModelIndex &index) const;
+  QString getLookmarkComments(const QModelIndex &index) const;
+  QImage getLookmarkPipeline(const QModelIndex &index) const;
+  QImage getLargeLookmarkIcon(const QModelIndex &index) const;
+  QImage getSmallLookmarkIcon(const QModelIndex &index) const;
+  bool getLookmarkRestoreDataFlag(const QModelIndex &index) const;
+  bool getLookmarkRestoreCameraFlag(const QModelIndex &index) const;
+  void setLookmarkName(const QModelIndex &index, QString name);
+  void setLookmarkComments(const QModelIndex &index, QString name);
+  void setLookmarkRestoreDataFlag(const QModelIndex &index, bool state);
+  void setLookmarkRestoreCameraFlag(const QModelIndex &index, bool state);
 
   /// \brief
   ///   Gets the model index for the given lookmark name.
@@ -144,7 +154,7 @@ public slots:
   /// \param name The name of the new lookmark definition.
   /// \param image The icon of the new lookmark definition.
   /// \param state The server manager state of the new lookmark definition.
-  void addLookmark(QString name, QImage &image, QString state);
+  void addLookmark(QString name, QString dataName, QString comments, QImage &image, QImage &pipeline, QString state, bool restoreData=true, bool restoreCamera=true);
 
   /// \brief
   ///   Adds new lookmark definition(s) to the model.
@@ -183,6 +193,7 @@ signals:
   ///   model.
   /// \param name The name of the new lookmark definition.
   void lookmarkAdded(const QString &name);
+  void lookmarkLoaded();
 
 private:
   /// Stores the lookmark list.

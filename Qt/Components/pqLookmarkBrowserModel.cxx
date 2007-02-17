@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QByteArray>
 #include <QBuffer>
+#include <QPointer>
+#include <QRect>
 
 #include "pqSettings.h"
 #include "vtkPVXMLElement.h"
@@ -49,24 +51,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerStartupBrowser.h"
 #include "vtkSMProxyManager.h"
 #include "pqServer.h"
+#include "pqActiveView.h"
+#include "pqRenderViewModule.h"
+#include "pqLookmarkStateLoader.h"
+#include "pqPipelineBuilder.h"
+#include "pqGenericViewModule.h"
+#include "pqMainWindowCore.h"
+#include "QVTKWidget.h"
+#include "assert.h"
+#include "vtkRenderWindow.h"
+#include "vtkSmartPointer.h"
+#include "pqStateLoader.h"
 
 // Temporary data structure for storing the metadata of a lookmark. 
 struct pqLookmarkInfo
 {
   QString Name;
+  QString DataName;
   QImage Icon;
+  QImage Pipeline;
   QString Comments;
   QString State;
+  bool RestoreCamera;
+  bool RestoreData;
 };
 
 
-class pqLookmarkBrowserModelInternal : public QList<pqLookmarkInfo> {};
+class pqLookmarkBrowserModelInternal : public QList<pqLookmarkInfo> 
+{
+public:
+  QPointer<pqMainWindowCore> MainWindowCore;
+};
 
 
 pqLookmarkBrowserModel::pqLookmarkBrowserModel(QObject *parentObject)
   : QAbstractListModel(parentObject)
 {
   this->Internal = new pqLookmarkBrowserModelInternal();
+  this->Internal->MainWindowCore = dynamic_cast<pqMainWindowCore*>(parentObject);
 
   // Restore the contents of the lookmark browser from a previous ParaView session, if any.
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -123,7 +145,7 @@ QVariant pqLookmarkBrowserModel::data(const QModelIndex &idx,
         }
       case Qt::DecorationRole:
         {
-        return QVariant(info.Icon);
+        return QVariant(this->getSmallLookmarkIcon(idx));
         }
       }
     }
@@ -136,6 +158,17 @@ Qt::ItemFlags pqLookmarkBrowserModel::flags(const QModelIndex &) const
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
+QString pqLookmarkBrowserModel::getLookmarkDataName(
+    const QModelIndex &idx) const
+{
+  if(this->Internal && idx.isValid() && idx.model() == this)
+    {
+    return (*this->Internal)[idx.row()].DataName;
+    }
+
+  return QString();
+}
+
 QString pqLookmarkBrowserModel::getLookmarkName(
     const QModelIndex &idx) const
 {
@@ -145,6 +178,16 @@ QString pqLookmarkBrowserModel::getLookmarkName(
     }
 
   return QString();
+}
+
+void pqLookmarkBrowserModel::setLookmarkName(
+    const QModelIndex &idx, QString name)
+{
+  if(this->Internal && idx.isValid() && idx.model() == this)
+    {
+    (*this->Internal)[idx.row()].Name = name;
+    }
+  emit this->dataChanged(idx,idx);
 }
 
 
@@ -160,8 +203,40 @@ QString pqLookmarkBrowserModel::getLookmarkState(
 }
 
 
+QString pqLookmarkBrowserModel::getLookmarkComments(
+    const QModelIndex &idx) const
+{
+  if(this->Internal && idx.isValid() && idx.model() == this)
+    {
+    return (*this->Internal)[idx.row()].Comments;
+    }
 
-QImage pqLookmarkBrowserModel::getLookmarkIcon(
+  return QString();
+}
+
+
+void pqLookmarkBrowserModel::setLookmarkComments(
+    const QModelIndex &idx, QString comments)
+{
+  if(this->Internal && idx.isValid() && idx.model() == this)
+    {
+    (*this->Internal)[idx.row()].Comments = comments;
+    }
+}
+
+QImage pqLookmarkBrowserModel::getSmallLookmarkIcon(
+    const QModelIndex &idx) const
+{
+  if(this->Internal && idx.isValid() && idx.model() == this)
+    {
+    return (*this->Internal)[idx.row()].Icon.scaled(48,48);
+    }
+
+  return QImage();
+}
+
+
+QImage pqLookmarkBrowserModel::getLargeLookmarkIcon(
     const QModelIndex &idx) const
 {
   if(this->Internal && idx.isValid() && idx.model() == this)
@@ -170,6 +245,58 @@ QImage pqLookmarkBrowserModel::getLookmarkIcon(
     }
 
   return QImage();
+}
+
+QImage pqLookmarkBrowserModel::getLookmarkPipeline(
+    const QModelIndex &idx) const
+{
+  if(this->Internal && idx.isValid() && idx.model() == this)
+    {
+    return (*this->Internal)[idx.row()].Pipeline;
+    }
+
+  return QImage();
+}
+
+
+bool pqLookmarkBrowserModel::getLookmarkRestoreCameraFlag(
+    const QModelIndex &idx) const
+{
+  if(this->Internal && idx.isValid() && idx.model() == this)
+    {
+    return (*this->Internal)[idx.row()].RestoreCamera;
+    }
+  return 0;
+}
+
+
+void pqLookmarkBrowserModel::setLookmarkRestoreCameraFlag(
+    const QModelIndex &idx, bool state)
+{
+  if(this->Internal && idx.isValid() && idx.model() == this)
+    {
+    (*this->Internal)[idx.row()].RestoreCamera = state;
+    }
+}
+
+bool pqLookmarkBrowserModel::getLookmarkRestoreDataFlag(
+    const QModelIndex &idx) const
+{
+  if(this->Internal && idx.isValid() && idx.model() == this)
+    {
+    return (*this->Internal)[idx.row()].RestoreData;
+    }
+  return 0;
+}
+
+
+void pqLookmarkBrowserModel::setLookmarkRestoreDataFlag(
+    const QModelIndex &idx, bool state)
+{
+  if(this->Internal && idx.isValid() && idx.model() == this)
+    {
+    (*this->Internal)[idx.row()].RestoreData = state;
+    }
 }
 
 QModelIndex pqLookmarkBrowserModel::getIndexFor(
@@ -195,7 +322,7 @@ QModelIndex pqLookmarkBrowserModel::getIndexFor(
   return QModelIndex();
 }
 
-void pqLookmarkBrowserModel::addLookmark(QString name, QImage &image, QString state)
+void pqLookmarkBrowserModel::addLookmark(QString name, QString dataName, QString comments, QImage &image, QImage &pipeline, QString state, bool restoreData, bool restoreCamera)
 {
   if(!this->Internal || name.isEmpty())
     {
@@ -203,6 +330,7 @@ void pqLookmarkBrowserModel::addLookmark(QString name, QImage &image, QString st
     }
 
   // Insert the lookmark in alphabetical order.
+/*
   int row = 0;
   for( ; row < this->Internal->size(); row++)
     {
@@ -211,11 +339,17 @@ void pqLookmarkBrowserModel::addLookmark(QString name, QImage &image, QString st
       break;
       }
     }
-
+*/
+  int row = this->Internal->size();
   pqLookmarkInfo info;
   info.Name = name;
+  info.DataName = dataName;
+  info.Comments = comments;
   info.Icon = image;
+  info.Pipeline = pipeline;
   info.State = state;
+  info.RestoreCamera = restoreCamera;
+  info.RestoreData = restoreData;
 
   this->beginInsertRows(QModelIndex(), row, row);
   this->Internal->insert(row, info);
@@ -291,6 +425,10 @@ QString pqLookmarkBrowserModel::getLookmarks(const QModelIndexList &lookmarks)
     vtkPVXMLElement *lookmark = vtkPVXMLElement::New();
     lookmark->SetName("LookmarkDefinition");
     lookmark->AddAttribute("Name", this->getLookmarkName(*iter).toAscii().constData());
+    lookmark->AddAttribute("DataName", this->getLookmarkDataName(*iter).toAscii().constData());
+    lookmark->AddAttribute("Comments", this->getLookmarkComments(*iter).toAscii().constData());
+    lookmark->AddAttribute("RestoreData", this->getLookmarkRestoreDataFlag(*iter));
+    lookmark->AddAttribute("RestoreCamera", this->getLookmarkRestoreCameraFlag(*iter));
 
     // Server manager state
     QString state = this->getLookmarkState(*iter);
@@ -324,7 +462,7 @@ QString pqLookmarkBrowserModel::getLookmarks(const QModelIndexList &lookmarks)
     QByteArray ba;
     QBuffer buffer(&ba);
     buffer.open(QIODevice::WriteOnly);
-    QImage image = this->getLookmarkIcon(*iter);
+    QImage image = this->getLargeLookmarkIcon(*iter);
     image.save(&buffer, "PNG"); // writes image into ba in PNG format
     ba = ba.toBase64();
     vtkPVXMLElement *iconElement = vtkPVXMLElement::New();
@@ -332,6 +470,19 @@ QString pqLookmarkBrowserModel::getLookmarks(const QModelIndexList &lookmarks)
     iconElement->AddAttribute("Value",ba.constData());
     lookmark->AddNestedElement(iconElement);
     iconElement->Delete();
+
+    // Pipeline Icon
+    QByteArray ba2;
+    QBuffer buffer2(&ba2);
+    buffer2.open(QIODevice::WriteOnly);
+    QImage pipeline = this->getLookmarkPipeline(*iter);
+    pipeline.save(&buffer2, "PNG"); // writes image into ba in PNG format
+    ba2 = ba2.toBase64();
+    vtkPVXMLElement *pipelineElement = vtkPVXMLElement::New();
+    pipelineElement->SetName("Pipeline");
+    pipelineElement->AddAttribute("Value",ba2.constData());
+    lookmark->AddNestedElement(pipelineElement);
+    pipelineElement->Delete();
 
     root->AddNestedElement(lookmark);
     lookmark->Delete();
@@ -396,6 +547,12 @@ void pqLookmarkBrowserModel::addLookmarks(vtkPVXMLElement *root)
   while( (lookmark = root->GetNestedElement(i++)) )
     {
     QString name = lookmark->GetAttribute("Name");
+    QString dataName = lookmark->GetAttribute("DataName");
+    QString comments = lookmark->GetAttribute("Comments");
+    int restoreData;
+    int restoreCamera;
+    lookmark->GetScalarAttribute("RestoreData",&restoreData);
+    lookmark->GetScalarAttribute("RestoreCamera",&restoreCamera);
     vtkPVXMLElement *stateElem = lookmark->FindNestedElementByName("ServerManagerState");
     if(!stateElem)
       {
@@ -414,7 +571,14 @@ void pqLookmarkBrowserModel::addLookmarks(vtkPVXMLElement *root)
       QByteArray array(iconElement->GetAttribute("Value"));
       image.loadFromData(QByteArray::fromBase64(array),"PNG");
       }
-    this->addLookmark(name,image,state);
+    vtkPVXMLElement *pipelineElement = lookmark->FindNestedElementByName("Pipeline");
+    QImage pipeline;
+    if(pipelineElement)
+      {
+      QByteArray array(pipelineElement->GetAttribute("Value"));
+      pipeline.loadFromData(QByteArray::fromBase64(array),"PNG");
+      }
+    this->addLookmark(name, dataName, comments, image, pipeline, state, restoreData, restoreCamera);
     }
 }
 
@@ -447,13 +611,31 @@ void pqLookmarkBrowserModel::loadLookmark(const QModelIndex &idx, pqServer *serv
   parser->Parse();
   vtkPVXMLElement *smState = parser->GetRootElement();
   if(smState)
-    {
-    // We need to add a root <ParaView> tag in order pqApplication to parse it correctly
-    vtkPVXMLElement *root = vtkPVXMLElement::New();
-    root->SetName("ParaView");
-    root->AddNestedElement(smState);
-    pqApplicationCore::instance()->loadState(root,server);
-    root->Delete();
+    {  
+    // for now, load it in the current view
+    vtkSmartPointer<pqLookmarkStateLoader> loader;
+    loader.TakeReference(pqLookmarkStateLoader::New());
+    loader->SetMainWindowCore(this->Internal->MainWindowCore);
+    loader->SetUseCameraFlag(this->getLookmarkRestoreCameraFlag(idx));
+    loader->SetUseDataFlag(this->getLookmarkRestoreDataFlag(idx));
+    // only support render views for now
+    pqRenderViewModule* renModule = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
+    if(!renModule)
+      {
+      renModule = qobject_cast<pqRenderViewModule*>(pqPipelineBuilder::instance()->createView(server,pqRenderViewModule::renderViewType()));
+      }
+    loader->AddPreferredRenderModule(renModule->getRenderModuleProxy());
+    pqApplicationCore::instance()->loadState(smState,server,loader);
+/*
+    renModule->render();
+    QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renModule->getWidget());
+    assert(widget);
+    widget->resize(widget->width(),widget->height());
+    int *size = widget->GetRenderWindow()->GetSize();
+*/
+    //loader->Delete();
+
+    emit this->lookmarkLoaded();
     }
   parser->Delete();
   delete charArray;
