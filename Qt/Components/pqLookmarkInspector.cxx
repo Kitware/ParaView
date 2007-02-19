@@ -96,6 +96,9 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkBrowserModel *model, QWidget 
   this->Form->LoadButton->setEnabled(false);
   this->Form->DeleteButton->setEnabled(false);
 
+  // Disable the restore data button until a fix can be made for the crash that's ocurring as ParaView closes when a lookmark that has this option turned off has been loaded.
+  this->Form->RestoreData->setEnabled(false);
+
   this->connect(this->Form->RestoreData, 
                 SIGNAL(stateChanged(int)),
                 SLOT(onRestoreDataModified()));
