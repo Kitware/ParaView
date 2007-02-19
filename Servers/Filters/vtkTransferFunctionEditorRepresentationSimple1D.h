@@ -58,9 +58,11 @@ public:
   vtkHandleRepresentation* GetHandleRepresentation(unsigned int idx);
 
   // Description:
-  // Set the display position of a vtkHandleRepresentation (for a transfer
+  // Set/get the display position of a vtkHandleRepresentation (for a transfer
   // function node) with a particular id.
   virtual void SetHandleDisplayPosition(unsigned int nodeNum, double pos[3]);
+  void GetHandleDisplayPosition(unsigned int nodeNum, double pos[3]);
+  double* GetHandleDisplayPosition(unsigned int nodeNum);
 
   // Description:
   // Remove a vtkHandleRepresentation (for a transfer function node) with a

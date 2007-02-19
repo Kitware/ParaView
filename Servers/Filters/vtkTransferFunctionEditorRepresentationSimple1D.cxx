@@ -25,7 +25,7 @@
 #include "vtkViewport.h"
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.3");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.4");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -314,6 +314,51 @@ void vtkTransferFunctionEditorRepresentationSimple1D::SetHandleDisplayPosition(
         }
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::GetHandleDisplayPosition(
+  unsigned int nodeNum, double pos[3])
+{
+  if (nodeNum > this->Handles->size()-1)
+    {
+    return;
+    }
+
+  vtkHandleListIterator iter;
+  unsigned int i = 0;
+  for (iter = this->Handles->begin(); iter != this->Handles->end();
+       iter++, i++)
+    {
+    if (i == nodeNum)
+      {
+      (*iter)->GetDisplayPosition(pos);
+      return;
+      }
+    }  
+}
+
+//----------------------------------------------------------------------------
+double* vtkTransferFunctionEditorRepresentationSimple1D::GetHandleDisplayPosition(
+  unsigned int nodeNum)
+{
+  if (nodeNum > this->Handles->size()-1)
+    {
+    return NULL;
+    }
+
+  vtkHandleListIterator iter;
+  unsigned int i = 0;
+  for (iter = this->Handles->begin(); iter != this->Handles->end();
+       iter++, i++)
+    {
+    if (i == nodeNum)
+      {
+      return (*iter)->GetDisplayPosition();
+      }
+    }  
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

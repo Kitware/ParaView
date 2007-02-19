@@ -61,6 +61,10 @@ public:
   // displaying the histogram behind the widget.
   vtkSetVector2Macro(ScalarBinRange, int);
 
+  // Description:
+  // Return the current handle Id.
+  virtual unsigned int GetActiveHandle() { return 0; }
+
 protected:
   vtkTransferFunctionEditorRepresentation();
   ~vtkTransferFunctionEditorRepresentation();
