@@ -80,7 +80,8 @@ public:
     ADD = 0,
     POLYDATA_APPEND = 1,
     UNSTRUCTURED_APPEND = 2,
-    FIRST_NODE_ONLY = 3 
+    FIRST_NODE_ONLY = 3,
+    RECTILINEAR_GRID_APPEND=4
     };
   //ETX
 

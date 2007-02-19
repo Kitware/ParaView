@@ -18,15 +18,18 @@
 #include "vtkDataSet.h"
 #include "vtkDataSetReader.h"
 #include "vtkDataSetWriter.h"
+#include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkRectilinearGrid.h"
 #include "vtkRemoteConnection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
+#include "vtkStructuredGrid.h"
 #include "vtkToolkits.h"
-#include "vtkInstantiator.h"
 
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
@@ -35,7 +38,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.7");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.8");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -217,6 +220,9 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
     {
     int *data_lengths = new int[numProcs];
     int *offsets = new int[numProcs];
+    int *extents = new int[numProcs*6];
+    int *extent_lengths = new int[numProcs];
+    int *extent_offsets = new int[numProcs];
 
     // Collect data lengths from all satellites.
     com->Gather(&this->DataLength, data_lengths, 1, 0);
@@ -228,10 +234,16 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
       {
       offsets[cc] = total_size;
       total_size += data_lengths[cc];
+
+      extent_offsets[cc] = cc*6;
+      extent_lengths[cc] = 6;
       }
     char* gathered_data = new char[total_size];
     com->GatherV(this->RawData, gathered_data, this->DataLength,
       data_lengths, offsets, 0);
+    com->GatherV(this->Extent, extents, 6, 
+      extent_lengths, extent_offsets, 0);
+
 
     // Form vtkDataSets from collected data.
     // Meanwhile if the user wants to see only one node's data
@@ -242,7 +254,7 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
       if (this->PassThrough<0 || this->PassThrough==cc)
         {        
         vtkDataSet* ds = this->Reconstruct(
-          gathered_data + offsets[cc], data_lengths[cc]);
+          gathered_data + offsets[cc], data_lengths[cc], &extents[cc*6]);
         data_sets.push_back(ds);
         ds->Delete();
         }
@@ -295,6 +307,9 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
     delete[] data_lengths;
     delete[] offsets;
     delete[] gathered_data;
+    delete[] extents;
+    delete[] extent_offsets;
+    delete[] extent_lengths;
     }
   else
     {
@@ -302,6 +317,8 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
     com->Gather(&this->DataLength, 0, 1, 0);
     // Send the data to be gathered on the root.
     com->GatherV(this->RawData, 0, this->DataLength, 0, 0, 0);
+    // Send the extents.
+    com->GatherV(this->Extent, 0, 6, 0, 0, 0);
     output->ShallowCopy(preOutput);
     }
 
@@ -327,12 +344,33 @@ void vtkReductionFilter::MarshallData(vtkDataSet* input)
   delete []this->RawData;
   this->DataLength = writer->GetOutputStringLength();
   this->RawData = writer->RegisterAndGetOutputString();
+  this->Extent[0] = this->Extent[1] = this->Extent[2] = 
+    this->Extent[3] = this->Extent[4] = this->Extent[5] = 0;
+  if (data->GetExtentType() == VTK_3D_EXTENT)
+    {
+    vtkRectilinearGrid* rg = vtkRectilinearGrid::SafeDownCast(data);
+    vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(data);
+    vtkImageData* id = vtkImageData::SafeDownCast(data);
+    if (rg)
+      {
+      rg->GetExtent(this->Extent);
+      }
+    else if (sg)
+      {
+      sg->GetExtent(this->Extent);
+      }
+    else if (id)
+      {
+      id->GetExtent(this->Extent);
+      }
+    }
   writer->Delete();
   data->Delete();
 }
 
 //-----------------------------------------------------------------------------
-vtkDataSet* vtkReductionFilter::Reconstruct(char* raw_data, int data_length)
+vtkDataSet* vtkReductionFilter::Reconstruct(char* raw_data, int data_length,
+  int *extent)
 {
   vtkDataSetReader* reader= vtkDataSetReader::New();
   reader->ReadFromInputStringOn();
@@ -343,6 +381,33 @@ vtkDataSet* vtkReductionFilter::Reconstruct(char* raw_data, int data_length)
 
   vtkDataSet* output = reader->GetOutput()->NewInstance();
   output->ShallowCopy(reader->GetOutput());
+
+  // Set the extents if the dataobject supports it.
+  if (output->GetExtentType() == VTK_3D_EXTENT)
+    {
+    cout <<"Extent: "<<
+      extent[0] << ", " << 
+      extent[1] << ", " << 
+      extent[2] << ", " << 
+      extent[3] << ", " << 
+      extent[4] << ", " << 
+      extent[5] << endl;
+    vtkRectilinearGrid* rg = vtkRectilinearGrid::SafeDownCast(output);
+    vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(output);
+    vtkImageData* id = vtkImageData::SafeDownCast(output);
+    if (rg)
+      {
+      rg->SetExtent(extent);
+      }
+    else if (sg)
+      {
+      sg->SetExtent(extent);
+      }
+    else if (id)
+      {
+      id->SetExtent(extent);
+      }
+    }
 
   reader->Delete();
   string_data->Delete();

@@ -84,11 +84,12 @@ protected:
                           vtkInformationVector* outputVector);
 
   void MarshallData(vtkDataSet* input);
-  vtkDataSet* Reconstruct(char* raw_data, int data_length);
+  vtkDataSet* Reconstruct(char* raw_data, int data_length, int *extent);
   void Reduce(vtkDataSet* input, vtkDataSet* output);
 
   char* RawData;
   int DataLength;
+  int Extent[6];
   vtkAlgorithm* PreGatherHelper;
   vtkAlgorithm* PostGatherHelper;
   vtkMultiProcessController* Controller;

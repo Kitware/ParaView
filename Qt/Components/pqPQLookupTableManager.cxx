@@ -31,21 +31,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPQLookupTableManager.h"
 
+#include "vtkProcessModule.h"
+#include "vtkSMIntRangeDomain.h"
+#include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkProcessModule.h"
+
 #include <QList>
 #include <QMap>
 #include <QPointer>
 #include <QRegExp>
 #include <QtDebug>
 
+#include "pqApplicationCore.h"
+#include "pqPipelineDisplay.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
-#include "pqSMAdaptor.h"
-#include "pqPipelineDisplay.h"
-#include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
+#include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
 class pqPQLookupTableManagerInternal
@@ -179,6 +182,14 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
     lutProxy->GetProperty("ColorSpace"), "HSV");
   lutProxy->UpdateVTKObjects();
   lutProxy->InvokeCommand("Build");
+
+  if (number_of_components >= 1)
+    {
+    vtkSMIntRangeDomain* componentsDomain = 
+      vtkSMIntRangeDomain::SafeDownCast(
+        lutProxy->GetProperty("VectorComponent")->GetDomain("range"));
+    componentsDomain->AddMaximum(0, (number_of_components-1));
+    }
   pqPQLookupTableManagerInternal::Key key(
     server->GetConnectionID(), arrayname, number_of_components);
   if (!this->Internal->LookupTables.contains(key))

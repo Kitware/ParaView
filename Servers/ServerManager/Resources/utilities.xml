@@ -148,7 +148,7 @@
          command="SetVectorComponent"
          number_of_elements="1" 
          default_values="0">
-        <IntRangeDomain name="range" min="0" /> 
+        <IntRangeDomain name="range" min="0" max="0" /> 
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -1245,8 +1245,7 @@
           <Entry value="2" text="Ramp" />
           <Entry value="3" text="Exponential" />
           <Entry value="4" text="Sinusoid" />
-          <Entry value="5" text="Timestep" />
-          <Entry value="6" text="Camera" />
+          <Entry value="5" text="Camera" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -1261,13 +1260,6 @@
         <Proxy name="Ramp" 
                proxygroup="animation_keyframes"
                proxyname="RampKeyFrame">
-        </Proxy>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="Timestep" 
-               proxygroup="animation_keyframes"
-               proxyname="TimestepKeyFrame">
         </Proxy>
       </SubProxy>
 
@@ -1319,10 +1311,6 @@
     <RampKeyFrameProxy name="RampKeyFrame"
       base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
     </RampKeyFrameProxy>
-
-    <TimestepKeyFrameProxy name="TimestepKeyFrame"
-      base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
-    </TimestepKeyFrameProxy>
 
     <ExponentialKeyFrameProxy name="ExponentialKeyFrame" 
       base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">

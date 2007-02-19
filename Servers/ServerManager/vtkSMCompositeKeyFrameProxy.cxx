@@ -19,7 +19,7 @@
 #include "vtkSMPropertyLink.h"
 
 vtkStandardNewMacro(vtkSMCompositeKeyFrameProxy);
-vtkCxxRevisionMacro(vtkSMCompositeKeyFrameProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMCompositeKeyFrameProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMCompositeKeyFrameProxy::vtkSMCompositeKeyFrameProxy()
 {
@@ -49,9 +49,6 @@ const char* vtkSMCompositeKeyFrameProxy::GetTypeAsString(int type)
   case RAMP:
     return "Ramp";
 
-  case TIMESTEP:
-    return "Timestep";
-
   case EXPONENTIAL:
     return "Exponential";
 
@@ -80,10 +77,6 @@ int vtkSMCompositeKeyFrameProxy::GetTypeFromString(const char* type)
   else if (strcmp(type, "Ramp") == 0)
     {
     return RAMP;
-    }
-  else if (strcmp(type, "Timestep") == 0)
-    {
-    return TIMESTEP;
     }
   else if (strcmp(type, "Exponential") == 0)
     {
@@ -144,7 +137,6 @@ void vtkSMCompositeKeyFrameProxy::UpdateValue(double currenttime,
     {
   case BOOLEAN:
   case RAMP:
-  case TIMESTEP:
   case EXPONENTIAL:
   case SINUSOID:
   case CAMERA:

@@ -65,6 +65,8 @@ public:
   /// exists, use getCue() before calling this to avoid duplicates.
   pqAnimationCue* createCue(vtkSMProxy* proxy, const char* propertyname,
     int index);
+  pqAnimationCue* createCue(vtkSMProxy* proxy, const char* propertyname,
+    int index, const QString& manip_type);
 
   /// Removes all cues which animate the indicated proxy, if any.
   void removeCues(vtkSMProxy* proxy);

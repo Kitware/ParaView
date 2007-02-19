@@ -79,6 +79,11 @@ public:
   void setManipulatorType(const QString& type)
     { this->ManipulatorType = type; }
 
+  /// Set the type of the keyframe created by default.
+  /// default is CompositeKeyFrame.
+  void setKeyFrameType(const QString& type)
+    { this->KeyFrameType = type; }
+
   // returns the manipulator proxy.
   vtkSMProxy* getManipulatorProxy() const;
 
@@ -101,6 +106,7 @@ private:
   pqAnimationCue(const pqAnimationCue&); // Not implemented.
   void operator=(const pqAnimationCue&); // Not implemented.
 
+  QString KeyFrameType;
   QString ManipulatorType;
   class pqInternals;
   pqInternals* Internal;

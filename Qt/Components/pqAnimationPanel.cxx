@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkClientServerID.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMVectorProperty.h"
 
 #include <QDoubleValidator>
@@ -46,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScrollArea>
 #include <QtDebug>
 
+#include "pqActiveView.h"
 #include "pqAnimationCue.h"
 #include "pqAnimationManager.h"
 #include "pqAnimationScene.h"
@@ -54,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqKeyFrameTimeValidator.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
+#include "pqRenderViewModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
@@ -69,7 +73,7 @@ class pqAnimationPanel::pqInternals : public Ui::AnimationPanel
 {
 public:
   QPointer<pqAnimationManager> Manager;
-  QPointer<pqPipelineSource> CurrentSource;
+  QPointer<pqProxy> CurrentProxy;
   QPointer<pqAnimationCue> ActiveCue;
   vtkSmartPointer<vtkSMProxy> ActiveKeyFrame;
   QPointer<pqSignalAdaptorKeyFrameValue> ValueAdaptor;
@@ -78,7 +82,8 @@ public:
   QPointer<pqKeyFrameTimeValidator> KeyFrameTimeValidator;
   QPointer<pqDoubleSpinBoxDomain> SceneCurrentTimeDomain;
   QPointer<pqAnimationScene> ActiveScene;
-  pqPropertyLinks Links;
+  QPointer<pqRenderViewModule> ActiveView;
+  pqPropertyLinks KeyFrameLinks;
   pqPropertyLinks SceneLinks;
   struct PropertyInfo
     {
@@ -113,14 +118,15 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
   vboxlayout->addWidget(s);
 
   this->Internal->setupUi(container);
+  this->Internal->cameraFrame->hide();
 
   this->Internal->KeyFrameTimeValidator = new pqKeyFrameTimeValidator(this);
   this->Internal->keyFrameTime->setValidator(
     this->Internal->KeyFrameTimeValidator);
 
-  QObject::connect(&this->Internal->Links, SIGNAL(beginUndoSet(const QString&)),
+  QObject::connect(&this->Internal->KeyFrameLinks, SIGNAL(beginUndoSet(const QString&)),
     this, SIGNAL(beginUndoSet(const QString&)));
-  QObject::connect(&this->Internal->Links, SIGNAL(endUndoSet()),
+  QObject::connect(&this->Internal->KeyFrameLinks, SIGNAL(endUndoSet()),
     this, SIGNAL(endUndoSet()));
 
   QObject::connect(&this->Internal->SceneLinks, SIGNAL(beginUndoSet(const QString&)),
@@ -158,6 +164,14 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(nameChanged(pqServerManagerModelItem*)),
     this, SLOT(onNameChanged(pqServerManagerModelItem*)));
+
+  QObject::connect(&pqActiveView::instance(),
+    SIGNAL(changed(pqGenericViewModule*)),
+    this, SLOT(onActiveViewChanged(pqGenericViewModule*)));
+
+  QObject::connect(this->Internal->useCurrent,
+    SIGNAL(clicked(bool)), 
+    this, SLOT(resetCameraKeyFrameToCurrent()));
 
   this->Internal->ValueAdaptor = new pqSignalAdaptorKeyFrameValue(
     this->Internal->valueFrameLarge, this->Internal->valueFrame);
@@ -317,7 +331,7 @@ void pqAnimationPanel::onSceneCuesChanged()
     this->updateEnableState();
     }
 
-  if (!this->Internal->ActiveCue && this->Internal->CurrentSource)
+  if (!this->Internal->ActiveCue && this->Internal->CurrentProxy)
     {
     // It is possible that the scene has detected a new cue for the 
     // currently selected property, this call will show that.
@@ -381,7 +395,7 @@ void pqAnimationPanel::setActiveCue(pqAnimationCue* cue)
 //-----------------------------------------------------------------------------
 void pqAnimationPanel::updateEnableState()
 {
-  bool enable = (this->Internal->CurrentSource != 0);
+  bool enable = (this->Internal->CurrentProxy!= 0);
 
   this->Internal->propertyName->setEnabled(enable);
 
@@ -411,25 +425,36 @@ void pqAnimationPanel::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
+// Called when the pipeline brower selection changes.
 void pqAnimationPanel::onCurrentChanged(pqServerManagerModelItem* current)
 {
-  pqPipelineSource* src = qobject_cast<pqPipelineSource*>(current);
+  pqProxy* src = qobject_cast<pqProxy*>(current);
+  if (!src)
+    {
+    // We don't change the selection if the request is to select nothing 
+    // at all.
+    return;
+    }
+  this->onCurrentChanged(src);
+}
 
-  if (this->Internal->CurrentSource == src)
+//-----------------------------------------------------------------------------
+// Called when pipeline browser selection changes or the source combobox
+// selection changes.
+void pqAnimationPanel::onCurrentChanged(pqProxy* src)
+{
+  if (this->Internal->CurrentProxy == src)
     {
     return;
     }
 
   this->setActiveCue(0);
-
+  this->Internal->CurrentProxy = src;
   if (!src)
     {
-    this->Internal->CurrentSource = 0;
     this->updateEnableState();
     return;
     }
-
-  this->Internal->CurrentSource = src;
   
   int index = this->Internal->sourceName->findData(
     QVariant(src->getProxy()->GetSelfID().ID));
@@ -441,7 +466,7 @@ void pqAnimationPanel::onCurrentChanged(pqServerManagerModelItem* current)
     }
   if (index == -1)
     {
-    this->Internal->CurrentSource = 0;
+    this->Internal->CurrentProxy = 0;
     this->updateEnableState();
     this->Internal->sourceName->setCurrentIndex(-1);
     return;
@@ -453,11 +478,23 @@ void pqAnimationPanel::onCurrentChanged(pqServerManagerModelItem* current)
 }
 
 //-----------------------------------------------------------------------------
+// called when the source combo-box changes.
 void pqAnimationPanel::onCurrentSourceChanged(int index)
 {
-  QString pname = this->Internal->sourceName->itemText(index);
-  pqPipelineSource* src = 
-    pqApplicationCore::instance()->getServerManagerModel()-> getPQSource(pname);
+  pqProxy* src = 0;
+  if (index != -1)
+    {
+    QString pname = this->Internal->sourceName->itemText(index);
+    if (pname == "Camera" && this->Internal->ActiveView)
+      {
+      src = this->Internal->ActiveView;
+      }
+    else
+      {
+      src = pqApplicationCore::instance()->
+        getServerManagerModel()-> getPQSource(pname);
+      }
+    }
 #if 0
   pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(
     src, pqServerManagerSelectionModel::ClearAndSelect);
@@ -470,16 +507,49 @@ void pqAnimationPanel::onCurrentSourceChanged(int index)
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationPanel::buildPropertyList()
+void pqAnimationPanel::onActiveViewChanged(pqGenericViewModule* view)
 {
-  this->Internal->propertyName->clear();
-  if (!this->Internal->CurrentSource)
+  pqRenderViewModule* rview = qobject_cast<pqRenderViewModule*>(view);
+  if (this->Internal->ActiveView == rview)
     {
     return;
     }
+
+  this->Internal->ActiveView = rview;
+  if (rview && this->Internal->sourceName->findText("Camera") == -1)
+    {
+    this->Internal->sourceName->insertItem(0, "Camera",
+      QVariant(rview->getProxy()->GetSelfID().ID));
+
+    }
+  if (!rview && this->Internal->sourceName->findText("Camera") != -1)
+    {
+    this->Internal->sourceName->removeItem(0);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationPanel::buildPropertyList()
+{
+  this->Internal->propertyName->clear();
+  if (!this->Internal->CurrentProxy)
+    {
+    return;
+    }
+
+  if (this->Internal->CurrentProxy == this->Internal->ActiveView)
+    {
+    // Render modules are never actulally animated, we animate their camera.
+    pqAnimationPanel::pqInternals::PropertyInfo info;
+    info.Name = "Camera";
+    info.Index =  -1;
+    this->Internal->propertyName->addItem("Camera", QVariant::fromValue(info));
+    return;
+    }
+
   vtkSmartPointer<vtkSMPropertyIterator> iter;
   iter.TakeReference(
-    this->Internal->CurrentSource->getProxy()->NewPropertyIterator());
+    this->Internal->CurrentProxy->getProxy()->NewPropertyIterator());
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMVectorProperty* smproperty = 
@@ -523,7 +593,7 @@ void pqAnimationPanel::onCurrentPropertyChanged(int index)
       pqAnimationPanel::pqInternals::PropertyInfo>();
 
     cue = mgr->getCue(scene, 
-      this->Internal->CurrentSource->getProxy(),
+      this->Internal->CurrentProxy->getProxy(),
       info.Name.toAscii().data(), info.Index);
     }
 
@@ -534,6 +604,36 @@ void pqAnimationPanel::onCurrentPropertyChanged(int index)
     this->showKeyFrame(0);
     }
   this->updateEnableState();
+}
+//-----------------------------------------------------------------------------
+void pqAnimationPanel::resetCameraKeyFrameToCurrent()
+{
+  vtkSMRenderModuleProxy* src = 
+    this->Internal->ActiveView->getRenderModuleProxy();
+  src->SynchronizeCameraProperties();
+
+  vtkSMProxy* dest = this->Internal->ActiveKeyFrame;
+  if (!src || !dest)
+    {
+    return;
+    }
+
+  const char* names[] = { "Position", "FocalPoint", "ViewUp", "ViewAngle",  0 };
+  const char* snames[] = { "CameraPositionInfo", "CameraFocalPointInfo", 
+    "CameraViewUpInfo",  "CameraViewAngleInfo", 0 };
+  for (int cc=0; names[cc] && snames[cc]; cc++)
+    {
+    vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      src->GetProperty(snames[cc]));
+    vtkSMDoubleVectorProperty* ddvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      dest->GetProperty(names[cc]));
+    if (sdvp && ddvp)
+      {
+      ddvp->Copy(sdvp);
+      ddvp->Modified();
+      }
+    }
+  dest->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -551,9 +651,11 @@ void pqAnimationPanel::addKeyFrameCallback()
     this->Internal->ActiveCue->getNumberOfKeyFrames() == 1)
     {
     this->Internal->ValueAdaptor->setValueToMin();
+    this->resetCameraKeyFrameToCurrent();
 
     this->insertKeyFrame(index+1);
     this->Internal->ValueAdaptor->setValueToMax();
+    this->resetCameraKeyFrameToCurrent();
     
     this->showKeyFrame(0);
     }
@@ -616,8 +718,17 @@ void pqAnimationPanel::insertKeyFrame(int index)
       this->Internal->propertyName->itemData(
         this->Internal->propertyName->currentIndex()).value<
       pqAnimationPanel::pqInternals::PropertyInfo>();
-    cue = scene->createCue(this->Internal->CurrentSource->getProxy(),
-      info.Name.toAscii().data(), info.Index);
+    if (this->Internal->CurrentProxy == this->Internal->ActiveView)
+      {
+      cue = scene->createCue(this->Internal->CurrentProxy->getProxy(),
+        info.Name.toAscii().data(), info.Index, "CameraManipulator");
+      cue->setKeyFrameType("CameraKeyFrame");
+      }
+    else
+      {
+      cue = scene->createCue(this->Internal->CurrentProxy->getProxy(),
+        info.Name.toAscii().data(), info.Index);
+      }
     this->setActiveCue(cue);
     }
 
@@ -677,7 +788,7 @@ void pqAnimationPanel::showKeyFrame(int index)
   this->Internal->ActiveKeyFrame = toShowKf;
 
   // clean up old keyframe.
-  this->Internal->Links.removeAllPropertyLinks();
+  this->Internal->KeyFrameLinks.removeAllPropertyLinks();
   this->Internal->ValueAdaptor->setAnimationCue(0);
   this->Internal->TimeAdaptor->setAnimationCue(0);
   this->Internal->TimeAdaptor->setAnimationScene(0);
@@ -689,15 +800,18 @@ void pqAnimationPanel::showKeyFrame(int index)
     return;
     }
 
-  // TODO: Update the type menu based on the possible KF types
-  this->Internal->interpolationType->blockSignals(true);
-  this->Internal->interpolationType->clear();
-  this->Internal->interpolationType->addItem("Ramp", "Ramp");
-  this->Internal->interpolationType->addItem("Exponential", "Exponential");
-  this->Internal->interpolationType->addItem("Sinusoid", "Sinusoid");
-  this->Internal->interpolationType->addItem("Boolean", "Boolean");
-  this->Internal->interpolationType->setCurrentIndex(-1);
-  this->Internal->interpolationType->blockSignals(false);
+  // So interpolation options only for composite key frames.
+  if (toShowKf->IsA("vtkSMCompositeKeyFrameProxy"))
+    {
+    this->Internal->interpolationType->blockSignals(true);
+    this->Internal->interpolationType->clear();
+    this->Internal->interpolationType->addItem("Ramp", "Ramp");
+    this->Internal->interpolationType->addItem("Exponential", "Exponential");
+    this->Internal->interpolationType->addItem("Sinusoid", "Sinusoid");
+    this->Internal->interpolationType->addItem("Boolean", "Boolean");
+    this->Internal->interpolationType->setCurrentIndex(-1);
+    this->Internal->interpolationType->blockSignals(false);
+    }
 
   this->Internal->ValueAdaptor->setAnimationCue(this->Internal->ActiveCue);
   this->Internal->TimeAdaptor->setAnimationCue(this->Internal->ActiveCue);
@@ -717,27 +831,69 @@ void pqAnimationPanel::showKeyFrame(int index)
 
   // Update and connect the type adaptor
   this->Internal->TypeAdaptor->setKeyFrameProxy(toShowKf);
-  this->Internal->Links.addPropertyLink(
+  this->Internal->KeyFrameLinks.addPropertyLink(
     this->Internal->TypeAdaptor, "currentText",
     SIGNAL(currentTextChanged(const QString&)),
     toShowKf, toShowKf->GetProperty("Type"));
-  int animated_index = this->Internal->ActiveCue->getAnimatedPropertyIndex();
-  if (animated_index == -1)
+
+  if (toShowKf->GetXMLName() == QString("CameraKeyFrame"))
     {
-    this->Internal->Links.addPropertyLink(
-      this->Internal->ValueAdaptor, "values",
-      SIGNAL(valueChanged()),
-      toShowKf, toShowKf->GetProperty("KeyValues"));
+    this->Internal->cameraFrame->show();
+    this->Internal->KeyFrameLinks.addPropertyLink(
+      this->Internal->position0, "value", SIGNAL(valueChanged(double)),
+      toShowKf, toShowKf->GetProperty("Position"), 0);
+    this->Internal->KeyFrameLinks.addPropertyLink(
+      this->Internal->position1, "value", SIGNAL(valueChanged(double)),
+      toShowKf, toShowKf->GetProperty("Position"), 1);
+    this->Internal->KeyFrameLinks.addPropertyLink(
+      this->Internal->position2, "value", SIGNAL(valueChanged(double)),
+      toShowKf, toShowKf->GetProperty("Position"), 2);
+
+    this->Internal->KeyFrameLinks.addPropertyLink(
+      this->Internal->focalPoint0, "value", SIGNAL(valueChanged(double)),
+      toShowKf, toShowKf->GetProperty("FocalPoint"), 0);
+    this->Internal->KeyFrameLinks.addPropertyLink(
+      this->Internal->focalPoint1, "value", SIGNAL(valueChanged(double)),
+      toShowKf, toShowKf->GetProperty("FocalPoint"), 1);
+    this->Internal->KeyFrameLinks.addPropertyLink(
+      this->Internal->focalPoint2, "value", SIGNAL(valueChanged(double)),
+      toShowKf, toShowKf->GetProperty("FocalPoint"), 2);
+
+    this->Internal->KeyFrameLinks.addPropertyLink(
+      this->Internal->viewUp0, "value", SIGNAL(valueChanged(double)),
+      toShowKf, toShowKf->GetProperty("ViewUp"), 0);
+    this->Internal->KeyFrameLinks.addPropertyLink(
+      this->Internal->viewUp1, "value", SIGNAL(valueChanged(double)),
+      toShowKf, toShowKf->GetProperty("ViewUp"), 1);  
+    this->Internal->KeyFrameLinks.addPropertyLink(
+      this->Internal->viewUp2, "value", SIGNAL(valueChanged(double)),
+      toShowKf, toShowKf->GetProperty("ViewUp"), 2);
+
+    this->Internal->KeyFrameLinks.addPropertyLink(
+      this->Internal->viewAngle, "value", SIGNAL(valueChanged(double)),
+      toShowKf, toShowKf->GetProperty("ViewAngle"), 0);
     }
   else
     {
-    this->Internal->Links.addPropertyLink(
-      this->Internal->ValueAdaptor, "value",
-      SIGNAL(valueChanged()),
-      toShowKf, toShowKf->GetProperty("KeyValues"),
-      animated_index);
+    this->Internal->cameraFrame->hide();
+    int animated_index = this->Internal->ActiveCue->getAnimatedPropertyIndex();
+    if (animated_index == -1)
+      {
+      this->Internal->KeyFrameLinks.addPropertyLink(
+        this->Internal->ValueAdaptor, "values",
+        SIGNAL(valueChanged()),
+        toShowKf, toShowKf->GetProperty("KeyValues"));
+      }
+    else
+      {
+      this->Internal->KeyFrameLinks.addPropertyLink(
+        this->Internal->ValueAdaptor, "value",
+        SIGNAL(valueChanged()),
+        toShowKf, toShowKf->GetProperty("KeyValues"),
+        animated_index);
+      }
     }
-  this->Internal->Links.addPropertyLink(
+  this->Internal->KeyFrameLinks.addPropertyLink(
     this->Internal->TimeAdaptor, "normalizedTime",
     SIGNAL(timeChanged()),
     toShowKf, toShowKf->GetProperty("KeyTime"));

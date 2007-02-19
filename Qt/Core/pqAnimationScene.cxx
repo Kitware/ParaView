@@ -275,6 +275,14 @@ pqAnimationCue* pqAnimationScene::createCue(vtkSMProxy* proxy,
 }
 
 //-----------------------------------------------------------------------------
+pqAnimationCue* pqAnimationScene::createCue(vtkSMProxy* proxy, 
+  const char* propertyname, int index, const QString& manip_type) 
+{
+  return this->createCueInternal(manip_type,
+    proxy, propertyname, index);
+}
+
+//-----------------------------------------------------------------------------
 pqAnimationCue* pqAnimationScene::createCueInternal(const QString& mtype,
   vtkSMProxy* proxy, const char* propertyname, int index) 
 {

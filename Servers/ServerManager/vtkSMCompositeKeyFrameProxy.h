@@ -42,8 +42,7 @@ public:
     RAMP=2,
     EXPONENTIAL=3,
     SINUSOID=4,
-    TIMESTEP=5,
-    CAMERA=6
+    CAMERA=5
     };
   //ETX
 

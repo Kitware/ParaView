@@ -26,7 +26,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.17");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -132,6 +132,10 @@ void vtkSMGenericViewDisplayProxy::SetReductionType(int type)
 
   case FIRST_NODE_ONLY:
     classname = 0;
+    break;
+
+  case RECTILINEAR_GRID_APPEND:
+    classname = "vtkAppendRectilinearGrid";
     break;
 
   default:

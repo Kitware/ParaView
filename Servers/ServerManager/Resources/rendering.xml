@@ -3660,6 +3660,7 @@
           <Entry value="1" text="POLYDATA_APPEND" />
           <Entry value="2" text="UNSTRUCTURED_APPEND" />
           <Entry value="3" text="FIRST_NODE_ONLY" />
+          <Entry value="4" text="RECTILINEAR_GRID_APPEND" />
         </EnumerationDomain>
       </IntVectorProperty>
 

@@ -37,12 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRectilinearGrid.h"
 #include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 #include <QtDebug>
 
 #include "pqApplicationCore.h"
 #include "pqLookupTableManager.h"
+#include "pqPipelineSource.h"
 #include "pqScalarsToColors.h"
 #include "pqSMAdaptor.h"
 
@@ -98,8 +100,16 @@ void pqBarChartDisplay::setDefaults()
   bool use_points = (svp->GetElement(0) == 0);
   pqSMAdaptor::setElementProperty(
     proxy->GetProperty("XAxisUsePoints"), use_points);
-  pqSMAdaptor::setEnumerationProperty(
-    proxy->GetProperty("ReductionType"), "FIRST_NODE_ONLY");
+  if (this->getInput()->getProxy()->GetXMLName() == QString("ExtractHistogram"))
+    {
+    pqSMAdaptor::setEnumerationProperty(
+      proxy->GetProperty("ReductionType"), "FIRST_NODE_ONLY");
+    }
+  else
+    {
+    pqSMAdaptor::setEnumerationProperty(
+      proxy->GetProperty("ReductionType"), "RECTILINEAR_GRID_APPEND");
+    }
   proxy->UpdateVTKObjects();
 
   // Now initialize the lookup table.

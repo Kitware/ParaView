@@ -61,6 +61,7 @@ pqAnimationCue::pqAnimationCue(const QString& group, const QString& name,
 : pqProxy(group, name, proxy, server, _parent)
 {
   this->ManipulatorType = "KeyFrameAnimationCueManipulator";
+  this->KeyFrameType = "CompositeKeyFrame";
 
   this->Internal = new pqAnimationCue::pqInternals();
 
@@ -268,10 +269,11 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
   // Get the current keyframes.
   QList<vtkSMProxy*> keyframes = this->getKeyFrames();
   
-  vtkSMProxy* kf = pxm->NewProxy("animation_keyframes", "CompositeKeyFrame");
+  vtkSMProxy* kf = pxm->NewProxy("animation_keyframes", 
+    this->KeyFrameType.toAscii().data());
   if (!kf)
     {
-    qDebug() << "Could not create new proxy CompositeKeyFrame";
+    qDebug() << "Could not create new proxy " << this->KeyFrameType;
     return 0;
     }
   kf->SetConnectionID(this->getServer()->GetConnectionID());

@@ -11,6 +11,7 @@ ENDIF(PARAVIEW_ENABLE_PYTHON_FILTER)
 
 SET(Filters_SRCS
   vtkAcuSolveReaderProxy.cxx
+  vtkAppendRectilinearGrid.cxx
   vtkAttributeDataReductionFilter.cxx
   vtkAttributeEditor.cxx
   vtkCameraManipulator.cxx
