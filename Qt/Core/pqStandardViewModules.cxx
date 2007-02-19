@@ -86,7 +86,7 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
     }
   else if(viewtype == pqPlotViewModule::XYPlotType())
     {
-    return pxm->NewProxy("plotmodules", "XYViewModule");
+    return pxm->NewProxy("plotmodules", "XYPlotViewModule");
     }
   else if(viewtype == pqTableViewModule::tableType())
     {
