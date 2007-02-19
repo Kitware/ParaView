@@ -28,6 +28,7 @@
 
 #include "vtkObject.h"
 
+class vtkColorTransferFunction;
 class vtkDataSet;
 class vtkEventForwarderCommand;
 class vtkInteractorStyleTransferFunctionEditor;
@@ -139,9 +140,33 @@ public:
   // function editor.
   void SetHistogramVisibility(int visibility);
 
-  //Description:
+  // Description:
   // Get the opacity function.
   vtkPiecewiseFunction* GetOpacityFunction();
+
+  // Description:
+  // Get the color function.
+  vtkColorTransferFunction* GetColorFunction();
+
+  // Description:
+  // Set the opacity of a particular transfer function element.
+  void SetElementOpacity(unsigned int idx, double opacity);
+
+  // Description:
+  // Set the RGB color of a particular transfer function element.
+  void SetElementRGBColor(unsigned int idx, double r, double g, double b);
+
+  // Description:
+  // Set the HSV color of a particular transfer function element.
+  void SetElementHSVColor(unsigned int idx, double h, double s, double v);
+
+  // Description:
+  // Return the current element Id.
+  unsigned int GetCurrentElementId();
+
+  // Description:
+  // Set the color space. (RGB = 0, HSV = 1, HSV with wrapping = 2)
+  void SetColorSpace(int space);
 
 protected:
   vtkTransferFunctionViewer();
@@ -156,6 +181,8 @@ protected:
   vtkInteractorStyleTransferFunctionEditor *InteractorStyle;
   vtkTransferFunctionEditorWidget *EditorWidget;
   vtkEventForwarderCommand *EventForwarder;
+  unsigned long HistogramMTime;
+  vtkRectilinearGrid *Histogram;
 
 private:
   vtkTransferFunctionViewer(const vtkTransferFunctionViewer&); // Not implemented.

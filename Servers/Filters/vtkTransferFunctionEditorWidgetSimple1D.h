@@ -51,6 +51,12 @@ public:
     { this->SetVisibleScalarRange(range[0], range[1]); }
 
   // Description:
+  // Set the whole range of possible scalar values to show in this widget.
+  virtual void SetWholeScalarRange(double min, double max);
+  virtual void SetWholeScalarRange(double range[2])
+    { this->SetWholeScalarRange(range[0], range[1]); }
+
+  // Description:
   // Update the size of the rendering window containing this widget, and
   // recompute the position of the transfer function nodes based on the new
   // window size.
@@ -60,6 +66,22 @@ public:
   // Respond to keypress events.
   virtual void OnChar();
 
+  // Description:
+  // Set the opacity of a particular node in the transfer function.
+  virtual void SetElementOpacity(unsigned int idx, double opacity);
+
+  // Description:
+  // Set the color of a particular node in the transfer function using the
+  // RGB or HSV color space.
+  virtual void SetElementRGBColor(unsigned int idx,
+                                  double r, double g, double b);
+  virtual void SetElementHSVColor(unsigned int idx,
+                                  double h, double s, double v);
+
+  // Description:
+  // Set the color space.
+  void SetColorSpace(int space);
+
 protected:
   vtkTransferFunctionEditorWidgetSimple1D();
   ~vtkTransferFunctionEditorWidgetSimple1D();
@@ -67,6 +89,9 @@ protected:
   // the positioning handle widgets
   vtkNodeList *Nodes;
   int WidgetState;
+
+  double InitialMinimumColor[3];
+  double InitialMaximumColor[3];
 
 //BTX
   // the state of the widget
@@ -83,8 +108,11 @@ protected:
   static void EndSelectAction(vtkAbstractWidget*);
   static void MoveNodeAction(vtkAbstractWidget*);
 
+  void AddNewNode(int x, int y);
   void AddOpacityPoint(int x, int y);
   void RemoveOpacityPoint(unsigned int id);
+  void AddColorPoint(int x);
+  void RemoveColorPoint(unsigned int id);
   
   // Helper method for creating widgets
   static vtkHandleWidget* CreateHandleWidget(

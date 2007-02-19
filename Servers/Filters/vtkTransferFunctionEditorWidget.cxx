@@ -15,6 +15,7 @@
 #include "vtkTransferFunctionEditorWidget.h"
 
 #include "vtkCellData.h"
+#include "vtkColorTransferFunction.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkPiecewiseFunction.h"
@@ -22,7 +23,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.6");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.7");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
@@ -32,6 +33,7 @@ vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
   this->WholeScalarRange[1] = this->VisibleScalarRange[1] = 0;
   this->ModificationType = OPACITY;
   this->OpacityFunction = vtkPiecewiseFunction::New();
+  this->ColorFunction = vtkColorTransferFunction::New();
   this->Histogram = NULL;
 }
 
@@ -39,6 +41,7 @@ vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
 vtkTransferFunctionEditorWidget::~vtkTransferFunctionEditorWidget()
 {
   this->OpacityFunction->Delete();
+  this->ColorFunction->Delete();
   this->SetHistogram(NULL);
 }
 

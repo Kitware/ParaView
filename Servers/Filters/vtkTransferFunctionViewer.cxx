@@ -29,7 +29,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.6");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.7");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -41,6 +41,8 @@ vtkTransferFunctionViewer::vtkTransferFunctionViewer()
   this->InteractorStyle = vtkInteractorStyleTransferFunctionEditor::New();
   this->EditorWidget = NULL;
   this->EventForwarder = vtkEventForwarderCommand::New();
+  this->Histogram = NULL;  
+  this->HistogramMTime = 0;
 
   this->EventForwarder->SetTarget(this);
 
@@ -71,6 +73,7 @@ vtkTransferFunctionViewer::~vtkTransferFunctionViewer()
     this->EditorWidget = NULL;
     }
   this->EventForwarder->Delete();
+  this->SetHistogram(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -255,6 +258,20 @@ void vtkTransferFunctionViewer::Render()
 {
   if (this->EditorWidget && this->EditorWidget->GetRepresentation())
     {
+    if (this->Histogram &&
+        this->Histogram->GetMTime() > this->HistogramMTime ||
+        !this->EditorWidget->GetHistogram())
+      {
+      this->EditorWidget->SetHistogram(this->Histogram);
+      vtkDataArray *hist = this->Histogram->GetXCoordinates();
+      if (hist)
+        {
+        double range[2];
+        hist->GetRange(range);
+        this->SetWholeScalarRange(range);
+        this->SetVisibleScalarRange(this->GetWholeScalarRange());
+        }
+      }
     this->EditorWidget->GetRepresentation()->BuildRepresentation();
     }
 
@@ -398,15 +415,93 @@ vtkPiecewiseFunction* vtkTransferFunctionViewer::GetOpacityFunction()
 }
 
 //----------------------------------------------------------------------------
-void vtkTransferFunctionViewer::SetHistogram(vtkRectilinearGrid *histogram)
+vtkColorTransferFunction* vtkTransferFunctionViewer::GetColorFunction()
 {
-  if (!this->EditorWidget)
+  if (this->EditorWidget)
     {
-    vtkErrorMacro("Set the transfer function editor type before setting the histogram.");
-    return;
+    return this->EditorWidget->GetColorFunction();
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetElementOpacity(unsigned int idx,
+                                                  double opacity)
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->SetElementOpacity(idx, opacity);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetElementRGBColor(
+  unsigned int idx, double r, double g, double b)
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->SetElementRGBColor(idx, r, g, b);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetElementHSVColor(
+  unsigned int idx, double h, double s, double v)
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->SetElementHSVColor(idx, h, s, v);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetColorSpace(int space)
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->SetColorSpace(space);
+    }
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkTransferFunctionViewer::GetCurrentElementId()
+{
+  if (this->EditorWidget)
+    {
+    vtkTransferFunctionEditorRepresentation *rep =
+      vtkTransferFunctionEditorRepresentation::SafeDownCast(
+        this->EditorWidget->GetRepresentation());
+    if (rep)
+      {
+      return rep->GetActiveHandle();
+      }
     }
 
-  this->EditorWidget->SetHistogram(histogram);
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetHistogram(vtkRectilinearGrid *histogram)
+{
+  if (this->Histogram != histogram)
+    {
+    if (this->EditorWidget)
+      {
+      this->EditorWidget->SetHistogram(histogram);
+      }
+    vtkRectilinearGrid *tmpHist = this->Histogram;
+    this->Histogram = histogram;
+    if (this->Histogram)
+      {
+      this->Histogram->Register(this);
+      this->HistogramMTime = histogram->GetMTime();
+      }
+    if (tmpHist)
+      {
+      tmpHist->UnRegister(this);
+      }
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------

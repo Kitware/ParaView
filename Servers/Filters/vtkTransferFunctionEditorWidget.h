@@ -29,6 +29,7 @@
 
 #include "vtkAbstractWidget.h"
 
+class vtkColorTransferFunction;
 class vtkDataSet;
 class vtkPiecewiseFunction;
 class vtkRectilinearGrid;
@@ -49,7 +50,7 @@ public:
   // Description:
   // Set the whole range of possible scalar values to show in the transfer
   // function editor. This is used for showing the whole scalar range when
-  // the input is not set.
+  // the histogram is not set.
   vtkSetVector2Macro(WholeScalarRange, double);
   vtkGetVector2Macro(WholeScalarRange, double);
 
@@ -80,9 +81,32 @@ public:
   vtkGetObjectMacro(OpacityFunction, vtkPiecewiseFunction);
 
   // Description:
-  // Set the rectilinear grid containing the histogram.
+  // Get the color transfer function.
+  vtkGetObjectMacro(ColorFunction, vtkColorTransferFunction);
+
+  // Description:
+  // Set the opacity of a particular element in the transfer function editor.
+  virtual void SetElementOpacity(unsigned int, double) {}
+
+  // Description:
+  // Set the RGB color of a particular element in the transfer function editor.
+  // Description:
+  virtual void SetElementRGBColor(unsigned int, double, double, double) {}
+
+  // Description:
+  // Set the HSV color of a particular element in the transfer function editor.
+  // Description:
+  virtual void SetElementHSVColor(unsigned int, double, double, double) {}
+
+  // Description:
+  // Set/get the rectilinear grid containing the histogram.
   virtual void SetHistogram(vtkRectilinearGrid *histogram);
-  
+  vtkGetObjectMacro(Histogram, vtkRectilinearGrid);
+
+  // Description:
+  // Set the color space. (RGB = 0, HSV = 1, HSV with wrapping = 2)
+  virtual void SetColorSpace(int) {}
+
 protected:
   vtkTransferFunctionEditorWidget();
   ~vtkTransferFunctionEditorWidget();
@@ -92,6 +116,7 @@ protected:
   int NumberOfScalarBins; // used for float and double input images
   int ModificationType;
   vtkPiecewiseFunction *OpacityFunction;
+  vtkColorTransferFunction *ColorFunction;
   vtkRectilinearGrid *Histogram;
 
 private:
