@@ -114,7 +114,6 @@ class pqDefaultDisplayPanel::pqInternal
 {
 public:
   pqPropertyLinks Links;
-  pqStandardDisplayPanels StandardPanels;
 };
 
 pqDefaultDisplayPanel::pqDefaultDisplayPanel(pqDisplay* display, QWidget* p)
@@ -155,6 +154,7 @@ public:
   QPointer<pqGenericViewModule> View;
   QPointer<pqDisplay> Display;
   QPointer<pqDisplayPanel> DisplayPanel;
+  pqStandardDisplayPanels StandardPanels;
 };
 
 //-----------------------------------------------------------------------------
@@ -234,6 +234,13 @@ void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
       this->Internal->DisplayPanel = piface->createPanel(display, this);
       break;
       }
+    }
+
+  if (!this->Internal->DisplayPanel &&
+    this->Internal->StandardPanels.canCreatePanel(display))
+    {
+    this->Internal->DisplayPanel =
+      this->Internal->StandardPanels.createPanel(display, this);
     }
 
   pqPipelineDisplay* pd = qobject_cast<pqPipelineDisplay*>(display);
