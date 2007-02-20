@@ -12,7 +12,7 @@
 
 pqDisplayPanel* @PANEL_NAME@Implementation::createPanel(pqDisplay* display, QWidget* p)
 {
-  if(!display || !display->getProxy())
+  if(!this->canCreatePanel(display))
     {
     return NULL;
     }
