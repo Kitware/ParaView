@@ -97,10 +97,11 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name XMLFile)
 ENDMACRO(ADD_SERVER_MANAGER_EXTENSION)
 
 # create implementation for a custom object panel interface
-MACRO(ADD_OBJECT_PANEL_INTERFACE OUTSRCS ClassName XMLName XMLGroup)
+MACRO(ADD_PARAVIEW_OBJECT_PANEL OUTIFACES OUTSRCS ClassName XMLName XMLGroup)
   SET(PANEL_NAME ${ClassName})
   SET(PANEL_XML_NAME ${XMLName})
   SET(PANEL_XML_GROUP ${XMLGroup})
+  SET(${OUTIFACES} ${ClassName})
 
   CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqObjectPanelImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
@@ -118,12 +119,13 @@ MACRO(ADD_OBJECT_PANEL_INTERFACE OUTSRCS ClassName XMLName XMLGroup)
       ${IFACE_MOC_SRCS}
       )
 
-ENDMACRO(ADD_OBJECT_PANEL_INTERFACE)
+ENDMACRO(ADD_PARAVIEW_OBJECT_PANEL)
 
 # create implementation for a custom display panel interface
-MACRO(ADD_DISPLAY_PANEL_INTERFACE OUTSRCS ClassName XMLName)
+MACRO(ADD_PARAVIEW_DISPLAY_PANEL OUTIFACES OUTSRCS ClassName XMLName)
   SET(PANEL_NAME ${ClassName})
   SET(PANEL_XML_NAME ${XMLName})
+  SET(${OUTIFACES} ${ClassName})
 
   CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
@@ -140,18 +142,73 @@ MACRO(ADD_DISPLAY_PANEL_INTERFACE OUTSRCS ClassName XMLName)
       ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h
       ${IFACE_MOC_SRCS}
       )
-ENDMACRO(ADD_DISPLAY_PANEL_INTERFACE)
+ENDMACRO(ADD_PARAVIEW_DISPLAY_PANEL)
 
-# create implementation for a custom panel interface
-MACRO(ADD_VIEW_MODULE_INTERFACE OUTSRCS ViewType ViewName DisplayType ViewXMLGroup)
-  SET(VIEW_TYPE ${ViewType})
-  SET(VIEW_TYPE_NAME ${ViewName})
-  IF(${DisplayType})
-    SET(DISPLAY_TYPE ${ViewName})
-  ELSE(${DisplayType})
+# create implementation for a custom view 
+# Usage:
+# ADD_PARAVIEW_VIEW_MODULE( OUTIFACES OUTSRCS
+#     VIEW_TYPE Type
+#     VIEW_XML_GROUP Group
+#     [VIEW_NAME Name]
+#     [VIEW_DISPLAY Display]
+#     [DISPLAY_PANEL]
+
+# for the given server manager XML
+#  <SourceProxy name="MyFilter" class="MyFilter" label="My Filter">
+#    ...
+#    <Hints>
+#      <View type="MyView" />
+#    </Hints>
+#  </SourceProxy>
+#  ....
+# <ProxyGroup name="plotmodules">
+#  <ViewModuleProxy name="MyViewViewModule"
+#      base_proxygroup="rendermodules" base_proxyname="ViewModule"
+#      display_name="MyDisplay">
+#  </ViewModuleProxy>
+# </ProxyGroup>
+
+#  VIEW_TYPE = "MyView"
+#  VIEW_XML_GROUP = "plotmodules"
+#  VIEW_NAME is optional and gives a friendly name for the view type
+#  DISPLAY_TYPE is optional and defaults to pqConsumerDisplay
+#  DISPLAY_PANEL specifies whether a custom pqDisplayPanel is being built.
+#  DISPLAY_XML is the XML name of the display for this view and is required if
+#     DISPLAY_PANEL is set
+#
+#  if DISPLAY_TYPE is MyDisplay, then "MyDisplayPanel.h" is looked for.
+#  a class MyView derived from pqGenericViewModule is expected to be in "MyView.h"
+
+MACRO(ADD_PARAVIEW_VIEW_MODULE OUTIFACES OUTSRCS)
+
+  PV_PLUGIN_PARSE_ARGUMENTS(ARG "VIEW_TYPE;VIEW_XML_GROUP;VIEW_NAME;DISPLAY_TYPE;DISPLAY_XML"
+                  "DISPLAY_PANEL" ${ARGN} )
+
+  IF(NOT ARG_VIEW_TYPE OR NOT ARG_VIEW_XML_GROUP)
+    MESSAGE(ERROR "ADD_PARAVIEW_VIEW_MODULE called without VIEW_TYPE or VIEW_XML_GROUP")
+  ENDIF(NOT ARG_VIEW_TYPE OR NOT ARG_VIEW_XML_GROUP)
+
+  IF(ARG_DISPLAY_PANEL)
+    IF(NOT ARG_DISPLAY_TYPE OR NOT ARG_DISPLAY_XML)
+      MESSAGE(ERROR "ADD_PARAVIEW_VIEW_MODULE called with DISPLAY_PANEL but DISPLAY_TYPE or DISPLAY_XML not specified")
+    ENDIF(NOT ARG_DISPLAY_TYPE OR NOT ARG_DISPLAY_XML)
+  ENDIF(ARG_DISPLAY_PANEL)
+
+
+  SET(${OUTIFACES} ${ARG_VIEW_TYPE})
+  SET(VIEW_TYPE ${ARG_VIEW_TYPE})
+  SET(VIEW_XML_GROUP ${ARG_VIEW_XML_GROUP})
+  IF(ARG_VIEW_NAME)
+    SET(VIEW_TYPE_NAME ${ARG_VIEW_NAME})
+  ELSE(ARG_VIEW_NAME)
+    SET(VIEW_TYPE_NAME ${ARG_VIEW_TYPE})
+  ENDIF(ARG_VIEW_NAME)
+
+  IF(ARG_VIEW_DISPLAY)
+    SET(DISPLAY_TYPE ${ARG_VIEW_DISPLAY})
+  ELSE(ARG_VIEW_DISPLAY)
     SET(DISPLAY_TYPE "pqConsumerDisplay")
-  ENDIF(${DisplayType})
-  SET(VIEW_XML_GROUP ${ViewXMLGroup})
+  ENDIF(ARG_VIEW_DISPLAY)
 
   CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Core/pqViewModuleImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${VIEW_TYPE}Implementation.h @ONLY)
@@ -163,27 +220,36 @@ MACRO(ADD_VIEW_MODULE_INTERFACE OUTSRCS ViewType ViewName DisplayType ViewXMLGro
   QT4_WRAP_CPP(IFACE_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${VIEW_TYPE}Implementation.h)
   SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
+  IF(ARG_DISPLAY_PANEL)
+    ADD_PARAVIEW_DISPLAY_PANEL(OUT_PANEL_IFACES PANEL_SRCS ${DISPLAY_TYPE} ${ARG_DISPLAY_XML})
+    SET(${OUTIFACES} ${ARG_VIEW_TYPE} ${OUT_PANEL_IFACES})
+  ENDIF(ARG_DISPLAY_PANEL)
+
   SET(${OUTSRCS} 
       ${CMAKE_CURRENT_BINARY_DIR}/${VIEW_TYPE}Implementation.cxx
       ${CMAKE_CURRENT_BINARY_DIR}/${VIEW_TYPE}Implementation.h
       ${IFACE_MOC_SRCS}
+      ${PANEL_SRCS}
       )
 
-ENDMACRO(ADD_VIEW_MODULE_INTERFACE)
+ENDMACRO(ADD_PARAVIEW_VIEW_MODULE)
 
 # create implementation for a Qt/ParaView plugin given a 
 # module name and a list of interfaces
-MACRO(ADD_GUI_EXTENSION OUTSRCS NAME)
+# ADD_PARAVIEW_GUI_EXTENSION(OUTSRCS NAME INTERFACES iface1;iface2;iface3)
+MACRO(ADD_PARAVIEW_GUI_EXTENSION OUTSRCS NAME)
   SET(INTERFACE_INCLUDES)
   SET(INTERFACE_INSTANCES)
   SET(PLUGIN_NAME ${NAME})
+  
+  PV_PLUGIN_PARSE_ARGUMENTS(ARG "INTERFACES" "" ${ARGN} )
 
-  FOREACH(IFACE ${ARGN})
+  FOREACH(IFACE ${ARG_INTERFACES})
     SET(TMP "#include \"${IFACE}Implementation.h\"")
     SET(INTERFACE_INCLUDES "${INTERFACE_INCLUDES}\n${TMP}")
     SET(TMP "  this->Interfaces.append(new ${IFACE}Implementation(this));")
     SET(INTERFACE_INSTANCES "${INTERFACE_INSTANCES}\n${TMP}")
-  ENDFOREACH(IFACE ${ARGN})
+  ENDFOREACH(IFACE ${ARG_INTERFACES})
   
   CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Core/pqPluginImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}PluginImplementation.cxx @ONLY)
@@ -198,7 +264,7 @@ MACRO(ADD_GUI_EXTENSION OUTSRCS NAME)
   SET(${OUTSRCS} ${PLUGIN_MOC_SRCS} 
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}PluginImplementation.cxx)
 
-ENDMACRO(ADD_GUI_EXTENSION)
+ENDMACRO(ADD_PARAVIEW_GUI_EXTENSION)
 
 # create a plugin from sources
 # ADD_PARAVIEW_PLUGIN(Name Version
@@ -226,7 +292,7 @@ MACRO(ADD_PARAVIEW_PLUGIN NAME VERSION)
   ENDIF(ARG_SERVER_MANAGER_SOURCES OR ARG_SERVER_MANAGER_XML)
 
   IF(ARG_GUI_INTERFACES)
-    ADD_GUI_EXTENSION(GUI_SRCS ${NAME} ${ARG_GUI_INTERFACES})
+    ADD_PARAVIEW_GUI_EXTENSION(GUI_SRCS ${NAME} INTERFACES ${ARG_GUI_INTERFACES})
   ENDIF(ARG_GUI_INTERFACES)
 
   ADD_LIBRARY(${NAME} SHARED ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES})
