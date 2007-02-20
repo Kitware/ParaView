@@ -112,6 +112,9 @@ void pqBarChartDisplay::setDefaults()
     }
   proxy->UpdateVTKObjects();
 
+  // Need to update since we would have changed the reduction type.
+  vtkSMGenericViewDisplayProxy::SafeDownCast(proxy)->Update();
+
   // Now initialize the lookup table.
   this->updateLookupTable();
 }
