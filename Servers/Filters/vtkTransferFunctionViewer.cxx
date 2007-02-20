@@ -29,7 +29,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.7");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.8");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -451,6 +451,16 @@ void vtkTransferFunctionViewer::SetElementHSVColor(
   if (this->EditorWidget)
     {
     this->EditorWidget->SetElementHSVColor(idx, h, s, v);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetElementScalar(
+  unsigned int idx, double scalar)
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->SetElementScalar(idx, scalar);
     }
 }
 

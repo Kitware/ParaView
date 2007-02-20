@@ -79,6 +79,11 @@ public:
                                   double h, double s, double v);
 
   // Description:
+  // Set the scalar value associated with a particular element in the transfer
+  // function editor.
+  virtual void SetElementScalar(unsigned int, double);
+
+  // Description:
   // Set the color space.
   void SetColorSpace(int space);
 

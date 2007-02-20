@@ -99,6 +99,11 @@ public:
   virtual void SetElementHSVColor(unsigned int, double, double, double) {}
 
   // Description:
+  // Set the scalar value associated with a particular element in the transfer
+  // function editor.
+  virtual void SetElementScalar(unsigned int, double) {}
+
+  // Description:
   // Set/get the rectilinear grid containing the histogram.
   virtual void SetHistogram(vtkRectilinearGrid *histogram);
   vtkGetObjectMacro(Histogram, vtkRectilinearGrid);

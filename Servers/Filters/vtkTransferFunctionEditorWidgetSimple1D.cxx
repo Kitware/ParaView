@@ -27,7 +27,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.6");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.7");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -585,6 +585,132 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementHSVColor(
   this->ColorFunction->GetNodeValue(idx, value);
   this->ColorFunction->RemovePoint(value[0]);
   this->ColorFunction->AddHSVPoint(value[0], h, s, v);
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidgetSimple1D::SetElementScalar(
+  unsigned int idx, double value)
+{
+  unsigned int size = this->Nodes->size();
+  if (idx >= this->Nodes->size())
+    {
+    return;
+    }
+
+  vtkTransferFunctionEditorRepresentationSimple1D *rep =
+    reinterpret_cast<vtkTransferFunctionEditorRepresentationSimple1D*>
+    (this->WidgetRep);
+  if (!rep)
+    {
+    return;
+    }
+
+  int allowSet = 0;
+  double prevScalar, nextScalar, displayPos[3], pct;
+  displayPos[2] = 0;
+  int displaySize[2];
+  prevScalar = nextScalar = 0; // initialize to avoid warnings
+  if (this->ModificationType != OPACITY)
+    {
+    allowSet = 0;
+    if (idx == 0 && size == 1)
+      {
+      allowSet = 1;
+      }
+    else
+      {
+      double colorNode[6];
+      if (idx < size-1)
+        {
+        this->ColorFunction->GetNodeValue(idx+1, colorNode);
+        nextScalar = colorNode[0];
+        }
+      if (idx > 0)
+        {
+        this->ColorFunction->GetNodeValue(idx-1, colorNode);
+        prevScalar = colorNode[0];
+        }
+      if (idx == 0 && nextScalar > value)
+        {
+        allowSet = 1;
+        }
+      else if (idx == size-1 && prevScalar < value)
+        {
+        allowSet = 1;
+        }
+      else if (prevScalar < value && value < nextScalar)
+        {
+        allowSet = 1;
+        }
+      }
+    if (allowSet)
+      {
+      this->RemoveColorPoint(idx);
+      rep->GetDisplaySize(displaySize);
+      pct = (value - this->VisibleScalarRange[0]) /
+        (this->VisibleScalarRange[1] - this->VisibleScalarRange[0]);
+      int xPos = static_cast<int>(displaySize[0] * pct);
+      this->AddColorPoint(xPos);
+      displayPos[0] = xPos;
+      displayPos[1] = 0;
+      rep->SetHandleDisplayPosition(idx, displayPos);
+      this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
+      }
+    }
+  if (this->ModificationType != COLOR)
+    {
+    double opacityNode[4];
+    allowSet = 0;
+    if (idx == 0 && size == 1)
+      {
+      allowSet = 1;
+      }
+    else
+      {
+      if (idx < size-1)
+        {
+        this->OpacityFunction->GetNodeValue(idx+1, opacityNode);
+        nextScalar = opacityNode[0];
+        }
+      if (idx > 0)
+        {
+        this->OpacityFunction->GetNodeValue(idx-1, opacityNode);
+        prevScalar = opacityNode[0];
+        }
+      if (idx == 0 && nextScalar > value)
+        {
+        allowSet = 1;
+        }
+      else if (idx == size-1 && prevScalar < value)
+        {
+        allowSet = 1;
+        }
+      else if (prevScalar < value && value < nextScalar)
+        {
+        allowSet = 1;
+        }
+      }
+    if (allowSet)
+      {
+      this->OpacityFunction->GetNodeValue(idx, opacityNode);
+      this->RemoveOpacityPoint(idx);
+      rep->GetDisplaySize(displaySize);
+      pct = (value - this->VisibleScalarRange[0]) /
+        (this->VisibleScalarRange[1] - this->VisibleScalarRange[0]);
+      int xPos = static_cast<int>(displaySize[0] * pct);
+      int yPos = static_cast<int>(displaySize[1] * opacityNode[1]);
+      this->AddOpacityPoint(xPos, yPos);
+      displayPos[0] = xPos;
+      displayPos[1] = yPos;
+      rep->SetHandleDisplayPosition(idx, displayPos);
+      this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
+      }
+    }
+
+  if (!allowSet)
+    {
+    vtkErrorMacro("Cannot move a transfer function node horizontally past the ones on either side of it.");
+    }
 }
 
 //----------------------------------------------------------------------------

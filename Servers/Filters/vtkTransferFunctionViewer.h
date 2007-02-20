@@ -161,6 +161,10 @@ public:
   void SetElementHSVColor(unsigned int idx, double h, double s, double v);
 
   // Description:
+  // Set the scalar value of a particular transfer function element.
+  void SetElementScalar(unsigned int idx, double scalar);
+
+  // Description:
   // Return the current element Id.
   unsigned int GetCurrentElementId();
 
