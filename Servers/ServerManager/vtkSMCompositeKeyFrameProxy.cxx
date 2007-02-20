@@ -19,7 +19,7 @@
 #include "vtkSMPropertyLink.h"
 
 vtkStandardNewMacro(vtkSMCompositeKeyFrameProxy);
-vtkCxxRevisionMacro(vtkSMCompositeKeyFrameProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMCompositeKeyFrameProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMCompositeKeyFrameProxy::vtkSMCompositeKeyFrameProxy()
 {
@@ -127,6 +127,10 @@ void vtkSMCompositeKeyFrameProxy::CreateVTKObjects(int numObjects)
     this->ValueLink->AddLinkedProperty(proxy->GetProperty("KeyValues"),
       vtkSMLink::OUTPUT);
     }
+
+  // This is essential so that current values get propagated to the subproxies.
+  this->GetProperty("KeyTime")->Modified();
+  this->GetProperty("KeyValues")->Modified();
 }
 
 //-----------------------------------------------------------------------------

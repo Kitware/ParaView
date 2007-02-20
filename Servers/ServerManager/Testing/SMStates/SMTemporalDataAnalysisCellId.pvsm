@@ -1975,12 +1975,6 @@
     <Property name="KeyValues" id="611.KeyValues" number_of_elements="1">
       <Element index="0" value="0"/>
     </Property>
-    <Property name="NumberOfKeyValues" id="611.NumberOfKeyValues" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="range" id="611.NumberOfKeyValues.range">
-        <Min index="0" value="0"/>
-      </Domain>
-    </Property>
   </Proxy>
   <Proxy group="animation_keyframes" type="RampKeyFrame" id="612">
     <Property name="KeyTime" id="612.KeyTime" number_of_elements="1">
@@ -1992,12 +1986,6 @@
     </Property>
     <Property name="KeyValues" id="612.KeyValues" number_of_elements="1">
       <Element index="0" value="2"/>
-    </Property>
-    <Property name="NumberOfKeyValues" id="612.NumberOfKeyValues" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="range" id="612.NumberOfKeyValues.range">
-        <Min index="0" value="0"/>
-      </Domain>
     </Property>
   </Proxy>
   <Proxy group="animation_manipulators" type="KeyFrameAnimationCueManipulator" id="594">

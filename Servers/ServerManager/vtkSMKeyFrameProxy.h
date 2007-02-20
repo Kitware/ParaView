@@ -57,6 +57,10 @@ public:
   double GetKeyValue(unsigned int index);
 
   // Description:
+  // Removes all key values.
+  void RemoveAllKeyValues();
+
+  // Description:
   // Set/Get the number of key values this key frame currently stores.
   unsigned int GetNumberOfKeyValues();
   void SetNumberOfKeyValues(unsigned int num);

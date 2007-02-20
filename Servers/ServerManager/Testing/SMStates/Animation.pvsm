@@ -1867,12 +1867,6 @@
     <Property name="KeyValues" id="734.KeyValues" number_of_elements="1">
       <Element index="0" value="0"/>
     </Property>
-    <Property name="NumberOfKeyValues" id="734.NumberOfKeyValues" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="range" id="734.NumberOfKeyValues.range">
-        <Min index="0" value="0"/>
-      </Domain>
-    </Property>
     <Property name="Position" id="734.Position" number_of_elements="3">
       <Element index="0" value="6.04589"/>
       <Element index="1" value="19.5669"/>
@@ -1903,12 +1897,6 @@
     <Property name="KeyValues" id="735.KeyValues" number_of_elements="1">
       <Element index="0" value="0"/>
     </Property>
-    <Property name="NumberOfKeyValues" id="735.NumberOfKeyValues" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="range" id="735.NumberOfKeyValues.range">
-        <Min index="0" value="0"/>
-      </Domain>
-    </Property>
     <Property name="Position" id="735.Position" number_of_elements="3">
       <Element index="0" value="50.4634"/>
       <Element index="1" value="25.1713"/>
@@ -1934,12 +1922,6 @@
     <Property name="KeyValues" id="736.KeyValues" number_of_elements="1">
       <Element index="0" value="37.3531"/>
     </Property>
-    <Property name="NumberOfKeyValues" id="736.NumberOfKeyValues" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="range" id="736.NumberOfKeyValues.range">
-        <Min index="0" value="0"/>
-      </Domain>
-    </Property>
   </Proxy>
   <Proxy group="animation_keyframes" type="RampKeyFrame" id="737">
     <Property name="KeyTime" id="737.KeyTime" number_of_elements="1">
@@ -1951,12 +1933,6 @@
     </Property>
     <Property name="KeyValues" id="737.KeyValues" number_of_elements="1">
       <Element index="0" value="276.829"/>
-    </Property>
-    <Property name="NumberOfKeyValues" id="737.NumberOfKeyValues" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="range" id="737.NumberOfKeyValues.range">
-        <Min index="0" value="0"/>
-      </Domain>
     </Property>
   </Proxy>
   <Proxy group="animation_manipulators" type="CameraManipulator" id="34">

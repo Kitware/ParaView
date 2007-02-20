@@ -28,7 +28,7 @@ public:
 //----------------------------------------------------------------------------
 
 
-vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.10");
 vtkStandardNewMacro(vtkSMKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()
@@ -47,6 +47,13 @@ vtkSMKeyFrameProxy::~vtkSMKeyFrameProxy()
 void vtkSMKeyFrameProxy::UpdateValue(double vtkNotUsed(currenttime), 
   vtkSMAnimationCueProxy* vtkNotUsed(cueProxy), vtkSMKeyFrameProxy* vtkNotUsed(next))
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkSMKeyFrameProxy::RemoveAllKeyValues()
+{
+  this->Internals->KeyValues.clear();
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
