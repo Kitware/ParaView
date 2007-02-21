@@ -29,7 +29,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.9");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.10");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -261,8 +261,8 @@ void vtkTransferFunctionViewer::Render()
   if (this->EditorWidget && this->EditorWidget->GetRepresentation())
     {
     if (this->Histogram &&
-        this->Histogram->GetMTime() > this->HistogramMTime ||
-        !this->EditorWidget->GetHistogram())
+        (this->Histogram->GetMTime() > this->HistogramMTime ||
+        !this->EditorWidget->GetHistogram()))
       {
       this->EditorWidget->SetHistogram(this->Histogram);
       vtkDataArray *hist = this->Histogram->GetXCoordinates();
