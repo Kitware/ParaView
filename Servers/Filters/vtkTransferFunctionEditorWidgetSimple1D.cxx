@@ -27,7 +27,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.8");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.9");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -252,7 +252,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::ModifyAction(
   int y = self->Interactor->GetEventPosition()[1];
   int state = self->WidgetRep->ComputeInteractionState(x, y);
 
-  if (state == vtkTransferFunctionEditorRepresentationSimple1D::NearNode)
+  if (state == vtkTransferFunctionEditorRepresentationSimple1D::NearNode &&
+      self->ModificationType != OPACITY)
     {
     // Fire an event indicating that a node has been selected
     // so we can know when to display a color chooser.
