@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqLoadedFormObjectPanel.cxx
+   Module:    pqFormBuilder.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,47 +30,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-// this include
-#include "pqLoadedFormObjectPanel.h"
+#ifndef _pqFormBuilder_h
+#define _pqFormBuilder_h
 
-// Qt includes
-#include <QVBoxLayout>
-#include <QFile>
+#include "pqCoreExport.h"
+#include <QtUiTools/QUiLoader>   // CMake 2.4.3+ finds QtUiTools correctly
 
-// VTK includes
-
-// Paraview Server Manager includes
-
-// ParaView includes
-#include "pqProxy.h"
-#include "pqFormBuilder.h"
-
-/// constructor
-pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, pqProxy* object_proxy, QWidget* p)
-  : pqNamedObjectPanel(object_proxy, p)
+/// form builder that can create forms
+/// dynamic and static plugins are searched
+/// by default, dynamic plugins from the application directory are included in
+/// the search
+class PQCORE_EXPORT pqFormBuilder : public QUiLoader
 {
-  QBoxLayout* mainlayout = new QVBoxLayout(this);
-  mainlayout->setMargin(0);
-
-  QFile file(filename);
+  Q_OBJECT
+public:
+  pqFormBuilder(QObject* p = 0);
+  ~pqFormBuilder();
   
-  if(file.open(QFile::ReadOnly))
-    {
-    pqFormBuilder builder;
-    QWidget* customForm = builder.load(&file, NULL);
-    file.close();
-    mainlayout->addWidget(customForm);
-    }
-    
-  this->linkServerManagerProperties();
-}
+  // overload function to create widgets
+  QWidget* createWidget(const QString& className, 
+                        QWidget* parent, 
+                        const QString& name);
+};
 
-/// destructor
-pqLoadedFormObjectPanel::~pqLoadedFormObjectPanel()
-{
-}
+#endif
 
-bool pqLoadedFormObjectPanel::isValid()
-{
-  return this->layout()->count() == 1;
-}
