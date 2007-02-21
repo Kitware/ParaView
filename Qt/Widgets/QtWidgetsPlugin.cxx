@@ -30,6 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#if defined(WIN32) && defined(NDEBUG)
+# define QT_NO_DEBUG
+#endif
+
 #include "QtWidgetsPlugin.h"
 #include "pqCollapsedGroup.h"
 
@@ -103,5 +107,6 @@ QList<QDesignerCustomWidgetInterface*> QtWidgetsPlugin::customWidgets() const
 {
   return this->List;
 }
-  
-Q_EXPORT_PLUGIN(QtWidgetsPlugin);
+
+Q_EXPORT_PLUGIN2(QtWidgets, QtWidgetsPlugin);
+

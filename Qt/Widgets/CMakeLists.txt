@@ -3,10 +3,18 @@ PROJECT (QtWidgets)
 INCLUDE_DIRECTORIES(
   ${QtWidgets_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
+  ${QT_QTDESIGNER_INCLUDE_DIR}
 )
+
+IF(NOT BUILD_SHARED_LIBS)
+  ADD_DEFINITIONS(-DQT_STATICPLUGIN)
+ENDIF(NOT BUILD_SHARED_LIBS)
 
 ## Add the source (*.cxx,*.h) files here.
 SET(QtWidgets_SRCS
+  QtWidgetsPlugin.cxx
+  QtWidgetsPlugin.h
+
   pqChartContextMenu.cxx
   pqChartContextMenu.h
   pqCollapsedGroup.cxx
@@ -58,6 +66,8 @@ SET(QtWidgets_SRCS
 ## Add the header files that need to moc processed.
 
 QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
+  QtWidgetsPlugin.h
+
   pqChartContextMenu.h
   pqCollapsedGroup.h
   pqColorChooserButton.h
@@ -108,14 +118,11 @@ SOURCE_GROUP("Generated" FILES
   ${QtWidgets_UI_BUILT_SOURCES}
 )
 
+SET(QT_WIDGETS_ALL_SRCS ${QtWidgets_SRCS} ${QtWidgets_MOC_SOURCES}
+  ${RCS_SOURCES} ${QtWidgets_UI_BUILT_SOURCES})
 
 ##########################################################################
-ADD_LIBRARY(QtWidgets
-  ${QtWidgets_SRCS}  
-  ${QtWidgets_MOC_SOURCES}
-  ${RCS_SOURCES}
-  ${QtWidgets_UI_BUILT_SOURCES}
-)
+ADD_LIBRARY(QtWidgets ${QT_WIDGETS_ALL_SRCS})
 
 
 ## Widgets does not depend on VTK/ParaView. Only Qt.
@@ -128,35 +135,3 @@ INSTALL(TARGETS QtWidgets
   LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
   ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
 
-# -----------------------------------------------------------------------------
-# plugin
-# -----------------------------------------------------------------------------
-
-INCLUDE_DIRECTORIES(${QT_QTDESIGNER_INCLUDE_DIR})
-
-SET(QtWidgetsPlugin_SRCS
-  QtWidgetsPlugin.cxx
-  QtWidgetsPlugin.h
-)
-
-QT4_WRAP_CPP(QtWidgetsPlugin_MOC_SRCS
-  QtWidgetsPlugin.h
-)
-
-ADD_DEFINITIONS(-DQT_PLUGIN -DQT_NO_DEBUG)
-
-ADD_LIBRARY(QtWidgetsPlugin
-  SHARED
-  ${QtWidgetsPlugin_SRCS}
-  ${QtWidgetsPlugin_MOC_SRCS}
-)
-
-TARGET_LINK_LIBRARIES(QtWidgetsPlugin 
-  QtWidgets
-  ${QT_LIBRARIES}
-)
-
-INSTALL(TARGETS QtWidgetsPlugin
-  RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
-  LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
-  ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
