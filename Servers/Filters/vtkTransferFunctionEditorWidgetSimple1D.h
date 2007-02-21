@@ -112,6 +112,7 @@ protected:
   static void AddNodeAction(vtkAbstractWidget*);
   static void EndSelectAction(vtkAbstractWidget*);
   static void MoveNodeAction(vtkAbstractWidget*);
+  static void ModifyAction(vtkAbstractWidget*);
 
   void AddNewNode(int x, int y);
   void AddOpacityPoint(int x, int y);

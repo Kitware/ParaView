@@ -19,6 +19,14 @@
 // editor. It invokes an InteractionEvent when the scalar range shown in
 // the transfer function editor changes.
 //
+// This viewer invokes the following events from vtkCommand:
+// InteractionEvent - Lets you know the visible scalar range of the data has
+// changed because of panning, zooming, or resetting to the whole scalar range.
+// PickEvent - Lets you know a transfer function element has been right-
+// clicked so you can display a color chooser to select a color for it. (A
+// PickEvent is being invoked instead of a RightButtonPressEvent because it
+// was being incorrectly picked up by the interactor style.)
+// 
 // .SECTION See Also
 // vtkTransferFunctionEditorWidget vtkTransferFunctionEditorRepresentation
 // vtkInteractorStyleTransferFunctionEditor

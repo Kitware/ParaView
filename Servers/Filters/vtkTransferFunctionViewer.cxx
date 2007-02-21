@@ -29,7 +29,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.8");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.9");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -186,6 +186,8 @@ void vtkTransferFunctionViewer::SetTransferFunctionEditorType(int type)
     this->EditorWidget->SetInteractor(this->Interactor);
     this->EditorWidget->SetDefaultRenderer(this->Renderer);
     this->EditorWidget->SetEnabled(1);
+    this->EditorWidget->AddObserver(vtkCommand::PickEvent,
+                                    this->EventForwarder);
     vtkTransferFunctionEditorRepresentation *rep =
       vtkTransferFunctionEditorRepresentation::SafeDownCast(
         this->EditorWidget->GetRepresentation());
