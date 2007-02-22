@@ -399,7 +399,7 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
 
   // Update Scene properties based on user options. 
   double num_frames = sceneProxy->GetNumberOfFrames();
-  double duration = sceneProxy->GetDuration();
+  //double duration = sceneProxy->GetDuration();
   double frames_per_timestep = sceneProxy->GetFramesPerTimestep();
 
   switch (sceneProxy->GetPlayMode())
@@ -410,8 +410,12 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
     break;
 
   case vtkSMPVAnimationSceneProxy::REALTIME:
-    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("Duration"),
-      dialogUI.animationDuration->value());
+    // Since even in real-time mode, while saving animation, it is played back 
+    // in sequence mode, we change the NumberOfFrames instead of changing the
+    // Duration. The spinBoxNumberOfFrames is updated to satisfy
+    // duration * frame rate = number of frames.
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"),
+      dialogUI.spinBoxNumberOfFrames->value());
     break;
 
   case vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS:
@@ -497,8 +501,8 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
     break;
 
   case vtkSMPVAnimationSceneProxy::REALTIME:
-    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("Duration"),
-      duration);
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"),
+      num_frames);
     break;
 
   case vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS:
