@@ -465,7 +465,6 @@ TARGET_LINK_LIBRARIES(pqComponents
   vtkPVServerManager
   QVTK
   ${PYTHON_LINK_LIBRARIES}
-  QtUiTools
 )
 
 

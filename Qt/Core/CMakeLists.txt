@@ -302,6 +302,7 @@ TARGET_LINK_LIBRARIES(pqCore
   QtWidgets
   vtkPVServerManager
   QVTK
+  QtUiTools
 )
 
 IF(VTK_USE_INFOVIS)
