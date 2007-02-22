@@ -49,7 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 pqLinkViewWidget::pqLinkViewWidget(pqRenderViewModule* firstLink)
-  : QWidget(firstLink->getWidget(), Qt::Popup),
+  : QWidget(firstLink->getWidget(), 
+            Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
     RenderView(firstLink)
 {
   QVBoxLayout* l = new QVBoxLayout(this);
