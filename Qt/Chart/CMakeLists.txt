@@ -1,10 +1,24 @@
 PROJECT(QtChart)
 
+# when you remove this, remove the moc workaround for include directories
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
 )
 
+INCLUDE_DIRECTORIES(${QT_QTDESIGNER_INCLUDE_DIR})
+
+IF(NOT BUILD_SHARED_LIBS)
+  ADD_DEFINITIONS(-DQT_STATICPLUGIN)
+ENDIF(NOT BUILD_SHARED_LIBS)
+
 SET(QtChart_SRCS
+  pqChartPlugin.cxx
+  pqChartPlugin.h
+  pqColorMapWidgetPlugin.h
+  pqHistogramWidgetPlugin.h
+  pqLineChartWidgetPlugin.h
+
+
   pqChartAxis.cxx
   pqChartAxis.h
   pqChartCoordinate.cxx
@@ -64,10 +78,17 @@ SET(QtChart_SRCS
 
 # Reduce the number of dirs that get included on moc command line
 # since it causes issues on Windows 2000.
+SET(MOC_INCLUDE_DIRS ${MOC_INCLUDE_DIRS} ${QT_QTDESIGNER_INCLUDE_DIR})
 GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 QT4_WRAP_CPP(QtChart_MOC_SRCS
+  pqChartPlugin.h
+  pqColorMapWidgetPlugin.h
+  pqHistogramWidgetPlugin.h
+  pqLineChartWidgetPlugin.h
+
+
   pqChartAxis.h
   pqChartLabel.h
   pqChartLegend.h
@@ -86,6 +107,7 @@ QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqLineChartPlotOptions.h
   pqLineChartWidget.h
 )
+
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_RESOURCES
@@ -125,52 +147,5 @@ TARGET_LINK_LIBRARIES(ChartTest
   ${QT_LIBRARIES}
 )
 
-# -----------------------------------------------------------------------------
-# plugin
-# -----------------------------------------------------------------------------
 
-SET(BUILD_PARAVIEW_CHART_PLUGIN ON)
-
-INCLUDE_DIRECTORIES(${QT_QTDESIGNER_INCLUDE_DIR})
-
-# don't build plugin on systems that require dependents to be shared (PIC actually)
-IF(NOT BUILD_SHARED_LIBS)
-  IF(CMAKE_SYSTEM MATCHES "HP-UX.*")
-    SET(BUILD_PARAVIEW_CHART_PLUGIN OFF)
-  ENDIF(CMAKE_SYSTEM MATCHES "HP-UX.*")
-ENDIF(NOT BUILD_SHARED_LIBS)
-
-
-SET(QtChartPlugin_SRCS
-  pqChartPlugin.cxx
-  pqChartPlugin.h
-  pqColorMapWidgetPlugin.h
-  pqHistogramWidgetPlugin.h
-  pqLineChartWidgetPlugin.h
-)
-
-QT4_WRAP_CPP(QtChartPlugin_MOC_SRCS
-  pqChartPlugin.h
-  pqColorMapWidgetPlugin.h
-  pqHistogramWidgetPlugin.h
-  pqLineChartWidgetPlugin.h
-)
-
-ADD_DEFINITIONS(-DQT_PLUGIN -DQT_NO_DEBUG)
-
-ADD_LIBRARY(QtChartPlugin
-  SHARED
-  ${QtChartPlugin_SRCS}
-  ${QtChartPlugin_MOC_SRCS}
-)
-
-TARGET_LINK_LIBRARIES(QtChartPlugin 
-  QtChart
-  ${QT_LIBRARIES}
-)
-
-INSTALL(TARGETS QtChart
-  RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
-  LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
-  ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
 

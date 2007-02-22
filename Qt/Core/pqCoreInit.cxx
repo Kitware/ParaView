@@ -38,7 +38,10 @@ void pqCoreInit()
 {
 #ifndef PARAVIEW_BUILD_SHARED_LIBS
   Q_INIT_RESOURCE(pqCore);
+  Q_INIT_RESOURCE(QtWidgets);
   Q_IMPORT_PLUGIN(QtWidgets);
+  Q_INIT_RESOURCE(pqChart);
+  Q_IMPORT_PLUGIN(QtChart);
 #endif
 }
 

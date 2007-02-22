@@ -30,10 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#if !defined(_DEBUG)
-# if !defined(QT_NO_DEBUG)
-#  define QT_NO_DEBUG
-# endif
+#if defined(WIN32) && defined(NDEBUG)
+# define QT_NO_DEBUG
 #endif
 
 #include "pqChartPlugin.h"
@@ -218,4 +216,4 @@ QList<QDesignerCustomWidgetInterface*> pqChartPlugin::customWidgets() const
   return plugins;
 }
 
-Q_EXPORT_PLUGIN(pqChartPlugin)
+Q_EXPORT_PLUGIN2(QtChart, pqChartPlugin)
