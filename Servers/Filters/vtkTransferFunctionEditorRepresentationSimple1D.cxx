@@ -15,17 +15,22 @@
 #include "vtkTransferFunctionEditorRepresentationSimple1D.h"
 
 #include "vtkActor2D.h"
+#include "vtkCommand.h"
 #include "vtkGlyphSource2D.h"
 #include "vtkMath.h"
 #include "vtkPointHandleRepresentation2D.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper2D.h"
+#include "vtkPropCollection.h"
+#include "vtkProperty2D.h"
 #include "vtkObjectFactory.h"
+#include "vtkTransform.h"
+#include "vtkTransformPolyDataFilter.h"
 #include "vtkViewport.h"
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.4");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.5");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -57,8 +62,18 @@ vtkTransferFunctionEditorRepresentationSimple1D::vtkTransferFunctionEditorRepres
   this->HandlePolyDataSource->SetScale(6.5);
   this->HandleRepresentation->SetCursorShape(
     this->HandlePolyDataSource->GetOutput());
+  this->HandleRepresentation->SetSelectedProperty(
+    this->HandleRepresentation->GetProperty());
   this->ActiveHandle = VTK_UNSIGNED_INT_MAX;
   this->Tolerance = 5;
+
+  vtkTransform *xform = vtkTransform::New();
+  xform->Scale(1.5, 1.5, 1.5);
+  this->ActiveHandleFilter = vtkTransformPolyDataFilter::New();
+  this->ActiveHandleFilter->SetInputConnection(
+    this->HandlePolyDataSource->GetOutputPort());
+  this->ActiveHandleFilter->SetTransform(xform);
+  xform->Delete();
 
   this->Lines = vtkPolyData::New();
   this->LinesMapper = vtkPolyDataMapper2D::New();
@@ -79,6 +94,7 @@ vtkTransferFunctionEditorRepresentationSimple1D::~vtkTransferFunctionEditorRepre
 
   this->HandleRepresentation->Delete();
   this->HandlePolyDataSource->Delete();
+  this->ActiveHandleFilter->Delete();
 
   this->Lines->Delete();
   this->LinesMapper->Delete();
@@ -186,7 +202,7 @@ int vtkTransferFunctionEditorRepresentationSimple1D::ComputeInteractionState(
         {
         this->InteractionState =
           vtkTransferFunctionEditorRepresentationSimple1D::NearNode;
-        this->ActiveHandle = i;
+        this->SetActiveHandle(i);
         return this->InteractionState;
         }
       }
@@ -225,6 +241,14 @@ unsigned int vtkTransferFunctionEditorRepresentationSimple1D::CreateHandle(
 {
   vtkHandleRepresentation *rep = this->HandleRepresentation->NewInstance();
   rep->ShallowCopy(this->HandleRepresentation);
+  vtkProperty2D *property = vtkProperty2D::New();
+  property->DeepCopy(this->HandleRepresentation->GetProperty());
+  vtkPointHandleRepresentation2D *pointRep =
+    static_cast<vtkPointHandleRepresentation2D*>(rep);
+  pointRep->SetProperty(property);
+  pointRep->SetSelectedProperty(property);
+  property->Delete();
+
   rep->SetDisplayPosition(displayPos);
   vtkHandleListIterator hiter;
   double tmpPos[3];
@@ -240,14 +264,41 @@ unsigned int vtkTransferFunctionEditorRepresentationSimple1D::CreateHandle(
       break;
       }
     }
-  this->ActiveHandle = i;
 
   if (!inserted)
     {
     this->Handles->insert(this->Handles->end(), rep);
     }
 
-  return this->ActiveHandle;
+  return i;
+}
+
+//----------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::SetHandleColor(
+  unsigned int idx, double r, double g, double b)
+{
+  vtkPointHandleRepresentation2D *handleRep =
+    vtkPointHandleRepresentation2D::SafeDownCast(
+      this->GetHandleRepresentation(idx));
+  if (handleRep)
+    {
+    handleRep->GetProperty()->SetColor(r, g, b);
+    this->UpdateHandleProperty(handleRep);
+    }
+}
+
+//----------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::UpdateHandleProperty(
+  vtkPointHandleRepresentation2D *handleRep)
+{
+  vtkPropCollection *pc = vtkPropCollection::New();
+  handleRep->GetActors2D(pc);
+  vtkActor2D *actor = vtkActor2D::SafeDownCast(pc->GetItemAsObject(0));
+  if (actor)
+    {
+    actor->SetProperty(handleRep->GetProperty());
+    }
+  pc->Delete();
 }
 
 //----------------------------------------------------------------------
@@ -310,6 +361,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::SetHandleDisplayPosition(
         {
         (*hiter)->SetDisplayPosition(pos);
         this->BuildRepresentation();
+        this->InvokeEvent(vtkCommand::WidgetValueChangedEvent, NULL);
         return;
         }
       }
@@ -381,6 +433,39 @@ void vtkTransferFunctionEditorRepresentationSimple1D::RemoveHandle(
       this->Handles->erase(iter);
       this->BuildRepresentation();
       return;
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::SetActiveHandle(
+  unsigned int handle)
+{
+  this->ActiveHandle = handle;
+  this->HighlightActiveHandle();
+  this->InvokeEvent(vtkCommand::WidgetValueChangedEvent, NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::HighlightActiveHandle()
+{
+  vtkHandleListIterator iter;
+  unsigned int i = 0;
+  vtkPointHandleRepresentation2D *rep;
+  for (iter = this->Handles->begin(); iter != this->Handles->end();
+       iter++, i++)
+    {
+    rep = vtkPointHandleRepresentation2D::SafeDownCast(*iter);
+    if (rep)
+      {
+      if (i == this->ActiveHandle)
+        {
+        rep->SetCursorShape(this->ActiveHandleFilter->GetOutput());
+        }
+      else
+        {
+        rep->SetCursorShape(this->HandlePolyDataSource->GetOutput());
+        }
       }
     }
 }

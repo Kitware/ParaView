@@ -62,7 +62,8 @@ public:
   vtkSetVector2Macro(ScalarBinRange, int);
 
   // Description:
-  // Return the current handle Id.
+  // Set/get the current handle Id.
+  virtual void SetActiveHandle(unsigned int) {}
   virtual unsigned int GetActiveHandle() { return 0; }
 
 protected:

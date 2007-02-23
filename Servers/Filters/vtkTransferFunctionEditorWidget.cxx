@@ -21,9 +21,10 @@
 #include "vtkPiecewiseFunction.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.7");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.8");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
@@ -46,17 +47,20 @@ vtkTransferFunctionEditorWidget::~vtkTransferFunctionEditorWidget()
 }
 
 //----------------------------------------------------------------------------
+int vtkTransferFunctionEditorWidget::TransferFunctionsInitialized()
+{
+  int cSize = this->ColorFunction->GetSize();
+  int oSize = this->OpacityFunction->GetSize();
+  return (cSize || oSize);
+}
+
+//----------------------------------------------------------------------------
 void vtkTransferFunctionEditorWidget::SetVisibleScalarRange(double min,
                                                             double max)
 {
   if (min == this->VisibleScalarRange[0] && max == this->VisibleScalarRange[1])
     {
     return;
-    }
-
-  if (this->WholeScalarRange[0] > this->WholeScalarRange[1])
-    {
-    this->SetWholeScalarRange(min, max);
     }
 
   this->VisibleScalarRange[0] = min;
@@ -142,6 +146,48 @@ void vtkTransferFunctionEditorWidget::SetHistogram(
       tempHist->UnRegister(this);
       }
     this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidget::MoveToPreviousElement()
+{
+  vtkTransferFunctionEditorRepresentation *rep =
+    vtkTransferFunctionEditorRepresentation::SafeDownCast(this->WidgetRep);
+  if (rep)
+    {
+    rep->SetActiveHandle(rep->GetActiveHandle()-1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidget::MoveToNextElement()
+{
+  vtkTransferFunctionEditorRepresentation *rep =
+    vtkTransferFunctionEditorRepresentation::SafeDownCast(this->WidgetRep);
+  if (rep)
+    {
+    rep->SetActiveHandle(rep->GetActiveHandle()+1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidget::OnChar()
+{
+  if (!this->Interactor)
+    {
+    return;
+    }
+
+  char *keySym = this->Interactor->GetKeySym();
+
+  if (!strcmp(keySym, "Left"))
+    {
+    this->MoveToPreviousElement();
+    }
+  else if (!strcmp(keySym, "Right"))
+    {
+    this->MoveToNextElement();
     }
 }
 

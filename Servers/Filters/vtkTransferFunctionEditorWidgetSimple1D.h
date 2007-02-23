@@ -51,12 +51,6 @@ public:
     { this->SetVisibleScalarRange(range[0], range[1]); }
 
   // Description:
-  // Set the whole range of possible scalar values to show in this widget.
-  virtual void SetWholeScalarRange(double min, double max);
-  virtual void SetWholeScalarRange(double range[2])
-    { this->SetWholeScalarRange(range[0], range[1]); }
-
-  // Description:
   // Update the size of the rendering window containing this widget, and
   // recompute the position of the transfer function nodes based on the new
   // window size.
@@ -67,25 +61,33 @@ public:
   virtual void OnChar();
 
   // Description:
-  // Set the opacity of a particular node in the transfer function.
+  // Set/get the opacity of a particular node in the transfer function.
   virtual void SetElementOpacity(unsigned int idx, double opacity);
+  virtual double GetElementOpacity(unsigned int idx);
 
   // Description:
-  // Set the color of a particular node in the transfer function using the
+  // Set/get the color of a particular node in the transfer function using the
   // RGB or HSV color space.
   virtual void SetElementRGBColor(unsigned int idx,
                                   double r, double g, double b);
+  virtual int GetElementRGBColor(unsigned int idx, double color[3]);
   virtual void SetElementHSVColor(unsigned int idx,
                                   double h, double s, double v);
+  virtual int GetElementHSVColor(unsigned int idx, double color[3]);
 
   // Description:
-  // Set the scalar value associated with a particular element in the transfer
-  // function editor.
-  virtual void SetElementScalar(unsigned int, double);
+  // Set/get the scalar value associated with a particular element in the
+  // transfer function editor.
+  virtual void SetElementScalar(unsigned int idx, double value);
+  virtual double GetElementScalar(unsigned int idx);
 
   // Description:
   // Set the color space.
   void SetColorSpace(int space);
+
+  // Description:
+  // Set up initial transfer functions.
+  virtual void InitializeTransferFunctions();
 
 protected:
   vtkTransferFunctionEditorWidgetSimple1D();
@@ -118,6 +120,7 @@ protected:
   void AddOpacityPoint(int x, int y);
   void RemoveOpacityPoint(unsigned int id);
   void AddColorPoint(int x);
+  void RepositionColorPoint(unsigned int idx, double scalar);
   void RemoveColorPoint(unsigned int id);
   
   // Helper method for creating widgets

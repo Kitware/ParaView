@@ -29,7 +29,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.10");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.11");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -193,6 +193,8 @@ void vtkTransferFunctionViewer::SetTransferFunctionEditorType(int type)
         this->EditorWidget->GetRepresentation());
     if (rep)
       {
+      rep->AddObserver(vtkCommand::WidgetValueChangedEvent,
+                       this->EventForwarder);
       int *size = this->RenderWindow->GetSize();
       if (size[0] == 0 && size[1] == 0)
         {
@@ -260,19 +262,34 @@ void vtkTransferFunctionViewer::Render()
 {
   if (this->EditorWidget && this->EditorWidget->GetRepresentation())
     {
-    if (this->Histogram &&
-        (this->Histogram->GetMTime() > this->HistogramMTime ||
-        !this->EditorWidget->GetHistogram()))
+    if (this->Histogram)
       {
-      this->EditorWidget->SetHistogram(this->Histogram);
-      vtkDataArray *hist = this->Histogram->GetXCoordinates();
-      if (hist)
+      if (this->Histogram->GetMTime() > this->HistogramMTime ||
+          !this->EditorWidget->GetHistogram())
         {
-        double range[2];
-        hist->GetRange(range);
-        this->SetWholeScalarRange(range);
+        this->EditorWidget->SetHistogram(this->Histogram);
+        vtkDataArray *hist = this->Histogram->GetXCoordinates();
+        if (hist)
+          {
+          double range[2];
+          hist->GetRange(range);
+          this->SetWholeScalarRange(range);
+          this->SetVisibleScalarRange(this->GetWholeScalarRange());
+          }
+        }
+      }
+    else
+      {
+      double range[2];
+      this->GetVisibleScalarRange(range);
+      if (range[0] > range[1])
+        {
         this->SetVisibleScalarRange(this->GetWholeScalarRange());
         }
+      }
+    if (!this->EditorWidget->TransferFunctionsInitialized())
+      {
+      this->EditorWidget->InitializeTransferFunctions();
       }
     this->EditorWidget->GetRepresentation()->BuildRepresentation();
     }
@@ -467,6 +484,48 @@ void vtkTransferFunctionViewer::SetElementScalar(
 }
 
 //----------------------------------------------------------------------------
+double vtkTransferFunctionViewer::GetElementOpacity(unsigned int idx)
+{
+  if (this->EditorWidget)
+    {
+    return this->EditorWidget->GetElementOpacity(idx);
+    }
+  return 0.0;
+}
+
+//----------------------------------------------------------------------------
+int vtkTransferFunctionViewer::GetElementRGBColor(unsigned int idx,
+                                                  double color[3])
+{
+  if (this->EditorWidget)
+    {
+    return this->EditorWidget->GetElementRGBColor(idx, color);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkTransferFunctionViewer::GetElementHSVColor(unsigned int idx,
+                                                  double color[3])
+{
+  if (this->EditorWidget)
+    {
+    return this->EditorWidget->GetElementHSVColor(idx, color);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+double vtkTransferFunctionViewer::GetElementScalar(unsigned int idx)
+{
+  if (this->EditorWidget)
+    {
+    return this->EditorWidget->GetElementScalar(idx);
+    }
+  return 0.0;
+}
+
+//----------------------------------------------------------------------------
 void vtkTransferFunctionViewer::SetColorSpace(int space)
 {
   if (this->EditorWidget)
@@ -490,6 +549,24 @@ unsigned int vtkTransferFunctionViewer::GetCurrentElementId()
     }
 
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::MoveToPreviousElement()
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->MoveToPreviousElement();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::MoveToNextElement()
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->MoveToNextElement();
+    }
 }
 
 //----------------------------------------------------------------------------

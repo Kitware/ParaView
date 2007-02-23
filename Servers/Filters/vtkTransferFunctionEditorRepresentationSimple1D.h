@@ -30,6 +30,7 @@ class vtkHandleRepresentation;
 class vtkPointHandleRepresentation2D;
 class vtkPolyData;
 class vtkPolyDataMapper2D;
+class vtkTransformPolyDataFilter;
 
 class VTK_EXPORT vtkTransferFunctionEditorRepresentationSimple1D : public vtkTransferFunctionEditorRepresentation1D
 {
@@ -70,7 +71,8 @@ public:
   virtual void RemoveHandle(unsigned int id);
 
   // Description:
-  // Get the index of the currently active handle (node).
+  // Set/get the index of the currently active handle (node).
+  void SetActiveHandle(unsigned int handle);
   vtkGetMacro(ActiveHandle, unsigned int);
 
   // Description:
@@ -87,19 +89,28 @@ public:
   };
 //ETX
 
+  // Description:
+  // Set the color for the specified handle.
+  void SetHandleColor(unsigned int idx, double r, double g, double b);
+
 protected:
   vtkTransferFunctionEditorRepresentationSimple1D();
   ~vtkTransferFunctionEditorRepresentationSimple1D();
 
+  void UpdateHandleProperty(vtkPointHandleRepresentation2D *handleRep);
+
   vtkHandleList *Handles;
   vtkPointHandleRepresentation2D *HandleRepresentation;
   vtkGlyphSource2D *HandlePolyDataSource;
+  vtkTransformPolyDataFilter *ActiveHandleFilter;
   unsigned int ActiveHandle;
   int Tolerance;  // Selection tolerance for the handles
 
   vtkPolyData *Lines;
   vtkPolyDataMapper2D *LinesMapper;
   vtkActor2D *LinesActor;
+
+  void HighlightActiveHandle();
 
 private:
   vtkTransferFunctionEditorRepresentationSimple1D(const vtkTransferFunctionEditorRepresentationSimple1D&); // Not implemented.

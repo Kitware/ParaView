@@ -85,23 +85,31 @@ public:
   vtkGetObjectMacro(ColorFunction, vtkColorTransferFunction);
 
   // Description:
-  // Set the opacity of a particular element in the transfer function editor.
+  // Set/get the opacity of a particular element in the transfer function
+  // editor.
   virtual void SetElementOpacity(unsigned int, double) {}
+  virtual double GetElementOpacity(unsigned int) { return 0; }
 
   // Description:
-  // Set the RGB color of a particular element in the transfer function editor.
-  // Description:
+  // Set/get the RGB color of a particular element in the transfer function
+  // editor.
   virtual void SetElementRGBColor(unsigned int, double, double, double) {}
+//BTX
+  virtual int GetElementRGBColor(unsigned int, double[3]) { return 0; }
+//ETX
 
   // Description:
   // Set the HSV color of a particular element in the transfer function editor.
-  // Description:
   virtual void SetElementHSVColor(unsigned int, double, double, double) {}
+//BTX
+  virtual int GetElementHSVColor(unsigned int, double[3]) { return 0; }
+//ETX
 
   // Description:
   // Set the scalar value associated with a particular element in the transfer
   // function editor.
   virtual void SetElementScalar(unsigned int, double) {}
+  virtual double GetElementScalar(unsigned int) { return 0.0; }
 
   // Description:
   // Set/get the rectilinear grid containing the histogram.
@@ -111,6 +119,24 @@ public:
   // Description:
   // Set the color space. (RGB = 0, HSV = 1, HSV with wrapping = 2)
   virtual void SetColorSpace(int) {}
+
+  // Description:
+  // Move to previous/next transfer function element.
+  virtual void MoveToPreviousElement();
+  virtual void MoveToNextElement();
+
+  // Description:
+  // Respond to keypress events.
+  virtual void OnChar();
+
+  // Description:
+  // Initialize the underlying transfer functions and add editor elements
+  // as appropriate.
+  virtual void InitializeTransferFunctions() {}
+
+  // Description:
+  // Return whether the underlying transfer functions have been initialized.
+  int TransferFunctionsInitialized();
 
 protected:
   vtkTransferFunctionEditorWidget();

@@ -20,12 +20,14 @@
 // the transfer function editor changes.
 //
 // This viewer invokes the following events from vtkCommand:
-// InteractionEvent - Lets you know the visible scalar range of the data has
+// * InteractionEvent - Lets you know the visible scalar range of the data has
 // changed because of panning, zooming, or resetting to the whole scalar range.
-// PickEvent - Lets you know a transfer function element has been right-
+// * PickEvent - Lets you know a transfer function element has been right-
 // clicked so you can display a color chooser to select a color for it. (A
 // PickEvent is being invoked instead of a RightButtonPressEvent because it
 // was being incorrectly picked up by the interactor style.)
+// * WidgetValueChangedEvent - Lets you know that either a transfer function
+// node has been moved or the active node has changed.
 // 
 // .SECTION See Also
 // vtkTransferFunctionEditorWidget vtkTransferFunctionEditorRepresentation
@@ -157,24 +159,33 @@ public:
   vtkColorTransferFunction* GetColorFunction();
 
   // Description:
-  // Set the opacity of a particular transfer function element.
+  // Set/get the opacity of a particular transfer function element.
   void SetElementOpacity(unsigned int idx, double opacity);
+  double GetElementOpacity(unsigned int idx);
 
   // Description:
-  // Set the RGB color of a particular transfer function element.
+  // Set/get the RGB color of a particular transfer function element.
   void SetElementRGBColor(unsigned int idx, double r, double g, double b);
+  int GetElementRGBColor(unsigned int idx, double color[3]);
 
   // Description:
-  // Set the HSV color of a particular transfer function element.
+  // Set/get the HSV color of a particular transfer function element.
   void SetElementHSVColor(unsigned int idx, double h, double s, double v);
+  int GetElementHSVColor(unsigned int idx, double color[3]);
 
   // Description:
-  // Set the scalar value of a particular transfer function element.
+  // Set/get the scalar value of a particular transfer function element.
   void SetElementScalar(unsigned int idx, double scalar);
+  double GetElementScalar(unsigned int idx);
 
   // Description:
   // Return the current element Id.
   unsigned int GetCurrentElementId();
+
+  // Description:
+  // Move to the previous/next transfer function element.
+  void MoveToPreviousElement();
+  void MoveToNextElement();
 
   // Description:
   // Set the color space. (RGB = 0, HSV = 1, HSV with wrapping = 2)
