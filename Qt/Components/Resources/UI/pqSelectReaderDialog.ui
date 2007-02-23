@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pqSelectReaderDialog</class>
  <widget class="QDialog" name="pqSelectReaderDialog" >
   <property name="geometry" >
@@ -13,7 +10,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Dialog</string>
+   <string>Open Data With...</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
@@ -84,7 +81,6 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections>
   <connection>
@@ -94,8 +90,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>278</x>
-     <y>253</y>
+     <x>268</x>
+     <y>271</y>
     </hint>
     <hint type="destinationlabel" >
      <x>96</x>
@@ -110,12 +106,28 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>369</x>
-     <y>253</y>
+     <x>351</x>
+     <y>271</y>
     </hint>
     <hint type="destinationlabel" >
      <x>179</x>
      <y>282</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>listWidget</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>pqSelectReaderDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>170</x>
+     <y>92</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>16</x>
+     <y>263</y>
     </hint>
    </hints>
   </connection>
