@@ -601,7 +601,7 @@ void pqLineChartWidget::savePDF(const QStringList& files)
 {
   for(int i = 0; i != files.size(); ++i)
     {
-    QPrinter printer(QPrinter::HighResolution);
+    QPrinter printer(QPrinter::ScreenResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
     printer.setOutputFileName(files[i]);
     
