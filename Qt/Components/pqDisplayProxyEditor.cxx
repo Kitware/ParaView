@@ -62,12 +62,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView client includes
 #include "pqApplicationCore.h"
 #include "pqColorMapEditor.h"
+#include "pqColorScaleEditor.h"
 #include "pqSMAdaptor.h"
 #include "pqPropertyLinks.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqRenderViewModule.h"
 #include "pqFileDialog.h"
+
+
+// Temporary switch
+#define USE_VTK_TFE 0
+
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
 {
@@ -511,9 +517,15 @@ void pqDisplayProxyEditor::openColorMapEditor()
     }
 
   // Create a color map editor and set the display.
+#if USE_VTK_TFE
+  pqColorScaleEditor colorScale(this);
+  colorScale.setDisplay(this->Internal->Display);
+  colorScale.exec();
+#else
   pqColorMapEditor colorMap(this);
   colorMap.setDisplay(this->Internal->Display);
   colorMap.exec();
+#endif
 }
 
 //-----------------------------------------------------------------------------

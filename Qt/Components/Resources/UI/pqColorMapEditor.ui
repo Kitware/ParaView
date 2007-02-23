@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pqColorMapEditor</class>
  <widget class="QDialog" name="pqColorMapEditor" >
   <property name="geometry" >
@@ -156,7 +153,7 @@
       <number>6</number>
      </property>
      <item>
-      <widget class="pqColorMapWidget" name="ColorScale" >
+      <widget class="pqColorMapWidget" native="1" name="ColorScale" >
        <property name="whatsThis" >
         <string>This displays the color scale. The control points determine how the gradient is rendered.</string>
        </property>
@@ -283,7 +280,7 @@
         </property>
         <layout class="QGridLayout" >
          <property name="margin" >
-          <number>9</number>
+          <number>0</number>
          </property>
          <property name="spacing" >
           <number>6</number>
@@ -485,21 +482,16 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>pqColorMapWidget</class>
    <extends>QWidget</extends>
    <header>pqColorMapWidget.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
   </customwidget>
   <customwidget>
    <class>pqColorChooserButton</class>
    <extends>QPushButton</extends>
    <header>pqColorChooserButton.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
   </customwidget>
  </customwidgets>
  <tabstops>

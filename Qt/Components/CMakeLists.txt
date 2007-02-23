@@ -49,6 +49,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCalculatorPanel.h
   pqClipPanel.h
   pqColorMapEditor.h
+  pqColorScaleEditor.h
   pqComboBoxDomain.h
   pqContourPanel.h
   pqCreateServerStartupDialog.h
@@ -148,6 +149,7 @@ SET(UI_FORMS
   Resources/UI/pqBarChartDisplayEditor.ui
   Resources/UI/pqCalculatorPanel.ui
   Resources/UI/pqColorMapEditor.ui
+  Resources/UI/pqColorScaleDialog.ui
   Resources/UI/pqContourControls.ui
   Resources/UI/pqCreateServerStartupDialog.ui
   Resources/UI/pqCustomFilterDefinitionWizard.ui
@@ -255,6 +257,8 @@ ADD_LIBRARY(pqComponents
   pqClipPanel.h
   pqColorMapEditor.cxx
   pqColorMapEditor.h
+  pqColorScaleEditor.cxx
+  pqColorScaleEditor.h
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
   pqComponentsExport.h
