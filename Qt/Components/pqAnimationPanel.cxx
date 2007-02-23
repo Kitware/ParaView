@@ -64,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptorKeyFrameTime.h"
 #include "pqSignalAdaptorKeyFrameType.h"
 #include "pqSignalAdaptorKeyFrameValue.h"
+#include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqTimeKeeper.h"
@@ -83,6 +84,7 @@ public:
   QPointer<pqDoubleSpinBoxDomain> SceneCurrentTimeDomain;
   QPointer<pqAnimationScene> ActiveScene;
   QPointer<pqRenderViewModule> ActiveView;
+  pqSignalAdaptorComboBox* PlayModeAdaptor;
   pqPropertyLinks KeyFrameLinks;
   pqPropertyLinks SceneLinks;
   struct PropertyInfo
@@ -119,6 +121,9 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
 
   this->Internal->setupUi(container);
   this->Internal->cameraFrame->hide();
+
+  this->Internal->PlayModeAdaptor = 
+    new pqSignalAdaptorComboBox(this->Internal->playMode);
 
   this->Internal->KeyFrameTimeValidator = new pqKeyFrameTimeValidator(this);
   this->Internal->keyFrameTime->setValidator(
@@ -300,8 +305,8 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
     sceneProxy, sceneProxy->GetProperty("ClockTimeRangeLocks"), 1);
 
   this->Internal->SceneLinks.addPropertyLink(
-    this->Internal->playMode, "currentText", 
-    SIGNAL(currentIndexChanged(const QString&)),
+    this->Internal->PlayModeAdaptor, "currentText", 
+    SIGNAL(currentTextChanged(const QString&)),
     sceneProxy, sceneProxy->GetProperty("PlayMode"));
 
   this->Internal->SceneLinks.addPropertyLink(

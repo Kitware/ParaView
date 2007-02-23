@@ -183,6 +183,8 @@ void pqAnimationScene::updateTimeRanges()
     pqSMAdaptor::setMultipleElementProperty(
       sceneProxy->GetProperty("ClockTimeRange"), 1, range.second);
     }
+  pqSMAdaptor::setEnumerationProperty(
+    sceneProxy->GetProperty("PlayMode"), "Snap To TimeSteps");
   sceneProxy->UpdateVTKObjects();
 }
 
