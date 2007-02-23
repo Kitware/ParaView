@@ -53,7 +53,7 @@
         </item>
         <item>
          <property name="text" >
-          <string>Snap to TimeSteps</string>
+          <string>Snap To TimeSteps</string>
          </property>
         </item>
        </widget>
