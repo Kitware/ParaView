@@ -684,6 +684,9 @@
         <property name="text" >
          <string>Specular White</string>
         </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="1" column="1" >
@@ -700,6 +703,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
+  </customwidget>
+  <customwidget>
    <class>pqDisplayColorWidget</class>
    <extends>QWidget</extends>
    <header>pqDisplayColorWidget.h</header>
@@ -708,11 +716,6 @@
    <class>pqDisplayRepresentationWidget</class>
    <extends>QWidget</extends>
    <header>pqDisplayRepresentationWidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>pqColorChooserButton</class>
-   <extends>QPushButton</extends>
-   <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

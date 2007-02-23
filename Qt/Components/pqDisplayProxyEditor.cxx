@@ -161,10 +161,16 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
   // setup for choosing color
   this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
     "color", SIGNAL(colorChanged(const QVariant&)),
-    displayProxy, displayProxy->GetProperty("Color"));
+    displayProxy, displayProxy->GetProperty("AmbientColor"));
+  this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
+    "color", SIGNAL(colorChanged(const QVariant&)),
+    displayProxy, displayProxy->GetProperty("DiffuseColor"));
 
   // setup for specular lighting
   QObject::connect(this->Internal->SpecularWhite, SIGNAL(toggled(bool)),
+                   this, SIGNAL(specularColorChanged()));
+  QObject::connect(this->Internal->ColorAdaptor,
+                   SIGNAL(colorChanged(const QVariant&)),
                    this, SIGNAL(specularColorChanged()));
   this->Internal->Links->addPropertyLink(this->Internal->SpecularIntensity,
     "value", SIGNAL(valueChanged(double)),
@@ -568,7 +574,7 @@ QVariant pqDisplayProxyEditor::specularColor() const
   
   vtkSMProxy* proxy = this->Internal->Display->getDisplayProxy();
   return pqSMAdaptor::getMultipleElementProperty(
-       proxy->GetProperty("Color"));
+       proxy->GetProperty("DiffuseColor"));
 }
 
 void pqDisplayProxyEditor::setSpecularColor(QVariant specColor)

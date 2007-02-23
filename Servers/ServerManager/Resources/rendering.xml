@@ -1507,7 +1507,7 @@
         name="PointSize"
         command="SetPointSize"
         number_of_elements="1"
-        default_values="1.0"
+        default_values="5.0"
         animateable="0">
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
@@ -1520,7 +1520,7 @@
         <EnumerationDomain name="enum">
           <Entry value="0" text="Flat" />
           <Entry value="1" text="Gouraud" />
-          <Entry value="2" text="Phong" />
+          <!--<Entry value="2" text="Phong" />-->
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty
@@ -1538,6 +1538,22 @@
       <DoubleVectorProperty
         name="Color"
         command="SetColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0"
+        animateable="0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="AmbientColor"
+        command="SetAmbientColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0"
+        animateable="0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="DiffuseColor"
+        command="SetDiffuseColor"
         number_of_elements="3"
         default_values="1.0 1.0 1.0"
         animateable="0">
@@ -3065,6 +3081,8 @@
           <Property name="PointSize" />
           <Property name="Interpolation" />
           <Property name="Color" />
+          <Property name="AmbientColor" />
+          <Property name="DiffuseColor" />
           <Property name="Opacity" />
           <Property name="Shading" />
           <Property name="Specular" />
