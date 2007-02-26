@@ -16,9 +16,11 @@ MyView::MyView(const QString& viewmoduletype,
        QObject* p)
  : pqGenericViewModule(viewmoduletype, group, name, viewmodule, server, p)
 {
+  // our view is just a simple QWidget
   this->MyWidget = new QWidget;
   new QVBoxLayout(this->MyWidget);
 
+  // connect to display creation so we can show them in our view
   this->connect(this, SIGNAL(displayAdded(pqDisplay*)),
     SLOT(onDisplayAdded(pqDisplay*)));
   this->connect(this, SIGNAL(displayRemoved(pqDisplay*)),
@@ -38,6 +40,7 @@ QWidget* MyView::getWidget()
 
 void MyView::onDisplayAdded(pqDisplay* d)
 {
+  // add a label with the display id
   QLabel* l = new QLabel(
     QString("Display (%1)").arg(d->getProxy()->GetSelfIDAsString()), 
     this->MyWidget);
@@ -47,6 +50,7 @@ void MyView::onDisplayAdded(pqDisplay* d)
 
 void MyView::onDisplayRemoved(pqDisplay* d)
 {
+  // remove the label
   QLabel* l = this->Labels.take(d);
   if(l)
     {
@@ -57,7 +61,7 @@ void MyView::onDisplayRemoved(pqDisplay* d)
 
 bool MyView::canDisplaySource(pqPipelineSource* source) const
 {
-  // always check valid server connections
+  // check valid source and server connections
   if(!source ||
      this->getServer()->GetConnectionID() !=
      source->getServer()->GetConnectionID())
@@ -65,6 +69,7 @@ bool MyView::canDisplaySource(pqPipelineSource* source) const
     return false;
     }
 
+  // we can show MyExtractEdges as defined in the server manager xml
   if(QString("MyExtractEdges") == source->getProxy()->GetXMLName())
     {
     return true;

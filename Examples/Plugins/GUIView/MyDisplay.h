@@ -4,10 +4,13 @@
 
 #include "pqDisplayPanel.h"
 
+/// a simple display panel widget
 class MyDisplay : public pqDisplayPanel
 {
   Q_OBJECT
 public:
+
+    /// constructor
   MyDisplay(pqDisplay* display, QWidget* p = NULL);
   ~MyDisplay();
 

@@ -97,11 +97,28 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name XMLFile)
 ENDMACRO(ADD_SERVER_MANAGER_EXTENSION)
 
 # create implementation for a custom object panel interface
-MACRO(ADD_PARAVIEW_OBJECT_PANEL OUTIFACES OUTSRCS ClassName XMLName XMLGroup)
-  SET(PANEL_NAME ${ClassName})
-  SET(PANEL_XML_NAME ${XMLName})
-  SET(PANEL_XML_GROUP ${XMLGroup})
-  SET(${OUTIFACES} ${ClassName})
+# ADD_PARAVIEW_OBJECT_PANEL(
+#    OUTIFACES
+#    OUTSRCS
+#    [CLASS_NAME classname]
+#    XML_NAME xmlname
+#    XML_GROUP xmlgroup
+#  CLASS_NAME: optional name for the class that implements pqObjectPanel
+#              if none give ${XML_NAME}Panel is assumed
+#  XML_NAME : the xml name of the source/filter this panel corresponds with
+#  XML_GROUP : the xml group of the source/filter this panel corresponds with
+MACRO(ADD_PARAVIEW_OBJECT_PANEL OUTIFACES OUTSRCS)
+  
+  PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;XML_NAME;XML_GROUP" "" ${ARGN} )
+
+  IF(ARG_CLASS_NAME)
+    SET(PANEL_NAME ${ARG_CLASS_NAME})
+  ELSE(ARG_CLASS_NAME)
+    SET(PANEL_NAME ${ARG_XML_NAME}Panel)
+  ENDIF(ARG_CLASS_NAME)
+  SET(PANEL_XML_NAME ${ARG_XML_NAME})
+  SET(PANEL_XML_GROUP ${ARG_XML_GROUP})
+  SET(${OUTIFACES} ${PANEL_NAME})
 
   CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqObjectPanelImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
@@ -113,7 +130,7 @@ MACRO(ADD_PARAVIEW_OBJECT_PANEL OUTIFACES OUTSRCS ClassName XMLName XMLGroup)
   QT4_WRAP_CPP(PANEL_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h)
   SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
-  SET(${OUTSRCS} 
+ SET(${OUTSRCS} 
       ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx
       ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h
       ${PANEL_MOC_SRCS}
@@ -122,10 +139,20 @@ MACRO(ADD_PARAVIEW_OBJECT_PANEL OUTIFACES OUTSRCS ClassName XMLName XMLGroup)
 ENDMACRO(ADD_PARAVIEW_OBJECT_PANEL)
 
 # create implementation for a custom display panel interface
-MACRO(ADD_PARAVIEW_DISPLAY_PANEL OUTIFACES OUTSRCS ClassName XMLName)
-  SET(PANEL_NAME ${ClassName})
-  SET(PANEL_XML_NAME ${XMLName})
-  SET(${OUTIFACES} ${ClassName})
+# ADD_PARAVIEW_DISPLAY_PANEL(
+#    OUTIFACES
+#    OUTSRCS
+#    CLASS_NAME classname
+#    XML_NAME xmlname
+#  CLASS_NAME: pqDisplayPanel
+#  XML_NAME : the xml name of the display this panel corresponds with
+MACRO(ADD_PARAVIEW_DISPLAY_PANEL OUTIFACES OUTSRCS)
+  
+  PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;XML_NAME" "" ${ARGN} )
+  
+  SET(PANEL_NAME ${ARG_CLASS_NAME})
+  SET(PANEL_XML_NAME ${ARG_XML_NAME})
+  SET(${OUTIFACES} ${PANEL_NAME})
 
   CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
@@ -223,7 +250,9 @@ MACRO(ADD_PARAVIEW_VIEW_MODULE OUTIFACES OUTSRCS)
   SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
   IF(ARG_DISPLAY_PANEL)
-    ADD_PARAVIEW_DISPLAY_PANEL(OUT_PANEL_IFACES PANEL_SRCS ${ARG_DISPLAY_PANEL} ${ARG_DISPLAY_XML})
+    ADD_PARAVIEW_DISPLAY_PANEL(OUT_PANEL_IFACES PANEL_SRCS 
+                               CLASS_NAME ${ARG_DISPLAY_PANEL} 
+                               XML_NAME ${ARG_DISPLAY_XML})
     SET(${OUTIFACES} ${ARG_VIEW_TYPE} ${OUT_PANEL_IFACES})
   ENDIF(ARG_DISPLAY_PANEL)
 

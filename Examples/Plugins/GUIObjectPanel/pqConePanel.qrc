@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/ParaViewResources" >
-        <file>pqConePanel.xml</file>
-    </qresource>
-</RCC>
