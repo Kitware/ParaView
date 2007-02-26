@@ -34,6 +34,8 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMCompoundProxy.h"
+#include "vtkDoubleArray.h"
+#include "vtkIdTypeArray.h"
 
 #include <vtkstd/algorithm>
 #include <vtkstd/list>
@@ -49,7 +51,7 @@ static void vtkSMSelectionProxyReorderBoundingBox(int src[4], int dest[4])
 }
 
 //-----------------------------------------------------------------------------
-// traverse selection and extract prop ids (unique)
+// traverse selection and extract a linear set of prop_ids without duplicates
 static void vtkSMSelectionProxyExtractPropIds(
   vtkSelection* sel, vtkstd::list<int>& ids)
 {
@@ -70,22 +72,26 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.9");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
 vtkSMSelectionProxy::vtkSMSelectionProxy()
 {
   this->Mode = vtkSMSelectionProxy::SURFACE;
-  this->Type = vtkSMSelectionProxy::SOURCE;
   this->RenderModule = 0;
   this->ClientSideSelection = 0;
   this->SelectionUpToDate = 0;
-  this->Selection[0] = 0;
-  this->Selection[1] = 0;
-  this->Selection[2] = 0;
-  this->Selection[3] = 0;
-
+  this->ScreenRectangle[0] = 0;
+  this->ScreenRectangle[1] = 0;
+  this->ScreenRectangle[2] = 0;
+  this->ScreenRectangle[3] = 0;
+  this->Ids = 0;
+  this->Points[0] = 0.0;
+  this->Points[1] = 0.0;
+  this->Points[2] = 0.0;
+  this->Thresholds[0] = 0.0;
+  this->Thresholds[1] = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -123,6 +129,7 @@ void vtkSMSelectionProxy::GetSelectedSourceProxies(vtkCollection* coll)
     this->SetClientSideSelection(selInfo->GetSelection());
     selInfo->Delete();
     }
+
   this->FillSources(this->ClientSideSelection, this->RenderModule, coll);
 }
 
@@ -162,33 +169,57 @@ void vtkSMSelectionProxy::UpdateSelection()
 
   this->UpdateRenderModuleCamera(false);
 
-  vtkSMProxy* geomSelectionProxy = this;
-  if (this->Type != vtkSMSelectionProxy::GEOMETRY)
+  vtkSMProxy* inSel = this->GetProxyManager()->NewProxy(
+    "selection_helpers", "Selection");
+  inSel->SetConnectionID(this->GetConnectionID());
+  inSel->SetServers(this->GetServers());
+  inSel->UpdateVTKObjects();
+
+  vtkSMProxy* outSel = this;
+  if (this->Mode == vtkSMSelectionProxy::SURFACE)
     {
-    geomSelectionProxy = this->GetProxyManager()->NewProxy(
+    //doing a surface selection,
+    //make a temporary vtkSelection to store ids in
+    outSel = this->GetProxyManager()->NewProxy(
       "selection_helpers", "Selection");
-    geomSelectionProxy->SetConnectionID(this->GetConnectionID());
-    geomSelectionProxy->SetServers(this->GetServers());
-    geomSelectionProxy->UpdateVTKObjects();
+    outSel->SetConnectionID(this->GetConnectionID());
+    outSel->SetServers(this->GetServers());
+    outSel->UpdateVTKObjects();
     }
 
   switch (this->Mode)
     {
   case vtkSMSelectionProxy::SURFACE:
-    this->SelectOnSurface(this->Selection, this->RenderModule, geomSelectionProxy);
+    this->SelectOnSurface(this->RenderModule, outSel);
     break;
 
-  case vtkSMSelectionProxy::FRUSTRUM:
-    this->SelectInFrustrum(this->Selection, this->RenderModule, geomSelectionProxy);
+  case vtkSMSelectionProxy::FRUSTUM:
+    this->SelectInFrustum(this->RenderModule, inSel, outSel);
     break;
+
+  case vtkSMSelectionProxy::IDS:
+    this->SelectIds(this->RenderModule, inSel, outSel);
+    break;
+
+  case vtkSMSelectionProxy::POINTS:
+    this->SelectPoints(this->RenderModule, inSel, outSel);
+    break;
+
+  case vtkSMSelectionProxy::THRESHOLDS:
+    this->SelectThresholds(this->RenderModule, inSel, outSel);
+    break;
+
     }
 
-  if (this->Type != vtkSMSelectionProxy::GEOMETRY)
+  if (this->Mode == vtkSMSelectionProxy::SURFACE)
     {
-    // We need to convert the geometry selection to source selection.
-    this->ConvertGeometrySelectionToSource(geomSelectionProxy, this);
-    geomSelectionProxy->Delete();
+    //convert the temporary vtkSelection with suface cell ids
+    //into one with volume cell ids
+    this->ConvertPolySelectionToVoxelSelection(outSel, this);
+    outSel->Delete();
     }
+
+  inSel->Delete();
 
   this->UpdateRenderModuleCamera(true);
 
@@ -200,11 +231,11 @@ void vtkSMSelectionProxy::UpdateSelection()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSelectionProxy::SelectOnSurface(int in_rect[4],
-  vtkSMRenderModuleProxy* renderModule, vtkSMProxy* geomSelectionProxy)
+void vtkSMSelectionProxy::SelectOnSurface(
+  vtkSMRenderModuleProxy* renderModule, vtkSMProxy* outSel)
 {
   int display_rectangle[4];
-  vtkSMSelectionProxyReorderBoundingBox(in_rect, display_rectangle);
+  vtkSMSelectionProxyReorderBoundingBox(this->ScreenRectangle, display_rectangle);
 
   vtkSelection *selection = renderModule->SelectVisibleCells(
     display_rectangle[0], display_rectangle[1],
@@ -215,7 +246,7 @@ void vtkSMSelectionProxy::SelectOnSurface(int in_rect[4],
   this->ConvertSelection(selection, renderModule);
 
   // Since the selection in on the client, we need to send it to the data server.
-  this->SendSelection(selection, geomSelectionProxy);
+  this->SendSelection(selection, outSel);
 
   // Since we already have a client side selection, fill up the selected source
   // collection, just in case the user needs it.
@@ -295,10 +326,10 @@ void vtkSMSelectionProxy::SendSelection(vtkSelection* sel, vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSelectionProxy::ConvertGeometrySelectionToSource(
-  vtkSMProxy* geomSelectionProxy, vtkSMProxy* sourceSelectionProxy)
+void vtkSMSelectionProxy::ConvertPolySelectionToVoxelSelection(
+  vtkSMProxy* outSel, vtkSMProxy* insideSelectionDestination)
 {
-  if (!geomSelectionProxy || !sourceSelectionProxy)
+  if (!outSel || !insideSelectionDestination)
     {
     return;
     }
@@ -310,25 +341,25 @@ void vtkSMSelectionProxy::ConvertGeometrySelectionToSource(
   stream << vtkClientServerStream::Invoke
     << converterID 
     << "Convert" 
-    << geomSelectionProxy->GetID(0) 
-    << sourceSelectionProxy->GetID(0)
+    << outSel->GetID(0) 
+    << insideSelectionDestination->GetID(0)
     << vtkClientServerStream::End;
   processModule->DeleteStreamObject(converterID, stream);
-  processModule->SendStream(sourceSelectionProxy->GetConnectionID(), 
-    sourceSelectionProxy->GetServers(), stream);
+  processModule->SendStream(insideSelectionDestination->GetConnectionID(), 
+    insideSelectionDestination->GetServers(), stream);
 }
 
 
 //-----------------------------------------------------------------------------
-void vtkSMSelectionProxy::SelectInFrustrum(int in_rect[4],
-  vtkSMRenderModuleProxy* rmp, vtkSMProxy* geomSelectionProxy)
+void vtkSMSelectionProxy::SelectInFrustum(
+  vtkSMRenderModuleProxy* rmp, vtkSMProxy* inSel, vtkSMProxy* outSel)
 {
   vtkRenderer *renderer = rmp->GetRenderer();
 
   int display_rectangle[4];
-  vtkSMSelectionProxyReorderBoundingBox(in_rect, display_rectangle);
+  vtkSMSelectionProxyReorderBoundingBox(this->ScreenRectangle, display_rectangle);
 
-  // First, compute the frustrum from the given rectangle
+  // First, compute the frustum from the given rectangle
   double x0 = display_rectangle[0];
   double y0 = display_rectangle[1];
   double x1 = display_rectangle[2];
@@ -345,41 +376,45 @@ void vtkSMSelectionProxy::SelectInFrustrum(int in_rect[4],
     y1 += 0.5;
     }
 
-  double frustrum[32];
+  double frustum[32];
   renderer->SetDisplayPoint(x0, y0, 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&frustrum[0]);
+  renderer->GetWorldPoint(&frustum[0]);
 
   renderer->SetDisplayPoint(x0, y0, 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&frustrum[4]);
+  renderer->GetWorldPoint(&frustum[4]);
 
   renderer->SetDisplayPoint(x0, y1, 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&frustrum[8]);
+  renderer->GetWorldPoint(&frustum[8]);
 
   renderer->SetDisplayPoint(x0, y1, 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&frustrum[12]);
+  renderer->GetWorldPoint(&frustum[12]);
 
   renderer->SetDisplayPoint(x1, y0, 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&frustrum[16]);
+  renderer->GetWorldPoint(&frustum[16]);
 
   renderer->SetDisplayPoint(x1, y0, 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&frustrum[20]);
+  renderer->GetWorldPoint(&frustum[20]);
 
   renderer->SetDisplayPoint(x1, y1, 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&frustrum[24]);
+  renderer->GetWorldPoint(&frustum[24]);
 
   renderer->SetDisplayPoint(x1, y1, 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&frustrum[28]);
+  renderer->GetWorldPoint(&frustum[28]);
 
   // pick with the given rectange. this will need some work when rendering
   // in parallel, specially with tiled display
+  // if it turns out that area pick doesn't work in some cases, we can 
+  // probably just get all visible and pickable objects like the other 
+  // extractors do. if we don't have very many datasets being diplayed at the
+  // same time then this is not speeding us up anyway.
   vtkPVClientServerIdCollectionInformation* idInfo = 
     rmp->Pick(
       static_cast<int>(x0), 
@@ -387,8 +422,10 @@ void vtkSMSelectionProxy::SelectInFrustrum(int in_rect[4],
       static_cast<int>(x1), 
       static_cast<int>(y1));
 
+  //create lists that contain the proxies for each picked prop's
+  //display, surface filter, and filter that produced what the prop shows
+
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> > displays;
-  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > geomFilters;
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> > sources;
 
   int numProps = idInfo->GetLength();
@@ -401,13 +438,7 @@ void vtkSMSelectionProxy::SelectInFrustrum(int in_rect[4],
       rmp->GetProxyFromPropID(&id, vtkSMRenderModuleProxy::INPUT);
     vtkSMProxy* dispProxy = 
       rmp->GetProxyFromPropID(&id, vtkSMRenderModuleProxy::DISPLAY);
-    vtkSMProxy* geomProxy = 
-      rmp->GetProxyFromPropID(&id, vtkSMRenderModuleProxy::GEOMETRY);
     if (!dispProxy)
-      {
-      continue;
-      }
-    if (!geomProxy)
       {
       continue;
       }
@@ -430,15 +461,14 @@ void vtkSMSelectionProxy::SelectInFrustrum(int in_rect[4],
         continue;
         }
       }
-    // selected
+    // selectable
     displays.push_back(dispProxy);
-    geomFilters.push_back(geomProxy);
     sources.push_back(objProxy);
     }
 
-  // now select cells
+  //create the extraction filter on the server that will find the results
   vtkSMProxy* selectorProxy = 
-    this->GetProxyManager()->NewProxy("selection_helpers", "VolumeSelector");
+    this->GetProxyManager()->NewProxy("selection_helpers", "ExtractSelection");
   if (!selectorProxy)
     {
     vtkErrorMacro("No selection proxy was created on the data server. "
@@ -448,44 +478,413 @@ void vtkSMSelectionProxy::SelectInFrustrum(int in_rect[4],
   selectorProxy->SetConnectionID(rmp->GetConnectionID());
   selectorProxy->SetServers(vtkProcessModule::DATA_SERVER);
 
-  vtkSMProxyProperty* selectionProperty = 
-    vtkSMProxyProperty::SafeDownCast(selectorProxy->GetProperty("Selection"));
-  selectionProperty->AddProxy(geomSelectionProxy);
+  //tell the filter what type of extraction to do
+  vtkSelection *sel = vtkSelection::New();
+  sel->GetProperties()->Set(
+    vtkSelection::CONTENT_TYPE(), vtkSelection::FRUSTUM
+    );
+  vtkDoubleArray* vals = vtkDoubleArray::New();
+  vals->SetNumberOfComponents(1);
+  vals->SetNumberOfTuples(32);
+  for (int i = 0; i<32; i++)
+    {
+    vals->SetValue(i, frustum[i]);
+    }
+  sel->SetSelectionList(vals);
+  this->SendSelection(sel,inSel);
+  vals->Delete();
+  sel->Delete();
 
-  vtkSMDoubleVectorProperty* cf = vtkSMDoubleVectorProperty::SafeDownCast(
-    selectorProxy->GetProperty("CreateFrustum"));
-  cf->SetElements(&frustrum[0]);
+  vtkSMProxyProperty* inSelectionProperty = 
+    vtkSMProxyProperty::SafeDownCast(selectorProxy->GetProperty("InputSelection"));
+  inSelectionProperty->AddProxy(inSel);
+
+  //tell the filter to put its results where we can get them
+  vtkSMProxyProperty* outSelectionProperty = 
+    vtkSMProxyProperty::SafeDownCast(selectorProxy->GetProperty("OutputSelection"));
+  outSelectionProperty->AddProxy(outSel);
 
   selectorProxy->UpdateVTKObjects();
   selectorProxy->InvokeCommand("Initialize");
 
-  vtkSMProxyProperty* dataSets = vtkSMProxyProperty::SafeDownCast(
-    selectorProxy->GetProperty("DataSets"));
+  //give the extraction filter the list of source algorithms and vtkProps
+  //it will grab datasets to extract from the sources
   vtkSMProxyProperty* props = vtkSMProxyProperty::SafeDownCast(
     selectorProxy->GetProperty("Props"));
   vtkSMProxyProperty* originalSources = vtkSMProxyProperty::SafeDownCast(
     selectorProxy->GetProperty("OriginalSources"));
 
-  unsigned int numProxies = geomFilters.size();
+  unsigned int numProxies = displays.size();
   for (unsigned int j = 0; j < numProxies; j++)
     {
     vtkSMDataObjectDisplayProxy* dp = 
       vtkSMDataObjectDisplayProxy::SafeDownCast(displays[j]);
     if (dp)
       {
-      dataSets->AddProxy(geomFilters[j]);
       props->AddProxy(dp->GetActorProxy());
       originalSources->AddProxy(sources[j]);
       }
     }
   idInfo->Delete();
+
+  //tell the extraction filter to execute
+  //this will finally select cells
+  //the extraction filter produces:
+  //for each processor and each dataset
+  //  an array of cell ids extracted from the dataset
+  //  the client server id of the filter that produced the dataset (SOURCE_ID)
+  //  the client server id of the prop that we that we said produced the dataset (PROP_ID)
+  //  the rank of the processor that extracted each portion
+  // this is all gathered into outSel
   selectorProxy->UpdateVTKObjects();
   selectorProxy->InvokeCommand("Select");
+
   // no need for the selector anymore.
   selectorProxy->Delete();
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMSelectionProxy::SelectIds(
+  vtkSMRenderModuleProxy* rmp, vtkSMProxy* inSel, vtkSMProxy* outSel)
+{  
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > displays;
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > sources;
+
+  // unlike frustum, we don't do a pick first, so we just look for all
+  // visible and selectable display objects instead.
+  int numProps = rmp->GetDisplays()->GetNumberOfItems();
+  for (int i = 0; i < numProps; i++)
+    {
+    vtkSMProxy* objProxy = 
+      rmp->GetProxyForDisplay(i, vtkSMRenderModuleProxy::INPUT);
+    vtkSMProxy* dispProxy = 
+      rmp->GetProxyForDisplay(i, vtkSMRenderModuleProxy::DISPLAY);
+    if (!dispProxy)
+      {
+      continue;
+      }
+    // Make sure the proxy is visible and pickable
+    vtkSMIntVectorProperty* enabled = vtkSMIntVectorProperty::SafeDownCast(
+      dispProxy->GetProperty("Pickable"));
+    if (enabled)
+      {
+      if (!enabled->GetElement(0))
+        {
+        continue;
+        }
+      }
+    enabled = vtkSMIntVectorProperty::SafeDownCast(
+      dispProxy->GetProperty("Visibility"));
+    if (enabled)
+      {
+      if (!enabled->GetElement(0))
+        {
+        continue;
+        }
+      }
+    // selectable
+    displays.push_back(dispProxy);
+    sources.push_back(objProxy);
+    }
+
+  //create the extraction filter on the server that will find the results
+  vtkSMProxy* selectorProxy = 
+    this->GetProxyManager()->NewProxy("selection_helpers", "ExtractSelection");
+  if (!selectorProxy)
+    {
+    vtkErrorMacro("No selection proxy was created on the data server. "
+      "Cannot select cells");
+    return;
+    }
+  selectorProxy->SetConnectionID(rmp->GetConnectionID());
+  selectorProxy->SetServers(vtkProcessModule::DATA_SERVER);
+
+  //tell the filter what type of extraction to do
+  vtkSelection *sel = vtkSelection::New();
+  sel->GetProperties()->Set(
+    vtkSelection::CONTENT_TYPE(), vtkSelection::CELL_IDS
+    );
+  vtkIdTypeArray* vals = vtkIdTypeArray::New();
+  vals->SetNumberOfComponents(1);
+  vals->SetNumberOfTuples(1);
+  for (int i = 0; i<1; i++)
+    {
+    vals->SetValue(i, this->Ids);
+    }
+  sel->SetSelectionList(vals);
+  this->SendSelection(sel,inSel);
+  vals->Delete();
+  sel->Delete();
+  
+  vtkSMProxyProperty* inSelectionProperty = 
+    vtkSMProxyProperty::SafeDownCast(selectorProxy->GetProperty("InputSelection"));
+  inSelectionProperty->AddProxy(inSel);
+
+  //tell the filter to put its results where we can get them
+  vtkSMProxyProperty* outSelectionProperty = 
+    vtkSMProxyProperty::SafeDownCast(selectorProxy->GetProperty("OutputSelection"));
+  outSelectionProperty->AddProxy(outSel);
+
+  selectorProxy->UpdateVTKObjects();
+  selectorProxy->InvokeCommand("Initialize");
+
+  //give the extraction filter the list of source algorithms and vtkProps
+  vtkSMProxyProperty* props = vtkSMProxyProperty::SafeDownCast(
+    selectorProxy->GetProperty("Props"));
+  vtkSMProxyProperty* originalSources = vtkSMProxyProperty::SafeDownCast(
+    selectorProxy->GetProperty("OriginalSources"));
+
+  unsigned int numProxies = displays.size();
+  for (unsigned int j = 0; j < numProxies; j++)
+    {
+    vtkSMDataObjectDisplayProxy* dp = 
+      vtkSMDataObjectDisplayProxy::SafeDownCast(displays[j]);
+    if (dp)
+      {
+      props->AddProxy(dp->GetActorProxy());
+      originalSources->AddProxy(sources[j]);
+      }
+    }
+
+  //tell the extraction filter to execute
+  selectorProxy->UpdateVTKObjects();
+  selectorProxy->InvokeCommand("Select");
+
+  // no need for the selector anymore.
+  selectorProxy->Delete();
+
+  return;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSelectionProxy::SelectPoints(
+  vtkSMRenderModuleProxy* rmp, vtkSMProxy* inSel, vtkSMProxy* outSel)
+{
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > displays;
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > sources;
+
+  // unlike frustum, we don't do a pick first, so we just look for all
+  // visible and selectable display objects instead.
+  int numProps = rmp->GetDisplays()->GetNumberOfItems();
+  for (int i = 0; i < numProps; i++)
+    {
+    vtkSMProxy* objProxy = 
+      rmp->GetProxyForDisplay(i, vtkSMRenderModuleProxy::INPUT);
+    vtkSMProxy* dispProxy = 
+      rmp->GetProxyForDisplay(i, vtkSMRenderModuleProxy::DISPLAY);
+    if (!dispProxy)
+      {
+      continue;
+      }
+    // Make sure the proxy is visible and pickable
+    vtkSMIntVectorProperty* enabled = vtkSMIntVectorProperty::SafeDownCast(
+      dispProxy->GetProperty("Pickable"));
+    if (enabled)
+      {
+      if (!enabled->GetElement(0))
+        {
+        continue;
+        }
+      }
+    enabled = vtkSMIntVectorProperty::SafeDownCast(
+      dispProxy->GetProperty("Visibility"));
+    if (enabled)
+      {
+      if (!enabled->GetElement(0))
+        {
+        continue;
+        }
+      }
+    // selectable
+    displays.push_back(dispProxy);
+    sources.push_back(objProxy);
+    }
+ 
+  //create the extraction filter on the server that will find the results
+  vtkSMProxy* selectorProxy = 
+    this->GetProxyManager()->NewProxy("selection_helpers", "ExtractSelection");
+  if (!selectorProxy)
+    {
+    vtkErrorMacro("No selection proxy was created on the data server. "
+      "Cannot select cells");
+    return;
+    }
+  selectorProxy->SetConnectionID(rmp->GetConnectionID());
+  selectorProxy->SetServers(vtkProcessModule::DATA_SERVER);
+
+  //tell the filter what type of extraction to do
+  vtkSelection *sel = vtkSelection::New();
+  sel->GetProperties()->Set(
+    vtkSelection::CONTENT_TYPE(), vtkSelection::POINTS
+    );
+  vtkDoubleArray* vals = vtkDoubleArray::New();
+  vals->SetNumberOfComponents(3);
+  vals->SetNumberOfTuples(1);
+  for (int i = 0; i<1; i++)
+    {
+    vals->SetTupleValue(i, &this->Points[i]);
+    }
+  sel->SetSelectionList(vals);
+  this->SendSelection(sel,inSel);
+  vals->Delete();
+  sel->Delete();
+  
+  vtkSMProxyProperty* inSelectionProperty = 
+    vtkSMProxyProperty::SafeDownCast(selectorProxy->GetProperty("InputSelection"));
+  inSelectionProperty->AddProxy(inSel);
+
+  //tell the filter to put its results where we can get them
+  vtkSMProxyProperty* outSelectionProperty = 
+    vtkSMProxyProperty::SafeDownCast(selectorProxy->GetProperty("OutputSelection"));
+  outSelectionProperty->AddProxy(outSel);
+
+  selectorProxy->UpdateVTKObjects();
+  selectorProxy->InvokeCommand("Initialize");
+
+  //give the extraction filter the list of source algorithms and vtkProps
+  vtkSMProxyProperty* props = vtkSMProxyProperty::SafeDownCast(
+    selectorProxy->GetProperty("Props"));
+  vtkSMProxyProperty* originalSources = vtkSMProxyProperty::SafeDownCast(
+    selectorProxy->GetProperty("OriginalSources"));
+
+  unsigned int numProxies = displays.size();
+  for (unsigned int j = 0; j < numProxies; j++)
+    {
+    vtkSMDataObjectDisplayProxy* dp = 
+      vtkSMDataObjectDisplayProxy::SafeDownCast(displays[j]);
+    if (dp)
+      {
+      props->AddProxy(dp->GetActorProxy());
+      originalSources->AddProxy(sources[j]);
+      }
+    }
+
+  //tell the extraction filter to execute
+  selectorProxy->UpdateVTKObjects();
+  selectorProxy->InvokeCommand("Select");
+
+  // no need for the selector anymore.
+  selectorProxy->Delete();
+
+  return;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSelectionProxy::SelectThresholds(
+  vtkSMRenderModuleProxy* rmp, vtkSMProxy* inSel, vtkSMProxy* outSel)
+{  
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > displays;
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > sources;
+
+  // unlike frustum, we don't do a pick first, so we just look for all
+  // visible and selectable display objects instead.
+  int numProps = rmp->GetDisplays()->GetNumberOfItems();
+  for (int i = 0; i < numProps; i++)
+    {
+    vtkSMProxy* objProxy = 
+      rmp->GetProxyForDisplay(i, vtkSMRenderModuleProxy::INPUT);
+    vtkSMProxy* dispProxy = 
+      rmp->GetProxyForDisplay(i, vtkSMRenderModuleProxy::DISPLAY);
+    if (!dispProxy)
+      {
+      continue;
+      }
+    // Make sure the proxy is visible and pickable
+    vtkSMIntVectorProperty* enabled = vtkSMIntVectorProperty::SafeDownCast(
+      dispProxy->GetProperty("Pickable"));
+    if (enabled)
+      {
+      if (!enabled->GetElement(0))
+        {
+        continue;
+        }
+      }
+    enabled = vtkSMIntVectorProperty::SafeDownCast(
+      dispProxy->GetProperty("Visibility"));
+    if (enabled)
+      {
+      if (!enabled->GetElement(0))
+        {
+        continue;
+        }
+      }
+    // selectable
+    displays.push_back(dispProxy);
+    sources.push_back(objProxy);
+    }
+
+  //create the extraction filter on the server that will find the results
+  vtkSMProxy* selectorProxy = 
+    this->GetProxyManager()->NewProxy("selection_helpers", "ExtractSelection");
+  if (!selectorProxy)
+    {
+    vtkErrorMacro("No selection proxy was created on the data server. "
+      "Cannot select cells");
+    return;
+    }
+  selectorProxy->SetConnectionID(rmp->GetConnectionID());
+  selectorProxy->SetServers(vtkProcessModule::DATA_SERVER);
+
+  //tell the filter what type of extraction to do
+  vtkSelection *sel = vtkSelection::New();
+  sel->GetProperties()->Set(
+    vtkSelection::CONTENT_TYPE(), vtkSelection::THRESHOLDS
+    );
+  vtkDoubleArray* vals = vtkDoubleArray::New();
+  vals->SetNumberOfComponents(1);
+  vals->SetNumberOfTuples(2);
+  for (int i = 0; i<2; i+=2)
+    {
+    vals->SetValue(i*2+0, this->Thresholds[i*2+0]);
+    vals->SetValue(i*2+1, this->Thresholds[i*2+1]);
+    }
+  sel->SetSelectionList(vals);
+  this->SendSelection(sel,inSel);
+  vals->Delete();
+  sel->Delete();
+  
+  vtkSMProxyProperty* inSelectionProperty = 
+    vtkSMProxyProperty::SafeDownCast(selectorProxy->GetProperty("InputSelection"));
+  inSelectionProperty->AddProxy(inSel);
+
+  //tell the filter to put its results where we can get them
+  vtkSMProxyProperty* outSelectionProperty = 
+    vtkSMProxyProperty::SafeDownCast(selectorProxy->GetProperty("OutputSelection"));
+  outSelectionProperty->AddProxy(outSel);
+
+  selectorProxy->UpdateVTKObjects();
+  selectorProxy->InvokeCommand("Initialize");
+
+  //give the extraction filter the list of source algorithms and vtkProps
+  vtkSMProxyProperty* props = vtkSMProxyProperty::SafeDownCast(
+    selectorProxy->GetProperty("Props"));
+  vtkSMProxyProperty* originalSources = vtkSMProxyProperty::SafeDownCast(
+    selectorProxy->GetProperty("OriginalSources"));
+
+  unsigned int numProxies = displays.size();
+  for (unsigned int j = 0; j < numProxies; j++)
+    {
+    vtkSMDataObjectDisplayProxy* dp = 
+      vtkSMDataObjectDisplayProxy::SafeDownCast(displays[j]);
+    if (dp)
+      {
+      props->AddProxy(dp->GetActorProxy());
+      originalSources->AddProxy(sources[j]);
+      }
+    }
+
+  //tell the extraction filter to execute
+  selectorProxy->UpdateVTKObjects();
+  selectorProxy->InvokeCommand("Select");
+
+  // no need for the selector anymore.
+  selectorProxy->Delete();
+
+  return;
+}
+
+//-----------------------------------------------------------------------------
+//finds the client server ids of the algorithms that produced the props we selected on
 void vtkSMSelectionProxy::FillSources(vtkSelection* sel, 
   vtkSMRenderModuleProxy* rmp, vtkCollection* coll)
 {
@@ -616,38 +1015,36 @@ void vtkSMSelectionProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "RenderModule: " << this->RenderModule << endl;
   os << indent << "SelectionUpToDate: " << this->SelectionUpToDate << endl;
-  os << indent << "Selection: " 
-    << this->Selection[0] << ","
-    << this->Selection[1] << ","
-    << this->Selection[2] << ","
-    << this->Selection[3] << endl;
+  os << indent << "ScreenRectangle: " 
+    << this->ScreenRectangle[0] << ","
+    << this->ScreenRectangle[1] << " to "
+    << this->ScreenRectangle[2] << ","
+    << this->ScreenRectangle[3] << endl;
   os << indent << "Mode: ";
   switch (this->Mode)
     {
-  case FRUSTRUM:
-    os << "FRUSTRUM";
-    break;
-
   case SURFACE:
     os << "SURFACE";
     break;
-  default:
-    os << "(Unknown)";
-    }
-  os << endl;
 
-  os << indent << "Type: " ;
-  switch(this->Type)
-    {
-  case GEOMETRY:
-    os << "GEOMETRY";
+  case FRUSTUM:
+    os << "FRUSTUM";
     break;
-  case SOURCE:
-    os << "SOURCE";
+
+  case IDS:
+    os << "IDS";
     break;
+
+  case POINTS:
+    os << "POINTS";
+    break;
+
+  case THRESHOLDS:
+    os << "THRESHOLDS";
+    break;
+
   default:
     os << "(Unknown)";
-    break;
     }
   os << endl;
 }

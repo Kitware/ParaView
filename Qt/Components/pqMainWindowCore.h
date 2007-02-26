@@ -270,7 +270,17 @@ public slots:
   void onToolsOutputWindow();
   
   void onToolsPythonShell();
-  
+
+  // pop up dialogs to let the user enter in selections manually
+  void onEnterSelectionPoints();
+  void onEnterSelectionIds();
+  void onEnterSelectionThresholds();
+
+  // extract whatever was manually selected
+  void onPointsEntered(double X, double Y, double Z);
+  void onIdsEntered(int id);
+  void onThresholdsEntered(double min, double max);
+
   void onHelpEnableTooltips(bool enabled = true);
 
   void createPendingDisplays();

@@ -57,6 +57,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayColorWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqElementInspectorWidget.h"
+#include "pqEnterIdsDialog.h"
+#include "pqEnterPointsDialog.h"
+#include "pqEnterThresholdsDialog.h"
 #include "pqLinksManager.h"
 #include "pqLookmarkBrowser.h"
 #include "pqLookmarkInspector.h"
@@ -1690,6 +1693,7 @@ void pqMainWindowCore::onToolsPythonShell()
 #endif // PARAVIEW_EMBED_PYTHON
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onHelpEnableTooltips(bool enabled)
 {
   if(enabled)
@@ -2717,3 +2721,77 @@ void pqMainWindowCore::onManagePlugins()
   diag.exec();
 }
 
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onEnterSelectionIds()
+{
+  //pop up the dialog to ask for ids to select
+  pqEnterIdsDialog* const points_dialog = new pqEnterIdsDialog( 
+    this->Implementation->Parent);
+    
+  points_dialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(
+    points_dialog, 
+    SIGNAL(idsEntered(int)), 
+    this, 
+    SLOT(onIdsEntered(int))
+    );
+  points_dialog->setModal(true); 
+  points_dialog->show(); 
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onIdsEntered(int id)
+{
+  //take the ids selected in the dialog and tell paraview to extract them
+  this->Implementation->SelectionManager.setIds(id);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onEnterSelectionPoints()
+{
+  //pop up the dialog to ask for points to select
+  pqEnterPointsDialog* const points_dialog = new pqEnterPointsDialog( 
+    this->Implementation->Parent);
+    
+  points_dialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(
+    points_dialog, 
+    SIGNAL(pointsEntered(double , double , double )), 
+    this, 
+    SLOT(onPointsEntered(double , double , double ))
+    );
+  points_dialog->setModal(true); 
+  points_dialog->show(); 
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onPointsEntered(double X, double Y, double Z)
+{
+  //take the points selected in the dialog and tell paraview to extract them
+  this->Implementation->SelectionManager.setPoints(X,Y,Z);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onEnterSelectionThresholds()
+{
+  //pop up the dialog to ask for thresholds to select
+  pqEnterThresholdsDialog* const points_dialog = new pqEnterThresholdsDialog( 
+    this->Implementation->Parent);
+    
+  points_dialog->setAttribute(Qt::WA_DeleteOnClose);
+  QObject::connect(
+    points_dialog, 
+    SIGNAL(thresholdsEntered(double , double)), //toil and trouble 
+    this, 
+    SLOT(onThresholdsEntered(double , double))
+    );
+  points_dialog->setModal(true); 
+  points_dialog->show(); 
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onThresholdsEntered(double min, double max)
+{
+  //take the thresholds selected in the dialog and tell paraview to extract them
+  this->Implementation->SelectionManager.setThresholds(min, max);
+}

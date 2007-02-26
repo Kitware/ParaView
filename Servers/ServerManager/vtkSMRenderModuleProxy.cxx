@@ -54,7 +54,7 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.68");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.69");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -940,6 +940,39 @@ vtkSMProxy *vtkSMRenderModuleProxy::GetProxyFromPropID(
     }
 
   iter->Delete();  
+  return ret;
+}
+
+
+//----------------------------------------------------------------------------
+vtkSMProxy *vtkSMRenderModuleProxy::GetProxyForDisplay(
+  int number,
+  int proxyType)
+{
+  vtkSMProxy *ret = NULL;
+
+  vtkSMDataObjectDisplayProxy* dodp = 
+    vtkSMDataObjectDisplayProxy::SafeDownCast(
+      this->GetDisplays()->GetItemAsObject(number)
+      );
+    
+  if (dodp)
+    {
+    vtkSMProxy *actorProxy = dodp->GetActorProxy();
+    if (proxyType == DISPLAY)
+      {
+      ret = dodp;
+      }
+    else if (proxyType == INPUT)
+      {
+      ret = dodp->GetInput(0);
+      }
+    else if (proxyType == GEOMETRY)
+      {
+      ret = dodp->GetGeometryFilterProxy();
+      }
+    }    
+
   return ret;
 }
 

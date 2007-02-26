@@ -291,6 +291,13 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionToolsPythonShell,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsPythonShell()));
 
+  connect(this->Implementation->UI.actionSelectPoints,
+    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEnterSelectionPoints()));
+  connect(this->Implementation->UI.actionSelectIds,
+    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEnterSelectionIds()));
+  connect(this->Implementation->UI.actionSelectThresholds,
+    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEnterSelectionThresholds()));
+
   connect(this->Implementation->UI.actionHelpAbout,
     SIGNAL(triggered()), this, SLOT(onHelpAbout()));
 
@@ -351,6 +358,9 @@ MainWindow::MainWindow() :
     
   connect(this->Implementation->UI.actionSelectionMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToSelection()));
+
+  connect(this->Implementation->UI.actionSelectFrustum, 
+    SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToSelectThrough()));
 
   // Create Selection Shortcut.
   QShortcut *s=new QShortcut(QKeySequence(tr("S")),&this->Implementation->Core.multiViewManager());
@@ -426,6 +436,10 @@ MainWindow::MainWindow() :
   QActionGroup *modeGroup = new QActionGroup(this);
     modeGroup->addAction(this->Implementation->UI.actionMoveMode);
     modeGroup->addAction(this->Implementation->UI.actionSelectionMode);
+    modeGroup->addAction(this->Implementation->UI.actionSelectFrustum);
+    modeGroup->addAction(this->Implementation->UI.actionSelectThresholds);
+    modeGroup->addAction(this->Implementation->UI.actionSelectIds);
+    modeGroup->addAction(this->Implementation->UI.actionSelectPoints);
 
   this->Implementation->Core.setupVariableToolbar(
     this->Implementation->UI.variableToolbar);

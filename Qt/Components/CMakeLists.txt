@@ -69,6 +69,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDoubleSpinBoxDomain.h
   pqEditServerStartupDialog.h
   pqElementInspectorWidget.h
+  pqEnterIdsDialog.h
+  pqEnterPointsDialog.h
+  pqEnterThresholdsDialog.h
   pqExodusPanel.h
   pqFileChooserWidget.h
   pqFilterInputDialog.h
@@ -159,6 +162,9 @@ SET(UI_FORMS
   Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqEditServerStartupDialog.ui
   Resources/UI/pqElementInspectorWidget.ui
+  Resources/UI/pqEnterIdsDialog.ui
+  Resources/UI/pqEnterPointsDialog.ui
+  Resources/UI/pqEnterThresholdsDialog.ui
   Resources/UI/pqExodusPanel.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
@@ -302,6 +308,12 @@ ADD_LIBRARY(pqComponents
   pqEditServerStartupDialog.h
   pqElementInspectorWidget.cxx
   pqElementInspectorWidget.h
+  pqEnterIdsDialog.cxx
+  pqEnterIdsDialog.h
+  pqEnterPointsDialog.cxx
+  pqEnterPointsDialog.h
+  pqEnterThresholdsDialog.cxx
+  pqEnterThresholdsDialog.h
   pqExodusPanel.cxx
   pqExodusPanel.h
   pqFileChooserWidget.cxx

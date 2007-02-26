@@ -187,6 +187,10 @@ public:
   // If INPUT, the input of the display proxy is returned.
   // If GEOMETRY, the geometry filter proxy is returned
   vtkSMProxy *GetProxyFromPropID(vtkClientServerID *id, int proxyType);
+  // Decription:
+  // Like GetProxyFromPropIds, but this lets you iterate over the displays when
+  // you don't have an id to request specifically.
+  vtkSMProxy *GetProxyForDisplay(int number, int proxyType);
 
   // Description:
   // Return a list of visible cells within the provided screen area.

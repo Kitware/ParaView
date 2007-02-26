@@ -24,8 +24,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>909</width>
-     <height>24</height>
+     <width>940</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSources" >
@@ -51,62 +51,6 @@
     <addaction name="separator" />
     <addaction name="actionChangeInput" />
     <addaction name="actionDelete" />
-   </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <widget class="QMenu" name="menuAddPlot" >
-     <property name="title" >
-      <string>Add &amp;Plot</string>
-     </property>
-     <addaction name="actionHistogram" />
-     <addaction name="actionXY_Plot" />
-     <addaction name="actionTable_View" />
-    </widget>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="actionMoveMode" />
-    <addaction name="actionSelectionMode" />
-    <addaction name="separator" />
-    <addaction name="menuAddPlot" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
-   </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>&amp;File</string>
-    </property>
-    <widget class="QMenu" name="menuRecentFiles" >
-     <property name="title" >
-      <string>Recent Files</string>
-     </property>
-    </widget>
-    <addaction name="actionFileOpen" />
-    <addaction name="menuRecentFiles" />
-    <addaction name="separator" />
-    <addaction name="actionFileLoadServerState" />
-    <addaction name="actionFileSaveServerState" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveData" />
-    <addaction name="actionFileSaveScreenshot" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveAnimation" />
-    <addaction name="actionFileSaveGeometry" />
-    <addaction name="separator" />
-    <addaction name="actionServerConnect" />
-    <addaction name="actionServerDisconnect" />
-    <addaction name="separator" />
-    <addaction name="actionFileExit" />
-   </widget>
-   <widget class="QMenu" name="menuFilters" >
-    <property name="title" >
-     <string>F&amp;ilters</string>
-    </property>
    </widget>
    <widget class="QMenu" name="menuAnimation" >
     <property name="title" >
@@ -141,6 +85,37 @@
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
    </widget>
+   <widget class="QMenu" name="menuFilters" >
+    <property name="title" >
+     <string>F&amp;ilters</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuRecentFiles" >
+     <property name="title" >
+      <string>Recent Files</string>
+     </property>
+    </widget>
+    <addaction name="actionFileOpen" />
+    <addaction name="menuRecentFiles" />
+    <addaction name="separator" />
+    <addaction name="actionFileLoadServerState" />
+    <addaction name="actionFileSaveServerState" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveData" />
+    <addaction name="actionFileSaveScreenshot" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveAnimation" />
+    <addaction name="actionFileSaveGeometry" />
+    <addaction name="separator" />
+    <addaction name="actionServerConnect" />
+    <addaction name="actionServerDisconnect" />
+    <addaction name="separator" />
+    <addaction name="actionFileExit" />
+   </widget>
    <widget class="QMenu" name="menuView" >
     <property name="title" >
      <string>&amp;View</string>
@@ -164,6 +139,35 @@
     <addaction name="separator" />
     <addaction name="menuToolbars" />
     <addaction name="separator" />
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <widget class="QMenu" name="menuAddPlot" >
+     <property name="title" >
+      <string>Add &amp;Plot</string>
+     </property>
+     <addaction name="actionHistogram" />
+     <addaction name="actionXY_Plot" />
+     <addaction name="actionTable_View" />
+    </widget>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="actionMoveMode" />
+    <addaction name="actionSelectionMode" />
+    <addaction name="actionSelectFrustum" />
+    <addaction name="actionSelectIds" />
+    <addaction name="actionSelectPoints" />
+    <addaction name="actionSelectThresholds" />
+    <addaction name="separator" />
+    <addaction name="menuAddPlot" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -638,7 +642,13 @@
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSelect24.png</iconset>
    </property>
    <property name="text" >
-    <string>Selection Mode (s)</string>
+    <string>Select Surface</string>
+   </property>
+   <property name="iconText" >
+    <string>Select Surface</string>
+   </property>
+   <property name="toolTip" >
+    <string>Select Surface</string>
    </property>
    <property name="shortcut" >
     <string/>
@@ -1048,6 +1058,47 @@
   <action name="actionToolsCreateLookmark" >
    <property name="text" >
     <string>Create Lookmark</string>
+   </property>
+  </action>
+  <action name="actionSelectFrustum" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Select Through</string>
+   </property>
+   <property name="iconText" >
+    <string>Select Through</string>
+   </property>
+   <property name="toolTip" >
+    <string>Select Through</string>
+   </property>
+  </action>
+  <action name="actionSelectIds" >
+   <property name="text" >
+    <string>Enter In Ids</string>
+   </property>
+   <property name="iconText" >
+    <string>Enter In Ids</string>
+   </property>
+   <property name="toolTip" >
+    <string>Enter In Ids</string>
+   </property>
+  </action>
+  <action name="actionSelectPoints" >
+   <property name="text" >
+    <string>Enter In Points</string>
+   </property>
+   <property name="iconText" >
+    <string>Enter In Points</string>
+   </property>
+   <property name="toolTip" >
+    <string>Enter In Points</string>
+   </property>
+  </action>
+  <action name="actionSelectThresholds" >
+   <property name="text" >
+    <string>Enter Thresholds</string>
    </property>
   </action>
  </widget>

@@ -50,9 +50,15 @@ class vtkSMProxy;
 class vtkSMSelectionProxy;
 class vtkSMViewModuleProxy;
 
-/// pqSelectionManager is the link between the server manager level
-/// selection and the GUI. It keeps a list of selected proxies and
-/// corresponding point/cell list proxies.
+/// pqSelectionManager is the nexus for selection in paraview.
+/// It responds to UI events to tell the servermanager to setup for making
+/// selections. It watches the servermanager's state to see if the selection
+/// parameters are changed (either from the UI or from playback) and tells 
+/// the servermanager to perform the requested selection.
+/// It is also the link between the server manager level selection and the 
+/// GUI, converting servermanager selection result datastructures into pq/Qt 
+/// level selection datastructures so that all views can be synchronized and
+/// show the same selection in their own manner.
 class PQCOMPONENTS_EXPORT pqSelectionManager : public QObject
 {
   Q_OBJECT
@@ -60,15 +66,6 @@ class PQCOMPONENTS_EXPORT pqSelectionManager : public QObject
 public:
   pqSelectionManager(QObject* parent=NULL);
   virtual ~pqSelectionManager();
-
-  /// Returns the mode the manager is in. In SELECT mode, the
-  /// interaction involves drawing a rubber-band. In INTERACT
-  /// mode, the user can interact with the view by rotating, panning
-  // etc.
-  int getMode() 
-    {
-      return this->Mode;
-    }
 
   /// Returns the number of client-side data objects that were created by
   /// the selection.
@@ -86,8 +83,12 @@ public:
 
   enum Modes
   {
-    SELECT,
-    INTERACT
+    INTERACT,
+    SELECT, //aka suface selection
+    FRUSTUM,
+    IDS,
+    POINTS,
+    THRESHOLDS
   };
 
   friend class vtkPQSelectionObserver;
@@ -101,56 +102,77 @@ signals:
   void selectionMarked();
   
 public slots:
-  /// Change mode to SELECT
-  void switchToSelection();
   /// Change mode to INTERACT
   void switchToInteraction();
+
+  /// Change mode to surface selection
+  void switchToSelection();
+
+  /// Change mode to frustum selection
+  void switchToSelectThrough();
+
+  /// Change mode to select listed cell ids
+  void setIds(int id);
+
+  /// Change mode to select cells with that contain the given points
+  void setPoints(double X, double Y, double Z);
+
+  /// Change mode to select data with attributes within the given thresholds
+  void setThresholds(double min, double max);
+
   /// Clear all selections. Note that this does not clear
   /// the server manager model selection
   void clearSelection();
+
   /// Used to keep track of active render module
   void setActiveView(pqGenericViewModule*);
+
   /// cleans all internal proxies.
   void cleanSelections();
 
 private slots:
+  //checks if any server state relating to selection is out of data and
+  //if so tells the server to execute and gets the results into the client
+  //in other words it checks proxies then calls
+  //vtkSMSelectionProxy::UpdateSelection() and then calls
+  //pqSelectionManager::selectionChanged()
+  void updateSelections();
+
   void sourceRemoved(pqPipelineSource*);
   void proxyRegistered(QString, QString, vtkSMProxy*);
   void proxyUnRegistered(QString, QString, vtkSMProxy*);
   void viewModuleRemoved(pqGenericViewModule* rm);
   void onSelectionUpdateVTKObjects(vtkObject* sel);
-  void updateSelections();
 
 private:
   pqSelectionManagerImplementation* Implementation;
   int Mode;
 
+  //pushes the state for a requested selection onto the servermanager
+  //later, when updateSelections will make it happen
+  void prepareForSelection();
+
+  // takes the results of a selection, converts it into a Qt friendly 
+  // format to share amongst views, creates the highlighted outline and
+  // fires a selectionChanged() signal.
+  void selectionChanged(vtkIdType cid);
+
+  //helpers
   int setInteractorStyleToSelect(pqRenderViewModule*);
   int setInteractorStyleToInteract(pqRenderViewModule*);
   void processEvents(unsigned long event);
   vtkSMDisplayProxy* getDisplayProxy(pqRenderViewModule*, vtkSMProxy*, bool create_new=true);
   void createDisplayProxies(vtkSMProxy*, bool show=true);
-
-  void updateSelection(int* eventpos, pqRenderViewModule* rm);
-
   void clearClientDisplays();
   void createNewClientDisplays(pqServerManagerSelection&);
-
   /// set the active selection for a particular connection.
   /// If selection is NULL, then the current active selection is
   /// cleared.
   void setActiveSelection(vtkIdType cid, vtkSMSelectionProxy* selection);
-
   void activeSelectionRegistered(vtkSMSelectionProxy* selection);
-
-  // called when selection is updated. Updates views/displays are fires
-  // selectionChanged() signal.
-  void selectionChanged(vtkIdType cid);
-
   // creates the SelectionSource proxy for the connection if none
   // exists.
   void initializeSelectionSource(vtkIdType cid);
-
 };
 
 

@@ -15,9 +15,10 @@
 // .NAME vtkSelectionConverter - converts one selection type to another
 // .SECTION Description
 // vtkSelectionConverter can be used to convert from one selection type
-// to another. Two most common uses are to convert from geometry selection
-// to volume selection and/or global id selection. Currently, it only
-// supports conversion from geometry to volume.
+// to another. Currently, it only supports conversion from a 'surface' 
+// geometry selection to a 'volume' selection. It does this by looking for a 
+// pedigree array called vtkOriginalCellIds that says what 3D cell produced 
+// each selected 2D surface cell.
 // .SECTION See Also
 // vtkSelection
 

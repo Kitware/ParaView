@@ -1,0 +1,173 @@
+<ui version="4.0" >
+ <class>pqEnterPointsDialog</class>
+ <widget class="QDialog" name="pqEnterPointsDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>228</width>
+    <height>169</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Enter A Coordinate</string>
+  </property>
+  <widget class="QWidget" name="" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>130</y>
+     <width>221</width>
+     <height>33</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" >
+    <property name="margin" >
+     <number>0</number>
+    </property>
+    <property name="spacing" >
+     <number>6</number>
+    </property>
+    <item>
+     <widget class="QPushButton" name="okButton" >
+      <property name="text" >
+       <string>Configure</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="cancelButton" >
+      <property name="text" >
+       <string>Cancel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QDoubleSpinBox" name="coord_Y" >
+   <property name="geometry" >
+    <rect>
+     <x>90</x>
+     <y>50</y>
+     <width>131</width>
+     <height>29</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="coord_Z" >
+   <property name="geometry" >
+    <rect>
+     <x>90</x>
+     <y>90</y>
+     <width>131</width>
+     <height>29</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_Y" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>53</y>
+     <width>72</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="sizePolicy" >
+    <sizepolicy>
+     <hsizetype>5</hsizetype>
+     <vsizetype>5</vsizetype>
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text" >
+    <string>Y</string>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_X" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>14</y>
+     <width>72</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>X</string>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_Z" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>89</y>
+     <width>72</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Z</string>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="coord_X" >
+   <property name="geometry" >
+    <rect>
+     <x>90</x>
+     <y>10</y>
+     <width>131</width>
+     <height>29</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>okButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>okButton</sender>
+   <signal>clicked()</signal>
+   <receiver>pqEnterPointsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>442</x>
+     <y>217</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>92</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>pqEnterPointsDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>525</x>
+     <y>217</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>175</x>
+     <y>230</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

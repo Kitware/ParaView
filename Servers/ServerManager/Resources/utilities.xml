@@ -2040,18 +2040,11 @@
       </IntVectorProperty>
     </SourceProxy>
 
-    <Proxy name="VolumeSelector" class="vtkVolumeSelector">
+    <Proxy name="ExtractSelection" class="vtkPVExtractSelection">
        <Property 
          name="Initialize" 
          command="Initialize" >
        </Property>
-
-       <ProxyProperty 
-         name="DataSets" 
-         command="AddDataSet" 
-         is_internal="1"
-         clean_command="ClearDataSets">
-       </ProxyProperty>
 
        <ProxyProperty 
          name="Props" 
@@ -2068,43 +2061,22 @@
        </ProxyProperty>
 
        <ProxyProperty 
-         name="Selection" 
-         command="SetSelection">
+          name="InputSelection" 
+          command="SetInputSelection" 
+          number_of_elements="1"
+          default_values="0" >
        </ProxyProperty>
 
-       <IntVectorProperty 
-          name="ExactTest" 
-          command="SetExactTest" 
-          number_of_elements="1"
-          default_values="1" >
-         <EnumerationDomain name="enum">
-           <Entry value="0" text="Off"/>
-           <Entry value="1" text="On"/>
-         </EnumerationDomain>
-       </IntVectorProperty>
-
-       <DoubleVectorProperty
-          name="CreateFrustum"
-          command="CreateFrustum"
-          number_of_elements="32"
-          is_internal="1"
-          argument_is_array="1"
-          default_values=
-          "0.0 0.0 0.0 0.0
-           0.0 0.0 0.0 0.0
-           0.0 0.0 0.0 0.0
-           0.0 0.0 0.0 0.0
-           0.0 0.0 0.0 0.0
-           0.0 0.0 0.0 0.0
-           0.0 0.0 0.0 0.0
-           0.0 0.0 0.0 0.0">
-       </DoubleVectorProperty>
+       <ProxyProperty 
+         name="OutputSelection" 
+         command="SetOutputSelection">
+       </ProxyProperty>
 
        <Property 
          name="Select" 
          command="Select">
        </Property>
-   <!-- End VolumeSelection -->
+   <!-- End ExtractSelection -->
    </Proxy>
 
     <SelectionProxy name="Selection" class="vtkSelection">
@@ -2118,13 +2090,37 @@
         </ProxyGroupDomain>
       </ProxyProperty>
       <IntVectorProperty
-        name="Selection"
-        command="SetSelection"
+        name="ScreenRectangle"
+        command="SetScreenRectangle"
         update_self="1"
         number_of_elements="4"
         default_values="0 0 1 1">
         <IntRangeDomain name="range" />
       </IntVectorProperty>
+      <IntVectorProperty
+        name="Ids"
+        command="SetIds"
+        update_self="1"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" />
+      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="Points"
+        command="SetPoints"
+        update_self="1"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Thresholds"
+        command="SetThresholds"
+        update_self="1"
+        number_of_elements="2"
+        default_values="0.0 1.0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
       <IntVectorProperty
         name="Mode"
         command="SetMode"
@@ -2133,18 +2129,10 @@
         default_values="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="SURFACE" />
-          <Entry value="1" text="FRUSTRUM" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <IntVectorProperty
-        name="Type"
-        command="SetType"
-        update_self="1"
-        number_of_elements="1"
-        default_values="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="SOURCE" />
-          <Entry value="1" text="GEOMETRY" />
+          <Entry value="1" text="FRUSTUM" />
+          <Entry value="2" text="IDS" />
+          <Entry value="3" text="POINTS" />
+          <Entry value="4" text="THRESHOLDS" />
         </EnumerationDomain>
       </IntVectorProperty>
       <SubProxy>
@@ -2166,6 +2154,7 @@
         </Proxy>
       </SubProxy>
     </SelectionProxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="connection_cleaners">

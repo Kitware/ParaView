@@ -55,7 +55,7 @@ public:
   static void Parse(const char* xml, vtkSelection* root);
 
   // Description:
-  // ID the data or algorithm the selection belongs to. What
+  // ID of the dataset or algorithm that the selection belongs to. What
   // ID means is application specific.
   static vtkInformationIntegerKey* ORIGINAL_SOURCE_ID();
 

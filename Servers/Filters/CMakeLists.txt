@@ -50,6 +50,7 @@ SET(Filters_SRCS
   vtkMultiDisplayManager.cxx
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
+  vtkPExtractHistogram.cxx
   vtkPhastaReader.cxx
   vtkPickFilter.cxx
   vtkPolyLineToRectilinearGridFilter.cxx
@@ -67,7 +68,7 @@ SET(Filters_SRCS
   vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerTranslator.cxx
   vtkPVExtentTranslator.cxx
-  vtkPExtractHistogram.cxx
+  vtkPVExtractSelection.cxx
   vtkPVExtractVOI.cxx
   vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryFilter.cxx
@@ -130,7 +131,6 @@ SET(Filters_SRCS
   vtkTransferFunctionEditorWidgetSimple1D.cxx
   vtkTransferFunctionViewer.cxx
   vtkUpdateSuppressorPipeline.cxx
-  vtkVolumeSelector.cxx
   vtkVRMLSource.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx

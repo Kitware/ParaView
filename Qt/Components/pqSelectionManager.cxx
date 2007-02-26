@@ -123,6 +123,9 @@ public:
     RenderModule(0),
     SelectionObserver(0),
     Xs(0), Ys(0), Xe(0), Ye(0),
+    Ids(0),
+    CoordsX(0), CoordsY(0), CoordsZ(0),
+    ThresholdsMin(0), ThresholdsMax(0),
     InSetActiveSelection(false),
     InUpdateSelections(false)
     {
@@ -158,7 +161,9 @@ public:
   vtkPQSelectionObserver* SelectionObserver;
 
   int Xs, Ys, Xe, Ye;
-
+  int Ids;
+  double CoordsX, CoordsY, CoordsZ;
+  double ThresholdsMin, ThresholdsMax;
   typedef vtkstd::map<vtkIdType, pqSelectionProxies > 
      ServerSelectionsType;
   ServerSelectionsType ServerSelections;
@@ -253,6 +258,23 @@ void pqSelectionManager::switchToSelection()
   if (this->setInteractorStyleToSelect(this->Implementation->RenderModule))
     {
     this->Mode = SELECT;
+    // set the selection cursor
+    this->Implementation->RenderModule->getWidget()->setCursor(Qt::CrossCursor);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::switchToSelectThrough()
+{
+  if (!this->Implementation->RenderModule)
+    {
+    qDebug("No render module specified. Cannot switch to selection");
+    return;
+    }
+
+  if (this->setInteractorStyleToSelect(this->Implementation->RenderModule))
+    {
+    this->Mode = FRUSTUM;
     // set the selection cursor
     this->Implementation->RenderModule->getWidget()->setCursor(Qt::CrossCursor);
     }
@@ -440,7 +462,7 @@ void pqSelectionManager::setActiveView(pqGenericViewModule* view)
     }
   
   // make sure the active render module has the right interactor
-  if (this->Mode == SELECT)
+  if (this->Mode == SELECT || this->Mode == FRUSTUM)
     {
     // the previous one should switch to the previous interactor, only
     // the current one uses the select interactor
@@ -597,20 +619,19 @@ void pqSelectionManager::processEvents(unsigned long eventId)
       this->Implementation->Ys = eventpos[1];
       break;
     case vtkCommand::LeftButtonReleaseEvent:
-      this->updateSelection(eventpos, this->Implementation->RenderModule);
+      this->Implementation->Xe = eventpos[0];
+      this->Implementation->Ye = eventpos[1];
+      this->prepareForSelection();
       break;
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::updateSelection(int* eventpos, pqRenderViewModule* rm)
+void pqSelectionManager::prepareForSelection()
 {
-  // Set the selection rectangle
-  this->Implementation->Xe = eventpos[0];
-  this->Implementation->Ye = eventpos[1];
-
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
+  pqRenderViewModule *rm = this->Implementation->RenderModule;
   vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
   vtkIdType connId = rmp->GetConnectionID();
   // set up selection source if none already exists.
@@ -620,17 +641,57 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderViewModule* rm)
       pxm->NewProxy("selection_helpers", "Selection"));
   sourceSelection->SetServers(vtkProcessModule::DATA_SERVER);
   sourceSelection->SetConnectionID(connId);
-
   pqSMAdaptor::setProxyProperty(sourceSelection->GetProperty("RenderModule"),
     rmp);
-  pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("Selection"),
-    0, this->Implementation->Xs);
-  pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("Selection"),
-    1, this->Implementation->Ys);
-  pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("Selection"),
-    2, this->Implementation->Xe);
-  pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("Selection"),
-    3, this->Implementation->Ye);
+  switch(this->Mode)
+    {
+    case SELECT:
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("ScreenRectangle"),
+                                              0, this->Implementation->Xs);
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("ScreenRectangle"),
+                                              1, this->Implementation->Ys);
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("ScreenRectangle"),
+                                              2, this->Implementation->Xe);
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("ScreenRectangle"),
+                                              3, this->Implementation->Ye);
+      pqSMAdaptor::setElementProperty(sourceSelection->GetProperty("Mode"), vtkSMSelectionProxy::SURFACE);
+      break;
+    case FRUSTUM:
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("ScreenRectangle"),
+                                              0, this->Implementation->Xs);
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("ScreenRectangle"),
+                                              1, this->Implementation->Ys);
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("ScreenRectangle"),
+                                              2, this->Implementation->Xe);
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("ScreenRectangle"),
+                                              3, this->Implementation->Ye);
+      pqSMAdaptor::setElementProperty(sourceSelection->GetProperty("Mode"), vtkSMSelectionProxy::FRUSTUM);
+      break;
+    case IDS:
+      pqSMAdaptor::setElementProperty(sourceSelection->GetProperty("Ids"),
+                                      this->Implementation->Ids);
+      pqSMAdaptor::setElementProperty(sourceSelection->GetProperty("Mode"), vtkSMSelectionProxy::IDS);
+      break;
+    case POINTS:
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("Points"),
+                                              0, this->Implementation->CoordsX);
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("Points"),
+                                              1, this->Implementation->CoordsY);
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("Points"),
+                                              2, this->Implementation->CoordsZ);
+      pqSMAdaptor::setElementProperty(sourceSelection->GetProperty("Mode"), vtkSMSelectionProxy::POINTS);
+      break;
+    case THRESHOLDS:
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("Thresholds"),
+                                              0, this->Implementation->ThresholdsMin);
+      pqSMAdaptor::setMultipleElementProperty(sourceSelection->GetProperty("Thresholds"),
+                                              1, this->Implementation->ThresholdsMax);
+      pqSMAdaptor::setElementProperty(sourceSelection->GetProperty("Mode"), vtkSMSelectionProxy::THRESHOLDS);
+      break;
+    default:
+      return;
+    }
+
   sourceSelection->UpdateVTKObjects();
   sourceSelection->UpdateCameraPropertiesFromRenderModule();
   sourceSelection->UpdateVTKObjects();
@@ -841,12 +902,12 @@ void pqSelectionManager::sourceRemoved(pqPipelineSource* vtkNotUsed(source))
 // are typically a result of state loading or undo/redo operation.
 void pqSelectionManager::updateSelections()
 {
- if (this->Implementation->InUpdateSelections)
-   {
-   return;
-   }
- this->Implementation->InUpdateSelections  = true;
-
+  if (this->Implementation->InUpdateSelections)
+    {
+    return;
+    }
+  this->Implementation->InUpdateSelections  = true;
+  
   pqSelectionManagerImplementation::ServerSelectionsType::iterator iter =
     this->Implementation->ServerSelections.begin();
   for(; iter != this->Implementation->ServerSelections.end(); iter++)
@@ -894,6 +955,7 @@ void pqSelectionManager::selectionChanged(vtkIdType cid)
 
   pqServerManagerSelection selection;
 
+  // get all of the vtkProps that we selected in
   vtkCollection* selectedProxies = vtkCollection::New();
   sourceSelection->GetSelectedSourceProxies(selectedProxies);
 
@@ -1002,4 +1064,32 @@ void pqSelectionManager::viewModuleRemoved(pqGenericViewModule* vm)
     // since these displays are not registered or anything, simply clean it up.
     this->Implementation->Displays.erase(iter);
     }
+}
+
+//----------------------------------------------------------------------------
+void pqSelectionManager::setIds(int id)
+{
+  this->Mode = IDS;
+  this->Implementation->Ids = id;
+  this->prepareForSelection();
+}
+
+//----------------------------------------------------------------------------
+void pqSelectionManager::setPoints(double X, double Y, double Z)
+{
+  this->Mode = POINTS;
+  this->Implementation->CoordsX = X;
+  this->Implementation->CoordsY = Y;
+  this->Implementation->CoordsZ = Z;
+  this->prepareForSelection();
+}
+
+
+//----------------------------------------------------------------------------
+void pqSelectionManager::setThresholds(double min, double max)
+{
+  this->Mode = THRESHOLDS;
+  this->Implementation->ThresholdsMin = min;
+  this->Implementation->ThresholdsMax = max;
+  this->prepareForSelection();
 }

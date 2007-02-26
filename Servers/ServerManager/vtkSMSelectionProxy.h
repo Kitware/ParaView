@@ -40,36 +40,43 @@ public:
 
   // Description:
   // Get/Set the selection region (in display coordinates).
-  vtkSetVector4Macro(Selection, int);
-  vtkGetVector4Macro(Selection, int);
+  vtkSetVector4Macro(ScreenRectangle, int);
+  vtkGetVector4Macro(ScreenRectangle, int);
 
   // Description:
-  // Get/Set the selection modes. Supported selection modes are
-  // FRUSTRUM and SURFACE. Default is SURFACE.
+  // Get/Set the selected ids.
+  vtkSetMacro(Ids, int);
+  vtkGetMacro(Ids, int);
+
+  // Description:
+  // Get/Set the selected points.
+  vtkSetVector3Macro(Points, double);
+  vtkGetVector3Macro(Points, double);
+
+  // Description:
+  // Get/Set the selected thresholds.
+  vtkSetVector2Macro(Thresholds, double);
+  vtkGetVector2Macro(Thresholds, double);
+
+  // Description:
+  // Get/Set the selection algorithm. Supported selection algorithms are
+  // ColorBuffer selection, Frustum extraction, Ids lookup, Point containment
+  // lookup, and threshold extraction.
   vtkSetMacro(Mode, int);
   vtkGetMacro(Mode, int);
-  void SetModeToFrustrum() { this->SetMode(FRUSTRUM); }
   void SetModeToSurface() { this->SetMode(SURFACE); }
+  void SetModeToFrustum() { this->SetMode(FRUSTUM); }
+  void SetModeToIds() { this->SetMode(IDS); }
+  void SetModeToPoints() { this->SetMode(POINTS); }
+  void SetModeToThresholds() { this->SetMode(THRESHOLDS); }
   //BTX
   enum SelectionModes
     {
     SURFACE,
-    FRUSTRUM
-    };
-  //ETX
-
-  // Description:
-  // Get/Set the selection type. A selection can be a GEOMETRY selection
-  // or a SOURCE selection. Default is SOURCE.
-  vtkSetMacro(Type, int);
-  vtkGetMacro(Type, int);
-  void SetTypeToGeometry() { this->SetType(GEOMETRY); }
-  void SetTypeToSource() { this->SetType(SOURCE); }
-  //BTX
-  enum SelectionTypes
-    {
-    SOURCE,
-    GEOMETRY
+    FRUSTUM,
+    IDS,
+    POINTS,
+    THRESHOLDS
     };
   //ETX
   
@@ -111,45 +118,82 @@ protected:
   // the camera subproxy is merely used for the data.
   virtual void CreateVTKObjects(int numObjects);
 
-  int Selection[4];
+  int ScreenRectangle[4];
+  int Ids;
+  double Points[3];
+  double Thresholds[2];
+
   int Mode;
-  int Type;
   vtkSMRenderModuleProxy* RenderModule;
 
   // Description:
-  // The method creates a surface selection for the surfaces visible within
-  // the specified region. The region must be specified in display coordinates.
+  // The does a color id selection to find cells drawn in the screen region 
+  // bounded by ScreenRectangle. The region must be specified in display 
+  // coordinates.
   // It returns a new selection proxy
   // that represents the selection on the data server. This selection proxy 
   // represents a geometry selection.
-  void SelectOnSurface(int in_rect[4],
-    vtkSMRenderModuleProxy* renderModule, vtkSMProxy* geomSelectionProxy);
+  void SelectOnSurface(
+    vtkSMRenderModuleProxy* renderModule, 
+    vtkSMProxy* outSel
+    );
 
   // Description:
-  // This method take a on-surface selection and sets it up to include the
-  // grometry proxy IDs and original source proxy IDs. This is essential
+  // The does a frustum extraction to find all cells behind the screen region 
+  // bounded by ScreenRectangle. The region must be specified in display 
+  // coordinates.
+  void SelectInFrustum(
+    vtkSMRenderModuleProxy* renderModule, 
+    vtkSMProxy* inSel,
+    vtkSMProxy* outSel
+    );
+
+  // Description:
+  // The does an id extraction to find just the cells matching Ids. 
+  void SelectIds(
+    vtkSMRenderModuleProxy* renderModule, 
+    vtkSMProxy* inSel,
+    vtkSMProxy* outSel
+    );
+
+  // Description:
+  // The does a point extraction to find all cells that contain 
+  // Points.
+  void SelectPoints(
+    vtkSMRenderModuleProxy* renderModule, 
+    vtkSMProxy* inSel,
+    vtkSMProxy* outSel
+    );
+
+  // Description:
+  // The does a threshold extraction to find all cells whose data values
+  // fall within the thresholds listed in Thresholds.
+  void SelectThresholds(
+    vtkSMRenderModuleProxy* renderModule, 
+    vtkSMProxy* inSel,
+    vtkSMProxy* outSel
+    );
+
+  // Description:
+  // This method take a Surface selection and sets it up to include the
+  // geometry proxy IDs and original source proxy IDs. This is essential
   // since a selection must have these two IDs however on-surface selection
   // generates a selection object which doesn't have any other information
   // execept that of the selection prop IDs.
   void ConvertSelection(vtkSelection* sel, vtkSMRenderModuleProxy* rmp);
 
   // Description:
-  // This method sends the client side selection to the server side objects represented
-  // by the proxy. This is used to send the client-side selection obtained on surface 
-  // selection over to the data server.
+  // This method sends the client side selection to the server side objects 
+  // represented by the proxy. This is used to send the client-side color_id
+  // selection results over to the data server.
   void SendSelection(vtkSelection* sel, vtkSMProxy* selProxy);
-
-
-  // Description:
-  // This method creates a selection that includes everything with
-  // the frustrum indicated by the display rectangle. The rectangle must
-  // be specified in display coordinates. 
-  void SelectInFrustrum(int display_rectangle[4], 
-    vtkSMRenderModuleProxy* renderModule, vtkSMProxy* geomSelectionProxy);
 
   // Description
   // Convers a geometry selection to a source selection.
-  void ConvertGeometrySelectionToSource(
+  // That is it takes a selection including 2D polygonal "shell" ids and
+  // converts it to one including 3D "outer edge" cell ids.
+  // The outer edge cells are not necessarily voxels.
+  void ConvertPolySelectionToVoxelSelection(
     vtkSMProxy* geomSelectionProxy, vtkSMProxy* sourceSelectionProxy);
 
   // Description:
@@ -159,7 +203,7 @@ protected:
 
   // Description:
   // This is the client side selection object. This is maintained so that
-  // the GetSelectedSourceProxies() query can be answered. In FRUSTRUM mode,
+  // the GetSelectedSourceProxies() query can be answered. In FRUSTUM mode,
   // this selection object is fetched from the server on first
   // GetSelectedSourceProxies() call. For SURFACE mode, the selection
   // yields a client-side selection object.
