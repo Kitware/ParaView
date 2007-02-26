@@ -1,0 +1,6 @@
+<ParaViewReaders>
+  <Reader name="PNGReader"
+          extensions="mypng"
+          file_description="My PNG Files">
+  </Reader>
+</ParaViewReaders>

@@ -1,0 +1,3 @@
+
+ADD_PARAVIEW_PLUGIN(GUIMyPNGReader "1.0" GUI_RESOURCES pqReader.qrc)
+
