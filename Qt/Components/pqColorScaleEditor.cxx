@@ -89,6 +89,7 @@ pqColorScaleEditorForm::pqColorScaleEditorForm()
 
 //----------------------------------------------------------------------------
 pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
+  : QDialog(widgetParent)
 {
   this->Form = new pqColorScaleEditorForm();
   this->Viewer = vtkTransferFunctionViewer::New();
@@ -254,6 +255,12 @@ void pqColorScaleEditor::closeEvent(QCloseEvent *e)
     }
 
   QDialog::closeEvent(e);
+}
+
+void pqColorScaleEditor::showEvent(QShowEvent *e)
+{
+  QDialog::showEvent(e);
+  //this->Viewer->Render();
 }
 
 void pqColorScaleEditor::setUseDiscreteColors(bool on)

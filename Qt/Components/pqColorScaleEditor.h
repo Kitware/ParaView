@@ -45,6 +45,7 @@ class pqPipelineDisplay;
 class pqScalarBarDisplay;
 class pqScalarsToColors;
 class QCloseEvent;
+class QShowEvent;
 class QString;
 class QTimer;
 class vtkTransferFunctionViewer;
@@ -62,6 +63,7 @@ public:
 
 protected:
   virtual void closeEvent(QCloseEvent *e);
+  virtual void showEvent(QShowEvent *e);
 
 private slots:
   /// \name Color Scale Methods
