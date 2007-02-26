@@ -33,7 +33,7 @@
 #include "vtkVRMLImporter.h"
 
 
-vtkCxxRevisionMacro(vtkVRMLSource, "1.9");
+vtkCxxRevisionMacro(vtkVRMLSource, "1.9.12.1");
 vtkStandardNewMacro(vtkVRMLSource);
 
 //------------------------------------------------------------------------------
@@ -43,6 +43,8 @@ vtkVRMLSource::vtkVRMLSource()
   this->Importer = NULL;
   this->Color = 1;
   this->Append = 1;
+
+  this->SetNumberOfInputPorts(0);
 }
 
 //------------------------------------------------------------------------------
