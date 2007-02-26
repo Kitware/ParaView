@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes.
 #include <QDomDocument>
 #include <QFileInfo>
+#include <QDir>
 #include <QList>
 #include <QStringList>
 #include <QtDebug>
@@ -55,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqPluginManager.h"
 
 
 //-----------------------------------------------------------------------------
@@ -63,6 +65,13 @@ struct pqReaderInfo
   vtkSmartPointer<vtkSMProxy> PrototypeProxy;
   QString Description;
   QList<QString> Extensions;
+
+  bool operator==(const pqReaderInfo& other) const
+    {
+    return (this->Description == other.Description &&
+            this->PrototypeProxy == other.PrototypeProxy &&
+            this->Extensions == other.Extensions);
+    }
 
   QString getTypeString() const
     {
@@ -169,6 +178,10 @@ public:
 pqReaderFactory::pqReaderFactory(QObject* _parent) : QObject(_parent)
 {
   this->Internal = new pqReaderFactoryInternal();
+  this->loadFileTypes();
+  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
+                   SIGNAL(guiPluginLoaded()),
+                   this, SLOT(loadFileTypes()));
 }
 
 //-----------------------------------------------------------------------------
@@ -233,6 +246,15 @@ void pqReaderFactory::addFileType(const QString& description,
   info.Description = description;
   info.Extensions = extensions;
   info.PrototypeProxy = prototype;
+  
+  // check that it is already added
+  foreach(const pqReaderInfo &i, this->Internal->ReaderList)
+    {
+    if(info == i)
+      {
+      return;
+      }
+    }
 
   this->Internal->ReaderList.push_back(info);
 }
@@ -376,6 +398,18 @@ QString pqReaderFactory::getExtensionTypeString(pqPipelineSource* reader)
       }
     }
   return ext;
+}
+
+//-----------------------------------------------------------------------------
+void pqReaderFactory::loadFileTypes()
+{
+  QString readersDirName = ":/ParaViewResources";
+  QDir readersDir(readersDirName);
+  QStringList resources = readersDir.entryList(QDir::Files);
+  foreach(QString resource, resources)
+    {
+    this->loadFileTypes(readersDirName + QString("/") + resource);
+    }
 }
 
 //-----------------------------------------------------------------------------

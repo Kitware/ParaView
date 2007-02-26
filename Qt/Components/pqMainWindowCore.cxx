@@ -235,25 +235,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     this->Implementation->LookupTableManager, 
     SLOT(updateLookupTableScalarRanges()));
 
-  // Initialize supported file types.
-  QString readersDirName = ":/ParaViewResources";
-  QDir readersDir(readersDirName);
-  QStringList resources = readersDir.entryList(QDir::Files);
-  foreach(QString resource, resources)
-    {
-    core->getReaderFactory()->loadFileTypes(
-      readersDirName + QString("/") + resource);
-    }
-  
-  QString writersDirName = ":/ParaViewResources";
-  QDir writersDir(writersDirName);
-  resources = writersDir.entryList(QDir::Files);
-  foreach(QString resource, resources)
-    {
-    core->getWriterFactory()->loadFileTypes(
-      writersDirName + QString("/") + resource);
-    }
-
   // Connect the view manager to the pqActiveView.
   QObject::connect(&this->Implementation->MultiViewManager,
     SIGNAL(activeViewModuleChanged(pqGenericViewModule*)),

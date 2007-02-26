@@ -45,6 +45,7 @@ class vtkSMProxy;
 // to create a reader that can read a particular file. 
 class PQCORE_EXPORT pqReaderFactory : public QObject
 {
+  Q_OBJECT
 public:
   pqReaderFactory(QObject* parent=NULL);
   virtual ~pqReaderFactory();
@@ -91,6 +92,16 @@ public:
   // Return the reader type for a file
   QString getReaderType(const QString& filename, pqServer*);
 
+  bool checkIfFileIsReadable(const QString& name, pqServer*);
+ 
+public slots: 
+  
+  // loads file types from the Qt resource directory
+  // ":/ParaViewResources/"
+  void loadFileTypes();
+ 
+protected: 
+  
   // Loads file type definitions from the xml file.
   // Format of this xml is:
   // \verbatim
@@ -106,8 +117,6 @@ public:
   // \endverbatim
   // By default, the reader is searched for under the \c sources group.
   void loadFileTypes(const QString& xmlfilename);
-  
-  bool checkIfFileIsReadable(const QString& name, pqServer*);
 
 private:
   pqReaderFactoryInternal* Internal;

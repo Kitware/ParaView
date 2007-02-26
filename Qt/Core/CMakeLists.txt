@@ -70,6 +70,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPropertyManager.h
   pqProxy.h
   pqQVTKWidgetEventTranslator.h
+  pqReaderFactory.h
   pqRenderViewModule.h
   pqScalarBarDisplay.h
   pqScalarBarVisibilityAdaptor.h

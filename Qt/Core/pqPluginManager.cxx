@@ -107,6 +107,7 @@ bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
         {
         success = true;
         this->Plugins.insert(NULL, lib);
+        emit this->guiPluginLoaded();
         QObjectList ifaces = pqplugin->interfaces();
         foreach(QObject* iface, ifaces)
           {

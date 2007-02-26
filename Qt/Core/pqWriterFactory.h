@@ -74,14 +74,19 @@ public:
   // must call Delete() on the returned proxy.
   vtkSMProxy* newWriter(const QString& filename, pqPipelineSource* toWrite);
 
-  // Initializes the factory from XML.
-  void loadFileTypes(const QString& xmlfilename);
-
   // Returns a file type filtering string suitable for file dialogs. 
   // Returns only those file formats that can be written using the 
   // output of given and the number of partitions on the data server
   // on which the source exists.
   QString getSupportedFileTypes(pqPipelineSource* toWrite);
+
+public slots:
+  // load file types from ":/ParaViewResources/"
+  void loadFileTypes();
+  
+protected: 
+  // Initializes the factory from XML.
+  void loadFileTypes(const QString& xmlfilename);
 
 private:
   pqWriterFactoryInternal* Internal;

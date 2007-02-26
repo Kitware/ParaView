@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes.
 #include <QDomDocument>
 #include <QFileInfo>
+#include <QDir>
 #include <QList>
 #include <QStringList>
 #include <QtDebug>
@@ -51,12 +52,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqPluginManager.h"
 
 struct pqWriterInfo
 {
   vtkSmartPointer<vtkSMProxy> PrototypeProxy;
   QString Description;
   QList<QString> Extensions;
+  
+  bool operator==(const pqWriterInfo& other) const
+    {
+    return (this->Description == other.Description &&
+            this->PrototypeProxy == other.PrototypeProxy &&
+            this->Extensions == other.Extensions);
+    }
 
   // Tells is the file extension matches the supported extensions.
   bool canWriteFile(const QString& filename) const
@@ -141,6 +150,10 @@ public:
 pqWriterFactory::pqWriterFactory(QObject* _parent/*=NULL*/) : QObject(_parent)
 {
   this->Internal = new pqWriterFactoryInternal;
+  this->loadFileTypes();
+  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
+                   SIGNAL(guiPluginLoaded()),
+                   this, SLOT(loadFileTypes()));
 }
 
 //-----------------------------------------------------------------------------
@@ -200,6 +213,15 @@ void pqWriterFactory::addFileType(const QString& description,
   info.Description = description;
   info.Extensions = extensions;
   info.PrototypeProxy = writer;
+  
+  // check that it is already added
+  foreach(const pqWriterInfo &i, this->Internal->WriterList)
+    {
+    if(info == i)
+      {
+      return;
+      }
+    }
 
   this->Internal->WriterList.push_back(info);
 }
@@ -268,6 +290,18 @@ QString pqWriterFactory::getSupportedFileTypes(pqPipelineSource* toWrite)
       }
     }
   return types;
+}
+
+//-----------------------------------------------------------------------------
+void pqWriterFactory::loadFileTypes()
+{
+  QString readersDirName = ":/ParaViewResources";
+  QDir readersDir(readersDirName);
+  QStringList resources = readersDir.entryList(QDir::Files);
+  foreach(QString resource, resources)
+    {
+    this->loadFileTypes(readersDirName + QString("/") + resource);
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -70,9 +70,8 @@ signals:
   /// signal for when an interface is loaded
   void guiInterfaceLoaded(QObject* iface);
   
-  /// signal for when some GUI XML is loaded
-  /// which can be used to add new readers/writers to the file dialog, etc..
-  void guiXMLLoaded(const QString& xml);
+  /// signal for when a gui plugin is loaded
+  void guiPluginLoaded();
 
   /// notification that new extensions were added to the server manager
   void serverManagerExtensionLoaded();
