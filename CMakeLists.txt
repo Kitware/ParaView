@@ -155,8 +155,14 @@ ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 #########################################################################
 IF (PARAVIEW_BUILD_QT_GUI)
-SUBDIRS(Applications)
+  SUBDIRS(Applications)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
+
+#########################################################################
+OPTION(BUILD_EXAMPLES "Build ParaView examples." OFF)
+IF (BUILD_EXAMPLES)
+  SUBDIRS(Examples)
+ENDIF (BUILD_EXAMPLES)
 
 # Find hints file for the client/server wrapping
 FIND_FILE(VTK_WRAP_HINTS hints ${ParaView_SOURCE_DIR}/VTK/Wrapping)
