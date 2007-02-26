@@ -54,7 +54,7 @@ QStringList @VIEW_TYPE@Implementation::displayTypes() const
   return QStringList() << "@DISPLAY_TYPE@";
 }
 
-QString @VIEW_TYPE@Implementation::viewTypeName(const QString& type) const
+QString @VIEW_TYPE@Implementation::viewTypeName(const QString& /*type*/) const
 {
   return "@VIEW_TYPE_NAME@";
 }
@@ -75,7 +75,7 @@ vtkSMProxy* @VIEW_TYPE@Implementation::createViewProxy(const QString& viewtype)
   return NULL;
 }
 
-pqGenericViewModule* @VIEW_TYPE@Implementation::createView(const QString& viewtype,
+pqGenericViewModule* @VIEW_TYPE@Implementation::createView(const QString& /*viewtype*/,
                                                 const QString& group,
                                                 const QString& viewname,
                                                 vtkSMAbstractViewModuleProxy* viewmodule,
@@ -85,7 +85,7 @@ pqGenericViewModule* @VIEW_TYPE@Implementation::createView(const QString& viewty
   return new @VIEW_TYPE@("@VIEW_TYPE@", group, viewname, viewmodule, server, p);
 }
 
-pqConsumerDisplay* @VIEW_TYPE@Implementation::createDisplay(const QString& display_type, 
+pqConsumerDisplay* @VIEW_TYPE@Implementation::createDisplay(const QString& /*display_type*/, 
   const QString& group,
   const QString& n,
   vtkSMProxy* proxy,
