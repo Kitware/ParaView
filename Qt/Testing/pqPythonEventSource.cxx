@@ -159,7 +159,7 @@ QtTesting_setProperty(PyObject* /*self*/, PyObject* args)
   const char* property = 0;
   const char* value = 0;
 
-  if(!PyArg_ParseTuple(args, const_cast<char*>("ss"), &object, 
+  if(!PyArg_ParseTuple(args, const_cast<char*>("sss"), &object, 
                                                       &property, &value))
     {
     return NULL;
