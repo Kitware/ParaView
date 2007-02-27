@@ -2005,7 +2005,15 @@
       <IntVectorProperty name="MinCells" command="SetMinCells"
                          number_of_elements="1"
                          default_values="100"/>
-      <Property name="BuildLocator" command="BuildLocator"/>
+      <Property
+        name="OmitZPartitioning"
+        command="OmitZPartitioning"/>
+      <Property
+        name="BuildLocator"
+        command="BuildLocator"/>
+      <ProxyProperty
+        name="BuildLocatorFromPoints"
+        command="BuildLocatorFromPoints"/>
     </Proxy>
   </ProxyGroup>
 
