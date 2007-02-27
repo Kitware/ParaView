@@ -42,8 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqChartCoordinate;
 class pqChartValue;
-class QColor;
-
 
 /// \class pqLineChartPlot
 /// \brief
@@ -106,13 +104,6 @@ public:
   /// \return
   ///   The drawing type for a series.
   virtual SeriesType getSeriesType(int series) const=0;
-
-  /// \brief
-  ///   Get the drawing color for a series.
-  /// \param series The index of the series.
-  /// \return
-  ///   The drawing color for a series.
-  virtual QColor getColor(int series) const=0;
 
   /// \brief
   ///   Get the number of points in a series.

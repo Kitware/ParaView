@@ -44,10 +44,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColor>
 #include <QtDebug>
 #include <QPointer>
+#include <QPen>
 
 #include "pqChartCoordinate.h"
 #include "pqChartValue.h"
 #include "pqLineChartDisplay.h"
+#include "pqLineChartPlotOptions.h"
 
 //-----------------------------------------------------------------------------
 class pqVTKLineChartPlotInternal
@@ -58,6 +60,7 @@ public:
 
   vtkTimeStamp LastUpdateTime;
   vtkTimeStamp ModifiedTime;
+  pqLineChartPlotOptions Options;
 };
 
 //-----------------------------------------------------------------------------
@@ -107,6 +110,19 @@ void pqVTKLineChartPlot::update()
 //-----------------------------------------------------------------------------
 void pqVTKLineChartPlot::forceUpdate()
 {
+  // Update colors for all the series in this plot.
+  int series_no =0;
+  for (int cc=0; cc < this->Internal->Display->getNumberOfYArrays(); cc++)
+    {
+    if  (this->Internal->Display->getYArrayEnabled(cc) &&
+       this->Internal->Display->getYArray(cc))
+      {
+      this->Internal->Options.setPen(series_no,
+        QPen(this->Internal->Display->getYColor(cc)));
+      series_no++;
+      }
+    }
+
   this->resetPlot();
   this->Internal->LastUpdateTime.Modified();
 }
@@ -266,12 +282,8 @@ void pqVTKLineChartPlot::getRangeY(pqChartValue &min, pqChartValue &max) const
 }
 
 //-----------------------------------------------------------------------------
-QColor pqVTKLineChartPlot::getColor(int series) const
+pqLineChartPlotOptions* pqVTKLineChartPlot::getOptions() const
 {
-  int index  = this->getIndexFromSeries(series);
-  if (index < 0)
-    {
-    return QColor(255,0,0);
-    }
-  return this->Internal->Display->getYColor(index);
+  return &this->Internal->Options;
 }
+

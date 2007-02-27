@@ -156,7 +156,7 @@ public:
   ///   Gets the line chart plot's display options.
   /// \return
   ///   A pointer to the line chart plot's display options.
-  pqLineChartPlotOptions *getOptions(int index) const;
+  virtual pqLineChartPlotOptions *getOptions(int index) const;
 
   /// \brief
   ///   Sets the line chart plot's display options.

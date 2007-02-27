@@ -133,3 +133,14 @@ void pqVTKLineChartModel::update()
     }
 }
 
+//-----------------------------------------------------------------------------
+pqLineChartPlotOptions* pqVTKLineChartModel::getOptions(int index) const
+{
+  pqVTKLineChartPlot* plot = qobject_cast<pqVTKLineChartPlot*>(
+    this->getPlot(index));
+  if (plot)
+    {
+    return plot->getOptions();
+    }
+  return 0;
+}

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqVTKLineChartPlotInternal;
 class vtkDataArray;
 class pqLineChartDisplay;
+class pqLineChartPlotOptions;
 
 class PQCORE_EXPORT pqVTKLineChartPlot : public pqLineChartPlot
 {
@@ -68,9 +69,8 @@ public:
   /// Update the plot with the current data values.
   void forceUpdate();
 
-  /// Get/Set the color for this curve.
-  QColor getColor(int) const; 
-
+  /// Return the options for this plot.
+  pqLineChartPlotOptions* getOptions() const;
 protected slots:
   /// updates the MTime.
   void markModified();

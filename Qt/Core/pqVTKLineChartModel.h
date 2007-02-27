@@ -50,6 +50,14 @@ public:
   pqVTKLineChartModel(QObject* parent=0);
   virtual ~pqVTKLineChartModel();
 
+  /// \name Chart Display Options
+  //@{
+  /// \brief
+  ///   Gets the line chart plot's display options.
+  /// \return
+  ///   A pointer to the line chart plot's display options.
+  virtual pqLineChartPlotOptions *getOptions(int index) const;
+
 public slots:
   /// Add a display to the view.
   void addDisplay(pqDisplay*);
