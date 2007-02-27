@@ -37,11 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqVTKLineChartPlotInternal;
 class vtkDataArray;
+class pqLineChartDisplay;
 
 class PQCORE_EXPORT pqVTKLineChartPlot : public pqLineChartPlot
 {
+  Q_OBJECT
 public:
-  pqVTKLineChartPlot(QObject* parent);
+  pqVTKLineChartPlot(pqLineChartDisplay* display, QObject* parent);
   virtual ~pqVTKLineChartPlot();
 
   // pqLineChartPlot API.
@@ -59,18 +61,19 @@ public:
   virtual void getRangeY(pqChartValue &min, pqChartValue &max) const;
 
 
+  /// This will check the modified times and the last update time
+  /// and call forceUpdate() if required.
   void update();
+
+  /// Update the plot with the current data values.
   void forceUpdate();
-
-  /// Set the array for Y values.
-  void setYArray(vtkDataArray*);
-
-  /// Set the array for X values. 
-  void setXArray(vtkDataArray*);
 
   /// Get/Set the color for this curve.
   QColor getColor(int) const; 
-  void setColor(const QColor& c);
+
+protected slots:
+  /// updates the MTime.
+  void markModified();
 
 private:
   pqVTKLineChartPlot(const pqVTKLineChartPlot&); // Not implemented.
@@ -78,8 +81,8 @@ private:
 
   pqVTKLineChartPlotInternal* Internal;
 
-  double getXPoint(int index) const;
-  double getYPoint(int index) const;
+  /// Converts a series number to a Y array index in the pqLineChartDisplay.
+  int getIndexFromSeries(int series) const;
 
 };
 

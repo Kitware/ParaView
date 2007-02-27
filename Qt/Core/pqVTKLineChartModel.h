@@ -57,9 +57,6 @@ public slots:
   /// Remove a display from the view.
   void removeDisplay(pqDisplay*);
 
-  /// Remove all displays.
-  void removeAllDisplays();
-
   /// Equivalent to render on render views. It checks is
   /// the plot data/displays have modified since last update.
   /// If so, it will rebuilt the plots.
@@ -67,13 +64,6 @@ public slots:
 
   /// Removes all the plots from the model.
   virtual void clearPlots();
-protected:
-  /// Creates pqVTKLineChartPlot objects for each display. A pqVTKLineChartPlot
-  /// is create for each YAxis array for every display visible.
-  void createPlotsForDisplay(pqLineChartDisplay*);
-
-protected slots:
-  void markModified();
 
 private:
   pqVTKLineChartModel(const pqVTKLineChartModel&); // Not implemented.

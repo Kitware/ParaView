@@ -31,29 +31,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqVTKLineChartModel.h"
 
-#include "vtkEventQtSlotConnect.h"
-#include "vtkPointData.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkSMGenericViewDisplayProxy.h"
+#include "vtkSMProxy.h"
 
-#include <QColor>
-#include <QList>
 #include <QMap>
-#include <QPointer>
 #include <QtDebug>
 
 #include "pqVTKLineChartPlot.h"
-#include "pqSMAdaptor.h"
 #include "pqLineChartDisplay.h"
 
 //-----------------------------------------------------------------------------
 class pqVTKLineChartModelInternal
 {
 public:
-  QList<QPointer<pqLineChartDisplay> > Displays;
-  QList<pqVTKLineChartPlot*> Plots;
-  vtkEventQtSlotConnect* VTKConnect;
-  bool DisplaysChangedSinceLastUpdate;
+  QMap<pqLineChartDisplay*, pqVTKLineChartPlot*> Plots;
 };
 
 //-----------------------------------------------------------------------------
@@ -61,22 +51,13 @@ pqVTKLineChartModel::pqVTKLineChartModel(QObject* p/*=0*/)
   : pqLineChartModel(p)
 {
   this->Internal = new pqVTKLineChartModelInternal();
-  this->Internal->VTKConnect = vtkEventQtSlotConnect::New();
-  this->Internal->DisplaysChangedSinceLastUpdate = true;
 }
 
 
 //-----------------------------------------------------------------------------
 pqVTKLineChartModel::~pqVTKLineChartModel()
 {
-  this->Internal->VTKConnect->Delete();
   delete this->Internal;
-}
-
-//-----------------------------------------------------------------------------
-void pqVTKLineChartModel::markModified()
-{
-  this->Internal->DisplaysChangedSinceLastUpdate = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -98,12 +79,10 @@ void pqVTKLineChartModel::addDisplay(pqDisplay* disp)
   pqLineChartDisplay* display = qobject_cast<pqLineChartDisplay*>(disp);
   if (display && display->getProxy()->GetXMLName() == QString("XYPlotDisplay2"))
     {
-    if (!this->Internal->Displays.contains(display))
+    if (!this->Internal->Plots.contains(display))
       {
-      this->Internal->VTKConnect->Connect(display->getProxy(),
-        vtkCommand::PropertyModifiedEvent, this, SLOT(markModified()));
-      this->Internal->Displays.push_back(display);
-      this->Internal->DisplaysChangedSinceLastUpdate = true;
+      pqVTKLineChartPlot* plot = new pqVTKLineChartPlot(display, this);
+      this->Internal->Plots[display] = plot;
       }
     }
 }
@@ -114,96 +93,43 @@ void pqVTKLineChartModel::removeDisplay(pqDisplay* disp)
   pqLineChartDisplay* display = qobject_cast<pqLineChartDisplay*>(disp);
   if (display)
     {
-    this->Internal->VTKConnect->Disconnect(display->getProxy(),
-      vtkCommand::PropertyModifiedEvent, this, SLOT(markModified()));
-    this->Internal->Displays.removeAll(display);
-    this->Internal->DisplaysChangedSinceLastUpdate = true;
+    if (this->Internal->Plots.contains(display))
+      {
+      pqVTKLineChartPlot* plot = this->Internal->Plots.take(display);
+      this->removePlot(plot);
+      delete plot;
+      }
     }
 }
 
-//-----------------------------------------------------------------------------
-void pqVTKLineChartModel::removeAllDisplays()
-{
-  this->Internal->VTKConnect->Disconnect();
-  this->Internal->Displays.clear();
-  this->Internal->DisplaysChangedSinceLastUpdate = true;
-}
 
 //-----------------------------------------------------------------------------
 void pqVTKLineChartModel::update()
 {
-  // If any of the displays were modified, we need to recreate the
-  // pqVTKLineChartPlot objects since the array selections 
-  // made by the user may have changed. Otherwise, we can use old
-  // pqVTKLineChartPlot objects and let then update themselves
-  // based of data changes.
+  // Add visible plots not already added to view
+  // while remove those that are no longer visible but were 
+  // previously added to the view.
 
-  bool some_plot_changed = false;
-  if (true || this->Internal->DisplaysChangedSinceLastUpdate)
+  QMap<pqLineChartDisplay*, pqVTKLineChartPlot*>::iterator iter;
+  for (iter = this->Internal->Plots.begin();
+    iter != this->Internal->Plots.end(); ++iter)
     {
-    // Remove all old plots.
-    this->clearPlots();
-
-    foreach (pqLineChartDisplay* display, this->Internal->Displays)
+    bool isVisible = (iter.key()->isVisible() && iter.value()->getNumberOfSeries() > 0);
+    if (isVisible && this->getIndexOf(iter.value()) < 0)
       {
-      if (display->isVisible())
-        {
-        this->createPlotsForDisplay(display);
-        }
-      }
-    some_plot_changed = true;
-    }
-
-  foreach (pqVTKLineChartPlot* plot, this->Internal->Plots)
-    {
-    plot->update();
-    if (true)
-      {
-      some_plot_changed = true;
-      }
-    }
-
-  this->Internal->DisplaysChangedSinceLastUpdate = false;
-
-  if (some_plot_changed)
-    {
-    // This may be an overkill if none of the plots actually changed.
-    emit this->plotsReset();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqVTKLineChartModel::createPlotsForDisplay(pqLineChartDisplay* display)
-{
-  // We create  a pqVTKLineChartPlot for every array in the display
-  // to be plotted.
-  if (!display->getClientSideData())
-    {
-    qDebug() << "No client side data available.";
-    return;
-    }
-
-  int num_y_arrays = display->getNumberOfYArrays();
-  for (int cc=0; cc < num_y_arrays; cc++)
-    {
-    if (!display->getYArrayEnabled(cc))
-      {
-      continue;
+      this->appendPlot(iter.value());
       }
 
-    vtkDataArray* yarray = display->getYArray(cc);
-    if (!yarray || !display->getXArray())
+    if (!isVisible && this->getIndexOf(iter.value()) >= 0)
       {
-      // property may be requesting a non-existing array.
-      continue;
+      this->removePlot(iter.value());
       }
-    pqVTKLineChartPlot* plot = new pqVTKLineChartPlot(this);
-    plot->setXArray(display->getXArray());
-    plot->setYArray(yarray);
-    plot->setColor(display->getYColor(cc));
 
-    this->Internal->Plots.push_back(plot);
-    this->appendPlot(plot);
+    if (isVisible)
+      {
+      // update all visible views.
+      iter.value()->update();
+      }
     }
 }
 
