@@ -52,13 +52,23 @@ class QTCHART_EXPORT pqColorMapWidget : public QAbstractScrollArea
   Q_OBJECT
 
 public:
+  enum ColorSpace
+    {
+    RgbSpace,
+    HsvSpace
+    };
+
+public:
   pqColorMapWidget(QWidget *parent=0);
   virtual ~pqColorMapWidget();
 
   virtual QSize sizeHint() const;
 
+  ColorSpace getColorSpace() const {return this->Space;}
+  void setColorSpace(ColorSpace space);
+
   int getPointCount() const;
-  void addPoint(const pqChartValue &value, const QColor &color);
+  int addPoint(const pqChartValue &value, const QColor &color);
   void removePoint(int index);
   void clearPoints();
 
@@ -68,6 +78,14 @@ public:
 
   void setTableSize(int tableSize);
   int getTableSize() const {return this->TableSize;}
+
+  /// \brief
+  ///   Scales the current points to fit in the given range.
+  /// \note
+  ///   If there are no points, this method does nothing.
+  /// \param min The minimum value.
+  /// \param max The maximum value.
+  void setValueRange(const pqChartValue &min, const pqChartValue &max);
 
   void setMovingPointsAllowed(bool allowed) {this->MovingAllowed = allowed;}
   bool isMovingPointsAllowed() const {return this->MovingAllowed;}
@@ -79,19 +97,27 @@ public:
 signals:
   void colorChangeRequested(int index);
   void colorChanged(int index, const QColor &color);
+  void pointAdded(int index);
+  void pointRemoved(int index);
 
 protected:
   virtual void mousePressEvent(QMouseEvent *e);
   virtual void mouseMoveEvent(QMouseEvent *e);
   virtual void mouseReleaseEvent(QMouseEvent *e);
-  virtual void mouseDoubleClickEvent(QMouseEvent *e);
   virtual void paintEvent(QPaintEvent *e);
   virtual void resizeEvent(QResizeEvent *e);
   virtual void scrollContentsBy(int dx, int dy);
 
+private slots:
+  void moveTimeout();
+
+private:
+  bool isInScaleRegion(int px, int py);
+
 private:
   pqColorMapWidgetInternal *Internal; ///< Stores the color map data.
   QPixmap *DisplayImage;              ///< Used for drawing color map.
+  ColorSpace Space;                   ///< Stores the color space.
   int TableSize;                      ///< Stores the color table size.
   int Spacing;                        ///< Stores the layout spacing.
   int Margin;                         ///< Stores the layout margin.
