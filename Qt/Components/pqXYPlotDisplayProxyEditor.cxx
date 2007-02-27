@@ -216,11 +216,11 @@ void pqXYPlotDisplayProxyEditor::reloadGUI()
   QPixmap pixmap(attribute_mode == vtkDataObject::FIELD_ASSOCIATION_POINTS?
     ":/pqWidgets/Icons/pqPointData16.png":":/pqWidgets/Icons/pqCellData16.png");
 
-  vtkSMProperty* property  = proxy->GetProperty(
+  vtkSMProperty* smproperty  = proxy->GetProperty(
     attribute_mode == vtkDataObject::FIELD_ASSOCIATION_POINTS?
     "YPointArrayStatus" : "YCellArrayStatus");
   vtkSMArraySelectionDomain* asd = vtkSMArraySelectionDomain::SafeDownCast(
-    property->GetDomain("array_list"));
+    smproperty->GetDomain("array_list"));
 
   // Get the array names available from the domain, however, 
   // their selection state and color is obtained from the property.
@@ -275,7 +275,7 @@ void pqXYPlotDisplayProxyEditor::updateSMState()
   int attribute_mode = pqSMAdaptor::getElementProperty(
     proxy->GetProperty("AttributeType")).toInt();
 
-  vtkSMStringVectorProperty* property  = vtkSMStringVectorProperty::SafeDownCast(
+  vtkSMStringVectorProperty* smproperty  = vtkSMStringVectorProperty::SafeDownCast(
     proxy->GetProperty(
       attribute_mode == vtkDataObject::FIELD_ASSOCIATION_POINTS?
       "YPointArrayStatus" : "YCellArrayStatus"));
@@ -294,8 +294,8 @@ void pqXYPlotDisplayProxyEditor::updateSMState()
     values.push_back(arrayName);
     }
 
-  property->SetNumberOfElements(values.size());
-  pqSMAdaptor::setMultipleElementProperty(property, values);
+  smproperty->SetNumberOfElements(values.size());
+  pqSMAdaptor::setMultipleElementProperty(smproperty, values);
   proxy->UpdateVTKObjects();
   this->updateAllViews();
 }
