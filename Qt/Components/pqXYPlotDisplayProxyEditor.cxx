@@ -135,10 +135,7 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqDisplay* disp)
   this->setEnabled(false);
   // Clean up stuff setup during previous call to setDisplay.
   this->Internal->Links.removeAllPropertyLinks();
-  foreach (pqTreeWidgetItemObject* item, this->Internal->TreeItems)
-    {
-    delete item;
-    }
+  this->Internal->YAxisArrays->clear();
   this->Internal->TreeItems.clear();
   delete this->Internal->XAxisArrayDomain;
   this->Internal->XAxisArrayDomain = 0;
@@ -203,6 +200,7 @@ void pqXYPlotDisplayProxyEditor::reloadGUI()
     return;
     }
   this->Internal->YAxisArrays->clear();
+  this->Internal->TreeItems.clear();
 
   proxy->GetProperty("Input")->UpdateDependentDomains();
   proxy->UpdatePropertyInformation();
