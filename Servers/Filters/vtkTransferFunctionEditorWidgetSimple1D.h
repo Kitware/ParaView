@@ -51,12 +51,6 @@ public:
     { this->SetVisibleScalarRange(range[0], range[1]); }
 
   // Description:
-  // Set the whole scalar range of the underlying data.
-  virtual void SetWholeScalarRange(double min, double max);
-  virtual void SetWholeScalarRange(double range[2]) 
-    { this->SetWholeScalarRange(range[0], range[1]); }
-
-  // Description:
   // Update the size of the rendering window containing this widget, and
   // recompute the position of the transfer function nodes based on the new
   // window size.

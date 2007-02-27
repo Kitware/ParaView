@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.12");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.13");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -458,36 +458,6 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetVisibleScalarRange(
   this->Superclass::SetVisibleScalarRange(min, max);
 
   this->RecomputeNodePositions(oldRange, this->VisibleScalarRange);
-}
-
-//----------------------------------------------------------------------------
-void vtkTransferFunctionEditorWidgetSimple1D::SetWholeScalarRange(
-  double min, double max)
-{
-  if (this->WholeScalarRange[0] == min && this->WholeScalarRange[1] == max)
-    {
-    return;
-    }
-
-  this->Superclass::SetWholeScalarRange(min, max);
-
-  if (!this->TransferFunctionsInitialized())
-    {
-    if (this->ColorFunction)
-      {
-      this->ColorFunction->AddRGBPoint(min, this->InitialMinimumColor[0],
-                                       this->InitialMinimumColor[1],
-                                       this->InitialMinimumColor[2]);
-      this->ColorFunction->AddRGBPoint(max, this->InitialMaximumColor[0],
-                                       this->InitialMaximumColor[1],
-                                       this->InitialMaximumColor[2]);
-      }
-    if (this->OpacityFunction)
-      {
-      this->OpacityFunction->AddPoint(min, 0);
-      this->OpacityFunction->AddPoint(max, 1);
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
