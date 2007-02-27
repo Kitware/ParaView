@@ -209,6 +209,24 @@ IF(BUILD_TESTING)
       --exit)
   ENDFOREACH(test) 
 
+  # test the plugins
+  IF(BUILD_SHARED_LIBS AND BUILD_TESTING)
+
+    SET(PLUGIN_TESTS
+        ToolBarPlugin
+        ObjectPanelPlugin
+        )
+
+    FOREACH(test ${PLUGIN_TESTS})
+      ADD_TEST(pqClient${test}
+               ${CMAKE_COMMAND} -E chdir ${LIBRARY_OUTPUT_PATH}
+               ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
+               --exit)
+    ENDFOREACH(test)
+
+  ENDIF(BUILD_SHARED_LIBS AND BUILD_TESTING)
+
+
 # Now we add tests that use the pvTestDriver for running.
   SET(XML_TESTS_WITH_BASELINES
     3DWidgetInCustomFilter
