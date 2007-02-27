@@ -21,6 +21,17 @@ ELSE(NOT ParaView_BINARY_DIR)
     SET(ParaViewExamples_CONFIG_TYPE)
   ENDIF(CMAKE_CONFIGURATION_TYPES)
   
+  SET(PARAVIEW_TEST_COMMAND)
+  IF(BUILD_TESTING)
+    IF(APPLE)
+      SET(PARAVIEW_TEST_COMMAND ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha.app/Contents/MacOS/paraview_alpha 
+                      --test-directory=${PARAVIEW_TEST_DIR})
+    ELSE(APPLE)
+      SET(PARAVIEW_TEST_COMMAND ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+    ENDIF(APPLE)
+  ENDIF(BUILD_TESTING)
+
+  
   ADD_CUSTOM_COMMAND(
     OUTPUT ${ParaView_BINARY_DIR}/ParaViewExamples
     COMMAND ${CMAKE_CTEST_COMMAND}

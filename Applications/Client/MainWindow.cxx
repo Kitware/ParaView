@@ -662,6 +662,8 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
+  this->Implementation->Core.removePluginToolBars();
+
   // Save the state of the window ...
   pqApplicationCore::instance()->settings()->saveState(*this, "MainWindow");
 

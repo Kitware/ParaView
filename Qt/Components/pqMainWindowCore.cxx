@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QList>
 #include <QDir>
+#include <QMainWindow>
 
 #include "pqActiveView.h"
 #include "pqAnimationManager.h"
@@ -106,6 +107,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWriterFactory.h"
 #include "pqPluginDialog.h"
 #include "pqPluginManager.h"
+#include "pqActionGroupInterface.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -207,6 +209,7 @@ public:
   pqPipelineBrowser *PipelineBrowser;
   QToolBar* VariableToolbar;
   QToolBar* CustomFilterToolbar;
+  QList<QToolBar*> PluginToolBars;
   
   pqToolTipTrapper* ToolTipTrapper;
 
@@ -311,6 +314,11 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
                 SIGNAL(serverManagerExtensionLoaded()),
                 this,
                 SLOT(refreshFiltersMenu()));
+  
+  this->connect(pqApplicationCore::instance()->getPluginManager(),
+                SIGNAL(guiInterfaceLoaded(QObject*)),
+                this,
+                SLOT(addPluginActions(QObject*)));
 
 /*
   this->installEventFilter(this);
@@ -2795,3 +2803,55 @@ void pqMainWindowCore::onThresholdsEntered(double min, double max)
   //take the thresholds selected in the dialog and tell paraview to extract them
   this->Implementation->SelectionManager.setThresholds(min, max);
 }
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::addPluginActions(QObject* iface)
+{
+  pqActionGroupInterface* actionGroup =
+    qobject_cast<pqActionGroupInterface*>(iface);
+  if(actionGroup)
+    {
+    this->addPluginActions(actionGroup);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::addPluginActions(pqActionGroupInterface* iface)
+{
+  QString name = iface->groupName();
+  QStringList splitName = name.split('/', QString::SkipEmptyParts);
+
+  QMainWindow* mw = qobject_cast<QMainWindow*>(this->Implementation->Parent);
+  if(!mw)
+    {
+    QWidgetList allWidgets = QApplication::topLevelWidgets();
+    QWidgetList::iterator iter;
+    for(iter = allWidgets.begin(); !mw && iter != allWidgets.end(); ++iter)
+      {
+      mw = qobject_cast<QMainWindow*>(*iter);
+      }
+    }
+
+  if(!mw)
+    {
+    qWarning("Could not find MainWindow for actions group");
+    return;
+    }
+
+  if(splitName.size() == 2 && splitName[0] == "ToolBar")
+    {
+    QToolBar* tb = new QToolBar(splitName[1], mw);
+    tb->setObjectName(splitName[1]);
+    tb->addActions(iface->actionGroup()->actions());
+    mw->addToolBar(tb);
+    this->Implementation->PluginToolBars.append(tb);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::removePluginToolBars()
+{
+  qDeleteAll(this->Implementation->PluginToolBars);
+  this->Implementation->PluginToolBars.clear();
+}
+

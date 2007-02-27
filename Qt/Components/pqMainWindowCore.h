@@ -60,6 +60,7 @@ class pqToolsMenu;
 class pqVCRController;
 class pqViewManager;
 class pqViewMenu;
+class pqActionGroupInterface;
 
 class vtkUnstructuredGrid;
 
@@ -190,6 +191,8 @@ public:
   // Returns the object inspector driver. If the driver is not
   // created, a new one will be created and returned.
   pqObjectInspectorDriver* getObjectInspectorDriver();
+
+  void removePluginToolBars();
 
 signals:
   void enableFileOpen(bool);
@@ -351,6 +354,10 @@ private slots:
   void refreshFiltersMenu();
   
   void updateRecentFilterMenu(QAction* action);
+
+  void addPluginActions(QObject* iface);
+  void addPluginActions(pqActionGroupInterface* iface);
+
 private:
   pqServerManagerModelItem *getActiveObject() const;
   void updatePendingActions(pqServer *server, pqPipelineSource *source,
