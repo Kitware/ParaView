@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqVTKLineChartPlot.h"
 
-#include "vtkTimeStamp.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkSmartPointer.h"
-#include "vtkPointData.h"
+#include "vtkCellData.h"
 #include "vtkDataArray.h"
+#include "vtkPointData.h"
+#include "vtkSmartPointer.h"
+#include "vtkTimeStamp.h"
 
 #include <QColor>
 #include <QtDebug>
@@ -47,21 +47,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqVTKLineChartPlotInternal
 {
 public:
-  vtkSmartPointer<vtkRectilinearGrid> Data;
   vtkTimeStamp LastUpdateTime;
-  pqVTKLineChartPlot::XAxisModes XAxisMode;
-  QString XAxisArray;
-  QString YAxisArray;
+  vtkSmartPointer<vtkDataArray> XAxisArray;
+  vtkSmartPointer<vtkDataArray> YAxisArray;
   QColor Color;
 };
 
 //-----------------------------------------------------------------------------
-pqVTKLineChartPlot::pqVTKLineChartPlot(vtkRectilinearGrid* dataset, QObject* p)
+pqVTKLineChartPlot::pqVTKLineChartPlot(QObject* p)
   : pqLineChartPlot(p)
 {
   this->Internal = new pqVTKLineChartPlotInternal;
-  this->Internal->Data = vtkRectilinearGrid::SafeDownCast(dataset);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -71,43 +67,22 @@ pqVTKLineChartPlot::~pqVTKLineChartPlot()
 }
 
 //-----------------------------------------------------------------------------
-void pqVTKLineChartPlot::setXAxisMode(int mode)
+void pqVTKLineChartPlot::setXArray(vtkDataArray* array)
 {
-  switch (mode)
-    {
-  case INDEX:
-    this->Internal->XAxisMode = INDEX;
-    break;
-  case DATA_ARRAY:
-    this->Internal->XAxisMode = DATA_ARRAY;
-    break;
-  case ARC_LENGTH:
-    this->Internal->XAxisMode = ARC_LENGTH;
-    break;
-  default:
-    qDebug() << "Mode not supported: " << mode;
-    }
+  this->Internal->XAxisArray = array;
 }
 
 //-----------------------------------------------------------------------------
-void pqVTKLineChartPlot::setXArray(const QString& name)
+void pqVTKLineChartPlot::setYArray(vtkDataArray* array)
 {
-  this->Internal->XAxisArray = name;
-}
-
-//-----------------------------------------------------------------------------
-void pqVTKLineChartPlot::setYArray(const QString& name)
-{
-  this->Internal->YAxisArray = name;
+  this->Internal->YAxisArray = array;
 }
 
 //-----------------------------------------------------------------------------
 void pqVTKLineChartPlot::update()
 {
-  if (this->Internal->LastUpdateTime < this->Internal->Data->GetMTime())
-    {
-    this->forceUpdate();
-    }
+  // TODO: Do the MTime stuff.
+  this->forceUpdate();
 }
 
 //-----------------------------------------------------------------------------
@@ -126,7 +101,11 @@ int pqVTKLineChartPlot::getNumberOfSeries() const
 //-----------------------------------------------------------------------------
 int pqVTKLineChartPlot::getTotalNumberOfPoints() const
 {
-  return static_cast<int>(this->Internal->Data->GetNumberOfPoints());
+  if (this->Internal->XAxisArray.GetPointer())
+    {
+    return static_cast<int>(this->Internal->XAxisArray->GetNumberOfTuples());
+    }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -139,7 +118,7 @@ pqVTKLineChartPlot::getSeriesType(int vtkNotUsed(series)) const
 //-----------------------------------------------------------------------------
 int pqVTKLineChartPlot::getNumberOfPoints(int vtkNotUsed(series)) const
 {
-  return static_cast<int>(this->Internal->Data->GetNumberOfPoints());
+  return this->getTotalNumberOfPoints();
 }
 
 //-----------------------------------------------------------------------------
@@ -173,47 +152,7 @@ void pqVTKLineChartPlot::getErrorWidth(
 //-----------------------------------------------------------------------------
 void pqVTKLineChartPlot::getRangeX(pqChartValue &min, pqChartValue &max) const
 {
-  switch (this->Internal->XAxisMode)
-    {
-  case INDEX:
-      {
-      int dims[3];
-      this->Internal->Data->GetDimensions(dims);
-      min = (double)0;
-      max = (double)(dims[0]-1);
-      }
-    break;
-
-  case DATA_ARRAY:
-  case ARC_LENGTH:
-      {
-      vtkPointData* pd = this->Internal->Data->GetPointData();
-      QString array_name = this->getXArrayNameToUse();
-      vtkDataArray* array = pd->GetArray(array_name.toAscii().data());
-      if (array)
-        {
-        double range[2];
-        array->GetRange(range);
-        min = range[0];
-        max = range[1];
-        }
-      else
-        {
-        qDebug() << "Failed to locate X array " << array_name;
-        min = 0;
-        max = 1;
-        }
-      }
-    break;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqVTKLineChartPlot::getRangeY(pqChartValue &min, pqChartValue &max) const
-{
-  vtkPointData* pd = this->Internal->Data->GetPointData();
-  vtkDataArray* array = pd->GetArray(
-    this->Internal->YAxisArray.toAscii().data());
+  vtkDataArray* array = this->Internal->XAxisArray.GetPointer();
   if (array)
     {
     double range[2];
@@ -223,7 +162,26 @@ void pqVTKLineChartPlot::getRangeY(pqChartValue &min, pqChartValue &max) const
     }
   else
     {
-    qDebug() << "Failed to locate Y array " << this->Internal->YAxisArray;
+    qDebug() << "Failed to locate X array";
+    min = 0;
+    max = 1;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqVTKLineChartPlot::getRangeY(pqChartValue &min, pqChartValue &max) const
+{
+  vtkDataArray* array = this->Internal->YAxisArray.GetPointer();
+  if (array)
+    {
+    double range[2];
+    array->GetRange(range);
+    min = range[0];
+    max = range[1];
+    }
+  else
+    {
+    qDebug() << "Failed to locate Y array ";
     min = 0;
     max = 1;
     }
@@ -232,13 +190,7 @@ void pqVTKLineChartPlot::getRangeY(pqChartValue &min, pqChartValue &max) const
 //-----------------------------------------------------------------------------
 double pqVTKLineChartPlot::getXPoint(int index) const
 {
-  if (this->Internal->XAxisMode == INDEX)
-    {
-    return index;
-    }
-  vtkPointData* pd = this->Internal->Data->GetPointData();
-  vtkDataArray* array = 
-    pd->GetArray(this->getXArrayNameToUse().toAscii().data());
+  vtkDataArray* array = this->Internal->XAxisArray.GetPointer();
   if (array)
     {
     return array->GetTuple1(index);
@@ -249,24 +201,12 @@ double pqVTKLineChartPlot::getXPoint(int index) const
 //-----------------------------------------------------------------------------
 double pqVTKLineChartPlot::getYPoint(int index) const
 {
-  vtkPointData* pd = this->Internal->Data->GetPointData();
-  vtkDataArray* array = pd->GetArray(
-    this->Internal->YAxisArray.toAscii().data());
+  vtkDataArray* array = this->Internal->YAxisArray.GetPointer();
   if (array)
     {
     return array->GetTuple1(index);
     }
   return 0;
-}
-
-//-----------------------------------------------------------------------------
-QString pqVTKLineChartPlot::getXArrayNameToUse() const
-{
-  if (this->Internal->XAxisMode == ARC_LENGTH)
-    {
-    return "arc_length";
-    }
-  return this->Internal->XAxisArray;
 }
 
 //-----------------------------------------------------------------------------

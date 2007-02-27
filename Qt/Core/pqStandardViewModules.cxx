@@ -34,9 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMProxyManager.h"
 
+#include "pqBarChartDisplay.h"
+#include "pqLineChartDisplay.h"
 #include "pqPlotViewModule.h"
 #include "pqTableViewModule.h"
-#include "pqBarChartDisplay.h"
 
 pqStandardViewModules::pqStandardViewModules(QObject* o)
   : QObject(o)
@@ -57,7 +58,8 @@ QStringList pqStandardViewModules::viewTypes() const
 
 QStringList pqStandardViewModules::displayTypes() const
 {
-  return QStringList() << "BarChartDisplay";
+  return QStringList() << "BarChartDisplay"
+    << "XYPlotDisplay2";
 }
 
 QString pqStandardViewModules::viewTypeName(const QString& type) const
@@ -132,6 +134,10 @@ pqConsumerDisplay* pqStandardViewModules::createDisplay(const QString& display_t
   if(display_type == "BarChartDisplay")
     {
     return new pqBarChartDisplay(group, n, proxy, server, p);
+    }
+  else if (display_type == "XYPlotDisplay2")
+    {
+    return new pqLineChartDisplay(group, n, proxy, server, p);
     }
 
   return NULL;

@@ -52,9 +52,10 @@ public slots:
   void reloadGUI();
 
 protected slots:
-  void updateXArrayNameEnableState();
-
   void yArraySelectionChanged();
+
+  /// Called when the attribute mode selection changes.
+  void onAttributeModeChanged();
 
   /// Slot to listen to clicks for changing color.
   void onItemClicked(QTreeWidgetItem* item, int column);
@@ -70,7 +71,7 @@ private:
   void operator=(const pqXYPlotDisplayProxyEditor&); // Not implemented.
 
   // pushes the item's state to the SM property.
-  void updateSMState(QTreeWidgetItem* item);
+  void updateSMState();
 
   class pqInternal;
   pqInternal* Internal;

@@ -44,13 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqVTKLineChartPlot.h"
 #include "pqSMAdaptor.h"
-#include "pqDisplay.h"
+#include "pqLineChartDisplay.h"
 
 //-----------------------------------------------------------------------------
 class pqVTKLineChartModelInternal
 {
 public:
-  QList<QPointer<pqDisplay> > Displays;
+  QList<QPointer<pqLineChartDisplay> > Displays;
   QList<pqVTKLineChartPlot*> Plots;
   vtkEventQtSlotConnect* VTKConnect;
   bool DisplaysChangedSinceLastUpdate;
@@ -93,8 +93,9 @@ void pqVTKLineChartModel::clearPlots()
 }
 
 //-----------------------------------------------------------------------------
-void pqVTKLineChartModel::addDisplay(pqDisplay* display)
+void pqVTKLineChartModel::addDisplay(pqDisplay* disp)
 {
+  pqLineChartDisplay* display = qobject_cast<pqLineChartDisplay*>(disp);
   if (display && display->getProxy()->GetXMLName() == QString("XYPlotDisplay2"))
     {
     if (!this->Internal->Displays.contains(display))
@@ -108,12 +109,16 @@ void pqVTKLineChartModel::addDisplay(pqDisplay* display)
 }
 
 //-----------------------------------------------------------------------------
-void pqVTKLineChartModel::removeDisplay(pqDisplay* display)
+void pqVTKLineChartModel::removeDisplay(pqDisplay* disp)
 {
-  this->Internal->VTKConnect->Disconnect(display->getProxy(),
-    vtkCommand::PropertyModifiedEvent, this, SLOT(markModified()));
-  this->Internal->Displays.removeAll(display);
-  this->Internal->DisplaysChangedSinceLastUpdate = true;
+  pqLineChartDisplay* display = qobject_cast<pqLineChartDisplay*>(disp);
+  if (display)
+    {
+    this->Internal->VTKConnect->Disconnect(display->getProxy(),
+      vtkCommand::PropertyModifiedEvent, this, SLOT(markModified()));
+    this->Internal->Displays.removeAll(display);
+    this->Internal->DisplaysChangedSinceLastUpdate = true;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -134,12 +139,12 @@ void pqVTKLineChartModel::update()
   // based of data changes.
 
   bool some_plot_changed = false;
-  if (this->Internal->DisplaysChangedSinceLastUpdate)
+  if (true || this->Internal->DisplaysChangedSinceLastUpdate)
     {
     // Remove all old plots.
     this->clearPlots();
 
-    foreach (pqDisplay* display, this->Internal->Displays)
+    foreach (pqLineChartDisplay* display, this->Internal->Displays)
       {
       if (display->isVisible())
         {
@@ -168,57 +173,31 @@ void pqVTKLineChartModel::update()
 }
 
 //-----------------------------------------------------------------------------
-void pqVTKLineChartModel::createPlotsForDisplay(pqDisplay* display)
+void pqVTKLineChartModel::createPlotsForDisplay(pqLineChartDisplay* display)
 {
   // We create  a pqVTKLineChartPlot for every array in the display
   // to be plotted.
-  vtkSMGenericViewDisplayProxy* proxy = 
-    vtkSMGenericViewDisplayProxy::SafeDownCast(display->getProxy());
-  if (!proxy)
-    {
-    qDebug() << "Display is not a vtkSMGenericViewDisplayProxy.";
-    return;
-    }
-
-  vtkRectilinearGrid* dataset = 
-    vtkRectilinearGrid::SafeDownCast(proxy->GetOutput());
-  if (!dataset)
+  if (!display->getClientSideData())
     {
     qDebug() << "No client side data available.";
     return;
     }
 
-  QString xaxisarray = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("XArrayName")).toString();
-  int xaxismode = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("XAxisMode")).toInt();
-
-  QList<QVariant> arraynames  = pqSMAdaptor::getMultipleElementProperty(
-    proxy->GetProperty("SelectYArrays"));
-
-  for (int cc=0; cc+4 < arraynames.size(); cc+= 5)
+  int num_y_arrays = display->getNumberOfYArrays();
+  for (int cc=0; cc < num_y_arrays; cc++)
     {
-    if (!arraynames[cc+3].toBool())
+    if (!display->getYArrayEnabled(cc))
       {
       continue;
       }
-    QString vname = arraynames[cc+4].toString();
-    if (vname != "")
-      {
-      pqVTKLineChartPlot* plot = new pqVTKLineChartPlot(dataset, this);
-      plot->setYArray(vname);
-      plot->setXArray(xaxisarray);
-      plot->setXAxisMode(xaxismode);
 
-      QColor color;
-      color.setRedF(arraynames[cc+0].toDouble());
-      color.setGreenF(arraynames[cc+1].toDouble());
-      color.setBlueF(arraynames[cc+2].toDouble());
-      plot->setColor(color);
+    pqVTKLineChartPlot* plot = new pqVTKLineChartPlot(this);
+    plot->setXArray(display->getXArray());
+    plot->setYArray(display->getYArray(cc));
+    plot->setColor(display->getYColor(cc));
 
-      this->Internal->Plots.push_back(plot);
-      this->appendPlot(plot);
-      }
+    this->Internal->Plots.push_back(plot);
+    this->appendPlot(plot);
     }
 }
 

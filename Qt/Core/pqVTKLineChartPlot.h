@@ -34,13 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLineChartPlot.h"
 #include "pqCoreExport.h"
-class vtkRectilinearGrid;
+
 class pqVTKLineChartPlotInternal;
+class vtkDataArray;
 
 class PQCORE_EXPORT pqVTKLineChartPlot : public pqLineChartPlot
 {
 public:
-  pqVTKLineChartPlot(vtkRectilinearGrid* dataset, QObject* parent);
+  pqVTKLineChartPlot(QObject* parent);
   virtual ~pqVTKLineChartPlot();
 
   // pqLineChartPlot API.
@@ -61,18 +62,16 @@ public:
   void update();
   void forceUpdate();
 
-  void setYArray(const QString& arrayname);
-  void setXArray(const QString& arrayname);
-  enum XAxisModes
-    {
-    INDEX = 0,
-    DATA_ARRAY = 1,
-    ARC_LENGTH=2
-    };
-  void setXAxisMode(int mode);
+  /// Set the array for Y values.
+  void setYArray(vtkDataArray*);
 
+  /// Set the array for X values. 
+  void setXArray(vtkDataArray*);
+
+  /// Get/Set the color for this curve.
   QColor getColor(int) const; 
   void setColor(const QColor& c);
+
 private:
   pqVTKLineChartPlot(const pqVTKLineChartPlot&); // Not implemented.
   void operator=(const pqVTKLineChartPlot&); // Not implemented.
@@ -82,9 +81,6 @@ private:
   double getXPoint(int index) const;
   double getYPoint(int index) const;
 
-  // This method returns the arrayname set by calling setXArray() if mode is
-  // DATA_ARRAY/INDEX, if mode is ARC_LENGTH returns "arc_length".
-  QString getXArrayNameToUse() const;
 };
 
 #endif

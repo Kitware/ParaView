@@ -1535,14 +1535,15 @@ void pqSMAdaptor::setUncheckedFieldSelectionScalar(vtkSMProperty* prop,
 }
 
 QList<QString> pqSMAdaptor::getFieldSelectionScalarDomain(vtkSMProperty*
-  prop)
+  prop, const char* domainname/*=0*/)
 {
   QList<QString> types;
 
   vtkSMStringVectorProperty* Property =
     vtkSMStringVectorProperty::SafeDownCast(prop);
-  vtkSMArrayListDomain* domain =
-    vtkSMArrayListDomain::SafeDownCast(prop->GetDomain("array_list"));
+  vtkSMArrayListDomain* domain = prop?
+    vtkSMArrayListDomain::SafeDownCast(prop->GetDomain(
+        domainname? domainname : "array_list")) : 0;
   
   if(Property && domain)
     {

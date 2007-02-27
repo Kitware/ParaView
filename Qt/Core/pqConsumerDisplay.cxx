@@ -164,38 +164,20 @@ void pqConsumerDisplay::setDefaults()
   proxy->Update();
 
   proxy->GetProperty("Input")->UpdateDependentDomains();
+  proxy->UpdatePropertyInformation();
+
 
   // This will setup default array names. Just reset-to-default all properties,
   // the vtkSMArrayListDomain will do the rest.
   vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-    iter->GetProperty()->ResetToDefault();
+    if (!iter->GetProperty()->GetInformationOnly())
+      {
+      iter->GetProperty()->ResetToDefault();
+      }
     }
   iter->Delete();
-
-  if (proxy->GetXMLName() == QString("XYPlotDisplay2"))
-    {
-    // Intialize array colors.
-    QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("SelectYArrays"));
-    QList<QString> input_scalars = pqSMAdaptor::getFieldSelectionScalarDomain(
-      proxy->GetProperty("SelectYArrays"));
-
-    double hue_step = (input_scalars.size() > 1)?  1.0 / (input_scalars.size()) : 1.0;
-    for (int cc=0; cc < input_scalars.size(); cc++)
-      {
-      QColor qcolor;
-      qcolor.setHsvF(cc*hue_step, 1.0, 1.0);
-      values.push_back(QVariant(qcolor.redF()));
-      values.push_back(QVariant(qcolor.greenF()));
-      values.push_back(QVariant(qcolor.blueF()));
-      values.push_back(QVariant(1));
-      values.push_back(input_scalars[cc]);
-      }
-    pqSMAdaptor::setMultipleElementProperty(proxy->GetProperty("SelectYArrays"), values);
-    proxy->UpdateVTKObjects();
-    }
 }
 
 //-----------------------------------------------------------------------------

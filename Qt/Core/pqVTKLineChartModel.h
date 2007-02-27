@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 
 class pqDisplay;
+class pqLineChartDisplay;
 class pqVTKLineChartModelInternal;
 
 /// pqVTKLineChartModelInternal is a concrete implementation for
@@ -69,7 +70,7 @@ public slots:
 protected:
   /// Creates pqVTKLineChartPlot objects for each display. A pqVTKLineChartPlot
   /// is create for each YAxis array for every display visible.
-  void createPlotsForDisplay(pqDisplay*);
+  void createPlotsForDisplay(pqLineChartDisplay*);
 
 protected slots:
   void markModified();

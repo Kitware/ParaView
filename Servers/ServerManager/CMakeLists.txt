@@ -21,6 +21,7 @@ SET(Kit_SRCS
   vtkSMAnimationSceneWriter.cxx
   vtkSMApplication.cxx
   vtkSMArrayListDomain.cxx
+  vtkSMArrayListInformationHelper.cxx
   vtkSMArrayRangeDomain.cxx
   vtkSMArraySelectionDomain.cxx
   vtkSMArraySelectionInformationHelper.cxx

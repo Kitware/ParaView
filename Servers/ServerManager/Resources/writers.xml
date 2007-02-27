@@ -398,5 +398,19 @@
       </Property>
     </SummaryHelperProxy>
 
+    <WriterProxy name="CSVWriter" class="vtkCSVWriter">
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkRectilinearGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <StringVectorProperty 
+        name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+      </StringVectorProperty>
+      <!-- End of CSVWriter -->
+    </WriterProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

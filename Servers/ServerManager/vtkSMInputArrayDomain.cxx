@@ -20,12 +20,13 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.12");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.13");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
@@ -158,11 +159,17 @@ int vtkSMInputArrayDomain::IsFieldValid(
   int attributeType = this->AttributeType;
   if (!bypass)
     {
+    // FieldDataSelection typically is a SelectInputScalars kind of property
+    // in which case the attribute type is at index 3 or is a simple
+    // type choosing property in which case it's a vtkSMIntVectorProperty.
+    vtkSMProperty* pfds = this->GetRequiredProperty("FieldDataSelection");
     vtkSMStringVectorProperty* fds = vtkSMStringVectorProperty::SafeDownCast(
-      this->GetRequiredProperty("FieldDataSelection"));
-    if (fds)
+      pfds);
+    vtkSMIntVectorProperty* ifds = vtkSMIntVectorProperty::SafeDownCast(pfds);
+    if (fds || ifds)
       {
-      int val = atoi(fds->GetUncheckedElement(3));
+      int val = (fds)? atoi(fds->GetUncheckedElement(3)) :
+        ifds->GetUncheckedElement(0);
       if (val == vtkDataObject::FIELD_ASSOCIATION_POINTS)
         {
         attributeType = vtkSMInputArrayDomain::POINT;

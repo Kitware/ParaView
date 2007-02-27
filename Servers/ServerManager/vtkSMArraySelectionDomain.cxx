@@ -18,7 +18,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArraySelectionDomain);
-vtkCxxRevisionMacro(vtkSMArraySelectionDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMArraySelectionDomain, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMArraySelectionDomain::vtkSMArraySelectionDomain()
@@ -39,16 +39,30 @@ void vtkSMArraySelectionDomain::Update(vtkSMProperty* prop)
     this->RemoveAllStrings();
     this->SetIntDomainMode(vtkSMStringListRangeDomain::BOOLEAN);
 
-    unsigned int numEls = svp->GetNumberOfElements();
-    if (numEls % 2 != 0)
+    if (svp->GetNumberOfElementsPerCommand() == 1 &&
+      svp->GetElementType(0) == vtkSMStringVectorProperty::STRING)
       {
-      vtkErrorMacro("The required property seems to have wrong number of "
-                    "elements. It should be a multiple of 2");
-      return;
+      // Information property does not provide selection information,
+      // it simply provides the list of arrays.
+      unsigned int numEls = svp->GetNumberOfElements();
+      for (unsigned int i=0; i<numEls; i++)
+        {
+        this->AddString(svp->GetElement(i));
+        }
       }
-    for (unsigned int i=0; i<numEls/2; i++)
+    else
       {
-      this->AddString(svp->GetElement(i*2));
+      unsigned int numEls = svp->GetNumberOfElements();
+      if (numEls % 2 != 0)
+        {
+        vtkErrorMacro("The required property seems to have wrong number of "
+          "elements. It should be a multiple of 2");
+        return;
+        }
+      for (unsigned int i=0; i<numEls/2; i++)
+        {
+        this->AddString(svp->GetElement(i*2));
+        }
       }
     this->InvokeModified();
     }
