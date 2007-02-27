@@ -56,15 +56,6 @@ IF(UNIX)
     SET(TCL_TCLSH "TCL_TCLSH-NOTFOUND" CACHE FILEPATH "Tcl SH" FORCE)
   ENDIF(SAME_TCL_DIR)
 
-  # OS X already includes a tcl8.4 library and although we override
-  # the library path with -L, it prefers that one. So, we simply
-  # rename the library.
-  IF (APPLE)
-    IF (NOT TCLTK_BUILD_DEBUG)
-      SET(TCLTK_DEBUG_EXT "int")
-    ENDIF (NOT TCLTK_BUILD_DEBUG)
-  ENDIF (APPLE)
-    
   SET(TCL_LIBRARY "${TclTk_BINARY_DIR_TCLBIN}/libtcl8.4${TCLTK_DEBUG_EXT}.a"
     CACHE INTERNAL "Path to tcl library" FORCE)
   SET(TCL_STUB_LIBRARY 
