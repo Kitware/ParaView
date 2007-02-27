@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqColorScaleDialog.h"
 
 #include "pqApplicationCore.h"
+#include "pqChartValue.h"
+#include "pqColorMapColorChanger.h"
+#include "pqColorMapWidget.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
 #include "pqGenericViewModule.h"
@@ -49,6 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QCloseEvent>
 #include <QGridLayout>
+#include <QList>
+#include <QMenu>
 #include <QSpacerItem>
 #include <QString>
 #include <QtDebug>
@@ -60,6 +65,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkTransferFunctionViewer.h"
 #include "vtkType.h"
+
+// Temporary switch
+#define USE_VTK_TFE 0
 
 
 class pqColorScaleEditorForm : public Ui::pqColorScaleDialog
@@ -73,6 +81,7 @@ public:
   pqSignalAdaptorColor *LabelColorAdaptor;
   pqSignalAdaptorComboBox *TitleFontAdaptor;
   pqSignalAdaptorComboBox *LabelFontAdaptor;
+  pqColorMapWidget *Gradient;
 };
 
 
@@ -84,6 +93,7 @@ pqColorScaleEditorForm::pqColorScaleEditorForm()
   this->LabelColorAdaptor = 0;
   this->TitleFontAdaptor = 0;
   this->LabelFontAdaptor = 0;
+  this->Gradient = 0;
 }
 
 
@@ -100,12 +110,31 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
 
   // Set up the ui.
   this->Form->setupUi(this);
+
+#if USE_VTK_TFE
   this->Form->ColorScale->SetRenderWindow(this->Viewer->GetRenderWindow());
-  //this->Viewer->SetInteractor(this->Form->ColorScale->GetInteractor());
-  //this->Viewer->SetRenderWindow(this->Form->ColorScale->GetRenderWindow());
   this->Viewer->SetTransferFunctionEditorType(vtkTransferFunctionViewer::SIMPLE_1D);
   this->Viewer->SetModificationTypeToColor();
   //this->Viewer->SetBackgroundColor(1.0, 1.0, 1.0);
+  this->Viewer->SetWholeScalarRange(0.0, 1.0);
+  this->Viewer->SetVisibleScalarRange(0.0, 1.0);
+#else
+  // Hide the qvtk widget and add in a color map widget.
+  QGridLayout *grid = qobject_cast<QGridLayout *>(
+      this->Form->ScalePage->layout());
+  this->Form->Gradient = new pqColorMapWidget();
+  this->Form->ColorScale->hide();
+  grid->addWidget(this->Form->Gradient, 0, 0, 1, 4);
+
+  new pqColorMapColorChanger(this->Form->Gradient);
+  this->connect(
+      this->Form->Gradient, SIGNAL(colorChanged(int, const QColor &)),
+      this, SLOT(setColors()));
+  this->connect(this->Form->Gradient, SIGNAL(pointAdded(int)),
+      this, SLOT(setColors()));
+  this->connect(this->Form->Gradient, SIGNAL(pointRemoved(int)),
+      this, SLOT(setColors()));
+#endif
 
   // Set up the timer. The timer is used when the user edits the
   // table size.
@@ -121,7 +150,19 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
 
   this->enableLegendControls(this->Form->ShowColorLegend->isChecked());
 
+  // Add the color scale presets menu.
+  QMenu *menu = new QMenu(this->Form->PresetButton);
+  menu->addAction("Blue to Red", this, SLOT(applyBlueToRedPreset()));
+  menu->addAction("Red to Blue", this, SLOT(applyRedToBluePreset()));
+  menu->addAction("Grayscale", this, SLOT(applyGrayscalePreset()));
+  //menu->addAction("CIELab Blue to Red",
+  //    this, SLOT(applyCIELabBlueToRedPreset()));
+  this->Form->PresetButton->setMenu(menu);
+
   // Connect the color scale widgets.
+  this->connect(this->Form->ColorSpace, SIGNAL(activated(int)),
+      this, SLOT(setColorSpace(int)));
+
   this->connect(this->Form->UseDiscreteColors, SIGNAL(toggled(bool)),
       this, SLOT(setUseDiscreteColors(bool)));
   this->connect(this->Form->TableSize, SIGNAL(valueChanged(int)),
@@ -171,13 +212,6 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   // Hook the close button up to the accept action.
   this->connect(this->Form->CloseButton, SIGNAL(clicked()),
       this, SLOT(accept()));
-
-  // Add a spacer to the legend page. Adding the spacer in the designer
-  // messed up the layout.
-  QGridLayout *grid = qobject_cast<QGridLayout *>(
-      this->Form->LegendPage->layout());
-  grid->addItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding,
-      QSizePolicy::MinimumExpanding), 4, 0, 1, 3);
 }
 
 pqColorScaleEditor::~pqColorScaleEditor()
@@ -229,7 +263,12 @@ void pqColorScaleEditor::setDisplay(pqPipelineDisplay *display)
 
   // Cleanup the previous gui data if any.
   this->Form->Component->clear();
+  this->Form->ColorSpace->clear();
+#if USE_VTK_TFE
   this->Viewer->GetColorFunction()->RemoveAllPoints();
+#else
+  this->Form->Gradient->clearPoints();
+#endif
 
   // Disable the gui elements if the color map is null.
   this->Form->ColorTabs->setEnabled(this->ColorMap != 0);
@@ -263,15 +302,181 @@ void pqColorScaleEditor::showEvent(QShowEvent *e)
   //this->Viewer->Render();
 }
 
-void pqColorScaleEditor::setUseDiscreteColors(bool on)
+void pqColorScaleEditor::setColors()
 {
+  if(!this->ColorMap)
+    {
+    return;
+    }
+
   vtkSMProxy *lookupTable = this->ColorMap->getProxy();
-  pqSMAdaptor::setElementProperty(
-      lookupTable->GetProperty("Discretize"), (on ? 1 : 0));
-  this->enableResolutionControls(on);
-  this->Viewer->Render();
+  if(lookupTable->GetXMLName() == QString("PVLookupTable"))
+    {
+    QList<QVariant> rgbPoints;
+#if USE_VTK_TFE
+#else
+    for(int i = 0; i < this->Form->Gradient->getPointCount(); ++i)
+      {
+      QColor color;
+      pqChartValue scalar;
+      this->Form->Gradient->getPointValue(i, scalar);
+      this->Form->Gradient->getPointColor(i, color);
+      rgbPoints << scalar.getDoubleValue()
+        << color.redF() << color.greenF() << color.blueF();
+      }
+#endif
+
+    pqSMAdaptor::setMultipleElementProperty(
+        lookupTable->GetProperty("RGBPoints"), rgbPoints);
+    }
+  else
+    {
+#if USE_VTK_TFE
+#else
+    QColor color1;
+    QColor color2;
+    this->Form->Gradient->getPointColor(0, color1);
+    this->Form->Gradient->getPointColor(1, color2);
+    QList<QVariant> list;
+    list.append(QVariant(color1.hueF()));
+    list.append(QVariant(color2.hueF()));
+    pqSMAdaptor::setMultipleElementProperty(
+        lookupTable->GetProperty("HueRange"), list);
+    list[0] = QVariant(color1.saturationF());
+    list[1] = QVariant(color2.saturationF());
+    pqSMAdaptor::setMultipleElementProperty(
+        lookupTable->GetProperty("SaturationRange"), list);
+    list[0] = QVariant(color1.valueF());
+    list[1] = QVariant(color2.valueF());
+    pqSMAdaptor::setMultipleElementProperty(
+        lookupTable->GetProperty("ValueRange"), list);
+#endif
+    }
+
   lookupTable->UpdateVTKObjects();
   this->Display->renderAllViews();
+}
+
+void pqColorScaleEditor::applyBlueToRedPreset()
+{
+#if USE_VTK_TFE
+#else
+  this->Form->Gradient->blockSignals(true);
+  this->Form->Gradient->clearPoints();
+  this->Form->Gradient->addPoint(
+      pqChartValue((double)0.0), QColor(0, 0, 255));
+  this->Form->Gradient->addPoint(
+      pqChartValue((double)1.0), QColor(255, 0, 0));
+  this->Form->Gradient->blockSignals(false);
+#endif
+  this->setColors();
+}
+
+void pqColorScaleEditor::applyRedToBluePreset()
+{
+#if USE_VTK_TFE
+#else
+  this->Form->Gradient->blockSignals(true);
+  this->Form->Gradient->clearPoints();
+  this->Form->Gradient->addPoint(
+      pqChartValue((double)0.0), QColor(255, 0, 0));
+  this->Form->Gradient->addPoint(
+      pqChartValue((double)1.0), QColor(0, 0, 255));
+  this->Form->Gradient->blockSignals(false);
+#endif
+  this->setColors();
+}
+
+void pqColorScaleEditor::applyGrayscalePreset()
+{
+#if USE_VTK_TFE
+#else
+  this->Form->Gradient->blockSignals(true);
+  this->Form->Gradient->clearPoints();
+  this->Form->Gradient->addPoint(
+      pqChartValue((double)0.0), QColor(0, 0, 0));
+  this->Form->Gradient->addPoint(
+      pqChartValue((double)1.0), QColor(255, 255, 255));
+  this->Form->Gradient->blockSignals(false);
+#endif
+  this->setColors();
+}
+
+void pqColorScaleEditor::applyCIELabBlueToRedPreset()
+{
+#if USE_VTK_TFE
+#else
+  this->Form->Gradient->blockSignals(true);
+  this->Form->Gradient->clearPoints();
+  this->Form->Gradient->addPoint(
+      pqChartValue((double)0.0), QColor(0, 153, 191));
+  this->Form->Gradient->addPoint(
+      pqChartValue((double)1.0), QColor(196, 119, 87));
+  this->Form->Gradient->blockSignals(false);
+#endif
+  this->setColors();
+}
+
+void pqColorScaleEditor::setColorSpace(int index)
+{
+#if USE_VTK_TFE
+  this->Viewer->SetColorSpace(index);
+  this->Viewer->Render();
+#else
+  if(index == 0)
+    {
+    this->Form->Gradient->setColorSpace(pqColorMapWidget::RgbSpace);
+    }
+  else
+    {
+    this->Form->Gradient->setColorSpace(pqColorMapWidget::HsvSpace);
+    }
+#endif
+
+  if(this->ColorMap)
+    {
+    // Set the property on the lookup table.
+    int wrap = index == 2 ? 1 : 0;
+    if(wrap == 1)
+      {
+      index = 1;
+      }
+
+    vtkSMProxy *lookupTable = this->ColorMap->getProxy();
+    pqSMAdaptor::setElementProperty(
+        lookupTable->GetProperty("ColorSpace"), index);
+    pqSMAdaptor::setElementProperty(
+        lookupTable->GetProperty("HSVWrap"), wrap);
+    lookupTable->UpdateVTKObjects();
+    this->Display->renderAllViews();
+    }
+}
+
+void pqColorScaleEditor::setUseDiscreteColors(bool on)
+{
+  // Update the color scale widget and gui controls.
+  this->enableResolutionControls(on);
+#if USE_VTK_TFE
+  this->Viewer->Render();
+#else
+  int tableSize = 0;
+  if(!on)
+    {
+    tableSize = this->Form->TableSizeText->text().toInt();
+    }
+
+  this->Form->Gradient->setTableSize(tableSize);
+#endif
+
+  if(this->ColorMap)
+    {
+    // Set the property on the lookup table.
+    vtkSMProxy *lookupTable = this->ColorMap->getProxy();
+    pqSMAdaptor::setElementProperty(
+        lookupTable->GetProperty("Discretize"), (on ? 1 : 0));
+    lookupTable->UpdateVTKObjects();
+    this->Display->renderAllViews();
+    }
 }
 
 void pqColorScaleEditor::handleSizeTextEdit(const QString &)
@@ -303,7 +508,12 @@ void pqColorScaleEditor::setSizeFromSlider(int tableSize)
 
 void pqColorScaleEditor::setTableSize(int tableSize)
 {
+#if USE_VTK_TFE
   // TODO
+#else
+  this->Form->Gradient->setTableSize(tableSize);
+#endif
+
   if(this->ColorMap)
     {
     vtkSMProxy *lookupTable = this->ColorMap->getProxy();
@@ -359,7 +569,6 @@ void pqColorScaleEditor::setScalarRange(double min, double max)
 {
   // Update the gui elements.
   this->updateScalarRange(min, max);
-  this->Viewer->Render();
 
   // Update the color map and the rendered views.
   this->ColorMap->setScalarRange(min, max);
@@ -501,7 +710,6 @@ void pqColorScaleEditor::initColorScale()
   this->Form->UseDataRange->blockSignals(false);
   QPair<double, double> range = this->ColorMap->getScalarRange();
   this->updateScalarRange(range.first, range.second);
-  this->Viewer->SetVisibleScalarRange(range.first, range.second);
 
   // Set up the color table size elements.
   vtkSMProxy *lookupTable = this->ColorMap->getProxy();
@@ -511,10 +719,13 @@ void pqColorScaleEditor::initColorScale()
   this->Form->TableSize->setValue(tableSize);
   this->Form->TableSize->blockSignals(false);
   this->Form->TableSizeText->setText(QString::number(tableSize));
-  //this->Viewer->SetTableSize(tableSize); // TODO
 
   QList<QVariant> list;
+#if USE_VTK_TFE
   vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
+#else
+  QColor color;
+#endif
   if(lookupTable->GetXMLName() == QString("PVLookupTable"))
     {
     this->Form->UseDiscreteColors->setEnabled(true);
@@ -524,12 +735,53 @@ void pqColorScaleEditor::initColorScale()
     this->Form->UseDiscreteColors->setChecked(discretize != 0);
     this->Form->UseDiscreteColors->blockSignals(false);
 
+    // Add the color space options to the combo box.
+    this->Form->ColorSpace->addItem("RGB");
+    this->Form->ColorSpace->addItem("HSV");
+#if USE_VTK_TFE
+    this->Form->ColorSpace->addItem("Wrapped HSV");
+#endif
+    int space = pqSMAdaptor::getElementProperty(
+        lookupTable->GetProperty("ColorSpace")).toInt();
+    this->Form->ColorSpace->setCurrentIndex(space);
+#if USE_VTK_TFE
+    if(pqSMAdaptor::getElementProperty(
+        lookupTable->GetProperty("HSVWrap")).toInt())
+      {
+      this->Form->ColorSpace->setCurrentIndex(2);
+      }
+
+    this->Viewer->SetColorSpace(this->Form->ColorSpace->currentIndex());
+#else
+    switch(this->Form->ColorSpace->currentIndex())
+      {
+      case 0:
+        {
+        this->Form->Gradient->setColorSpace(pqColorMapWidget::RgbSpace);
+        break;
+        }
+      case 1:
+      default:
+        {
+        this->Form->Gradient->setColorSpace(pqColorMapWidget::HsvSpace);
+        break;
+        }
+      }
+#endif
+
     list = pqSMAdaptor::getMultipleElementProperty(
         lookupTable->GetProperty("RGBPoints"));
     for(int i = 0; (i + 3) < list.size(); i += 4)
       {
+#if USE_VTK_TFE
       colors->AddRGBPoint(list[i].toDouble(), list[i + 1].toDouble(),
           list[i + 2].toDouble(), list[i + 3].toDouble());
+#else
+      color = QColor::fromRgbF(list[i + 1].toDouble(),
+          list[i + 2].toDouble(), list[i + 3].toDouble());
+      pqChartValue scalar = list[i].toDouble();
+      this->Form->Gradient->addPoint(scalar, color);
+#endif
       }
     }
   else
@@ -538,6 +790,15 @@ void pqColorScaleEditor::initColorScale()
     this->Form->UseDiscreteColors->blockSignals(true);
     this->Form->UseDiscreteColors->setChecked(true);
     this->Form->UseDiscreteColors->blockSignals(false);
+
+    // Add the color space options to the combo box.
+    this->Form->ColorSpace->addItem("HSV");
+    this->Form->ColorSpace->setCurrentIndex(0);
+#if USE_VTK_TFE
+    this->Viewer->SetColorSpace(1);
+#else
+    this->Form->Gradient->setColorSpace(pqColorMapWidget::HsvSpace);
+#endif
 
     list = pqSMAdaptor::getMultipleElementProperty(
         lookupTable->GetProperty("HueRange"));
@@ -551,14 +812,31 @@ void pqColorScaleEditor::initColorScale()
         lookupTable->GetProperty("ValueRange"));
     double v1 = list[0].toDouble();
     double v2 = list[1].toDouble();
-    list = pqSMAdaptor::getMultipleElementProperty(
-        lookupTable->GetProperty("ScalarRange"));
-    colors->AddHSVPoint(list[0].toDouble(), h1, s1, v1);
-    colors->AddHSVPoint(list[1].toDouble(), h2, s2, v2);
+#if USE_VTK_TFE
+    colors->AddHSVPoint(0.0, h1, s1, v1);
+    colors->AddHSVPoint(1.0, h2, s2, v2);
+#else
+    color = QColor::fromHsvF(h1, s1, v1);
+    this->Form->Gradient->addPoint(pqChartValue((double)0.0), color);
+    color = QColor::fromHsvF(h2, s2, v2);
+    this->Form->Gradient->addPoint(pqChartValue((double)1.0), color);
+#endif
     }
 
   this->enableResolutionControls(this->Form->UseDiscreteColors->isChecked());
+#if USE_VTK_TFE
+  //this->Viewer->SetTableSize(tableSize); // TODO
   this->Viewer->Render();
+#else
+  if(!this->Form->UseDiscreteColors->isChecked())
+    {
+    tableSize = 0;
+    }
+
+  this->Form->Gradient->setTableSize(tableSize);
+  this->Form->Gradient->setAddingPointsAllowed(
+      this->Form->UseDiscreteColors->isEnabled());
+#endif
 }
 
 void pqColorScaleEditor::enableResolutionControls(bool enable)
@@ -587,9 +865,6 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
   this->Form->ScalarRangeMax->setValue(max);
   this->Form->ScalarRangeMin->blockSignals(false);
   this->Form->ScalarRangeMax->blockSignals(false);
-
-  // Update the transfer function editor.
-  this->Viewer->SetWholeScalarRange(min, max);
 }
 
 void pqColorScaleEditor::setLegend(pqScalarBarDisplay *legend)

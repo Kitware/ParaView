@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>424</width>
-    <height>329</height>
+    <height>354</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -35,84 +35,51 @@
        <property name="spacing" >
         <number>6</number>
        </property>
-       <item row="3" column="1" >
+       <item row="7" column="3" >
+        <widget class="QDoubleSpinBox" name="ScalarRangeMax" >
+         <property name="whatsThis" >
+          <string>Used to display and edit the maximum scalar value.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="2" >
+        <widget class="QLabel" name="label_3" >
+         <property name="text" >
+          <string>Maximum</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1" >
+        <widget class="QDoubleSpinBox" name="ScalarRangeMin" >
+         <property name="whatsThis" >
+          <string>Used to display and edit the minimum scalar value.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" >
+        <widget class="QLabel" name="label_2" >
+         <property name="text" >
+          <string>Minimum</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1" >
         <widget class="QComboBox" name="Component" />
        </item>
-       <item row="3" column="0" >
+       <item row="4" column="0" >
         <widget class="QLabel" name="ComponentLabel" >
          <property name="text" >
           <string>Component</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="0" colspan="2" >
+       <item row="1" column="2" colspan="2" >
         <layout class="QHBoxLayout" >
          <property name="margin" >
           <number>0</number>
          </property>
          <property name="spacing" >
-          <number>6</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label_2" >
-           <property name="text" >
-            <string>Minimum</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="ScalarRangeMin" >
-           <property name="whatsThis" >
-            <string>Used to display and edit the minimum scalar value.</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_3" >
-           <property name="text" >
-            <string>Maximum</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="ScalarRangeMax" >
-           <property name="whatsThis" >
-            <string>Used to display and edit the maximum scalar value.</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="4" column="0" colspan="2" >
-        <widget class="QRadioButton" name="UseDataRange" >
-         <property name="whatsThis" >
-          <string>Select this option to use the scalar range from the data.</string>
-         </property>
-         <property name="text" >
-          <string>Use the Scalar Range from the Data</string>
-         </property>
-         <property name="checked" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="2" >
-        <widget class="QRadioButton" name="UseSpecifiedRange" >
-         <property name="whatsThis" >
-          <string>Select this option to specify the scalar range.</string>
-         </property>
-         <property name="text" >
-          <string>Specify the Scalar Range</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0" colspan="2" >
-        <layout class="QHBoxLayout" >
-         <property name="margin" >
           <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>6</number>
          </property>
          <item>
           <spacer>
@@ -121,32 +88,36 @@
            </property>
            <property name="sizeHint" >
             <size>
-             <width>40</width>
+             <width>0</width>
              <height>20</height>
             </size>
            </property>
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="ResetRangeButton" >
-           <property name="enabled" >
-            <bool>false</bool>
-           </property>
+          <widget class="QPushButton" name="PresetButton" >
            <property name="text" >
-            <string>Reset Range</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="ResetRangeToCurrentButton" >
-           <property name="text" >
-            <string>Reset Range to Current</string>
+            <string>Choose Preset</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-       <item row="0" column="0" colspan="2" >
+       <item row="1" column="1" >
+        <widget class="QComboBox" name="ColorSpace" >
+         <property name="whatsThis" >
+          <string>Select the color space used for the color interpolation.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="label" >
+         <property name="text" >
+          <string>Color Space</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="4" >
         <widget class="QVTKWidget" native="1" name="ColorScale" >
          <property name="sizePolicy" >
           <sizepolicy>
@@ -161,7 +132,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2" >
+       <item row="2" column="0" colspan="4" >
         <widget class="QCheckBox" name="UseDiscreteColors" >
          <property name="whatsThis" >
           <string>Check this box if the color table should have discrete colors, otherwise color values will be interpolated.</string>
@@ -174,7 +145,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2" >
+       <item row="3" column="0" colspan="4" >
         <layout class="QHBoxLayout" >
          <property name="margin" >
           <number>0</number>
@@ -225,6 +196,69 @@
          </item>
         </layout>
        </item>
+       <item row="6" column="0" colspan="4" >
+        <widget class="QRadioButton" name="UseSpecifiedRange" >
+         <property name="whatsThis" >
+          <string>Select this option to specify the scalar range.</string>
+         </property>
+         <property name="text" >
+          <string>Specify the Scalar Range</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="4" >
+        <widget class="QRadioButton" name="UseDataRange" >
+         <property name="whatsThis" >
+          <string>Select this option to use the scalar range from the data.</string>
+         </property>
+         <property name="text" >
+          <string>Use the Scalar Range from the Data</string>
+         </property>
+         <property name="checked" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0" colspan="4" >
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <spacer>
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" >
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="ResetRangeButton" >
+           <property name="enabled" >
+            <bool>false</bool>
+           </property>
+           <property name="text" >
+            <string>Reset Range</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="ResetRangeToCurrentButton" >
+           <property name="text" >
+            <string>Reset Range to Current</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="LegendPage" >
@@ -238,6 +272,19 @@
        <property name="spacing" >
         <number>6</number>
        </property>
+       <item row="4" column="0" colspan="3" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="1" column="0" colspan="3" >
         <widget class="QGroupBox" name="TitleFrame" >
          <property name="sizePolicy" >
@@ -666,7 +713,7 @@
          </property>
          <property name="sizeHint" >
           <size>
-           <width>181</width>
+           <width>0</width>
            <height>20</height>
           </size>
          </property>
@@ -674,6 +721,16 @@
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QPushButton" name="CloseButton" >
+     <property name="text" >
+      <string>&amp;Close</string>
+     </property>
+     <property name="default" >
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="1" column="0" >
@@ -689,31 +746,23 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="1" >
-    <widget class="QPushButton" name="CloseButton" >
-     <property name="text" >
-      <string>&amp;Close</string>
-     </property>
-     <property name="default" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>QVTKWidget</class>
-   <extends>QWidget</extends>
-   <header>QVTKWidget.h</header>
-  </customwidget>
   <customwidget>
    <class>pqColorChooserButton</class>
    <extends>QPushButton</extends>
    <header>pqColorChooserButton.h</header>
   </customwidget>
+  <customwidget>
+   <class>QVTKWidget</class>
+   <extends>QWidget</extends>
+   <header>QVTKWidget.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>ColorSpace</tabstop>
+  <tabstop>PresetButton</tabstop>
   <tabstop>UseDiscreteColors</tabstop>
   <tabstop>TableSize</tabstop>
   <tabstop>TableSizeText</tabstop>

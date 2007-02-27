@@ -71,10 +71,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 
 
-// Temporary switch
-#define USE_VTK_TFE 0
-
-
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
 {
 public:
@@ -517,15 +513,12 @@ void pqDisplayProxyEditor::openColorMapEditor()
     }
 
   // Create a color map editor and set the display.
-#if USE_VTK_TFE
   pqColorScaleEditor colorScale(this);
   colorScale.setDisplay(this->Internal->Display);
   colorScale.exec();
-#else
-  pqColorMapEditor colorMap(this);
-  colorMap.setDisplay(this->Internal->Display);
-  colorMap.exec();
-#endif
+  //pqColorMapEditor colorMap(this);
+  //colorMap.setDisplay(this->Internal->Display);
+  //colorMap.exec();
 }
 
 //-----------------------------------------------------------------------------

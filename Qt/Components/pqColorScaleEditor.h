@@ -68,6 +68,14 @@ protected:
 private slots:
   /// \name Color Scale Methods
   //@{
+  void setColors();
+  void applyBlueToRedPreset();
+  void applyRedToBluePreset();
+  void applyGrayscalePreset();
+  void applyCIELabBlueToRedPreset();
+
+  void setColorSpace(int index);
+
   void setUseDiscreteColors(bool on);
   void handleSizeTextEdit(const QString &text);
   void setSizeFromText();
