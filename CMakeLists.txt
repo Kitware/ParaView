@@ -1,5 +1,5 @@
 PROJECT(ParaView)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4.5)
 
 #########################################################################
 # Warn about ParaQ
