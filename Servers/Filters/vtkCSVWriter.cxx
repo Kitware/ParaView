@@ -28,7 +28,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkCSVWriter);
-vtkCxxRevisionMacro(vtkCSVWriter, "1.1");
+vtkCxxRevisionMacro(vtkCSVWriter, "1.2");
 //-----------------------------------------------------------------------------
 vtkCSVWriter::vtkCSVWriter()
 {
@@ -51,7 +51,8 @@ vtkCSVWriter::~vtkCSVWriter()
 }
 
 //-----------------------------------------------------------------------------
-int vtkCSVWriter::FillInputPortInformation(int port, vtkInformation* info)
+int vtkCSVWriter::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkRectilinearGrid");
   return 1;
@@ -140,7 +141,6 @@ void vtkCSVWriter::WriteData()
 {
   vtkRectilinearGrid* rg = vtkRectilinearGrid::SafeDownCast(this->GetInput());
   vtkIdType numPoints = rg->GetNumberOfPoints();
-  vtkIdType numCells = rg->GetNumberOfCells();
   vtkPointData* pd = rg->GetPointData();
   vtkCellData* cd = rg->GetCellData();
   int dims[3];
