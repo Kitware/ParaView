@@ -191,9 +191,15 @@ void pqVTKLineChartModel::createPlotsForDisplay(pqLineChartDisplay* display)
       continue;
       }
 
+    vtkDataArray* yarray = display->getYArray(cc);
+    if (!yarray || !display->getXArray())
+      {
+      // property may be requesting a non-existing array.
+      continue;
+      }
     pqVTKLineChartPlot* plot = new pqVTKLineChartPlot(this);
     plot->setXArray(display->getXArray());
-    plot->setYArray(display->getYArray(cc));
+    plot->setYArray(yarray);
     plot->setColor(display->getYColor(cc));
 
     this->Internal->Plots.push_back(plot);

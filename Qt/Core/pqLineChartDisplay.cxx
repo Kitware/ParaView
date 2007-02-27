@@ -31,14 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqLineChartDisplay.h"
 
+#include "vtkCellData.h"
 #include "vtkDoubleArray.h"
+#include "vtkMath.h"
+#include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMProperty.h"
-#include "vtkPointData.h"
-#include "vtkCellData.h"
 
 #include <QColor>
 #include <QtDebug>
@@ -300,5 +301,9 @@ QColor pqLineChartDisplay::getYColor(const QString& arrayname) const
       }
     }
 
-  return QColor(100,100,100);
+  QColor color;
+  color.setRedF(vtkMath::Random(0,1));
+  color.setGreenF(vtkMath::Random(0,1));
+  color.setBlueF(vtkMath::Random(0,1));
+  return color;
 }
