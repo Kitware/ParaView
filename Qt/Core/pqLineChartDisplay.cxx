@@ -148,6 +148,10 @@ vtkDataArray* pqLineChartDisplay::getXArray()
         {
         this->Internals->YIndexArray->SetTuple1(cc, cc);
         }
+      // FIXME: Need to mark the array modified so that it does not
+      // use the cached ranges for this array anymore. This is probably
+      // a bug in vtkDataArrayTemplate, need to look into that.
+      this->Internals->YIndexArray->Modified();
       }
     return this->Internals->YIndexArray;
     }
