@@ -71,6 +71,10 @@ public:
   virtual void RemoveHandle(unsigned int id);
 
   // Description:
+  // Remove all the vtkHandleRepresentations currently used by this class.
+  void RemoveAllHandles();
+
+  // Description:
   // Set/get the index of the currently active handle (node).
   void SetActiveHandle(unsigned int handle);
   vtkGetMacro(ActiveHandle, unsigned int);

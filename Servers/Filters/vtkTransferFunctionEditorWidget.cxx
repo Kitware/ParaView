@@ -24,7 +24,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.8");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.9");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
@@ -33,16 +33,24 @@ vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
   this->WholeScalarRange[0] = this->VisibleScalarRange[0] = 1;
   this->WholeScalarRange[1] = this->VisibleScalarRange[1] = 0;
   this->ModificationType = OPACITY;
-  this->OpacityFunction = vtkPiecewiseFunction::New();
-  this->ColorFunction = vtkColorTransferFunction::New();
+  this->OpacityFunction = NULL;
+  vtkPiecewiseFunction *oFunc = vtkPiecewiseFunction::New();
+  this->SetOpacityFunction(oFunc);
+  oFunc->Delete();
+  this->ColorFunction = NULL;
+  vtkColorTransferFunction *cFunc = vtkColorTransferFunction::New();
+  this->SetColorFunction(cFunc);
+  cFunc->Delete();
   this->Histogram = NULL;
+  this->OpacityMTime = 0;
+  this->ColorMTime = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::~vtkTransferFunctionEditorWidget()
 {
-  this->OpacityFunction->Delete();
-  this->ColorFunction->Delete();
+  this->SetOpacityFunction(NULL);
+  this->SetColorFunction(NULL);
   this->SetHistogram(NULL);
 }
 
@@ -133,12 +141,16 @@ void vtkTransferFunctionEditorWidget::SetHistogram(
       {
       this->Histogram->Register(this);
       vtkDataArray *hist = this->Histogram->GetXCoordinates();
-      if (hist &&
-          this->VisibleScalarRange[0] == 1 && this->VisibleScalarRange[1] == 0)
+      if (hist)
         {
         double range[2];
         hist->GetRange(range);
-        this->SetVisibleScalarRange(range);
+        if (this->VisibleScalarRange[0] == 1 &&
+            this->VisibleScalarRange[1] == 0)
+          {
+          this->SetVisibleScalarRange(range);
+          }
+        this->SetWholeScalarRange(range);
         }
       }
     if (tempHist != NULL)
@@ -146,6 +158,61 @@ void vtkTransferFunctionEditorWidget::SetHistogram(
       tempHist->UnRegister(this);
       }
     this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidget::SetColorFunction(
+  vtkColorTransferFunction *function)
+{
+  if (this->ColorFunction != function)
+    {
+    vtkColorTransferFunction *tempFunc = this->ColorFunction;
+    this->ColorFunction = function;
+    if (this->ColorFunction != NULL)
+      {
+      this->ColorFunction->Register(this);
+      this->ColorMTime = this->ColorFunction->GetMTime();
+      }
+    if (tempFunc != NULL)
+      {
+      tempFunc->UnRegister(this);
+      }
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidget::SetOpacityFunction(
+  vtkPiecewiseFunction *function)
+{
+  if (this->OpacityFunction != function)
+    {
+    vtkPiecewiseFunction *tempFunc = this->OpacityFunction;
+    this->OpacityFunction = function;
+    if (this->OpacityFunction != NULL)
+      {
+      this->OpacityFunction->Register(this);
+      this->OpacityMTime = this->OpacityFunction->GetMTime();
+      }
+    if (tempFunc != NULL)
+      {
+      tempFunc->UnRegister(this);
+      }
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidget::UpdateFromTransferFunctions()
+{
+  if (this->OpacityFunction)
+    {
+    this->OpacityMTime = this->OpacityFunction->GetMTime();
+    }
+  if (this->ColorFunction)
+    {
+    this->ColorMTime = this->ColorFunction->GetMTime();
     }
 }
 

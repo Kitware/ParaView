@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkTransferFunctionViewer.h"
 
+#include "vtkColorTransferFunction.h"
 #include "vtkDataSet.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkFieldData.h"
@@ -29,7 +30,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.11");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.12");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -276,6 +277,7 @@ void vtkTransferFunctionViewer::Render()
           this->SetWholeScalarRange(range);
           this->SetVisibleScalarRange(this->GetWholeScalarRange());
           }
+        this->HistogramMTime = this->Histogram->GetMTime();
         }
       }
     else
@@ -287,9 +289,13 @@ void vtkTransferFunctionViewer::Render()
         this->SetVisibleScalarRange(this->GetWholeScalarRange());
         }
       }
-    if (!this->EditorWidget->TransferFunctionsInitialized())
+    vtkColorTransferFunction *cFunc = this->EditorWidget->GetColorFunction();
+    vtkPiecewiseFunction *oFunc =
+      this->EditorWidget->GetOpacityFunction();
+    if ((cFunc && cFunc->GetMTime() > this->EditorWidget->GetColorMTime()) ||
+        (oFunc && oFunc->GetMTime() > this->EditorWidget->GetOpacityMTime()))
       {
-      this->EditorWidget->InitializeTransferFunctions();
+      this->EditorWidget->UpdateFromTransferFunctions();
       }
     this->EditorWidget->GetRepresentation()->BuildRepresentation();
     }
@@ -424,6 +430,16 @@ double* vtkTransferFunctionViewer::GetWholeScalarRange()
 }
 
 //----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetOpacityFunction(
+  vtkPiecewiseFunction *function)
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->SetOpacityFunction(function);
+    }
+}
+
+//----------------------------------------------------------------------------
 vtkPiecewiseFunction* vtkTransferFunctionViewer::GetOpacityFunction()
 {
   if (this->EditorWidget)
@@ -431,6 +447,16 @@ vtkPiecewiseFunction* vtkTransferFunctionViewer::GetOpacityFunction()
     return this->EditorWidget->GetOpacityFunction();
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetColorFunction(
+  vtkColorTransferFunction *function)
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->SetColorFunction(function);
+    }
 }
 
 //----------------------------------------------------------------------------

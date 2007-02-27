@@ -151,11 +151,17 @@ public:
   void SetHistogramVisibility(int visibility);
 
   // Description:
-  // Get the opacity function.
+  // Set/get the opacity function.
+  // Set the type of transfer function editor before trying to set or get
+  // the opacity function.
+  void SetOpacityFunction(vtkPiecewiseFunction *function);
   vtkPiecewiseFunction* GetOpacityFunction();
 
   // Description:
-  // Get the color function.
+  // Set/get the color function.
+  // Set the type of transfer function editor before trying to set or get
+  // the color function.
+  void SetColorFunction(vtkColorTransferFunction *function);
   vtkColorTransferFunction* GetColorFunction();
 
   // Description:

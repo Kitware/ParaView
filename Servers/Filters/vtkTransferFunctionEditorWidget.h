@@ -77,12 +77,14 @@ public:
 //ETX
 
   // Description:
-  // Get the opacity transfer function.
+  // Set/get the opacity transfer function.
   vtkGetObjectMacro(OpacityFunction, vtkPiecewiseFunction);
+  void SetOpacityFunction(vtkPiecewiseFunction *function);
 
   // Description:
-  // Get the color transfer function.
+  // Set/get the color transfer function.
   vtkGetObjectMacro(ColorFunction, vtkColorTransferFunction);
+  void SetColorFunction(vtkColorTransferFunction *function);
 
   // Description:
   // Set/get the opacity of a particular element in the transfer function
@@ -130,13 +132,18 @@ public:
   virtual void OnChar();
 
   // Description:
-  // Initialize the underlying transfer functions and add editor elements
-  // as appropriate.
-  virtual void InitializeTransferFunctions() {}
-
-  // Description:
   // Return whether the underlying transfer functions have been initialized.
   int TransferFunctionsInitialized();
+
+  // Description:
+  // Get the modified time associated with the color / opacity transfer
+  // functions.
+  vtkGetMacro(ColorMTime, unsigned long);
+  vtkGetMacro(OpacityMTime, unsigned long);
+
+  // Description:
+  // Update this widget based on changes to the transfer functions.
+  virtual void UpdateFromTransferFunctions();
 
 protected:
   vtkTransferFunctionEditorWidget();
@@ -149,6 +156,8 @@ protected:
   vtkPiecewiseFunction *OpacityFunction;
   vtkColorTransferFunction *ColorFunction;
   vtkRectilinearGrid *Histogram;
+  unsigned long ColorMTime;
+  unsigned long OpacityMTime;
 
 private:
   vtkTransferFunctionEditorWidget(const vtkTransferFunctionEditorWidget&); // Not implemented.

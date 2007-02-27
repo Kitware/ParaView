@@ -51,6 +51,12 @@ public:
     { this->SetVisibleScalarRange(range[0], range[1]); }
 
   // Description:
+  // Set the whole scalar range of the underlying data.
+  virtual void SetWholeScalarRange(double min, double max);
+  virtual void SetWholeScalarRange(double range[2]) 
+    { this->SetWholeScalarRange(range[0], range[1]); }
+
+  // Description:
   // Update the size of the rendering window containing this widget, and
   // recompute the position of the transfer function nodes based on the new
   // window size.
@@ -83,15 +89,17 @@ public:
 
   // Description:
   // Set the color space.
-  void SetColorSpace(int space);
+  virtual void SetColorSpace(int space);
 
   // Description:
-  // Set up initial transfer functions.
-  virtual void InitializeTransferFunctions();
+  // Update this widget based on changes to the transfer functions.
+  virtual void UpdateFromTransferFunctions();
 
 protected:
   vtkTransferFunctionEditorWidgetSimple1D();
   ~vtkTransferFunctionEditorWidgetSimple1D();
+
+  void RemoveAllNodes();
 
   // the positioning handle widgets
   vtkNodeList *Nodes;
@@ -117,6 +125,7 @@ protected:
   static void ModifyAction(vtkAbstractWidget*);
 
   void AddNewNode(int x, int y);
+  void AddNewNode(double scalar);
   void AddOpacityPoint(int x, int y);
   void RemoveOpacityPoint(unsigned int id);
   void AddColorPoint(int x);
