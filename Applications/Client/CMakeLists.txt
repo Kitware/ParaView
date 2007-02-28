@@ -209,8 +209,22 @@ IF(BUILD_TESTING)
       --exit)
   ENDFOREACH(test) 
 
+
   # test the plugins
   IF(BUILD_SHARED_LIBS AND BUILD_TESTING)
+    SET(DOLLAR "$")
+    IF(CMAKE_CONFIGURATION_TYPES)
+      SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/${DOLLAR}{CTEST_CONFIGURATION_TYPE}/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+      SET(RUN_PATH ${EXECUTABLE_OUTPUT_PATH}/${DOLLAR}{CTEST_CONFIGURATION_TYPE})
+    ELSE(CMAKE_CONFIGURATION_TYPES)
+      SET(RUN_PATH ${EXECUTABLE_OUTPUT_PATH})
+      IF(APPLE)
+        SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha.app/Contents/MacOS/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+      ELSE(APPLE)
+        SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+      ENDIF(APPLE)
+    ENDIF(CMAKE_CONFIGURATION_TYPES)
+  
 
     SET(PLUGIN_TESTS
         ToolBarPlugin
@@ -219,7 +233,7 @@ IF(BUILD_TESTING)
 
     FOREACH(test ${PLUGIN_TESTS})
       ADD_TEST(pqClient${test}
-               ${CMAKE_COMMAND} -E chdir ${LIBRARY_OUTPUT_PATH}
+               ${CMAKE_COMMAND} -E chdir ${RUN_PATH}
                ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
                --exit)
     ENDFOREACH(test)
