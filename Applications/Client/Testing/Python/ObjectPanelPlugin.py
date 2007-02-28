@@ -22,9 +22,11 @@ object5 = 'MainWindow/menubar/menuSources'
 QtTesting.playCommand(object5, 'activate', 'Cone')
 object6 = 'MainWindow/ServerStartupBrowser/connect'
 QtTesting.playCommand(object6, 'activate', '')
+object7 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
+QtTesting.playCommand(object7, 'activate', '')
 
-object7 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1QLabel4'
+object8 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1QLabel4'
 
-text = QtTesting.getProperty(object7, 'text')
+text = QtTesting.getProperty(object8, 'text')
 print text
 
