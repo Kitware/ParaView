@@ -32,13 +32,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBarChartDisplay.h"
 
 #include "vtkCellData.h"
+#include "vtkCommand.h"
 #include "vtkDataArray.h"
+#include "vtkEventQtSlotConnect.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkTimeStamp.h"
 
 #include <QtDebug>
 
@@ -49,16 +53,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
+class pqBarChartDisplay::pqInternals
+{
+public:
+  vtkTimeStamp MTime;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+};
+
+//-----------------------------------------------------------------------------
 pqBarChartDisplay::pqBarChartDisplay(const QString& group, const QString& name,
   vtkSMProxy* display, pqServer* server, QObject* _parent)
 : pqConsumerDisplay(group, name, display, server, _parent)
 {
-
+  this->Internal = new pqInternals();
+  this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Internal->VTKConnect->Connect(display, vtkCommand::PropertyModifiedEvent,
+    this, SLOT(markModified()), 0, 0, Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
 pqBarChartDisplay::~pqBarChartDisplay()
 {
+  delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqBarChartDisplay::markModified()
+{
+  this->Internal->MTime.Modified();
+}
+
+//-----------------------------------------------------------------------------
+vtkTimeStamp pqBarChartDisplay::getMTime() const
+{
+  vtkRectilinearGrid* data = this->getClientSideData();
+  if (data && data->GetMTime() > this->Internal->MTime)
+    {
+    this->Internal->MTime.Modified();
+    }
+
+  return this->Internal->MTime;
 }
 
 //-----------------------------------------------------------------------------

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqScalarsToColors;
 class vtkDataArray;
 class vtkRectilinearGrid;
+class vtkTimeStamp;
 
 /// pqBarChartDisplay is a pqDisplay for "BarChartDisplay" proxy.
 /// It adds logic to initialize the default state of the display proxy
@@ -71,13 +72,25 @@ public:
   /// Returns the client-side rectilinear grid. 
   /// Note that this method does not update the pipeline.
   vtkRectilinearGrid* getClientSideData() const;
+
+  /// Returns the time when the underlying proxy changed
+  /// or the client side data (if any) changed.
+  vtkTimeStamp getMTime() const;
+
 public slots:
   /// Updates the lookup table based on the current proxy values.
   void updateLookupTable();
 
+protected slots:
+  /// updates MTime.
+  void markModified();
+
 private:
   pqBarChartDisplay(const pqBarChartDisplay&); // Not implemented.
   void operator=(const pqBarChartDisplay&); // Not implemented.
+
+  class pqInternals;
+  pqInternals* Internal;
 };
 
 
