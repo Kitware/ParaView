@@ -1539,6 +1539,14 @@
      <Documentation
         long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
      </Documentation>
+     <!-- Unlike most readers, we need to show the "filename" so that users
+          can strip off the extension and replace it in the file pattern.
+          I'm creating this "Property" hint that has an attribute to force
+          whether the given property is shown in the GUI or not. -->
+     <Hints>
+       <Property name="FilePrefix" show="1"/>
+     </Hints>
+
      <StringVectorProperty
         name="FilePrefix"
         command="SetFilePrefix"
@@ -1600,9 +1608,13 @@
         command="SetFileDimensionality"
         number_of_elements="1" 
         default_values="3">
-        <Documentation>
-          Select whether the file(s) in this dataset contain slices (2D) or volumes (3D).
-        </Documentation>
+       <EnumerationDomain name="enum">
+         <Entry value="2" text="2"/>
+         <Entry value="3" text="3"/>
+       </EnumerationDomain>
+       <Documentation>
+         Select whether the file(s) in this dataset contain slices (2D) or volumes (3D).
+       </Documentation>
      </IntVectorProperty>
 
       <DoubleVectorProperty
