@@ -99,27 +99,9 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
       }
     else
       {
-      // Create the preferred view only if one doesn't exist already.
-      pqGenericViewModule *preferredView = 0;
-      if (currentView)
-        {
-        // If currentView is empty, then we must always create a new view of the preferred type.
-        QList<pqGenericViewModule*> views = 
-          pqApplicationCore::instance()->getServerManagerModel()->getViewModules(
-            source->getServer());
-        foreach (pqGenericViewModule* view, views)
-          {
-          if (proxy_name == view->getProxy()->GetXMLName())
-            {
-            preferredView = view;
-            break;
-            }
-          }
-        }
-      if (!preferredView)
-        {
-        currentView = builder->createView(source->getServer(), view_type);
-        }
+      // Create the preferred view only if the current one is not of the same type
+      // as the preferred view.
+      currentView = builder->createView(source->getServer(), view_type);
       }
     }
 
