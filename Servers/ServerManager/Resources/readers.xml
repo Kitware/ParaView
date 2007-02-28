@@ -2757,5 +2757,49 @@
    </SourceProxy>
    <!-- End of LSDyna Reader -->
 
+   <SourceProxy name="CSVReader" class="vtkCSVReader">
+      <StringVectorProperty name="FileName"
+        command="SetFileName">
+        <FileListDomain name="files"/>
+        <Documentation>
+          Set the file name for the CSV (Command Separated Values) reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="UseStringDelimiter"
+        command="SetUseStringDelimiter"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set/get whether to use the string delimiter.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="HaveHeaders"
+        command="SetHaveHeaders"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to treat the first line of the file as headers.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="FieldDelimiterCharacters"
+        command="SetFieldDelimiterCharacters"
+        number_of_elements="1"
+        default_values=",">
+        <Documentation>
+          Get/set the characters that will be used to separate fields.  For
+          example, set this to "," for a comma-separated value file.  Set
+          it to ".:;" for a file where columns can be separated by a
+          period, colon or semicolon.  The order of the characters in the
+          string does not matter.  Defaults to a comma.
+        </Documentation>
+      </StringVectorProperty>
+      <!-- End of CSVReader -->
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

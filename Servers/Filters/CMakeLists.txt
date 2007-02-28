@@ -23,6 +23,7 @@ SET(Filters_SRCS
   vtkClientServerMoveData.cxx
 #  vtkColorByPart.cxx
   vtkCompleteArrays.cxx
+  vtkCSVReader.cxx
   vtkCSVWriter.cxx
   vtkCVGeometryCache.cxx
   vtkDataAnalysisFilter.cxx

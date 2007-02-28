@@ -13,8 +13,7 @@
 
 =========================================================================*/
 // .NAME vtkCSVWriter - writer for 1D vtkRectilinearGrid.
-// Writes the data as a delimited text file (such as CSV). The vtkRectilinearGrid must
-// be 1 dimensional.
+// Writes a vtkRectilinearGrid as a delimited text file (such as CSV). 
 #ifndef __vtkCSVWriter_h
 #define __vtkCSVWriter_h
 
@@ -40,6 +39,8 @@ public:
   vtkSetStringMacro(StringDelimiter);
   vtkGetStringMacro(StringDelimiter);
 
+  // Description:
+  // Get/Set the filename for the file.
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
 
@@ -48,7 +49,11 @@ public:
   // True by default.
   vtkSetMacro(UseStringDelimiter, bool);
   vtkGetMacro(UseStringDelimiter, bool);
+
 //BTX
+  // Description:
+  // Internal method: decortes the "string" with the "StringDelimiter" if 
+  // UseStringDelimiter is true.
   vtkStdString GetString(vtkStdString string);
 protected:
   vtkCSVWriter();
@@ -58,7 +63,8 @@ protected:
 
   virtual void WriteData();
 
-  // see algorithm for more info
+  // see algorithm for more info.
+  // This writer takes in vtkRectilinearGrids.
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   char* FileName;

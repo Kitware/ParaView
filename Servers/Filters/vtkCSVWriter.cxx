@@ -28,7 +28,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkCSVWriter);
-vtkCxxRevisionMacro(vtkCSVWriter, "1.2");
+vtkCxxRevisionMacro(vtkCSVWriter, "1.3");
 //-----------------------------------------------------------------------------
 vtkCSVWriter::vtkCSVWriter()
 {
@@ -84,6 +84,7 @@ bool vtkCSVWriter::OpenFile()
   return true;
 }
 
+//-----------------------------------------------------------------------------
 template <class iterT>
 void vtkCSVWriterGetDataString(
   iterT* iter, vtkIdType tupleIndex, ofstream* stream, vtkCSVWriter* writer)
@@ -104,9 +105,11 @@ void vtkCSVWriterGetDataString(
     }
 }
 
+//-----------------------------------------------------------------------------
 VTK_TEMPLATE_SPECIALIZE
 void vtkCSVWriterGetDataString(
-  vtkArrayIteratorTemplate<vtkStdString>* iter, vtkIdType tupleIndex, ofstream* stream, vtkCSVWriter* writer)
+  vtkArrayIteratorTemplate<vtkStdString>* iter, vtkIdType tupleIndex, 
+  ofstream* stream, vtkCSVWriter* writer)
 {
   int numComps = iter->GetNumberOfComponents();
   vtkIdType index = tupleIndex* numComps;
@@ -127,7 +130,7 @@ void vtkCSVWriterGetDataString(
 //-----------------------------------------------------------------------------
 vtkStdString vtkCSVWriter::GetString(vtkStdString string)
 {
-  if (this->UseStringDelimiter)
+  if (this->UseStringDelimiter && this->StringDelimiter)
     {
     vtkStdString temp = this->StringDelimiter;
     temp += string + this->StringDelimiter; 

@@ -167,9 +167,14 @@
           extensions="sesame"
           file_description="SESAME">
   </Reader>
-  <Reader name="DelimitedTextReader"
+
+  <Reader name="CSVReader"
           extensions="csv"
           file_description="Comma-separated-values">
   </Reader>
 
+  <Reader name="DelimitedTextReader"
+          extensions="csv"
+          file_description="Comma-separated-values">
+  </Reader>
 </ParaViewReaders>
