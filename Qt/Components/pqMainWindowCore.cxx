@@ -1659,6 +1659,7 @@ void pqMainWindowCore::onToolsTimerLog()
     {
     this->Implementation->TimerLog
       = new pqTimerLogDisplay(this->Implementation->Parent);
+    this->Implementation->TimerLog->setAttribute(Qt::WA_QuitOnClose, false);
     }
   this->Implementation->TimerLog->show();
   this->Implementation->TimerLog->raise();
@@ -1691,6 +1692,7 @@ void pqMainWindowCore::onToolsPythonShell()
       GetOptions()->GetArgv0();
     this->Implementation->PythonDialog = 
       new pqPythonDialog(this->Implementation->Parent, 1, (char**)&argv0);
+    this->Implementation->PythonDialog->setAttribute(Qt::WA_QuitOnClose, false);
     }
   this->Implementation->PythonDialog->show();
   this->Implementation->PythonDialog->raise();

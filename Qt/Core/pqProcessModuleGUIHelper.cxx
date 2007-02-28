@@ -117,7 +117,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.12");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.13");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -196,6 +196,7 @@ int pqProcessModuleGUIHelper::InitializeApplication(int vtkNotUsed(argc),
   
   // Redirect VTK debug output to a Qt window ...
   this->Implementation->OutputWindow = new pqOutputWindow(0);
+  this->Implementation->OutputWindow->setAttribute(Qt::WA_QuitOnClose, false);
   this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, 
     SIGNAL(displayText(const QString&)), SLOT(onDisplayText(const QString&)));
   this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, 
