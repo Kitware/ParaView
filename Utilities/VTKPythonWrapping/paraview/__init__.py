@@ -401,8 +401,9 @@ class pyPropertyIterator:
        the python iterator protocol."""
     def __init__(self, proxy):
         self.SMIterator = proxy.NewPropertyIterator()
-        self.SMIterator.UnRegister(None)
-        self.SMIterator.Begin()
+	if self.SMIterator:
+		self.SMIterator.UnRegister(None)
+		self.SMIterator.Begin()
         self.Key = None
         self.Property = None
         self.Proxy = None
@@ -411,6 +412,9 @@ class pyPropertyIterator:
         return self
 
     def next(self):
+	if not self.SMIterator:
+		raise StopIteration
+
         if self.SMIterator.IsAtEnd():
             self.Key = None
             self.Property = None
@@ -765,3 +769,4 @@ def Fetch(input, arg=None):
    gvd.UpdateVTKObjects()
    gvd.Update()   
    return gvd.GetOutput()
+
