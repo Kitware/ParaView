@@ -267,6 +267,7 @@ bool pqPlotViewModule::saveImage(int width, int height,
   return grabbedPixMap.save(filename);
 }
 
+//-----------------------------------------------------------------------------
 bool pqPlotViewModule::canDisplaySource(pqPipelineSource* source) const
 {
   if(!source || 

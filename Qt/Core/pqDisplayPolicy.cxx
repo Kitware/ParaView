@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqDisplayPolicy.h"
 
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSMAbstractViewModuleProxy.h"
@@ -42,9 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqConsumerDisplay.h"
-#include "pqGenericViewModule.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineSource.h"
+#include "pqPlotViewModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 
@@ -89,6 +91,41 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
   vtkPVXMLElement* viewElement = hints? 
     hints->FindNestedElementByName("View") : 0;
   const char* view_type = viewElement? viewElement->GetAttribute("type") : 0;
+  QString temp_type;
+
+  if (!view_type)
+    {
+    // The proxy gives us no hint. In that case we try to determine the
+    // preferred view by looking at the output from the source.
+    vtkPVDataInformation* datainfo = source->getDataInformation();
+    if (datainfo && datainfo->GetDataClassName() == QString("vtkRectilinearGrid"))
+      {
+      int extent[6];
+      datainfo->GetExtent(extent);
+      int non_zero_dims = 0;
+      for (int cc=0; cc < 3; cc++)
+        {
+        non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
+        }
+
+      vtkPVDataSetAttributesInformation* cellDataInfo =
+        datainfo->GetCellDataInformation();
+      vtkPVDataSetAttributesInformation* pointDataInfo =
+        datainfo->GetPointDataInformation();
+      if (non_zero_dims == 1 && cellDataInfo->GetNumberOfArrays() > 0)
+        {
+        // Has cell data, mostlikely this is a histogram.
+        temp_type = pqPlotViewModule::barChartType();
+        view_type = temp_type.toAscii().data();
+        }
+      else if (non_zero_dims == 1 && pointDataInfo->GetNumberOfArrays() > 0)
+        {
+        // No cell data, but some point data -- may be a XY line plot.
+        temp_type = pqPlotViewModule::XYPlotType();
+        view_type = temp_type.toAscii().data();
+        }
+      }
+    }
   if (view_type)
     {
     QString proxy_name = view_type;
@@ -185,7 +222,8 @@ pqConsumerDisplay* pqDisplayPolicy::setDisplayVisibility(
     }
   if (view)
     {
-    display = pqApplicationCore::instance()->getPipelineBuilder()->createDisplay(source, view);
+    display = pqApplicationCore::instance()->
+      getPipelineBuilder()->createDisplay(source, view);
     display->setVisible(visible);
     }
   return display;
