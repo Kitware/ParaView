@@ -64,7 +64,7 @@ public:
   virtual vtkSMProxy* newDisplayProxy(pqPipelineSource* source,
     pqGenericViewModule* view) const;
 
-  /// Returns a new display for thethe given (source,view) pair, or NULL 
+  /// Returns a new display for the given (source,view) pair, or NULL 
   /// on failure. If the \c view is not a preferred view to display the source
   /// this method will attempt to create a new view of the preferred type
   /// and create a display for that view. In other words, the argument \c view
@@ -79,10 +79,8 @@ public:
   ///     <ul>
   ///     <li>If \c view is of preferred type, we added display to \c view itself.
   ///     </li>
-  ///     <li>If \c view is not of preferred type, we check if a view of
-  ///         the preferred type exists. 
-  ///         If not, then alone we create a a new view of the preferred type.
-  ///         Otherwise the display is added to the current \c view itself, if possible.
+  ///     <li>If \c view is not of preferred type, 
+  ///         we create a a new view of the preferred type.
   ///     </li>
   ///     </ul>
   /// </li>
