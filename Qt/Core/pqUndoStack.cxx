@@ -120,26 +120,26 @@ void pqUndoStack::addToActiveUndoSet(vtkUndoElement* element)
 //-----------------------------------------------------------------------------
 void pqUndoStack::onStackChanged()
 {
-  bool canUndo = false;
-  bool canRedo = false;
-  QString undoLabel;
-  QString redoLabel;
+  bool can_undo = false;
+  bool can_redo = false;
+  QString undo_label;
+  QString redo_label;
   if (this->Implementation->UndoStack->CanUndo())
     {
-    canUndo = true;
-    undoLabel = this->Implementation->UndoStack->GetUndoSetLabel(0);
+    can_undo = true;
+    undo_label = this->Implementation->UndoStack->GetUndoSetLabel(0);
     }
   if (this->Implementation->UndoStack->CanRedo())
     {
-    canRedo = true;
-    redoLabel = this->Implementation->UndoStack->GetRedoSetLabel(0);
+    can_redo = true;
+    redo_label = this->Implementation->UndoStack->GetRedoSetLabel(0);
     }
     
-  emit this->stackChanged(canUndo, undoLabel, canRedo, redoLabel);
-  emit this->canUndoChanged(canUndo);
-  emit this->canRedoChanged(canRedo);
-  emit this->undoLabelChanged(undoLabel);
-  emit this->redoLabelChanged(redoLabel);
+  emit this->stackChanged(can_undo, undo_label, can_redo, redo_label);
+  emit this->canUndoChanged(can_undo);
+  emit this->canRedoChanged(can_redo);
+  emit this->undoLabelChanged(undo_label);
+  emit this->redoLabelChanged(redo_label);
 }
 
 //-----------------------------------------------------------------------------
