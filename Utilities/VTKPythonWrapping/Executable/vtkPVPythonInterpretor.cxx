@@ -75,16 +75,19 @@ static void vtkPythonAppInitPrependPythonPath(const char* dir)
 static void vtkPythonAppInitPrependPath(const char* self_dir)
 {
   // Try to put the VTK python module location in sys.path.
-  vtkstd::string package_dir = self_dir;
+  vtkstd::string pkg_prefix = self_dir;
 #if defined(CMAKE_INTDIR)
-  package_dir += "/..";
+  pkg_prefix += "/..";
 #endif
-#if defined (__APPLE__)
-  package_dir += "/../../../../Utilities/VTKPythonWrapping";
-#else
-  package_dir += "/../Utilities/VTKPythonWrapping";
-#endif
+  vtkstd::string package_dir;
+  package_dir = pkg_prefix + "/../Utilities/VTKPythonWrapping";
   package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
+  if (!vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
+    {
+    // This is the right path for app bundles on OS X
+    package_dir = pkg_prefix + "/../../../../Utilities/VTKPythonWrapping";
+    package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
+    }
   if(vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
     {
     // This executable is running from the build tree.  Prepend the
@@ -184,7 +187,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.10");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.11");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
