@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxy.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMVectorProperty.h"
 
@@ -621,8 +621,10 @@ void pqAnimationPanel::buildPropertyList(vtkSMProxy* proxy,
   // proxy lists.
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-    vtkSMProperty* smproperty = iter->GetProperty();
-    if (pqSMAdaptor::getPropertyType(smproperty) == pqSMAdaptor::PROXYSELECTION)
+    vtkSMProxyProperty* smproperty = 
+      vtkSMProxyProperty::SafeDownCast(iter->GetProperty());
+    if (smproperty && 
+      pqSMAdaptor::getPropertyType(smproperty) == pqSMAdaptor::PROXYSELECTION)
       {
       vtkSMProxy* child_proxy = pqSMAdaptor::getProxyProperty(smproperty);
       QString newPrefix = labelPrefix.isEmpty()? "" : labelPrefix + ":";
