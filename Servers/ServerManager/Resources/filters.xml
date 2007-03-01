@@ -974,7 +974,8 @@ This filter only operates on unstructured data. It produces polygonal output.
 
 <!-- For the below property, you also need a way to say, "Don't clip. -->
 
-     <ProxyProperty name="ClipPlane" command="SetClipPlane">
+     <ProxyProperty name="ClipPlane" command="SetClipPlane"
+        label="Clip Type">
            <ProxyGroupDomain name="groups">
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
@@ -3240,7 +3241,8 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
           </Documentation>
      </InputProperty>
 
-     <ProxyProperty name="CutFunction" command="SetCutFunction">
+     <ProxyProperty name="CutFunction" command="SetCutFunction"
+        label="Cut Type">
            <ProxyGroupDomain name="groups">
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
@@ -3314,7 +3316,8 @@ This filter operates on all types of data sets, and it returns unstructured grid
           </Documentation>
      </InputProperty>
 
-     <ProxyProperty name="ClipFunction" command="SetClipFunction">
+     <ProxyProperty name="ClipFunction" command="SetClipFunction"
+        label="Clip Type">
            <ProxyGroupDomain name="groups">
                <Group name="implicit_functions"/>
            </ProxyGroupDomain>
@@ -3636,7 +3639,8 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
 
      <InputProperty
         name="Source"
-        command="SetSourceConnection">
+        command="SetSourceConnection"
+        label="Glyph Type">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="glyph_sources" />
@@ -4008,7 +4012,8 @@ The Probe filter operates on any type of data and produces polygonal output (a p
 
      <InputProperty
         name="Source"
-        command="SetInputConnection">
+        command="SetInputConnection"
+        label="Probe Type">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
@@ -4155,7 +4160,8 @@ This filter operates on any type of data set, provided it has point-centered vec
 
      <InputProperty
         name="Source"
-        command="SetSourceConnection">
+        command="SetSourceConnection"
+        label="Seed Type">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
@@ -4502,7 +4508,8 @@ This filter operates on all types of data sets, and it returns unstructured grid
           </Documentation>
      </InputProperty>
 
-     <ProxyProperty name="ClipFunction" command="SetClipFunction">
+     <ProxyProperty name="ClipFunction" command="SetClipFunction"
+        label="Clip Type">
            <ProxyGroupDomain name="groups">
                <Group name="implicit_functions"/>
            </ProxyGroupDomain>
@@ -4665,7 +4672,8 @@ The Generic Cut filter takes a generic dataset as input. Use the Input menu to c
           </Documentation>
      </InputProperty>
 
-     <ProxyProperty name="CutFunction" command="SetCutFunction">
+     <ProxyProperty name="CutFunction" command="SetCutFunction"
+        label="Cut Type">
            <ProxyGroupDomain name="groups">
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
@@ -5579,7 +5587,8 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
           </Documentation>
      </InputProperty>
 
-     <ProxyProperty name="CutFunction" command="SetCutFunction">
+     <ProxyProperty name="CutFunction" command="SetCutFunction"
+        label="Cut Type">
            <ProxyGroupDomain name="groups">
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
