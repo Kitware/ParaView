@@ -179,21 +179,22 @@ MainWindow::MainWindow() :
     SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));  
 
   connect(this->Implementation->UI.actionEditUndo,
-    SIGNAL(triggered()), pqApplicationCore::instance()->getUndoStack(), SLOT(Undo()));
+    SIGNAL(triggered()), pqApplicationCore::instance()->getUndoStack(), SLOT(undo()));
   connect(pqApplicationCore::instance()->getUndoStack(),
-    SIGNAL(CanUndoChanged(bool)), this->Implementation->UI.actionEditUndo, SLOT(setEnabled(bool)));
+    SIGNAL(canUndoChanged(bool)), 
+    this->Implementation->UI.actionEditUndo, SLOT(setEnabled(bool)));
   connect(pqApplicationCore::instance()->getUndoStack(),
-    SIGNAL(UndoLabelChanged(const QString&)), this, SLOT(onUndoLabel(const QString&)));
+    SIGNAL(undoLabelChanged(const QString&)), this, SLOT(onUndoLabel(const QString&)));
 
   connect(this->Implementation->UI.actionEditSettings,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEditSettings()));
     
   connect(this->Implementation->UI.actionEditRedo,
-    SIGNAL(triggered()), pqApplicationCore::instance()->getUndoStack(), SLOT(Redo()));
+    SIGNAL(triggered()), pqApplicationCore::instance()->getUndoStack(), SLOT(redo()));
   connect(pqApplicationCore::instance()->getUndoStack(),
-    SIGNAL(CanRedoChanged(bool)), this->Implementation->UI.actionEditRedo, SLOT(setEnabled(bool)));
+    SIGNAL(canRedoChanged(bool)), this->Implementation->UI.actionEditRedo, SLOT(setEnabled(bool)));
   connect(pqApplicationCore::instance()->getUndoStack(),
-    SIGNAL(RedoLabelChanged(const QString&)), this, SLOT(onRedoLabel(const QString&)));
+    SIGNAL(redoLabelChanged(const QString&)), this, SLOT(onRedoLabel(const QString&)));
 
   connect(this->Implementation->UI.actionEditCameraUndo,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEditCameraUndo()));
@@ -624,11 +625,11 @@ MainWindow::MainWindow() :
   this->Implementation->Core.initializeStates();
   
   this->Implementation->UI.actionEditUndo->setEnabled(
-    pqApplicationCore::instance()->getUndoStack()->CanUndo());
+    pqApplicationCore::instance()->getUndoStack()->canUndo());
   this->Implementation->UI.actionEditRedo->setEnabled(
-    pqApplicationCore::instance()->getUndoStack()->CanRedo());
-  this->onUndoLabel(pqApplicationCore::instance()->getUndoStack()->UndoLabel());
-  this->onRedoLabel(pqApplicationCore::instance()->getUndoStack()->RedoLabel());
+    pqApplicationCore::instance()->getUndoStack()->canRedo());
+  this->onUndoLabel(pqApplicationCore::instance()->getUndoStack()->undoLabel());
+  this->onRedoLabel(pqApplicationCore::instance()->getUndoStack()->redoLabel());
 
   // Set up scalar bar visibility tool bar item.
   pqScalarBarVisibilityAdaptor* sbva = new pqScalarBarVisibilityAdaptor(

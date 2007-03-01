@@ -478,7 +478,7 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     }
 
   // Clear undo stack.
-  this->Internal->UndoStack->Clear();
+  this->Internal->UndoStack->clear();
 
   if (pqLoader)
     {
@@ -691,7 +691,7 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
     return NULL;
     }
 
-  this->getUndoStack()->BeginUndoSet(QString("Create ") + xmlname);
+  this->getUndoStack()->beginUndoSet(QString("Create ") + xmlname);
 
   pqPipelineSource* filter = this->getPipelineBuilder()->createSource(
     "filters", xmlname.toAscii().data(), input->getServer());
@@ -753,7 +753,7 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
     }
 
   emit this->finishSourceCreation(filter);
-  this->getUndoStack()->EndUndoSet();
+  this->getUndoStack()->endUndoSet();
   emit this->finishedAddingSource(filter);
   return filter;
 }
@@ -768,14 +768,14 @@ pqPipelineSource* pqApplicationCore::createSourceOnServer(const QString& xmlname
     return 0;
     }
 
-  this->getUndoStack()->BeginUndoSet(QString("Create ") + xmlname);
+  this->getUndoStack()->beginUndoSet(QString("Create ") + xmlname);
 
   pqPipelineSource* source = this->getPipelineBuilder()->createSource(
     "sources", xmlname.toAscii().data(), server);
   source->setDefaultValues();
 
   emit this->finishSourceCreation(source);
-  this->getUndoStack()->EndUndoSet();
+  this->getUndoStack()->endUndoSet();
   
   emit this->finishedAddingSource(source);
   return source;
@@ -786,7 +786,7 @@ pqPipelineSource* pqApplicationCore::createCompoundFilter(
                          pqServer* server,
                          pqPipelineSource* input)
 {
-  this->getUndoStack()->BeginUndoSet(QString("Create ") + name);
+  this->getUndoStack()->beginUndoSet(QString("Create ") + name);
 
   pqPipelineSource* source = this->getPipelineBuilder()->createSource(
     NULL, name.toAscii().data(), server);
@@ -816,7 +816,7 @@ pqPipelineSource* pqApplicationCore::createCompoundFilter(
     }
 
   emit this->finishSourceCreation(source);
-  this->getUndoStack()->EndUndoSet();
+  this->getUndoStack()->endUndoSet();
   emit this->finishedAddingSource(source);
   return source;
 }
@@ -839,7 +839,7 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
     return NULL; 
     }
   
-  this->getUndoStack()->BeginUndoSet(QString("Create reader for ") + filename);
+  this->getUndoStack()->beginUndoSet(QString("Create reader for ") + filename);
 
   if(whichReader == QString::null)
     {
@@ -850,7 +850,7 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
                                                                    server);
   if (!reader)
     {
-    this->getUndoStack()->EndUndoSet();
+    this->getUndoStack()->endUndoSet();
     return NULL;
     }
 
@@ -902,7 +902,7 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
     vtksys::SystemTools::GetFilenameName(filename.toAscii().data()).c_str());
 
   emit this->finishSourceCreation(reader);
-  this->getUndoStack()->EndUndoSet();
+  this->getUndoStack()->endUndoSet();
   emit this->finishedAddingSource(reader);
   return reader;
 }

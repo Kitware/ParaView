@@ -73,8 +73,7 @@ pqUndoStack::pqUndoStack(bool clientOnly, QObject* _parent/*=null*/)
 
   this->Implementation->VTKConnector = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->Implementation->VTKConnector->Connect(this->Implementation->UndoStack,
-    vtkCommand::ModifiedEvent, this, SLOT(onStackChanged(vtkObject*, 
-        unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
+    vtkCommand::ModifiedEvent, this, SLOT(onStackChanged()), NULL, 1.0);
   this->Implementation->Server = NULL;
 }
 
@@ -85,25 +84,27 @@ pqUndoStack::~pqUndoStack()
 }
 
 //-----------------------------------------------------------------------------
-bool pqUndoStack::CanUndo()
+bool pqUndoStack::canUndo()
 {
   return this->Implementation->UndoStack->CanUndo();
 }
 
 //-----------------------------------------------------------------------------
-bool pqUndoStack::CanRedo()
+bool pqUndoStack::canRedo()
 {
   return this->Implementation->UndoStack->CanRedo();
 }
 
-const QString pqUndoStack::UndoLabel()
+//-----------------------------------------------------------------------------
+const QString pqUndoStack::undoLabel()
 {
   return this->Implementation->UndoStack->CanUndo() ?
     this->Implementation->UndoStack->GetUndoSetLabel(0) :
     QString();
 }
 
-const QString pqUndoStack::RedoLabel()
+//-----------------------------------------------------------------------------
+const QString pqUndoStack::redoLabel()
 {
   return this->Implementation->UndoStack->CanRedo() ?
     this->Implementation->UndoStack->GetRedoSetLabel(0) :
@@ -111,14 +112,13 @@ const QString pqUndoStack::RedoLabel()
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStack::AddToActiveUndoSet(vtkUndoElement* element)
+void pqUndoStack::addToActiveUndoSet(vtkUndoElement* element)
 {
   this->Implementation->UndoStack->AddToActiveUndoSet(element);
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStack::onStackChanged(vtkObject*, unsigned long, void*, 
-    void*,  vtkCommand*)
+void pqUndoStack::onStackChanged()
 {
   bool canUndo = false;
   bool canRedo = false;
@@ -135,15 +135,15 @@ void pqUndoStack::onStackChanged(vtkObject*, unsigned long, void*,
     redoLabel = this->Implementation->UndoStack->GetRedoSetLabel(0);
     }
     
-  emit this->StackChanged(canUndo, undoLabel, canRedo, redoLabel);
-  emit this->CanUndoChanged(canUndo);
-  emit this->CanRedoChanged(canRedo);
-  emit this->UndoLabelChanged(undoLabel);
-  emit this->RedoLabelChanged(redoLabel);
+  emit this->stackChanged(canUndo, undoLabel, canRedo, redoLabel);
+  emit this->canUndoChanged(canUndo);
+  emit this->canRedoChanged(canRedo);
+  emit this->undoLabelChanged(undoLabel);
+  emit this->redoLabelChanged(redoLabel);
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStack::BeginUndoSet(QString label)
+void pqUndoStack::beginUndoSet(QString label)
 {
   if (!this->Implementation->Server)
     {
@@ -162,11 +162,11 @@ void pqUndoStack::BeginUndoSet(QString label)
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStack::EndUndoSet()
+void pqUndoStack::endUndoSet()
 {
   if(this->Implementation->NestedCount == 0)
     {
-    qDebug() << "EndUndoSet called without a BeginUndoSet.";
+    qDebug() << "endUndoSet called without a beginUndoSet.";
     return;
     }
 
@@ -178,24 +178,24 @@ void pqUndoStack::EndUndoSet()
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStack::Accept()
+void pqUndoStack::accept()
 {
-  this->BeginUndoSet("Accept");
+  this->beginUndoSet("Accept");
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStack::Reset()
+void pqUndoStack::reset()
 {
   this->Implementation->UndoStack->CancelUndoSet();
   if(this->Implementation->NestedCount != 0)
     {
-    qDebug() << "Reset called without a closing EndUndoSet.";
+    qDebug() << "Reset called without a closing endUndoSet.";
     }
   this->Implementation->NestedCount = 0;
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStack::Undo()
+void pqUndoStack::undo()
 {
   this->Implementation->UndoStack->Undo();
   // Update of proxies have to happen in order.
@@ -203,11 +203,11 @@ void pqUndoStack::Undo()
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("displays", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
   pqApplicationCore::instance()->render();
-  emit this->Undone();
+  emit this->undone();
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStack::Redo()
+void pqUndoStack::redo()
 {
   this->Implementation->UndoStack->Redo();
   // Update of proxies have to happen in order.
@@ -215,15 +215,16 @@ void pqUndoStack::Redo()
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("displays", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
   pqApplicationCore::instance()->render();
-  emit this->Redone();
+  emit this->redone();
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStack::Clear()
+void pqUndoStack::clear()
 {
   this->Implementation->UndoStack->Clear();
 }
   
+//-----------------------------------------------------------------------------
 void pqUndoStack::setActiveServer(pqServer* server)
 {
   this->Implementation->Server = server;

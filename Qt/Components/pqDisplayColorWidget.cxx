@@ -201,7 +201,7 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
     // I cannot decide if we should use signals here of directly 
     // call the appropriate methods on undo stack.
     pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-    stack->BeginUndoSet("Color Change");
+    stack->beginUndoSet("Color Change");
     switch(type)
       {
     case VARIABLE_TYPE_NONE:
@@ -216,7 +216,7 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
         vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
       break;
       }
-    stack->EndUndoSet();
+    stack->endUndoSet();
     display->renderAllViews();
     }
 }

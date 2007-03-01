@@ -127,7 +127,7 @@ void pqPipelineBuilder::addConnection(pqPipelineSource* source,
 
   if (this->UndoStack)
     {
-    this->UndoStack->BeginUndoSet(QString("Add Connection"));
+    this->UndoStack->beginUndoSet(QString("Add Connection"));
     }
 
   vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
@@ -152,7 +152,7 @@ void pqPipelineBuilder::addConnection(pqPipelineSource* source,
 
   if (this->UndoStack)
     {
-    this->UndoStack->EndUndoSet();
+    this->UndoStack->endUndoSet();
     }
 }
 
@@ -191,7 +191,7 @@ void pqPipelineBuilder::removeConnection(pqPipelineSource* pqsource,
 
   if (this->UndoStack)
     {
-    this->UndoStack->BeginUndoSet(QString("Remove Connection"));
+    this->UndoStack->beginUndoSet(QString("Remove Connection"));
     }
 
   vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
@@ -204,7 +204,7 @@ void pqPipelineBuilder::removeConnection(pqPipelineSource* pqsource,
 
   if (this->UndoStack)
     {
-    this->UndoStack->EndUndoSet();
+    this->UndoStack->endUndoSet();
     }
 }
 
@@ -246,7 +246,7 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
   if (this->UndoStack && is_undoable)
     {
     QString label = QString("Create %1").arg(xmlname);
-    this->UndoStack->BeginUndoSet(label);
+    this->UndoStack->beginUndoSet(label);
     }
 
   QString name = QString("%1%2");
@@ -258,7 +258,7 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
 
   if (this->UndoStack && is_undoable)
     {
-    this->UndoStack->EndUndoSet();
+    this->UndoStack->endUndoSet();
     }
   return proxy;
 }
@@ -293,14 +293,14 @@ pqConsumerDisplay* pqPipelineBuilder::createDisplay(pqPipelineSource* src,
     {
     QString label("Display %1");
     label = label.arg(proxy->GetXMLName()?  proxy->GetXMLName() : "" );
-    this->UndoStack->BeginUndoSet(label);
+    this->UndoStack->beginUndoSet(label);
     }
   pqConsumerDisplay* display = 
     this->createDisplayProxyInternal(src , viewModule);
 
   if (this->UndoStack)
     {
-    this->UndoStack->EndUndoSet();
+    this->UndoStack->endUndoSet();
     }
 
   return display;
@@ -378,14 +378,14 @@ void pqPipelineBuilder::remove(pqPipelineDisplay* display,
 {
   if (is_undoable && this->UndoStack)
     {
-    this->UndoStack->BeginUndoSet(QString("Remove Display"));
+    this->UndoStack->beginUndoSet(QString("Remove Display"));
     }
 
   this->removeInternal(display);
 
   if (is_undoable && this->UndoStack)
     {
-    this->UndoStack->EndUndoSet();
+    this->UndoStack->endUndoSet();
     }
 }
 
@@ -407,7 +407,7 @@ void pqPipelineBuilder::remove(pqPipelineSource* source,
 
   if (this->UndoStack && is_undoable)
     {
-    this->UndoStack->BeginUndoSet(QString("Remove Source"));
+    this->UndoStack->beginUndoSet(QString("Remove Source"));
     }
 
 
@@ -440,7 +440,7 @@ void pqPipelineBuilder::remove(pqPipelineSource* source,
 
   if (this->UndoStack && is_undoable)
     {
-    this->UndoStack->EndUndoSet();
+    this->UndoStack->endUndoSet();
     }
 }
 
@@ -449,7 +449,7 @@ void pqPipelineBuilder::remove(pqProxy* proxy, bool is_undoable)
 {
   if (this->UndoStack && is_undoable)
     {
-    this->UndoStack->BeginUndoSet(QString("Remove proxy"));
+    this->UndoStack->beginUndoSet(QString("Remove proxy"));
     }
 
   vtkSMProxyManager::GetProxyManager()->UnRegisterProxy(
@@ -459,7 +459,7 @@ void pqPipelineBuilder::remove(pqProxy* proxy, bool is_undoable)
 
   if (this->UndoStack && is_undoable)
     {
-    this->UndoStack->EndUndoSet();
+    this->UndoStack->endUndoSet();
     }
 }
 
@@ -646,7 +646,7 @@ pqScalarBarDisplay* pqPipelineBuilder::createScalarBar(pqScalarsToColors *lut,
 
   if (this->UndoStack)
     {
-    this->UndoStack->BeginUndoSet("Create ScalarBar");
+    this->UndoStack->beginUndoSet("Create ScalarBar");
     }
   pqServer* server = (lut? lut->getServer() : renModule->getServer());
   vtkSMProxy* scalarBarProxy = this->createProxy("displays", "ScalarBarWidget",
@@ -673,7 +673,7 @@ pqScalarBarDisplay* pqPipelineBuilder::createScalarBar(pqScalarsToColors *lut,
 
   if (this->UndoStack)
     {
-    this->UndoStack->EndUndoSet();
+    this->UndoStack->endUndoSet();
     } 
   return scalarBar;
 }

@@ -333,12 +333,12 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
 
     pqUndoStack* stack = view->getInteractionUndoStack();
     QObject::connect(frame->BackButton, SIGNAL(pressed()), 
-      stack, SLOT(Undo()));
+      stack, SLOT(undo()));
     QObject::connect(frame->ForwardButton, SIGNAL(pressed()),
-      stack, SLOT(Redo()));
-    QObject::connect(stack, SIGNAL(CanUndoChanged(bool)),
+      stack, SLOT(redo()));
+    QObject::connect(stack, SIGNAL(canUndoChanged(bool)),
       frame->BackButton, SLOT(setEnabled(bool)));
-    QObject::connect(stack, SIGNAL(CanRedoChanged(bool)),
+    QObject::connect(stack, SIGNAL(canRedoChanged(bool)),
       frame->ForwardButton, SLOT(setEnabled(bool)));
     }
   else

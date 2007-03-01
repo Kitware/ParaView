@@ -36,9 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class pqUndoStackImplementation;
-class vtkCommand;
-class vtkObject;
-class vtkSMUndoStack;
 class vtkUndoElement;
 class pqServer;
 
@@ -53,16 +50,22 @@ public:
   pqUndoStack(bool clientOnly, QObject* parent=NULL);
   virtual ~pqUndoStack();
 
-  bool CanUndo();
-  bool CanRedo();
-  const QString UndoLabel();
-  const QString RedoLabel();
+  /// returns if it's possible to undo.
+  bool canUndo();
 
-  // Description:
-  // One can add arbritary elements to the active undo set.
-  // If no ActiveUndoSet is present, an error will be raised. It is essential
-  // that the StateLoader can handle the arbritary undo elements.
-  void AddToActiveUndoSet(vtkUndoElement* element);
+  /// returns if it's possible to redo.
+  bool canRedo();
+
+  /// returns the undo label.
+  const QString undoLabel();
+
+  /// returns the redo label.
+  const QString redoLabel();
+
+  /// One can add arbritary elements to the active undo set.
+  /// If no ActiveUndoSet is present, an error will be raised. It is essential
+  /// that the StateLoader can handle the arbritary undo elements.
+  void addToActiveUndoSet(vtkUndoElement* element);
 
 public slots:
   /// NOTE: Notice that the BeginOrContinueUndoSet doesn;t take
@@ -72,36 +75,35 @@ public slots:
   /// 2)  Once we start supporting multiple connections vtkSMUndoStack()
   ///     will support UndoSet with elements on multiple connections
   ///     transparently.
-  void BeginUndoSet(QString label);
-  void EndUndoSet();
-  void Accept();
-  void Reset();
-  void Undo();
-  void Redo();
-  void Clear();
+  void beginUndoSet(QString label);
+  void endUndoSet();
+  void accept();
+  void reset();
+  void undo();
+  void redo();
+  void clear();
 
 signals:
   /// Fired to notify interested parites that the stack has changed.
   /// Has information to know the status of the top of the stack.
-  void StackChanged(bool canUndo, QString undoLabel, 
+  void stackChanged(bool canUndo, QString undoLabel, 
     bool canRedo, QString redoLabel);
     
-  void CanUndoChanged(bool);
-  void CanRedoChanged(bool);
-  void UndoLabelChanged(const QString&);
-  void RedoLabelChanged(const QString&);
+  void canUndoChanged(bool);
+  void canRedoChanged(bool);
+  void undoLabelChanged(const QString&);
+  void redoLabelChanged(const QString&);
   
   // Fired after undo.
-  void Undone();
+  void undone();
   // Fired after redo.
-  void Redone();
+  void redone();
  
 public slots: 
   void setActiveServer(pqServer* server);  // TODO remove this
 
 private slots:
-  void onStackChanged(vtkObject*, unsigned long, void*, 
-    void*,  vtkCommand*);
+  void onStackChanged();
 
 
 private:

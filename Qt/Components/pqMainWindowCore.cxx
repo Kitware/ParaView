@@ -559,7 +559,7 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
     object_inspector,
     SIGNAL(preaccept()),
     undoStack,
-    SLOT(Accept()));
+    SLOT(accept()));
     
   QObject::connect(
     object_inspector,
@@ -571,7 +571,7 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
     object_inspector, 
     SIGNAL(postaccept()),
     undoStack,
-    SLOT(EndUndoSet()));
+    SLOT(endUndoSet()));
 
   QObject::connect(
     object_inspector,
@@ -623,7 +623,7 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
     object_inspector,
     SIGNAL(preaccept()),
     undoStack,
-    SLOT(Accept()));
+    SLOT(accept()));
     
   QObject::connect(
     object_inspector,
@@ -635,7 +635,7 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
     object_inspector, 
     SIGNAL(postaccept()),
     undoStack,
-    SLOT(EndUndoSet()));
+    SLOT(endUndoSet()));
 
   QObject::connect(
     object_inspector,
@@ -687,13 +687,13 @@ void pqMainWindowCore::setupStatisticsView(QDockWidget* dock_widget)
   // hence we must refresh the data on undo/redo.
   QObject::connect(
     undo_stack,
-    SIGNAL(Undone()),
+    SIGNAL(undone()),
     statistics_view,
     SLOT(refreshData()));
     
   QObject::connect(
     undo_stack,
-    SIGNAL(Redone()),
+    SIGNAL(redone()),
     statistics_view,
     SLOT(refreshData()));
 
@@ -800,9 +800,9 @@ void pqMainWindowCore::setupAnimationPanel(QDockWidget* dock_widget)
     &this->VCRController(), SLOT(setAnimationScene(pqAnimationScene*)));
 
   QObject::connect(panel, SIGNAL(beginUndoSet(const QString&)),
-    undoStack, SLOT(BeginUndoSet(QString)));
+    undoStack, SLOT(beginUndoSet(QString)));
   QObject::connect(panel, SIGNAL(endUndoSet()),
-    undoStack, SLOT(EndUndoSet()));
+    undoStack, SLOT(endUndoSet()));
   
   panel->setManager(mgr);
   dock_widget->setWidget(panel);
@@ -1415,7 +1415,7 @@ void pqMainWindowCore::onEditCameraUndo()
     return;
     }
   pqUndoStack* stack = view->getInteractionUndoStack();
-  stack->Undo();
+  stack->undo();
   view->render();
 }
 
@@ -1430,7 +1430,7 @@ void pqMainWindowCore::onEditCameraRedo()
     return;
     }
   pqUndoStack* stack = view->getInteractionUndoStack();
-  stack->Redo();
+  stack->redo();
   view->render();
 }
 
@@ -2073,7 +2073,7 @@ void pqMainWindowCore::onActiveViewChanged(pqGenericViewModule *view)
     {
     // Make sure the render module undo stack is connected.
     this->connect(renderModule->getInteractionUndoStack(),
-        SIGNAL(StackChanged(bool, QString, bool, QString)),
+        SIGNAL(stackChanged(bool, QString, bool, QString)),
         this, SLOT(onActiveViewUndoChanged()));
     }
 }
@@ -2152,12 +2152,12 @@ void pqMainWindowCore::updateViewUndoRedo(pqRenderViewModule *renderModule)
   if(renderModule)
     {
     pqUndoStack* const stack = renderModule->getInteractionUndoStack();
-    if (stack && stack->CanUndo())
+    if (stack && stack->canUndo())
       {
       can_undo_camera = true;
       undo_camera_label = "Interaction";
       }
-    if (stack && stack->CanRedo())
+    if (stack && stack->canRedo())
       {
       can_redo_camera = true;
       redo_camera_label = "Interaction";

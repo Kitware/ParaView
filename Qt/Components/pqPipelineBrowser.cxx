@@ -372,7 +372,7 @@ void pqPipelineBrowser::changeInput()
       pqPipelineBuilder *builder =
           pqApplicationCore::instance()->getPipelineBuilder();
       pqUndoStack *undo = pqApplicationCore::instance()->getUndoStack();
-      undo->BeginUndoSet(QString("Change Input"));
+      undo->beginUndoSet(QString("Change Input"));
       for(iter = toRemove.begin(); iter != toRemove.end(); ++iter)
         {
         source = smModel->getPQSource(*iter);
@@ -386,7 +386,7 @@ void pqPipelineBrowser::changeInput()
         builder->addConnection(source, filter);
         }
 
-      undo->EndUndoSet();
+      undo->endUndoSet();
       }
 
     delete model;

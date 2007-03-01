@@ -703,9 +703,9 @@ void pqSelectionManager::prepareForSelection()
   // (such as update of client displays etc).
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  core->getUndoStack()->BeginUndoSet("Selection");
+  core->getUndoStack()->beginUndoSet("Selection");
   this->setActiveSelection(connId, sourceSelection); 
-  core->getUndoStack()->EndUndoSet();
+  core->getUndoStack()->endUndoSet();
   sourceSelection->Delete();
 
   // Let the world know that the user has marked a selection.

@@ -405,7 +405,7 @@ void pqRenderViewModule::startInteraction()
   
   // NOTE: bewary of the server used while calling
   // BeginOrContinueUndoSet on vtkSMUndoStack.
-  this->Internal->UndoStack->BeginUndoSet("Interaction");
+  this->Internal->UndoStack->beginUndoSet("Interaction");
 
   vtkPVGenericRenderWindowInteractor* iren =
     vtkPVGenericRenderWindowInteractor::SafeDownCast(
@@ -421,7 +421,7 @@ void pqRenderViewModule::startInteraction()
 void pqRenderViewModule::endInteraction()
 {
   this->Internal->RenderModuleProxy->SynchronizeCameraProperties();
-  this->Internal->UndoStack->EndUndoSet();
+  this->Internal->UndoStack->endUndoSet();
 
   vtkPVGenericRenderWindowInteractor* iren =
     vtkPVGenericRenderWindowInteractor::SafeDownCast(

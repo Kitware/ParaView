@@ -86,7 +86,7 @@ void pqPendingDisplayManager::addPendingDisplayForSource(pqPipelineSource* s)
 
   pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
   elem->PendingDisplay(s, true);
-  pqApplicationCore::instance()->getUndoStack()->AddToActiveUndoSet(elem);
+  pqApplicationCore::instance()->getUndoStack()->addToActiveUndoSet(elem);
   elem->Delete();
 }
 
@@ -176,7 +176,7 @@ void pqPendingDisplayManager::createPendingDisplays(
     // a source pending a display.
     pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
     elem->PendingDisplay(source, false);
-    pqApplicationCore::instance()->getUndoStack()->AddToActiveUndoSet(elem);
+    pqApplicationCore::instance()->getUndoStack()->addToActiveUndoSet(elem);
     elem->Delete();
     }
 
