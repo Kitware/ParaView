@@ -228,6 +228,11 @@ protected:
   // Check is cache size is within limit.
   bool CheckCacheSizeWithinLimit();
 
+  // Description:
+  // Called on every vtkCommand::InteractionEvent received
+  // from the interactor. Updates the camera's info properties. 
+  void OnInteractionEvent();
+
   // Collection of props added to the renderer.
   vtkCollection* RendererProps; 
 

@@ -253,7 +253,7 @@
     </Proxy>
   </ProxyGroup>
   <ProxyGroup name="camera">
-    <Proxy name="Camera" class="vtkCamera">
+    <CameraProxy name="Camera" class="vtkCamera">
       <DoubleVectorProperty
         name="CameraPositionInfo"
         command="GetPosition"
@@ -376,7 +376,7 @@
         default_values="2.0">
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
-    </Proxy> <!-- end of Camera Proxy -->
+    </CameraProxy> <!-- end of Camera Proxy -->
   </ProxyGroup>
     
   <ProxyGroup name="renderwindow">

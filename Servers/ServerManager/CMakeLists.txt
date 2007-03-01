@@ -32,8 +32,9 @@ SET(Kit_SRCS
   vtkSMBoxProxy.cxx
   vtkSMBoxWidgetProxy.cxx
   vtkSMCameraKeyFrameProxy.cxx
-  vtkSMCameraManipulatorProxy.cxx
   vtkSMCameraLink.cxx
+  vtkSMCameraManipulatorProxy.cxx
+  vtkSMCameraProxy.cxx
   vtkSMCaveRenderModuleProxy.cxx
   vtkSMClientServerRenderModuleProxy.cxx
   vtkSMComparativeVisProxy.cxx

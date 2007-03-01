@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.2");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.3");
 vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------
@@ -100,6 +100,7 @@ void vtkPVGenericRenderWindowInteractor::Render()
   // This should fix the problem of the plane widget render 
   if (this->InteractiveRenderEnabled)
     {
+    this->InvokeEvent(vtkCommand::InteractionEvent);
     this->PVRenderView->Render();
     }
   else
