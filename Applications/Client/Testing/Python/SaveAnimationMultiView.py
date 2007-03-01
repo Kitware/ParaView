@@ -2,6 +2,7 @@
 
 import QtTesting
 import QtTestingImage
+import time
 
 object1 = 'MainWindow/menubar/menuFile'
 QtTesting.playCommand(object1, 'activate', 'actionServerConnect')
@@ -109,9 +110,9 @@ QtTesting.playCommand(object22, 'set_int', '800')
 object22 = 'Dialog/okButton'
 QtTesting.playCommand(object22, 'activate', '')
 
-QtTesting.wait(1000);
+time.sleep(2);
 objectPlayButton = 'MainWindow/VCRToolbar/1QToolButton2'
 while QtTesting.getProperty(objectPlayButton, "text") == 'Pause' :
-  QtTesting.wait(50)
+  time.sleep(3)
 
 QtTestingImage.compareImage('$PARAVIEW_TEST_ROOT/movie_test.0005.png', 'SaveAnimationMultiView.png');
