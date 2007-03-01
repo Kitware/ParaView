@@ -471,7 +471,11 @@ void pqAnimationPanel::onCurrentChanged(pqProxy* src)
     return;
     }
 
+  // clear property listing.
+  this->Internal->VTKConnect->Disconnect();
+  this->Internal->propertyName->clear();
   this->setActiveCue(0);
+
   this->Internal->CurrentProxy = src;
   if (!src)
     {
