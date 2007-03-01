@@ -144,6 +144,22 @@ QList<vtkSMProxy*> pqProxy::getInternalProxies(const QString& key) const
   return list;
 }
 
+//-----------------------------------------------------------------------------
+QList<vtkSMProxy*> pqProxy::getInternalProxies() const
+{
+  QList<vtkSMProxy*> list;
+
+  pqProxyInternal::ProxyListsType::iterator iter
+      = this->Internal->ProxyLists.begin();
+    for (;iter != this->Internal->ProxyLists.end(); ++iter)
+      {
+      foreach( vtkSMProxy* proxy, iter.value())
+        {
+        list.push_back(proxy);
+        }
+      }
+  return list;
+}
 
 //-----------------------------------------------------------------------------
 void pqProxy::clearInternalProxies()

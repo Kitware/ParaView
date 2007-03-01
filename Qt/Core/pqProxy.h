@@ -86,6 +86,9 @@ public:
   /// Returns a list of all the internal proxies added with a given key.
   QList<vtkSMProxy*> getInternalProxies(const QString& key) const;
 
+  /// Returns a list of all internal proxies.
+  QList<vtkSMProxy*> getInternalProxies() const;
+
   /// \brief
   ///   Gets whether or not the source has been modified.
   /// \return

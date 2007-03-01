@@ -42,6 +42,7 @@ class pqGenericViewModule;
 class pqPipelineSource;
 class pqProxy;
 class pqServerManagerModelItem;
+class vtkSMProxy;
 
 /// This is the Animation panel widget. It controls the behaviour
 /// of the Animation panel which includes adding of key frames,
@@ -133,9 +134,12 @@ protected slots:
   /// Called when the user presses the "Use Current" button
   /// when we reset the keyframe to use current camera.
   void resetCameraKeyFrameToCurrent();
-protected:
+
   // updates the "Property To Animate" list.
   void buildPropertyList();
+
+protected:
+  void buildPropertyList(vtkSMProxy* proxy, const QString& labelPrefix);
 
   /// Actual implementation for source changed.
   void onCurrentChanged(pqProxy*);

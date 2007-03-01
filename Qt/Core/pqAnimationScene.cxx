@@ -342,7 +342,6 @@ void pqAnimationScene::removeCues(vtkSMProxy* animated_proxy)
       }
     }
   vtkSMProxy* sceneProxy = this->getProxy();
-  pp->RemoveAllProxies();
   foreach (pqAnimationCue* cue, toRemove)
     {
     if (cue)
