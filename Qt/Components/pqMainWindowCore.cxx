@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 
 #include "pqActiveView.h"
+#include "pqActiveServer.h"
 #include "pqAnimationManager.h"
 #include "pqAnimationPanel.h"
 #include "pqApplicationCore.h"
@@ -225,6 +226,7 @@ public:
 #endif // PARAVIEW_EMBED_PYTHON
 
   pqCoreTestUtility TestUtility;
+  pqActiveServer ActiveServer;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -275,12 +277,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   this->connect(core->getPendingDisplayManager(), SIGNAL(pendingDisplays(bool)),
       this, SLOT(onPendingDisplayChanged(bool)));
 
-  // Create a render module and associate it with a window when a new
-  // server is added.
-  this->connect(core->getServerManagerModel(),
-      SIGNAL(serverAdded(pqServer*)),
-      this, SLOT(onServerCreation(pqServer*)));
-
   this->connect(core, SIGNAL(finishedAddingServer(pqServer*)),
       this, SLOT(onServerCreationFinished(pqServer*)));
   this->connect(core->getServerManagerModel(),
@@ -323,6 +319,13 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
 /*
   this->installEventFilter(this);
 */
+  QObject::connect(
+    &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
+    &this->Implementation->MultiViewManager, SLOT(setActiveServer(pqServer*)));
+
+  QObject::connect(
+    &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
+    core->getUndoStack(), SLOT(setActiveServer(pqServer*))); 
 
   // set up state loader.
   pqStateLoader* loader = pqStateLoader::New();
@@ -729,7 +732,12 @@ void pqMainWindowCore::setupLookmarkBrowser(QDockWidget* dock_widget)
     {
     this->Implementation->Lookmarks = new pqLookmarkBrowserModel(this);
     }
-  this->Implementation->LookmarkBrowser = new pqLookmarkBrowser(this->Implementation->Lookmarks, dock_widget);
+  this->Implementation->LookmarkBrowser = 
+    new pqLookmarkBrowser(this->Implementation->Lookmarks, dock_widget);
+  QObject::connect(
+    &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
+    this->Implementation->LookmarkBrowser, SLOT(setActiveServer(pqServer*)));
+
   dock_widget->setWidget(this->Implementation->LookmarkBrowser);
 }
 
@@ -742,7 +750,12 @@ void pqMainWindowCore::setupLookmarkInspector(QDockWidget* dock_widget)
     this->Implementation->Lookmarks = new pqLookmarkBrowserModel(this);
     }
 
-  this->Implementation->LookmarkInspector = new pqLookmarkInspector(this->Implementation->Lookmarks, dock_widget);
+  this->Implementation->LookmarkInspector = 
+    new pqLookmarkInspector(this->Implementation->Lookmarks, dock_widget);
+
+  QObject::connect(
+    &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
+    this->Implementation->LookmarkInspector, SLOT(setActiveServer(pqServer*)));
 
   if(this->Implementation->LookmarkBrowser)
     {
@@ -762,6 +775,11 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
   if (!this->Implementation->AnimationManager)
     {
     this->Implementation->AnimationManager = new pqAnimationManager(this);
+    QObject::connect(
+      &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
+      this->Implementation->AnimationManager, 
+      SLOT(onActiveServerChanged(pqServer*)));
+
     QObject::connect(this->Implementation->AnimationManager,
       SIGNAL(activeSceneChanged(pqAnimationScene*)),
       this, SLOT(onActiveSceneChanged(pqAnimationScene*)));
@@ -1125,6 +1143,7 @@ void pqMainWindowCore::onFileLoadServerState(const QStringList& files)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveServerState()
 {
   QString filters;
@@ -1142,6 +1161,7 @@ void pqMainWindowCore::onFileSaveServerState()
   file_dialog->show();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
 {
   vtkPVXMLElement *root = vtkPVXMLElement::New();
@@ -1436,6 +1456,7 @@ void pqMainWindowCore::onServerDisconnect()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsCreateCustomFilter()
 {
   // Get the selected sources from the application core. Notify the user
@@ -1484,6 +1505,7 @@ void pqMainWindowCore::onToolsCreateCustomFilter()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsManageCustomFilters()
 {
   if(!this->Implementation->CustomFilterManager)
@@ -1496,12 +1518,14 @@ void pqMainWindowCore::onToolsManageCustomFilters()
   this->Implementation->CustomFilterManager->show();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsCreateLookmark()
 {
   // Create a lookmark of the currently active view
   this->onToolsCreateLookmark(pqActiveView::instance().current());
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsCreateLookmark(pqGenericViewModule *view)
 {
   // right now we only support Lookmarks of render modules
@@ -1524,6 +1548,7 @@ void pqMainWindowCore::onToolsCreateLookmark(pqGenericViewModule *view)
 }
 
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsDumpWidgetNames()
 {
   QStringList names;
@@ -1536,6 +1561,7 @@ void pqMainWindowCore::onToolsDumpWidgetNames()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsRecordTest()
 {
   QString filters;
@@ -1557,6 +1583,7 @@ void pqMainWindowCore::onToolsRecordTest()
   fileDialog->show();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsRecordTest(const QStringList &fileNames)
 {
   if(fileNames.empty())
@@ -1567,6 +1594,7 @@ void pqMainWindowCore::onToolsRecordTest(const QStringList &fileNames)
   this->Implementation->TestUtility.recordTests(fileNames[0]);
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsRecordTestScreenshot()
 {
   if(!qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current()))
@@ -1594,6 +1622,7 @@ void pqMainWindowCore::onToolsRecordTestScreenshot()
   fileDialog->show();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsRecordTestScreenshot(const QStringList &fileNames)
 {
   pqRenderViewModule* const render_module = qobject_cast<pqRenderViewModule*>(
@@ -1624,6 +1653,7 @@ void pqMainWindowCore::onToolsRecordTestScreenshot(const QStringList &fileNames)
   render_module->render();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsPlayTest()
 {
   QString filters;
@@ -1645,6 +1675,7 @@ void pqMainWindowCore::onToolsPlayTest()
   fileDialog->show();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsPlayTest(const QStringList &fileNames)
 {
   if(1 == fileNames.size())
@@ -1653,6 +1684,7 @@ void pqMainWindowCore::onToolsPlayTest(const QStringList &fileNames)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsTimerLog()
 {
   if(!this->Implementation->TimerLog)
@@ -1667,6 +1699,7 @@ void pqMainWindowCore::onToolsTimerLog()
   this->Implementation->TimerLog->refresh();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsOutputWindow()
 {
   vtkProcessModuleGUIHelper *helper
@@ -1683,6 +1716,7 @@ void pqMainWindowCore::onToolsOutputWindow()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsPythonShell()
 {
 #ifdef PARAVIEW_EMBED_PYTHON
@@ -1835,6 +1869,7 @@ static const char* RecentFilterMenuSettings[] = {
 };
 
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::saveRecentFilterMenu()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -1855,6 +1890,8 @@ void pqMainWindowCore::saveRecentFilterMenu()
 
   }
 }
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::restoreRecentFilterMenu()
 {
   this->Implementation->RecentFiltersMenu->clear();
@@ -1957,11 +1994,7 @@ void pqMainWindowCore::onSelectionChanged()
 {
   pqServerManagerModelItem *item = this->getActiveObject();
   pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
-  pqServer *server = dynamic_cast<pqServer *>(item);
-  if(!server && source)
-    {
-    server = source->getServer();
-    }
+  pqServer *server = this->getActiveServer();
 
   pqApplicationCore *core = pqApplicationCore::instance();
   int numServers = core->getServerManagerModel()->getNumberOfServers();
@@ -1976,10 +2009,6 @@ void pqMainWindowCore::onSelectionChanged()
     this->updateFiltersMenu();
     }
 
-  // Update the multi-view and undo stack.
-  this->Implementation->MultiViewManager.setActiveServer(server);
-  pqApplicationCore::instance()->getUndoStack()->setActiveServer(server);
-
   // Update the server connect/disconnect actions.
   emit this->enableServerConnect(numServers == 0);
   emit this->enableServerDisconnect(server != 0);
@@ -1992,25 +2021,6 @@ void pqMainWindowCore::onSelectionChanged()
 
   // Update the save screenshot action.
   emit this->enableFileSaveScreenshot(server != 0 && view != 0);
-
-  // Update the animation manager if it exists.
-  if(this->Implementation->AnimationManager)
-    {
-    // Update the animation manager. Setting the active server will
-    // change the active scene.
-    this->Implementation->AnimationManager->onActiveServerChanged(server);
-    }
-
-  if ( this->Implementation->LookmarkBrowser )
-    {
-    // Update the lookmark browser so it knows about the (possible) change in servers
-    this->Implementation->LookmarkBrowser->setActiveServer(server);
-    }
-  if ( this->Implementation->LookmarkInspector )
-    {
-    // Update the lookmark inspector so it knows about the (possible) change in servers
-    this->Implementation->LookmarkInspector->setActiveServer(server);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -2018,11 +2028,7 @@ void pqMainWindowCore::onPendingDisplayChanged(bool pendingDisplays)
 {
   pqServerManagerModelItem *item = this->getActiveObject();
   pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
-  pqServer *server = dynamic_cast<pqServer *>(item);
-  if(!server && source)
-    {
-    server = source->getServer();
-    }
+  pqServer *server = this->getActiveServer(); 
 
   emit this->enableFileOpen(!pendingDisplays);
 
@@ -2042,11 +2048,7 @@ void pqMainWindowCore::onActiveViewChanged(pqGenericViewModule *view)
   // Get the active source and server.
   pqServerManagerModelItem *item = this->getActiveObject();
   pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
-  pqServer *server = dynamic_cast<pqServer *>(item);
-  if(!server && source)
-    {
-    server = source->getServer();
-    }
+  pqServer *server = this->getActiveServer();
 
   // Update the reset center action.
   emit this->enableResetCenter(source != 0 && renderModule != 0);
@@ -2171,8 +2173,15 @@ void pqMainWindowCore::updateViewUndoRedo(pqRenderViewModule *renderModule)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onServerCreationFinished(pqServer *server)
 {
+  pqApplicationCore* core = pqApplicationCore::instance();
+  this->Implementation->ActiveServer.setCurrent(server);
+
+  // Create a render module.
+  core->getPipelineBuilder()->createView(server);
+
   // Select the newly created server.
-  pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(server,
+  this->Implementation->ActiveServer.setCurrent(server);
+  core->getSelectionModel()->setCurrentItem(server,
       pqServerManagerSelectionModel::ClearAndSelect);
 }
 
@@ -2205,6 +2214,8 @@ void pqMainWindowCore::onRemovingServer(pqServer *server)
       selection->setCurrentItem(0, pqServerManagerSelectionModel::NoUpdate);
       }
     }
+
+  this->Implementation->ActiveServer.setCurrent(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -2260,19 +2271,6 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
         }
       }
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::onServerCreation(pqServer *server)
-{
-
-  // Tell the multiview manager to associate a window
-  // for the newly created render module.
-  this->Implementation->MultiViewManager.setActiveServer(server);
-
-  // Create a render module.
-  pqPipelineBuilder::instance()->createView(server);
-  //this->Implementation->MultiViewManager.allocateWindowsToRenderModules();
 }
 
 //-----------------------------------------------------------------------------
@@ -2419,18 +2417,7 @@ void pqMainWindowCore::getRootSources(QList<pqPipelineSource*> *sources, pqPipel
 //-----------------------------------------------------------------------------
 pqServer* pqMainWindowCore::getActiveServer()
 {
-  pqServerManagerModelItem *item = this->getActiveObject();
-  pqServer *server = dynamic_cast<pqServer *>(item);
-  if(!server)
-    {
-    pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
-    if(source)
-      {
-      server = source->getServer();
-      }
-    }
-
-  return server;
+  return this->Implementation->ActiveServer.current();
 }
 
 //-----------------------------------------------------------------------------
@@ -2708,6 +2695,7 @@ void pqMainWindowCore::setCenterAxesVisibility(bool visible)
   rm->render();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsManageLinks()
 {
   if(this->Implementation->LinksManager)
@@ -2725,6 +2713,7 @@ void pqMainWindowCore::onToolsManageLinks()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onManagePlugins()
 {
   pqPluginDialog diag(this->getActiveServer(), this->Implementation->Parent);

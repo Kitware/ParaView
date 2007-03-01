@@ -41,6 +41,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DViewPropertiesWidget.h
   pq3DWidget.h
   pqActiveView.h
+  pqActiveServer.h
   pqAddSourceDialog.h
   pqAnimationManager.h
   pqAnimationPanel.h
@@ -247,6 +248,8 @@ ADD_LIBRARY(pqComponents
   pq3DWidget.h
   pqActiveView.cxx
   pqActiveView.h
+  pqActiveServer.cxx
+  pqActiveServer.h
   pqAddSourceDialog.cxx
   pqAddSourceDialog.h
   pqAnimationManager.cxx
