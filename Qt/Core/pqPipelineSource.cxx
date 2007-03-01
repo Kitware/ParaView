@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager.
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
@@ -427,19 +426,28 @@ vtkPVDataInformation* pqPipelineSource::getDataInformation() const
     return proxy->GetDataInformation();
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMAbstractDisplayProxy* display = vtkSMAbstractDisplayProxy::SafeDownCast(
-      pxm->NewProxy("displays", "GenericViewDisplay"));
-  display->SetConnectionID(this->getServer()->GetConnectionID());
-  pqSMAdaptor::setProxyProperty(display->GetProperty("Input"), proxy);
-  display->UpdateVTKObjects();
-
-  // Set display update time.
   pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
   double time = timekeeper->getTime();
-  pqSMAdaptor::setElementProperty(display->GetProperty("UpdateTime"), time);
-  display->UpdateVTKObjects();
-  display->Update();
-  display->Delete();
+
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  // FIXME: We'll get rid of the geomFilter once the update suppressor
+  // can take dataobjects.
+  vtkSmartPointer<vtkSMProxy> geomFilter;
+  geomFilter.TakeReference(pxm->NewProxy("filters", "GeometryFilter"));
+  geomFilter->SetConnectionID(proxy->GetConnectionID());
+  pqSMAdaptor::setProxyProperty(geomFilter->GetProperty("Input"), proxy);
+  geomFilter->UpdateVTKObjects();
+
+  vtkSmartPointer<vtkSMProxy> updateSuppressor;
+  updateSuppressor.TakeReference(pxm->NewProxy("filters", "UpdateSuppressor"));
+  updateSuppressor->SetConnectionID(proxy->GetConnectionID());
+  pqSMAdaptor::setProxyProperty(
+    updateSuppressor->GetProperty("Input"), geomFilter);
+  pqSMAdaptor::setElementProperty(
+    updateSuppressor->GetProperty("UpdateTime"), time);
+  updateSuppressor->UpdateVTKObjects();
+  updateSuppressor->InvokeCommand("ForceUpdate");
   return proxy->GetDataInformation();
 }
