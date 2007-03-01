@@ -14,23 +14,24 @@
 =========================================================================*/
 #include "vtkTransferFunctionEditorRepresentationSimple1D.h"
 
-#include "vtkActor2D.h"
+#include "vtkActor.h"
 #include "vtkCommand.h"
-#include "vtkGlyphSource2D.h"
 #include "vtkMath.h"
-#include "vtkPointHandleRepresentation2D.h"
+#include "vtkPointHandleRepresentationSphere.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
-#include "vtkPolyDataMapper2D.h"
+#include "vtkPolyDataMapper.h"
 #include "vtkPropCollection.h"
-#include "vtkProperty2D.h"
+#include "vtkProperty.h"
 #include "vtkObjectFactory.h"
+#include "vtkSphereSource.h"
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkViewport.h"
+
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.6");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.7");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -55,30 +56,24 @@ public:
 vtkTransferFunctionEditorRepresentationSimple1D::vtkTransferFunctionEditorRepresentationSimple1D()
 {
   this->Handles = new vtkHandleList;
-  this->HandleRepresentation = vtkPointHandleRepresentation2D::New();
-  this->HandlePolyDataSource = vtkGlyphSource2D::New();
-  this->HandlePolyDataSource->SetGlyphTypeToCircle();
-  this->HandlePolyDataSource->FilledOn();
-  this->HandlePolyDataSource->SetScale(6.5);
-  this->HandleRepresentation->SetCursorShape(
-    this->HandlePolyDataSource->GetOutput());
+  this->HandleRepresentation = vtkPointHandleRepresentationSphere::New();
   this->HandleRepresentation->SetSelectedProperty(
     this->HandleRepresentation->GetProperty());
   this->ActiveHandle = VTK_UNSIGNED_INT_MAX;
   this->Tolerance = 5;
 
   vtkTransform *xform = vtkTransform::New();
-  xform->Scale(1.5, 1.5, 1.5);
+  xform->Scale(1.35, 1.35, 1.35);
   this->ActiveHandleFilter = vtkTransformPolyDataFilter::New();
-  this->ActiveHandleFilter->SetInputConnection(
-    this->HandlePolyDataSource->GetOutputPort());
+  this->ActiveHandleFilter->SetInput(
+    this->HandleRepresentation->GetCursorShape());
   this->ActiveHandleFilter->SetTransform(xform);
   xform->Delete();
 
   this->Lines = vtkPolyData::New();
-  this->LinesMapper = vtkPolyDataMapper2D::New();
+  this->LinesMapper = vtkPolyDataMapper::New();
   this->LinesMapper->SetInput(this->Lines);
-  this->LinesActor = vtkActor2D::New();
+  this->LinesActor = vtkActor::New();
   this->LinesActor->SetMapper(this->LinesMapper);
 }
 
@@ -89,7 +84,6 @@ vtkTransferFunctionEditorRepresentationSimple1D::~vtkTransferFunctionEditorRepre
   delete this->Handles;
 
   this->HandleRepresentation->Delete();
-  this->HandlePolyDataSource->Delete();
   this->ActiveHandleFilter->Delete();
 
   this->Lines->Delete();
@@ -114,6 +108,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
     (*hiter)->GetDisplayPosition(lastPos);
     hiter++;
     vtkPoints *pts = vtkPoints::New();
+    lastPos[2] = -8;
     pts->InsertNextPoint(lastPos);
     vtkIdType *ids = new vtkIdType[2];
 
@@ -122,6 +117,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
       ids[0] = i-1;
       ids[1] = i;
       (*hiter)->GetDisplayPosition(pos);
+      pos[2] = -8;
       pts->InsertNextPoint(pos);
       this->Lines->InsertNextCell(VTK_LINE, 2, ids);
       lastPos[0] = pos[0];
@@ -237,10 +233,13 @@ unsigned int vtkTransferFunctionEditorRepresentationSimple1D::CreateHandle(
 {
   vtkHandleRepresentation *rep = this->HandleRepresentation->NewInstance();
   rep->ShallowCopy(this->HandleRepresentation);
-  vtkProperty2D *property = vtkProperty2D::New();
+  vtkProperty *property = vtkProperty::New();
+  property->SetDiffuse(0.8);
+  property->SetSpecular(0.5);
+  property->SetSpecularPower(5);
   property->DeepCopy(this->HandleRepresentation->GetProperty());
-  vtkPointHandleRepresentation2D *pointRep =
-    static_cast<vtkPointHandleRepresentation2D*>(rep);
+  vtkPointHandleRepresentationSphere *pointRep =
+    static_cast<vtkPointHandleRepresentationSphere*>(rep);
   pointRep->SetProperty(property);
   pointRep->SetSelectedProperty(property);
   property->Delete();
@@ -273,8 +272,8 @@ unsigned int vtkTransferFunctionEditorRepresentationSimple1D::CreateHandle(
 void vtkTransferFunctionEditorRepresentationSimple1D::SetHandleColor(
   unsigned int idx, double r, double g, double b)
 {
-  vtkPointHandleRepresentation2D *handleRep =
-    vtkPointHandleRepresentation2D::SafeDownCast(
+  vtkPointHandleRepresentationSphere *handleRep =
+    vtkPointHandleRepresentationSphere::SafeDownCast(
       this->GetHandleRepresentation(idx));
   if (handleRep)
     {
@@ -285,11 +284,11 @@ void vtkTransferFunctionEditorRepresentationSimple1D::SetHandleColor(
 
 //----------------------------------------------------------------------
 void vtkTransferFunctionEditorRepresentationSimple1D::UpdateHandleProperty(
-  vtkPointHandleRepresentation2D *handleRep)
+  vtkPointHandleRepresentationSphere *handleRep)
 {
   vtkPropCollection *pc = vtkPropCollection::New();
-  handleRep->GetActors2D(pc);
-  vtkActor2D *actor = vtkActor2D::SafeDownCast(pc->GetItemAsObject(0));
+  handleRep->GetActors(pc);
+  vtkActor *actor = vtkActor::SafeDownCast(pc->GetItemAsObject(0));
   if (actor)
     {
     actor->SetProperty(handleRep->GetProperty());
@@ -458,11 +457,11 @@ void vtkTransferFunctionEditorRepresentationSimple1D::HighlightActiveHandle()
 {
   vtkHandleListIterator iter;
   unsigned int i = 0;
-  vtkPointHandleRepresentation2D *rep;
+  vtkPointHandleRepresentationSphere *rep;
   for (iter = this->Handles->begin(); iter != this->Handles->end();
        iter++, i++)
     {
-    rep = vtkPointHandleRepresentation2D::SafeDownCast(*iter);
+    rep = vtkPointHandleRepresentationSphere::SafeDownCast(*iter);
     if (rep)
       {
       if (i == this->ActiveHandle)
@@ -471,7 +470,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::HighlightActiveHandle()
         }
       else
         {
-        rep->SetCursorShape(this->HandlePolyDataSource->GetOutput());
+        rep->SetCursorShape(this->HandleRepresentation->GetCursorShape());
         }
       }
     }

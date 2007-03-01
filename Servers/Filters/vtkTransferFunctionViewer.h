@@ -63,10 +63,11 @@ public:
     { this->SetBackgroundColor(color[0], color[1], color[2]); }
 
   // Description:
-  // Set the size of the rendering window.
+  // Set/get the size of the rendering window.
   void SetSize(int x, int y);
   void SetSize(int size[2])
     { this->SetSize(size[0], size[1]); }
+  int* GetSize();
 
   // Description:
   // Render the transfer function editor.

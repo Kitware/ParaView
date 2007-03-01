@@ -14,6 +14,8 @@
 =========================================================================*/
 #include "vtkTransferFunctionViewer.h"
 
+#include "vtkCallbackCommand.h"
+#include "vtkCamera.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkDataSet.h"
 #include "vtkEventForwarderCommand.h"
@@ -30,14 +32,33 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.12");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.13");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
+
+//----------------------------------------------------------------------------
+static void vtkTransferFunctionViewer_UpdateDisplaySize(
+  vtkObject *caller,
+  unsigned long vtkNotUsed(eventId),
+  void *tfv, void*)
+{
+  vtkTransferFunctionViewer *viewer =
+    reinterpret_cast<vtkTransferFunctionViewer*>(tfv);
+  vtkRenderWindow *win = reinterpret_cast<vtkRenderWindow*>(caller);
+  int *rwSize = win->GetSize();
+  int *dispSize = viewer->GetSize();
+  if (rwSize[0] > 0 && rwSize[1] > 0 &&
+      (rwSize[0] != dispSize[0] || rwSize[1] != dispSize[1]))
+    {
+    viewer->SetSize(rwSize);
+    }
+}
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionViewer::vtkTransferFunctionViewer()
 {
   this->RenderWindow = NULL;
   this->Renderer = vtkRenderer::New();
+  this->Renderer->GetActiveCamera()->ParallelProjectionOn();
   this->Interactor = NULL;
   this->InteractorStyle = vtkInteractorStyleTransferFunctionEditor::New();
   this->EditorWidget = NULL;
@@ -97,6 +118,11 @@ void vtkTransferFunctionViewer::SetRenderWindow(vtkRenderWindow *win)
   if (this->RenderWindow)
     {
     this->RenderWindow->Register(this);
+    vtkCallbackCommand *cb = vtkCallbackCommand::New();
+    cb->SetCallback(vtkTransferFunctionViewer_UpdateDisplaySize);
+    cb->SetClientData(this);
+    this->RenderWindow->AddObserver(vtkCommand::ModifiedEvent, cb);
+    cb->Delete();
     }
 
   this->InstallPipeline();
@@ -245,7 +271,6 @@ void vtkTransferFunctionViewer::SetBackgroundColor(double r, double g,
 //----------------------------------------------------------------------------
 void vtkTransferFunctionViewer::SetSize(int x, int y)
 {
-  this->RenderWindow->SetSize(x, y);
   if (this->EditorWidget)
     {
     vtkTransferFunctionEditorRepresentation *rep =
@@ -256,6 +281,22 @@ void vtkTransferFunctionViewer::SetSize(int x, int y)
       rep->SetDisplaySize(x, y);
       }
     }
+}
+
+//----------------------------------------------------------------------------
+int* vtkTransferFunctionViewer::GetSize()
+{
+  if (this->EditorWidget)
+    {
+    vtkTransferFunctionEditorRepresentation *rep =
+      vtkTransferFunctionEditorRepresentation::SafeDownCast(
+        this->EditorWidget->GetRepresentation());
+    if (rep)
+      {
+      return rep->GetDisplaySize();
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -298,6 +339,18 @@ void vtkTransferFunctionViewer::Render()
       this->EditorWidget->UpdateFromTransferFunctions();
       }
     this->EditorWidget->GetRepresentation()->BuildRepresentation();
+    int size[2];
+    vtkTransferFunctionEditorRepresentation *rep =
+      vtkTransferFunctionEditorRepresentation::SafeDownCast(
+        this->EditorWidget->GetRepresentation());
+    rep->GetDisplaySize(size);
+    if (size[0] > 0 && size[1] > 0)
+      {
+      vtkCamera *cam = this->Renderer->GetActiveCamera();
+      cam->SetPosition(size[0]*0.5, size[1]*0.5, 1);
+      cam->SetFocalPoint(size[0]*0.5, size[1]*0.5, 0);
+      cam->SetParallelScale(size[1]*0.5);
+      }
     }
 
   this->RenderWindow->Render();

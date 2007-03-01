@@ -23,13 +23,12 @@
 
 #include "vtkTransferFunctionEditorRepresentation1D.h"
 
-class vtkActor2D;
-class vtkGlyphSource2D;
+class vtkActor;
 class vtkHandleList;
 class vtkHandleRepresentation;
-class vtkPointHandleRepresentation2D;
+class vtkPointHandleRepresentationSphere;
 class vtkPolyData;
-class vtkPolyDataMapper2D;
+class vtkPolyDataMapper;
 class vtkTransformPolyDataFilter;
 
 class VTK_EXPORT vtkTransferFunctionEditorRepresentationSimple1D : public vtkTransferFunctionEditorRepresentation1D
@@ -101,18 +100,17 @@ protected:
   vtkTransferFunctionEditorRepresentationSimple1D();
   ~vtkTransferFunctionEditorRepresentationSimple1D();
 
-  void UpdateHandleProperty(vtkPointHandleRepresentation2D *handleRep);
+  void UpdateHandleProperty(vtkPointHandleRepresentationSphere *handleRep);
 
   vtkHandleList *Handles;
-  vtkPointHandleRepresentation2D *HandleRepresentation;
-  vtkGlyphSource2D *HandlePolyDataSource;
+  vtkPointHandleRepresentationSphere *HandleRepresentation;
   vtkTransformPolyDataFilter *ActiveHandleFilter;
   unsigned int ActiveHandle;
   int Tolerance;  // Selection tolerance for the handles
 
   vtkPolyData *Lines;
-  vtkPolyDataMapper2D *LinesMapper;
-  vtkActor2D *LinesActor;
+  vtkPolyDataMapper *LinesMapper;
+  vtkActor *LinesActor;
 
   void HighlightActiveHandle();
 
