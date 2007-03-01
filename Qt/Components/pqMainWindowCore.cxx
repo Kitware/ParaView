@@ -277,8 +277,14 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   this->connect(core->getPendingDisplayManager(), SIGNAL(pendingDisplays(bool)),
       this, SLOT(onPendingDisplayChanged(bool)));
 
-  this->connect(core, SIGNAL(finishedAddingServer(pqServer*)),
-      this, SLOT(onServerCreationFinished(pqServer*)));
+  this->connect(core->getServerManagerModel(), 
+    SIGNAL(serverAdded(pqServer*)),
+    this, SLOT(onServerCreation(pqServer*)));
+
+  this->connect(core, 
+    SIGNAL(finishedAddingServer(pqServer*)),
+    this, SLOT(onServerCreationFinished(pqServer*)));
+
   this->connect(core->getServerManagerModel(),
       SIGNAL(aboutToRemoveServer(pqServer*)),
       this, SLOT(onRemovingServer(pqServer*)));
@@ -736,7 +742,8 @@ void pqMainWindowCore::setupLookmarkBrowser(QDockWidget* dock_widget)
     new pqLookmarkBrowser(this->Implementation->Lookmarks, dock_widget);
   QObject::connect(
     &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
-    this->Implementation->LookmarkBrowser, SLOT(setActiveServer(pqServer*)));
+    this->Implementation->LookmarkBrowser, SLOT(setActiveServer(pqServer*)),
+    Qt::QueuedConnection);
 
   dock_widget->setWidget(this->Implementation->LookmarkBrowser);
 }
@@ -755,7 +762,8 @@ void pqMainWindowCore::setupLookmarkInspector(QDockWidget* dock_widget)
 
   QObject::connect(
     &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
-    this->Implementation->LookmarkInspector, SLOT(setActiveServer(pqServer*)));
+    this->Implementation->LookmarkInspector, SLOT(setActiveServer(pqServer*)),
+    Qt::QueuedConnection);
 
   if(this->Implementation->LookmarkBrowser)
     {
@@ -778,7 +786,7 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
     QObject::connect(
       &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
       this->Implementation->AnimationManager, 
-      SLOT(onActiveServerChanged(pqServer*)));
+      SLOT(onActiveServerChanged(pqServer*)), Qt::QueuedConnection);
 
     QObject::connect(this->Implementation->AnimationManager,
       SIGNAL(activeSceneChanged(pqAnimationScene*)),
@@ -2171,16 +2179,19 @@ void pqMainWindowCore::updateViewUndoRedo(pqRenderViewModule *renderModule)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onServerCreationFinished(pqServer *server)
+void pqMainWindowCore::onServerCreation(pqServer* server)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   this->Implementation->ActiveServer.setCurrent(server);
 
   // Create a render module.
   core->getPipelineBuilder()->createView(server);
+}
 
-  // Select the newly created server.
-  this->Implementation->ActiveServer.setCurrent(server);
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onServerCreationFinished(pqServer *server)
+{
+  pqApplicationCore *core = pqApplicationCore::instance();
   core->getSelectionModel()->setCurrentItem(server,
       pqServerManagerSelectionModel::ClearAndSelect);
 }

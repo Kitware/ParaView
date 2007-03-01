@@ -345,6 +345,7 @@ private slots:
   void onSourceCreationFinished(pqPipelineSource *source);
   void onRemovingSource(pqPipelineSource *source);
 
+  void onServerCreation(pqServer*);
   void onSourceCreation(pqPipelineSource *source);
 
   void onPostAccept();
