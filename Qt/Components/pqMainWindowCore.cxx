@@ -2848,6 +2848,16 @@ void pqMainWindowCore::addPluginActions(pqActionGroupInterface* iface)
     mw->addToolBar(tb);
     this->Implementation->PluginToolBars.append(tb);
     }
+  else if (splitName.size())
+    {
+    QString msg = 
+      QString("Do not know what action group \"%1\" is").arg(splitName[0]);
+    qWarning(msg.toAscii().data());
+    }
+  else 
+    {
+    qWarning("Action group doesn't have an identifier.");
+    }
 }
 
 //-----------------------------------------------------------------------------
