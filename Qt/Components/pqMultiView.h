@@ -46,7 +46,7 @@ class PQCOMPONENTS_EXPORT pqMultiView : public QStackedWidget
 {
   Q_OBJECT
 public:
-  class Index: public QList<int>
+  class PQCOMPONENTS_EXPORT Index: public QList<int>
   {
   public:
     QString getString() const;
