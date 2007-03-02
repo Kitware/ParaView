@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.13");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.14");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -133,7 +133,6 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNodeAction(
     {
     // move an existing node
     self->WidgetState = vtkTransferFunctionEditorWidgetSimple1D::MovingNode;
-    self->InvokeEvent(vtkCommand::LeftButtonPressEvent, NULL);
     self->Superclass::StartInteraction();
     self->InvokeEvent(vtkCommand::StartInteractionEvent, NULL);
     }
@@ -256,7 +255,6 @@ void vtkTransferFunctionEditorWidgetSimple1D::EndSelectAction(
   if (self->WidgetState == vtkTransferFunctionEditorWidgetSimple1D::MovingNode)
     {
     self->WidgetState = vtkTransferFunctionEditorWidgetSimple1D::Start;
-    self->InvokeEvent(vtkCommand::LeftButtonReleaseEvent,NULL);
     self->EventCallbackCommand->SetAbortFlag(1);
     self->InvokeEvent(vtkCommand::EndInteractionEvent,NULL);
     self->Superclass::EndInteraction();

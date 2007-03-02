@@ -32,7 +32,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.13");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.14");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -46,8 +46,9 @@ static void vtkTransferFunctionViewer_UpdateDisplaySize(
   vtkRenderWindow *win = reinterpret_cast<vtkRenderWindow*>(caller);
   int *rwSize = win->GetSize();
   int *dispSize = viewer->GetSize();
-  if (rwSize[0] > 0 && rwSize[1] > 0 &&
-      (rwSize[0] != dispSize[0] || rwSize[1] != dispSize[1]))
+  if (!dispSize ||
+      (rwSize[0] > 0 && rwSize[1] > 0 &&
+       (rwSize[0] != dispSize[0] || rwSize[1] != dispSize[1])))
     {
     viewer->SetSize(rwSize);
     }
@@ -273,13 +274,11 @@ void vtkTransferFunctionViewer::SetSize(int x, int y)
 {
   if (this->EditorWidget)
     {
-    vtkTransferFunctionEditorRepresentation *rep =
-      vtkTransferFunctionEditorRepresentation::SafeDownCast(
-        this->EditorWidget->GetRepresentation());
-    if (rep)
-      {
-      rep->SetDisplaySize(x, y);
-      }
+    int size[2];
+    size[0] = x;
+    size[1] = y;
+    this->EditorWidget->Configure(size);
+    this->Render();
     }
 }
 
