@@ -110,9 +110,9 @@ QtTesting.playCommand(object22, 'set_int', '800')
 object22 = 'Dialog/okButton'
 QtTesting.playCommand(object22, 'activate', '')
 
-time.sleep(2);
+QtTesting.wait(1000);
 objectPlayButton = 'MainWindow/VCRToolbar/1QToolButton2'
 while QtTesting.getProperty(objectPlayButton, "text") == 'Pause' :
-  time.sleep(3)
+  QtTesting.wait(2000);
 
 QtTestingImage.compareImage('$PARAVIEW_TEST_ROOT/movie_test.0005.png', 'SaveAnimationMultiView.png');
