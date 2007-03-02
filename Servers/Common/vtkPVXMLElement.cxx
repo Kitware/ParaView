@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.16");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.17");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -133,11 +133,11 @@ void vtkPVXMLElement::AddSanitizedAttribute(const char* attrName,
 
   //escape any characters that are not allowed in XML
   vtkstd::string sanitized = "";
-  const int numtok = 8;
+  const int numtok = 9;
   const char escapees[numtok][3] = 
-    {{"&"},{"\'"},{">"},{"<"},{"\""},{"\r\n"},{"\r"},{"\n"}};
-  const char replacees[numtok][8] = 
-    {{"&amp;"},{"&apos;"},{"&gt;"},{"&lt;"},{"&quot;"},{";PVEOL;"},{";PVEOL;"},{";PVEOL;"}};
+    {{"&"},{"\'"},{">"},{"<"},{"\""},{"\r\n"},{"\r"},{"\n"},{"\t"}};
+  const char replacees[numtok][13] = 
+    {{"&amp;"},{"&apos;"},{"&gt;"},{"&lt;"},{"&quot;"},{"&#x0D;&#x0A;"},{"&#x0D;"},{"&#x0A;"},{"&#x0B;"}};
   int len = strlen(attrValue);
   const char *ptr = attrValue;
   for (int i = 0; i < len; i++)
@@ -281,11 +281,11 @@ char* vtkPVXMLElement::GetSanitizedAttribute(const char* name)
         {
         //un-escape any characters that are not allowed in XML
         vtkstd::string sanitized = "";
-        const int numtok = 8;
+        const int numtok = 9;
         const char escapees[numtok][3] = 
-          {{"&"},{"\'"},{">"},{"<"},{"\""},{"\r\n"},{"\r"},{"\n"}};
-        const char replacees[numtok][8] = 
-          {{"&amp;"},{"&apos;"},{"&gt;"},{"&lt;"},{"&quot;"},{";PVEOL;"},{";PVEOL;"},{";PVEOL;"}};
+          {{"&"},{"\'"},{">"},{"<"},{"\""},{"\r\n"},{"\r"},{"\n"},{"\t"}};
+        const char replacees[numtok][13] = 
+          {{"&amp;"},{"&apos;"},{"&gt;"},{"&lt;"},{"&quot;"},{"&#x0D;&#x0A;"},{"&#x0D;"},{"&#x0A;"},{"&#x0B;"}};
         int len = strlen(value);
         const char *ptr = value;
         for (int i = 0; i < len; i++)
