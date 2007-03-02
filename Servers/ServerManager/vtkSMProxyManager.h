@@ -271,6 +271,10 @@ public:
   // If revival=1, then these methods save the revival states for all proxies.
   // Revival states are useful to revive a proxy using already present
   // server side objects.
+  // RevivalState includes the entire state saved by calling 
+  // SaveState() as well additional information such as server side
+  // object IDs. This makes it possible to restore the servermanager state
+  // while reusing server side object ids.
   void SaveState(const char* filename)
     { this->SaveState(filename, 0); }
   void SaveState(const char* filename, int revival);

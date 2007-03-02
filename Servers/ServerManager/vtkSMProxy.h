@@ -620,6 +620,12 @@ protected:
   // Description:
   // Updates state from an XML element. Returns 0 on failure.
   virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
+
+  // Loads the revival state for the proxy.
+  // RevivalState includes the entire state saved by calling 
+  // SaveState() as well additional information such as server side
+  // object IDs. This makes it possible to restore the servermanager state
+  // while reusing server side object ids.
   virtual int LoadRevivalState(vtkPVXMLElement* revivalElement, 
     vtkSMStateLoader* loader);
  
@@ -663,9 +669,10 @@ protected:
   // Description:
   // This method saves state information about the proxy
   // which can be used to revive the proxy using server side objects
-  // already present. This includes the entire state saved by calling 
+  // already present. RevivalState includes the entire state saved by calling 
   // SaveState() as well additional information such as server side
-  // object IDs.
+  // object IDs. This makes it possible to restore the servermanager state
+  // while reusing server side object ids.
   virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
 
   void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
