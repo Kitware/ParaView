@@ -107,7 +107,7 @@ int pqThreadedEventSource::getNextEvent(
   object = this->Internal->CurrentObject;
   command = this->Internal->CurrentCommand;
   arguments = this->Internal->CurrentArgument;
-  this->Internal->GotEvent = false;
+  this->Internal->GotEvent = 0;
   this->guiAcknowledge();
   
   if(object == QString::null)
@@ -127,7 +127,7 @@ void pqThreadedEventSource::relayEvent(QString object, QString command, QString 
   this->Internal->CurrentObject = object;
   this->Internal->CurrentCommand = command;
   this->Internal->CurrentArgument = arguments;
-  this->Internal->GotEvent = true;
+  this->Internal->GotEvent = 1;
 }
 
 
@@ -155,27 +155,27 @@ void pqThreadedEventSource::stop()
 
 bool pqThreadedEventSource::waitForGUI()
 {
-  this->Internal->Waiting = true;
+  this->Internal->Waiting = 1;
 
-  while(this->Internal->Waiting == true &&
-        !this->Internal->ShouldStop)
+  while(this->Internal->Waiting == 1 &&
+        this->Internal->ShouldStop == 0)
     {
     pqInternal::ThreadHelper::msleep(50);
     }
   
-  this->Internal->Waiting = false;
+  this->Internal->Waiting = 0;
 
   return !this->Internal->ShouldStop;
 }
 
 void pqThreadedEventSource::guiAcknowledge()
 {
-  while(this->Internal->Waiting == false)
+  while(this->Internal->Waiting == 0)
     {
     pqInternal::ThreadHelper::msleep(10);
     }
   
-  this->Internal->Waiting = false;
+  this->Internal->Waiting = 0;
 }
 
 void pqThreadedEventSource::done(int success)
