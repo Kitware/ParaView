@@ -54,6 +54,14 @@ public:
   typedef QMap<double, QList<QPointer<pqPipelineSource> > > TimeMapType;
   typedef TimeMapType::iterator TimeMapIteratorType;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+
+  // When every a source's TimestepValues property is modified,
+  // we add it to this list. On idle, we update the
+  // timekeepers timesteps to include the values from all
+  // modified sources present in this list and clear this list.
+  // If in the mean time a source in unregistered, we ensure
+  // that it is removed from this list as well.
+  QList<QPointer<pqPipelineSource> > ModifiedSources;
   TimeMapType Times;
 };
 
@@ -148,8 +156,8 @@ void pqTimeKeeper::sourceAdded(pqPipelineSource* source)
   if (proxy->GetProperty("TimestepValues"))
     {
     this->Internals->VTKConnect->Connect(proxy, vtkCommand::PropertyModifiedEvent,
-      this, SLOT(propertyModified(vtkObject*, unsigned long, void*, void*)),
-      0, 0, Qt::QueuedConnection);
+      this, SLOT(propertyModified(vtkObject*, unsigned long, void*, void*)));
+
     this->propertyModified(source);
     }
 
@@ -163,10 +171,26 @@ void pqTimeKeeper::propertyModified(vtkObject* obj, unsigned long, void*, void* 
     {
     return;
     }
-
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   pqPipelineSource* source = smmodel->getPQSource(proxy);
-  this->propertyModified(source);
+  if (!this->Internals->ModifiedSources.contains(source))
+    {
+    this->Internals->ModifiedSources.push_back(source);
+    }
+  QTimer::singleShot(1, this,  SLOT(updateTimestepsFromModifiedSources()));
+}
+
+//-----------------------------------------------------------------------------
+void pqTimeKeeper::updateTimestepsFromModifiedSources()
+{
+  foreach (pqPipelineSource* source, this->Internals->ModifiedSources)
+    {
+    if (source)
+      {
+      this->propertyModified(source);
+      }
+    }
+  this->Internals->ModifiedSources.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -197,6 +221,7 @@ void pqTimeKeeper::propertyModified(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::sourceRemoved(pqPipelineSource* source)
 {
+  this->Internals->ModifiedSources.removeAll(source);
   this->Internals->VTKConnect->Disconnect(source->getProxy());
   this->cleanupTimes(source);
   this->updateTimeKeeperProxy();
