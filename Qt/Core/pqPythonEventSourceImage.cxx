@@ -183,7 +183,7 @@ void pqPythonEventSourceImage::run()
 void pqPythonEventSourceImage::doComparison()
 {
   // make sure all other processing has been done before we take a snapshot
-  pqEventDispatcher::processEventsAndWait(1);
+  pqEventDispatcher::processEventsAndWait(10);
 
   // assume all images are in the dataroot/Baseline directory
   QString fullpath = pqCoreTestUtility::DataRoot();
