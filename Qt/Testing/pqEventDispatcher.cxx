@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include <QApplication>
 #include <QEventLoop>
+#include <QThread>
 
 ////////////////////////////////////////////////////////////////////////////
 // pqEventDispatcher::pqImplementation
@@ -198,10 +199,18 @@ void pqEventDispatcher::stopPlayback()
 
 void pqEventDispatcher::processEventsAndWait(int ms)
 {
-  pqEventDispatcher::pqImplementation::WaitTime = ms <= 0 ? 1 : ms;
+  if(QThread::currentThread() == qApp->thread())
+  {
+    pqEventDispatcher::pqImplementation::WaitTime = ms <= 0 ? 1 : ms;
+  }
+  
   QEventLoop loop;
   QTimer::singleShot(ms, &loop, SLOT(quit()));
   loop.exec();
-  pqEventDispatcher::pqImplementation::WaitTime = 0;
+  
+  if(QThread::currentThread() == qApp->thread())
+  {
+    pqEventDispatcher::pqImplementation::WaitTime = 0;
+  }
 }
 
