@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QImage>
 #include <QWidget>
-#include <QMutex>
 #include <QCoreApplication>
 #include <QEvent>
 #include <QDir>
@@ -114,14 +113,11 @@ QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
   SnapshotHeight = height;
   SnapshotTestImage = pngfile;
 
-  QMutex mut;
-  mut.lock();
-
   // get our routines on the GUI thread to do the image comparison
   QMetaObject::invokeMethod(Instance, "doComparison", Qt::QueuedConnection);
 
   // wait for image comparison results
-  if(!Instance->waitForGUI(mut))
+  if(!Instance->waitForGUI())
     {
     PyErr_SetString(PyExc_ValueError, "error during image comparison");
     return NULL;

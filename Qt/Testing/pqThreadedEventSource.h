@@ -75,7 +75,7 @@ public:
       For use by the testing thread.
       If return value is false, an error occurred and 
       the testing thread should terminate. */
-  bool waitForGUI(QMutex& m);
+  bool waitForGUI();
 
   /** Give the testing thread an acknowledgement.
       For use by the GUI thread */

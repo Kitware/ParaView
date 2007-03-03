@@ -47,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 #include <QFile>
 #include <QtDebug>
-#include <QMutex>
 #include <QCoreApplication>
 #include <QEvent>
 #include <QStringList>
@@ -120,10 +119,8 @@ QtTesting_getProperty(PyObject* /*self*/, PyObject* args)
 
   if(Instance && QThread::currentThread() != QApplication::instance()->thread())
     {
-    QMutex mut;
-    mut.lock();
     QMetaObject::invokeMethod(Instance, "threadGetProperty", Qt::QueuedConnection);
-    if(!Instance->waitForGUI(mut))
+    if(!Instance->waitForGUI())
       {
       PyErr_SetString(PyExc_ValueError, "error getting property");
       return NULL;
@@ -171,10 +168,8 @@ QtTesting_setProperty(PyObject* /*self*/, PyObject* args)
 
   if(Instance && QThread::currentThread() != QApplication::instance()->thread())
     {
-    QMutex mut;
-    mut.lock();
     QMetaObject::invokeMethod(Instance, "threadSetProperty", Qt::QueuedConnection);
-    if(!Instance->waitForGUI(mut))
+    if(!Instance->waitForGUI())
       {
       PyErr_SetString(PyExc_ValueError, "error setting property");
       return NULL;
@@ -253,10 +248,8 @@ QtTesting_getChildren(PyObject* /*self*/, PyObject* args)
 
   if(Instance && QThread::currentThread() != QApplication::instance()->thread())
     {
-    QMutex mut;
-    mut.lock();
     QMetaObject::invokeMethod(Instance, "threadGetChildren", Qt::QueuedConnection);
-    if(!Instance->waitForGUI(mut))
+    if(!Instance->waitForGUI())
       {
       PyErr_SetString(PyExc_ValueError, "error getting children");
       return NULL;
@@ -305,10 +298,8 @@ QtTesting_invokeMethod(PyObject* /*self*/, PyObject* args)
 
   if(Instance && QThread::currentThread() != QApplication::instance()->thread())
     {
-    QMutex mut;
-    mut.lock();
     QMetaObject::invokeMethod(Instance, "threadInvokeMethod", Qt::QueuedConnection);
-    if(!Instance->waitForGUI(mut))
+    if(!Instance->waitForGUI())
       {
       PyErr_SetString(PyExc_ValueError, "error invoking method");
       return NULL;

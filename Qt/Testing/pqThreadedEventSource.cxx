@@ -59,12 +59,22 @@ public:
   pqThreadedEventSource& Source;
 
   QWaitCondition WaitCondition;
+  QAtomic Waiting;
 
   QAtomic ShouldStop;
   QAtomic GotEvent;
   QString CurrentObject;
   QString CurrentCommand;
   QString CurrentArgument;
+
+  class ThreadHelper : public QThread
+  {
+    public:
+      static void msleep(int msecs)
+        {
+        QThread::msleep(msecs);
+        }
+  };
 };
 
 pqThreadedEventSource::pqThreadedEventSource(QObject* p)
@@ -125,14 +135,12 @@ bool pqThreadedEventSource::postNextEvent(const QString& object,
                    const QString& command,
                    const QString& argument)
 {
-  QMutex mut;
-  mut.lock();
   QMetaObject::invokeMethod(this, "relayEvent", Qt::QueuedConnection, 
                             Q_ARG(QString, object),
                             Q_ARG(QString, command),
                             Q_ARG(QString, argument));
 
-  return this->waitForGUI(mut);
+  return this->waitForGUI();
 }
 
 void pqThreadedEventSource::start()
@@ -143,22 +151,31 @@ void pqThreadedEventSource::start()
 void pqThreadedEventSource::stop()
 {
   this->Internal->ShouldStop = 1;
-  this->guiAcknowledge();
 }
 
-bool pqThreadedEventSource::waitForGUI(QMutex& m)
+bool pqThreadedEventSource::waitForGUI()
 {
-  if(this->Internal->ShouldStop)
+  this->Internal->Waiting = true;
+
+  while(this->Internal->Waiting == true &&
+        !this->Internal->ShouldStop)
     {
-    return false;
+    pqInternal::ThreadHelper::msleep(50);
     }
-  this->Internal->WaitCondition.wait(&m);
+  
+  this->Internal->Waiting = false;
+
   return !this->Internal->ShouldStop;
 }
 
 void pqThreadedEventSource::guiAcknowledge()
 {
-  this->Internal->WaitCondition.wakeAll();
+  while(this->Internal->Waiting == false)
+    {
+    pqInternal::ThreadHelper::msleep(10);
+    }
+  
+  this->Internal->Waiting = false;
 }
 
 void pqThreadedEventSource::done(int success)
