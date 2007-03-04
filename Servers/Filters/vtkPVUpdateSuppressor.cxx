@@ -31,7 +31,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.46");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.47");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -283,7 +283,7 @@ int vtkPVUpdateSuppressor::RequestUpdateExtent(vtkInformation* vtkNotUsed(reques
 
 //----------------------------------------------------------------------------
 int vtkPVUpdateSuppressor::RequestDataObject(
-  vtkInformation* info, 
+  vtkInformation* vtkNotUsed(reqInfo), 
   vtkInformationVector** inputVector , 
   vtkInformationVector* outputVector)
 {
@@ -299,13 +299,13 @@ int vtkPVUpdateSuppressor::RequestDataObject(
     // for each output
     for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
       {
-      vtkInformation* info = outputVector->GetInformationObject(i);
-      vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
+      vtkInformation* outInfo = outputVector->GetInformationObject(i);
+      vtkDataObject *output = outInfo->Get(vtkDataObject::DATA_OBJECT());
     
       if (!output || !output->IsA(input->GetClassName())) 
         {
         vtkDataObject* newOutput = input->NewInstance();
-        newOutput->SetPipelineInformation(info);
+        newOutput->SetPipelineInformation(outInfo);
         newOutput->Delete();
         this->GetOutputPortInformation(0)->Set(
           vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());

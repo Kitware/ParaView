@@ -39,7 +39,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.9");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.10");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -106,10 +106,8 @@ int vtkReductionFilter::RequestDataObject(
         vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
       }
     }
-  else
-    {
-    return this->Superclass::RequestDataObject(reqInfo, inputVector, outputVector);
-    }
+
+  return this->Superclass::RequestDataObject(reqInfo, inputVector, outputVector);
 }
 
 //-----------------------------------------------------------------------------

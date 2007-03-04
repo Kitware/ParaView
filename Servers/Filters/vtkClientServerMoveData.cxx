@@ -29,7 +29,7 @@
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.4");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.5");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 //-----------------------------------------------------------------------------
@@ -53,7 +53,7 @@ int vtkClientServerMoveData::FillInputPortInformation(int idx, vtkInformation *i
 
 //----------------------------------------------------------------------------
 int vtkClientServerMoveData::RequestDataObject(
-  vtkInformation* info, 
+  vtkInformation* vtkNotUsed(reqInfo), 
   vtkInformationVector** inputVector , 
   vtkInformationVector* outputVector)
 {
@@ -77,13 +77,13 @@ int vtkClientServerMoveData::RequestDataObject(
     // for each output
     for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
       {
-      vtkInformation* info = outputVector->GetInformationObject(i);
-      vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
+      vtkInformation* oInfo = outputVector->GetInformationObject(i);
+      vtkDataObject *output = oInfo->Get(vtkDataObject::DATA_OBJECT());
     
       if (!output || !output->IsA(input->GetClassName())) 
         {
         vtkDataObject* newOutput = input->NewInstance();
-        newOutput->SetPipelineInformation(info);
+        newOutput->SetPipelineInformation(oInfo);
         newOutput->Delete();
         this->GetOutputPortInformation(0)->Set(
           vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
