@@ -80,6 +80,8 @@ protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();
 
+  int RequestDataObject(vtkInformation* request, vtkInformationVector **inputVector,
+    vtkInformationVector *outputVector);
   int RequestData(vtkInformation* request, vtkInformationVector **inputVector,
     vtkInformationVector *outputVector);
   virtual int RequestUpdateExtent(vtkInformation*,
@@ -97,7 +99,7 @@ protected:
   vtkCacheSizeKeeper* CacheSizeKeeper;
   vtkTimeStamp PipelineUpdateTime;
 
-  vtkDataSet** CachedGeometry;
+  vtkDataObject** CachedGeometry;
   int CachedGeometryLength;
 
   int SaveCacheOnCacheUpdate;

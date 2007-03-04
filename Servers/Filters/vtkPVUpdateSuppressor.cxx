@@ -20,7 +20,7 @@
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
-#include "vtkDataSet.h"
+#include "vtkDataObject.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformation.h"
@@ -31,7 +31,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.45");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.46");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -107,13 +107,13 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   // Make sure that output type matches input type
   this->UpdateInformation();
 
-  vtkDataSet *input = vtkDataSet::SafeDownCast(this->GetInput());
+  vtkDataObject *input = this->GetInput();
   if (input == 0)
     {
     vtkErrorMacro("No valid input.");
     return;
     }
-  vtkDataSet *output = this->GetOutput();
+  vtkDataObject *output = this->GetOutput();
 
   // int fixme; // I do not like this hack.  How can we get rid of it?
   // Assume the input is the collection filter.
@@ -158,7 +158,7 @@ void vtkPVUpdateSuppressor::ForceUpdate()
 
   input->Update();
   // Input may have changed, we obtain the pointer again.
-  input = vtkDataSet::SafeDownCast(this->GetInput());
+  input = this->GetInput();
 
   output->ShallowCopy(input);
   this->PipelineUpdateTime.Modified();
@@ -196,8 +196,8 @@ void vtkPVUpdateSuppressor::RemoveAllCaches()
 //----------------------------------------------------------------------------
 void vtkPVUpdateSuppressor::CacheUpdate(int idx, int num)
 {
-  vtkDataSet *pd;
-  vtkDataSet *output;
+  vtkDataObject *pd;
+  vtkDataObject *output;
   int j;
 
   if (num == -1)
@@ -214,7 +214,7 @@ void vtkPVUpdateSuppressor::CacheUpdate(int idx, int num)
   if (num != this->CachedGeometryLength)
     {
     this->RemoveAllCaches();
-    this->CachedGeometry = new vtkDataSet*[num];
+    this->CachedGeometry = new vtkDataObject*[num];
     for (j = 0; j < num; ++j)
       {
       this->CachedGeometry[j] = NULL;
@@ -282,6 +282,42 @@ int vtkPVUpdateSuppressor::RequestUpdateExtent(vtkInformation* vtkNotUsed(reques
 }
 
 //----------------------------------------------------------------------------
+int vtkPVUpdateSuppressor::RequestDataObject(
+  vtkInformation* info, 
+  vtkInformationVector** inputVector , 
+  vtkInformationVector* outputVector)
+{
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (!inInfo)
+    {
+    return 0;
+    }
+  
+  vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  if (input)
+    {
+    // for each output
+    for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
+      {
+      vtkInformation* info = outputVector->GetInformationObject(i);
+      vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
+    
+      if (!output || !output->IsA(input->GetClassName())) 
+        {
+        vtkDataObject* newOutput = input->NewInstance();
+        newOutput->SetPipelineInformation(info);
+        newOutput->Delete();
+        this->GetOutputPortInformation(0)->Set(
+          vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+        }
+      }
+    return 1;
+    }
+  return 0;
+
+}
+
+//----------------------------------------------------------------------------
 int vtkPVUpdateSuppressor::RequestData(vtkInformation *request,
                                        vtkInformationVector **inputVector,
                                        vtkInformationVector *outputVector)
@@ -290,10 +326,8 @@ int vtkPVUpdateSuppressor::RequestData(vtkInformation *request,
   // condition (for example, streaming), shallow copy input to output.
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkDataSet *input = vtkDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkDataSet *output = vtkDataSet::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkDataObject *output = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
   if (!this->Enabled 
     || outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) > 1)

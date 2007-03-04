@@ -16,9 +16,9 @@
 
 #include "vtkCharArray.h"
 #include "vtkClientConnection.h"
-#include "vtkDataSet.h"
-#include "vtkDataSetReader.h"
-#include "vtkDataSetWriter.h"
+#include "vtkDataObject.h"
+#include "vtkGenericDataObjectReader.h"
+#include "vtkGenericDataObjectWriter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkInstantiator.h"
@@ -29,7 +29,7 @@
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.3");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.4");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 //-----------------------------------------------------------------------------
@@ -70,7 +70,29 @@ int vtkClientServerMoveData::RequestDataObject(
       }
     return 1;
     }
-  return this->Superclass::RequestDataObject(info, inputVector, outputVector);
+  
+  vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  if (input)
+    {
+    // for each output
+    for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
+      {
+      vtkInformation* info = outputVector->GetInformationObject(i);
+      vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
+    
+      if (!output || !output->IsA(input->GetClassName())) 
+        {
+        vtkDataObject* newOutput = input->NewInstance();
+        newOutput->SetPipelineInformation(info);
+        newOutput->Delete();
+        this->GetOutputPortInformation(0)->Set(
+          vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+        }
+      }
+    return 1;
+    }
+  return 0;
+
 }
 
 //-----------------------------------------------------------------------------
@@ -80,15 +102,13 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  vtkDataSet* input = 0;
-  vtkDataSet* output = vtkDataSet::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataObject* input = 0;
+  vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
   if (inputVector[0]->GetNumberOfInformationObjects() > 0)
     {
-    input = vtkDataSet::SafeDownCast(
-      inputVector[0]->GetInformationObject(0)->Get(
-        vtkDataObject::DATA_OBJECT()));
+    input = inputVector[0]->GetInformationObject(0)->Get(
+        vtkDataObject::DATA_OBJECT());
     }
 
   vtkRemoteConnection* rc = vtkRemoteConnection::SafeDownCast(
@@ -106,7 +126,7 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
       {
       vtkDebugMacro("Client: Get data from server and put it on the output.");
       // This is a client node.
-      vtkDataSet* data = this->ReceiveData(controller);
+      vtkDataObject* data = this->ReceiveData(controller);
       if (data)
         {
         if (output->IsA(data->GetClassName()))
@@ -132,12 +152,12 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
 
 //-----------------------------------------------------------------------------
 int vtkClientServerMoveData::SendData(vtkSocketController* controller,
-  vtkDataSet* in_data)
+  vtkDataObject* in_data)
 {
-  vtkDataSet* data = in_data->NewInstance();
+  vtkDataObject* data = in_data->NewInstance();
   data->ShallowCopy(in_data);
 
-  vtkDataSetWriter* writer = vtkDataSetWriter::New();
+  vtkGenericDataObjectWriter* writer = vtkGenericDataObjectWriter::New();
   writer->SetInput(data);
   writer->SetFileTypeToBinary();
   writer->WriteToOutputStringOn();
@@ -158,7 +178,7 @@ int vtkClientServerMoveData::SendData(vtkSocketController* controller,
 }
 
 //-----------------------------------------------------------------------------
-vtkDataSet* vtkClientServerMoveData::ReceiveData(vtkSocketController* controller)
+vtkDataObject* vtkClientServerMoveData::ReceiveData(vtkSocketController* controller)
 {
   int data_length = 0;
   controller->Receive(&data_length, 1, 1, 
@@ -167,14 +187,14 @@ vtkDataSet* vtkClientServerMoveData::ReceiveData(vtkSocketController* controller
   controller->Receive(raw_data, data_length, 1,
     vtkClientServerMoveData::COMMUNICATION_DATA);
 
-  vtkDataSetReader* reader= vtkDataSetReader::New();
+  vtkGenericDataObjectReader* reader= vtkGenericDataObjectReader::New();
   reader->ReadFromInputStringOn();
   vtkCharArray* string_data = vtkCharArray::New();
   string_data->SetArray(raw_data, data_length, 1);
   reader->SetInputArray(string_data);
   reader->Update();
 
-  vtkDataSet* output = reader->GetOutput()->NewInstance();
+  vtkDataObject* output = reader->GetOutput()->NewInstance();
   output->ShallowCopy(reader->GetOutput());
 
   reader->Delete();

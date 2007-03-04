@@ -16,8 +16,9 @@
 
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
-#include "vtkDataSetReader.h"
-#include "vtkDataSetWriter.h"
+#include "vtkDataObject.h"
+#include "vtkGenericDataObjectReader.h"
+#include "vtkGenericDataObjectWriter.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -38,7 +39,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.8");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.9");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -69,7 +70,6 @@ int vtkReductionFilter::FillInputPortInformation(int idx, vtkInformation *info)
   return this->Superclass::FillInputPortInformation(idx, info);
 }
 
-/*
 //-----------------------------------------------------------------------------
 int vtkReductionFilter::RequestDataObject(
   vtkInformation* reqInfo,
@@ -78,35 +78,28 @@ int vtkReductionFilter::RequestDataObject(
 {
   if (this->PostGatherHelper != NULL)
     {
-    cerr << "ALIGNING OUTPUT TYPES" << endl;
-
     vtkInformation* helpersInfo = 
       this->PostGatherHelper->GetOutputPortInformation(0);
 
-    if (helpersInfo)
-      cerr << "GOT HELPERS OUT INFO" << endl;
-    else
-      cerr << "NO INFO" << endl;
-
-    const char *helpersOutType = helpersInfo->Get(vtkDataObject::DATA_TYPE_NAME());
-    if (helpersOutType)
-      cerr << "HELPERS OUT IS A " << helpersOutType << endl;
-    else
-      cerr << "NO OUT TYPE" << endl;
-
+    const char *hOT = helpersInfo->Get(vtkDataObject::DATA_TYPE_NAME());
+    const char *helpersOutType = (
+      (!strcmp(hOT, "vtkDataSet") || !strcmp(hOT, "vtkDataObject")) ? 
+      "vtkUnstructuredGrid" : hOT);
+    
     vtkInformation* info = outputVector->GetInformationObject(0);
-    vtkDataSet *output = vtkDataSet::SafeDownCast(
-      reqInfo->Get(vtkDataObject::DATA_OBJECT()));
+    vtkDataObject *output = reqInfo->Get(vtkDataObject::DATA_OBJECT());
+      
     if (!output || !output->IsA(helpersOutType)) 
       {
       vtkObject* anObj = vtkInstantiator::CreateInstance(helpersOutType);
       if (!anObj || !anObj->IsA(helpersOutType))
         {
+        cerr << helpersOutType << endl;
+        cerr << anObj << endl;
         vtkErrorMacro("Could not create chosen output data type.");
         return 0;
         }
-      cerr << "CHANGING OUTPUT TYPE" << endl;
-      vtkDataSet* newOutput = vtkDataSet::SafeDownCast(anObj);
+      vtkDataObject* newOutput = vtkDataObject::SafeDownCast(anObj);
       newOutput->SetPipelineInformation(info);
       newOutput->Delete();
       this->GetOutputPortInformation(0)->Set(
@@ -118,22 +111,19 @@ int vtkReductionFilter::RequestDataObject(
     return this->Superclass::RequestDataObject(reqInfo, inputVector, outputVector);
     }
 }
-*/
 
 //-----------------------------------------------------------------------------
 int vtkReductionFilter::RequestData(vtkInformation*,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  vtkDataSet* input = 0;
-  vtkDataSet* output = vtkDataSet::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataObject* input = 0;
+  vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
   if (inputVector[0]->GetNumberOfInformationObjects() > 0)
     {
-    input = vtkDataSet::SafeDownCast(
-      inputVector[0]->GetInformationObject(0)->Get(
-        vtkDataObject::DATA_OBJECT()));
+    input = inputVector[0]->GetInformationObject(0)->Get(
+        vtkDataObject::DATA_OBJECT());
     }
   
   this->Reduce(input, output);
@@ -141,11 +131,11 @@ int vtkReductionFilter::RequestData(vtkInformation*,
 }
 
 //-----------------------------------------------------------------------------
-void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
+void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
 {
   //run the PreReduction filter on our input
   //result goes into preOutput
-  vtkDataSet *preOutput = NULL;
+  vtkDataObject *preOutput = NULL;
   if (this->PreGatherHelper == NULL)
     {
     //allow a passthrough
@@ -157,12 +147,12 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
     //don't just use the input directly, in that case the pipeline info gets
     //messed up and PreGatherHelper won't have piece or time info.
     this->PreGatherHelper->RemoveAllInputs();
-    vtkDataSet *incopy = input->NewInstance();
+    vtkDataObject *incopy = input->NewInstance();
     incopy->ShallowCopy(input);
     this->PreGatherHelper->AddInputConnection(0, incopy->GetProducerPort());
     this->PreGatherHelper->Update();
-    vtkDataSet* reduced_output = 
-      vtkDataSet::SafeDownCast(this->PreGatherHelper->GetOutputDataObject(0));
+    vtkDataObject* reduced_output = 
+      this->PreGatherHelper->GetOutputDataObject(0);
     incopy->Delete();
 
     if (this->PostGatherHelper != NULL)
@@ -245,16 +235,16 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
       extent_lengths, extent_offsets, 0);
 
 
-    // Form vtkDataSets from collected data.
+    // Form vtkDataObjects from collected data.
     // Meanwhile if the user wants to see only one node's data
     // then pass only that through
-    vtkstd::vector<vtkSmartPointer<vtkDataSet> > data_sets;
+    vtkstd::vector<vtkSmartPointer<vtkDataObject> > data_sets;
     for (cc=0; cc < numProcs; ++cc)
       {
       if (this->PassThrough<0 || this->PassThrough==cc)
         {        
-        vtkDataSet* ds = this->Reconstruct(
-          gathered_data + offsets[cc], data_lengths[cc], &extents[cc*6]);
+        vtkDataObject* ds = vtkDataObject::SafeDownCast(this->Reconstruct(
+          gathered_data + offsets[cc], data_lengths[cc], &extents[cc*6]));
         data_sets.push_back(ds);
         ds->Delete();
         }
@@ -288,9 +278,8 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
         }
        
       this->PostGatherHelper->Update();
-      vtkDataSet* reduced_output = 
-        vtkDataSet::SafeDownCast(
-          this->PostGatherHelper->GetOutputDataObject(0));
+      vtkDataObject* reduced_output = 
+        this->PostGatherHelper->GetOutputDataObject(0);
 
       if (output->IsA(reduced_output->GetClassName()))
         {
@@ -330,12 +319,12 @@ void vtkReductionFilter::Reduce(vtkDataSet* input, vtkDataSet* output)
 }
 
 //-----------------------------------------------------------------------------
-void vtkReductionFilter::MarshallData(vtkDataSet* input)
+void vtkReductionFilter::MarshallData(vtkDataObject* input)
 {
-  vtkDataSet* data = input->NewInstance();
+  vtkDataObject* data = input->NewInstance();
   data->ShallowCopy(input);
 
-  vtkDataSetWriter* writer = vtkDataSetWriter::New();
+  vtkGenericDataObjectWriter* writer = vtkGenericDataObjectWriter::New();
   writer->SetFileTypeToBinary();
   writer->WriteToOutputStringOn();
   writer->SetInput(data);
@@ -369,17 +358,17 @@ void vtkReductionFilter::MarshallData(vtkDataSet* input)
 }
 
 //-----------------------------------------------------------------------------
-vtkDataSet* vtkReductionFilter::Reconstruct(char* raw_data, int data_length,
+vtkDataObject* vtkReductionFilter::Reconstruct(char* raw_data, int data_length,
   int *extent)
 {
-  vtkDataSetReader* reader= vtkDataSetReader::New();
+  vtkGenericDataObjectReader* reader= vtkGenericDataObjectReader::New();
   reader->ReadFromInputStringOn();
   vtkCharArray* string_data = vtkCharArray::New();
   string_data->SetArray(raw_data, data_length, 1);
   reader->SetInputArray(string_data);
   reader->Update();
 
-  vtkDataSet* output = reader->GetOutput()->NewInstance();
+  vtkDataObject* output = reader->GetOutput()->NewInstance();
   output->ShallowCopy(reader->GetOutput());
 
   // Set the extents if the dataobject supports it.

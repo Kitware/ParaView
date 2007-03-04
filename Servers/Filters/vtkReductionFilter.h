@@ -74,18 +74,17 @@ protected:
   // Overridden to mark input as optional, since input data may
   // not be available on all processes that this filter is instantiated.
   virtual int FillInputPortInformation(int port, vtkInformation *info);
-  /*
+
   virtual int RequestDataObject(vtkInformation* request,
                                 vtkInformationVector** inputVector,
                                 vtkInformationVector* outputVector);
-  */
   virtual int RequestData(vtkInformation* request,
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
 
-  void MarshallData(vtkDataSet* input);
-  vtkDataSet* Reconstruct(char* raw_data, int data_length, int *extent);
-  void Reduce(vtkDataSet* input, vtkDataSet* output);
+  void MarshallData(vtkDataObject* input);
+  vtkDataObject* Reconstruct(char* raw_data, int data_length, int *extent);
+  void Reduce(vtkDataObject* input, vtkDataObject* output);
 
   char* RawData;
   int DataLength;
