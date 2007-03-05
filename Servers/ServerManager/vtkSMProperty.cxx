@@ -33,13 +33,15 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.52");
+vtkCxxRevisionMacro(vtkSMProperty, "1.53");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkSMProperty, ControllerProxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, Documentation, vtkSMDocumentation);
+vtkCxxSetObjectMacro(vtkSMProperty, Hints, vtkPVXMLElement);
+
 int vtkSMProperty::CheckDomains = 0;
 
 //---------------------------------------------------------------------------
@@ -62,6 +64,8 @@ vtkSMProperty::vtkSMProperty()
   this->ControllerPropertyName = 0;
   this->IsInternal = 1;
   this->Documentation = 0;
+
+  this->Hints = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -78,6 +82,7 @@ vtkSMProperty::~vtkSMProperty()
   this->SetControllerPropertyName(0);
   this->SetControllerProxy(0);
   this->SetDocumentation(0);
+  this->SetHints(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -393,6 +398,8 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* domainEl = element->GetNestedElement(i);
+
+    // These are not domain elements.
     if (strcmp(domainEl->GetName(),"Documentation") == 0)
       {
       vtkSMDocumentation* doc = vtkSMDocumentation::New();
@@ -401,6 +408,13 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
       doc->Delete();
       continue;
       }
+    else if (strcmp(domainEl->GetName(), "Hints") == 0)
+      {
+      this->SetHints(domainEl);
+      continue;
+      }
+
+    // Everything else is assumed to be a domain element.
     vtkObject* object = 0;
     ostrstream name;
     name << "vtkSM" << domainEl->GetName() << ends;

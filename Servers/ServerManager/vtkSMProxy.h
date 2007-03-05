@@ -370,9 +370,8 @@ public:
   // does not (and should not) interpret the hints. Hints provide a mechanism
   // to add GUI pertinant information to the server manager XML.
   // Returns the XML element for the hints associated with this proxy,
-  // if any, otherwise returns NULL. This method is a convenience method,
-  // one can use the vtkSMProxyManager::GetHints() as well. 
-  vtkPVXMLElement* GetHints();
+  // if any, otherwise returns NULL.  
+  vtkGetObjectMacro(Hints, vtkPVXMLElement);
 
   // Description:
   // Retuns if the VTK objects for this proxy have been created.
@@ -657,6 +656,7 @@ protected:
   // Indicates if any properties are modified.
   int ArePropertiesModified(int selfOnly = 0);
 
+  void SetHints(vtkPVXMLElement* hints);
 
   void SetXMLElement(vtkPVXMLElement* element);
   vtkPVXMLElement* XMLElement;
@@ -686,6 +686,7 @@ protected:
   vtkIdType ConnectionID;
 
   vtkSMDocumentation* Documentation;
+  vtkPVXMLElement* Hints;
 
   // Flag used to break consumer loops.
   int InMarkModified;

@@ -225,6 +225,16 @@ public:
   // Description:
   // The label assigned by the xml parser.
   vtkGetStringMacro(XMLLabel);
+
+  // Description:
+  // The server manager configuration XML may define <Hints /> element for
+  // a property. Hints are metadata associated with the property. The
+  // Server Manager does not (and should not) interpret the hints. Hints
+  // provide a mechanism to add GUI pertinant information to the server
+  // manager XML.  Returns the XML element for the hints associated with
+  // this property, if any, otherwise returns NULL.
+  vtkGetObjectMacro(Hints, vtkPVXMLElement);
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -320,6 +330,9 @@ protected:
   // Set from the XML file, information helpers fill in the property
   // values with information obtained from server.
   void SetInformationHelper(vtkSMInformationHelper* helper);
+
+  void SetHints(vtkPVXMLElement* hints);
+  vtkPVXMLElement* Hints;
 
   char* Command;
 

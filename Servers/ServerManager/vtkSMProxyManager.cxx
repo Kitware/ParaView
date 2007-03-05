@@ -91,7 +91,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.60");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.61");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -1469,25 +1469,37 @@ void vtkSMProxyManager::SaveRegisteredLinks(vtkPVXMLElement* rootElement)
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyManager::GetHints(const char* xmlgroup, 
-  const char* xmlname)
+vtkPVXMLElement* vtkSMProxyManager::GetProxyHints(
+  const char* groupName, const char* proxyName)
 {
-  vtkPVXMLElement* element = this->GetProxyElement(xmlgroup, xmlname);
-  if (!element)
+  if (!groupName || !proxyName)
     {
-    return NULL;
+    return 0;
     }
-  unsigned int max = element->GetNumberOfNestedElements();
-  for (unsigned int cc=0; cc < max; cc++)
+
+  vtkSMProxy* proxy = this->GetPrototypeProxy(groupName, proxyName);
+  return proxy? proxy->GetHints() : NULL;
+}
+
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxyManager::GetPropertyHints(
+  const char* groupName, const char* proxyName, const char* propertyName)
+{
+  if (!groupName || !proxyName || !propertyName)
     {
-    vtkPVXMLElement* curElement = element->GetNestedElement(cc);
-    if (curElement && curElement->GetName() 
-      && strcmp(curElement->GetName(), "Hints")==0)
+    return 0;
+    }
+ 
+  vtkSMProxy* proxy = this->GetPrototypeProxy(groupName, proxyName);
+  if (proxy)
+    {
+    vtkSMProperty* prop = proxy->GetProperty(propertyName);
+    if (prop)
       {
-      return curElement;
+      return prop->GetHints();
       }
     }
-  return NULL;
+  return 0;
 }
 
 //---------------------------------------------------------------------------

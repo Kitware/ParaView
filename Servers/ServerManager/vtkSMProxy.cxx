@@ -37,9 +37,10 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.85");
+vtkCxxRevisionMacro(vtkSMProxy, "1.86");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
+vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -133,6 +134,8 @@ vtkSMProxy::vtkSMProxy()
 
   this->Documentation = vtkSMDocumentation::New();
   this->InMarkModified = 0;
+
+  this->Hints = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -172,6 +175,7 @@ vtkSMProxy::~vtkSMProxy()
     this->SubProxyObserver->Delete();
     }
   this->Documentation->Delete();
+  this->SetHints(0);
 }
 
 //---------------------------------------------------------------------------
@@ -1579,11 +1583,14 @@ int vtkSMProxy::ReadXMLAttributes(
   // Locate documentation.
   for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); ++cc)
     {
-    vtkPVXMLElement* doc_elem = element->GetNestedElement(cc);
-    if (strcmp(doc_elem->GetName(), "Documentation") == 0)
+    vtkPVXMLElement* subElem = element->GetNestedElement(cc);
+    if (strcmp(subElem->GetName(), "Documentation") == 0)
       {
-      this->Documentation->SetDocumentationElement(doc_elem);
-      break;
+      this->Documentation->SetDocumentationElement(subElem);
+      }
+    else if (strcmp(subElem->GetName(), "Hints") == 0)
+      {
+      this->SetHints(subElem);
       }
     }
   this->SetXMLElement(0);
@@ -2127,13 +2134,6 @@ void vtkSMProxy::ExposeSubProxyProperty(const char* subproxy_name,
   // This vector keeps track of the order in which properties
   // were added.
   this->Internals->PropertyNamesInOrder.push_back(exposed_name);
-}
-
-//---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxy::GetHints()
-{
-  return vtkSMProxyManager::GetProxyManager()->GetHints(
-    this->XMLGroup, this->XMLName);
 }
 
 //---------------------------------------------------------------------------

@@ -350,13 +350,16 @@ public:
   int AreProxiesModified();
 
   // Description:
-  // The server manager configuration XML may define <Hints /> element for a 
-  // proxy. Hints are metadata associated with the proxy. The Server Manager
-  // does not (and should not) interpret the hints. Hints provide a mechanism
-  // to add GUI pertinant information to the server manager XML.
-  // Returns the XML element for the hints associated with this proxy,
-  // if any, otherwise returns NULL. 
-  vtkPVXMLElement* GetHints(const char* xmlgroup, const char* xmlname);
+  // The server manager configuration XML may define <Hints /> element for
+  // a proxy/property. Hints are metadata associated with the
+  // proxy/property. The Server Manager does not (and should not) interpret
+  // the hints. Hints provide a mechanism to add GUI pertinant information
+  // to the server manager XML.  Returns the XML element for the hints
+  // associated with this proxy/property, if any, otherwise returns NULL.
+  vtkPVXMLElement* GetProxyHints(const char* xmlgroup, const char* xmlname);
+  vtkPVXMLElement* GetPropertyHints(const char* groupName, 
+                                    const char* proxyName,
+                                    const char* propertyName);
 
   // Description:
   // Check if UpdateInputProxies flag is set.
