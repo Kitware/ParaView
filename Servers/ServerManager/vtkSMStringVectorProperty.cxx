@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.29");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.30");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -46,7 +46,6 @@ struct vtkSMStringVectorPropertyInternals
 vtkSMStringVectorProperty::vtkSMStringVectorProperty()
 {
   this->Internals = new vtkSMStringVectorPropertyInternals;
-  this->MultiLine = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -292,11 +291,6 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if (!retVal)
     {
     return retVal;
-    }
-
-  if (element->GetAttribute("multiline"))
-    {
-    this->MultiLine = 1;
     }
 
   int numEls = this->GetNumberOfElements();

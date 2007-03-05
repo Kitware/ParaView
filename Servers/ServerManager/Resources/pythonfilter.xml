@@ -57,8 +57,10 @@ Interpretor, a python interpretor to run the script in upon the first
      <StringVectorProperty 
         name="Script" 
         command="SetScript"
-        number_of_elements="1"
-        multiline="1">
+        number_of_elements="1">
+       <Hints>
+         <Widget type="multi_line"/>
+       </Hints>
      </StringVectorProperty>
 
     <!-- End PythonScript -->
