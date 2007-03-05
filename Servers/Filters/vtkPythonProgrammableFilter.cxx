@@ -22,12 +22,12 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkDataObject.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
-#include "vtkCommonInstantiator.h"
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.7");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.8");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -53,37 +53,6 @@ vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
 }
 
 //----------------------------------------------------------------------------
-const char * vtkPythonProgrammableFilter::IntToDataSetTypeString(int i)
-{
-  switch (i)
-    {
-    case VTK_POLY_DATA: return "vtkPolyData";
-    case VTK_STRUCTURED_POINTS: return "vtkStructuredPoints";
-    case VTK_STRUCTURED_GRID: return "vtkStructuredGrid";
-    case VTK_RECTILINEAR_GRID: return "vtkRectilinearGrid";
-    case VTK_UNSTRUCTURED_GRID: return "vtkUnstructuredGrid";
-    case VTK_PIECEWISE_FUNCTION: return "vtkPiecewiseFunction";
-    case VTK_IMAGE_DATA: return "vtkImageData";
-    case VTK_DATA_OBJECT: return "vtkDataObject";
-    case VTK_DATA_SET: return "vtkDataSet";
-    case VTK_POINT_SET: return "vtkPointSet";
-    case VTK_UNIFORM_GRID: return "vtkUniformGrid";
-    case VTK_COMPOSITE_DATA_SET: return "vtkCompositeDataSet";
-    case VTK_MULTIGROUP_DATA_SET: return "vtkMultigroupDataSet";
-    case VTK_MULTIBLOCK_DATA_SET: return "vtkMultiblockDataSet";
-    case VTK_HIERARCHICAL_DATA_SET: return "vtkHierarchicalDataSet";
-    case VTK_HIERARCHICAL_BOX_DATA_SET: return "vtkHierarchical_BoxDataSet";
-    case VTK_GENERIC_DATA_SET: return "vtkGenericDataSet";
-    case VTK_HYPER_OCTREE: return "vtkHyperOctree";
-    case VTK_TEMPORAL_DATA_SET: return "vtkTemporalDataSet";
-    case VTK_TABLE: return "vtkTable";
-    case VTK_GRAPH: return "vtkGraph";
-    case VTK_TREE: return "vtkTree";
-    default: return "unknown";
-    }
-}
-
-//----------------------------------------------------------------------------
 int vtkPythonProgrammableFilter::RequestDataObject(
   vtkInformation* inInfo, 
   vtkInformationVector** inputVector , 
@@ -97,31 +66,27 @@ int vtkPythonProgrammableFilter::RequestDataObject(
     }
 
   const char *outTypeStr = 
-    vtkPythonProgrammableFilter::IntToDataSetTypeString(
-      this->OutputDataSetType
-      );
-
+    vtkDataObjectTypes::GetClassNameFromTypeId(this->OutputDataSetType);
 
   // for each output
   for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
     {
     vtkInformation* info = outputVector->GetInformationObject(i);
-    vtkDataSet *output = vtkDataSet::SafeDownCast(
-      info->Get(vtkDataObject::DATA_OBJECT()));
-    
+    vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
     if (!output || !output->IsA(outTypeStr)) 
       {
-      vtkObject* anObj = vtkInstantiator::CreateInstance(outTypeStr);
-      if (!anObj || !anObj->IsA(outTypeStr))
+      vtkDataObject* newOutput = 
+        vtkDataObjectTypes::NewDataObject(this->OutputDataSetType);
+      if (!newOutput)
         {
-        vtkErrorMacro("Could not create chosen output data type.");
+        vtkErrorMacro("Could not create chosen output data type: "
+                      << outTypeStr);
         return 0;
         }
-      vtkDataSet* newOutput = vtkDataSet::SafeDownCast(anObj);
       newOutput->SetPipelineInformation(info);
-      newOutput->Delete();
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+      newOutput->Delete();
       }
     }
 

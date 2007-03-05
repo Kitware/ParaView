@@ -27,8 +27,8 @@
 #include "vtkBSPCuts.h"
 #include "vtkCallbackCommand.h"
 #include "vtkDataSet.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkDataSetSurfaceFilter.h"
-#include "vtkDemandDrivenPipeline.h"
 #include "vtkDistributedDataFilter.h"
 #include "vtkGarbageCollector.h"
 #include "vtkInformation.h"
@@ -55,7 +55,7 @@ static void D3UpdateProgress(vtkObject *_D3, unsigned long,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.8");
+vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.9");
 vtkStandardNewMacro(vtkOrderedCompositeDistributor);
 
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, PKdTree, vtkPKdTree);
@@ -160,7 +160,7 @@ int vtkOrderedCompositeDistributor::RequestDataObject(
 
     if (!output || !output->IsA(this->OutputType)) 
       {
-      output = vtkDemandDrivenPipeline::NewDataObject(this->OutputType);
+      output = vtkDataObjectTypes::NewDataObject(this->OutputType);
       if (!output)
         {
         return 0;

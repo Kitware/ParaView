@@ -57,10 +57,6 @@ protected:
   ~vtkPythonProgrammableFilter();
 
   // Description:
-  // Returns a string for the chosen data set type integer.
-  static const char *IntToDataSetTypeString(int i);
-
-  // Description:
   // Creates whatever output data set type is selected.
   virtual int RequestDataObject(vtkInformation* request, 
                                 vtkInformationVector** inputVector, 
