@@ -1,10 +1,9 @@
 #/usr/bin/env python
 
 import QtTesting
-
 # objects on test widget
 openDialog = 'main/OpenDialog'
-returnLabel = 'main/ReturnLabel'
+returnLabel = 'main/EmitLabel'
 filter = 'main/FileFilter'
 mode = 'main/FileMode'
 connection = 'main/ConnectionMode'
@@ -18,7 +17,6 @@ fdUp = 'main/pqFileDialog/NavigateUp'
 fdMsgOk = 'main/pqFileDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0'
 
 def checkFile(f):
-  QtTesting.wait(300)
   text = QtTesting.getProperty(returnLabel, 'text')
   if not text.endswith(f):
     raise ValueError('failed and got ' + text + ' instead of ' + f)
