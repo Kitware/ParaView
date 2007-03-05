@@ -30,15 +30,15 @@
 #ifndef __vtkReductionFilter_h
 #define __vtkReductionFilter_h
 
-#include "vtkDataSetAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
 
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkReductionFilter : public vtkDataSetAlgorithm
+class VTK_EXPORT vtkReductionFilter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkReductionFilter* New();
-  vtkTypeRevisionMacro(vtkReductionFilter, vtkDataSetAlgorithm);
+  vtkTypeRevisionMacro(vtkReductionFilter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -17,6 +17,7 @@
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
 #include "vtkDataObject.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkGenericDataObjectReader.h"
 #include "vtkGenericDataObjectWriter.h"
 #include "vtkImageData.h"
@@ -39,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.10");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.11");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -91,11 +92,9 @@ int vtkReductionFilter::RequestDataObject(
       
     if (!output || !output->IsA(helpersOutType)) 
       {
-      vtkObject* anObj = vtkInstantiator::CreateInstance(helpersOutType);
+      vtkObject* anObj = vtkDataObjectTypes::NewDataObject(helpersOutType);
       if (!anObj || !anObj->IsA(helpersOutType))
         {
-        cerr << helpersOutType << endl;
-        cerr << anObj << endl;
         vtkErrorMacro("Could not create chosen output data type.");
         return 0;
         }
@@ -105,9 +104,35 @@ int vtkReductionFilter::RequestDataObject(
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
       }
+    return 1;
+    }
+  else
+    {
+    vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+    vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  
+    if (input)
+      {
+      // for each output
+      for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
+        {
+        vtkInformation* info = outputVector->GetInformationObject(i);
+        vtkDataObject *output =  info->Get(vtkDataObject::DATA_OBJECT());
+    
+        if (!output || !output->IsA(input->GetClassName())) 
+          {
+          vtkDataObject* newOutput = input->NewInstance();
+          newOutput->SetPipelineInformation(info);
+          newOutput->Delete();
+          this->GetOutputPortInformation(0)->Set(
+            vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+          }
+        }
+      return 1;
+      }
     }
 
-  return this->Superclass::RequestDataObject(reqInfo, inputVector, outputVector);
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -372,13 +397,6 @@ vtkDataObject* vtkReductionFilter::Reconstruct(char* raw_data, int data_length,
   // Set the extents if the dataobject supports it.
   if (output->GetExtentType() == VTK_3D_EXTENT)
     {
-    cout <<"Extent: "<<
-      extent[0] << ", " << 
-      extent[1] << ", " << 
-      extent[2] << ", " << 
-      extent[3] << ", " << 
-      extent[4] << ", " << 
-      extent[5] << endl;
     vtkRectilinearGrid* rg = vtkRectilinearGrid::SafeDownCast(output);
     vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(output);
     vtkImageData* id = vtkImageData::SafeDownCast(output);
