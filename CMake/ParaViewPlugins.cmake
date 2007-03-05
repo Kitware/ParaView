@@ -81,10 +81,11 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name XMLFile)
   ENDFOREACH(SRC ${ARGN})
   
   IF(HDRS)
-    VTK_WRAP_ClientServer(${Name} CS_SRCS ${HDRS})
+    VTK_WRAP_ClientServer(${Name} CS_SRCS "${HDRS}")
     SET(HAVE_SRCS 1)
   ELSE(HDRS)
     SET(HAVE_SRCS 0)
+    SET(CS_SRCS)
   ENDIF(HDRS)
   
   CONFIGURE_FILE("${ParaView_SOURCE_DIR}/Servers/ServerManager/vtkSMPluginInit.cxx.in"
