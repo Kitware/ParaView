@@ -47,8 +47,20 @@ public:
   // Description:
   // Rendering methods
   virtual int RenderOpaqueGeometry(vtkViewport *viewport);
-  virtual int RenderTranslucentGeometry(vtkViewport *viewport);
+  virtual int RenderTranslucentPolygonalGeometry(vtkViewport *viewport);
   virtual int RenderOverlay(vtkViewport *viewport);
+
+  // Description:
+  // WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
+  // DO NOT USE THESE METHODS OUTSIDE OF THE RENDERING PROCESS
+  // Does this prop have some translucent polygonal geometry?
+  // This method is called during the rendering process to know if there is
+  // some translucent polygonal geometry. A simple prop that has some
+  // translucent polygonal geometry will return true. A composite prop (like
+  // vtkAssembly) that has at least one sub-prop that has some translucent
+  // polygonal geometry will return true.
+  // Default implementation return false.
+  virtual int HasTranslucentPolygonalGeometry(); 
 
   // Description:
   // Set/get the size of the display containing this representation.

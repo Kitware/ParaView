@@ -50,12 +50,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPVAxesActor, "1.1");
+vtkCxxRevisionMacro(vtkPVAxesActor, "1.2");
 vtkStandardNewMacro(vtkPVAxesActor);
 
 vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedTip, vtkPolyData );
 vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedShaft, vtkPolyData );
 
+//-----------------------------------------------------------------------------
 vtkPVAxesActor::vtkPVAxesActor()
 {
   this->XAxisLabelText = NULL;
@@ -167,6 +168,7 @@ vtkPVAxesActor::vtkPVAxesActor()
   this->UpdateProps();
 }
 
+//-----------------------------------------------------------------------------
 vtkPVAxesActor::~vtkPVAxesActor()
 {
   this->CylinderSource->Delete();
@@ -198,6 +200,7 @@ vtkPVAxesActor::~vtkPVAxesActor()
   this->ZAxisLabel->Delete();
 }
 
+//-----------------------------------------------------------------------------
 // Shallow copy of an actor.
 void vtkPVAxesActor::ShallowCopy(vtkProp *prop)
 {
@@ -210,6 +213,7 @@ void vtkPVAxesActor::ShallowCopy(vtkProp *prop)
   this->vtkProp3D::ShallowCopy(prop);
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVAxesActor::GetActors(vtkPropCollection *ac)
 {
   ac->AddItem(this->XAxisShaft);
@@ -224,6 +228,7 @@ void vtkPVAxesActor::GetActors(vtkPropCollection *ac)
 
 }
 
+//-----------------------------------------------------------------------------
 int vtkPVAxesActor::RenderOpaqueGeometry(vtkViewport *vp)
 {
   int          renderedSomething = 0; 
@@ -251,27 +256,53 @@ int vtkPVAxesActor::RenderOpaqueGeometry(vtkViewport *vp)
   return renderedSomething;
 }
 
-int vtkPVAxesActor::RenderTranslucentGeometry(vtkViewport *vp)
+//-----------------------------------------------------------------------------
+int vtkPVAxesActor::RenderTranslucentPolygonalGeometry(vtkViewport *vp)
 {
-  int          renderedSomething = 0; 
+  int renderedSomething=0; 
 
   this->UpdateProps();
   
-  this->XAxisShaft->RenderTranslucentGeometry(vp);
-  this->YAxisShaft->RenderTranslucentGeometry(vp);
-  this->ZAxisShaft->RenderTranslucentGeometry(vp);
+  renderedSomething += this->XAxisShaft->RenderTranslucentPolygonalGeometry(vp);
+  renderedSomething += this->YAxisShaft->RenderTranslucentPolygonalGeometry(vp);
+  renderedSomething += this->ZAxisShaft->RenderTranslucentPolygonalGeometry(vp);
 
-  this->XAxisTip->RenderTranslucentGeometry(vp);
-  this->YAxisTip->RenderTranslucentGeometry(vp);
-  this->ZAxisTip->RenderTranslucentGeometry(vp);
+  renderedSomething += this->XAxisTip->RenderTranslucentPolygonalGeometry(vp);
+  renderedSomething += this->YAxisTip->RenderTranslucentPolygonalGeometry(vp);
+  renderedSomething += this->ZAxisTip->RenderTranslucentPolygonalGeometry(vp);
   
-  this->XAxisLabel->RenderTranslucentGeometry(vp);
-  this->YAxisLabel->RenderTranslucentGeometry(vp);
-  this->ZAxisLabel->RenderTranslucentGeometry(vp);
+  renderedSomething += this->XAxisLabel->RenderTranslucentPolygonalGeometry(vp);
+  renderedSomething += this->YAxisLabel->RenderTranslucentPolygonalGeometry(vp);
+  renderedSomething += this->ZAxisLabel->RenderTranslucentPolygonalGeometry(vp);
   
   return renderedSomething;
 }
 
+//-----------------------------------------------------------------------------
+int vtkPVAxesActor::HasTranslucentPolygonalGeometry()
+{
+  int result = 0; 
+
+  this->UpdateProps();
+  
+  result |= this->XAxisShaft->HasTranslucentPolygonalGeometry();
+  result |= this->YAxisShaft->HasTranslucentPolygonalGeometry();
+  result |= this->ZAxisShaft->HasTranslucentPolygonalGeometry();
+
+  result |= this->XAxisTip->HasTranslucentPolygonalGeometry();
+  result |= this->YAxisTip->HasTranslucentPolygonalGeometry();
+  result |= this->ZAxisTip->HasTranslucentPolygonalGeometry();
+  
+  result |= this->XAxisLabel->HasTranslucentPolygonalGeometry();
+  result |= this->YAxisLabel->HasTranslucentPolygonalGeometry();
+  result |= this->ZAxisLabel->HasTranslucentPolygonalGeometry();
+  
+  return result;
+}
+
+
+
+//-----------------------------------------------------------------------------
 void vtkPVAxesActor::ReleaseGraphicsResources(vtkWindow *win)
 {
   this->XAxisShaft->ReleaseGraphicsResources( win );
@@ -287,6 +318,7 @@ void vtkPVAxesActor::ReleaseGraphicsResources(vtkWindow *win)
   this->ZAxisLabel->ReleaseGraphicsResources( win );
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVAxesActor::GetBounds(double bounds[6])
 {
   double *bds = this->GetBounds();
@@ -298,6 +330,7 @@ void vtkPVAxesActor::GetBounds(double bounds[6])
   bounds[5] = bds[5];
 }
 
+//-----------------------------------------------------------------------------
 // Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).
 double *vtkPVAxesActor::GetBounds()
 {
@@ -361,6 +394,7 @@ double *vtkPVAxesActor::GetBounds()
   return this->Bounds;
 }
 
+//-----------------------------------------------------------------------------
 unsigned long int vtkPVAxesActor::GetMTime()
 {
   unsigned long mTime=this->Superclass::GetMTime();
@@ -369,6 +403,7 @@ unsigned long int vtkPVAxesActor::GetMTime()
   return mTime;
 }
 
+//-----------------------------------------------------------------------------
 unsigned long int vtkPVAxesActor::GetRedrawMTime()
 {
   unsigned long mTime=this->GetMTime();
@@ -376,51 +411,61 @@ unsigned long int vtkPVAxesActor::GetRedrawMTime()
   return mTime;
 }
 
+//-----------------------------------------------------------------------------
 vtkProperty *vtkPVAxesActor::GetXAxisTipProperty()
 {
   return this->XAxisTip->GetProperty();
 }
 
+//-----------------------------------------------------------------------------
 vtkProperty *vtkPVAxesActor::GetYAxisTipProperty()
 {
   return this->YAxisTip->GetProperty();
 }
 
+//-----------------------------------------------------------------------------
 vtkProperty *vtkPVAxesActor::GetZAxisTipProperty()
 {
   return this->ZAxisTip->GetProperty();
 }
 
+//-----------------------------------------------------------------------------
 vtkProperty *vtkPVAxesActor::GetXAxisShaftProperty()
 {
   return this->XAxisShaft->GetProperty();
 }
 
+//-----------------------------------------------------------------------------
 vtkProperty *vtkPVAxesActor::GetYAxisShaftProperty()
 {
   return this->YAxisShaft->GetProperty();
 }
 
+//-----------------------------------------------------------------------------
 vtkProperty *vtkPVAxesActor::GetZAxisShaftProperty()
 {
   return this->ZAxisShaft->GetProperty();
 }
 
+//-----------------------------------------------------------------------------
 vtkProperty *vtkPVAxesActor::GetXAxisLabelProperty()
 {
   return this->XAxisLabel->GetProperty();
 }
 
+//-----------------------------------------------------------------------------
 vtkProperty *vtkPVAxesActor::GetYAxisLabelProperty()
 {
   return this->YAxisLabel->GetProperty();
 }
 
+//-----------------------------------------------------------------------------
 vtkProperty *vtkPVAxesActor::GetZAxisLabelProperty()
 {
   return this->ZAxisLabel->GetProperty();
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVAxesActor::SetTotalLength( float x, float y, float z )
 {
   if ( this->TotalLength[0] != x ||
@@ -437,6 +482,7 @@ void vtkPVAxesActor::SetTotalLength( float x, float y, float z )
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVAxesActor::SetNormalizedShaftLength( float x, float y, float z )
 {
   if ( this->NormalizedShaftLength[0] != x ||
@@ -453,6 +499,7 @@ void vtkPVAxesActor::SetNormalizedShaftLength( float x, float y, float z )
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVAxesActor::SetNormalizedTipLength( float x, float y, float z )
 {
   if ( this->NormalizedTipLength[0] != x ||
@@ -469,6 +516,7 @@ void vtkPVAxesActor::SetNormalizedTipLength( float x, float y, float z )
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVAxesActor::SetShaftType( int type )
 {
   if ( this->ShaftType != type )
@@ -481,6 +529,7 @@ void vtkPVAxesActor::SetShaftType( int type )
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVAxesActor::SetTipType( int type )
 {
   if ( this->TipType != type )
@@ -493,6 +542,7 @@ void vtkPVAxesActor::SetTipType( int type )
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVAxesActor::UpdateProps()
 {
   this->CylinderSource->SetRadius(this->CylinderRadius);
@@ -667,6 +717,7 @@ void vtkPVAxesActor::UpdateProps()
                                  (bounds[5]-bounds[4]) );
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVAxesActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

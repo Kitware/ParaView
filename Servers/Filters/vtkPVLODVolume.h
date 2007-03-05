@@ -41,7 +41,7 @@ public:
   // Description:
   // This method is used internally by the rendering process.
   virtual int RenderOpaqueGeometry(vtkViewport *viewport);
-  virtual int RenderTranslucentGeometry(vtkViewport *viewport);
+  virtual int RenderVolumetricGeometry(vtkViewport *viewport);
 
   // Description:
   // Release any graphics resources that are being consumed by this actor.

@@ -31,7 +31,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.7");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.8");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -145,18 +145,32 @@ int vtkTransferFunctionEditorRepresentationSimple1D::RenderOpaqueGeometry(
 }
 
 //----------------------------------------------------------------------------
-int vtkTransferFunctionEditorRepresentationSimple1D::RenderTranslucentGeometry(
+int vtkTransferFunctionEditorRepresentationSimple1D::RenderTranslucentPolygonalGeometry(
   vtkViewport *viewport)
 {
-  int ret = this->Superclass::RenderTranslucentGeometry(viewport);
+  int ret = this->Superclass::RenderTranslucentPolygonalGeometry(viewport);
 
   if (this->Handles->size() > 1)
     {
-    ret += this->LinesActor->RenderTranslucentGeometry(viewport);
+    ret += this->LinesActor->RenderTranslucentPolygonalGeometry(viewport);
     }
 
   return ret;
 }
+
+//----------------------------------------------------------------------------
+int vtkTransferFunctionEditorRepresentationSimple1D::HasTranslucentPolygonalGeometry()
+{
+  int ret = this->Superclass::HasTranslucentPolygonalGeometry();
+
+  if (this->Handles->size() > 1)
+    {
+    ret |= this->LinesActor->HasTranslucentPolygonalGeometry();
+    }
+
+  return ret;
+}
+
 
 //----------------------------------------------------------------------------
 int vtkTransferFunctionEditorRepresentationSimple1D::RenderOverlay(

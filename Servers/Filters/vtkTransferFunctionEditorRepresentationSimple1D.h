@@ -81,8 +81,9 @@ public:
   // Description:
   // Rendering methods
   virtual int RenderOpaqueGeometry(vtkViewport *viewport);
-  virtual int RenderTranslucentGeometry(vtkViewport *viewport);
+  virtual int RenderTranslucentPolygonalGeometry(vtkViewport *viewport);
   virtual int RenderOverlay(vtkViewport *viewport);
+  virtual int HasTranslucentPolygonalGeometry(); 
 
 //BTX
   enum

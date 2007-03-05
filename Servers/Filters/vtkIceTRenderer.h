@@ -192,7 +192,7 @@ protected:
   // Return the number of rendered props.
   // It is called once with alpha blending technique. It is called multiple
   // times with depth peeling technique.
-  virtual int UpdateTranslucentGeometry();
+  virtual int UpdateTranslucentPolygonalGeometry();
 
   vtkIceTRenderer(const vtkIceTRenderer&); // Not implemented
   void operator=(const vtkIceTRenderer&); // Not implemented

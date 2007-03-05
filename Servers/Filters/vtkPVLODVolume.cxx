@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODVolume);
-vtkCxxRevisionMacro(vtkPVLODVolume, "1.8");
+vtkCxxRevisionMacro(vtkPVLODVolume, "1.9");
 vtkCxxSetObjectMacro(vtkPVLODVolume, RenderModuleHelper, vtkPVRenderModuleHelper);
 
 //----------------------------------------------------------------------------
@@ -93,9 +93,10 @@ int vtkPVLODVolume::RenderOpaqueGeometry(vtkViewport *vp)
   return retval;
 }
 
-int vtkPVLODVolume::RenderTranslucentGeometry(vtkViewport *vp)
+//-----------------------------------------------------------------------------
+int vtkPVLODVolume::RenderVolumetricGeometry(vtkViewport *vp)
 {
-  int retval = this->LODProp->RenderTranslucentGeometry(vp);
+  int retval = this->LODProp->RenderVolumetricGeometry(vp);
 
   this->EstimatedRenderTime = this->LODProp->GetEstimatedRenderTime();
 

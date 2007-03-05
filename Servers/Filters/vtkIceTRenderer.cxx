@@ -46,7 +46,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.22");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.23");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkCxxSetObjectMacro(vtkIceTRenderer, SortingKdTree, vtkPKdTree);
@@ -502,19 +502,18 @@ int vtkIceTRenderer::UpdateGeometry()
       }
     }
   this->PropVisibility = visible;
-  this->DeviceRenderTranslucentGeometry();
+  this->DeviceRenderTranslucentPolygonalGeometry();
   this->PropVisibility = 0;
 
-  /*
   for (i = 0; i < this->PropArrayCount; i++)
     {
     if (visible[i])
       {
       this->NumberOfPropsRendered +=
-        this->PropArray[i]->RenderTranslucentGeometry(this);
+        this->PropArray[i]->RenderVolumetricGeometry(this);
       }
     }
-    */
+
   for (i = 0; i < this->PropArrayCount; i++)
     {
     if (visible[i])
@@ -532,7 +531,7 @@ int vtkIceTRenderer::UpdateGeometry()
 }
 
 //-----------------------------------------------------------------------------
-int vtkIceTRenderer::UpdateTranslucentGeometry()
+int vtkIceTRenderer::UpdateTranslucentPolygonalGeometry()
 {
   int result=0;
   // loop through props and give them a chance to 
@@ -541,7 +540,7 @@ int vtkIceTRenderer::UpdateTranslucentGeometry()
     {
     if (this->PropVisibility && this->PropVisibility[i])
       {
-      int rendered=this->PropArray[i]->RenderTranslucentGeometry(this);
+      int rendered=this->PropArray[i]->RenderTranslucentPolygonalGeometry(this);
       this->NumberOfPropsRendered += rendered;
       result+=rendered;
       }
