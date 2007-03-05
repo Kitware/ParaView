@@ -3690,6 +3690,9 @@
       <SubProxy>
         <Proxy name="Collect" proxygroup="filters" proxyname="ClientServerMoveData">
         </Proxy>
+        <ExposedProperties>
+          <Property name="OutputDataType" />
+        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>

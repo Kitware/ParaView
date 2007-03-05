@@ -5304,6 +5304,13 @@ This filter uses colors to show levels of a hiearchical dataset.
             Set the input to the Client Server Move Data filter.
           </Documentation>
       </InputProperty>
+      <IntVectorProperty
+        name="OutputDataType"
+        command="SetOutputDataType"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+      </IntVectorProperty>
     <!-- End ClientServerMoveData -->
     </SourceProxy>
         
