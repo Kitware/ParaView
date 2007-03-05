@@ -23,21 +23,33 @@
 // .SECTION Warning
 // This filter may change the output in RequestData().
 
-#include "vtkDataSetAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
 
 class vtkProcessModuleConnection;
 class vtkSocketController;
 
-class VTK_EXPORT vtkClientServerMoveData : public vtkDataSetAlgorithm
+class VTK_EXPORT vtkClientServerMoveData : public vtkDataObjectAlgorithm
 {
 public:
   static vtkClientServerMoveData* New();
-  vtkTypeRevisionMacro(vtkClientServerMoveData, vtkDataSetAlgorithm);
+  vtkTypeRevisionMacro(vtkClientServerMoveData, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Set the connection on which we are moving the data.
   // Thus must not be set on the render server only nodes at all.
   void SetProcessModuleConnection(vtkProcessModuleConnection*);
+
+  // Description:
+  // Controls the output type. This is required because processes receiving
+  // data cannot know their output type in RequestDataObject without
+  // communicating with other processes. Since communicating with other
+  // processes in RequestDataObject is dangerous (can cause deadlock because
+  // it may happen out-of-sync), the application has to set the output
+  // type. The default is VTK_POLY_DATA. Make sure to call this before any
+  // pipeline updates occur.
+  vtkSetMacro(OutputDataType, int);
+  vtkGetMacro(OutputDataType, int);
+
 protected:
   vtkClientServerMoveData();
   ~vtkClientServerMoveData();
@@ -50,8 +62,7 @@ protected:
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
 
-  // Description:
-  // Overridden to create output of datatype obtained from the server.
+  // Create an output of the type defined by OutputDataType
   virtual int RequestDataObject(vtkInformation* request, 
                                 vtkInformationVector** inputVector, 
                                 vtkInformationVector* outputVector);
@@ -70,6 +81,9 @@ protected:
     COMMUNICATION_DATA_LENGTH = 23487
   };
   //ETX
+
+  int OutputDataType;
+
 private:
   vtkClientServerMoveData(const vtkClientServerMoveData&); // Not implemented.
   void operator=(const vtkClientServerMoveData&); // Not implemented.

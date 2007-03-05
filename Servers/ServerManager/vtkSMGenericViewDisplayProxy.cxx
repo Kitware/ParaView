@@ -14,19 +14,20 @@
 =========================================================================*/
 #include "vtkSMGenericViewDisplayProxy.h"
 
+#include "vtkClientServerStream.h"
+#include "vtkDataObject.h"
+#include "vtkDataSet.h"
+#include "vtkMPIMoveData.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVOptions.h"
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
-#include "vtkClientServerStream.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkDataObject.h"
-#include "vtkMPIMoveData.h"
-#include "vtkDataSet.h"
-#include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.18");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -329,6 +330,32 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
 //-----------------------------------------------------------------------------
 void vtkSMGenericViewDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
 {
+  // Set the output type of the collect filter based on the input data
+  // type.
+  vtkSMSourceProxy* input = 0;
+  vtkSMInputProperty* inProp = vtkSMInputProperty::SafeDownCast(
+    this->GetProperty("Input"));
+  if (inProp && inProp->GetNumberOfProxies() == 1)
+    {
+    input = vtkSMSourceProxy::SafeDownCast(inProp->GetProxy(0));
+    }
+  if (input)
+    {
+    input->UpdatePipeline();
+    int dataType = input->GetDataInformation()->GetDataSetType();
+
+    vtkClientServerStream stream;
+
+    stream << vtkClientServerStream::Invoke
+           << this->CollectProxy->GetID(0) << "SetOutputDataType" << dataType
+           << vtkClientServerStream::End;
+
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID,
+      this->CollectProxy->GetServers(), 
+      stream);
+    }
+      
   this->UpdateSuppressorProxy->InvokeCommand("ForceUpdate");
   this->Superclass::Update(view);
   this->UpdateRequiredFlag = 0;

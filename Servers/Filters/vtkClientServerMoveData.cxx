@@ -17,11 +17,11 @@
 #include "vtkCharArray.h"
 #include "vtkClientConnection.h"
 #include "vtkDataObject.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkGenericDataObjectReader.h"
 #include "vtkGenericDataObjectWriter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 #include "vtkServerConnection.h"
@@ -29,13 +29,15 @@
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.5");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.6");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
+
 //-----------------------------------------------------------------------------
 vtkClientServerMoveData::vtkClientServerMoveData()
 {
   this->ProcessModuleConnection = 0;
+  this->OutputDataType = VTK_POLY_DATA;
 }
 
 //-----------------------------------------------------------------------------
@@ -54,45 +56,35 @@ int vtkClientServerMoveData::FillInputPortInformation(int idx, vtkInformation *i
 //----------------------------------------------------------------------------
 int vtkClientServerMoveData::RequestDataObject(
   vtkInformation* vtkNotUsed(reqInfo), 
-  vtkInformationVector** inputVector , 
+  vtkInformationVector**, 
   vtkInformationVector* outputVector)
 {
-  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  if (!inInfo)
-    {
-    vtkDataObject* output = 
-      outputVector->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT());
-    if (!output)
-      {
-      output = vtkPolyData::New();//vtkUnstructuredGrid::New();
-      output->SetPipelineInformation(outputVector->GetInformationObject(0));
-      output->Delete();
-      }
-    return 1;
-    }
-  
-  vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  if (input)
-    {
-    // for each output
-    for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
-      {
-      vtkInformation* oInfo = outputVector->GetInformationObject(i);
-      vtkDataObject *output = oInfo->Get(vtkDataObject::DATA_OBJECT());
-    
-      if (!output || !output->IsA(input->GetClassName())) 
-        {
-        vtkDataObject* newOutput = input->NewInstance();
-        newOutput->SetPipelineInformation(oInfo);
-        newOutput->Delete();
-        this->GetOutputPortInformation(0)->Set(
-          vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
-        }
-      }
-    return 1;
-    }
-  return 0;
+  const char *outTypeStr = 
+    vtkDataObjectTypes::GetClassNameFromTypeId(this->OutputDataType);
 
+  // for each output
+  for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
+    {
+    vtkInformation* info = outputVector->GetInformationObject(i);
+    vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
+    if (!output || !output->IsA(outTypeStr)) 
+      {
+      vtkDataObject* newOutput = 
+        vtkDataObjectTypes::NewDataObject(this->OutputDataType);
+      if (!newOutput)
+        {
+        vtkErrorMacro("Could not create chosen output data type: "
+                      << outTypeStr);
+        return 0;
+        }
+      newOutput->SetPipelineInformation(info);
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+      newOutput->Delete();
+      }
+    }
+
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
