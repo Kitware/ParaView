@@ -19,14 +19,14 @@
 #ifndef __vtkPVUpdateSuppressor_h
 #define __vtkPVUpdateSuppressor_h
 
-#include "vtkDataSetAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
 
 class vtkCacheSizeKeeper;
 
-class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataSetAlgorithm
+class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataObjectAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkPVUpdateSuppressor,vtkDataSetAlgorithm);
+  vtkTypeRevisionMacro(vtkPVUpdateSuppressor,vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
