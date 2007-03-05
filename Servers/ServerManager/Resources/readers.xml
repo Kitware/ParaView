@@ -89,7 +89,7 @@
         information_only="1">
         <TimeStepsInformationHelper/>
         <Documentation>
-          Set the current timestep.
+          Available timestep values.
         </Documentation>
      </DoubleVectorProperty>
    <!-- End PVDReader -->
@@ -840,6 +840,15 @@
         </Documentation>
      </StringVectorProperty>
 
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
      <IntVectorProperty 
         name="ByteOrder" 
         command="SetByteOrder" 
@@ -853,18 +862,6 @@
          Select the byte order of the binary file(s).
        </Documentation>
      </IntVectorProperty>
-
-      <DoubleVectorProperty
-         name="SetTimeValue"
-         command="SetTimeValue"
-         number_of_elements="1"
-         default_values="0.0" 
-         animateable="1">
-        <DoubleRangeDomain name="range"/>
-        <Documentation>
-          Set the time value to read.
-        </Documentation>
-      </DoubleVectorProperty>
 
      <StringVectorProperty 
         name="CellArrayInfo"
@@ -983,6 +980,9 @@
         name="TimestepValues"
         information_only="1">
         <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -1330,6 +1330,9 @@
          name="TimestepValues"
          information_only="1">
         <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
      </DoubleVectorProperty>
    </SourceProxy>
 
