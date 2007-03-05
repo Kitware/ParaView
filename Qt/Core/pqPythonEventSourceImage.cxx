@@ -302,6 +302,7 @@ void pqPythonEventSourceImage::compareImage(const QString& image,
   vtkSmartPointer<vtkPNGReader> reader = vtkSmartPointer<vtkPNGReader>::New();
   if (!reader->CanReadFile(image.toAscii().data()))
     {
+    qCritical("cannot read file %s\n", image.toAscii().data());
     SnapshotResult = false;
     return;
     }
@@ -309,3 +310,4 @@ void pqPythonEventSourceImage::compareImage(const QString& image,
   reader->Update();
   this->compareImageInternal(reader->GetOutput(), baseline, threshold, tempDir);
 }
+
