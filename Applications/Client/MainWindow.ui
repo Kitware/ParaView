@@ -25,7 +25,7 @@
      <x>0</x>
      <y>0</y>
      <width>940</width>
-     <height>25</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSources" >
@@ -63,27 +63,6 @@
     <addaction name="actionVCRNextFrame" />
     <addaction name="actionVCRLastFrame" />
     <addaction name="actionVCRLoop" />
-   </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>&amp;Tools</string>
-    </property>
-    <addaction name="actionToolsCreateCustomFilter" />
-    <addaction name="actionToolsManageCustomFilters" />
-    <addaction name="actionToolsCreateLookmark" />
-    <addaction name="actionToolsManageLinks" />
-    <addaction name="actionManage_Plugins" />
-    <addaction name="separator" />
-    <addaction name="actionToolsDumpWidgetNames" />
-    <addaction name="actionToolsRecordTest" />
-    <addaction name="actionToolsRecordTestScreenshot" />
-    <addaction name="actionToolsPlayTest" />
-    <addaction name="actionTesting_Window_Size" />
-    <addaction name="separator" />
-    <addaction name="actionToolsTimerLog" />
-    <addaction name="actionToolsOutputWindow" />
-    <addaction name="separator" />
-    <addaction name="actionToolsPythonShell" />
    </widget>
    <widget class="QMenu" name="menuFilters" >
     <property name="title" >
@@ -168,6 +147,28 @@
     <addaction name="menuAddPlot" />
     <addaction name="separator" />
     <addaction name="actionEditSettings" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionToolsCreateCustomFilter" />
+    <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="actionToolsCreateLookmark" />
+    <addaction name="actionToolsManageLinks" />
+    <addaction name="actionToolsAddCameraLink" />
+    <addaction name="actionManage_Plugins" />
+    <addaction name="separator" />
+    <addaction name="actionToolsDumpWidgetNames" />
+    <addaction name="actionToolsRecordTest" />
+    <addaction name="actionToolsRecordTestScreenshot" />
+    <addaction name="actionToolsPlayTest" />
+    <addaction name="actionTesting_Window_Size" />
+    <addaction name="separator" />
+    <addaction name="actionToolsTimerLog" />
+    <addaction name="actionToolsOutputWindow" />
+    <addaction name="separator" />
+    <addaction name="actionToolsPythonShell" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -1099,6 +1100,11 @@
   <action name="actionSelectThresholds" >
    <property name="text" >
     <string>Enter Thresholds</string>
+   </property>
+  </action>
+  <action name="actionToolsAddCameraLink" >
+   <property name="text" >
+    <string>Add Camera Link...</string>
    </property>
   </action>
  </widget>

@@ -271,6 +271,9 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionToolsManageLinks,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsManageLinks()));
 
+  connect(this->Implementation->UI.actionToolsAddCameraLink,
+    SIGNAL(triggered()), this, SLOT(onAddCameraLink()));
+
   connect(this->Implementation->UI.actionToolsDumpWidgetNames,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsDumpWidgetNames()));
 
@@ -939,6 +942,22 @@ void MainWindow::onPlaying(bool playing)
 {
   this->Implementation->UI.actionVCRPlay->setVisible(!playing);
   this->Implementation->UI.actionVCRPause->setVisible(playing);
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::onAddCameraLink()
+{
+  pqGenericViewModule* vm = pqActiveView::instance().current();
+  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(vm);
+  if(rm)
+    {
+    rm->linkToOtherView();
+    }
+  else
+    {
+    QMessageBox::information(this, "Add Camera Link", 
+                             "No render module is active");
+    }
 }
 
 //-----------------------------------------------------------------------------

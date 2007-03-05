@@ -78,6 +78,9 @@ private slots:
   void setTimeRanges(double, double);
 
   void onPlaying(bool);
+
+  void onAddCameraLink();
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
