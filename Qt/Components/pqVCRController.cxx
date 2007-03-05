@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqAnimationScene.h"
 #include "pqSMAdaptor.h"
+#include "pqEventDispatcher.h"
 //-----------------------------------------------------------------------------
 pqVCRController::pqVCRController(QObject* _parent/*=null*/) : QObject(_parent)
 {
@@ -122,7 +123,10 @@ void pqVCRController::onTick()
   // the animation scene proxy does it.
 
   // process the events so that the GUI remains responsive.
-  QCoreApplication::processEvents();
+  pqEventDispatcher::processEventsAndWait(0);  // would be nice to enhance
+                                               // testing framework so we can
+                                               // simply call
+                                               // QApplication::processEvents
 
   emit this->timestepChanged();
 }
