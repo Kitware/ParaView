@@ -260,7 +260,7 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
       {
       vtkSMProxy* pxy = this->getProxy1(idx);
       pqProxy* qpxy = this->representativeProxy(pxy);
-      return qpxy ? qpxy->getProxyName() : "Unknown";
+      return qpxy ? qpxy->getSMName() : "Unknown";
       }
     else if(idx.column() == 2)
       {
@@ -292,7 +292,7 @@ QVariant pqLinksModel::data(const QModelIndex &idx, int role) const
       {
       vtkSMProxy* pxy = this->getProxy2(idx);
       pqProxy* qpxy = this->representativeProxy(pxy);
-      return qpxy ? qpxy->getProxyName() : "Unknown";
+      return qpxy ? qpxy->getSMName() : "Unknown";
       }
     else if(idx.column() == 4)
       {

@@ -150,7 +150,7 @@ QString pqCustomFilterDefinitionModelSource::GetName() const
 {
   if(this->Source)
     {
-    return this->Source->getProxyName();
+    return this->Source->getSMName();
     }
 
   return QString();

@@ -63,7 +63,6 @@ pqProxy::pqProxy(const QString& group, const QString& name,
     vtkSMProxy* proxy, pqServer* server, QObject* _parent/*=NULL*/) 
 : pqServerManagerModelItem(_parent),
   Server(server),
-  ProxyName(name),
   SMName(name),
   SMGroup(group)
 {
@@ -203,19 +202,13 @@ void pqProxy::rename(const QString& newname)
 }
   
 //-----------------------------------------------------------------------------
-void pqProxy::setProxyName(const QString& name)
+void pqProxy::setSMName(const QString& name)
 {
-  if (this->ProxyName != name)
+  if (!name.isEmpty() && this->SMName != name)
     {
-    this->ProxyName = name; 
+    this->SMName = name; 
     emit this->nameChanged(this);
     }
-}
-
-//-----------------------------------------------------------------------------
-const QString& pqProxy::getProxyName()
-{
-  return this->ProxyName;
 }
 
 //-----------------------------------------------------------------------------

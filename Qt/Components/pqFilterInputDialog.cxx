@@ -257,7 +257,7 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
 
     // Set the filter title.
     this->setWindowTitle(this->windowTitle() + " - " +
-        this->Filter->getProxyName());
+        this->Filter->getSMName());
 
     // Create a widget to hold all the input properties.
     QWidget *frame = new QWidget();
@@ -273,7 +273,7 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
       {
       source = this->Filter->getInput(index);
       sourceMap.insert(source->getProxy(), source);
-      this->Internal->SourceMap.insert(source->getProxyName(), source);
+      this->Internal->SourceMap.insert(source->getSMName(), source);
       }
 
     // Add widgets for each of the filter inputs.
@@ -317,7 +317,7 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
             if(item != sourceMap.end())
               {
               source = item.value();
-              list->addItem(source->getProxyName());
+              list->addItem(source->getSMName());
               }
             }
           }
@@ -336,7 +336,7 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
           if(item != sourceMap.end())
             {
             source = item.value();
-            label->setText(source->getProxyName());
+            label->setText(source->getSMName());
             }
           }
 
@@ -424,7 +424,7 @@ void pqFilterInputDialog::getCurrentFilterInputs(const QString &port,
         if(item != sourceMap.end())
           {
           source = item.value();
-          inputs.append(source->getProxyName());
+          inputs.append(source->getSMName());
           }
         }
       }
@@ -434,7 +434,7 @@ void pqFilterInputDialog::getCurrentFilterInputs(const QString &port,
       if(item != sourceMap.end())
         {
         source = item.value();
-        inputs.append(source->getProxyName());
+        inputs.append(source->getSMName());
         }
       }
     }
@@ -521,7 +521,7 @@ void pqFilterInputDialog::changeInput(const QItemSelection &selected,
     // the deselected items.
     if(list)
       {
-      items = list->findItems(source->getProxyName(), Qt::MatchExactly);
+      items = list->findItems(source->getSMName(), Qt::MatchExactly);
       for(item = items.begin(); item != items.end(); ++item)
         {
         delete *item;
@@ -536,17 +536,17 @@ void pqFilterInputDialog::changeInput(const QItemSelection &selected,
     source = dynamic_cast<pqPipelineSource *>(
         this->Pipeline->getItemFor(*iter));
     this->Model->addConnection(source, this->Filter);
-    this->Internal->SourceMap.insert(source->getProxyName(), source);
+    this->Internal->SourceMap.insert(source->getSMName(), source);
 
     // Add the selected item to the input display widget.
     if(list)
       {
-      list->addItem(source->getProxyName());
+      list->addItem(source->getSMName());
       }
     else if(label)
       {
       // There should only be one selected item.
-      label->setText(source->getProxyName());
+      label->setText(source->getSMName());
       }
     }
 }

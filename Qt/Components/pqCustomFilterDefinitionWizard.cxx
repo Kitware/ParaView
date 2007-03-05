@@ -213,7 +213,7 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
     source = this->Model->getSourceFor(index);
     if(source)
       {
-      this->Filter->AddProxy(source->getProxyName().toAscii().data(),
+      this->Filter->AddProxy(source->getSMName().toAscii().data(),
           source->getProxy());
       }
 
@@ -375,7 +375,7 @@ void pqCustomFilterDefinitionWizard::setupDefaultInputOutput()
             }
 
           QStringList list;
-          list.append(source->getProxyName());
+          list.append(source->getSMName());
           list.append(propertyName);
           list.append("Input");
           QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->InputPorts,
@@ -405,7 +405,7 @@ void pqCustomFilterDefinitionWizard::setupDefaultInputOutput()
       {
       // Add the exposed output port to the list.
       QStringList list;
-      list.append(output->getProxyName());
+      list.append(output->getSMName());
       list.append("Output");
       QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->OutputPorts,
           list);
@@ -593,7 +593,7 @@ void pqCustomFilterDefinitionWizard::addInput()
 
   // Add the exposed input port to the list.
   QStringList list;
-  list.append(source->getProxyName());
+  list.append(source->getSMName());
   list.append(this->Form->InputCombo->itemText(propertyIndex));
   list.append(name);
   QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->InputPorts, list);
@@ -707,7 +707,7 @@ void pqCustomFilterDefinitionWizard::addOutput()
 
   // Add the exposed output port to the list.
   QStringList list;
-  list.append(source->getProxyName());
+  list.append(source->getSMName());
   list.append(name);
   QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->OutputPorts, list);
   this->Form->OutputPorts->setCurrentItem(item);
@@ -821,7 +821,7 @@ void pqCustomFilterDefinitionWizard::addProperty()
 
   // Add the exposed property to the list.
   QStringList list;
-  list.append(source->getProxyName());
+  list.append(source->getSMName());
   list.append(this->Form->PropertyCombo->itemText(propertyIndex));
   list.append(name);
   QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->PropertyList, list);

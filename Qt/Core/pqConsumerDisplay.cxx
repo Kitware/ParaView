@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
+#include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
@@ -178,6 +179,23 @@ void pqConsumerDisplay::setDefaults()
       }
     }
   iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqConsumerDisplay::getLookupTableProxy()
+{
+  return pqSMAdaptor::getProxyProperty(
+    this->getProxy()->GetProperty("LookupTable"));
+}
+
+//-----------------------------------------------------------------------------
+pqScalarsToColors* pqConsumerDisplay::getLookupTable()
+{
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  vtkSMProxy* lut = this->getLookupTableProxy();
+
+  return (lut? qobject_cast<pqScalarsToColors*>(smmodel->getPQProxy(lut)): 0);
 }
 
 //-----------------------------------------------------------------------------

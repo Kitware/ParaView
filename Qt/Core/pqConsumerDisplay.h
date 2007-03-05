@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqConsumerDisplayInternal;
 class pqPipelineSource;
+class pqScalarsToColors;
 
 // pqConsumerDisplay is the superclass for a display for a pqPiplineSource 
 // i.e. the input for this display proxy is a pqPiplineSource.
@@ -52,6 +53,19 @@ public:
 
   // Get the source/filter of which this is a display.
   pqPipelineSource* getInput() const;
+
+
+  /// Returns the lookuptable proxy, if any.
+  /// Most consumer displays take a lookup table. This method 
+  /// provides access to the Lookup table, if one exists.
+  virtual vtkSMProxy* getLookupTableProxy();
+
+  /// Returns the pqScalarsToColors object for the lookup table
+  /// proxy if any.
+  /// Most consumer displays take a lookup table. This method 
+  /// provides access to the Lookup table, if one exists.
+  virtual pqScalarsToColors* getLookupTable();
+
 
   // Called after to creation to set default values.
   virtual void setDefaults();

@@ -299,7 +299,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch(role)
       {
     case Qt::DisplayRole:
-      return QVariant(source->getProxyName());
+      return QVariant(source->getSMName());
       }
     break;
 

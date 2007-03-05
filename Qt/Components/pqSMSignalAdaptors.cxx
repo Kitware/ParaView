@@ -84,7 +84,7 @@ void pqSignalAdaptorProxy::setProxy(const QVariant& var)
       pqPipelineSource* o = pqServerManagerModel::instance()->getPQSource(p);
       if(o)
         {
-        QString name = o->getProxyName();
+        QString name = o->getSMName();
         this->parent()->setProperty(this->PropertyName, QVariant(name));
         }
       }

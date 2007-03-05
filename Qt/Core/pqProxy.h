@@ -43,9 +43,9 @@ class pqServer;
 class vtkPVXMLElement;
 class vtkSMProxy;
 
-// This class represents any registered Server Manager proxy.
-// It keeps essential information to locate the proxy as well as
-// additional metadata such as user-specified label.
+/// This class represents any registered Server Manager proxy.
+/// It keeps essential information to locate the proxy as well as
+/// additional metadata such as user-specified label.
 class PQCORE_EXPORT pqProxy : public pqServerManagerModelItem
 {
   Q_OBJECT
@@ -58,21 +58,13 @@ public:
   pqServer *getServer() const
     { return this->Server; }
 
-  /// This method renames this proxy. It registers the proxy
-  /// under the same old group but with new name, and unregisters
-  /// the old name. This must be distinguished from setProxyName()
-  /// which merely changes the client side name.
+  /// This is a convenience method. It re-registers the underlying proxy
+  /// with the requested new name under the same group. Then it unregisters
+  /// the proxy from the group with the old name. This operation is
+  /// understood as renaming the proxy, since as a consequence, this
+  /// pqProxy's \c SMName changes.
   void rename(const QString& newname);
 
-  // Get/Set the name for the pqProxy. This is the same name
-  // with which the vtkSMProxy is registered with the proxy manager.
-  // This does not affect the name with which the proxy is registered.
-  // Emit nameChanged() signal when the name changes. 
-  // Don't call this method directly, pqServerManagerModel will update this
-  // as a side effect of rename().
-  void setProxyName(const QString& name);
-  const QString& getProxyName();
-  
   /// Get the name with which this proxy is registered on the
   /// server manager. A proxy can be registered with more than
   /// one name on the Server Manager. This is the name/group which
@@ -81,6 +73,8 @@ public:
   const QString& getSMGroup();
 
   /// Get the vtkSMProxy this object stands for.
+  /// This can never be null. A pqProxy always represents
+  /// one and only one Server Manager proxy.
   vtkSMProxy* getProxy() const;
   
   /// Returns a list of all the internal proxies added with a given key.
@@ -111,18 +105,30 @@ signals:
   void modifiedStateChanged(pqServerManagerModelItem*);
 
 protected:
+  friend class pqServerManagerModel;
+
+  /// Make this pqProxy take on a new identity. This is following case:
+  /// Proxy A registered as (gA, nA), then is again registered as (gA, nA2).
+  /// pqServerManagerModel does not create a new pqProxy for (gA, nA2). 
+  /// However, if (gA, nA) is now unregistered, the same old instace of pqProxy
+  /// which represented (gA, nA) will now "take on a new identity" and 
+  /// represent proxy (gA, nA2). This method will trigger the
+  /// nameChanged() signal.
+  void setSMName(const QString& new_name);
+
+protected:
   /// Concept of internal proxies:
-  // A pqProxy is created for every important vtkSMProxy registered. Many a times, 
-  // there may be other proxies associated with that proxy, eg. lookup table proxies,
-  // implicit function proxies may be associated with a filter/source proxy. 
-  // The GUI can create "associated" proxies and add them as internal proxies.
-  // Internal proxies get registered under special groups, so that they are 
-  // undo/redo-able, and state save-restore-able. The pqProxy makes sure that 
-  // the internal proxies are unregistered when the main proxy is unregistered.
+  /// A pqProxy is created for every important vtkSMProxy registered. Many a times, 
+  /// there may be other proxies associated with that proxy, eg. lookup table proxies,
+  /// implicit function proxies may be associated with a filter/source proxy. 
+  /// The GUI can create "associated" proxies and add them as internal proxies.
+  /// Internal proxies get registered under special groups, so that they are 
+  /// undo/redo-able, and state save-restore-able. The pqProxy makes sure that 
+  /// the internal proxies are unregistered when the main proxy is unregistered.
   void addInternalProxy(const QString& key, vtkSMProxy*);
   void removeInternalProxy(const QString& key, vtkSMProxy*);
 
-  // Unregisters all internal proxies.
+  /// Unregisters all internal proxies.
   void clearInternalProxies();
 
 private slots:
@@ -130,7 +136,6 @@ private slots:
 
 private:
   pqServer *Server;           ///< Stores the parent server.
-  QString ProxyName;
   QString SMName;
   QString SMGroup;
   pqProxyInternal* Internal;

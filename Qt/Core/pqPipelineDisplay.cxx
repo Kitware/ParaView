@@ -139,8 +139,10 @@ void pqPipelineDisplay::setDefaults()
     {
     return;
     }
-  this->Internal->VTKConnect->Connect(displayProxy,
-    vtkCommand::UserEvent, this, SLOT(deferredSetDefaults()));
+
+  this->deferredSetDefaults();
+  //this->Internal->VTKConnect->Connect(displayProxy,
+  //  vtkCommand::UserEvent, this, SLOT(deferredSetDefaults()));
 }
 
 //-----------------------------------------------------------------------------
@@ -254,6 +256,7 @@ void pqPipelineDisplay::deferredSetDefaults()
 
   // Color by property.
   this->colorByArray(NULL, 0);
+  cout << "Dont setDefaults" << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -363,23 +366,6 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
 
   this->updateLookupTableScalarRange();
   emit this->colorChanged();
-}
-
-//-----------------------------------------------------------------------------
-vtkSMProxy* pqPipelineDisplay::getLookupTableProxy()
-{
-  return pqSMAdaptor::getProxyProperty(
-    this->getProxy()->GetProperty("LookupTable"));
-}
-
-//-----------------------------------------------------------------------------
-pqScalarsToColors* pqPipelineDisplay::getLookupTable()
-{
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  vtkSMProxy* lut = this->getLookupTableProxy();
-
-  return (lut? qobject_cast<pqScalarsToColors*>(smmodel->getPQProxy(lut)): 0);
 }
 
 //-----------------------------------------------------------------------------

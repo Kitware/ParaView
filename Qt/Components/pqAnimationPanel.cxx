@@ -244,10 +244,10 @@ void pqAnimationPanel::onNameChanged(pqServerManagerModelItem* item)
     int index = this->Internal->sourceName->findData(
         QVariant(src->getProxy()->GetSelfID().ID));
     if (index != -1 
-      && src->getProxyName() != this->Internal->sourceName->itemText(index))
+      && src->getSMName() != this->Internal->sourceName->itemText(index))
       {
       this->Internal->sourceName->blockSignals(true);
-      this->Internal->sourceName->insertItem(index, src->getProxyName(),
+      this->Internal->sourceName->insertItem(index, src->getSMName(),
         QVariant(src->getProxy()->GetSelfID().ID));
       this->Internal->sourceName->removeItem(index+1);
       this->Internal->sourceName->blockSignals(false);
@@ -487,7 +487,7 @@ void pqAnimationPanel::onCurrentChanged(pqProxy* src)
     QVariant(src->getProxy()->GetSelfID().ID));
   if (index == -1)
     {
-    this->Internal->sourceName->addItem(src->getProxyName(), 
+    this->Internal->sourceName->addItem(src->getSMName(), 
       QVariant(src->getProxy()->GetSelfID().ID));
     index = this->Internal->sourceName->findText(src->getSMName());
     }

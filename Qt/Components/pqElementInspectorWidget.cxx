@@ -189,7 +189,7 @@ void pqElementInspectorWidget::onSelectionChanged(pqSelectionManager* selMan)
   foreach(pqPipelineSource* source, proxies)
     {
     this->Implementation->SourceComboBox->addItem(
-      source->getProxyName(), index);
+      source->getSMName(), index);
     this->Implementation->Sources.push_back(source);
     if (currentSource && currentSource->getProxy() && 
       source->getProxy() == currentSource->getProxy())

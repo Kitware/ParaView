@@ -251,7 +251,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
               pqServerManagerModel::instance()->getPQSource(v);
             if(o)
               {
-              comboBox->addItem(o->getProxyName());
+              comboBox->addItem(o->getSMName());
               }
             }
           pqSignalAdaptorComboBox* comboAdaptor = 

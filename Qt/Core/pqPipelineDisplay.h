@@ -97,13 +97,6 @@ public:
   /// return the array name
   QString getColorField(bool raw=false);
 
-  /// Returns the lookuptable proxy, if any.
-  vtkSMProxy* getLookupTableProxy();
-
-  /// Returns the pqScalarsToColors object for the lookup table
-  /// proxy if any.
-  pqScalarsToColors* getLookupTable();
-
   /// Returns the number of components for the given field.
   /// field is a string of format "<arrayname> (cell|point)".
   int getColorFieldNumberOfComponents(const QString& field);

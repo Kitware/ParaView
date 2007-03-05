@@ -275,7 +275,7 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
   //vtksys_ios::ostringstream name_stream;
   //name_stream << source->GetXMLName() << 
   //  this->Internal->NameGenerator.GetCountAndIncrement(source->GetXMLName());
-  ////pqSource->setProxyName(name_stream.str().c_str());
+  ////pqSource->setSMName(name_stream.str().c_str());
 
 
   QObject::connect(pqSource, 
@@ -324,7 +324,7 @@ void pqServerManagerModel::onRemoveSource(QString name, vtkSMProxy* proxy)
     return;
     }
 
-  if (source->getProxyName() != name)
+  if (source->getSMName() != name)
     {
     // The proxy is being unregistered from a name that is not visible to the GUI.
     // The GUI can only view the first name with which the proxy is registered
@@ -346,7 +346,7 @@ void pqServerManagerModel::onRemoveSource(QString name, vtkSMProxy* proxy)
       continue;
       }
     // Change the name of the pqsource.
-    source->setProxyName(names->GetString(cc));
+    source->setSMName(names->GetString(cc));
     return;
     }
 

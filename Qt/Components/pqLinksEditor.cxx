@@ -241,7 +241,7 @@ public:
         m = pqApplicationCore::instance()->getServerManagerModel();
         if(pxy)
           {
-          return m->getPQProxy(pxy)->getProxyName();
+          return m->getPQProxy(pxy)->getSMName();
           }
         }
       else
