@@ -2382,10 +2382,10 @@
            <RequiredProperties>
              <Property name="TableIds" function="Enumeration"/>
           </RequiredProperties>
-          <Documentation>
-            Set which table to read.
-          </Documentation>
          </EnumerationDomain>
+         <Documentation>
+           Set which table to read.
+         </Documentation>
      </IntVectorProperty>
      <IntVectorProperty
          name="TableIds"

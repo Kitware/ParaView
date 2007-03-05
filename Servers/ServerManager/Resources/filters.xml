@@ -811,10 +811,10 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         If off, the Decimate filter will not remove points on the boundary of the dataset.
+       </Documentation>
      </IntVectorProperty>
-     <Documentation>
-       If off, the Decimate filter will not remove points on the boundary of the dataset.
-     </Documentation>
    <!-- End DecimatePro -->
    </SourceProxy>
 
