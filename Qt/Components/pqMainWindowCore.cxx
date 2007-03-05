@@ -120,9 +120,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqUndoStack.h>
 #include "QtTestingConfigure.h"
 
-#ifdef PARAVIEW_EMBED_PYTHON
+#ifdef PARAVIEW_ENABLE_PYTHON
 #include <pqPythonDialog.h>
-#endif // PARAVIEW_EMBED_PYTHON
+#endif // PARAVIEW_ENABLE_PYTHON
 
 #include <QVTKWidget.h>
 
@@ -172,9 +172,9 @@ public:
     LinksManager(0),
     TimerLog(0)
   {
-#ifdef PARAVIEW_EMBED_PYTHON
+#ifdef PARAVIEW_ENABLE_PYTHON
   this->PythonDialog = 0;
-#endif // PARAVIEW_EMBED_PYTHON
+#endif // PARAVIEW_ENABLE_PYTHON
   this->MultiViewManager.setObjectName("MultiViewManager");
   }
 
@@ -221,9 +221,9 @@ public:
   QPointer<pqLinksManager> LinksManager;
   QPointer<pqTimerLogDisplay> TimerLog;
 
-#ifdef PARAVIEW_EMBED_PYTHON
+#ifdef PARAVIEW_ENABLE_PYTHON
   QPointer<pqPythonDialog> PythonDialog;
-#endif // PARAVIEW_EMBED_PYTHON
+#endif // PARAVIEW_ENABLE_PYTHON
 
   pqCoreTestUtility TestUtility;
   pqActiveServer ActiveServer;
@@ -1727,7 +1727,7 @@ void pqMainWindowCore::onToolsOutputWindow()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsPythonShell()
 {
-#ifdef PARAVIEW_EMBED_PYTHON
+#ifdef PARAVIEW_ENABLE_PYTHON
   if (!this->Implementation->PythonDialog)
     {
     const char* argv0 = vtkProcessModule::GetProcessModule()->
@@ -1740,9 +1740,9 @@ void pqMainWindowCore::onToolsPythonShell()
   this->Implementation->PythonDialog->raise();
   this->Implementation->PythonDialog->activateWindow();
  
-#else // PARAVIEW_EMBED_PYTHON
+#else // PARAVIEW_ENABLE_PYTHON
   QMessageBox::information(NULL, "ParaView", "Python Shell not available");
-#endif // PARAVIEW_EMBED_PYTHON
+#endif // PARAVIEW_ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------

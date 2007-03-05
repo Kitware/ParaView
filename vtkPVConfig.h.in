@@ -22,7 +22,7 @@
 #cmakedefine XDMF_SYSTEM_HDF5
 #cmakedefine PARAVIEW_BUILD_DEVELOPMENT
 #cmakedefine PARAVIEW_BLT_LIBRARY
-#cmakedefine PARAVIEW_ENABLE_PYTHON_FILTER
+#cmakedefine PARAVIEW_ENABLE_PYTHON
 
 // Build ParaView with Floating Point Exceptions turned on
 #cmakedefine PARAVIEW_ENABLE_FPE

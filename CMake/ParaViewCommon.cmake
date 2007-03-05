@@ -386,9 +386,7 @@ SUBDIRS(Utilities/VTKClientServer)
 
 #########################################################################
 # Configure Python wrapping
-OPTION(PARAVIEW_WRAP_PYTHON "Wrap ParaView server manager into Python" OFF)
-MARK_AS_ADVANCED(PARAVIEW_WRAP_PYTHON)
-IF(PARAVIEW_WRAP_PYTHON)
+IF(PARAVIEW_ENABLE_PYTHON)
   FIND_PACKAGE(PythonLibs REQUIRED)
   SUBDIRS(Utilities/VTKPythonWrapping)
   IF(PV_INSTALL_NO_LIBRARIES)
@@ -399,7 +397,7 @@ IF(PARAVIEW_WRAP_PYTHON)
   SET(VTKPythonWrapping_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
   SET(VTKPythonWrapping_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
   MARK_AS_ADVANCED(PYTHON_INCLUDE_PATH PYTHON_LIBRARY)
-ENDIF(PARAVIEW_WRAP_PYTHON)
+ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 #########################################################################
 # Configure Tcl Wraping.
@@ -553,9 +551,9 @@ SUBDIRS(Servers)
 
 #########################################################################
 # Configure Python executable
-IF(PARAVIEW_WRAP_PYTHON)
+IF(PARAVIEW_ENABLE_PYTHON)
   SUBDIRS(Utilities/VTKPythonWrapping/Executable)
-ENDIF(PARAVIEW_WRAP_PYTHON)
+ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 #########################################################################
 # Configure Servers executables
