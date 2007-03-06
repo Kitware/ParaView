@@ -315,15 +315,15 @@ int pqSelectionManager::setInteractorStyleToSelect(pqRenderViewModule* rm)
     }
 
   //start watching left mouse actions to get a begin and end pixel
+  this->Implementation->SavedStyle = rwi->GetInteractorStyle();
+  this->Implementation->SavedStyle->Register(0);
+  rwi->SetInteractorStyle(this->Implementation->RubberBand);
+  
   rwi->AddObserver(vtkCommand::LeftButtonPressEvent, 
                    this->Implementation->SelectionObserver);
   rwi->AddObserver(vtkCommand::LeftButtonReleaseEvent, 
                    this->Implementation->SelectionObserver);
 
-  this->Implementation->SavedStyle = rwi->GetInteractorStyle();
-  this->Implementation->SavedStyle->Register(0);
-  rwi->SetInteractorStyle(this->Implementation->RubberBand);
-  
   this->Implementation->RubberBand->StartSelect();
 
   return 1;
