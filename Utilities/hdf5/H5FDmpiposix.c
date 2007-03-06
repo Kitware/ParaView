@@ -870,7 +870,10 @@ H5FD_mpiposix_open(const char *name, unsigned flags, hid_t fapl_id,
     /* Set the general file information */
     file->fd = fd;
     file->eof = sb.st_size;
+#ifndef WIN32
     file->blksize = sb.st_blksize;
+#endif
+
 
     /* Set this field in the H5FD_mpiposix_t struct for later use */
     file->use_gpfs = fa->use_gpfs;
@@ -1491,7 +1494,7 @@ H5FD_mpiposix_flush(H5FD_t *_file, hid_t UNUSED dxpl_id, unsigned UNUSED closing
         if(file->mpi_rank == H5_PAR_META_WRITE) {
 #ifdef WIN32
             /* Map the posix file handle to a Windows file handle */
-            filehandle = _get_osfhandle(fd);
+            filehandle = _get_osfhandle(filehandle);
 
             /* Translate 64-bit integers into form Windows wants */
             /* [This algorithm is from the Windows documentation for SetFilePointer()] */
