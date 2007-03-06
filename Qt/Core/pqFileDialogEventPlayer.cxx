@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogEventPlayer.h"
 #include "pqCoreTestUtility.h"
 
-#include <pqFileDialog.h>
+#include "pqFileDialog.h"
+#include "pqEventDispatcher.h"
 
 #include <QApplication>
 #include <QtDebug>
@@ -83,7 +84,7 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
     files.append(file);
 
     object->emitFilesSelected(files);
-    QApplication::processEvents();
+    pqEventDispatcher::processEventsAndWait(0);
         
     return true;
     }
