@@ -100,6 +100,10 @@ signals:
   // emitted when the user has marked a selection i.e.
   // on mouse up in selection mode.
   void selectionMarked();
+
+  // emitted when the user changes to a 3d view and declares whether
+  // it is possible to do color buffer selections in that view or not
+  void selectionAvailable(bool);
   
 public slots:
   /// Change mode to INTERACT

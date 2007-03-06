@@ -619,6 +619,7 @@ void pqSelectionManager::processEvents(unsigned long eventId)
       this->Implementation->Ys = eventpos[1];
       break;
     case vtkCommand::LeftButtonReleaseEvent:
+      this->Implementation->RubberBand->CancelSelect();
       this->Implementation->Xe = eventpos[0];
       this->Implementation->Ye = eventpos[1];
       this->prepareForSelection();
@@ -908,6 +909,20 @@ void pqSelectionManager::updateSelections()
     }
   this->Implementation->InUpdateSelections  = true;
   
+  // Enable or disable the selection button 
+  // This is here instead of in SetActiveView because before this point
+  // The RMProxy will not have a vtkRenderWindow assigned.
+  bool selectOK = false;
+  vtkSMRenderModuleProxy* rmp = this->Implementation->RenderModule->getRenderModuleProxy();
+  if (rmp)
+    {
+    if (rmp->IsSelectionAvailable() == 1)
+      {
+      selectOK = true;
+      }
+    }
+  emit this->selectionAvailable(selectOK);
+
   pqSelectionManagerImplementation::ServerSelectionsType::iterator iter =
     this->Implementation->ServerSelections.begin();
   for(; iter != this->Implementation->ServerSelections.end(); iter++)

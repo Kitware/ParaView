@@ -193,6 +193,12 @@ public:
   vtkSMProxy *GetProxyForDisplay(int number, int proxyType);
 
   // Description:
+  // Checks if color depth is sufficient to support selection.
+  // If not, will return 0 and any calls to SelectVisibleCells will 
+  // quietly return an empty selection.
+  int IsSelectionAvailable();
+
+  // Description:
   // Return a list of visible cells within the provided screen area.
   vtkSelection *SelectVisibleCells(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1);
 

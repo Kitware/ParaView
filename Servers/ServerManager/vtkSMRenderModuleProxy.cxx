@@ -55,7 +55,7 @@
 #include "vtkWindowToImageFilter.h"
 #include "vtkMemberFunctionCommand.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.71");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.72");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1447,8 +1447,32 @@ void vtkSMRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
+int vtkSMRenderModuleProxy::IsSelectionAvailable()
+{  
+  int rgba[4];
+  vtkRenderWindow *rwin = this->GetRenderWindow();
+  if (rwin)
+    {
+    rwin->GetColorBufferSizes(rgba);
+    if (rgba[0] >= 8 && rgba[1] >= 8 && rgba[2] >= 8)
+      {
+      return 1;
+      }
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
 vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
 {  
+
+  if (!this->IsSelectionAvailable())
+    {
+    vtkSelection *selection = vtkSelection::New();
+    selection->Clear();
+    return selection;
+    }
+
   int *win_size=this->GetRenderWindow()->GetSize();
   unsigned int wsx = (unsigned int) win_size[0];
   unsigned int wsy = (unsigned int) win_size[1];

@@ -366,6 +366,12 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionSelectFrustum, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToSelectThrough()));
 
+  QObject::connect(
+    &this->Implementation->Core.selectionManager(),
+    SIGNAL(selectionAvailable(bool)),
+    this->Implementation->UI.actionSelectionMode, 
+    SLOT(setEnabled(bool)));
+
   // Create Selection Shortcut.
   QShortcut *s=new QShortcut(QKeySequence(tr("S")),&this->Implementation->Core.multiViewManager());
   QObject::connect(
