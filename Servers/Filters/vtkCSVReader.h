@@ -91,8 +91,15 @@ protected:
   vtkCSVReader();
   ~vtkCSVReader();
 
-  int RequestData(vtkInformation*, vtkInformationVector**, 
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, 
     vtkInformationVector*);
+
+  virtual int RequestInformation(vtkInformation *, 
+    vtkInformationVector **, vtkInformationVector *);
+
+  // Description:
+  // Performs the actual reading.
+  virtual int ReadData(vtkRectilinearGrid* output);
 
   char* FileName;
   char *FieldDelimiterCharacters;
@@ -100,7 +107,8 @@ protected:
   bool UseStringDelimiter;
   bool HaveHeaders;
   bool MergeConsecutiveDelimiters;
-
+  vtkRectilinearGrid* Cache;
+  vtkTimeStamp CacheUpdateTime;
 private:
   vtkCSVReader(const vtkCSVReader&); // Not implemented.
   void operator=(const vtkCSVReader&); // Not implemented.

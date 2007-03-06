@@ -16,6 +16,7 @@
 
 #include "vtkCellData.h"
 #include "vtkDelimitedTextReader.h"
+#include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -23,17 +24,17 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
 #include "vtkStdString.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 #include "vtkVariant.h"
-#include "vtkDoubleArray.h"
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkCSVReader);
-vtkCxxRevisionMacro(vtkCSVReader, "1.1");
+vtkCxxRevisionMacro(vtkCSVReader, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkCSVReader::vtkCSVReader()
@@ -47,6 +48,7 @@ vtkCSVReader::vtkCSVReader()
   this->UseStringDelimiter = true;
   this->HaveHeaders = false;
   this->MergeConsecutiveDelimiters = false;
+  this->Cache = vtkRectilinearGrid::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -54,7 +56,7 @@ vtkCSVReader::~vtkCSVReader()
 {
   this->SetFileName(0);
   this->SetFieldDelimiterCharacters(0);
-
+  this->Cache->Delete();
 }
 
 enum ColumnCategories
@@ -74,11 +76,42 @@ struct ColumnInfo
 };
 
 //-----------------------------------------------------------------------------
+int vtkCSVReader::RequestInformation(
+  vtkInformation *,
+  vtkInformationVector **,
+  vtkInformationVector *outputVector)
+{
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  if (this->CacheUpdateTime <= this->GetMTime())
+    {
+    this->Cache->Initialize();
+    if (!this->ReadData(this->Cache))
+      {
+      // failed to read file.
+      return 0;
+      }
+    this->CacheUpdateTime.Modified();
+    }
+
+  int extent[6];
+  this->Cache->GetExtent(extent);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),
+    extent, 6);
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
 int vtkCSVReader::RequestData(vtkInformation*, vtkInformationVector**, 
   vtkInformationVector* outputVector)
 {
   vtkRectilinearGrid* output = vtkRectilinearGrid::GetData(outputVector, 0); 
+  output->ShallowCopy(this->Cache);
+  return 1;
+}
 
+//-----------------------------------------------------------------------------
+int vtkCSVReader::ReadData(vtkRectilinearGrid* output)
+{
   // Create the internal reader and read the file.
   // TODO: we need to pass the update request correctly to this reader.
   vtkSmartPointer<vtkDelimitedTextReader> reader = 
@@ -376,9 +409,6 @@ int vtkCSVReader::RequestData(vtkInformation*, vtkInformationVector**,
   return 1;
 } 
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void vtkCSVReader::PrintSelf(ostream& os, vtkIndent indent)
 {
