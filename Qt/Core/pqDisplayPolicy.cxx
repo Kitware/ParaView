@@ -90,10 +90,9 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
   vtkPVXMLElement* hints = source->getHints();
   vtkPVXMLElement* viewElement = hints? 
     hints->FindNestedElementByName("View") : 0;
-  const char* view_type = viewElement? viewElement->GetAttribute("type") : 0;
-  QString temp_type;
+  QString view_type = viewElement ? QString(viewElement->GetAttribute("type")) : QString::null;
 
-  if (!view_type)
+  if (view_type.isNull())
     {
     // The proxy gives us no hint. In that case we try to determine the
     // preferred view by looking at the output from the source.
@@ -115,18 +114,16 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
       if (non_zero_dims == 1 && cellDataInfo->GetNumberOfArrays() > 0)
         {
         // Has cell data, mostlikely this is a histogram.
-        temp_type = pqPlotViewModule::barChartType();
-        view_type = temp_type.toAscii().data();
+        view_type = pqPlotViewModule::barChartType();
         }
       else if (non_zero_dims == 1 && pointDataInfo->GetNumberOfArrays() > 0)
         {
         // No cell data, but some point data -- may be a XY line plot.
-        temp_type = pqPlotViewModule::XYPlotType();
-        view_type = temp_type.toAscii().data();
+        view_type = pqPlotViewModule::XYPlotType();
         }
       }
     }
-  if (view_type)
+  if (!view_type.isNull())
     {
     QString proxy_name = view_type;
     proxy_name += "ViewModule";
