@@ -619,7 +619,6 @@ void pqSelectionManager::processEvents(unsigned long eventId)
       this->Implementation->Ys = eventpos[1];
       break;
     case vtkCommand::LeftButtonReleaseEvent:
-      this->Implementation->RubberBand->CancelSelect();
       this->Implementation->Xe = eventpos[0];
       this->Implementation->Ye = eventpos[1];
       this->prepareForSelection();
