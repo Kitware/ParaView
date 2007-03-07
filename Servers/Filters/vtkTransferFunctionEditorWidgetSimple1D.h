@@ -89,6 +89,10 @@ public:
   // Update this widget based on changes to the transfer functions.
   virtual void UpdateFromTransferFunctions();
 
+  // Description:
+  // Set the type of function to modify.
+  virtual void SetModificationType(int type);
+
 protected:
   vtkTransferFunctionEditorWidgetSimple1D();
   ~vtkTransferFunctionEditorWidgetSimple1D();

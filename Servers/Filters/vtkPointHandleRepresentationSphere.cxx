@@ -31,7 +31,7 @@
 #include "vtkSphereSource.h"
 #include "vtkWindow.h"
 
-vtkCxxRevisionMacro(vtkPointHandleRepresentationSphere, "1.1");
+vtkCxxRevisionMacro(vtkPointHandleRepresentationSphere, "1.2");
 vtkStandardNewMacro(vtkPointHandleRepresentationSphere);
 
 vtkCxxSetObjectMacro(vtkPointHandleRepresentationSphere,Property,vtkProperty);
@@ -81,6 +81,8 @@ vtkPointHandleRepresentationSphere::vtkPointHandleRepresentationSphere()
   // The size of the hot spot
   this->WaitingForMotion = 0;
   this->ConstraintAxis = -1;
+
+  this->Scalar = VTK_DOUBLE_MAX;
 }
 
 //----------------------------------------------------------------------

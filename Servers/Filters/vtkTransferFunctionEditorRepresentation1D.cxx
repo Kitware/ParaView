@@ -21,7 +21,7 @@
 #include "vtkPointData.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.5");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.6");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation1D, Histogram,
                      vtkIntArray);
@@ -95,6 +95,10 @@ void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
   double range[2];
   this->Histogram->GetRange(range);
   double logRange = log(range[1]);
+  unsigned char color[3];
+  color[0] = this->HistogramColor[0] * 255;
+  color[1] = this->HistogramColor[1] * 255;
+  color[2] = this->HistogramColor[2] * 255;
 
   int i, j, histogramIdx, height;
 
@@ -115,9 +119,9 @@ void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
 
     for (j = 0; j < height; j++)
       {
-      scalars->SetComponent(j * this->DisplaySize[0] + i, 0, 200);
-      scalars->SetComponent(j * this->DisplaySize[0] + i, 1, 200);
-      scalars->SetComponent(j * this->DisplaySize[0] + i, 2, 200);
+      scalars->SetComponent(j * this->DisplaySize[0] + i, 0, color[0]);
+      scalars->SetComponent(j * this->DisplaySize[0] + i, 1, color[1]);
+      scalars->SetComponent(j * this->DisplaySize[0] + i, 2, color[2]);
       scalars->SetComponent(j * this->DisplaySize[0] + i, 3, 255);
       }
     for (j = height; j < this->DisplaySize[1]; j++)
@@ -128,6 +132,8 @@ void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
       scalars->SetComponent(j * this->DisplaySize[0] + i, 3, 0);
       }
     }
+
+  this->HistogramImage->Modified();
 }
 
 //----------------------------------------------------------------------------

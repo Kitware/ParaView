@@ -30,6 +30,7 @@
 
 #include "vtkWidgetRepresentation.h"
 
+class vtkColorTransferFunction;
 class vtkImageActor;
 
 class VTK_EXPORT vtkTransferFunctionEditorRepresentation : public vtkWidgetRepresentation
@@ -77,6 +78,14 @@ public:
   virtual void SetActiveHandle(unsigned int) {}
   virtual unsigned int GetActiveHandle() { return 0; }
 
+  // Description:
+  // Set the color of the histogram.
+  vtkSetVector3Macro(HistogramColor, double);
+
+  // Description:
+  // Set the color transfer function being modified.
+  virtual void SetColorFunction(vtkColorTransferFunction *color);
+
 protected:
   vtkTransferFunctionEditorRepresentation();
   ~vtkTransferFunctionEditorRepresentation();
@@ -85,6 +94,8 @@ protected:
   int HistogramVisibility;
   int DisplaySize[2];
   int ScalarBinRange[2];
+  double HistogramColor[3];
+  vtkColorTransferFunction *ColorFunction;
 
 private:
   vtkTransferFunctionEditorRepresentation(const vtkTransferFunctionEditorRepresentation&); // Not implemented.

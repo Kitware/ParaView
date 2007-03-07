@@ -32,7 +32,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.14");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.15");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -267,6 +267,21 @@ void vtkTransferFunctionViewer::SetBackgroundColor(double r, double g,
                                                    double b)
 {
   this->Renderer->SetBackground(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetHistogramColor(double r, double g, double b)
+{
+  if (this->EditorWidget)
+    {
+    vtkTransferFunctionEditorRepresentation *rep =
+      vtkTransferFunctionEditorRepresentation::SafeDownCast(
+        this->EditorWidget->GetRepresentation());
+    if (rep)
+      {
+      rep->SetHistogramColor(r, g, b);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

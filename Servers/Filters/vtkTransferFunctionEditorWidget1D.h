@@ -40,6 +40,8 @@ protected:
   vtkTransferFunctionEditorWidget1D();
   ~vtkTransferFunctionEditorWidget1D();
 
+  double ComputeScalar(double pos, int width);
+
 private:
   vtkTransferFunctionEditorWidget1D(const vtkTransferFunctionEditorWidget1D&); // Not implemented.
   void operator=(const vtkTransferFunctionEditorWidget1D&); // Not implemented.

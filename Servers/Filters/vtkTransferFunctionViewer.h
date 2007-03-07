@@ -63,6 +63,14 @@ public:
     { this->SetBackgroundColor(color[0], color[1], color[2]); }
 
   // Description:
+  // Set the color of the histogram.
+  // Set the transfer function editor type before setting the color of the
+  // histogram.
+  void SetHistogramColor(double r, double g, double b);
+  void SetHistogramColor(double color[3])
+    { this->SetHistogramColor(color[0], color[1], color[2]); }
+
+  // Description:
   // Set/get the size of the rendering window.
   void SetSize(int x, int y);
   void SetSize(int size[2])

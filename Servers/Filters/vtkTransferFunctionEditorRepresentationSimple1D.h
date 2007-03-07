@@ -24,6 +24,7 @@
 #include "vtkTransferFunctionEditorRepresentation1D.h"
 
 class vtkActor;
+class vtkColorTransferFunction;
 class vtkHandleList;
 class vtkHandleRepresentation;
 class vtkPointHandleRepresentationSphere;
@@ -50,7 +51,7 @@ public:
   // Description:
   // Create a new handle representation for a transfer function node at a
   // particular display position. Returns the id of the node.
-  unsigned int CreateHandle(double displayPos[3]);
+  unsigned int CreateHandle(double displayPos[3], double scalar);
 
   // Description:
   // Return the vtkHandleRepresentation (for a transfer function node) with a
@@ -60,7 +61,8 @@ public:
   // Description:
   // Set/get the display position of a vtkHandleRepresentation (for a transfer
   // function node) with a particular id.
-  virtual void SetHandleDisplayPosition(unsigned int nodeNum, double pos[3]);
+  virtual void SetHandleDisplayPosition(unsigned int nodeNum, double pos[3],
+                                        double scalar);
   void GetHandleDisplayPosition(unsigned int nodeNum, double pos[3]);
   double* GetHandleDisplayPosition(unsigned int nodeNum);
 
@@ -83,7 +85,7 @@ public:
   virtual int RenderOpaqueGeometry(vtkViewport *viewport);
   virtual int RenderTranslucentPolygonalGeometry(vtkViewport *viewport);
   virtual int RenderOverlay(vtkViewport *viewport);
-  virtual int HasTranslucentPolygonalGeometry(); 
+  virtual int HasTranslucentPolygonalGeometry();
 
 //BTX
   enum
@@ -96,6 +98,16 @@ public:
   // Description:
   // Set the color for the specified handle.
   void SetHandleColor(unsigned int idx, double r, double g, double b);
+
+  // Description:
+  // Pass the color transfer function to the representation.
+  // Used for coloring the lines by the color transfer function.
+  virtual void SetColorFunction(vtkColorTransferFunction *color);
+
+  // Description:
+  // Tell the representation whether the lines should be a solid color or
+  // whether they should display the color transfer function.
+  virtual void SetColorLinesByScalar(int color);
 
 protected:
   vtkTransferFunctionEditorRepresentationSimple1D();

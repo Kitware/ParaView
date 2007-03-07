@@ -83,7 +83,12 @@ public:
   virtual void GetActors(vtkPropCollection *);
   virtual void ReleaseGraphicsResources(vtkWindow *);
   virtual int RenderOpaqueGeometry(vtkViewport *viewport);
-  
+
+  // Description:
+  // Set/get the scalar value associated with this handle.
+  vtkSetMacro(Scalar, double);
+  vtkGetMacro(Scalar, double);
+
 protected:
   vtkPointHandleRepresentationSphere();
   ~vtkPointHandleRepresentationSphere();
@@ -116,7 +121,9 @@ protected:
   int    DetermineConstraintAxis(int constraint, double eventPos[2]);
   int    WaitingForMotion;
   int    WaitCount;
-  
+
+  double Scalar;
+
 private:
   vtkPointHandleRepresentationSphere(const vtkPointHandleRepresentationSphere&);  //Not implemented
   void operator=(const vtkPointHandleRepresentationSphere&);  //Not implemented

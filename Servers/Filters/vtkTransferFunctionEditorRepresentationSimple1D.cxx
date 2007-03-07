@@ -15,8 +15,11 @@
 #include "vtkTransferFunctionEditorRepresentationSimple1D.h"
 
 #include "vtkActor.h"
+#include "vtkColorTransferFunction.h"
 #include "vtkCommand.h"
+#include "vtkDoubleArray.h"
 #include "vtkMath.h"
+#include "vtkPointData.h"
 #include "vtkPointHandleRepresentationSphere.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
@@ -31,7 +34,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.8");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.9");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -73,6 +76,7 @@ vtkTransferFunctionEditorRepresentationSimple1D::vtkTransferFunctionEditorRepres
   this->Lines = vtkPolyData::New();
   this->LinesMapper = vtkPolyDataMapper::New();
   this->LinesMapper->SetInput(this->Lines);
+  this->LinesMapper->InterpolateScalarsBeforeMappingOn();
   this->LinesActor = vtkActor::New();
   this->LinesActor->SetMapper(this->LinesMapper);
 }
@@ -102,10 +106,20 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
     this->Lines->Initialize();
     this->Lines->Allocate();
 
+    vtkDoubleArray *scalars = vtkDoubleArray::New();
+    scalars->SetNumberOfComponents(1);
+    scalars->SetNumberOfTuples(this->Handles->size());
+
     unsigned int i = 1;
     double lastPos[3], pos[3];
     vtkHandleListIterator hiter = this->Handles->begin();
     (*hiter)->GetDisplayPosition(lastPos);
+    vtkPointHandleRepresentationSphere *rep =
+      vtkPointHandleRepresentationSphere::SafeDownCast(*hiter);
+    if (rep)
+      {
+      scalars->SetValue(0, rep->GetScalar());
+      }
     hiter++;
     vtkPoints *pts = vtkPoints::New();
     lastPos[2] = -8;
@@ -117,6 +131,11 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
       ids[0] = i-1;
       ids[1] = i;
       (*hiter)->GetDisplayPosition(pos);
+      rep = vtkPointHandleRepresentationSphere::SafeDownCast(*hiter);
+      if (rep)
+        {
+        scalars->SetValue(i, rep->GetScalar());
+        }
       pos[2] = -8;
       pts->InsertNextPoint(pos);
       this->Lines->InsertNextCell(VTK_LINE, 2, ids);
@@ -125,7 +144,9 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
       lastPos[2] = pos[0];
       }
     this->Lines->SetPoints(pts);
+    this->Lines->GetPointData()->SetScalars(scalars);
     pts->Delete();
+    scalars->Delete();
     delete [] ids;
     }
 }
@@ -171,7 +192,6 @@ int vtkTransferFunctionEditorRepresentationSimple1D::HasTranslucentPolygonalGeom
   return ret;
 }
 
-
 //----------------------------------------------------------------------------
 int vtkTransferFunctionEditorRepresentationSimple1D::RenderOverlay(
   vtkViewport *viewport)
@@ -184,6 +204,13 @@ int vtkTransferFunctionEditorRepresentationSimple1D::RenderOverlay(
     }
 
   return ret;
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::SetColorLinesByScalar(
+  int color)
+{
+  this->LinesMapper->SetScalarVisibility(color);
 }
 
 //----------------------------------------------------------------------------
@@ -243,7 +270,7 @@ vtkHandleRepresentation* vtkTransferFunctionEditorRepresentationSimple1D::GetHan
 
 //----------------------------------------------------------------------------
 unsigned int vtkTransferFunctionEditorRepresentationSimple1D::CreateHandle(
-  double displayPos[3])
+  double displayPos[3], double scalar)
 {
   vtkHandleRepresentation *rep = this->HandleRepresentation->NewInstance();
   rep->ShallowCopy(this->HandleRepresentation);
@@ -256,6 +283,7 @@ unsigned int vtkTransferFunctionEditorRepresentationSimple1D::CreateHandle(
     static_cast<vtkPointHandleRepresentationSphere*>(rep);
   pointRep->SetProperty(property);
   pointRep->SetSelectedProperty(property);
+  pointRep->SetScalar(scalar);
   property->Delete();
 
   rep->SetDisplayPosition(displayPos);
@@ -312,7 +340,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::UpdateHandleProperty(
 
 //----------------------------------------------------------------------
 void vtkTransferFunctionEditorRepresentationSimple1D::SetHandleDisplayPosition(
-  unsigned int nodeNum, double pos[3])
+  unsigned int nodeNum, double pos[3], double scalar)
 {
   if ( nodeNum >= this->Handles->size() )
     {
@@ -369,6 +397,12 @@ void vtkTransferFunctionEditorRepresentationSimple1D::SetHandleDisplayPosition(
       if (allowSet)
         {
         (*hiter)->SetDisplayPosition(pos);
+        vtkPointHandleRepresentationSphere *rep =
+          vtkPointHandleRepresentationSphere::SafeDownCast(*hiter);
+        if (rep)
+          {
+          rep->SetScalar(scalar);
+          }
         this->BuildRepresentation();
         this->InvokeEvent(vtkCommand::WidgetValueChangedEvent, NULL);
         return;
@@ -488,6 +522,14 @@ void vtkTransferFunctionEditorRepresentationSimple1D::HighlightActiveHandle()
         }
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::SetColorFunction(
+  vtkColorTransferFunction *color)
+{
+  this->Superclass::SetColorFunction(color);
+  this->LinesMapper->SetLookupTable(color);
 }
 
 //----------------------------------------------------------------------------

@@ -14,9 +14,13 @@
 =========================================================================*/
 #include "vtkTransferFunctionEditorRepresentation.h"
 
+#include "vtkColorTransferFunction.h"
 #include "vtkImageActor.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.3");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.4");
+
+vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation,
+                     ColorFunction, vtkColorTransferFunction);
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorRepresentation::vtkTransferFunctionEditorRepresentation()
@@ -27,12 +31,17 @@ vtkTransferFunctionEditorRepresentation::vtkTransferFunctionEditorRepresentation
   this->HistogramVisibility = 1;
   this->ScalarBinRange[0] = 1;
   this->ScalarBinRange[1] = 0;
+
+  this->HistogramColor[0] = this->HistogramColor[1] = this->HistogramColor[2] =
+    0.8;
+  this->ColorFunction = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorRepresentation::~vtkTransferFunctionEditorRepresentation()
 {
   this->HistogramActor->Delete();
+  this->SetColorFunction(NULL);
 }
 
 //----------------------------------------------------------------------------
