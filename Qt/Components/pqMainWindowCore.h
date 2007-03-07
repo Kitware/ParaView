@@ -43,7 +43,6 @@ class QSize;
 class pqAnimationManager;
 class pqAnimationScene;
 class pqGenericViewModule;
-class pqLookmarkToolbar;
 class pqMultiView;
 class pqObjectInspectorDriver;
 class pqObjectInspectorWidget;
@@ -123,8 +122,6 @@ public:
   void setupVariableToolbar(QToolBar* parent);
   /// Setup a compound-proxy toolbar
   void setupCustomFilterToolbar(QToolBar* parent);
-  /// Setup a lookmark toolbar
-  void setupLookmarkToolbar(pqLookmarkToolbar* parent);
   /// Setup a representation-selection toolbar
   void setupRepresentationToolbar(QToolBar* parent);
   
@@ -145,6 +142,9 @@ public:
 
   /// returns the active source.
   pqPipelineSource* getActiveSource();
+
+  /// populate list of the non-server, non-filter objects that are in the same pipeline as "src"
+  void getRootSources(QList<pqPipelineSource*> *sources, pqPipelineSource *src);
 
   /// returns the active server.
   pqServer* getActiveServer();
@@ -255,15 +255,6 @@ public slots:
   // Right now this creates one for a single render view only.
   void onToolsCreateLookmark();
   void onToolsCreateLookmark(pqGenericViewModule*);
-
-  // Have the main window handle all lookmark load signals (from the toolbar, inspector, browser)
-  // The reason is because the lookmark needs to be passed a server to load the state on and
-  // this class keeps track of the active server. It also contains code to prompt the user if there is none. 
-  void onLoadLookmark(const QString &name);
-  void onLoadCurrentLookmark(pqServer *server);
-
-  // Display the Lookmark Inspector and set the current lookmark to the one with name "name"
-  void onEditLookmark(const QString &name);
 
   void onToolsManageLinks();
 

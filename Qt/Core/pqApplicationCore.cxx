@@ -94,7 +94,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqWriterFactory.h"
 #include "pqXMLUtil.h"
-#include "pqLookmarkManagerModel.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -102,7 +101,6 @@ class pqApplicationCoreInternal
 public:
   pqServerManagerObserver* ServerManagerObserver;
   pqServerManagerModel* ServerManagerModel;
-  pqLookmarkManagerModel* LookmarkManagerModel;
   pqUndoStack* UndoStack;
   pqPipelineBuilder* PipelineBuilder;
   pq3DWidgetFactory* WidgetFactory;
@@ -156,6 +154,7 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   // *  Make signal-slot connections between ServerManagerObserver and ServerManagerModel.
   this->connect(this->Internal->ServerManagerObserver, this->Internal->ServerManagerModel);
 
+
   // *  Create the Undo/Redo stack.
   this->Internal->UndoStack = new pqUndoStack(false, this);
 
@@ -186,10 +185,6 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   // add standard views
   this->Internal->PluginManager.addInterface(
     new pqStandardViewModules(&this->Internal->PluginManager));
-
-  // *  Create pqLookmarkManagerModel.
-  //    This is the model for the application's collection of lookmarks.
-  this->Internal->LookmarkManagerModel = new pqLookmarkManagerModel(this);
 
   this->LoadingState = false;
 }
@@ -267,12 +262,6 @@ pqServerManagerObserver* pqApplicationCore::getServerManagerObserver()
 pqServerManagerModel* pqApplicationCore::getServerManagerModel()
 {
   return this->Internal->ServerManagerModel;
-}
-
-//-----------------------------------------------------------------------------
-pqLookmarkManagerModel* pqApplicationCore::getLookmarkManagerModel()
-{
-  return this->Internal->LookmarkManagerModel;
 }
 
 //-----------------------------------------------------------------------------

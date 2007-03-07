@@ -90,7 +90,7 @@
       <item>
        <widget class="QPushButton" name="RemoveButton" >
         <property name="text" >
-         <string>Delete</string>
+         <string>Remove</string>
         </property>
        </widget>
       </item>
@@ -136,3 +136,4 @@
  </resources>
  <connections/>
 </ui>
+

@@ -374,23 +374,6 @@
     <number>4</number>
    </attribute>
   </widget>
-  <widget class="pqLookmarkToolbar" native="1" name="lookmarkToolbar" >
-   <property name="windowTitle" >
-    <string>Lookmark Toolbar</string>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Vertical</enum>
-   </property>
-   <property name="iconSize" >
-    <size>
-     <width>48</width>
-     <height>48</height>
-    </size>
-   </property>
-   <attribute name="toolBarArea" >
-    <number>2</number>
-   </attribute>
-  </widget>
   <widget class="QToolBar" name="cameraToolbar" >
    <property name="windowTitle" >
     <string>Camera Controls</string>
@@ -1125,14 +1108,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>pqLookmarkToolbar</class>
-   <extends>QToolBar</extends>
-   <header>pqLookmarkToolbar.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../../Qt/Components/Resources/pqComponents.qrc" />
  </resources>

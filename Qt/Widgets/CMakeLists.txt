@@ -35,8 +35,6 @@ SET(QtWidgets_SRCS
   pqFlatTreeView.h
   pqListWidgetItemObject.cxx
   pqListWidgetItemObject.h
-  pqLookmarkToolbar.cxx
-  pqLookmarkToolbar.h
   pqProgressBar.cxx
   pqProgressBar.h
   pqProgressWidget.cxx
@@ -78,7 +76,6 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqDelimitedTextParser.h
   pqFlatTreeView.h
   pqListWidgetItemObject.h
-  pqLookmarkToolbar.h
   pqProgressBar.h
   pqProgressWidget.h
   pqSectionVisibilityContextMenu.h
