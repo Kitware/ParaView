@@ -53,9 +53,8 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkMemberFunctionCommand.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.72");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.73");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -320,13 +319,6 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->Helper = vtkPVRenderModuleHelper::SafeDownCast(
     pvm->GetObjectFromID(this->HelperProxy->GetID(0)));
 
-  vtkMemberFunctionCommand<vtkSMRenderModuleProxy>* interactorObserver
-    = vtkMemberFunctionCommand<vtkSMRenderModuleProxy>::New();
-  interactorObserver->SetCallback(
-    (*this), &vtkSMRenderModuleProxy::OnInteractionEvent);
-  this->Interactor->AddObserver(vtkCommand::InteractionEvent, interactorObserver);
-  interactorObserver->Delete();
-
   // Set the active camera for the renderers.  We can't use the Proxy
   // Property since Camera is only create on the CLIENT.  Proxy properties
   // don't take intersection of servers on which they are created before
@@ -483,12 +475,6 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::OnInteractionEvent()
-{
-  this->ActiveCameraProxy->UpdatePropertyInformation();
-}
-
-//-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::SetUseLight(int enable)
 {
   if (!this->RendererProxy || !this->LightKitProxy)
@@ -543,6 +529,10 @@ void vtkSMRenderModuleProxy::BeginInteractiveRender()
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::EndInteractiveRender()
 {
+  // This is a fast operation since we directly use the client side camera.
+  this->ActiveCameraProxy->UpdatePropertyInformation();
+
+
   this->Superclass::EndInteractiveRender();
   //pm->SendCleanupPendingProgress(this->ConnectionID);
 }
@@ -571,6 +561,9 @@ void vtkSMRenderModuleProxy::BeginStillRender()
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::EndStillRender()
 {
+  // This is a fast operation since we directly use the client side camera.
+  this->ActiveCameraProxy->UpdatePropertyInformation();
+
   this->Superclass::EndStillRender();
 
   //pm->SendCleanupPendingProgress(this->ConnectionID);

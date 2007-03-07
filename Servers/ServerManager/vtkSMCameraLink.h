@@ -50,8 +50,9 @@ public:
   virtual void RemoveLinkedProxy(vtkSMProxy* proxy);
   
   // Description:
-  // Update all the views linked with an OUTPUT direction
-  virtual void UpdateViews(vtkSMProxy* caller);
+  // Update all the views linked with an OUTPUT direction.
+  // \c interactive indicates if the render is interactive or not.
+  virtual void UpdateViews(vtkSMProxy* caller, bool interactive);
 
 protected:
   vtkSMCameraLink();

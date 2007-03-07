@@ -25,18 +25,19 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.4");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.5");
 
 //---------------------------------------------------------------------------
 struct vtkSMCameraLinkInternals
 {
   static void UpdateViewCallback(vtkObject* caller, unsigned long eid, 
-                                 void* clientData, void*)
+                                 void* clientData, void* callData)
     {
-    if(eid == vtkCommand::EndEvent && clientData && caller)
+    if(eid == vtkCommand::EndEvent && clientData && caller && callData)
       {
+      int *interactive = reinterpret_cast<int*>(callData);
       vtkSMCameraLink* camLink = reinterpret_cast<vtkSMCameraLink*>(clientData);
-      camLink->UpdateViews(vtkSMProxy::SafeDownCast(caller));
+      camLink->UpdateViews(vtkSMProxy::SafeDownCast(caller), (*interactive==1));
       }
     }
   struct LinkedCamera
@@ -150,7 +151,7 @@ void vtkSMCameraLink::UpdateVTKObjects(vtkSMProxy* vtkNotUsed(fromProxy))
 }
 
 //---------------------------------------------------------------------------
-void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller)
+void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
 {
   if(this->Internals->Updating)
     {
@@ -182,13 +183,20 @@ void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller)
   for(int i=0; i<numObjects; i++)
     {
     vtkSMProxy* p = this->GetLinkedProxy(i);
-    if(this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT)
+    if(this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT && p != caller)
       {
       vtkSMRenderModuleProxy* rmp;
       rmp = vtkSMRenderModuleProxy::SafeDownCast(p);
       if(rmp)
         {
-        rmp->StillRender();
+        if (interactive)
+          {
+          rmp->InteractiveRender();
+          }
+        else
+          {
+          rmp->StillRender();
+          }
         }
       }
     }
