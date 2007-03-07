@@ -93,6 +93,15 @@ public:
 
   friend class vtkPQSelectionObserver;
 
+  /// Change mode to select listed cell ids
+  void setIds(int numvals, int *vals);
+
+  /// Change mode to select cells with that contain the given points
+  void setPoints(int numvals, double *vals);
+
+  /// Change mode to select data with attributes within the given thresholds
+  void setThresholds(int numvals, double *vals);
+
 signals:
   // fired when the selection changes.
   void selectionChanged(pqSelectionManager*);
@@ -114,15 +123,6 @@ public slots:
 
   /// Change mode to frustum selection
   void switchToSelectThrough();
-
-  /// Change mode to select listed cell ids
-  void setIds(int id);
-
-  /// Change mode to select cells with that contain the given points
-  void setPoints(double X, double Y, double Z);
-
-  /// Change mode to select data with attributes within the given thresholds
-  void setThresholds(double min, double max);
 
   /// Clear all selections. Note that this does not clear
   /// the server manager model selection

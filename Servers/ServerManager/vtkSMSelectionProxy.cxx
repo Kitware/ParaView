@@ -72,7 +72,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.10");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -86,12 +86,12 @@ vtkSMSelectionProxy::vtkSMSelectionProxy()
   this->ScreenRectangle[1] = 0;
   this->ScreenRectangle[2] = 0;
   this->ScreenRectangle[3] = 0;
-  this->Ids = 0;
-  this->Points[0] = 0.0;
-  this->Points[1] = 0.0;
-  this->Points[2] = 0.0;
-  this->Thresholds[0] = 0.0;
-  this->Thresholds[1] = 1.0;
+  this->NumIds = 0;
+  this->Ids = NULL;
+  this->NumPoints = 0;
+  this->Points = NULL;
+  this->NumThresholds = 0;
+  this->Thresholds = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -99,6 +99,18 @@ vtkSMSelectionProxy::~vtkSMSelectionProxy()
 {
   this->SetRenderModule(0);
   this->SetClientSideSelection(0);
+  if (this->Ids != NULL)
+    {
+    delete[] this->Ids;
+    }
+  if (this->Points != NULL)
+    {
+    delete[] this->Points;
+    }
+  if (this->Thresholds != NULL)
+    {
+    delete[] this->Thresholds;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -606,10 +618,10 @@ void vtkSMSelectionProxy::SelectIds(
     );
   vtkIdTypeArray* vals = vtkIdTypeArray::New();
   vals->SetNumberOfComponents(1);
-  vals->SetNumberOfTuples(1);
-  for (int i = 0; i<1; i++)
+  vals->SetNumberOfTuples(this->NumIds);
+  for (int i = 0; i<this->NumIds; i++)
     {
-    vals->SetValue(i, this->Ids);
+    vals->SetTupleValue(i, &this->Ids[i]);
     }
   sel->SetSelectionList(vals);
   this->SendSelection(sel,inSel);
@@ -719,10 +731,10 @@ void vtkSMSelectionProxy::SelectPoints(
     );
   vtkDoubleArray* vals = vtkDoubleArray::New();
   vals->SetNumberOfComponents(3);
-  vals->SetNumberOfTuples(1);
-  for (int i = 0; i<1; i++)
+  vals->SetNumberOfTuples(this->NumPoints);
+  for (int i = 0; i<this->NumPoints; i++)
     {
-    vals->SetTupleValue(i, &this->Points[i]);
+    vals->SetTupleValue(i, &this->Points[i*3]);
     }
   sel->SetSelectionList(vals);
   this->SendSelection(sel,inSel);
@@ -832,8 +844,8 @@ void vtkSMSelectionProxy::SelectThresholds(
     );
   vtkDoubleArray* vals = vtkDoubleArray::New();
   vals->SetNumberOfComponents(1);
-  vals->SetNumberOfTuples(2);
-  for (int i = 0; i<2; i+=2)
+  vals->SetNumberOfTuples(this->NumThresholds*2);
+  for (int i = 0; i<this->NumThresholds; i++)
     {
     vals->SetValue(i*2+0, this->Thresholds[i*2+0]);
     vals->SetValue(i*2+1, this->Thresholds[i*2+1]);
@@ -1048,3 +1060,67 @@ void vtkSMSelectionProxy::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << endl;
 }
+
+//-----------------------------------------------------------------------------
+void vtkSMSelectionProxy::SetNumIds(int num)
+{
+  if (this->Ids != NULL)
+    {
+    delete[] this->Ids;
+    }
+  this->Ids = new int[num];
+  this->NumIds = num;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSelectionProxy::SetIds(int i, int *vals)
+{
+  if (this->Ids == NULL)
+    {
+    return;
+    }
+  memcpy(&this->Ids[i], vals, sizeof(int));
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSelectionProxy::SetNumPoints(int num)
+{
+  if (this->Points != NULL)
+    {
+    delete[] this->Points;
+    }
+  this->Points = new double[num*3];
+  this->NumPoints = num;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSelectionProxy::SetPoints(int i, double *vals)
+{
+  if (this->Points == NULL)
+    {
+    return;
+    }
+  memcpy(&this->Points[i*3], vals, sizeof(double)*3);
+}
+//-----------------------------------------------------------------------------
+void vtkSMSelectionProxy::SetNumThresholds(int num)
+{
+  if (this->Thresholds != NULL)
+    {
+    delete[] this->Thresholds;
+    }
+  this->Thresholds = new double[num*2];
+  this->NumThresholds = num;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSelectionProxy::SetThresholds(int i, double *vals)
+{
+  if (this->Thresholds == NULL)
+    {
+    return;
+    }
+  memcpy(&this->Thresholds[i*2], vals, sizeof(double)*2);
+}
+
+

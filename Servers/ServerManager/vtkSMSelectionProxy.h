@@ -43,20 +43,12 @@ public:
   vtkSetVector4Macro(ScreenRectangle, int);
   vtkGetVector4Macro(ScreenRectangle, int);
 
-  // Description:
-  // Get/Set the selected ids.
-  vtkSetMacro(Ids, int);
-  vtkGetMacro(Ids, int);
-
-  // Description:
-  // Get/Set the selected points.
-  vtkSetVector3Macro(Points, double);
-  vtkGetVector3Macro(Points, double);
-
-  // Description:
-  // Get/Set the selected thresholds.
-  vtkSetVector2Macro(Thresholds, double);
-  vtkGetVector2Macro(Thresholds, double);
+  void SetNumIds(int num);
+  void SetIds(int i, int *vals);
+  void SetNumPoints(int num);
+  void SetPoints(int i, double *vals);
+  void SetNumThresholds(int num);
+  void SetThresholds(int i, double *vals);
 
   // Description:
   // Get/Set the selection algorithm. Supported selection algorithms are
@@ -119,9 +111,12 @@ protected:
   virtual void CreateVTKObjects(int numObjects);
 
   int ScreenRectangle[4];
-  int Ids;
-  double Points[3];
-  double Thresholds[2];
+  int NumIds;
+  int *Ids;
+  int NumPoints;
+  double *Points;
+  int NumThresholds;
+  double *Thresholds;
 
   int Mode;
   vtkSMRenderModuleProxy* RenderModule;

@@ -2753,7 +2753,7 @@ void pqMainWindowCore::onEnterSelectionIds()
 void pqMainWindowCore::onIdsEntered(int id)
 {
   //take the ids selected in the dialog and tell paraview to extract them
-  this->Implementation->SelectionManager.setIds(id);
+  this->Implementation->SelectionManager.setIds(1, &id);
 }
 
 //-----------------------------------------------------------------------------
@@ -2778,7 +2778,11 @@ void pqMainWindowCore::onEnterSelectionPoints()
 void pqMainWindowCore::onPointsEntered(double X, double Y, double Z)
 {
   //take the points selected in the dialog and tell paraview to extract them
-  this->Implementation->SelectionManager.setPoints(X,Y,Z);
+  double pts[3];
+  pts[0] = X;
+  pts[1] = Y;
+  pts[2] = Z;
+  this->Implementation->SelectionManager.setPoints(1, pts);
 }
 
 //-----------------------------------------------------------------------------
@@ -2803,7 +2807,10 @@ void pqMainWindowCore::onEnterSelectionThresholds()
 void pqMainWindowCore::onThresholdsEntered(double min, double max)
 {
   //take the thresholds selected in the dialog and tell paraview to extract them
-  this->Implementation->SelectionManager.setThresholds(min, max);
+  double T[2];
+  T[0] = min;
+  T[1] = max;
+  this->Implementation->SelectionManager.setThresholds(1, T);
 }
 
 //-----------------------------------------------------------------------------
