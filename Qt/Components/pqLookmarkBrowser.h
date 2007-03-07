@@ -42,7 +42,6 @@ class pqLookmarkBrowserModel;
 class QItemSelection;
 class QStringList;
 class QModelIndex;
-class pqServer;
 class QItemSelectionModel;
 
 /// \class pqLookmarkBrowser
@@ -51,7 +50,7 @@ class QItemSelectionModel;
 ///
 /// The lookmark browser uses a pqLookmarkBrowserModel to get the list of lookmarks. 
 /// 
-/// It provides an interface for loading and removing lookmarks.
+/// It provides an interface for loading, removing, importing, and exporting lookmarks.
 ///
 /// Still to do: 
 ///  - convert to a tree view
@@ -79,30 +78,18 @@ public slots:
   void selectLookmark(const QString &name);
 
   /// \brief
-  ///   load the given lookmark in the list.
+  ///   Load the given lookmark in the list. Handled by pqMainWindowCore.
   /// \param index The index in the list of the lookmark to be loaded.
-  void onLoadLookmark(const  QModelIndex &index);
+  void loadLookmark(const  QModelIndex &index);
 
   /// \brief
-  ///   Creates lookmark definitions from the files.
-  /// \param files The list of files to import.
-  void importFiles(const QStringList &files);
-
-  /// \brief
-  ///   Saves the selected lookmark definitions to the given files.
+  ///   Saves the selected lookmark definitions to the given files. Handled by pqLookmarkManagerModel.
   /// \param files The list of files to export to.
   void exportSelected(const QStringList &files);
-
-  /// \brief
-  ///   Keep track of the current server.
-  ///   Question: should this be kept in pqLookmarkBrowserModel instead?
-  /// \param server The new server.
-  void setActiveServer(pqServer *server){this->ActiveServer = server;};
 
 private slots:
   /// \brief
   ///   Opens the file dialog to select import files.
-  /// \sa pqLookmarkBrowser::importFiles(const QStringList &)
   void importFiles();
 
   /// \brief
@@ -120,24 +107,22 @@ private slots:
   ///
   /// If there is no selection, the export, create, and remove buttons are
   /// disabled.
+  void updateButtons();
+
+  /// \brief
+  ///   A house-keeping method to perform tasks that need to be done when the selection changes, like updating the button state.
   ///
   /// \param selected The list of newly selected items.
   /// \param deselected The list of deselected items.
-  void updateButtons(const QItemSelection &selected,
+  void onSelectionChanged(const QItemSelection &selected,
       const QItemSelection &deselected);
 
-  /// \brief
-  ///   Called after the user selects a server from a browser on which load the lookmark's state. 
-  ///
-  ///   Loads the lookmark at the currently selected index.
-  ///
-  /// \param server the server on which to load the state
-  void loadCurrentLookmark(pqServer *server);
+signals:
+  void loadLookmark(const QString &name);
 
 private:
   pqLookmarkBrowserModel *Model; ///< Stores the lookmark list.
   pqLookmarkBrowserForm *Form;   ///< Defines the gui layout.
-  pqServer *ActiveServer;
 
 };
 

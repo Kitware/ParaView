@@ -38,11 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLookmarkBrowserModel.h"
 #include "pqFileDialog.h"
-#include "pqServer.h"
-#include "pqServerStartupBrowser.h"
 #include "pqApplicationCore.h"
-#include "vtkPVXMLParser.h"
-#include "vtkPVXMLElement.h"
 
 #include <QItemSelection>
 #include <QItemSelectionModel>
@@ -60,7 +56,6 @@ pqLookmarkBrowser::pqLookmarkBrowser(pqLookmarkBrowserModel *model,
   this->Model = model;
   this->Form = new pqLookmarkBrowserForm();
   this->Form->setupUi(this);
-  this->ActiveServer = 0;
 
   // Initialize the form.
   this->Form->ImportButton->setEnabled(true);
@@ -80,13 +75,13 @@ pqLookmarkBrowser::pqLookmarkBrowser(pqLookmarkBrowserModel *model,
   QObject::connect(this->Form->LookmarkList->selectionModel(),
       SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
       this,
-      SLOT(updateButtons(const QItemSelection &, const QItemSelection &)));
+      SLOT(onSelectionChanged(const QItemSelection &, const QItemSelection &)));
 
   // Listen for a lookmark to load.
   QObject::connect(this->Form->LookmarkList,
       SIGNAL(doubleClicked(const QModelIndex &)),
       this,
-      SLOT(onLoadLookmark(const QModelIndex &)));
+      SLOT(loadLookmark(const QModelIndex &)));
 
   // Listen for new lookmark additions.
   QObject::connect(this->Model, SIGNAL(lookmarkAdded(const QString &)),
@@ -100,47 +95,24 @@ pqLookmarkBrowser::~pqLookmarkBrowser()
 
 void pqLookmarkBrowser::selectLookmark(const QString &name)
 {
+  this->Form->LookmarkList->selectionModel()->clearSelection();
+
   QModelIndex index = this->Model->getIndexFor(name);
   if(index.isValid())
     {
     this->Form->LookmarkList->selectionModel()->select(index,
-        QItemSelectionModel::SelectCurrent);
+        QItemSelectionModel::Select);
     }
 }
 
 
-void pqLookmarkBrowser::onLoadLookmark(const QModelIndex &index)
+void pqLookmarkBrowser::loadLookmark(const QModelIndex &index)
 {
-  if(this->ActiveServer)
-    {
-    this->Model->loadLookmark(index, this->ActiveServer);
-    }
-  else
-    {
-    pqServerStartupBrowser* const server_browser = new pqServerStartupBrowser(
-      pqApplicationCore::instance()->serverStartups(),
-      *pqApplicationCore::instance()->settings(),
-      this);
-    server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
-    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
-      this, SLOT(loadCurrentLookmark(pqServer*)), Qt::QueuedConnection);
-    server_browser->setModal(true);
-    server_browser->show();
-    return;
-    }
-}
-
-
-void pqLookmarkBrowser::loadCurrentLookmark(pqServer *server)
-{
-  QModelIndex idx = this->Form->LookmarkList->selectionModel()->currentIndex();
-  if(!server || !idx.isValid())
+  if(!index.isValid())
     {
     return;
     }
-
-  this->ActiveServer = server;
-  this->Model->loadLookmark(idx,server);
+  emit this->loadLookmark(this->Model->getNameFor(index));
 }
 
 void pqLookmarkBrowser::importFiles()
@@ -156,29 +128,13 @@ void pqLookmarkBrowser::importFiles()
   fileDialog->setObjectName("FileOpenDialog");
   fileDialog->setFileMode(pqFileDialog::ExistingFiles);
 
-  // Listen for the user's selection.
-  this->connect(fileDialog, SIGNAL(filesSelected(const QStringList &)),
-      this, SLOT(importFiles(const QStringList &)));
-
-  fileDialog->show();
-}
-
-void pqLookmarkBrowser::importFiles(const QStringList &files)
-{
-  // Clear the current selection. The new lookmark definitions
-  // will be selected as they're added.
   this->Form->LookmarkList->selectionModel()->clear();
 
-  QStringList::ConstIterator iter = files.begin();
-  for( ; iter != files.end(); ++iter)
-    {
-    vtkPVXMLParser* parser = vtkPVXMLParser::New();
-    parser->SetFileName((*iter).toAscii().data());
-    parser->Parse();
+  // Listen for the user's selection.
+  this->connect(fileDialog, SIGNAL(filesSelected(const QStringList &)),
+      this->Model, SIGNAL(importLookmarks(const QStringList &)));
 
-    this->Model->addLookmarks(parser->GetRootElement());
-    parser->Delete();
-    }
+  fileDialog->show();
 }
 
 void pqLookmarkBrowser::exportSelected()
@@ -206,51 +162,24 @@ void pqLookmarkBrowser::exportSelected(const QStringList &files)
 {
   // Get the selected lookmarks from the list.
   QModelIndexList selection =
-      this->Form->LookmarkList->selectionModel()->selectedIndexes();
+      this->Form->LookmarkList->selectionModel()->selection().indexes();
   if(selection.size() == 0 || files.size() == 0)
     {
     return;
     }
 
-  QString lookmarks = this->Model->getLookmarks(selection);
-
-  // Save the lookmarks in the selected files.
-  QStringList::ConstIterator jter = files.begin();
-  for( ; jter != files.end(); ++jter)
-    {
-    ofstream os((*jter).toAscii().data(), ios::out);
-    os << lookmarks.toAscii().data();
-    }
+  this->Model->exportLookmarks(selection, files);
 }
 
 void pqLookmarkBrowser::removeSelected()
 {
   // Get the selected lookmarks from the list.
   QModelIndexList selection =this->Form->LookmarkList->selectionModel()->selectedIndexes();
-  QList<QModelIndex>::iterator iter;
-  QList<QString> names;
-  for(iter=selection.begin(); iter!=selection.end(); iter++)
-    {
-    names.push_back(this->Model->getLookmarkName(*iter));
-    }
-  QList<QString>::iterator iter2;
-  for(iter2=names.begin(); iter2!=names.end(); iter2++)
-    {
-    this->Model->removeLookmark(*iter2);
-    }
-/*
-  while(selection.count()>0)
-    {
-    this->Model->removeLookmark(selection.back());  
-    // by removing a lookmark, the list of selected indices changed
-    selection = this->Form->LookmarkList->selectionModel()->selectedIndexes();
-    }
-*/
+  this->Model->removeLookmarks(selection);
 }
 
 
-void pqLookmarkBrowser::updateButtons(const QItemSelection &,
-    const QItemSelection &)
+void pqLookmarkBrowser::updateButtons()
 {
   QItemSelectionModel *selection = this->Form->LookmarkList->selectionModel();
   bool hasSelected = selection->selection().size() > 0;
@@ -261,6 +190,11 @@ void pqLookmarkBrowser::updateButtons(const QItemSelection &,
 
 }
 
+void pqLookmarkBrowser::onSelectionChanged(const QItemSelection &selection,
+    const QItemSelection &)
+{
+  this->updateButtons();
+}
 
 QItemSelectionModel* pqLookmarkBrowser::getSelectionModel()
 { 

@@ -351,8 +351,6 @@ ADD_LIBRARY(pqComponents
   pqLookmarkDefinitionWizard.h
   pqLookmarkInspector.cxx
   pqLookmarkInspector.h
-  pqLookmarkStateLoader.cxx
-  pqLookmarkStateLoader.h
   pqMainWindowCore.cxx
   pqMainWindowCore.h
   pqMultiView.cxx

@@ -56,6 +56,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLineChartDisplay.h
   pqLinksModel.h
   pqLinkViewWidget.h
+  pqLookmarkManagerModel.h
+  pqLookmarkModel.h
   pqLookupTableManager.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
@@ -185,6 +187,12 @@ ADD_LIBRARY(pqCore
   pqLinkViewWidget.h
   pqLookupTableManager.cxx
   pqLookupTableManager.h
+  pqLookmarkManagerModel.cxx
+  pqLookmarkManagerModel.h
+  pqLookmarkModel.cxx
+  pqLookmarkModel.h
+  pqLookmarkStateLoader.cxx
+  pqLookmarkStateLoader.h
   pqMain.cxx
   pqMain.h
   pqManualServerStartup.cxx

@@ -38,25 +38,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 
 class pqLookmarkDefinitionWizardForm;
-class pqLookmarkBrowserModel;
 class QModelIndex;
-class pqRenderViewModule;
+class pqGenericViewModule;
 class vtkCollection;
 class pqConsumerDisplay;
 class pqFlatTreeView;
 class pqPipelineModel;
+class vtkPVXMLElement;
 
 /*! \class pqLookmarkDefinitionWizard
  *  \brief
- *    The pqLookmarkDefinitionWizard class is used to create a
- *    lookmark definition.
+ *    The pqLookmarkDefinitionWizard class is used to create a lookmark model.
  *
- *  Currently the user only needs to provide a name for the lookmark. But in the future, other 
- *  lookmark metadata could be given such as a description of the lookmark
+ *  Currently you cannot create a lookmark of multiple views. 
  * 
- *  Currently a lookmark needs three things to be created: a unique name, an icon (of the current view), and an XML representation of a subset of the server manager state. 
+ *  A lookmark needs three things to be created: a unique name, an icon (of the current view), and an XML representation of a subset of the server manager state.
+ *  The user may also add a description of the lookmark. 
  *
- *  But which subset of the server manager state is saved? The current implementation saves:
+ *  A subset of the server manager state is saved on creation:
  *   - all pqConsumerDisplays that are visible in the given pqRenderViewModule
  *   - all pqConsumerDisplays that are invisible in the given pqRenderViewModule but "upstream" from a visible one in the pipeline 
  *   - all pqPipelineSources associated with the displays being saved
@@ -71,10 +70,9 @@ class PQCOMPONENTS_EXPORT pqLookmarkDefinitionWizard : public QDialog
 public:
   /// \brief
   ///   Creates a lookmark definition wizard.
-  /// \param model The lookmark browser model to add the lookmark to. The
-  ///   model should not be null.
+  /// \param model The view module to create a lookmark from (currently only supports render views)
   /// \param parent The parent widget for the wizard.
-  pqLookmarkDefinitionWizard(pqRenderViewModule *renderModule, pqLookmarkBrowserModel *model, QWidget *parent=0);
+  pqLookmarkDefinitionWizard(pqGenericViewModule *view, QWidget *parent=0);
   virtual ~pqLookmarkDefinitionWizard();
 
 public slots:
@@ -82,19 +80,8 @@ public slots:
   ///   Creates a lookmark definition.
   ///
   /// A lookmark is created with the name provided by the user, an icon image of the current view, 
-  /// and the state of the displays and sources that make up the render module
-  ///
-  /// \sa pqLookmarkDefinitionWizard::getLookmarkName()
+  /// and the state of the displays and sources that make up the render module.
   void createLookmark();
-
-
-  /// \brief
-  ///   Gets the name of the lookmark created by the wizard.
-  /// \return
-  ///   The name of the new lookmark definition. The name will
-  ///   be empty if the compound proxy has not been created.
-  /// \sa pqLookmarkDefinitionWizard::createLookmark();
-  QString getLookmarkName() const;
 
 private:
 
@@ -112,7 +99,7 @@ private:
   ///   Generates a "trimmed" view of the current pipeline that reflects the pipeline that will be restored when this lookmark is invoked.
   /// \return
   ///   The view of the pipeline.
-  pqFlatTreeView* createPipelinePreview();
+  void createPipelinePreview();
 
   /// \brief
   ///   A recursive helper function for adding to the proxy collection the given display, its input source, 
@@ -132,13 +119,15 @@ private slots:
   void clearNameOverwrite(const QString &text);
   //@}
 
+  void addChildItems(const QModelIndex &index, vtkPVXMLElement *elem);
+
 private:
   bool OverwriteOK;                         ///< Used with name validation.
-  pqRenderViewModule *RenderModule;
-  pqLookmarkBrowserModel *Lookmarks;
+  pqGenericViewModule *ViewModule;
   pqLookmarkDefinitionWizardForm *Form;
   pqFlatTreeView *PipelineView;
   pqPipelineModel *PipelineModel;
+  vtkPVXMLElement *PipelineHierarchy;
 };
 
 #endif

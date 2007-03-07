@@ -159,58 +159,6 @@
          <number>6</number>
         </property>
         <item>
-         <widget class="QLabel" name="label" >
-          <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>5</hsizetype>
-            <vsizetype>5</vsizetype>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize" >
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text" >
-           <string>Data:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="LookmarkData" >
-          <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>7</hsizetype>
-            <vsizetype>5</vsizetype>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize" >
-           <size>
-            <width>0</width>
-            <height>18</height>
-           </size>
-          </property>
-          <property name="text" >
-           <string>none</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" >
-        <property name="margin" >
-         <number>2</number>
-        </property>
-        <property name="spacing" >
-         <number>6</number>
-        </property>
-        <item>
          <widget class="QLabel" name="label_2" >
           <property name="sizePolicy" >
            <sizepolicy>
@@ -256,9 +204,9 @@
       </item>
       <item>
        <widget class="pqCollapsedGroup" native="1" name="groupBox" >
-        <property name="title" >
-         <string>Lookmark Pipeline</string>
-        </property>
+         <property name="title" >
+            <string>Pipeline Preview</string>
+         </property>
         <layout class="QVBoxLayout" >
          <property name="margin" >
           <number>2</number>
@@ -267,20 +215,16 @@
           <number>2</number>
          </property>
          <item>
-          <widget class="QLabel" name="LookmarkPipeline" >
-           <property name="text" >
-            <string/>
-           </property>
-          </widget>
+          <widget class="pqFlatTreeView" native="1" name="PipelineView" />
          </item>
         </layout>
        </widget>
       </item>
       <item>
        <widget class="pqCollapsedGroup" native="1" name="groupBox_2" >
-        <property name="title" >
-         <string>Description</string>
-        </property>
+         <property name="title" >
+            <string>Description</string>
+         </property>
         <layout class="QVBoxLayout" >
          <property name="margin" >
           <number>2</number>
@@ -361,7 +305,7 @@
          <string>Data</string>
         </property>
         <property name="checked" >
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -404,6 +348,12 @@
    <class>pqCollapsedGroup</class>
    <extends>QWidget</extends>
    <header>pqCollapsedGroup.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqFlatTreeView</class>
+   <extends>QAbstractScrollArea</extends>
+   <header>pqFlatTreeView.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
