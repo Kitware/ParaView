@@ -957,11 +957,13 @@ void pqAnimationPanel::showKeyFrame(int index)
       }
     else
       {
+      // Note the index here must be 0. It is the index in
+      // the keyframe value property not the index in the
+      // animated property.
       this->Internal->KeyFrameLinks.addPropertyLink(
         this->Internal->ValueAdaptor, "value",
         SIGNAL(valueChanged()),
-        toShowKf, toShowKf->GetProperty("KeyValues"),
-        animated_index);
+        toShowKf, toShowKf->GetProperty("KeyValues"), 0);
       }
     }
   this->Internal->KeyFrameLinks.addPropertyLink(
