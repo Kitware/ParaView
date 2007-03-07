@@ -28,7 +28,7 @@
 #include "vtkIntArray.h"
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.14");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.15");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -223,9 +223,12 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
 
   int num_of_tuples = data_array->GetNumberOfTuples();
 
-  this->UpdateProgress(0.1);
   for(i = 0; i != num_of_tuples; ++i)
     {
+    if (i%1000 == 0)
+      {
+      this->UpdateProgress(0.10 + 0.90*i/num_of_tuples);
+      }
     const double value = data_array->GetComponent(i, this->Component);
     for(int j = 0; j != this->BinCount; ++j)
       {
@@ -243,7 +246,6 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
         break;
         }
       }
-    this->UpdateProgress(0.10 + 0.90*i/num_of_tuples);
     }
 
   return 1;
