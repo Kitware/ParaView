@@ -124,12 +124,12 @@ public:
     SelectionObserver(0),
     Xs(0), Ys(0), Xe(0), Ye(0),
     NumVals(0),
-    DoubleVals(NULL),
-    IntVals(NULL),
     InSetActiveSelection(false),
     InUpdateSelections(false)
     {
     this->VTKConnect = vtkEventQtSlotConnect::New(); 
+    this->IntVals = NULL;
+    this->DoubleVals = NULL;
     }
 
   ~pqSelectionManagerImplementation() 
