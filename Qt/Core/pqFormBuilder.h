@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFormBuilder_h
 
 #include "pqCoreExport.h"
-#include <QtUiTools/QUiLoader>   // CMake 2.4.3+ finds QtUiTools correctly
+#include <QUiLoader>
 
 /// form builder that can create forms
 /// dynamic and static plugins are searched
