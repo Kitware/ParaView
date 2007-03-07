@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComboBoxDomain.h"
 #include "pqDisplay.h"
 #include "pqPropertyLinks.h"
+#include "pqSignalAdaptors.h"
 
 
 //-----------------------------------------------------------------------------
@@ -53,6 +54,9 @@ public:
   QPointer<pqComboBoxDomain> YDomain;
   vtkEventQtSlotConnect* VTKConnect;
   pqPropertyLinks Links;
+  pqSignalAdaptorComboBox* XArrayNameAdaptor;
+  pqSignalAdaptorComboBox* PointComponentAdaptor;
+  pqSignalAdaptorComboBox* YArrayNameAdaptor;
 };
 
 //-----------------------------------------------------------------------------
@@ -62,7 +66,14 @@ pqBarChartDisplayProxyEditor::pqBarChartDisplayProxyEditor(pqDisplay* display, Q
   this->Internal = new pqInternal;
   this->Internal->VTKConnect = vtkEventQtSlotConnect::New();
   this->Internal->setupUi(this);
-  
+ 
+  this->Internal->XArrayNameAdaptor = new pqSignalAdaptorComboBox(
+    this->Internal->XArrayName);
+  this->Internal->PointComponentAdaptor = new pqSignalAdaptorComboBox(
+    this->Internal->PointComponent);
+  this->Internal->YArrayNameAdaptor = new pqSignalAdaptorComboBox(
+    this->Internal->YArrayName);
+
   QObject::connect(
     this->Internal->EditColorMapButton, SIGNAL(clicked()),
     this, SLOT(openColorMapEditor()));
@@ -113,14 +124,14 @@ void pqBarChartDisplayProxyEditor::setDisplay(pqDisplay* display)
   this->Internal->Links.addPropertyLink(this->Internal->ViewData,
     "checked", SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("Visibility"));
-  this->Internal->Links.addPropertyLink(this->Internal->XArrayName,
-    "currentText", SIGNAL(currentIndexChanged(const QString&)),
+  this->Internal->Links.addPropertyLink(this->Internal->XArrayNameAdaptor,
+    "currentText", SIGNAL(currentTextChanged(const QString&)),
     proxy, proxy->GetProperty("XArrayName"));
-  this->Internal->Links.addPropertyLink(this->Internal->YArrayName,
-    "currentText", SIGNAL(currentIndexChanged(const QString&)),
+  this->Internal->Links.addPropertyLink(this->Internal->YArrayNameAdaptor,
+    "currentText", SIGNAL(currentTextChanged(const QString&)),
     proxy, proxy->GetProperty("YArrayName"));
-  this->Internal->Links.addPropertyLink(this->Internal->PointComponent,
-    "currentText", SIGNAL(currentIndexChanged(const QString&)),
+  this->Internal->Links.addPropertyLink(this->Internal->PointComponentAdaptor,
+    "currentText", SIGNAL(currentTextChanged(const QString&)),
     proxy, proxy->GetProperty("XAxisPointComponent"));
   this->Internal->Links.addPropertyLink(this->Internal->UsePoints,
     "checked", SIGNAL(stateChanged(int)),
