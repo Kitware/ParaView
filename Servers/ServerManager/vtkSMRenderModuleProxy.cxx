@@ -53,7 +53,7 @@
 #include "vtkSelection.h"
 #include "vtkSMMPIRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.54.2.3");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.54.2.4");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -375,14 +375,6 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   pp->RemoveAllProxies();
   pp->AddProxy(this->RendererProxy);
 
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->Renderer2DProxy->GetProperty("AutomaticLightCreation"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property AutomaticLightCreation.");
-    return;
-    }
-  ivp->SetElement(0, 0);
   pp = vtkSMProxyProperty::SafeDownCast(
     this->RendererProxy->GetProperty("Lights"));
   if (!pp)
@@ -391,15 +383,6 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     return;
     }
   pp->AddProxy(this->LightProxy);
-
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->LightProxy->GetProperty("LightType"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property LightType.");
-    return;
-    }
-  ivp->SetElement(0, 1); // Headlight
 
   this->RendererProxy->UpdateVTKObjects();
   this->Renderer2DProxy->UpdateVTKObjects();
