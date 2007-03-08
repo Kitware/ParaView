@@ -44,7 +44,7 @@ class pqColorScaleEditorForm;
 class pqPipelineDisplay;
 class pqScalarBarDisplay;
 class pqScalarsToColors;
-class QCloseEvent;
+class QHideEvent;
 class QShowEvent;
 class QString;
 class QTimer;
@@ -62,8 +62,8 @@ public:
   void setDisplay(pqPipelineDisplay *display);
 
 protected:
-  virtual void closeEvent(QCloseEvent *e);
   virtual void showEvent(QShowEvent *e);
+  virtual void hideEvent(QHideEvent *e);
 
 private slots:
   /// \name Color Scale Methods
@@ -74,6 +74,7 @@ private slots:
   void applyGrayscalePreset();
   void applyCIELabBlueToRedPreset();
 
+  void changeCurrentColor();
   void setColorSpace(int index);
 
   void setUseDiscreteColors(bool on);

@@ -61,7 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView client includes
 #include "pqApplicationCore.h"
-#include "pqColorMapEditor.h"
 #include "pqColorScaleEditor.h"
 #include "pqSMAdaptor.h"
 #include "pqPropertyLinks.h"
@@ -516,9 +515,6 @@ void pqDisplayProxyEditor::openColorMapEditor()
   pqColorScaleEditor colorScale(this);
   colorScale.setDisplay(this->Internal->Display);
   colorScale.exec();
-  //pqColorMapEditor colorMap(this);
-  //colorMap.setDisplay(this->Internal->Display);
-  //colorMap.exec();
 }
 
 //-----------------------------------------------------------------------------
