@@ -99,6 +99,7 @@ signals:
   void colorChanged(int index, const QColor &color);
   void pointAdded(int index);
   void pointRemoved(int index);
+  void pointMoved(int index);
 
 protected:
   virtual void mousePressEvent(QMouseEvent *e);
@@ -106,13 +107,14 @@ protected:
   virtual void mouseReleaseEvent(QMouseEvent *e);
   virtual void paintEvent(QPaintEvent *e);
   virtual void resizeEvent(QResizeEvent *e);
-  virtual void scrollContentsBy(int dx, int dy);
 
 private slots:
   void moveTimeout();
 
 private:
   bool isInScaleRegion(int px, int py);
+  void layoutPoints();
+  void generateGradient();
 
 private:
   pqColorMapWidgetInternal *Internal; ///< Stores the color map data.
