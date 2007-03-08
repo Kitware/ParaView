@@ -34,7 +34,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.10");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.11");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -339,13 +339,13 @@ void vtkTransferFunctionEditorRepresentationSimple1D::UpdateHandleProperty(
 }
 
 //----------------------------------------------------------------------
-void vtkTransferFunctionEditorRepresentationSimple1D::SetHandleDisplayPosition(
+int vtkTransferFunctionEditorRepresentationSimple1D::SetHandleDisplayPosition(
   unsigned int nodeNum, double pos[3], double scalar)
 {
   if ( nodeNum >= this->Handles->size() )
     {
     vtkErrorMacro("Trying to access non-existent handle");
-    return;
+    return 0;
     }
 
   vtkHandleListIterator hiter, tmpIter;
@@ -405,10 +405,11 @@ void vtkTransferFunctionEditorRepresentationSimple1D::SetHandleDisplayPosition(
           }
         this->BuildRepresentation();
         this->InvokeEvent(vtkCommand::WidgetValueChangedEvent, NULL);
-        return;
+        return 1;
         }
       }
     }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
