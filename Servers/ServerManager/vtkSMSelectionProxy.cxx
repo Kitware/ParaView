@@ -72,7 +72,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.12");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -916,7 +916,10 @@ void vtkSMSelectionProxy::FillSources(vtkSelection* sel,
     id.ID = *iter;
     vtkSMProxy* objProxy = 
       rmp->GetProxyFromPropID(&id, vtkSMRenderModuleProxy::INPUT);
-    coll->AddItem(objProxy); 
+    if (objProxy)
+      {
+      coll->AddItem(objProxy); 
+      }
     }
 }
 
