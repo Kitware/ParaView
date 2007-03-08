@@ -94,7 +94,7 @@ public:
   friend class vtkPQSelectionObserver;
 
   /// Change mode to select listed cell ids
-  void setIds(int numvals, int *vals);
+  void setIds(int numvals, vtkIdType *vals);
 
   /// Change mode to select cells with that contain the given points
   void setPoints(int numvals, double *vals);

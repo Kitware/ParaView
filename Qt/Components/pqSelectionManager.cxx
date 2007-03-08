@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -128,7 +129,7 @@ public:
     InUpdateSelections(false)
     {
     this->VTKConnect = vtkEventQtSlotConnect::New(); 
-    this->IntVals = NULL;
+    this->IdVals = NULL;
     this->DoubleVals = NULL;
     }
 
@@ -151,9 +152,9 @@ public:
       this->SelectionObserver->Delete();
       this->SelectionObserver = 0;
       }
-    if (this->IntVals != NULL)
+    if (this->IdVals != NULL)
       {
-      delete[] this->IntVals;
+      delete[] this->IdVals;
       }
     if (this->DoubleVals != NULL)
       {
@@ -170,7 +171,7 @@ public:
 
   int Xs, Ys, Xe, Ye;
   int NumVals;
-  int *IntVals;
+  vtkIdType *IdVals;
   double *DoubleVals;
   typedef vtkstd::map<vtkIdType, pqSelectionProxies > 
      ServerSelectionsType;
@@ -704,10 +705,10 @@ void pqSelectionManager::prepareForSelection()
         sourceSelection->GetProperty("NumIds"), 
         this->Implementation->NumVals);
       sourceSelection->UpdateVTKObjects();
-      vtkSMIntVectorProperty *vp = vtkSMIntVectorProperty::SafeDownCast(
+      vtkSMIdTypeVectorProperty *vp = vtkSMIdTypeVectorProperty::SafeDownCast(
         sourceSelection->GetProperty("Ids"));
       vp->SetNumberOfElements(this->Implementation->NumVals*1);
-      vp->SetElements(this->Implementation->IntVals);
+      vp->SetElements(this->Implementation->IdVals);
       pqSMAdaptor::setElementProperty(sourceSelection->GetProperty("Mode"), 
                                       vtkSMSelectionProxy::IDS);
       break;
@@ -1133,16 +1134,16 @@ void pqSelectionManager::viewModuleRemoved(pqGenericViewModule* vm)
 }
 
 //----------------------------------------------------------------------------
-void pqSelectionManager::setIds(int numvals, int *vals)
+void pqSelectionManager::setIds(int numvals, vtkIdType *vals)
 {
   this->Mode = IDS;
-  if (this->Implementation->IntVals != NULL)
+  if (this->Implementation->IdVals != NULL)
     {
-    delete[] this->Implementation->IntVals;
+    delete[] this->Implementation->IdVals;
     }
   this->Implementation->NumVals = numvals;
-  this->Implementation->IntVals = new int[numvals];
-  memcpy(this->Implementation->IntVals, vals, numvals*1*sizeof(int));
+  this->Implementation->IdVals = new vtkIdType[numvals];
+  memcpy(this->Implementation->IdVals, vals, numvals*1*sizeof(vtkIdType));
   this->prepareForSelection();
 }
 

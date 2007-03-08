@@ -44,7 +44,7 @@ public:
   vtkGetVector4Macro(ScreenRectangle, int);
 
   void SetNumIds(int num);
-  void SetIds(int i, int *vals);
+  void SetIds(int i, vtkIdType *vals);
   void SetNumPoints(int num);
   void SetPoints(int i, double *vals);
   void SetNumThresholds(int num);
@@ -112,7 +112,7 @@ protected:
 
   int ScreenRectangle[4];
   int NumIds;
-  int *Ids;
+  vtkIdType *Ids;
   int NumPoints;
   double *Points;
   int NumThresholds;

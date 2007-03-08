@@ -141,6 +141,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
+//#include <vtkType.h>
 
 #include <vtkToolkits.h>
 
@@ -2753,7 +2754,8 @@ void pqMainWindowCore::onEnterSelectionIds()
 void pqMainWindowCore::onIdsEntered(int id)
 {
   //take the ids selected in the dialog and tell paraview to extract them
-  this->Implementation->SelectionManager.setIds(1, &id);
+  vtkIdType ID = id;
+  this->Implementation->SelectionManager.setIds(1, &ID);
 }
 
 //-----------------------------------------------------------------------------

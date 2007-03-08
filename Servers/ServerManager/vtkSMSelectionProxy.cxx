@@ -72,7 +72,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.11");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -1073,13 +1073,13 @@ void vtkSMSelectionProxy::SetNumIds(int num)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSelectionProxy::SetIds(int i, int *vals)
+void vtkSMSelectionProxy::SetIds(int i, vtkIdType *vals)
 {
   if (this->Ids == NULL)
     {
     return;
     }
-  memcpy(&this->Ids[i], vals, sizeof(int));
+  memcpy(&this->Ids[i], vals, sizeof(vtkIdType));
 }
 
 //-----------------------------------------------------------------------------
