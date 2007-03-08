@@ -389,8 +389,6 @@ void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProperty* Property,
     }
 }
 
-// TODO:  callers need to clear items from vtkStringVectorProperty before
-//        settings all the values to push down to the server
 void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property, 
                                        QList<QVariant> Value)
 {
@@ -948,10 +946,11 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
   idvp = vtkSMIdTypeVectorProperty::SafeDownCast(Property);
   svp = vtkSMStringVectorProperty::SafeDownCast(Property);
 
+  int num = Value.size();
+
   if(dvp)
     {
-    unsigned int num = Value.size();
-    for(unsigned int i=0; i<num; i++)
+    for(int i=0; i<num; i++)
       {
       bool ok = true;
       double v = Value[i].toDouble(&ok);
@@ -960,11 +959,11 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
         dvp->SetElement(i, v);
         }
       }
+    dvp->SetNumberOfElements(num);
     }
   else if(ivp)
     {
-    unsigned int num = Value.size();
-    for(unsigned int i=0; i<num; i++)
+    for(int i=0; i<num; i++)
       {
       bool ok = true;
       int v = Value[i].toInt(&ok);
@@ -973,11 +972,11 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
         ivp->SetElement(i, v);
         }
       }
+    ivp->SetNumberOfElements(num);
     }
   else if(svp)
     {
-    unsigned int num = Value.size();
-    for(unsigned int i=0; i<num; i++)
+    for(int i=0; i<num; i++)
       {
       QString v = Value[i].toString();
       if(!v.isNull())
@@ -985,11 +984,11 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
         svp->SetElement(i, v.toAscii().data());
         }
       }
+    svp->SetNumberOfElements(num);
     }
   else if(idvp)
     {
-    unsigned int num = Value.size();
-    for(unsigned int i=0; i<num; i++)
+    for(int i=0; i<num; i++)
       {
       bool ok = true;
       vtkIdType v;
@@ -1003,6 +1002,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
         idvp->SetElement(i, v);
         }
       }
+    idvp->SetNumberOfElements(num);
     }
 }
 
@@ -1018,10 +1018,12 @@ void pqSMAdaptor::setUncheckedMultipleElementProperty(vtkSMProperty* Property,
   ivp = vtkSMIntVectorProperty::SafeDownCast(Property);
   idvp = vtkSMIdTypeVectorProperty::SafeDownCast(Property);
   svp = vtkSMStringVectorProperty::SafeDownCast(Property);
+  
+  int num = Value.size();
 
-  if(dvp && dvp->GetNumberOfElements() >= (unsigned int)Value.size())
+  if(dvp)
     {
-    for(int i=0; i<Value.size(); i++)
+    for(int i=0; i<num; i++)
       {
       bool ok = true;
       double v = Value[i].toDouble(&ok);
@@ -1031,9 +1033,9 @@ void pqSMAdaptor::setUncheckedMultipleElementProperty(vtkSMProperty* Property,
         }
       }
     }
-  else if(ivp && ivp->GetNumberOfElements() >= (unsigned int)Value.size())
+  else if(ivp)
     {
-    for(int i=0; i<Value.size(); i++)
+    for(int i=0; i<num; i++)
       {
       bool ok = true;
       int v = Value[i].toInt(&ok);
@@ -1043,9 +1045,9 @@ void pqSMAdaptor::setUncheckedMultipleElementProperty(vtkSMProperty* Property,
         }
       }
     }
-  else if(svp && svp->GetNumberOfElements() >= (unsigned int)Value.size())
+  else if(svp)
     {
-    for(int i=0; i<Value.size(); i++)
+    for(int i=0; i<num; i++)
       {
       QString v = Value[i].toString();
       if(!v.isNull())
@@ -1054,9 +1056,9 @@ void pqSMAdaptor::setUncheckedMultipleElementProperty(vtkSMProperty* Property,
         }
       }
     }
-  else if(idvp && idvp->GetNumberOfElements() >= (unsigned int)Value.size())
+  else if(idvp)
     {
-    for(int i=0; i<Value.size(); i++)
+    for(int i=0; i<num; i++)
       {
       bool ok = true;
       vtkIdType v;
