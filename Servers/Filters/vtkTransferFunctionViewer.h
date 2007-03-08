@@ -26,8 +26,10 @@
 // clicked so you can display a color chooser to select a color for it. (A
 // PickEvent is being invoked instead of a RightButtonPressEvent because it
 // was being incorrectly picked up by the interactor style.)
-// * WidgetValueChangedEvent - Lets you know that either a transfer function
-// node has been moved or the active node has changed.
+// * WidgetValueChangedEvent - Lets you know that a transfer function
+// node has been moved
+// * WidgetModifiedEvent - Lets you know that the active node has changed.
+// * PlacePointEvent - Lets you know a node has been added or deleted.
 // 
 // .SECTION See Also
 // vtkTransferFunctionEditorWidget vtkTransferFunctionEditorRepresentation

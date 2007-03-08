@@ -30,8 +30,9 @@
 
 #include "vtkWidgetRepresentation.h"
 
+class vtkActor2D;
 class vtkColorTransferFunction;
-class vtkImageActor;
+class vtkImageMapper;
 
 class VTK_EXPORT vtkTransferFunctionEditorRepresentation : public vtkWidgetRepresentation
 {
@@ -90,7 +91,8 @@ protected:
   vtkTransferFunctionEditorRepresentation();
   ~vtkTransferFunctionEditorRepresentation();
 
-  vtkImageActor *HistogramActor;
+  vtkImageMapper *HistogramMapper;
+  vtkActor2D *HistogramActor;
   int HistogramVisibility;
   int DisplaySize[2];
   int ScalarBinRange[2];

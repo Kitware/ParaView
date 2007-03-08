@@ -14,14 +14,14 @@
 =========================================================================*/
 #include "vtkTransferFunctionEditorRepresentation1D.h"
 
-#include "vtkImageActor.h"
 #include "vtkImageData.h"
+#include "vtkImageMapper.h"
 #include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkPointData.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.7");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.8");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation1D, Histogram,
                      vtkIntArray);
@@ -34,7 +34,7 @@ vtkTransferFunctionEditorRepresentation1D::vtkTransferFunctionEditorRepresentati
   this->HistogramImage->SetScalarTypeToUnsignedChar();
   this->DisplaySize[0] = this->DisplaySize[1] = 100;
 
-  this->HistogramActor->SetInput(this->HistogramImage);
+  this->HistogramMapper->SetInput(this->HistogramImage);
 }
 
 //----------------------------------------------------------------------------

@@ -34,7 +34,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.9");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.10");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -497,7 +497,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::SetActiveHandle(
 {
   this->ActiveHandle = handle;
   this->HighlightActiveHandle();
-  this->InvokeEvent(vtkCommand::WidgetValueChangedEvent, NULL);
+  this->InvokeEvent(vtkCommand::WidgetModifiedEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
