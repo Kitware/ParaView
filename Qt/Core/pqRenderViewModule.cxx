@@ -149,6 +149,8 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   pqSMAdaptor::setMultipleElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Scale"),
     scaleValues);
+  pqSMAdaptor::setElementProperty(
+    this->Internal->CenterAxesProxy->GetProperty("Pickable"), 0);
   this->Internal->CenterAxesProxy->UpdateVTKObjects();
 
   /// When a state is loaded, if this render module is reused, its interactor style will change

@@ -179,6 +179,7 @@
           <Property name="Position" />
           <Property name="Scale" />
           <Property name="Origin" />
+          <Property name="Pickable" />
         </ExposedProperties>
       </SubProxy>
     </AxesProxy>

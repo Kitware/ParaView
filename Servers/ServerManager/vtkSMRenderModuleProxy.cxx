@@ -53,8 +53,10 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkMemberFunctionCommand.h"
+#include "vtkRendererCollection.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.74");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.75");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1438,7 +1440,6 @@ int vtkSMRenderModuleProxy::IsSelectionAvailable()
   return 0;
 }
 
-//-----------------------------------------------------------------------------
 vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
 {  
 
@@ -1551,6 +1552,31 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
   double black[3] = {0.0,0.0,0.0};
   this->SetBackgroundColorCM(black);
 
+  //don't draw the scalar bar, text annotation, orientation axes
+  vtkRendererCollection *rcol = this->RenderWindow->GetRenderers();
+  int numlayers = rcol->GetNumberOfItems();
+  int *renOldVis = new int[numlayers];
+  for (int i = 0; i < numlayers; i++)
+    {
+    //I tried Using vtkRendererCollection::GetItem but that was giving me 
+    //NULL for i=1,2 so I am doing it the long way
+    vtkObject *anObj = rcol->GetItemAsObject(i);
+    if (!anObj)
+      {
+      continue;
+      }
+    vtkRenderer *nextRen = vtkRenderer::SafeDownCast(anObj);
+    if (!nextRen)
+      {
+      continue;
+      }
+    renOldVis[i] = nextRen->GetDraw();
+    if (nextRen != this->Renderer)
+      {
+      nextRen->DrawOff();      
+      }
+    }
+
   unsigned char *buf;  
   for (int p = 0; p < 5; p++)
     {
@@ -1588,6 +1614,23 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
   //clear selection mode to resume normal rendering
   setModeMethod->SetElements1(0);
   vcsProxy->UpdateVTKObjects();   
+
+  for (int i = 0; i < numlayers; i++)
+    {
+    vtkObject *anObj = rcol->GetItemAsObject(i);
+    if (!anObj)
+      {
+      continue;
+      }
+    vtkRenderer *nextRen = vtkRenderer::SafeDownCast(anObj);
+    if (!nextRen)
+      {
+      continue;
+      }
+    nextRen->SetDraw(renOldVis[i]);
+    }
+  delete[] renOldVis;
+
   this->SetBackgroundColorCM(origBG);
   if (!usefrontbuf)
     {
