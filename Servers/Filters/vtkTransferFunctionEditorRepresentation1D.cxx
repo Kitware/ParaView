@@ -21,7 +21,7 @@
 #include "vtkPointData.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.6");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.7");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation1D, Histogram,
                      vtkIntArray);
@@ -96,9 +96,9 @@ void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
   this->Histogram->GetRange(range);
   double logRange = log(range[1]);
   unsigned char color[3];
-  color[0] = this->HistogramColor[0] * 255;
-  color[1] = this->HistogramColor[1] * 255;
-  color[2] = this->HistogramColor[2] * 255;
+  color[0] = static_cast<unsigned char>(this->HistogramColor[0] * 255);
+  color[1] = static_cast<unsigned char>(this->HistogramColor[1] * 255);
+  color[2] = static_cast<unsigned char>(this->HistogramColor[2] * 255);
 
   int i, j, histogramIdx, height;
 
