@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.487.2.1");
+vtkCxxRevisionMacro(vtkPVSource, "1.487.2.2");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1348,6 +1348,7 @@ void vtkPVSource::SetupDisplays()
   pDisp->UpdateVTKObjects();
 
   this->AddDisplayToRenderModule(pDisp);
+  pDisp->InvalidateGeometry();
 
   if (!this->GetSourceList())
     {
