@@ -20,7 +20,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkIdentColoredPainter.h"
 
-vtkCxxRevisionMacro(vtkPVVisibleCellSelector, "1.4");
+vtkCxxRevisionMacro(vtkPVVisibleCellSelector, "1.5");
 vtkStandardNewMacro(vtkPVVisibleCellSelector);
 
 //----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ void vtkPVVisibleCellSelector::SetRenderer(vtkRenderer *r)
     }
 
   vtkIdentColoredPainter *ip = vtkIdentColoredPainter::New();
-  ip->SetActorLookupTable(SaveProps, arr);
+  ip->MakeActorLookupTable(SaveProps, arr);
   this->Superclass::SetIdentPainter(ip);
 
   //now that we have given these away, we can delete our reference to them
