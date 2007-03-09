@@ -32,7 +32,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.16");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.17");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -538,6 +538,15 @@ vtkColorTransferFunction* vtkTransferFunctionViewer::GetColorFunction()
     return this->EditorWidget->GetColorFunction();
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetAllowInteriorElements(int allow)
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->SetAllowInteriorElements(allow);
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -176,6 +176,11 @@ public:
   vtkColorTransferFunction* GetColorFunction();
 
   // Description:
+  // Toggle whether to allow interior nodes in the transfer function.
+  // Set the type of transfer function editor before trying to set this value.
+  void SetAllowInteriorElements(int allow);
+
+  // Description:
   // Set/get the opacity of a particular transfer function element.
   void SetElementOpacity(unsigned int idx, double opacity);
   double GetElementOpacity(unsigned int idx);

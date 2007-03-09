@@ -41,6 +41,7 @@ protected:
   ~vtkTransferFunctionEditorWidget1D();
 
   double ComputeScalar(double pos, int width);
+  double ComputePositionFromScalar(double scalar, int width);
 
 private:
   vtkTransferFunctionEditorWidget1D(const vtkTransferFunctionEditorWidget1D&); // Not implemented.

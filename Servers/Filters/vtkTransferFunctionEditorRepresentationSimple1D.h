@@ -54,6 +54,10 @@ public:
   unsigned int CreateHandle(double displayPos[3], double scalar);
 
   // Description:
+  // Return the number of existing handles.
+  virtual unsigned int GetNumberOfHandles();
+
+  // Description:
   // Return the vtkHandleRepresentation (for a transfer function node) with a
   // particular id. Returns NULL if the id is out of range.
   vtkHandleRepresentation* GetHandleRepresentation(unsigned int idx);

@@ -124,11 +124,13 @@ protected:
 
   void AddNewNode(int x, int y);
   void AddNewNode(double scalar);
-  void AddOpacityPoint(int x, int y);
+  void AddOpacityPoint(double x, double y);
   void RemoveOpacityPoint(unsigned int id);
-  void AddColorPoint(int x);
+  void AddColorPoint(double x);
   void RepositionColorPoint(unsigned int idx, double scalar);
   void RemoveColorPoint(unsigned int id);
+  void ClampToWholeRange(double pos[2], int size[2], double &scalar);
+  int NodeExists(double scalar);
   
   // Helper method for creating widgets
   static vtkHandleWidget* CreateHandleWidget(

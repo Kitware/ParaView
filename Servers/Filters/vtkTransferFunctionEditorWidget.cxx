@@ -24,7 +24,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.10");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.11");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
@@ -44,6 +44,7 @@ vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
   this->Histogram = NULL;
   this->OpacityMTime = 0;
   this->ColorMTime = 0;
+  this->AllowInteriorElements = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -229,7 +230,10 @@ void vtkTransferFunctionEditorWidget::MoveToPreviousElement()
     vtkTransferFunctionEditorRepresentation::SafeDownCast(this->WidgetRep);
   if (rep)
     {
-    rep->SetActiveHandle(rep->GetActiveHandle()-1);
+    if (rep->GetActiveHandle() != 0)
+      {
+      rep->SetActiveHandle(rep->GetActiveHandle()-1);
+      }
     }
 }
 
@@ -240,7 +244,10 @@ void vtkTransferFunctionEditorWidget::MoveToNextElement()
     vtkTransferFunctionEditorRepresentation::SafeDownCast(this->WidgetRep);
   if (rep)
     {
-    rep->SetActiveHandle(rep->GetActiveHandle()+1);
+    if (rep->GetActiveHandle() < rep->GetNumberOfHandles()-1)
+      {
+      rep->SetActiveHandle(rep->GetActiveHandle()+1);
+      }
     }
 }
 

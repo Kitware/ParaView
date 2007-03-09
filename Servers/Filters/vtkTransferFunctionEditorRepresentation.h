@@ -80,6 +80,10 @@ public:
   virtual unsigned int GetActiveHandle() { return 0; }
 
   // Description:
+  // Get the number of existing handles.
+  virtual unsigned int GetNumberOfHandles() { return 0; }
+
+  // Description:
   // Set the color of the histogram.
   vtkSetVector3Macro(HistogramColor, double);
 

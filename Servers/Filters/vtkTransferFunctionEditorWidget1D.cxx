@@ -19,7 +19,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkTransferFunctionEditorRepresentation1D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget1D, "1.5");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget1D, "1.6");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget1D::vtkTransferFunctionEditorWidget1D()
@@ -63,6 +63,15 @@ double vtkTransferFunctionEditorWidget1D::ComputeScalar(double pos, int width)
   double pct = pos / (double)width;
   return this->VisibleScalarRange[0] + pct *
     (this->VisibleScalarRange[1] - this->VisibleScalarRange[0]);
+}
+
+//----------------------------------------------------------------------------
+double vtkTransferFunctionEditorWidget1D::ComputePositionFromScalar(
+  double scalar, int width)
+{
+  double pct = (scalar - this->VisibleScalarRange[0]) /
+    (this->VisibleScalarRange[1] - this->VisibleScalarRange[0]);
+  return width * pct;
 }
 
 //----------------------------------------------------------------------------

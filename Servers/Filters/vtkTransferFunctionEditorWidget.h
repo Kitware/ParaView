@@ -87,6 +87,12 @@ public:
   void SetColorFunction(vtkColorTransferFunction *function);
 
   // Description:
+  // Toggle whether to allow interior nodes in the transfer function.
+  vtkSetClampMacro(AllowInteriorElements, int, 0, 1);
+  vtkGetMacro(AllowInteriorElements, int);
+  vtkBooleanMacro(AllowInteriorElements, int);
+
+  // Description:
   // Set/get the opacity of a particular element in the transfer function
   // editor.
   virtual void SetElementOpacity(unsigned int, double) {}
@@ -158,6 +164,7 @@ protected:
   vtkRectilinearGrid *Histogram;
   unsigned long ColorMTime;
   unsigned long OpacityMTime;
+  int AllowInteriorElements;
 
 private:
   vtkTransferFunctionEditorWidget(const vtkTransferFunctionEditorWidget&); // Not implemented.
