@@ -21,7 +21,7 @@
 #include "vtkTransferFunctionEditorRepresentation.h"
 #include "vtkTransferFunctionEditorWidget.h"
 
-vtkCxxRevisionMacro(vtkInteractorStyleTransferFunctionEditor, "1.3");
+vtkCxxRevisionMacro(vtkInteractorStyleTransferFunctionEditor, "1.4");
 vtkStandardNewMacro(vtkInteractorStyleTransferFunctionEditor);
 
 vtkCxxSetObjectMacro(vtkInteractorStyleTransferFunctionEditor, Widget,
@@ -154,29 +154,32 @@ void vtkInteractorStyleTransferFunctionEditor::OnChar()
     return;
     }
 
-  switch (this->Interactor->GetKeyCode())
+  if (strlen(this->Interactor->GetKeySym()) == 1)
     {
-    case 'r':
-    case 'R':
+    switch (this->Interactor->GetKeyCode())
       {
-      this->Widget->ShowWholeScalarRange();
-      vtkTransferFunctionEditorRepresentation *rep =
-        vtkTransferFunctionEditorRepresentation::SafeDownCast(
-          this->Widget->GetRepresentation());
-      if (rep)
+      case 'r':
+      case 'R':
         {
-        rep->BuildRepresentation();
+        this->Widget->ShowWholeScalarRange();
+        vtkTransferFunctionEditorRepresentation *rep =
+          vtkTransferFunctionEditorRepresentation::SafeDownCast(
+            this->Widget->GetRepresentation());
+        if (rep)
+          {
+          rep->BuildRepresentation();
+          }
+        this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
         }
-      this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
+        break;
+
+      case 'Q' :
+      case 'q' :
+      case 'e' :
+      case 'E' :
+        this->Interactor->ExitCallback();
+        break;
       }
-      break;
-      
-    case 'Q' :
-    case 'q' :
-    case 'e' :
-    case 'E' :
-      this->Interactor->ExitCallback();
-      break;
     }
 
   this->Interactor->Render();
