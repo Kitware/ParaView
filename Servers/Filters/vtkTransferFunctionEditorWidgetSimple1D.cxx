@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.17");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.18");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -345,7 +345,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::MoveNodeAction(
     if (self->ModificationType != COLOR)
       {
       self->RemoveOpacityPoint(nodeId);
-      self->AddOpacityPoint(pos[0], pos[1]);
+      self->AddOpacityPoint(x, y);
       }
     if (self->ModificationType != OPACITY)
       {
