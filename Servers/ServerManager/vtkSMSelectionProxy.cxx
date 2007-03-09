@@ -72,7 +72,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.13");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -1071,7 +1071,7 @@ void vtkSMSelectionProxy::SetNumIds(int num)
     {
     delete[] this->Ids;
     }
-  this->Ids = new int[num];
+  this->Ids = new vtkIdType[num];
   this->NumIds = num;
 }
 
