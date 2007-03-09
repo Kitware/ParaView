@@ -180,6 +180,8 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
     lutProxy->GetProperty("RGBPoints"), values);
   pqSMAdaptor::setEnumerationProperty(
     lutProxy->GetProperty("ColorSpace"), "HSV");
+  pqSMAdaptor::setEnumerationProperty(
+    lutProxy->GetProperty("VectorMode"), "Magnitude");
   lutProxy->UpdateVTKObjects();
   lutProxy->InvokeCommand("Build");
 
