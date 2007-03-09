@@ -30,6 +30,7 @@
         <file>Icons/pqDisconnect16.png</file>
         <file>Icons/pqDisconnect24.png</file>
         <file>Icons/pqDisconnect32.png</file>
+        <file>Icons/pqExponential24.png</file>
         <file>Icons/pqEyeball16.png</file>
         <file>Icons/pqEyeballd16.png</file>
         <file>Icons/pqFavorites16.png</file>
@@ -49,6 +50,7 @@
         <file>Icons/pqHelp16.png</file>
         <file>Icons/pqHelp24.png</file>
         <file>Icons/pqHelp32.png</file>
+        <file>Icons/pqHideCenterAxes24.png</file>
         <file>Icons/pqHierarchicalData16.png</file>
         <file>Icons/pqImageData16.png</file>
         <file>Icons/pqInspect22.png</file>
@@ -79,13 +81,16 @@
         <file>Icons/pqPointData16.png</file>
         <file>Icons/pqPolydata16.png</file>
         <file>Icons/pqPrint22.png</file>
+        <file>Icons/pqRamp24.png</file>
         <file>Icons/pqRectilinearGrid16.png</file>
         <file>Icons/pqRedo16.png</file>
         <file>Icons/pqRedo24.png</file>
         <file>Icons/pqRedo32.png</file>
+        <file>Icons/pqRedoCamera24.png</file>
         <file>Icons/pqResetCamera16.png</file>
         <file>Icons/pqResetCamera24.png</file>
         <file>Icons/pqResetCamera32.png</file>
+        <file>Icons/pqResetCenter24.png</file>
         <file>Icons/pqResetCenter32.png</file>
         <file>Icons/pqRotate16.png</file>
         <file>Icons/pqRotate24.png</file>
@@ -102,18 +107,22 @@
         <file>Icons/pqServer16.png</file>
         <file>Icons/pqServer22.png</file>
         <file>Icons/pqServer32.png</file>
+        <file>Icons/pqShowCenterAxes24.png</file>
         <file>Icons/pqShowCenterAxes32.png</file>
         <file>Icons/pqSideSet16.png</file>
+        <file>Icons/pqSinusoidal24.png</file>
         <file>Icons/pqSolidColor16.png</file>
         <file>Icons/pqSource16.png</file>
         <file>Icons/pqSource22.png</file>
         <file>Icons/pqSource32.png</file>
         <file>Icons/pqSplitViewH12.png</file>
         <file>Icons/pqSplitViewV12.png</file>
+        <file>Icons/pqStep24.png</file>
         <file>Icons/pqStructuredGrid16.png</file>
         <file>Icons/pqUndo16.png</file>
         <file>Icons/pqUndo24.png</file>
         <file>Icons/pqUndo32.png</file>
+        <file>Icons/pqUndoCamera24.png</file>
         <file>Icons/pqUniformData16.png</file>
         <file>Icons/pqUnknownData16.png</file>
         <file>Icons/pqUnstructuredGrid16.png</file>
