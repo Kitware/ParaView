@@ -34,13 +34,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_AboutDialog.h"
 
+#include "pqOptions.h"
+#include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
+
 AboutDialog::AboutDialog(QWidget* Parent) :
   QDialog(Parent),
   Ui(new Ui::AboutDialog())
 {
   this->Ui->setupUi(this);
   this->setObjectName("AboutDialog");
-  this->setAttribute(Qt::WA_DeleteOnClose);
+
+  // get extra information and put it in
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pqOptions* opts = pqOptions::SafeDownCast(pm->GetOptions());
+
+  ostrstream str;
+  vtkIndent indent;
+  opts->PrintSelf(str, indent.GetNextIndent());
+  QString info = str.str();
+  int idx = info.indexOf("Runtime information:");
+  info = info.remove(0, idx);
+  this->Ui->Information->append("ParaView was developed by Kitware Inc.");
+  this->Ui->Information->append("http://www.paraview.org");
+  this->Ui->Information->append("http://www.kitware.com");
+  QString version = QString("This is version %1").arg(PARAVIEW_VERSION_FULL);
+  this->Ui->Information->append(version);
+  
+  this->Ui->Information->append("\n");
+  
+  this->Ui->Information->append(info);
+  this->Ui->Information->moveCursor(QTextCursor::Start);
+  this->Ui->Information->viewport()->setBackgroundRole(QPalette::Window);
 }
 
 AboutDialog::~AboutDialog()
