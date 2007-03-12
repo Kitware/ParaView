@@ -1,5 +1,3 @@
-SUBDIRS(
-  Client
-  Server
-)
+ADD_SUBDIRECTORY(Client)
+ADD_SUBDIRECTORY(Server)
 

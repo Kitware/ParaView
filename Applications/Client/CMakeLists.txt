@@ -301,7 +301,7 @@ IF(BUILD_TESTING)
     ENDFOREACH(test)
   ENDIF(PARAVIEW_DATA_ROOT)
 
-  SUBDIRS(Testing/Cxx)
+  ADD_SUBDIRECTORY(Testing/Cxx)
 ENDIF(BUILD_TESTING)
 
 # Add shared link forwarding executables if necessary.

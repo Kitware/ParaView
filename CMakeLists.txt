@@ -119,7 +119,7 @@ INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
 
 #########################################################################
 IF(BUILD_DOCUMENTATION)
-  SUBDIRS(Utilities/Doxygen)
+  ADD_SUBDIRECTORY(Utilities/Doxygen)
 ENDIF(BUILD_DOCUMENTATION)
 
 #########################################################################
@@ -129,18 +129,18 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPQConfig.h.in
 
 #########################################################################
 IF (PARAVIEW_BUILD_QT_GUI)
-  SUBDIRS(Qt)
+  ADD_SUBDIRECTORY(Qt)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 #########################################################################
 IF (PARAVIEW_BUILD_QT_GUI)
-  SUBDIRS(Applications)
+  ADD_SUBDIRECTORY(Applications)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 #########################################################################
 OPTION(BUILD_EXAMPLES "Build ParaView examples." OFF)
 IF (BUILD_EXAMPLES)
-  SUBDIRS(Examples)
+  ADD_SUBDIRECTORY(Examples)
 ENDIF (BUILD_EXAMPLES)
 
 # Find hints file for the client/server wrapping
@@ -214,12 +214,9 @@ SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/Qt/Widgets
                               ${ParaView_SOURCE_DIR}/Qt/Components )
 SET(PARAVIEW_KWSYS_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS})
 
-SET(PARAVIEW_GUI_CLIENT_EXECUTABLE 
-  "${EXECUTABLE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/paraview_alpha")
-SET(PARAVIEW_BATCH_EXECUTABLE 
-  "${EXECUTABLE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/pvbatch")
-SET(PARAVIEW_PROCESS_XML_EXECUTABLE 
-  "${EXECUTABLE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/kwProcessXML")
+GET_TARGET_PROPERTY(PARAVIEW_GUI_CLIENT_EXECUTABLE paraview_alpha${PV_EXE_SUFFIX} LOCATION)
+GET_TARGET_PROPERTY(PARAVIEW_BATCH_EXECUTABLE pvbatch${PV_EXE_SUFFIX} LOCATION)
+GET_TARGET_PROPERTY(PARAVIEW_PROCESS_XML_EXECUTABLE kwProcessXML LOCATION)
 SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY 
   "${ParaView_SOURCE_DIR}/Servers/ServerManager/Resources")
 SET(VTKCS_SOURCE_DIR 

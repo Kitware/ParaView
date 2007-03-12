@@ -92,6 +92,43 @@ IF(NOT PV_INSTALL_DATA_DIR)
   SET(PV_INSTALL_DATA_DIR ${PV_INSTALL_ROOT}/share/paraview-${PARAVIEW_VERSION})
 ENDIF(NOT PV_INSTALL_DATA_DIR)
 
+#########################################################################
+# Enable shared link forwarding support if needed.
+SET(PV_EXE_SUFFIX)
+SET(PV_EXE_INSTALL ${PV_INSTALL_BIN_DIR})
+IF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
+  IF(NOT WIN32)
+    SET(PV_NEED_SHARED_FORWARD 1)
+    SET(PV_EXE_SUFFIX -real)
+    SET(PV_EXE_INSTALL ${PV_INSTALL_LIB_DIR})
+    SET(PV_FORWARD_DIR_BUILD "${EXECUTABLE_OUTPUT_PATH}")
+    SET(PV_FORWARD_DIR_INSTALL "..${PV_EXE_INSTALL}")
+    SET(PV_FORWARD_PATH_BUILD "\"${PV_FORWARD_DIR_BUILD}\"")
+    SET(PV_FORWARD_PATH_INSTALL "\"${PV_FORWARD_DIR_INSTALL}\"")
+    FOREACH(ldir ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
+      SET(PV_FORWARD_PATH_BUILD "${PV_FORWARD_PATH_BUILD}, \"${ldir}\"")
+      SET(PV_FORWARD_PATH_INSTALL "${PV_FORWARD_PATH_INSTALL}, \"${ldir}\"")
+    ENDFOREACH(ldir)
+  ENDIF(NOT WIN32)
+ENDIF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
+
+#########################################################################
+# Because INSTALL_* commands require a leading / and because INSTALL (cmake 2.4
+# and newer) requires no leading / to install under INSTALL_PREFIX, we
+# are stripping the leading /. In the future, there should be no leading
+# / in any install directory variables
+IF(PV_INSTALL_HAS_CMAKE_24)
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_LIB_DIR_CM24 "${PV_INSTALL_LIB_DIR}")
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_BIN_DIR_CM24 "${PV_INSTALL_BIN_DIR}")
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_INCLUDE_DIR_CM24 "${PV_INSTALL_INCLUDE_DIR}")
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_DATA_DIR_CM24 "${PV_INSTALL_DATA_DIR}")
+  STRING(REGEX REPLACE "^/" "" PV_EXE_INSTALL_CM24 "${PV_EXE_INSTALL}")
+
+  STRING(REGEX REPLACE "^/" "" KWCommon_INSTALL_LIB_DIR_CM24 "${KWCommon_INSTALL_LIB_DIR}")
+  STRING(REGEX REPLACE "^/" "" KWCommon_INSTALL_BIN_DIR_CM24 "${KWCommon_INSTALL_BIN_DIR}")
+  STRING(REGEX REPLACE "^/" "" KWCommon_INSTALL_INCLUDE_DIR_CM24 "${KWCommon_INSTALL_INCLUDE_DIR}")
+ENDIF(PV_INSTALL_HAS_CMAKE_24)
+
 # Install no development files by default, but allow the user to get
 # them installed by setting PV_INSTALL_DEVELOPMENT to true.  Disable
 # the option altogether if PV_INSTALL_NO_DEVELOPMENT is already set to
@@ -221,7 +258,7 @@ MARK_AS_ADVANCED(PARAVIEW_ALWAYS_SECURE_CONNECTION)
 
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
   ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
-SUBDIRS(VTK)
+ADD_SUBDIRECTORY(VTK)
 
 #########################################################################
 # Set the ICET MPI variables from the VTK ones.
@@ -299,7 +336,7 @@ ELSE(PARAVIEW_USE_SYSTEM_HDF5)
     ${ParaView_BINARY_DIR}/Utilities/hdf5)
 
   SET(HDF5_CONFIG ${ParaView_BINARY_DIR}/Utilities/hdf5/HDF5Config.cmake)
-  SUBDIRS(Utilities/hdf5)
+  ADD_SUBDIRECTORY(Utilities/hdf5)
 
 ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
 
@@ -319,7 +356,7 @@ SET(XDMF_INCLUDE_DIRS
   "${ParaView_SOURCE_DIR}/Utilities/Xdmf/vtk"
   "${ParaView_BINARY_DIR}/Utilities/Xdmf/vtk")
 SET(PARAVIEW_LINK_XDMF ON)
-SUBDIRS(Utilities/Xdmf)
+ADD_SUBDIRECTORY(Utilities/Xdmf)
 
 
 #########################################################################
@@ -365,7 +402,7 @@ IF(VTK_USE_MPI)
       ${ParaView_SOURCE_DIR}/Utilities/IceT/src/include
       ${ParaView_BINARY_DIR}/Utilities/IceT/src/include
       )
-    SUBDIRS(Utilities/IceT)
+    ADD_SUBDIRECTORY(Utilities/IceT)
   ENDIF(PARAVIEW_USE_ICE_T)
 
   # Needed for mpich 2
@@ -374,7 +411,7 @@ ENDIF(VTK_USE_MPI)
 
 #########################################################################
 # Configure Common
-SUBDIRS(Common)
+ADD_SUBDIRECTORY(Common)
 
 #########################################################################
 # Configure VTKClientServer wrapping
@@ -382,13 +419,13 @@ SET(VTKCLIENTSERVER_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
   )
-SUBDIRS(Utilities/VTKClientServer)
+ADD_SUBDIRECTORY(Utilities/VTKClientServer)
 
 #########################################################################
 # Configure Python wrapping
 IF(PARAVIEW_ENABLE_PYTHON)
   FIND_PACKAGE(PythonLibs REQUIRED)
-  SUBDIRS(Utilities/VTKPythonWrapping)
+  ADD_SUBDIRECTORY(Utilities/VTKPythonWrapping)
   IF(PV_INSTALL_NO_LIBRARIES)
     SET(VTKPythonWrapping_INSTALL_LIBRARIES 0)
   ELSE(PV_INSTALL_NO_LIBRARIES)
@@ -404,7 +441,7 @@ ENDIF(PARAVIEW_ENABLE_PYTHON)
 # We can't remove this from ParaViewCommon.cmake since it must be
 # included after VTK has been included but before ServerManager.
 IF (PARAVIEW_BUILD_GUI)
-  SUBDIRS(Utilities/VTKTclWrapping)
+  ADD_SUBDIRECTORY(Utilities/VTKTclWrapping)
   SET(VTKTclWrapping_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
   SET(VTKTclWrapping_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
   SET(VTKTclWrapping_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
@@ -547,59 +584,22 @@ SET(PVSERVERCOMMON_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/Servers/Common
   ${ParaView_BINARY_DIR}/Servers/Common)
 
-SUBDIRS(Servers)
+ADD_SUBDIRECTORY(Servers)
 
 #########################################################################
 # Configure Python executable
 IF(PARAVIEW_ENABLE_PYTHON)
-  SUBDIRS(Utilities/VTKPythonWrapping/Executable)
+  ADD_SUBDIRECTORY(Utilities/VTKPythonWrapping/Executable)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 #########################################################################
 # Configure Servers executables
-SUBDIRS(Servers/Executables)
+ADD_SUBDIRECTORY(Servers/Executables)
 
 
 #########################################################################
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/CMake/CTestCustom.ctest.in
   ${ParaView_BINARY_DIR}/CTestCustom.ctest @ONLY)
-
-#########################################################################
-# Enable shared link forwarding support if needed.
-SET(PV_EXE_SUFFIX)
-SET(PV_EXE_INSTALL ${PV_INSTALL_BIN_DIR})
-IF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
-  IF(NOT WIN32)
-    SET(PV_NEED_SHARED_FORWARD 1)
-    SET(PV_EXE_SUFFIX -real)
-    SET(PV_EXE_INSTALL ${PV_INSTALL_LIB_DIR})
-    SET(PV_FORWARD_DIR_BUILD "${EXECUTABLE_OUTPUT_PATH}")
-    SET(PV_FORWARD_DIR_INSTALL "..${PV_EXE_INSTALL}")
-    SET(PV_FORWARD_PATH_BUILD "\"${PV_FORWARD_DIR_BUILD}\"")
-    SET(PV_FORWARD_PATH_INSTALL "\"${PV_FORWARD_DIR_INSTALL}\"")
-    FOREACH(ldir ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
-      SET(PV_FORWARD_PATH_BUILD "${PV_FORWARD_PATH_BUILD}, \"${ldir}\"")
-      SET(PV_FORWARD_PATH_INSTALL "${PV_FORWARD_PATH_INSTALL}, \"${ldir}\"")
-    ENDFOREACH(ldir)
-  ENDIF(NOT WIN32)
-ENDIF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
-
-#########################################################################
-# Because INSTALL_* commands require a leading / and because INSTALL (cmake 2.4
-# and newer) requires no leading / to install under INSTALL_PREFIX, we
-# are stripping the leading /. In the future, there should be no leading
-# / in any install directory variables
-IF(PV_INSTALL_HAS_CMAKE_24)
-  STRING(REGEX REPLACE "^/" "" PV_INSTALL_LIB_DIR_CM24 "${PV_INSTALL_LIB_DIR}")
-  STRING(REGEX REPLACE "^/" "" PV_INSTALL_BIN_DIR_CM24 "${PV_INSTALL_BIN_DIR}")
-  STRING(REGEX REPLACE "^/" "" PV_INSTALL_INCLUDE_DIR_CM24 "${PV_INSTALL_INCLUDE_DIR}")
-  STRING(REGEX REPLACE "^/" "" PV_INSTALL_DATA_DIR_CM24 "${PV_INSTALL_DATA_DIR}")
-  STRING(REGEX REPLACE "^/" "" PV_EXE_INSTALL_CM24 "${PV_EXE_INSTALL}")
-
-  STRING(REGEX REPLACE "^/" "" KWCommon_INSTALL_LIB_DIR_CM24 "${KWCommon_INSTALL_LIB_DIR}")
-  STRING(REGEX REPLACE "^/" "" KWCommon_INSTALL_BIN_DIR_CM24 "${KWCommon_INSTALL_BIN_DIR}")
-  STRING(REGEX REPLACE "^/" "" KWCommon_INSTALL_INCLUDE_DIR_CM24 "${KWCommon_INSTALL_INCLUDE_DIR}")
-ENDIF(PV_INSTALL_HAS_CMAKE_24)
 
 #########################################################################
 SET(PARAVIEW_INCLUDE_DIRS

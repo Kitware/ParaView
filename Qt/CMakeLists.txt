@@ -16,10 +16,12 @@ INCLUDE(${QT_USE_FILE})
 
 #########################################################################
 # Include Qt dependent code.
-SUBDIRS(Testing Widgets Chart)
+ADD_SUBDIRECTORY(Testing)
+ADD_SUBDIRECTORY(Widgets)
+ADD_SUBDIRECTORY(Chart)
 
 IF(PARAVIEW_ENABLE_PYTHON)
-  SUBDIRS(Python)
+  ADD_SUBDIRECTORY(Python)
   SET (MOC_INCLUDE_DIRS
     ${MOC_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/Python
@@ -27,5 +29,6 @@ IF(PARAVIEW_ENABLE_PYTHON)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 # Include Qt, VTK & Server Manager dependent code.
-SUBDIRS(Core Components)
+ADD_SUBDIRECTORY(Core)
+ADD_SUBDIRECTORY(Components)
 
