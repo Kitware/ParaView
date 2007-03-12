@@ -1851,21 +1851,21 @@ This filter creates a new cell array containing a geometric measure of each cell
         default_values="2">
        <EnumerationDomain name="enum">
          <Entry value="0" text="Edge Ratio"/>
+
+         <Entry value="27" text="Aspect Gamma"/>
          <Entry value="3" text="Aspect Frobenius"/>
          <Entry value="1" text="Aspect Ratio"/>
-         <Entry value="2" text="Radius Ratio"/>
-         <Entry value="6" text="Minimum Dihedral Angle"/>
          <Entry value="7" text="Collapse Ratio"/>
-         <Entry value="29" text="Aspect Beta"/>
-         <Entry value="27" text="Aspect Gamma"/>
-         <Entry value="19" text="Volume"/>
          <Entry value="9" text="Condition"/>
+         <Entry value="15" text="Distortion"/>
          <Entry value="25" text="Jacobian"/>
-         <Entry value="10" text="Scaled Jacobian"/>
+         <Entry value="6" text="Minimum Dihedral Angle"/>
+         <Entry value="2" text="Radius Ratio"/>
          <Entry value="12" text="Relative Size Squared"/>
+         <Entry value="10" text="Scaled Jacobian"/>
          <Entry value="13" text="Shape"/>
          <Entry value="14" text="Shape and Size"/>
-         <Entry value="15" text="Distortion"/>
+         <Entry value="19" text="Volume"/>
        </EnumerationDomain>
        <Documentation>
          Select the quality measure used to evaluate tetrahedral quality. The radius ratio is the size of a sphere circumscribed by a tetrahedron's 4 vertices divided by the size of a circle tangent to a tetrahedron's 4 faces. The edge ratio is the ratio of the longest edge length to the shortest edge length. The collapse ratio is the minimum ratio of height of a vertex above the triangle opposite it divided by the longest edge of the opposing triangle across all vertex/triangle pairs.
@@ -1878,8 +1878,8 @@ This filter creates a new cell array containing a geometric measure of each cell
         default_values="5">
        <EnumerationDomain name="enum">
          <Entry value="21" text="Diagonal"/> 
-         <Entry value="15" text="Distortion"/>
          <Entry value="22" text="Dimension"/>
+         <Entry value="15" text="Distortion"/>
          <Entry value="0" text="Edge Ratio"/>
          <Entry value="25" text="Jacobian"/>
          <Entry value="16" text="Maximum Edge Ratio"/>
