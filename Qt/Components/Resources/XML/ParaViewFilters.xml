@@ -122,6 +122,10 @@
       <Filter name="GradientMagnitude" />
       <Filter name="SurfaceVectors" />
     </Category>
+    <Category name="Temporal">
+      <Filter name="TemporalCache" />
+      <Filter name="ParticleTracer" />
+    </Category>
     <Category name="Test">
       <Filter name="ExtractHistogram" />
     </Category>

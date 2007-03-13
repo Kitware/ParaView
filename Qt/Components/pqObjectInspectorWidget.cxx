@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqClipPanel.h"
 #include "pqCalculatorPanel.h"
 #include "pqStreamTracerPanel.h"
+#include "pqParticleTracerPanel.h"
 #include "pqThresholdPanel.h"
 #include "pqContourPanel.h"
 #include "pqExodusPanel.h"
@@ -97,6 +98,10 @@ public:
         {
         return new pqStreamTracerPanel(proxy, p);
         }
+      if(QString("ParticleTracer") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqParticleTracerPanel(proxy, p);
+        }
       if(QString("Threshold") == proxy->getProxy()->GetXMLName())
         {
         return new pqThresholdPanel(proxy, p);
@@ -127,6 +132,7 @@ public:
          QString("Clip") == proxy->getProxy()->GetXMLName() ||
          QString("Calculator") == proxy->getProxy()->GetXMLName() ||
          QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||
+         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName())
         {
