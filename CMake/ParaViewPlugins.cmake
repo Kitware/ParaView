@@ -50,7 +50,7 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name XMLFile)
 
   IF(XML_NAME)
     GET_FILENAME_COMPONENT(XML_FILE "${XMLFile}" ABSOLUTE)
-    SET(XML_HEADER "${CMAKE_CURRENT_BINARY_DIR}/vtkSMXML.h")
+    SET(XML_HEADER "${CMAKE_CURRENT_BINARY_DIR}/vtkSMXML_${Name}.h")
     SET(MODULE_NAME ${Name})
     
     SET(XML_IFACE_PREFIX ${Name})
@@ -80,19 +80,20 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name XMLFile)
     SET(HDRS ${HDRS} "${src_path}/${src_name}.h")
   ENDFOREACH(SRC ${ARGN})
   
+  SET(CS_SRCS)
   IF(HDRS)
     VTK_WRAP_ClientServer(${Name} CS_SRCS "${HDRS}")
     SET(HAVE_SRCS 1)
   ELSE(HDRS)
     SET(HAVE_SRCS 0)
-    SET(CS_SRCS)
   ENDIF(HDRS)
   
-  CONFIGURE_FILE("${ParaView_SOURCE_DIR}/Servers/ServerManager/vtkSMPluginInit.cxx.in"
-                 "${CMAKE_CURRENT_BINARY_DIR}/vtkSMPluginInit.cxx" @ONLY)
+  CONFIGURE_FILE(
+    "${ParaView_SOURCE_DIR}/Servers/ServerManager/vtkSMPluginInit.cxx.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/vtkSMPluginInit_${Name}.cxx" @ONLY)
 
   SET(${OUTSRCS} ${CS_SRCS} ${XML_HEADER}
-    ${CMAKE_CURRENT_BINARY_DIR}/vtkSMPluginInit.cxx
+    ${CMAKE_CURRENT_BINARY_DIR}/vtkSMPluginInit_${Name}.cxx
     )
   
 ENDMACRO(ADD_SERVER_MANAGER_EXTENSION)
