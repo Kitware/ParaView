@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSetName.h"
 
 //-----------------------------------------------------------------------------
-pqLookmarkToolbar::pqLookmarkToolbar(const QString &title, QObject* p)// :  QToolBar(p)
+pqLookmarkToolbar::pqLookmarkToolbar(const QString &title, QWidget* p) :  QToolBar(title, p)
 {
   this->CurrentLookmark = 0;
   this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -54,7 +54,7 @@ pqLookmarkToolbar::pqLookmarkToolbar(const QString &title, QObject* p)// :  QToo
 }
 
 //-----------------------------------------------------------------------------
-pqLookmarkToolbar::pqLookmarkToolbar(QObject* p)// :  QObject(p)
+pqLookmarkToolbar::pqLookmarkToolbar(QWidget* p) :  QToolBar(p)
 {
   this->CurrentLookmark = 0;
   this->setContextMenuPolicy(Qt::CustomContextMenu);

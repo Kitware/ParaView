@@ -50,8 +50,8 @@ class QTWIDGETS_EXPORT pqLookmarkToolbar : public QToolBar
   Q_OBJECT
 
 public:
-  pqLookmarkToolbar(const QString &title, QObject* p=0);
-  pqLookmarkToolbar(QObject* p=0);
+  pqLookmarkToolbar(const QString &title, QWidget* p=0);
+  pqLookmarkToolbar(QWidget* p=0);
   ~pqLookmarkToolbar(){}
 
 public slots:
