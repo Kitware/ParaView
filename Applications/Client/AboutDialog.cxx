@@ -52,6 +52,7 @@ AboutDialog::AboutDialog(QWidget* Parent) :
   ostrstream str;
   vtkIndent indent;
   opts->PrintSelf(str, indent.GetNextIndent());
+  str << ends;
   QString info = str.str();
   int idx = info.indexOf("Runtime information:");
   info = info.remove(0, idx);
