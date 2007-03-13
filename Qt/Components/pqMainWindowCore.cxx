@@ -66,7 +66,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLookmarkBrowser.h"
 #include "pqLookmarkInspector.h"
 #include "pqLookmarkBrowserModel.h"
+#include "pqLookmarkManagerModel.h"
+#include "pqLookmarkModel.h"
 #include "pqLookmarkDefinitionWizard.h"
+#include "pqLookmarkToolbar.h"
 #include "pqMainWindowCore.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
@@ -167,6 +170,7 @@ public:
     PipelineMenu(0),
     PipelineBrowser(0),
     VariableToolbar(0),
+    LookmarkToolbar(0),
     CustomFilterToolbar(0),
     ToolTipTrapper(0),
     InCreateSource(false),
@@ -196,6 +200,7 @@ public:
   pqElementInspectorWidget* ElementInspector;
   pqLookmarkBrowser* LookmarkBrowser;
   pqLookmarkInspector* LookmarkInspector;
+  QString LookmarkToLoad;
   pqLookmarkBrowserModel* Lookmarks;
   pqCustomFilterManagerModel* const CustomFilters;
   pqCustomFilterManager* CustomFilterManager;
@@ -210,6 +215,7 @@ public:
   pqPipelineMenu* PipelineMenu;
   pqPipelineBrowser *PipelineBrowser;
   QToolBar* VariableToolbar;
+  pqLookmarkToolbar* LookmarkToolbar;
   QToolBar* CustomFilterToolbar;
   QList<QToolBar*> PluginToolBars;
   
@@ -264,6 +270,22 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
       this->Implementation->CustomFilters, SLOT(addCustomFilter(QString)));
   this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
       this->Implementation->CustomFilters, SLOT(removeCustomFilter(QString)));
+  // Connect up the pqLookmarkManagerModel and pqLookmarkBrowserModel
+  const pqLookmarkManagerModel *lmkModel = pqApplicationCore::instance()->getLookmarkManagerModel();
+  this->Implementation->Lookmarks = new pqLookmarkBrowserModel(lmkModel,parent_widget);
+  QObject::connect(lmkModel,SIGNAL(lookmarkAdded(pqLookmarkModel*)),
+      this->Implementation->Lookmarks,SLOT(addLookmark(pqLookmarkModel*)));
+  QObject::connect(lmkModel,SIGNAL(lookmarkRemoved(const QString&)),
+      this->Implementation->Lookmarks,SLOT(removeLookmark(const QString&)));
+  QObject::connect(lmkModel,SIGNAL(lookmarkModified(pqLookmarkModel*)),
+      this->Implementation->Lookmarks,SLOT(onLookmarkModified(pqLookmarkModel*)));
+  QObject::connect(this->Implementation->Lookmarks,SIGNAL(lookmarkRemoved(const QString&)),
+      lmkModel,SLOT(removeLookmark(const QString&)));
+  QObject::connect(this->Implementation->Lookmarks,SIGNAL(importLookmarks(const QStringList&)),
+      lmkModel,SLOT(importLookmarksFromFiles(const QStringList&)));
+  QObject::connect(this->Implementation->Lookmarks,SIGNAL(exportLookmarks(const QList<pqLookmarkModel*>&,const QStringList&)),
+      lmkModel,SLOT(exportLookmarksToFiles(const QList<pqLookmarkModel*>&,const QStringList&)));
+
 
   // Listen to selection changed events.
   pqServerManagerSelectionModel *selection =
@@ -735,16 +757,10 @@ void pqMainWindowCore::setupElementInspector(QDockWidget* dock_widget)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setupLookmarkBrowser(QDockWidget* dock_widget)
 {
-  if(!this->Implementation->Lookmarks)
-    {
-    this->Implementation->Lookmarks = new pqLookmarkBrowserModel(this);
-    }
-  this->Implementation->LookmarkBrowser = 
-    new pqLookmarkBrowser(this->Implementation->Lookmarks, dock_widget);
-  QObject::connect(
-    &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
-    this->Implementation->LookmarkBrowser, SLOT(setActiveServer(pqServer*)),
-    Qt::QueuedConnection);
+  this->Implementation->LookmarkBrowser = new pqLookmarkBrowser(this->Implementation->Lookmarks, dock_widget);
+
+  QObject::connect(this->Implementation->LookmarkBrowser,SIGNAL(loadLookmark(const QString&)),
+      this,SLOT(onLoadLookmark(const QString&)));
 
   dock_widget->setWidget(this->Implementation->LookmarkBrowser);
 }
@@ -753,28 +769,19 @@ void pqMainWindowCore::setupLookmarkBrowser(QDockWidget* dock_widget)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setupLookmarkInspector(QDockWidget* dock_widget)
 {
-  if(!this->Implementation->Lookmarks)
-    {
-    this->Implementation->Lookmarks = new pqLookmarkBrowserModel(this);
-    }
+  this->Implementation->LookmarkInspector = new pqLookmarkInspector(this->Implementation->Lookmarks, dock_widget);
 
-  this->Implementation->LookmarkInspector = 
-    new pqLookmarkInspector(this->Implementation->Lookmarks, dock_widget);
+  QObject::connect(this->Implementation->LookmarkInspector,SIGNAL(removeLookmark(pqLookmarkModel*)),
+      pqApplicationCore::instance()->getLookmarkManagerModel(),SLOT(removeLookmark(pqLookmarkModel*)));
+  QObject::connect(this->Implementation->LookmarkInspector,SIGNAL(loadLookmark(const QString&)),
+      this,SLOT(onLoadLookmark(const QString&)));
 
   QObject::connect(
-    &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
-    this->Implementation->LookmarkInspector, SLOT(setActiveServer(pqServer*)),
-    Qt::QueuedConnection);
+    this->Implementation->LookmarkBrowser->getSelectionModel(),
+    SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection & )),
+    this->Implementation->LookmarkInspector,
+    SLOT(onLookmarkSelectionChanged(const QItemSelection &)));
 
-  if(this->Implementation->LookmarkBrowser)
-    {
-    QObject::connect(
-      this->Implementation->LookmarkBrowser->getSelectionModel(),
-      SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection & )),
-      this->Implementation->LookmarkInspector,
-      SLOT(onLookmarkSelectionChanged(const QItemSelection &)));
-      //SLOT(onLookmarkSelectionChanged(const QItemSelection &, const QItemSelection & )));
-    }
   dock_widget->setWidget(this->Implementation->LookmarkInspector);
 }
 
@@ -893,6 +900,93 @@ void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* toolbar)
   // Workaround for file new crash.
   this->Implementation->PipelineBrowser->setFocus();
 */
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setupLookmarkToolbar(pqLookmarkToolbar* toolbar)
+{
+  this->Implementation->LookmarkToolbar = toolbar;
+  
+  // add in existing lookmarks first
+  pqLookmarkManagerModel *lmkModel = pqApplicationCore::instance()->getLookmarkManagerModel();
+  for(int i=0; i<lmkModel->getNumberOfLookmarks();i++)
+    {
+    pqLookmarkModel *lmk = lmkModel->getLookmark(i);
+    toolbar->onLookmarkAdded(lmk->getName(),lmk->getIcon());
+    }
+
+  QObject::connect(toolbar, SIGNAL(loadLookmark(const QString&)),
+      this, SLOT(onLoadLookmark(const QString&)));
+  QObject::connect(toolbar, SIGNAL(editLookmark(const QString&)),
+      this, SLOT(onEditLookmark(const QString&)));
+  QObject::connect(toolbar, SIGNAL(removeLookmark(const QString&)),
+      pqApplicationCore::instance()->getLookmarkManagerModel(), SLOT(removeLookmark(const QString&)));
+  QObject::connect(pqApplicationCore::instance()->getLookmarkManagerModel(), SIGNAL(lookmarkAdded(const QString&, const QImage&)),
+      toolbar, SLOT(onLookmarkAdded(const QString&, const QImage&)));
+  QObject::connect(pqApplicationCore::instance()->getLookmarkManagerModel(), SIGNAL(lookmarkRemoved(const QString&)),
+      toolbar, SLOT(onLookmarkRemoved(const QString&)));
+  QObject::connect(pqApplicationCore::instance()->getLookmarkManagerModel(), SIGNAL(lookmarkNameChanged(const QString&, const QString&)),
+      toolbar, SLOT(onLookmarkNameChanged(const QString&, const QString&)));
+}
+
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onEditLookmark(const QString &name)
+{
+  this->Implementation->LookmarkBrowser->getSelectionModel()->clear();
+  this->Implementation->LookmarkBrowser->getSelectionModel()->setCurrentIndex(this->Implementation->Lookmarks->getIndexFor(name),QItemSelectionModel::SelectCurrent);
+  this->Implementation->LookmarkInspector->parentWidget()->show();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onLoadLookmark(const QString &name)
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  int num_servers = core->getServerManagerModel()->getNumberOfServers();
+  if (num_servers > 0)
+    {
+    pqServer* server = this->getActiveServer();
+    if (!server)
+      {
+      // If there is only one server, use it, otherwise prompt the user
+      if(num_servers==1)
+        {
+        server = core->getServerManagerModel()->getServerByIndex(0);
+        }
+      else
+        {
+        qDebug() << "No active server. Cannot load lookmark.";
+        return;
+        }
+      }
+    this->Implementation->LookmarkToLoad = name;
+    this->onLoadCurrentLookmark(server);
+    }
+  else
+    {
+    // Needed a way to provide the slot access to the name of the lookmark to load. Is there a better way to do this?
+    this->Implementation->LookmarkToLoad = name;
+    pqServerStartupBrowser* const server_browser = new pqServerStartupBrowser(
+      pqApplicationCore::instance()->serverStartups(),
+      *pqApplicationCore::instance()->settings(),
+      this->Implementation->Parent);
+    server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
+    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
+      this, SLOT(onLoadCurrentLookmark(pqServer*)), Qt::QueuedConnection);
+    server_browser->setModal(true);
+    server_browser->show();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onLoadCurrentLookmark(pqServer *server)
+{
+  pqGenericViewModule *view = pqActiveView::instance().current();
+  if(!view)
+    {
+    view = pqPipelineBuilder::instance()->createView(server,pqRenderViewModule::renderViewType());
+    }
+  pqApplicationCore::instance()->getLookmarkManagerModel()->loadLookmark(server, pqActiveView::instance().current(), this->Implementation->LookmarkToLoad);
 }
 
 //-----------------------------------------------------------------------------
@@ -1545,14 +1639,10 @@ void pqMainWindowCore::onToolsCreateLookmark(pqGenericViewModule *view)
     return;
     }
 
-  pqLookmarkDefinitionWizard wizard(render_module, this->Implementation->Lookmarks, this->Implementation->Parent);
+  pqLookmarkDefinitionWizard wizard(render_module, this->Implementation->Parent);
   if(wizard.exec() == QDialog::Accepted)
     {
     wizard.createLookmark();
-    QString lookmarkName = wizard.getLookmarkName();
-    this->Implementation->LookmarkBrowser->selectLookmark(lookmarkName);
-    this->Implementation->LookmarkBrowser->parentWidget()->show();
-    this->Implementation->LookmarkInspector->parentWidget()->show();
     }
 }
 
@@ -2030,6 +2120,14 @@ void pqMainWindowCore::onSelectionChanged()
 
   // Update the save screenshot action.
   emit this->enableFileSaveScreenshot(server != 0 && view != 0);
+
+  // Update the animation manager if it exists.
+  if(this->Implementation->AnimationManager)
+    {
+    // Update the animation manager. Setting the active server will
+    // change the active scene.
+    this->Implementation->AnimationManager->onActiveServerChanged(server);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -2409,22 +2507,6 @@ pqPipelineSource* pqMainWindowCore::getActiveSource()
 {
   return dynamic_cast<pqPipelineSource *>(this->getActiveObject());
 }
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::getRootSources(QList<pqPipelineSource*> *sources, pqPipelineSource *src)
-{
-  pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter*>(src);
-  if(!filter || filter->getInputCount()==0)
-    {
-    sources->push_back(src);
-    return;
-    }
-  for(int i=0; i<filter->getInputCount(); i++)
-    {
-    this->getRootSources(sources, filter->getInput(i));
-    }
-}
-
 
 //-----------------------------------------------------------------------------
 pqServer* pqMainWindowCore::getActiveServer()
