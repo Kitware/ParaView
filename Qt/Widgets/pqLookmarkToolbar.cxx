@@ -120,9 +120,9 @@ void pqLookmarkToolbar::removeCurrentLookmark()
 }
 
 //-----------------------------------------------------------------------------
-void pqLookmarkToolbar::showContextMenu(const QPoint &pos)
+void pqLookmarkToolbar::showContextMenu(const QPoint &menuPos)
 {
-  this->CurrentLookmark = this->actionAt(pos);
+  this->CurrentLookmark = this->actionAt(menuPos);
   if(!this->CurrentLookmark)
     {
     return;
@@ -134,7 +134,7 @@ void pqLookmarkToolbar::showContextMenu(const QPoint &pos)
   menu.addAction(this->ActionEdit);
   menu.addAction(this->ActionRemove);
 
-  menu.exec(this->mapToGlobal(pos));
+  menu.exec(this->mapToGlobal(menuPos));
 }
 
 //-----------------------------------------------------------------------------
