@@ -166,6 +166,7 @@ public:
     LookupTableManager(new pqPQLookupTableManager(parent)),
     ObjectInspectorDriver(0),
     RecentFiltersMenu(0),
+    SourceMenu(0),
     FilterMenu(0),
     PipelineMenu(0),
     PipelineBrowser(0),
@@ -209,6 +210,7 @@ public:
   pqObjectInspectorDriver* ObjectInspectorDriver;
  
   QMenu* RecentFiltersMenu; 
+  QMenu* SourceMenu;
   QMenu* FilterMenu;
   QMenu* AlphabeticalMenu;
   QList<QString> RecentFilterList;
@@ -341,6 +343,10 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
                 SIGNAL(serverManagerExtensionLoaded()),
                 this,
                 SLOT(refreshFiltersMenu()));
+  this->connect(pqApplicationCore::instance()->getPluginManager(),
+                SIGNAL(serverManagerExtensionLoaded()),
+                this,
+                SLOT(refreshSourcesMenu()));
   
   this->connect(pqApplicationCore::instance()->getPluginManager(),
                 SIGNAL(guiInterfaceLoaded(QObject*)),
@@ -388,43 +394,60 @@ pqVCRController& pqMainWindowCore::VCRController()
 
 void pqMainWindowCore::setSourceMenu(QMenu* menu)
 {
-  if(menu)
+  if(this->Implementation->SourceMenu)
+    {
+    QObject::disconnect(this->Implementation->SourceMenu, SIGNAL(triggered(QAction*)),
+                        this, SLOT(onCreateSource(QAction*)));
+    }
+
+  this->Implementation->SourceMenu = menu;
+
+  if(this->Implementation->SourceMenu)
     {
     QObject::connect(menu, SIGNAL(triggered(QAction*)), 
       this, SLOT(onCreateSource(QAction*)));
 
-    menu->clear();
+    this->refreshSourcesMenu();
+    }
+}
+
+void pqMainWindowCore::refreshSourcesMenu()
+{
+  vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
+  manager->InstantiateGroupPrototypes("sources");
     
-    menu->addAction("2D Glyph") 
-      << pqSetName("2D Glyph") << pqSetData("GlyphSource2D");
-    menu->addAction("3D Text") 
-      << pqSetName("3D Text") << pqSetData("VectorText");
-    menu->addAction("Text")
-      <<pqSetData("Text") << pqSetData("TextSource");
-    menu->addAction("Arrow")
-      << pqSetName("Arrow") << pqSetData("ArrowSource");
-    menu->addAction("Axes") 
-      << pqSetName("Axes") << pqSetData("Axes");
-    menu->addAction("Box") 
-      << pqSetName("Box") << pqSetData("CubeSource");
-    menu->addAction("Cone") 
-      << pqSetName("Cone") << pqSetData("ConeSource");
-    menu->addAction("Cylinder")
-      << pqSetName("Cylinder") << pqSetData("CylinderSource");
-    menu->addAction("Hierarchical Fractal") 
-      << pqSetName("Hierarchical Fractal") << pqSetData("HierarchicalFractal");
-    menu->addAction("Line") 
-      << pqSetName("Line") << pqSetData("LineSource");
-    menu->addAction("Mandelbrot") 
-      << pqSetName("Mandelbrot") << pqSetData("ImageMandelbrotSource");
-    menu->addAction("Plane") 
-      << pqSetName("Plane") << pqSetData("PlaneSource");
-    menu->addAction("Sphere") 
-      << pqSetName("Sphere") << pqSetData("SphereSource");
-    menu->addAction("Superquadric") 
-      << pqSetName("Superquadric") << pqSetData("SuperquadricSource");
-    menu->addAction("Wavelet") 
-      << pqSetName("Wavelet") << pqSetData("RTAnalyticSource");
+  if(this->Implementation->SourceMenu)
+    {
+    this->Implementation->SourceMenu->clear();
+  
+    int numSources = manager->GetNumberOfProxies("sources_prototypes");
+    QMap<QString, QString> sortingMap;
+    for(int i=0; i<numSources; i++)
+      {
+      QStringList categoryList;
+      QString proxyName = manager->GetProxyName("sources_prototypes",i);
+      vtkSMProxy* proxy = manager->GetProxy(
+        "sources_prototypes", proxyName.toAscii().data());
+      QString proxyLabel = proxyName;
+      if (proxy && proxy->GetXMLLabel())
+        {
+        proxyLabel = proxy->GetXMLLabel();
+        }
+      vtkSMProperty* prop =
+        pqApplicationCore::instance()->getReaderFactory()->getFileNameProperty(proxy);
+      if(!prop && proxyLabel != "Test3DWidget" && 
+         proxyLabel != "PointSource" && proxyLabel != "OutlineSource" &&
+         proxyLabel != "NetworkImageSource")
+        {
+        sortingMap[proxyLabel] = proxyName;
+        }
+      }
+    for (QMap<QString, QString>::iterator iter2 = sortingMap.begin();
+      iter2 != sortingMap.end(); ++iter2)
+        {
+        this->Implementation->SourceMenu->addAction(iter2.key()) 
+          << pqSetName(iter2.value()) << pqSetData(iter2.value());
+        }
     }
 }
 

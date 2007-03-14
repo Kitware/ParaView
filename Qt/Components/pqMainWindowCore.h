@@ -364,6 +364,7 @@ private slots:
 
   void updateFiltersMenu();
   void refreshFiltersMenu();
+  void refreshSourcesMenu();
   
   void updateRecentFilterMenu(QAction* action);
 

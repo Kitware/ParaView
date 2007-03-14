@@ -39,6 +39,7 @@ class pqPipelineSource;
 class pqReaderFactoryInternal;
 class pqServer;
 class vtkSMProxy;
+class vtkSMProperty;
 
 // This class is a reader factory. The factory must be made file-type aware
 // by using addFileType. Once initialized, one can use createReader()
@@ -93,6 +94,9 @@ public:
   QString getReaderType(const QString& filename, pqServer*);
 
   bool checkIfFileIsReadable(const QString& name, pqServer*);
+
+  // get the property for the filename
+  vtkSMProperty* getFileNameProperty(vtkSMProxy*);
  
 public slots: 
   

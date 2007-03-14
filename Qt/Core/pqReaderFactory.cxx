@@ -41,6 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMDomainIterator.h"
+#include "vtkSMDomain.h"
 
 
 // Qt includes.
@@ -447,3 +450,40 @@ void pqReaderFactory::loadFileTypes(const QString& xmlfilename)
     }
 }
 
+vtkSMProperty* pqReaderFactory::getFileNameProperty(vtkSMProxy* proxy)
+{
+  // Find the first property that has a vtkSMFileListDomain. Assume that
+  // it is the property used to set the filename.
+  vtkSmartPointer<vtkSMPropertyIterator> piter;
+  piter.TakeReference(proxy->NewPropertyIterator());
+  piter->Begin();
+  while(!piter->IsAtEnd())
+    {
+    vtkSMProperty* prop = piter->GetProperty();
+    if (prop->IsA("vtkSMStringVectorProperty"))
+      {
+      vtkSmartPointer<vtkSMDomainIterator> diter;
+      diter.TakeReference(prop->NewDomainIterator());
+      diter->Begin();
+      while(!diter->IsAtEnd())
+        {
+        if (diter->GetDomain()->IsA("vtkSMFileListDomain"))
+          {
+          break;
+          }
+        diter->Next();
+        }
+      if (!diter->IsAtEnd())
+        {
+        break;
+        }
+      }
+    piter->Next();
+    }
+
+  if (!piter->IsAtEnd())
+    {
+    return piter->GetProperty();
+    }
+  return NULL;
+}

@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
-   <SourceProxy name="GlyphSource2D" class="vtkGlyphSource2D">
+   <SourceProxy name="GlyphSource2D" class="vtkGlyphSource2D" label="2D Glyph">
      <Documentation
         long_help="2D glyph source"
         short_help="Create a 3D arrow">
@@ -55,7 +55,7 @@ The output of the 2D Glyph source is polygonal data.
    <!-- End 2DGlyph -->
    </SourceProxy>
 
-   <SourceProxy name="VectorText" class="vtkVectorText">
+   <SourceProxy name="VectorText" class="vtkVectorText" label="3D Text">
      <Documentation
         long_help="3D geometric representation of a text string." 
         short_help="Create a 3D text object">
@@ -75,7 +75,7 @@ The output of the 3D Text source is polygonal data.
    <!-- End 3DText -->
    </SourceProxy>
 
-   <SourceProxy name="ArrowSource" class="vtkPVArrowSource">
+   <SourceProxy name="ArrowSource" class="vtkPVArrowSource" label="Arrow">
       <Documentation
         long_help="3D arrow with a long cylindrical shaft and a cone for the tip." 
         short_help="Create a 3D arrow">
@@ -146,7 +146,7 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
    <!-- End Arrow -->
    </SourceProxy>
 
-   <SourceProxy name="Axes" class="vtkAxes">
+   <SourceProxy name="Axes" class="vtkAxes" label="Axes">
       <Documentation
          long_help="Three lines representing the axes - red line along X, green line along Y, and blue line along Z." 
          short_help="Create three lines representing X, Y and Z axes">
@@ -208,7 +208,7 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
    <!-- End OutlineSource -->
    </SourceProxy>
 
-   <SourceProxy name="CubeSource" class="vtkCubeSource">
+   <SourceProxy name="CubeSource" class="vtkCubeSource" label="Box">
       <Documentation
          long_help="3D box with specified X, Y, and Z lengths." 
          short_help="Create a box with specified X, Y, and Z lengths.">
@@ -269,7 +269,7 @@ The output of the Box source is polygonal data containing both normals and textu
    <!-- End Box -->
    </SourceProxy>
 
-   <SourceProxy name="ConeSource" class="vtkConeSource">
+   <SourceProxy name="ConeSource" class="vtkConeSource" label="Cone">
       <Documentation
         long_help="3D cone of a given radius and height." 
         short_help="Create a 3D cone of a given radius and height">
@@ -341,7 +341,8 @@ The output of the Cone source is polygonal data.
    <!-- End Cone -->
    </SourceProxy>
 
-   <SourceProxy name="HierarchicalFractal" class="vtkHierarchicalFractal">
+   <SourceProxy name="HierarchicalFractal" class="vtkHierarchicalFractal" 
+                label="Hierarchical Fractal">
       <Documentation
         long_help="Test source for AMR with HierarchicalDataSet" 
         short_help="HierarchicalFractal">
@@ -448,7 +449,7 @@ The output of the Cone source is polygonal data.
    <!-- End HierarchicalFractal -->
    </SourceProxy>
 
-   <SourceProxy name="CylinderSource" class="vtkCylinderSource">
+   <SourceProxy name="CylinderSource" class="vtkCylinderSource" label="Cylinder">
       <Documentation
          long_help="3D cylinder of a given radius and height." 
           short_help="Create a 3D cylinder of a given radius and height">
@@ -519,7 +520,7 @@ The output of the Cylinder source is polygonal data containing both normals and 
    <!-- End Cylinder -->
    </SourceProxy>
 
-   <SourceProxy name="LineSource" class="vtkLineSource">
+   <SourceProxy name="LineSource" class="vtkLineSource" label="Line">
       <Documentation
          long_help="Line between two points. The resolution indicates how many segments are in the line." 
          short_help="Create a line between two points">
@@ -575,7 +576,8 @@ The output of the Line source is polygonal data.
    <!-- End Line -->
    </SourceProxy>
 
-   <SourceProxy name="ImageMandelbrotSource" class="vtkImageMandelbrotSource">
+   <SourceProxy name="ImageMandelbrotSource" class="vtkImageMandelbrotSource"
+                label="Mandelbrot">
       <Documentation
         long_help="Representation (unsigned char ) of the Mandlebrot set in up to 3 dimensions." 
         short_help="Create a Mandelbrot representation">
@@ -656,7 +658,8 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
    <!-- End Mandelbrot -->
    </SourceProxy>
 
-   <SourceProxy name="OctreeFractal" class="vtkHyperOctreeFractalSource">
+   <SourceProxy name="OctreeFractal" class="vtkHyperOctreeFractalSource"
+                label="Octree Fractal">
       <Documentation
          long_help="Test source for octree with Mandelbrot fractal" 
          short_help="OctreeFractal">
@@ -753,7 +756,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
    <!-- End OctreeFractal -->
    </SourceProxy>
 
-   <SourceProxy name="PlaneSource" class="vtkPlaneSource">
+   <SourceProxy name="PlaneSource" class="vtkPlaneSource" label="Plane">
       <Documentation
         long_help="Parallelogram given an origin and two points. The resolution indicates the number of division along each axis of the plane." 
         short_help="Create a parallelogram from an origin and two points">
@@ -876,7 +879,7 @@ The point source creates a specified number of points within a given radius abou
    <!-- End PointSource -->
    </SourceProxy>
 
-   <SourceProxy name="SphereSource" class="vtkSphereSource">
+   <SourceProxy name="SphereSource" class="vtkSphereSource" label="Sphere">
       <Documentation
          long_help="3D sphere given a center and radius." 
          short_help="Create a 3D sphere">
@@ -988,7 +991,8 @@ The output of the Sphere source is polygonal data with point normals defined.
    <!-- End Sphere -->
    </SourceProxy>
 
-   <SourceProxy name="SuperquadricSource" class="vtkSuperquadricSource">
+   <SourceProxy name="SuperquadricSource" class="vtkSuperquadricSource"
+                label="Superquadric">
       <Documentation
          long_help="Superquadric according to the theta and phi roundness parameters. This one function can generate a wide variety of 3D objects including a box, a sphere, or a torus." 
          short_help="Create a superquadric according to the theta and phi roundness parameters">
@@ -1274,7 +1278,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
    <!-- End NetworkImageSource -->
    </SourceProxy>
 
-   <Proxy name="TextSource" class="">
+   <Proxy name="TextSource" class="" label="Text">
      <!-- 
        "class" is deliberately empty, since this object has no server-side 
        representation. 
