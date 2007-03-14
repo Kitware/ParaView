@@ -4382,6 +4382,217 @@ This filter operates on any type of data set, provided it has point-centered vec
    <!-- End StreamTracer -->
    </SourceProxy>
 
+    <SourceProxy name="TemporalDataSetCache" class="vtkTemporalDataSetCache">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty 
+         name="CacheSize" 
+         command="SetCacheSize" 
+         number_of_elements="1"
+         default_values="2" >
+        <IntRangeDomain name="range" min="2" max="10"/>
+      </IntVectorProperty>
+      <!-- End TemporalDataSetCache -->
+    </SourceProxy>
+
+    <SourceProxy name="ParticleTracer" class="vtkTemporalStreamTracer">
+    <Documentation
+       long_help="Trace Particles through time in a vector field."
+       short_help="Trace Particles through time in a vector field.">
+The Particle Trace filter generates pathlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 7.4.
+This filter operates on any type of data set, provided it has point-centered vectors. The output is polygonal data containing polylines. This filter is available on the Toolbar.
+    </Documentation>
+     
+     <InputProperty
+        name="Input"
+        command="AddInputConnection"
+        clean_command="RemoveAllInputs"
+        multiple_input="1">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type" composite_data_supported="1">
+         <DataType value="vtkTemporalDataSet"/>
+       </DataTypeDomain>
+       <InputArrayDomain name="input_array" attribute_type="point"
+                         number_of_components="3"/>
+     </InputProperty>
+
+     <InputProperty
+        name="Source2"
+        command="SetSource2Connection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+     </InputProperty>
+     
+     <InputProperty
+        name="Source"
+        command="SetSourceConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+       </ProxyGroupDomain>
+       <ProxyListDomain name="proxy_list">
+         <Proxy group="sources" name="PointSource" />
+         <Proxy group="sources" name="LineSource" />
+       </ProxyListDomain>
+     </InputProperty>
+
+     <IntVectorProperty
+                       name="EnableSource1"
+                       command="SetEnableSource1"
+                       number_of_elements="1"
+                       default_values="1" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     
+     <IntVectorProperty
+                       name="EnableSource2"
+                       command="SetEnableSource2"
+                       number_of_elements="1"
+                       default_values="0" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="TimeStepResolution"
+        command="SetTimeStepResolution"
+        number_of_elements="1"
+        default_values="1.0" >
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty
+       name="TimeStep"
+       command="SetTimeStep"
+       number_of_elements="1"
+       animateable="1"
+       default_values="0"
+       information_property="TimestepValues">
+
+       <IntRangeDomain name="range">
+         <RequiredProperties>
+           <Property name="TimeStepRangeInfo" function="Range"/>
+         </RequiredProperties>
+       </IntRangeDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+     
+     <IntVectorProperty 
+        name="ForceReinjectionEveryNSteps" 
+        command="SetForceReinjectionEveryNSteps" 
+        number_of_elements="1"
+        default_values="0" >
+     </IntVectorProperty>
+
+     <StringVectorProperty 
+        name="SelectInputVectors" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"> 
+           <ArrayListDomain name="array_list" attribute_type="Vectors">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="InitialIntegrationStepUnit" 
+        command="SetInitialIntegrationStepUnit" 
+        number_of_elements="1"
+        default_values="2" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Time"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="InitialIntegrationStep"
+        command="SetInitialIntegrationStep"
+        number_of_elements="1"
+        default_values="0.25" >
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="IntegratorType" 
+        command="SetIntegratorType" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Runge-Kutta 2"/>
+         <Entry value="1" text="Runge-Kutta 4"/>
+         <Entry value="2" text="Runge-Kutta 4-5"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MaximumError"
+        command="SetMaximumError"
+        number_of_elements="1"
+        default_values="0.000001" >
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="MinimumIntegrationStepUnit" 
+        command="SetMinimumIntegrationStepUnit" 
+        number_of_elements="1"
+        default_values="2" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Time"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MinimumIntegrationStep"
+        command="SetMinimumIntegrationStep"
+        number_of_elements="1"
+        default_values="0.01" >
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="MaximumIntegrationStepUnit" 
+        command="SetMaximumIntegrationStepUnit" 
+        number_of_elements="1"
+        default_values="2" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Time"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MaximumIntegrationStep"
+        command="SetMaximumIntegrationStep"
+        number_of_elements="1"
+        default_values="0.01" >
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+   <!-- End ParticleTracer -->
+   </SourceProxy>
+    
    <SourceProxy name="StructuredGridOutlineFilter" 
                 class="vtkStructuredGridOutlineFilter"
                 label="Outline (curvilinear)">
