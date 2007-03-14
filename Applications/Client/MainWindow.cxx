@@ -472,7 +472,7 @@ MainWindow::MainWindow() :
     &this->Implementation->Core,
     SIGNAL(enableSelectionToolbar(bool)),
     this->Implementation->UI.selectionToolbar,
-    SLOT(setVisible(bool)));
+    SLOT(setEnabled(bool)));
 
   this->Implementation->Core.setupCustomFilterToolbar(
     this->Implementation->UI.customFilterToolbar);
