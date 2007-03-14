@@ -141,7 +141,7 @@
     <addaction name="actionSelectionMode" />
     <addaction name="actionSelectFrustum" />
     <addaction name="actionSelectIds" />
-    <addaction name="actionSelectPoints" />
+    <addaction name="actionSelectLocations" />
     <addaction name="actionSelectThresholds" />
     <addaction name="separator" />
     <addaction name="menuAddPlot" />
@@ -1038,15 +1038,15 @@
     <string>Enter In Ids</string>
    </property>
   </action>
-  <action name="actionSelectPoints" >
+  <action name="actionSelectLocations" >
    <property name="text" >
-    <string>Enter In Points</string>
+    <string>Enter In Locations</string>
    </property>
    <property name="iconText" >
-    <string>Enter In Points</string>
+    <string>Enter In Locations</string>
    </property>
    <property name="toolTip" >
-    <string>Enter In Points</string>
+    <string>Enter In Locations</string>
    </property>
   </action>
   <action name="actionSelectThresholds" >

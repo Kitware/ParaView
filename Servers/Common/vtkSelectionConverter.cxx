@@ -25,7 +25,7 @@
 #include "vtkSelectionSerializer.h"
 
 vtkStandardNewMacro(vtkSelectionConverter);
-vtkCxxRevisionMacro(vtkSelectionConverter, "1.5");
+vtkCxxRevisionMacro(vtkSelectionConverter, "1.6");
 
 //----------------------------------------------------------------------------
 vtkSelectionConverter::vtkSelectionConverter()
@@ -59,7 +59,12 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output)
     }
 
   if (inputProperties->Get(vtkSelection::CONTENT_TYPE()) !=
-      vtkSelection::CELL_IDS)
+      vtkSelection::IDS
+      ||
+      !inputProperties->Has(vtkSelection::FIELD_TYPE())
+      ||
+      inputProperties->Get(vtkSelection::FIELD_TYPE()) !=
+      vtkSelection::CELL)
     {
     return;
     }

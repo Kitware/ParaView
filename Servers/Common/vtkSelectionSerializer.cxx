@@ -28,7 +28,7 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.5");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.6");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -198,6 +198,14 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
             node->GetProperties()->Set(vtkSelection::CONTENT_TYPE(), val);
             }
           }
+        else if (strcmp("FIELD_TYPE", key) == 0)
+          {
+          int val;
+          if (elem->GetScalarAttribute("value", &val))
+            {
+            node->GetProperties()->Set(vtkSelection::FIELD_TYPE(), val);
+            }
+          }
         else if (strcmp("SOURCE_ID", key) == 0)
           {
           int val;
@@ -228,6 +236,14 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           if (elem->GetScalarAttribute("value", &val))
             {
             node->GetProperties()->Set(vtkSelection::PROCESS_ID(), val);
+            }
+          }
+        else if (strcmp("NAME", key) == 0)
+          {
+          const char *val = elem->GetAttribute("value");
+          if (val)
+            {
+            node->GetProperties()->Set(vtkSelection::NAME(), val);
             }
           }
         }

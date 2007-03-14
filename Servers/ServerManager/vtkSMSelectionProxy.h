@@ -45,8 +45,8 @@ public:
 
   void SetNumIds(int num);
   void SetIds(int i, vtkIdType *vals);
-  void SetNumPoints(int num);
-  void SetPoints(int i, double *vals);
+  void SetNumLocations(int num);
+  void SetLocations(int i, double *vals);
   void SetNumThresholds(int num);
   void SetThresholds(int i, double *vals);
 
@@ -59,7 +59,7 @@ public:
   void SetModeToSurface() { this->SetMode(SURFACE); }
   void SetModeToFrustum() { this->SetMode(FRUSTUM); }
   void SetModeToIds() { this->SetMode(IDS); }
-  void SetModeToPoints() { this->SetMode(POINTS); }
+  void SetModeToLocations() { this->SetMode(LOCATIONS); }
   void SetModeToThresholds() { this->SetMode(THRESHOLDS); }
   //BTX
   enum SelectionModes
@@ -67,7 +67,7 @@ public:
     SURFACE,
     FRUSTUM,
     IDS,
-    POINTS,
+    LOCATIONS,
     THRESHOLDS
     };
   //ETX
@@ -117,8 +117,8 @@ protected:
   int ScreenRectangle[4];
   int NumIds;
   vtkIdType *Ids;
-  int NumPoints;
-  double *Points;
+  int NumLocations;
+  double *Locations;
   int NumThresholds;
   double *Thresholds;
 
@@ -157,8 +157,8 @@ protected:
 
   // Description:
   // The does a point extraction to find all cells that contain 
-  // Points.
-  void SelectPoints(
+  // Locations.
+  void SelectLocations(
     vtkSMRenderModuleProxy* renderModule, 
     vtkSMProxy* inSel,
     vtkSMProxy* outSel

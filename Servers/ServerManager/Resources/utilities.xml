@@ -2124,15 +2124,15 @@
         update_self="1">
       </IdTypeVectorProperty>
       <IntVectorProperty
-        name="NumPoints"
-        command="SetNumPoints"
+        name="NumLocations"
+        command="SetNumLocations"
         update_self="1"
         number_of_elements="1"
         default_values="0">
       </IntVectorProperty>
       <DoubleVectorProperty
-        name="Points"
-        command="SetPoints"
+        name="Locations"
+        command="SetLocations"
         number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="3"
@@ -2167,7 +2167,7 @@
           <Entry value="0" text="SURFACE" />
           <Entry value="1" text="FRUSTUM" />
           <Entry value="2" text="IDS" />
-          <Entry value="3" text="POINTS" />
+          <Entry value="3" text="LOCATIONS" />
           <Entry value="4" text="THRESHOLDS" />
         </EnumerationDomain>
       </IntVectorProperty>

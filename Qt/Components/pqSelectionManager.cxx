@@ -713,18 +713,18 @@ void pqSelectionManager::prepareForSelection()
                                       vtkSMSelectionProxy::IDS);
       break;
     }
-    case POINTS:
+    case LOCATIONS:
     {
       pqSMAdaptor::setElementProperty(
-        sourceSelection->GetProperty("NumPoints"), 
+        sourceSelection->GetProperty("NumLocations"), 
         this->Implementation->NumVals);
       sourceSelection->UpdateVTKObjects();
       vtkSMDoubleVectorProperty *vp = vtkSMDoubleVectorProperty::SafeDownCast(
-        sourceSelection->GetProperty("Points"));
+        sourceSelection->GetProperty("Locations"));
       vp->SetNumberOfElements(this->Implementation->NumVals*3);
       vp->SetElements(this->Implementation->DoubleVals);
       pqSMAdaptor::setElementProperty(sourceSelection->GetProperty("Mode"), 
-                                      vtkSMSelectionProxy::POINTS);
+                                      vtkSMSelectionProxy::LOCATIONS);
       break;
     }
     case THRESHOLDS:
@@ -1148,9 +1148,9 @@ void pqSelectionManager::setIds(int numvals, vtkIdType *vals)
 }
 
 //----------------------------------------------------------------------------
-void pqSelectionManager::setPoints(int numvals, double *vals)
+void pqSelectionManager::setLocations(int numvals, double *vals)
 {
-  this->Mode = POINTS;
+  this->Mode = LOCATIONS;
   if (this->Implementation->DoubleVals != NULL)
     {
     delete[] this->Implementation->DoubleVals;

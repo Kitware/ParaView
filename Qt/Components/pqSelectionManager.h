@@ -87,7 +87,7 @@ public:
     SELECT, //aka suface selection
     FRUSTUM,
     IDS,
-    POINTS,
+    LOCATIONS,
     THRESHOLDS
   };
 
@@ -97,7 +97,7 @@ public:
   void setIds(int numvals, vtkIdType *vals);
 
   /// Change mode to select cells with that contain the given points
-  void setPoints(int numvals, double *vals);
+  void setLocations(int numvals, double *vals);
 
   /// Change mode to select data with attributes within the given thresholds
   void setThresholds(int numvals, double *vals);

@@ -72,7 +72,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.14");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -88,8 +88,8 @@ vtkSMSelectionProxy::vtkSMSelectionProxy()
   this->ScreenRectangle[3] = 0;
   this->NumIds = 0;
   this->Ids = NULL;
-  this->NumPoints = 0;
-  this->Points = NULL;
+  this->NumLocations = 0;
+  this->Locations = NULL;
   this->NumThresholds = 0;
   this->Thresholds = NULL;
 }
@@ -103,9 +103,9 @@ vtkSMSelectionProxy::~vtkSMSelectionProxy()
     {
     delete[] this->Ids;
     }
-  if (this->Points != NULL)
+  if (this->Locations != NULL)
     {
-    delete[] this->Points;
+    delete[] this->Locations;
     }
   if (this->Thresholds != NULL)
     {
@@ -213,8 +213,8 @@ void vtkSMSelectionProxy::UpdateSelection()
     this->SelectIds(this->RenderModule, inSel, outSel);
     break;
 
-  case vtkSMSelectionProxy::POINTS:
-    this->SelectPoints(this->RenderModule, inSel, outSel);
+  case vtkSMSelectionProxy::LOCATIONS:
+    this->SelectLocations(this->RenderModule, inSel, outSel);
     break;
 
   case vtkSMSelectionProxy::THRESHOLDS:
@@ -614,7 +614,10 @@ void vtkSMSelectionProxy::SelectIds(
   //tell the filter what type of extraction to do
   vtkSelection *sel = vtkSelection::New();
   sel->GetProperties()->Set(
-    vtkSelection::CONTENT_TYPE(), vtkSelection::CELL_IDS
+    vtkSelection::CONTENT_TYPE(), vtkSelection::IDS
+    );
+  sel->GetProperties()->Set(
+    vtkSelection::FIELD_TYPE(), vtkSelection::CELL
     );
   vtkIdTypeArray* vals = vtkIdTypeArray::New();
   vals->SetNumberOfComponents(1);
@@ -669,7 +672,7 @@ void vtkSMSelectionProxy::SelectIds(
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSelectionProxy::SelectPoints(
+void vtkSMSelectionProxy::SelectLocations(
   vtkSMRenderModuleProxy* rmp, vtkSMProxy* inSel, vtkSMProxy* outSel)
 {
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> > displays;
@@ -727,14 +730,14 @@ void vtkSMSelectionProxy::SelectPoints(
   //tell the filter what type of extraction to do
   vtkSelection *sel = vtkSelection::New();
   sel->GetProperties()->Set(
-    vtkSelection::CONTENT_TYPE(), vtkSelection::POINTS
+    vtkSelection::CONTENT_TYPE(), vtkSelection::LOCATIONS
     );
   vtkDoubleArray* vals = vtkDoubleArray::New();
   vals->SetNumberOfComponents(3);
-  vals->SetNumberOfTuples(this->NumPoints);
-  for (int i = 0; i<this->NumPoints; i++)
+  vals->SetNumberOfTuples(this->NumLocations);
+  for (int i = 0; i<this->NumLocations; i++)
     {
-    vals->SetTupleValue(i, &this->Points[i*3]);
+    vals->SetTupleValue(i, &this->Locations[i*3]);
     }
   sel->SetSelectionList(vals);
   this->SendSelection(sel,inSel);
@@ -1050,8 +1053,8 @@ void vtkSMSelectionProxy::PrintSelf(ostream& os, vtkIndent indent)
     os << "IDS";
     break;
 
-  case POINTS:
-    os << "POINTS";
+  case LOCATIONS:
+    os << "LOCATIONS";
     break;
 
   case THRESHOLDS:
@@ -1086,24 +1089,24 @@ void vtkSMSelectionProxy::SetIds(int i, vtkIdType *vals)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSelectionProxy::SetNumPoints(int num)
+void vtkSMSelectionProxy::SetNumLocations(int num)
 {
-  if (this->Points != NULL)
+  if (this->Locations != NULL)
     {
-    delete[] this->Points;
+    delete[] this->Locations;
     }
-  this->Points = new double[num*3];
-  this->NumPoints = num;
+  this->Locations = new double[num*3];
+  this->NumLocations = num;
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSelectionProxy::SetPoints(int i, double *vals)
+void vtkSMSelectionProxy::SetLocations(int i, double *vals)
 {
-  if (this->Points == NULL)
+  if (this->Locations == NULL)
     {
     return;
     }
-  memcpy(&this->Points[i*3], vals, sizeof(double)*3);
+  memcpy(&this->Locations[i*3], vals, sizeof(double)*3);
 }
 //-----------------------------------------------------------------------------
 void vtkSMSelectionProxy::SetNumThresholds(int num)

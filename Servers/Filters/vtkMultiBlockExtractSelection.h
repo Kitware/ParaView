@@ -41,7 +41,7 @@ public:
 
   // Description:
   // Specify the implicit function for inside/outside checks. The selection
-  // must have a CONTENT_TYPE of CELL_IDS and have a vtkIdTypeArray
+  // must have a CONTENT_TYPE of IDS and FIELD_TYPE of CELLS and have a vtkIdTypeArray
   // containing the cell id list.
   virtual void SetSelection(vtkSelection*);
   vtkGetObjectMacro(Selection,vtkSelection);

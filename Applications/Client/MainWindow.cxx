@@ -296,8 +296,8 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionToolsPythonShell,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsPythonShell()));
 
-  connect(this->Implementation->UI.actionSelectPoints,
-    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEnterSelectionPoints()));
+  connect(this->Implementation->UI.actionSelectLocations,
+    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEnterSelectionLocations()));
   connect(this->Implementation->UI.actionSelectIds,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEnterSelectionIds()));
   connect(this->Implementation->UI.actionSelectThresholds,
@@ -450,7 +450,7 @@ MainWindow::MainWindow() :
     modeGroup->addAction(this->Implementation->UI.actionSelectFrustum);
     modeGroup->addAction(this->Implementation->UI.actionSelectThresholds);
     modeGroup->addAction(this->Implementation->UI.actionSelectIds);
-    modeGroup->addAction(this->Implementation->UI.actionSelectPoints);
+    modeGroup->addAction(this->Implementation->UI.actionSelectLocations);
 
   this->Implementation->Core.setupVariableToolbar(
     this->Implementation->UI.variableToolbar);

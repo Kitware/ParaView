@@ -2827,18 +2827,18 @@ void pqMainWindowCore::onManagePlugins()
 void pqMainWindowCore::onEnterSelectionIds()
 {
   //pop up the dialog to ask for ids to select
-  pqEnterIdsDialog* const points_dialog = new pqEnterIdsDialog( 
+  pqEnterIdsDialog* const dialog = new pqEnterIdsDialog( 
     this->Implementation->Parent);
     
-  points_dialog->setAttribute(Qt::WA_DeleteOnClose);
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(
-    points_dialog, 
+    dialog, 
     SIGNAL(idsEntered(int)), 
     this, 
     SLOT(onIdsEntered(int))
     );
-  points_dialog->setModal(true); 
-  points_dialog->show(); 
+  dialog->setModal(true); 
+  dialog->show(); 
 }
 
 //-----------------------------------------------------------------------------
@@ -2850,50 +2850,50 @@ void pqMainWindowCore::onIdsEntered(int id)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onEnterSelectionPoints()
+void pqMainWindowCore::onEnterSelectionLocations()
 {
   //pop up the dialog to ask for points to select
-  pqEnterPointsDialog* const points_dialog = new pqEnterPointsDialog( 
+  pqEnterPointsDialog* const dialog = new pqEnterPointsDialog( 
     this->Implementation->Parent);
     
-  points_dialog->setAttribute(Qt::WA_DeleteOnClose);
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(
-    points_dialog, 
+    dialog, 
     SIGNAL(pointsEntered(double , double , double )), 
     this, 
-    SLOT(onPointsEntered(double , double , double ))
+    SLOT(onLocationsEntered(double , double , double ))
     );
-  points_dialog->setModal(true); 
-  points_dialog->show(); 
+  dialog->setModal(true); 
+  dialog->show(); 
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onPointsEntered(double X, double Y, double Z)
+void pqMainWindowCore::onLocationsEntered(double X, double Y, double Z)
 {
   //take the points selected in the dialog and tell paraview to extract them
   double pts[3];
   pts[0] = X;
   pts[1] = Y;
   pts[2] = Z;
-  this->Implementation->SelectionManager.setPoints(1, pts);
+  this->Implementation->SelectionManager.setLocations(1, pts);
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onEnterSelectionThresholds()
 {
   //pop up the dialog to ask for thresholds to select
-  pqEnterThresholdsDialog* const points_dialog = new pqEnterThresholdsDialog( 
+  pqEnterThresholdsDialog* const dialog = new pqEnterThresholdsDialog( 
     this->Implementation->Parent);
     
-  points_dialog->setAttribute(Qt::WA_DeleteOnClose);
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(
-    points_dialog, 
+    dialog, 
     SIGNAL(thresholdsEntered(double , double)), //toil and trouble 
     this, 
     SLOT(onThresholdsEntered(double , double))
     );
-  points_dialog->setModal(true); 
-  points_dialog->show(); 
+  dialog->setModal(true); 
+  dialog->show(); 
 }
 
 //-----------------------------------------------------------------------------

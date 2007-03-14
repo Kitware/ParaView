@@ -37,7 +37,7 @@
 #include "vtkSmartPointer.h"
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVExtractSelection, "1.2");
+vtkCxxRevisionMacro(vtkPVExtractSelection, "1.3");
 vtkStandardNewMacro(vtkPVExtractSelection);
 
 vtkCxxSetObjectMacro(vtkPVExtractSelection, OutputSelection, vtkSelection);
@@ -122,8 +122,8 @@ void vtkPVExtractSelection::Select()
       // to the ParaView pipeline
       vtkDataSet* newDS = ds->NewInstance();
       newDS->ShallowCopy(ds);       
-      this->AtomExtractor->SetInput(0,this->InputSelection);
-      this->AtomExtractor->SetInput(1,newDS);
+      this->AtomExtractor->SetInput(1,this->InputSelection);
+      this->AtomExtractor->SetInput(0,newDS);
       newDS->Delete();
       this->AtomExtractor->Update();
       
@@ -141,7 +141,9 @@ void vtkPVExtractSelection::Select()
         
       // For now, we only support cell ids
       selection->GetProperties()->Set(
-        vtkSelection::CONTENT_TYPE(), vtkSelection::CELL_IDS);
+        vtkSelection::CONTENT_TYPE(), vtkSelection::IDS);
+      selection->GetProperties()->Set(
+        vtkSelection::FIELD_TYPE(), vtkSelection::CELL);
 
       //copy over the ids we found into the new node
       selection->SetSelectionList(origIds);
