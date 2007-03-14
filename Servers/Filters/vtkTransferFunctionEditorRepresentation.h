@@ -116,8 +116,7 @@ public:
 
   // Description:
   // Set the lighting parameters for the transfer function editor elements.
-  virtual void SetElementLighting(double ambient, double diffuse,
-                                  double specular, double specularPower) {}
+  virtual void SetElementLighting(double, double, double, double) {}
 
 protected:
   vtkTransferFunctionEditorRepresentation();
