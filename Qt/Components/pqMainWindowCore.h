@@ -44,6 +44,7 @@ class pqAnimationManager;
 class pqAnimationScene;
 class pqGenericViewModule;
 class pqLookmarkToolbar;
+class pqLookmarkManagerModel;
 class pqMultiView;
 class pqObjectInspectorDriver;
 class pqObjectInspectorWidget;
@@ -193,6 +194,8 @@ public:
   pqObjectInspectorDriver* getObjectInspectorDriver();
 
   void removePluginToolBars();
+
+  pqLookmarkManagerModel* getLookmarkManagerModel();
 
 signals:
   void enableFileOpen(bool);

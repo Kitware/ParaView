@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QWidget>
 
-class pqLookmarkBrowserModel;
 class QModelIndex;
 class QItemSelection;
 class pqLookmarkInspectorForm;
@@ -51,6 +50,7 @@ class pqLookmarkModel;
 class vtkPVXMLElement;
 class QStandardItem;
 //class QStandardItemModel;
+class pqLookmarkManagerModel;
 
 /// \class pqLookmarkInspector
 /// \brief
@@ -60,7 +60,7 @@ class PQCOMPONENTS_EXPORT pqLookmarkInspector : public QWidget
 {
   Q_OBJECT
 public:
-  pqLookmarkInspector(pqLookmarkBrowserModel *model, QWidget *parent=0);
+  pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget *parent=0);
   virtual ~pqLookmarkInspector();
 
   /// hint for sizing this widget
@@ -70,8 +70,8 @@ public slots:
 
   // Called when the selection has changed in the lookmark browser
   // Which widgets are displayed is based on whether there are 0, 1, or more lookmarks currently selected
-  // It uses the pqLookmarkBrowserModel to initialize the widget values.
-  void onLookmarkSelectionChanged(const QItemSelection &selected); //, const QItemSelection &deselected );
+  // selected: names of selected lookmarks
+  void onLookmarkSelectionChanged(const QStringList &selected);
 
   // This modifies/deletes the the data at the selected indices of the pqLookmarkBrowserModel
   void save();
@@ -97,7 +97,7 @@ private:
   // The current selection in the lookmark browser
   //QList<QModelIndex> CurrentSelection;
   pqLookmarkModel *CurrentLookmark;
-  pqLookmarkBrowserModel *BrowserModel;
+  pqLookmarkManagerModel *Model;
   //QStandardItemModel *PipelineModel;
   pqLookmarkInspectorForm *Form;   ///< Defines the gui layout.
 };

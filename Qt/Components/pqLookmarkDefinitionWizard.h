@@ -45,6 +45,7 @@ class pqConsumerDisplay;
 class pqFlatTreeView;
 class pqPipelineModel;
 class vtkPVXMLElement;
+class pqLookmarkManagerModel;
 
 /*! \class pqLookmarkDefinitionWizard
  *  \brief
@@ -72,7 +73,7 @@ public:
   ///   Creates a lookmark definition wizard.
   /// \param model The view module to create a lookmark from (currently only supports render views)
   /// \param parent The parent widget for the wizard.
-  pqLookmarkDefinitionWizard(pqGenericViewModule *view, QWidget *parent=0);
+  pqLookmarkDefinitionWizard(pqLookmarkManagerModel *model, pqGenericViewModule *view, QWidget *parent=0);
   virtual ~pqLookmarkDefinitionWizard();
 
 public slots:
@@ -128,6 +129,7 @@ private:
   pqFlatTreeView *PipelineView;
   pqPipelineModel *PipelineModel;
   vtkPVXMLElement *PipelineHierarchy;
+  pqLookmarkManagerModel *Model;
 };
 
 #endif

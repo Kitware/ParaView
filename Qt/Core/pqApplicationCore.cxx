@@ -94,7 +94,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqWriterFactory.h"
 #include "pqXMLUtil.h"
-#include "pqLookmarkManagerModel.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -102,7 +101,6 @@ class pqApplicationCoreInternal
 public:
   pqServerManagerObserver* ServerManagerObserver;
   pqServerManagerModel* ServerManagerModel;
-  pqLookmarkManagerModel* LookmarkManagerModel;
   pqUndoStack* UndoStack;
   pqPipelineBuilder* PipelineBuilder;
   pq3DWidgetFactory* WidgetFactory;
@@ -187,10 +185,6 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   this->Internal->PluginManager.addInterface(
     new pqStandardViewModules(&this->Internal->PluginManager));
 
-  // *  Create pqLookmarkManagerModel.
-  //    This is the model for the application's collection of lookmarks.
-  this->Internal->LookmarkManagerModel = new pqLookmarkManagerModel(this);
-
   this->LoadingState = false;
 }
 
@@ -267,12 +261,6 @@ pqServerManagerObserver* pqApplicationCore::getServerManagerObserver()
 pqServerManagerModel* pqApplicationCore::getServerManagerModel()
 {
   return this->Internal->ServerManagerModel;
-}
-
-//-----------------------------------------------------------------------------
-pqLookmarkManagerModel* pqApplicationCore::getLookmarkManagerModel()
-{
-  return this->Internal->LookmarkManagerModel;
 }
 
 //-----------------------------------------------------------------------------

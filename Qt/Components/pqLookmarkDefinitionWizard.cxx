@@ -84,14 +84,15 @@ class pqLookmarkDefinitionWizardForm :
     public Ui::pqLookmarkDefinitionWizard
 {
 public:
-  QStringList ListNames; ///< Used to make sure names are unique.
+  pqLookmarkManagerModel ListNames; ///< Used to make sure names are unique.
 };
 
 
-pqLookmarkDefinitionWizard::pqLookmarkDefinitionWizard(
+pqLookmarkDefinitionWizard::pqLookmarkDefinitionWizard(pqLookmarkManagerModel *model,
     pqGenericViewModule *viewModule, QWidget *widgetParent)
   : QDialog(widgetParent)
 { 
+  this->Model = model;
   this->OverwriteOK = false;
   this->ViewModule = viewModule;
   this->PipelineHierarchy = vtkPVXMLElement::New();
@@ -314,7 +315,8 @@ void pqLookmarkDefinitionWizard::createLookmark()
   lmkModel->setPipelineHierarchy(this->PipelineHierarchy);
 
   //this->Lookmarks->addLookmark(lmkModel);
-  pqApplicationCore::instance()->getLookmarkManagerModel()->addLookmark(lmkModel);
+  this->Model->addLookmark(lmkModel);
+  //pqApplicationCore::instance()->getLookmarkManagerModel()->addLookmark(lmkModel);
 
   proxies->Delete();
   stateElement->Delete();
@@ -371,7 +373,7 @@ bool pqLookmarkDefinitionWizard::validateLookmarkName()
   // Make sure the name is unique.
   if(!this->OverwriteOK)
     {
-    if(pqApplicationCore::instance()->getLookmarkManagerModel()->getLookmark(lookmarkName))
+    if(this->Model->getLookmark(lookmarkName))
       {
       int button = QMessageBox::warning(this, "Duplicate Name",
           "The lookmark name already exists.\n"
@@ -382,7 +384,7 @@ bool pqLookmarkDefinitionWizard::validateLookmarkName()
         return false;
         }
 
-      pqApplicationCore::instance()->getLookmarkManagerModel()->removeLookmark(lookmarkName);
+      this->Model->removeLookmark(lookmarkName);
       this->OverwriteOK = true;
       }
     }

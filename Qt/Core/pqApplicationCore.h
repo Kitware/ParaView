@@ -59,8 +59,6 @@ class pqUndoStack;
 class pqWriterFactory;
 class vtkPVXMLElement;
 class vtkSMStateLoader;
-class pqLookmarkManagerModel;
-//class pqLookmarkManagerSelectionModel;
 
 /// This class is the crux of the ParaView application. It creates
 /// and manages various managers which are necessary for the PQClient
@@ -87,7 +85,6 @@ public:
   pqServerManagerObserver* getPipelineData()
     {return this->getServerManagerObserver(); }
   pqServerManagerModel* getServerManagerModel();
-  pqLookmarkManagerModel* getLookmarkManagerModel();
   pqUndoStack* getUndoStack();
   pqPipelineBuilder* getPipelineBuilder();
   pq3DWidgetFactory* get3DWidgetFactory();

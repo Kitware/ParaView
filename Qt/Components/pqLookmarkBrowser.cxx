@@ -194,6 +194,13 @@ void pqLookmarkBrowser::onSelectionChanged(const QItemSelection &selection,
     const QItemSelection &)
 {
   this->updateButtons();
+
+  QStringList names;
+  for(int i=0;i<selection.indexes().size();i++)
+    {
+    names.push_back(this->Model->getNameFor(selection.indexes().at(i)));
+    }
+  emit this->selectedLookmarksChanged(names);
 }
 
 QItemSelectionModel* pqLookmarkBrowser::getSelectionModel()

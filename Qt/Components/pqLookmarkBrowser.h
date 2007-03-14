@@ -119,6 +119,7 @@ private slots:
 
 signals:
   void loadLookmark(const QString &name);
+  void selectedLookmarksChanged(const QStringList &names);
 
 private:
   pqLookmarkBrowserModel *Model; ///< Stores the lookmark list.

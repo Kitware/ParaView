@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes
 #include "pqApplicationCore.h"
-#include "pqLookmarkBrowserModel.h"
 #include <QItemSelectionModel>
 #include "pqLookmarkManagerModel.h"
 #include "pqLookmarkModel.h"
@@ -59,16 +58,16 @@ class pqLookmarkInspectorForm : public Ui::pqLookmarkInspector {};
 
 
 //-----------------------------------------------------------------------------
-pqLookmarkInspector::pqLookmarkInspector(pqLookmarkBrowserModel *model, QWidget *p)
+pqLookmarkInspector::pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget *p)
   : QWidget(p)
 {
   this->setObjectName("lookmarkInspector");
 
-  this->BrowserModel = model;
+  this->Model = model;
   this->Form = new pqLookmarkInspectorForm();
   this->Form->setupUi(this);
   this->Form->PropertiesFrame->hide();
-  this->Form->ControlsFrame->hide();
+  //this->Form->ControlsFrame->hide();
   this->CurrentLookmark = NULL;
   //this->PipelineModel = new QStandardItemModel();
   this->Form->PipelineView->getHeader()->hide();
@@ -86,13 +85,13 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkBrowserModel *model, QWidget 
   // Disable the restore data button until a fix can be made for the crash that's ocurring as ParaView closes when a lookmark that has this option turned off has been loaded.
   //this->Form->RestoreData->setEnabled(false);
 
-  this->connect(this->Form->RestoreData, 
-                SIGNAL(stateChanged(int)),
-                SIGNAL(modified()));
+  //this->connect(this->Form->RestoreData, 
+  //              SIGNAL(stateChanged(int)),
+  //              SIGNAL(modified()));
 
-  this->connect(this->Form->RestoreCamera, 
-                SIGNAL(stateChanged(int)),
-                SIGNAL(modified()));
+  //this->connect(this->Form->RestoreCamera, 
+  //              SIGNAL(stateChanged(int)),
+  //              SIGNAL(modified()));
 
   this->connect(this->Form->LookmarkName, 
                 SIGNAL(textChanged(const QString &)),
@@ -143,11 +142,10 @@ void pqLookmarkInspector::save()
     }
 
   // make sure the new name is not already taken
-  pqLookmarkManagerModel *model = pqApplicationCore::instance()->getLookmarkManagerModel();
   bool nameTaken = false;
-  for(int i=0; i<model->getNumberOfLookmarks(); i++)
+  for(int i=0; i<this->Model->getNumberOfLookmarks(); i++)
     {
-    pqLookmarkModel *lmk = model->getLookmark(i);
+    pqLookmarkModel *lmk = this->Model->getLookmark(i);
     if(lmk!=this->CurrentLookmark && QString::compare(lmk->getName(),this->Form->LookmarkName->text())==0)
       {
       nameTaken = true;
@@ -165,23 +163,9 @@ void pqLookmarkInspector::save()
 
   this->CurrentLookmark->setName(this->Form->LookmarkName->text());
   this->CurrentLookmark->setDescription(this->Form->LookmarkComments->toPlainText());
-  this->CurrentLookmark->setRestoreDataFlag(this->Form->RestoreData->isChecked());
-  this->CurrentLookmark->setRestoreCameraFlag(this->Form->RestoreCamera->isChecked());
+  //this->CurrentLookmark->setRestoreDataFlag(this->Form->RestoreData->isChecked());
+  //this->CurrentLookmark->setRestoreCameraFlag(this->Form->RestoreCamera->isChecked());
 
-/*
-  if(this->CurrentSelection.count()==1)
-    {
-    this->BrowserModel->setLookmarkName(this->CurrentSelection.at(0),this->Form->LookmarkName->text());
-    this->BrowserModel->setLookmarkComments(this->CurrentSelection.at(0),this->Form->LookmarkComments->toPlainText());
-    }
-
-  QList<QModelIndex>::iterator iter;
-  for(iter = this->CurrentSelection.begin(); iter!=this->CurrentSelection.end(); ++iter)
-    {
-    this->BrowserModel->setLookmarkRestoreDataFlag(this->CurrentSelection.at(0),this->Form->RestoreData->isChecked());
-    this->BrowserModel->setLookmarkRestoreCameraFlag(this->CurrentSelection.at(0),this->Form->RestoreCamera->isChecked());
-    }
-*/
   this->Form->SaveButton->setEnabled(false);
 }
 
@@ -192,15 +176,15 @@ void pqLookmarkInspector::onModified()
 }
 
 //-----------------------------------------------------------------------------
-void pqLookmarkInspector::onLookmarkSelectionChanged(const QItemSelection &selected)
+void pqLookmarkInspector::onLookmarkSelectionChanged(const QStringList &selected)
 {
 
-  if(selected.isEmpty() || selected.indexes().count()==0)
+  if(selected.isEmpty())
     {
     this->CurrentLookmark = 0;
     // don't display anything if nothing is selected
     this->Form->PropertiesFrame->hide();
-    this->Form->ControlsFrame->hide();
+    //this->Form->ControlsFrame->hide();
     this->Form->LoadButton->setEnabled(false);
     this->Form->SaveButton->setEnabled(false);
     this->Form->DeleteButton->setEnabled(false);
@@ -209,7 +193,7 @@ void pqLookmarkInspector::onLookmarkSelectionChanged(const QItemSelection &selec
     {
     // only display the lookmark settings that are applicable to multiple lookmarks
     this->Form->PropertiesFrame->hide();
-    this->Form->ControlsFrame->show();
+    //this->Form->ControlsFrame->show();
     this->Form->LoadButton->setEnabled(false);
     this->Form->SaveButton->setEnabled(false);
     this->Form->DeleteButton->setEnabled(true);
@@ -217,7 +201,7 @@ void pqLookmarkInspector::onLookmarkSelectionChanged(const QItemSelection &selec
   else if(selected.count()==1)
     {
     //this->CurrentSelection = selected.indexes();
-    this->CurrentLookmark = pqApplicationCore::instance()->getLookmarkManagerModel()->getLookmark(this->BrowserModel->getNameFor(selected.indexes().at(0)));
+    this->CurrentLookmark = this->Model->getLookmark(selected.at(0));
 
     this->Form->LookmarkName->setText(this->CurrentLookmark->getName());
   //  this->Form->LookmarkData->setText(this->BrowserModel->getLookmarkDataName(this->CurrentSelection.at(0)));
@@ -230,17 +214,12 @@ void pqLookmarkInspector::onLookmarkSelectionChanged(const QItemSelection &selec
       }
 
     this->generatePipelineView();
-/*
-    if(!img.isNull())
-      {
-      this->Form->LookmarkPipeline->setPixmap(QPixmap::fromImage(img));
-      }
-*/
-    this->Form->RestoreData->setChecked(this->CurrentLookmark->getRestoreDataFlag());
-    this->Form->RestoreCamera->setChecked(this->CurrentLookmark->getRestoreCameraFlag());
+
+    //this->Form->RestoreData->setChecked(this->CurrentLookmark->getRestoreDataFlag());
+    //this->Form->RestoreCamera->setChecked(this->CurrentLookmark->getRestoreCameraFlag());
 
     this->Form->PropertiesFrame->show();
-    this->Form->ControlsFrame->show();
+    //this->Form->ControlsFrame->show();
     this->Form->LoadButton->setEnabled(true);
     this->Form->SaveButton->setEnabled(false);
     this->Form->DeleteButton->setEnabled(true);
