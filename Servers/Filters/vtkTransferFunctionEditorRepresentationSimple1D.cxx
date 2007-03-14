@@ -34,7 +34,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.12");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.13");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -214,10 +214,45 @@ void vtkTransferFunctionEditorRepresentationSimple1D::SetColorLinesByScalar(
 }
 
 //----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::SetLinesColor(
+  double r, double g, double b)
+{
+  this->LinesActor->GetProperty()->SetColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::SetElementLighting(
+  double ambient, double diffuse, double specular, double specularPower)
+{
+  vtkHandleListIterator iter;
+
+  vtkProperty *prop;
+  for (iter = this->Handles->begin(); iter != this->Handles->end(); iter++)
+    {
+    vtkPointHandleRepresentationSphere *handle =
+      vtkPointHandleRepresentationSphere::SafeDownCast(*iter);
+    if (handle)
+      {
+      prop = handle->GetProperty();
+      prop->SetAmbient(ambient);
+      prop->SetDiffuse(diffuse);
+      prop->SetSpecular(specular);
+      prop->SetSpecularPower(specularPower);
+      }
+    }
+
+  prop = this->HandleRepresentation->GetProperty();
+  prop->SetAmbient(ambient);
+  prop->SetDiffuse(diffuse);
+  prop->SetSpecular(specular);
+  prop->SetSpecularPower(specularPower);
+}
+
+//----------------------------------------------------------------------------
 int vtkTransferFunctionEditorRepresentationSimple1D::ComputeInteractionState(
   int x, int y, int vtkNotUsed(modify))
 {
-    // Loop over all the seeds to see if the point is close to any of them.
+  // Loop over all the seeds to see if the point is close to any of them.
   double xyz[3], pos[3];
   double tol2 = this->Tolerance*this->Tolerance;
   xyz[0] = static_cast<double>(x);
@@ -275,9 +310,6 @@ unsigned int vtkTransferFunctionEditorRepresentationSimple1D::CreateHandle(
   vtkHandleRepresentation *rep = this->HandleRepresentation->NewInstance();
   rep->ShallowCopy(this->HandleRepresentation);
   vtkProperty *property = vtkProperty::New();
-  property->SetDiffuse(0.8);
-  property->SetSpecular(0.5);
-  property->SetSpecularPower(5);
   property->DeepCopy(this->HandleRepresentation->GetProperty());
   vtkPointHandleRepresentationSphere *pointRep =
     static_cast<vtkPointHandleRepresentationSphere*>(rep);
@@ -317,6 +349,23 @@ unsigned int
 vtkTransferFunctionEditorRepresentationSimple1D::GetNumberOfHandles()
 {
   return this->Handles->size();
+}
+
+//----------------------------------------------------------------------
+double vtkTransferFunctionEditorRepresentationSimple1D::GetHandleScalar(
+  unsigned int idx, int &valid)
+{
+  vtkPointHandleRepresentationSphere *handleRep =
+    vtkPointHandleRepresentationSphere::SafeDownCast(
+      this->GetHandleRepresentation(idx));
+  if (handleRep)
+    {
+    valid = 1;
+    return handleRep->GetScalar();
+    }
+
+  valid = 0;
+  return 0;
 }
 
 //----------------------------------------------------------------------
@@ -525,10 +574,12 @@ void vtkTransferFunctionEditorRepresentationSimple1D::HighlightActiveHandle()
       if (i == this->ActiveHandle)
         {
         rep->SetCursorShape(this->ActiveHandleFilter->GetOutput());
+        rep->Highlight(1);
         }
       else
         {
         rep->SetCursorShape(this->HandleRepresentation->GetCursorShape());
+        rep->Highlight(0);
         }
       }
     }

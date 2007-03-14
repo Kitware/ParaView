@@ -89,6 +89,10 @@ public:
   vtkSetMacro(Scalar, double);
   vtkGetMacro(Scalar, double);
 
+  // Description:
+  // Toggle whether this handle should be highlighted.
+  void Highlight(int highlight);
+
 protected:
   vtkPointHandleRepresentationSphere();
   ~vtkPointHandleRepresentationSphere();
@@ -109,7 +113,6 @@ protected:
   int  ConstraintAxis;
   void Translate(double eventPos[2]);
   void Scale(double eventPos[2]);
-  void Highlight(int highlight);
 
   // Properties used to control the appearance of selected objects and
   // the manipulator in general.

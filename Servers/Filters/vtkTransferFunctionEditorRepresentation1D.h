@@ -29,7 +29,6 @@
 
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-class vtkImageData;
 class vtkIntArray;
 
 class VTK_EXPORT vtkTransferFunctionEditorRepresentation1D : public vtkTransferFunctionEditorRepresentation
@@ -47,18 +46,14 @@ public:
   // Put together the necessary parts to display this 3D widget
   virtual void BuildRepresentation();
 
-  // Description:
-  // Specify the size of the display containing this 3D widget representation.
-  virtual void SetDisplaySize(int x, int y);
-
 protected:
   vtkTransferFunctionEditorRepresentation1D();
   ~vtkTransferFunctionEditorRepresentation1D();
 
   void UpdateHistogramImage();
+  void UpdateBackgroundImage();
 
   vtkIntArray *Histogram;
-  vtkImageData *HistogramImage;
 
 private:
   vtkTransferFunctionEditorRepresentation1D(const vtkTransferFunctionEditorRepresentation1D&); // Not implemented.

@@ -93,6 +93,11 @@ public:
   // Set the type of function to modify.
   virtual void SetModificationType(int type);
 
+  // Descripition:
+  // Set whether the endpoint nodes may or may not change scalar values
+  // and/or be deleted. By default moving and deleting are allowed.
+  vtkSetMacro(LockEndPoints, int);
+
 protected:
   vtkTransferFunctionEditorWidgetSimple1D();
   ~vtkTransferFunctionEditorWidgetSimple1D();
@@ -105,6 +110,8 @@ protected:
 
   double InitialMinimumColor[3];
   double InitialMaximumColor[3];
+
+  int LockEndPoints;
 
 //BTX
   // the state of the widget

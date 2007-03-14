@@ -54,6 +54,10 @@ public:
   unsigned int CreateHandle(double displayPos[3], double scalar);
 
   // Description:
+  // Get the scalar value associated with the handle at the given index.
+  double GetHandleScalar(unsigned int idx, int &valid);
+
+  // Description:
   // Return the number of existing handles.
   virtual unsigned int GetNumberOfHandles();
 
@@ -115,6 +119,16 @@ public:
   // Tell the representation whether the lines should be a solid color or
   // whether they should display the color transfer function.
   virtual void SetColorLinesByScalar(int color);
+
+  // Description:
+  // Specify the color to use for the lines if they are not displaying
+  // the color transfer function.
+  virtual void SetLinesColor(double r, double g, double b);
+
+  // Description:
+  // Set the lighting parameters for the transfer function editor elements.
+  virtual void SetElementLighting(double ambient, double diffuse,
+                                  double specular, double specularPower);
 
 protected:
   vtkTransferFunctionEditorRepresentationSimple1D();

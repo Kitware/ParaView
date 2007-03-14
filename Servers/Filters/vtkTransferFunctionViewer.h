@@ -162,6 +162,30 @@ public:
   void SetHistogramVisibility(int visibility);
 
   // Description:
+  // Determine whether a gradient image showing the color function
+  // should be displayed in the background.
+  // Set the transfer function editor type before setting this value.
+  void SetShowColorFunctionInBackground(int visibility);
+
+  // Description:
+  // Determine whether the color gradient should be displayed on the lines
+  // connecting the nodes of the transfer function editor.
+  // Set the transfer function editor type before setting this value.
+  void SetShowColorFunctionOnLines(int visibility);
+
+  // Description:
+  // Specify the color in which to display the lines connecting the nodes
+  // if they are not displaying the color gradient.
+  void SetLinesColor(double r, double g, double b);
+
+  // Description:
+  // Specify the lighting parameters for the transfer function editor
+  // elements. Set the transfer function editor type before calling this
+  // method.
+  void SetElementLighting(double ambient, double diffuse,
+                          double specular, double specularPower);
+
+  // Description:
   // Set/get the opacity function.
   // Set the type of transfer function editor before trying to set or get
   // the opacity function.
@@ -212,6 +236,13 @@ public:
   // Description:
   // Set the color space. (RGB = 0, HSV = 1, HSV with wrapping = 2)
   void SetColorSpace(int space);
+
+  // Description:
+  // Set whether the endpoint nodes may or may not change scalar values 
+  // and/or be deleted. By default moving and deleting are allowed.
+  // Set the transfer function editor type before calling this method.
+  // It only has an effect on the simple 1D case.
+  void SetLockEndPoints(int lock);
 
 protected:
   vtkTransferFunctionViewer();

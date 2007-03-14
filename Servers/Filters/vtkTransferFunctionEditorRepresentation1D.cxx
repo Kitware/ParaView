@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkTransferFunctionEditorRepresentation1D.h"
 
+#include "vtkColorTransferFunction.h"
 #include "vtkImageData.h"
 #include "vtkImageMapper.h"
 #include "vtkIntArray.h"
@@ -21,7 +22,7 @@
 #include "vtkPointData.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.8");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.9");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation1D, Histogram,
                      vtkIntArray);
@@ -30,47 +31,18 @@ vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation1D, Histogram,
 vtkTransferFunctionEditorRepresentation1D::vtkTransferFunctionEditorRepresentation1D()
 {
   this->Histogram = NULL;
-  this->HistogramImage = vtkImageData::New();
-  this->HistogramImage->SetScalarTypeToUnsignedChar();
-  this->DisplaySize[0] = this->DisplaySize[1] = 100;
-
-  this->HistogramMapper->SetInput(this->HistogramImage);
 }
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorRepresentation1D::~vtkTransferFunctionEditorRepresentation1D()
 {
   this->SetHistogram(NULL);
-  this->HistogramImage->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkTransferFunctionEditorRepresentation1D::SetDisplaySize(int x, int y)
-{
-  this->Superclass::SetDisplaySize(x, y);
-  if (this->HistogramImage)
-    {
-    this->HistogramImage->Initialize();
-    this->HistogramImage->SetDimensions(this->DisplaySize[0],
-                                        this->DisplaySize[1], 1);
-    this->HistogramImage->SetNumberOfScalarComponents(4);
-    this->HistogramImage->AllocateScalars();
-    vtkUnsignedCharArray *array = vtkUnsignedCharArray::SafeDownCast(
-      this->HistogramImage->GetPointData()->GetScalars());
-    if (array)
-      {
-      array->FillComponent(0, 0);
-      array->FillComponent(1, 0);
-      array->FillComponent(2, 0);
-      array->FillComponent(3, 0);
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
 void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
 {
-  if (!this->Histogram)
+  if (!this->HistogramVisibility || !this->Histogram)
     {
     return;
     }
@@ -137,9 +109,54 @@ void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
 }
 
 //----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentation1D::UpdateBackgroundImage()
+{
+  if (!this->ShowColorFunctionInBackground || !this->ColorFunction ||
+      this->VisibleScalarRange[0] > this->VisibleScalarRange[1])
+    {
+    return;
+    }
+
+  unsigned char* scalars = static_cast<unsigned char*>(
+    this->BackgroundImage->GetScalarPointer());
+  double stepSize =
+    (this->VisibleScalarRange[1]-this->VisibleScalarRange[0]) /
+    this->DisplaySize[0];
+
+  double rgb[3];
+  int i, j;
+
+  for (j = 0; j < this->DisplaySize[1]; j++)
+    {
+    for (i = 0; i < this->DisplaySize[0]; i++)
+      {
+      this->ColorFunction->GetColor(this->VisibleScalarRange[0] + i*stepSize,
+                                    rgb);
+      *scalars = static_cast<unsigned char>(rgb[0] * 255);
+      scalars++;
+      *scalars = static_cast<unsigned char>(rgb[1] * 255);
+      scalars++;
+      *scalars = static_cast<unsigned char>(rgb[2] * 255);
+      scalars++;
+      *scalars = 255;
+      scalars++;
+      }
+    }
+
+  this->BackgroundImage->Modified();
+}
+
+//----------------------------------------------------------------------------
 void vtkTransferFunctionEditorRepresentation1D::BuildRepresentation()
 {
-  this->UpdateHistogramImage();
+  if (this->HistogramVisibility)
+    {
+    this->UpdateHistogramImage();
+    }
+  if (this->ShowColorFunctionInBackground)
+    {
+    this->UpdateBackgroundImage();
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.19");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.20");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -45,6 +45,7 @@ vtkTransferFunctionEditorWidgetSimple1D::vtkTransferFunctionEditorWidgetSimple1D
   this->InitialMinimumColor[2] = 1;
   this->InitialMaximumColor[0] = 1;
   this->InitialMaximumColor[1] = this->InitialMaximumColor[2] = 0;
+  this->LockEndPoints = 0;
 
   this->CallbackMapper->SetCallbackMethod(
     vtkCommand::LeftButtonPressEvent,
@@ -431,6 +432,19 @@ void vtkTransferFunctionEditorWidgetSimple1D::MoveNodeAction(
     {
     pos[0] = rep->GetHandleDisplayPosition(nodeId)[0];
     }
+  if (self->LockEndPoints)
+    {
+    if (nodeId == 0 || nodeId == self->Nodes->size()-1)
+      {
+      pos[0] = rep->GetHandleDisplayPosition(nodeId)[0];
+      int valid;
+      double oldScalar = rep->GetHandleScalar(nodeId, valid);
+      if (valid)
+        {
+        scalar = oldScalar;
+        }
+      }
+    }
   if (rep->SetHandleDisplayPosition(nodeId, pos, scalar))
     {
     if (self->ModificationType != COLOR)
@@ -510,7 +524,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::OnChar()
 //-------------------------------------------------------------------------
 void vtkTransferFunctionEditorWidgetSimple1D::RemoveNode(unsigned int id)
 {
-  if (id > this->Nodes->size()-1)
+  if (id > this->Nodes->size()-1 ||
+      (this->LockEndPoints && (id == 0 || id == this->Nodes->size()-1)))
     {
     return;
     }
@@ -1004,6 +1019,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementRGBColor(
   if (rep)
     {
     rep->SetHandleColor(idx, r, g, b);
+    if (rep->GetShowColorFunctionInBackground())
+      {
+      rep->BuildRepresentation();
+      }
     this->Render();
     }
 }

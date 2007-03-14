@@ -24,7 +24,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.11");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.12");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
@@ -78,6 +78,7 @@ void vtkTransferFunctionEditorWidget::SetVisibleScalarRange(double min,
 
   vtkTransferFunctionEditorRepresentation *rep =
     vtkTransferFunctionEditorRepresentation::SafeDownCast(this->WidgetRep);
+  rep->SetVisibleScalarRange(min, max);
   if (this->Histogram)
     {
     double histogramRange[2];

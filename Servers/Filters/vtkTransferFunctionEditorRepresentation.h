@@ -32,6 +32,7 @@
 
 class vtkActor2D;
 class vtkColorTransferFunction;
+class vtkImageData;
 class vtkImageMapper;
 
 class VTK_EXPORT vtkTransferFunctionEditorRepresentation : public vtkWidgetRepresentation
@@ -48,8 +49,6 @@ public:
 
   // Description:
   // Rendering methods
-  virtual int RenderOpaqueGeometry(vtkViewport *viewport);
-  virtual int RenderTranslucentPolygonalGeometry(vtkViewport *viewport);
   virtual int RenderOverlay(vtkViewport *viewport);
 
   // Description:
@@ -66,7 +65,9 @@ public:
 
   // Description:
   // Set/get the size of the display containing this representation.
-  vtkSetVector2Macro(DisplaySize, int);
+  virtual void SetDisplaySize(int x, int y);
+  virtual void SetDisplaySize(int size[2])
+    { this->SetDisplaySize(size[0], size[1]); }
   vtkGetVector2Macro(DisplaySize, int);
 
   // Description:
@@ -91,10 +92,38 @@ public:
   // Set the color transfer function being modified.
   virtual void SetColorFunction(vtkColorTransferFunction *color);
 
+  // Description:
+  // Toggle whether to display to color transfer function as a gradient in
+  // the background of the editor.
+  vtkSetMacro(ShowColorFunctionInBackground, int);
+  vtkGetMacro(ShowColorFunctionInBackground, int);
+  vtkBooleanMacro(ShowColorFunctionInBackground, int);
+
+  // Description:
+  // Tell the representation whether the lines should be a solid color or
+  // whether they should display the color transfer function.
+  virtual void SetColorLinesByScalar(int) {}
+
+  // Description:
+  // Specify the color to use for the lines if they are not displaying
+  // the color transfer function.
+  virtual void SetLinesColor(double, double, double) {}
+
+  // Description:
+  // Set/get the visible scalar range.
+  vtkSetVector2Macro(VisibleScalarRange, double);
+  vtkGetVector2Macro(VisibleScalarRange, double);
+
+  // Description:
+  // Set the lighting parameters for the transfer function editor elements.
+  virtual void SetElementLighting(double ambient, double diffuse,
+                                  double specular, double specularPower) {}
+
 protected:
   vtkTransferFunctionEditorRepresentation();
   ~vtkTransferFunctionEditorRepresentation();
 
+  vtkImageData *HistogramImage;
   vtkImageMapper *HistogramMapper;
   vtkActor2D *HistogramActor;
   int HistogramVisibility;
@@ -102,6 +131,11 @@ protected:
   int ScalarBinRange[2];
   double HistogramColor[3];
   vtkColorTransferFunction *ColorFunction;
+  vtkImageData *BackgroundImage;
+  vtkImageMapper *BackgroundMapper;
+  vtkActor2D *BackgroundActor;
+  int ShowColorFunctionInBackground;
+  double VisibleScalarRange[2];
 
 private:
   vtkTransferFunctionEditorRepresentation(const vtkTransferFunctionEditorRepresentation&); // Not implemented.
