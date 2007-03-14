@@ -87,7 +87,7 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
     return;
     }
   QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
-  format.setForeground(Qt::darkRed);
+  format.setForeground(Qt::black);
   format.clearBackground();
   this->Implementation->Ui.consoleWidget->setFormat(format);
   
@@ -100,7 +100,7 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
 void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
 {
   QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
-  format.setForeground(Qt::darkRed);
+  format.setForeground(Qt::black);
   format.clearBackground();
   this->Implementation->Ui.consoleWidget->setFormat(format);
   
@@ -113,8 +113,8 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
 void pqOutputWindow::onDisplayErrorText(const QString& text)
 {
   QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
-  format.setForeground(Qt::white);
-  format.setBackground(Qt::red);
+  format.setForeground(Qt::darkRed);
+  format.clearBackground();
   this->Implementation->Ui.consoleWidget->setFormat(format);
   
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
