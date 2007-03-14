@@ -28,7 +28,7 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.6");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.7");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -238,14 +238,23 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
             node->GetProperties()->Set(vtkSelection::PROCESS_ID(), val);
             }
           }
-        else if (strcmp("NAME", key) == 0)
+        else if (strcmp("ARRAY_NAME", key) == 0)
           {
           const char *val = elem->GetAttribute("value");
           if (val)
             {
-            node->GetProperties()->Set(vtkSelection::NAME(), val);
+            node->GetProperties()->Set(vtkSelection::ARRAY_NAME(), val);
             }
           }
+        else if (strcmp("EPSILON", key) == 0)
+          {
+          double val;
+          if (elem->GetScalarAttribute("value", &val))
+            {
+            node->GetProperties()->Set(vtkSelection::EPSILON(), val);
+            }
+          }
+
         }
       }
     else if (strcmp("SelectionList", name) == 0)
