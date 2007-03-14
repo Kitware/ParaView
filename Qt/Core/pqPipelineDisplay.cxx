@@ -170,6 +170,41 @@ void pqPipelineDisplay::deferredSetDefaults()
   vtkPVDataSetAttributesInformation* attrInfo;
   vtkPVArrayInformation* arrayInfo;
 
+  vtkPVDataInformation* dataInfo = 0;
+  dataInfo = this->getInput()->getDataInformation();
+
+  // get data set type
+  // and set the default representation
+  if(dataInfo)
+    {
+    int dataSetType = dataInfo->GetDataSetType();
+    if(dataSetType == VTK_POLY_DATA ||
+       dataSetType == VTK_UNSTRUCTURED_GRID ||
+       dataSetType == VTK_HYPER_OCTREE ||
+       dataSetType == VTK_GENERIC_DATA_SET)
+      {
+      displayProxy->SetRepresentationCM(vtkSMDataObjectDisplayProxy::SURFACE);
+      }
+    else if(dataSetType == VTK_RECTILINEAR_GRID ||
+       dataSetType == VTK_STRUCTURED_GRID ||
+       dataSetType == VTK_IMAGE_DATA)
+      {
+      int* ext = dataInfo->GetExtent();
+      if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+        {
+        displayProxy->SetRepresentationCM(vtkSMDataObjectDisplayProxy::SURFACE);
+        }
+      else
+        {
+        displayProxy->SetRepresentationCM(vtkSMDataObjectDisplayProxy::OUTLINE);
+        }
+      }
+    else
+      {
+      displayProxy->SetRepresentationCM(vtkSMDataObjectDisplayProxy::OUTLINE);
+      }
+    }
+  
   geomInfo = displayProxy->GetGeometryInformation();
 
   // Locate input display.
@@ -256,7 +291,6 @@ void pqPipelineDisplay::deferredSetDefaults()
 
   // Color by property.
   this->colorByArray(NULL, 0);
-  cout << "Dont setDefaults" << endl;
 }
 
 //-----------------------------------------------------------------------------
