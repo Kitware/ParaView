@@ -170,7 +170,7 @@ public:
     PipelineMenu(0),
     PipelineBrowser(0),
     VariableToolbar(0),
-    LookmarkToolbar(0),
+    //LookmarkToolbar(0),
     CustomFilterToolbar(0),
     ToolTipTrapper(0),
     InCreateSource(false),
@@ -216,7 +216,7 @@ public:
   pqPipelineMenu* PipelineMenu;
   pqPipelineBrowser *PipelineBrowser;
   QToolBar* VariableToolbar;
-  pqLookmarkToolbar* LookmarkToolbar;
+  //pqLookmarkToolbar* LookmarkToolbar;
   QToolBar* CustomFilterToolbar;
   QList<QToolBar*> PluginToolBars;
   
@@ -913,6 +913,7 @@ void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* toolbar)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setupLookmarkToolbar(pqLookmarkToolbar* toolbar)
 {
+/*
   this->Implementation->LookmarkToolbar = toolbar;
   
   // add in existing lookmarks first
@@ -934,6 +935,7 @@ void pqMainWindowCore::setupLookmarkToolbar(pqLookmarkToolbar* toolbar)
       toolbar, SLOT(onLookmarkRemoved(const QString&)));
   QObject::connect(this->Implementation->LookmarkManagerModel, SIGNAL(lookmarkNameChanged(const QString&, const QString&)),
       toolbar, SLOT(onLookmarkNameChanged(const QString&, const QString&)));
+*/
 }
 
 
