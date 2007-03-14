@@ -72,30 +72,34 @@ public:
     };
   //ETX
   
-  // Generates/Regenerates the selection. This method must be called explicitly
-  // to create the selection. Fires vtkCommand::StartEvent and vtkCommand::EndEvent
-  // at start and end of this method call.
+  // Description:
+  // Generates/Regenerates the selection. This method must be called
+  // explicitly to create the selection. Fires vtkCommand::StartEvent and
+  // vtkCommand::EndEvent at start and end of this method call.
   void UpdateSelection();
 
-  // Fills the collection with the selected sources.
-  // UpdateSelection() selection must be called explicitly to update the selection
-  // before using this method.
+  // Description:
+  // Fills the collection with the selected sources.  UpdateSelection()
+  // selection must be called explicitly to update the selection before
+  // using this method.
   void GetSelectedSourceProxies(vtkCollection* collection);
 
   // Description:
-  // This is a convenience method. Although this proxy provides a Camera subproxy,
-  // whose properties define the view point for the selection, in most cases the 
-  // the current render module view should be used. To simply this, this method is provided,
-  // is simply copies the Camera properties from the render module over to
-  // this proxy so that the two are same.
+  // This is a convenience method. Although this proxy provides a Camera
+  // subproxy, whose properties define the view point for the selection, in
+  // most cases the the current render module view should be used. To
+  // simply this, this method is provided, is simply copies the Camera
+  // properties from the render module over to this proxy so that the two
+  // are same.
   void UpdateCameraPropertiesFromRenderModule();
 
 
   // Description:
-  // Overridden to update the SelectionUpToDate flag. The flag is cleared when 
-  // any of the properties of this proxy itself are modified and set when UpdateSelection
-  // is called. Note that this proxy is typically a consumer of a render module proxy. However,
-  // we don't clear the SelectionUpToDate flag if properties on the render module change.
+  // Overridden to update the SelectionUpToDate flag. The flag is cleared
+  // when any of the properties of this proxy itself are modified and set
+  // when UpdateSelection is called. Note that this proxy is typically a
+  // consumer of a render module proxy. However, we don't clear the
+  // SelectionUpToDate flag if properties on the render module change.
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
   // Description:
