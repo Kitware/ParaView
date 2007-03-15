@@ -215,7 +215,7 @@ QVariant pqColorPresetModel::data(const QModelIndex &idx, int role) const
 }
 
 bool pqColorPresetModel::setData(const QModelIndex &idx,
-    const QVariant &value, int role)
+    const QVariant &value, int)
 {
   if(idx.isValid() && idx.model() == this && idx.column() == 0)
     {

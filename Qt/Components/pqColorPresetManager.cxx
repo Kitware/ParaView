@@ -51,6 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QPainter>
 #include <QPersistentModelIndex>
+#include <QPoint>
+#include <QRect>
 #include <QString>
 #include <QStringList>
 
@@ -94,16 +96,16 @@ QSize pqColorPresetDelegate::sizeHint(const QStyleOptionViewItem &option,
 }
 
 void pqColorPresetDelegate::drawDecoration(QPainter *painter,
-    const QStyleOptionViewItem &option, const QRect &rect,
+    const QStyleOptionViewItem &option, const QRect &area,
     const QPixmap &pixmap) const
 {
-  if(pixmap.isNull() || !rect.isValid())
+  if(pixmap.isNull() || !area.isValid())
     {
     return;
     }
 
   QPoint p = QStyle::alignedRect(option.direction, option.decorationAlignment,
-      pixmap.size(), rect).topLeft();
+      pixmap.size(), area).topLeft();
   painter->drawPixmap(p, pixmap);
 }
 
@@ -436,7 +438,7 @@ void pqColorPresetManager::updateButtons()
   this->Form->RemoveButton->setEnabled(canDelete);
 }
 
-void pqColorPresetManager::showContextMenu(const QPoint &pos)
+void pqColorPresetManager::showContextMenu(const QPoint &point)
 {
   QMenu menu(this);
   QAction *action = menu.addAction(this->Form->ImportButton->text(),
@@ -449,7 +451,7 @@ void pqColorPresetManager::showContextMenu(const QPoint &pos)
   action = menu.addAction(this->Form->RemoveButton->text(),
       this, SLOT(removeSelected()));
   action->setEnabled(this->Form->RemoveButton->isEnabled());
-  menu.exec(this->Form->Gradients->viewport()->mapToGlobal(pos));
+  menu.exec(this->Form->Gradients->viewport()->mapToGlobal(point));
 }
 
 void pqColorPresetManager::handleItemActivated()
@@ -464,7 +466,7 @@ void pqColorPresetManager::selectNewItem(const QModelIndex &, int first,
     int last)
 {
   QItemSelectionModel *selection = this->Form->Gradients->selectionModel();
-  if(this->Form->Gradients->selectionBehavior() ==
+  if(this->Form->Gradients->selectionMode() ==
       QAbstractItemView::SingleSelection)
     {
     selection->setCurrentIndex(this->Model->index(last, 0),
