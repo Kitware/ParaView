@@ -3166,58 +3166,6 @@ The Warp (vector) filter translates the points of the input data set using a spe
    <!-- End WarpVector -->
    </SourceProxy>
 
-   <SourceProxy name="AnimateWarp" class="vtkWarpVector" label="Animate Warp">
-     <Documentation
-        long_help="This filter displaces point coordinates along a vector attribute.  It is useful for showing mechanical deformation. This class also simplifies the animation process."
-        short_help="Warp (displace) the geometry with a given vector field.">
-The Warp (vector) filter translates the points of the input data set using a specified vector array. The vector array chosen specifies a vector per point in the input. Each point is translated along its vector by the value in the Scale factor entry box. This filter operates on polygonal, curvilinear, and unstructured grid data sets. Because this filter only changes the positions of the points, the output data set type is the same as that of the input. This filter is available on the Toolbar.
-     </Documentation>
-     <InputProperty
-        name="Input"
-        command="SetInputConnection">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
-             <DataType value="vtkPointSet"/>
-           </DataTypeDomain>
-           <InputArrayDomain name="input_array" attribute_type="point"
-                             number_of_components="3"/>
-           <Documentation>
-             Set the input to the Animate Warp filter.
-           </Documentation>
-      </InputProperty>
-
-      <StringVectorProperty 
-         name="SelectInputVectors" 
-         command="SetInputArrayToProcess"
-         number_of_elements="5"
-         element_types="0 0 0 0 2"
-         label="Vectors">
-            <ArrayListDomain name="array_list" attribute_type="Vectors">
-              <RequiredProperties>
-                 <Property name="Input" function="Input"/>
-              </RequiredProperties>
-            </ArrayListDomain>
-            <Documentation>
-              Select the vector array by which to warp the dataset's point coordinates.
-            </Documentation>
-      </StringVectorProperty> 
-
-      <DoubleVectorProperty
-         name="ScaleFactor"
-         command="SetScaleFactor"
-         number_of_elements="1"
-         default_values="1.0" >
-        <DoubleRangeDomain name="range"/>
-        <Documentation>
-          Each component of the selected vector array will be multiplied by this value before being used to compute new point coordinates.
-        </Documentation>
-      </DoubleVectorProperty>
-   <!-- End AnimateWarp -->
-   </SourceProxy>
-
    <SourceProxy name="Cut" class="vtkCutter">
     <Documentation
        long_help="This filter cuts a data set with a plane or sphere.  Cutting is similar to a contour.  It creates surfaces from volumes and lines from surfaces."
