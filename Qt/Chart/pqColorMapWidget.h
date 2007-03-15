@@ -40,9 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtChartExport.h"
 #include <QAbstractScrollArea>
 
-class pqChartValue;
+class pqColorMapModel;
 class pqColorMapWidgetInternal;
-class QColor;
+class pqChartValue;
 class QPixmap;
 
 
@@ -52,40 +52,14 @@ class QTCHART_EXPORT pqColorMapWidget : public QAbstractScrollArea
   Q_OBJECT
 
 public:
-  enum ColorSpace
-    {
-    RgbSpace,
-    HsvSpace
-    };
-
-public:
   pqColorMapWidget(QWidget *parent=0);
   virtual ~pqColorMapWidget();
 
-  virtual QSize sizeHint() const;
+  pqColorMapModel *getModel() const {return this->Model;}
+  void setModel(pqColorMapModel *model);
 
-  ColorSpace getColorSpace() const {return this->Space;}
-  void setColorSpace(ColorSpace space);
-
-  int getPointCount() const;
-  int addPoint(const pqChartValue &value, const QColor &color);
-  void removePoint(int index);
-  void clearPoints();
-
-  void getPointValue(int index, pqChartValue &value) const;
-  void getPointColor(int index, QColor &color) const;
-  void setPointColor(int index, const QColor &color);
-
-  void setTableSize(int tableSize);
   int getTableSize() const {return this->TableSize;}
-
-  /// \brief
-  ///   Scales the current points to fit in the given range.
-  /// \note
-  ///   If there are no points, this method does nothing.
-  /// \param min The minimum value.
-  /// \param max The maximum value.
-  void setValueRange(const pqChartValue &min, const pqChartValue &max);
+  void setTableSize(int resolution);
 
   void setMovingPointsAllowed(bool allowed) {this->MovingAllowed = allowed;}
   bool isMovingPointsAllowed() const {return this->MovingAllowed;}
@@ -94,11 +68,10 @@ public:
 
   void layoutColorMap();
 
+  virtual QSize sizeHint() const;
+
 signals:
   void colorChangeRequested(int index);
-  void colorChanged(int index, const QColor &color);
-  void pointAdded(int index);
-  void pointRemoved(int index);
   void pointMoved(int index);
 
 protected:
@@ -110,6 +83,12 @@ protected:
 
 private slots:
   void moveTimeout();
+  void updateColorGradient();
+  void handlePointsReset();
+  void addPoint(int index);
+  void startRemovingPoint(int index);
+  void finishRemovingPoint(int index);
+  void updatePointValue(int index, const pqChartValue &value);
 
 private:
   bool isInScaleRegion(int px, int py);
@@ -118,10 +97,9 @@ private:
 
 private:
   pqColorMapWidgetInternal *Internal; ///< Stores the color map data.
+  pqColorMapModel *Model;             ///< Stores the color map points
   QPixmap *DisplayImage;              ///< Used for drawing color map.
-  ColorSpace Space;                   ///< Stores the color space.
-  int TableSize;                      ///< Stores the color table size.
-  int Spacing;                        ///< Stores the layout spacing.
+  int TableSize;                      ///< Stores the table size.
   int Margin;                         ///< Stores the layout margin.
   int PointWidth;                     ///< Stores the size of the points.
   bool AddingAllowed;                 ///< True if points can be added.

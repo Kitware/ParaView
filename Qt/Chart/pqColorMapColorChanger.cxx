@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqColorMapColorChanger.h"
 
+#include "pqColorMapModel.h"
 #include "pqColorMapWidget.h"
 #include <QApplication>
 #include <QColor>
@@ -57,13 +58,14 @@ void pqColorMapColorChanger::changeIndexColor(int index)
     {
     // Get the color for the given index.
     QColor color;
-    this->ColorMap->getPointColor(index, color);
+    pqColorMapModel *model = this->ColorMap->getModel();
+    model->getPointColor(index, color);
 
     // Let the user choose a color.
     color = QColorDialog::getColor(color, QApplication::activeWindow());
     if(color.isValid())
       {
-      this->ColorMap->setPointColor(index, color);
+      model->setPointColor(index, color);
       }
     }
 }

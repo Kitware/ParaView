@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorMapWidget.h"
 
 #include "pqChartValue.h"
+#include "pqColorMapModel.h"
 #include "pqPointMarker.h"
 #include "pqPixelTransferFunction.h"
 
@@ -48,19 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QRect>
 #include <QSize>
 #include <QTimer>
-
-
-class pqColorMapWidgetItem
-{
-public:
-  pqColorMapWidgetItem();
-  pqColorMapWidgetItem(const pqChartValue &value, const QColor &color);
-  ~pqColorMapWidgetItem() {}
-
-  QColor Color;       ///< The Color for the point.
-  pqChartValue Value; ///< The value at the point.
-  int Pixel;          ///< The pixel location of the point.
-};
 
 
 class pqColorMapWidgetInternal
@@ -79,30 +67,15 @@ public:
   pqColorMapWidgetInternal();
   ~pqColorMapWidgetInternal() {}
 
-  QList<pqColorMapWidgetItem *> Items; ///< The list of points.
+  QList<int> Items;                    ///< The list of point locations.
   QRect ImageArea;                     ///< The color scale rectangle.
   QPoint LastPoint;                    ///< Used for interaction.
   pqPixelTransferFunction PixelMap;    ///< The pixel to value map.
   QTimer *MoveTimer;                   ///< Used for mouse interaction.
-  int PointIndex;                      ///< Used for mouse interaction.
   MouseMode Mode;                      ///< The current mouse mode.
+  int PointIndex;                      ///< Used for mouse interaction.
   bool PointMoved;                     ///< True if point was moved.
 };
-
-
-//-----------------------------------------------------------------------------
-pqColorMapWidgetItem::pqColorMapWidgetItem()
-  : Color(), Value()
-{
-  this->Pixel = 0;
-}
-
-pqColorMapWidgetItem::pqColorMapWidgetItem(const pqChartValue &value,
-    const QColor &color)
-  : Color(color), Value(value)
-{
-  this->Pixel = 0;
-}
 
 
 //-----------------------------------------------------------------------------
@@ -110,8 +83,8 @@ pqColorMapWidgetInternal::pqColorMapWidgetInternal()
   : Items(), ImageArea(), LastPoint(), PixelMap()
 {
   this->MoveTimer = 0;
-  this->PointIndex = -1;
   this->Mode = pqColorMapWidgetInternal::NoMode;
+  this->PointIndex = -1;
   this->PointMoved = false;
 }
 
@@ -121,10 +94,9 @@ pqColorMapWidget::pqColorMapWidget(QWidget *widgetParent)
   : QAbstractScrollArea(widgetParent)
 {
   this->Internal = new pqColorMapWidgetInternal();
+  this->Model = 0;
   this->DisplayImage = 0;
-  this->Space = pqColorMapWidget::HsvSpace;
   this->TableSize = 0;
-  this->Spacing = 1;
   this->Margin = 2;
   this->PointWidth = 9;
   this->AddingAllowed = true;
@@ -135,12 +107,6 @@ pqColorMapWidget::pqColorMapWidget(QWidget *widgetParent)
 
 pqColorMapWidget::~pqColorMapWidget()
 {
-  QList<pqColorMapWidgetItem *>::Iterator iter = this->Internal->Items.begin();
-  for(; iter != this->Internal->Items.end(); ++iter)
-    {
-    delete *iter;
-    }
-
   delete this->Internal;
   if(this->DisplayImage)
     {
@@ -148,168 +114,48 @@ pqColorMapWidget::~pqColorMapWidget()
     }
 }
 
-QSize pqColorMapWidget::sizeHint() const
+void pqColorMapWidget::setModel(pqColorMapModel *model)
 {
-  // Set up the prefered size for the color gradient image. Add space
-  // for the point control line and layout spacing.
-  int w = 100;
-  int h = 22 + this->PointWidth + this->Spacing + (2 * this->Margin);
-  return QSize(w, h);
-}
-
-void pqColorMapWidget::setColorSpace(pqColorMapWidget::ColorSpace space)
-{
-  if(this->Space != space)
+  if(this->Model)
     {
-    this->Space = space;
-    this->generateGradient();
-    this->viewport()->update();
+    this->disconnect(this->Model, 0, this, 0);
     }
-}
 
-int pqColorMapWidget::getPointCount() const
-{
-  return this->Internal->Items.size();
-}
-
-int pqColorMapWidget::addPoint(const pqChartValue &value, const QColor &color)
-{
-  // The list of points should be in ascending value order. Add the
-  // new point according to its value.
-  QList<pqColorMapWidgetItem *>::Iterator iter = this->Internal->Items.begin();
-  for( ; iter != this->Internal->Items.end(); ++ iter)
+  this->Model = model;
+  if(this->Model)
     {
-    if(value == (*iter)->Value)
+    this->connect(this->Model, SIGNAL(colorSpaceChanged()),
+        this, SLOT(updateColorGradient()));
+    this->connect(this->Model, SIGNAL(tableSizeChanged()),
+        this, SLOT(updateColorGradient()));
+    this->connect(this->Model, SIGNAL(colorChanged(int, const QColor &)),
+        this, SLOT(updateColorGradient()));
+    this->connect(this->Model, SIGNAL(pointsReset()),
+        this, SLOT(handlePointsReset()));
+    this->connect(this->Model, SIGNAL(pointAdded(int)),
+        this, SLOT(addPoint(int)));
+    this->connect(this->Model, SIGNAL(removingPoint(int)),
+        this, SLOT(startRemovingPoint(int)));
+    this->connect(this->Model, SIGNAL(pointRemoved(int)),
+        this, SLOT(finishRemovingPoint(int)));
+    this->connect(this->Model, SIGNAL(valueChanged(int, const pqChartValue &)),
+        this, SLOT(updatePointValue(int, const pqChartValue &)));
+    }
+
+  this->handlePointsReset();
+}
+
+void pqColorMapWidget::setTableSize(int resolution)
+{
+  if(resolution != this->TableSize)
+    {
+    this->TableSize = resolution;
+    if(this->Model && !this->Model->isDataBeingModified())
       {
-      return -1;
-      }
-    else if(value < (*iter)->Value)
-      {
-      break;
-      }
-    }
-
-  pqColorMapWidgetItem *item = new pqColorMapWidgetItem(value, color);
-  if(iter == this->Internal->Items.end())
-    {
-    // Add the point to the end of the list if it is greater than all
-    // the current points.
-    this->Internal->Items.append(item);
-    }
-  else
-    {
-    this->Internal->Items.insert(iter, item);
-    }
-
-  this->layoutColorMap();
-  this->viewport()->update();
-  return this->Internal->Items.indexOf(item);
-}
-
-void pqColorMapWidget::removePoint(int index)
-{
-  if(index >= 0 && index < this->Internal->Items.size())
-    {
-    pqColorMapWidgetItem *item = this->Internal->Items.takeAt(index);
-    delete item;
-    this->layoutColorMap();
-    this->viewport()->update();
-    }
-}
-
-void pqColorMapWidget::clearPoints()
-{
-  QList<pqColorMapWidgetItem *>::Iterator iter = this->Internal->Items.begin();
-  for( ; iter != this->Internal->Items.end(); ++iter)
-    {
-    delete *iter;
-    }
-
-  this->Internal->Items.clear();
-  this->layoutColorMap();
-  this->viewport()->update();
-}
-
-void pqColorMapWidget::getPointValue(int index, pqChartValue &value) const
-{
-  if(index >= 0 && index < this->Internal->Items.size())
-    {
-    value = this->Internal->Items[index]->Value;
-    }
-}
-
-void pqColorMapWidget::getPointColor(int index, QColor &color) const
-{
-  if(index >= 0 && index < this->Internal->Items.size())
-    {
-    color = this->Internal->Items[index]->Color;
-    }
-}
-
-void pqColorMapWidget::setPointColor(int index, const QColor &color)
-{
-  if(index >= 0 && index < this->Internal->Items.size() &&
-      this->Internal->Items[index]->Color != color)
-    {
-    this->Internal->Items[index]->Color = color;
-    this->generateGradient();
-    this->viewport()->update();
-
-    // Notify observers that the color changed.
-    emit this->colorChanged(index, color);
-    }
-}
-
-void pqColorMapWidget::setTableSize(int tableSize)
-{
-  if(this->TableSize != tableSize)
-    {
-    this->TableSize = tableSize;
-    this->generateGradient();
-    this->viewport()->update();
-    }
-}
-
-void pqColorMapWidget::setValueRange(const pqChartValue &min,
-  const pqChartValue &max)
-{
-  if(this->Internal->Items.size() == 0)
-    {
-    return;
-    }
-
-  // Scale the current points to fit the given range.
-  if(this->Internal->Items.size() == 1)
-    {
-    this->Internal->Items.first()->Value = min;
-    }
-  else
-    {
-    pqChartValue newMin, newRange;
-    pqChartValue oldMin = this->Internal->Items.first()->Value;
-    pqChartValue oldRange = this->Internal->Items.last()->Value - oldMin;
-    if(max < min)
-      {
-      newMin = max;
-      newRange = min - max;
-      }
-    else
-      {
-      newMin = min;
-      newRange = max - min;
-      }
-
-    QList<pqColorMapWidgetItem *>::Iterator iter =
-        this->Internal->Items.begin();
-    for( ; iter != this->Internal->Items.end(); ++iter)
-      {
-      (*iter)->Value = (((*iter)->Value - oldMin) * newRange) / oldRange;
-      (*iter)->Value += newMin;
+      this->layoutColorMap();
+      this->viewport()->update();
       }
     }
-
-  this->layoutColorMap();
-  this->viewport()->update();
 }
 
 void pqColorMapWidget::layoutColorMap()
@@ -325,8 +171,9 @@ void pqColorMapWidget::layoutColorMap()
   // Use the gradient area to set up the pixel to value map.
   if(this->Internal->ImageArea.isValid())
     {
-    this->Internal->PixelMap.setPixelRange(this->Internal->ImageArea.left(),
-        this->Internal->ImageArea.right());
+    int left = this->Internal->ImageArea.left();
+    this->Internal->PixelMap.setPixelRange(left,
+        left + this->Internal->ImageArea.width() - 1);
     }
   else
     {
@@ -335,16 +182,13 @@ void pqColorMapWidget::layoutColorMap()
 
   // Make sure the value range is set as well. There must be at least
   // two point for a valid range.
-  if(this->Internal->Items.size() < 2)
+  pqChartValue min, max;
+  if(this->Model)
     {
-    this->Internal->PixelMap.setValueRange(pqChartValue(), pqChartValue());
+    this->Model->getValueRange(min, max);
     }
-  else
-    {
-    this->Internal->PixelMap.setValueRange(
-        this->Internal->Items.first()->Value,
-        this->Internal->Items.last()->Value);
-    }
+
+  this->Internal->PixelMap.setValueRange(min, max);
 
   // Layout the points.
   this->layoutPoints();
@@ -353,8 +197,22 @@ void pqColorMapWidget::layoutColorMap()
   this->generateGradient();
 }
 
+QSize pqColorMapWidget::sizeHint() const
+{
+  // Set up the prefered size for the color gradient image. Add space
+  // for the point control line and layout spacing.
+  int w = 100;
+  int h = 22 + this->PointWidth + (2 * this->Margin);
+  return QSize(w, h);
+}
+
 void pqColorMapWidget::mousePressEvent(QMouseEvent *e)
 {
+  if(!this->Model)
+    {
+    return;
+    }
+
   // Make sure the timer is allocated and connected.
   if(!this->Internal->MoveTimer)
     {
@@ -370,40 +228,38 @@ void pqColorMapWidget::mousePressEvent(QMouseEvent *e)
 
   // Use the mouse press coordinates to determine if the user picked a
   // point.
-  bool foundPoint = false;
   int ex = e->x();
+  this->Internal->PointIndex = -1;
   if(this->isInScaleRegion(ex, e->y()))
     {
     // The mouse is in the point scale region. Determine if it is over
     // one of the points.
-    int halfWidth = this->PointWidth/2 + 1;
-    QList<pqColorMapWidgetItem *>::Iterator iter =
-        this->Internal->Items.begin();
+    int halfWidth = this->PointWidth / 2 + 1;
+    QList<int>::Iterator iter = this->Internal->Items.begin();
     for(int i = 0; iter != this->Internal->Items.end(); ++iter, ++i)
       {
-      if(ex < (*iter)->Pixel - halfWidth)
+      if(ex < *iter - halfWidth)
         {
         // The mouse is between points.
         break;
         }
-      else if(ex <= (*iter)->Pixel + halfWidth)
+      else if(ex <= *iter + halfWidth)
         {
         // The mouse is over a point.
-        foundPoint = true;
         this->Internal->PointIndex = i;
         break;
         }
       }
     }
-
-  if(!foundPoint)
-    {
-    this->Internal->PointIndex = -1;
-    }
 }
 
 void pqColorMapWidget::mouseMoveEvent(QMouseEvent *e)
 {
+  if(!this->Model)
+    {
+    return;
+    }
+
   if(this->Internal->Mode == pqColorMapWidgetInternal::MoveWait)
     {
     this->Internal->Mode = pqColorMapWidgetInternal::NoMode;
@@ -431,10 +287,10 @@ void pqColorMapWidget::mouseMoveEvent(QMouseEvent *e)
       {
       // Make sure the point does not run into neighboring points.
       int index = this->Internal->PointIndex;
-      pqColorMapWidgetItem *item = this->Internal->Items[index];
+      int pixel = this->Internal->Items[index];
       int delta = e->x() - this->Internal->LastPoint.x();
       index = delta > 0 ? index + 1 : index - 1;
-      int space = this->Internal->Items[index]->Pixel - item->Pixel;
+      int space = this->Internal->Items[index] - pixel;
       if(delta > 0 && delta >= space)
         {
         delta = space > 0 ? space - 1 : space;
@@ -447,10 +303,14 @@ void pqColorMapWidget::mouseMoveEvent(QMouseEvent *e)
       // Only update the last position if the point can be moved.
       if(delta != 0)
         {
+        pixel += delta;
+        this->Internal->Items[this->Internal->PointIndex] = pixel;
         this->Internal->LastPoint.rx() += delta;
         this->Internal->PointMoved = true;
-        item->Pixel += delta;
-        item->Value = this->Internal->PixelMap.getValueFor(item->Pixel);
+
+        pqChartValue value = this->Internal->PixelMap.getValueFor(pixel);
+        this->Model->setPointValue(this->Internal->PointIndex, value);
+
         this->generateGradient();
         this->viewport()->update();
         }
@@ -467,6 +327,11 @@ void pqColorMapWidget::mouseReleaseEvent(QMouseEvent *e)
       {
       this->Internal->MoveTimer->stop();
       }
+    }
+
+  if(!this->Model)
+    {
+    return;
     }
 
   if(this->Internal->Mode == pqColorMapWidgetInternal::MoveMode)
@@ -491,8 +356,7 @@ void pqColorMapWidget::mouseReleaseEvent(QMouseEvent *e)
           {
           int index = this->Internal->PointIndex;
           this->Internal->PointIndex = -1;
-          this->removePoint(index);
-          emit this->pointAdded(index);
+          this->Model->removePoint(index);
           }
         }
       else
@@ -509,18 +373,14 @@ void pqColorMapWidget::mouseReleaseEvent(QMouseEvent *e)
       pqChartValue value = this->Internal->PixelMap.getValueFor(e->x());
       QImage image = this->DisplayImage->toImage();
       QColor color = image.pixel(e->x() - this->Internal->ImageArea.left(), 0);
-      int index = this->addPoint(value, color);
-      if(index != -1)
-        {
-        emit this->pointAdded(index);
-        }
+      this->Model->addPoint(value, color);
       }
     }
 }
 
 void pqColorMapWidget::paintEvent(QPaintEvent *e)
 {
-  if(this->Internal->Items.size() < 2)
+  if(!this->Model || this->Internal->Items.size() < 2)
     {
     return;
     }
@@ -559,23 +419,23 @@ void pqColorMapWidget::paintEvent(QPaintEvent *e)
         this->Internal->PixelMap.getMaxPixel(), 0);
 
     // Draw the points on the scale.
+    QColor color;
     painter.setPen(QColor(Qt::black));
     //painter.setRenderHint(QPainter::Antialiasing, true);
     pqDiamondPointMarker marker(QSize(this->PointWidth, this->PointWidth));
-    QList<pqColorMapWidgetItem *>::Iterator iter =
-        this->Internal->Items.begin();
-    for( ; iter != this->Internal->Items.end(); ++iter)
+    QList<int>::Iterator iter = this->Internal->Items.begin();
+    for(int i = 0; iter != this->Internal->Items.end(); ++iter, ++i)
       {
       painter.save();
-      if((*iter)->Color.red() < 60 && (*iter)->Color.green() < 60 &&
-          (*iter)->Color.blue() < 60)
+      this->Model->getPointColor(i, color);
+      if(color.red() < 60 && color.green() < 60 && color.blue() < 60)
         {
         // If the color is too dark, a black outline won't show up.
         painter.setPen(QColor(128, 128, 128));
         }
 
-      painter.setBrush(QBrush((*iter)->Color));
-      painter.translate((*iter)->Pixel, 0);
+      painter.setBrush(QBrush(color));
+      painter.translate(*iter, 0);
       marker.drawMarker(painter);
       painter.restore();
       }
@@ -595,6 +455,74 @@ void pqColorMapWidget::moveTimeout()
   this->Internal->Mode = pqColorMapWidgetInternal::NoMode;
 }
 
+void pqColorMapWidget::updateColorGradient()
+{
+  this->generateGradient();
+  this->viewport()->update();
+}
+
+void pqColorMapWidget::handlePointsReset()
+{
+  this->Internal->Items.clear();
+  if(this->Model)
+    {
+    for(int i = 0; i < this->Model->getNumberOfPoints(); i++)
+      {
+      this->Internal->Items.append(0);
+      }
+    }
+
+  this->layoutColorMap();
+  this->viewport()->update();
+}
+
+void pqColorMapWidget::addPoint(int index)
+{
+  if(index < 0)
+    {
+    return;
+    }
+
+  if(index < this->Internal->Items.size())
+    {
+    this->Internal->Items.insert(index, 0);
+    }
+  else
+    {
+    this->Internal->Items.append(0);
+    }
+
+  this->layoutColorMap();
+  this->viewport()->update();
+}
+
+void pqColorMapWidget::startRemovingPoint(int index)
+{
+  if(index >= 0 && index < this->Internal->Items.size())
+    {
+    this->Internal->Items.removeAt(index);
+    }
+}
+
+void pqColorMapWidget::finishRemovingPoint(int)
+{
+  this->generateGradient();
+  this->viewport()->update();
+}
+
+void pqColorMapWidget::updatePointValue(int index, const pqChartValue &value)
+{
+  if(!this->Internal->PointMoved && this->Internal->PixelMap.isValid() &&
+      index >= 0 && index < this->Internal->Items.size())
+    {
+    // Update the pixel position of the point.
+    this->Internal->Items[index] = this->Internal->PixelMap.getPixelFor(value);
+
+    this->generateGradient();
+    this->viewport()->update();
+    }
+}
+
 bool pqColorMapWidget::isInScaleRegion(int px, int py)
 {
   return py >= this->Margin && py <= this->Margin + this->PointWidth &&
@@ -603,14 +531,15 @@ bool pqColorMapWidget::isInScaleRegion(int px, int py)
 
 void pqColorMapWidget::layoutPoints()
 {
-  if(this->Internal->PixelMap.isValid())
+  if(this->Model && this->Internal->PixelMap.isValid())
     {
     // Loop through the list of items and set the pixel position.
-    QList<pqColorMapWidgetItem *>::Iterator iter =
-        this->Internal->Items.begin();
-    for( ; iter != this->Internal->Items.end(); ++iter)
+    pqChartValue value;
+    QList<int>::Iterator iter = this->Internal->Items.begin();
+    for(int i = 0; iter != this->Internal->Items.end(); ++iter, ++i)
       {
-      (*iter)->Pixel = this->Internal->PixelMap.getPixelFor((*iter)->Value);
+      this->Model->getPointValue(i, value);
+      *iter = this->Internal->PixelMap.getPixelFor(value);
       }
     }
 }
@@ -623,7 +552,8 @@ void pqColorMapWidget::generateGradient()
     this->DisplayImage = 0;
     }
 
-  if(this->Internal->ImageArea.isValid() && this->Internal->Items.size() > 1)
+  if(this->Model && this->Internal->ImageArea.isValid() &&
+      this->Internal->Items.size() > 1)
     {
     if(this->TableSize > 0)
       {
@@ -635,10 +565,10 @@ void pqColorMapWidget::generateGradient()
       }
 
     // Draw the first color.
-    QList<pqColorMapWidgetItem *>::Iterator iter =
-        this->Internal->Items.begin();
-    pqColorMapWidgetItem *item = *iter;
-    QColor previous = item->Color;
+    int i = 0;
+    QColor next, previous;
+    QList<int>::Iterator iter = this->Internal->Items.begin();
+    this->Model->getPointColor(i, previous);
     int imageHeight = this->DisplayImage->height();
     QPainter painter(this->DisplayImage);
     painter.setPen(previous);
@@ -646,13 +576,14 @@ void pqColorMapWidget::generateGradient()
 
     // Loop through the points to draw the gradient(s).
     int px = 1;
+    int pixel = *iter;
     int imageWidth = this->DisplayImage->width();
     int pixelWidth = this->Internal->ImageArea.width() - 1;
-    for(++iter; iter != this->Internal->Items.end(); ++iter)
+    for(++i, ++iter; iter != this->Internal->Items.end(); ++i, ++iter)
       {
       // Draw the colors between the previous and next color.
-      QColor next = (*iter)->Color;
-      int w = (*iter)->Pixel - item->Pixel;
+      this->Model->getPointColor(i, next);
+      int w = *iter - pixel;
       w = (w * imageWidth) / pixelWidth;
 
       if(w > 0)
@@ -666,7 +597,7 @@ void pqColorMapWidget::generateGradient()
             {
             painter.setPen(next);
             }
-          else if(this->Space == pqColorMapWidget::RgbSpace)
+          else if(this->Model->getColorSpace() == pqColorMapModel::RgbSpace)
             {
             // vx = ((px - p1)*(v2 - v1))/(p2 - p1) + v1
             int r=0, g=0, b=0;
@@ -676,7 +607,8 @@ void pqColorMapWidget::generateGradient()
             b = ((px - x1)*(next.blue() - previous.blue()))/w + previous.blue();
             painter.setPen(QColor(r, g, b));
             }
-          else if(this->Space == pqColorMapWidget::HsvSpace)
+          else if(this->Model->getColorSpace() == pqColorMapModel::HsvSpace ||
+              this->Model->getColorSpace() == pqColorMapModel::WrappedHsvSpace)
             {
             // TODO: Add wrapping HSV
             // vx = ((px - p1)*(v2 - v1))/(p2 - p1) + v1
@@ -693,7 +625,7 @@ void pqColorMapWidget::generateGradient()
         }
 
       previous = next;
-      item = *iter;
+      pixel = *iter;
       }
 
     // Make sure the last pixel is drawn.
