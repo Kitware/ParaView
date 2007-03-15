@@ -934,7 +934,7 @@ void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* toolbar)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::setupLookmarkToolbar(pqLookmarkToolbar* toolbar)
+void pqMainWindowCore::setupLookmarkToolbar(pqLookmarkToolbar* vtkNotUsed(toolbar))
 {
 /*
   this->Implementation->LookmarkToolbar = toolbar;
