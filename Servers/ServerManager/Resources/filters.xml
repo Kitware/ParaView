@@ -4400,6 +4400,33 @@ This filter operates on any type of data set, provided it has point-centered vec
          default_values="2" >
         <IntRangeDomain name="range" min="2" max="10"/>
       </IntVectorProperty>
+
+      <DoubleVectorProperty 
+         name="TimestepValues"
+         information_only="1">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
+
+      <!-- End TemporalDataSetCache -->
+    </SourceProxy>
+
+    <SourceProxy name="TemporalInterpolator" class="vtkTemporalInterpolator">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty 
+         name="TimestepValues"
+         information_only="1">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
+
       <!-- End TemporalDataSetCache -->
     </SourceProxy>
 
