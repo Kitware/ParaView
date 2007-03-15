@@ -39,7 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqChartValue.h"
 #include "pqColorMapColorChanger.h"
+#include "pqColorMapModel.h"
 #include "pqColorMapWidget.h"
+#include "pqColorPresetModel.h"
+#include "pqColorPresetManager.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
 #include "pqGenericViewModule.h"
@@ -54,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColor>
 #include <QColorDialog>
 #include <QGridLayout>
+#include <QItemSelectionModel>
 #include <QList>
 #include <QMenu>
 #include <QSpacerItem>
@@ -86,6 +90,7 @@ public:
   pqSignalAdaptorComboBox *LabelFontAdaptor;
   vtkEventQtSlotConnect *Listener;
   pqColorMapWidget *Gradient;
+  pqColorPresetManager *Presets;
 };
 
 
@@ -99,6 +104,7 @@ pqColorScaleEditorForm::pqColorScaleEditorForm()
   this->LabelFontAdaptor = 0;
   this->Listener = 0;
   this->Gradient = 0;
+  this->Presets = 0;
 }
 
 
@@ -116,6 +122,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   // Set up the ui.
   this->Form->setupUi(this);
   this->Form->Listener = vtkEventQtSlotConnect::New();
+  this->Form->Presets = new pqColorPresetManager(this);
+  this->Form->Presets->restoreSettings();
 
 #if USE_VTK_TFE
   this->Form->ColorScale->SetRenderWindow(this->Viewer->GetRenderWindow());
@@ -138,14 +146,15 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->Gradient = new pqColorMapWidget();
   this->Form->ColorScale->hide();
   grid->addWidget(this->Form->Gradient, 0, 0, 1, 4);
+  pqColorMapModel *colorModel = new pqColorMapModel(this->Form->Gradient);
+  colorModel->setObjectName("ColorModel");
+  this->Form->Gradient->setModel(colorModel);
 
   new pqColorMapColorChanger(this->Form->Gradient);
-  this->connect(
-      this->Form->Gradient, SIGNAL(colorChanged(int, const QColor &)),
+  this->connect(colorModel, SIGNAL(colorChanged(int, const QColor &)),
       this, SLOT(setColors()));
-  this->connect(this->Form->Gradient, SIGNAL(pointAdded(int)),
-      this, SLOT(setColors()));
-  this->connect(this->Form->Gradient, SIGNAL(pointRemoved(int)),
+  this->connect(colorModel, SIGNAL(pointAdded(int)), this, SLOT(setColors()));
+  this->connect(colorModel, SIGNAL(pointRemoved(int)),
       this, SLOT(setColors()));
   this->connect(this->Form->Gradient, SIGNAL(pointMoved(int)),
       this, SLOT(setColors()));
@@ -166,17 +175,16 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->enableLegendControls(this->Form->ShowColorLegend->isChecked());
 
   // Add the color scale presets menu.
-  QMenu *menu = new QMenu(this->Form->PresetButton);
-  menu->addAction("Blue to Red", this, SLOT(applyBlueToRedPreset()));
-  menu->addAction("Red to Blue", this, SLOT(applyRedToBluePreset()));
-  menu->addAction("Grayscale", this, SLOT(applyGrayscalePreset()));
-  //menu->addAction("CIELab Blue to Red",
-  //    this, SLOT(applyCIELabBlueToRedPreset()));
-  this->Form->PresetButton->setMenu(menu);
+  this->initColorPresets();
 
   // Connect the color scale widgets.
   this->connect(this->Form->ColorSpace, SIGNAL(activated(int)),
       this, SLOT(setColorSpace(int)));
+
+  this->connect(this->Form->SaveButton, SIGNAL(clicked()),
+      this, SLOT(savePreset()));
+  this->connect(this->Form->PresetButton, SIGNAL(clicked()),
+      this, SLOT(loadPreset()));
 
   this->connect(this->Form->UseDiscreteColors, SIGNAL(toggled(bool)),
       this, SLOT(setUseDiscreteColors(bool)));
@@ -231,6 +239,9 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
 
 pqColorScaleEditor::~pqColorScaleEditor()
 {
+  // Save the color map presets.
+  this->Form->Presets->saveSettings();
+
   delete this->Form->LabelColorAdaptor;
   delete this->Form->TitleColorAdaptor;
   delete this->Form->LabelFontAdaptor;
@@ -283,7 +294,7 @@ void pqColorScaleEditor::setDisplay(pqPipelineDisplay *display)
 #if USE_VTK_TFE
   this->Viewer->GetColorFunction()->RemoveAllPoints();
 #else
-  this->Form->Gradient->clearPoints();
+  this->Form->Gradient->getModel()->removeAllPoints();
 #endif
 
   // Disable the gui elements if the color map is null.
@@ -343,12 +354,13 @@ void pqColorScaleEditor::setColors()
         }
       }
 #else
-    for(int i = 0; i < this->Form->Gradient->getPointCount(); ++i)
+    pqColorMapModel *model = this->Form->Gradient->getModel();
+    for(int i = 0; i < model->getNumberOfPoints(); ++i)
       {
       QColor color;
       pqChartValue scalar;
-      this->Form->Gradient->getPointValue(i, scalar);
-      this->Form->Gradient->getPointColor(i, color);
+      model->getPointValue(i, scalar);
+      model->getPointColor(i, color);
       rgbPoints << scalar.getDoubleValue() <<
           color.redF() << color.greenF() << color.blueF();
       }
@@ -384,8 +396,9 @@ void pqColorScaleEditor::setColors()
 #else
     QColor color1;
     QColor color2;
-    this->Form->Gradient->getPointColor(0, color1);
-    this->Form->Gradient->getPointColor(1, color2);
+    pqColorMapModel *model = this->Form->Gradient->getModel();
+    model->getPointColor(0, color1);
+    model->getPointColor(1, color2);
     list.append(QVariant(color1.hueF()));
     list.append(QVariant(color2.hueF()));
     pqSMAdaptor::setMultipleElementProperty(
@@ -403,86 +416,6 @@ void pqColorScaleEditor::setColors()
 
   lookupTable->UpdateVTKObjects();
   this->Display->renderAllViews();
-}
-
-void pqColorScaleEditor::applyBlueToRedPreset()
-{
-#if USE_VTK_TFE
-  vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
-  colors->RemoveAllPoints();
-  colors->AddRGBPoint(0.0, 0.0, 0.0, 1.0);
-  colors->AddRGBPoint(1.0, 1.0, 0.0, 0.0);
-  this->Viewer->Render();
-#else
-  this->Form->Gradient->blockSignals(true);
-  this->Form->Gradient->clearPoints();
-  this->Form->Gradient->addPoint(
-      pqChartValue((double)0.0), QColor(0, 0, 255));
-  this->Form->Gradient->addPoint(
-      pqChartValue((double)1.0), QColor(255, 0, 0));
-  this->Form->Gradient->blockSignals(false);
-#endif
-  this->setColors();
-}
-
-void pqColorScaleEditor::applyRedToBluePreset()
-{
-#if USE_VTK_TFE
-  vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
-  colors->RemoveAllPoints();
-  colors->AddRGBPoint(0.0, 1.0, 0.0, 0.0);
-  colors->AddRGBPoint(1.0, 0.0, 0.0, 1.0);
-  this->Viewer->Render();
-#else
-  this->Form->Gradient->blockSignals(true);
-  this->Form->Gradient->clearPoints();
-  this->Form->Gradient->addPoint(
-      pqChartValue((double)0.0), QColor(255, 0, 0));
-  this->Form->Gradient->addPoint(
-      pqChartValue((double)1.0), QColor(0, 0, 255));
-  this->Form->Gradient->blockSignals(false);
-#endif
-  this->setColors();
-}
-
-void pqColorScaleEditor::applyGrayscalePreset()
-{
-#if USE_VTK_TFE
-  vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
-  colors->RemoveAllPoints();
-  colors->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
-  colors->AddRGBPoint(1.0, 1.0, 1.0, 1.0);
-  this->Viewer->Render();
-#else
-  this->Form->Gradient->blockSignals(true);
-  this->Form->Gradient->clearPoints();
-  this->Form->Gradient->addPoint(
-      pqChartValue((double)0.0), QColor(0, 0, 0));
-  this->Form->Gradient->addPoint(
-      pqChartValue((double)1.0), QColor(255, 255, 255));
-  this->Form->Gradient->blockSignals(false);
-#endif
-  this->setColors();
-}
-
-void pqColorScaleEditor::applyCIELabBlueToRedPreset()
-{
-#if USE_VTK_TFE
-  vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
-  colors->RemoveAllPoints();
-  colors->AddRGBPoint(0.0, 0.0, 0.6, 0.75);
-  colors->AddRGBPoint(1.0, 0.77, 0.47, 0.34);
-  this->Viewer->Render();
-#else
-  this->Form->Gradient->blockSignals(true);
-  this->Form->Gradient->clearPoints();
-  this->Form->Gradient->addPoint(
-      pqChartValue((double)0.0), QColor(0, 153, 191));
-  this->Form->Gradient->addPoint(
-      pqChartValue((double)1.0), QColor(196, 119, 87));
-  this->Form->Gradient->blockSignals(false);
-#endif
-  this->setColors();
 }
 
 void pqColorScaleEditor::changeCurrentColor()
@@ -512,14 +445,8 @@ void pqColorScaleEditor::setColorSpace(int index)
   this->Viewer->SetColorSpace(index);
   this->Viewer->Render();
 #else
-  if(index == 0)
-    {
-    this->Form->Gradient->setColorSpace(pqColorMapWidget::RgbSpace);
-    }
-  else
-    {
-    this->Form->Gradient->setColorSpace(pqColorMapWidget::HsvSpace);
-    }
+  pqColorMapModel *model = this->Form->Gradient->getModel();
+  model->setColorSpaceFromInt(index);
 #endif
 
   if(this->ColorMap)
@@ -538,6 +465,110 @@ void pqColorScaleEditor::setColorSpace(int index)
         lookupTable->GetProperty("HSVWrap"), wrap);
     lookupTable->UpdateVTKObjects();
     this->Display->renderAllViews();
+    }
+}
+
+void pqColorScaleEditor::savePreset()
+{
+  // Save the current color scale settings as a preset.
+  pqColorPresetModel *model = this->Form->Presets->getModel();
+  model->addColorMap(*this->Form->Gradient->getModel(), "New Color Preset");
+  QItemSelectionModel *selection = this->Form->Presets->getSelectionModel();
+  selection->setCurrentIndex(model->index(model->rowCount() - 1, 0),
+      QItemSelectionModel::ClearAndSelect);
+
+  // Set up the dialog and open it.
+  this->Form->Presets->setUsingCloseButton(true);
+  this->Form->Presets->exec();
+}
+
+void pqColorScaleEditor::loadPreset()
+{
+  this->Form->Presets->setUsingCloseButton(false);
+  if(this->Form->Presets->exec() == QDialog::Accepted)
+    {
+    // Get the color map from the selection.
+    QItemSelectionModel *selection = this->Form->Presets->getSelectionModel();
+    QModelIndex index = selection->currentIndex();
+    const pqColorMapModel *colorMap =
+        this->Form->Presets->getModel()->getColorMap(index.row());
+    if(colorMap)
+      {
+#if USE_VTK_TFE
+      vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
+#else
+      pqColorMapModel *model = this->Form->Gradient->getModel();
+#endif
+      if(this->Form->UseDiscreteColors->isEnabled())
+        {
+        int colorSpace = colorMap->getColorSpaceAsInt();
+#if USE_VTK_TFE
+        QColor color;
+        pqChartValue value;
+        colors->RemoveAllPoints();
+        for(int i = 0; i < colorMap->getNumberOfPoints(); i++)
+          {
+          colorMap->getPointColor(i, color);
+          colorMap->getPointValue(i, value);
+          colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
+              color.greenF(), color.blueF());
+          }
+
+        // Update the color space.
+        this->Viewer->SetColorSpace(colorSpace);
+        this->Viewer->Render();
+#else
+        model->startModifyingData();
+        *model = *colorMap;
+        model->finishModifyingData();
+        if(colorSpace == 2)
+          {
+          colorSpace = 1; // TEMP
+          }
+#endif
+
+        // Update the color space chooser.
+        this->Form->ColorSpace->setCurrentIndex(colorSpace);
+        if(this->ColorMap)
+          {
+          // Set the property on the lookup table.
+          int wrap = colorSpace == 2 ? 1 : 0;
+          if(wrap == 1)
+            {
+            colorSpace = 1;
+            }
+
+          vtkSMProxy *lookupTable = this->ColorMap->getProxy();
+          pqSMAdaptor::setElementProperty(
+              lookupTable->GetProperty("ColorSpace"), colorSpace);
+          pqSMAdaptor::setElementProperty(
+              lookupTable->GetProperty("HSVWrap"), wrap);
+          }
+        }
+      else
+        {
+        QColor color1, color2;
+        colorMap->getPointColor(0, color1);
+        colorMap->getPointColor(colorMap->getNumberOfPoints() - 1, color2);
+#if USE_VTK_TFE
+        colors->RemoveAllPoints();
+        colors->AddRGBPoint(0.0, color1.redF(), color1.greenF(),
+            color1.blueF());
+        colors->AddRGBPoint(1.0, color2.redF(), color2.greenF(),
+            color2.blueF());
+        this->Viewer->Render();
+#else
+        model->startModifyingData();
+        model->removeAllPoints();
+        model->addPoint(pqChartValue((double)0.0), color1);
+        model->addPoint(pqChartValue((double)1.0), color2);
+        model->finishModifyingData();
+#endif
+        }
+
+      // Update the actual color map.
+      this->setColors();
+      }
     }
 }
 
@@ -748,6 +779,30 @@ void pqColorScaleEditor::cleanupLegend()
   this->setLegend(0);
 }
 
+void pqColorScaleEditor::initColorPresets()
+{
+  pqColorMapModel colorMap;
+  pqColorPresetModel *model = this->Form->Presets->getModel();
+  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 0, 255));
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 0, 0));
+  model->addBuiltinColorMap(colorMap, "Blue to Red");
+
+  colorMap.removeAllPoints();
+  colorMap.addPoint(pqChartValue((double)0.0), QColor(255, 0, 0));
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(0, 0, 255));
+  model->addBuiltinColorMap(colorMap, "Red to Blue");
+
+  colorMap.removeAllPoints();
+  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 0, 0));
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255));
+  model->addBuiltinColorMap(colorMap, "Grayscale");
+
+  colorMap.removeAllPoints();
+  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 153, 191));
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(196, 119, 87));
+  model->addBuiltinColorMap(colorMap, "CIELab Blue to Red");
+}
+
 void pqColorScaleEditor::initColorScale()
 {
   // Set up the component combo box.
@@ -815,6 +870,8 @@ void pqColorScaleEditor::initColorScale()
   vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
 #else
   QColor color;
+  pqColorMapModel *model = this->Form->Gradient->getModel();
+  model->startModifyingData();
 #endif
   if(lookupTable->GetXMLName() == QString("PVLookupTable"))
     {
@@ -843,20 +900,7 @@ void pqColorScaleEditor::initColorScale()
 
     this->Viewer->SetColorSpace(this->Form->ColorSpace->currentIndex());
 #else
-    switch(this->Form->ColorSpace->currentIndex())
-      {
-      case 0:
-        {
-        this->Form->Gradient->setColorSpace(pqColorMapWidget::RgbSpace);
-        break;
-        }
-      case 1:
-      default:
-        {
-        this->Form->Gradient->setColorSpace(pqColorMapWidget::HsvSpace);
-        break;
-        }
-      }
+    model->setColorSpaceFromInt(this->Form->ColorSpace->currentIndex());
 #endif
 
     list = pqSMAdaptor::getMultipleElementProperty(
@@ -870,11 +914,11 @@ void pqColorScaleEditor::initColorScale()
       color = QColor::fromRgbF(list[i + 1].toDouble(),
           list[i + 2].toDouble(), list[i + 3].toDouble());
       pqChartValue scalar = list[i].toDouble();
-      this->Form->Gradient->addPoint(scalar, color);
+      model->addPoint(scalar, color);
 #endif
       }
     }
-  else
+  else // Old lookup table.
     {
     this->Form->UseDiscreteColors->setEnabled(false);
     this->Form->UseDiscreteColors->blockSignals(true);
@@ -887,7 +931,7 @@ void pqColorScaleEditor::initColorScale()
 #if USE_VTK_TFE
     this->Viewer->SetColorSpace(1);
 #else
-    this->Form->Gradient->setColorSpace(pqColorMapWidget::HsvSpace);
+    model->setColorSpace(pqColorMapModel::HsvSpace);
 #endif
 
     list = pqSMAdaptor::getMultipleElementProperty(
@@ -907,15 +951,17 @@ void pqColorScaleEditor::initColorScale()
     colors->AddHSVPoint(1.0, h2, s2, v2);
 #else
     color = QColor::fromHsvF(h1, s1, v1);
-    this->Form->Gradient->addPoint(pqChartValue((double)0.0), color);
+    model->addPoint(pqChartValue((double)0.0), color);
     color = QColor::fromHsvF(h2, s2, v2);
-    this->Form->Gradient->addPoint(pqChartValue((double)1.0), color);
+    model->addPoint(pqChartValue((double)1.0), color);
 #endif
     }
 
   this->enableResolutionControls(this->Form->UseDiscreteColors->isChecked());
 #if USE_VTK_TFE
   //this->Viewer->SetTableSize(tableSize); // TODO?
+  this->Viewer->SetAllowInteriorElements(
+      this->Form->UseDiscreteColors->isEnabled() ? 1 : 0);
   this->Viewer->Render();
 #else
   if(!this->Form->UseDiscreteColors->isChecked())
@@ -924,6 +970,7 @@ void pqColorScaleEditor::initColorScale()
     }
 
   this->Form->Gradient->setTableSize(tableSize);
+  model->finishModifyingData();
   this->Form->Gradient->setAddingPointsAllowed(
       this->Form->UseDiscreteColors->isEnabled());
 #endif

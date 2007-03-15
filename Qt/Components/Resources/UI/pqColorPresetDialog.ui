@@ -1,0 +1,98 @@
+<ui version="4.0" >
+ <class>pqColorPresetDialog</class>
+ <widget class="QDialog" name="pqColorPresetDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>394</width>
+    <height>229</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Preset Color Scales</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="3" column="1" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item rowspan="6" row="0" column="0" >
+    <widget class="QTreeView" name="Gradients" >
+     <property name="editTriggers" >
+      <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers|QAbstractItemView::SelectedClicked</set>
+     </property>
+     <property name="selectionBehavior" >
+      <enum>QAbstractItemView::SelectItems</enum>
+     </property>
+     <property name="rootIsDecorated" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1" >
+    <widget class="QPushButton" name="CancelButton" >
+     <property name="text" >
+      <string>&amp;Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" >
+    <widget class="QPushButton" name="OkButton" >
+     <property name="text" >
+      <string>&amp;OK</string>
+     </property>
+     <property name="default" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QPushButton" name="RemoveButton" >
+     <property name="text" >
+      <string>&amp;Remove</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QPushButton" name="ExportButton" >
+     <property name="text" >
+      <string>&amp;Export</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" >
+    <widget class="QPushButton" name="ImportButton" >
+     <property name="text" >
+      <string>&amp;Import</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>Gradients</tabstop>
+  <tabstop>OkButton</tabstop>
+  <tabstop>CancelButton</tabstop>
+  <tabstop>ImportButton</tabstop>
+  <tabstop>ExportButton</tabstop>
+  <tabstop>RemoveButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

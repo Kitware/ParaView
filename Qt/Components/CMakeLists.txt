@@ -49,6 +49,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqBarChartDisplayProxyEditor.h
   pqCalculatorPanel.h
   pqClipPanel.h
+  pqColorPresetManager.h
+  pqColorPresetModel.h
   pqColorScaleEditor.h
   pqComboBoxDomain.h
   pqContourPanel.h
@@ -154,6 +156,7 @@ SET(UI_FORMS
   Resources/UI/pqAnimationSettings.ui
   Resources/UI/pqBarChartDisplayEditor.ui
   Resources/UI/pqCalculatorPanel.ui
+  Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorScaleDialog.ui
   Resources/UI/pqContourControls.ui
   Resources/UI/pqCreateServerStartupDialog.ui
@@ -266,6 +269,10 @@ ADD_LIBRARY(pqComponents
   pqCalculatorPanel.h
   pqClipPanel.cxx
   pqClipPanel.h
+  pqColorPresetManager.cxx
+  pqColorPresetManager.h
+  pqColorPresetModel.cxx
+  pqColorPresetModel.h
   pqColorScaleEditor.cxx
   pqColorScaleEditor.h
   pqComboBoxDomain.cxx

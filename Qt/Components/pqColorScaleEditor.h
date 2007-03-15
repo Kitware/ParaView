@@ -69,13 +69,12 @@ private slots:
   /// \name Color Scale Methods
   //@{
   void setColors();
-  void applyBlueToRedPreset();
-  void applyRedToBluePreset();
-  void applyGrayscalePreset();
-  void applyCIELabBlueToRedPreset();
 
   void changeCurrentColor();
   void setColorSpace(int index);
+
+  void savePreset();
+  void loadPreset();
 
   void setUseDiscreteColors(bool on);
   void handleSizeTextEdit(const QString &text);
@@ -109,6 +108,7 @@ private slots:
   //@}
 
 private:
+  void initColorPresets();
   void initColorScale();
   void enableResolutionControls(bool enable);
   void enableRangeControls(bool enable);

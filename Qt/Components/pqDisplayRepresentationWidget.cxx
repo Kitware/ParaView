@@ -111,12 +111,13 @@ void pqDisplayRepresentationWidget::updateLinks()
   QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(repProperty);
   foreach(QVariant item, items)
     {
-    // Disable volume rendering support for now
-    if (item == "Volume" && 1
-        /*!this->Internal->Display->getDisplayProxy()->GetHasVolumePipeline()*/)
+    if(item == "Volume" &&
+        this->Internal->Display->getDisplayProxy()->GetVolumePipelineType() ==
+        vtkSMDataObjectDisplayProxy::NONE) 
       {
       continue; // add volume only if volume representation is supported.
       }
+
     this->Internal->comboBox->addItem(item.toString());
     }
 
