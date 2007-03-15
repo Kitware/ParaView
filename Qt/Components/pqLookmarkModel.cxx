@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqLookmarkModel::pqLookmarkModel(QString name, vtkPVXMLElement *state, QObject* _parent /*=null*/)
-  : Name(name), QObject(_parent)
+  : QObject(_parent), Name(name)
 {
   this->RestoreCamera = false;
   this->RestoreData = false;
