@@ -28,7 +28,7 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.7");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.8");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -254,7 +254,22 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
             node->GetProperties()->Set(vtkSelection::EPSILON(), val);
             }
           }
-
+        else if (strcmp("PRESERVE_TOPOLOGY", key) == 0)
+          {
+          int val;
+          if (elem->GetScalarAttribute("value", &val))
+            {
+            node->GetProperties()->Set(vtkSelection::PRESERVE_TOPOLOGY(), val);
+            }
+          }
+        else if (strcmp("CONTAINING_CELLS", key) == 0)
+          {
+          int val;
+          if (elem->GetScalarAttribute("value", &val))
+            {
+            node->GetProperties()->Set(vtkSelection::CONTAINING_CELLS(), val);
+            }
+          }
         }
       }
     else if (strcmp("SelectionList", name) == 0)
