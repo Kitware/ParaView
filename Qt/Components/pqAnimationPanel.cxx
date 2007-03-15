@@ -876,10 +876,14 @@ void pqAnimationPanel::showKeyFrame(int index)
     {
     this->Internal->interpolationType->blockSignals(true);
     this->Internal->interpolationType->clear();
-    this->Internal->interpolationType->addItem("Ramp", "Ramp");
-    this->Internal->interpolationType->addItem("Exponential", "Exponential");
-    this->Internal->interpolationType->addItem("Sinusoid", "Sinusoid");
-    this->Internal->interpolationType->addItem("Boolean", "Boolean");
+    this->Internal->interpolationType->addItem(
+        QIcon(":pqWidgets/Icons/pqRamp16.png"), "Ramp", "Ramp");
+    this->Internal->interpolationType->addItem(
+        QIcon(":pqWidgets/Icons/pqExponential16.png"), "Exponential", "Exponential");
+    this->Internal->interpolationType->addItem(
+        QIcon(":pqWidgets/Icons/pqSinusoidal16.png"), "Sinusoid", "Sinusoid");
+    this->Internal->interpolationType->addItem(
+        QIcon(":pqWidgets/Icons/pqStep16.png"), "Boolean", "Boolean");
     this->Internal->interpolationType->setCurrentIndex(-1);
     this->Internal->interpolationType->blockSignals(false);
     }
