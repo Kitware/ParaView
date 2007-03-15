@@ -74,7 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkType.h"
 
 // Temporary switch
-#define USE_VTK_TFE 0
+#define USE_VTK_TFE 1
 
 
 class pqColorScaleEditorForm : public Ui::pqColorScaleDialog
@@ -129,9 +129,13 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->ColorScale->SetRenderWindow(this->Viewer->GetRenderWindow());
   this->Viewer->SetTransferFunctionEditorType(vtkTransferFunctionViewer::SIMPLE_1D);
   this->Viewer->SetModificationTypeToColor();
-  //this->Viewer->SetBackgroundColor(1.0, 1.0, 1.0);
   this->Viewer->SetWholeScalarRange(0.0, 1.0);
   this->Viewer->SetVisibleScalarRange(0.0, 1.0);
+  this->Viewer->SetLockEndPoints(1);
+  this->Viewer->SetShowColorFunctionInBackground(1);
+  this->Viewer->SetShowColorFunctionOnLines(0);
+  this->Viewer->SetBackgroundColor(1.0, 1.0, 1.0);
+  this->Viewer->SetLinesColor(0.0, 0.0, 0.0);
 
   this->Form->Listener->Connect(this->Viewer, vtkCommand::PickEvent,
       this, SLOT(changeCurrentColor()));
@@ -798,6 +802,7 @@ void pqColorScaleEditor::initColorPresets()
   model->addBuiltinColorMap(colorMap, "Grayscale");
 
   colorMap.removeAllPoints();
+  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
   colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 153, 191));
   colorMap.addPoint(pqChartValue((double)1.0), QColor(196, 119, 87));
   model->addBuiltinColorMap(colorMap, "CIELab Blue to Red");
