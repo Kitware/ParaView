@@ -55,7 +55,9 @@ public:
     DataServerPort(-1),
     RenderServerPort(-1)
   {
-    QUrl temp(rhs);
+    QStringList strings = rhs.split(";");
+
+    QUrl temp(strings[0]);
     this->Scheme = temp.scheme();
     
     if(this->Scheme == "cdsrs" || this->Scheme == "cdsrsrc")
@@ -105,7 +107,13 @@ public:
     {
     this->Path = QDir::convertSeparators(this->Path);
     }
-  
+
+  strings.removeFirst();
+  foreach(QString str, strings)
+    {
+    QStringList data = str.split(":");
+    this->ExtraData[data[0]] = data[1];
+    }
   }
 
   const bool operator==(const pqImplementation& rhs)
@@ -157,6 +165,7 @@ public:
   int RenderServerPort;
   QString Path;
   QString SessionServer;
+  QMap<QString, QString> ExtraData;
 };
 
 pqServerResource::pqServerResource() :
@@ -189,7 +198,7 @@ pqServerResource::~pqServerResource()
   delete this->Implementation;
 }
 
-const QString pqServerResource::toString() const
+const QString pqServerResource::toURI() const
 {
   QString result;
   
@@ -459,7 +468,7 @@ void pqServerResource::setSessionServer(const pqServerResource& rhs)
     return;
     }
     
-  this->Implementation->SessionServer = rhs.toString();
+  this->Implementation->SessionServer = rhs.toURI();
 }
 
 const pqServerResource pqServerResource::schemeHostsPorts() const
@@ -515,3 +524,27 @@ bool pqServerResource::operator<(const pqServerResource& rhs) const
 {
   return *this->Implementation < *rhs.Implementation;
 }
+  
+void pqServerResource::addData(const QString& key, const QString& value)
+{
+  this->Implementation->ExtraData[key] = value;
+}
+
+const QString pqServerResource::data(const QString& key) const
+{
+  return this->Implementation->ExtraData[key];
+}
+
+const QString pqServerResource::serializeString() const
+{
+  QString uri = this->toURI();
+  QMap<QString, QString>::iterator iter;
+  for(iter = this->Implementation->ExtraData.begin();
+      iter != this->Implementation->ExtraData.end();
+      ++iter)
+    {
+    uri += QString(";%1:%2").arg(iter.key()).arg(iter.value());
+    }
+  return uri;
+}
+

@@ -78,7 +78,7 @@ pqEditServerStartupDialog::pqEditServerStartupDialog(
   
   this->Implementation->UI.message->setText(
     QString(tr("Configure %1 (%2)")).arg(name).arg(
-      server.schemeHosts().toString()));
+      server.schemeHosts().toURI()));
   this->Implementation->UI.secondaryMessage->setText(
     tr("Please configure the startup procedure to be used when connecting to this server:"));
   this->Implementation->UI.type->setEnabled(true);
@@ -91,7 +91,7 @@ pqEditServerStartupDialog::pqEditServerStartupDialog(
         {
         this->Implementation->UI.message->setText(
           QString(tr("%1 (%2) configuration")).arg(name).arg(
-            server.schemeHosts().toString()));
+            server.schemeHosts().toURI()));
         this->Implementation->UI.secondaryMessage->setText(
           tr("This server was configured by site administrators and cannot be modified."));
           

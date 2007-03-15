@@ -1189,6 +1189,7 @@ void pqMainWindowCore::onFileOpen(const QStringList& files)
       {
       pqServerResource resource = server->getResource();
       resource.setPath(files[i]);
+      resource.addData("reader", reader->getProxy()->GetXMLName());
       core->serverResources().add(resource);
       core->serverResources().save(*core->settings());
       }

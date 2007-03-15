@@ -248,7 +248,7 @@ void pqSimpleServerStartup::startServer(
   else
     {
     pqServerBrowser dialog(server_startups, settings);
-    dialog.setMessage(QString(tr("Pick the configuration for starting %1")).arg(server.schemeHosts().toString()));
+    dialog.setMessage(QString(tr("Pick the configuration for starting %1")).arg(server.schemeHosts().toURI()));
     
     if(QDialog::Accepted == dialog.exec())
       {
@@ -311,7 +311,7 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
 
   // Dynamically-generate a dialog based on user options ...
   QDialog dialog;
-  dialog.setWindowTitle("Start " + this->Implementation->Server.toString());
+  dialog.setWindowTitle("Start " + this->Implementation->Server.toURI());
   
   QGridLayout* const layout = new QGridLayout();
   dialog.setLayout(layout);

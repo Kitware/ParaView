@@ -142,10 +142,10 @@ void pqRecentFilesMenu::onResourcesChanged()
     {
     const pqServerResource& server = servers[i];
     
-    const QString label = server.schemeHosts().toString();
+    const QString label = server.schemeHosts().toURI();
     
     QAction* const action = new QAction(label, &this->Implementation->Menu);
-    action->setData(server.toString());
+    action->setData(server.serializeString());
     
     action->setIcon(QIcon(":/pqWidgets/Icons/pqConnect16.png"));
     
@@ -169,7 +169,7 @@ void pqRecentFilesMenu::onResourcesChanged()
         }
         
       QAction* const act = new QAction(resource.path(), &this->Implementation->Menu);
-      act->setData(resource.toString());
+      act->setData(resource.serializeString());
       act->setIcon(QIcon(":/pqWidgets/Icons/pqAppIcon16.png"));
       
       this->Implementation->Menu.addAction(act);
@@ -189,7 +189,7 @@ void pqRecentFilesMenu::onResourcesChanged()
         }
         
       QAction* const act = new QAction(resource.path(), &this->Implementation->Menu);
-      act->setData(resource.toString());
+      act->setData(resource.serializeString());
 
       this->Implementation->Menu.addAction(act);
       }

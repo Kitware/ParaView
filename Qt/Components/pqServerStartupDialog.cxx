@@ -67,7 +67,7 @@ pqServerStartupDialog::pqServerStartupDialog(
   full_server.setRenderServerPort(server.renderServerPort(22221));
   
   this->Implementation->UI.message->setText(
-    QString("Please wait while server %1 starts ...").arg(full_server.toString()));
+    QString("Please wait while server %1 starts ...").arg(full_server.toURI()));
     
   this->setModal(true);
 }

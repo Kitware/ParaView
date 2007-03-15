@@ -89,7 +89,7 @@ public:
     xml_server.setAttributeNode(xml_server_name);
 
     QDomAttr xml_server_resource = xml.createAttribute("resource");
-    xml_server_resource.setValue(startup.getServer().toString());
+    xml_server_resource.setValue(startup.getServer().toURI());
     xml_server.setAttributeNode(xml_server_resource);
 
     QDomAttr xml_server_owner = xml.createAttribute("owner");

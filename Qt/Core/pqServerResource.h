@@ -99,7 +99,11 @@ public:
   ~pqServerResource();
 
   /// Returns a compact string representation of the resource in URI format
-  const QString toString() const;
+  const QString toURI() const;
+ 
+  /// Returns a compact string representation of the resource including extra
+  /// data
+  const QString serializeString() const;
   
   /** Returns the resource scheme -
   builtin, cs, csrc, cdsrs, cdsrsrc, or session */
@@ -136,6 +140,11 @@ public:
 
   const pqServerResource sessionServer() const;
   void setSessionServer(const pqServerResource&);
+
+  // add extra data to this resource
+  void addData(const QString& key, const QString& value);
+  // get extra data from this resource
+  const QString data(const QString& key) const;
   
   /** Returns a copy of this resource containing only server information -
   scheme, host, and port numbers */

@@ -286,7 +286,7 @@ QString pqPipelineModelServer::getName() const
 {
   if(this->Server)
     {
-    return this->Server->getResource().toString();
+    return this->Server->getResource().toURI();
     }
 
   return QString();

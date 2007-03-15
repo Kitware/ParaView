@@ -130,7 +130,7 @@ void pqServerResources::save(pqSettings& settings)
       resource != this->Implementation->Resources.end();
       ++resource)
     {
-    resources.push_back(resource->toString());
+    resources.push_back(resource->serializeString());
     }
   settings.setValue("ServerResources", resources);
 }
@@ -168,7 +168,9 @@ void pqServerResources::open(pqServer* server, const pqServerResource& resource)
     {
     if(!resource.path().isEmpty())
       {
-      if(!pqApplicationCore::instance()->createReaderOnServer(resource.path(), server))
+      QString reader = resource.data("reader");
+      if(!pqApplicationCore::instance()->createReaderOnServer(resource.path(), 
+                                                              server, reader))
         {
         qCritical() << "Error opening file " << resource.path() << "\n";
         return;

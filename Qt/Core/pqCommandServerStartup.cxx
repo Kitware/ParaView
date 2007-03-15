@@ -163,7 +163,7 @@ void pqCommandServerStartup::execute(const OptionsT& user_options,
   // Generate predefined variables ...
   OptionsT options;
   options["PV_CONNECTION_URI"] =
-    this->Server.toString();
+    this->Server.toURI();
   options["PV_CONNECTION_SCHEME"] =
     this->Server.scheme();
   options["PV_CLIENT_HOST"] =
