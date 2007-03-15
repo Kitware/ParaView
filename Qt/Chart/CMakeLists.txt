@@ -39,6 +39,8 @@ SET(QtChart_SRCS
   pqChartZoomPanAlt.h
   pqColorMapColorChanger.cxx
   pqColorMapColorChanger.h
+  pqColorMapModel.cxx
+  pqColorMapModel.h
   pqColorMapWidget.cxx
   pqColorMapWidget.h
   pqHistogramChart.cxx
@@ -95,6 +97,7 @@ QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqChartZoomPan.h
   pqChartZoomPanAlt.h
   pqColorMapColorChanger.h
+  pqColorMapModel.h
   pqColorMapWidget.h
   pqHistogramChart.h
   pqHistogramListModel.h
