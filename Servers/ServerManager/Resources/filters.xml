@@ -3234,7 +3234,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
           </Documentation>
      </DoubleVectorProperty>
      <Hints>
-       <Visibility replace_input="0" />
+       <Visibility replace_input="2" />
      </Hints>
    <!-- End Cut -->
    </SourceProxy>
@@ -3333,6 +3333,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
             Choose the scalar value with which to clip.
           </Documentation>
      </DoubleVectorProperty>
+     <Hints>
+       <Visibility replace_input="2" />
+     </Hints>
    <!-- End Clip -->
    </SourceProxy>
 
@@ -3412,6 +3415,9 @@ The Threshold filter extracts the portions of the input data set whose scalars l
          If All Scalars is checked, then a cell is only included in the output if all its points are within the threshold. This is only relevant when thresholding by a point-centered array.
        </Documentation>
      </IntVectorProperty>
+     <Hints>
+       <Visibility replace_input="2" />
+     </Hints>
    <!-- End Threshold -->
    </SourceProxy>
 
@@ -4325,7 +4331,7 @@ This filter operates on any type of data set, provided it has point-centered vec
        </Documentation>
      </DoubleVectorProperty>
      <Hints>
-       <Visibility replace_input="0" />
+       <Visibility replace_input="2" />
      </Hints>
    <!-- End StreamTracer -->
    </SourceProxy>
