@@ -2343,6 +2343,11 @@
 
     <!-- End of FileInformationHelper -->
     </Proxy>
+    
+    <Proxy name="EnvironmentInformationHelper" class="vtkPVEnvironmentInformationHelper">
+      <StringVectorProperty name="Variable" command="SetVariable" />
+    <!-- End of FileInformationHelper -->
+    </Proxy>
 
     <Proxy name="TimeKeeper" class="">
       <DoubleVectorProperty
