@@ -50,13 +50,17 @@ public:
   ~pqPluginManager();
 
   /// attempt to load a plugin
-  /// return true on success
+  /// return true on success, if there was a failure, the error is reported
   bool loadPlugin(pqServer* server, const QString& lib);
+  
+  /// attempt to load all available plugins on a server, 
+  /// or client plugins if NULL
+  void loadPlugins(pqServer*);
 
   /// return all GUI interfaces that have been loaded
   QObjectList interfaces();
 
-  /// return all the plugins loaded on a server
+  /// return all the plugins loaded on a server, or locally if NULL is passed in
   QStringList loadedPlugins(pqServer*);
 
   /// add an extra interface.
@@ -75,6 +79,11 @@ signals:
 
   /// notification that new extensions were added to the server manager
   void serverManagerExtensionLoaded();
+
+protected:
+
+  bool loadClientPlugin(const QString& lib, QString& error);
+  bool loadServerPlugin(pqServer* server, const QString& lib, QString& error);
 
 private:
 

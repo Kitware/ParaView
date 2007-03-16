@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QLibrary>
 #include <QPluginLoader>
+#include <QDir>
 #include <QMessageBox>
 
 #include "vtkSMXMLParser.h"
@@ -41,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
+#include "vtksys/SystemTools.hxx"
 
 #include "pqPlugin.h"
 #include "pqServer.h"
@@ -60,72 +62,116 @@ QObjectList pqPluginManager::interfaces()
   return this->Interfaces + this->ExtraInterfaces;
 }
 
-bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
+bool pqPluginManager::loadServerPlugin(pqServer* server, const QString& lib,
+                                       QString& error)
 {
   bool success = false;
 
-  // look for SM stuff in the plugin
-  if(server)
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMProxy* pxy = pxm->NewProxy("misc", "PluginLoader");
+  if(pxy && !lib.isEmpty())
     {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-    vtkSMProxy* pxy = pxm->NewProxy("misc", "PluginLoader");
-    if(pxy && !lib.isEmpty())
+    vtkSMProperty* prop = pxy->GetProperty("FileName");
+    pqSMAdaptor::setElementProperty(prop, lib);
+    pxy->SetConnectionID(server->GetConnectionID());
+    pxy->UpdateVTKObjects();
+    pxy->UpdatePropertyInformation();
+    prop = pxy->GetProperty("Loaded");
+    success = pqSMAdaptor::getElementProperty(prop).toInt();
+    if(success)
       {
-      vtkSMProperty* prop = pxy->GetProperty("FileName");
-      pqSMAdaptor::setElementProperty(prop, lib);
-      pxy->SetConnectionID(server->GetConnectionID());
-      pxy->UpdateVTKObjects();
-      pxy->UpdatePropertyInformation();
-      prop = pxy->GetProperty("Loaded");
-      success = pqSMAdaptor::getElementProperty(prop).toInt();
-      if(success)
+      prop = pxy->GetProperty("ServerManagerXML");
+      QString xml = pqSMAdaptor::getElementProperty(prop).toString();
+      if(!xml.isEmpty())
         {
-        this->Plugins.insert(server, lib);
-        prop = pxy->GetProperty("ServerManagerXML");
-        QString xml = pqSMAdaptor::getElementProperty(prop).toString();
-        if(!xml.isEmpty())
-          {
-          vtkSMXMLParser* parser = vtkSMXMLParser::New();
-          parser->Parse(xml.toAscii().data());
-          parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
-          parser->Delete();
-          emit this->serverManagerExtensionLoaded();
-          }
-        pxy->UnRegister(NULL);
+        vtkSMXMLParser* parser = vtkSMXMLParser::New();
+        parser->Parse(xml.toAscii().data());
+        parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
+        parser->Delete();
         }
       }
+    else
+      {
+      error =
+        pqSMAdaptor::getElementProperty(pxy->GetProperty("Error")).toString();
+      }
+    pxy->UnRegister(NULL);
+    }
+  
+  if(success)
+    {
+    this->Plugins.insert(server, lib);
+    emit this->serverManagerExtensionLoaded();
+    }
+
+  return success;
+}
+
+bool pqPluginManager::loadClientPlugin(const QString& lib, QString& error)
+{
+  bool success = false;
+  QPluginLoader qplugin(lib);
+  if(qplugin.load())
+    {
+    pqPlugin* pqplugin = qobject_cast<pqPlugin*>(qplugin.instance());
+    if(pqplugin)
+      {
+      success = true;
+      this->Plugins.insert(NULL, lib);
+      emit this->guiPluginLoaded();
+      QObjectList ifaces = pqplugin->interfaces();
+      foreach(QObject* iface, ifaces)
+        {
+        this->Interfaces.append(iface);
+        emit this->guiInterfaceLoaded(iface);
+        }
+      }
+    else
+      {
+      error = "This is not a ParaView Client Plugin.";
+      qplugin.unload();
+      }
+    }
+  else
+    {
+    error = qplugin.errorString();
+    }
+  return success;
+}
+
+void pqPluginManager::loadPlugins(pqServer* server)
+{
+  if(!server)
+    {
+    const char* plugin_path = vtksys::SystemTools::GetEnv("PV_PLUGIN_PATH");
+    if(!plugin_path)
+      {
+      return;
+      }
+    QDir plugindir(plugin_path);
+    }
+}
+
+bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
+{
+  bool success = false;
+  QString error;
+  
+  if(server)
+    {
+    // look for SM stuff in the plugin
+    success = pqPluginManager::loadServerPlugin(server, lib, error);
     }
 
   if(!server)
     {
     // check if this plugin has gui stuff in it
-    QPluginLoader qplugin(lib);
-    if(qplugin.load())
-      {
-      pqPlugin* pqplugin = qobject_cast<pqPlugin*>(qplugin.instance());
-      if(pqplugin)
-        {
-        success = true;
-        this->Plugins.insert(NULL, lib);
-        emit this->guiPluginLoaded();
-        QObjectList ifaces = pqplugin->interfaces();
-        foreach(QObject* iface, ifaces)
-          {
-          this->Interfaces.append(iface);
-          emit this->guiInterfaceLoaded(iface);
-          }
-        }
-      }
-    else
-      {
-      QMessageBox::information(NULL, "Plugin Load Failed", qplugin.errorString());
-      }
-    
-    // this is not a paraview plugin, unload it
-    if(success == false && qplugin.isLoaded())
-      {
-      qplugin.unload();
-      }
+    success = loadClientPlugin(lib, error);
+    }
+  
+  if(!success)
+    {
+    QMessageBox::information(NULL, "Plugin Load Failed", error);
     }
 
   return success;
