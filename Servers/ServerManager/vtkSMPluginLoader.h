@@ -41,14 +41,21 @@ public:
   // Desctiption:
   // Get whether the plugin is loaded
   vtkGetMacro(Loaded, int);
+  
+  // Desctiption:
+  // Get the error string if the plugin failed to load
+  vtkGetStringMacro(Error);
 
 protected:
   vtkSMPluginLoader();
   ~vtkSMPluginLoader();
+  
+  vtkSetStringMacro(Error);
 
   char* FileName;
   int Loaded;
   char* ServerManagerXML;
+  char* Error;
 
 private:
   vtkSMPluginLoader(const vtkSMPluginLoader&); // Not implemented.

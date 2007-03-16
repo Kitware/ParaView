@@ -20,7 +20,7 @@
 #include "vtkDynamicLoader.h"
 
 vtkStandardNewMacro(vtkSMPluginLoader);
-vtkCxxRevisionMacro(vtkSMPluginLoader, "1.5");
+vtkCxxRevisionMacro(vtkSMPluginLoader, "1.6");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -39,6 +39,7 @@ vtkSMPluginLoader::vtkSMPluginLoader()
   this->Loaded = 0;
   this->FileName = 0;
   this->ServerManagerXML = NULL;
+  this->Error = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -102,7 +103,12 @@ void vtkSMPluginLoader::SetFileName(const char* file)
         {
         // toss it out if it isn't a server manager plugin
         vtkDynamicLoader::CloseLibrary(lib);
+        this->SetError("This is not a ParaView plugin.");
         }
+      }
+    else
+      {
+      this->SetError(vtkDynamicLoader::LastError());
       }
     }
 }
