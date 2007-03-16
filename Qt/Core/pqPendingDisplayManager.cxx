@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Server Manager includes
 #include "vtkPVXMLElement.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMProxy.h"
 
 // pq includes
@@ -46,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqConsumerDisplay.h"
 #include "pqGenericViewModule.h"
 #include "pqPendingDisplayUndoElement.h"
+#include "pqPipelineDisplay.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineFilter.h"
 #include "pqRenderViewModule.h"
@@ -153,17 +155,35 @@ void pqPendingDisplayManager::createPendingDisplays(
       }
 
     pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
-    if (filter && filter->replaceInput())
+    if (filter)
       {
-      // hide input source.
-      QList<pqPipelineSource*> inputs = filter->getInputs();
-      for(int cc=0; cc < inputs.size(); ++cc)
+      int replace_input = filter->replaceInput();
+      if (replace_input > 0)
         {
-        pqPipelineSource* input_src = inputs[cc];
-        pqConsumerDisplay* disp = input_src->getDisplay(view);
-        if (disp)
+        // hide input source.
+        QList<pqPipelineSource*> inputs = filter->getInputs();
+        for(int cc=0; cc < inputs.size(); ++cc)
           {
-          disp->setVisible(false);
+          pqPipelineSource* input_src = inputs[cc];
+          pqConsumerDisplay* disp = input_src->getDisplay(view);
+          if (disp)
+            {
+            pqPipelineDisplay *sourceDisp =
+                dynamic_cast<pqPipelineDisplay *>(disp);
+            if (sourceDisp && replace_input == 2)
+              {
+              // Conditionaly turn off the input. The input should be turned
+              // off if the representation is surface and the opacity is 1.
+              vtkSMDataObjectDisplayProxy *dodp = sourceDisp->getDisplayProxy();
+              if(dodp && (dodp->GetRepresentationCM() !=
+                  vtkSMDataObjectDisplayProxy::SURFACE ||
+                  dodp->GetOpacityCM() < 1.0))
+                {
+                continue;
+                }
+              }
+            disp->setVisible(false);
+            }
           }
         }
       }

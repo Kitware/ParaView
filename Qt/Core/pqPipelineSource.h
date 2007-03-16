@@ -105,7 +105,7 @@ public:
   /// This checks the "Hints" for the proxy, if any. If a <Visibility>
   /// element is present with replace_input="0", then this method
   /// returns false, otherwise true.
-  bool replaceInput() const;
+  int replaceInput() const;
 
   /// Before a source's output datainformation can be examined, we have
   /// to make sure that the first update is called through a display

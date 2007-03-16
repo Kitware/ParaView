@@ -378,18 +378,18 @@ void pqPipelineSource::renderAllViews(bool force /*=false*/)
 }
 
 //-----------------------------------------------------------------------------
-bool pqPipelineSource::replaceInput() const
+int pqPipelineSource::replaceInput() const
 {
   vtkSMProxy* proxy = this->getProxy();
   if (!proxy)
     {
-    return true;
+    return 1;
     }
 
   vtkPVXMLElement* hints = proxy->GetHints();
   if (!hints)
     {
-    return true;
+    return 1;
     }
   for (unsigned int cc=0; cc < hints->GetNumberOfNestedElements(); cc++)
     {
@@ -404,9 +404,9 @@ bool pqPipelineSource::replaceInput() const
       {
       continue;
       }
-    return (replace_input==1);
+    return replace_input;
     }
-  return true; // default value.
+  return 1; // default value.
 }
 
 
