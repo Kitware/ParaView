@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProcessModuleGUIHelper.h"
 
 #include "pqApplicationCore.h"
+#include "pqPluginManager.h"
 #include "pqOutputWindowAdapter.h"
 #include "pqOutputWindow.h"
 #include "pqCoreTestUtility.h"
@@ -117,7 +118,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.13");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.14");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -172,6 +173,11 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
           Q_ARG(QStringList, options->GetTestFiles()));
         }
       }
+
+    // load client plugins
+    pqPluginManager* pluginManager = 
+      pqApplicationCore::instance()->getPluginManager();
+    pluginManager->loadPlugins(NULL);
 
     // Starts the event loop.
     QCoreApplication* app = QApplication::instance();

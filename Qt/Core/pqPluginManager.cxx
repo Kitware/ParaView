@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QLibrary>
 #include <QPluginLoader>
-#include <QDir>
+#include <QFileInfo>
 #include <QMessageBox>
 
 #include "vtkSMXMLParser.h"
@@ -42,15 +42,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
+#include "vtkPVEnvironmentInformation.h"
+#include "vtkPVEnvironmentInformationHelper.h"
 #include "vtksys/SystemTools.hxx"
 
 #include "pqPlugin.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
+#include "pqApplicationCore.h"
 #include "pqSMAdaptor.h"
+#include "pqFileDialogModel.h"
 
 pqPluginManager::pqPluginManager(QObject* p)
   : QObject(p)
 {
+  pqServerManagerModel* sm =
+    pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(sm, SIGNAL(serverAdded(pqServer*)),
+                   this, SLOT(onServerConnected(pqServer*)),
+                   Qt::QueuedConnection);
+  QObject::connect(sm, SIGNAL(serverRemoved(pqServer*)),
+                   this, SLOT(onServerDisconnected(pqServer*)));
 }
 
 pqPluginManager::~pqPluginManager()
@@ -139,16 +151,76 @@ bool pqPluginManager::loadClientPlugin(const QString& lib, QString& error)
   return success;
 }
 
+static QStringList getLibraries(const QString& path, pqServer* server)
+{
+  QStringList libs;
+  pqFileDialogModel model(server);
+  model.setCurrentPath(path);
+  int numfiles = model.rowCount(QModelIndex());
+  for(int i=0; i<numfiles; i++)
+    {
+    QModelIndex idx = model.index(i, 0, QModelIndex());
+    QString file = model.getFilePaths(idx)[0];
+    QFileInfo fileinfo(file);
+    // if file names start with known lib suffixes
+    if(fileinfo.completeSuffix().indexOf(QRegExp("(so|dll|sl|dylib)")) == 0)
+      {
+      libs.append(file);
+      }
+    }
+  return libs;
+}
+
 void pqPluginManager::loadPlugins(pqServer* server)
 {
+  QString pv_plugin_path;
+
   if(!server)
     {
-    const char* plugin_path = vtksys::SystemTools::GetEnv("PV_PLUGIN_PATH");
-    if(!plugin_path)
+    pv_plugin_path = vtksys::SystemTools::GetEnv("PV_PLUGIN_PATH");
+    }
+  else
+    {
+    // get the PV_PLUGIN_PATH environment variable on the server
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMProxy* helper = pxm->NewProxy("misc", "EnvironmentInformationHelper");
+    helper->SetConnectionID(server->GetConnectionID());
+    helper->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
+    pqSMAdaptor::setElementProperty(helper->GetProperty("Variable"),
+                                    "PV_PLUGIN_PATH");
+    helper->UpdateVTKObjects();
+    vtkPVEnvironmentInformation* info = vtkPVEnvironmentInformation::New();
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    pm->GatherInformation(helper->GetConnectionID(),
+      vtkProcessModule::DATA_SERVER, info, helper->GetID(0));
+
+    pv_plugin_path = info->GetVariable();
+
+    info->Delete();
+    helper->UnRegister(NULL);
+    }
+  
+  QStringList plugin_paths = pv_plugin_path.split(QRegExp("\\;|\\:"), QString::SkipEmptyParts);
+  if(plugin_paths.isEmpty())
+    {
+    return;
+    }
+  QStringList libs;
+  foreach(QString path, plugin_paths)
+    {
+    libs += getLibraries(path, server);
+    }
+  foreach(QString lib, libs)
+    {
+    QString dummy;
+    if(server)
       {
-      return;
+      loadServerPlugin(server, lib, dummy);
       }
-    QDir plugindir(plugin_path);
+    else
+      {
+      loadClientPlugin(lib, dummy);
+      }
     }
 }
 
@@ -197,5 +269,16 @@ void pqPluginManager::removeInterface(QObject* iface)
     {
     this->ExtraInterfaces.removeAt(idx);
     }
+}
+
+void pqPluginManager::onServerConnected(pqServer* server)
+{
+  this->loadPlugins(server);
+}
+
+void pqPluginManager::onServerDisconnected(pqServer* server)
+{
+  // remove referenced plugins
+  this->Plugins.remove(server);
 }
 

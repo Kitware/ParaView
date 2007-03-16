@@ -56,7 +56,7 @@ public:
   /// attempt to load all available plugins on a server, 
   /// or client plugins if NULL
   void loadPlugins(pqServer*);
-
+  
   /// return all GUI interfaces that have been loaded
   QObjectList interfaces();
 
@@ -84,6 +84,10 @@ protected:
 
   bool loadClientPlugin(const QString& lib, QString& error);
   bool loadServerPlugin(pqServer* server, const QString& lib, QString& error);
+
+protected slots:
+  void onServerConnected(pqServer*);
+  void onServerDisconnected(pqServer*);
 
 private:
 

@@ -58,7 +58,7 @@ class PQCORE_EXPORT pqFileDialogModel : public QAbstractItemModel
 public:
   /// server is the server for which we need the listing.
   /// if the server is NULL, we get file listings locally
-  pqFileDialogModel(pqServer* server, QObject* Parent);
+  pqFileDialogModel(pqServer* server, QObject* Parent = NULL);
   ~pqFileDialogModel();
 
   /// Returns the path that will be automatically displayed when the file dialog is opened

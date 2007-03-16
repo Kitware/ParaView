@@ -103,9 +103,12 @@ void pqPluginDialog::refreshClient()
 
 void pqPluginDialog::refreshServer()
 {
-  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  QStringList plugins = pm->loadedPlugins(this->Server);
-  this->serverPlugins->clear();
-  this->serverPlugins->addItems(plugins);
+  if(this->Server)
+    {
+    pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
+    QStringList plugins = pm->loadedPlugins(this->Server);
+    this->serverPlugins->clear();
+    this->serverPlugins->addItems(plugins);
+    }
 }
 

@@ -110,7 +110,7 @@ public:
   vtkSmartPointer<vtkSMStateLoader> StateLoader;
   QPointer<pqLookupTableManager> LookupTableManager;
   pqLinksModel LinksModel;
-  pqPluginManager PluginManager;
+  pqPluginManager* PluginManager;
   pqProgressManager* ProgressManager;
 
   QString OrganizationName;
@@ -163,6 +163,8 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
     {
     pqApplicationCore::Instance = this;
     }
+  
+  this->Internal->PluginManager = new pqPluginManager(this);
 
   // * Create various factories.
   this->Internal->WidgetFactory = new pq3DWidgetFactory(this);
@@ -180,8 +182,8 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   this->Internal->ProgressManager = new pqProgressManager(this);
 
   // add standard views
-  this->Internal->PluginManager.addInterface(
-    new pqStandardViewModules(&this->Internal->PluginManager));
+  this->Internal->PluginManager->addInterface(
+    new pqStandardViewModules(this->Internal->PluginManager));
 
   this->LoadingState = false;
 }
@@ -312,7 +314,7 @@ pqLinksModel* pqApplicationCore::getLinksModel()
 //-----------------------------------------------------------------------------
 pqPluginManager* pqApplicationCore::getPluginManager()
 {
-  return &this->Internal->PluginManager;
+  return this->Internal->PluginManager;
 }
 
 //-----------------------------------------------------------------------------
