@@ -5975,7 +5975,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
            </ProxyGroupDomain>
            <Documentation>
              Adjust the parameters of the function used for picking.
-`          </Documentation>
+           </Documentation>
      </ProxyProperty>
 
      <DoubleVectorProperty
