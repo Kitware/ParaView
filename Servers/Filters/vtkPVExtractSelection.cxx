@@ -37,7 +37,7 @@
 #include "vtkSmartPointer.h"
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVExtractSelection, "1.3");
+vtkCxxRevisionMacro(vtkPVExtractSelection, "1.4");
 vtkStandardNewMacro(vtkPVExtractSelection);
 
 vtkCxxSetObjectMacro(vtkPVExtractSelection, OutputSelection, vtkSelection);
@@ -122,8 +122,8 @@ void vtkPVExtractSelection::Select()
       // to the ParaView pipeline
       vtkDataSet* newDS = ds->NewInstance();
       newDS->ShallowCopy(ds);       
-      this->AtomExtractor->SetInput(1,this->InputSelection);
       this->AtomExtractor->SetInput(0,newDS);
+      this->AtomExtractor->SetInput(1,this->InputSelection);
       newDS->Delete();
       this->AtomExtractor->Update();
       
@@ -131,7 +131,8 @@ void vtkPVExtractSelection::Select()
       vtkIdTypeArray *origIds = vtkIdTypeArray::SafeDownCast(output->GetCellData()->GetArray("vtkOriginalCellIds"));
       if (origIds == NULL || origIds->GetNumberOfTuples() == 0)
         {
-        this->AtomExtractor->SetInput((vtkDataSet*)0);
+        this->AtomExtractor->SetInput(0,(vtkSelection*)0);
+        this->AtomExtractor->SetInput(1,(vtkDataSet*)0);
         continue;
         }
       
@@ -149,7 +150,8 @@ void vtkPVExtractSelection::Select()
       selection->SetSelectionList(origIds);
         
       // Make sure that the input is released
-      this->AtomExtractor->SetInput((vtkDataSet*)0);
+      this->AtomExtractor->SetInput(0,(vtkSelection*)0);
+      this->AtomExtractor->SetInput(1,(vtkDataSet*)0);
 
       vtkClientServerID pid = processModule->GetIDFromObject(
         this->Internal->OriginalSources[i]);

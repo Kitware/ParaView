@@ -26,7 +26,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkMultiBlockExtractSelection, "1.7");
+vtkCxxRevisionMacro(vtkMultiBlockExtractSelection, "1.8");
 vtkStandardNewMacro(vtkMultiBlockExtractSelection);
 vtkCxxSetObjectMacro(vtkMultiBlockExtractSelection, Selection,vtkSelection);
 
@@ -147,7 +147,8 @@ vtkDataSet* vtkMultiBlockExtractSelection::SelectFromDataSet(
   this->ExtractFilter->SetInput(1, sel);
   this->ExtractFilter->SetInput(0, inputCopy);
   this->ExtractFilter->Update();
-  this->ExtractFilter->SetInput(0);
+  this->ExtractFilter->SetInput(0, 0);
+  this->ExtractFilter->SetInput(1, 0);
   inputCopy->Delete();
   
   vtkUnstructuredGrid* output = vtkUnstructuredGrid::SafeDownCast(
