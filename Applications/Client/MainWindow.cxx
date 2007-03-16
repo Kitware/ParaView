@@ -108,6 +108,8 @@ MainWindow::MainWindow() :
   Implementation(new pqImplementation(this))
 {
   this->Implementation->UI.setupUi(this);
+
+  this->setIconSize(QSize(24, 24));
   
   this->Implementation->RecentFilesMenu = new
     pqRecentFilesMenu(*this->Implementation->UI.menuRecentFiles, this);
