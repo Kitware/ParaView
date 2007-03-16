@@ -30,6 +30,8 @@ SET(Kit_SRCS
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDisplayInformation.cxx
+  vtkPVEnvironmentInformation.cxx
+  vtkPVEnvironmentInformationHelper.cxx
   vtkPVFileInformation.cxx
   vtkPVFileInformationHelper.cxx
   vtkPVGenericAttributeInformation.cxx
