@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.20");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.21");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -350,7 +350,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNewNode(double scalar)
         {
         // color the node based on the CTF
         this->ColorFunction->GetColor(scalar, rgb);
-        rep->SetHandleColor(i, rgb[0], rgb[1], rgb[2]);
+        if (rep->GetColorElementsByColorFunction())
+          {
+          rep->SetHandleColor(i, rgb[0], rgb[1], rgb[2]);
+          }
         }
       return;
       }
@@ -361,7 +364,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNewNode(double scalar)
     {
     // color the node based on the CTF
     this->ColorFunction->GetColor(scalar, rgb);
-    rep->SetHandleColor(currentHandleNumber, rgb[0], rgb[1], rgb[2]);
+    if (rep->GetColorElementsByColorFunction())
+      {
+      rep->SetHandleColor(currentHandleNumber, rgb[0], rgb[1], rgb[2]);
+      }
     }
   vtkHandleWidget *newHandleWidget = NULL;
   if (rep->GetNumberOfHandles() > this->Nodes->size())
@@ -1018,7 +1024,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementRGBColor(
       this->WidgetRep);
   if (rep)
     {
-    rep->SetHandleColor(idx, r, g, b);
+    if (rep->GetColorElementsByColorFunction())
+      {
+      rep->SetHandleColor(idx, r, g, b);
+      }
     if (rep->GetShowColorFunctionInBackground())
       {
       rep->BuildRepresentation();

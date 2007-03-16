@@ -126,6 +126,16 @@ public:
   virtual void SetLinesColor(double r, double g, double b);
 
   // Description:
+  // Specify whether the node color should be determined by the color
+  // transfer function.
+  virtual void SetColorElementsByColorFunction(int color);
+
+  // Description:
+  // Set the color to use for nodes if not coloring them by the color
+  // transfer function.
+  virtual void SetElementsColor(double r, double g, double b);
+
+  // Description:
   // Set the lighting parameters for the transfer function editor elements.
   virtual void SetElementLighting(double ambient, double diffuse,
                                   double specular, double specularPower);
@@ -135,6 +145,8 @@ protected:
   ~vtkTransferFunctionEditorRepresentationSimple1D();
 
   void UpdateHandleProperty(vtkPointHandleRepresentationSphere *handleRep);
+  void HighlightActiveHandle();
+  void ColorAllElements();
 
   vtkHandleList *Handles;
   vtkPointHandleRepresentationSphere *HandleRepresentation;
@@ -145,8 +157,6 @@ protected:
   vtkPolyData *Lines;
   vtkPolyDataMapper *LinesMapper;
   vtkActor *LinesActor;
-
-  void HighlightActiveHandle();
 
 private:
   vtkTransferFunctionEditorRepresentationSimple1D(const vtkTransferFunctionEditorRepresentationSimple1D&); // Not implemented.

@@ -22,7 +22,7 @@
 #include "vtkPointData.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.9");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.10");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation1D, Histogram,
                      vtkIntArray);
@@ -37,6 +37,14 @@ vtkTransferFunctionEditorRepresentation1D::vtkTransferFunctionEditorRepresentati
 vtkTransferFunctionEditorRepresentation1D::~vtkTransferFunctionEditorRepresentation1D()
 {
   this->SetHistogram(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentation1D::SetShowColorFunctionInHistogram(
+  int color)
+{
+  this->Superclass::SetShowColorFunctionInHistogram(color);
+  this->UpdateHistogramImage();
 }
 
 //----------------------------------------------------------------------------
@@ -71,10 +79,15 @@ void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
   color[0] = static_cast<unsigned char>(this->HistogramColor[0] * 255);
   color[1] = static_cast<unsigned char>(this->HistogramColor[1] * 255);
   color[2] = static_cast<unsigned char>(this->HistogramColor[2] * 255);
+  double scalarInc =
+    (this->VisibleScalarRange[1] - this->VisibleScalarRange[0]) /
+    (double)(this->DisplaySize[0]);
+  double scalar = this->VisibleScalarRange[0];
+  double dColor[3];
 
   int i, j, histogramIdx, height;
 
-  for (i = 0; i < this->DisplaySize[0]; i++)
+  for (i = 0; i < this->DisplaySize[0]; i++, scalar += scalarInc)
     {
     histogramIdx = vtkMath::Floor(i * numBins / this->DisplaySize[0]);
     histogramIdx += minBinIdx;
@@ -87,6 +100,14 @@ void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
       height = vtkMath::Floor(
         log((double)(this->Histogram->GetValue(histogramIdx))) *
         this->DisplaySize[1] / logRange);
+      }
+
+    if (height && this->ShowColorFunctionInHistogram && this->ColorFunction)
+      {
+      this->ColorFunction->GetColor(scalar, dColor);
+      color[0] = static_cast<unsigned char>(255 * dColor[0]);
+      color[1] = static_cast<unsigned char>(255 * dColor[1]);
+      color[2] = static_cast<unsigned char>(255 * dColor[2]);
       }
 
     for (j = 0; j < height; j++)

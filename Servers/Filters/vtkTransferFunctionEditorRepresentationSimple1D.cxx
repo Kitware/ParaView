@@ -34,7 +34,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.13");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.14");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -221,6 +221,52 @@ void vtkTransferFunctionEditorRepresentationSimple1D::SetLinesColor(
 }
 
 //----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::SetColorElementsByColorFunction(int color)
+{
+  this->Superclass::SetColorElementsByColorFunction(color);
+
+  this->ColorAllElements();
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::SetElementsColor(
+  double r, double g, double b)
+{
+  this->Superclass::SetElementsColor(r, g, b);
+  this->ColorAllElements();
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::ColorAllElements()
+{
+  unsigned int i;
+  if (!this->ColorElementsByColorFunction)
+    {
+    for (i = 0; i < this->Handles->size(); i++)
+      {
+      this->SetHandleColor(i, this->ElementsColor[0], this->ElementsColor[1],
+                           this->ElementsColor[2]);
+      }
+    }
+  else if (this->ColorFunction)
+    {
+    double color[3];
+    vtkHandleListIterator iter;
+    vtkPointHandleRepresentationSphere *sphereHandle;
+    for (iter = this->Handles->begin(), i = 0; iter != this->Handles->end();
+         iter++, i++)
+      {
+      sphereHandle = vtkPointHandleRepresentationSphere::SafeDownCast(*iter);
+      if (sphereHandle)
+        {
+        this->ColorFunction->GetColor(sphereHandle->GetScalar(), color);
+        this->SetHandleColor(i, color[0], color[1], color[2]);
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkTransferFunctionEditorRepresentationSimple1D::SetElementLighting(
   double ambient, double diffuse, double specular, double specularPower)
 {
@@ -340,6 +386,9 @@ unsigned int vtkTransferFunctionEditorRepresentationSimple1D::CreateHandle(
     {
     this->Handles->insert(this->Handles->end(), rep);
     }
+
+  this->SetHandleColor(i, this->ElementsColor[0], this->ElementsColor[1],
+                       this->ElementsColor[2]);
 
   return i;
 }

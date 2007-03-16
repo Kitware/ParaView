@@ -46,6 +46,10 @@ public:
   // Put together the necessary parts to display this 3D widget
   virtual void BuildRepresentation();
 
+  // Description:
+  // Toggle whether to display the color function in the histogram.
+  virtual void SetShowColorFunctionInHistogram(int color);
+
 protected:
   vtkTransferFunctionEditorRepresentation1D();
   ~vtkTransferFunctionEditorRepresentation1D();

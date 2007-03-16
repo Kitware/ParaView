@@ -168,6 +168,12 @@ public:
   void SetShowColorFunctionInBackground(int visibility);
 
   // Description:
+  // Determine whether a gradient image showing the color function
+  // should be displayed in the histogram (if the histogram is visible).
+  // Set the transfer function editor type before setting this value.
+  void SetShowColorFunctionInHistogram(int visibility);
+
+  // Description:
   // Determine whether the color gradient should be displayed on the lines
   // connecting the nodes of the transfer function editor.
   // Set the transfer function editor type before setting this value.
@@ -176,7 +182,20 @@ public:
   // Description:
   // Specify the color in which to display the lines connecting the nodes
   // if they are not displaying the color gradient.
+  // Set the transfer function editor type before calling this method.
   void SetLinesColor(double r, double g, double b);
+
+  // Description:
+  // Specify whether the node color should be determined by the color
+  // transfer function.
+  // Set the transfer function editor type before setting this value.
+  void SetColorElementsByColorFunction(int color);
+
+  // Description:
+  // Set the color to use for nodes if not coloring them by the color
+  // transfer function.
+  // Set the transfer function editor type before calling this method.
+  void SetElementsColor(double r, double g, double b);
 
   // Description:
   // Specify the lighting parameters for the transfer function editor

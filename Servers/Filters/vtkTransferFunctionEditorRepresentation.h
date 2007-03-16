@@ -48,20 +48,13 @@ public:
   vtkBooleanMacro(HistogramVisibility, int);
 
   // Description:
-  // Rendering methods
-  virtual int RenderOverlay(vtkViewport *viewport);
+  // Toggle whether to display the color function in the histogram.
+  vtkSetMacro(ShowColorFunctionInHistogram, int);
 
   // Description:
-  // WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
-  // DO NOT USE THESE METHODS OUTSIDE OF THE RENDERING PROCESS
-  // Does this prop have some translucent polygonal geometry?
-  // This method is called during the rendering process to know if there is
-  // some translucent polygonal geometry. A simple prop that has some
-  // translucent polygonal geometry will return true. A composite prop (like
-  // vtkAssembly) that has at least one sub-prop that has some translucent
-  // polygonal geometry will return true.
-  // Default implementation return false.
-  virtual int HasTranslucentPolygonalGeometry(); 
+  // Rendering methods
+  virtual int RenderOverlay(vtkViewport *viewport);
+  virtual int HasTranslucentPolygonalGeometry();
 
   // Description:
   // Set/get the size of the display containing this representation.
@@ -110,6 +103,17 @@ public:
   virtual void SetLinesColor(double, double, double) {}
 
   // Description:
+  // Specify whether the node color should be determined by the color
+  // transfer function.
+  vtkSetMacro(ColorElementsByColorFunction, int);
+  vtkGetMacro(ColorElementsByColorFunction, int);
+
+  // Description:
+  // Set the color to use for nodes if not coloring them by the color
+  // transfer function.
+  vtkSetVector3Macro(ElementsColor, double);
+
+  // Description:
   // Set/get the visible scalar range.
   vtkSetVector2Macro(VisibleScalarRange, double);
   vtkGetVector2Macro(VisibleScalarRange, double);
@@ -126,6 +130,8 @@ protected:
   vtkImageMapper *HistogramMapper;
   vtkActor2D *HistogramActor;
   int HistogramVisibility;
+  int ColorElementsByColorFunction;
+  double ElementsColor[3];
   int DisplaySize[2];
   int ScalarBinRange[2];
   double HistogramColor[3];
@@ -134,6 +140,7 @@ protected:
   vtkImageMapper *BackgroundMapper;
   vtkActor2D *BackgroundActor;
   int ShowColorFunctionInBackground;
+  int ShowColorFunctionInHistogram;
   double VisibleScalarRange[2];
 
 private:
