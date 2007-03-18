@@ -28,7 +28,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkCSVWriter);
-vtkCxxRevisionMacro(vtkCSVWriter, "1.3");
+vtkCxxRevisionMacro(vtkCSVWriter, "1.4");
 //-----------------------------------------------------------------------------
 vtkCSVWriter::vtkCSVWriter()
 {
@@ -247,4 +247,6 @@ void vtkCSVWriter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "StringDelimiter: " << (this->StringDelimiter ?
     this->StringDelimiter : "(none)") << endl;
   os << indent << "UseStringDelimiter: " << this->UseStringDelimiter << endl;
+  os << indent << "FileName: " << (this->FileName? this->FileName : "none") 
+    << endl;
 }
