@@ -232,6 +232,11 @@ class pyProxy:
         returns the SMProxy method"""
         if not self.SMProxy:
           return getattr(self, name)
+        try:
+          proxyAttr = getattr(self.SMProxy, name)
+          return proxyAttr
+        except:
+          pass
         if re.compile("^Set").match(name) and self.SMProxy.GetProperty(name[3:]):
             self.__LastAttrName = name[3:]
             return self.__SetProperty
