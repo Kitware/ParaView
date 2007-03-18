@@ -3330,9 +3330,6 @@ This filter operates on all types of data sets, and it returns unstructured grid
        </Documentation>
      </IntVectorProperty>
 
-     <!--
-     For now, this proxy will only represent clipping with clip function.
-     we'll create another proxy for clipping with scalars if needed.
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SetInputArrayToProcess"
@@ -3365,7 +3362,6 @@ This filter operates on all types of data sets, and it returns unstructured grid
             Choose the scalar value with which to clip.
           </Documentation>
      </DoubleVectorProperty>
-     -->
      <Hints>
        <Visibility replace_input="2" />
      </Hints>
