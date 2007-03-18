@@ -219,11 +219,11 @@
       </InputProperty>
     </PWriterProxy>
 
-    <WriterProxy name="DataSetWriter" class="vtkDataSet"
+    <WriterProxy name="DataSetWriter" class="vtkGenericDataObjectWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataObject" />
         </DataTypeDomain>
       </InputProperty>
     </WriterProxy>
