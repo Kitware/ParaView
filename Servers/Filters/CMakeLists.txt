@@ -30,7 +30,6 @@ SET(Filters_SRCS
   vtkDataSetSubdivisionAlgorithm.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
-  vtkExtractBlockFromSelection.cxx
   vtkExtractHistogram.cxx
   vtkExtractScatterPlot.cxx
 #  vtkGroup.cxx
@@ -48,7 +47,6 @@ SET(Filters_SRCS
   vtkMPIDuplicateUnstructuredGrid.cxx
   vtkMPIMoveData.cxx
   vtkMultiActorHelper.cxx
-  vtkMultiBlockExtractSelection.cxx
   vtkMultiDisplayManager.cxx
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
