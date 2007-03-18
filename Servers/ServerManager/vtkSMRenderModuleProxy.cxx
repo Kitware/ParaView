@@ -56,7 +56,7 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkRendererCollection.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.75");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.76");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1464,7 +1464,7 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
   numProcessors = pm->GetNumberOfPartitions(this->ConnectionID);
 
   //Find largest polygon count in any actor
-  vtkTypeInt64 maxNumCells = 0;
+  vtkIdType maxNumCells = 0;
   vtkCollection *displays = this->GetDisplays();
   vtkCollectionIterator* iter = displays->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -1486,7 +1486,7 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
       {
       continue;
       }
-    vtkTypeInt64 numCells = gi->GetNumberOfCells();
+    vtkIdType numCells = gi->GetNumberOfCells();
     if (numCells > maxNumCells)
       {
       maxNumCells = numCells;
@@ -1494,8 +1494,8 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
     }
   iter->Delete();
 
-  vtkTypeInt64 needs_2_passes = (maxNumCells+1)>>24;//more than 2^24-1 cells
-  vtkTypeInt64 needs_3_passes = needs_2_passes>>24; //more than 2^48-1
+  vtkIdType needs_2_passes = (maxNumCells+1)>>24;//more than 2^24-1 cells
+  vtkIdType needs_3_passes = needs_2_passes>>24; //more than 2^48-1
 
   vtkSMProxyManager* proxyManager = vtkSMObject::GetProxyManager();  
   vtkSMProxy *vcsProxy = proxyManager->NewProxy("PropPickers", "PVVisibleCellSelector");
