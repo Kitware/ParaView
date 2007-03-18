@@ -120,8 +120,8 @@ SET(Kit_SRCS
   vtkSMRenderModuleProxy.cxx
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetProxy.cxx
-#  vtkSMSelectionManager.cxx
-  vtkSMSelectionProxy.cxx
+  vtkSMSelectionHelper.cxx
+#  vtkSMSelectionProxy.cxx
   vtkSMServerFileListingProxy.cxx
   vtkSMServerProxyManagerReviver.cxx
   vtkSMServerSideAnimationPlayer.cxx
