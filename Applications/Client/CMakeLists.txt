@@ -148,13 +148,13 @@ IF(BUILD_TESTING)
   SET (XML_TESTS_WITH_BASELINES
     CreateSourceWithoutConnect
     ImageShrink
-    LoadStateSelection
+#    LoadStateSelection
     OpenFile
     OpenSaveData
     PropertyLink
     # PropertyLink doesn't work in client/server mode
     SimpleInteraction
-    SelectionUndo
+#    SelectionUndo
     VariableSelector
     ViewSettingsDialog
     )
