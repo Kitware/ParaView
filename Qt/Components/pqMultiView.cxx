@@ -454,9 +454,9 @@ QWidget* pqMultiView::widgetOfIndex(Index index)
 }
 
 //-----------------------------------------------------------------------------
-Qt::Orientation pqMultiView::widgetOrientation(QWidget* widget) const
+Qt::Orientation pqMultiView::widgetOrientation(QWidget* _widget) const
 {
-  QSplitter *splitter = qobject_cast<QSplitter *>(widget->parentWidget());
+  QSplitter *splitter = qobject_cast<QSplitter *>(_widget->parentWidget());
   if (!splitter)
     {
     qCritical() << "widgetOrientation called with incorrect widget.";
@@ -467,9 +467,9 @@ Qt::Orientation pqMultiView::widgetOrientation(QWidget* widget) const
 }
 
 //-----------------------------------------------------------------------------
-float pqMultiView::widgetSplitRatio(QWidget* widget) const
+float pqMultiView::widgetSplitRatio(QWidget* _widget) const
 {
-  QSplitter *splitter = qobject_cast<QSplitter *>(widget->parentWidget());
+  QSplitter *splitter = qobject_cast<QSplitter *>(_widget->parentWidget());
   if (!splitter)
     {
     qCritical() << "widgetSplitRatio called with incorrect widget.";
@@ -478,9 +478,9 @@ float pqMultiView::widgetSplitRatio(QWidget* widget) const
 
   QList<int> sizes = splitter->sizes();
   float sum = 0;
-  foreach (int size, sizes)
+  foreach (int _size, sizes)
     {
-    sum += size;
+    sum += _size;
     }
 
   float ratio = sum>0? (1.0 - sizes[0]/sum) : 0.5;

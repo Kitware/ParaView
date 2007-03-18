@@ -305,7 +305,7 @@ pqDisplayPolicy* pqApplicationCore::getDisplayPolicy() const
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::registerManager(const QString& function, 
-  QObject* manager)
+  QObject* _manager)
 {
   if (this->Internal->RegisteredManagers.contains(function) &&
     this->Internal->RegisteredManagers[function] != 0)
@@ -313,7 +313,7 @@ void pqApplicationCore::registerManager(const QString& function,
     qDebug() << "Replacing existing manager for function : " 
       << function;
     }
-  this->Internal->RegisteredManagers[function] = manager;
+  this->Internal->RegisteredManagers[function] = _manager;
 }
 
 //-----------------------------------------------------------------------------
