@@ -1295,5 +1295,24 @@ The output of the Wavelet source is image (uniform rectilinear) data.
    <!-- End of TextSource -->
    </Proxy>
 
+   <SourceProxy name="SelectionSource" class="vtkSelectionSource">
+     <IdTypeVectorProperty 
+        name="IDs"
+        command="AddID" 
+        clean_command="RemoveAllIDs"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        number_of_elements="0"
+        label="IDs">
+        <Documentation>
+          The list of IDs that will be added to the selection produced by the selection source.
+        </Documentation>
+     </IdTypeVectorProperty> 
+
+     <Documentation>
+       Given a list of (processor id, cell id), this source generates a selection object.
+     </Documentation>
+   <!-- End SelectionSource -->
+   </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

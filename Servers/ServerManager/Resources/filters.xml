@@ -1,6 +1,35 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
 
+   <SourceProxy name="ExtractOverTime" 
+                class="vtkExtractDataOverTime" 
+                label="Extract over Time">
+    <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkPointSet"/>
+          </DataTypeDomain>
+          <Documentation>
+            Set the input to the Extract over Time filter.
+          </Documentation>
+     </InputProperty>
+     <IntVectorProperty 
+        name="PointIndex" 
+        command="SetPointIndex" 
+        number_of_elements="1"
+        default_values="0" > 
+       <IntRangeDomain name="range" min="0"/>
+       <Documentation>
+         Index of point to extract at each time step
+       </Documentation>
+     </IntVectorProperty>
+   </SourceProxy>
+
    <SourceProxy name="ImageShrink" class="vtkImageShrink3D" label="Image Shrink">
     <InputProperty
        name="Input"
@@ -6147,6 +6176,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
             Set the input to the Polyline to Rectilinear Grid filter.
           </Documentation>
      </InputProperty>     
+     <!-- End PolyLineToRectilinearGrid -->
    </SourceProxy>
 
    <SourceProxy name="MinMax" class="vtkMinMax">
@@ -6179,7 +6209,43 @@ This filter operates on all types of data sets, and it returns unstructured grid
           Select whether to perform a min, max, or sum operation on the data.
         </Documentation>
      </StringVectorProperty>
-     
+     <!-- End MinMax -->
+   </SourceProxy>
+
+   <SourceProxy name="ExtractSelection" labal="Extract Selection" 
+                class="vtkExtractSelection">
+     <Documentation>
+       This filter extracts a given set of cells or points given a selection. The selection can be obtained from a rubber-band selection (either point, cell, visible or in a frustrum) and passed to the filter or specified by providing an ID list.
+     </Documentation>
+     <InputProperty
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input from which the selection is extracted.
+       </Documentation>
+     </InputProperty>
+     <InputProperty
+         name="Selection"
+         command="SetSelectionConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkSelection"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input that provides the selection object.
+       </Documentation>
+     </InputProperty>
+     <!-- End ExtractSelection -->
    </SourceProxy>
    
    </ProxyGroup>
