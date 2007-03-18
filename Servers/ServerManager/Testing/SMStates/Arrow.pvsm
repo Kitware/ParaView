@@ -226,13 +226,6 @@
       <Element index="0" value="0"/>
       <Domain name="bool" id="44.Shading.bool"/>
     </Property>
-    <Property name="Specular" id="44.Specular" number_of_elements="1">
-      <Element index="0" value="0.1"/>
-      <Domain name="range" id="44.Specular.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="1"/>
-      </Domain>
-    </Property>
     <Property name="UseLookupTableScalarRange" id="44.UseLookupTableScalarRange" number_of_elements="1">
       <Element index="0" value="1"/>
       <Domain name="bool" id="44.UseLookupTableScalarRange.bool"/>
@@ -439,13 +432,6 @@
       <Element index="0" value="0"/>
       <Domain name="bool" id="122.Shading.bool"/>
     </Property>
-    <Property name="Specular" id="122.Specular" number_of_elements="1">
-      <Element index="0" value="0.1"/>
-      <Domain name="range" id="122.Specular.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="1"/>
-      </Domain>
-    </Property>
     <Property name="UseLookupTableScalarRange" id="122.UseLookupTableScalarRange" number_of_elements="1">
       <Element index="0" value="1"/>
       <Domain name="bool" id="122.UseLookupTableScalarRange.bool"/>
@@ -647,13 +633,6 @@
     <Property name="Shading" id="202.Shading" number_of_elements="1">
       <Element index="0" value="0"/>
       <Domain name="bool" id="202.Shading.bool"/>
-    </Property>
-    <Property name="Specular" id="202.Specular" number_of_elements="1">
-      <Element index="0" value="0.1"/>
-      <Domain name="range" id="202.Specular.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="1"/>
-      </Domain>
     </Property>
     <Property name="UseLookupTableScalarRange" id="202.UseLookupTableScalarRange" number_of_elements="1">
       <Element index="0" value="1"/>
@@ -858,13 +837,6 @@
       <Element index="0" value="0"/>
       <Domain name="bool" id="440.Shading.bool"/>
     </Property>
-    <Property name="Specular" id="440.Specular" number_of_elements="1">
-      <Element index="0" value="0.1"/>
-      <Domain name="range" id="440.Specular.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="1"/>
-      </Domain>
-    </Property>
     <Property name="UseLookupTableScalarRange" id="440.UseLookupTableScalarRange" number_of_elements="1">
       <Element index="0" value="1"/>
       <Domain name="bool" id="440.UseLookupTableScalarRange.bool"/>
@@ -1062,13 +1034,6 @@
     <Property name="Shading" id="282.Shading" number_of_elements="1">
       <Element index="0" value="0"/>
       <Domain name="bool" id="282.Shading.bool"/>
-    </Property>
-    <Property name="Specular" id="282.Specular" number_of_elements="1">
-      <Element index="0" value="0.1"/>
-      <Domain name="range" id="282.Specular.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="1"/>
-      </Domain>
     </Property>
     <Property name="UseLookupTableScalarRange" id="282.UseLookupTableScalarRange" number_of_elements="1">
       <Element index="0" value="1"/>
@@ -1302,13 +1267,6 @@
       <Element index="0" value="0"/>
       <Domain name="bool" id="360.Shading.bool"/>
     </Property>
-    <Property name="Specular" id="360.Specular" number_of_elements="1">
-      <Element index="0" value="0.1"/>
-      <Domain name="range" id="360.Specular.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="1"/>
-      </Domain>
-    </Property>
     <Property name="UseLookupTableScalarRange" id="360.UseLookupTableScalarRange" number_of_elements="1">
       <Element index="0" value="1"/>
       <Domain name="bool" id="360.UseLookupTableScalarRange.bool"/>
@@ -1522,13 +1480,6 @@
       <Element index="0" value="0"/>
       <Domain name="bool" id="520.Shading.bool"/>
     </Property>
-    <Property name="Specular" id="520.Specular" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="range" id="520.Specular.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="1"/>
-      </Domain>
-    </Property>
     <Property name="UseLookupTableScalarRange" id="520.UseLookupTableScalarRange" number_of_elements="1">
       <Element index="0" value="1"/>
       <Domain name="bool" id="520.UseLookupTableScalarRange.bool"/>
@@ -1716,13 +1667,6 @@
     <Property name="Shading" id="624.Shading" number_of_elements="1">
       <Element index="0" value="0"/>
       <Domain name="bool" id="624.Shading.bool"/>
-    </Property>
-    <Property name="Specular" id="624.Specular" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="range" id="624.Specular.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="1"/>
-      </Domain>
     </Property>
     <Property name="UseLookupTableScalarRange" id="624.UseLookupTableScalarRange" number_of_elements="1">
       <Element index="0" value="1"/>
@@ -1940,13 +1884,6 @@
     <Property name="Shading" id="718.Shading" number_of_elements="1">
       <Element index="0" value="0"/>
       <Domain name="bool" id="718.Shading.bool"/>
-    </Property>
-    <Property name="Specular" id="718.Specular" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="range" id="718.Specular.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="1"/>
-      </Domain>
     </Property>
     <Property name="UseLookupTableScalarRange" id="718.UseLookupTableScalarRange" number_of_elements="1">
       <Element index="0" value="1"/>
@@ -3054,9 +2991,6 @@
     <Property name="CameraParallelScale" id="4.CameraParallelScale" number_of_elements="1">
       <Element index="0" value="1"/>
     </Property>
-    <Property name="CameraParallelScaleInfo" id="4.CameraParallelScaleInfo" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
     <Property name="CameraPosition" id="4.CameraPosition" number_of_elements="3">
       <Element index="0" value="0.5"/>
       <Element index="1" value="0"/>
@@ -3068,9 +3002,6 @@
       <Element index="2" value="1.99832"/>
     </Property>
     <Property name="CameraViewAngle" id="4.CameraViewAngle" number_of_elements="1">
-      <Element index="0" value="30"/>
-    </Property>
-    <Property name="CameraViewAngleInfo" id="4.CameraViewAngleInfo" number_of_elements="1">
       <Element index="0" value="30"/>
     </Property>
     <Property name="CameraViewUp" id="4.CameraViewUp" number_of_elements="3">

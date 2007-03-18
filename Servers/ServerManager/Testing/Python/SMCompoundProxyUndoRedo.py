@@ -25,9 +25,12 @@ pxm = paraview.pyProxyManager()
 renModule = pxm.GetProxy("rendermodules", "RenderModule0")
 renModule.UpdateVTKObjects()
 
-undoStack = paraview.vtkSMUndoStack()
-
 self_cid = paraview.ActiveConnection.ID
+
+undoStack = paraview.vtkSMUndoStack()
+undoStackBuilder = paraview.vtkSMUndoStackBuilder();
+undoStackBuilder.SetUndoStack(undoStack);
+undoStackBuilder.SetConnectionID(self_cid);
 
 # Create a compound proxy for the elevation filter.
 shrink = pxm.GetProxy("filters", "Shrink0")
@@ -44,18 +47,18 @@ cp_definition = compound_proxy.SaveDefinition(None)
 
 pxm.RegisterCompoundProxyDefinition("MyMacro", cp_definition)
 
-undoStack.BeginOrContinueUndoSet(self_cid, "CPRegister")
+undoStackBuilder.Begin("CPRegister")
 pxm.RegisterProxy("mygroup", "Groupping", compound_proxy)
-undoStack.EndUndoSet()
+undoStackBuilder.EndAndPushToStack()
 
 del compound_proxy
 
 compound_proxy = pxm.NewCompoundProxy("MyMacro")
 compound_proxy.SetConnectionID(self_cid)
 
-undoStack.BeginOrContinueUndoSet(self_cid, "CPRegister2")
+undoStackBuilder.Begin("CPRegister2")
 pxm.RegisterProxy("mygroup", "Instantiation", compound_proxy)
-undoStack.EndUndoSet()
+undoStackBuilder.EndAndPushToStack()
 del compound_proxy
 
 RenderAndWait(renModule)

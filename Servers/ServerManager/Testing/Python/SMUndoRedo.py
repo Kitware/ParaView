@@ -26,9 +26,13 @@ pxm = paraview.pyProxyManager()
 renModule = pxm.GetProxy("rendermodules", "RenderModule0")
 renModule.UpdateVTKObjects()
 
-undoStack = paraview.vtkSMUndoStack()
-
 self_cid = paraview.ActiveConnection.ID 
+
+undoStack = paraview.vtkSMUndoStack()
+undoStackBuilder = paraview.vtkSMUndoStackBuilder();
+undoStackBuilder.SetUndoStack(undoStack);
+undoStackBuilder.SetConnectionID(self_cid);
+
   
 proxy = pxm.NewProxy("sources","SphereSource")
 proxy2 = pxm.NewProxy("sources","CubeSource")
@@ -39,39 +43,45 @@ display = renModule.CreateDisplayProxy()
 # hence we need to unregister it.
 display.UnRegister(None)
  
-undoStack.BeginOrContinueUndoSet(self_cid, "CreateFilter")
+undoStackBuilder.Begin("CreateFilter")
 pxm.RegisterProxy("mygroup", "sphere", proxy)
 pxm.RegisterProxy("mygroup", "cube", proxy2)
 pxm.RegisterProxy("filters", "elevationFilter", filter)
-undoStack.EndUndoSet()
+undoStackBuilder.End()
+undoStackBuilder.PushToStack();
 
-undoStack.BeginOrContinueUndoSet(self_cid, "FilterInput")
+undoStackBuilder.Begin("FilterInput")
 filter.SetInput(proxy)
 filter.UpdateVTKObjects()
-undoStack.EndUndoSet()
+undoStackBuilder.End()
+undoStackBuilder.PushToStack();
   
-undoStack.BeginOrContinueUndoSet(self_cid, "CreateDisplay")
+undoStackBuilder.Begin("CreateDisplay")
 pxm.RegisterProxy("displays", "sphereDisplay", display)
-undoStack.EndUndoSet()
+undoStackBuilder.End()
+undoStackBuilder.PushToStack();
 
-undoStack.BeginOrContinueUndoSet(self_cid, "SetupDisplay")
+undoStackBuilder.Begin("SetupDisplay")
 display.SetInput(filter)
 display.SetRepresentation(2)
 display.UpdateVTKObjects()
-undoStack.EndUndoSet()
+undoStackBuilder.End()
+undoStackBuilder.PushToStack();
 
-undoStack.BeginOrContinueUndoSet(self_cid, "AddDisplay")
+undoStackBuilder.Begin("AddDisplay")
 renModule.AddToDisplays(display)
 renModule.UpdateVTKObjects()
-undoStack.EndUndoSet()
+undoStackBuilder.End()
+undoStackBuilder.PushToStack();
 
-undoStack.BeginOrContinueUndoSet(self_cid, "RemoveDisplay")
+undoStackBuilder.Begin("RemoveDisplay")
 renModule.RemoveFromDisplays(display)
 renModule.UpdateVTKObjects()
 pxm.SMProxyManager.UnRegisterProxy("displays", "sphereDisplay")
-undoStack.EndUndoSet()
+undoStackBuilder.End()
+undoStackBuilder.PushToStack();
 
-undoStack.BeginOrContinueUndoSet(self_cid, "CleanupSources")
+undoStackBuilder.Begin("CleanupSources")
 pxm.SMProxyManager.UnRegisterProxy("filters", "elevationFilter")
 pxm.SMProxyManager.UnRegisterProxy("mygroup", "sphere")
 pxm.SMProxyManager.UnRegisterProxy("mygroup", "cube")
@@ -79,7 +89,8 @@ pxm.SMProxyManager.UnRegisterProxy("mygroup", "cube")
 #  extra references to the proxies-->BUG.
 #  Undoing this set will create new proxies, if not, i.e. existing
 #  proxies are used then---> BUG.
-undoStack.EndUndoSet()
+undoStackBuilder.End()
+undoStackBuilder.PushToStack();
 #
 # Release all references to the objects we created, only the Proxy manager
 # now keeps a reference to these proxies. This ensures that unregister
