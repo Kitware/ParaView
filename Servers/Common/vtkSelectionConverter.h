@@ -18,7 +18,12 @@
 // to another. Currently, it only supports conversion from a 'surface' 
 // geometry selection to a 'volume' selection. It does this by looking for a 
 // pedigree array called vtkOriginalCellIds that says what 3D cell produced 
-// each selected 2D surface cell.
+// each selected 2D surface cell. The input selection must have
+// SOURCE_ID() and ORIGINAL_SOURCE_ID() properties set. The SOURCE_ID()
+// corresponds to the geometry filter whereas the ORIGINAL_SOURCE_ID()
+// corresponds to the input of the geometry filter. The output selection
+// will have SOURCE_ID() corresponding to the input of the geometry filter
+// (what was ORIGINAL_SOURCE_ID()).
 // .SECTION See Also
 // vtkSelection
 
