@@ -73,16 +73,6 @@ signals:
   void qtWidgetChanged();
   void smPropertyChanged();
 
-  // Fired before the sm property is updated to reflect the
-  // changes in the GUI. This event is not fired
-  // it useUncheckedProperties is true.
-  void beginUndoSet(const QString&);
-
-  // Fired after the sm property has been updated to reflect the
-  // changes in the GUI.  This event is not fired
-  // it useUncheckedProperties is true.
-  void endUndoSet();
-
 public slots:
   /// accept the changes and push them to the server manager
   /// regardless of the whether we're using unchecked properties
@@ -141,17 +131,9 @@ signals:
   void qtWidgetChanged();
   void smPropertyChanged();
 
-  // Fired before the sm property is updated to reflect the
-  // changes in the GUI. This event is not fired
-  // it useUncheckedProperties is true.
-  void beginUndoSet(const QString&);
-
-  // Fired after the sm property has been updated to reflect the
-  // changes in the GUI.  This event is not fired
-  // it useUncheckedProperties is true.
-  void endUndoSet();
-
 private slots:
+  void triggerDelayedSMLinkedPropertyChanged();
+
   void smLinkedPropertyChanged();
   void qtLinkedPropertyChanged();
 

@@ -91,7 +91,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.61");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.62");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -783,6 +783,10 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
     this->Observer);
   obj.UpdateObserverTag = proxy->AddObserver(vtkCommand::UpdateEvent,
     this->Observer);
+  obj.UpdateInformationObserverTag = proxy->AddObserver(
+    vtkCommand::UpdateInformationEvent,
+    this->Observer);
+
   // Note, these observer will be removed in the destructor of obj.
 
   RegisteredProxyInformation info;
@@ -977,6 +981,10 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
           &info);
         }
       }
+    break;
+
+  case vtkCommand::UpdateInformationEvent:
+    this->InvokeEvent(vtkCommand::UpdateInformationEvent, proxy);
     break;
     
   case vtkCommand::UpdateEvent:

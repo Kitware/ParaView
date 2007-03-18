@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqServer;
+class pqReaderFactory;
 
 /// a dialog that prompts for a reader type to open a file
 class PQCOMPONENTS_EXPORT pqSelectReaderDialog : public QDialog
@@ -45,7 +46,9 @@ class PQCOMPONENTS_EXPORT pqSelectReaderDialog : public QDialog
 public:
   /// constructor
   pqSelectReaderDialog(const QString& file,
-                       pqServer* s, QWidget* p = 0);
+                       pqServer* s, 
+                       pqReaderFactory* factory,
+                       QWidget* p = 0);
   /// destructor
   ~pqSelectReaderDialog();
 

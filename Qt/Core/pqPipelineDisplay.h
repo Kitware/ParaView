@@ -59,6 +59,7 @@ class vtkSMDataObjectDisplayProxy;
 class PQCORE_EXPORT pqPipelineDisplay : public pqConsumerDisplay
 {
   Q_OBJECT
+  typedef pqConsumerDisplay Superclass;
 public:
   pqPipelineDisplay(const QString& name,
     vtkSMDataObjectDisplayProxy* display, pqServer* server,
@@ -74,7 +75,7 @@ public:
   // Else if the source created a NEW cell scalar array, use it.
   // Else if the input color by array exists in this source, use it.
   // Else color by property.
-  virtual void setDefaults(); 
+  virtual void setDefaultPropertyValues();
 
   // Call to select the coloring array. 
   void colorByArray(const char* arrayname, int fieldtype);
@@ -105,7 +106,8 @@ public:
   /// Returns if the operation was successful.
   bool getDataBounds(double bounds[6]);
 signals:
-  // emitted when colorByArray()/setColorField() is called.
+  /// This is fire when any property that affects the color
+  /// mode for the display changes.
   void colorChanged();
 
 public slots:
@@ -119,9 +121,6 @@ public slots:
   // color array's scalar range. This call respects the lookup table's
   // "lock" on scalar range.
   void updateLookupTableScalarRange();
-
-protected slots:
-  void deferredSetDefaults();
 
 private:
   pqPipelineDisplayInternal *Internal; 

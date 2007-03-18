@@ -181,22 +181,24 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionFileExit,
     SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));  
 
+  pqUndoStack* undoStack = this->Implementation->Core.getApplicationUndoStack();
+
   connect(this->Implementation->UI.actionEditUndo,
-    SIGNAL(triggered()), pqApplicationCore::instance()->getUndoStack(), SLOT(undo()));
-  connect(pqApplicationCore::instance()->getUndoStack(),
+    SIGNAL(triggered()), undoStack, SLOT(undo()));
+  connect(undoStack,
     SIGNAL(canUndoChanged(bool)), 
     this->Implementation->UI.actionEditUndo, SLOT(setEnabled(bool)));
-  connect(pqApplicationCore::instance()->getUndoStack(),
+  connect(undoStack,
     SIGNAL(undoLabelChanged(const QString&)), this, SLOT(onUndoLabel(const QString&)));
 
   connect(this->Implementation->UI.actionEditSettings,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEditSettings()));
     
   connect(this->Implementation->UI.actionEditRedo,
-    SIGNAL(triggered()), pqApplicationCore::instance()->getUndoStack(), SLOT(redo()));
-  connect(pqApplicationCore::instance()->getUndoStack(),
+    SIGNAL(triggered()), undoStack, SLOT(redo()));
+  connect(undoStack,
     SIGNAL(canRedoChanged(bool)), this->Implementation->UI.actionEditRedo, SLOT(setEnabled(bool)));
-  connect(pqApplicationCore::instance()->getUndoStack(),
+  connect(undoStack,
     SIGNAL(redoLabelChanged(const QString&)), this, SLOT(onRedoLabel(const QString&)));
 
   connect(this->Implementation->UI.actionEditCameraUndo,
@@ -415,19 +417,6 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionNegativeZ, SIGNAL(triggered()),
     &this->Implementation->Core, SLOT(resetViewDirectionNegZ()));
 
-  connect(
-    this->Implementation->UI.actionHistogram, SIGNAL(triggered()),
-    &this->Implementation->Core, SLOT(createBarCharView()));
-  connect(
-    this->Implementation->UI.actionXY_Plot, SIGNAL(triggered()),
-    &this->Implementation->Core, SLOT(createXYPlotView()));
-
-
-  connect(
-    this->Implementation->UI.actionTable_View,
-    SIGNAL(triggered()),
-    &this->Implementation->Core,
-    SLOT(createTableView()));
 
   // Setup the 'modes' so that they are exclusively selected
   QActionGroup *modeGroup = new QActionGroup(this);
@@ -501,12 +490,6 @@ MainWindow::MainWindow() :
     this,
     SLOT(onPostAccept()));
 
-  QObject::connect(
-    &this->Implementation->Core,
-    SIGNAL(enableServerDisconnect(bool)),
-    this->Implementation->UI.menuAddPlot,
-    SLOT(setEnabled(bool)));
-      
   QObject::connect(
     this->Implementation->UI.actionTesting_Window_Size,
     SIGNAL(toggled(bool)),
@@ -625,11 +608,11 @@ MainWindow::MainWindow() :
   this->Implementation->Core.initializeStates();
   
   this->Implementation->UI.actionEditUndo->setEnabled(
-    pqApplicationCore::instance()->getUndoStack()->canUndo());
+    undoStack->canUndo());
   this->Implementation->UI.actionEditRedo->setEnabled(
-    pqApplicationCore::instance()->getUndoStack()->canRedo());
-  this->onUndoLabel(pqApplicationCore::instance()->getUndoStack()->undoLabel());
-  this->onRedoLabel(pqApplicationCore::instance()->getUndoStack()->redoLabel());
+    undoStack->canRedo());
+  this->onUndoLabel(undoStack->undoLabel());
+  this->onRedoLabel(undoStack->redoLabel());
 
   // Set up scalar bar visibility tool bar item.
   pqScalarBarVisibilityAdaptor* sbva = new pqScalarBarVisibilityAdaptor(
@@ -698,6 +681,8 @@ void MainWindow::onUndoLabel(const QString& label)
 {
   this->Implementation->UI.actionEditUndo->setText(
     label.isEmpty() ? tr("Can't Undo") : QString(tr("&Undo %1")).arg(label));
+  this->Implementation->UI.actionEditUndo->setStatusTip(
+    label.isEmpty() ? tr("Can't Undo") : QString(tr("Undo %1")).arg(label));
 }
 
 //-----------------------------------------------------------------------------
@@ -705,6 +690,8 @@ void MainWindow::onRedoLabel(const QString& label)
 {
   this->Implementation->UI.actionEditRedo->setText(
     label.isEmpty() ? tr("Can't Redo") : QString(tr("&Redo %1")).arg(label));
+  this->Implementation->UI.actionEditRedo->setStatusTip(
+    label.isEmpty() ? tr("Can't Redo") : QString(tr("Redo %1")).arg(label));
 }
 
 //-----------------------------------------------------------------------------
@@ -712,6 +699,8 @@ void MainWindow::onCameraUndoLabel(const QString& label)
 {
   this->Implementation->UI.actionEditCameraUndo->setText(
     label.isEmpty() ? tr("Can't Undo Camera") : QString(tr("U&ndo %1")).arg(label));
+  this->Implementation->UI.actionEditCameraUndo->setStatusTip(
+    label.isEmpty() ? tr("Can't Undo Camera") : QString(tr("Undo %1")).arg(label));
 }
 
 //-----------------------------------------------------------------------------
@@ -719,6 +708,8 @@ void MainWindow::onCameraRedoLabel(const QString& label)
 {
   this->Implementation->UI.actionEditCameraRedo->setText(
     label.isEmpty() ? tr("Can't Redo Camera") : QString(tr("R&edo %1")).arg(label));
+  this->Implementation->UI.actionEditCameraRedo->setStatusTip(
+    label.isEmpty() ? tr("Can't Redo Camera") : QString(tr("Redo %1")).arg(label));
 }
 
 //-----------------------------------------------------------------------------

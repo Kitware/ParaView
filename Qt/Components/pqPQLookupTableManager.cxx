@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
-class pqPQLookupTableManagerInternal
+class pqPQLookupTableManager::pqInternal
 {
 public:
   class Key
@@ -115,7 +115,7 @@ public:
 pqPQLookupTableManager::pqPQLookupTableManager(QObject* _p)
   : pqLookupTableManager(_p)
 {
-  this->Internal = new pqPQLookupTableManagerInternal;
+  this->Internal = new pqInternal;
 }
 
 //-----------------------------------------------------------------------------
@@ -128,7 +128,7 @@ pqPQLookupTableManager::~pqPQLookupTableManager()
 void pqPQLookupTableManager::onAddLookupTable(pqScalarsToColors* lut)
 {
   QString registration_name = lut->getSMName();
-  pqPQLookupTableManagerInternal::Key key = 
+  pqInternal::Key key = 
     this->Internal->getKey(lut->getServer()->GetConnectionID(),
       registration_name);
   if (!this->Internal->LookupTables.contains(key))
@@ -138,10 +138,28 @@ void pqPQLookupTableManager::onAddLookupTable(pqScalarsToColors* lut)
 }
 
 //-----------------------------------------------------------------------------
+void pqPQLookupTableManager::onRemoveLookupTable(pqScalarsToColors* lut)
+{
+  pqInternal::MapOfLUT::iterator iter = 
+    this->Internal->LookupTables.begin();
+  for (; iter != this->Internal->LookupTables.end(); )
+    {
+    if (iter.value() == lut)
+      {
+      iter = this->Internal->LookupTables.erase(iter);
+      }
+    else
+      {
+      ++iter;
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 pqScalarsToColors* pqPQLookupTableManager::getLookupTable(pqServer* server,
   const QString& arrayname,  int number_of_components, int component)
 {
-  pqPQLookupTableManagerInternal::Key key(
+  pqInternal::Key key(
     server->GetConnectionID(), arrayname, number_of_components);
 
   if (this->Internal->LookupTables.contains(key))
@@ -192,7 +210,7 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
         lutProxy->GetProperty("VectorComponent")->GetDomain("range"));
     componentsDomain->AddMaximum(0, (number_of_components-1));
     }
-  pqPQLookupTableManagerInternal::Key key(
+  pqInternal::Key key(
     server->GetConnectionID(), arrayname, number_of_components);
   if (!this->Internal->LookupTables.contains(key))
     {

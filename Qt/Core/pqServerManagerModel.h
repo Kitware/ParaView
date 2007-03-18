@@ -41,6 +41,7 @@ class vtkSMAbstractViewModuleProxy;
 class QVTKWidget;
 
 class pqConsumerDisplay;
+class pqDisplay;
 class pqGenericViewModule;
 class pqPipelineDisplay;
 class pqPipelineSource;
@@ -248,6 +249,13 @@ signals:
   void sourceDisplayChanged(pqPipelineSource *source,
       pqConsumerDisplay* display);
 
+  /// Fired whe a display is added.
+  void preDisplayAdded(pqDisplay*);
+  void displayAdded(pqDisplay*);
+
+  /// Fired whe a display is removed.
+  void preDisplayRemoved(pqDisplay*);
+  void displayRemoved(pqDisplay*);
 private slots:
   /// Used to map a server name change to the name changed signal.
   void updateServerName();

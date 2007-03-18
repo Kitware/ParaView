@@ -12,8 +12,7 @@
 #include "pqServer.h"
 #include "pqRenderViewModule.h"
 #include "pqApplicationCore.h"
-#include "pqPipelineBuilder.h"
-#include "pqUndoStack.h"
+#include "pqObjectBuilder.h"
 #include "pqCoreTestUtility.h"
 
 
@@ -25,31 +24,23 @@ public:
   {
     // automatically make a server connection
     pqApplicationCore* core = pqApplicationCore::instance();
-    pqPipelineBuilder* pb = core->getPipelineBuilder();
+    pqObjectBuilder* ob = core->getObjectBuilder();
     pqServer* server = core->createServer(pqServerResource("builtin:"));
     
     // create a graphics window and put it in our main window
     this->RenderModule = qobject_cast<pqRenderViewModule*>(
-      pb->createView(server));
+      ob->createView(pqRenderViewModule::renderViewType(), server));
     this->setCentralWidget(this->RenderModule->getWidget());
     
-    // hmm... (we get problems if we don't do this)
-    core->getUndoStack()->setActiveServer(server);
-
     // create source and elevation filter
     pqPipelineSource* source;
     pqPipelineSource* elevation;
-    source = pb->createSource("sources", "SphereSource", server);
-    elevation = pb->createSource("filters", "ElevationFilter", server);
-    // passing render module in for the creation of the
-    // ElevationFilter only leads to problems since the pipeline isn't connected
-    // yet
 
-    // connect the sphere and elevation
-    pb->addConnection(source, elevation);
-
+    source = ob->createSource("sources", "SphereSource", server);
+    elevation = ob->createFilter("filters", "ElevationFilter", source);
+    
     // put the elevation in the window
-    pb->createDisplay(elevation, this->RenderModule);
+    ob->createDataDisplay(elevation, this->RenderModule);
 
     // zoom to sphere
     this->RenderModule->resetCamera();

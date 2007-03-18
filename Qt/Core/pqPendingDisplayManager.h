@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqGenericViewModule;
 class pqPendingDisplayUndoElement;
 class pqPipelineSource;
+class pqUndoStack;
 
 /// This class helps manage deferred displays for an application.
 /// An application may add sources for which displays will eventually 
@@ -52,8 +53,12 @@ public:
   pqPendingDisplayManager(QObject* p = 0);
   ~pqPendingDisplayManager();
 
-public slots:
+  /// Get/Set the undo stack that should be used to add
+  /// pending display undo elements.
+  void setUndoStack(pqUndoStack*);
+  pqUndoStack* undoStack() const;
 
+public slots:
   /// add a source for which a display will eventually be made
   void addPendingDisplayForSource(pqPipelineSource* s);
 

@@ -63,6 +63,7 @@ class pqVCRController;
 class pqViewManager;
 class pqViewMenu;
 class pqActionGroupInterface;
+class pqUndoStack;
 
 class vtkUnstructuredGrid;
 
@@ -156,7 +157,7 @@ public:
   // This will create a source with the given xmlname on the active server. 
   // On success returns
   // pqPipelineSource for the source proxy. The actual creation is delegated 
-  // to pqPipelineBuilder instance. Using this method will optionally,
+  // to pqObjectBuilder instance. Using this method will optionally,
   // create a display for the source in the active render window (if both
   // the active window is indeed on the active server. The created source
   // becomes the active source.
@@ -164,7 +165,7 @@ public:
 
   // This will create a filter and connect it to the active source.
   // The actual creation is delegated 
-  // to pqPipelineBuilder instance. Using this method will optionally,
+  // to pqObjectBuilder instance. Using this method will optionally,
   // create a display for the source in the active render window (if both
   // the active window is indeed on the active server. The created source
   // becomes the active source.
@@ -195,6 +196,10 @@ public:
 
   void removePluginToolBars();
 
+  /// Returns the undo stack used for the application.
+  pqUndoStack* getApplicationUndoStack() const;
+
+  /// Returns the lookmark model.
   pqLookmarkManagerModel* getLookmarkManagerModel();
 
 signals:
@@ -309,13 +314,6 @@ public slots:
     double look_x, double look_y, double look_z,
     double up_x, double up_y, double up_z);
 
-  // Create New Plot Views.
-  void createBarCharView();
-  void createXYPlotView();
-  
-  /// Create a table view
-  void createTableView();
-
   // This option is used for testing. Sets the maximum size for
   // all render windows. When size.isEmpty() is true,
   // it resets the maximum bounds on the render windows.
@@ -342,13 +340,32 @@ private slots:
   void onActiveViewUndoChanged();
   void onActiveSceneChanged(pqAnimationScene *scene);
 
+  /// Called when a new source/filter/reader is created
+  /// by the GUI. This slot is connected with 
+  /// Qt::QueuedConnection.
+  void onSourceCreationFinished(pqPipelineSource *source);
+
+  /// Called when a new source/filter/reader is created
+  /// by the GUI. Unlike  onSourceCreationFinished
+  /// this is not connected with Qt::QueuedConnection
+  /// hence is called immediately when a source is
+  /// created.
+  void onSourceCreation(pqPipelineSource* source);
+
+  /// Called when a new reader is created by the GUI.
+  /// We add the reader to the recent files menu.
+  void onReaderCreated(pqPipelineSource* reader, const QString& filename);
+
+  /// Called when any pqProxy or subclass is created,
+  /// We update the undo stack to include an element
+  /// which will manage the helper proxies correctly.
+  void onProxyCreation(pqProxy*);
+
   void onServerCreationFinished(pqServer *server);
   void onRemovingServer(pqServer *server);
-  void onSourceCreationFinished(pqPipelineSource *source);
   void onRemovingSource(pqPipelineSource *source);
 
   void onServerCreation(pqServer*);
-  void onSourceCreation(pqPipelineSource *source);
 
   void onPostAccept();
 

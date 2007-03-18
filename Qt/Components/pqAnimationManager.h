@@ -90,12 +90,22 @@ public:
   // Saves the animation geometry from the active scene
   // as visible in the given view.
   bool saveGeometry(const QString& filename, pqGenericViewModule* view);
+
 signals:
-  // emitted when the active scene changes (\c scene may be NULL).
+  /// emitted when the active scene changes (\c scene may be NULL).
   void activeSceneChanged(pqAnimationScene* scene);
 
   /// emitted with the current save progress.
   void saveProgress(const QString&, int);
+
+  /// emitted when the manager begins changes that should not get 
+  /// recorded on the undo stack. 
+  void beginNonUndoableChanges();
+
+  /// emitted when the manager is done with changes that
+  /// should not get recorded on the undo stack.
+  void endNonUndoableChanges();
+
 public slots:
   // Called when the active server changes.
   void onActiveServerChanged(pqServer*);

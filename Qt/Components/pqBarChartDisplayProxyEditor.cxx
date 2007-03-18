@@ -146,13 +146,17 @@ void pqBarChartDisplayProxyEditor::setDisplay(pqDisplay* display)
   this->Internal->YDomain->forceDomainChanged();
 
   this->Internal->VTKConnect->Connect(proxy->GetProperty("XArrayName"),
-    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()));
+    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()), 0, 0,
+    Qt::QueuedConnection);
   this->Internal->VTKConnect->Connect(proxy->GetProperty("YArrayName"),
-    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()));
+    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()), 0, 0,
+    Qt::QueuedConnection);
   this->Internal->VTKConnect->Connect(proxy->GetProperty("XAxisUsePoints"),
-    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()));
+    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()), 0, 0,
+    Qt::QueuedConnection);
   this->Internal->VTKConnect->Connect(proxy->GetProperty("XAxisPointComponent"),
-    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()));
+    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()), 0, 0,
+    Qt::QueuedConnection);
 
   this->reloadGUI();
 }

@@ -35,11 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqDisplayProxyEditor.h"
 
 // Qt includes
+#include <QFileInfo>
+#include <QIcon>
 #include <QMetaType>
 #include <QPointer>
 #include <QtDebug>
-#include <QIcon>
-#include <QFileInfo>
+#include <QTimer>
 
 // VTK includes
 #include "QVTKWidget.h"
@@ -285,7 +286,7 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
 
   this->Internal->ColorBy->setDisplay(display);
   QObject::connect(this->Internal->ColorBy,
-    SIGNAL(variableChanged(pqVariableType, const QString&)),
+    SIGNAL(modified()),
     this, SLOT(updateEnableState()));
 
   this->Internal->StyleRepresentation->setDisplay(display);
@@ -327,8 +328,8 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
   this->Internal->StyleMaterial->blockSignals(false);
 
   this->DisableSlots = 0;
-
-  this->updateEnableState();
+  
+  QTimer::singleShot(0, this, SLOT(updateEnableState()));
 }
 
 //-----------------------------------------------------------------------------

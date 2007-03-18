@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSlider>
 #include <QTextEdit>
 
+//----------------------------------------------------------------------------
 pqSignalAdaptorComboBox::pqSignalAdaptorComboBox(QComboBox* p)
   : QObject(p)
 {
@@ -48,11 +49,13 @@ pqSignalAdaptorComboBox::pqSignalAdaptorComboBox(QComboBox* p)
                    this, SIGNAL(currentIndexChanged(int)));
 }
 
+//----------------------------------------------------------------------------
 QString pqSignalAdaptorComboBox::currentText() const
 {
   return static_cast<QComboBox*>(this->parent())->currentText();
 }
 
+//----------------------------------------------------------------------------
 void pqSignalAdaptorComboBox::setCurrentText(const QString& text)
 {
   QComboBox* combo = static_cast<QComboBox*>(this->parent());
@@ -64,17 +67,40 @@ void pqSignalAdaptorComboBox::setCurrentText(const QString& text)
     }
 }
 
+//----------------------------------------------------------------------------
 int pqSignalAdaptorComboBox::currentIndex() const
 {
   return static_cast<QComboBox*>(this->parent())->currentIndex();
 }
 
+//----------------------------------------------------------------------------
 void pqSignalAdaptorComboBox::setCurrentIndex(int index)
 {
   QComboBox* combo = static_cast<QComboBox*>(this->parent());
   combo->setCurrentIndex(index);
 }
 
+//----------------------------------------------------------------------------
+void pqSignalAdaptorComboBox::setCurrentData(const QVariant& data)
+{
+  QComboBox* combo = static_cast<QComboBox*>(this->parent());
+  int idx = combo->findData(data);
+  combo->setCurrentIndex(idx);
+  if(idx == -1 && combo->count() > 0)
+    {
+    combo->setCurrentIndex(0);
+    }
+}
+
+//----------------------------------------------------------------------------
+QVariant pqSignalAdaptorComboBox::currentData() const
+{
+  int index = this->currentIndex();
+  QComboBox* combo = static_cast<QComboBox*>(this->parent());
+  return combo->itemData(index);
+}
+
+//----------------------------------------------------------------------------
 pqSignalAdaptorColor::pqSignalAdaptorColor(QObject* p, 
               const char* colorProperty, const char* signal, bool enableAlpha)
   : QObject(p), PropertyName(colorProperty), EnableAlpha(enableAlpha)
@@ -84,6 +110,7 @@ pqSignalAdaptorColor::pqSignalAdaptorColor(QObject* p,
                    this, SLOT(handleColorChanged()));
 }
 
+//----------------------------------------------------------------------------
 QVariant pqSignalAdaptorColor::color() const
 {
   QColor col = this->parent()->property(this->PropertyName).value<QColor>();
@@ -101,6 +128,7 @@ QVariant pqSignalAdaptorColor::color() const
   return rgba;
 }
 
+//----------------------------------------------------------------------------
 void pqSignalAdaptorColor::setColor(const QVariant& var)
 {
   QColor col;
@@ -123,12 +151,14 @@ void pqSignalAdaptorColor::setColor(const QVariant& var)
     }
 }
 
+//----------------------------------------------------------------------------
 void pqSignalAdaptorColor::handleColorChanged()
 {
   QVariant col = this->color();
   emit this->colorChanged(col);
 }
 
+//----------------------------------------------------------------------------
 pqSignalAdaptorSliderRange::pqSignalAdaptorSliderRange(QSlider* p)
   : QObject(p)
 {
@@ -136,6 +166,7 @@ pqSignalAdaptorSliderRange::pqSignalAdaptorSliderRange(QSlider* p)
                    this, SLOT(handleValueChanged()));
 }
 
+//----------------------------------------------------------------------------
 double pqSignalAdaptorSliderRange::value() const
 {
   QSlider* slider = static_cast<QSlider*>(this->parent());
@@ -143,6 +174,7 @@ double pqSignalAdaptorSliderRange::value() const
   return slider->value() / factor;
 }
 
+//----------------------------------------------------------------------------
 void pqSignalAdaptorSliderRange::setValue(double val)
 {
   QSlider* slider = static_cast<QSlider*>(this->parent());
@@ -150,6 +182,7 @@ void pqSignalAdaptorSliderRange::setValue(double val)
   slider->setValue(qRound(val * factor));
 }
 
+//----------------------------------------------------------------------------
 void pqSignalAdaptorSliderRange::handleValueChanged()
 {
   emit this->valueChanged(this->value());

@@ -87,9 +87,11 @@ public:
   vtkSmartPointer<vtkSMProxy> InteractorStyleProxy;
   pqUndoStack* UndoStack;
   int DefaultBackground[3];
+  bool InitializedWidgets;
 
   pqRenderViewModuleInternal()
     {
+    this->InitializedWidgets = false;
     this->Viewport = 0;
     this->RenderViewProxy = vtkSmartPointer<pqRenderViewProxy>::New();
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
@@ -138,25 +140,49 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
 
   this->ResetCenterWithCamera = true;
 
-  this->Internal->CenterAxesProxy.TakeReference(
-    vtkSMObject::GetProxyManager()->NewProxy("axes","Axes"));
-  this->Internal->CenterAxesProxy->SetConnectionID(
-    this->Internal->RenderModuleProxy->GetConnectionID());
-  this->Internal->CenterAxesProxy->SetServers(
-    vtkProcessModule::CLIENT);
-  QList<QVariant> scaleValues;
-  scaleValues << .25 << .25 << .25;
-  pqSMAdaptor::setMultipleElementProperty(
-    this->Internal->CenterAxesProxy->GetProperty("Scale"),
-    scaleValues);
-  pqSMAdaptor::setElementProperty(
-    this->Internal->CenterAxesProxy->GetProperty("Pickable"), 0);
-  this->Internal->CenterAxesProxy->UpdateVTKObjects();
-
-  /// When a state is loaded, if this render module is reused, its interactor style will change
+  /// When a state is loaded, if this render module is reused, 
+  /// its interactor style will change
   QObject::connect(pqApplicationCore::instance(), SIGNAL(stateLoaded()), this,
     SLOT(updateInteractorStyleFromState()));
 
+  // help the QVTKWidget know when to clear the cache
+  this->Internal->VTKConnect->Connect(
+    renModule, vtkCommand::ModifiedEvent,
+    this->Internal->Viewport, SLOT(markCachedImageAsDirty()));  
+
+  this->Internal->VTKConnect->Connect(
+    renModule, vtkCommand::ResetCameraEvent,
+    this, SLOT(onResetCameraEvent()));
+
+  // We need to listen to events from the render module's interactor
+  // style. So whenever it changes, we set up observers.
+  this->Internal->VTKConnect->Connect(
+    renModule->GetProperty("InteractorStyle"), vtkCommand::ModifiedEvent,
+    this, SLOT(onInteractorStyleChanged()));
+  
+  // If there is a InteractorStyle, initialize it.
+  this->onInteractorStyleChanged();
+
+
+  // The render module needs to obtain client side objects
+  // for the RenderWindow etc. to initialize the QVTKWidget
+  // correctly. It cannot do this unless the underlying proxy
+  // has been created. Since any pqProxy should never call
+  // UpdateVTKObjects() on itself in the constructor, we 
+  // do the following.
+  if (!renModule->GetObjectsCreated())
+    {
+    // Wait till first UpdateVTKObjects() call on the render module.
+    // Under usual circumstances, after UpdateVTKObjects() the
+    // render module objects will be created.
+    this->Internal->VTKConnect->Connect(
+      renModule, vtkCommand::UpdateEvent,
+      this, SLOT(initializeWidgets()));
+    }
+  else
+    {
+    this->initializeWidgets();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -186,139 +212,76 @@ pqUndoStack* pqRenderViewModule::getInteractionUndoStack() const
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::viewModuleInit()
+// This method is called for all pqRenderViewModule objects irrespective
+// of whether it is created from state/undo-redo/python or by the GUI. Hence
+// don't change any render module properties here.
+void pqRenderViewModule::initializeWidgets()
 {
-  if (!this->Internal->Viewport || !this->Internal->RenderViewProxy)
+  if (this->Internal->InitializedWidgets)
     {
-    qDebug() << "viewModuleInit() missing information.";
     return;
     }
+
+  this->Internal->InitializedWidgets = true;
+  // Disconnect old slots.
+  // this->Internal->VTKConnect->Disconnect(
+  //   this->Internal->RenderModuleProxy, vtkCommand::UpdateEvent);
+
+  vtkSMRenderModuleProxy* renModule =
+    this->Internal->RenderModuleProxy;
+
   this->Internal->Viewport->SetRenderWindow(
-    this->Internal->RenderModuleProxy->GetRenderWindow());
+    renModule->GetRenderWindow());
 
   // Enable interaction on this client.
   vtkPVGenericRenderWindowInteractor* iren =
     vtkPVGenericRenderWindowInteractor::SafeDownCast(
-      this->Internal->RenderModuleProxy->GetInteractor());
+      renModule->GetInteractor());
   iren->SetPVRenderView(this->Internal->RenderViewProxy);
 
   // Init axes actor.
   this->Internal->OrientationAxesWidget->SetParentRenderer(
-    this->Internal->RenderModuleProxy->GetRenderer());
+    renModule->GetRenderer());
   this->Internal->OrientationAxesWidget->SetViewport(0, 0, 0.25, 0.25);
   this->Internal->OrientationAxesWidget->SetInteractor(iren);
   this->Internal->OrientationAxesWidget->SetEnabled(1);
   this->Internal->OrientationAxesWidget->SetInteractive(0);
 
-  this->Internal->RenderModuleProxy->ResetCamera();
+  iren->Enable();
 
-  // Set up interactor styles and their manipulators.
+  // Link ViewTime with global time.
+  vtkSMProxy* timekeeper = this->getServer()->getTimeKeeper()->getProxy();
 
-  // If viewModuleInit() is called while state is being loaded, 
-  // then everything inside this conditional will be taken care of by the state and we don't want to override it.
-  if(!pqApplicationCore::instance()->isLoadingState())
+  vtkSMPropertyLink* link = vtkSMPropertyLink::New();
+  link->AddLinkedProperty(timekeeper->GetProperty("Time"), vtkSMLink::INPUT);
+  link->AddLinkedProperty(renModule->GetProperty("ViewTime"), vtkSMLink::OUTPUT);
+  renModule->GetProperty("ViewTime")->Copy(timekeeper->GetProperty("Time"));
+  this->Internal->ViewTimeLink = link;
+  link->Delete();
+}
+
+//-----------------------------------------------------------------------------
+// Called when the "InteractorStyle" property on the render module proxy changes.
+// We end up observers on the interactor style to know about
+// start and end of interaction.
+void pqRenderViewModule::onInteractorStyleChanged()
+{
+  if (this->Internal->InteractorStyleProxy)
     {
-    // Create the interactor style proxy:
-    this->Internal->InteractorStyleProxy.TakeReference(
-      vtkSMObject::GetProxyManager()->NewProxy("interactorstyles","InteractorStyle"));
-    this->Internal->InteractorStyleProxy->SetConnectionID(
-      this->Internal->RenderModuleProxy->GetConnectionID());
-    this->Internal->InteractorStyleProxy->SetServers(
-      vtkProcessModule::CLIENT);
-    this->addInternalProxy("InteractorStyles",this->Internal->InteractorStyleProxy);
-    vtkSMProperty *styleManips = this->Internal->InteractorStyleProxy->GetProperty("CameraManipulators");
-  
-    // It is possible that the interactor style is setup via python in which case it may be something 
-    // other than PVInteractorStyle which may not accept manipulators, hence this conditional
-    if(styleManips)
-      {
-      // Create and register manipulators, then add to interactor style
-
-      vtkSMProxy *manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballRotate");
-      manip->SetConnectionID(
-        this->Internal->RenderModuleProxy->GetConnectionID());
-      manip->SetServers(vtkProcessModule::CLIENT);
-      this->addInternalProxy("CameraManipulators",manip);
-      pqSMAdaptor::addProxyProperty(styleManips, manip);
-      manip->Delete();
-
-      manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballPan1");
-      manip->SetConnectionID(
-        this->Internal->RenderModuleProxy->GetConnectionID());
-      manip->SetServers(vtkProcessModule::CLIENT);
-      vtkSMIntVectorProperty *button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
-      button->SetElement(0,2);
-      this->addInternalProxy("CameraManipulators",manip);
-      pqSMAdaptor::addProxyProperty(styleManips, manip);
-      manip->UpdateVTKObjects();
-      manip->Delete();
-
-      manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballPan1");
-      manip->SetConnectionID(
-        this->Internal->RenderModuleProxy->GetConnectionID());
-      manip->SetServers(vtkProcessModule::CLIENT);
-      button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
-      button->SetElement(0,1);
-      button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Control"));
-      button->SetElement(0,1);
-      this->addInternalProxy("CameraManipulators",manip);
-      pqSMAdaptor::addProxyProperty(styleManips, manip);
-      manip->UpdateVTKObjects();
-      manip->Delete();
-
-      manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballZoom");
-      manip->SetConnectionID(
-        this->Internal->RenderModuleProxy->GetConnectionID());
-      manip->SetServers(vtkProcessModule::CLIENT);
-      button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
-      button->SetElement(0,3);
-      this->addInternalProxy("CameraManipulators",manip);
-      pqSMAdaptor::addProxyProperty(styleManips, manip);
-      manip->UpdateVTKObjects();
-      manip->Delete();
-
-      manip = vtkSMObject::GetProxyManager()->NewProxy("cameramanipulators","TrackballZoom");
-      manip->SetConnectionID(
-        this->Internal->RenderModuleProxy->GetConnectionID());
-      manip->SetServers(vtkProcessModule::CLIENT);
-      button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Button"));
-      button->SetElement(0,1);
-      button = vtkSMIntVectorProperty::SafeDownCast(manip->GetProperty("Shift"));
-      button->SetElement(0,1);
-      this->addInternalProxy("CameraManipulators",manip);
-      pqSMAdaptor::addProxyProperty(styleManips, manip);
-      manip->UpdateVTKObjects();
-      manip->Delete();
-      }
-
-    // Is this needed?
-    this->Internal->InteractorStyleProxy->UpdateVTKObjects();
-
-    // Set interactor style as a proxy property of the render module so it will get saved in the state
-    vtkSMProxyProperty *iStyle = vtkSMProxyProperty::SafeDownCast(this->Internal->RenderModuleProxy->GetProperty("InteractorStyle"));
-    iStyle->RemoveAllProxies();
-    iStyle->AddProxy(this->Internal->InteractorStyleProxy);
-
-    }
-  else
-    {
-    // If we got here, this render module was created and initialized from state
-
-    vtkSMProxyProperty *iStyle = vtkSMProxyProperty::SafeDownCast(this->Internal->RenderModuleProxy->GetProperty("InteractorStyle"));
-
-    // if the state is an older version, then it may not support interactor style proxies, thus the following conditional 
-    //     (and all subsequent conditionals in this class that make sure the interactor style proxy objct is valid)
-    if(iStyle->GetNumberOfProxies() > 0)
-      {
-      // Just grab its interactor style and use it as our own
-      this->Internal->InteractorStyleProxy = iStyle->GetProxy(0);
-      }
+    // remove observers from old interactor style.
+    this->Internal->VTKConnect->Disconnect(
+      this->Internal->InteractorStyleProxy);
+    this->Internal->InteractorStyleProxy = 0;
     }
 
-  if(this->Internal->InteractorStyleProxy)
+  this->Internal->InteractorStyleProxy = pqSMAdaptor::getProxyProperty(
+    this->getProxy()->GetProperty("InteractorStyle"));
+
+  if (this->Internal->InteractorStyleProxy.GetPointer())
     {
     vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
-    vtkInteractorStyle *style = vtkInteractorStyle::SafeDownCast(pvm->GetObjectFromID(this->Internal->InteractorStyleProxy->GetID(0)));
+    vtkObject *style = vtkObject::SafeDownCast(pvm->GetObjectFromID(
+      this->Internal->InteractorStyleProxy->GetID(0)));
     this->Internal->VTKConnect->Connect(style,
       vtkCommand::StartInteractionEvent, 
       this, SLOT(startInteraction()));
@@ -326,38 +289,12 @@ void pqRenderViewModule::viewModuleInit()
       vtkCommand::EndInteractionEvent, 
       this, SLOT(endInteraction()));
     }
-
-  // help the QVTKWidget know when to clear the cache
-  this->Internal->VTKConnect->Connect(
-    this->Internal->RenderModuleProxy, vtkCommand::ModifiedEvent,
-    this->Internal->Viewport, SLOT(markCachedImageAsDirty()));  
-
-  this->Internal->VTKConnect->Connect(
-    this->Internal->RenderModuleProxy, vtkCommand::ResetCameraEvent,
-    this, SLOT(onResetCameraEvent()));
-
-  iren->Enable();
-
-  this->Superclass::viewModuleInit();
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::updateInteractorStyleFromState()
 {
-  if(!this->Internal->InteractorStyleProxy)
-    {
-    return;
-    }
-
-  vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
-  vtkInteractorStyle *currentStyle = vtkInteractorStyle::SafeDownCast(pvm->GetObjectFromID(this->Internal->InteractorStyleProxy->GetID(0)));
-  vtkInteractorStyle *newStyle = vtkInteractorStyle::SafeDownCast(this->Internal->RenderModuleProxy->GetInteractor()->GetInteractorStyle());
-
-  if(currentStyle != newStyle)
-    {
-    this->setInteractorStyle(newStyle);
-    }
-
+  /*
   // This is a temporary fix to make sure the center axes gets displayed after the state is loaded
   pqSMAdaptor::removeProxyProperty(this->Internal->RenderModuleProxy->GetProperty("Displays"),
     this->Internal->CenterAxesProxy);
@@ -366,35 +303,165 @@ void pqRenderViewModule::updateInteractorStyleFromState()
   this->Internal->RenderModuleProxy->UpdateVTKObjects();
 
   this->updateCenterAxes();
+  */
 }
 
+//-----------------------------------------------------------------------------
+// Sets default values for the underlying proxy.  This is during the 
+// initialization stage of the pqProxy for proxies created by the GUI itself 
+// i.e. for proxies loaded through state or created by python client or 
+// undo/redo, this method won't be called. 
+void pqRenderViewModule::setDefaultPropertyValues()
+{
+  this->Superclass::setDefaultPropertyValues();
+
+  this->createDefaultInteractors();
+
+  vtkSMProxy* proxy = this->getProxy();
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("LODResolution"), 50);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("LODThreshold"), 5);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("CompositeThreshold"), 3);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("SquirtLevel"), 3);
+
+  vtkSMProperty* backgroundProperty;
+  int* bg = this->defaultBackgroundColor();
+  backgroundProperty = proxy->GetProperty("Background");
+  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 0, bg[0]/255.0);
+  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 1, bg[1]/255.0);
+  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 2, bg[2]/255.0);
+
+  // setup the center axes.
+  this->initializeCenterAxes();
+
+  proxy->UpdateVTKObjects();
+
+  this->restoreSettings();
+  this->resetCamera();
+}
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::setInteractorStyle(vtkInteractorStyle* style)
+// This method gets called only with the object is directly created by the GUI
+// i.e. it wont get called when the proxy is loaded from state/undo/redo or 
+// python.
+// TODO: Python paraview modules createView() equivalent should make sure
+// that it sets up some default interactor.
+void pqRenderViewModule::createDefaultInteractors()
 {
-  vtkPVGenericRenderWindowInteractor* iren =
-    vtkPVGenericRenderWindowInteractor::SafeDownCast(
-      this->Internal->RenderModuleProxy->GetInteractor());
-  vtkInteractorObserver* old_style = iren->GetInteractorStyle();
-  if (old_style)
+  // Create the interactor style proxy:
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkIdType cid = this->getServer()->GetConnectionID();
+
+  vtkSMProxy* interactorStyle = 
+    pxm->NewProxy("interactorstyles", "InteractorStyle");
+  this->Internal->InteractorStyleProxy.TakeReference(interactorStyle);
+  interactorStyle->SetConnectionID(cid);
+  interactorStyle->SetServers(vtkProcessModule::CLIENT);
+  this->addHelperProxy("InteractorStyles", interactorStyle);
+
+  vtkSMProperty *styleManips = 
+    interactorStyle->GetProperty("CameraManipulators");
+
+  // Create and register manipulators, then add to interactor style
+  vtkSMProxy *manip = pxm->NewProxy("cameramanipulators", "TrackballRotate");
+  manip->SetConnectionID(cid);
+  manip->SetServers(vtkProcessModule::CLIENT);
+  this->addHelperProxy("Manipulators",manip);
+  pqSMAdaptor::addProxyProperty(styleManips, manip);
+  manip->UpdateVTKObjects();
+  manip->Delete();
+
+  manip = pxm->NewProxy("cameramanipulators", "TrackballPan1");
+  manip->SetConnectionID(cid);
+  manip->SetServers(vtkProcessModule::CLIENT);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 2);
+  this->addHelperProxy("Manipulators",manip);
+  pqSMAdaptor::addProxyProperty(styleManips, manip);
+  manip->UpdateVTKObjects();
+  manip->Delete();
+
+  manip = pxm->NewProxy("cameramanipulators", "TrackballPan1");
+  manip->SetConnectionID(cid);
+  manip->SetServers(vtkProcessModule::CLIENT);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 1);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), 1);
+  this->addHelperProxy("Manipulators",manip);
+  pqSMAdaptor::addProxyProperty(styleManips, manip);
+  manip->UpdateVTKObjects();
+  manip->Delete();
+
+  manip = pxm->NewProxy("cameramanipulators", "TrackballZoom");
+  manip->SetConnectionID(cid);
+  manip->SetServers(vtkProcessModule::CLIENT);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 3);
+  this->addHelperProxy("Manipulators",manip);
+  pqSMAdaptor::addProxyProperty(styleManips, manip);
+  manip->UpdateVTKObjects();
+  manip->Delete();
+
+  manip = pxm->NewProxy("cameramanipulators", "TrackballZoom");
+  manip->SetConnectionID(cid);
+  manip->SetServers(vtkProcessModule::CLIENT);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 1);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), 1);
+  this->addHelperProxy("Manipulators",manip);
+  pqSMAdaptor::addProxyProperty(styleManips, manip);
+  manip->UpdateVTKObjects();
+  manip->Delete();
+
+  interactorStyle->UpdateVTKObjects();
+
+  // Set interactor style on the render module.
+  // This will trigger a call to onInteractorStyleChanged() which
+  // updates the observers etc.
+  pqSMAdaptor::setProxyProperty(
+    this->Internal->RenderModuleProxy->GetProperty("InteractorStyle"),
+    interactorStyle);
+  this->Internal->RenderModuleProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+// Create a center axes if one doesn't already exist.
+void pqRenderViewModule::initializeCenterAxes()
+{
+  if (this->Internal->CenterAxesProxy.GetPointer())
     {
-    this->Internal->VTKConnect->Disconnect(old_style, 0, this, 0);
+    // sanity check.
+    return;
     }
 
-  iren->SetInteractorStyle(style);
+  vtkSMProxy* centerAxes = 0;
+  // First try to determine if the render module already has a Axes display.
+  // If so, the first Axes display is treated as the center axes.
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->Internal->RenderModuleProxy->GetProperty("Displays"));
+  for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); cc++)
+    {
+    vtkSMProxy* proxy = pp->GetProxy(cc);
+    if (proxy && strcmp(proxy->GetXMLName(), "Axes") == 0
+      && strcmp(proxy->GetXMLGroup(), "axes") == 0)
+      {
+      centerAxes = proxy;
+      break;
+      }
+    }
 
-  // Grab the new interactor style's proxy and  register it:
-  this->removeInternalProxy("InteractorStyles",this->Internal->InteractorStyleProxy);
-  vtkSMProxyProperty *iStyle = vtkSMProxyProperty::SafeDownCast(this->Internal->RenderModuleProxy->GetProperty("InteractorStyle"));
-  this->Internal->InteractorStyleProxy = iStyle->GetProxy(0);
-  this->addInternalProxy("InteractorStyles",this->Internal->InteractorStyleProxy);
+  if (!centerAxes)
+    {
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    centerAxes = pxm->NewProxy("axes", "Axes");
+    centerAxes->SetConnectionID(this->getServer()->GetConnectionID());
+    QList<QVariant> scaleValues;
+    scaleValues << .25 << .25 << .25;
+    pqSMAdaptor::setMultipleElementProperty(
+      centerAxes->GetProperty("Scale"), scaleValues);
+    pqSMAdaptor::setElementProperty(centerAxes->GetProperty("Pickable"), 0);
+    centerAxes->UpdateVTKObjects();
+    this->addHelperProxy("CenterAxesProxy", centerAxes);
+    pqSMAdaptor::addProxyProperty(pp, centerAxes);
+    centerAxes->Delete();
+    }
 
-  this->Internal->VTKConnect->Connect(style,
-    vtkCommand::StartInteractionEvent, 
-    this, SLOT(startInteraction()));
-  this->Internal->VTKConnect->Connect(style,
-    vtkCommand::EndInteractionEvent, 
-    this, SLOT(endInteraction()));
+  this->Internal->CenterAxesProxy = centerAxes;
 }
 
 //-----------------------------------------------------------------------------
@@ -549,45 +616,13 @@ bool pqRenderViewModule::saveImage(int width, int height, const QString& filenam
   return (ret == vtkErrorCode::NoError);
 }
 
+//-----------------------------------------------------------------------------
 int* pqRenderViewModule::defaultBackgroundColor()
 {
   return this->Internal->DefaultBackground;
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::setDefaults()
-{
-  vtkSMProxy* proxy = this->getProxy();
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("LODResolution"), 50);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("LODThreshold"), 5);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("CompositeThreshold"), 3);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("SquirtLevel"), 3);
-
-  vtkSMProperty* backgroundProperty;
-  int* bg = this->defaultBackgroundColor();
-  backgroundProperty = proxy->GetProperty("Background");
-  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 0, bg[0]/255.0);
-  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 1, bg[1]/255.0);
-  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 2, bg[2]/255.0);
- 
-  pqSMAdaptor::addProxyProperty(proxy->GetProperty("Displays"),
-    this->Internal->CenterAxesProxy);
-
-  proxy->UpdateVTKObjects();
-
-  // Link ViewTime with global time.
-  vtkSMProxy* timekeeper = this->getServer()->getTimeKeeper()->getProxy();
-
-  vtkSMPropertyLink* link = vtkSMPropertyLink::New();
-  link->AddLinkedProperty(timekeeper->GetProperty("Time"), vtkSMLink::INPUT);
-  link->AddLinkedProperty(proxy->GetProperty("ViewTime"), vtkSMLink::OUTPUT);
-  this->Internal->ViewTimeLink = link;
-  link->Delete();
-  timekeeper->GetProperty("Time")->Modified();
-
-  this->restoreSettings();
-}
-
 static const char* pqRenderViewModuleLightSettings [] = {
   "LightSwitch",
   "LightIntensity",
@@ -648,6 +683,7 @@ static const char** pqRenderViewModuleSettingsMulti[] = {
   NULL  // keep last
 };
 
+//-----------------------------------------------------------------------------
 void pqRenderViewModule::restoreSettings()
 {
   vtkSMProxy* proxy = this->getProxy();
@@ -723,6 +759,7 @@ void pqRenderViewModule::restoreSettings()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqRenderViewModule::saveSettings()
 {
   vtkSMProxy* proxy = this->getProxy();
@@ -840,6 +877,12 @@ void pqRenderViewModule::updateCenterAxes()
     return;
     }
 
+  if (!this->getCenterAxesVisibility())
+    {
+    return;
+    }
+  this->initializeCenterAxes();
+
   double center[3];
   QList<QVariant> val =
     pqSMAdaptor::getMultipleElementProperty(
@@ -920,6 +963,8 @@ void pqRenderViewModule::getCenterOfRotation(double center[3]) const
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::setCenterAxesVisibility(bool visible)
 {
+  this->initializeCenterAxes();
+
   pqSMAdaptor::setElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Visibility"),
     visible? 1 : 0);
@@ -929,6 +974,11 @@ void pqRenderViewModule::setCenterAxesVisibility(bool visible)
 //-----------------------------------------------------------------------------
 bool pqRenderViewModule::getCenterAxesVisibility() const
 {
+  if (this->Internal->CenterAxesProxy.GetPointer()==0)
+    {
+    return false;
+    }
+
   return pqSMAdaptor::getElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Visibility")).toBool();
 }

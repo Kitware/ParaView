@@ -15,6 +15,8 @@
 // .NAME vtkSMPropertyLink -
 // .SECTION Description
 // Creates a link between two properties. Can create M->N links.
+// At the time when the link is created every output property is synchornized 
+// with the first input property.
 
 #ifndef __vtkSMPropertyLink_h
 #define __vtkSMPropertyLink_h
@@ -39,7 +41,9 @@ public:
   // the proxy is read or written. When a property of an input proxy
   // changes, it's value is pushed to all other output proxies in the link.
   // A property can be set to be both input and output by setting updateDir
-  // to INPUT | OUTPUT
+  // to INPUT | OUTPUT.
+  // When a link is added, all output property values are
+  // synchronized with that of the input.
   void AddLinkedProperty(vtkSMProxy* proxy, 
                          const char* propertyname, 
                          int updateDir);
@@ -50,6 +54,8 @@ public:
   // we cannot propagate UpdateVTKObjects() calls irrespective
   // of the PropagateUpdateVTKObjects flag. If one wants to propagate 
   // UpdateVTKObjects, use the overload with vtkSMProxy as the argument.
+  // When a link is added, all output property values are
+  // synchronized with that of the input.
   void AddLinkedProperty(vtkSMProperty* property, int updateDir);
 
   // Description:
@@ -85,6 +91,10 @@ protected:
   ~vtkSMPropertyLink();
 
 
+  // Description:
+  // Synchornize the value of all output properties
+  // with the input property.
+  void Synchronize();
 //BTX
   friend struct vtkSMPropertyLinkInternals;
   friend class vtkSMPropertyLinkObserver;

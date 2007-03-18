@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLookupTableManager.h"
 #include "pqComponentsExport.h"
 
-class pqPQLookupTableManagerInternal;
 
+/// pqPQLookupTableManager is an implementation specific to ParaView.
+/// A lookup table is shared among all arrays with same name and
+/// same number of components.
 class PQCOMPONENTS_EXPORT pqPQLookupTableManager : public pqLookupTableManager
 {
   Q_OBJECT
@@ -44,27 +46,37 @@ public:
   pqPQLookupTableManager(QObject* parent=0);
   virtual ~pqPQLookupTableManager();
 
-  // Get a LookupTable for the array with name \c arrayname 
-  // and component. component = -1 represents magnitude. 
-  // This subclass associates a LUT with arrayname:component
-  // pair. If  none exists, a new one will be created.
+  /// Get a LookupTable for the array with name \c arrayname 
+  /// and component. component = -1 represents magnitude. 
+  /// This subclass associates a LUT with arrayname:component
+  /// pair. If  none exists, a new one will be created.
   pqScalarsToColors* getLookupTable(pqServer* server, const QString& arrayname,
     int number_of_components, int component);
-public slots:
-  // Called when a new LUT pq object is created. 
-  // This happens as a result of either the GUI or python
-  // registering a LUT proxy.
-  virtual void onAddLookupTable(pqScalarsToColors* lut);
 
-  // Called to update scalar ranges of all lookup tables.
+public slots:
+  /// Called to update scalar ranges of all lookup tables.
   virtual void updateLookupTableScalarRanges();
 
 protected:
-  // creates a new LUT.
+  /// Called when a new LUT pq object is created. 
+  /// This happens as a result of either the GUI or python
+  /// registering a LUT proxy.
+  virtual void onAddLookupTable(pqScalarsToColors* lut);
+
+  /// Called when a LUT is removed.
+  virtual void onRemoveLookupTable(pqScalarsToColors* lut);
+
+protected:
+  /// creates a new LUT.
   pqScalarsToColors* createLookupTable(pqServer* server,
     const QString& arrayname, int number_of_components, int component);
+
 private:
-  pqPQLookupTableManagerInternal* Internal;
+  pqPQLookupTableManager(const pqPQLookupTableManager&); // Not implemented.
+  void operator=(const pqPQLookupTableManager&); // Not implemented.
+
+  class pqInternal;
+  pqInternal* Internal;
 };
 
 #endif

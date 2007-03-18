@@ -36,26 +36,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 
 class pqPipelineSource;
-class vtkPVXMLElement;
 
-// pqPendingDisplayUndoElement is an GUI undo element used to ensure that
-// "pending displays" in pqMainWindowCore work well with undo/redo.
-// When any source is created using pqMainWindowCore, the operation has two
-// parts (a) embryo-state: the source is in the embryo-state until the first 
-// "Accept" following the creation. In this state, as far as the user is concerned
-// the source is not yet available for use. The user can merely set the 
-// initialization values for parameters. (b) birth:- This happens on the first
-// "Accept" following the creation of the source. Here, the pqMainWindowCore
-// creates a display for the source in the active view and the source becomes
-// usable. Undo/Redo of the source creation has now been split up into two parts
-// as well. After the birth of a source, the first Undo will take the source into
-// embryo-state, which another undo will actually remove the source i.e. undo the
-// creation of the source. Similarly for redo.
-//
-// A pqPendingDisplayUndoElement object is pushed on the undo stack to mark both
-// states i.e. on element for creation of source and another element on the
-// first accept following the source creation. The two undo elements
-// are distinguished by the value \c state while calling PendingDisplay().
+/// pqPendingDisplayUndoElement is an GUI undo element used to ensure that
+/// "pending displays" in pqMainWindowCore work well with undo/redo.
+/// When any source is created using pqMainWindowCore, the operation has two
+/// parts (a) embryo-state: the source is in the embryo-state until the first 
+/// "Accept" following the creation. In this state, as far as the user is concerned
+/// the source is not yet available for use. The user can merely set the 
+/// initialization values for parameters. (b) birth:- This happens on the first
+/// "Accept" following the creation of the source. Here, the pqMainWindowCore
+/// creates a display for the source in the active view and the source becomes
+/// usable. Undo/Redo of the source creation has now been split up into two parts
+/// as well. After the birth of a source, the first Undo will take the source into
+/// embryo-state, which another undo will actually remove the source i.e. undo the
+/// creation of the source. Similarly for redo.
+///
+/// A pqPendingDisplayUndoElement object is pushed on the undo stack to mark both
+/// states i.e. on element for creation of source and another element on the
+/// first accept following the source creation. The two undo elements
+/// are distinguished by the value \c state while calling PendingDisplay().
 class PQCORE_EXPORT pqPendingDisplayUndoElement : public vtkSMUndoElement
 {
 public:
@@ -63,28 +62,32 @@ public:
   vtkTypeRevisionMacro(pqPendingDisplayUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Undo the operation encapsulated by this element.
-  // If state==ADD, undo means the source creation is undone, hence the source
-  // is removed from the pending displays list.
-  // If state==REMOVE, undo means the pending display created for the source
-  // was undone, hence the source gets added to the pending displays list.
+  /// Description:
+  /// Undo the operation encapsulated by this element.
+  /// If state==ADD, undo means the source creation is undone, hence the source
+  /// is removed from the pending displays list.
+  /// If state==REMOVE, undo means the pending display created for the source
+  /// was undone, hence the source gets added to the pending displays list.
   virtual int Undo();
 
-  // Description:
-  // Redo the operation encaspsulated by this element.
-  // If state==ADD, redo means the source creation is redone, hence the source
-  // is added to the pending displays list.
-  // If state==REMOVE, redo means the pending display created for the source
-  // was redone, hence the source gets removed from the pending displays list.
+  /// Description:
+  /// Redo the operation encaspsulated by this element.
+  /// If state==ADD, redo means the source creation is redone, hence the source
+  /// is added to the pending displays list.
+  /// If state==REMOVE, redo means the pending display created for the source
+  /// was redone, hence the source gets removed from the pending displays list.
   virtual int Redo();
 
   // Description:
-  // Use this method to setup this element.
-  // pqMainWindowCore puts two pqPendingDisplayUndoElements
-  // per source. 1 in the undoset containing the creation of the 
-  // source (with state==ADD) and 1 in the undoset containig the
-  // creation of the pending display for the source (with state==REMOVE).
+  // Returns if this element can load the xml state for the given element.
+  virtual bool CanLoadState(vtkPVXMLElement*);
+
+  /// Description:
+  /// Use this method to setup this element.
+  /// pqMainWindowCore puts two pqPendingDisplayUndoElements
+  /// per source. 1 in the undoset containing the creation of the 
+  /// source (with state==ADD) and 1 in the undoset containig the
+  /// creation of the pending display for the source (with state==REMOVE).
   void PendingDisplay(pqPipelineSource* source, int state);
 
   enum {
@@ -95,18 +98,6 @@ public:
 protected:
   pqPendingDisplayUndoElement();
   ~pqPendingDisplayUndoElement();
-  // Description:
-  // Overridden by subclasses to save state specific to the class.
-  // \arg \c parent element. 
-  virtual void SaveStateInternal(vtkPVXMLElement* root);
-
-  // Description:
-  // Overridden by subclasses to load state specific to the class.
-  // \arg \c parent element. 
-  virtual void LoadStateInternal(vtkPVXMLElement* element);
-
-  vtkPVXMLElement* XMLElement;
-  void SetXMLElement(vtkPVXMLElement*);
 
   int InternalUndoRedo(bool undo);
 private:

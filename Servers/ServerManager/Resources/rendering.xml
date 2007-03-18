@@ -309,19 +309,9 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
-        name="CameraViewAngleInfo"
-        command="GetViewAngle"
-        number_of_elements="1"
-        information_only="1"
-        default_values="30">
-        <SimpleDoubleInformationHelper/>
-      </DoubleVectorProperty>
-        
-      <DoubleVectorProperty
         name="CameraViewAngle"
         command="SetViewAngle"
         number_of_elements="1"
-        information_property="CameraViewAngleInfo"
         immediate_update="1"
         default_values="30">
       </DoubleVectorProperty>
@@ -345,19 +335,9 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
-        name="CameraParallelScaleInfo"
-        command="GetParallelScale"
-        number_of_elements="1"
-        information_only="1"
-        default_values="1.0">
-      </DoubleVectorProperty>
-
-      
-      <DoubleVectorProperty
         name="CameraParallelScale"
         command="SetParallelScale"
         number_of_elements="1"
-        information_property="CameraParallelScaleInfo"
         default_values="1.0">
       </DoubleVectorProperty>
 
@@ -538,6 +518,7 @@
         name="ImmediateModeRendering" 
         command="SetImmediateModeRendering"
         number_of_elements="1"
+        is_internal="1"
         default_values="0"
         animateable="0">
         <BooleanDomain name="bool" />
@@ -1595,7 +1576,7 @@
         name="Specular"
         command="SetSpecular"
         number_of_elements="1"
-        default_values="0.0"
+        default_values="0.1"
         animateable="0">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
@@ -1603,7 +1584,7 @@
         name="SpecularPower"
         command="SetSpecularPower"
         number_of_elements="1"
-        default_values="0.0"
+        default_values="100.0"
         animateable="0">
         <DoubleRangeDomain name="range" min="0" max="100" />
       </DoubleVectorProperty>
@@ -1850,11 +1831,9 @@
           <Property name="CameraFocalPoint" />
           <Property name="CameraViewUpInfo" />
           <Property name="CameraViewUp" />
-          <Property name="CameraViewAngleInfo" />
           <Property name="CameraViewAngle" />
           <Property name="CameraClippingRangeInfo" />
           <Property name="CameraClippingRange" />
-          <Property name="CameraParallelScaleInfo" />
           <Property name="CameraParallelScale" />
           <Property name="CameraParallelProjection" />
           <Property name="EyeAngle" />
@@ -2022,6 +2001,12 @@
     </CaveRenderModuleProxy>
 
     <MultiViewRenderModuleProxy name="MultiViewRenderModule">
+      <ProxyProperty
+        name="RenderModules"
+        update_self="1"
+        command="AddRenderModule"
+        remove_command="RemoveRenderModule">
+      </ProxyProperty>
     </MultiViewRenderModuleProxy>
 
     <ViewModuleProxy name="ViewModule">
@@ -3085,7 +3070,6 @@
           <Property name="DiffuseColor" />
           <Property name="Opacity" />
           <Property name="Shading" />
-          <Property name="Specular" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
         </ExposedProperties>
@@ -3308,6 +3292,7 @@
       </IntVectorProperty>
       <ProxyProperty name="OrderedCompositingTree"
                      command="SetOrderedCompositingTree"
+                     is_internal="1"
                      update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="locators"/>

@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes.
 #include "pqApplicationCore.h"
-#include "pqPipelineBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqPluginManager.h"
@@ -266,9 +265,8 @@ QString pqWriterFactory::getSupportedFileTypes(pqPipelineSource* toWrite)
 
   QList<QString> supportedWriters;
 
-  // TODO: We are only looking into sources group for now.
-  pqApplicationCore::instance()->getPipelineBuilder()->
-    getSupportedProxies("writers", toWrite->getServer(), supportedWriters);
+  // TODO: We are only looking into writers group for now.
+  toWrite->getServer()->getSupportedProxies("writers", supportedWriters);
 
   bool first = true;
   foreach(const pqWriterInfo &info , this->Internal->WriterList)

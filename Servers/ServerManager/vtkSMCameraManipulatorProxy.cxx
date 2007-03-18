@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMCameraManipulatorProxy);
-vtkCxxRevisionMacro(vtkSMCameraManipulatorProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMCameraManipulatorProxy, "1.4");
 //------------------------------------------------------------------------------
 vtkSMCameraManipulatorProxy::vtkSMCameraManipulatorProxy()
 {
@@ -41,6 +41,7 @@ void vtkSMCameraManipulatorProxy::Initialize(vtkSMAnimationCueProxy* cue)
   this->Superclass::Initialize(cue);
   int nos = this->GetNumberOfKeyFrames();
   this->CameraInterpolator->Initialize();
+  this->CameraInterpolator->SetInterpolationTypeToSpline();
   if (nos < 2)
     {
     vtkErrorMacro("Too few keyframes to animate.");

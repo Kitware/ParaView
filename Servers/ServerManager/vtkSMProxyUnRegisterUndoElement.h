@@ -43,24 +43,16 @@ public:
   virtual int Redo();
 
   // Description:
+  // Returns if this element can load the xml state for the given element.
+  virtual bool CanLoadState(vtkPVXMLElement*);
+
+  // Description:
   // Sets the information about the proxy that is getting unregistered.
-  void ProxyToUnRegister(const char* groupname, const char* proxyname, 
+  virtual void ProxyToUnRegister(const char* groupname, const char* proxyname, 
     vtkSMProxy* proxy);
 protected:
   vtkSMProxyUnRegisterUndoElement();
   ~vtkSMProxyUnRegisterUndoElement();
-
-  // Description:
-  // Overridden to save state specific to the class.
-  // \arg \c element <Element /> representing this object.
-  virtual void SaveStateInternal(vtkPVXMLElement* root);
-
-  virtual void LoadStateInternal(vtkPVXMLElement* element);
-
-  // Description:
-  // State of the proxy before unregistering.
-  vtkPVXMLElement* XMLElement;
-  void SetXMLElement(vtkPVXMLElement*);
 
 private:
   vtkSMProxyUnRegisterUndoElement(const vtkSMProxyUnRegisterUndoElement&); // Not implemented.

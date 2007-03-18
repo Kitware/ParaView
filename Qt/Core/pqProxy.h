@@ -77,12 +77,6 @@ public:
   /// one and only one Server Manager proxy.
   vtkSMProxy* getProxy() const;
   
-  /// Returns a list of all the internal proxies added with a given key.
-  QList<vtkSMProxy*> getInternalProxies(const QString& key) const;
-
-  /// Returns a list of all internal proxies.
-  QList<vtkSMProxy*> getInternalProxies() const;
-
   /// \brief
   ///   Gets whether or not the source has been modified.
   /// \return
@@ -97,6 +91,24 @@ public:
   /// Returns the hints for this proxy, if any. May returns NULL
   /// if no hints are defined.
   vtkPVXMLElement* getHints() const;
+
+  /// Sets default values for the underlying proxy. 
+  /// This is during the initialization stage of the pqProxy 
+  /// for proxies created by the GUI itself i.e.
+  /// for proxies loaded through state or created by python client
+  /// this method won't be called. 
+  /// The default implementation iterates over all properties
+  /// of the proxy and sets them to default values. 
+  virtual void setDefaultPropertyValues();
+
+  /// Returns a list of all helper proxies.
+  QList<vtkSMProxy*> getHelperProxies() const;
+
+  /// Returns a list of all the helper proxies added with a given key.
+  QList<vtkSMProxy*> getHelperProxies(const QString& key) const;
+
+  /// Returns the keys for helper proxies.
+  QList<QString> getHelperKeys() const;
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);
@@ -106,6 +118,7 @@ signals:
 
 protected:
   friend class pqServerManagerModel;
+  friend class pqHelperProxyRegisterUndoElement;
 
   /// Make this pqProxy take on a new identity. This is following case:
   /// Proxy A registered as (gA, nA), then is again registered as (gA, nA2).
@@ -116,20 +129,20 @@ protected:
   /// nameChanged() signal.
   void setSMName(const QString& new_name);
 
-protected:
-  /// Concept of internal proxies:
+  /// Concept of helper proxies:
   /// A pqProxy is created for every important vtkSMProxy registered. Many a times, 
   /// there may be other proxies associated with that proxy, eg. lookup table proxies,
   /// implicit function proxies may be associated with a filter/source proxy. 
-  /// The GUI can create "associated" proxies and add them as internal proxies.
-  /// Internal proxies get registered under special groups, so that they are 
+  /// The GUI can create "associated" proxies and add them as helper proxies.
+  /// Helper proxies get registered under special groups, so that they are 
   /// undo/redo-able, and state save-restore-able. The pqProxy makes sure that 
-  /// the internal proxies are unregistered when the main proxy is unregistered.
-  void addInternalProxy(const QString& key, vtkSMProxy*);
-  void removeInternalProxy(const QString& key, vtkSMProxy*);
+  /// the helper proxies are unregistered when the main proxy is unregistered.
+  virtual void addHelperProxy(const QString& key, vtkSMProxy*);
+  void removeHelperProxy(const QString& key, vtkSMProxy*);
 
-  /// Unregisters all internal proxies.
-  void clearInternalProxies();
+
+  /// Unregisters all helper proxies.
+  void clearHelperProxies();
 
 private slots:
   void onUpdateVTKObjects();

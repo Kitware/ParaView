@@ -45,21 +45,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // pq includes
 #include "pqApplicationCore.h"
 #include "pqConsumerDisplay.h"
+#include "pqDisplayPolicy.h"
 #include "pqGenericViewModule.h"
 #include "pqPendingDisplayUndoElement.h"
 #include "pqPipelineDisplay.h"
-#include "pqPipelineBuilder.h"
 #include "pqPipelineFilter.h"
 #include "pqRenderViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
-#include "pqDisplayPolicy.h"
 
 //-----------------------------------------------------------------------------
 class pqPendingDisplayManager::MyInternal
 {
 public:
   QList<QPointer< pqPipelineSource> > SourcesSansDisplays;
+  QPointer<pqUndoStack> UndoStack;
 };
 
 //-----------------------------------------------------------------------------
@@ -77,6 +77,18 @@ pqPendingDisplayManager::~pqPendingDisplayManager()
 
 
 //-----------------------------------------------------------------------------
+void pqPendingDisplayManager::setUndoStack(pqUndoStack* stack)
+{
+  this->Internal->UndoStack = stack;
+}
+
+//-----------------------------------------------------------------------------
+pqUndoStack* pqPendingDisplayManager::undoStack() const
+{
+  return this->Internal->UndoStack;
+}
+
+//-----------------------------------------------------------------------------
 void pqPendingDisplayManager::addPendingDisplayForSource(pqPipelineSource* s)
 {
   if(!s)
@@ -86,10 +98,13 @@ void pqPendingDisplayManager::addPendingDisplayForSource(pqPipelineSource* s)
 
   this->internalAddPendingDisplayForSource(s);
 
-  pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
-  elem->PendingDisplay(s, true);
-  pqApplicationCore::instance()->getUndoStack()->addToActiveUndoSet(elem);
-  elem->Delete();
+  if (this->Internal->UndoStack)
+    {
+    pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
+    elem->PendingDisplay(s, true);
+    this->Internal->UndoStack->addToActiveUndoSet(elem);
+    elem->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -189,15 +204,18 @@ void pqPendingDisplayManager::createPendingDisplays(
       }
     view->render();
 
-    // For every pending display we create, we push an undoelement
-    // nothing the creation of the pending display. 
-    // This ensures that when this step is undone, the source for
-    // which we created the pending display is once again marked as
-    // a source pending a display.
-    pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
-    elem->PendingDisplay(source, false);
-    pqApplicationCore::instance()->getUndoStack()->addToActiveUndoSet(elem);
-    elem->Delete();
+    if (this->Internal->UndoStack)
+      {
+      // For every pending display we create, we push an undoelement
+      // nothing the creation of the pending display. 
+      // This ensures that when this step is undone, the source for
+      // which we created the pending display is once again marked as
+      // a source pending a display.
+      pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
+      elem->PendingDisplay(source, false);
+      this->Internal->UndoStack->addToActiveUndoSet(elem);
+      elem->Delete();
+      }
     }
 
   this->Internal->SourcesSansDisplays.clear();

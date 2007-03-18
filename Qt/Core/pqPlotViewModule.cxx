@@ -81,6 +81,8 @@ pqPlotViewModule::pqPlotViewModule(const QString& type,
   vtkSMAbstractViewModuleProxy* renModule, pqServer* server, QObject* _parent)
 : pqGenericViewModule(type, group, name, renModule, server, _parent)
 {
+  QList<pqDisplay*> currentDisplays = this->getDisplays();
+
   this->Internal = new pqPlotViewModuleInternal();
   this->Internal->RenderRequestPending = false;
   if(type == this->barChartType())
@@ -92,6 +94,10 @@ pqPlotViewModule::pqPlotViewModule(const QString& type,
     this->Internal->PlotWidget = widget;
     this->Internal->VTKModel = model;
     this->Internal->MaxNumberOfVisibleDisplays = 1;
+    foreach (pqDisplay* display, currentDisplays)
+      {
+      model->addDisplay(display);
+      }
     }
   else if(type == this->XYPlotType())
     {
@@ -101,6 +107,10 @@ pqPlotViewModule::pqPlotViewModule(const QString& type,
     this->Internal->PlotWidget = widget; 
     this->Internal->VTKModel = model;
     this->Internal->MaxNumberOfVisibleDisplays = -1;
+    foreach (pqDisplay* display, currentDisplays)
+      {
+      model->addDisplay(display);
+      }
     }
   else
     {

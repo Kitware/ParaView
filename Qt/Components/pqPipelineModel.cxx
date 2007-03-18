@@ -848,7 +848,8 @@ bool pqPipelineModel::setData(const QModelIndex &idx, const QVariant &value,
       this->getItemFor(idx));
   if(source)
     {
-    source->rename(value.toString());
+    //source->rename(value.toString());
+    emit this->rename(idx, value.toString());
     }
   return true;
 }

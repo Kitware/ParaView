@@ -145,7 +145,9 @@ SET(Kit_SRCS
   vtkSMTransformProxy.cxx
   vtkSMUndoElement.cxx
   vtkSMUndoRedoStateLoader.cxx
+  vtkSMUndoStackBuilder.cxx
   vtkSMUndoStack.cxx
+  vtkSMUpdateInformationUndoElement.cxx
   vtkSMUpdateSuppressorProxy.cxx
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx

@@ -25,7 +25,6 @@
 
 #include "vtkSMUndoElement.h"
 
-class vtkPVXMLElement;
 class vtkSMProxy;
 
 
@@ -45,6 +44,10 @@ public:
   virtual int Redo();
 
   // Description:
+  // Returns if this element can load the xml state for the given element.
+  virtual bool CanLoadState(vtkPVXMLElement*);
+
+  // Description:
   // Set the information about the proxy that is getting registered.
   void ProxyToRegister(const char* groupname, const char* proxyname,
     vtkSMProxy* proxy);
@@ -53,15 +56,7 @@ protected:
   vtkSMProxyRegisterUndoElement();
   ~vtkSMProxyRegisterUndoElement();
 
-  vtkPVXMLElement* XMLElement;
-  void SetXMLElement(vtkPVXMLElement*);
 
-  // Description:
-  // Overridden to save state specific to the class.
-  // \arg \c element <Element /> representing this object.
-  virtual void SaveStateInternal(vtkPVXMLElement* root);
-
-  virtual void LoadStateInternal(vtkPVXMLElement* element);
 private:
   vtkSMProxyRegisterUndoElement(const vtkSMProxyRegisterUndoElement&); // Not implemented.
   void operator=(const vtkSMProxyRegisterUndoElement&); // Not implemented.

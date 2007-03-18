@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMRenderModuleProxy.h"
-#include "pqPipelineBuilder.h"
+#include "pqObjectBuilder.h"
 
 #include <QtDebug>
 
@@ -196,6 +196,7 @@ void pqLookmarkModel::load(pqServer *server, pqGenericViewModule *view, vtkSMSta
     return;
     }
 
+  pqApplicationCore* core = pqApplicationCore::instance();
   // Now deal with the different types of possible state loaders:
 
   vtkSmartPointer<vtkSMStateLoader> loader = arg_loader;
@@ -217,7 +218,9 @@ void pqLookmarkModel::load(pqServer *server, pqGenericViewModule *view, vtkSMSta
       renModule = qobject_cast<pqRenderViewModule*>(view);
       if(!renModule)
         {
-        renModule = qobject_cast<pqRenderViewModule*>(pqPipelineBuilder::instance()->createView(server,pqRenderViewModule::renderViewType()));
+        renModule = qobject_cast<pqRenderViewModule*>(
+          core->getObjectBuilder()->createView(
+            pqRenderViewModule::renderViewType(), server));
         }
       smpqLoader->AddPreferredRenderModule(renModule->getRenderModuleProxy());
       }

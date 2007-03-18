@@ -50,10 +50,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
+#include "pqRenderViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
+#include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
-#include "pqRenderViewModule.h"
 
 class pqSignalAdaptorProxyListInternal
 {
@@ -136,12 +137,12 @@ void pqSignalAdaptorProxyList::createProxyList()
   this->Internal->ComboBox->blockSignals(true);
   this->Internal->ComboBox->clear();
 
-  QList<vtkSMProxy*> list = this->Internal->ReferenceProxy->getInternalProxies(
-    this->Internal->SMPropertyName);
-
-  foreach(vtkSMProxy* _proxy, list)
+  QList<pqSMProxy> proxies = pqSMAdaptor::getProxyPropertyDomain(
+    this->Internal->ReferenceProxy->getProxy()->GetProperty(
+      this->Internal->SMPropertyName.toAscii().data()));
+  foreach(vtkSMProxy* _proxy, proxies)
     {
-    this->Internal->ComboBox->addItem(_proxy->GetXMLName());
+    this->Internal->ComboBox->addItem(_proxy->GetXMLLabel());
     }
   this->Internal->ComboBox->blockSignals(false);
   this->Internal->ComboBox->setCurrentIndex(-1);
@@ -150,16 +151,17 @@ void pqSignalAdaptorProxyList::createProxyList()
 //-----------------------------------------------------------------------------
 QVariant pqSignalAdaptorProxyList::proxy() const
 {
-  QList<vtkSMProxy*> list = this->Internal->ReferenceProxy->getInternalProxies(
-    this->Internal->SMPropertyName);
+  QList<pqSMProxy> proxies = pqSMAdaptor::getProxyPropertyDomain(
+    this->Internal->ReferenceProxy->getProxy()->GetProperty(
+      this->Internal->SMPropertyName.toAscii().data()));
 
   int index = this->Internal->ComboBox->currentIndex();
-  if (index < 0 || index >= list.size())
+  if (index < 0 || index >= proxies.size())
     {
     return QVariant(); 
     }
 
-  pqSMProxy selected_proxy = list[index];
+  pqSMProxy selected_proxy = proxies[index];
   QVariant ret;
   ret.setValue(selected_proxy);
   return ret;
@@ -174,9 +176,10 @@ void pqSignalAdaptorProxyList::setProxy(const QVariant& var)
     int index = -1;
     if (p.GetPointer())
       {
-      QList<vtkSMProxy*> list = this->Internal->ReferenceProxy->getInternalProxies(
-        this->Internal->SMPropertyName);
-      index = list.indexOf(p.GetPointer());
+      QList<pqSMProxy> proxies = pqSMAdaptor::getProxyPropertyDomain(
+        this->Internal->ReferenceProxy->getProxy()->GetProperty(
+          this->Internal->SMPropertyName.toAscii().data()));
+      index = proxies.indexOf(p.GetPointer());
       if (index < 0)
         {
         qDebug() << "Selected proxy value not in the list: " << p.GetPointer();

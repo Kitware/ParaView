@@ -62,23 +62,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEnterIdsDialog.h"
 #include "pqEnterPointsDialog.h"
 #include "pqEnterThresholdsDialog.h"
+#include "pqHelperProxyRegisterUndoElement.h"
 #include "pqLinksManager.h"
 #include "pqLookmarkBrowser.h"
-#include "pqLookmarkInspector.h"
 #include "pqLookmarkBrowserModel.h"
 #include "pqLookmarkManagerModel.h"
 #include "pqLookmarkModel.h"
 #include "pqLookmarkDefinitionWizard.h"
+#include "pqLookmarkInspector.h"
 #include "pqLookmarkToolbar.h"
 #include "pqMainWindowCore.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
+#include "pqObjectBuilder.h"
 #include "pqObjectInspectorDriver.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqPendingDisplayManager.h"
-#include "pqPendingDisplayManager.h"
 #include "pqPipelineBrowser.h"
-#include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineMenu.h"
@@ -99,7 +99,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerSelectionModel.h"
 #include "pqServerStartupBrowser.h"
 #include "pqSettingsDialog.h"
-#include "pqSettingsDialog.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqSMAdaptor.h"
@@ -112,6 +111,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginDialog.h"
 #include "pqPluginManager.h"
 #include "pqActionGroupInterface.h"
+#include "pqUndoStackBuilder.h"
+#include "pqSplitViewUndoElement.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -182,6 +183,7 @@ public:
   this->PythonDialog = 0;
 #endif // PARAVIEW_ENABLE_PYTHON
   this->MultiViewManager.setObjectName("MultiViewManager");
+
   }
 
   ~pqImplementation()
@@ -208,6 +210,10 @@ public:
   pqCustomFilterManager* CustomFilterManager;
   pqPQLookupTableManager* LookupTableManager;
   pqObjectInspectorDriver* ObjectInspectorDriver;
+  pqReaderFactory ReaderFactory;
+  pqWriterFactory WriterFactory;
+  pqPendingDisplayManager PendingDisplayManager;
+  QPointer<pqUndoStack> UndoStack;
  
   QMenu* RecentFiltersMenu; 
   QMenu* SourceMenu;
@@ -248,10 +254,11 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   this->setObjectName("MainWindowCore");
   
   pqApplicationCore* const core = pqApplicationCore::instance();
+  pqObjectBuilder* const builder = core->getObjectBuilder();
+
   core->setLookupTableManager(this->Implementation->LookupTableManager);
-  QObject::connect(this, SIGNAL(postAccept()),
-    this->Implementation->LookupTableManager, 
-    SLOT(updateLookupTableScalarRanges()));
+  core->registerManager("PENDING_DISPLAY_MANAGER", 
+    &this->Implementation->PendingDisplayManager);
 
   // Connect the view manager to the pqActiveView.
   QObject::connect(&this->Implementation->MultiViewManager,
@@ -262,13 +269,15 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   QObject::connect(
     &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
     this, SLOT(onActiveViewChanged(pqGenericViewModule*)));
+  /*
   QObject::connect(
     &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
     &this->selectionManager(), SLOT(setActiveView(pqGenericViewModule*)));
+    */
     
   // Listen for compound proxy register events.
   pqServerManagerObserver *observer =
-      pqApplicationCore::instance()->getPipelineData();
+      pqApplicationCore::instance()->getServerManagerObserver();
   this->connect(observer, SIGNAL(compoundProxyDefinitionRegistered(QString)),
       this->Implementation->CustomFilters, SLOT(addCustomFilter(QString)));
   this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
@@ -292,17 +301,24 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
       this->Implementation->LookmarkManagerModel,SLOT(exportLookmarksToFiles(const QList<pqLookmarkModel*>&,const QStringList&)));
 
   // Listen to selection changed events.
+  // These are queued connections, since while changes are happening the SM
+  // may not be in a good state to check which filters should be enabled 
+  // etc etc.
+  // As a general policy, GUI updates must be QueuedConnection. This policy
+  // does not apply to core layer i.e. creation of pqProxies etc.
   pqServerManagerSelectionModel *selection =
       pqApplicationCore::instance()->getSelectionModel();
   this->connect(selection, SIGNAL(currentChanged(pqServerManagerModelItem*)),
-      this, SLOT(onSelectionChanged()));
+      this, SLOT(onSelectionChanged()), Qt::QueuedConnection);
   this->connect(selection,
-      SIGNAL(selectionChanged(const pqServerManagerSelection&, const pqServerManagerSelection&)),
-      this, SLOT(onSelectionChanged()));
+      SIGNAL(selectionChanged(
+          const pqServerManagerSelection&, const pqServerManagerSelection&)),
+      this, SLOT(onSelectionChanged()), Qt::QueuedConnection);
 
   // Update enable state when pending displays state changes.
-  this->connect(core->getPendingDisplayManager(), SIGNAL(pendingDisplays(bool)),
-      this, SLOT(onPendingDisplayChanged(bool)));
+  this->connect(
+    &this->Implementation->PendingDisplayManager, SIGNAL(pendingDisplays(bool)),
+    this, SLOT(onPendingDisplayChanged(bool)));
 
   this->connect(core->getServerManagerModel(), 
     SIGNAL(serverAdded(pqServer*)),
@@ -319,19 +335,50 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
       SIGNAL(finishedRemovingServer()),
       this, SLOT(onSelectionChanged()));
 
-  // Add a source to the pending display list when a new one is created.
-  // The pending display should be created inside the undo set.
-  this->connect(core, SIGNAL(finishSourceCreation(pqPipelineSource*)),
-      this, SLOT(onSourceCreation(pqPipelineSource*)));
   this->connect(core->getServerManagerModel(),
       SIGNAL(preSourceRemoved(pqPipelineSource*)),
-      core->getPendingDisplayManager(), 
+      &this->Implementation->PendingDisplayManager, 
       SLOT(removePendingDisplayForSource(pqPipelineSource*)));
 
-  this->connect(core, SIGNAL(finishedAddingSource(pqPipelineSource*)),
-      this, SLOT(onSourceCreationFinished(pqPipelineSource*)));
-  this->connect(core, SIGNAL(aboutToRemoveSource(pqPipelineSource*)),
-      this, SLOT(onRemovingSource(pqPipelineSource*)));
+  this->connect(builder, SIGNAL(sourceCreated(pqPipelineSource*)),
+    this, SLOT(onSourceCreationFinished(pqPipelineSource*)),
+    Qt::QueuedConnection);
+
+  this->connect(builder, SIGNAL(filterCreated(pqPipelineSource*)),
+    this, SLOT(onSourceCreationFinished(pqPipelineSource*)),
+    Qt::QueuedConnection);
+
+  this->connect(builder, SIGNAL(customFilterCreated(pqPipelineSource*)),
+    this, SLOT(onSourceCreationFinished(pqPipelineSource*)),
+    Qt::QueuedConnection);
+
+  this->connect(builder, 
+    SIGNAL(readerCreated(pqPipelineSource*, const QString&)),
+    this, SLOT(onSourceCreationFinished(pqPipelineSource*)),
+    Qt::QueuedConnection);
+
+  this->connect(builder, 
+    SIGNAL(readerCreated(pqPipelineSource*, const QString&)),
+    this, SLOT(onReaderCreated(pqPipelineSource*, const QString&)));
+
+  this->connect(builder, SIGNAL(sourceCreated(pqPipelineSource*)),
+    this, SLOT(onSourceCreation(pqPipelineSource*)));
+
+  this->connect(builder, SIGNAL(filterCreated(pqPipelineSource*)),
+    this, SLOT(onSourceCreation(pqPipelineSource*)));
+
+  this->connect(builder, SIGNAL(customFilterCreated(pqPipelineSource*)),
+    this, SLOT(onSourceCreation(pqPipelineSource*)));
+
+  this->connect(builder, 
+    SIGNAL(readerCreated(pqPipelineSource*, const QString&)),
+    this, SLOT(onSourceCreation(pqPipelineSource*)));
+
+  this->connect(builder, SIGNAL(destroying(pqPipelineSource*)),
+    this, SLOT(onRemovingSource(pqPipelineSource*)));
+
+  this->connect(builder, SIGNAL(proxyCreated(pqProxy*)),
+    this, SLOT(onProxyCreation(pqProxy*)));
 
   // Listen for the signal that the lookmark button for a given view was pressed
   QObject::connect(
@@ -360,9 +407,36 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
     &this->Implementation->MultiViewManager, SLOT(setActiveServer(pqServer*)));
 
+  // setup Undo Stack.
+  pqUndoStackBuilder* usBuilder = pqUndoStackBuilder::New();
+  this->Implementation->UndoStack = new pqUndoStack(false, usBuilder, this);
+  usBuilder->Delete();
+
+  pqSplitViewUndoElement* svu_elem = pqSplitViewUndoElement::New();
+  this->Implementation->UndoStack->registerElementForLoader(svu_elem);
+  svu_elem->Delete();
+
+  this->Implementation->PendingDisplayManager.setUndoStack(
+    this->Implementation->UndoStack);
+  this->Implementation->MultiViewManager.setUndoStack(
+    this->Implementation->UndoStack);
+
   QObject::connect(
     &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
-    core->getUndoStack(), SLOT(setActiveServer(pqServer*))); 
+    this->Implementation->UndoStack, SLOT(setActiveServer(pqServer*))); 
+
+  // clear undo stack when state is loaded.
+  QObject::connect(core, SIGNAL(stateLoaded()),
+    this->Implementation->UndoStack, SLOT(clear()));
+
+  QObject::connect(
+    &this->Implementation->VCRController, SIGNAL(beginNonUndoableChanges()),
+    this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
+  QObject::connect(
+    &this->Implementation->VCRController, SIGNAL(endNonUndoableChanges()),
+    this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
+
+  core->setUndoStack(this->Implementation->UndoStack);
 
   // set up state loader.
   pqStateLoader* loader = pqStateLoader::New();
@@ -415,7 +489,10 @@ void pqMainWindowCore::refreshSourcesMenu()
 {
   vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
   manager->InstantiateGroupPrototypes("sources");
-    
+   
+  pqObjectBuilder* builder = 
+    pqApplicationCore::instance()->getObjectBuilder();
+
   if(this->Implementation->SourceMenu)
     {
     this->Implementation->SourceMenu->clear();
@@ -433,9 +510,8 @@ void pqMainWindowCore::refreshSourcesMenu()
         {
         proxyLabel = proxy->GetXMLLabel();
         }
-      vtkSMProperty* prop =
-        pqApplicationCore::instance()->getReaderFactory()->getFileNameProperty(proxy);
-      if(!prop && proxyLabel != "Test3DWidget" && 
+      QString filenamePropName = builder->getFileNamePropertyName(proxy);
+      if(filenamePropName.isEmpty() && proxyLabel != "Test3DWidget" && 
          proxyLabel != "PointSource" && proxyLabel != "OutlineSource" &&
          proxyLabel != "NetworkImageSource")
         {
@@ -594,6 +670,14 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
     SIGNAL(changed(pqGenericViewModule*)),
     this->Implementation->PipelineBrowser,
     SLOT(setViewModule(pqGenericViewModule*)));
+
+  // Connect undo/redo.
+  QObject::connect(
+    this->Implementation->PipelineBrowser, SIGNAL(beginUndo(const QString&)),
+    this->Implementation->UndoStack, SLOT(beginUndoSet(const QString&)));
+  QObject::connect(
+    this->Implementation->PipelineBrowser, SIGNAL(endUndo()),
+    this->Implementation->UndoStack, SLOT(endUndoSet()));
 }
 
 pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget)
@@ -606,7 +690,7 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
     
   dock_widget->setWidget(proxyPanel);
 
-  pqUndoStack* const undoStack = pqApplicationCore::instance()->getUndoStack();
+  pqUndoStack* const undoStack = this->Implementation->UndoStack;
   
   // Connect Accept/reset signals.
   QObject::connect(
@@ -620,6 +704,11 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
     SIGNAL(preaccept()),
     &this->Implementation->SelectionManager,
     SLOT(clearSelection()));
+
+  QObject::connect(
+    object_inspector, SIGNAL(accepted()),
+    this->Implementation->LookupTableManager, 
+    SLOT(updateLookupTableScalarRanges()));
 
   QObject::connect(
     object_inspector, 
@@ -640,7 +729,7 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
     SLOT(createPendingDisplays()));
     
   QObject::connect(
-    pqApplicationCore::instance()->getPendingDisplayManager(),
+    &this->Implementation->PendingDisplayManager,
     SIGNAL(pendingDisplays(bool)),
     object_inspector,
     SLOT(forceModified(bool)));
@@ -658,7 +747,8 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
     &pqActiveView::instance(),
     SIGNAL(changed(pqGenericViewModule*)),
     proxyPanel,
-    SLOT(setView(pqGenericViewModule*)));
+    SLOT(setView(pqGenericViewModule*)), 
+    Qt::QueuedConnection);
 
   return proxyPanel;
 }
@@ -670,7 +760,7 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
 
   dock_widget->setWidget(object_inspector);
 
-  pqUndoStack* const undoStack = pqApplicationCore::instance()->getUndoStack();
+  pqUndoStack* const undoStack = this->Implementation->UndoStack;
   
   // Connect Accept/reset signals.
   QObject::connect(
@@ -704,7 +794,7 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
     SLOT(createPendingDisplays()));
     
   QObject::connect(
-    pqApplicationCore::instance()->getPendingDisplayManager(),
+    &this->Implementation->PendingDisplayManager,
     SIGNAL(pendingDisplays(bool)),
     object_inspector,
     SLOT(forceModified(bool)));
@@ -736,7 +826,8 @@ void pqMainWindowCore::setupStatisticsView(QDockWidget* dock_widget)
     
   dock_widget->setWidget(statistics_view);
 
-  pqUndoStack* const undo_stack = pqApplicationCore::instance()->getUndoStack();
+  pqUndoStack* const undo_stack = this->Implementation->UndoStack;
+  
   // Undo/redo operations can potentially change data information,
   // hence we must refresh the data on undo/redo.
   QObject::connect(
@@ -825,13 +916,25 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
     QObject::connect(
       &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
       this->Implementation->AnimationManager, 
-      SLOT(onActiveServerChanged(pqServer*)), Qt::QueuedConnection);
+      SLOT(onActiveServerChanged(pqServer*)));
 
     QObject::connect(this->Implementation->AnimationManager,
       SIGNAL(activeSceneChanged(pqAnimationScene*)),
       this, SLOT(onActiveSceneChanged(pqAnimationScene*)));
+
+    QObject::connect(this->Implementation->AnimationManager, 
+      SIGNAL(activeSceneChanged(pqAnimationScene*)),
+      &this->VCRController(), SLOT(setAnimationScene(pqAnimationScene*)));
+
     this->Implementation->AnimationManager->setViewWidget(
       &this->multiViewManager());
+
+    QObject::connect(this->Implementation->AnimationManager,
+      SIGNAL(beginNonUndoableChanges()),
+      this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
+    QObject::connect(this->Implementation->AnimationManager,
+      SIGNAL(endNonUndoableChanges()),
+      this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
     }
   return this->Implementation->AnimationManager;
 }
@@ -840,17 +943,14 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
 void pqMainWindowCore::setupAnimationPanel(QDockWidget* dock_widget)
 {
   pqAnimationPanel* const panel = new pqAnimationPanel(dock_widget);
-  pqUndoStack* const undoStack = pqApplicationCore::instance()->getUndoStack();
-  
-  pqAnimationManager* mgr = this->getAnimationManager();
-  QObject::connect(mgr, SIGNAL(activeSceneChanged(pqAnimationScene*)),
-    &this->VCRController(), SLOT(setAnimationScene(pqAnimationScene*)));
 
-  QObject::connect(panel, SIGNAL(beginUndoSet(const QString&)),
-    undoStack, SLOT(beginUndoSet(QString)));
-  QObject::connect(panel, SIGNAL(endUndoSet()),
-    undoStack, SLOT(endUndoSet()));
-  
+  QObject::connect(panel, SIGNAL(beginUndo(const QString&)),
+    this->Implementation->UndoStack, SLOT(beginUndoSet(const QString&)));
+
+  QObject::connect(panel, SIGNAL(endUndo()),
+    this->Implementation->UndoStack, SLOT(endUndoSet()));
+
+  pqAnimationManager* mgr = this->getAnimationManager();
   panel->setManager(mgr);
   dock_widget->setWidget(panel);
 }
@@ -870,11 +970,8 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
     SIGNAL(displayChanged(pqConsumerDisplay *, pqGenericViewModule *)),
     display_color, SLOT(setDisplay(pqConsumerDisplay *)));
   
-  QObject::connect(
-    this,
-    SIGNAL(postAccept()),
-    display_color,
-    SLOT(reloadGUI()));
+  QObject::connect( this, SIGNAL(postAccept()),
+    display_color, SLOT(reloadGUI()));
 }
 
 //-----------------------------------------------------------------------------
@@ -921,7 +1018,7 @@ void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* toolbar)
     SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
   // Listen for compound proxy register events.
   pqServerManagerObserver *observer =
-      pqApplicationCore::instance()->getPipelineData();
+      pqApplicationCore::instance()->getServerManagerObserver();
   this->connect(observer, SIGNAL(compoundProxyDefinitionRegistered(QString)),
       this, SLOT(onCompoundProxyAdded(QString)));
   this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
@@ -1013,12 +1110,14 @@ void pqMainWindowCore::onLoadLookmark(const QString &name)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onLoadCurrentLookmark(pqServer *server)
 {
+  pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
   pqGenericViewModule *view = pqActiveView::instance().current();
   if(!view)
     {
-    view = pqPipelineBuilder::instance()->createView(server,pqRenderViewModule::renderViewType());
+    view = builder->createView(pqRenderViewModule::renderViewType(), server);
     }
-  this->Implementation->LookmarkManagerModel->loadLookmark(server, pqActiveView::instance().current(), this->Implementation->LookmarkToLoad);
+  this->Implementation->LookmarkManagerModel->loadLookmark(server, 
+    pqActiveView::instance().current(), this->Implementation->LookmarkToLoad);
 }
 
 //-----------------------------------------------------------------------------
@@ -1142,8 +1241,7 @@ void pqMainWindowCore::onFileOpen()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileOpen(pqServer* server)
 {
-  QString filters = pqApplicationCore::instance()->getReaderFactory()->
-    getSupportedFileTypes(server);
+  QString filters = this->Implementation->ReaderFactory.getSupportedFileTypes(server);
   if (filters != "")
     {
     filters += ";;";
@@ -1164,35 +1262,9 @@ void pqMainWindowCore::onFileOpen(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileOpen(const QStringList& files)
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqServer *server = this->getActiveServer();
   for(int i = 0; i != files.size(); ++i)
     {
-    pqPipelineSource* reader = this->createReaderOnActiveServer(files[i]);
-    if (!reader)
-      {
-      pqSelectReaderDialog prompt(files[i], server,
-                                  qobject_cast<QWidget*>(this->parent()));
-      if(prompt.exec() == QDialog::Accepted)
-        {
-        QString whichReader = prompt.getReader();
-        reader = core->createReaderOnServer(files[i], server, whichReader);
-        }
-      else
-        {
-        continue;
-        }
-      }
-      
-    // Add this to the list of recent server resources ...
-    if(reader)
-      {
-      pqServerResource resource = server->getResource();
-      resource.setPath(files[i]);
-      resource.addData("reader", reader->getProxy()->GetXMLName());
-      core->serverResources().add(resource);
-      core->serverResources().save(*core->settings());
-      }
+    this->createReaderOnActiveServer(files[i]);
     }
 }
 
@@ -1338,8 +1410,7 @@ void pqMainWindowCore::onFileSaveData()
 
   // Get the list of writers that can write the output from the given source.
   QString filters = 
-    pqApplicationCore::instance()->getWriterFactory()->getSupportedFileTypes(
-      source);
+    this->Implementation->WriterFactory.getSupportedFileTypes(source);
 
   pqFileDialog file_dialog(source->getServer(),
     this->Implementation->Parent, tr("Save File:"), QString(), filters);
@@ -1367,8 +1438,8 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
     }
 
   vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(pqApplicationCore::instance()->getWriterFactory()->
-    newWriter(files[0], source));
+  proxy.TakeReference(
+    this->Implementation->WriterFactory.newWriter(files[0], source));
 
   vtkSMSourceProxy* writer = vtkSMSourceProxy::SafeDownCast(proxy);
   if (!writer)
@@ -1889,6 +1960,11 @@ void pqMainWindowCore::onEditSettings()
   pqSettingsDialog dialog(this->Implementation->Parent);
   dialog.setRenderModule(qobject_cast<pqRenderViewModule*>(
       pqActiveView::instance().current()));
+  QObject::connect(&dialog, SIGNAL(beginUndo(const QString&)),
+    this->Implementation->UndoStack, SLOT(beginUndoSet(const QString&)));
+  QObject::connect(&dialog, SIGNAL(endUndo()),
+    this->Implementation->UndoStack, SLOT(endUndoSet()));
+
   dialog.exec();
 }
 
@@ -2133,7 +2209,7 @@ void pqMainWindowCore::onSelectionChanged()
   pqGenericViewModule* view = pqActiveView::instance().current();
   pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(view);
   bool pendingDisplays = 
-      core->getPendingDisplayManager()->getNumberOfPendingDisplays() > 0;
+    this->Implementation->PendingDisplayManager.getNumberOfPendingDisplays() > 0;
 
   // Update the filters menu.
   if(!pendingDisplays)
@@ -2317,7 +2393,9 @@ void pqMainWindowCore::onServerCreation(pqServer* server)
   this->Implementation->ActiveServer.setCurrent(server);
 
   // Create a render module.
-  core->getPipelineBuilder()->createView(server);
+  core->getObjectBuilder()->createView(
+    pqRenderViewModule::renderViewType(), server);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -2326,6 +2404,8 @@ void pqMainWindowCore::onServerCreationFinished(pqServer *server)
   pqApplicationCore *core = pqApplicationCore::instance();
   core->getSelectionModel()->setCurrentItem(server,
       pqServerManagerSelectionModel::ClearAndSelect);
+
+  this->Implementation->UndoStack->clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -2362,6 +2442,59 @@ void pqMainWindowCore::onRemovingServer(pqServer *server)
 }
 
 //-----------------------------------------------------------------------------
+/// Called when a new reader is created by the GUI.
+void pqMainWindowCore::onReaderCreated(pqPipelineSource* reader, 
+  const QString& filename)
+{
+  if (!reader)
+    {
+    return;
+    }
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServer* server = reader->getServer();
+
+  // Add this to the list of recent server resources ...
+  pqServerResource resource = server->getResource();
+  resource.setPath(filename);
+  resource.addData("readergroup", reader->getProxy()->GetXMLGroup());
+  resource.addData("reader", reader->getProxy()->GetXMLName());
+  core->serverResources().add(resource);
+  core->serverResources().save(*core->settings());
+}
+
+//-----------------------------------------------------------------------------
+// Called when any pqProxy or subclass is created,
+// We update the undo stack to include an element
+// which will manage the helper proxies correctly.
+void pqMainWindowCore::onProxyCreation(pqProxy* proxy)
+{
+  if (proxy->getHelperProxies().size() > 0)
+    {
+    pqHelperProxyRegisterUndoElement* elem = 
+      pqHelperProxyRegisterUndoElement::New();
+    elem->RegisterHelperProxies(proxy);
+    this->Implementation->UndoStack->addToActiveUndoSet(elem);
+    elem->Delete();
+    }
+}
+
+//-----------------------------------------------------------------------------
+/// Called when a new source/filter/reader is created
+/// by the GUI. Unlike  onSourceCreationFinished
+/// this is not connected with Qt::QueuedConnection
+/// hence is called immediately when a source is
+/// created.
+void pqMainWindowCore::onSourceCreation(pqPipelineSource *source)
+{
+  this->Implementation->PendingDisplayManager.addPendingDisplayForSource(
+    source);
+}
+
+//-----------------------------------------------------------------------------
+/// Called when a new source/filter/reader is created
+/// by the GUI. This slot is connected with 
+/// Qt::QueuedConnection.
 void pqMainWindowCore::onSourceCreationFinished(pqPipelineSource *source)
 {
   if(this->Implementation->ProxyPanel)
@@ -2373,13 +2506,17 @@ void pqMainWindowCore::onSourceCreationFinished(pqPipelineSource *source)
     }
 
   // Set the new source as the current selection.
-  pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(source,
+  pqApplicationCore *core = pqApplicationCore::instance();
+  core->getSelectionModel()->setCurrentItem(source,
       pqServerManagerSelectionModel::ClearAndSelect);
 }
 
 //-----------------------------------------------------------------------------
+// This method is called only when the gui intiates the removal of the source.
 void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
 {
+  // FIXME: updating of selection must happen even is the source is removed
+  // from python script or undo redo.
   // If the source is selected, remove it from the selection.
   pqApplicationCore *core = pqApplicationCore::instance();
   pqServerManagerSelectionModel *selection = core->getSelectionModel();
@@ -2414,14 +2551,43 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
         }
       }
     }
+
+  QList<pqGenericViewModule*> viewModules = source->getViewModules();
+
+  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
+  if (filter)
+    {
+    // Make all inputs visible in views that the removed source
+    // is currently visible.
+    QList<pqPipelineSource*> inputs = filter->getInputs();
+    foreach(pqGenericViewModule* view, viewModules)
+      {
+      pqConsumerDisplay* src_disp = source->getDisplay(view);
+      if (!src_disp || !src_disp->isVisible())
+        {
+        continue;
+        }
+      // For each input, if it is not visibile in any of the views
+      // that the delete filter is visible, we make the input visible.
+      for(int cc=0; cc < inputs.size(); ++cc)
+        {
+        pqPipelineSource* input = inputs[cc];
+        pqConsumerDisplay* input_disp = input->getDisplay(view);
+        if (input_disp && !input_disp->isVisible())
+          {
+          input_disp->setVisible(true);
+          }
+        }
+      }
+    }
+
+  foreach (pqGenericViewModule* view, viewModules)
+    {
+    // this triggers an eventually render call.
+    view->render();
+    }
 }
 
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::onSourceCreation(pqPipelineSource *source)
-{
-  pqApplicationCore *core = pqApplicationCore::instance();
-  core->getPendingDisplayManager()->addPendingDisplayForSource(source);
-}
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onPostAccept()
@@ -2476,8 +2642,7 @@ void pqMainWindowCore::updateFiltersMenu()
 
   // Get the list of available filters.
   QList<QString> supportedFilters;
-  pqApplicationCore::instance()->getPipelineBuilder()->
-    getSupportedProxies("filters", source->getServer(), supportedFilters);
+  source->getServer()->getSupportedProxies("filters", supportedFilters);
 
   // Iterate over all filters in the menu and see if they can be
   // applied to the current source(s).
@@ -2556,7 +2721,7 @@ void pqMainWindowCore::removeActiveSource()
     qDebug() << "No active source to remove.";
     return;
     }
-  pqApplicationCore::instance()->removeSource(source);
+  pqApplicationCore::instance()->getObjectBuilder()->destroy(source);
 }
 
 //-----------------------------------------------------------------------------
@@ -2575,8 +2740,16 @@ void pqMainWindowCore::removeActiveServer()
 pqPipelineSource* pqMainWindowCore::createSourceOnActiveServer(
   const QString& xmlname)
 {
-  return pqApplicationCore::instance()->createSourceOnServer(xmlname, 
-                 this->getActiveServer());
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqObjectBuilder* builder = core->getObjectBuilder();  
+
+  this->Implementation->UndoStack->beginUndoSet(
+    QString("Create '%1'").arg(xmlname));
+  pqPipelineSource* source =
+    builder->createSource("sources", xmlname, this->getActiveServer());
+  this->Implementation->UndoStack->endUndoSet();
+
+  return source;
 }
 
 
@@ -2584,29 +2757,26 @@ pqPipelineSource* pqMainWindowCore::createSourceOnActiveServer(
 pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
   const QString& xmlname)
 {
-  // Get the list of selected sources.
   pqApplicationCore* core = pqApplicationCore::instance();
+  pqObjectBuilder* builder = core->getObjectBuilder();  
+
+  // Get the list of selected sources.
   pqServerManagerSelection selected =
       *core->getSelectionModel()->selectedItems();
-  pqPipelineSource* source = 0;
-  pqPipelineSource* filter = 0;
-  pqServerManagerModelItem* item = 0;
-  pqServerManagerSelection::ConstIterator iter = selected.begin();
-  if(iter != selected.end())
-    {
-    item = *iter;
-    source = dynamic_cast<pqPipelineSource*>(item);
-    filter = core->createFilterForSource(xmlname, source);
-    ++iter;
-    }
 
-  pqPipelineBuilder* builder = core->getPipelineBuilder();
-  for( ; filter && iter != selected.end(); ++iter)
+  QList<pqPipelineSource*> inputs;
+  foreach (pqServerManagerModelItem* item, selected)
     {
-    item = *iter;
-    source = dynamic_cast<pqPipelineSource*>(item);
-    builder->addConnection(source, filter);
+    pqPipelineSource* source = dynamic_cast<pqPipelineSource*>(item);
+    if (source)
+      {
+      inputs.push_back(source);
+      }
     }
+  this->Implementation->UndoStack->beginUndoSet(
+    QString("Create '%1'").arg(xmlname));
+  pqPipelineSource* filter = builder->createFilter("filters", xmlname, inputs);
+  this->Implementation->UndoStack->endUndoSet();
 
   return filter;
 }
@@ -2615,6 +2785,9 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
 pqPipelineSource* pqMainWindowCore::createCompoundSource(
   const QString& name)
 {
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqObjectBuilder* builder = core->getObjectBuilder();  
+
   pqServerManagerModelItem *item = this->getActiveObject();
   pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
   pqServer *server = dynamic_cast<pqServer *>(item);
@@ -2623,11 +2796,11 @@ pqPipelineSource* pqMainWindowCore::createCompoundSource(
     server = source->getServer();
     }
 
-  pqPipelineSource* cp = pqApplicationCore::instance()->createCompoundFilter(
-      name, server, source);
+  this->Implementation->UndoStack->beginUndoSet(
+    QString("Create '%1'").arg(name));
+  pqPipelineSource* cp = builder->createCustomFilter(name, server, source);
+  this->Implementation->UndoStack->endUndoSet();
 
-  cp->getProxy()->UpdateVTKObjects();
-  
   return cp;
 }
 
@@ -2635,10 +2808,48 @@ pqPipelineSource* pqMainWindowCore::createCompoundSource(
 pqPipelineSource* pqMainWindowCore::createReaderOnActiveServer(
   const QString& filename)
 {
-  return pqApplicationCore::instance()->createReaderOnServer(filename,
-     this->getActiveServer());
+  pqServer* server = this->getActiveServer();
+  if (!server)
+    {
+    qCritical() << "Cannot create reader without an active server.";
+    return 0;
+    }
+
+  pqReaderFactory *readerFactory = &this->Implementation->ReaderFactory;
+  if (!readerFactory->checkIfFileIsReadable(filename, server))
+    {
+    qWarning() << "File '" << filename << "' cannot be read.";
+    return 0;
+    }
+
+  QString readerType = readerFactory->getReaderType(filename, server);
+  if (readerType.isEmpty())
+    {
+    // The reader factory could not determine the type of reader to create for the
+    // file. Ask the user.
+    pqSelectReaderDialog prompt(filename, server, 
+      readerFactory, this->Implementation->Parent);
+    if(prompt.exec() == QDialog::Accepted)
+      {
+      readerType = prompt.getReader();
+      }
+    else
+      {
+      // User didn't choose any reader.
+      return NULL;
+      }
+    }
+
+  this->Implementation->UndoStack->beginUndoSet(
+    QString("Create 'Reader'")); /// FIXME
+  pqPipelineSource* reader = readerFactory->createReader(
+    filename, readerType, server);
+  this->Implementation->UndoStack->endUndoSet();
+
+  return reader;
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::disableAutomaticDisplays()
 {
   QObject::disconnect(pqApplicationCore::instance(),
@@ -2650,8 +2861,7 @@ void pqMainWindowCore::disableAutomaticDisplays()
 void pqMainWindowCore::createPendingDisplays()
 {
   pqGenericViewModule* view = pqActiveView::instance().current();
-  pqApplicationCore::instance()->getPendingDisplayManager()->
-    createPendingDisplays(view);
+  this->Implementation->PendingDisplayManager.createPendingDisplays(view);
 }
 
 //-----------------------------------------------------------------------------
@@ -2750,27 +2960,6 @@ void pqMainWindowCore::enableTestingRenderWindowSize(bool enable)
 void pqMainWindowCore::setMaxRenderWindowSize(const QSize& size)
 {
   this->Implementation->MultiViewManager.setMaxViewWindowSize(size);
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::createBarCharView()
-{
-    pqApplicationCore::instance()->getPipelineBuilder()->createView(
-      this->getActiveServer(), "BarChart");
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::createXYPlotView()
-{
-  pqApplicationCore::instance()->getPipelineBuilder()->createView(
-    this->getActiveServer(), "XYPlot");
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::createTableView()
-{
-  pqApplicationCore::instance()->getPipelineBuilder()->createView(
-    this->getActiveServer(), "TableView");
 }
 
 //-----------------------------------------------------------------------------
@@ -2908,3 +3097,8 @@ void pqMainWindowCore::removePluginToolBars()
   this->Implementation->PluginToolBars.clear();
 }
 
+//-----------------------------------------------------------------------------
+pqUndoStack* pqMainWindowCore::getApplicationUndoStack() const
+{
+  return this->Implementation->UndoStack;
+}

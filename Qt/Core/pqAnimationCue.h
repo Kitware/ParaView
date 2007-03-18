@@ -40,6 +40,7 @@ class vtkSMProperty;
 class PQCORE_EXPORT pqAnimationCue : public pqProxy
 {
   Q_OBJECT;
+  typedef pqProxy Superclass;
 public:
   pqAnimationCue(const QString& group, const QString& name,
     vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
@@ -87,8 +88,14 @@ public:
   // returns the manipulator proxy.
   vtkSMProxy* getManipulatorProxy() const;
 
-public slots:
-  void setDefaults();
+  /// Sets default values for the underlying proxy. 
+  /// This is during the initialization stage of the pqProxy 
+  /// for proxies created by the GUI itself i.e.
+  /// for proxies loaded through state or created by python client
+  /// this method won't be called. 
+  /// The default implementation iterates over all properties
+  /// of the proxy and sets them to default values. 
+  void setDefaultPropertyValues();
     
 signals:
   // emitted when something about the keyframes changes.

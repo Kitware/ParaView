@@ -1,7 +1,7 @@
 /*=========================================================================
 
-   Program:   ParaView
-   Module:    pqUndoRedoStateLoader.cxx
+   Program: ParaView
+   Module:    pqDialog.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -28,58 +28,36 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
+=========================================================================*/
+#include "pqDialog.h"
 
-#include "pqUndoRedoStateLoader.h"
-
-#include "vtkObjectFactory.h"
-#include "vtkUndoSet.h"
-
-#include "pqPendingDisplayUndoElement.h"
-
-
-vtkStandardNewMacro(pqUndoRedoStateLoader);
-vtkCxxRevisionMacro(pqUndoRedoStateLoader, "1.1");
 //-----------------------------------------------------------------------------
-pqUndoRedoStateLoader::pqUndoRedoStateLoader()
+pqDialog::pqDialog(QWidget* _parent/*=0*/, Qt::WindowFlags f/*=0*/)
+  : QDialog(_parent, f)
+{
+  this->UndoLabel = "Dialog";
+}
+
+//-----------------------------------------------------------------------------
+pqDialog::~pqDialog()
 {
 }
 
 //-----------------------------------------------------------------------------
-pqUndoRedoStateLoader::~pqUndoRedoStateLoader()
+void pqDialog::accept()
 {
-}
-//-----------------------------------------------------------------------------
-void pqUndoRedoStateLoader::HandleTag(const char* tagName, 
-  vtkPVXMLElement* root)
-{
-  if (!this->UndoSet)
-    {
-    return; //sanity check.
-    }
-  if (strcmp(tagName, "PendingDisplay") == 0)
-    {
-    this->HandlePendingDisplay(root);
-    }
-  else
-    {
-    this->Superclass::HandleTag(tagName, root);
-    }
+  emit this->beginUndo(this->UndoLabel);
+  this->acceptInternal();
+  this->Superclass::accept();
+  emit this->endUndo();
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoRedoStateLoader::HandlePendingDisplay(vtkPVXMLElement* root)
+void pqDialog::done(int r)
 {
-  pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
-  elem->LoadState(root);
-  elem->SetConnectionID(this->ConnectionID);
-  this->UndoSet->AddElement(elem);
-  elem->Delete();
+  emit this->beginUndo(this->UndoLabel);
+  this->doneInternal(r);
+  this->Superclass::done(r);
+  emit this->endUndo();
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void pqUndoRedoStateLoader::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-}

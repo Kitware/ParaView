@@ -25,7 +25,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.12");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.13");
 vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewRenderModuleProxy, 
   vtkSMMultiViewRenderModuleProxy);
 
@@ -85,14 +85,14 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
           {
           vtkSMRenderModuleProxy *renMod = this->PQInternal->PreferredRenderModules.front();
           unsigned int i=0;
-          for(i=0; i<this->MultiViewRenderModuleProxy->GetNumberOfProxies(); i++)
+          for(i=0; i<this->MultiViewRenderModuleProxy->GetNumberOfRenderModules(); i++)
             {
-            if(this->MultiViewRenderModuleProxy->GetProxy(i) == renMod)
+            if(this->MultiViewRenderModuleProxy->GetRenderModule(i) == renMod)
               {
               break;
               }
             }
-          if(i<this->MultiViewRenderModuleProxy->GetNumberOfProxies())
+          if(i<this->MultiViewRenderModuleProxy->GetNumberOfRenderModules())
             {
             renMod->Register(this);
             this->PQInternal->PreferredRenderModules.pop_front();
@@ -190,4 +190,6 @@ void vtkSMPQStateLoader::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "MultiViewRenderModuleProxy: " 
      << this->MultiViewRenderModuleProxy << endl;
+//  os << indent << "UseExistingRenderModules: " << 
+//    this->UseExistingRenderModules << endl;
 }

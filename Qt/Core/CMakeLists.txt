@@ -57,10 +57,10 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksModel.h
   pqLinkViewWidget.h
   pqLookupTableManager.h
+  pqObjectBuilder.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
   pqPendingDisplayManager.h
-  pqPipelineBuilder.h
   pqPipelineDisplay.h
   pqPipelineSource.h
   pqPipelineFilter.h
@@ -173,6 +173,8 @@ ADD_LIBRARY(pqCore
   pqFormBuilder.h
   pqGenericViewModule.cxx
   pqGenericViewModule.h
+  pqHelperProxyRegisterUndoElement.cxx
+  pqHelperProxyRegisterUndoElement.h
   pqHistogramTableModel.cxx
   pqHistogramTableModel.h
   pqLineChartDisplay.cxx
@@ -193,6 +195,8 @@ ADD_LIBRARY(pqCore
   pqNameCount.h
   pqOptions.cxx
   pqOptions.h
+  pqObjectBuilder.cxx
+  pqObjectBuilder.h
   pqOutputWindow.cxx
   pqOutputWindow.h
   pqOutputWindowAdapter.cxx
@@ -201,8 +205,6 @@ ADD_LIBRARY(pqCore
   pqPendingDisplayManager.h
   pqPendingDisplayUndoElement.cxx
   pqPendingDisplayUndoElement.h
-  pqPipelineBuilder.cxx
-  pqPipelineBuilder.h
   pqPipelineDisplay.cxx
   pqPipelineDisplay.h
   pqPipelineFilter.cxx
@@ -223,6 +225,8 @@ ADD_LIBRARY(pqCore
   pqPropertyManager.h
   pqProxy.cxx
   pqProxy.h
+  pqProxyUnRegisterUndoElement.cxx
+  pqProxyUnRegisterUndoElement.h
   pqQVTKWidgetEventPlayer.cxx
   pqQVTKWidgetEventPlayer.h
   pqQVTKWidgetEventTranslator.cxx
@@ -272,8 +276,6 @@ ADD_LIBRARY(pqCore
   pqTimeKeeper.h
   pqTextWidgetDisplay.cxx
   pqTextWidgetDisplay.h
-  pqUndoRedoStateLoader.cxx
-  pqUndoRedoStateLoader.h
   pqUndoStack.cxx
   pqUndoStack.h
   pqVTKHistogramColor.cxx

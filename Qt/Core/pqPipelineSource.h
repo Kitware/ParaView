@@ -53,7 +53,7 @@ class vtkPVDataInformation;
 class PQCORE_EXPORT pqPipelineSource : public pqProxy
 {
   Q_OBJECT
-
+  typedef pqProxy Superclass;
 public:
   pqPipelineSource(const QString& name, vtkSMProxy *proxy, pqServer* server,
     QObject* parent=NULL);
@@ -96,10 +96,14 @@ public:
   // render otherwise render on idle.
   void renderAllViews(bool force=false);
 
-  /// Sets default values for the underlying proxy. This is typically called
-  /// only on proxies created by the GUI itself, and after the input 
-  /// (if applicable) has been set.
-  void setDefaultValues();
+  /// Sets default values for the underlying proxy. 
+  /// This is during the initialization stage of the pqProxy 
+  /// for proxies created by the GUI itself i.e.
+  /// for proxies loaded through state or created by python client
+  /// this method won't be called. 
+  /// The default implementation iterates over all properties
+  /// of the proxy and sets them to default values. 
+  void setDefaultPropertyValues();
 
   /// Returns if this proxy replaces input on creation.
   /// This checks the "Hints" for the proxy, if any. If a <Visibility>
@@ -148,15 +152,18 @@ protected:
   /// widget thru which the user can choose one of the available proxies.
   void createProxiesForProxyListDomains();
 
-  // called by pqPipelineFilter when the connections change.
+  /// called by pqPipelineFilter when the connections change.
   void removeConsumer(pqPipelineSource *);
   void addConsumer(pqPipelineSource*);
 
-  // called by pqConsumerDisplay when the connections change.
+  /// called by pqConsumerDisplay when the connections change.
   void addDisplay(pqConsumerDisplay*);
   void removeDisplay(pqConsumerDisplay*);
 
   void processProxyListHints(vtkSMProxy *proxy_list_proxy);
+  
+  /// Overridden to add the proxies to the domain as well.
+  virtual void addHelperProxy(const QString& key, vtkSMProxy*);
 
 private:
   pqPipelineSourceInternal *Internal; ///< Stores the output connections.

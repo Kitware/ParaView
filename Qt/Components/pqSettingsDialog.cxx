@@ -62,11 +62,13 @@ public:
 
 //-----------------------------------------------------------------------------
 pqSettingsDialog::pqSettingsDialog(QWidget* _p/*=null*/, 
-  Qt::WFlags f/*=0*/): QDialog(_p, f)
+  Qt::WFlags f/*=0*/): pqDialog(_p, f)
 {
   this->Internal = new pqSettingsDialogInternal;
   this->Internal->setupUi(this);
   this->Internal->ViewProperties = new pq3DViewPropertiesWidget();
+
+  this->setUndoLabel("Settings");
   
 
   QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onFinished(int)));

@@ -47,9 +47,8 @@ class vtkObject;
 class PQCORE_EXPORT pqRenderViewModule : public pqGenericViewModule
 {
   Q_OBJECT
-public:
   typedef pqGenericViewModule Superclass;
-
+public:
   static QString renderViewType() { return "RenderView"; }
 
   pqRenderViewModule(const QString& name, vtkSMRenderModuleProxy* renModule, 
@@ -85,9 +84,12 @@ public:
   /// on interaction is managed by this class.
   virtual pqUndoStack* getInteractionUndoStack() const;
 
-  /// Sets default values for the underlying proxy. This is typically called
-  /// only on proxies created by the GUI itself.
-  virtual void setDefaults();
+  /// Sets default values for the underlying proxy. 
+  /// This is during the initialization stage of the pqProxy 
+  /// for proxies created by the GUI itself i.e.
+  /// for proxies loaded through state or created by python client
+  /// this method won't be called. 
+  virtual void setDefaultPropertyValues();
 
   /// restore the default background color
   int* defaultBackgroundColor();
@@ -95,11 +97,6 @@ public:
   /// restore the default light parameters
   void restoreDefaultLightSettings();
 
-  /// Change the interactive style used by this render module. One is
-  /// encouraged to use this method to change the interactive style
-  /// rather than simply changing it on the render window interactor.
-  void setInteractorStyle(vtkInteractorStyle* style);
- 
   /// Save the settings of this render module with QSettings
   virtual void saveSettings();
 
@@ -192,11 +189,33 @@ private slots:
   // ResetCameraEvent.
   void onResetCameraEvent();
 
-protected:
-  /// setups up RM and QVTKWidget binding.
-  virtual void viewModuleInit();
+  /// Called when the "InteractorStyle" property on the render module
+  /// proxy changes. We set up the observers on the new interactor
+  /// style to know about interaction events.
+  void onInteractorStyleChanged();
 
+  /// Setups up RenderModule and QVTKWidget binding.
+  /// This method is called for all pqRenderViewModule objects irrespective
+  /// of whether it is created from state/undo-redo/python or by the GUI. Hence
+  /// don't change any render module properties here.
+  virtual void initializeWidgets();
+
+protected:
   bool eventFilter(QObject* caller, QEvent* e);
+
+  /// Creates default interactor style/manipulators.
+  void createDefaultInteractors();
+
+  /// Center Axes represents the 3D axes in the view. When GUI creates the view,
+  /// we explicitly create a center axes, register it and add it to the view 
+  /// displays.
+  /// However, when the view is not created by GUI explicitly i.e. created 
+  /// through undo-redo/state/python, we try to use the first Axes display in 
+  /// the view as the center axes if any. Otherwise a new center axes will be 
+  /// created for the view then setCenterAxesVisibility(true) is called. Thus, 
+  /// for such views the behaviour is analogous to center axis visibility being 
+  /// off. Once, the user enables the center axes, we will show one.
+  void initializeCenterAxes();
 
   // When true, the camera center of rotation will be reset when the
   // user reset the camera.

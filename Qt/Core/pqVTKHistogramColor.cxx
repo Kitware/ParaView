@@ -115,6 +115,11 @@ void pqVTKHistogramColor::setScalarsToColors(vtkSMProxy* lut)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   this->Internals->ScalarToColors = 
     vtkScalarsToColors::SafeDownCast(pm->GetObjectFromID(lut->GetID(0)));
+  if (this->Internals->ScalarToColors)
+    {
+    // This ensures that the LUT is up-to-date.
+    this->Internals->ScalarToColors->Build();
+    }
 }
 
 //-----------------------------------------------------------------------------

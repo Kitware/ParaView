@@ -33,7 +33,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNew3DWidgetProxy);
-vtkCxxRevisionMacro(vtkSMNew3DWidgetProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMNew3DWidgetProxy, "1.9");
 
 class vtkSMNew3DWidgetObserver : public vtkCommand
 {
@@ -216,6 +216,11 @@ void vtkSMNew3DWidgetProxy::CreateVTKObjects(int numObjects)
     this->Widget->AddObserver(
       vtkCommand::InteractionEvent, this->Observer);
     }
+
+  // Since links copy values from input to output,
+  // we need to make sure that input properties i.e. the info
+  // properties are not empty.
+  this->UpdatePropertyInformation();
 
   vtkSMPropertyIterator* piter = this->NewPropertyIterator();
   for(piter->Begin(); !piter->IsAtEnd(); piter->Next())

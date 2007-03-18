@@ -40,13 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMap>
 #include <QPointer>
 #include <QtDebug>
-#include <QTimer>
+#include <QVector>
 
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
+#include <vtkstd/vector>
 //-----------------------------------------------------------------------------
 class pqTimeKeeper::pqInternals
 {
@@ -55,13 +56,6 @@ public:
   typedef TimeMapType::iterator TimeMapIteratorType;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
-  // When every a source's TimestepValues property is modified,
-  // we add it to this list. On idle, we update the
-  // timekeepers timesteps to include the values from all
-  // modified sources present in this list and clear this list.
-  // If in the mean time a source in unregistered, we ensure
-  // that it is removed from this list as well.
-  QList<QPointer<pqPipelineSource> > ModifiedSources;
   TimeMapType Times;
 };
 
@@ -73,18 +67,6 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
   this->Internals = new pqInternals();
   this->Internals->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
-  QTimer::singleShot(0, this, SLOT(delayedInitialization()));
-}
-
-//-----------------------------------------------------------------------------
-pqTimeKeeper::~pqTimeKeeper()
-{
-  delete this->Internals;
-}
-
-//-----------------------------------------------------------------------------
-void pqTimeKeeper::delayedInitialization()
-{
   pqServerManagerModel* smmodel = 
     pqApplicationCore::instance()->getServerManagerModel();
 
@@ -92,7 +74,6 @@ void pqTimeKeeper::delayedInitialization()
     this, SLOT(sourceAdded(pqPipelineSource*)));
   QObject::connect(smmodel, SIGNAL(sourceRemoved(pqPipelineSource*)),
     this, SLOT(sourceRemoved(pqPipelineSource*)));
-
 
   this->blockSignals(true);
   // ServerManagerModel may already have some registered sources
@@ -105,7 +86,17 @@ void pqTimeKeeper::delayedInitialization()
     this->sourceAdded(src);
     }
   this->blockSignals(false);
-  emit this->timeStepsChanged();
+
+  if (sources.size() > 0)
+    {
+    emit this->timeStepsChanged();
+    }
+}
+
+//-----------------------------------------------------------------------------
+pqTimeKeeper::~pqTimeKeeper()
+{
+  delete this->Internals;
 }
 
 //-----------------------------------------------------------------------------
@@ -120,12 +111,12 @@ void pqTimeKeeper::updateTimeKeeperProxy()
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->getProxy()->GetProperty("TimestepValues"));
 
+
+  QVector<double> keys = this->Internals->Times.keys().toVector();
+  vtkstd::vector<double> std_keys = keys.toStdVector();
+
   dvp->SetNumberOfElements(this->Internals->Times.size());
-  pqInternals::TimeMapIteratorType iter = this->Internals->Times.begin();
-  for (int cc=0; iter != this->Internals->Times.end(); ++iter, ++cc)
-    {
-    dvp->SetElement(cc, iter.key());
-    }
+  dvp->SetElements(&std_keys[0]);
   this->getProxy()->UpdateVTKObjects();
   emit this->timeStepsChanged();
 }
@@ -171,31 +162,25 @@ void pqTimeKeeper::propertyModified(vtkObject* obj, unsigned long, void*, void* 
     {
     return;
     }
+
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   pqPipelineSource* source = smmodel->getPQSource(proxy);
-  if (!this->Internals->ModifiedSources.contains(source))
+  if (source)
     {
-    this->Internals->ModifiedSources.push_back(source);
+    this->propertyModified(source);
     }
-  QTimer::singleShot(1, this,  SLOT(updateTimestepsFromModifiedSources()));
-}
-
-//-----------------------------------------------------------------------------
-void pqTimeKeeper::updateTimestepsFromModifiedSources()
-{
-  foreach (pqPipelineSource* source, this->Internals->ModifiedSources)
-    {
-    if (source)
-      {
-      this->propertyModified(source);
-      }
-    }
-  this->Internals->ModifiedSources.clear();
 }
 
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::propertyModified(pqPipelineSource* source)
 {
+  // The important thing to note here is that pqTimeKeeper never itself calls
+  // UpdatePipelineInformation() or UpdatePropertyInformation(). It merely
+  // updates the timekeeper whenever any reader reports it have timesteps
+  // available or they are changed. This is crucial since this method may
+  // get called during undo/redo, loading state etc when the proxy may not
+  // have necessary properties intialized to do a UpdatePropertyInformation().
+
   vtkSMProxy* proxy = source->getProxy();
   this->cleanupTimes(source);
   QList<QVariant> timestepValues = pqSMAdaptor::getMultipleElementProperty(
@@ -221,7 +206,6 @@ void pqTimeKeeper::propertyModified(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::sourceRemoved(pqPipelineSource* source)
 {
-  this->Internals->ModifiedSources.removeAll(source);
   this->Internals->VTKConnect->Disconnect(source->getProxy());
   this->cleanupTimes(source);
   this->updateTimeKeeperProxy();

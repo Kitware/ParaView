@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationCue.h"
 #include "pqApplicationCore.h"
-#include "pqPipelineBuilder.h"
+#include "pqObjectBuilder.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
@@ -288,21 +288,22 @@ pqAnimationCue* pqAnimationScene::createCue(vtkSMProxy* proxy,
 pqAnimationCue* pqAnimationScene::createCueInternal(const QString& mtype,
   vtkSMProxy* proxy, const char* propertyname, int index) 
 {
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineBuilder* builder = pqApplicationCore::instance()->getPipelineBuilder();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
 
-  vtkSMProxy* cueProxy = builder->createProxy("animation", "AnimationCue", "animation",
-    this->getServer());
+  pqObjectBuilder* builder = core->getObjectBuilder();
+  vtkSMProxy* cueProxy = builder->createProxy("animation", "AnimationCue", 
+    this->getServer(), "animation");
   cueProxy->SetServers(vtkProcessModule::CLIENT);
-  pqAnimationCue* cue = qobject_cast<pqAnimationCue*>(smmodel->getPQProxy(cueProxy));
+  pqAnimationCue* cue = qobject_cast<pqAnimationCue*>(
+    smmodel->getPQProxy(cueProxy));
   if (!cue)
     {
     qDebug() << "Failed to create AnimationCue.";
     return 0;
     }
   cue->setManipulatorType(mtype);
-  cue->setDefaults();
+  cue->setDefaultPropertyValues();
 
   pqSMAdaptor::setProxyProperty(cueProxy->GetProperty("AnimatedProxy"), proxy);
   pqSMAdaptor::setElementProperty(cueProxy->GetProperty("AnimatedPropertyName"), 
@@ -351,17 +352,16 @@ void pqAnimationScene::removeCues(vtkSMProxy* animated_proxy)
     }
   sceneProxy->UpdateVTKObjects();
 
-  pqPipelineBuilder* builder = pqApplicationCore::instance()->getPipelineBuilder();
+  pqObjectBuilder* builder = 
+    pqApplicationCore::instance()->getObjectBuilder();
+
   foreach (pqAnimationCue* cue, toRemove)
     {
-    if (cue)
-      {
-      // When the Cue is removed, the manipulator proxy as well as the keyframes
-      // get unregistered automatically, since we've registered them as internal
-      // proxies to the pqAnimationCue. Ofcourse, if python client had registered
-      // the manipulator/keyframes, they won't get unregistered by this.
-      builder->remove(cue);
-      }
+    // When the Cue is removed, the manipulator proxy as well as the keyframes
+    // get unregistered automatically, since we've registered them as internal
+    // proxies to the pqAnimationCue. Ofcourse, if python client had registered
+    // the manipulator/keyframes, they won't get unregistered by this.
+    builder->destroy(cue);
     }
 }
 

@@ -36,11 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 #include "pqApplicationCore.h"
-#include "pqPipelineBuilder.h"
+#include "pqObjectBuilder.h"
 #include "pqPipelineDisplay.h"
-#include "pqScalarsToColors.h"
-#include "pqScalarBarDisplay.h"
 #include "pqRenderViewModule.h"
+#include "pqScalarBarDisplay.h"
+#include "pqScalarsToColors.h"
+#include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarBarVisibilityAdaptor::pqInternal
@@ -48,6 +49,7 @@ class pqScalarBarVisibilityAdaptor::pqInternal
 public:
   QPointer<pqPipelineDisplay> ActiveDisplay;
   QPointer<pqRenderViewModule> ActiveRenderModule;
+  QPointer<pqScalarsToColors> ActiveLUT;
 };
 
 //-----------------------------------------------------------------------------
@@ -61,6 +63,15 @@ pqScalarBarVisibilityAdaptor::pqScalarBarVisibilityAdaptor(QAction* p)
     p, SLOT(setEnabled(bool)));
   QObject::connect(this, SIGNAL(scalarBarVisible(bool)),
     p, SLOT(setChecked(bool)));
+
+  pqUndoStack* us = pqApplicationCore::instance()->getUndoStack();
+  if (us)
+    {
+    QObject::connect(this, SIGNAL(begin(const QString&)),
+      us, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(this, SIGNAL(end()),
+      us, SLOT(endUndoSet()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -77,7 +88,7 @@ void pqScalarBarVisibilityAdaptor::setActiveDisplay(pqConsumerDisplay *display,
     {
     if(this->Internal->ActiveDisplay)
       {
-      this->disconnect(this->Internal->ActiveDisplay, 0, this, 0);
+      QObject::disconnect(this->Internal->ActiveDisplay, 0, this, 0);
       }
 
     this->Internal->ActiveDisplay = dynamic_cast<pqPipelineDisplay *>(display);
@@ -85,14 +96,14 @@ void pqScalarBarVisibilityAdaptor::setActiveDisplay(pqConsumerDisplay *display,
         dynamic_cast<pqRenderViewModule *>(view);
     if(this->Internal->ActiveDisplay)
       {
-      this->connect(this->Internal->ActiveDisplay,
+      QObject::connect(this->Internal->ActiveDisplay,
           SIGNAL(visibilityChanged(bool)), 
-          this, SLOT(updateEnableState()), Qt::QueuedConnection);
-      this->connect(this->Internal->ActiveDisplay, SIGNAL(colorChanged()),
-          this, SLOT(updateEnableState()), Qt::QueuedConnection);
+          this, SLOT(updateState()), Qt::QueuedConnection);
+      QObject::connect(this->Internal->ActiveDisplay, SIGNAL(colorChanged()),
+          this, SLOT(updateState()), Qt::QueuedConnection);
       }
 
-    this->updateEnableState();
+    this->updateState();
     }
 }
 
@@ -111,13 +122,22 @@ void pqScalarBarVisibilityAdaptor::setScalarBarVisibility(bool visible)
     qDebug() << "No Lookup Table found for the active display.";
     return;
     }
-  
+
   pqScalarBarDisplay* sb = 
     lut->getScalarBar(this->Internal->ActiveRenderModule);
+
+  if (!sb && !visible)
+    {
+    // nothing to do, scalar bar already invisible.
+    return;
+    }
+
+  emit this->begin("Toggle Color Legend Visibility");
   if (!sb)
     {
-    pqPipelineBuilder* builder = pqApplicationCore::instance()->getPipelineBuilder();
-    sb = builder->createScalarBar(lut, this->Internal->ActiveRenderModule);
+    pqObjectBuilder* builder = 
+      pqApplicationCore::instance()->getObjectBuilder();
+    sb = builder->createScalarBarDisplay(lut, this->Internal->ActiveRenderModule);
     sb->makeTitle(this->Internal->ActiveDisplay);
     }
   if (!sb)
@@ -126,13 +146,39 @@ void pqScalarBarVisibilityAdaptor::setScalarBarVisibility(bool visible)
     return;
     }
   sb->setVisible(visible);
+
+  emit this->end();
+
   sb->renderAllViews();
 
-  this->updateEnableState();
+  this->updateState();
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarBarVisibilityAdaptor::updateEnableState()
+void pqScalarBarVisibilityAdaptor::updateState()
+{
+  if (this->Internal->ActiveLUT)
+    {
+    QObject::disconnect(this->Internal->ActiveLUT, 0, this, 0);
+    this->Internal->ActiveLUT = 0;
+    }
+
+  // We block the action signals so that we don't call
+  // setScalarBarVisibility() slot as a consequence of updating
+  // the state of the action.
+  bool old = this->parent()->blockSignals(true);
+  this->updateStateInternal();
+  this->parent()->blockSignals(old);
+
+  if (this->Internal->ActiveLUT)
+    {
+    QObject::connect(this->Internal->ActiveLUT, SIGNAL(scalarBarsChanged()),
+      this, SLOT(updateState()), Qt::QueuedConnection);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarBarVisibilityAdaptor::updateStateInternal()
 {
   // No display, no scalar bar.
   if (!this->Internal->ActiveDisplay)
@@ -158,6 +204,8 @@ void pqScalarBarVisibilityAdaptor::updateEnableState()
     }
 
   emit this->canChangeVisibility(true);
+
+  this->Internal->ActiveLUT = lut;
 
   // update check state.
   pqScalarBarDisplay* sb = 

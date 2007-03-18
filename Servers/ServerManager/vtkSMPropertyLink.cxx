@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.13");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.14");
 //-----------------------------------------------------------------------------
 class vtkSMPropertyLinkObserver : public vtkCommand
 {
@@ -129,6 +129,7 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname,
 {
   int addToList = 1;
   int addObserver = updateDir & INPUT;
+  bool input_exists = false;
   
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
@@ -141,7 +142,20 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname,
       addObserver = 0;
       addToList = 0;
       }
+    if (iter->UpdateDirection & INPUT)
+      {
+      input_exists = true;
+      }
     }
+
+  if (addToList && input_exists && (updateDir & INPUT) )
+    {
+    /* For now, allow multiple inputs. This strategy needs some evaluation.
+    vtkErrorMacro("Only one input can be added at a time.");
+    return;
+    */
+    }
+
   if (addToList)
     {
     vtkSMPropertyLinkInternals::LinkedProperty link(proxy, pname, updateDir);
@@ -157,6 +171,8 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname,
     this->ObserveProxyUpdates(proxy);
     }
 
+  this->Synchronize();
+
   this->Modified();
 }
 
@@ -170,6 +186,7 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProperty* property, int updateDir
     }
   int addToList = 1;
   int addObserver = updateDir & INPUT;
+  bool input_exists = false;
 
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
@@ -180,6 +197,17 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProperty* property, int updateDir
       addObserver = 0;
       addToList = 0;
       }
+
+    if (iter->UpdateDirection & INPUT)
+      {
+      input_exists = true;
+      }
+    }
+
+  if (addToList && input_exists && (updateDir & INPUT) )
+    {
+    vtkErrorMacro("Only one input can be added at a time.");
+    return;
     }
 
   if (addToList)
@@ -199,10 +227,34 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProperty* property, int updateDir
       this->Internals->PropertyObserver);
     }
   
+  this->Synchronize();
   this->Modified();
-
 }
 
+
+//-----------------------------------------------------------------------------
+// Find input property and update all output properties
+// to match the value of the input property.
+void vtkSMPropertyLink::Synchronize()
+{
+  vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
+    this->Internals->LinkedProperties.begin();
+  for(; iter != this->Internals->LinkedProperties.end(); iter++)
+    { 
+    if (iter->UpdateDirection & INPUT)
+      {
+      if (iter->Property)
+        {
+        this->UpdateProperties(iter->Property);
+        }
+      else if (iter->Proxy)
+        {
+        this->UpdateProperties(iter->Proxy, iter->PropertyName);
+        }
+      break;
+      }
+    }
+}
 
 //-----------------------------------------------------------------------------
 void vtkSMPropertyLink::RemoveAllLinks()

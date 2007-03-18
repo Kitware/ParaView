@@ -102,6 +102,8 @@ public:
   // Description:
   // Flag indicating if the display supports a volume rendering 
   // representation.
+  // VolumePipelineType is one of INVALID (not-determined yet), 
+  // NONE (no volume support), IMAGE_DATA, UNSTRUCTURED_GRID.
   vtkGetMacro(VolumePipelineType,    int);
   vtkGetMacro(SupportsHAVSMapper,   int);
   vtkGetMacro(SupportsBunykMapper,  int);

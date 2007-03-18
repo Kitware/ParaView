@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
-vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.11");
+vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.12");
 
 vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
 
@@ -296,6 +296,17 @@ int vtkSMBoundsDomain::SetDefaultValues(vtkSMProperty* prop)
           dvp->SetElement(cc, this->GetMaximum(cc));
           status = 1;
           }
+        }
+      }
+    break;
+
+  case vtkSMBoundsDomain::MAGNITUDE:
+      {
+      if (this->GetMinimumExists(0) && this->GetMaximumExists(0))
+        {
+        double val = (this->GetMinimum(0)+this->GetMaximum(0))/2.0;
+        dvp->SetElement(0, val);
+        status = 1;
         }
       }
     break;

@@ -269,6 +269,12 @@ IF(BUILD_TESTING)
     StreamTracerUpdates
     Threshold
     UndoRedo
+    UndoRedo1
+    UndoRedo2
+    UndoRedo3
+    UndoRedo4
+    UndoRedo5
+    UndoRedo6
   )
 
   SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver${PV_EXE_SUFFIX})

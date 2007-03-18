@@ -36,6 +36,6 @@ QtTesting.playCommand(object2, 'activate', '')
 QtTesting.playCommand(object3, 'filesSelected', '$PARAVIEW_TEST_ROOT/TestMultiView.pvsm')
 
 QtTesting.wait(1000)
-snapshotWidget = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'LoadStateMultiView.png', 200, 200);
 

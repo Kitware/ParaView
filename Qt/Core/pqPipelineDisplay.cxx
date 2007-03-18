@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqLookupTableManager.h"
-#include "pqPipelineBuilder.h"
+#include "pqObjectBuilder.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqRenderViewModule.h"
@@ -70,12 +70,10 @@ class pqPipelineDisplayInternal
 public:
   vtkSmartPointer<vtkSMDataObjectDisplayProxy> DisplayProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  bool DefaultsInitialized;
 
   pqPipelineDisplayInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-    this->DefaultsInitialized = false;
     }
   // Convenience method to get array information.
   vtkPVArrayInformation* getArrayInformation(
@@ -117,6 +115,20 @@ pqPipelineDisplay::pqPipelineDisplay(const QString& name,
 {
   this->Internal = new pqPipelineDisplayInternal();
   this->Internal->DisplayProxy = display;
+
+  const char* properties[] = {
+    "ScalarVisibility",
+    "LookupTable",
+    "ScalarMode",
+    "ColorArray", 
+    0};
+
+  for (int cc=0; properties[cc]; cc++)
+    {
+    this->Internal->VTKConnect->Connect(
+      display->GetProperty(properties[cc]), vtkCommand::ModifiedEvent,
+      this, SIGNAL(colorChanged()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -132,24 +144,15 @@ vtkSMDataObjectDisplayProxy* pqPipelineDisplay::getDisplayProxy() const
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineDisplay::setDefaults()
+void pqPipelineDisplay::setDefaultPropertyValues()
 {
-  vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
-  if (!displayProxy)
-    {
-    return;
-    }
+  // We deliberately don;t call superclass. For somereason,
+  // its messing up with the scalar coloring.
+  // this->Superclass::setDefaultPropertyValues();
 
-  this->deferredSetDefaults();
-  //this->Internal->VTKConnect->Connect(displayProxy,
-  //  vtkCommand::UserEvent, this, SLOT(deferredSetDefaults()));
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineDisplay::deferredSetDefaults()
-{
-  if (this->Internal->DefaultsInitialized)
+  if (!this->isVisible())
     {
+    // don't worry about invisible displays.
     return;
     }
 
@@ -158,7 +161,7 @@ void pqPipelineDisplay::deferredSetDefaults()
     {
     return;
     }
-  this->Internal->DefaultsInitialized = true;
+
   // if the source created a new point scalar, use it
   // else if the source created a new cell scalar, use it
   // else if the input color by array exists in this source, use it
@@ -316,7 +319,6 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     pqSMAdaptor::setElementProperty(
       displayProxy->GetProperty("ScalarVisibility"), 0);
     displayProxy->UpdateVTKObjects();
-    emit this->colorChanged();
     return;
     }
 
@@ -340,8 +342,9 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     // we simply create new lookup tables for each display.
     if (pp->GetNumberOfProxies() == 0)
       {
-      pqPipelineBuilder* builder = core->getPipelineBuilder();
-      lut = builder->createLookupTable(this);
+      pqObjectBuilder* builder = core->getObjectBuilder();
+      lut = builder->createProxy("lookup_tables", "LookupTable", 
+        this->getServer(), "lookup_tables");
       }
     else
       {
@@ -355,7 +358,6 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     pqSMAdaptor::setElementProperty(
       displayProxy->GetProperty("ScalarVisibility"), 0);
     displayProxy->UpdateVTKObjects();
-    emit this->colorChanged();
     return;
     }
 
@@ -399,7 +401,6 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
   displayProxy->UpdateVTKObjects();
 
   this->updateLookupTableScalarRange();
-  emit this->colorChanged();
 }
 
 //-----------------------------------------------------------------------------

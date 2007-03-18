@@ -83,22 +83,17 @@ pqGenericViewModule::pqGenericViewModule(
   // Listen to updates on the displays property.
   this->Internal->VTKConnect->Connect(renModule->GetProperty("Displays"),
     vtkCommand::ModifiedEvent, this, SLOT(displaysChanged()));
+
+  // Fire start/end render signals when the underlying proxy
+  // fires appropriate events.
   this->Internal->VTKConnect->Connect(renModule,
     vtkCommand::StartEvent, this, SIGNAL(beginRender()));
   this->Internal->VTKConnect->Connect(renModule,
     vtkCommand::EndEvent, this, SIGNAL(endRender()));
 
-  if (renModule->GetObjectsCreated())
-    {
-    this->viewModuleInit();
-    }
-  else
-    {
-    // the render module hasn't been created yet.
-    // listen to the create event to connect the QVTKWidget.
-    this->Internal->VTKConnect->Connect(renModule, vtkCommand::UpdateEvent,
-      this, SLOT(onUpdateVTKObjects()));
-    }
+  // If the render module already has some displays in it when it is registered,
+  // this method will detect them and sync the GUI state with the SM state.
+  this->displaysChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -185,6 +180,7 @@ void pqGenericViewModule::displaysChanged()
   pqServerManagerModel* smModel = 
     pqApplicationCore::instance()->getServerManagerModel();
 
+  bool unknown_display = false;
   unsigned int max = prop->GetNumberOfProxies();
   for (unsigned int cc=0; cc < max; ++cc)
     {
@@ -197,6 +193,7 @@ void pqGenericViewModule::displaysChanged()
       smModel->getPQProxy(proxy));
     if (!display)
       {
+      unknown_display = true;
       continue;
       }
     currentDisplays.append(QPointer<pqDisplay>(display));
@@ -229,24 +226,35 @@ void pqGenericViewModule::displaysChanged()
       ++iter;
       }
     }
+
+  // If the "Displays" property has some proxy which 
+  // hasn't been registered, we will listen to the SMModel
+  // to known when it gets registered.
+  if (unknown_display)
+    {
+    QObject::connect(smModel, SIGNAL(displayAdded(pqDisplay*)),
+      this, SLOT(displayCreated(pqDisplay*)));
+    }
+  else
+    {
+    QObject::disconnect(smModel, SIGNAL(displayAdded(pqDisplay*)),
+      this, SLOT(displayCreated(pqDisplay*)));
+    }
 }
 
 //-----------------------------------------------------------------------------
-void pqGenericViewModule::viewModuleInit()
+void pqGenericViewModule::displayCreated(pqDisplay* display)
 {
-  // If the render module already has some displays in it when it is registered,
-  // this method will detect them and sync the GUI state with the SM state.
-  this->displaysChanged();
-}
-
-//-----------------------------------------------------------------------------
-void pqGenericViewModule::onUpdateVTKObjects()
-{
-  this->viewModuleInit();
-  // no need to listen to any more events.
-  this->Internal->VTKConnect->Disconnect(
-    this->getProxy(), vtkCommand::UpdateEvent,
-    this, SLOT(onUpdateVTKObjects()));
+  vtkSMProxyProperty* prop = vtkSMProxyProperty::SafeDownCast(
+    this->getProxy()->GetProperty("Displays"));
+  if (prop->IsProxyAdded(display->getProxy()))
+    {
+    display->addRenderModule(this);
+    this->Internal->Displays.append(display);
+    QObject::connect(display, SIGNAL(visibilityChanged(bool)),
+      this, SLOT(onDisplayVisibilityChanged(bool)));
+    emit this->displayAdded(display);
+    }
 }
 
 //-----------------------------------------------------------------------------

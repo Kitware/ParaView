@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqDisplayProxyEditorWidget.h"
+#include "ui_pqDisplayProxyEditorWidget.h"
 
 #include "vtkSMProxy.h"
 
@@ -38,19 +39,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqBarChartDisplayProxyEditor.h"
+#include "pqDisplayPanelInterface.h"
 #include "pqDisplayPolicy.h"
 #include "pqDisplayProxyEditor.h"
 #include "pqGenericViewModule.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
+#include "pqPluginManager.h"
+#include "pqPropertyLinks.h"
 #include "pqTextDisplayPropertiesWidget.h"
 #include "pqTextWidgetDisplay.h"
+#include "pqUndoStack.h"
 #include "pqXYPlotDisplayProxyEditor.h"
-#include "pqPropertyLinks.h"
-#include "ui_pqDisplayProxyEditorWidget.h"
-#include "pqDisplayPanelInterface.h"
-#include "pqPluginManager.h"
-
 
 /// standard display panels
 class pqStandardDisplayPanels : public QObject,
@@ -167,6 +167,15 @@ pqDisplayProxyEditorWidget::pqDisplayProxyEditorWidget(QWidget* p /*=0*/)
 
   this->Internal->DisplayPanel = new pqDefaultDisplayPanel(NULL, this);
   l->addWidget(this->Internal->DisplayPanel);
+
+  pqUndoStack* ustack = pqApplicationCore::instance()->getUndoStack();
+  if (ustack)
+    {
+    QObject::connect(this, SIGNAL(beginUndo(const QString&)),
+      ustack, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(this, SIGNAL(endUndo()),
+      ustack, SLOT(endUndoSet()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -196,9 +205,17 @@ pqDisplay* pqDisplayProxyEditorWidget::getDisplay() const
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditorWidget::onVisibilityChanged(bool state)
 {
+  if (!this->Internal->Source)
+    {
+    return;
+    }
+
+  emit this->beginUndo(QString("Change Visibility of %1").arg(
+      this->Internal->Source->getSMName()));
   pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
   pqDisplay* disp = policy->setDisplayVisibility(this->Internal->Source, 
     this->Internal->View, state);
+  emit this->endUndo();
   
   if (disp)
     {

@@ -115,9 +115,10 @@ pqScalarsToColors* pqBarChartDisplay::setLookupTable(const char* arrayname)
 }
 
 //-----------------------------------------------------------------------------
-void pqBarChartDisplay::setDefaults()
+void pqBarChartDisplay::setDefaultPropertyValues()
 {
-  this->Superclass::setDefaults();
+  this->Superclass::setDefaultPropertyValues();
+
   if (!this->isVisible())
     {
     // For any non-visible display, we don't set its defaults.
@@ -144,6 +145,8 @@ void pqBarChartDisplay::setDefaults()
     pqSMAdaptor::setEnumerationProperty(
       proxy->GetProperty("ReductionType"), "RECTILINEAR_GRID_APPEND");
     }
+  pqSMAdaptor::setElementProperty(
+    proxy->GetProperty("OutputDataType"),"vtkRectilinearGrid");
   proxy->UpdateVTKObjects();
 
   // Need to update since we would have changed the reduction type.

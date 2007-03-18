@@ -35,19 +35,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include <QObject>
 
-class pqUndoStackImplementation;
-class vtkUndoElement;
 class pqServer;
+class vtkSMUndoElement;
+class vtkSMUndoStack;
+class vtkSMUndoStackBuilder;
+class vtkUndoElement;
 
-/// This is an adaptor for the vtkSMUndoStack.
-/// This class updates the vtkSMUndoStack status on accept reset etc etc.
-/// That way, the Accept/Reset mechanism doesn't explicitly have
-/// to manage Undo/Redo states.
+/// pqUndoStack represents a vtkSMUndoStack along with a
+/// a vtkSMUndoStackBuilder. It provides Qt slots to call
+/// methods on undo stack or builder. Also it converts
+/// vtk events from the stack/builder to Qt signals.
+/// The only purpose of this class is to provide Qt
+/// friendly API to the ServerManager classes.
+/// All logic must be in the server manager classes (or their
+/// subclasses).
 class PQCORE_EXPORT pqUndoStack : public QObject
 {
   Q_OBJECT
 public:
-  pqUndoStack(bool clientOnly, QObject* parent=NULL);
+  /// If no \c builder is provided a default vtkSMUndoStackBuilder object
+  /// will be created.
+  pqUndoStack(bool clientOnly, vtkSMUndoStackBuilder* builder=0, QObject* parent=NULL);
   virtual ~pqUndoStack();
 
   /// returns if it's possible to undo.
@@ -62,26 +70,43 @@ public:
   /// returns the redo label.
   const QString redoLabel();
 
-  /// One can add arbritary elements to the active undo set.
-  /// If no ActiveUndoSet is present, an error will be raised. It is essential
-  /// that the StateLoader can handle the arbritary undo elements.
-  void addToActiveUndoSet(vtkUndoElement* element);
+
+  /// Get the status of the IgnoreAllChanges flag on the
+  /// stack builder.
+  bool ignoreAllChanges() const;
+
+  /// Register Application specific undo elements.
+  void registerElementForLoader(vtkSMUndoElement*);
+
+  /// Get if the stack is currently being undone/redone.
+  bool getInUndo() const;
+  bool getInRedo() const;
 
 public slots:
-  /// NOTE: Notice that the BeginOrContinueUndoSet doesn;t take
-  /// connection Id. This is for two reasons:
-  /// 1)  For 1st release we are not supporting multiple connections
-  ///     from teh client, hence we only have one connection to deal with.
-  /// 2)  Once we start supporting multiple connections vtkSMUndoStack()
-  ///     will support UndoSet with elements on multiple connections
-  ///     transparently.
   void beginUndoSet(QString label);
   void endUndoSet();
   void accept();
-  void reset();
+ 
+  /// triggers Undo.
   void undo();
+
+  /// triggers Redo.
   void redo();
+
+  /// Clears undo stack.
   void clear();
+
+  /// when the GUI is performing some changes
+  /// that should not go on the UndoStack at all, it should
+  /// call beginNonUndoableChanges(). Once it's finished doing
+  /// these changes, it must call endNonUndoableChanges() to restore
+  /// the IgnoreAllChanges flag state to the one before the push.
+  void beginNonUndoableChanges();
+  void endNonUndoableChanges();
+
+  /// One can add arbritary elements to the 
+  /// undo set currently being built.
+  void addToActiveUndoSet(vtkUndoElement* element);
 
 signals:
   /// Fired to notify interested parites that the stack has changed.
@@ -105,9 +130,9 @@ public slots:
 private slots:
   void onStackChanged();
 
-
 private:
-  pqUndoStackImplementation* Implementation;
+  class pqImplementation;  
+  pqImplementation* Implementation;
   
 };
 

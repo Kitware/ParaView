@@ -1063,6 +1063,7 @@
       <IntVectorProperty
         name="NumberOfFrames"
         command="SetNumberOfFrames"
+        label="No. Of Frames"
         number_of_elements="1"
         default_values="10"
         update_self="1">
@@ -1088,6 +1089,7 @@
       <IntVectorProperty
         name="Caching"
         command="SetCaching"
+        label="Cache Geometry"
         number_of_elements="1"
         default_values="0"
         update_self="1">
@@ -1112,6 +1114,7 @@
       <DoubleVectorProperty
         name="ClockTimeRange"
         command="SetClockTimeRange"
+        label="Animation Start/End Time"
         number_of_elements="2"
         default_values="0 1"
         update_self="1">
@@ -1120,6 +1123,7 @@
 
       <IntVectorProperty
         name="ClockTimeRangeLocks"
+        label="Lock Animation Start/End Time"
         number_of_elements="2"
         default_values="0 0">
         <!-- This is a "no-command" property. Has not effect 
@@ -1230,6 +1234,7 @@
       <IntVectorProperty
         name="Type"
         command="SetType"
+        label="Interpolation"
         number_of_elements="1"
         default_values="2"
         update_self="1">
@@ -1238,7 +1243,6 @@
           <Entry value="2" text="Ramp" />
           <Entry value="3" text="Exponential" />
           <Entry value="4" text="Sinusoid" />
-          <Entry value="5" text="Camera" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -1277,19 +1281,6 @@
           <Property name="Phase"/>
           <Property name="Frequency" />
           <Property name="Offset" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="Camera" 
-               proxygroup="animation_keyframes"
-               proxyname="CameraKeyFrame">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Position" />
-          <Property name="FocalPoint" />
-          <Property name="ViewUp" />
-          <Property name="ViewAngle" />
         </ExposedProperties>
       </SubProxy>
 

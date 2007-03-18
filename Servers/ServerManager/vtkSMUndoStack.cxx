@@ -16,19 +16,13 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkUndoElement.h"
+#include "vtkProcessModuleConnectionManager.h"
+#include "vtkProcessModule.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMUndoRedoStateLoader.h"
 #include "vtkUndoSet.h"
 #include "vtkUndoStackInternal.h"
-#include "vtkProcessModule.h"
-#include "vtkProcessModuleConnectionManager.h"
-#include "vtkPVXMLElement.h"
-#include "vtkSMProperty.h"
-#include "vtkSMPropertyModificationUndoElement.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxyRegisterUndoElement.h"
-#include "vtkSMProxyUnRegisterUndoElement.h"
-#include "vtkSMUndoRedoStateLoader.h"
 
 #include <vtksys/RegularExpression.hxx>
 
@@ -37,13 +31,15 @@ class vtkSMUndoStackObserver : public vtkCommand
 {
 public:
   static vtkSMUndoStackObserver* New()
-    {
-    return new vtkSMUndoStackObserver;
+    { 
+    return new vtkSMUndoStackObserver; 
     }
+  
   void SetTarget(vtkSMUndoStack* t)
     {
     this->Target = t;
     }
+
   virtual void Execute(vtkObject* caller, unsigned long eventid, void* data)
     {
     if (this->Target)
@@ -51,17 +47,16 @@ public:
       this->Target->ExecuteEvent(caller, eventid, data);
       }
     }
-protected:
+
+private:
   vtkSMUndoStackObserver()
     {
     this->Target = 0;
     }
-  ~vtkSMUndoStackObserver()
-    {
-    this->Target = 0;
-    }
+
   vtkSMUndoStack* Target;
 };
+
 //*****************************************************************************
 class vtkSMUndoStackUndoSet : public vtkUndoSet
 {
@@ -153,38 +148,21 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.12");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.13");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.12");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.13");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
 {
   this->ClientOnly = 0;
+  this->StateLoader = NULL;
+
   this->Observer = vtkSMUndoStackObserver::New();
   this->Observer->SetTarget(this);
-  this->ActiveUndoSet = NULL;
-  this->ActiveConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
-  this->Label = NULL;
-  this->StateLoader = NULL;
-  this->BuildUndoSet = 0;
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  if (!pxm)
-    {
-    vtkErrorMacro("vtkSMUndoStack must be created only"
-       << " after the ProxyManager has been created.");
-    }
-  else
-    {
-    // It is essential that the Undo/Redo system notices these events
-    // before anyone else, hence we put these observers on a high priority level.
-    pxm->AddObserver(vtkCommand::RegisterEvent, this->Observer, 100);
-    pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Observer, 100);
-    pxm->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer, 100);
-    }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (pm)
     {
@@ -195,80 +173,16 @@ vtkSMUndoStack::vtkSMUndoStack()
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::~vtkSMUndoStack()
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  if (pxm)
+  this->SetStateLoader(NULL);
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm)
     {
-    pxm->RemoveObserver(this->Observer);
+    pm->RemoveObserver(this->Observer);
     }
+
   this->Observer->SetTarget(NULL);
   this->Observer->Delete();
-  if (this->ActiveUndoSet)
-    {
-    this->ActiveUndoSet->Delete();
-    this->ActiveUndoSet = NULL;
-    }
-  this->SetLabel(NULL);
-  this->SetStateLoader(NULL);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMUndoStack::BeginOrContinueUndoSet(vtkIdType cid, const char* label)
-{
-  if (this->ActiveUndoSet && this->ActiveConnectionID != cid)
-    {
-    vtkWarningMacro("Connection ID has changed, cannot continue "
-      << "with the active undo set. Starting a new one.");
-    this->EndUndoSet();
-    }
-
-  if (!this->ActiveUndoSet)
-    {
-    this->ActiveUndoSet = vtkUndoSet::New();
-    this->SetLabel(label);
-    this->ActiveConnectionID = cid;
-    }
-  this->BuildUndoSet = 1;
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMUndoStack::PauseUndoSet()
-{
-  if (!this->BuildUndoSet)
-    {
-    vtkWarningMacro("No undo set active.");
-    }
-  this->BuildUndoSet = 0;
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMUndoStack::EndUndoSet()
-{
-  if (!this->ActiveUndoSet)
-    {
-    vtkErrorMacro("BeginOrContinueUndoSet must be called before calling EndUndoSet.");
-    return;
-    }
-
-  // We add an undo set to the stack only if it has some elements.
-  if (this->ActiveUndoSet->GetNumberOfElements() > 0)
-    {
-    this->Push(this->ActiveConnectionID, this->Label, this->ActiveUndoSet);
-    }
-  this->CancelUndoSet();
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMUndoStack::CancelUndoSet()
-{
-  if (this->ActiveUndoSet)
-    {
-    this->ActiveUndoSet->Delete();
-    this->ActiveUndoSet = NULL;
-    this->SetLabel(NULL);
-    this->ActiveConnectionID = 
-      vtkProcessModuleConnectionManager::GetNullConnectionID();
-    this->BuildUndoSet = 0;
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -287,8 +201,8 @@ void vtkSMUndoStack::Push(vtkIdType cid, const char* label, vtkUndoSet* set)
     }
   
   vtkPVXMLElement* state = set->SaveState(NULL);
-  // if (!this->ClientOnly)
-  //   state->PrintXML();
+//    if (!this->ClientOnly)
+//      state->PrintXML();
   if (this->ClientOnly)
     {
     vtkSMUndoStackUndoSet* elem = vtkSMUndoStackUndoSet::New();
@@ -328,114 +242,89 @@ void vtkSMUndoStack::PushUndoConnection(const char* label,
 }
 
 //-----------------------------------------------------------------------------
+int vtkSMUndoStack::ProcessUndo(vtkIdType id, vtkPVXMLElement* root)
+{
+  if (!this->StateLoader)
+    {
+    vtkSMUndoRedoStateLoader* sl = vtkSMUndoRedoStateLoader::New();
+    this->SetStateLoader(sl);
+    sl->Delete();
+    }
+  this->StateLoader->SetConnectionID(id); 
+  vtkUndoSet* undo = this->StateLoader->LoadUndoRedoSet(root);
+  int status = 0;
+  if (undo)
+    {
+    status = undo->Undo();
+    undo->Delete();
+    // Update modified proxies.
+    // vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
+    }
+
+  // This is essential otherwise we have un-intentional references to proxies
+  // in the state loader.
+  this->StateLoader->ClearCreatedProxies();
+  return status;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMUndoStack::ProcessRedo(vtkIdType id, vtkPVXMLElement* root)
+{
+  if (!this->StateLoader)
+    {
+    vtkSMUndoRedoStateLoader* sl = vtkSMUndoRedoStateLoader::New();
+    this->SetStateLoader(sl);
+    sl->Delete();
+    }
+  this->StateLoader->SetConnectionID(id); 
+  vtkUndoSet* redo = this->StateLoader->LoadUndoRedoSet(root);
+  int status = 0;
+  if (redo)
+    {
+    status = redo->Redo();
+    redo->Delete();
+    // Update modified proxies.
+    // vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
+    }
+
+  // This is essential otherwise we have un-intentional references to proxies
+  // in the state loader.
+  this->StateLoader->ClearCreatedProxies();
+  return status;
+}
+
+
+//-----------------------------------------------------------------------------
+int vtkSMUndoStack::Undo()
+{
+  if (!this->CanUndo())
+    {
+    vtkErrorMacro("Cannot undo. Nothing on undo stack.");
+    return 0;
+    }
+
+  return this->Superclass::Undo();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMUndoStack::Redo()
+{
+  if (!this->CanRedo())
+    {
+    vtkErrorMacro("Cannot redo. Nothing on redo stack.");
+    return 0;
+    }
+
+  return this->Superclass::Redo();
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMUndoStack::ExecuteEvent(vtkObject* vtkNotUsed(caller), 
-  unsigned long eventid,  void* data)
+  unsigned long eventid, void* data)
 {
-  switch (eventid)
+  if (eventid == vtkCommand::ConnectionClosedEvent)
     {
-  case vtkCommand::RegisterEvent:
-    if (this->BuildUndoSet)
-      {
-      this->OnRegisterProxy(data);
-      }
-    break;
-
-  case vtkCommand::UnRegisterEvent:
-    if (this->BuildUndoSet)
-      {
-      this->OnUnRegisterProxy(data);
-      }
-    break;
-
-  case vtkCommand::PropertyModifiedEvent:
-    if (this->BuildUndoSet)
-      {
-      this->OnPropertyModified(data);
-      }
-    break;
-
-  case vtkCommand::ConnectionClosedEvent:
     this->OnConnectionClosed(*reinterpret_cast<vtkIdType*>(data));
-    break;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMUndoStack::AddToActiveUndoSet(vtkUndoElement* element)
-{
-  if (!this->ActiveUndoSet)
-    {
-    vtkErrorMacro("No active UndoSet, cannot add the element to it.");
-    return;
-    }
-  if (!element)
-    {
-    return;
-    }
-  this->ActiveUndoSet->AddElement(element);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMUndoStack::OnRegisterProxy(void* data)
-{
-  // proxies registered as prototypes don't participate in
-  // undo/redo.
-  vtksys::RegularExpression prototypesRe("_prototypes$");
-
-  vtkSMProxyManager::RegisteredProxyInformation &info =*(reinterpret_cast<
-    vtkSMProxyManager::RegisteredProxyInformation*>(data));
-  if (prototypesRe.find(info.GroupName) != 0)
-    {
-    return;
-    }
-
-  vtkSMProxyRegisterUndoElement* elem = vtkSMProxyRegisterUndoElement::New();
-  elem->SetConnectionID(this->ActiveConnectionID);
-  elem->ProxyToRegister(info.GroupName, info.ProxyName, info.Proxy);
-  this->ActiveUndoSet->AddElement(elem);
-  elem->Delete();
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMUndoStack::OnUnRegisterProxy(void* data)
-{
-  // proxies registered as prototypes don't participate in
-  // undo/redo.
-  vtksys::RegularExpression prototypesRe("_prototypes$");
-
-  vtkSMProxyManager::RegisteredProxyInformation &info =*(reinterpret_cast<
-    vtkSMProxyManager::RegisteredProxyInformation*>(data));
-  if (!info.Proxy || (info.GroupName && prototypesRe.find(info.GroupName) != 0))
-    {
-    return;
-    }
-  vtkSMProxyUnRegisterUndoElement* elem = 
-    vtkSMProxyUnRegisterUndoElement::New();
-  elem->SetConnectionID(this->ActiveConnectionID);
-  elem->ProxyToUnRegister(info.GroupName, info.ProxyName, info.Proxy);
-  this->ActiveUndoSet->AddElement(elem);
-  elem->Delete();
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMUndoStack::OnPropertyModified(void* data)
-{
-  // TODO: We need to determine if the property is being changed on a proxy 
-  // that is registered only as a prototype. If so, we should not worry
-  // about recording its property changes. When we update the SM data structure
-  // to separately manage prototypes, this will be take care of automatically.
-  // Hence, we defer it for now.
-  vtkSMProxyManager::ModifiedPropertyInformation &info =*(reinterpret_cast<
-    vtkSMProxyManager::ModifiedPropertyInformation*>(data)); 
- 
-  vtkSMProperty* prop = info.Proxy->GetProperty(info.PropertyName);
-  if (prop && !prop->GetInformationOnly() && !prop->GetIsInternal())
-    {
-    vtkSMPropertyModificationUndoElement* elem = 
-      vtkSMPropertyModificationUndoElement::New();
-    elem->ModifiedProperty(info.Proxy, info.PropertyName);
-    this->ActiveUndoSet->AddElement(elem);
-    elem->Delete();
     }
 }
 
@@ -475,87 +364,6 @@ void vtkSMUndoStack::OnConnectionClosed(vtkIdType cid)
   this->Internal->RedoStack.insert(this->Internal->RedoStack.begin(),
     tempStack.begin(), tempStack.end());
   this->Modified();
-}
-
-//-----------------------------------------------------------------------------
-int vtkSMUndoStack::ProcessUndo(vtkIdType id, vtkPVXMLElement* root)
-{
-  if (!this->StateLoader)
-    {
-    vtkSMUndoRedoStateLoader* sl = vtkSMUndoRedoStateLoader::New();
-    this->SetStateLoader(sl);
-    sl->Delete();
-    }
-  this->StateLoader->SetConnectionID(id); 
-  vtkUndoSet* undo = this->StateLoader->LoadUndoRedoSet(root);
-  int status = 0;
-  if (undo)
-    {
-    status = undo->Undo();
-    undo->Delete();
-    // Update modified proxies.
-    // vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
-    }
-  return status;
-}
-
-//-----------------------------------------------------------------------------
-int vtkSMUndoStack::ProcessRedo(vtkIdType id, vtkPVXMLElement* root)
-{
-  if (!this->StateLoader)
-    {
-    vtkSMUndoRedoStateLoader* sl = vtkSMUndoRedoStateLoader::New();
-    this->SetStateLoader(sl);
-    sl->Delete();
-    }
-  this->StateLoader->SetConnectionID(id); 
-  vtkUndoSet* redo = this->StateLoader->LoadUndoRedoSet(root);
-  int status = 0;
-  if (redo)
-    {
-    status = redo->Redo();
-    redo->Delete();
-    // Update modified proxies.
-    // vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
-    }
-  return status;
-}
-
-
-//-----------------------------------------------------------------------------
-int vtkSMUndoStack::Undo()
-{
-  if (!this->CanUndo())
-    {
-    vtkErrorMacro("Cannot undo. Nothing on undo stack.");
-    return 0;
-    }
-  if (this->ActiveUndoSet)
-    {
-    this->ActiveUndoSet->Undo();
-    this->CancelUndoSet();
-    }
-
-  return this->Superclass::Undo();
-}
-
-//-----------------------------------------------------------------------------
-int vtkSMUndoStack::Redo()
-{
-  if (!this->CanRedo())
-    {
-    vtkErrorMacro("Cannot redo. Nothing on redo stack.");
-    return 0;
-    }
-
-  // before redoing, get rid of the half done state.
-  if (this->ActiveUndoSet)
-    {
-    this->ActiveUndoSet->Undo();
-    this->CancelUndoSet();
-    }
-
-  return this->Superclass::Redo();
 }
 
 //-----------------------------------------------------------------------------

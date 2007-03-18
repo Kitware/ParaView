@@ -48,6 +48,10 @@ public:
   virtual int Redo() = 0;
 
   // Description:
+  // Returns if this element can load the xml state for the given element.
+  virtual bool CanLoadState(vtkPVXMLElement*) = 0;
+
+  // Description:
   // Saves the state of the element in an xml. Subclasses must override
   // SaveStateInternal() to add any subclass specific state information.
   // This method merely ensure that root is valid.
@@ -61,6 +65,26 @@ public:
   // state loading. This method merely ensure that element is valid.
   // \arg \c element is the XML element for this object. 
   void LoadState(vtkPVXMLElement* element);
+
+  // Description:
+  // Returns if this undo element can be merged with other
+  // undo elements.
+  // When an undo element is added to a vtkUndoSet unsing AddElement,
+  // an attempt is made to \c "merge" the element with the 
+  // most recently added undo element, if any, if both the undo elements
+  // are mergeable.
+  vtkGetMacro(Mergeable, bool);
+
+  // Description:
+  // Called on the older element in the UndoSet to merge with the
+  // element being added if  both the elements are \c mergeable.
+  // Returns if the merge was successful. 
+  // Default implementation doesn't do anything.
+  virtual bool Merge(vtkUndoElement* vtkNotUsed(new_element))
+    {
+    return false;
+    }
+
 //BTX
 protected:
   vtkUndoElement();
@@ -75,6 +99,12 @@ protected:
   // Overridden by subclasses to load state specific to the class.
   // \arg \c parent element. 
   virtual void LoadStateInternal(vtkPVXMLElement* element) =0;
+
+  // Description:
+  // Subclasses must set this flag to enable merging of consecutive elements
+  // in an UndoSet.
+  bool Mergeable;
+  vtkSetMacro(Mergeable, bool);
 
 private:
   vtkUndoElement(const vtkUndoElement&); // Not implemented.

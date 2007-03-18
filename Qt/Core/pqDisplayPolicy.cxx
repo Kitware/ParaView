@@ -44,16 +44,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqConsumerDisplay.h"
-#include "pqPipelineBuilder.h"
+#include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqPlotViewModule.h"
+#include "pqRenderViewModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 
 //-----------------------------------------------------------------------------
 pqDisplayPolicy::pqDisplayPolicy(QObject* _parent) :QObject(_parent)
 {
-
 }
 
 //-----------------------------------------------------------------------------
@@ -85,8 +85,8 @@ vtkSMProxy* pqDisplayPolicy::newDisplayProxy(
 pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
   pqGenericViewModule* currentView) const
 {
-  pqPipelineBuilder* builder = 
-    pqApplicationCore::instance()->getPipelineBuilder();
+  pqObjectBuilder* builder = 
+    pqApplicationCore::instance()->getObjectBuilder();
   vtkPVXMLElement* hints = source->getHints();
   vtkPVXMLElement* viewElement = hints? 
     hints->FindNestedElementByName("View") : 0;
@@ -135,7 +135,7 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
       {
       // Create the preferred view only if the current one is not of the same type
       // as the preferred view.
-      currentView = builder->createView(source->getServer(), view_type);
+      currentView = builder->createView(view_type, source->getServer());
       }
     }
 
@@ -143,7 +143,8 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
     {
     // The user has selected a frame that is empty or the source does not
     // recommend any view type. Hence we create a render view.
-    currentView = builder->createView(source->getServer());
+    currentView = builder->createView(pqRenderViewModule::renderViewType(),
+      source->getServer());
     }
 
   // No hints. We don't know what type of view is suitable
@@ -188,14 +189,15 @@ pqConsumerDisplay* pqDisplayPolicy::createPreferredDisplay(
 
   // Simply create a display for the view set up the connections and
   // return.
-  pqConsumerDisplay* display = pqApplicationCore::instance()->getPipelineBuilder()->
-    createDisplay(source, view);
+  pqConsumerDisplay* display = 
+    pqApplicationCore::instance()->getObjectBuilder()->
+    createDataDisplay(source, view);
   return display;
 }
 
 //-----------------------------------------------------------------------------
 pqConsumerDisplay* pqDisplayPolicy::setDisplayVisibility(
-  pqPipelineSource* source, pqGenericViewModule* view, bool visible) const
+  pqPipelineSource* source, pqGenericViewModule* view, bool visible) 
 {
   if (!source)
     {
@@ -206,9 +208,16 @@ pqConsumerDisplay* pqDisplayPolicy::setDisplayVisibility(
   pqConsumerDisplay* display = source->getDisplay(view);
   if (display)
     {
+
     // set the visibility.
     display->setVisible(visible);
     return display;
+    }
+
+  if (!display && !visible)
+    {
+    // isn't visible already, nothing to change.
+    return 0;
     }
 
   // No display exists for this view.
@@ -219,10 +228,11 @@ pqConsumerDisplay* pqDisplayPolicy::setDisplayVisibility(
     }
   if (view)
     {
-    display = pqApplicationCore::instance()->
-      getPipelineBuilder()->createDisplay(source, view);
+    display = pqApplicationCore::instance()->getObjectBuilder()->
+      createDataDisplay(source, view);
     display->setVisible(visible);
     }
+
   return display;
 }
 

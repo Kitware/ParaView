@@ -63,6 +63,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDataInformationModelSelectionAdaptor.h
   pqDataInformationWidget.h
   pqDataSetModel.h
+  pqDialog.h
   pqDisplayColorWidget.h
   pqDisplayPanel.h
   pqDisplayProxyEditor.h
@@ -302,6 +303,8 @@ ADD_LIBRARY(pqComponents
   pqDataInformationWidget.h
   pqDataSetModel.cxx
   pqDataSetModel.h
+  pqDialog.cxx
+  pqDialog.h
   pqDisplayColorWidget.cxx
   pqDisplayColorWidget.h
   pqDisplayPanel.cxx
@@ -454,6 +457,8 @@ ADD_LIBRARY(pqComponents
   pqSourceProxyInfo.h
   pqSpinBoxDomain.cxx
   pqSpinBoxDomain.h
+  pqSplitViewUndoElement.cxx
+  pqSplitViewUndoElement.h
   pqStateLoader.cxx
   pqStateLoader.h
   pqStreamTracerPanel.cxx
@@ -466,6 +471,8 @@ ADD_LIBRARY(pqComponents
   pqTimerLogDisplay.h
   pqToolTipTrapper.cxx
   pqToolTipTrapper.h
+  pqUndoStackBuilder.cxx
+  pqUndoStackBuilder.h
   pqVariableType.h
   pqVCRController.cxx
   pqVCRController.h

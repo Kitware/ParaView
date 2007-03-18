@@ -74,9 +74,13 @@ pqScalarBarDisplay::pqScalarBarDisplay(const QString& group, const QString& name
 //-----------------------------------------------------------------------------
 pqScalarBarDisplay::~pqScalarBarDisplay()
 {
+  if (this->Internal->LookupTable)
+    {
+    this->Internal->LookupTable->removeScalarBar(this);
+    }
+
   this->Internal->VTKConnect->Disconnect();
   this->Internal->VTKConnect->Delete();
-
   delete this->Internal;
 }
 

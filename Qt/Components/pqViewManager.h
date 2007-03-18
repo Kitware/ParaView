@@ -35,11 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiView.h"
 
 class pqGenericViewModule;
-class pqMultiView;
 class pqMultiViewFrame;
 class pqServer;
+class pqUndoStack;
 class vtkPVXMLElement;
 class vtkSMStateLoader;
+class vtkUndoElement;
 
 /// This class manages all view windows. View windows occupy the central
 /// area in the application are all layed out using split windows. This 
@@ -50,6 +51,7 @@ class vtkSMStateLoader;
 class PQCOMPONENTS_EXPORT pqViewManager : public pqMultiView 
 {
   Q_OBJECT
+  typedef pqMultiView Superclass;
 public:
   pqViewManager(QWidget* parent=NULL);
   virtual ~pqViewManager();
@@ -72,12 +74,33 @@ public:
   /// Given a view module, get the frame in which the view is contained,
   /// if any.
   pqMultiViewFrame* getFrame(pqGenericViewModule* view) const;
+
+  /// Set the undo stack used for the application.
+  void setUndoStack(pqUndoStack* stack);
+
 signals:
   /// Fired when the active view module changes.
   void activeViewModuleChanged(pqGenericViewModule*);
 
-  // Fired when the user pressed the lookmark button for one of the views
+  /// Fired when the user pressed the lookmark button for one of the views
   void createLookmark(pqGenericViewModule*);
+
+  /// Fired when the manager begins an undoable change.
+  void beginUndo(const QString& label);
+
+  /// Fired when the manager is done with an undoable change.
+  void endUndo();
+
+  /// Fired to add the elem to the undo stack.
+  void addToUndoStack(vtkUndoElement* elem);
+
+  /// emitted when the manager begins changes that should not get
+  /// recorded on the undo stack.
+  void beginNonUndoableChanges();
+
+  /// emitted when the manager is done with changes that
+  /// should not get recorded on the undo stack.
+  void endNonUndoableChanges();
 
 private slots:
   /// This will create a view module to fill the frame.
@@ -85,6 +108,10 @@ private slots:
   /// which must be set by the application.
   void onFrameAdded(pqMultiViewFrame* frame);
   void onFrameRemoved(pqMultiViewFrame* frame);
+
+  /// Called when a frame close request is made.
+  /// We add an undo element to the stack to undo/redo the close.
+  void onPreFrameRemoved(pqMultiViewFrame*);
 
   /// When ever a new view module is noticed, the active 
   /// frame is split and the view module is shown in the new 
@@ -111,6 +138,12 @@ private slots:
   void frameDragEnter(pqMultiViewFrame*,QDragEnterEvent*);
   void frameDragMove(pqMultiViewFrame*,QDragMoveEvent*);
   void frameDrop(pqMultiViewFrame*,QDropEvent*);
+
+  /// Called when a split frame request is made.
+  /// We add an undo element to the stack to undo/redo the split.
+  void onSplittingView(const Index&, Qt::Orientation, float, const Index&);
+
+
 
 public slots:
   /// Set the active server. This must be called whenever
@@ -142,10 +175,7 @@ protected:
   /// Hiding superclasses loadState. Don't use this API
   /// since it is not aware of the loader which gives us 
   /// the render modules to put in the window.
-  virtual void loadState(vtkPVXMLElement* root)
-    {
-    this->pqMultiView::loadState(root);
-    }
+  virtual void loadState(vtkPVXMLElement* /*root*/) { }
 
   /// Update the GUISize/WindowPosition properties
   /// on all view modules.
@@ -153,6 +183,11 @@ protected:
 
   /// Updates the context menu.
   void updateConversionActions(pqMultiViewFrame* frame);
+
+  /// Called when a frame close request is made.
+  /// We add an undo element to the stack to undo/redo the close.
+  void onFrameRemovedInternal(pqMultiViewFrame*);
+
 private:
   pqViewManager(pqViewManager&); // Not implemented.
   void operator=(const pqViewManager&); // Not implemented.

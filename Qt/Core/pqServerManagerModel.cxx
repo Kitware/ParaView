@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqNameCount.h"
-#include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
@@ -421,13 +420,14 @@ void pqServerManagerModel::onAddDisplay(QString name,
     display = new pqConsumerDisplay("displays", name, proxy, server, this);
     }
 
+  emit this->preDisplayAdded(display);
   this->Internal->Displays[proxy] = display;
 
   // Listen for visibility changes.
   QObject::connect(display, SIGNAL(visibilityChanged(bool)),
       this, SLOT(updateDisplayVisibility(bool)));
 
-  // emit this->displayAdded(display);
+  emit this->displayAdded(display);
 }
 
 //-----------------------------------------------------------------------------
@@ -443,10 +443,15 @@ void pqServerManagerModel::onRemoveDisplay(vtkSMProxy* proxy)
     {
     display = this->Internal->Displays.take(proxy);
     }
-  QObject::disconnect(display, 0, this, 0);
-  // emit this->displayRemoved(display);
 
-  delete display;
+  if (display)
+    {
+    emit this->preDisplayRemoved(display);
+    QObject::disconnect(display, 0, this, 0);
+    emit this->displayRemoved(display);
+
+    delete display;
+    }
 }
 
 //-----------------------------------------------------------------------------

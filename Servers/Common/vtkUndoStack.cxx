@@ -14,16 +14,19 @@
 =========================================================================*/
 #include "vtkUndoStack.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkUndoStackInternal.h"
 
 
 vtkStandardNewMacro(vtkUndoStack);
-vtkCxxRevisionMacro(vtkUndoStack, "1.4");
+vtkCxxRevisionMacro(vtkUndoStack, "1.5");
 //-----------------------------------------------------------------------------
 vtkUndoStack::vtkUndoStack()
 {
   this->Internal = new vtkUndoStackInternal;
+  this->InUndo = false;
+  this->InRedo = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -90,11 +93,15 @@ int vtkUndoStack::Undo()
     {
     return 0;
     }
+  this->InUndo = true;
+  this->InvokeEvent(vtkCommand::StartEvent);
   int status = this->Internal->UndoStack.back().UndoSet.GetPointer()->Undo();
   if (status)
     {
     this->PopUndoStack();
     }
+  this->InvokeEvent(vtkCommand::EndEvent);
+  this->InUndo = false;
   return status;
 }
 
@@ -105,11 +112,15 @@ int vtkUndoStack::Redo()
     {
     return 0;
     }
+  this->InRedo = true;
+  this->InvokeEvent(vtkCommand::StartEvent);
   int status = this->Internal->RedoStack.back().UndoSet.GetPointer()->Redo();
   if (status)
     {
     this->PopRedoStack();
     }
+  this->InvokeEvent(vtkCommand::EndEvent);
+  this->InRedo = false;
   return status;
 }
 
@@ -161,4 +172,6 @@ vtkUndoSet* vtkUndoStack::GetNextRedoSet()
 void vtkUndoStack::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "InUndo: " << this->InUndo << endl;
+  os << indent << "InRedo: " << this->InRedo << endl;
 }

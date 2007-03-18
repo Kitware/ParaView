@@ -81,8 +81,25 @@ public slots:
 signals:
   /// Signal emitted whenever the user chooses a variable, 
   /// or chooseVariable() is called.
+  /// This signal is fired only when the change is triggered by the wiget
+  /// i.e. if the ServerManager property changes, this signal won't be fired,
+  /// use \c modified() instead.
   void variableChanged(pqVariableType type, const QString& name);
 
+  /// Fired when ever the color mode on the display changes
+  /// either thorough this widget itself, of when the underlying SMObject
+  /// changes.
+  void modified();
+
+  /// Fired just before the color is changed on the underlying proxy.
+  /// This must be hooked to an undo stack to record the
+  /// changes in a undo set.
+  void begin(const QString&);
+
+  /// Fired just after the color is changed on the underlying proxy.
+  /// This must be hooked to an undo stack to record the
+  /// changes in a undo set.
+  void end();
 private slots:
   /// Called to emit the variableChanged() signal in response to user input 
   /// or the chooseVariable() method.

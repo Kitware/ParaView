@@ -65,14 +65,20 @@ public:
   // By default, this is set to 0.
   vtkSetMacro(ReviveProxies, int);
   vtkGetMacro(ReviveProxies, int);
+
+
+  // Description:
+  // Clears all internal references to created proxies.
+  void ClearCreatedProxies();
 protected:
   vtkSMStateLoader();
   ~vtkSMStateLoader();
 
   vtkPVXMLElement* RootElement;
+  void SetRootElement(vtkPVXMLElement*);
+
   int ReviveProxies;
 
-  void ClearCreatedProxies();
 
   int HandleProxyCollection(vtkPVXMLElement* collectionElement);
   void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
@@ -93,7 +99,7 @@ protected:
   // of existing properties. Newly created proxies are stored
   // in the map with the id as the key. The root is the xml
   // element under which the proxy definitions are stored.
-  vtkSMProxy* NewProxy(vtkPVXMLElement* root, int id);
+  virtual vtkSMProxy* NewProxy(vtkPVXMLElement* root, int id);
 
   // Default implementation simply requests the proxy manager
   // to create a new proxy of the given type.

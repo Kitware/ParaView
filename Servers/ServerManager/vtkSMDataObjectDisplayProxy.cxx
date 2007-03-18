@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.30");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.31");
 
 
 //-----------------------------------------------------------------------------
@@ -430,15 +430,6 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
 
   // Init Property properties.
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->PropertyProxy->GetProperty("Ambient"));
-  if (!dvp)
-    {
-    vtkErrorMacro("Failed to find property Ambient on PropertyProxy.");
-    return;
-    }
-  dvp->SetElement(0, 0.0);
-
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->PropertyProxy->GetProperty("Diffuse"));
   if (!dvp)
     {
@@ -446,35 +437,6 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
     return;
     }
   dvp->SetElement(0, 1.0);
-
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->PropertyProxy->GetProperty("Specular"));
-  if (!dvp)
-    {
-    vtkErrorMacro("Failed to find property Specular on PropertyProxy.");
-    return;
-    }
-  dvp->SetElement(0, 0.1);
-
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->PropertyProxy->GetProperty("SpecularPower"));
-  if (!dvp)
-    {
-    vtkErrorMacro("Failed to find property SpecularPower on PropertyProxy.");
-    return;
-    }
-  dvp->SetElement(0, 100);
-
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->PropertyProxy->GetProperty("SpecularColor"));
-  if (!dvp)
-    {
-    vtkErrorMacro("Failed to find property SpecularColor on PropertyProxy.");
-    return;
-    }
-  dvp->SetElement(0, 1.0);
-  dvp->SetElement(1, 1.0);
-  dvp->SetElement(2, 1.0);
 
   // Init UpdateSuppressor properties.
   // Seems like we can't use properties for this 
@@ -1318,6 +1280,12 @@ void vtkSMDataObjectDisplayProxy::UpdateRenderModuleExtensions(
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetUpdateTime(double time)
 {
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Objects not created!");
+    return;
+    }
+
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->UpdateSuppressorProxy->GetProperty("UpdateTime"));
   dvp->SetElement(0, time);

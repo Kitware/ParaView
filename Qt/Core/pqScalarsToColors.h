@@ -86,7 +86,19 @@ public slots:
   // if not, it hides all the scalars bar showing this LUT.
   void hideUnusedScalarBars();
 
+  /// Set the scalar range lock.
   void setScalarRangeLock(bool lock);
+
+  /// Triggers a build on the lookup table.
+  void build();
+signals:
+  /// Fired after a new scalar bar is added or removed from this LUT.
+  void scalarBarsChanged();
+
+protected slots:
+  /// Called when the ScalarRange property is modified.
+  void scalarRangeModified();
+
 
 protected:
   friend class pqScalarBarDisplay;

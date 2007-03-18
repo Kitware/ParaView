@@ -71,6 +71,14 @@ signals:
   void loop(bool);
 
   void timeRanges(double, double);
+
+  /// emitted when the animation begins playing.
+  /// For now, playing of animation is non-undoable.
+  void beginNonUndoableChanges();
+
+  /// emitted when the animation ends playing.
+  void endNonUndoableChanges();
+
 public slots:
   // Set the animation scene. If null, the VCR control is disabled
   // (emits enabled(false)).

@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMPropertyIterator.h"
 
 #include <QtDebug>
 #include <QPointer>
@@ -146,7 +145,7 @@ void pqConsumerDisplay::onInputChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pqConsumerDisplay::setDefaults()
+void pqConsumerDisplay::setDefaultPropertyValues()
 {
   if (!this->isVisible())
     {
@@ -158,27 +157,14 @@ void pqConsumerDisplay::setDefaults()
   vtkSMAbstractDisplayProxy* proxy = vtkSMAbstractDisplayProxy::SafeDownCast(
     this->getProxy());
   
-  // setDefaults() can always call Update on the display. 
-  // This is safe since setDefaults() will typically be called only after having
+  // setDefaultPropertyValues() can always call Update on the display. 
+  // This is safe since setDefaultPropertyValues is called only after having
   // added the display to the render module, which ensures that the
   // update time has been set correctly on the display.
   proxy->Update();
-
   proxy->GetProperty("Input")->UpdateDependentDomains();
-  proxy->UpdatePropertyInformation();
-
-
-  // This will setup default array names. Just reset-to-default all properties,
-  // the vtkSMArrayListDomain will do the rest.
-  vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    if (!iter->GetProperty()->GetInformationOnly())
-      {
-      iter->GetProperty()->ResetToDefault();
-      }
-    }
-  iter->Delete();
+  
+  this->Superclass::setDefaultPropertyValues();
 }
 
 //-----------------------------------------------------------------------------

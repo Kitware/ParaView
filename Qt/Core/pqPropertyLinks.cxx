@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 #include <QSet>
 #include <QSignalMapper>
+#include <QTimer>
 
 // VTK includes
 #include "vtkEventQtSlotConnect.h"
@@ -60,6 +61,15 @@ public:
     this->AutoUpdate = true;
   }
 
+  ~pqInternal()
+    {
+    // Ensuring that no slots get called
+    // when timer expires. This may be utterly unnecessary,
+    // but no harm in being safe.
+    this->SingleShotTimer.stop();
+    }
+
+  QTimer SingleShotTimer;
   pqSMAdaptor::PropertyType Type;
 
   vtkSMProxy* Proxy;
@@ -111,6 +121,12 @@ pqPropertyLinksConnection::pqPropertyLinksConnection(
 : QObject(_parent)
 {
   this->Internal = new pqPropertyLinksConnection::pqInternal;
+  this->Internal->SingleShotTimer.setSingleShot(true);
+  this->Internal->SingleShotTimer.setInterval(1);
+  QObject::connect(
+    &this->Internal->SingleShotTimer, SIGNAL(timeout()),
+    this, SLOT(smLinkedPropertyChanged()));
+
   this->Internal->Proxy = smproxy;
   this->Internal->Property = smproperty;
   this->Internal->Index = idx;
@@ -143,6 +159,12 @@ bool pqPropertyLinksConnection::getOutOfSync() const
 void pqPropertyLinksConnection::clearOutOfSync() const
 {
   this->Internal->OutOfSync = false;
+}
+
+void pqPropertyLinksConnection::triggerDelayedSMLinkedPropertyChanged()
+{
+  this->Internal->SingleShotTimer.start();
+  // will eventually call smLinkedPropertyChanged().
 }
 
 void pqPropertyLinksConnection::smLinkedPropertyChanged() 
@@ -283,11 +305,6 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
     }
   this->Internal->OutOfSync = true;
   this->Internal->SettingProperty = this->Internal->Property;
-
-  if (!this->Internal->UseUncheckedProperties)
-    {
-    emit this->beginUndoSet(this->Internal->QtProperty + " Changed");
-    }
 
   if(this->Internal->QtObject)
     {
@@ -477,10 +494,6 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
     }
   this->Internal->SettingProperty = NULL;
   emit this->qtWidgetChanged();
-  if (!this->Internal->UseUncheckedProperties)
-    {
-    emit this->endUndoSet();
-    }
 }
 
 bool pqPropertyLinksConnection::useUncheckedProperties() const
@@ -530,7 +543,7 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
   this->Internal->Links.push_back(conn);
   this->Internal->VTKConnections->Connect(Property, vtkCommand::ModifiedEvent,
                                           conn, 
-                                          SLOT(smLinkedPropertyChanged()));
+                                          SLOT(triggerDelayedSMLinkedPropertyChanged()));
   
   QObject::connect(qObject, signal,conn, SLOT(qtLinkedPropertyChanged()));
 
@@ -538,11 +551,6 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
     this, SIGNAL(qtWidgetChanged()));
   QObject::connect(conn, SIGNAL(smPropertyChanged()),
     this, SIGNAL(smPropertyChanged()));
-  QObject::connect(conn, SIGNAL(beginUndoSet(const QString&)),
-    this, SIGNAL(beginUndoSet(const QString&)));
-  QObject::connect(conn, SIGNAL(endUndoSet()),
-    this, SIGNAL(endUndoSet()));
-    
   
   conn->setUseUncheckedProperties(this->Internal->UseUncheckedProperties);
   conn->setAutoUpdateVTKObjects(this->Internal->AutoUpdate);

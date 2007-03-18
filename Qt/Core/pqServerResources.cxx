@@ -31,13 +31,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqApplicationCore.h"
-#include "pqServerResources.h"
+#include "pqObjectBuilder.h"
+#include "pqReaderFactory.h"
 #include "pqServer.h"
+#include "pqServerResources.h"
 #include "pqServerStartups.h"
 #include "pqSettings.h"
+#include "pqUndoStack.h"
 
 #include <QStringList>
 #include <QtDebug>
+#include <QPointer>
 
 #include <vtkPVXMLParser.h>
 
@@ -68,16 +72,19 @@ private:
   const pqServerResource& Resource;
 };
 
+//-----------------------------------------------------------------------------
 pqServerResources::pqServerResources(QObject* p) :
   QObject(p), Implementation(new pqImplementation())
 {
 }
 
+//-----------------------------------------------------------------------------
 pqServerResources::~pqServerResources()
 {
   delete this->Implementation;
 }
 
+//-----------------------------------------------------------------------------
 void pqServerResources::add(const pqServerResource& resource)
 {
   // Remove any existing resources that match the resource we're about to add ...
@@ -101,6 +108,7 @@ void pqServerResources::add(const pqServerResource& resource)
   emit this->changed();
 }
 
+//-----------------------------------------------------------------------------
 const pqServerResources::ListT pqServerResources::list() const
 {
   ListT results;
@@ -113,6 +121,7 @@ const pqServerResources::ListT pqServerResources::list() const
   return results;
 }
 
+//-----------------------------------------------------------------------------
 void pqServerResources::load(pqSettings& settings)
 {
   const QStringList resources = settings.value("ServerResources").toStringList();
@@ -122,6 +131,7 @@ void pqServerResources::load(pqSettings& settings)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqServerResources::save(pqSettings& settings)
 {
   QStringList resources;
@@ -135,6 +145,7 @@ void pqServerResources::save(pqSettings& settings)
   settings.setValue("ServerResources", resources);
 }
 
+//-----------------------------------------------------------------------------
 void pqServerResources::open(pqServer* server, const pqServerResource& resource)
 {
   if(!server)
@@ -166,11 +177,35 @@ void pqServerResources::open(pqServer* server, const pqServerResource& resource)
     }
   else
     {
-    if(!resource.path().isEmpty())
+    if (!resource.path().isEmpty())
       {
-      QString reader = resource.data("reader");
-      if(!pqApplicationCore::instance()->createReaderOnServer(resource.path(), 
-                                                              server, reader))
+      QString readerGroup = resource.data("readergroup");
+      QString readerName = resource.data("reader");
+      pqPipelineSource* reader = 0;
+
+      if (!readerName.isEmpty() && !readerGroup.isEmpty())
+        {
+        pqApplicationCore* core = pqApplicationCore::instance();
+        pqObjectBuilder* builder = core->getObjectBuilder();
+        pqUndoStack* ustack = core->getUndoStack(); 
+        if (ustack)
+          {
+          ustack->beginUndoSet("Create Reader");
+          }
+        reader = builder->createReader(
+          readerGroup, readerName, resource.path(), server);
+        if (ustack)
+          {
+          ustack->endUndoSet();
+          }
+        }
+      else
+        {
+        qDebug() << "Recent changes to the settings code have "
+          << "made these old entries unusable.";
+        }
+  
+      if (!reader)
         {
         qCritical() << "Error opening file " << resource.path() << "\n";
         return;

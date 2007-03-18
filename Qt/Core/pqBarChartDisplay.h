@@ -52,8 +52,14 @@ public:
     QObject* parent=0);
   virtual ~pqBarChartDisplay();
 
-  /// Called after to creation to set default values.
-  virtual void setDefaults();
+  /// Sets default values for the underlying proxy. 
+  /// This is during the initialization stage of the pqProxy 
+  /// for proxies created by the GUI itself i.e.
+  /// for proxies loaded through state or created by python client
+  /// this method won't be called. 
+  /// The default implementation iterates over all properties
+  /// of the proxy and sets them to default values. 
+  virtual void setDefaultPropertyValues();
 
   /// Sets up the looktable for the display. It requests the lookuptable
   /// manager for a lookuptable for array with given name and 1 component.

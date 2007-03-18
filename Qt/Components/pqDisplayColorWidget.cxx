@@ -42,14 +42,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QComboBox>
 #include <QHBoxLayout>
+#include <QIcon>
 #include <QList>
 #include <QRegExp>
 #include <QtDebug>
-#include <QIcon>
+#include <QTimer>
 
 #include "pqApplicationCore.h"
 #include "pqPipelineDisplay.h"
-#include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
@@ -82,6 +82,15 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
     SLOT(onVariableChanged(pqVariableType, const QString&)));
 
   this->VTKConnect = vtkEventQtSlotConnect::New();
+
+  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+  if (stack)
+    {
+    QObject::connect(this, SIGNAL(begin(const QString&)),
+      stack, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(this, SIGNAL(end()),
+      stack, SLOT(endUndoSet()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -172,6 +181,7 @@ void pqDisplayColorWidget::onVariableActivated(int row)
   const QString name = d[0];
   
   emit variableChanged(type, name);
+  emit this->modified();
 }
 
 //-----------------------------------------------------------------------------
@@ -198,10 +208,7 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
   pqPipelineDisplay* display = this->getDisplay();
   if (display)
     {
-    // I cannot decide if we should use signals here of directly 
-    // call the appropriate methods on undo stack.
-    pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-    stack->beginUndoSet("Color Change");
+    emit this->begin("Color Change");
     switch(type)
       {
     case VARIABLE_TYPE_NONE:
@@ -216,7 +223,7 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
         vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
       break;
       }
-    stack->endUndoSet();
+    emit this->end();
     display->renderAllViews();
     }
 }
@@ -224,6 +231,7 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::updateGUI()
 {
+  this->BlockEmission = true;
   pqPipelineDisplay* display = this->getDisplay();
   if (display)
     {
@@ -234,6 +242,7 @@ void pqDisplayColorWidget::updateGUI()
       }
     this->Variables->setCurrentIndex(index);
     }
+  this->BlockEmission = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -268,7 +277,7 @@ void pqDisplayColorWidget::setDisplay(pqConsumerDisplay* display)
       NULL, 0.0,
       Qt::QueuedConnection);
     }
-  this->reloadGUI();
+  QTimer::singleShot(0, this, SLOT(reloadGUI()));
 }
 
 //-----------------------------------------------------------------------------
@@ -316,7 +325,7 @@ void pqDisplayColorWidget::reloadGUI()
 
   this->BlockEmission = false;
   this->updateGUI();
-  // BlockEmissions blocked a signal that needs to be sent out
-  this->onVariableActivated(this->Variables->currentIndex());
+
+  emit this->modified();
 }
 

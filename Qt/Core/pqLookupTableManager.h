@@ -39,10 +39,10 @@ class pqProxy;
 class pqScalarsToColors;
 class pqServer;
 
-// pqLookupTableManager is the manager that manages color lookup objects.
-// This is an abstract class that defines the API for any LUT manager.
-// subclasses are free to implement their own policy which can be specific
-// to the application.
+/// pqLookupTableManager is the manager that manages color lookup objects.
+/// This is an abstract class that defines the API for any LUT manager.
+/// subclasses are free to implement their own policy which can be specific
+/// to the application.
 class PQCORE_EXPORT pqLookupTableManager : public QObject
 {
   Q_OBJECT
@@ -50,25 +50,34 @@ public:
   pqLookupTableManager(QObject* parent=NULL);
   virtual ~pqLookupTableManager();
 
-  // Get a LookupTable for the array with name \c arrayname 
-  // and component. component = -1 represents magnitude. Subclasses
-  // can implemenent their own policy for managing lookup tables.
+  /// Get a LookupTable for the array with name \c arrayname 
+  /// and component. component = -1 represents magnitude. Subclasses
+  /// can implemenent their own policy for managing lookup tables.
   virtual pqScalarsToColors* getLookupTable(pqServer* server, 
     const QString& arrayname, int number_of_components, int component) = 0;
 
 public slots:
-  // Called when any proxy is added. Subclasses can override
-  // onAddLookupTable() which is called by this method when it is
-  // ascertained that the proxy is a lookup table.
+  /// Called to update scalar ranges of all lookup tables.
+  virtual void updateLookupTableScalarRanges()=0;
+
+private slots:
+  /// Called when any proxy is added. Subclasses can override
+  /// onAddLookupTable() which is called by this method when it is
+  /// ascertained that the proxy is a lookup table.
   void onAddProxy(pqProxy* proxy);
 
-  // Called when a LUT is added.
+  /// Called when any proxy is removed. Subclasses can
+  /// override onRemoveLookupTable which is called by this method
+  /// with the proxy removed is a lookuptable.
+  void onRemoveProxy(pqProxy* proxy);
+
+protected:
+  /// Called when a LUT is added.
   virtual void onAddLookupTable(pqScalarsToColors* lut) = 0;
 
-  // Called to update scalar ranges of all lookup tables.
-  virtual void updateLookupTableScalarRanges()=0;
-protected:
- 
+  /// Called when a LUT is removed.
+  virtual void onRemoveLookupTable(pqScalarsToColors* lut) = 0;
+
 };
 
 

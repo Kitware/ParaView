@@ -42,22 +42,25 @@ public:
   virtual int Redo();
 
   // Description:
+  // Returns if this element can load the xml state for the given element.
+  virtual bool CanLoadState(vtkPVXMLElement*);
+
+  // Description:
   // Set the property/proxy that was modified. 
   void ModifiedProperty(vtkSMProxy* proxy, const char* propertyname);
+
+  // Description:
+  // Called on the older element in the UndoSet to merge with the
+  // element being added if  both the elements are \c mergeable.
+  // vtkSMPropertyModificationUndoElement is mergeable with 
+  // vtkSMPropertyModificationUndoElement alone if both
+  // represent change to the same property.
+  // Returns if the merge was successful. 
+  virtual bool Merge(vtkUndoElement* vtkNotUsed(new_element));
+  
 protected:
   vtkSMPropertyModificationUndoElement();
   ~vtkSMPropertyModificationUndoElement();
-
-  // Description:
-  // Overridden to save state specific to the class.
-  // \arg \c element <Element /> representing this object.
-  virtual void SaveStateInternal(vtkPVXMLElement* root);
-
-  virtual void LoadStateInternal(vtkPVXMLElement* element);
-
-  vtkPVXMLElement* XMLElement;
-  void SetXMLElement(vtkPVXMLElement*);
-
 
 private:
   vtkSMPropertyModificationUndoElement(const vtkSMPropertyModificationUndoElement&); // Not implemented.

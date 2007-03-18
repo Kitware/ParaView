@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QListWidgetItem>
 
-#include "pqApplicationCore.h"
 #include "pqReaderFactory.h"
 
 class pqSelectReaderDialog::pqInternal : public QObject, public Ui::pqSelectReaderDialog
@@ -46,7 +45,8 @@ public:
 };
 
 pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
-                       pqServer* s, QWidget* p)
+                       pqServer* s,
+                       pqReaderFactory* readerInfo, QWidget* p)
   : QDialog(p)
 {
   this->Internal = new pqInternal(this);
@@ -59,9 +59,6 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
 
   // populate the list view with readers
   QListWidget* lw = this->Internal->listWidget;
-
-  pqReaderFactory* readerInfo;
-  readerInfo = pqApplicationCore::instance()->getReaderFactory();
 
   QStringList readers = readerInfo->getSupportedReaders(s);
   foreach(QString reader, readers)

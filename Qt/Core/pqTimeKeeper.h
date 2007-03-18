@@ -71,11 +71,7 @@ public slots:
 
 protected slots:
   void propertyModified(vtkObject*, unsigned long, void*, void* callData);
-  void delayedInitialization();
 
-  /// Iterates to internal list of sources whose timesteps values 
-  /// were modified and updates the timekeeper's timesteps accordingly.
-  void updateTimestepsFromModifiedSources();
 protected:
   void updateTimeKeeperProxy();
 

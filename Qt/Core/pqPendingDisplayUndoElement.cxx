@@ -42,20 +42,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPendingDisplayManager.h"
 
 vtkStandardNewMacro(pqPendingDisplayUndoElement);
-vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.3");
-vtkCxxSetObjectMacro(pqPendingDisplayUndoElement, XMLElement, vtkPVXMLElement);
+vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.4");
 //-----------------------------------------------------------------------------
 pqPendingDisplayUndoElement::pqPendingDisplayUndoElement()
 {
-  this->XMLElement = 0;
 }
 
 //-----------------------------------------------------------------------------
 pqPendingDisplayUndoElement::~pqPendingDisplayUndoElement()
 {
-  this->SetXMLElement(0);
 }
-  
+
+//-----------------------------------------------------------------------------
+bool pqPendingDisplayUndoElement::CanLoadState(vtkPVXMLElement* elem)
+{
+  return (elem && elem->GetName() && 
+    strcmp(elem->GetName(), "PendingDisplay") == 0);
+}
+
 //-----------------------------------------------------------------------------
 void pqPendingDisplayUndoElement::PendingDisplay(pqPipelineSource* source, 
   int state)
@@ -66,28 +70,6 @@ void pqPendingDisplayUndoElement::PendingDisplay(pqPipelineSource* source,
   elem->AddAttribute("state", (state? "1": "0"));
   this->SetXMLElement(elem);
   elem->Delete();
-}
-
-//-----------------------------------------------------------------------------
-void pqPendingDisplayUndoElement::SaveStateInternal(vtkPVXMLElement* root)
-{
-   if (!this->XMLElement)
-    {
-    vtkErrorMacro("No state present to save.");
-    }
-  root->AddNestedElement(this->XMLElement);
-}
-//-----------------------------------------------------------------------------
-void pqPendingDisplayUndoElement::LoadStateInternal(vtkPVXMLElement* element)
-{
-  if (strcmp(element->GetName(), "PendingDisplay") != 0)
-    {
-    vtkErrorMacro("Invalid element name: " 
-      << element->GetName() << ". Must be PendingDisplay.");
-    return;
-    }
-
-  this->SetXMLElement(element);
 }
 
 //-----------------------------------------------------------------------------
@@ -119,15 +101,21 @@ int pqPendingDisplayUndoElement::InternalUndoRedo(bool undo)
 
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smModel = core->getServerManagerModel();
+  pqPendingDisplayManager* pdmanager = qobject_cast<pqPendingDisplayManager*>(
+    core->manager("PENDING_DISPLAY_MANAGER"));
+  if (!pdmanager)
+    {
+    vtkErrorMacro("PENDING_DISPLAY_MANAGER must be registered with the "
+      << "pqApplicationCore instance.");
+    return 0;
+    }
   if ((state && undo) || (!state && !undo))
     {
-    core->getPendingDisplayManager()->
-          removePendingDisplayForSource(smModel->getPQSource(proxy));
+    pdmanager->removePendingDisplayForSource(smModel->getPQSource(proxy));
     }
   else
     {
-    core->getPendingDisplayManager()->
-          internalAddPendingDisplayForSource(smModel->getPQSource(proxy));
+    pdmanager->internalAddPendingDisplayForSource(smModel->getPQSource(proxy));
     }
   proxy->Delete();
   return 1;

@@ -16,24 +16,33 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMClientServerRenderModuleProxy.h"
 #include "vtkSMIceTDesktopRenderModuleProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
+
+#include <vtkstd/vector>
+
+class vtkSMMultiViewRenderModuleProxyVector : 
+  public vtkstd::vector<vtkSmartPointer<vtkSMProxy> > {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMultiViewRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.7");
 
 //----------------------------------------------------------------------------
 vtkSMMultiViewRenderModuleProxy::vtkSMMultiViewRenderModuleProxy()
 {
   this->RenderModuleName = 0;
   this->RenderModuleId = 0;
+  this->RenderModules = new vtkSMMultiViewRenderModuleProxyVector;
 }
 
 //----------------------------------------------------------------------------
 vtkSMMultiViewRenderModuleProxy::~vtkSMMultiViewRenderModuleProxy()
 {
+  delete this->RenderModules;
   this->SetRenderModuleName(0);
 }
 
@@ -52,14 +61,45 @@ vtkSMProxy* vtkSMMultiViewRenderModuleProxy::NewRenderModule()
     "rendermodules", this->RenderModuleName);
   renderModule->SetConnectionID(this->ConnectionID);
 
+  /*
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->vtkSMProxy::GetProperty("RenderModules"));
+  pp->AddProxy(renderModule);
+  this->UpdateProperty("RenderModules");
+  */
+
+  return renderModule;
+}
+
+//-----------------------------------------------------------------------------
+unsigned int vtkSMMultiViewRenderModuleProxy::GetNumberOfRenderModules()
+{
+  return this->RenderModules->size();
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMMultiViewRenderModuleProxy::GetRenderModule(unsigned int index)
+{
+  if (index >= this->RenderModules->size())
+    {
+    vtkErrorMacro("Invalid index " << index);
+    return 0;
+    }
+  return (*this->RenderModules)[index].GetPointer();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMultiViewRenderModuleProxy::AddRenderModule(
+  vtkSMProxy* renderModule)
+{
   vtkSMClientServerRenderModuleProxy *clientServerModule =
     vtkSMClientServerRenderModuleProxy::SafeDownCast(renderModule);
   if (clientServerModule)
     {
     clientServerModule->SetServerRenderWindowProxy(
-                                             this->GetSubProxy("RenderWindow"));
+      this->GetSubProxy("RenderWindow"));
     clientServerModule->SetServerRenderSyncManagerProxy(
-                                        this->GetSubProxy("RenderSyncManager"));
+      this->GetSubProxy("RenderSyncManager"));
     clientServerModule->SetRenderModuleId(this->RenderModuleId);
     }
 
@@ -70,13 +110,38 @@ vtkSMProxy* vtkSMMultiViewRenderModuleProxy::NewRenderModule()
     iceT->SetServerDisplayManagerProxy(this->GetSubProxy("DisplayManager"));
     }
 
-  ostrstream name;
-  name << "RenderModule" << this->RenderModuleId << ends;
-  this->AddProxy(name.str(), renderModule);
-  delete[] name.str();
   this->RenderModuleId++;
 
-  return renderModule;
+  ostrstream name;
+  name << "RenderModule." << renderModule->GetSelfIDAsString() << endl;
+  this->AddSubProxy(name.str(), renderModule);
+
+  this->RenderModules->push_back(renderModule);
+  delete[] name.str();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMultiViewRenderModuleProxy::RemoveRenderModule(
+  vtkSMProxy* renderModule)
+{
+  const char* name = this->GetSubProxyName(renderModule);
+  if (name)
+    {
+    this->RemoveSubProxy(name);
+    this->RenderModuleId--; // this will only work when the
+                            // render modules are removed in reverse
+                            // order that they were added.
+    }
+  vtkSMMultiViewRenderModuleProxyVector::iterator iter = 
+    this->RenderModules->begin();
+  for (; iter != this->RenderModules->end(); ++iter)
+    {
+    if ( (*iter).GetPointer() == renderModule)
+      {
+      this->RenderModules->erase(iter);
+      break;
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -136,11 +201,11 @@ vtkSMAbstractDisplayProxy* vtkSMMultiViewRenderModuleProxy::CreateDisplayProxy()
                   "vtkSMMultiViewRenderModuleProxyProxy can create "
                   "display proxies.");
     }
-  unsigned int numMax = this->GetNumberOfProxies();
+  unsigned int numMax = this->GetNumberOfRenderModules();
   for (unsigned int cc=0;  cc <numMax; cc++)
     {
     vtkSMRenderModuleProxy* renModule = vtkSMRenderModuleProxy::SafeDownCast(
-      this->GetProxy(cc));
+      this->GetRenderModule(cc));
     if (renModule)
       {
       return renModule->CreateDisplayProxy();

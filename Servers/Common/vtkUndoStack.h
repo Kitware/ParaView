@@ -94,21 +94,25 @@ public:
  
   // Description:
   // Get the UndoSet on the top of the Undo stack, if any.
-  vtkUndoSet* GetNextUndoSet();
+  virtual vtkUndoSet* GetNextUndoSet();
 
   // Description:
   // Get the UndoSet on the top of the Redo stack, if any.
-  vtkUndoSet* GetNextRedoSet();
+  virtual vtkUndoSet* GetNextRedoSet();
 
   // Description:
   // Performs an Undo using the set on the top of the undo stack. The set is poped from
   // the undo stack and pushed at the top of the redo stack. 
+  // Before undo begins, it fires vtkCommand::StartEvent and when undo completes,
+  // it fires vtkCommand::EndEvent.
   // \returns the status of the operation.
   virtual int Undo();
 
   // Description:
   // Performs a Redo using the set on the top of the redo stack. The set is poped from
   // the redo stack and pushed at the top of the undo stack. 
+  // Before redo begins, it fires vtkCommand::StartEvent and when redo completes,
+  // it fires vtkCommand::EndEvent.
   // \returns the status of the operation.
   virtual int Redo();
 
@@ -127,15 +131,26 @@ public:
   // Description:
   // Clears all the undo/redo elements from the stack.
   void Clear();
+
+  // Description:
+  // Returns if the stack is currently being undone.
+  vtkGetMacro(InUndo, bool);
+
+  // Description:
+  // Returns if the stack is currently being redone.
+  vtkGetMacro(InRedo, bool);
 protected:
   vtkUndoStack();
   ~vtkUndoStack();
 
   vtkUndoStackInternal* Internal;
+
 private:
   vtkUndoStack(const vtkUndoStack&); // Not implemented.
   void operator=(const vtkUndoStack&); // Not implemented.
 
+  bool InUndo;
+  bool InRedo;
 };
 
 #endif

@@ -40,15 +40,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPolicy.h"
 #include "pqFilterInputDialog.h"
 #include "pqFlatTreeView.h"
+#include "pqGenericViewModule.h"
+#include "pqObjectBuilder.h"
 #include "pqPipelineBrowserStateManager.h"
-#include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineModelSelectionAdaptor.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
-#include "pqGenericViewModule.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqSourceHistoryModel.h"
@@ -56,7 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSourceInfoGroupMap.h"
 #include "pqSourceInfoIcons.h"
 #include "pqSourceInfoModel.h"
-#include "pqUndoStack.h"
 
 #include <QApplication>
 #include <QEvent>
@@ -143,6 +142,10 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
       SIGNAL(sourceDisplayChanged(pqPipelineSource *, pqConsumerDisplay*)),
       this->Model,
       SLOT(updateDisplays(pqPipelineSource *, pqConsumerDisplay*)));
+  
+  this->connect(
+    this->Model, SIGNAL(rename(const QModelIndex&, const QString&)),
+    this, SLOT(onRename(const QModelIndex&, const QString&)));
 
   // Create a flat tree view to display the pipeline.
   this->TreeView = new pqFlatTreeView(this);
@@ -295,26 +298,23 @@ void pqPipelineBrowser::addFilter()
     this->FilterHistory->addRecentSource(filterName);
 
     // Create the filter.
-    pqPipelineSource *source = 0;
-    pqPipelineSource *filter = 0;
-    QModelIndexList::Iterator index = indexes.begin();
     pqApplicationCore *core = pqApplicationCore::instance();
-    if(index != indexes.end())
+    pqObjectBuilder* builder = core->getObjectBuilder();
+
+    QList<pqPipelineSource*> inputs;
+    for(QModelIndexList::Iterator index = indexes.begin();
+      index != indexes.end(); ++index)
       {
-      source = dynamic_cast<pqPipelineSource *>(
+      pqPipelineSource* source = dynamic_cast<pqPipelineSource *>(
           this->Model->getItemFor(*index));
-      filter = core->createFilterForSource(filterName, source);
-      ++index;
+      if (source)
+        {
+        inputs.push_back(source);
+        }
       }
 
-    pqPipelineBuilder* builder = core->getPipelineBuilder();
-    for( ; filter && index != indexes.end(); ++index)
-      {
-      source = dynamic_cast<pqPipelineSource *>(
-          this->Model->getItemFor(*index));
-      builder->addConnection(source, filter);
-      }
-
+    pqPipelineSource *filter = builder->createFilter("filters", filterName,
+      inputs);
     if(!filter)
       {
       qCritical() << "Filter could not be created.";
@@ -369,10 +369,12 @@ void pqPipelineBrowser::changeInput()
 
       // Remove the old connections.
       pqPipelineSource *source = 0;
-      pqPipelineBuilder *builder =
-          pqApplicationCore::instance()->getPipelineBuilder();
-      pqUndoStack *undo = pqApplicationCore::instance()->getUndoStack();
-      undo->beginUndoSet(QString("Change Input"));
+      pqObjectBuilder *builder =
+          pqApplicationCore::instance()->getObjectBuilder();
+
+      emit this->beginUndo(QString("Change Input for %1").arg(
+          filter->getSMName()));
+
       for(iter = toRemove.begin(); iter != toRemove.end(); ++iter)
         {
         source = smModel->getPQSource(*iter);
@@ -385,8 +387,7 @@ void pqPipelineBrowser::changeInput()
         source = smModel->getPQSource(*iter);
         builder->addConnection(source, filter);
         }
-
-      undo->endUndoSet();
+      emit this->endUndo();
       }
 
     delete model;
@@ -411,12 +412,28 @@ void pqPipelineBrowser::deleteSelected()
     {
     if(source->getNumberOfConsumers() == 0)
       {
-      pqApplicationCore::instance()->removeSource(source);
+      emit this->beginUndo(QString("Delete %1").arg(source->getSMName()));
+      pqApplicationCore::instance()->getObjectBuilder()->destroy(source);
+      emit this->endUndo();
       }
     }
   else if(server)
     {
     pqApplicationCore::instance()->removeServer(server);
+    }
+}
+
+//----------------------------------------------------------------------------
+void pqPipelineBrowser::onRename(const QModelIndex& index, const QString& name)
+{
+  pqPipelineSource* source = qobject_cast<pqPipelineSource*>(
+    this->Model->getItemFor(index));
+  if (source)
+    {
+    emit this->beginUndo(QString("Rename %1 to %2").arg(
+        source->getSMName()).arg(name));
+    source->rename(name);
+    emit this->endUndo();
     }
 }
 
@@ -450,6 +467,9 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
         visible = !display->isVisible();
         }
 
+      emit this->beginUndo(QString("Change Visibility of %1").arg(
+        source->getSMName()));
+
       pqDisplayPolicy* dpolicy = 
         pqApplicationCore::instance()->getDisplayPolicy();
       // Will create new display if needed. May also create new view 
@@ -457,6 +477,7 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
       display = dpolicy->setDisplayVisibility(
         source, this->Internal->ViewModule, visible);
 
+      emit this->endUndo();
       if(display)
         {
         display->renderAllViews(false);

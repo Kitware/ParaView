@@ -75,7 +75,13 @@ void pqServer::disconnect(pqServer* server)
   // For now, ensure that the render module is deleted before the connection is broken.
   // Eventually, the vtkSMProxyManager will support a close connection method
   // which will do proper connection proxy cleanup.
-  server->RenderModule = NULL;
+  if (server->RenderModule)
+    {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    pxm->UnRegisterProxy("multirendermodule", 
+      server->RenderModule->GetSelfIDAsString(), server->RenderModule);
+    server->RenderModule = NULL;
+    }
   vtkProcessModule::GetProcessModule()->Disconnect(
     server->GetConnectionID());
 }
@@ -108,6 +114,13 @@ pqServer::~pqServer()
     vtkProcessModule::GetProcessModule()->Disconnect(this->ConnectionID);
     }
     */
+
+  if (this->RenderModule)
+    {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    pxm->UnRegisterProxy("multirendermodule", 
+      this->RenderModule->GetSelfIDAsString(), this->RenderModule);
+    }
   this->ConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
 
   delete this->Internals;
@@ -158,6 +171,11 @@ void pqServer::createRenderModule()
     vtkSMMultiViewRenderModuleProxy::SafeDownCast(
       proxy_manager->NewProxy("rendermodules", "MultiViewRenderModule"));
   render_module->SetConnectionID(this->ConnectionID);
+
+  // we register under prototypes so it doesn't get saved in state files
+  // but undo/redo is possible.
+  proxy_manager->RegisterProxy("multirendermodule", 
+    render_module->GetSelfIDAsString(), render_module);
 
   const char* renderModuleName = 0;
   if (!pm->IsRemote(this->ConnectionID))
@@ -217,8 +235,10 @@ vtkSMRenderModuleProxy* pqServer::newRenderModule()
     qDebug() << "No MultiDisplayRenderModule to create a new render module.";
     return NULL;
     }
-  return vtkSMRenderModuleProxy::SafeDownCast(
+
+  vtkSMRenderModuleProxy* proxy = vtkSMRenderModuleProxy::SafeDownCast(
     this->RenderModule->NewRenderModule());
+  return proxy;
 }
 
 const pqServerResource& pqServer::getResource()
@@ -252,3 +272,22 @@ void pqServer::setResource(const pqServerResource &server_resource)
   this->Resource = server_resource;
   emit this->nameChanged();
 }
+
+//-----------------------------------------------------------------------------
+void pqServer::getSupportedProxies(const QString& xmlgroup, QList<QString>& names)
+{
+  names.clear();
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  unsigned int numProxies = pxm->GetNumberOfXMLProxies(
+    xmlgroup.toAscii().data());
+  for (unsigned int cc=0; cc <numProxies; cc++)
+    {
+    const char* name = pxm->GetXMLProxyName(xmlgroup.toAscii().data(),
+      cc);
+    if (name)
+      {
+      names.push_back(name);
+      }
+    }
+}
+

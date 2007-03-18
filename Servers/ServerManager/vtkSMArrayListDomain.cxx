@@ -24,12 +24,13 @@
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 #include <vtkstd/map>
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.8");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.9");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -229,6 +230,33 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
     }
   
   return 1;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
+{
+  vtkSMStringVectorProperty* svp = 
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  if (!prop)
+    {
+    return 0;
+    }
+
+  if (this->GetNumberOfStrings() > 0)
+    {
+    const char* array = this->GetString(0);
+    if (svp->GetNumberOfElements() == 5)
+      {
+      svp->SetElement(4, array);
+      return 1;
+      }
+    else if (svp->GetNumberOfElements() == 1)
+      {
+      svp->SetElement(0, array);
+      return 1;
+      }
+    }
+  return this->Superclass::SetDefaultValues(prop);
 }
 
 //---------------------------------------------------------------------------

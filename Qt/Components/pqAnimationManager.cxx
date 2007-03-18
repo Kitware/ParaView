@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqAnimationSceneImageWriter.h"
 #include "pqApplicationCore.h"
-#include "pqPipelineBuilder.h"
+#include "pqObjectBuilder.h"
 #include "pqProgressManager.h"
 #include "pqProxy.h"
 #include "pqRenderViewModule.h"
@@ -130,10 +130,14 @@ void pqAnimationManager::updateViewModules()
     viewList.push_back(pqSMProxy(view->getProxy()));
     } 
 
+  emit this->beginNonUndoableChanges();
+
   vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
   pqSMAdaptor::setProxyListProperty(sceneProxy->GetProperty("ViewModules"),
     viewList);
   sceneProxy->UpdateProperty("ViewModules");
+
+  emit this->endNonUndoableChanges();
 }
 
 //-----------------------------------------------------------------------------
@@ -196,9 +200,10 @@ pqAnimationScene* pqAnimationManager::createActiveScene()
 {
   if (this->Internals->ActiveServer)
     {
-    pqPipelineBuilder* builder = pqApplicationCore::instance()->getPipelineBuilder();
-    vtkSMProxy *scene = builder->createProxy("animation", "PVAnimationScene", "animation",
-      this->Internals->ActiveServer, false);
+    pqObjectBuilder* builder = 
+      pqApplicationCore::instance()->getObjectBuilder();
+    vtkSMProxy *scene = builder->createProxy("animation", "PVAnimationScene", 
+      this->Internals->ActiveServer, "animation");
     scene->SetServers(vtkProcessModule::CLIENT);
     // this will result in a call to onProxyAdded() and proper
     // signals will be emitted.
@@ -402,6 +407,8 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   //double duration = sceneProxy->GetDuration();
   double frames_per_timestep = sceneProxy->GetFramesPerTimestep();
 
+  emit this->beginNonUndoableChanges();
+
   switch (sceneProxy->GetPlayMode())
     {
   case vtkSMPVAnimationSceneProxy::SEQUENCE:
@@ -463,6 +470,7 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
       vtkSMServerProxyManagerReviver::New();
     int status = reviver->ReviveRemoteServerManager(server->GetConnectionID());
     reviver->Delete();
+    emit this->endNonUndoableChanges();
     pqApplicationCore::instance()->removeServer(server);
     return status;
     }
@@ -513,6 +521,7 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   sceneProxy->UpdateVTKObjects();
 
   this->restoreViewSizes();
+  emit this->endNonUndoableChanges();
   return status;
 }
 

@@ -45,6 +45,7 @@ class pqScalarsToColors;
 class PQCORE_EXPORT pqConsumerDisplay : public pqDisplay
 {
   Q_OBJECT
+  typedef pqDisplay Superclass;
 public:
   pqConsumerDisplay(const QString& group, const QString& name,
     vtkSMProxy* display, pqServer* server,
@@ -67,8 +68,14 @@ public:
   virtual pqScalarsToColors* getLookupTable();
 
 
-  // Called after to creation to set default values.
-  virtual void setDefaults();
+  /// Sets default values for the underlying proxy. 
+  /// This is during the initialization stage of the pqProxy 
+  /// for proxies created by the GUI itself i.e.
+  /// for proxies loaded through state or created by python client
+  /// this method won't be called. 
+  /// The default implementation iterates over all properties
+  /// of the proxy and sets them to default values. 
+  virtual void setDefaultPropertyValues();
 protected slots:
   // called when input property on display changes. We must detect if
   // (and when) the display is connected to a new proxy.

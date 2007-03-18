@@ -56,7 +56,7 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkRendererCollection.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.76");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.77");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -608,7 +608,6 @@ void vtkSMRenderModuleProxy::AddDisplay(vtkSMAbstractDisplayProxy* adisp)
   if (prop)
     {
     this->ViewTimeLinks->AddLinkedProperty(prop, vtkSMLink::OUTPUT);
-    prop->Copy(this->GetProperty("ViewTime"));
     disp->UpdateProperty("UpdateTime");
     }
 
@@ -982,6 +981,9 @@ void vtkSMRenderModuleProxy::ResetCamera()
 void vtkSMRenderModuleProxy::ResetCamera(double bds[6])
 {
   this->GetRenderer()->ResetCamera(bds);
+  this->ActiveCameraProxy->UpdatePropertyInformation();
+  this->SynchronizeCameraProperties();
+
   this->Modified();
   this->InvokeEvent(vtkCommand::ResetCameraEvent);
 }

@@ -41,15 +41,14 @@ public:
     BOOLEAN=1,
     RAMP=2,
     EXPONENTIAL=3,
-    SINUSOID=4,
-    CAMERA=5
+    SINUSOID=4
     };
   //ETX
 
   // Description:
   // Get/Set the type of keyframe to be used as the active type.
   // Default is RAMP.
-  vtkSetClampMacro(Type, int, NONE, CAMERA);
+  vtkSetClampMacro(Type, int, NONE, SINUSOID);
   vtkGetMacro(Type, int);
   const char* GetTypeAsString() { return this->GetTypeAsString(this->Type); }
   static const char* GetTypeAsString(int);

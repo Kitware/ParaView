@@ -87,10 +87,6 @@ public:
   // otherwise render on idle.
   void renderAllViews(bool force);
 
-  // This method is called on all displays after creation to
-  // fill it up with default parameters. This is called only when the GUI
-  // creates the display using the pipeline builder.
-  virtual void setDefaults() { };
 public slots:
   void renderAllViews() { this->renderAllViews(false); }
 

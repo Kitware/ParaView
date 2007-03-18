@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.86");
+vtkCxxRevisionMacro(vtkSMProxy, "1.87");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1165,6 +1165,21 @@ const char* vtkSMProxy::GetSubProxyName(unsigned int index)
 }
 
 //---------------------------------------------------------------------------
+const char* vtkSMProxy::GetSubProxyName(vtkSMProxy* proxy)
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for(;it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    if (it2->second.GetPointer() == proxy)
+      {
+      return it2->first.c_str();
+      }
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxy::GetSubProxy(unsigned int index)
 {
   vtkSMProxyInternals::ProxyMap::iterator it2 =
@@ -2158,6 +2173,15 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
     << endl;
   os << indent << "Documentation: " << this->Documentation << endl;
   os << indent << "ObjectsCreated: " << this->ObjectsCreated << endl;
+  os << indent << "Hints: " ;
+  if (this->Hints)
+    {
+    this->Hints->PrintSelf(os, indent);
+    }
+  else
+    {
+    os << "(null)" << endl;
+    }
 
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
   if (iter)

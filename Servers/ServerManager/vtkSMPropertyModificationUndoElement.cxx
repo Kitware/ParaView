@@ -21,19 +21,17 @@
 #include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkSMPropertyModificationUndoElement);
-vtkCxxRevisionMacro(vtkSMPropertyModificationUndoElement, "1.3");
-vtkCxxSetObjectMacro(vtkSMPropertyModificationUndoElement, XMLElement,
-  vtkPVXMLElement);
+vtkCxxRevisionMacro(vtkSMPropertyModificationUndoElement, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMPropertyModificationUndoElement::vtkSMPropertyModificationUndoElement()
 {
-  this->XMLElement = 0;
+  this->SetMergeable(true);
+
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPropertyModificationUndoElement::~vtkSMPropertyModificationUndoElement()
 {
-  this->SetXMLElement(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -47,19 +45,22 @@ int vtkSMPropertyModificationUndoElement::Undo()
   int proxy_id;
   this->XMLElement->GetScalarAttribute("id", &proxy_id);
   const char* property_name = this->XMLElement->GetAttribute("name");
-  vtkSMDefaultStateLoader* stateLoader = vtkSMDefaultStateLoader::New();
-  stateLoader->SetConnectionID(this->ConnectionID);
 
-  vtkSMProxy* proxy = stateLoader->NewProxy(proxy_id);
+  vtkSMStateLoader* loader = this->GetStateLoader();
+  if (!loader)
+    {
+    vtkErrorMacro("No loader set. Cannot Undo.");
+    return 0;
+    }
+  vtkSMProxy* proxy = loader->NewProxy(proxy_id);
   vtkSMProperty* property = (proxy? proxy->GetProperty(property_name): NULL);
   int ret = 0;
   if (property)
     {
     ret = property->LoadState(this->XMLElement->GetNestedElement(0),  
-      stateLoader, 1);
+      loader, 1);
     }
   proxy->Delete();
-  stateLoader->Delete();
   return ret;
 }
 
@@ -74,44 +75,32 @@ int vtkSMPropertyModificationUndoElement::Redo()
   int proxy_id;
   this->XMLElement->GetScalarAttribute("id", &proxy_id);
   const char* property_name = this->XMLElement->GetAttribute("name");
-  vtkSMDefaultStateLoader* stateLoader = vtkSMDefaultStateLoader::New();
-  stateLoader->SetConnectionID(this->ConnectionID);
 
-  vtkSMProxy* proxy = stateLoader->NewProxy(proxy_id);
+  vtkSMStateLoader* loader = this->GetStateLoader();
+  if (!loader)
+    {
+    vtkErrorMacro("No loader set. Cannot Redo.");
+    return 0;
+    }
+
+  vtkSMProxy* proxy = loader->NewProxy(proxy_id);
   vtkSMProperty* property = (proxy? proxy->GetProperty(property_name): NULL);
   int ret = 0;
   if (property)
     {
     ret = property->LoadState(this->XMLElement->GetNestedElement(0),  
-      stateLoader, 0);
+      loader, 0);
     }
   proxy->Delete();
-  stateLoader->Delete();
   return ret;
 }
 
-//-----------------------------------------------------------------------------
-void vtkSMPropertyModificationUndoElement::SaveStateInternal(vtkPVXMLElement* root)
-{
-  if (!this->XMLElement)
-    {
-    vtkErrorMacro("No state present to save.");
-    return;
-    }
-  root->AddNestedElement(this->XMLElement);
-}
 
 //-----------------------------------------------------------------------------
-void vtkSMPropertyModificationUndoElement::LoadStateInternal(
-  vtkPVXMLElement* pmElement)
+bool vtkSMPropertyModificationUndoElement::CanLoadState(vtkPVXMLElement* elem)
 {
-  if (strcmp(pmElement->GetName(), "PropertyModification") != 0)
-    {
-    vtkErrorMacro("Invalid element name: " << pmElement->GetName()
-      << ". Must be PropertyModification.");
-    return;
-    }
-  this->SetXMLElement(pmElement);
+  return (elem && elem->GetName() && 
+    strcmp(elem->GetName(), "PropertyModification") == 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -139,8 +128,56 @@ void vtkSMPropertyModificationUndoElement::ModifiedProperty(vtkSMProxy* proxy,
 }
 
 //-----------------------------------------------------------------------------
+bool vtkSMPropertyModificationUndoElement::Merge(vtkUndoElement* 
+  vtkNotUsed(new_element))
+{
+  return false;
+
+  // FIXME this doesn't work correctly...need to check.
+#if 0
+  vtkSMPropertyModificationUndoElement* toMerge = 
+    vtkSMPropertyModificationUndoElement::SafeDownCast(new_element);
+  if (!toMerge || !toMerge->XMLElement)
+    {
+    return false;
+    }
+
+  int proxy_id=0;
+  this->XMLElement->GetScalarAttribute("id", &proxy_id);
+  const char* property_name = this->XMLElement->GetAttribute("name");
+
+  int other_id=0;
+  toMerge->XMLElement->GetScalarAttribute("id", &other_id);
+  const char* other_name = toMerge->XMLElement->GetAttribute("name");
+
+  if (proxy_id != other_id && strcmp(property_name, other_name) != 0)
+    {
+    return false;
+    }
+
+  // Merge the XMLs.
+  vtkPVXMLElement* last_pushed_values = 
+    this->XMLElement->GetNestedElement(0)->
+    FindNestedElementByName("LastPushedValues");
+  vtkPVXMLElement* other_last_pushed_values = toMerge->XMLElement->
+    GetNestedElement(0)->FindNestedElementByName("LastPushedValues");
+  if (!last_pushed_values || !other_last_pushed_values)
+    {
+    return false;
+    }
+
+  toMerge->XMLElement->GetNestedElement(0)->RemoveNestedElement(
+    other_last_pushed_values);
+  toMerge->XMLElement->GetNestedElement(0)->AddNestedElement(
+    last_pushed_values);
+
+  this->SetXMLElement(toMerge->XMLElement);
+  return true;
+#endif
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMPropertyModificationUndoElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "XMLElement: " << this->XMLElement << endl;
 }

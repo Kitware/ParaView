@@ -32,9 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerSelectionModel.h"
 
 #include <QPointer>
+#include <QGlobalStatic>
 
 #include "pqServerManagerModelItem.h"
 #include "pqServerManagerModel.h"
+
+// register meta type for pqSMProxy
+static const int pqServerManagerSelectionId = 
+qRegisterMetaType<pqServerManagerSelection>("pqServerManagerSelection");
 
 //-----------------------------------------------------------------------------
 class pqServerManagerSelectionModelInternal

@@ -562,6 +562,11 @@ protected:
   const char* GetSubProxyName(unsigned int index);
 
   // Description:
+  // Returns the name used to store sub-proxy. Returns 0 is the sub-proxy
+  // does not exist.
+  const char* GetSubProxyName(vtkSMProxy*);
+
+  // Description:
   // Returns the number of sub-proxies.
   unsigned int GetNumberOfSubProxies();
 

@@ -32,17 +32,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 
-#include "vtkSmartPointer.h"
 #include "vtkEventQtSlotConnect.h"
-
+#include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-
 
 #include <QMap>
 #include <QList>
 #include <QtDebug>
-
 
 //-----------------------------------------------------------------------------
 class pqProxyInternal
@@ -74,18 +73,16 @@ pqProxy::pqProxy(const QString& group, const QString& name,
     this, SLOT(onUpdateVTKObjects()));
 }
 
+//-----------------------------------------------------------------------------
 pqProxy::~pqProxy()
 {
-  this->clearInternalProxies();
+  this->clearHelperProxies();
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-void pqProxy::addInternalProxy(const QString& key,
-  vtkSMProxy* proxy)
+void pqProxy::addHelperProxy(const QString& key, vtkSMProxy* proxy)
 {
-  QString group_name = QString(this->getProxy()->GetXMLName()) + "_" + key;
-
   bool already_added = false;
   if (this->Internal->ProxyLists.contains(key))
     {
@@ -96,40 +93,44 @@ void pqProxy::addInternalProxy(const QString& key,
     {
     this->Internal->ProxyLists[key].push_back(proxy);
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    if (!pxm->GetProxyName(group_name.toAscii().data(), proxy))
+    if (!pxm->GetProxyName("pq_helper_proxies", proxy))
       {
       // register proxy only if it is not already registered.
-      pxm->RegisterProxy(group_name.toAscii().data(),
+      pxm->RegisterProxy("pq_helper_proxies",
         proxy->GetSelfIDAsString(), proxy);
       }
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqProxy::removeInternalProxy(const QString& key,
-  vtkSMProxy* proxy)
+void pqProxy::removeHelperProxy(const QString& key, vtkSMProxy* proxy)
 {
   if (!proxy)
     {
-    qDebug() << "proxy argument to pqProxy::removeInternalProxy cannot be 0.";
+    qDebug() << "proxy argument to pqProxy::removeHelperProxy cannot be 0.";
     return;
     }
 
-  QString group_name = QString(this->getProxy()->GetXMLName()) + "_" + key;
   if (this->Internal->ProxyLists.contains(key))
     {
     this->Internal->ProxyLists[key].removeAll(proxy);
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    const char* name = pxm->GetProxyName(group_name.toAscii().data(), proxy);
+    const char* name = pxm->GetProxyName("pq_helper_proxies", proxy);
     if (name)
       {
-      pxm->UnRegisterProxy(group_name.toAscii().data(), name, proxy);
+      pxm->UnRegisterProxy("pq_helper_proxies", name, proxy);
       }
     }
 }
 
 //-----------------------------------------------------------------------------
-QList<vtkSMProxy*> pqProxy::getInternalProxies(const QString& key) const
+QList<QString> pqProxy::getHelperKeys() const
+{
+  return this->Internal->ProxyLists.keys();
+}
+
+//-----------------------------------------------------------------------------
+QList<vtkSMProxy*> pqProxy::getHelperProxies(const QString& key) const
 {
   QList<vtkSMProxy*> list;
 
@@ -144,7 +145,7 @@ QList<vtkSMProxy*> pqProxy::getInternalProxies(const QString& key) const
 }
 
 //-----------------------------------------------------------------------------
-QList<vtkSMProxy*> pqProxy::getInternalProxies() const
+QList<vtkSMProxy*> pqProxy::getHelperProxies() const
 {
   QList<vtkSMProxy*> list;
 
@@ -161,7 +162,7 @@ QList<vtkSMProxy*> pqProxy::getInternalProxies() const
 }
 
 //-----------------------------------------------------------------------------
-void pqProxy::clearInternalProxies()
+void pqProxy::clearHelperProxies()
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   if (pxm)
@@ -170,20 +171,17 @@ void pqProxy::clearInternalProxies()
       = this->Internal->ProxyLists.begin();
     for (;iter != this->Internal->ProxyLists.end(); ++iter)
       {
-      QString group_name = QString(this->getProxy()->GetXMLName())
-        + "_" + iter.key();
-
       foreach(vtkSMProxy* proxy, iter.value())
         {
-        const char* name = pxm->GetProxyName(group_name.toAscii().data(),
-          proxy);
+        const char* name = pxm->GetProxyName("pq_helper_proxies", proxy);
         if (name)
           {
-          pxm->UnRegisterProxy(group_name.toAscii().data(), name, proxy);
+          pxm->UnRegisterProxy("pq_helper_proxies", name, proxy);
           }
         }
       }
     }
+
   this->Internal->ProxyLists.clear();
 }
 
@@ -252,7 +250,43 @@ void pqProxy::onUpdateVTKObjects()
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
+void pqProxy::setDefaultPropertyValues()
+{
+  vtkSMProxy* proxy = this->getProxy();
+
+  // since some domains rely on information properties,
+  // it is essential that we update the property information 
+  // before resetting values.
+  proxy->UpdatePropertyInformation();
+
+  vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty* smproperty = iter->GetProperty();
+
+    if (!smproperty->GetInformationOnly())
+      {
+      iter->GetProperty()->ResetToDefault();
+      iter->GetProperty()->UpdateDependentDomains();
+      }
+    }
+
+  // Since domains may depend on defaul values of other properties to be set,
+  // we iterate over the properties once more. We need a better mechanism for this.
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty* smproperty = iter->GetProperty();
+
+    if (!smproperty->GetInformationOnly())
+      {
+      iter->GetProperty()->ResetToDefault();
+      iter->GetProperty()->UpdateDependentDomains();
+      }
+    }
+
+  iter->Delete();
+}
+
 //-----------------------------------------------------------------------------
 
 

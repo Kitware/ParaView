@@ -15,26 +15,27 @@
 #include "vtkSMSourceProxy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCollection.h"
+#include "vtkCommand.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVNumberOfOutputsInformation.h"
-#include "vtkProcessModule.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
 #include "vtkSMPart.h"
 #include "vtkSMProperty.h"
-#include "vtkSmartPointer.h"
-#include "vtkCollection.h"
-#include "vtkPVXMLElement.h"
+#include "vtkSMStringVectorProperty.h"
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.44");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.45");
 
 struct vtkSMSourceProxyInternals
 {
@@ -98,6 +99,7 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
   // This simply iterates over subproxies and calls UpdatePropertyInformation();
   this->Superclass::UpdatePipelineInformation();
 
+  this->InvokeEvent(vtkCommand::UpdateInformationEvent);
   this->MarkModified(this);  
 }
 //---------------------------------------------------------------------------

@@ -350,6 +350,13 @@ signals:
   /// \sa pqPipelineModel::movingIndex(const QModelIndex &)
   void indexRestored(const QModelIndex &index);
 
+  /// \brief
+  //    Emitted when the label for any index is changed via the GUI.
+  //  
+  //  \param index The index that was changed.
+  //  \param name New name set by the user.
+  void rename(const QModelIndex& index, const QString& name);
+
 private:
   /// \brief
   ///   Handles the connection of the internal pipeline objects.

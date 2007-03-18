@@ -17,10 +17,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkUndoElement, "1.1");
+vtkCxxRevisionMacro(vtkUndoElement, "1.2");
 //-----------------------------------------------------------------------------
 vtkUndoElement::vtkUndoElement()
 {
+  this->Mergeable = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -54,4 +55,5 @@ void vtkUndoElement::LoadState(vtkPVXMLElement* element)
 void vtkUndoElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Mergeable: " << this->Mergeable << endl;
 }

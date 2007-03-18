@@ -57,14 +57,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqMultiViewFrame.h"
-#include "pqPipelineBuilder.h"
+#include "pqObjectBuilder.h"
+#include "pqPluginManager.h"
 #include "pqRenderViewModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqSplitViewUndoElement.h"
 #include "pqUndoStack.h"
-#include "pqXMLUtil.h"
 #include "pqViewModuleInterface.h"
-#include "pqPluginManager.h"
+#include "pqXMLUtil.h"
 
 #if WIN32
 #include "process.h"
@@ -84,30 +85,26 @@ class pqViewManager::pqInternals
 public:
   QPointer<pqServer> ActiveServer;
   QPointer<pqGenericViewModule> ActiveViewModule;
-  QPointer<pqMultiViewFrame> FrameBeingRemoved;
+  QPointer<pqUndoStack> UndoStack;
   QMenu ConvertMenu;
 
   typedef QMap<pqMultiViewFrame*, QPointer<pqGenericViewModule> > FrameMapType;
   FrameMapType Frames;
 
   QList<QPointer<pqMultiViewFrame> > PendingFrames;
+  QList<QPointer<pqGenericViewModule> > PendingViews;
 
   QSize MaxWindowSize;
 
   bool DontCreateDeleteViewsModules;
-  bool DontCloseFrameWhenRenderModuleIsRemoved;
-  pqGenericViewModule* getViewModuleToAllocate()
-    {
-    if (!this->ActiveServer || this->DontCreateDeleteViewsModules)
-      {
-      return NULL;
-      }
 
-    // Create a new module (for now we'll create a render module always.
-    pqGenericViewModule* ren  = pqPipelineBuilder::instance()->createView(
-      this->ActiveServer);
-    return ren;
-    }
+  // When a frame is being closed, we create an undo element
+  // and  save it to be pushed on the stack after the 
+  // view in the frame has been unregistered. The sequence
+  // of operations on the undo stack is 
+  // * unregister view
+  // * close frame
+  vtkSmartPointer<pqSplitViewUndoElement> CloseFrameUndoElement;
 };
 
 //-----------------------------------------------------------------------------
@@ -116,7 +113,6 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
 {
   this->Internal = new pqInternals();
   this->Internal->DontCreateDeleteViewsModules = false;
-  this->Internal->DontCloseFrameWhenRenderModuleIsRemoved = false;
   this->Internal->MaxWindowSize = QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   pqServerManagerModel* smModel = pqServerManagerModel::instance();
   if (!smModel)
@@ -135,9 +131,14 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
   // Record creation/removal of frames.
   QObject::connect(this, SIGNAL(frameAdded(pqMultiViewFrame*)), 
     this, SLOT(onFrameAdded(pqMultiViewFrame*)));
+  QObject::connect(this, SIGNAL(preFrameRemoved(pqMultiViewFrame*)), 
+    this, SLOT(onPreFrameRemoved(pqMultiViewFrame*)));
   QObject::connect(this, SIGNAL(frameRemoved(pqMultiViewFrame*)), 
     this, SLOT(onFrameRemoved(pqMultiViewFrame*)));
 
+  QObject::connect(this, 
+    SIGNAL(afterSplitView(const Index&, Qt::Orientation, float, const Index&)),
+    this, SLOT(onSplittingView(const Index&, Qt::Orientation, float, const Index&)));
   
   QAction* view_action = new QAction("3D View", this);
   view_action->setData(pqRenderViewModule::renderViewType());
@@ -177,7 +178,7 @@ pqViewManager::~pqViewManager()
     {
     if (frame)
       {
-      this->onFrameRemoved(frame);
+      this->onFrameRemovedInternal(frame);
       }
     }
   pqServerManagerModel* smModel = pqServerManagerModel::instance();
@@ -198,6 +199,30 @@ void pqViewManager::setActiveServer(pqServer* server)
 pqGenericViewModule* pqViewManager::getActiveViewModule() const
 {
   return this->Internal->ActiveViewModule;
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::setUndoStack(pqUndoStack* stack)
+{
+  if (this->Internal->UndoStack)
+    {
+    QObject::disconnect(this->Internal->UndoStack, 0, this, 0);
+    }
+
+  this->Internal->UndoStack = stack;
+
+  if (stack)
+    {
+    QObject::connect(this, SIGNAL(beginUndo(const QString&)),
+      stack, SLOT(beginUndoSet(QString)));
+    QObject::connect(this, SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
+    QObject::connect(this, SIGNAL(addToUndoStack(vtkUndoElement*)),
+      stack, SLOT(addToActiveUndoSet(vtkUndoElement*)));
+    QObject::connect(this, SIGNAL(beginNonUndoableChanges()),
+      stack, SLOT(beginNonUndoableChanges()));
+    QObject::connect(this, SIGNAL(endNonUndoableChanges()),
+      stack, SLOT(endNonUndoableChanges()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -260,10 +285,19 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
   this->Internal->PendingFrames.push_back(frame);
 
   frame->setActive(true);
+
+  // HACK: When undo-redoing, a view may be registered before
+  // a frame is created, in that case the view is added to
+  // PendingViews and we assign it to the frame here.
+  if (this->Internal->PendingViews.size() > 0)
+    {
+    pqGenericViewModule* view = this->Internal->PendingViews.takeAt(0);
+    this->assignFrame(view);
+    }
 }
 
 //-----------------------------------------------------------------------------
-void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
+void pqViewManager::onFrameRemovedInternal(pqMultiViewFrame* frame)
 {
   QObject::disconnect(frame, SIGNAL(dragStart(pqMultiViewFrame*)),
     this, SLOT(frameDragStart(pqMultiViewFrame*)));
@@ -298,8 +332,38 @@ void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
   // When a frame is removed, the contained view is also destroyed.
   if (view)
     {
-    pqPipelineBuilder::instance()->removeView(view);
+    pqApplicationCore::instance()->getObjectBuilder()->destroy(view);
     }
+
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
+{
+  this->onFrameRemovedInternal(frame);
+
+  if (this->Internal->CloseFrameUndoElement)
+    {
+    emit this->addToUndoStack(this->Internal->CloseFrameUndoElement);
+    this->Internal->CloseFrameUndoElement = 0;
+    }
+  emit this->endUndo();
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
+{
+  emit this->beginUndo("Close View");
+
+  pqMultiView::Index index = this->indexOf(frame);
+  pqMultiView::Index parent_index = this->parentIndex(index);
+
+  pqSplitViewUndoElement* elem = pqSplitViewUndoElement::New();
+  elem->SplitView(this, parent_index, 
+    this->widgetOrientation(frame), 
+    this->widgetSplitRatio(frame), index, true);
+  this->Internal->CloseFrameUndoElement = elem;
+  elem->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -403,7 +467,18 @@ void pqViewManager::assignFrame(pqGenericViewModule* view)
   if (this->Internal->PendingFrames.size() == 0)
     {
     // Create a new frame.
-   
+  
+    if (this->Internal->UndoStack && (
+      this->Internal->UndoStack->getInUndo() ||
+      this->Internal->UndoStack->getInRedo()))
+      {
+      // HACK: If undo-redoing, don't split 
+      // to create a new pane, it will be created 
+      // as a part of the undo/redo.
+      this->Internal->PendingViews.push_back(view);
+      return;
+      }
+
     // Locate frame to split.
     // If there is an active view, use it.
     pqMultiViewFrame* oldFrame = 0;
@@ -482,31 +557,11 @@ void pqViewManager::onViewModuleRemoved(pqGenericViewModule* view)
   if (frame)
     {
     this->disconnect(frame, view);
-    if (!this->Internal->DontCloseFrameWhenRenderModuleIsRemoved)
-      {
-      // close the frame for this view as well.
-      this->removeWidget(frame);
-      }
     }
 
-  if (this->Internal->DontCloseFrameWhenRenderModuleIsRemoved)
-    {
-    this->onActivate(frame);
-    return;
-    }
+  this->Internal->PendingViews.removeAll(view);
 
-  if (this->Internal->ActiveViewModule == view)
-    {
-    if (this->Internal->Frames.size() > 0)
-      {
-      // Activate some other view, so that atleast one view is active.
-      this->Internal->Frames.begin().key()->setActive(true);
-      }
-    else
-      {
-      this->onActivate(NULL);
-      }
-    }
+  this->onActivate(frame);
 }
 
 //-----------------------------------------------------------------------------
@@ -523,16 +578,18 @@ void pqViewManager::onConvertToTriggered(QAction* action)
     return;
     }
 
-  pqPipelineBuilder* builder = pqApplicationCore::instance()->
-    getPipelineBuilder();
+  emit this->beginUndo(QString("Convert View to %1").arg(type));
+
+  pqObjectBuilder* builder = 
+    pqApplicationCore::instance()-> getObjectBuilder();
   if (this->Internal->ActiveViewModule)
     {
-    this->Internal->DontCloseFrameWhenRenderModuleIsRemoved = true;
-    builder->removeView(this->Internal->ActiveViewModule);
-    this->Internal->DontCloseFrameWhenRenderModuleIsRemoved = false;
+    builder->destroy(this->Internal->ActiveViewModule);
     }
 
-  builder->createView(server, type);
+  builder->createView(type, server);
+
+  emit this->endUndo();
 }
 
 //-----------------------------------------------------------------------------
@@ -651,6 +708,11 @@ void pqViewManager::updateViewModulePositions()
     totalBounds |= bounds;
     }
 
+  /// GUISize and WindowPosition properties are managed
+  /// by the GUI, the undo/redo stack should not worry about 
+  /// the changes made to them.
+  emit this->beginNonUndoableChanges();
+
   // Now we loop thorough all view modules and set the GUISize/WindowPosition.
   foreach(pqGenericViewModule* view, this->Internal->Frames)
     {
@@ -674,6 +736,8 @@ void pqViewManager::updateViewModulePositions()
       prop->SetElements2(view_pos.x(), view_pos.y());
       }
     }
+
+  emit this->endNonUndoableChanges();
 }
 
 //-----------------------------------------------------------------------------
@@ -728,7 +792,7 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
     {
     this->removeWidget(frame);
     }
-  this->pqMultiView::loadState(rwRoot);
+  this->Superclass::loadState(rwRoot);
   this->Internal->DontCreateDeleteViewsModules = false; 
   
   this->Internal->Frames.clear();
@@ -898,6 +962,20 @@ void pqViewManager::frameDrop(pqMultiViewFrame* acceptingFrame,
     {
     e->ignore();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::onSplittingView(const Index& index, 
+  Qt::Orientation orientation, float fraction, const Index& childIndex)
+{
+  emit this->beginUndo("Split View");
+
+  pqSplitViewUndoElement* elem = pqSplitViewUndoElement::New();
+  elem->SplitView(this, index, orientation, fraction, childIndex, false);
+  emit this->addToUndoStack(elem);
+  elem->Delete();
+
+  emit this->endUndo();
 }
 
 //-----------------------------------------------------------------------------

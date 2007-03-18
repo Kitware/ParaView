@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqApplicationCore.h>
 #include <pqMainWindowCore.h>
 #include <pqMultiView.h>
+#include <pqObjectBuilder.h>
 #include <pqPendingDisplayManager.h>
 #include <pqViewManager.h>
 
@@ -113,11 +114,15 @@ MainWindow::MainWindow() :
   this->connect(
     pqApplicationCore::instance(), SIGNAL(finishedAddingServer(pqServer*)),
     this, SLOT(onServerCreationFinished(pqServer*)));
-    
-  this->connect(
-    pqApplicationCore::instance()->getPendingDisplayManager(),
-    SIGNAL(pendingDisplays(bool)),
-    this, SLOT(onPendingDisplaysChanged(bool)), Qt::QueuedConnection);
+   
+  pqPendingDisplayManager* pdm = 
+    qobject_cast<pqPendingDisplayManager*>(
+      pqApplicationCore::instance()->manager("PENDING_DISPLAY_MANAGER"));
+  if (pdm)
+    {
+    this->connect(pdm, SIGNAL(pendingDisplays(bool)),
+      this, SLOT(onPendingDisplaysChanged(bool)), Qt::QueuedConnection);
+    }
 
   // Setup the multiview render window ...
   this->setCentralWidget(&this->Implementation->Core.multiViewManager());
@@ -150,7 +155,8 @@ void MainWindow::onServerCreationFinished(pqServer* server)
   parser->Parse(custom_filters);
   parser->ProcessConfiguration(vtkSMProxyManager::GetProxyManager());
 
-  pqApplicationCore::instance()->createSourceOnServer("CustomSource", server);
+  pqApplicationCore::instance()->getObjectBuilder()->createSource("sources",
+    "CustomSource", server);
 }
 
 void MainWindow::onPendingDisplaysChanged(bool hasDisplays)

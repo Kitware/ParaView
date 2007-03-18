@@ -59,6 +59,10 @@ public:
   void AddProxy(vtkSMProxy*);
 
   // Description:
+  // Returns if the proxy is present in the domain.
+  bool HasProxy(vtkSMProxy*);
+
+  // Description:
   // Get number of proxies in the domain.
   unsigned int GetNumberOfProxies();
 

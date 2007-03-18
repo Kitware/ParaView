@@ -19,7 +19,7 @@
 #include "vtkSMPropertyLink.h"
 
 vtkStandardNewMacro(vtkSMCompositeKeyFrameProxy);
-vtkCxxRevisionMacro(vtkSMCompositeKeyFrameProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMCompositeKeyFrameProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMCompositeKeyFrameProxy::vtkSMCompositeKeyFrameProxy()
 {
@@ -54,9 +54,6 @@ const char* vtkSMCompositeKeyFrameProxy::GetTypeAsString(int type)
 
   case SINUSOID:
     return "Sinusoid";
-
-  case CAMERA:
-    return "Camera";
     }
 
   return "Unknown";
@@ -86,10 +83,6 @@ int vtkSMCompositeKeyFrameProxy::GetTypeFromString(const char* type)
     {
     return SINUSOID;
     }
-  else if (strcmp(type, "Camera") == 0)
-    {
-    return CAMERA;
-    }
   return NONE; 
 }
 
@@ -108,13 +101,8 @@ void vtkSMCompositeKeyFrameProxy::CreateVTKObjects(int numObjects)
     return;
     }
 
-  this->TimeLink->AddLinkedProperty(this->GetProperty("KeyTime"),
-    vtkSMLink::INPUT);
-  this->ValueLink->AddLinkedProperty(this->GetProperty("KeyValues"),
-    vtkSMLink::INPUT);
-
   // Link properties between the subproxies.
-  for (int cc= NONE+1; cc <= CAMERA; cc++)
+  for (int cc= NONE+1; cc <= SINUSOID; cc++)
     {
     vtkSMProxy* proxy = this->GetSubProxy(this->GetTypeAsString(cc));
     if (!proxy)
@@ -128,9 +116,10 @@ void vtkSMCompositeKeyFrameProxy::CreateVTKObjects(int numObjects)
       vtkSMLink::OUTPUT);
     }
 
-  // This is essential so that current values get propagated to the subproxies.
-  this->GetProperty("KeyTime")->Modified();
-  this->GetProperty("KeyValues")->Modified();
+  this->TimeLink->AddLinkedProperty(this->GetProperty("KeyTime"),
+    vtkSMLink::INPUT);
+  this->ValueLink->AddLinkedProperty(this->GetProperty("KeyValues"),
+    vtkSMLink::INPUT);
 }
 
 //-----------------------------------------------------------------------------
@@ -143,7 +132,6 @@ void vtkSMCompositeKeyFrameProxy::UpdateValue(double currenttime,
   case RAMP:
   case EXPONENTIAL:
   case SINUSOID:
-  case CAMERA:
       {
       vtkSMProxy* proxy = this->GetSubProxy(this->GetTypeAsString(this->Type));
       if (!proxy)

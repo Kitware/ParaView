@@ -125,7 +125,7 @@ vtkSMProxy* pqSignalAdaptorKeyFrameType::getKeyFrameProxy() const
 //-----------------------------------------------------------------------------
 void pqSignalAdaptorKeyFrameType::onTypeChanged()
 {
-  QString text = this->currentText();
+  QString text = this->currentData().toString();
   int type = vtkSMCompositeKeyFrameProxy::GetTypeFromString(text.toAscii().data());
   if (type == vtkSMCompositeKeyFrameProxy::NONE)
     {

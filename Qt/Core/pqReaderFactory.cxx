@@ -56,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
-#include "pqPipelineBuilder.h"
+#include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqPluginManager.h"
@@ -281,11 +281,11 @@ bool pqReaderFactory::checkIfFileIsReadable(const QString& filename,
     proxy->GetProperty("ActiveFileName"));
   svp->SetElement(0, filename.toAscii().data());
   proxy->UpdateVTKObjects();
+  proxy->UpdatePropertyInformation();
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     proxy->GetProperty("ActiveFileIsReadable"));
 
-  proxy->UpdatePropertyInformation(ivp);
   if (ivp->GetElement(0))
     {
     return true;
@@ -294,18 +294,18 @@ bool pqReaderFactory::checkIfFileIsReadable(const QString& filename,
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqReaderFactory::createReader(const QString& readerName,
-                                                pqServer* server)
+pqPipelineSource* pqReaderFactory::createReader(const QString& filename,
+  const QString& readerName, pqServer* server)
 {
   foreach(const pqReaderInfo &info, this->Internal->ReaderList)
     {
     if(readerName == info.PrototypeProxy->GetXMLName())
       {
-      pqPipelineBuilder* builder = 
-        pqApplicationCore::instance()->getPipelineBuilder();
+      pqObjectBuilder* builder = 
+        pqApplicationCore::instance()->getObjectBuilder();
       pqPipelineSource* source = 
-        builder->createSource("sources",      // TODO: support other groups
-                              info.PrototypeProxy->GetXMLName(), server);
+        builder->createReader("sources",      // TODO: support other groups
+          info.PrototypeProxy->GetXMLName(), filename, server);
       return source;
       }
     }
@@ -332,8 +332,7 @@ QString pqReaderFactory::getSupportedFileTypes(pqServer* server)
   QList<QString> supportedSources;
 
   // TODO: We are only looking into sources group for now.
-  pqApplicationCore::instance()->getPipelineBuilder()->
-    getSupportedProxies("sources", server, supportedSources);
+  server->getSupportedProxies("sources", supportedSources);
   
 
   QString types = this->Internal->getTypeString();
@@ -355,8 +354,7 @@ QStringList pqReaderFactory::getSupportedReaders(pqServer* server)
   QStringList supportedReaders;
 
   // TODO: We are only looking into sources group for now.
-  pqApplicationCore::instance()->getPipelineBuilder()->
-    getSupportedProxies("sources", server, supportedSources);
+  server->getSupportedProxies("sources", supportedSources);
   
 
   foreach(const pqReaderInfo &info, this->Internal->ReaderList)
@@ -450,40 +448,3 @@ void pqReaderFactory::loadFileTypes(const QString& xmlfilename)
     }
 }
 
-vtkSMProperty* pqReaderFactory::getFileNameProperty(vtkSMProxy* proxy)
-{
-  // Find the first property that has a vtkSMFileListDomain. Assume that
-  // it is the property used to set the filename.
-  vtkSmartPointer<vtkSMPropertyIterator> piter;
-  piter.TakeReference(proxy->NewPropertyIterator());
-  piter->Begin();
-  while(!piter->IsAtEnd())
-    {
-    vtkSMProperty* prop = piter->GetProperty();
-    if (prop->IsA("vtkSMStringVectorProperty"))
-      {
-      vtkSmartPointer<vtkSMDomainIterator> diter;
-      diter.TakeReference(prop->NewDomainIterator());
-      diter->Begin();
-      while(!diter->IsAtEnd())
-        {
-        if (diter->GetDomain()->IsA("vtkSMFileListDomain"))
-          {
-          break;
-          }
-        diter->Next();
-        }
-      if (!diter->IsAtEnd())
-        {
-        break;
-        }
-      }
-    piter->Next();
-    }
-
-  if (!piter->IsAtEnd())
-    {
-    return piter->GetProperty();
-    }
-  return NULL;
-}

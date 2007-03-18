@@ -20,7 +20,7 @@
 #include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkSMDefaultStateLoader);
-vtkCxxRevisionMacro(vtkSMDefaultStateLoader, "1.4");
+vtkCxxRevisionMacro(vtkSMDefaultStateLoader, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMDefaultStateLoader::vtkSMDefaultStateLoader()
 {
@@ -46,7 +46,11 @@ vtkSMProxy* vtkSMDefaultStateLoader::NewProxy(int id)
     }
   vtkDebugMacro("Creating new proxy: " << id);
   proxy = this->Superclass::NewProxy(id);
-  if (proxy)
+  // the extra check for SelfID is needed since Superclass::NewProxy(id)
+  // can lead to call to vtkSMDefaultStateLoader::NewProxyFromElement()
+  // which sets the self id and we don't want to raise unnecessary errors
+  // if that's the case.
+  if (proxy && proxy->GetSelfID() != csid)
     {
     proxy->SetSelfID(csid);
     }

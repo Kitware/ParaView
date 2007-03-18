@@ -51,14 +51,22 @@ public:
   virtual int Redo();
 
   // Description:
-  // Add an element to this set.
-  // \returns the index at which the element got added.
-  int AddElement(vtkUndoElement*);
+  // Add an element to this set. If the newly added element, \c elem, and
+  // the most recently added element are both \c Mergeable, then an
+  // attempt is made to merge the new element with the previous one. On
+  // successful merging, the new element is discarded, otherwise
+  // it is appended to the set.
+  // \returns the index at which the element got added/merged.
+  int AddElement(vtkUndoElement* elem);
 
   // Description:
   // Remove an element at a particular index.
   void RemoveElement(int index);
-  
+
+  // Description:
+  // Remove all elemments.
+  void RemoveAllElements();
+
   // Description:
   // Get number of elements in the set.
   int GetNumberOfElements();

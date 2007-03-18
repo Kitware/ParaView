@@ -133,17 +133,17 @@ MainWindow::MainWindow() :
     SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));  
 
   connect(this->Implementation->UI.actionEditUndo,
-    SIGNAL(triggered()), pqApplicationCore::instance()->getUndoStack(), SLOT(undo()));
-  connect(pqApplicationCore::instance()->getUndoStack(),
+    SIGNAL(triggered()), this->Implementation->Core.getApplicationUndoStack(), SLOT(undo()));
+  connect(this->Implementation->Core.getApplicationUndoStack(),
     SIGNAL(canUndoChanged(bool)), this->Implementation->UI.actionEditUndo, SLOT(setEnabled(bool)));
-  connect(pqApplicationCore::instance()->getUndoStack(),
+  connect(this->Implementation->Core.getApplicationUndoStack(),
     SIGNAL(undoLabelChanged(const QString&)), this, SLOT(onUndoLabel(const QString&)));
     
   connect(this->Implementation->UI.actionEditRedo,
-    SIGNAL(triggered()), pqApplicationCore::instance()->getUndoStack(), SLOT(Redo()));
-  connect(pqApplicationCore::instance()->getUndoStack(),
+    SIGNAL(triggered()), this->Implementation->Core.getApplicationUndoStack(), SLOT(Redo()));
+  connect(this->Implementation->Core.getApplicationUndoStack(),
     SIGNAL(canRedoChanged(bool)), this->Implementation->UI.actionEditRedo, SLOT(setEnabled(bool)));
-  connect(pqApplicationCore::instance()->getUndoStack(),
+  connect(this->Implementation->Core.getApplicationUndoStack(),
     SIGNAL(redoLabelChanged(const QString&)), this, SLOT(onRedoLabel(const QString&)));
 
   connect(this->Implementation->UI.actionEditCameraUndo,

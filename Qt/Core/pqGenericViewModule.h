@@ -111,9 +111,6 @@ public:
   /// are queries it.
   virtual bool canDisplaySource(pqPipelineSource* source) const = 0;
 
-  /// Sets default values for the underlying proxy. This is typically called
-  /// only on proxies created by the GUI itself.
-  virtual void setDefaults() { };
 signals:
   /// Fired after a display has been added to this render module.
   void displayAdded(pqDisplay*);
@@ -135,20 +132,14 @@ signals:
   void displayVisibilityChanged(pqDisplay* display, bool visible);
 
 private slots:
-  /// if renModule is not created when this object is instantianted, we
-  /// must listen to UpdateVTKObjects event to bind the QVTKWidget and
-  /// then render window.
-  void onUpdateVTKObjects();
-
   /// Called when the "Displays" property changes.
   void displaysChanged();
 
   void onDisplayVisibilityChanged(bool);
 
-protected:
-  /// Called to initialize the view module either when this object is created
-  /// on when the proxy is created.
-  virtual void viewModuleInit();
+  /// Called when a new display is registered by the ServerManagerModel.
+  /// We check if the display belongs to this render module.
+  void displayCreated(pqDisplay* display);
 
 protected:
   pqGenericViewModule(const QString& type,

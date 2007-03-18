@@ -54,8 +54,8 @@ class PQCORE_EXPORT pqServer : public pqServerManagerModelItem
   Q_OBJECT
 
 public:
-  // Use this method to disconnect a server. On calling this method,
-  // the server instance will be deleted.
+  /// Use this method to disconnect a server. On calling this method,
+  /// the server instance will be deleted.
   static void disconnect(pqServer* server);
 
 public:  
@@ -75,20 +75,30 @@ public:
 
   vtkIdType GetConnectionID();
 
-  // Return the number of data server partitions on this 
-  // server connection. A convenience method.
+  /// Return the number of data server partitions on this 
+  /// server connection. A convenience method.
   int getNumberOfPartitions();
 
-  // Returns is this connection is a connection to a remote
-  // server or a built-in server.
+  /// Returns is this connection is a connection to a remote
+  /// server or a built-in server.
   bool isRemote() const;
 
-  // Returns the time keeper for this connection.
+  /// Returns the time keeper for this connection.
   pqTimeKeeper* getTimeKeeper() const;
 
-  // Initializes the pqServer, must be called as soon as pqServer 
-  // is created.
+  /// Initializes the pqServer, must be called as soon as pqServer 
+  /// is created.
   void initialize();
+
+  /// Every server can potentially be compiled with different compile time options
+  /// while could lead to certain filters/sources/writers being non-instantiable
+  /// on that server. For all proxies in the \c xmlgroup that the client 
+  /// server manager is aware of, this method populates \c names with only the names
+  /// for those proxies that can be instantiated on the given \c server.
+  /// \todo Currently, this method does not actually validate if the server
+  /// can instantiate the proxies.
+  void getSupportedProxies(const QString& xmlgroup, QList<QString>& names);
+
 signals:
   void nameChanged();
 

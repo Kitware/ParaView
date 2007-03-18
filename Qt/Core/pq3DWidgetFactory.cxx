@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
-#include "pqPipelineBuilder.h"
+#include "pqObjectBuilder.h"
 #include "pqServerManagerObserver.h"
 #include "pqServer.h"
 
@@ -59,7 +59,7 @@ pq3DWidgetFactory::pq3DWidgetFactory(QObject* _parent/*=null*/)
 : QObject(_parent)
 {
   this->Internal = new pq3DWidgetFactoryInternal();
-  QObject::connect(pqApplicationCore::instance()->getPipelineData(),
+  QObject::connect(pqApplicationCore::instance()->getServerManagerObserver(),
     SIGNAL(proxyUnRegistered(QString, QString, vtkSMProxy*)), this, 
     SLOT(proxyUnRegistered(QString, QString, vtkSMProxy*)));
 }
@@ -88,14 +88,14 @@ vtkSMNew3DWidgetProxy* pq3DWidgetFactory::get3DWidget(const QString& name,
       }
     }
 
-  pqPipelineBuilder* builder = 
-    pqApplicationCore::instance()->getPipelineBuilder();
+  pqObjectBuilder* builder = 
+    pqApplicationCore::instance()->getObjectBuilder();
 
   // We register  the 3DWidget proxy under prototypes so that it
   // is never saved in state
   vtkSMNew3DWidgetProxy* proxy = vtkSMNew3DWidgetProxy::SafeDownCast(
-    builder->createProxy("displays", name.toAscii().data(), 
-      "3d_widgets_prototypes", server, false));
+    builder->createProxy("displays", name.toAscii().data(), server,
+      "3d_widgets_prototypes"));
   if (!proxy)
     {
     qDebug() << "Could not create the 3D widget with name: " << name;

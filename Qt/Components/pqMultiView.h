@@ -81,7 +81,18 @@ public:
 
   /// get the index of the widget in its parent's layout
   Index indexOf(QWidget*) const;
-  
+
+  /// Returns the index of the parent. If index is the top
+  /// most widget returns an empty index.
+  Index parentIndex(const Index& index) const;
+
+  /// Returns the orientation for the placement of the
+  /// widget in its parent splitter.
+  Qt::Orientation widgetOrientation(QWidget* widget) const;
+
+  /// returns the ratio used while splitting the widget.
+  float widgetSplitRatio(QWidget* widget) const;
+
   /// get the widget from an index
   QWidget* widgetOfIndex(Index index);
 
@@ -93,11 +104,19 @@ signals:
   /// signal for frame removed
   void frameRemoved(pqMultiViewFrame*);
 
+  /// signal before a frame is removed
+  void preFrameRemoved(pqMultiViewFrame*);
+
   // Fired to hide all frame decorations.
   void hideFrameDecorations();
   
   // Fired to show all frame decorations.
   void showFrameDecorations();
+
+  /// Fired when a request is made to split the views
+  void afterSplitView(const Index& index, 
+    Qt::Orientation orientation, float percent, const Index& childIndex);
+
 public slots:
   void removeWidget(QWidget *widget);
   pqMultiViewFrame* splitWidgetHorizontal(QWidget *widget);

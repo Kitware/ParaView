@@ -21,7 +21,7 @@
 #include "vtkUndoElement.h"
 
 vtkStandardNewMacro(vtkUndoSet);
-vtkCxxRevisionMacro(vtkUndoSet, "1.2");
+vtkCxxRevisionMacro(vtkUndoSet, "1.3");
 //-----------------------------------------------------------------------------
 vtkUndoSet::vtkUndoSet()
 {
@@ -37,14 +37,35 @@ vtkUndoSet::~vtkUndoSet()
 //-----------------------------------------------------------------------------
 int vtkUndoSet::AddElement(vtkUndoElement* elem)
 {
+  int num_elements =  this->Collection->GetNumberOfItems();
+  if (elem->GetMergeable() && num_elements > 0)
+    {
+    vtkUndoElement* prev = vtkUndoElement::SafeDownCast(
+      this->Collection->GetItemAsObject(num_elements-1));
+    if (prev && prev->GetMergeable())
+      {
+      if (prev->Merge(elem))
+        {
+        // merge was successful, return index of the merge.
+        return (num_elements-1);
+        }
+      }
+    }
+
   this->Collection->AddItem(elem);
-  return (this->GetNumberOfElements()-1);
+  return num_elements;
 }
 
 //-----------------------------------------------------------------------------
 void vtkUndoSet::RemoveElement(int index)
 {
   this->Collection->RemoveItem(index);
+}
+
+//-----------------------------------------------------------------------------
+void vtkUndoSet::RemoveAllElements()
+{
+  this->Collection->RemoveAllItems();
 }
 
 //-----------------------------------------------------------------------------

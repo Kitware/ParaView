@@ -24,14 +24,16 @@
 #ifndef __vtkMultiViewRenderModuleProxy_h
 #define __vtkMultiViewRenderModuleProxy_h
 
-#include "vtkSMCompoundProxy.h"
+#include "vtkSMProxy.h"
 
 class vtkSMAbstractDisplayProxy;
-class VTK_EXPORT vtkSMMultiViewRenderModuleProxy : public vtkSMCompoundProxy
+class vtkSMMultiViewRenderModuleProxyVector;
+
+class VTK_EXPORT vtkSMMultiViewRenderModuleProxy : public vtkSMProxy
 {
 public:
   static vtkSMMultiViewRenderModuleProxy* New();
-  vtkTypeRevisionMacro(vtkSMMultiViewRenderModuleProxy, vtkSMCompoundProxy);
+  vtkTypeRevisionMacro(vtkSMMultiViewRenderModuleProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -52,6 +54,25 @@ public:
   // Creates a display proxy for the type of render module indicated by
   // RenderModuleName.
   vtkSMAbstractDisplayProxy* CreateDisplayProxy();
+
+  // Description:
+  // Don't use this methods directly,
+  // Whenever NewRenderModule() is called, the newly created render module
+  // is added to the "RenderModules" property of this proxy. The property
+  // leads to a call to these methods to add/remove the proxy which gets 
+  // added/removed as a subproxy. We have a property for the render modules
+  // so that the operation is undo/redo able.
+  void AddRenderModule(vtkSMProxy*);
+  void RemoveRenderModule(vtkSMProxy*);
+
+  // Description:
+  // Returns the number of render modules added using AddRenderModule.
+  unsigned int GetNumberOfRenderModules();
+
+  // Description:
+  // Returns the render module at a given index.
+  vtkSMProxy* GetRenderModule(unsigned int index);
+
 protected:
   vtkSMMultiViewRenderModuleProxy();
   ~vtkSMMultiViewRenderModuleProxy();
@@ -59,12 +80,13 @@ protected:
   virtual void CreateVTKObjects(int numObjects);
 
   char* RenderModuleName;
-
   int RenderModuleId;
 
 private:
   vtkSMMultiViewRenderModuleProxy(const vtkSMMultiViewRenderModuleProxy&); // Not implemented
   void operator=(const vtkSMMultiViewRenderModuleProxy&); // Not implemented
+
+  vtkSMMultiViewRenderModuleProxyVector* RenderModules;
 };
 
 #endif

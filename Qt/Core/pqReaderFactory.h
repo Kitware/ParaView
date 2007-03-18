@@ -41,9 +41,13 @@ class pqServer;
 class vtkSMProxy;
 class vtkSMProperty;
 
-// This class is a reader factory. The factory must be made file-type aware
-// by using addFileType. Once initialized, one can use createReader()
-// to create a reader that can read a particular file. 
+/// This class is a reader factory. The factory must be made file-type aware
+/// by using addFileType. Once initialized, one can use createReader()
+/// to create a reader that can read a particular file. 
+/// Applications that want to use the reader factory for creating readers,
+/// must instantiate their own reader factory, initialize it and then
+/// use it to create readers. pqApplicationCore/pqObjectBuilder does not require 
+/// that a reader factory is used at all.
 class PQCORE_EXPORT pqReaderFactory : public QObject
 {
   Q_OBJECT
@@ -51,75 +55,73 @@ public:
   pqReaderFactory(QObject* parent=NULL);
   virtual ~pqReaderFactory();
 
-  // Register an extension (or extensions) with a particular reader proxy 
-  // identified by
-  // the \c xmlgroup and \c xmlname. Same extension can be associated with
-  // more than one reader, however, in that case, the reader(s) must support
-  // \c CanReadFile() for this work correctly.
+  /// Register an extension (or extensions) with a particular reader proxy 
+  /// identified by
+  /// the \c xmlgroup and \c xmlname. Same extension can be associated with
+  /// more than one reader, however, in that case, the reader(s) must support
+  /// \c CanReadFile() for this work correctly.
   void addFileType(const QString& description, const QString& extension,
     const QString& xmlgroup, const QString& xmlname);
 
   void addFileType(const QString& description, const QList<QString>& extensions,
     const QString& xmlgroup, const QString& xmlname);
 
-  // An overload of addFileType where one can specify the prototype of the
-  // reader proxy.
+  /// An overload of addFileType where one can specify the prototype of the
+  /// reader proxy.
   void addFileType(const QString& description, const QString& extension,
     vtkSMProxy* prototype);
   void addFileType(const QString& description, const QList<QString>& extensions,
     vtkSMProxy* prototype);
 
-  // Create a reader given by name on the given server.
-  // File types must be registered before a file of the given type can be read.
-  // This method creates and registers the reader proxy that can read
-  pqPipelineSource* createReader(const QString& readerName, pqServer* server);
+  /// Create a reader given by name on the given server to read the given file.
+  /// File types must be registered before a file of the given type can be read.
+  /// This method creates and registers the reader proxy that can read
+  pqPipelineSource* createReader(const QString& filename,
+    const QString& readerName, pqServer* server);
 
-  // Returns a list of file types suitable for use with file dialog.
-  // \c server is required to ensure that only those readers that can
-  // be instantiated on the server will be considered.
+  /// Returns a list of file types suitable for use with file dialog.
+  /// \c server is required to ensure that only those readers that can
+  /// be instantiated on the server will be considered.
   QString getSupportedFileTypes(pqServer* server);
   
-  // Returns a list of the supported readers on a server.
-  // \c server is required to ensure that only those readers that can
-  // be instantiated on the server will be considered.
+  /// Returns a list of the supported readers on a server.
+  /// \c server is required to ensure that only those readers that can
+  /// be instantiated on the server will be considered.
   QStringList getSupportedReaders(pqServer* server);
 
-  // Returns a short description of the reader.
+  /// Returns a short description of the reader.
   QString getReaderDescription(const QString& readerName);
 
-  // Returns the list of extensions for a reader
+  /// Returns the list of extensions for a reader
   QString getExtensionTypeString(pqPipelineSource* reader);
 
-  // Return the reader type for a file
+  /// Return the reader type for a file
   QString getReaderType(const QString& filename, pqServer*);
 
   bool checkIfFileIsReadable(const QString& name, pqServer*);
 
-  // get the property for the filename
-  vtkSMProperty* getFileNameProperty(vtkSMProxy*);
- 
 public slots: 
   
-  // loads file types from the Qt resource directory
-  // ":/ParaViewResources/"
+  /// loads file types from the Qt resource directory
+  /// ":/ParaViewResources/"
   void loadFileTypes();
  
 protected: 
   
-  // Loads file type definitions from the xml file.
-  // Format of this xml is:
-  // \verbatim
-  // <ParaViewReaders>
-  //    <Reader name="[reader name should match the xmlname of the proxy]" 
-  //      extensions="[space separated extensions supported, dont include ." 
-  //      file_description="[short description]"
-  //      group=[optional: server manager group under which the reader definition 
-  //            can be found.]" >
-  //    </Reader>
-  //    ...
-  // </ParaViewReaders>
-  // \endverbatim
-  // By default, the reader is searched for under the \c sources group.
+  /// Loads file type definitions from the xml file.
+  /// Format of this xml is:
+  /// \verbatim
+  /// <ParaViewReaders>
+  ///    <Reader name="[reader name should match the xmlname of the proxy]" 
+  ///      extensions="[space separated extensions supported, dont include ." 
+  ///      file_description="[short description]"
+  ///      group=[optional: server manager group under which the reader definition 
+  ///            can be found.]" >
+  ///    </Reader>
+  ///    ...
+  /// </ParaViewReaders>
+  /// \endverbatim
+  /// By default, the reader is searched for under the \c sources group.
   void loadFileTypes(const QString& xmlfilename);
 
 private:

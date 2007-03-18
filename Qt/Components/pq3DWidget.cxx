@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMNew3DWidgetProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSourceProxy.h"
 
 // Qt includes.
@@ -159,28 +160,24 @@ void pq3DWidget::setRenderModule(pqRenderViewModule* renModule)
   bool cur_visbility = this->widgetVisible();
   this->hideWidget();
 
-  vtkSMProxy* widget = this->getWidgetProxy();
+  vtkSMDisplayProxy* widget = this->getWidgetProxy();
   if (this->Internal->RenderModule && widget)
     {
-    vtkSMProxy* rm = this->Internal->RenderModule->getProxy();
-    if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-        rm->GetProperty("Displays")))
-      {
-      pp->RemoveProxy(widget);
-      rm->UpdateVTKObjects();
-      }
+    // To add/remove the 3D widget display from the view module.
+    // we don't use the property. This is so since the 3D widget add/remove 
+    // should not get saved in state or undo-redo. 
+    this->Internal->RenderModule->getRenderModuleProxy()->RemoveDisplay(widget);
     }
+
   this->Internal->RenderModule = renModule;
   if (this->Internal->RenderModule && widget)
     {
-    vtkSMProxy* rm = this->Internal->RenderModule->getProxy();
-    if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-        rm->GetProperty("Displays")))
-      {
-      pp->AddProxy(widget);
-      rm->UpdateVTKObjects();
-      }
+    // To add/remove the 3D widget display from the view module.
+    // we don't use the property. This is so since the 3D widget add/remove 
+    // should not get saved in state or undo-redo. 
+    this->Internal->RenderModule->getRenderModuleProxy()->AddDisplay(widget);
     }
+
   if (cur_visbility)
     {
     this->showWidget();
@@ -217,31 +214,25 @@ void pq3DWidget::onControlledPropertyChanged()
 //-----------------------------------------------------------------------------
 void pq3DWidget::setWidgetProxy(vtkSMNew3DWidgetProxy* proxy)
 {
- vtkSMProxy* widget = this->getWidgetProxy();
+ vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
 
  if (this->Internal->RenderModule && widget)
     {
-    vtkSMProxy* rm = this->Internal->RenderModule->getProxy();
-    if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-        rm->GetProperty("Displays")))
-      {
-      pp->RemoveProxy(widget);
-      rm->UpdateVTKObjects();
-      this->Internal->RenderModule->render();
-      }
+    // To add/remove the 3D widget display from the view module.
+    // we don't use the property. This is so since the 3D widget add/remove 
+    // should not get saved in state or undo-redo. 
+    this->Internal->RenderModule->getRenderModuleProxy()->RemoveDisplay(widget);
+    this->Internal->RenderModule->render();
     }
   this->Internal->WidgetProxy = proxy;
 
   if (this->Internal->RenderModule && proxy)
     {
-    vtkSMProxy* rm = this->Internal->RenderModule->getProxy();
-    if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-        rm->GetProperty("Displays")))
-      {
-      pp->AddProxy(proxy);
-      rm->UpdateVTKObjects();
-      this->Internal->RenderModule->render();
-      }
+    // To add/remove the 3D widget display from the view module.
+    // we don't use the property. This is so since the 3D widget add/remove 
+    // should not get saved in state or undo-redo. 
+    this->Internal->RenderModule->getRenderModuleProxy()->AddDisplay(widget);
+    this->Internal->RenderModule->render();
     }
 }
 

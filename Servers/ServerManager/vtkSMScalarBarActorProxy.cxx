@@ -25,7 +25,7 @@
 #include "vtkSMPropertyIterator.h"
 
 vtkStandardNewMacro(vtkSMScalarBarActorProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMScalarBarActorProxy::vtkSMScalarBarActorProxy()
 {
@@ -67,7 +67,8 @@ void vtkSMScalarBarActorProxy::CreateVTKObjects(int numObjects)
     vtkProcessModule::GetProcessModule()->SendStream(
       this->ConnectionID, this->GetServers(), stream);
     }
-  
+
+  /*
   // Let's set bold/shadow/italic on the text properties.
   vtkSMIntVectorProperty* ivp;
   vtkSMDoubleVectorProperty* dvp;
@@ -108,6 +109,7 @@ void vtkSMScalarBarActorProxy::CreateVTKObjects(int numObjects)
   //dvp->SetElements2(0.13, 0.5);
   dvp->Modified();
   this->UpdateVTKObjects();
+  */
 }
 
 //-----------------------------------------------------------------------------

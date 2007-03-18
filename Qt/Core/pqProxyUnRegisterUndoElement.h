@@ -1,7 +1,7 @@
 /*=========================================================================
 
-   Program:   ParaView
-   Module:    pqUndoRedoStateLoader.h
+   Program: ParaView
+   Module:    pqProxyUnRegisterUndoElement.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -28,36 +28,41 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#ifndef __pqUndoRedoStateLoader_h
-#define __pqUndoRedoStateLoader_h
+=========================================================================*/
+#ifndef __pqProxyUnRegisterUndoElement_
+#define __pqProxyUnRegisterUndoElement_
 
-#include "vtkSMUndoRedoStateLoader.h"
+#include "vtkSMProxyUnRegisterUndoElement.h"
 #include "pqCoreExport.h"
 
-// pqUndoRedoStateLoader is the undo/redo state loader that understand
-// GUI specific undo elements such as \c PendingDisplay. 
-class PQCORE_EXPORT pqUndoRedoStateLoader : public vtkSMUndoRedoStateLoader
+class PQCORE_EXPORT pqProxyUnRegisterUndoElement : public vtkSMProxyUnRegisterUndoElement
 {
 public:
-  static pqUndoRedoStateLoader* New();
-  vtkTypeRevisionMacro(pqUndoRedoStateLoader, vtkSMUndoRedoStateLoader);
+  static pqProxyUnRegisterUndoElement* New();
+  vtkTypeRevisionMacro(pqProxyUnRegisterUndoElement, vtkSMProxyUnRegisterUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Undo the operation encapsulated by this element.
+  // Overridden to set the helper proxies on undo.
+  virtual int Undo();
+
+  // Description:
+  // Returns if this element can load the xml state for the given element.
+  virtual bool CanLoadState(vtkPVXMLElement*);
+
+  /// Description:
+  /// Sets the information about the proxy that is getting unregistered.
+  virtual void ProxyToUnRegister(const char* groupname, const char* proxyname, 
+    vtkSMProxy* proxy);
 protected:
-  pqUndoRedoStateLoader();
-  ~pqUndoRedoStateLoader();
-
-  virtual void HandleTag(const char* tagName, vtkPVXMLElement* root);
-
-  void HandlePendingDisplay(vtkPVXMLElement* elem);
+  pqProxyUnRegisterUndoElement();
+  ~pqProxyUnRegisterUndoElement();
 
 private:
-  pqUndoRedoStateLoader(const pqUndoRedoStateLoader&); // Not implemented.
-  void operator=(const pqUndoRedoStateLoader&); // Not implemented.
+  pqProxyUnRegisterUndoElement(const pqProxyUnRegisterUndoElement&); // Not implemented.
+  void operator=(const pqProxyUnRegisterUndoElement&); // Not implemented.
 };
-
-
 
 #endif
 

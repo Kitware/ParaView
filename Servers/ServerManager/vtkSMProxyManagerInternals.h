@@ -36,6 +36,7 @@ struct ProxyInfo
     {
     this->ModifiedObserverTag = 0;
     this->UpdateObserverTag = 0;
+    this->UpdateInformationObserverTag = 0;
     }
   ~ProxyInfo()
     {
@@ -50,11 +51,18 @@ struct ProxyInfo
       this->Proxy.GetPointer()->RemoveObserver(this->UpdateObserverTag);
       this->UpdateObserverTag = 0;
       }
+    if (this->UpdateInformationObserverTag && this->Proxy.GetPointer())
+      {
+      this->Proxy.GetPointer()->RemoveObserver(
+        this->UpdateInformationObserverTag);
+      this->UpdateInformationObserverTag = 0;
+      }
     }
 
   vtkSmartPointer<vtkSMProxy> Proxy;
   unsigned long ModifiedObserverTag;
   unsigned long UpdateObserverTag;
+  unsigned long UpdateInformationObserverTag;
 };
 
 class vtkSMProxyManagerProxyListType :

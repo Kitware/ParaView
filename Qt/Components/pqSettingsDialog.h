@@ -32,13 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqSettingsDialog_h
 #define __pqSettingsDialog_h
 
-#include <QDialog>
-#include "pqComponentsExport.h"
+#include "pqDialog.h"
 
 class pqSettingsDialogInternal;
 class pqRenderViewModule;
 
-class PQCOMPONENTS_EXPORT pqSettingsDialog : public QDialog
+class PQCOMPONENTS_EXPORT pqSettingsDialog : public pqDialog 
 {
   Q_OBJECT
 public:

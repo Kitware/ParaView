@@ -41,6 +41,8 @@ protected:
   vtkSMDefaultStateLoader();
   ~vtkSMDefaultStateLoader();
 
+  virtual vtkSMProxy* NewProxy(vtkPVXMLElement* root, int id)
+    { return this->Superclass::NewProxy(root, id); }
 private:
   vtkSMDefaultStateLoader(const vtkSMDefaultStateLoader&); // Not implemented.
   void operator=(const vtkSMDefaultStateLoader&); // Not implemented.

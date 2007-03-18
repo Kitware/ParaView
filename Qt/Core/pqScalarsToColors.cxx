@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqScalarsToColors.h"
 
+#include "vtkCommand.h"
+#include "vtkEventQtSlotConnect.h"
 #include "vtkSMProxy.h"
 
 #include <QPointer>
@@ -39,10 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqPipelineDisplay.h"
+#include "pqRenderViewModule.h"
 #include "pqScalarBarDisplay.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
-#include "pqRenderViewModule.h"
+#include "vtkSMProperty.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarsToColorsInternal
@@ -50,6 +53,16 @@ class pqScalarsToColorsInternal
 public:
   QList<QPointer<pqScalarBarDisplay> > ScalarBars;
   bool ScalarRangeInitialized;
+  vtkEventQtSlotConnect* VTKConnect;
+
+  pqScalarsToColorsInternal()
+    {
+    this->VTKConnect = vtkEventQtSlotConnect::New();
+    }
+  ~pqScalarsToColorsInternal()
+    {
+    this->VTKConnect->Delete();
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -59,6 +72,10 @@ pqScalarsToColors::pqScalarsToColors(const QString& group, const QString& name,
 {
   this->Internal = new pqScalarsToColorsInternal;
   this->Internal->ScalarRangeInitialized = false;
+
+  this->Internal->VTKConnect->Connect(proxy->GetProperty("ScalarRange"),
+    vtkCommand::ModifiedEvent, 
+    this, SLOT(scalarRangeModified()));
 }
 
 //-----------------------------------------------------------------------------
@@ -73,13 +90,17 @@ void pqScalarsToColors::addScalarBar(pqScalarBarDisplay* sb)
   if (this->Internal->ScalarBars.indexOf(sb) == -1)
     {
     this->Internal->ScalarBars.push_back(sb);
+    emit this->scalarBarsChanged();
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::removeScalarBar(pqScalarBarDisplay* sb)
 {
-  this->Internal->ScalarBars.removeAll(sb);
+  if (this->Internal->ScalarBars.removeAll(sb) > 0)
+    {
+    emit this->scalarBarsChanged();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -218,4 +239,18 @@ int pqScalarsToColors::getVectorComponent() const
 {
   return pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("VectorComponent")).toInt();
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarsToColors::build()
+{
+  this->getProxy()->InvokeCommand("Build");
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarsToColors::scalarRangeModified()
+{
+  // This is easiest, although not so safe way of determining if the
+  // scalar range was ever initialized by anybody.
+  this->Internal->ScalarRangeInitialized = true;
 }

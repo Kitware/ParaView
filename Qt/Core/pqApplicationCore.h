@@ -39,13 +39,13 @@ class pq3DWidgetFactory;
 class pqApplicationCoreInternal;
 class pqDisplayPolicy;
 class pqLinksModel;
+class pqLookmarkManagerModel;
 class pqLookupTableManager;
+class pqObjectBuilder;
 class pqPendingDisplayManager;
-class pqPipelineBuilder;
 class pqPipelineSource;
 class pqPluginManager;
 class pqProgressManager;
-class pqReaderFactory;
 class pqRenderViewModule;
 class pqServer;
 class pqServerManagerModel;
@@ -56,7 +56,6 @@ class pqServerResources;
 class pqServerStartups;
 class pqSettings;
 class pqUndoStack;
-class pqWriterFactory;
 class vtkPVXMLElement;
 class vtkSMStateLoader;
 
@@ -80,17 +79,57 @@ public:
   pqApplicationCore(QObject* parent=NULL);
   virtual ~pqApplicationCore();
 
+  /// Get the Object Builder. Object Buider must be used
+  /// to create complex objects such as sources, filters,
+  /// readers, views, displays etc.
+  pqObjectBuilder* getObjectBuilder() const;
 
+  /// Set/Get the application undo stack.
+  /// No undo stack is set up by default. The application
+  /// must create and set one if it should support undo/redo
+  /// operations.
+  /// I'd really like the application core not reference the
+  /// the undo stack at all. However, time and again we have 
+  /// some widget somewhere in the GUI that needs access to the undo
+  /// stack. It's a pain to provide the undo stack to evety such deep
+  /// widget, hence we provide this access location. 
+  /// Everyone using getUndoStack() must handle the case
+  /// when this method returns NULL.
+  void setUndoStack(pqUndoStack* stack);
+  pqUndoStack* getUndoStack() const;
+
+  /// Custom Applications may need use various "managers"
+  /// All such manager can be registered with the pqApplicationCore
+  /// so that that can be used by other components of the 
+  /// application. Registering with pqApplicationCore gives easy
+  /// access to these managers from the application code. Note 
+  /// that custom applications are not required to register managers.
+  /// However certain optional components of the pqCore may
+  /// expect some managers.
+  /// Only one manager can be registered for a \c function.
+  void registerManager(const QString& function, QObject* manager);
+
+  /// Returns a manager for a particular function, if any.
+  //. \sa registerManager
+  QObject* manager(const QString& function);
+
+  /// Unregisters a manager for a particular function, if any.
+  void unRegisterManager(const QString& function);
+
+  /// ServerManagerObserver observer the vtkSMProxyManager
+  /// for changes to the server manager and fires signals on
+  /// certain actions such as registeration/unregistration of proxies
+  /// etc. Returns the ServerManagerObserver used by the application.
   pqServerManagerObserver* getServerManagerObserver();
-  pqServerManagerObserver* getPipelineData()
-    {return this->getServerManagerObserver(); }
+
+
+  /// ServerManagerModel is the representation of the ServerManager
+  /// using pqServerManagerModelItem subclasses. It makes it possible to
+  /// explore the ServerManager with ease by separating proxies based 
+  /// on their functionality/type.
   pqServerManagerModel* getServerManagerModel();
-  pqUndoStack* getUndoStack();
-  pqPipelineBuilder* getPipelineBuilder();
+
   pq3DWidgetFactory* get3DWidgetFactory();
-  pqReaderFactory* getReaderFactory();
-  pqWriterFactory* getWriterFactory();
-  pqPendingDisplayManager* getPendingDisplayManager();
   pqLinksModel* getLinksModel();
   pqPluginManager* getPluginManager();
 
@@ -113,16 +152,6 @@ public:
   // Set/Get the lookup table manager. 
   void setLookupTableManager(pqLookupTableManager*);
   pqLookupTableManager* getLookupTableManager() const;
-
-  // Use this method to delete the active source. 
-  // This involves following operations
-  // \li remove all displays from the render modules.
-  // \li Break all display connections.
-  // \li unregister all displays.
-  // \li Unregister the proxy for the \c source.
-  // All this is delegated to the pipeline builder.
-  // This method can only be called when the active source has no consumers.
-  void removeSource(pqPipelineSource* source);
 
   void removeServer(pqServer *server);
 
@@ -152,23 +181,6 @@ public:
 
   pqServer* createServer(const pqServerResource& resource);
   
-  pqPipelineSource* createFilterForSource(const QString& xmlname,
-                                          pqPipelineSource* input);
-  
-  pqPipelineSource* createSourceOnServer(const QString& xmlname, 
-                                         pqServer* server);
-
-  /// Create a compound proxy on a server with an input.
-  /// If the compound proxy doesn't have an "Input" property,
-  /// input is ignored.
-  pqPipelineSource* createCompoundFilter(const QString& xmlname, 
-                                         pqServer* server,
-                                         pqPipelineSource* input);
-
-  pqPipelineSource* createReaderOnServer(const QString& filename, 
-                                         pqServer* server,
-                                         QString whichReader = QString());
-
   /// Renders all windows
   void render();
 
@@ -185,10 +197,6 @@ signals:
   void stateLoaded();
 
   void finishedAddingServer(pqServer *server);
-  void finishSourceCreation(pqPipelineSource *source);
-  void finishedAddingSource(pqPipelineSource *source);
-  void aboutToRemoveSource(pqPipelineSource *source);
-
 protected:
   /// create signal/slot connections between pdata and smModel.
   void connect(pqServerManagerObserver* pdata, pqServerManagerModel* smModel);

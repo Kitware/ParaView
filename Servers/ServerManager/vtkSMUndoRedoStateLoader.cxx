@@ -16,23 +16,95 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMPropertyModificationUndoElement.h"
 #include "vtkSMProxyRegisterUndoElement.h"
 #include "vtkSMProxyUnRegisterUndoElement.h"
-#include "vtkSMPropertyModificationUndoElement.h"
+#include "vtkSMUpdateInformationUndoElement.h"
 #include "vtkUndoSet.h"
 
+#include <vtkstd/vector>
+
+class vtkSMUndoRedoStateLoaderVector : public vtkstd::vector<vtkSmartPointer<vtkSMUndoElement> >
+{
+};
+
+
 vtkStandardNewMacro(vtkSMUndoRedoStateLoader);
-vtkCxxRevisionMacro(vtkSMUndoRedoStateLoader, "1.1");
+vtkCxxRevisionMacro(vtkSMUndoRedoStateLoader, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMUndoRedoStateLoader::vtkSMUndoRedoStateLoader()
 {
-  this->UndoSet = 0;
+  this->RegisteredElements = new vtkSMUndoRedoStateLoaderVector;
+
+  vtkSMUndoElement* elem = vtkSMProxyRegisterUndoElement::New();
+  this->RegisterElement(elem);
+  elem->Delete();
+
+  elem = vtkSMProxyUnRegisterUndoElement::New();
+  this->RegisterElement(elem);
+  elem->Delete();
+
+  elem = vtkSMPropertyModificationUndoElement::New();
+  this->RegisterElement(elem);
+  elem->Delete();
+
+  elem = vtkSMUpdateInformationUndoElement::New();
+  this->RegisterElement(elem);
+  elem->Delete();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMUndoRedoStateLoader::~vtkSMUndoRedoStateLoader()
 {
-  this->UndoSet = 0;
+  delete this->RegisteredElements;
+}
+
+//-----------------------------------------------------------------------------
+unsigned int vtkSMUndoRedoStateLoader::RegisterElement(vtkSMUndoElement* elem)
+{
+  this->RegisteredElements->push_back(elem);
+  return static_cast<unsigned int>(this->RegisteredElements->size()-1);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoRedoStateLoader::UnRegisterElement(unsigned int index)
+{
+  if (index >= this->RegisteredElements->size())
+    {
+    vtkErrorMacro("Invalid index " << index);
+    return;
+    }
+
+  vtkSMUndoRedoStateLoaderVector::iterator iter = 
+    this->RegisteredElements->begin();
+
+  for (unsigned int cc=0; iter != this->RegisteredElements->end();  iter++, cc++)
+    {
+    if (cc == index)
+      {
+      this->RegisteredElements->erase(iter);
+      break;
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkSMUndoElement* vtkSMUndoRedoStateLoader::GetRegisteredElement(unsigned int index)
+{
+  if (index >= this->RegisteredElements->size())
+    {
+    vtkErrorMacro("Invalid index " << index);
+    return 0;
+    }
+
+  return (*this->RegisteredElements)[index];
+}
+
+//-----------------------------------------------------------------------------
+unsigned int vtkSMUndoRedoStateLoader::GetNumberOfRegisteredElements()
+{
+  return this->RegisteredElements->size();
 }
 
 //-----------------------------------------------------------------------------
@@ -45,15 +117,16 @@ vtkUndoSet* vtkSMUndoRedoStateLoader::LoadUndoRedoSet(
     return 0;
     }
 
+
   if (!rootElement->GetName() || strcmp(rootElement->GetName(), "UndoSet") != 0)
     {
     vtkErrorMacro("Can only load state from root element with tag UndoSet.");
     return 0;
     }
 
+  this->SetRootElement(rootElement);
+
   vtkUndoSet* undoSet = vtkUndoSet::New();
-  this->UndoSet = undoSet;
-  
   unsigned int numElems = rootElement->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
     {
@@ -63,64 +136,70 @@ vtkUndoSet* vtkSMUndoRedoStateLoader::LoadUndoRedoSet(
       {
       continue;
       }
-    this->HandleTag(name, currentElement);
+    vtkUndoElement* elem = this->HandleTag(currentElement);
+    if (elem)
+      {
+      undoSet->AddElement(elem);
+      elem->Delete();
+      }
     }
   
-  this->UndoSet = 0;
   return undoSet;
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMUndoRedoStateLoader::HandleTag(const char* tagName, vtkPVXMLElement* root)
+vtkSMProxy* vtkSMUndoRedoStateLoader::NewProxy(vtkPVXMLElement* root, int id)
 {
-  if (!this->UndoSet)
+  // When control reaches here, we are assured that a proxy with the given
+  // id doesn't already exist, so we try to locate an element
+  // with the state for the proxy and create the new proxy.
+  unsigned int numElems = root->GetNumberOfNestedElements();
+  for (unsigned int i=0; i<numElems; i++)
     {
-    return; //sanity check.
+    vtkPVXMLElement* currentElement = root->GetNestedElement(i);
+    unsigned int child_numElems = currentElement->GetNumberOfNestedElements();
+    for (unsigned int cc=0; cc < child_numElems; cc++)
+      {
+      vtkPVXMLElement* child = currentElement->GetNestedElement(cc);
+      int child_id=0;
+      if (child->GetName() && 
+        strcmp(child->GetName(), "Proxy") == 0 &&
+        child->GetAttribute("group") &&
+        child->GetAttribute("type") &&
+        child->GetScalarAttribute("id", &child_id))
+        {
+        if (child_id == id)
+          {
+          // We found an element that defines this unknown proxy.
+          // we create this new proxy and return it.
+          return this->NewProxyFromElement(child, id);
+          }
+        }
+      }
     }
-  if (strcmp(tagName, "PropertyModification") == 0)
-    {
-    this->HandlePropertyModification(root);
-    }
-  else if (strcmp(tagName, "ProxyRegister") == 0)
-    {
-    this->HandleProxyRegister(root);
-    }
-  else if (strcmp(tagName, "ProxyUnRegister") == 0)
-    {
-    this->HandleProxyUnRegister(root);
-    }
+  vtkErrorMacro("Cannot locate proxy with id " << id);
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMUndoRedoStateLoader::HandleProxyRegister(vtkPVXMLElement* root)
+vtkUndoElement* vtkSMUndoRedoStateLoader::HandleTag(vtkPVXMLElement* root)
 {
-  vtkSMProxyRegisterUndoElement* elem = vtkSMProxyRegisterUndoElement::New();
-  elem->SetConnectionID(this->ConnectionID);
-  elem->LoadState(root);
-  this->UndoSet->AddElement(elem);
-  elem->Delete(); 
-}
+  vtkSMUndoRedoStateLoaderVector::reverse_iterator iter = 
+    this->RegisteredElements->rbegin();
 
-//-----------------------------------------------------------------------------
-void vtkSMUndoRedoStateLoader::HandleProxyUnRegister(vtkPVXMLElement* root)
-{
-  vtkSMProxyUnRegisterUndoElement* elem = vtkSMProxyUnRegisterUndoElement::New();
-  elem->SetConnectionID(this->ConnectionID);
-  elem->LoadState(root);
-  this->UndoSet->AddElement(elem);
-  elem->Delete(); 
-}
-
-
-//-----------------------------------------------------------------------------
-void vtkSMUndoRedoStateLoader::HandlePropertyModification(vtkPVXMLElement* root)
-{
-  vtkSMPropertyModificationUndoElement* elem = 
-    vtkSMPropertyModificationUndoElement::New();
-  elem->SetConnectionID(this->ConnectionID);
-  elem->LoadState(root);
-  this->UndoSet->AddElement(elem);
-  elem->Delete(); 
+  for (; iter != this->RegisteredElements->rend();  iter++)
+    {
+    if ((*iter)->CanLoadState(root))
+      {
+      vtkSMUndoElement* elem = (*iter)->NewInstance();
+      elem->SetConnectionID(this->ConnectionID);
+      elem->SetStateLoader(this);
+      elem->LoadState(root);
+      return elem;
+      }
+    }
+  vtkWarningMacro("Cannot handle element : " << root->GetName());
+  return 0;
 }
 
 //-----------------------------------------------------------------------------

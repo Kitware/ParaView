@@ -23,19 +23,22 @@
 
 
 vtkStandardNewMacro(vtkSMProxyRegisterUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyRegisterUndoElement, "1.5");
-vtkCxxSetObjectMacro(vtkSMProxyRegisterUndoElement, XMLElement,
-  vtkPVXMLElement);
+vtkCxxRevisionMacro(vtkSMProxyRegisterUndoElement, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMProxyRegisterUndoElement::vtkSMProxyRegisterUndoElement()
 {
-  this->XMLElement = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxyRegisterUndoElement::~vtkSMProxyRegisterUndoElement()
 {
-  this->SetXMLElement(0);
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMProxyRegisterUndoElement::CanLoadState(vtkPVXMLElement* elem)
+{
+  return (elem && elem->GetName() && 
+    strcmp(elem->GetName(), "ProxyRegister") == 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -80,12 +83,15 @@ int vtkSMProxyRegisterUndoElement::Undo()
     return 0;
     }
 
-  vtkSMStateLoader* loader = vtkSMDefaultStateLoader::New();
-  loader->SetConnectionID(this->GetConnectionID());
+  vtkSMStateLoader* loader = this->GetStateLoader();
+  if (!loader)
+    {
+    vtkErrorMacro("No loader set. Cannot Undo.");
+    return 0;
+    }
+
   vtkSMProxy* proxy = loader->NewProxyFromElement(
     this->XMLElement->GetNestedElement(0), id);
-  loader->Delete();
-
   if (!proxy)
     {
     vtkErrorMacro("Failed to locate the proxy to register.");
@@ -126,11 +132,15 @@ int vtkSMProxyRegisterUndoElement::Redo()
     return 0;
     }
 
-  vtkSMStateLoader* loader = vtkSMDefaultStateLoader::New();
-  loader->SetConnectionID(this->GetConnectionID());
+  vtkSMStateLoader* loader = this->GetStateLoader();
+  if (!loader)
+    {
+    vtkErrorMacro("No loader set. Cannot Redo.");
+    return 0;
+    }
+
   vtkSMProxy* proxy = loader->NewProxyFromElement(
     this->XMLElement->GetNestedElement(0), id);
-  loader->Delete();
 
   if (!proxy)
     {
@@ -148,28 +158,6 @@ int vtkSMProxyRegisterUndoElement::Redo()
   return 1;
 }
 
-//-----------------------------------------------------------------------------
-void vtkSMProxyRegisterUndoElement::SaveStateInternal(vtkPVXMLElement* root)
-{
-  if (!this->XMLElement)
-    {
-    vtkErrorMacro("No state present to save.");
-    }
-  root->AddNestedElement(this->XMLElement);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMProxyRegisterUndoElement::LoadStateInternal(vtkPVXMLElement* element)
-{
-  if (strcmp(element->GetName(), "ProxyRegister") != 0)
-    {
-    vtkErrorMacro("Invalid element name: " 
-      << element->GetName() << ". Must be ProxyRegister.");
-    return;
-    }
-
-  this->SetXMLElement(element);
-}
 
 //-----------------------------------------------------------------------------
 void vtkSMProxyRegisterUndoElement::PrintSelf(ostream& os, vtkIndent indent)

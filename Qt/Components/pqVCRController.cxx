@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqRenderViewModule.h"
-#include "pqUndoStack.h"
 #include "pqAnimationScene.h"
 #include "pqSMAdaptor.h"
 #include "pqEventDispatcher.h"
@@ -135,12 +134,14 @@ void pqVCRController::onTick()
 void pqVCRController::onBeginPlay()
 {
   emit this->playing(true);
+  emit this->beginNonUndoableChanges();
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onEndPlay()
 {
   emit this->playing(false);
+  emit this->endNonUndoableChanges();
 }
 
 //-----------------------------------------------------------------------------
@@ -175,44 +176,52 @@ void pqVCRController::onPause()
 //-----------------------------------------------------------------------------
 void pqVCRController::onFirstFrame()
 {
+  emit this->beginNonUndoableChanges();
   vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
     this->Scene->getProxy());
   if (scene)
     {
     scene->GoToFirst();
     }
+  emit this->endNonUndoableChanges();
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onPreviousFrame()
 {
+  emit this->beginNonUndoableChanges();
   vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
     this->Scene->getProxy());
   if (scene)
     {
     scene->GoToPrevious();
     }
+  emit this->endNonUndoableChanges();
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onNextFrame()
 {
+  emit this->beginNonUndoableChanges();
   vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
     this->Scene->getProxy());
   if (scene)
     {
     scene->GoToNext();
     }
+  emit this->endNonUndoableChanges();
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onLastFrame()
 {
+  emit this->beginNonUndoableChanges();
   vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
     this->Scene->getProxy());
   if (scene)
     {
     scene->GoToLast();
     }
+  emit this->endNonUndoableChanges();
 }
 

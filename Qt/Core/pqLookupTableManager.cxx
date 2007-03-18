@@ -33,12 +33,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 
+#include "pqApplicationCore.h"
 #include "pqScalarsToColors.h"
+#include "pqServerManagerModel.h"
 
 //-----------------------------------------------------------------------------
 pqLookupTableManager::pqLookupTableManager(QObject* _parent/*=0*/)
   : QObject(_parent)
 {
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(smmodel, SIGNAL(proxyAdded(pqProxy*)),
+    this, SLOT(onAddProxy(pqProxy*)));
+  QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)),
+    this, SLOT(onRemoveProxy(pqProxy*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -56,5 +64,10 @@ void pqLookupTableManager::onAddProxy(pqProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
+void pqLookupTableManager::onRemoveProxy(pqProxy* proxy)
+{
+  if (pqScalarsToColors* lut = qobject_cast<pqScalarsToColors*>(proxy))
+    {
+    this->onRemoveLookupTable(lut);
+    }
+}

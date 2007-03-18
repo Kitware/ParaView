@@ -39,10 +39,10 @@ class pqConsumerDisplay;
 class pqGenericViewModule;
 class QAction;
 
-// pqScalarBarVisibilityAdaptor is an adptor that can be hooked on to
-// any action to make it control the scalar bar 
-// visibility of the scalar bar for the selected source 
-// in the selected render window.
+/// pqScalarBarVisibilityAdaptor is an adptor that can be hooked on to
+/// any action to make it control the scalar bar 
+/// visibility of the scalar bar for the selected source 
+/// in the selected render window.
 class PQCORE_EXPORT pqScalarBarVisibilityAdaptor : public QObject
 {
   Q_OBJECT
@@ -51,19 +51,32 @@ public:
   virtual ~pqScalarBarVisibilityAdaptor();
 
 signals:
-  // Fired when to indicate if the visibility of the scalar bar can
-  // be changed in the current setup.
+  /// Fired when to indicate if the visibility of the scalar bar can
+  /// be changed in the current setup.
   void canChangeVisibility(bool);
 
-  // Fired to update the scalarbar visibility state.
+  /// Fired to update the scalarbar visibility state.
   void scalarBarVisible(bool);
 
+  /// Fired before scalar bar visibility is changed. 
+  /// This signal can be connected with pqUndoStack.
+  void begin(const QString& label);
+
+  /// Fired after changing scalar bar visibility.
+  void end();
+
 public slots:
+  /// Set the active display which this adaptor is going to
+  /// show/hide the scalar bar for.
   void setActiveDisplay(pqConsumerDisplay *display, pqGenericViewModule *view);
 
 protected slots:
-  void updateEnableState();
+  void updateState();
   void setScalarBarVisibility(bool visible);
+
+protected:
+  /// internal method called by updateState().
+  void updateStateInternal();
 
 private:
   pqScalarBarVisibilityAdaptor(const pqScalarBarVisibilityAdaptor&); // Not implemented.

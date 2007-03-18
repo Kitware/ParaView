@@ -15,9 +15,20 @@
 // .NAME vtkSMUndoRedoStateLoader -  loader for a vtkUndoSet.
 // .SECTION Description
 // This is the state loader for loading undo/redo states.
-// The GUI can subclass this to handle GUI specific elements.
-// vtkSMUndoStack can be given an instance of appropriate subclass
-// to handle undo/redo elements properly.
+// This class has dual role: 
+// \li Firstly, it needs to know how to create
+// undo elements based on their state xmls and load the element states.
+// All undo elements must be registered with the state loader so that the 
+// loader can create the correct type when loading the state.
+// \li Secondly, it needs to provide the undo elements with proxies 
+// they may request based on the proxy id. The loader may have to create new 
+// proxies based on the state, if none already exists. The vtkSMUndoElement
+// subclasses ask the loader to provide it with proxies they need
+// to access.
+//
+// One can register vtkSMUndoElement subclassess with the state loader.
+// The loader creates the most recently registered element which can 
+// load the current state.
 // .SECTION See Also
 // vtkSMUndoStack vtkUndoElement vtkUndoSet
 
@@ -27,6 +38,9 @@
 #include "vtkSMDefaultStateLoader.h"
 
 class vtkPVXMLElement;
+class vtkSMUndoElement;
+class vtkSMUndoRedoStateLoaderVector;
+class vtkUndoElement;
 class vtkUndoSet;
 
 class VTK_EXPORT vtkSMUndoRedoStateLoader : public vtkSMDefaultStateLoader
@@ -42,20 +56,51 @@ public:
   // of the caller to \c Delete it.
   vtkUndoSet* LoadUndoRedoSet(vtkPVXMLElement* rootElement);
 
+  // Description:
+  // The loader creates a vtkSMUndoElement subclass for every XML entry
+  // in the state. Application can register undo elements that should be
+  // created when loading state. The most recently registered element
+  // is given higher priority for handling the state.
+  // Returns the index for the register element.
+  // By default, vtkSMProxyRegisterUndoElement, 
+  // vtkSMProxyUnRegisterUndoElement, and vtkSMPropertyModificationUndoElement
+  // are registered.
+  unsigned int RegisterElement(vtkSMUndoElement*);
+
+  // Description:
+  // Unregister an undo element at an index.
+  void UnRegisterElement(unsigned int index);
+
+  // Description:
+  // Get the registered element at an index.
+  vtkSMUndoElement* GetRegisteredElement(unsigned int index);
+
+  // Description:
+  // Get number of registered elements.
+  unsigned int GetNumberOfRegisteredElements();
+
+  // Description:
+  // Unhiding superclass implementation.
+  virtual vtkSMProxy* NewProxy(int id)
+    { return this->Superclass::NewProxy(id); }
+
 protected:
   vtkSMUndoRedoStateLoader();
   ~vtkSMUndoRedoStateLoader();
 
-  virtual void HandleTag(const char* tagName, vtkPVXMLElement* root);
+  virtual vtkUndoElement* HandleTag(vtkPVXMLElement* root);
 
-  void HandleProxyRegister(vtkPVXMLElement*);
-  void HandleProxyUnRegister(vtkPVXMLElement*);
-  void HandlePropertyModification(vtkPVXMLElement*);
+  // Either create a new proxy or returns one from the map
+  // of existing properties. Newly created proxies are stored
+  // in the map with the id as the key. The root is the xml
+  // element under which the proxy definitions are stored.
+  virtual vtkSMProxy* NewProxy(vtkPVXMLElement* root, int id);
 
-  vtkUndoSet* UndoSet;
 private:
   vtkSMUndoRedoStateLoader(const vtkSMUndoRedoStateLoader&); // Not implemented.
   void operator=(const vtkSMUndoRedoStateLoader&); // Not implemented.
+
+  vtkSMUndoRedoStateLoaderVector* RegisteredElements;
 };
 
 #endif

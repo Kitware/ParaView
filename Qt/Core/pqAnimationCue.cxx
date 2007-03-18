@@ -127,8 +127,10 @@ int pqAnimationCue::getAnimatedPropertyIndex() const
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationCue::setDefaults()
+void pqAnimationCue::setDefaultPropertyValues()
 {
+  this->Superclass::setDefaultPropertyValues();
+
   vtkSMProxy* proxy = this->getProxy();
   if (!this->Internal->Manipulator)
     {
@@ -138,7 +140,7 @@ void pqAnimationCue::setDefaults()
         this->ManipulatorType.toAscii().data());
     manip->SetConnectionID(this->getServer()->GetConnectionID());
     manip->SetServers(vtkProcessModule::CLIENT);
-    this->addInternalProxy("Manipulator", manip);
+    this->addHelperProxy("Manipulator", manip);
     manip->Delete();
     pqSMAdaptor::setProxyProperty(proxy->GetProperty("Manipulator"),
       manip);
@@ -149,7 +151,6 @@ void pqAnimationCue::setDefaults()
   pqSMAdaptor::setEnumerationProperty(proxy->GetProperty("TimeMode"),
     "Normalized");
   proxy->UpdateVTKObjects();
-
 }
 
 //-----------------------------------------------------------------------------
@@ -251,7 +252,7 @@ void pqAnimationCue::deleteKeyFrame(int index)
     }
   this->Internal->Manipulator->UpdateVTKObjects();
 
-  this->removeInternalProxy("KeyFrame", keyframe);
+  this->removeHelperProxy("KeyFrames", keyframe);
 }
 
 //-----------------------------------------------------------------------------
@@ -300,7 +301,7 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
 
   pqSMAdaptor::setElementProperty(kf->GetProperty("KeyTime"), keyTime);
   kf->UpdateVTKObjects();
-  this->addInternalProxy("KeyFrame", kf);
+  this->addHelperProxy("KeyFrames", kf);
 
   vtkSMProxyProperty* pp =vtkSMProxyProperty::SafeDownCast(
     this->Internal->Manipulator->GetProperty("KeyFrames"));

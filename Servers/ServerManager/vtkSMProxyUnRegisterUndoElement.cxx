@@ -23,18 +23,15 @@
 
 
 vtkStandardNewMacro(vtkSMProxyUnRegisterUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyUnRegisterUndoElement, "1.7");
-vtkCxxSetObjectMacro(vtkSMProxyUnRegisterUndoElement, XMLElement, vtkPVXMLElement);
+vtkCxxRevisionMacro(vtkSMProxyUnRegisterUndoElement, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMProxyUnRegisterUndoElement::vtkSMProxyUnRegisterUndoElement()
 {
-  this->XMLElement = NULL;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxyUnRegisterUndoElement::~vtkSMProxyUnRegisterUndoElement()
 {
-  this->SetXMLElement(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -46,7 +43,7 @@ int vtkSMProxyUnRegisterUndoElement::Undo()
     return 0;
     }
   
-  if (this->XMLElement->GetNumberOfNestedElements() != 1)
+  if (this->XMLElement->GetNumberOfNestedElements() < 1)
     {
     vtkErrorMacro("Invalid child elements. Cannot undo.");
     return 0;
@@ -63,11 +60,15 @@ int vtkSMProxyUnRegisterUndoElement::Undo()
     return 0;
     }
 
-  vtkSMStateLoader* loader = vtkSMDefaultStateLoader::New();
-  loader->SetConnectionID(this->GetConnectionID());
+  vtkSMStateLoader* loader = this->GetStateLoader();
+  if (!loader)
+    {
+    vtkErrorMacro("No loader set. Cannot Undo.");
+    return 0;
+    }
+
   vtkSMProxy* proxy = loader->NewProxyFromElement(
-    this->XMLElement->GetNestedElement(0), id);
-  loader->Delete();
+    this->XMLElement->FindNestedElementByName("Proxy"), id);
 
   if (!proxy)
     {
@@ -104,11 +105,15 @@ int vtkSMProxyUnRegisterUndoElement::Redo()
     return 0;
     }
 
-  vtkSMStateLoader* loader = vtkSMDefaultStateLoader::New();
-  loader->SetConnectionID(this->GetConnectionID());
+  vtkSMStateLoader* loader = this->GetStateLoader();
+  if (!loader)
+    {
+    vtkErrorMacro("No loader set. Cannot Redo.");
+    return 0;
+    }
+
   vtkSMProxy* proxy = loader->NewProxyFromElement(
     this->XMLElement->GetNestedElement(0), id);
-  loader->Delete();
 
   if (!proxy)
     {
@@ -122,6 +127,12 @@ int vtkSMProxyUnRegisterUndoElement::Redo()
   
   // Unregistering may trigger deletion of the proxy.
   return 1;
+}
+//-----------------------------------------------------------------------------
+bool vtkSMProxyUnRegisterUndoElement::CanLoadState(vtkPVXMLElement* elem)
+{
+  return (elem && elem->GetName() && 
+    strcmp(elem->GetName(), "ProxyUnRegister") == 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -144,29 +155,6 @@ void vtkSMProxyUnRegisterUndoElement::ProxyToUnRegister(const char* groupname,
   
   this->SetXMLElement(pdElement);
   pdElement->Delete();
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMProxyUnRegisterUndoElement::SaveStateInternal(vtkPVXMLElement* root)
-{
-  if (!this->XMLElement)
-    {
-    vtkErrorMacro("No state present to save.");
-    }
-  root->AddNestedElement(this->XMLElement);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMProxyUnRegisterUndoElement::LoadStateInternal(vtkPVXMLElement* element)
-{
-  if (strcmp(element->GetName(), "ProxyUnRegister") != 0)
-    {
-    vtkErrorMacro("Invalid element name: " << element->GetName()
-      << ". Must be ProxyUnRegister.");
-    return;
-    }
-  
-  this->SetXMLElement(element);
 }
 
 //-----------------------------------------------------------------------------

@@ -124,6 +124,7 @@ class PQCORE_EXPORT pqServerManagerSelection :
 {
 };
 
+Q_DECLARE_METATYPE(pqServerManagerSelection);
 
 #endif
 

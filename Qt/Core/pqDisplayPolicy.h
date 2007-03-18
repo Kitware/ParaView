@@ -55,6 +55,7 @@ public:
   pqDisplayPolicy(QObject* p);
   virtual ~pqDisplayPolicy();
 
+  /// FIXME: Move to pqObjectBuilder.
   /// Creates a new display proxy for the (source, view) pair and returns it.
   /// The caller must release the reference when it's done with the returned proxy.
   /// Both view and source must be non-null. If source cannot be displayed in the
@@ -102,7 +103,7 @@ public:
   /// create new views, we provide this as part of display policy which can 
   /// be easily overridden by creating a new subclass.
   virtual pqConsumerDisplay* setDisplayVisibility(
-    pqPipelineSource* source, pqGenericViewModule* view, bool visible) const;
+    pqPipelineSource* source, pqGenericViewModule* view, bool visible);
 
 protected:
   /// Determines the type of view that's preferred by the \c source. If \c view

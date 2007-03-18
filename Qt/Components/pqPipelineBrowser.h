@@ -122,9 +122,19 @@ public slots:
   ///   Sets the current render module.
   /// \param rm The current render module.
   void setViewModule(pqGenericViewModule* rm);
-  
+
+signals:
+  /// Fired when the browser begins performing an undoable change.
+  void beginUndo(const QString& label);
+
+  /// Fired when the browser is finished with the undoable change.
+  void endUndo();
+
 private slots:
   void handleIndexClicked(const QModelIndex &index);
+  
+  /// Called when the user changes the name of a source.
+  void onRename(const QModelIndex& index, const QString& name);
 
 private:
   pqSourceInfoModel *getFilterModel();

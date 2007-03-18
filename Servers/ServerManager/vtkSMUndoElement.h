@@ -24,20 +24,48 @@
 
 #include "vtkUndoElement.h"
 
+class vtkPVXMLElement;
+class vtkSMStateLoader;
+
 class VTK_EXPORT vtkSMUndoElement : public vtkUndoElement
 {
 public:
   vtkTypeRevisionMacro(vtkSMUndoElement, vtkUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Get/Set the connection ID.
   vtkGetMacro(ConnectionID, vtkIdType);
   vtkSetMacro(ConnectionID, vtkIdType);
 
+  // Description:
+  // Get/Set the state loader.
+  // This must be set before the undo/redo actions are called.
+  // The element may use the state loader to access
+  // proxies. 
+  // This is only valid within Undo()/Redo() calls.
+  vtkGetObjectMacro(StateLoader, vtkSMStateLoader);
+  void SetStateLoader(vtkSMStateLoader* loader);
 protected:
   vtkSMUndoElement();
   ~vtkSMUndoElement();
 
   vtkIdType ConnectionID;
+
+  // Description:
+  // Access the XML element that is keeps the state 
+  // to undo/redo.
+  vtkPVXMLElement* XMLElement;
+  void SetXMLElement(vtkPVXMLElement*);
+
+  vtkSMStateLoader* StateLoader;
+
+  // Description:
+  // Overridden to save state specific to the class.
+  // \arg \c element <Element /> representing this object.
+  virtual void SaveStateInternal(vtkPVXMLElement* root);
+
+  virtual void LoadStateInternal(vtkPVXMLElement* element);
 private:
   vtkSMUndoElement(const vtkSMUndoElement&); // Not implemented.
   void operator=(const vtkSMUndoElement&); // Not implemented.

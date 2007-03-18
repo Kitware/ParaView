@@ -77,10 +77,10 @@ public slots:
 
 signals:
   /// fired before the panel performs an undoable operation.
-  void beginUndoSet(const QString&);
+  void beginUndo(const QString&);
 
   /// fired after the panel has performed an undoable operation.
-  void endUndoSet();
+  void endUndo();
 
 protected slots:
   /// Called when the application selection changes.
@@ -107,6 +107,10 @@ protected slots:
 
   /// Called when the cue tells us that the keyframes have somehow changed.
   void onKeyFramesModified();
+
+  /// Called when a source is addded. We make the source
+  /// available in the source selection combo-box.
+  void onSourceAdded(pqPipelineSource* src);
 
   /// Called before a source is removed. We clean up the
   /// animation cue/keyframes for this source.

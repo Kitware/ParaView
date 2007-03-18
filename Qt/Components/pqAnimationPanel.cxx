@@ -138,16 +138,6 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
   this->Internal->keyFrameTime->setValidator(
     this->Internal->KeyFrameTimeValidator);
 
-  QObject::connect(&this->Internal->KeyFrameLinks, SIGNAL(beginUndoSet(const QString&)),
-    this, SIGNAL(beginUndoSet(const QString&)));
-  QObject::connect(&this->Internal->KeyFrameLinks, SIGNAL(endUndoSet()),
-    this, SIGNAL(endUndoSet()));
-
-  QObject::connect(&this->Internal->SceneLinks, SIGNAL(beginUndoSet(const QString&)),
-    this, SIGNAL(beginUndoSet(const QString&)));
-  QObject::connect(&this->Internal->SceneLinks, SIGNAL(endUndoSet()),
-    this, SIGNAL(endUndoSet()));
-
   QObject::connect(pqApplicationCore::instance()->getSelectionModel(),
     SIGNAL(currentChanged(pqServerManagerModelItem*)),
     this, SLOT(onCurrentChanged(pqServerManagerModelItem*)));
@@ -175,6 +165,10 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(preSourceRemoved(pqPipelineSource*)),
     this, SLOT(onSourceRemoved(pqPipelineSource*)));
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+    SIGNAL(sourceAdded(pqPipelineSource*)),
+    this, SLOT(onSourceAdded(pqPipelineSource*)));
+
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(nameChanged(pqServerManagerModelItem*)),
     this, SLOT(onNameChanged(pqServerManagerModelItem*)));
@@ -210,6 +204,13 @@ pqAnimationPanel::~pqAnimationPanel()
 }
 
 //-----------------------------------------------------------------------------
+void pqAnimationPanel::onSourceAdded(pqPipelineSource* src)
+{
+  this->Internal->sourceName->addItem(src->getSMName(), 
+    QVariant(src->getProxy()->GetSelfID().ID));
+}
+
+//-----------------------------------------------------------------------------
 void pqAnimationPanel::onSourceRemoved(pqPipelineSource* source)
 {
   int index = this->Internal->sourceName->findData(
@@ -222,11 +223,12 @@ void pqAnimationPanel::onSourceRemoved(pqPipelineSource* source)
     if (scene)
       {
       scene->removeCues(source->getProxy());
+
       // we also want to remove cues we might have
       // added for the proxies on proxy properties. 
       // We are assured that all those proxies are saved
       // as internal proxies for the source.
-      QList<vtkSMProxy*> internalProxies = source->getInternalProxies();
+      QList<vtkSMProxy*> internalProxies = source->getHelperProxies();
       foreach (vtkSMProxy* proxy, internalProxies)
         {
         scene->removeCues(proxy);
@@ -487,12 +489,6 @@ void pqAnimationPanel::onCurrentChanged(pqProxy* src)
     QVariant(src->getProxy()->GetSelfID().ID));
   if (index == -1)
     {
-    this->Internal->sourceName->addItem(src->getSMName(), 
-      QVariant(src->getProxy()->GetSelfID().ID));
-    index = this->Internal->sourceName->findText(src->getSMName());
-    }
-  if (index == -1)
-    {
     this->Internal->CurrentProxy = 0;
     this->updateEnableState();
     this->Internal->sourceName->setCurrentIndex(-1);
@@ -684,7 +680,7 @@ void pqAnimationPanel::resetCameraKeyFrameToCurrent()
 
   const char* names[] = { "Position", "FocalPoint", "ViewUp", "ViewAngle",  0 };
   const char* snames[] = { "CameraPositionInfo", "CameraFocalPointInfo", 
-    "CameraViewUpInfo",  "CameraViewAngleInfo", 0 };
+    "CameraViewUpInfo",  "CameraViewAngle", 0 };
   for (int cc=0; names[cc] && snames[cc]; cc++)
     {
     vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -709,7 +705,7 @@ void pqAnimationPanel::addKeyFrameCallback()
     {
     index = this->Internal->keyFrameIndex->value()+1;
     }
-  emit this->beginUndoSet("Insert Key Frame");
+  emit this->beginUndo("Insert Key Frame");
   this->insertKeyFrame(index);
   if (index ==0 && 
     this->Internal->ActiveCue->getNumberOfKeyFrames() == 1)
@@ -721,7 +717,7 @@ void pqAnimationPanel::addKeyFrameCallback()
     
     this->showKeyFrame(0);
     }
-  emit this->endUndoSet();
+  emit this->endUndo();
 }
 
 //-----------------------------------------------------------------------------
@@ -754,7 +750,7 @@ void pqAnimationPanel::onKeyFramesModified()
 //-----------------------------------------------------------------------------
 void pqAnimationPanel::insertKeyFrame(int index)
 {
-  emit this->beginUndoSet("Insert Key Frame");
+  emit this->beginUndo("Insert Key Frame");
   pqAnimationManager* mgr = this->Internal->Manager;
   pqAnimationScene* scene = mgr->getActiveScene();
   if (!scene)
@@ -810,13 +806,12 @@ void pqAnimationPanel::insertKeyFrame(int index)
     }
 
   
-  emit this->endUndoSet();
+  emit this->endUndo();
 }
 
 //-----------------------------------------------------------------------------
 void pqAnimationPanel::deleteKeyFrame(int index)
 {
-  emit this->beginUndoSet("Delete Key Frame");
   pqAnimationManager* mgr = this->Internal->Manager;
   pqAnimationScene* scene = mgr->getActiveScene();
   if (!scene)
@@ -826,12 +821,13 @@ void pqAnimationPanel::deleteKeyFrame(int index)
     return;
     }
 
+  emit this->beginUndo("Delete Key Frame");
   pqAnimationCue* cue = this->Internal->ActiveCue;
   if (cue)
     {
     cue->deleteKeyFrame(index);
     }
-  emit this->endUndoSet();
+  emit this->endUndo();
 }
 
 //-----------------------------------------------------------------------------
@@ -877,13 +873,14 @@ void pqAnimationPanel::showKeyFrame(int index)
     this->Internal->interpolationType->blockSignals(true);
     this->Internal->interpolationType->clear();
     this->Internal->interpolationType->addItem(
-        QIcon(":pqWidgets/Icons/pqRamp16.png"), "Ramp", "Ramp");
+      QIcon(":pqWidgets/Icons/pqRamp16.png"), "Ramp", "Ramp");
     this->Internal->interpolationType->addItem(
-        QIcon(":pqWidgets/Icons/pqExponential16.png"), "Exponential", "Exponential");
+      QIcon(":pqWidgets/Icons/pqExponential16.png"), "Exponential", 
+      "Exponential");
     this->Internal->interpolationType->addItem(
-        QIcon(":pqWidgets/Icons/pqSinusoidal16.png"), "Sinusoid", "Sinusoid");
+      QIcon(":pqWidgets/Icons/pqSinusoidal16.png"), "Sinusoid", "Sinusoid");
     this->Internal->interpolationType->addItem(
-        QIcon(":pqWidgets/Icons/pqStep16.png"), "Boolean", "Boolean");
+      QIcon(":pqWidgets/Icons/pqStep16.png"), "Step", "Boolean");
     this->Internal->interpolationType->setCurrentIndex(-1);
     this->Internal->interpolationType->blockSignals(false);
     }
@@ -907,7 +904,7 @@ void pqAnimationPanel::showKeyFrame(int index)
   // Update and connect the type adaptor
   this->Internal->TypeAdaptor->setKeyFrameProxy(toShowKf);
   this->Internal->KeyFrameLinks.addPropertyLink(
-    this->Internal->TypeAdaptor, "currentText",
+    this->Internal->TypeAdaptor, "currentData",
     SIGNAL(currentTextChanged(const QString&)),
     toShowKf, toShowKf->GetProperty("Type"));
 

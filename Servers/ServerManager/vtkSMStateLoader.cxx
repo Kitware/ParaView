@@ -30,8 +30,9 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.19");
-
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.20");
+vtkCxxSetObjectMacro(vtkSMStateLoader, RootElement, vtkPVXMLElement);
+//---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
 {
   vtkstd::string GroupName;
@@ -62,7 +63,7 @@ vtkSMStateLoader::vtkSMStateLoader()
 vtkSMStateLoader::~vtkSMStateLoader()
 {
   delete this->Internal;
-  this->RootElement = 0;
+  this->SetRootElement(0);
 }
 
 //---------------------------------------------------------------------------
@@ -394,7 +395,7 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
     return 0;
     }
 
-  this->RootElement = rootElement;
+  this->SetRootElement(rootElement);
 
   this->ClearCreatedProxies();
   this->Internal->RegistrationInformation.clear();
@@ -445,7 +446,7 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
     this->ClearCreatedProxies();
     }
 
-  this->RootElement = 0;
+  this->SetRootElement(0);
 
   return 1;
 }

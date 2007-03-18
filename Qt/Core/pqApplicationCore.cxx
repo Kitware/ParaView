@@ -60,9 +60,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QDomDocument>
 #include <QFile>
+#include <QMap>
 #include <QPointer>
-#include <QtDebug>
 #include <QSize>
+#include <QtDebug>
 
 // ParaView includes.
 #include "pq3DWidgetFactory.h"
@@ -70,15 +71,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPolicy.h"
 #include "pqLinksModel.h"
 #include "pqLookupTableManager.h"
+#include "pqObjectBuilder.h"
 #include "pqOptions.h"
-#include "pqPendingDisplayManager.h"
-#include "pqPendingDisplayUndoElement.h"
-#include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
-#include "pqReaderFactory.h"
 #include "pqRenderViewModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -89,9 +87,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqStandardViewModules.h"
-#include "pqUndoStack.h"
-#include "pqWriterFactory.h"
 #include "pqXMLUtil.h"
+#include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -99,19 +96,19 @@ class pqApplicationCoreInternal
 public:
   pqServerManagerObserver* ServerManagerObserver;
   pqServerManagerModel* ServerManagerModel;
-  pqUndoStack* UndoStack;
-  pqPipelineBuilder* PipelineBuilder;
+  pqObjectBuilder* ObjectBuilder;
   pq3DWidgetFactory* WidgetFactory;
-  pqReaderFactory* ReaderFactory;
-  pqWriterFactory* WriterFactory;
   pqServerManagerSelectionModel* SelectionModel;
-  pqPendingDisplayManager* PendingDisplayManager;
   QPointer<pqDisplayPolicy> DisplayPolicy;
   vtkSmartPointer<vtkSMStateLoader> StateLoader;
   QPointer<pqLookupTableManager> LookupTableManager;
   pqLinksModel LinksModel;
   pqPluginManager* PluginManager;
   pqProgressManager* ProgressManager;
+
+  QPointer<pqUndoStack> UndoStack;
+
+  QMap<QString, QPointer<QObject> > RegisteredManagers;
 
   QString OrganizationName;
   QString ApplicationName;
@@ -152,12 +149,9 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   // *  Make signal-slot connections between ServerManagerObserver and ServerManagerModel.
   this->connect(this->Internal->ServerManagerObserver, this->Internal->ServerManagerModel);
 
-  // *  Create the Undo/Redo stack.
-  this->Internal->UndoStack = new pqUndoStack(false, this);
 
-  // *  Create the pqPipelineBuilder. This is used to create pipeline objects.
-  this->Internal->PipelineBuilder = new pqPipelineBuilder(this);
-  this->Internal->PipelineBuilder->setUndoStack(this->Internal->UndoStack);
+  // *  Create the pqObjectBuilder. This is used to create pipeline objects.
+  this->Internal->ObjectBuilder = new pqObjectBuilder(this);
 
   if (!pqApplicationCore::Instance)
     {
@@ -168,15 +162,11 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
 
   // * Create various factories.
   this->Internal->WidgetFactory = new pq3DWidgetFactory(this);
-  this->Internal->ReaderFactory = new pqReaderFactory(this);
-  this->Internal->WriterFactory = new pqWriterFactory(this);
 
   // * Setup the selection model.
   this->Internal->SelectionModel = new pqServerManagerSelectionModel(
     this->Internal->ServerManagerModel, this);
   
-  this->Internal->PendingDisplayManager = new pqPendingDisplayManager(this);
-
   this->Internal->DisplayPolicy = new pqDisplayPolicy(this);
 
   this->Internal->ProgressManager = new pqProgressManager(this);
@@ -232,23 +222,31 @@ void pqApplicationCore::connect(pqServerManagerObserver* pdata,
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setLookupTableManager(pqLookupTableManager* mgr)
 {
-  pqServerManagerModel* smModel = this->getServerManagerModel();
-  if (this->Internal->LookupTableManager)
-    {
-    QObject::disconnect(smModel, 0, this->Internal->LookupTableManager, 0);
-    }
   this->Internal->LookupTableManager = mgr;
-  if (mgr)
-    {
-    QObject::connect(smModel, SIGNAL(proxyAdded(pqProxy*)),
-      mgr, SLOT(onAddProxy(pqProxy*)));
-    }
 }
 
 //-----------------------------------------------------------------------------
 pqLookupTableManager* pqApplicationCore::getLookupTableManager() const
 {
   return this->Internal->LookupTableManager;
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::setUndoStack(pqUndoStack* stack)
+{
+  this->Internal->UndoStack = stack;
+}
+
+//-----------------------------------------------------------------------------
+pqUndoStack* pqApplicationCore::getUndoStack() const
+{
+  return this->Internal->UndoStack;
+}
+
+//-----------------------------------------------------------------------------
+pqObjectBuilder* pqApplicationCore::getObjectBuilder() const
+{
+  return this->Internal->ObjectBuilder;
 }
 
 //-----------------------------------------------------------------------------
@@ -264,45 +262,15 @@ pqServerManagerModel* pqApplicationCore::getServerManagerModel()
 }
 
 //-----------------------------------------------------------------------------
-pqUndoStack* pqApplicationCore::getUndoStack()
-{
-  return this->Internal->UndoStack;
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineBuilder* pqApplicationCore::getPipelineBuilder()
-{
-  return this->Internal->PipelineBuilder;
-}
-
-//-----------------------------------------------------------------------------
 pq3DWidgetFactory* pqApplicationCore::get3DWidgetFactory()
 {
   return this->Internal->WidgetFactory;
 }
 
 //-----------------------------------------------------------------------------
-pqReaderFactory* pqApplicationCore::getReaderFactory()
-{
-  return this->Internal->ReaderFactory;
-}
-
-//-----------------------------------------------------------------------------
-pqWriterFactory* pqApplicationCore::getWriterFactory()
-{
-  return this->Internal->WriterFactory;
-}
-
-//-----------------------------------------------------------------------------
 pqServerManagerSelectionModel* pqApplicationCore::getSelectionModel()
 {
   return this->Internal->SelectionModel;
-}
-
-//-----------------------------------------------------------------------------
-pqPendingDisplayManager* pqApplicationCore::getPendingDisplayManager()
-{
-  return this->Internal->PendingDisplayManager;
 }
 
 //-----------------------------------------------------------------------------
@@ -336,59 +304,35 @@ pqDisplayPolicy* pqApplicationCore::getDisplayPolicy() const
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::removeSource(pqPipelineSource* source)
+void pqApplicationCore::registerManager(const QString& function, 
+  QObject* manager)
 {
-  if (!source)
+  if (this->Internal->RegisteredManagers.contains(function) &&
+    this->Internal->RegisteredManagers[function] != 0)
     {
-    qDebug() << "No source to remove.";
-    return;
+    qDebug() << "Replacing existing manager for function : " 
+      << function;
     }
-  if (source->getNumberOfConsumers())
-    {
-    qDebug() << "Active source has consumers, cannot delete";
-    return;
-    }
-
-  QList<pqGenericViewModule*> viewModules = source->getViewModules();
-
-  // Make all inputs visible in views that the removed source
-  // is currently visible.
-  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
-  if (filter)
-    {
-    QList<pqPipelineSource*> inputs = filter->getInputs();
-    foreach(pqGenericViewModule* view, viewModules)
-      {
-      pqConsumerDisplay* src_disp = source->getDisplay(view);
-      if (!src_disp || !src_disp->isVisible())
-        {
-        continue;
-        }
-      // For each input, if it is not visibile in any of the views
-      // that the delete filter is visible, we make the input visible.
-      for(int cc=0; cc < inputs.size(); ++cc)
-        {
-        pqPipelineSource* input = inputs[cc];
-        pqConsumerDisplay* input_disp = input->getDisplay(view);
-        if (input_disp && !input_disp->isVisible())
-          {
-          input_disp->setVisible(true);
-          }
-        }
-      }
-    }
-
-  emit this->aboutToRemoveSource(source);
- 
-  this->getPipelineBuilder()->remove(source);
-
-
-  foreach (pqGenericViewModule* view, viewModules)
-    {
-    view->render();
-    }
+  this->Internal->RegisteredManagers[function] = manager;
 }
 
+//-----------------------------------------------------------------------------
+void pqApplicationCore::unRegisterManager(const QString& function)
+{
+  this->Internal->RegisteredManagers.remove(function);
+}
+
+//-----------------------------------------------------------------------------
+QObject* pqApplicationCore::manager(const QString& function)
+{
+  QMap<QString, QPointer<QObject> >::iterator iter =
+    this->Internal->RegisteredManagers.find(function);
+  if (iter != this->Internal->RegisteredManagers.end())
+    {
+    return iter.value();
+    }
+  return 0;
+}
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::removeServer(pqServer* server)
@@ -400,13 +344,10 @@ void pqApplicationCore::removeServer(pqServer* server)
     }
 
   this->getServerManagerModel()->beginRemoveServer(server);
-  this->getPipelineBuilder()->deleteProxies(server);
+  this->getObjectBuilder()->destroyAllProxies(server);
   pqServer::disconnect(server);
   this->getServerManagerModel()->endRemoveServer();
 }
-
-
-
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setStateLoader(vtkSMStateLoader* loader)
@@ -457,9 +398,11 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     {
     // tell the state loader to use the existing render modules before creating new ones
     vtkSMRenderModuleProxy *smRen;
-    for(unsigned int i=0; i<server->GetRenderModule()->GetNumberOfProxies(); i++)
+    for(unsigned int i=0; 
+      i<server->GetRenderModule()->GetNumberOfRenderModules(); i++)
       {
-      if( (smRen = dynamic_cast<vtkSMRenderModuleProxy*>(server->GetRenderModule()->GetProxy(i))) )
+      if( (smRen = dynamic_cast<vtkSMRenderModuleProxy*>(
+            server->GetRenderModule()->GetRenderModule(i))) )
         {
         pqLoader->AddPreferredRenderModule(smRen);
         }
@@ -476,8 +419,6 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     pxm->UpdateRegisteredProxiesInOrder(0);
     }
 
-  // Clear undo stack.
-  this->Internal->UndoStack->clear();
 
   if (pqLoader)
     {
@@ -495,6 +436,7 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
   emit this->stateLoaded();
 }
 
+//-----------------------------------------------------------------------------
 pqServerResources& pqApplicationCore::serverResources()
 {
   if(!this->Internal->ServerResources)
@@ -506,6 +448,7 @@ pqServerResources& pqApplicationCore::serverResources()
   return *this->Internal->ServerResources;
 }
 
+//-----------------------------------------------------------------------------
 pqServerStartups& pqApplicationCore::serverStartups()
 {
   if(!this->Internal->ServerStartups)
@@ -658,226 +601,6 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
     }
 
   return server;
-}
-
-static void SetDefaultInputArray(vtkSMProxy* Proxy, const char* PropertyName)
-{
-  if(vtkSMStringVectorProperty* const array =
-    vtkSMStringVectorProperty::SafeDownCast(
-      Proxy->GetProperty(PropertyName)))
-    {
-    Proxy->UpdateVTKObjects();
-  
-    QList<QVariant> domain = 
-      pqSMAdaptor::getEnumerationPropertyDomain(array);
-
-    for(int i = 0; i != domain.size(); ++i)
-      {
-      const QString name = domain[i].toString();
-      array->SetElement(4, name.toAscii().data());
-      array->UpdateDependentDomains();
-      break;
-      }
-    }
-}
-
-pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlname,
-                                        pqPipelineSource* input)
-{
-  if (!input)
-    {
-    qDebug() << "No source/filter active. Cannot createFilterForSource.";
-    return NULL;
-    }
-
-  this->getUndoStack()->beginUndoSet(QString("Create ") + xmlname);
-
-  pqPipelineSource* filter = this->getPipelineBuilder()->createSource(
-    "filters", xmlname.toAscii().data(), input->getServer());
-
-  if(filter)
-    {
-    this->getPipelineBuilder()->addConnection(input, filter);
-    if (vtkSMProperty* const input_prop = filter->getProxy()->GetProperty("Input"))
-      {
-      input_prop->UpdateDependentDomains();
-      }
-    filter->setDefaultValues();
-
-    // As a special-case, set a default implicit function for new Cut filters
-    if(xmlname == "Cut")
-      {
-      if(vtkSMDoubleVectorProperty* const contours =
-        vtkSMDoubleVectorProperty::SafeDownCast(
-          filter->getProxy()->GetProperty("ContourValues")))
-        {
-        contours->SetNumberOfElements(1);
-        contours->SetElement(0, 0.0);
-        }
-      }
-
-    // As a special-case, set the default contour for new Contour filters
-    if(xmlname == "Contour")
-      {
-      double min_value = 0.0;
-      double max_value = 0.0;
-
-      ::SetDefaultInputArray(filter->getProxy(), "SelectInputScalars");
-
-      if(vtkSMDoubleVectorProperty* const contours =
-        vtkSMDoubleVectorProperty::SafeDownCast(
-          filter->getProxy()->GetProperty("ContourValues")))
-        {
-        if(vtkSMDoubleRangeDomain* const domain =
-          vtkSMDoubleRangeDomain::SafeDownCast(
-            contours->GetDomain("scalar_range")))
-          {
-          int min_exists = 0;
-          min_value = domain->GetMinimum(0, min_exists);
-          
-          int max_exists = 0;
-          max_value = domain->GetMaximum(0, max_exists);
-          }
-
-        contours->SetNumberOfElements(1);
-        contours->SetElement(0, (min_value + max_value) * 0.5);
-        }
-      }
-
-    // As a special-case, set a default point source for new StreamTracer filters
-    if(xmlname == "StreamTracer")
-      {
-      ::SetDefaultInputArray(filter->getProxy(), "SelectInputVectors");
-      }
-    }
-
-  emit this->finishSourceCreation(filter);
-  this->getUndoStack()->endUndoSet();
-  emit this->finishedAddingSource(filter);
-  return filter;
-}
-
-pqPipelineSource* pqApplicationCore::createSourceOnServer(const QString& xmlname,
-  pqServer* server)
-{
-  if (!server)
-    {
-    qDebug() << "No server specified. "
-      << "Cannot createSourceOnServer.";
-    return 0;
-    }
-
-  this->getUndoStack()->beginUndoSet(QString("Create ") + xmlname);
-
-  pqPipelineSource* source = this->getPipelineBuilder()->createSource(
-    "sources", xmlname.toAscii().data(), server);
-  source->setDefaultValues();
-
-  emit this->finishSourceCreation(source);
-  this->getUndoStack()->endUndoSet();
-  
-  emit this->finishedAddingSource(source);
-  return source;
-}
-
-pqPipelineSource* pqApplicationCore::createCompoundFilter(
-                         const QString& name,
-                         pqServer* server,
-                         pqPipelineSource* input)
-{
-  this->getUndoStack()->beginUndoSet(QString("Create ") + name);
-
-  pqPipelineSource* source = this->getPipelineBuilder()->createSource(
-    NULL, name.toAscii().data(), server);
-  
-  vtkSMProperty* inputProperty = NULL;
-
-  if(source)
-    {
-    inputProperty = source->getProxy()->GetProperty("Input");
-    }
-
-  if(inputProperty && input == NULL)
-    {
-    this->removeSource(source);
-    source = NULL;
-    qWarning() << "Cannot create custom filter without active input source.";
-    }
-  else if(inputProperty && input)
-    {
-    this->getPipelineBuilder()->addConnection(input, source);
-    inputProperty->UpdateDependentDomains();
-    }
-
-  if(source)
-    {
-    source->setDefaultValues();
-    }
-
-  emit this->finishSourceCreation(source);
-  this->getUndoStack()->endUndoSet();
-  emit this->finishedAddingSource(source);
-  return source;
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineSource* pqApplicationCore::createReaderOnServer(
-               const QString& filename,
-               pqServer* server,
-               QString whichReader)
-{
-  if (!server)
-    {
-    qDebug() << "No active server. Cannot create reader.";
-    return 0;
-    }
-    
-  if(this->getReaderFactory()->checkIfFileIsReadable(filename, server))
-    {
-    qDebug() << "File \"" << filename << "\"  cannot be read.";
-    return NULL; 
-    }
-  
-  this->getUndoStack()->beginUndoSet(QString("Create reader for ") + filename);
-
-  if(whichReader == QString::null)
-    {
-    whichReader = this->getReaderFactory()->getReaderType(filename, server);
-    }
-
-  pqPipelineSource* reader= this->getReaderFactory()->createReader(whichReader,
-                                                                   server);
-  if (!reader)
-    {
-    this->getUndoStack()->endUndoSet();
-    return NULL;
-    }
-
-  vtkSMProxy* proxy = reader->getProxy();
-
-  vtkSMProperty* prop =
-    this->getReaderFactory()->getFileNameProperty(proxy);
-
-  if (prop)
-    {
-    pqSMAdaptor::setElementProperty(prop, filename);
-    proxy->UpdateVTKObjects();
-    }
-
-  // Update pipeline information so that the reader
-  // readers file headers and obtains necessary information.
-  vtkSMSourceProxy::SafeDownCast(proxy)->UpdatePipelineInformation();
-  proxy->UpdatePropertyInformation();
-  reader->setDefaultValues();
-
-  // Set the proxy name to be the same as the filename.
-  reader->rename(
-    vtksys::SystemTools::GetFilenameName(filename.toAscii().data()).c_str());
-
-  emit this->finishSourceCreation(reader);
-  this->getUndoStack()->endUndoSet();
-  emit this->finishedAddingSource(reader);
-  return reader;
 }
 
 //-----------------------------------------------------------------------------

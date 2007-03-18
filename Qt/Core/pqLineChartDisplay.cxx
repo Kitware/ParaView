@@ -67,9 +67,15 @@ pqLineChartDisplay::~pqLineChartDisplay()
 }
 
 //-----------------------------------------------------------------------------
-void pqLineChartDisplay::setDefaults()
+void pqLineChartDisplay::setDefaultPropertyValues()
 {
-  this->Superclass::setDefaults();
+  this->Superclass::setDefaultPropertyValues();
+
+  if (!this->isVisible())
+    {
+    // we don't worry about invisible display defaults.
+    return;
+    }
 
   vtkSMProxy* proxy = this->getProxy();
   proxy->GetProperty("CellArrayInfo")->UpdateDependentDomains();
