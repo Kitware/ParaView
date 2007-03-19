@@ -395,7 +395,7 @@ MACRO(ADD_PARAVIEW_PLUGIN NAME VERSION)
     ENDIF(SM_SRCS)
   
   ELSE(PARAVIEW_BUILD_SHARED_LIBS)
-    MESSAGE(STATUS "ParaView plugins are disabled.  Please build ParaView with shared libraries.") 
+    MESSAGE("ParaView plugins are disabled.  Please build ParaView with shared libraries.") 
   ENDIF(PARAVIEW_BUILD_SHARED_LIBS)
 
 ENDMACRO(ADD_PARAVIEW_PLUGIN)
