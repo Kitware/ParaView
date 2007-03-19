@@ -359,14 +359,16 @@ void pqColorMapWidget::mouseReleaseEvent(QMouseEvent *e)
           this->Model->removePoint(index);
           }
         }
-      else
+      else if(e->modifiers() == Qt::NoModifier)
         {
         // Make a request for the color change event.
         emit this->colorChangeRequested(this->Internal->PointIndex);
         }
       }
-    else if(this->AddingAllowed && this->Internal->PixelMap.isValid() &&
-        this->isInScaleRegion(e->x(), e->y()))
+    else if(this->AddingAllowed && e->modifiers() == Qt::NoModifier &&
+        this->Internal->PixelMap.isValid() &&
+        this->Internal->ImageArea.contains(e->pos()) &&
+        !this->Internal->Items.contains(e->x()))
       {
       // Add a point to the list. Use the mouse position to determine
       // the value and color.
