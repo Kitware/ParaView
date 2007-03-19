@@ -56,7 +56,7 @@ pqTextDisplayPropertiesWidget::pqTextDisplayPropertiesWidget(pqDisplay* display,
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(renderAllViews()));
+    this, SLOT(updateAllViews()));
   this->setDisplay(display);
 }
 
