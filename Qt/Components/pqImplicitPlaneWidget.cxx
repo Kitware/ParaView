@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqImplicitPlaneWidget.h"
 #include "pqRenderViewModule.h"
-#include "pqServerManagerModel.h"
 #include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineDisplay.h"
@@ -93,8 +92,8 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqImplicitPlaneWidget
 
-pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
-  Superclass(p),
+pqImplicitPlaneWidget::pqImplicitPlaneWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
+  Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
   this->ScaleFactor[0] = 1;
@@ -147,6 +146,9 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
 
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
     this, SIGNAL(widgetChanged()));
+  
+  
+  this->createWidget(o->getServer());
 }
 
 pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
@@ -235,19 +237,6 @@ void pqImplicitPlaneWidget::cleanupWidget()
       free3DWidget(widget);
     }
   this->setWidgetProxy(0);
-}
-
-//-----------------------------------------------------------------------------
-void pqImplicitPlaneWidget::setControlledProxy(vtkSMProxy* proxy)
-{
-  if (!this->getWidgetProxy())
-    {
-    pqServerManagerModel* smModel = 
-      pqApplicationCore::instance()->getServerManagerModel();
-    this->createWidget(smModel->getServer(proxy->GetConnectionID()));
-    }
-
-  this->Superclass::setControlledProxy(proxy);
 }
 
 //-----------------------------------------------------------------------------

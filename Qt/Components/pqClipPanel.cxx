@@ -58,45 +58,20 @@ class pqClipPanel::pqImplementation
 public:
   pqImplementation() :
     InsideOutWidget(tr("Inside Out")),
-    ImplicitPlaneWidget()
+    ImplicitPlaneWidget(NULL)
   {
   }
   
   /// Provides a Qt control for the "Inside Out" property of the Clip filter
   QCheckBox InsideOutWidget;
   /// Manages a 3D implicit plane widget, plus Qt controls  
-  pqImplicitPlaneWidget ImplicitPlaneWidget;
+  pqImplicitPlaneWidget* ImplicitPlaneWidget;
 };
 
 pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
   Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
-  pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
-  group1->setTitle(tr("Clip"));
-  QVBoxLayout* l = new QVBoxLayout(group1);
-  l->addWidget(&this->Implementation->InsideOutWidget);
-
-  pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
-  group2->setTitle(tr("Implicit Plane"));
-  l = new QVBoxLayout(group2);
-  this->Implementation->ImplicitPlaneWidget.layout()->setMargin(0);
-  l->addWidget(&this->Implementation->ImplicitPlaneWidget);
-  
-  QVBoxLayout* const panel_layout = new QVBoxLayout(this);
-  panel_layout->addWidget(group1);
-  panel_layout->addWidget(group2);
-  panel_layout->addStretch();
-  
-  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
-                   &this->Implementation->ImplicitPlaneWidget,
-                   SLOT(setRenderModule(pqRenderViewModule*)));
-
-  connect(&this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onWidgetChanged()));
-  connect(this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
-  connect(this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
-
-  pqProxy* reference_proxy = this->proxy();
   vtkSMProxy* controlled_proxy = NULL;
    
   if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
@@ -114,10 +89,36 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
       }
     controlled_proxy = clip_function_property->GetProxy(0);
     controlled_proxy->UpdateVTKObjects();
+    controlled_proxy->UpdatePropertyInformation();
     }
+  
+  this->Implementation->ImplicitPlaneWidget =
+    new pqImplicitPlaneWidget(this->proxy(), controlled_proxy, NULL);
 
-  this->Implementation->ImplicitPlaneWidget.setReferenceProxy(reference_proxy);
-  this->Implementation->ImplicitPlaneWidget.setControlledProxy(controlled_proxy);
+  pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
+  group1->setTitle(tr("Clip"));
+  QVBoxLayout* l = new QVBoxLayout(group1);
+  l->addWidget(&this->Implementation->InsideOutWidget);
+
+  pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
+  group2->setTitle(tr("Implicit Plane"));
+  l = new QVBoxLayout(group2);
+  this->Implementation->ImplicitPlaneWidget->layout()->setMargin(0);
+  l->addWidget(this->Implementation->ImplicitPlaneWidget);
+  
+  QVBoxLayout* const panel_layout = new QVBoxLayout(this);
+  panel_layout->addWidget(group1);
+  panel_layout->addWidget(group2);
+  panel_layout->addStretch();
+  
+  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
+                   this->Implementation->ImplicitPlaneWidget,
+                   SLOT(setRenderModule(pqRenderViewModule*)));
+
+  connect(this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onWidgetChanged()));
+  connect(this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
+  connect(this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
+
 
   if (controlled_proxy)
     {
@@ -128,13 +129,13 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
       if (QString("PropertyGroup") == elem->GetName() && 
         QString("Plane") == elem->GetAttribute("type"))
         {
-        this->Implementation->ImplicitPlaneWidget.setHints(elem);
+        this->Implementation->ImplicitPlaneWidget->setHints(elem);
         break;
         }
       }
     }
-  this->Implementation->ImplicitPlaneWidget.resetBounds();
-  this->Implementation->ImplicitPlaneWidget.reset();
+  this->Implementation->ImplicitPlaneWidget->resetBounds();
+  this->Implementation->ImplicitPlaneWidget->reset();
 
   this->propertyManager()->registerLink(
     &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
@@ -155,20 +156,20 @@ void pqClipPanel::onWidgetChanged()
 
 void pqClipPanel::onAccepted()
 {
-  this->Implementation->ImplicitPlaneWidget.accept();
+  this->Implementation->ImplicitPlaneWidget->accept();
 }
 
 void pqClipPanel::onRejected()
 {
-  this->Implementation->ImplicitPlaneWidget.reset();
+  this->Implementation->ImplicitPlaneWidget->reset();
 }
 
 void pqClipPanel::select()
 {
-  this->Implementation->ImplicitPlaneWidget.select();
+  this->Implementation->ImplicitPlaneWidget->select();
 }
 
 void pqClipPanel::deselect()
 {
-  this->Implementation->ImplicitPlaneWidget.deselect();
+  this->Implementation->ImplicitPlaneWidget->deselect();
 }

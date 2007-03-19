@@ -65,8 +65,8 @@ class pqParticleTracerPanel::pqImplementation
 {
 public:
   pqImplementation() :
-    PointSourceWidget(new pqPointSourceWidget()),
-    LineSourceWidget(new pqLineSourceWidget())
+    PointSourceWidget(NULL),
+    LineSourceWidget(NULL)
   {
   }
 
@@ -80,9 +80,9 @@ public:
   QWidget UIContainer;
 
   /// Provides a UI for managing a vtkPointSource
-  pqPointSourceWidget* const PointSourceWidget;
+  pqPointSourceWidget* PointSourceWidget;
   /// Manages a 3D line widget, plus Qt controls  
-  pqLineSourceWidget* const LineSourceWidget;
+  pqLineSourceWidget* LineSourceWidget;
   /// Provides the remaining Qt controls for the panel
   Ui::pqParticleTracerPanel UI;
 };
@@ -92,6 +92,121 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
   Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
+  // Get the boundaries of the new proxy ...
+  double proxy_center[3];
+  double proxy_size[3];
+  
+  if(vtkSMProxyProperty* const input_property =
+    vtkSMProxyProperty::SafeDownCast(
+      this->proxy()->getProxy()->GetProperty("Input")))
+    {
+    if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
+      input_property->GetProxy(0)))
+      {
+      double input_bounds[6];
+      input_proxy->GetDataInformation()->GetBounds(input_bounds);
+
+      proxy_center[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
+      proxy_center[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
+      proxy_center[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
+
+      proxy_size[0] = fabs(input_bounds[1] - input_bounds[0]);
+      proxy_size[1] = fabs(input_bounds[3] - input_bounds[2]);
+      proxy_size[2] = fabs(input_bounds[5] - input_bounds[4]);
+      }
+    }
+  
+  vtkSMProxyProperty* source_property = vtkSMProxyProperty::SafeDownCast(
+    this->proxy()->getProxy()->GetProperty("Source"));
+  
+  QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
+    
+  for(int i = 0; i != sources.size(); ++i)
+    {
+    pqSMProxy source = sources[i];
+    if(source->GetVTKClassName() == QString("vtkPointSource"))
+      {
+      if(vtkSMDoubleVectorProperty* const center =
+        vtkSMDoubleVectorProperty::SafeDownCast(
+          source->GetProperty("Center")))
+        {
+        center->SetNumberOfElements(3);
+        center->SetElement(0, proxy_center[0]);
+        center->SetElement(1, proxy_center[1]);
+        center->SetElement(2, proxy_center[2]);
+        }
+          
+      if(vtkSMIntVectorProperty* const number_of_points =
+        vtkSMIntVectorProperty::SafeDownCast(
+          source->GetProperty("NumberOfPoints")))
+        {
+        number_of_points->SetNumberOfElements(1);
+        number_of_points->SetElement(0, 100);
+        }
+      source->UpdateVTKObjects();
+
+      this->Implementation->PointSourceWidget = 
+        new pqPointSourceWidget(this->proxy(), source, NULL);
+
+      if(vtkPVXMLElement* const hints = source->GetHints())
+        {
+        for(unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
+          {
+          if(vtkPVXMLElement* const elem = hints->GetNestedElement(cc))
+            {
+            if (QString("PropertyGroup") == elem->GetName() && 
+              QString("PointSource") == elem->GetAttribute("type"))
+              {
+              this->Implementation->PointSourceWidget->setHints(elem);
+              break;
+              }
+            }
+          }
+        }
+      }
+    else if(source->GetVTKClassName() == QString("vtkLineSource"))
+      {
+      if(vtkSMDoubleVectorProperty* const point1 =
+        vtkSMDoubleVectorProperty::SafeDownCast(
+          source->GetProperty("Point1")))
+        {
+        point1->SetNumberOfElements(3);
+        point1->SetElement(0, proxy_center[0] - proxy_size[0]);
+        point1->SetElement(1, proxy_center[1]);
+        point1->SetElement(2, proxy_center[2]);
+        }
+          
+      if(vtkSMDoubleVectorProperty* const point2 =
+        vtkSMDoubleVectorProperty::SafeDownCast(
+          source->GetProperty("Point2")))
+        {
+        point2->SetNumberOfElements(3);
+        point2->SetElement(0, proxy_center[0] + proxy_size[0]);
+        point2->SetElement(1, proxy_center[1]);
+        point2->SetElement(2, proxy_center[2]);
+        }
+          
+      if(vtkSMIntVectorProperty* const resolution =
+        vtkSMIntVectorProperty::SafeDownCast(
+          source->GetProperty("Resolution")))
+        {
+        resolution->SetNumberOfElements(1);
+        resolution->SetElement(0, 100);
+        }
+      source->UpdateVTKObjects();
+
+      this->Implementation->LineSourceWidget = 
+        new pqLineSourceWidget(this->proxy(), source, NULL);
+      
+      vtkSMProperty* const point1 = source->GetProperty("Point1");
+      vtkSMProperty* const point2 = source->GetProperty("Point2");
+      vtkSMProperty* const resolution = source->GetProperty("Resolution");
+          
+      if(point1 && point2 && resolution)
+        this->Implementation->LineSourceWidget->setControlledProperties(point1, point2, resolution);
+      }
+    }
+
   this->Implementation->UI.setupUi(
     &this->Implementation->UIContainer);
   
@@ -149,30 +264,8 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
   QObject::connect(
     this, SIGNAL(ondeselect()), this->Implementation->LineSourceWidget, SLOT(deselect()));
 
-  // Get the boundaries of the new proxy ...
-  double proxy_center[3];
-  double proxy_size[3];
-  
-  if(vtkSMProxyProperty* const input_property =
-    vtkSMProxyProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("Input")))
-    {
-    if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
-      input_property->GetProxy(0)))
-      {
-      double input_bounds[6];
-      input_proxy->GetDataInformation()->GetBounds(input_bounds);
+#if 0
 
-      proxy_center[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
-      proxy_center[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
-      proxy_center[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
-
-      proxy_size[0] = fabs(input_bounds[1] - input_bounds[0]);
-      proxy_size[1] = fabs(input_bounds[3] - input_bounds[2]);
-      proxy_size[2] = fabs(input_bounds[5] - input_bounds[4]);
-      }
-    }
-      
   if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
     this->proxy()->getProxy()->GetProperty("Source")))
     {
@@ -246,9 +339,14 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
       this->Implementation->LineSourceWidget->setWidgetVisible(false);
       }
     }
+#endif
 
   pqNamedWidgets::link(
     &this->Implementation->UIContainer, this->proxy()->getProxy(), this->propertyManager());
+  
+  // TODO:  remove this as we should just accept the values we get from the
+  // server manager
+  this->Implementation->UI.seedType->setCurrentIndex(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -260,57 +358,8 @@ pqParticleTracerPanel::~pqParticleTracerPanel()
 //-----------------------------------------------------------------------------
 void pqParticleTracerPanel::onRenderModuleChanged(pqRenderViewModule* render_module)
 {
-  // Setup widgets for each available source ...
-  if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("Source")))
-    {
-    const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
-    
-    for(int i = 0; i != sources.size(); ++i)
-      {
-      pqSMProxy source = sources[i];
-
-      // Setup the point source widget ...        
-      if(source->GetVTKClassName() == QString("vtkPointSource"))
-        {
-        this->Implementation->PointSourceWidget->setReferenceProxy(
-          this->proxy());
-        this->Implementation->PointSourceWidget->setControlledProxy(
-          source);
-        this->Implementation->PointSourceWidget->setRenderModule(render_module);
-
-        if(vtkPVXMLElement* const hints = source->GetHints())
-          {
-          for(unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
-            {
-            if(vtkPVXMLElement* const elem = hints->GetNestedElement(cc))
-              {
-              if (QString("PropertyGroup") == elem->GetName() && 
-                QString("PointSource") == elem->GetAttribute("type"))
-                {
-                this->Implementation->PointSourceWidget->setHints(elem);
-                break;
-                }
-              }
-            }
-          }
-        }
-      // Setup the line widget ...
-      else if(source->GetVTKClassName() == QString("vtkLineSource"))
-        {
-        this->Implementation->LineSourceWidget->setReferenceProxy(this->proxy());
-        this->Implementation->LineSourceWidget->setControlledProxy(source);
-        this->Implementation->LineSourceWidget->setRenderModule(render_module);
-        
-        vtkSMProperty* const point1 = source->GetProperty("Point1");
-        vtkSMProperty* const point2 = source->GetProperty("Point2");
-        vtkSMProperty* const resolution = source->GetProperty("Resolution");
-            
-        if(point1 && point2 && resolution)
-          this->Implementation->LineSourceWidget->setControlledProperties(point1, point2, resolution);
-        }
-      }
-    }
+  this->Implementation->PointSourceWidget->setRenderModule(render_module);
+  this->Implementation->LineSourceWidget->setRenderModule(render_module);
 }
 
 //-----------------------------------------------------------------------------

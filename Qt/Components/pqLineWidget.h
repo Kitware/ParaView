@@ -46,7 +46,7 @@ class PQCOMPONENTS_EXPORT pqLineWidget : public pq3DWidget
   Q_OBJECT
   
 public:
-  pqLineWidget(QWidget* p = 0);
+  pqLineWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p = 0);
   ~pqLineWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
@@ -57,7 +57,6 @@ public:
   /// and hints have been set.
   virtual void resetBounds();
 
-  void setControlledProxy(vtkSMProxy* proxy);
   void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2);
 
 public slots:

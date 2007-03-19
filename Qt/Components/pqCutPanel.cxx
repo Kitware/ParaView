@@ -56,13 +56,13 @@ class pqCutPanel::pqImplementation
 {
 public:
   pqImplementation() :
-    ImplicitPlaneWidget(),
+    ImplicitPlaneWidget(NULL),
     SampleScalarWidget(false)
   {
   }
   
   /// Manages a 3D implicit plane widget, plus Qt controls  
-  pqImplicitPlaneWidget ImplicitPlaneWidget;
+  pqImplicitPlaneWidget* ImplicitPlaneWidget;
   /// Controls the number and position of "slices"
   pqSampleScalarWidget SampleScalarWidget;
 };
@@ -71,47 +71,7 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
   Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
-  pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
-  group1->setTitle(tr("Implicit Plane"));
-  QVBoxLayout* l = new QVBoxLayout(group1);
-  this->Implementation->ImplicitPlaneWidget.layout()->setMargin(0);
-  l->addWidget(&this->Implementation->ImplicitPlaneWidget);
-
-  pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
-  group2->setTitle(tr("Slices"));
-  l = new QVBoxLayout(group2);
-  this->Implementation->SampleScalarWidget.layout()->setMargin(0);
-  l->addWidget(&this->Implementation->SampleScalarWidget);
-  
-  QVBoxLayout* const panel_layout = new QVBoxLayout(this);
-  panel_layout->addWidget(group1);
-  panel_layout->addWidget(group2);
-  panel_layout->addStretch();
-  
-  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
-                   &this->Implementation->ImplicitPlaneWidget,
-                   SLOT(setRenderModule(pqRenderViewModule*)));
-
-  connect(
-    &this->Implementation->ImplicitPlaneWidget,
-    SIGNAL(widgetChanged()),
-    this->propertyManager(),
-    SLOT(propertyChanged()));
-    
-  connect(
-    &this->Implementation->SampleScalarWidget,
-    SIGNAL(samplesChanged()),
-    this->propertyManager(),
-    SLOT(propertyChanged()));
-  
-  connect(
-    this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
-    
-  connect(
-    this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
-
   // Setup the implicit plane widget ...
-  pqProxy* reference_proxy = this->proxy();
   pqSMProxy controlled_proxy = NULL;
    
   if(vtkSMProxyProperty* const cut_function_property = vtkSMProxyProperty::SafeDownCast(
@@ -131,8 +91,48 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
     controlled_proxy->UpdateVTKObjects();
     }
 
-  this->Implementation->ImplicitPlaneWidget.setReferenceProxy(reference_proxy);
-  this->Implementation->ImplicitPlaneWidget.setControlledProxy(controlled_proxy);
+  this->Implementation->ImplicitPlaneWidget = 
+    new pqImplicitPlaneWidget(this->proxy(), controlled_proxy, NULL);
+
+  pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
+  group1->setTitle(tr("Implicit Plane"));
+  QVBoxLayout* l = new QVBoxLayout(group1);
+  this->Implementation->ImplicitPlaneWidget->layout()->setMargin(0);
+  l->addWidget(this->Implementation->ImplicitPlaneWidget);
+
+  pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
+  group2->setTitle(tr("Slices"));
+  l = new QVBoxLayout(group2);
+  this->Implementation->SampleScalarWidget.layout()->setMargin(0);
+  l->addWidget(&this->Implementation->SampleScalarWidget);
+  
+  QVBoxLayout* const panel_layout = new QVBoxLayout(this);
+  panel_layout->addWidget(group1);
+  panel_layout->addWidget(group2);
+  panel_layout->addStretch();
+  
+  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
+                   this->Implementation->ImplicitPlaneWidget,
+                   SLOT(setRenderModule(pqRenderViewModule*)));
+
+  connect(
+    this->Implementation->ImplicitPlaneWidget,
+    SIGNAL(widgetChanged()),
+    this->propertyManager(),
+    SLOT(propertyChanged()));
+    
+  connect(
+    &this->Implementation->SampleScalarWidget,
+    SIGNAL(samplesChanged()),
+    this->propertyManager(),
+    SLOT(propertyChanged()));
+  
+  connect(
+    this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
+    
+  connect(
+    this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
+
 
   if (controlled_proxy)
     {
@@ -143,12 +143,12 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
       if (QString("PropertyGroup") == elem->GetName() && 
         QString("Plane") == elem->GetAttribute("type"))
         {
-        this->Implementation->ImplicitPlaneWidget.setHints(elem);
+        this->Implementation->ImplicitPlaneWidget->setHints(elem);
         break;
         }
       }
     }
-  this->Implementation->ImplicitPlaneWidget.resetBounds();
+  this->Implementation->ImplicitPlaneWidget->resetBounds();
 
   // Setup the sample scalar widget ...
   this->Implementation->SampleScalarWidget.setDataSources(
@@ -163,27 +163,27 @@ pqCutPanel::~pqCutPanel()
 
 void pqCutPanel::onAccepted()
 {
-  this->Implementation->ImplicitPlaneWidget.accept();
+  this->Implementation->ImplicitPlaneWidget->accept();
   this->Implementation->SampleScalarWidget.accept();
 }
 
 void pqCutPanel::onRejected()
 {
-  this->Implementation->ImplicitPlaneWidget.reset();
+  this->Implementation->ImplicitPlaneWidget->reset();
   this->Implementation->SampleScalarWidget.reset();
 }
 
 void pqCutPanel::select()
 {
-  this->Implementation->ImplicitPlaneWidget.select();
+  this->Implementation->ImplicitPlaneWidget->select();
 }
 
 void pqCutPanel::deselect()
 {
-  this->Implementation->ImplicitPlaneWidget.deselect();
+  this->Implementation->ImplicitPlaneWidget->deselect();
 }
 
 pqImplicitPlaneWidget* pqCutPanel::getImplicitPlaneWidget()
 {
-  return &this->Implementation->ImplicitPlaneWidget;
+  return this->Implementation->ImplicitPlaneWidget;
 }

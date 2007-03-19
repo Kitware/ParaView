@@ -48,7 +48,7 @@ class PQCOMPONENTS_EXPORT pqPointSourceWidget : public pqHandleWidget
   Q_OBJECT
   
 public:
-  pqPointSourceWidget(QWidget* p = 0);
+  pqPointSourceWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p = 0);
   ~pqPointSourceWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.

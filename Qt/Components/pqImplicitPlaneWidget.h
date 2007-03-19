@@ -50,14 +50,8 @@ class PQCOMPONENTS_EXPORT pqImplicitPlaneWidget : public pq3DWidget
   Q_OBJECT
   
 public:
-  pqImplicitPlaneWidget(QWidget* p = 0);
+  pqImplicitPlaneWidget(pqProxy* o, vtkSMProxy* proxy, QWidget* p = 0);
   ~pqImplicitPlaneWidget();
-
-  /// Controlled proxy is a proxy which is controlled by the 3D widget.
-  /// A controlled proxy must provide "Hints" describing how
-  /// the properties of the controlled proxy are controlled by the
-  /// 3D widget.
-  virtual void setControlledProxy(vtkSMProxy*);
 
   /// A implicit plane widget can optionally have  a ScaleFactor/ScaleOrigin
   /// which affects how the widget is placed on reset bounds.

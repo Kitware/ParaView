@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QFileIconProvider>
 #include <QStyle>
+#include <QDir>
 #include <QApplication>
 
 #include <pqServer.h>

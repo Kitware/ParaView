@@ -285,7 +285,7 @@ void pqSignalAdaptorProxyList::initialize3DWidget()
 pq3DWidget* pqSignalAdaptorProxyList::new3DWidget(vtkSMProxy* smProxy)
 {
   QList<pq3DWidget*> widgets =
-    pq3DWidget::createWidgets(smProxy);
+    pq3DWidget::createWidgets(this->Internal->ReferenceProxy, smProxy);
   if (widgets.size() == 0)
     {
     return 0;
@@ -301,7 +301,7 @@ pq3DWidget* pqSignalAdaptorProxyList::new3DWidget(vtkSMProxy* smProxy)
     }
 
   widgets[0]->setParent(this->Internal->WidgetFrame);
-  widgets[0]->setReferenceProxy(this->Internal->ReferenceProxy);
+  //widgets[0]->setReferenceProxy(this->Internal->ReferenceProxy);
   // We implicitly reset the widget bounds the first time the widget is shown.
   widgets[0]->resetBounds();
   widgets[0]->reset();

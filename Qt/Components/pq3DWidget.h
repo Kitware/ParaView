@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pq3DWidget : public QWidget
   Q_OBJECT
 
 public:
-  pq3DWidget(QWidget* parent=0);
+  pq3DWidget(pqProxy* object, vtkSMProxy* proxy, QWidget* parent=0);
   virtual ~pq3DWidget();
 
   // This method creates widgets using the hints provided by 
@@ -60,18 +60,16 @@ public:
   // return them. There is no parent associated with the newly
   // created 3D widgets, it's the responsibility of the caller
   // to do the memory management for the 3D widgets.
-  static QList<pq3DWidget*> createWidgets(vtkSMProxy* proxy);
+  static QList<pq3DWidget*> createWidgets(pqProxy*, vtkSMProxy* proxy);
 
   /// Reference proxy is a proxy which is used to determine the bounds
   /// for the 3D widget.
-  virtual void setReferenceProxy(pqProxy*);
   pqProxy* getReferenceProxy() const;
 
   /// Controlled proxy is a proxy which is controlled by the 3D widget.
   /// A controlled proxy must provide "Hints" describing how
   /// the properties of the controlled proxy are controlled by the
   /// 3D widget.
-  virtual void setControlledProxy(vtkSMProxy*);
   vtkSMProxy* getControlledProxy() const;
 
   /// Set the hints XML to be using to map the 3D widget to the controlled
@@ -152,6 +150,7 @@ protected:
   /// accept/reset.
   virtual void setControlledProperty(const char* function,
     vtkSMProperty * controlled_property);
+  
 
   void setControlledProperty(vtkSMProperty* widget_property, vtkSMProperty* controlled_property);
 
@@ -167,6 +166,9 @@ protected:
   int getReferenceInputBounds(double bounds[6]) const;
 
 private:
+  void setReferenceProxy(pqProxy*);
+  void setControlledProxy(vtkSMProxy*);
+
   void updateWidgetVisibility();
   pq3DWidgetInternal* const Internal;
 };

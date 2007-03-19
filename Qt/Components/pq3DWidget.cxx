@@ -85,7 +85,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pq3DWidget::pq3DWidget(QWidget* _p) :
+pq3DWidget::pq3DWidget(pqProxy* o, vtkSMProxy* proxy, QWidget* _p) :
   QWidget(_p),
   Internal(new pq3DWidgetInternal())
 {
@@ -93,6 +93,9 @@ pq3DWidget::pq3DWidget(QWidget* _p) :
     vtkMakeMemberFunctionCommand(*this, 
       &pq3DWidget::onControlledPropertyChanged));
   this->Internal->IgnorePropertyChange = false;
+
+  this->setControlledProxy(proxy);
+  this->setReferenceProxy(o);
 }
 
 //-----------------------------------------------------------------------------
@@ -104,7 +107,7 @@ pq3DWidget::~pq3DWidget()
 }
 
 //-----------------------------------------------------------------------------
-QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* proxy)
+QList<pq3DWidget*> pq3DWidget::createWidgets(pqProxy* o, vtkSMProxy* proxy)
 {
   QList<pq3DWidget*> widgets;
 
@@ -119,28 +122,27 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* proxy)
       pq3DWidget *widget = 0;
       if (widgetType == "Plane")
         {
-        widget = new pqImplicitPlaneWidget(0);
+        widget = new pqImplicitPlaneWidget(o, proxy, 0);
         }
       else if (widgetType == "Handle")
         {
-        widget = new pqHandleWidget(0);
+        widget = new pqHandleWidget(o, proxy, 0);
         }
       else if (widgetType == "PointSource")
         {
-        widget = new pqPointSourceWidget(0);
+        widget = new pqPointSourceWidget(o, proxy, 0);
         }
       else if (widgetType == "LineSource")
         {
-        widget = new pqLineSourceWidget(0);
+        widget = new pqLineSourceWidget(o, proxy, 0);
         }
       else if (widgetType == "Line")
         {
-        widget = new pqLineWidget(0);
+        widget = new pqLineWidget(o, proxy, 0);
         }
 
       if (widget)
         {
-        widget->setControlledProxy(proxy);
         widget->setHints(element);
         widgets.push_back(widget);
         }

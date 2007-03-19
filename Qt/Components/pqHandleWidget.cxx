@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqHandleWidget.h"
 #include "pqRenderViewModule.h"
-#include "pqServerManagerModel.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
@@ -88,8 +87,8 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqHandleWidget
 
-pqHandleWidget::pqHandleWidget(QWidget* p) :
-  Superclass(p),
+pqHandleWidget::pqHandleWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
+  Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
   this->Implementation->StartDragObserver.TakeReference(
@@ -120,6 +119,8 @@ pqHandleWidget::pqHandleWidget(QWidget* p) :
 
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
     this, SIGNAL(widgetChanged()));
+    
+  this->createWidget(o->getServer());
 }
 
 //-----------------------------------------------------------------------------
@@ -182,19 +183,6 @@ void pqHandleWidget::cleanupWidget()
       free3DWidget(widget);
     }
   this->setWidgetProxy(0);
-}
-
-//-----------------------------------------------------------------------------
-void pqHandleWidget::setControlledProxy(vtkSMProxy* proxy)
-{
-  if (!this->getWidgetProxy())
-    {
-    pqServerManagerModel* smModel = 
-      pqApplicationCore::instance()->getServerManagerModel();
-    this->createWidget(smModel->getServer(proxy->GetConnectionID()));
-    }
-
-  this->Superclass::setControlledProxy(proxy);
 }
 
 //-----------------------------------------------------------------------------

@@ -69,8 +69,8 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqPointSourceWidget
 
-pqPointSourceWidget::pqPointSourceWidget(QWidget* p) :
-  Superclass(p),
+pqPointSourceWidget::pqPointSourceWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
+  Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
   this->Implementation->Controls.setupUi(

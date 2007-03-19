@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqRenderViewModule.h"
 #include "pqSMSignalAdaptors.h"
-#include "pqServerManagerModel.h"
 
 #include "ui_pqLineWidget.h"
 
@@ -82,8 +81,8 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqLineWidget
 
-pqLineWidget::pqLineWidget(QWidget* p) :
-  Superclass(p),
+pqLineWidget::pqLineWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
+  Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
   this->Implementation->UI.setupUi(this);
@@ -116,6 +115,8 @@ pqLineWidget::pqLineWidget(QWidget* p) :
 
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
     this, SIGNAL(widgetChanged()));
+  
+  this->createWidget(o->getServer());
 }
 
 pqLineWidget::~pqLineWidget()
@@ -131,18 +132,6 @@ pqLineWidget::~pqLineWidget()
     }
 
   delete this->Implementation;
-}
-
-void pqLineWidget::setControlledProxy(vtkSMProxy* proxy)
-{
-  if (!this->getWidgetProxy())
-    {
-    pqServerManagerModel* smModel = 
-      pqApplicationCore::instance()->getServerManagerModel();
-    this->createWidget(smModel->getServer(proxy->GetConnectionID()));
-    }
-
-  this->Superclass::setControlledProxy(proxy);
 }
 
 //-----------------------------------------------------------------------------

@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqRenderViewModule.h"
 #include "pqSMSignalAdaptors.h"
-#include "pqServerManagerModel.h"
 
 #include "ui_pqLineSourceControls.h"
 
@@ -72,8 +71,8 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqLineSourceWidget
 
-pqLineSourceWidget::pqLineSourceWidget(QWidget* p) :
-  Superclass(p),
+pqLineSourceWidget::pqLineSourceWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
+  Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
   this->Implementation->UI.setupUi(

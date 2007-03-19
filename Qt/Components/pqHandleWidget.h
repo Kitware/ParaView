@@ -45,14 +45,9 @@ class PQCOMPONENTS_EXPORT pqHandleWidget : public pq3DWidget
 public:
   typedef pq3DWidget Superclass;
 
-  pqHandleWidget(QWidget* p);
+  pqHandleWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p);
   ~pqHandleWidget();
 
-  /// Controlled proxy is a proxy which is controlled by the 3D widget.
-  /// A controlled proxy must provide "Hints" describing how
-  /// the properties of the controlled proxy are controlled by the
-  /// 3D widget.
-  virtual void setControlledProxy(vtkSMProxy*);
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   /// This typically calls PlaceWidget on the underlying 3D Widget 
@@ -75,7 +70,7 @@ private slots:
 protected:
   /// Internal method to create the widget.
   void createWidget(pqServer*);
-
+  
   /// Internal method to cleanup widget.
   void cleanupWidget();
 private:

@@ -46,7 +46,7 @@ class pqLineSourceWidget :
   Q_OBJECT
   
 public:
-  pqLineSourceWidget(QWidget* p = 0);
+  pqLineSourceWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p = 0);
   ~pqLineSourceWidget();
 
   void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2, vtkSMProperty* resolution);
