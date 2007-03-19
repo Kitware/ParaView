@@ -3549,7 +3549,7 @@ The Contour filter operates on any type of data set, but the input is required t
        </Documentation>
      </IntVectorProperty>
      <Hints>
-       <Visibility replace_input="0" />
+       <Visibility replace_input="2" />
      </Hints>
    <!-- End Contour -->
    </SourceProxy>
