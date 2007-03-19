@@ -340,6 +340,8 @@ void pqViewManager::onFrameRemovedInternal(pqMultiViewFrame* frame)
 //-----------------------------------------------------------------------------
 void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
 {
+  bool was_active = frame->active();
+
   this->onFrameRemovedInternal(frame);
 
   if (this->Internal->CloseFrameUndoElement)
@@ -348,6 +350,12 @@ void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
     this->Internal->CloseFrameUndoElement = 0;
     }
   emit this->endUndo();
+
+  // Now activate some frame, so that we have an active view.
+  if (was_active && this->Internal->Frames.size() > 0)
+    {
+    this->Internal->Frames.begin().key()->setActive(true);
+    }
 }
 
 //-----------------------------------------------------------------------------
