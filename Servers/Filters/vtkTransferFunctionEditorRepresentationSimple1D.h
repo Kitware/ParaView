@@ -134,6 +134,8 @@ public:
   // Set the color to use for nodes if not coloring them by the color
   // transfer function.
   virtual void SetElementsColor(double r, double g, double b);
+  virtual void SetElementsColor(double color[3])
+    { this->SetElementsColor(color[0], color[1], color[2]); }
 
   // Description:
   // Set the lighting parameters for the transfer function editor elements.
