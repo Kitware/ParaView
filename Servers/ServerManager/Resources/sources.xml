@@ -322,6 +322,7 @@ The output of the Cone source is polygonal data.
          number_of_elements="3"
          animateable="1"
          default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range" />
          <Documentation>
            Set the center of the cone.
          </Documentation>
