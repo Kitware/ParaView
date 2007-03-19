@@ -1,3 +1,4 @@
+// This file is generated.  Do not edit.
 
 #if @HAVE_XML@
 #include "@XML_HEADER@"
