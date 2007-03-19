@@ -97,6 +97,9 @@ public slots:
 
   /// set the visibility of the delete button.
   void setDeleteButtonVisibility(bool visible);
+
+  /// sets the enabled state of the delete button.
+  void updateDeleteButtonState();
   
 signals:
   /// emitted before accept.
@@ -119,6 +122,9 @@ protected slots:
   void removeProxy(pqPipelineSource* proxy);
 
   void deleteProxy();
+
+  /// checks the enabled state of the delete button.
+  void handleConnectionChanged(pqPipelineSource* in, pqPipelineSource* out);
   
 private:
 

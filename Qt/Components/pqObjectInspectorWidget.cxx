@@ -217,7 +217,12 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
                 SIGNAL(sourceRemoved(pqPipelineSource*)),
                 SLOT(removeProxy(pqPipelineSource*)));
- 
+  this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
+      SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
+      SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
+  this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
+      SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
+      SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -370,8 +375,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   this->CurrentPanel->setRenderModule(this->getRenderModule());
   this->CurrentPanel->select();
   this->CurrentPanel->show();
-  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(proxy);
-  this->DeleteButton->setEnabled(source && source->getNumberOfConsumers() == 0);
+  this->updateDeleteButtonState();
 
   this->PanelStore[proxy] = this->CurrentPanel;
 }
@@ -488,6 +492,26 @@ void pqObjectInspectorWidget::deleteProxy()
 void pqObjectInspectorWidget::setDeleteButtonVisibility(bool visible)
 {
   this->DeleteButton->setVisible(visible);
+}
+
+void pqObjectInspectorWidget::handleConnectionChanged(pqPipelineSource* in,
+    pqPipelineSource*)
+{
+  if(this->CurrentPanel && this->CurrentPanel->proxy() == in)
+    {
+    this->updateDeleteButtonState();
+    }
+}
+
+void pqObjectInspectorWidget::updateDeleteButtonState()
+{
+  pqPipelineSource *source = 0;
+  if(this->CurrentPanel)
+    {
+    source = dynamic_cast<pqPipelineSource *>(this->CurrentPanel->proxy());
+    }
+
+  this->DeleteButton->setEnabled(source && source->getNumberOfConsumers() == 0);
 }
 
 

@@ -232,6 +232,10 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
     this->Pipeline = new pqPipelineModel(*this->Model, this);
     this->Pipeline->setEditable(false);
     this->Sources->setModel(this->Pipeline);
+    for(int i = 1; i < columns; ++i)
+      {
+      this->Sources->getHeader()->hideSection(i);
+      }
     }
 
   this->setWindowTitle("Input Editor");

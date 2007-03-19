@@ -95,6 +95,12 @@ void pqPipelineMenu::setModels(pqPipelineModel *model,
         this, SLOT(handleDeletion()));
     this->connect(this->Model, SIGNAL(destroyed()),
         this, SLOT(handleDeletion()));
+    this->connect(this->Model,
+        SIGNAL(rowsInserted(const QModelIndex &, int, int)),
+        this, SLOT(handleConnectionChange(const QModelIndex &)));
+    this->connect(this->Model,
+        SIGNAL(rowsRemoved(const QModelIndex &, int, int)),
+        this, SLOT(handleConnectionChange(const QModelIndex &)));
     }
 
   this->updateActions();
@@ -199,6 +205,29 @@ void pqPipelineMenu::handleDeletion()
   this->Model = 0;
   this->Selection = 0;
   this->updateActions();
+}
+
+void pqPipelineMenu::handleConnectionChange(const QModelIndex &parentIndex)
+{
+  if(this->MenuList[pqPipelineMenu::DeleteAction] != 0 && this->Selection &&
+      this->Selection->isSelected(parentIndex))
+    {
+    // TODO: Allow for deleting multiple items at once.
+    QModelIndexList indexes = this->Selection->selectedIndexes();
+    bool enabled = indexes.size() == 1;
+    if(enabled)
+      {
+      // TODO: If the item is a link, it can always be removed.
+      pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(
+          this->Model->getItemFor(indexes.first()));
+      if(source)
+        {
+        enabled = source->getNumberOfConsumers() == 0;
+        }
+      }
+
+    this->MenuList[pqPipelineMenu::DeleteAction]->setEnabled(enabled);
+    }
 }
 
 

@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPipelineModel;
 class QAction;
 class QItemSelectionModel;
+class QModelIndex;
 
 
 /// \class pqPipelineMenu
@@ -80,6 +81,7 @@ public slots:
 
 private slots:
   void handleDeletion();
+  void handleConnectionChange(const QModelIndex &parent);
 
 private:
   pqPipelineModel *Model;
