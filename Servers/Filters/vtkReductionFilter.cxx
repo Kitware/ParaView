@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.11");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.12");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -83,9 +83,14 @@ int vtkReductionFilter::RequestDataObject(
       this->PostGatherHelper->GetOutputPortInformation(0);
 
     const char *hOT = helpersInfo->Get(vtkDataObject::DATA_TYPE_NAME());
-    const char *helpersOutType = (
-      (!strcmp(hOT, "vtkDataSet") || !strcmp(hOT, "vtkDataObject")) ? 
-      "vtkUnstructuredGrid" : hOT);
+    const char *helpersOutType = hOT;
+    if ((!strcmp(hOT, "vtkDataSet") || !strcmp(hOT, "vtkDataObject")))
+      {
+      // Output type must be same as input.
+      vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+      vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+      helpersOutType = input? input->GetClassName() : "vtkUnstructuredGrid";
+      }
     
     vtkInformation* info = outputVector->GetInformationObject(0);
     vtkDataObject *output = reqInfo->Get(vtkDataObject::DATA_OBJECT());
