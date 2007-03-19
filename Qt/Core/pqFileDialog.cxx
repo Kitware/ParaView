@@ -564,6 +564,13 @@ void pqFileDialog::fileSelectionChanged()
 
   const QModelIndexList indices =
     this->Implementation->Ui.Files->selectionModel()->selectedIndexes();
+
+  if(indices.isEmpty())
+    {
+    // do not change the FileName text if no selections
+    return;
+    }
+
   for(int i = 0; i != indices.size(); ++i)
     {
     QModelIndex index = indices[i];
