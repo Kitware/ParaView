@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAction>
 #include <QItemSelectionModel>
+#include <QPushButton>
 #include <QtDebug>
 
 
@@ -89,8 +90,7 @@ void pqPipelineMenu::setModels(pqPipelineModel *model,
     // Listen to the new selection model's changes.
     this->connect(this->Selection,
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-        this,
-        SLOT(updateActions(const QItemSelection &, const QItemSelection &)));
+        this, SLOT(updateActions()));
     this->connect(this->Selection, SIGNAL(destroyed()),
         this, SLOT(handleDeletion()));
     this->connect(this->Model, SIGNAL(destroyed()),
@@ -192,12 +192,6 @@ void pqPipelineMenu::updateActions()
 
     this->MenuList[pqPipelineMenu::DeleteAction]->setEnabled(enabled);
     }
-}
-
-void pqPipelineMenu::updateActions(const QItemSelection &,
-    const QItemSelection &)
-{
-  this->updateActions();
 }
 
 void pqPipelineMenu::handleDeletion()

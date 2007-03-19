@@ -370,7 +370,8 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   this->CurrentPanel->setRenderModule(this->getRenderModule());
   this->CurrentPanel->select();
   this->CurrentPanel->show();
-  this->DeleteButton->setEnabled(true);
+  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(proxy);
+  this->DeleteButton->setEnabled(source && source->getNumberOfConsumers() == 0);
 
   this->PanelStore[proxy] = this->CurrentPanel;
 }

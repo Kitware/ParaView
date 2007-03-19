@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPipelineModel;
 class QAction;
-class QItemSelection;
 class QItemSelectionModel;
 
 
@@ -76,11 +75,10 @@ public:
 
   bool isActionEnabled(ActionName name) const;
 
+public slots:
   void updateActions();
 
 private slots:
-  void updateActions(const QItemSelection &selected,
-      const QItemSelection &deselected);
   void handleDeletion();
 
 private:
