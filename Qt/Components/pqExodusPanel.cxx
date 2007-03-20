@@ -48,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMProperty.h"
 
 // ParaView includes
 #include "pqPropertyManager.h"
@@ -96,29 +95,6 @@ pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
 
 pqExodusPanel::~pqExodusPanel()
 {
-}
-  
-void pqExodusPanel::accept()
-{
-  this->pqNamedObjectPanel::accept();
- 
-  // setting block/material/hierarchy status 
-  // may affect each other
-  // query the reader for the new values 
-  this->proxy()->getProxy()->UpdatePropertyInformation();
-
-  vtkSMProxy* pxy = this->proxy()->getProxy();
-  vtkSMProperty* prop = NULL;
-
-  prop = pxy->GetProperty("BlockArrayStatus");
-  prop->Copy(pxy->GetProperty("BlockArrayInfo"));
-  
-  prop = pxy->GetProperty("MaterialArrayStatus");
-  prop->Copy(pxy->GetProperty("MaterialArrayInfo"));
-  
-  prop = pxy->GetProperty("HierarchyArrayStatus");
-  prop->Copy(pxy->GetProperty("HierarchyArrayInfo"));
-  
 }
 
 int pqExodusPanel::displayType() const
