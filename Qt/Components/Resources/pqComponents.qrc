@@ -13,12 +13,14 @@
         <file>Icons/pqBundle16.png</file>
         <file>Icons/pqBundle22.png</file>
         <file>Icons/pqBundle32.png</file>
+        <file>Icons/pqCalculator24.png</file>
         <file>Icons/pqCamera16.png</file>
         <file>Icons/pqCamerad16.png</file>
         <file>Icons/pqCancel16.png</file>
         <file>Icons/pqCancel24.png</file>
         <file>Icons/pqCancel32.png</file>
         <file>Icons/pqCellData16.png</file>
+        <file>Icons/pqClip24.png</file>
         <file>Icons/pqConnect16.png</file>
         <file>Icons/pqConnect24.png</file>
         <file>Icons/pqConnect32.png</file>
@@ -32,6 +34,7 @@
         <file>Icons/pqDisconnect32.png</file>
         <file>Icons/pqExponential16.png</file>
         <file>Icons/pqExponential24.png</file>
+        <file>Icons/pqExtractGrid24.png</file>
         <file>Icons/pqEyeball16.png</file>
         <file>Icons/pqEyeballd16.png</file>
         <file>Icons/pqFavorites16.png</file>
@@ -48,6 +51,9 @@
         <file>Icons/pqFolderNew16.png</file>
         <file>Icons/pqFolderOpen16.png</file>
         <file>Icons/pqFolderUp16.png</file>
+        <file>Icons/pqGlyph24.png</file>
+        <file>Icons/pqGroup24.png</file>
+        <file>Icons/pqGroupExtract24.png</file>
         <file>Icons/pqHelp16.png</file>
         <file>Icons/pqHelp24.png</file>
         <file>Icons/pqHelp32.png</file>
@@ -55,9 +61,11 @@
         <file>Icons/pqHierarchicalData16.png</file>
         <file>Icons/pqImageData16.png</file>
         <file>Icons/pqInspect22.png</file>
+        <file>Icons/pqIsosurface24.png</file>
         <file>Icons/pqLinkBack16.png</file>
         <file>Icons/pqLinkIn16.png</file>
         <file>Icons/pqLookmark.png</file>
+        <file>Icons/pqMeasure24.png</file>
         <file>Icons/pqMinus16.png</file>
         <file>Icons/pqMouseMove15.png</file>
         <file>Icons/pqMousePick15.png</file>
@@ -114,6 +122,7 @@
         <file>Icons/pqSideSet16.png</file>
         <file>Icons/pqSinusoidal16.png</file>
         <file>Icons/pqSinusoidal24.png</file>
+        <file>Icons/pqSlice24.png</file>
         <file>Icons/pqSolidColor16.png</file>
         <file>Icons/pqSource16.png</file>
         <file>Icons/pqSource22.png</file>
@@ -122,7 +131,9 @@
         <file>Icons/pqSplitViewV12.png</file>
         <file>Icons/pqStep16.png</file>
         <file>Icons/pqStep24.png</file>
+        <file>Icons/pqStreamTracer24.png</file>
         <file>Icons/pqStructuredGrid16.png</file>
+        <file>Icons/pqThreshold24.png</file>
         <file>Icons/pqUndo16.png</file>
         <file>Icons/pqUndo24.png</file>
         <file>Icons/pqUndo32.png</file>
@@ -145,6 +156,7 @@
         <file>Icons/pqVcrLast16.png</file>
         <file>Icons/pqVcrLast24.png</file>
         <file>Icons/pqVcrLast32.png</file>
+        <file>Icons/pqVcrLoop24.png</file>
         <file>Icons/pqVcrPause16.png</file>
         <file>Icons/pqVcrPause24.png</file>
         <file>Icons/pqVcrPause32.png</file>
@@ -153,6 +165,7 @@
         <file>Icons/pqVcrPlay32.png</file>
         <file>Icons/pqView22.png</file>
         <file>Icons/pqVolumeData16.png</file>
+        <file>Icons/pqWarp24.png</file>
         <file>Icons/pqWindow16.png</file>
         <file>Icons/pqWindow22.png</file>
         <file>Icons/pqWindow32.png</file>
