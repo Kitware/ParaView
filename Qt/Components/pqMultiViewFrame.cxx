@@ -155,6 +155,12 @@ pqMultiViewFrame::~pqMultiViewFrame()
 
 void pqMultiViewFrame::onCustomContextMenuRequested(const QPoint& point)
 {
+  // get the focus before showing the context menu.
+  // When the context menu closes, it returns the focus to the wiget with the previous
+  // focus which can cause issues.
+  this->setFocus(Qt::OtherFocusReason);
+  this->setActive(true);
+
   emit this->contextMenuRequested();
   this->ContextMenu->exec(this->Menu->mapToGlobal(point));
 }
