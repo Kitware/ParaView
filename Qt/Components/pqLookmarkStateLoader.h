@@ -38,9 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPQStateLoader.h"
 #include <QList>
 
-//class pqMainWindowCore;
 class pqLookmarkStateLoaderInternal;
 class pqPipelineSource;
+class QStandardItem;
 
 // State loader for the lookmark state.
 // Currently only supports state with single (non-filter) sources. 
@@ -55,41 +55,33 @@ public:
   vtkTypeRevisionMacro(pqLookmarkStateLoader, vtkSMPQStateLoader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // A root xml element is created before passing  the xml data structure up for the superclass to handle
   virtual int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
 
-  // Set the main window core. The core is GUI side manager.
-  // This is used to grab the active (non-filter) source in the pipeline
-  //void SetMainWindowCore(pqMainWindowCore* core);
+  // Can be given a list of sources to use before any others
+  void SetPreferredSources(QList<pqPipelineSource*> *sources);
 
-  // When UseDataFlag is turned off, the state of the stored (non-filter) source proxy is used to set up the active (non-filter) source in the pipeline browser.
-  void SetUseDataFlag(bool state);
-
-  // When UseCameraFlag is turned off, the camera properties of the render module proxy are filtered out.
-  void SetUseCameraFlag(bool state);
-
-  //void SetMultipleSourcesFlag(bool state);
+  // The XML representation of the lookmark's pipeline hierarchy.
+  // see pqLookmarkModel
+  void SetPipelineHierarchy(vtkPVXMLElement*);
 
 protected:
   pqLookmarkStateLoader();
   ~pqLookmarkStateLoader();
 
   // Description:
-  // Overridden so that animation scene proxy is not recreated types.
+  // When a source proxy is about to be created, provide it with an existing one instead.
   virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
 
-  // Overridden to avoid registering the reused animation scene twice.
+  // Make sure we do not re-register proxies that are being reused
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
 
   // Description:
-  // This method is called to load a proxy state. Overloaded to make sure that 
-  // when states are loaded for existsing render modules, the displays already present
-  // in those render modules are not affected.
+  // This method is called to load a proxy state. Overloaded to make sure their are enough existing source for this lookmark
   virtual int LoadProxyState(vtkPVXMLElement* proxyElement, vtkSMProxy* proxy);
 
-  /// populate list of the non-server, non-filter objects that are in the same pipeline as "src"
-  void GetRootSources(QList<pqPipelineSource*> *sources, pqPipelineSource *src);
+  // Helper function for constructing a QAbstractItemModel from the lookmark's pipeline hierarchy
+  void AddChildItems(vtkPVXMLElement *elem, QStandardItem *item);
 
 private:
   pqLookmarkStateLoader(const pqLookmarkStateLoader&); // Not implemented.

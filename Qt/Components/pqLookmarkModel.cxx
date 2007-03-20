@@ -59,8 +59,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqLookmarkModel::pqLookmarkModel(QString name, vtkPVXMLElement *state, QObject* _parent /*=null*/)
-  : QObject(_parent), Name(name)
+  : QObject(_parent)
 {
+  this->Name = name;
   this->RestoreCamera = false;
   this->RestoreData = false;
   this->State = state;
@@ -88,7 +89,9 @@ void pqLookmarkModel::initializeState(vtkPVXMLElement *lookmark)
 {
   // REQUIRED PROPERTIES: name and state
  
-  this->Name = lookmark->GetAttribute("Name");
+  char *tempName = lookmark->GetSanitizedAttribute("Name");
+  this->Name = tempName;
+  delete [] tempName;
 
   this->State = lookmark->FindNestedElementByName("ServerManagerState");
   if(!this->State)
@@ -106,7 +109,9 @@ void pqLookmarkModel::initializeState(vtkPVXMLElement *lookmark)
   if(lookmark->GetScalarAttribute("RestoreCamera",&val))
     this->RestoreCamera = val;
 
-  this->Description = lookmark->GetAttribute("Comments");
+  char *tempDesc = lookmark->GetSanitizedAttribute("Comments");
+  this->Description = tempDesc;
+  delete [] tempDesc;
 
   vtkPVXMLElement *iconElement = lookmark->FindNestedElementByName("Icon");
   if(iconElement)
@@ -186,9 +191,15 @@ void pqLookmarkModel::setPipelineHierarchy(vtkPVXMLElement *pipeline)
 }
 
 
-void pqLookmarkModel::load(pqServer *server, pqGenericViewModule *view, vtkSMStateLoader *arg_loader)
+void pqLookmarkModel::load(pqServer *server, QList<pqPipelineSource*> *sources, pqGenericViewModule *view,  vtkSMStateLoader *arg_loader)
 {
   pqRenderViewModule* renModule;
+
+  if(sources->size()==0)
+    {
+    qDebug() << "No source to apply lookmark to.";
+    return;
+    }
 
   if(!server)
     {
@@ -230,21 +241,20 @@ void pqLookmarkModel::load(pqServer *server, pqGenericViewModule *view, vtkSMSta
   pqLookmarkStateLoader *pqLoader = pqLookmarkStateLoader::SafeDownCast(loader);
   if(pqLoader)
     {
-    pqLoader->SetUseCameraFlag(this->RestoreCamera);
-    pqLoader->SetUseDataFlag(this->RestoreData);
+    pqLoader->SetPreferredSources(sources);
+    pqLoader->SetPipelineHierarchy(this->PipelineHierarchy);
     }
 
   pqApplicationCore::instance()->loadState(this->State,server,loader);
 
   emit this->loaded(this);
-
 }
 
 
 
 void pqLookmarkModel::saveState(vtkPVXMLElement *lookmark) const
 {
-  lookmark->AddAttribute("Name", this->getName().toAscii().constData());
+  lookmark->AddSanitizedAttribute("Name", this->getName().toAscii().constData());
   lookmark->AddAttribute("RestoreData", this->getRestoreDataFlag());
   lookmark->AddAttribute("RestoreCamera", this->getRestoreCameraFlag());
 
@@ -256,7 +266,7 @@ void pqLookmarkModel::saveState(vtkPVXMLElement *lookmark) const
 
   if(!this->Description.isEmpty() && !this->Description.isNull())
     {
-    lookmark->AddAttribute("Comments", this->getDescription().toAscii().constData());
+    lookmark->AddSanitizedAttribute("Comments", this->getDescription().toAscii().constData());
     }
 
   // Icon

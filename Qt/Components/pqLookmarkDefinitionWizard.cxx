@@ -338,12 +338,13 @@ void pqLookmarkDefinitionWizard::addToProxyCollection(pqConsumerDisplay *disp, v
   src = disp->getInput();
 
   // Add this display/source's proxy to the list if it has not already been added
+
   if(!proxies->IsItemPresent(disp->getProxy()))
     {
     proxies->AddItem(disp->getProxy());
     proxies->AddItem(src->getProxy());
     }
-  
+
   // If this is a filter, recurse on its inputs
   if( (filter = dynamic_cast<pqPipelineFilter*>(src)) )
     {

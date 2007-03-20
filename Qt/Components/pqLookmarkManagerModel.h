@@ -41,6 +41,7 @@ class pqLookmarkManagerModelInternal;
 class pqLookmarkManagerModelItem;
 class pqLookmarkModel;
 class QImage;
+class pqPipelineSource;
 
 /// \class pqLookmarkManagerModel
 /// \brief
@@ -111,9 +112,9 @@ public slots:
   void exportAllLookmarksToSettings();
 
   // Load the state of the lookmark with the given name, on the given server, in the given view
-  void loadLookmark(pqServer *server, pqGenericViewModule* dest, const QString &name);
+  void loadLookmark(pqServer *server, pqGenericViewModule* dest, QList<pqPipelineSource*> *sources, const QString &name);
   // Load the state of the given lookmark, on the given server, in the given view
-  void loadLookmark(pqServer *server, pqGenericViewModule* dest, pqLookmarkModel *lmk);
+  void loadLookmark(pqServer *server, pqGenericViewModule* dest, QList<pqPipelineSource*> *sources, pqLookmarkModel *lmk);
 
 signals:
 

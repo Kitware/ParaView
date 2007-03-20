@@ -35,43 +35,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSmartPointer.h"
 
 #include <QPointer>
 #include <QList>
 #include <QString>
 #include <QMessageBox>
+#include <QStandardItemModel>
+#include <QStandardItem>
 
 #include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
 #include "pqApplicationCore.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqServerManagerModel.h"
+#include "pqLookmarkSourceDialog.h"
+#include "pqPipelineModel.h"
 
 //-----------------------------------------------------------------------------
 class pqLookmarkStateLoaderInternal
 {
 public:
-  //QPointer<pqMainWindowCore> MainWindowCore;
-  bool UseDataFlag;
-  bool UseCameraFlag;
-  bool MultipleSourcesFlag;
-  //vtkSMProxy *ActiveSourceProxy;
-  QList<pqPipelineSource*> Sources;
+  QList<pqPipelineSource*> *PreferredSources;
+  QList<QStandardItem*> LookmarkSources;
+  int NumberOfLookmarkSources;
+  QStandardItemModel *LookmarkPipelineModel;
+  pqPipelineModel *PipelineModel;
 };
 
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.3");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.4");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
   this->Internal = new pqLookmarkStateLoaderInternal;
-  //this->Internal->MainWindowCore = 0;
-  //this->Internal->ActiveSourceProxy = 0;
-  this->Internal->MultipleSourcesFlag = false;
-  this->Internal->UseDataFlag = false;
-  this->Internal->UseCameraFlag = false;
+  this->Internal->NumberOfLookmarkSources = 0;
+  this->Internal->PreferredSources = 0;
+  this->Internal->LookmarkPipelineModel = 0;
+  this->Internal->PipelineModel = 0;
+
+  pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
+  this->Internal->PipelineModel = new pqPipelineModel(*model);
 }
 
 //-----------------------------------------------------------------------------
@@ -80,100 +86,153 @@ pqLookmarkStateLoader::~pqLookmarkStateLoader()
   delete this->Internal;
 }
 
+//-----------------------------------------------------------------------------
+void pqLookmarkStateLoader::SetPreferredSources(QList<pqPipelineSource*> *sources)
+{
+  if(this->Internal->PreferredSources)
+    {
+    this->Internal->PreferredSources->clear();
+    }
+
+  this->Internal->PreferredSources = sources;
+}
+
 
 //-----------------------------------------------------------------------------
-int pqLookmarkStateLoader::LoadState(vtkPVXMLElement* state, int keep_proxies/*=0*/)
+void pqLookmarkStateLoader::SetPipelineHierarchy(vtkPVXMLElement *lookmarkPipeline)
 {
-
-  // If we are to use an existing dataset for this lookmark, there are several hoops we need to jump through to try to find one
-  if(!this->Internal->UseDataFlag)
+  // Determine the number of sources in the lookmmark's state from the pipeline hierarchy
+  int numSources = 0;
+  for(unsigned int i=0; i<lookmarkPipeline->GetNumberOfNestedElements(); i++)
     {
-    bool abort = false;
-    // First make sure the pipeline is not empty
-    pqServerManagerModel *smModel = pqApplicationCore::instance()->getServerManagerModel();
-    if(smModel->getNumberOfSources()==0)
+    vtkPVXMLElement *childElem = lookmarkPipeline->GetNestedElement(i);
+    if(strcmp(childElem->GetName(),"Source")==0)
       {
-      abort = true;
-      }
-  
-    // Try to get the "active" source in the application because its a good bet this is the data the user means to use with this lookmark
-    pqPipelineSource *activeSource = dynamic_cast<pqPipelineSource *>(pqApplicationCore::instance()->getSelectionModel()->currentItem());
-    if(activeSource)
-      {
-      // Get the source data for the active source
-      this->GetRootSources(&this->Internal->Sources,activeSource);
-      if(this->Internal->Sources.size()>1)
-        {
-        this->Internal->MultipleSourcesFlag = true;
-        }
-      else if(this->Internal->Sources.size()==0)
-        {
-        // This should never happen
-        abort = true;
-        }
-      }
-    else
-      {
-      abort = true;
-      }
-
-    if(abort)
-      {
-      QMessageBox::warning(NULL, "No Data Selected",
-            "Please select the source in the Pipeline Browser that you would like the lookmark to be applied to and try again.");
-      return 0;
+      numSources++;
       }
     }
 
-  return this->Superclass::LoadState(state, keep_proxies);
+  this->Internal->NumberOfLookmarkSources = numSources;
+
+  // Set up the pipeline model for this lookmak's state
+  this->Internal->LookmarkSources.clear();
+  this->Internal->LookmarkPipelineModel = new QStandardItemModel();
+  this->AddChildItems(lookmarkPipeline,this->Internal->LookmarkPipelineModel->invisibleRootItem());
 }
 
-//-----------------------------------------------------------------------------
-void pqLookmarkStateLoader::GetRootSources(QList<pqPipelineSource*> *sources, pqPipelineSource *src)
+void pqLookmarkStateLoader::AddChildItems(vtkPVXMLElement *elem, QStandardItem *item)
 {
-  pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter*>(src);
-  if(!filter || filter->getInputCount()==0)
+  for(unsigned int i=0; i<elem->GetNumberOfNestedElements(); i++)
     {
-    sources->push_back(src);
-    return;
+    vtkPVXMLElement *childElem = elem->GetNestedElement(i);
+    // determine icon type:
+    QIcon icon = QIcon();
+    if(strcmp(childElem->GetName(),"Server")==0)
+      {
+      icon.addFile(":/pqWidgets/Icons/pqServer16.png");
+      }
+    if(strcmp(childElem->GetName(),"Source")==0)
+      {
+      icon.addFile(":/pqWidgets/Icons/pqSource16.png");
+      }
+    if(strcmp(childElem->GetName(),"Filter")==0)
+      {
+      icon.addFile(":/pqWidgets/Icons/pqFilter16.png");
+      }
+    QStandardItem *childItem = new QStandardItem(icon,QString(childElem->GetAttribute("Name")));
+    item->setChild(i,0,childItem);
+    if(strcmp(childElem->GetName(),"Source")==0)
+      {
+      this->Internal->LookmarkSources.push_back(childItem);
+      }
+    this->AddChildItems(childElem,childItem);
     }
-  for(int i=0; i<filter->getInputCount(); i++)
+}
+
+
+//---------------------------------------------------------------------------
+int pqLookmarkStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*=0*/)
+{
+  pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
+
+  if (!rootElement)
     {
-    this->GetRootSources(sources, filter->getInput(i));
+    vtkErrorMacro("Cannot load state from (null) root element.");
+    return 0;
     }
-}
 
-//-----------------------------------------------------------------------------
-void pqLookmarkStateLoader::SetUseDataFlag(bool state)
-{
-  this->Internal->UseDataFlag = state;
-}
+  // Do we have enough open sources to accomodate this lookmark's state?
+  int numExistingSources = 0;
+  for(unsigned int i=0; i<model->getNumberOfSources(); i++)
+    {
+    if(!dynamic_cast<pqPipelineFilter*>(model->getPQSource(i)))
+      {
+      numExistingSources++;
+      }
+    }
 
-//-----------------------------------------------------------------------------
-void pqLookmarkStateLoader::SetUseCameraFlag(bool state)
-{
-  this->Internal->UseCameraFlag = state;
+  if(numExistingSources<this->Internal->NumberOfLookmarkSources)
+    {
+    QMessageBox::warning(NULL, "Error Loading Lookmark",
+          "There are not enough existing readers or sources in the pipeline to accomodate this lookmark.");
+    return 0;
+    }
+
+  return this->Superclass::LoadState(rootElement, keep_proxies);
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqLookmarkStateLoader::NewProxyInternal(
   const char* xml_group, const char* xml_name)
 {
-  if (xml_group && xml_name && strcmp(xml_group, "sources")==0 && !this->Internal->UseDataFlag && !this->Internal->MultipleSourcesFlag)
+  if(!xml_group || !xml_name || strcmp(xml_group, "sources")!=0)
     {
-    return this->Internal->Sources.at(0)->getProxy();
+    // let superclass handle it
+    return this->Superclass::NewProxyInternal(xml_group, xml_name);
     }
-  return this->Superclass::NewProxyInternal(xml_group, xml_name);
+
+  // If this lookmark has one source, use the first item in the preferred source list, if any
+  if(this->Internal->NumberOfLookmarkSources==1 && this->Internal->PreferredSources->size()>=1)
+    {
+    vtkSMProxy *proxy = this->Internal->PreferredSources->at(0)->getProxy();
+    proxy->Register(this);
+    return proxy;
+    }
+
+  // If it has multiple sources, prompt user
+  pqLookmarkSourceDialog *srcDialog = new pqLookmarkSourceDialog(this->Internal->LookmarkPipelineModel,this->Internal->PipelineModel);
+  srcDialog->setLookmarkSource(this->Internal->LookmarkSources.takeFirst());
+  if(srcDialog->exec() == QDialog::Accepted)
+    {
+    // return the source the user selected to use for this proxy
+    pqPipelineSource *src = srcDialog->getSelectedSource();
+    if(src)
+      {
+    //  this->Internal->Sources->removeAll(src);
+      //this->Internal->PipelineModel->removeSource(src);
+      vtkSMProxy *proxy = src->getProxy();
+      proxy->Register(this);
+      return proxy;
+      }
+    }
+  delete srcDialog;
+
+  return 0;
 }
+
 
 //---------------------------------------------------------------------------
 void pqLookmarkStateLoader::RegisterProxyInternal(const char* group,
   const char* name, vtkSMProxy* proxy)
 {
-  if (proxy->GetXMLGroup() 
-    && strcmp(proxy->GetXMLGroup(), "sources")==0 && !this->Internal->UseDataFlag && !this->Internal->MultipleSourcesFlag)
+  if (proxy->GetXMLGroup() && strcmp(proxy->GetXMLGroup(), "sources")==0 )
     {
-    return;
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    if (pxm->GetProxyName(group, proxy))
+      {
+      // source is registered, don't re-register it.
+      return;
+      }
     }
   this->Superclass::RegisterProxyInternal(group, name, proxy);
 }
@@ -182,7 +241,12 @@ void pqLookmarkStateLoader::RegisterProxyInternal(const char* group,
 int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement, 
   vtkSMProxy* proxy)
 {
-  if (strcmp(proxy->GetXMLGroup(), "rendermodules")==0 )
+  if (strcmp(proxy->GetXMLGroup(), "sources")==0 )
+    {
+    // If this is a source, don't load the state
+    return 1;
+    }
+  else if (strcmp(proxy->GetXMLGroup(), "rendermodules")==0 )
     {
     unsigned int max = proxyElement->GetNumberOfNestedElements();
     QList<vtkPVXMLElement*> toRemove;
@@ -192,7 +256,7 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
       name = element->GetAttribute("name");
       if (element->GetName() == QString("Property") &&
-         name.contains("Camera") && !this->Internal->UseCameraFlag)
+         name.contains("Camera"))
         {
         toRemove.push_back(element);
         }

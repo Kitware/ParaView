@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMainWindowCore.h"
 #include <vtkPQConfig.h>
 
+#include <QAction>
 #include <QApplication>
 #include <QDockWidget>
 #include <QFile>
@@ -172,7 +173,7 @@ public:
     PipelineMenu(0),
     PipelineBrowser(0),
     VariableToolbar(0),
-    //LookmarkToolbar(0),
+    LookmarkToolbar(0),
     CustomFilterToolbar(0),
     ToolTipTrapper(0),
     InCreateSource(false),
@@ -204,7 +205,7 @@ public:
   pqLookmarkManagerModel* LookmarkManagerModel;
   pqLookmarkBrowser* LookmarkBrowser;
   pqLookmarkInspector* LookmarkInspector;
-  QString LookmarkToLoad;
+  QString CurrentLookmark;
   pqLookmarkBrowserModel* Lookmarks;
   pqCustomFilterManagerModel* const CustomFilters;
   pqCustomFilterManager* CustomFilterManager;
@@ -224,7 +225,7 @@ public:
   pqPipelineMenu* PipelineMenu;
   pqPipelineBrowser *PipelineBrowser;
   QToolBar* VariableToolbar;
-  //pqLookmarkToolbar* LookmarkToolbar;
+  QToolBar* LookmarkToolbar;
   QToolBar* CustomFilterToolbar;
   QList<QToolBar*> PluginToolBars;
   
@@ -1034,41 +1035,140 @@ void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* toolbar)
 */
 }
 
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::setupLookmarkToolbar(pqLookmarkToolbar* vtkNotUsed(toolbar))
+void pqMainWindowCore::setupLookmarkToolbar(QToolBar* toolbar)
 {
-/*
   this->Implementation->LookmarkToolbar = toolbar;
-  
+
   // add in existing lookmarks first
   for(int i=0; i<this->Implementation->LookmarkManagerModel->getNumberOfLookmarks();i++)
     {
     pqLookmarkModel *lmk = this->Implementation->LookmarkManagerModel->getLookmark(i);
-    toolbar->onLookmarkAdded(lmk->getName(),lmk->getIcon());
+    this->Implementation->LookmarkToolbar->addAction(QIcon(QPixmap::fromImage(lmk->getIcon())), lmk->getName()) 
+      << pqSetName(lmk->getName()) << pqSetData(lmk->getName());
     }
 
-  QObject::connect(toolbar, SIGNAL(loadLookmark(const QString&)),
-      this, SLOT(onLoadLookmark(const QString&)));
-  QObject::connect(toolbar, SIGNAL(editLookmark(const QString&)),
-      this, SLOT(onEditLookmark(const QString&)));
-  QObject::connect(toolbar, SIGNAL(removeLookmark(const QString&)),
-      this->Implementation->LookmarkManagerModel, SLOT(removeLookmark(const QString&)));
+  // connect up toolbar with lookmark manager events
+  QObject::connect(toolbar, SIGNAL(actionTriggered(QAction*)), 
+      this, SLOT(onLoadToolbarLookmark(QAction*)));
+  QObject::connect(toolbar, SIGNAL(customContextMenuRequested(const QPoint &)),
+      this, SLOT(showLookmarkToolbarContextMenu(const QPoint &)));
   QObject::connect(this->Implementation->LookmarkManagerModel, SIGNAL(lookmarkAdded(const QString&, const QImage&)),
-      toolbar, SLOT(onLookmarkAdded(const QString&, const QImage&)));
+      this, SLOT(onLookmarkAdded(const QString&, const QImage&)));
   QObject::connect(this->Implementation->LookmarkManagerModel, SIGNAL(lookmarkRemoved(const QString&)),
-      toolbar, SLOT(onLookmarkRemoved(const QString&)));
+      this, SLOT(onLookmarkRemoved(const QString&)));
   QObject::connect(this->Implementation->LookmarkManagerModel, SIGNAL(lookmarkNameChanged(const QString&, const QString&)),
-      toolbar, SLOT(onLookmarkNameChanged(const QString&, const QString&)));
-*/
+      this, SLOT(onLookmarkNameChanged(const QString&, const QString&)));
 }
 
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onEditLookmark(const QString &name)
+void pqMainWindowCore::showLookmarkToolbarContextMenu(const QPoint &menuPos)
 {
+  QMenu menu;
+  menu.setObjectName("ToolbarLookmarkMenu");
+
+  // Create the actions that are not lookmark-specific
+  QAction *actionDisplayBrowser = new QAction("Lookmark Browser",this->Implementation->LookmarkToolbar);
+  QObject::connect(actionDisplayBrowser, SIGNAL(triggered()), 
+      this->Implementation->LookmarkBrowser->parentWidget(), SLOT(show()));
+  menu.addAction(actionDisplayBrowser);
+  QAction *actionNew = new QAction("New",this->Implementation->LookmarkToolbar);
+  QObject::connect(actionNew, SIGNAL(triggered()), 
+      this, SLOT(onToolsCreateLookmark()));
+  menu.addAction(actionNew);
+
+  // Create the lookmark-specific toolbar context menu actions if the mouse event was over a lookmark
+  QAction *lmkAction = this->Implementation->LookmarkToolbar->actionAt(menuPos);
+  if(lmkAction)
+    {
+    this->Implementation->CurrentLookmark = lmkAction->data().toString();
+    if(this->Implementation->CurrentLookmark.isNull() || this->Implementation->CurrentLookmark.isEmpty())
+      {
+      return;
+      }
+
+    QAction *actionEdit = new QAction("Edit",this->Implementation->LookmarkToolbar);
+    QObject::connect(actionEdit, SIGNAL(triggered()), 
+        this, SLOT(onEditToolbarLookmark()));
+    menu.addAction(actionEdit);
+  
+    //this->Implementation->LookmarkToolbarContextMenuActions.push_back(actionEdit);
+    QAction *actionRemove = new QAction("Delete",this->Implementation->LookmarkToolbar);
+    //this->Implementation->LookmarkToolbarContextMenuActions.push_back(actionRemove);
+    QObject::connect(actionRemove, SIGNAL(triggered()), 
+        this, SLOT(onRemoveToolbarLookmark()));
+    menu.addAction(actionRemove);
+    }
+
+  menu.exec(this->Implementation->LookmarkToolbar->mapToGlobal(menuPos));
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onLookmarkAdded(const QString &name, const QImage &icon)
+{
+  this->Implementation->LookmarkToolbar->addAction(QIcon(QPixmap::fromImage(icon)), name) 
+    << pqSetName(name) << pqSetData(name);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onRemoveToolbarLookmark()
+{
+  if(this->Implementation->CurrentLookmark.isNull() || this->Implementation->CurrentLookmark.isEmpty())
+    {
+    return;
+    }
+  this->Implementation->LookmarkManagerModel->removeLookmark(this->Implementation->CurrentLookmark);
+}
+
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onLookmarkRemoved(const QString &name)
+{
+  // Remove the action associated with the lookmark.
+  QAction *action = this->Implementation->LookmarkToolbar->findChild<QAction *>(name);
+  if(action)
+    {
+    this->Implementation->LookmarkToolbar->removeAction(action);
+    delete action;
+    }
+}
+
+void pqMainWindowCore::onLookmarkNameChanged(const QString &oldName, const QString &newName)
+{
+  QAction *action = this->Implementation->LookmarkToolbar->findChild<QAction *>(oldName);
+  if(action)
+    {
+    action << pqSetName(newName);
+    action << pqSetData(newName);
+    action->setText(newName);
+    action->setIconText(newName);
+    action->setToolTip(newName);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onEditToolbarLookmark()
+{
+  if(this->Implementation->CurrentLookmark.isNull() || this->Implementation->CurrentLookmark.isEmpty())
+    {
+    return;
+    }
+
   this->Implementation->LookmarkBrowser->getSelectionModel()->clear();
-  this->Implementation->LookmarkBrowser->getSelectionModel()->setCurrentIndex(this->Implementation->Lookmarks->getIndexFor(name),QItemSelectionModel::SelectCurrent);
+  this->Implementation->LookmarkBrowser->getSelectionModel()->setCurrentIndex(this->Implementation->Lookmarks->getIndexFor(this->Implementation->CurrentLookmark),QItemSelectionModel::SelectCurrent);
   this->Implementation->LookmarkInspector->parentWidget()->show();
+}
+
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onLoadToolbarLookmark(QAction *action)
+{
+  if(!action)
+    {
+    return;
+    }
+
+  this->onLoadLookmark(action->data().toString());
 }
 
 //-----------------------------------------------------------------------------
@@ -1092,13 +1192,13 @@ void pqMainWindowCore::onLoadLookmark(const QString &name)
         return;
         }
       }
-    this->Implementation->LookmarkToLoad = name;
+    this->Implementation->CurrentLookmark = name;
     this->onLoadCurrentLookmark(server);
     }
   else
     {
     // Needed a way to provide the slot access to the name of the lookmark to load. Is there a better way to do this?
-    this->Implementation->LookmarkToLoad = name;
+    this->Implementation->CurrentLookmark = name;
     pqServerStartupBrowser* const server_browser = new pqServerStartupBrowser(
       pqApplicationCore::instance()->serverStartups(),
       *pqApplicationCore::instance()->settings(),
@@ -1114,14 +1214,42 @@ void pqMainWindowCore::onLoadLookmark(const QString &name)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onLoadCurrentLookmark(pqServer *server)
 {
+  if(this->Implementation->CurrentLookmark.isNull() || this->Implementation->CurrentLookmark.isEmpty())
+    {
+    return;
+    }
+
+  // Construct a list of the sources at the head of the exisitng pipeline(s).
+
+  // First find the ones in the pipeline belonging to the "active" source:
+  pqPipelineSource *activeSource = this->getActiveSource();
+  QList<pqPipelineSource*> sources;
+  if(activeSource)
+    {
+    this->getRootSources(&sources,activeSource);
+    }
+
+  // Next, iterate over all sources in the server manager model and if it is a source with no inputs and has not been added, add to list
+  pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
+  for(unsigned int i=0; i<model->getNumberOfSources(); i++)
+    {
+    pqPipelineSource *src = model->getPQSource(i);
+    if(!dynamic_cast<pqPipelineFilter*>(src) && !sources.contains(src))
+      {
+      sources.push_back(src);
+      }
+    }
+
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
   pqGenericViewModule *view = pqActiveView::instance().current();
   if(!view)
     {
     view = builder->createView(pqRenderViewModule::renderViewType(), server);
     }
+
   this->Implementation->LookmarkManagerModel->loadLookmark(server, 
-    pqActiveView::instance().current(), this->Implementation->LookmarkToLoad);
+    pqActiveView::instance().current(), &sources, this->Implementation->CurrentLookmark);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -2708,6 +2836,21 @@ void pqMainWindowCore::updateFiltersMenu()
 pqPipelineSource* pqMainWindowCore::getActiveSource()
 {
   return dynamic_cast<pqPipelineSource *>(this->getActiveObject());
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::getRootSources(QList<pqPipelineSource*> *sources, pqPipelineSource *src)
+{
+  pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter*>(src);
+  if(!filter || filter->getInputCount()==0)
+    {
+    sources->push_back(src);
+    return;
+    }
+  for(int i=0; i<filter->getInputCount(); i++)
+    {
+    this->getRootSources(sources, filter->getInput(i));
+    }
 }
 
 //-----------------------------------------------------------------------------

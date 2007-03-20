@@ -448,8 +448,8 @@ MainWindow::MainWindow() :
   this->Implementation->Core.setupCustomFilterToolbar(
     this->Implementation->UI.customFilterToolbar);
 
-  //this->Implementation->Core.setupLookmarkToolbar(
-  //  this->Implementation->UI.lookmarkToolbar);
+  this->Implementation->Core.setupLookmarkToolbar(
+    this->Implementation->UI.lookmarkToolbar);
 
   // Setup dockable windows ...
   this->Implementation->Core.setupPipelineBrowser(
@@ -532,9 +532,9 @@ MainWindow::MainWindow() :
     this->Implementation->UI.customFilterToolbar,
     this->Implementation->UI.customFilterToolbar->windowTitle());
 
-  //this->Implementation->ToolbarsMenu->addWidget(
-  //  this->Implementation->UI.lookmarkToolbar,
-  //  this->Implementation->UI.lookmarkToolbar->windowTitle());
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.lookmarkToolbar,
+    this->Implementation->UI.lookmarkToolbar->windowTitle());
     
   this->Implementation->ToolbarsMenu->addWidget(
     this->Implementation->UI.undoRedoToolbar,
@@ -599,7 +599,7 @@ MainWindow::MainWindow() :
   this->Implementation->UI.variableToolbar->layout()->setSpacing(0);
   this->Implementation->UI.representationToolbar->layout()->setSpacing(0);
   this->Implementation->UI.customFilterToolbar->layout()->setSpacing(0);
-  //this->Implementation->UI.lookmarkToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.lookmarkToolbar->layout()->setSpacing(0);
   this->Implementation->UI.undoRedoToolbar->layout()->setSpacing(0);
   this->Implementation->UI.VCRToolbar->layout()->setSpacing(0);
   this->Implementation->UI.cameraToolbar->layout()->setSpacing(0);

@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>312</width>
-    <height>232</height>
+    <height>231</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -204,9 +204,9 @@
       </item>
       <item>
        <widget class="pqCollapsedGroup" native="1" name="groupBox" >
-         <property name="title" >
-            <string>Pipeline Preview</string>
-         </property>
+        <property name="title" >
+         <string>Pipeline Preview</string>
+        </property>
         <layout class="QVBoxLayout" >
          <property name="margin" >
           <number>2</number>
@@ -222,9 +222,9 @@
       </item>
       <item>
        <widget class="pqCollapsedGroup" native="1" name="groupBox_2" >
-         <property name="title" >
-            <string>Description</string>
-         </property>
+        <property name="title" >
+         <string>Description</string>
+        </property>
         <layout class="QVBoxLayout" >
          <property name="margin" >
           <number>2</number>
@@ -258,6 +258,14 @@
    </item>
    <item>
     <widget class="QFrame" name="ControlsFrame" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize" >
       <size>
        <width>0</width>
@@ -288,6 +296,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QAbstractScrollArea</class>
+   <extends>QWidget</extends>
+   <header>qabstractscrollarea.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>pqCollapsedGroup</class>
    <extends>QWidget</extends>

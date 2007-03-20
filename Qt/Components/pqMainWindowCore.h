@@ -43,7 +43,6 @@ class QSize;
 class pqAnimationManager;
 class pqAnimationScene;
 class pqGenericViewModule;
-class pqLookmarkToolbar;
 class pqLookmarkManagerModel;
 class pqMultiView;
 class pqObjectInspectorDriver;
@@ -70,7 +69,9 @@ class vtkUnstructuredGrid;
 class QAction;
 class QDockWidget;
 class QIcon;
+class QImage;
 class QMenu;
+class QPoint;
 class QStatusBar;
 class QToolBar;
 class QWidget;
@@ -126,7 +127,7 @@ public:
   /// Setup a compound-proxy toolbar
   void setupCustomFilterToolbar(QToolBar* parent);
   /// Setup a lookmark toolbar
-  void setupLookmarkToolbar(pqLookmarkToolbar* parent);
+  void setupLookmarkToolbar(QToolBar* parent);
   /// Setup a representation-selection toolbar
   void setupRepresentationToolbar(QToolBar* parent);
   
@@ -147,6 +148,9 @@ public:
 
   /// returns the active source.
   pqPipelineSource* getActiveSource();
+
+  // creates a list of the sources at the head of the pipeline of the given source "src"
+  void getRootSources(QList<pqPipelineSource*> *sources, pqPipelineSource *src);
 
   /// returns the active server.
   pqServer* getActiveServer();
@@ -265,14 +269,26 @@ public slots:
   void onToolsCreateLookmark(pqGenericViewModule*);
 
   // Have the main window handle all lookmark load signals (from the toolbar, inspector, browser)
-  // The reason is because the lookmark needs to be passed a server to load the state on and
-  // this class keeps track of the active server. It also contains code to prompt the user if there is none. 
+  // Load a lookmark with the given name on the active server. 
+  // If no server is active, store the lookmark as the "current" lookmark and prompt the user.
   void onLoadLookmark(const QString &name);
+  // Load the "current" lookmark on the given server
   void onLoadCurrentLookmark(pqServer *server);
 
-  // Display the Lookmark Inspector and set the current lookmark to the one with name "name"
-  void onEditLookmark(const QString &name);
+  // Lookmark toolbar slots:
 
+  // Add an action with the given name and icon to the lookmark toolbar
+  void onLookmarkAdded(const QString &name, const QImage &image);
+  // Remove the action with the given name from the lookmark toolbar 
+  void onLookmarkRemoved(const QString &name);
+  // Change the action's text from oldname to newname
+  void onLookmarkNameChanged(const QString &oldname, const QString &newname);
+  // TO DO: have a separate pqLookmarkToolbarContextMenu class handle the toolbar's context menu event
+  void showLookmarkToolbarContextMenu(const QPoint &pos);
+  void onRemoveToolbarLookmark();
+  void onEditToolbarLookmark();
+  void onLoadToolbarLookmark(QAction *action);
+ 
   void onToolsManageLinks();
 
   void onToolsDumpWidgetNames();

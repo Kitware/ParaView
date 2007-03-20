@@ -94,6 +94,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLookmarkInspector.h
   pqLookmarkManagerModel.h
   pqLookmarkModel.h
+  pqLookmarkSourceDialog.h
   pqMainWindowCore.h
   pqMultiView.h
   pqMultiViewFrame.h
@@ -365,6 +366,8 @@ ADD_LIBRARY(pqComponents
   pqLookmarkManagerModel.h
   pqLookmarkModel.cxx
   pqLookmarkModel.h
+  pqLookmarkSourceDialog.cxx
+  pqLookmarkSourceDialog.h
   pqLookmarkStateLoader.cxx
   pqLookmarkStateLoader.h
   pqMainWindowCore.cxx

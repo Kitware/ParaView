@@ -25,7 +25,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.13");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.14");
 vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewRenderModuleProxy, 
   vtkSMMultiViewRenderModuleProxy);
 
@@ -41,22 +41,12 @@ vtkSMPQStateLoader::vtkSMPQStateLoader()
 {
   this->PQInternal = new vtkSMPQStateLoaderInternals;
   this->MultiViewRenderModuleProxy = 0;
-  //this->UseExistingRenderModules = 0;
-  //this->UsedExistingRenderModules = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPQStateLoader::~vtkSMPQStateLoader()
 {
   this->SetMultiViewRenderModuleProxy(0);
-}
-
-//-----------------------------------------------------------------------------
-int vtkSMPQStateLoader::LoadState(vtkPVXMLElement* rootElement, 
-  int keep_proxies)
-{
-  //this->UsedExistingRenderModules= 0;
-  return this->Superclass::LoadState(rootElement, keep_proxies);
 }
 
 //-----------------------------------------------------------------------------
