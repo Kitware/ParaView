@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPipelineDisplayInternal;
 class pqPipelineSource;
 class pqRenderViewModule;
-class pqScalarsToColors;
 class pqServer;
 
 class vtkPVDataSetAttributesInformation;
