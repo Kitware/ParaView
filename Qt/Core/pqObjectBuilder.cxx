@@ -459,7 +459,23 @@ void pqObjectBuilder::destroy(pqDisplay* display)
     view->getProxy()->UpdateVTKObjects();
     }
 
+  // If this display has a lookuptable, we hide all scalar bars for that
+  // lookup table unless there is some other display that's using it.
+  pqScalarsToColors* stc =0;
+  if (pqConsumerDisplay* cd = qobject_cast<pqConsumerDisplay*>(display))
+    {
+    stc = cd->getLookupTable();
+    }
+
   this->destroyProxyInternal(display);
+
+  if (stc)
+    {
+    // this hides scalar bars only if the LUT is not used by
+    // any other display. This must happen after the display has 
+    // been deleted.
+    stc->hideUnusedScalarBars();
+    }
 }
 
 //-----------------------------------------------------------------------------
