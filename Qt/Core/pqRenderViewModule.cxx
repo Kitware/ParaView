@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
@@ -63,15 +64,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
+#include "pqDisplay.h"
+#include "pqLinkViewWidget.h"
+#include "pqPipelineSource.h"
 #include "pqRenderViewProxy.h"
 #include "pqServer.h"
-#include "pqPipelineSource.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 #include "vtkPVAxesWidget.h"
-#include "pqLinkViewWidget.h"
 
 class pqRenderViewModuleInternal
 {
@@ -258,6 +260,9 @@ void pqRenderViewModule::initializeWidgets()
   renModule->GetProperty("ViewTime")->Copy(timekeeper->GetProperty("Time"));
   this->Internal->ViewTimeLink = link;
   link->Delete();
+
+  // setup the center axes.
+  this->initializeCenterAxes();
 }
 
 //-----------------------------------------------------------------------------
@@ -329,9 +334,6 @@ void pqRenderViewModule::setDefaultPropertyValues()
   pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 0, bg[0]/255.0);
   pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 1, bg[1]/255.0);
   pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 2, bg[2]/255.0);
-
-  // setup the center axes.
-  this->initializeCenterAxes();
 
   proxy->UpdateVTKObjects();
 
@@ -429,39 +431,24 @@ void pqRenderViewModule::initializeCenterAxes()
     return;
     }
 
-  vtkSMProxy* centerAxes = 0;
-  // First try to determine if the render module already has a Axes display.
-  // If so, the first Axes display is treated as the center axes.
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->Internal->RenderModuleProxy->GetProperty("Displays"));
-  for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); cc++)
-    {
-    vtkSMProxy* proxy = pp->GetProxy(cc);
-    if (proxy && strcmp(proxy->GetXMLName(), "Axes") == 0
-      && strcmp(proxy->GetXMLGroup(), "axes") == 0)
-      {
-      centerAxes = proxy;
-      break;
-      }
-    }
-
-  if (!centerAxes)
-    {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-    centerAxes = pxm->NewProxy("axes", "Axes");
-    centerAxes->SetConnectionID(this->getServer()->GetConnectionID());
-    QList<QVariant> scaleValues;
-    scaleValues << .25 << .25 << .25;
-    pqSMAdaptor::setMultipleElementProperty(
-      centerAxes->GetProperty("Scale"), scaleValues);
-    pqSMAdaptor::setElementProperty(centerAxes->GetProperty("Pickable"), 0);
-    centerAxes->UpdateVTKObjects();
-    this->addHelperProxy("CenterAxesProxy", centerAxes);
-    pqSMAdaptor::addProxyProperty(pp, centerAxes);
-    centerAxes->Delete();
-    }
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMProxy* centerAxes = pxm->NewProxy("axes", "Axes");
+  centerAxes->SetConnectionID(this->getServer()->GetConnectionID());
+  QList<QVariant> scaleValues;
+  scaleValues << .25 << .25 << .25;
+  pqSMAdaptor::setMultipleElementProperty(
+    centerAxes->GetProperty("Scale"), scaleValues);
+  pqSMAdaptor::setElementProperty(centerAxes->GetProperty("Pickable"), 0);
+  centerAxes->UpdateVTKObjects();
+  this->addHelperProxy("CenterAxesProxy", centerAxes);
 
   this->Internal->CenterAxesProxy = centerAxes;
+  
+  // Add to render module without using properties. That way it does not
+  // get saved in state.
+  this->Internal->RenderModuleProxy->AddDisplay(
+    vtkSMDisplayProxy::SafeDownCast(centerAxes));
+  centerAxes->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -881,7 +868,6 @@ void pqRenderViewModule::updateCenterAxes()
     {
     return;
     }
-  this->initializeCenterAxes();
 
   double center[3];
   QList<QVariant> val =
@@ -963,7 +949,6 @@ void pqRenderViewModule::getCenterOfRotation(double center[3]) const
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::setCenterAxesVisibility(bool visible)
 {
-  this->initializeCenterAxes();
 
   pqSMAdaptor::setElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Visibility"),
@@ -1052,6 +1037,7 @@ void pqRenderViewModule::restoreDefaultLightSettings()
 
 }
   
+//-----------------------------------------------------------------------------
 void pqRenderViewModule::linkToOtherView()
 {
   pqLinkViewWidget* linkWidget = new pqLinkViewWidget(this);
@@ -1061,6 +1047,7 @@ void pqRenderViewModule::linkToOtherView()
   linkWidget->show();
 }
   
+//-----------------------------------------------------------------------------
 bool pqRenderViewModule::canDisplaySource(pqPipelineSource* source) const
 {
   if(!source ||
@@ -1071,5 +1058,4 @@ bool pqRenderViewModule::canDisplaySource(pqPipelineSource* source) const
     }
   return true;
 }
-
 

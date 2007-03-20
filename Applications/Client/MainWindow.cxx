@@ -632,10 +632,10 @@ MainWindow::MainWindow() :
 
   QObject::connect(
     &this->Implementation->Core, SIGNAL(enableShowCenterAxis(bool)),
-    this, SLOT(onShowCenterAxisChanged(bool)));
+    this, SLOT(onShowCenterAxisChanged(bool)), Qt::QueuedConnection);
   QObject::connect(
     &this->Implementation->Core, SIGNAL(enableResetCenter(bool)),
-    this->Implementation->UI.actionShowCenterAxes, SLOT(setEnabled(bool)));
+    this->Implementation->UI.actionResetCenter, SLOT(setEnabled(bool)));
   
   connect(this->Implementation->UI.actionManage_Plugins,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onManagePlugins()));

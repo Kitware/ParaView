@@ -36,12 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqGenericViewModule.h"
 #include <QColor> // needed for return type.
 
+class pqDisplay;
 class pqRenderViewModuleInternal;
-class QVTKWidget;
 class QAction;
+class QVTKWidget;
 class vtkInteractorStyle;
-class vtkSMRenderModuleProxy;
 class vtkObject;
+class vtkSMRenderModuleProxy;
 
 // This is a PQ abstraction of a render module.
 class PQCORE_EXPORT pqRenderViewModule : public pqGenericViewModule
