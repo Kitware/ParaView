@@ -367,7 +367,7 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
   pqMultiView::Index parent_index = this->parentIndex(index);
 
   pqSplitViewUndoElement* elem = pqSplitViewUndoElement::New();
-  elem->SplitView(this, parent_index, 
+  elem->SplitView(parent_index, 
     this->widgetOrientation(frame), 
     this->widgetSplitRatio(frame), index, true);
   this->Internal->CloseFrameUndoElement = elem;
@@ -979,7 +979,7 @@ void pqViewManager::onSplittingView(const Index& index,
   emit this->beginUndo("Split View");
 
   pqSplitViewUndoElement* elem = pqSplitViewUndoElement::New();
-  elem->SplitView(this, index, orientation, fraction, childIndex, false);
+  elem->SplitView(index, orientation, fraction, childIndex, false);
   emit this->addToUndoStack(elem);
   elem->Delete();
 

@@ -34,10 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
-#include "pqObjectNaming.h"
+#include "pqApplicationCore.h"
 
 vtkStandardNewMacro(pqSplitViewUndoElement);
-vtkCxxRevisionMacro(pqSplitViewUndoElement, "1.1");
+vtkCxxRevisionMacro(pqSplitViewUndoElement, "1.2");
 //-----------------------------------------------------------------------------
 pqSplitViewUndoElement::pqSplitViewUndoElement()
 {
@@ -90,8 +90,6 @@ int pqSplitViewUndoElement::RedoInternal()
   pqMultiView::Index index;
   index.setFromString(this->XMLElement->GetAttribute("index"));
 
-  const char* mgr_name = this->XMLElement->GetAttribute("manager");
-
   int orientation;
   this->XMLElement->GetScalarAttribute("orientation", &orientation);
 
@@ -99,10 +97,11 @@ int pqSplitViewUndoElement::RedoInternal()
   this->XMLElement->GetScalarAttribute("percent", &percent);
 
   pqMultiView* manager = qobject_cast<pqMultiView*>(
-    pqObjectNaming::GetObject(mgr_name));
+    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
   if (!manager)
     {
-    vtkErrorMacro("Failed to locate the multi view manager.");
+    vtkErrorMacro("Failed to locate the multi view manager. "
+      << "MULTIVIEW_MANAGER must be registered with application core.");
     return 0;
     }
 
@@ -119,13 +118,12 @@ int pqSplitViewUndoElement::UndoInternal()
   pqMultiView::Index index;
   index.setFromString(this->XMLElement->GetAttribute("child_index"));
 
-  const char* mgr_name = this->XMLElement->GetAttribute("manager");
-
   pqMultiView* manager = qobject_cast<pqMultiView*>(
-    pqObjectNaming::GetObject(mgr_name));
+    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
   if (!manager)
     {
-    vtkErrorMacro("Failed to locate the multi view manager.");
+    vtkErrorMacro("Failed to locate the multi view manager. "
+      << "MULTIVIEW_MANAGER must be registered with application core.");
     return 0;
     }
 
@@ -140,7 +138,7 @@ bool pqSplitViewUndoElement::CanLoadState(vtkPVXMLElement* elem)
 }
 
 //-----------------------------------------------------------------------------
-void pqSplitViewUndoElement::SplitView(pqMultiView* view,  
+void pqSplitViewUndoElement::SplitView(
   const pqMultiView::Index& index, Qt::Orientation orientation, float percent,
   const pqMultiView::Index& childIndex, bool invert)
 {
@@ -151,7 +149,6 @@ void pqSplitViewUndoElement::SplitView(pqMultiView* view,
   elem->AddAttribute("child_index", childIndex.getString().toAscii().data());
   elem->AddAttribute("orientation", orientation);
   elem->AddAttribute("percent", static_cast<double>(percent));
-  elem->AddAttribute("manager", pqObjectNaming::GetName(*view).toAscii().data());
   elem->AddAttribute("invert", static_cast<int>(invert));
 
   this->SetXMLElement(elem);

@@ -257,8 +257,12 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   pqObjectBuilder* const builder = core->getObjectBuilder();
 
   core->setLookupTableManager(this->Implementation->LookupTableManager);
+
+  // Register some universally accessible managers.
   core->registerManager("PENDING_DISPLAY_MANAGER", 
     &this->Implementation->PendingDisplayManager);
+  core->registerManager("MULTIVIEW_MANAGER",
+    &this->Implementation->MultiViewManager);
 
   // Connect the view manager to the pqActiveView.
   QObject::connect(&this->Implementation->MultiViewManager,

@@ -65,7 +65,7 @@ public:
   // Creates the undo element for the split operation.
   // \c invert flag inverts the operation of this undo element. When true,
   // Undo() does with Redo() would when invert=false, and vice-versa.
-  void SplitView(pqMultiView* viewManager,
+  void SplitView(
     const pqMultiView::Index& index, Qt::Orientation orientation, 
     float fraction, const pqMultiView::Index& childIndex, bool invert);
 
