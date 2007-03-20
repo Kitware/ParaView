@@ -116,7 +116,10 @@ void pqTimeKeeper::updateTimeKeeperProxy()
   vtkstd::vector<double> std_keys = keys.toStdVector();
 
   dvp->SetNumberOfElements(this->Internals->Times.size());
-  dvp->SetElements(&std_keys[0]);
+  if (this->Internals->Times.size() == 0)
+    {
+   dvp->SetElements(&std_keys[0]);
+    }
   this->getProxy()->UpdateVTKObjects();
   emit this->timeStepsChanged();
 }
