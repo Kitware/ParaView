@@ -3624,6 +3624,10 @@
         <Proxy name="Widget"
           proxygroup="3d_widgets" proxyname="TextWidget">
         </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+          <Property name="Selectable" />
+        </ExposedProperties>
       </SubProxy>     
 
       <!-- End of TextWidgetDisplay -->
