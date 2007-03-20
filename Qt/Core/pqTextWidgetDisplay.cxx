@@ -72,11 +72,6 @@ void pqTextWidgetDisplay::onInputChanged()
       input->getProxy(), "Text", vtkSMLink::INPUT);
     link->AddLinkedProperty(
       this->getProxy(), "Text", vtkSMLink::OUTPUT);
-
-    // synchronize input value.
-    this->getProxy()->GetProperty("Text")->Copy(
-      input->getProxy()->GetProperty("Text"));
-
     this->Internal->InputLink = link;
     link->Delete();
     }
