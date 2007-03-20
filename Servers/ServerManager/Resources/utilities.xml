@@ -833,6 +833,13 @@
         <BooleanDomain/>
       </IntVectorProperty>
 
+      <IntVectorProperty name="Selectable"
+                         command="SetSelectable"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain/>
+      </IntVectorProperty>
+
       <!-- End of TextWidget -->
     </Proxy>
 
