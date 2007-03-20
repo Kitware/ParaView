@@ -52,6 +52,7 @@ public:
     QObject* parent=0);
   virtual ~pqTextWidgetDisplay();
 
+  virtual void setDefaultPropertyValues();
 protected slots:
   // called when input property on display changes. We must detect if
   // (and when) the display is connected to a new proxy.

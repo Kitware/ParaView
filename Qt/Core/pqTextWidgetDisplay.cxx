@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "pqSMAdaptor.h"
 
 #include "pqPipelineSource.h"
 
@@ -57,6 +58,26 @@ pqTextWidgetDisplay::pqTextWidgetDisplay(const QString& group,
 pqTextWidgetDisplay::~pqTextWidgetDisplay()
 {
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqTextWidgetDisplay::setDefaultPropertyValues()
+{
+  this->Superclass::setDefaultPropertyValues();
+  if (!this->isVisible())
+    {
+    // For any non-visible display, we don't set its defaults.
+    return;
+    }
+
+  // Set default arrays and lookup table.
+  vtkSMProxy* proxy = this->getProxy();
+  
+  pqSMAdaptor::setElementProperty(
+    proxy->GetProperty("Selectable"), 0);
+  pqSMAdaptor::setElementProperty(
+    proxy->GetProperty("Enabled"),1);
+  proxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
