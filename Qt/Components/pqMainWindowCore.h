@@ -206,6 +206,8 @@ public:
   /// Returns the lookmark model.
   pqLookmarkManagerModel* getLookmarkManagerModel();
 
+  /// Asks the user to make a new server connection, if none exists.
+  bool makeServerConnectionIfNoneExists();
 signals:
   void enableFileOpen(bool);
   void enableFileLoadServerState(bool);
@@ -342,6 +344,10 @@ public slots:
 
   // Set center axes visibility on active render view.
   void setCenterAxesVisibility(bool visible);
+
+  /// If user specified any data file to load on command line
+  /// using the --data option, this method will try to load it.
+  void loadDataFromCommandLine();
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);

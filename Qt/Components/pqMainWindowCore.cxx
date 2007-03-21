@@ -1345,6 +1345,7 @@ bool pqMainWindowCore::compareView(
   return ret;
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::initializeStates()
 {
   emit this->enableFileOpen(true);
@@ -1371,6 +1372,28 @@ void pqMainWindowCore::initializeStates()
   emit this->enableCameraRedo(false);
   emit this->cameraUndoLabel("");
   emit this->cameraRedoLabel("");
+}
+
+//-----------------------------------------------------------------------------
+bool pqMainWindowCore::makeServerConnectionIfNoneExists()
+{
+  if (this->getActiveServer())
+    {
+    return true;
+    }
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+  if (core->getServerManagerModel()->getNumberOfServers() != 0)
+    {
+    // cannot really happen, however, if no active server, yet
+    // server connection exists, we don't try to make a new server connection.
+    return false;
+    }
+
+  pqServerStartupBrowser server_browser (core->serverStartups(), 
+    *(core->settings()), this->Implementation->Parent);
+  server_browser.exec();
+  return (this->getActiveServer() != NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -3281,4 +3304,17 @@ void pqMainWindowCore::removePluginToolBars()
 pqUndoStack* pqMainWindowCore::getApplicationUndoStack() const
 {
   return this->Implementation->UndoStack;
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::loadDataFromCommandLine()
+{
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+  if (options->GetParaViewDataName())
+    {
+    if (this->makeServerConnectionIfNoneExists())
+      {
+      this->createReaderOnActiveServer(options->GetParaViewDataName());
+      }
+    }
 }
