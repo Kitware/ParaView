@@ -925,55 +925,11 @@ QVariant MainWindow::findToolBarActionsNotInMenus()
   return missingInActions.join(", ");
 }
 
-static void swapActionApperances(QAction &a, QAction &b)
-{
-  QAction* temp = new QAction(0);
-  temp->setIcon(a.icon());
-  temp->setIconText(a.iconText());
-  temp->setStatusTip(a.statusTip());
-  temp->setText(a.text());
-
-  a.setIcon(b.icon());
-  a.setIconText(b.iconText());
-  a.setStatusTip(b.statusTip());
-  a.setText(b.text());
-
-  b.setIcon(temp->icon());
-  b.setIconText(temp->iconText());
-  b.setStatusTip(temp->statusTip());
-  b.setText(temp->text());
-  delete temp;
-}
-
 //-----------------------------------------------------------------------------
 void MainWindow::onPlaying(bool playing)
 {
-  swapActionApperances(*this->Implementation->UI.actionVCRPlay,
-    *this->Implementation->UI.actionVCRPause);
-
-  if (playing)
-    {
-    QObject::disconnect(this->Implementation->UI.actionVCRPlay, 
-      SIGNAL(triggered()), 
-      &this->Implementation->Core.VCRController(), SLOT(onPlay()));
-    QObject::connect(this->Implementation->UI.actionVCRPlay, 
-      SIGNAL(triggered()), 
-      &this->Implementation->Core.VCRController(), SLOT(onPause()));
-    }
-  else
-    {
-    QObject::disconnect(this->Implementation->UI.actionVCRPlay, 
-      SIGNAL(triggered()), 
-      &this->Implementation->Core.VCRController(), SLOT(onPause()));
-    QObject::connect(this->Implementation->UI.actionVCRPlay, 
-      SIGNAL(triggered()),
-      &this->Implementation->Core.VCRController(), SLOT(onPlay()));
-    }
-  
-  connect(this->Implementation->UI.actionVCRPause, SIGNAL(triggered()), 
-    &this->Implementation->Core.VCRController(), SLOT(onPause()));
-
- // this->Implementation->UI.actionVCRPause->setVisible(playing);
+  this->Implementation->UI.actionVCRPlay->setVisible(!playing);
+  this->Implementation->UI.actionVCRPause->setVisible(playing);
 }
 
 //-----------------------------------------------------------------------------
