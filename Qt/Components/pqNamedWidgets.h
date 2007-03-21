@@ -76,6 +76,14 @@ public:
   static void link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager);
   /// Remove links between Qt widgets and server manager properties
   static void unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager);
+
+  static void linkObject(QObject* object, pqSMProxy proxy, 
+                         const QString& property,
+                         pqPropertyManager* property_manager);
+  
+  static void unlinkObject(QObject* object, pqSMProxy proxy,
+                           const QString& property,
+                           pqPropertyManager* property_manager);
 };
 
 #endif
