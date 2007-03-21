@@ -53,6 +53,8 @@ public:
   /// destructor
   ~pqExodusPanel();
 
+  void reset();
+
 signals:
   void displayTypeChanged();
 

@@ -497,6 +497,19 @@ void pqExodusPanel::propertyChanged()
     }
 }
 
+void pqExodusPanel::reset()
+{
+  // push original values for block status back
+  // onto the vtkExodusReader, as the ExodusHelper
+  // might have played with them
+  vtkSMProxy* pxy = this->proxy()->getProxy();
+  pxy->UpdateProperty("BlockArrayStatus", 1);
+  pxy->UpdateProperty("MaterialArrayStatus", 1);
+  pxy->UpdateProperty("HierarchyArrayStatus", 1);
+
+  pqNamedObjectPanel::reset();
+}
+
 void pqExodusPanel::blockItemChanged(QTreeWidgetItem* item)
 {
   this->selectionItemChanged(item, "BlockArrayStatus");
