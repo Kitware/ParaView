@@ -28,7 +28,7 @@
 #include "vtkIntArray.h"
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.15");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.16");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -212,7 +212,9 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   // input ...  
   double range[2];
   data_array->GetRange(range, this->Component);
-  const double bin_delta = (range[1] - range[0]) / this->BinCount;
+  double bin_delta = (range[1] - range[0]) / this->BinCount;
+  bin_delta = (bin_delta==0)? 1 : bin_delta;
+
   
   bin_extents->SetValue(0, range[0]);
   for(i = 1; i < this->BinCount; ++i)
