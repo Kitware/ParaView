@@ -122,7 +122,7 @@ void pqVCRController::onTick()
   // the animation scene proxy does it.
 
   // process the events so that the GUI remains responsive.
-  pqEventDispatcher::processEventsAndWait(0);  // would be nice to enhance
+  pqEventDispatcher::processEventsAndWait(1);  // would be nice to enhance
                                                // testing framework so we can
                                                // simply call
                                                // QApplication::processEvents
