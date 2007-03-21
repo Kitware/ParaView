@@ -378,6 +378,13 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property,
     {
     pqSMAdaptor::setSelectionProperty(Property, l);
     }
+  
+  vtkSMStringVectorProperty* StringProperty;
+  StringProperty = vtkSMStringVectorProperty::SafeDownCast(Property);
+  if(StringProperty)
+    {
+    StringProperty->SetNumberOfElements(Value.size() * 2);
+    }
 }
 
 void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProperty* Property,
