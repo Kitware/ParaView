@@ -22,7 +22,7 @@
 class vtkPVAnimationSceneSetOfDouble : public vtkstd::set<double> {};
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.3");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.4");
 //-----------------------------------------------------------------------------
 vtkPVAnimationScene::vtkPVAnimationScene()
 {
@@ -97,12 +97,16 @@ void vtkPVAnimationScene::Play()
   this->StopPlay = 0;
 
   double frame_count = this->FramesPerTimestep>1? this->FramesPerTimestep: 1.0;
-
+ 
+  double cycle_start_time = this->AnimationTime;
+  // adjust cycle_start_time to a valid time.
+  cycle_start_time = (cycle_start_time < this->StartTime || cycle_start_time >= this->EndTime)?
+    this->StartTime : cycle_start_time;
   do
     {
     this->Initialize(); // Set the Scene in unintialized mode.
 
-    vtkPVAnimationSceneSetOfDouble::iterator iter = this->TimeSteps->lower_bound(this->StartTime);
+    vtkPVAnimationSceneSetOfDouble::iterator iter = this->TimeSteps->lower_bound(cycle_start_time);
     if (iter == this->TimeSteps->end())
       {
       break;
@@ -136,8 +140,9 @@ void vtkPVAnimationScene::Play()
       deltatime = (*iter) - previous_tick_time;
       deltatime = (deltatime < 0)? -1*deltatime : deltatime;
       } while (!this->StopPlay && this->CueState != vtkAnimationCue::INACTIVE);
-    // End of loop for 1 cycle.
 
+    // End of loop for 1 cycle.
+    cycle_start_time = this->StartTime;
     } while (this->Loop && !this->StopPlay);
 
   this->StopPlay = 0;
