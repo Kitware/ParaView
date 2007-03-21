@@ -312,13 +312,20 @@ bool pqPlotViewModule::canDisplaySource(pqPipelineSource* source) const
     }
   else if(this->getViewType() == this->XYPlotType())
     {
-    if (srcProxyName == "Probe2")
-      {
-      return true;
-      }
     vtkPVDataInformation* dataInfo = source->getDataInformation();
     if (dataInfo)
       {
+      if (dataInfo->GetNumberOfPoints() <= 1)
+        {
+        // can be XY-plotted  only when number of points > 1.
+        return false;
+        }
+
+      if (srcProxyName == "Probe2" )
+        {
+        return true;
+        }
+
       int extent[6];
       dataInfo->GetExtent(extent);
       int non_zero_dims = 0;

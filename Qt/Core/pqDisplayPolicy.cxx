@@ -97,7 +97,9 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
     // The proxy gives us no hint. In that case we try to determine the
     // preferred view by looking at the output from the source.
     vtkPVDataInformation* datainfo = source->getDataInformation();
-    if (datainfo && datainfo->GetDataClassName() == QString("vtkRectilinearGrid"))
+    if (datainfo && (
+        datainfo->GetDataClassName() == QString("vtkRectilinearGrid")  ||
+        source->getProxy()->GetXMLName() == QString("Probe2")))
       {
       int extent[6];
       datainfo->GetExtent(extent);
@@ -116,7 +118,10 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
         // Has cell data, mostlikely this is a histogram.
         view_type = pqPlotViewModule::barChartType();
         }
-      else if (non_zero_dims == 1 && pointDataInfo->GetNumberOfArrays() > 0)
+      else if (
+        (source->getProxy()->GetXMLName() == QString("Probe2") || 
+          non_zero_dims == 1) && pointDataInfo->GetNumberOfArrays() > 0 && 
+        datainfo->GetNumberOfPoints() > 1)
         {
         // No cell data, but some point data -- may be a XY line plot.
         view_type = pqPlotViewModule::XYPlotType();
