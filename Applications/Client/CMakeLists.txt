@@ -254,6 +254,7 @@ IF(BUILD_TESTING)
     ClipUndo
     Contour
     ContourRange
+    CreateAndLoadLookmark
     CreateCustomFilter
     CreateSource
     CustomFilter
