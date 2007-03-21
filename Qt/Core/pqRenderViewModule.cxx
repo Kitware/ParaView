@@ -142,11 +142,6 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
 
   this->ResetCenterWithCamera = true;
 
-  /// When a state is loaded, if this render module is reused, 
-  /// its interactor style will change
-  QObject::connect(pqApplicationCore::instance(), SIGNAL(stateLoaded()), this,
-    SLOT(updateInteractorStyleFromState()));
-
   // help the QVTKWidget know when to clear the cache
   this->Internal->VTKConnect->Connect(
     renModule, vtkCommand::ModifiedEvent,
@@ -297,21 +292,6 @@ void pqRenderViewModule::onInteractorStyleChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::updateInteractorStyleFromState()
-{
-  /*
-  // This is a temporary fix to make sure the center axes gets displayed after the state is loaded
-  pqSMAdaptor::removeProxyProperty(this->Internal->RenderModuleProxy->GetProperty("Displays"),
-    this->Internal->CenterAxesProxy);
-  pqSMAdaptor::addProxyProperty(this->Internal->RenderModuleProxy->GetProperty("Displays"),
-    this->Internal->CenterAxesProxy);
-  this->Internal->RenderModuleProxy->UpdateVTKObjects();
-
-  this->updateCenterAxes();
-  */
-}
-
-//-----------------------------------------------------------------------------
 // Sets default values for the underlying proxy.  This is during the 
 // initialization stage of the pqProxy for proxies created by the GUI itself 
 // i.e. for proxies loaded through state or created by python client or 
@@ -440,8 +420,6 @@ void pqRenderViewModule::initializeCenterAxes()
     centerAxes->GetProperty("Scale"), scaleValues);
   pqSMAdaptor::setElementProperty(centerAxes->GetProperty("Pickable"), 0);
   centerAxes->UpdateVTKObjects();
-  this->addHelperProxy("CenterAxesProxy", centerAxes);
-
   this->Internal->CenterAxesProxy = centerAxes;
   
   // Add to render module without using properties. That way it does not

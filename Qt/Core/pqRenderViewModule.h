@@ -166,10 +166,6 @@ public slots:
   // Sets the position and scale of the axes when the center of rotation has been modified
   void updateCenterAxes();
 
-  // Initializes the interactor style and center axes using server state.
-  // This is called after a state file is finished loading.
-  void updateInteractorStyleFromState();
-
   // Toggle center axes visibility.
   void setCenterAxesVisibility(bool visible);
 
