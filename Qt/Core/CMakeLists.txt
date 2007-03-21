@@ -307,8 +307,8 @@ TARGET_LINK_LIBRARIES(pqCore
   QtChart
   QtTesting
   QtWidgets
-  vtkPVServerManager
   QVTK
+  vtkPVServerManager
 )
 
 IF(VTK_USE_INFOVIS)
