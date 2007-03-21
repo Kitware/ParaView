@@ -242,6 +242,15 @@ public:
   unsigned int GetNumberOfIDs();
 
   // Description:
+  // Use the method with caution. It copies the VTK object IDs from this 
+  // proxy to the proxy passed in as the argument. This proxy must
+  // be created while the passed in proxy should not have any VTK objects
+  // associated with it. This is useful to make two (or more) proxies 
+  // represent the same VTK object.
+  // This method does not copy IDs for any subproxies.
+  void CopyIDs(vtkSMProxy* copyTo);
+
+  // Description:
   // Returns a new (initialized) iterator of the properties.
   virtual vtkSMPropertyIterator* NewPropertyIterator();
 

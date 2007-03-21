@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.87");
+vtkCxxRevisionMacro(vtkSMProxy, "1.88");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -2149,6 +2149,23 @@ void vtkSMProxy::ExposeSubProxyProperty(const char* subproxy_name,
   // This vector keeps track of the order in which properties
   // were added.
   this->Internals->PropertyNamesInOrder.push_back(exposed_name);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::CopyIDs(vtkSMProxy* copyTo)
+{
+  // Ensure we are created.
+  this->CreateVTKObjects(1);
+
+  if (copyTo->GetObjectsCreated())
+    {
+    vtkErrorMacro("Proxy has already been created, argument must be an "
+      "initialized proxy.");
+    return;
+    }
+
+  copyTo->Internals->IDs = this->Internals->IDs;
+  copyTo->ObjectsCreated = 1;
 }
 
 //---------------------------------------------------------------------------
