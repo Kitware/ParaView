@@ -26,7 +26,7 @@
 #include "vtkDoubleArray.h"
 
 vtkStandardNewMacro(vtkPolyLineToRectilinearGridFilter);
-vtkCxxRevisionMacro(vtkPolyLineToRectilinearGridFilter, "1.2");
+vtkCxxRevisionMacro(vtkPolyLineToRectilinearGridFilter, "1.3");
 //-----------------------------------------------------------------------------
 vtkPolyLineToRectilinearGridFilter::vtkPolyLineToRectilinearGridFilter()
 {
@@ -92,7 +92,7 @@ int vtkPolyLineToRectilinearGridFilter::RequestData(
   int num_lines = lines->GetNumberOfCells();
   if (num_lines == 0)
     {
-    vtkWarningMacro("No lines in the input.");
+    // vtkWarningMacro("No lines in the input.");
     return 1;
     }
 
