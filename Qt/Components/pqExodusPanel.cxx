@@ -48,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxyManager.h"
 
 // ParaView includes
 #include "pqPropertyManager.h"
@@ -60,7 +62,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqExodusPanel::pqUI : public QObject, public Ui::ExodusPanel 
 {
 public:
-  pqUI(pqExodusPanel* p) : QObject(p) {}
+  pqUI(pqExodusPanel* p) : QObject(p)
+  {
+    // make a clone of the ExodusReader proxy
+    // we'll use the clone to help us with the Block/Material/Hierarchy array
+    // status (keep them in sync and auto check/uncheck hierarchically related 
+    // items in the hierarchy view).
+    vtkSMProxyManager* pm = vtkSMProxy::GetProxyManager();
+    ExodusHelper.TakeReference(pm->NewProxy("misc", "ExodusReaderHelper"));
+    p->proxy()->getProxy()->CopyIDs(ExodusHelper);
+  }
+  vtkSmartPointer<vtkSMProxy> ExodusHelper;
 };
 
 pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
@@ -79,15 +91,6 @@ pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
 
   this->UI->XMLFileName->setServer(this->proxy()->getServer());
   
-#if QT_VERSION < 0x040200
-  // workaround for Qt bug in plastique style, where painter state wasn't being
-  // restored after a save.
-  // we always want a height greater than 2 anyway
-  this->UI->BlockArrayStatus->setMinimumHeight(2);
-  this->UI->HierarchyArrayStatus->setMinimumHeight(2);
-  this->UI->MaterialArrayStatus->setMinimumHeight(2);
-#endif
- 
   this->DataUpdateInProgress = false;
   
   this->linkServerManagerProperties();
@@ -111,6 +114,16 @@ void pqExodusPanel::linkServerManagerProperties()
 {
   // parent class hooks up some of our widgets in the ui
   pqNamedObjectPanel::linkServerManagerProperties();
+
+  QObject::connect(this->UI->BlockArrayStatus,
+    SIGNAL(itemClicked(QTreeWidgetItem*, int)),
+    this, SLOT(blockItemChanged(QTreeWidgetItem*)));
+  QObject::connect(this->UI->HierarchyArrayStatus,
+    SIGNAL(itemClicked(QTreeWidgetItem*, int)),
+    this, SLOT(hierarchyItemChanged(QTreeWidgetItem*)));
+  QObject::connect(this->UI->MaterialArrayStatus,
+    SIGNAL(itemClicked(QTreeWidgetItem*, int)),
+    this, SLOT(materialItemChanged(QTreeWidgetItem*)));
   
   this->propertyManager()->registerLink(
     this,
@@ -483,3 +496,82 @@ void pqExodusPanel::propertyChanged()
     QTimer::singleShot(0, this, SLOT(updateDataRanges()));
     }
 }
+
+void pqExodusPanel::blockItemChanged(QTreeWidgetItem* item)
+{
+  this->selectionItemChanged(item, "BlockArrayStatus");
+}
+
+void pqExodusPanel::hierarchyItemChanged(QTreeWidgetItem* item)
+{
+  this->selectionItemChanged(item, "HierarchyArrayStatus");
+}
+
+void pqExodusPanel::materialItemChanged(QTreeWidgetItem* item)
+{
+  this->selectionItemChanged(item, "MaterialArrayStatus");
+}
+
+void pqExodusPanel::selectionItemChanged(QTreeWidgetItem* item,
+                                         const QString& propName)
+{
+  vtkSMProxy* pxy = this->UI->ExodusHelper;
+  vtkSMProperty* blockInfo[3];
+  vtkSMProperty* blockStatus[3];
+  int i;
+  
+  blockInfo[0] = pxy->GetProperty("BlockArrayInfo");
+  blockInfo[1] = pxy->GetProperty("HierarchyArrayInfo");
+  blockInfo[2] = pxy->GetProperty("MaterialArrayInfo");
+  
+  blockStatus[0] = pxy->GetProperty("BlockArrayStatus");
+  blockStatus[1] = pxy->GetProperty("HierarchyArrayStatus");
+  blockStatus[2] = pxy->GetProperty("MaterialArrayStatus");
+
+  pqTreeWidgetItemObject* itemObject;
+  itemObject = static_cast<pqTreeWidgetItemObject*>(item);
+  vtkSMProperty* prop = NULL;
+  prop = pxy->GetProperty(propName.toAscii().data());
+  
+  QList< QList< QVariant > > values;
+  // clear out any old stuff
+  for(i=0; i<3; i++)
+    {
+    pqSMAdaptor::setSelectionProperty(blockStatus[i], values);
+    }
+
+  // set only the single selection the user changed
+  values.append(QList<QVariant>());
+  values[0].append(itemObject->text(0));
+  values[0].append(itemObject->isChecked());
+  // send change down to the vtkExodusReader
+  pqSMAdaptor::setSelectionProperty(prop, values);
+  pxy->UpdateProperty(propName.toAscii().data());
+
+  // get the new selections back
+  for(i=0; i<3; i++)
+    {
+    pxy->UpdatePropertyInformation(blockInfo[i]);
+    blockStatus[i]->Copy(blockInfo[i]);
+    }
+
+  QTreeWidget* widgets[3] =
+    {
+    this->UI->BlockArrayStatus,
+    this->UI->HierarchyArrayStatus,
+    this->UI->MaterialArrayStatus
+    };
+
+  for(i=0; i<3; i++)
+    {
+    values = pqSMAdaptor::getSelectionProperty(blockStatus[i]);
+    for(int j=0; j<values.size(); j++)
+      {
+      pqTreeWidgetItemObject* treeItemObject;
+      treeItemObject = static_cast<pqTreeWidgetItemObject*>(
+                       widgets[i]->topLevelItem(j));
+      treeItemObject->setChecked(values[j][1].toBool());
+      }
+    }
+}
+

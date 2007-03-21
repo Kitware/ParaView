@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqTreeWidgetItemObject;
 class QTreeWidget;
+class QTreeWidgetItem;
 class QListWidget;
 class vtkPVArrayInformation;
 
@@ -62,6 +63,11 @@ protected slots:
 
   void updateDataRanges();
   void propertyChanged();
+
+  void blockItemChanged(QTreeWidgetItem*);
+  void hierarchyItemChanged(QTreeWidgetItem*);
+  void materialItemChanged(QTreeWidgetItem*);
+  void selectionItemChanged(QTreeWidgetItem*, const QString&);
   
 protected:
   int displayType() const;
