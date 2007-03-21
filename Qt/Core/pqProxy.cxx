@@ -127,6 +127,35 @@ void pqProxy::removeHelperProxy(const QString& key, vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
+void pqProxy::clearHelperProxies()
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  if (pxm)
+    {
+    QString groupname = QString("pq_helper_proxies.%1").arg(
+      this->getProxy()->GetSelfIDAsString());
+
+    pqProxyInternal::ProxyListsType::iterator iter
+      = this->Internal->ProxyLists.begin();
+    for (;iter != this->Internal->ProxyLists.end(); ++iter)
+      {
+      foreach(vtkSMProxy* proxy, iter.value())
+        {
+        const char* name = pxm->GetProxyName(
+          groupname.toAscii().data(), proxy);
+        if (name)
+          {
+          pxm->UnRegisterProxy(groupname.toAscii().data(), name, proxy);
+          }
+        }
+      }
+    }
+
+  this->Internal->ProxyLists.clear();
+}
+
+
+//-----------------------------------------------------------------------------
 QList<QString> pqProxy::getHelperKeys() const
 {
   return this->Internal->ProxyLists.keys();
@@ -162,30 +191,6 @@ QList<vtkSMProxy*> pqProxy::getHelperProxies() const
         }
       }
   return list;
-}
-
-//-----------------------------------------------------------------------------
-void pqProxy::clearHelperProxies()
-{
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  if (pxm)
-    {
-    pqProxyInternal::ProxyListsType::iterator iter
-      = this->Internal->ProxyLists.begin();
-    for (;iter != this->Internal->ProxyLists.end(); ++iter)
-      {
-      foreach(vtkSMProxy* proxy, iter.value())
-        {
-        const char* name = pxm->GetProxyName("pq_helper_proxies", proxy);
-        if (name)
-          {
-          pxm->UnRegisterProxy("pq_helper_proxies", name, proxy);
-          }
-        }
-      }
-    }
-
-  this->Internal->ProxyLists.clear();
 }
 
 //-----------------------------------------------------------------------------
