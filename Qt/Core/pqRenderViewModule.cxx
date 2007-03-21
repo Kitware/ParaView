@@ -344,14 +344,42 @@ void pqRenderViewModule::createDefaultInteractors()
     interactorStyle->GetProperty("CameraManipulators");
 
   // Create and register manipulators, then add to interactor style
+
+  // LeftButton -- Rotate
   vtkSMProxy *manip = pxm->NewProxy("cameramanipulators", "TrackballRotate");
   manip->SetConnectionID(cid);
   manip->SetServers(vtkProcessModule::CLIENT);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 1);
   this->addHelperProxy("Manipulators",manip);
   pqSMAdaptor::addProxyProperty(styleManips, manip);
   manip->UpdateVTKObjects();
   manip->Delete();
 
+  // Shift + LeftButton  -- Roll.
+  manip = pxm->NewProxy("cameramanipulators", "TrackballRoll");
+  manip->SetConnectionID(cid);
+  manip->SetServers(vtkProcessModule::CLIENT);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 1);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), 1);
+  this->addHelperProxy("Manipulators", manip);
+  pqSMAdaptor::addProxyProperty(styleManips, manip);
+  manip->UpdateVTKObjects();
+  manip->Delete();
+
+  // Control + LeftButton -- FlyIn
+  // manip = pxm->NewProxy("cameramanipulators", "JoystickFly2");
+  manip = pxm->NewProxy("cameramanipulators", "TrackballZoom");
+  manip->SetConnectionID(cid);
+  manip->SetServers(vtkProcessModule::CLIENT);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 1);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), 1);
+  // pqSMAdaptor::setElementProperty(manip->GetProperty("In"), 1);
+  this->addHelperProxy("Manipulators", manip);
+  pqSMAdaptor::addProxyProperty(styleManips, manip);
+  manip->UpdateVTKObjects();
+  manip->Delete();
+
+  // MiddleButton -- Pan
   manip = pxm->NewProxy("cameramanipulators", "TrackballPan1");
   manip->SetConnectionID(cid);
   manip->SetServers(vtkProcessModule::CLIENT);
@@ -361,16 +389,29 @@ void pqRenderViewModule::createDefaultInteractors()
   manip->UpdateVTKObjects();
   manip->Delete();
 
-  manip = pxm->NewProxy("cameramanipulators", "TrackballPan1");
+  // Shift + MiddleButton -- Rotate
+  manip = pxm->NewProxy("cameramanipulators", "TrackballRotate");
   manip->SetConnectionID(cid);
   manip->SetServers(vtkProcessModule::CLIENT);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 1);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), 1);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 2);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), 1);
   this->addHelperProxy("Manipulators",manip);
   pqSMAdaptor::addProxyProperty(styleManips, manip);
   manip->UpdateVTKObjects();
   manip->Delete();
 
+  // Control + MiddleButton -- Rotate
+  manip = pxm->NewProxy("cameramanipulators", "TrackballRotate");
+  manip->SetConnectionID(cid);
+  manip->SetServers(vtkProcessModule::CLIENT);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 2);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), 1);
+  this->addHelperProxy("Manipulators",manip);
+  pqSMAdaptor::addProxyProperty(styleManips, manip);
+  manip->UpdateVTKObjects();
+  manip->Delete();
+  
+  // RightButton -- Zoom
   manip = pxm->NewProxy("cameramanipulators", "TrackballZoom");
   manip->SetConnectionID(cid);
   manip->SetServers(vtkProcessModule::CLIENT);
@@ -380,12 +421,26 @@ void pqRenderViewModule::createDefaultInteractors()
   manip->UpdateVTKObjects();
   manip->Delete();
 
+  // Shift + RightButton -- Pan
+  manip = pxm->NewProxy("cameramanipulators", "TrackballPan1");
+  manip->SetConnectionID(cid);
+  manip->SetServers(vtkProcessModule::CLIENT);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 3);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), 1);
+  this->addHelperProxy("Manipulators",manip);
+  pqSMAdaptor::addProxyProperty(styleManips, manip);
+  manip->UpdateVTKObjects();
+  manip->Delete();
+  
+  // Control + RightButton -- FlyOut
+  // manip = pxm->NewProxy("cameramanipulators", "JoystickFly2");
   manip = pxm->NewProxy("cameramanipulators", "TrackballZoom");
   manip->SetConnectionID(cid);
   manip->SetServers(vtkProcessModule::CLIENT);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 1);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), 1);
-  this->addHelperProxy("Manipulators",manip);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 3);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), 1);
+  // pqSMAdaptor::setElementProperty(manip->GetProperty("In"), 0);
+  this->addHelperProxy("Manipulators", manip);
   pqSMAdaptor::addProxyProperty(styleManips, manip);
   manip->UpdateVTKObjects();
   manip->Delete();
