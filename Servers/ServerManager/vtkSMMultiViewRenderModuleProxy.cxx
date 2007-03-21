@@ -29,7 +29,7 @@ class vtkSMMultiViewRenderModuleProxyVector :
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMultiViewRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.8");
 
 //----------------------------------------------------------------------------
 vtkSMMultiViewRenderModuleProxy::vtkSMMultiViewRenderModuleProxy()
@@ -60,14 +60,6 @@ vtkSMProxy* vtkSMMultiViewRenderModuleProxy::NewRenderModule()
   vtkSMProxy* renderModule = this->GetProxyManager()->NewProxy(
     "rendermodules", this->RenderModuleName);
   renderModule->SetConnectionID(this->ConnectionID);
-
-  /*
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->vtkSMProxy::GetProperty("RenderModules"));
-  pp->AddProxy(renderModule);
-  this->UpdateProperty("RenderModules");
-  */
-
   return renderModule;
 }
 
@@ -113,7 +105,7 @@ void vtkSMMultiViewRenderModuleProxy::AddRenderModule(
   this->RenderModuleId++;
 
   ostrstream name;
-  name << "RenderModule." << renderModule->GetSelfIDAsString() << endl;
+  name << "RenderModule." << renderModule->GetSelfIDAsString() << ends;
   this->AddSubProxy(name.str(), renderModule);
 
   this->RenderModules->push_back(renderModule);
