@@ -116,6 +116,10 @@ pqPlotViewModule::pqPlotViewModule(const QString& type,
     {
     qDebug() << "PlotType: " << type << " not supported yet.";
     }
+  if (this->Internal->PlotWidget)
+    {
+    this->Internal->PlotWidget->setObjectName("PlotWidget");
+    }
   
   QObject::connect(this, SIGNAL(displayVisibilityChanged(pqDisplay*, bool)),
     this, SLOT(visibilityChanged(pqDisplay*)));
