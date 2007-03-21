@@ -91,14 +91,13 @@ void pqProxy::addHelperProxy(const QString& key, vtkSMProxy* proxy)
 
   if (!already_added)
     {
+    QString groupname = QString("pq_helper_proxies.%1").arg(
+      this->getProxy()->GetSelfIDAsString());
+
     this->Internal->ProxyLists[key].push_back(proxy);
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    if (!pxm->GetProxyName("pq_helper_proxies", proxy))
-      {
-      // register proxy only if it is not already registered.
-      pxm->RegisterProxy("pq_helper_proxies",
-        proxy->GetSelfIDAsString(), proxy);
-      }
+    pxm->RegisterProxy(groupname.toAscii().data(), 
+      key.toAscii().data(), proxy);
     }
 }
 
@@ -114,11 +113,15 @@ void pqProxy::removeHelperProxy(const QString& key, vtkSMProxy* proxy)
   if (this->Internal->ProxyLists.contains(key))
     {
     this->Internal->ProxyLists[key].removeAll(proxy);
+
+
+    QString groupname = QString("pq_helper_proxies.%1").arg(
+      this->getProxy()->GetSelfIDAsString());
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    const char* name = pxm->GetProxyName("pq_helper_proxies", proxy);
+    const char* name = pxm->GetProxyName(groupname.toAscii().data(), proxy);
     if (name)
       {
-      pxm->UnRegisterProxy("pq_helper_proxies", name, proxy);
+      pxm->UnRegisterProxy(groupname.toAscii().data(), name, proxy);
       }
     }
 }

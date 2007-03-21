@@ -33,14 +33,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
 
 #include <QPointer>
+#include <QRegExp>
 
 #include "pqAnimationManager.h"
 #include "pqAnimationScene.h"
+#include "pqApplicationCore.h"
 #include "pqMainWindowCore.h"
+#include "pqProxy.h"
+#include "pqServerManagerModel.h"
 #include "pqViewManager.h"
 
 //-----------------------------------------------------------------------------
@@ -48,12 +54,13 @@ class pqStateLoaderInternal
 {
 public:
   QPointer<pqMainWindowCore> MainWindowCore;
+  QList<vtkSmartPointer<vtkPVXMLElement> > HelperProxyCollectionElements;
 };
 
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.6");
+vtkCxxRevisionMacro(pqStateLoader, "1.7");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -75,6 +82,8 @@ void pqStateLoader::SetMainWindowCore(pqMainWindowCore* core)
 //-----------------------------------------------------------------------------
 int pqStateLoader::LoadState(vtkPVXMLElement* root, int keep_proxies/*=0*/)
 {
+  this->Internal->HelperProxyCollectionElements.clear();
+
   unsigned int numElems = root->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; ++cc)
     {
@@ -101,12 +110,18 @@ int pqStateLoader::LoadState(vtkPVXMLElement* root, int keep_proxies/*=0*/)
       }
     }
 
+  // After having loaded all state,
+  // try to discover helper proxies for all pqProxies.
+  this->DiscoverHelperProxies();
+
   if (!keep_proxies)
     {
     this->ClearCreatedProxies();
     }
+  this->Internal->HelperProxyCollectionElements.clear();
   return 1;
 }
+
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqStateLoader::NewProxyInternal(
   const char* xml_group, const char* xml_name)
@@ -176,6 +191,80 @@ int pqStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
     }
   return this->Superclass::LoadProxyState(proxyElement, proxy);
 }
+
+//-----------------------------------------------------------------------------
+int pqStateLoader::BuildProxyCollectionInformation(
+  vtkPVXMLElement* collectionElement)
+{
+  const char* groupName = collectionElement->GetAttribute("name");
+  if (!groupName)
+    {
+    vtkErrorMacro("Requied attribute name is missing.");
+    return 0;
+    }
+
+  QRegExp helper_group_rx ("pq_helper_proxies.(\\d+)");
+  if (helper_group_rx.indexIn(groupName) == -1)
+    {
+    return this->Superclass::BuildProxyCollectionInformation(
+      collectionElement);
+    }
+
+  // The collection is a pq_helper_proxies collection.
+  // We don't register these proxies directly again, instead
+  // we add them as helper proxies which will get registered
+  // while adding them as helper proxies to pqProxy objects.
+  this->Internal->HelperProxyCollectionElements.push_back(collectionElement);
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+void pqStateLoader::DiscoverHelperProxies()
+{
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  QRegExp helper_group_rx ("pq_helper_proxies.(\\d+)");
+
+  foreach(vtkPVXMLElement* proxyCollection, 
+    this->Internal->HelperProxyCollectionElements)
+    {
+    const char* groupname = proxyCollection->GetAttribute("name");
+    if (helper_group_rx.indexIn(groupname) == -1)
+      {
+      continue;
+      }
+    int proxyid = helper_group_rx.cap(1).toInt();
+    vtkSmartPointer<vtkSMProxy> proxy;
+    proxy.TakeReference(this->NewProxy(proxyid));
+    pqProxy *pq_proxy = smmodel->getPQProxy(proxy);
+    if (!pq_proxy)
+      {
+      continue;
+      }
+    unsigned int num_children = proxyCollection->GetNumberOfNestedElements();
+    for (unsigned int cc=0; cc < num_children; cc++)
+      {
+      vtkPVXMLElement* child = proxyCollection->GetNestedElement(cc);
+      if (child->GetName() != QString("Item"))
+        {
+        continue;
+        }
+      const char* name = child->GetAttribute("name");
+      int helperid;
+      if (!name || !child->GetScalarAttribute("id", &helperid))
+        {
+        continue;
+        }
+      vtkSMProxy* helper = this->NewProxy(helperid);
+      if (helper)
+        {
+        pq_proxy->addHelperProxy(name, helper);
+        helper->Delete();
+        }
+      }
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 void pqStateLoader::PrintSelf(ostream& os, vtkIndent indent)

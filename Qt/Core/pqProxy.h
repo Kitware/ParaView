@@ -144,6 +144,8 @@ protected:
   /// Unregisters all helper proxies.
   void clearHelperProxies();
 
+  /// state loader needs access to addHelperProxy.
+  friend class pqStateLoader;
 private slots:
   void onUpdateVTKObjects();
 

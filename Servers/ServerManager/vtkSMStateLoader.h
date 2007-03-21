@@ -83,7 +83,7 @@ protected:
   int HandleProxyCollection(vtkPVXMLElement* collectionElement);
   void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
   int HandleLinks(vtkPVXMLElement* linksElement);
-  int BuildProxyCollectionInformation(vtkPVXMLElement*);
+  virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
 
   // Description:
   // This method scans through the internal data structure built 

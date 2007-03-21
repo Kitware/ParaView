@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqMainWindowCore;
 class pqStateLoaderInternal;
 
-// State loader which makes it possible to load
-// additional GUI related state (including multiview layout).
+/// State loader which makes it possible to load
+/// additional GUI related state (including multiview layout).
 class PQCOMPONENTS_EXPORT pqStateLoader : public vtkSMPQStateLoader
 {
 public:
@@ -49,28 +49,31 @@ public:
   vtkTypeRevisionMacro(pqStateLoader, vtkSMPQStateLoader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Loads the GUI as well as the ServerManager state.
+  /// Loads the GUI as well as the ServerManager state.
   virtual int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
 
-  // Set the main window core. The core is GUI side manager.
+  /// Set the main window core. The core is GUI side manager.
   void SetMainWindowCore(pqMainWindowCore* core);
 protected:
   pqStateLoader();
   ~pqStateLoader();
 
-  // Description:
-  // Overridden so that animation scene proxy is not recreated types.
+  /// Overridden so that animation scene proxy is not recreated types.
   virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
 
-  // Overridden to avoid registering the reused animation scene twice.
+  /// Overridden to avoid registering the reused animation scene twice.
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
 
-  // Description:
-  // This method is called to load a proxy state. Overloaded to make sure that 
-  // when states are loaded for existsing render modules, the displays already present
-  // in those render modules are not affected.
+  /// This method is called to load a proxy state. Overloaded to make sure that 
+  /// when states are loaded for existsing render modules, the displays already present
+  /// in those render modules are not affected.
   virtual int LoadProxyState(vtkPVXMLElement* proxyElement, vtkSMProxy* proxy);
+
+  virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
+
+  /// Finds helper proxies for any pqProxies and assigns them accordingly.
+  void DiscoverHelperProxies();
 private:
   pqStateLoader(const pqStateLoader&); // Not implemented.
   void operator=(const pqStateLoader&); // Not implemented.
