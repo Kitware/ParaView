@@ -303,21 +303,12 @@ ADD_LIBRARY(pqCore
   vtkPVAxesActor.h
 )
 
-#TEMP  for Qt 4.2.2 and CMake < 2.4.3
-#      also FindQt4.cmake can't find QtUiTools with mac binary install 
-IF(WIN32)
-  SET(tmp_ui_lib debug QtUiToolsd optimized QtUiTools)
-ELSE(WIN32)
-  SET(tmp_ui_lib QtUiTools )
-ENDIF(WIN32)
-
 TARGET_LINK_LIBRARIES(pqCore
   QtChart
   QtTesting
   QtWidgets
   vtkPVServerManager
   QVTK
-  ${tmp_ui_lib}
 )
 
 IF(VTK_USE_INFOVIS)
