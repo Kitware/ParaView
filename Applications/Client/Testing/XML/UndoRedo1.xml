@@ -42,7 +42,7 @@ the renderview active. That's the final state.
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitHorizontalButton" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/Form/ViewGroup/ViewData" command="set_boolean" arguments="true" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/Form/ViewGroup/ViewData" command="set_boolean" arguments="true" />
@@ -72,4 +72,6 @@ the renderview active. That's the final state.
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.562092,0.437393,1,1,0)" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.562092,0.437393,1,0,0)" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.562092,0.437393,1,0,0)" />
+  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
 </pqevents>

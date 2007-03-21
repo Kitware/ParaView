@@ -516,7 +516,10 @@ void pqViewManager::assignFrame(pqGenericViewModule* view)
   
     this->Internal->DontCreateDeleteViewsModules = true;
     QSize cur_size = oldFrame->size();
-    if (cur_size.width() > cur_size.height())
+    if (cur_size.width() > 1.15*cur_size.height()) 
+        // give a slight preference to
+        // vertical splitting.
+                      
       {
       frame = this->splitWidgetHorizontal(oldFrame);
       }
