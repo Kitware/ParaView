@@ -54,7 +54,7 @@
    </widget>
    <widget class="QMenu" name="menuAnimation" >
     <property name="title" >
-     <string>&amp;Animation</string>
+     <string>A&amp;nimation</string>
     </property>
     <addaction name="actionVCRFirstFrame" />
     <addaction name="actionVCRPreviousFrame" />
