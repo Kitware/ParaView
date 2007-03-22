@@ -119,100 +119,97 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
     }
 
 
-  if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("Source")))
+  vtkSMProperty* const source_property =
+    this->proxy()->getProxy()->GetProperty("Source");
+    
+  // Setup initial defaults for our seed sources ...  
+  const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
+  for(int i = 0; i != sources.size(); ++i)
     {
-    // Setup initial defaults for our seed sources ...  
-    const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
-    for(int i = 0; i != sources.size(); ++i)
+    pqSMProxy source = sources[i];
+
+    if(source->GetVTKClassName() == QString("vtkPointSource"))
       {
-      pqSMProxy source = sources[i];
-
-      if(source->GetVTKClassName() == QString("vtkPointSource"))
+      if(vtkSMDoubleVectorProperty* const center =
+        vtkSMDoubleVectorProperty::SafeDownCast(
+          source->GetProperty("Center")))
         {
-        if(vtkSMDoubleVectorProperty* const center =
-          vtkSMDoubleVectorProperty::SafeDownCast(
-            source->GetProperty("Center")))
-          {
-          center->SetNumberOfElements(3);
-          center->SetElement(0, proxy_center[0]);
-          center->SetElement(1, proxy_center[1]);
-          center->SetElement(2, proxy_center[2]);
-          }
+        center->SetNumberOfElements(3);
+        center->SetElement(0, proxy_center[0]);
+        center->SetElement(1, proxy_center[1]);
+        center->SetElement(2, proxy_center[2]);
+        }
 
-        if(vtkSMIntVectorProperty* const number_of_points =
-          vtkSMIntVectorProperty::SafeDownCast(
-            source->GetProperty("NumberOfPoints")))
-          {
-          number_of_points->SetNumberOfElements(1);
-          number_of_points->SetElement(0, 100);
-          }
-        source->UpdateVTKObjects();
+      if(vtkSMIntVectorProperty* const number_of_points =
+        vtkSMIntVectorProperty::SafeDownCast(
+          source->GetProperty("NumberOfPoints")))
+        {
+        number_of_points->SetNumberOfElements(1);
+        number_of_points->SetElement(0, 100);
+        }
+      source->UpdateVTKObjects();
 
-        this->Implementation->PointSourceWidget = 
-          new pqPointSourceWidget(this->proxy(), source, NULL);
+      this->Implementation->PointSourceWidget = 
+        new pqPointSourceWidget(this->proxy(), source, NULL);
+      this->Implementation->PointSourceWidget->hideWidget();
 
-        if(vtkPVXMLElement* const hints = source->GetHints())
+      if(vtkPVXMLElement* const hints = source->GetHints())
+        {
+        for(unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
           {
-          for(unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
+          if(vtkPVXMLElement* const elem = hints->GetNestedElement(cc))
             {
-            if(vtkPVXMLElement* const elem = hints->GetNestedElement(cc))
+            if (QString("PropertyGroup") == elem->GetName() && 
+              QString("PointSource") == elem->GetAttribute("type"))
               {
-              if (QString("PropertyGroup") == elem->GetName() && 
-                QString("PointSource") == elem->GetAttribute("type"))
-                {
-                this->Implementation->PointSourceWidget->setHints(elem);
-                break;
-                }
+              this->Implementation->PointSourceWidget->setHints(elem);
+              break;
               }
             }
           }
-
         }
-      else if(source->GetVTKClassName() == QString("vtkLineSource"))
-        {
-        if(vtkSMIntVectorProperty* const resolution =
-          vtkSMIntVectorProperty::SafeDownCast(
-            source->GetProperty("Resolution")))
-          {
-          resolution->SetNumberOfElements(1);
-          resolution->SetElement(0, 100);
-          }
-        source->UpdateVTKObjects();
 
-        this->Implementation->LineSourceWidget =
-          new pqLineSourceWidget(this->proxy(), source, NULL);
-
-        if(vtkPVXMLElement* const hints = source->GetHints())
-          {
-          for(unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
-            {
-            if(vtkPVXMLElement* const elem = hints->GetNestedElement(cc))
-              {
-              if (QString("PropertyGroup") == elem->GetName() && 
-                QString("LineSource") == elem->GetAttribute("type"))
-                {
-                this->Implementation->LineSourceWidget->setHints(elem);
-                break;
-                }
-              }
-            }
-          }
-
-        }
       }
-
-    // Set the default source ...
-    if(sources.size())
+    else if(source->GetVTKClassName() == QString("vtkLineSource"))
       {
-      source_property->RemoveAllProxies();
-      source_property->AddProxy(sources[0]);
-      this->Implementation->UI.seedType->setCurrentIndex(0);
-      this->Implementation->PointSourceWidget->setWidgetVisible(true);
-      this->Implementation->LineSourceWidget->setWidgetVisible(false);
+      if(vtkSMIntVectorProperty* const resolution =
+        vtkSMIntVectorProperty::SafeDownCast(
+          source->GetProperty("Resolution")))
+        {
+        resolution->SetNumberOfElements(1);
+        resolution->SetElement(0, 100);
+        }
+      source->UpdateVTKObjects();
+
+      this->Implementation->LineSourceWidget =
+        new pqLineSourceWidget(this->proxy(), source, NULL);
+      this->Implementation->LineSourceWidget->hideWidget();
+
+      if(vtkPVXMLElement* const hints = source->GetHints())
+        {
+        for(unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
+          {
+          if(vtkPVXMLElement* const elem = hints->GetNestedElement(cc))
+            {
+            if (QString("PropertyGroup") == elem->GetName() && 
+              QString("LineSource") == elem->GetAttribute("type"))
+              {
+              this->Implementation->LineSourceWidget->setHints(elem);
+              break;
+              }
+            }
+          }
+        }
+
       }
     }
+  
+  pqSMProxy current = pqSMAdaptor::getProxyProperty(source_property);
 
+  int idx = sources.indexOf(current);
+  this->Implementation->UI.seedType->setCurrentIndex(idx);
+  this->onSeedTypeChanged(idx);
+  
   this->Implementation->LineSourceWidget->resetBounds();
   this->Implementation->PointSourceWidget->resetBounds();
   this->Implementation->LineSourceWidget->reset();
@@ -276,14 +273,15 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
     this, SIGNAL(onreset()), this->Implementation->PointSourceWidget, SLOT(reset()));
   QObject::connect(
     this, SIGNAL(onreset()), this->Implementation->LineSourceWidget, SLOT(reset()));
-  QObject::connect(
-    this, SIGNAL(onselect()), this->Implementation->PointSourceWidget, SLOT(select()));
-  QObject::connect(
-    this, SIGNAL(onselect()), this->Implementation->LineSourceWidget, SLOT(select()));
-  QObject::connect(
-    this, SIGNAL(ondeselect()), this->Implementation->PointSourceWidget, SLOT(deselect()));
-  QObject::connect(
-    this, SIGNAL(ondeselect()), this->Implementation->LineSourceWidget, SLOT(deselect()));
+  
+  QObject::connect(this, SIGNAL(onselect()), 
+                   this->Implementation->PointSourceWidget, SLOT(select()));
+  QObject::connect(this, SIGNAL(onselect()), 
+                   this->Implementation->LineSourceWidget, SLOT(select()));
+  QObject::connect(this, SIGNAL(ondeselect()), 
+                   this->Implementation->PointSourceWidget, SLOT(deselect()));
+  QObject::connect(this, SIGNAL(ondeselect()), 
+                   this->Implementation->LineSourceWidget, SLOT(deselect()));
 
 
   pqNamedWidgets::link(this, this->proxy()->getProxy(), 
@@ -331,8 +329,8 @@ void pqStreamTracerPanel::onUsePointSource()
         {
         this->Implementation->UI.stackedWidget->setCurrentWidget(
                         this->Implementation->UI.pointSource);
-        this->Implementation->PointSourceWidget->setWidgetVisible(true);
         this->Implementation->LineSourceWidget->setWidgetVisible(false);
+        this->Implementation->PointSourceWidget->setWidgetVisible(true);
         pqSMAdaptor::setUncheckedProxyProperty(source_property, source);
         emit this->canAcceptOrReject(true);
         break;
@@ -421,3 +419,4 @@ void pqStreamTracerPanel::onIntegratorTypeChanged(int index)
   this->Implementation->UI.MaximumIntegrationStep->setEnabled(enabled);
   this->Implementation->UI.MaximumError->setEnabled(enabled);
 }
+
