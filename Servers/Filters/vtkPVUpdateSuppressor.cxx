@@ -31,7 +31,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.47");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.48");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -71,12 +71,12 @@ vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 //----------------------------------------------------------------------------
 void vtkPVUpdateSuppressor::SetUpdateTime(double utime)
 {
+  this->UpdateTimeInitialized = true;
   if (this->UpdateTime != utime)
     {
     this->Modified();
     this->UpdateTime = utime;
     }
-  this->UpdateTimeInitialized = true;
 }
 
 //----------------------------------------------------------------------------
