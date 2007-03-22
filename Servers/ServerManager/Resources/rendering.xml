@@ -2016,6 +2016,13 @@
         update_self="1">
       </Property>
 
+      <DoubleVectorProperty
+        name="ViewTime"
+        number_of_elements="1"
+        default_values="0">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
       <Property name="InteractiveRender" 
         command="InteractiveRender" update_self="1">
       </Property>
@@ -2785,121 +2792,6 @@
       </SubProxy>
     </XYPlotDisplayProxy>
 
-
-    <TemporalXYPlotDisplayProxy name="TemporalXYPlotDisplay"
-      base_proxygroup="displays" base_proxyname="XYPlotDisplay">
-
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        update_self="1"
-        information_only="1">
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        update_self="1"
-        information_only="1">
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayNames"
-        command="AddPointArrayName"
-        update_self="1"
-        clean_command="RemoveAllPointArrayNames"
-        repeat_command="1"
-        number_of_elements_per_command="1">
-        <StringListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="PointArrayInfo" function="ArrayList" />
-          </RequiredProperties>
-        </StringListDomain>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayNames"
-        command="AddCellArrayName"
-        update_self="1"
-        clean_command="RemoveAllCellArrayNames"
-        repeat_command="1"
-        number_of_elements_per_command="1">
-        <StringListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="CellArrayInfo" function="ArrayList" />
-          </RequiredProperties>
-        </StringListDomain>
-     </StringVectorProperty>
-
-     <IntVectorProperty
-        name="PlotPointData"
-        command="SetPlotPointData"
-        number_of_elements="1"
-        update_self="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="LockTemporalCache"
-        command="SetLockTemporalCache"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-     </IntVectorProperty>
-
-     <ProxyProperty
-        name="AnimationCue"
-        command="SetAnimationCueProxy"
-        update_self="1">
-        <ProxyGroupDomain name="groups">
-          <Group name="animation"/>
-        </ProxyGroupDomain>
-     </ProxyProperty>
-
-      <SubProxy>
-        <Proxy name="TemporalCache" 
-          proxygroup="filters" proxyname="TemporalCache">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="UseCache" />
-          <Property name="AttributeToCollect" />
-        </ExposedProperties>
-      </SubProxy>
-      <!-- End of TemporalXYPlotDisplay -->
-    </TemporalXYPlotDisplayProxy>
-   
-
-    <ClientSideDataProxy name="ClientSideData">
-      <InputProperty name="Input" command="SetInput-not-used">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-          <Group name="glyph_sources" />
-        </ProxyGroupDomain>
-        <InputArrayDomain name="input_array" attribute_type="point">
-        </InputArrayDomain>
-      </InputProperty>
-      <Property name="Update" command="Update" update_self="1" is_internal="1">
-      </Property>
-      <Property name="InvalidateGeometry" command="InvalidateGeometry" update_self="1">
-      </Property>
-      <!-- Cache Update directly on UpdateSuppressor subproxy -->
-      <IntVectorProperty name="Visibility" command="SetVisibility" number_of_elements="1" update_self="1" default_values="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <SubProxy>
-        <Proxy name="UpdateSuppressor" proxygroup="filters" proxyname="UpdateSuppressor" />
-        <ExposedProperties>
-          <Property name="CacheUpdate" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
-        </Proxy>
-      </SubProxy>
-    </ClientSideDataProxy>
-    
     <CubeAxesDisplayProxy name="CubeAxesDisplay">
        <InputProperty
         name="Input"
@@ -2975,7 +2867,7 @@
         update_self="1"
         immediate_update="1"
         number_of_elements="1"
-        default_values="0"
+        default_values="none"
         is_internal="1">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
@@ -3670,6 +3562,17 @@
           <Entry value="4" text="RECTILINEAR_GRID_APPEND" />
         </EnumerationDomain>
       </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none"
+        is_internal="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
 
       <SubProxy>
         <Proxy name="UpdateSuppressor" 
