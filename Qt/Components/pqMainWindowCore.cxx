@@ -515,9 +515,10 @@ void pqMainWindowCore::refreshSourcesMenu()
         proxyLabel = proxy->GetXMLLabel();
         }
       QString filenamePropName = builder->getFileNamePropertyName(proxy);
+      // TODO mayabe put an internal tag on the SM XML
       if(filenamePropName.isEmpty() && proxyLabel != "Test3DWidget" && 
          proxyLabel != "PointSource" && proxyLabel != "OutlineSource" &&
-         proxyLabel != "NetworkImageSource")
+         proxyLabel != "NetworkImageSource" && proxyLabel != "SelectionSource")
         {
         sortingMap[proxyLabel] = proxyName;
         }
