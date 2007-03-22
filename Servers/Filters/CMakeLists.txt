@@ -17,7 +17,7 @@ SET(Filters_SRCS
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCaveRenderManager.cxx
-  vtkCellSelect.cxx
+#  vtkCellSelect.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkClientCompositeManager.cxx
   vtkClientServerMoveData.cxx
