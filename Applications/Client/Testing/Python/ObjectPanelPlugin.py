@@ -20,8 +20,6 @@ object4 = 'MainWindow/pqPluginDialog/buttonBox/1QPushButton0'
 QtTesting.playCommand(object4, 'activate', '')
 object5 = 'MainWindow/menubar/menuSources'
 QtTesting.playCommand(object5, 'activate', 'Cone')
-object6 = 'MainWindow/ServerStartupBrowser/connect'
-QtTesting.playCommand(object6, 'activate', '')
 object7 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
 QtTesting.playCommand(object7, 'activate', '')
 
