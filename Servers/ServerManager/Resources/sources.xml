@@ -863,7 +863,7 @@ The point source creates a specified number of points within a given radius abou
          command="SetRadius"
          number_of_elements="1"
          animateable="1"
-         default_values="1.0" >
+         default_values="0.0" >
         <DoubleRangeDomain name="range" min="0"/>
         <Documentation>
           Set the radius of the point cloud, measured from the specified center point.
