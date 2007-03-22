@@ -15,7 +15,7 @@ object5 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/ob
 QtTesting.playCommand(object5, 'activate', '')
 object6 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/1QScrollBar0'
 
-object7 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/XMLFileName/FileLineEdit'
+object7 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/FilePatternGroup/XMLFileName/FileLineEdit'
 
 print 'TODO: Add tests to turn materials, hierarchies on/off.  \nTesting framework needs enhanced first.'
 # for now, we'll just check that we have an XML file
