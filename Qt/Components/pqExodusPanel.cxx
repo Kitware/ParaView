@@ -337,7 +337,10 @@ void pqExodusPanel::linkServerManagerProperties()
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
                       this->proxy()->getProxy()->GetProperty("TimestepValues"));
   this->UI->ModeSelectSlider->setMaximum(dvp->GetNumberOfElements()-1);
-  this->UI->ModeLabel->setText(QString("%1").arg(dvp->GetElement(0)));
+  if (dvp->GetNumberOfElements() > 0)
+    {
+    this->UI->ModeLabel->setText(QString("%1").arg(dvp->GetElement(0)));
+    }
   this->propertyManager()->registerLink(this->UI->ModeSelectSlider,
                                         "value",
                                         SIGNAL(valueChanged(int)),
@@ -412,7 +415,10 @@ void pqExodusPanel::modeChanged(int value)
 {
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
                       this->proxy()->getProxy()->GetProperty("TimestepValues"));
-  this->UI->ModeLabel->setText(QString("%1").arg(dvp->GetElement(value)));
+  if ((value >= 0) && (value < (int)dvp->GetNumberOfElements()))
+    {
+    this->UI->ModeLabel->setText(QString("%1").arg(dvp->GetElement(value)));
+    }
 }
 
 void pqExodusPanel::updateDataRanges()
