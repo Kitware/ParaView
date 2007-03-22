@@ -2032,7 +2032,7 @@
   </ProxyGroup>
 
   <ProxyGroup name="extended_sources">
-    <SourceProxy name="LineSource" class="vtkLineSource">
+    <SourceProxy name="LineSource" class="vtkLineSource" label="Line Source">
       <DoubleVectorProperty
          name="Point1"
          command="SetPoint1"
@@ -2085,7 +2085,7 @@
     <!-- End LineSource -->
     </SourceProxy>
 
-    <SourceProxy name="PointSource" class="vtkPointSource">
+    <SourceProxy name="PointSource" class="vtkPointSource" label="Point Source">
        <DoubleVectorProperty
           name="Center"
           command="SetCenter"
@@ -2119,6 +2119,57 @@
               <Property name="DummyInput" function="Input" />
             </RequiredProperties>
           </BoundsDomain>
+       </DoubleVectorProperty>
+
+       <InputProperty name="DummyInput" is_internal="1">
+         <!-- Used when this source is added to a proxy list domain. -->
+       </InputProperty>
+
+       <Hints>
+         <PropertyGroup type="PointSource" >
+           <Property function="WorldPosition"  name="Center" />
+           <Property function="Radius"         name="Radius" />
+           <Property function="NumberOfPoints" name="NumberOfPoints" />
+         </PropertyGroup>
+
+         <ProxyList>
+           <Link name="DummyInput" with_property="Input" />
+         </ProxyList>
+       </Hints>
+    <!-- End PointSource -->
+    </SourceProxy>
+
+    <SourceProxy name="FixedRadiusPointSource" class="vtkPointSource"
+                 label="Point Source">
+       <DoubleVectorProperty
+          name="Center"
+          command="SetCenter"
+          number_of_elements="3"
+          animateable="1"
+          default_values="0.0 0.0 0.0" >
+          <BoundsDomain name="range" mode="normal" default_mode="mid" >
+            <RequiredProperties>
+              <Property name="DummyInput" function="Input" />
+            </RequiredProperties>
+          </BoundsDomain>
+       </DoubleVectorProperty>
+
+       <IntVectorProperty
+          name="NumberOfPoints"
+          command="SetNumberOfPoints"
+          number_of_elements="1"
+          animateable="1"
+          default_values="1" >
+          <IntRangeDomain name="range" min="1"/>
+       </IntVectorProperty>
+
+       <DoubleVectorProperty
+          name="Radius"
+          command="SetRadius"
+          number_of_elements="1"
+          animateable="1"
+          default_values="0.0" >
+          <DoubleRangeDomain name="range" min="0.0"/>
        </DoubleVectorProperty>
 
        <InputProperty name="DummyInput" is_internal="1">
