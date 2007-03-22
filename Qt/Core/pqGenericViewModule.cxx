@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
 
 // Qt includes.
@@ -48,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplay.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqTimeKeeper.h"
 
 template<class T>
 inline uint qHash(QPointer<T> p)
@@ -62,6 +64,7 @@ public:
 
   // List of displays shown by this render module.
   QList<QPointer<pqDisplay> > Displays;
+  vtkSmartPointer<vtkSMPropertyLink> ViewTimeLink;
 
   pqGenericViewModuleInternal()
     {
@@ -94,6 +97,17 @@ pqGenericViewModule::pqGenericViewModule(
   // If the render module already has some displays in it when it is registered,
   // this method will detect them and sync the GUI state with the SM state.
   this->displaysChanged();
+
+  // Link ViewTime with global time.
+  vtkSMProxy* timekeeper = this->getServer()->getTimeKeeper()->getProxy();
+
+  vtkSMPropertyLink* link = vtkSMPropertyLink::New();
+  link->AddLinkedProperty(timekeeper->GetProperty("Time"), vtkSMLink::INPUT);
+  link->AddLinkedProperty(renModule->GetProperty("ViewTime"), vtkSMLink::OUTPUT);
+  renModule->GetProperty("ViewTime")->Copy(timekeeper->GetProperty("Time"));
+  this->Internal->ViewTimeLink = link;
+  link->Delete();
+
 }
 
 //-----------------------------------------------------------------------------

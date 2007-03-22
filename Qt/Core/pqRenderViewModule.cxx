@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -71,7 +70,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
-#include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 #include "vtkPVAxesWidget.h"
 
@@ -85,7 +83,6 @@ public:
   vtkSmartPointer<vtkSMRenderModuleProxy> RenderModuleProxy;
   vtkSmartPointer<vtkPVAxesWidget> OrientationAxesWidget;
   vtkSmartPointer<vtkSMProxy> CenterAxesProxy;
-  vtkSmartPointer<vtkSMPropertyLink> ViewTimeLink;
   vtkSmartPointer<vtkSMProxy> InteractorStyleProxy;
   pqUndoStack* UndoStack;
   int DefaultBackground[3];
@@ -245,16 +242,6 @@ void pqRenderViewModule::initializeWidgets()
   this->Internal->OrientationAxesWidget->SetInteractive(0);
 
   iren->Enable();
-
-  // Link ViewTime with global time.
-  vtkSMProxy* timekeeper = this->getServer()->getTimeKeeper()->getProxy();
-
-  vtkSMPropertyLink* link = vtkSMPropertyLink::New();
-  link->AddLinkedProperty(timekeeper->GetProperty("Time"), vtkSMLink::INPUT);
-  link->AddLinkedProperty(renModule->GetProperty("ViewTime"), vtkSMLink::OUTPUT);
-  renModule->GetProperty("ViewTime")->Copy(timekeeper->GetProperty("Time"));
-  this->Internal->ViewTimeLink = link;
-  link->Delete();
 
   // setup the center axes.
   this->initializeCenterAxes();
