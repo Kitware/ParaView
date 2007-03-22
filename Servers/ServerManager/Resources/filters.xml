@@ -5422,65 +5422,6 @@ This filter extracts a list of datasets from multigroup datasets.
    <!-- End ShrunkContours -->
    </ShrunkContoursProxy>
 
-   
-   <SourceProxy name="TemporalCache" class="vtkTemporalCacheFilter">
-     <InputProperty name="Input" command="SetInputConnection">
-       <ProxyGroupDomain name="groups">
-         <Group name="sources"/>
-         <Group name="filters"/>
-       </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
-         <DataType value="vtkPointSet"/>
-       </DataTypeDomain>
-       <Documentation>
-         Set the input to the Temporal Cache filter.
-       </Documentation>
-     </InputProperty>
-
-     <IntVectorProperty 
-        name="UseCache" 
-        command="SetUseCache" 
-        number_of_elements="1"
-        default_values="0" > 
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Toggle whether this filter will use the collected cache or simply behave as a pass-through filter.
-        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="AttributeToCollect"
-        command="SetAttributeToCollect"
-        number_of_elements="1"
-        default_values="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="PointData" />
-          <Entry value="1" text="CellData" />
-          <Entry value="2" text="FieldData" />
-        </EnumerationDomain>
-        <Documentation>
-          Choose whether point, cell, or field data is collected.
-        </Documentation>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="CollectAttributeData"
-        command="CollectAttributeData"
-        number_of_elements="1"
-        default_values="0">
-        <Documentation>
-          Set the time to collect the data attribute.
-        </Documentation>
-     </DoubleVectorProperty>
-
-     <Property
-        name="ClearCache"
-        command="ClearCache"
-        immediate_update="1">
-     </Property>
-   <!-- End TemporalCache -->
-   </SourceProxy>
-   
    <SourceProxy name="ExtractHistogram" class="vtkPExtractHistogram"
                 label="Histogram">
      <Documentation
@@ -5583,6 +5524,7 @@ This filter extracts a list of datasets from multigroup datasets.
    <!-- End RectilinearGridGeometryFilter -->
    </SourceProxy>
 
+   <!-- Temporarily removing attribute editor
    <SourceProxy name="AttributeEditor" class="vtkAttributeEditor">
      <Documentation
           long_help="Select with a point or box widget the region to edit.  This output data type of this filter is always an unstructured grid."
@@ -5706,8 +5648,8 @@ This filter operates on all types of data sets, and it returns unstructured grid
          Toggle between a source view and a filter view.
        </Documentation>
      </IntVectorProperty>
-   <!-- End AttributeEditor -->
    </SourceProxy>
+   -->
 
    <SourceProxy name="TextureMapToPlane" class="vtkTextureMapToPlane"
      label="Texture Map to Plane">
