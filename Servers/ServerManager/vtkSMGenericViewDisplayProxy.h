@@ -88,6 +88,10 @@ public:
   // Description:
   // Chains to superclass and update UpdateRequiredFlag.
   virtual void MarkModified(vtkSMProxy* modifiedProxy); 
+
+  // Description:
+  // Set the update time passed on to the update suppressor.
+  virtual void SetUpdateTime(double time);
 protected:
   vtkSMGenericViewDisplayProxy();
   ~vtkSMGenericViewDisplayProxy();

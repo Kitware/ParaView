@@ -44,12 +44,13 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.9");
 
 //-----------------------------------------------------------------------------
 vtkSMAbstractViewModuleProxy::vtkSMAbstractViewModuleProxy()
@@ -61,11 +62,15 @@ vtkSMAbstractViewModuleProxy::vtkSMAbstractViewModuleProxy()
   this->GUISize[0] = this->GUISize[1] = 300;
   this->WindowPosition[0] = this->WindowPosition[1] = 0;
 
+  this->ViewTimeLinks = vtkSMPropertyLink::New();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMAbstractViewModuleProxy::~vtkSMAbstractViewModuleProxy()
 {
+  this->ViewTimeLinks->Delete();
+  this->ViewTimeLinks = 0;
+
   this->Displays->Delete();
   this->SetDisplayXMLName(0);
 }
@@ -85,6 +90,9 @@ void vtkSMAbstractViewModuleProxy::CreateVTKObjects(int numObjects)
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
   this->Superclass::CreateVTKObjects(numObjects);
+
+  this->ViewTimeLinks->AddLinkedProperty(
+    this->GetProperty("ViewTime"), vtkSMLink::INPUT);
 }
 
 //-----------------------------------------------------------------------------
@@ -148,6 +156,14 @@ void vtkSMAbstractViewModuleProxy::AddDisplay(
     {
     return;
     }
+
+  // Link UpdateTime on DisplayProxy with ViewTime.
+  vtkSMProperty* prop = disp->GetProperty("UpdateTime");
+  if (prop)
+    {
+    this->ViewTimeLinks->AddLinkedProperty(prop, vtkSMLink::OUTPUT);
+    disp->UpdateProperty("UpdateTime");
+    }
   
   this->Displays->AddItem(disp);
 
@@ -161,6 +177,11 @@ void vtkSMAbstractViewModuleProxy::RemoveDisplay(
   if (!disp)
     {
     return;
+    }
+  vtkSMProperty* prop = disp->GetProperty("UpdateTime");
+  if (prop)
+    {
+    this->ViewTimeLinks->RemoveLinkedProperty(prop);
     }
   this->Displays->RemoveItem(disp);
 }

@@ -30,6 +30,7 @@ class vtkRenderer;
 class vtkPVRenderModuleHelper;
 class vtkSMDisplay;
 class vtkSMAbstractDisplayProxy;
+class vtkSMPropertyLink;
 class vtkPVClientServerIdCollectionInformation;
 class vtkTimerLog;
 
@@ -141,6 +142,8 @@ protected:
 
   int GUISize[2];
   int WindowPosition[2];
+
+  vtkSMPropertyLink* ViewTimeLinks;
 private:
   // Description:
   // Overridden since Interactor properties must be cleared.

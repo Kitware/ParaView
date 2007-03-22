@@ -14,20 +14,19 @@
 =========================================================================*/
 #include "vtkSMGenericViewDisplayProxy.h"
 
+#include "vtkAlgorithm.h"
 #include "vtkClientServerStream.h"
 #include "vtkDataObject.h"
-#include "vtkDataSet.h"
-#include "vtkMPIMoveData.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVOptions.h"
-#include "vtkPVUpdateSuppressor.h"
 #include "vtkProcessModule.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.19");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -325,6 +324,36 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
     }
   vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
     this->UpdateSuppressorProxy->GetServers(), stream);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMGenericViewDisplayProxy::SetUpdateTime(double time)
+{
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Objects not created!");
+    return;
+    }
+
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->UpdateSuppressorProxy->GetProperty("UpdateTime"));
+  dvp->SetElement(0, time);
+  // UpdateTime is immediate update, so no need to update.
+
+  // Go upstream to the reader and mark it modified.
+  vtkSMProxy* current = this;
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    current->GetProperty("Input"));
+  while (current && pp && pp->GetNumberOfProxies() > 0)
+    {
+    current = pp->GetProxy(0);
+    pp = vtkSMProxyProperty::SafeDownCast(current->GetProperty("Input"));
+    }
+
+  if (current)
+    {
+    current->MarkModified(current);
+    }
 }
 
 //-----------------------------------------------------------------------------
