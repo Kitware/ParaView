@@ -385,11 +385,27 @@ void pqSelectionManager::processEvents(unsigned long eventId)
     {
     case vtkCommand::LeftButtonPressEvent:
       this->Implementation->Xs = eventpos[0];
+      if (this->Implementation->Xs < 0) 
+        {
+        this->Implementation->Xs = 0;
+        }
       this->Implementation->Ys = eventpos[1];
+      if (this->Implementation->Ys < 0) 
+        {
+        this->Implementation->Ys = 0;
+        }
       break;
     case vtkCommand::LeftButtonReleaseEvent:
       this->Implementation->Xe = eventpos[0];
+      if (this->Implementation->Xe < 0) 
+        {
+        this->Implementation->Xe = 0;
+        }
       this->Implementation->Ye = eventpos[1];
+      if (this->Implementation->Ye < 0) 
+        {
+        this->Implementation->Ye = 0;
+        }
       this->select();
       break;
     }
