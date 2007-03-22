@@ -5,8 +5,8 @@ import QtTestingImage
 
 object1 = 'MainWindow/menubar/menuFile'
 QtTesting.playCommand(object1, 'activate', 'actionFileLoadServerState')
-object2 = 'MainWindow/ServerStartupBrowser/connect'
-QtTesting.playCommand(object2, 'activate', '')
+##object2 = 'MainWindow/ServerStartupBrowser/connect'
+#QtTesting.playCommand(object2, 'activate', '')
 object3 = 'MainWindow/FileLoadServerStateDialog'
 QtTesting.playCommand(object3, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/LoadStateMultiView.pvsm')
 object4 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:0/0/MultiViewFrameMenu/MaximizeButton'
@@ -32,7 +32,7 @@ QtTesting.playCommand(object13, 'filesSelected', '$PARAVIEW_TEST_ROOT/TestMultiV
 object14 = 'MainWindow/mainToolBar/1QToolButton3'
 QtTesting.playCommand(object14, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'actionFileLoadServerState')
-QtTesting.playCommand(object2, 'activate', '')
+#QtTesting.playCommand(object2, 'activate', '')
 QtTesting.playCommand(object3, 'filesSelected', '$PARAVIEW_TEST_ROOT/TestMultiView.pvsm')
 
 QtTesting.wait(1000)

@@ -312,11 +312,13 @@ void pqUndoStack::setActiveServer(pqServer* server)
     {
     this->Implementation->UndoStackBuilder->SetConnectionID(
       server->GetConnectionID());
+    this->endNonUndoableChanges();
     }
   else
     {
     this->Implementation->UndoStackBuilder->SetConnectionID(
       vtkProcessModuleConnectionManager::GetNullConnectionID());
+    this->beginNonUndoableChanges();
     }
 }
 

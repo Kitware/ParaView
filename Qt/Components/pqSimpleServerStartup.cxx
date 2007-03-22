@@ -152,6 +152,7 @@ pqSimpleServerStartup::pqSimpleServerStartup(QObject* p) :
     SIGNAL(timeout()),
     this,
     SLOT(monitorReverseConnections()));
+  this->IgnoreConnectIfAlreadyConnected = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -168,12 +169,15 @@ void pqSimpleServerStartup::startServer(pqServerStartup& startup)
   this->Implementation->Server = startup.getServer();
 
   // If requested server is already running, nothing needs to be done.
-  if(pqServer* const existing_server =
-    pqApplicationCore::instance()->getServerManagerModel()->getServer(
-      this->Implementation->Server))
+  if (this->IgnoreConnectIfAlreadyConnected)
     {
-    this->started(existing_server);
-    return;
+    if (pqServer* const existing_server =
+      pqApplicationCore::instance()->getServerManagerModel()->getServer(
+        this->Implementation->Server))
+      {
+      this->started(existing_server);
+      return;
+      }
     }
 
   // Prompt the user for runtime server arguments ...

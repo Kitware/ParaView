@@ -83,6 +83,12 @@ pqServerStartupBrowser::pqServerStartupBrowser(
     SIGNAL(serverStarted(pqServer*)),
     this,
     SLOT(onServerStarted(pqServer*)));
+
+  // When the dialog is shown, we always want to create a new connection
+  // irrespective of whether the selected connection is already connected
+  // or not. 
+  this->Implementation->SimpleServerStartup.
+    setIgnoreConnectIfAlreadyConnected(false);
 }
 
 pqServerStartupBrowser::~pqServerStartupBrowser()

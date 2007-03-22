@@ -78,6 +78,19 @@ public:
     pqSettings& settings,
     const pqServerResource& server);
 
+  /// By default, if the server request is same as the existing server
+  /// then nothing is done. The request to connect to the server again
+  /// is ignored. To override this, set this to false.
+  /// That way it will always try to make a new connection.
+  void setIgnoreConnectIfAlreadyConnected(bool ignore)
+    {
+    this->IgnoreConnectIfAlreadyConnected = ignore;
+    }
+
+  bool ignoreConnectIfAlreadyConnected() const
+    {
+    return this->IgnoreConnectIfAlreadyConnected;
+    }
 signals:
   /// Signal emitted if the user cancels startup
   void serverCancelled();
@@ -99,6 +112,7 @@ private:
   class pqImplementation;
   pqImplementation* const Implementation;
 
+  bool IgnoreConnectIfAlreadyConnected;
   bool promptRuntimeArguments();
   void startBuiltinConnection();
   void startForwardConnection();

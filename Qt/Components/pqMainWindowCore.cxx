@@ -1832,23 +1832,53 @@ void pqMainWindowCore::onEditCameraRedo()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onServerConnect()
 {
-  pqServerStartupBrowser* const server_browser = new pqServerStartupBrowser(
+  pqServer* server = this->getActiveServer();
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
+
+  if (server && smmodel->getNumberOfSources() > 0)
+    {
+    int ret = QMessageBox::warning(this->Implementation->Parent, 
+      tr("Disconnect from current server?"),
+      tr("Before connecting to a new server, \n"
+        "the current connection will be closed and \n"
+        "the state will be discarded.\n"
+        "Are you sure you want to continue?"),
+      QMessageBox::Yes | QMessageBox::No);
+    if (ret == QMessageBox::No)
+      {
+      return;
+      }
+    }
+
+  pqServerStartupBrowser server_browser (
     pqApplicationCore::instance()->serverStartups(),
     *pqApplicationCore::instance()->settings(),
     this->Implementation->Parent);
-  server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
-  server_browser->setModal(true);
-  server_browser->show();
+
+  if (server_browser.exec() != QDialog::Accepted && !this->getActiveServer())
+    {
+    pqServerResource resource = pqServerResource("builtin:");
+    core->createServer(resource);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onServerDisconnect()
 {
+  pqApplicationCore* core = pqApplicationCore::instance();
   pqServer* server = this->getActiveServer();
   if (server)
     {
-    pqApplicationCore::instance()->removeServer(server);
+    core->removeServer(server);
     }
+
+  QCoreApplication::processEvents();
+
+  // Always have a builtin connection connected.
+  pqServerResource resource = pqServerResource("builtin:");
+  core->createServer(resource);
 }
 
 //-----------------------------------------------------------------------------
@@ -2406,7 +2436,9 @@ void pqMainWindowCore::onSelectionChanged()
     }
 
   // Update the server connect/disconnect actions.
-  emit this->enableServerConnect(numServers == 0);
+  // emit this->enableServerConnect(numServers == 0); -- it's always possible to
+  //      create a new connection, it just implies that we'll disconnect before
+  //      connecting to the new one.
   emit this->enableServerDisconnect(server != 0);
 
   // Update various actions that depend on pending displays.

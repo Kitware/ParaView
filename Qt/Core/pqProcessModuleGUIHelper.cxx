@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputWindow.h"
 #include "pqCoreTestUtility.h"
 #include "pqOptions.h"
+#include "pqServerResource.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkProcessModuleConnectionManager.h>
@@ -118,7 +119,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.14");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.15");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -137,6 +138,7 @@ void pqProcessModuleGUIHelper::disableOutputWindow()
   this->Implementation->OutputWindowAdapter->setActive(false);
 }
 
+//-----------------------------------------------------------------------------
 void pqProcessModuleGUIHelper::showOutputWindow()
 {
   this->Implementation->OutputWindow->show();
@@ -178,6 +180,10 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     pqPluginManager* pluginManager = 
       pqApplicationCore::instance()->getPluginManager();
     pluginManager->loadPlugins(NULL);
+
+    // Create the default connection.
+    pqServerResource resource = pqServerResource("builtin:");
+    this->Implementation->ApplicationCore->createServer(resource);
 
     // Starts the event loop.
     QCoreApplication* app = QApplication::instance();
@@ -315,12 +321,14 @@ bool pqProcessModuleGUIHelper::compareView(
 {
   return false;
 }
+
 //-----------------------------------------------------------------------------
 QWidget* pqProcessModuleGUIHelper::GetMainWindow()
 {
   return this->Implementation->Window;
 }
 
+//-----------------------------------------------------------------------------
 pqTestUtility* pqProcessModuleGUIHelper::TestUtility()
 {
   return &this->Implementation->TestUtility;

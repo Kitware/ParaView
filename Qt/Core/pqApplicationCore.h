@@ -196,7 +196,9 @@ signals:
   // Fired when a state file is loaded successfully.
   void stateLoaded();
 
+  /// Emitted after the core has finished creating a new server connection.
   void finishedAddingServer(pqServer *server);
+
 protected:
   /// create signal/slot connections between pdata and smModel.
   void connect(pqServerManagerObserver* pdata, pqServerManagerModel* smModel);
