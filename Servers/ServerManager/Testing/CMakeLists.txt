@@ -10,7 +10,6 @@ SET (SMSTATE_FILES
   BoundsDisplay
   CalcInput
   # ClipCut
-  DataAnalysisLinePlot
   ExtractGrid
   TestPHT
   SPCTH2

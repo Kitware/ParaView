@@ -26,7 +26,7 @@ SET(Filters_SRCS
   vtkCSVReader.cxx
   vtkCSVWriter.cxx
   vtkCVGeometryCache.cxx
-  vtkDataAnalysisFilter.cxx
+#  vtkDataAnalysisFilter.cxx
   vtkDataSetSubdivisionAlgorithm.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
@@ -114,9 +114,9 @@ SET(Filters_SRCS
   vtkStreamingTessellator.cxx
   vtkSubdivisionAlgorithm.cxx
   vtkSurfaceVectors.cxx
-  vtkTemporalCacheFilter.cxx
-  vtkTemporalPickFilter.cxx
-  vtkTemporalProbeFilter.cxx
+#  vtkTemporalCacheFilter.cxx
+#  vtkTemporalPickFilter.cxx
+#  vtkTemporalProbeFilter.cxx
   vtkTessellatorFilter.cxx
   vtkTiledDisplaySchedule.cxx
   vtkTrackballPan.cxx

@@ -44,12 +44,3 @@ IF (VTK_USE_DISPLAY)
   ENDFOREACH(name)
 ENDIF (VTK_USE_DISPLAY)
 
-IF(VTK_USE_DISPLAY AND VTK_USE_RENDERING)
-  ADD_EXECUTABLE(TestTemporalCacheHierarchical TestTemporalCacheHierarchical.cxx)
-  TARGET_LINK_LIBRARIES(TestTemporalCacheHierarchical vtkPVFilters)
-  ADD_TEST(TestTemporalCacheHierarchical 
-    ${CXX_TEST_PATH}/TestTemporalCacheHierarchical
-    -T ${ParaView_BINARY_DIR}/Testing/Temporary
-    )
-ENDIF(VTK_USE_DISPLAY AND VTK_USE_RENDERING)
-
