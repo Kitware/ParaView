@@ -53,6 +53,9 @@ protected:
   virtual void mousePressEvent(QMouseEvent*);
   virtual void mouseMoveEvent(QMouseEvent*);
   virtual void mouseReleaseEvent(QMouseEvent*);
+  virtual void childEvent(QChildEvent *c);
+
+  virtual void setChildrenEnabled(bool);
   
   bool Collapsed;
   bool Pressed;

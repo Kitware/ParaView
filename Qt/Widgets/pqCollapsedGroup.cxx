@@ -199,6 +199,30 @@ void pqCollapsedGroup::mouseReleaseEvent(QMouseEvent* e)
   }
 }
 
+void pqCollapsedGroup::childEvent(QChildEvent *c)
+{
+  if ((c->type() == QEvent::ChildAdded) && c->child()->isWidgetType())
+    {
+    QWidget *w = (QWidget*)c->child();
+    if (!this->Collapsed)
+      {
+      if (!w->testAttribute(Qt::WA_ForceDisabled))
+        {
+        w->setEnabled(true);
+        }
+      }
+    else
+      {
+      if (w->isEnabled())
+        {
+        w->setEnabled(false);
+        w->setAttribute(Qt::WA_ForceDisabled, false);
+        }
+      }
+    }
+  this->QGroupBox::childEvent(c);
+}
+
 bool pqCollapsedGroup::collapsed() const
 {
   return this->Collapsed;
@@ -207,26 +231,53 @@ bool pqCollapsedGroup::collapsed() const
 void pqCollapsedGroup::setCollapsed(bool v)
 {
   if(v == this->Collapsed)
-  {
+    {
     return;
-  }
+    }
 
   this->Collapsed = v;
   QSize sz = this->minimumSizeHint();
 
   if(this->Collapsed)
-  {
-    this->layout()->setEnabled(false);
+    {
+    this->setChildrenEnabled(false);
     this->setMinimumHeight(sz.height());
     this->setMaximumHeight(sz.height());
-  }
+    }
   else
-  {
-    this->layout()->setEnabled(true);
+    {
+    this->setChildrenEnabled(true);
     this->setMinimumHeight(sz.height());
     this->setMaximumHeight(QWIDGETSIZE_MAX);
-  }
+    }
   this->updateGeometry();
   this->update();
 }
 
+void pqCollapsedGroup::setChildrenEnabled(bool enable)
+{
+  QObjectList childList = this->children();
+  for (int i = 0; i < childList.size(); i++)
+    {
+    QObject *o = childList.at(i);
+    if (o->isWidgetType())
+      {
+      QWidget *w = static_cast<QWidget *>(o);
+      if (enable)
+        {
+        if (!w->testAttribute(Qt::WA_ForceDisabled))
+          {
+          w->setEnabled(true);
+          }
+        }
+      else
+        {
+        if (w->isEnabled())
+          {
+          w->setEnabled(false);
+          w->setAttribute(Qt::WA_ForceDisabled, false);
+          }
+        }
+      }
+    }
+}
