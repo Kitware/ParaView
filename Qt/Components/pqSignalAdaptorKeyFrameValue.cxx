@@ -201,7 +201,7 @@ void pqSignalAdaptorKeyFrameValue::onCueModified()
       {
       activeWidget = this->Internals->comboBox;
       this->Internals->ComboBoxDomain = new pqComboBoxDomain(
-        this->Internals->comboBox, prop, index);
+        this->Internals->comboBox, prop);
       this->Internals->ActiveWidgetType = pqInternals::COMBOBOX;
       QObject::connect(this->Internals->comboBox,
         SIGNAL(currentIndexChanged(int)), 

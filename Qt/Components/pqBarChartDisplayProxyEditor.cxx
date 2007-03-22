@@ -139,9 +139,9 @@ void pqBarChartDisplayProxyEditor::setDisplay(pqDisplay* display)
 
   // Initialize domains.
   this->Internal->XDomain = new pqComboBoxDomain(
-    this->Internal->XArrayName, proxy->GetProperty("XArrayName"), 1);
+    this->Internal->XArrayName, proxy->GetProperty("XArrayName"));
   this->Internal->YDomain = new pqComboBoxDomain(
-    this->Internal->YArrayName, proxy->GetProperty("YArrayName"), 1);
+    this->Internal->YArrayName, proxy->GetProperty("YArrayName"));
   this->Internal->XDomain->forceDomainChanged();
   this->Internal->YDomain->forceDomainChanged();
 

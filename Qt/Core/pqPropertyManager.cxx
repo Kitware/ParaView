@@ -225,16 +225,6 @@ void pqPropertyManager::registerLink(
 
 
 //-----------------------------------------------------------------------------
-void pqPropertyManager::registerLink(
-  QObject* qObject, const char* qProperty, const char* signal,
-  const char* modified_signal,
-  vtkSMProxy* smProxy, vtkSMProperty* smProperty, int index)
-{
-  this->registerLink(qObject, qProperty, signal, smProxy, smProperty, index);
-  QObject::connect(qObject, modified_signal, this, SLOT(propertyChanged()));
-}
-
-//-----------------------------------------------------------------------------
 void pqPropertyManager::unregisterLink(
   QObject* qObject, const char* qProperty, const char* signal,
   vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)

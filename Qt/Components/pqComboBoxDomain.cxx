@@ -69,28 +69,22 @@ public:
   vtkSmartPointer<vtkSMProperty> Property;
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
-  int Index;
+  QString DomainName;
   bool MarkedForUpdate;
 };
   
 
-pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, int idx)
+pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop,
+                                   const QString& domainName)
   : QObject(p)
 {
   this->Internal = new pqInternal();
   this->Internal->Property = prop;
-  this->Internal->Index = idx;
+  this->Internal->DomainName = domainName;
 
-  if(pqSMAdaptor::getPropertyType(prop) == pqSMAdaptor::FIELD_SELECTION)
+  if(!domainName.isEmpty())
     {
-    if(idx == 0)
-      {
-      this->Internal->Domain = prop->GetDomain("field_list");
-      }
-    else if(idx == 1)
-      {
-      this->Internal->Domain = prop->GetDomain("array_list");
-      }
+    this->Internal->Domain = prop->GetDomain(domainName.toAscii().data());
     }
   else
     {
@@ -159,18 +153,25 @@ void pqComboBoxDomain::internalDomainChanged()
       domain.append(var.toString());
       }
     }
-  else if(type == pqSMAdaptor::SINGLE_ELEMENT)
-    {
-    }
   else if(type == pqSMAdaptor::FIELD_SELECTION)
     {
-    if(this->Internal->Index == 0)
+    if(this->Internal->DomainName == "field_list")
       {
       domain = pqSMAdaptor::getFieldSelectionModeDomain(this->Internal->Property);
       }
-    else if(this->Internal->Index == 1)
+    else if(this->Internal->DomainName == "array_list")
       {
       domain = pqSMAdaptor::getFieldSelectionScalarDomain(this->Internal->Property);
+      }
+    }
+  else if(type == pqSMAdaptor::PROXYSELECTION ||
+          type == pqSMAdaptor::PROXYLIST)
+    {
+    QList<pqSMProxy> proxies = pqSMAdaptor::getProxyPropertyDomain(
+      this->Internal->Property);
+    foreach(vtkSMProxy* pxy, proxies)
+      {
+      domain.append(pxy->GetXMLLabel());
       }
     }
 

@@ -113,6 +113,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPluginDialog.h
   pqPointSourceWidget.h
   pqProxyInformationWidget.h
+  pqProxySelectionWidget.h
   pqProxyTabWidget.h
   pqRecentFilesMenu.h
   pqSMSignalAdaptors.h
@@ -126,7 +127,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerStartupBrowser.h
   pqServerStartupDialog.h
   pqSettingsDialog.h
-  pqSignalAdaptorProxyList.h
   pqSignalAdaptorKeyFrameValue.h
   pqSignalAdaptorKeyFrameTime.h
   pqSignalAdaptorKeyFrameType.h
@@ -408,6 +408,8 @@ ADD_LIBRARY(pqComponents
   pqPointSourceWidget.h
   pqProxyInformationWidget.cxx
   pqProxyInformationWidget.h
+  pqProxySelectionWidget.cxx
+  pqProxySelectionWidget.h
   pqProxyTabWidget.cxx
   pqProxyTabWidget.h
   pqRecentFilesMenu.cxx
@@ -434,8 +436,6 @@ ADD_LIBRARY(pqComponents
   pqServerStartupDialog.h
   pqSettingsDialog.cxx
   pqSettingsDialog.h
-  pqSignalAdaptorProxyList.cxx
-  pqSignalAdaptorProxyList.h
   pqSignalAdaptorKeyFrameValue.cxx
   pqSignalAdaptorKeyFrameValue.h
   pqSignalAdaptorKeyFrameTime.cxx

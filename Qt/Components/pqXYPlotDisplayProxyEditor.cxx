@@ -174,7 +174,7 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqDisplay* disp)
   // pqComboBoxDomain will ensure that when ever the domain changes the
   // widget is updated as well.
   this->Internal->XAxisArrayDomain = new pqComboBoxDomain(
-    this->Internal->XAxisArray, proxy->GetProperty("XArrayName"), 1);
+    this->Internal->XAxisArray, proxy->GetProperty("XArrayName"));
   // This is useful to initially populate the combobox.
   this->Internal->XAxisArrayDomain->forceDomainChanged();
 

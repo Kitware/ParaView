@@ -62,7 +62,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
-#include "pqSignalAdaptorProxyList.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
@@ -74,6 +73,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSliderDomain.h"
 #include "pqFileChooserWidget.h"
 #include "pqFieldSelectionAdaptor.h"
+#include "pqProxySelectionWidget.h"
 
 void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
 {
@@ -280,42 +280,27 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     }
   else if (pt == pqSMAdaptor::PROXYSELECTION)
     {
-    QComboBox* comboBox = qobject_cast<QComboBox*>(object);
-    QWidget* parent = comboBox->parentWidget();
-    QString propertyName = property;
-    propertyName.replace(':', '_');
-    propertyName.replace(' ', '_');
-    QWidget* widgetFrame = parent->findChild<QWidget*>(
-      QString("WidgetBox.%1").arg(propertyName));
-    if (comboBox)
+    pqProxySelectionWidget* w = qobject_cast<pqProxySelectionWidget*>(object);
+    if(w)
       {
-      comboBox->clear();  //TODO: why is this here?  is a domain helper needed?
-      pqProxy* pq_proxy =
-        pqApplicationCore::instance()->getServerManagerModel()->getPQSource(proxy);
-      pqSignalAdaptorProxyList* proxyAdaptor = 
-        new pqSignalAdaptorProxyList(comboBox, pq_proxy, property);
-      proxyAdaptor->setWidgetFrame(widgetFrame);
-      pqObjectPanel* object_panel = qobject_cast<pqObjectPanel*>(parent);
-      if (object_panel)
-        {
-        proxyAdaptor->setRenderModule(object_panel->renderModule());
-        }
-      QObject::connect(parent, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
-        proxyAdaptor, SLOT(setRenderModule(pqRenderViewModule*)));
-
-      QObject::connect(parent, SIGNAL(onaccept()), proxyAdaptor, 
-        SLOT(accept()));
-      QObject::connect(parent, SIGNAL(onreset()), proxyAdaptor,
-        SLOT(reset()));
-      QObject::connect(parent, SIGNAL(onselect()), proxyAdaptor,
-        SLOT(select()));
-      QObject::connect(parent, SIGNAL(ondeselect()), proxyAdaptor,
-        SLOT(deselect()));
-
-      proxyAdaptor->setObjectName("ComboBoxProxyAdaptor");
       property_manager->registerLink(
-        proxyAdaptor, "proxy", SIGNAL(proxyChanged(const QVariant&)),
-        SIGNAL(modified()), proxy, SMProperty);
+        w, "proxy", SIGNAL(proxyChanged(pqSMProxy)),
+        proxy, SMProperty);
+
+      QWidget* parent = w->parentWidget();
+      pqObjectPanel* object_panel = qobject_cast<pqObjectPanel*>(parent);
+      if(object_panel)
+        {
+        w->setRenderModule(object_panel->renderModule());
+        QObject::connect(parent, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
+                         w, SLOT(setRenderModule(pqRenderViewModule*)));
+        QObject::connect(parent, SIGNAL(onaccept()), w, SLOT(accept()));
+        QObject::connect(parent, SIGNAL(onreset()), w, SLOT(reset()));
+        QObject::connect(parent, SIGNAL(onselect()), w, SLOT(select()));
+        QObject::connect(parent, SIGNAL(ondeselect()), w, SLOT(deselect()));
+        QObject::connect(w, SIGNAL(modified()), parent, SLOT(modified()));
+        }
+
       }
     }
   else if(pt == pqSMAdaptor::SINGLE_ELEMENT)
@@ -409,7 +394,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       {
       if(comboBox->objectName().contains(QRegExp("_mode$")))
         {
-        pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty, 0);
+        pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty,
+                                                    "field_list");
         d0->setObjectName("FieldModeDomain");
 
         pqSignalAdaptorComboBox* adaptor = 
@@ -421,7 +407,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
         }
       else if(comboBox->objectName().contains(QRegExp("_scalars$")))
         {
-        pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty, 1);
+        pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty,
+                                                    "array_list");
         d0->setObjectName("FieldScalarsDomain");
 
         pqSignalAdaptorComboBox* adaptor = 
