@@ -63,6 +63,8 @@ protected slots:
   void applyDisplacements(int);
   void displChanged(bool);
 
+  void modeChanged(int);
+
   void updateDataRanges();
   void propertyChanged();
 

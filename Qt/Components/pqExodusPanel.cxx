@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
 #include "ui_pqExodusPanel.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 class pqExodusPanel::pqUI : public QObject, public Ui::ExodusPanel 
 {
@@ -325,6 +326,26 @@ void pqExodusPanel::linkServerManagerProperties()
   QObject::connect(a, SIGNAL(triggered(bool)), VariablesTree, SLOT(allOff()));
   VariablesTree->addAction(a);
   VariablesTree->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+  // connect the mode shapes
+  this->propertyManager()->registerLink(this->UI->HasModeShapes,
+                                        "checked",
+                                        SIGNAL(toggled(bool)),
+                                        this->proxy()->getProxy(),
+                                        this->proxy()->getProxy()
+                                        ->GetProperty("HasModeShapes"));
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+                      this->proxy()->getProxy()->GetProperty("TimestepValues"));
+  this->UI->ModeSelectSlider->setMaximum(dvp->GetNumberOfElements()-1);
+  this->UI->ModeLabel->setText(QString("%1").arg(dvp->GetElement(0)));
+  this->propertyManager()->registerLink(this->UI->ModeSelectSlider,
+                                        "value",
+                                        SIGNAL(valueChanged(int)),
+                                        this->proxy()->getProxy(),
+                                        this->proxy()->getProxy()
+                                        ->GetProperty("TimeStep"));
+  QObject::connect(this->UI->ModeSelectSlider, SIGNAL(sliderMoved(int)),
+                   this, SLOT(modeChanged(int)));
 }
   
 void pqExodusPanel::applyDisplacements(int state)
@@ -385,6 +406,13 @@ QString pqExodusPanel::formatDataFor(vtkPVArrayInformation* ai)
     info = "Unavailable";
     }
   return info;
+}
+
+void pqExodusPanel::modeChanged(int value)
+{
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+                      this->proxy()->getProxy()->GetProperty("TimestepValues"));
+  this->UI->ModeLabel->setText(QString("%1").arg(dvp->GetElement(value)));
 }
 
 void pqExodusPanel::updateDataRanges()
