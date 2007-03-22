@@ -186,11 +186,11 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   QBoxLayout* buttonlayout = new QHBoxLayout();
   this->AcceptButton = new QPushButton(this);
   this->AcceptButton->setObjectName("Accept");
-  this->AcceptButton->setText(tr("Apply"));
+  this->AcceptButton->setText(tr("&Apply"));
   this->AcceptButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqUpdate16.png")));
   this->ResetButton = new QPushButton(this);
   this->ResetButton->setObjectName("Reset");
-  this->ResetButton->setText(tr("Reset"));
+  this->ResetButton->setText(tr("&Reset"));
   this->ResetButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqCancel16.png")));
   this->DeleteButton = new QPushButton(this);
   this->DeleteButton->setObjectName("Delete");
