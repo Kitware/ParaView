@@ -20,7 +20,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVDReader, "1.4");
+#include <vtkstd/algorithm>
+#include <vtkstd/vector>
+
+vtkCxxRevisionMacro(vtkPVDReader, "1.5");
 vtkStandardNewMacro(vtkPVDReader);
 
 
@@ -160,7 +163,7 @@ void vtkPVDReader::SetupOutputInformation(vtkInformation *outInfo)
     {
     this->TimeStepRange[1] = 0;
     }
-  double* timeSteps = new double[numTimeSteps];
+  vtkstd::vector<double> timeSteps(numTimeSteps);
   for(int i=0; i<numTimeSteps; i++)
     {
     const char* attr = this->GetAttributeValue(index, i);
@@ -177,10 +180,15 @@ void vtkPVDReader::SetupOutputInformation(vtkInformation *outInfo)
       timeSteps[i] = val;
       }
     }
+  vtkstd::sort(timeSteps.begin(), timeSteps.end());
   outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
-               timeSteps,
+               &timeSteps[0],
                numTimeSteps);
-  delete[] timeSteps;
+  double timeRange[2];
+  timeRange[0] = timeSteps[0];
+  timeRange[1] = timeSteps[numTimeSteps-1];
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
+               timeRange, 2);               
 }
 
 
