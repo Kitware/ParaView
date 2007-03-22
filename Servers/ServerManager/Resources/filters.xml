@@ -2,7 +2,7 @@
   <ProxyGroup name="filters">
 
    <SourceProxy name="ExtractOverTime" 
-                class="vtkExtractDataOverTime" 
+                class="vtkExtractArraysOverTime" 
                 label="Extract over Time">
     <InputProperty
        name="Input"
@@ -12,22 +12,12 @@
             <Group name="filters"/>
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
-            <DataType value="vtkPointSet"/>
+            <DataType value="vtkDataSet"/>
           </DataTypeDomain>
           <Documentation>
             Set the input to the Extract over Time filter.
           </Documentation>
      </InputProperty>
-     <IntVectorProperty 
-        name="PointIndex" 
-        command="SetPointIndex" 
-        number_of_elements="1"
-        default_values="0" > 
-       <IntRangeDomain name="range" min="0"/>
-       <Documentation>
-         Index of point to extract at each time step
-       </Documentation>
-     </IntVectorProperty>
    </SourceProxy>
 
    <SourceProxy name="ImageShrink" class="vtkImageShrink3D" label="Image Shrink">
@@ -3831,145 +3821,11 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
    <!-- End ExtractGrid -->
    </SourceProxy>
 
-   <SourceProxy name="DataAnalysis" class="vtkDataAnalysisFilter"
-    label="Data Analysis (Pick/Probe)">
-    <Documentation
-       long_help="Sample point data at a point or along a line or by point id. Select cell at a point or by cell id. Data can be plotted on an XY plot."
-       short_help="Pick a cell or point.">
-    The Data Analysis filter provides the ability to query either cell or point data in a given data set. The data may be plotted as an plot. If the "Query Method" is "Point", the filter outputs the interpolated point data at the selected point. If the "Query Method" is "Cell", the filter outputs the cell data at the closest cell to the choosen point. If the "Query Method" is "Line", the filter interpolates the point data at the sample points on the line. If the "Query Method" is "Cell Id", the filter outputs the cell data for the cell with the given Id. If the "Query Method" is "Point Id", the filter outpus the point data for the point with the given Id. The data can be plotted on an XY plot. Additionally, if the input supports multiple timesteps, this filter can be used to plot the queried data over time.
-    </Documentation>
-    <InputProperty
-       name="Input"
-       command="SetInputConnection">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources"/>
-            <Group name="filters"/>
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkDataSet"/>
-            <DataType value="vtkMultiGroupDataSet"/>
-          </DataTypeDomain>
-          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
-          <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
-          <Documentation>
-            Set the input to the Data Analysis (Pick/Probe) filter.
-          </Documentation>
-     </InputProperty>
-
-     <InputProperty
-        name="Source"
-        command="SetSourceConnection">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-           </ProxyGroupDomain>
-           <Documentation>
-             Choose the dataset to probe with.
-           </Documentation>
-     </InputProperty>
-
-     <IntVectorProperty name="Mode"
-        command="SetMode"
-        number_of_elements="1"
-        default_values="1">
-        <EnumerationDomain name="enum">
-          <Entry text="Probe" value="0" />
-          <Entry text="Pick" value="1" />
-        </EnumerationDomain>
-        <Documentation>
-          Choose whether to perform a pick or probe.
-        </Documentation>
-     </IntVectorProperty>
-     <IntVectorProperty name="Id"
-        command="SetId"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
-        <Documentation>
-          Set the Id of the point or cell to pick.
-        </Documentation>
-     </IntVectorProperty>
-     <IntVectorProperty name="UseIdToPick"
-        command="SetUseIdToPick"
-        number_of_elements="1"
-        default_values="0"
-        label="Use Id to Pick">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Select whether to pick based on a point or cell Id.
-        </Documentation>
-     </IntVectorProperty>
-     <IntVectorProperty name="PickCell"
-        command="SetPickCell"
-        number_of_elements="1"
-        default_values="1"
-        label="Pick Cells">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Toggle whether to pick cells or points.
-        </Documentation>
-     </IntVectorProperty>
-     <DoubleVectorProperty
-         name="WorldPoint"
-         command="SetWorldPoint"
-         number_of_elements="3"
-         default_values="0 0 0" >
-         <Documentation>
-           Pick the cell or point closest to this world point.  The 'p' key can be used to select a point under the cursor.
-         </Documentation>
-      </DoubleVectorProperty>
-   <!-- End PickProbe -->
-   </SourceProxy>
-
    <SourceProxy name="Probe" class="vtkPProbeFilter">
     <Documentation
        long_help="Sample data attributes at a point or along a line.  Probed lines will be displayed in a graph of the attributes."
        short_help="Sample data values at a point or along a line.">
-The Probe filter samples the data set attributes of the current data set at a point or along a line. Selecting either Point or Line from the menu button in the Probe object portion of the interface displays the appropriate 3D widget and its associated user interface controls. See section 7.4 for more information about using 3D widgets.
-If you are probing with a point, the values of the point-centered variables at the selected point will be listed on the Parameters tab for this filter. If you are probing with a line, the values of the point-centered variables along that line will be displayed in a 2D graph in the display area if Show XY-Plot is selected.
-Probing with a point is different from using the Pick filter at a point because the Pick filter displays the values for the input point closest to the selected point. Instead the Probe filter uses interpolation to determine the value at the selected point, whether or not it lies at an input point.
-The Probe filter operates on any type of data and produces polygonal output (a point or a line).
-    </Documentation>
-    <InputProperty
-       name="Source"
-       command="SetSourceConnection">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources"/>
-            <Group name="filters"/>
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkDataSet"/>
-            <DataType value="vtkMultiGroupDataSet"/>
-          </DataTypeDomain>
-          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
-          <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
-          <InputArrayDomain name="input_array" attribute_type="point"/>
-          <Documentation>
-            Select the dataset from which to obtain probe values.
-          </Documentation>
-     </InputProperty>
-
-     <InputProperty
-        name="Input"
-        command="SetInputConnection">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-           </ProxyGroupDomain>
-           <Documentation>
-             Select the dataset whose geometry will be used in determining positions to probe.
-           </Documentation>
-      </InputProperty>
-   <!-- End Probe -->
-   </SourceProxy>
-
-   <SourceProxy name="Probe2" class="vtkPProbeFilter">
-    <!-- This is same a Probe except that the Input is the data in which we are probing,
-         while source is the dataset with which we are probing. The output is of the
-         type of the source.
-      -->
-    <Documentation
-       long_help="Sample data attributes at a point or along a line.  Probed lines will be displayed in a graph of the attributes."
-       short_help="Sample data values at a point or along a line.">
-The Probe filter samples the data set attributes of the current data set at a point or along a line. Selecting either Point or Line from the menu button in the Probe object portion of the interface displays the appropriate 3D widget and its associated user interface controls. See section 7.4 for more information about using 3D widgets.
+The Probe filter samples the data set attributes of the current data set at a point or along a line. Selecting either Point or Line from the menu button in the Probe object portion of the interface displays the appropriate 3D widget and its associated user interface controls. 
 If you are probing with a point, the values of the point-centered variables at the selected point will be listed on the Parameters tab for this filter. If you are probing with a line, the values of the point-centered variables along that line will be displayed in a 2D graph in the display area if Show XY-Plot is selected.
 Probing with a point is different from using the Pick filter at a point because the Pick filter displays the values for the input point closest to the selected point. Instead the Probe filter uses interpolation to determine the value at the selected point, whether or not it lies at an input point.
 The Probe filter operates on any type of data and produces polygonal output (a point or a line).
@@ -4002,7 +3858,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
              <Proxy group="extended_sources" name="LineSource" />
-             <Proxy group="extended_sources" name="PointSource" />
+             <Proxy group="extended_sources" name="FixedRadiusPointSource" />
            </ProxyListDomain>
            <Documentation>
              Select the dataset whose geometry will be used in determining positions to probe.
@@ -4013,100 +3869,6 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       </Hints>
    <!-- End Probe2 -->
    </SourceProxy>
-
-   <SourceProxy name="TemporalProbe" class="vtkTemporalProbeFilter">
-    <InputProperty
-       name="Input"
-       command="SetInputConnection">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources"/>
-            <Group name="filters"/>
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkPolyData"/>
-          </DataTypeDomain>
-          <Documentation>
-            Set the input to the temporal probe filter.
-          </Documentation>
-    </InputProperty>
- 
-    <Property
-       name="AnimateInit"
-       command="AnimateInit"
-       is_internal="1">
-    </Property>
-
-    <DoubleVectorProperty
-       name="AnimateTick"
-       command="AnimateTick"
-       is_internal="1"
-       number_of_elements="1"
-       default_values="0.0" >
-          <DoubleRangeDomain name="range" min="0" max="1" />
-          <Documentation>
-            Specify the time value at which to probe.
-          </Documentation>
-    </DoubleVectorProperty>
-    <Hints>
-      <Visibility replace_input="0" />
-    </Hints>
-   <!-- End TemporalProbe -->
-   </SourceProxy>
-
-   <SourceProxy name="TemporalPick" class="vtkTemporalPickFilter">
-    <InputProperty
-       name="Input"
-       command="SetInputConnection">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources"/>
-            <Group name="filters"/>
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkUnstructuredGrid"/>
-          </DataTypeDomain>
-          <Documentation>
-            Set the input to the Temporal Pick filter.
-          </Documentation>
-    </InputProperty>
- 
-    <Property
-       name="AnimateInit"
-       command="AnimateInit"
-       is_internal="1">
-    </Property>
-
-    <DoubleVectorProperty
-       name="AnimateTick"
-       command="AnimateTick"
-       is_internal="1"
-       number_of_elements="1"
-       default_values="0.0" >
-          <DoubleRangeDomain name="range" min="0" max="1" />
-          <Documentation>
-            Specify the time value at which to perform a pick.
-          </Documentation>          
-    </DoubleVectorProperty>
-
-    <IntVectorProperty 
-       name="PointOrCell" 
-       command="SetPointOrCell" 
-       number_of_elements="1"
-       default_values="0"
-       label="Point or Cell">
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="On"/>
-         <Entry value="1" text="Off"/>
-       </EnumerationDomain>
-       <Documentation>
-         Select whether to pick a point (0) or cell (1).
-       </Documentation>
-    </IntVectorProperty>
-    <Hints>
-       <Visibility replace_input="0" />
-    </Hints>
-   <!-- End TemporalPick -->
-   </SourceProxy>
-
 
    <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer"
     label="Stream Tracer">
@@ -5461,7 +5223,7 @@ This filter uses colors to show levels of a hiearchical dataset.
         name="UpdateTime"
         command="SetUpdateTime"
         number_of_elements="1"
-        default_values="0"
+        default_values="none"
         immediate_update="1"
         is_internal="1">
         <DoubleRangeDomain name="range"/>
