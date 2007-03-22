@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.12");
+vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.13");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {
@@ -29,6 +29,9 @@ struct vtkSMIdTypeVectorPropertyInternals
   vtkstd::vector<vtkIdType> UncheckedValues;
   vtkstd::vector<vtkIdType> LastPushedValues;
   vtkstd::vector<vtkIdType> DefaultValues;
+  bool DefaultsValid;
+
+  vtkSMIdTypeVectorPropertyInternals() : DefaultsValid(false) {}
 
   void UpdateLastPushedValues()
     {
@@ -43,6 +46,7 @@ struct vtkSMIdTypeVectorPropertyInternals
     this->DefaultValues.clear();
     this->DefaultValues.insert(this->DefaultValues.end(),
       this->Values.begin(), this->Values.end());
+    this->DefaultsValid = true;
     }
 };
 
@@ -51,6 +55,7 @@ vtkSMIdTypeVectorProperty::vtkSMIdTypeVectorProperty()
 {
   this->Internals = new vtkSMIdTypeVectorPropertyInternals;
   this->ArgumentIsArray = 0;
+  this->Initialized = false;
 }
 
 //---------------------------------------------------------------------------
@@ -138,6 +143,7 @@ void vtkSMIdTypeVectorProperty::SetNumberOfElements(unsigned int num)
     }
   this->Internals->Values.resize(num, 0);
   this->Internals->UncheckedValues.resize(num, 0);
+  this->Initialized = false;
   this->Modified();
 }
 
@@ -181,7 +187,7 @@ int vtkSMIdTypeVectorProperty::SetElement(unsigned int idx, vtkIdType value)
 {
   unsigned int numElems = this->GetNumberOfElements();
 
-  if (idx < numElems && value == this->GetElement(idx))
+  if (this->Initialized && idx < numElems && value == this->GetElement(idx))
     {
     return 1;
     }
@@ -207,6 +213,7 @@ int vtkSMIdTypeVectorProperty::SetElement(unsigned int idx, vtkIdType value)
     }
   this->Internals->Values[idx] = value;
   this->Modified();
+  this->Initialized = true;
   return 1;
 }
 
@@ -249,7 +256,7 @@ int vtkSMIdTypeVectorProperty::SetElements(const vtkIdType* values)
       break;
       }
     }
-  if(!modified)
+  if(!modified && this->Initialized)
     {
     return 1;
     }
@@ -266,6 +273,7 @@ int vtkSMIdTypeVectorProperty::SetElements(const vtkIdType* values)
     }
 
   memcpy(&this->Internals->Values[0], values, numArgs*sizeof(vtkIdType));
+  this->Initialized = true;
   this->Modified();
   return 1;
 }
@@ -292,34 +300,42 @@ int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
   int numElems = this->GetNumberOfElements();
   if (numElems > 0)
     {
-    int* initVal = new int[numElems];
-    int numRead = element->GetVectorAttribute("default_values",
-                                              numElems,
-                                              initVal);
-
-    if (numRead > 0)
+    if (element->GetAttribute("default_values") &&
+        strcmp("none", element->GetAttribute("default_values")) == 0 )
       {
-      if (numRead != numElems)
-        {
-        vtkErrorMacro("The number of default values does not match the number "
-                      "of elements. Initialization failed.");
-        delete[] initVal;
-        return 0;
-        }
-      for(int i=0; i<numRead; i++)
-        {
-        this->SetElement(i, initVal[i]);
-        }
-      this->Internals->UpdateLastPushedValues();
-      this->Internals->UpdateDefaultValues();
+      this->Initialized = false;
       }
     else
       {
-      vtkErrorMacro("No default value is specified for property: "
-                    << this->GetXMLName()
-                    << ". This might lead to stability problems");
+      int* initVal = new int[numElems];
+      int numRead = element->GetVectorAttribute("default_values",
+                                                numElems,
+                                                initVal);
+      
+      if (numRead > 0)
+        {
+        if (numRead != numElems)
+          {
+          vtkErrorMacro("The number of default values does not match the "
+                        "number of elements. Initialization failed.");
+          delete[] initVal;
+          return 0;
+          }
+        for(int i=0; i<numRead; i++)
+          {
+          this->SetElement(i, initVal[i]);
+          }
+        this->Internals->UpdateLastPushedValues();
+        this->Internals->UpdateDefaultValues();
+        }
+      else
+        {
+        vtkErrorMacro("No default value is specified for property: "
+                      << this->GetXMLName()
+                      << ". This might lead to stability problems");
+        }
+      delete[] initVal;
       }
-    delete[] initVal;
     }
 
   return 1;
@@ -450,7 +466,8 @@ void vtkSMIdTypeVectorProperty::Copy(vtkSMProperty* src)
 //---------------------------------------------------------------------------
 void vtkSMIdTypeVectorProperty::ResetToDefaultInternal()
 {
-  if (this->Internals->DefaultValues != this->Internals->Values)
+  if (this->Internals->DefaultValues != this->Internals->Values &&
+    this->Internals->DefaultsValid)
     {
     this->Internals->Values.clear();
     this->Internals->Values.insert(this->Internals->Values.end(),

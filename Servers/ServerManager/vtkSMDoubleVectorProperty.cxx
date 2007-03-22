@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.35");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.36");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -30,6 +30,9 @@ struct vtkSMDoubleVectorPropertyInternals
   vtkstd::vector<double> UncheckedValues;
   vtkstd::vector<double> LastPushedValues;
   vtkstd::vector<double> DefaultValues;
+  bool DefaultsValid;
+
+  vtkSMDoubleVectorPropertyInternals() : DefaultsValid(false) {}
 
   void UpdateLastPushedValues()
     {
@@ -45,6 +48,7 @@ struct vtkSMDoubleVectorPropertyInternals
     this->DefaultValues.clear();
     this->DefaultValues.insert(this->DefaultValues.end(),
       this->Values.begin(), this->Values.end());
+    this->DefaultsValid = true;
     }
 };
 
@@ -54,6 +58,7 @@ vtkSMDoubleVectorProperty::vtkSMDoubleVectorProperty()
   this->Internals = new vtkSMDoubleVectorPropertyInternals;
   this->ArgumentIsArray = 0;
   this->SetNumberCommand = 0;
+  this->Initialized = false;
 }
 
 //---------------------------------------------------------------------------
@@ -156,6 +161,7 @@ void vtkSMDoubleVectorProperty::SetNumberOfElements(unsigned int num)
     }
   this->Internals->Values.resize(num, 0);
   this->Internals->UncheckedValues.resize(num, 0);
+  this->Initialized = false;
   this->Modified();
 }
 
@@ -206,11 +212,10 @@ int vtkSMDoubleVectorProperty::SetElement(unsigned int idx, double value)
 {
   unsigned int numElems = this->GetNumberOfElements();
 
-  if (idx < numElems && value == this->GetElement(idx))
+  if (this->Initialized && idx < numElems && value == this->GetElement(idx))
     {
     return 1;
     }
-
   if ( vtkSMProperty::GetCheckDomains() )
     {
     int numArgs = this->GetNumberOfElements();
@@ -232,6 +237,7 @@ int vtkSMDoubleVectorProperty::SetElement(unsigned int idx, double value)
     }
   this->Internals->Values[idx] = value;
   this->Modified();
+  this->Initialized = true;
   return 1;
 }
 
@@ -284,7 +290,7 @@ int vtkSMDoubleVectorProperty::SetElements(const double* values)
       break;
       }
     }
-  if(!modified)
+  if(!modified && this->Initialized)
     {
     return 1;
     }
@@ -301,6 +307,7 @@ int vtkSMDoubleVectorProperty::SetElements(const double* values)
     }
 
   memcpy(&this->Internals->Values[0], values, numArgs*sizeof(double));
+  this->Initialized = true;
   this->Modified();
   return 1;
 }
@@ -333,31 +340,39 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   int numElems = this->GetNumberOfElements();
   if (numElems > 0)
     {
-    double* initVal = new double[numElems];
-    int numRead = element->GetVectorAttribute("default_values",
-                                              numElems,
-                                              initVal);
-
-    if (numRead > 0)
+    if (element->GetAttribute("default_values") &&
+        strcmp("none", element->GetAttribute("default_values")) == 0 )
       {
-      if (numRead != numElems)
-        {
-        vtkErrorMacro("The number of default values does not match the number "
-                      "of elements. Initialization failed.");
-        delete[] initVal;
-        return 0;
-        }
-      this->SetElements(initVal);
-      this->Internals->UpdateLastPushedValues();
-      this->Internals->UpdateDefaultValues();
+      this->Initialized = false;
       }
     else
       {
-      vtkErrorMacro("No default value is specified for property: "
-                    << this->GetXMLName()
-                    << ". This might lead to stability problems");
+      double* initVal = new double[numElems];
+      int numRead = element->GetVectorAttribute("default_values",
+                                                numElems,
+                                                initVal);
+      
+      if (numRead > 0)
+        {
+        if (numRead != numElems)
+          {
+          vtkErrorMacro("The number of default values does not match the number "
+                        "of elements. Initialization failed.");
+          delete[] initVal;
+          return 0;
+          }
+        this->SetElements(initVal);
+        this->Internals->UpdateLastPushedValues();
+        this->Internals->UpdateDefaultValues();
+        }
+      else
+        {
+        vtkErrorMacro("No default value is specified for property: "
+                      << this->GetXMLName()
+                      << ". This might lead to stability problems");
+        }
+      delete[] initVal;
       }
-    delete[] initVal;
     }
     
   return 1;
@@ -495,7 +510,8 @@ void vtkSMDoubleVectorProperty::Copy(vtkSMProperty* src)
 //---------------------------------------------------------------------------
 void vtkSMDoubleVectorProperty::ResetToDefaultInternal()
 {
-  if (this->Internals->DefaultValues != this->Internals->Values)
+  if (this->Internals->DefaultValues != this->Internals->Values &&
+      this->Internals->DefaultsValid)
     {
     this->Internals->Values.clear();
     this->Internals->Values.insert(this->Internals->Values.end(),

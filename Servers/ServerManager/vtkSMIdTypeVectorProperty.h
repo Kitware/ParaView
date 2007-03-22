@@ -156,6 +156,9 @@ protected:
   // Subclass may override this if ResetToDefault can reset to default
   // value specified in the configuration file.
   virtual void ResetToDefaultInternal();
+
+  bool Initialized;
+
 private:
   vtkSMIdTypeVectorProperty(const vtkSMIdTypeVectorProperty&); // Not implemented
   void operator=(const vtkSMIdTypeVectorProperty&); // Not implemented

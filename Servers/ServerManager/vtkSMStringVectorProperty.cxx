@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.30");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.31");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -46,6 +46,7 @@ struct vtkSMStringVectorPropertyInternals
 vtkSMStringVectorProperty::vtkSMStringVectorProperty()
 {
   this->Internals = new vtkSMStringVectorPropertyInternals;
+  this->Initialized = false;
 }
 
 //---------------------------------------------------------------------------
@@ -180,6 +181,7 @@ void vtkSMStringVectorProperty::SetNumberOfElements(unsigned int num)
   this->Internals->Values.resize(num);
   this->Internals->Initialized.resize(num, 0);
   this->Internals->UncheckedValues.resize(num);
+  this->Initialized = false;
   this->Modified();
 }
 
@@ -233,7 +235,8 @@ int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
 
   unsigned int numElems = this->GetNumberOfElements();
 
-  if (idx < numElems && strcmp(value, this->GetElement(idx)) == 0)
+  if (this->Initialized && 
+      idx < numElems && strcmp(value, this->GetElement(idx)) == 0)
     {
     return 1;
     }
@@ -260,6 +263,7 @@ int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
   this->Internals->Values[idx] = value;
   this->Internals->Initialized[idx] = 1;
   this->Modified();
+  this->Initialized = true;
   return 1;
 }
 

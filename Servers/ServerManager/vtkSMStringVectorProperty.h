@@ -129,6 +129,7 @@ protected:
     int loadLastPushedValues=0);
 
   virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
+  bool Initialized;
 
 private:
   vtkSMStringVectorProperty(const vtkSMStringVectorProperty&); // Not implemented

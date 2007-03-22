@@ -48,7 +48,6 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
@@ -56,7 +55,7 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkRendererCollection.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.77");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.78");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -131,16 +130,11 @@ vtkSMRenderModuleProxy::vtkSMRenderModuleProxy()
   this->OpenGLExtensionsInformation = 0;
 
   this->CacheLimit = 100*1024; // 100 MBs.
-
-  this->ViewTimeLinks = vtkSMPropertyLink::New();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
 {
-  this->ViewTimeLinks->Delete();
-  this->ViewTimeLinks = 0;
-
   if (this->ResetCameraClippingRangeTag)
     {
     vtkRenderer* ren = this->GetRenderer();
@@ -454,9 +448,6 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->StartRenderEventTag =
     this->GetRenderer()->AddObserver(vtkCommand::StartEvent, src);
   src->Delete();
-
-  this->ViewTimeLinks->AddLinkedProperty(
-    this->GetProperty("ViewTime"), vtkSMLink::INPUT);
 }
 
 //-----------------------------------------------------------------------------
@@ -603,14 +594,6 @@ void vtkSMRenderModuleProxy::AddDisplay(vtkSMAbstractDisplayProxy* adisp)
     pp->AddProxy(this->HelperProxy);
     }
 
-  // Link UpdateTime on DisplayProxy with ViewTime.
-  vtkSMProperty* prop = disp->GetProperty("UpdateTime");
-  if (prop)
-    {
-    this->ViewTimeLinks->AddLinkedProperty(prop, vtkSMLink::OUTPUT);
-    disp->UpdateProperty("UpdateTime");
-    }
-
   disp->AddToRenderModule(this);
 
   this->Superclass::AddDisplay(disp);
@@ -623,11 +606,6 @@ void vtkSMRenderModuleProxy::RemoveDisplay(vtkSMAbstractDisplayProxy* adisp)
   if (!disp)
     {
     return;
-    }
-  vtkSMProperty* prop = disp->GetProperty("UpdateTime");
-  if (prop)
-    {
-    this->ViewTimeLinks->RemoveLinkedProperty(prop);
     }
   disp->RemoveFromRenderModule(this);
   this->Superclass::RemoveDisplay(disp);

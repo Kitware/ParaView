@@ -182,6 +182,8 @@ protected:
 
   char* SetNumberCommand;
 
+  bool Initialized;
+
 private:
   vtkSMDoubleVectorProperty(const vtkSMDoubleVectorProperty&); // Not implemented
   void operator=(const vtkSMDoubleVectorProperty&); // Not implemented
