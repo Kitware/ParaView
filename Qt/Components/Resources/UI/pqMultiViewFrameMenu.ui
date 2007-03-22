@@ -268,7 +268,7 @@
       <string>Lookmark</string>
      </property>
      <property name="icon" >
-      <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqLookmark.png</iconset>
+      <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqLookmark16.png</iconset>
      </property>
     </widget>
    </item>
