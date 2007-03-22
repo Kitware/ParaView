@@ -58,7 +58,7 @@ TARGET_LINK_LIBRARIES(DobranoViz
   pqCore
   QtChart
   QtTesting
-  QtWidgets
+  ParaViewQtWidgets
   ${QT_XML_LIBRARIES}
 )
 
