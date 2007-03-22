@@ -20,7 +20,6 @@
 #include "vtkClientCompositeManager.h"
 #include "vtkCompleteArrays.h"
 #include "vtkCVGeometryCache.h"
-#include "vtkDataAnalysisFilter.h"
 #include "vtkDataSetSubdivisionAlgorithm.h"
 #include "vtkHDF5RawImageReader.h"
 #include "vtkHierarchicalFractal.h"
@@ -78,9 +77,6 @@
 #include "vtkStreamingTessellator.h"
 #include "vtkSubdivisionAlgorithm.h"
 #include "vtkSurfaceVectors.h"
-#include "vtkTemporalCacheFilter.h"
-#include "vtkTemporalPickFilter.h"
-#include "vtkTemporalProbeFilter.h"
 #include "vtkTessellatorFilter.h"
 #include "vtkTiledDisplaySchedule.h"
 #include "vtkUpdateSuppressorPipeline.h"
@@ -115,7 +111,6 @@ int main(int , char *[])
   c = vtkClientCompositeManager::New(); c->Print(cout); c->Delete();
   c = vtkCompleteArrays::New(); c->Print(cout); c->Delete();
   c = vtkCVGeometryCache::New(); c->Print(cout); c->Delete();
-  c = vtkDataAnalysisFilter::New(); c->Print(cout); c->Delete();
   c = vtkDataSetSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
   c = vtkHDF5RawImageReader::New(); c->Print(cout); c->Delete();
   c = vtkHierarchicalFractal::New(); c->Print(cout); c->Delete();
@@ -169,9 +164,6 @@ int main(int , char *[])
   c = vtkSquirtCompressor::New(); c->Print(cout); c->Delete();
   c = vtkStreamingTessellator::New(); c->Print(cout); c->Delete();
   c = vtkSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
-  c = vtkTemporalCacheFilter::New(); c->Print(cout); c->Delete();
-  c = vtkTemporalPickFilter::New(); c->Print(cout); c->Delete();
-  c = vtkTemporalProbeFilter::New(); c->Print(cout); c->Delete();
   c = vtkTessellatorFilter::New(); c->Print(cout); c->Delete();
   c = vtkTiledDisplaySchedule::New(); c->Print(cout); c->Delete();
   c = vtkUpdateSuppressorPipeline::New(); c->Print(cout); c->Delete();
