@@ -274,11 +274,10 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   QObject::connect(
     &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
     this, SLOT(onActiveViewChanged(pqGenericViewModule*)));
-  /*
+
   QObject::connect(
     &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
     &this->selectionManager(), SLOT(setActiveView(pqGenericViewModule*)));
-    */
     
   // Listen for compound proxy register events.
   pqServerManagerObserver *observer =
