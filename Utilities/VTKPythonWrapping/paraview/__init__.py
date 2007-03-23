@@ -235,7 +235,6 @@ class pyProxy(object):
         else:
           newArgs.append(arg)
       func = getattr(self.SMProxy, self.__LastAttrName)
-      print "Calling ", self.__LastAttrName
       retVal = func(*newArgs)
       if type(retVal) is type(self.SMProxy) and retVal.IsA("vtkSMProxy"):
         return pyProxy(retVal)
