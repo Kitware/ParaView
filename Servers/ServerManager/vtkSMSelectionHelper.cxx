@@ -32,7 +32,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.2");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -133,47 +133,64 @@ void vtkSMSelectionHelper::SelectOnSurface(vtkSMRenderModuleProxy* rmP,
   vtkstd::set<int> propIDs;
   unsigned int numChildren = selection->GetNumberOfChildren();
   unsigned int i;
+  int MaxPixels = -1;
+  int PropWithMostPixels = -1;
   for (i=0; i<numChildren; i++)
     {
     vtkSelection* child = selection->GetChild(i);
     vtkInformation* properties = child->GetProperties();
-    if (properties->Has(vtkSelection::PROP_ID()))
+    int NumPixels = 0;
+    if (properties->Has(vtkSelection::PIXEL_COUNT()))
       {
-      propIDs.insert(properties->Get(vtkSelection::PROP_ID()));
+      NumPixels = properties->Get(vtkSelection::PIXEL_COUNT());
+      if (NumPixels > MaxPixels)
+        {
+        if (properties->Has(vtkSelection::PROP_ID()))
+          {
+          PropWithMostPixels = properties->Get(vtkSelection::PROP_ID());
+          MaxPixels = NumPixels;
+          }        
+        }
       }
     }
 
-  // For each item in the set, find the corresponding proxy
-  // and selection
-  vtkstd::set<int>::iterator iter = propIDs.begin();
-  for(; iter != propIDs.end(); iter++)
+  if (PropWithMostPixels >= 0)
     {
-    vtkClientServerID propID;
-    propID.ID = *iter;
-    vtkSMProxy* objP = 
-      rmP->GetProxyFromPropID(&propID, vtkSMRenderModuleProxy::INPUT);
-    if (objP)
+    propIDs.insert(PropWithMostPixels);
+
+    // For each item in the set, find the corresponding proxy
+    // and selection
+    vtkstd::set<int>::iterator iter = propIDs.begin();
+    for(; iter != propIDs.end(); iter++)
       {
-      selectedProxies->AddItem(objP);
-      vtkSelection* newSelection = vtkSelection::New();
-      newSelection->GetProperties()->Copy(selection->GetProperties(), 0);
-      for(i=0; i<numChildren; i++)
+      vtkClientServerID propID;
+      propID.ID = *iter;
+      vtkSMProxy* objP = 
+        rmP->GetProxyFromPropID(&propID, vtkSMRenderModuleProxy::INPUT);
+      if (objP)
         {
-        vtkSelection* child = selection->GetChild(i);
-        vtkInformation* properties = child->GetProperties();
-        if (properties->Has(vtkSelection::PROP_ID()) &&
-            properties->Get(vtkSelection::PROP_ID()) == (int)propID.ID)
+        selectedProxies->AddItem(objP);
+        vtkSelection* newSelection = vtkSelection::New();
+        newSelection->GetProperties()->Copy(selection->GetProperties(), 0);
+        for(i=0; i<numChildren; i++)
           {
-          vtkSelection* newChildSelection = vtkSelection::New();
-          newChildSelection->ShallowCopy(child);
-          newSelection->AddChild(newChildSelection);
-          newChildSelection->Delete();
+          vtkSelection* child = selection->GetChild(i);
+          vtkInformation* properties = child->GetProperties();
+          if (properties->Has(vtkSelection::PROP_ID()) &&
+              properties->Get(vtkSelection::PROP_ID()) == (int)propID.ID)
+            {
+            vtkSelection* newChildSelection = vtkSelection::New();
+            newChildSelection->ShallowCopy(child);
+            newSelection->AddChild(newChildSelection);
+            newChildSelection->Delete();
+            }
           }
+        selections->AddItem(newSelection);
+        newSelection->Delete();
         }
-      selections->AddItem(newSelection);
-      newSelection->Delete();
       }
     }
+
   selection->Delete();
 }
 
