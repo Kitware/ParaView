@@ -634,7 +634,7 @@ void WriteLeafNodes(vtkPVXMLElement *elem, vtkSMProxyManager *manager,
     ostrstream filename;
     filename << filePath << "/" << xmlProxyName << ".html" << ends;
     docFile.open(filename.str());
-    baseFile << "<a href=\"" << filename.str() << "\">";
+    baseFile << "<a href=\"" << xmlProxyName << ".html\">";
     filename.rdbuf()->freeze(0);
     docFile << "<html>" << endl;
     docFile << "<head>" << endl;
