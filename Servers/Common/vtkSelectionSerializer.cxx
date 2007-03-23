@@ -18,6 +18,8 @@
 #include "vtkInformation.h"
 #include "vtkInformationIterator.h"
 #include "vtkInformationIntegerKey.h"
+#include "vtkInformationDoubleKey.h"
+#include "vtkInformationStringKey.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationKey.h"
 #include "vtkInstantiator.h"
@@ -28,7 +30,7 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.8");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.9");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -75,6 +77,18 @@ void vtkSelectionSerializer::PrintXML(
       vtkInformationIntegerKey* iKey = 
         static_cast<vtkInformationIntegerKey*>(key);
       os << properties->Get(iKey);
+      }
+    else if (key->IsA("vtkInformationDoubleKey"))
+      {
+      vtkInformationDoubleKey* dKey = 
+        static_cast<vtkInformationDoubleKey*>(key);
+      os << properties->Get(dKey);
+      }
+    else if (key->IsA("vtkInformationStringKey"))
+      {
+      vtkInformationStringKey* sKey = 
+        static_cast<vtkInformationStringKey*>(key);
+      os << properties->Get(sKey);
       }
       
     os << "\"/>" << endl;
@@ -268,6 +282,14 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           if (elem->GetScalarAttribute("value", &val))
             {
             node->GetProperties()->Set(vtkSelection::CONTAINING_CELLS(), val);
+            }
+          }
+        else if (strcmp("PIXEL_COUNT", key) == 0)
+          {
+          int val;
+          if (elem->GetScalarAttribute("value", &val))
+            {
+            node->GetProperties()->Set(vtkSelection::PIXEL_COUNT(), val);
             }
           }
         }
