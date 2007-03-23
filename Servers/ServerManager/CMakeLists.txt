@@ -198,7 +198,6 @@ SET_SOURCE_FILES_PROPERTIES(
   ABSTRACT
   )
 
-
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
   ${TCL_INCLUDE_PATH}
@@ -326,7 +325,39 @@ ADD_CUSTOM_COMMAND(
   COMMAND ${CMD}
   ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
   vtkSMDefaultModules Interface GetInterfaces
-  ${resourceFiles})
+  ${resourceFiles}
+  COMMENT "generating modules")
+
+SET(GUI_CONFIG_FILES
+#  ParaViewSources
+  ParaViewFilters
+  ParaViewReaders
+  ParaViewWriters
+)
+
+ADD_EXECUTABLE(vtkSMExtractDocumentation vtkSMExtractDocumentation.cxx)
+TARGET_LINK_LIBRARIES(vtkSMExtractDocumentation vtkPVServerManager)
+GET_TARGET_PROPERTY(DOCUMENTATION_EXE vtkSMExtractDocumentation LOCATION)
+
+FILE(MAKE_DIRECTORY ${ParaView_BINARY_DIR}/Documentation)
+
+FOREACH(gcf ${GUI_CONFIG_FILES})
+  SET(fullXMLFile ${ParaView_SOURCE_DIR}/Qt/Components/Resources/XML/${gcf}.xml)
+  SET(fullHTMLFile ${ParaView_BINARY_DIR}/Documentation/${gcf}.html)
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${fullHTMLFile}
+    DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
+    COMMAND ${DOCUMENTATION_EXE}
+    ARGS ${ParaView_BINARY_DIR}/Documentation ${fullXMLFile}
+    COMMENT Creating Documentation
+    )
+
+  SET(HTML_RESULTS ${HTML_RESULTS} ${fullHTMLFile})
+ENDFOREACH(gcf)
+
+ADD_CUSTOM_TARGET(HTMLDocumentation ALL
+  DEPENDS ${HTML_RESULTS}
+)
 
 SET(PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION "")
 FOREACH(rf ${resourceFiles})
