@@ -73,11 +73,12 @@
 
     </LookupTableProxy>
 
-    <Proxy name="PVLookupTable" class="vtkPVLookupTable">
+    <PVLookupTableProxy name="PVLookupTable" class="vtkPVLookupTable">
       <IntVectorProperty
         name="LockScalarRange"
         number_of_elements="1"
         default_values="0">
+        <!-- This is obsolete - - - -  don't use it any more! -->
         <!-- This is a data-property allowing us to save state of
           scalar range lock in state. SM does not use this at all
           hence the absence of "command" -->
@@ -92,6 +93,14 @@
         clean_command="RemoveAllPoints"
         animateable="0">
       </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ScalePointsWithRange"
+        command="SetScalePointsWithRange"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
 
       <IntVectorProperty
         name="ColorSpace"
@@ -161,7 +170,8 @@
           <Entry value="1" text="Component" />
        </EnumerationDomain>
       </IntVectorProperty>
-    </Proxy>
+      <!-- End of PVLookupTable -->
+    </PVLookupTableProxy>
   </ProxyGroup>
 
   <ProxyGroup name="axes">

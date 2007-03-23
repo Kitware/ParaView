@@ -113,6 +113,7 @@ SET(Kit_SRCS
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
+  vtkSMPVLookupTableProxy.cxx
   vtkSMPQStateLoader.cxx
   vtkSMPVAnimationSceneProxy.cxx
   vtkSMPWriterProxy.cxx
