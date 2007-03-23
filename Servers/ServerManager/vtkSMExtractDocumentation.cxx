@@ -708,6 +708,7 @@ void WriteLeafNodes(vtkPVXMLElement *elem, vtkSMProxyManager *manager,
             }
           docFile << "<br>" << endl;
           }
+        dIt->Delete();
         }
       }
     docFile << "</body>" << endl;
@@ -768,5 +769,9 @@ int main(int argc, char *argv[])
 
   baseFile.close();
   parser->Delete();
+  pm->Finalize();
+  pm->Delete();
+  app->Finalize();
+  app->Delete();
   return 0;
 }
