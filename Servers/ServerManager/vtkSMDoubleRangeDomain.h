@@ -142,7 +142,14 @@ public:
   // Set the value of an element of a property from the animation editor.
   virtual void SetAnimationValue(vtkSMProperty *property, int idx,
                                  double value);
-  
+
+  // Description:
+  // Returns the number of entries in the internal
+  // maxima/minima list. No maxima/minima exists beyond
+  // this index. Maxima/minima below this number may or
+  // may not exist.
+  unsigned int GetNumberOfEntries();
+
 protected:
   vtkSMDoubleRangeDomain();
   ~vtkSMDoubleRangeDomain();
@@ -159,8 +166,7 @@ protected:
   void SetEntry(unsigned int idx, int minOrMax, int set, double value);
 
   // Internal use only.
-  // Set/Get the number of min/max entries.
-  unsigned int GetNumberOfEntries();
+  // Set the number of min/max entries.
   void SetNumberOfEntries(unsigned int size);
 
   vtkSMDoubleRangeDomainInternals* DRInternals;
