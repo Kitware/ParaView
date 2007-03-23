@@ -52,10 +52,6 @@ public:
   virtual void AddInput(vtkSMSourceProxy* input, const char*, int);
 
   // Description:
-  // Connect the VTK data object to display pipeline.
-  void SetInput(vtkSMProxy* input);
-
-  // Description:
   // Obtain the proxy for the algorithm that this displays the output of.
   vtkSMProxy *GetInput(int i=0);
 
@@ -404,6 +400,11 @@ protected:
 
   // convenience method to connect to proxies.
   bool Connect(vtkSMProxy* consumer, vtkSMProxy* producer);
+
+  // Description:
+  // Connect the VTK data object to display pipeline.
+  void SetInput(vtkSMProxy* input);
+
 private:
   vtkSMDataObjectDisplayProxy(const vtkSMDataObjectDisplayProxy&); // Not implemented.
   void operator=(const vtkSMDataObjectDisplayProxy&); // Not implemented.
