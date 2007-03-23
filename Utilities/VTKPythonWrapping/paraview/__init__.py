@@ -45,7 +45,7 @@ else:
   from vtkPVServerManagerPython import *
   from vtkCommonPython import *
 
-class pyProxy:
+class pyProxy(object):
     """
     Proxy wrapper. Makes it easier to set properties on a proxy.
     Instead of:
@@ -227,16 +227,27 @@ class pyProxy:
           property_list.append(iter.GetKey())
         return property_list
 
+    def __ConvertArgumentsAndCall(self, *args):
+      newArgs = []
+      for arg in args:
+        if type(arg) is type(self):
+          newArgs.append(arg.SMProxy)
+        else:
+          newArgs.append(arg)
+      func = getattr(self.SMProxy, self.__LastAttrName)
+      print "Calling ", self.__LastAttrName
+      retVal = func(*newArgs)
+      if type(retVal) is type(self.SMProxy) and retVal.IsA("vtkSMProxy"):
+        return pyProxy(retVal)
+      else:
+        return retVal
+
     def __getattr__(self, name):
         """With the exception of a few overloaded methods,
         returns the SMProxy method"""
         if not self.SMProxy:
           return getattr(self, name)
-        try:
-          proxyAttr = getattr(self.SMProxy, name)
-          return proxyAttr
-        except:
-          pass
+        # First check if this is a property
         if re.compile("^Set").match(name) and self.SMProxy.GetProperty(name[3:]):
             self.__LastAttrName = name[3:]
             return self.__SetProperty
@@ -249,15 +260,18 @@ class pyProxy:
         if re.compile("^RemoveFrom").match(name) and self.SMProxy.GetProperty(name[10:]):
             self.__LastAttrName = name[10:]
             return self.__RemoveFromProperty
-        if name == "CreateDisplayProxy" and hasattr(self.SMProxy, "CreateDisplayProxy"):
-            return self.__CreateDisplayProxy
         if name == "SaveDefinition" and hasattr(self.SMProxy, "SaveDefinition"):
             return self.__SaveDefinition
-        if name == "AddProxy" and hasattr(self.SMProxy, "AddProxy"):
-            return self.__AddProxy
+        # If not a property, see if SMProxy has the method
+        try:
+          proxyAttr = getattr(self.SMProxy, name)
+          self.__LastAttrName = name
+          return self.__ConvertArgumentsAndCall
+        except:
+          pass
         return getattr(self.SMProxy, name)
         
-class pyProxyManager:
+class pyProxyManager(object):
     "Proxy manager wrapper"
 
     def __init__(self):
@@ -401,7 +415,7 @@ class pyProxyManager:
             return proxy.ListProperties()
         
 
-class pyPropertyIterator:
+class pyPropertyIterator(object):
     """Wrapper for a vtkSMPropertyIterator class to satisfy
        the python iterator protocol."""
     def __init__(self, proxy):
@@ -447,7 +461,7 @@ class pyPropertyIterator:
         """returns attributes from the vtkSMProxyIterator."""
         return getattr(self.SMIterator, name)
 
-class pyProxyDefinitionIterator:
+class pyProxyDefinitionIterator(object):
     """Wrapper for a vtkSMProxyDefinitionIterator class to satisfy
        the python iterator protocol."""
     def __init__(self):
@@ -481,7 +495,7 @@ class pyProxyDefinitionIterator:
         return getattr(self.SMIterator, name)
 
 
-class pyProxyIterator:
+class pyProxyIterator(object):
     """Wrapper for a vtkSMProxyIterator class to satisfy the
      python iterator protocol."""
     def __init__(self):
@@ -525,7 +539,7 @@ class pyProxyIterator:
         """returns attributes from the vtkSMProxyIterator."""
         return getattr(self.SMIterator, name)
 
-class pyConnection:
+class pyConnection(object):
     """
       This is a representation for a connection on in the python client.
       Eventually,  this may move to the server manager itself.
