@@ -30,7 +30,7 @@
         name="DataMode"
         command="SetDataMode"
         number_of_elements="1"
-        default_values="0">
+        default_values="2">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Ascii" />
           <Entry value="1" text="Binary" />

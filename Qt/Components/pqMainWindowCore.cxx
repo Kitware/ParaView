@@ -78,6 +78,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqObjectInspectorDriver.h"
 #include "pqObjectInspectorWidget.h"
+#include "pqOptions.h"
 #include "pqPendingDisplayManager.h"
 #include "pqPipelineBrowser.h"
 #include "pqPipelineDisplay.h"
@@ -98,6 +99,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
+#include "pqServerStartup.h"
+#include "pqServerStartups.h"
 #include "pqServerStartupBrowser.h"
 #include "pqSettingsDialog.h"
 #include "pqSettings.h"
@@ -447,6 +450,11 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   loader->SetMainWindowCore(this);
   core->setStateLoader(loader);
   loader->Delete();
+
+
+  // Set up a callback to before further intialization once the application
+  // event loop starts.
+  QTimer::singleShot(100, this, SLOT(applicationInitialize()));
 }
 
 //-----------------------------------------------------------------------------
@@ -3339,9 +3347,36 @@ pqUndoStack* pqMainWindowCore::getApplicationUndoStack() const
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::loadDataFromCommandLine()
+void pqMainWindowCore::applicationInitialize()
 {
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqOptions* options = pqOptions::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetOptions());
+
+  // check for --server.
+  const char* serverresource_name = options->GetServerResourceName();
+  if (serverresource_name)
+    {
+    pqServerStartup* startUp = 
+      core->serverStartups().getStartup(serverresource_name);
+    if (startUp)
+      {
+      core->createServer(startUp->getServer());
+      }
+    }
+
+  if (!this->getActiveServer())
+    {
+    if (serverresource_name)
+      {
+      qCritical() << "Could not connect to requested server \"" 
+        << serverresource_name 
+        << "\". Creating default builtin connection.";
+      }
+    core->createServer(pqServerResource("builtin:"));
+    }
+    
+  // check for --data option.
   if (options->GetParaViewDataName())
     {
     if (this->makeServerConnectionIfNoneExists())

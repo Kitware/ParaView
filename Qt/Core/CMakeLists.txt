@@ -179,8 +179,6 @@ ADD_LIBRARY(pqCore
   pqHistogramTableModel.h
   pqLineChartDisplay.cxx
   pqLineChartDisplay.h
-  pqJoystickFly.cxx
-  pqJoystickFly.h
   pqLinksModel.cxx
   pqLinksModel.h
   pqLinkViewWidget.cxx

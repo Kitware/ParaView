@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.5");
+vtkCxxRevisionMacro(pqOptions, "1.6");
 
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
@@ -49,6 +49,7 @@ pqOptions::pqOptions()
   this->DisableRegistry = 0;
   this->TestFileName = 0;
   this->TestInitFileName = 0;
+  this->ServerResourceName = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -58,6 +59,7 @@ pqOptions::~pqOptions()
   this->SetTestDirectory(0);
   this->SetTestFileName(0);
   this->SetTestInitFileName(0);
+  this->SetServerResourceName(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -87,6 +89,10 @@ void pqOptions::Initialize()
 
   this->AddBooleanArgument("--disable-registry", "-dr", &this->DisableRegistry,
     "Do not use registry when running ParaView (for testing).");
+
+  this->AddArgument("--server", "-s",
+    &this->ServerResourceName,
+    "Set the name of the server resource to connect with when the client starts.");
 }
 
 //-----------------------------------------------------------------------------
@@ -133,4 +139,7 @@ void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
     this->BaselineImage : "(none)") << endl;
   os << indent << "TestDirectory: " << (this->TestDirectory?
     this->TestDirectory : "(none)") << endl;
+
+  os << indent << "ServerResourceName: " 
+    << (this->ServerResourceName? this->ServerResourceName : "(none)") << endl;
 }

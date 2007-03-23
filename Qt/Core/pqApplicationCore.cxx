@@ -33,26 +33,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QVTKWidget.h"
 // ParaView Server Manager includes.
-#include "vtkProcessModule.h"
 #include "vtkProcessModuleConnectionManager.h"
+#include "vtkProcessModule.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMMultiViewRenderModuleProxy.h"
 #include "vtkSMPQStateLoader.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMMultiViewRenderModuleProxy.h"
-#include "vtkSMRenderModuleProxy.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -361,14 +361,13 @@ void pqApplicationCore::saveState(vtkPVXMLElement* rootElement)
   // * Save the Proxy Manager state.
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
   // Eventually proxy manager will save state for each connection separately.
   // For now, we only have one connection, so simply save it.
-  vtkPVXMLElement* smState = vtkPVXMLElement::New();
-  smState->SetName("ServerManagerState");
+  vtkPVXMLElement* smState = pxm->SaveState();
   rootElement->AddNestedElement(smState);
   smState->Delete();
 
-  pxm->SaveState(smState);
 }
 
 //-----------------------------------------------------------------------------
@@ -376,7 +375,7 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
                                   pqServer* server,
                                   vtkSMStateLoader* arg_loader/*=NULL*/)
 {
-  if (!server)
+  if (!server || !rootElement)
     {
     return ;
     }
@@ -386,8 +385,13 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     {
     loader = this->Internal->StateLoader;
     }
+
   if (!loader)
     {
+    // Create a default server manager state loader.
+    // Since server manager state loader does not handle
+    // any elements except "ServerManagerState",
+    // we make that the root element.
     loader.TakeReference(vtkSMPQStateLoader::New());
     rootElement = pqXMLUtil::FindNestedElementByName(rootElement,
       "ServerManagerState");

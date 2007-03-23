@@ -345,9 +345,6 @@ public slots:
   // Set center axes visibility on active render view.
   void setCenterAxesVisibility(bool visible);
 
-  /// If user specified any data file to load on command line
-  /// using the --data option, this method will try to load it.
-  void loadDataFromCommandLine();
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);
@@ -399,6 +396,12 @@ private slots:
 
   void addPluginActions(QObject* iface);
   void addPluginActions(pqActionGroupInterface* iface);
+
+  /// This method is called once after the application event loop
+  /// begins. This is where we process certain command line options
+  /// such as --data, --server etc.
+  void applicationInitialize();
+
 
 private:
   pqServerManagerModelItem *getActiveObject() const;

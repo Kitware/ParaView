@@ -33,11 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // VTK includes.
 #include "QVTKWidget.h"
+#include "vtkPVConfig.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMStateLoader.h"
-#include "vtkSMIntVectorProperty.h"
 
 // Qt includes.
 #include <QAction>
@@ -763,6 +764,7 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
 {
   vtkPVXMLElement* rwRoot = vtkPVXMLElement::New();
   rwRoot->SetName("ViewManager");
+  rwRoot->AddAttribute("version", PARAVIEW_VERSION_FULL);
   root->AddNestedElement(rwRoot);
   rwRoot->Delete();
 

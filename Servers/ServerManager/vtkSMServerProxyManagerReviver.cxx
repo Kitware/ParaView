@@ -28,7 +28,7 @@
 
 #include <vtksys/ios/sstream>
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.2");
+vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {
@@ -52,9 +52,7 @@ int vtkSMServerProxyManagerReviver::ReviveRemoteServerManager(vtkIdType cid)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   // 1) Save revival state for the cid.
-  vtkPVXMLElement* root = vtkPVXMLElement::New();
-  root->SetName("ServerManagerState");
-  pxm->SaveState(cid, root, 1);
+  vtkPVXMLElement* root = pxm->SaveRevivalState(cid);
 
   vtkClientServerStream stream;
 
@@ -92,9 +90,9 @@ int vtkSMServerProxyManagerReviver::ReviveRemoteServerManager(vtkIdType cid)
   vtksys_ios::ostringstream xml_stream;
   root->PrintXML(xml_stream, vtkIndent());
 
-  ofstream file("/tmp/revive.xml");
-  root->PrintXML(file, vtkIndent());
-  file.close();
+  //ofstream file("/tmp/revive.xml");
+  //root->PrintXML(file, vtkIndent());
+  //file.close();
 
   root->Delete();
 

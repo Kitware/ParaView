@@ -276,9 +276,7 @@ void pqLookmarkDefinitionWizard::createLookmark()
     }
 
   // Get the XML representation of the contents of "proxies", as well as their referred proxies
-  vtkPVXMLElement *stateElement = vtkPVXMLElement::New();
-  stateElement->SetName("ServerManagerState");
-  proxyManager->SaveState(stateElement, proxies, 1);
+  vtkPVXMLElement *stateElement = proxyManager->SaveState(proxies, true);
 
   // Collect all referred (proxy property) proxies of the render module EXCEPT its "Displays" These have been handled separately.
   proxies->RemoveAllItems();
@@ -300,12 +298,23 @@ void pqLookmarkDefinitionWizard::createLookmark()
     }
   
   // Save all referred proxies of the render module's non-display referred proxies
-  proxyManager->SaveState(stateElement, proxies, 1);
+  vtkPVXMLElement* childElement = proxyManager->SaveState(proxies, true);
+  unsigned int cc;
+  for (cc=0; cc < childElement->GetNumberOfNestedElements(); cc++)
+    {
+    stateElement->AddNestedElement(childElement->GetNestedElement(cc));
+    }
+  childElement->Delete();
 
   // Now add the render module, but don't save its referred proxies, because we've dealt with them separately
   proxies->RemoveAllItems();
   proxies->AddItem(smRen);
-  proxyManager->SaveState(stateElement, proxies, 0);
+  childElement = proxyManager->SaveState(proxies, false);
+  for (cc=0; cc < childElement->GetNumberOfNestedElements(); cc++)
+    {
+    stateElement->AddNestedElement(childElement->GetNestedElement(cc));
+    }
+  childElement->Delete();
 
   // Create a lookmark with the given name, image, and state
   pqLookmarkModel *lmkModel = new pqLookmarkModel(this->Form->LookmarkName->text(), stateElement);

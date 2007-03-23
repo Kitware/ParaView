@@ -18,8 +18,9 @@
 #include "vtkCommand.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkProcessModuleConnectionManager.h"
+#include "vtkProcessModule.h"
+#include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
@@ -37,8 +38,9 @@
 
 #include <vtkstd/map>
 #include <vtkstd/set>
-#include <vtksys/RegularExpression.hxx>
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
+#include <vtksys/RegularExpression.hxx>
 
 #include "vtkSMProxyManagerInternals.h"
 
@@ -91,7 +93,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.62");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.63");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -114,6 +116,24 @@ vtkSMProxyManager::~vtkSMProxyManager()
 
   this->Observer->SetTarget(0);
   this->Observer->Delete();
+}
+
+//----------------------------------------------------------------------------
+int vtkSMProxyManager::GetVersionMajor()
+{
+  return PARAVIEW_VERSION_MAJOR;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMProxyManager::GetVersionMinor()
+{
+  return PARAVIEW_VERSION_MINOR;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMProxyManager::GetVersionPatch()
+{
+  return PARAVIEW_VERSION_PATCH;
 }
 
 //----------------------------------------------------------------------------
@@ -1069,13 +1089,9 @@ void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveState(const char* filename, int revival/*=0*/)
+void vtkSMProxyManager::SaveState(const char* filename)
 {
-  vtkPVXMLElement* rootElement = vtkPVXMLElement::New();
-  rootElement->SetName("ServerManagerState");
-
-  this->SaveState(rootElement, revival);
-
+  vtkPVXMLElement* rootElement = this->SaveState();
   ofstream os(filename, ios::out);
   rootElement->PrintXML(os, vtkIndent());
   rootElement->Delete();
@@ -1083,24 +1099,28 @@ void vtkSMProxyManager::SaveState(const char* filename, int revival/*=0*/)
 
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveState(vtkPVXMLElement* root, int revival/*=0*/)
+vtkPVXMLElement* vtkSMProxyManager::SaveState()
 {
-  this->SaveStateInternal(
-    vtkProcessModuleConnectionManager::GetNullConnectionID(), root, 0, revival);
+  return this->SaveStateInternal(
+    vtkProcessModuleConnectionManager::GetNullConnectionID(), 0, 0);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveState(vtkIdType connectionID,
-  vtkPVXMLElement* root, int revival/*=0*/)
+vtkPVXMLElement* vtkSMProxyManager::SaveState(vtkIdType connectionID)
 {
-  this->SaveStateInternal(connectionID, root, 0, revival);
+  return this->SaveStateInternal(connectionID, 0, 0);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveState(vtkPVXMLElement* root, 
-  vtkCollection* proxies, int save_referred_proxies)
+vtkPVXMLElement* vtkSMProxyManager::SaveRevivalState(vtkIdType connectionID)
 {
-  
+  return this->SaveStateInternal(connectionID, 0, 1);
+}
+
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxyManager::SaveState(vtkCollection* proxies, 
+  bool save_referred_proxies)
+{
   vtkSMProxyManagerProxySet setOfProxies;
   for (int cc=0; cc < proxies->GetNumberOfItems(); ++cc)
     {
@@ -1114,9 +1134,10 @@ void vtkSMProxyManager::SaveState(vtkPVXMLElement* root,
         }
       }
     }
-  this->SaveStateInternal(
-    vtkProcessModuleConnectionManager::GetNullConnectionID(),
-    root, &setOfProxies, 0);
+
+  return this->SaveStateInternal(
+    vtkProcessModuleConnectionManager::GetNullConnectionID(), 
+    &setOfProxies, 0);
 }
 
 //---------------------------------------------------------------------------
@@ -1143,18 +1164,18 @@ void vtkSMProxyManager::CollectReferredProxies(
 
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
-  vtkPVXMLElement* rootElement, vtkSMProxyManagerProxySet* proxySet, int revival)
+vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
+ vtkSMProxyManagerProxySet* proxySet, int revival)
 {
-  if (!rootElement)
-    {
-    rootElement = vtkPVXMLElement::New();
-    rootElement->SetName("ServerManagerState");
-    }
-  else
-    {
-    rootElement->Register(this);
-    }
+  vtkPVXMLElement* rootElement = vtkPVXMLElement::New();
+  rootElement->SetName("ServerManagerState");
+
+  // Set version number on the state element.
+  vtksys_ios::ostringstream version_string;
+  version_string << this->GetVersionMajor() << "."
+    << this->GetVersionMinor() << "." << this->GetVersionPatch();
+  rootElement->AddAttribute("version", version_string.str().c_str());
+
 
   vtkstd::set<vtkstd::string> seen;
   vtkstd::set<vtkSMProxy*> visited_proxies; // set of proxies already added.
@@ -1296,7 +1317,7 @@ void vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
     links->Delete();
     }
 
-  rootElement->Delete();
+  return rootElement;
 }
 
 //---------------------------------------------------------------------------

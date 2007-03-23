@@ -2163,7 +2163,7 @@
       </StringVectorProperty>
     </Proxy>
 
-    <Proxy name="JoystickFly1" class="vtkPVJoystickFly" base_proxygroup="cameramanipulators"
+    <Proxy name="JoystickFlyIn" class="vtkPVJoystickFlyIn" base_proxygroup="cameramanipulators"
       base_proxyname="CameraManipulator">
       <DoubleVectorProperty
         name="FlySpeed"
@@ -2174,7 +2174,7 @@
       </DoubleVectorProperty>
     </Proxy>
 
-    <Proxy name="JoystickFly2" class="pqJoystickFly" base_proxygroup="cameramanipulators"
+    <Proxy name="JoystickFlyOut" class="vtkPVJoystickFlyOut" base_proxygroup="cameramanipulators"
       base_proxyname="CameraManipulator">
       <DoubleVectorProperty
         name="FlySpeed"
@@ -2183,16 +2183,6 @@
         default_values="15">
         <DoubleRangeDomain name="range" min="1" max="30"/>
       </DoubleVectorProperty>
-      <IntVectorProperty
-        name="In"
-        command="SetIn"
-        number_of_elements="1"
-        default_values="0">
-        <EnumerationDomain>
-          <Entry value="0" text="Fly In"/>
-          <Entry value="1" text="Fly Out"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
     </Proxy>
 
     <Proxy name="TrackballMoveActor" class="vtkPVTrackballMoveActor" base_proxygroup="cameramanipulators"

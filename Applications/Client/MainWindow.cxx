@@ -642,12 +642,6 @@ MainWindow::MainWindow() :
 
   // Restore the state of the window ...
   pqApplicationCore::instance()->settings()->restoreState("MainWindow", *this);
-
-  // Now load data file is specified on command line.
-  // Let the application startup before we attemp to 
-  // read the file.
-  QTimer::singleShot(100, &this->Implementation->Core,
-    SLOT(loadDataFromCommandLine()));
 }
 
 MainWindow::~MainWindow()

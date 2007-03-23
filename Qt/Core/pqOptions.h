@@ -54,9 +54,13 @@ public:
   vtkGetMacro(ImageThreshold, int);
   vtkGetMacro(ExitAppWhenTestsDone, int);
   vtkGetMacro(DisableRegistry, int);
-
+  
   const QStringList& GetTestFiles() 
     { return this->TestFiles; }
+
+  /// Returns the server resource name specified
+  /// to load.
+  vtkGetStringMacro(ServerResourceName);
 
 protected:
   pqOptions();
@@ -69,6 +73,7 @@ protected:
   char* BaselineImage;
   char* TestFileName;
   char* TestInitFileName;
+  char* ServerResourceName;
   int ImageThreshold;
   int ExitAppWhenTestsDone;
   int DisableRegistry;
@@ -79,6 +84,7 @@ protected:
   vtkSetStringMacro(BaselineImage);
   vtkSetStringMacro(TestFileName);
   vtkSetStringMacro(TestInitFileName);
+  vtkSetStringMacro(ServerResourceName);
 
  
   // Description:

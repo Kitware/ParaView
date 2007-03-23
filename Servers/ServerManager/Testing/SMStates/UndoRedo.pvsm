@@ -1,4 +1,4 @@
-<ServerManagerState>
+<ServerManagerState version="2.9.10">
   <Proxy group="3d_widgets" type="LineWidgetProxy" id="272">
     <Property name="IgnorePlaceWidgetChanges" id="272.IgnorePlaceWidgetChanges" number_of_elements="1">
       <Element index="0" value="1"/>

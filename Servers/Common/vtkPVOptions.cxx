@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.38");
+vtkCxxRevisionMacro(vtkPVOptions, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -99,6 +99,10 @@ vtkPVOptions::~vtkPVOptions()
 //----------------------------------------------------------------------------
 void vtkPVOptions::Initialize()
 {
+  this->AddArgument("--data", 0, &this->ParaViewDataName,
+                    "Load the specified data.", 
+                    vtkPVOptions::PVCLIENT|vtkPVOptions::PARAVIEW);
+  /*
   this->AddBooleanArgument("--client-render-server", "-crs", &this->ClientRenderServer,
                            "Run ParaView as a client to a data and render server."
                            " The render server will wait for the data server.",
@@ -114,24 +118,26 @@ void vtkPVOptions::Initialize()
   this->AddArgument("--render-server-host", "-rsh", &this->RenderServerHostName, 
                     "Tell the client the host name of the render server (default: localhost).", 
                     vtkPVOptions::PVCLIENT);
-  this->AddArgument("--data", 0, &this->ParaViewDataName,
-                    "Load the specified data.", 
-                    vtkPVOptions::PVCLIENT|vtkPVOptions::PARAVIEW);
+
   this->AddArgument("--connect-id", 0, &this->ConnectID,
                     "Set the ID of the server and client to make sure they match.",
                     vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER |
                     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER);
   this->AddArgument("--render-module", 0, &this->RenderModuleName,
                     "User specified rendering module.",
-                    vtkPVOptions::PVCLIENT| vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER | vtkPVOptions::PARAVIEW);
+                    vtkPVOptions::PVCLIENT| vtkPVOptions::PVRENDER_SERVER 
+                    | vtkPVOptions::PVSERVER | vtkPVOptions::PARAVIEW);
+  */
   this->AddBooleanArgument("--use-offscreen-rendering", 0, &this->UseOffscreenRendering,
                            "Render offscreen on the satellite processes."
                            " This option only works with software rendering or mangled mesa on Unix.",
                            vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER);
+
   this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
                            "Tell the application to enable stereo rendering"
                            " (only when running on a single process).",
                            vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
+  /*
   this->AddArgument("--server-host", "-sh", &this->ServerHostName,
                     "Tell the client the host name of the data server.",
                     vtkPVOptions::PVCLIENT);
@@ -141,19 +147,20 @@ void vtkPVOptions::Initialize()
   this->AddArgument("--render-server-host", "-rsh", &this->RenderServerHostName,
                     "Tell the client the host name of the render server.", 
                     vtkPVOptions::PVCLIENT);
+  */
   this->AddArgument("--client-host", "-ch", &this->ClientHostName,
                     "Tell the data|render server the host name of the client, use with -rc.",
                     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER |
                     vtkPVOptions::PVSERVER);
   this->AddArgument("--data-server-port", "-dsp", &this->DataServerPort,
                     "What port data server use to connect to the client. (default 11111).", 
-                    vtkPVOptions::PVCLIENT | vtkPVOptions::PVDATA_SERVER);
+                    /*vtkPVOptions::PVCLIENT | */vtkPVOptions::PVDATA_SERVER);
   this->AddArgument("--render-server-port", "-rsp", &this->RenderServerPort,
                     "What port should the render server use to connect to the client. (default 22221).", 
-                    vtkPVOptions::PVCLIENT | vtkPVOptions::PVRENDER_SERVER);
+                    /*vtkPVOptions::PVCLIENT |*/ vtkPVOptions::PVRENDER_SERVER);
   this->AddArgument("--server-port", "-sp", &this->ServerPort,
                     "What port should the combined server use to connect to the client. (default 11111).", 
-                    vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER);
+                    /*vtkPVOptions::PVCLIENT |*/ vtkPVOptions::PVSERVER);
 
   this->AddArgument("--render-node-port", 0, &this->RenderNodePort, 
                     "Specify the port to be used by each render node (--render-node-port=22222)."
@@ -163,7 +170,10 @@ void vtkPVOptions::Initialize()
                            "Use this option when rendering resources are not available on the server.", 
                            vtkPVOptions::PVSERVER);
   this->AddBooleanArgument("--reverse-connection", "-rc", &this->ReverseConnection, 
-                           "Have the server connect to the client.");
+                           "Have the server connect to the client.",
+                           vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER |
+                           vtkPVOptions::PVSERVER);
+
   this->AddArgument("--tile-dimensions-x", "-tdx", this->TileDimensions, 
                     "Size of tile display in the number of displays in each row of the display.",
                     vtkPVOptions::PVCLIENT|vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);

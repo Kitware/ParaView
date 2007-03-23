@@ -1,4 +1,4 @@
-<ServerManagerState>
+<ServerManagerState version="2.9.10">
   <Proxy group="3d_widgets" type="ImplicitPlaneWidgetProxy" id="1099">
     <Property name="Center" id="1099.Center" number_of_elements="3">
       <Element index="0" value="0"/>

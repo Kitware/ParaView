@@ -266,20 +266,25 @@ public:
 
   // Description:
   // Save the state of the server manager in XML format in a file.
-  // This saves the state of all proxies and properties. NOTE: The XML
-  // format is still evolving.
-  // If revival=1, then these methods save the revival states for all proxies.
-  // Revival states are useful to revive a proxy using already present
-  // server side objects.
-  // RevivalState includes the entire state saved by calling 
-  // SaveState() as well additional information such as server side
-  // object IDs. This makes it possible to restore the servermanager state
-  // while reusing server side object ids.
-  void SaveState(const char* filename)
-    { this->SaveState(filename, 0); }
-  void SaveState(const char* filename, int revival);
-  void SaveState(vtkPVXMLElement* rootElement, int revival=0);
-  void SaveState(vtkIdType connectionID, vtkPVXMLElement* root, int revival=0);
+  // This saves the state of all proxies and properties. 
+  void SaveState(const char* filename);
+
+  // Description:
+  // Saves the state of the server manager as XML, and returns the 
+  // vtkPVXMLElement for the root of the state. 
+  // Note this this method allocates a new vtkPVXMLElement object,
+  // it's the caller's responsibility to free it by calling Delete().
+  vtkPVXMLElement* SaveState();
+
+  // Description:
+  // Saves the state of all proxies registered with the proxy manager
+  // that are on the connection with given \c connectionID
+  // as XML, and returns the vtkPVXMLElement for the root of the state. 
+  // If connectionID = NullConnectionID, then state of all registered
+  // proxies will be saved.
+  // Note this this method allocates a new vtkPVXMLElement object,
+  // it's the caller responsibility to free it by calling Delete().
+  vtkPVXMLElement* SaveState(vtkIdType connectionID);
 
   // Description:
   // Saves the server manager state for the collection of proxies
@@ -287,8 +292,19 @@ public:
   // proxies on any proxy property of the proxies in the collection 
   // will also be saved. Note that for the state of any proxy
   // to be saved, it has to be registered with the proxy manager.
-  void SaveState(vtkPVXMLElement* rootElement, vtkCollection* proxies,
-    int save_referred_proxies);
+  vtkPVXMLElement* SaveState(vtkCollection* proxies, bool save_referred_proxies);
+
+  // Description:
+  // Saves the revival states for all proxies on the given connection.
+  // In most cases, the generic SaveState must be used which saves
+  // state that can be reloaded by the proxy manager.
+  // Revival states are useful to revive a proxy using already present
+  // server side objects.
+  // RevivalState includes the entire state saved by calling 
+  // SaveState() as well as additional information such as server side
+  // object IDs. This makes it possible to restore the servermanager state
+  // while reusing server side object ids.
+  vtkPVXMLElement* SaveRevivalState(vtkIdType cid);
 
   // Description:
   // Given a group name, create prototypes and store them
@@ -368,6 +384,25 @@ public:
   // vtkSMProxy checks in UpdateVTKObjects() to call UpdateVTKObjects() on the input
   // proxies as well if the flag is set.
   vtkGetMacro(UpdateInputProxies, int);
+
+  // Description:
+  // These methods can be used to obtain the ProxyManager version number.
+  // Returns the major version number eg. if version is 2.9.1 
+  // this method will return 2.
+  int GetVersionMajor();
+
+  // Description:
+  // These methods can be used to obtain the ProxyManager version number.
+  // Returns the minor version number eg. if version is 2.9.1 
+  // this method will return 9.
+  int GetVersionMinor();
+
+  // Description:
+  // These methods can be used to obtain the ProxyManager version number.
+  // Returns the patch version number eg. if version is 2.9.1 
+  // this method will return 1.
+  int GetVersionPatch();
+
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
@@ -410,7 +445,11 @@ protected:
   // Save/Load registered link states.
   void SaveRegisteredLinks(vtkPVXMLElement* root);
 
-  void SaveStateInternal(vtkIdType connectionID, vtkPVXMLElement* root, 
+  // Description:
+  // Internal method to save server manager state in an XML
+  // and return a new vtkPVXMLElement for it. The caller has 
+  // the responsibility of freeing the vtkPVXMLElement returned.
+  vtkPVXMLElement* SaveStateInternal(vtkIdType connectionID, 
     vtkSMProxyManagerProxySet* setOfProxies, int revival);
 
   // Recursively collects all proxies referred by the proxy in the set.

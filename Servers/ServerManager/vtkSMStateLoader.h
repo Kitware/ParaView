@@ -111,6 +111,11 @@ protected:
   // some state pre-processing.
   virtual int LoadProxyState(vtkPVXMLElement* proxyElement, vtkSMProxy* proxy);
 
+
+  // Description:
+  // Checks the root element for version. If failed, return false.
+  virtual bool VerifyXMLVersion(vtkPVXMLElement* rootElement);
+
   vtkSMStateLoaderInternals* Internal;
 
   vtkIdType ConnectionID;

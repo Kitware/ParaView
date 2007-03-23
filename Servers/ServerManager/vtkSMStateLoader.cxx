@@ -30,7 +30,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.20");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.21");
 vtkCxxSetObjectMacro(vtkSMStateLoader, RootElement, vtkPVXMLElement);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -380,6 +380,20 @@ void vtkSMStateLoader::ClearCreatedProxies()
 }
 
 //---------------------------------------------------------------------------
+bool vtkSMStateLoader::VerifyXMLVersion(vtkPVXMLElement* rootElement)
+{
+  const char* version = rootElement->GetAttribute("version");
+  if (!version)
+    {
+    vtkWarningMacro("ServerManagerState missing \"version\" information.");
+    return true;
+    }
+
+  // Nothing to check here really.
+  return true;
+}
+
+//---------------------------------------------------------------------------
 int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*=0*/)
 {
   if (!rootElement)
@@ -395,7 +409,24 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
     return 0;
     }
 
+  if (rootElement->GetName() && 
+    strcmp(rootElement->GetName(),"ServerManagerState") != 0)
+    {
+    rootElement = rootElement->FindNestedElementByName("ServerManagerState");
+    if (!rootElement)
+      {
+      vtkErrorMacro("Failed to locate <ServerManagerState /> element."
+        << "Cannot load server manager state.");
+      return 0;
+      }
+    }
+
   this->SetRootElement(rootElement);
+
+  if (!this->VerifyXMLVersion(rootElement))
+    {
+    return 0;
+    }
 
   this->ClearCreatedProxies();
   this->Internal->RegistrationInformation.clear();
