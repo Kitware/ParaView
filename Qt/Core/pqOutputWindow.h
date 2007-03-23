@@ -65,6 +65,7 @@ public slots:
 private slots:
   void accept();
   void reject();
+  void clear();
 
 private:
   pqOutputWindow(const pqOutputWindow&);

@@ -56,6 +56,9 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent) :
   this->Implementation->Ui.setupUi(this);
   this->setObjectName("outputDialog");
   this->setWindowTitle(tr("Output Messages"));
+
+  QObject::connect(this->Implementation->Ui.clearButton, 
+    SIGNAL(clicked(bool)), this, SLOT(clear()));
 }
 
 pqOutputWindow::~pqOutputWindow()
@@ -133,6 +136,11 @@ void pqOutputWindow::reject()
 {
   this->hide();
   Superclass::reject();
+}
+
+void pqOutputWindow::clear()
+{
+  this->Implementation->Ui.consoleWidget->clear();
 }
 
 void pqOutputWindow::showEvent(QShowEvent* e)

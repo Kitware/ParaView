@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pqOutputWindow</class>
  <widget class="QDialog" name="pqOutputWindow" >
   <property name="geometry" >
@@ -55,6 +52,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="clearButton" >
+       <property name="text" >
+        <string>Clear</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="closeButton" >
        <property name="text" >
         <string>Close</string>
@@ -68,14 +72,11 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>pqConsoleWidget</class>
    <extends>QTextEdit</extends>
    <header>pqConsoleWidget.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
   </customwidget>
  </customwidgets>
  <resources>
