@@ -73,6 +73,11 @@ public:
   int IsArrayPartial(unsigned int idx);
 
   // Description:
+  // Return the attribute type. The values are listed in
+  // vtkDataSetAttributes.h.
+  vtkGetMacro(AttributeType, int);
+
+  // Description:
   // A vtkSMProperty is often defined with a default value in the
   // XML itself. However, many times, the default value must be determined
   // at run time. To facilitate this, domains can override this method
@@ -82,6 +87,7 @@ public:
   // property.
   // Returns 1 if the domain updated the property.
   virtual int SetDefaultValues(vtkSMProperty*);
+
 protected:
   vtkSMArrayListDomain();
   ~vtkSMArrayListDomain();
@@ -103,7 +109,6 @@ protected:
   // Description:
   // Set to an attribute type defined in vtkDataSetAttributes.
   vtkSetMacro(AttributeType, int);
-  vtkGetMacro(AttributeType, int);
 
   vtkSetMacro(DefaultElement, unsigned int);
 
