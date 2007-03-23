@@ -78,7 +78,7 @@ void pqPluginDialog::loadClientPlugin()
 void pqPluginDialog::loadPlugin(pqServer* server)
 {
   pqFileDialog fd(server, this, "Load Plugin", QString(), 
-                  "Plugins (*.so;*.dylib;*.dll;*.sl); All Files (*)");
+                  "Plugins (*.so;*.dylib;*.dll;*.sl)\nAll Files (*)");
   if(fd.exec() == QDialog::Accepted)
     {
     QString plugin = fd.getSelectedFiles()[0];
