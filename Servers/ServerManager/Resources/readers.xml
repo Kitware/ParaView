@@ -2244,12 +2244,6 @@
        </Documentation>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
-        name="TimestepValues"
-        information_only="1">
-        <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
-
      <IntVectorProperty name="HasModeShapes"
                         command="SetHasModeShapes"
                         number_of_elements="1"
@@ -2265,6 +2259,18 @@
          off, which is the case for most Exodus files.
        </Documentation>
      </IntVectorProperty>
+
+     <!-- The following two properties magically send time information -->
+     <!-- to the animation panel.  Usually you only need one (the former -->
+     <!-- for discrete time, the latter for continuous time), but changing -->
+     <!-- the HasModeShapes ivar switches between discrete and continuous -->
+     <!-- time. -->
+     <DoubleVectorProperty name="TimestepValues" information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+     <DoubleVectorProperty name="TimeRange" information_only="1">
+       <TimeRangeInformationHelper/>
+     </DoubleVectorProperty>
    <!-- End ExodusReader -->
    </SourceProxy>
 

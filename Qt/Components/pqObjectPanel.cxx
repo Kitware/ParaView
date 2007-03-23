@@ -160,6 +160,16 @@ QSize pqObjectPanel::sizeHint() const
 void pqObjectPanel::accept()
 {
   this->Implementation->PropertyManager->accept();
+  vtkSMSourceProxy *source
+    = vtkSMSourceProxy::SafeDownCast(this->Implementation->Proxy->getProxy());
+  if (source)
+    {
+    source->UpdatePipelineInformation();
+    }
+  else
+    {
+    qWarning("Why does pqObjectPanel have a proxy that is not a source proxy?");
+    }
   emit this->onaccept();
 }
 

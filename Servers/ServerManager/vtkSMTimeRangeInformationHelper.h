@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMTimeStepsInformationHelper.h
+  Module:    vtkSMTimeRangeInformationHelper.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,27 +12,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMTimeStepsInformationHelper - Gets the time step values from server 
+// .NAME vtkSMTimeRangeInformationHelper - Gets the time range from server 
 // .SECTION Description
-// vtkSMTimeStepsInformationHelper gets the time step values (using
+// vtkSMTimeRangeInformationHelper gets the time range (using
 // vtkPVServerTimeSteps) from server and fills the information property
 //
 // .SECTION See also
-// vtkSMTimeRangeInformationHelper vtkPVServerTimeSteps
+// vtkSMTimeStepsInformationHelper vtkPVServerTimeSteps
 
-#ifndef __vtkSMTimeStepsInformationHelper_h
-#define __vtkSMTimeStepsInformationHelper_h
+#ifndef __vtkSMTimeRangeInformationHelper_h
+#define __vtkSMTimeRangeInformationHelper_h
 
 #include "vtkSMInformationHelper.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
 
 class vtkSMProperty;
 
-class VTK_EXPORT vtkSMTimeStepsInformationHelper : public vtkSMInformationHelper
+class VTK_EXPORT vtkSMTimeRangeInformationHelper : public vtkSMInformationHelper
 {
 public:
-  static vtkSMTimeStepsInformationHelper* New();
-  vtkTypeRevisionMacro(vtkSMTimeStepsInformationHelper, vtkSMInformationHelper);
+  static vtkSMTimeRangeInformationHelper* New();
+  vtkTypeRevisionMacro(vtkSMTimeRangeInformationHelper, vtkSMInformationHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
   
 //BTX
@@ -43,12 +43,12 @@ public:
 //ETX
 
 protected:
-  vtkSMTimeStepsInformationHelper();
-  ~vtkSMTimeStepsInformationHelper();
+  vtkSMTimeRangeInformationHelper();
+  ~vtkSMTimeRangeInformationHelper();
 
 private:
-  vtkSMTimeStepsInformationHelper(const vtkSMTimeStepsInformationHelper&); // Not implemented
-  void operator=(const vtkSMTimeStepsInformationHelper&); // Not implemented
+  vtkSMTimeRangeInformationHelper(const vtkSMTimeRangeInformationHelper&); // Not implemented
+  void operator=(const vtkSMTimeRangeInformationHelper&); // Not implemented
 };
 
 #endif

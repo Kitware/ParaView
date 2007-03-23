@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMTimeStepsInformationHelper.cxx
+  Module:    vtkSMTimeRangeInformationHelper.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,28 +12,28 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMTimeStepsInformationHelper.h"
+#include "vtkSMTimeRangeInformationHelper.h"
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 
-vtkStandardNewMacro(vtkSMTimeStepsInformationHelper);
-vtkCxxRevisionMacro(vtkSMTimeStepsInformationHelper, "1.5");
+vtkStandardNewMacro(vtkSMTimeRangeInformationHelper);
+vtkCxxRevisionMacro(vtkSMTimeRangeInformationHelper, "1.1");
 
 //---------------------------------------------------------------------------
-vtkSMTimeStepsInformationHelper::vtkSMTimeStepsInformationHelper()
+vtkSMTimeRangeInformationHelper::vtkSMTimeRangeInformationHelper()
 {
 }
 
 //---------------------------------------------------------------------------
-vtkSMTimeStepsInformationHelper::~vtkSMTimeStepsInformationHelper()
+vtkSMTimeRangeInformationHelper::~vtkSMTimeRangeInformationHelper()
 {
 }
 
 //---------------------------------------------------------------------------
-void vtkSMTimeStepsInformationHelper::UpdateProperty(
+void vtkSMTimeRangeInformationHelper::UpdateProperty(
   vtkIdType connectionId, int serverIds, vtkClientServerID objectId, 
   vtkSMProperty* prop)
 {
@@ -57,10 +57,10 @@ void vtkSMTimeStepsInformationHelper::UpdateProperty(
          << vtkClientServerStream::End;
   pm->SendStream(connectionId, vtkProcessModule::GetRootId(serverIds), stream);
 
-  vtkClientServerStream timeSteps;
+  vtkClientServerStream timeRange;
   int retVal = 
     pm->GetLastResult(connectionId,
-      vtkProcessModule::GetRootId(serverIds)).GetArgument(0, 0, &timeSteps);
+      vtkProcessModule::GetRootId(serverIds)).GetArgument(0, 0, &timeRange);
 
   if(!retVal)
     {
@@ -68,17 +68,21 @@ void vtkSMTimeStepsInformationHelper::UpdateProperty(
     return;
     }
 
-  int numArgs = timeSteps.GetNumberOfArguments(0);
-  if (numArgs >= 2)
+  int numArgs = timeRange.GetNumberOfArguments(0);
+  if (numArgs >= 1)
     {
     vtkTypeUInt32 length;
-    if (timeSteps.GetArgumentLength(0, 1, &length))
+    if (timeRange.GetArgumentLength(0, 0, &length))
       {
       dvp->SetNumberOfElements(length);
       double *values = new double[length];
-      if (length>0)
+      if (length == 2)
         {
-        timeSteps.GetArgument(0, 1, values, length);
+        timeRange.GetArgument(0, 0, values, length);
+        }
+      else
+        {
+        vtkErrorMacro(<< "vtkPVServerTimeSteps returned invalid array length for time range.");
         }
       dvp->SetElements(values);
       delete[] values;
@@ -95,7 +99,7 @@ void vtkSMTimeStepsInformationHelper::UpdateProperty(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMTimeStepsInformationHelper::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMTimeRangeInformationHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

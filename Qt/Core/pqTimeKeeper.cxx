@@ -56,7 +56,40 @@ public:
   typedef TimeMapType::iterator TimeMapIteratorType;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
-  TimeMapType Times;
+  TimeMapType Timesteps;
+  TimeMapType Timeranges;
+
+  static void clearValues(TimeMapType &map, pqPipelineSource *value)
+  {
+    TimeMapIteratorType iter = map.begin();
+    while (iter != map.end())
+      {
+      if (iter.value().contains(value))
+        {
+        iter.value().removeAll(value);
+        if (iter.value().size() == 0)
+          {
+          iter = map.erase(iter);
+          continue;
+          }
+        }
+      ++iter;
+      }
+  }
+  static void insertValue(TimeMapType &map, double key, pqPipelineSource *value)
+  {
+    TimeMapIteratorType iter = map.find(key);
+    if (iter != map.end())
+      {
+      iter.value().push_back(value);
+      }
+    else
+      {
+      QList<QPointer<pqPipelineSource> > valueList;
+      valueList.push_back(value);
+      map.insert(key, valueList);
+      }
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -102,7 +135,7 @@ pqTimeKeeper::~pqTimeKeeper()
 //-----------------------------------------------------------------------------
 int pqTimeKeeper::getNumberOfTimeStepValues() const
 {
-  return this->Internals->Times.size();
+  return this->Internals->Timesteps.size();
 }
 
 //-----------------------------------------------------------------------------
@@ -112,11 +145,11 @@ void pqTimeKeeper::updateTimeKeeperProxy()
     this->getProxy()->GetProperty("TimestepValues"));
 
 
-  QVector<double> keys = this->Internals->Times.keys().toVector();
+  QVector<double> keys = this->Internals->Timesteps.keys().toVector();
   vtkstd::vector<double> std_keys = keys.toStdVector();
 
-  dvp->SetNumberOfElements(this->Internals->Times.size());
-  if (this->Internals->Times.size() != 0)
+  dvp->SetNumberOfElements(this->Internals->Timesteps.size());
+  if (this->Internals->Timesteps.size() != 0)
     {
     dvp->SetElements(&std_keys[0]);
     }
@@ -127,13 +160,13 @@ void pqTimeKeeper::updateTimeKeeperProxy()
 //-----------------------------------------------------------------------------
 QPair<double, double> pqTimeKeeper::getTimeRange() const
 {
-  if (this->Internals->Times.size() == 0)
+  if (this->Internals->Timeranges.size() == 0)
     {
     return QPair<double, double>(0.0, 0.0);
     }
 
-  return QPair<double, double>(this->Internals->Times.begin().key(),
-    (this->Internals->Times.end()-1).key());
+  return QPair<double, double>(this->Internals->Timeranges.begin().key(),
+    (this->Internals->Timeranges.end()-1).key());
 }
 
 //-----------------------------------------------------------------------------
@@ -147,7 +180,7 @@ double pqTimeKeeper::getTime() const
 void pqTimeKeeper::sourceAdded(pqPipelineSource* source)
 {
   vtkSMProxy* proxy = source->getProxy();
-  if (proxy->GetProperty("TimestepValues"))
+  if (proxy->GetProperty("TimestepValues") || proxy->GetProperty("TimeRange"))
     {
     this->Internals->VTKConnect->Connect(proxy, vtkCommand::PropertyModifiedEvent,
       this, SLOT(propertyModified(vtkObject*, unsigned long, void*, void*)));
@@ -161,7 +194,9 @@ void pqTimeKeeper::propertyModified(vtkObject* obj, unsigned long, void*, void* 
 {
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(obj);
   const char* name = reinterpret_cast<const char*>(callData);
-  if (!proxy || !name || strcmp(name, "TimestepValues") != 0)
+  if (   !proxy || !name
+      || (   (strcmp(name, "TimestepValues") != 0)
+          && (strcmp(name, "TimeRange") != 0) ) )
     {
     return;
     }
@@ -186,23 +221,41 @@ void pqTimeKeeper::propertyModified(pqPipelineSource* source)
 
   vtkSMProxy* proxy = source->getProxy();
   this->cleanupTimes(source);
-  QList<QVariant> timestepValues = pqSMAdaptor::getMultipleElementProperty(
-    proxy->GetProperty("TimestepValues"));
-  foreach (QVariant vtime, timestepValues)
+
+  if (proxy->GetProperty("TimestepValues"))
     {
-    double time = vtime.toDouble();
-    pqInternals::TimeMapIteratorType iter = this->Internals->Times.find(time);
-    if (iter != this->Internals->Times.end())
+    QList<QVariant> timestepValues = pqSMAdaptor::getMultipleElementProperty(
+                                          proxy->GetProperty("TimestepValues"));
+    if (timestepValues.size() > 0)
       {
-      iter.value().push_back(source);
-      }
-    else
+      foreach (QVariant vtime, timestepValues)
+        {
+        pqInternals::insertValue(this->Internals->Timesteps,
+                                 vtime.toDouble(), source);
+        }
+      // The following may result in multiple entries in the Timeranges map for
+      // sources with both TimestepValues and TimeRanges properties, but that is
+      // OK.
+      pqInternals::insertValue(this->Internals->Timeranges,
+                               timestepValues.first().toDouble(), source);
+      pqInternals::insertValue(this->Internals->Timeranges,
+                               timestepValues.last().toDouble(), source);
+    }
+    }
+
+  if (proxy->GetProperty("TimeRange"))
+    {
+    QList<QVariant> timeRange = pqSMAdaptor::getMultipleElementProperty(
+                                               proxy->GetProperty("TimeRange"));
+    if (timeRange.size() == 2)
       {
-      QList<QPointer<pqPipelineSource> > value;
-      value.push_back(source);
-      this->Internals->Times.insert(time, value);
+      pqInternals::insertValue(this->Internals->Timeranges,
+                               timeRange[0].toDouble(), source);
+      pqInternals::insertValue(this->Internals->Timeranges,
+                               timeRange[1].toDouble(), source);
       }
     }
+
   this->updateTimeKeeperProxy();
 }
 
@@ -218,18 +271,6 @@ void pqTimeKeeper::sourceRemoved(pqPipelineSource* source)
 void pqTimeKeeper::cleanupTimes(pqPipelineSource* source)
 {
   // Remove times reported by this source.
-  pqInternals::TimeMapIteratorType iter = this->Internals->Times.begin();
-  while (iter != this->Internals->Times.end())
-    {
-    if (iter.value().contains(source))
-      {
-      iter.value().removeAll(source);
-      if (iter.value().size() == 0)
-        {
-        iter = this->Internals->Times.erase(iter);
-        continue;
-        }
-      }
-    ++iter;
-    }
+  pqInternals::clearValues(this->Internals->Timesteps, source);
+  pqInternals::clearValues(this->Internals->Timeranges, source);
 }

@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerTimeSteps);
-vtkCxxRevisionMacro(vtkPVServerTimeSteps, "1.3");
+vtkCxxRevisionMacro(vtkPVServerTimeSteps, "1.4");
 
 //----------------------------------------------------------------------------
 class vtkPVServerTimeStepsInternals
@@ -61,16 +61,30 @@ const vtkClientServerStream& vtkPVServerTimeSteps::GetTimeSteps(
   vtkInformation* outInfo = algo->GetExecutive()->GetOutputInformation(0);
   if (outInfo)
     {
-    const  double* timeSteps = 
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    if (timeSteps)
+    if (outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
       {
+      const  double* timeSteps
+        = outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
       int len = outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-      if (len > 0)
+      double timeRange[2];
+      timeRange[0] = timeSteps[0];
+      timeRange[1] = timeSteps[len-1];
+      this->Internal->Result
+        << vtkClientServerStream::InsertArray(timeRange, 2);
+      this->Internal->Result 
+        << vtkClientServerStream::InsertArray(timeSteps, len);
+      }
+    else if (outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
+      {
+      const double *timeRange
+        = outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+      int len = outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+      if (len != 2)
         {
-        this->Internal->Result 
-          << vtkClientServerStream::InsertArray(timeSteps, len);
+        vtkWarningMacro(<< "Filter reports inappropriate time range.");
         }
+      this->Internal->Result
+        << vtkClientServerStream::InsertArray(timeRange, 2);
       }
     }
   this->Internal->Result << vtkClientServerStream::End;

@@ -159,11 +159,9 @@ void pqAnimationScene::setupTimeTrack()
 void pqAnimationScene::updateTimeRanges()
 {
   pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
-  if (timekeeper->getNumberOfTimeStepValues() == 0 || 
-    pqApplicationCore::instance()->isLoadingState())
+  if (pqApplicationCore::instance()->isLoadingState())
     {
-    // If timekeeper has no timesteps at all
-    // or if we are currently loading state then we don't want to change
+    // If we are currently loading state then we don't want to change
     // the currently set start/end times.
     return;
     }
@@ -171,20 +169,37 @@ void pqAnimationScene::updateTimeRanges()
   QPair<double, double> range = timekeeper->getTimeRange();
   vtkSMProxy* sceneProxy = this->getProxy();
 
-  QList<QVariant> locks = pqSMAdaptor::getMultipleElementProperty(
-    sceneProxy->GetProperty("ClockTimeRangeLocks"));
-  if (!locks[0].toBool())
+  // Only adjust the time range if the one in the timekeeper looks valid.
+  if (range.first < range.second)
     {
-    pqSMAdaptor::setMultipleElementProperty(
-      sceneProxy->GetProperty("ClockTimeRange"), 0, range.first);
+    QList<QVariant> locks = pqSMAdaptor::getMultipleElementProperty(
+                                sceneProxy->GetProperty("ClockTimeRangeLocks"));
+    if (!locks[0].toBool())
+      {
+      pqSMAdaptor::setMultipleElementProperty(
+                     sceneProxy->GetProperty("ClockTimeRange"), 0, range.first);
+      }
+    if (!locks[1].toBool())
+      {
+      pqSMAdaptor::setMultipleElementProperty(
+                    sceneProxy->GetProperty("ClockTimeRange"), 1, range.second);
+      }
     }
-  if (!locks[1].toBool())
+
+  // Adjust the play mode based on whether or not we have time steps.
+  vtkSMProperty *playModeProperty = sceneProxy->GetProperty("PlayMode");
+  if (timekeeper->getNumberOfTimeStepValues() == 0)
     {
-    pqSMAdaptor::setMultipleElementProperty(
-      sceneProxy->GetProperty("ClockTimeRange"), 1, range.second);
+    if (   pqSMAdaptor::getEnumerationProperty(playModeProperty)
+        == "Snap To TimeSteps" )
+      {
+      pqSMAdaptor::setEnumerationProperty(playModeProperty, "Sequence");
+      }
     }
-  pqSMAdaptor::setEnumerationProperty(
-    sceneProxy->GetProperty("PlayMode"), "Snap To TimeSteps");
+  else
+    {
+    pqSMAdaptor::setEnumerationProperty(playModeProperty, "Snap To TimeSteps");
+    }
   sceneProxy->UpdateVTKObjects();
 }
 
