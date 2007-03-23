@@ -33,13 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExodusPanel.h"
 
 // Qt includes
-#include <QTreeWidget>
-#include <QVariant>
+#include <QAction>
 #include <QCheckBox>
 #include <QDoubleSpinBox>
-#include <QAction>
-#include <QTimer>
 #include <QLabel>
+#include <QTimer>
+#include <QTreeWidget>
+#include <QVariant>
+#include <QVector>
 
 // VTK includes
 
@@ -74,6 +75,7 @@ public:
     p->proxy()->getProxy()->CopyIDs(ExodusHelper);
   }
   vtkSmartPointer<vtkSMProxy> ExodusHelper;
+  QVector<double> TimestepValues;
 };
 
 pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
@@ -327,6 +329,16 @@ void pqExodusPanel::linkServerManagerProperties()
   VariablesTree->addAction(a);
   VariablesTree->setContextMenuPolicy(Qt::ActionsContextMenu);
 
+  // Get the timestep values.  Note that the TimestepValues property will change
+  // if HasModeShapes is on.  However, we know that when this method is called
+  // on initialization, it has the actual time steps in the data.  Store the
+  // values now.
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+                      this->proxy()->getProxy()->GetProperty("TimestepValues"));
+  this->UI->TimestepValues.resize(dvp->GetNumberOfElements());
+  qCopy(dvp->GetElements(), dvp->GetElements()+dvp->GetNumberOfElements(),
+        this->UI->TimestepValues.begin());
+
   // connect the mode shapes
   this->propertyManager()->registerLink(this->UI->HasModeShapes,
                                         "checked",
@@ -334,12 +346,11 @@ void pqExodusPanel::linkServerManagerProperties()
                                         this->proxy()->getProxy(),
                                         this->proxy()->getProxy()
                                         ->GetProperty("HasModeShapes"));
-  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-                      this->proxy()->getProxy()->GetProperty("TimestepValues"));
-  this->UI->ModeSelectSlider->setMaximum(dvp->GetNumberOfElements()-1);
-  if (dvp->GetNumberOfElements() > 0)
+  this->UI->ModeSelectSlider->setMaximum(this->UI->TimestepValues.size()-1);
+  if (this->UI->TimestepValues.size() > 0)
     {
-    this->UI->ModeLabel->setText(QString("%1").arg(dvp->GetElement(0)));
+    this->UI->ModeLabel->setText(
+                                QString("%1").arg(this->UI->TimestepValues[0]));
     }
   this->propertyManager()->registerLink(this->UI->ModeSelectSlider,
                                         "value",
@@ -413,11 +424,10 @@ QString pqExodusPanel::formatDataFor(vtkPVArrayInformation* ai)
 
 void pqExodusPanel::modeChanged(int value)
 {
-  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-                      this->proxy()->getProxy()->GetProperty("TimestepValues"));
-  if ((value >= 0) && (value < (int)dvp->GetNumberOfElements()))
+  if ((value >= 0) && (value < this->UI->TimestepValues.size()))
     {
-    this->UI->ModeLabel->setText(QString("%1").arg(dvp->GetElement(value)));
+    this->UI->ModeLabel->setText(
+                            QString("%1").arg(this->UI->TimestepValues[value]));
     }
 }
 
