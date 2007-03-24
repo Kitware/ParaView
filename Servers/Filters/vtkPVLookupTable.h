@@ -17,30 +17,46 @@
 // .SECTION Description
 // This is a cross between a vtkColorTransferFunction and a vtkLookupTable
 // selectively combiniting the functionality of both.
+// NOTE: One must call Build() after making any changes to the points
+// in the ColorTransferFunction to ensure that the discrete and non-discrete
+// version match up.
 
 #ifndef __vtkPVLookupTable_h
 #define __vtkPVLookupTable_h
 
-#include "vtkScalarsToColors.h"
+#include "vtkColorTransferFunction.h"
 
 class vtkLookupTable;
 class vtkColorTransferFunction;
 
-class VTK_EXPORT vtkPVLookupTable : public vtkScalarsToColors
+class VTK_EXPORT vtkPVLookupTable : public vtkColorTransferFunction
 {
 public:
   static vtkPVLookupTable* New();
-  vtkTypeRevisionMacro(vtkPVLookupTable, vtkScalarsToColors);
+  vtkTypeRevisionMacro(vtkPVLookupTable, vtkColorTransferFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Generate discretized lookup table, if applicable.
+  // This method must be called after changes to the ColorTransferFunction
+  // otherwise the discretized version will be inconsitent with the 
+  // non-discretized one.
   virtual void Build();
 
   // Description:
   // Sets/Gets the range of scalars which will be mapped.
-  virtual double *GetRange() { return this->TableRange; }
+  // If ScalePointsWithRange is off, this has no effect on the
+  // lookup table. Is ScalePointsWithRange is 1, then all points in the
+  // ColorTransferFunction will be scaled to fit the new range.
   virtual void SetRange(double min, double max);
+
+  // Description:
+  // When set to 1, SetRange() results in scaling of the points 
+  // in the color transfer function to fit the new range.
+  // By default, set to 1.
+  vtkSetMacro(ScalePointsWithRange, int);
+  vtkGetMacro(ScalePointsWithRange, int);
+  vtkBooleanMacro(ScalePointsWithRange, int);
 
   // Description:
   // Set if the values are to mapped after discretization. The
@@ -68,31 +84,6 @@ public:
   virtual void GetColor(double v, double rgb[3]);
 
   // Description:
-  // Add/Remove a point to/from the function defined in RGB or HSV
-  // Return the index of the point (0 based), or -1 on error.
-  // Unlike vtkColorTransferFunction, these methods expect that
-  // the x is normalized [0,1].
-  int AddRGBPoint( double x, double r, double g, double b );
-  int AddRGBPoint( double x, double r, double g, double b, 
-                   double midpoint, double sharpness );
-  int AddHSVPoint( double x, double h, double s, double v );
-  int AddHSVPoint( double x, double h, double s, double v,
-                   double midpoint, double sharpness );
-
-  // Description:
-  // Remove all points
-  void RemoveAllPoints();
-
-  // Description:
-  // Set/Get the color space used for interpolation: RGB, or HSV.
-  // In HSV mode, if HSVWrap is on, it  will take the shortest path in Hue
-  // (going back through 0 if that is the shortest way around the hue circle)
-  // whereas if HSVWrap is off it will not go through 0 (in order the match
-  // the current functionality of vtkLookupTable)
-  void SetColorSpace(int);
-  void SetHSVWrap(int);
-
-  // Description:
   // An internal method typically not used in applications.
   virtual void MapScalarsThroughTable2(void *input, unsigned char *output,
                                        int inputDataType, int numberOfValues,
@@ -102,12 +93,11 @@ protected:
   vtkPVLookupTable();
   ~vtkPVLookupTable();
 
-  vtkSetVector2Macro(TableRange, double);
+  int ScalePointsWithRange;
   int Discretize;
-  double TableRange[2];
+
   vtkIdType NumberOfValues;
   vtkLookupTable* LookupTable;
-  vtkColorTransferFunction* ColorTransferFunction;
 
   vtkTimeStamp BuildTime;
 private:

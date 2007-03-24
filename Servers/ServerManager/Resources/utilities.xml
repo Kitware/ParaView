@@ -94,7 +94,6 @@
         animateable="0">
       </DoubleVectorProperty>
       
-      <!--
       <IntVectorProperty
         name="ScalePointsWithRange"
         command="SetScalePointsWithRange"
@@ -102,7 +101,6 @@
         default_values="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      -->
 
       <IntVectorProperty
         name="ColorSpace"
