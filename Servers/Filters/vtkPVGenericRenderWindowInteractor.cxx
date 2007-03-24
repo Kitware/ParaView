@@ -12,17 +12,46 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkRenderer.h"
-#include "vtkPVRenderViewProxy.h"
-#include "vtkObjectFactory.h"
-#include "vtkRenderWindow.h"
-#include "vtkRendererCollection.h"
 #include "vtkCommand.h"
+#include "vtkInteractorObserver.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVRenderViewProxy.h"
+#include "vtkRendererCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
+//-----------------------------------------------------------------------------
+class vtkPVGenericRenderWindowInteractorObserver : public vtkCommand
+{
+public:
+  static vtkPVGenericRenderWindowInteractorObserver* New()
+    { return new vtkPVGenericRenderWindowInteractorObserver(); }
+
+  void SetTarget(vtkPVGenericRenderWindowInteractor* target)
+    {
+    this->Target = target;
+    }
+
+  virtual void Execute(vtkObject* vtkNotUsed(caller), unsigned long event, void* data)
+    {
+    if (this->Target)
+      {
+      this->Target->InvokeEvent(event, data);
+      }
+    }
+
+protected:
+  vtkPVGenericRenderWindowInteractorObserver()
+    {
+    this->Target = 0;
+    }
+  vtkPVGenericRenderWindowInteractor* Target;
+};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.3");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.4");
 vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------
@@ -31,13 +60,38 @@ vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
   this->PVRenderView = NULL;
   this->Renderer = NULL;
   this->InteractiveRenderEnabled = 0;
+  this->Observer = vtkPVGenericRenderWindowInteractorObserver::New();
+  this->Observer->SetTarget(this);
 }
 
 //----------------------------------------------------------------------------
 vtkPVGenericRenderWindowInteractor::~vtkPVGenericRenderWindowInteractor()
 {
+  this->Observer->SetTarget(0);
+  this->Observer->Delete();
+
   this->SetPVRenderView(NULL);
   this->SetRenderer(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SetInteractorStyle(
+  vtkInteractorObserver *style)
+{
+  if (this->GetInteractorStyle())
+    {
+    this->GetInteractorStyle()->RemoveObserver(this->Observer);
+    }
+
+  this->Superclass::SetInteractorStyle(style);
+
+  if (this->GetInteractorStyle())
+    {
+    this->GetInteractorStyle()->AddObserver(
+      vtkCommand::StartInteractionEvent, this->Observer);
+    this->GetInteractorStyle()->AddObserver(
+      vtkCommand::EndInteractionEvent, this->Observer);
+    }
 }
 
 //----------------------------------------------------------------------------

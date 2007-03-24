@@ -22,6 +22,7 @@
 
 class vtkPVRenderViewProxy;
 class vtkRenderer;
+class vtkPVGenericRenderWindowInteractorObserver;
 
 class VTK_EXPORT vtkPVGenericRenderWindowInteractor : public vtkRenderWindowInteractor
 {
@@ -74,6 +75,9 @@ public:
   virtual void OnMove(int x, int y);
   virtual void OnKeyPress(char keyCode, int x, int y);
 
+
+  // Overridden to pass interaction events from the interactor style out.
+  virtual void SetInteractorStyle(vtkInteractorObserver *);
 protected:
   vtkPVGenericRenderWindowInteractor();
   ~vtkPVGenericRenderWindowInteractor();
@@ -82,9 +86,12 @@ protected:
   int InteractiveRenderEnabled;
   vtkRenderer* Renderer;
 
+
 private:
   vtkPVGenericRenderWindowInteractor(const vtkPVGenericRenderWindowInteractor&); // Not implemented
   void operator=(const vtkPVGenericRenderWindowInteractor&); // Not implemented
+
+  vtkPVGenericRenderWindowInteractorObserver* Observer;
 };
 
 #endif
