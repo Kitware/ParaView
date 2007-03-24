@@ -25,11 +25,11 @@ class vtkCamera;
 class vtkCollection;
 class vtkImageData;
 class vtkPVClientServerIdCollectionInformation;
+class vtkPVGenericRenderWindowInteractor;
 class vtkPVOpenGLExtensionsInformation;
 class vtkPVRenderModuleHelper;
 class vtkRenderer;
 class vtkRenderWindow;
-class vtkRenderWindowInteractor;
 class vtkSelection;
 class vtkSMDisplay;
 class vtkSMDisplayProxy;
@@ -72,7 +72,7 @@ public:
   vtkGetObjectMacro(Renderer, vtkRenderer);
   vtkGetObjectMacro(Renderer2D, vtkRenderer);
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
-  vtkGetObjectMacro(Interactor, vtkRenderWindowInteractor);
+  vtkGetObjectMacro(Interactor, vtkPVGenericRenderWindowInteractor);
 
   // Description:
   // Convenience method to set the background color.
@@ -261,7 +261,7 @@ protected:
   vtkRenderer* Renderer2D;
   vtkRenderer* Renderer;
   vtkRenderWindow* RenderWindow;
-  vtkRenderWindowInteractor* Interactor;
+  vtkPVGenericRenderWindowInteractor* Interactor;
   vtkCamera* ActiveCamera;
   vtkPVRenderModuleHelper* Helper;
   

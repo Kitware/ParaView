@@ -19,7 +19,7 @@
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkRenderWindowInteractor.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMRenderModuleProxy.h"
 
@@ -101,7 +101,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.39");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.40");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()

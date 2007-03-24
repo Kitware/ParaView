@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
-#include "vtkRenderWindowInteractor.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkProcessModule.h"
@@ -25,7 +25,7 @@
 
 
 vtkStandardNewMacro(vtkSMPickPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPickPointWidgetProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMPickPointWidgetProxy, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkSMPickPointWidgetProxy::vtkSMPickPointWidgetProxy()

@@ -17,14 +17,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
-#include "vtkRenderWindowInteractor.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkProcessModule.h"
 #include "vtkLineWidget.h"
 
 vtkStandardNewMacro(vtkSMPickLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPickLineWidgetProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMPickLineWidgetProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMPickLineWidgetProxy::vtkSMPickLineWidgetProxy()
 {

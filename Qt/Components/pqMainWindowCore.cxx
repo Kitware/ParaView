@@ -1817,8 +1817,7 @@ void pqMainWindowCore::onEditCameraUndo()
     qDebug() << "No active render module, cannot undo camera.";
     return;
     }
-  pqUndoStack* stack = view->getInteractionUndoStack();
-  stack->undo();
+  view->undo();
   view->render();
 }
 
@@ -1832,8 +1831,7 @@ void pqMainWindowCore::onEditCameraRedo()
     qDebug() << "No active render module, cannot redo camera.";
     return;
     }
-  pqUndoStack* stack = view->getInteractionUndoStack();
-  stack->redo();
+  view->redo();
   view->render();
 }
 
@@ -2516,8 +2514,7 @@ void pqMainWindowCore::onActiveViewChanged(pqGenericViewModule *view)
   if(renderModule)
     {
     // Make sure the render module undo stack is connected.
-    this->connect(renderModule->getInteractionUndoStack(),
-        SIGNAL(stackChanged(bool, QString, bool, QString)),
+    this->connect(renderModule, SIGNAL(canUndoChanged(bool)),
         this, SLOT(onActiveViewUndoChanged()));
     }
 }
@@ -2595,13 +2592,12 @@ void pqMainWindowCore::updateViewUndoRedo(pqRenderViewModule *renderModule)
 
   if(renderModule)
     {
-    pqUndoStack* const stack = renderModule->getInteractionUndoStack();
-    if (stack && stack->canUndo())
+    if (renderModule->canUndo())
       {
       can_undo_camera = true;
       undo_camera_label = "Interaction";
       }
-    if (stack && stack->canRedo())
+    if (renderModule->canRedo())
       {
       can_redo_camera = true;
       redo_camera_label = "Interaction";

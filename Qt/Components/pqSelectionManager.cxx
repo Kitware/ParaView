@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkInteractorStyleRubberBandPick.h"
 #include "vtkInteractorObserver.h"
 #include "vtkProcessModule.h"
-#include "vtkRenderWindowInteractor.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"

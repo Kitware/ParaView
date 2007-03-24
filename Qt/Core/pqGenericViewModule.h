@@ -64,15 +64,14 @@ public:
   /// Returns if this view module can support 
   /// undo/redo. Returns false by default. Subclassess must override
   /// if that's not the case.
+  /// View modules that support undo must fire 
+  /// all undo related signals defined by this class.
   virtual bool supportsUndo() const { return false; }
-
-  /// View modules that support undo must override this method
-  /// to return the undo stack for the view module.
-  virtual pqUndoStack* getInteractionUndoStack() const { return 0;} 
 
   /// Returns the type of this view module.
   QString getViewType() const
     { return this->ViewType; }
+
 public slots:
   /// Request a StillRender. Default implementation simply calls
   /// forceRender(). Subclasses can implement a delayed/buffered render.
@@ -81,8 +80,15 @@ public slots:
   /// Forces an immediate render.
   virtual void forceRender();
 
-public:
+  /// Called to undo interaction.
+  /// View modules supporting interaction undo must override this method.
+  virtual void undo() { }
 
+  /// Called to redo interaction.
+  /// View modules supporting interaction undo must override this method.
+  virtual void redo() {}
+
+public:
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.
   /// TODO:  pqGenericViewModule should probably report file types is supports
@@ -130,6 +136,12 @@ signals:
 
   /// Fired when any displays visibility changes.
   void displayVisibilityChanged(pqDisplay* display, bool visible);
+
+  /// Fired when interaction undo stack status changes.
+  void canUndoChanged(bool);
+  
+  /// Fired when interaction undo stack status changes.
+  void canRedoChanged(bool);
 
 private slots:
   /// Called when the "Displays" property changes.

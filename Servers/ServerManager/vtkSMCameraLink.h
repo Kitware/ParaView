@@ -51,8 +51,10 @@ public:
   
   // Description:
   // Update all the views linked with an OUTPUT direction.
-  // \c interactive indicates if the render is interactive or not.
-  virtual void UpdateViews(vtkSMProxy* caller, bool interactive);
+  virtual void UpdateViews(vtkSMProxy* caller);
+
+  void StartInteraction(vtkObject* caller);
+  void EndInteraction(vtkObject* caller);
 
 protected:
   vtkSMCameraLink();

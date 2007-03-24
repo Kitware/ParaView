@@ -79,12 +79,6 @@ public:
   /// and returns it.
   virtual vtkImageData* captureImage(int magnification);
 
-  /// Each render module keeps a undo stack for interaction.
-  /// This method returns that undo stack. External world
-  /// typically uses it to Undo/Redo; pushing of elements on this stack
-  /// on interaction is managed by this class.
-  virtual pqUndoStack* getInteractionUndoStack() const;
-
   /// Sets default values for the underlying proxy. 
   /// This is during the initialization stage of the pqProxy 
   /// for proxies created by the GUI itself i.e.
@@ -140,6 +134,10 @@ public:
   // returns whether a source can be displayed in this view module 
   virtual bool canDisplaySource(pqPipelineSource* source) const;
 
+  /// Returns if the view module can undo/redo interaction
+  /// given the current state of the interaction undo stack.
+  bool canUndo() const;
+  bool canRedo() const;
 public slots:
   // Toggle the orientation axes visibility.
   void setOrientationAxesVisibility(bool visible);
@@ -177,6 +175,14 @@ public slots:
   /// start the link to other view process
   void linkToOtherView();
 
+  /// Called to undo interaction.
+  /// View modules supporting interaction undo must override this method.
+  virtual void undo();
+
+  /// Called to redo interaction.
+  /// View modules supporting interaction undo must override this method.
+  virtual void redo();
+
 private slots:
   // Called on start/end interaction.
   void startInteraction();
@@ -195,8 +201,11 @@ private slots:
   /// This method is called for all pqRenderViewModule objects irrespective
   /// of whether it is created from state/undo-redo/python or by the GUI. Hence
   /// don't change any render module properties here.
-  virtual void initializeWidgets();
+  void initializeWidgets();
 
+  /// Called when undo stack changes. We fires appropriate 
+  /// undo signals as required by pqGenericViewModule.
+  void onUndoStackChanged();
 protected:
   bool eventFilter(QObject* caller, QEvent* e);
 

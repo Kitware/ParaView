@@ -16,30 +16,39 @@
 
 #include "vtkCallbackCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMStateLoader.h"
-#include "vtkSMProperty.h"
 
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.5");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.6");
 
 //---------------------------------------------------------------------------
 struct vtkSMCameraLinkInternals
 {
   static void UpdateViewCallback(vtkObject* caller, unsigned long eid, 
-                                 void* clientData, void* callData)
+                                 void* clientData, void* )
     {
-    if(eid == vtkCommand::EndEvent && clientData && caller && callData)
+    vtkSMCameraLink* camLink = reinterpret_cast<vtkSMCameraLink*>(clientData);
+    if(eid == vtkCommand::EndEvent && clientData && caller)
       {
-      int *interactive = reinterpret_cast<int*>(callData);
-      vtkSMCameraLink* camLink = reinterpret_cast<vtkSMCameraLink*>(clientData);
-      camLink->UpdateViews(vtkSMProxy::SafeDownCast(caller), (*interactive==1));
+      camLink->UpdateViews(vtkSMProxy::SafeDownCast(caller));
+      }
+    else if (eid == vtkCommand::StartInteractionEvent && clientData && caller)
+      {
+      camLink->StartInteraction(caller);
+      }
+    else if (eid == vtkCommand::EndInteractionEvent && clientData && caller)
+      {
+      camLink->EndInteraction(caller);
       }
     }
+
   struct LinkedCamera
   {
     LinkedCamera(vtkSMProxy* proxy, vtkSMCameraLink* camLink) : 
@@ -49,10 +58,26 @@ struct vtkSMCameraLinkInternals
       this->Observer->SetClientData(camLink);
       this->Observer->SetCallback(vtkSMCameraLinkInternals::UpdateViewCallback);
       proxy->AddObserver(vtkCommand::EndEvent, this->Observer);
+
+      vtkSMRenderModuleProxy* rmp = vtkSMRenderModuleProxy::SafeDownCast(proxy);
+      if (rmp)
+        {
+        vtkPVGenericRenderWindowInteractor* iren = rmp->GetInteractor();
+        iren->AddObserver(vtkCommand::StartInteractionEvent, this->Observer);
+        iren->AddObserver(vtkCommand::EndInteractionEvent, this->Observer); 
+        }
       };
     ~LinkedCamera()
       {
       this->Proxy->RemoveObserver(this->Observer);
+      vtkSMRenderModuleProxy* rmp = 
+        vtkSMRenderModuleProxy::SafeDownCast(this->Proxy);
+      if (rmp)
+        {
+        vtkPVGenericRenderWindowInteractor* iren = rmp->GetInteractor();
+        iren->RemoveObserver(this->Observer);
+        iren->RemoveObserver(this->Observer); 
+        }
       }
     vtkSmartPointer<vtkSMProxy> Proxy;
     vtkSmartPointer<vtkCallbackCommand> Observer;
@@ -109,7 +134,7 @@ void vtkSMCameraLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
   // must be render module to link cameras
   if(vtkSMRenderModuleProxy::SafeDownCast(proxy))
     {
-    Superclass::AddLinkedProxy(proxy, updateDir);
+    this->Superclass::AddLinkedProxy(proxy, updateDir);
     if(updateDir == vtkSMLink::INPUT)
       {
       this->Internals->LinkedProxies.push_back(
@@ -121,7 +146,7 @@ void vtkSMCameraLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
 //---------------------------------------------------------------------------
 void vtkSMCameraLink::RemoveLinkedProxy(vtkSMProxy* proxy)
 {
-  Superclass::RemoveLinkedProxy(proxy);
+  this->Superclass::RemoveLinkedProxy(proxy);
 
   vtkSMCameraLinkInternals::LinkedProxiesType::iterator iter;
   for(iter = this->Internals->LinkedProxies.begin();
@@ -151,14 +176,20 @@ void vtkSMCameraLink::UpdateVTKObjects(vtkSMProxy* vtkNotUsed(fromProxy))
 }
 
 //---------------------------------------------------------------------------
-void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
+void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller)
 {
   if(this->Internals->Updating)
     {
     return;
     }
 
+
   this->Internals->Updating = true;
+
+  vtkSMRenderModuleProxy* srcRM =
+    vtkSMRenderModuleProxy::SafeDownCast(caller);
+  bool interactive = (srcRM &&
+    srcRM->GetInteractor()->GetInteractiveRenderEnabled());
 
   const char** props = this->Internals->LinkedPropertyNames;
 
@@ -198,6 +229,52 @@ void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
           rmp->StillRender();
           }
         }
+      }
+    }
+  this->Internals->Updating = false;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMCameraLink::StartInteraction(vtkObject* caller)
+{
+  if (this->Internals->Updating)
+    {
+    return;
+    }
+
+  this->Internals->Updating = true;
+  int numObjects = this->GetNumberOfLinkedProxies();
+  for(int i=0; i<numObjects; i++)
+    {
+    vtkSMRenderModuleProxy* rmp = vtkSMRenderModuleProxy::SafeDownCast(
+      this->GetLinkedProxy(i));
+    if(rmp && this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT && 
+      rmp->GetInteractor() != caller)
+      {
+      rmp->GetInteractor()->InvokeEvent(vtkCommand::StartInteractionEvent);
+      }
+    }
+  this->Internals->Updating = false;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMCameraLink::EndInteraction(vtkObject* caller)
+{
+  if (this->Internals->Updating)
+    {
+    return;
+    }
+
+  this->Internals->Updating = true;
+  int numObjects = this->GetNumberOfLinkedProxies();
+  for(int i=0; i<numObjects; i++)
+    {
+    vtkSMRenderModuleProxy* rmp = vtkSMRenderModuleProxy::SafeDownCast(
+      this->GetLinkedProxy(i));
+    if(rmp && this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT && 
+      rmp->GetInteractor() != caller)
+      {
+      rmp->GetInteractor()->InvokeEvent(vtkCommand::EndInteractionEvent);
       }
     }
   this->Internals->Updating = false;

@@ -411,14 +411,13 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
     frame->BackButton->show();
     frame->ForwardButton->show();
 
-    pqUndoStack* stack = view->getInteractionUndoStack();
     QObject::connect(frame->BackButton, SIGNAL(pressed()), 
-      stack, SLOT(undo()));
+      view, SLOT(undo()));
     QObject::connect(frame->ForwardButton, SIGNAL(pressed()),
-      stack, SLOT(redo()));
-    QObject::connect(stack, SIGNAL(canUndoChanged(bool)),
+      view, SLOT(redo()));
+    QObject::connect(view, SIGNAL(canUndoChanged(bool)),
       frame->BackButton, SLOT(setEnabled(bool)));
-    QObject::connect(stack, SIGNAL(canRedoChanged(bool)),
+    QObject::connect(view, SIGNAL(canRedoChanged(bool)),
       frame->ForwardButton, SLOT(setEnabled(bool)));
     }
   else
@@ -453,13 +452,12 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* vie
     }
   frame->setMainWidget(NULL);
 
-  pqUndoStack* stack = view->getInteractionUndoStack();
-  if (view->supportsUndo() && stack)
+  if (view->supportsUndo())
     {
-    QObject::disconnect(frame->BackButton, 0, stack, 0);
-    QObject::disconnect(frame->ForwardButton, 0, stack, 0);
-    QObject::disconnect(stack, 0,frame->BackButton, 0);
-    QObject::disconnect(stack, 0,frame->ForwardButton, 0);
+    QObject::disconnect(frame->BackButton, 0, view, 0);
+    QObject::disconnect(frame->ForwardButton, 0, view, 0);
+    QObject::disconnect(view, 0,frame->BackButton, 0);
+    QObject::disconnect(view, 0,frame->ForwardButton, 0);
     }
   QObject::disconnect(frame->LookmarkButton, 0, this, 0);
 

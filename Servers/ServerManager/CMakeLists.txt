@@ -70,6 +70,7 @@ SET(Kit_SRCS
   vtkSMImplicitPlaneWidgetProxy.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInformationHelper.cxx
+  vtkSMInteractionUndoStackBuilder.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
   vtkSMIntArrayInformationHelper.cxx

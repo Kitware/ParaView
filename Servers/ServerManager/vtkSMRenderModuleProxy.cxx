@@ -32,14 +32,15 @@
 #include "vtkProcessModule.h"
 #include "vtkPVCacheSizeInformation.h"
 #include "vtkPVClientServerIdCollectionInformation.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVRenderModuleHelper.h"
 #include "vtkPVVisibleCellSelector.h"
+#include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
 #include "vtkSelection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDataObjectDisplayProxy.h"
@@ -52,10 +53,8 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkMemberFunctionCommand.h"
-#include "vtkRendererCollection.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.78");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.79");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -308,7 +307,7 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     pvm->GetObjectFromID(this->RendererProxy->GetID(0)));
   this->RenderWindow = vtkRenderWindow::SafeDownCast(
     pvm->GetObjectFromID(this->RenderWindowProxy->GetID(0)));
-  this->Interactor = vtkRenderWindowInteractor::SafeDownCast(
+  this->Interactor = vtkPVGenericRenderWindowInteractor::SafeDownCast(
     pvm->GetObjectFromID(this->InteractorProxy->GetID(0)));
   this->ActiveCamera = vtkCamera::SafeDownCast(
     pvm->GetObjectFromID(this->ActiveCameraProxy->GetID(0)));

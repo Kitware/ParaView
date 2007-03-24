@@ -48,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkTrackballPan.h"
+#include "vtkSMUndoStack.h"
+#include "vtkSMInteractionUndoStackBuilder.h"
 
 // Qt includes.
 #include <QFileInfo>
@@ -70,7 +72,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
-#include "pqUndoStack.h"
 #include "vtkPVAxesWidget.h"
 
 class pqRenderViewModuleInternal
@@ -84,7 +85,10 @@ public:
   vtkSmartPointer<vtkPVAxesWidget> OrientationAxesWidget;
   vtkSmartPointer<vtkSMProxy> CenterAxesProxy;
   vtkSmartPointer<vtkSMProxy> InteractorStyleProxy;
-  pqUndoStack* UndoStack;
+
+  vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
+  vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
+
   int DefaultBackground[3];
   bool InitializedWidgets;
 
@@ -96,16 +100,21 @@ public:
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->OrientationAxesWidget = vtkSmartPointer<vtkPVAxesWidget>::New();
     this->InteractorStyleProxy = 0;
-    this->UndoStack = new pqUndoStack(true);
     this->DefaultBackground[0] = 84;
     this->DefaultBackground[1] = 89;
     this->DefaultBackground[2] = 109;
+
+    this->InteractionUndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
+    this->InteractionUndoStack->SetClientOnly(true);
+    this->UndoStackBuilder = 
+      vtkSmartPointer<vtkSMInteractionUndoStackBuilder>::New();
+    this->UndoStackBuilder->SetUndoStack(
+      this->InteractionUndoStack);
     }
 
   ~pqRenderViewModuleInternal()
     {
     this->RenderViewProxy->setRenderModule(0);
-    delete this->UndoStack;
     }
 };
 
@@ -118,7 +127,11 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   this->Internal = new pqRenderViewModuleInternal();
   this->Internal->RenderViewProxy->setRenderModule(this);
   this->Internal->RenderModuleProxy = renModule;
-  this->Internal->UndoStack->setActiveServer(this->getServer());
+
+  // we need to fire signals when undo stack changes.
+  this->Internal->VTKConnect->Connect(this->Internal->InteractionUndoStack,
+    vtkCommand::ModifiedEvent, this, SLOT(onUndoStackChanged()),
+    0, 0, Qt::QueuedConnection);
 
   this->Internal->Viewport = new QVTKWidget();
   this->Internal->Viewport->setObjectName("Viewport");
@@ -200,12 +213,6 @@ QWidget* pqRenderViewModule::getWidget()
 }
 
 //-----------------------------------------------------------------------------
-pqUndoStack* pqRenderViewModule::getInteractionUndoStack() const
-{
-  return this->Internal->UndoStack;
-}
-
-//-----------------------------------------------------------------------------
 // This method is called for all pqRenderViewModule objects irrespective
 // of whether it is created from state/undo-redo/python or by the GUI. Hence
 // don't change any render module properties here.
@@ -245,6 +252,8 @@ void pqRenderViewModule::initializeWidgets()
 
   // setup the center axes.
   this->initializeCenterAxes();
+
+  this->Internal->UndoStackBuilder->SetRenderModule(renModule);
 }
 
 //-----------------------------------------------------------------------------
@@ -474,38 +483,16 @@ void pqRenderViewModule::initializeCenterAxes()
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::startInteraction()
 {
-  // It is essential to synchronize camera properties prior to starting the 
-  // interaction since the current state of the camera might be different from 
-  // that reflected by the properties.
-  this->Internal->RenderModuleProxy->SynchronizeCameraProperties();
-  
-  // NOTE: bewary of the server used while calling
-  // BeginOrContinueUndoSet on vtkSMUndoStack.
-  this->Internal->UndoStack->beginUndoSet("Interaction");
-
-  vtkPVGenericRenderWindowInteractor* iren =
-    vtkPVGenericRenderWindowInteractor::SafeDownCast(
-      this->Internal->RenderModuleProxy->GetInteractor());
-  if (!iren)
-    {
-    return;
-    }
+  vtkPVGenericRenderWindowInteractor* iren = 
+      this->Internal->RenderModuleProxy->GetInteractor();
   iren->SetInteractiveRenderEnabled(true);
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::endInteraction()
 {
-  this->Internal->RenderModuleProxy->SynchronizeCameraProperties();
-  this->Internal->UndoStack->endUndoSet();
-
-  vtkPVGenericRenderWindowInteractor* iren =
-    vtkPVGenericRenderWindowInteractor::SafeDownCast(
-      this->Internal->RenderModuleProxy->GetInteractor());
-  if (!iren)
-    {
-    return;
-    }
+  vtkPVGenericRenderWindowInteractor* iren = 
+      this->Internal->RenderModuleProxy->GetInteractor();
   iren->SetInteractiveRenderEnabled(false);
 }
 
@@ -1079,3 +1066,40 @@ bool pqRenderViewModule::canDisplaySource(pqPipelineSource* source) const
   return true;
 }
 
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::onUndoStackChanged()
+{
+  bool can_undo = this->Internal->InteractionUndoStack->CanUndo();
+  bool can_redo = this->Internal->InteractionUndoStack->CanRedo();
+
+  emit this->canUndoChanged(can_undo);
+  emit this->canRedoChanged(can_redo);
+}
+
+//-----------------------------------------------------------------------------
+bool pqRenderViewModule::canUndo() const
+{
+  return this->Internal->InteractionUndoStack->CanUndo();
+}
+
+//-----------------------------------------------------------------------------
+bool pqRenderViewModule::canRedo() const
+{
+  return this->Internal->InteractionUndoStack->CanRedo();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::undo()
+{
+  this->Internal->InteractionUndoStack->Undo();
+  this->Internal->RenderModuleProxy->UpdateVTKObjects();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::redo()
+{
+  this->Internal->InteractionUndoStack->Redo();
+  this->Internal->RenderModuleProxy->UpdateVTKObjects();
+  this->render();
+}
