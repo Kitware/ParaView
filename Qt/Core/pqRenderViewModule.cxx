@@ -90,12 +90,14 @@ public:
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
 
   QList<QPointer<pqRenderViewModule> > LinkedUndoStacks;
+  bool UpdatingStack;
 
   int DefaultBackground[3];
   bool InitializedWidgets;
 
   pqRenderViewModuleInternal()
     {
+    this->UpdatingStack = false;
     this->InitializedWidgets = false;
     this->Viewport = 0;
     this->RenderViewProxy = vtkSmartPointer<pqRenderViewProxy>::New();
@@ -1097,13 +1099,7 @@ void pqRenderViewModule::undo()
   this->Internal->RenderModuleProxy->UpdateVTKObjects();
   this->render();
 
-  foreach (pqRenderViewModule* other, this->Internal->LinkedUndoStacks)
-    {
-    if (other)
-      {
-      other->Internal->InteractionUndoStack->PopUndoStack();
-      }
-    }
+  this->fakeUndoRedo(false, false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1112,13 +1108,8 @@ void pqRenderViewModule::redo()
   this->Internal->InteractionUndoStack->Redo();
   this->Internal->RenderModuleProxy->UpdateVTKObjects();
   this->render();
-  foreach (pqRenderViewModule* other, this->Internal->LinkedUndoStacks)
-    {
-    if (other)
-      {
-      other->Internal->InteractionUndoStack->PopRedoStack();
-      }
-    }
+  
+  this->fakeUndoRedo(true, false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1132,11 +1123,8 @@ void pqRenderViewModule::linkUndoStack(pqRenderViewModule* other)
 
   this->Internal->LinkedUndoStacks.push_back(other);
 
-  // Clear both stacks until now.
-  this->Internal->InteractionUndoStack->Clear();
-  this->Internal->UndoStackBuilder->Clear();
-  other->Internal->InteractionUndoStack->Clear();
-  other->Internal->UndoStackBuilder->Clear();
+  // Clear all linked stacks until now.
+  this->clearUndoStack();
 }
 
 //-----------------------------------------------------------------------------
@@ -1147,5 +1135,53 @@ void pqRenderViewModule::unlinkUndoStack(pqRenderViewModule* other)
     return;
     }
   this->Internal->LinkedUndoStacks.removeAll(other);
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::clearUndoStack()
+{
+  if (this->Internal->UpdatingStack)
+    {
+    return;
+    }
+  this->Internal->UpdatingStack = true;
+  this->Internal->InteractionUndoStack->Clear();
+  foreach (pqRenderViewModule* other, this->Internal->LinkedUndoStacks)
+    {
+    if (other)
+      {
+      other->clearUndoStack();
+      }
+    }
+  this->Internal->UpdatingStack = false;
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::fakeUndoRedo(bool redo, bool self)
+{
+  if (this->Internal->UpdatingStack)
+    {
+    return;
+    }
+  this->Internal->UpdatingStack = true;
+  if (self)
+    {
+    if (redo)
+      {
+      this->Internal->InteractionUndoStack->PopRedoStack();
+      }
+    else
+      {
+      this->Internal->InteractionUndoStack->PopUndoStack();
+      }
+    }
+  foreach (pqRenderViewModule* other, this->Internal->LinkedUndoStacks)
+    {
+    if (other)
+      {
+      other->fakeUndoRedo(redo, true);
+      }
+    }
+  this->Internal->UpdatingStack = false;
 }
 

@@ -51,7 +51,8 @@ public:
   
   // Description:
   // Update all the views linked with an OUTPUT direction.
-  virtual void UpdateViews(vtkSMProxy* caller);
+  // \c interactive indicates if the render is interactive or not.
+  virtual void UpdateViews(vtkSMProxy* caller, bool interactive);
 
   void StartInteraction(vtkObject* caller);
   void EndInteraction(vtkObject* caller);

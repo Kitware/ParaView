@@ -26,18 +26,19 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.7");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.8");
 
 //---------------------------------------------------------------------------
 struct vtkSMCameraLinkInternals
 {
   static void UpdateViewCallback(vtkObject* caller, unsigned long eid, 
-                                 void* clientData, void* )
+                                 void* clientData, void* callData)
     {
     vtkSMCameraLink* camLink = reinterpret_cast<vtkSMCameraLink*>(clientData);
-    if(eid == vtkCommand::EndEvent && clientData && caller)
+    if(eid == vtkCommand::EndEvent && clientData && caller && callData)
       {
-      camLink->UpdateViews(vtkSMProxy::SafeDownCast(caller));
+      int *interactive = reinterpret_cast<int*>(callData);
+      camLink->UpdateViews(vtkSMProxy::SafeDownCast(caller), (*interactive==1));
       }
     else if (eid == vtkCommand::StartInteractionEvent && clientData && caller)
       {
@@ -181,7 +182,7 @@ void vtkSMCameraLink::UpdateVTKObjects(vtkSMProxy* vtkNotUsed(fromProxy))
 }
 
 //---------------------------------------------------------------------------
-void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller)
+void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
 {
   if(this->Internals->Updating)
     {
@@ -190,11 +191,6 @@ void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller)
 
 
   this->Internals->Updating = true;
-
-  vtkSMRenderModuleProxy* srcRM =
-    vtkSMRenderModuleProxy::SafeDownCast(caller);
-  bool interactive = (srcRM &&
-    srcRM->GetInteractor()->GetInteractiveRenderEnabled());
 
   const char** props = this->Internals->LinkedPropertyNames;
 

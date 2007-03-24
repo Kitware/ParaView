@@ -145,6 +145,9 @@ public:
   void linkUndoStack(pqRenderViewModule* other);
   void unlinkUndoStack(pqRenderViewModule* other);
 
+  /// Clears interaction undo stack of this view
+  /// (and all linked views, if any).
+  void clearUndoStack();
 public slots:
   // Toggle the orientation axes visibility.
   void setOrientationAxesVisibility(bool visible);
@@ -233,6 +236,9 @@ protected:
   // When true, the camera center of rotation will be reset when the
   // user reset the camera.
   bool ResetCenterWithCamera;
+
+  /// Updates undo stack without actually performing the undo/redo actions.
+  void fakeUndoRedo(bool redo, bool self);
 
 private: 
   pqRenderViewModuleInternal* Internal;
