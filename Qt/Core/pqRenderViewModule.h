@@ -138,6 +138,13 @@ public:
   /// given the current state of the interaction undo stack.
   bool canUndo() const;
   bool canRedo() const;
+
+  /// For linking of interaction undo stacks.
+  /// This method is used by pqLinksModel to link 
+  /// interaction undo stack for linked render views.
+  void linkUndoStack(pqRenderViewModule* other);
+  void unlinkUndoStack(pqRenderViewModule* other);
+
 public slots:
   // Toggle the orientation axes visibility.
   void setOrientationAxesVisibility(bool visible);

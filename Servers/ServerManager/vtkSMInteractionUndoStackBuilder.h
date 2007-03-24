@@ -47,6 +47,9 @@ public:
   vtkGetObjectMacro(UndoStack, vtkSMUndoStack);
   virtual void SetUndoStack(vtkSMUndoStack*);
 
+  // Description:
+  // Clear the undo set currently being recorded.
+  void Clear();
 //BTX
 protected:
   vtkSMInteractionUndoStackBuilder();

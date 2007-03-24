@@ -78,7 +78,8 @@ public:
 
     if(eid == vtkCommand::RegisterEvent)
       {
-      LinkObjects.append(new pqLinksModelObject(linkName, this->Model));
+      this->LinkObjects.append(
+        new pqLinksModelObject(linkName, this->Model));
       this->Model->reset();
       }
     else if(eid == vtkCommand::UnRegisterEvent)
@@ -618,6 +619,38 @@ void pqLinksModelObject::remove()
 }
 
 
+void pqLinksModelObject::unlinkUndoStacks(pqRenderViewModule* ren)
+{
+  foreach (pqProxy* output, this->Internal->OutputProxies)
+    {
+    pqRenderViewModule* other = qobject_cast<pqRenderViewModule*>(output);
+    if (other && other != ren)
+      {
+      ren->unlinkUndoStack(other);
+      }
+    }
+}
+
+
+void pqLinksModelObject::linkUndoStacks()
+{
+  foreach (pqProxy* proxy, this->Internal->InputProxies)
+    {
+    pqRenderViewModule* src = qobject_cast<pqRenderViewModule*>(proxy);
+    if (src)
+      {
+      for (int cc=0; cc < this->Internal->OutputProxies.size(); cc++)
+        {
+        pqRenderViewModule* dest = qobject_cast<pqRenderViewModule*>(
+          this->Internal->OutputProxies[cc]);
+        if (dest && src != dest)
+          {
+          src->linkUndoStack(dest);
+          }
+        }
+      }
+    }
+}
 
 void pqLinksModelObject::refresh()
 {
@@ -626,6 +659,14 @@ void pqLinksModelObject::refresh()
     QObject::disconnect(p,
       SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
       this, SLOT(proxyModified(pqServerManagerModelItem*)));
+
+    // For render module links, we have to ensure that we remove
+    // the links between their interaction undo stacks as well.
+    pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(p);
+    if (ren)
+      {
+      this->unlinkUndoStacks(ren);
+      }
     }
 
   this->Internal->InputProxies.clear();
@@ -698,6 +739,11 @@ void pqLinksModelObject::refresh()
       QObject::connect(pxy, SIGNAL(destroyed(QObject*)),
         this, SLOT(remove()));
       }
+    }
+
+  if (vtkSMCameraLink::SafeDownCast(this->link()))
+    {
+    this->linkUndoStacks();
     }
 }
 

@@ -407,23 +407,24 @@ protected:
   // public interface exposed by vtkSMProxy. Each of these classes
   // use a small subset of protected methods. This should be kept
   // as such.
-  friend class vtkSMProperty;
-  friend class vtkSMProxyManager;
+  friend class vtkSMCameraLink;
+  friend class vtkSMCompoundProxy;
+  friend class vtkSMDefaultStateLoader;
+  friend class vtkSMIceTDesktopRenderModuleProxy;
   friend class vtkSMInputProperty;
+  friend class vtkSMNew3DWidgetProxy;
   friend class vtkSMOrderedPropertyIterator;
+  friend class vtkSMPart;
+  friend class vtkSMProperty;
   friend class vtkSMPropertyIterator;
+  friend class vtkSMProxyManager;
   friend class vtkSMProxyObserver;
   friend class vtkSMProxyProperty;
-  friend class vtkSMSourceProxy;
-  friend class vtkSMRenderModuleProxy;
-  friend class vtkSMIceTDesktopRenderModuleProxy;
-  friend class vtkSMCompoundProxy;
-  friend class vtkSMStateLoader;
-  friend class vtkSMDefaultStateLoader;
   friend class vtkSMProxyRegisterUndoElement;
   friend class vtkSMProxyUnRegisterUndoElement;
-  friend class vtkSMNew3DWidgetProxy;
-  friend class vtkSMPart;
+  friend class vtkSMRenderModuleProxy;
+  friend class vtkSMSourceProxy;
+  friend class vtkSMStateLoader;
   // -- PVEE only
   friend class vtkWSMApplication;
 //ETX

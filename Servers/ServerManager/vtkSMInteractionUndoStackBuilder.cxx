@@ -53,7 +53,7 @@ protected:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMInteractionUndoStackBuilder);
-vtkCxxRevisionMacro(vtkSMInteractionUndoStackBuilder, "1.1");
+vtkCxxRevisionMacro(vtkSMInteractionUndoStackBuilder, "1.2");
 vtkCxxSetObjectMacro(vtkSMInteractionUndoStackBuilder, UndoStack, vtkSMUndoStack);
 
 //-----------------------------------------------------------------------------
@@ -139,6 +139,11 @@ void vtkSMInteractionUndoStackBuilder::EndInteraction()
   // Interaction end -- get final camera properties
   // Then push undo set on stack.
 
+  if (this->UndoSet->GetNumberOfElements() == 0)
+    {
+    return;
+    }
+
   this->RenderModule->SynchronizeCameraProperties();
   this->PropertyModified("CameraPosition");
   this->PropertyModified("CameraFocalPoint");
@@ -166,6 +171,12 @@ void vtkSMInteractionUndoStackBuilder::PropertyModified(const char* pname)
   elem->ModifiedProperty(this->RenderModule, pname);
   this->UndoSet->AddElement(elem);
   elem->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMInteractionUndoStackBuilder::Clear()
+{
+  this->UndoSet->RemoveAllElements();
 }
 
 //-----------------------------------------------------------------------------

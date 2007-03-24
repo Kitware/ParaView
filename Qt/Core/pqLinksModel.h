@@ -37,12 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include <QAbstractItemModel>
 
+class pqProxy;
+class pqRenderViewModule;
+class pqServerManagerModelItem;
 class vtkSMLink;
 class vtkSMProxy;
-class vtkSMRenderModuleProxy;
-class pqServerManagerModelItem;
-class pqProxy;
 class vtkSMProxyListDomain;
+class vtkSMRenderModuleProxy;
 
 /// A Qt based model to represent the vtkSMLinks in the
 /// server manager.
@@ -159,6 +160,9 @@ private slots:
 private:
   class pqInternal;
   pqInternal* Internal;
+
+  void linkUndoStacks();
+  void unlinkUndoStacks(pqRenderViewModule*);
 };
 
 #endif

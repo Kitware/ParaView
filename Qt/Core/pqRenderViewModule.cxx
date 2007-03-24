@@ -89,6 +89,8 @@ public:
   vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
 
+  QList<QPointer<pqRenderViewModule> > LinkedUndoStacks;
+
   int DefaultBackground[3];
   bool InitializedWidgets;
 
@@ -1094,6 +1096,14 @@ void pqRenderViewModule::undo()
   this->Internal->InteractionUndoStack->Undo();
   this->Internal->RenderModuleProxy->UpdateVTKObjects();
   this->render();
+
+  foreach (pqRenderViewModule* other, this->Internal->LinkedUndoStacks)
+    {
+    if (other)
+      {
+      other->Internal->InteractionUndoStack->PopUndoStack();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1102,4 +1112,40 @@ void pqRenderViewModule::redo()
   this->Internal->InteractionUndoStack->Redo();
   this->Internal->RenderModuleProxy->UpdateVTKObjects();
   this->render();
+  foreach (pqRenderViewModule* other, this->Internal->LinkedUndoStacks)
+    {
+    if (other)
+      {
+      other->Internal->InteractionUndoStack->PopRedoStack();
+      }
+    }
 }
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::linkUndoStack(pqRenderViewModule* other)
+{
+  if (other == this)
+    {
+    // Sanity check, nothing to link if both are same.
+    return;
+    }
+
+  this->Internal->LinkedUndoStacks.push_back(other);
+
+  // Clear both stacks until now.
+  this->Internal->InteractionUndoStack->Clear();
+  this->Internal->UndoStackBuilder->Clear();
+  other->Internal->InteractionUndoStack->Clear();
+  other->Internal->UndoStackBuilder->Clear();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::unlinkUndoStack(pqRenderViewModule* other)
+{
+  if (!other || other == this)
+    {
+    return;
+    }
+  this->Internal->LinkedUndoStacks.removeAll(other);
+}
+
