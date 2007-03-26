@@ -81,10 +81,10 @@ pqLineSourceWidget::pqLineSourceWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) 
   this->layout()->addWidget(&this->Implementation->ControlsContainer);
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SIGNAL(widgetChanged()));
+    this, SLOT(modified()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
-    this, SIGNAL(widgetChanged()));
+    this, SLOT(modified()));
 }
 
 //-----------------------------------------------------------------------------

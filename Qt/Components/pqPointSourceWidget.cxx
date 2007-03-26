@@ -79,10 +79,10 @@ pqPointSourceWidget::pqPointSourceWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p
   this->layout()->addWidget(&this->Implementation->ControlsContainer);
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SIGNAL(widgetChanged()));
+    this, SLOT(modified()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
-    this, SIGNAL(widgetChanged()));
+    this, SLOT(modified()));
 }
 
 //-----------------------------------------------------------------------------
@@ -90,8 +90,6 @@ pqPointSourceWidget::~pqPointSourceWidget()
 {
   delete this->Implementation;
 }
-
-#define vtkMin(a,b) ((a>b)? (b) : (a))
 
 //-----------------------------------------------------------------------------
 void pqPointSourceWidget::resetBounds()
@@ -103,8 +101,8 @@ void pqPointSourceWidget::resetBounds()
   if(widget && this->getReferenceInputBounds(input_bounds))
     {
     double min_diameter = input_bounds[1]-input_bounds[0];
-    min_diameter = vtkMin(min_diameter, input_bounds[3]-input_bounds[2]);
-    min_diameter = vtkMin(min_diameter, input_bounds[5]-input_bounds[4]);
+    min_diameter = qMin(min_diameter, input_bounds[3]-input_bounds[2]);
+    min_diameter = qMin(min_diameter, input_bounds[5]-input_bounds[4]);
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
       widget->GetProperty("Radius"));
     if (dvp)

@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
+#include <vtkSmartPointer.h>
 
 /////////////////////////////////////////////////////////////////////////
 // pqHandleWidget::pqImplementation
@@ -115,10 +116,10 @@ pqHandleWidget::pqHandleWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
     SIGNAL(clicked()), this, SLOT(onResetBounds()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SIGNAL(widgetChanged()));
+    this, SLOT(modified()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
-    this, SIGNAL(widgetChanged()));
+    this, SLOT(modified()));
     
   this->createWidget(o->getServer());
 }

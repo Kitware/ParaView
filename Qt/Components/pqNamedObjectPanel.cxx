@@ -42,11 +42,11 @@ pqNamedObjectPanel::pqNamedObjectPanel(pqProxy* object_proxy, QWidget* p) :
 
 pqNamedObjectPanel::~pqNamedObjectPanel()
 {
-  pqNamedWidgets::unlink(this, this->proxy()->getProxy(), this->propertyManager());
+  pqNamedWidgets::unlink(this, this->proxy(), this->propertyManager());
 }
 
 void pqNamedObjectPanel::linkServerManagerProperties()
 {
-  pqNamedWidgets::link(this, this->proxy()->getProxy(), this->propertyManager());
+  pqNamedWidgets::link(this, this->proxy(), this->propertyManager());
 }
 

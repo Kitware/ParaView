@@ -198,12 +198,12 @@ void pqCalculatorPanel::accept()
 {
   this->pqObjectPanel::accept();
 
-  if(!this->proxy()->getProxy())
+  if(!this->proxy())
     {
     return;
     }
 
-  vtkSMProxy* CalcProxy = this->proxy()->getProxy();
+  vtkSMProxy* CalcProxy = this->proxy();
 
   int mode = this->Internal->AttributeMode->currentText() == 
              "Point Data" ? 1 : 2;
@@ -337,7 +337,7 @@ void pqCalculatorPanel::reset()
 {
   this->pqObjectPanel::reset();
   
-  vtkSMProxy* CalcProxy = this->proxy()->getProxy();
+  vtkSMProxy* CalcProxy = this->proxy();
 
 
   // restore the function
@@ -391,7 +391,7 @@ void pqCalculatorPanel::updateVariables(const QString& mode)
     }
 
   vtkPVDataSetAttributesInformation* fdi = NULL;
-  pqPipelineFilter* f = qobject_cast<pqPipelineFilter*>(this->proxy());
+  pqPipelineFilter* f = qobject_cast<pqPipelineFilter*>(this->referenceProxy());
   if(!f)
     {
     return;

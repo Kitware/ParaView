@@ -75,7 +75,7 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
   pqSMProxy controlled_proxy = NULL;
    
   if(vtkSMProxyProperty* const cut_function_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("CutFunction")))
+    this->proxy()->GetProperty("CutFunction")))
     {
     if (cut_function_property->GetNumberOfProxies() == 0)
       {
@@ -84,7 +84,7 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
       if (pld)
         {
         cut_function_property->AddProxy(pld->GetProxy(0));
-        this->proxy()->getProxy()->UpdateVTKObjects();
+        this->proxy()->UpdateVTKObjects();
         }
       }
     controlled_proxy = cut_function_property->GetProxy(0);
@@ -92,7 +92,7 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
     }
 
   this->Implementation->ImplicitPlaneWidget = 
-    new pqImplicitPlaneWidget(this->proxy(), controlled_proxy, NULL);
+    new pqImplicitPlaneWidget(this->referenceProxy(), controlled_proxy, NULL);
 
   pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
   group1->setTitle(tr("Implicit Plane"));
@@ -117,9 +117,9 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
 
   connect(
     this->Implementation->ImplicitPlaneWidget,
-    SIGNAL(widgetChanged()),
-    this->propertyManager(),
-    SLOT(propertyChanged()));
+    SIGNAL(canAcceptOrReject(bool)),
+    this,
+    SLOT(updateProxyModified(bool)));
     
   connect(
     &this->Implementation->SampleScalarWidget,
@@ -152,8 +152,8 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
 
   // Setup the sample scalar widget ...
   this->Implementation->SampleScalarWidget.setDataSources(
-    this->proxy()->getProxy(),
-    vtkSMDoubleVectorProperty::SafeDownCast(this->proxy()->getProxy()->GetProperty("ContourValues")));
+    this->proxy(),
+    vtkSMDoubleVectorProperty::SafeDownCast(this->proxy()->GetProperty("ContourValues")));
 }
 
 pqCutPanel::~pqCutPanel()

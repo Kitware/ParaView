@@ -98,7 +98,7 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
   
   if(vtkSMProxyProperty* const input_property =
     vtkSMProxyProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("Input")))
+      this->proxy()->GetProperty("Input")))
     {
     if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
       input_property->GetProxy(0)))
@@ -117,7 +117,7 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
     }
   
   vtkSMProxyProperty* source_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("Source"));
+    this->proxy()->GetProperty("Source"));
   
   QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
     
@@ -146,7 +146,7 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
       source->UpdateVTKObjects();
 
       this->Implementation->PointSourceWidget = 
-        new pqPointSourceWidget(this->proxy(), source, NULL);
+        new pqPointSourceWidget(this->referenceProxy(), source, NULL);
 
       if(vtkPVXMLElement* const hints = source->GetHints())
         {
@@ -196,7 +196,7 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
       source->UpdateVTKObjects();
 
       this->Implementation->LineSourceWidget = 
-        new pqLineSourceWidget(this->proxy(), source, NULL);
+        new pqLineSourceWidget(this->referenceProxy(), source, NULL);
       
       vtkSMProperty* const point1 = source->GetProperty("Point1");
       vtkSMProperty* const point2 = source->GetProperty("Point2");
@@ -237,15 +237,15 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
 
   QObject::connect(
     this->Implementation->PointSourceWidget,
-    SIGNAL(widgetChanged()),
-    this->propertyManager(),
-    SLOT(propertyChanged()));
+    SIGNAL(canAcceptOrReject(bool)),
+    this,
+    SLOT(updateProxyModified(bool)));
 
   QObject::connect(
     this->Implementation->LineSourceWidget,
-    SIGNAL(widgetChanged()),
-    this->propertyManager(),
-    SLOT(propertyChanged()));
+    SIGNAL(canAcceptOrReject(bool)),
+    this,
+    SLOT(updateProxyModified(bool)));
   
   QObject::connect(
     this, SIGNAL(onaccept()), this->Implementation->PointSourceWidget, SLOT(accept()));
@@ -342,7 +342,7 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
 #endif
 
   pqNamedWidgets::link(
-    &this->Implementation->UIContainer, this->proxy()->getProxy(), this->propertyManager());
+    &this->Implementation->UIContainer, this->proxy(), this->propertyManager());
   
   // TODO:  remove this as we should just accept the values we get from the
   // server manager
@@ -380,7 +380,7 @@ void pqParticleTracerPanel::onSeedTypeChanged(int type)
 void pqParticleTracerPanel::onUsePointSource()
 {
   if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("Source")))
+    this->proxy()->GetProperty("Source")))
     {
     const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
     for(int i = 0; i != sources.size(); ++i)
@@ -392,7 +392,7 @@ void pqParticleTracerPanel::onUsePointSource()
         this->Implementation->LineSourceWidget->setWidgetVisible(false);
         source_property->RemoveAllProxies();
         source_property->AddProxy(source);
-        this->proxy()->getProxy()->UpdateVTKObjects();
+        this->proxy()->UpdateVTKObjects();
         pqApplicationCore::instance()->render();
         break;
         }
@@ -404,7 +404,7 @@ void pqParticleTracerPanel::onUsePointSource()
 void pqParticleTracerPanel::onUseLineSource()
 {
   if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("Source")))
+    this->proxy()->GetProperty("Source")))
     {
     const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
     for(int i = 0; i != sources.size(); ++i)
@@ -416,7 +416,7 @@ void pqParticleTracerPanel::onUseLineSource()
         this->Implementation->LineSourceWidget->setWidgetVisible(true);
         source_property->RemoveAllProxies();
         source_property->AddProxy(source);
-        this->proxy()->getProxy()->UpdateVTKObjects();
+        this->proxy()->UpdateVTKObjects();
         pqApplicationCore::instance()->render();
         break;
         }
@@ -431,7 +431,7 @@ void pqParticleTracerPanel::accept()
   if(seedType == 0)  // point source
     {
     if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("Source")))
+      this->proxy()->GetProperty("Source")))
       {
       const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
       for(int i = 0; i != sources.size(); ++i)
@@ -448,7 +448,7 @@ void pqParticleTracerPanel::accept()
   else if(seedType == 1) // line source
     {
     if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("Source")))
+      this->proxy()->GetProperty("Source")))
       {
       const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
       for(int i = 0; i != sources.size(); ++i)

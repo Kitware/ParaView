@@ -100,7 +100,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
 
   if(vtkSMProxyProperty* const input_property =
     vtkSMProxyProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("Input")))
+      this->proxy()->GetProperty("Input")))
     {
     if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
         input_property->GetProxy(0)))
@@ -120,7 +120,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
 
 
   vtkSMProperty* const source_property =
-    this->proxy()->getProxy()->GetProperty("Source");
+    this->proxy()->GetProperty("Source");
     
   // Setup initial defaults for our seed sources ...  
   const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
@@ -150,7 +150,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
       source->UpdateVTKObjects();
 
       this->Implementation->PointSourceWidget = 
-        new pqPointSourceWidget(this->proxy(), source, NULL);
+        new pqPointSourceWidget(this->referenceProxy(), source, NULL);
       this->Implementation->PointSourceWidget->hideWidget();
 
       if(vtkPVXMLElement* const hints = source->GetHints())
@@ -182,7 +182,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
       source->UpdateVTKObjects();
 
       this->Implementation->LineSourceWidget =
-        new pqLineSourceWidget(this->proxy(), source, NULL);
+        new pqLineSourceWidget(this->referenceProxy(), source, NULL);
       this->Implementation->LineSourceWidget->hideWidget();
 
       if(vtkPVXMLElement* const hints = source->GetHints())
@@ -255,15 +255,15 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
 
   QObject::connect(
     this->Implementation->PointSourceWidget,
-    SIGNAL(widgetChanged()),
-    this->propertyManager(),
-    SLOT(propertyChanged()));
+    SIGNAL(canAcceptOrReject(bool)),
+    this,
+    SLOT(updateProxyModified(bool)));
 
   QObject::connect(
     this->Implementation->LineSourceWidget,
-    SIGNAL(widgetChanged()),
-    this->propertyManager(),
-    SLOT(propertyChanged()));
+    SIGNAL(canAcceptOrReject(bool)),
+    this,
+    SLOT(updateProxyModified(bool)));
 
   QObject::connect(
     this, SIGNAL(onaccept()), this->Implementation->PointSourceWidget, SLOT(accept()));
@@ -284,7 +284,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
                    this->Implementation->LineSourceWidget, SLOT(deselect()));
 
 
-  pqNamedWidgets::link(this, this->proxy()->getProxy(), 
+  pqNamedWidgets::link(this, this->proxy(), 
     this->propertyManager());
 }
 
@@ -319,7 +319,7 @@ void pqStreamTracerPanel::onSeedTypeChanged(int type)
 void pqStreamTracerPanel::onUsePointSource()
 {
   if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("Source")))
+    this->proxy()->GetProperty("Source")))
     {
     const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
     for(int i = 0; i != sources.size(); ++i)
@@ -343,7 +343,7 @@ void pqStreamTracerPanel::onUsePointSource()
 void pqStreamTracerPanel::onUseLineSource()
 {
   if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("Source")))
+    this->proxy()->GetProperty("Source")))
     {
     const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
     for(int i = 0; i != sources.size(); ++i)
@@ -370,7 +370,7 @@ void pqStreamTracerPanel::accept()
   if(seedType == 0)  // point source
     {
     if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("Source")))
+      this->proxy()->GetProperty("Source")))
       {
       const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
       for(int i = 0; i != sources.size(); ++i)
@@ -387,7 +387,7 @@ void pqStreamTracerPanel::accept()
   else if(seedType == 1) // line source
     {
     if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("Source")))
+      this->proxy()->GetProperty("Source")))
       {
       const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
       for(int i = 0; i != sources.size(); ++i)

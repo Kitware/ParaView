@@ -34,18 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqObjectPanel_h
 
 #include "pqComponentsExport.h"
-
-#include <QWidget>
-#include <QPointer>
-#include "pqComponentsExport.h"
-class pqProxy;
-class pqRenderViewModule;
+#include "pqProxyPanel.h"
 
 class pqPropertyManager;
 
 /// Base class for Widget which provides an editor for editing properties
 /// of a proxy
-class PQCOMPONENTS_EXPORT pqObjectPanel : public QWidget
+class PQCOMPONENTS_EXPORT pqObjectPanel : public pqProxyPanel
 {
   Q_OBJECT
 public:
@@ -54,60 +49,6 @@ public:
   /// destructor
   ~pqObjectPanel();
 
-  /// get the proxy for which properties are displayed
-  pqProxy* proxy();
-  
-  /// get the render module that this object panel works with
-  pqRenderViewModule* renderModule();
-  
-  /// size hint for this widget
-  QSize sizeHint() const;
-
-public slots:
-  /// accept the changes made to the properties
-  /// changes will be propogated down to the server manager
-  virtual void accept();
-
-  /// reset the changes made
-  /// editor will query properties from the server manager
-  virtual void reset();
-
-  /// Called when the panel becomes active. Default implemnetation does
-  /// nothing.
-  virtual void select();
-
-  /// Called when the panel becomes inactive. Default implemnetation does
-  /// nothing.
-  virtual void deselect();
-
-  /// Set the render module that this panel works with
-  void setRenderModule(pqRenderViewModule*);
-  
-  /// Fires canAcceptOrReject(true).
-  void modified();
-
-protected slots:
-
-  /// \brief
-  ///   Updates the proxy's modified status.
-  /// \param mod True if the proxy has been modified.
-  void updateProxyModified(bool mod);
-
-signals:
-  void canAcceptOrReject(bool);
-  void onaccept();
-  void onreset();
-  void onselect();
-  void ondeselect();
-  void renderModuleChanged(pqRenderViewModule*);
-
-protected:
-  /// property manager belongs to this panel
-  pqPropertyManager* propertyManager();
-
-private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
 };
 
 #endif

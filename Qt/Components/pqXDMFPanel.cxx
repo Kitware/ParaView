@@ -148,7 +148,7 @@ void pqXDMFPanel::PopulateDomainWidget()
   //get access to the paraview-"Domain" that restricts what names we can choose
   vtkSMStringVectorProperty* SetNameProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("SetDomainName"));
+      this->proxy()->GetProperty("SetDomainName"));
   vtkSMStringListDomain* canChooseFrom = 
     vtkSMStringListDomain::SafeDownCast(
       SetNameProperty->GetDomain("AvailableDomains"));
@@ -156,10 +156,10 @@ void pqXDMFPanel::PopulateDomainWidget()
   canChooseFrom->RemoveAllStrings();
 
   //ask the reader for the list of available Xdmf-"domain" names
-  this->proxy()->getProxy()->UpdatePropertyInformation();
+  this->proxy()->UpdatePropertyInformation();
   vtkSMStringVectorProperty* GetNamesProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("GetDomainName"));
+      this->proxy()->GetProperty("GetDomainName"));
 
   //add each xdmf-domain name to the widget and to the paraview-Domain
   int numNames = GetNamesProperty->GetNumberOfElements();
@@ -183,9 +183,9 @@ void pqXDMFPanel::PopulateGridWidget()
   //about the available grids, because it is wrong when domain changes
   vtkSMProperty* RemoveProperty = 
     vtkSMProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("RemoveAllGrids"));
+      this->proxy()->GetProperty("RemoveAllGrids"));
   RemoveProperty->Modified();
-  this->proxy()->getProxy()->UpdateVTKObjects();
+  this->proxy()->UpdateVTKObjects();
 
   //empty the selection widget on the UI (and don't call the changed slot)
   QListWidget* selectionWidget = this->UI->GridNames;
@@ -196,7 +196,7 @@ void pqXDMFPanel::PopulateGridWidget()
   //get access to the paraview Domain that restricts what names we can choose
   vtkSMStringVectorProperty* SetNameProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("SetGridName"));
+      this->proxy()->GetProperty("SetGridName"));
   vtkSMStringListDomain* canChooseFrom = 
     vtkSMStringListDomain::SafeDownCast(
       SetNameProperty->GetDomain("AvailableGrids"));
@@ -206,13 +206,13 @@ void pqXDMFPanel::PopulateGridWidget()
   //get access to the property that turns on/off each grid
   vtkSMStringVectorProperty* EnableProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("EnableGrid"));
+      this->proxy()->GetProperty("EnableGrid"));
 
   //ask the reader for the list of available Xdmf grid names
-  this->proxy()->getProxy()->UpdatePropertyInformation();
+  this->proxy()->UpdatePropertyInformation();
   vtkSMStringVectorProperty* GetNamesProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("GetGridName"));
+      this->proxy()->GetProperty("GetGridName"));
 
   //add each name to the widget and the Domain, and enable each one
   int numNames = GetNamesProperty->GetNumberOfElements();
@@ -226,7 +226,7 @@ void pqXDMFPanel::PopulateGridWidget()
 
     EnableProperty->SetElement(0, name); //enable on proxy
     EnableProperty->Modified();
-    this->proxy()->getProxy()->UpdateVTKObjects();
+    this->proxy()->UpdateVTKObjects();
     }
 
   //whenever grid changes, update the available arrays
@@ -260,23 +260,23 @@ void pqXDMFPanel::ResetArrays()
     if (mem.CorP == 0)
       {
       registeredProperty =
-        this->proxy()->getProxy()->GetProperty("CellArrayStatus");
+        this->proxy()->GetProperty("CellArrayStatus");
       }
     else
       {
       registeredProperty =
-        this->proxy()->getProxy()->GetProperty("PointArrayStatus");
+        this->proxy()->GetProperty("PointArrayStatus");
       }
     this->propertyManager()->unregisterLink(item, 
                                             "checked", 
                                             SIGNAL(checkedStateChanged(bool)),
-                                            this->proxy()->getProxy(), 
+                                            this->proxy(), 
                                             registeredProperty, 
                                             mem.location);
     }
 
   //tell the servermanager to read what arrays the server has now
-  this->proxy()->getProxy()->UpdatePropertyInformation();
+  this->proxy()->UpdatePropertyInformation();
 
   //now copy the names and enabled status for the arrays
   //from the input property to the output property
@@ -285,10 +285,10 @@ void pqXDMFPanel::ResetArrays()
   vtkSMArraySelectionDomain* ODomain;
   
   IProperty = vtkSMStringVectorProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("PointArrayInfo")
+    this->proxy()->GetProperty("PointArrayInfo")
     );
   OProperty = vtkSMStringVectorProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("PointArrayStatus")
+    this->proxy()->GetProperty("PointArrayStatus")
     );
   ODomain = vtkSMArraySelectionDomain::SafeDownCast(
     OProperty->GetDomain("array_list")
@@ -299,10 +299,10 @@ void pqXDMFPanel::ResetArrays()
 
 
   IProperty = vtkSMStringVectorProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("CellArrayInfo")
+    this->proxy()->GetProperty("CellArrayInfo")
     );
   OProperty = vtkSMStringVectorProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("CellArrayStatus")
+    this->proxy()->GetProperty("CellArrayStatus")
     );
   ODomain = vtkSMArraySelectionDomain::SafeDownCast(
     OProperty->GetDomain("array_list")
@@ -331,13 +331,13 @@ void pqXDMFPanel::PopulateArrayWidget()
   QList<QString> strs;
   QString varName;
 
-  this->proxy()->getProxy()->UpdatePropertyInformation();
+  this->proxy()->UpdatePropertyInformation();
 
   // do the cell variables
   // uses the input domain and output status to create widgets for each cell
   // array
   vtkSMProperty* CellProperty = 
-    this->proxy()->getProxy()->GetProperty("CellArrayStatus");
+    this->proxy()->GetProperty("CellArrayStatus");
   QList<QVariant> CellDomain;
   CellDomain = pqSMAdaptor::getSelectionPropertyDomain(CellProperty);
   int j;
@@ -353,11 +353,11 @@ void pqXDMFPanel::PopulateArrayWidget()
     this->propertyManager()->registerLink(item, 
                                       "checked", 
                                       SIGNAL(checkedStateChanged(bool)),
-                                      this->proxy()->getProxy(), CellProperty, j);
+                                      this->proxy(), CellProperty, j);
     }
 
   // do the node variables
-  vtkSMProperty* NodeProperty = this->proxy()->getProxy()->GetProperty("PointArrayStatus");
+  vtkSMProperty* NodeProperty = this->proxy()->GetProperty("PointArrayStatus");
   QList<QVariant> PointDomain;
   PointDomain = pqSMAdaptor::getSelectionPropertyDomain(NodeProperty);
   for(j=0; j<PointDomain.size(); j++)
@@ -372,7 +372,7 @@ void pqXDMFPanel::PopulateArrayWidget()
     this->propertyManager()->registerLink(item, 
                                       "checked", 
                                       SIGNAL(checkedStateChanged(bool)),
-                                      this->proxy()->getProxy(), NodeProperty, j);
+                                      this->proxy(), NodeProperty, j);
     }
 }
 
@@ -382,10 +382,10 @@ void pqXDMFPanel::PopulateParameterWidget()
   QTableWidget* paramsContainer = this->UI->Parameters;
 
   //ask the reader for the list of available Xdmf parameters
-  this->proxy()->getProxy()->UpdatePropertyInformation();
+  this->proxy()->UpdatePropertyInformation();
   vtkSMStringVectorProperty* GetParameterProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("ParametersInfo"));
+      this->proxy()->GetProperty("ParametersInfo"));
 
   int numParameter = GetParameterProperty->GetNumberOfElements();
   paramsContainer->setRowCount(numParameter/5);
@@ -459,9 +459,9 @@ void pqXDMFPanel::SetSelectedDomain(QString newDomain)
   //get access to the property that lets us pick the domain
   vtkSMStringVectorProperty* SetNameProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("SetDomainName"));
+      this->proxy()->GetProperty("SetDomainName"));
   SetNameProperty->SetElement(0, newDomain.toAscii());
-  this->proxy()->getProxy()->UpdateVTKObjects();
+  this->proxy()->UpdateVTKObjects();
 
   //when domain changes, update the available grids
   this->PopulateGridWidget();
@@ -501,21 +501,21 @@ void pqXDMFPanel::SetSelectedGrids()
   //turn off all grids so we can enable only those selected in the gui
   vtkSMProperty* DisableProperty = 
     vtkSMProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("DisableAllGrids"));
+      this->proxy()->GetProperty("DisableAllGrids"));
   DisableProperty->Modified();
-  this->proxy()->getProxy()->UpdateVTKObjects();
+  this->proxy()->UpdateVTKObjects();
   
   //get access to the property that lets us turn on grids
   vtkSMStringVectorProperty* EnableProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("EnableGrid"));
+      this->proxy()->GetProperty("EnableGrid"));
 
   for (int i = 0; i < selections.size(); i++)
     {
     const char *namestr = ((selections.at(i))->text()).toAscii();
     EnableProperty->SetElement(0, namestr);
     EnableProperty->Modified();
-    this->proxy()->getProxy()->UpdateVTKObjects();
+    this->proxy()->UpdateVTKObjects();
     }
   
   //whenever grid changes, update the available arrays
@@ -535,11 +535,11 @@ void pqXDMFPanel::SetCellValue(int row)
 
   vtkSMStringVectorProperty* SetParameterProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("ParameterIndex"));
+      this->proxy()->GetProperty("ParameterIndex"));
 
   vtkSMStringVectorProperty* GetParameterProperty = 
     vtkSMStringVectorProperty::SafeDownCast(
-      this->proxy()->getProxy()->GetProperty("ParametersInfo"));
+      this->proxy()->GetProperty("ParametersInfo"));
 
   char valS[20];
   sprintf(valS, "%d", value);
@@ -559,6 +559,6 @@ void pqXDMFPanel::SetCellValue(int row)
       }
 
     }
-  this->proxy()->getProxy()->UpdateVTKObjects();
+  this->proxy()->UpdateVTKObjects();
   this->modified();
 }

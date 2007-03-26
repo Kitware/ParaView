@@ -32,9 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pq3DWidget_h
 #define __pq3DWidget_h
 
-#include <QWidget>
 #include "pqComponentsExport.h"
-#include "pqSMProxy.h"
+#include "pqProxyPanel.h"
 
 class vtkPVXMLElement;
 class vtkSMProperty;
@@ -46,7 +45,7 @@ class pq3DWidgetInternal;
 /// pq3DWidget is the abstract superclass for all 3D widgets.
 /// This class represents a 3D Widget proxy as well as the GUI for the
 /// widget.
-class PQCOMPONENTS_EXPORT pq3DWidget : public QWidget
+class PQCOMPONENTS_EXPORT pq3DWidget : public pqProxyPanel
 {
   Q_OBJECT
 
@@ -61,10 +60,6 @@ public:
   // created 3D widgets, it's the responsibility of the caller
   // to do the memory management for the 3D widgets.
   static QList<pq3DWidget*> createWidgets(pqProxy*, vtkSMProxy* proxy);
-
-  /// Reference proxy is a proxy which is used to determine the bounds
-  /// for the 3D widget.
-  pqProxy* getReferenceProxy() const;
 
   /// Controlled proxy is a proxy which is controlled by the 3D widget.
   /// A controlled proxy must provide "Hints" describing how
@@ -86,17 +81,12 @@ public:
   /// Note: this *does not* indicate that the 3D widget is currently visible
   /// in the display, since this widget's panel might not be visible.
   bool widgetVisible() const;
-  
-  /// Get the render module that this widget works with
-  pqRenderViewModule* getRenderModule() const;
 
 signals:
   /// Notifies observers that widget visibility has changed
   void widgetVisibilityChanged(bool);
   /// Notifies observers that the user is dragging the 3D widget
   void widgetStartInteraction();
-  /// Notifies observers that the widget has been modified
-  void widgetChanged();
   /// Notifies observers that the user is done dragging the 3D widget
   void widgetEndInteraction();
 
@@ -122,7 +112,7 @@ public slots:
   virtual void accept();
 
   /// Resets pending changes. Default implementation
-  /// pushes the property values of the controlled widget to the 
+  /// pushes the property values of the controlled widget to the
   /// 3D widget properties.
   /// The correspondence is determined from the <Hints />
   /// associated with the controlled proxy.

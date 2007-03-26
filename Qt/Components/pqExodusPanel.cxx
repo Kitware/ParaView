@@ -72,7 +72,7 @@ public:
     // items in the hierarchy view).
     vtkSMProxyManager* pm = vtkSMProxy::GetProxyManager();
     ExodusHelper.TakeReference(pm->NewProxy("misc", "ExodusReaderHelper"));
-    p->proxy()->getProxy()->CopyIDs(ExodusHelper);
+    p->proxy()->CopyIDs(ExodusHelper);
   }
   vtkSmartPointer<vtkSMProxy> ExodusHelper;
   QVector<double> TimestepValues;
@@ -92,7 +92,7 @@ pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
                    SIGNAL(canAcceptOrReject(bool)),
                    this, SLOT(propertyChanged()));
 
-  this->UI->XMLFileName->setServer(this->proxy()->getServer());
+  this->UI->XMLFileName->setServer(this->referenceProxy()->getServer());
   
   this->DataUpdateInProgress = false;
   
@@ -132,8 +132,8 @@ void pqExodusPanel::linkServerManagerProperties()
     this,
     "displayType", 
     SIGNAL(displayTypeChanged()),
-    this->proxy()->getProxy(), 
-    this->proxy()->getProxy()->GetProperty("DisplayType"));
+    this->proxy(), 
+    this->proxy()->GetProperty("DisplayType"));
 
   this->DisplItem = 0;
 
@@ -158,8 +158,8 @@ void pqExodusPanel::linkServerManagerProperties()
   this->propertyManager()->registerLink(item, 
                       "checked", 
                       SIGNAL(checkedStateChanged(bool)),
-                      this->proxy()->getProxy(), 
-                      this->proxy()->getProxy()->GetProperty("GenerateBlockIdCellArray"));
+                      this->proxy(), 
+                      this->proxy()->GetProperty("GenerateBlockIdCellArray"));
   
   varName = "Global Element Ids";
   strs.clear();
@@ -170,11 +170,11 @@ void pqExodusPanel::linkServerManagerProperties()
   this->propertyManager()->registerLink(item, 
                     "checked", 
                     SIGNAL(checkedStateChanged(bool)),
-                    this->proxy()->getProxy(), 
-                    this->proxy()->getProxy()->GetProperty("GenerateGlobalElementIdArray"));
+                    this->proxy(), 
+                    this->proxy()->GetProperty("GenerateGlobalElementIdArray"));
   
   // do the cell variables
-  vtkSMProperty* CellProperty = this->proxy()->getProxy()->GetProperty("CellArrayStatus");
+  vtkSMProperty* CellProperty = this->proxy()->GetProperty("CellArrayStatus");
   QList<QVariant> CellDomain;
   CellDomain = pqSMAdaptor::getSelectionPropertyDomain(CellProperty);
   int j;
@@ -189,7 +189,7 @@ void pqExodusPanel::linkServerManagerProperties()
     this->propertyManager()->registerLink(item, 
                                       "checked", 
                                       SIGNAL(checkedStateChanged(bool)),
-                                      this->proxy()->getProxy(), CellProperty, j);
+                                      this->proxy(), CellProperty, j);
     }
   
   
@@ -203,11 +203,11 @@ void pqExodusPanel::linkServerManagerProperties()
   this->propertyManager()->registerLink(item, 
                     "checked", 
                     SIGNAL(checkedStateChanged(bool)),
-                    this->proxy()->getProxy(), 
-                    this->proxy()->getProxy()->GetProperty("GenerateGlobalNodeIdArray"));
+                    this->proxy(), 
+                    this->proxy()->GetProperty("GenerateGlobalNodeIdArray"));
 
   // do the node variables
-  vtkSMProperty* NodeProperty = this->proxy()->getProxy()->GetProperty("PointArrayStatus");
+  vtkSMProperty* NodeProperty = this->proxy()->GetProperty("PointArrayStatus");
   QList<QVariant> PointDomain;
   PointDomain = pqSMAdaptor::getSelectionPropertyDomain(NodeProperty);
 
@@ -222,7 +222,7 @@ void pqExodusPanel::linkServerManagerProperties()
     this->propertyManager()->registerLink(item, 
                                       "checked", 
                                       SIGNAL(checkedStateChanged(bool)),
-                                      this->proxy()->getProxy(), NodeProperty, j);
+                                      this->proxy(), NodeProperty, j);
 
     if(PointDomain[j].toString() == "DISPL")
       {
@@ -257,7 +257,7 @@ void pqExodusPanel::linkServerManagerProperties()
   new pqTreeWidgetCheckHelper(SetsTree, 0, this);
 
   // do the sidesets
-  vtkSMProperty* SideProperty = this->proxy()->getProxy()->GetProperty("SideSetArrayStatus");
+  vtkSMProperty* SideProperty = this->proxy()->GetProperty("SideSetArrayStatus");
   QList<QVariant> SideDomain;
   SideDomain = pqSMAdaptor::getSelectionPropertyDomain(SideProperty);
   for(j=0; j<SideDomain.size(); j++)
@@ -271,11 +271,11 @@ void pqExodusPanel::linkServerManagerProperties()
     this->propertyManager()->registerLink(item, 
                                       "checked", 
                                       SIGNAL(checkedStateChanged(bool)),
-                                      this->proxy()->getProxy(), SideProperty, j);
+                                      this->proxy(), SideProperty, j);
     }
   
   // do the nodesets
-  vtkSMProperty* NSProperty = this->proxy()->getProxy()->GetProperty("NodeSetArrayStatus");
+  vtkSMProperty* NSProperty = this->proxy()->GetProperty("NodeSetArrayStatus");
   QList<QVariant> NSDomain;
   NSDomain = pqSMAdaptor::getSelectionPropertyDomain(NSProperty);
   for(j=0; j<NSDomain.size(); j++)
@@ -289,7 +289,7 @@ void pqExodusPanel::linkServerManagerProperties()
     this->propertyManager()->registerLink(item, 
                                       "checked", 
                                       SIGNAL(checkedStateChanged(bool)),
-                                      this->proxy()->getProxy(), NSProperty, j);
+                                      this->proxy(), NSProperty, j);
     }
 
   // update ranges to begin with
@@ -334,7 +334,7 @@ void pqExodusPanel::linkServerManagerProperties()
   // on initialization, it has the actual time steps in the data.  Store the
   // values now.
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-                      this->proxy()->getProxy()->GetProperty("TimestepValues"));
+                      this->proxy()->GetProperty("TimestepValues"));
   this->UI->TimestepValues.resize(dvp->GetNumberOfElements());
   qCopy(dvp->GetElements(), dvp->GetElements()+dvp->GetNumberOfElements(),
         this->UI->TimestepValues.begin());
@@ -343,9 +343,9 @@ void pqExodusPanel::linkServerManagerProperties()
   this->propertyManager()->registerLink(this->UI->HasModeShapes,
                                         "checked",
                                         SIGNAL(toggled(bool)),
-                                        this->proxy()->getProxy(),
-                                        this->proxy()->getProxy()
-                                        ->GetProperty("HasModeShapes"));
+                                        this->proxy(),
+                                        this->proxy()->
+                                        GetProperty("HasModeShapes"));
   this->UI->ModeSelectSlider->setMaximum(this->UI->TimestepValues.size()-1);
   if (this->UI->TimestepValues.size() > 0)
     {
@@ -355,8 +355,8 @@ void pqExodusPanel::linkServerManagerProperties()
   this->propertyManager()->registerLink(this->UI->ModeSelectSlider,
                                         "value",
                                         SIGNAL(valueChanged(int)),
-                                        this->proxy()->getProxy(),
-                                        this->proxy()->getProxy()
+                                        this->proxy(),
+                                        this->proxy()
                                         ->GetProperty("TimeStep"));
   QObject::connect(this->UI->ModeSelectSlider, SIGNAL(sliderMoved(int)),
                    this, SLOT(modeChanged(int)));
@@ -438,7 +438,7 @@ void pqExodusPanel::updateDataRanges()
   // update data information about loaded arrays
 
   vtkSMSourceProxy* sp =
-    vtkSMSourceProxy::SafeDownCast(this->proxy()->getProxy());
+    vtkSMSourceProxy::SafeDownCast(this->proxy());
   vtkPVDataSetAttributesInformation* pdi = 0;
   vtkPVDataSetAttributesInformation* cdi = 0;
   if (sp->GetNumberOfParts() > 0)
@@ -479,7 +479,7 @@ void pqExodusPanel::updateDataRanges()
   const int CellOffset = 2;
   
   // do the cell variables
-  vtkSMProperty* CellProperty = this->proxy()->getProxy()->GetProperty("CellArrayStatus");
+  vtkSMProperty* CellProperty = this->proxy()->GetProperty("CellArrayStatus");
   QList<QVariant> CellDomain;
   CellDomain = pqSMAdaptor::getSelectionPropertyDomain(CellProperty);
   int j;
@@ -511,7 +511,7 @@ void pqExodusPanel::updateDataRanges()
 
   const int PointOffset = 1;
   // do the node variables
-  vtkSMProperty* NodeProperty = this->proxy()->getProxy()->GetProperty("PointArrayStatus");
+  vtkSMProperty* NodeProperty = this->proxy()->GetProperty("PointArrayStatus");
   QList<QVariant> PointDomain;
   PointDomain = pqSMAdaptor::getSelectionPropertyDomain(NodeProperty);
 
@@ -546,7 +546,7 @@ void pqExodusPanel::reset()
   // push original values for block status back
   // onto the vtkExodusReader, as the ExodusHelper
   // might have played with them
-  vtkSMProxy* pxy = this->proxy()->getProxy();
+  vtkSMProxy* pxy = this->proxy();
   pxy->UpdateProperty("BlockArrayStatus", 1);
   pxy->UpdateProperty("MaterialArrayStatus", 1);
   pxy->UpdateProperty("HierarchyArrayStatus", 1);

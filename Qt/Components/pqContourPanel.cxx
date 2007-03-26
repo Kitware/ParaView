@@ -107,12 +107,12 @@ pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
 
   // Setup the sample scalar widget ...
   this->Implementation->SampleScalarWidget.setDataSources(
-    this->proxy()->getProxy(),
-    vtkSMDoubleVectorProperty::SafeDownCast(this->proxy()->getProxy()->GetProperty("ContourValues")),
-    this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
+    this->proxy(),
+    vtkSMDoubleVectorProperty::SafeDownCast(this->proxy()->GetProperty("ContourValues")),
+    this->proxy()->GetProperty("SelectInputScalars"));
     
   pqNamedWidgets::link(
-    &this->Implementation->ControlsContainer, this->proxy()->getProxy(), this->propertyManager());
+    &this->Implementation->ControlsContainer, this->proxy(), this->propertyManager());
 }
 
 pqContourPanel::~pqContourPanel()

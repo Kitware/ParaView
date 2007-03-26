@@ -85,8 +85,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pq3DWidget::pq3DWidget(pqProxy* o, vtkSMProxy* proxy, QWidget* _p) :
-  QWidget(_p),
+pq3DWidget::pq3DWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* _p) :
+  pqProxyPanel(o, pxy, _p),
   Internal(new pq3DWidgetInternal())
 {
   this->Internal->ControlledPropertiesObserver.TakeReference(
@@ -94,7 +94,7 @@ pq3DWidget::pq3DWidget(pqProxy* o, vtkSMProxy* proxy, QWidget* _p) :
       &pq3DWidget::onControlledPropertyChanged));
   this->Internal->IgnorePropertyChange = false;
 
-  this->setControlledProxy(proxy);
+  this->setControlledProxy(pxy);
   this->setReferenceProxy(o);
 }
 
@@ -107,11 +107,11 @@ pq3DWidget::~pq3DWidget()
 }
 
 //-----------------------------------------------------------------------------
-QList<pq3DWidget*> pq3DWidget::createWidgets(pqProxy* o, vtkSMProxy* proxy)
+QList<pq3DWidget*> pq3DWidget::createWidgets(pqProxy* o, vtkSMProxy* pxy)
 {
   QList<pq3DWidget*> widgets;
 
-  vtkPVXMLElement* hints = proxy->GetHints();
+  vtkPVXMLElement* hints = pxy->GetHints();
   unsigned int max = hints->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < max; cc++)
     {
@@ -122,23 +122,23 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(pqProxy* o, vtkSMProxy* proxy)
       pq3DWidget *widget = 0;
       if (widgetType == "Plane")
         {
-        widget = new pqImplicitPlaneWidget(o, proxy, 0);
+        widget = new pqImplicitPlaneWidget(o, pxy, 0);
         }
       else if (widgetType == "Handle")
         {
-        widget = new pqHandleWidget(o, proxy, 0);
+        widget = new pqHandleWidget(o, pxy, 0);
         }
       else if (widgetType == "PointSource")
         {
-        widget = new pqPointSourceWidget(o, proxy, 0);
+        widget = new pqPointSourceWidget(o, pxy, 0);
         }
       else if (widgetType == "LineSource")
         {
-        widget = new pqLineSourceWidget(o, proxy, 0);
+        widget = new pqLineSourceWidget(o, pxy, 0);
         }
       else if (widgetType == "Line")
         {
-        widget = new pqLineWidget(o, proxy, 0);
+        widget = new pqLineWidget(o, pxy, 0);
         }
 
       if (widget)
@@ -187,17 +187,11 @@ void pq3DWidget::setRenderModule(pqRenderViewModule* renModule)
 }
 
 //-----------------------------------------------------------------------------
-pqRenderViewModule* pq3DWidget::getRenderModule() const
-{
-  return this->Internal->RenderModule;
-}
-
-//-----------------------------------------------------------------------------
 void pq3DWidget::render()
 {
-  if (this->getRenderModule())
+  if (this->renderModule())
     {
-    this->getRenderModule()->render();
+    this->renderModule()->render();
     }
 }
 
@@ -214,7 +208,7 @@ void pq3DWidget::onControlledPropertyChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setWidgetProxy(vtkSMNew3DWidgetProxy* proxy)
+void pq3DWidget::setWidgetProxy(vtkSMNew3DWidgetProxy* pxy)
 {
  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
 
@@ -226,9 +220,9 @@ void pq3DWidget::setWidgetProxy(vtkSMNew3DWidgetProxy* proxy)
     this->Internal->RenderModule->getRenderModuleProxy()->RemoveDisplay(widget);
     this->Internal->RenderModule->render();
     }
-  this->Internal->WidgetProxy = proxy;
+  this->Internal->WidgetProxy = pxy;
 
-  if (this->Internal->RenderModule && proxy)
+  if (this->Internal->RenderModule && pxy)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
@@ -245,19 +239,19 @@ vtkSMNew3DWidgetProxy* pq3DWidget::getWidgetProxy() const
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setReferenceProxy(pqProxy* proxy)
+void pq3DWidget::setReferenceProxy(pqProxy* pxy)
 {
-  this->Internal->ReferenceProxy = proxy;
+  this->Internal->ReferenceProxy = pxy;
 }
 
 //-----------------------------------------------------------------------------
-pqProxy* pq3DWidget::getReferenceProxy() const
+vtkSMProxy* pq3DWidget::getControlledProxy() const
 {
-  return this->Internal->ReferenceProxy;
+  return this->proxy();
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setControlledProxy(vtkSMProxy* proxy)
+void pq3DWidget::setControlledProxy(vtkSMProxy* pxy)
 {
   foreach(vtkSMProperty* controlledProperty, this->Internal->PropertyMap)
     {
@@ -266,7 +260,7 @@ void pq3DWidget::setControlledProxy(vtkSMProxy* proxy)
     }
   this->Internal->PropertyMap.clear();
 
-  this->Internal->ControlledProxy = proxy;
+  this->Internal->ControlledProxy = pxy;
 }
 
 //-----------------------------------------------------------------------------
@@ -284,7 +278,7 @@ void pq3DWidget::setHints(vtkPVXMLElement* hints)
     return;
     }
 
-  if (!this->getControlledProxy())
+  if (!this->proxy())
     {
     qDebug() << "pq3DWidget::setHints must be called only after the controlled "
       << "proxy has been set.";
@@ -296,7 +290,7 @@ void pq3DWidget::setHints(vtkPVXMLElement* hints)
     return;
     }
 
-  vtkSMProxy* proxy = this->getControlledProxy();
+  vtkSMProxy* pxy = this->proxy();
   unsigned int max = hints->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < max; cc++)
     {
@@ -305,15 +299,9 @@ void pq3DWidget::setHints(vtkPVXMLElement* hints)
       {
       vtkPVXMLElement* propElem = hints->GetNestedElement(i);
       this->setControlledProperty(propElem->GetAttribute("function"),
-        proxy->GetProperty(propElem->GetAttribute("name")));
+        pxy->GetProperty(propElem->GetAttribute("name")));
       }
     }
-}
-
-//-----------------------------------------------------------------------------
-vtkSMProxy* pq3DWidget::getControlledProxy() const
-{
-  return this->Internal->ControlledProxy;
 }
 
 //-----------------------------------------------------------------------------
@@ -436,11 +424,11 @@ void pq3DWidget::hideWidget()
 //-----------------------------------------------------------------------------
 int pq3DWidget::getReferenceInputBounds(double bounds[6]) const
 {
-  if (!this->getReferenceProxy())
+  if (!this->referenceProxy())
     {
     return 0;
     }
-  vtkSMProxy* refProxy = this->getReferenceProxy()->getProxy();
+  vtkSMProxy* refProxy = this->referenceProxy()->getProxy();
   vtkSMProperty* input_prop = refProxy->GetProperty("Input");
   if (!input_prop)
     {

@@ -75,7 +75,7 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
   vtkSMProxy* controlled_proxy = NULL;
    
   if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy()->getProxy()->GetProperty("ClipFunction")))
+    this->proxy()->GetProperty("ClipFunction")))
     {
     if (clip_function_property->GetNumberOfProxies() == 0)
       {
@@ -84,7 +84,7 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
       if (pld)
         {
         clip_function_property->AddProxy(pld->GetProxy(0));
-        this->proxy()->getProxy()->UpdateVTKObjects();
+        this->proxy()->UpdateVTKObjects();
         }
       }
     controlled_proxy = clip_function_property->GetProxy(0);
@@ -93,7 +93,7 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
     }
   
   this->Implementation->ImplicitPlaneWidget =
-    new pqImplicitPlaneWidget(this->proxy(), controlled_proxy, NULL);
+    new pqImplicitPlaneWidget(this->referenceProxy(), controlled_proxy, NULL);
 
   pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
   group1->setTitle(tr("Clip"));
@@ -115,7 +115,9 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
                    this->Implementation->ImplicitPlaneWidget,
                    SLOT(setRenderModule(pqRenderViewModule*)));
 
-  connect(this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onWidgetChanged()));
+  connect(this->Implementation->ImplicitPlaneWidget,
+          SIGNAL(canAcceptOrReject(bool)),
+          this, SLOT(onWidgetChanged()));
   connect(this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
   connect(this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
 
@@ -139,8 +141,8 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
 
   this->propertyManager()->registerLink(
     &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
-    this->proxy()->getProxy(), 
-    this->proxy()->getProxy()->GetProperty("InsideOut"));
+    this->proxy(), 
+    this->proxy()->GetProperty("InsideOut"));
 }
 
 pqClipPanel::~pqClipPanel()

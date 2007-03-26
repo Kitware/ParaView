@@ -265,7 +265,7 @@ pqRenderViewModule* pqObjectInspectorWidget::getRenderModule()
 void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
 {
   // do nothing if this proxy is already current
-  if(this->CurrentPanel && (this->CurrentPanel->proxy() == proxy))
+  if(this->CurrentPanel && (this->CurrentPanel->referenceProxy() == proxy))
     {
     return;
     }
@@ -289,7 +289,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     if(this->CurrentPanel)
       {
       // QueuedPanels keeps track of all modified panels.
-      this->QueuedPanels.insert(this->CurrentPanel->proxy(),
+      this->QueuedPanels.insert(this->CurrentPanel->referenceProxy(),
         this->CurrentPanel);
       }
     }
@@ -453,7 +453,7 @@ void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
     this->QueuedPanels.erase(iter);
     }
 
-  if(this->CurrentPanel && (this->CurrentPanel->proxy() == proxy))
+  if(this->CurrentPanel && (this->CurrentPanel->referenceProxy() == proxy))
     {
     this->CurrentPanel = NULL;
     }
@@ -468,10 +468,10 @@ void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
 
 void pqObjectInspectorWidget::deleteProxy()
 {
-  if (this->CurrentPanel && this->CurrentPanel->proxy())
+  if (this->CurrentPanel && this->CurrentPanel->referenceProxy())
     {
     pqPipelineSource* source =
-      qobject_cast<pqPipelineSource*>(this->CurrentPanel->proxy());
+      qobject_cast<pqPipelineSource*>(this->CurrentPanel->referenceProxy());
 
     pqApplicationCore* core = pqApplicationCore::instance();
     pqUndoStack* us = core->getUndoStack();
@@ -497,7 +497,7 @@ void pqObjectInspectorWidget::setDeleteButtonVisibility(bool visible)
 void pqObjectInspectorWidget::handleConnectionChanged(pqPipelineSource* in,
     pqPipelineSource*)
 {
-  if(this->CurrentPanel && this->CurrentPanel->proxy() == in)
+  if(this->CurrentPanel && this->CurrentPanel->referenceProxy() == in)
     {
     this->updateDeleteButtonState();
     }
@@ -508,7 +508,7 @@ void pqObjectInspectorWidget::updateDeleteButtonState()
   pqPipelineSource *source = 0;
   if(this->CurrentPanel)
     {
-    source = dynamic_cast<pqPipelineSource *>(this->CurrentPanel->proxy());
+    source = dynamic_cast<pqPipelineSource *>(this->CurrentPanel->referenceProxy());
     }
 
   this->DeleteButton->setEnabled(source && source->getNumberOfConsumers() == 0);

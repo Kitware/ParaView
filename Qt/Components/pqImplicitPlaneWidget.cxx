@@ -140,12 +140,12 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(pqProxy* o, vtkSMProxy* pxy, QWidge
     SIGNAL(clicked()), this, SLOT(onUseCenterBounds()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SIGNAL(widgetChanged()));
+    this, SLOT(modified()));
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(render()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
-    this, SIGNAL(widgetChanged()));
+    this, SLOT(modified()));
   
   
   this->createWidget(o->getServer());
@@ -414,9 +414,9 @@ void pqImplicitPlaneWidget::resetBounds()
       origin->SetElements(input_origin);
       }
     widget->UpdateProperty("Origin");
-    if(this->getRenderModule())
+    if(this->renderModule())
       {
-      this->getRenderModule()->render();
+      this->renderModule()->render();
       }
     }
 }
@@ -441,7 +441,7 @@ void pqImplicitPlaneWidget::onUseCenterBounds()
     {
     if(vtkSMProxyProperty* const input_property =
       vtkSMProxyProperty::SafeDownCast(
-        this->getReferenceProxy()->getProxy()->GetProperty("Input")))
+        this->proxy()->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
         input_property->GetProxy(0)))
@@ -460,9 +460,9 @@ void pqImplicitPlaneWidget::onUseCenterBounds()
           {
           origin->SetElements(input_origin);
           widget->UpdateVTKObjects();
-          if(this->getRenderModule())
+          if(this->renderModule())
             {
-            this->getRenderModule()->render();
+            this->renderModule()->render();
             }
           }
         }
@@ -481,9 +481,9 @@ void pqImplicitPlaneWidget::onUseXNormal()
       {
       normal->SetElements3(1, 0, 0);
       widget->UpdateVTKObjects();
-      if(this->getRenderModule())
+      if(this->renderModule())
         {
-        this->getRenderModule()->render();
+        this->renderModule()->render();
         }
       }
     }
@@ -500,9 +500,9 @@ void pqImplicitPlaneWidget::onUseYNormal()
       {
       normal->SetElements3(0, 1, 0);
       widget->UpdateVTKObjects();
-      if(this->getRenderModule())
+      if(this->renderModule())
         {
-        this->getRenderModule()->render();
+        this->renderModule()->render();
         }
       }
     }
@@ -519,9 +519,9 @@ void pqImplicitPlaneWidget::onUseZNormal()
       {
       normal->SetElements3(0, 0, 1);
       widget->UpdateVTKObjects();
-      if(this->getRenderModule())
+      if(this->renderModule())
         {
-        this->getRenderModule()->render();
+        this->renderModule()->render();
         }
       }
     }
@@ -532,7 +532,7 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
   vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
   if(widget)
     {
-    if(vtkCamera* const camera = this->getRenderModule()->getRenderModuleProxy()->GetRenderer()->GetActiveCamera())
+    if(vtkCamera* const camera = this->renderModule()->getRenderModuleProxy()->GetRenderer()->GetActiveCamera())
       {
       if(vtkSMDoubleVectorProperty* const normal =
         vtkSMDoubleVectorProperty::SafeDownCast(
@@ -544,9 +544,9 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
           -camera_normal[0], -camera_normal[1], -camera_normal[2]);
         
         widget->UpdateVTKObjects();
-        if(this->getRenderModule())
+        if(this->renderModule())
           {
-          this->getRenderModule()->render();
+          this->renderModule()->render();
           }
         }
       }
