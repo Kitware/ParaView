@@ -1,135 +1,98 @@
 <ParaViewFilters>
-  <CategoryGroup>
-    <Category name="Favorites" menuName="&amp;Favorites">
-      <Filter name="Clip" />
-      <Filter name="Cut" />
-      <Filter name="Glyph" />
-      <Filter name="TubeFilter" />
-    </Category>
-  </CategoryGroup>
-  <CategoryGroup>
-    <Category name="Thermal">
-      <Filter name="Contour" />
-      <Filter name="StreamTracer" />
-    </Category>
-  </CategoryGroup>
-  <CategoryGroup>
-    <Category name="CTH/AMR/MultiBlock">
-      <Filter name="CTHPart" />
-      <Filter name="OctreeDepthScalars" />
-      <Filter name="GroupDataSets" />
-      <Filter name="GroupIdScalars" />
-      <Filter name="ExtractLevel" />
-    </Category>
-    <Category name="Geometric Operations">
-      <Filter name="CellCenters" />
-      <Filter name="CellDataToPointData" />
-      <Filter name="Contour" />
-      <Filter name="Curvatures" />
-      <Filter name="DataSetSurfaceFilter" />
-      <Filter name="DataSetTriangleFilter" />
-      <Filter name="DecimatePro" />
-      <Filter name="Delaunay2D" />
-      <Filter name="ElevationFilter" />
-      <Filter name="LinearExtrusionFilter" />
-      <Filter name="PointDataToCellData" />
-      <Filter name="ReflectionFilter" />
-      <Filter name="RotationalExtrusionFilter" />
-      <Filter name="ShrinkFilter" />
-      <Filter name="Stripper" />
-      <Filter name="TransformFilter" />
-      <Filter name="TriangleFilter" />
-      <Filter name="WarpScalar" />
-      <Filter name="WarpVector" />
-    </Category>
-    <Category name="Generic">
-      <Filter name="GenericClip" />
-      <Filter name="GenericContour" />
-      <Filter name="GenericCut" />
-      <Filter name="GenericGeometryFilter" />
-      <Filter name="GenericOutlineFilter" />
-      <Filter name="GenericStreamTracer" />
-    </Category>
-    <Category name="Group">
-      <Filter name="Append" />
-      <Filter name="AppendPolyData" />
-      <Filter name="AttributeEditor" />
-      <Filter name="GroupDataSets" />
-      <Filter name="GroupIdScalars" />
-    </Category>
-    <Category name="Higher Order">
-      <Filter name="Tessellator" />
-      <Filter name="TessellatorFilter" />
-    </Category>
-    <Category name="Image">
-      <Filter name="ImageClip" />
-      <Filter name="ImageShrink" />
-    </Category>
-    <Category name="Load Balance">
-      <Filter name="AllToN" />
-      <Filter name="Balance" />
-      <Filter name="D3" />
-    </Category>
-    <Category name="Make Pretty">
-      <Filter name="CleanPolyData" />
-      <Filter name="CleanUnstructuredGrid" />
-      <Filter name="FeatureEdges" />
-      <Filter name="LoopSubdivisionFilter" />
-      <Filter name="PolyDataNormals" />
-      <Filter name="RibbonFilter" />
-      <Filter name="SmoothPolyDataFilter" />
-      <Filter name="Subdivide" />
-      <Filter name="TubeFilter" />
-    </Category>
-    <Category name="Miscellaneous">
-      <Filter name="AppendAttributes" />
-      <Filter name="BrownianPoints" />
-      <Filter name="IntegrateAttributes" />
-      <Filter name="IntegrateFlowThroughSurface" />
-      <Filter name="Median" />
-      <Filter name="MeshQuality" />
-      <Filter name="ProcessIdScalars" />
-      <Filter name="PVConnectivityFilter" />
-      <Filter name="PythonScript" />
-    </Category>
-    <Category name="Outline">
-      <Filter name="OutlineCornerFilter" />
-      <Filter name="OutlineFilter" />
-      <Filter name="StructuredGridOutlineFilter" />
-    </Category>
-    <Category name="Quantitative">
-      <Filter name="Calculator" />
-      <Filter name="ExtractHistogram" />
-      <Filter name="Probe2" />
-      <Filter name="StreamTracer" />
-    </Category>
-    <Category name="Tensors" />
-    <Category name="Subset">
-      <Filter name="Clip" />
-      <Filter name="Cut" />
-      <Filter name="ExtractEdges" />
-      <Filter name="ExtractGrid" />
-      <Filter name="ExtractLevel" />
-      <Filter name="GeometryFilter" />
-      <Filter name="MaskPoints" />
-      <Filter name="QuadricClustering" />
-      <Filter name="Threshold" />
-    </Category>
-    <Category name="Vectors/Gradients">
-      <Filter name="Glyph" />
-      <Filter name="Gradient" />
-      <Filter name="GradientMagnitude" />
-      <Filter name="SurfaceVectors" />
-    </Category>
-    <Category name="Temporal">
-      <Filter name="TemporalCache" />
-      <Filter name="ParticleTracer" />
-    </Category>
-    <Category name="Test">
-      <Filter name="ExtractHistogram" />
-    </Category>
-  </CategoryGroup>
-  <CategoryGroup>
-    <Category name="Alphabetical" />
-  </CategoryGroup>
+  <Category name="Common" menu_label="&amp;Common">
+    <Filter name="Clip" icon=":/pqWidgets/Icons/pqClip24.png"/>
+    <Filter name="Cut" icon=":/pqWidgets/Icons/pqSlice24.png"/>
+    <Filter name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
+    <Filter name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
+    <Filter name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
+    <Filter name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid24.png"/>
+    <Filter name="Glyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
+    <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
+    <Filter name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
+    <Filter name="ExtractLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
+    <Filter name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
+  </Category>
+
+  <Filter name="Append" />
+  <Filter name="AppendAttributes" />
+  <Filter name="AppendPolyData" />
+  <Filter name="BrownianPoints" />
+  <Filter name="CTHPart" />
+  <Filter name="Calculator" />
+  <Filter name="CellCenters" />
+  <Filter name="CellDataToPointData" />
+  <Filter name="CleanPolyData" />
+  <Filter name="CleanUnstructuredGrid" />
+  <Filter name="Clip" />
+  <Filter name="Contour" />
+  <Filter name="Curvatures" />
+  <Filter name="Cut" />
+  <Filter name="D3" />
+  <Filter name="DataSetSurfaceFilter" />
+  <Filter name="DataSetTriangleFilter" />
+  <Filter name="DecimatePro" />
+  <Filter name="Delaunay2D" />
+  <Filter name="ElevationFilter" />
+  <Filter name="ExtractDataSets" />
+  <Filter name="ExtractEdges" />
+  <Filter name="ExtractGrid" />
+  <Filter name="ExtractHistogram" />
+  <Filter name="ExtractLevel" />
+  <Filter name="ExtractSelection" />
+  <Filter name="FeatureEdges" />
+  <Filter name="GenericClip" />
+  <Filter name="GenericContour" />
+  <Filter name="GenericCut" />
+  <Filter name="GenericGeometryFilter" />
+  <Filter name="GenericOutlineFilter" />
+  <Filter name="GenericStreamTracer" />
+  <Filter name="GenericTessellator" />
+  <Filter name="Glyph" />
+  <Filter name="Gradient" />
+  <Filter name="GradientMagnitude" />
+  <Filter name="GroupDataSets" />
+  <Filter name="GroupIdScalars" />
+  <Filter name="ImageClip" />
+  <Filter name="ImageShrink" />
+  <Filter name="IntegrateAttributes" />
+  <Filter name="IntegrateFlowThroughSurface" />
+  <Filter name="LinearExtrusionFilter" />
+  <Filter name="LoopSubdivisionFilter" />
+  <Filter name="MaskPoints" />
+  <Filter name="Median" />
+  <Filter name="MeshQuality" />
+  <Filter name="OctreeDepthLimit" />
+  <Filter name="OctreeDepthScalars" />
+  <Filter name="OutlineCornerFilter" />
+  <Filter name="OutlineFilter" />
+  <Filter name="PVConnectivityFilter" />
+  <Filter name="ParticleTracer" />
+  <Filter name="PointDataToCellData" />
+  <Filter name="PolyDataNormals" />
+  <Filter name="Probe" />
+  <Filter name="ProcessIdScalars" />
+  <Filter name="Programmable Filter" />
+  <Filter name="QuadricClustering" />
+  <Filter name="ReflectionFilter" />
+  <Filter name="RibbonFilter" />
+  <Filter name="RotationalExtrusionFilter" />
+  <Filter name="ShrinkFilter" />
+  <Filter name="SmoothPolyDataFilter" />
+  <Filter name="StreamTracer" />
+  <Filter name="Stripper" />
+  <Filter name="StructuredGridOutlineFilter" />
+  <Filter name="Subdivide" />
+  <Filter name="SurfaceVectors" />
+  <Filter name="TessellatorFilter" />
+  <Filter name="TextureMapToCylinder" />
+  <Filter name="TextureMapToPlane" />
+  <Filter name="TextureMapToSphere" />
+  <Filter name="Threshold" />
+  <Filter name="TransformFilter" />
+  <Filter name="TriangleFilter" />
+  <Filter name="TubeFilter" />
+  <Filter name="UnstructuredGradient" />
+  <Filter name="WarpScalar" />
+  <Filter name="WarpVector" />
+
 </ParaViewFilters>

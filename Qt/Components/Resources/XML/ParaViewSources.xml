@@ -1,0 +1,20 @@
+<ParaViewSources>
+  <Source name="ArrowSource" />
+  <Source name="Axes" />
+  <Source name="ConeSource" />
+  <Source name="CubeSource" />
+  <Source name="CylinderSource" />
+  <Source name="GlyphSource2D" />
+  <Source name="HierarchicalFractal" />
+  <Source name="ImageMandelbrotSource" />
+  <Source name="LineSource" />
+  <Source name="OctreeFractal" />
+  <Source name="OutlineSource" />
+  <Source name="PlaneSource" />
+  <Source name="PointSource" />
+  <Source name="RTAnalyticSource" />
+  <Source name="SphereSource" />
+  <Source name="SuperquadricSource" />
+  <Source name="TextSource" />
+  <Source name="VectorText" />
+</ParaViewSources>
