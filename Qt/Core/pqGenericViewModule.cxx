@@ -158,6 +158,21 @@ int pqGenericViewModule::getDisplayCount() const
 }
 
 //-----------------------------------------------------------------------------
+int pqGenericViewModule::getVisibleDisplayCount() const
+{
+  int count = 0;
+  for (int i=0; i<this->Internal->Displays.size(); i++)
+    {
+    pqDisplay *display = this->Internal->Displays[i];
+    if(display->isVisible())
+      {
+      count++;
+      }
+    }
+  return count;
+}
+
+//-----------------------------------------------------------------------------
 pqDisplay* pqGenericViewModule::getDisplay(int index) const
 {
   if(index >= 0 && index < this->Internal->Displays.size())

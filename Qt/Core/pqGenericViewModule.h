@@ -105,6 +105,9 @@ public:
   /// Gets the number of displays in the render module.
   int getDisplayCount() const;
 
+  // Gets the number of displays in this render module that are visible
+  int getVisibleDisplayCount() const;
+
   /// Gets the display for the specified index.
   pqDisplay* getDisplay(int index) const;
  

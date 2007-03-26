@@ -197,6 +197,18 @@ pqConsumerDisplay* pqDisplayPolicy::createPreferredDisplay(
   pqConsumerDisplay* display = 
     pqApplicationCore::instance()->getObjectBuilder()->
     createDataDisplay(source, view);
+
+  // If this is the only source displayed in the view, reset the camera to make sure its visible
+  if(view->getVisibleDisplayCount()==1)
+    {
+    pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(view);
+    if (ren)
+      {
+      ren->resetCamera();
+      ren->render();
+      }
+    }
+
   return display;
 }
 
@@ -211,31 +223,40 @@ pqConsumerDisplay* pqDisplayPolicy::setDisplayVisibility(
     }
 
   pqConsumerDisplay* display = source->getDisplay(view);
-  if (display)
-    {
-
-    // set the visibility.
-    display->setVisible(visible);
-    return display;
-    }
 
   if (!display && !visible)
     {
     // isn't visible already, nothing to change.
     return 0;
     }
-
-  // No display exists for this view.
-  // First check if the view exists. If not, we will create a "suitable" view.
-  if (!view)
+  else if(!display)
     {
-    view = this->getPreferredView(source, view);
+    // No display exists for this view.
+    // First check if the view exists. If not, we will create a "suitable" view.
+    if (!view)
+      {
+      view = this->getPreferredView(source, view);
+      }
+    if (view)
+      {
+      display = pqApplicationCore::instance()->getObjectBuilder()->
+        createDataDisplay(source, view);
+      }
     }
-  if (view)
+
+  display->setVisible(visible);
+
+  // If this is the only source displayed in the view, reset the camera to make sure its visible
+  // Only do so if a source is being turned ON. Otherwise when the next to last source is turned off, 
+  // the camera would be reset to fit the last remaining one which would be unexpected to the user (hence the conditional on "visible")
+  if(view->getVisibleDisplayCount()==1 && visible)
     {
-    display = pqApplicationCore::instance()->getObjectBuilder()->
-      createDataDisplay(source, view);
-    display->setVisible(visible);
+    pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(view);
+    if (ren)
+      {
+      ren->resetCamera();
+      ren->render();
+      }
     }
 
   return display;
