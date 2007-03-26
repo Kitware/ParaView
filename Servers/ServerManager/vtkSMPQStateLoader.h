@@ -49,10 +49,7 @@ public:
   void SetMultiViewRenderModuleProxy(vtkSMMultiViewRenderModuleProxy*);
 
   // Description:
-  // If this flag is set, for every request to create a render module, an available
-  // render module will be used. Off by default.
-  //vtkSetMacro(UseExistingRenderModules, int);
-  //vtkGetMacro(UseExistingRenderModules, int);
+  // For every request to create a render module, one from this list is used first, if possible
   void AddPreferredRenderModule(vtkSMRenderModuleProxy*);
   void RemovePreferredRenderModule(vtkSMRenderModuleProxy*);
   void ClearPreferredRenderModules();
