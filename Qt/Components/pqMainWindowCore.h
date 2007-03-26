@@ -272,10 +272,7 @@ public slots:
 
   // Have the main window handle all lookmark load signals (from the toolbar, inspector, browser)
   // Load a lookmark with the given name on the active server. 
-  // If no server is active, store the lookmark as the "current" lookmark and prompt the user.
   void onLoadLookmark(const QString &name);
-  // Load the "current" lookmark on the given server
-  void onLoadCurrentLookmark(pqServer *server);
 
   // Lookmark toolbar slots:
 
