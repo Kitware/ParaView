@@ -58,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QBuffer>
 
 //-----------------------------------------------------------------------------
-pqLookmarkModel::pqLookmarkModel(QString name, vtkPVXMLElement *state, QObject* _parent /*=null*/)
+pqLookmarkModel::pqLookmarkModel(QString name, const QString &state, QObject* _parent /*=null*/)
   : QObject(_parent)
 {
   this->Name = name;
@@ -93,11 +93,17 @@ void pqLookmarkModel::initializeState(vtkPVXMLElement *lookmark)
   this->Name = tempName;
   delete [] tempName;
 
-  this->State = lookmark->FindNestedElementByName("ServerManagerState");
-  if(!this->State)
+  vtkPVXMLElement *stateRoot = lookmark->FindNestedElementByName("ServerManagerState");
+  if(!stateRoot)
     {
     return;
     }
+  // convert state xml to a qstring
+  ostrstream stateStream;
+  stateRoot->PrintXML(stateStream, vtkIndent(0));
+  stateStream << ends;
+  stateStream.freeze();
+  this->State = stateStream.str();
 
   // OPTIONAL PROPERTIES: 
 
@@ -124,7 +130,7 @@ void pqLookmarkModel::initializeState(vtkPVXMLElement *lookmark)
 }
 
 
-vtkPVXMLElement* pqLookmarkModel::getState() const
+QString pqLookmarkModel::getState() const
 {
   return this->State;
 }
@@ -152,7 +158,7 @@ void pqLookmarkModel::setName(QString newName)
     }
 }
 
-void pqLookmarkModel::setState(vtkPVXMLElement *state)
+void pqLookmarkModel::setState(QString state)
 {
   this->State = state;
   emit this->modified(this);
@@ -242,11 +248,24 @@ void pqLookmarkModel::load(pqServer *server, QList<pqPipelineSource*> *sources, 
   if(pqLoader)
     {
     pqLoader->SetPreferredSources(sources);
+    pqLoader->SetRestoreCameraFlag(this->RestoreCamera);
     pqLoader->SetPipelineHierarchy(this->PipelineHierarchy);
     }
 
-  pqApplicationCore::instance()->loadState(this->State,server,loader);
+  // convert the stored state from a qstring to a vtkPVXMLElement
+  vtkPVXMLParser *parser = vtkPVXMLParser::New();
+  parser->Parse(this->State.toAscii().data());
+  vtkPVXMLElement *stateElement = parser->GetRootElement();
+  if(!stateElement)
+    {
+    qDebug() << "Could not parse lookmark's state.";
+    parser->Delete();
+    return;
+    }
 
+  pqApplicationCore::instance()->loadState(stateElement,server,loader);
+
+  parser->Delete();
   emit this->loaded(this);
 }
 
@@ -258,7 +277,19 @@ void pqLookmarkModel::saveState(vtkPVXMLElement *lookmark) const
   lookmark->AddAttribute("RestoreData", this->getRestoreDataFlag());
   lookmark->AddAttribute("RestoreCamera", this->getRestoreCameraFlag());
 
-  lookmark->AddNestedElement(this->State); 
+  // convert the stored state from a qstring to a vtkPVXMLElement
+  vtkPVXMLParser *parser = vtkPVXMLParser::New();
+  parser->Parse(this->State.toAscii().data());
+  vtkPVXMLElement *stateElement = parser->GetRootElement();
+  if(!stateElement)
+    {
+    qDebug() << "Could not parse lookmark's state.";
+    parser->Delete();
+    return;
+    }
+
+  lookmark->AddNestedElement(stateElement); 
+
   if(this->PipelineHierarchy) 
     {
     lookmark->AddNestedElement(this->PipelineHierarchy); 
@@ -285,5 +316,6 @@ void pqLookmarkModel::saveState(vtkPVXMLElement *lookmark) const
     iconElement->Delete();
     }
 
+  parser->Delete();
 }
 

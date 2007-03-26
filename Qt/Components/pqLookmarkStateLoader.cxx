@@ -61,12 +61,13 @@ public:
   int NumberOfLookmarkSources;
   QStandardItemModel *LookmarkPipelineModel;
   pqPipelineModel *PipelineModel;
+  bool RestoreCamera;
 };
 
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.4");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.5");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -75,6 +76,7 @@ pqLookmarkStateLoader::pqLookmarkStateLoader()
   this->Internal->PreferredSources = 0;
   this->Internal->LookmarkPipelineModel = 0;
   this->Internal->PipelineModel = 0;
+  this->Internal->RestoreCamera = false;
 
   pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
   this->Internal->PipelineModel = new pqPipelineModel(*model);
@@ -84,6 +86,12 @@ pqLookmarkStateLoader::pqLookmarkStateLoader()
 pqLookmarkStateLoader::~pqLookmarkStateLoader()
 {
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqLookmarkStateLoader::SetRestoreCameraFlag(bool state)
+{
+  this->Internal->RestoreCamera = state;
 }
 
 //-----------------------------------------------------------------------------
@@ -246,7 +254,8 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
     // If this is a source, don't load the state
     return 1;
     }
-  else if (strcmp(proxy->GetXMLGroup(), "rendermodules")==0 )
+  
+  if (strcmp(proxy->GetXMLGroup(), "rendermodules")==0 )
     {
     unsigned int max = proxyElement->GetNumberOfNestedElements();
     QList<vtkPVXMLElement*> toRemove;
@@ -256,7 +265,7 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
       name = element->GetAttribute("name");
       if (element->GetName() == QString("Property") &&
-         name.contains("Camera"))
+         name.contains("Camera") && !this->Internal->RestoreCamera)
         {
         toRemove.push_back(element);
         }

@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>312</width>
-    <height>231</height>
+    <height>282</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -269,7 +269,7 @@
      <property name="minimumSize" >
       <size>
        <width>0</width>
-       <height>24</height>
+       <height>18</height>
       </size>
      </property>
      <property name="frameShape" >
@@ -278,6 +278,27 @@
      <property name="frameShadow" >
       <enum>QFrame::Raised</enum>
      </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>0</number>
+      </property>
+      <property name="spacing" >
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="RestoreCamera" >
+        <property name="minimumSize" >
+         <size>
+          <width>0</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>Use Lookmark's camera settings</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -297,6 +318,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>pqFlatTreeView</class>
+   <extends>QAbstractScrollArea</extends>
+   <header>pqFlatTreeView.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QAbstractScrollArea</class>
    <extends>QWidget</extends>
    <header>qabstractscrollarea.h</header>
@@ -306,12 +333,6 @@
    <class>pqCollapsedGroup</class>
    <extends>QWidget</extends>
    <header>pqCollapsedGroup.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqFlatTreeView</class>
-   <extends>QAbstractScrollArea</extends>
-   <header>pqFlatTreeView.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

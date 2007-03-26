@@ -224,7 +224,7 @@ void pqLookmarkManagerModel::addLookmark(pqLookmarkModel *lookmark)
     qDebug() << "Lookmark requires a name.";
     return;
     }
-  if(!lookmark->getState())
+  if(lookmark->getState().isNull() || lookmark->getState().isEmpty())
     {
     qDebug() << "Lookmark requires server manager state.";
     return;

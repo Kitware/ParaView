@@ -89,9 +89,9 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget 
   //              SIGNAL(stateChanged(int)),
   //              SIGNAL(modified()));
 
-  //this->connect(this->Form->RestoreCamera, 
-  //              SIGNAL(stateChanged(int)),
-  //              SIGNAL(modified()));
+  this->connect(this->Form->RestoreCamera, 
+                SIGNAL(stateChanged(int)),
+                SIGNAL(modified()));
 
   this->connect(this->Form->LookmarkName, 
                 SIGNAL(textChanged(const QString &)),
@@ -164,7 +164,7 @@ void pqLookmarkInspector::save()
   this->CurrentLookmark->setName(this->Form->LookmarkName->text());
   this->CurrentLookmark->setDescription(this->Form->LookmarkComments->toPlainText());
   //this->CurrentLookmark->setRestoreDataFlag(this->Form->RestoreData->isChecked());
-  //this->CurrentLookmark->setRestoreCameraFlag(this->Form->RestoreCamera->isChecked());
+  this->CurrentLookmark->setRestoreCameraFlag(this->Form->RestoreCamera->isChecked());
 
   this->Form->SaveButton->setEnabled(false);
 }
@@ -216,7 +216,7 @@ void pqLookmarkInspector::onLookmarkSelectionChanged(const QStringList &selected
     this->generatePipelineView();
 
     //this->Form->RestoreData->setChecked(this->CurrentLookmark->getRestoreDataFlag());
-    //this->Form->RestoreCamera->setChecked(this->CurrentLookmark->getRestoreCameraFlag());
+    this->Form->RestoreCamera->setChecked(this->CurrentLookmark->getRestoreCameraFlag());
 
     this->Form->PropertiesFrame->show();
     //this->Form->ControlsFrame->show();

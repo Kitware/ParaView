@@ -69,7 +69,7 @@ public:
 
   // Only a name and server manager state are required to create a lookmark
   //pqLookmarkModel(QString name, QString state, QObject* parent=NULL);
-  pqLookmarkModel(QString name, vtkPVXMLElement *smState, QObject* parent=NULL);
+  pqLookmarkModel(QString name, const QString &state, QObject* parent=NULL);
   pqLookmarkModel(const pqLookmarkModel &other, QObject* parent=NULL);
   // Alternatively, a lookmark can be initialized from a <LookmarkDefinition> XML element
   pqLookmarkModel(vtkPVXMLElement *lmkState, QObject* parent=NULL);
@@ -81,7 +81,7 @@ public:
   QString getName()const {return this->Name;};
 
   // Get the server manager state stored as a qstring
-  vtkPVXMLElement *getState() const;
+  QString getState() const;
   
   // When this flag is set, the state of any readers and root sources of the pipeline will be loaded, 
   // otherwise the state loader will try to use existing ones
@@ -122,7 +122,7 @@ public slots:
   void setName(QString name);
 
   // Set the server manager state stored as an xml tree
-  void setState(vtkPVXMLElement *state);
+  void setState(QString state);
 
   // When this flag is set, the state of any readers and root sources of the pipeline will be loaded, 
   // otherwise the state loader will try to use existing ones
@@ -150,7 +150,7 @@ private:
   void initializeState(vtkPVXMLElement *state);
 
   QString Name;
-  vtkSmartPointer<vtkPVXMLElement> State;
+  QString State;
   bool RestoreData;
   bool RestoreCamera;
   QString Description;

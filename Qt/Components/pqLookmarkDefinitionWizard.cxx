@@ -80,12 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "assert.h"
 
-class pqLookmarkDefinitionWizardForm :
-    public Ui::pqLookmarkDefinitionWizard
-{
-public:
-  pqLookmarkManagerModel ListNames; ///< Used to make sure names are unique.
-};
+class pqLookmarkDefinitionWizardForm : public Ui::pqLookmarkDefinitionWizard{};
 
 
 pqLookmarkDefinitionWizard::pqLookmarkDefinitionWizard(pqLookmarkManagerModel *model,
@@ -316,8 +311,15 @@ void pqLookmarkDefinitionWizard::createLookmark()
     }
   childElement->Delete();
 
+  ostrstream stateString;
+  stateElement->PrintXML(stateString,vtkIndent(1));
+  stateString << ends;
+  stateString.freeze();
+
+  QString lmkState = stateString.str();
+
   // Create a lookmark with the given name, image, and state
-  pqLookmarkModel *lmkModel = new pqLookmarkModel(this->Form->LookmarkName->text(), stateElement);
+  pqLookmarkModel *lmkModel = new pqLookmarkModel(this->Form->LookmarkName->text(), lmkState);
   lmkModel->setDescription(this->Form->LookmarkComments->toPlainText());
   lmkModel->setIcon(image);
   //lmkModel->setPipelinePreview(pipeline);

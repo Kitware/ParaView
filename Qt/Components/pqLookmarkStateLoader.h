@@ -43,11 +43,9 @@ class pqPipelineSource;
 class QStandardItem;
 
 // State loader for the lookmark state.
-// Currently only supports state with single (non-filter) sources. 
-// When UseDataFlag is turned off, the state of the stored (non-filter) source proxy is used to set up the active (non-filter) source in the pipeline browser.
+// Supports 
 // When UseCameraFlag is turned off, the camera properties of the render module proxy are filtered out.
-// TODO: Support multiple sources. As they are encountered, prompt user to select which one to use for the given proxy.
-// Will also need to prompt the user for the case when the lookmark's state has only one (non-filter) source but the active pipeline has multiple. 
+
 class PQCOMPONENTS_EXPORT pqLookmarkStateLoader : public vtkSMPQStateLoader
 {
 public:
@@ -63,6 +61,8 @@ public:
   // The XML representation of the lookmark's pipeline hierarchy.
   // see pqLookmarkModel
   void SetPipelineHierarchy(vtkPVXMLElement*);
+
+  void SetRestoreCameraFlag(bool state);
 
 protected:
   pqLookmarkStateLoader();
