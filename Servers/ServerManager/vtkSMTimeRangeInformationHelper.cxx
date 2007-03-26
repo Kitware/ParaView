@@ -20,7 +20,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMTimeRangeInformationHelper);
-vtkCxxRevisionMacro(vtkSMTimeRangeInformationHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMTimeRangeInformationHelper, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMTimeRangeInformationHelper::vtkSMTimeRangeInformationHelper()
@@ -75,17 +75,19 @@ void vtkSMTimeRangeInformationHelper::UpdateProperty(
     if (timeRange.GetArgumentLength(0, 0, &length))
       {
       dvp->SetNumberOfElements(length);
-      double *values = new double[length];
+      double *values = 0;
       if (length == 2)
         {
+        values = new double[length];
         timeRange.GetArgument(0, 0, values, length);
+        dvp->SetElements(values);
+        delete[] values;
         }
       else
         {
-        vtkErrorMacro(<< "vtkPVServerTimeSteps returned invalid array length for time range.");
+        vtkErrorMacro("vtkPVServerTimeSteps returned invalid array length "
+                      "for time range.");
         }
-      dvp->SetElements(values);
-      delete[] values;
       }
     }
   else

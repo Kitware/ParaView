@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerTimeSteps);
-vtkCxxRevisionMacro(vtkPVServerTimeSteps, "1.4");
+vtkCxxRevisionMacro(vtkPVServerTimeSteps, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkPVServerTimeStepsInternals
@@ -66,11 +66,19 @@ const vtkClientServerStream& vtkPVServerTimeSteps::GetTimeSteps(
       const  double* timeSteps
         = outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
       int len = outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-      double timeRange[2];
-      timeRange[0] = timeSteps[0];
-      timeRange[1] = timeSteps[len-1];
-      this->Internal->Result
-        << vtkClientServerStream::InsertArray(timeRange, 2);
+        double timeRange[2];
+      if (len > 0)
+        {
+        timeRange[0] = timeSteps[0];
+        timeRange[1] = timeSteps[len-1];
+        this->Internal->Result
+          << vtkClientServerStream::InsertArray(timeRange, 2);
+        }
+      else
+        {
+        this->Internal->Result
+          << vtkClientServerStream::InsertArray(timeRange, 0);
+        }
       this->Internal->Result 
         << vtkClientServerStream::InsertArray(timeSteps, len);
       }
