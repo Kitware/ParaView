@@ -77,7 +77,11 @@ public:
   // Call to select the coloring array. 
   void colorByArray(const char* arrayname, int fieldtype);
 
-  /// get the names of the arrays that a part may be colored by
+  /// Get the names of the arrays that a part may be colored by.
+  /// This information may change based on the current reprentation
+  /// of the display, eg. when showing Outline, only "Solid Color" is
+  /// available; when rendering as Volume, can be colored only by 
+  /// point data.
   QList<QString> getColorFields();
 
   /// get the data ranges for a color field
@@ -105,7 +109,7 @@ public:
 
   /// Returns the proxy for the piecewise function used to
   /// map scalars to opacity.
-  vtkSMProxy* getScalarOpacityFunction() const;
+  vtkSMProxy* getScalarOpacityFunctionProxy() const;
 
 signals:
   /// This is fire when any property that affects the color
@@ -118,11 +122,20 @@ public slots:
   // range of the selected array.
   void resetLookupTableScalarRange();
 
-  // If lookuptable is set up and coloring is enabled, the this
-  // ensure that the lookuptable scalar range is greater than than the
-  // color array's scalar range. This call respects the lookup table's
-  // "lock" on scalar range.
+  /// If color lookuptable is set up and coloring is enabled, the this
+  /// ensure that the lookuptable scalar range is greater than than the
+  /// color array's scalar range. It also updates the scalar range on
+  /// the scalar-opacity function, if any. Both the ColorLUT and the 
+  /// ScalarOpacityFunction may choose to ignore the set scalar range
+  /// based on value ScalePointsWithRange.
   void updateLookupTableScalarRange();
+
+protected slots:
+  /// Called when the "Representation" property changes. If
+  /// representation changes to "Volume", we have to ensure that
+  /// the color field is initialized to something other than
+  /// "Solid Color" otherwise the volume mapper segfaults.
+  void onRepresentationChanged();
 
 protected:
   /// Creates helper proxies such as as the proxy

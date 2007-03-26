@@ -54,7 +54,7 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.79");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.80");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1011,7 +1011,7 @@ void vtkSMRenderModuleProxy::ComputeVisiblePropBounds(double bds[6])
       iter->GetCurrentObject());
     if (pDisp && pDisp->GetVisibilityCM() )
       {
-      vtkPVGeometryInformation* info = pDisp->GetGeometryInformation();
+      vtkPVGeometryInformation* info = pDisp->GetDisplayedDataInformation();
       if (!info)
         {
         continue;
@@ -1342,7 +1342,7 @@ vtkIdType vtkSMRenderModuleProxy::GetTotalNumberOfPolygons()
       iter->GetCurrentObject());
     if (pDisp && pDisp->GetVisibilityCM())
       {
-      vtkPVGeometryInformation* info = pDisp->GetGeometryInformation();
+      vtkPVGeometryInformation* info = pDisp->GetDisplayedDataInformation();
       if (!info)
         {
         continue;
@@ -1460,7 +1460,7 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
       continue;
       }
 
-    vtkPVGeometryInformation *gi = dodp->GetGeometryInformation();
+    vtkPVGeometryInformation *gi = dodp->GetDisplayedDataInformation();
     if (!gi)
       {
       continue;

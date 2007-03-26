@@ -474,7 +474,7 @@ void pqDisplayProxyEditor::updateEnableState()
     this->Internal->Display->getDisplayProxy();
   if (display)
     {
-    vtkPVGeometryInformation* geomInfo = display->GetGeometryInformation();
+    vtkPVGeometryInformation* geomInfo = display->GetDisplayedDataInformation();
     vtkPVDataSetAttributesInformation* attrInfo;
     if (display->GetScalarModeCM() == 
         vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
@@ -535,7 +535,7 @@ void pqDisplayProxyEditor::zoomToData()
     return;
     }
   double bounds[6];
-  display->GetGeometryInformation()->GetBounds(bounds);
+  display->GetDisplayedDataInformation()->GetBounds(bounds);
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
     unsigned int numRenModules;

@@ -292,11 +292,11 @@ void pqDisplayColorWidget::reloadGUI()
 {
   this->BlockEmission = true;
   this->clear();
-  this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
 
   pqPipelineDisplay* display = this->getDisplay();
   if (!display)
     {
+    this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
     this->BlockEmission = false;
     this->setEnabled(false);
     return;

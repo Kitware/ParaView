@@ -42,9 +42,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get information about the geometry.
+  // Get information about the data being displayed.
   // Some displays (like Scalar bar, 3DWidgets), may return NULL.
-  virtual vtkPVGeometryInformation* GetGeometryInformation() { return NULL; }
+  virtual vtkPVGeometryInformation* GetDisplayedDataInformation() { return NULL; }
   
   // Description:
   // Called to update the Display. Default implementation does nothing.

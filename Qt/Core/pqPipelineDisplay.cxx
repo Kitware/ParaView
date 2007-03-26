@@ -88,7 +88,7 @@ public:
       return 0; 
       }
     vtkSMDataObjectDisplayProxy* displayProxy = this->DisplayProxy;
-    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+    vtkPVDataInformation* geomInfo = displayProxy->GetDisplayedDataInformation();
     if(!geomInfo)
       {
       return 0;
@@ -133,6 +133,13 @@ pqPipelineDisplay::pqPipelineDisplay(const QString& name,
       display->GetProperty(properties[cc]), vtkCommand::ModifiedEvent,
       this, SIGNAL(colorChanged()));
     }
+
+  // Whenever representation changes to VolumeRendering, we have to
+  // ensure that the ColorArray has been initialized to something.
+  // Otherwise, the VolumeMapper segfaults.
+  this->Internal->VTKConnect->Connect(
+    display->GetProperty("Representation"), vtkCommand::ModifiedEvent,
+    this, SLOT(onRepresentationChanged()), 0, 0, Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -148,7 +155,7 @@ vtkSMDataObjectDisplayProxy* pqPipelineDisplay::getDisplayProxy() const
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqPipelineDisplay::getScalarOpacityFunction() const
+vtkSMProxy* pqPipelineDisplay::getScalarOpacityFunctionProxy() const
 {
   // We may want to create a new proxy is none exists.
   return pqSMAdaptor::getProxyProperty(
@@ -242,7 +249,7 @@ void pqPipelineDisplay::setDefaultPropertyValues()
       }
     }
   
-  geomInfo = displayProxy->GetGeometryInformation();
+  geomInfo = displayProxy->GetDisplayedDataInformation();
 
   // Locate input display.
   pqPipelineFilter* myInput = qobject_cast<pqPipelineFilter*>(this->getInput());
@@ -254,7 +261,7 @@ void pqPipelineDisplay::setDefaultPropertyValues()
       myInputsInput->getDisplay(this->getViewModule(0)));
     if (upstreamDisplay)
       {
-      inGeomInfo = upstreamDisplay->getDisplayProxy()->GetGeometryInformation();
+      inGeomInfo = upstreamDisplay->getDisplayProxy()->GetDisplayedDataInformation();
       }
     }
 
@@ -486,6 +493,18 @@ void pqPipelineDisplay::updateLookupTableScalarRange()
     {
     QPair<double, double> range = ranges[0];
     lut->setWholeScalarRange(range.first, range.second);
+
+    // Adjust opacity function range.
+    vtkSMProxy* opacityFunction = this->getScalarOpacityFunctionProxy();
+    if (opacityFunction)
+      {
+      QPair<double, double> adjusted_range = lut->getScalarRange();
+      pqSMAdaptor::setMultipleElementProperty(
+        opacityFunction->GetProperty("ScalarRange"), 0, adjusted_range.first);
+      pqSMAdaptor::setMultipleElementProperty(
+        opacityFunction->GetProperty("ScalarRange"), 1, adjusted_range.second);
+      opacityFunction->UpdateVTKObjects();
+      }
     }
 }
 
@@ -521,7 +540,7 @@ void pqPipelineDisplay::getColorArray(
 //-----------------------------------------------------------------------------
 QList<QString> pqPipelineDisplay::getColorFields()
 {
-  vtkSMDisplayProxy* displayProxy = this->getDisplayProxy();
+  vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
 
   QList<QString> ret;
   if(!displayProxy)
@@ -529,10 +548,16 @@ QList<QString> pqPipelineDisplay::getColorFields()
     return ret;
     }
 
-  // Actor color is one way to color this part
-  ret.append("Solid Color");
+  int representation = displayProxy->GetRepresentationCM();
 
-  vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+  if (representation != vtkSMDataObjectDisplayProxy::VOLUME)
+    {
+    // Actor color is one way to color this part.
+    // Not applicable when volume rendering.
+    ret.append("Solid Color");
+    }
+
+  vtkPVDataInformation* geomInfo = displayProxy->GetDisplayedDataInformation();
   if(!geomInfo)
     {
     return ret;
@@ -541,7 +566,7 @@ QList<QString> pqPipelineDisplay::getColorFields()
   // get cell arrays
   vtkPVDataSetAttributesInformation* cellinfo = 
     geomInfo->GetCellDataInformation();
-  if(cellinfo)
+  if(cellinfo && representation != vtkSMDataObjectDisplayProxy::VOLUME)
     {
     for(int i=0; i<cellinfo->GetNumberOfArrays(); i++)
       {
@@ -746,10 +771,45 @@ bool pqPipelineDisplay::getDataBounds(double bounds[6])
   vtkSMDataObjectDisplayProxy* display = 
     this->getDisplayProxy();
 
-  if(!display || !display->GetGeometryInformation())
+  if(!display || !display->GetDisplayedDataInformation())
     {
     return false;
     }
-  display->GetGeometryInformation()->GetBounds(bounds);
+  display->GetDisplayedDataInformation()->GetBounds(bounds);
   return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::onRepresentationChanged()
+{
+ vtkSMDataObjectDisplayProxy* display = 
+    this->getDisplayProxy();
+
+  if(!display || 
+    display->GetRepresentationCM() != vtkSMDataObjectDisplayProxy::VOLUME)
+    {
+    // Nothing to do here.
+    return;
+    }
+
+  // This is essential, since otherwise the geometry filter does not execute
+  // and we wont get the correct arrays available.
+  display->Update();
+
+  // Representation is Volume, is color array set?
+  QString colorField = this->getColorField(false);
+  QRegExp regExpCell(" \\(cell\\)\\w*$");
+  if (colorField == "Solid Color" || regExpCell.indexIn(colorField) != -1)
+    {
+    // Current color field is not suitable for Volume rendering.
+    // Change it.
+    QList<QString> colorFields = this->getColorFields();
+    if (colorFields.size() == 0)
+      {
+      qCritical() << "Cannot volume render since no point data available!";
+      display->SetRepresentationCM(vtkSMDataObjectDisplayProxy::OUTLINE);
+      return;
+      }
+    this->setColorField(colorFields[0]);
+    }
 }

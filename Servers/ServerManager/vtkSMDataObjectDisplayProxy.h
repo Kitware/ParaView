@@ -82,9 +82,11 @@ public:
   virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
 
   // Description:
-  // Get information about the geometry.
+  // Get information about the data being displayed. When representation is
+  // Volume, it simply returns the DataInformation from the input,
+  // otherwise, it's the data information from the GeometryFilter.
   // Some displays (like Scalar bar, 3DWidgets), may return NULL.
-  virtual vtkPVGeometryInformation* GetGeometryInformation();
+  virtual vtkPVGeometryInformation* GetDisplayedDataInformation();
   
   
   // Description:
@@ -297,7 +299,7 @@ protected:
  
   virtual void CreateVTKObjects(int numObjects);
 
-  virtual void GatherGeometryInformation();
+  virtual void GatherDisplayedDataInformation();
 
 //BTX
   // This is the least intrusive way of giving vtkPVComparativeVisManager
@@ -377,8 +379,8 @@ protected:
 
   int RenderModuleExtensionsTested;
 
-  int GeometryInformationIsValid;
-  vtkPVGeometryInformation* GeometryInformation;
+  int DisplayedDataInformationIsValid;
+  vtkPVGeometryInformation* DisplayedDataInformation;
 
   // Invalidate geometry. If useCache is true, do not invalidate
   // cached geometry

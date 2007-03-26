@@ -40,7 +40,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.32");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.33");
 
 
 //-----------------------------------------------------------------------------
@@ -79,8 +79,8 @@ vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
   this->Visibility = 1;
   this->Representation = -1;
 
-  this->GeometryInformationIsValid = 0;
-  this->GeometryInformation = vtkPVGeometryInformation::New();
+  this->DisplayedDataInformationIsValid = 0;
+  this->DisplayedDataInformation = vtkPVGeometryInformation::New();
 
   this->CacherProxy = 0;
   this->VolumeCacherProxy = 0;
@@ -111,7 +111,7 @@ vtkSMDataObjectDisplayProxy::~vtkSMDataObjectDisplayProxy()
   this->VolumeUpdateSuppressorProxy = 0;
   this->VolumeActorProxy = 0;
   this->VolumePropertyProxy = 0;
-  this->GeometryInformation->Delete();
+  this->DisplayedDataInformation->Delete();
 
   this->ColorArrayLink->Delete();
   this->LookupTableLink->Delete();
@@ -625,18 +625,18 @@ void vtkSMDataObjectDisplayProxy::SetupVolumeDefaults()
 }
 
 //-----------------------------------------------------------------------------
-vtkPVGeometryInformation* vtkSMDataObjectDisplayProxy::GetGeometryInformation()
+vtkPVGeometryInformation* vtkSMDataObjectDisplayProxy::GetDisplayedDataInformation()
 {
   if (!this->ObjectsCreated)
     {
     vtkErrorMacro("Objects not created yet!");
     return 0;
     }
-  if (!this->GeometryInformationIsValid)
+  if (!this->DisplayedDataInformationIsValid)
     {
-    this->GatherGeometryInformation();
+    this->GatherDisplayedDataInformation();
     }
-  return this->GeometryInformation;
+  return this->DisplayedDataInformation;
 }
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetRepresentation(int representation)
@@ -1144,7 +1144,7 @@ void vtkSMDataObjectDisplayProxy::CacheUpdate(int idx, int total)
 void vtkSMDataObjectDisplayProxy::InvalidateGeometryInternal(int useCache)
 {
   this->VolumeGeometryIsValid = 0;
-  this->GeometryInformationIsValid = 0;
+  this->DisplayedDataInformationIsValid = 0;
   if (!useCache)
     {
     this->GeometryIsValid = 0;
@@ -1333,7 +1333,7 @@ void vtkSMDataObjectDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
       }
     this->UpdateSuppressorProxy->InvokeCommand("ForceUpdate");
     this->GeometryIsValid = 1;
-    this->GeometryInformationIsValid = 0;
+    this->DisplayedDataInformationIsValid = 0;
     }
 
   // Do this after the update so that the first update is not caused by 
@@ -1393,9 +1393,9 @@ void vtkSMDataObjectDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy*
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDataObjectDisplayProxy::GatherGeometryInformation()
+void vtkSMDataObjectDisplayProxy::GatherDisplayedDataInformation()
 {
-  this->GeometryInformation->Initialize();
+  this->DisplayedDataInformation->Initialize();
   if (this->GeometryFilterProxy->GetNumberOfIDs() < 1)
     {
     vtkErrorMacro("Display has no associated object, can not gather info.");
@@ -1408,20 +1408,33 @@ void vtkSMDataObjectDisplayProxy::GatherGeometryInformation()
   this->Update();
   pm->SendCleanupPendingProgress(this->ConnectionID);
 
-  int num, i;
-  vtkPVGeometryInformation* information;
-  num = this->GeometryFilterProxy->GetNumberOfIDs();
-  information = vtkPVGeometryInformation::New();
-  for (i = 0; i < num; ++i)
+  if (this->Representation != VOLUME)
     {
-    pm->GatherInformation(this->ConnectionID,
-      this->GeometryFilterProxy->GetServers(),
-      information, this->GeometryFilterProxy->GetID(i));
-    this->GeometryInformation->AddInformation(information);
+    int num, i;
+    vtkPVGeometryInformation* information;
+    num = this->GeometryFilterProxy->GetNumberOfIDs();
+    information = vtkPVGeometryInformation::New();
+    for (i = 0; i < num; ++i)
+      {
+      pm->GatherInformation(this->ConnectionID,
+        this->GeometryFilterProxy->GetServers(),
+        information, this->GeometryFilterProxy->GetID(i));
+      this->DisplayedDataInformation->AddInformation(information);
+      }
+    information->Delete();
     }
-  information->Delete();
+  else
+    {
+    vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(this->GetInput(0));
+    if (input)
+      {
+      this->DisplayedDataInformation->AddInformation(
+        input->GetDataInformation());
+      }
+    }
+
   // Skip generation of names.
-  this->GeometryInformationIsValid = 1;
+  this->DisplayedDataInformationIsValid = 1;
 }
 
 //-----------------------------------------------------------------------------
