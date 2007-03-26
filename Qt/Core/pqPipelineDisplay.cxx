@@ -377,8 +377,19 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     if (pp->GetNumberOfProxies() == 0)
       {
       pqObjectBuilder* builder = core->getObjectBuilder();
-      lut = builder->createProxy("lookup_tables", "LookupTable", 
+      lut = builder->createProxy("lookup_tables", "PVLookupTable", 
         this->getServer(), "lookup_tables");
+      // Setup default LUT to go from Blue to Red.
+      QList<QVariant> values;
+      values << 0.0 << 0.0 << 0.0 << 1.0
+        << 1.0 << 1.0 << 0.0 << 0.0;
+      pqSMAdaptor::setMultipleElementProperty(
+        lut->GetProperty("RGBPoints"), values);
+      pqSMAdaptor::setEnumerationProperty(
+        lut->GetProperty("ColorSpace"), "HSV");
+      pqSMAdaptor::setEnumerationProperty(
+        lut->GetProperty("VectorMode"), "Magnitude");
+      lut->UpdateVTKObjects();
       }
     else
       {
