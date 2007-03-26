@@ -191,7 +191,7 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
    <!-- End Axes -->
    </SourceProxy>
 
-   <SourceProxy name="OutlineSource" class="vtkOutlineSource">
+   <SourceProxy name="OutlineSource" label="Outline" class="vtkOutlineSource">
       <Documentation
          long_help="3D outline of the specified bounds." 
          short_help="Create an outline from the bounds.">
