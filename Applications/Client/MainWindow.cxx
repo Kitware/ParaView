@@ -255,10 +255,10 @@ MainWindow::MainWindow() :
     this->Implementation->UI.menuFilters,
     SLOT(setEnabled(bool)));
 
-  this->Implementation->Core.pipelineMenu().setMenuAction(
-    pqPipelineMenu::AddSourceAction, this->Implementation->UI.actionAddSource);
-  this->Implementation->Core.pipelineMenu().setMenuAction(
-    pqPipelineMenu::AddFilterAction, this->Implementation->UI.actionAddFilter);
+  //this->Implementation->Core.pipelineMenu().setMenuAction(
+  //pqPipelineMenu::AddSourceAction, this->Implementation->UI.actionAddSource);
+  //this->Implementation->Core.pipelineMenu().setMenuAction(
+  //pqPipelineMenu::AddFilterAction, this->Implementation->UI.actionAddFilter);
   this->Implementation->Core.pipelineMenu().setMenuAction(
     pqPipelineMenu::ChangeInputAction, this->Implementation->UI.actionChangeInput);
   this->Implementation->Core.pipelineMenu().setMenuAction(
@@ -457,10 +457,10 @@ MainWindow::MainWindow() :
   pqPipelineBrowser *browser = this->Implementation->Core.pipelineBrowser();
   this->Implementation->Core.pipelineMenu().setModels(browser->getModel(),
     browser->getSelectionModel());
-  connect(this->Implementation->UI.actionAddSource, SIGNAL(triggered()),
-    browser, SLOT(addSource()));
-  connect(this->Implementation->UI.actionAddFilter, SIGNAL(triggered()),
-    browser, SLOT(addFilter()));
+  //connect(this->Implementation->UI.actionAddSource, SIGNAL(triggered()),
+  //browser, SLOT(addSource()));
+  //connect(this->Implementation->UI.actionAddFilter, SIGNAL(triggered()),
+  //browser, SLOT(addFilter()));
   connect(this->Implementation->UI.actionChangeInput, SIGNAL(triggered()),
     browser, SLOT(changeInput()));
   connect(this->Implementation->UI.actionDelete, SIGNAL(triggered()),
@@ -469,7 +469,7 @@ MainWindow::MainWindow() :
     new pqPipelineBrowserContextMenu(browser);
   browserMenu->setMenuAction(this->Implementation->UI.actionFileOpen);
   //browserMenu->setMenuAction(this->Implementation->UI.actionAddSource);
-  browserMenu->setMenuAction(this->Implementation->UI.actionAddFilter);
+  //browserMenu->setMenuAction(this->Implementation->UI.actionAddFilter);
   browserMenu->setMenuAction(this->Implementation->UI.actionChangeInput);
   browserMenu->setMenuAction(this->Implementation->UI.actionDelete);
   browserMenu->setMenuAction(this->Implementation->UI.actionToolsCreateCustomFilter);

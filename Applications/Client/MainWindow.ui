@@ -46,9 +46,6 @@
     <property name="title" >
      <string>&amp;Pipeline</string>
     </property>
-    <addaction name="actionAddSource" />
-    <addaction name="actionAddFilter" />
-    <addaction name="separator" />
     <addaction name="actionChangeInput" />
     <addaction name="actionDelete" />
    </widget>
