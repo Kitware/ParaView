@@ -30,7 +30,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.21");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.22");
 vtkCxxSetObjectMacro(vtkSMStateLoader, RootElement, vtkPVXMLElement);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -153,6 +153,13 @@ void vtkSMStateLoader::RegisterProxyInternal(const char* group,
   const char* name, vtkSMProxy* proxy)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  // Do not re-register
+  if(group && name && strcmp(group, "lookup_tables")==0 && pxm->GetProxy(group,name))
+    {
+    return;
+    }
+
   pxm->RegisterProxy(group, name, proxy);
 }
 
@@ -280,6 +287,7 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
         vtkErrorMacro("Could not read id for Item. Skipping.");
         continue;
         }
+
       vtkSMProxy* proxy = this->NewProxy(id);
       if (!proxy)
         {
