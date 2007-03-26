@@ -11,7 +11,6 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
-#include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
@@ -25,6 +24,18 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
+
+#include <vtkstd/list>
+#include <vtkstd/string>
+
+class vtkStringPairList : public vtkstd::list<vtkstd::pair<vtkstd::string, vtkstd::string>> {};
+typedef vtkstd::list<vtkstd::pair<vtkstd::string, vtkstd::string>>::iterator vtkStringPairListIterator;
+
+bool operator < (const vtkstd::pair<vtkstd::string, vtkstd::string> &x,
+                 const vtkstd::pair<vtkstd::string, vtkstd::string> &y)
+{
+  return x.first < y.first;
+}
 
 void WriteDocumentation(vtkSMDocumentation *doc, ofstream &docFile)
 {
@@ -53,8 +64,6 @@ void WriteDefaultValues(vtkSMProperty *prop, ofstream &docFile)
     vtkSMDoubleVectorProperty::SafeDownCast(prop);
   vtkSMStringVectorProperty *stringVecProp =
     vtkSMStringVectorProperty::SafeDownCast(prop);
-  vtkSMIdTypeVectorProperty *idTypeVecProp =
-    vtkSMIdTypeVectorProperty::SafeDownCast(prop);
   unsigned int i;
   if (intVecProp)
     {
@@ -592,23 +601,11 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     }
 }
 
-void WriteLeafNodes(vtkPVXMLElement *elem, vtkSMProxyManager *manager,
-                    ofstream &baseFile, char *filePath)
+void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList)
 {
-  unsigned int i;
-  char *elemName;
-  vtkSMProxy *proxy;
-  vtkSMProperty *prop;
-  vtkSMPropertyIterator *pIt;
-  vtkSMDomainIterator *dIt;
-  vtkSMDocumentation *doc;
-  ofstream docFile;
-  char proxyName[100];
-  const char *xmlProxyName;
-
   if (elem->GetNumberOfNestedElements() == 0)
     {
-    elemName = elem->GetName();
+    char *elemName = elem->GetName();
     if (!strcmp(elemName, "Category"))
       {
       return;
@@ -623,18 +620,43 @@ void WriteLeafNodes(vtkPVXMLElement *elem, vtkSMProxyManager *manager,
       {
       groupName << elemName << "s" << ends;
       }
-    xmlProxyName = elem->GetAttribute("name");
-    proxy = manager->GetPrototypeProxy(groupName.str(), xmlProxyName);
+    const char *xmlProxyName = elem->GetAttribute("name");
+    vtkstd::pair<vtkstd::string, vtkstd::string> namePair(xmlProxyName, groupName.str());
+    proxyNameList->insert(proxyNameList->end(), namePair);
     groupName.rdbuf()->freeze(0);
+    }
+  else
+    {
+    unsigned int i;
+    for (i = 0; i < elem->GetNumberOfNestedElements(); i++)
+      {
+      ExtractProxyNames(elem->GetNestedElement(i), proxyNameList);
+      }
+    }
+}
+
+void WriteProxies(vtkStringPairList *stringList, vtkStringPairList *labelList,
+                  vtkSMProxyManager *manager, char *filePath)
+{
+  vtkSMProxy *proxy;
+  vtkSMProperty *prop;
+  vtkSMPropertyIterator *pIt;
+  vtkSMDomainIterator *dIt;
+  vtkSMDocumentation *doc;
+  ofstream docFile;
+
+  vtkStringPairListIterator iter;
+  for (iter = stringList->begin(); iter != stringList->end(); iter++)
+    {
+    proxy = manager->GetPrototypeProxy((*iter).second.c_str(), (*iter).first.c_str());
     if (!proxy)
       {
       return;
       }
 
     ostrstream filename;
-    filename << filePath << "/" << xmlProxyName << ".html" << ends;
+    filename << filePath << "/" << (*iter).first.c_str() << ".html" << ends;
     docFile.open(filename.str());
-    baseFile << "<a href=\"" << xmlProxyName << ".html\">";
     filename.rdbuf()->freeze(0);
     docFile << "<html>" << endl;
     docFile << "<head>" << endl;
@@ -644,14 +666,17 @@ void WriteLeafNodes(vtkPVXMLElement *elem, vtkSMProxyManager *manager,
     if (label)
       {
       docFile << label;
-      baseFile << label;
+      vtkstd::pair<vtkstd::string, vtkstd::string> nameLabelPair(
+        label, (*iter).first);
+      labelList->insert(labelList->end(), nameLabelPair);
       }
     else
       {
-      docFile << proxyName;
-      baseFile << proxyName;
+      docFile << (*iter).first.c_str();
+      vtkstd::pair<vtkstd::string, vtkstd::string> nameLabelPair(
+        (*iter).first, (*iter).first);
+      labelList->insert(labelList->end(), nameLabelPair);
       }
-    baseFile << "</a><br>" << endl;
     docFile << "</title>" << endl;
     docFile << "</head>" << endl;
     docFile << "<body>" << endl;
@@ -662,7 +687,7 @@ void WriteLeafNodes(vtkPVXMLElement *elem, vtkSMProxyManager *manager,
       }
     else
       {
-      docFile << proxyName;
+      docFile << (*iter).first.c_str();
       }
     docFile << "</h2>" << endl;
     doc = proxy->GetDocumentation();
@@ -716,12 +741,15 @@ void WriteLeafNodes(vtkPVXMLElement *elem, vtkSMProxyManager *manager,
     pIt->Delete();
     docFile.close();
     }
-  else
+}
+
+void WriteHTMLList(vtkStringPairList *labelList, ofstream &baseFile)
+{
+  vtkStringPairListIterator iter;
+  for (iter = labelList->begin(); iter != labelList->end(); iter++)
     {
-    for (i = 0; i < elem->GetNumberOfNestedElements(); i++)
-      {
-      WriteLeafNodes(elem->GetNestedElement(i), manager, baseFile, filePath);
-      }
+    baseFile << "<a href=\"" << (*iter).second.c_str() << ".html\">"
+             << (*iter).first.c_str() << "</a><br>" << endl;
     }
 }
 
@@ -765,7 +793,32 @@ int main(int argc, char *argv[])
 
   vtkSMProxyManager *manager = vtkSMObject::GetProxyManager();
 
-  WriteLeafNodes(rootElem, manager, baseFile, argv[1]);
+  vtkStringPairList *proxyNameList = new vtkStringPairList;
+  ExtractProxyNames(rootElem, proxyNameList);
+  proxyNameList->sort();
+  proxyNameList->unique();
+
+  vtkStringPairList *proxyLabelList = new vtkStringPairList;
+  
+  WriteProxies(proxyNameList, proxyLabelList, manager, argv[1]);
+
+  proxyLabelList->sort();
+
+  WriteHTMLList(proxyLabelList, baseFile);
+
+  vtkStringPairListIterator iter;
+  for (iter = proxyNameList->begin(); iter != proxyNameList->end();)
+    {
+    proxyNameList->erase(iter++);
+    }
+  delete proxyNameList;
+
+  vtkStringPairListIterator iter2;
+  for (iter2 = proxyLabelList->begin(); iter2 != proxyLabelList->end();)
+    {
+    proxyLabelList->erase(iter2++);
+    }
+  delete proxyLabelList;
 
   baseFile.close();
   parser->Delete();
