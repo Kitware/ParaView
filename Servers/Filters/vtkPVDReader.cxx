@@ -23,7 +23,7 @@
 #include <vtkstd/algorithm>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVDReader, "1.5");
+vtkCxxRevisionMacro(vtkPVDReader, "1.6");
 vtkStandardNewMacro(vtkPVDReader);
 
 
@@ -181,14 +181,17 @@ void vtkPVDReader::SetupOutputInformation(vtkInformation *outInfo)
       }
     }
   vtkstd::sort(timeSteps.begin(), timeSteps.end());
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
-               &timeSteps[0],
-               numTimeSteps);
-  double timeRange[2];
-  timeRange[0] = timeSteps[0];
-  timeRange[1] = timeSteps[numTimeSteps-1];
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
-               timeRange, 2);               
+  if (!timeSteps.empty())
+    {
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
+                 &timeSteps[0],
+                 numTimeSteps);
+    double timeRange[2];
+    timeRange[0] = timeSteps[0];
+    timeRange[1] = timeSteps[numTimeSteps-1];
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
+                 timeRange, 2);               
+    }
 }
 
 
