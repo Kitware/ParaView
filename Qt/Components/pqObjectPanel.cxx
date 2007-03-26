@@ -166,10 +166,6 @@ void pqObjectPanel::accept()
     {
     source->UpdatePipelineInformation();
     }
-  else
-    {
-    qWarning("Why does pqObjectPanel have a proxy that is not a source proxy?");
-    }
   emit this->onaccept();
 }
 
