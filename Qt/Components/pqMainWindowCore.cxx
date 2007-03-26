@@ -346,6 +346,9 @@ void pqMainWindowCore::pqImplementation::updateFiltersFromXML()
     return;
     }
 
+  this->FilterCategories.clear();
+  this->AlphabeticalFilters.clear();
+
   // First create a uniquified, alphabetical vector of all filters
   vtkstd::vector<vtkstd::string> filters;
   QDomNodeList filterList = doc.elementsByTagName("Filter");
@@ -442,12 +445,12 @@ void pqMainWindowCore::pqImplementation::instantiateGroupPrototypes(
     proxyIter->Begin(prototypeName.c_str());
     while (!proxyIter->IsAtEnd())
       {
-      proxySetBefore.insert(proxyIter->GetKey());
+      proxySetAfter.insert(proxyIter->GetKey());
       proxyIter->Next();
       }
     vtkstd::set<vtkstd::string> proxySetD;
-    vtkstd::set_difference(proxySetBefore.begin(), proxySetBefore.end(),
-                           proxySetAfter.begin(),  proxySetAfter.end(),
+    vtkstd::set_difference(proxySetAfter.begin(),  proxySetAfter.end(),
+                           proxySetBefore.begin(), proxySetBefore.end(),
                            vtkstd::inserter(difference, difference.begin()));
     }
   proxyIter->Delete();
@@ -673,6 +676,12 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   // Set up a callback to before further intialization once the application
   // event loop starts.
   QTimer::singleShot(100, this, SLOT(applicationInitialize()));
+
+  // Instantiate prototypes for sources and filters. These are used
+  // in populating sources and filters menus.
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  pxm->InstantiateGroupPrototypes("sources_prototypes");
+  pxm->InstantiateGroupPrototypes("filters_prototypes");
 }
 
 //-----------------------------------------------------------------------------
@@ -757,30 +766,35 @@ void pqMainWindowCore::refreshSourcesMenu()
 {
   this->Implementation->updateSourcesFromXML();
 
-  vtkstd::set<vtkstd::string> newSources;
-  this->Implementation->instantiateGroupPrototypes("sources", newSources);
-
-  vtkstd::vector<vtkstd::string>::iterator sourceIter =
-    this->Implementation->Sources.begin();
-  for(; sourceIter != this->Implementation->Sources.end(); sourceIter++)
+  if (this->Implementation->SourceMenu)
     {
-    this->Implementation->addProxyToMenu("sources_prototypes",
-                                         sourceIter->c_str(),
-                                         this->Implementation->SourceMenu,
-                                         0,
-                                         false);
-    }
+    this->Implementation->SourceMenu->clear();
 
-  // We now add the new sources that were added to sources_prototypes:
-  // these sources were added by a plugin
-  vtkstd::set<vtkstd::string>::iterator nsIter = newSources.begin();
-  for(; nsIter != newSources.end(); nsIter++)
-    {
-    this->Implementation->addProxyToMenu("sources_prototypes",
-                                         nsIter->c_str(),
-                                         this->Implementation->SourceMenu,
-                                         0,
-                                         false);
+    vtkstd::set<vtkstd::string> newSources;
+    this->Implementation->instantiateGroupPrototypes("sources", newSources);
+
+    vtkstd::vector<vtkstd::string>::iterator sourceIter =
+      this->Implementation->Sources.begin();
+    for(; sourceIter != this->Implementation->Sources.end(); sourceIter++)
+      {
+      this->Implementation->addProxyToMenu("sources_prototypes",
+                                           sourceIter->c_str(),
+                                           this->Implementation->SourceMenu,
+                                           0,
+                                           false);
+      }
+
+    // We now add the new sources that were added to sources_prototypes:
+    // these sources were added by a plugin
+    vtkstd::set<vtkstd::string>::iterator nsIter = newSources.begin();
+    for(; nsIter != newSources.end(); nsIter++)
+      {
+      this->Implementation->addProxyToMenu("sources_prototypes",
+                                           nsIter->c_str(),
+                                           this->Implementation->SourceMenu,
+                                           0,
+                                           false);
+      }
     }
 }
 
