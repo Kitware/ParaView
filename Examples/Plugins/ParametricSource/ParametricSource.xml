@@ -1,0 +1,25 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="parametric_functions">
+    <Proxy name="ParametricBoy" class="vtkParametricBoy"/>
+    <Proxy name="ParametricConicSpiral" class="vtkParametricConicSpiral"/>
+    <Proxy name="ParametricEllipsoid" class="vtkParametricEllipsoid"/>
+  </ProxyGroup>
+
+  <ProxyGroup name="sources">
+   <SourceProxy name="ParametricSource" 
+                class="vtkParametricFunctionSource" 
+                label="Parametric Source">
+     <ProxyProperty
+       command="SetParametricFunction"
+       name="ParametricFunction"
+       label="Parametric Function">
+       <ProxyListDomain name="proxy_list">
+         <Proxy group="parametric_functions" name="ParametricBoy" />
+         <Proxy group="parametric_functions" name="ParametricConicSpiral" />
+         <Proxy group="parametric_functions" name="ParametricEllipsoid" />
+       </ProxyListDomain>
+     </ProxyProperty>
+   </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>
+
