@@ -262,6 +262,12 @@ void pqProxy::setDefaultPropertyValues()
 {
   vtkSMProxy* proxy = this->getProxy();
 
+  // If this is a compound proxy, its property values will be set from XML
+  if(proxy->IsA("vtkSMCompoundProxy"))
+    {
+    return;
+    }
+
   // since some domains rely on information properties,
   // it is essential that we update the property information 
   // before resetting values.
