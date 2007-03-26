@@ -1441,8 +1441,15 @@ void pqMainWindowCore::onLoadLookmark(const QString &name)
   this->Implementation->UndoStack->beginUndoSet(
     QString("Load Lookmark %1").arg(this->Implementation->CurrentToolbarLookmark));
 
+  pqObjectBuilder* builder = core->getObjectBuilder();
+  pqGenericViewModule *view = pqActiveView::instance().current();
+  if (!view)
+    {
+    view = builder->createView(pqRenderViewModule::renderViewType(), this->getActiveServer());
+    }
+
   this->Implementation->LookmarkManagerModel->loadLookmark(this->getActiveServer(), 
-    pqActiveView::instance().current(), &sources, name);
+    view, &sources, name);
 
   this->Implementation->UndoStack->endUndoSet();
 
