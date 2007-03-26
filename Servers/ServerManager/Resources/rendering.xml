@@ -1350,6 +1350,7 @@
       <StringVectorProperty
          name="Text"
          command="SetText"
+         immediate_update="1"
          default_values="Some Default">
       </StringVectorProperty>
 
@@ -1445,6 +1446,7 @@
           <Entry value="1" text="Linear" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <!-- Why is this duplicate property present? -->
       <ProxyProperty
         name="GrayTransferFunction"
         command="SetColor">
@@ -2894,12 +2896,6 @@
         animateable="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <Property
-        name="ResetTransferFunctions"
-        command="ResetTransferFunctions"
-        immediate_update="1"
-        update_self="1">
-      </Property>
       <SubProxy>
         <Proxy name="GeometryFilter" 
           proxygroup="filters" proxyname="GeometryFilter" />
@@ -3015,9 +3011,15 @@
                proxygroup="mappers"
                proxyname="DummyVolumeMapper">
         </Proxy>
+        <!--
+          This property is linked with "ColorArray" property on
+          the PolyDataMapper. So, the volume rendering pipeline uses
+          the same scalar array as the polygonal pipeline.
+
         <ExposedProperties>
           <Property name="SelectScalarArray" />
         </ExposedProperties>
+        -->
       </SubProxy>
 
       <SubProxy>
@@ -3088,26 +3090,7 @@
         </Proxy>
         <ExposedProperties>
           <Property name="ScalarOpacityUnitDistance" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="OpacityFunction" 
-          proxygroup="piecewise_functions" proxyname="PiecewiseFunction">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Points" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="ColorTransferFunction"
-          proxygroup="transfer_functions" proxyname="ColorTransferFunction">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="RGBPoints" />
-          <Property name="ColorSpace" />
-          <Property name="HSVWrap" />
+          <Property name="ScalarOpacityFunction" />
         </ExposedProperties>
       </SubProxy>
     </DataObjectDisplayProxy>

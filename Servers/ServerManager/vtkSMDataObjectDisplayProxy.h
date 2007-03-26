@@ -30,9 +30,9 @@
 #define __vtkSMDataObjectDisplayProxy_h
 
 #include "vtkSMConsumerDisplayProxy.h"
+
+class vtkSMPropertyLink;
 class vtkSMProxy;
-class vtkPVDataInformation;
-class vtkPVArrayInformation;
 class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMDataObjectDisplayProxy : public vtkSMConsumerDisplayProxy
@@ -112,11 +112,6 @@ public:
   // Here, only for RenderModuleProxy.
   vtkGetMacro(VolumeRenderMode, int);
 
-  // Description:
-  // Method to initlaize the Volume Transfer functions 
-  // (ie. Opacity Function & Color Transfer fuction).
-  void ResetTransferFunctions();
-  
   // Description:
   // Convenience methods for switching between volume
   // mappers.
@@ -289,9 +284,6 @@ protected:
 
   virtual void SetInputInternal(vtkSMSourceProxy* input);
 
-  void ResetTransferFunctions(vtkPVDataInformation* dataInfo,
-    vtkPVArrayInformation* arrayInfo);
-
   // Description:
   // Set up the PolyData rendering pipeline.
   virtual void SetupPipeline();
@@ -345,7 +337,6 @@ protected:
   vtkSMProxy* VolumeActorProxy;
   vtkSMProxy* VolumePropertyProxy;
   vtkSMProxy* OpacityFunctionProxy;
-  vtkSMProxy* ColorTransferFunctionProxy;
 
   // These are pointers to update suppressor proxies
   // that keep the cache for animation.
@@ -405,6 +396,13 @@ protected:
   // Connect the VTK data object to display pipeline.
   void SetInput(vtkSMProxy* input);
 
+  // Link used to link "ColorArray" from geometry mapper 
+  // to "SelectScalarArray" on volume mappers.
+  vtkSMPropertyLink* ColorArrayLink;
+
+  // Link used to link "LookupTable" from geometry mapper
+  // to "ColorTransferFunction" on  volume property.
+  vtkSMPropertyLink* LookupTableLink;
 private:
   vtkSMDataObjectDisplayProxy(const vtkSMDataObjectDisplayProxy&); // Not implemented.
   void operator=(const vtkSMDataObjectDisplayProxy&); // Not implemented.

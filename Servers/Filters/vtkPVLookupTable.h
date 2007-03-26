@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   ParaView
   Module:    vtkPVLookupTable.h
 
   Copyright (c) Kitware, Inc.

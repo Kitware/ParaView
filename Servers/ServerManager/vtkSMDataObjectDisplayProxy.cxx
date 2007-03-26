@@ -33,13 +33,14 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMMaterialLoaderProxy.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.31");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.32");
 
 
 //-----------------------------------------------------------------------------
@@ -65,8 +66,6 @@ vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
   this->VolumeUpdateSuppressorProxy = 0;
   this->VolumeActorProxy = 0;
   this->VolumePropertyProxy = 0;
-  this->OpacityFunctionProxy = 0;
-  this->ColorTransferFunctionProxy = 0;
 
   // We haven't determined if this display can support volume rendering
   // hence we mark it INVALID.
@@ -87,6 +86,9 @@ vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
   this->VolumeCacherProxy = 0;
 
   this->RenderModuleExtensionsTested = 0;
+
+  this->ColorArrayLink = vtkSMPropertyLink::New();
+  this->LookupTableLink = vtkSMPropertyLink::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -109,9 +111,10 @@ vtkSMDataObjectDisplayProxy::~vtkSMDataObjectDisplayProxy()
   this->VolumeUpdateSuppressorProxy = 0;
   this->VolumeActorProxy = 0;
   this->VolumePropertyProxy = 0;
-  this->OpacityFunctionProxy = 0;
-  this->ColorTransferFunctionProxy = 0;
   this->GeometryInformation->Delete();
+
+  this->ColorArrayLink->Delete();
+  this->LookupTableLink->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -189,15 +192,24 @@ void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
   this->VolumePropertyProxy = this->GetSubProxy("VolumeProperty");
   this->VolumePropertyProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->OpacityFunctionProxy = this->GetSubProxy("OpacityFunction");
-  this->OpacityFunctionProxy->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->ColorTransferFunctionProxy = 
-    this->GetSubProxy("ColorTransferFunction");
-  this->ColorTransferFunctionProxy->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
   this->Superclass::CreateVTKObjects(numObjects);
+
+  // Link "ColorArray" property to 
+  // "SelectScalarArray" property of the VolumeMappers.
+  this->ColorArrayLink->AddLinkedProperty(
+    this->MapperProxy->GetProperty("ColorArray"), vtkSMLink::INPUT);
+  this->ColorArrayLink->AddLinkedProperty(
+    this->GetSubProxy("VolumeDummyMapper")->GetProperty("SelectScalarArray"), 
+    vtkSMLink::OUTPUT);
+
+  // Link "LookupTable" from geometry mapper
+  // to "ColorTransferFunction" on  volume property.
+  this->LookupTableLink->AddLinkedProperty(
+    this->MapperProxy->GetProperty("LookupTable"), vtkSMLink::INPUT);
+  this->LookupTableLink->AddLinkedProperty(
+    this->VolumePropertyProxy->GetProperty("ColorTransferFunction"),
+    vtkSMLink::OUTPUT);
 
   vtkSMMaterialLoaderProxy* mlp = vtkSMMaterialLoaderProxy::SafeDownCast(
     this->GetSubProxy("MaterialLoader"));
@@ -520,7 +532,7 @@ void vtkSMDataObjectDisplayProxy::SetupVolumePipeline()
       return;
       }
     pp->RemoveAllProxies();
-    if (this->SupportsHAVSMapper)
+    if (this->SupportsHAVSMapper && false)
       {
       pp->AddProxy(this->VolumeHAVSMapperProxy);
       }
@@ -558,28 +570,7 @@ void vtkSMDataObjectDisplayProxy::SetupVolumePipeline()
   pp->RemoveAllProxies();
   pp->AddProxy(this->VolumePropertyProxy);
   this->VolumeActorProxy->UpdateVTKObjects();
- 
-  pp = vtkSMProxyProperty::SafeDownCast(
-    this->VolumePropertyProxy->GetProperty("ColorTransferFunction"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property ColorTransferFunction "
-                  "on VolumePropertyProxy.");
-    return;
-    }
-  pp->RemoveAllProxies();
-  pp->AddProxy(this->ColorTransferFunctionProxy);
 
-  pp = vtkSMProxyProperty::SafeDownCast(
-    this->VolumePropertyProxy->GetProperty("ScalarOpacityFunction"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property ScalarOpacityFunction "
-                  "on VolumePropertyProxy.");
-    return;
-    }
-  pp->RemoveAllProxies();
-  pp->AddProxy(this->OpacityFunctionProxy);
   this->VolumePropertyProxy->UpdateVTKObjects();
 }
 
@@ -757,6 +748,8 @@ void vtkSMDataObjectDisplayProxy::VolumeRenderModeOff()
     }
 }
 
+/* OBSOLETE CODE: keeping it in as a reference until the GUI code 
+ * has been updated.
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::ResetTransferFunctions()
 {
@@ -927,6 +920,7 @@ void vtkSMDataObjectDisplayProxy::ResetTransferFunctions(
   this->OpacityFunctionProxy->UpdateVTKObjects();
   this->ColorTransferFunctionProxy->UpdateVTKObjects();
 }
+*/
 
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetVolumeMapperToBunykCM()

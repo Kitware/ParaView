@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   ParaView
   Module:    vtkPVLookupTable.cxx
 
   Copyright (c) Kitware, Inc.
@@ -20,7 +20,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVLookupTable);
-vtkCxxRevisionMacro(vtkPVLookupTable, "1.3");
+vtkCxxRevisionMacro(vtkPVLookupTable, "1.4");
 //-----------------------------------------------------------------------------
 vtkPVLookupTable::vtkPVLookupTable()
 {

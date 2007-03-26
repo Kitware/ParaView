@@ -37,14 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // ParaView Server Manager includes.
+#include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkProcessModule.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkSmartPointer.h" 
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkCommand.h"
 
 // Qt includes.
 #include <QList>
@@ -60,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqRenderViewModule.h"
 #include "pqScalarsToColors.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
@@ -75,6 +78,7 @@ public:
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     }
+
   // Convenience method to get array information.
   vtkPVArrayInformation* getArrayInformation(
     const char* arrayname, int fieldType)
@@ -144,6 +148,34 @@ vtkSMDataObjectDisplayProxy* pqPipelineDisplay::getDisplayProxy() const
 }
 
 //-----------------------------------------------------------------------------
+vtkSMProxy* pqPipelineDisplay::getScalarOpacityFunction() const
+{
+  // We may want to create a new proxy is none exists.
+  return pqSMAdaptor::getProxyProperty(
+    this->getProxy()->GetProperty("ScalarOpacityFunction"));
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::createHelperProxies()
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* opacityFunction = 
+    pxm->NewProxy("piecewise_functions", "PVPiecewiseFunction");
+  opacityFunction->SetConnectionID(this->getServer()->GetConnectionID());
+  opacityFunction->SetServers(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  opacityFunction->UpdateVTKObjects();
+
+  this->addHelperProxy("ScalarOpacityFunction", opacityFunction);
+  opacityFunction->Delete();
+
+  pqSMAdaptor::setProxyProperty(
+    this->getProxy()->GetProperty("ScalarOpacityFunction"),
+    opacityFunction);
+  this->getProxy()->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineDisplay::setDefaultPropertyValues()
 {
   // We deliberately don;t call superclass. For somereason,
@@ -155,6 +187,8 @@ void pqPipelineDisplay::setDefaultPropertyValues()
     // don't worry about invisible displays.
     return;
     }
+
+  this->createHelperProxies();
 
   vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
   if (!displayProxy)

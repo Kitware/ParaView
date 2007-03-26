@@ -44,11 +44,9 @@ class pqPipelineDisplayInternal;
 class pqPipelineSource;
 class pqRenderViewModule;
 class pqServer;
-
-class vtkPVDataSetAttributesInformation;
-class vtkPVDataSetAttributesInformation;
 class vtkPVArrayInformation;
-
+class vtkPVDataSetAttributesInformation;
+class vtkPVDataSetAttributesInformation;
 class vtkSMDataObjectDisplayProxy;
 
 /// This is PQ representation for a single display. A pqDisplay represents
@@ -104,6 +102,11 @@ public:
   /// Get the data bounds for the input of this display.
   /// Returns if the operation was successful.
   bool getDataBounds(double bounds[6]);
+
+  /// Returns the proxy for the piecewise function used to
+  /// map scalars to opacity.
+  vtkSMProxy* getScalarOpacityFunction() const;
+
 signals:
   /// This is fire when any property that affects the color
   /// mode for the display changes.
@@ -120,6 +123,11 @@ public slots:
   // color array's scalar range. This call respects the lookup table's
   // "lock" on scalar range.
   void updateLookupTableScalarRange();
+
+protected:
+  /// Creates helper proxies such as as the proxy
+  /// for volume opacity function.
+  void createHelperProxies();
 
 private:
   pqPipelineDisplayInternal *Internal; 
