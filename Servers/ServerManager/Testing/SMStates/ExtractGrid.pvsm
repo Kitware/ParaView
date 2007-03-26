@@ -3325,19 +3325,25 @@
     <SubProxy name="Property" id="420"/>
     <SubProxy name="UpdateSuppressor" id="422"/>
   </Proxy>
-  <Proxy group="lookup_tables" type="LookupTable" id="790">
-    <Property name="ArrayName" id="790.ArrayName" number_of_elements="1">
-      <Element index="0" value="scalars"/>
-    </Property>
-    <Property name="HueRange" id="790.HueRange" number_of_elements="2">
-      <Element index="0" value="0.6667"/>
-      <Element index="1" value="0"/>
-      <Domain name="range" id="790.HueRange.range">
-        <Min index="0" value="0"/>
-        <Min index="1" value="0"/>
-        <Max index="0" value="1"/>
-        <Max index="1" value="1"/>
+  <Proxy group="lookup_tables" type="PVLookupTable" id="790">
+    <Property name="ColorSpace" id="790.ColorSpace" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="enum" id="790.ColorSpace.enum">
+        <Entry value="0" text="RGB"/>
+        <Entry value="1" text="HSV"/>
       </Domain>
+    </Property>
+    <Property name="Discretize" id="790.Discretize" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="790.Discretize.bool"/>
+    </Property>
+    <Property name="HSVWrap" id="790.HSVWrap" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="790.HSVWrap.bool"/>
+    </Property>
+    <Property name="LockScalarRange" id="790.LockScalarRange" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="790.LockScalarRange.bool"/>
     </Property>
     <Property name="NumberOfTableValues" id="790.NumberOfTableValues" number_of_elements="1">
       <Element index="0" value="256"/>
@@ -3345,29 +3351,23 @@
         <Min index="0" value="1"/>
       </Domain>
     </Property>
-    <Property name="SaturationRange" id="790.SaturationRange" number_of_elements="2">
+    <Property name="RGBPoints" id="790.RGBPoints" number_of_elements="8">
+      <Element index="0" value="0"/>
+      <Element index="1" value="0"/>
+      <Element index="2" value="0"/>
+      <Element index="3" value="1"/>
+      <Element index="4" value="1"/>
+      <Element index="5" value="1"/>
+      <Element index="6" value="0"/>
+      <Element index="7" value="0"/>
+    </Property>
+    <Property name="ScalePointsWithRange" id="790.ScalePointsWithRange" number_of_elements="1">
       <Element index="0" value="1"/>
-      <Element index="1" value="1"/>
-      <Domain name="range" id="790.SaturationRange.range">
-        <Min index="0" value="0"/>
-        <Min index="1" value="0"/>
-        <Max index="0" value="1"/>
-        <Max index="1" value="1"/>
-      </Domain>
+      <Domain name="bool" id="790.ScalePointsWithRange.bool"/>
     </Property>
     <Property name="ScalarRange" id="790.ScalarRange" number_of_elements="2">
       <Element index="0" value="0"/>
       <Element index="1" value="255"/>
-    </Property>
-    <Property name="ValueRange" id="790.ValueRange" number_of_elements="2">
-      <Element index="0" value="1"/>
-      <Element index="1" value="1"/>
-      <Domain name="range" id="790.ValueRange.range">
-        <Min index="0" value="0"/>
-        <Min index="1" value="0"/>
-        <Max index="0" value="1"/>
-        <Max index="1" value="1"/>
-      </Domain>
     </Property>
     <Property name="VectorComponent" id="790.VectorComponent" number_of_elements="1">
       <Element index="0" value="0"/>
