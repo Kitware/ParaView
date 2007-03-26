@@ -402,7 +402,6 @@ private slots:
   /// such as --data, --server etc.
   void applicationInitialize();
 
-
 private:
   pqServerManagerModelItem *getActiveObject() const;
   void updatePendingActions(pqServer *server, pqPipelineSource *source,

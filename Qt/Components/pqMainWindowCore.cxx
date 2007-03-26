@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QApplication>
 #include <QDockWidget>
+#include <QDomDocument>
 #include <QFile>
 #include <QMenu>
 #include <QMessageBox>
@@ -144,14 +145,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMInputProperty.h>
 #include <vtkSMIntVectorProperty.h>
+#include <vtkSMProxyIterator.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
-//#include <vtkType.h>
 
 #include <vtkToolkits.h>
+
+#include <vtkstd/algorithm>
+#include <vtkstd/map>
+#include <vtkstd/set>
+#include <vtkstd/string>
+#include <vtkstd/vector>
 
 #include "assert.h"
 
@@ -199,6 +206,48 @@ public:
     delete this->Lookmarks;
     delete this->LookupTableManager;
   }
+
+  // Stuff related to proxy menu (sources & filters)
+  typedef vtkstd::map<vtkstd::string, vtkstd::string> ProxyIconsType;
+
+  // Given a group name, instantiate the related prototype. The
+  // change in the prototype group is returned in difference.
+  void instantiateGroupPrototypes(vtkstd::string groupName,
+                                  vtkstd::set<vtkstd::string>& difference);
+
+  // Helper method: given a proxy name, looks up it's prototype in the given
+  // group, gets the XMLLabel and adds an action to the given menu with
+  // it. It also checks for an icon in the given map.
+  void addProxyToMenu(const char* groupName,
+                      const char* proxyname,
+                      QMenu* menu,
+                      pqImplementation::ProxyIconsType* icons,
+                      bool disable=true);
+
+  // Stuff related to the filters menu
+  void updateFiltersFromXML();
+
+  vtkstd::vector<vtkstd::string> AlphabeticalFilters;
+
+  ProxyIconsType FilterIcons;
+
+  struct FilterCategory
+  {
+    FilterCategory(const char* name, const char* label) :
+      Name(name), MenuLabel(label)
+      {
+      }
+    vtkstd::string Name;
+    vtkstd::string MenuLabel;
+    vtkstd::vector<vtkstd::string> Filters;
+  };
+  typedef vtkstd::vector<FilterCategory> FilterCategoriesType;
+  FilterCategoriesType FilterCategories;
+
+  // Stuff related to the sources menu
+  void updateSourcesFromXML();
+
+  vtkstd::vector<vtkstd::string> Sources;
 
   QWidget* const Parent;
   pqViewManager MultiViewManager;
@@ -249,6 +298,162 @@ public:
   pqActiveServer ActiveServer;
 };
 
+void pqMainWindowCore::pqImplementation::updateSourcesFromXML()
+{
+  QString xmlfilename(":/ParaViewResources/ParaViewSources.xml");
+  QFile xml(xmlfilename);
+  if (!xml.open(QIODevice::ReadOnly))
+    {
+    qDebug() << "Failed to load " << xmlfilename;
+    return;
+    }
+
+  QDomDocument doc("doc");
+  if (!doc.setContent(&xml))
+    {
+    xml.close();
+    qDebug() << "Failed to load " << xmlfilename;
+    return;
+    }
+
+  // Get all the sources
+  this->Sources.clear();
+  QDomNodeList sourceList = doc.elementsByTagName("Source");
+  for(int i=0; i<sourceList.size(); i++)
+    {
+    QDomNode node = sourceList.item(i);
+    QDomElement source = node.toElement();
+    QString name = source.attribute("name");
+    this->Sources.push_back(name.toStdString());
+    }
+}
+
+void pqMainWindowCore::pqImplementation::updateFiltersFromXML()
+{
+  QString xmlfilename(":/ParaViewResources/ParaViewFilters.xml");
+  QFile xml(xmlfilename);
+  if (!xml.open(QIODevice::ReadOnly))
+    {
+    qDebug() << "Failed to load " << xmlfilename;
+    return;
+    }
+
+  QDomDocument doc("doc");
+  if (!doc.setContent(&xml))
+    {
+    xml.close();
+    qDebug() << "Failed to load " << xmlfilename;
+    return;
+    }
+
+  // First create a uniquified, alphabetical vector of all filters
+  vtkstd::vector<vtkstd::string> filters;
+  QDomNodeList filterList = doc.elementsByTagName("Filter");
+  for(int i=0; i<filterList.size(); i++)
+    {
+    QDomNode node = filterList.item(i);
+    QDomElement filter = node.toElement();
+    QString name = filter.attribute("name");
+    QString icon = filter.attribute("icon");
+    if (name != "")
+      {
+      filters.push_back(name.toStdString());
+      if (icon != "")
+        {
+        this->FilterIcons[name.toStdString()] = icon.toStdString();
+        }
+      }
+    }
+  vtkstd::sort(filters.begin(), filters.end());
+  vtkstd::vector<vtkstd::string>::iterator newEnd =
+    unique(filters.begin(), filters.end());
+
+  this->AlphabeticalFilters.clear();
+  this->AlphabeticalFilters.insert(this->AlphabeticalFilters.begin(),
+                                   filters.begin(), 
+                                   newEnd);
+
+  // Next create the categories
+  QDomNodeList categoryList = doc.elementsByTagName("Category");
+  for(int i=0; i<categoryList.size(); i++)
+    {
+    QDomNode node = categoryList.item(i);
+    QDomElement categoryNode = node.toElement();
+    QString categoryName = categoryNode.attribute("name");
+    if (categoryName != "")
+      {
+      QString categoryLabel = categoryNode.attribute("menu_label");
+      if (categoryLabel == "")
+        {
+        categoryLabel = categoryName;
+        }
+      pqImplementation::FilterCategory category(
+        categoryName.toAscii().data(),
+        categoryLabel.toAscii().data());
+      QDomNodeList children = node.childNodes();
+      for (int j=0; j<children.size(); j++)
+        {
+        QDomNode childNode = children.item(j);
+        QString nodeName = childNode.nodeName();
+        if (nodeName == "Filter")
+          {
+          QDomElement filter = childNode.toElement();
+          QString name = filter.attribute("name");
+          if (name != "")
+            {
+            category.Filters.push_back(name.toStdString());
+            }
+          }
+        }
+      if (!category.Filters.empty())
+        {
+        this->FilterCategories.push_back(category);
+        }
+      }
+    }
+}
+
+void pqMainWindowCore::pqImplementation::instantiateGroupPrototypes(
+  vtkstd::string groupName,
+  vtkstd::set<vtkstd::string>& difference)
+{
+  difference.clear();
+
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+
+  vtkSMProxyIterator* proxyIter = vtkSMProxyIterator::New();
+  proxyIter->SetModeToOneGroup();
+
+  vtkstd::set<vtkstd::string> proxySetBefore;
+  vtkstd::string prototypeName = groupName + "_prototypes";
+  proxyIter->Begin(prototypeName.c_str());
+  while (!proxyIter->IsAtEnd())
+    {
+    proxySetBefore.insert(proxyIter->GetKey());
+    proxyIter->Next();
+    }
+  pxm->InstantiateGroupPrototypes(groupName.c_str());
+  // If the "before set" is empty, this is the first time the
+  // prototypes are being instantiated: return an empty
+  // difference.
+  if (!proxySetBefore.empty())
+    {
+    vtkstd::set<vtkstd::string> proxySetAfter;
+    proxyIter->Begin(prototypeName.c_str());
+    while (!proxyIter->IsAtEnd())
+      {
+      proxySetBefore.insert(proxyIter->GetKey());
+      proxyIter->Next();
+      }
+    vtkstd::set<vtkstd::string> proxySetD;
+    vtkstd::set_difference(proxySetBefore.begin(), proxySetBefore.end(),
+                           proxySetAfter.begin(),  proxySetAfter.end(),
+                           vtkstd::inserter(difference, difference.begin()));
+    }
+  proxyIter->Delete();
+}
+
+
 ///////////////////////////////////////////////////////////////////////////
 // pqMainWindowCore
 
@@ -293,19 +498,32 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   // Connect up the pqLookmarkManagerModel and pqLookmarkBrowserModel
   this->Implementation->LookmarkManagerModel = new pqLookmarkManagerModel(this);
 
-  this->Implementation->Lookmarks = new pqLookmarkBrowserModel(this->Implementation->LookmarkManagerModel,parent_widget);
-  QObject::connect(this->Implementation->LookmarkManagerModel,SIGNAL(lookmarkAdded(pqLookmarkModel*)),
-      this->Implementation->Lookmarks,SLOT(addLookmark(pqLookmarkModel*)));
-  QObject::connect(this->Implementation->LookmarkManagerModel,SIGNAL(lookmarkRemoved(const QString&)),
-      this->Implementation->Lookmarks,SLOT(removeLookmark(const QString&)));
-  QObject::connect(this->Implementation->LookmarkManagerModel,SIGNAL(lookmarkModified(pqLookmarkModel*)),
-      this->Implementation->Lookmarks,SLOT(onLookmarkModified(pqLookmarkModel*)));
-  QObject::connect(this->Implementation->Lookmarks,SIGNAL(lookmarkRemoved(const QString&)),
-      this->Implementation->LookmarkManagerModel,SLOT(removeLookmark(const QString&)));
-  QObject::connect(this->Implementation->Lookmarks,SIGNAL(importLookmarks(const QStringList&)),
-      this->Implementation->LookmarkManagerModel,SLOT(importLookmarksFromFiles(const QStringList&)));
-  QObject::connect(this->Implementation->Lookmarks,SIGNAL(exportLookmarks(const QList<pqLookmarkModel*>&,const QStringList&)),
-      this->Implementation->LookmarkManagerModel,SLOT(exportLookmarksToFiles(const QList<pqLookmarkModel*>&,const QStringList&)));
+  this->Implementation->Lookmarks = new pqLookmarkBrowserModel(
+    this->Implementation->LookmarkManagerModel,parent_widget);
+  QObject::connect(this->Implementation->LookmarkManagerModel,
+                   SIGNAL(lookmarkAdded(pqLookmarkModel*)),
+                   this->Implementation->Lookmarks,
+                   SLOT(addLookmark(pqLookmarkModel*)));
+  QObject::connect(this->Implementation->LookmarkManagerModel,
+                   SIGNAL(lookmarkRemoved(const QString&)),
+                   this->Implementation->Lookmarks,
+                   SLOT(removeLookmark(const QString&)));
+  QObject::connect(this->Implementation->LookmarkManagerModel,
+                   SIGNAL(lookmarkModified(pqLookmarkModel*)),
+                   this->Implementation->Lookmarks,
+                   SLOT(onLookmarkModified(pqLookmarkModel*)));
+  QObject::connect(this->Implementation->Lookmarks,
+                   SIGNAL(lookmarkRemoved(const QString&)),
+                   this->Implementation->LookmarkManagerModel,
+                   SLOT(removeLookmark(const QString&)));
+  QObject::connect(this->Implementation->Lookmarks,
+                   SIGNAL(importLookmarks(const QStringList&)),
+                   this->Implementation->LookmarkManagerModel,
+                   SLOT(importLookmarksFromFiles(const QStringList&)));
+  QObject::connect(this->Implementation->Lookmarks,
+                   SIGNAL(exportLookmarks(const QList<pqLookmarkModel*>&,const QStringList&)),
+                   this->Implementation->LookmarkManagerModel,
+                   SLOT(exportLookmarksToFiles(const QList<pqLookmarkModel*>&,const QStringList&)));
 
   // Listen to selection changed events.
   // These are queued connections, since while changes are happening the SM
@@ -388,10 +606,10 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     this, SLOT(onProxyCreation(pqProxy*)));
 
   // Listen for the signal that the lookmark button for a given view was pressed
-  QObject::connect(
-    &this->Implementation->MultiViewManager, SIGNAL(createLookmark(pqGenericViewModule*)),
-    this,
-    SLOT(onToolsCreateLookmark(pqGenericViewModule*)));
+  this->connect(&this->Implementation->MultiViewManager, 
+                SIGNAL(createLookmark(pqGenericViewModule*)),
+                this,
+                SLOT(onToolsCreateLookmark(pqGenericViewModule*)));
 
   this->connect(pqApplicationCore::instance()->getPluginManager(),
                 SIGNAL(serverManagerExtensionLoaded()),
@@ -482,8 +700,10 @@ void pqMainWindowCore::setSourceMenu(QMenu* menu)
 {
   if(this->Implementation->SourceMenu)
     {
-    QObject::disconnect(this->Implementation->SourceMenu, SIGNAL(triggered(QAction*)),
-                        this, SLOT(onCreateSource(QAction*)));
+    QObject::disconnect(this->Implementation->SourceMenu, 
+                        SIGNAL(triggered(QAction*)),
+                        this, 
+                        SLOT(onCreateSource(QAction*)));
     }
 
   this->Implementation->SourceMenu = menu;
@@ -497,126 +717,148 @@ void pqMainWindowCore::setSourceMenu(QMenu* menu)
     }
 }
 
-void pqMainWindowCore::refreshSourcesMenu()
+void pqMainWindowCore::pqImplementation::addProxyToMenu(
+  const char* groupName,
+  const char* proxyName,
+  QMenu* menu,
+  pqImplementation::ProxyIconsType* icons,
+  bool disable)
 {
   vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
-  manager->InstantiateGroupPrototypes("sources");
-   
-  pqObjectBuilder* builder = 
-    pqApplicationCore::instance()->getObjectBuilder();
-
-  if(this->Implementation->SourceMenu)
+  vtkSMProxy* prototype = manager->GetProxy(groupName, proxyName);
+  if (prototype)
     {
-    this->Implementation->SourceMenu->clear();
-  
-    int numSources = manager->GetNumberOfProxies("sources_prototypes");
-    QMap<QString, QString> sortingMap;
-    for(int i=0; i<numSources; i++)
+    const char* label = prototype->GetXMLLabel();
+    if (!label)
       {
-      QStringList categoryList;
-      QString proxyName = manager->GetProxyName("sources_prototypes",i);
-      vtkSMProxy* proxy = manager->GetProxy(
-        "sources_prototypes", proxyName.toAscii().data());
-      QString proxyLabel = proxyName;
-      if (proxy && proxy->GetXMLLabel())
+      label = proxyName;
+      }
+    QAction* action = 
+      menu->addAction(label) 
+      << pqSetName(proxyName) << pqSetData(proxyName);
+    if (disable)
+      {
+      action->setEnabled(false);
+      }
+    if (icons)
+      {
+      pqImplementation::ProxyIconsType::iterator iconIter =
+        icons->find(proxyName);
+      if (iconIter != icons->end())
         {
-        proxyLabel = proxy->GetXMLLabel();
-        }
-      QString filenamePropName = builder->getFileNamePropertyName(proxy);
-      // TODO mayabe put an internal tag on the SM XML
-      if(filenamePropName.isEmpty() && proxyLabel != "Test3DWidget" && 
-         proxyLabel != "PointSource" && proxyLabel != "OutlineSource" &&
-         proxyLabel != "NetworkImageSource" && proxyLabel != "SelectionSource")
-        {
-        sortingMap[proxyLabel] = proxyName;
+        action->setIcon(QIcon(iconIter->second.c_str()));
         }
       }
-    for (QMap<QString, QString>::iterator iter2 = sortingMap.begin();
-      iter2 != sortingMap.end(); ++iter2)
-        {
-        this->Implementation->SourceMenu->addAction(iter2.key()) 
-          << pqSetName(iter2.value()) << pqSetData(iter2.value());
-        }
+    }
+}
+
+
+void pqMainWindowCore::refreshSourcesMenu()
+{
+  this->Implementation->updateSourcesFromXML();
+
+  vtkstd::set<vtkstd::string> newSources;
+  this->Implementation->instantiateGroupPrototypes("sources", newSources);
+
+  vtkstd::vector<vtkstd::string>::iterator sourceIter =
+    this->Implementation->Sources.begin();
+  for(; sourceIter != this->Implementation->Sources.end(); sourceIter++)
+    {
+    this->Implementation->addProxyToMenu("sources_prototypes",
+                                         sourceIter->c_str(),
+                                         this->Implementation->SourceMenu,
+                                         0,
+                                         false);
+    }
+
+  // We now add the new sources that were added to sources_prototypes:
+  // these sources were added by a plugin
+  vtkstd::set<vtkstd::string>::iterator nsIter = newSources.begin();
+  for(; nsIter != newSources.end(); nsIter++)
+    {
+    this->Implementation->addProxyToMenu("sources_prototypes",
+                                         nsIter->c_str(),
+                                         this->Implementation->SourceMenu,
+                                         0,
+                                         false);
     }
 }
 
 void pqMainWindowCore::refreshFiltersMenu()
 {
-  vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
-  manager->InstantiateGroupPrototypes("filters");
+  this->Implementation->updateFiltersFromXML();
+
+  vtkstd::set<vtkstd::string> newFilters;
+  this->Implementation->instantiateGroupPrototypes("filters", newFilters);
+  // We now add the new filters that were added to filters_prototypes:
+  // these filters were added by a plugin
+  if (!newFilters.empty())
+    {
+    vtkstd::set<vtkstd::string>::iterator nfIter = newFilters.begin();
+    for(; nfIter != newFilters.end(); nfIter++)
+      {
+      this->Implementation->AlphabeticalFilters.push_back(*nfIter);
+      }
+    // List changed, sort again.
+    vtkstd::sort(this->Implementation->AlphabeticalFilters.begin(),
+                 this->Implementation->AlphabeticalFilters.end());
+    }
+
   if(this->Implementation->FilterMenu)
     {
     this->Implementation->FilterMenu->clear();
 
-    // Update the menu items for the server and compound filters too.
-
-    QStringList::Iterator iter;
-
+    // First add the recently used filters to the Recent menu
     this->Implementation->RecentFiltersMenu = 
       this->Implementation->FilterMenu->addMenu("&Recent") 
       << pqSetName("Recent");
     this->restoreRecentFilterMenu();
     
-
-
-    //Common Filters
-    QStringList commonFilters;
-    commonFilters<<"Clip";
-    commonFilters<<"Cut";
-    commonFilters<<"Threshold";
-    commonFilters<<"Contour";
-    commonFilters<<"StreamTracer";
-
-    QMenu *commonMenu = this->Implementation->FilterMenu->addMenu("&Common") 
-      << pqSetName("Common");
-    for(iter = commonFilters.begin(); iter != commonFilters.end(); ++iter)
+    // Next add all categories.
+    pqImplementation::FilterCategoriesType::iterator catIter =
+      this->Implementation->FilterCategories.begin();
+    for(; catIter != this->Implementation->FilterCategories.end(); catIter++)
       {
-      QString proxyName = (*iter);
-      vtkSMProxy* proxy = manager->GetProxy(
-        "filters_prototypes", proxyName.toAscii().data());
-      QString proxyLabel = proxyName;
-      if (proxy && proxy->GetXMLLabel())
+      pqImplementation::FilterCategory& category = *catIter;
+      const vtkstd::string& catName = category.Name;
+      const vtkstd::string& catLabel = category.MenuLabel;
+      vtkstd::vector<vtkstd::string>& filters = category.Filters;
+      if (!filters.empty())
         {
-        proxyLabel = proxy->GetXMLLabel();
+        QMenu *catMenu = 
+          this->Implementation->FilterMenu->addMenu(catLabel.c_str()) 
+          << pqSetName(catName.c_str());
+        vtkstd::vector<vtkstd::string>::iterator filterIter =
+          filters.begin();
+        for(; filterIter!=filters.end(); filterIter++)
+          {
+          const char* filterName = filterIter->c_str();
+          this->Implementation->addProxyToMenu(
+            "filters_prototypes",
+            filterName, 
+            catMenu,
+            &this->Implementation->FilterIcons);
+          }
         }
-      QAction* action = commonMenu->addAction(proxyLabel) << pqSetName(proxyName)
-        << pqSetData(proxyName);
-      action->setEnabled(false);
       }
 
+    // Finally add all filters to the Alphabetical sub-menu..
     this->Implementation->AlphabeticalMenu = 
       this->Implementation->FilterMenu->addMenu("&Alphabetical") 
       << pqSetName("Alphabetical");
 
-
-    int numFilters = manager->GetNumberOfProxies("filters_prototypes");
-    QMap<QString, QString> sortingMap;
-    for(int i=0; i<numFilters; i++)
+    vtkstd::vector<vtkstd::string>::iterator filterIter =
+      this->Implementation->AlphabeticalFilters.begin();
+    for(;
+        filterIter!=this->Implementation->AlphabeticalFilters.end(); 
+        filterIter++)
       {
-      QStringList categoryList;
-      QString proxyName = manager->GetProxyName("filters_prototypes",i);
-      vtkSMProxy* proxy = manager->GetProxy(
-        "filters_prototypes", proxyName.toAscii().data());
-      QString proxyLabel = proxyName;
-      if (proxy && proxy->GetXMLLabel())
-        {
-        proxyLabel = proxy->GetXMLLabel();
-        }
-      sortingMap[proxyLabel] = proxyName;
-      }
-    for (QMap<QString, QString>::iterator iter2 = sortingMap.begin();
-      iter2 != sortingMap.end(); ++iter2)
-      {
-      //I am hiding the min max filter because it is intended for python 
-      //scripts and its output is not 'correct' on parallel runs when it
-      //uses the standard paraview display pipeline.
-      if (QString::compare(iter2.key(), "MinMax") != 0)
-        {
-        QAction* action = 
-          this->Implementation->AlphabeticalMenu->addAction(iter2.key()) 
-            << pqSetName(iter2.value()) << pqSetData(iter2.value());
-        action->setEnabled(false);
-        }
+      const char* filterName = filterIter->c_str();
+      this->Implementation->addProxyToMenu(
+        "filters_prototypes",
+        filterName, 
+        this->Implementation->AlphabeticalMenu,
+        &this->Implementation->FilterIcons);
       }
     }
 
@@ -706,62 +948,38 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
   pqUndoStack* const undoStack = this->Implementation->UndoStack;
   
   // Connect Accept/reset signals.
-  QObject::connect(
-    object_inspector,
-    SIGNAL(preaccept()),
-    undoStack,
-    SLOT(accept()));
+  QObject::connect(object_inspector, SIGNAL(preaccept()),
+                   undoStack,        SLOT(accept()));
     
-  QObject::connect(
-    object_inspector,
-    SIGNAL(preaccept()),
-    &this->Implementation->SelectionManager,
-    SLOT(clearSelection()));
-
-  QObject::connect(
-    object_inspector, SIGNAL(accepted()),
-    this->Implementation->LookupTableManager, 
-    SLOT(updateLookupTableScalarRanges()));
-
-  QObject::connect(
-    object_inspector, 
-    SIGNAL(postaccept()),
-    undoStack,
-    SLOT(endUndoSet()));
-
-  QObject::connect(
-    object_inspector,
-    SIGNAL(postaccept()),
-    this,
-    SLOT(onPostAccept()));
-
-  QObject::connect(
-    object_inspector,
-    SIGNAL(accepted()), 
-    this,
-    SLOT(createPendingDisplays()));
-    
-  QObject::connect(
-    &this->Implementation->PendingDisplayManager,
-    SIGNAL(pendingDisplays(bool)),
-    object_inspector,
-    SLOT(forceModified(bool)));
+  QObject::connect(object_inspector, 
+                   SIGNAL(preaccept()),
+                   &this->Implementation->SelectionManager, 
+                   SLOT(clearSelection()));
+  QObject::connect(object_inspector, 
+                   SIGNAL(accepted()),
+                   this->Implementation->LookupTableManager, 
+                   SLOT(updateLookupTableScalarRanges()));
+  QObject::connect( object_inspector, SIGNAL(postaccept()),
+                    undoStack,        SLOT(endUndoSet()));
+  QObject::connect(object_inspector, SIGNAL(postaccept()),
+                   this,             SLOT(onPostAccept()));
+  QObject::connect(object_inspector, SIGNAL(accepted()), 
+                   this,             SLOT(createPendingDisplays()));
+  QObject::connect( &this->Implementation->PendingDisplayManager,
+                    SIGNAL(pendingDisplays(bool)),
+                    object_inspector,
+                    SLOT(forceModified(bool)));
 
   // Use the server manager selection model to determine which page
   // should be shown.
   pqObjectInspectorDriver *driver = this->getObjectInspectorDriver();
-  QObject::connect(
-    driver,
-    SIGNAL(sourceChanged(pqProxy *)),
-    proxyPanel,
-    SLOT(setProxy(pqProxy *)));
-  
-  QObject::connect(
-    &pqActiveView::instance(),
-    SIGNAL(changed(pqGenericViewModule*)),
-    proxyPanel,
-    SLOT(setView(pqGenericViewModule*)), 
-    Qt::QueuedConnection);
+  QObject::connect(driver,     SIGNAL(sourceChanged(pqProxy *)),
+                   proxyPanel, SLOT(setProxy(pqProxy *)));
+  QObject::connect(&pqActiveView::instance(),
+                   SIGNAL(changed(pqGenericViewModule*)),
+                   proxyPanel,
+                   SLOT(setView(pqGenericViewModule*)), 
+                   Qt::QueuedConnection);
 
   return proxyPanel;
 }
@@ -776,56 +994,32 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
   pqUndoStack* const undoStack = this->Implementation->UndoStack;
   
   // Connect Accept/reset signals.
-  QObject::connect(
-    object_inspector,
-    SIGNAL(preaccept()),
-    undoStack,
-    SLOT(accept()));
-    
-  QObject::connect(
-    object_inspector,
-    SIGNAL(preaccept()),
-    &this->Implementation->SelectionManager,
-    SLOT(clearSelection()));
-
-  QObject::connect(
-    object_inspector, 
-    SIGNAL(postaccept()),
-    undoStack,
-    SLOT(endUndoSet()));
-
-  QObject::connect(
-    object_inspector,
-    SIGNAL(postaccept()),
-    this,
-    SLOT(onPostAccept()));
-
-  QObject::connect(
-    object_inspector,
-    SIGNAL(accepted()), 
-    this,
-    SLOT(createPendingDisplays()));
-    
-  QObject::connect(
-    &this->Implementation->PendingDisplayManager,
-    SIGNAL(pendingDisplays(bool)),
-    object_inspector,
-    SLOT(forceModified(bool)));
+  QObject::connect(object_inspector, SIGNAL(preaccept()),
+                   undoStack,        SLOT(accept()));
+  QObject::connect(object_inspector,
+                   SIGNAL(preaccept()),
+                   &this->Implementation->SelectionManager,
+                   SLOT(clearSelection()));
+  QObject::connect(object_inspector, SIGNAL(postaccept()),
+                   undoStack,        SLOT(endUndoSet()));
+  QObject::connect(object_inspector, SIGNAL(postaccept()),
+                   this,             SLOT(onPostAccept()));
+  QObject::connect(object_inspector, SIGNAL(accepted()), 
+                   this,             SLOT(createPendingDisplays()));
+  QObject::connect(&this->Implementation->PendingDisplayManager,
+                   SIGNAL(pendingDisplays(bool)),
+                   object_inspector,
+                   SLOT(forceModified(bool)));
 
   // Use the server manager selection model to determine which page
   // should be shown.
   pqObjectInspectorDriver *driver = this->getObjectInspectorDriver();
-  QObject::connect(
-    driver,
-    SIGNAL(sourceChanged(pqProxy *)),
-    object_inspector,
-    SLOT(setProxy(pqProxy *)));
-  
-  QObject::connect(
-    &pqActiveView::instance(),
-    SIGNAL(changed(pqGenericViewModule*)),
-    object_inspector,
-    SLOT(setView(pqGenericViewModule*)));
+  QObject::connect(driver,           SIGNAL(sourceChanged(pqProxy *)),
+                   object_inspector, SLOT(setProxy(pqProxy *)));
+    QObject::connect(&pqActiveView::instance(),
+                   SIGNAL(changed(pqGenericViewModule*)),
+                   object_inspector,
+                   SLOT(setView(pqGenericViewModule*)));
 
   return object_inspector;
 }
@@ -843,29 +1037,14 @@ void pqMainWindowCore::setupStatisticsView(QDockWidget* dock_widget)
   
   // Undo/redo operations can potentially change data information,
   // hence we must refresh the data on undo/redo.
-  QObject::connect(
-    undo_stack,
-    SIGNAL(undone()),
-    statistics_view,
-    SLOT(refreshData()));
-    
-  QObject::connect(
-    undo_stack,
-    SIGNAL(redone()),
-    statistics_view,
-    SLOT(refreshData()));
-
-  QObject::connect(
-    this,
-    SIGNAL(postAccept()),
-    statistics_view,
-    SLOT(refreshData()));    
-  
-  QObject::connect(
-    pqApplicationCore::instance(),
-    SIGNAL(stateLoaded()),
-    statistics_view,
-    SLOT(refreshData()));
+  QObject::connect(undo_stack,      SIGNAL(undone()),
+                   statistics_view, SLOT(refreshData()));
+  QObject::connect(undo_stack,      SIGNAL(redone()),
+                   statistics_view, SLOT(refreshData()));
+  QObject::connect(this,            SIGNAL(postAccept()),
+                   statistics_view, SLOT(refreshData()));    
+    QObject::connect(pqApplicationCore::instance(), SIGNAL(stateLoaded()),
+                   statistics_view,               SLOT(refreshData()));
      
 }
 
@@ -892,10 +1071,13 @@ pqLookmarkManagerModel* pqMainWindowCore::getLookmarkManagerModel()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setupLookmarkBrowser(QDockWidget* dock_widget)
 {
-  this->Implementation->LookmarkBrowser = new pqLookmarkBrowser(this->Implementation->Lookmarks, dock_widget);
+  this->Implementation->LookmarkBrowser = 
+    new pqLookmarkBrowser(this->Implementation->Lookmarks, dock_widget);
 
-  QObject::connect(this->Implementation->LookmarkBrowser,SIGNAL(loadLookmark(const QString&)),
-      this,SLOT(onLoadLookmark(const QString&)));
+  QObject::connect(this->Implementation->LookmarkBrowser,
+                   SIGNAL(loadLookmark(const QString&)),
+                   this,
+                   SLOT(onLoadLookmark(const QString&)));
 
   dock_widget->setWidget(this->Implementation->LookmarkBrowser);
 }
@@ -904,18 +1086,21 @@ void pqMainWindowCore::setupLookmarkBrowser(QDockWidget* dock_widget)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setupLookmarkInspector(QDockWidget* dock_widget)
 {
-  this->Implementation->LookmarkInspector = new pqLookmarkInspector(this->Implementation->LookmarkManagerModel, dock_widget);
+  this->Implementation->LookmarkInspector = 
+    new pqLookmarkInspector(this->Implementation->LookmarkManagerModel, 
+                            dock_widget);
 
-  QObject::connect(this->Implementation->LookmarkInspector,SIGNAL(removeLookmark(pqLookmarkModel*)),
-      this->Implementation->LookmarkManagerModel,SLOT(removeLookmark(pqLookmarkModel*)));
-  QObject::connect(this->Implementation->LookmarkInspector,SIGNAL(loadLookmark(const QString&)),
-      this,SLOT(onLoadLookmark(const QString&)));
-
-  QObject::connect(
-    this->Implementation->LookmarkBrowser,
-    SIGNAL(selectedLookmarksChanged(const QStringList &)),
-    this->Implementation->LookmarkInspector,
-    SLOT(onLookmarkSelectionChanged(const QStringList &)));
+  QObject::connect(this->Implementation->LookmarkInspector,
+                   SIGNAL(removeLookmark(pqLookmarkModel*)),
+                   this->Implementation->LookmarkManagerModel,
+                   SLOT(removeLookmark(pqLookmarkModel*)));
+  QObject::connect(this->Implementation->LookmarkInspector,
+                   SIGNAL(loadLookmark(const QString&)),
+                   this,SLOT(onLoadLookmark(const QString&)));
+  QObject::connect(this->Implementation->LookmarkBrowser,
+                   SIGNAL(selectedLookmarksChanged(const QStringList &)),
+                   this->Implementation->LookmarkInspector,
+                   SLOT(onLookmarkSelectionChanged(const QStringList &)));
 
   dock_widget->setWidget(this->Implementation->LookmarkInspector);
 }
@@ -932,22 +1117,25 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
       SLOT(onActiveServerChanged(pqServer*)));
 
     QObject::connect(this->Implementation->AnimationManager,
-      SIGNAL(activeSceneChanged(pqAnimationScene*)),
-      this, SLOT(onActiveSceneChanged(pqAnimationScene*)));
-
+                     SIGNAL(activeSceneChanged(pqAnimationScene*)),
+                     this, 
+                     SLOT(onActiveSceneChanged(pqAnimationScene*)));
     QObject::connect(this->Implementation->AnimationManager, 
-      SIGNAL(activeSceneChanged(pqAnimationScene*)),
-      &this->VCRController(), SLOT(setAnimationScene(pqAnimationScene*)));
+                     SIGNAL(activeSceneChanged(pqAnimationScene*)),
+                     &this->VCRController(), 
+                     SLOT(setAnimationScene(pqAnimationScene*)));
 
     this->Implementation->AnimationManager->setViewWidget(
       &this->multiViewManager());
 
     QObject::connect(this->Implementation->AnimationManager,
-      SIGNAL(beginNonUndoableChanges()),
-      this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
+                     SIGNAL(beginNonUndoableChanges()),
+                     this->Implementation->UndoStack, 
+                     SLOT(beginNonUndoableChanges()));
     QObject::connect(this->Implementation->AnimationManager,
-      SIGNAL(endNonUndoableChanges()),
-      this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
+                     SIGNAL(endNonUndoableChanges()),
+                     this->Implementation->UndoStack, 
+                     SLOT(endNonUndoableChanges()));
     }
   return this->Implementation->AnimationManager;
 }
@@ -957,11 +1145,13 @@ void pqMainWindowCore::setupAnimationPanel(QDockWidget* dock_widget)
 {
   pqAnimationPanel* const panel = new pqAnimationPanel(dock_widget);
 
-  QObject::connect(panel, SIGNAL(beginUndo(const QString&)),
-    this->Implementation->UndoStack, SLOT(beginUndoSet(const QString&)));
+  QObject::connect(panel, 
+                   SIGNAL(beginUndo(const QString&)),
+                   this->Implementation->UndoStack, 
+                   SLOT(beginUndoSet(const QString&)));
 
-  QObject::connect(panel, SIGNAL(endUndo()),
-    this->Implementation->UndoStack, SLOT(endUndoSet()));
+  QObject::connect(panel,                           SIGNAL(endUndo()),
+                   this->Implementation->UndoStack, SLOT(endUndoSet()));
 
   pqAnimationManager* mgr = this->getAnimationManager();
   panel->setManager(mgr);
@@ -980,11 +1170,12 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
   toolbar->addWidget(display_color);
 
   QObject::connect(this->getObjectInspectorDriver(),
-    SIGNAL(displayChanged(pqConsumerDisplay *, pqGenericViewModule *)),
-    display_color, SLOT(setDisplay(pqConsumerDisplay *)));
+                   SIGNAL(displayChanged(pqConsumerDisplay*, pqGenericViewModule*)),
+                   display_color, 
+                   SLOT(setDisplay(pqConsumerDisplay *)));
   
-  QObject::connect( this, SIGNAL(postAccept()),
-    display_color, SLOT(reloadGUI()));
+  QObject::connect( this,          SIGNAL(postAccept()),
+                    display_color, SLOT(reloadGUI()));
 }
 
 //-----------------------------------------------------------------------------
@@ -997,9 +1188,9 @@ pqObjectInspectorDriver* pqMainWindowCore::getObjectInspectorDriver()
     this->Implementation->ObjectInspectorDriver->setSelectionModel(
         pqApplicationCore::instance()->getSelectionModel());
     this->connect(&pqActiveView::instance(),
-        SIGNAL(changed(pqGenericViewModule *)),
-        this->Implementation->ObjectInspectorDriver,
-        SLOT(setActiveView(pqGenericViewModule *)));
+                  SIGNAL(changed(pqGenericViewModule *)),
+                  this->Implementation->ObjectInspectorDriver,
+                  SLOT(setActiveView(pqGenericViewModule *)));
     }
 
   return this->Implementation->ObjectInspectorDriver;
@@ -1015,11 +1206,12 @@ void pqMainWindowCore::setupRepresentationToolbar(QToolBar* toolbar)
   toolbar->addWidget(display_representation);
 
   QObject::connect(this->getObjectInspectorDriver(),
-    SIGNAL(displayChanged(pqConsumerDisplay *, pqGenericViewModule *)),
-    display_representation, SLOT(setDisplay(pqConsumerDisplay *)));
+                   SIGNAL(displayChanged(pqConsumerDisplay *, pqGenericViewModule *)),
+                   display_representation, 
+                   SLOT(setDisplay(pqConsumerDisplay *)));
 
-  QObject::connect(this, SIGNAL(postAccept()),
-    display_representation, SLOT(reloadGUI()));
+  QObject::connect(this,                   SIGNAL(postAccept()),
+                   display_representation, SLOT(reloadGUI()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1033,9 +1225,9 @@ void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* toolbar)
   pqServerManagerObserver *observer =
       pqApplicationCore::instance()->getServerManagerObserver();
   this->connect(observer, SIGNAL(compoundProxyDefinitionRegistered(QString)),
-      this, SLOT(onCompoundProxyAdded(QString)));
+                this,     SLOT(onCompoundProxyAdded(QString)));
   this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
-      this, SLOT(onCompoundProxyRemoved(QString)));
+                this,     SLOT(onCompoundProxyRemoved(QString)));
 
 /*
   // Workaround for file new crash.
@@ -1048,24 +1240,36 @@ void pqMainWindowCore::setupLookmarkToolbar(QToolBar* toolbar)
   this->Implementation->LookmarkToolbar = toolbar;
 
   // add in existing lookmarks first
-  for(int i=0; i<this->Implementation->LookmarkManagerModel->getNumberOfLookmarks();i++)
+  for(int i=0; 
+      i<this->Implementation->LookmarkManagerModel->getNumberOfLookmarks();
+      i++)
     {
-    pqLookmarkModel *lmk = this->Implementation->LookmarkManagerModel->getLookmark(i);
-    this->Implementation->LookmarkToolbar->addAction(QIcon(QPixmap::fromImage(lmk->getIcon())), lmk->getName()) 
+    pqLookmarkModel *lmk = 
+      this->Implementation->LookmarkManagerModel->getLookmark(i);
+    this->Implementation->LookmarkToolbar->addAction(
+      QIcon(QPixmap::fromImage(lmk->getIcon())), lmk->getName()) 
       << pqSetName(lmk->getName()) << pqSetData(lmk->getName());
     }
 
   // connect up toolbar with lookmark manager events
   QObject::connect(toolbar, SIGNAL(actionTriggered(QAction*)), 
-      this, SLOT(onLoadToolbarLookmark(QAction*)));
-  QObject::connect(toolbar, SIGNAL(customContextMenuRequested(const QPoint &)),
-      this, SLOT(showLookmarkToolbarContextMenu(const QPoint &)));
-  QObject::connect(this->Implementation->LookmarkManagerModel, SIGNAL(lookmarkAdded(const QString&, const QImage&)),
-      this, SLOT(onLookmarkAdded(const QString&, const QImage&)));
-  QObject::connect(this->Implementation->LookmarkManagerModel, SIGNAL(lookmarkRemoved(const QString&)),
-      this, SLOT(onLookmarkRemoved(const QString&)));
-  QObject::connect(this->Implementation->LookmarkManagerModel, SIGNAL(lookmarkNameChanged(const QString&, const QString&)),
-      this, SLOT(onLookmarkNameChanged(const QString&, const QString&)));
+                   this,    SLOT(onLoadToolbarLookmark(QAction*)));
+  QObject::connect(toolbar, 
+                   SIGNAL(customContextMenuRequested(const QPoint &)),
+                   this, 
+                   SLOT(showLookmarkToolbarContextMenu(const QPoint &)));
+  QObject::connect(this->Implementation->LookmarkManagerModel, 
+                   SIGNAL(lookmarkAdded(const QString&, const QImage&)),
+                   this, 
+                   SLOT(onLookmarkAdded(const QString&, const QImage&)));
+  QObject::connect(this->Implementation->LookmarkManagerModel, 
+                   SIGNAL(lookmarkRemoved(const QString&)),
+                   this, 
+                   SLOT(onLookmarkRemoved(const QString&)));
+  QObject::connect(this->Implementation->LookmarkManagerModel, 
+                   SIGNAL(lookmarkNameChanged(const QString&, const QString&)),
+                   this, 
+                   SLOT(onLookmarkNameChanged(const QString&, const QString&)));
 }
 
 
@@ -1078,8 +1282,10 @@ void pqMainWindowCore::showLookmarkToolbarContextMenu(const QPoint &menuPos)
   // Create the actions that are not lookmark-specific
   QAction *actionDisplayBrowser = new QAction("Lookmark Browser",
     this->Implementation->LookmarkToolbar);
-  QObject::connect(actionDisplayBrowser, SIGNAL(triggered()), 
-      this->Implementation->LookmarkBrowser->parentWidget(), SLOT(show()));
+  QObject::connect(actionDisplayBrowser, 
+                   SIGNAL(triggered()), 
+                   this->Implementation->LookmarkBrowser->parentWidget(), 
+                   SLOT(show()));
   menu.addAction(actionDisplayBrowser);
   QAction *actionNew = new QAction("New",
     this->Implementation->LookmarkToolbar);
@@ -1123,7 +1329,8 @@ void pqMainWindowCore::showLookmarkToolbarContextMenu(const QPoint &menuPos)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onLookmarkAdded(const QString &name, const QImage &icon)
 {
-  this->Implementation->LookmarkToolbar->addAction(QIcon(QPixmap::fromImage(icon)), name) 
+  this->Implementation->LookmarkToolbar->addAction(
+    QIcon(QPixmap::fromImage(icon)), name) 
     << pqSetName(name) << pqSetData(name);
 }
 
@@ -1135,7 +1342,8 @@ void pqMainWindowCore::onRemoveToolbarLookmark()
     {
     return;
     }
-  this->Implementation->LookmarkManagerModel->removeLookmark(this->Implementation->CurrentLookmark);
+  this->Implementation->LookmarkManagerModel->removeLookmark(
+    this->Implementation->CurrentLookmark);
 }
 
 
@@ -1143,7 +1351,8 @@ void pqMainWindowCore::onRemoveToolbarLookmark()
 void pqMainWindowCore::onLookmarkRemoved(const QString &name)
 {
   // Remove the action associated with the lookmark.
-  QAction *action = this->Implementation->LookmarkToolbar->findChild<QAction *>(name);
+  QAction *action = 
+    this->Implementation->LookmarkToolbar->findChild<QAction *>(name);
   if(action)
     {
     this->Implementation->LookmarkToolbar->removeAction(action);
@@ -1151,9 +1360,11 @@ void pqMainWindowCore::onLookmarkRemoved(const QString &name)
     }
 }
 
-void pqMainWindowCore::onLookmarkNameChanged(const QString &oldName, const QString &newName)
+void pqMainWindowCore::onLookmarkNameChanged(const QString &oldName, 
+                                             const QString &newName)
 {
-  QAction *action = this->Implementation->LookmarkToolbar->findChild<QAction *>(oldName);
+  QAction *action = 
+    this->Implementation->LookmarkToolbar->findChild<QAction *>(oldName);
   if(action)
     {
     action << pqSetName(newName);
@@ -1225,7 +1436,7 @@ void pqMainWindowCore::onLoadLookmark(const QString &name)
       pqApplicationCore::instance()->serverStartups(),
       *pqApplicationCore::instance()->settings(),
       this->Implementation->Parent);
-    server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
+    server_browser->setAttribute(Qt::WA_DeleteOnClose); //auto delete when closed
     QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
       this, SLOT(onLoadCurrentLookmark(pqServer*)), Qt::QueuedConnection);
     server_browser->setModal(true);
@@ -1304,16 +1515,16 @@ void pqMainWindowCore::setupProgressBar(QStatusBar* toolbar)
     pqApplicationCore::instance()->getProgressManager();
 
   QObject::connect(progress_manager, SIGNAL(enableProgress(bool)),
-    progress_bar, SLOT(enableProgress(bool)));
+                   progress_bar,     SLOT(enableProgress(bool)));
     
   QObject::connect(progress_manager, SIGNAL(progress(const QString&, int)),
-    progress_bar, SLOT(setProgress(const QString&, int)));
+                   progress_bar,     SLOT(setProgress(const QString&, int)));
 
   QObject::connect(progress_manager, SIGNAL(enableAbort(bool)),
-    progress_bar, SLOT(enableAbort(bool)));
+                   progress_bar,      SLOT(enableAbort(bool)));
 
-  QObject::connect(progress_bar, SIGNAL(abortPressed()),
-    progress_manager, SLOT(triggerAbort()));
+  QObject::connect(progress_bar,     SIGNAL(abortPressed()),
+                   progress_manager, SLOT(triggerAbort()));
 
   progress_manager->addNonBlockableObject(progress_bar);
   progress_manager->addNonBlockableObject(progress_bar->getAbortButton());
@@ -1414,7 +1625,7 @@ void pqMainWindowCore::onFileOpen()
       pqApplicationCore::instance()->serverStartups(),
       *pqApplicationCore::instance()->settings(),
       this->Implementation->Parent);
-    server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
+    server_browser->setAttribute(Qt::WA_DeleteOnClose); //auto delete when closed
     QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
       this, SLOT(onFileOpen(pqServer*)), Qt::QueuedConnection);
     server_browser->setModal(true);
@@ -1486,9 +1697,10 @@ void pqMainWindowCore::onFileLoadServerState()
       pqApplicationCore::instance()->serverStartups(),
       *pqApplicationCore::instance()->settings(),
       this->Implementation->Parent);
-    server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
+    server_browser->setAttribute(Qt::WA_DeleteOnClose); //auto delete when closed
     QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
-      this, SLOT(onFileLoadServerState(pqServer*)), Qt::QueuedConnection);
+                     this,           SLOT(onFileLoadServerState(pqServer*)), 
+                     Qt::QueuedConnection);
     server_browser->setModal(true);
     server_browser->show();
     }
@@ -1507,7 +1719,7 @@ void pqMainWindowCore::onFileLoadServerState(pqServer*)
   fileDialog->setObjectName("FileLoadServerStateDialog");
   fileDialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList&)),
-      this, SLOT(onFileLoadServerState(const QStringList&)));
+                   this,       SLOT(onFileLoadServerState(const QStringList&)));
   fileDialog->setModal(true);
   fileDialog->show();
 }
@@ -1588,7 +1800,8 @@ void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
     resource.setPath(files[i]);
     resource.setSessionServer(server->getResource());
     pqApplicationCore::instance()->serverResources().add(resource);
-    pqApplicationCore::instance()->serverResources().save(*pqApplicationCore::instance()->settings());
+    pqApplicationCore::instance()->serverResources().save(
+      *pqApplicationCore::instance()->settings());
     }
 
   root->Delete();
@@ -1644,8 +1857,8 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
     return;
     }
 
-  vtkSMStringVectorProperty::SafeDownCast(writer->GetProperty("FileName"))
-    ->SetElement(0, files[0].toAscii().data());
+  vtkSMStringVectorProperty::SafeDownCast(
+    writer->GetProperty("FileName"))->SetElement(0, files[0].toAscii().data());
 
   // TODO: We can popup a wizard or something for setting the properties
   // on the writer.
@@ -1774,13 +1987,17 @@ void pqMainWindowCore::onSaveGeometry()
     }
 
   QString filters = "ParaView Data files (*.pvd);;All files (*)";
-  pqFileDialog* const file_dialog = new pqFileDialog(NULL,
-    this->Implementation->Parent, tr("Save Animation Geometry"), QString(), filters);
+  pqFileDialog* const file_dialog = new pqFileDialog(
+    NULL,
+    this->Implementation->Parent, 
+    tr("Save Animation Geometry"), 
+    QString(), 
+    filters);
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileSaveAnimationDialog");
   file_dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
-    this, SLOT(onSaveGeometry(const QStringList&)));
+                   this,        SLOT(onSaveGeometry(const QStringList&)));
   file_dialog->setModal(true);
   file_dialog->show();  
 }
@@ -1960,14 +2177,17 @@ void pqMainWindowCore::onToolsCreateLookmark()
 void pqMainWindowCore::onToolsCreateLookmark(pqGenericViewModule *view)
 {
   // right now we only support Lookmarks of render modules
-  pqRenderViewModule* const render_module = qobject_cast<pqRenderViewModule*>(view);
+  pqRenderViewModule* const render_module = 
+    qobject_cast<pqRenderViewModule*>(view);
   if(!render_module)
     {
     qCritical() << "Cannnot create Lookmark. No active render module.";
     return;
     }
 
-  pqLookmarkDefinitionWizard wizard(this->Implementation->LookmarkManagerModel, render_module, this->Implementation->Parent);
+  pqLookmarkDefinitionWizard wizard(this->Implementation->LookmarkManagerModel, 
+                                    render_module, 
+                                    this->Implementation->Parent);
   if(wizard.exec() == QDialog::Accepted)
     {
     wizard.createLookmark();
@@ -2060,7 +2280,8 @@ void pqMainWindowCore::onToolsRecordTestScreenshot(const QStringList &fileNames)
     return;
     }
 
-  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(render_module->getWidget());
+  QVTKWidget* const widget = 
+    qobject_cast<QVTKWidget*>(render_module->getWidget());
   assert(widget);
 
   QSize old_size = widget->size();
@@ -2097,7 +2318,7 @@ void pqMainWindowCore::onToolsPlayTest()
   fileDialog->setObjectName("ToolsPlayTestDialog");
   fileDialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList&)), 
-      this, SLOT(onToolsPlayTest(const QStringList&)));
+                   this,       SLOT(onToolsPlayTest(const QStringList&)));
   fileDialog->setModal(true);
   fileDialog->show();
 }
@@ -2208,7 +2429,7 @@ void pqMainWindowCore::onCreateSource(QAction* action)
       pqApplicationCore::instance()->serverStartups(),
       *pqApplicationCore::instance()->settings(),
       this->Implementation->Parent);
-    server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
+    server_browser->setAttribute(Qt::WA_DeleteOnClose); //auto delete when closed
     server_browser->exec();
     }
   
@@ -2258,28 +2479,18 @@ void pqMainWindowCore::updateRecentFilterMenu(QAction* action)
     this->Implementation->RecentFilterList.removeLast();
     }
 
-
-
   this->Implementation->RecentFiltersMenu->clear();
 
-
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   QList<QString>::iterator begin,end;
   begin=this->Implementation->RecentFilterList.begin();
   end=this->Implementation->RecentFilterList.end();
   for(;begin!=end;++begin)
     {
-    QString proxyLabel = (*begin);
-    vtkSMProxy* proxy = pxm->GetProxy(
-      "filters_prototypes", (*begin).toAscii().data());
-    if (proxy && proxy->GetXMLLabel())
-      {
-      proxyLabel = proxy->GetXMLLabel();
-      }
-    QAction* recentA = 
-      this->Implementation->RecentFiltersMenu->addAction(proxyLabel) 
-      << pqSetName(*begin) << pqSetData(*begin);
-    recentA->setEnabled(false);
+    QString proxyName = *begin;
+    this->Implementation->addProxyToMenu("filters_prototypes", 
+                                         proxyName.toAscii().data(),
+                                         this->Implementation->RecentFiltersMenu,
+                                         &this->Implementation->FilterIcons);
     }
 
   this->saveRecentFilterMenu();
@@ -2334,10 +2545,10 @@ void pqMainWindowCore::restoreRecentFilterMenu()
   const char** str;
 
   for(str=RecentFilterMenuSettings; *str != NULL; str++)
-  {
+    {
     QString key = QString("recentFilterMenu/") + *str;
     if (settings->contains(key))
-    {
+      {
       QString filterName=settings->value(key).toString();
 
       int idx=this->Implementation->RecentFilterList.indexOf(filterName);
@@ -2351,31 +2562,22 @@ void pqMainWindowCore::restoreRecentFilterMenu()
         {
         this->Implementation->RecentFilterList.removeLast();
         }
+      }
     }
-  }
 
+  this->Implementation->RecentFiltersMenu->clear();
 
-   this->Implementation->RecentFiltersMenu->clear();
-
-
-   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-   QList<QString>::iterator begin,end;
-   begin=this->Implementation->RecentFilterList.begin();
-   end=this->Implementation->RecentFilterList.end();
-   for(;begin!=end;++begin)
-     {
-      QString proxyLabel = (*begin);
-      vtkSMProxy* proxy = pxm->GetProxy(
-        "filters_prototypes", (*begin).toAscii().data());
-      if (proxy && proxy->GetXMLLabel())
-        {
-        proxyLabel = proxy->GetXMLLabel();
-        }
-     QAction* recentA = 
-       this->Implementation->RecentFiltersMenu->addAction(proxyLabel) 
-       << pqSetName(*begin) << pqSetData(*begin);
-     recentA->setEnabled(false);
-     }
+  QList<QString>::iterator begin,end;
+  begin=this->Implementation->RecentFilterList.begin();
+  end=this->Implementation->RecentFilterList.end();
+  for(;begin!=end;++begin)
+    {
+    QString proxyName = *begin;
+    this->Implementation->addProxyToMenu("filters_prototypes",
+                                         proxyName.toAscii().data(),
+                                         this->Implementation->RecentFiltersMenu,
+                                         &this->Implementation->FilterIcons);
+    }
 }
 
 
@@ -2931,7 +3133,8 @@ pqPipelineSource* pqMainWindowCore::getActiveSource()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::getRootSources(QList<pqPipelineSource*> *sources, pqPipelineSource *src)
+void pqMainWindowCore::getRootSources(QList<pqPipelineSource*> *sources, 
+                                      pqPipelineSource *src)
 {
   pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter*>(src);
   if(!filter || filter->getInputCount()==0)
