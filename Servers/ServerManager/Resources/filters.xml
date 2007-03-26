@@ -3622,9 +3622,13 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
              <DataType value="vtkPolyData"/>
            </DataTypeDomain>
            <ProxyListDomain name="proxy_list">
-              <Proxy group="sources" name="SphereSource" />
+              <Proxy group="sources" name="ArrowSource" />
               <Proxy group="sources" name="ConeSource" />
+              <Proxy group="sources" name="CubeSource" />
               <Proxy group="sources" name="CylinderSource" />
+              <Proxy group="sources" name="LineSource" />
+              <Proxy group="sources" name="SphereSource" />
+              <Proxy group="sources" name="GlyphSource2D" />
            </ProxyListDomain>
            <Documentation>
              Select the type of glyph to use.
