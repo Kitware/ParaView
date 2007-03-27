@@ -2363,22 +2363,14 @@
       </Domain>
     </Property>
     <Property name="RGBPoints" id="625.RGBPoints" number_of_elements="8">
-      <Element index="0" value="0"/>
+      <Element index="0" value="0.714286"/>
       <Element index="1" value="0"/>
       <Element index="2" value="0"/>
       <Element index="3" value="1"/>
-      <Element index="4" value="1"/>
+      <Element index="4" value="0.716286"/>
       <Element index="5" value="1"/>
       <Element index="6" value="0"/>
       <Element index="7" value="0"/>
-    </Property>
-    <Property name="ScalePointsWithRange" id="625.ScalePointsWithRange" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="bool" id="625.ScalePointsWithRange.bool"/>
-    </Property>
-    <Property name="ScalarRange" id="625.ScalarRange" number_of_elements="2">
-      <Element index="0" value="0.714286"/>
-      <Element index="1" value="0.716286"/>
     </Property>
     <Property name="VectorComponent" id="625.VectorComponent" number_of_elements="1">
       <Element index="0" value="0"/>
