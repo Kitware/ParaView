@@ -74,7 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkType.h"
 
 // Temporary switch
-#define USE_VTK_TFE 0
+#define USE_VTK_TFE 1
 
 
 class pqColorScaleEditorForm : public Ui::pqColorScaleDialog
