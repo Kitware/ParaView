@@ -40,7 +40,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.34");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.35");
 
 
 //-----------------------------------------------------------------------------
@@ -532,7 +532,7 @@ void vtkSMDataObjectDisplayProxy::SetupVolumePipeline()
       return;
       }
     pp->RemoveAllProxies();
-    if (this->SupportsHAVSMapper && false)
+    if (this->SupportsHAVSMapper)
       {
       pp->AddProxy(this->VolumeHAVSMapperProxy);
       }
