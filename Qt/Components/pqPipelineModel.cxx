@@ -1629,9 +1629,6 @@ void pqPipelineModel::initializePixmaps()
     // For now, initialized these icons to empty. In the future, these
     // icons will represent where the proxy can be displayed (view type)
     // as opposed to the proxy type.
-    this->PixmapList[pqPipelineModel::Source];
-    this->PixmapList[pqPipelineModel::Filter];
-    this->PixmapList[pqPipelineModel::CustomFilter];
 
     this->PixmapList[pqPipelineModel::Link].load(
         ":/pqWidgets/Icons/pqLinkBack16.png");
