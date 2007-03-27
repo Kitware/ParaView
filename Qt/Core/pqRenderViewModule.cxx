@@ -1157,7 +1157,7 @@ void pqRenderViewModule::clearUndoStack()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::fakeUndoRedo(bool redo, bool self)
+void pqRenderViewModule::fakeUndoRedo(bool fake_redo, bool self)
 {
   if (this->Internal->UpdatingStack)
     {
@@ -1166,7 +1166,7 @@ void pqRenderViewModule::fakeUndoRedo(bool redo, bool self)
   this->Internal->UpdatingStack = true;
   if (self)
     {
-    if (redo)
+    if (fake_redo)
       {
       this->Internal->InteractionUndoStack->PopRedoStack();
       }
@@ -1179,7 +1179,7 @@ void pqRenderViewModule::fakeUndoRedo(bool redo, bool self)
     {
     if (other)
       {
-      other->fakeUndoRedo(redo, true);
+      other->fakeUndoRedo(fake_redo, true);
       }
     }
   this->Internal->UpdatingStack = false;
