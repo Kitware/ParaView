@@ -20,7 +20,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVLookupTable);
-vtkCxxRevisionMacro(vtkPVLookupTable, "1.4");
+vtkCxxRevisionMacro(vtkPVLookupTable, "1.5");
 //-----------------------------------------------------------------------------
 vtkPVLookupTable::vtkPVLookupTable()
 {
@@ -28,76 +28,22 @@ vtkPVLookupTable::vtkPVLookupTable()
 
   this->Discretize = 0;
   this->NumberOfValues = 256;
-  this->ScalePointsWithRange = 1;
+
+  this->Data = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVLookupTable::~vtkPVLookupTable()
 {
   this->LookupTable->Delete();
+  delete [] this->Data;
 }
 
+//-----------------------------------------------------------------------------
 struct vtkPVLookupTableNode
 {
   double Value[6];
 };
-
-//-----------------------------------------------------------------------------
-void vtkPVLookupTable::SetRange(double min, double max)
-{
-  if (!this->ScalePointsWithRange)
-    {
-    // If ScalePointsWithRange if off, all SetRange requests are simply ignored.
-    // The range is determined by the control points added to the 
-    // ColorTransferFunction.
-    return;
-    }
-
-  // Scale the ColorTransferFunction control points over the new range.
-  double oldrange[2];
-  this->GetRange(oldrange);
-
-  if (oldrange[0] == min && oldrange[1] == max)
-    {
-    // no range change, nothing to do.
-    return;
-    }
-
-
-  // Adjust vtkColorTransferFunction points to the new range.
-  double dold = (oldrange[1] - oldrange[0]);
-  dold = (dold > 0) ? dold : 1;
-
-  double dnew = (max -min);
-  dnew = (dnew > 0) ? dnew : 1;
-
-  double scale = dnew/dold;
-
-  // Get the current control points.
-  vtkstd::vector<vtkPVLookupTableNode> controlPoints;
-  int num_points = this->GetSize();
-  for (int cc=0; cc < num_points; cc++)
-    {
-    vtkPVLookupTableNode node;
-    this->GetNodeValue(cc, node.Value);
-    node.Value[0] = scale*(node.Value[0] - oldrange[0]) + min;
-    controlPoints.push_back(node);
-    }
-
-  // Remove old points and add the moved points.
-  this->RemoveAllPoints();
-
-  // Now added the control points again.
-  vtkstd::vector<vtkPVLookupTableNode>::iterator iter;
-  for (iter = controlPoints.begin(); iter != controlPoints.end(); ++iter)
-    {
-    this->AddRGBPoint(iter->Value[0], iter->Value[1], iter->Value[2], 
-      iter->Value[3], iter->Value[4], iter->Value[5]);
-    }
-  
-  this->Build();
-  this->Modified();
-}
 
 //-----------------------------------------------------------------------------
 void vtkPVLookupTable::SetNumberOfValues(vtkIdType number)
@@ -119,7 +65,9 @@ void vtkPVLookupTable::Build()
       this->NumberOfValues);
     double* table = new double[this->NumberOfValues*3];
     double range[2];
-    this->LookupTable->GetTableRange(range);
+    this->GetRange(range);
+    this->LookupTable->SetRange(range);
+
     this->GetTable(range[0], range[1], this->NumberOfValues, table);
     // Now, convert double to unsigned chars and fill the LUT.
     for (int cc=0; cc < this->NumberOfValues; cc++)
@@ -131,7 +79,6 @@ void vtkPVLookupTable::Build()
       }
     delete [] table;
 
-    this->LookupTable->SetRange(this->GetRange());
     this->BuildTime.Modified();
     }
 }
@@ -183,11 +130,32 @@ void vtkPVLookupTable::MapScalarsThroughTable2(void *input,
 }
 
 //-----------------------------------------------------------------------------
+double* vtkPVLookupTable::GetRGBPoints()
+{
+  delete [] this->Data;
+  this->Data = 0;
+
+  int num_points = this->GetSize();
+  if (num_points > 0)
+    {
+    this->Data = new double[num_points*4];
+    for (int cc=0; cc < num_points; cc++)
+      {
+      double values[6];
+      this->GetNodeValue(cc, values);
+      this->Data[4*cc] = values[0];
+      this->Data[4*cc+1] = values[0];
+      this->Data[4*cc+2] = values[1];
+      this->Data[4*cc+3] = values[2];
+      }
+    }
+  return this->Data;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVLookupTable::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ScalePointsWithRange: " 
-    << this->ScalePointsWithRange << endl;
   os << indent << "Discretize: " << this->Discretize << endl;
   os << indent << "NumberOfValues: " << this->NumberOfValues << endl;
 }

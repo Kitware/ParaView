@@ -84,7 +84,6 @@ SET(Filters_SRCS
   vtkPVLODVolume.cxx
   vtkPVLookupTable.cxx
   vtkPVMain.cxx
-  vtkPVPiecewiseFunction.cxx
   vtkPVRenderModuleHelper.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVServerArrayHelper.cxx

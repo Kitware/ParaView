@@ -78,12 +78,20 @@
         name="LockScalarRange"
         number_of_elements="1"
         default_values="0">
-        <!-- This is obsolete - - - -  don't use it any more! -->
         <!-- This is a data-property allowing us to save state of
           scalar range lock in state. SM does not use this at all
           hence the absence of "command" -->
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="ScalarRangeInitialized"
+        number_of_elements="1"
+        default_values="0">
+        <!-- This is used to keep track of whether the 
+        user initialized the scalar range -->
+        <BooleanDomain name="bool" />
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="RGBPoints"
@@ -94,14 +102,6 @@
         animateable="0">
       </DoubleVectorProperty>
       
-      <IntVectorProperty
-        name="ScalePointsWithRange"
-        command="SetScalePointsWithRange"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
       <IntVectorProperty
         name="ColorSpace"
         command="SetColorSpace"
@@ -122,13 +122,6 @@
         animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty
-         name="ScalarRange"
-         command="SetRange"
-         number_of_elements="2" 
-         default_values="0 1">
-      </DoubleVectorProperty>
 
       <IntVectorProperty
          name="NumberOfTableValues"
@@ -1414,37 +1407,10 @@
         number_of_elements_per_command="2"
         repeat_command="1"
         clean_command="RemoveAllPoints"
-        animateable="0">
-      </DoubleVectorProperty>
-    </Proxy>
-
-    <Proxy name="PVPiecewiseFunction"  class="vtkPVPiecewiseFunction">
-      <DoubleVectorProperty
-        name="Points"
-        command="AddPoint"
-        number_of_elements_per_command="2"
-        repeat_command="1"
-        clean_command="RemoveAllPoints"
         animateable="0"
         number_of_elements="4"
         default_values="0.0 0.0 1.0 1.0">
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-         name="ScalarRange"
-         command="SetRange"
-         number_of_elements="2" 
-         default_values="0 1">
-         <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-
-      <IntVectorProperty
-        name="ScalePointsWithRange"
-        command="SetScalePointsWithRange"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
     </Proxy>
   </ProxyGroup>
 

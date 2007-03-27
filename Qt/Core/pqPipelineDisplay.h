@@ -111,6 +111,11 @@ public:
   /// map scalars to opacity.
   vtkSMProxy* getScalarOpacityFunctionProxy() const;
 
+  /// Set the scalar range for the opacity function. This
+  /// will rescale all the control points to fit the 
+  /// scalar range.
+  void setScalarOpacityRange(double min, double max);
+
 signals:
   /// This is fire when any property that affects the color
   /// mode for the display changes.

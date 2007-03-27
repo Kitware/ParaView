@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGeometryInformation.h"
 #include "vtkSmartPointer.h" 
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 
@@ -167,7 +168,7 @@ void pqPipelineDisplay::createHelperProxies()
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* opacityFunction = 
-    pxm->NewProxy("piecewise_functions", "PVPiecewiseFunction");
+    pxm->NewProxy("piecewise_functions", "PiecewiseFunction");
   opacityFunction->SetConnectionID(this->getServer()->GetConnectionID());
   opacityFunction->SetServers(
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
@@ -496,16 +497,54 @@ void pqPipelineDisplay::updateLookupTableScalarRange()
 
     // Adjust opacity function range.
     vtkSMProxy* opacityFunction = this->getScalarOpacityFunctionProxy();
-    if (opacityFunction)
+    if (opacityFunction && !lut->getScalarRangeLock() &&
+      this->getDisplayProxy()->GetRepresentationCM() == 
+      vtkSMDataObjectDisplayProxy::VOLUME)
       {
       QPair<double, double> adjusted_range = lut->getScalarRange();
-      pqSMAdaptor::setMultipleElementProperty(
-        opacityFunction->GetProperty("ScalarRange"), 0, adjusted_range.first);
-      pqSMAdaptor::setMultipleElementProperty(
-        opacityFunction->GetProperty("ScalarRange"), 1, adjusted_range.second);
-      opacityFunction->UpdateVTKObjects();
+      // Opacity function always follows the LUT scalar range.
+      this->setScalarOpacityRange(adjusted_range.first, adjusted_range.second);
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::setScalarOpacityRange(double min, double max)
+{
+  // A far more better way would be to create a new pqProxy subclass for
+  // the piecewise function.
+  vtkSMProxy* opacityFunction = this->getScalarOpacityFunctionProxy();
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    opacityFunction->GetProperty("Points"));
+
+  QList<QVariant> controlPoints = pqSMAdaptor::getMultipleElementProperty(dvp);
+  if (controlPoints.size() == 0)
+    {
+    return;
+    }
+
+  int max_index = dvp->GetNumberOfElementsPerCommand() * (
+    (controlPoints.size()-1)/ dvp->GetNumberOfElementsPerCommand());
+  QPair<double, double> current_range(controlPoints[0].toDouble(),
+    controlPoints[max_index].toDouble());
+
+  // Adjust vtkPiecewiseFunction points to the new range.
+  double dold = (current_range.second - current_range.first);
+  dold = (dold > 0) ? dold : 1;
+
+  double dnew = (max -min);
+  dnew = (dnew > 0) ? dnew : 1;
+
+  double scale = dnew/dold;
+  for (int cc=0; cc < controlPoints.size(); 
+    cc+= dvp->GetNumberOfElementsPerCommand())
+    {
+    controlPoints[cc] = 
+      scale * (controlPoints[cc].toDouble()-current_range.first) + min;
+    }
+
+  pqSMAdaptor::setMultipleElementProperty(dvp, controlPoints);
+  opacityFunction->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

@@ -48,21 +48,28 @@ public:
     vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
   virtual ~pqScalarsToColors();
 
-  // Returns the first scalar bar visible in the given render module,
-  // if any.
+  /// Returns the first scalar bar visible in the given render module,
+  /// if any.
   pqScalarBarDisplay* getScalarBar(pqRenderViewModule* ren) const;
 
-  // Returns if the lookup table's scalar range is locked.
+  /// Returns if the lookup table's scalar range is locked.
   bool getScalarRangeLock() const;
 
-  // Set the scalar range if the range specified is greater than
-  // the current scalar range. This call respects the ScalarRangeLock.
-  // If the lock is set, then this call has no effect.
+  /// Set the scalar range if the range specified is greater than
+  /// the current scalar range. This call respects the ScalarRangeLock.
+  /// If the lock is set, then this call has no effect.
+  /// If ScalarRangeLock is false, then this call will 
+  /// move all control points uniformly to fit the new range.
   void setWholeScalarRange(double min, double max);
 
-  // Sets the scalar range. Does not consider the ScalarRangeLock.
+  /// Sets the scalar range. 
+  /// Does not consider the ScalarRangeLock. Moves all control points
+  /// uniformly to fit the new range.
   void setScalarRange(double min, double max);
 
+  /// Returns the current scalar range. If number of RGBPoints is 0,
+  /// then the scalar range is not defined (in which case this method
+  /// returns (0, 0).
   QPair<double, double> getScalarRange() const;
 
   enum Mode
@@ -94,11 +101,6 @@ public slots:
 signals:
   /// Fired after a new scalar bar is added or removed from this LUT.
   void scalarBarsChanged();
-
-protected slots:
-  /// Called when the ScalarRange property is modified.
-  void scalarRangeModified();
-
 
 protected:
   friend class pqScalarBarDisplay;

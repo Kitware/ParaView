@@ -44,21 +44,6 @@ public:
   virtual void Build();
 
   // Description:
-  // Sets/Gets the range of scalars which will be mapped.
-  // If ScalePointsWithRange is off, this has no effect on the
-  // lookup table. Is ScalePointsWithRange is 1, then all points in the
-  // ColorTransferFunction will be scaled to fit the new range.
-  virtual void SetRange(double min, double max);
-
-  // Description:
-  // When set to 1, SetRange() results in scaling of the points 
-  // in the color transfer function to fit the new range.
-  // By default, set to 1.
-  vtkSetMacro(ScalePointsWithRange, int);
-  vtkGetMacro(ScalePointsWithRange, int);
-  vtkBooleanMacro(ScalePointsWithRange, int);
-
-  // Description:
   // Set if the values are to mapped after discretization. The
   // number of discrete values is set by using SetNumberOfValues().
   // Not set by default, i.e. color value is determined by
@@ -89,11 +74,15 @@ public:
                                        int inputDataType, int numberOfValues,
                                        int inputIncrement, 
                                        int outputFormat);
+
+  // Description:
+  // Returns the (x, r, g, b) values as an array.
+  double* GetRGBPoints();
+
 protected:
   vtkPVLookupTable();
   ~vtkPVLookupTable();
 
-  int ScalePointsWithRange;
   int Discretize;
 
   vtkIdType NumberOfValues;
@@ -103,6 +92,9 @@ protected:
 private:
   vtkPVLookupTable(const vtkPVLookupTable&); // Not implemented.
   void operator=(const vtkPVLookupTable&); // Not implemented.
+
+  // Pointer used by GetRGBPoints().
+  double* Data;
 };
 
 #endif

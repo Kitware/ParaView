@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxy.h"
 
 #include <QPointer>
@@ -52,7 +53,6 @@ class pqScalarsToColorsInternal
 {
 public:
   QList<QPointer<pqScalarBarDisplay> > ScalarBars;
-  bool ScalarRangeInitialized;
   vtkEventQtSlotConnect* VTKConnect;
 
   pqScalarsToColorsInternal()
@@ -71,11 +71,6 @@ pqScalarsToColors::pqScalarsToColors(const QString& group, const QString& name,
 : pqProxy(group, name, proxy, server, _parent)
 {
   this->Internal = new pqScalarsToColorsInternal;
-  this->Internal->ScalarRangeInitialized = false;
-
-  this->Internal->VTKConnect->Connect(proxy->GetProperty("ScalarRange"),
-    vtkCommand::ModifiedEvent, 
-    this, SLOT(scalarRangeModified()));
 }
 
 //-----------------------------------------------------------------------------
@@ -177,22 +172,57 @@ void pqScalarsToColors::setScalarRange(double min, double max)
     min = max;
     max = t;
     }
-  QList<QVariant> curRange;
-  curRange << min << max;
 
-  pqSMAdaptor::setMultipleElementProperty(
-    this->getProxy()->GetProperty("ScalarRange"), curRange);
+  pqSMAdaptor::setElementProperty(
+    this->getProxy()->GetProperty("ScalarRangeInitialized"), 1);
+
+  QPair <double, double> current_range = this->getScalarRange();
+  if (current_range.first == min && current_range.second == max)
+    {
+    // Nothing to do.
+    return;
+    }
+
+  // Adjust vtkColorTransferFunction points to the new range.
+  double dold = (current_range.second - current_range.first);
+  dold = (dold > 0) ? dold : 1;
+
+  double dnew = (max -min);
+  dnew = (dnew > 0) ? dnew : 1;
+
+  double scale = dnew/dold;
+
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->getProxy()->GetProperty("RGBPoints"));
+  QList<QVariant> controlPoints = pqSMAdaptor::getMultipleElementProperty(dvp);
+
+  for (int cc=0; cc < controlPoints.size(); 
+    cc+= dvp->GetNumberOfElementsPerCommand())
+    {
+    controlPoints[cc] = 
+      scale * (controlPoints[cc].toDouble()-current_range.first) + min;
+    }
+
+  pqSMAdaptor::setMultipleElementProperty(dvp, controlPoints);
   this->getProxy()->UpdateVTKObjects();
-
-  this->Internal->ScalarRangeInitialized = true;
 }
 
 //-----------------------------------------------------------------------------
 QPair<double, double> pqScalarsToColors::getScalarRange() const
 {
-  QList<QVariant> range = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("ScalarRange"));
-  return QPair<double, double>(range[0].toDouble(), range[1].toDouble());
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->getProxy()->GetProperty("RGBPoints"));
+  QList<QVariant> controlPoints = pqSMAdaptor::getMultipleElementProperty(dvp);
+
+  if (controlPoints.size() == 0)
+    {
+    return QPair<double, double>(0, 0);
+    }
+
+  int max_index = dvp->GetNumberOfElementsPerCommand() * (
+    (controlPoints.size()-1)/ dvp->GetNumberOfElementsPerCommand());
+  return QPair<double, double>(controlPoints[0].toDouble(),
+    controlPoints[max_index].toDouble());
 }
 
 //-----------------------------------------------------------------------------
@@ -203,12 +233,13 @@ void pqScalarsToColors::setWholeScalarRange(double min, double max)
     return;
     }
 
-  QList<QVariant> curRange = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("ScalarRange"));
-  min = (!this->Internal->ScalarRangeInitialized || min < curRange[0].toDouble())? 
-    min :  curRange[0].toDouble();
-  max = (!this->Internal->ScalarRangeInitialized || max > curRange[1].toDouble())? 
-    max :  curRange[1].toDouble();
+  if (pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("ScalarRangeInitialized")).toBool())
+    {
+    QPair<double, double> curRange = this->getScalarRange();
+    min = (min < curRange.first)?  min :  curRange.first;
+    max = (max > curRange.second)?  max :  curRange.second;
+    }
 
   this->setScalarRange(min, max);
 }
@@ -248,10 +279,3 @@ void pqScalarsToColors::build()
   this->getProxy()->InvokeCommand("Build");
 }
 
-//-----------------------------------------------------------------------------
-void pqScalarsToColors::scalarRangeModified()
-{
-  // This is easiest, although not so safe way of determining if the
-  // scalar range was ever initialized by anybody.
-  this->Internal->ScalarRangeInitialized = true;
-}
