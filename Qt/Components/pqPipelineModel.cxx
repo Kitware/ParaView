@@ -1618,12 +1618,21 @@ void pqPipelineModel::initializePixmaps()
     this->PixmapList = new QPixmap[pqPipelineModelInternal::Total];
     this->PixmapList[pqPipelineModel::Server].load(
         ":/pqWidgets/Icons/pqServer16.png");
+    /*
     this->PixmapList[pqPipelineModel::Source].load(
         ":/pqWidgets/Icons/pqSource16.png");
     this->PixmapList[pqPipelineModel::Filter].load(
         ":/pqWidgets/Icons/pqFilter16.png");
     this->PixmapList[pqPipelineModel::CustomFilter].load(
         ":/pqWidgets/Icons/pqBundle16.png");
+    */
+    // For now, initialized these icons to empty. In the future, these
+    // icons will represent where the proxy can be displayed (view type)
+    // as opposed to the proxy type.
+    this->PixmapList[pqPipelineModel::Source];
+    this->PixmapList[pqPipelineModel::Filter];
+    this->PixmapList[pqPipelineModel::CustomFilter];
+
     this->PixmapList[pqPipelineModel::Link].load(
         ":/pqWidgets/Icons/pqLinkBack16.png");
     this->PixmapList[pqPipelineModelInternal::Eyeball].load(
