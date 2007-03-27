@@ -4,13 +4,13 @@
     <Filter name="Cut" icon=":/pqWidgets/Icons/pqSlice24.png"/>
     <Filter name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
     <Filter name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
-    <Filter name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
     <Filter name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid24.png"/>
     <Filter name="Glyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
+    <Filter name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
+    <Filter name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
     <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
     <Filter name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
     <Filter name="ExtractLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
-    <Filter name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
   </Category>
 
   <Filter name="Append" />
@@ -40,13 +40,6 @@
   <Filter name="ExtractLevel" />
   <Filter name="ExtractSelection" />
   <Filter name="FeatureEdges" />
-  <Filter name="GenericClip" />
-  <Filter name="GenericContour" />
-  <Filter name="GenericCut" />
-  <Filter name="GenericGeometryFilter" />
-  <Filter name="GenericOutlineFilter" />
-  <Filter name="GenericStreamTracer" />
-  <Filter name="GenericTessellator" />
   <Filter name="Glyph" />
   <Filter name="Gradient" />
   <Filter name="GradientMagnitude" />
