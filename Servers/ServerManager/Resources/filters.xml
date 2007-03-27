@@ -4469,7 +4469,7 @@ The Pick filter operates on any type of data and produces unstructured grid outp
 
    </SourceProxy>
 
-  <SourceProxy name="GenericClip" class="vtkGenericClip">
+  <SourceProxy name="GenericClip" class="vtkGenericClip" label="Clip (Generic Datasets)">
     <Documentation
        long_help="Clip with an implicit plane, sphere or with scalars. Clipping does not reduce the dimensionality of the data set.  This output data type of this filter is always an unstructured grid."
        short_help="Clip with an implicit plane, sphere or with scalars.">
@@ -4549,7 +4549,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
    <!-- End GenericClip -->
    </SourceProxy>
 
-   <SourceProxy name="GenericContour" class="vtkGenericContourFilter">
+   <SourceProxy name="GenericContour" class="vtkGenericContourFilter" label="Contour (Generic Datasets)">
     <Documentation
        long_help="Generate isolines or isosurfaces using point scalars."
        short_help="Generate isolines or isosurfaces.">
@@ -4635,7 +4635,7 @@ The Generic Contour filter operates on a generic data set, but the input is requ
    <!-- End GenericContour -->
    </SourceProxy>
 
- <SourceProxy name="GenericCut" class="vtkGenericCutter">
+ <SourceProxy name="GenericCut" class="vtkGenericCutter" label="Slice (Generic Datasets)">
     <Documentation
        long_help="This filter cuts a data set with a plane or sphere.  Cutting is similar to a contour.  It creates surfaces from volumes and lines from surfaces."
        short_help="Cut datasets with planes or spheres.">
@@ -4707,7 +4707,8 @@ The Generic Cut filter takes a generic dataset as input. Use the Input menu to c
    <!-- End GenericCut -->
    </SourceProxy>
 
-  <SourceProxy name="GenericGeometryFilter" class="vtkGenericGeometryFilter">
+  <SourceProxy name="GenericGeometryFilter" class="vtkGenericGeometryFilter"
+               label="Extract Surface (Generic Datasets)">
      <Documentation
          long_help="Extract geometry from a higher-order dataset"
          short_help="Extract geometry from a higher-order dataset">
@@ -4732,7 +4733,7 @@ Extract geometry from a higher-order dataset.
    </SourceProxy>
 
  <SourceProxy name="GenericOutlineFilter" class="vtkGenericOutlineFilter"
-     label="Generic Outline">
+     label="Outline (Generic DataSets)">
      <Documentation
        long_help="This filter generates a bounding box representation of the input."
        short_help="Generates a bounding box.">
@@ -4760,7 +4761,7 @@ The Generic Outline filter generates an axis-aligned bounding box for the input 
    </SourceProxy>
 
  <SourceProxy name="GenericStreamTracer" class="vtkGenericStreamTracer"
-    label="Generic Stream Tracer">
+              label="Stream Tracer (Generic Datasets)">
     <Documentation
        long_help="Integrate streamlines in a vector field."
        short_help="Integrate streamlines in a vector field.">
@@ -5007,7 +5008,7 @@ This filter operates on any type of data set, provided it has point-centered vec
    </SourceProxy>
 
   <SourceProxy name="GenericTessellator" class="vtkGenericDataSetTessellator"
-      label="Generic Tessellator">
+               label="Tessellator (Generic Datasets)">
      <Documentation
          long_help="Tessellate a higher-order dataset"
          short_help="Tessellate a higher-order dataset">
@@ -5804,4 +5805,3 @@ This filter operates on all types of data sets, and it returns unstructured grid
    </ProxyGroup>
 
 </ServerManagerConfiguration>
-
