@@ -3871,7 +3871,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       <Hints>
         <Visibility replace_input="0" />
       </Hints>
-   <!-- End Probe2 -->
+   <!-- End Probe -->
    </SourceProxy>
 
    <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer"
