@@ -156,7 +156,6 @@ protected:
   int getReferenceInputBounds(double bounds[6]) const;
 
 private:
-  void setReferenceProxy(pqProxy*);
   void setControlledProxy(vtkSMProxy*);
 
   void updateWidgetVisibility();

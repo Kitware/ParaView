@@ -236,16 +236,13 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
     SLOT(onRenderModuleChanged(pqRenderViewModule*)));
 
   QObject::connect(
-    this->Implementation->PointSourceWidget,
-    SIGNAL(canAcceptOrReject(bool)),
-    this,
-    SLOT(updateProxyModified(bool)));
+    this->Implementation->PointSourceWidget, SIGNAL(modified()),
+    this, SLOT(setModified()));
 
   QObject::connect(
     this->Implementation->LineSourceWidget,
-    SIGNAL(canAcceptOrReject(bool)),
-    this,
-    SLOT(updateProxyModified(bool)));
+    SIGNAL(modified()),
+    this, SLOT(setModified()));
   
   QObject::connect(
     this, SIGNAL(onaccept()), this->Implementation->PointSourceWidget, SLOT(accept()));

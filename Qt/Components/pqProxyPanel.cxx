@@ -85,9 +85,8 @@ pqProxyPanel::pqProxyPanel(pqProxy* refProxy, vtkSMProxy* pxy, QWidget* p) :
   this->Implementation->PropertyManager = new pqPropertyManager(this);
 
   QObject::connect(this->Implementation->PropertyManager,
-                   SIGNAL(canAcceptOrReject(bool)),
-                   this,
-                   SLOT(updateProxyModified(bool)));
+                   SIGNAL(modified()),
+                   this, SLOT(setModified()));
 
   this->Implementation->Proxy->UpdateVTKObjects();
   vtkSMSourceProxy* sp;
@@ -174,6 +173,7 @@ void pqProxyPanel::accept()
     {
     source->UpdatePipelineInformation();
     }
+  this->Implementation->ReferenceProxy->setModified(false);
   emit this->onaccept();
 }
 
@@ -184,6 +184,7 @@ void pqProxyPanel::reset()
 {
   this->Implementation->Proxy->UpdatePropertyInformation();
   this->Implementation->PropertyManager->reject();
+  this->Implementation->ReferenceProxy->setModified(false);
   emit this->onreset();
 }
 
@@ -208,18 +209,9 @@ void pqProxyPanel::setRenderModule(pqRenderViewModule* rm)
   emit this->renderModuleChanged(this->Implementation->RenderModule);
 }
 
-void pqProxyPanel::modified()
+void pqProxyPanel::setModified()
 {
-  this->updateProxyModified(true);
-}
-
-void pqProxyPanel::updateProxyModified(bool mod)
-{
-  if(mod)
-    {
-    // only mark proxy as modified, never unmodified
-    this->Implementation->ReferenceProxy->setModified(mod);
-    }
-  emit this->canAcceptOrReject(mod);
+  this->Implementation->ReferenceProxy->setModified(true);
+  emit this->modified();
 }
 

@@ -65,10 +65,12 @@ public:
   pqInternal()
     {
     Links.setUseUncheckedProperties(true);
+    Modified = false;
     }
   typedef QMultiMap<PropertyKey, pqPropertyManagerProperty*> PropertyMap;
   PropertyMap Properties;
   pqPropertyLinks Links;
+  bool Modified;
 };
 
 //-----------------------------------------------------------------------------
@@ -254,8 +256,7 @@ void pqPropertyManager::accept()
 {
   this->Internal->Links.accept();
   emit this->accepted();
-  
-  emit this->canAcceptOrReject(false);
+  this->Internal->Modified = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -263,13 +264,18 @@ void pqPropertyManager::reject()
 {
   this->Internal->Links.reset();
   emit this->rejected();
-  
-  emit this->canAcceptOrReject(false);
+  this->Internal->Modified = false;
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertyManager::propertyChanged()
 {
-  emit this->canAcceptOrReject(true);
+  this->Internal->Modified = true;
+  emit this->modified();
 }
 
+//-----------------------------------------------------------------------------
+bool pqPropertyManager::isModified() const
+{
+  return this->Internal->Modified;
+}

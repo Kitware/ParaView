@@ -221,12 +221,16 @@ void pqProxySelectionWidget::initialize3DWidget()
   
   pqObjectPanel* panel = qobject_cast<pqObjectPanel*>(this->parentWidget());
   
-  QObject::connect(panel, SIGNAL(onselect()), this->Internal->Widget, SLOT(select()));
-  QObject::connect(panel, SIGNAL(ondeselect()), this->Internal->Widget, SLOT(deselect()));
-  QObject::connect(panel, SIGNAL(onaccept()), this->Internal->Widget, SLOT(accept()));
-  QObject::connect(panel, SIGNAL(onreset()), this->Internal->Widget, SLOT(reset()));
-  QObject::connect(this->Internal->Widget, SIGNAL(canAcceptOrReject(bool)), 
-                   panel, SLOT(updateProxyModified(bool)));
+  QObject::connect(panel, SIGNAL(onselect()),
+                   this->Internal->Widget, SLOT(select()));
+  QObject::connect(panel, SIGNAL(ondeselect()),
+                   this->Internal->Widget, SLOT(deselect()));
+  QObject::connect(panel, SIGNAL(onaccept()),
+                   this->Internal->Widget, SLOT(accept()));
+  QObject::connect(panel, SIGNAL(onreset()),
+                   this->Internal->Widget, SLOT(reset()));
+  QObject::connect(this->Internal->Widget, SIGNAL(modified()), 
+                   panel, SLOT(setModified()));
   QObject::connect(panel, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
          this->Internal->Widget, SLOT(setRenderModule(pqRenderViewModule*)));
   

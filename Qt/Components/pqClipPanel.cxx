@@ -114,10 +114,11 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
   QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
                    this->Implementation->ImplicitPlaneWidget,
                    SLOT(setRenderModule(pqRenderViewModule*)));
+  this->Implementation->ImplicitPlaneWidget->setRenderModule(this->renderModule());
 
   connect(this->Implementation->ImplicitPlaneWidget,
-          SIGNAL(canAcceptOrReject(bool)),
-          this, SLOT(onWidgetChanged()));
+          SIGNAL(modified()),
+          this, SLOT(setModified()));
   connect(this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
   connect(this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
 
@@ -148,12 +149,6 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
 pqClipPanel::~pqClipPanel()
 {
   delete this->Implementation;
-}
-
-void pqClipPanel::onWidgetChanged()
-{
-  // Signal the UI that there are changes to accept/reject ...
-  this->propertyManager()->propertyChanged();
 }
 
 void pqClipPanel::onAccepted()

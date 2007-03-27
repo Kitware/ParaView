@@ -155,27 +155,27 @@ pqCalculatorPanel::pqCalculatorPanel(pqProxy* pxy, QWidget* p) :
   QObject::connect(this->Internal->Function,
                    SIGNAL(textEdited(const QString&)),
                    this,
-                   SLOT(modified()));
+                   SLOT(setModified()));
   QObject::connect(this->Internal->ResultArrayName,
                    SIGNAL(textEdited(const QString&)),
                    this,
-                   SLOT(modified()));
+                   SLOT(setModified()));
   QObject::connect(this->Internal->AttributeMode,
                    SIGNAL(currentIndexChanged(const QString&)),
                    this,
-                   SLOT(modified()));
+                   SLOT(setModified()));
   QObject::connect(this->Internal->ReplaceInvalidResult,
                    SIGNAL(stateChanged(int)),
                    this,
-                   SLOT(modified()));
+                   SLOT(setModified()));
   QObject::connect(this->Internal->ReplacementValue,
                    SIGNAL(textChanged(const QString&)),
                    this,
-                   SLOT(modified()));
+                   SLOT(setModified()));
   QObject::connect(this->Internal->CoordinateResults,
                    SIGNAL(toggled(bool)),
                    this,
-                   SLOT(modified()));
+                   SLOT(setModified()));
   QObject::connect(this->Internal->CoordinateResults,
                    SIGNAL(toggled(bool)),
                    this,

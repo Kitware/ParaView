@@ -67,9 +67,6 @@ public:
   {
   }
     
-  QPointer<pqProxy> ReferenceProxy;
-  QPointer<pqRenderViewModule> RenderModule;
-  pqSMProxy ControlledProxy;
   vtkSmartPointer<vtkSMNew3DWidgetProxy> WidgetProxy;
   vtkSmartPointer<vtkCommand> ControlledPropertiesObserver;
   vtkSmartPointer<vtkPVXMLElement> Hints;
@@ -95,7 +92,6 @@ pq3DWidget::pq3DWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* _p) :
   this->Internal->IgnorePropertyChange = false;
 
   this->setControlledProxy(pxy);
-  this->setReferenceProxy(o);
 }
 
 //-----------------------------------------------------------------------------
@@ -154,7 +150,7 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(pqProxy* o, vtkSMProxy* pxy)
 //-----------------------------------------------------------------------------
 void pq3DWidget::setRenderModule(pqRenderViewModule* renModule)
 {
-  if (renModule == this->Internal->RenderModule)
+  if (renModule == this->renderModule())
     {
     return;
     }
@@ -163,21 +159,22 @@ void pq3DWidget::setRenderModule(pqRenderViewModule* renModule)
   this->hideWidget();
 
   vtkSMDisplayProxy* widget = this->getWidgetProxy();
-  if (this->Internal->RenderModule && widget)
+  if (this->renderModule() && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->Internal->RenderModule->getRenderModuleProxy()->RemoveDisplay(widget);
+    this->renderModule()->getRenderModuleProxy()->RemoveDisplay(widget);
     }
 
-  this->Internal->RenderModule = renModule;
-  if (this->Internal->RenderModule && widget)
+  pqProxyPanel::setRenderModule(renModule);
+
+  if (this->renderModule() && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->Internal->RenderModule->getRenderModuleProxy()->AddDisplay(widget);
+    this->renderModule()->getRenderModuleProxy()->AddDisplay(widget);
     }
 
   if (cur_visbility)
@@ -212,23 +209,23 @@ void pq3DWidget::setWidgetProxy(vtkSMNew3DWidgetProxy* pxy)
 {
  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
 
- if (this->Internal->RenderModule && widget)
+ if (this->renderModule() && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->Internal->RenderModule->getRenderModuleProxy()->RemoveDisplay(widget);
-    this->Internal->RenderModule->render();
+    this->renderModule()->getRenderModuleProxy()->RemoveDisplay(widget);
+    this->renderModule()->render();
     }
   this->Internal->WidgetProxy = pxy;
 
-  if (this->Internal->RenderModule && pxy)
+  if (this->renderModule() && pxy)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->Internal->RenderModule->getRenderModuleProxy()->AddDisplay(widget);
-    this->Internal->RenderModule->render();
+    this->renderModule()->getRenderModuleProxy()->AddDisplay(widget);
+    this->renderModule()->render();
     }
 }
 
@@ -239,19 +236,13 @@ vtkSMNew3DWidgetProxy* pq3DWidget::getWidgetProxy() const
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setReferenceProxy(pqProxy* pxy)
-{
-  this->Internal->ReferenceProxy = pxy;
-}
-
-//-----------------------------------------------------------------------------
 vtkSMProxy* pq3DWidget::getControlledProxy() const
 {
   return this->proxy();
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setControlledProxy(vtkSMProxy* pxy)
+void pq3DWidget::setControlledProxy(vtkSMProxy* /*pxy*/)
 {
   foreach(vtkSMProperty* controlledProperty, this->Internal->PropertyMap)
     {
@@ -259,8 +250,6 @@ void pq3DWidget::setControlledProxy(vtkSMProxy* pxy)
       this->Internal->ControlledPropertiesObserver);
     }
   this->Internal->PropertyMap.clear();
-
-  this->Internal->ControlledProxy = pxy;
 }
 
 //-----------------------------------------------------------------------------
@@ -338,9 +327,9 @@ void pq3DWidget::accept()
     {
     iter.value()->Copy(iter.key());
     }
-  if (this->Internal->ControlledProxy)
+  if (this->proxy())
     {
-    this->Internal->ControlledProxy->UpdateVTKObjects();
+    this->proxy()->UpdateVTKObjects();
     }
   this->Internal->IgnorePropertyChange = false;
 }
@@ -452,7 +441,7 @@ void pq3DWidget::updateWidgetVisibility()
     
   const bool widget_enabled = widget_visible;
   
-  if(this->Internal->WidgetProxy && this->Internal->RenderModule)
+  if(this->Internal->WidgetProxy && this->renderModule())
     {
     if(vtkSMIntVectorProperty* const visibility =
       vtkSMIntVectorProperty::SafeDownCast(

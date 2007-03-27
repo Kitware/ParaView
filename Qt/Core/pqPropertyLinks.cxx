@@ -59,17 +59,13 @@ public:
   {
     this->UseUncheckedProperties = false;
     this->AutoUpdate = true;
+    this->Updating = false;
   }
 
   ~pqInternal()
     {
-    // Ensuring that no slots get called
-    // when timer expires. This may be utterly unnecessary,
-    // but no harm in being safe.
-    this->SingleShotTimer.stop();
     }
 
-  QTimer SingleShotTimer;
   pqSMAdaptor::PropertyType Type;
 
   vtkSMProxy* Proxy;
@@ -80,6 +76,7 @@ public:
   QByteArray QtProperty;
   bool UseUncheckedProperties;
   bool AutoUpdate;
+  bool Updating;
 
   // This flag indicates if the QObject and the vtkSMProperty are out of synch. 
   bool OutOfSync;
@@ -121,12 +118,6 @@ pqPropertyLinksConnection::pqPropertyLinksConnection(
 : QObject(_parent)
 {
   this->Internal = new pqPropertyLinksConnection::pqInternal;
-  this->Internal->SingleShotTimer.setSingleShot(true);
-  this->Internal->SingleShotTimer.setInterval(1);
-  QObject::connect(
-    &this->Internal->SingleShotTimer, SIGNAL(timeout()),
-    this, SLOT(smLinkedPropertyChanged()));
-
   this->Internal->Proxy = smproxy;
   this->Internal->Property = smproperty;
   this->Internal->Index = idx;
@@ -163,12 +154,16 @@ void pqPropertyLinksConnection::clearOutOfSync() const
 
 void pqPropertyLinksConnection::triggerDelayedSMLinkedPropertyChanged()
 {
-  this->Internal->SingleShotTimer.start();
-  // will eventually call smLinkedPropertyChanged().
+  if(this->Internal->Updating == false)
+    {
+    QTimer::singleShot(0, this, SLOT(smLinkedPropertyChanged()));
+    this->Internal->Updating = true;
+    }
 }
 
 void pqPropertyLinksConnection::smLinkedPropertyChanged() 
 {
+  this->Internal->Updating = false;
   if(this->Internal->SettingProperty == this->Internal->Property)
     {
     return;

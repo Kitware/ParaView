@@ -114,12 +114,12 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
   QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
                    this->Implementation->ImplicitPlaneWidget,
                    SLOT(setRenderModule(pqRenderViewModule*)));
+  this->Implementation->ImplicitPlaneWidget->setRenderModule(this->renderModule());
 
   connect(
     this->Implementation->ImplicitPlaneWidget,
-    SIGNAL(canAcceptOrReject(bool)),
-    this,
-    SLOT(updateProxyModified(bool)));
+    SIGNAL(modified()),
+    this, SLOT(setModified()));
     
   connect(
     &this->Implementation->SampleScalarWidget,

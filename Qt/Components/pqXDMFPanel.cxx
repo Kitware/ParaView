@@ -467,7 +467,7 @@ void pqXDMFPanel::SetSelectedDomain(QString newDomain)
   this->PopulateGridWidget();
 
   //turn on apply/reset button
-  this->modified();
+  this->setModified();
 }
 
 //-----------------------------------------------------------------------------
@@ -523,7 +523,7 @@ void pqXDMFPanel::SetSelectedGrids()
   this->PopulateArrayWidget();
 
   //turn on apply/reset button
-  this->modified();
+  this->setModified();
 }
   
 //---------------------------------------------------------------------------
@@ -560,5 +560,5 @@ void pqXDMFPanel::SetCellValue(int row)
 
     }
   this->proxy()->UpdateVTKObjects();
-  this->modified();
+  this->setModified();
 }

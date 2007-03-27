@@ -116,11 +116,8 @@ pqHandleWidget::pqHandleWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
     SIGNAL(clicked()), this, SLOT(onResetBounds()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(modified()));
+    this, SLOT(setModified()));
 
-  QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
-    this, SLOT(modified()));
-    
   this->createWidget(o->getServer());
 }
 
@@ -213,6 +210,7 @@ void pqHandleWidget::resetBounds()
       widget_position->SetElements(input_origin);
       widget->UpdateVTKObjects();
       }
+    this->setModified();
     }
 }
 
@@ -227,6 +225,7 @@ void pqHandleWidget::onResetBounds()
 //-----------------------------------------------------------------------------
 void pqHandleWidget::on3DWidgetStartDrag()
 {
+  this->setModified();
   emit widgetStartInteraction();
 }
 

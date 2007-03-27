@@ -254,16 +254,12 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
     SLOT(onRenderModuleChanged(pqRenderViewModule*)));
 
   QObject::connect(
-    this->Implementation->PointSourceWidget,
-    SIGNAL(canAcceptOrReject(bool)),
-    this,
-    SLOT(updateProxyModified(bool)));
+    this->Implementation->PointSourceWidget, SIGNAL(modified()),
+    this, SLOT(setModified()));
 
   QObject::connect(
-    this->Implementation->LineSourceWidget,
-    SIGNAL(canAcceptOrReject(bool)),
-    this,
-    SLOT(updateProxyModified(bool)));
+    this->Implementation->LineSourceWidget, SIGNAL(modified()),
+    this, SLOT(setModified()));
 
   QObject::connect(
     this, SIGNAL(onaccept()), this->Implementation->PointSourceWidget, SLOT(accept()));
@@ -332,7 +328,7 @@ void pqStreamTracerPanel::onUsePointSource()
         this->Implementation->LineSourceWidget->setWidgetVisible(false);
         this->Implementation->PointSourceWidget->setWidgetVisible(true);
         pqSMAdaptor::setUncheckedProxyProperty(source_property, source);
-        emit this->canAcceptOrReject(true);
+        this->setModified();
         break;
         }
       }
@@ -356,7 +352,7 @@ void pqStreamTracerPanel::onUseLineSource()
         this->Implementation->PointSourceWidget->setWidgetVisible(false);
         this->Implementation->LineSourceWidget->setWidgetVisible(true);
         pqSMAdaptor::setUncheckedProxyProperty(source_property, source);
-        emit this->canAcceptOrReject(true);
+        this->setModified();
         break;
         }
       }

@@ -48,8 +48,6 @@ public:
   ~pqClipPanel();
   
 private slots:
-  /// Called when changes are made to the implicit plane widget
-  void onWidgetChanged();
   /// Called if the user accepts pending modifications
   void onAccepted();
   /// Called if the user rejects pending modifications

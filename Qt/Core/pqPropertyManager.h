@@ -65,10 +65,15 @@ public:
     QObject* qObject, const char* qProperty, const char* signal,
     vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
 
-signals:
-  /// Signal emitted whether there are possible properties to send down to
+  /// returns whether there are modified properties to send to 
   /// the server manager
-  void canAcceptOrReject(bool);
+  bool isModified() const;
+
+signals:
+  /// Signal emitted when there are possible properties to send down to
+  /// the server manager
+  void modified();
+
   /// Signal emitted when the user has accepted changes
   void accepted();
   /// Signal emitted when the user has rejected changes

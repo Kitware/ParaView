@@ -140,14 +140,10 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(pqProxy* o, vtkSMProxy* pxy, QWidge
     SIGNAL(clicked()), this, SLOT(onUseCenterBounds()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(modified()));
+    this, SLOT(setModified()));
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(render()));
 
-  QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
-    this, SLOT(modified()));
-  
-  
   this->createWidget(o->getServer());
 }
 
@@ -418,6 +414,7 @@ void pqImplicitPlaneWidget::resetBounds()
       {
       this->renderModule()->render();
       }
+    this->setModified();
     }
 }
 
@@ -464,6 +461,7 @@ void pqImplicitPlaneWidget::onUseCenterBounds()
             {
             this->renderModule()->render();
             }
+          this->setModified();
           }
         }
       }
@@ -485,6 +483,7 @@ void pqImplicitPlaneWidget::onUseXNormal()
         {
         this->renderModule()->render();
         }
+      this->setModified();
       }
     }
 }
@@ -504,6 +503,7 @@ void pqImplicitPlaneWidget::onUseYNormal()
         {
         this->renderModule()->render();
         }
+      this->setModified();
       }
     }
 }
@@ -523,6 +523,7 @@ void pqImplicitPlaneWidget::onUseZNormal()
         {
         this->renderModule()->render();
         }
+      this->setModified();
       }
     }
 }
@@ -548,6 +549,7 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
           {
           this->renderModule()->render();
           }
+        this->setModified();
         }
       }
     }
@@ -555,6 +557,7 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
 
 void pqImplicitPlaneWidget::on3DWidgetStartDrag()
 {
+  this->setModified();
   emit widgetStartInteraction();
   this->showPlane();
 }

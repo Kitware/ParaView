@@ -124,6 +124,8 @@ protected slots:
 
   /// checks the enabled state of the delete button.
   void handleConnectionChanged(pqPipelineSource* in, pqPipelineSource* out);
+
+  void setAcceptEnabled();
   
 private:
 

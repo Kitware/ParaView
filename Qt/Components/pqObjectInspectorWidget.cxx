@@ -243,6 +243,12 @@ void pqObjectInspectorWidget::forceModified(bool status)
 }
 
 //-----------------------------------------------------------------------------
+void pqObjectInspectorWidget::setAcceptEnabled()
+{
+  this->canAccept(true);
+}
+
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::canAccept(bool status)
 {
   this->AcceptButton->setEnabled(status);
@@ -364,8 +370,8 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   
   if(!reusedPanel)
     {
-    QObject::connect(this->CurrentPanel, SIGNAL(canAcceptOrReject(bool)), 
-                     this, SLOT(canAccept(bool)));
+    QObject::connect(this->CurrentPanel, SIGNAL(modified()), 
+                     this, SLOT(setAcceptEnabled()));
     
     QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)), 
                      this->CurrentPanel, SLOT(setRenderModule(pqRenderViewModule*)));
@@ -401,9 +407,11 @@ void pqObjectInspectorWidget::accept()
   
   this->ForceModified = false;
   emit this->postaccept();
-
+  
   // Essential to render all views.
   pqApplicationCore::instance()->render();
+  
+  this->canAccept(false);
 }
 
 void pqObjectInspectorWidget::reset()
@@ -426,7 +434,10 @@ void pqObjectInspectorWidget::reset()
     {
     this->forceModified(true);
     }
-  emit postreject();
+  
+  emit this->postreject();
+  
+  this->canAccept(false);
 }
 
 QSize pqObjectInspectorWidget::sizeHint() const

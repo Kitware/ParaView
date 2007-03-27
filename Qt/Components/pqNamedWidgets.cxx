@@ -298,7 +298,7 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
         QObject::connect(parent, SIGNAL(onreset()), w, SLOT(reset()));
         QObject::connect(parent, SIGNAL(onselect()), w, SLOT(select()));
         QObject::connect(parent, SIGNAL(ondeselect()), w, SLOT(deselect()));
-        QObject::connect(w, SIGNAL(modified()), parent, SLOT(modified()));
+        QObject::connect(w, SIGNAL(modified()), parent, SLOT(setModified()));
         }
 
       }

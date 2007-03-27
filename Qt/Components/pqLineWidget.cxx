@@ -111,10 +111,10 @@ pqLineWidget::pqLineWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
     SIGNAL(clicked()), this, SLOT(onZAxis()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(modified()));
+    this, SLOT(setModified()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
-    this, SLOT(modified()));
+    this, SLOT(setModified()));
   
   this->createWidget(o->getServer());
 }
