@@ -1,7 +1,7 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    pqThresholdPanel.h
+   Program:   ParaView
+   Module:    pqDoubleRangeWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,38 +29,57 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef __pqDoubleRangeWidget_h
+#define __pqDoubleRangeWidget_h
 
-#ifndef _pqThresholdPanel_h
-#define _pqThresholdPanel_h
+#include <QWidget>
+#include "QtWidgetsExport.h"
+  
+class QSlider;
+class QLineEdit;
 
-#include "pqLoadedFormObjectPanel.h"
-#include "pqComponentsExport.h"
-class pqDoubleRangeWidget;
-
-class PQCOMPONENTS_EXPORT pqThresholdPanel :
-  public pqLoadedFormObjectPanel
+/// a widget with a tied slider and line edit for editing a double property
+class QTWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
 {
   Q_OBJECT
+  Q_PROPERTY(double value READ value WRITE setValue)
 public:
-  /// constructor
-  pqThresholdPanel(pqProxy* proxy, QWidget* p = NULL);
-  /// destructor
-  ~pqThresholdPanel();
+  /// constructor requires the proxy, property
+  pqDoubleRangeWidget(QWidget* parent = NULL);
+  ~pqDoubleRangeWidget();
 
-  virtual void accept();
-  virtual void reset();
+  /// get the value
+  double value() const;
+  
+  // get the min range value
+  double minimum() const;
+  // get the max range value
+  double maximum() const;
+  
+signals:
+  /// signal the value changed
+  void valueChanged(double);
 
-protected slots:
-  void lowerChanged(double);
-  void upperChanged(double);
+public slots:
+  /// set the value
+  void setValue(double);
 
-protected:
-  /// populate widgets with properties from the server manager
-  virtual void linkServerManagerProperties();
+  // set the min range value
+  void setMinimum(double);
+  // set the max range value
+  void setMaximum(double);
 
-  pqDoubleRangeWidget* Lower;
-  pqDoubleRangeWidget* Upper;
+private slots:
+  void sliderChanged(int);
+  void textChanged(const QString&);
 
+private:
+  double Value;
+  double Minimum;
+  double Maximum;
+  QSlider* Slider;
+  QLineEdit* LineEdit;
+  bool BlockUpdate;
 };
 
 #endif

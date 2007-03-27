@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtWidgetsPlugin.h"
 #include "pqCollapsedGroup.h"
+#include "pqDoubleRangeWidget.h"
 
 ///////////////////////////////////////////////////////////////////////////
 // pqCollapsedGroupPlugin
@@ -94,6 +95,63 @@ bool pqCollapsedGroupPlugin::isContainer() const
   return true;
 }
 
+///////////////////////////////////////////////////////////////////////////
+// pqDoubleRangeWidgetPlugin
+
+QString pqDoubleRangeWidgetPlugin::name() const
+{
+  return "pqDoubleRangeWidget";
+}
+
+QString pqDoubleRangeWidgetPlugin::domXml() const
+{
+  return "<widget class=\"pqDoubleRangeWidget\" name=\"doubleRange\">\n"
+    " <property name=\"geometry\">\n"
+    "  <rect>\n"
+    "   <x>0</x>\n"
+    "   <y>0</y>\n"
+    "   <width>24</width>\n"
+    "   <height>100</height>\n"
+    "  </rect>\n"
+    " </property>\n"
+    "</widget>\n";
+}
+
+QWidget* pqDoubleRangeWidgetPlugin::createWidget(QWidget* parent)
+{
+  return new pqDoubleRangeWidget(parent);
+}
+
+QString pqDoubleRangeWidgetPlugin::group() const
+{
+  return "ParaView Qt Widgets";
+}
+
+QIcon pqDoubleRangeWidgetPlugin::icon() const
+{
+  return QIcon(":/QtWidgets/Icons/pqCollapsedGroup22.png");
+}
+
+QString pqDoubleRangeWidgetPlugin::includeFile() const
+{
+  return "pqDoubleRangeWidget.h";
+}
+
+QString pqDoubleRangeWidgetPlugin::toolTip() const
+{
+  return "Double Range Widget";
+}
+
+QString pqDoubleRangeWidgetPlugin::whatsThis() const
+{
+  return "The Double Range Widget is a tied slider and line edit.";
+}
+
+bool pqDoubleRangeWidgetPlugin::isContainer() const
+{
+  return false;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // QtWidgetsPlugin
 
@@ -101,6 +159,7 @@ QtWidgetsPlugin::QtWidgetsPlugin(QObject* p) :
   QObject(p)
 {
   this->List.append(new pqCollapsedGroupPlugin());
+  this->List.append(new pqDoubleRangeWidgetPlugin());
 }
 
 QList<QDesignerCustomWidgetInterface*> QtWidgetsPlugin::customWidgets() const

@@ -31,6 +31,8 @@ SET(QtWidgets_SRCS
   pqConsoleWidget.h
   pqDelimitedTextParser.cxx
   pqDelimitedTextParser.h
+  pqDoubleRangeWidget.cxx
+  pqDoubleRangeWidget.h
   pqFlatTreeView.cxx
   pqFlatTreeView.h
   pqListWidgetItemObject.cxx
@@ -76,6 +78,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqColorTableModel.h
   pqConsoleWidget.h
   pqDelimitedTextParser.h
+  pqDoubleRangeWidget.h
   pqFlatTreeView.h
   pqListWidgetItemObject.h
   pqLookmarkToolbar.h

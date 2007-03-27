@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqThresholdPanel.h
+   Module:    pqDoubleRangeWidgetDomain.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,37 +30,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqThresholdPanel_h
-#define _pqThresholdPanel_h
+#ifndef pq_DoubleRangeWidgetDomain_h
+#define pq_DoubleRangeWidgetDomain_h
 
-#include "pqLoadedFormObjectPanel.h"
+#include <QObject>
 #include "pqComponentsExport.h"
-class pqDoubleRangeWidget;
 
-class PQCOMPONENTS_EXPORT pqThresholdPanel :
-  public pqLoadedFormObjectPanel
+class pqDoubleRangeWidget;
+class vtkSMProperty;
+
+/// combo box domain 
+/// observers the domain for a combo box and updates accordingly
+class PQCOMPONENTS_EXPORT pqDoubleRangeWidgetDomain : public QObject
 {
   Q_OBJECT
 public:
-  /// constructor
-  pqThresholdPanel(pqProxy* proxy, QWidget* p = NULL);
-  /// destructor
-  ~pqThresholdPanel();
+  /// constructor requires a pqDoubleRangeWidget, 
+  /// and the property with the domain to observe
+  /// the list of values in the combo box is automatically 
+  /// updated when the domain changes
+  pqDoubleRangeWidgetDomain(pqDoubleRangeWidget* p, vtkSMProperty* prop, int index=-1);
+  ~pqDoubleRangeWidgetDomain();
 
-  virtual void accept();
-  virtual void reset();
-
+public slots:
+  void domainChanged();
 protected slots:
-  void lowerChanged(double);
-  void upperChanged(double);
+  void internalDomainChanged();
 
 protected:
-  /// populate widgets with properties from the server manager
-  virtual void linkServerManagerProperties();
+  virtual void setRange(double min, double max);
 
-  pqDoubleRangeWidget* Lower;
-  pqDoubleRangeWidget* Upper;
-
+  pqDoubleRangeWidget* getRangeWidget() const;
+private:
+  class pqInternal;
+  pqInternal* Internal;
 };
 
 #endif

@@ -55,6 +55,23 @@ public:
   bool isContainer() const;
 };
 
+class pqDoubleRangeWidgetPlugin :
+  public QDesignerCustomWidgetInterface
+{
+  Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+  QString name() const;
+  QString domXml() const;
+  QWidget* createWidget(QWidget* parent);
+  QString group() const;
+  QIcon icon() const;
+  QString includeFile() const;
+  QString toolTip() const;
+  QString whatsThis() const;
+  bool isContainer() const;
+};
+
 class QtWidgetsPlugin :
   public QObject,
   public QDesignerCustomWidgetCollectionInterface

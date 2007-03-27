@@ -69,6 +69,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDisplayProxyEditor.h
   pqDisplayProxyEditorWidget.h
   pqDisplayRepresentationWidget.h
+  pqDoubleRangeWidgetDomain.h
   pqDoubleSpinBoxDomain.h
   pqEditServerStartupDialog.h
   pqElementInspectorWidget.h
@@ -319,6 +320,8 @@ ADD_LIBRARY(pqComponents
   pqDisplayProxyEditorWidget.cxx
   pqDisplayRepresentationWidget.cxx
   pqDisplayRepresentationWidget.h
+  pqDoubleRangeWidgetDomain.cxx
+  pqDoubleRangeWidgetDomain.h
   pqDoubleSpinBoxDomain.cxx
   pqDoubleSpinBoxDomain.h
   pqEditServerStartupDialog.cxx

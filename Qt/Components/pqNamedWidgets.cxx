@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include <QSlider>
 #include <QDoubleSpinBox>
+#include "pqDoubleRangeWidget.h"
 
 // VTK includes
 
@@ -70,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComboBoxDomain.h"
 #include "pqSpinBoxDomain.h"
 #include "pqDoubleSpinBoxDomain.h"
+#include "pqDoubleRangeWidgetDomain.h"
 #include "pqSliderDomain.h"
 #include "pqFileChooserWidget.h"
 #include "pqFieldSelectionAdaptor.h"
@@ -142,6 +144,7 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
         QLineEdit* le = qobject_cast<QLineEdit*>(propertyWidget);
         QSlider* sl = qobject_cast<QSlider*>(propertyWidget);
         QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(object);
+        pqDoubleRangeWidget* doubleRange = qobject_cast<pqDoubleRangeWidget*>(object);
         QSpinBox* spinBox = qobject_cast<QSpinBox*>(object);
         if(le)
           {
@@ -164,6 +167,14 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
             pqDoubleSpinBoxDomain(doubleSpinBox, SMProperty, index);
           d0->setObjectName("DoubleSpinBoxDomain");
           property_manager->registerLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
+                                             proxy, SMProperty, index);
+          }
+        else if(doubleRange)
+          {
+          pqDoubleRangeWidgetDomain* d0 = new
+            pqDoubleRangeWidgetDomain(doubleRange, SMProperty, index);
+          d0->setObjectName("DoubleRangeWidgetDomain");
+          property_manager->registerLink(doubleRange, "value", SIGNAL(valueChanged(double)),
                                              proxy, SMProperty, index);
           }
         else if(spinBox)
@@ -310,8 +321,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     QTextEdit* textEdit = qobject_cast<QTextEdit*>(object);
     QSlider* slider = qobject_cast<QSlider*>(object);
     QSpinBox* spinBox = qobject_cast<QSpinBox*>(object);
-    QDoubleSpinBox* doubleSpinBox = 
-      qobject_cast<QDoubleSpinBox*>(object);
+    QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(object);
+    pqDoubleRangeWidget* doubleRange = qobject_cast<pqDoubleRangeWidget*>(object);
     if(comboBox)
       {
       // these combo boxes tend to be true/false combos
@@ -356,6 +367,15 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       d0->setObjectName("DoubleSpinBoxDomain");
       property_manager->registerLink(
         doubleSpinBox, "value", SIGNAL(valueChanged(double)),
+        proxy, SMProperty);
+      }
+    else if(doubleRange)
+      {
+      pqDoubleRangeWidgetDomain* d0 = new
+        pqDoubleRangeWidgetDomain(doubleRange, SMProperty);
+      d0->setObjectName("DoubleRangeWidgetDomain");
+      property_manager->registerLink(
+        doubleRange, "value", SIGNAL(valueChanged(double)),
         proxy, SMProperty);
       }
     else if(spinBox)
@@ -499,8 +519,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
         {
         QLineEdit* le = qobject_cast<QLineEdit*>(propertyWidget);
         QSlider* sl = qobject_cast<QSlider*>(propertyWidget);
-        QDoubleSpinBox* doubleSpinBox =
-          qobject_cast<QDoubleSpinBox*>(propertyWidget);
+        QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(propertyWidget);
+        pqDoubleRangeWidget* doubleRange = qobject_cast<pqDoubleRangeWidget*>(propertyWidget);
         QSpinBox* spinBox = qobject_cast<QSpinBox*>(propertyWidget);
         if(le)
           {
@@ -529,6 +549,19 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
             delete d0;
             }
           property_manager->unregisterLink(doubleSpinBox, 
+                                              "value", 
+                                              SIGNAL(valueChanged(double)),
+                                              proxy, SMProperty);
+          }
+        else if(doubleRange)
+          {
+          pqDoubleRangeWidgetDomain* d0 = 
+            doubleRange->findChild<pqDoubleRangeWidgetDomain*>("DoubleRangeWidgetDomain");
+          if(d0)
+            {
+            delete d0;
+            }
+          property_manager->unregisterLink(doubleRange, 
                                               "value", 
                                               SIGNAL(valueChanged(double)),
                                               proxy, SMProperty);
@@ -639,8 +672,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
     QSlider* slider = qobject_cast<QSlider*>(object);
-    QDoubleSpinBox* doubleSpinBox = 
-      qobject_cast<QDoubleSpinBox*>(object);
+    QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(object);
+    pqDoubleRangeWidget* doubleRange = qobject_cast<pqDoubleRangeWidget*>(object);
     QSpinBox* spinBox = qobject_cast<QSpinBox*>(object);
     if(comboBox)
       {
@@ -686,6 +719,18 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
         }
       property_manager->unregisterLink(
         doubleSpinBox, "value", SIGNAL(valueChanged(double)),
+        proxy, SMProperty);
+      }
+    else if(doubleRange)
+      {
+      pqDoubleRangeWidgetDomain* d0 = 
+        doubleRange->findChild<pqDoubleRangeWidgetDomain*>("DoubleRangeWidgetDomain");
+      if(d0)
+        {
+        delete d0;
+        }
+      property_manager->unregisterLink(
+        doubleRange, "value", SIGNAL(valueChanged(double)),
         proxy, SMProperty);
       }
     else if(spinBox)
