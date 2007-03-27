@@ -210,6 +210,32 @@ public:
   // Stuff related to proxy menu (sources & filters)
   typedef vtkstd::map<vtkstd::string, vtkstd::string> ProxyIconsType;
 
+  // Used in sort
+  static bool proxyLessThan(vtkSMProxy* first, vtkSMProxy* second)
+    {
+      if (first && second)
+        {
+        if (strcmp(first->GetXMLLabel(), second->GetXMLLabel()) < 0)
+          {
+          return true;
+          }
+        }
+      return false;
+    }
+
+  // Used in unique
+  static bool proxySame(vtkSMProxy* first, vtkSMProxy* second)
+    {
+      if (first && second)
+        {
+        if (strcmp(first->GetXMLLabel() , second->GetXMLLabel()) == 0)
+          {
+          return true;
+          } 
+        }
+      return false;
+    }
+
   // Given a group name, instantiate the related prototype. The
   // change in the prototype group is returned in difference.
   void instantiateGroupPrototypes(vtkstd::string groupName,
@@ -227,7 +253,8 @@ public:
   // Stuff related to the filters menu
   void updateFiltersFromXML();
 
-  vtkstd::vector<vtkstd::string> AlphabeticalFilters;
+  typedef vtkstd::vector<vtkSMProxy*> ProxyVector;
+  ProxyVector AlphabeticalFilters;
 
   ProxyIconsType FilterIcons;
 
@@ -330,6 +357,8 @@ void pqMainWindowCore::pqImplementation::updateSourcesFromXML()
 
 void pqMainWindowCore::pqImplementation::updateFiltersFromXML()
 {
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+
   QString xmlfilename(":/ParaViewResources/ParaViewFilters.xml");
   QFile xml(xmlfilename);
   if (!xml.open(QIODevice::ReadOnly))
@@ -347,10 +376,9 @@ void pqMainWindowCore::pqImplementation::updateFiltersFromXML()
     }
 
   this->FilterCategories.clear();
-  this->AlphabeticalFilters.clear();
 
   // First create a uniquified, alphabetical vector of all filters
-  vtkstd::vector<vtkstd::string> filters;
+  pqImplementation::ProxyVector filters;
   QDomNodeList filterList = doc.elementsByTagName("Filter");
   for(int i=0; i<filterList.size(); i++)
     {
@@ -360,18 +388,24 @@ void pqMainWindowCore::pqImplementation::updateFiltersFromXML()
     QString icon = filter.attribute("icon");
     if (name != "")
       {
-      filters.push_back(name.toStdString());
-      if (icon != "")
+      vtkSMProxy* prototype = pxm->GetProxy("filters_prototypes",
+                                            name.toAscii().data());
+      if (prototype)
         {
-        this->FilterIcons[name.toStdString()] = icon.toStdString();
+        filters.push_back(prototype);
+        if (icon != "")
+          {
+          this->FilterIcons[name.toStdString()] = icon.toStdString();
+          }
         }
       }
     }
-  vtkstd::sort(filters.begin(), filters.end());
-  vtkstd::vector<vtkstd::string>::iterator newEnd =
-    unique(filters.begin(), filters.end());
+  vtkstd::sort(filters.begin(), filters.end(), pqImplementation::proxyLessThan);
+  pqImplementation::ProxyVector::iterator newEnd =
+    unique(filters.begin(), filters.end(), pqImplementation::proxySame);
 
   this->AlphabeticalFilters.clear();
+  pqImplementation::ProxyVector::iterator filterIter = filters.begin();
   this->AlphabeticalFilters.insert(this->AlphabeticalFilters.begin(),
                                    filters.begin(), 
                                    newEnd);
@@ -680,8 +714,8 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   // Instantiate prototypes for sources and filters. These are used
   // in populating sources and filters menus.
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  pxm->InstantiateGroupPrototypes("sources_prototypes");
-  pxm->InstantiateGroupPrototypes("filters_prototypes");
+  pxm->InstantiateGroupPrototypes("sources");
+  pxm->InstantiateGroupPrototypes("filters");
 }
 
 //-----------------------------------------------------------------------------
@@ -800,6 +834,8 @@ void pqMainWindowCore::refreshSourcesMenu()
 
 void pqMainWindowCore::refreshFiltersMenu()
 {
+  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+
   this->Implementation->updateFiltersFromXML();
 
   vtkstd::set<vtkstd::string> newFilters;
@@ -811,11 +847,17 @@ void pqMainWindowCore::refreshFiltersMenu()
     vtkstd::set<vtkstd::string>::iterator nfIter = newFilters.begin();
     for(; nfIter != newFilters.end(); nfIter++)
       {
-      this->Implementation->AlphabeticalFilters.push_back(*nfIter);
+      vtkSMProxy* prototype = proxyManager->GetProxy("filters_prototypes",
+                                                     nfIter->c_str());
+      if (prototype)
+        {
+        this->Implementation->AlphabeticalFilters.push_back(prototype);
+        }
       }
     // List changed, sort again.
     vtkstd::sort(this->Implementation->AlphabeticalFilters.begin(),
-                 this->Implementation->AlphabeticalFilters.end());
+                 this->Implementation->AlphabeticalFilters.end(),
+                 pqImplementation::proxyLessThan);
     }
 
   if(this->Implementation->FilterMenu)
@@ -861,13 +903,13 @@ void pqMainWindowCore::refreshFiltersMenu()
       this->Implementation->FilterMenu->addMenu("&Alphabetical") 
       << pqSetName("Alphabetical");
 
-    vtkstd::vector<vtkstd::string>::iterator filterIter =
+    pqImplementation::ProxyVector::iterator filterIter =
       this->Implementation->AlphabeticalFilters.begin();
     for(;
         filterIter!=this->Implementation->AlphabeticalFilters.end(); 
         filterIter++)
       {
-      const char* filterName = filterIter->c_str();
+      const char* filterName = (*filterIter)->GetXMLName();
       this->Implementation->addProxyToMenu(
         "filters_prototypes",
         filterName, 
