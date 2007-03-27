@@ -140,6 +140,7 @@ pqPropertyManagerPropertyLink::pqPropertyManagerPropertyLink(
   QObject::connect(p, SIGNAL(propertyChanged()), 
                    this, SLOT(managerPropertyChanged()));
   QObject::connect(o, signal, this, SLOT(guiPropertyChanged()));
+  this->Block = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -151,13 +152,17 @@ void pqPropertyManagerPropertyLink::guiPropertyChanged()
   if(p->value() != v)
     {
     p->setValue(v);
-    emit p->guiPropertyChanged();
+    if(this->Block == 0)
+      {
+      emit p->guiPropertyChanged();
+      }
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertyManagerPropertyLink::managerPropertyChanged()
 {
+  ++this->Block;
   pqPropertyManagerProperty* p = 
     qobject_cast<pqPropertyManagerProperty*>(this->parent());
   QVariant v = p->value();
@@ -165,6 +170,7 @@ void pqPropertyManagerPropertyLink::managerPropertyChanged()
     {
     this->QtObject->setProperty(this->QtProperty, v);
     }
+  --this->Block;
 }
 
 //-----------------------------------------------------------------------------

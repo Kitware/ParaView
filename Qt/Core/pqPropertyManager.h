@@ -84,7 +84,7 @@ public slots:
   void accept();
   /// reject property changes and revert all QObject properties
   void reject();
-  /// Called whenever a property changes
+  /// Called whenever a property changes from the GUI side
   void propertyChanged();
   
 protected:
@@ -111,6 +111,7 @@ private slots:
 private:
   QPointer<QObject> QtObject;
   QByteArray QtProperty;
+  int Block;
 };
 
 class PQCORE_EXPORT pqPropertyManagerProperty : public QObject
