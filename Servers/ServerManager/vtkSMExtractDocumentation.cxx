@@ -28,8 +28,8 @@
 #include <vtkstd/list>
 #include <vtkstd/string>
 
-class vtkStringPairList : public vtkstd::list<vtkstd::pair<vtkstd::string, vtkstd::string>> {};
-typedef vtkstd::list<vtkstd::pair<vtkstd::string, vtkstd::string>>::iterator vtkStringPairListIterator;
+class vtkStringPairList : public vtkstd::list<vtkstd::pair<vtkstd::string, vtkstd::string> > {};
+typedef vtkstd::list<vtkstd::pair<vtkstd::string, vtkstd::string> >::iterator vtkStringPairListIterator;
 
 bool operator < (const vtkstd::pair<vtkstd::string, vtkstd::string> &x,
                  const vtkstd::pair<vtkstd::string, vtkstd::string> &y)
