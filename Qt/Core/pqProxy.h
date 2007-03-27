@@ -109,25 +109,6 @@ public:
 
   /// Returns the keys for helper proxies.
   QList<QString> getHelperKeys() const;
-signals:
-  /// Fired when the name of the proxy is changed.
-  void nameChanged(pqServerManagerModelItem*);
-
-  /// Fired when the modified status changes for the proxy.
-  void modifiedStateChanged(pqServerManagerModelItem*);
-
-protected:
-  friend class pqServerManagerModel;
-  friend class pqHelperProxyRegisterUndoElement;
-
-  /// Make this pqProxy take on a new identity. This is following case:
-  /// Proxy A registered as (gA, nA), then is again registered as (gA, nA2).
-  /// pqServerManagerModel does not create a new pqProxy for (gA, nA2). 
-  /// However, if (gA, nA) is now unregistered, the same old instace of pqProxy
-  /// which represented (gA, nA) will now "take on a new identity" and 
-  /// represent proxy (gA, nA2). This method will trigger the
-  /// nameChanged() signal.
-  void setSMName(const QString& new_name);
 
   /// Concept of helper proxies:
   /// A pqProxy is created for every important vtkSMProxy registered. Many a times, 
@@ -140,12 +121,28 @@ protected:
   virtual void addHelperProxy(const QString& key, vtkSMProxy*);
   void removeHelperProxy(const QString& key, vtkSMProxy*);
 
-
   /// Unregisters all helper proxies.
   void clearHelperProxies();
 
-  /// state loader needs access to addHelperProxy.
-  friend class pqStateLoader;
+signals:
+  /// Fired when the name of the proxy is changed.
+  void nameChanged(pqServerManagerModelItem*);
+
+  /// Fired when the modified status changes for the proxy.
+  void modifiedStateChanged(pqServerManagerModelItem*);
+
+protected:
+  friend class pqServerManagerModel;
+
+  /// Make this pqProxy take on a new identity. This is following case:
+  /// Proxy A registered as (gA, nA), then is again registered as (gA, nA2).
+  /// pqServerManagerModel does not create a new pqProxy for (gA, nA2). 
+  /// However, if (gA, nA) is now unregistered, the same old instace of pqProxy
+  /// which represented (gA, nA) will now "take on a new identity" and 
+  /// represent proxy (gA, nA2). This method will trigger the
+  /// nameChanged() signal.
+  void setSMName(const QString& new_name);
+
 private slots:
   void onUpdateVTKObjects();
 
