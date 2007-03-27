@@ -30,7 +30,7 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.9");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.10");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -282,6 +282,14 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           if (elem->GetScalarAttribute("value", &val))
             {
             node->GetProperties()->Set(vtkSelection::CONTAINING_CELLS(), val);
+            }
+          }
+        else if (strcmp("INVERSE", key) == 0)
+          {
+          int val;
+          if (elem->GetScalarAttribute("value", &val))
+            {
+            node->GetProperties()->Set(vtkSelection::INVERSE(), val);
             }
           }
         else if (strcmp("PIXEL_COUNT", key) == 0)
