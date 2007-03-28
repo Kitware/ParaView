@@ -14,32 +14,35 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkSpyPlotReader.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkHierarchicalDataSet.h"
-#include "vtkDoubleArray.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkCellData.h"
-#include "vtkDataArraySelection.h"
-#include "vtkCallbackCommand.h"
-#include "vtkDataArraySelection.h"
-#include "vtkMultiProcessController.h"
-#include "vtkInformationVector.h"
-#include "vtkInformation.h"
-#include "vtkCompositeDataPipeline.h"
-#include "vtkMultiGroupDataInformation.h"
-#include "vtkUniformGrid.h"
-#include "vtkImageData.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkFloatArray.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkByteSwap.h"
 #include "vtkBoundingBox.h"
+#include "vtkByteSwap.h"
+#include "vtkCallbackCommand.h"
+#include "vtkCellData.h"
+#include "vtkCompositeDataPipeline.h"
+#include "vtkDataArraySelection.h"
+#include "vtkDataArraySelection.h"
+#include "vtkDoubleArray.h"
 #include "vtkExtractCTHPart.h" // for the BOUNDS key
+#include "vtkFloatArray.h"
+#include "vtkHierarchicalDataSet.h"
+#include "vtkImageData.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkIntArray.h"
+#include "vtkMultiGroupDataInformation.h"
+#include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkUniformGrid.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkUnsignedCharArray.h"
+
 #include "vtkSpyPlotReaderMap.h"
 #include "vtkSpyPlotUniReader.h"
 #include "vtkSpyPlotBlock.h"
 #include "vtkSpyPlotBlockIterator.h"
 #include "vtkSpyPlotIStream.h"
+
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
@@ -58,7 +61,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.48");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.49");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
