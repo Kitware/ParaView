@@ -27,7 +27,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.11");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.12");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -218,6 +218,12 @@ int vtkSMArrayRangeDomain::SetDefaultValues(vtkSMProperty* prop)
       dvp->SetNumberOfElements(1);
       double value = (this->GetMinimum(0)+this->GetMaximum(0))/2.0;
       dvp->SetElement(0, value);
+      return 1;
+      }
+    else if(dvp->GetNumberOfElements() == 2)
+      {
+      // min,max case
+      dvp->SetElements2(this->GetMinimum(0), this->GetMaximum(0));
       return 1;
       }
     }
