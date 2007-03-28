@@ -37,13 +37,13 @@ A simple example:
 import re
 import os
 if os.name == "posix":
-  from libvtkPVServerCommonPython import *
-  from libvtkPVServerManagerPython import *
-  from libvtkCommonPython import *
+    from libvtkPVServerCommonPython import *
+    from libvtkPVServerManagerPython import *
+    from libvtkCommonPython import *
 else:
-  from vtkPVServerCommonPython import *
-  from vtkPVServerManagerPython import *
-  from vtkCommonPython import *
+    from vtkPVServerCommonPython import *
+    from vtkPVServerManagerPython import *
+    from vtkCommonPython import *
 
 class pyProxy(object):
     """
@@ -81,19 +81,19 @@ class pyProxy(object):
           print property
     """
     def __eq__(self, other):
-      if isinstance(other, pyProxy):
-        return self.SMProxy == other.SMProxy
-      return self.SMProxy == other
+        if isinstance(other, pyProxy):
+            return self.SMProxy == other.SMProxy
+        return self.SMProxy == other
 
     def __ne__(self, other):
-      return not self.__eq__(other)
+        return not self.__eq__(other)
 
     def __init__(self, proxy):
         "Constructor. Assigns proxy to self.SMProxy"
         self.SMProxy = proxy
         doc = proxy.GetDocumentation().GetDescription()
         if doc:
-          self.__doc__ = doc
+            self.__doc__ = doc
 
     def __iter__(self):
         return pyPropertyIterator(self)
@@ -216,7 +216,7 @@ class pyProxy(object):
         "Overload for CompoundProxy's SaveDefinition."
         defn = self.SMProxy.SaveDefinition(root)
         if defn:
-             defn.UnRegister(None)
+            defn.UnRegister(None)
         return defn
 
     def ListProperties(self):
@@ -224,28 +224,28 @@ class pyProxy(object):
         property_list = []
         iter = self.__iter__()
         for property in iter:
-          property_list.append(iter.GetKey())
+            property_list.append(iter.GetKey())
         return property_list
 
     def __ConvertArgumentsAndCall(self, *args):
       newArgs = []
       for arg in args:
-        if type(arg) is type(self):
-          newArgs.append(arg.SMProxy)
-        else:
-          newArgs.append(arg)
+          if type(arg) is type(self):
+              newArgs.append(arg.SMProxy)
+          else:
+              newArgs.append(arg)
       func = getattr(self.SMProxy, self.__LastAttrName)
       retVal = func(*newArgs)
       if type(retVal) is type(self.SMProxy) and retVal.IsA("vtkSMProxy"):
-        return pyProxy(retVal)
+          return pyProxy(retVal)
       else:
-        return retVal
+          return retVal
 
     def __getattr__(self, name):
         """With the exception of a few overloaded methods,
         returns the SMProxy method"""
         if not self.SMProxy:
-          return getattr(self, name)
+            return getattr(self, name)
         # First check if this is a property
         if re.compile("^Set").match(name) and self.SMProxy.GetProperty(name[3:]):
             self.__LastAttrName = name[3:]
@@ -263,11 +263,11 @@ class pyProxy(object):
             return self.__SaveDefinition
         # If not a property, see if SMProxy has the method
         try:
-          proxyAttr = getattr(self.SMProxy, name)
-          self.__LastAttrName = name
-          return self.__ConvertArgumentsAndCall
+            proxyAttr = getattr(self.SMProxy, name)
+            self.__LastAttrName = name
+            return self.__ConvertArgumentsAndCall
         except:
-          pass
+            pass
         return getattr(self.SMProxy, name)
         
 class pyProxyManager(object):
@@ -358,7 +358,7 @@ class pyProxyManager(object):
         if proxy != None and isinstance(proxy,pyProxy):
             proxy = proxy.SMProxy
         if not proxy:
-          self.SMProxyManager.UnRegisterProxy(groupname, proxyname, proxy)
+            self.SMProxyManager.UnRegisterProxy(groupname, proxyname, proxy)
 
     def GetProxies(self, groupname, proxyname):
         """Returns all proxies registered under the given group with the given name."""
@@ -402,8 +402,8 @@ class pyProxyManager(object):
            can create."""
         iter = pyProxyDefinitionIterator()
         if groupname != None:
-          iter.SetModeToOneGroup()
-          iter.Begin(groupname)
+            iter.SetModeToOneGroup()
+            iter.Begin(groupname)
         return iter
 
     def ListProperties(self, groupname, proxyname):
@@ -420,8 +420,8 @@ class pyPropertyIterator(object):
     def __init__(self, proxy):
         self.SMIterator = proxy.NewPropertyIterator()
 	if self.SMIterator:
-		self.SMIterator.UnRegister(None)
-		self.SMIterator.Begin()
+            self.SMIterator.UnRegister(None)
+            self.SMIterator.Begin()
         self.Key = None
         self.Property = None
         self.Proxy = None
@@ -431,7 +431,7 @@ class pyPropertyIterator(object):
 
     def next(self):
 	if not self.SMIterator:
-		raise StopIteration
+            raise StopIteration
 
         if self.SMIterator.IsAtEnd():
             self.Key = None
@@ -445,11 +445,13 @@ class pyPropertyIterator(object):
         return self.Property
 
     def GetProxy(self):
-        """Returns the proxy for the property last returned by the call to 'next()'"""
+        """Returns the proxy for the property last returned by the call to
+        'next()'"""
         return self.Proxy
 
     def GetKey(self):
-        """Returns the key for the property last returned by the call to 'next()' """
+        """Returns the key for the property last returned by the call to
+        'next()' """
         return self.Key
 
     def GetProperty(self):
@@ -482,11 +484,13 @@ class pyProxyDefinitionIterator(object):
         return {"group": self.Group, "key":self.Key }
 
     def GetKey(self):
-        """Returns the key for the proxy definition last returned by the call to 'next()' """
+        """Returns the key for the proxy definition last returned by the call
+        to 'next()' """
         return self.Key
 
     def GetGroup(self):
-        """Returns the group for the proxy definition last returned by the call to 'next()' """
+        """Returns the group for the proxy definition last returned by the
+        call to 'next()' """
         return self.Group
 
     def __getattr__(self, name):
@@ -516,7 +520,7 @@ class pyProxyIterator(object):
             return None
         self.Proxy = self.SMIterator.GetProxy()
         if self.Proxy:
-          self.Proxy = pyProxy(self.Proxy)
+            self.Proxy = pyProxy(self.Proxy)
         self.Group = self.SMIterator.GetGroup()
         self.Key = self.SMIterator.GetKey()
         self.SMIterator.Next()
@@ -527,11 +531,13 @@ class pyProxyIterator(object):
         return self.Proxy
 
     def GetKey(self):
-        """Returns the key for the proxy last returned by the call to 'next()' """
+        """Returns the key for the proxy last returned by the call to
+        'next()' """
         return self.Key
 
     def GetGroup(self):
-        """Returns the group for the proxy last returned by the call to 'next()' """
+        """Returns the group for the proxy last returned by the call to
+        'next()' """
         return self.Group
 
     def __getattr__(self, name):
@@ -579,8 +585,8 @@ ActiveConnection = None
 ## One can connect to a server, (data-server,render-server)
 ## or simply create a built-in connection.
 def connect_server(host, port):
-    """Connect to a host:port. Returns the connection object if successfully connected 
-    with the server."""
+    """Connect to a host:port. Returns the connection object if successfully
+    connected with the server."""
     pm =  vtkProcessModule.GetProcessModule()
     cid = pm.ConnectToRemote(host, port)
     if not cid:
@@ -731,60 +737,70 @@ def CreateDisplay(proxy, renModule):
     return display
 
 def Fetch(input, arg=None):
-   """ 
-   A convenience method that moves data from the server to the client, 
-   optionally performing some operation on the data as it moves.
-   The input argument is the name of the (proxy for a) source or filter
-   whose output is needed on the client.
+    """ 
+    A convenience method that moves data from the server to the client, 
+    optionally performing some operation on the data as it moves.
+    The input argument is the name of the (proxy for a) source or filter
+    whose output is needed on the client.
+    
+    You can use fetch to do three things.
+    If arg is None (the default) then the output is brought to the client 
+    unmodified. In parallel runs the Append or AppenPolyData filters merges the
+    data on each processor into one dataset.
+    
+    If arg is an integer then one particular processor's output is brought to
+    the client. In serial runs the arg is ignored. If you have a filter that
+    computes results in parallel and brings them to the root node, then set 
+    arg to be 0.
+    
+    If arg is an algorithm, for example vtkMinMax, the algorithm will be applied
+    to the data to obtain some result. In parallel runs the algorithm will be
+    run on each processor to make intermediate results and then again on the 
+    root processor over all of the intermediate results to create a 
+    global result.
+    """
 
-   You can use fetch to do three things.
-   If arg is None (the default) then the output is brought to the client 
-   unmodified. In parallel runs the Append or AppenPolyData filters merges the
-   data on each processor into one dataset.
+    import types
 
-   If arg is an integer then one particular processor's output is brought to
-   the client. In serial runs the arg is ignored. If you have a filter that
-   computes results in parallel and brings them to the root node, then set 
-   arg to be 0.
-
-   If arg is an algorithm, for example vtkMinMax, the algorithm will be applied
-   to the data to obtain some result. In parallel runs the algorithm will be
-   run on each processor to make intermediate results and then again on the 
-   root processor over all of the intermediate results to create a 
-   global result.
-   """
-
-   import types
-
-   #create the pipeline that reduces and transmits the data
-   gvd = CreateProxy("displays", "GenericViewDisplay")
-   gvd.SetInput(input) 
+    #create the pipeline that reduces and transmits the data
+    gvd = CreateProxy("displays", "GenericViewDisplay")
+    gvd.SetInput(input) 
   
-   if arg == None:
-     print "getting appended"
-     if input.GetDataInformation().GetDataClassName() == "vtkPolyData":
-       print "use append poly data filter"
-       gvd.SetReductionType(1)
-     else:
-       print "use append filter"
-       gvd.SetReductionType(2)
+    if arg == None:
+        print "getting appended"
+        if input.GetDataInformation().GetDataClassName() == "vtkPolyData":
+            print "use append poly data filter"
+            gvd.SetReductionType(1)
+        else:
+            print "use append filter"
+            gvd.SetReductionType(2)
 
-   elif type(arg) is types.IntType:          
-     print "getting node %d" % arg
-     gvd.SetReductionType(3)   
-     gvd.SetPreGatherHelper(None)
-     gvd.SetPostGatherHelper(None)
-     gvd.SetPassThrough(arg)
+    elif type(arg) is types.IntType:          
+        print "getting node %d" % arg
+        gvd.SetReductionType(3)   
+        gvd.SetPreGatherHelper(None)
+        gvd.SetPostGatherHelper(None)
+        gvd.SetPassThrough(arg)
 
-   else:
-     print "applying operation"
-     gvd.SetReductionType(3)   
-     gvd.SetPreGatherHelper(arg)
-     gvd.SetPostGatherHelper(arg)
-     gvd.SetPassThrough(-1)
+    else:
+        print "applying operation"
+        gvd.SetReductionType(3)   
+        gvd.SetPreGatherHelper(arg)
+        gvd.SetPostGatherHelper(arg)
+        gvd.SetPassThrough(-1)
 
-   #go!
-   gvd.UpdateVTKObjects()
-   gvd.Update()   
-   return gvd.GetOutput()
+    #go!
+    gvd.UpdateVTKObjects()
+    gvd.Update()   
+    return gvd.GetOutput()
 
+def IntegrateCell(dataset, cellId):
+    """
+    This functions uses vtkCellIntegrator's Integrate method that calculates
+    the length/area/volume of a 1D/2D/3D cell. The calculation is exact for
+    lines, polylines, triangles, triangle strips, pixels, voxels, convex
+    polygons, quads and tetrahedra. All other 3D cells are triangulated
+    during volume calculation. In such cases, the result may not be exact.
+    """
+    
+    return vtkCellIntegrator.Integrate(dataset, cellId)
