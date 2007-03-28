@@ -131,6 +131,11 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
   this->Internal->setupUi(container);
   this->Internal->cameraFrame->hide();
 
+  QDoubleValidator* validator = new QDoubleValidator(this);
+  this->Internal->currentTime->setValidator(validator);
+  this->Internal->startTime->setValidator(validator);
+  this->Internal->endTime->setValidator(validator);
+
   this->Internal->PlayModeAdaptor = 
     new pqSignalAdaptorComboBox(this->Internal->playMode);
 
