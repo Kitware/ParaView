@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMCompoundProxy.h"
 
 // Qt includes.
 #include <QtDebug>
@@ -52,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImplicitPlaneWidget.h"
 #include "pqLineSourceWidget.h"
 #include "pqPipelineSource.h"
+#include "pqPipelineFilter.h"
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
 #include "pqRenderViewModule.h"
@@ -417,20 +419,28 @@ int pq3DWidget::getReferenceInputBounds(double bounds[6]) const
     {
     return 0;
     }
-  vtkSMProxy* refProxy = this->referenceProxy()->getProxy();
-  vtkSMProperty* input_prop = refProxy->GetProperty("Input");
-  if (!input_prop)
+  
+  pqPipelineFilter* filter = NULL;
+  vtkSMSourceProxy* input = NULL;
+  filter = qobject_cast<pqPipelineFilter*>(this->referenceProxy());
+  if(filter)
     {
-    return 0;
+    vtkSMProxy* pxy = filter->getInput(0)->getProxy();
+    input = vtkSMSourceProxy::SafeDownCast(pxy);
+    vtkSMCompoundProxy* cp;
+    cp = vtkSMCompoundProxy::SafeDownCast(pxy);
+    if(cp)
+      {
+      input = vtkSMSourceProxy::SafeDownCast(cp->GetConsumableProxy());
+      }
     }
-  vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
-    pqSMAdaptor::getProxyProperty(input_prop));
-  if (!input)
+
+  if(input)
     {
-    return 0;
+    input->GetDataInformation()->GetBounds(bounds);
+    return 1;
     }
-  input->GetDataInformation()->GetBounds(bounds);
-  return 1;
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
