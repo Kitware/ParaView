@@ -114,7 +114,6 @@ void pqProxyInformationWidget::updateInformation()
   this->Ui->numberOfCells->setText(tr("NA"));
   this->Ui->numberOfPoints->setText(tr("NA"));
   this->Ui->memory->setText(tr("NA"));
-  this->Ui->polygonCount->setText(tr("NA"));
   
   this->Ui->dataArrays->clear();
 
@@ -138,7 +137,7 @@ void pqProxyInformationWidget::updateInformation()
 
   if(dataInformation)
     {
-    this->Ui->type->setText(tr(dataInformation->GetDataSetTypeAsString()));
+    this->Ui->type->setText(tr(dataInformation->GetPrettyDataTypeString()));
     
     QString numCells = QString("%1").arg(dataInformation->GetNumberOfCells());
     this->Ui->numberOfCells->setText(numCells);

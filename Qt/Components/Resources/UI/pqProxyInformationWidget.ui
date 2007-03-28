@@ -68,13 +68,6 @@
       <property name="spacing" >
        <number>4</number>
       </property>
-      <item row="4" column="1" >
-       <widget class="QLabel" name="polygonCount" >
-        <property name="text" >
-         <string>Polygon Count:</string>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="1" >
        <widget class="QLabel" name="memory" >
         <property name="text" >
@@ -128,13 +121,6 @@
        <widget class="QLabel" name="label" >
         <property name="text" >
          <string>Type:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" >
-       <widget class="QLabel" name="label_5" >
-        <property name="text" >
-         <string>Polygon Count:</string>
         </property>
        </widget>
       </item>
