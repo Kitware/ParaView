@@ -126,55 +126,13 @@ struct pqSourceInfo
   // Given a data type ID, returns the string.
   QString getDataTypeAsString() const
     {
-    if (!this->DataInformationValid)
+    if (!this->DataInformationValid ||
+        !this->Source ||
+        !this->Source->getDataInformation())
       {
       return "Unavailable";
       }
-
-    switch (this->DataType)
-      {
-    case VTK_POLY_DATA:
-      return "Polygonal";
-
-    case VTK_HYPER_OCTREE:
-      return "Octree";
-
-    case VTK_UNSTRUCTURED_GRID:
-      return "Unstructured Grid";
-
-    case VTK_STRUCTURED_GRID:
-      return "Structured Grid";
-
-    case VTK_RECTILINEAR_GRID:
-      return "Rectilinear Grid";
-
-    case VTK_IMAGE_DATA:
-      /*
-      {
-      int *ext = dataInfo->GetExtent();
-      if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
-      {
-      return "Image (Uniform Rectilinear)";
-      }
-      return "Volume (Uniform Rectilinear)";
-      }
-      */
-      return "Image (Uniform Rectilinear)";
-    case VTK_MULTIGROUP_DATA_SET:
-      return "Multi-group";
-
-    case VTK_MULTIBLOCK_DATA_SET:
-      return "Multi-block";
-
-    case VTK_HIERARCHICAL_DATA_SET:
-      return "Hierarchical AMR";
-
-    case VTK_HIERARCHICAL_BOX_DATA_SET:
-      return "Hierarchical Uniform AMR";
-
-    default:
-      return "Unknown";
-      }
+    return this->Source->getDataInformation()->GetPrettyDataTypeString();
     }
 
   // Given a datatype, returns the icon for that data type.
@@ -213,10 +171,10 @@ struct pqSourceInfo
       return "Volume (Uniform Rectilinear)";
       }
       */
-      return QIcon(":/pqWidgets/Icons/pqImageData16.png");
+      return QIcon(":/pqWidgets/Icons/pqStructuredGrid16.png");
 
     case VTK_MULTIGROUP_DATA_SET:
-      return QIcon(":/pqWidgets/Icons/pqMultiGroupData16.png");
+      return QIcon(":/pqWidgets/Icons/pqGroup24.png");
 
     case VTK_MULTIBLOCK_DATA_SET:
       return QIcon(":/pqWidgets/Icons/pqMultiBlockData16.png");
@@ -225,7 +183,7 @@ struct pqSourceInfo
       return QIcon(":/pqWidgets/Icons/pqHierarchicalData16.png");
 
     case VTK_HIERARCHICAL_BOX_DATA_SET:
-      return QIcon(":/pqWidgets/Icons/pqUniformData16.png");
+      return QIcon(":/pqWidgets/Icons/pqOctreeData16.png");
 
     default:
       return QIcon(":/pqWidgets/Icons/pqUnknownData16.png");
