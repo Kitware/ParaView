@@ -56,6 +56,9 @@ protected:
   vtkPythonProgrammableFilter();
   ~vtkPythonProgrammableFilter();
 
+  //overridden to allow multiple inputs to port 0
+  virtual int FillInputPortInformation(int port, vtkInformation *info);
+
   // Description:
   // Creates whatever output data set type is selected.
   virtual int RequestDataObject(vtkInformation* request, 

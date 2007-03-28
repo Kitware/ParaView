@@ -12,7 +12,9 @@ Interpretor, a python interpretor to run the script in upon the first
       </Documentation>
       <InputProperty
          name="Input"
-         command="SetInputConnection">
+         command="AddInputConnection"
+         clean_command="RemoveAllInputs"
+         multiple_input="1">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>

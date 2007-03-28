@@ -27,7 +27,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.8");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.9");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -161,6 +161,22 @@ void vtkPythonProgrammableFilter::Exec()
   this->Interpretor->RunSimpleString(this->Script);
 }
 
+
+//----------------------------------------------------------------------------
+int vtkPythonProgrammableFilter::FillInputPortInformation(
+  int port, vtkInformation *info)
+{
+  if(!this->Superclass::FillInputPortInformation(port, info))
+    {
+    return 0;
+    }
+  if(port==0)
+    {
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(),1);
+    }
+  return 1;
+}
 
 //----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::PrintSelf(ostream& os, vtkIndent indent)
