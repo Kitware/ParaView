@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>260</width>
-    <height>281</height>
+    <width>270</width>
+    <height>283</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -19,57 +19,105 @@
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item row="5" column="0" >
-    <widget class="QTreeWidget" name="GlobalIDs" >
-     <property name="alternatingRowColors" >
-      <bool>true</bool>
+   <item row="2" column="0" >
+    <layout class="QVBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
      </property>
-     <property name="selectionMode" >
-      <enum>QAbstractItemView::ExtendedSelection</enum>
+     <property name="spacing" >
+      <number>0</number>
      </property>
-     <property name="rootIsDecorated" >
-      <bool>false</bool>
+     <item>
+      <widget class="QLabel" name="GlobalIDRange" >
+       <property name="text" >
+        <string>Global ID Range: 0 - 1</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="IndexRange" >
+       <property name="text" >
+        <string>Index Range: 0 -1</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0" >
+    <layout class="QVBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
      </property>
-     <property name="sortingEnabled" >
-      <bool>true</bool>
+     <property name="spacing" >
+      <number>0</number>
      </property>
-     <column>
-      <property name="text" >
-       <string>Global ID</string>
-      </property>
-     </column>
+     <item>
+      <widget class="QTreeWidget" name="Indices" >
+       <property name="editTriggers" >
+        <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="alternatingRowColors" >
+        <bool>true</bool>
+       </property>
+       <property name="selectionMode" >
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+       <property name="rootIsDecorated" >
+        <bool>false</bool>
+       </property>
+       <property name="sortingEnabled" >
+        <bool>true</bool>
+       </property>
+       <column>
+        <property name="text" >
+         <string>Process ID</string>
+        </property>
+       </column>
+       <column>
+        <property name="text" >
+         <string>Index</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTreeWidget" name="GlobalIDs" >
+       <property name="alternatingRowColors" >
+        <bool>true</bool>
+       </property>
+       <property name="selectionMode" >
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+       <property name="rootIsDecorated" >
+        <bool>false</bool>
+       </property>
+       <property name="sortingEnabled" >
+        <bool>true</bool>
+       </property>
+       <column>
+        <property name="text" >
+         <string>Global ID</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0" >
+    <widget class="QCheckBox" name="UseGlobalIDs" >
+     <property name="text" >
+      <string>Use Global Ids</string>
+     </property>
     </widget>
    </item>
-   <item row="4" column="0" >
-    <widget class="QTreeWidget" name="Indices" >
-     <property name="editTriggers" >
-      <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers</set>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="ProcessIDRange" >
+     <property name="text" >
+      <string>Process ID Range: 0 - 0</string>
      </property>
-     <property name="alternatingRowColors" >
-      <bool>true</bool>
-     </property>
-     <property name="selectionMode" >
-      <enum>QAbstractItemView::ExtendedSelection</enum>
-     </property>
-     <property name="rootIsDecorated" >
-      <bool>false</bool>
-     </property>
-     <property name="sortingEnabled" >
-      <bool>true</bool>
-     </property>
-     <column>
-      <property name="text" >
-       <string>Process ID</string>
-      </property>
-     </column>
-     <column>
-      <property name="text" >
-       <string>Index</string>
-      </property>
-     </column>
     </widget>
    </item>
-   <item rowspan="2" row="4" column="1" >
+   <item row="3" column="1" >
     <layout class="QVBoxLayout" >
      <property name="margin" >
       <number>0</number>
@@ -147,34 +195,6 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="0" >
-    <widget class="QLabel" name="IndexRange" >
-     <property name="text" >
-      <string>Index Range: 0 -1</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" >
-    <widget class="QLabel" name="GlobalIDRange" >
-     <property name="text" >
-      <string>Global ID Range: 0 - 1</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="ProcessIDRange" >
-     <property name="text" >
-      <string>Process ID Range: 0 - 0</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" >
-    <widget class="QCheckBox" name="UseGlobalIDs" >
-     <property name="text" >
-      <string>Use Global Ids</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources/>
@@ -215,7 +235,7 @@
    <sender>UseGlobalIDs</sender>
    <signal>toggled(bool)</signal>
    <receiver>ProcessIDRange</receiver>
-   <slot>setHidden(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
      <x>81</x>

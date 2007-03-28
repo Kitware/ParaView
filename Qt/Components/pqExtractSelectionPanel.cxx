@@ -37,14 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 
-#include "pqPropertyLinks.h"
+#include "pqPropertyManager.h"
 #include "pqProxy.h"
 #include "pqSignalAdaptorTreeWidget.h"
 
 class pqExtractSelectionPanel::pqInternal : public Ui::ExtractSelectionPanel
 {
 public:
-  pqPropertyLinks Links;
   pqSignalAdaptorTreeWidget* GlobalIDsAdaptor;
   pqSignalAdaptorTreeWidget* IndicesAdaptor;
 };
@@ -55,7 +54,6 @@ pqExtractSelectionPanel::pqExtractSelectionPanel(pqProxy* _proxy, QWidget* _pare
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
-  this->Internal->Links.setUseUncheckedProperties(false);
 
   this->Internal->GlobalIDsAdaptor =
     new pqSignalAdaptorTreeWidget(this->Internal->GlobalIDs, true);
@@ -86,16 +84,17 @@ pqExtractSelectionPanel::~pqExtractSelectionPanel()
 //-----------------------------------------------------------------------------
 void pqExtractSelectionPanel::linkServerManagerProperties()
 {
+  pqPropertyManager* pmanager = this->propertyManager();
+
   vtkSMProxy* smproxy = this->proxy();
-  this->Internal->Links.addPropertyLink(
+  pmanager->registerLink(
     this->Internal->UseGlobalIDs, "checked", SIGNAL(toggled(bool)),
     smproxy, smproxy->GetProperty("UseGlobalIDs"));
-
-  this->Internal->Links.addPropertyLink(
+  pmanager->registerLink(
     this->Internal->GlobalIDsAdaptor, "values", SIGNAL(valuesChanged()),
     smproxy, smproxy->GetProperty("GlobalIDs"));
 
-  this->Internal->Links.addPropertyLink(
+  pmanager->registerLink(
     this->Internal->IndicesAdaptor, "values", SIGNAL(valuesChanged()),
     smproxy, smproxy->GetProperty("Indices"));
 }

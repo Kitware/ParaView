@@ -98,6 +98,8 @@ QTreeWidgetItem* pqSignalAdaptorTreeWidget::appendValue(
     }
   QObject::connect(item, SIGNAL(destroyed()), this, SIGNAL(valuesChanged()),
     Qt::QueuedConnection);
+
+  emit this->valuesChanged();
   return item;
 }
 

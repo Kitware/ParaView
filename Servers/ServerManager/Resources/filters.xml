@@ -5859,10 +5859,10 @@ This filter operates on all types of data sets, and it returns unstructured grid
         clean_command="RemoveAllIndices"
         repeat_command="1"
         number_of_elements_per_command="2"
-        number_of_elements="6"
+        number_of_elements="2"
         update_self="1"
         label="Indices" 
-        default_values="0 1 0 2 0 3">
+        default_values="0 0">
         <Documentation>
           The list of IDs that will be added to the selection produced by the selection source.
         </Documentation>
@@ -5874,9 +5874,10 @@ This filter operates on all types of data sets, and it returns unstructured grid
         clean_command="RemoveAllGlobalIDs"
         repeat_command="1"
         number_of_elements_per_command="1"
-        number_of_elements="0"
+        number_of_elements="1"
         update_self="1"
-        label="Global IDs">
+        label="Global IDs"
+        default_values="0">
         <Documentation>
           The list of Global IDs that will be added to the selection produced by the selection source.
         </Documentation>
