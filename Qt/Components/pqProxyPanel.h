@@ -88,7 +88,7 @@ public slots:
   virtual void deselect();
 
   /// Set the render module that this panel works with
-  void setRenderModule(pqRenderViewModule*);
+  virtual void setRenderModule(pqRenderViewModule*);
   
   /// Fires modified
   void setModified();
