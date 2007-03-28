@@ -52,6 +52,7 @@ void pqTreeWidgetItemObject::setData(int column, int role, const QVariant& v)
     {
     QTreeWidgetItem::setData(column, role, v);
     }
+  emit this->modified();
 }
 
 bool pqTreeWidgetItemObject::isChecked() const

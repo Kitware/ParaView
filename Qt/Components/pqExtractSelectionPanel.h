@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTreeWidgetItemObject.h
+   Module:    pqExtractSelectionPanel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,38 +29,43 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef __pqExtractSelectionPanel_h
+#define __pqExtractSelectionPanel_h
 
-#ifndef _pqTreeWidgetItemObject_h
-#define _pqTreeWidgetItemObject_h
 
-#include "QtWidgetsExport.h"
-#include <QObject>
-#include <QTreeWidgetItem>
+#include "pqObjectPanel.h"
 
-/// QTreeWidgetItem subclass with additional signals, slots, and properties
-class QTWIDGETS_EXPORT pqTreeWidgetItemObject : public QObject, public QTreeWidgetItem
+/// pqExtractSelectionPanel is a custom panel used for 
+/// "ExtractCellSelection" and "ExtractPointSelection" filters.
+class PQCOMPONENTS_EXPORT pqExtractSelectionPanel : public pqObjectPanel
 {
   Q_OBJECT
-  Q_PROPERTY(bool checked READ isChecked WRITE setChecked)
+  typedef pqObjectPanel Superclass;
 public:
-  /// construct list widget item to for QTreeWidget with a string
-  pqTreeWidgetItemObject(QTreeWidget* p, const QStringList& t);
+  pqExtractSelectionPanel(pqProxy* proxy, QWidget* parent=0);
+  ~pqExtractSelectionPanel();
 
-  /// overload setData() to emit changed signal
-  void setData(int column, int role, const QVariant& v);
+protected slots:
+  /// Deletes selected elements.
+  void deleteSelected();
 
-public slots:
-  /// get the check true/false
-  bool isChecked() const;
-  /// set the check state true/false
-  void setChecked(bool v);
+  /// Deletes all elements.
+  void deleteAll();
 
-signals:
-  /// signal check state changed
-  void checkedStateChanged(bool);
+  // Adds a new value.
+  void newValue();
 
-  /// Fired every time setData is called.
-  void modified();
+protected:
+  /// Creates links between the Qt widgets and the server manager properties.
+  void linkServerManagerProperties();
+
+private:
+  pqExtractSelectionPanel(const pqExtractSelectionPanel&); // Not implemented.
+  void operator=(const pqExtractSelectionPanel&); // Not implemented.
+
+  class pqInternal;
+  pqInternal *Internal;
 };
 
 #endif
+

@@ -1,0 +1,263 @@
+<ui version="4.0" >
+ <class>ExtractSelectionPanel</class>
+ <widget class="QWidget" name="ExtractSelectionPanel" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>260</width>
+    <height>281</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="5" column="0" >
+    <widget class="QTreeWidget" name="GlobalIDs" >
+     <property name="alternatingRowColors" >
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode" >
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="rootIsDecorated" >
+      <bool>false</bool>
+     </property>
+     <property name="sortingEnabled" >
+      <bool>true</bool>
+     </property>
+     <column>
+      <property name="text" >
+       <string>Global ID</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="4" column="0" >
+    <widget class="QTreeWidget" name="Indices" >
+     <property name="editTriggers" >
+      <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors" >
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode" >
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="rootIsDecorated" >
+      <bool>false</bool>
+     </property>
+     <property name="sortingEnabled" >
+      <bool>true</bool>
+     </property>
+     <column>
+      <property name="text" >
+       <string>Process ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Index</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item rowspan="2" row="4" column="1" >
+    <layout class="QVBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="Delete" >
+       <property name="enabled" >
+        <bool>true</bool>
+       </property>
+       <property name="toolTip" >
+        <string>Delete selected values from the current set</string>
+       </property>
+       <property name="text" >
+        <string>Delete</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="DeleteAll" >
+       <property name="enabled" >
+        <bool>true</bool>
+       </property>
+       <property name="toolTip" >
+        <string>Delete all values</string>
+       </property>
+       <property name="text" >
+        <string>Delete All</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="NewValue" >
+       <property name="toolTip" >
+        <string>Add a single value to the current set</string>
+       </property>
+       <property name="statusTip" >
+        <string>Add a single value to the current set.</string>
+       </property>
+       <property name="text" >
+        <string>New Value</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="NewRange" >
+       <property name="enabled" >
+        <bool>false</bool>
+       </property>
+       <property name="toolTip" >
+        <string>Add a single value to the current set</string>
+       </property>
+       <property name="statusTip" >
+        <string>Add a single value to the current set.</string>
+       </property>
+       <property name="text" >
+        <string>New Range</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0" >
+    <widget class="QLabel" name="IndexRange" >
+     <property name="text" >
+      <string>Index Range: 0 -1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="GlobalIDRange" >
+     <property name="text" >
+      <string>Global ID Range: 0 - 1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="ProcessIDRange" >
+     <property name="text" >
+      <string>Process ID Range: 0 - 0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" >
+    <widget class="QCheckBox" name="UseGlobalIDs" >
+     <property name="text" >
+      <string>Use Global Ids</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>UseGlobalIDs</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>GlobalIDs</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>64</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>64</x>
+     <y>156</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UseGlobalIDs</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Indices</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>64</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>64</x>
+     <y>75</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UseGlobalIDs</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ProcessIDRange</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>81</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>81</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UseGlobalIDs</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>GlobalIDRange</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>87</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>87</x>
+     <y>73</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UseGlobalIDs</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>IndexRange</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>85</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>85</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

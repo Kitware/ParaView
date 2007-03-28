@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqContourPanel.h"
 #include "pqCutPanel.h"
 #include "pqExodusPanel.h"
+#include "pqExtractSelectionPanel.h"
 #include "pqLoadedFormObjectPanel.h"
 #include "pqObjectBuilder.h"
 #include "pqObjectPanelInterface.h"
@@ -107,6 +108,14 @@ public:
         {
         return new pqThresholdPanel(proxy, p);
         }
+      if(QString("ExractPointSelection") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqExtractSelectionPanel(proxy, p);
+        }
+      if(QString("ExtractCellSelection") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqExtractSelectionPanel(proxy, p);
+        }
       if(QString("Contour") == proxy->getProxy()->GetXMLName())
         {
         return new pqContourPanel(proxy, p);
@@ -135,6 +144,8 @@ public:
          QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||
          QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||
+         QString("ExtractPointSelection") == proxy->getProxy()->GetXMLName() ||
+         QString("ExtractCellSelection") == proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName())
         {
         return true;

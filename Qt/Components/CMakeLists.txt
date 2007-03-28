@@ -77,6 +77,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqEnterPointsDialog.h
   pqEnterThresholdsDialog.h
   pqExodusPanel.h
+  pqExtractSelectionPanel.h
   pqFileChooserWidget.h
   pqFilterInputDialog.h
   pqFieldSelectionAdaptor.h
@@ -132,6 +133,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSignalAdaptorKeyFrameValue.h
   pqSignalAdaptorKeyFrameTime.h
   pqSignalAdaptorKeyFrameType.h
+  pqSignalAdaptorTreeWidget.h
   pqSimpleServerStartup.h
   pqSliderDomain.h
   pqSourceHistoryModel.h
@@ -175,6 +177,7 @@ SET(UI_FORMS
   Resources/UI/pqEnterPointsDialog.ui
   Resources/UI/pqEnterThresholdsDialog.ui
   Resources/UI/pqExodusPanel.ui
+  Resources/UI/pqExtractSelectionPanel.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqLineSourceControls.ui
@@ -336,6 +339,8 @@ ADD_LIBRARY(pqComponents
   pqEnterThresholdsDialog.h
   pqExodusPanel.cxx
   pqExodusPanel.h
+  pqExtractSelectionPanel.cxx
+  pqExtractSelectionPanel.h
   pqFileChooserWidget.cxx
   pqFileChooserWidget.h
   pqFilterInputDialog.cxx
@@ -450,6 +455,8 @@ ADD_LIBRARY(pqComponents
   pqSignalAdaptorKeyFrameTime.h
   pqSignalAdaptorKeyFrameType.cxx
   pqSignalAdaptorKeyFrameType.h
+  pqSignalAdaptorTreeWidget.cxx
+  pqSignalAdaptorTreeWidget.h
   pqSimpleServerStartup.cxx
   pqSimpleServerStartup.h
   pqSliderDomain.cxx

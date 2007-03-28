@@ -5766,10 +5766,13 @@ This filter operates on all types of data sets, and it returns unstructured grid
      <!-- End MinMax -->
    </SourceProxy>
 
-   <SourceProxy name="ExtractSelection" labal="Extract Selection" 
+   <SourceProxy name="ExtractSelection" label="Extract Selection" 
                 class="vtkExtractSelection">
      <Documentation>
-       This filter extracts a given set of cells or points given a selection. The selection can be obtained from a rubber-band selection (either point, cell, visible or in a frustrum) and passed to the filter or specified by providing an ID list.
+       This filter extracts a given set of cells or points given a selection. 
+       The selection can be obtained from a rubber-band selection 
+       (either point, cell, visible or in a frustrum) and passed to the filter 
+       or specified by providing an ID list.
      </Documentation>
      <InputProperty
          name="Input"
@@ -5801,6 +5804,103 @@ This filter operates on all types of data sets, and it returns unstructured grid
      </InputProperty>
      <!-- End ExtractSelection -->
    </SourceProxy>
+
+   <ExtractSelectionProxy name="ExtractPointSelection" 
+      label="Extract Selection (point)"
+      class="vtkExtractSelection"
+      selection_field_type="POINT" >
+
+     <InputProperty
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input from which the selection is extracted.
+       </Documentation>
+     </InputProperty>
+
+     <SubProxy>
+        <Proxy name="SelectionSource" proxygroup="sources"
+          proxyname="SelectionSource">
+        </Proxy>
+     </SubProxy>
+    <!-- End of ExtractPointSelection -->
+   </ExtractSelectionProxy>
+
+   <ExtractSelectionProxy name="ExtractCellSelection" 
+      label="Extract Selection (cell)"
+      class="vtkExtractSelection"
+      selection_field_type="CELL" >
+
+     <InputProperty
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input from which the selection is extracted.
+       </Documentation>
+     </InputProperty>
+
+     <IdTypeVectorProperty 
+        name="Indices"
+        command="AddIndex"
+        clean_command="RemoveAllIndices"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        number_of_elements="6"
+        update_self="1"
+        label="Indices" 
+        default_values="0 1 0 2 0 3">
+        <Documentation>
+          The list of IDs that will be added to the selection produced by the selection source.
+        </Documentation>
+     </IdTypeVectorProperty> 
+
+     <IdTypeVectorProperty 
+        name="GlobalIDs"
+        command="AddGlobalID"
+        clean_command="RemoveAllGlobalIDs"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        number_of_elements="0"
+        update_self="1"
+        label="Global IDs">
+        <Documentation>
+          The list of Global IDs that will be added to the selection produced by the selection source.
+        </Documentation>
+     </IdTypeVectorProperty> 
+
+     <IntVectorProperty
+        name="UseGlobalIDs"
+        command="SetUseGlobalIDs"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use GlobalIDs (instead of Indices) to generate the selection.
+        </Documentation>
+     </IntVectorProperty>
+
+     <SubProxy>
+        <Proxy name="SelectionSource" proxygroup="sources"
+          proxyname="SelectionSource">
+        </Proxy>
+     </SubProxy>
+    <!-- End of ExtractPointSelection -->
+   </ExtractSelectionProxy>
    
    </ProxyGroup>
 

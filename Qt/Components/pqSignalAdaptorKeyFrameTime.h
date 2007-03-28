@@ -38,38 +38,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationCue;
 class pqAnimationScene;
 
-// pqSignalAdaptorKeyFrameTime is adaptor for key frame's time.
-// We use the adptor to scale the actual SMProperty value since
-// the SMProperty is usually normalized while the GUI should show
-// it in human readable form i.e. scaled with respect to the scene's
-// clock time range.
+/// pqSignalAdaptorKeyFrameTime is adaptor for key frame's time.
+/// We use the adptor to scale the actual SMProperty value since
+/// the SMProperty is usually normalized while the GUI should show
+/// it in human readable form i.e. scaled with respect to the scene's
+/// clock time range.
 class PQCOMPONENTS_EXPORT pqSignalAdaptorKeyFrameTime : public QObject
 {
   Q_OBJECT;
   Q_PROPERTY(double normalizedTime READ normalizedTime WRITE setNormalizedTime);
 public:
-  // Constructor. \c object is the QObject showing the time in the GUI
-  // \c propertyname is the Qt property to get/set the GUI's time value
-  // \c signal is the signal emitted when the GUI changes.
+  /// Constructor. \c object is the QObject showing the time in the GUI
+  /// \c propertyname is the Qt property to get/set the GUI's time value
+  /// \c signal is the signal emitted when the GUI changes.
   pqSignalAdaptorKeyFrameTime(QObject* object, 
     const QString& propertyname, const QString& signal);
   virtual ~pqSignalAdaptorKeyFrameTime();
 
-  // Set the time keeper. Time keeper provides us
-  // with the range for the time values.
+  /// Set the time keeper. Time keeper provides us
+  /// with the range for the time values.
   void setAnimationScene(pqAnimationScene* keeper);
 
-  // Set the AnimationCue. It is needed to know the time mode of the key frame
-  // itself. The user may explicitly change the time to relative, in which
-  // case we don't want to crash and burn!
+  /// Set the AnimationCue. It is needed to know the time mode of the key frame
+  /// itself. The user may explicitly change the time to relative, in which
+  /// case we don't want to crash and burn!
   void setAnimationCue(pqAnimationCue* cue);
 
-  // Get normalized Time. 
+  /// Get normalized Time. 
   double normalizedTime() const;
 
 signals:
-  // fired when the GUI changes i.e. when the signal indicated in the
-  // constructor of this class is fired.
+  /// fired when the GUI changes i.e. when the signal indicated in the
+  /// constructor of this class is fired.
   void timeChanged();
 
 public slots:

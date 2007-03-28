@@ -38,7 +38,11 @@
   <Filter name="ExtractGrid" />
   <Filter name="ExtractHistogram" />
   <Filter name="ExtractLevel" />
+  <!--
   <Filter name="ExtractSelection" />
+  -->
+  <Filter name="ExtractPointSelection" />
+  <Filter name="ExtractCellSelection" />
   <Filter name="FeatureEdges" />
   <Filter name="Glyph" />
   <Filter name="Gradient" />
