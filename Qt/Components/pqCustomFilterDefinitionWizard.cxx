@@ -318,7 +318,7 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
     {
     if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) || proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
       {
-      int button = QMessageBox::warning(this, "Duplicate Name",
+      QMessageBox::warning(this, "Duplicate Name",
           "This filter name already exists.\n"
           "Please enter a different name.",
           QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);

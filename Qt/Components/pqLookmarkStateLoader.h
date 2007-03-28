@@ -76,7 +76,7 @@ protected:
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
 
-  virtual void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
+  virtual void HandleCompoundProxyDefinitions(vtkPVXMLElement* element=0);
 
   // Description:
   // This method is called to load a proxy state. Overloaded to make sure their are enough existing source for this lookmark

@@ -916,7 +916,6 @@ void pqMainWindowCore::refreshFiltersMenu()
         filterIter++)
       {
       const char* filterName = (*filterIter)->GetXMLName();
-      vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
 
       this->Implementation->addProxyToMenu(
         "filters_prototypes",
