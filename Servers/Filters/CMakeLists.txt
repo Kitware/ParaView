@@ -148,7 +148,7 @@ SET_SOURCE_FILES_PROPERTIES(
   WRAP_EXCLUDE)
 
 SET_SOURCE_FILES_PROPERTIES( 
-  vtkCameraManipulatorGUIHelper
+  vtkCameraManipulatorGUIHelper.cxx
   vtkImageCompressor.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVJoystickFly.cxx
