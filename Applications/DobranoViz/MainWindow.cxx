@@ -272,11 +272,6 @@ MainWindow::MainWindow() :
     this->Implementation->UI.selectionToolbar,
     SLOT(setEnabled(bool)));
 
-  this->Implementation->Core.setupCustomFilterToolbar(
-    this->Implementation->UI.customFilterToolbar);
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.customFilterToolbar,
-    this->Implementation->UI.customFilterToolbar->windowTitle());
-
   this->Implementation->ViewMenu->addSeparator();
 
   // Setup dockable windows ...

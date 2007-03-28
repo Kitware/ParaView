@@ -117,6 +117,10 @@ public:
   QModelIndex getIndexFor(const QString &filter) const;
   //@}
 
+  // Save/Load custom filters from pqSettings
+  void importCustomFiltersFromSettings();
+  void exportCustomFiltersToSettings();
+
 public slots:
   /// \brief
   ///   Adds a new custom filter definition to the model.

@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 
 #include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkSMProxyManager.h"
 
 
@@ -110,12 +111,59 @@ void pqCustomFilterManager::importFiles(const QStringList &files)
   QStringList::ConstIterator iter = files.begin();
   for( ; iter != files.end(); ++iter)
     {
+    // Make sure name is unique among filters
+    // Should this be done in vtkSMProxyManager???
+    vtkPVXMLParser* parser = vtkPVXMLParser::New();
+    parser->SetFileName((*iter).toAscii().data());
+    parser->Parse();
+    vtkPVXMLElement *root = parser->GetRootElement();
+    if (!root)
+      {
+      continue;
+      }
+    unsigned int numElems = root->GetNumberOfNestedElements();
+    for (unsigned int i=0; i<numElems; i++)
+      {
+      vtkPVXMLElement* currentElement = root->GetNestedElement(i);
+      if (currentElement->GetName() &&
+          strcmp(currentElement->GetName(), "CompoundProxyDefinition") == 0)
+        {
+        const char* name = currentElement->GetAttribute("name");
+        if (name)
+          {
+          QString newname = this->getUnusedFilterName(QString(name));
+          currentElement->SetAttribute("name",newname.toAscii().data());
+          }
+        }
+      }
+
     // Load the compound proxy definitions using the server manager.
     // This should trigger some register events, which will update the
     // list of custom filters.
-    proxyManager->LoadCompoundProxyDefinitions((*iter).toAscii().data());
+    proxyManager->LoadCompoundProxyDefinitions(root);
+
+    parser->Delete();
     }
 }
+
+
+
+//----------------------------------------------------------------------------
+QString pqCustomFilterManager::getUnusedFilterName(const QString &name)
+{
+  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  
+  QString tempName = name;
+  int counter = 1;
+  while(proxyManager->GetCompoundProxyDefinition(tempName.toAscii().data()) || proxyManager->GetProxy("filters_prototypes",tempName.toAscii().data()))
+    {
+    tempName = QString(name + " (" + QString::number(counter) + ")");
+    counter++;
+    }
+
+  return tempName;
+}
+
 
 void pqCustomFilterManager::exportSelected(const QStringList &files)
 {

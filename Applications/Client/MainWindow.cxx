@@ -448,8 +448,8 @@ MainWindow::MainWindow() :
     this->Implementation->UI.selectionToolbar,
     SLOT(setEnabled(bool)));
 
-  this->Implementation->Core.setupCustomFilterToolbar(
-    this->Implementation->UI.customFilterToolbar);
+  //this->Implementation->Core.setupCustomFilterToolbar(
+  //  this->Implementation->UI.customFilterToolbar);
 
   this->Implementation->Core.setupLookmarkToolbar(
     this->Implementation->UI.lookmarkToolbar);
@@ -531,9 +531,9 @@ MainWindow::MainWindow() :
     this->Implementation->UI.representationToolbar,
     this->Implementation->UI.representationToolbar->windowTitle());
 
-  this->Implementation->ToolbarsMenu->addWidget(
-    this->Implementation->UI.customFilterToolbar,
-    this->Implementation->UI.customFilterToolbar->windowTitle());
+  //this->Implementation->ToolbarsMenu->addWidget(
+  //  this->Implementation->UI.customFilterToolbar,
+  //  this->Implementation->UI.customFilterToolbar->windowTitle());
 
   this->Implementation->ToolbarsMenu->addWidget(
     this->Implementation->UI.lookmarkToolbar,
@@ -601,7 +601,7 @@ MainWindow::MainWindow() :
   this->Implementation->UI.selectionToolbar->layout()->setSpacing(0);
   this->Implementation->UI.variableToolbar->layout()->setSpacing(0);
   this->Implementation->UI.representationToolbar->layout()->setSpacing(0);
-  this->Implementation->UI.customFilterToolbar->layout()->setSpacing(0);
+  //this->Implementation->UI.customFilterToolbar->layout()->setSpacing(0);
   this->Implementation->UI.lookmarkToolbar->layout()->setSpacing(0);
   this->Implementation->UI.undoRedoToolbar->layout()->setSpacing(0);
   this->Implementation->UI.VCRToolbar->layout()->setSpacing(0);

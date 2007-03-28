@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCustomFilterDefinitionModel.h"
 #include "pqCustomFilterManagerModel.h"
 #include "pqPipelineSource.h"
+#include "pqFlatTreeView.h"
 
 #include <QHeaderView>
 #include <QMessageBox>
@@ -71,7 +72,6 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
   this->CurrentPage = 0;
   this->OverwriteOK = false;
   this->Filter = 0;
-  this->Filters = 0;
   this->Model = model;
   this->Form = new pqCustomFilterDefinitionWizardForm();
   this->Form->setupUi(this);
@@ -92,9 +92,9 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
   this->Form->PropertyUpButton->setEnabled(false);
   this->Form->PropertyDownButton->setEnabled(false);
 
-  this->Form->InputPipeline->header()->hide();
-  this->Form->OutputPipeline->header()->hide();
-  this->Form->PropertyPipeline->header()->hide();
+  this->Form->InputPipeline->getHeader()->hide();
+  this->Form->OutputPipeline->getHeader()->hide();
+  this->Form->PropertyPipeline->getHeader()->hide();
   this->Form->InputPipeline->setModel(this->Model);
   this->Form->OutputPipeline->setModel(this->Model);
   this->Form->PropertyPipeline->setModel(this->Model);
@@ -112,13 +112,13 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
       this, SLOT(finishWizard()));
 
   // Listen to the selection events.
-  QObject::connect(this->Form->InputPipeline->selectionModel(),
+  QObject::connect(this->Form->InputPipeline->getSelectionModel(),
       SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
       this, SLOT(updateInputForm(const QModelIndex &, const QModelIndex &)));
-  QObject::connect(this->Form->OutputPipeline->selectionModel(),
+  QObject::connect(this->Form->OutputPipeline->getSelectionModel(),
       SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
       this, SLOT(updateOutputForm(const QModelIndex &, const QModelIndex &)));
-  QObject::connect(this->Form->PropertyPipeline->selectionModel(),
+  QObject::connect(this->Form->PropertyPipeline->getSelectionModel(),
       SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
       this,
       SLOT(updatePropertyForm(const QModelIndex &, const QModelIndex &)));
@@ -181,11 +181,6 @@ pqCustomFilterDefinitionWizard::~pqCustomFilterDefinitionWizard()
     }
 }
 
-void pqCustomFilterDefinitionWizard::setCustomFilterList(
-    pqCustomFilterManagerModel *model)
-{
-  this->Filters = model;
-}
 
 QString pqCustomFilterDefinitionWizard::getCustomFilterName() const
 {
@@ -318,21 +313,16 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
     }
 
   // Make sure the name is unique.
-  if(this->Filters && !this->OverwriteOK)
+  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  if(!this->OverwriteOK)
     {
-    QModelIndex index = this->Filters->getIndexFor(filterName);
-    if(index.isValid())
+    if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) || proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
       {
       int button = QMessageBox::warning(this, "Duplicate Name",
-          "The custom filter name already exists.\n"
-          "Do you want to overwrite the custom filter?",
-          QMessageBox::Yes | QMessageBox::Default, QMessageBox::No);
-      if(button != QMessageBox::Yes)
-        {
-        return false;
-        }
-
-      this->OverwriteOK = true;
+          "This filter name already exists.\n"
+          "Please enter a different name.",
+          QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+      return false;
       }
     }
 
@@ -549,7 +539,7 @@ void pqCustomFilterDefinitionWizard::addInput()
   // Validate the entry. Make sure there is an object and a property
   // selected. Make sure the name is unique.
   pqPipelineSource *source = this->Model->getSourceFor(
-      this->Form->InputPipeline->selectionModel()->currentIndex());
+      this->Form->InputPipeline->getSelectionModel()->currentIndex());
   if(!source)
     {
     QMessageBox::warning(this, "No Object Selected",
@@ -664,7 +654,7 @@ void pqCustomFilterDefinitionWizard::addOutput()
   // Validate the entry. Make sure there is an object and a property
   // selected. Make sure the name is unique.
   pqPipelineSource *source = this->Model->getSourceFor(
-      this->Form->OutputPipeline->selectionModel()->currentIndex());
+      this->Form->OutputPipeline->getSelectionModel()->currentIndex());
   if(!source)
     {
     QMessageBox::warning(this, "No Object Selected",
@@ -777,7 +767,7 @@ void pqCustomFilterDefinitionWizard::addProperty()
   // Validate the entry. Make sure there is an object and a property
   // selected. Make sure the name is unique.
   pqPipelineSource *source = this->Model->getSourceFor(
-      this->Form->PropertyPipeline->selectionModel()->currentIndex());
+      this->Form->PropertyPipeline->getSelectionModel()->currentIndex());
   if(!source)
     {
     QMessageBox::warning(this, "No Object Selected",

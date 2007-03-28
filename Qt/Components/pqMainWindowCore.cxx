@@ -531,6 +531,12 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
       this->Implementation->CustomFilters, SLOT(addCustomFilter(QString)));
   this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
       this->Implementation->CustomFilters, SLOT(removeCustomFilter(QString)));
+  this->connect(observer, SIGNAL(compoundProxyDefinitionRegistered(QString)),
+                this, SLOT(refreshFiltersMenu()));
+  this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
+                this, SLOT(refreshFiltersMenu()));
+  // Now that the connections are set up, import custom filters from settings
+  this->Implementation->CustomFilters->importCustomFiltersFromSettings();
 
   // Connect up the pqLookmarkManagerModel and pqLookmarkBrowserModel
   this->Implementation->LookmarkManagerModel = new pqLookmarkManagerModel(this);
@@ -910,11 +916,54 @@ void pqMainWindowCore::refreshFiltersMenu()
         filterIter++)
       {
       const char* filterName = (*filterIter)->GetXMLName();
+      vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
+
       this->Implementation->addProxyToMenu(
         "filters_prototypes",
         filterName, 
         this->Implementation->AlphabeticalMenu,
         &this->Implementation->FilterIcons);
+      }
+
+    // Add custom filters to alphabetical filter menu
+    // We have to do this 
+    if(this->Implementation->CustomFilters->rowCount()!=0)
+      {
+      QList<QAction*> menuActions = this->Implementation->AlphabeticalMenu->actions();
+
+      for(int i=0; i<this->Implementation->CustomFilters->rowCount(); i++)
+        {
+        QString filterName = this->Implementation->CustomFilters->getCustomFilterName(this->Implementation->CustomFilters->index(i,0));
+        // Check to see if the filter by this name is a custom filter or not and add to menu accordingly
+        // Custom filters cannot have the same name as an existing filter. 
+        // If there is for some reason a filter and a custom filter of the same name,
+        // revert to the regular filter.
+        vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
+        if(manager->GetCompoundProxyDefinition(filterName.toAscii().data()) && !manager->GetProxy("filters_prototypes",filterName.toAscii().data()))
+          {
+          // Find where we should insert the action
+          int j=0;
+          while(j<menuActions.count())
+            {
+            // Compare name with the filter proxy labels if possible
+            QAction *currentFilter = menuActions[j++];
+            vtkSMProxy *proxy = manager->GetProxy("filters_prototypes",currentFilter->data().toString().toAscii().data()); //this->Implementation->AlphabeticalFilters[j];
+            QString actionName = proxy->GetXMLLabel();
+            if(actionName.isNull())
+              {
+              actionName = currentFilter->data().toString();
+              }
+            //QString actionString = manager->GetProxy("filters_prototypes",menuActions[j++]->data().toString().toAscii().data())->GetXMLLabel();
+            if(QString::localeAwareCompare(filterName,actionName) <= 0)
+              {
+              break;
+              }
+            }
+
+          QAction* action = new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"), filterName, this) << pqSetName(filterName) << pqSetData(filterName);
+          this->Implementation->AlphabeticalMenu->insertAction(menuActions[j-1], action);
+          }
+        }
       }
     }
 
@@ -1268,27 +1317,6 @@ void pqMainWindowCore::setupRepresentationToolbar(QToolBar* toolbar)
 
   QObject::connect(this,                   SIGNAL(postAccept()),
                    display_representation, SLOT(reloadGUI()));
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* toolbar)
-{
-  this->Implementation->CustomFilterToolbar = toolbar;
-
-  this->connect(toolbar, 
-    SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
-  // Listen for compound proxy register events.
-  pqServerManagerObserver *observer =
-      pqApplicationCore::instance()->getServerManagerObserver();
-  this->connect(observer, SIGNAL(compoundProxyDefinitionRegistered(QString)),
-                this,     SLOT(onCompoundProxyAdded(QString)));
-  this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
-                this,     SLOT(onCompoundProxyRemoved(QString)));
-
-/*
-  // Workaround for file new crash.
-  this->Implementation->PipelineBrowser->setFocus();
-*/
 }
 
 void pqMainWindowCore::setupLookmarkToolbar(QToolBar* toolbar)
@@ -2148,7 +2176,6 @@ void pqMainWindowCore::onToolsCreateCustomFilter()
     }
 
   pqCustomFilterDefinitionWizard wizard(&custom, mainWin);
-  wizard.setCustomFilterList(this->Implementation->CustomFilters);
   if(wizard.exec() == QDialog::Accepted)
     {
     // Create a new compound proxy from the custom filter definition.
@@ -2462,7 +2489,21 @@ void pqMainWindowCore::onCreateFilter(QAction* action)
     }
 
   QString filterName = action->data().toString();
-  if (!this->createFilterForActiveSource(filterName))
+
+  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+
+  // Check whether the action is associated with a custom filter or a regular filter
+  // Custom filters cannot have the same name as an existing filter. 
+  // If there is for some reason a filter and a custom filter of the same name,
+  // revert to the regular filter.
+  if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) && !proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
+    {
+    if (!this->createCompoundSource(filterName))
+      {
+      qCritical() << "Custom filter could not be created.";
+      }
+    }
+  else if (!this->createFilterForActiveSource(filterName))
     {
     qCritical() << "Filter could not be created.";
     } 
@@ -2590,48 +2631,6 @@ void pqMainWindowCore::restoreRecentFilterMenu()
     }
 }
 
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::onCreateCompoundProxy(QAction* action)
-{
-  if(!action)
-    {
-    return;
-    }
-
-  QString sourceName = action->data().toString();
-  if (!this->createCompoundSource(sourceName))
-    {
-    qCritical() << "Source could not be created.";
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::onCompoundProxyAdded(QString proxy)
-{
-  if(this->Implementation->CustomFilterToolbar)
-    {
-    this->Implementation->CustomFilterToolbar->addAction(
-      QIcon(":/pqWidgets/Icons/pqBundle32.png"), proxy) 
-      << pqSetName(proxy) << pqSetData(proxy);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::onCompoundProxyRemoved(QString proxy)
-{
-  // Remove the action associated with the compound proxy.
-  if(this->Implementation->CustomFilterToolbar)
-    {
-    QAction *action =
-      this->Implementation->CustomFilterToolbar->findChild<QAction *>(proxy);
-    if(action)
-      {
-      this->Implementation->CustomFilterToolbar->removeAction(action);
-      delete action;
-      }
-    }
-}
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onSelectionChanged()
@@ -3091,6 +3090,17 @@ void pqMainWindowCore::updateFiltersMenu()
     QString filterName = (*action)->data().toString();
     if (filterName.isEmpty())
       {
+      continue;
+      }
+
+    // For now simply make sure custom filters are enabled in the menu.
+    // Custom filters cannot have the same name as an existing filter. 
+    // If there is for some reason a filter and a custom filter of the same name,
+    // revert to the regular filter.
+    if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) && !proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
+      {
+      (*action)->setEnabled(true);
+      some_enabled = true;
       continue;
       }
 

@@ -263,7 +263,7 @@
            </widget>
           </item>
           <item rowspan="4" row="1" column="0" >
-           <widget class="QTreeView" name="InputPipeline" >
+           <widget class="pqFlatTreeView" native="1" name="InputPipeline" >
             <property name="sizePolicy" >
              <sizepolicy>
               <hsizetype>0</hsizetype>
@@ -521,7 +521,7 @@
            </widget>
           </item>
           <item rowspan="3" row="1" column="0" >
-           <widget class="QTreeView" name="OutputPipeline" >
+           <widget class="pqFlatTreeView" native="1" name="OutputPipeline" >
             <property name="sizePolicy" >
              <sizepolicy>
               <hsizetype>0</hsizetype>
@@ -719,7 +719,7 @@
            </widget>
           </item>
           <item rowspan="4" row="1" column="0" >
-           <widget class="QTreeView" name="PropertyPipeline" >
+           <widget class="pqFlatTreeView" native="1" name="PropertyPipeline" >
             <property name="sizePolicy" >
              <sizepolicy>
               <hsizetype>0</hsizetype>
@@ -915,6 +915,14 @@
   <tabstop>FinishButton</tabstop>
   <tabstop>CancelButton</tabstop>
  </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>pqFlatTreeView</class>
+   <extends>QAbstractScrollArea</extends>
+   <header>pqFlatTreeView.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../pqComponents.qrc" />
  </resources>

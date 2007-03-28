@@ -46,7 +46,6 @@ class pqCustomFilterManagerModel;
 class QModelIndex;
 class vtkSMCompoundProxy;
 
-
 /*! \class pqCustomFilterDefinitionWizard
  *  \brief
  *    The pqCustomFilterDefinitionWizard class is used to create a
@@ -91,11 +90,6 @@ public:
   pqCustomFilterDefinitionWizard(pqCustomFilterDefinitionModel *model,
       QWidget *parent=0);
   virtual ~pqCustomFilterDefinitionWizard();
-
-  /// \brief
-  ///   Sets the list of registered custom filter definitions.
-  /// \param model The list of registered custom filter definitions.
-  void setCustomFilterList(pqCustomFilterManagerModel *model);
 
   /// \brief
   ///   Gets the custom filter definition model used by the wizard.
@@ -276,7 +270,6 @@ private:
   int CurrentPage;                          ///< Stores the current page.
   bool OverwriteOK;                         ///< Used with name validation.
   vtkSMCompoundProxy *Filter;               ///< Stores the custom filter.
-  pqCustomFilterManagerModel *Filters;      ///< Stores the current filters.
   pqCustomFilterDefinitionModel *Model;     ///< Stores the source hierarchy.
   pqCustomFilterDefinitionWizardForm *Form; ///< Defines the gui layout.
 };

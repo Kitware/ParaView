@@ -25,7 +25,7 @@
      <x>0</x>
      <y>0</y>
      <width>940</width>
-     <height>19</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSources" >
@@ -61,11 +61,6 @@
     <addaction name="actionVCRNextFrame" />
     <addaction name="actionVCRLastFrame" />
     <addaction name="actionVCRLoop" />
-   </widget>
-   <widget class="QMenu" name="menuFilters" >
-    <property name="title" >
-     <string>F&amp;ilters</string>
-    </property>
    </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
@@ -163,6 +158,11 @@
     <addaction name="actionToolsOutputWindow" />
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
+   </widget>
+   <widget class="QMenu" name="menuFilters" >
+    <property name="title" >
+     <string>F&amp;ilters</string>
+    </property>
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -307,17 +307,6 @@
   <widget class="QToolBar" name="representationToolbar" >
    <property name="windowTitle" >
     <string>Representation</string>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <attribute name="toolBarArea" >
-    <number>4</number>
-   </attribute>
-  </widget>
-  <widget class="QToolBar" name="customFilterToolbar" >
-   <property name="windowTitle" >
-    <string>Custom Filter Controls</string>
    </property>
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>

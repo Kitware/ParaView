@@ -40,6 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QtDebug>
 
+#include "pqSettings.h"
+#include "vtkPVXMLParser.h"
+#include "vtkPVXMLElement.h"
+#include "pqApplicationCore.h"
+#include "vtkSMProxyManager.h"
 
 class pqCustomFilterManagerModelInternal : public QList<QString> {};
 
@@ -52,6 +57,8 @@ pqCustomFilterManagerModel::pqCustomFilterManagerModel(QObject *parentObject)
 
 pqCustomFilterManagerModel::~pqCustomFilterManagerModel()
 {
+  this->exportCustomFiltersToSettings();
+
   delete this->Internal;
 }
 
@@ -181,6 +188,80 @@ void pqCustomFilterManagerModel::removeCustomFilter(QString name)
   this->beginRemoveRows(QModelIndex(), row, row);
   this->Internal->removeAt(row);
   this->endRemoveRows();
+}
+
+
+void pqCustomFilterManagerModel::importCustomFiltersFromSettings()
+{
+  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+
+  QString key = "CustomFilters";
+  if(!settings->contains(key))
+    {
+    return;
+    }
+
+  QString state = settings->value(key).toString();
+
+  if(state.isNull())
+    {
+    return;
+    }
+
+  char *charArray = new char[state.size()];
+  const QChar *ptr = state.unicode();
+  int j;
+  // This is a hack for converting the QString to a char*. None of qstring's conversion methods were working.
+  for(j=0; j<state.size(); j++)
+    {
+    charArray[j] = (char)ptr->toAscii();
+    ptr++;
+    if(ptr->isNull())
+      {
+      break;
+      }
+    }
+
+  //istrstream *is = new istrstream(state.toAscii().data(),state.size()); //j+1);
+  istrstream *is = new istrstream(charArray,j+1);
+
+  vtkPVXMLParser *parser = vtkPVXMLParser::New();
+  parser->SetStream(is);
+  parser->Parse();
+
+  proxyManager->LoadCompoundProxyDefinitions(parser->GetRootElement());
+
+  parser->Delete();
+  delete [] charArray;
+  delete is;
+}
+
+
+void pqCustomFilterManagerModel::exportCustomFiltersToSettings()
+{
+  // Store the custom filters for a subsequent ParaView session
+  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  vtkPVXMLElement *root = vtkPVXMLElement::New();
+  root->SetName("CustomFilterDefinitions");
+  proxyManager->SaveCompoundProxyDefinitions(root);
+/*
+  QString name;
+  for(int i=0; i<this->rowCount(); i++)
+    {
+    QString name = this->getCustomFilterName(this->index(i,0));
+    vtkPVXMLElement *cf = proxyManager->GetCompoundProxyDefinition(name.toAscii().data());
+    root->AddNestedElement(cf);
+    }
+*/
+  ostrstream os;
+  root->PrintXML(os,vtkIndent(0));
+  os << ends;
+  os.rdbuf()->freeze(0);
+  QString state = os.str();
+  root->Delete();
+
+  pqApplicationCore::instance()->settings()->setValue("CustomFilters", state);
 }
 
 

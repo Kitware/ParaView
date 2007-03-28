@@ -108,6 +108,10 @@ private slots:
   void updateButtons(const QItemSelection &selected,
       const QItemSelection &deselected);
 
+protected:
+
+  QString getUnusedFilterName(const QString &name);
+
 private:
   pqCustomFilterManagerModel *Model; ///< Stores the custom filter list.
   pqCustomFilterManagerForm *Form;   ///< Defines the gui layout.

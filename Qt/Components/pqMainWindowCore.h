@@ -124,8 +124,6 @@ public:
   
   /// Setup a variable-selection toolbar
   void setupVariableToolbar(QToolBar* parent);
-  /// Setup a compound-proxy toolbar
-  void setupCustomFilterToolbar(QToolBar* parent);
   /// Setup a lookmark toolbar
   void setupLookmarkToolbar(QToolBar* parent);
   /// Setup a representation-selection toolbar
@@ -345,10 +343,6 @@ public slots:
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);
-
-  void onCreateCompoundProxy(QAction*);
-  void onCompoundProxyAdded(QString proxy);
-  void onCompoundProxyRemoved(QString proxy);
 
   void onSelectionChanged();
   void onPendingDisplayChanged(bool pendingDisplays);
