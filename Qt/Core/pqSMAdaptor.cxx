@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMBoundsDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMArrayRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMIdTypeVectorProperty.h"
@@ -1112,14 +1113,21 @@ QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(
     {
     vtkSMDoubleVectorProperty* dvp;
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(Property);
+    vtkSMArrayRangeDomain* arrayDomain;
+    arrayDomain = vtkSMArrayRangeDomain::SafeDownCast(DoubleDomain);
 
     unsigned int numElems = dvp->GetNumberOfElements();
     for(unsigned int i=0; i<numElems; i++)
       {
       QList<QVariant> domain;
       int exists1, exists2;
-      double min = DoubleDomain->GetMinimum(i, exists1);
-      double max = DoubleDomain->GetMaximum(i, exists2);
+      int which = i;
+      if(arrayDomain)
+        {
+        which = 0;
+        }
+      double min = DoubleDomain->GetMinimum(which, exists1);
+      double max = DoubleDomain->GetMaximum(which, exists2);
       if(exists1 && exists2)  // what if one of them exists?
         {
         domain.push_back(min);
@@ -1543,16 +1551,14 @@ void pqSMAdaptor::setUncheckedFieldSelectionScalar(vtkSMProperty* prop,
     }
 }
 
-QList<QString> pqSMAdaptor::getFieldSelectionScalarDomain(vtkSMProperty*
-  prop, const char* domainname/*=0*/)
+QList<QString> pqSMAdaptor::getFieldSelectionScalarDomain(vtkSMProperty* prop)
 {
   QList<QString> types;
 
   vtkSMStringVectorProperty* Property =
     vtkSMStringVectorProperty::SafeDownCast(prop);
-  vtkSMArrayListDomain* domain = prop?
-    vtkSMArrayListDomain::SafeDownCast(prop->GetDomain(
-        domainname? domainname : "array_list")) : 0;
+  vtkSMArrayListDomain* domain = prop ?
+    vtkSMArrayListDomain::SafeDownCast(prop->GetDomain("array_list")) : 0;
   
   if(Property && domain)
     {

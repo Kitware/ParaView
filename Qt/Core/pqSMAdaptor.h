@@ -183,7 +183,7 @@ public:
   static QString getFieldSelectionScalar(vtkSMProperty*);
   static void setFieldSelectionScalar(vtkSMProperty*, const QString&);
   static void setUncheckedFieldSelectionScalar(vtkSMProperty*, const QString&);
-  static QList<QString> getFieldSelectionScalarDomain(vtkSMProperty*, const char* domainname=0);
+  static QList<QString> getFieldSelectionScalarDomain(vtkSMProperty*);
 
 
   /// Returns a list of domains types for the property. eg.
