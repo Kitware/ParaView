@@ -981,9 +981,6 @@
    </property>
   </action>
   <action name="actionDelete_All" >
-   <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqDelete24.png</iconset>
-   </property>
    <property name="text" >
     <string>Delete All</string>
    </property>
