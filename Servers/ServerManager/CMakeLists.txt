@@ -333,7 +333,7 @@ ADD_CUSTOM_COMMAND(
   COMMENT "generating modules")
 
 SET(GUI_CONFIG_FILES
-#  ParaViewSources
+  ParaViewSources
   ParaViewFilters
   ParaViewReaders
   ParaViewWriters
