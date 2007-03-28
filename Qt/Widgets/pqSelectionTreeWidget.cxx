@@ -161,12 +161,9 @@ void pqSelectionTreeWidget::updateCheckState()
     newState = numChecked == 0 ? Qt::Unchecked : Qt::PartiallyChecked;
     }
 
-  if(newState != oldState)
-    {
-    this->headerItem()->setCheckState(0, newState);
-    this->headerItem()->setData(0, Qt::DecorationRole, 
-                                pixmap(newState, this->hasFocus()));
-    }
+  this->headerItem()->setCheckState(0, newState);
+  this->headerItem()->setData(0, Qt::DecorationRole, 
+                              pixmap(newState, this->hasFocus()));
 }
 
 Qt::CheckState pqSelectionTreeWidget::checkState() const
