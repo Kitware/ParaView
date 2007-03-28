@@ -126,6 +126,9 @@ signals:
   void lookmarkModified(pqLookmarkModel*);
   void lookmarkNameChanged(const QString &oldName,const QString &newName);
 
+protected:
+  QString getUnusedLookmarkName(const QString &name);
+
 private:
   pqLookmarkManagerModelInternal* Internal;
 };

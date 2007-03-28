@@ -81,7 +81,7 @@ protected:
 
 
   int HandleProxyCollection(vtkPVXMLElement* collectionElement);
-  void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
+  virtual void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
   int HandleLinks(vtkPVXMLElement* linksElement);
   virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
 

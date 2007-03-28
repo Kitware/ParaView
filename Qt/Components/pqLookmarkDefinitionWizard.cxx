@@ -245,11 +245,13 @@ void pqLookmarkDefinitionWizard::createLookmark()
 
   // Save a screenshot of the view to store with the lookmark
   // FIXME: Is there a better way to do this? I tried using the vtkWindowToImageFilter but I don't know how to convert its output vtkImageData to an image format that QImage will understand
-  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renderModule->getWidget());
+  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renderModule->getWidget());  
   assert(widget);
-  this->hide();
+  //this->hide();
   widget->GetRenderWindow()->Render();
+  widget->GetRenderWindow()->SetOffScreenRendering(1);
   renderModule->saveImage(150,150,"tempLookmarkImage.png");
+  widget->GetRenderWindow()->SetOffScreenRendering(0);
   QImage image("tempLookmarkImage.png","PNG");
   remove("tempLookmarkImage.png");
 

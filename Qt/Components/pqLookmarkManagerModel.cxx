@@ -99,9 +99,9 @@ QString pqLookmarkManagerModel::getLookmarksSerialized(const QList<pqLookmarkMod
   vtkPVXMLElement *root = vtkPVXMLElement::New();
   root->SetName("LookmarkDefinitionFile");
 
-  QList<pqLookmarkModel*>::const_iterator iter = lookmarks.begin();
+  //QList<pqLookmarkModel*>::const_iterator iter = lookmarks.begin();
 
-  foreach (pqLookmarkModel* lookmark, this->Internal->Lookmarks)
+  foreach (pqLookmarkModel* lookmark, lookmarks)
     {
     vtkPVXMLElement *lmkElem = vtkPVXMLElement::New();
     lmkElem->SetName("LookmarkDefinition");
@@ -168,7 +168,7 @@ int pqLookmarkManagerModel::getNumberOfLookmarks()
 void pqLookmarkManagerModel::importLookmarksFromSettings()
 {
   this->Internal->Settings = pqApplicationCore::instance()->settings();
-  QString key = "LookmarkBrowserState";
+  QString key = "Lookmarks";
   if(!this->Internal->Settings->contains(key))
     {
     return;
@@ -213,6 +213,7 @@ void pqLookmarkManagerModel::importLookmarksFromSettings()
     }
 
   parser->Delete();
+  delete [] charArray;
   delete is;
 }
 
@@ -299,22 +300,38 @@ void pqLookmarkManagerModel::importLookmarksFromFiles(const QStringList &files)
   // Clear the current selection. The new lookmark definitions
   // will be selected as they're added.
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
-  int i=0;
   vtkPVXMLElement *lookmark;
   vtkPVXMLElement *root;
 
   QStringList::ConstIterator iter = files.begin();
   for( ; iter != files.end(); ++iter)
     {
+    // Make sure name is unique among lookmarks
     parser->SetFileName((*iter).toAscii().data());
     parser->Parse();
     root = parser->GetRootElement();
-    if(!root)
+    if (!root)
       {
       continue;
       }
-    i = 0;
-    while( (lookmark = root->GetNestedElement(i++)) )
+    unsigned int numElems = root->GetNumberOfNestedElements();
+    for (unsigned int i=0; i<numElems; i++)
+      {
+      vtkPVXMLElement* currentElement = root->GetNestedElement(i);
+      if (currentElement->GetName() &&
+          strcmp(currentElement->GetName(), "LookmarkDefinition") == 0)
+        {
+        const char* name = currentElement->GetAttribute("Name");
+        if (name)
+          {
+          QString newname = this->getUnusedLookmarkName(QString(name));
+          currentElement->SetAttribute("Name",newname.toAscii().data());
+          }
+        }
+      }
+
+    int j = 0;
+    while( (lookmark = root->GetNestedElement(j++)) )
       {
       this->addLookmark(new pqLookmarkModel(lookmark));
       }
@@ -322,11 +339,28 @@ void pqLookmarkManagerModel::importLookmarksFromFiles(const QStringList &files)
   parser->Delete();
 }
 
+
+
+//----------------------------------------------------------------------------
+QString pqLookmarkManagerModel::getUnusedLookmarkName(const QString &name)
+{
+  QString tempName = name;
+  int counter = 1;
+  while(this->getLookmark(tempName))
+    {
+    tempName = QString(name + " (" + QString::number(counter) + ")");
+    counter++;
+    }
+
+  return tempName;
+}
+
+
 void pqLookmarkManagerModel::exportAllLookmarksToSettings()
 {
   // Store the contents of the lookmarks browser for a subsequent ParaView session
   //pqSettings* settings = pqApplicationCore::instance()->settings();
-  this->Internal->Settings->setValue("LookmarkBrowserState", this->getAllLookmarksSerialized());
+  this->Internal->Settings->setValue("Lookmarks", this->getAllLookmarksSerialized());
 }
 
 

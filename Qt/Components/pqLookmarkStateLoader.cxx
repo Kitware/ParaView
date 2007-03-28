@@ -67,7 +67,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.5");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.6");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -245,6 +245,14 @@ void pqLookmarkStateLoader::RegisterProxyInternal(const char* group,
   this->Superclass::RegisterProxyInternal(group, name, proxy);
 }
 
+
+//---------------------------------------------------------------------------
+void pqLookmarkStateLoader::HandleCompoundProxyDefinitions(
+  vtkPVXMLElement* element)
+{
+  return;
+}
+
 //-----------------------------------------------------------------------------
 int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement, 
   vtkSMProxy* proxy)
@@ -278,6 +286,11 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
         }
       else if (element->GetName() == QString("Property") &&
         element->GetAttribute("name") == QString("RenderWindowSize"))
+        {
+        toRemove.push_back(element);
+        }
+      else if (element->GetName() == QString("Property") &&
+        element->GetAttribute("name") == QString("ViewTime"))
         {
         toRemove.push_back(element);
         }
