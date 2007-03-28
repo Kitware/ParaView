@@ -438,3 +438,9 @@ double vtkCellIntegrator::Integrate(vtkDataSet* input,
 
   return sum;
 }
+
+//----------------------------------------------------------------------------
+void vtkCellIntegrator::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+}
