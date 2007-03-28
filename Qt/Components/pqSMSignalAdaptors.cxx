@@ -133,7 +133,10 @@ void pqSignalAdaptorDouble::setValue(const QString &string)
 void pqSignalAdaptorDouble::objectSignalFired()
 {
   QString val = this->value();
-  emit this->valueChanged(val);
+  if(val != "nan")
+    {
+    emit this->valueChanged(val);
+    }
 }
 
 //-----------------------------------------------------------------------------
