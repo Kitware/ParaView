@@ -10,6 +10,7 @@ ENDIF(NOT WIN32)
 
 SET(Kit_SRCS
   vtkCacheSizeKeeper.cxx
+  vtkCellIntegrator.cxx
   vtkClientConnection.cxx
   vtkCommandOptions.cxx
   vtkCommandOptionsXMLParser.cxx
@@ -62,6 +63,7 @@ SET(Kit_SRCS
 
 # Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
+  vtkCellIntegrator.cxx
   vtkPVCreateProcessModule
   vtkPVInformation
   vtkProcessModuleConnection

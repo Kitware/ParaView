@@ -82,6 +82,11 @@ public:
   vtkGetVector6Macro(Bounds, double);
 
   // Description:
+  // Returns a string describing the datatype that can be directly
+  // shown in a user interface.
+  const char* GetPrettyDataTypeString();
+
+  // Description:
   // Of course Extent is only valid for structured data sets.
   // Extent is the largest extent that contains all the parts.
   vtkGetVector6Macro(Extent, int);

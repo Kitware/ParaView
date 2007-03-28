@@ -42,7 +42,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.25");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.26");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -688,6 +688,67 @@ const char* vtkPVDataInformation::GetName()
     this->NameSetToDefault = 1;
     }
   return this->Name;
+}
+
+
+//----------------------------------------------------------------------------
+const char* vtkPVDataInformation::GetPrettyDataTypeString()
+{
+  int dataType = this->DataSetType;
+  if (this->CompositeDataSetType >= 0)
+    {
+    dataType = this->CompositeDataSetType;
+    }
+
+  switch(dataType)
+    {
+    case VTK_POLY_DATA:
+      return "Polygonal Mesh";
+    case VTK_STRUCTURED_POINTS:
+      return "Image (Uniform Rectilinear Grid)";
+    case VTK_STRUCTURED_GRID:
+      return "Structured (Curvilinear) Grid";
+    case VTK_RECTILINEAR_GRID:
+      return "Rectilinear Grid";
+    case VTK_UNSTRUCTURED_GRID:
+      return "Unstructured Grid";
+    case VTK_PIECEWISE_FUNCTION:
+      return "Piecewise function";
+    case VTK_IMAGE_DATA:
+      return "Image (Uniform Rectilinear Grid)";
+    case VTK_DATA_OBJECT:
+      return "Data Object";
+    case VTK_DATA_SET:
+      return "Data Set";
+    case VTK_POINT_SET:
+      return "Point Set";
+    case VTK_UNIFORM_GRID:
+      return "Image (Uniform Rectilinear Grid) with blanking";
+    case VTK_COMPOSITE_DATA_SET:
+      return "Composite Dataset";
+    case VTK_MULTIGROUP_DATA_SET:
+      return "Multi-group Dataset";
+    case VTK_MULTIBLOCK_DATA_SET:
+      return "Multi-block Dataset";
+    case VTK_HIERARCHICAL_DATA_SET:
+      return "Hierarchical DataSet";
+    case VTK_HIERARCHICAL_BOX_DATA_SET:
+      return "AMR Dataset";
+    case VTK_GENERIC_DATA_SET:
+      return "Generic Dataset";
+    case VTK_HYPER_OCTREE:
+      return "Hyper-octree";
+    case VTK_TEMPORAL_DATA_SET:
+      return "Temporal Dataset";
+    case VTK_TABLE:
+      return "Table";
+    case VTK_GRAPH:
+      return "Graph";
+    case VTK_TREE:
+      return "Tree";
+    }
+  
+  return "UnknownType";
 }
 
 //----------------------------------------------------------------------------
