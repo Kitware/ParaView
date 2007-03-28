@@ -143,6 +143,12 @@ public:
   /// which the pqProxy represents.
   virtual void destroy(pqProxy* proxy);
 
+  /// Destroy all sources/filters on a server.
+  virtual void destroySources(pqServer*);
+
+  /// Destroy all sources/filters on all servers.
+  void destroySources();
+
   /// This method unregisters all proxies on the given server. 
   /// This is usually done in anticipate of a disconnect
   /// or starting afresh.

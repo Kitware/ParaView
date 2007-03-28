@@ -613,6 +613,41 @@ void pqObjectBuilder::destroy(pqProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
+void pqObjectBuilder::destroySources(pqServer* server)
+{
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqObjectBuilder* builder =
+    pqApplicationCore::instance()->getObjectBuilder();
+
+  QList<pqPipelineSource*> sources = model->getSources(server);
+  while(!sources.isEmpty())
+    {
+    for(int i=0; i<sources.size(); i++)
+      {
+      if(sources[i]->getNumberOfConsumers() == 0)
+        {
+        builder->destroy(sources[i]);
+        sources[i] = NULL;
+        }
+      }
+    sources.removeAll(NULL);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqObjectBuilder::destroySources()
+{
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  QList<pqServer*> servers = model->getServers();
+  foreach(pqServer* server, servers)
+    {
+    this->destroySources(server);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqObjectBuilder::destroyAllProxies(pqServer* server)
 {
   if (!server)
