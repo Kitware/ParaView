@@ -2686,14 +2686,6 @@
       <Element index="6" value="0"/>
       <Element index="7" value="0"/>
     </Property>
-    <Property name="ScalePointsWithRange" id="593.ScalePointsWithRange" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="bool" id="593.ScalePointsWithRange.bool"/>
-    </Property>
-    <Property name="ScalarRange" id="1218.ScalarRange" number_of_elements="2">
-      <Element index="0" value="0"/>
-      <Element index="1" value="1"/>
-    </Property>
     <Property name="VectorComponent" id="1218.VectorComponent" number_of_elements="1">
       <Element index="0" value="0"/>
       <Domain name="enum" id="1218.VectorComponent.enum">
