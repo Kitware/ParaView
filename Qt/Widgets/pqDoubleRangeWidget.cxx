@@ -42,6 +42,9 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
   : QWidget(p) 
 {
   this->BlockUpdate = false;
+  this->Value = 0;
+  this->Minimum = 0;
+  this->Maximum = 1;
 
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
@@ -52,15 +55,13 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
   l->addWidget(this->LineEdit);
   this->LineEdit->setObjectName("LineEdit");
   this->LineEdit->setValidator(new QDoubleValidator(this->LineEdit));
+  this->LineEdit->setText(QString().setNum(this->Value));
 
   QObject::connect(this->Slider, SIGNAL(valueChanged(int)),
                    this, SLOT(sliderChanged(int)));
   QObject::connect(this->LineEdit, SIGNAL(textChanged(const QString&)),
                    this, SLOT(textChanged(const QString&)));
   
-  this->setMinimum(0);
-  this->setMaximum(1);
-  this->setValue(0);
 }
 
 //-----------------------------------------------------------------------------
