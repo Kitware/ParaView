@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pqActiveView.h>
 #include <pqApplicationCore.h>
+#include <pqObjectBuilder.h>
 //#include <pqLookmarkToolbar.h>
 #include <pqMainWindowCore.h>
 #include <pqObjectInspectorDriver.h>
@@ -263,6 +264,8 @@ MainWindow::MainWindow() :
     pqPipelineMenu::ChangeInputAction, this->Implementation->UI.actionChangeInput);
   this->Implementation->Core.pipelineMenu().setMenuAction(
     pqPipelineMenu::DeleteAction, this->Implementation->UI.actionDelete);
+  connect(this->Implementation->UI.actionDelete_All, SIGNAL(triggered()),
+          this, SLOT(onDeleteAll()));
 
   connect(this->Implementation->UI.actionToolsCreateLookmark,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsCreateLookmark()));
@@ -946,6 +949,13 @@ void MainWindow::onAddCameraLink()
     QMessageBox::information(this, "Add Camera Link", 
                              "No render module is active");
     }
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::onDeleteAll()
+{
+  pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
+  builder->destroySources();
 }
 
 //-----------------------------------------------------------------------------

@@ -80,6 +80,8 @@ private slots:
   void onPlaying(bool);
 
   void onAddCameraLink();
+  
+  void onDeleteAll();
 
 private:
   class pqImplementation;

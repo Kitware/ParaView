@@ -48,6 +48,7 @@
     </property>
     <addaction name="actionChangeInput" />
     <addaction name="actionDelete" />
+    <addaction name="actionDelete_All" />
    </widget>
    <widget class="QMenu" name="menuAnimation" >
     <property name="title" >
@@ -977,6 +978,14 @@
    </property>
    <property name="statusTip" >
     <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionDelete_All" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqDelete24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Delete All</string>
    </property>
   </action>
   <action name="actionToolsManageLinks" >
