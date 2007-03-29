@@ -180,6 +180,7 @@ public:
     RecentFiltersMenu(0),
     SourceMenu(0),
     FilterMenu(0),
+    AlphabeticalMenu(0),
     PipelineMenu(0),
     PipelineBrowser(0),
     VariableToolbar(0),
@@ -905,9 +906,16 @@ void pqMainWindowCore::refreshFiltersMenu()
       }
 
     // Finally add all filters to the Alphabetical sub-menu..
-    this->Implementation->AlphabeticalMenu = 
-      this->Implementation->FilterMenu->addMenu("&Alphabetical") 
-      << pqSetName("Alphabetical");
+
+    // Only create this menu once:
+    if(!this->Implementation->AlphabeticalMenu)
+      {
+      this->Implementation->AlphabeticalMenu = 
+        this->Implementation->FilterMenu->addMenu("&Alphabetical") 
+        << pqSetName("Alphabetical");
+      }
+  
+    this->Implementation->AlphabeticalMenu->clear();
 
     pqImplementation::ProxyVector::iterator filterIter =
       this->Implementation->AlphabeticalFilters.begin();
@@ -925,7 +933,6 @@ void pqMainWindowCore::refreshFiltersMenu()
       }
 
     // Add custom filters to alphabetical filter menu
-    // We have to do this 
     if(this->Implementation->CustomFilters->rowCount()!=0)
       {
       QList<QAction*> menuActions = this->Implementation->AlphabeticalMenu->actions();
@@ -952,14 +959,14 @@ void pqMainWindowCore::refreshFiltersMenu()
               {
               actionName = currentFilter->data().toString();
               }
-            //QString actionString = manager->GetProxy("filters_prototypes",menuActions[j++]->data().toString().toAscii().data())->GetXMLLabel();
             if(QString::localeAwareCompare(filterName,actionName) <= 0)
               {
               break;
               }
             }
-
-          QAction* action = new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"), filterName, this) << pqSetName(filterName) << pqSetData(filterName);
+          // FInally, insert the action in the menu
+          QAction* action = new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"),filterName,this->Implementation->AlphabeticalMenu)
+             << pqSetName(filterName) << pqSetData(filterName);
           this->Implementation->AlphabeticalMenu->insertAction(menuActions[j-1], action);
           }
         }

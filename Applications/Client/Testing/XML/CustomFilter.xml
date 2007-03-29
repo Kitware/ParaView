@@ -6,6 +6,6 @@
   <pqevent object="MainWindow/pqCustomFilterManager/CloseButton" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/customFilterToolbar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyElevation" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
 </pqevents>
