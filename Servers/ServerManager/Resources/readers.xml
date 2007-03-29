@@ -1040,30 +1040,6 @@
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="TimeStepRangeInfo"
-        command="GetTimeStepRange"
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="TimeStep"
-        command="SetTimeStep"
-        number_of_elements="1"
-        animateable="1"
-        default_values="0"
-        information_property="TimestepValues">
-       <IntRangeDomain name="range">
-          <RequiredProperties>
-             <Property name="TimeStepRangeInfo" function="Range"/>
-          </RequiredProperties>
-       </IntRangeDomain>
-       <Documentation>
-         Set the current timestep.
-       </Documentation>
-     </IntVectorProperty>
-
      <StringVectorProperty 
         name="CellArrayInfo"
         information_only="1">
