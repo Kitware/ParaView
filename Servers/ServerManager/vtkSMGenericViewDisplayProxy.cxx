@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.20");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -371,13 +371,27 @@ void vtkSMGenericViewDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
   if (input)
     {
     input->UpdatePipeline();
-    int dataType = input->GetDataInformation()->GetDataSetType();
+    vtkPVDataInformation* inputInfo = input->GetDataInformation();
+    int dataType = inputInfo->GetDataSetType();
 
     vtkClientServerStream stream;
 
     stream << vtkClientServerStream::Invoke
            << this->CollectProxy->GetID(0) << "SetOutputDataType" << dataType
            << vtkClientServerStream::End;
+
+    if (dataType == VTK_STRUCTURED_POINTS ||
+        dataType == VTK_STRUCTURED_GRID   ||
+        dataType == VTK_RECTILINEAR_GRID  ||
+        dataType == VTK_IMAGE_DATA)
+      {
+      const int* extent = inputInfo->GetExtent();
+      stream << vtkClientServerStream::Invoke
+             << this->CollectProxy->GetID(0) 
+             << "SetWholeExtent" 
+             << vtkClientServerStream::InsertArray(extent, 6)
+             << vtkClientServerStream::End;
+      }
 
     vtkProcessModule::GetProcessModule()->SendStream(
       this->ConnectionID,
