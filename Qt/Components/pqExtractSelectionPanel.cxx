@@ -134,9 +134,7 @@ void pqExtractSelectionPanel::updateIDRanges()
     return;
     }
 
-  vtkTypeInt64 numCells = dataInfo->GetNumberOfCells();
-  this->Internal->IndexRange->setText(
-    QString("Index Range: 0 - %1").arg(numCells-1));
+  
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int numPartitions = pm->GetNumberOfPartitions(
@@ -146,14 +144,19 @@ void pqExtractSelectionPanel::updateIDRanges()
     QString("Process ID Range: 0 - %1").arg(numPartitions-1));
 
   vtkPVDataSetAttributesInformation* dsainfo = 0;
+  vtkTypeInt64 numIndices;
   if (filter->getProxy()->GetXMLName() == QString("ExtractCellSelection"))
     {
+    numIndices = dataInfo->GetNumberOfCells();
     dsainfo = dataInfo->GetCellDataInformation();
     }
   else
     {
+    numIndices = dataInfo->GetNumberOfPoints();
     dsainfo = dataInfo->GetPointDataInformation();
     }
+  this->Internal->IndexRange->setText(
+    QString("Index Range: 0 - %1").arg(numIndices-1));
 
   vtkPVArrayInformation* gidsInfo = dsainfo->GetAttributeInformation(
     vtkDataSetAttributes::GLOBALIDS);
