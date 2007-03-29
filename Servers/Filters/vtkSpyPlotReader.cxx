@@ -61,7 +61,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.49");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.50");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -101,6 +101,8 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->GenerateLevelArray=0; // by default, do not generate level array.
   this->GenerateBlockIdArray=0; // by default, do not generate block id array.
   this->GenerateActiveBlockArray = 0; // by default do not generate active array
+
+  this->TimeRequestedFromPipeline = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -413,12 +415,21 @@ int vtkSpyPlotReader::UpdateMetaData(vtkInformation* request,
   if(request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
     {
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
+    double* timeArray = uniReader->GetTimeArray();
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
-                 uniReader->GetTimeArray(),
+                 timeArray,
                  num_time_steps);
+    double timeRange[2];
+    timeRange[0] = timeArray[0];
+    timeRange[1] = timeArray[num_time_steps-1];
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), 
+                 timeRange, 2);
     }
 
-  this->CurrentTimeStep=this->TimeStep;
+  if (!this->TimeRequestedFromPipeline)
+    {
+    this->CurrentTimeStep=this->TimeStep;
+    }
   if(this->CurrentTimeStep<0||this->CurrentTimeStep>=num_time_steps)
     {
     vtkErrorMacro("TimeStep set to " << this->CurrentTimeStep << " outside of the range 0 - " << (num_time_steps-1) << ". Use 0.");
@@ -547,6 +558,10 @@ int vtkSpyPlotReader::RequestData(
     return 0;
     }
 
+  int tsLength =
+    info->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  double* steps =
+    info->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
   vtkMultiGroupDataInformation *compInfo=
     vtkMultiGroupDataInformation::SafeDownCast(
@@ -554,6 +569,8 @@ int vtkSpyPlotReader::RequestData(
 
   hb->Initialize(); // remove all previous blocks
   hb->SetMultiGroupDataInformation(compInfo);
+  hb->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
+                            steps+this->CurrentTimeStep, 1);
   
   //int numFiles = this->Map->Files.size();
 
@@ -567,7 +584,36 @@ int vtkSpyPlotReader::RequestData(
     info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
   
   // Update the timestep.
-  this->UpdateMetaData(request, outputVector);
+  if(info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+    {
+    int tsLength =
+      info->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    double* steps =
+      info->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+
+    // Get the requested time step. We only supprt requests of a single time
+    // step in this reader right now
+    double *requestedTimeSteps = 
+      info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+    double timeValue = requestedTimeSteps[0];
+    
+    // find the first time value larger than requested time value
+    // this logic could be improved
+    int cnt = 0;
+    while (cnt < tsLength-1 && steps[cnt] < timeValue)
+      {
+      cnt++;
+      }
+    this->CurrentTimeStep = cnt;
+    
+    this->TimeRequestedFromPipeline = true;
+    this->UpdateMetaData(request, outputVector);
+    this->TimeRequestedFromPipeline = false;
+    }
+  else
+    {
+    this->UpdateMetaData(request, outputVector);
+    }
   
   // Tell all of the unireaders that they need to make to check to see
   // if they are current
@@ -611,8 +657,6 @@ int vtkSpyPlotReader::RequestData(
     return 1;
     }
   
-  // vtkDebugMacro(processNumber<<" Global Bounds= "<< coutVector6(this->Bounds);
-  
   // Read all files
   
   //vtkDebugMacro("there is (are) "<<numFiles<<" file(s)");
@@ -624,12 +668,14 @@ int vtkSpyPlotReader::RequestData(
     {
     if ( !(current_block_number % progressInterval) )
       {
-      this->UpdateProgress(0.6 + 
-                           0.4 * static_cast<double>(current_block_number)/total_num_of_blocks);
+      this->UpdateProgress(
+        0.6 + 
+        0.4 * static_cast<double>(current_block_number)/total_num_of_blocks);
       }
     block=blockIterator->GetBlock();
     int numFields=blockIterator->GetNumberOfFields();
     uniReader=blockIterator->GetUniReader();
+
     int dims[3];
     int blockID = blockIterator->GetBlockID();
     int level = 0;

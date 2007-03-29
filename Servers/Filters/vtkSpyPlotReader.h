@@ -209,7 +209,7 @@ protected:
   virtual int RequestInformation(vtkInformation *request, 
                                  vtkInformationVector **inputVector, 
                                  vtkInformationVector *outputVector);
-  
+
   // Read the data: get the number of pieces (=processors) and get
   // my piece id (=my processor id).
   virtual int RequestData(vtkInformation *request,
@@ -293,6 +293,8 @@ protected:
 
   int DownConvertVolumeFraction;
   
+  bool TimeRequestedFromPipeline;
+
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.
   void operator=(const vtkSpyPlotReader&);  // Not implemented.
