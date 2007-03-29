@@ -38,13 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "vtkType.h"
 
-class vtkDataObject;
-class vtkSMProxy;
-
 class pqGenericViewModule;
 class pqPipelineSource;
 class pqRenderViewModule;
 class pqSelectionManagerImplementation;
+class vtkDataObject;
+class vtkSMGenericViewDisplayProxy;
+class vtkSMProxy;
 
 /// pqSelectionManager is the nexus for selection in paraview.
 /// It responds to UI events to tell the servermanager to setup for making
@@ -63,21 +63,14 @@ public:
   pqSelectionManager(QObject* parent=NULL);
   virtual ~pqSelectionManager();
 
-  /// Given an index, returns a client-side data objects that was created
-  /// by the selection and the corresponding proxy. The return value is
-  /// 1 on success, 0 on failure.
-  int getSelectedObject(unsigned int idx, 
-                        vtkSMProxy*& proxy, 
-                        vtkDataObject*& dataObject);
+  /// Returns the client side selection displayer for the source,
+  /// if the source is currently selected, otherwise return 0;
+  vtkSMGenericViewDisplayProxy* getClientSideDisplayer(
+    pqPipelineSource* source) const;
+
+  /// Returns the currently selected source, if any.
+  pqPipelineSource* getSelectedSource() const;
   
-  /// Returns a list of selected pipeline objects.
-  void getSelectedObjects(QList<pqPipelineSource*> &sourceProxies, 
-    QList<vtkDataObject*> &dataObjects);
-
-  /// Returns the number of client-side data objects that were created by
-  /// the selection.
-  unsigned int getNumberOfSelectedObjects();
-
   enum Modes
   {
     INTERACT,
@@ -90,6 +83,13 @@ public:
 
   friend class vtkPQSelectionObserver;
 
+  /// Returns a list of indices currently selected.
+  /// The list is in the form (<process id>, <index>, <process id>, <index> ...).
+  QList<QVariant> getSelectedIndicesWithProcessIDs() const;
+
+  /// Returns a list of global ids currently selected.
+  /// This list does not include the process Ids.
+  QList<QVariant> getSelectedGlobalIDs() const;
 signals:
   /// fired when the selection changes.
   void selectionChanged(pqSelectionManager*);

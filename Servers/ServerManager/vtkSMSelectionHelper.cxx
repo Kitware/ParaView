@@ -19,12 +19,13 @@
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVSelectionInformation.h"
 #include "vtkProcessModule.h"
+#include "vtkPVSelectionInformation.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSMCompoundProxy.h"
 #include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -32,7 +33,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.2");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.3");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -200,6 +201,26 @@ void vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelection(
   vtkSelection* input,
   vtkSelection* output)
 {
+  vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelectionInternal(
+    connectionID, input, output, 0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSelectionHelper::ConvertSurfaceSelectionToGlobalIDVolumeSelection(
+  vtkIdType connectionID,
+  vtkSelection* input, vtkSelection* output)
+{
+  vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelectionInternal(
+    connectionID, input, output, 1);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelectionInternal(
+  vtkIdType connectionID,
+  vtkSelection* input,
+  vtkSelection* output,
+  int global_ids)
+{
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
 
@@ -227,6 +248,7 @@ void vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelection(
          << "Convert" 
          << selectionP->GetID(0) 
          << volumeSelectionP->GetID(0)
+         << global_ids
          << vtkClientServerStream::End;
   processModule->DeleteStreamObject(converterID, stream);
   processModule->SendStream(connectionID, 
@@ -301,6 +323,17 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
         }
       }
     }
+
+  /*
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    selectionSourceP->GetProperty("ContentType"));
+  ivp->SetElement(0, selection->GetProperties()->Get(vtkSelection::CONTENT_TYPE()));
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    selectionSourceP->GetProperty("FieldType"));
+  ivp->SetElement(0, selection->GetProperties()->Get(vtkSelection::FIELD_TYPE()));
+  */
+
   selectionSourceP->UpdateVTKObjects();
   return selectionSourceP;
 }

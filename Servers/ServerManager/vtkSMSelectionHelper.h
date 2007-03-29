@@ -49,13 +49,20 @@ public:
   // Convert a polydata selection on the surface to an unstructured
   // selection on the surface. The input selection belongs to the output of
   // the geometry filter, the output selection belongs to the input of the
-  // geometry filter.  vtkSelectionConverter requires certain properties to
+  // geometry filter. 
+  // vtkSelectionConverter requires certain properties to
   // be set for this to work. See vtkSelectionConverter documentation.
   // Make sure to specify the connection id for the server on which
   // the selection was performed.
   static void ConvertSurfaceSelectionToVolumeSelection(vtkIdType connectionID,
                                                        vtkSelection* input,
                                                        vtkSelection* output);
+
+  // Description:
+  // Same as ConvertSurfaceSelectionToVolumeSelection except that the
+  // converted selection is in terms on GlobalIDs.
+  static void ConvertSurfaceSelectionToGlobalIDVolumeSelection(vtkIdType connectionID,
+    vtkSelection* input, vtkSelection* output);
 
   // Description:
   // Given a render module proxy and a selection rectange (xmin, ymin,
@@ -81,6 +88,10 @@ public:
 protected:
   vtkSMSelectionHelper() {};
   ~vtkSMSelectionHelper() {};
+
+  static void ConvertSurfaceSelectionToVolumeSelectionInternal(
+    vtkIdType connectionID, vtkSelection* input, vtkSelection* output,
+    int global_ids);
 
 private:
   vtkSMSelectionHelper(const vtkSMSelectionHelper&); // Not implemented.

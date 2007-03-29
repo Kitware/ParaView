@@ -29,24 +29,25 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-#include "pqDataSetModel.h"
 #include "pqElementInspectorWidget.h"
-#include "pqSelectionManager.h"
-#include "pqPipelineSource.h"
-#include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-
 #include "ui_pqElementInspectorWidget.h"
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QTreeView>
-#include <QVBoxLayout>
+
+#include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMGenericViewDisplayProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkUnstructuredGrid.h"
+
 #include <QPointer>
 
-#include <vtkAppendFilter.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkSmartPointer.h>
+#include "pqApplicationCore.h"
+#include "pqDataSetModel.h"
+#include "pqPipelineSource.h"
+#include "pqSelectionManager.h"
+#include "pqServerManagerModel.h"
+#include "pqServerManagerSelectionModel.h"
+#include "pqSMAdaptor.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // pqElementInspectorWidget::pqImplementation
@@ -59,39 +60,73 @@ public:
     SelectionManager(0)
   {
   }
-  
+
   ~pqImplementation()
-  {
+    {
     this->Data->Delete();
-  }
+    }
 
-  void clearData()
-  {
+  void clear()
+    {
     this->Data->Initialize();
-  }
 
-  void addData(vtkUnstructuredGrid* data)
-  {
-    vtkAppendFilter* const append_filter = vtkAppendFilter::New();
-    append_filter->AddInput(this->Data);
-    append_filter->AddInput(data);
-    
-    vtkUnstructuredGrid* const output = append_filter->GetOutput();
-    output->Update();
-    
-    this->Data->DeepCopy(output);
+    // clean the current.
+    this->ClientSideDisplayer = 0;
+    }
 
-    append_filter->Delete();
-  }
-  
   void setData(vtkUnstructuredGrid* data)
-  {
-    this->Data->DeepCopy(data);
-  }
+    {
+    if (data)
+      {
+      this->Data->DeepCopy(data);
+      }
+    else
+      {
+      this->Data->Initialize();
+      }
+    }
+
+  /// Creates a new displayer for the current source, if any.
+  void createDisplayer()
+    {
+    this->ClientSideDisplayer = 0;
+    if (!this->CurrentSource)
+      {
+      return;
+      }
+
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMProxy* input = this->CurrentSource->getProxy();
+    vtkSMGenericViewDisplayProxy* csDisplayer = 
+      vtkSMGenericViewDisplayProxy::SafeDownCast(
+        pxm->NewProxy("displays", "GenericViewDisplay"));
+    csDisplayer->SetConnectionID(input->GetConnectionID());
+    csDisplayer->SetServers(vtkProcessModule::DATA_SERVER);
+    pqSMAdaptor::setProxyProperty(csDisplayer->GetProperty("Input"),
+      input);
+    pqSMAdaptor::setEnumerationProperty(
+      csDisplayer->GetProperty("ReductionType"), "UNSTRUCTURED_APPEND");
+    csDisplayer->UpdateVTKObjects();
+    csDisplayer->Update();
+    this->ClientSideDisplayer = csDisplayer;
+    csDisplayer->Delete();
+    }
 
   vtkUnstructuredGrid* const Data;
-  QList<QPointer<pqPipelineSource> > Sources;
-  pqSelectionManager* SelectionManager;
+
+  /// Source whose output is currently being "inspected"
+  /// (either the entire output or a selection from it).
+  QPointer<pqPipelineSource> CurrentSource;
+
+  /// Displayer used to obtain the data to the client
+  /// for "inspecting". 
+  vtkSmartPointer<vtkSMGenericViewDisplayProxy> ClientSideDisplayer;
+
+  /// When set, the element inspector only shows the user selection
+  /// for the CurrentSource, if any.
+  bool SelectionOnly;
+
+  QPointer<pqSelectionManager> SelectionManager;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -104,11 +139,7 @@ pqElementInspectorWidget::pqElementInspectorWidget(QWidget *p) :
   this->setObjectName("ElementInspectorWidget");
 
   this->Implementation->setupUi(this);
-  QObject::connect(this->Implementation->ClearButton, 
-    SIGNAL(clicked()), SLOT(clear()));
-  QObject::connect(
-    this->Implementation->SourceComboBox, SIGNAL(currentIndexChanged(int)), 
-    this, SLOT(onCurrentSourceIndexChanged(int)));
+
   QObject::connect(
     this->Implementation->DataTypeComboBox, 
     SIGNAL(currentIndexChanged(const QString&)), 
@@ -121,6 +152,10 @@ pqElementInspectorWidget::pqElementInspectorWidget(QWidget *p) :
 
   this->Implementation->DataTypeComboBox->setCurrentIndex(
     this->Implementation->DataTypeComboBox->findText("Cell Data"));
+
+  QObject::connect(pqApplicationCore::instance()->getSelectionModel(),
+    SIGNAL(currentChanged(pqServerManagerModelItem*)),
+    this, SLOT(onCurrentChanged(pqServerManagerModelItem*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -132,15 +167,16 @@ pqElementInspectorWidget::~pqElementInspectorWidget()
 //-----------------------------------------------------------------------------
 void pqElementInspectorWidget::clear()
 {
-  this->Implementation->clearData();
+  QString label =  "Create a selection to view here";
+  if (this->Implementation->CurrentSource)
+    {
+    label = QString("%1 (nothing selected)").arg(
+      this->Implementation->CurrentSource->getSMName());
+    }
+  this->Implementation->SourceLabel->setText(label);
+  this->Implementation->DataTypeComboBox->setEnabled(false);
+  this->Implementation->clear();
   this->onElementsChanged(); 
-}
-
-//-----------------------------------------------------------------------------
-void pqElementInspectorWidget::addElements(vtkUnstructuredGrid* ug)
-{
-  this->Implementation->addData(ug);
-  this->onElementsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -148,6 +184,65 @@ void pqElementInspectorWidget::setElements(vtkUnstructuredGrid* ug)
 {
   this->Implementation->setData(ug);
   this->onElementsChanged();  
+}
+
+//-----------------------------------------------------------------------------
+void pqElementInspectorWidget::onSourceChanged()
+{
+  pqDataSetModel* model = qobject_cast<pqDataSetModel*>(
+    this->Implementation->TreeView->model());
+
+  model->setDataSet(this->Implementation->Data);
+  if (!this->Implementation->CurrentSource)
+    {
+    // Nothing to show.
+    this->clear();
+    return;
+    }
+
+  this->Implementation->DataTypeComboBox->setEnabled(true);
+
+  // Check if there is an active user selection for this source.
+  if (this->Implementation->SelectionManager)
+    {
+    this->Implementation->ClientSideDisplayer =
+      this->Implementation->SelectionManager->getClientSideDisplayer(
+        this->Implementation->CurrentSource);
+    }
+
+  if (this->Implementation->ClientSideDisplayer) 
+    {
+    this->Implementation->SourceLabel->setText(
+      QString("%1 (Selection)").arg(
+        this->Implementation->CurrentSource->getSMName()));
+    }
+  else if (!this->Implementation->SelectionOnly)
+    {
+    // Failed to locate active selection, fetch the entire data from the filter
+    // and show it.
+    this->Implementation->clear();
+    this->Implementation->createDisplayer();
+    this->Implementation->SourceLabel->setText(
+      QString("%1 (Output)").arg(
+        this->Implementation->CurrentSource->getSMName()));
+    }
+  else
+    {
+    this->clear();
+    return;
+    }
+
+  if (this->Implementation->ClientSideDisplayer)
+    {
+    if (this->Implementation->ClientSideDisplayer->UpdateRequired())
+      {
+      this->Implementation->ClientSideDisplayer->Update();
+      }
+
+    this->setElements(
+      vtkUnstructuredGrid::SafeDownCast(
+        this->Implementation->ClientSideDisplayer->GetOutput()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -162,65 +257,73 @@ void pqElementInspectorWidget::onElementsChanged()
   emit elementsChanged(this->Implementation->Data);
 }
 
+
 //-----------------------------------------------------------------------------
-void pqElementInspectorWidget::onSelectionChanged(pqSelectionManager* selMan)
+void pqElementInspectorWidget::inspect(pqPipelineSource* source)
 {
-  this->Implementation->SelectionManager = selMan;
+  this->Implementation->clear();
+  this->Implementation->CurrentSource = source;
+  this->Implementation->SelectionOnly = true;
 
-  int currentIndex = this->Implementation->SourceComboBox->currentIndex();
-  QString currentDataAttributesType = 
-    this->Implementation->DataTypeComboBox->currentText();
-
-  pqPipelineSource* currentSource = 
-    (currentIndex >= 0 && this->Implementation->Sources.size() > currentIndex)?
-    this->Implementation->Sources[currentIndex] : NULL;
-  currentIndex =0;
-
-  this->Implementation->Sources.clear();
-  this->Implementation->SourceComboBox->blockSignals(true);
-  this->Implementation->SourceComboBox->clear();
-
-  QList<pqPipelineSource*> proxies;
-  QList<vtkDataObject*> dataObjects;
-
-  selMan->getSelectedObjects(proxies, dataObjects);
-
-  int index = 0;
-  foreach(pqPipelineSource* source, proxies)
+  if (source &&
+    (source->getProxy()->GetXMLName() == QString("ExtractCellSelection") ||
+     source->getProxy()->GetXMLName() == QString("ExtractPointSelection")))
     {
-    this->Implementation->SourceComboBox->addItem(
-      source->getSMName(), index);
-    this->Implementation->Sources.push_back(source);
-    if (currentSource && currentSource->getProxy() && 
-      source->getProxy() == currentSource->getProxy())
-      {
-      currentIndex = index;
-      }
-    index++;
+    this->Implementation->SelectionOnly = false;
     }
-  this->Implementation->SourceComboBox->blockSignals(false);
 
-  // set the current index. If previously selected source is present in the 
-  // new selection, we select that one, else the first source is selected.
-  this->Implementation->SourceComboBox->setCurrentIndex(currentIndex);
-  this->onCurrentSourceIndexChanged(currentIndex);
+  this->onSourceChanged();
 }
 
 //-----------------------------------------------------------------------------
-void pqElementInspectorWidget::onCurrentSourceIndexChanged(int index)
+void pqElementInspectorWidget::setSelectionManager(pqSelectionManager* selMan)
 {
-  if (index >= 0 && index < this->Implementation->Sources.size())
+  if (this->Implementation->SelectionManager)
     {
-    vtkSMProxy* proxy = 0;
-    vtkDataObject* dataObject = 0;
-    this->Implementation->SelectionManager->getSelectedObject(
-      static_cast<unsigned int>(index), proxy, dataObject);
-    this->setElements(vtkUnstructuredGrid::SafeDownCast(dataObject));
+    QObject::disconnect(this->Implementation->SelectionManager, 0, this, 0);
+    }
+
+  this->Implementation->SelectionManager = selMan;
+
+  if (selMan)
+    {
+    QObject::connect(selMan, SIGNAL(selectionChanged(pqSelectionManager*)),
+      this, SLOT(onSelectionChanged()), Qt::QueuedConnection);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqElementInspectorWidget::onSelectionChanged()
+{
+  // We'll simply refresh the view, if the current source has any
+  // selection, we'll show it.
+  this->onSourceChanged();
+}
+
+//-----------------------------------------------------------------------------
+void pqElementInspectorWidget::onCurrentChanged(pqServerManagerModelItem* current)
+{
+  // We "inspect" the source only if it has been "updated".
+  // This handles the case where the source hasn't been accepted even once.
+  
+  pqPipelineSource* source = qobject_cast<pqPipelineSource*>(current);
+  vtkSMSourceProxy* sproxy = source? 
+    vtkSMSourceProxy::SafeDownCast(source->getProxy()) : 0;
+  if (sproxy && sproxy->GetNumberOfParts() > 0)
+    {
+    this->inspect(source);
     }
   else
     {
-    this->clear();
+    this->inspect(0);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqElementInspectorWidget::refresh()
+{
+  this->onCurrentChanged(
+    pqApplicationCore::instance()->getSelectionModel()->currentItem());
 }
 
 //-----------------------------------------------------------------------------

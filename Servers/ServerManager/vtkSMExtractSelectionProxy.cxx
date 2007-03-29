@@ -33,7 +33,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMExtractSelectionProxy);
-vtkCxxRevisionMacro(vtkSMExtractSelectionProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMExtractSelectionProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMExtractSelectionProxy::vtkSMExtractSelectionProxy()
 {
@@ -135,6 +135,17 @@ void vtkSMExtractSelectionProxy::UpdateVTKObjects()
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     selectionSource->GetProperty("FieldType"));
   ivp->SetElement(0, this->SelectionFieldType);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    selectionSource->GetProperty("ContentType"));
+  if (this->UseGlobalIDs)
+    {
+    ivp->SetElement(0, vtkSelection::GLOBALIDS);
+    }
+  else
+    {
+    ivp->SetElement(0, vtkSelection::INDICES);
+    }
   selectionSource->UpdateVTKObjects();
 }
 
@@ -147,7 +158,7 @@ int vtkSMExtractSelectionProxy::ReadXMLAttributes(
     return 0;
     }
   const char* type = element->GetAttribute("selection_field_type");
-  if (type && strcmp(type,"POINT"))
+  if (type && strcmp(type,"POINT") == 0)
     {
     this->SelectionFieldType  = vtkSelection::POINT;
     }

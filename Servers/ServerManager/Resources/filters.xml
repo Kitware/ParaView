@@ -5825,6 +5825,48 @@ This filter operates on all types of data sets, and it returns unstructured grid
        </Documentation>
      </InputProperty>
 
+     <IdTypeVectorProperty 
+        name="Indices"
+        command="AddIndex"
+        clean_command="RemoveAllIndices"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        number_of_elements="2"
+        update_self="1"
+        label="Indices" 
+        default_values="0 0">
+        <Documentation>
+          The list of IDs that will be added to the selection produced by the selection source.
+        </Documentation>
+     </IdTypeVectorProperty> 
+
+     <IdTypeVectorProperty 
+        name="GlobalIDs"
+        command="AddGlobalID"
+        clean_command="RemoveAllGlobalIDs"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        number_of_elements="1"
+        update_self="1"
+        label="Global IDs"
+        default_values="0">
+        <Documentation>
+          The list of Global IDs that will be added to the selection produced by the selection source.
+        </Documentation>
+     </IdTypeVectorProperty> 
+
+     <IntVectorProperty
+        name="UseGlobalIDs"
+        command="SetUseGlobalIDs"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use GlobalIDs (instead of Indices) to generate the selection.
+        </Documentation>
+     </IntVectorProperty>
+
      <SubProxy>
         <Proxy name="SelectionSource" proxygroup="sources"
           proxyname="SelectionSource">

@@ -108,7 +108,7 @@ public:
         {
         return new pqThresholdPanel(proxy, p);
         }
-      if(QString("ExractPointSelection") == proxy->getProxy()->GetXMLName())
+      if(QString("ExtractPointSelection") == proxy->getProxy()->GetXMLName())
         {
         return new pqExtractSelectionPanel(proxy, p);
         }

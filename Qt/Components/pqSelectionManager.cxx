@@ -44,10 +44,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCollection.h"
 #include "vtkCommand.h"
-#include "vtkInteractorStyleRubberBandPick.h"
 #include "vtkInteractorObserver.h"
+#include "vtkInteractorStyleRubberBandPick.h"
 #include "vtkProcessModule.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkSelection.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
@@ -55,7 +57,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSelectionHelper.h"
-#include "vtkSelection.h"
 
 // TODO:
 // * need to support multiple server connections
@@ -124,6 +125,9 @@ public:
 
   void clearSelection()
     {
+    this->SelectionSource = 0;
+    this->GlobalIDSelectionSource = 0;
+
     if (this->SelectionDisplayer)
       {
       this->SelectionDisplayer->Delete();
@@ -147,6 +151,9 @@ public:
   pqRenderViewModule* SelectionRenderModule;
   vtkSMGenericViewDisplayProxy* ClientSideDisplayer;
   vtkSMProxy* SelectedProxy;
+
+  vtkSmartPointer<vtkSMProxy> SelectionSource;
+  vtkSmartPointer<vtkSMProxy> GlobalIDSelectionSource;
 
   int Xs, Ys, Xe, Ye;
 };
@@ -427,52 +434,24 @@ void pqSelectionManager::select()
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::getSelectedObjects(QList<pqPipelineSource*> &proxies,
-  QList<vtkDataObject*> &dataObjects)
+vtkSMGenericViewDisplayProxy* pqSelectionManager::getClientSideDisplayer(
+  pqPipelineSource* source) const
 {
-  proxies.clear();
-  dataObjects.clear();
+  if (this->Implementation->SelectedProxy == source->getProxy())
+    {
+    return this->Implementation->ClientSideDisplayer;
+    }
+  return 0;
+}
 
+//-----------------------------------------------------------------------------
+pqPipelineSource* pqSelectionManager::getSelectedSource() const
+{
   pqServerManagerModel* model = 
     pqApplicationCore::instance()->getServerManagerModel();
-
   if (this->Implementation->SelectedProxy)
     {
-    pqPipelineSource* source = model->getPQSource(
-      this->Implementation->SelectedProxy);
-    if (source)
-      {
-      proxies.push_back(source);
-      dataObjects.push_back(
-        this->Implementation->ClientSideDisplayer->GetOutput());
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-int pqSelectionManager::getSelectedObject(
-  unsigned int idx, vtkSMProxy*& proxy, vtkDataObject*& dataObject)
-{
-  proxy = 0;
-  dataObject = 0;
-
-  if (idx > 0)
-    {
-    return 0;
-    }
-
-  proxy = this->Implementation->SelectedProxy;
-  dataObject = this->Implementation->ClientSideDisplayer->GetOutput();
-  
-  return 1;
-}
-
-//-----------------------------------------------------------------------------
-unsigned int pqSelectionManager::getNumberOfSelectedObjects()
-{
-  if (this->Implementation->SelectedProxy)
-    {
-    return 1;
+    return model->getPQSource(this->Implementation->SelectedProxy);
     }
   return 0;
 }
@@ -609,11 +588,23 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
   vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelection(
     connId, selectionForOne, volumeSelection);
 
-
   // Now pass the selection ids to a selection source.
   vtkSMProxy* selectionSourceP = 
     vtkSMSelectionHelper::NewSelectionSourceFromSelection(connId,
                                                           volumeSelection);
+  this->Implementation->SelectionSource = selectionSourceP;
+
+  // Obtain a global id selection as well.
+  vtkSelection* volumeSelectionGI = vtkSelection::New();
+  vtkSMSelectionHelper::ConvertSurfaceSelectionToGlobalIDVolumeSelection(
+    connId, selectionForOne, volumeSelectionGI);
+
+  vtkSMProxy* selectionSourceGI = 
+    vtkSMSelectionHelper::NewSelectionSourceFromSelection(connId,
+      volumeSelectionGI);
+  this->Implementation->GlobalIDSelectionSource = selectionSourceGI;
+  selectionSourceGI->Delete();
+  volumeSelectionGI->Delete();
 
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   // Apply the extraction filter
@@ -646,14 +637,9 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
     pqApplicationCore::instance()->getServerManagerModel();
   pqServerManagerSelectionModel* selectionModel =
     pqApplicationCore::instance()->getSelectionModel();
-  pqServerManagerSelection _selection;
   pqPipelineSource* pqSource = model->getPQSource(objP);
-  if (pqSource)
-    {
-    _selection.push_back(pqSource);
-    }
-  selectionModel->select(
-    _selection, pqServerManagerSelectionModel::ClearAndSelect);
+  selectionModel->setCurrentItem(
+    pqSource, pqServerManagerSelectionModel::ClearAndSelect);
 
   this->Implementation->SelectedProxy = objP;
 
@@ -668,3 +654,30 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
   extractFilterP->Delete();
 }
 
+//-----------------------------------------------------------------------------
+QList<QVariant> pqSelectionManager::getSelectedIndicesWithProcessIDs() const
+{
+  if (!this->Implementation->SelectionSource.GetPointer())
+    {
+    return QList<QVariant>();
+    }
+  return pqSMAdaptor::getMultipleElementProperty(
+    this->Implementation->SelectionSource->GetProperty("IDs"));
+}
+
+//-----------------------------------------------------------------------------
+QList<QVariant> pqSelectionManager::getSelectedGlobalIDs() const
+{
+  if (!this->Implementation->GlobalIDSelectionSource.GetPointer())
+    {
+    return QList<QVariant>();
+    }
+  QList<QVariant> reply;
+  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
+    this->Implementation->GlobalIDSelectionSource->GetProperty("IDs"));
+  for (int cc=1; cc < values.size(); cc+=2)
+    {
+    reply.push_back(values[cc]);
+    }
+  return reply;
+}

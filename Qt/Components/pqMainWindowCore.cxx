@@ -1165,11 +1165,12 @@ void pqMainWindowCore::setupElementInspector(QDockWidget* dock_widget)
   pqElementInspectorWidget* const element_inspector = 
     new pqElementInspectorWidget(dock_widget);
 
-  QObject::connect(&this->Implementation->SelectionManager,
-                   SIGNAL(selectionChanged(pqSelectionManager*)),
-                   element_inspector,
-                   SLOT(onSelectionChanged(pqSelectionManager*)));
-    
+  element_inspector->setSelectionManager(
+    &this->Implementation->SelectionManager);
+
+  QObject::connect(this, SIGNAL(postAccept()),
+    element_inspector, SLOT(refresh()));
+
   dock_widget->setWidget(element_inspector);
 }
 
@@ -3244,6 +3245,27 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
   this->Implementation->UndoStack->beginUndoSet(
     QString("Create '%1'").arg(xmlname));
   pqPipelineSource* filter = builder->createFilter("filters", xmlname, inputs);
+
+  vtkSMProxy* proxy = filter->getProxy();
+  // If the GUI created a "ExtractCellSelection"
+  // filter, we need to copy the active selection over to the filter.
+  if (proxy->GetXMLName() == QString("ExtractCellSelection"))
+    {
+    // If a selection exists on the input to this filter,
+    // we initialize the filter with that selection.
+    if (inputs.contains(
+        this->Implementation->SelectionManager.getSelectedSource()))
+      {
+      pqSMAdaptor::setMultipleElementProperty(
+        proxy->GetProperty("Indices"),
+        this->Implementation->SelectionManager.
+        getSelectedIndicesWithProcessIDs());
+      pqSMAdaptor::setMultipleElementProperty(
+        proxy->GetProperty("GlobalIDs"),
+        this->Implementation->SelectionManager.getSelectedGlobalIDs());
+      proxy->UpdateVTKObjects();
+      }
+    }
   this->Implementation->UndoStack->endUndoSet();
 
   return filter;
