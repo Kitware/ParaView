@@ -68,7 +68,8 @@ protected:
 private slots:
   /// \name Color Scale Methods
   //@{
-  void handleEditorPointChanged();
+  void handleEditorPointMoved();
+  void handleEditorAddOrDelete();
   void setColors();
   void changeCurrentColor();
 

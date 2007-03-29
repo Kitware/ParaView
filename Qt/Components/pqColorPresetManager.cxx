@@ -529,6 +529,7 @@ void pqColorPresetManager::importColorMap(vtkPVXMLElement *element)
     if(QString("Point") == point->GetName())
       {
       double px = 0.0;
+      double a = 1.0;
       double r = 0.0, g = 0.0, b = 0.0;
       double h = 0.0, s = 0.0, v = 0.0;
 
@@ -536,6 +537,8 @@ void pqColorPresetManager::importColorMap(vtkPVXMLElement *element)
         {
         continue;
         }
+
+      point->GetScalarAttribute("o", &a);
 
       QColor color;
       if(point->GetAttribute("r"))
@@ -578,7 +581,7 @@ void pqColorPresetManager::importColorMap(vtkPVXMLElement *element)
         }
 
       // Add the new color point to the color map.
-      colorMap.addPoint(pqChartValue(px), color);
+      colorMap.addPoint(pqChartValue(px), color, pqChartValue(a));
       }
     }
 
@@ -607,13 +610,16 @@ void pqColorPresetManager::exportColorMap(const QModelIndex &index,
     for(int i = 0; i < colorMap->getNumberOfPoints(); i++)
       {
       QColor color;
-      pqChartValue value;
+      pqChartValue value, opacity;
       colorMap->getPointColor(i, color);
       colorMap->getPointValue(i, value);
+      colorMap->getPointOpacity(i, opacity);
       vtkPVXMLElement *point = vtkPVXMLElement::New();
       point->SetName("Point");
       point->SetAttribute("x",
           QString::number(value.getDoubleValue()).toAscii().data());
+      point->SetAttribute("o",
+          QString::number(opacity.getDoubleValue()).toAscii().data());
       point->SetAttribute("r",
           QString::number(color.redF()).toAscii().data());
       point->SetAttribute("g",

@@ -70,6 +70,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPiecewiseFunction.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkTransferFunctionViewer.h"
@@ -160,9 +162,9 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
       this, SLOT(changeCurrentColor()));
   this->Form->Listener->Connect(this->Viewer,
       vtkCommand::WidgetValueChangedEvent,
-      this, SLOT(handleEditorPointChanged()));
+      this, SLOT(handleEditorPointMoved()));
   this->Form->Listener->Connect(this->Viewer,
-      vtkCommand::PlacePointEvent, this, SLOT(handleEditorPointChanged()));
+      vtkCommand::PlacePointEvent, this, SLOT(handleEditorAddOrDelete()));
   this->Form->Listener->Connect(this->Viewer, vtkCommand::WidgetModifiedEvent,
       this, SLOT(handleEditorCurrentChanged()));
 #else
@@ -179,11 +181,12 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   new pqColorMapColorChanger(this->Form->Gradient);
   this->connect(colorModel, SIGNAL(colorChanged(int, const QColor &)),
       this, SLOT(setColors()));
-  this->connect(colorModel, SIGNAL(pointAdded(int)), this, SLOT(setColors()));
+  this->connect(colorModel, SIGNAL(pointAdded(int)),
+      this, SLOT(handleEditorAddOrDelete()));
   this->connect(colorModel, SIGNAL(pointRemoved(int)),
-      this, SLOT(setColors()));
+      this, SLOT(handleEditorAddOrDelete()));
   this->connect(this->Form->Gradient, SIGNAL(pointMoved(int)),
-      this, SLOT(setColors()));
+      this, SLOT(handleEditorPointMoved()));
 #endif
 
   // Set up the timer. The timer is used when the user edits the
@@ -307,6 +310,12 @@ void pqColorScaleEditor::setDisplay(pqPipelineDisplay *display)
       this->Form->Listener->Disconnect(
           this->ColorMap->getProxy()->GetProperty("RGBPoints"));
       }
+
+    if(this->Form->HasOpacity)
+      {
+      this->Form->Listener->Disconnect(
+          this->Display->getScalarOpacityFunctionProxy()->GetProperty("Points"));
+      }
     }
 
   this->Display = display;
@@ -359,11 +368,33 @@ void pqColorScaleEditor::hideEvent(QHideEvent *e)
   QDialog::hideEvent(e);
 }
 
-void pqColorScaleEditor::handleEditorPointChanged()
+void pqColorScaleEditor::handleEditorPointMoved()
 {
   if(!this->Form->IgnoreEditor)
     {
     this->setColors();
+
+    // Update the gui controls.
+    this->updatePointValues();
+    }
+}
+
+void pqColorScaleEditor::handleEditorAddOrDelete()
+{
+  if(!this->Form->IgnoreEditor)
+    {
+    this->setColors();
+
+    // Update the current point.
+#if USE_VTK_TFE
+    this->Form->CurrentIndex = this->Viewer->GetCurrentElementId();
+#else
+    this->Form->CurrentIndex = -1; // TODO
+#endif
+
+    // Update the gui controls.
+    this->enablePointControls();
+    this->updatePointValues();
     }
 }
 
@@ -375,19 +406,24 @@ void pqColorScaleEditor::setColors()
     }
 
   QList<QVariant> rgbPoints;
+  QList<QVariant> opacityPoints;
   this->Form->InSetColors = true;
 
 #if USE_VTK_TFE
   double rgb[3];
   double scalar = 0.0;
-  unsigned int total = static_cast<unsigned int>(
-      this->Viewer->GetColorFunction()->GetSize());
-  for(unsigned int i = 0; i < total; i++)
+  int total = this->Viewer->GetColorFunction()->GetSize();
+  for(int i = 0; i < total; i++)
     {
     if(this->Viewer->GetElementRGBColor(i, rgb))
       {
       scalar = this->Viewer->GetElementScalar(i);
       rgbPoints << scalar << rgb[0] << rgb[1] << rgb[2];
+      if(this->Form->HasOpacity)
+        {
+        double opacity = this->Viewer->GetElementOpacity(i);
+        opacityPoints << scalar << opacity;
+        }
       }
     }
 #else
@@ -400,12 +436,24 @@ void pqColorScaleEditor::setColors()
     model->getPointColor(i, color);
     rgbPoints << scalar.getDoubleValue() <<
         color.redF() << color.greenF() << color.blueF();
+    if(this->Form->HasOpacity)
+      {
+      pqChartValue opacity;
+      model->getPointOpacity(i, opacity);
+      opacityPoints << scalar.getDoubleValue() << opacity.getDoubleValue();
+      }
     }
 #endif
 
   vtkSMProxy *lookupTable = this->ColorMap->getProxy();
   pqSMAdaptor::setMultipleElementProperty(
       lookupTable->GetProperty("RGBPoints"), rgbPoints);
+  if(this->Form->HasOpacity)
+    {
+    pqSMAdaptor::setMultipleElementProperty(
+        this->Display->getScalarOpacityFunctionProxy()->GetProperty("Points"),
+        opacityPoints);
+    }
 
   this->Form->InSetColors = false;
   lookupTable->UpdateVTKObjects();
@@ -588,7 +636,7 @@ void pqColorScaleEditor::handleOpacityEdit()
 
 void pqColorScaleEditor::setOpacityFromText()
 {
-  if(this->Form->CurrentIndex == -1)
+  if(this->Form->CurrentIndex == -1 || !this->Form->HasOpacity)
     {
     return;
     }
@@ -613,15 +661,17 @@ void pqColorScaleEditor::setOpacityFromText()
     opacity = 1.0;
     }
 
-  // TODO: Set the new opacity on the point in the editor.
+  // Set the new opacity on the point in the editor.
   this->Form->IgnoreEditor = true;
 #if USE_VTK_TFE
+  this->Viewer->SetElementOpacity(this->Form->CurrentIndex, opacity);
 #else
+  // TODO
 #endif
   this->Form->IgnoreEditor = false;
 
   // Update the colors on the proxy.
-  //this->setColors();
+  this->setColors();
 }
 
 void pqColorScaleEditor::setColorSpace(int index)
@@ -664,14 +714,27 @@ void pqColorScaleEditor::savePreset()
   // Save the current color scale settings as a preset.
 #if USE_VTK_TFE
   double rgb[3];
+  double scalar = 0.0;
   pqColorMapModel colorMap;
   colorMap.setColorSpaceFromInt(this->Form->ColorSpace->currentIndex());
   int total = this->Viewer->GetColorFunction()->GetSize();
   for(int i = 0; i < total; i++)
     {
-    this->Viewer->GetElementRGBColor(i, rgb);
-    colorMap.addPoint(pqChartValue(this->Viewer->GetElementScalar(i)),
-        QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
+    if(this->Viewer->GetElementRGBColor(i, rgb))
+      {
+      scalar = this->Viewer->GetElementScalar(i);
+      if(this->Form->HasOpacity)
+        {
+        colorMap.addPoint(pqChartValue(scalar),
+            QColor::fromRgbF(rgb[0], rgb[1], rgb[2]),
+            pqChartValue(this->Viewer->GetElementOpacity(i)));
+        }
+      else
+        {
+        colorMap.addPoint(pqChartValue(scalar),
+            QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
+        }
+      }
     }
 
   model->addColorMap(colorMap, "New Color Preset");
@@ -710,7 +773,7 @@ void pqColorScaleEditor::loadPreset()
 
 #if USE_VTK_TFE
       QColor color;
-      pqChartValue value;
+      pqChartValue value, opacity;
       pqColorMapModel temp(*colorMap);
       if(this->Form->UseAutoRescale->isChecked() ||
           colorMap->isRangeNormalized())
@@ -719,14 +782,27 @@ void pqColorScaleEditor::loadPreset()
         temp.setValueRange(range.first, range.second);
         }
 
+      vtkPiecewiseFunction *opacities = 0;
       vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
       colors->RemoveAllPoints();
+      if(this->Form->HasOpacity)
+        {
+        opacities = this->Viewer->GetOpacityFunction();
+        opacities->RemoveAllPoints();
+        }
+
       for(int i = 0; i < colorMap->getNumberOfPoints(); i++)
         {
         temp.getPointColor(i, color);
         temp.getPointValue(i, value);
         colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
             color.greenF(), color.blueF());
+        if(this->Form->HasOpacity)
+          {
+          temp.getPointOpacity(i, opacity);
+          opacities->AddPoint(value.getDoubleValue(),
+              opacity.getDoubleValue());
+          }
         }
 
       // Update the color space.
@@ -917,6 +993,11 @@ void pqColorScaleEditor::setScalarRange(double min, double max)
   // Update the gui elements.
   this->updateScalarRange(min, max);
 
+  // Update the opacity function if volume rendering.
+  this->Form->InSetColors = true;
+  this->Display->setScalarOpacityRange(min, max);
+  this->Form->InSetColors = false;
+
   // Update the color map and the rendered views.
   this->ColorMap->setScalarRange(min, max);
   this->Display->renderAllViews();
@@ -1037,8 +1118,14 @@ void pqColorScaleEditor::loadColorPoints()
 {
   // Clean up the previous data.
 #if USE_VTK_TFE
+  vtkPiecewiseFunction *opacities = 0;
   vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
   colors->RemoveAllPoints();
+  if(this->Form->HasOpacity)
+    {
+    opacities = this->Viewer->GetOpacityFunction();
+    opacities->RemoveAllPoints();
+    }
 #else
   pqColorMapModel *model = this->Form->Gradient->getModel();
   model->removeAllPoints();
@@ -1066,6 +1153,20 @@ void pqColorScaleEditor::loadColorPoints()
       pqChartValue scalar = list[i].toDouble();
       model->addPoint(scalar, color);
 #endif
+      }
+
+    if(this->Form->HasOpacity)
+      {
+      list = pqSMAdaptor::getMultipleElementProperty(
+          this->Display->getScalarOpacityFunctionProxy()->GetProperty("Points"));
+      for(int j = 0; (j + 1) < list.size(); j += 2)
+        {
+#if USE_VTK_TFE
+        opacities->AddPoint(list[j].toDouble(), list[j + 1].toDouble());
+#else
+        // TODO
+#endif
+        }
       }
     }
   else
@@ -1128,6 +1229,40 @@ void pqColorScaleEditor::initColorScale()
   pqColorMapModel *model = this->Form->Gradient->getModel();
   model->startModifyingData();
 #endif
+
+  // See if the display supports opacity editing.
+  bool usingOpacity = this->Form->HasOpacity;
+  if(this->Display)
+    {
+    usingOpacity = this->Display->getDisplayProxy()->GetRepresentationCM() ==
+        vtkSMDataObjectDisplayProxy::VOLUME;
+    }
+
+  if(usingOpacity != this->Form->HasOpacity)
+    {
+    this->Form->HasOpacity = usingOpacity;
+#if USE_VTK_TFE
+    this->Viewer->GetColorFunction()->RemoveAllPoints();
+    if(this->Form->HasOpacity)
+      {
+      this->Viewer->SetModificationTypeToColorAndOpacity();
+      }
+    else
+      {
+      this->Viewer->GetOpacityFunction()->RemoveAllPoints();
+      this->Viewer->SetModificationTypeToColor();
+      }
+#else
+    // TODO
+#endif
+    }
+
+  if(this->Form->HasOpacity)
+    {
+    this->Form->Listener->Connect(
+        this->Display->getScalarOpacityFunctionProxy()->GetProperty("Points"),
+        vtkCommand::ModifiedEvent, this, SLOT(handlePointsChanged()));
+    }
 
   if(this->ColorMap)
     {
