@@ -13,6 +13,13 @@
     <Filter name="ExtractLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
   </Category>
 
+  <Category name="DataAnalysis" menu_label="&amp;Data Analysis">
+    <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
+    <Filter name="ExtractHistogram" />
+    <Filter name="ExtractOverTime" />
+    <Filter name="Probe" />
+  </Category>
+
   <Filter name="Append" />
   <Filter name="AppendAttributes" />
   <Filter name="AppendPolyData" />
