@@ -26,7 +26,7 @@ At the same time it tests that the animation playing does not affect the undo st
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="vtkOriginalCellIds" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="RTData" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="cellNormals" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="RTData" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
