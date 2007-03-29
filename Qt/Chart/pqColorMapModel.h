@@ -83,6 +83,8 @@ public:
   void getPointColor(int index, QColor &color) const;
   void setPointColor(int index, const QColor &color);
 
+  bool isRangeNormalized() const;
+
   void getValueRange(pqChartValue &min, pqChartValue &max) const;
 
   /// \brief

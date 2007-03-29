@@ -285,6 +285,17 @@ void pqColorMapModel::setPointColor(int index, const QColor &color)
     }
 }
 
+bool pqColorMapModel::isRangeNormalized() const
+{
+  if(this->Internal->size() > 1)
+    {
+    return this->Internal->first()->Value == (float)0.0 &&
+        this->Internal->last()->Value == (float)1.0;
+    }
+
+  return false;
+}
+
 void pqColorMapModel::getValueRange(pqChartValue &min, pqChartValue &max) const
 {
   if(this->Internal->size() > 0)
