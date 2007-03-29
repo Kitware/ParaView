@@ -120,7 +120,9 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
         }
       else if (
         (source->getProxy()->GetXMLName() == QString("Probe") || 
-          non_zero_dims == 1) && pointDataInfo->GetNumberOfArrays() > 0 && 
+         non_zero_dims == 1) && 
+        (pointDataInfo->GetNumberOfArrays() > 0 ||
+         cellDataInfo->GetNumberOfArrays() > 0 ) && 
         datainfo->GetNumberOfPoints() > 1)
         {
         // No cell data, but some point data -- may be a XY line plot.
