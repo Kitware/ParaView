@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.26");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.27");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerDisplayManagerProxy,
@@ -146,8 +146,8 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
   // We must create an ICE-T Renderer on the server and a regular renderer
   // on the client.
   this->RendererProxy->SetServers(vtkProcessModule::CLIENT);
-  this->RendererProxy->UpdateVTKObjects(); // this will create the regular
-                                           // renderer on the client.
+  // Create the client side render.
+  this->RendererProxy->CreateVTKObjects(1); 
 
   vtkClientServerStream stream1;
   stream1 << vtkClientServerStream::New 
@@ -159,6 +159,8 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->RendererProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   // Now we can use the RendererProxy as one!
+
+  this->RendererProxy->UpdateVTKObjects(); 
   
   this->Superclass::CreateVTKObjects(numObjects);
 
