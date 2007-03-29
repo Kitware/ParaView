@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 
+//-----------------------------------------------------------------------------
 class pqPipelineBrowserContextMenuInternal
 {
 public:
@@ -58,6 +59,7 @@ public:
 };
 
 
+//-----------------------------------------------------------------------------
 pqPipelineBrowserContextMenuInternal::pqPipelineBrowserContextMenuInternal()
   : OpenFile(), AddSource(), AddFilter(), CustomFilter(), ChangeInput(),
     Delete()
@@ -65,6 +67,7 @@ pqPipelineBrowserContextMenuInternal::pqPipelineBrowserContextMenuInternal()
 }
 
 
+//-----------------------------------------------------------------------------
 pqPipelineBrowserContextMenu::pqPipelineBrowserContextMenu(
     pqPipelineBrowser *browser)
   : QObject(browser)
@@ -83,6 +86,13 @@ pqPipelineBrowserContextMenu::pqPipelineBrowserContextMenu(
     }
 }
 
+//-----------------------------------------------------------------------------
+pqPipelineBrowserContextMenu::~pqPipelineBrowserContextMenu()
+{
+  delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineBrowserContextMenu::setMenuAction(QAction *action)
 {
   if(!action)
@@ -118,6 +128,7 @@ void pqPipelineBrowserContextMenu::setMenuAction(QAction *action)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
 {
   if(!this->Browser)

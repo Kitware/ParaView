@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqPipelineBrowserContextMenu : public QObject
 
 public:
   pqPipelineBrowserContextMenu(pqPipelineBrowser *browser);
-  virtual ~pqPipelineBrowserContextMenu() {}
+  virtual ~pqPipelineBrowserContextMenu();
 
   void setMenuAction(QAction *action);
 

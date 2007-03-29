@@ -111,6 +111,7 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget 
 pqLookmarkInspector::~pqLookmarkInspector()
 {
   //delete this->PipelineModel;
+  delete this->Form;
 }
 
 

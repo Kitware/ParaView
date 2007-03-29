@@ -35,7 +35,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.8");
+vtkCxxRevisionMacro(vtkServerConnection, "1.9");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -348,6 +348,7 @@ void vtkServerConnection::GatherInformationFromController(vtkSocketController* c
     }
   stream.SetData(data2, length2);
   info->CopyFromStream(&stream);
+  delete [] data2;
 }
 
 //-----------------------------------------------------------------------------

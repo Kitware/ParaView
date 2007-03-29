@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVEnvironmentInformationHelper);
-vtkCxxRevisionMacro(vtkPVEnvironmentInformationHelper, "1.1");
+vtkCxxRevisionMacro(vtkPVEnvironmentInformationHelper, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkPVEnvironmentInformationHelper::vtkPVEnvironmentInformationHelper()
@@ -28,6 +28,7 @@ vtkPVEnvironmentInformationHelper::vtkPVEnvironmentInformationHelper()
 //-----------------------------------------------------------------------------
 vtkPVEnvironmentInformationHelper::~vtkPVEnvironmentInformationHelper()
 {
+  this->SetVariable(0);
 }
 
 //-----------------------------------------------------------------------------
