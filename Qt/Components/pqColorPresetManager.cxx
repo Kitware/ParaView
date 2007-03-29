@@ -137,6 +137,8 @@ pqColorPresetManager::pqColorPresetManager(QWidget *widgetParent)
       this, SLOT(importColorMap()));
   this->connect(this->Form->ExportButton, SIGNAL(clicked()),
       this, SLOT(exportColorMap()));
+  this->connect(this->Form->NormalizeButton, SIGNAL(clicked()),
+      this, SLOT(normalizeSelected()));
   this->connect(this->Form->RemoveButton, SIGNAL(clicked()),
       this, SLOT(removeSelected()));
 
@@ -395,6 +397,20 @@ void pqColorPresetManager::exportColorMap()
   fileDialog->exec();
 }
 
+void pqColorPresetManager::normalizeSelected()
+{
+  QModelIndexList indexes =
+      this->Form->Gradients->selectionModel()->selectedIndexes();
+  QModelIndexList::Iterator iter = indexes.begin();
+  for( ; iter != indexes.end(); ++iter)
+    {
+    this->Model->normalizeColorMap(iter->row());
+    }
+
+  // Normalizing should only happen once.
+  this->Form->NormalizeButton->setEnabled(false);
+}
+
 void pqColorPresetManager::removeSelected()
 {
   // Use a list of persistent model indexes so the row will be updated
@@ -425,16 +441,23 @@ void pqColorPresetManager::updateButtons()
 
   // Check the list for builtin color maps.
   bool canDelete = indexes.size() > 0;
+  bool canNormalize = false;
   QModelIndexList::Iterator iter = indexes.begin();
   for( ; iter != indexes.end(); ++iter)
     {
     if(!(this->Model->flags(*iter) & Qt::ItemIsEditable))
       {
       canDelete = false;
-      break;
+      }
+
+    const pqColorMapModel *colorMap = this->Model->getColorMap(iter->row());
+    if(!colorMap->isRangeNormalized())
+      {
+      canNormalize = true;
       }
     }
 
+  this->Form->NormalizeButton->setEnabled(canNormalize);
   this->Form->RemoveButton->setEnabled(canDelete);
 }
 

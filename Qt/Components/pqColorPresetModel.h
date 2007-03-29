@@ -72,6 +72,7 @@ public:
   void addBuiltinColorMap(const pqColorMapModel &colorMap,
       const QString &name);
   void addColorMap(const pqColorMapModel &colorMap, const QString &name);
+  void normalizeColorMap(int index);
   void removeColorMap(int index);
   const pqColorMapModel *getColorMap(int index) const;
   bool isModified() const {return this->Modified;}

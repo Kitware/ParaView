@@ -68,29 +68,39 @@ protected:
 private slots:
   /// \name Color Scale Methods
   //@{
+  void handleEditorPointChanged();
   void setColors();
-
   void changeCurrentColor();
+
+  void handlePointsChanged();
+
+  void handleEditorCurrentChanged();
+  void setCurrentPoint(int index);
+  void handleValueEdit();
+  void setValueFromText();
+  void handleOpacityEdit();
+  void setOpacityFromText();
+
   void setColorSpace(int index);
 
   void savePreset();
   void loadPreset();
 
+  void setComponent(int index);
+
+  void setAutoRescale(bool on);
+  void rescaleToNewRange();
+  void rescaleToDataRange();
+
   void setUseDiscreteColors(bool on);
-  void handleSizeTextEdit(const QString &text);
+  void handleSizeTextEdit();
   void setSizeFromText();
   void setSizeFromSlider(int tableSize);
   void setTableSize(int tableSize);
 
-  void setComponent(int index);
-
-  void handleRangeLockChanged(bool on);
-  void setMinimumScalar(double min);
-  void setMaximumScalar(double max);
   void setScalarRange(double min, double max);
 
-  void resetRange();
-  void resetRangeToCurrent();
+  void applyTextChanges();
   //@}
 
   /// \name Color Legend Methods
@@ -108,10 +118,13 @@ private slots:
   //@}
 
 private:
-  void initColorPresets();
+  void loadBuiltinColorPresets();
+  void loadColorPoints();
   void initColorScale();
+  void enablePointControls();
+  void updatePointValues();
+  void enableRescaleControls(bool enable);
   void enableResolutionControls(bool enable);
-  void enableRangeControls(bool enable);
   void updateScalarRange(double min, double max);
   void setLegend(pqScalarBarDisplay *legend);
   void enableLegendControls(bool enable);

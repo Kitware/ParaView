@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqColorPresetManager.h
+   Module:    pqRescaleRange.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,69 +30,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqColorPresetManager.h
-/// \date 3/12/2007
+/// \file pqRescaleRange.h
+/// \date 3/28/2007
 
-#ifndef _pqColorPresetManager_h
-#define _pqColorPresetManager_h
+#ifndef _pqRescaleRange_h
+#define _pqRescaleRange_h
 
 
 #include "pqComponentsExport.h"
 #include <QDialog>
 
-class pqColorPresetManagerForm;
-class pqColorPresetModel;
-class QItemSelectionModel;
-class QModelIndex;
-class QPoint;
-class QStringList;
-class vtkPVXMLElement;
+class pqRescaleRangeForm;
+class QTimer;
 
 
-class PQCOMPONENTS_EXPORT pqColorPresetManager : public QDialog
+class PQCOMPONENTS_EXPORT pqRescaleRange : public QDialog
 {
   Q_OBJECT
 
 public:
-  pqColorPresetManager(QWidget *parent=0);
-  virtual ~pqColorPresetManager();
+  pqRescaleRange(QWidget *parent=0);
+  virtual ~pqRescaleRange();
 
-  pqColorPresetModel *getModel() const {return this->Model;}
-  QItemSelectionModel *getSelectionModel() const;
-
-  bool isUsingCloseButton() const;
-  void setUsingCloseButton(bool showClose);
-
-  void saveSettings();
-  void restoreSettings();
-
-  virtual bool eventFilter(QObject *object, QEvent *e);
-
-public slots:
-  void importColorMap(const QStringList &files);
-  void exportColorMap(const QStringList &files);
+  double getMinimum() const {return this->Minimum;}
+  double getMaximum() const {return this->Maximum;}
+  void setRange(double min, double max);
 
 protected:
-  virtual void showEvent(QShowEvent *e);
+  virtual void hideEvent(QHideEvent *e);
 
 private slots:
-  void importColorMap();
-  void exportColorMap();
-  void normalizeSelected();
-  void removeSelected();
-  void updateButtons();
-  void showContextMenu(const QPoint &pos);
-  void handleItemActivated();
-  void selectNewItem(const QModelIndex &parent, int first, int last);
+  void handleMinimumEdited();
+  void handleMaximumEdited();
+  void applyTextChanges();
 
 private:
-  void importColorMap(vtkPVXMLElement *element);
-  void exportColorMap(const QModelIndex &index, vtkPVXMLElement *element);
+  void setMinimum();
+  void setMaximum();
 
 private:
-  pqColorPresetManagerForm *Form;
-  pqColorPresetModel *Model;
-  bool InitSections;
+  pqRescaleRangeForm *Form;
+  QTimer *EditDelay;
+  double Minimum;
+  double Maximum;
+  bool MinChanged;
+  bool MaxChanged;
 };
 
 #endif

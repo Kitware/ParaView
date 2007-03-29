@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>424</width>
-    <height>354</height>
+    <height>365</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -35,7 +35,70 @@
        <property name="spacing" >
         <number>6</number>
        </property>
-       <item row="1" column="2" colspan="2" >
+       <item row="5" column="3" >
+        <widget class="QLabel" name="MaximumLabel" >
+         <property name="sizePolicy" >
+          <sizepolicy>
+           <hsizetype>3</hsizetype>
+           <vsizetype>5</vsizetype>
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="whatsThis" >
+          <string>Displays the maximum scalar value.</string>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2" >
+        <widget class="QLabel" name="label_3" >
+         <property name="text" >
+          <string>Maximum:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1" >
+        <widget class="QLabel" name="MinimumLabel" >
+         <property name="sizePolicy" >
+          <sizepolicy>
+           <hsizetype>3</hsizetype>
+           <vsizetype>5</vsizetype>
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="whatsThis" >
+          <string>Displays the minimum scalar value.</string>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" >
+        <widget class="QLabel" name="label_2" >
+         <property name="text" >
+          <string>Minimum:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="4" >
+        <widget class="QCheckBox" name="UseDiscreteColors" >
+         <property name="whatsThis" >
+          <string>Check this box if the color table should have discrete colors, otherwise color values will be interpolated.</string>
+         </property>
+         <property name="text" >
+          <string>Use Discrete Colors</string>
+         </property>
+         <property name="checked" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2" colspan="2" >
         <layout class="QHBoxLayout" >
          <property name="margin" >
           <number>0</number>
@@ -58,84 +121,27 @@
          </item>
          <item>
           <widget class="QPushButton" name="SaveButton" >
+           <property name="whatsThis" >
+            <string>Click this button to save the current color map as a preset.</string>
+           </property>
            <property name="text" >
-            <string>Save</string>
+            <string>&amp;Save</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="PresetButton" >
+           <property name="whatsThis" >
+            <string>Click this button to change the color map to a preset.</string>
+           </property>
            <property name="text" >
-            <string>Choose Preset</string>
+            <string>Choose &amp;Preset</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
        <item row="8" column="0" colspan="4" >
-        <layout class="QHBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>6</number>
-         </property>
-         <item>
-          <spacer>
-           <property name="orientation" >
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" >
-            <size>
-             <width>0</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="ResetRangeButton" >
-           <property name="enabled" >
-            <bool>false</bool>
-           </property>
-           <property name="text" >
-            <string>Reset Range</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="ResetRangeToCurrentButton" >
-           <property name="text" >
-            <string>Reset Range to Current</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="5" column="0" colspan="4" >
-        <widget class="QRadioButton" name="UseDataRange" >
-         <property name="whatsThis" >
-          <string>Select this option to use the scalar range from the data.</string>
-         </property>
-         <property name="text" >
-          <string>Use the Scalar Range from the Data</string>
-         </property>
-         <property name="checked" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0" colspan="4" >
-        <widget class="QRadioButton" name="UseSpecifiedRange" >
-         <property name="whatsThis" >
-          <string>Select this option to specify the scalar range.</string>
-         </property>
-         <property name="text" >
-          <string>Specify the Scalar Range</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="4" >
         <layout class="QHBoxLayout" >
          <property name="margin" >
           <number>0</number>
@@ -186,19 +192,6 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="0" colspan="4" >
-        <widget class="QCheckBox" name="UseDiscreteColors" >
-         <property name="whatsThis" >
-          <string>Check this box if the color table should have discrete colors, otherwise color values will be interpolated.</string>
-         </property>
-         <property name="text" >
-          <string>Use Discrete Colors</string>
-         </property>
-         <property name="checked" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0" colspan="4" >
         <widget class="QVTKWidget" native="1" name="ColorScale" >
          <property name="sizePolicy" >
@@ -214,57 +207,117 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0" >
+       <item row="2" column="0" >
         <widget class="QLabel" name="label" >
          <property name="text" >
           <string>Color Space</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
+       <item row="1" column="0" >
+        <widget class="QLabel" name="ValueLabel" >
+         <property name="text" >
+          <string>Scalar Value</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
         <widget class="QComboBox" name="ColorSpace" >
          <property name="whatsThis" >
           <string>Select the color space used for the color interpolation.</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" >
+       <item row="1" column="3" >
+        <widget class="QLineEdit" name="Opacity" >
+         <property name="whatsThis" >
+          <string>This displays the opacity for the current control point. It can also be used to change the opacity of the point.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2" >
+        <widget class="QLabel" name="OpacityLabel" >
+         <property name="text" >
+          <string>Opacity</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" >
         <widget class="QLabel" name="ComponentLabel" >
          <property name="text" >
           <string>Component</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1" >
-        <widget class="QComboBox" name="Component" />
-       </item>
-       <item row="7" column="0" >
-        <widget class="QLabel" name="label_2" >
-         <property name="text" >
-          <string>Minimum</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1" >
-        <widget class="QDoubleSpinBox" name="ScalarRangeMin" >
+       <item row="3" column="1" >
+        <widget class="QComboBox" name="Component" >
          <property name="whatsThis" >
-          <string>Used to display and edit the minimum scalar value.</string>
+          <string>Select the component to color by.</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="2" >
-        <widget class="QLabel" name="label_3" >
-         <property name="text" >
-          <string>Maximum</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="3" >
-        <widget class="QDoubleSpinBox" name="ScalarRangeMax" >
+       <item row="1" column="1" >
+        <widget class="QLineEdit" name="ScalarValue" >
          <property name="whatsThis" >
-          <string>Used to display and edit the maximum scalar value.</string>
+          <string>This displays the value for the current control point. It can also be used to change the value of the point.</string>
          </property>
         </widget>
+       </item>
+       <item row="4" column="0" colspan="4" >
+        <widget class="QCheckBox" name="UseAutoRescale" >
+         <property name="whatsThis" >
+          <string>Check this option to automatically rescale the color map to the current data range.</string>
+         </property>
+         <property name="text" >
+          <string>Automatically Rescale to Fit Data Range</string>
+         </property>
+         <property name="checked" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" colspan="4" >
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <spacer>
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" >
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="RescaleButton" >
+           <property name="whatsThis" >
+            <string>Click this button to rescale the color map to a new range.</string>
+           </property>
+           <property name="text" >
+            <string>&amp;Rescale Range</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="RescaleToDataButton" >
+           <property name="whatsThis" >
+            <string>Click this button to rescale the color map to the current data range.</string>
+           </property>
+           <property name="text" >
+            <string>Rescale to &amp;Data Range</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -485,7 +538,7 @@
           <item row="0" column="3" colspan="2" >
            <widget class="pqColorChooserButton" name="TitleColorButton" >
             <property name="whatsThis" >
-             <string>Press this button to set the title color.</string>
+             <string>Click this button to set the title color.</string>
             </property>
             <property name="text" >
              <string>Color</string>
@@ -681,7 +734,7 @@
           <item row="0" column="3" colspan="2" >
            <widget class="pqColorChooserButton" name="LabelColorButton" >
             <property name="whatsThis" >
-             <string>Press this button to set the label color.</string>
+             <string>Click this button to set the label color.</string>
             </property>
             <property name="text" >
              <string>Color</string>
@@ -768,19 +821,18 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>ScalarValue</tabstop>
+  <tabstop>Opacity</tabstop>
   <tabstop>ColorSpace</tabstop>
   <tabstop>SaveButton</tabstop>
   <tabstop>PresetButton</tabstop>
+  <tabstop>Component</tabstop>
+  <tabstop>UseAutoRescale</tabstop>
+  <tabstop>RescaleButton</tabstop>
+  <tabstop>RescaleToDataButton</tabstop>
   <tabstop>UseDiscreteColors</tabstop>
   <tabstop>TableSize</tabstop>
   <tabstop>TableSizeText</tabstop>
-  <tabstop>Component</tabstop>
-  <tabstop>UseDataRange</tabstop>
-  <tabstop>UseSpecifiedRange</tabstop>
-  <tabstop>ScalarRangeMin</tabstop>
-  <tabstop>ScalarRangeMax</tabstop>
-  <tabstop>ResetRangeButton</tabstop>
-  <tabstop>ResetRangeToCurrentButton</tabstop>
   <tabstop>CloseButton</tabstop>
   <tabstop>ColorTabs</tabstop>
   <tabstop>ShowColorLegend</tabstop>

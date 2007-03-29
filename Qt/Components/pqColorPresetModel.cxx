@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqColorPresetModel.h"
 
+#include "pqChartValue.h"
 #include "pqColorMapModel.h"
 #include <QList>
 #include <QPixmap>
@@ -272,6 +273,17 @@ void pqColorPresetModel::addColorMap(const pqColorMapModel &colorMap,
   this->Internal->Presets.append(item);
   this->Modified = true;
   this->endInsertRows();
+}
+
+void pqColorPresetModel::normalizeColorMap(int idx)
+{
+  if(idx >= 0 && idx < this->Internal->Presets.size())
+    {
+    pqColorPresetModelItem *item = this->Internal->Presets[idx];
+    item->Colors.setValueRange(pqChartValue((double)0.0),
+        pqChartValue((double)1.0));
+    this->Modified = true;
+    }
 }
 
 void pqColorPresetModel::removeColorMap(int idx)
