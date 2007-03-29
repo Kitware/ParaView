@@ -2090,6 +2090,60 @@
     <!-- End LineSource -->
     </SourceProxy>
 
+    <SourceProxy name="HighResLineSource" class="vtkLineSource" 
+                 label="Line Source">
+      <DoubleVectorProperty
+         name="Point1"
+         command="SetPoint1"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.0 0.0 0.0" >
+         <BoundsDomain name="range" mode="normal" default_mode="min" >
+           <RequiredProperties>
+             <Property name="DummyInput" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Point2"
+         command="SetPoint2"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.0 0.0 0.0" >
+         <BoundsDomain name="range" mode="normal" default_mode="max" >
+           <RequiredProperties>
+             <Property name="DummyInput" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="Resolution"
+         command="SetResolution"
+         number_of_elements="1"
+         default_values="100" >
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <InputProperty name="DummyInput" is_internal="1">
+        <!-- Used when this source is added to a proxy list domain. -->
+      </InputProperty>
+
+      <Hints>
+        <PropertyGroup type="LineSource" >
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+          <Property function="Resolution"          name="Resolution" />
+        </PropertyGroup>
+
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input" />
+        </ProxyList>
+      </Hints>
+    <!-- End HighResLineSource -->
+    </SourceProxy>
+
     <SourceProxy name="PointSource" class="vtkPointSource" label="Point Source">
        <DoubleVectorProperty
           name="Center"

@@ -3,7 +3,7 @@
 
    <SourceProxy name="ExtractOverTime" 
                 class="vtkExtractArraysOverTime" 
-                label="Extract over Time">
+                label="Plot over Time">
     <InputProperty
        name="Input"
        command="SetInputConnection">
@@ -3847,7 +3847,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
           </DataTypeDomain>
           <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
           <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
-          <InputArrayDomain name="input_array" attribute_type="point"/>
+          <InputArrayDomain name="input_array"/>
           <Documentation>
             Select the dataset from which to obtain probe values.
           </Documentation>
@@ -3861,7 +3861,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
              <Group name="sources"/>
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
-             <Proxy group="extended_sources" name="LineSource" />
+             <Proxy group="extended_sources" name="HighResLineSource" />
              <Proxy group="extended_sources" name="FixedRadiusPointSource" />
            </ProxyListDomain>
            <Documentation>
