@@ -45,7 +45,9 @@ public:
   // Convert input selection and store it in output. Currently, the
   // input selection must be a geometry selection and the output
   // is a volume selection.
-  void Convert(vtkSelection* input, vtkSelection* output);
+  // If \c global_ids is set, then the selection is converted to global
+  // ids selection.
+  void Convert(vtkSelection* input, vtkSelection* output, int global_ids);
 
 protected:
   vtkSelectionConverter();
