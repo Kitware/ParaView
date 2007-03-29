@@ -49,6 +49,7 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
   this->Slider = new QSlider(Qt::Horizontal, this);
+  this->Slider->setRange(0,100);
   l->addWidget(this->Slider);
   this->Slider->setObjectName("Slider");
   this->LineEdit = new QLineEdit(this);
