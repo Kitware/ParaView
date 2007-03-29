@@ -35,6 +35,8 @@ SET(QtWidgets_SRCS
   pqDoubleRangeWidget.h
   pqFlatTreeView.cxx
   pqFlatTreeView.h
+  pqLineEditNumberValidator.cxx
+  pqLineEditNumberValidator.h
   pqListWidgetItemObject.cxx
   pqListWidgetItemObject.h
   pqLookmarkToolbar.cxx
