@@ -2483,7 +2483,8 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
         command="SetInputArrayToProcess"
         number_of_elements="5"
         element_types="0 0 0 0 2"
-        label="Vectors">
+        default_values="1"
+        label="Vectors"> <!-- default_values=1, send vectors to the right place -->
            <ArrayListDomain name="array_list" attribute_type="Vectors"
                             input_domain_name="input_array1">
              <RequiredProperties>
@@ -3598,7 +3599,8 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
         command="SetInputArrayToProcess"
         number_of_elements="5"
         element_types="0 0 0 0 2"
-        label="Vectors">
+        default_values="1" 
+        label="Vectors">  <!-- default value=1 so normals go to the right place -->
           <ArrayListDomain name="array_list" attribute_type="Vectors"
                input_domain_name="input_array2">
             <RequiredProperties>
