@@ -147,6 +147,9 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
 
 
   this->UniqueID=QUuid::createUuid();
+
+  // to allow an empty frame to work with the focus stuff
+  this->setFocusPolicy(Qt::ClickFocus);
 }
 
 pqMultiViewFrame::~pqMultiViewFrame()
