@@ -958,29 +958,35 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
 
   if(dvp)
     {
+    double *dvalues = new double[num+1];
     for(int i=0; i<num; i++)
       {
       bool ok = true;
       double v = Value[i].toDouble(&ok);
-      if(ok)
-        {
-        dvp->SetElement(i, v);
-        }
+      dvalues[i] = ok? v : 0.0;
       }
     dvp->SetNumberOfElements(num);
+    if (num > 0)
+      {
+      dvp->SetElements(dvalues);
+      }
+    delete[] dvalues;
     }
   else if(ivp)
     {
+    int *ivalues = new int[num+1];
     for(int i=0; i<num; i++)
       {
       bool ok = true;
       int v = Value[i].toInt(&ok);
-      if(ok)
-        {
-        ivp->SetElement(i, v);
-        }
+      ivalues[i] = ok? v : 0;
       }
     ivp->SetNumberOfElements(num);
+    if (num>0)
+      {
+      ivp->SetElements(ivalues);
+      }
+    delete []ivalues;
     }
   else if(svp)
     {
@@ -996,6 +1002,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     }
   else if(idvp)
     {
+    vtkIdType* idvalues = new vtkIdType[num+1];
     for(int i=0; i<num; i++)
       {
       bool ok = true;
@@ -1005,12 +1012,14 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
 #else
       v = Value[i].toInt(&ok);
 #endif
-      if(ok)
-        {
-        idvp->SetElement(i, v);
-        }
+      idvalues[i] = ok? v : 0;
       }
     idvp->SetNumberOfElements(num);
+    if (num>0)
+      {
+      idvp->SetElements(idvalues);
+      }
+    delete[] idvalues;
     }
 }
 
