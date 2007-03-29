@@ -50,6 +50,17 @@ public:
   vtkSetMacro(OutputDataType, int);
   vtkGetMacro(OutputDataType, int);
 
+  // Description:
+  // Controls the output WHOLE_EXTENT.  This is required because processes
+  // receiving data cannot know their WHOLE_EXTENT in RequestInformation
+  // without communicating with other processes. Since communicating with
+  // other processes in RequestInformation is dangerous (can cause deadlock
+  // because it may happen out-of-sync), the application has to set the
+  // output type. Make sure to call this before any pipeline updates occur.
+  vtkSetVector6Macro(WholeExtent, int);
+  vtkGetVector6Macro(WholeExtent, int);
+  
+
 protected:
   vtkClientServerMoveData();
   ~vtkClientServerMoveData();
@@ -67,6 +78,12 @@ protected:
                                 vtkInformationVector** inputVector, 
                                 vtkInformationVector* outputVector);
 
+  // If there is an input call superclass' RequestInformation
+  // otherwise set the output WHOLE_EXTENT() to be WholeExtent
+  virtual int RequestInformation(vtkInformation* request, 
+                                 vtkInformationVector** inputVector, 
+                                 vtkInformationVector* outputVector);
+
 
   int SendData(vtkSocketController* controller, vtkDataObject* data);
   vtkDataObject* ReceiveData(vtkSocketController* controller);
@@ -83,6 +100,7 @@ protected:
   //ETX
 
   int OutputDataType;
+  int WholeExtent[6];
 
 private:
   vtkClientServerMoveData(const vtkClientServerMoveData&); // Not implemented.

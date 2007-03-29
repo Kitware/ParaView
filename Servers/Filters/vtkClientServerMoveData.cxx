@@ -26,10 +26,11 @@
 #include "vtkPolyData.h"
 #include "vtkServerConnection.h"
 #include "vtkSocketController.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.6");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.7");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 
@@ -38,6 +39,12 @@ vtkClientServerMoveData::vtkClientServerMoveData()
 {
   this->ProcessModuleConnection = 0;
   this->OutputDataType = VTK_POLY_DATA;
+  this->WholeExtent[0] =  0;
+  this->WholeExtent[1] = -1;
+  this->WholeExtent[2] =  0;
+  this->WholeExtent[3] = -1;
+  this->WholeExtent[4] =  0;
+  this->WholeExtent[5] = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -62,28 +69,45 @@ int vtkClientServerMoveData::RequestDataObject(
   const char *outTypeStr = 
     vtkDataObjectTypes::GetClassNameFromTypeId(this->OutputDataType);
 
-  // for each output
-  for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
+  vtkInformation* info = outputVector->GetInformationObject(0);
+  vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
+  if (!output || !output->IsA(outTypeStr)) 
     {
-    vtkInformation* info = outputVector->GetInformationObject(i);
-    vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
-    if (!output || !output->IsA(outTypeStr)) 
+    vtkDataObject* newOutput = 
+      vtkDataObjectTypes::NewDataObject(this->OutputDataType);
+    if (!newOutput)
       {
-      vtkDataObject* newOutput = 
-        vtkDataObjectTypes::NewDataObject(this->OutputDataType);
-      if (!newOutput)
-        {
-        vtkErrorMacro("Could not create chosen output data type: "
-                      << outTypeStr);
-        return 0;
-        }
-      newOutput->SetPipelineInformation(info);
-      this->GetOutputPortInformation(0)->Set(
-        vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
-      newOutput->Delete();
+      vtkErrorMacro("Could not create chosen output data type: "
+                    << outTypeStr);
+      return 0;
       }
+    newOutput->SetPipelineInformation(info);
+    this->GetOutputPortInformation(0)->Set(
+      vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+    newOutput->Delete();
     }
 
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkClientServerMoveData::RequestInformation(
+  vtkInformation* request, 
+  vtkInformationVector** inputVector, 
+  vtkInformationVector* outputVector)
+{
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  if (inputVector[0]->GetNumberOfInformationObjects() > 0)
+    {
+    return 
+      this->Superclass::RequestInformation(request, inputVector, outputVector);
+    }
+  else
+    {
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),
+                 this->WholeExtent,
+                 6);
+    }
   return 1;
 }
 
