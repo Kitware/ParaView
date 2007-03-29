@@ -245,15 +245,12 @@ void pqPropertyManager::unregisterLink(
     iter.value()->removeLink(qObject, qProperty, signal);
     if(iter.value()->numberOfLinks() == 0)
       {
-      QObject::disconnect(iter.value(), SIGNAL(guiPropertyChanged()), 
-                          iter.value(), SIGNAL(flushProperty()));
-      QObject::disconnect(iter.value(), 0, this, 0);
       this->Internal->Links.removePropertyLink(
         iter.value(), "value", SIGNAL(flushProperty()),
         Proxy, Property, Index);
+      delete *iter;
       this->Internal->Properties.erase(iter);
       }
-    QObject::disconnect(qObject, 0, this, 0);
     }
 }
 
