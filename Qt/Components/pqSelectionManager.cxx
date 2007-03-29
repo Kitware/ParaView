@@ -353,9 +353,7 @@ void pqSelectionManager::clearSelection()
     {
     vtkSMRenderModuleProxy* renderModuleP = 
       this->Implementation->SelectionRenderModule->getRenderModuleProxy();
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      renderModuleP->GetProperty("Displays"));
-    pp->RemoveProxy(this->Implementation->SelectionDisplayer);
+    renderModuleP->RemoveDisplay(this->Implementation->SelectionDisplayer);
     renderModuleP->UpdateVTKObjects();
     }
   this->Implementation->clearSelection();
@@ -428,7 +426,11 @@ void pqSelectionManager::select()
   rectangle[2] = this->Implementation->Xe;
   rectangle[3] = this->Implementation->Ye;
 
+  emit this->beginNonUndoableChanges();
+
   this->selectOnSurface(rectangle);
+
+  emit this->endNonUndoableChanges();
 
   emit this->selectionMarked();
 }
@@ -497,9 +499,7 @@ void pqSelectionManager::createSelectionDisplayer(vtkSMProxy* input)
     displayP->GetProperty("Input"));
   pp->AddProxy(input);
   // Add the display proxy to render module.
-  pp = vtkSMProxyProperty::SafeDownCast(renderModuleP->GetProperty("Displays"));
-  pp->AddProxy(displayP);
-  renderModuleP->UpdateVTKObjects();
+  renderModuleP->AddDisplay(displayP);
   // Set representation to wireframe
   displayP->SetRepresentationCM(1);
   // Do not color by array

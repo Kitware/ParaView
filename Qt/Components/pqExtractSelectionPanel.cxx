@@ -122,7 +122,8 @@ void pqExtractSelectionPanel::updateIDRanges()
     }
 
   // this filter can have at most 1 input.
-  pqPipelineSource* input = filter->getInput(0);
+  pqPipelineSource* input = (filter->getInputCount()>0)?
+    filter->getInput(0):0;
   if (!input)
     {
     return;
@@ -133,8 +134,6 @@ void pqExtractSelectionPanel::updateIDRanges()
     {
     return;
     }
-
-  
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int numPartitions = pm->GetNumberOfPartitions(

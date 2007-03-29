@@ -98,6 +98,13 @@ signals:
   /// on mouse up in selection mode.
   void selectionMarked();
 
+  /// emitted before performing non-undoable server manager changes.
+  void beginNonUndoableChanges();
+
+  /// emitted after having performed non-undoable server
+  /// manager changes.
+  void endNonUndoableChanges();
+
 public slots:
   /// Change mode to INTERACT
   void switchToInteraction();

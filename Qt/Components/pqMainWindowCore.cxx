@@ -704,8 +704,16 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   QObject::connect(
     &this->Implementation->VCRController, SIGNAL(endNonUndoableChanges()),
     this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
+  QObject::connect(
+    &this->Implementation->SelectionManager, SIGNAL(beginNonUndoableChanges()),
+    this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
+  QObject::connect(
+    &this->Implementation->SelectionManager, SIGNAL(endNonUndoableChanges()),
+    this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
 
   core->setUndoStack(this->Implementation->UndoStack);
+
+
 
   // set up state loader.
   pqStateLoader* loader = pqStateLoader::New();
