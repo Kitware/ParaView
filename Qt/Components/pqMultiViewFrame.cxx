@@ -247,7 +247,11 @@ void pqMultiViewFrame::setMainWidget(QWidget* w)
     {
     l = this->layout()->itemAt(1)->layout();
     }
-    l->removeItem(l->itemAt(0));
+    QLayoutItem* item = l->takeAt(0);
+    if(item)
+      {
+      delete item;
+      }
 
 
   if(w)
