@@ -72,6 +72,8 @@ public:
 
   int getNumberOfPoints() const;
   void addPoint(const pqChartValue &value, const QColor &color);
+  void addPoint(const pqChartValue &value, const QColor &color,
+      const pqChartValue &opacity);
   void removePoint(int index);
   void removeAllPoints();
   void startModifyingData();
@@ -82,6 +84,8 @@ public:
   void setPointValue(int index, const pqChartValue &value);
   void getPointColor(int index, QColor &color) const;
   void setPointColor(int index, const QColor &color);
+  void getPointOpacity(int index, pqChartValue &opacity) const;
+  void setPointOpacity(int index, const pqChartValue &opacity);
 
   bool isRangeNormalized() const;
 
@@ -135,6 +139,12 @@ signals:
   /// \param index The index of the point.
   /// \param value The new value for the point.
   void valueChanged(int index, const pqChartValue &value);
+
+  /// \brief
+  ///   Emitted when the opacity of a point has been changed.
+  /// \param index The index of the point.
+  /// \param value The new opacity for the point.
+  void opacityChanged(int index, const pqChartValue &opacity);
 
 private:
   pqColorMapModelInternal *Internal; ///< Stores the points.

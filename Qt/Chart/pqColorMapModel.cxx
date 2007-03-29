@@ -50,10 +50,13 @@ class pqColorMapModelItem
 public:
   pqColorMapModelItem();
   pqColorMapModelItem(const pqChartValue &value, const QColor &color);
+  pqColorMapModelItem(const pqChartValue &value, const QColor &color,
+      const pqChartValue &opacity);
   ~pqColorMapModelItem() {}
 
   pqChartValue Value;
   QColor Color;
+  pqChartValue Opacity;
 };
 
 
@@ -68,7 +71,13 @@ pqColorMapModelItem::pqColorMapModelItem()
 
 pqColorMapModelItem::pqColorMapModelItem(const pqChartValue &value,
     const QColor &color)
-  : Value(value), Color(color)
+  : Value(value), Color(color), Opacity((double)1.0)
+{
+}
+
+pqColorMapModelItem::pqColorMapModelItem(const pqChartValue &value,
+    const QColor &color, const pqChartValue &opacity)
+  : Value(value), Color(color), Opacity(opacity)
 {
 }
 
@@ -94,7 +103,7 @@ pqColorMapModel::pqColorMapModel(const pqColorMapModel &other)
   for( ; iter != other.Internal->end(); ++iter)
     {
     this->Internal->append(new pqColorMapModelItem(
-        (*iter)->Value, (*iter)->Color));
+        (*iter)->Value, (*iter)->Color, (*iter)->Opacity));
     }
 }
 
@@ -160,6 +169,12 @@ int pqColorMapModel::getNumberOfPoints() const
 
 void pqColorMapModel::addPoint(const pqChartValue &value, const QColor &color)
 {
+  this->addPoint(value, color, pqChartValue((double)1.0));
+}
+
+void pqColorMapModel::addPoint(const pqChartValue &value, const QColor &color,
+    const pqChartValue &opacity)
+{
   // The list of points should be in ascending value order. Add the
   // new point according to its value.
   QList<pqColorMapModelItem *>::Iterator iter = this->Internal->begin();
@@ -175,7 +190,7 @@ void pqColorMapModel::addPoint(const pqChartValue &value, const QColor &color)
       }
     }
 
-  pqColorMapModelItem *item = new pqColorMapModelItem(value, color);
+  pqColorMapModelItem *item = new pqColorMapModelItem(value, color, opacity);
   if(iter == this->Internal->end())
     {
     // Add the point to the end of the list if it is greater than all
@@ -281,6 +296,27 @@ void pqColorMapModel::setPointColor(int index, const QColor &color)
     if(!this->InModify)
       {
       emit this->colorChanged(index, color);
+      }
+    }
+}
+
+void pqColorMapModel::getPointOpacity(int index, pqChartValue &opacity) const
+{
+  if(index >= 0 && index < this->Internal->size())
+    {
+    opacity = (*this->Internal)[index]->Opacity;
+    }
+}
+
+void pqColorMapModel::setPointOpacity(int index, const pqChartValue &opacity)
+{
+  if(index >= 0 && index < this->Internal->size() &&
+      (*this->Internal)[index]->Opacity != opacity)
+    {
+    (*this->Internal)[index]->Opacity = opacity;
+    if(!this->InModify)
+      {
+      emit this->opacityChanged(index, opacity);
       }
     }
 }
@@ -452,7 +488,7 @@ pqColorMapModel &pqColorMapModel::operator=(const pqColorMapModel &other)
   for( ; iter != other.Internal->end(); ++iter)
     {
     this->Internal->append(new pqColorMapModelItem(
-        (*iter)->Value, (*iter)->Color));
+        (*iter)->Value, (*iter)->Color, (*iter)->Opacity));
     }
 
   if(!this->InModify)
