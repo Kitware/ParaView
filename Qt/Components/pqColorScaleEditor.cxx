@@ -450,9 +450,10 @@ void pqColorScaleEditor::setColors()
       lookupTable->GetProperty("RGBPoints"), rgbPoints);
   if(this->Form->HasOpacity)
     {
-    pqSMAdaptor::setMultipleElementProperty(
-        this->Display->getScalarOpacityFunctionProxy()->GetProperty("Points"),
+    vtkSMProxy *points = this->Display->getScalarOpacityFunctionProxy();
+    pqSMAdaptor::setMultipleElementProperty(points->GetProperty("Points"),
         opacityPoints);
+    points->UpdateVTKObjects();
     }
 
   this->Form->InSetColors = false;
