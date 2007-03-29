@@ -18,6 +18,7 @@
     <Filter name="ExtractHistogram" />
     <Filter name="ExtractOverTime" />
     <Filter name="Probe" />
+    <Filter name="Programmable Filter" />
   </Category>
 
   <Filter name="Append" />
