@@ -32,6 +32,7 @@ public:
   // Description:
   // Updates the pipeline and writes the file(s).
   virtual void UpdatePipeline();
+  virtual void UpdatePipeline(double time);
 
 protected:
   vtkSMPVDWriterProxy() {}

@@ -188,6 +188,9 @@ protected:
   // be sent to the servers.
   virtual vtkTypeUInt32 GetRenderingProgressServers();
 
+  // Passess the collectionDecision flag to all visible displays.
+  void PassCollectionDecisionToDisplays(int collectionDecision, bool use_lod);
+
 private:
   vtkSMClientServerRenderModuleProxy(const vtkSMClientServerRenderModuleProxy &); // Not implemented.
   void operator=(const vtkSMClientServerRenderModuleProxy &); // Not implemented

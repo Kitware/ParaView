@@ -34,6 +34,7 @@ public:
                 int hasMultipleInputs);
 
   virtual void UpdatePipeline();
+  virtual void UpdatePipeline(double time);
 protected:
   vtkSMPWriterProxy();
   ~vtkSMPWriterProxy();

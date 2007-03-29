@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.28");
+vtkCxxRevisionMacro(vtkSMPart, "1.29");
 
 
 //----------------------------------------------------------------------------
@@ -512,6 +512,56 @@ void vtkSMPart::UpdatePipeline()
            << pm->GetNumberOfPartitions(this->ConnectionID) << 0
            << vtkClientServerStream::End; 
     }   
+
+  stream << vtkClientServerStream::Invoke 
+         << this->GetProducerID() << "Update"
+         << vtkClientServerStream::End;
+
+  pm->SendPrepareProgress(this->ConnectionID);
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  pm->SendCleanupPendingProgress(this->ConnectionID);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPart::UpdatePipeline(double time)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+
+  stream << vtkClientServerStream::Invoke 
+         << this->GetProducerID() << "UpdateInformation"
+         << vtkClientServerStream::End;
+
+  // When getting rid of streaming, throw away the conditional and 
+  // keep the else.
+  // TODO: disabling for now.
+  if (/*vtkPVProcessModule::GetGlobalStreamBlock()*/ 0)
+    {
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "GetPartitionId"
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << this->GetExecutiveID() << "SetUpdateExtent" << this->PortIndex
+           << vtkClientServerStream::LastResult 
+           << pm->GetNumberOfPartitions(this->ConnectionID) * 200 << 0
+           << vtkClientServerStream::End; 
+    }
+  else
+    {
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "GetPartitionId"
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << this->GetExecutiveID() << "SetUpdateExtent" << this->PortIndex
+           << vtkClientServerStream::LastResult 
+           << pm->GetNumberOfPartitions(this->ConnectionID) << 0
+           << vtkClientServerStream::End; 
+    }   
+
+  stream << vtkClientServerStream::Invoke
+         << this->GetExecutiveID() << "SetUpdateTimeStep" 
+         << this->PortIndex << time
+         << vtkClientServerStream::End; 
 
   stream << vtkClientServerStream::Invoke 
          << this->GetProducerID() << "Update"

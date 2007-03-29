@@ -71,6 +71,34 @@ void vtkSMWriterProxy::UpdatePipeline()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMWriterProxy::UpdatePipeline(double time)
+{
+  this->Superclass::UpdatePipeline(time);
+
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream str;
+  unsigned int idx;
+  for (idx = 0; idx < this->GetNumberOfIDs(); idx++)
+    {
+    str << vtkClientServerStream::Invoke
+        << this->GetID(idx)
+        << "Write"
+        << vtkClientServerStream::End;
+    str << vtkClientServerStream::Invoke
+        << this->GetID(idx)
+        << "GetErrorCode"
+        << vtkClientServerStream::End;
+    }
+
+  if (str.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->ConnectionID, this->Servers, str);
+    pm->GetLastResult(this->GetConnectionID(), this->GetServers()).GetArgument(
+      0, 0, &this->ErrorCode);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMWriterProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

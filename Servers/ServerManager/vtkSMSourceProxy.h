@@ -58,6 +58,11 @@ public:
   virtual void UpdatePipeline();
 
   // Description:
+  // Calls Update() on all sources with the given time request. 
+  // It also creates parts if they are not already created.
+  virtual void UpdatePipeline(double time);
+
+  // Description:
   // Connects filters/sinks to an input. If the filter(s) is not
   // created, this will create it. If hasMultipleInputs is
   // true,  only one filter is created, even if the input has

@@ -20,12 +20,13 @@
 #include "vtkProcessModule.h"
 #include "vtkPVLODPartDisplayInformation.h"
 #include "vtkPVRenderModuleHelper.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.17");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -78,6 +79,11 @@ vtkPVLODPartDisplayInformation* vtkSMLODDisplayProxy::GetLODInformation()
     {
     return 0;
     }
+
+  // Update the GeometryFilter so that we don't get obsolete
+  // data information.
+  vtkSMSourceProxy::SafeDownCast(this->GeometryFilterProxy)->UpdatePipeline(
+    this->UpdateTime);
   
   this->LODInformation->CopyFromObject(0); // Clear information.
   if (this->LODDecimatorProxy->GetNumberOfIDs() > 0)

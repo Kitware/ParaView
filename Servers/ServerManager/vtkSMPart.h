@@ -112,6 +112,10 @@ private:
 //BTX
   friend class vtkSMSourceProxy;
   void UpdatePipeline();
+  
+  // Update Pipeline with the given timestep request.
+  void UpdatePipeline(double time);
+
 
   // The index of the port the output is obtained from.
   vtkSetMacro(PortIndex, int);

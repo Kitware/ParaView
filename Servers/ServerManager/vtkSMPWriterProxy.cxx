@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPWriterProxy);
-vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMPWriterProxy::vtkSMPWriterProxy()
 {
@@ -143,6 +143,26 @@ void vtkSMPWriterProxy::UpdatePipeline()
   this->Superclass::UpdatePipeline();
 }
 
+//-----------------------------------------------------------------------------
+void vtkSMPWriterProxy::UpdatePipeline(double time)
+{
+  vtkSMProxy* sumHelper = this->GetSubProxy("SummaryHelper");
+  if (sumHelper)
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+
+    for (unsigned int cc=0; cc < sumHelper->GetNumberOfIDs(); cc++)
+      {
+      stream << vtkClientServerStream::Invoke
+             << sumHelper->GetID(cc) 
+             << "SynchronizeSummaryFiles"
+             << vtkClientServerStream::End;
+      }
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    }
+  this->Superclass::UpdatePipeline(time);
+}
 
 
 //-----------------------------------------------------------------------------

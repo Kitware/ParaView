@@ -40,7 +40,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.35");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.36");
 
 
 //-----------------------------------------------------------------------------
@@ -86,6 +86,7 @@ vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
   this->VolumeCacherProxy = 0;
 
   this->RenderModuleExtensionsTested = 0;
+  this->UpdateTime = 0.0;
 
   this->ColorArrayLink = vtkSMPropertyLink::New();
   this->LookupTableLink = vtkSMPropertyLink::New();
@@ -1282,6 +1283,8 @@ void vtkSMDataObjectDisplayProxy::SetUpdateTime(double time)
     return;
     }
 
+  this->UpdateTime = time;
+
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->UpdateSuppressorProxy->GetProperty("UpdateTime"));
   dvp->SetElement(0, time);
@@ -2001,4 +2004,5 @@ void vtkSMDataObjectDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SupportsHAVSMapper: " << this->SupportsHAVSMapper << endl;
   os << indent << "SupportsBunykMapper: " << this->SupportsBunykMapper << endl;
   os << indent << "SupportsZSweepMapper: " << this->SupportsZSweepMapper << endl;
+  os << indent << "UpdateTime: " << this->UpdateTime << endl;
 }

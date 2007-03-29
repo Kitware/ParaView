@@ -33,7 +33,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMClientServerRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMClientServerRenderModuleProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMClientServerRenderModuleProxy, "1.2");
 
 vtkCxxSetObjectMacro(vtkSMClientServerRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -351,13 +351,37 @@ void vtkSMClientServerRenderModuleProxy::InitializeRenderSyncPipeline()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMClientServerRenderModuleProxy::PassCollectionDecisionToDisplays(
+  int collectionDecision, bool use_lod)
+{
+  vtkCollection* displays = this->GetDisplays();
+  displays->InitTraversal();
+  vtkObject* object;
+  while ( (object = displays->GetNextItemAsObject()) )
+    {
+    vtkSMCompositeDisplayProxy* pDisp = vtkSMCompositeDisplayProxy::SafeDownCast(object);
+    if (pDisp && pDisp->GetVisibilityCM())
+      {
+      if (!use_lod)
+        {
+        this->SetCollectionDecision(pDisp, collectionDecision);
+        }
+      else
+        {
+        this->SetLODCollectionDecision(pDisp, collectionDecision);
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMClientServerRenderModuleProxy::StillRender()
 {
-  vtkObject* object;
-  vtkSMCompositeDisplayProxy* pDisp;
-
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendPrepareProgress(this->ConnectionID);
+
+  // This ensures that we use the update data sizes for collection decision.
+  this->UpdateAllDisplays();
 
   // Find out whether we are going to render localy.
   // Save this so we know where to get the z buffer (for picking?).
@@ -365,21 +389,12 @@ void vtkSMClientServerRenderModuleProxy::StillRender()
     this->GetTotalVisibleGeometryMemorySize(), 1);
 
   // Change the collection flags and update.
-  this->GetDisplays()->InitTraversal();
-  while ( (object = this->GetDisplays()->GetNextItemAsObject()) )
-    {
-    pDisp = vtkSMCompositeDisplayProxy::SafeDownCast(object);
-    if (pDisp && pDisp->GetVisibilityCM())
-      {
-      this->SetCollectionDecision(pDisp, this->LocalRender);
-      }
-    }
+  this->PassCollectionDecisionToDisplays(this->LocalRender, false);
 
   // We don't need to call UpdateAllDisplays explicitly, since
   // Superclass::StillRender() will call UpdateAllDisplays because
   // SetCollectionDecision invalidates geometry.
   // this->UpdateAllDisplays();
-
 
   //Turn of ImageReductionFactor if the RenderSyncManager supports it.
   if (this->RenderSyncManagerProxy)
@@ -402,13 +417,11 @@ void vtkSMClientServerRenderModuleProxy::StillRender()
 //-----------------------------------------------------------------------------
 void vtkSMClientServerRenderModuleProxy::InteractiveRender()
 {
-  vtkObject* object;
-  vtkSMCompositeDisplayProxy* pDisp;
-
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendPrepareProgress(this->ConnectionID);
 
   this->UpdateAllDisplays();
+
   int useLOD = this->GetUseLODDecision();
   unsigned long totalMemory = 0;
   totalMemory = (useLOD)? this->GetTotalVisibleLODGeometryMemorySize() :
@@ -417,25 +430,7 @@ void vtkSMClientServerRenderModuleProxy::InteractiveRender()
   this->LocalRender = this->GetLocalRenderDecision(totalMemory, 0);
 
   // Change the collection flags and update.
-  this->GetDisplays()->InitTraversal();
-  while ( (object = this->GetDisplays()->GetNextItemAsObject()) )
-    {
-    pDisp = vtkSMCompositeDisplayProxy::SafeDownCast(object);
-    if (pDisp && pDisp->GetVisibilityCM())
-      {
-      // TODO: should the two decision be kept independent.
-      // Why con't combine them using Shared properties and simplify
-      // our life?
-      if (useLOD)
-        {
-        this->SetLODCollectionDecision(pDisp, this->LocalRender);
-        }
-      else
-        {
-        this->SetCollectionDecision(pDisp, this->LocalRender);
-        }
-      }
-    }
+  this->PassCollectionDecisionToDisplays(this->LocalRender, useLOD);
   if (this->RenderSyncManagerProxy)
     {
     // Set Squirt Level (if supported).
@@ -443,7 +438,7 @@ void vtkSMClientServerRenderModuleProxy::InteractiveRender()
     this->SetUseCompositing(this->RenderSyncManagerProxy,
                             ((this->LocalRender)? 0 : 1));
     }
-
+  
   if (!this->LocalRender)
     {
     this->GetRenderWindow()->SetDesiredUpdateRate(5.0);
@@ -451,9 +446,7 @@ void vtkSMClientServerRenderModuleProxy::InteractiveRender()
     }
 
   this->Superclass::InteractiveRender();
- 
   pm->SendCleanupPendingProgress(this->ConnectionID);
-  
 }
 
 //-----------------------------------------------------------------------------

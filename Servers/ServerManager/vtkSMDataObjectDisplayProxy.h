@@ -405,6 +405,8 @@ protected:
   // Link used to link "LookupTable" from geometry mapper
   // to "ColorTransferFunction" on  volume property.
   vtkSMPropertyLink* LookupTableLink;
+
+  double UpdateTime;
 private:
   vtkSMDataObjectDisplayProxy(const vtkSMDataObjectDisplayProxy&); // Not implemented.
   void operator=(const vtkSMDataObjectDisplayProxy&); // Not implemented.
