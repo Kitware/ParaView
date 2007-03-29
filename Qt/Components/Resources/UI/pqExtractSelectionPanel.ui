@@ -235,7 +235,7 @@
    <sender>UseGlobalIDs</sender>
    <signal>toggled(bool)</signal>
    <receiver>ProcessIDRange</receiver>
-   <slot>setEnabled(bool)</slot>
+   <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
      <x>81</x>

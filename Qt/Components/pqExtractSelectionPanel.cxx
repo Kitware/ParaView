@@ -32,13 +32,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExtractSelectionPanel.h"
 #include "ui_pqExtractSelectionPanel.h"
 
-#include "vtkSMProxy.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkProcessModule.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkSMProxy.h"
 
 #include <QtDebug>
 
+#include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
+#include "pqServer.h"
 #include "pqSignalAdaptorTreeWidget.h"
 
 class pqExtractSelectionPanel::pqInternal : public Ui::ExtractSelectionPanel
@@ -97,6 +103,73 @@ void pqExtractSelectionPanel::linkServerManagerProperties()
   pmanager->registerLink(
     this->Internal->IndicesAdaptor, "values", SIGNAL(valuesChanged()),
     smproxy, smproxy->GetProperty("Indices"));
+}
+
+//-----------------------------------------------------------------------------
+void pqExtractSelectionPanel::select()
+{
+  this->updateIDRanges();
+  this->Superclass::select();
+}
+
+//-----------------------------------------------------------------------------
+void pqExtractSelectionPanel::updateIDRanges()
+{
+  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(this->referenceProxy());
+  if (!filter)
+    {
+    return;
+    }
+
+  // this filter can have at most 1 input.
+  pqPipelineSource* input = filter->getInput(0);
+  if (!input)
+    {
+    return;
+    }
+ 
+  vtkPVDataInformation* dataInfo = input->getDataInformation();
+  if (!dataInfo)
+    {
+    return;
+    }
+
+  vtkTypeInt64 numCells = dataInfo->GetNumberOfCells();
+  this->Internal->IndexRange->setText(
+    QString("Index Range: 0 - %1").arg(numCells-1));
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  int numPartitions = pm->GetNumberOfPartitions(
+    filter->getServer()->GetConnectionID());
+  
+  this->Internal->ProcessIDRange->setText(
+    QString("Process ID Range: 0 - %1").arg(numPartitions-1));
+
+  vtkPVDataSetAttributesInformation* dsainfo = 0;
+  if (filter->getProxy()->GetXMLName() == QString("ExtractCellSelection"))
+    {
+    dsainfo = dataInfo->GetCellDataInformation();
+    }
+  else
+    {
+    dsainfo = dataInfo->GetPointDataInformation();
+    }
+
+  vtkPVArrayInformation* gidsInfo = dsainfo->GetAttributeInformation(
+    vtkDataSetAttributes::GLOBALIDS);
+  if (gidsInfo)
+    {
+    double* range =gidsInfo->GetComponentRange(0);
+    vtkTypeInt64 gid_min = static_cast<vtkTypeInt64>(range[0]);
+    vtkTypeInt64 gid_max = static_cast<vtkTypeInt64>(range[1]);
+
+    this->Internal->GlobalIDRange->setText(
+      QString("Global ID Range: %1 - %2").arg(gid_min).arg(gid_max));
+    }
+  else
+    {
+    this->Internal->GlobalIDRange->setText("Global ID Range: <not available>");
+    }
 }
 
 //-----------------------------------------------------------------------------

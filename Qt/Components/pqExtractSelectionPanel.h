@@ -45,6 +45,9 @@ public:
   pqExtractSelectionPanel(pqProxy* proxy, QWidget* parent=0);
   ~pqExtractSelectionPanel();
 
+  /// Called when the panel becomes active. 
+  virtual void select();
+
 protected slots:
   /// Deletes selected elements.
   void deleteSelected();
@@ -59,6 +62,8 @@ protected:
   /// Creates links between the Qt widgets and the server manager properties.
   void linkServerManagerProperties();
 
+  /// Updates the labels for ID ranges.
+  void updateIDRanges();
 private:
   pqExtractSelectionPanel(const pqExtractSelectionPanel&); // Not implemented.
   void operator=(const pqExtractSelectionPanel&); // Not implemented.
