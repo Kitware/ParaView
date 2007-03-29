@@ -20,7 +20,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkIdentColoredPainter.h"
 
-vtkCxxRevisionMacro(vtkPVVisibleCellSelector, "1.5");
+vtkCxxRevisionMacro(vtkPVVisibleCellSelector, "1.6");
 vtkStandardNewMacro(vtkPVVisibleCellSelector);
 
 //----------------------------------------------------------------------------
@@ -85,6 +85,7 @@ void vtkPVVisibleCellSelector::SetRenderer(vtkRenderer *r)
   //now that we have given these away, we can delete our reference to them
   ip->Delete();
   arr->Delete();
+  delete [] SaveProps;
 }
 
 //----------------------------------------------------------------------------

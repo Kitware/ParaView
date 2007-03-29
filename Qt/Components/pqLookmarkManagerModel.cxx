@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLParser.h"
 #include "pqLookmarkModel.h"
 
+#include <vtksys/ios/sstream>
+
 //-----------------------------------------------------------------------------
 class pqLookmarkManagerModelInternal 
 {
@@ -110,11 +112,9 @@ QString pqLookmarkManagerModel::getLookmarksSerialized(const QList<pqLookmarkMod
     lmkElem->Delete();
     }
 
-  ostrstream os;
+  vtksys_ios::ostringstream os;
   root->PrintXML(os,vtkIndent(0));
-  os << ends;
-  os.rdbuf()->freeze(0);
-  QString modelState = os.str();
+  QString modelState = os.str().c_str();
   root->Delete();
 
   return modelState;

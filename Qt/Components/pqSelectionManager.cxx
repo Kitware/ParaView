@@ -564,8 +564,11 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
   pqSelectionManagerReorderBoundingBox(screenRectangle, displayRectangle);
 
   // Perform the selection.
-  vtkCollection* selectedProxies = vtkCollection::New();
-  vtkCollection* selections = vtkCollection::New();
+  vtkSmartPointer<vtkCollection> selectedProxies = 
+    vtkSmartPointer<vtkCollection>::New();
+  vtkSmartPointer<vtkCollection> selections =
+    vtkSmartPointer<vtkCollection>::New();
+
   vtkSMSelectionHelper::SelectOnSurface(renderModuleP,
                                         displayRectangle,
                                         selectedProxies,
@@ -648,8 +651,6 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
 
   // Cleanup
   selectionSourceP->Delete();
-  selections->Delete();
-  selectedProxies->Delete();
   volumeSelection->Delete();
   extractFilterP->Delete();
 }
