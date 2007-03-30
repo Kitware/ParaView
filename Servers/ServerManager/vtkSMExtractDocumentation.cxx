@@ -39,6 +39,12 @@ bool operator < (const vtkstd::pair<vtkstd::string, vtkstd::string> &x,
 
 void WriteDocumentation(vtkSMDocumentation *doc, ofstream &docFile)
 {
+  if (!doc->GetDocumentationElement())
+    {
+    docFile << "NO DOCUMENTATION" << endl;
+    docFile << "<br>" << endl;
+    return;
+    }
   if (doc->GetLongHelp())
     {
     docFile << "<b>long help:</b> " << doc->GetLongHelp() << endl;
@@ -214,7 +220,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     {
     WriteDomainHeader(headerWritten, docFile);
     vtkSMDataTypeDomain *dtd = vtkSMDataTypeDomain::SafeDownCast(dom);
-    docFile << "The selected dataset must be one of the following types:";
+    docFile << "The selected dataset must be one of the following types (or a subclass of one of them):";
     for (i = 0; i < dtd->GetNumberOfDataTypes(); i++)
       {
       docFile << " " << dtd->GetDataType(i);
@@ -342,7 +348,8 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
   else if (!strcmp("vtkSMExtentDomain", className))
     {
     WriteDomainHeader(headerWritten, docFile);
-    docFile << "The values must lie within the extent of the dataset." << endl;
+    docFile << "The values must lie within the extent of the input dataset."
+            << endl;
     }
   else if (!strcmp("vtkSMFieldDataDomain", className))
     {
@@ -522,6 +529,11 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
   else if (!strcmp("vtkSMProxyGroupDomain", className))
     {
     vtkSMProxyGroupDomain *pgd = vtkSMProxyGroupDomain::SafeDownCast(dom);
+    if (pgd->GetNumberOfGroups() == 1 &&
+        (!strcmp(pgd->GetGroup(0), "implicit_functions")))
+      {
+      return;
+      }
     WriteDomainHeader(headerWritten, docFile);
     docFile << "The dataset must have been the result of the following:";
     for (i = 0; i < pgd->GetNumberOfGroups(); i++)
@@ -729,7 +741,10 @@ void WriteProxies(vtkStringPairList *stringList, vtkStringPairList *labelList,
           int domainHeaderWritten = 0;
           for (; !dIt->IsAtEnd(); dIt->Next())
             {
-            WriteDomain(dIt->GetDomain(), docFile, domainHeaderWritten);
+            if (!dIt->GetDomain()->GetIsOptional())
+              {
+              WriteDomain(dIt->GetDomain(), docFile, domainHeaderWritten);
+              }
             }
           docFile << "<br>" << endl;
           }
