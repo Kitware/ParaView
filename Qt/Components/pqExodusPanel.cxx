@@ -88,7 +88,7 @@ pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
                    this, SIGNAL(displayTypeChanged()));
   
   this->DisplItem = 0;
-  QObject::connect(this, SIGNAL(modified()),
+  QObject::connect(this, SIGNAL(onaccept()),
                    this, SLOT(propertyChanged()));
 
   this->UI->XMLFileName->setServer(this->referenceProxy()->getServer());
