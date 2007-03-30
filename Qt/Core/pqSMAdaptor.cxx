@@ -697,12 +697,21 @@ void pqSMAdaptor::setEnumerationProperty(vtkSMProperty* Property,
     }
   else if(StringListDomain && svp)
     {
-    unsigned int nos = svp->GetNumberOfElements();
-    for (unsigned int i=0; i < nos ; i++)
+    // If repeat command is set, then a value is a list of QVariants
+    // and each QVariant is added to the property.
+    if (svp->GetRepeatCommand())
       {
-      if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
+      pqSMAdaptor::setMultipleElementProperty(svp, Value.toList());
+      }
+    else
+      {
+      unsigned int nos = svp->GetNumberOfElements();
+      for (unsigned int i=0; i < nos ; i++)
         {
-        svp->SetElement(i, Value.toString().toAscii().data());
+        if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
+          {
+          svp->SetElement(i, Value.toString().toAscii().data());
+          }
         }
       }
     }
@@ -787,15 +796,23 @@ void pqSMAdaptor::setUncheckedEnumerationProperty(vtkSMProperty* Property,
     }
   else if(StringListDomain && svp)
     {
-    QString str = Value.toString();
-    unsigned int nos = svp->GetNumberOfElements();
-    for (unsigned int i=0; i < nos ; i++)
+    // If repeat command is set, then a value is a list of QVariants
+    // and each QVariant is added to the property.
+    if (svp->GetRepeatCommand())
       {
-      if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
+      pqSMAdaptor::setUncheckedMultipleElementProperty(svp, Value.toList());
+      }
+    else
+      {
+      unsigned int nos = svp->GetNumberOfElements();
+      for (unsigned int i=0; i < nos ; i++)
         {
-        svp->SetUncheckedElement(i, str.toAscii().data());
-        Property->UpdateDependentDomains();
+        if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
+          {
+          svp->SetUncheckedElement(i, Value.toString().toAscii().data());
+          }
         }
+      Property->UpdateDependentDomains();
       }
     }
   else if (ProxyGroupDomain && pp)

@@ -189,6 +189,9 @@
   </ProxyGroup>
 
   <ProxyGroup name="implicit_functions">
+    <NullProxy name="None">
+    </NullProxy>
+
     <ImplicitPlaneProxy name="Plane" class="vtkPlane">
       <InputProperty
         name="Input"

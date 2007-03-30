@@ -45,37 +45,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include <QSlider>
 #include <QDoubleSpinBox>
-#include "pqDoubleRangeWidget.h"
 
 // VTK includes
 
 // ParaView Server Manager includes
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMStringListDomain.h"
 
 // ParaView includes
 #include "pqApplicationCore.h"
+#include "pqComboBoxDomain.h"
+#include "pqDoubleRangeWidgetDomain.h"
+#include "pqDoubleRangeWidget.h"
+#include "pqDoubleSpinBoxDomain.h"
+#include "pqFieldSelectionAdaptor.h"
+#include "pqFileChooserWidget.h"
 #include "pqListWidgetItemObject.h"
 #include "pqObjectPanel.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
+#include "pqProxySelectionWidget.h"
+#include "pqSelectionTreeWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
+#include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
+#include "pqSliderDomain.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqSMSignalAdaptors.h"
-#include "pqTreeWidgetItemObject.h"
-#include "pqComboBoxDomain.h"
 #include "pqSpinBoxDomain.h"
-#include "pqDoubleSpinBoxDomain.h"
-#include "pqDoubleRangeWidgetDomain.h"
-#include "pqSliderDomain.h"
-#include "pqFileChooserWidget.h"
-#include "pqFieldSelectionAdaptor.h"
-#include "pqProxySelectionWidget.h"
+#include "pqTreeWidgetItemObject.h"
 
 void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
 {
@@ -195,6 +198,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     QCheckBox* checkBox = qobject_cast<QCheckBox*>(object);
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
+    pqSelectionTreeWidget* treeWidget = 
+      qobject_cast<pqSelectionTreeWidget*>(object);
     if(checkBox)
       {
       property_manager->registerLink(
@@ -217,6 +222,17 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       {
       property_manager->registerLink(
         lineEdit, "text", SIGNAL(textChanged(const QString&)),
+        proxy, SMProperty);
+      }
+    else if (treeWidget)
+      {
+      pqSignalAdaptorSelectionTreeWidget* adaptor =
+        new pqSignalAdaptorSelectionTreeWidget(
+          vtkSMStringListDomain::SafeDownCast(
+            SMProperty->GetDomain("array_list")), 
+          treeWidget);
+      property_manager->registerLink(
+        adaptor, "values", SIGNAL(valuesChanged()),
         proxy, SMProperty);
       }
     }

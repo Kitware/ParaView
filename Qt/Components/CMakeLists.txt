@@ -134,6 +134,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSignalAdaptorKeyFrameValue.h
   pqSignalAdaptorKeyFrameTime.h
   pqSignalAdaptorKeyFrameType.h
+  pqSignalAdaptorSelectionTreeWidget.h
   pqSignalAdaptorTreeWidget.h
   pqSimpleServerStartup.h
   pqSliderDomain.h
@@ -459,6 +460,8 @@ ADD_LIBRARY(pqComponents
   pqSignalAdaptorKeyFrameTime.h
   pqSignalAdaptorKeyFrameType.cxx
   pqSignalAdaptorKeyFrameType.h
+  pqSignalAdaptorSelectionTreeWidget.cxx
+  pqSignalAdaptorSelectionTreeWidget.h
   pqSignalAdaptorTreeWidget.cxx
   pqSignalAdaptorTreeWidget.h
   pqSimpleServerStartup.cxx

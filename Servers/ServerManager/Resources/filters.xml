@@ -999,6 +999,7 @@ This filter only operates on unstructured data. It produces polygonal output.
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
+              <Proxy group="implicit_functions" name="None" />
               <Proxy group="implicit_functions" name="Plane" />
               <!--
               <Proxy group="implicit_functions" name="Box" />
@@ -1016,13 +1017,18 @@ This filter only operates on unstructured data. It produces polygonal output.
      <StringVectorProperty 
         name="AddVolumeArrayName"
         command="AddVolumeArrayName" 
+        clean_command="RemoveAllVolumeArrayNames"
         repeat_command="1"
         number_of_elements_per_command="1"
-        number_of_elements="1"
         label="Volume Arrays">
         <Documentation>
           Select the volume fraction arrays for generating parts.
         </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
      </StringVectorProperty> 
 
      <DoubleVectorProperty

@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.89");
+vtkCxxRevisionMacro(vtkSMProxy, "1.90");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -270,7 +270,10 @@ void vtkSMProxy::UnRegisterVTKObjects()
   vtkstd::vector<vtkClientServerID>::iterator it;
   for (it=this->Internals->IDs.begin(); it!=this->Internals->IDs.end(); ++it)
     {
-    pm->DeleteStreamObject(*it, stream);
+    if (it->ID != 0)
+      {
+      pm->DeleteStreamObject(*it, stream);
+      }
     }
   pm->SendStream(this->ConnectionID, this->Servers, stream);
 
