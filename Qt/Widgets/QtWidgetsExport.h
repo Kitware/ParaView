@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _QtWidgetsExport_h
 
 #if defined(WIN32) && defined(PARAVIEW_BUILD_SHARED_LIBS)
-# if defined(ParaViewQtWidgets_EXPORTS)
+# if defined(pqWidgets_EXPORTS)
 #   define QTWIDGETS_EXPORT __declspec(dllexport)
 # else
 #   define QTWIDGETS_EXPORT __declspec(dllimport)
