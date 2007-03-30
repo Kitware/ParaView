@@ -20,6 +20,11 @@
 // Interpretor, a python interpretor to run the script in upon the first 
 // execution. Use SetOutputDataSetType to choose and output data type instead
 // of using the default of using the same type as is on the input.
+// Use InformationScript to set meta-information during RequestInformation().
+// .SECTION Caveat
+// Note that this algorithm sets the output extent translator to be
+// vtkOnePieceExtentTranslator. This means that all processes will ask
+// for the whole extent. This behaviour can be overridden in InformationScript.
 
 #ifndef __vtkPythonProgrammableFilter_h
 #define __vtkPythonProgrammableFilter_h

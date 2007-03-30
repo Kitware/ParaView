@@ -15,19 +15,21 @@
 #include <vtkPython.h> // python first
 
 #include "vtkPythonProgrammableFilter.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVPythonInterpretor.h"
-#include "vtkProcessModule.h"
-#include "vtkPVOptions.h"
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
+
 #include "vtkDataObject.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
+#include "vtkOnePieceExtentTranslator.h"
+#include "vtkPVOptions.h"
+#include "vtkPVPythonInterpretor.h"
+#include "vtkProcessModule.h"
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.11");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.12");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -71,6 +73,19 @@ int vtkPythonProgrammableFilter::RequestInformation(
   vtkInformationVector** , 
   vtkInformationVector*)
 {
+  // Setup ExtentTranslator so that all downstream piece requests are
+  // converted to whole extent update requests, as need by the histogram filter.
+  vtkStreamingDemandDrivenPipeline* sddp = 
+    vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
+  if (strcmp(
+      sddp->GetExtentTranslator(outInfo)->GetClassName(), 
+      "vtkOnePieceExtentTranslator") != 0)
+    {
+    vtkExtentTranslator* et = vtkOnePieceExtentTranslator::New();
+    sddp->SetExtentTranslator(outInfo, et);
+    et->Delete();
+    }
+
   if (this->InformationScript)
     {
     this->Exec(this->InformationScript);
