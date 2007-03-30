@@ -412,151 +412,151 @@ private:
 /// \relates pqChartValue
 /// \brief
 ///   Adds an integer and a chart value object.
-int operator+(int value1, const pqChartValue &value2);
+QTCHART_EXPORT int operator+(int value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Adds a float and a chart value object.
-float operator+(float value1, const pqChartValue &value2);
+QTCHART_EXPORT float operator+(float value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Adds a double and a chart value object.
-double operator+(double value1, const pqChartValue &value2);
+QTCHART_EXPORT double operator+(double value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Subtracts an integer and a chart value object.
-int operator-(int value1, const pqChartValue &value2);
+QTCHART_EXPORT int operator-(int value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Subtracts a float and a chart value object.
-float operator-(float value1, const pqChartValue &value2);
+QTCHART_EXPORT float operator-(float value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Subtracts a double and a chart value object.
-double operator-(double value1, const pqChartValue &value2);
+QTCHART_EXPORT double operator-(double value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Multiplies an integer and a chart value object.
-int operator*(int value1, const pqChartValue &value2);
+QTCHART_EXPORT int operator*(int value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Multiplies a float and a chart value object.
-float operator*(float value1, const pqChartValue &value2);
+QTCHART_EXPORT float operator*(float value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Multiplies a double and a chart value object.
-double operator*(double value1, const pqChartValue &value2);
+QTCHART_EXPORT double operator*(double value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Divides an integer and a chart value object.
-int operator/(int value1, const pqChartValue &value2);
+QTCHART_EXPORT int operator/(int value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Divides a float and a chart value object.
-float operator/(float value1, const pqChartValue &value2);
+QTCHART_EXPORT float operator/(float value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Divides a double and a chart value object.
-double operator/(double value1, const pqChartValue &value2);
+QTCHART_EXPORT double operator/(double value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares an integer and a chart value object.
-bool operator==(int value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator==(int value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a float and a chart value object.
-bool operator==(float value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator==(float value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a double and a chart value object.
-bool operator==(double value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator==(double value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares an integer and a chart value object.
-bool operator!=(int value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator!=(int value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a float and a chart value object.
-bool operator!=(float value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator!=(float value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a double and a chart value object.
-bool operator!=(double value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator!=(double value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares an integer and a chart value object.
-bool operator>(int value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator>(int value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a float and a chart value object.
-bool operator>(float value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator>(float value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a double and a chart value object.
-bool operator>(double value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator>(double value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares an integer and a chart value object.
-bool operator<(int value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator<(int value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a float and a chart value object.
-bool operator<(float value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator<(float value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a double and a chart value object.
-bool operator<(double value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator<(double value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares an integer and a chart value object.
-bool operator>=(int value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator>=(int value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a float and a chart value object.
-bool operator>=(float value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator>=(float value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a double and a chart value object.
-bool operator>=(double value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator>=(double value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares an integer and a chart value object.
-bool operator<=(int value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator<=(int value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a float and a chart value object.
-bool operator<=(float value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator<=(float value1, const pqChartValue &value2);
 
 /// \relates pqChartValue
 /// \brief
 ///   Compares a double and a chart value object.
-bool operator<=(double value1, const pqChartValue &value2);
+QTCHART_EXPORT bool operator<=(double value1, const pqChartValue &value2);
 
 #endif
