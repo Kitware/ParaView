@@ -1029,6 +1029,12 @@ This filter only operates on unstructured data. It produces polygonal output.
              <Property name="Input" function="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
+        <Hints>
+          <!-- This overrides the GUI's default mechanism to
+            not set the default value for this property
+            using the domain when the proxy is created -->
+          <NoDefault />
+        </Hints>
      </StringVectorProperty> 
 
      <DoubleVectorProperty

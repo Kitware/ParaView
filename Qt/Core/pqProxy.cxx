@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
@@ -280,6 +281,12 @@ void pqProxy::setDefaultPropertyValues()
 
     if (!smproperty->GetInformationOnly())
       {
+      vtkPVXMLElement* propHints = iter->GetProperty()->GetHints();
+      if (propHints && propHints->FindNestedElementByName("NoDefault"))
+        {
+        // Don't reset properties that request overriding of default mechanism.
+        continue;
+        }
       iter->GetProperty()->ResetToDefault();
       iter->GetProperty()->UpdateDependentDomains();
       }
@@ -293,6 +300,12 @@ void pqProxy::setDefaultPropertyValues()
 
     if (!smproperty->GetInformationOnly())
       {
+      vtkPVXMLElement* propHints = iter->GetProperty()->GetHints();
+      if (propHints && propHints->FindNestedElementByName("NoDefault"))
+        {
+        // Don't reset properties that request overriding of default mechanism.
+        continue;
+        }
       iter->GetProperty()->ResetToDefault();
       iter->GetProperty()->UpdateDependentDomains();
       }
