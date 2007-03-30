@@ -180,7 +180,6 @@ public:
     RecentFiltersMenu(0),
     SourceMenu(0),
     FilterMenu(0),
-    AlphabeticalMenu(0),
     PipelineMenu(0),
     PipelineBrowser(0),
     VariableToolbar(0),
@@ -545,29 +544,29 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   this->Implementation->Lookmarks = new pqLookmarkBrowserModel(
     this->Implementation->LookmarkManagerModel,parent_widget);
   QObject::connect(this->Implementation->LookmarkManagerModel,
-                   SIGNAL(lookmarkAdded(pqLookmarkModel*)),
-                   this->Implementation->Lookmarks,
-                   SLOT(addLookmark(pqLookmarkModel*)));
+      SIGNAL(lookmarkAdded(pqLookmarkModel*)),
+      this->Implementation->Lookmarks,
+      SLOT(addLookmark(pqLookmarkModel*)));
   QObject::connect(this->Implementation->LookmarkManagerModel,
-                   SIGNAL(lookmarkRemoved(const QString&)),
-                   this->Implementation->Lookmarks,
-                   SLOT(removeLookmark(const QString&)));
+      SIGNAL(lookmarkRemoved(const QString&)),
+      this->Implementation->Lookmarks,
+      SLOT(removeLookmark(const QString&)));
   QObject::connect(this->Implementation->LookmarkManagerModel,
-                   SIGNAL(lookmarkModified(pqLookmarkModel*)),
-                   this->Implementation->Lookmarks,
-                   SLOT(onLookmarkModified(pqLookmarkModel*)));
+      SIGNAL(lookmarkModified(pqLookmarkModel*)),
+      this->Implementation->Lookmarks,
+      SLOT(onLookmarkModified(pqLookmarkModel*)));
   QObject::connect(this->Implementation->Lookmarks,
-                   SIGNAL(lookmarkRemoved(const QString&)),
-                   this->Implementation->LookmarkManagerModel,
-                   SLOT(removeLookmark(const QString&)));
+      SIGNAL(lookmarkRemoved(const QString&)),
+      this->Implementation->LookmarkManagerModel,
+      SLOT(removeLookmark(const QString&)));
   QObject::connect(this->Implementation->Lookmarks,
-                   SIGNAL(importLookmarks(const QStringList&)),
-                   this->Implementation->LookmarkManagerModel,
-                   SLOT(importLookmarksFromFiles(const QStringList&)));
+      SIGNAL(importLookmarks(const QStringList&)),
+      this->Implementation->LookmarkManagerModel,
+      SLOT(importLookmarksFromFiles(const QStringList&)));
   QObject::connect(this->Implementation->Lookmarks,
-                   SIGNAL(exportLookmarks(const QList<pqLookmarkModel*>&,const QStringList&)),
-                   this->Implementation->LookmarkManagerModel,
-                   SLOT(exportLookmarksToFiles(const QList<pqLookmarkModel*>&,const QStringList&)));
+      SIGNAL(exportLookmarks(const QList<pqLookmarkModel*>&,const QStringList&)),
+      this->Implementation->LookmarkManagerModel,
+      SLOT(exportLookmarksToFiles(const QList<pqLookmarkModel*>&,const QStringList&)));
 
   // Listen to selection changed events.
   // These are queued connections, since while changes are happening the SM
@@ -915,15 +914,9 @@ void pqMainWindowCore::refreshFiltersMenu()
 
     // Finally add all filters to the Alphabetical sub-menu..
 
-    // Only create this menu once:
-    if(!this->Implementation->AlphabeticalMenu)
-      {
-      this->Implementation->AlphabeticalMenu = 
-        this->Implementation->FilterMenu->addMenu("&Alphabetical") 
-        << pqSetName("Alphabetical");
-      }
-  
-    this->Implementation->AlphabeticalMenu->clear();
+    this->Implementation->AlphabeticalMenu = 
+      this->Implementation->FilterMenu->addMenu("&Alphabetical") 
+      << pqSetName("Alphabetical");
 
     pqImplementation::ProxyVector::iterator filterIter =
       this->Implementation->AlphabeticalFilters.begin();
@@ -943,17 +936,22 @@ void pqMainWindowCore::refreshFiltersMenu()
     // Add custom filters to alphabetical filter menu
     if(this->Implementation->CustomFilters->rowCount()!=0)
       {
-      QList<QAction*> menuActions = this->Implementation->AlphabeticalMenu->actions();
+      QList<QAction*> menuActions = 
+        this->Implementation->AlphabeticalMenu->actions();
 
       for(int i=0; i<this->Implementation->CustomFilters->rowCount(); i++)
         {
-        QString filterName = this->Implementation->CustomFilters->getCustomFilterName(this->Implementation->CustomFilters->index(i,0));
-        // Check to see if the filter by this name is a custom filter or not and add to menu accordingly
+        QString filterName = 
+          this->Implementation->CustomFilters->getCustomFilterName(
+              this->Implementation->CustomFilters->index(i,0));
+        // Check to see if the filter by this name is a custom filter or not
+        //     and add to menu accordingly
         // Custom filters cannot have the same name as an existing filter. 
-        // If there is for some reason a filter and a custom filter of the same name,
-        // revert to the regular filter.
+        // If there is for some reason a filter and a custom filter of the 
+        // same name revert to the regular filter.
         vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
-        if(manager->GetCompoundProxyDefinition(filterName.toAscii().data()) && !manager->GetProxy("filters_prototypes",filterName.toAscii().data()))
+        if(manager->GetCompoundProxyDefinition(filterName.toAscii().data()) &&
+          !manager->GetProxy("filters_prototypes",filterName.toAscii().data()))
           {
           // Find where we should insert the action
           int j=0;
@@ -961,7 +959,9 @@ void pqMainWindowCore::refreshFiltersMenu()
             {
             // Compare name with the filter proxy labels if possible
             QAction *currentFilter = menuActions[j++];
-            vtkSMProxy *proxy = manager->GetProxy("filters_prototypes",currentFilter->data().toString().toAscii().data()); //this->Implementation->AlphabeticalFilters[j];
+            vtkSMProxy *proxy = 
+                manager->GetProxy("filters_prototypes",
+                  currentFilter->data().toString().toAscii().data()); 
             QString actionName = proxy->GetXMLLabel();
             if(actionName.isNull())
               {
@@ -973,9 +973,12 @@ void pqMainWindowCore::refreshFiltersMenu()
               }
             }
           // FInally, insert the action in the menu
-          QAction* action = new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"),filterName,this->Implementation->AlphabeticalMenu)
-             << pqSetName(filterName) << pqSetData(filterName);
-          this->Implementation->AlphabeticalMenu->insertAction(menuActions[j-1], action);
+          QAction* action = 
+              new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"),filterName,
+                  this->Implementation->AlphabeticalMenu)
+              << pqSetName(filterName) << pqSetData(filterName);
+          this->Implementation->AlphabeticalMenu->insertAction(
+              menuActions[j-1], action);
           }
         }
       }
