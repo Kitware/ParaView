@@ -144,10 +144,10 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->Presets->restoreSettings();
 
 #if USE_VTK_TFE
-  vtkRenderWindow *window = this->Form->ColorScale->GetRenderWindow();
+  vtkRenderWindow *win = this->Form->ColorScale->GetRenderWindow();
   vtkRenderWindowInteractor *iren = this->Form->ColorScale->GetInteractor();
   this->Viewer->SetInteractor(iren);
-  this->Viewer->SetRenderWindow(window);
+  this->Viewer->SetRenderWindow(win);
   this->Viewer->SetTransferFunctionEditorType(vtkTransferFunctionViewer::SIMPLE_1D);
   this->Viewer->SetModificationTypeToColor();
   this->Viewer->SetWholeScalarRange(0.0, 1.0);
@@ -299,7 +299,6 @@ void pqColorScaleEditor::setDisplay(pqPipelineDisplay *display)
     }
 
   this->setLegend(0);
-  vtkSMProperty *prop = 0;
   if(this->Display)
     {
     this->disconnect(this->Display, 0, this, 0);
