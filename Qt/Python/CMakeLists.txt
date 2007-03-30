@@ -40,7 +40,7 @@ ADD_LIBRARY(QtPython
 
 TARGET_LINK_LIBRARIES(QtPython
   pqCore
-  ParaViewQtWidgets
+  pqWidgets
   ${QT_LIBRARIES}
   ${PYTHON_LIBRARIES}
   vtkPVPythonInterpretor

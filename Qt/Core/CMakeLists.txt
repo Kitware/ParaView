@@ -312,7 +312,7 @@ ENDIF(WIN32)
 TARGET_LINK_LIBRARIES(pqCore
   QtChart
   QtTesting
-  ParaViewQtWidgets
+  pqWidgets
   QVTK
   ${tmp_ui_lib}
   vtkPVServerManager

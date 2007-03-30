@@ -514,7 +514,7 @@ TARGET_LINK_LIBRARIES(pqComponents
   pqCore
   QtChart
   QtTesting
-  ParaViewQtWidgets
+  pqWidgets
   QVTK
   vtkPVServerManager
   ${PYTHON_LINK_LIBRARIES}

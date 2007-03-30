@@ -51,7 +51,7 @@ TARGET_LINK_LIBRARIES(csClient
   pqCore
   QtChart
   QtTesting
-  ParaViewQtWidgets
+  pqWidgets
   ${QT_XML_LIBRARIES}
 )
 

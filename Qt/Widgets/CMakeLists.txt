@@ -130,15 +130,15 @@ SET(QT_WIDGETS_ALL_SRCS ${QtWidgets_SRCS} ${QtWidgets_MOC_SOURCES}
   ${RCS_SOURCES} ${QtWidgets_UI_BUILT_SOURCES})
 
 ##########################################################################
-ADD_LIBRARY(ParaViewQtWidgets ${QT_WIDGETS_ALL_SRCS})
+ADD_LIBRARY(pqWidgets ${QT_WIDGETS_ALL_SRCS})
 
 
 ## Widgets does not depend on VTK/ParaView. Only Qt.
-TARGET_LINK_LIBRARIES(ParaViewQtWidgets
+TARGET_LINK_LIBRARIES(pqWidgets
   ${QT_LIBRARIES}
 )
 
-INSTALL(TARGETS ParaViewQtWidgets
+INSTALL(TARGETS pqWidgets
   RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
   LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
   ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)

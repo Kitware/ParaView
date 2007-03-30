@@ -35,7 +35,7 @@ Source: {#QtInstallDir}\bin\QtGui4.dll; DestDir: {app}
 Source: {#QtInstallDir}\bin\QtCore4.dll; DestDir: {app}
 Source: {#ParaViewBuildDir}\bin\release\QtPython.dll; DestDir: {app}
 Source: {#ParaViewBuildDir}\bin\release\QtTesting.dll; DestDir: {app}
-Source: {#ParaViewBuildDir}\bin\release\QtWidgets.dll; DestDir: {app}
+Source: {#ParaViewBuildDir}\bin\release\pqWidgets.dll; DestDir: {app}
 Source: {#ParaViewBuildDir}\bin\release\QVTK.dll; DestDir: {app}
 Source: {#ParaViewBuildDir}\bin\release\pqWidgets.dll; DestDir: {app}
 Source: {#ParaViewBuildDir}\bin\release\pqPython.dll; DestDir: {app}
