@@ -15,6 +15,8 @@
 
   <Category name="DataAnalysis" menu_label="&amp;Data Analysis">
     <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
+    <Filter name="ExtractPointSelection" />
+    <Filter name="ExtractCellSelection" />
     <Filter name="ExtractHistogram" />
     <Filter name="ExtractOverTime" />
     <Filter name="Probe" />
