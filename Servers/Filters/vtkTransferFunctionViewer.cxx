@@ -32,7 +32,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.19");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.20");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -740,6 +740,24 @@ void vtkTransferFunctionViewer::SetColorSpace(int space)
   if (this->EditorWidget)
     {
     this->EditorWidget->SetColorSpace(space);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetCurrentElementId(unsigned int idx)
+{
+  if (this->EditorWidget)
+    {
+    vtkTransferFunctionEditorRepresentation *rep =
+      vtkTransferFunctionEditorRepresentation::SafeDownCast(
+        this->EditorWidget->GetRepresentation());
+    if (rep)
+      {
+      if (idx < rep->GetNumberOfHandles())
+        {
+        rep->SetActiveHandle(idx);
+        }
+      }
     }
 }
 

@@ -244,7 +244,8 @@ public:
   double GetElementScalar(unsigned int idx);
 
   // Description:
-  // Return the current element Id.
+  // Set/get the current element Id.
+  void SetCurrentElementId(unsigned int idx);
   unsigned int GetCurrentElementId();
 
   // Description:
