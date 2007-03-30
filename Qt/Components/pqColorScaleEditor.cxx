@@ -492,7 +492,7 @@ void pqColorScaleEditor::handlePointsChanged()
   if(!this->Form->InSetColors)
     {
     // Save the current point index to use after the change.
-    //int index = this->Form->CurrentIndex;
+    int index = this->Form->CurrentIndex;
     this->Form->CurrentIndex = -1;
 
     // Load the new points.
@@ -511,7 +511,8 @@ void pqColorScaleEditor::handlePointsChanged()
     this->Form->IgnoreEditor = false;
 
 #if USE_VTK_TFE
-    // TODO: Set the current point on the editor.
+    // Set the current point on the editor.
+    this->Viewer->SetCurrentElementId(index);
     this->handleEditorCurrentChanged();
 #else
     // TODO
@@ -666,7 +667,8 @@ void pqColorScaleEditor::setOpacityFromText()
 #if USE_VTK_TFE
   this->Viewer->SetElementOpacity(this->Form->CurrentIndex, opacity);
 #else
-  // TODO
+  pqColorMapModel *model = this->Form->Gradient->getModel();
+  model->setPointOpacity(this->Form->CurrentIndex, pqChartValue(opacity));
 #endif
   this->Form->IgnoreEditor = false;
 
@@ -1385,8 +1387,17 @@ void pqColorScaleEditor::updatePointValues()
     model->getPointValue(this->Form->CurrentIndex, value);
     this->Form->ScalarValue->setText(
         QString::number(value.getDoubleValue(), 'g', 6));
-    // TODO: if(this->Form->HasOpacity)
-    this->Form->Opacity->setText("");
+    if(this->Form->HasOpacity)
+      {
+      pqChartValue opacity;
+      model->getPointOpacity(this->Form->CurrentIndex, opacity);
+      this->Form->Opacity->setText(
+          QString::number(opacity.getDoubleValue(), 'g', 6));
+      }
+    else
+      {
+      this->Form->Opacity->setText("");
+      }
 #endif
     }
 }
