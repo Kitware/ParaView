@@ -231,6 +231,7 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
           vtkSMStringListDomain::SafeDownCast(
             SMProperty->GetDomain("array_list")), 
           treeWidget);
+      adaptor->setObjectName("TreeWidgetAdaptor");
       property_manager->registerLink(
         adaptor, "values", SIGNAL(valuesChanged()),
         proxy, SMProperty);
@@ -604,6 +605,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
     QCheckBox* checkBox = qobject_cast<QCheckBox*>(object);
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
+    pqSelectionTreeWidget* treeWidget = 
+      qobject_cast<pqSelectionTreeWidget*>(object);
     if(checkBox)
       {
       property_manager->unregisterLink(
@@ -634,6 +637,18 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
       property_manager->unregisterLink(
         lineEdit, "text", SIGNAL(textChanged(const QString&)),
         proxy, SMProperty);
+      }
+    else if (treeWidget)
+      {
+      pqSignalAdaptorSelectionTreeWidget* adaptor = 
+        comboBox->findChild<pqSignalAdaptorSelectionTreeWidget*>("TreeWidgetAdaptor");
+      if (adaptor)
+        {
+        property_manager->unregisterLink(
+          adaptor, "values", SIGNAL(valuesChanged()),
+          proxy, SMProperty);
+        delete adaptor;
+        }
       }
     }
   else if(pt == pqSMAdaptor::SELECTION)

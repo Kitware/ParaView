@@ -613,13 +613,22 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property)
     }
   else if(StringListDomain && svp)
     {
-    unsigned int nos = svp->GetNumberOfElements();
-    for (unsigned int i=0; i < nos ; i++)
+    // If repeat command is set, then a value is a list of QVariants
+    // and each QVariant is added to the property.
+    if (svp->GetRepeatCommand())
       {
-      if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
+      var = pqSMAdaptor::getMultipleElementProperty(svp);
+      }
+    else
+      {
+      unsigned int nos = svp->GetNumberOfElements();
+      for (unsigned int i=0; i < nos ; i++)
         {
-        var = svp->GetElement(i);
-        break;
+        if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
+          {
+          var = svp->GetElement(i);
+          break;
+          }
         }
       }
     }
