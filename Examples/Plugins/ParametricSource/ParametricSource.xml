@@ -1,7 +1,16 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="parametric_functions">
     <Proxy name="ParametricBoy" class="vtkParametricBoy"/>
-    <Proxy name="ParametricConicSpiral" class="vtkParametricConicSpiral"/>
+    <Proxy name="ParametricConicSpiral" class="vtkParametricConicSpiral">
+      <DoubleVectorProperty name="TubeRadius" command="SetA"
+         number_of_elements="1" default_values="0.2"/>
+      <DoubleVectorProperty name="Height" command="SetB"
+         number_of_elements="1" default_values="1"/>
+      <DoubleVectorProperty name="Radius" command="SetC"
+         number_of_elements="1" default_values="0.1"/>
+      <DoubleVectorProperty name="NumberOfWindings" command="SetN"
+         number_of_elements="1" default_values="2"/>
+    </Proxy>
     <Proxy name="ParametricEllipsoid" class="vtkParametricEllipsoid"/>
   </ProxyGroup>
 
