@@ -31,12 +31,12 @@ SET(CONNECT_TO_RS_DS_SCRIPT
   ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectCRSDS.xml)
 
 
-SET (PARAVIEW_CLIENT paraview_alpha)
+SET (PARAVIEW_CLIENT paraview)
 SET (PARAVIEW_DATA_SERVER pvdataserver)
 SET (PARAVIEW_SERVER pvserver)
 SET (PARAVIEW_RENDER_SERVER pvrenderserver)
 IF (APPLE)
-  SET (PARAVIEW_CLIENT paraview_alpha.app/Contents/MacOS/paraview_alpha)
+  SET (PARAVIEW_CLIENT paraview.app/Contents/MacOS/paraview)
 ENDIF (APPLE)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/pvTestDriverConfig.h.in
@@ -44,5 +44,5 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/pvTestDriverConfig.h.in
   ESCAPE_QUOTES)
 
 ADD_EXECUTABLE(pvTestDriver${PV_EXE_SUFFIX} pvTestDriver.cxx)
-ADD_DEPENDENCIES(pvTestDriver${PV_EXE_SUFFIX} paraview_alpha${PV_EXE_SUFFIX})
+ADD_DEPENDENCIES(pvTestDriver${PV_EXE_SUFFIX} paraview${PV_EXE_SUFFIX})
 TARGET_LINK_LIBRARIES(pvTestDriver${PV_EXE_SUFFIX} vtksys)

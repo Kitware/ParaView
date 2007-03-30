@@ -24,10 +24,10 @@ ELSE(NOT ParaView_BINARY_DIR)
   SET(PARAVIEW_TEST_COMMAND)
   IF(BUILD_TESTING)
     IF(APPLE)
-      SET(PARAVIEW_TEST_COMMAND ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha.app/Contents/MacOS/paraview_alpha 
+      SET(PARAVIEW_TEST_COMMAND ${EXECUTABLE_OUTPUT_PATH}/paraview.app/Contents/MacOS/paraview 
                       --test-directory=${PARAVIEW_TEST_DIR})
     ELSE(APPLE)
-      SET(PARAVIEW_TEST_COMMAND ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+      SET(PARAVIEW_TEST_COMMAND ${EXECUTABLE_OUTPUT_PATH}/paraview --test-directory=${PARAVIEW_TEST_DIR})
     ENDIF(APPLE)
   ENDIF(BUILD_TESTING)
 

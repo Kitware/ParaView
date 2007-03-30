@@ -74,7 +74,7 @@ IF(APPLE)
 ENDIF(APPLE)
 
 # Add main server executables.
-SET(PV_EXE_LIST paraview_alpha)
+SET(PV_EXE_LIST paraview)
 # Add Qt assistant to the list of shared lib. forwarded executables.
 # If this is enabled, the build system will create an executable
 # call assistant. This executable will set the appropriate ld library
@@ -82,7 +82,7 @@ SET(PV_EXE_LIST paraview_alpha)
 # to install assistant-real
 #SET(PV_EXE_LIST ${PV_EXE_LIST} assistant)
 
-ADD_EXECUTABLE(paraview_alpha${PV_EXE_SUFFIX} WIN32 MACOSX_BUNDLE
+ADD_EXECUTABLE(paraview${PV_EXE_SUFFIX} WIN32 MACOSX_BUNDLE
   AboutDialog.cxx
   AboutDialog.h
   MainWindow.cxx
@@ -97,7 +97,7 @@ ADD_EXECUTABLE(paraview_alpha${PV_EXE_SUFFIX} WIN32 MACOSX_BUNDLE
   ${apple_bundle_sources}
 )
 
-TARGET_LINK_LIBRARIES(paraview_alpha${PV_EXE_SUFFIX}
+TARGET_LINK_LIBRARIES(paraview${PV_EXE_SUFFIX}
   pqComponents
   pqCore
   ParaViewQtWidgets
@@ -114,13 +114,13 @@ IF(APPLE)
     "${CMAKE_CURRENT_BINARY_DIR}/CreateBundle.sh"
     @ONLY IMMEDIATE)
 #  ADD_CUSTOM_COMMAND(
-#    TARGET paraview_alpha${PV_EXE_SUFFIX}
+#    TARGET paraview${PV_EXE_SUFFIX}
 #    POST_BUILD
 #    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/CompleteBundle.cmake")
 ENDIF(APPLE)
 
 IF(WIN32)
-  TARGET_LINK_LIBRARIES(paraview_alpha${PV_EXE_SUFFIX}
+  TARGET_LINK_LIBRARIES(paraview${PV_EXE_SUFFIX}
     optimized qtmain debug qtmaind
   )
 ENDIF(WIN32)
@@ -137,9 +137,9 @@ CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqClientDocFinder.txt.in"
   
 IF(BUILD_TESTING)
   IF(APPLE)
-    SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha.app/Contents/MacOS/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+    SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview.app/Contents/MacOS/paraview --test-directory=${PARAVIEW_TEST_DIR})
   ELSE(APPLE)
-    SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+    SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview --test-directory=${PARAVIEW_TEST_DIR})
   ENDIF(APPLE)
 
   SET(TEST_XML ${pqClient_SOURCE_DIR}/Testing/XML)
@@ -215,14 +215,14 @@ IF(BUILD_TESTING)
   IF(BUILD_SHARED_LIBS AND BUILD_EXAMPLES)
     SET(DOLLAR "$")
     IF(CMAKE_CONFIGURATION_TYPES)
-      SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/${DOLLAR}{CTEST_CONFIGURATION_TYPE}/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+      SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/${DOLLAR}{CTEST_CONFIGURATION_TYPE}/paraview --test-directory=${PARAVIEW_TEST_DIR})
       SET(RUN_PATH ${EXECUTABLE_OUTPUT_PATH}/${DOLLAR}{CTEST_CONFIGURATION_TYPE})
     ELSE(CMAKE_CONFIGURATION_TYPES)
       SET(RUN_PATH ${EXECUTABLE_OUTPUT_PATH})
       IF(APPLE)
-        SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha.app/Contents/MacOS/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+        SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview.app/Contents/MacOS/paraview --test-directory=${PARAVIEW_TEST_DIR})
       ELSE(APPLE)
-        SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha --test-directory=${PARAVIEW_TEST_DIR})
+        SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview --test-directory=${PARAVIEW_TEST_DIR})
       ENDIF(APPLE)
     ENDIF(CMAKE_CONFIGURATION_TYPES)
   
@@ -326,7 +326,7 @@ IF(PV_NEED_SHARED_FORWARD)
   ENDFOREACH(pvexe)
 ENDIF(PV_NEED_SHARED_FORWARD)
 
-INSTALL(TARGETS paraview_alpha${PV_EXE_SUFFIX}
+INSTALL(TARGETS paraview${PV_EXE_SUFFIX}
   DESTINATION ${PV_EXE_INSTALL_CM24}
   COMPONENT Runtime)
 
