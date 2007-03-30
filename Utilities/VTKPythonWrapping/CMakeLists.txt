@@ -660,9 +660,8 @@ IF (PARAVIEW_ENABLE_PYTHON)
   SET(PV_PYTHON_FILES
     __init__
     numeric
+    util
     )
-
-
 
   # Now copy these files if necessary.
   SET(PV_PYTHON_SOURCE_FILES)
