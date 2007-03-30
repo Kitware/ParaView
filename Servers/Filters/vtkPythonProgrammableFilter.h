@@ -35,16 +35,18 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPythonProgrammableFilter *New();
 
-  //Description: Set the text of the python script to execute.
+  // Description: 
+  // Set the text of the python script to execute.
   void SetScript(const char *script);
 
-  //Description: 
-  //For internal use only.
-  static void ExecuteScript(void *);
+  // Description: 
+  // Set the text of the python script to execute in RequestInformation().
+  vtkSetStringMacro(InformationScript)
+  vtkGetStringMacro(InformationScript)
 
-  //Description:
-  //For internal use only.
-  void Exec();
+  // Description: 
+  // For internal use only.
+  static void ExecuteScript(void *);
 
   // Description:
   // Changes the output data set type.
@@ -52,15 +54,20 @@ public:
   vtkSetMacro(OutputDataSetType, int);
   vtkGetMacro(OutputDataSetType, int);
 
-  //Description:
-  //This is overridden to break a cyclic reference between "this" and 
-  //this->Interpretor which has a self that points to "this". Without 
-  //this, "this" will never be deleted.
+  // Description:
+  // This is overridden to break a cyclic reference between "this" and 
+  // this->Interpretor which has a self that points to "this". Without 
+  // this, "this" will never be deleted.
   virtual void UnRegister(vtkObjectBase *o);
 
 protected:
   vtkPythonProgrammableFilter();
   ~vtkPythonProgrammableFilter();
+
+  // Description:
+  // For internal use only.
+  void Exec();
+  void Exec(const char*);
 
   //overridden to allow multiple inputs to port 0
   virtual int FillInputPortInformation(int port, vtkInformation *info);
@@ -71,7 +78,12 @@ protected:
                                 vtkInformationVector** inputVector, 
                                 vtkInformationVector* outputVector);
 
+  virtual int RequestInformation(vtkInformation* request, 
+                                 vtkInformationVector** inputVector, 
+                                 vtkInformationVector* outputVector);
+
   char *Script;
+  char *InformationScript;
   vtkPVPythonInterpretor* Interpretor;
   int OutputDataSetType;
 

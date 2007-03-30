@@ -27,13 +27,14 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.10");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.11");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
 vtkPythonProgrammableFilter::vtkPythonProgrammableFilter()
 {
   this->Script = NULL;
+  this->InformationScript = NULL;
   this->Interpretor = NULL;
   this->OutputDataSetType = VTK_DATA_SET;
 }
@@ -56,11 +57,25 @@ vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
     {
     delete[] this->Script;
     }
+  this->SetInformationScript(NULL);
 
   if (this->Interpretor != NULL)
     {
     this->Interpretor->Delete();
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkPythonProgrammableFilter::RequestInformation(
+  vtkInformation*, 
+  vtkInformationVector** , 
+  vtkInformationVector*)
+{
+  if (this->InformationScript)
+    {
+    this->Exec(this->InformationScript);
+    }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -137,13 +152,8 @@ void vtkPythonProgrammableFilter::ExecuteScript(void *arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonProgrammableFilter::Exec()
+void vtkPythonProgrammableFilter::Exec(const char* script)
 {
-  if (this->Script == NULL)
-    {
-    return;
-    }
-
   if (this->Interpretor == NULL)
     {
     this->Interpretor = vtkPVPythonInterpretor::New();
@@ -169,7 +179,17 @@ void vtkPythonProgrammableFilter::Exec()
     }
   
   this->Interpretor->MakeCurrent();
-  this->Interpretor->RunSimpleString(this->Script);
+  this->Interpretor->RunSimpleString(script);
+}
+
+//----------------------------------------------------------------------------
+void vtkPythonProgrammableFilter::Exec()
+{
+  if (this->Script == NULL)
+    {
+    return;
+    }
+  this->Exec(this->Script);
 }
 
 

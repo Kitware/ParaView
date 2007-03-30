@@ -65,6 +65,19 @@ Interpretor, a python interpretor to run the script in upon the first
        </Hints>
      </StringVectorProperty>
 
+     <StringVectorProperty 
+        name="InformationScript" 
+        command="SetInformationScript"
+        label="Script (RequestInformation)"
+        number_of_elements="1">
+       <Hints>
+         <Widget type="multi_line"/>
+       </Hints>
+       <Documentation>
+         This python script is executed during the RequestInformation pipeline pass. Use this to provide information such as WHOLE_EXTENT to the pipeline downstream.
+       </Documentation>
+     </StringVectorProperty>
+
     <!-- End PythonScript -->
     </SourceProxy>
 
