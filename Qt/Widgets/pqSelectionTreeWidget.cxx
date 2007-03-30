@@ -142,7 +142,6 @@ void pqSelectionTreeWidget::dataChanged(const QModelIndex& topLeft,
 
 void pqSelectionTreeWidget::updateCheckState()
 {
-  Qt::CheckState oldState = this->checkState();
   Qt::CheckState newState = Qt::Checked;
   int numChecked = 0;
   QAbstractItemModel* m = this->model();
