@@ -78,6 +78,13 @@ public:
   // Add a new required property to this domain.
   void AddRequiredProperty(vtkSMProperty *prop, const char *function);
 
+  // Description:
+  // When the IsOptional flag is set, IsInDomain() always returns true.
+  // This is used by properties that use domains to provide information
+  // (a suggestion to the gui for example) as opposed to restrict their
+  // values.
+  vtkGetMacro(IsOptional, int);
+
 protected:
   vtkSMDomain();
   ~vtkSMDomain();
@@ -114,7 +121,6 @@ protected:
   // (a suggestion to the gui for example) as opposed to restrict their
   // values.
   vtkSetMacro(IsOptional, int);
-  vtkGetMacro(IsOptional, int);
   int IsOptional;
 
   char* XMLName;
