@@ -294,9 +294,9 @@ public:
   pqPendingDisplayManager PendingDisplayManager;
   QPointer<pqUndoStack> UndoStack;
  
-  QMenu* RecentFiltersMenu; 
-  QMenu* SourceMenu;
-  QMenu* FilterMenu;
+  QPointer<QMenu> RecentFiltersMenu; 
+  QPointer<QMenu> SourceMenu;
+  QPointer<QMenu> FilterMenu;
   QPointer<QMenu> AlphabeticalMenu;
   QList<QString> RecentFilterList;
 
@@ -876,6 +876,17 @@ void pqMainWindowCore::refreshFiltersMenu()
   if(this->Implementation->FilterMenu)
     {
     this->Implementation->FilterMenu->clear();
+    // Clearing a menu does not destroy it's submenus,
+    // consequently we end up adding mutliple submenus with same objectname
+    // (altough only 1 may show up in the menu). Hence we delete all
+    // submenus belonging to this menu.
+    QList<QMenu*> subMenus = this->Implementation->FilterMenu->findChildren<QMenu*>();
+    foreach (QMenu* subMenu, subMenus)
+      {
+      delete subMenu;
+      }
+    subMenus.clear(); // So that we don't accidently access these dangling pointers.
+
 
     // First add the recently used filters to the Recent menu
     this->Implementation->RecentFiltersMenu = 
@@ -912,16 +923,9 @@ void pqMainWindowCore::refreshFiltersMenu()
       }
 
     // Finally add all filters to the Alphabetical sub-menu..
-    if (this->Implementation->AlphabeticalMenu)
-      {
-      this->Implementation->AlphabeticalMenu->clear();
-      }
-    else
-      {
-      this->Implementation->AlphabeticalMenu = 
-        this->Implementation->FilterMenu->addMenu("&Alphabetical") 
-        << pqSetName("Alphabetical");
-      }
+    this->Implementation->AlphabeticalMenu = 
+      this->Implementation->FilterMenu->addMenu("&Alphabetical") 
+      << pqSetName("Alphabetical");
 
     pqImplementation::ProxyVector::iterator filterIter =
       this->Implementation->AlphabeticalFilters.begin();
