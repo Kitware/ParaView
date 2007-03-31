@@ -268,8 +268,6 @@ void pqTimeKeeper::propertyModified(pqPipelineSource* source)
         {
         pqInternals::insertValue(this->Internals->Timesteps,
                                  vtime.toDouble(), source);
-        double t = vtime.toDouble();
-        cout << *((long*) &(t)) << endl;
         }
       // The following may result in multiple entries in the Timeranges map for
       // sources with both TimestepValues and TimeRanges properties, but that is
