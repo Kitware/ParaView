@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMEnumerationDomain.h"
 #include "vtkSMStringListDomain.h"
 
 #include <QTreeWidget>
@@ -46,7 +47,8 @@ class pqSignalAdaptorSelectionTreeWidget::pqInternal
 {
 public:
   QPointer<QTreeWidget> TreeWidget;
-  vtkSmartPointer<vtkSMStringListDomain> Domain;
+  vtkSmartPointer<vtkSMStringListDomain> StringListDomain;
+  vtkSmartPointer<vtkSMEnumerationDomain> EnumerationDomain;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 };
 
@@ -55,16 +57,30 @@ pqSignalAdaptorSelectionTreeWidget::pqSignalAdaptorSelectionTreeWidget(
   vtkSMStringListDomain* domain, QTreeWidget* treeWidget) :QObject(treeWidget)
 {
   this->Internal = new pqInternal();
-  this->Internal->Domain = domain;
+  this->Internal->StringListDomain = domain;
   this->Internal->TreeWidget = treeWidget;
   this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->Internal->VTKConnect->Connect(
     domain, vtkCommand::DomainModifiedEvent,
     this, SLOT(domainChanged()), 0, 0, Qt::QueuedConnection);
+
   this->domainChanged();
 }
 
+//-----------------------------------------------------------------------------
+pqSignalAdaptorSelectionTreeWidget::pqSignalAdaptorSelectionTreeWidget(
+  vtkSMEnumerationDomain* domain, QTreeWidget* treeWidget) :QObject(treeWidget)
+{
+  this->Internal = new pqInternal();
+  this->Internal->EnumerationDomain = domain;
+  this->Internal->TreeWidget = treeWidget;
+  this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Internal->VTKConnect->Connect(
+    domain, vtkCommand::DomainModifiedEvent,
+    this, SLOT(domainChanged()), 0, 0, Qt::QueuedConnection);
 
+  this->domainChanged();
+}
 //-----------------------------------------------------------------------------
 pqSignalAdaptorSelectionTreeWidget::~pqSignalAdaptorSelectionTreeWidget()
 {
@@ -114,11 +130,24 @@ void pqSignalAdaptorSelectionTreeWidget::domainChanged()
 {
   bool changed = false;
   QList<QString> domainValues;
-  vtkSMStringListDomain* domain = this->Internal->Domain;
-  int numEntries = domain->GetNumberOfStrings();
-  for(int i=0; i<numEntries; i++)
+
+  if (this->Internal->StringListDomain)
     {
-    domainValues.append(domain->GetString(i));
+    vtkSMStringListDomain* domain = this->Internal->StringListDomain;
+    unsigned int numEntries = domain->GetNumberOfStrings();
+    for(unsigned int i=0; i<numEntries; i++)
+      {
+      domainValues.append(domain->GetString(i));
+      }
+    }
+  else if (this->Internal->EnumerationDomain)
+    {
+    vtkSMEnumerationDomain* domain = this->Internal->EnumerationDomain;
+    unsigned int numEntries = domain->GetNumberOfEntries();
+    for(unsigned int i=0; i<numEntries; i++)
+      {
+      domainValues.append(domain->GetEntryText(i));
+      }
     }
 
   // Now update the tree widget. We hide any elements no longer in the domain.

@@ -601,13 +601,37 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property)
     }
   else if(EnumerationDomain && ivp && ivp->GetNumberOfElements() > 0)
     {
-    int val = ivp->GetElement(0);
-    for (unsigned int i=0; i<EnumerationDomain->GetNumberOfEntries(); i++)
+    // Some vtkSMIntVectorProperty with enumeration domains
+    // may have repeat_command="1". In which case the value
+    // is expected to be a list of values.
+    if (ivp->GetRepeatCommand())
       {
-      if (EnumerationDomain->GetEntryValue(i) == val)
+       QList<QVariant> list = pqSMAdaptor::getMultipleElementProperty(ivp);
+       QList<QVariant> values;
+       foreach (QVariant value, list)
+         {
+         int val = value.toInt();
+         for (unsigned int i=0; i<EnumerationDomain->GetNumberOfEntries(); i++)
+           {
+           if (EnumerationDomain->GetEntryValue(i) == val)
+             {
+             values.push_back(EnumerationDomain->GetEntryText(i));
+             break;
+             }
+           }
+         }
+       var = values;
+      }
+    else
+      {
+      int val = ivp->GetElement(0);
+      for (unsigned int i=0; i<EnumerationDomain->GetNumberOfEntries(); i++)
         {
-        var = EnumerationDomain->GetEntryText(i);
-        break;
+        if (EnumerationDomain->GetEntryValue(i) == val)
+          {
+          var = EnumerationDomain->GetEntryText(i);
+          break;
+          }
         }
       }
     }
@@ -692,15 +716,36 @@ void pqSMAdaptor::setEnumerationProperty(vtkSMProperty* Property,
       ivp->SetElement(0, v);
       }
     }
-  else if(EnumerationDomain && ivp && ivp->GetNumberOfElements() > 0)
+  else if(EnumerationDomain && ivp)
     {
-    QString str = Value.toString();
-    unsigned int numEntries = EnumerationDomain->GetNumberOfEntries();
-    for(unsigned int i=0; i<numEntries; i++)
+    // Some vtkSMIntVectorProperty with enumeration domains
+    // may have repeat_command="1". In which case the value
+    // is expected to be a list of values.
+    if (ivp->GetRepeatCommand())
       {
-      if(str == EnumerationDomain->GetEntryText(i))
+      QList<QVariant> values = Value.toList();
+      QList<QVariant> domainStrings = pqSMAdaptor::getEnumerationPropertyDomain(ivp);
+      QList<QVariant> actualValues;
+      foreach (QVariant val, values)
         {
-        ivp->SetElement(0, EnumerationDomain->GetEntryValue(i));
+        int index = domainStrings.indexOf(val);
+        if (index != -1)
+          {
+          actualValues << EnumerationDomain->GetEntryValue(index);
+          }
+        }
+      pqSMAdaptor::setMultipleElementProperty(Property, actualValues);
+      }
+    else
+      {
+      QString str = Value.toString();
+      unsigned int numEntries = EnumerationDomain->GetNumberOfEntries();
+      for(unsigned int i=0; i<numEntries; i++)
+        {
+        if(str == EnumerationDomain->GetEntryText(i))
+          {
+          ivp->SetElement(0, EnumerationDomain->GetEntryValue(i));
+          }
         }
       }
     }

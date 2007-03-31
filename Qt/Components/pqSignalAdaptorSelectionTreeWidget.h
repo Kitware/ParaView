@@ -38,19 +38,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 #include "pqComponentsExport.h"
 
-class vtkSMStringListDomain;
 class QTreeWidget;
+class vtkSMEnumerationDomain;
+class vtkSMStringListDomain;
 
 /// pqSignalAdaptorSelectionTreeWidget has two roles.
 /// \li It can be used to connect a vtkSMStringVectorProperty with a
 /// QTreeWidget (typically pqSelectionTreeWidget) where the SMProperty
 /// must have the values of only the selected items in the tree widget.
+/// Alternatively, it can be used to connect a vtkSMIntVectorProperty
+/// having a vtkSMEnumerationDomain with a QTreeWidget 
+/// (typically pqSelectionTreeWidget). Here too the vtkSMIntVectorProperty
+/// is an expandable property which is filled with values for all
+/// the selected items.
 /// \li Since the SMProperty contanis only the selected item, this adaptor
-/// requires a vtkSMStringListDomain from which it can get the list of
-/// possible values. It also updates the list of available values every time
+/// requires a vtkSMStringListDomain (or vtkSMEnumerationDomain) from which 
+/// it can get the list of possible values. 
+/// It also updates the list of available values every time
 /// the domain changes.
-/// Example use of this adaptor is to connect the "AddVolumeArrayName" 
-/// property or a CTHPart filter to a pqSelectionTreeWidget widget.
+/// Example use of this adaptor is to connect :
+/// \li "AddVolumeArrayName" property of a CTHPart filter to a 
+///     pqSelectionTreeWidget widget.
+/// \li "Functions" property of "P3DReader" with a pqSelectionTreeWidget.
+
+
 class PQCOMPONENTS_EXPORT pqSignalAdaptorSelectionTreeWidget : public QObject
 {
   Q_OBJECT
@@ -63,6 +74,14 @@ public:
   /// \param treeWidget The QTreeWidget controlled by this adaptor.
   pqSignalAdaptorSelectionTreeWidget(vtkSMStringListDomain* domain,
     QTreeWidget* treeWidget);
+
+  /// Constructor.
+  /// \param domain The EnumerationDomain from which the adaptor
+  ///        can obtain the list of possible values for this widget.
+  /// \param treeWidget The QTreeWidget controlled by this adaptor.
+  pqSignalAdaptorSelectionTreeWidget(vtkSMEnumerationDomain* domain,
+    QTreeWidget* treeWidget);
+
   virtual ~pqSignalAdaptorSelectionTreeWidget();
 
   /// Returns a list of strings which  correspond to the currently

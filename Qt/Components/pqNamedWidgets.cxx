@@ -34,21 +34,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNamedWidgets.h"
 
 // Qt includes
-#include <QLayout>
-#include <QComboBox>
 #include <QCheckBox>
-#include <QLineEdit>
-#include <QTextEdit>
-#include <QPushButton>
-#include <QListWidget>
-#include <QTreeWidget>
-#include <QGroupBox>
-#include <QSlider>
+#include <QComboBox>
 #include <QDoubleSpinBox>
+#include <QGroupBox>
+#include <QLayout>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QPushButton>
+#include <QSlider>
+#include <QtDebug>
+#include <QTextEdit>
+#include <QTreeWidget>
 
 // VTK includes
 
 // ParaView Server Manager includes
+#include "vtkSMEnumerationDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMStringListDomain.h"
@@ -226,15 +228,33 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       }
     else if (treeWidget)
       {
-      pqSignalAdaptorSelectionTreeWidget* adaptor =
-        new pqSignalAdaptorSelectionTreeWidget(
-          vtkSMStringListDomain::SafeDownCast(
-            SMProperty->GetDomain("array_list")), 
-          treeWidget);
-      adaptor->setObjectName("TreeWidgetAdaptor");
-      property_manager->registerLink(
-        adaptor, "values", SIGNAL(valuesChanged()),
-        proxy, SMProperty);
+      vtkSMDomain* array_list = SMProperty->GetDomain("array_list");
+      vtkSMStringListDomain* sld = vtkSMStringListDomain::SafeDownCast(
+        array_list);
+      vtkSMEnumerationDomain* ed = vtkSMEnumerationDomain::SafeDownCast(
+        array_list);
+
+      pqSignalAdaptorSelectionTreeWidget* adaptor = 0;
+      if (sld)
+        {
+        adaptor = new pqSignalAdaptorSelectionTreeWidget(sld, treeWidget);
+        }
+      else if (ed)
+        {
+        adaptor = new pqSignalAdaptorSelectionTreeWidget(ed, treeWidget);
+        }
+      if (adaptor)
+        {
+        adaptor->setObjectName("TreeWidgetAdaptor");
+        property_manager->registerLink(
+          adaptor, "values", SIGNAL(valuesChanged()),
+          proxy, SMProperty);
+        }
+      else
+        {
+        qDebug() << "Cannot create adaptor for property : " 
+          << SMProperty->GetXMLLabel();
+        }
       }
     }
   else if(pt == pqSMAdaptor::SELECTION)
