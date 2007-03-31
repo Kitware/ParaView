@@ -40,7 +40,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.36");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.37");
 
 
 //-----------------------------------------------------------------------------
@@ -1355,7 +1355,8 @@ void vtkSMDataObjectDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
 
     this->SetupVolumeDefaults();
     }
-  this->InvokeEvent(vtkCommand::UserEvent);
+
+  this->InvokeEvent(vtkSMAbstractDisplayProxy::ForceUpdateEvent);
 }
 
 //-----------------------------------------------------------------------------

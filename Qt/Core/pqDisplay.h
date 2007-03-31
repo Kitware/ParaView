@@ -57,48 +57,51 @@ public:
     QObject* parent=NULL);
   virtual ~pqDisplay();
 
-  // Returns if the display is shown in the given render module.
-  // Note that for a display to be visible in a render module,
-  // it must be \c shownIn that render modules as well as 
-  // visibility must be set to 1.
+  /// Returns if the display is shown in the given render module.
+  /// Note that for a display to be visible in a render module,
+  /// it must be \c shownIn that render modules as well as 
+  /// visibility must be set to 1.
   bool shownIn(pqGenericViewModule* rm) const;
 
-  // Returns if the status of the visbility property of this display.
-  // Note that for a display to be visible in a render module,
-  // it must be \c shownIn that render modules as well as 
-  // visibility must be set to 1.
+  /// Returns if the status of the visbility property of this display.
+  /// Note that for a display to be visible in a render module,
+  /// it must be \c shownIn that render modules as well as 
+  /// visibility must be set to 1.
   virtual bool isVisible() const;
 
-  // Set the visibility. Note that this affects the visibility of the
-  // display in all render modules it is added to, and only in all the
-  // render modules it is added to. This method does not call a re-render
-  // on the render module, caller must call that explicitly.
+  /// Set the visibility. Note that this affects the visibility of the
+  /// display in all render modules it is added to, and only in all the
+  /// render modules it is added to. This method does not call a re-render
+  /// on the render module, caller must call that explicitly.
   virtual void setVisible(bool visible);
 
-  // Get the number of render modules this display is present in.
+  /// Get the number of render modules this display is present in.
   unsigned int getNumberOfViewModules() const;
 
-  // Get the render module this display is present in at the given 
-  // index.
+  /// Get the render module this display is present in at the given 
+  /// index.
   pqGenericViewModule* getViewModule(unsigned int index) const;
 
-  // This method updates all render modules to which this 
-  // display belongs, if force is true, it for an immediate render
-  // otherwise render on idle.
+  /// This method updates all render modules to which this 
+  /// display belongs, if force is true, it for an immediate render
+  /// otherwise render on idle.
   void renderAllViews(bool force);
 
 public slots:
   void renderAllViews() { this->renderAllViews(false); }
 
 signals:
-  // Fired when the visibility property of the underlying display changes.
-  // It must be noted that this is fired on the property change, the property
-  // is not pushed yet, hence the visibility of the underlying VTK prop
-  // hasn't changed.
+  /// Fired when the visibility property of the underlying display changes.
+  /// It must be noted that this is fired on the property change, the property
+  /// is not pushed yet, hence the visibility of the underlying VTK prop
+  /// hasn't changed.
   void visibilityChanged(bool visible);
 
+  /// Fired whenever Update() is called on the underlying display proxy.
+  void updated();
+
 protected slots:
-  // called when the display visibility property changes.
+  /// called when the display visibility property changes.
   virtual void onVisibilityChanged();
 
 protected:

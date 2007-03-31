@@ -66,8 +66,11 @@ public:
   /// variableChanged() signal.
   void chooseVariable(pqVariableType type, const QString& name);
 
+  /// Returns the display whose color this widget is currently 
+  /// editing.
   pqPipelineDisplay* getDisplay() const;
 
+  /// Returns the current text in the combo box.
   QString getCurrentText() const;
 
 public slots:
@@ -77,6 +80,10 @@ public slots:
   /// When set, the source/renModule is not used to locate the
   /// display, instead this display is used.
   void setDisplay(pqConsumerDisplay* display);
+
+  /// Called when the GUI must reload the arrays shown in the widget.
+  /// i.e. this updates the domain for the combo box.
+  void reloadGUI();
 
 signals:
   /// Signal emitted whenever the user chooses a variable, 
@@ -108,9 +115,6 @@ private slots:
   /// Called when any important property on the display changes.
   /// This updates the selected value.
   void updateGUI();
-
-  /// Called when the GUI must reload the arrays shown in the widget.
-  void reloadGUI();
 
 private:
   /// Converts a variable type and name into a packed string representation 

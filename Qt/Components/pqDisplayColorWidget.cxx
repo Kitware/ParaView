@@ -254,6 +254,11 @@ void pqDisplayColorWidget::setDisplay(pqConsumerDisplay* display)
     return;
     }
 
+  if (this->Display)
+    {
+    QObject::disconnect(this->Display, 0, this, 0);
+    }
+
   this->VTKConnect->Disconnect();
   this->Display = dynamic_cast<pqPipelineDisplay*>(display);
   if(this->Display)
@@ -277,6 +282,11 @@ void pqDisplayColorWidget::setDisplay(pqConsumerDisplay* display)
       this, SLOT(reloadGUI()),
       NULL, 0.0,
       Qt::QueuedConnection);
+
+    // Every time the display updates, it is possible that the arrays available for 
+    // coloring have changed, hence we reload the list.
+    QObject::connect(this->Display, SIGNAL(updated()), 
+      this, SLOT(reloadGUI()), Qt::QueuedConnection);
     }
   QTimer::singleShot(0, this, SLOT(reloadGUI()));
 }

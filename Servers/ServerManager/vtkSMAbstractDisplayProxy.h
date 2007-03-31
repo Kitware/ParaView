@@ -32,6 +32,8 @@
 #define __vtkSMAbstractDisplayProxy_h
 
 #include "vtkSMProxy.h"
+#include "vtkCommand.h" // Needed for vtkCommand::UserEvent.
+
 class vtkPVGeometryInformation;
 class vtkSMAbstractViewModuleProxy;
 
@@ -81,6 +83,16 @@ public:
   // Convenience method to get/set Visibility property.
   void SetVisibilityCM(int v);
   int GetVisibilityCM(); 
+
+  //BTX
+  enum
+    {
+    /// Event fired every time Update() is called.
+    /// Subclassess must fire this event if they perform some operation
+    /// in Update().
+    ForceUpdateEvent = vtkCommand::UserEvent + 1
+    };
+  //ETX
 
 protected:
   vtkSMAbstractDisplayProxy();

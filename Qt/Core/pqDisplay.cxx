@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager includes.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSmartPointer.h" 
 
 // Qt includes.
@@ -59,6 +60,7 @@ public:
   // Set of render modules showing this display. Typically,
   // it will be 1, but theoretically there can be more.
   QList<QPointer<pqGenericViewModule> > RenderModules;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 };
 
 //-----------------------------------------------------------------------------
@@ -68,6 +70,10 @@ pqDisplay::pqDisplay(const QString& group, const QString& name,
   pqProxy(group, name, display, server, p)
 {
   this->Internal = new pqDisplayInternal();
+  this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Internal->VTKConnect->Connect(
+    display, vtkSMAbstractDisplayProxy::ForceUpdateEvent,
+    this, SIGNAL(updated()));
 }
 
 //-----------------------------------------------------------------------------

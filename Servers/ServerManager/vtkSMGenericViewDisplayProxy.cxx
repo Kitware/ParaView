@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.21");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -417,6 +417,8 @@ void vtkSMGenericViewDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
       dp->Update();
       }
     }
+
+  this->InvokeEvent(vtkSMAbstractDisplayProxy::ForceUpdateEvent);
 }
 
 //-----------------------------------------------------------------------------

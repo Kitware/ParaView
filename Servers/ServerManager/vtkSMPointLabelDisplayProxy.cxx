@@ -306,6 +306,7 @@ void vtkSMPointLabelDisplayProxy::Update(vtkSMAbstractViewModuleProxy*)
   p->Modified();
   this->UpdateSuppressorProxy->UpdateVTKObjects(); 
   this->GeometryIsValid = 1;
+  this->InvokeEvent(vtkSMAbstractDisplayProxy::ForceUpdateEvent);
 }
 
 //-----------------------------------------------------------------------------

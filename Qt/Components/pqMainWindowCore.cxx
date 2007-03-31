@@ -1300,8 +1300,7 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
 {
   this->Implementation->VariableToolbar = toolbar;
   
-  pqDisplayColorWidget* display_color = new pqDisplayColorWidget(
-    toolbar)
+  pqDisplayColorWidget* display_color = new pqDisplayColorWidget(toolbar)
     << pqSetName("displayColor");
     
   toolbar->addWidget(display_color);
@@ -1310,9 +1309,6 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
                    SIGNAL(displayChanged(pqConsumerDisplay*, pqGenericViewModule*)),
                    display_color, 
                    SLOT(setDisplay(pqConsumerDisplay *)));
-  
-  QObject::connect( this,          SIGNAL(postAccept()),
-                    display_color, SLOT(reloadGUI()));
 }
 
 //-----------------------------------------------------------------------------

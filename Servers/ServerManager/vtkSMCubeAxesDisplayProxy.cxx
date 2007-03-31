@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.11");
 
 
 //----------------------------------------------------------------------------
@@ -284,6 +284,8 @@ void vtkSMCubeAxesDisplayProxy::Update(vtkSMAbstractViewModuleProxy*)
     }
   pm->SendStream(this->ConnectionID, this->CubeAxesProxy->GetServers(), stream);
   this->GeometryIsValid = 1;
+
+  this->InvokeEvent(vtkSMAbstractDisplayProxy::ForceUpdateEvent);
 }
 
 //----------------------------------------------------------------------------
