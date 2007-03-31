@@ -21,7 +21,10 @@ Interpretor, a python interpretor to run the script in upon the first
            </ProxyGroupDomain>
            <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
-           </DataTypeDomain>
+           </DataTypeDomain>       
+           <Documentation>
+            Set the input(s) to the programmable filter.
+           </Documentation>
       </InputProperty>
 
      <IntVectorProperty 
@@ -54,6 +57,9 @@ Interpretor, a python interpretor to run the script in upon the first
          <!-- <Entry value="20" text="vtkGraph"/> -->
          <!-- <Entry value="21" text="vtkTree"/> -->
        </EnumerationDomain>
+       <Documentation>
+         Choose the data set type for the output of the programmable filter.
+       </Documentation>
      </IntVectorProperty>
 
      <StringVectorProperty 
@@ -63,6 +69,9 @@ Interpretor, a python interpretor to run the script in upon the first
        <Hints>
          <Widget type="multi_line"/>
        </Hints>
+       <Documentation>
+         The text of a python program that the programmable filter runs.
+       </Documentation>
      </StringVectorProperty>
 
      <StringVectorProperty 
