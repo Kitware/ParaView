@@ -163,6 +163,15 @@
           <Entry value="1" text="Component" />
        </EnumerationDomain>
       </IntVectorProperty>
+
+      <IntVectorProperty
+        name="UseLogScale"
+        command="SetUseLogScale"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <!-- End of PVLookupTable -->
     </PVLookupTableProxy>
   </ProxyGroup>

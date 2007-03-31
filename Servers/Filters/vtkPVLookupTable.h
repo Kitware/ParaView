@@ -53,6 +53,12 @@ public:
   vtkBooleanMacro(Discretize, int);
 
   // Description:
+  // Get/Set if log scale must be used while mapping scalars
+  // to colors.
+  vtkSetMacro(UseLogScale, int);
+  vtkGetMacro(UseLogScale, int);
+
+  // Description:
   // Set the number of values i.e. colors to be generated in the
   // discrete lookup table. This has no effect if Discretize is off.
   void SetNumberOfValues(vtkIdType number);
@@ -84,6 +90,7 @@ protected:
   ~vtkPVLookupTable();
 
   int Discretize;
+  int UseLogScale;
 
   vtkIdType NumberOfValues;
   vtkLookupTable* LookupTable;

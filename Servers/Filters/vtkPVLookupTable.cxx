@@ -20,7 +20,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVLookupTable);
-vtkCxxRevisionMacro(vtkPVLookupTable, "1.5");
+vtkCxxRevisionMacro(vtkPVLookupTable, "1.6");
 //-----------------------------------------------------------------------------
 vtkPVLookupTable::vtkPVLookupTable()
 {
@@ -30,6 +30,7 @@ vtkPVLookupTable::vtkPVLookupTable()
   this->NumberOfValues = 256;
 
   this->Data = 0;
+  this->UseLogScale = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -158,4 +159,5 @@ void vtkPVLookupTable::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Discretize: " << this->Discretize << endl;
   os << indent << "NumberOfValues: " << this->NumberOfValues << endl;
+  os << indent << "UseLogScale: " << this->UseLogScale << endl;
 }
