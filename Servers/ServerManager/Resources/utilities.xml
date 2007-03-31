@@ -1153,22 +1153,16 @@
         immediate_update="1"
         is_internal="1">
       </DoubleVectorProperty>
-
-      <SubProxy>
-        <Proxy name="TimeCue" proxygroup="animation" proxyname="AnimationCue" />
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="TimeCueManipulator" 
-          proxygroup="animation_manipulators"
-          proxyname="LinearAnimationCueManipulator" />
-      </SubProxy>
-
+    <!-- End of PVAnimationScene -->
     </PVAnimationSceneProxy>
 
+  <!-- End of animation -->
   </ProxyGroup>
 
   <ProxyGroup name="animation_manipulators">
+    <SimpleAnimationCueManipulatorProxy name="SimpleAnimationCueManipulator">
+    </SimpleAnimationCueManipulatorProxy>
+
     <LinearAnimationCueManipulatorProxy name="LinearAnimationCueManipulator"
       class="notused">
       <DoubleVectorProperty

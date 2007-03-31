@@ -31,6 +31,72 @@
       <property name="spacing" >
        <number>2</number>
       </property>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_8" >
+        <property name="text" >
+         <string>Start Time:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <layout class="QHBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>2</number>
+        </property>
+        <item>
+         <widget class="QLineEdit" name="startTime" >
+          <property name="sizePolicy" >
+           <sizepolicy>
+            <hsizetype>7</hsizetype>
+            <vsizetype>0</vsizetype>
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="startTimeIndex" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="startTimeLock" >
+          <property name="toolTip" >
+           <string>&lt;html>When ever a new file is read, the start time is adjusted to match the timesteps provided by the file. To avoid this behavior, turn the lock on.&lt;/html></string>
+          </property>
+          <property name="text" >
+           <string>lock</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="labelNumberOfFrames" >
+        <property name="text" >
+         <string>No. Of Frames:</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" >
+       <widget class="QLabel" name="labelDuration" >
+        <property name="text" >
+         <string>Duration (secs):</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
       <item row="3" column="1" >
        <widget class="QComboBox" name="playMode" >
         <property name="sizePolicy" >
@@ -58,16 +124,6 @@
         </item>
        </widget>
       </item>
-      <item row="5" column="0" >
-       <widget class="QLabel" name="labelDuration" >
-        <property name="text" >
-         <string>Duration (secs):</string>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="1" >
        <widget class="QSpinBox" name="duration" >
         <property name="sizePolicy" >
@@ -78,6 +134,23 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="maximum" >
+         <number>2147483647</number>
+        </property>
+        <property name="minimum" >
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>Play Mode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" >
+       <widget class="QSpinBox" name="numberOfFrames" >
         <property name="maximum" >
          <number>2147483647</number>
         </property>
@@ -107,7 +180,17 @@
          </widget>
         </item>
         <item>
+         <widget class="QSpinBox" name="endTimeIndex" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QCheckBox" name="endTimeLock" >
+          <property name="toolTip" >
+           <string>&lt;html>When ever a new file is read, the end time is adjusted to match the timesteps provided by the file. To avoid this behavior, turn the lock on.&lt;/html></string>
+          </property>
           <property name="text" >
            <string>lock</string>
           </property>
@@ -122,7 +205,14 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_9" >
+        <property name="text" >
+         <string>End Time:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
        <layout class="QHBoxLayout" >
         <property name="margin" >
          <number>0</number>
@@ -131,69 +221,16 @@
          <number>2</number>
         </property>
         <item>
-         <widget class="QLineEdit" name="startTime" >
-          <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>7</hsizetype>
-            <vsizetype>0</vsizetype>
-            <horstretch>1</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="currentTime" />
         </item>
         <item>
-         <widget class="QCheckBox" name="startTimeLock" >
-          <property name="text" >
-           <string>lock</string>
+         <widget class="QSpinBox" name="currentTimeIndex" >
+          <property name="enabled" >
+           <bool>false</bool>
           </property>
          </widget>
         </item>
        </layout>
-      </item>
-      <item row="0" column="1" >
-       <widget class="QLineEdit" name="currentTime" />
-      </item>
-      <item row="4" column="0" >
-       <widget class="QLabel" name="labelNumberOfFrames" >
-        <property name="text" >
-         <string>No. Of Frames:</string>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1" >
-       <widget class="QSpinBox" name="numberOfFrames" >
-        <property name="maximum" >
-         <number>2147483647</number>
-        </property>
-        <property name="minimum" >
-         <number>1</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="label_7" >
-        <property name="text" >
-         <string>Play Mode:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_9" >
-        <property name="text" >
-         <string>End Time:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_8" >
-        <property name="text" >
-         <string>Start Time:</string>
-        </property>
-       </widget>
       </item>
      </layout>
     </widget>

@@ -99,6 +99,8 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
 {
   this->Internals = new pqInternals();
   this->Internals->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Internals->VTKConnect->Connect(timekeeper->GetProperty("Time"),
+    vtkCommand::ModifiedEvent, this, SIGNAL(timeChanged()));
 
   pqServerManagerModel* smmodel = 
     pqApplicationCore::instance()->getServerManagerModel();
@@ -139,6 +141,32 @@ int pqTimeKeeper::getNumberOfTimeStepValues() const
 }
 
 //-----------------------------------------------------------------------------
+double pqTimeKeeper::getTimeStepValue(int index) const
+{
+  if (index < this->Internals->Timesteps.size())
+    {
+    QList<double> keys = this->Internals->Timesteps.keys();
+    return keys[index];
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+int pqTimeKeeper::getTimeStepValueIndex(double time) const
+{
+  QList<double> keys = this->Internals->Timesteps.keys();
+  int cc=1;
+  for (cc=1; cc < keys.size(); cc++)
+    {
+    if (keys[cc] > time)
+      {
+      return (cc-1);
+      }
+    }
+  return (cc-1); 
+}
+
+//-----------------------------------------------------------------------------
 void pqTimeKeeper::updateTimeKeeperProxy()
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -174,6 +202,14 @@ double pqTimeKeeper::getTime() const
 {
   return pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("Time")).toDouble();  
+}
+
+//-----------------------------------------------------------------------------
+void pqTimeKeeper::setTime(double time) 
+{
+  pqSMAdaptor::setElementProperty(
+    this->getProxy()->GetProperty("Time"), time);
+  this->getProxy()->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -232,6 +268,8 @@ void pqTimeKeeper::propertyModified(pqPipelineSource* source)
         {
         pqInternals::insertValue(this->Internals->Timesteps,
                                  vtime.toDouble(), source);
+        double t = vtime.toDouble();
+        cout << *((long*) &(t)) << endl;
         }
       // The following may result in multiple entries in the Timeranges map for
       // sources with both TimestepValues and TimeRanges properties, but that is

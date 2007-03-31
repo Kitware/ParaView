@@ -142,6 +142,15 @@ protected slots:
   // updates the "Property To Animate" list.
   void buildPropertyList();
 
+  /// called when timesteps reported by the timekeeper change.
+  void onTimeStepsChanged();
+
+  void setCurrentTimeByIndex(int index);
+  void setStartTimeByIndex(int index);
+  void setEndTimeByIndex(int index);
+
+
+  void onTimeChanged();
 protected:
   void buildPropertyList(vtkSMProxy* proxy, const QString& labelPrefix);
 

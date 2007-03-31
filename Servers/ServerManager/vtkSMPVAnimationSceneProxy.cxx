@@ -15,30 +15,26 @@
 #include "vtkSMPVAnimationSceneProxy.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMAnimationCueProxy.h"
-#include "vtkSMPropertyLink.h"
-#include "vtkSMLinearAnimationCueManipulatorProxy.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMProxyProperty.h"
 #include "vtkPVAnimationScene.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPVAnimationSceneProxy);
-vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.4");
+vtkCxxSetObjectMacro(vtkSMPVAnimationSceneProxy, TimeKeeper, vtkSMProxy);
 //-----------------------------------------------------------------------------
 vtkSMPVAnimationSceneProxy::vtkSMPVAnimationSceneProxy()
 {
   this->NumberOfFrames = 10;
   this->Duration = 10;
   this->ClockTimeRange[0] = this->ClockTimeRange[1] = 0;
-
-  this->TimeCueProxy = 0;
-  this->TimeCueManipulatorProxy = 0;
   this->InSetClockTime = false;
+  this->TimeKeeper = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPVAnimationSceneProxy::~vtkSMPVAnimationSceneProxy()
 {
+  this->SetTimeKeeper(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -53,44 +49,7 @@ void vtkSMPVAnimationSceneProxy::CreateVTKObjects(int numObjects)
   this->ObjectsCreated = 1;
 
   this->Superclass::CreateVTKObjects(numObjects);
-
-  this->TimeCueProxy = vtkSMAnimationCueProxy::SafeDownCast(
-    this->GetSubProxy("TimeCue"));
-  this->TimeCueManipulatorProxy = 
-    vtkSMLinearAnimationCueManipulatorProxy::SafeDownCast(
-      this->GetSubProxy("TimeCueManipulator"));
-  
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->TimeCueProxy->GetProperty("Manipulator"));
-  pp->RemoveAllProxies();
-  pp->AddProxy(this->TimeCueManipulatorProxy);
-
-  this->TimeCueManipulatorProxy->UpdateVTKObjects();
-  this->TimeCueProxy->UpdateVTKObjects();
-
   this->SetTimeMode(vtkAnimationScene::TIMEMODE_RELATIVE);
-
-  this->AddCue(this->TimeCueProxy);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMPVAnimationSceneProxy::SetTimeKeeper(vtkSMProxy* keeper)
-{
-  if (!this->ObjectsCreated)
-    {
-    vtkErrorMacro("Objects not created!");
-    return;
-    }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->TimeCueProxy->GetProperty("AnimatedProxy"));
-  pp->RemoveAllProxies();
-  pp->AddProxy(keeper);
-
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->TimeCueProxy->GetProperty("AnimatedPropertyName"));
-  svp->SetElement(0, "Time");
-  this->TimeCueProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -127,8 +86,6 @@ void vtkSMPVAnimationSceneProxy::SetClockTimeRange(double min, double max)
     {
     this->ClockTimeRange[0] = min;
     this->ClockTimeRange[1] = max;
-    this->TimeCueManipulatorProxy->SetStartValue(min);
-    this->TimeCueManipulatorProxy->SetEndValue(max);
     if (this->PlayMode == SNAP_TO_TIMESTEPS)
       {
       this->SetStartTime(min);
@@ -305,6 +262,22 @@ int vtkSMPVAnimationSceneProxy::GetFramesPerTimestep()
 {
   return vtkPVAnimationScene::SafeDownCast(
       this->AnimationCue)->GetFramesPerTimestep();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMPVAnimationSceneProxy::TickInternal(
+  void* info)
+{
+  vtkAnimationCue::AnimationCueInfo *cueInfo = 
+    reinterpret_cast<vtkAnimationCue::AnimationCueInfo*>(info);
+  if (this->TimeKeeper)
+    {
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->TimeKeeper->GetProperty("Time"));
+    dvp->SetElement(0, cueInfo->AnimationTime);
+    }
+
+  this->Superclass::TickInternal(info);
 }
 
 //-----------------------------------------------------------------------------

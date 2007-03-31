@@ -25,9 +25,6 @@
 
 #include "vtkSMAnimationSceneProxy.h"
 
-class vtkSMPropertyLink;
-class vtkSMLinearAnimationCueManipulatorProxy;
-
 class VTK_EXPORT vtkSMPVAnimationSceneProxy : public vtkSMAnimationSceneProxy
 {
 public:
@@ -81,7 +78,8 @@ public:
 
   // Description:
   // Set the time keeper proxy. The "Time" property on this
-  // proxy will be animated when the scene is played.
+  // proxy will be animated when the scene is played or the 
+  // scene time is changed.
   void SetTimeKeeper(vtkSMProxy* proxy);
 
   // Description:
@@ -105,22 +103,21 @@ public:
   // the FrameRate when playing in PLAYMODE_TIMESTEPS mode.
   void SetFramesPerTimestep(int);
   int GetFramesPerTimestep();
+  
 protected:
   vtkSMPVAnimationSceneProxy();
   ~vtkSMPVAnimationSceneProxy();
 
   virtual void CreateVTKObjects(int numObjects);
+  virtual void TickInternal(void* info);
 
-  vtkSMPropertyLink* TimeStepsLink;
-  vtkSMPropertyLink* TimeRangeLink;
 
   double ClockTimeRange[2];
   int NumberOfFrames;
   int Duration;
   bool InSetClockTime;
 
-  vtkSMAnimationCueProxy* TimeCueProxy;
-  vtkSMLinearAnimationCueManipulatorProxy* TimeCueManipulatorProxy;
+  vtkSMProxy* TimeKeeper;
 private:
   vtkSMPVAnimationSceneProxy(const vtkSMPVAnimationSceneProxy&); // Not implemented.
   void operator=(const vtkSMPVAnimationSceneProxy&); // Not implemented.

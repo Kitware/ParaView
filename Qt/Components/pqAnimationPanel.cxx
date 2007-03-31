@@ -148,6 +148,16 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
     this, SLOT(onCurrentChanged(pqServerManagerModelItem*)));
 
   QObject::connect(
+    this->Internal->currentTimeIndex, SIGNAL(valueChanged(int)),
+    this, SLOT(setCurrentTimeByIndex(int)));
+  QObject::connect(
+    this->Internal->startTimeIndex, SIGNAL(valueChanged(int)),
+    this, SLOT(setStartTimeByIndex(int)));
+  QObject::connect(
+    this->Internal->endTimeIndex, SIGNAL(valueChanged(int)),
+    this, SLOT(setEndTimeByIndex(int)));
+
+  QObject::connect(
     this->Internal->sourceName, SIGNAL(currentIndexChanged(int)),
     this, SLOT(onCurrentSourceChanged(int)));
 
@@ -291,6 +301,8 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
   if (this->Internal->ActiveScene)
     {
     QObject::disconnect(this->Internal->ActiveScene, 0, this, 0);
+    QObject::disconnect(
+      this->Internal->ActiveScene->getServer()->getTimeKeeper(), 0, this, 0);
     this->Internal->SceneLinks.removeAllPropertyLinks();
     delete this->Internal->SceneCurrentTimeDomain;
     }
@@ -311,7 +323,6 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
   // update domain to currentFrame before creating the link.
   this->onScenePlayModeChanged();
 
-  //pqTimeKeeper* timekeeper = scene->getServer()->getTimeKeeper();
 
   this->Internal->SceneLinks.addPropertyLink(
     this->Internal->currentTime, "text", SIGNAL(textChanged(const QString&)),
@@ -348,6 +359,31 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
     this, SLOT(onScenePlayModeChanged()));
   QObject::connect(scene, SIGNAL(cuesChanged()), 
     this, SLOT(onSceneCuesChanged()));
+
+  // Whenever timesteps change, we want to update the ranges for the spin boxes
+  // which show the timestep index.
+  pqTimeKeeper* timekeeper = scene->getServer()->getTimeKeeper();
+  QObject::connect(timekeeper, SIGNAL(timeStepsChanged()),
+    this, SLOT(onTimeStepsChanged()));
+  QObject::connect(timekeeper, SIGNAL(timeChanged()),
+    this, SLOT(onTimeChanged()));
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationPanel::onTimeStepsChanged()
+{
+  int max = 0;
+  if (this->Internal->ActiveScene)
+    {
+    pqTimeKeeper* timekeeper = 
+      this->Internal->ActiveScene->getServer()->getTimeKeeper();
+    max = timekeeper->getNumberOfTimeStepValues();
+    max = (max >0)? (max-1):max;
+    }
+
+  this->Internal->currentTimeIndex->setRange(0, max);
+  this->Internal->startTimeIndex->setRange(0, max);
+  this->Internal->endTimeIndex->setRange(0, max);
 }
 
 //-----------------------------------------------------------------------------
@@ -377,12 +413,20 @@ void pqAnimationPanel::onScenePlayModeChanged()
   QString playmode = 
     pqSMAdaptor::getEnumerationProperty(proxy->GetProperty("PlayMode")).toString();
 
+  this->Internal->currentTimeIndex->setEnabled(false);
+  this->Internal->startTimeIndex->setEnabled(false);
+  this->Internal->endTimeIndex->setEnabled(false);
+  this->Internal->currentTime->setEnabled(true);
+  this->Internal->startTime->setEnabled(true);
+  this->Internal->endTime->setEnabled(true);
+
   if (playmode == "Sequence")
     {
     this->Internal->numberOfFrames->show();
     this->Internal->labelNumberOfFrames->show();
     this->Internal->labelDuration->hide();
     this->Internal->duration->hide();
+
     }
   else if (playmode == "Real Time")
     {
@@ -391,12 +435,18 @@ void pqAnimationPanel::onScenePlayModeChanged()
     this->Internal->labelDuration->show();
     this->Internal->duration->show();
     }
-  else
+  else // playmode == "Snap To TimeSteps"
     {
     this->Internal->numberOfFrames->hide();
     this->Internal->labelNumberOfFrames->hide();
     this->Internal->labelDuration->hide();
     this->Internal->duration->hide();
+    this->Internal->currentTimeIndex->setEnabled(true);
+    this->Internal->startTimeIndex->setEnabled(true);
+    this->Internal->endTimeIndex->setEnabled(true);
+    this->Internal->currentTime->setEnabled(false);
+    this->Internal->startTime->setEnabled(false);
+    this->Internal->endTime->setEnabled(false);
     }
 }
 
@@ -978,4 +1028,76 @@ void pqAnimationPanel::showKeyFrame(int index)
     toShowKf, toShowKf->GetProperty("KeyTime"));
 
   this->Internal->keyFrameIndex->setValue(index);
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationPanel::setStartTimeByIndex(int index)
+{
+  if (!this->Internal->ActiveScene)
+    {
+    return;
+    }
+
+  pqTimeKeeper* timekeeper = 
+    this->Internal->ActiveScene->getServer()->getTimeKeeper();
+
+  double time = timekeeper->getTimeStepValue(index);
+  vtkSMProxy* proxy = this->Internal->ActiveScene->getProxy();
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("ClockTimeRange"), 0, time);
+  proxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationPanel::setEndTimeByIndex(int index)
+{
+  if (!this->Internal->ActiveScene)
+    {
+    return;
+    }
+
+  pqTimeKeeper* timekeeper = 
+    this->Internal->ActiveScene->getServer()->getTimeKeeper();
+  double time = timekeeper->getTimeStepValue(index);
+  vtkSMProxy* proxy = this->Internal->ActiveScene->getProxy();
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("ClockTimeRange"), 1, time);
+  proxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationPanel::setCurrentTimeByIndex(int index)
+{
+  if (!this->Internal->ActiveScene)
+    {
+    return;
+    }
+  pqTimeKeeper* timekeeper = 
+    this->Internal->ActiveScene->getServer()->getTimeKeeper();
+
+  double time = timekeeper->getTimeStepValue(index);
+  timekeeper->setTime(time);
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationPanel::onTimeChanged()
+{
+  if (!this->Internal->ActiveScene)
+    {
+    return;
+    }
+
+  vtkSMProxy* proxy = this->Internal->ActiveScene->getProxy();
+  QString playmode = pqSMAdaptor::getEnumerationProperty(
+    proxy->GetProperty("PlayMode")).toString();
+  if (playmode == "Snap To TimeSteps")
+    {
+    pqTimeKeeper* timekeeper = 
+      this->Internal->ActiveScene->getServer()->getTimeKeeper();
+    this->Internal->currentTimeIndex->blockSignals(true);
+    this->Internal->currentTimeIndex->setValue(
+      timekeeper->getTimeStepValueIndex(timekeeper->getTime()));
+    this->Internal->currentTimeIndex->blockSignals(false);
+    }
+
 }

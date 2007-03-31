@@ -55,15 +55,30 @@ public:
   /// known to this time keeper.
   int getNumberOfTimeStepValues() const;
 
+  /// Returns the timestep value at the given index.
+  /// index < getNumberOfTimeStepValues().
+  double getTimeStepValue(int index) const;
+
+  /// Returns the maximum index in the timestep values
+  /// for the given time for which timestep value[index] <= time.
+  int getTimeStepValueIndex(double time) const;
+
   /// Returns the time range. 
   /// Return (0,0) is getNumberOfTimeStepValues() == 0.
   QPair<double, double> getTimeRange() const;
 
   /// Returns the current time.
   double getTime() const;
+
+  /// Update the current time.
+  void setTime(double time);
+
 signals:
   /// Fired when the keeper updates the times.
   void timeStepsChanged();
+
+  /// Fired when the current time changes.
+  void timeChanged();
 
 public slots:
   void sourceAdded(pqPipelineSource*);
