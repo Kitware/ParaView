@@ -40,11 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // VTK includes
 #include "QVTKWidget.h"
+#include "vtkCommand.h"
+#include "vtkEventQtSlotConnect.h"
 
 // ParaView Server Manager includes
-#include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCompoundProxy.h"
+#include "vtkSMProperty.h"
+#include "vtkSMSourceProxy.h"
 
 // ParaView includes
 #include "pqServerManagerObserver.h"
@@ -64,6 +67,8 @@ public:
     ReferenceProxy(refProxy), Proxy(pxy)
   {
   this->RenderModule = NULL;
+  this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->InformationObsolete = true;
   }
   
   ~pqImplementation()
@@ -73,8 +78,18 @@ public:
   
   pqProxy* ReferenceProxy;
   vtkSmartPointer<vtkSMProxy> Proxy;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   pqPropertyManager* PropertyManager;
   QPointer<pqRenderViewModule> RenderModule;
+
+  // Flag indicating to the best of our knowledge, the information properties
+  // and domains are not up-to-date since the proxy was modified since the last
+  // time we updated the properties and their domains. This is just a guess, 
+  // to reduce number of updates information calls.
+  bool InformationObsolete;
+ 
+  // Indicates if the panel is currently selected.
+  bool Selected;
 };
 
 //-----------------------------------------------------------------------------
@@ -82,38 +97,18 @@ pqProxyPanel::pqProxyPanel(pqProxy* refProxy, vtkSMProxy* pxy, QWidget* p) :
   QWidget(p),
   Implementation(new pqImplementation(refProxy, pxy))
 {
+  // Just make sure that the proxy is setup properly.
+  this->Implementation->Proxy->UpdateVTKObjects();
+
   this->Implementation->PropertyManager = new pqPropertyManager(this);
 
   QObject::connect(this->Implementation->PropertyManager,
                    SIGNAL(modified()),
                    this, SLOT(setModified()));
 
-  this->Implementation->Proxy->UpdateVTKObjects();
-  vtkSMSourceProxy* sp;
-  vtkSMCompoundProxy* cp;
-  sp = vtkSMSourceProxy::SafeDownCast(this->Implementation->Proxy);
-  cp = vtkSMCompoundProxy::SafeDownCast(this->Implementation->Proxy);
-  if(sp)
-    {
-    sp->UpdatePipelineInformation();
-    }
-  else if(cp)
-    {
-    // TODO --  this is a workaround for a bug in the server manager
-    //          fix it the right way
-    //          does that mean calling UpdatePipelineInformation() above
-    //          for a source proxy goes away?
-    int num = cp->GetNumberOfProxies();
-    for(int i=0; i<num; i++)
-      {
-      sp = vtkSMSourceProxy::SafeDownCast(cp->GetProxy(i));
-      if(sp)
-        {
-        sp->UpdatePipelineInformation();
-        }
-      }
-    }
-  this->Implementation->Proxy->UpdatePropertyInformation();
+  this->Implementation->VTKConnect->Connect(
+    this->Implementation->Proxy, vtkCommand::ModifiedEvent,
+    this, SLOT(proxyModifiedEvent()));
 }
 
 //-----------------------------------------------------------------------------
@@ -134,11 +129,13 @@ pqProxy* pqProxyPanel::referenceProxy() const
   return this->Implementation->ReferenceProxy;
 }
 
+//-----------------------------------------------------------------------------
 pqPropertyManager* pqProxyPanel::propertyManager()
 {
   return this->Implementation->PropertyManager;
 }
 
+//-----------------------------------------------------------------------------
 pqRenderViewModule* pqProxyPanel::renderModule() const
 {
   return this->Implementation->RenderModule;
@@ -167,13 +164,13 @@ QSize pqProxyPanel::sizeHint() const
 void pqProxyPanel::accept()
 {
   this->Implementation->PropertyManager->accept();
-  vtkSMSourceProxy *source
-    = vtkSMSourceProxy::SafeDownCast(this->Implementation->Proxy);
-  if (source)
-    {
-    source->UpdatePipelineInformation();
-    }
   this->Implementation->ReferenceProxy->setModified(false);
+
+  if (this->Implementation->Selected)
+    {
+    this->updateInformationAndDomains();
+    }
+
   emit this->onaccept();
 }
 
@@ -188,16 +185,23 @@ void pqProxyPanel::reset()
   emit this->onreset();
 }
 
+//-----------------------------------------------------------------------------
 void pqProxyPanel::select()
 {
+  this->Implementation->Selected = true;
+
+  this->updateInformationAndDomains();
   emit this->onselect();
 }
 
+//-----------------------------------------------------------------------------
 void pqProxyPanel::deselect()
 {
+  this->Implementation->Selected = false;
   emit this->ondeselect();
 }
   
+//-----------------------------------------------------------------------------
 void pqProxyPanel::setRenderModule(pqRenderViewModule* rm)
 {
   if(this->Implementation->RenderModule == rm)
@@ -209,9 +213,68 @@ void pqProxyPanel::setRenderModule(pqRenderViewModule* rm)
   emit this->renderModuleChanged(this->Implementation->RenderModule);
 }
 
+//-----------------------------------------------------------------------------
 void pqProxyPanel::setModified()
 {
   this->Implementation->ReferenceProxy->setModified(true);
   emit this->modified();
 }
 
+//-----------------------------------------------------------------------------
+// Called when vtkSMProxy fires vtkCommand::ModifiedEvent which implies that
+// the proxy was modified. If that's the case,  the information properties
+// need to be updated. We mark them as obsolete so that next
+// time the panel becomes active (or is accepted when it is active),
+// we'll refresh the information properties and domains.
+// Note thate vtkCommand::ModifiedEvent is fired by a proxy when it is
+// updated or anyone upstream for it is updated.
+void pqProxyPanel::proxyModifiedEvent()
+{
+  this->Implementation->InformationObsolete = true;
+}
+
+//-----------------------------------------------------------------------------
+// Update information properties and domains. Since this is not a
+// particularly fast operation, we update the information and domains
+// only when the panel is selected or an already active panel is 
+// accepted. 
+void pqProxyPanel::updateInformationAndDomains()
+{
+  if (this->Implementation->InformationObsolete)
+    {
+    vtkSMSourceProxy* sp;
+    vtkSMCompoundProxy* cp;
+    sp = vtkSMSourceProxy::SafeDownCast(this->Implementation->Proxy);
+    cp = vtkSMCompoundProxy::SafeDownCast(this->Implementation->Proxy);
+    if(sp)
+      {
+      sp->UpdatePipelineInformation();
+      }
+    else if(cp)
+      {
+      // TODO --  this is a workaround for a bug in the server manager
+      //          fix it the right way
+      //          does that mean calling UpdatePipelineInformation() above
+      //          for a source proxy goes away?
+      int num = cp->GetNumberOfProxies();
+      for(int i=0; i<num; i++)
+        {
+        sp = vtkSMSourceProxy::SafeDownCast(cp->GetProxy(i));
+        if(sp)
+          {
+          sp->UpdatePipelineInformation();
+          }
+        }
+      }
+    else
+      {
+      this->Implementation->Proxy->UpdatePropertyInformation();
+      }
+    vtkSMProperty* inputProp = this->Implementation->Proxy->GetProperty("Input");
+    if (inputProp)
+      {
+      inputProp->UpdateDependentDomains();
+      }
+    this->Implementation->InformationObsolete = false;
+    }
+}

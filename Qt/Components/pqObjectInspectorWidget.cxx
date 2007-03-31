@@ -266,6 +266,7 @@ void pqObjectInspectorWidget::canAccept(bool status)
   this->ResetButton->setEnabled(status);
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::setView(pqGenericViewModule* view)
 {
   pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
@@ -273,6 +274,7 @@ void pqObjectInspectorWidget::setView(pqGenericViewModule* view)
   emit this->renderModuleChanged(this->RenderModule);
 }
 
+//-----------------------------------------------------------------------------
 pqRenderViewModule* pqObjectInspectorWidget::getRenderModule()
 {
   return this->RenderModule;
@@ -397,6 +399,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   this->PanelStore[proxy] = this->CurrentPanel;
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::accept()
 {
   emit this->preaccept();
@@ -425,6 +428,7 @@ void pqObjectInspectorWidget::accept()
   this->canAccept(false);
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::reset()
 {
   emit this->prereject();
@@ -451,6 +455,7 @@ void pqObjectInspectorWidget::reset()
   this->canAccept(false);
 }
 
+//-----------------------------------------------------------------------------
 QSize pqObjectInspectorWidget::sizeHint() const
 {
   // return a size hint that would reasonably fit several properties
@@ -466,6 +471,7 @@ QSize pqObjectInspectorWidget::sizeHint() const
                                     expandedTo(QApplication::globalStrut()), this));
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
 {
   QMap<pqProxy*, pqObjectPanel*>::iterator iter;
@@ -488,6 +494,7 @@ void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::deleteProxy()
 {
   if (this->CurrentPanel && this->CurrentPanel->referenceProxy())
@@ -511,11 +518,13 @@ void pqObjectInspectorWidget::deleteProxy()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::setDeleteButtonVisibility(bool visible)
 {
   this->DeleteButton->setVisible(visible);
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::handleConnectionChanged(pqPipelineSource* in,
     pqPipelineSource*)
 {
@@ -525,6 +534,7 @@ void pqObjectInspectorWidget::handleConnectionChanged(pqPipelineSource* in,
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::updateDeleteButtonState()
 {
   pqPipelineSource *source = 0;

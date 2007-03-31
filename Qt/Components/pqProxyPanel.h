@@ -93,6 +93,13 @@ public slots:
   /// Fires modified
   void setModified();
 
+private slots:
+  /// Called when the vtkSMProxy fires ModifiedEvent.
+  /// It implies that the proxy information properties (and domains
+  /// depending on those) may now be obsolete.
+  void proxyModifiedEvent();
+
+
 signals:
   void modified();
   void onaccept();
@@ -104,6 +111,8 @@ signals:
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
+
+  void updateInformationAndDomains();
 };
 
 #endif
