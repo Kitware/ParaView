@@ -184,7 +184,6 @@ public:
     PipelineBrowser(0),
     VariableToolbar(0),
     LookmarkToolbar(0),
-    CustomFilterToolbar(0),
     ToolTipTrapper(0),
     InCreateSource(false),
     LinksManager(0),
@@ -298,14 +297,13 @@ public:
   QMenu* RecentFiltersMenu; 
   QMenu* SourceMenu;
   QMenu* FilterMenu;
-  QMenu* AlphabeticalMenu;
+  QPointer<QMenu> AlphabeticalMenu;
   QList<QString> RecentFilterList;
 
   pqPipelineMenu* PipelineMenu;
   pqPipelineBrowser *PipelineBrowser;
   QToolBar* VariableToolbar;
   QToolBar* LookmarkToolbar;
-  QToolBar* CustomFilterToolbar;
   QList<QToolBar*> PluginToolBars;
   
   pqToolTipTrapper* ToolTipTrapper;
@@ -846,6 +844,7 @@ void pqMainWindowCore::refreshSourcesMenu()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::refreshFiltersMenu()
 {
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
@@ -913,10 +912,16 @@ void pqMainWindowCore::refreshFiltersMenu()
       }
 
     // Finally add all filters to the Alphabetical sub-menu..
-
-    this->Implementation->AlphabeticalMenu = 
-      this->Implementation->FilterMenu->addMenu("&Alphabetical") 
-      << pqSetName("Alphabetical");
+    if (this->Implementation->AlphabeticalMenu)
+      {
+      this->Implementation->AlphabeticalMenu->clear();
+      }
+    else
+      {
+      this->Implementation->AlphabeticalMenu = 
+        this->Implementation->FilterMenu->addMenu("&Alphabetical") 
+        << pqSetName("Alphabetical");
+      }
 
     pqImplementation::ProxyVector::iterator filterIter =
       this->Implementation->AlphabeticalFilters.begin();
@@ -987,6 +992,7 @@ void pqMainWindowCore::refreshFiltersMenu()
   this->updateFiltersMenu();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::setFilterMenu(QMenu* menu)
 {
   if(this->Implementation->FilterMenu)
@@ -1019,6 +1025,7 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     }
 }
 
+//-----------------------------------------------------------------------------
 pqPipelineMenu& pqMainWindowCore::pipelineMenu()
 {
   if(!this->Implementation->PipelineMenu)
@@ -1030,11 +1037,13 @@ pqPipelineMenu& pqMainWindowCore::pipelineMenu()
   return *this->Implementation->PipelineMenu;
 }
 
+//-----------------------------------------------------------------------------
 pqPipelineBrowser* pqMainWindowCore::pipelineBrowser()
 {
   return this->Implementation->PipelineBrowser;
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
 {
   this->Implementation->PipelineBrowser = new pqPipelineBrowser(dock_widget);
@@ -1057,6 +1066,7 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
     this->Implementation->UndoStack, SLOT(endUndoSet()));
 }
 
+//-----------------------------------------------------------------------------
 pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget)
 {
   pqProxyTabWidget* const proxyPanel = 
@@ -3115,7 +3125,8 @@ void pqMainWindowCore::updateFiltersMenu()
     // Custom filters cannot have the same name as an existing filter. 
     // If there is for some reason a filter and a custom filter of the same name,
     // revert to the regular filter.
-    if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) && !proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
+    if (proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) 
+      && !proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
       {
       (*action)->setEnabled(true);
       some_enabled = true;
