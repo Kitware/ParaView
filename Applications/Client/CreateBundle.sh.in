@@ -16,7 +16,7 @@ echo "Copy ParaView bundle"
 (cd "@ParaView_BINARY_DIR@/bin" && tar c${TAR_FLAG}f - pvserver pvdataserver pvrenderserver pvpython) | (cd paraview.app/Contents/MacOS && tar xf -)
 
 echo "Copy ParaView Documentation"
-(cd "@ParaView_SOURCE_DIR@/Applications/Client" && tar c${TAR_FLAG}f - doc pqClient.adp) | (cd paraview.app/Contents/MacOS && tar xf -)
+(cd "@ParaView_BINARY_DIR@/" && tar c${TAR_FLAG}f - Documentation pqClient.adp) | (cd paraview.app/Contents/MacOS && tar xf -)
 
 echo "Copy ParaView libraries"
 (cd "@ParaView_BINARY_DIR@/bin" && tar c${TAR_FLAG}f - *.dylib *.so) | (cd paraview.app/Contents/MacOS && tar xf - )

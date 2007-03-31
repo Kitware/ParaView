@@ -344,8 +344,6 @@ ADD_EXECUTABLE(vtkSMExtractDocumentation vtkSMExtractDocumentation.cxx)
 TARGET_LINK_LIBRARIES(vtkSMExtractDocumentation vtkPVServerManager)
 GET_TARGET_PROPERTY(DOCUMENTATION_EXE vtkSMExtractDocumentation LOCATION)
 
-FILE(MAKE_DIRECTORY ${ParaView_BINARY_DIR}/Documentation)
-
 FOREACH(gcf ${GUI_CONFIG_FILES})
   SET(fullXMLFile ${ParaView_SOURCE_DIR}/Qt/Components/Resources/XML/${gcf}.xml)
   SET(fullHTMLFile ${ParaView_BINARY_DIR}/Documentation/${gcf}.html)

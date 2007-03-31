@@ -125,7 +125,7 @@ IF(WIN32)
   )
 ENDIF(WIN32)
 
-SET(PV_CLIENT_DOC "${CMAKE_CURRENT_SOURCE_DIR}/pqClient.adp")
+SET(PV_CLIENT_DOC "${ParaView_BINARY_DIR}/pqClient.adp")
 STRING(REGEX REPLACE "[^/]+$" "" PV_ASSISTANT "${QT_QMAKE_EXECUTABLE}")
 IF(WIN32)
   STRING(REGEX REPLACE "/" "\\\\" PV_ASSISTANT "${PV_ASSISTANT}")
@@ -379,19 +379,6 @@ ENDFOREACH(qtlib)
 # probably go to a local cmake file. Change to match the build system's
 # libraries
 # INSTALL(FILES /usr/lib/libstdc++.so.5 /lib/libgcc_s.so.1 /usr/lib/libpng.so.3 /usr/lib/libexpat.so.0 /usr/lib/libfontconfig.so.1 /usr/lib/libfreetype.so.6 /lib/libz.so.1 DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime)
-
-SET(dir "${ParaView_SOURCE_DIR}/Applications/Client/doc/")
-FILE(GLOB list_of_files "${dir}/*")
-FOREACH(file ${list_of_files})
-  IF (${file} MATCHES CVS)
-  ELSE (${file} MATCHES CVS)
-    INSTALL(FILES ${file}
-      DESTINATION ${PV_EXE_INSTALL_CM24}/doc COMPONENT Runtime )
-  ENDIF (${file} MATCHES CVS)
-ENDFOREACH(file)
-
-INSTALL(FILES ${ParaView_SOURCE_DIR}/Applications/Client/pqClient.adp 
-  DESTINATION ${PV_EXE_INSTALL_CM24} COMPONENT Runtime )
 
 # Hard-coded install rules for anything left to install. These should
 # probably go to a local cmake file. Change to match the build system's
