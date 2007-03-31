@@ -19,7 +19,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPVAnimationSceneProxy);
-vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.5");
 vtkCxxSetObjectMacro(vtkSMPVAnimationSceneProxy, TimeKeeper, vtkSMProxy);
 //-----------------------------------------------------------------------------
 vtkSMPVAnimationSceneProxy::vtkSMPVAnimationSceneProxy()
@@ -27,7 +27,7 @@ vtkSMPVAnimationSceneProxy::vtkSMPVAnimationSceneProxy()
   this->NumberOfFrames = 10;
   this->Duration = 10;
   this->ClockTimeRange[0] = this->ClockTimeRange[1] = 0;
-  this->InSetClockTime = false;
+  this->UpdatingTime = false;
   this->TimeKeeper = 0;
 }
 
@@ -167,6 +167,7 @@ void vtkSMPVAnimationSceneProxy::GoToNext()
   double current_animation_time = vtkPVAnimationScene::SafeDownCast(
       this->AnimationCue)->GetAnimationTime();
 
+  this->UpdatingTime = true;
   switch (this->PlayMode)
     {
   case SEQUENCE:
@@ -187,6 +188,7 @@ void vtkSMPVAnimationSceneProxy::GoToNext()
       }
     break;
     }
+  this->UpdatingTime = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -195,6 +197,7 @@ void vtkSMPVAnimationSceneProxy::GoToPrevious()
   double current_animation_time = vtkPVAnimationScene::SafeDownCast(
       this->AnimationCue)->GetAnimationTime();
 
+  this->UpdatingTime = true;
   switch (this->PlayMode)
     {
   case SEQUENCE:
@@ -215,17 +218,18 @@ void vtkSMPVAnimationSceneProxy::GoToPrevious()
       }
     break;
     }
+  this->UpdatingTime = false;
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMPVAnimationSceneProxy::SetClockTime(double time)
 {
-  if (this->IsInPlay() || this->InSetClockTime)
+  if (this->IsInPlay() || this->UpdatingTime)
     {
     return;
     }
 
-  this->InSetClockTime = true;
+  this->UpdatingTime = true;
   double normalized_time = 0;
   if (this->ClockTimeRange[0] != this->ClockTimeRange[1])
     {
@@ -247,7 +251,7 @@ void vtkSMPVAnimationSceneProxy::SetClockTime(double time)
   double animation_time = 
     animation_start + normalized_time * (animation_end - animation_start);
   this->SetAnimationTime(animation_time);
-  this->InSetClockTime = false;
+  this->UpdatingTime = false;
 }
 
 //-----------------------------------------------------------------------------

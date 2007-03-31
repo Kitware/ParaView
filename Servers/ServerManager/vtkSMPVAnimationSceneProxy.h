@@ -115,7 +115,9 @@ protected:
   double ClockTimeRange[2];
   int NumberOfFrames;
   int Duration;
-  bool InSetClockTime;
+  
+  // Use to avoid loops when timekeeper's time is changed.
+  bool UpdatingTime;
 
   vtkSMProxy* TimeKeeper;
 private:
