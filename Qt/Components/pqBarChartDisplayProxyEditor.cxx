@@ -120,6 +120,16 @@ void pqBarChartDisplayProxyEditor::setDisplay(pqDisplay* display)
 
   this->setEnabled(true);
 
+  // Initialize domains.
+  // Domains must be intialized before links are created otherwise,
+  // we may loose current property values.
+  this->Internal->XDomain = new pqComboBoxDomain(
+    this->Internal->XArrayName, proxy->GetProperty("XArrayName"));
+  this->Internal->YDomain = new pqComboBoxDomain(
+    this->Internal->YArrayName, proxy->GetProperty("YArrayName"));
+  this->Internal->XDomain->forceDomainChanged();
+  this->Internal->YDomain->forceDomainChanged();
+
   // Initialize links.
   this->Internal->Links.addPropertyLink(this->Internal->ViewData,
     "checked", SIGNAL(stateChanged(int)),
@@ -136,14 +146,6 @@ void pqBarChartDisplayProxyEditor::setDisplay(pqDisplay* display)
   this->Internal->Links.addPropertyLink(this->Internal->UsePoints,
     "checked", SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("XAxisUsePoints"));
-
-  // Initialize domains.
-  this->Internal->XDomain = new pqComboBoxDomain(
-    this->Internal->XArrayName, proxy->GetProperty("XArrayName"));
-  this->Internal->YDomain = new pqComboBoxDomain(
-    this->Internal->YArrayName, proxy->GetProperty("YArrayName"));
-  this->Internal->XDomain->forceDomainChanged();
-  this->Internal->YDomain->forceDomainChanged();
 
   this->Internal->VTKConnect->Connect(proxy->GetProperty("XArrayName"),
     vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()), 0, 0,
