@@ -33,7 +33,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMClientServerRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMClientServerRenderModuleProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMClientServerRenderModuleProxy, "1.3");
 
 vtkCxxSetObjectMacro(vtkSMClientServerRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -430,7 +430,7 @@ void vtkSMClientServerRenderModuleProxy::InteractiveRender()
   this->LocalRender = this->GetLocalRenderDecision(totalMemory, 0);
 
   // Change the collection flags and update.
-  this->PassCollectionDecisionToDisplays(this->LocalRender, useLOD);
+  this->PassCollectionDecisionToDisplays(this->LocalRender, (useLOD>0));
   if (this->RenderSyncManagerProxy)
     {
     // Set Squirt Level (if supported).
