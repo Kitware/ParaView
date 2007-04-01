@@ -30,7 +30,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.13");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.14");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -40,17 +40,23 @@ vtkPythonProgrammableFilter::vtkPythonProgrammableFilter()
   this->InformationScript = NULL;
   this->Interpretor = NULL;
   this->OutputDataSetType = VTK_DATA_SET;
+  this->Unregistering = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::UnRegister(vtkObjectBase *o)
 {
-  if (this->GetReferenceCount() == 4 && this->Interpretor != NULL)
-    {
-    this->Interpretor->MakeCurrent();
-    this->Interpretor->RunSimpleString("self = 0");
-    }
   this->Superclass::UnRegister(o);
+  if (this->GetReferenceCount() == 4 && 
+      this->Interpretor != NULL &&
+      !this->Unregistering
+    )
+    {
+    this->Unregistering = 1;
+    this->Interpretor->Delete();
+    this->Interpretor = NULL;
+    this->Unregistering = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -70,10 +76,12 @@ vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
 
 //----------------------------------------------------------------------------
 int vtkPythonProgrammableFilter::RequestInformation(
-  vtkInformation*, 
-  vtkInformationVector** , 
+  vtkInformation*ri, 
+  vtkInformationVector** iv, 
   vtkInformationVector* outputVector)
 {
+return this->Superclass::RequestInformation(ri,iv,outputVector);
+
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   // Setup ExtentTranslator so that all downstream piece requests are

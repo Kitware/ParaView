@@ -61,8 +61,7 @@ public:
 
   // Description:
   // This is overridden to break a cyclic reference between "this" and 
-  // this->Interpretor which has a self that points to "this". Without 
-  // this, "this" will never be deleted.
+  // this->Interpretor which has a self that points to "this". 
   virtual void UnRegister(vtkObjectBase *o);
 
 protected:
@@ -95,6 +94,10 @@ protected:
 private:
   vtkPythonProgrammableFilter(const vtkPythonProgrammableFilter&);  // Not implemented.
   void operator=(const vtkPythonProgrammableFilter&);  // Not implemented.
+
+  //state used to getting by a ref counting cyclic reference
+  int Unregistering;
+
 };
 
 #endif
