@@ -12,13 +12,10 @@ configure_file(
   COPYONLY)
 
 set(dir "${ParaView_BINARY_DIR}/Documentation/")
-file(GLOB list_of_files "${dir}/*")
-foreach(file ${list_of_files})
-  if (${file} MATCHES .html OR ${file} MATCHES .png)
-    install(FILES ${file}
-      DESTINATION ${PV_EXE_INSTALL_CM24}/Documentation COMPONENT Runtime )
-    endif (${file} MATCHES .html OR ${file} MATCHES .png)
-endforeach(file)
+install(DIRECTORY ${ParaView_BINARY_DIR}/Documentation/ 
+        DESTINATION ${PV_EXE_INSTALL_CM24}/Documentation 
+        COMPONENT Runtime
+        REGEX ".html")
 
 install(FILES ${ParaView_BINARY_DIR}/pqClient.adp 
   DESTINATION ${PV_EXE_INSTALL_CM24} COMPONENT Runtime )
