@@ -448,6 +448,12 @@ MainWindow::MainWindow() :
     this->Implementation->UI.selectionToolbar,
     SLOT(setEnabled(bool)));
 
+  connect(
+    &this->Implementation->Core,
+    SIGNAL(enableSelectionToolbar(bool)),
+    this->Implementation->UI.actionSelectionMode,
+    SLOT(setEnabled(bool)));
+
   //this->Implementation->Core.setupCustomFilterToolbar(
   //  this->Implementation->UI.customFilterToolbar);
 
@@ -846,6 +852,10 @@ void MainWindow::assistantError(const QString& error)
 //-----------------------------------------------------------------------------
 void MainWindow::onSelectionShortcut()
 {
+  if (!this->Implementation->UI.selectionToolbar->isEnabled())
+  {
+    return;
+  }
 
   if(this->Implementation->UI.actionSelectionMode->isVisible())
   {
@@ -856,8 +866,6 @@ void MainWindow::onSelectionShortcut()
     this->Implementation->UI.actionSelectionMode->setChecked(true);
     this->Implementation->Core.selectionManager().switchToSelection();
   }
-
-
 }
 
 //-----------------------------------------------------------------------------

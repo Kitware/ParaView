@@ -576,7 +576,10 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
 
   if (selectedProxies->GetNumberOfItems() == 0)
     {
-    prevRvm->render();
+    if (prevRvm)
+      {
+      prevRvm->render();
+      }
     return;
     }
   // For now, we are using only the first selected object.

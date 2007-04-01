@@ -54,7 +54,9 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.80");
+#include "vtkSMClientServerRenderModuleProxy.h"
+
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.81");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1406,22 +1408,41 @@ void vtkSMRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
 //-----------------------------------------------------------------------------
 int vtkSMRenderModuleProxy::IsSelectionAvailable()
 {  
+  //check if we are not supposed to turn compositing on (in parallel)
+  //the paraview gui uses a big number to say never composite
+  //it we are not supposed to turn it on, then disallow selections
+  double compThresh = 0;
+  vtkSMClientServerRenderModuleProxy *me2 = 
+    vtkSMClientServerRenderModuleProxy::SafeDownCast(this);
+  if (me2 != NULL)
+    {
+    compThresh = me2->GetRemoteRenderThreshold();
+    }
+  if (compThresh > 100.0) //the highest setting in the paraview gui
+    {
+    return 0;
+    }
+
+  //check if we don't have enough color depth to do color buffer selection
+  //if we don't then disallow selection
   int rgba[4];
   vtkRenderWindow *rwin = this->GetRenderWindow();
-  if (rwin)
+  if (!rwin)
     {
-    rwin->GetColorBufferSizes(rgba);
-    if (rgba[0] >= 8 && rgba[1] >= 8 && rgba[2] >= 8)
-      {
-      return 1;
-      }
+    return 0;
     }
-  return 0;
+  rwin->GetColorBufferSizes(rgba);
+  if (rgba[0] < 8 || rgba[1] < 8 || rgba[2] < 8)
+    {
+    return 0;
+    }
+
+  //yeah!
+  return 1;
 }
 
 vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1)
 {  
-
   if (!this->IsSelectionAvailable())
     {
     vtkSelection *selection = vtkSelection::New();
@@ -1556,6 +1577,18 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
       }
     }
 
+  //Force parallel compositing on for the selection render.
+  //TODO: intelligently code dataserver rank into originalcellids to
+  //make this ugly hack unecessary.
+  double compThresh = 0.0;
+  vtkSMClientServerRenderModuleProxy *me2 = 
+    vtkSMClientServerRenderModuleProxy::SafeDownCast(this);
+  if (me2 != NULL)
+    {
+    compThresh = me2->GetRemoteRenderThreshold();
+    me2->SetRemoteRenderThreshold(0.0);
+    }      
+
   unsigned char *buf;  
   for (int p = 0; p < 5; p++)
     {
@@ -1593,6 +1626,14 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
   //clear selection mode to resume normal rendering
   setModeMethod->SetElements1(0);
   vcsProxy->UpdateVTKObjects();   
+
+  //Force parallel compositing on for the selection render.
+  //TODO: intelligently code dataserver rank into originalcellids to
+  //make this ugly hack unecessary.
+  if (me2 != NULL)
+    {
+    me2->SetRemoteRenderThreshold(compThresh);
+    }      
 
   for (int i = 0; i < numlayers; i++)
     {
