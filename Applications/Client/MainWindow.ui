@@ -25,7 +25,7 @@
      <x>0</x>
      <y>0</y>
      <width>940</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSources" >
@@ -88,55 +88,6 @@
     <addaction name="separator" />
     <addaction name="actionFileExit" />
    </widget>
-   <widget class="QMenu" name="menuView" >
-    <property name="title" >
-     <string>&amp;View</string>
-    </property>
-    <widget class="QMenu" name="menuToolbars" >
-     <property name="title" >
-      <string>Toolbars</string>
-     </property>
-    </widget>
-    <addaction name="actionResetCamera" />
-    <addaction name="actionPositiveX" />
-    <addaction name="actionNegativeX" />
-    <addaction name="actionPositiveY" />
-    <addaction name="actionNegativeY" />
-    <addaction name="actionPositiveZ" />
-    <addaction name="actionNegativeZ" />
-    <addaction name="separator" />
-    <addaction name="actionShowCenterAxes" />
-    <addaction name="actionResetCenter" />
-    <addaction name="actionScalarBarVisibility" />
-    <addaction name="separator" />
-    <addaction name="menuToolbars" />
-    <addaction name="separator" />
-   </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <widget class="QMenu" name="menuAddPlot" >
-     <property name="title" >
-      <string>Add &amp;Plot</string>
-     </property>
-     <addaction name="actionHistogram" />
-     <addaction name="actionXY_Plot" />
-     <addaction name="actionTable_View" />
-    </widget>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="actionMoveMode" />
-    <addaction name="actionSelectionMode" />
-    <addaction name="separator" />
-    <addaction name="menuAddPlot" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
-   </widget>
    <widget class="QMenu" name="menuTools" >
     <property name="title" >
      <string>&amp;Tools</string>
@@ -163,6 +114,55 @@
     <property name="title" >
      <string>F&amp;ilters</string>
     </property>
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <widget class="QMenu" name="menuAddPlot" >
+     <property name="title" >
+      <string>Add &amp;Plot</string>
+     </property>
+     <addaction name="actionHistogram" />
+     <addaction name="actionXY_Plot" />
+     <addaction name="actionTable_View" />
+    </widget>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="actionMoveMode" />
+    <addaction name="actionSelectionMode" />
+    <addaction name="separator" />
+    <addaction name="menuAddPlot" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
+   </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>&amp;View</string>
+    </property>
+    <widget class="QMenu" name="menuToolbars" >
+     <property name="title" >
+      <string>Toolbars</string>
+     </property>
+    </widget>
+    <addaction name="actionResetCamera" />
+    <addaction name="actionPositiveX" />
+    <addaction name="actionNegativeX" />
+    <addaction name="actionPositiveY" />
+    <addaction name="actionNegativeY" />
+    <addaction name="actionPositiveZ" />
+    <addaction name="actionNegativeZ" />
+    <addaction name="separator" />
+    <addaction name="actionShowCenterAxes" />
+    <addaction name="actionResetCenter" />
+    <addaction name="actionScalarBarVisibility" />
+    <addaction name="separator" />
+    <addaction name="menuToolbars" />
+    <addaction name="separator" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -412,6 +412,17 @@
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_7" />
+  </widget>
+  <widget class="QToolBar" name="currentTimeToolbar" >
+   <property name="windowTitle" >
+    <string>Current Time Controls</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
   </widget>
   <action name="actionFileOpen" >
    <property name="icon" >

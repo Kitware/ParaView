@@ -1278,7 +1278,7 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::setupAnimationPanel(QDockWidget* dock_widget)
+pqAnimationPanel* pqMainWindowCore::setupAnimationPanel(QDockWidget* dock_widget)
 {
   pqAnimationPanel* const panel = new pqAnimationPanel(dock_widget);
 
@@ -1293,6 +1293,7 @@ void pqMainWindowCore::setupAnimationPanel(QDockWidget* dock_widget)
   pqAnimationManager* mgr = this->getAnimationManager();
   panel->setManager(mgr);
   dock_widget->setWidget(panel);
+  return  panel;
 }
 
 //-----------------------------------------------------------------------------
@@ -3198,9 +3199,15 @@ void pqMainWindowCore::getRootSources(QList<pqPipelineSource*> *sources,
 }
 
 //-----------------------------------------------------------------------------
-pqServer* pqMainWindowCore::getActiveServer()
+pqServer* pqMainWindowCore::getActiveServer() const
 {
   return this->Implementation->ActiveServer.current();
+}
+
+//-----------------------------------------------------------------------------
+pqActiveServer* pqMainWindowCore::getActiveServerTracker() const
+{
+  return &this->Implementation->ActiveServer;
 }
 
 //-----------------------------------------------------------------------------

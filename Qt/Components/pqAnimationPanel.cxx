@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QScrollArea>
 #include <QtDebug>
+#include <QToolBar>
 
 #include "pqActiveView.h"
 #include "pqAnimationCue.h"
@@ -82,9 +83,11 @@ public:
   QPointer<pqSignalAdaptorKeyFrameType> TypeAdaptor;
   QPointer<pqSignalAdaptorKeyFrameTime> TimeAdaptor;
   QPointer<pqKeyFrameTimeValidator> KeyFrameTimeValidator;
-  QPointer<pqDoubleSpinBoxDomain> SceneCurrentTimeDomain;
   QPointer<pqAnimationScene> ActiveScene;
   QPointer<pqRenderViewModule> ActiveView;
+
+  QPointer<QLineEdit> ToolbarCurrentTimeWidget;
+  QPointer<QSpinBox> ToolbarCurrentTimeIndexWidget;
 
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   pqSignalAdaptorComboBox* PlayModeAdaptor;
@@ -304,7 +307,6 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
     QObject::disconnect(
       this->Internal->ActiveScene->getServer()->getTimeKeeper(), 0, this, 0);
     this->Internal->SceneLinks.removeAllPropertyLinks();
-    delete this->Internal->SceneCurrentTimeDomain;
     }
 
   this->Internal->ActiveScene = scene;
@@ -322,7 +324,6 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
 
   // update domain to currentFrame before creating the link.
   this->onScenePlayModeChanged();
-
 
   this->Internal->SceneLinks.addPropertyLink(
     this->Internal->currentTime, "text", SIGNAL(textChanged(const QString&)),
@@ -384,6 +385,11 @@ void pqAnimationPanel::onTimeStepsChanged()
   this->Internal->currentTimeIndex->setRange(0, max);
   this->Internal->startTimeIndex->setRange(0, max);
   this->Internal->endTimeIndex->setRange(0, max);
+
+  if (this->Internal->ToolbarCurrentTimeIndexWidget)
+    {
+    this->Internal->ToolbarCurrentTimeIndexWidget->setRange(0, max);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -419,6 +425,14 @@ void pqAnimationPanel::onScenePlayModeChanged()
   this->Internal->currentTime->setEnabled(true);
   this->Internal->startTime->setEnabled(true);
   this->Internal->endTime->setEnabled(true);
+  if (this->Internal->ToolbarCurrentTimeWidget)
+    {
+    this->Internal->ToolbarCurrentTimeWidget->setEnabled(true);
+    }
+  if (this->Internal->ToolbarCurrentTimeIndexWidget)
+    {
+    this->Internal->ToolbarCurrentTimeIndexWidget->setEnabled(false);
+    }
 
   if (playmode == "Sequence")
     {
@@ -447,6 +461,14 @@ void pqAnimationPanel::onScenePlayModeChanged()
     this->Internal->currentTime->setEnabled(false);
     this->Internal->startTime->setEnabled(false);
     this->Internal->endTime->setEnabled(false);
+    if (this->Internal->ToolbarCurrentTimeWidget)
+      {
+      this->Internal->ToolbarCurrentTimeWidget->setEnabled(false);
+      }
+    if (this->Internal->ToolbarCurrentTimeIndexWidget)
+      {
+      this->Internal->ToolbarCurrentTimeIndexWidget->setEnabled(true);
+      }
     }
 }
 
@@ -1077,6 +1099,8 @@ void pqAnimationPanel::setCurrentTimeByIndex(int index)
 
   double time = timekeeper->getTimeStepValue(index);
   timekeeper->setTime(time);
+  // This will trigger onTimeChanged() which should update the two
+  // widgets showing current time index.
 }
 
 //-----------------------------------------------------------------------------
@@ -1087,17 +1111,79 @@ void pqAnimationPanel::onTimeChanged()
     return;
     }
 
+
+  pqTimeKeeper* timekeeper = 
+    this->Internal->ActiveScene->getServer()->getTimeKeeper();
+  double current_time = timekeeper->getTime();
+
   vtkSMProxy* proxy = this->Internal->ActiveScene->getProxy();
   QString playmode = pqSMAdaptor::getEnumerationProperty(
     proxy->GetProperty("PlayMode")).toString();
   if (playmode == "Snap To TimeSteps")
     {
-    pqTimeKeeper* timekeeper = 
-      this->Internal->ActiveScene->getServer()->getTimeKeeper();
+    int index = timekeeper->getTimeStepValueIndex(current_time);
+
     this->Internal->currentTimeIndex->blockSignals(true);
-    this->Internal->currentTimeIndex->setValue(
-      timekeeper->getTimeStepValueIndex(timekeeper->getTime()));
+    this->Internal->currentTimeIndex->setValue(index);
     this->Internal->currentTimeIndex->blockSignals(false);
+
+    if (this->Internal->ToolbarCurrentTimeIndexWidget)
+      {
+      this->Internal->ToolbarCurrentTimeIndexWidget->blockSignals(true);
+      this->Internal->ToolbarCurrentTimeIndexWidget->setValue(index);
+      this->Internal->ToolbarCurrentTimeIndexWidget->blockSignals(false);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationPanel::updatePanelCurrentTime(const QString& str)
+{
+  if (this->Internal->currentTime->text() != str)
+    {
+    this->Internal->currentTime->setText(str);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationPanel::updateToolbarCurrentTime(const QString& str)
+{
+  if (this->Internal->ToolbarCurrentTimeWidget->text() != str)
+    {
+    this->Internal->ToolbarCurrentTimeWidget->setText(str);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationPanel::setCurrentTimeToolbar(QToolBar* toolbar)
+{
+  if (!toolbar)
+    {
+    return;
     }
 
+  QLabel* label = new QLabel(toolbar);
+  label->setText("Time: ");
+
+  QLineEdit* timeedit = new QLineEdit(toolbar);
+  timeedit->setObjectName("CurrentTime");
+  timeedit->setValidator(new QDoubleValidator(toolbar));
+  this->Internal->ToolbarCurrentTimeWidget = timeedit;
+
+  QObject::connect(this->Internal->currentTime, SIGNAL(textChanged(const QString&)),
+    this, SLOT(updateToolbarCurrentTime(const QString&)));
+  QObject::connect(timeedit, SIGNAL(textChanged(const QString&)),
+    this, SLOT(updatePanelCurrentTime(const QString&)));
+
+  QSpinBox* sbtimeedit = new QSpinBox(toolbar);
+  sbtimeedit->setObjectName("CurrentTimeIndex");
+  this->Internal->ToolbarCurrentTimeIndexWidget = sbtimeedit;
+
+  QObject::connect(
+    this->Internal->ToolbarCurrentTimeIndexWidget, SIGNAL(valueChanged(int)),
+    this, SLOT(setCurrentTimeByIndex(int)));
+
+  toolbar->addWidget(label);
+  toolbar->addWidget(timeedit);
+  toolbar->addWidget(sbtimeedit);
 }

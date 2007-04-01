@@ -39,9 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pqActiveView.h>
 #include <pqApplicationCore.h>
-#include <pqObjectBuilder.h>
+#include <pqAnimationPanel.h>
 //#include <pqLookmarkToolbar.h>
 #include <pqMainWindowCore.h>
+#include <pqObjectBuilder.h>
 #include <pqObjectInspectorDriver.h>
 #include <pqObjectInspectorWidget.h>
 #include <pqObjectNaming.h>
@@ -64,9 +65,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAssistantClient>
 #include <QDir>
 #include <QIcon>
+#include <QLabel>
 #include <QLayout>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QSpinBox>
+#include <QPointer>
 
 //////////////////////////////////////////////////////////////////////////////
 // MainWindow::pqImplementation
@@ -100,6 +105,9 @@ public:
   pqRecentFilesMenu* RecentFilesMenu;
   pqViewMenu* ViewMenu;
   pqViewMenu* ToolbarsMenu;
+  QLineEdit* CurrentTimeWidget;
+  QSpinBox* CurrentTimeIndexWidget;
+  QPointer<pqServer> ActiveServer;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -517,8 +525,11 @@ MainWindow::MainWindow() :
   this->Implementation->Core.setupLookmarkInspector(
     this->Implementation->UI.lookmarkInspectorDock);
 
-  this->Implementation->Core.setupAnimationPanel(
+  pqAnimationPanel* animation_panel = 
+    this->Implementation->Core.setupAnimationPanel(
     this->Implementation->UI.animationPanelDock);
+  animation_panel->setCurrentTimeToolbar(
+    this->Implementation->UI.currentTimeToolbar);
   
   // Setup the view menu ...
   this->Implementation->ToolbarsMenu->addWidget(
@@ -556,6 +567,10 @@ MainWindow::MainWindow() :
   this->Implementation->ToolbarsMenu->addWidget(
     this->Implementation->UI.cameraToolbar,
     this->Implementation->UI.cameraToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.currentTimeToolbar,
+    this->Implementation->UI.currentTimeToolbar->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.pipelineBrowserDock,

@@ -42,6 +42,7 @@ class pqGenericViewModule;
 class pqPipelineSource;
 class pqProxy;
 class pqServerManagerModelItem;
+class QToolBar;
 class vtkSMProxy;
 
 /// This is the Animation panel widget. It controls the behaviour
@@ -67,6 +68,9 @@ public:
 
   /// Delete the keyframe at the given index.
   void deleteKeyFrame(int index);
+
+  /// Sets up toolbar to show/change current time.
+  void setCurrentTimeToolbar(QToolBar* toolbar);
 
 public slots:
   /// Show the keyframe GUI for the keyframe at the given index.
@@ -151,6 +155,10 @@ protected slots:
 
 
   void onTimeChanged();
+
+  void updatePanelCurrentTime(const QString&);
+  void updateToolbarCurrentTime(const QString&);
+
 protected:
   void buildPropertyList(vtkSMProxy* proxy, const QString& labelPrefix);
 

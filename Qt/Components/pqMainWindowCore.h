@@ -39,8 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkIOStream.h>
 
 #include <QObject>
-class QSize;
+
+class pqActionGroupInterface;
+class pqActiveServer;
 class pqAnimationManager;
+class pqAnimationPanel;
 class pqAnimationScene;
 class pqGenericViewModule;
 class pqLookmarkManagerModel;
@@ -58,12 +61,10 @@ class pqSelectionManager;
 class pqServer;
 class pqServerManagerModelItem;
 class pqToolsMenu;
+class pqUndoStack;
 class pqVCRController;
 class pqViewManager;
 class pqViewMenu;
-class pqActionGroupInterface;
-class pqUndoStack;
-
 class vtkUnstructuredGrid;
 
 class QAction;
@@ -72,6 +73,7 @@ class QIcon;
 class QImage;
 class QMenu;
 class QPoint;
+class QSize;
 class QStatusBar;
 class QToolBar;
 class QWidget;
@@ -120,7 +122,7 @@ public:
   void setupLookmarkInspector(QDockWidget* parent);
 
   /// Setup the animation panel, attaching it to the given dock.
-  void setupAnimationPanel(QDockWidget* parent);
+  pqAnimationPanel* setupAnimationPanel(QDockWidget* parent);
   
   /// Setup a variable-selection toolbar
   void setupVariableToolbar(QToolBar* parent);
@@ -151,7 +153,10 @@ public:
   void getRootSources(QList<pqPipelineSource*> *sources, pqPipelineSource *src);
 
   /// returns the active server.
-  pqServer* getActiveServer();
+  pqServer* getActiveServer() const;
+
+  /// Returns the pqActiveServer instace that keeps track of the active server.
+  pqActiveServer* getActiveServerTracker() const;
 
   void removeActiveSource();
   void removeActiveServer();
