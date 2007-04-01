@@ -340,8 +340,21 @@ SET(GUI_CONFIG_FILES
   ParaViewWriters
 )
 
-ADD_EXECUTABLE(vtkSMExtractDocumentation vtkSMExtractDocumentation.cxx)
-TARGET_LINK_LIBRARIES(vtkSMExtractDocumentation vtkPVServerManager)
+ADD_EXECUTABLE(vtkSMExtractDocumentation${PV_EXE_SUFFIX} vtkSMExtractDocumentation.cxx)
+
+# Add shared link forwarding executables if necessary.
+IF(PV_NEED_SHARED_FORWARD)
+  SET(edexe vtkSMExtractDocumentation)
+  CONFIGURE_FILE(
+    ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${edexe}-forward.c
+    @ONLY IMMEDIATE)
+  ADD_EXECUTABLE(${edexe} ${CMAKE_CURRENT_BINARY_DIR}/${edexe}-forward.c)
+  ADD_DEPENDENCIES(${edexe} ${edexe}${PV_EXE_SUFFIX})
+  INSTALL(TARGETS ${edexe} DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime)
+ENDIF(PV_NEED_SHARED_FORWARD)
+
+TARGET_LINK_LIBRARIES(vtkSMExtractDocumentation${PV_EXE_SUFFIX} vtkPVServerManager)
 GET_TARGET_PROPERTY(DOCUMENTATION_EXE vtkSMExtractDocumentation LOCATION)
 
 FOREACH(gcf ${GUI_CONFIG_FILES})
