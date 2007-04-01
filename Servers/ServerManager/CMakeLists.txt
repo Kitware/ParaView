@@ -345,6 +345,7 @@ ADD_EXECUTABLE(vtkSMExtractDocumentation${PV_EXE_SUFFIX} vtkSMExtractDocumentati
 # Add shared link forwarding executables if necessary.
 IF(PV_NEED_SHARED_FORWARD)
   SET(edexe vtkSMExtractDocumentation)
+  SET(PV_FORWARD_EXE ${edexe}${PV_EXE_SUFFIX})
   CONFIGURE_FILE(
     ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
     ${CMAKE_CURRENT_BINARY_DIR}/${edexe}-forward.c
