@@ -48,7 +48,7 @@ class vtkSMProxy;
 class vtkSMAbstractViewModuleProxy;
 
 // This is a vtkSMProxyManager observer. This class should simply listen to events
-// fired by proxy manager and respond. It does not support any creation method. 
+// fired by proxy manager and responds. It does not support any creation method. 
 // Use pqObjectBuilder for creating objects. The purpose of this class
 // is mostly to filter vtkSMProxyManager manager events and emit Qt signals.
 class PQCORE_EXPORT pqServerManagerObserver : public QObject
