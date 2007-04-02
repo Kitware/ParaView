@@ -66,8 +66,11 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
     }
 
   QString str = this->sourceModel()->data(idx).toString();
+  
+  // file grouping removes extension from the above str,
+  // so let's let the parent item of file groups through
+  bool pass = this->sourceModel()->hasChildren(idx);
 
-  bool pass = false;
   int i=0, end=this->Wildcards.size();
   for(; i<end && pass == false; i++)
     {
