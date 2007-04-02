@@ -29,20 +29,21 @@
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSource.h"
 #include "vtkStructuredGrid.h"
+#include "vtkTable.h"
 #include "vtkUniformGrid.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.26");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.27");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -389,6 +390,20 @@ void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromTable(vtkTable* data)
+{
+  this->SetDataClassName(data->GetClassName());
+  this->DataSetType = data->GetDataObjectType();
+  this->NumberOfDataSets = 0;
+  this->Bounds[0] = this->Bounds[1] = this->Bounds[2] 
+    = this->Bounds[3] = this->Bounds[4] = this->Bounds[5] = 0;
+
+  this->MemorySize = data->GetActualMemorySize();
+  this->NumberOfCells = data->GetNumberOfRows() * data->GetNumberOfColumns();
+  this->NumberOfPoints = 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 {
   vtkDataObject* dobj = vtkDataObject::SafeDownCast(object);
@@ -430,6 +445,13 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (ads)
     {
     this->CopyFromGenericDataSet(ads);
+    return;
+    }
+
+  vtkTable* table = vtkTable::SafeDownCast(dobj);
+  if (table)
+    {
+    this->CopyFromTable(table);
     return;
     }
 

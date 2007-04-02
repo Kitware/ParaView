@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 #include "pqPropertyLinks.h"
 #include "pqTextDisplayPropertiesWidget.h"
-#include "pqTextWidgetDisplay.h"
+#include "pqTextDisplay.h"
 #include "pqUndoStack.h"
 #include "pqXYPlotDisplayProxyEditor.h"
 
@@ -74,7 +74,7 @@ public:
 
     if(type == "BarChartDisplay" ||
        type == "XYPlotDisplay2" ||
-       qobject_cast<pqTextWidgetDisplay*>(proxy))
+       qobject_cast<pqTextDisplay*>(proxy))
       {
       return true;
       }
@@ -100,7 +100,7 @@ public:
       return new pqBarChartDisplayProxyEditor(proxy, p);
       }
     
-    if (qobject_cast<pqTextWidgetDisplay*>(proxy))
+    if (qobject_cast<pqTextDisplay*>(proxy))
       {
       return new pqTextDisplayPropertiesWidget(proxy, p);
       }

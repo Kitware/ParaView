@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTextWidgetDisplay.h
+   Module:    pqTextDisplay.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,40 +29,31 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqTextWidgetDisplay_h
-#define __pqTextWidgetDisplay_h
+#ifndef __pqTextDisplay_h
+#define __pqTextDisplay_h
 
 #include "pqConsumerDisplay.h"
 
-class pqTextWidgetDisplayInternal;
-
-// This is a display representation for TextWidgetDisplay proxy.
-// TextWidgetDisplay is not really a consumer display i.e. it doesn't
-// have an input. However, we fake one my linking the Text property
-// from the dummy input with the property on the display. 
-// All this is managed by this display.
-class PQCORE_EXPORT pqTextWidgetDisplay : public pqConsumerDisplay
+/// This is a display representation for "TextDisplay" proxy.
+/// This class may soon be removed since there's no particular
+/// need for it. It was created when text source wasn't a
+/// true source.
+class PQCORE_EXPORT pqTextDisplay : public pqConsumerDisplay
 {
   Q_OBJECT
 
   typedef pqConsumerDisplay Superclass;
 public:
-  pqTextWidgetDisplay(const QString& group, const QString& name,
+  pqTextDisplay(const QString& group, const QString& name,
     vtkSMProxy* display, pqServer* server,
     QObject* parent=0);
-  virtual ~pqTextWidgetDisplay();
+  virtual ~pqTextDisplay();
 
   virtual void setDefaultPropertyValues();
-protected slots:
-  // called when input property on display changes. We must detect if
-  // (and when) the display is connected to a new proxy.
-  virtual void onInputChanged();
 
 private:
-  pqTextWidgetDisplay(const pqTextWidgetDisplay&); // Not implemented.
-  void operator=(const pqTextWidgetDisplay&); // Not implemented.
-
-  pqTextWidgetDisplayInternal *Internal;
+  pqTextDisplay(const pqTextDisplay&); // Not implemented.
+  void operator=(const pqTextDisplay&); // Not implemented.
 };
 
 #endif

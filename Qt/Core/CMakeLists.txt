@@ -88,7 +88,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqStandardViewModules.h
   pqTableViewModule.h
   pqTimeKeeper.h
-  pqTextWidgetDisplay.h
+  pqTextDisplay.h
   pqUndoStack.h
   pqVTKHistogramModel.h
   pqVTKLineChartModel.h
@@ -272,8 +272,8 @@ ADD_LIBRARY(pqCore
   pqTableViewModule.h
   pqTimeKeeper.cxx
   pqTimeKeeper.h
-  pqTextWidgetDisplay.cxx
-  pqTextWidgetDisplay.h
+  pqTextDisplay.cxx
+  pqTextDisplay.h
   pqUndoStack.cxx
   pqUndoStack.h
   pqVTKHistogramColor.cxx

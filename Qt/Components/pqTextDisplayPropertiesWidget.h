@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPanel.h"
 
 /// This is a display editor widget for Text displays. 
+/// Can only work with pqTextDisplay objects.
 class PQCOMPONENTS_EXPORT pqTextDisplayPropertiesWidget : public pqDisplayPanel
 {
   Q_OBJECT

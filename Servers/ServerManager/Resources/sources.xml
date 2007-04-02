@@ -1279,22 +1279,19 @@ The output of the Wavelet source is image (uniform rectilinear) data.
    <!-- End NetworkImageSource -->
    </SourceProxy>
 
-   <Proxy name="TextSource" class="" label="Text">
-     <!-- 
-       "class" is deliberately empty, since this object has no server-side 
-       representation. 
-     -->
+   <SourceProxy name="TextSource" class="vtkPVTextSource" 
+      label="Text">
      <StringVectorProperty
        name="Text"
+       command="SetText"
        number_of_elements="1"
        default_values="Text">
         <Documentation>
           Enter the text to display.
         </Documentation>
      </StringVectorProperty>
-
    <!-- End of TextSource -->
-   </Proxy>
+   </SourceProxy>
 
    <SourceProxy name="SelectionSource" class="vtkSelectionSource">
      <Documentation>

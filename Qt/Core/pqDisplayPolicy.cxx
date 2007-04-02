@@ -73,7 +73,7 @@ vtkSMProxy* pqDisplayPolicy::newDisplayProxy(
   if (srcProxyName == "TextSource")
     {
     vtkSMProxy* p = vtkSMObject::GetProxyManager()->NewProxy(
-      "displays", "TextWidgetDisplay");
+      "displays", "TextDisplay");
     p->SetConnectionID(view->getServer()->GetConnectionID());
     return p;
     }

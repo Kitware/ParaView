@@ -94,6 +94,7 @@ SET(Filters_SRCS
   vtkPVServerTimeSteps.cxx
   vtkPVServerXDMFParameters.cxx
   vtkPVSummaryHelper.cxx
+  vtkPVTextSource.cxx
   vtkPVTrackballMoveActor.cxx
   vtkPVTrackballPan.cxx
   vtkPVTrackballRoll.cxx

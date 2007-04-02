@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTextWidgetDisplay.cxx
+   Module:    pqTextDisplay.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,39 +29,26 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqTextWidgetDisplay.h"
+#include "pqTextDisplay.h"
 
-#include "vtkSmartPointer.h"
-#include "vtkSMPropertyLink.h"
-#include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "pqSMAdaptor.h"
 
-#include "pqPipelineSource.h"
-
-class pqTextWidgetDisplayInternal
-{
-public:
-  vtkSmartPointer<vtkSMPropertyLink> InputLink;
-};
-
 //-----------------------------------------------------------------------------
-pqTextWidgetDisplay::pqTextWidgetDisplay(const QString& group, 
+pqTextDisplay::pqTextDisplay(const QString& group, 
   const QString& name, vtkSMProxy* display, pqServer* server,
     QObject* _parent): 
   pqConsumerDisplay(group, name, display, server, _parent)
 {
-  this->Internal = new pqTextWidgetDisplayInternal;
 };
 
 //-----------------------------------------------------------------------------
-pqTextWidgetDisplay::~pqTextWidgetDisplay()
+pqTextDisplay::~pqTextDisplay()
 {
-  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-void pqTextWidgetDisplay::setDefaultPropertyValues()
+void pqTextDisplay::setDefaultPropertyValues()
 {
   this->Superclass::setDefaultPropertyValues();
   if (!this->isVisible())
@@ -80,23 +67,6 @@ void pqTextWidgetDisplay::setDefaultPropertyValues()
   proxy->UpdateVTKObjects();
 }
 
-//-----------------------------------------------------------------------------
-void pqTextWidgetDisplay::onInputChanged()
-{
-  this->Superclass::onInputChanged();
-  this->Internal->InputLink = 0;
-  pqPipelineSource* input = this->getInput();
-  if (input)
-    {
-    vtkSMPropertyLink* link = vtkSMPropertyLink::New();
-    link->AddLinkedProperty(
-      input->getProxy(), "Text", vtkSMLink::INPUT);
-    link->AddLinkedProperty(
-      this->getProxy(), "Text", vtkSMLink::OUTPUT);
-    this->Internal->InputLink = link;
-    link->Delete();
-    }
-}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

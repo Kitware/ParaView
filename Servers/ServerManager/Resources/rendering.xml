@@ -2584,6 +2584,55 @@
   </ProxyGroup>
   
   <ProxyGroup name="displays">
+    <TextDisplayProxy name="TextDisplay">
+      <InputProperty name="Input" command="">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+      </InputProperty>
+
+      <Property name="Update" 
+        command="Update" 
+        update_self="1">
+      </Property>
+
+      <Property name="InvalidateGeometry" 
+        command="InvalidateGeometry" 
+        update_self="1">
+      </Property>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressor"
+          proxygroup="filters" proxyname="UpdateSuppressor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="CacheUpdate" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="TextWidget"
+          proxygroup="displays" proxyname="TextWidgetDisplay">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+          <Property name="Visibility" />
+          <Property name="Position" />
+          <Property name="Position2" />
+          <Property name="PositionInfo" />
+          <Property name="Position2Info" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Collect" 
+        proxygroup="filters" proxyname="ClientServerMoveData">
+        </Proxy>
+      </SubProxy>
+    <!-- End of TextDisplay -->
+    </TextDisplayProxy>
+
     <PointLabelDisplayProxy name="PointLabelDisplay">
       <InputProperty
         name="Input"
@@ -3458,10 +3507,6 @@
     </New3DWidgetProxy>
 
     <New3DWidgetProxy name="TextWidgetDisplay">
-      <ProxyProperty
-        name="Input">
-      </ProxyProperty>
-
       <IntVectorProperty
         name="Enabled"
         command="SetEnabled"

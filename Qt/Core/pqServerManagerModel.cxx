@@ -55,14 +55,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
+#include "pqPluginManager.h"
 #include "pqRenderViewModule.h"
 #include "pqScalarBarDisplay.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
-#include "pqTextWidgetDisplay.h"
+#include "pqTextDisplay.h"
 #include "pqTimeKeeper.h"
-#include "pqPluginManager.h"
 #include "pqViewModuleInterface.h"
 
 #include <QVTKWidget.h>
@@ -396,9 +396,9 @@ void pqServerManagerModel::onAddDisplay(QString name,
     // 2) create a new pqConsumerDisplay;
     display = new pqPipelineDisplay(name, dProxy, server, this);
     }
-  else if (xml_name == QString("TextWidgetDisplay"))
+  else if (xml_name == QString("TextDisplay"))
     {
-    display = new pqTextWidgetDisplay("displays", name, proxy, server, this);
+    display = new pqTextDisplay("displays", name, proxy, server, this);
     }
   else
     {

@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyLinks.h"
 #include "pqDisplay.h"
-#include "pqTextWidgetDisplay.h"
+#include "pqTextDisplay.h"
 
 class pqTextDisplayPropertiesWidget::pqInternal : 
   public Ui::pqTextDisplayPropertiesWidget
@@ -81,7 +81,7 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqDisplay* display)
     QObject::disconnect(this->Internal->Display, 0, this, 0);
     }
 
-  this->Internal->Display = qobject_cast<pqTextWidgetDisplay*>(display);
+  this->Internal->Display = qobject_cast<pqTextDisplay*>(display);
   if (!this->Internal->Display)
     {
     return;
