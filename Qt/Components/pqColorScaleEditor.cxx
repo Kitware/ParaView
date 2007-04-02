@@ -179,10 +179,12 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->Gradient->setModel(colorModel);
 
   new pqColorMapColorChanger(this->Form->Gradient);
+  this->connect(this->Form->Gradient, SIGNAL(currentPointChanged(int)),
+      this, SLOT(setCurrentPoint(int)));
   this->connect(colorModel, SIGNAL(colorChanged(int, const QColor &)),
       this, SLOT(setColors()));
   this->connect(colorModel, SIGNAL(pointAdded(int)),
-      this, SLOT(handleEditorAddOrDelete()));
+      this, SLOT(handleEditorAdd(int)));
   this->connect(colorModel, SIGNAL(pointRemoved(int)),
       this, SLOT(handleEditorAddOrDelete()));
   this->connect(this->Form->Gradient, SIGNAL(pointMoved(int)),
@@ -388,13 +390,33 @@ void pqColorScaleEditor::handleEditorAddOrDelete()
 #if USE_VTK_TFE
     this->Form->CurrentIndex = this->Viewer->GetCurrentElementId();
 #else
-    this->Form->CurrentIndex = -1; // TODO
+    this->Form->CurrentIndex = this->Form->Gradient->getCurrentPoint();
 #endif
 
     // Update the gui controls.
     this->enablePointControls();
     this->updatePointValues();
     }
+}
+
+void pqColorScaleEditor::handleEditorAdd(int index)
+{
+#if !USE_VTK_TFE
+  if(!this->Form->IgnoreEditor)
+    {
+    this->setColors();
+
+    // Set the new point as the current point.
+    this->Form->Gradient->blockSignals(true);
+    this->Form->Gradient->setCurrentPoint(index);
+    this->Form->Gradient->blockSignals(false);
+    this->Form->CurrentIndex = this->Form->Gradient->getCurrentPoint();
+
+    // Update the gui controls.
+    this->enablePointControls();
+    this->updatePointValues();
+    }
+#endif
 }
 
 void pqColorScaleEditor::setColors()
@@ -508,15 +530,25 @@ void pqColorScaleEditor::handlePointsChanged()
 #else
     model->finishModifyingData();
 #endif
-    this->Form->IgnoreEditor = false;
 
-#if USE_VTK_TFE
     // Set the current point on the editor.
-    this->Viewer->SetCurrentElementId(index);
-    this->handleEditorCurrentChanged();
-#else
-    // TODO
-#endif
+    if(index != -1)
+      {
+  #if USE_VTK_TFE
+      this->Viewer->SetCurrentElementId(index);
+      this->Form->CurrentIndex = this->Viewer->GetCurrentElementId();
+  #else
+      this->Form->Gradient->blockSignals(true);
+      this->Form->Gradient->setCurrentPoint(index);
+      this->Form->Gradient->blockSignals(false);
+      this->Form->CurrentIndex = this->Form->Gradient->getCurrentPoint();
+  #endif
+      }
+
+    // Update the displayed values.
+    this->Form->IgnoreEditor = false;
+    this->enablePointControls();
+    this->updatePointValues();
     }
 }
 
@@ -537,7 +569,11 @@ void pqColorScaleEditor::setCurrentPoint(int index)
   if(index != this->Form->CurrentIndex)
     {
     // Make sure any pending value or opacity changes are handled.
-    this->applyTextChanges();
+    if(this->EditDelay->isActive())
+      {
+      this->EditDelay->stop();
+      this->applyTextChanges();
+      }
 
     // Change the current index and update the gui elements.
     this->Form->CurrentIndex = index;
@@ -644,7 +680,7 @@ void pqColorScaleEditor::setOpacityFromText()
 
   // Get the opacity from the line edit.
   bool ok = true;
-  double opacity = this->Form->ScalarValue->text().toDouble(&ok);
+  double opacity = this->Form->Opacity->text().toDouble(&ok);
   if(!ok)
     {
     // Reset to the previous opacity.
@@ -666,6 +702,7 @@ void pqColorScaleEditor::setOpacityFromText()
   this->Form->IgnoreEditor = true;
 #if USE_VTK_TFE
   this->Viewer->SetElementOpacity(this->Form->CurrentIndex, opacity);
+  this->Viewer->Render();
 #else
   pqColorMapModel *model = this->Form->Gradient->getModel();
   model->setPointOpacity(this->Form->CurrentIndex, pqChartValue(opacity));
@@ -708,7 +745,11 @@ void pqColorScaleEditor::setColorSpace(int index)
 void pqColorScaleEditor::savePreset()
 {
   // Make sure the any pending text changes are handled.
-  this->applyTextChanges();
+  if(this->EditDelay->isActive())
+    {
+    this->EditDelay->stop();
+    this->applyTextChanges();
+    }
 
   // Get the color preset model from the manager.
   pqColorPresetModel *model = this->Form->Presets->getModel();
@@ -757,7 +798,11 @@ void pqColorScaleEditor::savePreset()
 void pqColorScaleEditor::loadPreset()
 {
   // Make sure the any pending text changes are handled.
-  this->applyTextChanges();
+  if(this->EditDelay->isActive())
+    {
+    this->EditDelay->stop();
+    this->applyTextChanges();
+    }
 
   this->Form->Presets->setUsingCloseButton(false);
   if(this->Form->Presets->exec() == QDialog::Accepted)
@@ -852,10 +897,16 @@ void pqColorScaleEditor::loadPreset()
 
       // Set up the current point index.
 #if USE_VTK_TFE
-      this->handleEditorCurrentChanged();
+      this->Form->CurrentIndex = this->Viewer->GetCurrentElementId();
 #else
-      // TODO
+      this->Form->Gradient->blockSignals(true);
+      this->Form->Gradient->setCurrentPoint(0);
+      this->Form->Gradient->blockSignals(false);
+      this->Form->CurrentIndex = this->Form->Gradient->getCurrentPoint();
 #endif
+
+      this->enablePointControls();
+      this->updatePointValues();
       }
     }
 }
@@ -1323,17 +1374,23 @@ void pqColorScaleEditor::initColorScale()
 
 #if USE_VTK_TFE
   this->Viewer->Render();
+
+  // Get the current point from the editor.
+  this->Form->CurrentIndex = this->Viewer->GetCurrentElementId();
 #else
   model->finishModifyingData();
+
+  // Set the current point.
+  this->Form->Gradient->blockSignals(true);
+  this->Form->Gradient->setCurrentPoint(0);
+  this->Form->Gradient->blockSignals(false);
+  this->Form->CurrentIndex = this->Form->Gradient->getCurrentPoint();
 #endif
 
-  // Update the current point index.
+  // Update the displayed current point index.
   this->Form->IgnoreEditor = false;
-#if USE_VTK_TFE
-  this->handleEditorCurrentChanged();
-#else
-  // TODO
-#endif
+  this->enablePointControls();
+  this->updatePointValues();
 }
 
 void pqColorScaleEditor::enablePointControls()

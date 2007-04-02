@@ -70,6 +70,7 @@ private slots:
   //@{
   void handleEditorPointMoved();
   void handleEditorAddOrDelete();
+  void handleEditorAdd(int index);
   void setColors();
   void changeCurrentColor();
 
