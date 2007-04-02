@@ -768,6 +768,7 @@ void pqMainWindowCore::setSourceMenu(QMenu* menu)
     QObject::connect(menu, SIGNAL(triggered(QAction*)), 
       this, SLOT(onCreateSource(QAction*)));
 
+    this->Implementation->updateSourcesFromXML();
     this->refreshSourcesMenu();
     }
 }
@@ -810,14 +811,17 @@ void pqMainWindowCore::pqImplementation::addProxyToMenu(
 
 void pqMainWindowCore::refreshSourcesMenu()
 {
-  this->Implementation->updateSourcesFromXML();
-
   if (this->Implementation->SourceMenu)
     {
     this->Implementation->SourceMenu->clear();
 
     vtkstd::set<vtkstd::string> newSources;
+    vtkstd::set<vtkstd::string>::iterator iter;
     this->Implementation->instantiateGroupPrototypes("sources", newSources);
+    for(iter = newSources.begin(); iter != newSources.end(); ++iter)
+      {
+      this->Implementation->Sources.push_back(*iter);
+      }
 
     vtkstd::vector<vtkstd::string>::iterator sourceIter =
       this->Implementation->Sources.begin();
@@ -829,18 +833,6 @@ void pqMainWindowCore::refreshSourcesMenu()
                                            0,
                                            false);
       }
-
-    // We now add the new sources that were added to sources_prototypes:
-    // these sources were added by a plugin
-    vtkstd::set<vtkstd::string>::iterator nsIter = newSources.begin();
-    for(; nsIter != newSources.end(); nsIter++)
-      {
-      this->Implementation->addProxyToMenu("sources_prototypes",
-                                           nsIter->c_str(),
-                                           this->Implementation->SourceMenu,
-                                           0,
-                                           false);
-      }
     }
 }
 
@@ -848,8 +840,6 @@ void pqMainWindowCore::refreshSourcesMenu()
 void pqMainWindowCore::refreshFiltersMenu()
 {
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-
-  this->Implementation->updateFiltersFromXML();
 
   vtkstd::set<vtkstd::string> newFilters;
   this->Implementation->instantiateGroupPrototypes("filters", newFilters);
@@ -1025,6 +1015,7 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
       this, SLOT(updateRecentFilterMenu(QAction*)),
       Qt::QueuedConnection);
 
+    this->Implementation->updateFiltersFromXML();
     this->refreshFiltersMenu();
     }
 }
