@@ -66,6 +66,9 @@ public:
   void setAddingPointsAllowed(bool allowed) {this->AddingAllowed = allowed;}
   bool isAddingPointsAllowed() const {return this->AddingAllowed;}
 
+  int getCurrentPoint() const;
+  void setCurrentPoint(int index);
+
   void layoutColorMap();
 
   virtual QSize sizeHint() const;
@@ -73,11 +76,14 @@ public:
 signals:
   void colorChangeRequested(int index);
   void pointMoved(int index);
+  void currentPointChanged(int index);
 
 protected:
+  virtual void keyPressEvent(QKeyEvent *e);
   virtual void mousePressEvent(QMouseEvent *e);
   virtual void mouseMoveEvent(QMouseEvent *e);
   virtual void mouseReleaseEvent(QMouseEvent *e);
+  virtual void mouseDoubleClickEvent(QMouseEvent *e);
   virtual void paintEvent(QPaintEvent *e);
   virtual void resizeEvent(QResizeEvent *e);
 

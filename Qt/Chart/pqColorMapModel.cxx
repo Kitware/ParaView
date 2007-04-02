@@ -178,7 +178,7 @@ void pqColorMapModel::addPoint(const pqChartValue &value, const QColor &color,
   // The list of points should be in ascending value order. Add the
   // new point according to its value.
   QList<pqColorMapModelItem *>::Iterator iter = this->Internal->begin();
-  for( ; iter != this->Internal->end(); ++ iter)
+  for( ; iter != this->Internal->end(); ++iter)
     {
     if(value == (*iter)->Value)
       {

@@ -74,6 +74,7 @@ public:
   QTimer *MoveTimer;                   ///< Used for mouse interaction.
   MouseMode Mode;                      ///< The current mouse mode.
   int PointIndex;                      ///< Used for mouse interaction.
+  int CurrentPoint;                    ///< Used for point selection.
   bool PointMoved;                     ///< True if point was moved.
 };
 
@@ -85,6 +86,7 @@ pqColorMapWidgetInternal::pqColorMapWidgetInternal()
   this->MoveTimer = 0;
   this->Mode = pqColorMapWidgetInternal::NoMode;
   this->PointIndex = -1;
+  this->CurrentPoint = -1;
   this->PointMoved = false;
 }
 
@@ -121,6 +123,7 @@ void pqColorMapWidget::setModel(pqColorMapModel *model)
     this->disconnect(this->Model, 0, this, 0);
     }
 
+  this->Internal->CurrentPoint = -1;
   this->Model = model;
   if(this->Model)
     {
@@ -155,6 +158,26 @@ void pqColorMapWidget::setTableSize(int resolution)
       this->layoutColorMap();
       this->viewport()->update();
       }
+    }
+}
+
+int pqColorMapWidget::getCurrentPoint() const
+{
+  return this->Internal->CurrentPoint;
+}
+
+void pqColorMapWidget::setCurrentPoint(int index)
+{
+  if(!this->Model || index < 0 || index >= this->Model->getNumberOfPoints())
+    {
+    return;
+    }
+
+  if(index != this->Internal->CurrentPoint)
+    {
+    this->Internal->CurrentPoint = index;
+    emit this->currentPointChanged(this->Internal->CurrentPoint);
+    this->viewport()->update();
     }
 }
 
@@ -204,6 +227,42 @@ QSize pqColorMapWidget::sizeHint() const
   int w = 100;
   int h = 22 + this->PointWidth + (2 * this->Margin);
   return QSize(w, h);
+}
+
+void pqColorMapWidget::keyPressEvent(QKeyEvent *e)
+{
+  if(!this->Model)
+    {
+    return;
+    }
+
+  if(e->key() == Qt::Key_Delete || e->key() == Qt::Key_Backspace)
+    {
+    if(this->Internal->CurrentPoint != -1 && this->AddingAllowed &&
+        this->Internal->PointIndex > 0 &&
+        this->Internal->PointIndex < this->Internal->Items.size() - 1)
+      {
+      this->Model->removePoint(this->Internal->CurrentPoint);
+      }
+    }
+  else if(e->key() == Qt::Key_Left)
+    {
+    if(this->Internal->CurrentPoint > 0)
+      {
+      this->Internal->CurrentPoint--;
+      emit this->currentPointChanged(this->Internal->CurrentPoint);
+      this->viewport()->update();
+      }
+    }
+  else if(e->key() == Qt::Key_Right)
+    {
+    if(this->Internal->CurrentPoint < this->Model->getNumberOfPoints() - 1)
+      {
+      this->Internal->CurrentPoint++;
+      emit this->currentPointChanged(this->Internal->CurrentPoint);
+      this->viewport()->update();
+      }
+    }
 }
 
 void pqColorMapWidget::mousePressEvent(QMouseEvent *e)
@@ -348,21 +407,17 @@ void pqColorMapWidget::mouseReleaseEvent(QMouseEvent *e)
     {
     if(this->Internal->PointIndex != -1)
       {
-      if(e->modifiers() == Qt::ControlModifier)
+      if(this->Internal->CurrentPoint == this->Internal->PointIndex)
         {
-        // Ctrl+click removes a point.
-        if(this->AddingAllowed && this->Internal->PointIndex > 0 &&
-            this->Internal->PointIndex < this->Internal->Items.size() - 1)
-          {
-          int index = this->Internal->PointIndex;
-          this->Internal->PointIndex = -1;
-          this->Model->removePoint(index);
-          }
+        // This is a click on the current point. Make a request for
+        // the color change event.
+        emit this->colorChangeRequested(this->Internal->CurrentPoint);
         }
-      else if(e->modifiers() == Qt::NoModifier)
+      else
         {
-        // Make a request for the color change event.
-        emit this->colorChangeRequested(this->Internal->PointIndex);
+        this->Internal->CurrentPoint = this->Internal->PointIndex;
+        emit this->currentPointChanged(this->Internal->CurrentPoint);
+        this->viewport()->update();
         }
       }
     else if(this->AddingAllowed && e->modifiers() == Qt::NoModifier &&
@@ -377,6 +432,17 @@ void pqColorMapWidget::mouseReleaseEvent(QMouseEvent *e)
       QColor color = image.pixel(e->x() - this->Internal->ImageArea.left(), 0);
       this->Model->addPoint(value, color);
       }
+    }
+}
+
+void pqColorMapWidget::mouseDoubleClickEvent(QMouseEvent *e)
+{
+  if(this->Internal->Mode == pqColorMapWidgetInternal::NoMode &&
+      e->button() == Qt::LeftButton && this->Model &&
+      this->Internal->CurrentPoint != -1)
+    {
+    // Double click behaves the same as selected-clicked.
+    emit this->colorChangeRequested(this->Internal->CurrentPoint);
     }
 }
 
@@ -425,20 +491,30 @@ void pqColorMapWidget::paintEvent(QPaintEvent *e)
     painter.setPen(QColor(Qt::black));
     //painter.setRenderHint(QPainter::Antialiasing, true);
     pqDiamondPointMarker marker(QSize(this->PointWidth, this->PointWidth));
+    int highlightWidth = this->PointWidth + (2 * this->Margin);
+    pqDiamondPointMarker highlight(QSize(highlightWidth, highlightWidth));
     QList<int>::Iterator iter = this->Internal->Items.begin();
     for(int i = 0; iter != this->Internal->Items.end(); ++iter, ++i)
       {
       painter.save();
       this->Model->getPointColor(i, color);
+      painter.setBrush(QBrush(color));
+      painter.translate(*iter, 0);
       if(color.red() < 60 && color.green() < 60 && color.blue() < 60)
         {
         // If the color is too dark, a black outline won't show up.
         painter.setPen(QColor(128, 128, 128));
         }
 
-      painter.setBrush(QBrush(color));
-      painter.translate(*iter, 0);
-      marker.drawMarker(painter);
+      if(i == this->Internal->CurrentPoint)
+        {
+        highlight.drawMarker(painter);
+        }
+      else
+        {
+        marker.drawMarker(painter);
+        }
+
       painter.restore();
       }
     }
@@ -465,6 +541,7 @@ void pqColorMapWidget::updateColorGradient()
 
 void pqColorMapWidget::handlePointsReset()
 {
+  this->Internal->CurrentPoint = -1;
   this->Internal->Items.clear();
   if(this->Model)
     {
@@ -506,9 +583,15 @@ void pqColorMapWidget::startRemovingPoint(int index)
     }
 }
 
-void pqColorMapWidget::finishRemovingPoint(int)
+void pqColorMapWidget::finishRemovingPoint(int index)
 {
   this->generateGradient();
+  if(index == this->Internal->CurrentPoint &&
+      index >= this->Model->getNumberOfPoints())
+    {
+    this->Internal->CurrentPoint = this->Model->getNumberOfPoints() - 1;
+    }
+
   this->viewport()->update();
 }
 
