@@ -198,23 +198,46 @@ void pqProxyInformationWidget::updateInformation()
 
     double bounds[6];
     dataInformation->GetBounds(bounds);
-
-    QString xrange = QString("%1 to %2 (delta: %3)");
-    xrange = xrange.arg(bounds[0], -1, 'f', 3);
-    xrange = xrange.arg(bounds[1], -1, 'f', 3);
-    xrange = xrange.arg(bounds[1] - bounds[0], -1, 'f', 3);
+    QString xrange;
+    if (bounds[0] == VTK_DOUBLE_MAX && bounds[1] == -VTK_DOUBLE_MAX)
+      {
+      xrange = "Not available";
+      }
+    else
+      {
+      xrange = QString("%1 to %2 (delta: %3)");
+      xrange = xrange.arg(bounds[0], -1, 'f', 3);
+      xrange = xrange.arg(bounds[1], -1, 'f', 3);
+      xrange = xrange.arg(bounds[1] - bounds[0], -1, 'f', 3);
+      }
     this->Ui->xRange->setText(xrange);
 
-    QString yrange = QString("%1 to %2 (delta: %3)");
-    yrange = yrange.arg(bounds[2], -1, 'f', 3);
-    yrange = yrange.arg(bounds[3], -1, 'f', 3);
-    yrange = yrange.arg(bounds[3] - bounds[2], -1, 'f', 3);
+    QString yrange;
+    if (bounds[2] == VTK_DOUBLE_MAX && bounds[3] == -VTK_DOUBLE_MAX)
+      {
+      yrange = "Not available";
+      }
+    else
+      {
+      yrange = QString("%1 to %2 (delta: %3)");
+      yrange = yrange.arg(bounds[2], -1, 'f', 3);
+      yrange = yrange.arg(bounds[3], -1, 'f', 3);
+      yrange = yrange.arg(bounds[3] - bounds[2], -1, 'f', 3);
+      }
     this->Ui->yRange->setText(yrange);
 
-    QString zrange = QString("%1 to %2 (delta: %3)");
-    zrange = zrange.arg(bounds[4], -1, 'f', 3);
-    zrange = zrange.arg(bounds[5], -1, 'f', 3);
-    zrange = zrange.arg(bounds[5] - bounds[4], -1, 'f', 3);
+    QString zrange;
+    if (bounds[4] == VTK_DOUBLE_MAX && bounds[5] == -VTK_DOUBLE_MAX)
+      {
+      zrange = "Not available";
+      }
+    else
+      {
+      zrange = QString("%1 to %2 (delta: %3)");
+      zrange = zrange.arg(bounds[4], -1, 'f', 3);
+      zrange = zrange.arg(bounds[5], -1, 'f', 3);
+      zrange = zrange.arg(bounds[5] - bounds[4], -1, 'f', 3);
+      }
     this->Ui->zRange->setText(zrange);
 
     }
