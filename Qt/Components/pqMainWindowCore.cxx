@@ -1853,7 +1853,6 @@ void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
   //this->Implementation->MultiViewManager.saveState(root);
   this->multiViewManager().saveState(root);
 
-
   // Print the xml to the requested file(s).
   pqServer *server = this->getActiveServer();
   for(int i = 0; i != files.size(); ++i)
@@ -2574,11 +2573,11 @@ void pqMainWindowCore::updateRecentFilterMenu(QAction* action)
     if(proxyManager->GetCompoundProxyDefinition(proxyName.toAscii().data()) &&
      !proxyManager->GetProxy("filters_prototypes",proxyName.toAscii().data()))
       {
-      QAction* action = 
+      QAction* cfAction = 
           new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"),proxyName,
               this->Implementation->RecentFiltersMenu)
           << pqSetName(proxyName) << pqSetData(proxyName);
-      this->Implementation->RecentFiltersMenu->addAction(action);
+      this->Implementation->RecentFiltersMenu->addAction(cfAction);
       }
     else
       {
