@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogModel.h"
 #include "pqFileDialogFavoriteModel.h"
 #include "pqFileDialogFilter.h"
+#include "pqServer.h"
 
 #include "ui_pqFileDialog.h"
 
@@ -108,10 +109,10 @@ public:
   pqFileDialogModel* const Model;
   pqFileDialogFavoriteModel* const FavoriteModel;
   pqFileDialogFilter FileFilter;
+  QLineEdit *FolderNameEditorWidget;
   FileMode Mode;
   Ui::pqFileDialog Ui;
   QStringList SelectedFiles;
-  QLineEdit *FolderNameEditorWidget;
   QString TempFolderName;
 
   pqImplementation(pqServer* server) :
@@ -161,11 +162,15 @@ pqFileDialog::pqFileDialog(
 
   this->Implementation->Ui.Files->setModel(&this->Implementation->FileFilter);
   this->Implementation->Ui.Files->setSelectionBehavior(QAbstractItemView::SelectRows);
-  this->Implementation->Ui.Files->setContextMenuPolicy(Qt::CustomContextMenu);
- // QObject::connect(this->Implementation->Ui.Files,
- //                  SIGNAL(customContextMenuRequested(const QPoint &)), 
- //                  this, SLOT(onContextMenuRequested(const QPoint &)));
 
+  if(server && !server->isRemote())
+    {
+    this->Implementation->Ui.Files->setContextMenuPolicy(Qt::CustomContextMenu);
+    QObject::connect(this->Implementation->Ui.Files,
+                    SIGNAL(customContextMenuRequested(const QPoint &)), 
+                    this, SLOT(onContextMenuRequested(const QPoint &)));
+    this->Implementation->Ui.CreateFolder->setEnabled( true );
+    }
 
   this->Implementation->Ui.Favorites->setModel(this->Implementation->FavoriteModel);
   this->Implementation->Ui.Favorites->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -275,7 +280,7 @@ void pqFileDialog::onCreateNewFolder()
   int numrows = m->rowCount(QModelIndex());
   bool found = false;
   QModelIndex idx;
-  for(int i=0; i<numrows; i++)
+  for(i=0; i<numrows; i++)
     {
     idx = m->index(i, 0, QModelIndex());
     if(dirName == m->data(idx, Qt::DisplayRole))
