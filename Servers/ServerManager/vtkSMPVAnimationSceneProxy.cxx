@@ -19,7 +19,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPVAnimationSceneProxy);
-vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.6");
 vtkCxxSetObjectMacro(vtkSMPVAnimationSceneProxy, TimeKeeper, vtkSMProxy);
 //-----------------------------------------------------------------------------
 vtkSMPVAnimationSceneProxy::vtkSMPVAnimationSceneProxy()
@@ -278,7 +278,21 @@ void vtkSMPVAnimationSceneProxy::TickInternal(
     {
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
       this->TimeKeeper->GetProperty("Time"));
-    dvp->SetElement(0, cueInfo->AnimationTime);
+    if (this->PlayMode == SNAP_TO_TIMESTEPS)
+      {
+      dvp->SetElement(0, cueInfo->AnimationTime);
+      // When in SNAP_TO_TIMESTEPS mode, the tick time is same as the clock time.
+      }
+    else
+      {
+      // In any other mode, tick time depends on the number of frames or duration 
+      // in seconds. We've to compute the clock time using the start-end
+      // times for the clock.
+      double ntime = cueInfo->AnimationTime/(cueInfo->EndTime - cueInfo->StartTime);
+      double current_time = this->ClockTimeRange[0] + (this->ClockTimeRange[1] -
+        this->ClockTimeRange[0])*ntime;
+      dvp->SetElement(0, current_time);
+      }
     }
 
   this->Superclass::TickInternal(info);
