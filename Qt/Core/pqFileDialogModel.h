@@ -76,6 +76,11 @@ public:
 
   /// Return true iff the given row is a directory
   bool isDir(const QModelIndex&);
+
+  // Creates/Removes a directory called dirname in the CWD
+  // Return true on success, false otherwise
+  bool makeDir(const QString& dirname);
+  bool removeDir(const QString& dirname);
   
   /// Returns whether the file exists
   /// also returns the full path, which could be a resolved shortcut

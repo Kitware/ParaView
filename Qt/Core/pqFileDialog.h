@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 
 class QModelIndex;
+class QPoint;
 class pqServer;
 
 /**
@@ -140,6 +141,16 @@ private slots:
   
   // Called when the user changes the file selection.
   void fileSelectionChanged();
+
+  // Called when the user right-clicks in the file qtreeview
+  void onContextMenuRequested(const QPoint &pos);
+
+  // Called when the user requests to create a new directory in the cwd
+  void onCreateNewFolder();
+
+  // Called when the user presses 'return' or clicks out of the qlineedit 
+  // widget used to change the name of a directory that has just been created
+  void onFinishedEditingNewFolderName();
   
 private:
   pqFileDialog(const pqFileDialog&);

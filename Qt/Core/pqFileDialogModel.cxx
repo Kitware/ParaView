@@ -527,6 +527,44 @@ bool pqFileDialogModel::fileExists(const QString& file, QString& fullpath)
   return false;
 }
 
+bool pqFileDialogModel::makeDir(const QString& dirName)
+{
+  QDir currentDir(this->getCurrentPath());
+  bool dirCreated = currentDir.mkdir(dirName);
+  if(!dirCreated)
+    {
+    return false;
+    }
+
+  QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(true, cPath, false);
+  this->Implementation->Update(cPath, info);
+
+  this->reset();
+
+  return true;
+}
+
+bool pqFileDialogModel::removeDir(const QString& dirName)
+{
+  QDir currentDir(this->getCurrentPath());
+  bool dirRemoved = currentDir.rmdir(dirName);
+  if(!dirRemoved)
+    {
+    return false;
+    }
+
+  QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(true, cPath, false);
+  this->Implementation->Update(cPath, info);
+
+  this->reset();
+
+  return true;
+}
+
 bool pqFileDialogModel::dirExists(const QString& path, QString& fullpath)
 {
   QString dir = this->Implementation->cleanPath(path);
