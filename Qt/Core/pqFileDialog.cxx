@@ -157,13 +157,14 @@ pqFileDialog::pqFileDialog(
       standardPixmap(QStyle::SP_FileDialogToParent));
   this->Implementation->Ui.CreateFolder->setIcon(style()->
       standardPixmap(QStyle::SP_FileDialogNewFolder));
+  this->Implementation->Ui.CreateFolder->setDisabled( true );
 
   this->Implementation->Ui.Files->setModel(&this->Implementation->FileFilter);
   this->Implementation->Ui.Files->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->Implementation->Ui.Files->setContextMenuPolicy(Qt::CustomContextMenu);
-  QObject::connect(this->Implementation->Ui.Files,
-                   SIGNAL(customContextMenuRequested(const QPoint &)), 
-                   this, SLOT(onContextMenuRequested(const QPoint &)));
+ // QObject::connect(this->Implementation->Ui.Files,
+ //                  SIGNAL(customContextMenuRequested(const QPoint &)), 
+ //                  this, SLOT(onContextMenuRequested(const QPoint &)));
 
 
   this->Implementation->Ui.Favorites->setModel(this->Implementation->FavoriteModel);
