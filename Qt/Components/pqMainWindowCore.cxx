@@ -2564,13 +2564,29 @@ void pqMainWindowCore::updateRecentFilterMenu(QAction* action)
   QList<QString>::iterator begin,end;
   begin=this->Implementation->RecentFilterList.begin();
   end=this->Implementation->RecentFilterList.end();
+  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
   for(;begin!=end;++begin)
     {
     QString proxyName = *begin;
-    this->Implementation->addProxyToMenu("filters_prototypes", 
-                                         proxyName.toAscii().data(),
-                                         this->Implementation->RecentFiltersMenu,
-                                         &this->Implementation->FilterIcons);
+
+    // Check whether the action is associated with a custom filter or a regular 
+    // filter. 
+    if(proxyManager->GetCompoundProxyDefinition(proxyName.toAscii().data()) &&
+     !proxyManager->GetProxy("filters_prototypes",proxyName.toAscii().data()))
+      {
+      QAction* action = 
+          new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"),proxyName,
+              this->Implementation->RecentFiltersMenu)
+          << pqSetName(proxyName) << pqSetData(proxyName);
+      this->Implementation->RecentFiltersMenu->addAction(action);
+      }
+    else
+      {
+      this->Implementation->addProxyToMenu("filters_prototypes", 
+                                      proxyName.toAscii().data(),
+                                      this->Implementation->RecentFiltersMenu,
+                                      &this->Implementation->FilterIcons);
+      }
     }
 
   this->saveRecentFilterMenu();
@@ -2653,10 +2669,25 @@ void pqMainWindowCore::restoreRecentFilterMenu()
   for(;begin!=end;++begin)
     {
     QString proxyName = *begin;
-    this->Implementation->addProxyToMenu("filters_prototypes",
-                                         proxyName.toAscii().data(),
-                                         this->Implementation->RecentFiltersMenu,
-                                         &this->Implementation->FilterIcons);
+    // Check whether the action is associated with a custom filter or a regular 
+    // filter. 
+    vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+    if(proxyManager->GetCompoundProxyDefinition(proxyName.toAscii().data()) &&
+     !proxyManager->GetProxy("filters_prototypes",proxyName.toAscii().data()))
+      {
+      QAction* action = 
+          new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"),proxyName,
+              this->Implementation->RecentFiltersMenu)
+          << pqSetName(proxyName) << pqSetData(proxyName);
+      this->Implementation->RecentFiltersMenu->addAction(action);
+      }
+    else
+      {
+      this->Implementation->addProxyToMenu("filters_prototypes",
+                                          proxyName.toAscii().data(),
+                                          this->Implementation->RecentFiltersMenu,
+                                          &this->Implementation->FilterIcons);
+      }
     }
 }
 
@@ -3124,10 +3155,10 @@ void pqMainWindowCore::updateFiltersMenu()
 
     // For now simply make sure custom filters are enabled in the menu.
     // Custom filters cannot have the same name as an existing filter. 
-    // If there is for some reason a filter and a custom filter of the same name,
-    // revert to the regular filter.
-    if (proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) 
-      && !proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
+    // If there is for some reason a filter and a custom filter of the same 
+    // name, revert to the regular filter.
+    if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) &&
+     !proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
       {
       (*action)->setEnabled(true);
       some_enabled = true;
