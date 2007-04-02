@@ -56,7 +56,7 @@
 
 #include "vtkSMClientServerRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.81");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.82");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1213,9 +1213,11 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
 //-----------------------------------------------------------------------------
 vtkImageData* vtkSMRenderModuleProxy::CaptureWindow(int magnification)
 {
-  // I am using the vtkPVRenderView approach for saving the image.
-  // instead of vtkSMDisplayWindowProxy approach of creating a proxy.
+  // Offscreen rendering is not functioning properly on the mac.
+  // Do not use it.
+#if !defined(__APPLE__)
   this->GetRenderWindow()->SetOffScreenRendering(1);
+#endif
   this->GetRenderWindow()->SwapBuffersOff();
   this->StillRender();
 
@@ -1232,7 +1234,9 @@ vtkImageData* vtkSMRenderModuleProxy::CaptureWindow(int magnification)
 
   this->GetRenderWindow()->SwapBuffersOn();
   this->GetRenderWindow()->Frame();
+#if !defined(__APPLE__)
   this->GetRenderWindow()->SetOffScreenRendering(0);
+#endif
 
   // Update image extents based on WindowPosition.
   int extents[6];
