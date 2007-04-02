@@ -7,7 +7,7 @@
          short_help="Executes a python script to produce data.">
 This filter will execute a python script to produce an output dataset.
 The filter keeps a copy of the python script in Script, and creates 
-Interpretor, a python interpretor to run the script in upon the first 
+Interpretor, a python interpretor to run the script upon the first 
  execution.
       </Documentation>
       <InputProperty
@@ -23,7 +23,7 @@ Interpretor, a python interpretor to run the script in upon the first
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>       
            <Documentation>
-            Set the input(s) to the programmable filter.
+            This property specifies the input(s) to the programmable filter.
            </Documentation>
       </InputProperty>
 
@@ -58,7 +58,7 @@ Interpretor, a python interpretor to run the script in upon the first
          <!-- <Entry value="21" text="vtkTree"/> -->
        </EnumerationDomain>
        <Documentation>
-         Choose the data set type for the output of the programmable filter.
+         The value of this property determines the dataset type for the output of the programmable filter.
        </Documentation>
      </IntVectorProperty>
 
@@ -70,7 +70,7 @@ Interpretor, a python interpretor to run the script in upon the first
          <Widget type="multi_line"/>
        </Hints>
        <Documentation>
-         The text of a python program that the programmable filter runs.
+         This property contains the text of a python program that the programmable filter runs.
        </Documentation>
      </StringVectorProperty>
 
@@ -83,7 +83,7 @@ Interpretor, a python interpretor to run the script in upon the first
          <Widget type="multi_line"/>
        </Hints>
        <Documentation>
-         This python script is executed during the RequestInformation pipeline pass. Use this to provide information such as WHOLE_EXTENT to the pipeline downstream.
+         This property is a python script that is executed during the RequestInformation pipeline pass. Use this to provide information such as WHOLE_EXTENT to the pipeline downstream.
        </Documentation>
      </StringVectorProperty>
 
