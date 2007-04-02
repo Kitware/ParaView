@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSmartPointer.h"
 
 #include <QPointer>
@@ -51,6 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqLookmarkSourceDialog.h"
 #include "pqPipelineModel.h"
+#include "pqGenericViewModule.h"
+#include "pqActiveView.h"
 
 //-----------------------------------------------------------------------------
 class pqLookmarkStateLoaderInternal
@@ -62,12 +65,13 @@ public:
   QStandardItemModel *LookmarkPipelineModel;
   pqPipelineModel *PipelineModel;
   bool RestoreCamera;
+  bool RestoreTime;
 };
 
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.6");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.7");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -77,6 +81,7 @@ pqLookmarkStateLoader::pqLookmarkStateLoader()
   this->Internal->LookmarkPipelineModel = 0;
   this->Internal->PipelineModel = 0;
   this->Internal->RestoreCamera = false;
+  this->Internal->RestoreTime = false;
 
   pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
   this->Internal->PipelineModel = new pqPipelineModel(*model);
@@ -92,6 +97,12 @@ pqLookmarkStateLoader::~pqLookmarkStateLoader()
 void pqLookmarkStateLoader::SetRestoreCameraFlag(bool state)
 {
   this->Internal->RestoreCamera = state;
+}
+
+//-----------------------------------------------------------------------------
+void pqLookmarkStateLoader::SetRestoreTimeFlag(bool state)
+{
+  this->Internal->RestoreTime = state;
 }
 
 //-----------------------------------------------------------------------------
@@ -292,6 +303,20 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       else if (element->GetName() == QString("Property") &&
         element->GetAttribute("name") == QString("ViewTime"))
         {
+        if(this->Internal->RestoreTime)
+          {
+          vtkPVXMLElement *valElem = element->FindNestedElementByName("Element");
+          vtkSMDoubleVectorProperty *timeProp = 
+              vtkSMDoubleVectorProperty::SafeDownCast(
+                  pqActiveView::instance().current()->getProxy()->GetProperty(
+                        "ViewTime"));
+          if(valElem && timeProp)
+            {
+            double viewTime;
+            valElem->GetScalarAttribute("value",&viewTime);
+            timeProp->SetElement(0,viewTime);
+            }
+          }
         toRemove.push_back(element);
         }
       }

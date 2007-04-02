@@ -50,7 +50,7 @@ public:
 
   // Description:
   // For every request to create a render module, one from this list is used first, if possible
-  void AddPreferredRenderModule(vtkSMRenderModuleProxy*);
+  virtual void AddPreferredRenderModule(vtkSMRenderModuleProxy*);
   void RemovePreferredRenderModule(vtkSMRenderModuleProxy*);
   void ClearPreferredRenderModules();
 

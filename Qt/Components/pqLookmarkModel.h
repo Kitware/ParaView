@@ -91,6 +91,8 @@ public:
   // Otherwise the current camera properties will remain unchanged when this lookmark is loaded.
   bool getRestoreCameraFlag()const {return this->RestoreCamera;};
 
+  bool getRestoreTimeFlag()const {return this->RestoreTime;};
+
   // User-defined text can be stored along with the lookmark
   QString getDescription()const {return this->Description;};
 
@@ -132,6 +134,10 @@ public slots:
   // Otherwise the current camera properties will remain unchanged when this lookmark is loaded.
   void setRestoreCameraFlag(bool state);
 
+  // When this is set, the time value of the view stored in 
+  //  the lookmark overrides the current one when loaded
+  void setRestoreTimeFlag(bool state);
+
   // User-defined text can be stored along with the lookmark
   void setDescription(QString text);
 
@@ -153,6 +159,7 @@ private:
   QString State;
   bool RestoreData;
   bool RestoreCamera;
+  bool RestoreTime;
   QString Description;
   QImage Icon;
   vtkSmartPointer<vtkPVXMLElement> PipelineHierarchy;

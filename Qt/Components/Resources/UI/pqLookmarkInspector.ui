@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>312</width>
-    <height>282</height>
+    <width>326</width>
+    <height>393</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -14,10 +14,10 @@
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
-    <number>2</number>
+    <number>9</number>
    </property>
    <property name="spacing" >
-    <number>2</number>
+    <number>6</number>
    </property>
    <item>
     <widget class="QFrame" name="ButtonFrame" >
@@ -204,9 +204,6 @@
       </item>
       <item>
        <widget class="pqCollapsedGroup" native="1" name="groupBox" >
-        <property name="title" >
-         <string>Pipeline Preview</string>
-        </property>
         <layout class="QVBoxLayout" >
          <property name="margin" >
           <number>2</number>
@@ -222,9 +219,6 @@
       </item>
       <item>
        <widget class="pqCollapsedGroup" native="1" name="groupBox_2" >
-        <property name="title" >
-         <string>Description</string>
-        </property>
         <layout class="QVBoxLayout" >
          <property name="margin" >
           <number>2</number>
@@ -278,12 +272,12 @@
      <property name="frameShadow" >
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
+     <layout class="QVBoxLayout" >
       <property name="margin" >
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="spacing" >
-       <number>0</number>
+       <number>2</number>
       </property>
       <item>
        <widget class="QCheckBox" name="RestoreCamera" >
@@ -298,6 +292,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="RestoreTime" >
+        <property name="text" >
+         <string>Use Lookmark's time value</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -308,8 +309,8 @@
      </property>
      <property name="sizeHint" >
       <size>
-       <width>294</width>
-       <height>16</height>
+       <width>308</width>
+       <height>51</height>
       </size>
      </property>
     </spacer>

@@ -67,7 +67,7 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget 
   this->Form = new pqLookmarkInspectorForm();
   this->Form->setupUi(this);
   this->Form->PropertiesFrame->hide();
-  //this->Form->ControlsFrame->hide();
+  this->Form->ControlsFrame->hide();
   this->CurrentLookmark = NULL;
   //this->PipelineModel = new QStandardItemModel();
   this->Form->PipelineView->getHeader()->hide();
@@ -90,6 +90,10 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget 
   //              SIGNAL(modified()));
 
   this->connect(this->Form->RestoreCamera, 
+                SIGNAL(stateChanged(int)),
+                SIGNAL(modified()));
+
+  this->connect(this->Form->RestoreTime, 
                 SIGNAL(stateChanged(int)),
                 SIGNAL(modified()));
 
@@ -166,6 +170,7 @@ void pqLookmarkInspector::save()
   this->CurrentLookmark->setDescription(this->Form->LookmarkComments->toPlainText());
   //this->CurrentLookmark->setRestoreDataFlag(this->Form->RestoreData->isChecked());
   this->CurrentLookmark->setRestoreCameraFlag(this->Form->RestoreCamera->isChecked());
+  this->CurrentLookmark->setRestoreTimeFlag(this->Form->RestoreTime->isChecked());
 
   this->Form->SaveButton->setEnabled(false);
 }
@@ -185,7 +190,7 @@ void pqLookmarkInspector::onLookmarkSelectionChanged(const QStringList &selected
     this->CurrentLookmark = 0;
     // don't display anything if nothing is selected
     this->Form->PropertiesFrame->hide();
-    //this->Form->ControlsFrame->hide();
+    this->Form->ControlsFrame->hide();
     this->Form->LoadButton->setEnabled(false);
     this->Form->SaveButton->setEnabled(false);
     this->Form->DeleteButton->setEnabled(false);
@@ -194,7 +199,7 @@ void pqLookmarkInspector::onLookmarkSelectionChanged(const QStringList &selected
     {
     // only display the lookmark settings that are applicable to multiple lookmarks
     this->Form->PropertiesFrame->hide();
-    //this->Form->ControlsFrame->show();
+    this->Form->ControlsFrame->show();
     this->Form->LoadButton->setEnabled(false);
     this->Form->SaveButton->setEnabled(false);
     this->Form->DeleteButton->setEnabled(true);
@@ -218,9 +223,10 @@ void pqLookmarkInspector::onLookmarkSelectionChanged(const QStringList &selected
 
     //this->Form->RestoreData->setChecked(this->CurrentLookmark->getRestoreDataFlag());
     this->Form->RestoreCamera->setChecked(this->CurrentLookmark->getRestoreCameraFlag());
+    this->Form->RestoreTime->setChecked(this->CurrentLookmark->getRestoreTimeFlag());
 
     this->Form->PropertiesFrame->show();
-    //this->Form->ControlsFrame->show();
+    this->Form->ControlsFrame->show();
     this->Form->LoadButton->setEnabled(true);
     this->Form->SaveButton->setEnabled(false);
     this->Form->DeleteButton->setEnabled(true);
@@ -275,6 +281,7 @@ void pqLookmarkInspector::addChildItems(vtkPVXMLElement *elem, QStandardItem *it
     {
     vtkPVXMLElement *childElem = elem->GetNestedElement(i);
     // determine icon type:
+/*
     QIcon icon = QIcon();
     if(strcmp(childElem->GetName(),"Server")==0)
       {
@@ -288,7 +295,8 @@ void pqLookmarkInspector::addChildItems(vtkPVXMLElement *elem, QStandardItem *it
       {
       icon.addFile(":/pqWidgets/Icons/pqFilter16.png");
       }
-    QStandardItem *childItem = new QStandardItem(icon,QString(childElem->GetAttribute("Name")));
+*/
+    QStandardItem *childItem = new QStandardItem(QIcon(":/pqWidgets/Icons/pqBundle32.png"),QString(childElem->GetAttribute("Name")));
     item->setChild(i,0,childItem);
     this->addChildItems(childElem,childItem);
     }

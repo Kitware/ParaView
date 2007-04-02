@@ -62,6 +62,7 @@ pqLookmarkModel::pqLookmarkModel(QString name, const QString &state, QObject* _p
   : QObject(_parent)
 {
   this->Name = name;
+  this->RestoreTime = false;
   this->RestoreCamera = false;
   this->RestoreData = false;
   this->State = state;
@@ -114,6 +115,8 @@ void pqLookmarkModel::initializeState(vtkPVXMLElement *lookmark)
      this->RestoreData = val;
   if(lookmark->GetScalarAttribute("RestoreCamera",&val))
     this->RestoreCamera = val;
+  if(lookmark->GetScalarAttribute("RestoreTime",&val))
+    this->RestoreTime = val;
 
   char *tempDesc = lookmark->GetSanitizedAttribute("Comments");
   this->Description = tempDesc;
@@ -163,6 +166,13 @@ void pqLookmarkModel::setState(QString state)
   this->State = state;
   emit this->modified(this);
 }
+
+void pqLookmarkModel::setRestoreTimeFlag(bool state)
+{
+  this->RestoreTime = state;
+  emit this->modified(this);
+}
+
 
 void pqLookmarkModel::setRestoreDataFlag(bool state)
 {
@@ -249,6 +259,7 @@ void pqLookmarkModel::load(pqServer *server, QList<pqPipelineSource*> *sources, 
     {
     pqLoader->SetPreferredSources(sources);
     pqLoader->SetRestoreCameraFlag(this->RestoreCamera);
+    pqLoader->SetRestoreTimeFlag(this->RestoreTime);
     pqLoader->SetPipelineHierarchy(this->PipelineHierarchy);
     }
 
@@ -276,6 +287,7 @@ void pqLookmarkModel::saveState(vtkPVXMLElement *lookmark) const
   lookmark->AddSanitizedAttribute("Name", this->getName().toAscii().constData());
   lookmark->AddAttribute("RestoreData", this->getRestoreDataFlag());
   lookmark->AddAttribute("RestoreCamera", this->getRestoreCameraFlag());
+  lookmark->AddAttribute("RestoreTime", this->getRestoreTimeFlag());
 
   // convert the stored state from a qstring to a vtkPVXMLElement
   vtkPVXMLParser *parser = vtkPVXMLParser::New();

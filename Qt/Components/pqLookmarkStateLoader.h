@@ -63,6 +63,7 @@ public:
   void SetPipelineHierarchy(vtkPVXMLElement*);
 
   void SetRestoreCameraFlag(bool state);
+  void SetRestoreTimeFlag(bool state);
 
 protected:
   pqLookmarkStateLoader();
