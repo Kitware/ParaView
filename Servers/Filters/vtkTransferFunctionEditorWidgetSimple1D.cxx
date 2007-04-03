@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.21");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.22");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -1184,7 +1184,8 @@ double vtkTransferFunctionEditorWidgetSimple1D::GetElementOpacity(
 int vtkTransferFunctionEditorWidgetSimple1D::GetElementRGBColor(
   unsigned int idx, double color[3])
 {
-  if (idx >= this->Nodes->size() || this->ModificationType == OPACITY)
+  if (idx >= static_cast<unsigned int>(this->ColorFunction->GetSize()) ||
+      this->ModificationType == OPACITY)
     {
     return 0;
     }
@@ -1201,7 +1202,8 @@ int vtkTransferFunctionEditorWidgetSimple1D::GetElementRGBColor(
 int vtkTransferFunctionEditorWidgetSimple1D::GetElementHSVColor(
   unsigned int idx, double color[3])
 {
-  if (idx >= this->Nodes->size() || this->ModificationType == OPACITY)
+  if (idx >= static_cast<unsigned int>(this->ColorFunction->GetSize()) ||
+      this->ModificationType == OPACITY)
     {
     return 0;
     }
@@ -1219,19 +1221,22 @@ int vtkTransferFunctionEditorWidgetSimple1D::GetElementHSVColor(
 double vtkTransferFunctionEditorWidgetSimple1D::GetElementScalar(
   unsigned int idx)
 {
-  if (idx >= this->Nodes->size())
-    {
-    return 0;
-    }
-
   if (this->ModificationType != COLOR)
     {
+    if (idx >= static_cast<unsigned int>(this->OpacityFunction->GetSize()))
+      {
+      return 0;
+      }
     double opacity[4];
     this->OpacityFunction->GetNodeValue(idx, opacity);
     return opacity[0];
     }
   else
     {
+    if (idx >= static_cast<unsigned int>(this->ColorFunction->GetSize()))
+      {
+      return 0;
+      }
     double color[6];
     this->ColorFunction->GetNodeValue(idx, color);
     return color[0];
