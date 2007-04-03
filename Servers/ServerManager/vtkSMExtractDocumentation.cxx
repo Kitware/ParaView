@@ -337,7 +337,8 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     docFile << "The value must be one of the following:";
     for (i = 0; i < ed->GetNumberOfEntries(); i++)
       {
-      docFile << " " << ed->GetEntryText(i);
+      docFile << " " << ed->GetEntryText(i) << " (" << ed->GetEntryValue(i)
+              << ")";
       if (i != (ed->GetNumberOfEntries() - 1))
         {
         docFile << ",";
