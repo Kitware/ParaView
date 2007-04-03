@@ -85,6 +85,13 @@ public:
   // Returns the (x, r, g, b) values as an array.
   double* GetRGBPoints();
 
+  // Description:
+  // Specify an additional opacity (alpha) value to blend with. Values
+  // != 1 modify the resulting color consistent with the requested
+  // form of the output. This is typically used by an actor in order to
+  // blend its opacity.
+  // Overridden to pass the alpha to the internal vtkLookupTable.
+  virtual void SetAlpha(double alpha);
 protected:
   vtkPVLookupTable();
   ~vtkPVLookupTable();

@@ -20,7 +20,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVLookupTable);
-vtkCxxRevisionMacro(vtkPVLookupTable, "1.6");
+vtkCxxRevisionMacro(vtkPVLookupTable, "1.7");
 //-----------------------------------------------------------------------------
 vtkPVLookupTable::vtkPVLookupTable()
 {
@@ -85,6 +85,13 @@ void vtkPVLookupTable::Build()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVLookupTable::SetAlpha(double alpha)
+{
+  this->LookupTable->SetAlpha(alpha);
+  this->Superclass::SetAlpha(alpha);
+}
+
+//-----------------------------------------------------------------------------
 unsigned char* vtkPVLookupTable::MapValue(double v)
 {
   this->Build();
@@ -118,6 +125,7 @@ void vtkPVLookupTable::MapScalarsThroughTable2(void *input,
     {
     // Make sure the LUT is built.
     this->Build();
+
     this->LookupTable->MapScalarsThroughTable2(
       input, output, inputDataType, numberOfValues, inputIncrement, 
       outputFormat);
