@@ -22,7 +22,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkTimeToTextConvertor);
-vtkCxxRevisionMacro(vtkTimeToTextConvertor, "1.1");
+vtkCxxRevisionMacro(vtkTimeToTextConvertor, "1.2");
 //----------------------------------------------------------------------------
 vtkTimeToTextConvertor::vtkTimeToTextConvertor()
 {
@@ -53,26 +53,15 @@ int vtkTimeToTextConvertor::RequestData(
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
   vtkTable* output = vtkTable::GetData(outputVector);
 
-  bool has_time=false;
   char *buffer = new char[strlen(this->Format)+1024];
-  strcpy(buffer, this->Format);
-  double time;
+  strcpy(buffer, "?");
 
   vtkInformation* inputInfo= input->GetInformation();
   vtkInformation* outputInfo = outputVector->GetInformationObject(0);
-  if (inputInfo && inputInfo->Has(vtkDataObject::DATA_TIME_STEPS()))
+  if (inputInfo && inputInfo->Has(vtkDataObject::DATA_TIME_STEPS()) 
+    && this->Format)
     {
-    time = inputInfo->Get(vtkDataObject::DATA_TIME_STEPS())[0];
-    has_time = true;
-    }
-  else if(outputInfo && outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
-    {
-    time = outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0];
-    has_time = true;
-    }
-
-  if (has_time)
-    {
+    double time = inputInfo->Get(vtkDataObject::DATA_TIME_STEPS())[0];
     sprintf(buffer, this->Format, time);
     }
 

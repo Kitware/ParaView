@@ -14,7 +14,9 @@
 =========================================================================*/
 // .NAME vtkTimeToTextConvertor
 // .SECTION Description
-//
+// This filter can be attached to any filter/source/reader that supports time.
+// vtkTimeToTextConvertor will generate a 1x1 vtkTable with the string
+// for the data time using the format specified.
 
 #ifndef __vtkTimeToTextConvertor_h
 #define __vtkTimeToTextConvertor_h
