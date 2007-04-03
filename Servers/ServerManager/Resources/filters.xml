@@ -5962,30 +5962,33 @@ This filter operates on all types of data sets, and it returns unstructured grid
    </ExtractSelectionProxy>
 
    <SourceProxy name="TimeToTextConvertor" class="vtkTimeToTextConvertor"
-      label="Annotate Time" >
-      <Documentation>
-      Filter that can be used to show the data time in text annotation.
-      </Documentation>
-      <InputProperty
-          name="Input"
-          command="SetInputConnection">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <Documentation>
-          The input from which the selection is extracted.
-        </Documentation>
-      </InputProperty>
-      <StringVectorProperty
-        name="Format"
-        command="SetFormat"
-        number_of_elements="1"
-        default_values="Time: %f">
-        <Documentation>
-          Format used to display the input time (using printf style).
-        </Documentation>
-      </StringVectorProperty>
+     label="Annotate Time" >
+     <Documentation>
+     Filter that can be used to show the data time in text annotation.
+     </Documentation>
+     <InputProperty
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <Documentation>
+         The input from which the selection is extracted.
+       </Documentation>
+     </InputProperty>
+     <StringVectorProperty
+       name="Format"
+       command="SetFormat"
+       number_of_elements="1"
+       default_values="Time: %f">
+       <Documentation>
+         Format used to display the input time (using printf style).
+       </Documentation>
+     </StringVectorProperty>
+     <Hints>
+       <Visibility replace_input="0" />
+     </Hints>
 
    <!-- End of TimeToTextConvertor -->
    </SourceProxy>
