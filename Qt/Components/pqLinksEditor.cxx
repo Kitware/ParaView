@@ -78,15 +78,15 @@ static QString propertyType(vtkSMProperty* p)
     }
   else if(svp)
     {
-    return QString("String %i").arg(svp->GetNumberOfElements());
+    return QString("String %1").arg(svp->GetNumberOfElements());
     }
   else if(idvp)
     {
-    return QString("Id %i").arg(idvp->GetNumberOfElements());
+    return QString("Id %1").arg(idvp->GetNumberOfElements());
     }
   else if(pp)
     {
-    return QString("Proxy %i").arg(pp->GetNumberOfProxies());
+    return QString("Proxy %1").arg(pp->GetNumberOfProxies());
     }
   return "Unknown";
 }
