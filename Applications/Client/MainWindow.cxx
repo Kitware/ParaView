@@ -123,13 +123,13 @@ MainWindow::MainWindow() :
   this->Implementation->RecentFilesMenu = new
     pqRecentFilesMenu(*this->Implementation->UI.menuRecentFiles, this);
   
-  this->Implementation->ViewMenu = new
-    pqViewMenu(*this->Implementation->UI.menuView, this);
+  this->Implementation->ViewMenu = 
+    new pqViewMenu(*this->Implementation->UI.menuView, this);
   this->Implementation->ToolbarsMenu = 
     new pqViewMenu(*this->Implementation->UI.menuToolbars);
 
   this->setWindowTitle(
-    QString("ParaView %1 (alpha)").arg(PARAVIEW_VERSION_FULL));
+    QString("ParaView %1 (beta)").arg(PARAVIEW_VERSION_FULL));
 
   // Setup menus and toolbars ...
   connect(this->Implementation->UI.actionFileOpen,
