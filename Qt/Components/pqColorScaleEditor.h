@@ -90,6 +90,8 @@ private slots:
 
   void setComponent(int index);
 
+  void setLogScale(bool on);
+
   void setAutoRescale(bool on);
   void rescaleToNewRange();
   void rescaleToDataRange();
