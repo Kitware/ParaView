@@ -47,6 +47,7 @@ pqPixelTransferFunction::pqPixelTransferFunction()
 {
   this->PixelMin = 0;
   this->PixelMax = 0;
+  this->Scale = pqPixelTransferFunction::Linear;
 }
 
 void pqPixelTransferFunction::setValueRange(const pqChartValue &min,
