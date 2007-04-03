@@ -43,6 +43,9 @@ pqFormBuilder::pqFormBuilder(QObject* o)
 {
   // search plugins in application directory
   this->addPluginPath(QCoreApplication::applicationDirPath());
+#ifdef Q_WS_MAC
+  this->addPluginPath(QCoreApplication::applicationDirPath() + "/../../../");
+#endif //Q_WS_MAC
 }
 
 pqFormBuilder::~pqFormBuilder()
