@@ -71,7 +71,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.7");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.8");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -145,6 +145,7 @@ void pqLookmarkStateLoader::AddChildItems(vtkPVXMLElement *elem, QStandardItem *
     {
     vtkPVXMLElement *childElem = elem->GetNestedElement(i);
     // determine icon type:
+/*
     QIcon icon = QIcon();
     if(strcmp(childElem->GetName(),"Server")==0)
       {
@@ -158,7 +159,8 @@ void pqLookmarkStateLoader::AddChildItems(vtkPVXMLElement *elem, QStandardItem *
       {
       icon.addFile(":/pqWidgets/Icons/pqFilter16.png");
       }
-    QStandardItem *childItem = new QStandardItem(icon,QString(childElem->GetAttribute("Name")));
+*/
+    QStandardItem *childItem = new QStandardItem(QIcon(":/pqWidgets/Icons/pqBundle32.png"),QString(childElem->GetAttribute("Name")));
     item->setChild(i,0,childItem);
     if(strcmp(childElem->GetName(),"Source")==0)
       {
@@ -259,7 +261,7 @@ void pqLookmarkStateLoader::RegisterProxyInternal(const char* group,
 
 //---------------------------------------------------------------------------
 void pqLookmarkStateLoader::HandleCompoundProxyDefinitions(
-  vtkPVXMLElement* element)
+  vtkPVXMLElement* vtkNotUsed(element))
 {
   return;
 }
