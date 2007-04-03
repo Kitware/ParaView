@@ -90,7 +90,7 @@ public:
         vtkOutputWindow::GetInstance()->DisplayText(msg);
         break;
       case QtWarningMsg:
-        vtkOutputWindow::GetInstance()->DisplayWarningText(msg);
+        vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
         break;
       case QtCriticalMsg:
         vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
@@ -118,7 +118,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.16");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.17");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
