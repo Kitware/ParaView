@@ -61,11 +61,11 @@ This test tests animation key frame undo/redo.
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/sourceName" command="set_string" arguments="Clip1" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/propertyName" command="set_string" arguments="Clip Type - Offset" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/editorFrame/keyFrameIndex" command="set_int" arguments="1" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRLastFrame" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/editorFrame/SignalAdaptorKeyFrameValue/lineEdit" command="set_string" arguments="2" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRLastFrame" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/editorFrame/SignalAdaptorKeyFrameValue/lineEdit" command="set_string" arguments="5" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
@@ -76,19 +76,18 @@ This test tests animation key frame undo/redo.
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRLastFrame" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.0691318,0.926244,1,1,0)" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.28135,0.912521,1,0,0)" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.28135,0.912521,1,0,0)" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
-
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRLastFrame" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRLastFrame" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/deleteKeyFrame" command="activate" arguments="" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/deleteKeyFrame" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
@@ -98,7 +97,7 @@ This test tests animation key frame undo/redo.
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Pipeline Browser" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0/0|0" />
-  <pqevent object="MainWindow/menubar/menuPipeline" command="activate" arguments="actionDelete" />
+  <pqevent object="MainWindow/objectInspectorDock/0pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Delete" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0/0|0" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
@@ -106,11 +105,10 @@ This test tests animation key frame undo/redo.
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/sourceName" command="set_string" arguments="Clip1" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/propertyName" command="set_string" arguments="Clip Type - Offset" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/editorFrame/keyFrameIndex" command="set_int" arguments="1" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRLastFrame" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRPreviousFrame" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRPreviousFrame" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRPreviousFrame" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRPreviousFrame" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRPreviousFrame" />
 </pqevents>

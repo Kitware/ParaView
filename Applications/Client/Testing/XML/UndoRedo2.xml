@@ -107,9 +107,9 @@ At the same time it tests that the animation playing does not affect the undo st
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton2" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRFirstFrame" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRPlay" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRLastFrame" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />

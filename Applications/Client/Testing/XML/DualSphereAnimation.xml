@@ -4,12 +4,12 @@
   <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/dualSphereAnimation.pvd" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Animation Inspector" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
-  <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRLastFrame" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRFirstFrame" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
+  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/currentTime" command="set_string" arguments="0." />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/currentTime" command="set_string" arguments="0." />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/currentTime" command="set_string" arguments="0.2" />
