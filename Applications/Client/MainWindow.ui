@@ -25,14 +25,9 @@
      <x>0</x>
      <y>0</y>
      <width>940</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuSources" >
-    <property name="title" >
-     <string>&amp;Sources</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuHelp" >
     <property name="title" >
      <string>&amp;Help</string>
@@ -41,26 +36,6 @@
     <addaction name="actionHelpHelp" />
     <addaction name="separator" />
     <addaction name="actionHelpEnableTooltips" />
-   </widget>
-   <widget class="QMenu" name="menuPipeline" >
-    <property name="title" >
-     <string>&amp;Pipeline</string>
-    </property>
-    <addaction name="actionChangeInput" />
-    <addaction name="actionDelete" />
-    <addaction name="actionDelete_All" />
-   </widget>
-   <widget class="QMenu" name="menuAnimation" >
-    <property name="title" >
-     <string>A&amp;nimation</string>
-    </property>
-    <addaction name="actionVCRFirstFrame" />
-    <addaction name="actionVCRPreviousFrame" />
-    <addaction name="actionVCRPlay" />
-    <addaction name="actionVCRPause" />
-    <addaction name="actionVCRNextFrame" />
-    <addaction name="actionVCRLastFrame" />
-    <addaction name="actionVCRLoop" />
    </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
@@ -110,35 +85,46 @@
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
    </widget>
-   <widget class="QMenu" name="menuFilters" >
-    <property name="title" >
-     <string>F&amp;ilters</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
      <string>&amp;Edit</string>
     </property>
-    <widget class="QMenu" name="menuAddPlot" >
-     <property name="title" >
-      <string>Add &amp;Plot</string>
-     </property>
-     <addaction name="actionHistogram" />
-     <addaction name="actionXY_Plot" />
-     <addaction name="actionTable_View" />
-    </widget>
     <addaction name="actionEditUndo" />
     <addaction name="actionEditRedo" />
     <addaction name="separator" />
     <addaction name="actionEditCameraUndo" />
     <addaction name="actionEditCameraRedo" />
     <addaction name="separator" />
+    <addaction name="actionChangeInput" />
+    <addaction name="actionDelete" />
+    <addaction name="actionDelete_All" />
+    <addaction name="separator" />
     <addaction name="actionMoveMode" />
     <addaction name="actionSelectionMode" />
     <addaction name="separator" />
-    <addaction name="menuAddPlot" />
-    <addaction name="separator" />
     <addaction name="actionEditSettings" />
+   </widget>
+   <widget class="QMenu" name="menuSources" >
+    <property name="title" >
+     <string>&amp;Sources</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuFilters" >
+    <property name="title" >
+     <string>F&amp;ilters</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuAnimation" >
+    <property name="title" >
+     <string>A&amp;nimation</string>
+    </property>
+    <addaction name="actionVCRFirstFrame" />
+    <addaction name="actionVCRPreviousFrame" />
+    <addaction name="actionVCRPlay" />
+    <addaction name="actionVCRPause" />
+    <addaction name="actionVCRNextFrame" />
+    <addaction name="actionVCRLastFrame" />
+    <addaction name="actionVCRLoop" />
    </widget>
    <widget class="QMenu" name="menuView" >
     <property name="title" >
@@ -149,13 +135,24 @@
       <string>Toolbars</string>
      </property>
     </widget>
-    <addaction name="actionResetCamera" />
-    <addaction name="actionPositiveX" />
-    <addaction name="actionNegativeX" />
-    <addaction name="actionPositiveY" />
-    <addaction name="actionNegativeY" />
-    <addaction name="actionPositiveZ" />
-    <addaction name="actionNegativeZ" />
+    <widget class="QMenu" name="menuType_Here" >
+     <property name="title" >
+      <string>Type Here</string>
+     </property>
+    </widget>
+    <widget class="QMenu" name="menuCamera" >
+     <property name="title" >
+      <string>Camera</string>
+     </property>
+     <addaction name="actionResetCamera" />
+     <addaction name="actionPositiveX" />
+     <addaction name="actionNegativeX" />
+     <addaction name="actionPositiveY" />
+     <addaction name="actionNegativeY" />
+     <addaction name="actionPositiveZ" />
+     <addaction name="actionNegativeZ" />
+    </widget>
+    <addaction name="menuCamera" />
     <addaction name="separator" />
     <addaction name="actionShowCenterAxes" />
     <addaction name="actionResetCenter" />
@@ -167,7 +164,6 @@
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
    <addaction name="menuView" />
-   <addaction name="menuPipeline" />
    <addaction name="menuSources" />
    <addaction name="menuFilters" />
    <addaction name="menuAnimation" />
@@ -744,7 +740,7 @@
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqResetCamera24.png</iconset>
    </property>
    <property name="text" >
-    <string>&amp;Reset Camera</string>
+    <string>&amp;Reset</string>
    </property>
    <property name="iconText" >
     <string>Reset Camera</string>
