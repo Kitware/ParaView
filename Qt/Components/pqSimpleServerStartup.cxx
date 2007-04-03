@@ -54,14 +54,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
+#include <QEventLoop>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
-#include <QTimer>
 #include <QtDebug>
+#include <QTimer>
 
 #include <vtkstd/map>
 
@@ -79,6 +80,7 @@ public:
     DataServerPortID(0),
     RenderServerPortID(0)
   {
+    this->DoneWithConnect = false;
     this->Timer.setInterval(10);
   }
   
@@ -138,6 +140,8 @@ public:
   /** Stores a complete description of the server to be started
   (differs from the startup server if the user has chosen nonstandard ports */
   pqServerResource Server;
+
+  bool DoneWithConnect;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -159,6 +163,34 @@ pqSimpleServerStartup::pqSimpleServerStartup(QObject* p) :
 pqSimpleServerStartup::~pqSimpleServerStartup()
 {
   delete this->Implementation;
+}
+
+//-----------------------------------------------------------------------------
+void pqSimpleServerStartup::startServerBlocking(pqServerStartup& startup)
+{
+  // startServer() returns immediately, before the connection set 
+  // actually happens. To simplify our life, I am
+  // simply creating a event loop here which will exit once the starter
+  // has some response.
+  QEventLoop loop;
+  QObject::connect(this, SIGNAL(serverCancelled()), 
+    &loop, SLOT(quit()));
+  QObject::connect(this, SIGNAL(serverFailed()), 
+    &loop, SLOT(quit()));
+  QObject::connect(this, SIGNAL(serverStarted(pqServer*)), 
+    &loop, SLOT(quit()));
+
+  this->Implementation->DoneWithConnect = false;
+  this->startServer(startup);
+
+  // It is possible that the above call immediately leads to a successful
+  // (or failed) connection. In which case the signals we are lisening for
+  // are already fired. So, we start the event loop only if the 
+  // signals are still to be fired.
+  if (!this->Implementation->DoneWithConnect)
+    {
+    loop.exec();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -283,6 +315,7 @@ void pqSimpleServerStartup::reset()
 void pqSimpleServerStartup::cancelled()
 {
   this->reset();
+  this->Implementation->DoneWithConnect = true;
   emit this->serverCancelled();
 }
 
@@ -290,6 +323,7 @@ void pqSimpleServerStartup::cancelled()
 void pqSimpleServerStartup::failed()
 {
   this->reset();
+  this->Implementation->DoneWithConnect = true;
   emit this->serverFailed();
 }
 
@@ -297,6 +331,7 @@ void pqSimpleServerStartup::failed()
 void pqSimpleServerStartup::started(pqServer* server)
 {
   this->reset();
+  this->Implementation->DoneWithConnect = true;
   emit this->serverStarted(server);
 }
 

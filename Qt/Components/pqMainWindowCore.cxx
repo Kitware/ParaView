@@ -101,10 +101,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqServerStartup.h"
-#include "pqServerStartups.h"
 #include "pqServerStartupBrowser.h"
+#include "pqServerStartups.h"
 #include "pqSettingsDialog.h"
 #include "pqSettings.h"
+#include "pqSimpleServerStartup.h"
 #include "pqSMAdaptor.h"
 #include "pqSMAdaptor.h"
 #include "pqSourceProxyInfo.h"
@@ -3661,7 +3662,8 @@ void pqMainWindowCore::applicationInitialize()
       core->serverStartups().getStartup(serverresource_name);
     if (startUp)
       {
-      core->createServer(startUp->getServer());
+      pqSimpleServerStartup starter;
+      starter.startServerBlocking(*startUp);
       }
     }
 

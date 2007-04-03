@@ -70,6 +70,12 @@ public:
 
   /// Start a server, using a specific startup procedure
   void startServer(pqServerStartup& startup);
+
+  /// Same as startServer(pqServerStartup&) except that this class
+  /// blocks until the server is connected or cancelled or failed.
+  /// Returns the server on successful connection.
+  void startServerBlocking(pqServerStartup& startup);
+
   /** Start a server, prompting the user if there's any ambiguity
   over which startup procedure to use, or if a startup isn't already
   configured for the server */
