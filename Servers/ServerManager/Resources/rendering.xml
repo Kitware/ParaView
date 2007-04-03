@@ -2602,6 +2602,17 @@
         update_self="1">
       </Property>
 
+      <DoubleVectorProperty
+        name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
       <SubProxy>
         <Proxy name="UpdateSuppressor"
           proxygroup="filters" proxyname="UpdateSuppressor">

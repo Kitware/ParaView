@@ -18,6 +18,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNew3DWidgetProxy.h"
 #include "vtkSMProxyProperty.h"
@@ -29,7 +30,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMTextDisplayProxy);
-vtkCxxRevisionMacro(vtkSMTextDisplayProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMTextDisplayProxy, "1.2");
 vtkCxxSetObjectMacro(vtkSMTextDisplayProxy, Input, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMTextDisplayProxy::vtkSMTextDisplayProxy()
@@ -189,6 +190,24 @@ void vtkSMTextDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
   this->TextWidgetProxy->UpdateProperty("Text");
 
   this->InvokeEvent(vtkSMAbstractDisplayProxy::ForceUpdateEvent);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMTextDisplayProxy::SetUpdateTime(double time)
+{
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Objects not created!");
+    return;
+    }
+
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->UpdateSuppressorProxy->GetProperty("UpdateTime"));
+  dvp->SetElement(0, time);
+  // UpdateTime is immediate update, so no need to update.
+
+  // Go upstream to the reader and mark it modified.
+  this->MarkUpstreamModified();
 }
 
 //----------------------------------------------------------------------------

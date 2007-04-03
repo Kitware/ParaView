@@ -70,7 +70,7 @@ vtkSMProxy* pqDisplayPolicy::newDisplayProxy(
     return NULL;
     }
   QString srcProxyName = source->getProxy()->GetXMLName();
-  if (srcProxyName == "TextSource")
+  if (srcProxyName == "TextSource" || srcProxyName == "TimeToTextConvertor")
     {
     vtkSMProxy* p = vtkSMObject::GetProxyManager()->NewProxy(
       "displays", "TextDisplay");

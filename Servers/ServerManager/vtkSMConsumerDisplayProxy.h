@@ -66,6 +66,11 @@ protected:
   virtual void InvalidateGeometryInternal(int /*useCache*/) {};
 
   static int UseCache;
+
+  // Description:
+  // Subclasses can use this method to traverse up the input connection
+  // from this display and mark them modified.
+  void MarkUpstreamModified();
   
 private:
   vtkSMConsumerDisplayProxy(const vtkSMConsumerDisplayProxy&); // Not implemented.

@@ -1,24 +1,24 @@
 <ParaViewFilters>
   <Category name="Common" menu_label="&amp;Common">
-    <Filter name="Clip" icon=":/pqWidgets/Icons/pqClip24.png"/>
-    <Filter name="Cut" icon=":/pqWidgets/Icons/pqSlice24.png"/>
-    <Filter name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
-    <Filter name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
-    <Filter name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid24.png"/>
-    <Filter name="Glyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
-    <Filter name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
-    <Filter name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
     <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
-    <Filter name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
+    <Filter name="Clip" icon=":/pqWidgets/Icons/pqClip24.png"/>
+    <Filter name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
+    <Filter name="Cut" icon=":/pqWidgets/Icons/pqSlice24.png"/>
+    <Filter name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid24.png"/>
     <Filter name="ExtractLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
+    <Filter name="Glyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
+    <Filter name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
+    <Filter name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
+    <Filter name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
+    <Filter name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
   </Category>
 
   <Category name="DataAnalysis" menu_label="&amp;Data Analysis">
     <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
-    <Filter name="ExtractPointSelection" />
     <Filter name="ExtractCellSelection" />
     <Filter name="ExtractHistogram" />
     <Filter name="ExtractOverTime" />
+    <Filter name="ExtractPointSelection" />
     <Filter name="Probe" />
     <Filter name="Programmable Filter" />
   </Category>
@@ -27,7 +27,6 @@
   <Filter name="AppendAttributes" />
   <Filter name="AppendPolyData" />
   <Filter name="BrownianPoints" />
-  <Filter name="CTHPart" />
   <Filter name="Calculator" />
   <Filter name="CellCenters" />
   <Filter name="CellDataToPointData" />
@@ -35,6 +34,7 @@
   <Filter name="CleanUnstructuredGrid" />
   <Filter name="Clip" />
   <Filter name="Contour" />
+  <Filter name="CTHPart" />
   <Filter name="Curvatures" />
   <Filter name="Cut" />
   <Filter name="D3" />
@@ -43,16 +43,16 @@
   <Filter name="DecimatePro" />
   <Filter name="Delaunay2D" />
   <Filter name="ElevationFilter" />
+  <Filter name="ExtractCellSelection" />
   <Filter name="ExtractDataSets" />
   <Filter name="ExtractEdges" />
   <Filter name="ExtractGrid" />
   <Filter name="ExtractHistogram" />
   <Filter name="ExtractLevel" />
+  <Filter name="ExtractPointSelection" />
   <!--
   <Filter name="ExtractSelection" />
   -->
-  <Filter name="ExtractPointSelection" />
-  <Filter name="ExtractCellSelection" />
   <Filter name="FeatureEdges" />
   <Filter name="Glyph" />
   <Filter name="Gradient" />
@@ -72,13 +72,13 @@
   <Filter name="OctreeDepthScalars" />
   <Filter name="OutlineCornerFilter" />
   <Filter name="OutlineFilter" />
-  <Filter name="PVConnectivityFilter" />
   <Filter name="ParticleTracer" />
   <Filter name="PointDataToCellData" />
   <Filter name="PolyDataNormals" />
   <Filter name="Probe" />
   <Filter name="ProcessIdScalars" />
   <Filter name="Programmable Filter" />
+  <Filter name="PVConnectivityFilter" />
   <Filter name="QuadricClustering" />
   <Filter name="ReflectionFilter" />
   <Filter name="RibbonFilter" />
@@ -95,6 +95,7 @@
   <Filter name="TextureMapToPlane" />
   <Filter name="TextureMapToSphere" />
   <Filter name="Threshold" />
+  <Filter name="TimeToTextConvertor" />
   <Filter name="TransformFilter" />
   <Filter name="TriangleFilter" />
   <Filter name="TubeFilter" />

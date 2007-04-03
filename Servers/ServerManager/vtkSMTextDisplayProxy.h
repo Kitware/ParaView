@@ -60,6 +60,11 @@ public:
   // If such subproxies are not found no error is raised.
   virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
   virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
+
+  // Description:
+  // Set the update time passed on to the update suppressor.
+  void SetUpdateTime(double time);
+
 // BTX
 protected:
   vtkSMTextDisplayProxy();

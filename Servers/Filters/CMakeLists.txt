@@ -120,6 +120,7 @@ SET(Filters_SRCS
 #  vtkTemporalProbeFilter.cxx
   vtkTessellatorFilter.cxx
   vtkTiledDisplaySchedule.cxx
+  vtkTimeToTextConvertor.cxx
   vtkTrackballPan.cxx
   vtkTransferFunctionEditorRepresentation.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx
