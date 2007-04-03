@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqClientProcessModudeGUIHelper_h
 
 #include "pqProcessModuleGUIHelper.h"
+
+class QSplashScreen;
+
 /*!
  * ProcessModuleGUIHelper extends pqProcessModuleGUIHelper
  * so that we can create the type of MainWindow needed for pqClient.
@@ -54,6 +57,8 @@ protected:
   /// subclasses can override this method to create their own
   /// subclass of pqMainWindow as the Main Window.
   virtual QWidget* CreateMainWindow();
+
+  QSplashScreen* Splash;
 
 private:
   ProcessModuleGUIHelper(const ProcessModuleGUIHelper&); // Not implemented.
