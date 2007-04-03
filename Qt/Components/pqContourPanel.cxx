@@ -86,7 +86,7 @@ pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
   l->addWidget(&this->Implementation->ControlsContainer);
 
   pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
-  group2->setTitle(tr("Isosurfaces"));
+  group2->setTitle(tr(this->proxy()->GetProperty("ContourValues")->GetXMLLabel()));
   l = new QVBoxLayout(group2);
   this->Implementation->SampleScalarWidget.layout()->setMargin(0);
   l->addWidget(&this->Implementation->SampleScalarWidget);

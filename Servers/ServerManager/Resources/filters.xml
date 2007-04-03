@@ -1277,6 +1277,7 @@ The Calculator filter is available on the Toolbar.
 
      <IntVectorProperty 
         name="ReplaceInvalidValues" 
+        label="Replace Invalid Results"
         command="SetReplaceInvalidValues" 
         number_of_elements="1"
         default_values="1" > 
@@ -3222,7 +3223,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
      </InputProperty>
 
      <ProxyProperty name="CutFunction" command="SetCutFunction"
-        label="Cut Type">
+        label="Slice Type">
            <ProxyGroupDomain name="groups">
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
@@ -3255,7 +3256,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
         number_of_elements_per_command="1"
         use_index="1"
         animateable="1"
-        label="Cut Offset Values">
+        label="Slice Offset Values">
           <BoundsDomain name="bounds" mode="magnitude">
             <RequiredProperties>
               <Property name="Input" function="Input"/>
@@ -3485,7 +3486,7 @@ The Contour filter operates on any type of data set, but the input is required t
         number_of_elements="5"
         element_types="0 0 0 0 2"
         animateable="0"
-        label="Scalars">
+        label="Contour By">
           <ArrayListDomain name="array_list" attribute_type="Scalars">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
@@ -3499,6 +3500,7 @@ The Contour filter operates on any type of data set, but the input is required t
      <DoubleVectorProperty
         name="ContourValues"
         command="SetValue"
+        label="Isosurfaces"
         set_number_command="SetNumberOfContours"
         number_of_elements="0"
         repeat_command="1"

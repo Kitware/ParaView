@@ -101,7 +101,7 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
   l->addWidget(&this->Implementation->InsideOutWidget);
 
   pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
-  group2->setTitle(tr("Implicit Plane"));
+  group2->setTitle(QString("Clip Type: ") + QString(tr(controlled_proxy->GetXMLLabel())));
   l = new QVBoxLayout(group2);
   this->Implementation->ImplicitPlaneWidget->layout()->setMargin(0);
   l->addWidget(this->Implementation->ImplicitPlaneWidget);

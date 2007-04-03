@@ -95,13 +95,13 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
     new pqImplicitPlaneWidget(this->referenceProxy(), controlled_proxy, NULL);
 
   pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
-  group1->setTitle(tr("Implicit Plane"));
+  group1->setTitle(QString("Slice Type: ") + QString(tr(controlled_proxy->GetXMLLabel())));
   QVBoxLayout* l = new QVBoxLayout(group1);
   this->Implementation->ImplicitPlaneWidget->layout()->setMargin(0);
   l->addWidget(this->Implementation->ImplicitPlaneWidget);
 
   pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
-  group2->setTitle(tr("Slices"));
+  group2->setTitle(tr(this->proxy()->GetProperty("ContourValues")->GetXMLLabel()));
   l = new QVBoxLayout(group2);
   this->Implementation->SampleScalarWidget.layout()->setMargin(0);
   l->addWidget(&this->Implementation->SampleScalarWidget);

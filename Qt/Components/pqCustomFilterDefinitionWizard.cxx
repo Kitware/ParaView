@@ -62,8 +62,11 @@ class pqCustomFilterDefinitionWizardForm :
 {
 public:
   QStringList ListNames; ///< Used to make sure names are unique.
+  // Maps a proxy name with a map of <propertyLabel, propertyName>
+  // pairs for each of its properties. This assumes that labels of
+  // a proxy's properties are unique.
+  QMap< QString, QMap<QString,QString> > LabelToNamePropertyMap; 
 };
-
 
 pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
     pqCustomFilterDefinitionModel *model, QWidget *widgetParent)
@@ -223,7 +226,8 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
     {
     item = this->Form->InputPorts->topLevelItem(i);
     this->Filter->ExposeProperty(item->text(0).toAscii().data(),
-        item->text(1).toAscii().data(), item->text(2).toAscii().data());
+      this->Form->LabelToNamePropertyMap[item->text(0)][item->text(1)].toAscii().data(), 
+      item->text(2).toAscii().data());
     }
 
   // Set the output proxies.
@@ -241,7 +245,8 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
     {
     item = this->Form->PropertyList->topLevelItem(i);
     this->Filter->ExposeProperty(item->text(0).toAscii().data(),
-        item->text(1).toAscii().data(), item->text(2).toAscii().data());
+      this->Form->LabelToNamePropertyMap[item->text(0)][item->text(1)].toAscii().data(), 
+      item->text(2).toAscii().data());
     }
 
   // Include any internal proxies.
@@ -316,7 +321,8 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
   if(!this->OverwriteOK)
     {
-    if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) || proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
+    if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) 
+      || proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
       {
       QMessageBox::warning(this, "Duplicate Name",
           "This filter name already exists.\n"
@@ -370,6 +376,8 @@ void pqCustomFilterDefinitionWizard::setupDefaultInputOutput()
           list.append("Input");
           QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->InputPorts,
               list);
+          this->Form->LabelToNamePropertyMap[source->getSMName()][propertyName] = 
+              propertyName;
           this->Form->InputPorts->setCurrentItem(item);
           this->Form->ListNames.append("Input");
           }
@@ -486,7 +494,14 @@ void pqCustomFilterDefinitionWizard::updateInputForm(const QModelIndex &current,
         input = vtkSMInputProperty::SafeDownCast(iter->GetProperty());
         if(input)
           {
-          this->Form->InputCombo->addItem(QString(iter->GetKey()));
+          const char *name = iter->GetProperty()->GetXMLLabel();
+          if(!name)
+            {
+            name = iter->GetKey();
+            }
+          this->Form->LabelToNamePropertyMap[source->getSMName()][name] = 
+             iter->GetKey();
+          this->Form->InputCombo->addItem(name);
           }
         }
 
@@ -508,6 +523,7 @@ void pqCustomFilterDefinitionWizard::updatePropertyForm(
   // Clear the form fields.
   this->Form->PropertyName->setText("");
   this->Form->PropertyCombo->clear();
+  //this->Form->LabelToNamePropertyMap.clear();
 
   // Get the proxy from the index. Use the proxy to find all the
   // properties to put in the combo box. Don't display the input
@@ -525,7 +541,14 @@ void pqCustomFilterDefinitionWizard::updatePropertyForm(
         input = vtkSMInputProperty::SafeDownCast(iter->GetProperty());
         if(!input)
           {
-          this->Form->PropertyCombo->addItem(QString(iter->GetKey()));
+          const char *name = iter->GetProperty()->GetXMLLabel();
+          if(!name)
+            {
+            name = iter->GetKey();
+            }
+          this->Form->LabelToNamePropertyMap[source->getSMName()][name] = 
+            iter->GetKey();
+          this->Form->PropertyCombo->addItem(name);
           }
         }
 

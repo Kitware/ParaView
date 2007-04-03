@@ -42,13 +42,13 @@
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyPipeline" command="currentChanged" arguments="/0|0" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="BoundaryEdges" />
+  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="Boundary Edges" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Guess1" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/AddPropertyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="FeatureAngle" />
+  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="Feature Angle" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Guess2" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/AddPropertyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="ManifoldEdges" />
+  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="Manifold Edges" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Guess3" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/AddPropertyButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/PropertyUpButton" command="activate" arguments="" />
