@@ -62,7 +62,7 @@ MARK_AS_ADVANCED(PYTHON_DEBUG_LIBRARY)
 # Define a PARAVIEW_USE_MPI that is not advanced
 SET(PARAVIEW_USE_MPI OFF CACHE BOOL "Build ParaView with MPI support")
 SET(VTK_USE_MPI ${PARAVIEW_USE_MPI} CACHE INTERNAL "Build VTK with MPI support" FORCE)
-SET(VTK_USE_MPI_ISSET ON)
+SET(VTK_USE_MPI_ISSET OFF)
 
 #########################################################################
 # Force Infovis support on
