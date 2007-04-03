@@ -1500,7 +1500,6 @@ void pqColorScaleEditor::updatePointValues()
 void pqColorScaleEditor::enableRescaleControls(bool enable)
 {
   this->Form->RescaleButton->setEnabled(enable);
-  this->Form->RescaleToDataButton->setEnabled(enable);
 }
 
 void pqColorScaleEditor::enableResolutionControls(bool enable)
