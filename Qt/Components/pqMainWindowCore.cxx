@@ -2136,8 +2136,11 @@ void pqMainWindowCore::onServerConnect()
     pqApplicationCore::instance()->serverStartups(),
     *pqApplicationCore::instance()->settings(),
     this->Implementation->Parent);
+  server_browser.exec();
 
-  if (server_browser.exec() != QDialog::Accepted && !this->getActiveServer())
+  // If for some reason,  the connect failed,
+  // we create a default builtin connection.
+  if (!this->getActiveServer())
     {
     pqServerResource resource = pqServerResource("builtin:");
     core->createServer(resource);

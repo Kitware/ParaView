@@ -269,23 +269,34 @@ void pqSimpleServerStartup::startServer(
 }
 
 //-----------------------------------------------------------------------------
-void pqSimpleServerStartup::cancelled()
+void pqSimpleServerStartup::reset()
 {
   this->Implementation->reset();
+  QObject::disconnect(
+    pqApplicationCore::instance()->getServerManagerModel(),
+    SIGNAL(serverAdded(pqServer*)),
+    this,
+    SLOT(finishReverseConnection(pqServer*)));
+}
+
+//-----------------------------------------------------------------------------
+void pqSimpleServerStartup::cancelled()
+{
+  this->reset();
   emit this->serverCancelled();
 }
 
 //-----------------------------------------------------------------------------
 void pqSimpleServerStartup::failed()
 {
-  this->Implementation->reset();
+  this->reset();
   emit this->serverFailed();
 }
 
 //-----------------------------------------------------------------------------
 void pqSimpleServerStartup::started(pqServer* server)
 {
-  this->Implementation->reset();
+  this->reset();
   emit this->serverStarted(server);
 }
 

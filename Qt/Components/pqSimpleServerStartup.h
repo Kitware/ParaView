@@ -120,6 +120,9 @@ private:
 
   // disconnects from any already existing servers.
   void disconnectAllServers();
+
+  // Cleans up everything.
+  void reset();
 };
 
 #endif
