@@ -5962,7 +5962,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
    </ExtractSelectionProxy>
 
    <SourceProxy name="TimeToTextConvertor" class="vtkTimeToTextConvertor"
-      label="Time Annotation" >
+      label="Annotate Time" >
       <Documentation>
       Filter that can be used to show the data time in text annotation.
       </Documentation>
