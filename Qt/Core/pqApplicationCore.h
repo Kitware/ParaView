@@ -192,6 +192,13 @@ public:
   // Check to see if its in the process of loading a state
   bool isLoadingState(){return this->LoadingState;};
 
+public slots:
+  /// Called QCoreApplication::quit().
+  /// Applications should use this method instead of directly
+  /// calling QCoreApplication::quit() since this ensures
+  /// that any cleanup is performed correctly.
+  void quit();
+
 signals:
   // Fired when a state file is loaded successfully.
   void stateLoaded();

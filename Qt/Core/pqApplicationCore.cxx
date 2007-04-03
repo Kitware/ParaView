@@ -67,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pq3DWidgetFactory.h"
+#include "pqAnimationScene.h"
 #include "pqCoreInit.h"
 #include "pqDisplayPolicy.h"
 #include "pqLinksModel.h"
@@ -87,8 +88,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqStandardViewModules.h"
-#include "pqXMLUtil.h"
 #include "pqUndoStack.h"
+#include "pqXMLUtil.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -646,4 +647,19 @@ void pqApplicationCore::sendProgress(const char* name, int value)
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqApplicationCore::quit()
+{
+  // As tempting as it is to connect this slot to 
+  // aboutToQuit() signal, it doesn;t work since that signal is not
+  // fired until the event loop exits, which doesn't happen until animation
+  // stops playing.
+  QList<pqAnimationScene*> scenes = 
+    this->getServerManagerModel()->findChildren<pqAnimationScene*>();
+  foreach (pqAnimationScene* scene, scenes)
+    {
+    scene->pause();
+    }
+  QCoreApplication::instance()->quit();
+}
 

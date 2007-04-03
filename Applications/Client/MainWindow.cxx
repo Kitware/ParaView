@@ -187,8 +187,8 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionFileSaveGeometry,
     SLOT(setEnabled(bool)));
 
-  connect(this->Implementation->UI.actionFileExit,
-    SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));  
+  connect(this->Implementation->UI.actionFileExit, SIGNAL(triggered()), 
+    pqApplicationCore::instance(), SLOT(quit()));  
 
   pqUndoStack* undoStack = this->Implementation->Core.getApplicationUndoStack();
 
