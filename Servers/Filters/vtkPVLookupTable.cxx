@@ -20,7 +20,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVLookupTable);
-vtkCxxRevisionMacro(vtkPVLookupTable, "1.8");
+vtkCxxRevisionMacro(vtkPVLookupTable, "1.9");
 //-----------------------------------------------------------------------------
 vtkPVLookupTable::vtkPVLookupTable()
 {
@@ -88,7 +88,22 @@ void vtkPVLookupTable::Build()
     double* table = new double[this->NumberOfValues*3];
     double range[2];
     this->GetRange(range);
+    bool logRangeValid = true;
+    if(this->UseLogScale)
+      {
+      logRangeValid = range[0] > 0.0 || range[1] < 0.0;
+      if(!logRangeValid && this->LookupTable->GetScale() == VTK_SCALE_LOG10)
+        {
+        this->LookupTable->SetScaleToLinear();
+        }
+      }
+
     this->LookupTable->SetRange(range);
+    if(this->UseLogScale && logRangeValid &&
+        this->LookupTable->GetScale() == VTK_SCALE_LINEAR)
+      {
+      this->LookupTable->SetScaleToLog10();
+      }
 
     this->GetTable(range[0], range[1], this->NumberOfValues, table);
     // Now, convert double to unsigned chars and fill the LUT.
