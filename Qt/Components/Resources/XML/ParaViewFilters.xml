@@ -60,8 +60,6 @@
   <Filter name="GradientMagnitude" />
   <Filter name="GroupDataSets" />
   <Filter name="GroupIdScalars" />
-  <Filter name="ImageClip" />
-  <Filter name="ImageShrink" />
   <Filter name="IntegrateAttributes" />
   <Filter name="IntegrateFlowThroughSurface" />
   <Filter name="LinearExtrusionFilter" />
