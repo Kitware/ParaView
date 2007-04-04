@@ -145,6 +145,7 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
   view_action->setData(pqRenderViewModule::renderViewType());
   this->Internal->ConvertMenu.addAction(view_action);
 
+  // TODO:  gotta refresh this menu when new views come in from plugins
   // Create actions for converting view types.
   QObjectList ifaces =
     pqApplicationCore::instance()->getPluginManager()->interfaces();
