@@ -50,6 +50,7 @@ public:
   void PrintSelf(ostream &os, vtkIndent indent);
 
   vtkGetStringMacro(TestDirectory);
+  vtkGetStringMacro(DataDirectory);
   vtkGetStringMacro(BaselineImage);
   vtkGetMacro(ImageThreshold, int);
   vtkGetMacro(ExitAppWhenTestsDone, int);
@@ -70,6 +71,7 @@ protected:
   virtual int PostProcess(int argc, const char * const *argv);
 
   char* TestDirectory;
+  char* DataDirectory;
   char* BaselineImage;
   char* TestFileName;
   char* TestInitFileName;
@@ -81,6 +83,7 @@ protected:
   QStringList TestFiles;
     
   vtkSetStringMacro(TestDirectory);
+  vtkSetStringMacro(DataDirectory);
   vtkSetStringMacro(BaselineImage);
   vtkSetStringMacro(TestFileName);
   vtkSetStringMacro(TestInitFileName);

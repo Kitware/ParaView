@@ -111,8 +111,18 @@ pqCoreTestUtility::~pqCoreTestUtility()
 
 QString pqCoreTestUtility::DataRoot()
 {
+  QString result;
+  if (pqOptions* const options = pqOptions::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetOptions()))
+    {
+    result = options->GetDataDirectory();
+    }
+
   // Let the user override the defaults by setting an environment variable ...
-  QString result = getenv("PARAVIEW_DATA_ROOT");
+  if(result.isEmpty())
+    {
+    result = getenv("PARAVIEW_DATA_ROOT");
+    }
   
   // Otherwise, go with the compiled-in default ...
   if(result.isEmpty())

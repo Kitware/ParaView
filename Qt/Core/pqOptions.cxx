@@ -37,13 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.6");
+vtkCxxRevisionMacro(pqOptions, "1.7");
 
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
 {
   this->BaselineImage = 0;
   this->TestDirectory = 0;
+  this->DataDirectory = 0;
   this->ImageThreshold = 12;
   this->ExitAppWhenTestsDone = 0;
   this->DisableRegistry = 0;
@@ -57,6 +58,7 @@ pqOptions::~pqOptions()
 {
   this->SetBaselineImage(0);
   this->SetTestDirectory(0);
+  this->SetDataDirectory(0);
   this->SetTestFileName(0);
   this->SetTestInitFileName(0);
   this->SetServerResourceName(0);
@@ -74,6 +76,10 @@ void pqOptions::Initialize()
   this->AddArgument("--test-directory", NULL,
     &this->TestDirectory,
     "Set the temporary directory where test-case output will be stored.");
+  
+  this->AddArgument("--data-directory", NULL,
+    &this->DataDirectory,
+    "Set the data directory where test-case data are.");
  
   this->AddArgument("--run-test", NULL,
     &this->TestFileName,  "Run a recorded test case.");
@@ -139,6 +145,8 @@ void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
     this->BaselineImage : "(none)") << endl;
   os << indent << "TestDirectory: " << (this->TestDirectory?
     this->TestDirectory : "(none)") << endl;
+  os << indent << "DataDirectory: " << (this->DataDirectory?
+    this->DataDirectory : "(none)") << endl;
 
   os << indent << "ServerResourceName: " 
     << (this->ServerResourceName? this->ServerResourceName : "(none)") << endl;
