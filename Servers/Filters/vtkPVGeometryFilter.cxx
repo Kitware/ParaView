@@ -50,7 +50,7 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.69");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.70");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -81,6 +81,8 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->CurrentGroup = 0;
 
   this->PassThroughCellIds = 1;
+  this->ForceUseStrips = 0;
+  this->StripModFirstPass = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -984,15 +986,46 @@ void vtkPVGeometryFilter::SetPassThroughCellIds(int newvalue)
     this->GenericGeometryFilter->SetPassThroughCellIds(
       this->PassThroughCellIds);
     }
-  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::SetForceUseStrips(int newvalue)
+{
+  this->ForceUseStrips = newvalue;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::SetUseStrips(int newvalue)
 {
-  this->UseStrips = newvalue;
-  if (this->DataSetSurfaceFilter)
+  if (this->UseStrips != newvalue)
     {
-    this->DataSetSurfaceFilter->SetUseStrips(this->UseStrips);
-    }  
+    this->UseStrips = newvalue;
+    if (this->DataSetSurfaceFilter)
+      {
+      this->DataSetSurfaceFilter->SetUseStrips(this->UseStrips);
+      }
+    //this little bit of nastiness is here for surface selection
+    //surf selection has to have strips off
+    //but we don't want to reexecute this filter unless we really really have
+    //to, so this checks:
+    //if we have been asked to change the setting for selection AND
+    //if something other than the strip setting has been changed
+    int OnlyStripsChanged = 1;
+    if ((this->GetInput() &&
+        this->GetInput()->GetMTime() > this->StripSettingMTime)
+        ||
+        this->MTime > this->StripSettingMTime
+        ||
+        this->StripModFirstPass)
+        {
+        OnlyStripsChanged = 0;
+        }
+    if (this->ForceUseStrips && 
+        !OnlyStripsChanged)
+      {
+      this->Modified();
+      this->StripModFirstPass = 0;
+      }
+    this->StripSettingMTime.Modified();
+    }
 }

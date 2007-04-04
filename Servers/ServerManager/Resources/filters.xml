@@ -5127,6 +5127,18 @@ This filter uses colors to show levels of a hiearchical dataset.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty
+        name="ForceStrips"
+        command="SetForceUseStrips"
+        number_of_elements="1"
+        is_internal="1"
+        default_values="0"
+        animateable="0">
+        <BooleanDomain name="bool"/> 
+        <Documentation>
+          This makes UseStrips call Modified() after changing its setting to ensure that the filter's output is immediatley changed.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
         name="UseOutline"
         command="SetUseOutline"
         number_of_elements="1"

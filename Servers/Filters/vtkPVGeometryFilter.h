@@ -64,6 +64,12 @@ public:
   vtkGetMacro(UseStrips, int);
   vtkBooleanMacro(UseStrips, int);
 
+  // Desctiption:
+  // Makes set use strips call modified after it changes the setting.
+  void SetForceUseStrips(int);
+  vtkGetMacro(ForceUseStrips, int);
+  vtkBooleanMacro(ForceUseStrips, int);
+
   // Description:
   // Whether to generate cell normals.  Cell normals should speed up
   // rendering when point normals are not available.  They can only be used
@@ -86,7 +92,7 @@ public:
   void SetPassThroughCellIds(int);
   vtkGetMacro(PassThroughCellIds,int);
   vtkBooleanMacro(PassThroughCellIds,int);
-
+  
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
@@ -130,6 +136,8 @@ protected:
                               int& numInputs,
                               int updateGroup);
 
+  void ChangeUseStripsInternal(int val, int force);
+
   int OutlineFlag;
   int UseOutline;
   int UseStrips;
@@ -154,6 +162,9 @@ protected:
   virtual void ReportReferences(vtkGarbageCollector*);
 
   int PassThroughCellIds;
+  int ForceUseStrips;
+  vtkTimeStamp     StripSettingMTime;
+  int StripModFirstPass;
 
 private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented

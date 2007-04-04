@@ -287,8 +287,9 @@ protected:
   int StartRenderEventTag;
 
   int UseTriangleStrips;
+  int ForceTriStripUpdate;
   int UseImmediateMode;
-
+  
   // Description:
   // Method called before/after Still Render is called.
   // Can be used to set GlobalLODFlag.

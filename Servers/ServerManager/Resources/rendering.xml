@@ -2961,6 +2961,7 @@
           proxygroup="filters" proxyname="GeometryFilter" />
         <ExposedProperties>
           <Property name="UseStrips" />
+          <Property name="ForceStrips" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>

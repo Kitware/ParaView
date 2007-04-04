@@ -56,7 +56,7 @@
 
 #include "vtkSMClientServerRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.82");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.83");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -122,6 +122,7 @@ vtkSMRenderModuleProxy::vtkSMRenderModuleProxy()
   this->Helper = 0;
 
   this->UseTriangleStrips = 0;
+  this->ForceTriStripUpdate = 0;
   this->UseImmediateMode = 1;
 
   this->RenderTimer = vtkTimerLog::New();
@@ -706,10 +707,17 @@ void vtkSMRenderModuleProxy::SetUseTriangleStrips(int val)
       {
       continue;
       }
+
+    vtkSMIntVectorProperty *fivp = vtkSMIntVectorProperty::SafeDownCast(
+      disp->GetProperty("ForceStrips"));
     vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
       disp->GetProperty("UseStrips"));
     if (ivp)
       {
+      if (fivp)
+        {
+        fivp->SetElement(0, this->ForceTriStripUpdate);
+        }
       ivp->SetElement(0, val);
       disp->UpdateVTKObjects();
       disp->MarkModified(this);
@@ -1581,6 +1589,18 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
       }
     }
 
+  //If stripping is on, turn it off (if anything has been changed since the 
+  //last time we turned it off)
+  //TODO: encode the cell original ids directly into the color and
+  //to make this ugly hack uneccessary
+  int use_strips = this->UseTriangleStrips;
+  if (use_strips)
+    {
+    this->ForceTriStripUpdate = 1;
+    this->SetUseTriangleStrips(0);    
+    this->ForceTriStripUpdate = 0;
+    }
+
   //Force parallel compositing on for the selection render.
   //TODO: intelligently code dataserver rank into originalcellids to
   //make this ugly hack unecessary.
@@ -1631,9 +1651,13 @@ vtkSelection* vtkSMRenderModuleProxy::SelectVisibleCells(unsigned int x0, unsign
   setModeMethod->SetElements1(0);
   vcsProxy->UpdateVTKObjects();   
 
+  //Turn stripping back on if we had turned it off
+  if (use_strips)
+    {
+    this->SetUseTriangleStrips(1);
+    }
+
   //Force parallel compositing on for the selection render.
-  //TODO: intelligently code dataserver rank into originalcellids to
-  //make this ugly hack unecessary.
   if (me2 != NULL)
     {
     me2->SetRemoteRenderThreshold(compThresh);
