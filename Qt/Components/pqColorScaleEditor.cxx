@@ -674,6 +674,10 @@ void pqColorScaleEditor::setValueFromText()
     QPair<double, double> range = this->ColorMap->getScalarRange();
     this->updateScalarRange(range.first, range.second);
     }
+
+#if USE_VTK_TFE
+  this->Viewer->Render();
+#endif
 }
 
 void pqColorScaleEditor::handleOpacityEdit()
@@ -960,7 +964,17 @@ void pqColorScaleEditor::setLogScale(bool on)
   pqSMAdaptor::setElementProperty(
       lookupTable->GetProperty("UseLogScale"), on ? 1 : 0);
 
-  // TODO: Set the log scale flag on the editor.
+  // Set the log scale flag on the editor.
+#if USE_VTK_TFE
+  this->Viewer->GetColorFunction()->SetScale(
+      on ? VTK_CTF_LOG10 : VTK_CTF_LINEAR);
+  this->Viewer->Render();
+#else
+  // TODO
+#endif
+
+  lookupTable->UpdateVTKObjects();
+  this->Display->renderAllViews();
 }
 
 void pqColorScaleEditor::setAutoRescale(bool on)
@@ -1060,6 +1074,7 @@ void pqColorScaleEditor::setTableSize(int tableSize)
 {
 #if USE_VTK_TFE
   // TODO?
+  this->Viewer->Render();
 #else
   this->Form->Gradient->setTableSize(tableSize);
 #endif
@@ -1404,7 +1419,13 @@ void pqColorScaleEditor::initColorScale()
         lookupTable->GetProperty("UseLogScale")).toInt() != 0);
     this->Form->UseLogScale->blockSignals(false);
 
-    // TODO: Set the log scale flag on the editor.
+    // Set the log scale flag on the editor.
+#if USE_VTK_TFE
+    this->Viewer->GetColorFunction()->SetScale(
+        this->Form->UseLogScale->isChecked() ? VTK_CTF_LOG10 : VTK_CTF_LINEAR);
+#else
+    // TODO
+#endif
     }
 
   // Load the new color points into the editor.
