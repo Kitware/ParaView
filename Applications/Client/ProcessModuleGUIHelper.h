@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqClientProcessModudeGUIHelper_h
 
 #include "pqProcessModuleGUIHelper.h"
-
-class QSplashScreen;
+#include <QPointer>
+#include <QSplashScreen>
 
 /*!
  * ProcessModuleGUIHelper extends pqProcessModuleGUIHelper
@@ -58,7 +58,7 @@ protected:
   /// subclass of pqMainWindow as the Main Window.
   virtual QWidget* CreateMainWindow();
 
-  QSplashScreen* Splash;
+  QPointer<QSplashScreen> Splash;
 
 private:
   ProcessModuleGUIHelper(const ProcessModuleGUIHelper&); // Not implemented.

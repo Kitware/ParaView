@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ProcessModuleGUIHelper.h"
 
-#include <QSplashScreen>
 #include <QTimer>
 #include "MainWindow.h"
 
@@ -40,12 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.7");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.8");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
 {
   this->Splash = new QSplashScreen(QPixmap(":/pqClient/PVSplashScreen.png"));
+  this->Splash->setAttribute(Qt::WA_DeleteOnClose);
   this->Splash->show();
 }
 
