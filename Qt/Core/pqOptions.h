@@ -63,6 +63,13 @@ public:
   /// to load.
   vtkGetStringMacro(ServerResourceName);
 
+  vtkSetStringMacro(TestDirectory);
+  vtkSetStringMacro(DataDirectory);
+  vtkSetStringMacro(BaselineImage);
+  vtkSetStringMacro(TestFileName);
+  vtkSetStringMacro(TestInitFileName);
+  vtkSetStringMacro(ServerResourceName);
+
 protected:
   pqOptions();
   virtual ~pqOptions();
@@ -82,13 +89,6 @@ protected:
 
   QStringList TestFiles;
     
-  vtkSetStringMacro(TestDirectory);
-  vtkSetStringMacro(DataDirectory);
-  vtkSetStringMacro(BaselineImage);
-  vtkSetStringMacro(TestFileName);
-  vtkSetStringMacro(TestInitFileName);
-  vtkSetStringMacro(ServerResourceName);
-
  
   // Description:
   // This method is called when wrong argument is found. If it returns 0, then
