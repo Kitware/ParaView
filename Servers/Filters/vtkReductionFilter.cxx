@@ -15,9 +15,9 @@
 #include "vtkReductionFilter.h"
 
 #include "vtkCharArray.h"
-#include "vtkDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkDataObjectTypes.h"
+#include "vtkDataSet.h"
 #include "vtkGenericDataObjectReader.h"
 #include "vtkGenericDataObjectWriter.h"
 #include "vtkImageData.h"
@@ -30,6 +30,7 @@
 #include "vtkRemoteConnection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
 #include "vtkToolkits.h"
 
@@ -40,7 +41,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.12");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.13");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -155,6 +156,15 @@ int vtkReductionFilter::RequestData(vtkInformation*,
     }
   
   this->Reduce(input, output);
+
+  output->GetInformation()->Set(vtkDataObject::DATA_PIECE_NUMBER(), 
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+  output->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(), 
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+  output->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(), 
+    outInfo->Get(
+      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+
   return 1;
 }
 
