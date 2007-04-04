@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.22");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.23");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -46,6 +46,7 @@ vtkTransferFunctionEditorWidgetSimple1D::vtkTransferFunctionEditorWidgetSimple1D
   this->InitialMaximumColor[0] = 1;
   this->InitialMaximumColor[1] = this->InitialMaximumColor[2] = 0;
   this->LockEndPoints = 0;
+  this->LeftClickEventPosition[0] = this->LeftClickEventPosition[1] = 0;
 
   this->CallbackMapper->SetCallbackMethod(
     vtkCommand::LeftButtonPressEvent,
@@ -62,11 +63,6 @@ vtkTransferFunctionEditorWidgetSimple1D::vtkTransferFunctionEditorWidgetSimple1D
     vtkWidgetEvent::Move,
     this,
     vtkTransferFunctionEditorWidgetSimple1D::MoveNodeAction);
-  this->CallbackMapper->SetCallbackMethod(
-    vtkCommand::RightButtonPressEvent,
-    vtkWidgetEvent::ModifyEvent,
-    this,
-    vtkTransferFunctionEditorWidgetSimple1D::ModifyAction);
 }
 
 //----------------------------------------------------------------------------
@@ -178,6 +174,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNodeAction(
     self->WidgetState = vtkTransferFunctionEditorWidgetSimple1D::MovingNode;
     self->Superclass::StartInteraction();
     self->InvokeEvent(vtkCommand::StartInteractionEvent, NULL);
+    self->LeftClickEventPosition[0] = x;
+    self->LeftClickEventPosition[1] = y;
     }
   else
     {
@@ -395,6 +393,18 @@ void vtkTransferFunctionEditorWidgetSimple1D::EndSelectAction(
     self->InvokeEvent(vtkCommand::EndInteractionEvent,NULL);
     self->Superclass::EndInteraction();
     self->Render();
+
+    int x = self->Interactor->GetEventPosition()[0];
+    int y = self->Interactor->GetEventPosition()[1];
+    if (x == self->LeftClickEventPosition[0] &&
+        y == self->LeftClickEventPosition[1] &&
+        self->ModificationType != OPACITY)
+      {
+      // Fire an event indicating that a node has been selected
+      // so we can know when to display a color chooser.
+      self->InvokeEvent(vtkCommand::PickEvent, NULL);
+      self->EventCallbackCommand->SetAbortFlag(1);
+      }
     }
 }
 
@@ -466,31 +476,6 @@ void vtkTransferFunctionEditorWidgetSimple1D::MoveNodeAction(
     self->EventCallbackCommand->SetAbortFlag(1);
     self->InvokeEvent(vtkCommand::InteractionEvent, NULL);
     self->Render();
-    }
-}
-
-//-------------------------------------------------------------------------
-void vtkTransferFunctionEditorWidgetSimple1D::ModifyAction(
-  vtkAbstractWidget *widget)
-{
-  vtkTransferFunctionEditorWidgetSimple1D *self =
-    reinterpret_cast<vtkTransferFunctionEditorWidgetSimple1D*>(widget);
-  if (!self->WidgetRep)
-    {
-    return;
-    }
-
-  int x = self->Interactor->GetEventPosition()[0];
-  int y = self->Interactor->GetEventPosition()[1];
-  int state = self->WidgetRep->ComputeInteractionState(x, y);
-
-  if (state == vtkTransferFunctionEditorRepresentationSimple1D::NearNode &&
-      self->ModificationType != OPACITY)
-    {
-    // Fire an event indicating that a node has been selected
-    // so we can know when to display a color chooser.
-    self->InvokeEvent(vtkCommand::PickEvent, NULL);
-    self->EventCallbackCommand->SetAbortFlag(1);
     }
 }
 
