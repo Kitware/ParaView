@@ -55,7 +55,7 @@ public:
   // Description:
   // Get/Set if log scale must be used while mapping scalars
   // to colors.
-  vtkSetMacro(UseLogScale, int);
+  virtual void SetUseLogScale(int useLogScale);
   vtkGetMacro(UseLogScale, int);
 
   // Description:

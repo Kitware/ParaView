@@ -20,7 +20,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVLookupTable);
-vtkCxxRevisionMacro(vtkPVLookupTable, "1.7");
+vtkCxxRevisionMacro(vtkPVLookupTable, "1.8");
 //-----------------------------------------------------------------------------
 vtkPVLookupTable::vtkPVLookupTable()
 {
@@ -45,6 +45,27 @@ struct vtkPVLookupTableNode
 {
   double Value[6];
 };
+
+//-----------------------------------------------------------------------------
+void vtkPVLookupTable::SetUseLogScale(int useLogScale)
+{
+  if(this->UseLogScale != useLogScale)
+    {
+    this->UseLogScale = useLogScale;
+    if(this->UseLogScale)
+      {
+      this->LookupTable->SetScaleToLog10();
+      this->SetScaleToLog10();
+      }
+    else
+      {
+      this->LookupTable->SetScaleToLinear();
+      this->SetScaleToLinear();
+      }
+
+    this->Modified();
+    }
+}
 
 //-----------------------------------------------------------------------------
 void vtkPVLookupTable::SetNumberOfValues(vtkIdType number)
