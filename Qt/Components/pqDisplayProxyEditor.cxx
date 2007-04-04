@@ -69,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqRenderViewModule.h"
 #include "pqFileDialog.h"
+#include "pqScalarsToColors.h"
 
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
@@ -424,6 +425,9 @@ void pqDisplayProxyEditor::setupGUIConnections()
   QObject::connect(
     this->Internal->EditColorMapButton, SIGNAL(clicked()),
     this, SLOT(openColorMapEditor()));
+  QObject::connect(
+    this->Internal->RescaleButton, SIGNAL(clicked()),
+    this, SLOT(rescaleToDataRange()));
   
   // Create an connect signal adaptors.
   if (!QMetaType::isRegistered(QMetaType::type("QVariant")))
@@ -459,15 +463,15 @@ void pqDisplayProxyEditor::updateEnableState()
 
   if(val == "Solid Color")
     {
-    this->Internal->ColorActorColor->setEnabled(true);
     this->Internal->ColorInterpolateColors->setEnabled(false);
-    this->Internal->EditColorMapButton->setEnabled(false);
+    this->Internal->ColorButtonStack->setCurrentWidget(
+        this->Internal->SolidColorPage);
     }
   else
     {
-    this->Internal->ColorActorColor->setEnabled(false);
     this->Internal->ColorInterpolateColors->setEnabled(true);
-    this->Internal->EditColorMapButton->setEnabled(true);
+    this->Internal->ColorButtonStack->setCurrentWidget(
+        this->Internal->ColorMapPage);
     }
 
   vtkSMDataObjectDisplayProxy* display = 
@@ -516,6 +520,39 @@ void pqDisplayProxyEditor::openColorMapEditor()
   pqColorScaleEditor colorScale(this);
   colorScale.setDisplay(this->Internal->Display);
   colorScale.exec();
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditor::rescaleToDataRange()
+{
+  if(this->Internal->Display.isNull())
+    {
+    return;
+    }
+
+  pqScalarsToColors *colorMap = this->Internal->Display->getLookupTable();
+  if(colorMap)
+    {
+    QString colorField = this->Internal->Display->getColorField();
+    int component_no = -1;
+    if(colorMap->getVectorMode() == pqScalarsToColors::COMPONENT)
+      {
+      component_no = colorMap->getVectorComponent();
+      }
+
+    QPair<double, double> range = 
+        this->Internal->Display->getColorFieldRange(colorField, component_no);
+    this->Internal->Display->setScalarOpacityRange(range.first, range.second);
+    colorMap->setScalarRange(range.first, range.second);
+    this->Internal->Display->renderAllViews();
+    }
+
+  // TODO: This method is too slow using the vtk tfe.
+  // Use the color map editor to scale to the data range. This will
+  // ensure that the log scale is updated appropriately.
+  //pqColorScaleEditor colorScale(this);
+  //colorScale.setDisplay(this->Internal->Display);
+  //colorScale.rescaleRange();
 }
 
 //-----------------------------------------------------------------------------

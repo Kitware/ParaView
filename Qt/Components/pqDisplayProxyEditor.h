@@ -65,6 +65,7 @@ protected slots:
   /// internally used to update the graphics window when a property changes
   void updateView();
   void openColorMapEditor();
+  void rescaleToDataRange();
   void zoomToData();
   void updateEnableState();
   void updateMaterial(int idx);

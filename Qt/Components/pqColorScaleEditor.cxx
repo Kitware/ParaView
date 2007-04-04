@@ -354,6 +354,11 @@ void pqColorScaleEditor::setDisplay(pqPipelineDisplay *display)
     }
 }
 
+void pqColorScaleEditor::rescaleRange()
+{
+  this->rescaleToDataRange();
+}
+
 void pqColorScaleEditor::showEvent(QShowEvent *e)
 {
   QDialog::showEvent(e);

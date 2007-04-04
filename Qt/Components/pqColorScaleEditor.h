@@ -61,6 +61,8 @@ public:
 
   void setDisplay(pqPipelineDisplay *display);
 
+  void rescaleRange();
+
 protected:
   virtual void showEvent(QShowEvent *e);
   virtual void hideEvent(QHideEvent *e);
