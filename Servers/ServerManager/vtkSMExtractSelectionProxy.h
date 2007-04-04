@@ -49,6 +49,10 @@ public:
   void AddGlobalID(vtkIdType id);
   void RemoveAllGlobalIDs();
 
+  // Description:
+  // Get the selection field type.
+  vtkGetMacro(SelectionFieldType, int);
+
 //BTX
 protected:
   vtkSMExtractSelectionProxy();

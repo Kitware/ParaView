@@ -108,11 +108,13 @@ signals:
   void ondeselect();
   void renderModuleChanged(pqRenderViewModule*);
 
+protected:
+  virtual void updateInformationAndDomains();
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
 
-  void updateInformationAndDomains();
 };
 
 #endif

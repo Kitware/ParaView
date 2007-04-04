@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkSelection.h"
+#include "vtkSMExtractSelectionProxy.h"
 #include "vtkSMProxy.h"
 
 #include <QtDebug>
@@ -217,4 +219,44 @@ void pqExtractSelectionPanel::newValue()
   // change the current item and make it editable.
   activeTree->setCurrentItem(item, 0);
   activeTree->editItem(item, 0);
+}
+
+//-----------------------------------------------------------------------------
+void pqExtractSelectionPanel::updateInformationAndDomains()
+{
+  this->Superclass::updateInformationAndDomains();
+
+  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(
+    this->referenceProxy());
+  
+  pqPipelineSource* input = filter->getInput(0);
+  if (!input)
+    {
+    return;
+    }
+
+  vtkPVDataInformation* dataInfo = input->getDataInformation();
+  vtkSMExtractSelectionProxy* proxy = vtkSMExtractSelectionProxy::SafeDownCast(
+    filter->getProxy());
+
+  vtkPVDataSetAttributesInformation* dsainfo = 0;
+  if (proxy && proxy->GetSelectionFieldType() == vtkSelection::CELL)
+    {
+    dsainfo = dataInfo->GetCellDataInformation();
+    }
+  else
+    {
+    dsainfo = dataInfo->GetPointDataInformation();
+    }
+
+  if (dsainfo->GetAttributeInformation(vtkDataSetAttributes::GLOBALIDS))
+    {
+    // We have global ids.
+    this->Internal->UseGlobalIDs->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->UseGlobalIDs->setCheckState(Qt::Unchecked);
+    this->Internal->UseGlobalIDs->setEnabled(false);
+    }
 }
