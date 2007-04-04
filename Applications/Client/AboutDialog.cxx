@@ -54,6 +54,7 @@ AboutDialog::AboutDialog(QWidget* Parent) :
   opts->PrintSelf(str, indent.GetNextIndent());
   str << ends;
   QString info = str.str();
+  str.rdbuf()->freeze(0);
   int idx = info.indexOf("Runtime information:");
   info = info.remove(0, idx);
   this->Ui->Information->append("ParaView was developed by Kitware Inc.");
