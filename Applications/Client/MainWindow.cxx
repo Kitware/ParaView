@@ -99,7 +99,7 @@ public:
       }
   }
 
-  QAssistantClient* AssistantClient;
+  QPointer<QAssistantClient> AssistantClient;
   Ui::MainWindow UI;
   pqMainWindowCore Core;
   pqRecentFilesMenu* RecentFilesMenu;
@@ -763,14 +763,11 @@ void MainWindow::onHelpHelp()
 {
   if(this->Implementation->AssistantClient)
     {
-    if(this->Implementation->AssistantClient->isOpen())
-      {
-      return;
-      }
-    else
+    if(!this->Implementation->AssistantClient->isOpen())
       {
       this->Implementation->AssistantClient->openAssistant();
       }
+      return;
     }
 
   QString assistantExe;
@@ -848,7 +845,6 @@ void MainWindow::onHelpHelp()
       " points to that file");
     
     delete this->Implementation->AssistantClient;
-    this->Implementation->AssistantClient = NULL;
     return;
     }
   
