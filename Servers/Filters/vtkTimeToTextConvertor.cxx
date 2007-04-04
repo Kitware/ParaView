@@ -22,7 +22,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkTimeToTextConvertor);
-vtkCxxRevisionMacro(vtkTimeToTextConvertor, "1.2");
+vtkCxxRevisionMacro(vtkTimeToTextConvertor, "1.3");
 //----------------------------------------------------------------------------
 vtkTimeToTextConvertor::vtkTimeToTextConvertor()
 {
@@ -57,7 +57,6 @@ int vtkTimeToTextConvertor::RequestData(
   strcpy(buffer, "?");
 
   vtkInformation* inputInfo= input->GetInformation();
-  vtkInformation* outputInfo = outputVector->GetInformationObject(0);
   if (inputInfo && inputInfo->Has(vtkDataObject::DATA_TIME_STEPS()) 
     && this->Format)
     {
