@@ -39,7 +39,7 @@
 // Template for the <head/> with CSS styles for the Proxy documentation.
 static const char* ProxyDocumentHeadTemplate =
   "<head>\n"\
-    "  <title>%NAME%</title>\n"\
+    "  <title>%TITLE%</title>\n"\
     "  <style>\n"\
     "    body{\n"\
     "      border: 1px solid #000000;\n"\
@@ -105,6 +105,24 @@ static const char* PropertyTemplate =
     "  <td>%DEFAULTVALUES%</td>\n"\
     "  <td>%DOMAINS%</td>\n"\
     "</tr>\n";
+
+// Template for header before lising proxies.
+static const char* ProxyListTitleTemplate =
+  "<div class=\"ProxyDocumentation\">\n"\
+    "  <div class=\"ProxyHeading\">\n"\
+    "    %TITLE%\n"\
+    "  </div>\n"\
+    "  <br />\n"\
+    "</div>\n";
+
+static const char* ProxyListTableHeaderTemplate = 
+  "<table class=\"PropertiesTable\" border=\"1\" cellpadding=\"5\">\n"\
+    "  <tr><td>Name</td><td>Description</td></tr>\n";
+static const char* ProxyListTableFooterTemplate = "</table>\n";
+
+static const char* ProxyListItemTemplate = 
+  "<tr><td><a href=\"%LINK%\">%LABEL%</a></td><td>%DESCRIPTION%</td></tr>\n";
+  
 
 class vtkStringPairList : public vtkstd::list<vtkstd::pair<vtkstd::string, vtkstd::string> > {};
 typedef vtkstd::list<vtkstd::pair<vtkstd::string, vtkstd::string> >::iterator vtkStringPairListIterator;
@@ -740,6 +758,7 @@ void WriteProperty(const char* pname, vtkSMProperty* prop, ostream& docFile)
       }
     }
   dIt->Delete();
+  all_domains_stream  << "&nbsp;";
   dataMap["DOMAINS"] = all_domains_stream.str();
   WriteFromTemplate(docFile, ::PropertyTemplate, dataMap);
 }
@@ -776,7 +795,7 @@ void WriteProxyHeader(vtkSMProxy* proxy, ostream& docFile)
     return;
     }
   TemplateMap dataMap;
-  dataMap["NAME"] = proxy->GetXMLLabel();
+  dataMap["TITLE"] = proxy->GetXMLLabel();
   WriteFromTemplate(docFile, ProxyDocumentHeadTemplate, dataMap);
 }
 
@@ -878,14 +897,65 @@ void WriteProxies(vtkStringPairList *stringList, vtkStringPairList *labelList,
     }
 }
 
-void WriteHTMLList(vtkStringPairList *labelList, ofstream &baseFile)
+void WriteHTMLList(const char* groupname, vtkStringPairList *nameList, ostream &baseFile)
 {
+  // Write header.
+  TemplateMap dataMap;
+  dataMap["TITLE"] = groupname;
+  baseFile << "<html>" << endl;
+  WriteFromTemplate(baseFile, ProxyDocumentHeadTemplate, dataMap);
+  baseFile << "<body>" << endl;
+  WriteFromTemplate(baseFile, ProxyListTitleTemplate, dataMap);
+  WriteFromTemplate(baseFile, ProxyListTableHeaderTemplate, dataMap);
+
+  vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
   vtkStringPairListIterator iter;
-  for (iter = labelList->begin(); iter != labelList->end(); iter++)
+
+  vtkStringPairList proxyListItems;
+
+  for (iter = nameList->begin(); iter != nameList->end(); iter++)
     {
-    baseFile << "<a href=\"" << (*iter).second.c_str() << ".html\">"
-             << (*iter).first.c_str() << "</a><br>" << endl;
+    vtkSMProxy* proxy = manager->GetPrototypeProxy((*iter).second.c_str(), 
+      (*iter).first.c_str());
+    if (!proxy)
+      {
+      continue;
+      }
+
+    dataMap.clear();
+    dataMap["LINK"] = vtkstd::string(proxy->GetXMLName()) + ".html";
+    dataMap["LABEL"] = proxy->GetXMLLabel();
+    dataMap["DESCRIPTION"] = "&nbsp;";
+
+    vtkSMDocumentation* documentation = proxy->GetDocumentation();
+    if (documentation)
+      {
+      if (documentation->GetShortHelp())
+        {
+        dataMap["DESCRIPTION"] = documentation->GetShortHelp();
+        }
+      else if (documentation->GetLongHelp())
+        {
+        dataMap["DESCRIPTION"] = documentation->GetLongHelp();
+        }
+      }
+    vtksys_ios::ostringstream stream;
+    WriteFromTemplate(stream, ProxyListItemTemplate, dataMap);
+    vtkstd::pair<vtkstd::string, vtkstd::string> labelHtmlPair(
+      proxy->GetXMLLabel(), stream.str());
+    proxyListItems.push_back(labelHtmlPair);
     }
+
+  proxyListItems.sort();
+  for (iter = proxyListItems.begin(); iter!= proxyListItems.end(); ++iter)
+    {
+    baseFile << iter->second.c_str() << endl;
+    }
+  
+
+  WriteFromTemplate(baseFile, ProxyListTableFooterTemplate, dataMap);
+  baseFile << "</body>" << endl;
+  baseFile << "</html>" << endl;
 }
 
 int main(int argc, char *argv[])
@@ -911,14 +981,14 @@ int main(int argc, char *argv[])
   baseFileName << argv[1] << "/" << baseName << ".html" << ends;
   baseFile.open(baseFileName.str());
   baseFileName.rdbuf()->freeze(0);
-  baseFile << "<html>" << endl;
-  baseFile << "<head>" << endl;
-  baseFile << "<title>" << endl;
+  //baseFile << "<html>" << endl;
+  //baseFile << "<head>" << endl;
+  //baseFile << "<title>" << endl;
   char* proxyTypeName = strchr(baseName, 'w');
   proxyTypeName++;
-  baseFile << proxyTypeName << endl;
-  baseFile << "</title>" << endl;
-  baseFile << "</head>" << endl;
+  //baseFile << proxyTypeName << endl;
+  //baseFile << "</title>" << endl;
+  //baseFile << "</head>" << endl;
   
   vtkProcessModule *pm = vtkProcessModule::New();
   pm->Initialize();
@@ -939,7 +1009,7 @@ int main(int argc, char *argv[])
 
   proxyLabelList->sort();
 
-  WriteHTMLList(proxyLabelList, baseFile);
+  WriteHTMLList(proxyTypeName, proxyNameList, baseFile);
 
   vtkStringPairListIterator iter;
   for (iter = proxyNameList->begin(); iter != proxyNameList->end();)
