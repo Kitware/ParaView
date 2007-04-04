@@ -30,12 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "vtkPVConfig.h"
-
-#if defined(PARAVIEW_ENABLE_PYTHON)
-#include <vtkPython.h>
-#endif
-
 #include <QApplication>
 #include <QDir>
 #include "ProcessModuleGUIHelper.h"
@@ -52,11 +46,6 @@ int main(int argc, char* argv[])
   dir.cdUp();
   dir.cd("Plugins");
   QApplication::setLibraryPaths(QStringList(dir.absolutePath()));
-  int ret = pqMain::Run(app, ProcessModuleGUIHelper::New());
-#if defined(PARAVIEW_ENABLE_PYTHON)
-  // clean up python for leak checkers
-  Py_Finalize(); 
-#endif
-  return ret;
+  return pqMain::Run(app, ProcessModuleGUIHelper::New());
 }
 
