@@ -43,15 +43,20 @@ public:
   vtkGetMacro(UseGlobalIDs, int);
   vtkBooleanMacro(UseGlobalIDs, int);
 
-  void AddIndex(vtkIdType piece, vtkIdType id);
-  void RemoveAllIndices();
-
-  void AddGlobalID(vtkIdType id);
-  void RemoveAllGlobalIDs();
 
   // Description:
   // Get the selection field type.
   vtkGetMacro(SelectionFieldType, int);
+
+  // Description:
+  // Add an index to the selection.
+  void AddIndex(vtkIdType piece, vtkIdType id);
+  void RemoveAllIndices();
+
+  // Description:
+  // Add a global id to the selection.
+  void AddGlobalID(vtkIdType id);
+  void RemoveAllGlobalIDs();
 
 //BTX
 protected:
