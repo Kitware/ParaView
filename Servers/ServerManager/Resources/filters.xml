@@ -5825,6 +5825,13 @@ This filter operates on all types of data sets, and it returns unstructured grid
       label="Extract Selection (point)"
       class="vtkExtractSelection"
       selection_field_type="POINT" >
+     <Documentation
+      short_help="Extract selection by point."
+      long_help="Extract selection by point." >
+       This filter extracts a set of points given a selection. 
+       The selection can be created by specifying a point id list (either 
+       global ids or point indices).
+     </Documentation>
 
      <InputProperty
          name="Input"
@@ -5895,6 +5902,14 @@ This filter operates on all types of data sets, and it returns unstructured grid
       label="Extract Selection (cell)"
       class="vtkExtractSelection"
       selection_field_type="CELL" >
+     <Documentation
+        short_help="Extract selection by cell."
+        long_help="Extract selection by cell." >
+       This filter extracts a set of cells given a selection. 
+       The selection can be obtained from a rubber-band selection 
+       (either cell, visible or in a frustrum) and passed to the filter 
+       or specified by providing an ID list.
+     </Documentation>
 
      <InputProperty
          name="Input"
@@ -5963,8 +5978,10 @@ This filter operates on all types of data sets, and it returns unstructured grid
 
    <SourceProxy name="TimeToTextConvertor" class="vtkTimeToTextConvertor"
      label="Annotate Time" >
-     <Documentation>
-     Filter that can be used to show the data time in text annotation.
+     <Documentation
+        short_help="Show data time as text."
+        long_help="Shows input data time as text annnotation in the view." >
+      Filter that can be used to show the data time in text annotation.
      </Documentation>
      <InputProperty
          name="Input"
