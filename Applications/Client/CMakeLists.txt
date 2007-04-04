@@ -13,6 +13,11 @@ INCLUDE_DIRECTORIES(
   ${pqClient_SOURCE_DIR}
   ${pqClient_BINARY_DIR}
 )
+IF(PARAVIEW_ENABLE_PYTHON)
+INCLUDE_DIRECTORIES(
+  ${PYTHON_INCLUDE_PATH}
+  )
+ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 # Reduce the number of dirs that get included on moc command line
 # since it causes issues on Windows 2000.
