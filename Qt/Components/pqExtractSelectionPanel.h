@@ -64,9 +64,12 @@ protected:
 
   /// Updates the labels for ID ranges.
   void updateIDRanges();
+
+  virtual void updateInformationAndDomains();
 private:
   pqExtractSelectionPanel(const pqExtractSelectionPanel&); // Not implemented.
   void operator=(const pqExtractSelectionPanel&); // Not implemented.
+
 
   class pqInternal;
   pqInternal *Internal;
