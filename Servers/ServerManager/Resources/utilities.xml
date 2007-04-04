@@ -355,7 +355,8 @@
         default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
     </Proxy>
     
-    <TransformProxy name="Transform2" class="vtkTransform">
+    <TransformProxy name="Transform2" class="vtkTransform"
+      label="Transform">
       <!--Transform proxy with unconventional interface, used by BoxWidget -->
       <DoubleVectorProperty
         name="Position"
@@ -363,6 +364,7 @@
         number_of_elements="3"
         update_self="1"
         animateable="1"
+        label="Translate"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
@@ -372,6 +374,7 @@
         number_of_elements="3"
         update_self="1"
         animateable="1"
+        label="Rotate"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
@@ -381,7 +384,8 @@
         number_of_elements="3"
         update_self="1"
         animateable="1"
-        default_values="0.0 0.0 0.0" >
+        label="Scale"
+        default_values="1.0 1.0 1.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
     </TransformProxy>

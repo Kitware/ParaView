@@ -2939,6 +2939,10 @@ The Transform filter allows you to specify the position, size, and orientation o
            <ProxyGroupDomain name="groups">
               <Group name="transforms"/>
            </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <!-- Eventually, this transform will flaunt a 3D widget -->
+              <Proxy group="transforms" name="Transform2" />
+           </ProxyListDomain>
            <Documentation>
              Set the transform to apply to the input dataset.
            </Documentation>
