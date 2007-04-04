@@ -56,6 +56,10 @@ static const char* ProxyDocumentHeadTemplate =
     "      font-size: 24pt;\n"\
     "      border-bottom: 1px solid #000000;\n"\
     "    }\n"\
+    "    span.ProxyHeadingSmallText{\n"\
+    "      font-weight: bold;\n"\
+    "      font-size: 12pt;\n"\
+    "    }\n"\
     "    div.ProxyLongHelp {\n"\
     "      margin: 20px;\n"\
     "      font-style: italic;\n"\
@@ -76,7 +80,7 @@ static const char* ProxyDocumentationTemplate =
   "<div class=\"ProxyDocumentation\">\n"\
     "    <div class=\"ProxyHeading\"\n"\
     "      title=\"%SHORTHELP%\" >\n"\
-    "      %NAME%\n"\
+    "      %LABEL% <span class=\"ProxyHeadingSmallText\">(%NAME%)</span>\n"\
     "    </div>\n"\
     "    <div class=\"ProxyLongHelp\">\n"\
     "      %LONGHELP% \n"\
@@ -100,7 +104,7 @@ static const char* PropertiesTableFooterTemplate = "</table>\n";
 // Template for every property.
 static const char* PropertyTemplate =
   "<tr>\n"\
-    "  <td>%NAME%</td>\n"\
+    "  <td><b>%LABEL%</b><br/><i>(%NAME%)</i></td>\n"\
     "  <td>%DESCRIPTION%</td>\n"\
     "  <td>%DEFAULTVALUES%</td>\n"\
     "  <td>%DOMAINS%</td>\n"\
@@ -722,6 +726,7 @@ void WriteProperty(const char* pname, vtkSMProperty* prop, ostream& docFile)
 {
   TemplateMap dataMap;
   dataMap["NAME"] = pname;
+  dataMap["LABEL"] = prop->GetXMLLabel();
   vtkSMDocumentation* documentation = prop->GetDocumentation();
   if (documentation && documentation->GetDescription())
     {
@@ -808,7 +813,8 @@ void WriteProxyDocumentation(vtkSMProxy* proxy, ostream& docFile)
     }
 
   TemplateMap dataMap;
-  dataMap["NAME"] = proxy->GetXMLLabel();
+  dataMap["NAME"] = proxy->GetXMLName();
+  dataMap["LABEL"] = proxy->GetXMLLabel();
   vtkSMDocumentation* documentation = proxy->GetDocumentation();
   if (documentation)
     {
