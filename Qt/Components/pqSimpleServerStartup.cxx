@@ -280,11 +280,34 @@ void pqSimpleServerStartup::startServer(
       this->startServer(*startup);
       }
     }
-  // More than one startup, so prompt the user to pick one ...
   else
     {
+    // More than one startup. If we are already connected 
+    // to one of the startups that provide the data then we do thing,
+    // else prompt the user to pick one ...
+
+    if (this->IgnoreConnectIfAlreadyConnected)
+      {
+      // Are we connected to one of the startups?
+      foreach (QString startup_name, startups)
+        {
+        pqServerStartup* const startup = 
+          server_startups.getStartup(startup_name);
+        if (pqApplicationCore::instance()->getServerManagerModel()->getServer(
+            startup->getServer()))
+          {
+          // we call startServer so it performs all the 
+          // necessary actions.
+          this->startServer(*startup);
+          return;
+          }
+        }
+      }
+
     pqServerBrowser dialog(server_startups, settings);
-    dialog.setMessage(QString(tr("Pick the configuration for starting %1")).arg(server.schemeHosts().toURI()));
+    dialog.setMessage(
+      QString(tr("Pick the configuration for starting %1")).arg(
+        server.schemeHosts().toURI()));
     
     if(QDialog::Accepted == dialog.exec())
       {
