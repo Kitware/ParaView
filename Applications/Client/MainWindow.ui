@@ -135,11 +135,6 @@
       <string>Toolbars</string>
      </property>
     </widget>
-    <widget class="QMenu" name="menuType_Here" >
-     <property name="title" >
-      <string>Type Here</string>
-     </property>
-    </widget>
     <widget class="QMenu" name="menuCamera" >
      <property name="title" >
       <string>Camera</string>
@@ -456,6 +451,9 @@
    </property>
    <property name="text" >
     <string>Help</string>
+   </property>
+   <property name="shortcut" >
+    <string>F1</string>
    </property>
   </action>
   <action name="actionScalarBarVisibility" >
