@@ -109,6 +109,12 @@ signals:
   void renderModuleChanged(pqRenderViewModule*);
 
 protected:
+  /// This method gets called to referesh all domains 
+  /// and information properties. Subclassess can override
+  /// this to update any domain related entities.
+  /// Since this is not a particularly fast operation, we update 
+  /// the information and domains only when the panel is selected 
+  /// or an already active panel is accepted. 
   virtual void updateInformationAndDomains();
 
 private:
