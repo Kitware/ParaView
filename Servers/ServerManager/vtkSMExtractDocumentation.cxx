@@ -27,6 +27,84 @@
 
 #include <vtkstd/list>
 #include <vtkstd/string>
+#include <vtkstd/map>
+#include <vtksys/SystemTools.hxx>
+#include <vtksys/ios/sstream>
+#include <vtksys/RegularExpression.hxx>
+
+
+// For now let the template be here itself. We may want to read these from
+// external files in future.
+
+// Template for the <head/> with CSS styles for the Proxy documentation.
+static const char* ProxyDocumentHeadTemplate =
+  "<head>\n"\
+    "  <title>%NAME%</title>\n"\
+    "  <style>\n"\
+    "    body{\n"\
+    "      border: 1px solid #000000;\n"\
+    "      background: #EEF3F5;\n"\
+    "      margin: 0px;\n"\
+    "      padding: 0px;\n"\
+    "    }\n"\
+    "    div.ProxyHeading{\n"\
+    "      padding-top: 5px;\n"\
+    "      padding-bottom: 5px;\n"\
+    "      padding-left: 5px;\n"\
+    "      background: #adc4d2;"\
+    "      font-weight: bold;\n"\
+    "      font-size: 24pt;\n"\
+    "      border-bottom: 1px solid #000000;\n"\
+    "    }\n"\
+    "    div.ProxyLongHelp {\n"\
+    "      margin: 20px;\n"\
+    "      font-style: italic;\n"\
+    "    }\n"\
+    "    div.ProxyDescription {\n"\
+    "      border-top: 1px solid;\n"\
+    "    }\n"\
+    "    table.PropertiesTable {\n"\
+    "    }\n"\
+    "    tr.PropertiesTableHeading  {\n"\
+    "      background: #85a8bc;\n"\
+    "    }\n"\
+    "  </style>\n"\
+    "</head>\n";
+
+// Template for writing the documentation associated with a proxy.
+static const char* ProxyDocumentationTemplate = 
+  "<div class=\"ProxyDocumentation\">\n"\
+    "    <div class=\"ProxyHeading\"\n"\
+    "      title=\"%SHORTHELP%\" >\n"\
+    "      %NAME%\n"\
+    "    </div>\n"\
+    "    <div class=\"ProxyLongHelp\">\n"\
+    "      %LONGHELP% \n"\
+    "    </div>\n"\
+    "    <div class=\"ProxyDescription\">\n"\
+    "    %DESCRIPTION%\n"\
+    "    </div>\n"\
+    "  <!-- End of Proxy Documentation -->\n"\
+    "</div>\n";
+
+// Template for header before listing properties for the proxy.
+static const char* PropertiesTableHeaderTemplate =
+  "<table class=\"PropertiesTable\" border=\"1\" cellpadding=\"5\" >\n"\
+    "  <tr class=\"PropertiesTableHeading\">\n"\
+    "    <td>Property</td><td>Description</td><td>Default Value(s)</td><td>Restrictions</td>\n"\
+    "  </tr>\n";
+
+// Template for the footer after having finished with listing all properties of the proxy.
+static const char* PropertiesTableFooterTemplate = "</table>\n";
+
+// Template for every property.
+static const char* PropertyTemplate =
+  "<tr>\n"\
+    "  <td>%NAME%</td>\n"\
+    "  <td>%DESCRIPTION%</td>\n"\
+    "  <td>%DEFAULTVALUES%</td>\n"\
+    "  <td>%DOMAINS%</td>\n"\
+    "</tr>\n";
 
 class vtkStringPairList : public vtkstd::list<vtkstd::pair<vtkstd::string, vtkstd::string> > {};
 typedef vtkstd::list<vtkstd::pair<vtkstd::string, vtkstd::string> >::iterator vtkStringPairListIterator;
@@ -37,33 +115,29 @@ bool operator < (const vtkstd::pair<vtkstd::string, vtkstd::string> &x,
   return x.first < y.first;
 }
 
-void WriteDocumentation(vtkSMDocumentation *doc, ofstream &docFile)
+typedef vtkstd::map<vtkstd::string, vtkstd::string> TemplateMap;
+
+void WriteFromTemplate(ostream& docFile, const char* cdoc_template, TemplateMap& data)
 {
-  if (!doc->GetDocumentationElement())
+  vtkstd::string doc_template = cdoc_template;
+  TemplateMap::iterator iter = data.begin();
+  for (;iter != data.end(); iter++)
     {
-    docFile << "NO DOCUMENTATION" << endl;
-    docFile << "<br>" << endl;
-    return;
+    vtkstd::string key = iter->first;
+    vtkstd::string data = iter->second;
+    key = "%" + key + "%";
+
+    // Replace every occurance of key in the doc_template with the data.
+    vtksys::SystemTools::ReplaceString(doc_template, key.c_str(), data.c_str());
     }
-  if (doc->GetLongHelp())
-    {
-    docFile << "<b>long help:</b> " << doc->GetLongHelp() << endl;
-    docFile << "<br>" << endl;
-    }
-  if (doc->GetShortHelp())
-    {
-    docFile << "<b>short help:</b> " << doc->GetShortHelp() << endl;
-    docFile << "<br>" << endl;
-    }
-  if (doc->GetDescription())
-    {
-    docFile << "<b>description:</b> " << doc->GetDescription() << endl;
-    docFile << "<br>" << endl;
-    }
+  // Dump doc_template (which now has all keys replaces with nice data values) 
+  // into the file.
+  docFile << doc_template.c_str();
 }
 
-void WriteDefaultValues(vtkSMProperty *prop, ofstream &docFile)
+bool WriteDefaultValues(vtkSMProperty *prop, ostream& docFile)
 {
+  bool written = false;
   vtkSMIntVectorProperty *intVecProp =
     vtkSMIntVectorProperty::SafeDownCast(prop);
   vtkSMDoubleVectorProperty *doubleVecProp =
@@ -76,19 +150,11 @@ void WriteDefaultValues(vtkSMProperty *prop, ofstream &docFile)
     int *elements = intVecProp->GetElements();
     if (intVecProp->GetNumberOfElements() && elements)
       {
-      if (intVecProp->GetNumberOfElements() > 1)
-        {
-        docFile << "<b>Default Values:</b>" << endl;
-        }
-      else
-        {
-        docFile << "<b>Default Value:</b>" << endl;
-        }
       for (i = 0; i < intVecProp->GetNumberOfElements(); i++)
         {
         docFile << elements[i] << " ";
+        written = true;
         }
-      docFile << "<br>" << endl;
       }
     }
   else if (doubleVecProp)
@@ -96,19 +162,11 @@ void WriteDefaultValues(vtkSMProperty *prop, ofstream &docFile)
     double *elements = doubleVecProp->GetElements();
     if (doubleVecProp->GetNumberOfElements() && elements)
       {
-      if (doubleVecProp->GetNumberOfElements() > 1)
-        {
-        docFile << "<b>Default Values:</b>" << endl;
-        }
-      else
-        {
-        docFile << "<b>Default Value:</b>" << endl;
-        }
       for (i = 0; i < doubleVecProp->GetNumberOfElements(); i++)
         {
         docFile << elements[i] << " ";
+        written = true;
         }
-      docFile << "<br>" << endl;
       }
     }
   else if (stringVecProp)
@@ -116,34 +174,31 @@ void WriteDefaultValues(vtkSMProperty *prop, ofstream &docFile)
     if (stringVecProp->GetNumberOfElements() &&
         strlen(stringVecProp->GetElement(0)) > 0)
       {
-      if (stringVecProp->GetNumberOfElements() > 1)
-        {
-        docFile << "<b>Default Values:</b>" << endl;
-        }
-      else
-        {
-        docFile << "<b>Default Value:</b>" << endl;
-        }
       for (i = 0; i < stringVecProp->GetNumberOfElements(); i++)
         {
-        docFile << stringVecProp->GetElement(i) << " ";
+        docFile << stringVecProp->GetElement(i);
+        written = true;
         }
-      docFile << "<br>" << endl;
       }
     }
+  return written;
 }
 
-void WriteDomainHeader(int &written, ofstream &docFile)
+vtkstd::string FilterDescription(vtkstd::string description)
 {
-  if (!written)
+  // Remove leading/trailing spaces.
+  vtksys::RegularExpression regExp = "^[ \n\r\t]*(.+)[ \n\r\t]*$";
+  if (regExp.find(description))
     {
-    docFile << "<b>Restrictions:</b> ";
-    written = 1;
+    description = regExp.match(1);
     }
+  vtksys::SystemTools::ReplaceString(description,"\n","<br/><br/>\n");
+  return description;
 }
 
-void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
+bool WriteDomain(vtkSMDomain *dom, ostream &docFile)
 {
+  bool domainWritten = false;
   const char* className = dom->GetClassName();
   unsigned int i;
   int minExists, maxExists;
@@ -154,29 +209,29 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     switch (ald->GetAttributeType())
       {
       case vtkDataSetAttributes::SCALARS:
-        WriteDomainHeader(headerWritten, docFile);
+        domainWritten = true;
         docFile << "An array of scalars is required." << endl;
         break;
       case vtkDataSetAttributes::VECTORS:
-        WriteDomainHeader(headerWritten, docFile);
+        domainWritten = true;
         docFile << "An array of vectors is required." << endl;
         break;
       }
     }
   else if (!strcmp("vtkSMArrayRangeDomain", className))
     {
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     docFile << "The value must lie within the range of the selected data "
             << "array." << endl;
     }
   else if (!strcmp("vtkSMArraySelectionDomain", className))
     {
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     docFile << "The list of array names is provided by the reader." << endl;
     }
   else if (!strcmp("vtkSMBooleanDomain", className))
     {
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     docFile << "Only the values 0 and 1 are accepted." << endl;
     }
   else if (!strcmp("vtkSMBoundsDomain", className))
@@ -185,7 +240,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     switch (bd->GetMode())
       {
       case vtkSMBoundsDomain::NORMAL:
-        WriteDomainHeader(headerWritten, docFile);
+        domainWritten = true;
         docFile << "The coordinate must lie within the bounding box of the "
                 << "dataset. It will default to the ";
         switch (bd->GetDefaultMode())
@@ -203,13 +258,13 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
         docFile << "in each dimension." << endl;
         break;
       case vtkSMBoundsDomain::MAGNITUDE:
-        WriteDomainHeader(headerWritten, docFile);
+        domainWritten = true;
         docFile << "Determine the length of the dataset's diagonal. The "
                 << "value must lie within -diagonal length to +diagonal "
                 << "length." << endl;
         break;
       case vtkSMBoundsDomain::SCALED_EXTENT:
-        WriteDomainHeader(headerWritten, docFile);
+        domainWritten = true;
         docFile << "The value must be less than the largest dimension of the "
                 << "dataset multiplied by a scale factor of "
                 << bd->GetScaleFactor() << "." << endl;
@@ -218,7 +273,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     }
   else if (!strcmp("vtkSMDataTypeDomain", className))
     {
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     vtkSMDataTypeDomain *dtd = vtkSMDataTypeDomain::SafeDownCast(dom);
     docFile << "The selected dataset must be one of the following types (or a subclass of one of them):";
     for (i = 0; i < dtd->GetNumberOfDataTypes(); i++)
@@ -240,7 +295,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
 
     if (minExists && !maxExists)
       {
-      WriteDomainHeader(headerWritten, docFile);
+      domainWritten = true;
       docFile << "The value must be greater than or equal to ";
       if (numEntries > 1)
         {
@@ -264,7 +319,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
       }
     else if (!minExists && maxExists)
       {
-      WriteDomainHeader(headerWritten, docFile);
+      domainWritten = true;
       docFile << "The value must be less than or equal to ";
       if (numEntries > 1)
         {
@@ -288,7 +343,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
       }
     else if (minExists && maxExists)
       {
-      WriteDomainHeader(headerWritten, docFile);
+      domainWritten = true;
       docFile << "The value must be greater than or equal to ";
       if (numEntries > 1)
         {
@@ -333,7 +388,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
   else if (!strcmp("vtkSMEnumerationDomain", className))
     {
     vtkSMEnumerationDomain *ed = vtkSMEnumerationDomain::SafeDownCast(dom);
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     docFile << "The value must be one of the following:";
     for (i = 0; i < ed->GetNumberOfEntries(); i++)
       {
@@ -348,13 +403,13 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     }
   else if (!strcmp("vtkSMExtentDomain", className))
     {
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     docFile << "The values must lie within the extent of the input dataset."
             << endl;
     }
   else if (!strcmp("vtkSMFieldDataDomain", className))
     {
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     docFile << "Valud array names will be chosen from point and cell data."
             << endl;
     }
@@ -363,13 +418,13 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     }
   else if (!strcmp("vtkSMFixedTypeDomain", className))
     {
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     docFile << "Once set, the input dataset type cannot be changed." << endl;
     }
   else if (!strcmp("vtkSMInputArrayDomain", className))
     {
     vtkSMInputArrayDomain *iad = vtkSMInputArrayDomain::SafeDownCast(dom);
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     docFile << "The dataset must contain a ";
     switch (iad->GetAttributeType())
       {
@@ -399,7 +454,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
 
     if (minExists && !maxExists)
       {
-      WriteDomainHeader(headerWritten, docFile);
+      domainWritten = true;
       docFile << "The value must be greater than or equal to ";
       if (numEntries > 1)
         {
@@ -423,7 +478,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
       }
     else if (!minExists && maxExists)
       {
-      WriteDomainHeader(headerWritten, docFile);
+      domainWritten = true;
       docFile << "The value must be less than or equal to ";
       if (numEntries > 1)
         {
@@ -447,7 +502,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
       }
     else if (minExists && maxExists)
       {
-      WriteDomainHeader(headerWritten, docFile);
+      domainWritten = true;
       docFile << "The value must be greater than or equal to ";
       if (numEntries > 1)
         {
@@ -496,15 +551,15 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     switch (nogd->GetGroupMultiplicity())
       {
       case vtkSMNumberOfGroupsDomain::NOT_SET:
-        WriteDomainHeader(headerWritten, docFile);
+        domainWritten = true;
         docFile << "The number of groups is specified by the input dataset.";
         break;
       case vtkSMNumberOfGroupsDomain::SINGLE:
-        WriteDomainHeader(headerWritten, docFile);
+        domainWritten = true;
         docFile << "Multi-group datasets must contain only one group.";
         break;
       case vtkSMNumberOfGroupsDomain::MULTIPLE:
-        WriteDomainHeader(headerWritten, docFile);
+        domainWritten = true;
         docFile << "Multi-group datasets must contain more than one group.";
         break;
       }
@@ -517,11 +572,11 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     switch (nopd->GetPartMultiplicity())
       {
       case vtkSMNumberOfPartsDomain::SINGLE:
-        WriteDomainHeader(headerWritten, docFile);
+        domainWritten = true;
         docFile << "Multi-part datasets must have only one part.";
         break;
       case vtkSMNumberOfPartsDomain::MULTIPLE:
-        WriteDomainHeader(headerWritten, docFile);
+        domainWritten = true;
         docFile << "Multi-part datasets must have more than one part.";
         break;
       }
@@ -533,9 +588,9 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     if (pgd->GetNumberOfGroups() == 1 &&
         (!strcmp(pgd->GetGroup(0), "implicit_functions")))
       {
-      return;
+      return false;
       }
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     docFile << "The dataset must have been the result of the following:";
     for (i = 0; i < pgd->GetNumberOfGroups(); i++)
       {
@@ -557,7 +612,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
   else if (!strcmp("vtkSMProxyListDomain", className))
     {
     vtkSMProxyListDomain *pld = vtkSMProxyListDomain::SafeDownCast(dom);
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     docFile << "The value must be set to one of the following:";
     for (i = 0; i < pld->GetNumberOfProxyTypes(); i++)
       {
@@ -572,7 +627,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
   else if (!strcmp("vtkSMStringListDomain", className))
     {
     vtkSMStringListDomain *sld = vtkSMStringListDomain::SafeDownCast(dom);
-    WriteDomainHeader(headerWritten, docFile);
+    domainWritten = true;
     const char* domName = sld->GetXMLName();
     if (!strcmp("AvailableDomains", domName))
       {
@@ -607,11 +662,7 @@ void WriteDomain(vtkSMDomain *dom, ofstream &docFile, int &headerWritten)
     {
     docFile << "Unknown domain type: " << dom->GetClassName() << endl;
     }
-
-  if (headerWritten)
-    {
-    docFile << "<br>" << endl;
-    }
+  return domainWritten;
 }
 
 void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList)
@@ -648,14 +699,151 @@ void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList)
     }
 }
 
+void WriteProperty(const char* pname, vtkSMProperty* prop, ostream& docFile)
+{
+  TemplateMap dataMap;
+  dataMap["NAME"] = pname;
+  vtkSMDocumentation* documentation = prop->GetDocumentation();
+  if (documentation && documentation->GetDescription())
+    {
+    dataMap["DESCRIPTION"] = documentation->GetDescription();
+    }
+  else
+    {
+    dataMap["DESCRIPTION"] = "&nbsp;";
+    }
+
+  vtksys_ios::ostringstream default_value_stream;
+  if (!WriteDefaultValues(prop, default_value_stream))
+    {
+    dataMap["DEFAULTVALUES"] = "&nbsp;";
+    }
+  else
+    {
+    dataMap["DEFAULTVALUES"] = default_value_stream.str();
+    }
+
+  vtksys_ios::ostringstream all_domains_stream;
+
+  vtkSMDomainIterator* dIt = prop->NewDomainIterator();
+  for (dIt->Begin(); !dIt->IsAtEnd(); dIt->Next())
+    {
+    if (!dIt->GetDomain()->GetIsOptional())
+      {
+      vtksys_ios::ostringstream domain_stream;
+      if (WriteDomain(dIt->GetDomain(), domain_stream))
+        {
+        all_domains_stream << "<p>"
+          << domain_stream.str().c_str()
+          << "</p>";
+        }
+      }
+    }
+  dIt->Delete();
+  dataMap["DOMAINS"] = all_domains_stream.str();
+  WriteFromTemplate(docFile, ::PropertyTemplate, dataMap);
+}
+
+void WriteProperties(vtkSMProxy* proxy, ostream& docFile)
+{
+  if (!proxy)
+    {
+    return;
+    }
+
+  docFile << ::PropertiesTableHeaderTemplate << endl;
+
+  vtkSMPropertyIterator* pIt = proxy->NewPropertyIterator();
+  pIt->Begin();
+  for (; !pIt->IsAtEnd(); pIt->Next())
+    {
+    vtkSMProperty* prop = pIt->GetProperty();
+    if (!prop->GetInformationOnly() && !prop->GetIsInternal())
+      {
+      WriteProperty(pIt->GetKey(), prop, docFile);
+      }
+    }
+
+  docFile << ::PropertiesTableFooterTemplate<< endl;
+  pIt->Delete();
+}
+
+
+void WriteProxyHeader(vtkSMProxy* proxy, ostream& docFile)
+{
+  if (!proxy)
+    {
+    return;
+    }
+  TemplateMap dataMap;
+  dataMap["NAME"] = proxy->GetXMLLabel();
+  WriteFromTemplate(docFile, ProxyDocumentHeadTemplate, dataMap);
+}
+
+void WriteProxyDocumentation(vtkSMProxy* proxy, ostream& docFile)
+{
+  if (!proxy)
+    {
+    return;
+    }
+
+  TemplateMap dataMap;
+  dataMap["NAME"] = proxy->GetXMLLabel();
+  vtkSMDocumentation* documentation = proxy->GetDocumentation();
+  if (documentation)
+    {
+    bool some_help_added = false;
+    if (documentation->GetLongHelp())
+      {
+      dataMap["LONGHELP"] = documentation->GetLongHelp();
+      some_help_added = true;
+      }
+    else
+      {
+      dataMap["LONGHELP"] = "&nbsp;";
+      }
+    if (documentation->GetShortHelp())
+      {
+      dataMap["SHORTHELP"] = documentation->GetShortHelp();
+      }
+    else
+      {
+      dataMap["SHORTHELP"] = proxy->GetXMLLabel();
+      }
+    if (documentation->GetDescription())
+      {
+      vtkstd::string description = documentation->GetDescription();
+      description = FilterDescription(description);
+      //vtksys::SystemTools::ReplaceString(description, "\n", "<br /><br />\n");
+      dataMap["DESCRIPTION"] = description;
+      some_help_added = true;
+      }
+    else
+      {
+      dataMap["DESCRIPTION"] = "&nbsp;";
+      }
+
+    // Some message only if neither short help nor description is available.
+    if (!some_help_added)
+      {
+      dataMap["LONGHELP"] = "Sorry, no help is currently available.";
+      }
+    }
+  else
+    {
+    // Fill values for all expected keys.
+    dataMap["SHORTHELP"] = proxy->GetXMLLabel();
+    dataMap["LONGHELP"] = "Sorry, no help is currently available.";
+    dataMap["DESCRIPTION"] = "&nbsp;";
+    }
+
+  WriteFromTemplate(docFile, ::ProxyDocumentationTemplate, dataMap);
+}
+
 void WriteProxies(vtkStringPairList *stringList, vtkStringPairList *labelList,
                   vtkSMProxyManager *manager, char *filePath)
 {
   vtkSMProxy *proxy;
-  vtkSMProperty *prop;
-  vtkSMPropertyIterator *pIt;
-  vtkSMDomainIterator *dIt;
-  vtkSMDocumentation *doc;
   ofstream docFile;
 
   vtkStringPairListIterator iter;
@@ -671,90 +859,21 @@ void WriteProxies(vtkStringPairList *stringList, vtkStringPairList *labelList,
     filename << filePath << "/" << (*iter).first.c_str() << ".html" << ends;
     docFile.open(filename.str());
     filename.rdbuf()->freeze(0);
-    docFile << "<html>" << endl;
-    docFile << "<head>" << endl;
-    docFile << "<title>";
+
 
     char *label = proxy->GetXMLLabel();
-    if (label)
-      {
-      docFile << label;
-      vtkstd::pair<vtkstd::string, vtkstd::string> nameLabelPair(
-        label, (*iter).first);
-      labelList->insert(labelList->end(), nameLabelPair);
-      }
-    else
-      {
-      docFile << (*iter).first.c_str();
-      vtkstd::pair<vtkstd::string, vtkstd::string> nameLabelPair(
-        (*iter).first, (*iter).first);
-      labelList->insert(labelList->end(), nameLabelPair);
-      }
-    docFile << "</title>" << endl;
-    docFile << "</head>" << endl;
+    vtkstd::pair<vtkstd::string, vtkstd::string> nameLabelPair(
+      label, (*iter).first);
+    labelList->insert(labelList->end(), nameLabelPair);
+
+    docFile << "<html>" << endl;
+    WriteProxyHeader(proxy, docFile);
+
     docFile << "<body>" << endl;
-    docFile << "<h2>";
-    if (label)
-      {
-      docFile << label;
-      }
-    else
-      {
-      docFile << (*iter).first.c_str();
-      }
-    docFile << "</h2>" << endl;
-    doc = proxy->GetDocumentation();
-    if (doc)
-      {
-      WriteDocumentation(doc, docFile);
-      }
-    else
-      {
-      docFile << "NO DOCUMENTATION" << endl;
-      docFile << "<br>" << endl;
-      }
-    pIt = proxy->NewPropertyIterator();
-    pIt->Begin();
-    for (; !pIt->IsAtEnd(); pIt->Next())
-      {
-      prop = pIt->GetProperty();
-      if (!prop->GetInformationOnly() && !prop->GetIsInternal())
-        {
-        docFile << "<br>" << endl;
-        docFile << "<b>" << pIt->GetKey() << "</b><br>" << endl;
-        doc = prop->GetDocumentation();
-        if (doc)
-          {
-          WriteDocumentation(doc, docFile);
-          }
-        else
-          {
-          docFile << "NO DOCUMENTATION" << endl;
-          docFile << "<br>" << endl;
-          }
-
-        WriteDefaultValues(prop, docFile);
-
-        dIt = prop->NewDomainIterator();
-        dIt->Begin();
-        if (prop->GetNumberOfDomains())
-          {
-          int domainHeaderWritten = 0;
-          for (; !dIt->IsAtEnd(); dIt->Next())
-            {
-            if (!dIt->GetDomain()->GetIsOptional())
-              {
-              WriteDomain(dIt->GetDomain(), docFile, domainHeaderWritten);
-              }
-            }
-          docFile << "<br>" << endl;
-          }
-        dIt->Delete();
-        }
-      }
+    WriteProxyDocumentation(proxy, docFile);
+    WriteProperties(proxy, docFile);
     docFile << "</body>" << endl;
     docFile << "</html>" << endl;
-    pIt->Delete();
     docFile.close();
     }
 }
