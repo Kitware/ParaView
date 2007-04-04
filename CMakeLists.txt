@@ -62,6 +62,10 @@ MARK_AS_ADVANCED(PYTHON_DEBUG_LIBRARY)
 # Define a PARAVIEW_USE_MPI that is not advanced
 SET(PARAVIEW_USE_MPI OFF CACHE BOOL "Build ParaView with MPI support")
 SET(VTK_USE_MPI ${PARAVIEW_USE_MPI} CACHE INTERNAL "Build VTK with MPI support" FORCE)
+# define this variable so that VTK_DEPENDENT_OPTION in the VTK 
+# CMakeLists.txt does not turn VTK_USE_MPI back to a regular cache
+# variable
+# set it to PARAVIEW_USE_MPI so that VTK_USE_MPI is slaved to it.
 SET(VTK_USE_MPI_ISSET ${PARAVIEW_USE_MPI})
 
 #########################################################################
