@@ -142,12 +142,13 @@ void WriteFromTemplate(ostream& docFile, const char* cdoc_template, TemplateMap&
   for (;iter != data.end(); iter++)
     {
     vtkstd::string key = iter->first;
-    vtkstd::string data = iter->second;
+    vtkstd::string value = iter->second;
     key = "%" + key + "%";
 
     // Replace every occurance of key in the doc_template with the data.
-    vtksys::SystemTools::ReplaceString(doc_template, key.c_str(), data.c_str());
+    vtksys::SystemTools::ReplaceString(doc_template, key.c_str(), value.c_str());
     }
+
   // Dump doc_template (which now has all keys replaces with nice data values) 
   // into the file.
   docFile << doc_template.c_str();
