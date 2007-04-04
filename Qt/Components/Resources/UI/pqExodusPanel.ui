@@ -199,42 +199,65 @@
        <number>2</number>
       </property>
       <item>
-       <layout class="QGridLayout" >
+       <layout class="QVBoxLayout" >
         <property name="margin" >
          <number>0</number>
         </property>
         <property name="spacing" >
          <number>0</number>
         </property>
-        <item row="0" column="2" >
-         <widget class="QLabel" name="ModeLabel" />
+        <item>
+         <layout class="QHBoxLayout" >
+          <property name="margin" >
+           <number>0</number>
+          </property>
+          <property name="spacing" >
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_2" >
+            <property name="text" >
+             <string>Mode:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>181</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="ModeLabel" />
+          </item>
+         </layout>
         </item>
-        <item row="0" column="1" >
-         <spacer>
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
+        <item>
+         <layout class="QHBoxLayout" >
+          <property name="margin" >
+           <number>0</number>
           </property>
-          <property name="sizeHint" >
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
+          <property name="spacing" >
+           <number>0</number>
           </property>
-         </spacer>
-        </item>
-        <item row="1" column="0" colspan="3" >
-         <widget class="QSlider" name="ModeSelectSlider" >
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" >
-         <widget class="QLabel" name="label_2" >
-          <property name="text" >
-           <string>Mode:</string>
-          </property>
-         </widget>
+          <item>
+           <widget class="QSlider" name="ModeSelectSlider" >
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="ModeSelectSpinBox" />
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -413,12 +436,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqCollapsedGroup</class>
-   <extends>QGroupBox</extends>
-   <header>pqCollapsedGroup.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>pqSelectionTreeWidget</class>
    <extends>QTreeWidget</extends>
    <header>pqSelectionTreeWidget.h</header>
@@ -427,6 +444,12 @@
    <class>pqFileChooserWidget</class>
    <extends>QWidget</extends>
    <header>pqFileChooserWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqCollapsedGroup</class>
+   <extends>QGroupBox</extends>
+   <header>pqCollapsedGroup.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

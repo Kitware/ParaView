@@ -347,6 +347,7 @@ void pqExodusPanel::linkServerManagerProperties()
                                         this->proxy()->
                                         GetProperty("HasModeShapes"));
   this->UI->ModeSelectSlider->setMaximum(this->UI->TimestepValues.size()-1);
+  this->UI->ModeSelectSlider->setMaximum(this->UI->TimestepValues.size()-1);
   if (this->UI->TimestepValues.size() > 0)
     {
     this->UI->ModeLabel->setText(
@@ -358,7 +359,15 @@ void pqExodusPanel::linkServerManagerProperties()
                                         this->proxy(),
                                         this->proxy()
                                         ->GetProperty("TimeStep"));
+  this->propertyManager()->registerLink(this->UI->ModeSelectSpinBox,
+                                        "value",
+                                        SIGNAL(valueChanged(int)),
+                                        this->proxy(),
+                                        this->proxy()
+                                        ->GetProperty("TimeStep"));
   QObject::connect(this->UI->ModeSelectSlider, SIGNAL(sliderMoved(int)),
+                   this, SLOT(modeChanged(int)));
+  QObject::connect(this->UI->ModeSelectSpinBox, SIGNAL(valueChanged(int)),
                    this, SLOT(modeChanged(int)));
 }
   
