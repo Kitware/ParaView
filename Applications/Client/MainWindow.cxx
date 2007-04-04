@@ -462,8 +462,8 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionSelectionMode,
     SLOT(setEnabled(bool)));
 
-  //this->Implementation->Core.setupCustomFilterToolbar(
-  //  this->Implementation->UI.customFilterToolbar);
+  this->Implementation->Core.setupCommonFiltersToolbar(
+    this->Implementation->UI.commonFilters);
 
   this->Implementation->Core.setupLookmarkToolbar(
     this->Implementation->UI.lookmarkToolbar);

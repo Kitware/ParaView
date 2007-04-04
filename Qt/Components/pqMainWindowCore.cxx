@@ -252,6 +252,8 @@ public:
 
   // Stuff related to the filters menu
   void updateFiltersFromXML();
+  void setupFiltersMenu();
+  void restoreRecentFilterMenu();
 
   typedef vtkstd::vector<vtkSMProxy*> ProxyVector;
   ProxyVector AlphabeticalFilters;
@@ -352,6 +354,50 @@ void pqMainWindowCore::pqImplementation::updateSourcesFromXML()
     QString name = source.attribute("name");
     this->Sources.push_back(name.toStdString());
     }
+}
+
+void pqMainWindowCore::pqImplementation::setupFiltersMenu()
+{
+  this->updateFiltersFromXML();
+  
+  // First add the recently used filters to the Recent menu
+  this->RecentFiltersMenu = 
+    this->FilterMenu->addMenu("&Recent") << pqSetName("Recent");
+  this->restoreRecentFilterMenu();
+  
+  // Next add all categories.
+  pqImplementation::FilterCategoriesType::iterator catIter =
+    this->FilterCategories.begin();
+  for(; catIter != this->FilterCategories.end(); catIter++)
+    {
+    pqImplementation::FilterCategory& category = *catIter;
+    const vtkstd::string& catName = category.Name;
+    const vtkstd::string& catLabel = category.MenuLabel;
+    vtkstd::vector<vtkstd::string>& filters = category.Filters;
+    if (!filters.empty())
+      {
+      QMenu *catMenu = 
+        this->FilterMenu->addMenu(catLabel.c_str()) 
+        << pqSetName(catName.c_str());
+      vtkstd::vector<vtkstd::string>::iterator filterIter =
+        filters.begin();
+      for(; filterIter!=filters.end(); filterIter++)
+        {
+        const char* filterName = filterIter->c_str();
+        this->addProxyToMenu(
+          "filters_prototypes",
+          filterName, 
+          catMenu,
+          &this->FilterIcons);
+        }
+      }
+    }
+
+  // Finally add all filters to the Alphabetical sub-menu..
+  this->AlphabeticalMenu = 
+    this->FilterMenu->addMenu("&Alphabetical") 
+    << pqSetName("Alphabetical");
+
 }
 
 void pqMainWindowCore::pqImplementation::updateFiltersFromXML()
@@ -864,59 +910,9 @@ void pqMainWindowCore::refreshFiltersMenu()
                  pqImplementation::proxyLessThan);
     }
 
-  if(this->Implementation->FilterMenu)
+  if(this->Implementation->AlphabeticalMenu)
     {
-    this->Implementation->FilterMenu->clear();
-    // Clearing a menu does not destroy it's submenus,
-    // consequently we end up adding mutliple submenus with same objectname
-    // (altough only 1 may show up in the menu). Hence we delete all
-    // submenus belonging to this menu.
-    QList<QMenu*> subMenus = this->Implementation->FilterMenu->findChildren<QMenu*>();
-    foreach (QMenu* subMenu, subMenus)
-      {
-      delete subMenu;
-      }
-    subMenus.clear(); // So that we don't accidently access these dangling pointers.
-
-
-    // First add the recently used filters to the Recent menu
-    this->Implementation->RecentFiltersMenu = 
-      this->Implementation->FilterMenu->addMenu("&Recent") 
-      << pqSetName("Recent");
-    this->restoreRecentFilterMenu();
-    
-    // Next add all categories.
-    pqImplementation::FilterCategoriesType::iterator catIter =
-      this->Implementation->FilterCategories.begin();
-    for(; catIter != this->Implementation->FilterCategories.end(); catIter++)
-      {
-      pqImplementation::FilterCategory& category = *catIter;
-      const vtkstd::string& catName = category.Name;
-      const vtkstd::string& catLabel = category.MenuLabel;
-      vtkstd::vector<vtkstd::string>& filters = category.Filters;
-      if (!filters.empty())
-        {
-        QMenu *catMenu = 
-          this->Implementation->FilterMenu->addMenu(catLabel.c_str()) 
-          << pqSetName(catName.c_str());
-        vtkstd::vector<vtkstd::string>::iterator filterIter =
-          filters.begin();
-        for(; filterIter!=filters.end(); filterIter++)
-          {
-          const char* filterName = filterIter->c_str();
-          this->Implementation->addProxyToMenu(
-            "filters_prototypes",
-            filterName, 
-            catMenu,
-            &this->Implementation->FilterIcons);
-          }
-        }
-      }
-
-    // Finally add all filters to the Alphabetical sub-menu..
-    this->Implementation->AlphabeticalMenu = 
-      this->Implementation->FilterMenu->addMenu("&Alphabetical") 
-      << pqSetName("Alphabetical");
+    this->Implementation->AlphabeticalMenu->clear();
 
     pqImplementation::ProxyVector::iterator filterIter =
       this->Implementation->AlphabeticalFilters.begin();
@@ -992,13 +988,18 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
 {
   if(this->Implementation->FilterMenu)
     {
-    QObject::disconnect(this->Implementation->FilterMenu, 
-      SIGNAL(triggered(QAction*)), 
-      this, SLOT(onCreateFilter(QAction*)));
-
-    QObject::disconnect(this->Implementation->FilterMenu,
-      SIGNAL(triggered(QAction*)),
-      this, SLOT(updateRecentFilterMenu(QAction*)));
+    QList<QAction*> actions = this->Implementation->FilterMenu->actions();
+    foreach(QAction* a, actions)
+      {
+      if(a->menu())
+        {
+        QObject::disconnect(a->menu(), SIGNAL(triggered(QAction*)),
+                         this, SLOT(onCreateFilter(QAction*)));
+        
+        QObject::disconnect(a->menu(), SIGNAL(triggered(QAction*)),
+          this, SLOT(updateRecentFilterMenu(QAction*)));
+        }
+      }
 
     this->Implementation->FilterMenu->clear();
     }
@@ -1007,17 +1008,26 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
 
   if(this->Implementation->FilterMenu)
     {
-    QObject::connect(this->Implementation->FilterMenu, 
-      SIGNAL(triggered(QAction*)), 
-      this, SLOT(onCreateFilter(QAction*)));
 
-    QObject::connect(this->Implementation->FilterMenu,
-      SIGNAL(triggered(QAction*)),
-      this, SLOT(updateRecentFilterMenu(QAction*)),
-      Qt::QueuedConnection);
+    this->Implementation->setupFiltersMenu();
 
-    this->Implementation->updateFiltersFromXML();
+    // Qt bug - gotta connect to sub menus
+    QList<QAction*> actions = this->Implementation->FilterMenu->actions();
+    foreach(QAction* a, actions)
+      {
+      if(a->menu())
+        {
+        QObject::connect(a->menu(), SIGNAL(triggered(QAction*)),
+                         this, SLOT(onCreateFilter(QAction*)));
+        
+        QObject::connect(a->menu(), SIGNAL(triggered(QAction*)),
+          this, SLOT(updateRecentFilterMenu(QAction*)),
+          Qt::QueuedConnection);
+        }
+      }
+    
     this->refreshFiltersMenu();
+
     }
 }
 
@@ -1338,6 +1348,24 @@ void pqMainWindowCore::setupRepresentationToolbar(QToolBar* toolbar)
 
   QObject::connect(this,                   SIGNAL(postAccept()),
                    display_representation, SLOT(reloadGUI()));
+}
+
+void pqMainWindowCore::setupCommonFiltersToolbar(QToolBar* toolbar)
+{
+  // use QActions from Filters -> Common
+  if(this->Implementation->FilterMenu)
+    {
+    QList<QAction*> actions = this->Implementation->FilterMenu->actions();
+    foreach(QAction* action, actions)
+      {
+      QMenu* menu = action->menu();
+      if(menu && action->text().remove('&') == "Common")
+        {
+        toolbar->addActions(menu->actions());
+        break;
+        }
+      }
+    }
 }
 
 void pqMainWindowCore::setupLookmarkToolbar(QToolBar* toolbar)
@@ -2625,9 +2653,9 @@ void pqMainWindowCore::saveRecentFilterMenu()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::restoreRecentFilterMenu()
+void pqMainWindowCore::pqImplementation::restoreRecentFilterMenu()
 {
-  this->Implementation->RecentFiltersMenu->clear();
+  this->RecentFiltersMenu->clear();
 
   // Now load default values from the QSettings, if available.
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -2641,25 +2669,25 @@ void pqMainWindowCore::restoreRecentFilterMenu()
       {
       QString filterName=settings->value(key).toString();
 
-      int idx=this->Implementation->RecentFilterList.indexOf(filterName);
+      int idx=this->RecentFilterList.indexOf(filterName);
       if(idx!=-1)
         {
-        this->Implementation->RecentFilterList.removeAt(idx);
+        this->RecentFilterList.removeAt(idx);
         }
 
-      this->Implementation->RecentFilterList.push_back(filterName);
-      if(this->Implementation->RecentFilterList.size()>10)
+      this->RecentFilterList.push_back(filterName);
+      if(this->RecentFilterList.size()>10)
         {
-        this->Implementation->RecentFilterList.removeLast();
+        this->RecentFilterList.removeLast();
         }
       }
     }
 
-  this->Implementation->RecentFiltersMenu->clear();
+  this->RecentFiltersMenu->clear();
 
   QList<QString>::iterator begin,end;
-  begin=this->Implementation->RecentFilterList.begin();
-  end=this->Implementation->RecentFilterList.end();
+  begin=this->RecentFilterList.begin();
+  end=this->RecentFilterList.end();
   for(;begin!=end;++begin)
     {
     QString proxyName = *begin;
@@ -2671,16 +2699,16 @@ void pqMainWindowCore::restoreRecentFilterMenu()
       {
       QAction* action = 
           new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"),proxyName,
-              this->Implementation->RecentFiltersMenu)
+              this->RecentFiltersMenu)
           << pqSetName(proxyName) << pqSetData(proxyName);
-      this->Implementation->RecentFiltersMenu->addAction(action);
+      this->RecentFiltersMenu->addAction(action);
       }
     else
       {
-      this->Implementation->addProxyToMenu("filters_prototypes",
-                                          proxyName.toAscii().data(),
-                                          this->Implementation->RecentFiltersMenu,
-                                          &this->Implementation->FilterIcons);
+      this->addProxyToMenu("filters_prototypes",
+                           proxyName.toAscii().data(),
+                           this->RecentFiltersMenu,
+                           &this->FilterIcons);
       }
     }
 }

@@ -130,6 +130,8 @@ public:
   void setupLookmarkToolbar(QToolBar* parent);
   /// Setup a representation-selection toolbar
   void setupRepresentationToolbar(QToolBar* parent);
+  /// Setup a common filters toolbar
+  void setupCommonFiltersToolbar(QToolBar* parent);
   
   /// Setup a progress bar, attaching it to the given status bar
   void setupProgressBar(QStatusBar* parent);
@@ -404,7 +406,6 @@ private:
       int numServers, bool pendingDisplays);
   void updateViewUndoRedo(pqRenderViewModule *renderModule);
   void saveRecentFilterMenu();
-  void restoreRecentFilterMenu();
   class pqImplementation;
   pqImplementation* const Implementation;
 };
