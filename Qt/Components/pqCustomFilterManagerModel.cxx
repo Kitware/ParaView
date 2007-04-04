@@ -257,8 +257,8 @@ void pqCustomFilterManagerModel::exportCustomFiltersToSettings()
   ostrstream os;
   root->PrintXML(os,vtkIndent(0));
   os << ends;
-  os.rdbuf()->freeze(0);
   QString state = os.str();
+  os.rdbuf()->freeze(0);
   root->Delete();
 
   pqApplicationCore::instance()->settings()->setValue("CustomFilters", state);
