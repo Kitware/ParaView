@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.25");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.26");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -1086,7 +1086,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementScalar(
     }
 
   int allowSet = 0;
+  double oldDispPos[3];
+  rep->GetHandleDisplayPosition(idx, oldDispPos);
   double prevScalar, nextScalar, displayPos[3];
+  displayPos[1] = oldDispPos[1];
   displayPos[2] = 0;
   int displaySize[2];
   prevScalar = nextScalar = 0; // initialize to avoid warnings
@@ -1128,7 +1131,6 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementScalar(
       this->RepositionColorPoint(idx, value);
       rep->GetDisplaySize(displaySize);
       displayPos[0] = this->ComputePositionFromScalar(value, displaySize[0]);
-      displayPos[1] = 0;
       rep->SetHandleDisplayPosition(idx, displayPos, value);
       this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
       }
@@ -1171,11 +1173,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementScalar(
       this->OpacityFunction->GetNodeValue(idx, opacityNode);
       this->RemoveOpacityPoint(idx);
       rep->GetDisplaySize(displaySize);
-      double xPos = this->ComputePositionFromScalar(value, displaySize[0]);
-      double yPos = displaySize[1] * opacityNode[1];
-      this->AddOpacityPoint(xPos, yPos);
-      displayPos[0] = xPos;
-      displayPos[1] = yPos;
+      displayPos[0] = this->ComputePositionFromScalar(value, displaySize[0]);
+      this->AddOpacityPoint(displayPos[0], displayPos[1]);
       rep->SetHandleDisplayPosition(idx, displayPos, value);
       this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
       }
