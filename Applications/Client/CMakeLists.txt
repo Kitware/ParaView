@@ -148,7 +148,6 @@ IF(BUILD_TESTING)
 
   SET (XML_TESTS_WITH_BASELINES
     CreateSourceWithoutConnect
-    ImageShrink
 #    LoadStateSelection
     OpenFile
     OpenSaveData
