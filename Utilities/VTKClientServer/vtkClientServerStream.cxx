@@ -1334,6 +1334,7 @@ int vtkClientServerStream::ParseData()
         {
         case vtkClientServerStream::int8_value:
         case vtkClientServerStream::uint8_value:
+        case vtkClientServerStream::bool_value:
           data = this->ParseValue(order, data, end, 1); break;
         case vtkClientServerStream::int8_array:
         case vtkClientServerStream::uint8_array:
