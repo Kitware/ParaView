@@ -533,29 +533,37 @@ MainWindow::MainWindow() :
   
   // Setup the view menu ...
   this->Implementation->ToolbarsMenu->addWidget(
-    this->Implementation->UI.mainToolBar,
-    this->Implementation->UI.mainToolBar->windowTitle());
-  
-  this->Implementation->ToolbarsMenu->addWidget(
-    this->Implementation->UI.selectionToolbar,
-    this->Implementation->UI.selectionToolbar->windowTitle());
-
-  this->Implementation->ToolbarsMenu->addWidget(
     this->Implementation->UI.variableToolbar,
     this->Implementation->UI.variableToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.cameraToolbar,
+    this->Implementation->UI.cameraToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.commonFilters,
+    this->Implementation->UI.commonFilters->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.currentTimeToolbar,
+    this->Implementation->UI.currentTimeToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.lookmarkToolbar,
+    this->Implementation->UI.lookmarkToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.mainToolBar,
+    this->Implementation->UI.mainToolBar->windowTitle());
 
   this->Implementation->ToolbarsMenu->addWidget(
     this->Implementation->UI.representationToolbar,
     this->Implementation->UI.representationToolbar->windowTitle());
 
-  //this->Implementation->ToolbarsMenu->addWidget(
-  //  this->Implementation->UI.customFilterToolbar,
-  //  this->Implementation->UI.customFilterToolbar->windowTitle());
-
   this->Implementation->ToolbarsMenu->addWidget(
-    this->Implementation->UI.lookmarkToolbar,
-    this->Implementation->UI.lookmarkToolbar->windowTitle());
-    
+    this->Implementation->UI.selectionToolbar,
+    this->Implementation->UI.selectionToolbar->windowTitle());
+
   this->Implementation->ToolbarsMenu->addWidget(
     this->Implementation->UI.undoRedoToolbar,
     this->Implementation->UI.undoRedoToolbar->windowTitle());
@@ -564,13 +572,10 @@ MainWindow::MainWindow() :
     this->Implementation->UI.VCRToolbar,
     this->Implementation->UI.VCRToolbar->windowTitle());
 
-  this->Implementation->ToolbarsMenu->addWidget(
-    this->Implementation->UI.cameraToolbar,
-    this->Implementation->UI.cameraToolbar->windowTitle());
+  //this->Implementation->ToolbarsMenu->addWidget(
+  //  this->Implementation->UI.customFilterToolbar,
+  //  this->Implementation->UI.customFilterToolbar->windowTitle());
 
-  this->Implementation->ToolbarsMenu->addWidget(
-    this->Implementation->UI.currentTimeToolbar,
-    this->Implementation->UI.currentTimeToolbar->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.pipelineBrowserDock,
