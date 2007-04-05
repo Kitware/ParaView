@@ -69,6 +69,7 @@ public:
   this->RenderModule = NULL;
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->InformationObsolete = true;
+  this->Selected = false;
   }
   
   ~pqImplementation()
