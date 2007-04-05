@@ -614,7 +614,7 @@ bool WriteDomain(vtkSMDomain *dom, ostream &docFile)
       return false;
       }
     domainWritten = true;
-    docFile << "The dataset must have been the result of the following:";
+    docFile << "The selected object must be the result of the following:";
     for (i = 0; i < pgd->GetNumberOfGroups(); i++)
       {
       if (!strcmp(pgd->GetGroup(i), "sources"))
