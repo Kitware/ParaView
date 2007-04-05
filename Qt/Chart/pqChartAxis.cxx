@@ -113,6 +113,7 @@ pqChartAxis::pqChartAxis(AxisLocation location, QObject *p)
   this->GridVisible = true;
   this->ExtraMaxPadding = false;
   this->ExtraMinPadding = false;
+  this->DataAvailable = false;
   this->Notation = pqChartValue::StandardOrExponential;
 }
 
@@ -136,7 +137,7 @@ void pqChartAxis::setValueRange(const pqChartValue &min,
     {
     // A logarithmic scale axis cannot contain zero because it is
     // undefined. If the range includes zero, set the scale to linear.
-    if((min < 0 && max > 0) || (max < 0 && min > 0))
+    if((min <= 0 && max >= 0) || (max <= 0 && min >= 0))
       {
       this->Scale = pqChartAxis::Linear;
       }
@@ -487,6 +488,20 @@ void pqChartAxis::setVisible(bool visible)
     }
 }
 
+void pqChartAxis::setDataAvailable(bool available)
+{
+  this->DataAvailable = available;
+  if(this->DataAvailable && this->TrueMin == this->TrueMax)
+    {
+    this->ValueMin = this->TrueMin - 1;
+    this->ValueMax = this->TrueMax + 1;
+    this->Intervals = 2;
+    this->blockSignals(true);
+    this->calculateMaxWidth();
+    this->blockSignals(false);
+    }
+}
+
 void pqChartAxis::setNumberOfIntervals(int intervals)
 {
   this->Intervals = intervals;
@@ -632,12 +647,22 @@ void pqChartAxis::layoutAxis(const QRect &area)
 
   // Set up the remaining parameters.
   this->cleanData();
-  if(this->Layout == pqChartAxis::FixedInterval)
+  if(this->DataAvailable && this->TrueMin == this->TrueMax)
+    {
     this->calculateFixedLayout();
+    }
+  else if(this->Layout == pqChartAxis::FixedInterval)
+    {
+    this->calculateFixedLayout();
+    }
   else if(this->Scale == pqChartAxis::Logarithmic)
+    {
     this->calculateLogInterval();
+    }
   else
+    {
     this->calculateInterval();
+    }
 }
 
 void pqChartAxis::drawAxis(QPainter *p, const QRect &area)
@@ -1453,9 +1478,9 @@ void pqChartAxis::calculateFixedLayout()
   bool reversed = false;
   if(this->Scale == pqChartAxis::Logarithmic)
     {
-    reversed = this->TrueMin < 0;
-    if(this->TrueMin.getType() == pqChartValue::IntValue &&
-        this->TrueMin == 0)
+    reversed = this->ValueMin < 0;
+    if(this->ValueMin.getType() == pqChartValue::IntValue &&
+        this->ValueMin == 0)
       {
       logMin = MinIntLogPower;
       }
@@ -1463,16 +1488,16 @@ void pqChartAxis::calculateFixedLayout()
       {
       if(reversed)
         {
-        logMin = log10(-this->TrueMin.getDoubleValue());
+        logMin = log10(-this->ValueMin.getDoubleValue());
         }
       else
         {
-        logMin = log10(this->TrueMin.getDoubleValue());
+        logMin = log10(this->ValueMin.getDoubleValue());
         }
       }
 
-    if(this->TrueMax.getType() == pqChartValue::IntValue &&
-        this->TrueMax == 0)
+    if(this->ValueMax.getType() == pqChartValue::IntValue &&
+        this->ValueMax == 0)
       {
       logMax = MinIntLogPower;
       }
@@ -1480,11 +1505,11 @@ void pqChartAxis::calculateFixedLayout()
       {
       if(reversed)
         {
-        logMax = log10(-this->TrueMax.getDoubleValue());
+        logMax = log10(-this->ValueMax.getDoubleValue());
         }
       else
         {
-        logMax = log10(this->TrueMax.getDoubleValue());
+        logMax = log10(this->ValueMax.getDoubleValue());
         }
       }
 
@@ -1492,7 +1517,7 @@ void pqChartAxis::calculateFixedLayout()
     }
   else
     {
-    interval = (this->TrueMax - this->TrueMin)/this->Intervals;
+    interval = (this->ValueMax - this->ValueMin)/this->Intervals;
     }
 
   int needed = 0;
@@ -1543,7 +1568,7 @@ void pqChartAxis::calculateFixedLayout()
       this->ValueMax = this->ValueMin + (interval * this->Count);
       }
     }
-  else
+  else if(this->TrueMin != this->TrueMax)
     {
     this->ValueMax = this->TrueMax;
     }

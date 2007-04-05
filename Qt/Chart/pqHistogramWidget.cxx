@@ -50,9 +50,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartZoomPan.h"
 #include "pqHistogramChart.h"
 #include "pqHistogramColor.h"
+#include "pqHistogramModel.h"
 #include "pqHistogramSelection.h"
 #include "pqHistogramSelectionModel.h"
 #include "pqLineChart.h"
+#include "pqLineChartModel.h"
 
 #include <QCursor>
 #include <QEvent>
@@ -281,11 +283,22 @@ void pqHistogramWidget::repaintChart()
 void pqHistogramWidget::layoutChart(int w, int h)
 {
   QRect area(MARGIN, MARGIN, w - DBL_MARGIN, h - DBL_MARGIN);
-  
+
   const QRect title_request = this->Title->getSizeRequest();
   this->Title->setBounds(QRect(area.left(), area.top(), area.width(), title_request.height()));
   area = QRect(area.left(), area.top() + title_request.height(), area.right(), area.height() - title_request.height());
-  
+
+  // Let the axes know if there is data to display. This will make sure
+  // the axis is layed out correctly when the data min and max are the
+  // same value.
+  pqHistogramModel *histogramModel = this->Histogram->getModel();
+  pqLineChartModel *lineChartModel = this->LineChart->getModel();
+  bool histogramData = histogramModel && histogramModel->getNumberOfBins() > 0;
+  bool lineData = lineChartModel && lineChartModel->getNumberOfPlots() > 0;
+  this->XAxis->setDataAvailable(histogramData || lineData);
+  this->YAxis->setDataAvailable(histogramData);
+  this->FAxis->setDataAvailable(lineData);
+
   this->XAxis->layoutAxis(area);
   this->YAxis->layoutAxis(area);
   this->FAxis->layoutAxis(area);

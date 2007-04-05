@@ -442,6 +442,8 @@ public:
   /// \sa pqChartAxis::setExtraMaxPadding(bool)
   bool isMinExtraPadded() const {return this->ExtraMinPadding;}
 
+  void setDataAvailable(bool available);
+
   /// \brief
   ///   Sets the number of intervals for the axis.
   ///
@@ -646,6 +648,7 @@ private:
   bool GridVisible;         ///< True if the axis grid should be drawn.
   bool ExtraMaxPadding;     ///< Used for best interval layout.
   bool ExtraMinPadding;     ///< Used for best interval layout.
+  bool DataAvailable;
 
   /// Stores the axis label notation type.
   pqChartValue::NotationType Notation;

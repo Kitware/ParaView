@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartZoomPan.h"
 #include "pqChartZoomPanAlt.h"
 #include "pqLineChart.h"
+#include "pqLineChartModel.h"
 #include "pqLineChartWidget.h"
 
 #include <QCursor>
@@ -185,13 +186,13 @@ void pqLineChartWidget::repaintChart()
 void pqLineChartWidget::layoutChart(int w, int h)
 {
   QRect area(MARGIN, MARGIN, w - DBL_MARGIN, h - DBL_MARGIN);
-  
+
   // Leave space for the title ...
   const QRect title_request = this->Title->getSizeRequest();
   const QRect title_bounds = QRect(area.left(), area.top(), area.width(), title_request.height());
   this->Title->setBounds(title_bounds);
   area.setTop(title_bounds.bottom());
-  
+
   // Leave space for the legend ...
   const QRect legend_request = this->Legend->getSizeRequest();
   const QRect legend_bounds = QRect(
@@ -201,7 +202,18 @@ void pqLineChartWidget::layoutChart(int w, int h)
     legend_request.height());
   this->Legend->setBounds(legend_bounds);
   area.setRight(legend_bounds.left());
-  
+
+  // Let the axes know if there is data to display. This will make sure
+  // the axis is layed out correctly when the data min and max are the
+  // same value.
+  pqLineChartModel *firstModel = this->LineChart->getModel();
+  pqLineChartModel *secondModel = this->SecondLineChart->getModel();
+  bool firstData = firstModel && firstModel->getNumberOfPlots() > 0;
+  bool secondData = secondModel && secondModel->getNumberOfPlots() > 0;
+  this->XAxis->setDataAvailable(firstData || secondData);
+  this->YAxis->setDataAvailable(firstData);
+  this->RightYAxis->setDataAvailable(secondData);
+
   this->XAxis->layoutAxis(area);
   this->YAxis->layoutAxis(area);
   this->RightYAxis->layoutAxis(area);
