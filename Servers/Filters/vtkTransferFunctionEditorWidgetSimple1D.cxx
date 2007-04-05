@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.24");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.25");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -359,6 +359,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNewNode(double scalar)
           }
         }
       }
+    this->UpdateTransferFunctionMTime();
     }
 
   double nodePos[3];
@@ -785,7 +786,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::UpdateFromTransferFunctions()
       }
     }
 
-  this->Superclass::UpdateFromTransferFunctions();
+  this->UpdateTransferFunctionMTime();
 }
 
 //----------------------------------------------------------------------------
@@ -900,6 +901,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddOpacityPoint(double x,
   newScalar = this->ComputeScalar(x, windowSize[0]);
   
   this->OpacityFunction->AddPoint(newScalar, opacity);
+  this->UpdateTransferFunctionMTime();
 }
 
 //----------------------------------------------------------------------------
@@ -925,6 +927,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddColorPoint(double x)
   this->ColorFunction->GetColor(newScalar, color);
   idx = this->ColorFunction->AddRGBPoint(newScalar,
                                          color[0], color[1], color[2]);
+  this->UpdateTransferFunctionMTime();
   this->SetElementRGBColor(idx, color[0], color[1], color[2]);
 }
 
@@ -936,6 +939,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::RepositionColorPoint(
   this->ColorFunction->GetNodeValue(idx, value);
   this->RemoveColorPoint(idx);
   this->ColorFunction->AddRGBPoint(scalar, value[1], value[2], value[3]);
+  this->UpdateTransferFunctionMTime();
 }
 
 //----------------------------------------------------------------------------
@@ -945,6 +949,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::RemoveOpacityPoint(
   double value[4];
   this->OpacityFunction->GetNodeValue(id, value);
   this->OpacityFunction->RemovePoint(value[0]);
+  this->UpdateTransferFunctionMTime();
 }
 
 //----------------------------------------------------------------------------
@@ -954,6 +959,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::RemoveColorPoint(
   double value[6];
   this->ColorFunction->GetNodeValue(id, value);
   this->ColorFunction->RemovePoint(value[0]);
+  this->UpdateTransferFunctionMTime();
 }
 
 //----------------------------------------------------------------------------
@@ -1001,6 +1007,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementOpacity(
   this->RemoveOpacityPoint(idx);
 
   this->OpacityFunction->AddPoint(value[0], opacity);
+  this->UpdateTransferFunctionMTime();
 
   vtkTransferFunctionEditorRepresentationSimple1D *rep =
     vtkTransferFunctionEditorRepresentationSimple1D::SafeDownCast(
@@ -1032,6 +1039,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementRGBColor(
   this->ColorFunction->GetNodeValue(idx, value);
   this->ColorFunction->RemovePoint(value[0]);
   this->ColorFunction->AddRGBPoint(value[0], r, g, b);
+  this->UpdateTransferFunctionMTime();
 
   vtkTransferFunctionEditorRepresentationSimple1D *rep =
     vtkTransferFunctionEditorRepresentationSimple1D::SafeDownCast(
@@ -1279,6 +1287,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetColorSpace(int space)
       this->ColorFunction->HSVWrapOn();
       break;
     }
+
+  this->UpdateTransferFunctionMTime();
 }
 
 //----------------------------------------------------------------------------

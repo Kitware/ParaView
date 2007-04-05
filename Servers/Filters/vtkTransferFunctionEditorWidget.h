@@ -149,7 +149,7 @@ public:
 
   // Description:
   // Update this widget based on changes to the transfer functions.
-  virtual void UpdateFromTransferFunctions();
+  virtual void UpdateFromTransferFunctions() {}
 
 protected:
   vtkTransferFunctionEditorWidget();
@@ -165,6 +165,8 @@ protected:
   unsigned long ColorMTime;
   unsigned long OpacityMTime;
   int AllowInteriorElements;
+
+  virtual void UpdateTransferFunctionMTime();
 
 private:
   vtkTransferFunctionEditorWidget(const vtkTransferFunctionEditorWidget&); // Not implemented.
