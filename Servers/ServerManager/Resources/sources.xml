@@ -1346,5 +1346,24 @@ The output of the Wavelet source is image (uniform rectilinear) data.
 
    <!-- End SelectionSource -->
    </SourceProxy>
+
+   <SourceProxy name="TimeToTextConvertorSource" class="vtkTimeToTextConvertor"
+     label="Annotate Time" >
+     <Documentation
+        short_help="Show animation time as text."
+        long_help="Shows the animation time as text annnotation in the view." >
+      Source that can be used to show the animation time in text annotation.
+     </Documentation>
+     <StringVectorProperty
+       name="Format"
+       command="SetFormat"
+       number_of_elements="1"
+       default_values="Time: %f">
+       <Documentation>
+         Format used to display the input time (using printf style).
+       </Documentation>
+     </StringVectorProperty>
+     <!-- End of TimeToTextConvertorSource -->
+   </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

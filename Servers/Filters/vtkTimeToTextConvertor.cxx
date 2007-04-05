@@ -22,7 +22,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkTimeToTextConvertor);
-vtkCxxRevisionMacro(vtkTimeToTextConvertor, "1.3");
+vtkCxxRevisionMacro(vtkTimeToTextConvertor, "1.4");
 //----------------------------------------------------------------------------
 vtkTimeToTextConvertor::vtkTimeToTextConvertor()
 {
@@ -41,6 +41,27 @@ int vtkTimeToTextConvertor::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
+  info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkTimeToTextConvertor::RequestInformation(
+  vtkInformation *request,
+  vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
+{
+  if (!this->Superclass::RequestInformation(
+      request, inputVector, outputVector))
+    {
+    return 0;
+    }
+  double timeRange[2];
+  timeRange[0] = VTK_DOUBLE_MIN;
+  timeRange[1] = VTK_DOUBLE_MAX;
+
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
   return 1;
 }
 
@@ -56,11 +77,21 @@ int vtkTimeToTextConvertor::RequestData(
   char *buffer = new char[strlen(this->Format)+1024];
   strcpy(buffer, "?");
 
-  vtkInformation* inputInfo= input->GetInformation();
+  vtkInformation* inputInfo = input? input->GetInformation() : 0;
+  vtkInformation* outputInfo = outputVector->GetInformationObject(0);
+
   if (inputInfo && inputInfo->Has(vtkDataObject::DATA_TIME_STEPS()) 
     && this->Format)
     {
     double time = inputInfo->Get(vtkDataObject::DATA_TIME_STEPS())[0];
+    sprintf(buffer, this->Format, time);
+    }
+  else if(outputInfo && 
+    outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())
+    && this->Format)
+    {
+    double time = outputInfo->Get(
+      vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0];
     sprintf(buffer, this->Format, time);
     }
 

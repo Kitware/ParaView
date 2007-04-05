@@ -17,6 +17,8 @@
 // This filter can be attached to any filter/source/reader that supports time.
 // vtkTimeToTextConvertor will generate a 1x1 vtkTable with the string
 // for the data time using the format specified.
+// The input to this filter is optional. If no input is specified, it will show
+// produce request time in the output.
 
 #ifndef __vtkTimeToTextConvertor_h
 #define __vtkTimeToTextConvertor_h
@@ -46,6 +48,10 @@ protected:
   virtual int RequestData(vtkInformation* request,
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
+
+  virtual int RequestInformation(vtkInformation *request,
+                                 vtkInformationVector **inputVector,
+                                 vtkInformationVector *outputVector);
 
   char* Format;
 private:
