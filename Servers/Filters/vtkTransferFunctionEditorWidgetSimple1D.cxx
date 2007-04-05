@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.23");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.24");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -47,6 +47,7 @@ vtkTransferFunctionEditorWidgetSimple1D::vtkTransferFunctionEditorWidgetSimple1D
   this->InitialMaximumColor[1] = this->InitialMaximumColor[2] = 0;
   this->LockEndPoints = 0;
   this->LeftClickEventPosition[0] = this->LeftClickEventPosition[1] = 0;
+  this->LeftClickCount = 0;
 
   this->CallbackMapper->SetCallbackMethod(
     vtkCommand::LeftButtonPressEvent,
@@ -174,6 +175,26 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNodeAction(
     self->WidgetState = vtkTransferFunctionEditorWidgetSimple1D::MovingNode;
     self->Superclass::StartInteraction();
     self->InvokeEvent(vtkCommand::StartInteractionEvent, NULL);
+    double dispPos[3];
+    vtkTransferFunctionEditorRepresentationSimple1D *rep =
+      vtkTransferFunctionEditorRepresentationSimple1D::SafeDownCast(
+        self->WidgetRep);
+    rep->GetHandleDisplayPosition(rep->GetActiveHandle(), dispPos);
+    int tol2 = rep->GetTolerance();
+    tol2 *= tol2;
+    double leftClickDispPos[3];
+    leftClickDispPos[0] = static_cast<double>(self->LeftClickEventPosition[0]);
+    leftClickDispPos[1] = static_cast<double>(self->LeftClickEventPosition[1]);
+    leftClickDispPos[2] = 0.0;
+    double dist2 = vtkMath::Distance2BetweenPoints(leftClickDispPos, dispPos);
+    if (dist2 <= tol2)
+      {
+      self->LeftClickCount++;
+      }
+    else
+      {
+      self->LeftClickCount = 0;
+      }
     self->LeftClickEventPosition[0] = x;
     self->LeftClickEventPosition[1] = y;
     }
@@ -182,6 +203,9 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNodeAction(
     // add a new node
     self->WidgetState = vtkTransferFunctionEditorWidgetSimple1D::PlacingNode;
     self->AddNewNode(x, y);
+    self->LeftClickCount = 0;
+    self->LeftClickEventPosition[0] = x;
+    self->LeftClickEventPosition[1] = y;
     }
 
   self->EventCallbackCommand->SetAbortFlag(1);
@@ -248,6 +272,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNewNode(int x, int y)
     }
 
   rep->SetActiveHandle(currentHandleNumber);
+  this->LeftClickEventPosition[0] = x;
+  this->LeftClickEventPosition[1] = y;
   if (newHandleWidget)
     {
     newHandleWidget->SetEnabled(1);
@@ -375,6 +401,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNewNode(double scalar)
     newHandleWidget->SetEnabled(1);
     }
   rep->SetActiveHandle(currentHandleNumber);
+  this->LeftClickEventPosition[0] = displayPos[0];
+  this->LeftClickEventPosition[1] = displayPos[1];
   this->InvokeEvent(vtkCommand::PlacePointEvent,(void*)&(currentHandleNumber));
   this->InvokeEvent(vtkCommand::InteractionEvent,NULL);
 }
@@ -398,6 +426,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::EndSelectAction(
     int y = self->Interactor->GetEventPosition()[1];
     if (x == self->LeftClickEventPosition[0] &&
         y == self->LeftClickEventPosition[1] &&
+        self->LeftClickCount > 0 &&
         self->ModificationType != OPACITY)
       {
       // Fire an event indicating that a node has been selected

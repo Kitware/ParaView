@@ -114,6 +114,7 @@ protected:
   int LockEndPoints;
 
   int LeftClickEventPosition[2];
+  int LeftClickCount;
 
 //BTX
   // the state of the widget

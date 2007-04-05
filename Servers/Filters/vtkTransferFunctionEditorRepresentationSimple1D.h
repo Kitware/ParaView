@@ -142,6 +142,10 @@ public:
   virtual void SetElementLighting(double ambient, double diffuse,
                                   double specular, double specularPower);
 
+  // Description:
+  // Get the tolerance value used for determining whether a handle is selected.
+  vtkGetMacro(Tolerance, int);
+
 protected:
   vtkTransferFunctionEditorRepresentationSimple1D();
   ~vtkTransferFunctionEditorRepresentationSimple1D();
