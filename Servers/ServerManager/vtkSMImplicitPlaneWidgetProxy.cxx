@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.16");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -210,35 +210,6 @@ vtkPVXMLElement* vtkSMImplicitPlaneWidgetProxy::SaveState(vtkPVXMLElement* root)
   return this->Superclass::SaveState(root);
 }
 
-
-//----------------------------------------------------------------------------
-void vtkSMImplicitPlaneWidgetProxy::SaveInBatchScript(ofstream *file)
-{
-  this->Superclass::SaveInBatchScript(file);
-
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty Center] "
-        << "SetElements3 "
-        << this->Center[0] << " "
-        << this->Center[1] << " "
-        << this->Center[2] 
-        << endl;
-  
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() 
-        << " GetProperty Normal] "
-        << "SetElements3 "
-        << this->Normal[0] << " "
-        << this->Normal[1] << " "
-        << this->Normal[2] 
-        << endl;
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() 
-        << " GetProperty DrawPlane] "
-        << "SetElements1 " << this->DrawPlane 
-        << endl;
-  
-  *file << "  $pvTemp" << this->GetSelfIDAsString() 
-        << " UpdateVTKObjects" << endl;
-  *file << endl;
-}
 
 //----------------------------------------------------------------------------
 void vtkSMImplicitPlaneWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)

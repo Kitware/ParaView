@@ -71,15 +71,6 @@ public:
   vtkGetMacro(Enabled,int);
 
   // Description:
-  // vtkSMDisplayProxy provides a generic SaveInBatchScript.
-  // vtkSM3DWidgets don't use that
-  // since the order in which the properties are set is significant
-  // for them e.g. PlaceWidget must happend before properties are set etc.
-  // This is not favourable, but until that is resolved, we do
-  // this.
-  virtual void SaveInBatchScript(ofstream *file);
-
-  // Description:
   // Update the VTK object on the server by pushing the values of all 
   // modified properties (un-modified properties are ignored). If the 
   // object has not been created, it will be created first.

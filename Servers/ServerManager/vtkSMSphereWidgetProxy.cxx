@@ -22,7 +22,7 @@
 #include "vtkSphereWidget.h"
 
 vtkStandardNewMacro(vtkSMSphereWidgetProxy);
-vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.14");
 
 //----------------------------------------------------------------------------
 vtkSMSphereWidgetProxy::vtkSMSphereWidgetProxy()
@@ -125,28 +125,6 @@ void vtkSMSphereWidgetProxy::CreateVTKObjects(int numObjects)
     return;
     }
   this->Superclass::CreateVTKObjects(numObjects);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSphereWidgetProxy::SaveInBatchScript(ofstream *file)
-{
-  this->Superclass::SaveInBatchScript(file);
-
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty Center] "
-        << "SetElements3 "
-        << this->Center[0] << " "
-        << this->Center[1] << " "
-        << this->Center[2] 
-        << endl;
-  
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty Radius] "
-        << "SetElements1 "
-        << this->Radius
-        << endl;
-  
-  *file << "  $pvTemp" << this->GetSelfIDAsString() << " UpdateVTKObjects" 
-        << endl;
-  *file << endl;
 }
 
 //----------------------------------------------------------------------------

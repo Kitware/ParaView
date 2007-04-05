@@ -56,8 +56,6 @@ public:
   vtkSetStringMacro(ArrayName);
   vtkGetStringMacro(ArrayName);
  
-  virtual void SaveInBatchScript(ofstream* file);
-
   // Description:
   // Set whether to use a separate color for values outside the lookup table's
   // range.

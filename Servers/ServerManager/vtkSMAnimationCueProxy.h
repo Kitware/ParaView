@@ -42,13 +42,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Saves the proxy to batch script.
-  virtual void SaveInBatchScript(ofstream*);
-  void SaveInBatchScript(ofstream* file,
-                         const char* proxyTclName,
-                         int doRegister);
-  
-  // Description:
   // Pointer to the proxy whose property is being animated by this cue.
   void SetAnimatedProxy(vtkSMProxy* proxy);
   vtkGetObjectMacro(AnimatedProxy, vtkSMProxy);

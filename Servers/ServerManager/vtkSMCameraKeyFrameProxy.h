@@ -61,9 +61,6 @@ public:
   void SetViewUp(double x, double y, double z);
   void SetViewAngle(double angle);
 
-  // Description:
-  // Saves the proxy in batch.
-  virtual void SaveInBatchScript(ofstream* file);
 protected:
   vtkSMCameraKeyFrameProxy();
   ~vtkSMCameraKeyFrameProxy();

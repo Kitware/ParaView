@@ -30,8 +30,6 @@ public:
   vtkSetVector3Macro(Position,double);
   vtkGetVector3Macro(Position,double);
  
-  virtual void SaveInBatchScript(ofstream *file);
-
   virtual void UpdateVTKObjects();
 
 protected:

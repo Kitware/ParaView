@@ -40,8 +40,6 @@ public:
   vtkSetMacro(Radius,double);
   vtkGetMacro(Radius,double);
 
-  virtual void SaveInBatchScript(ofstream *file);
-
   virtual void UpdateVTKObjects();
 protected:
   vtkSMSphereWidgetProxy();

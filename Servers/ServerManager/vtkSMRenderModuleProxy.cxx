@@ -56,7 +56,7 @@
 
 #include "vtkSMClientServerRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.83");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.84");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1204,18 +1204,6 @@ vtkPVXMLElement* vtkSMRenderModuleProxy::SaveState(vtkPVXMLElement* root)
 {
   this->SynchronizeCameraProperties();
   return this->Superclass::SaveState(root);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
-{
-  if (!this->ObjectsCreated)
-    {
-    vtkErrorMacro("Render module not created yet!");
-    return;
-    }
-  this->SynchronizeCameraProperties();
-  this->Superclass::SaveInBatchScript(file);
 }
 
 //-----------------------------------------------------------------------------

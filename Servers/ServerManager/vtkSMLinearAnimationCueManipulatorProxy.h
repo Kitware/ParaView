@@ -34,8 +34,6 @@ public:
 
   static vtkSMLinearAnimationCueManipulatorProxy* New();
 
-  void SaveInBatchScript(ofstream* file);
-
   // Get/Set the start values.
   vtkSetMacro(StartValue, double);
   vtkGetMacro(StartValue, double);

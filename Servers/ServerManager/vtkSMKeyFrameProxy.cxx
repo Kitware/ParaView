@@ -28,7 +28,7 @@ public:
 //----------------------------------------------------------------------------
 
 
-vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.11");
 vtkStandardNewMacro(vtkSMKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()
@@ -94,30 +94,6 @@ void vtkSMKeyFrameProxy::SetNumberOfKeyValues(unsigned int num)
 unsigned int vtkSMKeyFrameProxy::GetNumberOfKeyValues()
 {
   return this->Internals->KeyValues.size();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMKeyFrameProxy::SaveInBatchScript(ofstream* file)
-{
-  *file << endl;
-  *file << "set pvTemp" << this->GetSelfIDAsString()
-    << " [$proxyManager NewProxy " 
-    << this->GetXMLGroup() <<" "
-    << this->GetXMLName() << "]" << endl;
-
-  vtkSMKeyFrameProxyInternals::VectorOfDoubles::iterator iter = 
-    this->Internals->KeyValues.begin();
-  int i = 0;
-  for (; iter != this->Internals->KeyValues.end(); ++iter)
-    {
-    *file << "[$pvTemp" << this->GetSelfIDAsString() << " GetProperty KeyValues]"
-      << " SetElement " << i << " " << (*iter) << endl;
-    i++;
-    }
-
-  *file << "[$pvTemp" << this->GetSelfIDAsString() << " GetProperty KeyTime]"
-    << " SetElements1 " << this->KeyTime << endl;
-  *file << "$pvTemp" << this->GetSelfIDAsString() << " UpdateVTKObjects" << endl;
 }
 
 //----------------------------------------------------------------------------

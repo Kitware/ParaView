@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.13");
 
 //----------------------------------------------------------------------------
 vtkSMPointWidgetProxy::vtkSMPointWidgetProxy()
@@ -117,25 +117,6 @@ vtkPVXMLElement* vtkSMPointWidgetProxy::SaveState(vtkPVXMLElement* root)
     dvp->SetElements(this->Position);
     }
   return this->Superclass::SaveState(root);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMPointWidgetProxy::SaveInBatchScript(ofstream *file)
-{
-  this->Superclass::SaveInBatchScript(file);
-
-  *file << endl;
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() 
-        << " GetProperty Position] "
-        << "SetElements3 "
-        << this->Position[0] << " "
-        << this->Position[1] << " "
-        << this->Position[2] 
-        << endl;
-  
-  *file << "  $pvTemp" << this->GetSelfIDAsString() 
-        << " UpdateVTKObjects" << endl;
-  *file << endl;
 }
 
 //----------------------------------------------------------------------------

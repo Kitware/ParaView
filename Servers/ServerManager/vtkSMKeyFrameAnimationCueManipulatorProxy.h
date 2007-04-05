@@ -49,8 +49,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMKeyFrameAnimationCueManipulatorProxy* New();
   
-  virtual void SaveInBatchScript(ofstream* file);
-
   // Description:
   // Add a key frame. Key frames are stored in a map, keyed by the
   // KeyFrameTime. If two keyframes have the same

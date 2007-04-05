@@ -51,8 +51,6 @@ public:
   vtkClientServerID GetID() {return this->GetSelfID();}
 //ETX
 
-  virtual void SaveInBatchScript(ofstream* file);
-
 //BTX
   // Description:
   // StateModifiedEvent - This event is fired when the manipulator modifies the animated proxy.

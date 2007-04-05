@@ -46,8 +46,6 @@ public:
   vtkSetMacro(EndPower, double);
   vtkGetMacro(EndPower, double);
 
-
-  virtual void SaveInBatchScript(ofstream* file);
 protected:
   vtkSMExponentialKeyFrameProxy();
   ~vtkSMExponentialKeyFrameProxy();

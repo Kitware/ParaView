@@ -138,12 +138,6 @@ public:
   int GetServerRenderWindowSize(int size[2]);
 
   // Description:
-  // Save the display in batch script. This will eventually get 
-  // removed as we will generate batch script from ServerManager
-  // state. However, until then.
-  virtual void SaveInBatchScript(ofstream* file);
-
-  // Description:
   // Called when saving server manager state.
   // Overridden to SynchronizeCameraProperties before saving the properties.
   virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);

@@ -50,7 +50,7 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.10");
 
 //-----------------------------------------------------------------------------
 vtkSMAbstractViewModuleProxy::vtkSMAbstractViewModuleProxy()
@@ -287,102 +287,6 @@ vtkSMAbstractDisplayProxy* vtkSMAbstractViewModuleProxy::CreateDisplayProxy()
 vtkPVXMLElement* vtkSMAbstractViewModuleProxy::SaveState(vtkPVXMLElement* root)
 {
   return this->Superclass::SaveState(root);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMAbstractViewModuleProxy::SaveInBatchScript(ofstream* file)
-{
-  if (!this->ObjectsCreated)
-    {
-    vtkErrorMacro("Render module not created yet!");
-    return;
-    }
-
-  *file << "set pvTemp" << this->GetSelfIDAsString() 
-        << " [$proxyManager NewProxy "
-        << this->GetXMLGroup() << " " << this->GetXMLName() << "]" << endl;
-  *file << "  $proxyManager RegisterProxy " << this->GetXMLGroup()
-        << " pvTemp" << this->GetSelfIDAsString() << " $pvTemp" 
-        << this->GetSelfIDAsString() << endl;
-  *file << "  $pvTemp" << this->GetSelfIDAsString() << " UnRegister {}" << endl;
-
-  // Now, we save all the properties that are not Input.
-  // Also note that only exposed properties are getting saved.
-  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMProperty* p = iter->GetProperty();
-    if (vtkSMInputProperty::SafeDownCast(p))
-      {
-      continue;
-      }
-
-    if (p->GetIsInternal() || p->GetInformationOnly())
-      {
-      *file << "  # skipping proxy property " << iter->GetKey() << endl;
-      continue;
-      }
-
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
-    vtkSMDoubleVectorProperty* dvp = 
-      vtkSMDoubleVectorProperty::SafeDownCast(p);
-    vtkSMStringVectorProperty* svp = 
-      vtkSMStringVectorProperty::SafeDownCast(p);
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(p);
-    if (ivp)
-      {
-      for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
-        {
-        *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
-          << iter->GetKey() << "}] SetElement "
-          << i << " " << ivp->GetElement(i) 
-          << endl;
-        }
-      }
-    else if (dvp)
-      {
-      for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
-        {
-        *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
-          << iter->GetKey() << "}] SetElement "
-          << i << " " << dvp->GetElement(i) 
-          << endl;
-        }
-      }
-    else if (svp)
-      {
-      for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
-        {
-        *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
-          << iter->GetKey() << "}] SetElement "
-          << i << " {" << svp->GetElement(i) << "}"
-          << endl;
-        }
-      }
-    else if (pp)
-      {
-      // the only proxy property the RenderModule exposes is
-      // Displays.
-      for (unsigned int i=0; i < pp->GetNumberOfProxies(); i++)
-        {
-        vtkSMProxy* proxy = pp->GetProxy(i);
-        // Some displays get saved in batch other don't,
-        // instead of mirroring that logic to determine if
-        // the display got saved in batch, we just catch the
-        // exception.
-        *file << "  catch { [$pvTemp" << this->GetSelfIDAsString() 
-              << " GetProperty {"
-              << iter->GetKey() << "}] AddProxy $pvTemp"
-              << proxy->GetSelfIDAsString()
-              << " } ;#--- " << proxy->GetXMLName() << endl;
-        }
-      }
-    else
-      {
-      *file << "  # skipping property " << iter->GetKey() << endl;
-      }
-    }
-  iter->Delete();
 }
 
 //-----------------------------------------------------------------------------

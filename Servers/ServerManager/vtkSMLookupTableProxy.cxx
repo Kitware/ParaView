@@ -22,7 +22,7 @@
 #include "vtkMath.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.16");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
@@ -176,72 +176,6 @@ void vtkSMLookupTableProxy::Build()
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(this->ConnectionID, this->Servers, stream);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMLookupTableProxy::SaveInBatchScript(ofstream* file)
-{
-  vtkSMIntVectorProperty* ivp;
-  vtkSMDoubleVectorProperty* dvp;
-
-  *file << endl;
-
-  *file << "set pvTemp" << this->GetSelfIDAsString()
-        << " [$proxyManager NewProxy lookup_tables LookupTable]" << endl;
-  *file << "  $proxyManager RegisterProxy lookup_tables pvTemp"
-        << this->GetSelfIDAsString() << " $pvTemp" << this->GetSelfIDAsString() << endl;
-  *file << "  $pvTemp" << this->GetSelfIDAsString() << " UnRegister {}" << endl;
-  
-  //Set ArrayName
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty ArrayName]"
-        << " SetElement 0 {"
-        << this->ArrayName << "}" << endl;
-  
-  // Set number of colors
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProperty("NumberOfTableValues"));
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty "
-        << "NumberOfTableValues] SetElements1 "
-        << ivp->GetElement(0) << endl;
-  
-  // Set color ranges
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GetProperty("HueRange"));
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty "
-        << "HueRange] SetElements2 "
-        << dvp->GetElement(0) << " " << dvp->GetElement(1) << endl;
-  
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GetProperty("SaturationRange"));
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty "
-        << "SaturationRange] SetElements2 "
-        << dvp->GetElement(0) << " " << dvp->GetElement(1) << endl;
-  
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GetProperty("ValueRange"));
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty "
-        << "ValueRange] SetElements2 "
-        << dvp->GetElement(0) << " " << dvp->GetElement(1) << endl;
-  
-  //Set scalar range
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GetProperty("ScalarRange"));
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty "
-        << "ScalarRange] SetElements2 "
-        << dvp->GetElement(0) << " " << dvp->GetElement(1) << endl;
-  
-  //Set Vector component and mode
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProperty("VectorComponent"));
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty "
-        << "VectorComponent] SetElements1 " << ivp->GetElement(0) << endl;
-  
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProperty("VectorMode"));
-  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty "
-        << "VectorMode] SetElements1 " << ivp->GetElement(0) << endl;
-  *file << "  $pvTemp" << this->GetSelfIDAsString() << " UpdateVTKObjects" << endl;
-  *file << endl;
 }
 
 //---------------------------------------------------------------------------

@@ -56,7 +56,6 @@ public:
   vtkSetMacro(Offset, double);
   vtkGetMacro(Offset, double);
 
-  virtual void SaveInBatchScript(ofstream* file);
 protected:
   vtkSMSinusoidKeyFrameProxy();
   ~vtkSMSinusoidKeyFrameProxy();

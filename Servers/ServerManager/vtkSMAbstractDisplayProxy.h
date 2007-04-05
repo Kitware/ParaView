@@ -74,12 +74,6 @@ public:
   virtual int UpdateRequired() { return false; }
   
   // Description:
-  // Save the display in batch script. This will eventually get 
-  // removed as we will generate batch script from ServerManager
-  // state. However, until then.
-  virtual void SaveInBatchScript(ofstream* file);
-  
-  // Description:
   // Convenience method to get/set Visibility property.
   void SetVisibilityCM(int v);
   int GetVisibilityCM(); 

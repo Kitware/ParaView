@@ -19,7 +19,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMAnimationCueProxy.h"
 
-vtkCxxRevisionMacro(vtkSMCameraKeyFrameProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMCameraKeyFrameProxy, "1.4");
 vtkStandardNewMacro(vtkSMCameraKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMCameraKeyFrameProxy::vtkSMCameraKeyFrameProxy()
@@ -126,31 +126,6 @@ void vtkSMCameraKeyFrameProxy::SetViewUp(double x, double y, double z)
 void vtkSMCameraKeyFrameProxy::SetViewAngle(double angle)
 {
   this->Camera->SetViewAngle(angle);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMCameraKeyFrameProxy::SaveInBatchScript(ofstream* file)
-{
-  this->Superclass::SaveInBatchScript(file);
-
-  double *val = this->Camera->GetPosition();
-  const char* batchName = this->GetSelfIDAsString();
-  *file << "  [$pvTemp" << batchName << " GetProperty Position]"
-        << " SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
-
-  val = this->Camera->GetFocalPoint();
-  *file << "  [$pvTemp" << batchName << " GetProperty FocalPoint]"
-        << " SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
- 
-  val = this->Camera->GetViewUp();
-  *file << "  [$pvTemp" << batchName << " GetProperty ViewUp]"
-        << " SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
-
-  double angle = this->Camera->GetViewAngle();
-  *file << "  [$pvTemp" << batchName << " GetProperty ViewAngle]"
-        << " SetElements1 " << angle << endl;
-
-  *file << "  $pvTemp" << batchName << " UpdateVTKObjects" << endl;
 }
 
 //----------------------------------------------------------------------------

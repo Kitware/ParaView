@@ -23,7 +23,7 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.17");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -308,25 +308,6 @@ vtkSMKeyFrameProxy* vtkSMKeyFrameAnimationCueManipulatorProxy::GetKeyFrameAtInde
     return NULL;
     }
   return this->Internals->KeyFrames[index];
-}
-
-//----------------------------------------------------------------------------
-void vtkSMKeyFrameAnimationCueManipulatorProxy::SaveInBatchScript(ofstream* file)
-{
-  this->Superclass::SaveInBatchScript(file);
-
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::KeyFrameVector::
-    iterator it = this->Internals->KeyFrames.begin();
-  for (; it != this->Internals->KeyFrames.end(); it++)
-    {
-    vtkSMKeyFrameProxy* proxy = *it; 
-    proxy->SaveInBatchScript(file);
-    *file << "[$pvTemp" << this->GetSelfIDAsString() << " GetProperty KeyFrames]"
-          << " AddProxy $pvTemp" << proxy->GetSelfIDAsString() << endl;
-    *file << "$pvTemp" << this->GetSelfIDAsString() 
-          << " UpdateVTKObjects" << endl;
-    *file << "$pvTemp" << proxy->GetSelfIDAsString() << " UnRegister {}" << endl;
-    }
 }
 
 //----------------------------------------------------------------------------

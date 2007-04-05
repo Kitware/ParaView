@@ -32,7 +32,6 @@ public:
   vtkGetVector3Macro(Point1,double);
   vtkGetVector3Macro(Point2,double);
 
-  virtual void SaveInBatchScript(ofstream *file);
   virtual void UpdateVTKObjects();
 
 protected:

@@ -16,7 +16,7 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueManipulatorProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMAnimationCueManipulatorProxy, "1.8");
 
 //----------------------------------------------------------------------------
 vtkSMAnimationCueManipulatorProxy::vtkSMAnimationCueManipulatorProxy()
@@ -43,17 +43,6 @@ void vtkSMAnimationCueManipulatorProxy::Copy(vtkSMProxy* src,
 {
   this->Superclass::Copy(src, exceptionClass, proxyPropertyCopyFlag);
   this->MarkAllPropertiesAsModified();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationCueManipulatorProxy::SaveInBatchScript(ofstream* file)
-{
-  *file << endl;
-  *file << "set pvTemp" << this->GetSelfIDAsString()
-    << " [$proxyManager NewProxy " << this->GetXMLGroup()
-    << " " << this->GetXMLName() << "]" << endl;
-  *file << "$pvTemp" << this->GetSelfIDAsString() 
-        << " UpdateVTKObjects" << endl;
 }
 
 //----------------------------------------------------------------------------

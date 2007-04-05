@@ -37,8 +37,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMKeyFrameProxy* New();
   
-  virtual void SaveInBatchScript(ofstream* file);
-
   // Description:;
   // Key time is the time at which this key frame is
   // associated. KeyTime ranges from [0,1], where 0 is the
