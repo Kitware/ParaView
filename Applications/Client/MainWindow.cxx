@@ -578,17 +578,9 @@ MainWindow::MainWindow() :
 
 
   this->Implementation->ViewMenu->addWidget(
-    this->Implementation->UI.pipelineBrowserDock,
-    this->Implementation->UI.pipelineBrowserDock->windowTitle());
+    this->Implementation->UI.animationPanelDock,
+    this->Implementation->UI.animationPanelDock->windowTitle());
 
-  this->Implementation->ViewMenu->addWidget(
-    this->Implementation->UI.objectInspectorDock,
-    this->Implementation->UI.objectInspectorDock->windowTitle());
-
-  this->Implementation->ViewMenu->addWidget(
-    this->Implementation->UI.statisticsViewDock,
-    this->Implementation->UI.statisticsViewDock->windowTitle());
-    
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.elementInspectorDock,
     this->Implementation->UI.elementInspectorDock->windowTitle());
@@ -602,9 +594,17 @@ MainWindow::MainWindow() :
     this->Implementation->UI.lookmarkInspectorDock->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(
-    this->Implementation->UI.animationPanelDock,
-    this->Implementation->UI.animationPanelDock->windowTitle());
-  
+    this->Implementation->UI.objectInspectorDock,
+    this->Implementation->UI.objectInspectorDock->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(
+    this->Implementation->UI.pipelineBrowserDock,
+    this->Implementation->UI.pipelineBrowserDock->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(
+    this->Implementation->UI.statisticsViewDock,
+    this->Implementation->UI.statisticsViewDock->windowTitle());
+    
   // Setup the multiview render window ...
   this->setCentralWidget(&this->Implementation->Core.multiViewManager());
 
