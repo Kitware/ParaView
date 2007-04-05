@@ -1010,7 +1010,7 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     {
 
     this->Implementation->setupFiltersMenu();
-
+      
     // Qt bug - gotta connect to sub menus
     QList<QAction*> actions = this->Implementation->FilterMenu->actions();
     foreach(QAction* a, actions)
@@ -3127,39 +3127,27 @@ void pqMainWindowCore::updateFiltersMenu()
   // only valid sources.
   const pqServerManagerSelection *selected =
       pqApplicationCore::instance()->getSelectionModel()->selectedItems();
-  if(selected->size() == 0)
-    {
-    // Filters need an input to be created.
-    menu->setEnabled(false);
-    return;
-    }
-
-  pqPipelineSource *source = 0;
-  pqServerManagerModelItem *item = 0;
+  
+  QList<pqPipelineSource*> sources;
+  pqServerManagerModelItem* item = NULL;
   pqServerManagerSelection::ConstIterator iter = selected->begin();
   for( ; iter != selected->end(); ++iter)
     {
     item = *iter;
-    pqServer *server = dynamic_cast<pqServer *>(item);
-    if(server)
+    pqPipelineSource* source;
+    source = qobject_cast<pqPipelineSource *>(item);
+    if(source && source->getProxy())
       {
-      // A server is not a valid input.
-      menu->setEnabled(false);
-      return;
-      }
-
-    source = dynamic_cast<pqPipelineSource *>(item);
-    if(!source || !source->getProxy())
-      {
-      // Unsupported/unknown input type or missing proxy.
-      menu->setEnabled(false);
-      return;
+      sources.append(source);
       }
     }
 
   // Get the list of available filters.
   QList<QString> supportedFilters;
-  source->getServer()->getSupportedProxies("filters", supportedFilters);
+  if(sources.size())
+    {
+    sources[0]->getServer()->getSupportedProxies("filters", supportedFilters);
+    }
 
   // Iterate over all filters in the menu and see if they can be
   // applied to the current source(s).
@@ -3211,10 +3199,8 @@ void pqMainWindowCore::updateFiltersMenu()
         }
 
       input->RemoveAllUncheckedProxies();
-      for(iter = selected->begin(); iter != selected->end(); ++iter)
+      foreach(pqPipelineSource* source, sources)
         {
-        item = *iter;
-        source = dynamic_cast<pqPipelineSource *>(item);
         input->AddUncheckedProxy(source->getProxy());
         }
 
@@ -3232,14 +3218,14 @@ void pqMainWindowCore::updateFiltersMenu()
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqMainWindowCore::getActiveSource()
 {
-  return dynamic_cast<pqPipelineSource *>(this->getActiveObject());
+  return qobject_cast<pqPipelineSource *>(this->getActiveObject());
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::getRootSources(QList<pqPipelineSource*> *sources, 
                                       pqPipelineSource *src)
 {
-  pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter*>(src);
+  pqPipelineFilter *filter = qobject_cast<pqPipelineFilter*>(src);
   if(!filter || filter->getInputCount()==0)
     {
     sources->push_back(src);
@@ -3318,7 +3304,7 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
   QList<pqPipelineSource*> inputs;
   foreach (pqServerManagerModelItem* item, selected)
     {
-    pqPipelineSource* source = dynamic_cast<pqPipelineSource*>(item);
+    pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
     if (source)
       {
       inputs.push_back(source);
@@ -3361,8 +3347,8 @@ pqPipelineSource* pqMainWindowCore::createCompoundSource(
   pqObjectBuilder* builder = core->getObjectBuilder();  
 
   pqServerManagerModelItem *item = this->getActiveObject();
-  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
-  pqServer *server = dynamic_cast<pqServer *>(item);
+  pqPipelineSource *source = qobject_cast<pqPipelineSource *>(item);
+  pqServer *server = qobject_cast<pqServer *>(item);
   if(!server && source)
     {
     server = source->getServer();
