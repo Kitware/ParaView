@@ -1436,29 +1436,6 @@
       <Element index="0" value="0"/>
       <Domain name="bool" id="1137.InsideOut.bool"/>
     </Property>
-    <Property name="SelectInputScalars" id="1137.SelectInputScalars" number_of_elements="5">
-      <Element index="0" value="0"/>
-      <Element index="1" value="0"/>
-      <Element index="2" value="0"/>
-      <Element index="3" value="0"/>
-      <Element index="4" value=""/>
-      <Domain name="array_list" id="1137.SelectInputScalars.array_list">
-        <String text="Normals"/>
-      </Domain>
-    </Property>
-    <Property name="Value" id="1137.Value" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="range" id="1137.Value.range"/>
-      <Domain name="scalar_range" id="1137.Value.scalar_range">
-        <Min index="0" value="-0.974928"/>
-        <Min index="1" value="-0.974928"/>
-        <Min index="2" value="-1"/>
-        <Min index="3" value="1"/>
-        <Max index="0" value="0.974928"/>
-        <Max index="1" value="0.974928"/>
-        <Max index="2" value="1"/>
-      </Domain>
-    </Property>
   </Proxy>
   <Proxy group="displays" type="LODDisplay" id="1178">
     <Property name="Input" id="1178.Input" number_of_elements="1">
