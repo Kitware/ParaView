@@ -853,10 +853,6 @@ void pqColorScaleEditor::loadPreset()
         temp.setValueRange(range.first, range.second);
         }
 
-      // Update the displayed range.
-      temp.getValueRange(value, opacity);
-      this->updateScalarRange(value.getDoubleValue(), opacity.getDoubleValue());
-
       vtkPiecewiseFunction *opacities = 0;
       vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
       colors->RemoveAllPoints();
@@ -865,6 +861,10 @@ void pqColorScaleEditor::loadPreset()
         opacities = this->Viewer->GetOpacityFunction();
         opacities->RemoveAllPoints();
         }
+
+      // Update the displayed range.
+      temp.getValueRange(value, opacity);
+      this->updateScalarRange(value.getDoubleValue(), opacity.getDoubleValue());
 
       for(int i = 0; i < colorMap->getNumberOfPoints(); i++)
         {
@@ -930,6 +930,7 @@ void pqColorScaleEditor::loadPreset()
 
       // Set up the current point index.
 #if USE_VTK_TFE
+      this->Viewer->SetCurrentElementId(0);
       this->Form->CurrentIndex = this->Viewer->GetCurrentElementId();
 #else
       this->Form->Gradient->blockSignals(true);
@@ -1439,7 +1440,8 @@ void pqColorScaleEditor::initColorScale()
 #if USE_VTK_TFE
   this->Viewer->Render();
 
-  // Get the current point from the editor.
+  // Set the current point.
+  this->Viewer->SetCurrentElementId(0);
   this->Form->CurrentIndex = this->Viewer->GetCurrentElementId();
 #else
   model->finishModifyingData();
