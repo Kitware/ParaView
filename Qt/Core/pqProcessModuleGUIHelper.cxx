@@ -99,11 +99,6 @@ public:
         vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
         break;
       }
-    int a;
-    if(a == 0)
-      {
-      int breakhere = 1;
-      }
   }
 
   /// Converts VTK debug output into Qt signals
@@ -123,7 +118,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.18");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.19");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
