@@ -15,42 +15,18 @@
 
 #include "vtkSMAbstractViewModuleProxy.h"
 
-#include "vtkCallbackCommand.h"
-#include "vtkCamera.h"
-#include "vtkClientServerID.h"
-#include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
-#include "vtkErrorCode.h"
-#include "vtkFloatArray.h"
-#include "vtkGarbageCollector.h"
-#include "vtkImageWriter.h"
-#include "vtkInstantiator.h"
-#include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
-#include "vtkPVClientServerIdCollectionInformation.h"
-#include "vtkPVGeometryInformation.h"
-#include "vtkPVOptions.h"
-#include "vtkPVRenderModuleHelper.h"
 #include "vtkPVXMLElement.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
 #include "vtkSMAbstractDisplayProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMInputProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
-#include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.11");
 
 //-----------------------------------------------------------------------------
 vtkSMAbstractViewModuleProxy::vtkSMAbstractViewModuleProxy()
