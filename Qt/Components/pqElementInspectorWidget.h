@@ -38,7 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPipelineSource;
 class pqSelectionManager;
+class pqServer;
 class pqServerManagerModelItem;
+class vtkSMGenericViewDisplayProxy;
 class vtkUnstructuredGrid;
 
 /// Displays a collection of data set elements in a spreadsheet form.
@@ -63,6 +65,11 @@ signals:
   /// Signal emitted whenever the collection of elements changes
   void elementsChanged(vtkUnstructuredGrid*);
 
+  /// Fired before performing non-undoable changes.
+  void beginNonUndoableChanges();
+
+  /// Fired after performing non-undoable changes.
+  void endNonUndoableChanges();
 public slots:
   /// Called when user creates a new surface selection (or old 
   /// surface selection is cleared).
@@ -76,23 +83,40 @@ public slots:
   /// Refreshes the view.
   void refresh();
 
+  /// Set the current server. This will create a new element inspector
+  /// view module is none exists for this server.
+  void setServer(pqServer* server);
+
 protected:
-  /// Call this to set the collection of elements
-  void setElements(vtkUnstructuredGrid* ug);
+  /// Set the data object to display in the panel. 
+  /// Currently it only works with unstructured grid,
+  /// we may want to extend it to work with
+  /// DataObject or DataSet.
+  void setDataObject(vtkUnstructuredGrid* ug);
 
   void onElementsChanged();
 
-  /// Updates the data for the CurrentSource.
-  void onSourceChanged();
-
-  /// Call this to clear the collection of elements
-  void clear();
+  /// Tunrs visibility off for all displays except the one
+  /// passed as argument, if any whose visibility is set to 1.
+  void showOnly(vtkSMGenericViewDisplayProxy* dislay);
 
 protected slots:
   void onCurrentTypeTextChanged(const QString& text);
 
   /// Called when the application selection changes.
   void onCurrentChanged(pqServerManagerModelItem*);
+
+  /// Call this to clean all server connection related objects.
+  /// Called when server disconnects.
+  void cleanServer();
+
+  /// Updates the panel to show the data from the first
+  /// visible display in the view, if any.
+  /// If none is located, the panel will be cleared.
+  void updateGUI();
+
+  /// Called when a source is removed.
+  void onSourceRemoved(pqPipelineSource* source);
 
 private:
   struct pqImplementation;

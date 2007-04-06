@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.7");
+vtkCxxRevisionMacro(pqStateLoader, "1.8");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -157,6 +157,24 @@ void pqStateLoader::RegisterProxyInternal(const char* group,
       return;
       }
     }
+
+  if (proxy->GetXMLGroup()
+    && strcmp(proxy->GetXMLGroup(), "views") == 0 
+    && strcmp(proxy->GetXMLName(), "ElementInspectorView") == 0)
+    {
+    // Don't register any element inspector views.
+    return;
+    }
+
+  if (proxy->GetXMLGroup()
+    && strcmp(proxy->GetXMLGroup(), "displays") == 0 
+    && strcmp(proxy->GetXMLName(), "ElementInspectorDisplay") == 0)
+    {
+    // Don't register any element inspector displays.
+    return;
+    }
+
+
   this->Superclass::RegisterProxyInternal(group, name, proxy);
 }
 

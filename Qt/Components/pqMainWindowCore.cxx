@@ -282,7 +282,6 @@ public:
   pqViewManager MultiViewManager;
   pqVCRController VCRController;
   pqSelectionManager SelectionManager;
-  pqElementInspectorWidget* ElementInspector;
   pqLookmarkManagerModel* LookmarkManagerModel;
   pqLookmarkBrowser* LookmarkBrowser;
   pqLookmarkInspector* LookmarkInspector;
@@ -1195,8 +1194,18 @@ void pqMainWindowCore::setupElementInspector(QDockWidget* dock_widget)
   element_inspector->setSelectionManager(
     &this->Implementation->SelectionManager);
 
+  pqApplicationCore* core = pqApplicationCore::instance();
+
   QObject::connect(this, SIGNAL(postAccept()),
     element_inspector, SLOT(refresh()));
+
+  QObject::connect(core, SIGNAL(finishedAddingServer(pqServer*)),
+    element_inspector, SLOT(setServer(pqServer*)));
+
+  QObject::connect(element_inspector, SIGNAL(beginNonUndoableChanges()),
+    this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
+  QObject::connect(element_inspector, SIGNAL(endNonUndoableChanges()),
+    this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
 
   dock_widget->setWidget(element_inspector);
 }

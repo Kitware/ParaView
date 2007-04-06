@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QPointer>
 #include <QtDebug>
+#include <QTimer>
 
 // ParaView includes.
 #include "pqApplicationCore.h"
@@ -70,6 +71,8 @@ public:
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     }
+
+  QTimer RenderTimer;
 };
 
 //-----------------------------------------------------------------------------
@@ -108,6 +111,10 @@ pqGenericViewModule::pqGenericViewModule(
   this->Internal->ViewTimeLink = link;
   link->Delete();
 
+  this->Internal->RenderTimer.setSingleShot(true);
+  this->Internal->RenderTimer.setInterval(1);
+  QObject::connect(&this->Internal->RenderTimer, SIGNAL(timeout()),
+    this, SLOT(forceRender()));
 }
 
 //-----------------------------------------------------------------------------
@@ -130,6 +137,12 @@ vtkSMAbstractViewModuleProxy* pqGenericViewModule::getViewModuleProxy() const
   return vtkSMAbstractViewModuleProxy::SafeDownCast(this->getProxy());
 }
 
+
+//-----------------------------------------------------------------------------
+void pqGenericViewModule::render()
+{
+  this->Internal->RenderTimer.start();
+}
 
 //-----------------------------------------------------------------------------
 void pqGenericViewModule::forceRender()

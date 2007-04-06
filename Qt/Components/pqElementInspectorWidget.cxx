@@ -33,18 +33,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqElementInspectorWidget.h"
 
 #include "vtkProcessModule.h"
+#include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <QPointer>
+#include <QtDebug>
 
 #include "pqApplicationCore.h"
+#include "pqConsumerDisplay.h"
 #include "pqDataSetModel.h"
+#include "pqElementInspectorViewModule.h"
+#include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqSelectionManager.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
@@ -69,16 +76,13 @@ public:
   void clear()
     {
     this->Data->Initialize();
-
-    // clean the current.
-    this->ClientSideDisplayer = 0;
     }
 
   void setData(vtkUnstructuredGrid* data)
     {
     if (data)
       {
-      this->Data->DeepCopy(data);
+      this->Data->ShallowCopy(data);
       }
     else
       {
@@ -86,47 +90,21 @@ public:
       }
     }
 
-  /// Creates a new displayer for the current source, if any.
-  void createDisplayer()
-    {
-    this->ClientSideDisplayer = 0;
-    if (!this->CurrentSource)
-      {
-      return;
-      }
-
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-    vtkSMProxy* input = this->CurrentSource->getProxy();
-    vtkSMGenericViewDisplayProxy* csDisplayer = 
-      vtkSMGenericViewDisplayProxy::SafeDownCast(
-        pxm->NewProxy("displays", "GenericViewDisplay"));
-    csDisplayer->SetConnectionID(input->GetConnectionID());
-    csDisplayer->SetServers(vtkProcessModule::DATA_SERVER);
-    pqSMAdaptor::setProxyProperty(csDisplayer->GetProperty("Input"),
-      input);
-    pqSMAdaptor::setEnumerationProperty(
-      csDisplayer->GetProperty("ReductionType"), "UNSTRUCTURED_APPEND");
-    csDisplayer->UpdateVTKObjects();
-    csDisplayer->Update();
-    this->ClientSideDisplayer = csDisplayer;
-    csDisplayer->Delete();
-    }
-
   vtkUnstructuredGrid* const Data;
 
-  /// Source whose output is currently being "inspected"
-  /// (either the entire output or a selection from it).
-  QPointer<pqPipelineSource> CurrentSource;
-
-  /// Displayer used to obtain the data to the client
-  /// for "inspecting". 
-  vtkSmartPointer<vtkSMGenericViewDisplayProxy> ClientSideDisplayer;
-
-  /// When set, the element inspector only shows the user selection
-  /// for the CurrentSource, if any.
-  bool SelectionOnly;
-
   QPointer<pqSelectionManager> SelectionManager;
+
+  /// Server we are currently connected to. Only 1 server at a time please.
+  QPointer<pqServer> Server;
+
+  /// The ViewModule for that current server.
+  QPointer<pqElementInspectorViewModule> ViewModule;
+
+  /// Displayer for the current selection.
+  vtkSmartPointer<vtkSMGenericViewDisplayProxy> SelectionDisplayer;
+
+  /// Currently selected source.
+  QPointer<pqPipelineSource> CurrentSource;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -156,6 +134,11 @@ pqElementInspectorWidget::pqElementInspectorWidget(QWidget *p) :
   QObject::connect(pqApplicationCore::instance()->getSelectionModel(),
     SIGNAL(currentChanged(pqServerManagerModelItem*)),
     this, SLOT(onCurrentChanged(pqServerManagerModelItem*)));
+
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
+    this, SLOT(onSourceRemoved(pqPipelineSource*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -165,84 +148,147 @@ pqElementInspectorWidget::~pqElementInspectorWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqElementInspectorWidget::clear()
+void pqElementInspectorWidget::showOnly(vtkSMGenericViewDisplayProxy* display)
+{
+  if (!this->Implementation->ViewModule)
+    {
+    return;
+    }
+
+  emit this->beginNonUndoableChanges();
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->Implementation->ViewModule->getProxy()->GetProperty("Displays"));
+  for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); cc++)
+    {
+    vtkSMProxy* disp = pp->GetProxy(cc);
+    pqSMAdaptor::setElementProperty(
+      disp->GetProperty("Visibility"),
+      (disp == display)? 1 : 0);
+    disp->UpdateVTKObjects();
+    }
+
+  emit this->endNonUndoableChanges();
+}
+
+//-----------------------------------------------------------------------------
+void pqElementInspectorWidget::setServer(pqServer* server)
+{
+  if (this->Implementation->Server)
+    {
+    QObject::disconnect(this->Implementation->Server, 0, this, 0);
+    if (this->Implementation->ViewModule)
+      {
+      QObject::disconnect(this->Implementation->ViewModule, 0, this, 0);
+      }
+    }
+
+  this->Implementation->Server = server;
+  this->Implementation->ViewModule = 0;
+
+  if (!server)
+    {
+    this->updateGUI();
+    return;
+    }
+
+  // For now we'll simply create a new view module.
+  // In future, we may want to locate an existsing one first.
+  pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
+
+  pqElementInspectorViewModule* view = qobject_cast<pqElementInspectorViewModule*>(
+    builder->createView(pqElementInspectorViewModule::eiViewType(), server));
+  this->Implementation->ViewModule = view;
+  QObject::connect(view, SIGNAL(endRender()), this, SLOT(updateGUI()),
+    Qt::QueuedConnection); 
+
+  // When the server disappear, we want to ensure that the
+  // element inspector is clean.
+  QObject::connect(server, SIGNAL(destroyed()),
+    this, SLOT(cleanServer()));
+}
+
+//-----------------------------------------------------------------------------
+// Shows the data from the current visible display in the panel, if any.
+// This should rarely be called directly, instead call render on the 
+// view module since that ensures that the displayes are updated as well.
+void pqElementInspectorWidget::updateGUI()
+{
+  vtkSMGenericViewDisplayProxy* visibleDisplay = 0;
+  if (this->Implementation->ViewModule)
+    {
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      this->Implementation->ViewModule->getProxy()->GetProperty("Displays"));
+
+    for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); cc++)
+      {
+      vtkSMGenericViewDisplayProxy* cdisplay = 
+        vtkSMGenericViewDisplayProxy::SafeDownCast(pp->GetProxy(cc));
+
+      if (cdisplay && cdisplay->GetVisibilityCM())
+        {
+        visibleDisplay = cdisplay;
+        break;
+        }
+      }
+    }
+
+  if (visibleDisplay)
+    {
+    this->setDataObject(vtkUnstructuredGrid::SafeDownCast(
+        visibleDisplay->GetOutput()));
+
+    // Now update the labels etc.
+    if (visibleDisplay == this->Implementation->SelectionDisplayer)
+      {
+      // We are showing the selection, create the label accordingly.
+      pqPipelineSource* input = 
+        this->Implementation->SelectionManager->getSelectedSource();
+      this->Implementation->SourceLabel->setText(
+        QString("%1 (Selection)").arg(input->getSMName()));
+      }
+    else
+      {
+      pqConsumerDisplay* cdisplay = 
+        pqApplicationCore::instance()->getServerManagerModel()->
+        getPQDisplay(visibleDisplay);
+
+      pqPipelineSource* input = cdisplay->getInput();
+      this->Implementation->SourceLabel->setText(
+        QString("%1 (Output)").arg(input->getSMName()));
+      }
+    this->Implementation->DataTypeComboBox->setEnabled(true);
+    }
+  else
+    {
+    this->setDataObject(0);
+    this->Implementation->SourceLabel->setText(
+      "Create a selection to view here");
+    // TODO: If selected source can only be displayed if selected, 
+    // show such a message.
+    this->Implementation->DataTypeComboBox->setEnabled(false);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqElementInspectorWidget::cleanServer()
 {
   QString label =  "Create a selection to view here";
-  if (this->Implementation->CurrentSource)
-    {
-    label = QString("%1 (nothing selected)").arg(
-      this->Implementation->CurrentSource->getSMName());
-    }
   this->Implementation->SourceLabel->setText(label);
   this->Implementation->DataTypeComboBox->setEnabled(false);
+  
+  this->Implementation->ViewModule = 0;
+  this->Implementation->Server = 0;
+  this->Implementation->SelectionDisplayer = 0;
   this->Implementation->clear();
   this->onElementsChanged(); 
 }
 
 //-----------------------------------------------------------------------------
-void pqElementInspectorWidget::setElements(vtkUnstructuredGrid* ug)
+void pqElementInspectorWidget::setDataObject(vtkUnstructuredGrid* ug)
 {
   this->Implementation->setData(ug);
   this->onElementsChanged();  
-}
-
-//-----------------------------------------------------------------------------
-void pqElementInspectorWidget::onSourceChanged()
-{
-  pqDataSetModel* model = qobject_cast<pqDataSetModel*>(
-    this->Implementation->TreeView->model());
-
-  model->setDataSet(this->Implementation->Data);
-  if (!this->Implementation->CurrentSource)
-    {
-    // Nothing to show.
-    this->clear();
-    return;
-    }
-
-  this->Implementation->DataTypeComboBox->setEnabled(true);
-
-  // Check if there is an active user selection for this source.
-  if (this->Implementation->SelectionManager)
-    {
-    this->Implementation->ClientSideDisplayer =
-      this->Implementation->SelectionManager->getClientSideDisplayer(
-        this->Implementation->CurrentSource);
-    }
-
-  if (this->Implementation->ClientSideDisplayer) 
-    {
-    this->Implementation->SourceLabel->setText(
-      QString("%1 (Selection)").arg(
-        this->Implementation->CurrentSource->getSMName()));
-    }
-  else if (!this->Implementation->SelectionOnly)
-    {
-    // Failed to locate active selection, fetch the entire data from the filter
-    // and show it.
-    this->Implementation->clear();
-    this->Implementation->createDisplayer();
-    this->Implementation->SourceLabel->setText(
-      QString("%1 (Output)").arg(
-        this->Implementation->CurrentSource->getSMName()));
-    }
-  else
-    {
-    this->clear();
-    return;
-    }
-
-  if (this->Implementation->ClientSideDisplayer)
-    {
-    if (this->Implementation->ClientSideDisplayer->UpdateRequired())
-      {
-      this->Implementation->ClientSideDisplayer->Update();
-      }
-
-    this->setElements(
-      vtkUnstructuredGrid::SafeDownCast(
-        this->Implementation->ClientSideDisplayer->GetOutput()));
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -261,18 +307,47 @@ void pqElementInspectorWidget::onElementsChanged()
 //-----------------------------------------------------------------------------
 void pqElementInspectorWidget::inspect(pqPipelineSource* source)
 {
-  this->Implementation->clear();
-  this->Implementation->CurrentSource = source;
-  this->Implementation->SelectionOnly = true;
-
-  if (source &&
-    (source->getProxy()->GetXMLName() == QString("ExtractCellSelection") ||
-     source->getProxy()->GetXMLName() == QString("ExtractPointSelection")))
+  if (!this->Implementation->ViewModule)
     {
-    this->Implementation->SelectionOnly = false;
+    return;
     }
 
-  this->onSourceChanged();
+  this->Implementation->CurrentSource = source;
+
+  emit this->beginNonUndoableChanges();
+  if (source)
+    {
+    // Does this source have any display in our view?
+    // If not, we create one.
+    pqConsumerDisplay* srcDisplay = 
+      source->getDisplay(this->Implementation->ViewModule);
+    if (!srcDisplay)
+      {
+      // create a new display for this source.
+      // This will create a new display only if the source's
+      // output can be displayed by the element inspector.
+      srcDisplay = 
+        pqApplicationCore::instance()->getObjectBuilder()->createDataDisplay(
+          source, this->Implementation->ViewModule);
+      }
+
+    // If there is an active selection for this source,
+    // we always give it a preference.
+    if (this->Implementation->SelectionManager->getSelectedSource()
+      == source)
+      {
+      this->showOnly(this->Implementation->SelectionDisplayer);
+      }
+    else
+      {
+      vtkSMGenericViewDisplayProxy* displayProxy = (srcDisplay?  
+         vtkSMGenericViewDisplayProxy::SafeDownCast(srcDisplay->getProxy()):0);
+      this->showOnly(displayProxy);
+      }
+    }
+
+  emit this->endNonUndoableChanges();
+  this->Implementation->ViewModule->render();
 }
 
 //-----------------------------------------------------------------------------
@@ -288,16 +363,73 @@ void pqElementInspectorWidget::setSelectionManager(pqSelectionManager* selMan)
   if (selMan)
     {
     QObject::connect(selMan, SIGNAL(selectionChanged(pqSelectionManager*)),
-      this, SLOT(onSelectionChanged()), Qt::QueuedConnection);
+      this, SLOT(onSelectionChanged()));
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqElementInspectorWidget::onSelectionChanged()
 {
-  // We'll simply refresh the view, if the current source has any
-  // selection, we'll show it.
-  this->onSourceChanged();
+  // The selection has changed, either a new selection was created
+  // or an old one cleared.
+
+  // * Remove the old selection displayer, if any.
+  if (this->Implementation->SelectionDisplayer)
+    {
+    emit this->beginNonUndoableChanges();
+    pqSMAdaptor::setElementProperty(
+      this->Implementation->SelectionDisplayer->GetProperty("Visibility"), 0);
+    pqSMAdaptor::removeProxyProperty(
+      this->Implementation->ViewModule->getProxy()->GetProperty("Displays"),
+      this->Implementation->SelectionDisplayer);
+    this->Implementation->SelectionDisplayer->UpdateVTKObjects();
+    this->Implementation->ViewModule->getProxy()->UpdateVTKObjects();
+    this->Implementation->SelectionDisplayer = 0;
+    emit this->endNonUndoableChanges();
+    }
+
+  pqPipelineSource* selectedSource = 
+    this->Implementation->SelectionManager->getSelectedSource();
+  if (selectedSource)
+    {
+    emit this->beginNonUndoableChanges();
+    this->Implementation->SelectionDisplayer = 
+      this->Implementation->SelectionManager->getClientSideDisplayer(
+        selectedSource);
+    pqSMAdaptor::setElementProperty(
+      this->Implementation->SelectionDisplayer->GetProperty("Visibility"), 0);
+    this->Implementation->SelectionDisplayer->UpdateVTKObjects();
+    pqSMAdaptor::addProxyProperty(
+      this->Implementation->ViewModule->getProxy()->GetProperty("Displays"),
+      this->Implementation->SelectionDisplayer);
+    this->Implementation->ViewModule->getProxy()->UpdateVTKObjects();
+    emit this->endNonUndoableChanges();
+
+    this->inspect(selectedSource);
+    }
+  else
+    {
+    this->inspect(this->Implementation->CurrentSource);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqElementInspectorWidget::onSourceRemoved(pqPipelineSource* source)
+{
+  // Cleanup displays for the source.
+  pqConsumerDisplay* srcDisplay = 
+    source->getDisplay(this->Implementation->ViewModule);
+  if (srcDisplay)
+    {
+    emit this->beginNonUndoableChanges();
+    bool was_visible = srcDisplay->isVisible();
+    pqApplicationCore::instance()->getObjectBuilder()->destroy(srcDisplay);
+    emit this->endNonUndoableChanges();
+    if (was_visible)
+      {
+      this->Implementation->ViewModule->render();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

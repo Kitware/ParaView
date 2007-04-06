@@ -73,9 +73,8 @@ public:
     { return this->ViewType; }
 
 public slots:
-  /// Request a StillRender. Default implementation simply calls
-  /// forceRender(). Subclasses can implement a delayed/buffered render.
-  virtual void render() { this->forceRender(); }
+  /// Request a StillRender on idle. Multiple calls are collapsed into one. 
+  virtual void render();
 
   /// Forces an immediate render.
   virtual void forceRender();

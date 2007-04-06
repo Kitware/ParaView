@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
+#include "pqElementInspectorViewModule.h"
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqPluginManager.h"
@@ -472,6 +473,11 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* vie
 //-----------------------------------------------------------------------------
 void pqViewManager::onViewModuleAdded(pqGenericViewModule* view)
 {
+  if (qobject_cast<pqElementInspectorViewModule*>(view))
+    {
+    // Ignore element inspector view modules.
+    return;
+    }
   this->assignFrame(view);
 }
 
@@ -571,6 +577,12 @@ pqMultiViewFrame* pqViewManager::getFrame(pqGenericViewModule* view) const
 //-----------------------------------------------------------------------------
 void pqViewManager::onViewModuleRemoved(pqGenericViewModule* view)
 {
+  if (qobject_cast<pqElementInspectorViewModule*>(view))
+    {
+    // Ignore element inspector view modules.
+    return;
+    }
+
   pqMultiViewFrame* frame = this->getFrame(view);
   if (frame)
     {

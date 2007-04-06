@@ -229,7 +229,8 @@ void pqExtractSelectionPanel::updateInformationAndDomains()
   pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(
     this->referenceProxy());
   
-  pqPipelineSource* input = filter->getInput(0);
+  pqPipelineSource* input = (filter->getInputCount() > 0)?
+    filter->getInput(0) : 0;
   if (!input)
     {
     return;

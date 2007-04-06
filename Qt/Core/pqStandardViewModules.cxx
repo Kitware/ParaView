@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 
 #include "pqBarChartDisplay.h"
+#include "pqElementInspectorViewModule.h"
 #include "pqLineChartDisplay.h"
 #include "pqPlotViewModule.h"
 #include "pqTableViewModule.h"
@@ -53,7 +54,8 @@ QStringList pqStandardViewModules::viewTypes() const
   return QStringList() << 
     pqPlotViewModule::barChartType() << 
     pqPlotViewModule::XYPlotType() << 
-    pqTableViewModule::tableType();
+    pqTableViewModule::tableType() <<
+    pqElementInspectorViewModule::eiViewType();
 }
 
 QStringList pqStandardViewModules::displayTypes() const
@@ -65,11 +67,21 @@ QStringList pqStandardViewModules::displayTypes() const
 QString pqStandardViewModules::viewTypeName(const QString& type) const
 {
   if(type == pqPlotViewModule::barChartType())
+    {
     return pqPlotViewModule::barChartTypeName();
+    }
   else if(type == pqPlotViewModule::XYPlotType())
+    {
     return pqPlotViewModule::XYPlotTypeName();
+    }
   else if(type == pqTableViewModule::tableType())
+    {
     return pqTableViewModule::tableTypeName();
+    }
+  else if (type == pqElementInspectorViewModule::eiViewType())
+    {
+    return pqElementInspectorViewModule::eiViewTypeName();
+    }
 
   return QString();
 }
@@ -94,7 +106,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
     {
     return pxm->NewProxy("views", "TableView");
     }
-
+  else if (viewtype == pqElementInspectorViewModule::eiViewType())
+    {
+    return pxm->NewProxy("views", "ElementInspectorView");
+    }
   return NULL;
 }
 
@@ -120,6 +135,12 @@ pqGenericViewModule* pqStandardViewModules::createView(const QString& viewtype,
     {
     return new pqTableViewModule(group, viewname, viewmodule, server, p);
     }
+  else if (viewtype == "ElementInspectorView")
+    {
+    return new pqElementInspectorViewModule(
+      group, viewname, viewmodule, server, p);
+    }
+
 
   return NULL;
 }
