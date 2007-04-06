@@ -433,6 +433,9 @@
    <property name="text" >
     <string>&amp;Open</string>
    </property>
+   <property name="statusTip" >
+    <string>Open</string>
+   </property>
    <property name="shortcut" >
     <string>Ctrl+O</string>
    </property>
@@ -444,6 +447,9 @@
    <property name="text" >
     <string>E&amp;xit</string>
    </property>
+   <property name="statusTip" >
+    <string>Exit</string>
+   </property>
    <property name="shortcut" >
     <string>Ctrl+Q</string>
    </property>
@@ -453,6 +459,9 @@
     <iconset/>
    </property>
    <property name="text" >
+    <string>About</string>
+   </property>
+   <property name="statusTip" >
     <string>About</string>
    </property>
   </action>
@@ -483,6 +492,9 @@
    <property name="toolTip" >
     <string>Toggle Color Legend Visibility</string>
    </property>
+   <property name="statusTip" >
+    <string>Toggle Color Legend Visibility</string>
+   </property>
   </action>
   <action name="actionServerConnect" >
    <property name="icon" >
@@ -491,6 +503,9 @@
    <property name="text" >
     <string>&amp;Connect</string>
    </property>
+   <property name="statusTip" >
+    <string>Connect</string>
+   </property>
   </action>
   <action name="actionServerDisconnect" >
    <property name="icon" >
@@ -498,6 +513,9 @@
    </property>
    <property name="text" >
     <string>&amp;Disconnect</string>
+   </property>
+   <property name="statusTip" >
+    <string>Disconnect</string>
    </property>
   </action>
   <action name="actionFileSaveScreenshot" >
@@ -620,6 +638,9 @@
     <string>Select Surface</string>
    </property>
    <property name="toolTip" >
+    <string>Select Surface</string>
+   </property>
+   <property name="statusTip" >
     <string>Select Surface</string>
    </property>
    <property name="shortcut" >
@@ -917,6 +938,9 @@
    <property name="text" >
     <string>Show Center</string>
    </property>
+   <property name="statusTip" >
+    <string>Show Center</string>
+   </property>
   </action>
   <action name="actionResetCenter" >
    <property name="enabled" >
@@ -926,6 +950,9 @@
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqResetCenter24.png</iconset>
    </property>
    <property name="text" >
+    <string>Reset Center</string>
+   </property>
+   <property name="statusTip" >
     <string>Reset Center</string>
    </property>
   </action>
@@ -1017,6 +1044,9 @@
     <string>Loop</string>
    </property>
    <property name="toolTip" >
+    <string>Loop</string>
+   </property>
+   <property name="statusTip" >
     <string>Loop</string>
    </property>
   </action>
