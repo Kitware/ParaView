@@ -2,12 +2,9 @@
   <ProxyGroup name="sources">
    <SourceProxy name="GlyphSource2D" class="vtkGlyphSource2D" label="2D Glyph">
      <Documentation
-        long_help="2D glyph source"
-        short_help="Create a 3D arrow">
-The 2D Glyph source is used for generating a family of 2D glyphs, each of which lies in the x-y plane. There are two parameters for 2D Glyphs.
-Glyph type: The types of 2D glyphs that can be created are Vertex, Dash, Cross, Thick Cross, Triangle, Square, Circle, Diamond, Arrow, and Thick Arrow. The default is Arrow.
-Filled: If the glyph is filled, it is drawn as a solid polygon; otherwise it is drawn with only lines. By default Filled is off.
-The output of the 2D Glyph source is polygonal data.
+        long_help="Create a 2D glyph (e.g., arrow, cross, dash, etc.)"
+        short_help="Create a 2D glyph">
+The 2D Glyph source is used for generating a family of 2D glyphs, each of which lies in the x-y plane. The output of the 2D Glyph source is polygonal data.
      </Documentation>
      <IntVectorProperty 
         name="GlyphType" 
@@ -27,7 +24,7 @@ The output of the 2D Glyph source is polygonal data.
          <Entry value="10" text="ThickArrow"/>
        </EnumerationDomain>
        <Documentation>
-         Select the glyph type.
+         This property specifies the type of the 2D glyph.
        </Documentation>
      </IntVectorProperty>
 
@@ -38,7 +35,7 @@ The output of the 2D Glyph source is polygonal data.
         default_values="0" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Specify whether the glyph is filled (a polygon) or not (a closed polygon defined by line segments). This only applies to 2D closed glyphs.
+         If the value of this property is 1, the 2D glyph will be a filled polygon; otherwise, only the edges (line segments) will be included in the output. This only applies to closed 2D glyphs.
        </Documentation>
      </IntVectorProperty>
 
@@ -57,11 +54,9 @@ The output of the 2D Glyph source is polygonal data.
 
    <SourceProxy name="VectorText" class="vtkVectorText" label="3D Text">
      <Documentation
-        long_help="3D geometric representation of a text string." 
+        long_help="3D geometric representation of a text string" 
         short_help="Create a 3D text object">
-The 3D Text source displays a text string as polygonal text. There is only one parameter for 3D Text.
-Text: Specify the text string to be displayed. The ASCII alphanumeric characters a-z, A-Z, and 0-9 are supported; so are ASCII punctuation marks. The only supported control character is "\n", which inserts a new line in the text string. The default value is "3D Text".
-The output of the 3D Text source is polygonal data.
+The 3D Text source displays a text string as polygonal data.
      </Documentation>
      <StringVectorProperty
         name="Text"
@@ -69,7 +64,7 @@ The output of the 3D Text source is polygonal data.
         number_of_elements="1"
         default_values="3D Text">
         <Documentation>
-          Enter the text to display.
+          This property contains the text string to be displayed. The ASCII alphanumeric characters a-z, A-Z, and 0-9 are supported; so are ASCII punctuation marks. The only supported control character is "\n", which inserts a new line in the text string.
         </Documentation>
      </StringVectorProperty>
    <!-- End 3DText -->
@@ -77,15 +72,9 @@ The output of the 3D Text source is polygonal data.
 
    <SourceProxy name="ArrowSource" class="vtkPVArrowSource" label="Arrow">
       <Documentation
-        long_help="3D arrow with a long cylindrical shaft and a cone for the tip." 
+        long_help="3D arrow with a long cylindrical shaft and a cone for the tip"
         short_help="Create a 3D arrow">
-The Arrow source appends a cylinder to a cone to form a 3D arrow. The parameters for the Arrow source are as follows.
-Tip resolution: Set the number of faces in the representation of the tip of the arrow (the cone). As the resolution increases, the cone will become smoother. The default value is 6.
-Tip radius: Specify the radius of the tip of the arrow (the cone). The length of the whole arrow is 1.0 unit. The default value is 0.1 units.
-Tip length: Specify the length of the tip. The value ranges between 0.0 units and 1.0 unit (the length of the whole arrow). The default is 0.35 units.
-Shaft resolution: Set the number of faces of the shaft of the arrow (the cylinder). As the resolution increases, the cylinder will become smoother. The default value is 6.
-Shaft radius: Specify the radius of the shaft of the arrow (the cylinder). The length of the whole arrow is 1.0 unit. The default value is 0.03 unit.
-The output of the Arrow source is polygonal data. This polygonal data will not contain normals, so rendering of the arrow will be performed using flat shading. The appearance of the arrow can be improved without significantly increasing the resolution of the tip and shaft by generating normals (Normals generation filter).
+The Arrow source appends a cylinder to a cone to form a 3D arrow. The length of the whole arrow is 1.0 unit. The output of the Arrow source is polygonal data. This polygonal data will not contain normals, so rendering of the arrow will be performed using flat shading. The appearance of the arrow can be improved without significantly increasing the resolution of the tip and shaft by generating normals. (Use Normals Generation filter).
       </Documentation>
       <IntVectorProperty
          name="TipResolution"
@@ -94,11 +83,10 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
          default_values="6" >
         <IntRangeDomain name="range" min="1" max="128" />
         <Documentation>
-          Set the number of faces on the tip.
+          This property specifies the number of faces in the representation of the tip of the arrow (the cone). As the resolution increases, the cone will become smoother.
         </Documentation>
       </IntVectorProperty>
 
-<!-- TODO Why the arbitrary ranges? Check the arrow sources-->
 <!-- These arbitrary ranges come from the header file for vtkArrowSource.-->
       <DoubleVectorProperty
          name="TipRadius"
@@ -107,7 +95,7 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
          default_values="0.1" >
         <DoubleRangeDomain name="range" min="0" max="10" />
         <Documentation>
-          Set the radius of the widest part of the tip.
+          This property specifies the radius of the widest part of the tip of the arrow (the cone).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -118,7 +106,7 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
          default_values="0.35" >
         <DoubleRangeDomain name="range" min="0" max="1" />
         <Documentation>
-          Set the length of the tip (the whole arrow is length 1).
+          This property specifies the length of the tip.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -129,7 +117,7 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
          default_values="6" >
         <IntRangeDomain name="range" min="0" max="128" />
         <Documentation>
-          Set the number of faces on the shaft.
+          This property specifies the number of faces of the shaft of the arrow (the cylinder). As the resolution increases, the cylinder will become smoother.
         </Documentation>
       </IntVectorProperty>
 
@@ -140,7 +128,7 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
          default_values="0.03" >
         <DoubleRangeDomain name="range" min="0" max="5" />
         <Documentation>
-          Set the radius of the shaft.
+          This property specifies the radius of the shaft of the arrow (the cylinder).
         </Documentation>
       </DoubleVectorProperty>
    <!-- End Arrow -->
@@ -148,13 +136,9 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
 
    <SourceProxy name="Axes" class="vtkAxes" label="Axes">
       <Documentation
-         long_help="Three lines representing the axes - red line along X, green line along Y, and blue line along Z." 
+         long_help="Three lines representing the axes - red line along X, green line along Y, and blue line along Z"
          short_help="Create three lines representing X, Y and Z axes">
-The Axes source can be used to add a representation of the coordinate system axes to the 3D scene. The X axis will be drawn as a blue line, the Y axis as a green line, and the Z axis as a red line. The axes can be drawn either as three lines drawn in the positive direction from the origin or as three lines crossing at the origin (drawn in both the positive and negative directions). The Axes source has the following parameters.
-Scale: By default the axes lines have a length of 1 (or 1 in each direction, for a total length of 2, if the Symmetric option is selected). This value can be changed to make the axes larger or smaller.
-Origin: These entry boxes can be used to change the origin of the axes. The default origin of the axes is at (0, 0, 0).
-Symmetric: When the Symmetric option is selected, the axes extend along both the positive and negative directions for a distance equal to the scale value. When unchecked (the default) the axes extend only in the positive direction.
-The output of the Axes source is polygonal data. This polygonal data has a scalar per line so that the lines can be colored. It also has normals defined.
+The Axes source can be used to add a representation of the coordinate system axes to the 3D scene. The X axis will be drawn as a blue line, the Y axis as a green line, and the Z axis as a red line. The axes can be drawn either as three lines drawn in the positive direction from the origin or as three lines crossing at the origin (drawn in both the positive and negative directions). The output of the Axes source is polygonal data. This polygonal data has a scalar per line so that the lines can be colored. It also has normals defined.
       </Documentation>
       <DoubleVectorProperty
          name="ScaleFactor"
@@ -163,7 +147,7 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
-          Set the size of the axes.
+          By default the axes lines have a length of 1 (or 1 in each direction, for a total length of 2, if value of the Symmetric property is 1). Increasing or decreasing the value of this property will make the axes larger or smaller, respectively.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -174,7 +158,7 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the x, y, z coordinates of the origin of the axes.
+          The values of this property set the X, Y, and Z coordinates of the origin of the axes.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -185,7 +169,7 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
         default_values="0" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Select whether to display the negative axes.
+         When this property is set to 1, the axes extend along each of the positive and negative directions for a distance equal to the value of the Scale Factor property. When set to 0, the axes extend only in the positive direction.
        </Documentation>
      </IntVectorProperty>
    <!-- End Axes -->
@@ -194,7 +178,8 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
    <SourceProxy name="OutlineSource" label="Outline" class="vtkOutlineSource">
       <Documentation
          long_help="3D outline of the specified bounds." 
-         short_help="Create an outline from the bounds.">
+         short_help="Create an outline from the bounds">
+         The Outline source creates an axis aligned bounding box given the user-specified minimum and maximum coordinates for each axis.
       </Documentation>
       <DoubleVectorProperty
          name="Bounds"
@@ -202,7 +187,7 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
          number_of_elements="6"
          default_values="0 1 0 1 0 1" >
          <Documentation>
-           Set the minimum and maximum X, Y, and Z coordinates (X min, X max, Y min, Y max, Z min, Z max) for drawing the outline.
+           The values of this property specify the minimum and maximum X, Y, and Z coordinates (X min, X max, Y min, Y max, Z min, Z max) for drawing the outline.
          </Documentation>
       </DoubleVectorProperty>
    <!-- End OutlineSource -->
@@ -210,14 +195,9 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
 
    <SourceProxy name="CubeSource" class="vtkCubeSource" label="Box">
       <Documentation
-         long_help="3D box with specified X, Y, and Z lengths." 
-         short_help="Create a box with specified X, Y, and Z lengths.">
-The Box source can be used to add a box to the 3D scene. The Box source has the following parameters.
-X Length: This value specifies the length of the box along the X axis. By default the X length of the box is 1.
-Y Length: This value specifies the length of the box along the Y axis. By default the Y length of the box is 1.
-Z Length: This value specifies the length of the box along the Z axis. By default the Z length of the box is 1.
-Center: These three values represent the coordinate at the center of the box. By default the box is centered at (0, 0, 0).
-The output of the Box source is polygonal data containing both normals and texture coordinates.
+         short_help="3D box with specified X, Y, and Z lengths" 
+         long_help="Create a box with specified X, Y, and Z lengths.">
+The Box source can be used to add a box to the 3D scene. The output of the Box source is polygonal data containing both normals and texture coordinates.
       </Documentation>
       <DoubleVectorProperty
          name="XLength"
@@ -227,7 +207,7 @@ The output of the Box source is polygonal data containing both normals and textu
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
-          Set the length of the cube in the x direction.
+          This property specifies the length of the box in the X direction.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -239,7 +219,7 @@ The output of the Box source is polygonal data containing both normals and textu
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
-          Set the length of the cube in the y direction.
+          This property specifies the length of the box in the Y direction.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -251,7 +231,7 @@ The output of the Box source is polygonal data containing both normals and textu
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
-          Set the length of the cube in the z direction.
+          This property specifies the length of the box in the Z direction.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -263,7 +243,7 @@ The output of the Box source is polygonal data containing both normals and textu
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the center of the cube.
+          This property specifies the center of the box.
         </Documentation>
       </DoubleVectorProperty>
    <!-- End Box -->
@@ -271,14 +251,9 @@ The output of the Box source is polygonal data containing both normals and textu
 
    <SourceProxy name="ConeSource" class="vtkConeSource" label="Cone">
       <Documentation
-        long_help="3D cone of a given radius and height." 
-        short_help="Create a 3D cone of a given radius and height">
-The Cone source can be used to add a polygonal cone to the 3D scene. The Cone source has the following parameters.
-Resolution: This value indicates the number of divisions around the cone. The higher this number, the closer the polygonal approximation will come to representing a cone, and the more polygons it will contain. The default resolution is 6.
-Radius: This is the radius of the cone. The default value is 0.5.
-Height: This is the height of the cone. The default value is 1.0.
-Capping: This check box indicates whether the cone is capped (i.e., there is a polygon closing off the wide end of the cone) or open. By default the cone is capped.
-The output of the Cone source is polygonal data.
+        short_help="3D cone of a given radius and height" 
+        long_help="Create a 3D cone of a given radius and height.">
+The Cone source can be used to add a polygonal cone to the 3D scene. The output of the Cone source is polygonal data.
       </Documentation>
       <IntVectorProperty
          name="Resolution"
@@ -288,7 +263,7 @@ The output of the Cone source is polygonal data.
          default_values="6" >
         <IntRangeDomain name="range" min="0" max="512" />
         <Documentation>
-          Set the number of faces on the cone.
+          This property indicates the number of divisions around the cone. The higher this number, the closer the polygonal approximation will come to representing a cone, and the more polygons it will contain.
         </Documentation>
       </IntVectorProperty>
 
@@ -300,7 +275,7 @@ The output of the Cone source is polygonal data.
          default_values="0.5" >
         <DoubleRangeDomain name="range" min="0"/>
         <Documentation>
-          Set the radius of the base of the cone.
+          This property specifies the radius of the base of the cone.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -312,7 +287,7 @@ The output of the Cone source is polygonal data.
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
-          Set the height of the cone.
+          This property specifies the height of the cone.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -324,7 +299,7 @@ The output of the Cone source is polygonal data.
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
          <Documentation>
-           Set the center of the cone.
+           This property specifies the center of the cone.
          </Documentation>
       </DoubleVectorProperty>
 
@@ -336,7 +311,7 @@ The output of the Cone source is polygonal data.
         default_values="1" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Set whether to draw the base of the cone.
+         If this property is set to 1, the base of the cone will be capped with a filled polygon. Otherwise, the base of the cone will be open.
        </Documentation>
      </IntVectorProperty>
    <!-- End Cone -->
@@ -346,7 +321,8 @@ The output of the Cone source is polygonal data.
                 label="Hierarchical Fractal">
       <Documentation
         long_help="Test source for AMR with HierarchicalDataSet" 
-        short_help="HierarchicalFractal">
+        short_help="Hierarchical fractal">
+The Hierarchical Fractal source is a collection of uniform grids. All have the same dimensions. Each block has a different origin and spacing. This source uses the Mandelbrot source to create cell data. The fractal array is scaled to look like a volme fraction.
       </Documentation>
       <IntVectorProperty
          name="Dimensions"
@@ -355,7 +331,7 @@ The output of the Cone source is polygonal data.
          default_values="10" >
         <IntRangeDomain name="range" min="2" max="64" />
         <Documentation>
-          XYZ cell dimensions of a block
+          This property specifies the X, Y, Z cell dimensions of a block.
         </Documentation>
       </IntVectorProperty>
 
@@ -366,7 +342,7 @@ The output of the Cone source is polygonal data.
          default_values="9.5" >
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
-          Map this value to 0.5 for use as a volume fraction.
+          The value of this property will be mapped to 0.5 for use as a volume fraction.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -377,7 +353,7 @@ The output of the Cone source is polygonal data.
          default_values="5" >
         <IntRangeDomain name="range" min="1" max="10" />
         <Documentation>
-          Determines how deep to refine the grid.
+          This property specifies how many levels of refinement should be included in this hierarchical dataset.
         </Documentation>
       </IntVectorProperty>
 
@@ -388,7 +364,7 @@ The output of the Cone source is polygonal data.
          default_values="1">
         <BooleanDomain name="bool"/>
         <Documentation>
-          Set whether to generate overlapping ghost levels.
+          This property specifies whether ghost levels should be generated at processor boundaries.
         </Documentation>
       </IntVectorProperty>
 
@@ -399,7 +375,7 @@ The output of the Cone source is polygonal data.
          default_values="1">
         <BooleanDomain name="bool"/>
         <Documentation>
-          Generate a 2D AMR fractal.
+          If this property is set to 1, the generated dataset will be 2D; otherwise it will be 3D.
         </Documentation>
       </IntVectorProperty>
 
@@ -410,7 +386,7 @@ The output of the Cone source is polygonal data.
          default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
-          Specify whether all the blocks should be the same size. If the dataset is asymetric, some blocks will have an X dimension that is larger by 2.
+          If this property is set to 0, all the blocks will be the same size. If it is set to 1, an asymmetric dataset will be created: some blocks will have an X dimension that is larger by 2 units.
         </Documentation>
       </IntVectorProperty>
 
@@ -421,7 +397,7 @@ The output of the Cone source is polygonal data.
          default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
-          Set whether to generate rectilinear grids or uniform grids.
+          If this property is set to 1, the hierarchical dataset will contain rectilinear grids; otherwise it will contain uniform grids.
         </Documentation>
       </IntVectorProperty>
 
@@ -443,7 +419,7 @@ The output of the Cone source is polygonal data.
            </RequiredProperties>
         </IntRangeDomain>
         <Documentation>
-          Set the current timestep.
+          This property specifies the timestep to use for this dataset.
         </Documentation>
       </IntVectorProperty>
 
@@ -452,15 +428,9 @@ The output of the Cone source is polygonal data.
 
    <SourceProxy name="CylinderSource" class="vtkCylinderSource" label="Cylinder">
       <Documentation
-         long_help="3D cylinder of a given radius and height." 
-          short_help="Create a 3D cylinder of a given radius and height">
-The Cylinder source can be used to add a polygonal cylinder to the 3D scene. The following parameters can be set for the Cylinder source.
-Resolution: This value indicates the number of divisions around the cylinder. The higher this number, the closer the polygonal approximation will come to representing a cylinder, and the more polygons it will contain. The default resolution is 6.
-Height: This is the height of the cylinder. The default value is 1.0.
-Radius: This is the radius of the cylinder. The default value is 0.5.
-Center: These three values represent the coordinate value at the center of the cylinder. By default, the cylinder is centered at (0, 0, 0).
-Capping: This check box indicates whether the cylinder is capped (i.e., each end of the cylinder is closed off by a polygon) or open. By default the cylinder is capped.
-The output of the Cylinder source is polygonal data containing both normals and texture coordinates.
+         short_help="3D cylinder of a given radius and height"
+         long_help="Create a 3D cylinder of a given radius and height.">
+The Cylinder source can be used to add a polygonal cylinder to the 3D scene. The output of the Cylinder source is polygonal data containing both normals and texture coordinates.
       </Documentation>
       <IntVectorProperty
          name="Resolution"
@@ -469,7 +439,7 @@ The output of the Cylinder source is polygonal data containing both normals and 
          default_values="6" >
         <IntRangeDomain name="range" min="2" max="512" />
         <Documentation>
-          Set the number of facets used to define the cylinder.
+          This property indicates the number of divisions around the cylinder. The higher this number, the closer the polygonal approximation will come to representing a cylinder, and the more polygons it will contain.
         </Documentation>
       </IntVectorProperty>
 
@@ -481,7 +451,7 @@ The output of the Cylinder source is polygonal data containing both normals and 
          default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
-          Set the height of the cylinder (along the y axis).
+          This property specifies the height of the cylinder (along the y axis).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -492,7 +462,7 @@ The output of the Cylinder source is polygonal data containing both normals and 
          default_values="0.5" >
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
-          Set the radius of the cylinder.
+          This property specifies the radius of the cylinder.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -504,7 +474,7 @@ The output of the Cylinder source is polygonal data containing both normals and 
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the center of the cylinder.
+          This property specifies the coordinate value at the center of the cylinder.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -515,7 +485,7 @@ The output of the Cylinder source is polygonal data containing both normals and 
         default_values="1" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Set whether to draw the ends of the cylinder.
+         If this property is set to 1, the ends of the cylinder will each be capped with a closed polygon. Otherwise, the ends of the cylinder will be open.
        </Documentation>
      </IntVectorProperty>
    <!-- End Cylinder -->
@@ -523,14 +493,9 @@ The output of the Cylinder source is polygonal data containing both normals and 
 
    <SourceProxy name="LineSource" class="vtkLineSource" label="Line">
       <Documentation
-         long_help="Line between two points. The resolution indicates how many segments are in the line." 
+         long_help="This source creates a line between two points. The resolution indicates how many segments are in the line." 
          short_help="Create a line between two points">
-The Line source can be used to interactively (using a 3D widget) or manually (using the entries on the user interface) add a line to the 3D scene. The Line source has the following parameters.
-Point 1: These three values indicate the coordinates of one of the two end points of the line. Moving one of the end points of the 3D widget will change these values. The default coordinates of Point 1 are (-0.5, 0, 0).
-Point 2: These three values indicate the coordinates of the other of the two end points of the line. Moving the other end point of the 3D widget will change these values. The default coordinates of Point 2 are (0.5, 0, 0).
-Resolution: This value represents the number of line segments in the output line. By default this value is 1. As opposed to some other sources (e.g., the sphere, cone, and cylinder), increasing the resolution does not increase the accuracy of the line; it simply increases the number of colinear line segments defining the line. This can sometimes be useful when using the output as input to a filter.
-There is also a Visibility check box in the Line Widget area of the parameters. This check box toggles the visibility of the 3D line widget.
-The output of the Line source is polygonal data.
+The Line source can be used to interactively (using a 3D widget) or manually (using the entries on the user interface) add a line to the 3D scene. The output of the Line source is polygonal data.
       </Documentation>
       <DoubleVectorProperty
          name="Point1"
@@ -540,7 +505,7 @@ The output of the Line source is polygonal data.
          default_values="0.0 0.0 0.0" >
          <DoubleRangeDomain name="range" />
          <Documentation>
-           Set the coordinates of the first endpoint of the line.
+           This property controls the coordinates of the first endpoint of the line.
          </Documentation>
       </DoubleVectorProperty>
 
@@ -552,7 +517,7 @@ The output of the Line source is polygonal data.
          default_values="0.0 0.0 0.0" >
          <DoubleRangeDomain name="range" />
          <Documentation>
-           Set the coordinates of the second endpoint of the line.
+           This property controls the coordinates of the second endpoint of the line.
          </Documentation>
       </DoubleVectorProperty>
 
@@ -563,7 +528,7 @@ The output of the Line source is polygonal data.
          default_values="6" >
         <IntRangeDomain name="range" min="1" />
         <Documentation>
-          Set the number of pieces to divide the line into.
+          This property specifies the number of pieces into which to divide the line.
         </Documentation>
       </IntVectorProperty>
 
@@ -580,15 +545,9 @@ The output of the Line source is polygonal data.
    <SourceProxy name="ImageMandelbrotSource" class="vtkImageMandelbrotSource"
                 label="Mandelbrot">
       <Documentation
-        long_help="Representation (unsigned char ) of the Mandlebrot set in up to 3 dimensions." 
+        long_help="Representation (unsigned char) of the Mandlebrot set in up to 3 dimensions"
         short_help="Create a Mandelbrot representation">
-The Mandelbrot source can be used to add a uniform rectilinear grid with scalar values derived from the Mandelbrot set to the 3D scene. The equation used is z = z2 + C (where z and C are complex). The scalar values in the grid are the number of iterations of the equation it takes for the magnitude of the value to become greater than 2. In the equation, the initial value of z is 0. By default, the real component of C is mapped onto the X axis; the imaginary component of C is mapped onto the Y axis; and the imaginary component of the initial value is mapped onto the Z axis. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed. The following parameters of the Mandelbrot source can be controlled.
-Extent: These six values indicate the X, Y, and Z extent of the output data. The first two numbers are the minimum and maximum X extent; the next two are the minimum and maximum Y extent; and the final two are the minimum and maximum Z extent. The numbers are inclusive, so the default values of 0, 250, 0, 250, 0, 0 indicate that the dimensions of the output will be 251 x 251 x 1.
-Sub-space: These three values allow you to set the projection from the 4D space to the axes of the 3D volume. By default, the real component of C (represented by 0) is mapped to the X axis; the imaginary component of C (represented by 1) is mapped to the Y axis; and the real component of X, the initial value (represented by 2) is mapped to the Z axis. The imaginary component of X is represented by 3. All values entered must be between 0 and 3, inclusive.
-Origin: These four values indicate the components of C (real and imaginary) and the components of the initial value, X (real and imaginary). The first two numbers represent the real and imaginary components of C, and the last two indicate the real and imaginary components of X. The default values are -1.75, -1.25, 0, and 0.
-Size: These four values indicate the length of the output in each of the four dimensions. (The three dimensions specified in the Sub-space will determine which of these values specify the length of the axes in the output.) The default values are 2.5, 2.5, 2, and 1.5
-Max. iterations: This number indicates the maximum number of iteration to perform in order to determine if the value will go above 2. The default value is 100.
-The output of the Mandelbrot source is image (uniform rectilinear) data.
+The Mandelbrot source can be used to add a uniform rectilinear grid with scalar values derived from the Mandelbrot set to the 3D scene. The equation used is z = z^2 + C (where z and C are complex, and C is a constant). The scalar values in the grid are the number of iterations of the equation it takes for the magnitude of the value to become greater than 2. In the equation, the initial value of z is 0. By default, the real component of C is mapped onto the X axis; the imaginary component of C is mapped onto the Y axis; and the imaginary component of the initial value is mapped onto the Z axis. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed. The output of the Mandelbrot source is image (uniform rectilinear) data.
       </Documentation>
       <IntVectorProperty
          name="WholeExtent"
@@ -597,7 +556,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="0 250 0 250 0 0" >
         <IntRangeDomain name="range"/>
         <Documentation>
-          Set the minimum and maximum values of the dataset in each dimension.
+          The six values in the property indicate the X, Y, and Z extent of the output data. The first two numbers are the minimum and maximum X extent; the next two are the minimum and maximum Y extent; and the final two are the minimum and maximum Z extent. The numbers are inclusive, so values of 0, 250, 0, 250, 0, 0 indicate that the dimensions of the output will be 251 x 251 x 1.
         </Documentation>
       </IntVectorProperty>
 
@@ -608,7 +567,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="0 1 2" >
         <IntRangeDomain name="range"/>
         <Documentation>
-          Choose which axes of the data set to display.
+          The three values in this property allow you to specify the projection from the 4D space used by the Mandelbrot set to the axes of the 3D volume. By default, the real component of C (represented by 0) is mapped to the X axis; the imaginary component of C (represented by 1) is mapped to the Y axis; and the real component of X, the initial value (represented by 2) is mapped to the Z axis. The imaginary component of X is represented by 3. All values entered must be between 0 and 3, inclusive.
         </Documentation>
       </IntVectorProperty>
 
@@ -619,7 +578,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="-1.75 -1.25 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the imaginary and real values for C (constant) and X (initial value).
+          The four values of this property indicate (in order) the components of C (real and imaginary) and the components of the initial value, X (real and imaginary).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -630,7 +589,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="2.5 2.5 2.0 1.5" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the imaginary and real values for the size of the volume for C (constant) and X (initial value).
+          The four values of this property indicate the length of the output in each of the four dimensions (the real and imaginary components of C and the real and imaginary components of X). The three dimensions specified in the Projection Axes property will determine which of these values specify the length of the axes in the output.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -642,7 +601,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="100" >
         <IntRangeDomain name="range" min="1" max="5000" />
         <Documentation>
-          Set the limit on computational iterations. Values less than 2.0 after the specified number of iterations are considered in the fractal set.
+          The value of this property specifies the limit on computational iterations (i.e., the maximum number of iterations to perform to determine if the value will go above 2). Values less than 2.0 after the specified number of iterations are considered in the fractal set.
         </Documentation>
       </IntVectorProperty>
 
@@ -653,7 +612,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="1" >
         <IntRangeDomain name="range" min="1" />
         <Documentation>
-          Set the rate at which to subsample the volume. The extent of the dataset in each dimension will be divided by this value.
+          This property specifies the rate at which to subsample the volume. The extent of the dataset in each dimension will be divided by this value.
         </Documentation>
       </IntVectorProperty>
    <!-- End Mandelbrot -->
@@ -663,7 +622,8 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
                 label="Octree Fractal">
       <Documentation
          long_help="Test source for octree with Mandelbrot fractal" 
-         short_help="OctreeFractal">
+         short_help="Octree Fractal">
+         Create an octree from a Mandelbrot fractal. See the Mandelbrot source for a description of the variables used.
       </Documentation>
       <IntVectorProperty
          name="Dimension"
@@ -672,7 +632,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="2" >
         <IntRangeDomain name="range" min="1" max="3" />
         <Documentation>
-          Set the dimensionality of the fractal: 1D - Binary tree line, 2D - Quadtree plane, 3D - Octree volume.
+          This property specifies the dimensionality of the fractal: 1D - Binary tree line, 2D - Quadtree plane, 3D - Octree volume.
         </Documentation>
       </IntVectorProperty>
 
@@ -683,7 +643,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="5" >
         <IntRangeDomain name="range" min="2" max="11" />
         <Documentation>
-          Specify the maximum refinement level for the grid.
+          This property specifies the maximum refinement level for the grid.
         </Documentation>
       </IntVectorProperty>
 
@@ -694,7 +654,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="3" >
         <IntRangeDomain name="range" min="1" max="10" />
         <Documentation>
-          Specify the minimum refinement level for the grid.
+          This property specifies the minimum refinement level for the grid.
         </Documentation>
       </IntVectorProperty>
 
@@ -705,7 +665,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="0 1 2" >
         <IntRangeDomain name="range"/>
         <Documentation>
-          Choose which axes of the data set to display.
+          This property indicates which axes of the dataset to display. See Mandelbrot source for a description of the possible axes.
         </Documentation>
       </IntVectorProperty>
 
@@ -716,7 +676,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="-1.75 -1.25 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the imaginary and real values for C (constant) and X (initial value).
+          This property specifies the imaginary and real values for C (constant) and X (initial value). See Mandelbrot source for a description of the C and X variables.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -727,7 +687,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="2.5 2.5 2.0 1.5" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the imaginary and real values for the size of the volume for C (constant) and X (initial value).
+          The four values of this property indicate the length of the output in each of the four dimensions (the real and imaginary components of C and the real and imaginary components of X). The three dimensions specified in the Projection Axes property will determine which of these values specify the length of the axes in the output.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -739,7 +699,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="100" >
         <IntRangeDomain name="range" min="1" max="5000" />
         <Documentation>
-          Specify the limit on computational iterations. Values less than 2.0 after the specified number of iterations are considered in the fractal set.
+          The value of this property specifies the limit on computational iterations (i.e., the maximum number of iterations to perform to determine if the value will go above 2). Values less than 2.0 after the specified number of iterations are considered in the fractal set.
         </Documentation>
       </IntVectorProperty>
 
@@ -750,7 +710,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
          default_values="2.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          The threshold value determine when to subdivide a leaf node.
+          This property specifies a threshold value that determines when to subdivide a leaf node.
         </Documentation>
       </DoubleVectorProperty>      
 
@@ -759,15 +719,9 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
 
    <SourceProxy name="PlaneSource" class="vtkPlaneSource" label="Plane">
       <Documentation
-        long_help="Parallelogram given an origin and two points. The resolution indicates the number of division along each axis of the plane." 
+        long_help="Create a parallelogram given an origin and two points. The resolution indicates the number of division along each axis of the plane." 
         short_help="Create a parallelogram from an origin and two points">
-The Plane source can be used to add a polygonal parallelogram to the 3D scene. Unlike the sphere, cone, and cylinder sources, the parallelogram is exactly represented at the lowest resolution, but higher resolutions may be desired if this plane is to be used as an input to a filter. The Plane source has the following parameters.
-Origin: The origin is the location of one of the corners of the parallelogram. By default this coordinate is (-0.5, -0.5, 0).
-First point: This coordinate represents the location of a second corner of the parallelogram. One edge of the parallelogram will be the line connecting the origin with this first point. This will be considered the X axis of the parallelogram. The default coordinate of the First point is (0.5, -0.5, 0).
-Second point: This coordinate represents the location of a third corner of the parallelogram. One edge of the parallelogram will be the line connecting the origin with this second point. This will be considered the Y axis of the parallelogram. The default coordinate of the Second point is (-0.5, 0.5, 0).
-X resolution: This is the number of divisions along the X axis of the parallelogram. By default this value is 1.
-Y resolution: This is the number of divisions along the Y axis of the parallelogram. By default this value is 1.
-The output of the Plane source is polygonal data.
+The Plane source can be used to add a polygonal parallelogram to the 3D scene. Unlike the sphere, cone, and cylinder sources, the parallelogram is exactly represented at the lowest resolution, but higher resolutions may be desired if this plane is to be used as an input to a filter. The output of the Plane source is polygonal data.
       </Documentation>
       <DoubleVectorProperty
          name="Origin"
@@ -777,7 +731,7 @@ The output of the Plane source is polygonal data.
          default_values="-0.5 -0.5 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the position of the origin of the plane.
+          This property specifies the 3D coordinate of the origin (one corner) of the plane.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -789,7 +743,7 @@ The output of the Plane source is polygonal data.
          default_values="0.5 -0.5 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the position of the point defining the first axis of the plane.
+          This property specifies the 3D coordinate a second corner of the parallelogram. The line connecting this point and that specified by the Origin property define one edge of the parallelogram (its X axis).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -801,7 +755,7 @@ The output of the Plane source is polygonal data.
          default_values="-0.5 0.5 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the position of the point defining the second axis of the plane.
+          This property specifies the 3D coordinate a third corner of the parallelogram. The line connecting this point and that specified by the Origin property define a second edge of the parallelogram (its Y axis).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -812,7 +766,7 @@ The output of the Plane source is polygonal data.
          default_values="1" >
         <IntRangeDomain name="range" min="1" />
         <Documentation>
-          Set the number of divisions along the X axis.
+          This property specifies the number of divisions along the X axis of the parallelogram.
         </Documentation>
       </IntVectorProperty>
 
@@ -823,7 +777,7 @@ The output of the Plane source is polygonal data.
          default_values="1" >
         <IntRangeDomain name="range" min="1" />
         <Documentation>
-          Set the number of divisions along the Y axis.
+          This property specifies the number of divisions along the Y axis of the parallelogram.
         </Documentation>
       </IntVectorProperty>
    <!-- End Plane -->
@@ -831,7 +785,7 @@ The output of the Plane source is polygonal data.
 
    <SourceProxy name="PointSource" class="vtkPointSource">
       <Documentation long_help="Create a point cloud of a certain size, radius, and center."
-                     short_help="Create a point cloud.">
+                     short_help="Create a point cloud">
 The point source creates a specified number of points within a given radius about a specified center point. 
       </Documentation>
       <DoubleVectorProperty
@@ -842,7 +796,7 @@ The point source creates a specified number of points within a given radius abou
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the center of the point cloud.
+          This property specifies the 3D coordinates of the center of the point cloud.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -854,7 +808,7 @@ The point source creates a specified number of points within a given radius abou
          default_values="1" >
          <IntRangeDomain name="range" min="1"/>
          <Documentation>
-           Set the number of points in the point cloud.
+           This property specifies the number of points in the point cloud.
          </Documentation>
       </IntVectorProperty>
 
@@ -866,7 +820,7 @@ The point source creates a specified number of points within a given radius abou
          default_values="0.0" >
         <DoubleRangeDomain name="range" min="0"/>
         <Documentation>
-          Set the radius of the point cloud, measured from the specified center point.
+          This property specifies the radius of the point cloud, measured from the value of the Center property.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -882,18 +836,9 @@ The point source creates a specified number of points within a given radius abou
 
    <SourceProxy name="SphereSource" class="vtkSphereSource" label="Sphere">
       <Documentation
-         long_help="3D sphere given a center and radius." 
+         long_help="Create a 3D sphere given a center and radius." 
          short_help="Create a 3D sphere">
-The Sphere source can be used to add a polygonal sphere to the 3D scene. The following parameters are available for the Sphere source.
-Center: This coordinate represents the center of the sphere. By default this value is (0, 0, 0).
-Radius: This is the radius of the sphere. The default value is 0.5.
-Theta Resolution: This number represents the number of divisions between Start Theta and End Theta around the sphere. The theta divisions are similar to longitude lines on the earth. The higher the resolution, the closer the approximation will come to a sphere, and the more polygons there will be. The default Theta Resolution is 8.
-Start Theta: To form a complete sphere, the Start Theta value should be 0 degrees, and the End Theta value should be 360 degrees. The Start Theta value can be adjusted to form only a portion of a sphere. The default value is 0 degrees.
-End Theta: The End Theta value can be adjusted to form only a portion of a sphere. The default End Theta value is 360 degrees.
-Phi Resolution: This number represents the number of divisions between Start Phi and End Phi on the sphere. The phi divisions are similar to latitude lines on the earth. The default Phi Resolution value is 8.
-Start Phi: To form a complete sphere, the Start Phi value should be 0 degrees, and the End Phi value should be 180 degrees. The Start Phi value can be adjusted to form only a portion of a sphere. The default value is 0 degrees.
-End Phi: The End Phi value can be adjusted to form only a portion of a sphere. The default End Phi value is 180 degrees.
-The output of the Sphere source is polygonal data with point normals defined.
+The Sphere source can be used to add a polygonal sphere to the 3D scene. The output of the Sphere source is polygonal data with point normals defined.
       </Documentation>
        
       <DoubleVectorProperty
@@ -904,7 +849,7 @@ The output of the Sphere source is polygonal data with point normals defined.
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the coordinates for the center of the sphere.
+          This property specifies the 3D coordinates for the center of the sphere.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -916,7 +861,7 @@ The output of the Sphere source is polygonal data with point normals defined.
          default_values="0.5" >
         <DoubleRangeDomain name="range" min="0"/>
         <Documentation>
-          Set the radius of the sphere.
+          This property specifies the radius of the sphere.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -927,7 +872,7 @@ The output of the Sphere source is polygonal data with point normals defined.
          default_values="8" >
         <IntRangeDomain name="range" min="3" max="1024" />
         <Documentation>
-          Set the number of points in the longitudinal direction (ranging from StartTheta to EndTheta).
+          The value of this property represents the number of divisions between Start Theta and End Theta around the sphere. (See the Start Theta and End Theta properties.) The theta divisions are similar to longitude lines on the earth. The higher the resolution, the closer the approximation will come to a sphere, and the more polygons there will be.
         </Documentation>
       </IntVectorProperty>
 
@@ -939,7 +884,7 @@ The output of the Sphere source is polygonal data with point normals defined.
          default_values="0" >
         <DoubleRangeDomain name="range" min="0" max="360" />
         <Documentation>
-          Set the starting angle (in degrees) in the longitudinal direction.
+          To form a complete sphere, the value of this property should be 0 degrees, and the value of the End Theta property should be 360 degrees. The value of this property can be adjusted to form only a portion of a sphere.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -951,7 +896,7 @@ The output of the Sphere source is polygonal data with point normals defined.
          default_values="360" >
         <DoubleRangeDomain name="range" min="0" max="360" />
         <Documentation>
-          Set the ending angle (in degrees) in the longitudinal direction.
+          The value of this property can be adjusted to form only a portion of a sphere. This value is measured in degrees.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -962,7 +907,7 @@ The output of the Sphere source is polygonal data with point normals defined.
          default_values="8" >
         <IntRangeDomain name="range" min="3" max="1024" />
         <Documentation>
-          Set the number of points in the latitudinal direction (ranging from StartPhi to EndPhi).
+          The value of this property represents the number of divisions between Start Phi and End Phi on the sphere. (See the Start Phi and End Phi properties.) The phi divisions are similar to latitude lines on the earth.
         </Documentation>
       </IntVectorProperty>
 
@@ -974,6 +919,7 @@ The output of the Sphere source is polygonal data with point normals defined.
          default_values="0" >
         <DoubleRangeDomain name="range" min="0" max="180" />
         <Documentation>
+          To form a complete sphere, the value of this property should be 0 degrees, and the value of the End Phi property should be 180 degrees. The value of this property can be adjusted to form only a portion of a sphere.
           Set the starting angle (in degrees) in the latitudinal direction.
         </Documentation>
       </DoubleVectorProperty>
@@ -986,7 +932,7 @@ The output of the Sphere source is polygonal data with point normals defined.
          default_values="180" >
         <DoubleRangeDomain name="range" min="0" max="180" />
         <Documentation>
-          Set the ending angle (in degrees) in the latitudinal direction.
+          The value of this property can be adjusted to form only a portion of a sphere. The value is measured in degrees.
         </Documentation>
       </DoubleVectorProperty>
    <!-- End Sphere -->
@@ -995,19 +941,9 @@ The output of the Sphere source is polygonal data with point normals defined.
    <SourceProxy name="SuperquadricSource" class="vtkSuperquadricSource"
                 label="Superquadric">
       <Documentation
-         long_help="Superquadric according to the theta and phi roundness parameters. This one function can generate a wide variety of 3D objects including a box, a sphere, or a torus." 
+         long_help="Create a superquadric according to the theta and phi roundness parameters. This one source can generate a wide variety of 3D objects including a box, a sphere, or a torus." 
          short_help="Create a superquadric according to the theta and phi roundness parameters">
-The Superquadric source can be used to add a polygonal superquadric to the 3D scene. This source can be used to create a wide variety of shapes (e.g., a sphere, a box, or a torus) by adjusting the roundness parameters. The Superquadric source has the following parameters.
-Center: This coordinate represents the center of the superquadric. By default this value is (0, 0, 0).
-Scale: These three values can be used to scale the superquadric in X, Y, and Z. The normals will be computed correctly even with anisotropic scaling. By default all three values are set to 1.
-Theta resolution: This number represents the number of divisions in the theta (longitudinal) direction. The default Theta Resolution value is 16. This value will be rounded to the nearest multiple of 8.
-Phi resolution: This number represents the number of divisions in the phi (latitudinal) direction. The default Phi Resolution value is 16. This number will be rounded to the nearest multiple of 4.
-Thickness: If the Toroidal box is checked, this value represents the thickness of the object as a value between 0 and 1. A value close to 0 leads to a thin object with a large hole, and a value near 1 leads to a thick object with a very small hole.
-Theta roundness: Define the roundness in the theta (longitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes. The default value is 1.
-Phi roundness: Define the roundness in the phi (latitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes. The default value is 1.
-Size: This value represents an isotropic size of the superquadric. By default it is 0.5. Note that both the Size and Thickness parameters control coefficients of superquadric generation, so the Size value may not exactly describe the size of the superquadric.
-Toroidal: If this box is not checked (the default), the generated superquadric will not contain a hole. If checked, a toroidal object is generated.
-The output of the Superquadric source is polygonal data with point normals and texture coordinates defined.
+The Superquadric source can be used to add a polygonal superquadric to the 3D scene. This source can be used to create a wide variety of shapes (e.g., a sphere, a box, or a torus) by adjusting the roundness parameters. The output of the Superquadric source is polygonal data with point normals and texture coordinates defined.
       </Documentation>
        
       <DoubleVectorProperty
@@ -1018,7 +954,7 @@ The output of the Superquadric source is polygonal data with point normals and t
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the coordinates of the center of the superquadric.
+          This property specifies the 3D coordinates of the center of the superquadric.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1029,7 +965,7 @@ The output of the Superquadric source is polygonal data with point normals and t
          default_values="1.0 1.0 1.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the scale of the superquadric along the X, Y, and Z axes.
+          The three values in this property are used to scale the superquadric in X, Y, and Z. The surface normals will be computed correctly even with anisotropic scaling.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1040,7 +976,7 @@ The output of the Superquadric source is polygonal data with point normals and t
          default_values="16" >
         <IntRangeDomain name="range" min="8" max="1024" />
         <Documentation>
-          Set the number of points in the longitudinal direction.
+          The value of this property represents the number of divisions in the theta (longitudinal) direction. This value will be rounded to the nearest multiple of 8.
         </Documentation>
       </IntVectorProperty>
 
@@ -1051,7 +987,7 @@ The output of the Superquadric source is polygonal data with point normals and t
          default_values="16" >
         <IntRangeDomain name="range" min="4" max="1024" />
         <Documentation>
-          Set the number of points in the latitudinal direction.
+          The value of this property represents the number of divisions in the phi (latitudinal) direction. This number will be rounded to the nearest multiple of 4.
         </Documentation>
       </IntVectorProperty>
 
@@ -1062,7 +998,7 @@ The output of the Superquadric source is polygonal data with point normals and t
          default_values="0.3333" >
         <DoubleRangeDomain name="range" min="0.0001" max="1" />
         <Documentation>
-          When the superquadric is toroidal, specify the distance between the inner and outer radii of the superquadric. Changing the thickness does not change the outer radius of the superquadric.
+          If the value of the Toroidal property is 1, this value represents the thickness of the superquadric as a value between 0 and 1. A value close to 0 leads to a thin object with a large hole, and a value near 1 leads to a thick object with a very small hole. Changing the thickness does not change the outer radius of the superquadric.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1074,7 +1010,7 @@ The output of the Superquadric source is polygonal data with point normals and t
          default_values="1" >
         <DoubleRangeDomain name="range" min="0.01" />
         <Documentation>
-          Specify how round the superquadric will be in the longitudinal direction. Values range from 0 (rectangular) to 1 (circular) to higher order.
+          This property defines the roundness of the superquadric in the theta (longitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1086,7 +1022,7 @@ The output of the Superquadric source is polygonal data with point normals and t
          default_values="1" >
         <DoubleRangeDomain name="range" min="0.01" />
         <Documentation>
-          Specify how round the superquadric will be in the latitudinal direction. Values range from 0 (rectangular) to 1 (circular) to higher order.
+          This property defines the roundness in the phi (latitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1097,7 +1033,7 @@ The output of the Superquadric source is polygonal data with point normals and t
          default_values="0.5" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Specify the isotropic size of the superquadric.
+          The value of this property represents the isotropic size of the superquadric. Note that both the Size and Thickness properties control coefficients of superquadric generation, so the value of this property may not exactly describe the size of the superquadric.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1109,7 +1045,7 @@ The output of the Superquadric source is polygonal data with point normals and t
         default_values="1" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Determine whether the superquadric is toroidal or ellipsoidal.
+         If the value of this property is 0, the generated superquadric will not contain a hole (i.e., the superquadric will be ellipsoidal). Otherwise, a toroidal object is generated.
        </Documentation>
      </IntVectorProperty>
    <!-- End SuperQuadric -->
@@ -1117,22 +1053,11 @@ The output of the Superquadric source is polygonal data with point normals and t
 
    <SourceProxy name="RTAnalyticSource" class="vtkRTAnalyticSource" label="Wavelet">
       <Documentation
-         long_help="Regular rectilinear grid in up to three dimensions with values varying according to a periodic function."
-         short_help="Create a Wavelet">
+         long_help="Create a regular rectilinear grid in up to three dimensions with values varying according to a periodic function."
+         short_help="Create a rectilinear grid containing a wavelet">
 The Wavelet source can be used to create a uniform rectilinear grid in up to three dimensions with values varying according to the following periodic function.
 OS = M * G * (XM * sin(XF * x) + YM * sin(YF * y) + ZM * cos(ZF * z))
-OS is the output scalar; M represents the maximum value; G represents the Gaussian; XM, YM, and ZM are the X, Y, and Z magnitude values; and XF, YF, and ZF are the X, Y, and Z frequency values. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed. The Wavelet source has the following parameters.
-Extent: These six values indicate the X, Y, and Z extent of the output data. The first two values represent the minimum and maximum X indices, the next two are the minimum and maximum Y indices, and the last two are the minimum and maximum Z indices. By default each axis ranges from -10 to 10.
-Center: This coordinate represents the center of the output data. By default this is (0, 0, 0).
-Maximum: This value is used to scale the scalar values in the output. The default value is 255.
-X Freq.: This is the XF value from the above equation. The default value is 60.
-Y Freq.: This is the YF value from the above equation. The default value is 30.
-Z Freq.: This is the ZF value from the above equation. The default value is 40.
-X Mag.: This is the XM value from the above equation. The default value is 10.
-Y Mag.: This is the YM value from the above equation. The default value is 18.
-Z Mag.: This is the ZM value from the above equation. The default value is 5.
-Standard dev.: The standard deviation is used in the generation of the Gaussian value in the above equation. The default value is 0.5.
-The output of the Wavelet source is image (uniform rectilinear) data.
+OS is the output scalar; M represents the maximum value; G represents the Gaussian; XM, YM, and ZM are the X, Y, and Z magnitude values; and XF, YF, and ZF are the X, Y, and Z frequency values. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed.
       </Documentation>
       <IntVectorProperty
          name="WholeExtent"
@@ -1141,7 +1066,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="-10 10 -10 10 -10 10" >
         <IntRangeDomain name="range"/>
         <Documentation>
-          Set the range (dimensions) of the function along the X, Y, and Z axes.
+          The six values in this property indicate the X, Y, and Z extent of the output data. The first two values represent the minimum and maximum X indices, the next two are the minimum and maximum Y indices, and the last two are the minimum and maximum Z indices.
         </Documentation>
       </IntVectorProperty>
 
@@ -1153,7 +1078,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the center of the dataset.
+          This property specifies the 3D coordinates of the center of the dataset.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1164,7 +1089,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="255.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the maximum value of the function.
+          This parameter specifies the maximum value (M) of the function.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1176,7 +1101,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="60.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the natural frequency in X.
+          This property specifies the natural frequency in X (XF in the equation).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1188,7 +1113,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="30.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the natural frequency in Y.
+          This property specifies the natural frequency in Y (XY in the equation).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1200,7 +1125,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="40.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the natural frequency in Y.
+          This property specifies the natural frequency in Z (XZ in the equation).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1211,7 +1136,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="10.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the wave amplitude in X.
+          This property specifies the wave amplitude in X (XM in the equation).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1222,7 +1147,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="18.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the wave amplitude in Y.
+          This property specifies the wave amplitude in Y (YM in the equation).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1233,7 +1158,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="5.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the wave amplitude in Z.
+          This property specifies the wave amplitude in Z (ZM in the equation).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1244,7 +1169,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="0.5" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the standard deviation of the gaussian used in computing this function.
+          This property specifies the standard deviation of the Gaussian used in computing this function.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1255,7 +1180,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="1" >
         <IntRangeDomain name="range" min="1" />
         <Documentation>
-          Set the rate at which to subsample the volume. The extent of the dataset in each dimension will be divided by this value.
+          This property specifies the rate at which to subsample the volume. The extent of the dataset in each dimension will be divided by this value. (See the Whole Extent property.)
         </Documentation>
       </IntVectorProperty>
    <!-- End Wavelet -->
@@ -1281,13 +1206,18 @@ The output of the Wavelet source is image (uniform rectilinear) data.
 
    <SourceProxy name="TextSource" class="vtkPVTextSource" 
       label="Text">
+     <Documentation
+       short_help="Display text"
+       long_help="The Text source generates a table containing text." >
+       The Text source is used to generate a 1x1 vtkTable with a single text string.
+     </Documentation>
      <StringVectorProperty
        name="Text"
        command="SetText"
        number_of_elements="1"
        default_values="Text">
         <Documentation>
-          Enter the text to display.
+          This property specifies the text to display.
         </Documentation>
      </StringVectorProperty>
    <!-- End of TextSource -->
@@ -1350,9 +1280,9 @@ The output of the Wavelet source is image (uniform rectilinear) data.
    <SourceProxy name="TimeToTextConvertorSource" class="vtkTimeToTextConvertor"
      label="Annotate Time" >
      <Documentation
-        short_help="Show animation time as text."
+        short_help="Show animation time as text"
         long_help="Shows the animation time as text annnotation in the view." >
-      Source that can be used to show the animation time in text annotation.
+      The Annotate Time source can be used to show the animation time in text annotation.
      </Documentation>
      <StringVectorProperty
        name="Format"
@@ -1360,7 +1290,7 @@ The output of the Wavelet source is image (uniform rectilinear) data.
        number_of_elements="1"
        default_values="Time: %f">
        <Documentation>
-         Format used to display the input time (using printf style).
+         This property specifies the format used to display the input time (using printf style).
        </Documentation>
      </StringVectorProperty>
      <!-- End of TimeToTextConvertorSource -->
