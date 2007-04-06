@@ -99,6 +99,11 @@ public:
         vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
         break;
       }
+    int a;
+    if(a == 0)
+      {
+      int breakhere = 1;
+      }
   }
 
   /// Converts VTK debug output into Qt signals
@@ -118,7 +123,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.17");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.18");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -239,6 +244,7 @@ void pqProcessModuleGUIHelper::SendPrepareProgress()
   // in other words, the progress will be enabled when a current
   // process is taking long enough
   this->Implementation->ReadyEnableProgress = true;
+  this->Implementation->LastProgress = vtkTimerLog::GetUniversalTime();
 }
 
 //-----------------------------------------------------------------------------
@@ -256,29 +262,42 @@ void pqProcessModuleGUIHelper::SendCleanupPendingProgress()
 void pqProcessModuleGUIHelper::SetLocalProgress(const char* text, 
   int progress)
 {
-  double lastprog = vtkTimerLog::GetUniversalTime();
-  if (!this->Implementation->ReadyEnableProgress)
+  // forgive those who don't call SendPrepareProgress beforehand
+  if(this->Implementation->EnableProgress == false &&
+     this->Implementation->ReadyEnableProgress == false &&
+     progress == 0)
     {
-    this->Implementation->LastProgress = lastprog;
+    this->SendPrepareProgress();
     return;
     }
+  
+  // forgive those who don't cleanup or want to go the extra mile
+  if(progress >= 100)
+    {
+    this->SendCleanupPendingProgress();
+    return;
+    }
+
+  // only forward progress events to the GUI 
+  // if we get at least .3 seconds since the last time we forwarded the progress
+  // event
+  double lastprog = vtkTimerLog::GetUniversalTime();
   if ( lastprog - this->Implementation->LastProgress < .3 )
     {
     return;
     }
 
-  // delayed progress starting
+  // delayed progress starting so the progress bar doesn't flicker
+  // so much for the quick operations
   if(this->Implementation->EnableProgress == false)
     {
     this->Implementation->EnableProgress = true;
     this->Implementation->ApplicationCore->prepareProgress();
     }
-
+  
   this->Implementation->LastProgress = lastprog;
-  if ( progress == 0 || progress > 100 )
-    {
-    return;
-    }
+  
+  // chop of "vtk" prefix
   if ( strlen(text) > 4 && text[0] == 'v' && text[1] == 't' && text[2] == 'k' )
     {
     text += 3;
