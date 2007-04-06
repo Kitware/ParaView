@@ -2018,16 +2018,18 @@
         update_self="1">
       </Property>
 
+      <Property 
+        name="InteractiveRender" 
+        command="InteractiveRender" 
+        update_self="1">
+      </Property>
+
       <DoubleVectorProperty
         name="ViewTime"
         number_of_elements="1"
         default_values="0">
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
-
-      <Property name="InteractiveRender" 
-        command="InteractiveRender" update_self="1">
-      </Property>
 
       <ProxyProperty
         name="Displays"
@@ -2085,6 +2087,13 @@
       base_proxygroup="rendermodules" base_proxyname="ViewModule"
       display_name="TableDisplay">
     </ViewModuleProxy>
+
+    <ViewModuleProxy name="ElementInspectorView"
+      base_proxygroup="rendermodules" base_proxyname="ViewModule"
+      display_name="ElementInspectorDisplay">
+    </ViewModuleProxy>
+
+    <!-- End of views -->
   </ProxyGroup>
   
   <ProxyGroup name="interactors">
@@ -3737,6 +3746,10 @@
     </GenericViewDisplayProxy>
 
     <GenericViewDisplayProxy name="TableDisplay"
+      base_proxygroup="displays" base_proxyname="GenericViewDisplay">
+    </GenericViewDisplayProxy>
+
+    <GenericViewDisplayProxy name="ElementInspectorDisplay"
       base_proxygroup="displays" base_proxyname="GenericViewDisplay">
     </GenericViewDisplayProxy>
 
