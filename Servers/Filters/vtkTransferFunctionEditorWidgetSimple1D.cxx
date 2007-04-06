@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.27");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.28");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -651,8 +651,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::UpdateFromTransferFunctions()
   vtkTransferFunctionEditorRepresentationSimple1D *rep =
     vtkTransferFunctionEditorRepresentationSimple1D::SafeDownCast(
       this->WidgetRep);
+  unsigned int activeHandle = 0;
   if (rep)
     {
+    activeHandle = rep->GetActiveHandle();
     rep->RemoveAllHandles();
     }
 
@@ -786,6 +788,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::UpdateFromTransferFunctions()
       }
     }
 
+  if (activeHandle < this->Nodes->size() && rep)
+    {
+    rep->SetActiveHandle(activeHandle);
+    }
   this->UpdateTransferFunctionMTime();
 }
 
@@ -1286,8 +1292,6 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetColorSpace(int space)
       this->ColorFunction->HSVWrapOn();
       break;
     }
-
-  this->UpdateTransferFunctionMTime();
 }
 
 //----------------------------------------------------------------------------
