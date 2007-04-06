@@ -84,7 +84,7 @@ public:
   QPointer<pqSignalAdaptorKeyFrameTime> TimeAdaptor;
   QPointer<pqKeyFrameTimeValidator> KeyFrameTimeValidator;
   QPointer<pqAnimationScene> ActiveScene;
-  QPointer<pqRenderViewModule> ActiveView;
+  QPointer<pqRenderViewModule> ActiveRenderView;
 
   QPointer<QLineEdit> ToolbarCurrentTimeWidget;
   QPointer<QSpinBox> ToolbarCurrentTimeIndexWidget;
@@ -585,9 +585,9 @@ void pqAnimationPanel::onCurrentSourceChanged(int index)
   if (index != -1)
     {
     QString pname = this->Internal->sourceName->itemText(index);
-    if (pname == "Camera" && this->Internal->ActiveView)
+    if (pname == "Camera" && this->Internal->ActiveRenderView)
       {
-      src = this->Internal->ActiveView;
+      src = this->Internal->ActiveRenderView;
       }
     else
       {
@@ -610,12 +610,12 @@ void pqAnimationPanel::onCurrentSourceChanged(int index)
 void pqAnimationPanel::onActiveViewChanged(pqGenericViewModule* view)
 {
   pqRenderViewModule* rview = qobject_cast<pqRenderViewModule*>(view);
-  if (this->Internal->ActiveView == rview)
+  if (this->Internal->ActiveRenderView == rview)
     {
     return;
     }
 
-  this->Internal->ActiveView = rview;
+  this->Internal->ActiveRenderView = rview;
   if (rview && this->Internal->sourceName->findText("Camera") == -1)
     {
     this->Internal->sourceName->insertItem(0, "Camera",
@@ -638,7 +638,7 @@ void pqAnimationPanel::buildPropertyList()
     return;
     }
 
-  if (this->Internal->CurrentProxy == this->Internal->ActiveView)
+  if (this->Internal->CurrentProxy == this->Internal->ActiveRenderView)
     {
     // Render modules are never actulally animated, we animate their camera.
     pqAnimationPanel::pqInternals::PropertyInfo info;
@@ -746,7 +746,7 @@ void pqAnimationPanel::onCurrentPropertyChanged(int index)
 void pqAnimationPanel::resetCameraKeyFrameToCurrent()
 {
   vtkSMRenderModuleProxy* src = 
-    this->Internal->ActiveView->getRenderModuleProxy();
+    this->Internal->ActiveRenderView->getRenderModuleProxy();
   src->SynchronizeCameraProperties();
 
   vtkSMProxy* dest = this->Internal->ActiveKeyFrame;
@@ -853,7 +853,9 @@ void pqAnimationPanel::insertKeyFrame(int index)
       this->Internal->propertyName->itemData(
         this->Internal->propertyName->currentIndex()).value<
       pqAnimationPanel::pqInternals::PropertyInfo>();
-    if (info.Proxy == this->Internal->ActiveView->getProxy())
+    // Check is we are creating a camera cue or a regular cue.
+    if (this->Internal->ActiveRenderView && 
+      info.Proxy == this->Internal->ActiveRenderView->getProxy())
       {
       cue = scene->createCue(info.Proxy,
         info.Name.toAscii().data(), info.Index, "CameraManipulator");
