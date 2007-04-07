@@ -1,16 +1,16 @@
 <ParaViewFilters>
   <Category name="Common" menu_label="&amp;Common">
     <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
-    <Filter name="Clip" icon=":/pqWidgets/Icons/pqClip24.png"/>
     <Filter name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
-    <Filter name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid24.png"/>
-    <Filter name="ExtractLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
-    <Filter name="Glyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
-    <Filter name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
+    <Filter name="Clip" icon=":/pqWidgets/Icons/pqClip24.png"/>
     <Filter name="Cut" icon=":/pqWidgets/Icons/pqSlice24.png"/>
-    <Filter name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
     <Filter name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
+    <Filter name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid24.png"/>
+    <Filter name="Glyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
+    <Filter name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
     <Filter name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
+    <Filter name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
+    <Filter name="ExtractLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
   </Category>
 
   <Category name="DataAnalysis" menu_label="&amp;Data Analysis">
@@ -18,7 +18,9 @@
     <Filter name="ExtractCellSelection" />
     <Filter name="ExtractPointSelection" />
     <Filter name="ExtractHistogram" />
-    <Filter name="ExtractOverTime" />
+    <Filter name="IntegrateAttributes" />
+    <Filter name="ExtractCellsOverTime" />
+    <Filter name="ExtractPointsOverTime" />
     <Filter name="Probe" />
     <Filter name="Programmable Filter" />
   </Category>
