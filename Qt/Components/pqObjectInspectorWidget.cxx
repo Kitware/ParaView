@@ -116,6 +116,14 @@ public:
         {
         return new pqExtractSelectionPanel(proxy, p);
         }
+      if(QString("ExtractPointsOverTime") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqExtractSelectionPanel(proxy, p);
+        }
+      if(QString("ExtractCellsOverTime") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqExtractSelectionPanel(proxy, p);
+        }
       if(QString("Contour") == proxy->getProxy()->GetXMLName())
         {
         return new pqContourPanel(proxy, p);
@@ -146,6 +154,8 @@ public:
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractPointSelection") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractCellSelection") == proxy->getProxy()->GetXMLName() ||
+         QString("ExtractPointsOverTime") == proxy->getProxy()->GetXMLName() ||
+         QString("ExtractCellsOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName())
         {
         return true;
