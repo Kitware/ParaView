@@ -1,24 +1,157 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
-
-   <SourceProxy name="ExtractOverTime" 
-                class="vtkExtractArraysOverTime" 
-                label="Plot over Time">
-    <InputProperty
-       name="Input"
-       command="SetInputConnection">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources"/>
-            <Group name="filters"/>
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkDataSet"/>
-          </DataTypeDomain>
-          <Documentation>
-            This property specifies the input to the Extract over Time filter.
-          </Documentation>
+    
+   <ExtractSelectionProxy name="ExtractPointsOverTime"
+                          class="vtkPExtractArraysOverTime"
+                          label="Plot Point over Time"
+                          selection_field_type="POINT">
+     <Documentation>
+This filter extracts the variables associated with a point over time. The
+output is a 1D rectilinear grid where the x coordinates correspond to time
+(the same array is also copied to a point array named Time or TimeData (if
+Time exists in the input)).  The input point coordinates are copied to a
+point array named Point Coordinates or Points (if Point Coordinates exists
+in the input).
+     </Documentation>
+     <InputProperty
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input from which the selection is extracted.
+       </Documentation>
      </InputProperty>
-   </SourceProxy>
+
+     <IdTypeVectorProperty 
+        name="Indices"
+        command="AddIndex"
+        clean_command="RemoveAllIndices"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        number_of_elements="2"
+        update_self="1"
+        label="Indices" 
+        default_values="0 0">
+        <Documentation>
+          The list of IDs that will be added to the selection produced by the selection source.
+        </Documentation>
+     </IdTypeVectorProperty> 
+
+     <IdTypeVectorProperty 
+        name="GlobalIDs"
+        command="AddGlobalID"
+        clean_command="RemoveAllGlobalIDs"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        number_of_elements="1"
+        update_self="1"
+        label="Global IDs"
+        default_values="0">
+        <Documentation>
+          The list of Global IDs that will be added to the selection produced by the selection source.
+        </Documentation>
+     </IdTypeVectorProperty> 
+
+     <IntVectorProperty
+        name="UseGlobalIDs"
+        command="SetUseGlobalIDs"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use GlobalIDs (instead of Indices) to generate the selection.
+        </Documentation>
+     </IntVectorProperty>
+
+     <SubProxy>
+        <Proxy name="SelectionSource" proxygroup="sources"
+          proxyname="SelectionSource">
+        </Proxy>
+     </SubProxy>
+     <!-- End ExtractPointsOverTime -->
+   </ExtractSelectionProxy>
+
+   <ExtractSelectionProxy name="ExtractCellsOverTime"
+                          class="vtkPExtractArraysOverTime"
+                          label="Plot Cell over Time"
+                          selection_field_type="CELL">
+     <Documentation>
+This filter extracts the variables associated with a cell
+over time. The output is a 1D rectilinear grid where the x coordinates
+correspond to time (the same array is also copied to a point array named
+Time or TimeData (if Time exists in the input)).
+     </Documentation>
+     <InputProperty
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input from which the selection is extracted.
+       </Documentation>
+     </InputProperty>
+
+     <IdTypeVectorProperty 
+        name="Indices"
+        command="AddIndex"
+        clean_command="RemoveAllIndices"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        number_of_elements="2"
+        update_self="1"
+        label="Indices" 
+        default_values="0 0">
+        <Documentation>
+          The list of IDs that will be added to the selection produced by the selection source.
+        </Documentation>
+     </IdTypeVectorProperty> 
+
+     <IdTypeVectorProperty 
+        name="GlobalIDs"
+        command="AddGlobalID"
+        clean_command="RemoveAllGlobalIDs"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        number_of_elements="1"
+        update_self="1"
+        label="Global IDs"
+        default_values="0">
+        <Documentation>
+          The list of Global IDs that will be added to the selection produced by the selection source.
+        </Documentation>
+     </IdTypeVectorProperty> 
+
+     <IntVectorProperty
+        name="UseGlobalIDs"
+        command="SetUseGlobalIDs"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use GlobalIDs (instead of Indices) to generate the selection.
+        </Documentation>
+     </IntVectorProperty>
+
+     <SubProxy>
+        <Proxy name="SelectionSource" proxygroup="sources"
+          proxyname="SelectionSource">
+        </Proxy>
+     </SubProxy>
+     <!-- End ExtractCellsOverTime -->
+   </ExtractSelectionProxy>
 
    <SourceProxy name="ImageShrink" class="vtkImageShrink3D" label="Image Shrink">
     <Documentation
@@ -124,7 +257,7 @@ The Surface Vectors filter is used for 2D data sets. It constrains vectors to li
    </SourceProxy>
 
    <SourceProxy name="IntegrateAttributes" class="vtkIntegrateAttributes" 
-     label="Integrate Attributes">
+     label="Integrate Variables">
      <Documentation 
         long_help="This filter integrates cell and point attributes."
         short_help="Integrates over lines, surfaces or vectors.">
@@ -3731,7 +3864,7 @@ The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, 
    </SourceProxy>
 
    <SourceProxy name="ExtractGrid" class="vtkPVExtractVOI"
-    label="Extract Grid">
+    label="Extract Subset">
     <Documentation
        long_help="Extract a subgrid from a structured grid with the option of setting subsample strides."
        short_help="Extract a subgrid or subsample.">
