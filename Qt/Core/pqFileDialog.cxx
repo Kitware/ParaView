@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QMenu>
 #include <QLineEdit>
+#include <QAbstractButton>
 
 namespace {
 
@@ -163,7 +164,7 @@ pqFileDialog::pqFileDialog(
   this->Implementation->Ui.Files->setModel(&this->Implementation->FileFilter);
   this->Implementation->Ui.Files->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-  if(server && !server->isRemote())
+  if(server)
     {
     this->Implementation->Ui.Files->setContextMenuPolicy(Qt::CustomContextMenu);
     QObject::connect(this->Implementation->Ui.Files,
@@ -270,7 +271,7 @@ void pqFileDialog::onCreateNewFolder()
   //    actually creating a new directory but this way I could reuse code.
   QString dirName = QString("NewFolder");
   int i=0;
-  while(!this->Implementation->Model->makeDir(dirName))
+  while(!this->Implementation->Model->makeDirEntry(dirName))
     {
     dirName = QString("NewFolder" + QString::number(i++));
     }
@@ -301,19 +302,17 @@ void pqFileDialog::onCreateNewFolder()
   editor->selectAll();
   this->Implementation->Ui.Files->setIndexWidget(idx,editor); 
   this->Implementation->Ui.Files->scrollTo(idx); 
+  // Listen for when the user is finished editing
+  QObject::connect(editor,SIGNAL(editingFinished()),this,
+                  SLOT(onFinishedEditingNewFolderName()));
   editor->grabMouse();
   editor->grabKeyboard();
   this->Implementation->Ui.OK->setAutoDefault(false);
   //this->Implementation->Ui.OK->setDefault(false);
   QObject::disconnect(this->Implementation->Ui.Files, 
-                   SIGNAL(activated(const QModelIndex&)), 
-                   this, 
-                   SLOT(onActivateFile(const QModelIndex&)));
-
-  
-  // Listen for when the user is finished editing
-  QObject::connect(editor,SIGNAL(editingFinished()),this,
-                  SLOT(onFinishedEditingNewFolderName()));
+                  SIGNAL(activated(const QModelIndex&)), 
+                  this, 
+                  SLOT(onActivateFile(const QModelIndex&)));
 
   // Store vars that we'll need access to in the slots
   this->Implementation->TempFolderName = dirName;
@@ -331,7 +330,7 @@ void pqFileDialog::onFinishedEditingNewFolderName()
   QString newName = this->Implementation->FolderNameEditorWidget->text();
   
   // remove the placeholder directory before creating actual one:
-  this->Implementation->Model->removeDir(this->Implementation->TempFolderName);
+  this->Implementation->Model->removeDirEntry(this->Implementation->TempFolderName);
 
   if(!this->Implementation->Model->makeDir(newName))
     {
@@ -349,7 +348,6 @@ void pqFileDialog::onFinishedEditingNewFolderName()
                     SIGNAL(activated(const QModelIndex&)), 
                     this, 
                     SLOT(onActivateFile(const QModelIndex&)));
-
     return;
     }  
 
