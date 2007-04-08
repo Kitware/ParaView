@@ -121,18 +121,18 @@ pqLookmarkInspector::~pqLookmarkInspector()
 
 void pqLookmarkInspector::load()
 {
-  if(this->CurrentLookmark)
+  if(this->SelectedLookmarks.count()==1)
     {
-    emit this->loadLookmark(this->CurrentLookmark->getName());
+    emit this->loadLookmark(this->SelectedLookmarks.at(0));
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqLookmarkInspector::remove()
 { 
-  if(this->CurrentLookmark) //this->CurrentSelection.at(0).isValid())
+  if(this->SelectedLookmarks.count()==1) //this->CurrentSelection.at(0).isValid())
     {
-    emit this->removeLookmark(this->CurrentLookmark); //this->BrowserModel->getLookmarkName(this->CurrentSelection.at(0)));
+    emit this->removeLookmark(this->SelectedLookmarks.at(0)); //this->BrowserModel->getLookmarkName(this->CurrentSelection.at(0)));
     }
 
   // this should change the selection in the browser model which will call this->onLookmarkSelectionChanged()
@@ -141,36 +141,52 @@ void pqLookmarkInspector::remove()
 
 void pqLookmarkInspector::save()
 {
-  if(!this->CurrentLookmark)
+  if(this->SelectedLookmarks.count()==0)
     {
     return;
     }
-
-  // make sure the new name is not already taken
-  bool nameTaken = false;
-  for(int i=0; i<this->Model->getNumberOfLookmarks(); i++)
+  
+  if(this->SelectedLookmarks.count()==1)
     {
-    pqLookmarkModel *lmk = this->Model->getLookmark(i);
-    if(lmk!=this->CurrentLookmark && QString::compare(lmk->getName(),this->Form->LookmarkName->text())==0)
+    pqLookmarkModel *lookmark = this->Model->getLookmark(this->SelectedLookmarks.at(0));
+    if(!lookmark)
       {
-      nameTaken = true;
-      break;
+      return;
+      }
+    // make sure the new name is not already taken
+    bool nameTaken = false;
+    for(int i=0; i<this->Model->getNumberOfLookmarks(); i++)
+      {
+      pqLookmarkModel *lmk = this->Model->getLookmark(i);
+      if(lmk!=lookmark && QString::compare(lmk->getName(),this->Form->LookmarkName->text())==0)
+        {
+        nameTaken = true;
+        break;
+        }
+      }
+    if(nameTaken)
+      {
+      QMessageBox::warning(this, "Duplicate Name",
+            "The lookmark name already exists.\n"
+            "Please choose a different one.");
+
+      return;
+      }
+
+    lookmark->setName(this->Form->LookmarkName->text());
+    lookmark->setDescription(this->Form->LookmarkComments->toPlainText());
+    }
+
+  if(this->SelectedLookmarks.count()>=1)
+    {
+    for(int i=0; i<this->SelectedLookmarks.count(); i++)
+      {
+      pqLookmarkModel *lookmark = this->Model->getLookmark(this->SelectedLookmarks.at(i));
+      //this->CurrentLookmark->setRestoreDataFlag(this->Form->RestoreData->isChecked());
+      lookmark->setRestoreCameraFlag(this->Form->RestoreCamera->isChecked());
+      lookmark->setRestoreTimeFlag(this->Form->RestoreTime->isChecked());
       }
     }
-  if(nameTaken)
-    {
-    QMessageBox::warning(this, "Duplicate Name",
-          "The lookmark name already exists.\n"
-          "Please choose a different one.");
-
-    return;
-    }
-
-  this->CurrentLookmark->setName(this->Form->LookmarkName->text());
-  this->CurrentLookmark->setDescription(this->Form->LookmarkComments->toPlainText());
-  //this->CurrentLookmark->setRestoreDataFlag(this->Form->RestoreData->isChecked());
-  this->CurrentLookmark->setRestoreCameraFlag(this->Form->RestoreCamera->isChecked());
-  this->CurrentLookmark->setRestoreTimeFlag(this->Form->RestoreTime->isChecked());
 
   this->Form->SaveButton->setEnabled(false);
 }
@@ -184,6 +200,7 @@ void pqLookmarkInspector::onModified()
 //-----------------------------------------------------------------------------
 void pqLookmarkInspector::onLookmarkSelectionChanged(const QStringList &selected)
 {
+  this->SelectedLookmarks = selected;
 
   if(selected.isEmpty())
     {
@@ -201,8 +218,8 @@ void pqLookmarkInspector::onLookmarkSelectionChanged(const QStringList &selected
     this->Form->PropertiesFrame->hide();
     this->Form->ControlsFrame->show();
     this->Form->LoadButton->setEnabled(false);
-    this->Form->SaveButton->setEnabled(false);
-    this->Form->DeleteButton->setEnabled(true);
+    this->Form->SaveButton->setEnabled(true);
+    this->Form->DeleteButton->setEnabled(false);
     }  
   else if(selected.count()==1)
     {

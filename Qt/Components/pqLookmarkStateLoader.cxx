@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSmartPointer.h"
 
 #include <QPointer>
@@ -52,8 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqLookmarkSourceDialog.h"
 #include "pqPipelineModel.h"
-#include "pqGenericViewModule.h"
-#include "pqActiveView.h"
+#include "pqTimeKeeper.h"
 
 //-----------------------------------------------------------------------------
 class pqLookmarkStateLoaderInternal
@@ -66,12 +64,13 @@ public:
   pqPipelineModel *PipelineModel;
   bool RestoreCamera;
   bool RestoreTime;
+  pqTimeKeeper *TimeKeeper;
 };
 
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.8");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.9");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -82,6 +81,7 @@ pqLookmarkStateLoader::pqLookmarkStateLoader()
   this->Internal->PipelineModel = 0;
   this->Internal->RestoreCamera = false;
   this->Internal->RestoreTime = false;
+  this->Internal->TimeKeeper = 0;
 
   pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
   this->Internal->PipelineModel = new pqPipelineModel(*model);
@@ -103,6 +103,12 @@ void pqLookmarkStateLoader::SetRestoreCameraFlag(bool state)
 void pqLookmarkStateLoader::SetRestoreTimeFlag(bool state)
 {
   this->Internal->RestoreTime = state;
+}
+
+//-----------------------------------------------------------------------------
+void pqLookmarkStateLoader::SetTimeKeeper(pqTimeKeeper *timekeeper)
+{
+  this->Internal->TimeKeeper = timekeeper;
 }
 
 //-----------------------------------------------------------------------------
@@ -272,15 +278,50 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
 {
   if (strcmp(proxy->GetXMLGroup(), "sources")==0 )
     {
-    // If this is a source, don't load the state
-    return 1;
+    // remove properties whose name contains the string "FileName"
+    // properties named pointarraystatus or cellarraystatus should only be turned on, not off
+    QList<vtkPVXMLElement*> arrayElementsToRemove;
+    QList<vtkPVXMLElement*> fileElementsToRemove;
+    QList<vtkPVXMLElement*>::iterator iter;
+    unsigned int max = proxyElement->GetNumberOfNestedElements();
+    QString name;
+    for (unsigned int cc=0; cc < max; ++cc)
+      {
+      vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
+      name = element->GetAttribute("name");
+      if (element->GetName() == QString("Property") && name.contains("File"))
+        {
+        fileElementsToRemove.push_back(element);
+        }
+      else if (element->GetName() == QString("Property") &&
+         ( name.contains("PointArrayStatus") || name.contains("CellArrayStatus")))
+        {
+        arrayElementsToRemove.clear();
+        for(unsigned int cc1=0; cc1<element->GetNumberOfNestedElements(); cc1++)
+          {
+          vtkPVXMLElement *valueElement = element->GetNestedElement(cc1);
+          if(valueElement->GetName() == QString("Element") && strcmp(valueElement->GetAttribute("value"),"0")==0 )
+            {
+            arrayElementsToRemove.push_back(valueElement);
+            }
+          }
+        for(iter=arrayElementsToRemove.begin(); iter!=arrayElementsToRemove.end(); iter++)
+          {
+          element->RemoveNestedElement(*iter);
+          }
+        }
+      }
+
+    for(iter=fileElementsToRemove.begin(); iter!=fileElementsToRemove.end(); iter++)
+      {
+      proxyElement->RemoveNestedElement(*iter);
+      }
     }
-  
-  if (strcmp(proxy->GetXMLGroup(), "rendermodules")==0 )
+  else if (strcmp(proxy->GetXMLGroup(), "rendermodules")==0 )
     {
     unsigned int max = proxyElement->GetNumberOfNestedElements();
-    QList<vtkPVXMLElement*> toRemove;
     QString name;
+    QList<vtkPVXMLElement*> toRemove;
     for (unsigned int cc=0; cc < max; ++cc)
       {
       vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
@@ -308,26 +349,24 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
         if(this->Internal->RestoreTime)
           {
           vtkPVXMLElement *valElem = element->FindNestedElementByName("Element");
-          vtkSMDoubleVectorProperty *timeProp = 
-              vtkSMDoubleVectorProperty::SafeDownCast(
-                  pqActiveView::instance().current()->getProxy()->GetProperty(
-                        "ViewTime"));
-          if(valElem && timeProp)
+          if(valElem && this->Internal->TimeKeeper)
             {
             double viewTime;
             valElem->GetScalarAttribute("value",&viewTime);
-            timeProp->SetElement(0,viewTime);
+            this->Internal->TimeKeeper->setTime(viewTime);
             }
           }
         toRemove.push_back(element);
         }
       }
+
     QList<vtkPVXMLElement*>::iterator iter;
     for(iter=toRemove.begin(); iter!=toRemove.end(); iter++)
       {
       proxyElement->RemoveNestedElement(*iter);
       }
     }
+
 
   return this->Superclass::LoadProxyState(proxyElement, proxy);
 }

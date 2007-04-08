@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqLookmarkStateLoaderInternal;
 class pqPipelineSource;
+class pqTimeKeeper;
 class QStandardItem;
 
 // State loader for the lookmark state.
@@ -61,6 +62,8 @@ public:
   // The XML representation of the lookmark's pipeline hierarchy.
   // see pqLookmarkModel
   void SetPipelineHierarchy(vtkPVXMLElement*);
+
+  void SetTimeKeeper(pqTimeKeeper *timekeeper);
 
   void SetRestoreCameraFlag(bool state);
   void SetRestoreTimeFlag(bool state);

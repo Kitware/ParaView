@@ -75,7 +75,7 @@ pqLookmarkBrowser::pqLookmarkBrowser(pqLookmarkBrowserModel *model,
   QObject::connect(this->Form->LookmarkList->selectionModel(),
       SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
       this,
-      SLOT(onSelectionChanged(const QItemSelection &, const QItemSelection &)));
+      SLOT(onSelectionChanged()));
 
   // Listen for a lookmark to load.
   QObject::connect(this->Form->LookmarkList,
@@ -190,15 +190,15 @@ void pqLookmarkBrowser::updateButtons()
 
 }
 
-void pqLookmarkBrowser::onSelectionChanged(const QItemSelection &selection,
-    const QItemSelection &)
+void pqLookmarkBrowser::onSelectionChanged()
 {
   this->updateButtons();
 
   QStringList names;
-  for(int i=0;i<selection.indexes().size();i++)
+  QModelIndexList indices = this->Form->LookmarkList->selectionModel()->selectedRows();
+  for(int i=0;i<indices.size();i++)
     {
-    names.push_back(this->Model->getNameFor(selection.indexes().at(i)));
+    names.push_back(this->Model->getNameFor(indices.at(i)));
     }
   emit this->selectedLookmarksChanged(names);
 }

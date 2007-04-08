@@ -151,7 +151,7 @@ void pqLookmarkDefinitionWizard::createPipelinePreview()
       {
       if(consDisp->isVisible() )
         {
-        this->addToProxyCollection(consDisp,proxies);
+        this->addToProxyCollection(consDisp->getInput(),proxies);
         }
       }
     }
@@ -160,8 +160,6 @@ void pqLookmarkDefinitionWizard::createPipelinePreview()
   for(int i=smModel->getNumberOfSources()-1; i>=0; i--)
     {
     src = smModel->getPQSource(i);
-
-    // if a display is visible, add it, its pipeline source, and all its upstream inputs to the collection of proxies
     if( src )
       {
       if(!proxies->IsItemPresent(src->getProxy()))
@@ -244,38 +242,40 @@ void pqLookmarkDefinitionWizard::createLookmark()
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
 
   // Save a screenshot of the view to store with the lookmark
-  // FIXME: Is there a better way to do this? I tried using the vtkWindowToImageFilter but I don't know how to convert its output vtkImageData to an image format that QImage will understand
+  // FIXME: Is there a better way to do this? I tried using the 
+  //  vtkWindowToImageFilter but I don't know how to convert its output 
+  //  vtkImageData to an image format that QImage will understand
   QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renderModule->getWidget());  
   assert(widget);
-  //this->hide();
-  widget->GetRenderWindow()->Render();
-  widget->GetRenderWindow()->SetOffScreenRendering(1);
   renderModule->saveImage(150,150,"tempLookmarkImage.png");
-  widget->GetRenderWindow()->SetOffScreenRendering(0);
   QImage image("tempLookmarkImage.png","PNG");
   remove("tempLookmarkImage.png");
 
   vtkCollection *proxies = vtkCollection::New();
-  // Save visible displays and their sources, also any display/source pair upstream from a visible one in the pipeline:
+  // Save visible displays and their sources, also any display/source pair 
+  // upstream from a visible one in the pipeline:
   QList<pqDisplay*> displays = renderModule->getDisplays();
   QList<pqDisplay *>::Iterator iter;
   pqConsumerDisplay *consDisp;
   for(iter = displays.begin(); iter != displays.end(); ++iter)
     {
-    // if a display is visible, add it, its pipeline source, and all its upstream inputs to the collection of proxies
+    // if a display is visible, add it, its pipeline source, and all its 
+    //  upstream inputs to the collection of proxies
     if( (consDisp = dynamic_cast<pqConsumerDisplay*>(*iter)))
       {
       if(consDisp->isVisible() )
         {
-        this->addToProxyCollection(consDisp,proxies);
+        this->addToProxyCollection(consDisp->getInput(),proxies);
         }
       }
     }
 
-  // Get the XML representation of the contents of "proxies", as well as their referred proxies
+  // Get the XML representation of the contents of "proxies", as well as 
+  // their referred proxies
   vtkPVXMLElement *stateElement = proxyManager->SaveState(proxies, true);
 
-  // Collect all referred (proxy property) proxies of the render module EXCEPT its "Displays" These have been handled separately.
+  // Collect all referred (proxy property) proxies of the render module EXCEPT 
+  // its "Displays" These have been handled separately.
   proxies->RemoveAllItems();
   vtkSmartPointer<vtkSMPropertyIterator> pIter;
   pIter.TakeReference(smRen->NewPropertyIterator());
@@ -303,7 +303,8 @@ void pqLookmarkDefinitionWizard::createLookmark()
     }
   childElement->Delete();
 
-  // Now add the render module, but don't save its referred proxies, because we've dealt with them separately
+  // Now add the render module, but don't save its referred proxies, because 
+  // we've dealt with them separately
   proxies->RemoveAllItems();
   proxies->AddItem(smRen);
   childElement = proxyManager->SaveState(proxies, false);
@@ -337,24 +338,29 @@ void pqLookmarkDefinitionWizard::createLookmark()
 
 
 
-void pqLookmarkDefinitionWizard::addToProxyCollection(pqConsumerDisplay *disp, vtkCollection *proxies)
+void pqLookmarkDefinitionWizard::addToProxyCollection(pqPipelineSource *src, vtkCollection *proxies)
 {
   pqPipelineFilter *filter;
-  pqPipelineSource *src;
+  //pqPipelineSource *src;
   pqPipelineSource *input;
+  pqConsumerDisplay *disp;
 
-  if(!disp || !disp->getInput())
-    {
-    return;
-    }
+//  if(!disp || !disp->getInput())
+//    {
+//    return;
+//    }
 
-  src = disp->getInput();
+  //src = disp->getInput();
 
   // Add this display/source's proxy to the list if it has not already been added
 
-  if(!proxies->IsItemPresent(disp->getProxy()))
+  if(!proxies->IsItemPresent(src->getProxy()))
     {
-    proxies->AddItem(disp->getProxy());
+    // The source may or may not have a display in the view
+    if( (disp = src->getDisplay(this->ViewModule)) )
+      {
+      proxies->AddItem(disp->getProxy());
+      }
     proxies->AddItem(src->getProxy());
     }
 
@@ -364,7 +370,7 @@ void pqLookmarkDefinitionWizard::addToProxyCollection(pqConsumerDisplay *disp, v
     for(int i=0; i<filter->getInputCount(); i++)
       {
       input = filter->getInput(i);
-      this->addToProxyCollection(input->getDisplay(this->ViewModule),proxies);
+      this->addToProxyCollection(input,proxies);
       }
     }
 }

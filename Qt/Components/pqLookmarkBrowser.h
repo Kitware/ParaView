@@ -111,11 +111,7 @@ private slots:
 
   /// \brief
   ///   A house-keeping method to perform tasks that need to be done when the selection changes, like updating the button state.
-  ///
-  /// \param selected The list of newly selected items.
-  /// \param deselected The list of deselected items.
-  void onSelectionChanged(const QItemSelection &selected,
-      const QItemSelection &deselected);
+  void onSelectionChanged();
 
 signals:
   void loadLookmark(const QString &name);

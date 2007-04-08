@@ -86,7 +86,7 @@ signals:
   void saved(pqLookmarkModel*);
   void modified();
   void loadLookmark(const QString &name);
-  void removeLookmark(pqLookmarkModel*);
+  void removeLookmark(const QString &name);
 
 protected:
   void generatePipelineView();
@@ -95,7 +95,7 @@ protected:
 private:
 
   // The current selection in the lookmark browser
-  //QList<QModelIndex> CurrentSelection;
+  QList<QString> SelectedLookmarks;
   pqLookmarkModel *CurrentLookmark;
   pqLookmarkManagerModel *Model;
   //QStandardItemModel *PipelineModel;

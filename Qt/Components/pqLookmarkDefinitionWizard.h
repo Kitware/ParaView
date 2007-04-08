@@ -41,11 +41,11 @@ class pqLookmarkDefinitionWizardForm;
 class QModelIndex;
 class pqGenericViewModule;
 class vtkCollection;
-class pqConsumerDisplay;
 class pqFlatTreeView;
 class pqPipelineModel;
 class vtkPVXMLElement;
 class pqLookmarkManagerModel;
+class pqPipelineSource;
 
 /*! \class pqLookmarkDefinitionWizard
  *  \brief
@@ -107,7 +107,7 @@ private:
   ///   and all displays and sources "upstream" in the pipeline from it.
   ///
   /// The collection of proxies is given to the server manager and their XML representation is generated
-  void addToProxyCollection(pqConsumerDisplay *src, vtkCollection *proxies);
+  void addToProxyCollection(pqPipelineSource *src, vtkCollection *proxies);
 
 private slots:
 

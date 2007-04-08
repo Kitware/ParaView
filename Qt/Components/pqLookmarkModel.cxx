@@ -261,6 +261,7 @@ void pqLookmarkModel::load(pqServer *server, QList<pqPipelineSource*> *sources, 
     pqLoader->SetRestoreCameraFlag(this->RestoreCamera);
     pqLoader->SetRestoreTimeFlag(this->RestoreTime);
     pqLoader->SetPipelineHierarchy(this->PipelineHierarchy);
+    pqLoader->SetTimeKeeper(server->getTimeKeeper());
     }
 
   // convert the stored state from a qstring to a vtkPVXMLElement
