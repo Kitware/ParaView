@@ -550,7 +550,8 @@ bool pqFileDialogModel::makeDirEntry(const QString& dirName)
 bool pqFileDialogModel::removeDirEntry(const QString& dirName)
 {
   QString dirPath = this->absoluteFilePath(dirName);
-  for(int i=0; i<this->Implementation->FileList.size(); i++)
+  int i=0;
+  for(i=0; i<this->Implementation->FileList.size(); i++)
     {
     if(this->Implementation->FileList[i].isDir() && this->Implementation->FileList[i].filePath()==dirPath)
       {
