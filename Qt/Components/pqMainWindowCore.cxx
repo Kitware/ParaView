@@ -694,9 +694,9 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
 
   // Listen for the signal that the lookmark button for a given view was pressed
   this->connect(&this->Implementation->MultiViewManager, 
-                SIGNAL(createLookmark(pqGenericViewModule*)),
+                SIGNAL(createLookmark()), //pqGenericViewModule*)),
                 this,
-                SLOT(onToolsCreateLookmark(pqGenericViewModule*)));
+                SLOT(onToolsCreateLookmark())); //pqGenericViewModule*)));
 
   this->connect(pqApplicationCore::instance()->getPluginManager(),
                 SIGNAL(serverManagerExtensionLoaded()),
@@ -1239,9 +1239,9 @@ void pqMainWindowCore::setupLookmarkInspector(QDockWidget* dock_widget)
                             dock_widget);
 
   QObject::connect(this->Implementation->LookmarkInspector,
-                   SIGNAL(removeLookmark(pqLookmarkModel*)),
+                   SIGNAL(removeLookmark(const QString&)),
                    this->Implementation->LookmarkManagerModel,
-                   SLOT(removeLookmark(pqLookmarkModel*)));
+                   SLOT(removeLookmark(const QString&)));
   QObject::connect(this->Implementation->LookmarkInspector,
                    SIGNAL(loadLookmark(const QString&)),
                    this,SLOT(onLoadLookmark(const QString&)));
@@ -2034,7 +2034,7 @@ void pqMainWindowCore::onFileSaveAnimation()
 #endif
   filters +="JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png);;";
   filters +="All files(*)";
-  pqFileDialog* const file_dialog = new pqFileDialog(NULL,
+  pqFileDialog* const file_dialog = new pqFileDialog(this->getActiveServer(),
     this->Implementation->Parent, tr("Save Animation:"), QString(), filters);
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileSaveAnimationDialog");

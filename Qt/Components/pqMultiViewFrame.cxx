@@ -97,11 +97,18 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
                   this->Menu);
   a->setObjectName("CloseAction");
   this->CloseButton->setDefaultAction(a);
+  a = new QAction(this->LookmarkButton->icon(), 
+                  this->LookmarkButton->text(), 
+                  this->Menu);
+  a->setObjectName("LookmarkAction");
+  this->LookmarkButton->setDefaultAction(a);
 
   this->connect(this->ActiveButton->defaultAction(), SIGNAL(triggered(bool)), 
                 SLOT(setActive(bool)));
-  QObject::connect(this->LookmarkButton, SIGNAL(pressed()),
-    this, SLOT(onLookmarkButtonPressed()));
+  //QObject::connect(this->LookmarkButton, SIGNAL(pressed()),
+  //  this, SLOT(onLookmarkButtonPressed()));
+  this->connect(this->LookmarkButton->defaultAction(), SIGNAL(triggered(bool)), 
+                SLOT(onLookmarkButtonPressed()), Qt::QueuedConnection);
   this->connect(this->CloseButton->defaultAction(), SIGNAL(triggered(bool)), 
                 SLOT(close()), Qt::QueuedConnection);
   this->connect(this->MaximizeButton->defaultAction(), 

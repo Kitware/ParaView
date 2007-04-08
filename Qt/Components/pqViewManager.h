@@ -83,7 +83,7 @@ signals:
   void activeViewModuleChanged(pqGenericViewModule*);
 
   /// Fired when the user pressed the lookmark button for one of the views
-  void createLookmark(pqGenericViewModule*);
+  void createLookmark();
 
   /// Fired when the manager begins an undoable change.
   void beginUndo(const QString& label);
@@ -151,10 +151,6 @@ public slots:
   /// determine the server on whcih to create new view modules
   /// when a frame a split.
   void setActiveServer(pqServer* server);
-
-  // Emits a signal to let listeners know that a lookmark 
-  // needs to be created for the active view
-  void onCreateLookmarkRequest();
 
 protected:
   /// Event filter callback.

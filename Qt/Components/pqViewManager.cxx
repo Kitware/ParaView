@@ -430,7 +430,7 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
 
   frame->LookmarkButton->show();
   QObject::connect(frame, SIGNAL(createLookmark()),
-    this, SLOT(onCreateLookmarkRequest()));
+    this, SIGNAL(createLookmark()));
   frame->LookmarkButton->setEnabled(true);
 
   this->Internal->Frames.insert(frame, view);
@@ -461,7 +461,9 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* vie
     QObject::disconnect(view, 0,frame->BackButton, 0);
     QObject::disconnect(view, 0,frame->ForwardButton, 0);
     }
-  QObject::disconnect(frame->LookmarkButton, 0, this, 0);
+
+  QObject::disconnect(frame, SIGNAL(createLookmark()),
+    this, SIGNAL(createLookmark()));
 
   frame->BackButton->hide();
   frame->ForwardButton->hide();
@@ -1009,8 +1011,3 @@ void pqViewManager::onSplittingView(const Index& index,
   emit this->endUndo();
 }
 
-//-----------------------------------------------------------------------------
-void pqViewManager::onCreateLookmarkRequest()
-{
-  emit this->createLookmark(this->Internal->ActiveViewModule);
-}
