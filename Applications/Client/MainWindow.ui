@@ -283,6 +283,17 @@
    <addaction name="actionVCRLastFrame" />
    <addaction name="actionVCRLoop" />
   </widget>
+  <widget class="QToolBar" name="currentTimeToolbar" >
+   <property name="windowTitle" >
+    <string>Current Time Controls</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
+  </widget>
   <widget class="QToolBar" name="variableToolbar" >
    <property name="windowTitle" >
     <string>Active Variable Controls</string>
@@ -404,17 +415,6 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_7" />
   </widget>
-  <widget class="QToolBar" name="currentTimeToolbar" >
-   <property name="windowTitle" >
-    <string>Current Time Controls</string>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <attribute name="toolBarArea" >
-    <number>4</number>
-   </attribute>
-  </widget>
   <widget class="QToolBar" name="commonFilters" >
    <property name="windowTitle" >
     <string>Common Filters</string>
@@ -423,7 +423,7 @@
     <enum>Qt::Vertical</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>1</number>
+    <number>4</number>
    </attribute>
   </widget>
   <action name="actionFileOpen" >

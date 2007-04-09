@@ -118,6 +118,9 @@ MainWindow::MainWindow() :
 {
   this->Implementation->UI.setupUi(this);
 
+  this->insertToolBarBreak(this->Implementation->UI.variableToolbar);
+  this->insertToolBarBreak(this->Implementation->UI.commonFilters);
+
   this->setIconSize(QSize(24, 24));
   
   this->Implementation->RecentFilesMenu = new
