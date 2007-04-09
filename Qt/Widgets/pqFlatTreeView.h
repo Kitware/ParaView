@@ -150,6 +150,12 @@ public:
   void setColumnSizeManaged(bool managed);
   //@}
 
+  /// \name Drawing Options
+  //@{
+  int getIconSize() const;
+  void setIconSize(int iconSize);
+  //@}
+
   /// \name Index Location Methods
   //@{
   bool isIndexHidden(const QModelIndex &index) const;
@@ -281,6 +287,8 @@ private:
   void drawBranches(QPainter &painter, pqFlatTreeViewItem *item,
       int halfIndent, const QColor &branchColor, const QColor &expandColor,
       QStyleOptionViewItem &options);
+  void drawFocus(QPainter &painter, const QStyleOptionViewItem &options,
+      const QRect &cell, bool selected);
 
 private:
   QAbstractItemModel *Model;
@@ -290,17 +298,18 @@ private:
   QHeaderView *HeaderView;
   pqFlatTreeViewItem *Root;
   pqFlatTreeViewInternal *Internal;
+  int IconSize;
   int IndentWidth;
   int ContentsWidth;
   int ContentsHeight;
+  int TextMargin;
+  int DoubleTextMargin;
   bool FontChanged;
   bool ManageSizes;
   bool InUpdateWidth;
   bool HeaderOwned;
   bool SelectionOwned;
 
-  static int TextMargin;
-  static int DoubleTextMargin;
   static int PipeLength;
 };
 

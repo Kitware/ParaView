@@ -151,8 +151,6 @@ pqFlatTreeViewInternal::pqFlatTreeViewInternal()
 
 
 //----------------------------------------------------------------------------
-int pqFlatTreeView::TextMargin = 4;
-int pqFlatTreeView::DoubleTextMargin = 2 * pqFlatTreeView::TextMargin;
 int pqFlatTreeView::PipeLength = 4;
 
 pqFlatTreeView::pqFlatTreeView(QWidget *p)
@@ -165,9 +163,12 @@ pqFlatTreeView::pqFlatTreeView(QWidget *p)
   this->HeaderView = 0;
   this->Root = new pqFlatTreeViewItem();
   this->Internal = new pqFlatTreeViewInternal();
+  this->IconSize = 0;
   this->IndentWidth = 0;
   this->ContentsWidth = 0;
   this->ContentsHeight = 0;
+  this->TextMargin = 4;
+  this->DoubleTextMargin = 2 * this->TextMargin;
   this->FontChanged = false;
   this->ManageSizes = true;
   this->InUpdateWidth = false;
@@ -550,6 +551,28 @@ void pqFlatTreeView::setColumnSizeManaged(bool managed)
       this->updateScrollBars();
       this->viewport()->update();
       }
+    }
+}
+
+int pqFlatTreeView::getIconSize() const
+{
+  if(this->IconSize > 0)
+    {
+    return this->IconSize;
+    }
+  else
+    {
+    return QApplication::style()->pixelMetric(QStyle::PM_SmallIconSize);
+    }
+}
+
+void pqFlatTreeView::setIconSize(int iconSize)
+{
+  if(this->IconSize != iconSize)
+    {
+    this->IconSize = iconSize;
+    this->layoutItems();
+    this->viewport()->update();
     }
 }
 
@@ -2198,7 +2221,7 @@ void pqFlatTreeView::mousePressEvent(QMouseEvent *e)
       if(px < columnStart + itemWidth)
         {
         columnStart += itemWidth - item->Cells[index.column()]->Width +
-            pqFlatTreeView::TextMargin;
+            this->DoubleTextMargin;
         if(px >= columnStart)
           {
           sendClicked = !this->startEditing(index);
@@ -2424,8 +2447,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
           // drawn in the correct location.
           px = this->HeaderView->sectionPosition(i);
           py = item->ContentsY + pqFlatTreeView::PipeLength;
-          columnWidth = this->HeaderView->sectionSize(i) -
-              pqFlatTreeView::TextMargin;
+          columnWidth = this->HeaderView->sectionSize(i);
 
           // If the item is selected, draw a highlight in the background.
           QRect highlightRect;
@@ -2435,13 +2457,12 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
               index == this->Selection->currentIndex()))
             {
             int ox = 0;
-            itemWidth = this->getWidthSum(item, i) -
-                pqFlatTreeView::TextMargin;
+            itemWidth = this->getWidthSum(item, i);
             if(!options.showDecorationSelected)
               {
               // If the decoration is not supposed to be selected,
               // adjust the position and width of the highlight.
-              ox = itemWidth - item->Cells[i]->Width;
+              ox = itemWidth - item->Cells[i]->Width - this->DoubleTextMargin;
               }
 
             if(itemWidth > columnWidth)
@@ -2468,9 +2489,9 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
             columnWidth -= item->Indent;
             }
 
-          // If the index has decoration, draw that next. Get the icon
-          // for this item from the model. QVariant won't automatically
-          // convert from pixmap to icon, so it has to be done here.
+          // If the index has decoration, get the icon for this item
+          // from the model. QVariant won't automatically convert from
+          // pixmap to icon, so it has to be done here.
           QIcon icon;
           QPixmap pixmap;
           QVariant decoration = this->Model->data(index, Qt::DecorationRole);
@@ -2483,6 +2504,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
             icon = qvariant_cast<QIcon>(decoration);
             }
 
+          // Draw the decoration for the index next.
           if(!icon.isNull() && columnWidth > 0)
             {
             // Draw the decoration icon. Scale the icon to the size in
@@ -2502,13 +2524,14 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
             pixmap = icon.pixmap(options.decorationSize);
             painter.drawPixmap(px + 1, py + 1, pixmap);
 
-            // Add extra padding to the x coordinate to put space
-            // between the icon and the text.
-            itemWidth = this->IndentWidth + pqFlatTreeView::TextMargin;
-            px += itemWidth;
-            columnWidth -= itemWidth;
+            px += this->IndentWidth;
+            columnWidth -= this->IndentWidth;
             py = item->ContentsY + pqFlatTreeView::PipeLength;
             }
+
+          // Adjust the remaining column width for the text margin.
+          columnWidth -= this->DoubleTextMargin;
+          px += this->TextMargin;
 
           // Draw in the display data.
           QVariant indexData = this->Model->data(index);
@@ -2605,25 +2628,8 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
           if(this->Behavior == pqFlatTreeView::SelectItems &&
               index == this->Selection->currentIndex())
             {
-            QStyleOptionFocusRect opt;
-            opt.QStyleOption::operator=(options);
-            if(item->Cells[i]->Selected)
-              {
-              opt.backgroundColor = options.palette.color(QPalette::Normal,
-                  QPalette::Highlight);
-              }
-            else
-              {
-              opt.backgroundColor = options.palette.color(QPalette::Normal,
-                  QPalette::Base);
-              }
-
-            opt.state |= QStyle::State_KeyboardFocusChange;
-            opt.state |= QStyle::State_HasFocus;
-
-            opt.rect = highlightRect;
-            QApplication::style()->drawPrimitive(QStyle::PE_FrameFocusRect,
-                &opt, &painter);
+            this->drawFocus(painter, options, highlightRect,
+                item->Cells[i]->Selected);
             }
           }
 
@@ -2634,32 +2640,15 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
           if(index.isValid() && index.row() == item->Index.row() &&
               index.parent() == item->Index.parent())
             {
-            QStyleOptionFocusRect opt;
-            opt.QStyleOption::operator=(options);
-            if(item->RowSelected)
-              {
-              opt.backgroundColor = options.palette.color(QPalette::Normal,
-                  QPalette::Highlight);
-              }
-            else
-              {
-              opt.backgroundColor = options.palette.color(QPalette::Normal,
-                  QPalette::Base);
-              }
-
-            opt.state |= QStyle::State_KeyboardFocusChange;
-            opt.state |= QStyle::State_HasFocus;
-
             itemWidth = this->viewport()->width();
             if(this->ContentsWidth > itemWidth)
               {
               itemWidth = this->ContentsWidth;
               }
 
-            opt.rect.setRect(0, item->ContentsY + pqFlatTreeView::PipeLength,
+            QRect rowRect(0, item->ContentsY + pqFlatTreeView::PipeLength,
                 itemWidth, itemHeight);
-            QApplication::style()->drawPrimitive(QStyle::PE_FrameFocusRect,
-                &opt, &painter);
+            this->drawFocus(painter, options, rowRect, item->RowSelected);
             }
           }
         }
@@ -2672,12 +2661,22 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
     item = this->getNextVisibleItem(item);
     }
 
-  // TODO: If using column selection, draw the current column outline.
+  // If using column selection, draw the current column outline.
   if(this->Behavior == pqFlatTreeView::SelectColumns)
     {
     index = this->Selection->currentIndex();
     if(index.isValid())
       {
+      py = 0;
+      if(this->HeaderView && !this->HeaderView->isHidden())
+        {
+        py += this->HeaderView->height();
+        }
+
+      QRect columnRect(this->HeaderView->sectionPosition(index.column()), py,
+          this->HeaderView->sectionSize(index.column()), totalHeight);
+      this->drawFocus(painter, options, columnRect,
+          this->Selection->isSelected(index));
       }
     }
 
@@ -2699,23 +2698,15 @@ QStyleOptionViewItem pqFlatTreeView::getViewOptions() const
   option.init(this);
   option.font = this->font();
   option.state &= ~QStyle::State_HasFocus;
-  //if(d->iconSize.isValid())
-  //  {
-  //  option.decorationSize = d->iconSize;
-  //  }
-  //else
-    {
-    int pm = style()->pixelMetric(QStyle::PM_SmallIconSize);
-    option.decorationSize = QSize(pm, pm);
-    }
-
+  int iconSize = this->getIconSize();
+  option.decorationSize = QSize(iconSize, iconSize);
   option.decorationPosition = QStyleOptionViewItem::Left;
   option.decorationAlignment = Qt::AlignCenter;
   option.displayAlignment = QStyle::visualAlignment(this->layoutDirection(),
       Qt::AlignLeft | Qt::AlignVCenter);
   //option.textElideMode = d->textElideMode;
   option.rect = QRect();
-  option.showDecorationSelected = style()->styleHint(
+  option.showDecorationSelected = QApplication::style()->styleHint(
       QStyle::SH_ItemView_ShowDecorationSelected);
   return option;
 }
@@ -3029,7 +3020,7 @@ void pqFlatTreeView::layoutEditor()
     if(editWidth < columnWidth)
       {
       // Add some extra space to the editor.
-      editWidth += pqFlatTreeView::DoubleTextMargin;
+      editWidth += this->DoubleTextMargin;
       if(editWidth > columnWidth)
         {
         editWidth = columnWidth;
@@ -3038,7 +3029,7 @@ void pqFlatTreeView::layoutEditor()
 
     // Figure out how much space is taken up by decoration.
     int indent = itemWidth - item->Cells[column]->Width -
-        pqFlatTreeView::TextMargin;
+        this->DoubleTextMargin;
     if(indent > 0)
       {
       ex += indent;
@@ -3086,6 +3077,11 @@ void pqFlatTreeView::layoutItems()
 
     // Reset the preferred column sizes.
     this->resetPreferredSizes();
+
+    // Set up the text margin based on the application style.
+    this->TextMargin = QApplication::style()->pixelMetric(
+        QStyle::PM_FocusFrameHMargin);
+    this->DoubleTextMargin = 2 * this->TextMargin;
 
     // Loop through all the items to set up their bounds.
     pqFlatTreeViewItem *item = this->getNextVisibleItem(this->Root);
@@ -3140,8 +3136,8 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem *item, int &point,
       {
       if(item->Cells[i]->Width == 0 || this->FontChanged)
         {
-        // If the cell has a font hint, use that font to determin the
-        // height.
+        // If the cell has a font hint, use that font to determine
+        // the height.
         QModelIndex index = item->Index.sibling(item->Index.row(), i);
         QVariant value = this->Model->data(index, Qt::FontRole);
         if(value.isValid())
@@ -3197,13 +3193,11 @@ int pqFlatTreeView::getDataWidth(const QModelIndex &index,
   QVariant indexData = index.data();
   if(indexData.type() == QVariant::Pixmap)
     {
-    // Make sure the pixmap is scaled to fit the uniform item height.
+    // Make sure the pixmap is scaled to fit the item height.
     QSize pixmapSize = qvariant_cast<QPixmap>(indexData).size();
-    pqFlatTreeViewItem *item = this->getItem(index);
-    int allowed = item->Height - pqFlatTreeView::PipeLength;
-    if(pixmapSize.height() > allowed)
+    if(pixmapSize.height() > fm.height())
       {
-      pixmapSize.scale(pixmapSize.width(), allowed, Qt::KeepAspectRatio);
+      pixmapSize.scale(pixmapSize.width(), fm.height(), Qt::KeepAspectRatio);
       }
 
     return pixmapSize.width();
@@ -3222,7 +3216,7 @@ int pqFlatTreeView::getDataWidth(const QModelIndex &index,
 
 int pqFlatTreeView::getWidthSum(pqFlatTreeViewItem *item, int column) const
 {
-  int total = item->Cells[column]->Width + pqFlatTreeView::TextMargin;
+  int total = item->Cells[column]->Width + this->DoubleTextMargin;
   QModelIndex index = item->Index;
   if(column == 0)
     {
@@ -3236,7 +3230,7 @@ int pqFlatTreeView::getWidthSum(pqFlatTreeViewItem *item, int column) const
   QVariant icon = index.data(Qt::DecorationRole);
   if(icon.isValid())
     {
-    total += this->IndentWidth + pqFlatTreeView::TextMargin;
+    total += this->IndentWidth;
     }
 
   return total;
@@ -3718,6 +3712,30 @@ void pqFlatTreeView::drawBranches(QPainter &painter, pqFlatTreeViewItem *item,
 
     branchItem = branchItem->Parent;
     }
+}
+
+void pqFlatTreeView::drawFocus(QPainter &painter,
+    const QStyleOptionViewItem &options, const QRect &cell, bool selected)
+{
+  QStyleOptionFocusRect opt;
+  opt.QStyleOption::operator=(options);
+  if(selected)
+    {
+    opt.backgroundColor = options.palette.color(QPalette::Normal,
+        QPalette::Highlight);
+    }
+  else
+    {
+    opt.backgroundColor = options.palette.color(QPalette::Normal,
+        QPalette::Base);
+    }
+
+  opt.state |= QStyle::State_KeyboardFocusChange;
+  opt.state |= QStyle::State_HasFocus;
+
+  opt.rect = cell;
+  QApplication::style()->drawPrimitive(QStyle::PE_FrameFocusRect, &opt,
+      &painter);
 }
 
 
