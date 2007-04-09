@@ -239,6 +239,7 @@
          <RequiredProperties>
             <Property name="Origin" function="Origin"/>
             <Property name="Normal" function="Normal"/>
+            <Property name="Input" function="Input" />
          </RequiredProperties>
         </BoundsDomain>
       </DoubleVectorProperty>

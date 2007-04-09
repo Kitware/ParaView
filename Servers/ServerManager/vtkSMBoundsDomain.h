@@ -101,6 +101,9 @@ protected:
 
   double ScaleFactor; // Used only in SCALED_EXTENT mode.
 
+  // Obtain the data information from the requried property with
+  // function "Input", if any.
+  vtkPVDataInformation* GetInputInformation();
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&); // Not implemented
   void operator=(const vtkSMBoundsDomain&); // Not implemented

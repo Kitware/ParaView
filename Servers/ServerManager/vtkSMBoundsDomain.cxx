@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
-vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.12");
+vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.13");
 
 vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
 
@@ -64,15 +64,50 @@ void vtkSMBoundsDomain::Update(vtkSMProperty*)
 }
 
 //---------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMBoundsDomain::GetInputInformation()
+{
+ vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
+    this->GetRequiredProperty("Input"));
+  if (pp)
+    {
+    if (pp->GetNumberOfUncheckedProxies() > 0)
+      {
+      vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(
+        pp->GetUncheckedProxy(0));
+      if (sp)
+        {
+        return sp->GetDataInformation();
+        }
+      }
+    else if (pp->GetNumberOfProxies() > 0)
+      {
+      vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(
+        pp->GetProxy(0));
+      if (sp)
+        {
+        return sp->GetDataInformation();
+        }
+      }
+
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMBoundsDomain::UpdateOriented()
 {
+  vtkPVDataInformation* inputInformation = this->InputInformation;
   if (!this->InputInformation)
+    {
+    inputInformation = this->GetInputInformation();
+    }
+  if (!inputInformation)
     {
     return;
     }
 
   double bounds[6];
-  this->InputInformation->GetBounds(bounds);
+  inputInformation->GetBounds(bounds);
 
   vtkSMDoubleVectorProperty *normal = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetRequiredProperty("Normal"));
