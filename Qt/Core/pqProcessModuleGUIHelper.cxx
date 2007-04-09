@@ -118,7 +118,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.19");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.20");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -239,7 +239,10 @@ void pqProcessModuleGUIHelper::SendPrepareProgress()
   // in other words, the progress will be enabled when a current
   // process is taking long enough
   this->Implementation->ReadyEnableProgress = true;
-  this->Implementation->LastProgress = vtkTimerLog::GetUniversalTime();
+
+  // I am disabling this. It does not have to be reset after every filter.
+  // This way filters like plot XXX over time produce much nicer progress.
+  // this->Implementation->LastProgress = vtkTimerLog::GetUniversalTime();
 }
 
 //-----------------------------------------------------------------------------
@@ -273,14 +276,16 @@ void pqProcessModuleGUIHelper::SetLocalProgress(const char* text,
     return;
     }
 
-  // only forward progress events to the GUI 
-  // if we get at least .3 seconds since the last time we forwarded the progress
-  // event
+  // only forward progress events to the GUI if we get at least .05 seconds
+  // since the last time we forwarded the progress event
   double lastprog = vtkTimerLog::GetUniversalTime();
-  if ( lastprog - this->Implementation->LastProgress < .3 )
+  if ( lastprog - this->Implementation->LastProgress < .05 )
     {
     return;
     }
+
+  // We will show progress. Reset timer.
+  this->Implementation->LastProgress = vtkTimerLog::GetUniversalTime();
 
   // delayed progress starting so the progress bar doesn't flicker
   // so much for the quick operations
