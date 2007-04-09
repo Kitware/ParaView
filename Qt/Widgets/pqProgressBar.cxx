@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqProgressBar.h"
+#include <QCoreApplication>
 
 //-----------------------------------------------------------------------------
 pqProgressBar::pqProgressBar(QWidget* _p) : QProgressBar(_p)
@@ -55,6 +56,7 @@ void pqProgressBar::setProgress(const QString& message, int _value)
 {
   this->Message = message + ": ";
   this->setValue(_value);
+  QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
 //-----------------------------------------------------------------------------
