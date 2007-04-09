@@ -3063,7 +3063,7 @@ The Transform filter allows you to specify the position, size, and orientation o
               <Proxy group="transforms" name="Transform2" />
            </ProxyListDomain>
            <Documentation>
-             The values in this property allow you to specify the transform to apply to the input dataset.
+             The values in this property allow you to specify the transform (translation, rotation, and scaling) to apply to the input dataset.
            </Documentation>
      </ProxyProperty>
    <!-- End TransformFilter -->
