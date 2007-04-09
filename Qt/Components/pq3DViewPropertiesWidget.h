@@ -59,6 +59,8 @@ private slots:
   void compositeThresholdSliderChanged(int);
   void subsamplingRateSliderChanged(int);
   void squirtLevelRateSliderChanged(int);
+  void stillRenderSubsampleRateSliderChanged(int);
+  void clientCollectSliderChanged(int);
   void restoreDefaultBackground();
   void resetLights();
 

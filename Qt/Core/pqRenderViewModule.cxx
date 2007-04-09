@@ -655,6 +655,8 @@ static const char* pqRenderViewModuleMiscSettings [] = {
   "ReductionFactor",
   "SquirtLevel",
   "OrderedCompositing",
+  "CollectGeometryThreshold",
+  "StillReductionFactor",
   NULL
   };
 

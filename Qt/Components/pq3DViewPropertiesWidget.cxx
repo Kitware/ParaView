@@ -107,6 +107,25 @@ public:
       QVariant(bitValues[val]).toString() + " Bits");
     }
 
+  void updateStillSubsampleRateLabel(int value)
+    {
+    if (value == 1)
+      {
+      this->stillRenderSubsampleRateLabel->setText("Disabled");
+      }
+    else
+      {
+      this->stillRenderSubsampleRateLabel->setText(
+        QString("%1 Pixels").arg(value));
+      }
+    }
+
+  void updateClientCollectLabel(double value_in_mb)
+    {
+    this->clientCollectLabel->setText(
+      QString("%1 MBytes").arg(value_in_mb));
+    }
+
 
   void loadValues(pqGenericViewModule* proxy);
   void accept();
@@ -202,8 +221,10 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
     this->lodParameters->setVisible(false);
     }
 
+  this->noServerSettingsLabel->setVisible(true);
   if (vtkSMCompositeRenderModuleProxy::SafeDownCast(proxy))
     {
+    this->noServerSettingsLabel->setVisible(false);
     this->compositingParameters->setVisible(true);
     double val = pqSMAdaptor::getElementProperty(
       proxy->GetProperty("CompositeThreshold")).toDouble();
@@ -254,6 +275,7 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
 
   if (vtkSMIceTDesktopRenderModuleProxy::SafeDownCast(proxy))
     {
+    this->noServerSettingsLabel->setVisible(false);
     // Only available for IceT.
     this->orderedCompositing->setVisible(true);
     this->Links.registerLink(this->orderedCompositing, "checked", 
@@ -263,6 +285,46 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
   else
     {
     this->orderedCompositing->setVisible(false);
+    }
+
+  if (proxy->IsA("vtkSMIceTRenderModuleProxy"))
+    {
+    // Only for tiledisplay render modules.
+    this->noServerSettingsLabel->setVisible(false);
+    this->tileDisplayParameters->setVisible(true);
+    int ival = pqSMAdaptor::getElementProperty(
+      proxy->GetProperty("StillReductionFactor")).toInt();
+    if (ival == 1)
+      {
+      this->enableStillRenderSubsampleRate->setCheckState(Qt::Unchecked);
+      this->updateSquirtLevelLabel(
+        this->stillRenderSubsampleRate->value());
+      }
+    else
+      {
+      this->enableStillRenderSubsampleRate->setCheckState(Qt::Checked);
+      this->stillRenderSubsampleRate->setValue(ival);
+      this->updateSquirtLevelLabel(
+        this->stillRenderSubsampleRate->value());
+      }
+
+    double dval = pqSMAdaptor::getElementProperty(
+      proxy->GetProperty("CollectGeometryThreshold")).toDouble();
+    if (dval >= VTK_LARGE_FLOAT)
+      {
+      this->enableClientCollect->setCheckState(Qt::Unchecked);
+      this->updateClientCollectLabel(this->clientCollect->value());
+      }
+    else
+      {
+      this->enableClientCollect->setCheckState(Qt::Checked);
+      this->clientCollect->setValue(static_cast<int>(dval));
+      this->updateClientCollectLabel(this->clientCollect->value());
+      }
+    }
+  else
+    {
+    this->tileDisplayParameters->setVisible(false);
     }
 
   pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(this->ViewModule);
@@ -360,7 +422,35 @@ void pq3DViewPropertiesWidgetInternal::accept()
         renModule->GetProperty("SquirtLevel"), 0);
       }
     }
+
+  if (renModule->IsA("vtkSMIceTRenderModuleProxy"))
+    {
+    if (this->enableStillRenderSubsampleRate->checkState() == Qt::Checked)
+      {
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("StillReductionFactor"),
+        this->stillRenderSubsampleRate->value());
+      }
+    else
+      {
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("StillReductionFactor"), VTK_DOUBLE_MAX);
+      }
+
+    if (this->enableClientCollect->checkState() == Qt::Checked)
+      {
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("CollectGeometryThreshold"),
+        this->clientCollect->value());
+      }
+    else
+      {
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("CollectGeometryThreshold"), VTK_DOUBLE_MAX);
+      }
+    }
   renModule->UpdateVTKObjects();
+
   pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(this->ViewModule);
   if(rm)
     {
@@ -427,6 +517,14 @@ pq3DViewPropertiesWidget::pq3DViewPropertiesWidget(QWidget* _parent):
   
   QObject::connect(this->Internal->ResetLight,
     SIGNAL(clicked(bool)), this, SLOT(resetLights()));
+
+  QObject::connect(this->Internal->stillRenderSubsampleRate, 
+    SIGNAL(valueChanged(int)), 
+    this, SLOT(stillRenderSubsampleRateSliderChanged(int)));
+  
+  QObject::connect(this->Internal->clientCollect,
+    SIGNAL(valueChanged(int)),
+    this, SLOT(clientCollectSliderChanged(int)));
   
 }
 
@@ -488,6 +586,18 @@ void pq3DViewPropertiesWidget::squirtLevelRateSliderChanged(int value)
 }
 
 //-----------------------------------------------------------------------------
+void pq3DViewPropertiesWidget::stillRenderSubsampleRateSliderChanged(int value)
+{
+  this->Internal->updateStillSubsampleRateLabel(value);
+}
+
+//-----------------------------------------------------------------------------
+void pq3DViewPropertiesWidget::clientCollectSliderChanged(int value)
+{
+  this->Internal->updateClientCollectLabel(static_cast<double>(value));
+}
+
+//-----------------------------------------------------------------------------
 void pq3DViewPropertiesWidget::restoreDefaultBackground()
 {
   pqRenderViewModule* rvm =
@@ -511,7 +621,4 @@ void pq3DViewPropertiesWidget::resetLights()
     }
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
+
