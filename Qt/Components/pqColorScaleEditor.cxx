@@ -424,6 +424,8 @@ void pqColorScaleEditor::handleEditorAdd(int index)
     this->enablePointControls();
     this->updatePointValues();
     }
+#else
+  index = index;
 #endif
 }
 
