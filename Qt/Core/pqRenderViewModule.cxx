@@ -150,7 +150,12 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
                    this, SLOT(linkToOtherView()));
 
   // do image caching for performance
-  //this->Internal->Viewport->setAutomaticImageCacheEnabled(true);
+  // For now, we are doing this only on Apple because it can render
+  // and capture a frame buffer even when it is obstructred by a
+  // window. This does not work as well on other platforms.
+#if defined(__APPLE__)
+  this->Internal->Viewport->setAutomaticImageCacheEnabled(true);
+#endif
 
   this->Internal->Viewport->installEventFilter(this);
 
@@ -962,11 +967,11 @@ void pqRenderViewModule::getCenterOfRotation(double center[3]) const
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::setCenterAxesVisibility(bool visible)
 {
-
   pqSMAdaptor::setElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Visibility"),
     visible? 1 : 0);
   this->Internal->CenterAxesProxy->UpdateProperty("Visibility");
+  this->Internal->RenderModuleProxy->MarkModified(0);
 }
 
 //-----------------------------------------------------------------------------
