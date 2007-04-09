@@ -22,7 +22,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
@@ -1573,28 +1573,6 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="2" >
-           <widget class="QSlider" name="clientCollect" >
-            <property name="enabled" >
-             <bool>false</bool>
-            </property>
-            <property name="toolTip" >
-             <string>&lt;html>This slider determines when any geometry is collected on the client. If geometry is not collected on the client, the outline is drawn on the client (but the tile display still shows the geometry). &lt;b>Left:&lt;/b> Never collect any geometry on the client. &lt;b>Right:&lt;/b> Collect larger geometry on client.&lt;/html></string>
-            </property>
-            <property name="maximum" >
-             <number>1000</number>
-            </property>
-            <property name="singleStep" >
-             <number>10</number>
-            </property>
-            <property name="pageStep" >
-             <number>100</number>
-            </property>
-            <property name="orientation" >
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="1" >
            <widget class="QCheckBox" name="enableClientCollect" >
             <property name="toolTip" >
@@ -1661,6 +1639,28 @@
             </property>
             <property name="text" >
              <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" >
+           <widget class="QSlider" name="clientCollect" >
+            <property name="enabled" >
+             <bool>false</bool>
+            </property>
+            <property name="toolTip" >
+             <string>&lt;html>This slider determines when any geometry is collected on the client. If geometry is not collected on the client, the outline is drawn on the client (but the tile display still shows the geometry). &lt;b>Left:&lt;/b> Never collect any geometry on the client. &lt;b>Right:&lt;/b> Collect larger geometry on client.&lt;/html></string>
+            </property>
+            <property name="maximum" >
+             <number>1000</number>
+            </property>
+            <property name="singleStep" >
+             <number>10</number>
+            </property>
+            <property name="pageStep" >
+             <number>100</number>
+            </property>
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
@@ -1943,22 +1943,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>enableClientCollect</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>clientCollect</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>176</x>
-     <y>239</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>287</x>
-     <y>239</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>enableStillRenderSubsampleRate</sender>
    <signal>toggled(bool)</signal>
    <receiver>stillRenderSubsampleRateLabel</receiver>
@@ -1987,6 +1971,22 @@
     <hint type="destinationlabel" >
      <x>416</x>
      <y>240</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableClientCollect</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>clientCollect</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>176</x>
+     <y>239</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>287</x>
+     <y>239</y>
     </hint>
    </hints>
   </connection>
