@@ -260,6 +260,7 @@ IF(BUILD_TESTING)
     CutMulti
     DualSphereAnimation
     ExodusPanel
+    LinePlot
     LoadState
     LoadSaveStateAnimation
     ObjectInspectorSphere
