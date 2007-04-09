@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>424</width>
-    <height>383</height>
+    <height>382</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -225,10 +225,16 @@
          <property name="sizePolicy" >
           <sizepolicy>
            <hsizetype>7</hsizetype>
-           <vsizetype>7</vsizetype>
+           <vsizetype>3</vsizetype>
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize" >
+          <size>
+           <width>0</width>
+           <height>45</height>
+          </size>
          </property>
          <property name="whatsThis" >
           <string>This displays the color scale. The control points determine how the gradient is rendered.</string>
