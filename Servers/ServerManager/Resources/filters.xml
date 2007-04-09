@@ -6,12 +6,7 @@
                           label="Plot Point over Time"
                           selection_field_type="POINT">
      <Documentation>
-This filter extracts the variables associated with a point over time. The
-output is a 1D rectilinear grid where the x coordinates correspond to time
-(the same array is also copied to a point array named Time or TimeData (if
-Time exists in the input)).  The input point coordinates are copied to a
-point array named Point Coordinates or Points (if Point Coordinates exists
-in the input).
+This filter extracts the variables associated with a point over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)).  The input point coordinates are copied to a point array named Point Coordinates or Points (if Point Coordinates exists in the input).
      </Documentation>
      <InputProperty
          name="Input"
@@ -83,10 +78,7 @@ in the input).
                           label="Plot Cell over Time"
                           selection_field_type="CELL">
      <Documentation>
-This filter extracts the variables associated with a cell
-over time. The output is a 1D rectilinear grid where the x coordinates
-correspond to time (the same array is also copied to a point array named
-Time or TimeData (if Time exists in the input)).
+This filter extracts the variables associated with a cell over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)).
      </Documentation>
      <InputProperty
          name="Input"
