@@ -95,7 +95,7 @@ static const char* ProxyDocumentationTemplate =
 static const char* PropertiesTableHeaderTemplate =
   "<table class=\"PropertiesTable\" border=\"1\" cellpadding=\"5\" >\n"\
     "  <tr class=\"PropertiesTableHeading\">\n"\
-    "    <td>Property</td><td>Description</td><td>Default Value(s)</td><td>Restrictions</td>\n"\
+    "    <td><b>Property</b></td><td><b>Description</b></td><td><b>Default Value(s)</b></td><td><b>Restrictions</b></td>\n"\
     "  </tr>\n";
 
 // Template for the footer after having finished with listing all properties of the proxy.
@@ -121,7 +121,7 @@ static const char* ProxyListTitleTemplate =
 
 static const char* ProxyListTableHeaderTemplate = 
   "<table class=\"PropertiesTable\" border=\"1\" cellpadding=\"5\">\n"\
-    "  <tr><td>Name</td><td>Description</td></tr>\n";
+    "  <tr><td><b>Name</b></td><td><b>Description</b></td></tr>\n";
 static const char* ProxyListTableFooterTemplate = "</table>\n";
 
 static const char* ProxyListItemTemplate = 
