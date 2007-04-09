@@ -1168,6 +1168,7 @@ void pqAnimationPanel::setCurrentTimeToolbar(QToolBar* toolbar)
   label->setText("Time: ");
 
   QLineEdit* timeedit = new QLineEdit(toolbar);
+  timeedit->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
   timeedit->setObjectName("CurrentTime");
   timeedit->setValidator(new QDoubleValidator(toolbar));
   this->Internal->ToolbarCurrentTimeWidget = timeedit;
