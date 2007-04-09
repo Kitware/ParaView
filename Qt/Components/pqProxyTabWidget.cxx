@@ -75,13 +75,11 @@ pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   this->addTab(scr, tr("Information"));
 
   // TODO: allow information page to work without help
-  QObject::connect(this->Inspector, SIGNAL(accepted()),
-                   this->Information, SLOT(updateInformation()),
-                   Qt::QueuedConnection);
+  QObject::connect(this->Inspector, SIGNAL(postaccept()),
+                   this->Information, SLOT(updateInformation()));
   // TODO: allow display page to work without help
-  QObject::connect(this->Inspector, SIGNAL(accepted()),
-                   this->Display, SLOT(reloadGUI()),
-                   Qt::QueuedConnection);
+  QObject::connect(this->Inspector, SIGNAL(postaccept()),
+                   this->Display, SLOT(reloadGUI()));
 }
 
 //-----------------------------------------------------------------------------
