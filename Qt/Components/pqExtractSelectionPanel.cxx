@@ -137,9 +137,7 @@ void pqExtractSelectionPanel::updateIDRanges()
     return;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int numPartitions = pm->GetNumberOfPartitions(
-    filter->getServer()->GetConnectionID());
+  int numPartitions = filter->getServer()->getNumberOfPartitions();
   
   this->Internal->ProcessIDRange->setText(
     QString("Process ID Range: 0 - %1").arg(numPartitions-1));

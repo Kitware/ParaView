@@ -232,17 +232,19 @@ public:
   virtual int GetPartitionId();
 
   // Description:
-
-  // This overrload is internal for call thru CS stream alone.  Use
-  // GetNumberOfPartitions(vtkIdType id) with appropriate connection Id to
-  // get the number of server partition. This method simply returns the
-  // number of partition on the local process.  NOTE: If this method is
-  // called on the client it is equivalent to
-  // GetNumberOfPartitions(vtkProcessModuleConnectionManager::GetRootServerConnectionID()).
-  virtual int GetNumberOfPartitions();
+  // Returns the number of partitions for the local processes. On client
+  // it returns the number of client process partitions (which is always 1),
+  // while on any server node, it returns the number of server partitions.
+  virtual int GetNumberOfLocalPartitions();
   
   // Description:
-  // Get the number of processes participating in sharing the data.
+  // Get the number of processes participating in sharing the data for
+  // the given connection id. This is only called 
+  // on the client to get the number of partitions on of server
+  // the client is connected to.
+  // On server side, the connection id is ignored
+  // (since server has no connections) and simply returns the
+  // number of local partitions (same as GetNumberOfLocalPartitions()).
   virtual int GetNumberOfPartitions(vtkIdType id);
 
 //BTX

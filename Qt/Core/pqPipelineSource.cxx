@@ -482,7 +482,7 @@ vtkPVDataInformation* pqPipelineSource::getDataInformation() const
     {
     stream
       << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << updateSuppressor->GetID(i) << "SetUpdateNumberOfPieces"

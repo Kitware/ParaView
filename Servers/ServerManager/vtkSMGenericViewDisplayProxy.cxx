@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.22");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -307,7 +307,8 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
     {
     stream
       << vtkClientServerStream::Invoke
-      << vtkProcessModule::GetProcessModule()->GetProcessModuleID() << "GetNumberOfPartitions"
+      << vtkProcessModule::GetProcessModule()->GetProcessModuleID() 
+      << "GetNumberOfLocalPartitions"
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << this->UpdateSuppressorProxy->GetID(j) << "SetUpdateNumberOfPieces"
@@ -315,7 +316,8 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
       << vtkClientServerStream::End;
     stream
       << vtkClientServerStream::Invoke
-      << vtkProcessModule::GetProcessModule()->GetProcessModuleID() << "GetPartitionId"
+      << vtkProcessModule::GetProcessModule()->GetProcessModuleID() 
+      << "GetPartitionId"
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << this->UpdateSuppressorProxy->GetID(j) << "SetUpdatePiece"

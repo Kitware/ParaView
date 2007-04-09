@@ -40,7 +40,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.38");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.39");
 
 
 //-----------------------------------------------------------------------------
@@ -458,7 +458,7 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
     {
     stream
       << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << this->UpdateSuppressorProxy->GetID(i) << "SetUpdateNumberOfPieces"
@@ -484,7 +484,7 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
       {
       stream2
         << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+        << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
         << vtkClientServerStream::End
         << vtkClientServerStream::Invoke
         << this->MapperProxy->GetID(i) << "SetNumberOfPieces"
@@ -605,7 +605,7 @@ void vtkSMDataObjectDisplayProxy::SetupVolumeDefaults()
     {
     stream
       << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << this->VolumeUpdateSuppressorProxy->GetID(i)

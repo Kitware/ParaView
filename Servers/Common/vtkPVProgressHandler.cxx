@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.5");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.6");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -106,8 +106,7 @@ void vtkPVProgressHandler::DetermineProgressType(vtkProcessModule* app)
   int client = this->ClientMode;
   int server = this->ServerMode;
   int local_process = app->GetPartitionId();
-  int num_processes = app->GetNumberOfPartitions(
-    vtkProcessModuleConnectionManager::GetSelfConnectionID());
+  int num_processes = app->GetNumberOfLocalPartitions();
 
   if ( client )
     {
@@ -380,7 +379,7 @@ void vtkPVProgressHandler::HandleProgress(int processid, int filterid, int progr
   vtkPVProgressHandlerInternal::VectorOfInts* vect 
     = &this->Internals->ProgressMap[filterid];
 #ifdef VTK_USE_MPI
-  vect->resize(this->ProcessModule->GetNumberOfPartitions());
+  vect->resize(this->ProcessModule->GetNumberOfLocalPartitions());
 #else
   vect->resize(processid < (int)vect->size()?vect->size():processid+1);
 #endif

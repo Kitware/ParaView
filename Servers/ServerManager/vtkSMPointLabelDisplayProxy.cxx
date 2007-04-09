@@ -267,7 +267,7 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
     {
     // Tell the update suppressor to produce the correct partition.
     stream << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << this->UpdateSuppressorProxy->GetID(i) << "SetUpdateNumberOfPieces"

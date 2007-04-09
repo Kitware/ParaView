@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.8");
 vtkStandardNewMacro(vtkSMIceTMultiDisplayProxy);
 
 //-----------------------------------------------------------------------------
@@ -197,7 +197,7 @@ void vtkSMIceTMultiDisplayProxy::SetupDefaults()
     vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
     stream
       << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << this->OutlineUpdateSuppressorProxy->GetID(i)
