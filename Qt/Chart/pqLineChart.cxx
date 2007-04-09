@@ -362,13 +362,15 @@ void pqLineChart::layoutChart()
         pqLineChartItemError *error = dynamic_cast<pqLineChartItemError *>(
             *series);
 
+        QList<pqChartCoordinate> coordList;
+        (*iter)->Plot->getPoints(i, coordList);
+
         QPolygon *polygon = 0;
         int total = (*iter)->Plot->getNumberOfPoints(i);
         for(int j = 0; j < total; j++)
           {
           // Get the point coordinate from the plot.
-          pqChartCoordinate coord;
-          (*iter)->Plot->getPoint(i, j, coord);
+          pqChartCoordinate coord = coordList[j];
 
           // Use the axis scale to translate the plot's coordinates
           // into chart coordinates.

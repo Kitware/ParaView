@@ -212,6 +212,50 @@ void pqVTKLineChartPlot::getPoint(
 }
 
 //-----------------------------------------------------------------------------
+template<class XType, class YType>
+inline void pqVTKLineChartPlotCopyPoints(XType *x, YType *y, int numberOfPoints,
+                                         QList<pqChartCoordinate> &coords)
+{
+  coords.clear();
+  for (int i = 0; i < numberOfPoints; i++)
+    {
+    coords.append(pqChartCoordinate((double)x[i], (double)y[i]));
+    }
+}
+
+template<class XType>
+inline void pqVTKLineChartPlotCopyPoints1(XType *x, vtkDataArray *y,
+                                          int numberOfPoints,
+                                          QList<pqChartCoordinate> &coords)
+{
+  switch(y->GetDataType())
+    {
+    vtkTemplateMacro(
+      pqVTKLineChartPlotCopyPoints(x, (VTK_TT *)y->GetVoidPointer(0),
+                                   numberOfPoints, coords));
+    }
+}
+
+void pqVTKLineChartPlot::getPoints(int series,
+                                   QList<pqChartCoordinate> &coords) const
+{
+  int array_index = this->getIndexFromSeries(series);
+
+  if (array_index >= 0)
+    {
+    vtkDataArray *x = this->Internal->Display->getXArray();
+    vtkDataArray *y = this->Internal->Display->getYArray(array_index);
+    switch(x->GetDataType())
+      {
+      vtkTemplateMacro(
+        pqVTKLineChartPlotCopyPoints1((VTK_TT *)x->GetVoidPointer(0), y,
+                                      this->getNumberOfPoints(series),
+                                      coords));
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqVTKLineChartPlot::getErrorBounds(
   int vtkNotUsed(series), 
   int vtkNotUsed(index), 

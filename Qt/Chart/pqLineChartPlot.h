@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtChartExport.h"
 #include <QObject>
 
+#include <QList>
+
 class pqChartCoordinate;
 class pqChartValue;
 
@@ -119,6 +121,14 @@ public:
   /// \param coord Used to return the point's coordinates.
   virtual void getPoint(int series, int index,
       pqChartCoordinate &coord) const=0;
+
+  /// \brief
+  ///   Get all of the point coordinates for a series.  If you want all of the
+  ///   point coordinates for a given series, using this method is probably
+  ///   much faster than getting individual points with getPoint.
+  /// \param series The index of the series.
+  /// \param coords Used to return all of the point coordinates.
+  virtual void getPoints(int series, QList<pqChartCoordinate> &coords) const=0;
   //@}
 
   /// \name Error Series Methods

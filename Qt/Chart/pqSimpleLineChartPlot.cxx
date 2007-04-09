@@ -199,6 +199,12 @@ void pqSimpleLineChartPlot::getPoint(int series, int index,
     }
 }
 
+void pqSimpleLineChartPlot::getPoints(int series,
+                                      QList<pqChartCoordinate> &coords) const
+{
+  coords = this->Internal->Series[series]->Points.toList();
+}
+
 void pqSimpleLineChartPlot::getErrorBounds(int series, int index,
     pqChartValue &upper, pqChartValue &lower) const
 {

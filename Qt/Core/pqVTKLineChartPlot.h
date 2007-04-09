@@ -54,6 +54,7 @@ public:
   virtual int getNumberOfPoints(int series) const;
   virtual void getPoint(int series, int index,
     pqChartCoordinate &coord) const;
+  virtual void getPoints(int series, QList<pqChartCoordinate> &coords) const;
   virtual void getErrorBounds(int series, int index, pqChartValue &upper,
     pqChartValue &lower) const;
   virtual void getErrorWidth(int series, pqChartValue &width) const;
