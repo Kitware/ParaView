@@ -2,7 +2,13 @@
   <ProxyGroup name="sources">
 
    <SourceProxy name="DEMReader" 
-                class="vtkDEMReader">
+                class="vtkDEMReader"
+                label="DEM reader">
+     <Documentation
+       short_help="Read a dataset in DEM format"
+       long_help="Read a DEM (Digital Elevation Model) file.">
+       The DEM reader reads Digital Elevation Model files containing elevation values derived from the U. S. Geologic Survey. The default file extension is .dem. This reader produces uniform rectilinear (image/volume) data output.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -10,7 +16,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the DEM (Digital Elevation Map) reader.
+          This property specifies the file name for the DEM (Digital Elevation Map) reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -18,70 +24,100 @@
    </SourceProxy>
 
    <SourceProxy name="XMLMultiBlockDataReader" 
-                class="vtkXMLMultiBlockDataReader">
+                class="vtkXMLMultiBlockDataReader"
+                label="XML Multi-Block Data reader">
+     <Documentation
+       short_help="Read VTK XML multi-block datasets."
+       long_help="Read a VTK XML multi-block data file and the serial VTK XML data files to which it points.">
+       The XML Multi-Block Data reader reads the VTK XML multi-block data file format. XML multi-block data files are meta-files that point to a list of serial VTK XML files. When reading in parallel, this reader will distribute sub-blocks among processors. The expected file extensions are .vtm and .vtmb.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK multi-block reader.
+          This property specifies the file name for the VTK multi-block reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End MultiBlockDataReader -->
    </SourceProxy>
 
    <SourceProxy name="XMLMultiGroupDataReader" 
-                class="vtkXMLMultiGroupDataReader">
+                class="vtkXMLMultiGroupDataReader"
+                label="XML Multi-Group Data reader">
+     <Documentation
+       short_help="Read VTK XML multi-group datasets."
+       long_help="Read a VTK XML multi-group data file and the serial VTK XML data files to which it points.">
+       The XML Multi-Group Data reader reads the VTK XML multi-group data file format. XML multi-group data files are meta-files that point to a list of serial VTK XML files. When reading in parallel, this reader will distribute sub-blocks among processors. The expected file extensions are .vtm and .vtmg.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK multi-group reader.
+          This property specifies the file name for the VTK multi-group reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End MultiGroupDataReader -->
    </SourceProxy>
 
    <SourceProxy name="XMLHierarchicalDataReader" 
-                class="vtkXMLHierarchicalDataReader">
+                class="vtkXMLHierarchicalDataReader"
+                label="XML Hierarchical Data reader">
+     <Documentation
+       short_help="Read a VTK XML Hierarchical Data file."
+       long_help="Read a VTK XML Hierarchical data file and the serial VTK XML files to which it points.">
+       The XML Hierarchical Data reader reads the VTK XML hierarchical data file format. XML hierarchical data files are meta-files that point to a list of serial VTK XML files. When reading in parallel, it will distribute sub-blocks among processors. The expected file extensions are .vtm and .vthd.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK hierarchical data reader.
+          This property specifies the file name for the VTK hierarchical data reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End HierarchicalDataReader -->
    </SourceProxy>
 
    <SourceProxy name="XMLHierarchicalBoxDataReader" 
-                class="vtkXMLHierarchicalBoxDataReader">
+                class="vtkXMLHierarchicalBoxDataReader"
+                label="XML Hierarchical Box Data reader">
+     <Documentation
+       short_help="Read a VTK data file containing a hierarchical box dataset."
+       long_help="Read a VTK XML-based data file containing a hierarchical dataset containing vtkUniformGrids.">
+       The XML Hierarchical Box Data reader reads VTK's XML-based file format containing a vtkHierarchicalBoxDataSet, which is a vtkHierarchicalDataSet containing only vtkUniformGrids. The expected file extensions are .vtm and .vthd.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK hierarchical box data reader.
+          This property specifies the file name for the VTK hierarchical box data reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End HierarchicalBoxDataReader -->
    </SourceProxy>
 
    <SourceProxy name="PVDReader" 
-                class="vtkPVDReader">
+                class="vtkPVDReader"
+                label="PVD reader">
+     <Documentation
+       short_help="Read a PVD file."
+       long_help="Load a dataset stored in ParaView's PVD file format.">
+       The PVD reader reads data stored in ParaView's PVD file format. The .pvd file is essentially a header file that collects together other data files stored in VTK's XML-based file format.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the PVD reader.
+          This property specifies the file name for the PVD reader.
         </Documentation>
      </StringVectorProperty>
      <DoubleVectorProperty 
@@ -96,7 +132,13 @@
    </SourceProxy>
 
    <SourceProxy name="XMLPolyDataReader" 
-                class="vtkXMLPolyDataReader">
+                class="vtkXMLPolyDataReader"
+                label="XML Polydata reader">
+     <Documentation
+       short_help="Read VTK XML polydata files."
+       long_help="Read serial VTK XML polydata files.">
+       The XML Polydata reader reads the VTK XML polydata file format. The standard extension is .vtp.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -104,7 +146,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK XML polygonal dataset reader.
+          This property specifies the file name for the VTK XML polygonal dataset reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -129,7 +171,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -154,10 +196,10 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
-   <!-- End XMLRectilinearGridReader -->
+   <!-- End XMLPolyDataReader -->
    </SourceProxy>
 
    <SourceProxy name="RTXMLPolyDataReader"
@@ -213,7 +255,13 @@
 
 
    <SourceProxy name="XMLUnstructuredGridReader" 
-                class="vtkXMLUnstructuredGridReader">
+                class="vtkXMLUnstructuredGridReader"
+                label="XML Unstructured Grid reader">
+     <Documentation
+       short_help="Read VTK XML unstructured grid data files."
+       long_help="Read serial VTK XML unstructured grid data files.">
+       The XML Unstructured Grid reader reads the VTK XML unstructured grid data file format. The standard extension is .vtu.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -221,7 +269,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK XML unstructured grid reader.
+          This property specifies the file name for the VTK XML unstructured grid reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -246,7 +294,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -271,14 +319,20 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End XMLUnstructuredGridReader -->
    </SourceProxy>
 
    <SourceProxy name="XMLImageDataReader" 
-                class="vtkXMLImageDataReader">
+                class="vtkXMLImageDataReader"
+                label="XML Image Data reader">
+     <Documentation
+       short_help="Read VTK XML image data files."
+       long_help="Read serial VTK XML image data files.">
+       The XML Image Data reader reads the VTK XML image data file format. The standard extension is .vti.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -286,7 +340,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK XML uniform rectilinear data reader.
+          This property specifies the file name for the VTK XML uniform rectilinear (image/volume) data reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -311,7 +365,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -336,14 +390,20 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End XMLImageDataReader -->
    </SourceProxy>
 
    <SourceProxy name="XMLStructuredGridReader" 
-                class="vtkXMLStructuredGridReader">
+                class="vtkXMLStructuredGridReader"
+                label="XML Structured Grid reader">
+     <Documentation
+       short_help="Read VTK XML structured grid data files."
+       long_help="Read serial VTK XML structured grid data files.">
+       The XML Structured Grid reader reads the VTK XML structured grid data file format. The standard extension is .vts.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -351,7 +411,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK XML structured grid reader.
+          This property specifies the file name for the VTK XML structured grid reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -376,7 +436,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -401,14 +461,20 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End XMLStructuredGridReader -->
    </SourceProxy>
 
    <SourceProxy name="XMLRectilinearGridReader" 
-                class="vtkXMLRectilinearGridReader">
+                class="vtkXMLRectilinearGridReader"
+                label="XML Rectilinear Grid reader">
+     <Documentation
+       short_help="Read VTK XML rectilinear grid data files."
+       long_help="Read serial VTK XML rectilinear grid data files.">
+       The XML Rectilinear Grid reader reads the VTK XML rectilinear grid data file format. The standard extension is .vtr.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -416,7 +482,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK XML non-uniform rectilinear grid reader.
+          This property specifies the file name for the VTK XML non-uniform rectilinear grid reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -441,7 +507,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -466,14 +532,20 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
 
    <SourceProxy name="XMLPPolyDataReader" 
-                class="vtkXMLPPolyDataReader">
+                class="vtkXMLPPolyDataReader"
+                label="XML Partitioned Polydata reader">
+     <Documentation
+       short_help="Read partitioned VTK XML polydata files."
+       long_help="Read the summary file and the associated VTK XML polydata files.">
+       The XML Partitioned Polydata reader reads the partitioned VTK polydata file format. It reads the partitioned format's summary file and then the associated VTK XML polydata files. The expected file extension is .pvtp.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -481,7 +553,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK XML partitioned polygonal dataset reader.
+          This property specifies the file name for the partitioned VTK XML polygonal dataset reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -506,7 +578,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -531,7 +603,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -539,7 +611,13 @@
    </SourceProxy>
 
    <SourceProxy name="XMLPUnstructuredGridReader" 
-                class="vtkXMLPUnstructuredGridReader">
+                class="vtkXMLPUnstructuredGridReader"
+                label="XML Partitioned Unstructured Grid reader">
+     <Documentation
+       short_help="Read partitioned VTK XML unstructured grid files."
+       long_help="Read the summary file and the associated VTK XML unstructured grid files.">
+       The XML Partitioned Unstructured Grid reader reads the partitioned VTK unstructured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML unstructured grid data files. The expected file extension is .pvtu.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -547,7 +625,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK XML partitioned unstructured grid reader.
+          This property specifies the file name for the partitioned VTK XML unstructured grid reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -572,7 +650,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -597,14 +675,20 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End XMLPUnstructuredGridReader -->
    </SourceProxy>
 
    <SourceProxy name="XMLPImageDataReader" 
-                class="vtkXMLPImageDataReader">
+                class="vtkXMLPImageDataReader"
+                label="XML Partitioned Image Data reader">
+     <Documentation
+       short_help="Read partitioned VTK XML image data files."
+       long_help="Read the summary file and the associated VTK XML image data files.">
+       The XML Partitioned Image Data reader reads the partitioned VTK image data file format. It reads the partitioned format's summary file and then the associated VTK XML image data files. The expected file extension is .pvti.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -612,7 +696,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK XML partitioned uniform rectilinear grid reader.
+          This property specifies the file name for the partitioned VTK XML uniform rectilinear grid (image/volume) reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -637,7 +721,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This propert lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -662,14 +746,20 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End XMLPImageDataReader -->
    </SourceProxy>
 
    <SourceProxy name="XMLPStructuredGridReader" 
-                class="vtkXMLPStructuredGridReader">
+                class="vtkXMLPStructuredGridReader"
+                label="XML Partitioned Structured Grid reader">
+     <Documentation
+       short_help="Read partitioned VTK XML structured grid files."
+       long_help="Read the summary file and the associated VTK XML structured grid files.">
+       The XML Partitioned Structured Grid reader reads the partitioned VTK structured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML structured grid data files. The expected file extension is .pvts.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -677,7 +767,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK XML partitioned structured grid reader.
+          This property specifies the file name for the partitioned VTK XML structured grid reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -702,7 +792,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -727,14 +817,20 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End XMLPStructuredGridReader -->
    </SourceProxy>
 
    <SourceProxy name="XMLPRectilinearGridReader" 
-                class="vtkXMLPRectilinearGridReader">
+                class="vtkXMLPRectilinearGridReader"
+                label="XML Partitioned Rectilinear Grid reader">
+     <Documentation
+       short_help="Read partitioned VTK XML rectilinear grid files."
+       long_help="Read the summary file and the associated VTK XML rectilinear grid files.">
+       The XML Partitioned Rectilinear Grid reader reads the partitioned VTK rectilinear grid file format. It reads the partitioned format's summary file and then the associated VTK XML rectilinear grid files. The expected file extension is .pvtr.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -742,7 +838,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VTK XML partitioned non-uniform rectilinear grid reader.
+          This property specifies the file name for the partitioned VTK XML non-uniform rectilinear grid reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -767,7 +863,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -792,14 +888,20 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End XMLPRectilinearGridReader -->
    </SourceProxy>
 
    <SourceProxy name="legacyreader" 
-                class="vtkPDataSetReader">
+                class="vtkPDataSetReader"
+                label="Legacy VTK reader">
+     <Documentation
+       short_help="Read legacy VTK files."
+       long_help="Read files stored in VTK's legacy file format.">
+       The Legacy VTK reader loads files stored in VTK's legacy file format (before VTK 4.2, although still supported). The expected file extension is .vtk. The type of the dataset may be structured grid, uniform rectilinear grid (image/volume), non-uniform rectiinear grid, unstructured grid, or polygonal.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -807,14 +909,20 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the legacy VTK dataset reader.
+          This property specifies the file name for the Legacy VTK reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End legacyreader -->
    </SourceProxy>
 
    <SourceProxy name="pvtkfile" 
-                class="vtkPDataSetReader">
+                class="vtkPDataSetReader"
+                label="Partitioned Legacy VTK reader">
+     <Documentation
+       short_help="Read partitioned legacy VTK files."
+       long_help="Read files stored in VTK partitioned legacy format.">
+       The Partitioned Legacy VTK reader loads files stored in VTK's partitioned legac file format (before VTK 4.2, although still supported). The expected file extension is .pvtk. The type of the dataset may be structured grid, uniform rectilinear grid (image/volume), non-uniform rectilinear grid, unstructured grid, or polygonal.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -822,21 +930,27 @@
         number_of_elements="1">
        <FileListDomain name="files"/>
        <Documentation>
-         Set the file name for the legacy partitioned VTK dataset reader.
+         This property specifies the file name for the Partitioned Legacy VTK reader.
        </Documentation>
      </StringVectorProperty>
    <!-- End pvtkfile -->
    </SourceProxy>
 
    <SourceProxy name="ensight" 
-                class="vtkGenericEnSightReader">
+                class="vtkGenericEnSightReader"
+                label="EnSight reader">
+     <Documentation
+       short_help="Read EnSight files."
+       long_help="Read EnSight 6 and Gold files.">
+       The EnSight reader reads files in the format produced by CEI's EnSight. EnSight 6 and Gold files (both ASCII and binary) are supported. The default extension is .case. The output of this reader is a multi-block dataset.
+     </Documentation>
      <StringVectorProperty
         name="CaseFileName"
         command="SetCaseFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the case file name for the EnSight reader.
+          This property specifies the case file name for the EnSight reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -859,7 +973,7 @@
          <Entry value="1" text="LittleEndian"/>
        </EnumerationDomain>
        <Documentation>
-         Select the byte order of the binary file(s).
+         This property indicates the byte order of the binary file(s).
        </Documentation>
      </IntVectorProperty>
 
@@ -884,7 +998,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -909,13 +1023,19 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End ensight -->
    </SourceProxy>
 
-   <SourceProxy name="HDF5RawImageReader" class="vtkHDF5RawImageReader">
+   <SourceProxy name="HDF5RawImageReader" class="vtkHDF5RawImageReader"
+                label="HDF5 Raw Image reader">
+     <Documentation
+       short_help="Read HDF5 datasets."
+       long_help="Read HDF5 raw image data files.">
+       The HDF5 Raw Image reader reads data in the hierarchical data format (HDF). This format was created at the National Center for Supercomputing Applications (NCSA) at the University of Illinois at Urbana-Champaign. Files of this type have a .h5 extension. The output of this reader is uniform rectilinear (image/volume) data.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -923,7 +1043,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the HDF5 raw image reader.
+          This property specifies the file name for the HDF5 raw image reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -948,7 +1068,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -959,20 +1079,26 @@
          default_values="1 1 1" >
         <IntRangeDomain name="range" min="1 1 1" />
         <Documentation>
-          Read a subset of the data spaced by the stride.
+          The values in this property indicate whether/how the data should be subsampled. Points will be skipped so that a smaller version of the data is produced. The first value indicates the change in index from one point to the next in X. The remaining two values do the same for Y and Z, respectively.
         </Documentation>
       </IntVectorProperty>
    <!-- End HDF5RawImageReader -->
    </SourceProxy>
 
-   <SourceProxy name="spcthreader" class="vtkSpyPlotReader">
+   <SourceProxy name="spcthreader" class="vtkSpyPlotReader"
+                label="Spy Plot reader">
+     <Documentation
+       short_help="Read files in the Spy Plot format."
+       long_help="Read files in the SPCTH Spy Plot file format.">
+       The Spy Plot reader loads an ASCII meta-file called the "case" file (extension .spcth). The case file lists all the binary files containing the dataset. This reader produces hierarchical datasets.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the SpyPlot reader.
+          This property specifies the file name for the Spy Plot reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -992,7 +1118,7 @@
         default_values="1" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Toggle whether the type of the volume fraction is float or should be down converted into unsinged char.
+         If this property is set to 0, the type of the volume fraction is float; is set to 1, the type is unsigned char.
        </Documentation>
      </IntVectorProperty>
 
@@ -1003,7 +1129,7 @@
         default_values="1" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         In parallel mode, toggle whether the reader distributes files or blocks.
+         In parallel mode, if this property is set to 1, the reader will distribute files or blocks.
        </Documentation>
      </IntVectorProperty>
 
@@ -1014,7 +1140,7 @@
         default_values="0" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Toggle whether to generate a cell array storing the level of each block.
+         If this property is set to 1, a cell array will be generated that stores the level of each block.
        </Documentation>
      </IntVectorProperty>
 
@@ -1025,7 +1151,7 @@
         default_values="0" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Toggle whether to generate a cell array that stores the active status of a block.
+         If this property is set to 1, a cell array will be generated that stores the active status of a block.
        </Documentation>
      </IntVectorProperty>
 
@@ -1036,7 +1162,7 @@
         default_values="0" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Toggle whether to generate a cell array storing a unique blockId of each block.
+         If this property is set to 1, a cell array will be generated that stores a unique blockId for each block.
        </Documentation>
      </IntVectorProperty>
 
@@ -1061,14 +1187,19 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End spcthreader-->
    </SourceProxy>
 
 
-   <SourceProxy name="vrmlreader" class="vtkVRMLSource">
+   <SourceProxy name="vrmlreader" class="vtkVRMLSource" label="VRML reader">
+     <Documentation
+       short_help="Read VRML 2.0 files."
+       long_help="Load the geometry from a VRML 2.0 file.">
+       The VRML reader loads only the geometry from a VRML (Virtual Reality Modeling Language) 2.0 file. The expected file extension is .wrl. The output of this reader is a polygonal dataset.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -1076,13 +1207,18 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the VRML reader.
+          This property specifies the file name for the VRML reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End vrmlreader -->
    </SourceProxy>
 
-   <SourceProxy name="plyreader" class="vtkPLYReader">
+   <SourceProxy name="plyreader" class="vtkPLYReader" label="PLY reader">
+     <Documentation
+       short_help="Read PLY polygonal files."
+       long_help="Read files stored in Stanford University's PLY polygonal file format.">
+       The PLY reader reads files stored in the PLY polygonal file format developed at Stanford University. The PLY files that ParaView can read must have the elements "vertex" and "face" defined. The "vertex" elements must have the propertys "x", "y", and "z". The "face" elements must have the property "vertex_indices" defined. The default file extension for this reader is .ply.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -1090,13 +1226,18 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the PLY reader.
+          This property specifies the file name for the PLY reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End plyreader -->
    </SourceProxy>
 
-   <SourceProxy name="pdbreader" class="vtkPDBReader">
+   <SourceProxy name="pdbreader" class="vtkPDBReader" label="PDB reader">
+     <Documentation
+       short_help="Read PDB files."
+       long_help="Read PDB molecule files.">
+       The PDB reader reads files in the format used by the Protein Data Bank (an archive of experimentally determined three-dimensional structures of biological macromolecules). The expected file extension is .pdb. The output datasets are polygonal.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -1104,20 +1245,25 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the PDB reader.
+          This property specifies the file name for the PDB reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End pdbreader -->
    </SourceProxy>
 
-   <SourceProxy name="xyzreader" class="vtkXYZMolReader">
+   <SourceProxy name="xyzreader" class="vtkXYZMolReader" label="XYZ reader">
+     <Documentation
+       short_help="Read XYZ molecular data files."
+       long_help="Read XYZ molecular data files into a polygonal dataset.">
+       The XYZ reader reads XYZ molecular data files. The expected file extension is .xyz. The output of this reader is a polygonal dataset.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the XMol Molecule reader.
+          This property specifies the file name for the XYZ reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -1129,13 +1275,19 @@
         default_values="0" >
        <IntRangeDomain name="range"/>
        <Documentation>
-         Set the current timestep.
+         This property specifies the timestep the XYZ reader should load.
        </Documentation>
      </IntVectorProperty>
    <!-- End xyzreader -->
    </SourceProxy>
 
-   <SourceProxy name="P3DReader" class="vtkMultiBlockPLOT3DReader">
+   <SourceProxy name="P3DReader" class="vtkMultiBlockPLOT3DReader"
+                label="PLOT3D reader">
+     <Documentation
+       short_help="Read PLOT3D files."
+       long_help="Read ASCII or binary PLOT3D files.">
+       PLOT3D is a plotting package developed at NASA. The PLOT3D reader can read both ASCII and binary PLOT3D files. The default file extension for the geometry files is .xyz, and the default file extension for the solution files is .q. The output of this reader is a multi-block dataset containing curvilinear (structured grid) datasets.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -1143,7 +1295,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the .xyz file name for the PLOT3D reader.
+          This property specifies the .xyz (geometry) file name for the PLOT3D reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -1154,7 +1306,7 @@
         number_of_elements="1">
        <FileListDomain name="files"/>
        <Documentation>
-         Set the .q file name for the PLOT3D reader.
+         This property specifies the .q (solution) file name for the PLOT3D reader.
        </Documentation>
      </StringVectorProperty>
 
@@ -1165,7 +1317,7 @@
         default_values="1" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Is this a binary file?
+         This property indicates whether the data files are binary.
        </Documentation>
      </IntVectorProperty>
 
@@ -1176,7 +1328,7 @@
         default_values="0" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Does this file have multiple-block information?
+         This property indicates whether these files have multiple-block information.
        </Documentation>
      </IntVectorProperty>
 
@@ -1187,7 +1339,7 @@
         default_values="0" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Does this file use Fortran leading-trailing byte counts?
+         This property indicates whether this file uses Fortran leading-trailing byte counts.
        </Documentation>
      </IntVectorProperty>
 
@@ -1198,7 +1350,7 @@
         default_values="0" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Is there any visibility information?
+         This property indicates whether this dataset has visibility information.
        </Documentation>
      </IntVectorProperty>
 
@@ -1209,7 +1361,7 @@
         default_values="0" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Is the data only two-dimensional?
+         This property indicates whether the data is two- or three-dimensional.
        </Documentation>
      </IntVectorProperty>
 
@@ -1220,7 +1372,7 @@
         default_values="0" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Should the file be read even if it appears corrupt?
+         This property indicates whether to attempt to read the file even if it appears corrupt
        </Documentation>
      </IntVectorProperty>
 
@@ -1234,7 +1386,7 @@
          <Entry value="1" text="LittleEndian"/>
        </EnumerationDomain>
        <Documentation>
-         Select the byte order of the binary file(s).
+         This property specifies the byte order of any binary file(s).
        </Documentation>
      </IntVectorProperty>
 
@@ -1261,21 +1413,27 @@
          <Entry value="210" text="Vector - Pressure gradient"/>
        </EnumerationDomain>
        <Documentation>
-         Choose which functions (arrays) to compute.
+         This property lists which functions (point-centered arrays) to compute.
        </Documentation>
      </IntVectorProperty>
    <!-- End P3DReader -->
    </SourceProxy>
 
    <SourceProxy name="PhastaReader" 
-                class="vtkPPhastaReader">
+                class="vtkPPhastaReader"
+                label="Phasta reader">
+     <Documentation
+       short_help="Read datasets stored in the Phasta format."
+       long_help="Read the parallel Phasta meta-file and the underlying Phasta files.">
+       This Phasta reader reads files stored in the Phasta (a CFD package) format. The expected file extension is .pht. The output of this reader is an unstructured grid.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the Phasta reader.
+          This property specifies the file name for the Phasta reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -1298,7 +1456,7 @@
           </RequiredProperties>
        </IntRangeDomain>
        <Documentation>
-         Set the current timestep.
+         This property indicates which timestep in the dataset to load.
        </Documentation>
      </IntVectorProperty>
 
@@ -1312,7 +1470,12 @@
      </DoubleVectorProperty>
    </SourceProxy>
 
-   <SourceProxy name="stlreader" class="vtkSTLReader">
+   <SourceProxy name="stlreader" class="vtkSTLReader" label="STL reader">
+     <Documentation
+       short_help="Read STL files."
+       long_help="Read ASCII or binary stereo lithography (STL) files.">
+       The STL reader reads ASCII or binary stereo lithography (STL) files. The expected file extension is .stl. The output of this reader is a polygonal dataset.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -1320,13 +1483,18 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the STL reader.
+          This property specifies the file name for the STL reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End stlreader -->
    </SourceProxy>
 
-   <SourceProxy name="byureader" class="vtkBYUReader">
+   <SourceProxy name="byureader" class="vtkBYUReader" label="BYU reader">
+     <Documentation
+       short_help="Read Movie.BYU files."
+       long_help="Read Movie.BYU files to produce polygonal data.">
+       The BYU reader reads data stored in Movie.BYU format. The expected file extension is .g. The datasets resulting from reading these files are polygonal.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -1334,13 +1502,19 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the BYU reader.
+          This property specifies the file name for the BYU reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End stlreader -->
    </SourceProxy>
 
-   <SourceProxy name="gaussiancubereader" class="vtkGaussianCubeReader">
+   <SourceProxy name="gaussiancubereader" class="vtkGaussianCubeReader"
+                label="Gaussian Cube reader">
+     <Documentation
+       short_help="Read Gaussian Cube data files."
+       long_help="Produce polygonal data by reading a Gaussian Cube file.">
+       The Gaussian Cube reader produces polygonal data by reading data files produced by the Gaussian software package. The expected file extension is .cube.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -1348,7 +1522,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the Gaussian Cube reader.
+          This property specifies the file name for the Gaussian Cube reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -1359,7 +1533,7 @@
          default_values="1.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the HB scale.
+          This property specifies the HB scale.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1370,13 +1544,18 @@
          default_values="1.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the B scale.
+          This property specifies the B scale.
         </Documentation>
       </DoubleVectorProperty>
    <!-- End gaussiancubereader -->
    </SourceProxy>
 
-   <SourceProxy name="popreader" class="vtkPOPReader">
+   <SourceProxy name="popreader" class="vtkPOPReader" label="POP reader">
+     <Documentation
+       short_help="Read POP data files."
+       long_help="Read data files from the Parallel Ocean Program (POP).">
+       The POP reader reads data files from the Parallel Ocean Program (POP). The expected file extension is .pop. The output of this reader is a structured grid dataset. 
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -1384,7 +1563,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the POP Ocean file reader.
+          This property specifies the file name for the POP Ocean file reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -1395,7 +1574,7 @@
          default_values="60000" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the radius of the dataset.
+          This property specifies the radius of the dataset.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1406,7 +1585,7 @@
         default_values="-2147483647 2147483647 -2147483647 2147483647 -2147483647 2147483647" > 
        <IntRangeDomain name="range"/>
        <Documentation>
-         Choose the extent of the dataset to read.
+         This property indicates the minimum and maximum extent in each dimension of the dataset (X, Y, and Z) to read.
        </Documentation>
      </IntVectorProperty>
 
@@ -1417,21 +1596,27 @@
         default_values="1" > 
        <IntRangeDomain name="range"/>
        <Documentation>
-         Set the number of ghost levels to generate.
+         This property indicates the number of ghost levels to generate.
        </Documentation>
      </IntVectorProperty>
    <!-- End popreader -->
    </SourceProxy>
 
    <SourceProxy name="ensightMS" 
-                class="vtkPVEnSightMasterServerReader">
+                class="vtkPVEnSightMasterServerReader"
+                label="EnSight Master Server reader">
+     <Documentation
+       short_help="Read parallel EnSight files."
+       long_help="Read files in EnSight's Master Server format.">
+       The EnSight Master Server reader reads EnSight's parallel files. The master file ususally has a .sos extension and may point to multiple .case files. The output is a multi-block dataset.
+     </Documentation>
      <StringVectorProperty
         name="CaseFileName"
         command="SetCaseFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the .sos file for the EnSight Master Server reader.
+          This property specifies the name of the .sos file for the EnSight Master Server reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -1445,7 +1630,7 @@
          <Entry value="1" text="LittleEndian"/>
        </EnumerationDomain>
        <Documentation>
-         Select the byte order of the binary file(s).
+         This property indicates the byte order of the binary file(s).
        </Documentation>
      </IntVectorProperty>
 
@@ -1457,7 +1642,7 @@
          animateable="1">
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the time value to read.
+          This property indicates which time value to read.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1482,7 +1667,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Select which cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -1507,16 +1692,19 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Select which point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End ensightMS -->
    </SourceProxy>
 
    <SourceProxy name="ImageReader" 
-                class="vtkImageReader">
+                class="vtkImageReader"
+                label="Image reader">
      <Documentation
-        long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
+       short_help="Read raw regular rectilinear grid data from a file." 
+       long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
+       The Image reader reads raw regular rectilinear grid (image/volume) data from a file. Because no metadata is provided, the user must specify information about the size, spacing, dimensionality, etc. about the dataset.
      </Documentation>
      <!-- Unlike most readers, we need to show the "filename" so that users
           can strip off the extension and replace it in the file pattern.
@@ -1532,7 +1720,7 @@
         number_of_elements="1">
        <FileListDomain name="files"/>
        <Documentation>
-         Set the file prefix (directory plus common initial part of file name) for the raw binary uniform rectilinear grid dataset.
+         The text string contained in this property specifies the file prefix (directory plus common initial part of file name) for the raw binary uniform rectilinear grid dataset.
        </Documentation>
      </StringVectorProperty>
 
@@ -1542,7 +1730,7 @@
         number_of_elements="1" 
         default_values="%s">
         <Documentation>
-          Set the format string to determine the file names necessary for reading this dataset. In creating the filenames, %s will be replaced by the prefix and %d by a digit which represents the slice number in Z.
+          The text string contained in the property specifies the format string to determine the file names necessary for reading this dataset. In creating the filenames, %s will be replaced by the prefix and %d by a digit which represents the slice number in Z. The format string is the same as that used by printf.
         </Documentation>
      </StringVectorProperty>
 
@@ -1564,7 +1752,7 @@
          <Entry value="11" text="double"/>
        </EnumerationDomain>
        <Documentation>
-         Select the pixel or voxel type in the file(s): short, int, float ...
+         The value of this property indicates the scalar type of the pixels/voxels in the file(s): short, int, float ...
        </Documentation>
      </IntVectorProperty>
 
@@ -1578,7 +1766,7 @@
          <Entry value="1" text="LittleEndian"/>
        </EnumerationDomain>
        <Documentation>
-         Select the byte order of the binary file(s).
+         This property indicates the byte order of the binary file(s).
        </Documentation>
      </IntVectorProperty>
 
@@ -1592,7 +1780,7 @@
          <Entry value="3" text="3"/>
        </EnumerationDomain>
        <Documentation>
-         Select whether the file(s) in this dataset contain slices (2D) or volumes (3D).
+         This property indicates whether the file(s) in this dataset contain slices (2D) or volumes (3D).
        </Documentation>
      </IntVectorProperty>
 
@@ -1603,7 +1791,7 @@
          default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the position of the point with index (0,0,0).
+          The coordinate contained in this property specifies the position of the point with index (0,0,0).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1614,7 +1802,7 @@
          default_values="1.0 1.0 1.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Set the size of a voxel in each dimension.
+          This property specifies the size of a voxel in each dimension.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1625,7 +1813,7 @@
         default_values="0 0 0 0 0 0" >
        <IntRangeDomain name="range"/>
        <Documentation>
-         Set the minimum and maximum index values of the data in each dimension.
+         This property specifies the minimum and maximum index values of the data in each dimension (xmin, xmax, ymin, ymax, zmin, zmax).
        </Documentation>
      </IntVectorProperty>
 
@@ -1636,7 +1824,7 @@
         default_values="1" >
        <IntRangeDomain name="range"/>
        <Documentation>
-         Set the number of componenets each pixel or voxel has (e.g., RGB - 3 scalar components).
+         This property specifies the number of componenets the scalar value at each pixel or voxel has (e.g., RGB - 3 scalar components).
        </Documentation>
      </IntVectorProperty>
 
@@ -1646,21 +1834,27 @@
         number_of_elements="1" 
         default_values="ImageFile">
         <Documentation>
-          Specify a name to assign to the point-centered data array read.
+          This property contains a text string listing a name to assign to the point-centered data array read.
         </Documentation>
      </StringVectorProperty>
    <!-- End ImageReader -->
    </SourceProxy>
 
    <SourceProxy name="XdmfReader" 
-                class="vtkXdmfReader">
+                class="vtkXdmfReader"
+                label="XDMF reader">
+     <Documentation
+       short_help="Read XDMF data files."
+       long_help="Read XDMF (eXtensible Data Model and Format) files.">
+       The XDMF reader reads files in XDMF format. The expected file extension is .xmf. Metadata is stored in the XDMF file using an XML format, and large attribute arrays are stored in a corresponding HDF5 file. The output may be unstructured grid, structured grid, or rectiliner grid.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the XDMF reader.
+          This property specifies the file name for the XDMF reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -1679,7 +1873,7 @@
         label="Domain Name">
         <StringListDomain name="AvailableDomains"/>
         <Documentation>
-          Set the domain name.
+          This property lists the domain name.
         </Documentation>
      </StringVectorProperty>
 
@@ -1699,7 +1893,7 @@
         label="Grid Name">
         <StringListDomain name="AvailableGrids"/>
         <Documentation>
-          Set the grid name.
+          This property lists the grid name.
         </Documentation>
      </StringVectorProperty>
 
@@ -1721,7 +1915,7 @@
         number_of_elements="1" 
         repeat_command="1">
         <Documentation>
-          Select which grid(s) to enable.
+          This property indicates which grid(s) to enable.
         </Documentation>
      </StringVectorProperty>
 
@@ -1748,7 +1942,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which cell-centered arrays to read.
+         This property lists which the cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -1775,7 +1969,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which point-centered arrays to read.
+         This property lists which the point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -1787,7 +1981,7 @@
          animateable="0">
         <IntRangeDomain name="range" min="1 1 1" />
         <Documentation>
-          Set the number of steps to skip between each point (structured data only).
+          If loading structured data, this property indicate the number of indices per dimension (X, Y, or Z) to skip between each point included in this output.
         </Documentation>
       </IntVectorProperty>
 
@@ -1811,14 +2005,20 @@
           </RequiredProperties>
        </XDMFPropertyDomain>
        <Documentation>
-         Set the parameter index.
+         This property specifies the parameter index.
        </Documentation>
      </StringVectorProperty>
    <!-- End XdmfReader -->
    </SourceProxy>
 
    <SourceProxy name="ExodusReader" 
-                class="vtkPExodusReader">
+                class="vtkPExodusReader"
+                label="Exodus reader">
+     <Documentation
+       short_help="Read Exodus II files."
+       long_help="Read an Exodus II file to produce an unstructured grid.">
+        The Exodus reader loads Exodus II files and produces an unstructured grid output. The default file extensions are .g, .e, .ex2, .ex2v2, .exo, .gen, .exoII, .0, .00, .000, and .0000.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -1826,7 +2026,7 @@
         animateable="0" >
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the Exodus reader.
+          This property specifies the file name for the Exodus reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -1841,14 +2041,15 @@
         name="XMLFileName"
         command="SetXMLFileName"
         number_of_elements="1"
-        animateable="0" >
+        animateable="0"
+        label="XML File Name">
        <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
              <Property name="XMLFileNameInfo" function="XMLFileName"/>
           </RequiredProperties>
        </FileListDomain>
        <Documentation>
-         Set the name of an XML file containing part and material descriptions and a mapping to element blocks.
+         This property specifies the name of an XML file containing part and material descriptions and a mapping to element blocks.
        </Documentation>
      </StringVectorProperty>
 
@@ -1871,7 +2072,7 @@
           </RequiredProperties>
        </FileListDomain>
         <Documentation>
-          Set the file root used with the file pattern to format a file name.
+          This property specifies the file root used with the file pattern to format a file name. (See the File Pattern property.)
         </Documentation>
      </StringVectorProperty>
 
@@ -1894,7 +2095,7 @@
           </RequiredProperties>
        </FileListDomain>
        <Documentation>
-         Set the pattern used to load files. There are two parts to it: the prefix (%s) and the file number (%i).
+         This property contains a text string specifying the pattern used to load files. There are two parts to it: the prefix (%s) and the file number (%i). The format used is the same as that used for printf.
        </Documentation>
      </StringVectorProperty>
 
@@ -1918,7 +2119,7 @@
           </RequiredProperties>
        </IntRangeDomain>
        <Documentation>
-         Choose the indices of the first and last files to be read.
+         This property controls the indices of the first and last files to be read.
        </Documentation>
      </IntVectorProperty>
 
@@ -1942,7 +2143,7 @@
           </RequiredProperties>
        </IntRangeDomain>
        <Documentation>
-         Set the current timestep.
+         This property specifies the current timestep.
        </Documentation>
      </IntVectorProperty>
 
@@ -1968,7 +2169,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose the cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -1994,7 +2195,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose the point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
      
@@ -2020,7 +2221,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose the side set arrays to read.
+         This property lists which side set arrays to read.
        </Documentation>
      </StringVectorProperty>
      
@@ -2046,7 +2247,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose the node set arrays to read.
+         This property lists which node set arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -2056,7 +2257,7 @@
         number_of_elements="1" 
         default_values="1">
         <Documentation>
-          Set the display type (blocks = 1, materials = 2, hierarchy = 3).
+          This property indicates the display type (blocks = 1, materials = 2, hierarchy = 3).
         </Documentation>
      </IntVectorProperty>
 
@@ -2082,7 +2283,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which block arrays to read.
+         This property lists which block arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -2108,7 +2309,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which material arrays to read.
+         This property lists which material arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -2134,7 +2335,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Choose which hierarchy arrays to read.
+         This property lists which hierarchy arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -2146,7 +2347,7 @@
         label="Block Ids"> 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Select whether the reader generates block ids.
+         If this property is set to 1, the reader will generate block ids. Otherwise these ids will not be generated.
        </Documentation>
      </IntVectorProperty>
 
@@ -2158,7 +2359,7 @@
         label="Global Node Ids">
        <BooleanDomain name="bool"/>
        <Documentation>
-         Select whether the reader generates global node ids.
+         If this property is set to 1, the reader will generate global node ids. Otherwise these ids will not be generated.
        </Documentation>
      </IntVectorProperty>
 
@@ -2170,7 +2371,7 @@
         label="Global Element Ids">
        <BooleanDomain name="bool"/>
        <Documentation>
-         Select whether the reader generates global element ids.
+         If this property is set to 1, the reader will generates global element ids. Otherwise these ids will not be generated.
        </Documentation>
      </IntVectorProperty>
 
@@ -2182,7 +2383,7 @@
         label="File Ids">
        <BooleanDomain name="bool"/>
        <Documentation>
-         Select whether the reader generates cell-based disk file ids.
+         If this property is set to 1, the reader will generate cell-based disk file ids. Otherwise these ids will not be generated.
        </Documentation>
      </IntVectorProperty>
 
@@ -2194,7 +2395,7 @@
         label="Include metadata">
        <BooleanDomain name="bool"/>
        <Documentation>
-         Turn this option on if you plan to write Exodus or EnSight files.
+         If this property is set to 1, Exodus model metadata will be created; this is the case needed if you plan to write Exodus or EnSight files. Otherwise set this property to 0 and the metadata will not be created.
        </Documentation>
      </IntVectorProperty>
 
@@ -2205,7 +2406,7 @@
         default_values="1" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Select whether the reader automatically applies displacements.
+         If this property is set to 1, the reader will automatically apply displacements.
        </Documentation>
      </IntVectorProperty>
 
@@ -2216,7 +2417,7 @@
         default_values="1" > 
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         Set the magnitude of the applied displacement.
+         If the value of the Apply Displacements property is 1, the value of this property specifies the magnitude of the applied displacement.
        </Documentation>
      </DoubleVectorProperty>
 
@@ -2230,9 +2431,8 @@
          shapes.  In this case, it does not make sense to iterate over the
          "time steps", because they are not meant to be played in order.
          Rather, each represents the vibration at a different "mode."
-         Setting this to 1 changes the semantics of the reader to not
-         report the time steps to downstream filters.  By default, this is
-         off, which is the case for most Exodus files.
+         Setting the value of this property to 1 changes the semantics of the reader to not
+         report the time steps to downstream filters.
        </Documentation>
      </IntVectorProperty>
 
@@ -2251,7 +2451,13 @@
    </SourceProxy>
 
    <SourceProxy name="AVSucdReader" 
-                class="vtkAVSucdReader">
+                class="vtkAVSucdReader"
+                label="AVS UCD reader">
+     <Documentation
+       short_help="Read a dataset in AVS UCD format."
+       long_help="Read binary or ASCII files stored in AVS UCD format.">
+       The AVS UCD reader reads binary or ASCII files stored in AVS UCD format. The default file extension is .inp. The output of this reader is unstructured grid.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -2259,7 +2465,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the AVS UCD reader.
+          This property specifies the file name for the AVS UCD reader.
         </Documentation>
      </StringVectorProperty>
 
@@ -2284,7 +2490,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Select which cell-centered arrays to read.
+         This property contains a list of the cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -2309,7 +2515,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         Select which point-centered arrays to read.
+         This property contains a list of the point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
    <!-- End AVSucdReader -->
@@ -2317,6 +2523,11 @@
 
    <SourceProxy name="Facet Reader" 
                 class="vtkFacetReader">
+     <Documentation
+       short_help="Read a dataset in Facet format."
+       long_help="Read ASCII files stored in Facet format.">
+       The Facet Reader reads files in Facet format: a simple ASCII file format listing point coordinates and connectivity between these points. The default file extension is .facet. The output of the Facet Reader is polygonal.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -2324,7 +2535,7 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the Facet reader.
+          This property specifies the file name for the Facet reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End Facet Reader -->
@@ -2332,6 +2543,11 @@
 
    <SourceProxy name="Meta Image Reader" 
                 class="vtkMetaImageReader">
+     <Documentation
+       short_help="Read UNC meta image data."
+       long_help="Read binary UNC meta image data.">
+       The Meta Image Reader reads binary UNC meta image data, and produces uniform rectilinear (image/volume) data. The default file extensions are .mhd and .mha.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -2339,14 +2555,20 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the Meta Image reader.
+          This property specifies the file name for the Meta Image reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End Meta Image Reader -->
    </SourceProxy>
 
    <SourceProxy name="PNGReader" 
-                class="vtkPNGReader">
+                class="vtkPNGReader"
+                label="PNG reader">
+     <Documentation
+       short_help="Read a PNG file."
+       long_help="Read a PNG file into an image data.">
+       The PNG reader reads PNG (Portable Network Graphics) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -2354,21 +2576,27 @@
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the PNG reader.
+          This property specifies the file name for the PNG reader.
         </Documentation>
      </StringVectorProperty>
    <!-- End PNGReader -->
    </SourceProxy>
 
    <SourceProxy name="SESAMEReader"
-                class="vtkSESAMEReader">
+                class="vtkSESAMEReader"
+                label="SESAME reader">
+     <Documentation
+       short_help="Read SESAME data files."
+       long_help="Read SESAME data files, producing rectilinear grids.">
+       The SESAME reader reads SESAME data files, and outputs rectilinear grids. The expected file extension is .sesame.
+     </Documentation>
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the SESAME reader.
+          This property specifies the file name for the SESAME reader.
         </Documentation>
      </StringVectorProperty>
      <IntVectorProperty
@@ -2382,7 +2610,7 @@
           </RequiredProperties>
          </EnumerationDomain>
          <Documentation>
-           Set which table to read.
+           This proeprty indicates which table to read.
          </Documentation>
      </IntVectorProperty>
      <IntVectorProperty
@@ -2758,12 +2986,17 @@
    </SourceProxy>
    <!-- End of LSDyna Reader -->
 
-   <SourceProxy name="CSVReader" class="vtkCSVReader">
+   <SourceProxy name="CSVReader" class="vtkCSVReader" label="CSV reader">
+      <Documentation
+        short_help="Read a comma-separated values file."
+        long_help="Read a comma-separated values file into a 1D rectilinear grid.">
+        The CSV reader reads a comma-separated values file into a 1D rectilinear grid. If the file was saved using the CSVWriter, then the rectilinear grid's points and point data can be restored as well as the cell data. Otherwise all the data in the CSV file is treated as cell data. The default file extension is .csv.
+      </Documentation>
       <StringVectorProperty name="FileName"
         command="SetFileName">
         <FileListDomain name="files"/>
         <Documentation>
-          Set the file name for the CSV (Command Separated Values) reader.
+          This property specifies the file name for the CSV (Command Separated Values) reader.
         </Documentation>
       </StringVectorProperty>
 
@@ -2773,7 +3006,7 @@
         default_values="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          Set/get whether to use the string delimiter.
+          This property indicates whether to use the string delimiter.
         </Documentation>
       </IntVectorProperty>
 
@@ -2783,7 +3016,7 @@
         default_values="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          Set whether to treat the first line of the file as headers.
+          If the value of this property is 1, treat the first line of the file as headers.
         </Documentation>
       </IntVectorProperty>
 
@@ -2792,11 +3025,11 @@
         number_of_elements="1"
         default_values=",">
         <Documentation>
-          Get/set the characters that will be used to separate fields.  For
-          example, set this to "," for a comma-separated value file.  Set
-          it to ".:;" for a file where columns can be separated by a
-          period, colon or semicolon.  The order of the characters in the
-          string does not matter.  Defaults to a comma.
+          This property lists the characters that may be used to separate fields.  For
+          example, a value of "," indicates a comma-separated value file.  A
+          value of ".:;" indicates that columns may be separated by a
+          period, colon or semicolon.  The order of the characters in the text
+          string does not matter.
         </Documentation>
       </StringVectorProperty>
       <!-- End of CSVReader -->
