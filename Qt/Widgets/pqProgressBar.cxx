@@ -56,7 +56,7 @@ void pqProgressBar::setProgress(const QString& message, int _value)
 {
   this->Message = message + ": ";
   this->setValue(_value);
-  QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+  //QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
 //-----------------------------------------------------------------------------
