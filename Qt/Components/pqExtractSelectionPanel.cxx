@@ -237,11 +237,11 @@ void pqExtractSelectionPanel::updateInformationAndDomains()
     }
 
   vtkPVDataInformation* dataInfo = input->getDataInformation();
-  vtkSMExtractSelectionProxy* proxy = vtkSMExtractSelectionProxy::SafeDownCast(
+  vtkSMExtractSelectionProxy* smproxy = vtkSMExtractSelectionProxy::SafeDownCast(
     filter->getProxy());
 
   vtkPVDataSetAttributesInformation* dsainfo = 0;
-  if (proxy && proxy->GetSelectionFieldType() == vtkSelection::CELL)
+  if (smproxy && smproxy->GetSelectionFieldType() == vtkSelection::CELL)
     {
     dsainfo = dataInfo->GetCellDataInformation();
     }
