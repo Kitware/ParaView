@@ -73,7 +73,7 @@ public:
   virtual ~pqPipelineModelItem() {}
 
   virtual QString getName() const=0;
-  virtual VisibleState getVisibleState(pqGenericViewModule *module) const=0;
+  virtual VisibleState getVisibleState() const=0;
   virtual bool isSelectable() const {return true;}
   virtual void setSelectable(bool selectable)=0;
   virtual bool isModified() const=0;
@@ -102,8 +102,7 @@ public:
   virtual ~pqPipelineModelServer();
 
   virtual QString getName() const;
-  virtual pqPipelineModelItem::VisibleState getVisibleState(
-      pqGenericViewModule *module) const;
+  virtual pqPipelineModelItem::VisibleState getVisibleState() const;
   virtual bool isSelectable() const {return this->Selectable;}
   virtual void setSelectable(bool selectable) {this->Selectable = selectable;}
   virtual bool isModified() const {return false;}
@@ -150,8 +149,7 @@ public:
   virtual ~pqPipelineModelSource();
 
   virtual QString getName() const;
-  virtual pqPipelineModelItem::VisibleState getVisibleState(
-      pqGenericViewModule *module) const;
+  virtual pqPipelineModelItem::VisibleState getVisibleState() const;
   virtual bool isSelectable() const {return this->Selectable;}
   virtual void setSelectable(bool selectable) {this->Selectable = selectable;}
   virtual bool isModified() const;
@@ -167,9 +165,12 @@ public:
 
   QList<pqPipelineModelObject *> &getOutputs() {return this->Outputs;}
 
+  void setVisibleState(pqGenericViewModule *module);
+
 private:
   pqPipelineSource *Source;
   QList<pqPipelineModelObject *> Outputs;
+  pqPipelineModelItem::VisibleState Eyeball;
   bool Selectable;
 };
 
@@ -201,8 +202,7 @@ public:
   virtual ~pqPipelineModelLink() {}
 
   virtual QString getName() const;
-  virtual pqPipelineModelItem::VisibleState getVisibleState(
-      pqGenericViewModule *module) const;
+  virtual pqPipelineModelItem::VisibleState getVisibleState() const;
   virtual bool isSelectable() const;
   virtual void setSelectable(bool selectable);
   virtual bool isModified() const;
@@ -292,8 +292,7 @@ QString pqPipelineModelServer::getName() const
   return QString();
 }
 
-pqPipelineModelItem::VisibleState pqPipelineModelServer::getVisibleState(
-    pqGenericViewModule *) const
+pqPipelineModelItem::VisibleState pqPipelineModelServer::getVisibleState() const
 {
   return pqPipelineModelItem::NotAllowed;
 }
@@ -339,6 +338,7 @@ pqPipelineModelSource::pqPipelineModelSource(pqPipelineModelServer *server,
   : pqPipelineModelObject(server, parentObject), Outputs()
 {
   this->Source = source;
+  this->Eyeball = pqPipelineModelItem::NotAllowed;
   this->Selectable = true;
 
   this->setType(pqPipelineModel::Source);
@@ -366,30 +366,9 @@ QString pqPipelineModelSource::getName() const
   return QString();
 }
 
-pqPipelineModelItem::VisibleState pqPipelineModelSource::getVisibleState(
-    pqGenericViewModule *module) const
+pqPipelineModelItem::VisibleState pqPipelineModelSource::getVisibleState() const
 {
-  // If no view module is preset, it implies that a suitable type
-  // of view module will be created.
-  pqPipelineModelItem::VisibleState state = pqPipelineModelItem::NotVisible;
-  if(module && module->getServer() == this->Source->getServer())
-    {
-    pqConsumerDisplay*display = this->Source->getDisplay(module);
-    if(display && display->isVisible())
-      {
-      state = pqPipelineModelItem::Visible;
-      }
-    else if (module->canDisplaySource(this->Source))
-      {
-      state = pqPipelineModelItem::NotVisible;
-      }
-    else
-      {
-      state = pqPipelineModelItem::NotAllowed;
-      }
-    }
-
-  return state;
+  return this->Eyeball;
 }
 
 bool pqPipelineModelSource::isModified() const
@@ -443,6 +422,30 @@ void pqPipelineModelSource::removeChild(pqPipelineModelItem *item)
     }
 }
 
+void pqPipelineModelSource::setVisibleState(pqGenericViewModule *module)
+{
+  // If no view module is preset, it implies that a suitable type
+  // of view module will be created.
+  this->Eyeball = pqPipelineModelItem::NotVisible;
+  if(module)
+    {
+    pqConsumerDisplay *display = this->Source->getDisplay(module);
+    if(display && display->isVisible())
+      {
+      this->Eyeball = pqPipelineModelItem::Visible;
+      }
+    else if(module->canDisplaySource(this->Source))
+      {
+      this->Eyeball = pqPipelineModelItem::NotVisible;
+      }
+    else
+      {
+      this->Eyeball = pqPipelineModelItem::NotAllowed;
+      }
+    }
+
+}
+
 
 //-----------------------------------------------------------------------------
 pqPipelineModelFilter::pqPipelineModelFilter(pqPipelineModelServer *server,
@@ -492,12 +495,11 @@ QString pqPipelineModelLink::getName() const
   return QString();
 }
 
-pqPipelineModelItem::VisibleState pqPipelineModelLink::getVisibleState(
-    pqGenericViewModule *module) const
+pqPipelineModelItem::VisibleState pqPipelineModelLink::getVisibleState() const
 {
   if(this->Sink)
     {
-    return this->Sink->getVisibleState(module);
+    return this->Sink->getVisibleState();
     }
 
   return pqPipelineModelItem::NotAllowed;
@@ -765,8 +767,7 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
           {
           if(idx.column() == 1)
             {
-            pqPipelineModelItem::VisibleState visible = item->getVisibleState(
-                this->Internal->RenderModule);
+            pqPipelineModelItem::VisibleState visible = item->getVisibleState();
             if(visible == pqPipelineModelItem::Visible)
               {
               return QVariant(QIcon(
@@ -1042,6 +1043,9 @@ void pqPipelineModel::addSource(pqPipelineSource *source)
     // Add the source to the map.
     this->Internal->ItemMap.insert(source, item);
 
+    // Set up the source visibility state.
+    item->setVisibleState(this->Internal->RenderModule);
+
     QModelIndex parentIndex = this->makeIndex(server);
     int row = server->getChildCount();
     this->beginInsertRows(parentIndex, row, row);
@@ -1216,18 +1220,20 @@ void pqPipelineModel::updateItemName(pqServerManagerModelItem *item)
 }
 
 void pqPipelineModel::updateDisplays(pqPipelineSource *source,
-    pqConsumerDisplay*)
+    pqConsumerDisplay *)
 {
-  pqPipelineModelItem *item = this->getModelItemFor(source);
+  pqPipelineModelSource *item = dynamic_cast<pqPipelineModelSource *>(
+      this->getModelItemFor(source));
   if(item)
     {
     // Update the current window column.
+    item->setVisibleState(this->Internal->RenderModule);
     QModelIndex changed = this->makeIndex(item, 1);
     emit this->dataChanged(changed, changed);
 
     // TODO: Update the column with the display list.
     // If the item is a fan in point, update the link items.
-    this->updateInputLinks(dynamic_cast<pqPipelineModelFilter *>(source), 1);
+    this->updateInputLinks(dynamic_cast<pqPipelineModelFilter *>(item), 1);
     }
 }
 
@@ -1238,37 +1244,64 @@ void pqPipelineModel::setViewModule(pqGenericViewModule *module)
     return;
     }
 
-  // Update the current view column for the previous render module.
-  // If the render modules are from different servers (or either one of them is NULL), 
-  // the whole column needs to be updated. Otherwise, use the previous and
-  // current render module to look up the affected sources.
-  QModelIndex changed;
-  pqPipelineModelItem *item = 0;
-  if ( (this->Internal->RenderModule && module &&
-      this->Internal->RenderModule->getServer() != module->getServer()) ||
-    !this->Internal->RenderModule || !module)
+  // If the render modules are from different servers or either one
+  // of them is NULL, the whole column needs to be updated. Otherwise,
+  // use the previous and current render module to look up the
+  // affected sources.
+  if(!this->Internal->RenderModule || !module ||
+      (this->Internal->RenderModule && module &&
+      this->Internal->RenderModule->getServer() != module->getServer()))
     {
     this->Internal->RenderModule = module;
+
+    pqPipelineModelItem *item = 0;
     if(this->Internal->Servers.size() > 0)
       {
       item = this->Internal->Servers.first();
       }
 
+    QModelIndex changed;
+    QList<QPersistentModelIndex> toUpdate;
+    pqPipelineModelSource *source = 0;
+    //pqPipelineModelLink *link = 0;
     while(item)
       {
-      changed = this->makeIndex(item, 1);
-      emit this->dataChanged(changed, changed);
+      source = dynamic_cast<pqPipelineModelSource *>(item);
+      //link = dynamic_cast<pqPipelineModelLink *>(item);
+      if(source)
+        {
+        source->setVisibleState(this->Internal->RenderModule);
+        changed = this->makeIndex(source, 1);
+        emit this->dataChanged(changed, changed);
+
+        // If the item is a fan in point, update the link items.
+        this->updateInputLinks(
+            dynamic_cast<pqPipelineModelFilter *>(source), 1);
+        }
+
+      //if(link || source)
+      //  {
+        //toUpdate.append(this->makeIndex(item, 1));
+      //  }
+
       item = this->getNextModelItem(item);
+      }
+
+    QList<QPersistentModelIndex>::Iterator iter = toUpdate.begin();
+    for( ; iter != toUpdate.end(); ++iter)
+      {
+      emit this->dataChanged(*iter, *iter);
       }
     }
   else
     {
-    if(this->Internal->RenderModule)
+    pqGenericViewModule *oldModule = this->Internal->RenderModule;
+    this->Internal->RenderModule = module;
+    if(oldModule)
       {
-      this->updateDisplays(this->Internal->RenderModule);
+      this->updateDisplays(oldModule);
       }
 
-    this->Internal->RenderModule = module;
     if(this->Internal->RenderModule)
       {
       this->updateDisplays(this->Internal->RenderModule);
@@ -1468,22 +1501,25 @@ void pqPipelineModel::removeConnection(pqPipelineModelSource *source,
 void pqPipelineModel::updateDisplays(pqGenericViewModule *module)
 {
   QModelIndex changed;
-  pqPipelineModelItem *item = 0;
-  pqConsumerDisplay* display = 0;
+  pqPipelineModelSource *source = 0;
+  pqConsumerDisplay *display = 0;
   int total = module->getDisplayCount();
   for(int i = 0; i < total; i++)
     {
-    display = qobject_cast<pqConsumerDisplay*>(module->getDisplay(i));
+    display = qobject_cast<pqConsumerDisplay *>(module->getDisplay(i));
     if(display)
       {
-      item = this->getModelItemFor(display->getInput());
-      if(item)
+      source = dynamic_cast<pqPipelineModelSource *>(
+          this->getModelItemFor(display->getInput()));
+      if(source)
         {
-        changed = this->makeIndex(item, 1);
+        source->setVisibleState(this->Internal->RenderModule);
+        changed = this->makeIndex(source, 1);
         emit this->dataChanged(changed, changed);
 
         // If the item is a fan in point, update the link items.
-        this->updateInputLinks(dynamic_cast<pqPipelineModelFilter *>(item), 1);
+        this->updateInputLinks(
+            dynamic_cast<pqPipelineModelFilter *>(source), 1);
         }
       }
     }
