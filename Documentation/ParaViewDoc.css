@@ -1,0 +1,31 @@
+body {
+  border: 1px solid #000000;
+  background: #EEF3F5;
+  margin: 0px;
+  padding: 0px;
+}
+div.ProxyHeading {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  background: #adc4d2;
+  font-weight: bold;
+  font-size: 24pt;
+  border-bottom: 1px solid #000000;
+}
+span.ProxyHeadingSmallText {
+  font-weight: bold;
+  font-size: 12pt;
+}
+div.ProxyLongHelp {
+  margin: 20px;
+  font-style: italic;
+}
+div.ProxyDescription {
+  border-top: 1px solid;
+}
+table.PropertiesTable {
+}
+tr.PropertiesTableHeading {
+  background: #85a8bc;
+}

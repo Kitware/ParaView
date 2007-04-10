@@ -10,6 +10,10 @@ configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewLogo.png"
   "${CMAKE_CURRENT_BINARY_DIR}/ParaViewLogo.png"
   COPYONLY)
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewDoc.css"
+  "${CMAKE_CURRENT_BINARY_DIR}/ParaViewDoc.css"
+  COPYONLY)
 
 set(dir "${ParaView_BINARY_DIR}/Documentation/")
 install(DIRECTORY ${ParaView_BINARY_DIR}/Documentation/ 

@@ -39,41 +39,9 @@
 // Template for the <head/> with CSS styles for the Proxy documentation.
 static const char* ProxyDocumentHeadTemplate =
   "<head>\n"\
-    "  <title>%TITLE%</title>\n"\
-    "  <style>\n"\
-    "    body{\n"\
-    "      border: 1px solid #000000;\n"\
-    "      background: #EEF3F5;\n"\
-    "      margin: 0px;\n"\
-    "      padding: 0px;\n"\
-    "    }\n"\
-    "    div.ProxyHeading{\n"\
-    "      padding-top: 5px;\n"\
-    "      padding-bottom: 5px;\n"\
-    "      padding-left: 5px;\n"\
-    "      background: #adc4d2;"\
-    "      font-weight: bold;\n"\
-    "      font-size: 24pt;\n"\
-    "      border-bottom: 1px solid #000000;\n"\
-    "    }\n"\
-    "    span.ProxyHeadingSmallText{\n"\
-    "      font-weight: bold;\n"\
-    "      font-size: 12pt;\n"\
-    "    }\n"\
-    "    div.ProxyLongHelp {\n"\
-    "      margin: 20px;\n"\
-    "      font-style: italic;\n"\
-    "    }\n"\
-    "    div.ProxyDescription {\n"\
-    "      border-top: 1px solid;\n"\
-    "    }\n"\
-    "    table.PropertiesTable {\n"\
-    "    }\n"\
-    "    tr.PropertiesTableHeading  {\n"\
-    "      background: #85a8bc;\n"\
-    "    }\n"\
-    "  </style>\n"\
-    "</head>\n";
+  "  <title>%TITLE%</title>\n"\
+  "  <link rel=\"stylesheet\" type=\"text/css\" href=\"ParaViewDoc.css\"/>"\
+  "</head>\n";
 
 // Template for writing the documentation associated with a proxy.
 static const char* ProxyDocumentationTemplate = 
@@ -988,14 +956,9 @@ int main(int argc, char *argv[])
   baseFileName << argv[1] << "/" << baseName << ".html" << ends;
   baseFile.open(baseFileName.str());
   baseFileName.rdbuf()->freeze(0);
-  //baseFile << "<html>" << endl;
-  //baseFile << "<head>" << endl;
-  //baseFile << "<title>" << endl;
+
   char* proxyTypeName = strchr(baseName, 'w');
   proxyTypeName++;
-  //baseFile << proxyTypeName << endl;
-  //baseFile << "</title>" << endl;
-  //baseFile << "</head>" << endl;
   
   vtkProcessModule *pm = vtkProcessModule::New();
   pm->Initialize();
