@@ -297,14 +297,14 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
     if (ival == 1)
       {
       this->enableStillRenderSubsampleRate->setCheckState(Qt::Unchecked);
-      this->updateSquirtLevelLabel(
+      this->updateStillSubsampleRateLabel(
         this->stillRenderSubsampleRate->value());
       }
     else
       {
       this->enableStillRenderSubsampleRate->setCheckState(Qt::Checked);
       this->stillRenderSubsampleRate->setValue(ival);
-      this->updateSquirtLevelLabel(
+      this->updateStillSubsampleRateLabel(
         this->stillRenderSubsampleRate->value());
       }
 
