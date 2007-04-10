@@ -260,6 +260,10 @@ private slots:
   /// Used to map a server name change to the name changed signal.
   void updateServerName();
 
+  /// Used to map a view's display added/removed to signal to the
+  /// visibility changed signal.
+  void updateDisplayVisibility(pqDisplay*);
+
   /// Used to map a display visibility change to the visibility
   /// changed signal.
   void updateDisplayVisibility(bool);

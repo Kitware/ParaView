@@ -289,12 +289,6 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
   QObject::connect(pqSource, 
     SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*)),
     this, SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*)));
-  QObject::connect(pqSource, 
-    SIGNAL(displayAdded(pqPipelineSource*, pqConsumerDisplay*)),
-    this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqConsumerDisplay*)));
-  QObject::connect(pqSource, 
-    SIGNAL(displayRemoved(pqPipelineSource*, pqConsumerDisplay*)),
-    this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqConsumerDisplay*)));
   this->connect(pqSource, SIGNAL(nameChanged(pqServerManagerModelItem*)), 
     this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
   this->connect(
@@ -573,6 +567,11 @@ void pqServerManagerModel::onAddViewModule(QString name,
 
   if (pqview)
     {
+    QObject::connect(pqview, SIGNAL(displayAdded(pqDisplay*)),
+      this, SLOT(updateDisplayVisibility(pqDisplay*)));
+    QObject::connect(pqview, SIGNAL(displayRemoved(pqDisplay*)),
+      this, SLOT(updateDisplayVisibility(pqDisplay*)));
+
     emit this->preViewModuleAdded(pqview);
     this->Internal->ViewModules.push_back(pqview);
     emit this->viewModuleAdded(pqview);
@@ -880,6 +879,20 @@ void pqServerManagerModel::updateServerName()
   if(server)
     {
     emit this->nameChanged(server);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::updateDisplayVisibility(pqDisplay* disp)
+{
+  pqConsumerDisplay *display = qobject_cast<pqConsumerDisplay *>(disp);
+  if(display)
+    {
+    pqPipelineSource *source = display->getInput();
+    if(source)
+      {
+      emit this->sourceDisplayChanged(source, display);
+      }
     }
 }
 
