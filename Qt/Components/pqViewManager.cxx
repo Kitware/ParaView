@@ -159,6 +159,11 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
       QStringList::iterator iter;
       for(iter = viewtypes.begin(); iter != viewtypes.end(); ++iter)
         {
+        if ((*iter) == "TableView" || (*iter) == "ElementInspectorView")
+          {
+          // Ignore these views for now.
+          continue;
+          }
         view_action = new QAction(vi->viewTypeName(*iter), this);
         view_action->setData(*iter);
         this->Internal->ConvertMenu.addAction(view_action);
