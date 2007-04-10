@@ -22,12 +22,12 @@
 // This viewer invokes the following events from vtkCommand:
 // * InteractionEvent - Lets you know the visible scalar range of the data has
 // changed because of panning, zooming, or resetting to the whole scalar range.
-// * PickEvent - Lets you know a transfer function element has been right-
-// clicked so you can display a color chooser to select a color for it. (A
-// PickEvent is being invoked instead of a RightButtonPressEvent because it
-// was being incorrectly picked up by the interactor style.)
+// * PickEvent - Lets you know a transfer function element has been left-
+// clicked so you can display a color chooser to select a color for it.
 // * WidgetValueChangedEvent - Lets you know that a transfer function
-// node has been moved
+// node has been moved.
+// * EndInteractionEvent - Lets you know the left mouse button has been
+// released after moving a node.
 // * WidgetModifiedEvent - Lets you know that the active node has changed.
 // * PlacePointEvent - Lets you know a node has been added or deleted.
 // 
