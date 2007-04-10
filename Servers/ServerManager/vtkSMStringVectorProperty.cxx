@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.31");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.32");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -84,8 +84,14 @@ int vtkSMStringVectorProperty::GetElementType(unsigned int idx)
 void vtkSMStringVectorProperty::AppendCommandToStream(
   vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (!this->Command || this->InformationOnly)
+  if (this->InformationOnly)
     {
+    return;
+    }
+
+  if (!this->Command)
+    {
+    this->Internals->UpdateLastPushedValues();
     return;
     }
 

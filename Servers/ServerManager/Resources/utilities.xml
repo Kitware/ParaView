@@ -2302,12 +2302,16 @@
       <DoubleVectorProperty
         name="Time"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        update_self="1"
+        immediate_update="1" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
-        name="TimestepValues">
+        name="TimestepValues"
+        update_self="1"
+        immediate_update="1" >
       </DoubleVectorProperty>
 
       <!-- End of TimeKeeper -->
