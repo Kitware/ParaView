@@ -71,6 +71,7 @@ private slots:
   /// \name Color Scale Methods
   //@{
   void handleEditorPointMoved();
+  void handleEditorPointMoveFinished();
   void handleEditorAddOrDelete();
   void handleEditorAdd(int index);
   void setColors();

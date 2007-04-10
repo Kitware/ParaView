@@ -163,8 +163,10 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->Listener->Connect(this->Viewer,
       vtkCommand::WidgetValueChangedEvent,
       this, SLOT(handleEditorPointMoved()));
-  this->Form->Listener->Connect(this->Viewer,
-      vtkCommand::PlacePointEvent, this, SLOT(handleEditorAddOrDelete()));
+  this->Form->Listener->Connect(this->Viewer, vtkCommand::EndInteractionEvent,
+      this, SLOT(handleEditorPointMoveFinished()));
+  this->Form->Listener->Connect(this->Viewer, vtkCommand::PlacePointEvent,
+      this, SLOT(handleEditorAddOrDelete()));
   this->Form->Listener->Connect(this->Viewer, vtkCommand::WidgetModifiedEvent,
       this, SLOT(handleEditorCurrentChanged()));
 #else
@@ -188,7 +190,7 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->connect(colorModel, SIGNAL(pointRemoved(int)),
       this, SLOT(handleEditorAddOrDelete()));
   this->connect(this->Form->Gradient, SIGNAL(pointMoved(int)),
-      this, SLOT(handleEditorPointMoved()));
+      this, SLOT(handleEditorPointMoveFinished()));
 #endif
 
   // Set up the timer. The timer is used when the user edits the
@@ -381,10 +383,16 @@ void pqColorScaleEditor::handleEditorPointMoved()
 {
   if(!this->Form->IgnoreEditor)
     {
-    this->setColors();
-
-    // Update the gui controls.
     this->updatePointValues();
+    }
+}
+
+void pqColorScaleEditor::handleEditorPointMoveFinished()
+{
+  if(!this->Form->IgnoreEditor)
+    {
+    this->updatePointValues();
+    this->setColors();
     }
 }
 
