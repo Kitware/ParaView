@@ -57,7 +57,7 @@ the renderview active. That's the final state.
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
 
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/MultiViewFrameMenu/CloseButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/2/MultiViewFrameMenu/CloseButton" command="activate" arguments="" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/CloseButton" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
