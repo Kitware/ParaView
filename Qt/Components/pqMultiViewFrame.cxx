@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static int gPenWidth = 2;
 
 pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
-  : QWidget(p), MainWidget(0), AutoHide(false), Active(false), 
+  : QWidget(p), EmptyMainWidget(new QWidget(this)), AutoHide(false), Active(false), 
     Color(QColor("red"))
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
@@ -157,6 +157,8 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
 
   // to allow an empty frame to work with the focus stuff
   this->setFocusPolicy(Qt::ClickFocus);
+
+  this->setMainWidget(NULL);
 }
 
 pqMultiViewFrame::~pqMultiViewFrame()
@@ -179,11 +181,8 @@ void pqMultiViewFrame::onCustomContextMenuRequested(const QPoint& point)
 void pqMultiViewFrame::setTitle(const QString& title)
 {
   this->WindowCaption->setText(title);
-  if(this->MainWidget)
-    {
-    this->MainWidget->setWindowTitle(title);
-    }
 }
+
 void pqMultiViewFrame::hideMenu(bool vis)
 {
   if(vis && !this->MenuHidden)
@@ -243,37 +242,41 @@ void pqMultiViewFrame::setBorderColor(QColor c)
   this->Color = c;
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiViewFrame::setMainWidget(QWidget* w)
 {
   QLayout* l;
   if(this->MenuHidden)
     {
-     l = this->layout()->itemAt(0)->layout();
+    l = this->layout()->itemAt(0)->layout();
     }
   else
     {
     l = this->layout()->itemAt(1)->layout();
     }
-    QLayoutItem* item = l->takeAt(0);
-    if(item)
-      {
-      delete item;
-      }
-
+  QLayoutItem* item = l->takeAt(0);
+  if(item)
+    {
+    delete item;
+    }
 
   if(w)
     {
     l->addWidget(w);
     this->WindowCaption->setText(w->windowTitle());
+    this->EmptyMainWidget->hide();
     }
   else
     {
-    static_cast<QBoxLayout*>(l)->addStretch();
+    l->addWidget(this->EmptyMainWidget);
+    this->EmptyMainWidget->show();
+    //static_cast<QBoxLayout*>(l)->addStretch();
     }
-    
+
   this->mainWidgetChanged(this);
 }
 
+//-----------------------------------------------------------------------------
 QWidget* pqMultiViewFrame::mainWidget()
 {
   QLayout* l;
@@ -294,6 +297,7 @@ QWidget* pqMultiViewFrame::mainWidget()
 
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiViewFrame::paintEvent(QPaintEvent* e)
 {
   QWidget::paintEvent(e);

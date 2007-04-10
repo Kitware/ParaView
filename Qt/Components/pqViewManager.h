@@ -129,6 +129,10 @@ private slots:
   /// Called when user requests conversion of view type.
   void onConvertToTriggered(QAction* action);
 
+  /// Called when the create view button is clicked in an
+  /// empty frame.
+  void onConvertToButtonClicked();
+
   /// Called before context menu is shown for the frame.
   /// We update menu enable state depending on view type.
   void onFrameContextMenuRequested(QWidget*);

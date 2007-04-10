@@ -63,7 +63,14 @@ public:
   void setMainWidget(QWidget*);
   /// get the main widget for this holder
   QWidget* mainWidget();
-  
+ 
+  /// Returns the QWidget that is used as the 
+  /// main widget in absence of any main widget.
+  /// This can be used to setup a UI to show
+  /// when there is not main widget present.
+  QWidget* emptyMainWidget() const
+    { return this->EmptyMainWidget; }
+
   /// get whether active, if active, a border is drawn
   bool active() const;
   /// get the color of the border
@@ -138,7 +145,7 @@ protected:
   bool eventFilter(QObject*, QEvent* e);
 
 private:
-  QWidget* MainWidget;
+  QWidget* EmptyMainWidget;
   QMenu* ContextMenu;
   bool AutoHide;
   bool Active;

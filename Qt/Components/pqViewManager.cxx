@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqViewManager.h"
+#include "ui_pqEmptyView.h"
 
 // VTK includes.
 #include "QVTKWidget.h"
@@ -50,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QMimeData>
 #include <QPointer>
+#include <QPushButton>
 #include <QSet>
 #include <QSignalMapper>
 #include <QtDebug>
@@ -301,6 +303,23 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
     {
     pqGenericViewModule* view = this->Internal->PendingViews.takeAt(0);
     this->assignFrame(view);
+    }
+
+  // Setup the UI shown when no view is present in the frame.
+  QWidget* emptyFrame = frame->emptyMainWidget();
+  Ui::EmptyView ui;
+  ui.setupUi(emptyFrame);
+
+  // Add buttons for all conversion actions.
+  QList<QAction*> convertActions = 
+    this->Internal->ConvertMenu.actions();
+  foreach (QAction* action, convertActions)
+    {
+    QPushButton* button = new QPushButton(action->text(), frame);
+    ui.ConvertActionsFrame->layout()->addWidget(button);
+    button->addAction(action);
+    QObject::connect(button, SIGNAL(clicked()),
+      this, SLOT(onConvertToButtonClicked()));
     }
 }
 
@@ -599,6 +618,40 @@ void pqViewManager::onViewModuleRemoved(pqGenericViewModule* view)
   this->Internal->PendingViews.removeAll(view);
 
   this->onActivate(frame);
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::onConvertToButtonClicked()
+{
+  QPushButton* button = qobject_cast<QPushButton*>(this->sender());
+  if (!button)
+    {
+    return;
+    }
+
+  pqMultiViewFrame* frame = 0;
+
+  // Try to locate the frame in which this button exists.
+  QWidget* button_parent = button->parentWidget();
+  while (button_parent)
+    {
+    frame = qobject_cast<pqMultiViewFrame*>(button_parent);
+    if (frame)
+      {
+      break;
+      }
+    button_parent = button_parent->parentWidget();
+    }
+
+  if (!frame)
+    {
+    return;
+    }
+
+  // Make the frame active.
+  frame->setActive(true);
+  QAction* action = button->actions()[0];
+  action->trigger();
 }
 
 //-----------------------------------------------------------------------------

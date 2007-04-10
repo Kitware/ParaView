@@ -175,6 +175,7 @@ SET(UI_FORMS
   Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqEditServerStartupDialog.ui
   Resources/UI/pqElementInspectorWidget.ui
+  Resources/UI/pqEmptyView.ui
   Resources/UI/pqEnterIdsDialog.ui
   Resources/UI/pqEnterPointsDialog.ui
   Resources/UI/pqEnterThresholdsDialog.ui
