@@ -93,6 +93,7 @@ public:
   pqSignalAdaptorComboBox* PlayModeAdaptor;
   pqPropertyLinks KeyFrameLinks;
   pqPropertyLinks SceneLinks;
+  pqPropertyLinks CurrentTimeLink;
   struct PropertyInfo
     {
     vtkSmartPointer<vtkSMProxy> Proxy;
@@ -103,6 +104,7 @@ public:
   pqInternals()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    this->CurrentTimeLink.setUseUncheckedProperties(true);
     }
 };
 
@@ -149,6 +151,10 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
   QObject::connect(pqApplicationCore::instance()->getSelectionModel(),
     SIGNAL(currentChanged(pqServerManagerModelItem*)),
     this, SLOT(onCurrentChanged(pqServerManagerModelItem*)));
+
+  QObject::connect(
+    this->Internal->currentTime, SIGNAL(editingFinished()),
+    this, SLOT(currentTimeEdited()));
 
   QObject::connect(
     this->Internal->currentTimeIndex, SIGNAL(valueChanged(int)),
@@ -307,6 +313,7 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
     QObject::disconnect(
       this->Internal->ActiveScene->getServer()->getTimeKeeper(), 0, this, 0);
     this->Internal->SceneLinks.removeAllPropertyLinks();
+    this->Internal->CurrentTimeLink.removeAllPropertyLinks();
     }
 
   this->Internal->ActiveScene = scene;
@@ -325,7 +332,11 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
   // update domain to currentFrame before creating the link.
   this->onScenePlayModeChanged();
 
-  this->Internal->SceneLinks.addPropertyLink(
+  /*this->Internal->SceneLinks.addPropertyLink(
+    this->Internal->currentTime, "text", SIGNAL(textChanged(const QString&)),
+    sceneProxy, sceneProxy->GetProperty("ClockTime"));
+    */
+  this->Internal->CurrentTimeLink.addPropertyLink(
     this->Internal->currentTime, "text", SIGNAL(textChanged(const QString&)),
     sceneProxy, sceneProxy->GetProperty("ClockTime"));
   this->Internal->SceneLinks.addPropertyLink(
@@ -1157,6 +1168,12 @@ void pqAnimationPanel::updateToolbarCurrentTime(const QString& str)
 }
 
 //-----------------------------------------------------------------------------
+void pqAnimationPanel::currentTimeEdited()
+{
+  this->Internal->CurrentTimeLink.accept();
+}
+
+//-----------------------------------------------------------------------------
 void pqAnimationPanel::setCurrentTimeToolbar(QToolBar* toolbar)
 {
   if (!toolbar)
@@ -1168,15 +1185,19 @@ void pqAnimationPanel::setCurrentTimeToolbar(QToolBar* toolbar)
   label->setText("Time: ");
 
   QLineEdit* timeedit = new QLineEdit(toolbar);
-  timeedit->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
+  timeedit->setSizePolicy(
+    QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
   timeedit->setObjectName("CurrentTime");
   timeedit->setValidator(new QDoubleValidator(toolbar));
   this->Internal->ToolbarCurrentTimeWidget = timeedit;
 
-  QObject::connect(this->Internal->currentTime, SIGNAL(textChanged(const QString&)),
+  QObject::connect(this->Internal->currentTime, 
+    SIGNAL(textChanged(const QString&)),
     this, SLOT(updateToolbarCurrentTime(const QString&)));
   QObject::connect(timeedit, SIGNAL(textChanged(const QString&)),
     this, SLOT(updatePanelCurrentTime(const QString&)));
+  QObject::connect(timeedit, SIGNAL(editingFinished()),
+    this, SLOT(currentTimeEdited()));
 
   QSpinBox* sbtimeedit = new QSpinBox(toolbar);
   sbtimeedit->setObjectName("CurrentTimeIndex");
@@ -1185,6 +1206,7 @@ void pqAnimationPanel::setCurrentTimeToolbar(QToolBar* toolbar)
   QObject::connect(
     this->Internal->ToolbarCurrentTimeIndexWidget, SIGNAL(valueChanged(int)),
     this, SLOT(setCurrentTimeByIndex(int)));
+
 
   toolbar->addWidget(label);
   toolbar->addWidget(timeedit);

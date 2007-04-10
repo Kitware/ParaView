@@ -154,11 +154,18 @@ protected slots:
   void setEndTimeByIndex(int index);
 
 
+  /// Called when the pqTimeKeeper signals that the current time changed.
   void onTimeChanged();
 
+  /// Called to update the Current time line edit on the panel
+  /// when the time line edit in the toolbar changes.
   void updatePanelCurrentTime(const QString&);
+
+  /// Called to update the Current time in the toolbar
+  /// when the one on the panel changes.
   void updateToolbarCurrentTime(const QString&);
 
+  void currentTimeEdited();
 protected:
   void buildPropertyList(vtkSMProxy* proxy, const QString& labelPrefix);
 
