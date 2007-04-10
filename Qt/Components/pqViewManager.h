@@ -192,6 +192,9 @@ private:
   pqViewManager(pqViewManager&); // Not implemented.
   void operator=(const pqViewManager&); // Not implemented.
 
+  /// Updates the converto menu.
+  void buildConvertMenu();
+
 
   class pqInternals;
   pqInternals* Internal;

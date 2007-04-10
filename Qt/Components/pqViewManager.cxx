@@ -144,35 +144,6 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
     SIGNAL(afterSplitView(const Index&, Qt::Orientation, float, const Index&)),
     this, SLOT(onSplittingView(const Index&, Qt::Orientation, float, const Index&)));
   
-  QAction* view_action = new QAction("3D View", this);
-  view_action->setData(pqRenderViewModule::renderViewType());
-  this->Internal->ConvertMenu.addAction(view_action);
-
-  // TODO:  gotta refresh this menu when new views come in from plugins
-  // Create actions for converting view types.
-  QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
-  foreach(QObject* iface, ifaces)
-    {
-    pqViewModuleInterface* vi = qobject_cast<pqViewModuleInterface*>(iface);
-    if(vi)
-      {
-      QStringList viewtypes = vi->viewTypes();
-      QStringList::iterator iter;
-      for(iter = viewtypes.begin(); iter != viewtypes.end(); ++iter)
-        {
-        if ((*iter) == "TableView" || (*iter) == "ElementInspectorView")
-          {
-          // Ignore these views for now.
-          continue;
-          }
-        view_action = new QAction(vi->viewTypeName(*iter), this);
-        view_action->setData(*iter);
-        this->Internal->ConvertMenu.addAction(view_action);
-        }
-      }
-    }
-
   QObject::connect(&this->Internal->ConvertMenu, SIGNAL(triggered(QAction*)),
     this, SLOT(onConvertToTriggered(QAction*)));
 
@@ -197,6 +168,40 @@ pqViewManager::~pqViewManager()
     QObject::disconnect(smModel, 0, this, 0);
     }
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::buildConvertMenu()
+{
+  this->Internal->ConvertMenu.clear();
+
+  QAction* view_action = new QAction("3D View", this);
+  view_action->setData(pqRenderViewModule::renderViewType());
+  this->Internal->ConvertMenu.addAction(view_action);
+
+  // Create actions for converting view types.
+  QObjectList ifaces =
+    pqApplicationCore::instance()->getPluginManager()->interfaces();
+  foreach(QObject* iface, ifaces)
+    {
+    pqViewModuleInterface* vi = qobject_cast<pqViewModuleInterface*>(iface);
+    if(vi)
+      {
+      QStringList viewtypes = vi->viewTypes();
+      QStringList::iterator iter;
+      for(iter = viewtypes.begin(); iter != viewtypes.end(); ++iter)
+        {
+        if ((*iter) == "TableView" || (*iter) == "ElementInspectorView")
+          {
+          // Ignore these views for now.
+          continue;
+          }
+        view_action = new QAction(vi->viewTypeName(*iter), this);
+        view_action->setData(*iter);
+        this->Internal->ConvertMenu.addAction(view_action);
+        }
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -309,6 +314,8 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
   QWidget* emptyFrame = frame->emptyMainWidget();
   Ui::EmptyView ui;
   ui.setupUi(emptyFrame);
+
+  this->buildConvertMenu();
 
   // Add buttons for all conversion actions.
   QList<QAction*> convertActions = 
@@ -650,8 +657,15 @@ void pqViewManager::onConvertToButtonClicked()
 
   // Make the frame active.
   frame->setActive(true);
-  QAction* action = button->actions()[0];
-  action->trigger();
+  if (button->actions().size() > 0)
+    {
+    QAction* action = button->actions()[0];
+    this->onConvertToTriggered(action);
+    }
+  else
+    {
+    qCritical() << "No actions!" << endl;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -685,6 +699,8 @@ void pqViewManager::onConvertToTriggered(QAction* action)
 //-----------------------------------------------------------------------------
 void pqViewManager::onFrameContextMenuRequested(QWidget* wid)
 {
+  this->buildConvertMenu();
+
   pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(wid);
   if (frame)
     {
