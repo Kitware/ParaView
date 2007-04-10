@@ -191,6 +191,10 @@ void pqPipelineSource::createProxiesForProxyListDomains()
 
 
 //-----------------------------------------------------------------------------
+// ProxyList hints are processed for any proxy, when it becomes a part of a 
+// proxy list domain. It provides mechanism to link certain properties
+// of the proxy (which is added in the proxy list domain) with properties of 
+// the proxy which has the property with the proxy list domain.
 void pqPipelineSource::processProxyListHints(vtkSMProxy *proxy_list_proxy)
 {
   vtkPVXMLElement* proxy_list_hint = pqXMLUtil::FindNestedElementByName(
