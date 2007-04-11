@@ -10,8 +10,5 @@
   <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
   <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
   <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/currentTime" command="set_string" arguments="0." />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/currentTime" command="set_string" arguments="0." />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/currentTime" command="set_string" arguments="0.2" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/currentTime" command="set_string" arguments="0.25" />
+  <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="1" />
 </pqevents>
