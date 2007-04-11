@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationManager.h"
 #include "pqAnimationPanel.h"
 #include "pqApplicationCore.h"
+#include "pqCloseViewUndoElement.h"
 #include "pqCustomFilterDefinitionModel.h"
 #include "pqCustomFilterDefinitionWizard.h"
 #include "pqCustomFilterManager.h"
@@ -727,6 +728,10 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   pqSplitViewUndoElement* svu_elem = pqSplitViewUndoElement::New();
   this->Implementation->UndoStack->registerElementForLoader(svu_elem);
   svu_elem->Delete();
+
+  pqCloseViewUndoElement* cvu_elem = pqCloseViewUndoElement::New();
+  this->Implementation->UndoStack->registerElementForLoader(cvu_elem);
+  cvu_elem->Delete();
 
   this->Implementation->PendingDisplayManager.setUndoStack(
     this->Implementation->UndoStack);

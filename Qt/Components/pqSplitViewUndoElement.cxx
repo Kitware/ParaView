@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 
 vtkStandardNewMacro(pqSplitViewUndoElement);
-vtkCxxRevisionMacro(pqSplitViewUndoElement, "1.2");
+vtkCxxRevisionMacro(pqSplitViewUndoElement, "1.3");
 //-----------------------------------------------------------------------------
 pqSplitViewUndoElement::pqSplitViewUndoElement()
 {
@@ -57,12 +57,6 @@ int pqSplitViewUndoElement::Redo()
     return 0;
     }
 
-  int invert=0;
-  this->XMLElement->GetScalarAttribute("invert", &invert);
-  if (static_cast<bool>(invert))
-    {
-    return this->UndoInternal();
-    }
   return this->RedoInternal();
 }
 
@@ -75,12 +69,6 @@ int pqSplitViewUndoElement::Undo()
     return 0;
     }
 
-  int invert=0;
-  this->XMLElement->GetScalarAttribute("invert", &invert);
-  if (static_cast<bool>(invert))
-    {
-    return this->RedoInternal();
-    }
   return this->UndoInternal();
 }
 
@@ -140,7 +128,7 @@ bool pqSplitViewUndoElement::CanLoadState(vtkPVXMLElement* elem)
 //-----------------------------------------------------------------------------
 void pqSplitViewUndoElement::SplitView(
   const pqMultiView::Index& index, Qt::Orientation orientation, float percent,
-  const pqMultiView::Index& childIndex, bool invert)
+  const pqMultiView::Index& childIndex)
 {
   vtkPVXMLElement* elem = vtkPVXMLElement::New();
   elem->SetName("SplitView");
@@ -149,7 +137,6 @@ void pqSplitViewUndoElement::SplitView(
   elem->AddAttribute("child_index", childIndex.getString().toAscii().data());
   elem->AddAttribute("orientation", orientation);
   elem->AddAttribute("percent", static_cast<double>(percent));
-  elem->AddAttribute("invert", static_cast<int>(invert));
 
   this->SetXMLElement(elem);
   elem->Delete();

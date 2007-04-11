@@ -70,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqViewModuleInterface.h"
 #include "pqXMLUtil.h"
+#include "pqCloseViewUndoElement.h"
 
 #if WIN32
 #include "process.h"
@@ -108,7 +109,7 @@ public:
   // of operations on the undo stack is 
   // * unregister view
   // * close frame
-  vtkSmartPointer<pqSplitViewUndoElement> CloseFrameUndoElement;
+  vtkSmartPointer<vtkSMUndoElement> CloseFrameUndoElement;
 };
 
 //-----------------------------------------------------------------------------
@@ -404,15 +405,16 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
 {
   emit this->beginUndo("Close View");
 
-  pqMultiView::Index index = this->indexOf(frame);
-  pqMultiView::Index parent_index = this->parentIndex(index);
+  vtkPVXMLElement* state = vtkPVXMLElement::New();
+  this->saveState(state);
 
-  pqSplitViewUndoElement* elem = pqSplitViewUndoElement::New();
-  elem->SplitView(parent_index, 
-    this->widgetOrientation(frame), 
-    this->widgetSplitRatio(frame), index, true);
+  pqMultiView::Index index = this->indexOf(frame);
+
+  pqCloseViewUndoElement* elem = pqCloseViewUndoElement::New();
+  elem->CloseView(index, state->GetNestedElement(0));
   this->Internal->CloseFrameUndoElement = elem;
   elem->Delete();
+  state->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -899,6 +901,15 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
     {
     this->removeWidget(frame);
     }
+  foreach (pqMultiViewFrame* frame, this->Internal->PendingFrames)
+    {
+    if (frame)
+      {
+      this->removeWidget(frame);
+      }
+    }
+  this->Internal->PendingFrames.clear();
+
   this->Superclass::loadState(rwRoot);
   this->Internal->DontCreateDeleteViewsModules = false; 
   
@@ -954,6 +965,7 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
       frame->setActive(true);
       }
     }
+
   return true;
 }
 
@@ -1078,7 +1090,7 @@ void pqViewManager::onSplittingView(const Index& index,
   emit this->beginUndo("Split View");
 
   pqSplitViewUndoElement* elem = pqSplitViewUndoElement::New();
-  elem->SplitView(index, orientation, fraction, childIndex, false);
+  elem->SplitView(index, orientation, fraction, childIndex);
   emit this->addToUndoStack(elem);
   elem->Delete();
 

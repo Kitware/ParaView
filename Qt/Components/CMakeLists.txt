@@ -282,6 +282,8 @@ ADD_LIBRARY(pqComponents
   pqCalculatorPanel.h
   pqClipPanel.cxx
   pqClipPanel.h
+  pqCloseViewUndoElement.cxx
+  pqCloseViewUndoElement.h
   pqColorPresetManager.cxx
   pqColorPresetManager.h
   pqColorPresetModel.cxx

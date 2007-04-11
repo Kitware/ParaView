@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSplitViewUndoElement.h
+   Module:    pqCloseViewUndoElement.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -28,24 +28,26 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-#ifndef __pqSplitViewUndoElement_h
-#define __pqSplitViewUndoElement_h
+========================================================================*/
+#ifndef __pqCloseViewUndoElement_h 
+#define __pqCloseViewUndoElement_h
 
 #include "vtkSMUndoElement.h"
 #include "pqComponentsExport.h"
-#include "pqMultiView.h" // needed for pqMultiView.
+#include "pqMultiView.h"
 
-/// pqSplitViewUndoElement is an undo element for splitting of views.
-/// pqViewManager creates an undo element on every split and pushes
+
+/// pqCloseViewUndoElement is undo element used to undo the closing
+/// of a view frame.
+/// pqViewManager creates an undo element on every frame close and pushes
 /// it on the stack.
 /// Make sure that the undo element is registered with the
 /// state loader for the undo stack on which it is pushed. 
-class PQCOMPONENTS_EXPORT pqSplitViewUndoElement : public vtkSMUndoElement
+class VTK_EXPORT pqCloseViewUndoElement : public vtkSMUndoElement 
 {
 public:
-  static pqSplitViewUndoElement* New();
-  vtkTypeRevisionMacro(pqSplitViewUndoElement, vtkSMUndoElement);
+  static pqCloseViewUndoElement* New();
+  vtkTypeRevisionMacro(pqCloseViewUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Description:
@@ -63,22 +65,19 @@ public:
 
   // Description:
   // Creates the undo element for the split operation.
-  void SplitView(
-    const pqMultiView::Index& index, Qt::Orientation orientation, 
-    float fraction, const pqMultiView::Index& childIndex);
+  // \c invert flag inverts the operation of this undo element. When true,
+  // Undo() does with Redo() would when invert=false, and vice-versa.
+  void CloseView(pqMultiView::Index frameIndex, vtkPVXMLElement* state);
 
 protected:
-  pqSplitViewUndoElement();
-  ~pqSplitViewUndoElement();
-
-  int UndoInternal();
-  int RedoInternal();
+  pqCloseViewUndoElement();
+  ~pqCloseViewUndoElement();
 
 private:
-  pqSplitViewUndoElement(const pqSplitViewUndoElement&); // Not implemented.
-  void operator=(const pqSplitViewUndoElement&); // Not implemented.
+  pqCloseViewUndoElement(const pqCloseViewUndoElement&); // Not implemented.
+  void operator=(const pqCloseViewUndoElement&); // Not implemented.
 };
 
-
 #endif
+
 
