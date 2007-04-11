@@ -50,6 +50,25 @@ public:
   // Description:
   // Clear the undo set currently being recorded.
   void Clear();
+
+
+  // Description:
+  // Called to record the state at the beginning of an interaction.
+  // Usually, this method isn't called directly, since the builder
+  // listens to interaction events on the interactor and calls it 
+  // automatically. May be used when changing the camera 
+  // programatically.
+  void StartInteraction();
+
+  // Description:
+  // Called to record the state at the end of an interaction and push
+  // it on the stack.
+  // Usually, this method isn't called directly, since the builder
+  // listens to interaction events on the interactor and calls it 
+  // automatically. May be used when changing the camera 
+  // programatically.
+  void EndInteraction();
+
 //BTX
 protected:
   vtkSMInteractionUndoStackBuilder();
@@ -64,8 +83,7 @@ protected:
   // Event handler.
   void ExecuteEvent(vtkObject* caller, unsigned long event, void* data);
 
-  void StartInteraction();
-  void EndInteraction();
+
   void PropertyModified(const char* pname);
 
   friend class vtkSMInteractionUndoStackBuilderObserver;

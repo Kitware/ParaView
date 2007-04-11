@@ -528,7 +528,12 @@ void pqRenderViewModule::resetCamera()
 {
   if (this->Internal->RenderModuleProxy)
     {
+    this->fakeInteraction(true);
     this->Internal->RenderModuleProxy->ResetCamera();
+    // This render is essential since vtkSMCameraLink does not 
+    // propagate changes to linked views until the render call.
+    this->forceRender();
+    this->fakeInteraction(false);
     }
 }
 
@@ -1192,3 +1197,28 @@ void pqRenderViewModule::fakeUndoRedo(bool fake_redo, bool self)
   this->Internal->UpdatingStack = false;
 }
 
+//-----------------------------------------------------------------------------
+void pqRenderViewModule::fakeInteraction(bool start)
+{
+  if (this->Internal->UpdatingStack)
+    {
+    return;
+    }
+
+  this->Internal->UpdatingStack = true;
+
+  if (start)
+    {
+    this->Internal->UndoStackBuilder->StartInteraction();
+    }
+  else
+    {
+    this->Internal->UndoStackBuilder->EndInteraction();
+    }
+
+  foreach (pqRenderViewModule* other, this->Internal->LinkedUndoStacks)
+    {
+    other->fakeInteraction(start);
+    }
+  this->Internal->UpdatingStack = false;
+}

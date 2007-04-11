@@ -66,6 +66,8 @@ public:
   virtual void render();
 
   /// Resets the camera to include all visible data.
+  /// It is essential to call this resetCamera, to ensure that the reset camera
+  /// action gets pushed on the interaction undo stack.
   void resetCamera();
 
   /// Resets the center of rotation to the focal point.
@@ -239,6 +241,11 @@ protected:
 
   /// Updates undo stack without actually performing the undo/redo actions.
   void fakeUndoRedo(bool redo, bool self);
+
+  /// Updates undo stack of all linked views to record a programatic change
+  /// in camera as a interaction. Must be called with start=true before the
+  /// change and with start=false after the change.
+  void fakeInteraction(bool start);
 
 private: 
   pqRenderViewModuleInternal* Internal;
