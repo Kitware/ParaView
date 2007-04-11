@@ -45,6 +45,12 @@ protected:
   virtual int RequestData(vtkInformation *request,
     vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
+
+  // Initialize the bin_extents using the data range for the selected 
+  // array.
+  virtual bool InitializeBinExtents(
+    vtkInformationVector** inputVector, vtkDoubleArray* bin_extents);
+
   vtkMultiProcessController* Controller;
 private:
   vtkPExtractHistogram(const vtkPExtractHistogram&); // Not implemented.

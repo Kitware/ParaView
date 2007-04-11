@@ -18,7 +18,10 @@
 
 #include "vtkRectilinearGridAlgorithm.h"
 
-// .NAME vtkExtractHistogram - Extract histogram data (binned values) from any dataset
+class vtkDoubleArray;
+
+// .NAME vtkExtractHistogram - Extract histogram data (binned values) from any 
+// dataset
 // .SECTION Description
 // vtkExtractHistogram accepts any vtkDataSet as input and produces a
 // vtkPolyData containing histogram data as output.  The output vtkPolyData
@@ -63,6 +66,11 @@ protected:
                                   vtkInformationVector**,
                                   vtkInformationVector*);
 
+
+  // Initialize the bin_extents using the data range for the selected 
+  // array.
+  virtual bool InitializeBinExtents(
+    vtkInformationVector** inputVector, vtkDoubleArray* bin_extents);
 
   int Component;
   int BinCount;

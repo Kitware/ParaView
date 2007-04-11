@@ -28,7 +28,7 @@
 #include "vtkIntArray.h"
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.16");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.17");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -65,6 +65,7 @@ int vtkExtractHistogram::FillInputPortInformation (int port,
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
 }
+
 //----------------------------------------------------------------------------
 int vtkExtractHistogram::RequestInformation(
   vtkInformation* vtkNotUsed(request),
@@ -94,6 +95,7 @@ int vtkExtractHistogram::RequestInformation(
 
   return 1;
 }
+
 //-----------------------------------------------------------------------------
 int vtkExtractHistogram::RequestUpdateExtent(
   vtkInformation* vtkNotUsed(request),
@@ -124,7 +126,48 @@ int vtkExtractHistogram::RequestUpdateExtent(
   return 1;
 }
 
+//-----------------------------------------------------------------------------
+bool vtkExtractHistogram::InitializeBinExtents(
+  vtkInformationVector** inputVector,
+  vtkDoubleArray* bin_extents)
+{
+  vtkDataArray* data_array = this->GetInputArrayToProcess(0, inputVector);
+  if (!data_array)
+    {
+    vtkErrorMacro("Failed to locate array to process.");
+    return false;
+    }
 
+  // If the requested component is out-of-range for the input, we return an
+  // empty dataset
+  if(this->Component < 0 && 
+     this->Component >= data_array->GetNumberOfComponents())
+    {
+    vtkWarningMacro("Requested component " 
+      <<  this->Component << " is not available."); 
+    return true;
+    }
+
+  // Calculate the extents of each bin, based on the range of values in the
+  // input ...  
+  double range[2];
+  data_array->GetRange(range, this->Component);
+  if (range[0] == range[1])
+    {
+    // Give it some width.
+    range[1] = range[0]+1;
+    }
+
+  double bin_delta = (range[1] - range[0]) / this->BinCount;
+  bin_extents->SetValue(0, range[0]);
+  for(int i = 1; i < this->BinCount; ++i)
+    {
+    bin_extents->SetValue(i, range[0] + (i * bin_delta));
+    }
+  bin_extents->SetValue(this->BinCount, range[1]);
+  bin_extents->SetName(data_array->GetName());
+  return true;
+}
 
 //-----------------------------------------------------------------------------
 int vtkExtractHistogram::RequestData(vtkInformation* /*request*/, 
@@ -145,6 +188,7 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   bin_extents->SetNumberOfComponents(1);
   bin_extents->SetNumberOfTuples(this->BinCount + 1);
   bin_extents->SetName("bin_extents");
+  bin_extents->FillComponent(0, 0.0);
   output_data->SetXCoordinates(bin_extents);
   output_data->GetPointData()->AddArray(bin_extents);
   bin_extents->Delete();
@@ -154,18 +198,9 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   bin_values->SetNumberOfComponents(1);
   bin_values->SetNumberOfTuples(this->BinCount);
   bin_values->SetName("bin_values");
+  bin_values->FillComponent(0, 0.0);
   output_data->GetCellData()->AddArray(bin_values);
   bin_values->Delete();
-
-  int i;
-  for(i = 0; i != this->BinCount + 1; ++i)
-    {
-    bin_extents->SetValue(i, 0);
-    if (i < this->BinCount)
-      {
-      bin_values->SetValue(i, 0);
-      }
-    }
 
   vtkDoubleArray* const otherCoords = vtkDoubleArray::New();
   otherCoords->SetNumberOfComponents(1);
@@ -175,19 +210,26 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   output_data->SetZCoordinates(otherCoords);
   otherCoords->Delete();
 
+  // Initializes the bin_extents array.
+  if (!this->InitializeBinExtents(inputVector, bin_extents))
+    {
+    return 0;
+    }
+
   // Find the field to process, if we can't find anything, we return an
   // empty dataset
   vtkDataArray* const data_array = this->GetInputArrayToProcess(0, inputVector);
-  if(!data_array)
-    {
-    vtkErrorMacro("Cannot locate array to process.");
-    return 0;
-    }
-  bin_extents->SetName(data_array->GetName());
-
+  /*
+   * Since it becomes tricky in the parallel version to determine if
+   * the data array is point or cell (since some processes may not have any data
+   * at all), we are not changing the name for bin_values based on type.
+   * If necessary, we'll have to perform additional communication
+   * in parallel version for this.
   vtkDataSet *inputDS = vtkDataSet::SafeDownCast(this->GetInput(0));
-  if (inputDS)
+  if (data_array && inputDS)
     {
+    // Try to assign the bin_values a name indicating if we are using point
+    // data or cell data.
     if (inputDS->GetPointData()->GetArray(data_array->GetName()) == data_array)
       {
       bin_values->SetName("point_values");
@@ -197,35 +239,19 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
       bin_values->SetName("cell_values");
       }
     }
+    */
 
-  // If the requested component is out-of-range for the input, we return an
-  // empty dataset
-  if(this->Component < 0 || 
-     this->Component >= data_array->GetNumberOfComponents())
+  // If the requested component is out-of-range for the input,
+  // the bin_values will be 0, so no need to do any actual counting.
+  if(data_array == NULL || 
+    this->Component < 0 || 
+    this->Component >= data_array->GetNumberOfComponents())
     {
-    vtkErrorMacro("Requested component " 
-      <<  this->Component << " is not available."); 
-    return 0;
+    return 1;
     }
-
-  // Calculate the extents of each bin, based on the range of values in the
-  // input ...  
-  double range[2];
-  data_array->GetRange(range, this->Component);
-  double bin_delta = (range[1] - range[0]) / this->BinCount;
-  bin_delta = (bin_delta==0)? 1 : bin_delta;
-
-  
-  bin_extents->SetValue(0, range[0]);
-  for(i = 1; i < this->BinCount; ++i)
-    {
-    bin_extents->SetValue(i, range[0] + (i * bin_delta));
-    }
-  bin_extents->SetValue(this->BinCount, range[1]);
 
   int num_of_tuples = data_array->GetNumberOfTuples();
-
-  for(i = 0; i != num_of_tuples; ++i)
+  for(int i = 0; i != num_of_tuples; ++i)
     {
     if (i%1000 == 0)
       {
@@ -249,6 +275,5 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
         }
       }
     }
-
   return 1;
 }
