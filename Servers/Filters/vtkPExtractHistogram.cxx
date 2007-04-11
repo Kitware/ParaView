@@ -18,16 +18,20 @@
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMPICommunicator.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
+#include "vtkToolkits.h"
+
+#ifdef VTK_USE_MPI
+#include "vtkMPICommunicator.h"
+#endif
 
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPExtractHistogram);
-vtkCxxRevisionMacro(vtkPExtractHistogram, "1.2");
+vtkCxxRevisionMacro(vtkPExtractHistogram, "1.3");
 vtkCxxSetObjectMacro(vtkPExtractHistogram, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkPExtractHistogram::vtkPExtractHistogram()
@@ -52,7 +56,10 @@ bool vtkPExtractHistogram::InitializeBinExtents(
     // Nothing extra to do for single process.
     return this->Superclass::InitializeBinExtents(inputVector, bin_extents);
     }
+#ifndef VTK_USE_MPI
+  return this->Superclass::InitializeBinExtents(inputVector, bin_extents);
 
+#else
   int num_processes = this->Controller->GetNumberOfProcesses();
   vtkMPICommunicator* comm = vtkMPICommunicator::SafeDownCast(
     this->Controller->GetCommunicator());
@@ -167,6 +174,7 @@ bool vtkPExtractHistogram::InitializeBinExtents(
     }
   bin_extents->SetValue(this->BinCount, range[1]);
   return true;
+#endif
 }
 
 //-----------------------------------------------------------------------------
