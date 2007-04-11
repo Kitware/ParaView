@@ -32,7 +32,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.41");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.42");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -498,6 +498,16 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
   this->ImmediateUpdate = 0;
   this->Superclass::LoadState(element, loader, loadLastPushedValues);
 
+  // If "clear" is present and is 0, it implies that the proxy elements
+  // currently in the property should not be cleared before loading 
+  // the new state.
+  int clear=1;
+  element->GetScalarAttribute("clear", &clear);
+  if (clear)
+    {
+    this->PPInternals->Proxies.clear();
+    }
+
   if (loadLastPushedValues)
     {
     element = element->FindNestedElementByName("LastPushedValues");
@@ -509,7 +519,6 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
       }
     }
 
-  vtkSMProxyPropertyInternals::VectorOfProxies newValue;
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElems; i++)
     {
@@ -526,7 +535,7 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
           vtkSMProxy* proxy = loader->NewProxy(id);
           if (proxy)
             {
-            newValue.push_back(proxy);
+            this->AddProxy(proxy, 0);
             proxy->Delete();
             }
           else
@@ -539,13 +548,12 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
           }
         else
           {
-          newValue.push_back(NULL);
+          this->AddProxy(0, 0);
           }
         }
       }
     }
 
-  this->PPInternals->Proxies = newValue;
   // Do not immediately update. Leave it to the loader.
   this->Modified();
   this->ImmediateUpdate = prevImUpdate;
