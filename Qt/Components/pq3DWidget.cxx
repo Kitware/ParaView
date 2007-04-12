@@ -307,7 +307,9 @@ void pq3DWidget::setControlledProperty(const char* function,
     this->Internal->ControlledPropertiesObserver);
 }
 
-void pq3DWidget::setControlledProperty(vtkSMProperty* widget_property, vtkSMProperty* controlled_property)
+//-----------------------------------------------------------------------------
+void pq3DWidget::setControlledProperty(vtkSMProperty* widget_property, 
+  vtkSMProperty* controlled_property)
 {
   this->Internal->PropertyMap.insert(
     widget_property,
@@ -321,8 +323,8 @@ void pq3DWidget::setControlledProperty(vtkSMProperty* widget_property, vtkSMProp
 void pq3DWidget::accept()
 {
   this->Internal->IgnorePropertyChange = true;
-  QMap<vtkSmartPointer<vtkSMProperty>, vtkSmartPointer<vtkSMProperty> >::const_iterator
-    iter;
+  QMap<vtkSmartPointer<vtkSMProperty>, 
+    vtkSmartPointer<vtkSMProperty> >::const_iterator iter;
   for (iter = this->Internal->PropertyMap.constBegin() ;
     iter != this->Internal->PropertyMap.constEnd(); 
     ++iter)
@@ -343,8 +345,8 @@ void pq3DWidget::reset()
   // 3D widget, hence we block all signals. Otherwise, on reset, we fire a
   // widget modified event, which makes the accept button enabled again.
   this->blockSignals(true);
-  QMap<vtkSmartPointer<vtkSMProperty>, vtkSmartPointer<vtkSMProperty> >::const_iterator
-    iter;
+  QMap<vtkSmartPointer<vtkSMProperty>, 
+    vtkSmartPointer<vtkSMProperty> >::const_iterator iter;
   for (iter = this->Internal->PropertyMap.constBegin() ;
     iter != this->Internal->PropertyMap.constEnd(); 
     ++iter)

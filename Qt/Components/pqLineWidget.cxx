@@ -115,10 +115,31 @@ pqLineWidget::pqLineWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
 
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
     this, SLOT(setModified()));
+
+  // Trigger a render when use explicitly edits the positions.
+  QObject::connect(this->Implementation->UI.point1X, 
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point1Y, 
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point1Z,
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point2X, 
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point2Y, 
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point2Z,
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
   
   this->createWidget(o->getServer());
 }
 
+//-----------------------------------------------------------------------------
 pqLineWidget::~pqLineWidget()
 {
   this->Implementation->Links.removeAllPropertyLinks();
@@ -212,6 +233,7 @@ void pqLineWidget::onYAxis()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineWidget::onZAxis()
 {
   double object_center[3];
