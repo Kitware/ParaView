@@ -225,7 +225,10 @@
   <tabstop>OK</tabstop>
   <tabstop>Cancel</tabstop>
   <tabstop>Parents</tabstop>
+  <tabstop>NavigateBack</tabstop>
+  <tabstop>NavigateForward</tabstop>
   <tabstop>NavigateUp</tabstop>
+  <tabstop>CreateFolder</tabstop>
   <tabstop>Favorites</tabstop>
   <tabstop>Files</tabstop>
  </tabstops>
