@@ -118,13 +118,13 @@ void pqExodusPanel::linkServerManagerProperties()
   pqNamedObjectPanel::linkServerManagerProperties();
 
   QObject::connect(this->UI->BlockArrayStatus,
-    SIGNAL(itemClicked(QTreeWidgetItem*, int)),
+    SIGNAL(itemChanged(QTreeWidgetItem*, int)),
     this, SLOT(blockItemChanged(QTreeWidgetItem*)));
   QObject::connect(this->UI->HierarchyArrayStatus,
-    SIGNAL(itemClicked(QTreeWidgetItem*, int)),
+    SIGNAL(itemChanged(QTreeWidgetItem*, int)),
     this, SLOT(hierarchyItemChanged(QTreeWidgetItem*)));
   QObject::connect(this->UI->MaterialArrayStatus,
-    SIGNAL(itemClicked(QTreeWidgetItem*, int)),
+    SIGNAL(itemChanged(QTreeWidgetItem*, int)),
     this, SLOT(materialItemChanged(QTreeWidgetItem*)));
   
   this->propertyManager()->registerLink(
