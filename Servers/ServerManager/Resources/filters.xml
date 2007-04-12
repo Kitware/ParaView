@@ -3944,11 +3944,58 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
    <!-- End ExtractGrid -->
    </SourceProxy>
 
-   <SourceProxy name="Probe" class="vtkPProbeFilter">
+   <SourceProxy name="ProbePoint" class="vtkPProbeFilter"
+    label="Probe Location">
     <Documentation
-       long_help="Sample data attributes at the points in a point cloud or along a line.  Probed lines will be displayed in a graph of the attributes."
-       short_help="Sample data values at the points in a point cloud or along a line.">
-The Probe filter samples the data set attributes of the current data set at the points in a point cloud or along a line. If you are probing with a line, the values of the point-centered variables along that line will be displayed in an XY Plot. Probing with a point is different than using the Pick filter at a point because the Pick filter returns the values for the input point closest to the selected point. Instead the Probe filter uses interpolation to determine the values at the selected point, whether or not it lies at an input point. The Probe filter operates on any type of data and produces polygonal output (a point cloud or a line).
+       long_help="Sample data attributes at the points in a point cloud."
+       short_help="Sample data values at the points in a point cloud.">
+The Probe filter samples the data set attributes of the current data set at the points in a point cloud. Probing with a point is different than using the Pick filter at a point because the Pick filter returns the values for the input point closest to the selected point. Instead the Probe filter uses interpolation to determine the values at the selected point, whether or not it lies at an input point. The Probe filter operates on any type of data and produces polygonal output (a point cloud).
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetSourceConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+            <DataType value="vtkMultiGroupDataSet"/>
+          </DataTypeDomain>
+          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
+          <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
+          <InputArrayDomain name="input_array"/>
+          <Documentation>
+            This property specifies the dataset from which to obtain probe values.
+          </Documentation>
+     </InputProperty>
+
+     <InputProperty
+        name="Source"
+        command="SetInputConnection"
+        label="Probe Type">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+           </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+             <Proxy group="extended_sources" name="FixedRadiusPointSource" />
+           </ProxyListDomain>
+           <Documentation>
+             This property specifies the dataset whose geometry will be used in determining positions to probe.
+           </Documentation>
+      </InputProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+      </Hints>
+   <!-- End ProbePoint -->
+   </SourceProxy>
+
+   <SourceProxy name="ProbeLine" class="vtkPProbeFilter"
+    label="Plot Over Line">
+    <Documentation
+       long_help="Sample data attributes at the points along a line.  Probed lines will be displayed in a graph of the attributes."
+       short_help="Sample data values at the points along a line.">
+The Plot Over Line filter samples the data set attributes of the current data set at the points along a line. The values of the point-centered variables along that line will be displayed in an XY Plot. This filter uses interpolation to determine the values at the selected point, whether or not it lies at an input point. The Probe filter operates on any type of data and produces polygonal output (a line).
     </Documentation>
     <InputProperty
        name="Input"
@@ -3978,7 +4025,6 @@ The Probe filter samples the data set attributes of the current data set at the 
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
              <Proxy group="extended_sources" name="HighResLineSource" />
-             <Proxy group="extended_sources" name="FixedRadiusPointSource" />
            </ProxyListDomain>
            <Documentation>
              This property specifies the dataset whose geometry will be used in determining positions to probe.
@@ -3987,7 +4033,7 @@ The Probe filter samples the data set attributes of the current data set at the 
       <Hints>
         <Visibility replace_input="0" />
       </Hints>
-   <!-- End Probe -->
+   <!-- End ProbeLine -->
    </SourceProxy>
 
    <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer"

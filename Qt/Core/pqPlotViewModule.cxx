@@ -321,7 +321,7 @@ bool pqPlotViewModule::canDisplaySource(pqPipelineSource* source) const
         return false;
         }
 
-      if (srcProxyName == "Probe" )
+      if (srcProxyName == "ProbeLine" )
         {
         return true;
         }

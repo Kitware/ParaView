@@ -21,7 +21,8 @@
     <Filter name="IntegrateAttributes" />
     <Filter name="ExtractCellsOverTime" />
     <Filter name="ExtractPointsOverTime" />
-    <Filter name="Probe" />
+    <Filter name="ProbeLine" />
+    <Filter name="ProbePoint" />
     <Filter name="Programmable Filter" />
   </Category>
 
@@ -75,8 +76,9 @@
   <Filter name="ParticleTracer" />
   <Filter name="PointDataToCellData" />
   <Filter name="PolyDataNormals" />
-  <Filter name="Probe" />
   <Filter name="ProcessIdScalars" />
+  <Filter name="ProbeLine" />
+  <Filter name="ProbePoint" />
   <Filter name="Programmable Filter" />
   <Filter name="PVConnectivityFilter" />
   <Filter name="QuadricClustering" />

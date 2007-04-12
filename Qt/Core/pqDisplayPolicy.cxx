@@ -100,7 +100,7 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
     vtkPVDataInformation* datainfo = source->getDataInformation();
     if (datainfo && (
         datainfo->GetDataClassName() == QString("vtkRectilinearGrid")  ||
-        source->getProxy()->GetXMLName() == QString("Probe")))
+        source->getProxy()->GetXMLName() == QString("ProbeLine")))
       {
       int extent[6];
       datainfo->GetExtent(extent);
@@ -120,7 +120,7 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
         view_type = pqPlotViewModule::barChartType();
         }
       else if (
-        (source->getProxy()->GetXMLName() == QString("Probe") || 
+        (source->getProxy()->GetXMLName() == QString("ProbeLine") || 
          non_zero_dims == 1) && 
         (pointDataInfo->GetNumberOfArrays() > 0 ||
          cellDataInfo->GetNumberOfArrays() > 0 ) && 
