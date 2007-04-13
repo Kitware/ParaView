@@ -46,18 +46,16 @@ public:
   pqProgressBar(QWidget* _p);
   virtual ~pqProgressBar();
 
-  // Overridden to concat the string with the  message text.
-  // This is the method called by Qt to determine what string
-  // to draw while drawing the text.
-  virtual QString text() const;
-
 public slots:
   void setProgress(const QString& message, int value);
   void enableProgress(bool);
 
+private slots:
+  void cleanup();
+
 private:
-  QString Message;
- 
+  bool CleanUp;
+
 };
 
 #endif

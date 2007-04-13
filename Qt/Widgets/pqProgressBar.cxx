@@ -31,11 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqProgressBar.h"
 #include <QCoreApplication>
+#include <QTimer>
 
 //-----------------------------------------------------------------------------
 pqProgressBar::pqProgressBar(QWidget* _p) : QProgressBar(_p)
 {
-  this->Message = "";
+  this->CleanUp = false;
 }
 
 
@@ -46,15 +47,9 @@ pqProgressBar::~pqProgressBar()
 }
 
 //-----------------------------------------------------------------------------
-QString pqProgressBar::text() const
-{
-  return this->Message + QProgressBar::text();
-}
-
-//-----------------------------------------------------------------------------
 void pqProgressBar::setProgress(const QString& message, int _value)
 {
-  this->Message = message + ": ";
+  this->setFormat(QString("%1: %p").arg(message));
   this->setValue(_value);
   //QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
@@ -62,11 +57,25 @@ void pqProgressBar::setProgress(const QString& message, int _value)
 //-----------------------------------------------------------------------------
 void pqProgressBar::enableProgress(bool e)
 {
-  this->setEnabled(e);
-  this->setTextVisible(e);
-  if(!e)
+  if(e)
     {
-    this->reset();
+    this->setEnabled(e);
+    this->setTextVisible(e);
+    }
+  else if(!this->CleanUp)
+    {
+    this->setValue(100);
+    this->CleanUp = true;
+    QTimer::singleShot(0, this, SLOT(cleanup()));
     }
 }
+
+void pqProgressBar::cleanup()
+{
+  this->CleanUp = false;
+  this->setEnabled(false);
+  this->setTextVisible(false);
+  this->reset();
+}
+
 
