@@ -223,8 +223,7 @@ void pqExodusPanel::linkServerManagerProperties()
                                       SIGNAL(checkedStateChanged(bool)),
                                       this->proxy(), NodeProperty, j);
 
-    if(strncmp(
-         PointDomain[j].toString().toUpper().toAscii().data(), "DISP", 4) == 0)
+    if(varName.left(3).toUpper() == "DIS")
       {
       this->DisplItem = item;
       }
