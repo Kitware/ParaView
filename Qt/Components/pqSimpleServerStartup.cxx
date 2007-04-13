@@ -791,5 +791,9 @@ void pqSimpleServerStartup::finishReverseConnection(pqServer* server)
 
   this->Implementation->Timer.stop();
   this->Implementation->StartupDialog->hide();
+
+  // It is essential that pqApplicationCore fires the finishedAddingServer()
+  // signal on server creation. Make it fire explicitly.
+  pqApplicationCore::instance()->fireFinishedAddingServer(server);
   this->started(server);
 }

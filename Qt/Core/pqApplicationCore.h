@@ -192,6 +192,14 @@ public:
   // Check to see if its in the process of loading a state
   bool isLoadingState(){return this->LoadingState;};
 
+  // HACK: pqSimpleServerStartup needs to fire the
+  // finishedAddingServer() signal on successful
+  // reverse connection. Server creation and correspoinding
+  // signals need a bit reorganizing.
+  void fireFinishedAddingServer(pqServer* server)
+    {
+    emit this->finishedAddingServer(server);
+    }
 public slots:
   /// Called QCoreApplication::quit().
   /// Applications should use this method instead of directly
