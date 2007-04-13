@@ -21,7 +21,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMStateLoader.h"
+#include "vtkSMStateLoaderBase.h"
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/algorithm>
@@ -32,7 +32,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.42");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.43");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -490,7 +490,7 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
 
 //---------------------------------------------------------------------------
 int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
-  vtkSMStateLoader* loader, int loadLastPushedValues/*=0*/)
+  vtkSMStateLoaderBase* loader, int loadLastPushedValues/*=0*/)
 {
   int prevImUpdate = this->ImmediateUpdate;
 

@@ -133,7 +133,7 @@ class vtkSMProperty;
 class vtkSMPropertyIterator;
 class vtkSMProxyManager;
 class vtkSMProxyObserver;
-class vtkSMStateLoader;
+class vtkSMStateLoaderBase;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMObject
 {
@@ -409,7 +409,6 @@ protected:
   // as such.
   friend class vtkSMCameraLink;
   friend class vtkSMCompoundProxy;
-  friend class vtkSMDefaultStateLoader;
   friend class vtkSMIceTDesktopRenderModuleProxy;
   friend class vtkSMInputProperty;
   friend class vtkSMNew3DWidgetProxy;
@@ -424,7 +423,7 @@ protected:
   friend class vtkSMProxyUnRegisterUndoElement;
   friend class vtkSMRenderModuleProxy;
   friend class vtkSMSourceProxy;
-  friend class vtkSMStateLoader;
+  friend class vtkSMStateLoaderBase;
   // -- PVEE only
   friend class vtkWSMApplication;
 //ETX
@@ -452,7 +451,7 @@ protected:
   // It is possible to set the SelfID for a proxy. However then the setter
   // has the responsiblity to ensure that the ID is going to be unique 
   // for the lifetime of the proxy. Also the SelfID can be set, only before
-  // an ID was assigned to the proxy. This is used by vtkSMStateLoader
+  // an ID was assigned to the proxy. This is used by vtkSMStateLoaderBase
   // and subclasses.
   void SetSelfID(vtkClientServerID id);
   
@@ -589,7 +588,7 @@ protected:
   // Description:
   // Load the subproxy state.
   void LoadSubProxyState(vtkPVXMLElement* subproxyElement, 
-    vtkSMStateLoader* loader);
+    vtkSMStateLoaderBase* loader);
 
   // Description:
   // Called by a proxy property, this adds the property,proxy
@@ -633,7 +632,7 @@ protected:
 
   // Description:
   // Updates state from an XML element. Returns 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoaderBase* loader);
 
   // Loads the revival state for the proxy.
   // RevivalState includes the entire state saved by calling 
@@ -641,7 +640,7 @@ protected:
   // object IDs. This makes it possible to restore the servermanager state
   // while reusing server side object ids.
   virtual int LoadRevivalState(vtkPVXMLElement* revivalElement, 
-    vtkSMStateLoader* loader);
+    vtkSMStateLoaderBase* loader);
  
   int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
     vtkPVXMLElement *element);

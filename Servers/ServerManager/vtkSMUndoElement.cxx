@@ -17,11 +17,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMStateLoader.h"
+#include "vtkSMStateLoaderBase.h"
 
-vtkCxxRevisionMacro(vtkSMUndoElement, "1.3");
+vtkCxxRevisionMacro(vtkSMUndoElement, "1.4");
 vtkCxxSetObjectMacro(vtkSMUndoElement, XMLElement, vtkPVXMLElement);
-vtkCxxSetObjectMacro(vtkSMUndoElement, StateLoader, vtkSMStateLoader);
+vtkCxxSetObjectMacro(vtkSMUndoElement, StateLoader, vtkSMStateLoaderBase);
 //-----------------------------------------------------------------------------
 vtkSMUndoElement::vtkSMUndoElement()
 {

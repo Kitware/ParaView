@@ -20,7 +20,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMStateLoader.h"
+#include "vtkSMStateLoaderBase.h"
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
@@ -45,7 +45,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMProxyListDomain);
-vtkCxxRevisionMacro(vtkSMProxyListDomain, "1.5");
+vtkCxxRevisionMacro(vtkSMProxyListDomain, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMProxyListDomain::vtkSMProxyListDomain()
 {
@@ -251,7 +251,7 @@ void vtkSMProxyListDomain::ChildSaveState(vtkPVXMLElement* element)
 
 //-----------------------------------------------------------------------------
 int vtkSMProxyListDomain::LoadState(vtkPVXMLElement* element,
-  vtkSMStateLoader* loader)
+  vtkSMStateLoaderBase* loader)
 {
   this->Internals->ProxyList.clear();
   if (!this->Superclass::LoadState(element, loader))

@@ -25,17 +25,21 @@
 
 #include <vtkstd/vector>
 
-class vtkSMUndoRedoStateLoaderVector : public vtkstd::vector<vtkSmartPointer<vtkSMUndoElement> >
+class vtkSMUndoRedoStateLoaderVector : 
+  public vtkstd::vector<vtkSmartPointer<vtkSMUndoElement> >
 {
 };
 
 
 vtkStandardNewMacro(vtkSMUndoRedoStateLoader);
-vtkCxxRevisionMacro(vtkSMUndoRedoStateLoader, "1.2");
+vtkCxxRevisionMacro(vtkSMUndoRedoStateLoader, "1.3");
+vtkCxxSetObjectMacro(vtkSMUndoRedoStateLoader, RootElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 vtkSMUndoRedoStateLoader::vtkSMUndoRedoStateLoader()
 {
   this->RegisteredElements = new vtkSMUndoRedoStateLoaderVector;
+  this->RootElement = 0;
+  this->UseExistingProxies = true;
 
   vtkSMUndoElement* elem = vtkSMProxyRegisterUndoElement::New();
   this->RegisterElement(elem);
@@ -58,6 +62,7 @@ vtkSMUndoRedoStateLoader::vtkSMUndoRedoStateLoader()
 vtkSMUndoRedoStateLoader::~vtkSMUndoRedoStateLoader()
 {
   delete this->RegisteredElements;
+  this->SetRootElement(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -143,13 +148,15 @@ vtkUndoSet* vtkSMUndoRedoStateLoader::LoadUndoRedoSet(
       elem->Delete();
       }
     }
-  
+
   return undoSet;
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* vtkSMUndoRedoStateLoader::NewProxy(vtkPVXMLElement* root, int id)
+vtkPVXMLElement* vtkSMUndoRedoStateLoader::LocateProxyElement(int id)
 {
+  vtkPVXMLElement* root = this->RootElement;
+
   // When control reaches here, we are assured that a proxy with the given
   // id doesn't already exist, so we try to locate an element
   // with the state for the proxy and create the new proxy.
@@ -172,12 +179,12 @@ vtkSMProxy* vtkSMUndoRedoStateLoader::NewProxy(vtkPVXMLElement* root, int id)
           {
           // We found an element that defines this unknown proxy.
           // we create this new proxy and return it.
-          return this->NewProxyFromElement(child, id);
+          return child;
           }
         }
       }
     }
-  vtkErrorMacro("Cannot locate proxy with id " << id);
+
   return 0;
 }
 

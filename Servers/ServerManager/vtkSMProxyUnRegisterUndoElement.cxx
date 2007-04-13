@@ -17,13 +17,13 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMDefaultStateLoader.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMStateLoaderBase.h"
 
 
 vtkStandardNewMacro(vtkSMProxyUnRegisterUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyUnRegisterUndoElement, "1.8");
+vtkCxxRevisionMacro(vtkSMProxyUnRegisterUndoElement, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMProxyUnRegisterUndoElement::vtkSMProxyUnRegisterUndoElement()
 {
@@ -60,7 +60,7 @@ int vtkSMProxyUnRegisterUndoElement::Undo()
     return 0;
     }
 
-  vtkSMStateLoader* loader = this->GetStateLoader();
+  vtkSMStateLoaderBase* loader = this->GetStateLoader();
   if (!loader)
     {
     vtkErrorMacro("No loader set. Cannot Undo.");
@@ -105,7 +105,7 @@ int vtkSMProxyUnRegisterUndoElement::Redo()
     return 0;
     }
 
-  vtkSMStateLoader* loader = this->GetStateLoader();
+  vtkSMStateLoaderBase* loader = this->GetStateLoader();
   if (!loader)
     {
     vtkErrorMacro("No loader set. Cannot Redo.");

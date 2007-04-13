@@ -23,7 +23,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMStateLoader.h"
+#include "vtkSMStateLoaderBase.h"
 
 #include <vtkstd/set>
 #include <vtkstd/list>
@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.16");
 
 struct vtkSMCompoundProxyInternals
 {
@@ -459,7 +459,7 @@ void vtkSMCompoundProxy::HandleExposedProperties(vtkPVXMLElement* element)
 
 //---------------------------------------------------------------------------
 int vtkSMCompoundProxy::LoadState(vtkPVXMLElement* proxyElement, 
-                                  vtkSMStateLoader* loader)
+                                  vtkSMStateLoaderBase* loader)
 {
   unsigned int i;
   unsigned int numElems = proxyElement->GetNumberOfNestedElements();

@@ -16,11 +16,11 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMDefaultStateLoader.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStateLoaderBase.h"
 
 vtkStandardNewMacro(vtkSMUpdateInformationUndoElement);
-vtkCxxRevisionMacro(vtkSMUpdateInformationUndoElement, "1.1");
+vtkCxxRevisionMacro(vtkSMUpdateInformationUndoElement, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMUpdateInformationUndoElement::vtkSMUpdateInformationUndoElement()
 {
@@ -67,8 +67,7 @@ int vtkSMUpdateInformationUndoElement::Redo()
   int proxy_id;
   this->XMLElement->GetScalarAttribute("id", &proxy_id);
 
-  vtkSMDefaultStateLoader* stateLoader = vtkSMDefaultStateLoader::New();
-  stateLoader->SetConnectionID(this->ConnectionID);
+  vtkSMStateLoaderBase* stateLoader = this->GetStateLoader();
 
   vtkSMProxy* proxy = stateLoader->NewProxy(proxy_id);
   if (proxy)
@@ -84,7 +83,6 @@ int vtkSMUpdateInformationUndoElement::Redo()
     proxy->UpdatePropertyInformation();
     proxy->Delete();
     }
-  stateLoader->Delete();
   return 1;
 }
 

@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderModuleProxy.h"
-#include "vtkSMStateLoader.h"
+#include "vtkSMStateLoaderBase.h"
 
 // Qt includes.
 #include <QAction>
@@ -879,7 +879,7 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
 
 //-----------------------------------------------------------------------------
 bool pqViewManager::loadState(vtkPVXMLElement* rwRoot, 
-  vtkSMStateLoader* loader)
+  vtkSMStateLoaderBase* loader)
 {
   if (!rwRoot || !rwRoot->GetName() || strcmp(rwRoot->GetName(), "ViewManager"))
     {

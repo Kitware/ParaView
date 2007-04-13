@@ -15,9 +15,8 @@
 #include "vtkSMVectorProperty.h"
 
 #include "vtkPVXMLElement.h"
-#include "vtkSMStateLoader.h"
 
-vtkCxxRevisionMacro(vtkSMVectorProperty, "1.10");
+vtkCxxRevisionMacro(vtkSMVectorProperty, "1.11");
 
 //---------------------------------------------------------------------------
 vtkSMVectorProperty::vtkSMVectorProperty()
@@ -37,7 +36,7 @@ vtkSMVectorProperty::~vtkSMVectorProperty()
 
 //---------------------------------------------------------------------------
 int vtkSMVectorProperty::LoadState(vtkPVXMLElement* element,
-  vtkSMStateLoader* loader, int loadLastPushedValues/*=0*/)
+  vtkSMStateLoaderBase* loader, int loadLastPushedValues/*=0*/)
 {
   this->Superclass::LoadState(element, loader, loadLastPushedValues);
 

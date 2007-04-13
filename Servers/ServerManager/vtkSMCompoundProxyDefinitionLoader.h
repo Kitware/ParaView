@@ -23,15 +23,16 @@
 #ifndef __vtkSMCompoundProxyDefinitionLoader_h
 #define __vtkSMCompoundProxyDefinitionLoader_h
 
-#include "vtkSMStateLoader.h"
+#include "vtkSMStateLoaderBase.h"
 
 class vtkSMCompoundProxy;
 
-class VTK_EXPORT vtkSMCompoundProxyDefinitionLoader : public vtkSMStateLoader
+class VTK_EXPORT vtkSMCompoundProxyDefinitionLoader : public vtkSMStateLoaderBase
 {
 public:
   static vtkSMCompoundProxyDefinitionLoader* New();
-  vtkTypeRevisionMacro(vtkSMCompoundProxyDefinitionLoader, vtkSMStateLoader);
+  vtkTypeRevisionMacro(vtkSMCompoundProxyDefinitionLoader, 
+    vtkSMStateLoaderBase);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -42,6 +43,11 @@ public:
 protected:
   vtkSMCompoundProxyDefinitionLoader();
   ~vtkSMCompoundProxyDefinitionLoader();
+
+  // Description:
+  // Called after a new proxy is created.
+  virtual void CreatedNewProxy(int vtkNotUsed(id), vtkSMProxy* vtkNotUsed(proxy))
+    { }
 
   vtkSMCompoundProxy* HandleDefinition(vtkPVXMLElement* rootElement);
 

@@ -102,8 +102,8 @@ protected:
   virtual void ChildSaveState(vtkPVXMLElement* domainElement);
   
   // Load the state of the domain from the XML.
-  virtual int LoadState(vtkPVXMLElement* vtkNotUsed(domainElement), 
-    vtkSMStateLoader* vtkNotUsed(loader));
+  virtual int LoadState(vtkPVXMLElement* domainElement, 
+    vtkSMStateLoaderBase* loader);
 
   vtkSMStringListDomainInternals* SLInternals;
 

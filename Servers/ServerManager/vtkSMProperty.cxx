@@ -25,7 +25,6 @@
 #include "vtkSMInformationHelper.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSMStateLoader.h"
 #include "vtkSMSubPropertyIterator.h"
 
 #include <vtkstd/vector>
@@ -33,12 +32,11 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.54");
+vtkCxxRevisionMacro(vtkSMProperty, "1.55");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
-vtkCxxSetObjectMacro(vtkSMProperty, ControllerProxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, Documentation, vtkSMDocumentation);
 vtkCxxSetObjectMacro(vtkSMProperty, Hints, vtkPVXMLElement);
 
@@ -60,8 +58,6 @@ vtkSMProperty::vtkSMProperty()
   this->InformationOnly = 0;
   this->InformationHelper = 0;
   this->InformationProperty = 0;
-  this->ControllerProxy = 0;
-  this->ControllerPropertyName = 0;
   this->IsInternal = 1;
   this->Documentation = 0;
 
@@ -79,8 +75,6 @@ vtkSMProperty::~vtkSMProperty()
   this->SetProxy(0);
   this->SetInformationHelper(0);
   this->SetInformationProperty(0);
-  this->SetControllerPropertyName(0);
-  this->SetControllerProxy(0);
   this->SetDocumentation(0);
   this->SetHints(0);
 }
@@ -463,7 +457,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 
 //---------------------------------------------------------------------------
 int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement, 
-  vtkSMStateLoader* loader, int vtkNotUsed(loadLastPushedValues))
+  vtkSMStateLoaderBase* loader, int vtkNotUsed(loadLastPushedValues))
 {
   // Process the domains.
   unsigned int numElems = propertyElement->GetNumberOfNestedElements();
@@ -483,19 +477,6 @@ int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement,
         domain->LoadState(child, loader);
         }
       }
-    else if (strcmp(child->GetName(), "ControllerProperty") == 0)
-      {
-      const char* pname = child->GetAttribute("name");
-      int id;
-      if (!child->GetScalarAttribute("id", &id) || !pname)
-        {
-        vtkWarningMacro("ControllerProperty element missing required attributes.");
-        continue;
-        }
-      vtkSMProxy* proxy = loader->NewProxy(id);
-      this->SetController(proxy, pname);
-      proxy->Delete();
-      }
     }
   return 1;
 }
@@ -507,13 +488,6 @@ void vtkSMProperty::ChildSaveState(vtkPVXMLElement* /*propertyElement*/,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::SetController(vtkSMProxy* p, const char* pname)
-{
-  this->SetControllerPropertyName(pname);
-  this->SetControllerProxy(p);
-}
-
-//---------------------------------------------------------------------------
 void vtkSMProperty::SaveState(vtkPVXMLElement* parent, 
   const char* property_name, const char* uid,
   int saveDomains/*=1*/, int saveLastPushedValues/*=0*/)
@@ -522,18 +496,6 @@ void vtkSMProperty::SaveState(vtkPVXMLElement* parent,
   propertyElement->SetName("Property");
   propertyElement->AddAttribute("name", property_name);
   propertyElement->AddAttribute("id", uid);
-
-  if (this->ControllerProxy && this->ControllerPropertyName)
-    {
-    vtkPVXMLElement* controllerProxyElem = vtkPVXMLElement::New();
-    controllerProxyElem->SetName("ControllerProperty");
-    controllerProxyElem->AddAttribute("id",
-      this->ControllerProxy->GetSelfIDAsString());
-    controllerProxyElem->AddAttribute("name",
-      this->ControllerPropertyName);
-    propertyElement->AddNestedElement(controllerProxyElem);
-    controllerProxyElem->Delete();
-    }
 
   this->ChildSaveState(propertyElement, saveLastPushedValues);
 

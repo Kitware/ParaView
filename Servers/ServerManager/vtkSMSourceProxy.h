@@ -134,7 +134,7 @@ public:
   // Overridden to save information pertinant to reviving the parts.
   virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
   virtual int LoadRevivalState(vtkPVXMLElement* revivalElement, 
-    vtkSMStateLoader* loader);
+    vtkSMStateLoaderBase* loader);
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();

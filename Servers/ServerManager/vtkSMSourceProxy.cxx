@@ -35,7 +35,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.46");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.47");
 
 struct vtkSMSourceProxyInternals
 {
@@ -538,7 +538,7 @@ vtkPVXMLElement* vtkSMSourceProxy::SaveRevivalState(vtkPVXMLElement* root)
 
 //---------------------------------------------------------------------------
 int vtkSMSourceProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
-  vtkSMStateLoader* loader)
+  vtkSMStateLoaderBase* loader)
 {
   if (!this->Superclass::LoadRevivalState(revivalElem, loader))
     {

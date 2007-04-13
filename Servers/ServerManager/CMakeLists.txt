@@ -47,7 +47,6 @@ SET(Kit_SRCS
   vtkSMConsumerDisplayProxy.cxx
   vtkSMDataObjectDisplayProxy.cxx
   vtkSMDataTypeDomain.cxx
-  vtkSMDefaultStateLoader.cxx
   vtkSMDisplayProxy.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
@@ -138,6 +137,7 @@ SET(Kit_SRCS
   vtkSMSourceProxy.cxx
   vtkSMSphereWidgetProxy.cxx
   vtkSMStateLoader.cxx
+  vtkSMStateLoaderBase.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx
@@ -199,6 +199,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMLink.cxx
   vtkSMProxyManagerReviver.cxx
   vtkSMRenderModuleProxy.cxx
+  vtkSMStateLoaderBase.cxx
   vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx
   ABSTRACT

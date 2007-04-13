@@ -35,7 +35,7 @@
 #ifndef __vtkSMUndoRedoStateLoader_h
 #define __vtkSMUndoRedoStateLoader_h
 
-#include "vtkSMDefaultStateLoader.h"
+#include "vtkSMStateLoaderBase.h"
 
 class vtkPVXMLElement;
 class vtkSMUndoElement;
@@ -43,11 +43,11 @@ class vtkSMUndoRedoStateLoaderVector;
 class vtkUndoElement;
 class vtkUndoSet;
 
-class VTK_EXPORT vtkSMUndoRedoStateLoader : public vtkSMDefaultStateLoader
+class VTK_EXPORT vtkSMUndoRedoStateLoader : public vtkSMStateLoaderBase
 {
 public:
   static vtkSMUndoRedoStateLoader* New();
-  vtkTypeRevisionMacro(vtkSMUndoRedoStateLoader, vtkSMDefaultStateLoader);
+  vtkTypeRevisionMacro(vtkSMUndoRedoStateLoader, vtkSMStateLoaderBase);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -79,22 +79,26 @@ public:
   // Get number of registered elements.
   unsigned int GetNumberOfRegisteredElements();
 
-  // Description:
-  // Unhiding superclass implementation.
-  virtual vtkSMProxy* NewProxy(int id)
-    { return this->Superclass::NewProxy(id); }
-
 protected:
   vtkSMUndoRedoStateLoader();
   ~vtkSMUndoRedoStateLoader();
 
   virtual vtkUndoElement* HandleTag(vtkPVXMLElement* root);
 
-  // Either create a new proxy or returns one from the map
-  // of existing properties. Newly created proxies are stored
-  // in the map with the id as the key. The root is the xml
-  // element under which the proxy definitions are stored.
-  virtual vtkSMProxy* NewProxy(vtkPVXMLElement* root, int id);
+  // Description:
+  // Return the xml element for the state of the proxy with the given id.
+  // This is used by NewProxy() when the proxy with the given id
+  // is not located in the internal CreatedProxies map.
+  virtual vtkPVXMLElement* LocateProxyElement(int id);
+
+  // Description:
+  // Called after a new proxy is created.
+  // Nothing to do here.
+  virtual void CreatedNewProxy(int vtkNotUsed(id), vtkSMProxy* vtkNotUsed(proxy))
+    { }
+
+  vtkPVXMLElement* RootElement;
+  void SetRootElement(vtkPVXMLElement*);
 
 private:
   vtkSMUndoRedoStateLoader(const vtkSMUndoRedoStateLoader&); // Not implemented.

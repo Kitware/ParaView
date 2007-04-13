@@ -72,7 +72,7 @@ class vtkSMDomain;
 class vtkSMDomainIterator;
 class vtkSMInformationHelper;
 class vtkSMProxy;
-class vtkSMStateLoader;
+class vtkSMStateLoaderBase;
 class vtkSMXMLParser;
 //BTX
 struct vtkSMPropertyInternals;
@@ -165,20 +165,6 @@ public:
   // to have access to both the in and out properties. The information
   // property has to be specified in the xml configuration file.
   vtkGetObjectMacro(InformationProperty, vtkSMProperty);
-
-  // Description:
-  // ControllerProxy is pointer to the proxy whose property
-  // (ControllerProperty) is mapped to the current property. This is useful
-  // for 3DWidgets. The properties of the implicit function proxy
-  // controlled by the 3DWidget will have these set to the corresponing
-  // property of the 3DWidget. Thus, providing hints about which implicit
-  // function property is controlled by which 3DWidget and what property.
-  // This goes mostly unnoticed in ParaView, but useful for PVEE(WebVis).  
-  // If these are set, then they are saved in the XML during SaveState as a element
-  // <ControllerProperty name="propertyname" />. WebVis notices such elements
-  // and creates a property value dependency among the controlee and the
-  // controller property.
-  void SetController(vtkSMProxy* proxy, const char* pname);
 
   // Description:
   // Properties can have one or more domains. These are assigned by
@@ -323,7 +309,7 @@ protected:
   // If \c loadLastPushedValues is set, then last pushed values
   // are loaded from the xml if present. If not present, the value 
   // of the property remains unchanged.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader,
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoaderBase* loader,
     int loadLastPushedValues=0);
 
   // Description:
@@ -369,29 +355,10 @@ protected:
   // Subclass may override this if ResetToDefault can reset to default
   // value specified in the configuration file.
   virtual void ResetToDefaultInternal() {};
-//BTX
-  // For PVEE.
-  friend class vtkWSMApplication;
-//ETX
+
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented
   void operator=(const vtkSMProperty&); // Not implemented
-
-  // ControllerProxy is pointer to the proxy whose property
-  // (ControllerProperty) is mapped to the current property. This is useful
-  // for 3DWidgets. The properties of the implicit function proxy
-  // controlled by the 3DWidget will have these set to the corresponing
-  // property of the 3DWidget. Thus, providing hints about which implicit
-  // function property is controlled by which 3DWidget and what property.
-  // This goes mostly unnoticed in ParaView, but useful for PVEE(WebVis).  
-  // If these are set, then they are saved in the XML during SaveState as a element
-  // <ControllerProperty name="propertyname" />. WebVis notices such elements
-  // and creates a property value dependency among the controlee and the
-  // controller property.
-  vtkSMProxy* ControllerProxy;
-  void SetControllerProxy(vtkSMProxy* );
-  char* ControllerPropertyName;
-  vtkSetStringMacro(ControllerPropertyName);
 
   // Description:
   // Given the string, this method will create and set a well-formated

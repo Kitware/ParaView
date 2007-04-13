@@ -25,7 +25,7 @@
 #include "vtkUndoElement.h"
 
 class vtkPVXMLElement;
-class vtkSMStateLoader;
+class vtkSMStateLoaderBase;
 
 class VTK_EXPORT vtkSMUndoElement : public vtkUndoElement
 {
@@ -44,8 +44,8 @@ public:
   // The element may use the state loader to access
   // proxies. 
   // This is only valid within Undo()/Redo() calls.
-  vtkGetObjectMacro(StateLoader, vtkSMStateLoader);
-  void SetStateLoader(vtkSMStateLoader* loader);
+  vtkGetObjectMacro(StateLoader, vtkSMStateLoaderBase);
+  void SetStateLoader(vtkSMStateLoaderBase* loader);
 protected:
   vtkSMUndoElement();
   ~vtkSMUndoElement();
@@ -58,7 +58,7 @@ protected:
   vtkPVXMLElement* XMLElement;
   void SetXMLElement(vtkPVXMLElement*);
 
-  vtkSMStateLoader* StateLoader;
+  vtkSMStateLoaderBase* StateLoader;
 
   // Description:
   // Overridden to save state specific to the class.

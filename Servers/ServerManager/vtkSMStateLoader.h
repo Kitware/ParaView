@@ -22,7 +22,7 @@
 #ifndef __vtkSMStateLoader_h
 #define __vtkSMStateLoader_h
 
-#include "vtkSMObject.h"
+#include "vtkSMStateLoaderBase.h"
 
 class vtkPVXMLElement;
 class vtkSMProxy;
@@ -31,11 +31,11 @@ class vtkSMProxy;
 struct vtkSMStateLoaderInternals;
 //ETX
 
-class VTK_EXPORT vtkSMStateLoader : public vtkSMObject
+class VTK_EXPORT vtkSMStateLoader : public vtkSMStateLoaderBase
 {
 public:
   static vtkSMStateLoader* New();
-  vtkTypeRevisionMacro(vtkSMStateLoader, vtkSMObject);
+  vtkTypeRevisionMacro(vtkSMStateLoader, vtkSMStateLoaderBase);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -46,30 +46,6 @@ public:
   // of proxy ids to proxies is not cleared on loading of the state.
   virtual int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
 
-  // Description:
-  // Either create a new proxy or returns one from the map
-  // of existing properties. Newly created proxies are stored
-  // in the map with the id as the key.
-  virtual vtkSMProxy* NewProxy(int id);
-  virtual vtkSMProxy* NewProxyFromElement(vtkPVXMLElement* proxyElement, int id);
-  
-  // Description:
-  // Get/Set the connection ID for the connection on which the state is
-  // loaded. By default it is set to RootServerConnectionID.
-  vtkSetMacro(ConnectionID, vtkIdType);
-  vtkGetMacro(ConnectionID, vtkIdType);
-
-  // Description:
-  // Get/Set if the proxies are to be revived, if the state has sufficient
-  // information needed to revive proxies (such as server-side object IDs etc).
-  // By default, this is set to 0.
-  vtkSetMacro(ReviveProxies, int);
-  vtkGetMacro(ReviveProxies, int);
-
-
-  // Description:
-  // Clears all internal references to created proxies.
-  void ClearCreatedProxies();
 protected:
   vtkSMStateLoader();
   ~vtkSMStateLoader();
@@ -77,13 +53,15 @@ protected:
   vtkPVXMLElement* RootElement;
   void SetRootElement(vtkPVXMLElement*);
 
-  int ReviveProxies;
-
-
   int HandleProxyCollection(vtkPVXMLElement* collectionElement);
   virtual void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
   int HandleLinks(vtkPVXMLElement* linksElement);
   virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
+
+  // Description:
+  // Called after a new proxy is created.
+  // We register all created proxies.
+  virtual void CreatedNewProxy(int id, vtkSMProxy* proxy);
 
   // Description:
   // This method scans through the internal data structure built 
@@ -95,33 +73,26 @@ protected:
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
 
-  // Either create a new proxy or returns one from the map
-  // of existing properties. Newly created proxies are stored
-  // in the map with the id as the key. The root is the xml
-  // element under which the proxy definitions are stored.
-  virtual vtkSMProxy* NewProxy(vtkPVXMLElement* root, int id);
-
-  // Default implementation simply requests the proxy manager
-  // to create a new proxy of the given type.
-  virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
+  // Description:
+  // Return the xml element for the state of the proxy with the given id.
+  // This is used by NewProxy() when the proxy with the given id
+  // is not located in the internal CreatedProxies map.
+  virtual vtkPVXMLElement* LocateProxyElement(int id);
 
   // Description:
-  // This method is called to load a proxy state. The implementation
-  // here merely calls proxy->LoadState() however, subclass can override to do
-  // some state pre-processing.
-  virtual int LoadProxyState(vtkPVXMLElement* proxyElement, vtkSMProxy* proxy);
-
+  // Used by LocateProxyElement(). Recursively tries to locate the
+  // proxy state element for the proxy.
+  vtkPVXMLElement* LocateProxyElementInternal(vtkPVXMLElement* root, int id);
 
   // Description:
   // Checks the root element for version. If failed, return false.
   virtual bool VerifyXMLVersion(vtkPVXMLElement* rootElement);
 
-  vtkSMStateLoaderInternals* Internal;
-
-  vtkIdType ConnectionID;
 private:
   vtkSMStateLoader(const vtkSMStateLoader&); // Not implemented
   void operator=(const vtkSMStateLoader&); // Not implemented
+
+  vtkSMStateLoaderInternals* Internal;
 };
 
 #endif

@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMDefaultStateLoader.h"
+#include "vtkSMProxy.h"
+#include "vtkSMStateLoaderBase.h"
 
 #include <QList>
 #include <QString>
@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 vtkStandardNewMacro(pqHelperProxyRegisterUndoElement);
-vtkCxxRevisionMacro(pqHelperProxyRegisterUndoElement, "1.1");
+vtkCxxRevisionMacro(pqHelperProxyRegisterUndoElement, "1.2");
 //-----------------------------------------------------------------------------
 pqHelperProxyRegisterUndoElement::pqHelperProxyRegisterUndoElement()
 {
@@ -102,8 +102,8 @@ int pqHelperProxyRegisterUndoElement::Redo()
     return 0;
     }
 
-  vtkSmartPointer<vtkSMStateLoader> loader = 
-    vtkSmartPointer<vtkSMDefaultStateLoader>::New();
+  vtkSmartPointer<vtkSMStateLoaderBase> loader = 
+   this->GetStateLoader(); 
 
   loader->SetConnectionID(this->GetConnectionID());
   vtkSmartPointer<vtkSMProxy> proxy;
