@@ -30,7 +30,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.14");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.15");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ vtkPythonProgrammableFilter::vtkPythonProgrammableFilter()
   this->InformationScript = NULL;
   this->Interpretor = NULL;
   this->OutputDataSetType = VTK_DATA_SET;
-  this->Unregistering = 0;
+  this->Running = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -49,13 +49,11 @@ void vtkPythonProgrammableFilter::UnRegister(vtkObjectBase *o)
   this->Superclass::UnRegister(o);
   if (this->GetReferenceCount() == 4 && 
       this->Interpretor != NULL &&
-      !this->Unregistering
+      !this->Running
     )
     {
-    this->Unregistering = 1;
     this->Interpretor->Delete();
     this->Interpretor = NULL;
-    this->Unregistering = 0;
     }
 }
 
@@ -76,12 +74,10 @@ vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
 
 //----------------------------------------------------------------------------
 int vtkPythonProgrammableFilter::RequestInformation(
-  vtkInformation*ri, 
-  vtkInformationVector** iv, 
+  vtkInformation*, 
+  vtkInformationVector**, 
   vtkInformationVector* outputVector)
 {
-return this->Superclass::RequestInformation(ri,iv,outputVector);
-
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   // Setup ExtentTranslator so that all downstream piece requests are
@@ -99,7 +95,7 @@ return this->Superclass::RequestInformation(ri,iv,outputVector);
 
   if (this->InformationScript)
     {
-    this->Exec(this->InformationScript);
+    this->Exec(this->InformationScript);    
     }
   return 1;
 }
@@ -180,6 +176,12 @@ void vtkPythonProgrammableFilter::ExecuteScript(void *arg)
 //----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::Exec(const char* script)
 {
+  if (!script || !strlen(script))
+    {
+    return;
+    }
+
+  this->Running = 1;
   if (this->Interpretor == NULL)
     {
     this->Interpretor = vtkPVPythonInterpretor::New();
@@ -206,6 +208,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script)
   
   this->Interpretor->MakeCurrent();
   this->Interpretor->RunSimpleString(script);
+  this->Running = 0;
 }
 
 //----------------------------------------------------------------------------

@@ -95,9 +95,8 @@ private:
   vtkPythonProgrammableFilter(const vtkPythonProgrammableFilter&);  // Not implemented.
   void operator=(const vtkPythonProgrammableFilter&);  // Not implemented.
 
-  //state used to getting by a ref counting cyclic reference
-  int Unregistering;
-
+  //state used to get by a reference counting cyclic loop
+  int Running;
 };
 
 #endif
