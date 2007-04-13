@@ -30,12 +30,108 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqProgressBar.h"
-#include <QCoreApplication>
 #include <QTimer>
+#include <QHBoxLayout>
+
+#ifdef Q_WS_MAC
+#include <Carbon/Carbon.h>
+
+// helper class for the mac
+// we can't call QCoreApplication::processEvents to update the progress bar
+// so we'll do some extra work to make the progress bar update
+class pqProgressBarHelper : public QWidget
+{
+public:
+  pqProgressBarHelper(pqProgressBar* p)
+    : QWidget(p, Qt::Tool | Qt::FramelessWindowHint), ParentProgress(p)
+    {
+    this->Progress = new QProgressBar(this);
+    QHBoxLayout* l = new QHBoxLayout(this);
+    l->setMargin(0);
+    l->addWidget(this->Progress);
+    }
+  
+  void setFormat(const QString& fmt)
+    {
+    this->Progress->setFormat(fmt);
+    }
+
+  void setProgress(int num)
+    {
+    this->Progress->setValue(num);
+    
+    // update the progress bar on the Mac
+    // Qt only posts a request to update the window
+    // we really want it to happen now
+    HIViewRef thisView = HIViewRef(this->Progress->winId());
+    HIViewSetNeedsDisplay(thisView, true);
+    HIWindowFlush(HIViewGetWindow(thisView));
+    }
+  
+  void enableProgress(bool e)
+    {
+    if(e)
+      {
+      QSize sz = this->ParentProgress->size();
+      QRect r(this->ParentProgress->mapToGlobal(QPoint(0,0)), sz);
+      this->setGeometry(r);
+      this->Progress->setAlignment(this->ParentProgress->alignment());
+      this->Progress->setMaximum(this->ParentProgress->maximum());
+      this->Progress->setMinimum(this->ParentProgress->minimum());
+      this->Progress->setOrientation(this->ParentProgress->orientation());
+      this->Progress->reset();
+      this->show();
+      }
+    else
+      {
+      this->hide();
+      }
+    }
+
+  QProgressBar* Progress;
+  pqProgressBar* ParentProgress;
+};
+
+#else
+
+// helper class for other platforms
+class pqProgressBarHelper : public QObject
+{
+public:
+  pqProgressBarHelper(pqProgressBar* p)
+    : QObject(p), Progress(p)
+    {
+    }
+  
+  void setFormat(const QString& fmt)
+    {
+    this->Progress->setFormat(fmt);
+    }
+
+  void setProgress(int num)
+    {
+    this->Progress->setValue(num);
+    }
+
+  void enableProgress(bool e)
+    {
+    this->Progress->setEnabled(e);
+    this->Progress->setTextVisible(e);
+    if(!e)
+      {
+      this->Progress->reset();
+      }
+    }
+
+  pqProgressBar* Progress;
+};
+
+#endif
 
 //-----------------------------------------------------------------------------
 pqProgressBar::pqProgressBar(QWidget* _p) : QProgressBar(_p)
 {
+  this->Helper = new pqProgressBarHelper(this);
   this->CleanUp = false;
 }
 
@@ -43,15 +139,13 @@ pqProgressBar::pqProgressBar(QWidget* _p) : QProgressBar(_p)
 //-----------------------------------------------------------------------------
 pqProgressBar::~pqProgressBar()
 {
-  
 }
 
 //-----------------------------------------------------------------------------
 void pqProgressBar::setProgress(const QString& message, int _value)
 {
-  this->setFormat(QString("%1: %p").arg(message));
-  this->setValue(_value);
-  //QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+  this->Helper->setFormat(QString("%1: %p").arg(message));
+  this->Helper->setProgress(_value);
 }
 
 //-----------------------------------------------------------------------------
@@ -59,23 +153,21 @@ void pqProgressBar::enableProgress(bool e)
 {
   if(e)
     {
-    this->setEnabled(e);
-    this->setTextVisible(e);
+    this->Helper->enableProgress(true);
     }
-  else if(!this->CleanUp)
+  if(!this->CleanUp)
     {
-    this->setValue(100);
+    this->Helper->setProgress(100);
     this->CleanUp = true;
     QTimer::singleShot(0, this, SLOT(cleanup()));
     }
 }
 
+
 void pqProgressBar::cleanup()
 {
   this->CleanUp = false;
-  this->setEnabled(false);
-  this->setTextVisible(false);
-  this->reset();
+  this->Helper->enableProgress(false);
 }
 
 

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtWidgetsExport.h"
 #include <QProgressBar>
 
+class pqProgressBarHelper;
 
 // QProgressBar shows a text on the progress bar which is string 
 // for the current progress value. This class makes it possible
@@ -55,6 +56,7 @@ private slots:
 
 private:
   bool CleanUp;
+  pqProgressBarHelper* Helper;
 
 };
 
