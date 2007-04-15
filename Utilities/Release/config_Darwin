@@ -1,7 +1,7 @@
 PLATFORM="darwin"
 CC="gcc"
 CXX="c++"
-CMAKE="/Users/kitware/Dashboards/CMake/CMakeBin/bin/cmake"
+CMAKE="cmake"
 DISPLAY=
 
 write_cache()
