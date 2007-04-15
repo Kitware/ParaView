@@ -523,7 +523,7 @@ build()
     echo "Running make ..." &&
     (
         cd "${PROJECT}-${VERSION}-${PLATFORM}" &&
-        ${MAKE}
+        ${MAKE} -j8
     ) >Logs/build.log 2>&1 || error_log Logs/build.log
 }
 
