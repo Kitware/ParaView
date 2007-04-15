@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.92");
+vtkCxxRevisionMacro(vtkSMProxy, "1.93");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1062,10 +1062,12 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
         pm->NewStreamObject(this->VTKClassName, stream);
       this->Internals->IDs.push_back(objectId);
 
-      stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-        << "RegisterProgressEvent"
-        << objectId << static_cast<int>(objectId.ID)
-        << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << pm->GetProcessModuleID()
+             << "RegisterProgressEvent" 
+             << objectId 
+             << static_cast<int>(objectId.ID)
+             << vtkClientServerStream::End;
       }
     if (stream.GetNumberOfMessages() > 0)
       {
