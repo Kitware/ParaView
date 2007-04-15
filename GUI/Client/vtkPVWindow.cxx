@@ -197,7 +197,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.800.2.3");
+vtkCxxRevisionMacro(vtkPVWindow, "1.800.2.4");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2717,6 +2717,8 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel,
         x3dex->Write();
         x3dex->Delete();
         }
+      this->GetTraceHelper()->AddEntry("$kw(%s) WriteVTKFile \"%s\" %d", this->GetTclName(),
+        filename, ghostLevel);
       return; 
       }
 #endif
@@ -2728,6 +2730,8 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel,
       x3dex->Update();
       x3dex->Write();
       x3dex->Delete();
+      this->GetTraceHelper()->AddEntry("$kw(%s) WriteVTKFile \"%s\" %d", this->GetTclName(),
+        filename, ghostLevel);
       return; 
       }
     if (strcmp(ext,".wrl")==0)
@@ -2739,6 +2743,8 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel,
       vrmlExporter->Update();
       vrmlExporter->Write();
       vrmlExporter->Delete();
+      this->GetTraceHelper()->AddEntry("$kw(%s) WriteVTKFile \"%s\" %d", this->GetTclName(),
+        filename, ghostLevel);
       return; 
       }
     }
