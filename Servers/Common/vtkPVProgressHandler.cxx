@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.6");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.7");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -153,8 +153,9 @@ void vtkPVProgressHandler::DetermineProgressType(vtkProcessModule* app)
     }
   if ( this->ProgressType == vtkPVProgressHandler::NotSet )
     {
-    vtkErrorMacro("Internal ParaView errorr. Progress is not set.");
-    abort();
+    vtkErrorMacro("Non-critical internal ParaView error: "
+                  "Progress is not set.");
+    //abort();
     }
   this->Modified();
 }
@@ -174,38 +175,44 @@ void vtkPVProgressHandler::InvokeProgressEvent(vtkProcessModule* app,
 
   switch( this->ProgressType )
     {
-  case vtkPVProgressHandler::SingleProcess:
-    vtkDebugMacro("This is the gui and I got the progress: " << val);
-    this->LocalDisplayProgress(app, o->GetClassName(), val);
-    break;
-  case vtkPVProgressHandler::SingleProcessMPI:
-    vtkDebugMacro("This is the gui and I got progress. I need to handle children. " << val);
-    this->InvokeRootNodeProgressEvent(app, o, val);
-    break;
-  case vtkPVProgressHandler::SatelliteMPI:
-    vtkDebugMacro("I am satellite and I need to send progress to the node 0: " << val);
-    this->InvokeSatelliteProgressEvent(app, o, val);
-    break;
-  case vtkPVProgressHandler::ClientServerClient:
-    // No need to receive since the event handling will take care of that
-    vtkDebugMacro("This is gui and I got the progress from the server: " << val);
-    if ( !filter )
-      {
-      filter = o->GetClassName();
-      }
-    this->LocalDisplayProgress(app, filter, val);
-    break;
-  case vtkPVProgressHandler::ClientServerServer:
-    vtkDebugMacro("This is non-mpi server and I need to send progress to client: " << val);
-    this->InvokeRootNodeServerProgressEvent(app, o, val);
-    break;
-  case vtkPVProgressHandler::ClientServerServerMPI:
-    vtkDebugMacro("This is mpi server and I need to send progress to client: " << val);
-    this->InvokeRootNodeServerProgressEvent(app, o, val);
-    break;
-  default:
-    vtkErrorMacro("Internal ParaView error. Progress type is set to some unknown value");
-    abort();
+    case vtkPVProgressHandler::SingleProcess:
+      vtkDebugMacro("This is the gui and I got the progress: " << val);
+      this->LocalDisplayProgress(app, o->GetClassName(), val);
+      break;
+    case vtkPVProgressHandler::SingleProcessMPI:
+      vtkDebugMacro("This is the gui and I got progress. I need to handle "
+                    "children. " << val);
+      this->InvokeRootNodeProgressEvent(app, o, val);
+      break;
+    case vtkPVProgressHandler::SatelliteMPI:
+      vtkDebugMacro("I am satellite and I need to send progress to the "
+                    "node 0: " << val);
+      this->InvokeSatelliteProgressEvent(app, o, val);
+      break;
+    case vtkPVProgressHandler::ClientServerClient:
+      // No need to receive since the event handling will take care of that
+      vtkDebugMacro("This is gui and I got the progress from the server: " 
+                    << val);
+      if ( !filter )
+        {
+        filter = o->GetClassName();
+        }
+      this->LocalDisplayProgress(app, filter, val);
+      break;
+    case vtkPVProgressHandler::ClientServerServer:
+      vtkDebugMacro("This is non-mpi server and I need to send progress "
+                    "to client: " << val);
+      this->InvokeRootNodeServerProgressEvent(app, o, val);
+      break;
+    case vtkPVProgressHandler::ClientServerServerMPI:
+      vtkDebugMacro("This is mpi server and I need to send progress "
+                    "to client: " << val);
+      this->InvokeRootNodeServerProgressEvent(app, o, val);
+      break;
+    default:
+      vtkErrorMacro("Non-critical internal ParaView error: "
+                    "Progress type is set to some unknown value");
+      //abort();
     }
 }
 
@@ -314,8 +321,9 @@ void vtkPVProgressHandler::InvokeSatelliteProgressEvent(
         }
       else
         {
-        vtkErrorMacro("Internal ParaView error: Got progresss from something not observed.");
-        abort();
+        vtkErrorMacro("Non-critical internal ParaView error: "
+                      "Got progresss from something not observed.");
+        //abort();
         }
       }
     }
@@ -414,8 +422,10 @@ void vtkPVProgressHandler::CleanupPendingProgress(vtkProcessModule* app)
 {
   if ( !this->ReceivingProgressReports )
     {
-    vtkErrorMacro("Internal ParaView Error: Got request for cleanup pending progress after being cleaned up");
-    abort();
+    vtkErrorMacro("Non-critical internal ParaView Error: "
+                  "Got request for cleanup pending progress "
+                  "after being cleaned up");
+    //abort();
     }
   vtkDebugMacro("Cleanup all pending progress events");
   int id = -1;
