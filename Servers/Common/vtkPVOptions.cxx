@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.39");
+vtkCxxRevisionMacro(vtkPVOptions, "1.40");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -118,16 +118,16 @@ void vtkPVOptions::Initialize()
   this->AddArgument("--render-server-host", "-rsh", &this->RenderServerHostName, 
                     "Tell the client the host name of the render server (default: localhost).", 
                     vtkPVOptions::PVCLIENT);
-
-  this->AddArgument("--connect-id", 0, &this->ConnectID,
-                    "Set the ID of the server and client to make sure they match.",
-                    vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER |
-                    vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER);
   this->AddArgument("--render-module", 0, &this->RenderModuleName,
                     "User specified rendering module.",
                     vtkPVOptions::PVCLIENT| vtkPVOptions::PVRENDER_SERVER 
                     | vtkPVOptions::PVSERVER | vtkPVOptions::PARAVIEW);
   */
+
+  this->AddArgument("--connect-id", 0, &this->ConnectID,
+                    "Set the ID of the server and client to make sure they match.",
+                    vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER |
+                    vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER);
   this->AddBooleanArgument("--use-offscreen-rendering", 0, &this->UseOffscreenRendering,
                            "Render offscreen on the satellite processes."
                            " This option only works with software rendering or mangled mesa on Unix.",
