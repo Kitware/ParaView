@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "QVTKWidget.h"
+#include "pqEventDispatcher.h"
 pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
   : pqWidgetEventPlayer(p)
 {
@@ -71,7 +72,7 @@ bool pqQVTKWidgetEventPlayer::playEvent(QObject* Object,
           ((Command=="mouseMove")?  QEvent::MouseMove : QEvent::MouseButtonRelease);
         QMouseEvent e(type, QPoint(x,y), button, buttons, keym);
         QCoreApplication::sendEvent(widget, &e);
-        QCoreApplication::processEvents();
+        pqEventDispatcher::processEventsAndWait(1);
         }
       return true;
       }
