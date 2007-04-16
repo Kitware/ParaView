@@ -63,9 +63,10 @@ AboutDialog::AboutDialog(QWidget* Parent) :
   QString version = QString("This is version %1").arg(PARAVIEW_VERSION_FULL);
   this->Ui->Information->append(version);
   
-  this->Ui->Information->append("\n");
-  
-  this->Ui->Information->append(info);
+  // For now, don't add any runtime information, it's 
+  // incorrect for PV3 (made sense of PV2).
+  // this->Ui->Information->append("\n");
+  // this->Ui->Information->append(info);
   this->Ui->Information->moveCursor(QTextCursor::Start);
   this->Ui->Information->viewport()->setBackgroundRole(QPalette::Window);
 }
