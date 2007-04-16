@@ -153,6 +153,11 @@ protected slots:
   void setStartTimeByIndex(int index);
   void setEndTimeByIndex(int index);
 
+  /// Called when the index spin box (either in the toolbar or the animation
+  /// panel is changed. We synchronize the two widgets. We don't push
+  /// the changed value immediately. It will be pushed when
+  /// "editingFinished" is fired by the spin box.
+  void currentTimeIndexChanged(int index);
 
   /// Called when the pqTimeKeeper signals that the current time changed.
   void onTimeChanged();
@@ -165,7 +170,13 @@ protected slots:
   /// when the one on the panel changes.
   void updateToolbarCurrentTime(const QString&);
 
+  /// Called when "editingFinished()" is fired by the
+  /// current time line edit.
   void currentTimeEdited();
+
+  /// Called when "editingFinished()" is fired by the
+  /// current time spin box.
+  void currentTimeIndexEdited();
 protected:
   void buildPropertyList(vtkSMProxy* proxy, const QString& labelPrefix);
 

@@ -157,8 +157,13 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
     this, SLOT(currentTimeEdited()));
 
   QObject::connect(
+    this->Internal->currentTimeIndex, SIGNAL(editingFinished()),
+    this, SLOT(currentTimeIndexEdited()));
+
+  QObject::connect(
     this->Internal->currentTimeIndex, SIGNAL(valueChanged(int)),
-    this, SLOT(setCurrentTimeByIndex(int)));
+    this, SLOT(currentTimeIndexChanged(int)));
+
   QObject::connect(
     this->Internal->startTimeIndex, SIGNAL(valueChanged(int)),
     this, SLOT(setStartTimeByIndex(int)));
@@ -1101,6 +1106,27 @@ void pqAnimationPanel::setEndTimeByIndex(int index)
 }
 
 //-----------------------------------------------------------------------------
+void pqAnimationPanel::currentTimeIndexEdited()
+{
+  this->setCurrentTimeByIndex(this->Internal->currentTimeIndex->value());
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationPanel::currentTimeIndexChanged(int index)
+{
+  this->Internal->currentTimeIndex->blockSignals(true);
+  this->Internal->currentTimeIndex->setValue(index);
+  this->Internal->currentTimeIndex->blockSignals(false);
+
+  if (this->Internal->ToolbarCurrentTimeIndexWidget)
+    {
+    this->Internal->ToolbarCurrentTimeIndexWidget->blockSignals(true);
+    this->Internal->ToolbarCurrentTimeIndexWidget->setValue(index);
+    this->Internal->ToolbarCurrentTimeIndexWidget->blockSignals(false);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqAnimationPanel::setCurrentTimeByIndex(int index)
 {
   if (!this->Internal->ActiveScene)
@@ -1205,7 +1231,11 @@ void pqAnimationPanel::setCurrentTimeToolbar(QToolBar* toolbar)
 
   QObject::connect(
     this->Internal->ToolbarCurrentTimeIndexWidget, SIGNAL(valueChanged(int)),
-    this, SLOT(setCurrentTimeByIndex(int)));
+    this, SLOT(currentTimeIndexChanged(int)));
+
+  QObject::connect(
+    this->Internal->ToolbarCurrentTimeIndexWidget, SIGNAL(editingFinished()),
+    this, SLOT(currentTimeIndexEdited()));
 
 
   toolbar->addWidget(label);
