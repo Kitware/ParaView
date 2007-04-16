@@ -329,6 +329,13 @@ void pqElementInspectorWidget::inspect(pqPipelineSource* source)
       srcDisplay = 
         pqApplicationCore::instance()->getObjectBuilder()->createDataDisplay(
           source, this->Implementation->ViewModule);
+      if (srcDisplay)
+        {
+        pqSMAdaptor::setEnumerationProperty(
+          srcDisplay->getProxy()->GetProperty("ReductionType"),
+          "UNSTRUCTURED_APPEND");
+        srcDisplay->getProxy()->UpdateVTKObjects();
+        }
       }
 
     // If there is an active selection for this source,
