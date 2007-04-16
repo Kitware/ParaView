@@ -12,13 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+/*----------------------------------------------------------------------------
+ Copyright (c) Sandia Corporation
+ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+----------------------------------------------------------------------------*/
 #include "vtkSquirtCompressor.h"
 #include "vtkObjectFactory.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkImageData.h"
 
 vtkStandardNewMacro(vtkSquirtCompressor);
-vtkCxxRevisionMacro(vtkSquirtCompressor, "1.5");
+vtkCxxRevisionMacro(vtkSquirtCompressor, "1.6");
 //-----------------------------------------------------------------------------
 vtkSquirtCompressor::vtkSquirtCompressor()
 {
