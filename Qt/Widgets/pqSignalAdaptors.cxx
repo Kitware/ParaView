@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptors.h"
 
 // Qt includes
+#include <QColor>
 #include <QComboBox>
 #include <QSlider>
 #include <QTextEdit>
