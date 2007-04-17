@@ -99,6 +99,7 @@ protected:
 private:
   class pqInternal;
   pqInternal* Internal;
+  friend class pqInternal;
 
 };
 
