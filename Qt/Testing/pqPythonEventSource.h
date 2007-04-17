@@ -52,6 +52,7 @@ public:
   static void setProperty(QString& object, QString& prop, const QString& value);
   static QStringList getChildren(QString& object);
   static QString invokeMethod(QString& object, QString& method);
+  static void wait(int ms);
 
 protected:
   virtual void run();
@@ -61,6 +62,7 @@ protected slots:
   void threadSetProperty();
   void threadGetChildren();
   void threadInvokeMethod();
+  void threadWait(int);
 
 private:
   class pqInternal;
