@@ -55,6 +55,7 @@ struct pqSourceInfo
   double MemorySize;
   bool DataInformationValid;
   double Bounds[6];
+  QString DataTypeName;
 
   unsigned long MTime;
   pqSourceInfo()
@@ -126,13 +127,11 @@ struct pqSourceInfo
   // Given a data type ID, returns the string.
   QString getDataTypeAsString() const
     {
-    if (!this->DataInformationValid ||
-        !this->Source ||
-        !this->Source->getDataInformation())
+    if (this->DataInformationValid)
       {
-      return "Unavailable";
+      return this->DataTypeName;
       }
-    return this->Source->getDataInformation()->GetPrettyDataTypeString();
+    return "Unavailable";
     }
 
   // Given a datatype, returns the icon for that data type.
@@ -410,6 +409,7 @@ void pqDataInformationModel::refreshModifiedData()
       {
       iter->MTime = dataInfo->GetMTime();
       iter->DataType = dataInfo->GetDataSetType();
+      iter->DataTypeName = dataInfo->GetPrettyDataTypeString();
       if (dataInfo->GetCompositeDataSetType() >= 0)
         {
         iter->DataType = dataInfo->GetCompositeDataSetType();
