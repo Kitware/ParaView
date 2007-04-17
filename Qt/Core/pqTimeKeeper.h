@@ -45,7 +45,7 @@ class vtkObject;
 /// global time and timesteps available currently.
 class PQCORE_EXPORT pqTimeKeeper : public pqProxy 
 {
-  Q_OBJECT;
+  Q_OBJECT
 public:
   pqTimeKeeper(const QString& group, const QString& name,
     vtkSMProxy* timekeeper, pqServer* server, QObject* parent=0);

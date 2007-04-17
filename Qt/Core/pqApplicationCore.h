@@ -71,7 +71,7 @@ class vtkSMStateLoader;
 
 class PQCORE_EXPORT pqApplicationCore : public QObject
 {
-  Q_OBJECT;
+  Q_OBJECT
 public:
   // Get the global instace for the pqApplicationCore.
   static pqApplicationCore* instance();

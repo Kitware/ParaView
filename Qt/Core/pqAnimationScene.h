@@ -44,7 +44,7 @@ class vtkSMAnimationSceneProxy;
 /// proxy. It provides API to access AnimationCues in the scene.
 class PQCORE_EXPORT pqAnimationScene : public pqProxy
 {
-  Q_OBJECT;
+  Q_OBJECT
 public:
   pqAnimationScene(const QString& group, const QString& name,
     vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);

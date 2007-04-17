@@ -39,7 +39,7 @@ class vtkSMProperty;
 
 class PQCORE_EXPORT pqAnimationCue : public pqProxy
 {
-  Q_OBJECT;
+  Q_OBJECT
   typedef pqProxy Superclass;
 public:
   pqAnimationCue(const QString& group, const QString& name,
