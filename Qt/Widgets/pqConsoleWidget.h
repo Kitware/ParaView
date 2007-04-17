@@ -77,6 +77,7 @@ private:
 
   class pqImplementation;
   pqImplementation* const Implementation;
+  friend class pqImplementation;
 };
 
 #endif // !_pqConsoleWidget_h
