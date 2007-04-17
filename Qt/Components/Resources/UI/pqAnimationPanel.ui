@@ -224,7 +224,7 @@
          <widget class="QLineEdit" name="currentTime" />
         </item>
         <item>
-         <widget class="QSpinBox" name="currentTimeIndex" >
+         <widget class="pqSpinBox" name="currentTimeIndex" >
           <property name="enabled" >
            <bool>false</bool>
           </property>
@@ -638,6 +638,11 @@
    <extends>QGroupBox</extends>
    <header>pqCollapsedGroup.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>pqSpinBox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -69,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
+#include "pqSpinBox.h"
 #include "pqTimeKeeper.h"
 
 //-----------------------------------------------------------------------------
@@ -1225,7 +1226,7 @@ void pqAnimationPanel::setCurrentTimeToolbar(QToolBar* toolbar)
   QObject::connect(timeedit, SIGNAL(editingFinished()),
     this, SLOT(currentTimeEdited()));
 
-  QSpinBox* sbtimeedit = new QSpinBox(toolbar);
+  QSpinBox* sbtimeedit = new pqSpinBox(toolbar);
   sbtimeedit->setObjectName("CurrentTimeIndex");
   this->Internal->ToolbarCurrentTimeIndexWidget = sbtimeedit;
 

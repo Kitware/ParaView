@@ -53,6 +53,8 @@ SET(QtWidgets_SRCS
   pqSetName.h
   pqSignalAdaptors.cxx
   pqSignalAdaptors.h
+  pqSpinBox.cxx
+  pqSpinBox.h
   pqListWidgetCheckHelper.cxx
   pqListWidgetCheckHelper.h
   pqSelectionTreeWidget.cxx
@@ -88,6 +90,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqProgressWidget.h
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
+  pqSpinBox.h
   pqListWidgetCheckHelper.h
   pqSelectionTreeWidget.h
   pqTreeWidgetCheckHelper.h
