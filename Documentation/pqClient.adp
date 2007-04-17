@@ -16,5 +16,6 @@
   <section ref="Documentation/ParaViewSources.html" title="Sources"/>
   <section ref="Documentation/ParaViewFilters.html" title="Filters"/>
   <section ref="Documentation/ParaViewWriters.html" title="Writers"/>
+  <section ref="Documentation/ObjectInspector.html" title="Object Inspector"/>
 </DCF>
 </assistantconfig> 
