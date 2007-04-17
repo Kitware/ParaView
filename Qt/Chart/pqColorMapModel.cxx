@@ -146,17 +146,17 @@ void pqColorMapModel::setColorSpaceFromInt(int space)
     {
     case 0:
       {
-      this->Space = pqColorMapModel::RgbSpace;
+      this->setColorSpace(pqColorMapModel::RgbSpace);
       break;
       }
     case 1:
       {
-      this->Space = pqColorMapModel::HsvSpace;
+      this->setColorSpace(pqColorMapModel::HsvSpace);
       break;
       }
     case 2:
       {
-      this->Space = pqColorMapModel::WrappedHsvSpace;
+      this->setColorSpace(pqColorMapModel::WrappedHsvSpace);
       break;
       }
     }
@@ -443,10 +443,29 @@ QPixmap pqColorMapModel::generateGradient(const QSize &size) const
         else if(this->Space == pqColorMapModel::HsvSpace ||
             this->Space == pqColorMapModel::WrappedHsvSpace)
           {
-          // TODO: Add wrapping HSV
           // vx = ((px - p1)*(v2 - v1))/(p2 - p1) + v1
-          int h=0, s=0, v=0;
-          h = ((px - x1)*(next.hue() - previous.hue()))/w + previous.hue();
+          int s=0, v=0;
+          int h = next.hue();
+          int h1 = previous.hue();
+          if(this->Space == pqColorMapModel::WrappedHsvSpace &&
+              (h - h1 > 180 || h1 - h > 180))
+            {
+            if(h1 > h)
+              {
+              h1 -= 360;
+              }
+            else
+              {
+              h -= 360;
+              }
+            }
+
+          h = ((px - x1)*(h - h1))/w + h1;
+          if(h < 0)
+            {
+            h += 360;
+            }
+
           s = ((px - x1)*(next.saturation() - previous.saturation()))/w +
               previous.saturation();
           v = ((px - x1)*(next.value() - previous.value()))/w + previous.value();

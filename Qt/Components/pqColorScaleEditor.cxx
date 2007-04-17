@@ -206,9 +206,7 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   // Add the color space options to the combo box.
   this->Form->ColorSpace->addItem("RGB");
   this->Form->ColorSpace->addItem("HSV");
-#if USE_VTK_TFE
   this->Form->ColorSpace->addItem("Wrapped HSV");
-#endif
 
   // Add the color scale presets menu.
   this->loadBuiltinColorPresets();
@@ -908,10 +906,6 @@ void pqColorScaleEditor::loadPreset()
       model->getValueRange(min, max);
       this->updateScalarRange(min.getDoubleValue(), max.getDoubleValue());
       model->finishModifyingData();
-      if(colorSpace == 2)
-        {
-        colorSpace = 1; // TEMP
-        }
 #endif
 
       // Update the color space chooser.
@@ -1416,13 +1410,13 @@ void pqColorScaleEditor::initColorScale()
     int space = pqSMAdaptor::getElementProperty(
         lookupTable->GetProperty("ColorSpace")).toInt();
     this->Form->ColorSpace->setCurrentIndex(space);
-#if USE_VTK_TFE
     if(pqSMAdaptor::getElementProperty(
         lookupTable->GetProperty("HSVWrap")).toInt())
       {
       this->Form->ColorSpace->setCurrentIndex(2);
       }
 
+#if USE_VTK_TFE
     this->Viewer->SetColorSpace(this->Form->ColorSpace->currentIndex());
 #else
     model->setColorSpaceFromInt(this->Form->ColorSpace->currentIndex());
