@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqEventDispatcher.h"
 
 static inline int pqCeil(double val)
 {
@@ -596,7 +597,7 @@ int pqAnimationManager::updateViewSizes(QSize newSize, QSize currentSize, bool i
     this->Internals->OldMaxSize = this->Internals->ViewWidget->maximumSize();
     this->Internals->ViewWidget->setMaximumSize(newSize);
     this->Internals->ViewWidget->resize(newSize);
-    QCoreApplication::processEvents();
+    pqEventDispatcher::processEventsAndWait(1);
     }
 
   return magnification;

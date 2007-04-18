@@ -90,6 +90,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardViewModules.h"
 #include "pqUndoStack.h"
 #include "pqXMLUtil.h"
+#include "pqEventDispatcher.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -434,7 +435,7 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     pqLoader->ClearPreferredRenderModules();
     }
 
-  QApplication::processEvents();
+  pqEventDispatcher::processEventsAndWait(1);
   this->render();
 
   this->LoadingState = false;

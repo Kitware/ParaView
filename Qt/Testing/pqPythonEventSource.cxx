@@ -215,7 +215,25 @@ QtTesting_wait(PyObject* /*self*/, PyObject* args)
     return NULL;
     }
 
-  pqEventDispatcher::processEventsAndWait(ms);
+  if(Instance && QThread::currentThread() != QApplication::instance()->thread())
+    {
+    QMetaObject::invokeMethod(Instance, "threadWait", Qt::QueuedConnection,
+                              Q_ARG(int, ms) );
+    if(!Instance->waitForGUI())
+      {
+      PyErr_SetString(PyExc_ValueError, "error waiting");
+      return NULL;
+      }
+    }
+  else if(QThread::currentThread() == QApplication::instance()->thread())
+    {
+    pqPythonEventSource::wait(ms);
+    }
+  else
+    {
+    PyErr_SetString(PyExc_AssertionError, "pqPythonEventSource not defined");
+    return NULL;
+    }
 
   return Py_BuildValue(const_cast<char*>(""));
 }
@@ -559,5 +577,16 @@ QString pqPythonEventSource::invokeMethod(QString& object, QString& method)
       }
     }
   return ret.toString();
+}
+
+void pqPythonEventSource::threadWait(int ms)
+{
+  this->wait(ms);
+  this->guiAcknowledge();
+}
+
+void pqPythonEventSource::wait(int ms)
+{
+  pqEventDispatcher::processEventsAndWait(ms);
 }
 

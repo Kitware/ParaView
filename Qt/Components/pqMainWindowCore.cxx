@@ -2200,7 +2200,7 @@ void pqMainWindowCore::onServerDisconnect()
     core->removeServer(server);
     }
 
-  QCoreApplication::processEvents();
+  pqEventDispatcher::processEventsAndWait(1);
 
   // Always have a builtin connection connected.
   pqServerResource resource = pqServerResource("builtin:");
