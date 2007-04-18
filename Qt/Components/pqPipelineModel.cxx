@@ -1250,7 +1250,8 @@ void pqPipelineModel::setViewModule(pqGenericViewModule *module)
   // affected sources.
   if(!this->Internal->RenderModule || !module ||
       (this->Internal->RenderModule && module &&
-      this->Internal->RenderModule->getServer() != module->getServer()))
+      (this->Internal->RenderModule->getServer() != module->getServer() ||
+      this->Internal->RenderModule->getViewType() != module->getViewType())))
     {
     this->Internal->RenderModule = module;
 
@@ -1261,13 +1262,10 @@ void pqPipelineModel::setViewModule(pqGenericViewModule *module)
       }
 
     QModelIndex changed;
-    QList<QPersistentModelIndex> toUpdate;
     pqPipelineModelSource *source = 0;
-    //pqPipelineModelLink *link = 0;
     while(item)
       {
       source = dynamic_cast<pqPipelineModelSource *>(item);
-      //link = dynamic_cast<pqPipelineModelLink *>(item);
       if(source)
         {
         source->setVisibleState(this->Internal->RenderModule);
@@ -1279,18 +1277,7 @@ void pqPipelineModel::setViewModule(pqGenericViewModule *module)
             dynamic_cast<pqPipelineModelFilter *>(source), 1);
         }
 
-      //if(link || source)
-      //  {
-        //toUpdate.append(this->makeIndex(item, 1));
-      //  }
-
       item = this->getNextModelItem(item);
-      }
-
-    QList<QPersistentModelIndex>::Iterator iter = toUpdate.begin();
-    for( ; iter != toUpdate.end(); ++iter)
-      {
-      emit this->dataChanged(*iter, *iter);
       }
     }
   else
