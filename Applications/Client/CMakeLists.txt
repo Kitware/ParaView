@@ -279,7 +279,7 @@ IF(BUILD_TESTING)
     UndoRedo6
   )
 
-  SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver${PV_EXE_SUFFIX})
+  SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver)
 
   IF(PARAVIEW_DATA_ROOT)
     FOREACH(test ${XML_TESTS_WITH_BASELINES})
@@ -310,6 +310,9 @@ IF(BUILD_TESTING)
   ENDIF(PARAVIEW_DATA_ROOT)
 
   ADD_SUBDIRECTORY(Testing/Cxx)
+
+  # Do the link forwarding for the test driver as well.
+  SET(PV_EXE_LIST ${PV_EXE_LIST} pvTestDriver)
 ENDIF(BUILD_TESTING)
 
 # Add shared link forwarding executables if necessary.
