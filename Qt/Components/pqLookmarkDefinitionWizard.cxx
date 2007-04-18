@@ -245,8 +245,6 @@ void pqLookmarkDefinitionWizard::createLookmark()
   // FIXME: Is there a better way to do this? I tried using the 
   //  vtkWindowToImageFilter but I don't know how to convert its output 
   //  vtkImageData to an image format that QImage will understand
-  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renderModule->getWidget());  
-  assert(widget);
   renderModule->saveImage(150,150,"tempLookmarkImage.png");
   QImage image("tempLookmarkImage.png","PNG");
   remove("tempLookmarkImage.png");
