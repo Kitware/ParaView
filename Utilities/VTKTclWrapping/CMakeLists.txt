@@ -156,6 +156,7 @@ ADD_LIBRARY(vtkCommonTCL ${vtkTCLSources}
   "${VTK_SOURCE_DIR}/Rendering/vtkTkRenderWidget.cxx"
   "${VTK_SOURCE_DIR}/Rendering/vtkTkImageViewerWidget.cxx"
   )
+ADD_DEPENDENCIES(vtkCommonTCL maketcltk)
 TARGET_LINK_LIBRARIES(vtkCommonTCL 
   vtkCommon
   vtkIO
