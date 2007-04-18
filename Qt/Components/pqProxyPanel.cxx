@@ -100,6 +100,7 @@ pqProxyPanel::pqProxyPanel(pqProxy* refProxy, vtkSMProxy* pxy, QWidget* p) :
 {
   // Just make sure that the proxy is setup properly.
   this->Implementation->Proxy->UpdateVTKObjects();
+  this->updateInformationAndDomains();
 
   this->Implementation->PropertyManager = new pqPropertyManager(this);
 
