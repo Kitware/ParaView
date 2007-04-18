@@ -82,7 +82,8 @@ SET(PV_EXE_LIST paraview)
 # to install assistant-real
 #SET(PV_EXE_LIST ${PV_EXE_LIST} assistant)
 
-ADD_EXECUTABLE(paraview${PV_EXE_SUFFIX} WIN32 MACOSX_BUNDLE
+SET(MACOSX_BUNDLE_BUNDLE_NAME "Kitware ParaView")
+ADD_EXECUTABLE(paraview${PV_EXE_SUFFIX} WIN32 MACOSX_BUNDLE  
   AboutDialog.cxx
   AboutDialog.h
   MainWindow.cxx
