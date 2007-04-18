@@ -603,7 +603,15 @@ void pqColorMapWidget::updatePointValue(int index, const pqChartValue &value)
     // Update the pixel position of the point.
     this->Internal->Items[index] = this->Internal->PixelMap.getPixelFor(value);
 
-    this->generateGradient();
+    if(index == 0 || index == this->Internal->Items.size() - 1)
+      {
+      this->layoutColorMap();
+      }
+    else
+      {
+      this->generateGradient();
+      }
+
     this->viewport()->update();
     }
 }
@@ -695,10 +703,29 @@ void pqColorMapWidget::generateGradient()
           else if(this->Model->getColorSpace() == pqColorMapModel::HsvSpace ||
               this->Model->getColorSpace() == pqColorMapModel::WrappedHsvSpace)
             {
-            // TODO: Add wrapping HSV
             // vx = ((px - p1)*(v2 - v1))/(p2 - p1) + v1
-            int h=0, s=0, v=0;
-            h = ((px - x1)*(next.hue() - previous.hue()))/w + previous.hue();
+            int s=0, v=0;
+            int h = next.hue();
+            int h1 = previous.hue();
+            if(this->Model->getColorSpace() == pqColorMapModel::WrappedHsvSpace
+                && (h - h1 > 180 || h1 - h > 180))
+              {
+              if(h1 > h)
+                {
+                h1 -= 360;
+                }
+              else
+                {
+                h -= 360;
+                }
+              }
+
+            h = ((px - x1)*(h - h1))/w + h1;
+            if(h < 0)
+              {
+              h += 360;
+              }
+
             s = ((px - x1)*(next.saturation() - previous.saturation()))/w +
                 previous.saturation();
             v = ((px - x1)*(next.value() - previous.value()))/w + previous.value();
