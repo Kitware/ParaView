@@ -8,10 +8,19 @@ IF(NOT WIN32)
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
 ENDIF(NOT WIN32)
 
-SET(Kit_SRCS
-  vtkClientConnection.cxx
+ADD_LIBRARY(vtkPVCommandOptions
   vtkCommandOptions.cxx
   vtkCommandOptionsXMLParser.cxx
+  vtkPVOptions.cxx
+  vtkPVOptionsXMLParser.cxx
+  vtkPVXMLParser.cxx
+  vtkPVXMLElement.cxx
+)
+TARGET_LINK_LIBRARIES(vtkPVCommandOptions
+  vtkIO)
+
+SET(Kit_SRCS
+  vtkClientConnection.cxx
   vtkConnectionIterator.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
@@ -28,16 +37,12 @@ SET(Kit_SRCS
   vtkPVLODPartDisplayInformation.cxx
   vtkPVNumberOfOutputsInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
-  vtkPVOptions.cxx
-  vtkPVOptionsXMLParser.cxx
   vtkPVProgressHandler.cxx
   vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
   vtkPVTimerInformation.cxx
-  vtkPVXMLElement.cxx
-  vtkPVXMLParser.cxx
   vtkProcessModule.cxx
   vtkProcessModuleConnection.cxx
   vtkProcessModuleConnectionManager.cxx
@@ -130,7 +135,8 @@ ADD_LIBRARY(vtk${KIT}
 TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkHybridCS vtkParallelCS KWCommon vtksys
   ${PARAVIEW_HDF5_LIBRARIES}
-  vtkClientServer)
+  vtkClientServer
+  vtkPVCommandOptions)
 
 # Create Tcl wrappers for classes.
 IF (PARAVIEW_BUILD_GUI)
