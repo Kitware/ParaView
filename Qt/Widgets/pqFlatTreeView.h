@@ -286,9 +286,15 @@ private:
 
   void drawBranches(QPainter &painter, pqFlatTreeViewItem *item,
       int halfIndent, const QColor &branchColor, const QColor &expandColor,
-      QStyleOptionViewItem &options);
-  void drawFocus(QPainter &painter, const QStyleOptionViewItem &options,
-      const QRect &cell, bool selected);
+      const QStyleOptionViewItem &options);
+  bool drawDecoration(QPainter &painter, int px, int py,
+      const QModelIndex &index, const QStyleOptionViewItem &options,
+      int itemHeight);
+  void drawData(QPainter &painter, int px, int py,
+      const QModelIndex &index, const QStyleOptionViewItem &options,
+      int itemHeight, int itemWidth, int columnWidth, bool selected);
+  void drawFocus(QPainter &painter, const QRect &cell,
+      const QStyleOptionViewItem &options, bool selected);
 
 private:
   QAbstractItemModel *Model;
