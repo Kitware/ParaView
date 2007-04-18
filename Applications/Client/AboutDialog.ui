@@ -74,7 +74,7 @@
       <string/>
      </property>
      <property name="pixmap" >
-      <pixmap resource="Resources.qrc" >:/pqClient/ParaViewLogo.png</pixmap>
+      <pixmap resource="Resources.qrc" >:/pqClient/PVSplashScreen.png</pixmap>
      </property>
     </widget>
    </item>
