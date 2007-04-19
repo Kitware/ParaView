@@ -17,5 +17,6 @@
   <section ref="Documentation/ParaViewFilters.html" title="Filters"/>
   <section ref="Documentation/ParaViewWriters.html" title="Writers"/>
   <section ref="Documentation/ObjectInspector.html" title="Object Inspector"/>
+  <section ref="Documentation/PipelineBrowser.html" title="Pipeline Browser"/>
 </DCF>
 </assistantconfig> 

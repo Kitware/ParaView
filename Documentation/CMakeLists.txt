@@ -1,5 +1,6 @@
 set(PARAVIEW_HTML_DOCUMENTATION
   CellData.png
+  ChangeInput.png
   ColorEditor.png
   ColorLegend.png
   ColorLegendToolbarButton.png
@@ -17,9 +18,12 @@ set(PARAVIEW_HTML_DOCUMENTATION
   ObjectInspector.html
   ParaViewDoc.css
   ParaViewLogo.png
+  PipelineBrowser.html
+  PipelineBrowser.png
   PointData.png
   Properties.html
   PropertiesButtons.png
+  RightClickFilter.png
 )
 
 foreach(filename ${PARAVIEW_HTML_DOCUMENTATION})
