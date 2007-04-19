@@ -15,7 +15,9 @@
 <a href="#View">View section</a><br>
 <a href="#Color">Color section</a><br>
 <a href="#Style">Style selection</a><br>
-<a href="#Transformation"> Transformation section</a>
+<a href="#Transformation">Transformation section</a><br>
+<a href="#Bar Chart View">Bar Chart view section</a><br>
+<a href="#XY Plot View">XY Plot view section</a><br> 
 <p>
 <a name="View"/>
 <h2>View</h2>
@@ -31,11 +33,14 @@ tab.
 If the dataset selected in the pipeline browser has never been added to the
 selected view, then the Display tab will only contain the View section, and
 the only control will be the Visible checkbutton. Once the dataset is visible
-in the selected view, several more sections are added to the Display tab, and
-the Zoom to Data button is added to the View section. This button centers the
-viewing position on the dataset selected from the pipeline browser. This item
-will fill most of the selected view unless another dataset is between it and
-the viewing position.
+in the selected view, several more sections are added to the Display
+tab. Which sections are added depends on the type of view being used to
+display the data. For a 3D View, the Zoom to Data button is added to the View
+section. This button centers the viewing position on the dataset selected
+from the pipeline browser. This item will fill most of the selected view
+unless another dataset is between it and the viewing position. Except for the
+last two sections, the rest of this page refers to the Display tab used for
+the 3D view.
 
 <a name="Color"/>
 <h2>Color</h2>
@@ -286,6 +291,63 @@ along the X, Y, and Z axes. The Scale controls increase or decrease the 3D
 size of the dataset in each of the three dimensions. The Orientation controls
 rotate the dataset in X, Y, or Z by the specified number of degrees. This
 rotation happens around the coordinate specified by the Origin spinboxes.
+
+<a name="Bar Chart View"/>
+<h2>Bar Chart View</h2>
+<p align="center">
+<img src="HistogramDisplayTab.png"/>
+</p>
+
+<p>
+When the dataset is displayed in a Bar Chart View (e.g., the output of the
+Histogram filter), the Display tab will look similar to the above
+image. There are two unique sections on the Display tab in this situation:
+one for controlling the X axis of the bar chart and another for controlling
+the Y axis.
+
+<p>
+If the Use Points checkbox is not checked, then the Array Name menu in the X
+Axis section is active and lists possible arrays for controlling the values
+along the X axis. If the Use Points option is checked, then X axis value come
+from the coordinates of the points in the underlying dataset; the selection
+in the Component menu determines which component (X, Y, or Z) of the point
+coordinates is used.  The Array Name menu in the Y Axis section determines
+which array controls the height of the bars in the bar chart.
+
+<a name="XY Plot View"/>
+<h2>XY Plot View</h2>
+<p align="center"/>
+<img src="XYPlotDisplayTab.png"/>
+</p>
+
+<p>
+The above image shows the Display tab for an XY Plot view. In the Properties
+section is a drop-down menu labelled Attribute Mode. The options in this menu
+are Point Data and Cell Data. Selecting Point Data causes point-centered
+(node-centered) scalar variables to be displayed in the XY Plot; selecting
+Cell Data causes the plot to contain cell-centered (element-centered) scalar
+variables.
+
+<p>
+The X Axis section controls the scale of the X axis of the XY plot. If the
+"Use Y Array Index" checkbox is marked, then the X axis is an index over the
+number of point or cell scalar values being plotted. If this checkbox is not
+marked, then the Data Array Name drop-down menu becomes available. It
+contains the names either of all the point-centered or all the cell-centered
+scalar array names, depending on the selection from the Attribute Mode
+menu. Selecting an array name from the Data Array Menu uses the range of the
+scalar values in that array over the points being plotted as the values along
+the X axis. This allows for plotting one or more variables with respect to
+another one.
+
+<p>
+The Y Axis section controls which arrays are plotted and what color is used
+for drawing the line graph for that array. The checkbox to the left of each
+array name toggles the visibility of that array's line plot. The colored
+squares in the Color column (to the right of the array names) indicates the
+color used for drawing the associated line graph. Clicking in a colored
+square causes a color chooser dialog to appear, from which a new color for
+the associated variable's line plot may be selected.
 
 </body>
 </html>

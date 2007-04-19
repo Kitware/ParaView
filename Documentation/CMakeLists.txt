@@ -12,6 +12,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   DisplayStyle.png
   DisplayTransformation.png
   DisplayView.png
+  HistogramDisplayTab.png
   index.html
   Information.html
   InformationTab.png
@@ -24,6 +25,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   Properties.html
   PropertiesButtons.png
   RightClickFilter.png
+  XYPlotDisplayTab.png
 )
 
 foreach(filename ${PARAVIEW_HTML_DOCUMENTATION})
