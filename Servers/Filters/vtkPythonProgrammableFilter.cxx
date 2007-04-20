@@ -30,7 +30,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.16");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.17");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -53,6 +53,12 @@ void vtkPythonProgrammableFilter::UnRegister(vtkObjectBase *o)
     )
     {
     vtkPVPythonInterpretor *cpy = this->Interpretor;
+    vtkstd::string initscript;
+    initscript  = "";
+    initscript += "self = 0\n";
+    cpy->MakeCurrent();
+    cpy->RunSimpleString(initscript.c_str());
+    cpy->ReleaseControl();
     this->Interpretor = NULL;
     cpy->UnRegister(this);
     }
