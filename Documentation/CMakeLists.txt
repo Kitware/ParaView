@@ -1,6 +1,9 @@
 set(PARAVIEW_HTML_DOCUMENTATION
   3DView.png
   AfterSwapViews.png
+  Animation.html
+  AnimationInspector.png
+  AnimationToolbar.png
   BeforeSwapViews.png
   CellData.png
   ChangeInput.png
@@ -17,6 +20,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   DisplayStyle.png
   DisplayTransformation.png
   DisplayView.png
+  Exponential.png
   HistogramDisplayTab.png
   HistogramView.png
   index.html
@@ -32,10 +36,20 @@ set(PARAVIEW_HTML_DOCUMENTATION
   PointData.png
   Properties.html
   PropertiesButtons.png
+  Ramp.png
   RestoreViewButton.png
   RightClickFilter.png
+  Sinusoidal.png
   SplitViewHorizontalButton.png
   SplitViewVerticalButton.png
+  Step.png
+  VCRBack.png
+  VCRFirst.png
+  VCRForward.png
+  VCRLast.png
+  VCRLoop.png
+  VCRPlay.png
+  VCRPause.png
   Views.html
   ViewTitleBarButtons.png
   XYPlotDisplayTab.png
