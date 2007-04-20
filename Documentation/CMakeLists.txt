@@ -1,11 +1,16 @@
 set(PARAVIEW_HTML_DOCUMENTATION
+  3DView.png
+  AfterSwapViews.png
+  BeforeSwapViews.png
   CellData.png
   ChangeInput.png
+  CloseViewButton.png
   ColorEditor.png
   ColorLegend.png
   ColorLegendToolbarButton.png
   ColorOpacityEditor.png
   ColorScalePresets.png
+  CreateViewButtons.png
   Display.html
   DisplayColorByArray.png
   DisplayColorSolid.png
@@ -13,9 +18,12 @@ set(PARAVIEW_HTML_DOCUMENTATION
   DisplayTransformation.png
   DisplayView.png
   HistogramDisplayTab.png
+  HistogramView.png
   index.html
   Information.html
   InformationTab.png
+  LookmarkButton.png
+  MaximizeViewButton.png
   ObjectInspector.html
   ParaViewDoc.css
   ParaViewLogo.png
@@ -24,8 +32,14 @@ set(PARAVIEW_HTML_DOCUMENTATION
   PointData.png
   Properties.html
   PropertiesButtons.png
+  RestoreViewButton.png
   RightClickFilter.png
+  SplitViewHorizontalButton.png
+  SplitViewVerticalButton.png
+  Views.html
+  ViewTitleBarButtons.png
   XYPlotDisplayTab.png
+  XYPlotView.png
 )
 
 foreach(filename ${PARAVIEW_HTML_DOCUMENTATION})
