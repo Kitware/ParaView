@@ -77,7 +77,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqEnterPointsDialog.h
   pqEnterThresholdsDialog.h
   pqExodusPanel.h
-  pqExtractSelectionPanel.h
+  pqExtractDataSetsPanel.h  
+  pqExtractSelectionPanel.h  
   pqFileChooserWidget.h
   pqFilterInputDialog.h
   pqFieldSelectionAdaptor.h
@@ -104,7 +105,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqObjectInspectorDriver.h
   pqObjectInspectorWidget.h
   pqObjectPanel.h
-  pqParticleTracerPanel.h
+#  pqParticleTracerPanel.h
   pqPQLookupTableManager.h
   pqPipelineBrowser.h
   pqPipelineBrowserContextMenu.h
@@ -180,6 +181,7 @@ SET(UI_FORMS
   Resources/UI/pqEnterPointsDialog.ui
   Resources/UI/pqEnterThresholdsDialog.ui
   Resources/UI/pqExodusPanel.ui
+  Resources/UI/pqExtractDataSetsPanel.ui
   Resources/UI/pqExtractSelectionPanel.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
@@ -192,7 +194,7 @@ SET(UI_FORMS
   Resources/UI/pqLookmarkBrowser.ui
   Resources/UI/pqLookmarkInspector.ui
   Resources/UI/pqMultiViewFrameMenu.ui
-  Resources/UI/pqParticleTracerPanel.ui
+#  Resources/UI/pqParticleTracerPanel.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
@@ -345,6 +347,8 @@ ADD_LIBRARY(pqComponents
   pqEnterThresholdsDialog.h
   pqExodusPanel.cxx
   pqExodusPanel.h
+  pqExtractDataSetsPanel.cxx
+  pqExtractDataSetsPanel.h
   pqExtractSelectionPanel.cxx
   pqExtractSelectionPanel.h
   pqFileChooserWidget.cxx
@@ -405,8 +409,8 @@ ADD_LIBRARY(pqComponents
   pqObjectPanel.h
   pqPQLookupTableManager.cxx
   pqPQLookupTableManager.h
-  pqParticleTracerPanel.cxx
-  pqParticleTracerPanel.h
+#  pqParticleTracerPanel.cxx
+#  pqParticleTracerPanel.h
   pqPipelineBrowser.cxx
   pqPipelineBrowser.h
   pqPipelineBrowserContextMenu.cxx
