@@ -130,7 +130,6 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
         break;
         }
       }
-
     // This executable does not actually link to the python wrapper
     // libraries, though it probably should now that the stub-modules
     // are separated from them.  Since it does not we have to make
@@ -176,6 +175,10 @@ public:
       {
       this->MakeCurrent();
       Py_EndInterpreter(this->Interpretor);
+      if (this->Interpretor == this->MainThreadState)
+        {
+        this->MainThreadState = 0;
+        }
       PyThreadState_Swap(this->MainThreadState);
       this->Interpretor= 0;
       }
@@ -190,7 +193,7 @@ PyThreadState* vtkPVPythonInterpretorInternal::MainThreadState = NULL;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.13");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.14");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -247,7 +250,6 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
     // Set the program name, so that we can ask python to provide us
     // full path.
     Py_SetProgramName(argv[0]);
-    PyEval_InitThreads();
     Py_Initialize();
     this->Internal->MainThreadState = PyThreadState_Get();
 #ifdef SIGINT
@@ -269,9 +271,7 @@ int vtkPVPythonInterpretor::PyMain(int argc, char** argv)
   Py_SetProgramName(argv[0]);
 
   // Initialize interpreter.
-  PyEval_InitThreads();
   Py_Initialize();
-  
   this->Internal->MainThreadState = PyThreadState_Get();
   this->InitializeInternal();
   return Py_Main(argc, argv);
