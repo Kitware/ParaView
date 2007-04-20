@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonDialog.h"
 #include "ui_pqPythonDialog.h"
 
+#include "pqFileDialog.h"
 
 #include <pqApplicationCore.h>
 #include <pqSettings.h>
 
 #include <QFile>
-#include <QFileDialog>
 #include <QtDebug>
 
 //////////////////////////////////////////////////////////////////////
@@ -100,14 +100,15 @@ pqPythonDialog::~pqPythonDialog()
 
 void pqPythonDialog::runScript()
 {
-  QFileDialog* const dialog = new QFileDialog(
+  pqFileDialog* const dialog = new pqFileDialog(
+    NULL,
     this,
     tr("Run Script"),
     QString(),
     QString(tr("Python Script (*.py);;All files (*)")));
     
   dialog->setObjectName("PythonShellRunScriptDialog");
-  dialog->setFileMode(QFileDialog::ExistingFiles);
+  dialog->setFileMode(pqFileDialog::ExistingFiles);
   QObject::connect(
     dialog,
     SIGNAL(filesSelected(const QStringList&)), 
