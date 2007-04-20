@@ -164,6 +164,7 @@ class vtkPVPythonInterpretorInternal
 {
 public:
   PyThreadState* Interpretor;
+  static PyThreadState *MainThreadState;
 
   vtkPVPythonInterpretorInternal()
     {
@@ -185,9 +186,11 @@ public:
     }
 };
 
+PyThreadState* vtkPVPythonInterpretorInternal::MainThreadState = NULL;
+
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.11");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.12");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -245,6 +248,7 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
     // full path.
     Py_SetProgramName(argv[0]);
     Py_Initialize();
+    this->Internal->MainThreadState = PyThreadState_Get();
 #ifdef SIGINT
     signal(SIGINT, SIG_DFL);
 #endif
@@ -266,6 +270,8 @@ int vtkPVPythonInterpretor::PyMain(int argc, char** argv)
   // Initialize interpreter.
   Py_Initialize();
 
+  this->Internal->MainThreadState = PyThreadState_Get();
+
   this->InitializeInternal();
   return Py_Main(argc, argv);
 }
@@ -286,6 +292,12 @@ void vtkPVPythonInterpretor::RunSimpleString(const char* const script)
   
   // The cast is necessary because PyRun_SimpleString() hasn't always been const-correct
   PyRun_SimpleString(const_cast<char*>(buffer.c_str()));
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::ReleaseControl()
+{
+  PyThreadState_Swap(this->Internal->MainThreadState);
 }
 
 //-----------------------------------------------------------------------------
