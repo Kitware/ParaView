@@ -67,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqStreamTracerPanel.h"
+#include "pqExtractDataSetsPanel.h"
 #include "pqThresholdPanel.h"
 #include "pqUndoStack.h"
 #include "pqXDMFPanel.h"
@@ -100,10 +101,14 @@ public:
         {
         return new pqStreamTracerPanel(proxy, p);
         }
-      if(QString("ParticleTracer") == proxy->getProxy()->GetXMLName())
+      if(QString("ExtractDataSets") == proxy->getProxy()->GetXMLName())
         {
-        return new pqParticleTracerPanel(proxy, p);
+        return new pqExtractDataSetsPanel(proxy, p);
         }
+//      if(QString("ParticleTracer") == proxy->getProxy()->GetXMLName())
+//        {
+//        return new pqParticleTracerPanel(proxy, p);
+//        }
       if(QString("Threshold") == proxy->getProxy()->GetXMLName())
         {
         return new pqThresholdPanel(proxy, p);
@@ -150,7 +155,8 @@ public:
          QString("Clip") == proxy->getProxy()->GetXMLName() ||
          QString("Calculator") == proxy->getProxy()->GetXMLName() ||
          QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||
-         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
+         QString("ExtractDataSets") == proxy->getProxy()->GetXMLName() ||
+//         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractPointSelection") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractCellSelection") == proxy->getProxy()->GetXMLName() ||

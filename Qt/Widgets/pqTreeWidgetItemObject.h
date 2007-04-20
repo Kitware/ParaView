@@ -45,6 +45,7 @@ class QTWIDGETS_EXPORT pqTreeWidgetItemObject : public QObject, public QTreeWidg
 public:
   /// construct list widget item to for QTreeWidget with a string
   pqTreeWidgetItemObject(QTreeWidget* p, const QStringList& t);
+  pqTreeWidgetItemObject(QTreeWidgetItem* p, const QStringList& t);
 
   /// overload setData() to emit changed signal
   void setData(int column, int role, const QVariant& v);

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTreeWidgetItemObject.cxx
+   Module:    pqExtractDataSetsPanel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -23,59 +23,60 @@ A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
 CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
 EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+cxxPROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqTreeWidgetItemObject.h"
+#ifndef _pqExtractDataSetsPanel_h
+#define _pqExtractDataSetsPanel_h
 
+#include "pqObjectPanel.h"
+#include "pqComponentsExport.h"
+#include "ui_pqExtractDataSetsPanel.h"
 
-pqTreeWidgetItemObject::pqTreeWidgetItemObject(QTreeWidget* p, const QStringList& t)
-  : QTreeWidgetItem(p, t) 
+class pqTreeWidgetItemObject;
+class QTreeWidget;
+class QTreeWidgetItem;
+class QListWidget;
+class vtkPVArrayInformation;
+class pqExtractDataSetsPanelInternals;
+
+class PQCOMPONENTS_EXPORT pqExtractDataSetsPanel :
+  public pqObjectPanel
 {
-}
+  Q_OBJECT
+public:
+  /// constructor
+  pqExtractDataSetsPanel(pqProxy* proxy, QWidget* p = NULL);
+  /// destructor
+  ~pqExtractDataSetsPanel();
 
-pqTreeWidgetItemObject::pqTreeWidgetItemObject(QTreeWidgetItem* p, const QStringList& t)
-  : QTreeWidgetItem(p, t) 
-{
-}
+signals:
 
+protected slots:
+  void datasetsItemChanged(QTreeWidgetItem* item);
 
-void pqTreeWidgetItemObject::setData(int column, int role, const QVariant& v)
-{
-  if(Qt::CheckStateRole == role)
-    {
-    if(v != this->data(column, Qt::CheckStateRole))
-      {
-      QTreeWidgetItem::setData(column, role, v);
-      emit this->checkedStateChanged(Qt::Checked == v ? true : false);
-      }
-    }
-  else
-    {
-    QTreeWidgetItem::setData(column, role, v);
-    }
-  emit this->modified();
-}
+  /// accept the changes made to the properties
+  /// changes will be propogated down to the server manager
+  virtual void accept();
 
-bool pqTreeWidgetItemObject::isChecked() const
-{
-  return Qt::Checked == this->checkState(0) ? true : false;
-}
+  /// reset the changes made
+  /// editor will query properties from the server manager
+  virtual void reset();
 
-void pqTreeWidgetItemObject::setChecked(bool v)
-{
-  if(v)
-    {
-    this->setCheckState(0, Qt::Checked);
-    }
-  else
-    {
-    this->setCheckState(0, Qt::Unchecked);
-    }
-}
+protected:
 
+  void updateMapState(QTreeWidgetItem* item);
+  void updateGUI();
+
+  pqExtractDataSetsPanelInternals* Internals;
+  bool UpdateInProgress;
+  Ui::ExtractDataSetsPanel* UI;
+
+};
+
+#endif
 

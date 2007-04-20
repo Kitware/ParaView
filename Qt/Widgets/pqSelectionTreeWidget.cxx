@@ -144,6 +144,7 @@ void pqSelectionTreeWidget::updateCheckState()
 {
   Qt::CheckState newState = Qt::Checked;
   int numChecked = 0;
+  int numPartial = 0;
   QAbstractItemModel* m = this->model();
   int numRows = m->rowCount(QModelIndex());
   for(int i=0; i<numRows; i++)
@@ -154,10 +155,15 @@ void pqSelectionTreeWidget::updateCheckState()
       {
       numChecked++;
       }
+    else if (v == Qt::PartiallyChecked)
+      { 
+      numPartial++;
+      }
     }
   if(numChecked != numRows)
     {
-    newState = numChecked == 0 ? Qt::Unchecked : Qt::PartiallyChecked;
+      newState = ((numChecked==0) && (numPartial==0)) 
+        ? Qt::Unchecked : Qt::PartiallyChecked;
     }
 
   this->headerItem()->setCheckState(0, newState);
