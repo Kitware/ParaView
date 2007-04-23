@@ -88,7 +88,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
     package_dir = pkg_prefix + "/../../../../Utilities/VTKPythonWrapping";
     package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
     }
-  if(vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
+  if(0 && vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
     {
     // This executable is running from the build tree.  Prepend the
     // library directory and package directory to the search path.
@@ -106,6 +106,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
     // packages in sys.path himself/herself.
     const char* inst_dirs[] = {
       "/paraview",
+      "/../Resources/paraview", // MacOS
       "/../lib/paraview-" PARAVIEW_VERSION "/paraview",
       "/../../lib/paraview-" PARAVIEW_VERSION "/paraview",
       "/lib/python" VTK_PYTHON_VERSION "/site-packages/paraview", // UNIX --prefix
@@ -115,6 +116,11 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
       0
     };
     vtkstd::string prefix = self_dir;
+    // On OS X distributions, the libraries are in a different directory
+    // than the module. They are in the same place as the executable.
+#if defined(__APPLE__)
+    vtkPythonAppInitPrependPythonPath(self_dir);
+#endif 
     for(const char** dir = inst_dirs; *dir; ++dir)
       {
       package_dir = prefix;
@@ -187,7 +193,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.11");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.11.4.1");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
