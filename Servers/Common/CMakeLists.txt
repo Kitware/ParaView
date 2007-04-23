@@ -8,48 +8,45 @@ IF(NOT WIN32)
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
 ENDIF(NOT WIN32)
 
-SET(Kit_SRCS
-  vtkCacheSizeKeeper.cxx
-  vtkCellIntegrator.cxx
-  vtkClientConnection.cxx
+ADD_LIBRARY(vtkPVCommandOptions
   vtkCommandOptions.cxx
   vtkCommandOptionsXMLParser.cxx
+  vtkPVOptions.cxx
+  vtkPVOptionsXMLParser.cxx
+  vtkPVXMLParser.cxx
+  vtkPVXMLElement.cxx
+)
+TARGET_LINK_LIBRARIES(vtkPVCommandOptions
+  vtkIO)
+
+SET(Kit_SRCS
+  vtkClientConnection.cxx
   vtkConnectionIterator.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkMPISelfConnection.cxx
-  vtkProcessModuleConnection.cxx
-  vtkProcessModuleConnectionManager.cxx
-  vtkProcessModule.cxx
-  vtkProcessModuleGUIHelper.cxx
   vtkPVArrayInformation.cxx
-  vtkPVCacheSizeInformation.cxx
   vtkPVClassNameInformation.cxx
-  vtkPVClientServerIdCollectionInformation.cxx
   vtkPVCompositeDataInformation.cxx
   vtkPVCreateProcessModule.cxx
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDisplayInformation.cxx
-  vtkPVEnvironmentInformation.cxx
-  vtkPVEnvironmentInformationHelper.cxx
-  vtkPVFileInformation.cxx
-  vtkPVFileInformationHelper.cxx
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
   vtkPVLODPartDisplayInformation.cxx
   vtkPVNumberOfOutputsInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
-  vtkPVOptions.cxx
-  vtkPVOptionsXMLParser.cxx
   vtkPVProgressHandler.cxx
   vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
   vtkPVTimerInformation.cxx
-  vtkPVXMLElement.cxx
-  vtkPVXMLParser.cxx
+  vtkProcessModule.cxx
+  vtkProcessModuleConnection.cxx
+  vtkProcessModuleConnectionManager.cxx
+  vtkProcessModuleGUIHelper.cxx
   vtkRemoteConnection.cxx
   vtkSelectionConverter.cxx
   vtkSelectionSerializer.cxx
@@ -59,11 +56,11 @@ SET(Kit_SRCS
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx
+  vtkPVClientServerIdCollectionInformation.cxx
   )
 
 # Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
-  vtkCellIntegrator.cxx
   vtkPVCreateProcessModule
   vtkPVInformation
   vtkProcessModuleConnection
@@ -136,9 +133,10 @@ ADD_LIBRARY(vtk${KIT}
   ${KitInstantiator_SRCS}
   )
 TARGET_LINK_LIBRARIES(vtk${KIT}
-  vtkHybridCS vtkParallelCS vtkInfovisCS KWCommon vtksys
+  vtkHybridCS vtkParallelCS KWCommon vtksys
   ${PARAVIEW_HDF5_LIBRARIES}
-  vtkClientServer)
+  vtkClientServer
+  vtkPVCommandOptions)
 
 # Create Tcl wrappers for classes.
 IF (PARAVIEW_BUILD_GUI)
