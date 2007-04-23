@@ -56,10 +56,10 @@ pqFieldSelectionAdaptor::pqFieldSelectionAdaptor(QComboBox* p,
 
   if(p && pqSMAdaptor::getPropertyType(prop) == pqSMAdaptor::FIELD_SELECTION)
     {
-    QObject::connect(p, SIGNAL(currentIndexChanged(int)),
-                     this, SLOT(indexChanged(int)));
     this->AttributeModeDomain = prop->GetDomain("field_list");
     this->ScalarDomain = prop->GetDomain("array_list");
+    
+    this->internalDomainChanged();
 
     this->Connection->Connect(this->AttributeModeDomain,
                               vtkCommand::DomainModifiedEvent,
@@ -82,8 +82,10 @@ pqFieldSelectionAdaptor::pqFieldSelectionAdaptor(QComboBox* p,
                               this,
                               SLOT(blockDomainModified(vtkObject*, unsigned long,void*, void*, vtkCommand*)),
                               NULL, 1.0);
+    
+    QObject::connect(p, SIGNAL(currentIndexChanged(int)),
+                     this, SLOT(indexChanged(int)));
 
-    this->domainChanged();
     }
 }
 
