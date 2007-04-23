@@ -64,14 +64,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAssistantClient>
 #include <QDir>
+#include <QFileInfo>
 #include <QIcon>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QPointer>
 #include <QShortcut>
 #include <QSpinBox>
-#include <QPointer>
 
 //////////////////////////////////////////////////////////////////////////////
 // MainWindow::pqImplementation
@@ -767,6 +768,34 @@ void MainWindow::onHelpAbout()
 }
 
 //-----------------------------------------------------------------------------
+QString Locate(const QString& appName)
+{
+  QString app_dir = QCoreApplication::applicationDirPath();
+  const char* inst_dirs[] = {
+    "/./",
+    "/../bin/",
+    "/../../bin/",
+    0
+  };
+  for (const char** dir = inst_dirs; *dir; ++dir)
+    {
+    QString path = app_dir;
+    path += *dir;
+    path += appName;
+    //cout << "Checking : " << path.toAscii().data() << " ... ";
+    //cout.flush();
+    QFileInfo finfo (path);
+    if (finfo.exists())
+      {
+      //cout << " Success!" << endl;
+      return path;
+      }
+    //cout << " Failed" << endl;
+    }
+  return app_dir + QDir::separator() + appName;
+}
+
+//-----------------------------------------------------------------------------
 void MainWindow::onHelpHelp()
 {
   if(this->Implementation->AssistantClient)
@@ -812,10 +841,14 @@ void MainWindow::onHelpHelp()
 
   if(assistantExe.isEmpty())
     {
+    assistantExe = ::Locate(assistantName);
+
+    /*
     QString assistant = QCoreApplication::applicationDirPath();
     assistant += QDir::separator();
     assistant += assistantName;
     assistantExe = assistant;
+    */
     }
 
   this->Implementation->AssistantClient = 
@@ -831,8 +864,9 @@ void MainWindow::onHelpHelp()
   if(profileFile.isEmpty())
     {
     // see if help is bundled up with the application
-    QString profile = QCoreApplication::applicationDirPath() + QDir::separator()
-      + QString("pqClient.adp");
+    QString profile = ::Locate("pqClient.adp");
+      /*QCoreApplication::applicationDirPath() + QDir::separator()
+      + QString("pqClient.adp");*/
     if(QFile::exists(profile))
       {
       profileFile = profile;
