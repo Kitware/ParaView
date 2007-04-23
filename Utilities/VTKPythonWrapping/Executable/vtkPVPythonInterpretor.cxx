@@ -88,7 +88,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
     package_dir = pkg_prefix + "/../../../../Utilities/VTKPythonWrapping";
     package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
     }
-  if(0 && vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
+  if(vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
     {
     // This executable is running from the build tree.  Prepend the
     // library directory and package directory to the search path.
@@ -199,7 +199,7 @@ PyThreadState* vtkPVPythonInterpretorInternal::MainThreadState = NULL;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.15");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.16");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
