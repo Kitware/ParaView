@@ -43,6 +43,7 @@ been created. These buttons are also available in the Animation menu.
 </table>
 
 <h2>Playback</h2>
+<p>
 The current time can also be changed by useing the Current Time entry box
 and/or spinbox in the Playback section at the top of the Animation Inspector.
 
@@ -89,7 +90,7 @@ through all time values in all loaded datasets. This is the desired behavior
 in most cases.
 
 <h2>Track Selection</h2>
-
+<p>
 The combination of a particular selected object (reader, source, filter, or
 camera) and an animateable property within that object is called a track. The
 user creates key frames in a track. The values of the key frames and the
@@ -106,7 +107,7 @@ in the Property To Animate menu. Both the Selected Object and the Property To
 Animate must be selected in order to edit key frames.
 
 <h2>Key Frame Editor</h2>
-
+<p>
 The Key Frame Editor section shows the properties of a key frame in the track
 chosen in the Track Selection section. If no key frames have yet been added
 in the selected track, the user interface for the Key Frame Editor section is
@@ -133,6 +134,16 @@ buttons become availabe next to the Value entry box if the property being
 animated has min and/or max bounds defined.
 
 <p>
+When adding key frames for animating the camera (viewing position), the key
+frame value section provides spinboxes for specifying several different
+parameters of the camera. There is also a "Use Current" button below these
+spinboxes. Clicking this button fills the spinboxes with the associated
+values of the camera in the selected view. This way, it is possible to
+interactively choose the desired camera parameters for the key frame. To
+animate the camera in another view, first change to that view, and then add
+new key frames associated with that camera.
+
+<p>
 ParaView supports four different types of interpolation of values between key frames.<br>
 <table class="PropertiesTable" border="1" cellpadding="3">
 <tr><td><img src="Ramp.png"></td><td>Linearly interpolate from one key frame value to the next.</td></tr>
@@ -146,7 +157,7 @@ ParaView supports four different types of interpolation of values between key fr
 
 
 <h2>Animation Settings</h2>
-
+<p>
 The Cache Geometry check box (the only control in the Animation Settings
 section) enables/disables whether caching is to be used while playing the
 animation. Note that caching is only in effect when playing in Sequence mode
@@ -159,6 +170,16 @@ Settings dialog box (Edit menu, Settings), there is a spinbox labelled "Cache
 Limit (in KBs)"; it specifies the maximum cache size per process to use for
 caching geometry for an animation. If while playing the animation, the cache
 size exceeds this limit, geometry caching is disabled.
+
+<h2>Saving Animations</h2>
+<p>
+Once an animation has been created in ParaView, the animataion may be saved
+as an AVI file or as a series of image files (JPEG, TIFF, or PNG), one image
+per animation frame. This functionality is available by choosing Save
+Animation from the File menu. When a movie file or series of images is saved,
+all of the views in the ParaView application window are captured. Additionally,
+the geometry per animation frame may be saved by selecting Save Geometry from
+the File menu. The data will be written out using ParaView's PVD file format.
 
 </body>
 </html>
