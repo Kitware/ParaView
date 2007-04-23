@@ -21,11 +21,13 @@
     <section ref="Documentation/Display.html" title="Display Panel">
       <keyword ref="Documentation/Display.html#View">View Section</keyword>
       <keyword ref="Documentation/Display.html#Color">Color Section</keyword>
+      <keyword ref="Documentation/Display.html#Style">Style Section</keyword>
       <keyword ref="Documentation/Display.html#Transformation">Transformation Section</keyword>
       <keyword ref="Documentation/Display.html#Bar Chart View">Bar Chart Settings</keyword>
       <keyword ref="Documentation/Display.html#XY Plot View">XY Plot Settings</keyword>
       <section ref="Documentation/Display.html#View" title="View Section"/>
       <section ref="Documentation/Display.html#Color" title="Color Section"/>
+      <section ref="Documentation/Display.html#Style" title="Style Section"/>
       <section ref="Documentation/Display.html#Transformation" title="Transformation Section"/>
       <section ref="Documentation/Display.html#Bar Chart View" title="Bar Chart Settings"/>
       <section ref="Documentation/Display.html#XY Plot View" title="XY Plot Settings"/>
