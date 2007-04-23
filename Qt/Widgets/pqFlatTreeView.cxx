@@ -241,6 +241,14 @@ bool pqFlatTreeView::eventFilter(QObject *object, QEvent *e)
       {
       bool finishNeeded = true;
       QWidget *widget = QApplication::focusWidget();
+      if(!widget)
+        {
+        // Switching focus to another application. On windows, Qt
+        // crashes while deleting the editor. To avoid this, leave
+        // the editor open.
+        finishNeeded = false;
+        }
+
       while(widget)
         {
         // Don't worry about focus changes internally in the editor.
