@@ -9,6 +9,7 @@ fi
 
 mkdir -p "@ParaView_BINARY_DIR@/paraview_bundle/paraview.app/Contents/Frameworks"
 mkdir -p "@ParaView_BINARY_DIR@/paraview_bundle/paraview.app/Contents/MacOS"
+mkdir -p "@ParaView_BINARY_DIR@/paraview_bundle/paraview.app/Contents/Resources"
 cd "@ParaView_BINARY_DIR@/paraview_bundle"
 
 echo "Copy ParaView bundle"
@@ -22,7 +23,7 @@ echo "Copy ParaView libraries"
 (cd "@ParaView_BINARY_DIR@/bin" && tar c${TAR_FLAG}f - *.dylib *.so) | (cd paraview.app/Contents/MacOS && tar xf - )
 
 echo "Copy ParaView Python scripts"
-(cd "@ParaView_BINARY_DIR@/Utilities/VTKPythonWrapping" && tar c${TAR_FLAG}f - paraview) | (cd paraview.app/Contents/MacOS && tar xf - )
+(cd "@ParaView_BINARY_DIR@/Utilities/VTKPythonWrapping" && tar c${TAR_FLAG}f - paraview) | (cd paraview.app/Contents/Resources && tar xf - )
 
 #exit
 
