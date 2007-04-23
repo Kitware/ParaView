@@ -36,9 +36,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMain.h"
 #include "pqComponentsInit.h"
 
+#ifdef Q_WS_X11
+#include <QCleanlooksStyle>
+#endif
 
 int main(int argc, char* argv[])
 {
+#ifdef Q_WS_X11
+  // There are lots of valid styles for X11.  For many systems the default
+  // is Motif, which is ugly and has been giving dashboard errors.  Rather
+  // than fix the problem, I am just forcing the style to Cleanlooks.  The
+  // logic could probably be better to allow users to set their own style
+  // or to default to a style to match CDE or Plastique when using those
+  // window managers.  If anyone complains, we can change this.
+  QApplication::setStyle(new QCleanlooksStyle);
+#endif
+
   QApplication app(argc, argv);
   pqComponentsInit();
 
