@@ -20,18 +20,30 @@ TARGET_LINK_LIBRARIES(vtkPVCommandOptions
   vtkIO)
 
 SET(Kit_SRCS
+  vtkCacheSizeKeeper.cxx
+  vtkCellIntegrator.cxx
   vtkClientConnection.cxx
-  vtkConnectionIterator.cxx
+    vtkConnectionIterator.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkMPISelfConnection.cxx
+  vtkProcessModuleConnection.cxx
+  vtkProcessModuleConnectionManager.cxx
+  vtkProcessModule.cxx
+  vtkProcessModuleGUIHelper.cxx
   vtkPVArrayInformation.cxx
+  vtkPVCacheSizeInformation.cxx
   vtkPVClassNameInformation.cxx
+  vtkPVClientServerIdCollectionInformation.cxx
   vtkPVCompositeDataInformation.cxx
   vtkPVCreateProcessModule.cxx
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDisplayInformation.cxx
+  vtkPVEnvironmentInformation.cxx
+  vtkPVEnvironmentInformationHelper.cxx
+  vtkPVFileInformation.cxx
+  vtkPVFileInformationHelper.cxx
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
   vtkPVLODPartDisplayInformation.cxx
@@ -43,10 +55,6 @@ SET(Kit_SRCS
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
   vtkPVTimerInformation.cxx
-  vtkProcessModule.cxx
-  vtkProcessModuleConnection.cxx
-  vtkProcessModuleConnectionManager.cxx
-  vtkProcessModuleGUIHelper.cxx
   vtkRemoteConnection.cxx
   vtkSelectionConverter.cxx
   vtkSelectionSerializer.cxx
@@ -56,11 +64,11 @@ SET(Kit_SRCS
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx
-  vtkPVClientServerIdCollectionInformation.cxx
   )
 
 # Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
+  vtkCellIntegrator.cxx
   vtkPVCreateProcessModule
   vtkPVInformation
   vtkProcessModuleConnection
@@ -133,7 +141,7 @@ ADD_LIBRARY(vtk${KIT}
   ${KitInstantiator_SRCS}
   )
 TARGET_LINK_LIBRARIES(vtk${KIT}
-  vtkHybridCS vtkParallelCS KWCommon vtksys
+  vtkHybridCS vtkParallelCS vtkInfovisCS KWCommon vtksys
   ${PARAVIEW_HDF5_LIBRARIES}
   vtkClientServer
   vtkPVCommandOptions)
