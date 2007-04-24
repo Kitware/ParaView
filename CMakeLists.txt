@@ -49,7 +49,9 @@ IF (PARAVIEW_BUILD_QT_GUI)
   SET(VTK_USE_GUISUPPORT ON CACHE BOOL "Build VTK with GUI Support" FORCE)
   SET(VTK_USE_QVTK ON CACHE BOOL "Build VTK with Qt Support" FORCE)
   SET(DESIRED_QT_VERSION 4 CACHE STRING "Use Qt4" FORCE)
+  # Mark these Qt variables as advanced. Users don't really have to set them.
   MARK_AS_ADVANCED(DESIRED_QT_VERSION VTK_USE_QVTK VTK_USE_GUISUPPORT)
+  MARK_AS_ADVANCED(QT_MKSPECS_DIR QT_PLUGINS_DIR QT_QMAKE_EXECUTABLE QT_X11_X11_LIBRARY QT_X11_Xext_LIBRARY QT_X11_m_LIBRARY)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 
@@ -128,6 +130,10 @@ ENDIF(BUILD_SHARED_LIBS)
 # Set the ServerManager test data dir,
 SET(PVServerManagerTestData ${PARAVIEW_DATA_ROOT})
 
+# Find hints file for the client/server wrapping
+FIND_FILE(VTK_WRAP_HINTS hints ${ParaView_SOURCE_DIR}/VTK/Wrapping)
+MARK_AS_ADVANCED(VTK_WRAP_HINTS)
+
 #########################################################################
 # Include the file that most of the environment setup (except GUI).
 SET(ParaView_SOURCE_DIR ${ParaView_SOURCE_DIR})
@@ -160,10 +166,6 @@ OPTION(BUILD_EXAMPLES "Build ParaView examples." OFF)
 IF (BUILD_EXAMPLES)
   ADD_SUBDIRECTORY(Examples)
 ENDIF (BUILD_EXAMPLES)
-
-# Find hints file for the client/server wrapping
-FIND_FILE(VTK_WRAP_HINTS hints ${ParaView_SOURCE_DIR}/VTK/Wrapping)
-MARK_AS_ADVANCED(VTK_WRAP_HINTS)
 
 # If the cmake version includes cpack, use it
 INCLUDE(InstallRequiredSystemLibraries)
@@ -249,6 +251,7 @@ EXPORT_LIBRARY_DEPENDENCIES(${PARAVIEW_LIBRARY_DEPENDS_FILE})
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
                ${ParaView_BINARY_DIR}/ParaViewConfig.cmake @ONLY IMMEDIATE)
 
+# Mark certain VTK variables as advanced. Users do not really have to set these.
 IF (APPLE)
   MARK_AS_ADVANCED(CMAKE_OSX_ARCHITECTURES CMAKE_OSX_SYSROOT VTK_USE_CARBON VTK_USE_COCOA VTK_APPLE_RESOURCE)
 ENDIF(APPLE)
