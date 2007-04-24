@@ -30,7 +30,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMTextDisplayProxy);
-vtkCxxRevisionMacro(vtkSMTextDisplayProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMTextDisplayProxy, "1.3.2.1");
 vtkCxxSetObjectMacro(vtkSMTextDisplayProxy, Input, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMTextDisplayProxy::vtkSMTextDisplayProxy()
@@ -74,7 +74,8 @@ void vtkSMTextDisplayProxy::CreateVTKObjects(int numObjects)
 
   this->UpdateSuppressorProxy = vtkSMSourceProxy::SafeDownCast(
     this->GetSubProxy("UpdateSuppressor"));
-  this->UpdateSuppressorProxy->SetServers(vtkProcessModule::DATA_SERVER);
+  this->UpdateSuppressorProxy->SetServers(vtkProcessModule::DATA_SERVER
+    | vtkProcessModule::CLIENT);
 
   this->TextWidgetProxy = vtkSMNew3DWidgetProxy::SafeDownCast(
     this->GetSubProxy("TextWidget"));
@@ -96,8 +97,9 @@ void vtkSMTextDisplayProxy::CreateVTKObjects(int numObjects)
   // Seems like we can't use properties for this 
   // to work properly.
   vtkClientServerStream stream;
+  unsigned int i;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  for (unsigned int i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
+  for (i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
     {
     stream
       << vtkClientServerStream::Invoke
@@ -118,6 +120,20 @@ void vtkSMTextDisplayProxy::CreateVTKObjects(int numObjects)
     }
   pm->SendStream(this->ConnectionID,
     this->UpdateSuppressorProxy->GetServers(), stream);
+
+  for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
+    {
+    stream
+      << vtkClientServerStream::Invoke
+      << this->CollectProxy->GetID(i) << "SetProcessModuleConnection"
+      << pm->GetConnectionClientServerID(this->GetConnectionID())
+      << vtkClientServerStream::End;
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->ConnectionID, 
+      this->CollectProxy->GetServers(), stream);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -133,17 +149,18 @@ void vtkSMTextDisplayProxy::AddInput(vtkSMSourceProxy* input,
   input->CreateParts();
   this->CreateVTKObjects(1);
 
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->UpdateSuppressorProxy->GetProperty("Input"));
-  pp->RemoveAllProxies();
-  pp->AddProxy(input);
-  this->UpdateSuppressorProxy->UpdateVTKObjects();
-
+  vtkSMProxyProperty* pp;
   pp = vtkSMProxyProperty::SafeDownCast(
     this->CollectProxy->GetProperty("Input"));
   pp->RemoveAllProxies();
-  pp->AddProxy(this->UpdateSuppressorProxy);
-  
+  pp->AddProxy(input);
+
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->UpdateSuppressorProxy->GetProperty("Input"));
+  pp->RemoveAllProxies();
+  pp->AddProxy(this->CollectProxy);
+  this->UpdateSuppressorProxy->UpdateVTKObjects();
+
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->CollectProxy->GetProperty("OutputDataType"));
   ivp->SetElement(0, VTK_TABLE);
@@ -169,8 +186,6 @@ void vtkSMTextDisplayProxy::Update(vtkSMAbstractViewModuleProxy* view)
   this->Dirty = false;
   this->UpdateSuppressorProxy->InvokeCommand("ForceUpdate");
   this->Superclass::Update(view);
-
-  this->CollectProxy->UpdatePipeline();
 
   vtkProcessModule* pm  = vtkProcessModule::GetProcessModule();
   vtkAlgorithm* dp = vtkAlgorithm::SafeDownCast(
