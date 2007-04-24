@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QUuid>
 
+
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqElementInspectorViewModule.h"
@@ -454,7 +455,7 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
       "Lookmark", 
       this);
     lookmarkAction->setObjectName("LookmarkButton");
-    frame->addAction(lookmarkAction);
+    frame->addTitlebarAction(lookmarkAction);
 
     lookmarkAction->setEnabled(true);
     this->Internal->LookmarkSignalMapper->setMapping(lookmarkAction, frame);
@@ -471,7 +472,7 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
       "", 
       this);
     forwardAction->setObjectName("ForwardButton");
-    frame->addAction(forwardAction);
+    frame->addTitlebarAction(forwardAction);
     forwardAction->setEnabled(true);
 
     QObject::connect(forwardAction, SIGNAL( triggered ()), 
@@ -484,7 +485,7 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
       "", 
       this);
     backAction->setObjectName("BackButton");
-    frame->addAction(backAction);
+    frame->addTitlebarAction(backAction);
     backAction->setEnabled(true);
     
     QObject::connect(backAction, SIGNAL( triggered ()), 
@@ -521,10 +522,10 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* vie
     qobject_cast<pqRenderViewModule*>(view);
   if(render_module)
     {
-    QAction *lookmarkAction= this->getAction(frame,"LookmarkButton");
+    QAction *lookmarkAction= frame->getAction("LookmarkButton");
     if(lookmarkAction)
       {
-      frame->removeAction(lookmarkAction);
+      frame->removeTitlebarAction(lookmarkAction);
       delete lookmarkAction;
       }
     }
@@ -533,18 +534,18 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* vie
 
   if (view->supportsUndo())
     {
-    QAction *forwardAction= this->getAction(frame,"ForwardButton");
+    QAction *forwardAction= frame->getAction("ForwardButton");
     if(forwardAction)
       {
-      frame->removeAction(forwardAction);
+      frame->removeTitlebarAction(forwardAction);
       delete forwardAction;
       }
 
 
-    QAction *backAction= this->getAction(frame,"BackButton");
+    QAction *backAction= frame->getAction("BackButton");
     if(backAction)
       {
-      frame->removeAction(backAction);
+      frame->removeTitlebarAction(backAction);
       delete backAction;
       }
 
@@ -1147,20 +1148,7 @@ void pqViewManager::onSplittingView(const Index& index,
 }
 
 
-QAction* pqViewManager::getAction(pqMultiViewFrame* frame,QString name)
-{
-  QList<QAction*> actionList=frame->actions();
-  QList<QAction*>::iterator i;
-  for (i = actionList.begin(); i != actionList.end(); ++i)
-    {
-    QAction *action= *i;
-    if(!QString::compare(action->objectName(),name))
-      return action;
-    }
 
-
-  return NULL;
-}
 
 
 

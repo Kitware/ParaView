@@ -83,6 +83,10 @@ public:
   QMenu* getContextMenu() const
     { return this->ContextMenu; }
 
+  void addTitlebarAction(QAction* action);
+  void removeTitlebarAction(QAction* action);
+  QAction* getAction(QString name);
+
 public slots:
 
   /// close this frame, emits closePressed() so receiver does the actual remove
@@ -136,7 +140,6 @@ protected slots:
   void onCustomContextMenuRequested(const QPoint& point);
 
 protected:
-  bool event(QEvent*);
   void paintEvent(QPaintEvent* e);
   bool eventFilter(QObject*, QEvent* e);
 
@@ -150,6 +153,7 @@ private:
   QWidget* Menu;
   QPoint DragStartPosition;
   QUuid UniqueID;
+  QList<QAction*> TitlebarActions;
 };
 
 #endif //_pqMultiViewFrame_h

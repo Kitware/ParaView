@@ -151,24 +151,38 @@ pqMultiViewFrame::~pqMultiViewFrame()
 }
 
 
-bool pqMultiViewFrame::event(QEvent* e)
+void pqMultiViewFrame::addTitlebarAction(QAction* action)
 {
-
-  if(e->type() == QEvent::ActionAdded)
-    {  
-    QAction * a = this->actions().last();
-    QToolButton* button = new QToolButton(this);
-    button->setDefaultAction(a);
-    this->hboxLayout->insertWidget(0,button);
-    }
-  else if(e->type() == QEvent::ActionRemoved)
-    {
-
-    }
-  return QWidget::event(e);
+  this->TitlebarActions.append(action);
+  QToolButton* button = new QToolButton(this);
+  button->setDefaultAction(action);
+  button->setObjectName(action->objectName());
+  this->hboxLayout->insertWidget(0,button);
+}
+void pqMultiViewFrame::removeTitlebarAction(QAction* action)
+{
+  this->TitlebarActions.removeAll(action);
+  QToolButton* button=this->Menu->findChild<QToolButton*>(action->objectName());
+  
+  if(button)
+    delete button;
 
 }
 
+
+QAction* pqMultiViewFrame::getAction(QString name)
+{
+  QList<QAction*>::iterator i;
+  for (i = this->TitlebarActions.begin(); i !=  this->TitlebarActions.end(); ++i)
+    {
+    QAction *action= *i;
+    if(!QString::compare(action->objectName(),name))
+      return action;
+    }
+
+
+  return NULL;
+}
 void pqMultiViewFrame::onCustomContextMenuRequested(const QPoint& point)
 {
   // get the focus before showing the context menu.
