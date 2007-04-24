@@ -135,12 +135,14 @@ pqPipelineDisplay::pqPipelineDisplay(const QString& name,
       this, SIGNAL(colorChanged()));
     }
 
+  /*
   // Whenever representation changes to VolumeRendering, we have to
   // ensure that the ColorArray has been initialized to something.
   // Otherwise, the VolumeMapper segfaults.
   this->Internal->VTKConnect->Connect(
     display->GetProperty("Representation"), vtkCommand::ModifiedEvent,
     this, SLOT(onRepresentationChanged()), 0, 0, Qt::QueuedConnection);
+    */
 }
 
 //-----------------------------------------------------------------------------
@@ -816,6 +818,14 @@ bool pqPipelineDisplay::getDataBounds(double bounds[6])
     }
   display->GetDisplayedDataInformation()->GetBounds(bounds);
   return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::setRepresentation(int representation)
+{
+  vtkSMDataObjectDisplayProxy* display = this->getDisplayProxy();
+  display->SetRepresentationCM(representation);
+  this->onRepresentationChanged();
 }
 
 //-----------------------------------------------------------------------------

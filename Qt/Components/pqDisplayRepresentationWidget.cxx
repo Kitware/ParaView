@@ -32,18 +32,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayRepresentationWidget.h"
 #include "ui_pqDisplayRepresentationWidget.h"
 
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMDataObjectDisplayProxy.h"
-
+#include "vtkSMEnumerationDomain.h"
+#include "vtkSMIntVectorProperty.h"
 
 #include<QPointer>
 
-#include "pqPipelineSource.h"
-#include "pqRenderViewModule.h"
+#include "pqApplicationCore.h"
 #include "pqPipelineDisplay.h"
+#include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
+#include "pqRenderViewModule.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
+#include "pqUndoStack.h"
 
 class pqDisplayRepresentationWidgetInternal : 
   public Ui::displayRepresentationWidget
@@ -60,6 +62,8 @@ pqDisplayRepresentationWidget::pqDisplayRepresentationWidget(
 {
   this->Internal = new pqDisplayRepresentationWidgetInternal;
   this->Internal->setupUi(this);
+  this->Internal->Links.setUseUncheckedProperties(true);
+
   this->Internal->Adaptor = new pqSignalAdaptorComboBox(
     this->Internal->comboBox);
   this->Internal->Adaptor->setObjectName("adaptor");
@@ -71,6 +75,19 @@ pqDisplayRepresentationWidget::pqDisplayRepresentationWidget(
   QObject::connect(this->Internal->Adaptor, 
     SIGNAL(currentTextChanged(const QString&)),
     this, SIGNAL(currentTextChanged(const QString&)), Qt::QueuedConnection);
+
+  QObject::connect(&this->Internal->Links,
+    SIGNAL(qtWidgetChanged()),
+    this, SLOT(onQtWidgetChanged()));
+
+  pqUndoStack* ustack = pqApplicationCore::instance()->getUndoStack();
+  if (ustack)
+    {
+    QObject::connect(this, SIGNAL(beginUndo(const QString&)),
+      ustack, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(this, SIGNAL(endUndo()),
+      ustack, SLOT(endUndoSet()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -125,12 +142,39 @@ void pqDisplayRepresentationWidget::updateLinks()
     this->Internal->Adaptor, "currentText",
     SIGNAL(currentTextChanged(const QString&)),
     displayProxy, repProperty);
+
 }
 
 //-----------------------------------------------------------------------------
 void pqDisplayRepresentationWidget::reloadGUI()
 {
   this->updateLinks();
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayRepresentationWidget::onQtWidgetChanged()
+{
+  emit this->beginUndo("Changed 'Representation'");
+
+  QString text = this->Internal->Adaptor->currentText();
+
+  vtkSMProperty* repProperty =
+      this->Internal->Display->getProxy()->GetProperty("Representation");
+  QList<QVariant> domainStrings = 
+    pqSMAdaptor::getEnumerationPropertyDomain(repProperty);
+
+  int index = domainStrings.indexOf(text);
+  if (index != -1)
+    {
+    vtkSMEnumerationDomain* ed = vtkSMEnumerationDomain::SafeDownCast(
+      repProperty->GetDomain("enum"));
+    int representation = ed->GetEntryValue(index);
+    this->Internal->Display->setRepresentation(representation);
+    this->Internal->Links.blockSignals(true);
+    //this->Internal->Links.accept();
+    this->Internal->Links.blockSignals(false);
+    }
+  emit this->endUndo();
 }
 
 //-----------------------------------------------------------------------------

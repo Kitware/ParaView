@@ -50,6 +50,13 @@ public:
 signals:
   void currentTextChanged(const QString&);
 
+  /// Fired when the widget begins an undo-able change.
+  void beginUndo(const QString&);
+
+  /// Fired when the widget is finished with an 
+  /// undo-able change.
+  void endUndo();
+
 public slots:
   void setDisplay(pqConsumerDisplay* display);
   
@@ -57,6 +64,10 @@ public slots:
 
 private slots:
   void onCurrentTextChanged(const QString&);
+
+  /// Called when the qt widget changes, we mark undo set
+  /// and push the widget changes to the property.
+  void onQtWidgetChanged();
 
   void updateLinks();
 private:

@@ -116,6 +116,10 @@ public:
   /// scalar range.
   void setScalarOpacityRange(double min, double max);
 
+  /// Set representation on the proxy.
+  /// If representation is changed to volume, this method ensures that the
+  /// scalar array is initialized.
+  void setRepresentation(int type);
 signals:
   /// This is fire when any property that affects the color
   /// mode for the display changes.
