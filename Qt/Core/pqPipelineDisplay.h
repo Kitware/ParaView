@@ -84,12 +84,14 @@ public:
   /// point data.
   QList<QString> getColorFields();
 
-  /// get the data ranges for a color field
-  QList<QPair<double, double> >getColorFieldRanges(const QString& array);
-
   /// get the data range for a particular component. if component == -1,
   /// range for the vector magnitude is returned.
   QPair<double, double> getColorFieldRange(const QString& array, int component);
+
+  /// Returns the range for the currently selected color field i.e.
+  /// the range for the array component (or magnitude) of the array by which
+  /// this display is being colored, if at all.
+  QPair<double, double> getColorFieldRange();
 
   /// set the array to color the part by
   void setColorField(const QString& field);
