@@ -3028,7 +3028,6 @@
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
-<!--
      <IntVectorProperty 
         name="GenerateGlobalNodeIdArray" 
         command="SetGenerateGlobalNodeIdArray" 
@@ -3044,7 +3043,6 @@
         default_values="1" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
-     -->
 
      <IntVectorProperty 
         name="ExodusModelMetadata" 
