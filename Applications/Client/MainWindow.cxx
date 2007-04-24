@@ -126,6 +126,10 @@ MainWindow::MainWindow() :
   
   this->Implementation->RecentFilesMenu = new
     pqRecentFilesMenu(*this->Implementation->UI.menuRecentFiles, this);
+  QObject::connect(this->Implementation->RecentFilesMenu,
+    SIGNAL(serverConnectFailed()),
+    &this->Implementation->Core,
+    SLOT(makeDefaultConnectionIfNoneExists()));
   
   this->Implementation->ViewMenu = 
     new pqViewMenu(*this->Implementation->UI.menuView, this);

@@ -1710,39 +1710,54 @@ bool pqMainWindowCore::makeServerConnectionIfNoneExists()
     return false;
     }
 
+  return this->makeServerConnection();
+}
+
+//-----------------------------------------------------------------------------
+bool pqMainWindowCore::makeServerConnection()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
   pqServerStartupBrowser server_browser (core->serverStartups(), 
     *(core->settings()), this->Implementation->Parent);
+  QStringList ignoreList;
+  ignoreList << "builtin";
+  server_browser.setIgnoreList(ignoreList);
   server_browser.exec();
   return (this->getActiveServer() != NULL);
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindowCore::makeDefaultConnectionIfNoneExists()
+{
+  if (this->getActiveServer())
+    {
+    return ;
+    }
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+  if (core->getServerManagerModel()->getNumberOfServers() != 0)
+    {
+    // cannot really happen, however, if no active server, yet
+    // server connection exists, we don't try to make a new server connection.
+    return ;
+    }
+
+  pqServerResource resource = pqServerResource("builtin:");
+  core->createServer(resource);
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileOpen()
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  if (core->getServerManagerModel()->getNumberOfServers() == 0)
+  this->makeServerConnectionIfNoneExists();
+  pqServer *server = this->getActiveServer();
+  if(server)
     {
-    pqServerStartupBrowser* const server_browser = new pqServerStartupBrowser(
-      pqApplicationCore::instance()->serverStartups(),
-      *pqApplicationCore::instance()->settings(),
-      this->Implementation->Parent);
-    server_browser->setAttribute(Qt::WA_DeleteOnClose); //auto delete when closed
-    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
-      this, SLOT(onFileOpen(pqServer*)), Qt::QueuedConnection);
-    server_browser->setModal(true);
-    server_browser->show();
+    this->onFileOpen(server);
     }
   else
     {
-    pqServer *server = this->getActiveServer();
-    if(server)
-      {
-      this->onFileOpen(server);
-      }
-    else
-      {
-      qDebug() << "No active server selected.";
-      }
+    qDebug() << "No active server selected.";
     }
 }
 
@@ -1779,6 +1794,7 @@ void pqMainWindowCore::onFileOpen(const QStringList& files)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileLoadServerState()
 {
+  this->makeServerConnectionIfNoneExists();
   pqApplicationCore* core = pqApplicationCore::instance();
   int num_servers = core->getServerManagerModel()->getNumberOfServers();
   if (num_servers > 0)
@@ -1794,16 +1810,7 @@ void pqMainWindowCore::onFileLoadServerState()
     }
   else
     {
-    pqServerStartupBrowser* const server_browser = new pqServerStartupBrowser(
-      pqApplicationCore::instance()->serverStartups(),
-      *pqApplicationCore::instance()->settings(),
-      this->Implementation->Parent);
-    server_browser->setAttribute(Qt::WA_DeleteOnClose); //auto delete when closed
-    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
-                     this,           SLOT(onFileLoadServerState(pqServer*)), 
-                     Qt::QueuedConnection);
-    server_browser->setModal(true);
-    server_browser->show();
+    qDebug() << "No server connection present.";
     }
 }
 
@@ -2175,19 +2182,11 @@ void pqMainWindowCore::onServerConnect()
       }
     }
 
-  pqServerStartupBrowser server_browser (
-    pqApplicationCore::instance()->serverStartups(),
-    *pqApplicationCore::instance()->settings(),
-    this->Implementation->Parent);
-  server_browser.exec();
+  this->makeServerConnection();
 
   // If for some reason,  the connect failed,
   // we create a default builtin connection.
-  if (!this->getActiveServer())
-    {
-    pqServerResource resource = pqServerResource("builtin:");
-    core->createServer(resource);
-    }
+  this->makeDefaultConnectionIfNoneExists();
 }
 
 //-----------------------------------------------------------------------------
@@ -2203,8 +2202,7 @@ void pqMainWindowCore::onServerDisconnect()
   pqEventDispatcher::processEventsAndWait(1);
 
   // Always have a builtin connection connected.
-  pqServerResource resource = pqServerResource("builtin:");
-  core->createServer(resource);
+  this->makeDefaultConnectionIfNoneExists();
 }
 
 //-----------------------------------------------------------------------------
@@ -2523,17 +2521,7 @@ void pqMainWindowCore::onCreateSource(QAction* action)
     return;
     }
 
-  pqApplicationCore* core = pqApplicationCore::instance();
-  if (core->getServerManagerModel()->getNumberOfServers() == 0)
-    {
-    // We need to create a new connection.
-    pqServerStartupBrowser* const server_browser = new pqServerStartupBrowser(
-      pqApplicationCore::instance()->serverStartups(),
-      *pqApplicationCore::instance()->settings(),
-      this->Implementation->Parent);
-    server_browser->setAttribute(Qt::WA_DeleteOnClose); //auto delete when closed
-    server_browser->exec();
-    }
+  this->makeServerConnectionIfNoneExists();
   
   if (this->getActiveServer())
     {
@@ -3704,7 +3692,7 @@ void pqMainWindowCore::applicationInitialize()
         << serverresource_name 
         << "\". Creating default builtin connection.";
       }
-    core->createServer(pqServerResource("builtin:"));
+    this->makeDefaultConnectionIfNoneExists();
     }
     
   // check for --data option.

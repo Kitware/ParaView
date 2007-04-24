@@ -62,6 +62,7 @@ public:
   pqServerStartups& Startups;
   pqSettings& Settings;
   pqServerStartup* SelectedServer;
+  QStringList IgnoreList;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -115,32 +116,48 @@ pqServerBrowser::pqServerBrowser(
   this->Implementation->UI.connect->setFocus(Qt::OtherFocusReason);
 }
 
+//-----------------------------------------------------------------------------
 pqServerBrowser::~pqServerBrowser()
 {
   delete this->Implementation;
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::setMessage(const QString& message)
 {
   this->Implementation->UI.message->setText(message);
 }
 
+//-----------------------------------------------------------------------------
+void pqServerBrowser::setIgnoreList(const QStringList& ignoreList)
+{
+  this->Implementation->IgnoreList = ignoreList;
+  this->onStartupsChanged();
+}
+
+//-----------------------------------------------------------------------------
 pqServerStartup* pqServerBrowser::getSelectedServer()
 {
   return this->Implementation->SelectedServer;
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onStartupsChanged()
 {
   this->Implementation->UI.startups->clear();
   
-  const pqServerStartups::StartupsT startups = this->Implementation->Startups.getStartups();
+  const pqServerStartups::StartupsT startups = 
+    this->Implementation->Startups.getStartups();
   for(int i = 0; i != startups.size(); ++i)
     {
-    this->Implementation->UI.startups->addItem(startups[i]);
+    if (!this->Implementation->IgnoreList.contains(startups[i]))
+      {
+      this->Implementation->UI.startups->addItem(startups[i]);
+      }
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onCurrentItemChanged(QListWidgetItem* current, QListWidgetItem*)
 {
   int editable_count = 0;
@@ -162,6 +179,7 @@ void pqServerBrowser::onCurrentItemChanged(QListWidgetItem* current, QListWidget
   this->Implementation->UI.connect->setEnabled(current);
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onItemDoubleClicked(QListWidgetItem* item)
 {
   if(item)
@@ -174,6 +192,7 @@ void pqServerBrowser::onItemDoubleClicked(QListWidgetItem* item)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onAddServer()
 {
   pqCreateServerStartupDialog create_server_dialog;
@@ -190,6 +209,7 @@ void pqServerBrowser::onAddServer()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onEditServer()
 {
   for(int row = 0; row != this->Implementation->UI.startups->count(); ++row)
@@ -212,6 +232,7 @@ void pqServerBrowser::onEditServer()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onDeleteServer()
 {
   pqServerStartups::StartupsT startups;
@@ -228,6 +249,7 @@ void pqServerBrowser::onDeleteServer()
   this->Implementation->Startups.save(this->Implementation->Settings);
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onSave()
 {
   QString filters;
@@ -244,6 +266,7 @@ void pqServerBrowser::onSave()
   dialog->show();
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onSave(const QStringList& files)
 {
   QDomDocument xml;
@@ -260,6 +283,7 @@ void pqServerBrowser::onSave(const QStringList& files)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onLoad()
 {
   QString filters;
@@ -276,6 +300,7 @@ void pqServerBrowser::onLoad()
   dialog->show();
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onLoad(const QStringList& files)
 {
   for(int i = 0; i != files.size(); ++i)
@@ -293,6 +318,7 @@ void pqServerBrowser::onLoad(const QStringList& files)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onConnect()
 {
   if(this->Implementation->UI.startups->currentItem())
@@ -305,11 +331,13 @@ void pqServerBrowser::onConnect()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onClose()
 {
   this->reject();
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::emitServerSelected(pqServerStartup& startup)
 {
   this->Implementation->SelectedServer = &startup;
@@ -317,6 +345,7 @@ void pqServerBrowser::emitServerSelected(pqServerStartup& startup)
   this->onServerSelected(startup);
 }
 
+//-----------------------------------------------------------------------------
 void pqServerBrowser::onServerSelected(pqServerStartup& /*startup*/)
 {
   this->accept();

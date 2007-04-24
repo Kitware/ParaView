@@ -213,6 +213,10 @@ public:
 
   /// Asks the user to make a new server connection, if none exists.
   bool makeServerConnectionIfNoneExists();
+
+  /// Asks the user for a new connection (even if a server connection
+  /// already exists.
+  bool makeServerConnection();
 signals:
   void enableFileOpen(bool);
   void enableFileLoadServerState(bool);
@@ -238,6 +242,10 @@ signals:
   void postAccept();
 
 public slots:
+  /// Creates a builtin connection, if no connection
+  /// currently exists.
+  void makeDefaultConnectionIfNoneExists();
+
   virtual void onFileOpen();
   virtual void onFileOpen(pqServer* Server);
   virtual void onFileOpen(const QStringList& Files);

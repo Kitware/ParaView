@@ -52,6 +52,11 @@ public:
   /// Assigns the menu that will display the list of files
   pqRecentFilesMenu(QMenu& menu, QObject* p=0);
 
+signals:
+  /// Fired when the server connection for the resource
+  /// cannot be created.
+  void serverConnectFailed();
+
 private slots:
   void onResourcesChanged();
   void onOpenResource(QAction*);
