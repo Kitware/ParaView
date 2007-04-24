@@ -695,9 +695,9 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
 
   // Listen for the signal that the lookmark button for a given view was pressed
   this->connect(&this->Implementation->MultiViewManager, 
-                SIGNAL(createLookmark()), //pqGenericViewModule*)),
+                SIGNAL(createLookmark(QWidget*)), //pqGenericViewModule*)),
                 this,
-                SLOT(onToolsCreateLookmark())); //pqGenericViewModule*)));
+                SLOT(onToolsCreateLookmark(QWidget*))); //pqGenericViewModule*)));
 
   this->connect(pqApplicationCore::instance()->getPluginManager(),
                 SIGNAL(serverManagerExtensionLoaded()),
@@ -2272,7 +2272,27 @@ void pqMainWindowCore::onToolsCreateLookmark()
   // Create a lookmark of the currently active view
   this->onToolsCreateLookmark(pqActiveView::instance().current());
 }
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onToolsCreateLookmark(QWidget* widget)
+{
+  pqMultiViewFrame* frame= qobject_cast<pqMultiViewFrame*>(widget);
+  if(frame)
+    {
+      QVTKWidget* w =qobject_cast<QVTKWidget*>(frame->mainWidget());
+      if(w)
+        {
+         pqRenderViewModule* rm = 
+         pqServerManagerModel::instance()->getRenderModule(w);
 
+         if(rm)
+           {
+           // Create a lookmark of the currently active view
+           this->onToolsCreateLookmark(rm);
+           }
+       }
+    }
+
+}
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsCreateLookmark(pqGenericViewModule *view)
 {

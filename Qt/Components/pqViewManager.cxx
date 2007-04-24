@@ -92,6 +92,8 @@ public:
   QPointer<pqGenericViewModule> ActiveViewModule;
   QPointer<pqUndoStack> UndoStack;
   QMenu ConvertMenu;
+  QSignalMapper* LookmarkSignalMapper;
+
 
   typedef QMap<pqMultiViewFrame*, QPointer<pqGenericViewModule> > FrameMapType;
   FrameMapType Frames;
@@ -119,6 +121,11 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
   this->Internal = new pqInternals();
   this->Internal->DontCreateDeleteViewsModules = false;
   this->Internal->MaxWindowSize = QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+  this->Internal->LookmarkSignalMapper = new QSignalMapper(this);
+  QObject::connect(this->Internal->LookmarkSignalMapper, SIGNAL(mapped(QWidget*)), 
+    this, SIGNAL(createLookmark(QWidget*)));
+
+
   pqServerManagerModel* smModel = pqServerManagerModel::instance();
   if (!smModel)
     {
@@ -276,7 +283,6 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
   frame->CloseButton->show();
   frame->SplitVerticalButton->show();
   frame->SplitHorizontalButton->show();
-  frame->LookmarkButton->show();
 
   frame->getContextMenu()->addSeparator();
   QAction* subAction = frame->getContextMenu()->addMenu(
@@ -439,32 +445,55 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
     frame->setMainWidget(NULL);
     }
 
+
+  pqRenderViewModule* const render_module = 
+    qobject_cast<pqRenderViewModule*>(view);
+  if(render_module)
+    {
+    QAction* lookmarkAction = new QAction(QIcon(":/pqWidgets/Icons/pqLookmark16.png"), 
+      "Lookmark", 
+      this);
+    lookmarkAction->setObjectName("LookmarkButton");
+    frame->addAction(lookmarkAction);
+
+    lookmarkAction->setEnabled(true);
+    this->Internal->LookmarkSignalMapper->setMapping(lookmarkAction, frame);
+    QObject::connect(lookmarkAction, SIGNAL(triggered(bool)), 
+      this->Internal->LookmarkSignalMapper, SLOT(map()));
+
+    }
+
   if (view->supportsUndo())
     {
     // Setup undo/redo connections if the view module
     // supports interaction undo.
-    frame->BackButton->show();
-    frame->ForwardButton->show();
+    QAction* forwardAction = new QAction(QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"), 
+      "", 
+      this);
+    forwardAction->setObjectName("ForwardButton");
+    frame->addAction(forwardAction);
+    forwardAction->setEnabled(true);
 
-    QObject::connect(frame->BackButton, SIGNAL(pressed()), 
-      view, SLOT(undo()));
-    QObject::connect(frame->ForwardButton, SIGNAL(pressed()),
+    QObject::connect(forwardAction, SIGNAL( triggered ()), 
       view, SLOT(redo()));
-    QObject::connect(view, SIGNAL(canUndoChanged(bool)),
-      frame->BackButton, SLOT(setEnabled(bool)));
     QObject::connect(view, SIGNAL(canRedoChanged(bool)),
-      frame->ForwardButton, SLOT(setEnabled(bool)));
-    }
-  else
-    {
-    frame->BackButton->hide();
-    frame->ForwardButton->hide();
+      forwardAction, SLOT(setEnabled(bool)));
+
+
+    QAction* backAction = new QAction(QIcon(":/pqWidgets/Icons/pqUndoCamera24.png"), 
+      "", 
+      this);
+    backAction->setObjectName("BackButton");
+    frame->addAction(backAction);
+    backAction->setEnabled(true);
+    
+    QObject::connect(backAction, SIGNAL( triggered ()), 
+      view, SLOT(undo()));
+    QObject::connect(view, SIGNAL(canUndoChanged(bool)),
+      backAction, SLOT(setEnabled(bool)));
     }
 
-  frame->LookmarkButton->show();
-  QObject::connect(frame, SIGNAL(createLookmark()),
-    this, SIGNAL(createLookmark()));
-  frame->LookmarkButton->setEnabled(true);
+
 
   this->Internal->Frames.insert(frame, view);
 }
@@ -487,20 +516,40 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* vie
     }
   frame->setMainWidget(NULL);
 
-  if (view->supportsUndo())
+
+  pqRenderViewModule* const render_module = 
+    qobject_cast<pqRenderViewModule*>(view);
+  if(render_module)
     {
-    QObject::disconnect(frame->BackButton, 0, view, 0);
-    QObject::disconnect(frame->ForwardButton, 0, view, 0);
-    QObject::disconnect(view, 0,frame->BackButton, 0);
-    QObject::disconnect(view, 0,frame->ForwardButton, 0);
+    QAction *lookmarkAction= this->getAction(frame,"LookmarkButton");
+    if(lookmarkAction)
+      {
+      frame->removeAction(lookmarkAction);
+      delete lookmarkAction;
+      }
     }
 
-  QObject::disconnect(frame, SIGNAL(createLookmark()),
-    this, SIGNAL(createLookmark()));
 
-  frame->BackButton->hide();
-  frame->ForwardButton->hide();
-  frame->LookmarkButton->setEnabled(false);
+
+  if (view->supportsUndo())
+    {
+    QAction *forwardAction= this->getAction(frame,"ForwardButton");
+    if(forwardAction)
+      {
+      frame->removeAction(forwardAction);
+      delete forwardAction;
+      }
+
+
+    QAction *backAction= this->getAction(frame,"BackButton");
+    if(backAction)
+      {
+      frame->removeAction(backAction);
+      delete backAction;
+      }
+
+
+    }
 
   this->Internal->PendingFrames.push_back(frame);
 }
@@ -1096,4 +1145,24 @@ void pqViewManager::onSplittingView(const Index& index,
 
   emit this->endUndo();
 }
+
+
+QAction* pqViewManager::getAction(pqMultiViewFrame* frame,QString name)
+{
+  QList<QAction*> actionList=frame->actions();
+  QList<QAction*>::iterator i;
+  for (i = actionList.begin(); i != actionList.end(); ++i)
+    {
+    QAction *action= *i;
+    if(!QString::compare(action->objectName(),name))
+      return action;
+    }
+
+
+  return NULL;
+}
+
+
+
+
 

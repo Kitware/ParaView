@@ -83,7 +83,7 @@ signals:
   void activeViewModuleChanged(pqGenericViewModule*);
 
   /// Fired when the user pressed the lookmark button for one of the views
-  void createLookmark();
+  void createLookmark(QWidget*);
 
   /// Fired when the manager begins an undoable change.
   void beginUndo(const QString& label);
@@ -147,8 +147,6 @@ private slots:
   /// We add an undo element to the stack to undo/redo the split.
   void onSplittingView(const Index&, Qt::Orientation, float, const Index&);
 
-
-
 public slots:
   /// Set the active server. This must be called whenever
   /// active server changes. The active server is used to 
@@ -187,6 +185,10 @@ protected:
   /// Called when a frame close request is made.
   /// We add an undo element to the stack to undo/redo the close.
   void onFrameRemovedInternal(pqMultiViewFrame*);
+
+
+  QAction* getAction(pqMultiViewFrame* frame,QString name);
+
 
 private:
   pqViewManager(pqViewManager&); // Not implemented.

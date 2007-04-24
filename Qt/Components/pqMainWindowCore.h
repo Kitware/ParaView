@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkIOStream.h>
 
 #include <QObject>
+#include <QWidget>
 
 class pqActionGroupInterface;
 class pqActiveServer;
@@ -281,6 +282,7 @@ public slots:
   // TO DO: Support lookmark of multiple views and different view types (plots, etc).
   // Right now this creates one for a single render view only.
   void onToolsCreateLookmark();
+  void onToolsCreateLookmark(QWidget* widget);
   void onToolsCreateLookmark(pqGenericViewModule*);
 
   // Have the main window handle all lookmark load signals (from the toolbar, inspector, browser)

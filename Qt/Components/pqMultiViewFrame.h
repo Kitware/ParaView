@@ -130,17 +130,13 @@ signals:
   void contextMenuRequested();
   /// Signal emitted after the main widget has changed for this frame
   void mainWidgetChanged(pqMultiViewFrame*);
-  /// signal create lookmark pressed
-  void createLookmark();
 
 protected slots:
   /// called when a context menu is requested.
   void onCustomContextMenuRequested(const QPoint& point);
 
-  /// fired when the lookmark button for this frame was pressed
-  void onLookmarkButtonPressed();
-
 protected:
+  bool event(QEvent*);
   void paintEvent(QPaintEvent* e);
   bool eventFilter(QObject*, QEvent* e);
 

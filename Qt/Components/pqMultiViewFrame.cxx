@@ -59,7 +59,7 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   QVBoxLayout* sublayout = new QVBoxLayout();
   boxLayout->addLayout(sublayout);
   sublayout->addStretch();
-
+  
   this->CloseButton->setIcon(
     QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton)));
   this->MaximizeButton->setIcon(
@@ -97,18 +97,9 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
                   this->Menu);
   a->setObjectName("CloseAction");
   this->CloseButton->setDefaultAction(a);
-  a = new QAction(this->LookmarkButton->icon(), 
-                  this->LookmarkButton->text(), 
-                  this->Menu);
-  a->setObjectName("LookmarkAction");
-  this->LookmarkButton->setDefaultAction(a);
 
   this->connect(this->ActiveButton->defaultAction(), SIGNAL(triggered(bool)), 
                 SLOT(setActive(bool)));
-  //QObject::connect(this->LookmarkButton, SIGNAL(pressed()),
-  //  this, SLOT(onLookmarkButtonPressed()));
-  this->connect(this->LookmarkButton->defaultAction(), SIGNAL(triggered(bool)), 
-                SLOT(onLookmarkButtonPressed()), Qt::QueuedConnection);
   this->connect(this->CloseButton->defaultAction(), SIGNAL(triggered(bool)), 
                 SLOT(close()), Qt::QueuedConnection);
   this->connect(this->MaximizeButton->defaultAction(), 
@@ -123,12 +114,9 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   this->connect(this->SplitHorizontalButton->defaultAction(), 
                 SIGNAL(triggered(bool)), 
                 SLOT(splitHorizontal()), Qt::QueuedConnection);
-  
+
   // setup the context menu
   this->Menu->setContextMenuPolicy(Qt::CustomContextMenu);
-  //this->Menu->addAction(this->SplitHorizontalButton->defaultAction());
-  //this->Menu->addAction(this->SplitVerticalButton->defaultAction());
-  //this->Menu->addAction(this->CloseButton->defaultAction());
   this->Menu->setAcceptDrops(true);
   QObject::connect(this->Menu,  
     SIGNAL(customContextMenuRequested(const QPoint&)),
@@ -144,13 +132,10 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   // TODO: temporary until they can be implemented or wanted
   this->RestoreButton->hide();
   this->ActiveButton->hide();
-  this->BackButton->hide();
-  this->ForwardButton->hide();
   this->MaximizeButton->hide();
   this->CloseButton->hide();
   this->SplitVerticalButton->hide();
   this->SplitHorizontalButton->hide();
-  this->LookmarkButton->hide();
 
 
   this->UniqueID=QUuid::createUuid();
@@ -163,6 +148,25 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
 
 pqMultiViewFrame::~pqMultiViewFrame()
 {
+}
+
+
+bool pqMultiViewFrame::event(QEvent* e)
+{
+
+  if(e->type() == QEvent::ActionAdded)
+    {  
+    QAction * a = this->actions().last();
+    QToolButton* button = new QToolButton(this);
+    button->setDefaultAction(a);
+    this->hboxLayout->insertWidget(0,button);
+    }
+  else if(e->type() == QEvent::ActionRemoved)
+    {
+
+    }
+  return QWidget::event(e);
+
 }
 
 void pqMultiViewFrame::onCustomContextMenuRequested(const QPoint& point)
@@ -419,14 +423,3 @@ void pqMultiViewFrame::showDecorations()
   this->Menu->show();
 }
 
-//-----------------------------------------------------------------------------
-void pqMultiViewFrame::onLookmarkButtonPressed()
-{
-  // make sure this frame's view is set as the active one
-  // FIXME: Is there a cleaner way to do this? 
-  // I thought of using the "pressed()" button signal to set the active view (since it needs to be done before anything else) 
-  // and the "clicked()" signal to emit 
-  // pqViewManager::createLookmark(pqGenericViewModule*) but would this cause a race condition?
-  this->setActive(true);
-  emit this->createLookmark();
-}
