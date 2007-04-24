@@ -8,7 +8,7 @@ IF(NOT WIN32)
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
 ENDIF(NOT WIN32)
 
-ADD_LIBRARY(vtkPVCommandOptions
+SET (PVCommandOptions_SRCS
   vtkCommandOptions.cxx
   vtkCommandOptionsXMLParser.cxx
   vtkPVOptions.cxx
@@ -16,6 +16,8 @@ ADD_LIBRARY(vtkPVCommandOptions
   vtkPVXMLParser.cxx
   vtkPVXMLElement.cxx
 )
+
+ADD_LIBRARY(vtkPVCommandOptions ${PVCommandOptions_SRCS})
 TARGET_LINK_LIBRARIES(vtkPVCommandOptions
   vtkIO)
 
@@ -23,7 +25,7 @@ SET(Kit_SRCS
   vtkCacheSizeKeeper.cxx
   vtkCellIntegrator.cxx
   vtkClientConnection.cxx
-    vtkConnectionIterator.cxx
+  vtkConnectionIterator.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkMPISelfConnection.cxx
@@ -166,6 +168,11 @@ IF (PARAVIEW_ENABLE_PYTHON)
   SET(VTK_WRAP_PYTHON_EXE ${PARAVIEW_VTK_WRAP_PYTHON_EXE})
   SET(VTK_WRAP_PYTHON_INIT_EXE ${PARAVIEW_VTK_WRAP_PYTHON_INIT_EXE})
   SET(Kit_PYTHON_EXTRA_SRCS
+    )
+
+  SET (Kit_SRCS
+      ${Kit_SRCS}
+      ${PVCommandOptions_SRCS} 
     )
   SET(KIT_PYTHON_LIBS
     vtkCommonPythonD vtkPVServerCommon vtk${KIT}CS
