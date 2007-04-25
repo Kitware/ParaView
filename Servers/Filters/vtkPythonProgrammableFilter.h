@@ -31,7 +31,7 @@
 
 #include "vtkProgrammableFilter.h"
 
-class vtkPVPythonInterpretor;
+class vtkPythonProgrammableFilterImplementation;
 
 class VTK_EXPORT vtkPythonProgrammableFilter : public vtkProgrammableFilter
 {
@@ -43,6 +43,15 @@ public:
   // Description: 
   // Set the text of the python script to execute.
   void SetScript(const char *script);
+
+  // Description:
+  // Set a name-value parameter that will be available to the script
+  // when it is run
+  void SetParameter(const char *name, const char *value);
+
+  // Description:
+  // Clear all name-value parameters
+  void ClearParameters();
 
   // Description: 
   // Set the text of the python script to execute in RequestInformation().
@@ -88,15 +97,15 @@ protected:
 
   char *Script;
   char *InformationScript;
-  vtkPVPythonInterpretor* Interpretor;
   int OutputDataSetType;
 
 private:
   vtkPythonProgrammableFilter(const vtkPythonProgrammableFilter&);  // Not implemented.
   void operator=(const vtkPythonProgrammableFilter&);  // Not implemented.
 
-  //state used to get by a reference counting cyclic loop
-  int Running;
+//BTX
+  vtkPythonProgrammableFilterImplementation* const Implementation;
+//ETX
 };
 
 #endif

@@ -87,6 +87,15 @@ Interpretor, a python interpretor to run the script upon the first
        </Documentation>
      </StringVectorProperty>
 
+     <StringVectorProperty
+       name="Parameters"
+       command="SetParameter"
+       repeat_command="1"
+       number_of_elements_per_command="2"
+       clean_command="ClearParameters"
+       animateable="0">
+     </StringVectorProperty>
+
     <!-- End PythonScript -->
     </SourceProxy>
 
