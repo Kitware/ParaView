@@ -31,7 +31,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.19");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.20");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -45,8 +45,6 @@ public:
     Running(0),
     Interpretor(NULL)
   {
-  this->Parameters["foo"] = "['bar', 'baz']";
-  this->Parameters["bleh"] = "'blah'";
   }
 
   //state used to get by a reference counting cyclic loop
