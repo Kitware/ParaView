@@ -574,6 +574,9 @@
      <property name="title" >
       <string>Lighting</string>
      </property>
+     <property name="visible" >
+      <bool>false</bool>
+     </property>
      <layout class="QGridLayout" >
       <property name="margin" >
        <number>9</number>
