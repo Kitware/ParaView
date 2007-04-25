@@ -1918,21 +1918,10 @@
       </SubProxy>
     </ClientServerRenderModuleProxy>
 
-    <CompositeRenderModuleProxy name="CompositeRenderModule" base_proxygroup="rendermodules"
+    <CompositeRenderModuleProxy name="CompositeRenderModule" 
+      base_proxygroup="rendermodules"
       base_proxyname="ClientServerRenderModule">
-
-      <!-- This is really an alias for RemoteRenderThreshold.  I have kept
-           it for backwards compatiability.  This can cause an issue with
-           the property becoming out-of-sync with the actual object if both
-           are used. -->
-      <DoubleVectorProperty
-        name="CompositeThreshold"
-        command="SetCompositeThreshold"
-        number_of_elements="1"
-        default_values="20.0"
-        update_self="1">
-        <DoubleRangeDomain name="range" min="0" />
-      </DoubleVectorProperty>
+      <!-- End of CompositeRenderModule -->
     </CompositeRenderModuleProxy>
 
     <IceTDesktopRenderModuleProxy name="IceTDesktopRenderModule" 

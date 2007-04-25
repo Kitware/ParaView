@@ -3337,12 +3337,6 @@
     </Property>
   </Proxy>
   <Proxy group="rendermodules" type="MPIRenderModule" id="4">
-    <Property name="CompositeThreshold" id="4.CompositeThreshold" number_of_elements="1">
-      <Element index="0" value="10"/>
-      <Domain name="range" id="4.CompositeThreshold.range">
-        <Min index="0" value="0"/>
-      </Domain>
-    </Property>
     <Property name="Displays" id="4.Displays" number_of_elements="30">
       <Proxy value="27"/>
       <Proxy value="44"/>
