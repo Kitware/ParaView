@@ -308,6 +308,16 @@ void pqSimpleServerStartup::startServer(
     dialog.setMessage(
       QString(tr("Pick the configuration for starting %1")).arg(
         server.schemeHosts().toURI()));
+    QStringList ignoreList;
+    pqServerStartups::StartupsT allStartups = server_startups.getStartups();
+    foreach (QString current_startup, allStartups)
+      {
+      if (!startups.contains(current_startup))
+        {
+        ignoreList << current_startup;
+        }
+      }
+    dialog.setIgnoreList(ignoreList);
     
     if(QDialog::Accepted == dialog.exec())
       {

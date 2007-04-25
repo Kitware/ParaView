@@ -3,10 +3,6 @@
 import QtTesting
 import QtTestingImage
 
-object1 = 'MainWindow/mainToolBar/1QToolButton2'
-QtTesting.playCommand(object1, 'activate', '')
-object2 = 'MainWindow/ServerStartupBrowser/connect'
-QtTesting.playCommand(object2, 'activate', '')
 object3 = 'MainWindow/mainToolBar/1QToolButton0'
 QtTesting.playCommand(object3, 'activate', '')
 object4 = 'MainWindow/FileOpenDialog'

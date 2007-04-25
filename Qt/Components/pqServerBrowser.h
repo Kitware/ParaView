@@ -77,6 +77,11 @@ public:
   /// Returns the startup selected by the user, or NULL
   pqServerStartup* getSelectedServer();
 
+  /// Set the names of startups that form the ignore list.
+  /// All startups in the ignore list are not
+  /// shown in the browser.
+  void setIgnoreList(const QStringList& startupName);
+
 signals:
   /// This signal will be emitted if the user picks a server to be started.
   void serverSelected(pqServerStartup&);

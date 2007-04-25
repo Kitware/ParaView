@@ -1,6 +1,3 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionServerConnect" />
-  <pqevent object="MainWindow/ServerStartupBrowser/startups" command="currentChanged" arguments="/0|0" />
-  <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
 </pqevents>

@@ -104,6 +104,10 @@ pqRecentFilesMenu::pqRecentFilesMenu(QMenu& menu, QObject* p) :
     SIGNAL(serverStarted(pqServer*)),
     this,
     SLOT(onServerStarted(pqServer*)));
+
+  QObject::connect(
+    &this->Implementation->ServerStartup, SIGNAL(serverFailed()),
+    this, SIGNAL(serverConnectFailed()));
   
   this->onResourcesChanged();
 }
