@@ -221,6 +221,10 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->AcceptButton->setObjectName("Accept");
   this->AcceptButton->setText(tr("&Apply"));
   this->AcceptButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqUpdate16.png")));
+#ifdef Q_WS_MAC
+  this->AcceptButton->setShortcut(
+      QKeySequence(Qt::ControlModifier + Qt::Key_Enter));
+#endif
   this->ResetButton = new QPushButton(this);
   this->ResetButton->setObjectName("Reset");
   this->ResetButton->setText(tr("&Reset"));
