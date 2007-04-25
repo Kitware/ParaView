@@ -3622,6 +3622,7 @@
           <Property name="PreGatherHelper" />
           <Property name="PostGatherHelper" />
           <Property name="PassThrough" />
+          <Property name="GenerateProcessIds" />
         </ExposedProperties>
       </SubProxy>
       <!-- End of GenericViewDisplayBase -->

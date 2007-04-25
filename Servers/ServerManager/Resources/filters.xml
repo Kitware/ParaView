@@ -5502,7 +5502,18 @@ The Level Scalars filter uses colors to show levels of a hierarchical dataset.
         <Documentation>
           If set to a non-negative value, then produce results using only the node Id specified.
         </Documentation>
-     </IntVectorProperty>
+      </IntVectorProperty>
+      <IntVectorProperty
+         name="GenerateProcessIds"
+         command="SetGenerateProcessIds"
+         number_of_elements="1"
+         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If true, the filter will generate vtkOriginalProcessIds arrays
+          indicating the process id on which the cell/point was generated. 
+        </Documentation>
+      </IntVectorProperty>
 
     <!-- End ReductionFilter -->
     </SourceProxy>

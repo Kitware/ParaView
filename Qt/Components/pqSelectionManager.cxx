@@ -528,6 +528,8 @@ void pqSelectionManager::createSelectionDisplayer(vtkSMProxy* input)
 
   pqSMAdaptor::setEnumerationProperty(csDisplayer->GetProperty("ReductionType"),
                                       "UNSTRUCTURED_APPEND");
+  pqSMAdaptor::setElementProperty(
+    csDisplayer->GetProperty("GenerateProcessIds"), 1);
   csDisplayer->UpdateVTKObjects();
   csDisplayer->Update();
   this->Implementation->ClientSideDisplayer = csDisplayer;

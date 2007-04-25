@@ -334,6 +334,8 @@ void pqElementInspectorWidget::inspect(pqPipelineSource* source)
         pqSMAdaptor::setEnumerationProperty(
           srcDisplay->getProxy()->GetProperty("ReductionType"),
           "UNSTRUCTURED_APPEND");
+        pqSMAdaptor::setElementProperty(
+          srcDisplay->getProxy()->GetProperty("GenerateProcessIds"), 1);
         srcDisplay->getProxy()->UpdateVTKObjects();
         }
       }

@@ -14,17 +14,19 @@
 =========================================================================*/
 #include "vtkReductionFilter.h"
 
+#include "vtkCellData.h"
 #include "vtkCharArray.h"
-#include "vtkDataObject.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkGenericDataObjectReader.h"
 #include "vtkGenericDataObjectWriter.h"
+#include "vtkIdTypeArray.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRemoteConnection.h"
@@ -41,7 +43,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.13");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.14");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -54,6 +56,7 @@ vtkReductionFilter::vtkReductionFilter()
   this->PreGatherHelper = 0;
   this->PostGatherHelper = 0;
   this->PassThrough = -1;
+  this->GenerateProcessIds = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -227,6 +230,29 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     preOutput->Delete();
     return;
     }
+
+  vtkDataSet* dsPreOutput = vtkDataSet::SafeDownCast(preOutput);
+  if (this->GenerateProcessIds && dsPreOutput)
+    {
+    // Note that preOutput is never the input directly (it is shallow copied at
+    // the least, hence we can add arrays to it.
+    vtkIdTypeArray* originalProcessIds = vtkIdTypeArray::New();
+    originalProcessIds->SetNumberOfComponents(1);
+    originalProcessIds->SetName("vtkOriginalProcessIds");
+    originalProcessIds->SetNumberOfTuples(dsPreOutput->GetNumberOfPoints());
+    originalProcessIds->FillComponent(0, controller->GetLocalProcessId());
+    dsPreOutput->GetPointData()->AddArray(originalProcessIds);
+    originalProcessIds->Delete();
+
+    originalProcessIds = vtkIdTypeArray::New();
+    originalProcessIds->SetNumberOfComponents(1);
+    originalProcessIds->SetName("vtkOriginalProcessIds");
+    originalProcessIds->SetNumberOfTuples(dsPreOutput->GetNumberOfCells());
+    originalProcessIds->FillComponent(0, controller->GetLocalProcessId());
+    dsPreOutput->GetCellData()->AddArray(originalProcessIds);
+    originalProcessIds->Delete();
+    }
+
 
 #ifdef VTK_USE_MPI
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
@@ -442,4 +468,5 @@ void vtkReductionFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PostGatherHelper: " << this->PostGatherHelper << endl;
   os << indent << "Controller: " << this->Controller << endl;
   os << indent << "PassThrough: " << this->PassThrough << endl;
+  os << indent << "GenerateProcessIds: " << this->GenerateProcessIds << endl;
 }
