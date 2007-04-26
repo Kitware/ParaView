@@ -297,7 +297,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     break;
 
   case pqDataInformationModel::Bounds:
-    // Data Bounds.
+    // Spatial Bounds.
     switch (role)
       {
     case Qt::DisplayRole:
@@ -332,7 +332,7 @@ QVariant pqDataInformationModel::headerData(int section,
         return QVariant("Name");
 
       case pqDataInformationModel::DataType:
-        return QVariant("Data");
+        return QVariant("Data Type");
 
       case pqDataInformationModel::CellCount:
         return QVariant("No. of Cells");
@@ -344,7 +344,7 @@ QVariant pqDataInformationModel::headerData(int section,
         return QVariant("Memory (MB)");
 
       case pqDataInformationModel::Bounds:
-        return QVariant("Data Bounds");
+        return QVariant("Spatial Bounds");
         }
       break;
       }
