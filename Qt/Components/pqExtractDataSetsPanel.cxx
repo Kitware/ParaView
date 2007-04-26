@@ -193,14 +193,14 @@ void pqExtractDataSetsPanel::accept()
   ivp->SetNumberOfElements(0);
 
   unsigned int idx=0;
-  DataSetsMap::iterator pos;
-  for (pos=this->Internals->SelectedData.begin(); 
-    pos!=this->Internals->SelectedData.end(); ++pos) 
+  DataSetsMap::iterator iter;
+  for (iter=this->Internals->SelectedData.begin(); 
+    iter!=this->Internals->SelectedData.end(); ++iter) 
     {
-    if (pos->second.first) // ie selected this {group,index}
+    if (iter->second.first) // ie selected this {group,index}
       {
-      int group = pos->first.first;
-      int index = pos->first.second;
+      int group = iter->first.first;
+      int index = iter->first.second;
       ivp->SetElement(idx++, group);
       ivp->SetElement(idx++, index);
       }
@@ -224,10 +224,10 @@ void pqExtractDataSetsPanel::updateMapState(QTreeWidgetItem* item)
     return;
   }
   int index = item->parent()->indexOfChild(item);
-  DataSetsMap::iterator pos = this->Internals->SelectedData.find( 
+  DataSetsMap::iterator iter = this->Internals->SelectedData.find( 
     GroupIndex(group, index)
   );
-  pos->second.first = item->checkState(0);
+  iter->second.first = item->checkState(0);
 }
 //----------------------------------------------------------------------------
 void pqExtractDataSetsPanel::datasetsItemChanged(QTreeWidgetItem* item)
@@ -247,25 +247,25 @@ void pqExtractDataSetsPanel::datasetsItemChanged(QTreeWidgetItem* item)
     }
 
   // if a child is changed, see if parent needs to be changed
-  QTreeWidgetItem *parent = item->parent();
-  if (parent && parent->childCount()>0)
+  QTreeWidgetItem *p = item->parent();
+  if (p && p->childCount()>0)
     {
     bool allsame = true;
-    Qt::CheckState laststate = parent->child(0)->checkState(0);
-    for (int i=1; i<parent->childCount(); i++) 
+    Qt::CheckState laststate = p->child(0)->checkState(0);
+    for (int i=1; i<p->childCount(); i++) 
       {
-      if (parent->child(i)->checkState(0)!=laststate)
+      if (p->child(i)->checkState(0)!=laststate)
         {
         allsame = false;
         }
       }
     if (allsame) 
       {
-      parent->setCheckState(0, parent->child(0)->checkState(0));
+      p->setCheckState(0, p->child(0)->checkState(0));
       }
     else 
       {
-        parent->setCheckState(0, Qt::PartiallyChecked);
+        p->setCheckState(0, Qt::PartiallyChecked);
       }
     } 
   this->setModified();
@@ -274,12 +274,12 @@ void pqExtractDataSetsPanel::datasetsItemChanged(QTreeWidgetItem* item)
 //----------------------------------------------------------------------------
 void pqExtractDataSetsPanel::updateGUI()
 {
-  DataSetsMap::iterator pos;
-  for (pos=this->Internals->SelectedData.begin(); 
-    pos!=this->Internals->SelectedData.end(); ++pos) 
+  DataSetsMap::iterator iter;
+  for (iter=this->Internals->SelectedData.begin(); 
+    iter!=this->Internals->SelectedData.end(); ++iter) 
     {
-    QTreeWidgetItem *item = pos->second.second;
-    item->setCheckState(0,pos->second.first);
+    QTreeWidgetItem *item = iter->second.second;
+    item->setCheckState(0,iter->second.first);
     }
 }
 //----------------------------------------------------------------------------
