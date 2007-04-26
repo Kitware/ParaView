@@ -550,8 +550,8 @@ class pqLinksModelObject::pqInternal
 {
 public:
   // a list of proxies involved in the link
-  QList<QPointer<pqProxy> > OutputProxies;
-  QList<QPointer<pqProxy> > InputProxies;
+  QList<pqProxy*> OutputProxies;
+  QList<pqProxy*> InputProxies;
   vtkSmartPointer<vtkEventQtSlotConnect> Connection;
   // name of link
   QString Name;
@@ -577,6 +577,20 @@ pqLinksModelObject::pqLinksModelObject(QString linkName, pqLinksModel* p)
 
 pqLinksModelObject::~pqLinksModelObject()
 {
+  if(vtkSMCameraLink::SafeDownCast(this->Internal->Link))
+    {
+    foreach(pqProxy* p, this->Internal->InputProxies)
+      {
+      // For render module links, we have to ensure that we remove
+      // the links between their interaction undo stacks as well.
+      pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(p);
+      if (ren)
+        {
+        this->unlinkUndoStacks(ren);
+        }
+      }
+    }
+
   delete this->Internal;
 }
   
@@ -623,7 +637,8 @@ void pqLinksModelObject::unlinkUndoStacks(pqRenderViewModule* ren)
 {
   foreach (pqProxy* output, this->Internal->OutputProxies)
     {
-    pqRenderViewModule* other = qobject_cast<pqRenderViewModule*>(output);
+    // assume all are render modules because some might be deleted already
+    pqRenderViewModule* other = static_cast<pqRenderViewModule*>(output);
     if (other && other != ren)
       {
       ren->unlinkUndoStack(other);
