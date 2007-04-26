@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
+#include "pqImageUtil.h"
 
 #include <QMessageBox>
 #include <QModelIndex>
@@ -68,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkImageData.h"
 
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
@@ -242,13 +244,15 @@ void pqLookmarkDefinitionWizard::createLookmark()
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
 
   // Save a screenshot of the view to store with the lookmark
-  // FIXME: Is there a better way to do this? I tried using the 
-  //  vtkWindowToImageFilter but I don't know how to convert its output 
-  //  vtkImageData to an image format that QImage will understand
-  renderModule->saveImage(150,150,"tempLookmarkImage.png");
-  QImage image("tempLookmarkImage.png","PNG");
-  remove("tempLookmarkImage.png");
-
+  QWidget* w = renderModule->getWidget();
+  QSize old = w->size();
+  w->resize(150,150);
+  vtkImageData* imageData = smRen->CaptureWindow(1);
+  w->resize(old);
+  QImage image;
+  pqImageUtil::fromImageData(imageData, image);
+  imageData->Delete();
+  
   vtkCollection *proxies = vtkCollection::New();
   // Save visible displays and their sources, also any display/source pair 
   // upstream from a visible one in the pipeline:

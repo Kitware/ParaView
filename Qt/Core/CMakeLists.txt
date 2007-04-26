@@ -180,6 +180,8 @@ ADD_LIBRARY(pqCore
   pqHelperProxyRegisterUndoElement.h
   pqHistogramTableModel.cxx
   pqHistogramTableModel.h
+  pqImageUtil.cxx
+  pqImageUtil.h
   pqLineChartDisplay.cxx
   pqLineChartDisplay.h
   pqLinksModel.cxx

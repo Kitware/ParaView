@@ -65,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // pqCore includes
 #include "pqCoreTestUtility.h"
 #include "pqOptions.h"
+#include "pqImageUtil.h"
 
 
 // since we have only one instance at a time
@@ -249,33 +250,9 @@ void pqPythonEventSourceImage::compareImage(QWidget* widget,
   widget->resize(oldSize);
   widget->setFont(oldFont);
   widget->setStyle(oldStyle);
-  img = img.convertToFormat(QImage::Format_RGB32);
-  img = img.mirrored();
-  int width = img.width();
-  int height = img.height();
-
-  // copy the QImage to a vtkImageData
+ 
   vtkSmartPointer<vtkImageData> vtkimage = vtkSmartPointer<vtkImageData>::New();
-  vtkimage->SetWholeExtent(0, width-1, 0, height-1, 0, 0); 
-  vtkimage->SetSpacing(1.0, 1.0, 1.0);
-  vtkimage->SetOrigin(0.0, 0.0, 0.0);
-  vtkimage->SetNumberOfScalarComponents(3);
-  vtkimage->SetScalarType(VTK_UNSIGNED_CHAR);
-  vtkimage->SetExtent(vtkimage->GetWholeExtent());
-  vtkimage->AllocateScalars();
-  for(int i=0; i<height; i++)
-    {
-    unsigned char* ptr = static_cast<unsigned
-      char*>(vtkimage->GetScalarPointer(0, i, 0));
-    QRgb* linePixels = reinterpret_cast<QRgb*>(img.scanLine(i));
-    for(int j=0; j<width; j++)
-      {
-      QRgb& col = linePixels[j];
-      ptr[j*3] = qRed(col);
-      ptr[j*3+1] = qGreen(col);
-      ptr[j*3+2] = qBlue(col);
-      }
-    }
+  pqImageUtil::toImageData(img, vtkimage);
 
   this->compareImageInternal(vtkimage, baseline, threshold, tempDir);
 }
