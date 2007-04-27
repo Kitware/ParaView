@@ -51,6 +51,9 @@ public:
   Qt::CheckState checkState() const;
 
   bool event(QEvent* e);
+
+  /// give a hint on the size
+  QSize sizeHint() const;
   
 public slots:
   void allOn();
@@ -60,6 +63,7 @@ protected slots:
   void doToggle(int col);
   void dataChanged(const QModelIndex&, const QModelIndex&);
   void updateCheckState();
+  void invalidateLayout();
 
 protected:
   QPixmap** CheckPixmaps;

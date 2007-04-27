@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyle>
 #include <QTimer>
 #include <QHeaderView>
+#include <QLayout>
 
 // enum for different pixmap types
 enum pqSelectionTreeWidgetPixmap
@@ -108,6 +109,11 @@ pqSelectionTreeWidget::pqSelectionTreeWidget(QWidget* p)
                    Qt::QueuedConnection);
   
   this->header()->setClickable(true);
+
+  QObject::connect(this->model(), SIGNAL(rowsInserted(QModelIndex, int, int)),
+                   this, SLOT(invalidateLayout()));
+  QObject::connect(this->model(), SIGNAL(rowsRemoved(QModelIndex, int, int)),
+                   this, SLOT(invalidateLayout()));
 }
 
 pqSelectionTreeWidget::~pqSelectionTreeWidget()
@@ -212,6 +218,40 @@ void pqSelectionTreeWidget::doToggle(int column)
       // both unchecked and partial checked go here
       this->allOn();
       }
+    }
+}
+
+QSize pqSelectionTreeWidget::sizeHint() const
+{
+  // lets show X items before we get a scrollbar
+  int maxItemHint = 6;
+  // for no items, let's give a space of X pixels
+  int minItemHeight = 16;
+
+  int num = this->topLevelItemCount();
+  num = qMin(num, maxItemHint);
+  
+  int pix = minItemHeight;
+
+  if(num)
+    {
+    QRect r = this->visualItemRect(this->topLevelItem(0));
+    pix = r.height() * num;
+    }
+
+  int margin[4];
+  this->getContentsMargins(margin, margin+1, margin+2, margin+3);
+  int h = pix + margin[1] + margin[3] + this->header()->frameSize().height();
+  return QSize(156, h);
+}
+
+void pqSelectionTreeWidget::invalidateLayout()
+{
+  // sizeHint is dynamic, so we need to invalidate parent layouts
+  // when items are added or removed
+  if(this->parentWidget() && this->parentWidget()->layout())
+    {
+    this->parentWidget()->layout()->invalidate();
     }
 }
 
