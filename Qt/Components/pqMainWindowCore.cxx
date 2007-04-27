@@ -1660,8 +1660,6 @@ bool pqMainWindowCore::compareView(
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::initializeStates()
 {
-  emit this->enableFileOpen(true);
-
   emit this->enableFileLoadServerState(true);
   
   emit this->enableFileSaveServerState(false);
@@ -2778,8 +2776,6 @@ void pqMainWindowCore::onPendingDisplayChanged(bool pendingDisplays)
   pqServerManagerModelItem *item = this->getActiveObject();
   pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
   pqServer *server = this->getActiveServer(); 
-
-  emit this->enableFileOpen(!pendingDisplays);
 
   pqApplicationCore *core = pqApplicationCore::instance();
   int numServers = core->getServerManagerModel()->getNumberOfServers();

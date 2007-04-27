@@ -142,11 +142,6 @@ MainWindow::MainWindow() :
   // Setup menus and toolbars ...
   connect(this->Implementation->UI.actionFileOpen,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onFileOpen()));
-  connect(
-    &this->Implementation->Core,
-    SIGNAL(enableFileOpen(bool)),
-    this->Implementation->UI.actionFileOpen,
-    SLOT(setEnabled(bool)));
 
   connect(this->Implementation->UI.actionFileLoadServerState,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onFileLoadServerState()));

@@ -219,7 +219,6 @@ public:
   /// already exists.
   bool makeServerConnection();
 signals:
-  void enableFileOpen(bool);
   void enableFileLoadServerState(bool);
   void enableFileSaveServerState(bool);
   void enableFileSaveData(bool);
