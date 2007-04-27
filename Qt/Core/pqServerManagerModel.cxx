@@ -265,10 +265,6 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
     pqSource = new pqPipelineSource(name, source, server, this);
     }
 
-  // Mark the new object as modified since the user has to hit the
-  // accept button after creating the proxy.
-  pqSource->setModified(true);
-  
   //// Set a nice label for the source, since registration names
   //// in ParaView are nothing but IDs which are merely numbers.
   //vtksys_ios::ostringstream name_stream;

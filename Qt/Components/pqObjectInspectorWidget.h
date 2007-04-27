@@ -84,10 +84,6 @@ public slots:
   /// editor will query properties from the server manager
   void reset();
 
-  /// This slot is a temporary slot to force  ObjectInspectorPanel
-  /// to become modified i.e. enable Accept/Reset buttons.
-  void forceModified(bool status);
-
   /// Updates the accept/reset button state.
   void canAccept(bool status);
 
@@ -131,11 +127,6 @@ private:
 
   pqObjectPanelInterface* StandardCustomPanels;
 
-  // When in forceModified(), reset, should not disable accept button,
-  // hence, we keep this flag. This behaviour may need rethinking, but currently,
-  // since forceModified is only called on source creation with pending,
-  // display proxy, it makes sense. This flag gets cleared on accept().
-  bool ForceModified;
   QWidget* PanelArea;
   QPushButton* AcceptButton;
   QPushButton* ResetButton;

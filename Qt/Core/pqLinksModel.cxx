@@ -613,13 +613,13 @@ void pqLinksModelObject::proxyModified(pqServerManagerModelItem* item)
 
   this->Internal->Setting = true;
   pqProxy* source = qobject_cast<pqProxy*>(item);
-  if(source && source->isModified())
+  if(source && source->modifiedState() == pqProxy::MODIFIED)
     {
     foreach(pqProxy* p, this->Internal->OutputProxies)
       {
-      if(p != source && !p->isModified())
+      if(p != source && !p->modifiedState() != pqProxy::MODIFIED)
         {
-        p->setModified(true);
+        p->setModifiedState(pqProxy::MODIFIED);
         }
       }
     }

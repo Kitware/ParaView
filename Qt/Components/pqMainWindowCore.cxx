@@ -1107,10 +1107,6 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
                    this,             SLOT(onPostAccept()));
   QObject::connect(object_inspector, SIGNAL(accepted()), 
                    this,             SLOT(createPendingDisplays()));
-  QObject::connect( &this->Implementation->PendingDisplayManager,
-                    SIGNAL(pendingDisplays(bool)),
-                    object_inspector,
-                    SLOT(forceModified(bool)));
 
   // Use the server manager selection model to determine which page
   // should be shown.
@@ -1148,10 +1144,6 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
                    this,             SLOT(onPostAccept()));
   QObject::connect(object_inspector, SIGNAL(accepted()), 
                    this,             SLOT(createPendingDisplays()));
-  QObject::connect(&this->Implementation->PendingDisplayManager,
-                   SIGNAL(pendingDisplays(bool)),
-                   object_inspector,
-                   SLOT(forceModified(bool)));
 
   // Use the server manager selection model to determine which page
   // should be shown.

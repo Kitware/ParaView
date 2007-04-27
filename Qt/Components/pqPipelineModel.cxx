@@ -375,7 +375,7 @@ bool pqPipelineModelSource::isModified() const
 {
   if(this->Source)
     {
-    return this->Source->isModified();
+    return this->Source->modifiedState() != pqProxy::UNMODIFIED;
     }
 
   return false;

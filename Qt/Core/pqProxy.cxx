@@ -68,10 +68,7 @@ pqProxy::pqProxy(const QString& group, const QString& name,
 {
   this->Internal = new pqProxyInternal;
   this->Internal->Proxy = proxy;
-  this->Modified = false;
-
-  this->Internal->Connection->Connect(proxy, vtkCommand::UpdateEvent,
-    this, SLOT(onUpdateVTKObjects()));
+  this->Modified = pqProxy::UNINITIALIZED;
 }
 
 //-----------------------------------------------------------------------------
@@ -243,19 +240,13 @@ vtkPVXMLElement* pqProxy::getHints() const
 }
 
 //-----------------------------------------------------------------------------
-void pqProxy::setModified(bool modified)
+void pqProxy::setModifiedState(ModifiedState modified)
 {
   if(modified != this->Modified)
     {
     this->Modified = modified;
     emit this->modifiedStateChanged(this);
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqProxy::onUpdateVTKObjects()
-{
-  this->setModified(false);
 }
 
 //-----------------------------------------------------------------------------

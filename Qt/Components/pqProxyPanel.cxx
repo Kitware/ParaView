@@ -166,7 +166,7 @@ QSize pqProxyPanel::sizeHint() const
 void pqProxyPanel::accept()
 {
   this->Implementation->PropertyManager->accept();
-  this->Implementation->ReferenceProxy->setModified(false);
+  this->Implementation->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
 
   if (this->Implementation->Selected)
     {
@@ -183,7 +183,7 @@ void pqProxyPanel::reset()
 {
   this->Implementation->Proxy->UpdatePropertyInformation();
   this->Implementation->PropertyManager->reject();
-  this->Implementation->ReferenceProxy->setModified(false);
+  this->Implementation->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
   emit this->onreset();
 }
 
@@ -218,7 +218,7 @@ void pqProxyPanel::setRenderModule(pqRenderViewModule* rm)
 //-----------------------------------------------------------------------------
 void pqProxyPanel::setModified()
 {
-  this->Implementation->ReferenceProxy->setModified(true);
+  this->Implementation->ReferenceProxy->setModifiedState(pqProxy::MODIFIED);
   emit this->modified();
 }
 

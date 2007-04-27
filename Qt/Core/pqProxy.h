@@ -50,6 +50,10 @@ class PQCORE_EXPORT pqProxy : public pqServerManagerModelItem
 {
   Q_OBJECT
 public:
+
+  /// The modification state of this proxy
+  enum ModifiedState { UNINITIALIZED, MODIFIED, UNMODIFIED };
+
   pqProxy(const QString& group, const QString& name,
     vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
   virtual ~pqProxy();
@@ -81,12 +85,12 @@ public:
   ///   Gets whether or not the source has been modified.
   /// \return
   ///   True if the source has been modified.
-  bool isModified() const {return this->Modified;}
+  ModifiedState modifiedState() const {return this->Modified;}
 
   /// \brief
   ///   Sets whether or not the source has been modified.
   /// \param modified True if the source has been modified.
-  void setModified(bool modified);
+  void setModifiedState(ModifiedState modified);
 
   /// Returns the hints for this proxy, if any. May returns NULL
   /// if no hints are defined.
@@ -143,15 +147,12 @@ protected:
   /// nameChanged() signal.
   void setSMName(const QString& new_name);
 
-private slots:
-  void onUpdateVTKObjects();
-
 private:
   pqServer *Server;           ///< Stores the parent server.
   QString SMName;
   QString SMGroup;
   pqProxyInternal* Internal;
-  bool Modified;
+  ModifiedState Modified;
 };
 
 #endif

@@ -191,7 +191,6 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 {
   this->setObjectName("objectInspector");
 
-  this->ForceModified = false;
   this->CurrentPanel = 0;
 
   // get custom panels
@@ -275,13 +274,6 @@ pqObjectInspectorWidget::~pqObjectInspectorWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqObjectInspectorWidget::forceModified(bool status)
-{
-  this->ForceModified = status;
-  this->canAccept(status);
-}
-
-//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::setAcceptEnabled()
 {
   this->canAccept(true);
@@ -291,7 +283,14 @@ void pqObjectInspectorWidget::setAcceptEnabled()
 void pqObjectInspectorWidget::canAccept(bool status)
 {
   this->AcceptButton->setEnabled(status);
-  this->ResetButton->setEnabled(status);
+  bool resetStatus = status;
+  if(resetStatus && this->CurrentPanel &&
+     this->CurrentPanel->referenceProxy()->modifiedState() ==
+     pqProxy::UNINITIALIZED)
+    {
+    resetStatus = false;
+    }
+  this->ResetButton->setEnabled(resetStatus);
 }
 
 //-----------------------------------------------------------------------------
@@ -425,6 +424,12 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   this->updateDeleteButtonState();
 
   this->PanelStore[proxy] = this->CurrentPanel;
+
+  if(this->CurrentPanel->referenceProxy()->modifiedState() ==
+    pqProxy::UNINITIALIZED)
+    {
+    this->canAccept(true);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -447,7 +452,6 @@ void pqObjectInspectorWidget::accept()
   
   this->QueuedPanels.clear();
   
-  this->ForceModified = false;
   emit this->postaccept();
   
   // Essential to render all views.
@@ -473,11 +477,6 @@ void pqObjectInspectorWidget::reset()
     this->CurrentPanel->reset();
     }
 
-  if (this->ForceModified)
-    {
-    this->forceModified(true);
-    }
-  
   emit this->postreject();
   
   this->canAccept(false);
