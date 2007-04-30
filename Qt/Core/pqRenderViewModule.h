@@ -196,18 +196,9 @@ public slots:
   virtual void redo();
 
 private slots:
-  // Called on start/end interaction.
-  void startInteraction();
-  void endInteraction();
-
   // Called when vtkSMRenderModuleProxy fires
   // ResetCameraEvent.
   void onResetCameraEvent();
-
-  /// Called when the "InteractorStyle" property on the render module
-  /// proxy changes. We set up the observers on the new interactor
-  /// style to know about interaction events.
-  void onInteractorStyleChanged();
 
   /// Setups up RenderModule and QVTKWidget binding.
   /// This method is called for all pqRenderViewModule objects irrespective

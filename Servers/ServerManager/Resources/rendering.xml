@@ -1857,6 +1857,7 @@
         </Proxy>
         <ExposedProperties>
           <Property name="InteractorStyle" />
+          <Property name="CenterOfRotation" />
         </ExposedProperties>
         <!-- TODO: we may expose the InteractorRender property and 
         GUI call call that property instead on iren->Render() -->
@@ -2108,17 +2109,17 @@
           <Group  name="interactorstyles" />
         </ProxyGroupDomain>
       </ProxyProperty>
-    </Proxy>
-  </ProxyGroup>
-
-  <ProxyGroup name="interactorstyles">
-    <Proxy name="InteractorStyle" class="vtkPVInteractorStyle">
       <DoubleVectorProperty
         name="CenterOfRotation"
         command="SetCenterOfRotation"
         number_of_elements="3"
         default_values="0 0 0">
       </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="interactorstyles">
+    <Proxy name="InteractorStyle" class="vtkPVInteractorStyle">
       <ProxyProperty
         name="CameraManipulators"
         command="AddManipulator">
