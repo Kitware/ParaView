@@ -218,8 +218,13 @@ void pqProxyPanel::setRenderModule(pqRenderViewModule* rm)
 //-----------------------------------------------------------------------------
 void pqProxyPanel::setModified()
 {
-  this->Implementation->ReferenceProxy->setModifiedState(pqProxy::MODIFIED);
-  emit this->modified();
+  // don't change from UNINITIALIZED to MODIFIED
+  pqProxy* refProxy = this->referenceProxy();
+  if(refProxy->modifiedState() != pqProxy::UNINITIALIZED)
+    {
+    this->Implementation->ReferenceProxy->setModifiedState(pqProxy::MODIFIED);
+    emit this->modified();
+    }
 }
 
 //-----------------------------------------------------------------------------
