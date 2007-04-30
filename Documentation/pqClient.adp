@@ -41,6 +41,7 @@
     <keyword ref="Documentation/Animation.html">Animation</keyword>
   </section>
   <section ref="Documentation/Views.html" title="Views"/>
+  <section ref="Documentation/ElementInspector.html" title="Element Inspector"/>
   <section ref="Documentation/ParaViewReaders.html" title="Readers"/>
   <section ref="Documentation/ParaViewSources.html" title="Sources"/>
   <section ref="Documentation/ParaViewFilters.html" title="Filters"/>

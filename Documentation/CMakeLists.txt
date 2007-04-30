@@ -20,6 +20,8 @@ set(PARAVIEW_HTML_DOCUMENTATION
   DisplayStyle.png
   DisplayTransformation.png
   DisplayView.png
+  ElementInspector.html
+  ElementInspector.png
   Exponential.png
   HistogramDisplayTab.png
   HistogramView.png
