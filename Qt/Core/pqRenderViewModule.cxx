@@ -281,6 +281,7 @@ void pqRenderViewModule::setDefaultPropertyValues()
 
   this->restoreSettings();
   this->resetCamera();
+  this->clearUndoStack();
 }
 
 //-----------------------------------------------------------------------------
