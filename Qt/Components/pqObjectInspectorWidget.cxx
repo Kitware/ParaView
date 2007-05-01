@@ -70,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqThresholdPanel.h"
 #include "pqUndoStack.h"
 #include "pqXDMFPanel.h"
+#include "pqExodusIIPanel.h"
 
 class pqStandardCustomPanels : public QObject, public pqObjectPanelInterface
 {
@@ -135,6 +136,10 @@ public:
         {
         return new pqExodusPanel(proxy, p);
         }
+      if(QString("ExodusIIReader") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqExodusIIPanel(proxy, p);
+        }
       if(QString("XdmfReader") == proxy->getProxy()->GetXMLName())
         {
         return new pqXDMFPanel(proxy, p);
@@ -164,6 +169,7 @@ public:
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
       {
       if(QString("ExodusReader") == proxy->getProxy()->GetXMLName() ||
+         QString("ExodusIIReader") == proxy->getProxy()->GetXMLName() ||
          QString("XdmfReader") == proxy->getProxy()->GetXMLName())
         {
         return true;

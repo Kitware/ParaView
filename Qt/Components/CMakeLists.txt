@@ -76,6 +76,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqEnterIdsDialog.h
   pqEnterPointsDialog.h
   pqEnterThresholdsDialog.h
+  pqExodusIIPanel.h
   pqExodusPanel.h
   pqExtractSelectionPanel.h
   pqFileChooserWidget.h
@@ -179,6 +180,7 @@ SET(UI_FORMS
   Resources/UI/pqEnterIdsDialog.ui
   Resources/UI/pqEnterPointsDialog.ui
   Resources/UI/pqEnterThresholdsDialog.ui
+  Resources/UI/pqExodusIIPanel.ui
   Resources/UI/pqExodusPanel.ui
   Resources/UI/pqExtractSelectionPanel.ui
   Resources/UI/pqHandleWidget.ui
@@ -343,6 +345,8 @@ ADD_LIBRARY(pqComponents
   pqEnterPointsDialog.h
   pqEnterThresholdsDialog.cxx
   pqEnterThresholdsDialog.h
+  pqExodusIIPanel.cxx
+  pqExodusIIPanel.h
   pqExodusPanel.cxx
   pqExodusPanel.h
   pqExtractSelectionPanel.cxx
