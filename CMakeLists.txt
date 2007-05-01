@@ -251,9 +251,8 @@ EXPORT_LIBRARY_DEPENDENCIES(${PARAVIEW_LIBRARY_DEPENDS_FILE})
 
 # Perform configuration.
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
-               ${ParaView_BINARY_DIR}/ParaViewConfig.cmake @ONLY IMMEDIATE)
-               
-               ADD_SUBDIRECTORY(Plugins)
+  ${ParaView_BINARY_DIR}/ParaViewConfig.cmake @ONLY IMMEDIATE)
+ADD_SUBDIRECTORY(Plugins)
 
 # Mark certain VTK variables as advanced. Users do not really have to set these.
 IF (APPLE)
