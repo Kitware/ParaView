@@ -1547,25 +1547,23 @@ void pqMainWindowCore::onLoadToolbarLookmark(QAction *action)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onLoadLookmark(const QString &name)
 {
+  // If no sources are selected, the lookmark has multiple inputs,
+  //    or there are more selected sources than the lookmark has inputs,
+  //    prompt the user to specify which source(s) to use.
+  // Otherwise apply the lookmark to the selected source(s)
+
   pqApplicationCore* core = pqApplicationCore::instance();
+  const pqServerManagerSelection *selections =
+    core->getSelectionModel()->selectedItems();
 
-  // Construct a list of the sources at the head of the exisitng pipeline(s).
+  // Construct a list of the sources 
 
-  // First find the ones in the pipeline belonging to the "active" source:
-  pqPipelineSource *activeSource = this->getActiveSource();
   QList<pqPipelineSource*> sources;
-  if (activeSource)
+  pqPipelineSource *src;
+  for (int i=0; i<selections->size(); i++)
     {
-    this->getRootSources(&sources,activeSource);
-    }
-
-  // Next, iterate over all sources in the server manager model and if it is a 
-  // source with no inputs and has not been added, add to list
-  pqServerManagerModel *model = core->getServerManagerModel();
-  for (unsigned int i=0; i<model->getNumberOfSources(); i++)
-    {
-    pqPipelineSource *src = model->getPQSource(i);
-    if(!dynamic_cast<pqPipelineFilter*>(src) && !sources.contains(src))
+    pqServerManagerModelItem *item = selections->at(i);
+    if( (src = dynamic_cast<pqPipelineSource*>(item)) )
       {
       sources.push_back(src);
       }

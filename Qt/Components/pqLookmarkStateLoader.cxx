@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMCompoundProxy.h"
 
 #include <QPointer>
 #include <QList>
@@ -65,12 +66,15 @@ public:
   bool RestoreCamera;
   bool RestoreTime;
   pqTimeKeeper *TimeKeeper;
+  vtkPVXMLElement *RootElement;
+  QStringList IdsOfProxyElementsToIgnore;
+  bool SourceProxyCollectionLoaded;
 };
 
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.9");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.10");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -82,6 +86,7 @@ pqLookmarkStateLoader::pqLookmarkStateLoader()
   this->Internal->RestoreCamera = false;
   this->Internal->RestoreTime = false;
   this->Internal->TimeKeeper = 0;
+  this->Internal->SourceProxyCollectionLoaded = false;
 
   pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
   this->Internal->PipelineModel = new pqPipelineModel(*model);
@@ -150,28 +155,16 @@ void pqLookmarkStateLoader::AddChildItems(vtkPVXMLElement *elem, QStandardItem *
   for(unsigned int i=0; i<elem->GetNumberOfNestedElements(); i++)
     {
     vtkPVXMLElement *childElem = elem->GetNestedElement(i);
-    // determine icon type:
-/*
-    QIcon icon = QIcon();
-    if(strcmp(childElem->GetName(),"Server")==0)
-      {
-      icon.addFile(":/pqWidgets/Icons/pqServer16.png");
-      }
-    if(strcmp(childElem->GetName(),"Source")==0)
-      {
-      icon.addFile(":/pqWidgets/Icons/pqSource16.png");
-      }
-    if(strcmp(childElem->GetName(),"Filter")==0)
-      {
-      icon.addFile(":/pqWidgets/Icons/pqFilter16.png");
-      }
-*/
-    QStandardItem *childItem = new QStandardItem(QIcon(":/pqWidgets/Icons/pqBundle32.png"),QString(childElem->GetAttribute("Name")));
+    QStandardItem *childItem = new QStandardItem(
+            QIcon(":/pqWidgets/Icons/pqBundle32.png"),
+            QString(childElem->GetAttribute("Name")));
     item->setChild(i,0,childItem);
+    // Store the model items of sources for later
     if(strcmp(childElem->GetName(),"Source")==0)
       {
       this->Internal->LookmarkSources.push_back(childItem);
       }
+    // recurse...
     this->AddChildItems(childElem,childItem);
     }
 }
@@ -188,80 +181,194 @@ int pqLookmarkStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_prox
     return 0;
     }
 
-  // Do we have enough open sources to accomodate this lookmark's state?
-  int numExistingSources = 0;
-  for(unsigned int i=0; i<model->getNumberOfSources(); i++)
-    {
-    if(!dynamic_cast<pqPipelineFilter*>(model->getPQSource(i)))
-      {
-      numExistingSources++;
-      }
-    }
+  this->Internal->RootElement = rootElement;
 
-  if(numExistingSources<this->Internal->NumberOfLookmarkSources)
+  // Do we have enough open sources to accomodate this lookmark's state?
+  int numSources = model->getNumberOfSources();
+  if(numSources<this->Internal->NumberOfLookmarkSources)
     {
     QMessageBox::warning(NULL, "Error Loading Lookmark",
-          "There are not enough existing readers or sources in the pipeline to accomodate this lookmark.");
+       "There are not enough existing sources or filters in the pipeline to accomodate this lookmark.");
     return 0;
     }
 
-  return this->Superclass::LoadState(rootElement, keep_proxies);
+  return this->Superclass::LoadState(rootElement,keep_proxies);
+}
+
+
+//---------------------------------------------------------------------------
+int pqLookmarkStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
+{
+  const char* groupName = collectionElement->GetAttribute("name");
+  if (strcmp(groupName,"sources")!=0 && !this->Internal->SourceProxyCollectionLoaded)
+    {
+    unsigned int numElems = this->Internal->RootElement->GetNumberOfNestedElements();
+    unsigned int i;
+    for (i=0; i<numElems; i++)
+      {
+      vtkPVXMLElement* currentElement = this->Internal->RootElement->GetNestedElement(i);
+      const char* name = currentElement->GetName();
+      const char* type = currentElement->GetAttribute("name");
+      if (name && type)
+        {
+        if (strcmp(name, "ProxyCollection") == 0 && strcmp(type, "sources") == 0)
+          {
+          this->HandleProxyCollection(currentElement);
+          break;
+          }
+        }
+      }
+    }
+  else if (strcmp(groupName,"sources")==0)
+    {
+    QString srcName;
+    vtkPVXMLElement *newCollectionElement = vtkPVXMLElement::New();
+    newCollectionElement->SetAttribute("name",groupName);
+    for(int j=0; j<this->Internal->LookmarkSources.count(); j++)
+      {
+      srcName = this->Internal->LookmarkSources[j]->text();
+      unsigned int numElems = collectionElement->GetNumberOfNestedElements();
+      for (unsigned int i=0; i<numElems; i++)
+        {
+        vtkPVXMLElement* currentElement = collectionElement->GetNestedElement(i);
+        if (currentElement->GetName() &&
+            strcmp(currentElement->GetName(), "Item") == 0 &&
+            srcName == QString(currentElement->GetAttribute("name")))
+          {
+          newCollectionElement->AddNestedElement(currentElement);
+          }
+        }
+      }
+    int ret = this->Superclass::HandleProxyCollection(newCollectionElement);
+    newCollectionElement->Delete();
+    this->Internal->SourceProxyCollectionLoaded = true;
+    return ret;
+    }
+
+  return this->Superclass::HandleProxyCollection(collectionElement);
+}
+
+
+//---------------------------------------------------------------------------
+vtkSMProxy* pqLookmarkStateLoader::NewProxyFromElement(
+  vtkPVXMLElement* proxyElement, int id)
+{
+  if(!proxyElement)
+    {
+    return 0;
+    }
+
+  vtkSMProxy* proxy = 0;
+
+  if( (proxy = this->GetCreatedProxy(id)) )
+    {
+    proxy->Register(this);
+    return proxy;
+    }
+
+  if (strcmp(proxyElement->GetName(), "Proxy") == 0)
+    {
+    const char* group = proxyElement->GetAttribute("group");
+    const char* type = proxyElement->GetAttribute("type");
+    if (!type || !group)
+      {
+      vtkErrorMacro("Could not create proxy from element.");
+      return 0;
+      }
+    if(strcmp(group,"sources")==0)
+      {
+      this->Internal->IdsOfProxyElementsToIgnore.push_back(
+            QString(proxyElement->GetAttribute("id")));
+
+      // Find the display in the state that has this source as an input and store for later
+      // so we can ignore it when its state is being loaded
+      for (unsigned int i=0; i<this->Internal->RootElement->GetNumberOfNestedElements(); i++)
+        {
+        vtkPVXMLElement* currentElement = 
+            this->Internal->RootElement->GetNestedElement(i);
+        const char* name = currentElement->GetName();
+        const char* type = currentElement->GetAttribute("group");
+        if (name && type)
+          {
+          if (strcmp(name, "Proxy") == 0 && strcmp(type, "displays") == 0)
+            {
+            for (unsigned int j=0; j<currentElement->GetNumberOfNestedElements(); j++)
+              {
+              vtkPVXMLElement* inputElement = currentElement->GetNestedElement(j);
+              name = inputElement->GetName();
+              type = inputElement->GetAttribute("name");
+              if (name && type)
+                {
+                if (strcmp(name, "Property") == 0 && strcmp(type, "Input") == 0)
+                  {
+                  vtkPVXMLElement *srcElem = inputElement->FindNestedElementByName("Proxy");
+                  if(QString::number(id) == QString(srcElem->GetAttribute("value")))
+                    {
+                    this->Internal->IdsOfProxyElementsToIgnore.push_back(
+                          QString(currentElement->GetAttribute("id")));
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  return this->Superclass::NewProxyFromElement(proxyElement, id);
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqLookmarkStateLoader::NewProxyInternal(
   const char* xml_group, const char* xml_name)
 {
-  if(!xml_group || !xml_name || strcmp(xml_group, "sources")!=0)
+  if(xml_group && xml_name && (strcmp(xml_group, "sources")==0) )
     {
-    // let superclass handle it
-    return this->Superclass::NewProxyInternal(xml_group, xml_name);
-    }
-
-  // If this lookmark has one source, use the first item in the preferred source list, if any
-  if(this->Internal->NumberOfLookmarkSources==1 && this->Internal->PreferredSources->size()>=1)
-    {
-    vtkSMProxy *proxy = this->Internal->PreferredSources->at(0)->getProxy();
-    proxy->Register(this);
-    return proxy;
-    }
-
-  // If it has multiple sources, prompt user
-  pqLookmarkSourceDialog *srcDialog = new pqLookmarkSourceDialog(this->Internal->LookmarkPipelineModel,this->Internal->PipelineModel);
-  srcDialog->setLookmarkSource(this->Internal->LookmarkSources.takeFirst());
-  if(srcDialog->exec() == QDialog::Accepted)
-    {
-    // return the source the user selected to use for this proxy
-    pqPipelineSource *src = srcDialog->getSelectedSource();
-    if(src)
+    // If this lookmark has one source and our collection of 
+    //  selected sources has only one, use it
+    if(this->Internal->NumberOfLookmarkSources==1 && 
+        this->Internal->PreferredSources->size()==1)
       {
-    //  this->Internal->Sources->removeAll(src);
-      //this->Internal->PipelineModel->removeSource(src);
-      vtkSMProxy *proxy = src->getProxy();
+      vtkSMProxy *proxy = this->Internal->PreferredSources->at(0)->getProxy();
       proxy->Register(this);
       return proxy;
       }
-    }
-  delete srcDialog;
 
-  return 0;
+    // If the lookmark has multiple sources 
+    //  OR there are more selections than lookmark inputs 
+    //  OR there are no selections
+    //  prompt the user.
+    pqLookmarkSourceDialog *srcDialog = new pqLookmarkSourceDialog(
+      this->Internal->LookmarkPipelineModel,this->Internal->PipelineModel);
+    srcDialog->setLookmarkSource(this->Internal->LookmarkSources.takeFirst());
+    if(srcDialog->exec() == QDialog::Accepted)
+      {
+      // return the source the user selected to use for this proxy
+      pqPipelineSource *src = srcDialog->getSelectedSource();
+      if(src)
+        {
+        vtkSMProxy *proxy = src->getProxy();
+        proxy->Register(this);
+        return proxy;
+        }
+      }
+    }
+
+  return this->Superclass::NewProxyInternal(xml_group, xml_name);
 }
 
 
 //---------------------------------------------------------------------------
-void pqLookmarkStateLoader::RegisterProxyInternal(const char* group,
-  const char* name, vtkSMProxy* proxy)
+void pqLookmarkStateLoader::RegisterProxy(int id, vtkSMProxy* proxy)
 {
-  if (proxy->GetXMLGroup() && strcmp(proxy->GetXMLGroup(), "sources")==0 )
+  // Don't register a proxy that we are going to ignore later
+  if(this->Internal->IdsOfProxyElementsToIgnore.contains(QString::number(id)))
     {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    if (pxm->GetProxyName(group, proxy))
-      {
-      // source is registered, don't re-register it.
-      return;
-      }
+    return;
     }
-  this->Superclass::RegisterProxyInternal(group, name, proxy);
+
+  return this->Superclass::RegisterProxy(id, proxy);
 }
 
 
@@ -269,6 +376,7 @@ void pqLookmarkStateLoader::RegisterProxyInternal(const char* group,
 void pqLookmarkStateLoader::HandleCompoundProxyDefinitions(
   vtkPVXMLElement* vtkNotUsed(element))
 {
+  // Compound proxy states are not loaded by a lookmark
   return;
 }
 
@@ -276,12 +384,15 @@ void pqLookmarkStateLoader::HandleCompoundProxyDefinitions(
 int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement, 
   vtkSMProxy* proxy)
 {
-  if (strcmp(proxy->GetXMLGroup(), "sources")==0 )
+  // Remove all elements of a source/reader's XML unless its a 
+  // PointArrayStatus or CellArrayStatus property. But these 
+  // should only be turned on, not off (so as not to affect other 
+  // views this source is displayed in).
+  if (strcmp(proxyElement->GetName(), "Proxy")==0 && 
+      strcmp(proxyElement->GetAttribute("group"), "sources")==0 )
     {
-    // remove properties whose name contains the string "FileName"
-    // properties named pointarraystatus or cellarraystatus should only be turned on, not off
+    QList<vtkPVXMLElement*> elementsToRemove;
     QList<vtkPVXMLElement*> arrayElementsToRemove;
-    QList<vtkPVXMLElement*> fileElementsToRemove;
     QList<vtkPVXMLElement*>::iterator iter;
     unsigned int max = proxyElement->GetNumberOfNestedElements();
     QString name;
@@ -289,18 +400,15 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       {
       vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
       name = element->GetAttribute("name");
-      if (element->GetName() == QString("Property") && name.contains("File"))
-        {
-        fileElementsToRemove.push_back(element);
-        }
-      else if (element->GetName() == QString("Property") &&
+      if (element->GetName() == QString("Property") &&
          ( name.contains("PointArrayStatus") || name.contains("CellArrayStatus")))
         {
         arrayElementsToRemove.clear();
         for(unsigned int cc1=0; cc1<element->GetNumberOfNestedElements(); cc1++)
           {
           vtkPVXMLElement *valueElement = element->GetNestedElement(cc1);
-          if(valueElement->GetName() == QString("Element") && strcmp(valueElement->GetAttribute("value"),"0")==0 )
+          if(valueElement->GetName() == QString("Element") && 
+              strcmp(valueElement->GetAttribute("value"),"0")==0 )
             {
             arrayElementsToRemove.push_back(valueElement);
             }
@@ -310,18 +418,47 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
           element->RemoveNestedElement(*iter);
           }
         }
+      else
+        {
+        elementsToRemove.push_back(element);
+        }
       }
 
-    for(iter=fileElementsToRemove.begin(); iter!=fileElementsToRemove.end(); iter++)
+    for(iter=elementsToRemove.begin(); iter!=elementsToRemove.end(); iter++)
       {
       proxyElement->RemoveNestedElement(*iter);
       }
+
+    // if a filter is being used in place of a source, find the filter's reader
+    //    and use its proxy instead
+    if(strcmp(proxy->GetXMLGroup(),"filters")==0)
+      {
+      pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
+      for(unsigned int i=0; i<model->getNumberOfSources(); i++)
+        {
+        pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter*>(model->getPQSource(i));
+        if(filter && filter->getProxy()==proxy)
+          {
+          // move up the pipeline until we find a non-filter source
+          pqPipelineSource *src;
+          while(filter)
+            {
+            src = filter->getInput(0);
+            filter = dynamic_cast<pqPipelineFilter*>(src);
+            }
+          proxy = src->getProxy();
+          }
+        }
+      }
     }
-  else if (strcmp(proxy->GetXMLGroup(), "rendermodules")==0 )
+  else if (strcmp(proxyElement->GetName(), "Proxy")==0 && 
+      strcmp(proxyElement->GetAttribute("group"), "rendermodules")==0 )
     {
     unsigned int max = proxyElement->GetNumberOfNestedElements();
     QString name;
+    QString value;
     QList<vtkPVXMLElement*> toRemove;
+    QList<vtkPVXMLElement*> displaysToRemove;
     for (unsigned int cc=0; cc < max; ++cc)
       {
       vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
@@ -334,9 +471,34 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       else if (element->GetName() == QString("Property") &&
         element->GetAttribute("name") == QString("Displays"))
         {
-        element->SetAttribute("clear", "0");
         // This will ensure that when the state for Displays property is loaded
         // all already present displays won't be cleared.
+        element->SetAttribute("clear", "0");
+
+        // remove unused displays from the render module's displays proxyproperty
+        QStringList ids = this->Internal->IdsOfProxyElementsToIgnore;
+        displaysToRemove.clear();
+        for(int k=0;k<ids.size();k++)
+          {
+          for (unsigned int cc2=0; cc2 < element->GetNumberOfNestedElements(); ++cc2)
+            {
+            vtkPVXMLElement* childElem = element->GetNestedElement(cc2);
+            value = childElem->GetAttribute("value");
+            if (value==ids[k])
+              {
+              displaysToRemove.push_back(childElem);
+              }
+            }
+          }
+        int num = QString(element->GetAttribute("number_of_elements")).toInt();
+        num -= displaysToRemove.count();
+        element->SetAttribute("number_of_elements",QString::number(num).toAscii().data());
+
+        QList<vtkPVXMLElement*>::iterator iter;
+        for(iter=displaysToRemove.begin(); iter!=displaysToRemove.end(); iter++)
+          {
+          element->RemoveNestedElement(*iter);
+          }
         }
       else if (element->GetName() == QString("Property") &&
         element->GetAttribute("name") == QString("RenderWindowSize"))
@@ -360,13 +522,24 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
         }
       }
 
+    // Finally, remove those xml elements we flagged
     QList<vtkPVXMLElement*>::iterator iter;
     for(iter=toRemove.begin(); iter!=toRemove.end(); iter++)
       {
       proxyElement->RemoveNestedElement(*iter);
       }
     }
-
+  else if (strcmp(proxyElement->GetName(), "Proxy")==0 && 
+      strcmp(proxyElement->GetAttribute("group"), "displays")==0 )
+    {
+    // Ignore any displays that have been flagged (i.e. those that have a 
+    // non-filter as input)
+    QString id(proxyElement->GetAttribute("id"));
+    if(this->Internal->IdsOfProxyElementsToIgnore.contains(id))
+      {
+      return 1;
+      }
+    }
 
   return this->Superclass::LoadProxyState(proxyElement, proxy);
 }
