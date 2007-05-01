@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/Prism" >
+        <file>Icons/SplitViewHorizontal.png</file>
+        <file>Icons/SplitViewVertical.png</file>
+        <file>Icons/ClearAllViews.png</file>
+        <file>Icons/ClearViewFrame.png</file>
+        <file>Icons/QuaterView.png</file>
+        <file>Icons/SingleView.png</file>
+        <file>Icons/SnapshotView.png</file>
+        <file>Icons/SplitViewA.png</file>
+        <file>Icons/SplitViewB.png</file>
+        <file>Icons/CreateGeometryViewSmall.png</file>
+        <file>Icons/CreateGeometryView.png</file>
+        <file>Icons/CreateSESAMESmall.png</file>
+        <file>Icons/CreateSESAME.png</file>
+    </qresource>
+    <qresource prefix="/ParaViewResources" >
+        <file>PrismReader.xml</file>
+    </qresource>
+</RCC>

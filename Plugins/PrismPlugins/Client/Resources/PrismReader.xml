@@ -1,0 +1,6 @@
+<ParaViewReaders>
+  <Reader name="PrismSurfaceFilter"
+          extensions=".dat"
+          file_description="Prism SESAME file reader">
+  </Reader>
+</ParaViewReaders>

@@ -1,0 +1,106 @@
+<ServerManagerConfiguration>
+ <ProxyGroup name="filters">
+   <SourceProxy name="PrismGeometryFilter" class="vtkPrismGeometryFilter"
+     label="Prism Geometry Filter">
+     <Documentation
+        long_help="Creates points for each cell in geometry."
+        short_help="Creates points for each cell in geometry.">
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="cell"/>
+           <FixedTypeDomain name="fixed_type"/>
+      </InputProperty>
+
+     <IntVectorProperty 
+        name="TableConversion" 
+        command="SetTable" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="None"/>
+         <Entry value="602" text="602: Electrical Conductivity"/>
+         <Entry value="301" text="301: Total EOS"/>
+         <Entry value="304" text="304: Electron EOS"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <StringVectorProperty 
+        name="XAxisVariableName" 
+        command="SetXAxisVarName"
+          number_of_elements="1"
+          element_types="2">
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
+     <StringVectorProperty 
+        name="YAxisVariableName" 
+        command="SetYAxisVarName"
+          number_of_elements="1"
+          element_types="2">
+           <ArrayListDomain name="aray_list" attribute_type="Scalars">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
+     <StringVectorProperty 
+        name="ZAxisVariableName" 
+        command="SetZAxisVarName"
+          number_of_elements="1"
+          element_types="2">
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
+   <!-- End PrismGeometryFilter -->
+   </SourceProxy>
+ </ProxyGroup>
+ <ProxyGroup name="sources">
+   <SourceProxy name="PrismSurfaceFilter"
+                class="vtkPrismSurfaceFilter">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+     </StringVectorProperty>
+     <IntVectorProperty
+         name="TableId"
+         command="SetTable"
+         number_of_elements="1"
+         default_values="-1">
+         <EnumerationDomain name="enum">
+           <RequiredProperties>
+             <Property name="TableIds" function="Enumeration"/>
+          </RequiredProperties>
+         </EnumerationDomain>
+     </IntVectorProperty>
+     <IntVectorProperty
+         name="TableIds"
+         command="GetTableIdsAsArray"
+         information_only="1">
+         <IntArrayInformationHelper />
+     </IntVectorProperty>
+     <StringVectorProperty
+         name="TableArrayInfo"
+         information_only="1">
+         <ArraySelectionInformationHelper attribute_name="Table"/>
+     </StringVectorProperty>
+     <!-- End PrismSurface -->
+    </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>
