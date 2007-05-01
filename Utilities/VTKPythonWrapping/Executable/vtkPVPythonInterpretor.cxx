@@ -136,7 +136,6 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
         break;
         }
       }
-
     // This executable does not actually link to the python wrapper
     // libraries, though it probably should now that the stub-modules
     // are separated from them.  Since it does not we have to make
@@ -170,6 +169,7 @@ class vtkPVPythonInterpretorInternal
 {
 public:
   PyThreadState* Interpretor;
+  static PyThreadState *MainThreadState;
 
   vtkPVPythonInterpretorInternal()
     {
@@ -181,8 +181,12 @@ public:
       {
       this->MakeCurrent();
       Py_EndInterpreter(this->Interpretor);
+      if (this->Interpretor == this->MainThreadState)
+        {
+        this->MainThreadState = 0;
+        }
+      PyThreadState_Swap(this->MainThreadState);
       this->Interpretor= 0;
-      this->MakeCurrent();
       }
     }
   void MakeCurrent()
@@ -193,7 +197,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.11.4.2");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.11.4.3");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -251,6 +255,7 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
     // full path.
     Py_SetProgramName(argv[0]);
     Py_Initialize();
+    this->Internal->MainThreadState = PyThreadState_Get();
 #ifdef SIGINT
     signal(SIGINT, SIG_DFL);
 #endif
@@ -262,6 +267,8 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
   return 1;
 }
 
+PyThreadState* vtkPVPythonInterpretorInternal::MainThreadState = NULL;
+
 //-----------------------------------------------------------------------------
 int vtkPVPythonInterpretor::PyMain(int argc, char** argv)
 {
@@ -271,7 +278,7 @@ int vtkPVPythonInterpretor::PyMain(int argc, char** argv)
 
   // Initialize interpreter.
   Py_Initialize();
-
+  this->Internal->MainThreadState = PyThreadState_Get();
   this->InitializeInternal();
   return Py_Main(argc, argv);
 }
@@ -292,6 +299,15 @@ void vtkPVPythonInterpretor::RunSimpleString(const char* const script)
   
   // The cast is necessary because PyRun_SimpleString() hasn't always been const-correct
   PyRun_SimpleString(const_cast<char*>(buffer.c_str()));
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::ReleaseControl()
+{
+  if (this->Internal)
+    {
+    PyThreadState_Swap(this->Internal->MainThreadState);
+    }
 }
 
 //-----------------------------------------------------------------------------

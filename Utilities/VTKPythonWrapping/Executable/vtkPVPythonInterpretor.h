@@ -54,6 +54,11 @@ public:
   //some pesky details with DOS line endings. */
   void RunSimpleString(const char* const script);
 
+  // Description:
+  // Call in a subinterpretter to pause it and return control to the 
+  //main interpretor.
+  void ReleaseControl();
+
 protected:
   vtkPVPythonInterpretor();
   ~vtkPVPythonInterpretor();
@@ -64,6 +69,7 @@ protected:
 
   char* ExecutablePath;
   vtkSetStringMacro(ExecutablePath);
+
 private:
   vtkPVPythonInterpretor(const vtkPVPythonInterpretor&); // Not implemented.
   void operator=(const vtkPVPythonInterpretor&); // Not implemented.
