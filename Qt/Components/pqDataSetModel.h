@@ -70,11 +70,18 @@ public:
 
   void setFieldDataType(FieldDataType type);
   FieldDataType fieldDataType() const { return Type; }
+
+  /// When set vtkOriginalCellIds will be shown as "Cell Ids" while
+  /// vtkOriginalPointIds will be shown as "Point Ids".
+  void setSubstitutePointCellIdNames(bool val)
+    { this->SubstitutePointCellIdNames=val;}
 private:
   vtkDataSet* DataSet;
   FieldDataType Type;
 
   vtkFieldData* getFieldData() const;
+
+  bool SubstitutePointCellIdNames;
 };
 
 #endif //_pqDataSetModel_h
