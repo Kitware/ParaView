@@ -61,13 +61,13 @@ pqPipelineSource* PrismToolBarActions::createFilterForActiveSource(
   // Get the list of selected sources.
   pqApplicationCore* core = pqApplicationCore::instance();
  pqObjectBuilder* builder = core->getObjectBuilder();
-   pqServerManagerSelection selected =
+   pqServerManagerSelection sels =
       *core->getSelectionModel()->selectedItems();
   pqPipelineSource* source = 0;
   pqPipelineSource* filter = 0;
   pqServerManagerModelItem* item = 0;
-  pqServerManagerSelection::ConstIterator iter = selected.begin();
-  if(iter != selected.end())
+  pqServerManagerSelection::ConstIterator iter = sels.begin();
+  if(iter != sels.end())
     {
     item = *iter;
     source = dynamic_cast<pqPipelineSource*>(item);
@@ -75,7 +75,7 @@ pqPipelineSource* PrismToolBarActions::createFilterForActiveSource(
     ++iter;
     }
 
-  for( ; filter && iter != selected.end(); ++iter)
+  for( ; filter && iter != sels.end(); ++iter)
     {
     item = *iter;
     source = dynamic_cast<pqPipelineSource*>(item);
@@ -125,12 +125,12 @@ pqServerManagerModelItem *PrismToolBarActions::getActiveObject() const
   pqServerManagerModelItem *item = 0;
   pqServerManagerSelectionModel *selection =
       pqApplicationCore::instance()->getSelectionModel();
-  const pqServerManagerSelection *selected = selection->selectedItems();
-  if(selected->size() == 1)
+  const pqServerManagerSelection *sels = selection->selectedItems();
+  if(sels->size() == 1)
     {
-    item = selected->first();
+    item = sels->first();
     }
-  else if(selected->size() > 1)
+  else if(sels->size() > 1)
     {
     item = selection->currentItem();
     if(item && !selection->isSelected(item))
