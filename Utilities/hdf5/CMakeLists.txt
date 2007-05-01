@@ -34,9 +34,29 @@ ENDIF(NOT HDF5_ZLIB_HEADER)
 CONFIGURE_FILE(${VTKHDF5_SOURCE_DIR}/hdf5_zlib.h.in
   ${VTKHDF5_BINARY_DIR}/hdf5_zlib.h)
 
-IF(CMAKE_C_FLAGS MATCHES "/W4")
-  STRING(REGEX REPLACE "/W4" "/W3" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
-ENDIF(CMAKE_C_FLAGS MATCHES "/W4")
+# Block warnings unless we are instructed to allow them.
+# SET(HDF5_WARNINGS_ALLOW 1)
+IF(NOT HDF5_WARNINGS_ALLOW)
+  # MSVC uses /w to suppress warnings.  It also complains if another
+  # warning level is given, so remove it.
+  IF(MSVC)
+    SET(HDF5_WARNINGS_BLOCKED 1)
+    STRING(REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " "
+      CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
+  ENDIF(MSVC)
+
+  # Borland uses -w- to suppress warnings.
+  IF(BORLAND)
+    SET(HDF5_WARNINGS_BLOCKED 1)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w-")
+  ENDIF(BORLAND)
+
+  # Most compilers use -w to suppress warnings.
+  IF(NOT HDF5_WARNINGS_BLOCKED)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+  ENDIF(NOT HDF5_WARNINGS_BLOCKED)
+ENDIF(NOT HDF5_WARNINGS_ALLOW)
 
 SET(PACKAGE_VERSION "\"1.6.5\"")
 SET(PACKAGE_TARNAME "\"hdf5\"")
