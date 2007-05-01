@@ -43,6 +43,7 @@ pqDataSetModel::pqDataSetModel(QObject* p)
   : QAbstractTableModel(p), DataSet(0)
 {
   this->Type = pqDataSetModel::CELL_DATA_FIELD;
+  this->SubstitutePointCellIdNames = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -178,7 +179,24 @@ QVariant pqDataSetModel::headerData(int section, Qt::Orientation orientation, in
       {
       vtkFieldData* fd = this->getFieldData();
       vtkDataArray* array = fd?  fd->GetArray(section) : 0;
-      return array? array->GetName() : QVariant();
+      QVariant arrayname = array? array->GetName() : QVariant();
+      if (arrayname.toString() == "vtkOriginalProcessIds")
+        {
+        arrayname = "Process ID";
+        }
+      else if (this->SubstitutePointCellIdNames)
+        {
+        if (arrayname.toString() == "vtkOriginalPointIds")
+          {
+          arrayname = "Point ID";
+          }
+
+        else if (arrayname.toString() == "vtkOriginalCellIds")
+          {
+          arrayname = "Cell ID";
+          }
+        }
+      return arrayname;
       }
     }
 
