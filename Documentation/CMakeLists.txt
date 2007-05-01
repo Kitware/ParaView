@@ -1,5 +1,6 @@
 set(PARAVIEW_HTML_DOCUMENTATION
   3DView.png
+  3DViewTitleBarButtons.png
   AfterSwapViews.png
   Animation.html
   AnimationInspector.png
@@ -13,6 +14,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   ColorLegendToolbarButton.png
   ColorOpacityEditor.png
   ColorScalePresets.png
+  CreateLookmarkDialog.png
   CreateViewButtons.png
   Display.html
   DisplayColorByArray.png
@@ -28,7 +30,10 @@ set(PARAVIEW_HTML_DOCUMENTATION
   index.html
   Information.html
   InformationTab.png
+  LookmarkBrowser.png
   LookmarkButton.png
+  LookmarkInspector.png
+  Lookmarks.html
   MaximizeViewButton.png
   ObjectInspector.html
   ParaViewDoc.css
@@ -39,12 +44,14 @@ set(PARAVIEW_HTML_DOCUMENTATION
   Properties.html
   PropertiesButtons.png
   Ramp.png
+  RedoCameraButton.png
   RestoreViewButton.png
   RightClickFilter.png
   Sinusoidal.png
   SplitViewHorizontalButton.png
   SplitViewVerticalButton.png
   Step.png
+  UndoCameraButton.png
   VCRBack.png
   VCRFirst.png
   VCRForward.png
