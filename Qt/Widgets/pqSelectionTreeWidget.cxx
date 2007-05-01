@@ -224,7 +224,9 @@ void pqSelectionTreeWidget::doToggle(int column)
 QSize pqSelectionTreeWidget::sizeHint() const
 {
   // lets show X items before we get a scrollbar
-  int maxItemHint = 6;
+  // probably want to make this a member variable
+  // that a caller has access to
+  int maxItemHint = 10;
   // for no items, let's give a space of X pixels
   int minItemHeight = 16;
 
