@@ -368,7 +368,7 @@ FOREACH(gcf ${GUI_CONFIG_FILES})
     DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
     COMMAND ${DOCUMENTATION_EXE}
     ARGS ${ParaView_BINARY_DIR}/Documentation ${fullXMLFile}
-    COMMENT Creating Documentation
+    COMMENT "Creating Documentation for ${gcf}"
     )
 
   SET(HTML_RESULTS ${HTML_RESULTS} ${fullHTMLFile})
